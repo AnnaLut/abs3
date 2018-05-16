@@ -24,9 +24,11 @@ is
     --                        BPK_ACC     <-> BPK_ACC_UPDATE
     -- version 1.1 10.05.2018 (Kharin) Добавлены функции для таблиц:
     --                        BPK_PARAMETERS  <-> BPK_PARAMETERS_UPDATE
+    -- version 1.2 16.05.2018 (Kharin) Добавлены функции для таблиц:
+    --                        CC_DEAL  <-> CC_DEAL_UPDATE
     -----------------------------------------------------------------
 
-    G_HEADER_VERSION      constant varchar2(64)  := 'version 1.1 10.05.2018';
+    G_HEADER_VERSION      constant varchar2(64)  := 'version 1.2 16.05.2018';
 
     ----------------------------------------------------------------
     -- HEADER_VERSION()
@@ -48,6 +50,12 @@ is
     --------------------------------------------------------------------------------------------------------------------
     procedure CHECK_ACCOUNTS_UPDATE;                                                    --9001
     procedure SYNC_ACCOUNTS_UPDATE( p_id out number, p_rowcount out number);            --9101
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- CC_DEAL_UPDATE
+    --------------------------------------------------------------------------------------------------------------------
+    procedure CHECK_CC_DEAL_UPDATE;
+    procedure SYNC_CC_DEAL_UPDATE( p_id out number, p_rowcount out number);
 
     --------------------------------------------------------------------------------------------------------------------
     -- DPT_DEPOSIT_CLOS
@@ -103,7 +111,7 @@ end;
 
 CREATE OR REPLACE PACKAGE BODY BARS.UPDATE_TBL_UTL
 IS
-    G_BODY_VERSION       constant varchar2(64) := 'version 1.0 13.02.2018';
+    G_BODY_VERSION       constant varchar2(64) := 'version 1.2 16.05.2018';
     G_TRACE              constant varchar2(20) := 'BARS.UPDATE_TBL_UTL.';
     G_MODULE             constant varchar2(3)  := 'UPL';
 
@@ -494,6 +502,227 @@ IS
                  SQL%ROWCOUNT,
                  l_tbl_name);
         end_process(l_tbl_name, 'SYNC');
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            ROLLBACK;
+            error_process(l_tbl_name, 'ERR', substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 1000) );
+            RAISE;
+    END;
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- CHECK_CC_DEAL_UPDATE
+    --------------------------------------------------------------------------------------------------------------------
+    PROCEDURE CHECK_CC_DEAL_UPDATE
+    IS
+       l_tbl_name                    VARCHAR2(100) := 'CC_DEAL_UPDATE';
+       l_trace                       varchar2(500) := G_TRACE || 'CHECK_CC_DEAL_UPDATE: ';
+    BEGIN
+       start_process(l_tbl_name, 'CHECK');
+ 
+       INSERT INTO BARS.UPDATE_TBL_STAT(ID,
+                                        STAT_ID,
+                                        FIELD_NAME,
+                                        FIELD_TYPE,
+                                        VALUE,
+                                        RUN_ID,
+                                        STARTDATE,
+                                        ENDDATE,
+                                        TBL_NAME)
+            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+                   G_STAT_ID,
+                   DECODE ( t_pivot.i,
+                            1, f1,    2, f2,    3, f3,    4, f4,    5, f5,
+                            6, f6,    7, f7,    8, f8,    9, f9,    10, f10,
+                           11, f11,  12, f12,  13, f13,  14, f14,   15, f15,
+                           16, f16,  17, f17,  18, f18,  19, f19,   20, f20,
+                           21, f21,  22, f22,  23, f23,  24, f24,   25, f25,
+                           26, f26,  27, f27,  28, f28 ) AS field,
+                   'count_diff' type1,
+                   DECODE ( t_pivot.i,
+                            1, c1,    2, c2,    3, c3,    4, c4,    5, c5,
+                            6, c6,    7, c7,    8, c8,    9, c9,   10, c10,
+                            11, c11, 12, c12,  13, c13,  14, c14,  15, c15,
+                            16, c16, 17, c17,  18, c18,  19, c19,  20, c20,
+                            21, c21, 22, c22,  23, c23,  24, c24,  25, c25,
+                            26, c26, 27, c27,  28, decode(c28, null, 0, c28) ) AS CNT,
+                  G_RUN_ID,
+                  G_START_DT,
+                  G_END_DT,
+                  l_tbl_name
+              FROM ( SELECT ROWNUM AS i FROM DUAL CONNECT BY LEVEL <= 28) t_pivot,
+                   ( SELECT SUM ( DECODE ( ccd.ND, ccd_upd.ND, 0, 1 ) ) c1,                             'ND' f1,
+                            SUM ( DECODE ( ccd.SOS, ccd_upd.SOS, 0, 1 ) ) c2,                           'SOS' f2,
+                            SUM ( DECODE ( ccd.CC_ID, ccd_upd.CC_ID, 0, 1 ) ) c3,                       'CC_ID' f3,
+                            SUM ( DECODE ( ccd.SDATE, ccd_upd.SDATE, 0, 1 ) ) c4,                       'SDATE' f4,
+                            SUM ( DECODE ( ccd.WDATE, ccd_upd.WDATE, 0, 1 ) ) c5,                       'WDATE' f5,
+                            SUM ( DECODE ( ccd.RNK, ccd_upd.RNK, 0, 1 ) ) c6,                           'RNK' f6,
+                            SUM ( DECODE ( ccd.VIDD, ccd_upd.VIDD, 0, 1 ) ) c7,                         'VIDD' f7,
+                            SUM ( DECODE ( ccd.LIMIT, ccd_upd.LIMIT, 0, 1 ) ) c8,                       'LIMIT' f8,
+                            SUM ( DECODE ( ccd.KPROLOG, ccd_upd.KPROLOG, 0, 1 ) ) c9,                   'KPROLOG' f9,
+                            SUM ( DECODE ( ccd.USER_ID, ccd_upd.USER_ID, 0, 1 ) ) c10,                  'USER_ID' f10,
+                            SUM ( DECODE ( ccd.OBS, ccd_upd.OBS, 0, 1 ) ) c11,                          'OBS' f11,
+                            SUM ( DECODE ( ccd.BRANCH, ccd_upd.BRANCH, 0, 1 ) ) c12,                    'BRANCH' f12,
+                            SUM ( DECODE ( ccd.KF, ccd_upd.KF, 0, 1 ) ) c13,                            'KF' f13,
+                            SUM ( DECODE ( ccd.IR, ccd_upd.IR, 0, 1 ) ) c14,                            'IR' f14,
+                            SUM ( DECODE ( ccd.PROD, ccd_upd.PROD, 0, 1 ) ) c15,                        'PROD' f15,
+                            SUM ( DECODE ( ccd.SDOG, ccd_upd.SDOG, 0, 1 ) ) c16,                        'SDOG' f16,
+                            SUM ( DECODE ( ccd.SKARB_ID, ccd_upd.SKARB_ID, 0, 1 ) ) c17,                'SKARB_ID' f17,
+                            SUM ( DECODE ( ccd.FIN, ccd_upd.FIN, 0, 1 ) ) c18,                          'FIN' f18,
+                            SUM ( DECODE ( ccd.NDI, ccd_upd.NDI, 0, 1 ) ) c19,                          'NDI' f19,
+                            SUM ( DECODE ( ccd.FIN23, ccd_upd.FIN23, 0, 1 ) ) c20,                      'FIN23' f20,
+                            SUM ( DECODE ( ccd.OBS23, ccd_upd.OBS23, 0, 1 ) ) c21,                      'OBS23' f21,
+                            SUM ( DECODE ( ccd.KAT23, ccd_upd.KAT23, 0, 1 ) ) c22,                      'KAT23' f22,
+                            SUM ( DECODE ( ccd.K23, ccd_upd.K23, 0, 1 ) ) c23,                          'K23' f23,
+                            SUM ( DECODE ( ccd.KOL_SP, ccd_upd.KOL_SP, 0, 1 ) ) c24,                    'KOL_SP' f24,
+                            SUM ( DECODE ( ccd.S250, ccd_upd.S250, 0, 1 ) ) c25,                        'S250' f25,
+                            SUM ( DECODE ( ccd.GRP, ccd_upd.GRP, 0, 1 ) ) c26,                          'GRP' f26,
+                            SUM ( DECODE ( ccd.NDG, ccd_upd.NDG, 0, 1 ) ) c27,                          'NDG' f27,
+                            SUM ( 1 ) c28,                                                              'TOTAL_ROWS' f28
+                       FROM BARS.CC_DEAL ccd
+                            FULL OUTER JOIN
+                            ( SELECT *
+                                FROM BARS.CC_DEAL_UPDATE ccd_upd1
+                               WHERE     ccd_upd1.IDUPD IN (  SELECT MAX (
+                                                                           ccd_upd2.IDUPD )
+                                                                FROM BARS.CC_DEAL_UPDATE ccd_upd2
+                                                            GROUP BY ccd_upd2.ND )
+                                     AND ccd_upd1.CHGACTION <> 'D' ) ccd_upd
+                               ON ( ccd.ND = ccd_upd.ND AND ccd.kf = ccd_upd.kf )
+                      WHERE     (    DECODE ( ccd.ND, ccd_upd.ND, 1, 0 ) = 0
+                                  OR DECODE ( ccd.SOS, ccd_upd.SOS, 1, 0 ) = 0
+                                  OR DECODE ( ccd.CC_ID, ccd_upd.CC_ID, 1, 0 ) = 0
+                                  OR DECODE ( ccd.SDATE, ccd_upd.SDATE, 1, 0 ) = 0
+                                  OR DECODE ( ccd.WDATE, ccd_upd.WDATE, 1, 0 ) = 0
+                                  OR DECODE ( ccd.RNK, ccd_upd.RNK, 1, 0 ) = 0
+                                  OR DECODE ( ccd.VIDD, ccd_upd.VIDD, 1, 0 ) = 0
+                                  OR DECODE ( ccd.LIMIT, ccd_upd.LIMIT, 1, 0 ) = 0
+                                  OR DECODE ( ccd.KPROLOG, ccd_upd.KPROLOG, 1, 0 ) = 0
+                                  OR DECODE ( ccd.USER_ID, ccd_upd.USER_ID, 1, 0 ) = 0
+                                  OR DECODE ( ccd.OBS, ccd_upd.OBS, 1, 0 ) = 0
+                                  OR DECODE ( ccd.BRANCH, ccd_upd.BRANCH, 1, 0 ) = 0
+                                  OR DECODE ( ccd.KF, ccd_upd.KF, 1, 0 ) = 0
+                                  OR DECODE ( ccd.IR, ccd_upd.IR, 1, 0 ) = 0
+                                  OR DECODE ( ccd.PROD, ccd_upd.PROD, 1, 0 ) = 0
+                                  OR DECODE ( ccd.SDOG, ccd_upd.SDOG, 1, 0 ) = 0
+                                  OR DECODE ( ccd.SKARB_ID, ccd_upd.SKARB_ID, 1, 0 ) = 0
+                                  OR DECODE ( ccd.FIN, ccd_upd.FIN, 1, 0 ) = 0
+                                  OR DECODE ( ccd.NDI, ccd_upd.NDI, 1, 0 ) = 0
+                                  OR DECODE ( ccd.FIN23, ccd_upd.FIN23, 1, 0 ) = 0
+                                  OR DECODE ( ccd.OBS23, ccd_upd.OBS23, 1, 0 ) = 0
+                                  OR DECODE ( ccd.KAT23, ccd_upd.KAT23, 1, 0 ) = 0
+                                  OR DECODE ( ccd.K23, ccd_upd.K23, 1, 0 ) = 0
+                                  OR DECODE ( ccd.KOL_SP, ccd_upd.KOL_SP, 1, 0 ) = 0
+                                  OR DECODE ( ccd.S250, ccd_upd.S250, 1, 0 ) = 0
+                                  OR DECODE ( ccd.GRP, ccd_upd.GRP, 1, 0 ) = 0
+                                  OR DECODE ( ccd.NDG, ccd_upd.NDG, 1, 0 ) = 0)
+                            AND ccd.KF = bars.gl.kf
+                            AND ccd_upd.KF = bars.gl.kf );
+
+        end_process(l_tbl_name, 'CHECK');
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            ROLLBACK;
+            error_process(l_tbl_name, 'ERR', substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 1000) );
+            RAISE;
+    END;
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- SYNC_CC_DEAL_UPDATE
+    --------------------------------------------------------------------------------------------------------------------
+    PROCEDURE SYNC_CC_DEAL_UPDATE ( p_id out number, p_rowcount out number )
+    IS
+       l_tbl_name                    VARCHAR2(100) := 'CC_DEAL_UPDATE';
+       l_trace                       varchar2(500) := G_TRACE || 'SYNC_CC_DEAL_UPDATE: ';
+       l_staff_id                    bars.staff$base.id%type;
+       l_staff_nm                    bars.staff$base.logname%type;
+    BEGIN
+       start_process(l_tbl_name, 'SYNC');
+       SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
+
+       INSERT /*+ APPEND */
+              INTO BARS.CC_DEAL_UPDATE ( IDUPD, CHGACTION, EFFECTDATE, CHGDATE, DONEBY,
+                                         ND, SOS, CC_ID, SDATE, WDATE, RNK, VIDD, LIMIT, KPROLOG, USER_ID,
+                                         OBS, BRANCH, KF, IR, PROD, SDOG, SKARB_ID, FIN, NDI, FIN23, OBS23,
+                                         KAT23, K23, KOL_SP, S250, GRP, NDG )
+          SELECT bars.bars_sqnc.get_nextval ( 'S_CCDEAL_UPDATE', COALESCE(ccd.KF, u.KF) ),
+                 DECODE ( ccd.ND, NULL, 'D', 'U' ),
+                 COALESCE ( bars.gl.bd, bars.glb_bankdate ),
+                 SYSDATE,
+                 l_staff_id,
+                 DECODE ( ccd.nd, NULL, u.ND, ccd.ND ),
+                 DECODE ( ccd.nd, NULL, u.SOS, ccd.SOS ),
+                 DECODE ( ccd.nd, NULL, u.CC_ID, ccd.CC_ID ),
+                 DECODE ( ccd.nd, NULL, u.SDATE, ccd.SDATE ),
+                 DECODE ( ccd.nd, NULL, u.WDATE, ccd.WDATE ),
+                 DECODE ( ccd.nd, NULL, u.RNK, ccd.RNK ),
+                 DECODE ( ccd.nd, NULL, u.VIDD, ccd.VIDD ),
+                 DECODE ( ccd.nd, NULL, u.LIMIT, ccd.LIMIT ),
+                 DECODE ( ccd.nd, NULL, u.KPROLOG, ccd.KPROLOG ),
+                 DECODE ( ccd.nd, NULL, u.USER_ID, ccd.USER_ID ),
+                 DECODE ( ccd.nd, NULL, u.OBS, ccd.OBS ),
+                 DECODE ( ccd.nd, NULL, u.BRANCH, ccd.BRANCH ),
+                 DECODE ( ccd.nd, NULL, u.KF, ccd.KF ),
+                 DECODE ( ccd.nd, NULL, u.IR, ccd.IR ),
+                 DECODE ( ccd.nd, NULL, u.PROD, ccd.PROD ),
+                 DECODE ( ccd.nd, NULL, u.SDOG, ccd.SDOG ),
+                 DECODE ( ccd.nd, NULL, u.SKARB_ID, ccd.SKARB_ID ),
+                 DECODE ( ccd.nd, NULL, u.FIN, ccd.FIN ),
+                 DECODE ( ccd.nd, NULL, u.NDI, ccd.NDI ),
+                 DECODE ( ccd.nd, NULL, u.FIN23, ccd.FIN23 ),
+                 DECODE ( ccd.nd, NULL, u.OBS23, ccd.OBS23 ),
+                 DECODE ( ccd.nd, NULL, u.KAT23, ccd.KAT23 ),
+                 DECODE ( ccd.nd, NULL, u.K23, ccd.K23 ),
+                 DECODE ( ccd.nd, NULL, u.KOL_SP, ccd.KOL_SP ),
+                 DECODE ( ccd.nd, NULL, u.S250, ccd.S250 ),
+                 DECODE ( ccd.nd, NULL, u.GRP, ccd.GRP ),
+                 DECODE ( ccd.nd, NULL, u.NDG, ccd.NDG )
+            FROM BARS.CC_DEAL ccd
+                 FULL OUTER JOIN
+                 ( SELECT *
+                     FROM BARS.CC_DEAL_UPDATE u1
+                    WHERE u1.IDUPD IN (  SELECT MAX ( u2.IDUPD )
+                                           FROM BARS.CC_DEAL_UPDATE u2
+                                          GROUP BY u2.ND )
+                      AND u1.CHGACTION <> 'D' ) u
+                    ON ( ccd.ND = u.ND AND ccd.kf = u.kf )
+           WHERE (    DECODE ( ccd.ND,       u.ND, 1, 0 ) = 0
+                   OR DECODE ( ccd.SOS,      u.SOS, 1, 0 ) = 0
+                   OR DECODE ( ccd.CC_ID,    u.CC_ID, 1, 0 ) = 0
+                   OR DECODE ( ccd.SDATE,    u.SDATE, 1, 0 ) = 0
+                   OR DECODE ( ccd.WDATE,    u.WDATE, 1, 0 ) = 0
+                   OR DECODE ( ccd.RNK,      u.RNK, 1, 0 ) = 0
+                   OR DECODE ( ccd.VIDD,     u.VIDD, 1, 0 ) = 0
+                   OR DECODE ( ccd.LIMIT,    u.LIMIT, 1, 0 ) = 0
+                   OR DECODE ( ccd.KPROLOG,  u.KPROLOG, 1, 0 ) = 0
+                   OR DECODE ( ccd.USER_ID,  u.USER_ID, 1, 0 ) = 0
+                   OR DECODE ( ccd.OBS,      u.OBS, 1, 0 ) = 0
+                   OR DECODE ( ccd.BRANCH,   u.BRANCH, 1, 0 ) = 0
+                   OR DECODE ( ccd.KF,       u.KF, 1, 0 ) = 0
+                   OR DECODE ( ccd.IR,       u.IR, 1, 0 ) = 0
+                   OR DECODE ( ccd.PROD,     u.PROD, 1, 0 ) = 0
+                   OR DECODE ( ccd.SDOG,     u.SDOG, 1, 0 ) = 0
+                   OR DECODE ( ccd.SKARB_ID, u.SKARB_ID, 1, 0 ) = 0
+                   OR DECODE ( ccd.FIN,      u.FIN, 1, 0 ) = 0
+                   OR DECODE ( ccd.NDI,      u.NDI, 1, 0 ) = 0
+                   OR DECODE ( ccd.FIN23,    u.FIN23, 1, 0 ) = 0
+                   OR DECODE ( ccd.OBS23,    u.OBS23, 1, 0 ) = 0
+                   OR DECODE ( ccd.KAT23,    u.KAT23, 1, 0 ) = 0
+                   OR DECODE ( ccd.K23,      u.K23, 1, 0 ) = 0
+                   OR DECODE ( ccd.KOL_SP,   u.KOL_SP, 1, 0 ) = 0
+                   OR DECODE ( ccd.S250,     u.S250, 1, 0 ) = 0
+                   OR DECODE ( ccd.GRP,      u.GRP, 1, 0 ) = 0
+                   OR DECODE ( ccd.NDG,      u.NDG, 1, 0 ) = 0 );
+ 
+        INS_STAT('rowcount',
+                 'SYNC',
+                 SQL%ROWCOUNT,
+                 l_tbl_name);
+        
+                end_process(l_tbl_name, 'SYNC');
         COMMIT;
     EXCEPTION
         WHEN OTHERS
