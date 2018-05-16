@@ -4,11 +4,16 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2008.  All Rights Reserved.
-% VERSION     : 29/03/2018 (19/03/2018, 12/03/2018)
+% VERSION     : 14/05/2018 (11/05/2018, 10/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+14.05.2018 - для МФО=324805 (Крым) закоментарил блок переформирования кода
+             ZZZZZZZZZZ на 'I'||LPAD (to_char(rnk_), 9, '0')  
+11.05.2018 - для RNK=92927301 параметр K021 формируем '9' вместо 'C' 
+10.05.2018 - пересмотрено и изменено формирование кодов K020 и K021
+11.04.2018 - изменено формирование кода ОКПО(K020) и кода K021
 29.03.2018 - для бал.счетов 3353, 3640 выполняется расшифровка из FX_DEAL 
              аналогично как и для бал.счета 3351
 19.03.2018 - для группы 8600(8608) депозитные линии для 2600 будем 
@@ -72,6 +77,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
    kos_         NUMBER;
    fmt_         VARCHAR2 (20)         := '9999999990D0000';
    dfmt_        VARCHAR2 (8)          := 'ddmmyyyy';
+   ise_         customer.ise%TYPE;   
    ved_         customer.ved%TYPE;
    sed_         VARCHAR2 (2);
    k110_        VARCHAR2 (5);
@@ -322,123 +328,165 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe8_nn (dat_     DATE,
 
       okpo_ := kod_okpo;
 
-      -- Физлица резиденты и нерезиденты
-      IF custtype_ in (1, 3)  and okpo_ in ('00000','000000000','0000000000','99999','999999999')
+      -- Физлица резиденты 
+      IF custtype_ in (1, 3)  
       THEN
-         IF custtype_ = 1 and rez_ = 2
-         THEN
-            kod_okpo := 'I' || LPAD (to_char(rnk_), 9,'0');
 
-            k021_ := '9';
+         -- для ФО резидент?в
+         IF rez_ = 1 
+         THEN      
+            -- наличие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') <> 'Z' AND 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') <> 'Z'  
+            THEN
+               kod_okpo := LPAD (okpo_, 10, '0');
+               k021_ := '2';
+            END IF;
+            -- отсутствие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') = 'Z' OR 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') = 'Z'  
+            THEN
+               BEGIN
+                  SELECT LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 10),
+                               10,
+                               '0'
+                              )
+                    INTO kod_okpo
+                  FROM person
+                  WHERE rnk = rnk_;
+                  k021_ := '6';
+               EXCEPTION
+                  WHEN NO_DATA_FOUND
+                  THEN
+                  kod_okpo := LPAD (rnk_, 10, '0');
+                  k021_ := '9';
+               END;
+            END IF;
          END IF;
 
-         IF custtype_ in (1, 3) and rez_ = 1
-         THEN
-            BEGIN
-               SELECT LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 10),
-                            10,
-                            '0'
-                           )
-                  INTO kod_okpo
-               FROM person
-               WHERE rnk = rnk_;
-               k021_ := '6';
-            EXCEPTION
-               WHEN NO_DATA_FOUND
-               THEN
-                  kod_okpo := 'RNK' || LPAD (SUBSTR (rnk_, 1, 7), 7, '0');
-                  k021_ := 'E';
-            END;
+         -- для ФО нерезидент?в
+         IF rez_ = 2 
+         THEN      
+            -- наличие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') <> 'Z' AND 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') <> 'Z'  
+            THEN
+               kod_okpo := LPAD (okpo_, 10, '0');
+               k021_ := '2';
+            END IF;
+            -- отсутствие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') = 'Z' OR 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') = 'Z'  
+            THEN
+               BEGIN
+                  SELECT 'I' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 9),
+                               9,
+                               '0'
+                              )
+                    INTO kod_okpo
+                    FROM person
+                   WHERE rnk = rnk_;
+                   k021_ := 'B';
+               EXCEPTION
+                  WHEN NO_DATA_FOUND
+                  THEN
+                     kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
+                     k021_ := '9';
+               END;
+            END IF;
          END IF;
-      END IF;
-
-      IF custtype_ in (1, 3) and okpo_ not in ('00000','000000000','0000000000','99999','999999999')
-      THEN
-         IF mfo_ <> 324805 and custtype_ = 1 and rez_ = 2
-         THEN
-            kod_okpo := 'I' || LPAD (to_char(rnk_), 9,'0');
-
-            k021_ := '9';
-         END IF;
-
-         if mfo_ = 324805 and custtype_ = 1 and rez_ = 2
-         then
-            kod_okpo := trim(kod_okpo);
-            k021_ := '9';
-         end if;
-
-         IF custtype_ in (1, 3) and rez_ = 1
-         THEN
-            kod_okpo := LPAD (kod_okpo, 10, '0');
-            k021_ := '2';
-         END IF;
-
       END IF;
 
       -- Юрлица резиденты, нерезиденты
-      IF custtype_ =2 and okpo_ in ('00000','000000000','0000000000','99999','999999999')
+      IF custtype_ = 2 and glb_ = 0 and kb_ = '0'
       THEN
-         IF custtype_ = 2 and rez_ = 2 and glb_ = 0 and kb_ = '0'
-         THEN
-            ncontr_ := ncontr_ + 1;
-            if mfo_ = 300465
-            then
-               --kod_okpo := 'IN' || LPAD (TO_CHAR (ncontr_), 8, '0');
-               kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
-            else
-               --kod_okpo := 'IN' || LPAD (TO_CHAR(our_reg_) || substr(TO_CHAR (100+ncontr_), 2, 2), 8, '0');
-               kod_okpo := 'I' || LPAD (TO_CHAR(rnk_), 9, '0');
-            end if;
-            k021_ := '9';
+
+         -- для ЮО резидент?в
+         IF rez_ = 1 
+         THEN      
+            -- наличие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') <> 'Z' AND 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') <> 'Z'  
+            THEN
+               kod_okpo := LPAD (okpo_, 10, '0');
+               k021_ := '1';
+               select ise
+                  into ise_
+               from customer
+               where rnk = rnk_;
+               if ise_ in ('13110','13120','13131','13132')
+               then
+                  k021_ := 'G';
+               end if;
+            END IF;
+            -- отсутствие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') = 'Z' OR 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') = 'Z'  
+            THEN
+               kod_okpo := LPAD (TO_CHAR (rnk_), 10, '0');
+               k021_ := 'E';
+            END IF;
          END IF;
 
-         -- Юрлица резиденты
-         IF custtype_ = 2 and rez_ = 1 and glb_ = 0 and kb_ = '0'
-         THEN
-            ncontr_ := ncontr_ + 1;
-            --kod_okpo := 'D' || LPAD (TO_CHAR (ncontr_), 9, '0');
-            kod_okpo :=  LPAD (TO_CHAR (rnk_), 10, '0');
-            k021_ := 'E';
-         END IF;
-      END IF;
-
-      IF custtype_ = 2 and okpo_ not in ('00000','000000000','0000000000','99999','999999999')
-      THEN
-         IF custtype_ = 2 and rez_ = 1 and glb_ = 0 and kb_ = '0'
-         THEN
-            kod_okpo := LPAD (kod_okpo, 10, '0');
-            k021_ := '1';
-         end if;
-         IF mfo_ <> 324805 and custtype_ = 2 and rez_ = 2 and glb_ = 0 and kb_ = '0'
-         THEN
-            ncontr_ := ncontr_ + 1;
-            if mfo_ = 300465
-            then
+         -- для ЮО нерезидент?в
+         IF rez_ = 2  
+         THEN      
+            -- наличие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') <> 'Z' AND 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') <> 'Z'  
+            THEN
+               kod_okpo := LPAD (okpo_, 10, '0');
+               k021_ := '1';
+            END IF;
+            -- отсутствие ИНН(ОКПО)
+            IF nvl(ltrim(trim(okpo_), '0'), 'Z') = 'Z' OR 
+               nvl(ltrim(trim(okpo_), '9'), 'Z') = 'Z'  
+            THEN
                kod_okpo := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
-            else
-               kod_okpo := 'I' || LPAD (TO_CHAR(rnk_), 9, '0');
-            end if;
-            k021_ := '9';
-         END IF;
-         IF mfo_ = 324805 and custtype_ = 2 and rez_ = 2 and glb_ = 0 and kb_ = '0'
-         THEN
-            kod_okpo := TRIM(kod_okpo);
-            k021_ := '1';
+               k021_ := 'C';
+            END IF;
+            IF rnk_ = 93709201  
+            THEN
+               k021_ := '9';
+            END IF;
          END IF;
       END IF;
 
       -- банки резиденты
-      IF custtype_ = 2 and rez_ = 1 and glb_ <> 0
+      IF custtype_ = 2 and (glb_ <> 0 or kb_ <> 0)
       THEN
-         kod_okpo := LPAD ( glb_, 10, '0');
-         k021_ := '3';
-      end if;
-      -- банки нерезиденты
-      IF custtype_ = 2 and rez_ = 2 and kb_ <> '0'
-      THEN
-         kod_okpo := LPAD ( kb_, 10, '0');
-         k021_ := '4';
-      end if;
+
+         -- для банк?в резидент?в
+         IF rez_ = 1 then
+            BEGIN
+               select NVL(rc.glb,0)
+                  into glb_
+               from custbank cb, rcukru rc
+               where cb.rnk = rnk_
+                 and cb.mfo = rc.mfo(+);
+   
+               kod_okpo := LPAD( TO_CHAR(glb_), 10, '0');
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+               kod_okpo := '0000000000';  --null;
+            END;
+            k021_ := '3';
+         END IF;
+   
+         -- для банк?в нерезидент?в
+         IF rez_ = 2 then
+            BEGIN
+               select NVL(cb.alt_bic,0)
+                  into glb_
+               from custbank cb
+               where cb.rnk = rnk_;
+   
+               kod_okpo := LPAD( TO_CHAR(glb_), 10, '0');
+            EXCEPTION WHEN NO_DATA_FOUND THEN
+               kod_okpo := '0000000000';  --null;
+            END;
+            k021_ := '4';
+         END IF;
+      END IF;
 
       -- для ЮЛ ФЛ и ФЛП(ФОП) по новому определяем NMK, OKPO, CUSTTYPE, VED, C_REG
       -- т.к при заполненном RNKP не всегда коректно формируются эти параметры
@@ -1421,9 +1469,9 @@ BEGIN
 
           if rez_ in (2,4,6) then  --and substr(kod_okpo,1,1) != 'I' then
              okpo_nerez := trim(kod_okpo);
-             if mfo_ = 324805 and substr(kod_okpo,1,1) <> 'I' then
-                kod_okpo := 'I'||LPAD (to_char(rnk_), 9, '0');
-             end if;
+             --if mfo_ = 324805 and substr(kod_okpo,1,1) <> 'I' then
+             --   kod_okpo := 'I'||LPAD (to_char(rnk_), 9, '0');
+             --end if;
 
              if length(okpo_nerez) > 8 then
                 kodp_ := kod_okpo || '0000' || '0000' || '000' || k021_;
