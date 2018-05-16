@@ -22,7 +22,7 @@ begin
             daybasetr    number(5),
             dayproctr    number(5),
             factenddaytr date,
-            klasstr      varchar2(1),
+            klasstr      varchar2(2),
             risktr       number(32),
             kf           varchar2(6 char)
      )
@@ -62,6 +62,12 @@ begin
    execute immediate 'create index i_core_credit_tranche on core_credit_tranche (request_id, nd) tablespace brsmdli local compress 2';
 exception
     when name_already_used then
-         null;
+         null;     
 end;
 /
+PROMPT *** MODIFY COLUMN  klasstr***
+begin   
+ execute immediate 'ALTER TABLE core_credit_tranche MODIFY klasstr VARCHAR2(2)';
+ end;
+/
+
