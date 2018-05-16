@@ -16,7 +16,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_CCK_RU0 AS
        SELECT d.CC_ID, d.nd, d.ndi, d.ndg, a.RNK, NULL nls, NULL SS, NULL ACC, a.kv, a.daos, a.mdate, a.dazs, acrn.fprocn (a.acc, 0, gl.bd) pr, d.sos, a.acc ACC8,
               NULL SP,NULL SN,NULL SPN,NULL SDI,NULL SNA,NULL SNO
        FROM bars.cc_deal d, bars.nd_acc n, bars.accounts a
-       WHERE d.NDG = TO_NUMBER (pul.Get ('NDG')) AND d.nd <> d.ndG AND d.nd = n.nd AND n.acc = a.acc AND a.tip = 'LIM' AND NOT EXISTS  (SELECT acc FROM accounts  WHERE accc = a.acc) 
+       WHERE d.NDG = TO_NUMBER (pul.Get ('NDG')) AND d.nd <> d.ndG AND d.nd = n.nd AND n.acc = a.acc AND a.tip = 'LIM' AND NOT EXISTS  (SELECT acc FROM accounts  WHERE accc = a.acc and tip ='SS ') 
      ) x;
 
 
