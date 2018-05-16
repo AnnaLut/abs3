@@ -1,22 +1,17 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F73_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F73_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F73_NN (Dat_ DATE ,
+CREATE OR REPLACE PROCEDURE BARS.p_f73_NN (Dat_ DATE ,
  sheme_ varchar2 default 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #73 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 07/09/2017 (16/06/2017, 22/12/2016)
+% VERSION     : 15/05/2018 (14/05/2018, 07/09/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
  sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 15.05.2018 для Дт 1101,1102 Кт 3800  и  Дт 3800 Кт 1101, 1102 и кодов 
+%            операций 'Z16', 'TOU' будет формироваться код "000"
+% 14.05.2018 для Дт 1101,1102 Кт 3800 и назначение пл. 
+%            "підкріплення БМ від ХОУ" будет формироваться код "000"
 % 07.09.2017 вместо кода 349 формировался код 300. Исправлено  
 % 16.06.2017 внесены изменения которые были выполнены для ММФО 
 % 02.08.2016 для Дт 1101,1102 Кт 3800 и назначение пл. "прийнято монети"
@@ -155,7 +150,8 @@ BEGIN
 
     insert /*+ APPEND */
     into tmp_file03 (fdat, tt, ref, accd, nlsd, kv, acck, nlsk, s, sq, nazn)
-    select fdat, tt, ref, accd, nlsd, kv, acck, nlsk, s, sq, nazn
+    select /*+ leading(p.ad) index(p.o.od, IDX_OPLDOK_KF_FDAT_ACC)  dynamic_sampling(p 0) */
+        fdat, tt, ref, accd, nlsd, kv, acck, nlsk, s, sq, nazn
     from provodki_otc p
     where kv != 980
       and ( (nlsd like '100%' and
@@ -173,7 +169,7 @@ BEGIN
           ) 
       and not (nlsd like '100%' and nlsk like '100%')         
       and not (nlsd like '110%' and nlsk like '110%')         
-      and fdat between Dat1_ and Dat_ ;
+      and fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ and Dat_);
     commit;
 
     -----------------------------------------------------------------------------
@@ -268,13 +264,15 @@ BEGIN
               END if;
 
               if (tt_ = 'BAK' or tt1_ = 'BAK') OR 
-                 (kv_ in (959,961,962,964) and ( lower(comm_) like '%отримано%' OR
-                                                 lower(comm_) like '%прийнято монети%' OR
-                                                 lower(comm_) like '%прийнято з гоу%'  OR
-                                                 lower(comm_) like '%прийом%оу%'
+                 (kv_ in (959,961,962,964) and ( lower(comm_) like '%отримано%'             OR
+                                                 lower(comm_) like '%прийнято монети%'      OR
+                                                 lower(comm_) like '%прийнято з гоу%'       OR
+                                                 lower(comm_) like '%прийом%оу%'            OR 
+                                                 lower(comm_) like '%підкріплення%хоу%'     OR
+                                                 lower(comm_) like '%оприбутковані%монети%'
                                                )
                  ) or
-                 tt_ = 'TIK'
+                 tt_ in ('TIK', 'Z16', 'TOU')
               then
                  p_ins('000', nls_, nbuc_);
                  prf_:=1;
@@ -307,7 +305,7 @@ BEGIN
            IF sn_>0 and (substr(nls_,1,4)='3800' and
               substr(nlsk_,1,4) in ('1001','1002','1101','1102')) and
               LOWER(comm_) not like 'вида%' and LOWER(comm_) not like 'переда%' and
-              d020_='000'
+              d020_='000' and tt_ not in ('Z16','TOU')
            THEN
               if nvl(cnt_bak_, 0) > 0 then
                  tt1_ := 'BAK';
@@ -326,12 +324,14 @@ BEGIN
 
            IF sn_>0 and (substr(nls_,1,4)='3800' and 
               substr(nlsk_,1,4) in ('1001','1002','1101','1102')) and
-              ( LOWER(comm_) like 'видан%' or 
-                LOWER(comm_) like 'передан%' or 
-                LOWER(comm_) like 'видача%' or
-                lower(comm_) like '%врегул%' or
-                lower(comm_) like '%відправ%'               
-              ) 
+              ( ( LOWER(comm_) like 'видан%' or 
+                  LOWER(comm_) like 'передан%' or 
+                  LOWER(comm_) like 'видача%' or
+                  lower(comm_) like '%врегул%' or
+                  lower(comm_) like '%відправ%'               
+                ) OR 
+                tt_ in ('Z16','TOU') 
+              )
            THEN
               p_ins('000', nls_, nbuc_);
               prf_:=1;
@@ -454,15 +454,3 @@ BEGIN
     logger.info ('P_F73_NN: End for '||to_char(dat_,'dd.mm.yyyy'));
 END p_f73_NN;
 /
-show err;
-
-PROMPT *** Create  grants  P_F73_NN ***
-grant EXECUTE                                                                on P_F73_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F73_NN        to RPBN002;
-grant EXECUTE                                                                on P_F73_NN        to WR_ALL_RIGHTS;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F73_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 
