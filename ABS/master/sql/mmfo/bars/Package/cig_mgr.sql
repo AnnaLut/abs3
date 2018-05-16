@@ -1,4 +1,4 @@
-create or replace package cig_mgr is
+create or replace package bars.cig_mgr is
 
   --
   -- Автор  : OLEG
@@ -55,12 +55,12 @@ create or replace package cig_mgr is
   -- @p_interval - интервал
   --
   procedure job_interval(p_job_id in varchar2, p_interval in varchar2);
-  
+
   procedure create_job_cig_mmfo;
-  
+
 end cig_mgr;
 /
-create or replace package body cig_mgr is
+create or replace package body bars.cig_mgr is
 
   --
   -- Автор  : OLEG
@@ -71,7 +71,7 @@ create or replace package body cig_mgr is
   --
 
   -- Private constant declarations
-  g_body_version constant varchar2(64) := 'version 2.7 11/10/2017';
+  g_body_version constant varchar2(64) := 'version 2.7 15/05/2018';
 
   g_awk_body_defs constant varchar2(512) := '' || 'для Ощадного банку ' || chr(13) || chr(10);
 
@@ -106,7 +106,7 @@ create or replace package body cig_mgr is
 
   g_currbranch varchar2(30) := null;
   g_newnbs          number := newnbs.get_state;  -- Признак перехода на новый план счетов. (1-перешли, 0-нет)
-  
+
   TYPE dog_general_rec_type IS RECORD(
     nd                cc_deal.nd%TYPE,
     rnk               accounts.rnk%TYPE,
@@ -915,16 +915,17 @@ create or replace package body cig_mgr is
 
     exception
       when no_data_found then
-      begin   
+      begin
         insert into V_CIG_SYNC_DATA
           (data_id, data_type, branch)
         values
           (p_data_id, p_data_type, p_branch);
-      EXCEPTION WHEN OTHERS  THEN        
-         bars_audit.info ('cig_mgr.upd_syncdata insert: '||p_data_id||' p_branch: '||p_branch||' : '|| sqlerrm);
+      EXCEPTION WHEN OTHERS  THEN
+         bars_audit.info ('cig_mgr.upd_syncdata 1 insert: '||p_data_id||' p_branch: '||p_branch||' : '|| sqlerrm);
       end;
     end;
-
+    
+ begin 
     if p_data_type = G_CUSTDATA then
       update V_CIG_CUSTOMERS
          set upd_date = sysdate
@@ -938,7 +939,11 @@ create or replace package body cig_mgr is
     elsif p_data_type = G_DOG_CREDITDATA then
       update V_CIG_DOG_CREDIT set update_date = sysdate where id = p_data_id;
     end if;
-
+    
+   EXCEPTION WHEN OTHERS  THEN
+         bars_audit.info ('cig_mgr.upd_syncdata 2 : '||p_data_id||' p_branch: '||p_branch||' : '|| sqlerrm);
+    end;
+    
     bars_audit.trace('%s: done', l_th);
   end upd_syncdata;
 
@@ -1043,7 +1048,7 @@ create or replace package body cig_mgr is
          insert into v_cig_cust_change_code values
           (l_row.cust_key, f_ourmfo, 1);
       end if;
-begin 
+begin
       update V_CIG_CUSTOMERS
          set cust_name = trim(l_row.surname) || ' ' || trim(l_row.firstname) || ' ' ||
                          trim(l_row.fathers_name),
@@ -1051,10 +1056,10 @@ begin
              branch    = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
-   EXCEPTION WHEN OTHERS  THEN        
-     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_custid||': '|| sqlerrm);
+   EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_row.rnk||': '|| sqlerrm);
   end;
- 
+
 begin
       update V_CIG_CUST_INDIVIDUAL
          set role_id        = l_row.role_id,
@@ -1094,10 +1099,10 @@ begin
        where cust_id = l_custid
          and branch = l_branch;
 
-  EXCEPTION WHEN OTHERS  THEN        
-     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_custid||': ' ||sqlerrm);
+  EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_row.rnk||': ' ||sqlerrm);
   end;
- 
+
       if sql%rowcount > 0 then
         l_upd := true;
       end if;
@@ -1177,7 +1182,7 @@ begin
 
       -- вставка в таблицу клентов
       select s_cig_customers.nextval into l_custid from dual;
- begin      
+ begin
       insert into V_CIG_CUSTOMERS
         (cust_id, cust_type, rnk, upd_date, cust_name, cust_code, branch)
       values
@@ -1189,13 +1194,13 @@ begin
          trim(l_row.fathers_name),
          l_row.okpo,
          l_row.branch);
-         
-   EXCEPTION WHEN OTHERS  THEN        
-     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_custid||': ' ||sqlerrm);
+
+   EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_row.rnk||': ' ||sqlerrm);
   end;
-  
+
       -- вставка в таблицу физлиц
- begin      
+ begin
       insert into V_CIG_CUST_INDIVIDUAL
         (cust_id,
          role_id,
@@ -1267,8 +1272,8 @@ begin
          l_row.reg_addr,
          l_row.reg_zip,
          l_row.branch);
-   EXCEPTION WHEN OTHERS  THEN        
-     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_custid||': ' ||sqlerrm);
+   EXCEPTION WHEN OTHERS  THEN
+     bars_audit.info ('cig_mgr.prc_individuals ERROR: '||l_row.rnk||': ' ||sqlerrm);
   end;
 
       upd_syncdata(l_custid, l_row.branch, G_CUSTDATA);
@@ -1355,11 +1360,11 @@ begin
              branch    = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
-  EXCEPTION WHEN OTHERS  THEN        
+  EXCEPTION WHEN OTHERS  THEN
      bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
   end;
 
-begin 
+begin
       update v_cig_cust_company
          set role_id           = l_row.role_id,
              status_id         = l_row.status_id,
@@ -1387,11 +1392,11 @@ begin
              branch               = l_row.branch
        where cust_id = l_custid
          and branch = l_branch;
-         
-  EXCEPTION WHEN OTHERS  THEN        
+
+  EXCEPTION WHEN OTHERS  THEN
      bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
   end;
-  
+
       if sql%rowcount > 0 then
         l_upd := true;
       end if;
@@ -1473,7 +1478,7 @@ begin
       -- вставка в таблицу клентов
       select s_cig_customers.nextval into l_custid from dual;
 
- begin       
+ begin
       insert into V_CIG_CUSTOMERS
         (cust_id, cust_type, rnk, upd_date, cust_name, cust_code, branch)
       values
@@ -1484,12 +1489,12 @@ begin
          l_row.name,
          l_row.cust_code,
          l_row.branch);
-  EXCEPTION WHEN OTHERS  THEN        
+  EXCEPTION WHEN OTHERS  THEN
      bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
   end;
 
       -- вставляем запись в таблицу
- begin     
+ begin
       insert into v_cig_cust_company
         (cust_id,
          role_id,
@@ -1541,7 +1546,7 @@ begin
          l_row.reg_addr,
          l_row.reg_zip,
          l_row.branch);
-  EXCEPTION WHEN OTHERS  THEN        
+  EXCEPTION WHEN OTHERS  THEN
      bars_audit.info ('cig_mgr.prc_company ERROR: '||l_custid||': ' ||sqlerrm);
   end;
 
@@ -1924,7 +1929,7 @@ begin
           when cd.vidd in (2, 3, 12, 13) then 2 end as contract_type,
                    1          AS role_id,
 
-----------------http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4056 --COBUMMFO-5168 
+----------------http://jira.unity-bars.com.ua:11000/browse/COBUMMFO-4056 --COBUMMFO-5168
  fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 2) firstname,     --  NULL AS firstname,
  fio(REGEXP_REPLACE (c.nmk,'^ФОП'), 1) surname, --  NULL AS surname,
                    NULL AS fathers_name,
@@ -2090,7 +2095,7 @@ begin
                AND cd.nd = ow.nd
                and ow.cig_13 > 0
                AND a.kv = val.kv
-               AND c.custtype in (3)
+               AND c.custtype in (2,3)
                AND cd.rnk = c1.rnk(+)
                AND cd.nd = n.nd
                AND n.acc = a.acc
@@ -2112,7 +2117,7 @@ begin
                      DECODE(domain1,   NULL, '', trim(domain1) || ', ') ||
                      DECODE(region1,   NULL, '', trim(region1) || ', ') ||
                      DECODE(locality1, NULL, '', trim(locality1) || ', ') || trim(address1)) as fact_addr, --
-       NVL(fact_zip, reg_zip) as fact_zip, --       
+       NVL(fact_zip, reg_zip) as fact_zip, --
        reg_terr_id            as reg_terr_id,--
        NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
                      DECODE(domain1,   NULL, '', trim(domain1) || ', ') ||
@@ -2160,15 +2165,15 @@ begin
                case
                  when ((tab.dazs is not null)
                         and (trunc(tab.dat_z) > trunc(tab.dazs)))
-                 then 6
+                 then ''6''
                  when ((tab.dazs is not null)
                         and (trunc(tab.dat_z) <= trunc(tab.dazs)))
-                 then 5
-                 else 4
+                 then ''5''
+                 else ''4''
                end as cig_15,
                tab.cig_16,
                tab.cig_17,
-               2 as cig_18,
+               ''2'' as cig_18,
                tab.cig_19,
                tab.cig_20,
                tab.custtype,
@@ -2234,7 +2239,7 @@ begin
                null as cig_16,
                null as cig_17,
                null as credit_period,
-               1 as cig_19,
+               ''1'' as cig_19,
                null as cig_20,
                aa.dazs,
                c.custtype,
@@ -2444,7 +2449,7 @@ select
                  null as cig_16,
                  null as cig_17,
                  null as credit_period,
-                 1 as cig_19,
+                 ''1'' as cig_19,
                  null as cig_20,
                  aa.dazs,
                  c.custtype,
@@ -2553,8 +2558,7 @@ select
                               from accounts a_ost left outer join saldoa s_ost on a_ost.acc = s_ost.acc and s_ost.fdat > :p_date
                             group by a_ost.acc, a_ost.ostc) ostatki
                               on ostatki.acc = any(o.acc_pk, o.acc_ovr, o.acc_2203, o.acc_2207, o.acc_2208, o.acc_2209, o.acc_3570, o.acc_3579, o.acc_9129)
-
-                           group by  o.nd, o.acc_pk, a.kv, b.daos, a.branch, a.rnk, a.dazs, sd.sysdt,
+  group by  o.nd, o.acc_pk, a.kv, b.daos, a.branch, a.rnk, a.dazs, sd.sysdt,
                                add_months(a.daos, nvl(to_number(w.value), nvl(p.mm_max, 0))), nvl(o.acc_ovr, o.acc_2203)
                            ) aa,
                        customer c,
@@ -2566,32 +2570,33 @@ select
                    and aa.rnk = w.rnk(+)
                    and w.tag(+) = ''CIGPO''
                    and aa.rnk = p.rnk(+)
-                   and c.country = cty.k040(+)) tab,
+                   and c.country = cty.k040(+)           
+                    ) tab,
                        tabval$global t,
     (SELECT rnk as rnk, --
        nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
        NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '''', '''') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '''', '''') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '''', '''') || trim(address2)
                 WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
                      address2
                 ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
-       NVL(fact_zip, reg_zip) as fact_zip, --       
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '''', '''') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '''', '''') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '''', '''') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --
        reg_terr_id            as reg_terr_id,--
        NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '''', '''') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '''', '''') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '''', '''') || trim(address1)
                 WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
                      address1
                 ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '''', '''') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '''', '''') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '''', '''') || trim(address2)) as reg_addr, --
        NVL(reg_zip, fact_zip) as reg_zip --
   FROM (SELECT rnk,
                min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
@@ -2897,23 +2902,23 @@ select
   from (
 select     d.nd,
        max(d.sos),
-       max(d.sdate) as datd, 
+       max(d.sdate) as datd,
        max(d.wdate) as datd2,
        max(case when a.nbs = ''2600'' then a.acc else null end) as acc, --   acc_2600,
        max(d.limit) as sd,
        max(case when a.nbs = ''9129'' then a.acc else null end) as acc_9129,
        max(case when a.nbs = ''2607'' then a.acc else null end) as acc_2067,
-       max(case when a.nbs = ''8000'' then a.acc else null end) as acc_8000, 
+       max(case when a.nbs = ''8000'' then a.acc else null end) as acc_8000,
        max(null) as deldate
   from bars.cc_deal  d,
        bars.nd_acc   n,
        bars.accounts a
    where d.nd = n.nd
      and a.acc = n.acc
-     AND d.vidd in (10) 
+     AND d.vidd in (10)
    group by d.nd       ) o,--end_acc_over
 (SELECT     nd,
-        MAX(cig_13) cig_13, 
+        MAX(cig_13) cig_13,
         MAX(cig_20) cig_20
      FROM (SELECT nd,
                   DECODE(tag, ''CIG_D13'', VALUE) cig_13,
@@ -3076,24 +3081,24 @@ select           aa.nd,
 from (
 select     d.nd,
        max(d.sos),
-       max(d.sdate) as datd, 
+       max(d.sdate) as datd,
        max(d.wdate) as datd2,
        max(case when a.nbs = ''2600'' then a.acc else null end) as acc, --   acc_2600,
        max(d.limit) as sd,
        max(case when a.nbs = ''9129'' then a.acc else null end) as acc_9129,
        max(case when a.nbs = ''2607'' then a.acc else null end) as acc_2067,
-       max(case when a.nbs = ''8000'' then a.acc else null end) as acc_8000, 
+       max(case when a.nbs = ''8000'' then a.acc else null end) as acc_8000,
        max(null) as deldate
   from bars.cc_deal  d,
        bars.nd_acc   n,
        bars.accounts a
    where d.nd = n.nd
      and a.acc = n.acc
-     AND d.vidd in (10) 
-   group by d.nd                      
+     AND d.vidd in (10)
+   group by d.nd
  ) o, --end_acc_over
 (SELECT     nd,
-        MAX(cig_13) cig_13, 
+        MAX(cig_13) cig_13,
         MAX(cig_20) cig_20
      FROM (SELECT nd,
                   DECODE(tag, ''CIG_D13'', VALUE) cig_13,
@@ -3134,27 +3139,27 @@ select     d.nd,
 (SELECT rnk as rnk, --
        nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
        NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '''', '''') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '''', '''') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '''', '''') || trim(address2)
                 WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
                      address2
                 ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
-       NVL(fact_zip, reg_zip) as fact_zip, --       
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '''', '''') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '''', '''') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '''', '''') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --
        reg_terr_id            as reg_terr_id,--
        NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '''', '''') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '''', '''') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '''', '''') || trim(address1)
                 WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
                      address1
                 ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '''', '''') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '''', '''') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '''', '''') || trim(address2)) as reg_addr, --
        NVL(reg_zip, fact_zip) as reg_zip --
   FROM (SELECT rnk,
                min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
@@ -3614,27 +3619,27 @@ select     d.nd,
 (SELECT rnk as rnk, --
        nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
        NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                     DECODE(domain2,   NULL, '', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '', trim(locality2) || '', '') || trim(address2)
                 WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
                      address2
                 ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
-       NVL(fact_zip, reg_zip) as fact_zip, --       
+                     DECODE(domain1,   NULL, '', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --
        reg_terr_id            as reg_terr_id,--
        NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                     DECODE(domain1,   NULL, '', trim(domain1)   || '', '') ||
+                     DECODE(region1,   NULL, '', trim(region1)   || '', '') ||
+                     DECODE(locality1, NULL, '', trim(locality1) || '', '') || trim(address1)
                 WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
                      address1
                 ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+                     DECODE(domain2,   NULL, '', trim(domain2)   || '', '') ||
+                     DECODE(region2,   NULL, '', trim(region2)   || '', '') ||
+                     DECODE(locality2, NULL, '', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
        NVL(reg_zip, fact_zip) as reg_zip --
   FROM (SELECT rnk,
                min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
@@ -3966,27 +3971,27 @@ select     d.nd,
 (SELECT rnk as rnk, --
        nvl(fact_terr_id, reg_terr_id) as fact_terr_id, --
        NVL(CASE WHEN fact_type_id = 2 AND fact_terr_id = -1 THEN
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '''', '''') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '''', '''') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '''', '''') || trim(address2)
                 WHEN fact_type_id = 2 AND fact_terr_id > 0  THEN
                      address2
                 ELSE NULL   END, --NVL-- Если нет адр.Рег. выводим Факт.адр.
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)) as fact_addr, --
-       NVL(fact_zip, reg_zip) as fact_zip, --       
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '''', '''') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '''', '''') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '''', '''') || trim(address1)) as fact_addr, --
+       NVL(fact_zip, reg_zip) as fact_zip, --
        reg_terr_id            as reg_terr_id,--
        NVL(CASE WHEN reg_type_id = 1 AND NVL(reg_terr_id, -1) = -1 THEN
-                     DECODE(domain1,   NULL, '''', trim(domain1)   || '', '') ||
-                     DECODE(region1,   NULL, '''', trim(region1)   || '', '') ||
-                     DECODE(locality1, NULL, '''', trim(locality1) || '', '') || trim(address1)
+                     DECODE(domain1,   NULL, '''', trim(domain1)   || '''', '''') ||
+                     DECODE(region1,   NULL, '''', trim(region1)   || '''', '''') ||
+                     DECODE(locality1, NULL, '''', trim(locality1) || '''', '''') || trim(address1)
                 WHEN reg_type_id = 1 AND reg_terr_id > 0           THEN
                      address1
                 ELSE NULL END,  --NVL-- Если нет Факт.адр. выводим адр.Рег.
-                     DECODE(domain2,   NULL, '''', trim(domain2)   || '', '') ||
-                     DECODE(region2,   NULL, '''', trim(region2)   || '', '') ||
-                     DECODE(locality2, NULL, '''', trim(locality2) || '', '') || trim(address2)) as reg_addr, --
+                     DECODE(domain2,   NULL, '''', trim(domain2)   || '''', '''') ||
+                     DECODE(region2,   NULL, '''', trim(region2)   || '''', '''') ||
+                     DECODE(locality2, NULL, '''', trim(locality2) || '''', '''') || trim(address2)) as reg_addr, --
        NVL(reg_zip, fact_zip) as reg_zip --
   FROM (SELECT rnk,
                min(DECODE(territory_id, null, -1, territory_id)) as territory_id,
@@ -4072,8 +4077,8 @@ begin
        p_rec.currency_id,
        abs(nvl(p_rec.overdue_sum, 0) / 100),
        p_rec.branch);
-   
-   EXCEPTION WHEN OTHERS  THEN        
+
+   EXCEPTION WHEN OTHERS  THEN
          bars_audit.info ('cig_mgr.prc_dog_bpk insrert \p_dog_id: '||p_dog_id||' p_oldbranch: '||p_oldbranch||'\p_rec.nd:'||p_rec.nd||' : '|| sqlerrm);
       end;
 
@@ -4304,7 +4309,7 @@ begin
            and csd.data_type = 4;
       end loop;
     end if;
-    
+
 begin
     select s_cig_dog_instalment.nextval into l_id from dual;
 
@@ -4341,7 +4346,7 @@ begin
        l_rec.overdue_sum,
        l_rec.branch);
 
-   EXCEPTION WHEN OTHERS  THEN        
+   EXCEPTION WHEN OTHERS  THEN
          bars_audit.info ('cig_mgr.prc_dog_inst insrert \p_dog_id: '||p_dog_id||' p_oldbranch: '||p_oldbranch||'\p_nd:'||p_nd||' : '|| sqlerrm);
       end;
 
@@ -4537,7 +4542,7 @@ begin
         end loop;
       end if;
     end if;
-    
+
 begin
     select s_cig_dog_credit.nextval into l_id from dual;
 
@@ -4566,7 +4571,7 @@ begin
        nvl(l_rec.overdue_sum,0),
        l_rec.branch);
 
-  EXCEPTION WHEN OTHERS  THEN        
+  EXCEPTION WHEN OTHERS  THEN
          bars_audit.info ('cig_mgr.prc_dog_credit insert: '||p_dog_id||' p_branch: '||p_branch||'\p_nd:'||p_nd||' : '|| sqlerrm);
       end;
 
@@ -4669,8 +4674,8 @@ begin
            and csd.data_type = 5;
       end loop;
     end if;
-    
-begin 
+
+begin
     select s_cig_dog_noninstalment.nextval into l_id from dual;
 
     insert into v_cig_dog_noninstalment
@@ -4694,7 +4699,7 @@ begin
        l_rec.used_sum,
        l_rec.branch);
 
-    EXCEPTION WHEN OTHERS  THEN        
+    EXCEPTION WHEN OTHERS  THEN
          bars_audit.info ('cig_mgr.prc_dog_noninst insert: '||p_dog_id||' p_branch: '||p_branch||'\p_nd:'||p_nd||' : '|| sqlerrm);
       end;
 
@@ -4730,6 +4735,7 @@ begin
     l_step := 0;
     bars_audit.trace('%s: entry point', l_th);
     savepoint dg_start;
+
     --курсор по общей информации о договорах
     get_dg_rs(p_dtype, p_date, l_cursor);
     add_event(G_WITHOUT_ERRORS,
@@ -4742,6 +4748,8 @@ begin
               null,
               null,
               p_dtype);
+       
+     
     bars_audit.trace('%s: cur_dog_general is open, p_dtype=%s',
                      l_th,
                      to_char(p_dtype));
@@ -4783,7 +4791,7 @@ begin
                              l_th,
                              to_char(l_row.rnk));
           end if;
-        elsif (l_row.custtype = 3) then
+        elsif (l_row.custtype = 3) then 
           if (check_ind_row(l_row, p_dtype)) then
             bars_audit.trace('%s: attrs checked, rnk=%s',
                              l_th,
@@ -4819,6 +4827,7 @@ begin
               end;
 
               if (l_not_exception) then
+  
                 --begin
                 -- поиск клиента для выбранного договора
                 l_step := 1;
@@ -4826,6 +4835,7 @@ begin
                   into l_custid
                   from V_CIG_CUSTOMERS
                  where rnk = l_row.rnk;
+          
                 -- сначала апдейтим
                 update V_CIG_DOG_GENERAL
                    set phase_id            = l_row.cig_15,
@@ -4851,7 +4861,6 @@ begin
                 returning id into l_id;
 
                 if (sql%rowcount != 0) then
-
                   upd_syncdata(l_id, l_row.branch, G_DOGDATA);
 
                   --запись в журнал
@@ -4923,13 +4932,12 @@ begin
                      sysdate,
                      l_row.branch,
                      l_row.branch_dog);
-      EXCEPTION WHEN OTHERS  THEN        
+      EXCEPTION WHEN OTHERS  THEN
+
          bars_audit.info ('cig_mgr.prc_dog_general insert: l_custid :'||l_custid||' l_row.branch: '||l_row.branch||'\l_row.nd:'||l_row.nd||' : '|| sqlerrm);
-      end;                
-
-                  upd_syncdata(l_id, l_row.branch, G_DOGDATA);
-
-                  --запись в журнал
+      end;
+                  upd_syncdata(l_id, l_row.branch, G_DOGDATA);          
+   --запись в журнал
                   add_event(G_WITHOUT_ERRORS,
                             bars_msg.get_msg(g_module_name,
                                              'DOG_INSERTED',
@@ -4952,11 +4960,11 @@ begin
                 if ((p_dtype = G_CONTRACT_BPK) or
                    (p_dtype = G_CONTRACT_OVR)) then
                   l_step := 2;
-
                   if (trunc(l_row.dazs) <= trunc(sysdate)) then
                     -- при закрытии договора БПК обновляем/добавляем запись с признаком не отправлять информацию по договору в следующий раз (заявка COBUSUPABS-3290)
                     -- l_count = 0 - первая передача договора, 1 - информация уже отправлялась
-                    select count(m.nd)
+          
+                   select count(m.nd)
                       into l_count
                     from v_cig_dog_sync_params m
                     where m.nd = l_row.nd
@@ -5192,11 +5200,10 @@ begin
               bars_msg.get_msg(g_module_name, 'SYNСDOG_STARTED'), null);
 
     -- собрать общую информацию по договорам
-
     dbms_application_info.set_module('prc_dog_general(1, p_date)', null);
     prc_dog_general(1, p_date);
     dbms_application_info.set_module('prc_dog_general(G_CONTRACT_BPK, p_date)', null);
-    prc_dog_general(G_CONTRACT_BPK, p_date);
+    prc_dog_general(G_CONTRACT_BPK, p_date);  
     dbms_application_info.set_module('prc_dog_general(G_CONTRACT_OVR, p_date)', null);
     prc_dog_general(G_CONTRACT_OVR, p_date);
     dbms_application_info.set_module('prc_dog_general(G_CONTRACT_GRNT, p_date)', null);
@@ -5348,7 +5355,7 @@ begin
         begin
           sys.dbms_scheduler.create_job(job_name        => 'BARS.CIG_PVBKI_MMFO_'||rec.kf,
                                         job_type        => 'PLSQL_BLOCK',
-                                        job_action      => 'begin cig_mgr.collect_data(sysdate,'''||rec.kf||'''); end;',
+                                        job_action      => 'begin bc.go('''||rec.kf||''');  cig_mgr.collect_data(sysdate,'''||rec.kf||'''); end;',
                                         start_date      => to_date(null),
                                         repeat_interval => 'Freq=Monthly;Interval=1;ByMonthDay=01;ByHour=00;ByMinute=01;BySecond=00',
                                         end_date        => to_date(null),
@@ -5380,5 +5387,4 @@ grant EXECUTE                                                                on 
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/cig_mgr.sql =========*** End *** ===
- PROMPT ===================================================================================== 
- 
+ PROMPT =====================================================================================
