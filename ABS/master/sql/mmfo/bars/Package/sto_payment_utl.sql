@@ -26,6 +26,10 @@ create or replace package sto_payment_utl is
 
     TRANS_ACCOUNT_PARAMETER        constant varchar2(30 char) := 'STO_TRANSIT';
 
+    wait_days                      constant int := 10;
+    try_days                       constant int := 3;
+
+
     function read_payment(
         p_payment_id in integer,
         p_lock in boolean default false,
@@ -91,6 +95,8 @@ create or replace package sto_payment_utl is
     procedure pay_off_order_amounts;
 
     procedure complete_payments_withdrawal;
+    procedure auto_storno;
+    procedure auto_try;
 end;
 /
 create or replace package body sto_payment_utl as
@@ -1049,6 +1055,7 @@ create or replace package body sto_payment_utl as
                                              o.sos = sto_payment_utl.DOCUMENT_STATE_COMPLETED));
     end;
 
+
     procedure auto_storno
     is
         l_n number;
@@ -1092,7 +1099,6 @@ create or replace package body sto_payment_utl as
        end;
      end loop;
     end;
-
     procedure auto_try
     is
     begin
@@ -1116,7 +1122,6 @@ create or replace package body sto_payment_utl as
      end loop;
 
     end;
-
 
 end;
 /
