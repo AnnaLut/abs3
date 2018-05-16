@@ -34,10 +34,6 @@ PROMPT *** Create  view V_ZAL_ND_NOT_NEW ***
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
                                                   ,p_splitting_symbol => ','))));
 
-PROMPT *** Create  grants  V_ZAL_ND_NOT_NEW ***
-grant SELECT                                                                 on V_ZAL_ND_NOT_NEW to BARSREADER_ROLE;
-grant SELECT                                                                 on V_ZAL_ND_NOT_NEW to UPLD;
-
 
 
 PROMPT ===================================================================================== 

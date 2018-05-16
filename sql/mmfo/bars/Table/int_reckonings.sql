@@ -1,6 +1,7 @@
 begin
-    bars_policy_adm.alter_policy_info('INT_RECKONINGS', 'WHOLE', null, null, null, null);
+    bars_policy_adm.alter_policy_info('INT_RECKONINGS', 'WHOLE', null, 'E', 'E', 'E');
     bars_policy_adm.alter_policy_info('INT_RECKONINGS', 'FILIAL', null, null, null, null);
+    bars_policy_adm.alter_policy_info('INT_RECKONINGS', 'CENTER', null, null, null, null);
 end;
 /
 
@@ -27,8 +28,7 @@ begin
             accrual_purpose varchar2(160 char),
             payment_purpose varchar2(160 char),
             accrual_document_id number(38),
-            payment_document_id number(38),
-            is_grouping_unit number(1)
+            payment_document_id number(38)
      )
      enable row movement
      tablespace brsbigd
@@ -160,5 +160,4 @@ comment on column int_reckonings.accrual_purpose     is 'Встановлене вручну приз
 comment on column int_reckonings.payment_purpose     is 'Встановлене вручну призначення документа виплати відсотків';
 comment on column int_reckonings.accrual_document_id is 'Ідентифікатор документу нарахування';
 comment on column int_reckonings.payment_document_id is 'Ідентифікатор документу виплати (для пасивів)';
-comment on column int_reckonings.is_grouping_unit    is 'Ознака групуючого запису (об''єднує декілька періодів нарахувань в один рядок)';
 

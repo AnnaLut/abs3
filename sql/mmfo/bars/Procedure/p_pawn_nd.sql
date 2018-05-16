@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_PAWN_ND.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_PAWN_ND ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_PAWN_ND 
+CREATE OR REPLACE PROCEDURE P_PAWN_ND
  (p_nd     number  , -- ref дог или 0 или null
   p_accZ   number  , -- счет залога
   p_ob22   varchar2,
@@ -25,6 +16,7 @@ PROMPT *** Create  procedure P_PAWN_ND ***
  ) is
 
 /*
+ 25/09/2017 LSO  Добавлено поиск счетов по cc_deal.ndg
  26-05-2016 LUDA Добавлены  Овердрафты холдинга
  25-08-2015 LUDA Добавлен "Термін дії залогу" пишется дата в ACCOUNTS(MDAT)
  18.02.2015 Sta  Вместе с C:\bars98\SQL\PATCHES.2\patch505_cp.sql - для тех МФО. где есть ЦБ
@@ -89,7 +81,7 @@ begin
   If    nvl(p_nd,0) = 0 and p_accs > 0 then acc1( 0,p_accZ,p_accS,p_12); ------- Нет  Дог, но есть 1 счет счет актива
   elsIf     p_nd    > 0 and p_accs > 0 then ------------------------------------ Есть Дог, и есть хотя бы 1 счет актива
      FOR k in  (SELECT n.acc ACCS   FROM nd_acc n, accounts a, cc_deal d
-                WHERE n.nd=d.nd and n.acc = a.acc AND n.ND= p_nd  AND
+                WHERE n.nd=d.nd and n.acc = a.acc  AND ( d.nd = p_nd or d.ndg= p_nd )   AND
                      (d.vidd <> ovrn.vidd AND a.tip     in ('SS ','SL ','SP ','CR9','SN ','SNO','SPN') or
                       d.vidd =  ovrn.vidd AND a.tip not in ('OVN') )         -- Овердрафты холдинга
                 Union ALL SELECT Acc          FROM acc_over WHERE nd = p_nd  -- Обычные Овердрафты
@@ -105,14 +97,3 @@ begin
 
 end p_pawn_nd;
 /
-show err;
-
-PROMPT *** Create  grants  P_PAWN_ND ***
-grant EXECUTE                                                                on P_PAWN_ND       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_PAWN_ND       to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_PAWN_ND.sql =========*** End ***
-PROMPT ===================================================================================== 

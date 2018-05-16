@@ -14,6 +14,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract
         //CRUD
         void BindProvideGroup(decimal refID, List<decimal> ACC_list, int mode, int tip);
         void CreateOrEditGroupProvide(List<UpdateProvide> list_provide, decimal? id, decimal? accs, int? tip);
+        string SendProvidesToND(decimal old_nd, decimal new_nd);
 
         //get Dictionary
         List<PAWNList> GetPawn(string nls, byte? tip, byte? balance);

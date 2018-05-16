@@ -1,8 +1,9 @@
 CREATE OR REPLACE PACKAGE cck IS
 
-  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.24  10/11/2017 ';
+  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.24.2  25/01/2018 ';
 
   /*
+   14.02.2018 Sta Анализ НЕ-нул.остатка комиссии перед выдачей кредита (при наличии доп.реквизита по комиссии)
    23.01.2017 LSO Додано призначення платежу для ручного розбіру
    15.02.2016 Sta Контроль пл.инструкций
    24.11.2016 Sta Выдача кредита по списку пл.инструкций)
@@ -94,8 +95,8 @@ CREATE OR REPLACE PACKAGE cck IS
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
   PROCEDURE lim_bdate
   (
-    p_nd  NUMBER
-    ,p_dat DATE default gl.bd
+   p_nd NUMBER, 
+   p_dat DATE default gl.bdate
   );
 
   -- расчет суммы процентов в удельном весе по ГПК за период ( рекомендовано для ануитета)
@@ -827,10 +828,10 @@ CREATE OR REPLACE PACKAGE cck IS
   ---------------------------
  PROCEDURE cc_grf_lim
   (
-    mode_ INT default 1
-   ,nd_   cc_deal.nd%type
-   ,acc_  accounts.acc%type
-   ,fdap_ DATE default gl.bd
+   mode_ INT default 1,
+   nd_   cc_deal.nd%type,
+   acc_  accounts.acc%type,
+   fdap_ DATE default gl.bdate
   );
   -- Построение графика лимитов.
   --MODE_ - способ 1-равными суммами
@@ -915,25 +916,16 @@ CREATE OR REPLACE PACKAGE cck IS
   --- конец 14.06.2013 --------------------
 
   -- старая проц построения ГПК
-  PROCEDURE cc_gpk
-  (
-    mode_  INT
-   ,nd_    INT
-   ,acc_   INT
-   ,bdat_1 DATE
-   , -- начало
-    datn_  DATE
-   , -- первая дата погашенпя
-    dat4_  DATE
-   , -- завершение
-    sum1_  NUMBER
-   , -- сумма к погашению в грн (1.00)
-    freq_  INT
-   ,rate_  NUMBER
-   , -- годовая % ставка
-    dig_   INT
-   ,flag   INT DEFAULT 0
-  ); --Запускати чи ні процедуру cc_tmp_gpk);
+  PROCEDURE cc_gpk(mode_  INT,
+                   nd_    INT,
+                   acc_   INT,
+                   bdat_1 DATE, -- начало
+                   datn_  DATE, -- первая дата погашенпя
+                   dat4_  DATE, -- завершение
+                   sum1_  NUMBER, -- сумма к погашению в грн (1.00)
+                   freq_  INT,
+                   rate_  NUMBER, -- годовая % ставка
+                   dig_   INT); --Запускати чи ні процедуру cc_tmp_gpk);
 
   -----------------------------
   PROCEDURE cc_gpk_lim
@@ -1170,7 +1162,9 @@ END cck;
 CREATE OR REPLACE PACKAGE BODY cck IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.8  12/01/2018 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.10  26/02/2018  ';
+  g_errn NUMBER := -20203;
+  g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
 
   /*
@@ -1185,6 +1179,10 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   /*
+26.02.2018 Sta Код вал Суб.дог определять не по счету SS, а по счету LIM
+
+22.02.2018 LSO Добавление субдоговоров для пролонгации CC_PROLONG
+22.02.2018 Sta Манипуляции псо счетом SG
   29.12.2016 Sta COBUSUPABS-5046
      При открытие счетов (раздел 20** и 22** ) в КП по "птичке" программа будет
      •  блокировать открытие - если таковой счет уже существует. При этом неважно – закрыт этот счет, или открыт в настоящее время.
@@ -1680,15 +1678,15 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                  vob_   => 6,
                  nd_    => oo.nd,
                  pdat_  => SYSDATE,
-                 vdat_  => gl.bd,
+                 vdat_  => gl.bdate,
                  dk_    => 1,
                  kv_    => aa.kv,
                  s_     => oo.s,
                  kv2_   => aa.kv,
                  s2_    => oo.s,
                  sk_    => NULL,
-                 data_  => gl.bd,
-                 datp_  => gl.bd,
+                 data_  => gl.bdate,
+                 datp_  => gl.bdate,
                  nam_a_ => oo.nam_a,
                  nlsa_  => aa.nls,
                  mfoa_  => gl.amfo,
@@ -1708,8 +1706,8 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                 0,
                 NULL,
                 oo.ref,
-                gl.bd,
-                gl.bd,
+                gl.bdate,
+                gl.bdate,
                 oo.tt,
                 1,
                 aa.kv,
@@ -1740,9 +1738,13 @@ CREATE OR REPLACE PACKAGE BODY cck IS
        WHERE (acc = p_acc OR kv = p_kv AND nls = p_nls);
       --      If aa.tip = 'LIM'      then  raise_application_error(  -(20203), '\ Виведення рах '||aa.nls||'*LIM недопустимо!' );  end if ;
       IF (aa.nbs LIKE '20_%' OR aa.nbs LIKE '22_%' OR aa.tip = 'LIM') THEN
+       if aa.tip = 'SPN' or aa.tip = 'SNO' then -- Временно для разделения линий
+         null;
+       else	   
         raise_application_error(-20203,
                                 '\ Виведення рах ' || aa.nls || '*' ||
                                 aa.tip || ' недопустимо !');
+	   end if;
       END IF;
     EXCEPTION
       WHEN no_data_found THEN
@@ -1785,7 +1787,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
       (nd, fdat, txt)
     VALUES
       (p_nd,
-       gl.bd,
+       gl.bdate,
        'Рах.' || aa.nls || '/' || aa.kv || '/' || aa.tip ||
        ' виведено з-під КД');
 
@@ -1842,13 +1844,15 @@ CREATE OR REPLACE PACKAGE BODY cck IS
       oo.s   := p_sd;
     ELSIF p_kvk = gl.baseval THEN
       oo.vob := 16;
-      oo.s   := gl.p_ncurval(p_kvd, p_sd, gl.bd);
+      oo.s   := gl.p_ncurval(p_kvd, p_sd, gl.bdate);
     ELSIF p_kvd = gl.baseval THEN
       oo.vob := 16;
-      oo.s   := gl.p_icurval(p_kvk, p_sd, gl.bd);
+      oo.s   := gl.p_icurval(p_kvk, p_sd, gl.bdate);
     ELSE
       oo.vob := 16;
-      oo.s   := gl.p_ncurval(p_kvd, gl.p_icurval(p_kvk, p_sd, gl.bd), gl.bd);
+       oo.s   := gl.p_ncurval(p_kvd,
+                             gl.p_icurval(p_kvk, p_sd, gl.bdate),
+                             gl.bdate);
     END IF;
 
     oo.tt  := 'ISG';
@@ -1931,7 +1935,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                         14);
       oo.kv2  := gl.baseval;
       IF p_kvk <> gl.baseval THEN
-        oo.s2 := gl.p_icurval(p_kvk, p_sd, gl.bd);
+        oo.s2 := gl.p_icurval(p_kvk, p_sd, gl.bdate);
       END IF;
     END IF;
 
@@ -1942,15 +1946,15 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                vob_   => oo.vob,
                nd_    => oo.nd,
                pdat_  => SYSDATE,
-               vdat_  => gl.bd,
+               vdat_  => gl.bdate,
                dk_    => 1,
                kv_    => oo.kv,
                s_     => oo.s,
                kv2_   => oo.kv2,
                s2_    => oo.s2,
                sk_    => NULL,
-               data_  => gl.bd,
-               datp_  => gl.bd,
+               data_  => gl.bdate,
+               datp_  => gl.bdate,
                nam_a_ => oo.nam_a,
                nlsa_  => oo.nlsa,
                mfoa_  => gl.amfo,
@@ -1969,7 +1973,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
 
     gl.payv(0,
             oo.ref,
-            gl.bd,
+            gl.bdate,
             oo.tt,
             1,
             oo.kv,
@@ -1997,7 +2001,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
       END;
       gl.payv(0,
               oo.ref,
-              gl.bd,
+              gl.bdate,
               oo.tt,
               1,
               p_kvk,
@@ -2014,7 +2018,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   ------------------------------------------------------
 
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
-  PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bd) IS
+  PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS
     ll cc_lim%ROWTYPE;
   BEGIN
     BEGIN
@@ -2026,7 +2030,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
          AND l.fdat = (SELECT MAX(fdat)
                          FROM cc_lim
                         WHERE nd = p_nd
-                          AND fdat <= nvl(p_dat, gl.bd));
+                          AND fdat <= nvl(p_dat, gl.bdate));
       UPDATE accounts SET ostx = -ll.lim2, pap = 1 WHERE acc = ll.acc;
       UPDATE cc_deal SET LIMIT = ll.lim2 / 100 WHERE nd = p_nd;
       UPDATE cc_add
@@ -2157,7 +2161,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
        AND id = 0;
     l_ndat := add_months(l_bdat, uu.n_mon);
 
-    IF l_ndat > gl.bd THEN
+    IF l_ndat > gl.bdate THEN
       RETURN;
     END IF;
     ---------------
@@ -2171,7 +2175,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                           FROM br_normal bb
                          WHERE bb.kv = l_kv
                            AND bb.br_id = uu.br
-                           AND bb.bdate <= gl.bd);
+                           AND bb.bdate <= gl.bdate);
     EXCEPTION
       WHEN no_data_found THEN
         RETURN;
@@ -2233,7 +2237,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     dat_next DATE; -- след.банк-дата
 
   BEGIN
-    dat_ := nvl(p_dat, gl.bd);
+    dat_ := nvl(p_dat, gl.bdate);
     --Универсальная функция поиска банковской даты, отстоящей от заданной (datb_)
     --на расстоянии  next_ шагов вперед (next_ > 0) или назад (next_ < 0)
 
@@ -2472,7 +2476,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                          AND a.tip IN ('SP ', 'SPN')
                          AND (p.s270 = '08' OR p.r013 = '2')
                          AND a.ostc < 0
-                         AND dat_ = gl.bd) obs3
+                         AND dat_ = gl.bdate) obs3
                 FROM cc_deal d
                WHERE d.sos >= 10
                  AND d.sos < 14
@@ -2649,7 +2653,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
           (nd, fdat, isp, txt, otm)
         VALUES
           (i,
-           gl.bd,
+           gl.bdate,
            gl.auid,
            'Змiна ОБС.боргу з ' ||
            TRIM(substr(txt_, mas_obs_(i).obs_old * 10 + 1, 10)) || ' на ' ||
@@ -2664,7 +2668,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
             (nd, fdat, isp, txt, otm)
           VALUES
             (i,
-             gl.bd,
+             gl.bdate,
              gl.auid,
              'Змiна ОБС.боргу з ' ||
              TRIM(substr(txt_, mas_obs_(i).obs_old * 10 + 1, 10)) || ' на ' ||
@@ -2719,8 +2723,8 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     acc8_     INT;
     nint_     NUMBER;
     nlim_     NUMBER;
-    dat_sn1_  DATE := gl.bd - 1;
-    dat_sk1_  DATE := gl.bd - 1;
+    dat_sn1_  DATE := gl.bdate - 1;
+    dat_sk1_  DATE := gl.bdate - 1;
     l_title   VARCHAR2(20) := 'CCK.GET_INFO:'; -- префикс для трассировки
     l_bn      NUMBER := 0; -- ознака безнад_йност_
     l_acc_s8p accounts.acc%TYPE;
@@ -3409,15 +3413,15 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                  6,
                  ref_,
                  SYSDATE,
-                 gl.bd,
+                 gl.bdate,
                  1,
                  gl.baseval,
                  s_,
                  gl.baseval,
                  s_,
                  NULL,
-                 gl.bd,
-                 gl.bd,
+                 gl.bdate,
+                 gl.bdate,
                  nms_2909,
                  nls_2909,
                  gl.amfo,
@@ -3435,7 +3439,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                  gl.auid);
       gl.payv(0,
               ref_,
-              gl.bd,
+              gl.bdate,
               'ASG',
               1,
               gl.baseval,
@@ -3446,7 +3450,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
               s_);
       gl.payv(0,
               ref_,
-              gl.bd,
+              gl.bdate,
               'ASG',
               1,
               gl.baseval,
@@ -3457,7 +3461,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
               s_);
 
       IF tip_6397 = 'NLX' OR fl_ = 1 THEN
-        gl.pay(2, ref_, gl.bd);
+        gl.pay(2, ref_, gl.bdate);
         IF tip_6397 = 'NLX' THEN
           DELETE FROM nlk_ref
            WHERE ref1 = ref_
@@ -3635,7 +3639,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     nms_     VARCHAR2(38);
     vob_     INT;
     nms6_    VARCHAR2(38);
-    vdat_    DATE := gl.bd;
+    vdat_    DATE := gl.bdate;
     acc8_    INT;
     nls6_    VARCHAR2(15);
     irr_     NUMBER;
@@ -3759,13 +3763,13 @@ CREATE OR REPLACE PACKAGE BODY cck IS
           /* k.KV - вал КД, k1.KV = вал ссудного сч */
           IF k.kv <> k1.kv THEN
             IF k1.kv = gl.baseval THEN
-              int_ := gl.p_ncurval(k.kv, int_, gl.bd);
+              int_ := gl.p_ncurval(k.kv, int_, gl.bdate);
             ELSIF k.kv = gl.baseval THEN
-              int_ := gl.p_icurval(k1.kv, int_, gl.bd);
+              int_ := gl.p_icurval(k1.kv, int_, gl.bdate);
             ELSE
               int_ := gl.p_ncurval(k.kv,
-                                   gl.p_icurval(k1.kv, int_, gl.bd),
-                                   gl.bd);
+                                   gl.p_icurval(k1.kv, int_, gl.bdate),
+                                   gl.bdate);
             END IF;
           END IF;
           sn_ := sn_ - int_;
@@ -3781,12 +3785,12 @@ CREATE OR REPLACE PACKAGE BODY cck IS
       IF zoirr_ = 1 THEN
         BEGIN
           IF gl.baseval = 980 AND
-             to_char(gl.bd, 'yyyyMM') > to_char(dat_, 'yyyyMM') THEN
+             to_char(gl.bdate, 'yyyyMM') > to_char(dat_, 'yyyyMM') THEN
             BEGIN
               SELECT MAX(fdat)
                 INTO vdat_
                 FROM fdat
-               WHERE to_char(fdat, 'yyyyMM') < to_char(gl.bd, 'yyyyMM');
+               WHERE to_char(fdat, 'yyyyMM') < to_char(gl.bdate, 'yyyyMM');
               vob_ := 96;
             EXCEPTION
               WHEN no_data_found THEN
@@ -3859,7 +3863,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
              SYSDATE,
              vdat_,
              vdat_,
-             gl.bd,
+             gl.bdate,
              k2.nms,
              k2.nls,
              gl.amfo,
@@ -3905,7 +3909,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                          s.ostf + s.kos -
                          decode(a.tip,
                                 'SN ',
-                                decode(s.fdat, gl.bd, 0, s.dos),
+                                decode(s.fdat, gl.bdate, 0, s.dos),
                                 s.dos) ost
                     FROM nd_acc n, accounts a, saldoa s
                    WHERE n.nd = k.nd
@@ -4029,7 +4033,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
              ref_,
              vdat_,
              vdat_,
-             gl.bd,
+             gl.bdate,
              gl.amfo,
              k.kv,
              nms6_,
@@ -4149,7 +4153,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                  ref_,
                  vdat_,
                  vdat_,
-                 gl.bd,
+                 gl.bdate,
                  gl.amfo,
                  k.kv,
                  nms6_,
@@ -4215,7 +4219,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                  ref_,
                  vdat_,
                  vdat_,
-                 gl.bd,
+                 gl.bdate,
                  gl.amfo,
                  k.kv,
                  nms6_,
@@ -4281,7 +4285,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                  ref_,
                  vdat_,
                  vdat_,
-                 gl.bd,
+                 gl.bdate,
                  gl.amfo,
                  k.kv,
                  nms6_,
@@ -4343,7 +4347,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     ref_   INT;
     mdate_ DATE;
     nazn_  VARCHAR2(160);
-    vdat_  DATE := gl.bd;
+    vdat_  DATE := gl.bdate;
     isp_   INT;
     grp_   INT;
     s65_   CHAR(1);
@@ -4357,12 +4361,12 @@ CREATE OR REPLACE PACKAGE BODY cck IS
      WHERE tt = tt_;
     -- в период ЗО на Украине
     IF gl.baseval = 980 AND
-       to_char(gl.bd, 'yyyyMM') > to_char(dat_, 'yyyyMM') THEN
+       to_char(gl.bdate, 'yyyyMM') > to_char(dat_, 'yyyyMM') THEN
       BEGIN
         SELECT MAX(fdat)
           INTO vdat_
           FROM fdat
-         WHERE to_char(fdat, 'yyyyMM') < to_char(gl.bd, 'yyyyMM');
+         WHERE to_char(fdat, 'yyyyMM') < to_char(gl.bdate, 'yyyyMM');
         vob_ := 96;
       EXCEPTION
         WHEN no_data_found THEN
@@ -4478,7 +4482,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
          SYSDATE,
          vdat_,
          vdat_,
-         gl.bd,
+         gl.bdate,
          nms_,
          nls_,
          gl.amfo,
@@ -4567,7 +4571,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
         INTO dd;
       EXIT WHEN d1%NOTFOUND;
       cck.int_irr(dd, p_dat2, l_ref);
-      --         If l_ref is not null then gl.pay (2, l_ref, gl.bd);  end if;
+      --         If l_ref is not null then gl.pay (2, l_ref, gl.bdate);  end if;
     END LOOP;
     CLOSE d1;
   END cc_irr_new;
@@ -4679,15 +4683,15 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                    tt_    => 'IRR',
                    vob_   => 6,
                    nd_    => to_char(dd.nd),
-                   vdat_  => gl.bd,
+                   vdat_  => gl.bdate,
                    dk_    => 1,
                    kv_    => aa2.kv,
                    s_     => 1,
                    kv2_   => gl.baseval,
                    s2_    => 1,
                    sk_    => NULL,
-                   data_  => gl.bd,
-                   datp_  => gl.bd,
+                   data_  => gl.bdate,
+                   datp_  => gl.bdate,
                    nam_a_ => substr(aa2.nms, 1, 38),
                    nlsa_  => aa2.nls,
                    mfoa_  => gl.amfo,
@@ -4739,7 +4743,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
             IF aad.ostc >= 1 THEN
               gl.payv(0,
                       p_ref,
-                      gl.bd,
+                      gl.bdate,
                       'IRR',
                       1,
                       aa8.kv,
@@ -4792,11 +4796,11 @@ CREATE OR REPLACE PACKAGE BODY cck IS
             IF aa8.kv = gl.baseval THEN
               oo_s2 := oo_s;
             ELSE
-              oo_s2 := gl.p_icurval(aa8.kv, oo_s, gl.bd);
+              oo_s2 := gl.p_icurval(aa8.kv, oo_s, gl.bdate);
             END IF;
             gl.payv(0,
                     p_ref,
-                    gl.bd,
+                    gl.bdate,
                     'IRR',
                     oo_dk,
                     aa8.kv,
@@ -4834,15 +4838,15 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                      tt_    => '%%1',
                      vob_   => 6,
                      nd_    => to_char(dd.nd),
-                     vdat_  => gl.bd,
+                     vdat_  => gl.bdate,
                      dk_    => 1,
                      kv_    => k.kv,
                      s_     => 1,
                      kv2_   => gl.baseval,
                      s2_    => 1,
                      sk_    => NULL,
-                     data_  => gl.bd,
-                     datp_  => gl.bd,
+                     data_  => gl.bdate,
+                     datp_  => gl.bdate,
                      nam_a_ => substr(aa1.nms, 1, 38),
                      nlsa_  => aa1.nls,
                      mfoa_  => gl.amfo,
@@ -4869,7 +4873,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
 
         gl.payv(0,
                 p_ref,
-                gl.bd,
+                gl.bdate,
                 '%%1',
                 1,
                 aa1.kv,
@@ -4888,7 +4892,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
          WHERE REF = gl.aref
            AND stmt = gl.astmt;
         UPDATE oper SET s = l_int, s2 = NULL WHERE REF = p_ref;
-        gl.pay(2, p_ref, gl.bd);
+        gl.pay(2, p_ref, gl.bdate);
 
         -- внести в архів для друку
         acrn.acr_dati(k.acc, 0, p_ref, p_dat2, l_remi);
@@ -5098,7 +5102,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   ----------------------------------------
   FUNCTION sum_spn(nd_ INT) RETURN NUMBER IS
     --Сумма просроч проц по договору на дату
-    dat31_ DATE := gl.bd - to_number(to_char(gl.bd, 'dd'));
+    dat31_ DATE := gl.bdate - to_number(to_char(gl.bdate, 'dd'));
     sn_    NUMBER := 0;
     kos_   NUMBER := 0;
     k_     NUMBER := 0;
@@ -5122,7 +5126,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                    AND a.tip = 'SN ') LOOP
         BEGIN
           --начислено (остаток) на 31 число
-          SELECT -gl.p_icurval(k.kv, s.ostf + s.kos - s.dos, gl.bd)
+          SELECT -gl.p_icurval(k.kv, s.ostf + s.kos - s.dos, gl.bdate)
             INTO s_
             FROM saldoa s
            WHERE s.acc = k.acc
@@ -5134,12 +5138,12 @@ CREATE OR REPLACE PACKAGE BODY cck IS
           sn_ := sn_ + s_;
 
           --погашено с тех пор по запрош.дату
-          SELECT nvl(SUM(gl.p_icurval(k.kv, s.kos, gl.bd)), 0)
+          SELECT nvl(SUM(gl.p_icurval(k.kv, s.kos, gl.bdate)), 0)
             INTO k_
             FROM saldoa s
            WHERE s.acc = k.acc
              AND s.fdat > dat31_
-             AND s.fdat <= gl.bd;
+             AND s.fdat <= gl.bdate;
           kos_ := kos_ + k_;
 
         EXCEPTION
@@ -5150,7 +5154,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
 
       IF sn_ > kos_ THEN
         -- не все погасили !
-        spn_ := gl.p_ncurval(kv_, sn_ - kos_, gl.bd);
+        spn_ := gl.p_ncurval(kv_, sn_ - kos_, gl.bdate);
       END IF;
 
     EXCEPTION
@@ -5302,54 +5306,28 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     -- Не контролирует лимит для операции типа 'BAK'
     l_su   NUMBER;
     l_sdi  NUMBER;
-    l_nd   NUMBER;
+    l_nd   NUMBER;   l_ndG   NUMBER;
     l_vidd NUMBER;
 
   BEGIN
 
-    --  Проверка на выдачу дисконта
-    BEGIN
+     --  Проверка на выдачу дисконта    14.02.2018 Sta Анализ НЕ-нул.остатка комиссии перед выдачей кредита (при наличии доп.реквизита по комиссии)
+    BEGIN   -- к какому дог привязан ссудный счет, с которого происходит выдача ? И есть ли на нем доп.реквизит про комиссию
+       SELECT cck_app.to_number2(t.txt), d.nd, d.ndG, d.vidd    INTO l_sdi, l_nd, l_ndG, l_vidd  FROM nd_txt t, accounts a, oper o, nd_acc n, cc_deal d
+       WHERE t.tag = 'S_SDI'  AND t.nd = n.nd  AND n.acc = a.acc
+         AND n.nd = d.nd      AND d.sos < 14   AND decode(o.dk, 1, o.nlsa, o.nlsb) = a.nls    AND decode(o.dk, 1, o.kv, o.kv2) = a.kv   AND o.ref = ref_;
+    EXCEPTION  WHEN OTHERS THEN     l_sdi := 0;
 
-      SELECT cck_app.to_number2(t.txt), d.nd, d.vidd
-        INTO l_sdi, l_nd, l_vidd
-        FROM nd_txt t, accounts a, oper o, nd_acc n, cc_deal d
-       WHERE t.tag = 'S_SDI'
-         AND t.nd = n.nd
-         AND n.acc = a.acc
-         AND n.nd = d.nd
-         AND d.sos < 14
-         AND decode(o.dk, 1, o.nlsa, o.nlsb) = a.nls
-         AND decode(o.dk, 1, o.kv, o.kv2) = a.kv
-         AND o.ref = ref_;
-    EXCEPTION
-      WHEN OTHERS THEN
-        l_sdi := 0;
+
     END;
 
-    -- 28.05.2013 - проверку на дисконт делаем только для стандартных договоров ЮЛ, а для ФЛ - для всех
-    IF l_vidd IN (1, 11, 12, 13) THEN
-
-      IF l_sdi > 0 THEN
-
-        -- 05.09.2012  select max(s.ostf-s.dos+s.kos)/100
-        -- Убрал -s.dos если в этот же день сделали амортизацию дисконта другие
-        -- будущие транши вылетали при следуюшем условии проверки как недоплата суммы дисконта
-        SELECT MAX(s.ostf + s.kos) / 100
-          INTO l_su
-          FROM accounts aa, nd_acc nn, saldoa s
-         WHERE nn.nd = l_nd
-           AND nn.acc = aa.acc
-           AND aa.tip IN ('SDI', 'S36')
-           AND s.acc = aa.acc
-           AND s.fdat >= aa.daos;
-
-        IF l_sdi > nvl(l_su, 0) THEN
-          erm := '8999 - На рахунок дисконту не нарахована (донарахована) сума в розмiрi  = ' ||
-                 to_char((l_sdi - l_su), '999G999G999G999D99');
-          RAISE err;
-        END IF;
-      END IF;
-
+      -- 28.05.2013 - проверку на дисконт делаем только для стандартных договоров ЮЛ, а для ФЛ - для всех
+    IF l_vidd IN (1, 11, 12, 13) and l_sdi > 0 THEN
+        -- 05.09.2012  ( Кто ?) select max(s.ostf-s.dos+s.kos)/100
+        -- Убрал -s.dos если в этот же день сделали амортизацию дисконта другие  -- будущие транши вылетали при следуюшем условии проверки как недоплата суммы дисконта
+        SELECT MAX(s.ostf + s.kos) / 100   INTO l_su   FROM accounts aa, nd_acc nn, saldoa s
+        WHERE nn.nd in (l_nd, l_nDG)   AND nn.acc = aa.acc     AND aa.tip IN ('SDI', 'S36')       AND s.acc = aa.acc       AND s.fdat >= aa.daos;
+        IF l_sdi > nvl(l_su, 0) THEN   erm := '8999 - Недостатні залишки по початковій комісії ';     RAISE err;    END IF;
     END IF;
 
     --- Проверка допустимости лимита  STA
@@ -5578,22 +5556,30 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     -----------------------------------------------------------------------------
     UPDATE cc_deal
        SET LIMIT = gl.p_ncurval(kv2_,
-                                gl.p_icurval(kv1_, LIMIT, gl.bd),
-                                gl.bd)
+                                gl.p_icurval(kv1_, LIMIT, gl.bdate),
+                                gl.bdate)
      WHERE nd = nd_;
     UPDATE cc_add
        SET kv = kv2_,
-           s  = gl.p_ncurval(kv2_, gl.p_icurval(kv1_, s, gl.bd), gl.bd)
+           s  = gl.p_ncurval(kv2_, gl.p_icurval(kv1_, s, gl.bdate), gl.bdate)
      WHERE nd = nd_
        AND adds = 0;
     UPDATE cc_lim
-       SET lim2 = gl.p_ncurval(kv2_, gl.p_icurval(kv1_, lim2, gl.bd), gl.bd),
-           sumg = gl.p_ncurval(kv2_, gl.p_icurval(kv1_, sumg, gl.bd), gl.bd),
-           sumo = gl.p_ncurval(kv2_, gl.p_icurval(kv1_, sumo, gl.bd), gl.bd)
+         SET lim2 = gl.p_ncurval(kv2_,
+                               gl.p_icurval(kv1_, lim2, gl.bdate),
+                               gl.bdate),
+           sumg = gl.p_ncurval(kv2_,
+                               gl.p_icurval(kv1_, sumg, gl.bdate),
+                               gl.bdate),
+           sumo = gl.p_ncurval(kv2_,
+                               gl.p_icurval(kv1_, sumo, gl.bdate),
+                               gl.bdate)
      WHERE nd = nd_;
     UPDATE accounts
        SET kv   = kv2_,
-           ostx = gl.p_ncurval(kv2_, gl.p_icurval(kv1_, ostx, gl.bd), gl.bd)
+              ostx = gl.p_ncurval(kv2_,
+                               gl.p_icurval(kv1_, ostx, gl.bdate),
+                               gl.bdate)
      WHERE nls = vkrzn(substr(gl.amfo, 1, 5), '89990' || nd_)
        AND kv = kv1_;
     cck.cc_start(nd_);
@@ -5622,7 +5608,10 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     COMMIT;
     id_ := nvl(id_, user_id);
     -- максим раб дата в запрошенном периоде
-    SELECT nvl(MAX(fdat), gl.bd) INTO dat_ FROM fdat WHERE fdat <= dat2_;
+     SELECT nvl(MAX(fdat), gl.bdate)
+      INTO dat_
+      FROM fdat
+     WHERE fdat <= dat2_;
 
     FOR k IN (SELECT substr(a.tip, 2, 1) dl,
                      a.acc,
@@ -5631,7 +5620,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                      a.kv,
                      ad.aim,
                      d.nd,
-                     nvl(a.mdate, gl.bd) mdate,
+                     nvl(a.mdate, gl.bdate) mdate,
                      a.daos,
                      acrn.fproc(a.acc, dat_) pr,
                      d.user_id,
@@ -5845,7 +5834,10 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     COMMIT;
 
     -- максим раб дата в запрошенном периоде
-    SELECT nvl(MAX(fdat), gl.bd) INTO dat_ FROM fdat WHERE fdat <= dat2_;
+     SELECT nvl(MAX(fdat), gl.bdate)
+      INTO dat_
+      FROM fdat
+     WHERE fdat <= dat2_;
 
     iq_ := 0;
     FOR k IN (SELECT a.acc,
@@ -6320,6 +6312,12 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     IF l_daynp_c = 0 THEN
       cck_app.set_nd_txt(nd_, 'DAYNP', 1);
     END IF;
+    if nvid in (2, 3) then
+      update cc_deal
+         set ndg = nd_
+       where nd = nd_
+         and ndg is null;
+    end if;
     -- процедура по установке платежных реквизитов по кредиту
     cck.set_pmt_instructions(p_nd       => nd_, -- реф КД
                              p_mfokred  => to_char(nbank), -- Платежные инструкции МФО
@@ -6386,7 +6384,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     INSERT INTO int_accn
       (acc, id, metr, basem, basey, freq, s, apl_dat, acr_dat)
     VALUES
-      (acc_, 0, 0, 0, nbasey, nfreqp, dfden, datnp, gl.bd - 1);
+      (acc_, 0, 0, 0, nbasey, nfreqp, dfden, datnp, gl.bdate - 1);
     INSERT INTO int_ratn
       (acc, id, bdat, ir)
     VALUES
@@ -6409,7 +6407,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
            cc_kom_,
            nbasey,
            1,
-           gl.bd - to_number(to_char(gl.bd, 'dd')));
+           gl.bdate - to_number(to_char(gl.bdate, 'dd')));
         INSERT INTO int_ratn
           (acc, id, bdat, ir)
         VALUES
@@ -6422,9 +6420,9 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     INSERT INTO cc_sob
       (nd, fdat, isp, txt, otm)
     VALUES
-      (nd_, gl.bd, id_, 'Договор введен', 6);
+      (nd_, gl.bdate, id_, 'Договор введен', 6);
     ntmp_ := ns * 100;
-    UPDATE accounts SET pap = 1, ostx = -ntmp_ WHERE acc = acc_;
+    UPDATE accounts SET pap = 1, ostx = -ntmp_, mdate = dat4 WHERE acc = acc_;
     acrn.p_int(acc_, 0, dat3, dat4 - 1, nint_, -ntmp_, 0);
     nint_ := ntmp_ + round(-nint_, 0);
     INSERT INTO cc_lim
@@ -6506,11 +6504,41 @@ CREATE OR REPLACE PACKAGE BODY cck IS
     dat3_   DATE;
     cc_kom_ INT;
     nsos cc_Deal.sos%type;
+    l_nd    cc_Deal.nd%TYPE;
   BEGIN
- begin
- select t.sos into  nsos from cc_deal t where t.nd= nd_;
- exception when no_data_found then
-   nsos:=0;
+   
+    BEGIN
+      --COBUPRVNIX-113
+      SELECT d.nd
+        INTO l_nd
+        FROM cc_Deal d
+       WHERE d.vidd in (2, 3)
+         AND d.nd = nd_;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+        --Тип КД не є ЮО або не заповнений !
+      WHEN TOO_MANY_ROWS THEN
+        raise_application_error(g_errn,
+                                g_errs || 'cc_kor -' || 'КД =' || nd_ ||
+                                ', має декілька записів');
+      
+        CASE
+          WHEN l_nd IS NOT NULL AND nvid_ = 1 THEN
+            raise_application_error(g_errn,
+                                    g_errs || 'cc_kor' ||
+                                    'Заборонено для кредитів ЮО змінювати вид КЛ на стандартний -' ||
+                                    nvid_);
+          ELSE
+            NULL;
+        END CASE;
+    END;
+  
+    begin
+      select t.sos into nsos from cc_deal t where t.nd = nd_;
+    exception
+      when no_data_found then
+        nsos := 0;
   end;
 
     UPDATE customer SET crisk = nfin_ WHERE rnk = nrnk_;
@@ -6595,7 +6623,7 @@ end if;
     INSERT INTO int_accn
       (acc, id, metr, basem, basey, freq, s, apl_dat, acr_dat)
     VALUES
-      (acc_, 0, 0, 0, nbasey_, nfreqp_, dfden_, datnp_, gl.bd - 1);
+      (acc_, 0, 0, 0, nbasey_, nfreqp_, dfden_, datnp_, gl.bdate - 1);
     INSERT INTO int_ratn
       (acc, id, bdat, ir)
     VALUES
@@ -6653,7 +6681,11 @@ end if;
     INSERT INTO cc_sob
       (nd, fdat, isp, txt, otm)
     VALUES
-      (nd_, gl.bd, gl.auid, 'Договор модифицирован', 6);
+       (nd_,
+       gl.bdate,
+       gl.auid,
+       'Договор модифицирован',
+       6);
     UPDATE nd_txt
        SET txt = saim_
      WHERE nd = nd_
@@ -6948,7 +6980,7 @@ end if;
           FROM accounts a
          WHERE a.nls = l_nls8
            AND a.kv = p_kv;
-        accreg.p_acc_restore(l_acc, gl.bd);
+        accreg.p_acc_restore(l_acc, gl.bdate);
       EXCEPTION
         WHEN no_data_found THEN
           NULL;
@@ -7134,7 +7166,7 @@ end if;
       cck_app.set_nd_txt(p_nd, 'PAWN', p_pawn);
     END IF;
 
-    cc_sob(p_nd, gl.bd, NULL, NULL, NULL, NULL, NULL, 0);
+    cc_sob(p_nd, gl.bdate, NULL, NULL, NULL, NULL, NULL, 0);
 
   END cc_open_ext;
 
@@ -7262,7 +7294,7 @@ end if;
         INSERT INTO int_accn
           (acc, id, metr, basey, freq, acr_dat)
         VALUES
-          (l_acc8, 4, 0, l_basey, 1, gl.bd - 1);
+          (l_acc8, 4, 0, l_basey, 1, gl.bdate - 1);
       END IF;
 
       DELETE FROM int_ratn
@@ -7549,7 +7581,7 @@ end if;
           IF SQL%ROWCOUNT = 0 THEN
             INSERT INTO int_accn
               (acc, id, metr, basem, basey, freq, acrb, acr_dat)
-              SELECT k.acc, 0, 0, 0, basey, 1, acc_, gl.bd - 1
+              SELECT k.acc, 0, 0, 0, basey, 1, acc_, gl.bdate - 1
                 FROM int_accn
                WHERE acc = l_acc8
                  AND id = 0;
@@ -7667,10 +7699,11 @@ end if;
 
     IF tip_ = 'SG ' THEN
       /* счет ГАШЕНИЯ и зачем это ? */
-      UPDATE cc_add
-         SET accp = acc_
-       WHERE nd = nd_
-         AND adds = 0;
+       UPDATE cc_add SET accp = acc_   WHERE nd = nd_   AND adds = 0;
+      begin  Insert into nd_acc ( nd, acc)   
+             select d.nd, acc_  from cc_deal d, nd_acc n, accounts a   where d.ndg = nd_ and d.nd <> d.ndg and d.nd = n.nd and n.acc = a.acc and a.kv = kv_ and a.tip ='LIM' ;
+      exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint 
+      end;
     END IF;
 
     -- Заполнение спецпараметров
@@ -7752,7 +7785,16 @@ end if;
         INSERT INTO int_accn
           (acc, id, metr, basem, basey, freq, acra, acrb, tt, acr_dat)
         VALUES
-          (acc_, 0, 0, l_basem, l_basey, 1, acra_, acrb_, tt_, gl.bd - 1);
+          (acc_,
+           0,
+           0,
+           l_basem,
+           l_basey,
+           1,
+           acra_,
+           acrb_,
+           tt_,
+           gl.bdate - 1);
         -- проц.ставку берем из доп.парам м/вал.договора
         BEGIN
           SELECT to_number(txt)
@@ -7776,7 +7818,7 @@ end if;
               (acc_, 0, x.bdat, x.ir);
           END LOOP;
           /*insert into int_ratn (ACC,ID,BDAT,IR)
-          select ACC_,0,gl.bd,IR from int_ratn
+          select ACC_,0,gl.bdate,IR from int_ratn
           where  acc = l_acc8 and id = 0
             and  bdat = (select max(bdat) from int_ratn  where id=0 and acc=l_ACC8 ) ;*/
         ELSE
@@ -7784,7 +7826,7 @@ end if;
           INSERT INTO int_ratn
             (acc, id, bdat, ir)
           VALUES
-            (acc_, 0, gl.bd, rat_);
+            (acc_, 0, gl.bdate, rat_);
         END IF;
       END IF;
     END IF;
@@ -7901,7 +7943,7 @@ end if;
           INSERT INTO int_accn
             (acc, id, metr, basem, basey, freq, acra, acrb, tt, acr_dat)
           VALUES
-            (acc_, 1, 4, 0, 0, 1, acra_, acrb_, tt_, gl.bd - 1);
+            (acc_, 1, 4, 0, 0, 1, acra_, acrb_, tt_, gl.bdate - 1);
         END IF;
       END IF;
     END IF;
@@ -7973,12 +8015,12 @@ end if;
           INSERT INTO int_ratn
             (acc, id, bdat, ir)
           VALUES
-            (acc_, 0, gl.bd, r_cr9);
+            (acc_, 0, gl.bdate, r_cr9);
         ELSE
           BEGIN
             INSERT INTO int_ratn
               (acc, id, bdat, ir)
-              (SELECT acc_, 0, gl.bd, r_cr9
+              (SELECT acc_, 0, gl.bdate, r_cr9
                  FROM dual
                 WHERE 0 = (SELECT COUNT(*)
                              FROM int_ratn
@@ -7991,7 +8033,7 @@ end if;
                  SET ir = r_cr9
                WHERE acc = acc_
                  AND id = 0
-                 AND bdat = gl.bd;
+                 AND bdat = gl.bdate;
           END;
 
         END IF;
@@ -8022,7 +8064,7 @@ end if;
         INSERT INTO int_accn
           (acc, id, metr, basey, freq, tt, acra, acrb, acr_dat)
         VALUES
-          (l_acc8, 2, 0, 0, 1, tt_, acc_, acrb_, gl.bd - 1);
+          (l_acc8, 2, 0, 0, 1, tt_, acc_, acrb_, gl.bdate - 1);
       END IF;
       -- дополняем проц каточку для коммиссии за неисользованный лимит
       UPDATE int_accn
@@ -8097,7 +8139,7 @@ end if;
               INSERT INTO int_accn
                 (acc, id, metr, basey, freq, tt, acra, acrb, acr_dat)
               VALUES
-                (k8.acc, 2, 0, 0, 1, tt_, acc_, acc_8006, gl.bd - 1);
+                (k8.acc, 2, 0, 0, 1, tt_, acc_, acc_8006, gl.bdate - 1);
               IF spn_bri_ IS NOT NULL THEN
                 SELECT COUNT(*)
                   INTO count_rat_
@@ -8111,7 +8153,7 @@ end if;
                     (acc, id, bdat, ir)
                     (SELECT k8.acc,
                             2,
-                            gl.bd,
+                            gl.bdate,
                             to_number(translate(txt, '.', ','),
                                       '9999D9999',
                                       ' NLS_NUMERIC_CHARACTERS = '',.''')
@@ -8122,7 +8164,7 @@ end if;
                     INSERT INTO int_ratn
                       (acc, id, bdat, ir, op, br)
                     VALUES
-                      (k8.acc, 2, gl.bd, 2, 3, spn_bri_);
+                      (k8.acc, 2, gl.bdate, 2, 3, spn_bri_);
                   END IF;
                 END IF;
               END IF;
@@ -8166,7 +8208,7 @@ end if;
             INSERT INTO int_accn
               (acc, id, metr, basey, freq, tt, acra, acrb, acr_dat)
             VALUES
-              (acc_, 2, 0, 0, 1, tt_, acc_8008, acc_8006, gl.bd - 1);
+              (acc_, 2, 0, 0, 1, tt_, acc_8008, acc_8006, gl.bdate - 1);
             IF spn_bri_ IS NOT NULL THEN
               SELECT COUNT(*)
                 INTO count_rat_
@@ -8180,7 +8222,7 @@ end if;
                   (acc, id, bdat, ir)
                   (SELECT acc_,
                           2,
-                          gl.bd,
+                          gl.bdate,
                           to_number(translate(txt, '.', ','),
                                     '9999D9999',
                                     ' NLS_NUMERIC_CHARACTERS = '',.''')
@@ -8191,7 +8233,7 @@ end if;
                   INSERT INTO int_ratn
                     (acc, id, bdat, ir, op, br)
                   VALUES
-                    (acc_, 2, gl.bd, 2, 3, spn_bri_);
+                    (acc_, 2, gl.bdate, 2, 3, spn_bri_);
                 END IF;
               END IF;
             END IF;
@@ -8230,9 +8272,9 @@ end if;
              acrb    = acrb_,
              tt      = nvl(tt, tt_),
              stp_dat = (CASE
-                         WHEN (stp_dat > nvl(acr_dat, gl.bd) OR
+                         WHEN (stp_dat > nvl(acr_dat, gl.bdate) OR
                               stp_dat IS NULL) AND cc_slstp = 0 THEN
-                          nvl(acr_dat, gl.bd)
+                          nvl(acr_dat, gl.bdate)
                          ELSE
                           stp_dat
                        END)
@@ -8261,9 +8303,9 @@ end if;
              acrb    = acrb_,
              tt      = nvl(tt, tt_),
              stp_dat = (CASE
-                         WHEN (stp_dat > nvl(acr_dat, gl.bd) OR
+                         WHEN (stp_dat > nvl(acr_dat, gl.bdate) OR
                               stp_dat IS NULL) AND cc_slstp = 0 THEN
-                          nvl(acr_dat, gl.bd)
+                          nvl(acr_dat, gl.bdate)
                          ELSE
                           stp_dat
                        END)
@@ -8290,9 +8332,9 @@ end if;
              acrb    = acrb_,
              tt      = nvl(tt, tt_),
              stp_dat = (CASE
-                         WHEN (stp_dat > nvl(acr_dat, gl.bd) OR
+                         WHEN (stp_dat > nvl(acr_dat, gl.bdate) OR
                               stp_dat IS NULL) AND cc_slstp = 0 THEN
-                          nvl(acr_dat, gl.bd)
+                          nvl(acr_dat, gl.bdate)
                          ELSE
                           stp_dat
                        END)
@@ -8377,7 +8419,7 @@ end if;
     RETURNING COUNT(acc) INTO l_col;
     IF l_col = 1 THEN
       cc_sob(p_nd,
-             gl.bd,
+             gl.bdate,
              NULL,
              NULL,
              'З договору виведен рахунок № ' || r_aa.nls,
@@ -8427,7 +8469,7 @@ end if;
                                   'ZZI') OR
                        (a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26'))
                    AND (a.ostc <> 0 OR a.ostb <> 0 OR a.ostf <> 0 OR
-                       (a.dos + a.kos) > 0 AND a.dapp >= gl.bd)) LOOP
+                       (a.dos + a.kos) > 0 AND a.dapp >= gl.bdate)) LOOP
         erm := erm || ' Сч ' || k.nls || '/' || k.kv ||
                ' имеет остаток или обороты.';
         RAISE err;
@@ -8444,7 +8486,7 @@ end if;
                          WHERE accs NOT IN
                                (SELECT acc FROM nd_acc WHERE nd = nd_))
                    AND (a.ostc <> 0 OR a.ostb <> 0 OR a.ostf <> 0 OR
-                       (a.dos + a.kos) > 0 AND a.dapp >= gl.bd)) LOOP
+                       (a.dos + a.kos) > 0 AND a.dapp >= gl.bdate)) LOOP
         erm := erm || ' Сч ' || k.nls || '/' || k.kv ||
                ' имеет остаток или обороты.';
         RAISE err;
@@ -8544,7 +8586,16 @@ end if;
                                 FROM cc_prol
                                WHERE nd = d.nd
                                  AND dmdat = c.dmdat
-                                 AND c.dmdat IS NOT NULL)) LOOP
+                                 AND c.dmdat IS NOT NULL)
+            union -- Добавление субдоговоров для пролонгации
+             select d.nd,c.mdate, d.vidd, d.sdate
+              from cc_deal d, cc_prol c
+             where p_nd = d.ndg 
+               and d.nd<>d.ndg 
+               and d.ndg = c.nd
+               and d.vidd in (1,2,3) and d.sos<15
+               and c.dmdat = p_dat and c.dmdat is not null
+               and c.npp = (select max(npp) from cc_prol where nd = d.ndg and dmdat = c.dmdat and c.dmdat is not null)) LOOP
       SELECT d.wdate,
              (SELECT MIN(s.s080)
                 FROM nd_acc n, accounts a, specparam s
@@ -8708,7 +8759,7 @@ end if;
                                 'S36') OR
                      a.tip = 'SG ' AND substr(a.nbs, 1, 2) <> '26')
                  AND (a.ostc <> 0 OR a.ostb <> 0 OR a.ostf <> 0 OR
-                     a.dos + a.kos > 0 AND a.dapp >= gl.bd)) LOOP
+                     a.dos + a.kos > 0 AND a.dapp >= gl.bdate)) LOOP
       serr_ := serr_ || ' Сч ' || k.nls || '/' || k.kv ||
                ' имеет остаток или обороты.';
     END LOOP;
@@ -8720,7 +8771,7 @@ end if;
                      p.accs    in (select acc from nd_acc  where nd=ND_) and
                      p.acc not in (select acc from cc_accp
                                    where accs not in (select acc from nd_acc where nd=ND_)) and
-                    (a.ostc<>0 or a.ostb<>0 or a.ostf<>0 or (a.dos+a.kos)>0 and a.dapp>=gl.bd ) )
+                    (a.ostc<>0 or a.ostb<>0 or a.ostf<>0 or (a.dos+a.kos)>0 and a.dapp>=gl.bdate ) )
     loop  sErr_:= sErr_||' Сч '||k.NLS||'/'||k.kv||' имеет остаток или обороты.' ; end loop;
     */
 
@@ -8742,7 +8793,7 @@ end if;
       acrn.p_int(k.acc,
                  k.id,
                  k.dat1,
-                 nvl(k.stp_dat, gl.bd - 1),
+                 nvl(k.stp_dat, gl.bdate - 1),
                  nint_,
                  NULL,
                  1);
@@ -8817,7 +8868,7 @@ end if;
       gl.ref(oo.ref);
       oo.tt    := 'ZAL';
       oo.vob   := 6;
-      oo.vdat  := gl.bd;
+      oo.vdat  := gl.bdate;
       oo.kv    := k.kv;
       oo.s     := k.ostc;
       oo.nlsb  := k.nls;
@@ -8900,7 +8951,7 @@ end if;
       IF l_migr IS NOT NULL AND k.tip LIKE '%SG%' AND k.nbs = '3739' THEN
         NULL;
       ELSE
-        UPDATE accounts SET dazs = gl.bd WHERE acc = k.acc;
+        UPDATE accounts SET dazs = gl.bdate WHERE acc = k.acc;
       END IF;
     END LOOP;
 
@@ -8916,9 +8967,9 @@ end if;
                  AND a.ostc = 0
                  AND a.ostb = 0
                  AND a.ostf = 0
-                 AND a.dapp < gl.bd
+                 AND a.dapp < gl.bdate
                  AND a.dazs IS NULL) LOOP
-      UPDATE accounts SET dazs = gl.bd WHERE acc = k.acc;
+      UPDATE accounts SET dazs = gl.bdate WHERE acc = k.acc;
     END LOOP;
 
     SELECT sos INTO sos_ FROM cc_deal WHERE nd = nd_;
@@ -9023,7 +9074,7 @@ end if;
     INSERT INTO cc_sob
       (nd, fdat, isp, txt, otm)
     VALUES
-      (nd_, gl.bd, gl.auid, saim_, 6);
+      (nd_, gl.bdate, gl.auid, saim_, 6);
 
     BEGIN
       SELECT substr(val, 1, 1) INTO par_ FROM params WHERE par = 'CC_KOL';
@@ -9503,7 +9554,7 @@ end if;
                   FROM cc_pog
                  WHERE nd = k.nd
                    AND fdat > k.sdate
-                   AND fdat < gl.bd
+                   AND fdat < gl.bdate
                    AND nvl(otm, 0) <> 1
                  ORDER BY fdat) LOOP
         IF s1_ <= 0 OR s1_ < p.sumg THEN
@@ -9538,7 +9589,7 @@ end if;
       FOR p IN (SELECT sumg, fdat
                   FROM cc_pog
                  WHERE nd = k.nd
-                   AND fdat >= gl.bd
+                   AND fdat >= gl.bdate
                    AND nvl(otm, 0) <> 1
                  ORDER BY decode(par1_, '0', -1, +1) * (k.wdate - fdat)) LOOP
         IF s1_ <= 0 OR s1_ < p.sumg THEN
@@ -9572,8 +9623,8 @@ end if;
   BEGIN
     SELECT kv, ostc INTO kv_, ostc_ FROM accounts WHERE acc = acc8_;
 
-    logger.trace('CCK.RATE_LIM gl.bd=' || to_char(gl.bd) || ' sysdate=' ||
-                 to_char(SYSDATE));
+    logger.trace('CCK.RATE_LIM gl.bdate=' || to_char(gl.bdate) ||
+                 ' sysdate=' || to_char(SYSDATE));
 
     FOR s IN (SELECT kv, ostc
                 FROM accounts
@@ -9581,12 +9632,12 @@ end if;
                  AND ostc <> 0) LOOP
       IF kv_ <> s.kv THEN
         IF s.kv <> gl.baseval THEN
-          se_ := gl.p_icurval(s.kv, s.ostc, gl.bd);
+          se_ := gl.p_icurval(s.kv, s.ostc, gl.bdate);
         ELSE
           se_ := s.ostc;
         END IF;
         IF kv_ <> gl.baseval THEN
-          sd_ := sd_ + gl.p_ncurval(kv_, se_, gl.bd);
+          sd_ := sd_ + gl.p_ncurval(kv_, se_, gl.bdate);
         ELSE
           sd_ := sd_ + se_;
         END IF;
@@ -9606,15 +9657,13 @@ end if;
 
   ---------------------
   PROCEDURE cc_9129(fdat_ DATE, nd_ INT, tip_ INT) IS
-
-    -- TIP_ = 0 - все КП
-    -- TIP_ = 2 - все КП ЮЛ
-    -- TIP_ = 3 - все КП ФЛ
-
+  
+    -- TIP_ = 0 - все КП  -- TIP_ = 2 - все КП ЮЛ  -- TIP_ = 3 - все КП ФЛ
+  
     fl_opl_ INT;
     sd_     NUMBER;
     x8_     NUMBER;
-    v_9129  NUMBER;
+    I_CR9   char(1);
     acc9_   INT;
     ref_    INT;
     dk_     INT;
@@ -9626,93 +9675,58 @@ end if;
     nms99_  VARCHAR2(38);
     okpo_b  oper.id_b%TYPE;
     d9129_  NUMBER;
-
-    vob_   INT;
-    vob_pr INT;
-    vob_rs INT;
+  
+    vob_   INT := 6;
+    vob_pr INT := 6;
+    vob_rs INT := 6;
     r013_  INT;
-
-    l_limt     NUMBER; -- текущий лимит из ГЛК
-    l_dos      NUMBER; -- сумма всех выдач (ДТ оборотов) с начала жизни
-    l_ost_fakt NUMBER; -- текущий остаток 9129
-    l_ost_plan NUMBER; -- ожидаемый остаток 9129
-    l_limb     NUMBER; -- первоначальный лимит из ГЛК
-
-    l_title VARCHAR2(20) := 'CCK.CC_9129:'; -- для трассировки
-
-    l_kol    INT := 0;
-    n_commit INT := 100;
-    i_commit INT := 0;
-
-    v_block_flag integer;
-
+  
+    l_limt      NUMBER; -- текущий лимит из ГЛК
+    l_dos       NUMBER; -- сумма всех выдач (ДТ оборотов) с начала жизни
+    l_ost_fakt  NUMBER; -- текущий остаток 9129
+    l_ost_plan  NUMBER; -- ожидаемый остаток 9129
+    l_limb      NUMBER; -- первоначальный лимит из ГЛК
+    l_kol       INT := 0;
+    n_commit    INT := 100;
+    i_commit    INT := 0;
+    l_ref_check number;
   BEGIN
     -- Проводки по 9129
-
+  
     BEGIN
-      --есть ли карточка операции и контрсчет ?
+      -- есть ли карточка операции и контрсчет ?
       SELECT nlsa, nlsm, substr(flags, 38, 1)
         INTO nls99_, nls9_, fl_opl_
         FROM tts
        WHERE tt = 'CR9';
-      logger.trace('CCK.CC_9129 Start nlsa= ' || nls99_ || ' nlsM= ' ||
-                   nls9_ || ' FL_OPL_= ' || fl_opl_);
-
-      BEGIN
-        IF nls9_ IS NOT NULL THEN
-          -- и модиф.карточку оп на будущее
-          UPDATE tts SET nlsa = nls9_, nlsm = NULL WHERE tt = 'CR9';
-          nls99_ := nls9_;
-        END IF;
-      EXCEPTION
-        WHEN OTHERS THEN
-          NULL;
-      END;
-
-      -- Шаг 2 если введена формула
+      IF nls9_ IS NOT NULL THEN
+        UPDATE tts SET nlsa = nls9_, nlsm = NULL WHERE tt = 'CR9';
+        nls99_ := nls9_;
+      END IF; -- и модиф.карточку оп на будущее
       IF substr(nls99_, 1, 2) = '#(' THEN
-        -- Dynamic account number present
-        BEGIN
-          EXECUTE IMMEDIATE 'SELECT ' ||
-                            substr(nls99_, 3, length(nls99_) - 3) ||
-                            ' FROM DUAL'
-            INTO nls99_;
-          logger.trace('CCK.CC_9129 Start введена формула nlsa= ' ||
-                       nls99_);
-        EXCEPTION
-          WHEN OTHERS THEN
-            raise_application_error(- (20203),
-                                    '\9351 - Cannot get account nom via ' ||
-                                    nls99_ || ' ' || SQLERRM,
-                                    TRUE);
-        END;
-      END IF;
-
-      -- Шаг 3 если формула не введена то поисчем самостоятельно
+        EXECUTE IMMEDIATE 'SELECT ' ||
+                          substr(nls99_, 3, length(nls99_) - 3) ||
+                          ' FROM DUAL'
+          INTO nls99_;
+      END IF; -- Шаг 2 если введена формула
       IF nls99_ IS NULL THEN
         nls99_ := substr(tobopack.gettoboparam('NLS_9900'), 1, 15);
-        logger.trace('CCK.CC_9129 Start Счет найден в TOBO_Params nlsa= ' ||
-                     nls99_);
-      END IF;
-
+      END IF; -- Шаг 3 если формула не введена то поисчем самостоятельно
+    
       SELECT substr(a.nms, 1, 38), c.okpo
         INTO nms99_, okpo_b
         FROM accounts a, customer c
        WHERE a.kv = 980
          AND a.nls = nls99_
          AND c.rnk = a.rnk;
-
+    
     EXCEPTION
       WHEN no_data_found THEN
         raise_application_error(- (20203),
                                 '\9351 - CCK.CC_9129 : ош в карточке оп.CR9',
                                 TRUE);
-        RETURN;
     END;
-
-    vob_   := 6;
-    vob_pr := vob_;
-    vob_rs := vob_;
+  
     BEGIN
       SELECT vob
         INTO vob_
@@ -9720,7 +9734,6 @@ end if;
        WHERE tt = 'CR9'
          AND ord IS NULL
          AND rownum = 1;
-
     EXCEPTION
       WHEN no_data_found THEN
         NULL;
@@ -9745,10 +9758,9 @@ end if;
       WHEN no_data_found THEN
         NULL;
     END;
-
+  
     --курсор по всем лимитам КП
     FOR k IN (SELECT d.nd,
-                     a.acc accs,
                      d.vidd,
                      d.sdate,
                      d.wdate,
@@ -9760,26 +9772,28 @@ end if;
                      c.okpo,
                      ad.wdate dat_beg,
                      nvl(ad.ssuda, 0) ssuda,
+                     d.NDG,
                      d.sdog * 100 lim_beg --первоначальный лимит
                 FROM cc_deal d,
                      cc_add ad,
-                     v_gl a,
                      customer c,
                      (SELECT nd, acc FROM cc_lim GROUP BY nd, acc) l
                WHERE d.nd = ad.nd
                  AND ad.adds = 0
-                 AND ad.accs = a.acc
-                 AND a.ostc = a.ostb
-                 AND d.nd = l.nd
+                 and d.nd = l.nd
                  AND (nd_ = 0 OR d.nd = nd_)
                  AND d.sos < 14
                  AND sos <> 0
                  AND d.rnk = c.rnk
-                 AND a.daos <= fdat_
+                 AND d.sdate <= fdat_
                  AND (tip_ IN (1, 2) AND d.vidd IN (1, 2, 3) OR
                      tip_ = 3 AND d.vidd IN (11, 12, 13) OR tip_ = 0)) LOOP
+      If k.NDG is not null and k.NDG <> k.ND then
+        goto kin_;
+      end if; -- это подчитенные суб.дог. Они не имеют своего 9129
+    
+      -- невiдновлювана КЛ   I_CR9 = '1'
       BEGIN
-        -- невiдновлювана КЛ   v_9129 = '1'
         SELECT a9.acc,
                a9.nls,
                substr(a9.nms, 1, 38),
@@ -9794,9 +9808,9 @@ end if;
                dazs9_,
                r013_,
                l_ost_fakt,
-               v_9129,
+               I_CR9,
                d9129_
-          FROM nd_acc n, v_gl a9, specparam s
+          FROM nd_acc n, accounts a9, specparam s
          WHERE a9.dazs IS NULL
            AND n.acc = a9.acc
            AND n.nd = k.nd
@@ -9813,140 +9827,146 @@ end if;
           GOTO kin_;
       END;
       ---------------------------------------------------------------------
-      -- лимит начальный с учетом дельты
-      l_limb := k.lim_beg + d9129_;
-
+      l_dos  := 0;
+      l_limb := k.lim_beg + d9129_; -- лимит начальный с учетом дельты
+    
       -- лимит на дату FDAT_ с учетом дельты
       BEGIN
-        SELECT l.lim2 + d9129_
+        SELECT lim2 + d9129_
           INTO l_limt
-          FROM cc_lim l
-         WHERE l.nd = k.nd
-           AND l.acc = k.acc8
-           AND nvl(l.not_9129, 0) = 0
-           AND (k.nd, l.fdat) = (SELECT nd, MAX(fdat)
-                                   FROM cc_lim
-                                  WHERE acc = k.acc8
-                                    AND nd = k.nd
-                                    AND fdat <= fdat_
-                                    AND nvl(not_9129, 0) = 0
-                                  GROUP BY nd);
+          FROM cc_lim
+         WHERE nd = k.nd
+           AND nvl(not_9129, 0) = 0
+           AND fdat = (SELECT MAX(fdat)
+                         FROM cc_lim
+                        WHERE nd = k.nd
+                          AND fdat <= fdat_
+                          AND nvl(not_9129, 0) = 0);
       EXCEPTION
         WHEN no_data_found THEN
-          /* берем просто первый с учетом дельты */
-          l_limt := l_limb;
+          l_limt := l_limb; -- берем просто первый с учетом дельты
       END;
-
-      l_dos := 0;
-      IF v_9129 = '1' THEN
-        -- HEвiдновлювана кредитна лiнiя
-
-        --Вар-1
-        SELECT nvl(SUM(gl.p_ncurval(k.kv,
-                                    gl.p_icurval(a.kv,
-                                                 fdos(a.acc, a.daos, fdat_),
-                                                 fdat_),
-                                    fdat_)),
-                   0) -- весь ДТ в начала жизни
-          INTO l_dos
-          FROM nd_acc n, accounts a
-         WHERE n.nd = k.nd
-           AND n.acc = a.acc
-           AND a.tip = 'SS ';
-
-        -- Ожидаемый остаток на 9129
+    
+      IF I_CR9 = '1' THEN
+        --------------------------- HEвiдновлювана кредитна лiнiя
+        If k.NDG is null then
+          SELECT nvl(SUM(gl.p_ncurval(k.kv,
+                                      gl.p_icurval(a.kv,
+                                                   fdos(a.acc, a.daos, fdat_),
+                                                   fdat_),
+                                      fdat_)),
+                     0) -- весь ДТ в начала жизни
+            INTO l_dos
+            FROM nd_acc n, accounts a
+           WHERE n.nd = k.nd
+             AND n.acc = a.acc
+             AND a.tip = 'SS ';
+        else
+          SELECT nvl(SUM(gl.p_ncurval(k.kv,
+                                      gl.p_icurval(a.kv,
+                                                   fdos(a.acc, a.daos, fdat_),
+                                                   fdat_),
+                                      fdat_)),
+                     0) -- весь ДТ c начала жизни
+            INTO l_dos
+            FROM nd_acc n, accounts a, cc_deal d
+           WHERE d.nd = n.nd
+             AND n.acc = a.acc
+             AND a.tip = 'SS '
+             and d.ndg = k.nd;
+        end if;
         l_ost_plan := least(greatest(l_limb - l_dos, 0),
-                            greatest(l_limt - (-fost(k.acc8, fdat_)), 0));
-
+                            greatest(l_limt - (-fost(k.acc8, fdat_)), 0)); ---- Ожидаемый остаток на 9129
       ELSE
-        -- вiдновлювана кредитна лiнiя
-        l_ost_plan := l_limt - (-fost(k.acc8, fdat_));
+        l_ost_plan := l_limt - (-fost(k.acc8, fdat_)); ---- вiдновлювана кредитна лiнiя
       END IF;
-
+    
       l_ost_plan := greatest(l_ost_plan, 0);
       IF k.wdate <= fdat_ THEN
         l_ost_plan := 0;
       END IF; -- если дата в прошлом - то обнуление лимита;
-
-      -- определение дельты и ее проплата по факту
       sd_ := l_ost_fakt - l_ost_plan;
       IF nvl(sd_, 0) = 0 THEN
         GOTO kin_;
-      END IF;
+      END IF; -- определение дельты и ее проплата по факту
       ----------------------------------
-      nazn_ := 'Невикористаний лiмiт кредитної ';
       IF sd_ < 0 THEN
         dk_  := 1;
         vob_ := vob_pr;
         sd_  := -sd_;
-        IF gl.amfo IN ('380623', '326955', '344045', '380214', '322498') THEN
-          nazn_ := 'Облiк невикористаного лiмiту згiдно ';
-        ELSIF gl.amfo IN ('353575') THEN
-          nazn_ := 'Винесення суми забов`язань з кредитування згiдно ';
-        END IF;
       ELSE
         dk_  := 0;
         vob_ := vob_rs;
-        IF gl.amfo IN ('380623', '326955', '344045', '380214', '322498') THEN
-          nazn_ := 'Списання використаного лiмiту згiдно ';
-        ELSIF gl.amfo IN ('353575') THEN
-          nazn_ := 'Списання суми забов`язань з кредитування згiдно ';
-        END IF;
       END IF;
-
-      select case dk_
-               when 1 then blkd
-               when 0 then blkk
-               else null
-             end
-        into v_block_flag
-        from accounts
-        where nls = nls9_
-          and kv = k.kv;
-          
-      if v_block_flag >0 then 
-        bars_audit.info('CCK.CC_9129: Вирівнювання неможливе, рахунок '||nls9_||' блокований на '||case dk_ when 1 then 'дебетування' when 0 then 'кредитування' end||'!');
-        continue;
-      end if;        
-
-
-      nazn_ := nazn_ || 'угоди N' || k.cc_id || ' вiд ' ||
-               to_char(k.sdate, 'DD.MM.YYYY');
-
+    
+      nazn_ := 'Невикористаний лiмiт кредитної угоди № ' || k.cc_id ||
+               ' вiд ' || to_char(k.sdate, 'DD.MM.YYYY');
+    
       --savepoint DO_PROVODKI;
       --begin
       gl.ref(ref_);
+      l_ref_check := length(ref_);
       IF nvl(g_reports, 0) = 0 THEN
-        gl.in_doc3(ref_   => ref_,
-                   tt_    => 'CR9',
-                   vob_   => vob_,
-                   nd_    => to_char(ref_),
-                   vdat_  => gl.bd,
-                   dk_    => dk_,
-                   kv_    => k.kv,
-                   s_     => sd_,
-                   kv2_   => k.kv,
-                   s2_    => sd_,
-                   sk_    => NULL,
-                   data_  => gl.bd,
-                   datp_  => gl.bd,
-                   nam_a_ => nms9_,
-                   nlsa_  => nls9_,
-                   mfoa_  => gl.amfo,
-                   nam_b_ => nms99_,
-                   nlsb_  => nls99_,
-                   mfob_  => gl.amfo,
-                   nazn_  => nazn_,
-                   d_rec_ => NULL,
-                   id_a_  => k.okpo,
-                   id_b_  => okpo_b,
-                   id_o_  => NULL,
-                   sign_  => NULL,
-                   sos_   => 0,
-                   prty_  => NULL);
+        if l_ref_check > 10 then
+          gl.in_doc3(ref_   => ref_,
+                     tt_    => 'CR9',
+                     vob_   => vob_,
+                     nd_    => substr(to_char(ref_), 1, 10),
+                     vdat_  => gl.bdate,
+                     dk_    => dk_,
+                     kv_    => k.kv,
+                     s_     => sd_,
+                     kv2_   => k.kv,
+                     s2_    => sd_,
+                     sk_    => NULL,
+                     data_  => gl.bdate,
+                     datp_  => gl.bdate,
+                     nam_a_ => nms9_,
+                     nlsa_  => nls9_,
+                     mfoa_  => gl.amfo,
+                     nam_b_ => nms99_,
+                     nlsb_  => nls99_,
+                     mfob_  => gl.amfo,
+                     nazn_  => nazn_,
+                     d_rec_ => NULL,
+                     id_a_  => k.okpo,
+                     id_b_  => okpo_b,
+                     id_o_  => NULL,
+                     sign_  => NULL,
+                     sos_   => 0,
+                     prty_  => NULL);
+        else
+          gl.in_doc3(ref_   => ref_,
+                     tt_    => 'CR9',
+                     vob_   => vob_,
+                     nd_    => substr(to_char(ref_), 1, 10),
+                     vdat_  => gl.bdate,
+                     dk_    => dk_,
+                     kv_    => k.kv,
+                     s_     => sd_,
+                     kv2_   => k.kv,
+                     s2_    => sd_,
+                     sk_    => NULL,
+                     data_  => gl.bdate,
+                     datp_  => gl.bdate,
+                     nam_a_ => nms9_,
+                     nlsa_  => nls9_,
+                     mfoa_  => gl.amfo,
+                     nam_b_ => nms99_,
+                     nlsb_  => nls99_,
+                     mfob_  => gl.amfo,
+                     nazn_  => nazn_,
+                     d_rec_ => NULL,
+                     id_a_  => k.okpo,
+                     id_b_  => okpo_b,
+                     id_o_  => NULL,
+                     sign_  => NULL,
+                     sos_   => 0,
+                     prty_  => NULL);
+        end if;
         gl.payv(fl_opl_,
                 ref_,
-                gl.bd,
+                gl.bdate,
                 'CR9',
                 dk_,
                 k.kv,
@@ -9982,7 +10002,7 @@ end if;
           (k.branch,
            'CR9',
            vob_,
-           gl.bd,
+           gl.bdate,
            k.kv,
            dk_,
            sd_ / 100,
@@ -10001,26 +10021,19 @@ end if;
            k.sdate,
            k.nmk);
       END IF;
-
+    
       IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN
         COMMIT;
         l_kol    := l_kol + i_commit;
         i_commit := 0;
       END IF;
+    
       <<kin_>>
       NULL;
-    END LOOP;
-    IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN
-      COMMIT;
-      l_kol    := l_kol + i_commit;
-      i_commit := 0;
-    END IF;
-    l_kol := l_kol + i_commit;
-    IF nvl(g_reports, 0) = 0 THEN
-      COMMIT;
-    END IF;
-    i_commit := 0;
-
+    END LOOP; --- k
+  
+    COMMIT;
+  
   END cc_9129;
 
   -------------------
@@ -10184,9 +10197,9 @@ end if;
                vob_,
                0,
                SYSDATE,
-               gl.bd,
-               gl.bd,
-               gl.bd,
+               gl.bdate,
+               gl.bdate,
+               gl.bdate,
                x8_,
                x8_,
                nms9_,
@@ -10204,7 +10217,7 @@ end if;
                okpo_b);
             gl.payv(fl_opl_,
                     ref_,
-                    gl.bd,
+                    gl.bdate,
                     'CR9',
                     0,
                     k.kv,
@@ -10374,9 +10387,9 @@ end if;
                vob_,
                1,
                SYSDATE,
-               gl.bd,
-               gl.bd,
-               gl.bd,
+               gl.bdate,
+               gl.bdate,
+               gl.bdate,
                x8_,
                x8_,
                nms9_,
@@ -10394,7 +10407,7 @@ end if;
                okpo_b);
             gl.payv(fl_opl_,
                     ref_,
-                    gl.bd,
+                    gl.bdate,
                     'CR9',
                     0,
                     k.kv,
@@ -10420,7 +10433,7 @@ end if;
   PROCEDURE cc_grf_lim(mode_ INT default 1,
                        nd_   cc_deal.nd%type,
                        acc_  accounts.acc%type,
-                       fdap_ DATE default gl.bd) IS
+                       fdap_ DATE default gl.bdate) IS
 
     -- Построение графика лимитов.
 
@@ -10441,7 +10454,7 @@ end if;
     BEGIN
       /* bars_audit.info('cck.CC_grf_LIM MODE_' || mode_ || ' ,ND_=' || nd_ ||
       ' ,ACC_' || l_acc_ || ' ,FDAP_' || fdap_);*/
-      SELECT nvl(d.wdate, add_months(gl.bd, 12)),
+      SELECT nvl(d.wdate, add_months(gl.bdate, 12)),
              a.freq,
              cck_app.to_number2(cck_app.get_nd_txt(nd_, 'DAYNP'))
       ----------(select to_number(txt) from nd_txt where TAG='DAYNP' and nd=d.nd)
@@ -10566,7 +10579,7 @@ end if;
       SELECT lim2
         INTO lim2_
         FROM cc_lim
-       WHERE fdat = gl.bd
+       WHERE fdat = gl.bdate
          AND nd = nd_;
       UPDATE accounts SET ostx = -lim2_ WHERE acc = l_acc_;
       UPDATE cc_deal SET LIMIT = round(lim2_ / 100, 0) WHERE nd = nd_;
@@ -10576,7 +10589,9 @@ end if;
     END;
 
     --cck.cc_lim_gpk(nd_, l_acc_, fdap_);
-    cck_ui.glk_bal(NULL, NULL);
+    --cck_ui.glk_bal(NULL, NULL);
+    EXECUTE IMMEDIATE  'begin cck_ui.glk_bal(NULL, NULL); end;'   ;
+
   EXCEPTION
     WHEN err THEN
       raise_application_error(- (20000 + ern), '\ ' || erm, TRUE);
@@ -10632,7 +10647,7 @@ end if;
 
     -- ОПРЕДЕЛЕНИЕ ДАТЫ В МЕС ПО НОМЕРУ ДНЯ
 
-    l_dd NUMBER := nvl(p_dd, to_number(to_char(gl.bd, 'dd')));
+    l_dd NUMBER := nvl(p_dd, to_number(to_char(gl.bdate, 'dd')));
 
     l_dat DATE;
     l_mm  INT := to_number(to_char(p_dat1, 'MM'));
@@ -10665,8 +10680,8 @@ end if;
     ntmp_  NUMBER;
     sum1_  NUMBER;
     l_kk   NUMBER := to_number(to_char(p_datk, 'dd')); -- номер дня последний
-    l_dd   NUMBER := nvl(p_dd, to_number(to_char(gl.bd, 'dd'))); -- Номер дня платежный
-    l_bb   NUMBER := to_number(to_char(gl.bd, 'dd')); -- номер дня банковский
+    l_dd   NUMBER := nvl(p_dd, to_number(to_char(gl.bdate, 'dd'))); -- Номер дня платежный
+    l_bb   NUMBER := to_number(to_char(gl.bdate, 'dd')); -- номер дня банковский
     l_ssr  NUMBER := nvl(p_ssr, 0);
     cl     cc_lim%ROWTYPE;
     b_date DATE;
@@ -10683,8 +10698,8 @@ end if;
         -- -- ануитет
 
         --первая пл дата = Начало первого месяца
-        ------- PDAT_ := CCK.f_dat (L_DD, TRUNC(         gl.bd,         'MM'));------- 21.08.2015
-        b_date := greatest(gl.bd, p_datn);
+        ------- PDAT_ := CCK.f_dat (L_DD, TRUNC(         gl.bdate,         'MM'));------- 21.08.2015
+        b_date := greatest(gl.bdate, p_datn);
 
         pdat_ := cck.f_dat(l_dd, trunc(b_date, 'MM'));
         kol_  := 1;
@@ -10718,7 +10733,7 @@ end if;
         INTO cl.fdat
         FROM cc_lim
        WHERE nd = p_nd
-         AND fdat >= gl.bd; -- ближайший будущий день с учетом тек дня.
+         AND fdat >= gl.bdate; -- ближайший будущий день с учетом тек дня.
       BEGIN
         SELECT *
           INTO cl
@@ -10731,7 +10746,7 @@ end if;
             INTO cl.fdat
             FROM cc_lim
            WHERE nd = p_nd
-             AND fdat < gl.bd; -- ближайший прошлый день без учета тек.дня
+             AND fdat < gl.bdate; -- ближайший прошлый день без учета тек.дня
           BEGIN
             SELECT *
               INTO cl
@@ -10771,22 +10786,22 @@ end if;
                        ) IS
 
     -- 14.06.2013 Sta универсальная процедура прстроения ГПК для ФЛ по постановке ОБ. Натуральный Ануитет.
-    d1_         DATE := trunc(gl.bd, 'MM');
+    d1_         DATE := trunc(gl.bdate, 'MM');
     si_         NUMBER;
     sg_         NUMBER;
     so_         NUMBER;
     lim2_       NUMBER := p_lim2;
     lim1_       NUMBER;
-    fdat1_      DATE := gl.bd;
+    fdat1_      DATE := gl.bdate;
     si1_        NUMBER := 0;
-    pdat1_      DATE := gl.bd;
+    pdat1_      DATE := gl.bdate;
     pdat2_      DATE;
     flag_       INT := 1;
-    l_dd        NUMBER := nvl(p_dd, to_number(to_char(gl.bd, 'dd')));
+    l_dd        NUMBER := nvl(p_dd, to_number(to_char(gl.bdate, 'dd')));
     l_ssr       NUMBER := nvl(p_ssr, 0);
     l_pl1       NUMBER;
-    l_datn      DATE := nvl(p_datn, gl.bd); -- дата нач КД, -- дата нач КД
-    l_gpk_begin DATE := greatest(nvl(p_datn, gl.bd), gl.bd);
+    l_datn      DATE := nvl(p_datn, gl.bdate); -- дата нач КД, -- дата нач КД
+    l_gpk_begin DATE := greatest(nvl(p_datn, gl.bdate), gl.bdate);
   BEGIN
 
     /* bars_audit.info('CCK.uni_gpk_fl p_lim2 =' || p_lim2 || ', p_gpk=' || p_gpk ||
@@ -10797,7 +10812,7 @@ end if;
     ',p_acrd=' || p_acrd ||',p_basey=' || p_basey); */
     DELETE FROM tmp_gpk;
     -- первая строка
-    -- insert into tmp_gpk(fdat, lim2, sumg,sumo,sumk) values (gl.bd,lim2_,0,0,0);
+    -- insert into tmp_gpk(fdat, lim2, sumg,sumo,sumk) values (gl.bdate,lim2_,0,0,0);
     -- Taras Shedenko Первая строка должна быть датой начала КД
     INSERT INTO tmp_gpk
       (fdat, lim2, sumg, sumo, sumk)
@@ -10970,8 +10985,7 @@ end if;
                    freq_  INT,
                    rate_  NUMBER -- параметр не використовується в коді
                   , -- годовая % ставка
-                   dig_   INT,
-                   flag   INT DEFAULT 0) IS
+                   dig_   INT) IS
 
     -- Построение ГПК.
     -- рАБОЧАЯ ВЕРСИЯ С ЭТАЛОНА ОБ от 14.06.2013.
@@ -11015,6 +11029,7 @@ end if;
     l_pl1   NUMBER;
     l_gpk   INT;
     l_flags CHAR(2);
+    flag    NUMBER := 1;
 
   BEGIN
     /* bars_audit.info('CC_GPK.MODE_=' || mode_ || ', ND_=' || nd_ ||
@@ -11048,8 +11063,16 @@ end if;
            AND l.nd = nd_
            AND l.fdat = (SELECT MIN(fdat) FROM cc_lim WHERE nd = nd_);
       END;
+    else
+      l_acc    := acc_;
+      l_bdat_1 := bdat_1;
+      l_datn_  := datn_;
+      l_dat4_  := dat4_;
+      l_sum1_  := sum1_;
+      l_freq_  := freq_;
+      l_rate_  := rate_;
     END IF;
-
+  
     l_datn_ := datn_;
     IF l_datn_ IS NULL THEN
       BEGIN
@@ -11091,7 +11114,8 @@ end if;
          AND id = 0;
     EXCEPTION
       WHEN no_data_found THEN
-        RETURN;
+        raise_application_error(-20001,
+                                'Не знайдено % картку рахунку 8999');
     END;
     l_flags := cck_app.get_nd_txt(nd_, 'FLAGS');
     IF (dd.vidd = 11 OR dd.vidd = 1) AND ii.basem = 1 AND mode_ <> 3 THEN
@@ -11186,6 +11210,12 @@ end if;
           SELECT nd_, fdat, lim2, l_acc, sumg, sumo, sumk
             FROM tmp_gpk
            WHERE fdat > k.bdat;
+
+    -- расчет комиссии для ГПК
+--    cck_ui.calc_comission_4_gpk(p_nd => nd_); 
+     EXECUTE IMMEDIATE  'begin cck_ui.calc_comission_4_gpk (:ND ); end;'    USING nd_;
+
+
       END LOOP;
       RETURN;
     END IF;
@@ -11591,16 +11621,29 @@ end if;
 
     END IF;
 
+    -- расчет комиссии для ГПК
+--   cck_ui.calc_comission_4_gpk(p_nd => nd_); 
+     EXECUTE IMMEDIATE  'begin cck_ui.calc_comission_4_gpk (:ND ); end;'    USING nd_;
+    
     --переливка в лимиты
     cck.cc_gpk_lim(nd_, l_acc, l_bdat_1, l_datn_, l_sum1_);
 
-    cck_ui.gpk_bal(nd_, NULL);
+--  cck_ui.gpk_bal(nd_, NULL);
+    EXECUTE IMMEDIATE  'begin cck_ui.gpk_bal( :nd, NULL) end;'    USING nd_;
+
     /*    bars_audit.info('cck.cc_gpk_lim nd_=' || nd_ || ', l_acc=' || l_acc ||
     ' ,L_bdat_1=' || l_bdat_1 || ' ,l_datn_=' || l_datn_ ||
     ' ,l_sum1_=' || l_sum1_);*/
 
     IF flag = 1 THEN
-      cck.cc_tmp_gpk(nd_, 2, l_acc, l_bdat_1, l_dat4_, 1, l_sum1_, gl.bd);
+      cck.cc_tmp_gpk(nd_,
+                     2,
+                     l_acc,
+                     l_bdat_1,
+                     l_dat4_,
+                     1,
+                     l_sum1_,
+                     gl.bdate);
     END IF;
   END cc_gpk;
   ---------------------
@@ -11624,7 +11667,7 @@ end if;
     --     INSERT INTO cc_lim(nd,acc,fdat,lim2,sumg,sumo, sumk)  VALUES ( p_ND, p_ACC8, p_dat1 ,S_,0,0,0);
     --  end if;
 
-    IF p_dat1 = gl.bd THEN
+    IF p_dat1 = gl.bdate THEN
       UPDATE accounts SET ostx = -s_ WHERE acc = p_acc8;
       UPDATE cc_deal SET LIMIT = p_sum1 WHERE nd = p_nd;
       UPDATE cc_add
@@ -11648,7 +11691,7 @@ end if;
     INSERT INTO cc_sob
       (nd, fdat, id, isp, txt, otm, freq)
       SELECT p_nd,
-             gl.bd,
+             gl.bdate,
              NULL,
              NULL,
              decode(id,
@@ -11660,14 +11703,14 @@ end if;
         FROM (SELECT nvl(MAX(id), 0) id
                 FROM cc_sob
                WHERE nd = p_nd
-                 AND fdat = gl.bd
+                 AND fdat = gl.bdate
                  AND (txt LIKE 'Изменен Г%' OR txt LIKE 'Построен Г%')
                  AND isp = user_id
               MINUS
               SELECT nvl(MAX(id), 1) id
                 FROM cc_sob
                WHERE nd = p_nd
-                 AND fdat = gl.bd);
+                 AND fdat = gl.bdate);
 
     cck.cc_lim_null(p_nd => p_nd);
 
@@ -11679,14 +11722,24 @@ end if;
     -- Превращение ГЛК (Петрокомерц) - ГПК (АЖИО)
     pdat_ DATE;
     sumg_ NUMBER;
+    l_acc number;
   BEGIN
+    if acc_ is null then
+      select a.acc into l_acc from nd_acc na ,accounts a
+      where a.acc=na.acc
+      and a.tip='LIM'
+      and na.nd=ND_;
+    else
+      l_acc:=acc_;
+    end if;  
+    --raise_application_error (-20008,l_acc);
 
     -- 08.10.2013
     --- for k in (select FDAT,LiM2 from cc_lim where nd=ND_ and acc=ACC_ and fdat > DATN_ order by 1)
     FOR k IN (SELECT fdat, lim2, acc
                 FROM cc_lim
                WHERE nd = nd_
-                    /* AND acc = l_acc*/
+                    AND acc = l_acc
                  AND fdat >= datn_
                ORDER BY 1) LOOP
       BEGIN
@@ -11718,7 +11771,7 @@ end if;
     INSERT INTO cc_sob
       (nd, fdat, id, isp, txt, otm, freq)
       SELECT nd_,
-             gl.bd,
+             gl.bdate,
              NULL,
              NULL,
              decode(id,
@@ -11730,14 +11783,14 @@ end if;
         FROM (SELECT nvl(MAX(id), 0) id
                 FROM cc_sob
                WHERE nd = nd_
-                 AND fdat = gl.bd
+                 AND fdat = gl.bdate
                  AND (txt LIKE 'Изменен Г%' OR txt LIKE 'Построен Г%')
                  AND isp = user_id
               MINUS
               SELECT nvl(MAX(id), 1) id
                 FROM cc_sob
                WHERE nd = nd_
-                 AND fdat = gl.bd);
+                 AND fdat = gl.bdate);
 
   END cc_lim_gpk;
   ---------------------------
@@ -11794,7 +11847,7 @@ end if;
                k.kv,
                k.rnk,
                k.nmk,
-               to_char(gl.bd, 'dd/mm/yyyy'),
+               to_char(gl.bdate, 'dd/mm/yyyy'),
                0,
                k.g2
           FROM dual
@@ -11928,14 +11981,14 @@ end if;
     -- + текущая дата и еще 3
     INSERT INTO cck_int
       (fdat, ost, otmp, otm)
-      SELECT gl.bd + d.dk, l2.lim2, 0, 0
+      SELECT gl.bdate + d.dk, l2.lim2, 0, 0
         FROM cc_lim l2, dk d
        WHERE l2.nd = nd_
-         AND gl.bd + d.dk NOT IN (SELECT fdat FROM cck_int)
+         AND gl.bdate + d.dk NOT IN (SELECT fdat FROM cck_int)
          AND l2.fdat = (SELECT MAX(l3.fdat)
                           FROM cc_lim l3
                          WHERE l3.nd = nd_
-                           AND l3.fdat < gl.bd + d.dk);
+                           AND l3.fdat < gl.bdate + d.dk);
     -------------------------------
     dat_ := dat3_;
     sli_ := 0;
@@ -12047,7 +12100,7 @@ end if;
     dapp_ DATE := NULL;
     daos_ DATE := NULL;
   BEGIN
-    dat_ := gl.bd;
+    dat_ := gl.bdate;
     BEGIN
       SELECT a.acc, a.kv
         INTO acc8_, kv8_
@@ -12128,13 +12181,13 @@ end if;
     gl.bdate := dat_;
 
     -- сумма план.остатков в экв всех доч.счетов
-    SELECT nvl(SUM(gl.p_icurval(kv, ostb, gl.bd)), 0)
+    SELECT nvl(SUM(gl.p_icurval(kv, ostb, gl.bdate)), 0)
       INTO ostb_
       FROM accounts
      WHERE accc = acc8_;
     -- сумма план.остатков в базовой вал КД всех доч.счетов
     IF kv8_ <> gl.baseval THEN
-      ostb_ := gl.p_ncurval(kv8_, ostb_, gl.bd);
+      ostb_ := gl.p_ncurval(kv8_, ostb_, gl.bdate);
     END IF;
 
     -- план.ост родительского счета
@@ -12169,7 +12222,7 @@ end if;
     cc_start(nd2_);
     UPDATE accounts SET pap = 1 WHERE acc = acc2_;
 
-    UPDATE accounts SET dazs = gl.bd WHERE acc = acc1_;
+    UPDATE accounts SET dazs = gl.bdate WHERE acc = acc1_;
 
     -- присоединить счета к другому КД
     INSERT INTO nd_acc
@@ -12443,9 +12496,9 @@ end if;
        vob_,
        dk_,
        SYSDATE,
-       gl.bd,
-       gl.bd,
-       gl.bd,
+       gl.bdate,
+       gl.bdate,
+       gl.bdate,
        sd_,
        sd_,
        nms9_,
@@ -12463,7 +12516,7 @@ end if;
 
     gl.payv(flg_,
             ref_,
-            gl.bd,
+            gl.bdate,
             'CRD',
             dk_,
             kv_,
@@ -12715,7 +12768,7 @@ end if;
     nls_new.fio   := nvl(fio_, nls_old.fio);
     nls_new.vlasn := nvl(vlasn_, nls_old.vlasn);
     nls_new.crdvd := nvl(nvl(to_char(crdvd_, 'dd.mm.yyyy'), nls_old.crdvd),
-                         to_char(gl.bd, 'dd.mm.yyyy'));
+                         to_char(gl.bdate, 'dd.mm.yyyy'));
     nls_new.crdsn := nvl(crdsn_, nls_old.crdsn);
     nls_new.crdsk := nvl(crdsk_, nls_old.crdsk);
 
@@ -13053,15 +13106,15 @@ end if;
                vob_,
                nls_new.ref,
                SYSDATE,
-               gl.bd,
+               gl.bdate,
                dk_,
                kv_,
                sd_,
                kv_,
                sd_,
                NULL,
-               gl.bd,
-               gl.bd,
+               gl.bdate,
+               gl.bdate,
                nls_new.nam_a,
                nls_new.nlsa,
                gl.amfo,
@@ -13081,7 +13134,7 @@ end if;
     IF dk_ < 2 THEN
       gl.payv(flg_,
               nls_new.ref,
-              gl.bd,
+              gl.bdate,
               'CRD',
               dk_,
               kv_,
@@ -13341,7 +13394,7 @@ end if;
     l_acr_dat DATE;
     ir_       NUMBER;
     nint_     NUMBER;
-    dat31_    DATE := last_day(gl.bd);
+    dat31_    DATE := last_day(gl.bdate);
     l_ir_k    NUMBER;
     l_sum_ret NUMBER;
     l_mdate   DATE;
@@ -13365,9 +13418,9 @@ end if;
     END IF;
 
     --1-й проц период по фактич. остаткам
-    IF l_acr_dat < gl.bd - 1 THEN
+    IF l_acr_dat < gl.bdate - 1 THEN
       nint_ := 0;
-      acrn.p_int(p_acck, 0, l_acr_dat + 1, gl.bd - 1, nint_, NULL, 0);
+      acrn.p_int(p_acck, 0, l_acr_dat + 1, gl.bdate - 1, nint_, NULL, 0);
       l_sum_ret := l_sum_ret + nint_;
     END IF;
 
@@ -13375,13 +13428,13 @@ end if;
       l_sum_ret := 0;
     ELSE
       --2-й проц период по плановому исход остатку
-      IF l_mdate > gl.bd AND l_mdate <= dat31_ THEN
+      IF l_mdate > gl.bdate AND l_mdate <= dat31_ THEN
         --завершение договора в тек месяце
         dat31_ := l_mdate - 1;
       END IF;
       --формулу вывела Сухова - доке
-      ir_       := acrn.fprocn(p_acck, 0, gl.bd) / 100;
-      l_ir_k    := (dat31_ - gl.bd + 1) / 365;
+      ir_       := acrn.fprocn(p_acck, 0, gl.bdate) / 100;
+      l_ir_k    := (dat31_ - gl.bdate + 1) / 365;
       l_ir_k    := ir_ * l_ir_k;
       l_sum_ret := round((l_sum_ret - l_ir_k * l_s) / (1 - l_ir_k), 0);
 
@@ -13587,7 +13640,7 @@ end if;
                      int_accn i8,
                      (SELECT *
                         FROM cc_deal
-                       WHERE sdate < gl.bd
+                       WHERE sdate < gl.bdate
                          AND sos >= 1
                          AND sos < 14
                          AND vidd IN (1, 2, 3, 11, 12, 13)
@@ -13596,7 +13649,7 @@ end if;
                WHERE a8.tip = 'LIM'
                  AND n8.acc = a8.acc
                  AND n8.nd = d.nd
-                 AND (a.dapp IS NULL OR a.dapp <= gl.bd)
+                 AND (a.dapp IS NULL OR a.dapp <= gl.bdate)
                  AND i8.acc = a8.acc
                  AND i8.id = 0
                  AND ((a.tip = 'SG' AND a.ostc > 0) OR
@@ -13631,8 +13684,8 @@ end if;
          24.07.2014 Поиск платежного дня Сейчас для поиска платежного дня используется запрос:
             select count(*), nvl(sum(sumg),0), nvl( sum(sumo),0)
             into pl_Den_,l_sumg,l_sumo  from cc_lim
-            where sumo > 0  and  cck_app.CorrectDate2( gl.baseval, fdat, nvl(k.daynp,1) ) =gl.bd
-              and fdat < gl.bd + 30 and fdat > gl.bd-30  and nd = k.ND  and sumo >0  ;
+            where sumo > 0  and  cck_app.CorrectDate2( gl.baseval, fdat, nvl(k.daynp,1) ) =gl.bdate
+              and fdat < gl.bdate + 30 and fdat > gl.bdate-30  and nd = k.ND  and sumo >0  ;
 
           Проблема в том что по новым договорам переменная k.daynp=-2 ( без корректировки по выходным дням)
           Предлагаю заменить nvl(k.daynp,1) на decode (k.daynp,null, CC_DAYNP, -2, CC_DAYNP, k.daynp).
@@ -13654,13 +13707,13 @@ end if;
           FROM cc_lim
          WHERE nd = k.nd
            AND sumo > 0
-           AND fdat < gl.bd + 30
-           AND fdat > gl.bd - 30
-           AND cck_app.correctdate2(gl.baseval, fdat, ntmp_) = gl.bd;
+           AND fdat < gl.bdate + 30
+           AND fdat > gl.bdate - 30
+           AND cck_app.correctdate2(gl.baseval, fdat, ntmp_) = gl.bdate;
         --------------------------------------------------------------------------------
         -- Блокировка погашения  в неплатежные дни для блк >=10,11,14,15
         -- если оплата по платежным дням и договор нормальный (не просроченный) тогда гасить больше ничего не надо
-        IF k.sos = 10 AND k.wdate >= gl.bd AND k.blk IN (10, 11, 14, 15) THEN
+        IF k.sos = 10 AND k.wdate >= gl.bdate AND k.blk IN (10, 11, 14, 15) THEN
           IF pl_den_ = 0 THEN
             GOTO met_kon;
           END IF; -- это НЕ платежный день
@@ -13673,10 +13726,10 @@ end if;
         END IF;
 
         -- Для  договоров  с датой окончание считаем день погашения каждый день
-        IF k.wdate <= gl.bd THEN
+        IF k.wdate <= gl.bdate THEN
           /* просрочка или завершение договора */
-          dat_sn1_ := gl.bd;
-          dat_sn2_ := gl.bd - 1;
+          dat_sn1_ := gl.bdate;
+          dat_sn2_ := gl.bdate - 1;
           pl_den_  := 1;
         END IF;
 
@@ -13697,17 +13750,17 @@ end if;
 
         -- 11.09.2014 --Для старых КД (k.blk=0) можно платить в любой день и не надо искать платежный день
         IF k.blk = 0 THEN
-          pl_dat := gl.bd;
+          pl_dat := gl.bdate;
         ELSE
           --платежная дата  м.б. меньше (вых) банковской  или равна
-          IF pl_den_ = 1 AND k.wdate <= gl.bd THEN
-            pl_dat := gl.bd;
+          IF pl_den_ = 1 AND k.wdate <= gl.bdate THEN
+            pl_dat := gl.bdate;
           ELSE
             SELECT MAX(fdat)
               INTO pl_dat
               FROM cc_lim
              WHERE nd = k.nd
-               AND fdat <= gl.bd;
+               AND fdat <= gl.bdate;
           END IF;
         END IF;
 
@@ -13715,13 +13768,13 @@ end if;
         -- DAT_SN1_  дата остатка счета  SN
         -- DAT_SN2_  дата. по кот д.б. начислены %%
 
-        IF l_int_debt = '1' AND k.wdate > gl.bd THEN
+        IF l_int_debt = '1' AND k.wdate > gl.bdate THEN
           -- если % по предмес и КД еще не завешен, то для погашения берем остаток за 31 число прош.мес
           dat_sn1_ := trunc(pl_dat, 'MM');
           dat_sn2_ := dat_sn1_ - 1; -- DAT_SN1_ = первый день тек месяца, DAT_SN2_ = последний пред.менсяца
         ELSE
           -- если % по пред.дент ИЛИ КД уже завешен, то для погашения берем остаток за пред.день (т.е. текущий остаток)
-          dat_sn1_ := gl.bd;
+          dat_sn1_ := gl.bdate;
           dat_sn2_ := pl_dat - 1; -- DAT_SN1_ = сегодня    DAT_SN2_ = вчера
         END IF;
 
@@ -13731,8 +13784,8 @@ end if;
         IF k.vidd = 12 AND k.blk = 13 AND pl_den_ != 1 THEN
           DECLARE
             nint_ NUMBER := 0; -- расчетные проц
-            dt2_  DATE := last_day(add_months(gl.bd, -1));
-            dt1_  DATE := trunc(last_day(add_months(gl.bd, -1)), 'MM');
+            dt2_  DATE := last_day(add_months(gl.bdate, -1));
+            dt1_  DATE := trunc(last_day(add_months(gl.bdate, -1)), 'MM');
           BEGIN
             acrn.p_int(acc_  => k.acc8,
                        id_   => 0,
@@ -13803,7 +13856,7 @@ end if;
                             FROM saldoa
                            WHERE acc = a.acc
                              AND fdat <=
-                                 decode(a.tip, 'SN ', dat_sn1_, gl.bd))
+                                 decode(a.tip, 'SN ', dat_sn1_, gl.bdate))
                    ORDER BY r.ord, d.sdate, d.wdate, a.nlsalt)
 
         -- цикл по счетам долга
@@ -13837,7 +13890,7 @@ end if;
                    AND a.tip = 'SS ';
 
                 -- 1)  после Финального месячного начисления % сегодня "наперед" по 31 число - разбор гашенич в части нач.процентов - Не делать !
-                IF acr_dat_ >= gl.bd THEN
+                IF acr_dat_ >= gl.bdate THEN
                   s_ := 0;
                   GOTO met_pet;
                 END IF;
@@ -13848,9 +13901,9 @@ end if;
                 --      плат.день = 29.06.2013 - субб, проценты должны быть взяты только по 28.06.2013 включительно  по условиям КД
                 --      но вечером= 28.06.2013 - пятн, были начислены проценты наперед ! по 30.06.2013 включительно, по банковским правилам
                 --      т.е. проценты за период 29.06.2013 - 30.06.2013 уже есть на счете, но они к оплате излишни
-                --If gl.bd <> pl_DAT  then - при таком условии будем дергать все КД каждый "понедельник" (nov)
-                -- cck.FINT (ND,  gl.bd, gl.bd-1  ) - возвращает ноль
-                --cck.FINT (ND,  gl.bd, gl.bd  ) - возвращает % за один день
+                --If gl.bdate <> pl_DAT  then - при таком условии будем дергать все КД каждый "понедельник" (nov)
+                -- cck.FINT (ND,  gl.bdate, gl.bdate-1  ) - возвращает ноль
+                --cck.FINT (ND,  gl.bdate, gl.bdate  ) - возвращает % за один день
                 IF pl_dat <= acr_dat_ THEN
                   p.s := p.s - cck.fint(k.nd, pl_dat, acr_dat_);
                   s_  := p.s;
@@ -13941,7 +13994,7 @@ end if;
             -- БЕЗАКЦЕПТНОЕ СПИСАНИЕ ПЕНИ
           ELSIF p.tip = 'SN8' AND k.kv = gl.baseval THEN
 
-            l_sum_sn8 := gl.p_ncurval(p.kv, least(p.s, s29_), gl.bd);
+            l_sum_sn8 := gl.p_ncurval(p.kv, least(p.s, s29_), gl.bdate);
             nls_6397  := substr(branch_usr.get_branch_param_acc(p.nlsk,
                                                                 p.kv,
                                                                 'CC_6397'),
@@ -14181,15 +14234,15 @@ end if;
                          6,
                          ref_,
                          SYSDATE,
-                         gl.bd,
+                         gl.bdate,
                          1,
                          k.kv,
                          s_,
                          gl.baseval,
                          s_980,
                          NULL,
-                         gl.bd,
-                         gl.bd,
+                         gl.bdate,
+                         gl.bdate,
                          k.nmsd,
                          nls_2902,
                          gl.amfo,
@@ -14207,7 +14260,7 @@ end if;
                          NULL);
               paytt(0,
                     ref_,
-                    gl.bd,
+                    gl.bdate,
                     tt_,
                     1,
                     k.kv,
@@ -14219,7 +14272,7 @@ end if;
               --внебалансовые проценты и комиссия в валюте договора
               paytt(0,
                     ref_,
-                    gl.bd,
+                    gl.bdate,
                     tt_odb,
                     1,
                     k.kv,
@@ -14245,15 +14298,15 @@ end if;
                          vob_   => vob_,
                          nd_    => to_char(ref_),
                          pdat_  => SYSDATE,
-                         vdat_  => gl.bd,
+                         vdat_  => gl.bdate,
                          dk_    => 1,
                          kv_    => k.kv,
                          s_     => s_,
                          kv2_   => p.kv,
                          s2_    => s_,
                          sk_    => NULL,
-                         data_  => gl.bd,
-                         datp_  => gl.bd,
+                         data_  => gl.bdate,
+                         datp_  => gl.bdate,
                          nam_a_ => k.nmsd,
                          nlsa_  => k.nlsd,
                          mfoa_  => gl.amfo,
@@ -14273,8 +14326,8 @@ end if;
                         mod1_  => 0,
                         mod2_  => 1,
                         ref_   => ref_,
-                        vdat1_ => gl.bd,
-                        vdat2_ => gl.bd,
+                        vdat1_ => gl.bdate,
+                        vdat2_ => gl.bdate,
                         tt0_   => tt_,
                         dk_    => 1,
                         kva_   => k.kv,
@@ -14291,7 +14344,7 @@ end if;
               IF p.tip = 'SN8' THEN
                 gl.payv(0,
                         ref_,
-                        gl.bd,
+                        gl.bdate,
                         tt_odb,
                         1,
                         p.kv,
@@ -14303,7 +14356,7 @@ end if;
               END IF;
             END IF;
             IF tt_ <> tt_bpk AND fl_ = 2 THEN
-              gl.pay(2, ref_, gl.bd);
+              gl.pay(2, ref_, gl.bdate);
             END IF;
             ---------------------------
             s29_ := s29_ - s_;
@@ -14389,15 +14442,16 @@ end if;
       INTO pl_den_, l_sumg, l_sumo
       FROM cc_lim
      WHERE sumo > 0
-       AND cck_app.correctdate2(gl.baseval, fdat, nvl(l_daynp, 1)) = gl.bd
-       AND fdat < gl.bd + 30
-       AND fdat > gl.bd - 30
+       AND cck_app.correctdate2(gl.baseval, fdat, nvl(l_daynp, 1)) =
+           gl.bdate
+       AND fdat < gl.bdate + 30
+       AND fdat > gl.bdate - 30
        AND nd = dd.nd;
 
     -- Для  договоров  с датой окончание считаем день погашения каждый день
-    IF dd.wdate <= gl.bd THEN
-      dat_sn1_ := gl.bd;
-      dat_sn2_ := gl.bd - 1;
+    IF dd.wdate <= gl.bdate THEN
+      dat_sn1_ := gl.bdate;
+      dat_sn2_ := gl.bdate - 1;
       pl_den_  := 1;
     END IF;
 
@@ -14415,7 +14469,7 @@ end if;
 
     -- Блокировка погашения  в неплатежные дни для блк >=10,11,14,15
     -- если оплата по платежным дням и договор нормальный (не просроченный) тогда гасить больше ничего не надо
-    IF dd.sos = 10 AND dd.wdate >= gl.bd AND pl_den_ = 0 AND l_blk >= 10 THEN
+    IF dd.sos = 10 AND dd.wdate >= gl.bdate AND pl_den_ = 0 AND l_blk >= 10 THEN
       --10,11,14,15 = Только По платiжним дня
       RETURN;
     END IF;
@@ -14442,17 +14496,17 @@ end if;
         l_int_debt := mode_e; -- =1 % за прош.мес, =0 % за прош.день
     END;
 
-    IF l_int_debt = '1' AND dd.wdate > gl.bd THEN
+    IF l_int_debt = '1' AND dd.wdate > gl.bdate THEN
       -- если % по предмес и КД еще не завешен,
       -- то для погашения берем остаток за 31 число прош.мес
       -- это первый день тек месяца и последний пред.менсяца
-      dat_sn1_ := trunc(gl.bd, 'MM');
+      dat_sn1_ := trunc(gl.bdate, 'MM');
       dat_sn2_ := dat_sn1_ - 1;
     ELSE
       -- если % по пред.дент ИЛИ КД уже завешен,
       -- то для погашения берем остаток за пред.день (т.е. текущий остаток)
       -- это сегодня и вчера
-      dat_sn1_ := gl.bd;
+      dat_sn1_ := gl.bdate;
       dat_sn2_ := dat_sn1_ - 1;
     END IF;
 
@@ -14479,7 +14533,7 @@ end if;
     -- p_ND = -11 = только ФЛ
     -- p_ND = 0   = ВСЕ ( ЮЛ + ФЛ)
     -- p_ND > 0   = один КД с реф = p_ND
-    -- Анализу поддлежат КД, кот. имеют проврочку по сумме  на дату gl.bd - DAY_;
+    -- Анализу поддлежат КД, кот. имеют проврочку по сумме  на дату gl.bdate - DAY_;
     -- Если вынос делать в след.день за платежным (утром), то DAY_ = 1
 
     s7_      NUMBER;
@@ -14512,7 +14566,7 @@ end if;
 
   BEGIN
 
-    SELECT MAX(fdat) INTO l_dat1 FROM fdat WHERE fdat < gl.bd; -- прошлый раб день
+    SELECT MAX(fdat) INTO l_dat1 FROM fdat WHERE fdat < gl.bdate; -- прошлый раб день
     IF l_dat1 IS NULL THEN
       RETURN;
     END IF;
@@ -14534,7 +14588,7 @@ end if;
       l_vidd := NULL;
     END IF;
 
-    dat7_    := gl.bd - day_;
+    dat7_    := gl.bdate - day_;
     l_branch := substr(pul.get_mas_ini_val('BRANCH'), 1, 30);
 
     --определение VOB для КД в инвалюте
@@ -14597,7 +14651,7 @@ end if;
 
       BEGIN
         -- Учет вых.дней, которые м.б. в только ГПК ФЛ
-        --например: gl.bd = сегодня            = 05.08.2013 - понедельник
+        --например: gl.bdate = сегодня            = 05.08.2013 - понедельник
         --          l_dat1   = прошлый банк.день  = 02.08.2013 - пятница
         --          ll.fdat  = пл.день по ГКП     = 03.08.2013 - суббота
         --          не выносим на просрочку
@@ -14609,7 +14663,7 @@ end if;
            AND fdat = (SELECT nvl(MAX(fdat), k.sdate)
                          FROM cc_lim
                         WHERE nd = l.nd
-                          AND fdat < gl.bd);
+                          AND fdat < gl.bdate);
         IF NOT
             (ll.fdat > l_dat2 AND ll.fdat <= l_dat1 AND ll.fdat <> k.sdate) THEN
           GOTO nexrec;
@@ -14631,8 +14685,8 @@ end if;
       --минус сумму, уже перенесенную на просрочку ранее
 
       SELECT gl.p_ncurval(k.kv8,
-                          SUM(gl.p_icurval(a.kv, a.ostc, gl.bd)),
-                          gl.bd)
+                          SUM(gl.p_icurval(a.kv, a.ostc, gl.bdate)),
+                          gl.bdate)
         INTO s8_
         FROM accounts a, nd_acc n
        WHERE a.tip = 'SP '
@@ -14665,10 +14719,10 @@ end if;
         -- столько реально погашено за платежный период  (ТОЛЬКО НОРМАЛЬНОЕ ТЕЛО !!!)
         SELECT nvl(SUM(gl.p_icurval(a.kv,
                                     decode(a.tip, 'SS ', s.kos, 0),
-                                    gl.bd)),
+                                    gl.bdate)),
                    0) - nvl(SUM(gl.p_icurval(a.kv,
                                              decode(a.tip, 'SP ', s.dos, 0),
-                                             gl.bd)),
+                                             gl.bdate)),
                             0)
           INTO l_s_pay
           FROM accounts a, nd_acc n, saldoa s
@@ -14682,14 +14736,14 @@ end if;
         l_s_pay := greatest(nvl(l_s_pay, 0), 0);
 
         IF l_s_pay <> 0 AND k.kv8 <> gl.baseval THEN
-          l_s_pay := gl.p_ncurval(k.kv8, l_s_pay, gl.bd);
+          l_s_pay := gl.p_ncurval(k.kv8, l_s_pay, gl.bdate);
         END IF;
         -- Клиент недогасил и проверяем что уже данный платеж мы не выносили
         s8_ := 0;
 
         IF ll.sumg > l_s_pay THEN
 
-          SELECT nvl(SUM(gl.p_icurval(a.kv, s.kos, gl.bd)), 0)
+          SELECT nvl(SUM(gl.p_icurval(a.kv, s.kos, gl.bdate)), 0)
             INTO s8_
             FROM accounts a, nd_acc n, saldoa s
            WHERE n.nd = k.nd
@@ -14698,7 +14752,7 @@ end if;
              AND s.acc = a.acc
              AND s.fdat > ll.fdat;
           IF s8_ <> 0 AND k.kv8 <> gl.baseval THEN
-            s8_ := gl.p_ncurval(k.kv8, s8_, gl.bd);
+            s8_ := gl.p_ncurval(k.kv8, s8_, gl.bdate);
           END IF;
 
         END IF;
@@ -14747,11 +14801,13 @@ end if;
         IF p.kv = k.kv8 THEN
           q7_ := s7_;
         ELSIF p.kv = gl.baseval THEN
-          q7_ := gl.p_icurval(k.kv8, s7_, gl.bd);
+          q7_ := gl.p_icurval(k.kv8, s7_, gl.bdate);
         ELSIF k.kv8 = gl.baseval THEN
-          q7_ := gl.p_ncurval(p.kv, s7_, gl.bd);
+          q7_ := gl.p_ncurval(p.kv, s7_, gl.bdate);
         ELSE
-          q7_ := gl.p_ncurval(p.kv, gl.p_icurval(k.kv8, s7_, gl.bd), gl.bd);
+          q7_ := gl.p_ncurval(p.kv,
+                              gl.p_icurval(k.kv8, s7_, gl.bdate),
+                              gl.bdate);
         END IF;
 
         s_ := least(p.ss, q7_);
@@ -14760,11 +14816,13 @@ end if;
         IF k.kv8 = p.kv THEN
           q_ := s_;
         ELSIF k.kv8 = gl.baseval THEN
-          q_ := gl.p_icurval(p.kv, s_, gl.bd);
+          q_ := gl.p_icurval(p.kv, s_, gl.bdate);
         ELSIF p.kv = gl.baseval THEN
-          q_ := gl.p_ncurval(k.kv8, s_, gl.bd);
+          q_ := gl.p_ncurval(k.kv8, s_, gl.bdate);
         ELSE
-          q_ := gl.p_ncurval(k.kv8, gl.p_icurval(p.kv, s_, gl.bd), gl.bd);
+          q_ := gl.p_ncurval(k.kv8,
+                             gl.p_icurval(p.kv, s_, gl.bdate),
+                             gl.bdate);
         END IF;
 
         --начало транзакции
@@ -14955,15 +15013,15 @@ end if;
                  vob_   => vob_,
                  nd_    => substr(to_char(ref_), 1, 10),
                  pdat_  => SYSDATE,
-                 vdat_  => gl.bd,
+                 vdat_  => gl.bdate,
                  dk_    => 1,
                  kv_    => p_kv,
                  s_     => p_s,
                  kv2_   => p_kv,
                  s2_    => p_s,
                  sk_    => NULL,
-                 data_  => gl.bd,
-                 datp_  => gl.bd,
+                 data_  => gl.bdate,
+                 datp_  => gl.bdate,
                  nam_a_ => nmsd_,
                  nlsa_  => nlsd_,
                  mfoa_  => gl.amfo,
@@ -14982,7 +15040,7 @@ end if;
 
       gl.payv(cck.fl38_asp,
               ref_,
-              gl.bd,
+              gl.bdate,
               'ASP',
               1,
               p_kv,
@@ -15019,7 +15077,7 @@ end if;
         (l_branch,
          'ASP',
          vob_,
-         gl.bd,
+         gl.bdate,
          p_kv,
          1,
          p_s / 100,
@@ -15158,26 +15216,26 @@ end if;
 
   BEGIN
 
-    dat30_ := trunc(gl.bd, 'MM') - 1; -- последний кал.день пред месяца
+    dat30_ := trunc(gl.bdate, 'MM') - 1; -- последний кал.день пред месяца
 
     IF day_ = -1 THEN
-      dat30_ := gl.bd; -- а так же изменяет счет начисления процентов на счет просроченных процентов
+      dat30_ := gl.bdate; -- а так же изменяет счет начисления процентов на счет просроченных процентов
     ELSIF day_ = -3 THEN
-      dat30_ := gl.bd;
+      dat30_ := gl.bdate;
 
     ELSIF day_ = -2 THEN
       -- Проц "За пред.мес" (- пока НЕ проверено или по какое-то фиксированное число, наприм 26 - как в УПБ)
 
       -- найти клиентскую пл.дату и узнать, надо ли она нам сегодня ?
       l_dd   := nvl(cck_app.pay_day_sn_to_nd(p_nd), '31'); -- день ДД погаш. процент долга в формате  '31'  '26'  '02' .... из доп.рекв. КД
-      datpl_ := cck_app.valid_date(l_dd || to_char(gl.bd, '/mm/yyyy')); -- день ДД в текущем  месяце
-      IF datpl_ > gl.bd THEN
+      datpl_ := cck_app.valid_date(l_dd || to_char(gl.bdate, '/mm/yyyy')); -- день ДД в текущем  месяце
+      IF datpl_ > gl.bdate THEN
         datpl_ := add_months(datpl_, -1);
       END IF; -- но он не мб больше тек.дня, иначе в прошлом мес
 
       --Универсальная функция поиска банковской даты, отстоящей от заданной (datb_) на расстоянии  next_ шагов вперед (next_ > 0) или назад (next_ < 0)
-      datb1_ := dat_next_u(gl.bd, -1); -- пред.раб.день
-      datb2_ := dat_next_u(gl.bd, -2); -- Поза-пред.раб.день
+      datb1_ := dat_next_u(gl.bdate, -1); -- пред.раб.день
+      datb2_ := dat_next_u(gl.bdate, -2); -- Поза-пред.раб.день
       IF NOT (datpl_ > datb2_ AND datpl_ <= datb1_) THEN
         RETURN;
       END IF;
@@ -15375,9 +15433,9 @@ end if;
            declare                  PDAT_ date  ; -- последняя пл.дата в ГПК по "сегодня"
            begin
              select max(fdat) into PDAT_ from cc_lim
-             where nd=p_ND and to_char(fdat,'YYMM') < to_char(gl.bd-1,'YYMM') and exists
+             where nd=p_ND and to_char(fdat,'YYMM') < to_char(gl.bdate-1,'YYMM') and exists
                   (select 1 from int_accn i, accounts a, nd_acc n where n.nd=p_nd and n.acc=a.acc and a.tip='LIM' and a.acc=i.acc and i.id=0 and i.BASEY=2 and i.BASEM=1);
-             If PDAT_ > gl.bd - 6  then    S_ := S_ - cck.FINT ( p_ND,  PDAT_, last_day (PDAT_) ); end if ;
+             If PDAT_ > gl.bdate - 6  then    S_ := S_ - cck.FINT ( p_ND,  PDAT_, last_day (PDAT_) ); end if ;
            end;
           */
         ELSE
@@ -15393,15 +15451,15 @@ end if;
                        vob_,
                        ref_,
                        SYSDATE,
-                       gl.bd,
+                       gl.bdate,
                        1,
                        p.kv,
                        s_,
                        p.kv,
                        s_,
                        NULL,
-                       gl.bd,
-                       gl.bd,
+                       gl.bdate,
+                       gl.bdate,
                        nmsd_,
                        nlsd_,
                        gl.amfo,
@@ -15419,7 +15477,7 @@ end if;
                        NULL);
             gl.payv(cck.fl38_asp,
                     ref_,
-                    gl.bd,
+                    gl.bdate,
                     'ASP',
                     1,
                     p.kv,
@@ -15461,7 +15519,7 @@ end if;
               (l_branch,
                'ASP',
                vob_,
-               gl.bd,
+               gl.bdate,
                p.kv,
                1,
                s_,
@@ -16032,7 +16090,7 @@ BEGIN
   cc_daynp  := to_number(nvl(getglobaloption('CC_DAYNP'), '1')); -- день гашения - следующий либо предыдущий для выбранного рабочего дня
   cc_slstp  := to_number(nvl(getglobaloption('CC_SLSTP'), '0'));
   IF to_date(getglobaloption('CCK_MIGR'), 'dd/mm/yyyy') >=
-     nvl(gl.bd, trunc(SYSDATE)) THEN
+     nvl(gl.bdate, trunc(SYSDATE)) THEN
     g_cck_migr := 1;
   ELSE
     g_cck_migr := 0;

@@ -88,10 +88,8 @@ PROMPT *** Create  view V_ZAL_ND ***
                   AND pul.Get_Mas_Ini_Val ('PAP') = 2);
 
 PROMPT *** Create  grants  V_ZAL_ND ***
-grant SELECT                                                                 on V_ZAL_ND        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_ZAL_ND        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_ZAL_ND        to START1;
-grant SELECT                                                                 on V_ZAL_ND        to UPLD;
 
 
 

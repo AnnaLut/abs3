@@ -21,9 +21,7 @@ from ( SELECT d.user_id ISP, d.ND, d.CC_ID, d.VIDD, d.RNK, a8.KV, d.LIMIT S, a8.
    ) x;
 
 PROMPT *** Create  grants  V_CCK_ZU ***
-grant SELECT                                                                 on V_CCK_ZU        to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CCK_ZU        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CCK_ZU        to UPLD;
 
 
 

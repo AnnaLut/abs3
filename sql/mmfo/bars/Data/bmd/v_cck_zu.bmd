@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Портфель ЗАКТИТИХ кредитів ЮО / V_CCK_ZU';
   l_tablinesdef := '10';
-  l_tabselect_statement := '';
   l_tabname     := 'V_CCK_ZU';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,25 +119,25 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 7, 'CC_ID', 'C', 'Зовн.~№ КД', '1.5', null, 10, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'DSDATE', 'D', 'Дата Поч~дії КД~----------~ГЛК', '1.3', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=CC_W_GLK1[NSIFUNCTION][ACCESSCODE=>0][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DWDATE', 'D', 'Дата заверш~дії КД~----------~ГПК', '1.3', null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=CC_W_LIM1_EXT[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.PUT(''ND'',:ND);PUL.PUT(''ACC8'',:ACC8)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'ISP', 'N', 'Відп~інсп~по КД', '.5', null, 63, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'KV', 'N', 'Вал~~----------~ПОДІЇ~CC_SOB_W', '.3', null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=CC_SOB[ACCESSCODE=>5][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X'')][EXEC=>BEFORE][showDialogWindow=>false][CONDITIONS=> nd=:ND]', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'ND', 'N', 'Реф КД~в АБС~----------~ПЕРЕГЛ./КОРР', '1.5', null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/CreditUi/NewCredit/?custtype=2'||chr(38)||'nd=:ND', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from V_ND_ACCOUNTS where nd=:ND and acc=a.acc)")', 0);
-  bars_metabase.add_column(l_tabid, 17, 'PR', 'N', '%~ст', '.7', null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'РНК~позич~----------~РАХУНКИ', '1.5', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/customerlist/custacc.aspx?type=3'||chr(38)||'nd=:ND', 'EditCustomer( IifN(:VIDD <10,2,3), NUMBER_Null, :CC_NMK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
-  bars_metabase.add_column(l_tabid, 21, 'S', 'N', 'Залишок~по тілу~----------~РАХ+ОПЕР', '', null, 0, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, 'sPar=CC_W017[NSIFUNCTION][ACCESSCODE=>2][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X''); PUL.Set_Mas_Ini(''ACCC'',:ACC8,''ACCC''); PUL.Set_Mas_Ini(''RNK'',:RNK,''RNK'')][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SDOG', 'N', 'Сума~по дог~----------~ЗАБЕЗПЕЧЕН', '', null, 16, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, 'sPar=V_ZAL_ND[NSIFUNCTION][ACCESSCODE=>5][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X''); PUL.Set_Mas_Ini(''ACCC'',:ACC8, ''ACCC'')][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'VIDD', 'N', 'Вид~КД', '.3', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'DAZS', 'D', 'Фактична~Дата закр КД', '1.3', null, 81, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'NAMK', 'C', 'Назва~Позичальника~----------~КАРТКА КЛ', '', null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'BRANCH', 'C', 'Бранч~КД', '', null, 57, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'PROD', 'C', 'Код~Продукт~----------~ДОД.РЕКВ.', '.5', null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=CC_DOPW[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'')][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'SOS', 'N', 'Стан~договору', '.3', null, 61, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'NDI', 'N', 'Реф~повяз~дог', '1.3', null, 62, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'TR', 'B', 'Транш~КЛ', '.3', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CC_W_TRANSH[NSIFUNCTION][ACCESSCODE=>2][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'ACC8', 'N', 'ACC рах 8999*LIM', '1.3', null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'CC_ID', 'C', 'Зовн.~№ КД', 1.5, null, 10, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DSDATE', 'D', 'Дата Поч~дії КД~----------~ГЛК', 1.3, null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=CC_W_GLK1[NSIFUNCTION][ACCESSCODE=>0][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'DWDATE', 'D', 'Дата заверш~дії КД~----------~ГПК', 1.3, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, 'sPar=CC_W_LIM1_EXT[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.PUT(''ND'',:ND);PUL.PUT(''ACC8'',:ACC8)][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ISP', 'N', 'Відп~інсп~по КД', .5, null, 63, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'KV', 'N', 'Вал~~----------~ПОДІЇ~CC_SOB_W', .3, null, 18, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=CC_SOB[ACCESSCODE=>5][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X'')][EXEC=>BEFORE][showDialogWindow=>false][CONDITIONS=> nd=:ND]', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'ND', 'N', 'Реф КД~в АБС~----------~ПЕРЕГЛ./КОРР', 1.5, null, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/CreditUi/NewCredit/?custtype=2'||chr(38)||'nd=:ND', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from V_ND_ACCOUNTS where nd=:ND and acc=a.acc)")', 0);
+  bars_metabase.add_column(l_tabid, 17, 'PR', 'N', '%~ст', .7, null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'РНК~позич~----------~РАХУНКИ', 1.5, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/customerlist/custacc.aspx?type=3'||chr(38)||'nd=:ND', 'EditCustomer( IifN(:VIDD <10,2,3), NUMBER_Null, :CC_NMK, CVIEW_ReadOnly, hWndForm, 0, "", FALSE)', 0);
+  bars_metabase.add_column(l_tabid, 21, 'S', 'N', 'Залишок~по тілу~----------~РАХ+ОПЕР', null, null, 0, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, 'sPar=CC_W017[NSIFUNCTION][ACCESSCODE=>2][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X''); PUL.Set_Mas_Ini(''ACCC'',:ACC8,''ACCC''); PUL.Set_Mas_Ini(''RNK'',:RNK,''RNK'')][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SDOG', 'N', 'Сума~по дог~----------~ЗАБЕЗПЕЧЕН', null, null, 16, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, 'sPar=V_ZAL_ND[NSIFUNCTION][ACCESSCODE=>5][PROC=>PUL.Set_Mas_Ini(''ND'',:ND,''X''); PUL.Set_Mas_Ini(''ACCC'',:ACC8, ''ACCC'')][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'VIDD', 'N', 'Вид~КД', .3, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'DAZS', 'D', 'Фактична~Дата закр КД', 1.3, null, 81, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'NAMK', 'C', 'Назва~Позичальника~----------~КАРТКА КЛ', null, null, 14, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/clientregister/registration.aspx?readonly=1'||chr(38)||'rnk=:RNK', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'BRANCH', 'C', 'Бранч~КД', null, null, 57, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'PROD', 'C', 'Код~Продукт~----------~ДОД.РЕКВ.', .5, null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=CC_DOPW[NSIFUNCTION][ACCESSCODE=>1][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'')][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'SOS', 'N', 'Стан~договору', .3, null, 61, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'NDI', 'N', 'Реф~повяз~дог', 1.3, null, 62, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'TR', 'B', 'Транш~КЛ', .3, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, 'sPar=CC_W_TRANSH[NSIFUNCTION][ACCESSCODE=>2][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][EXEC=>BEFORE][showDialogWindow=>false]', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'ACC8', 'N', 'ACC рах 8999*LIM', 1.3, null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание для условий фильтра
   l_newtabid := bars_metabase.get_tabid('KU_108');

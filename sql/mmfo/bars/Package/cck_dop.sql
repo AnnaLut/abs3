@@ -204,6 +204,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
   G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.00 PLAN 08/11/2017';
 
   /*
+ 27.11.2017 Sta+¬ика —еменова : ѕри авторизации кред.линий (√ен.договора - VIDD=2,3) при типе авторизации 1 (полна€ авторизаци€)
+              автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами √ен.договора (валюта, % ставка, база начислени€)
+
   28/03/2017 ѕриведение дисконта в формат NNNNNN.NN
   02/03/2017 вызов стандартной процедуры авторизации перенесен после открыти€ счетов
   15/02/2017 COBUSUPABS-5326
@@ -1496,8 +1499,9 @@ end builder_gpk;
     end loop;
   end open_an_account;
 
------ јвторизаци€  ƒ-------------------------
-procedure cc_autor(p_nd   in number,
+-----------------
+      procedure cc_autor_ex
+        (p_nd   in number,
                    p_saim in varchar2 default null,
                    p_urov in varchar2 default null
                    ) is
@@ -1709,9 +1713,10 @@ begin
                 sys_context('bars_context','user_branch');
 
   begin
+    
      -- параметры кредита
      select * into l_ccv from cc_v where nd = p_nd;
-
+ 
      -- установить доступ уровн€ договора дл€ возможности постановки виз
      -- прользователей уровн€ договора       -- bc.set_context;
      bc.subst_branch(l_ccv.branch);
@@ -1725,10 +1730,15 @@ begin
      if substr(l_nls9, 1, 2) = '#(' then      -- dynamic account number present
         execute immediate 'select '||substr(l_nls9,3,length(l_nls9)-3)||' from dual' into l_nls9;
      end if;
-
+     
+    l_nls9:= BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);
+   
      -- его наименование
+    begin
      select substr(nms,1,38) into l_nms9 from accounts where nls=l_nls9 and kv=gl.baseval;
-
+     exception when no_data_found then
+         RAise_application_error(-20008,'ƒл€ бранча  '||l_ccv.branch ||' не знайдено контррахунок дл€ обл≥ку забезпеченн€!');
+     end;
      -- поочередно перебираем сохраненн≥е в допреквизитах параметры обеспечени€
      for k in
         (SELECT cck_app.to_number2(txt)                          as PAWN,
@@ -1833,24 +1843,56 @@ begin
             substr(l_nms9,   1,38),l_nls9    , gl.amfo, substr(nazn_,1,160),
             null , l_okpo,  l_okpo, null,null, 0,null , l_ccv.id);
 
-       exception when others then
-         -- вернутьс€ в свою область видимости
-         bc.subst_branch(l_branch);
-         -- исключение бросаем дальше
-         raise_application_error(-20000,sqlerrm || chr(10) ||
-                                 dbms_utility.format_error_backtrace(), true);
+       exception when others then         -- вернутьс€ в свою область видимости
+         bc.subst_branch(l_branch);      -- исключение бросаем дальше
+         raise_application_error(-20000,sqlerrm || chr(10) ||  dbms_utility.format_error_backtrace(), true);
        end;
-
        gl.payv(l_fl_opl, ref_, gl.bdate, 'ZAL', l_dk,  gl.baseval,l_new_nls,   k.sum,  gl.baseval,   l_nls9,   k.sum);
-
      end loop;
 
      -- вернутьс€ в свою область видимости
      bc.subst_branch(l_branch);
 
-  end;
+     --27.11.2017 Sta+¬ика —еменова : ѕри авторизации кред.линий (√ен.договора - VIDD=2,3) при типе авторизации 1 (полна€ авторизаци€)
+     --               автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами √ен.договора (валюта, % ставка, база начислени€)
+     If l_cd_row.vidd in (2,3) and l_cd_row.NDG = l_cd_row.ND then
 
-end cc_autor;
+        declare  l_kv8 int ; l_bs8 int ; l_IR8  number;
+        begin
+
+            select a.kv, i.basey, (select ir from int_ratn where id = 0 and acc = a.acc and rownum = 1) IR
+            ----- acrn.fPROCN(0, a.acc, gl.bdate) IR
+            into l_kv8, l_bs8, l_IR8
+            from accounts a, int_accn i, nd_acc n
+            where a.tip = 'LIM' and a.acc = n.acc and n.nd =l_cd_row.ND and a.acc = i.acc and i.id =  0;
+
+            EXECUTE IMMEDIATE 'begin MSFZ9.OPN1 ( :NDG, :KV, :IR, :BS, null, null ) ; end ;'      USING l_cd_row.ND, l_KV8, l_IR8,  l_BS8 ;
+
+            If l_cd_row.vidd =3 then
+               for x in (select substr(tag,2,3)+0 KV, to_number(txt) IR from nd_txt where nd=l_cd_row.ND and tag in ('P643','P840','P978','P980','P987') and substr(tag,2,3)+0<>l_KV8)
+               loop  EXECUTE IMMEDIATE 'begin MSFZ9.OPN1 ( :NDG, :KV, :IR, :BS, null, null ) ; end ;'      USING l_cd_row.ND, x.KV, x.IR,  l_BS8 ;    end loop ;---x
+            end if ;
+
+        EXCEPTION WHEN NO_DATA_FOUND THEN null;
+        end ;
+
+     end if;  -- vidd in (2,3)
+
+  end; --- -- вызов стандартной процедуры авторизации
+
+end cc_autor_ex;
+----- јвторизаци€  ƒ-------------------------
+procedure cc_autor(p_nd   in number,  p_saim in varchar2 default null,    p_urov in varchar2 default null) is
+
+
+begin
+    CCK_DOP.cc_autor_ex (p_nd ,  p_saim,  p_urov );
+    for dd in (select nd from cc_deal where nd <> ndg and ndg =p_nd)
+    loop update cc_deal set sos =0 where nd = dd.nd;
+         CCK_DOP.cc_autor_ex (dd.nd ,  p_saim,  p_urov );
+    end loop ;
+end cc_autor ;
+-----------------------------------
 
 function get_prod_old(p_prod varchar2) return varchar2 is
 l_prod_old varchar2(6);

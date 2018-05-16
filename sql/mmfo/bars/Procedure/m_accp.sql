@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/M_ACCP.sql =========*** Run *** ==
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure M_ACCP ***
-
-  CREATE OR REPLACE PROCEDURE BARS.M_ACCP 
+CREATE OR REPLACE PROCEDURE m_accp
 (
   mod_  INT
  ,nd_   INT
@@ -112,8 +103,7 @@ BEGIN
                                 ,'SNO'
                                 ,'SPN'
                                 ,'DEP'
-                                ,'DEN'
-								,'ODB')
+                                ,'DEN')
                    AND a.nbs NOT LIKE '25%'
                    AND a.nbs NOT LIKE '26%'
                    AND (accz_, n.acc) NOT IN (SELECT acc, accs FROM cc_accp))
@@ -214,14 +204,3 @@ BEGIN
   END IF;
 END;
 /
-show err;
-
-PROMPT *** Create  grants  M_ACCP ***
-grant EXECUTE                                                                on M_ACCP          to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on M_ACCP          to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/M_ACCP.sql =========*** End *** ==
-PROMPT ===================================================================================== 

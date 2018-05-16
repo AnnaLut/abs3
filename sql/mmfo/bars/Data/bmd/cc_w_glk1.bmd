@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'Графік Лімітів Кредитування  одного КД / CC_W_GLK1';
   l_tablinesdef := '1500';
-  l_tabselect_statement := '';
   l_tabname     := 'CC_W_GLK1';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,15 +119,15 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'DEL2', 'N', 'Відхилення ~план-факт~05=03-04', '1.5', null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Дата ~ліміту~01', '1.5', null, 1, 0, 1, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'LIM2', 'N', 'Вих.Ліміт~ план~03', '1.5', null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф ~КД', '', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OST', 'N', 'Залишок~факт~04', '1.5', null, 4, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'LIM1', 'N', 'Вх.Ліміт~план~02', '1.5', null, 2, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'D9129', 'N', 'Поточна~Дельта~ для 9129', '1', null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DAYSN', 'B', 'Тільки ~тіло', '.8', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'UPD_FLAG', 'B', 'Зміни~ для~ всіх~ записів-1', '.9', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DEL2', 'N', 'Відхилення ~план-факт~05=03-04', 1.5, null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'Дата ~ліміту~01', 1.5, null, 1, 0, 1, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'LIM2', 'N', 'Вих.Ліміт~ план~03', 1.5, null, 3, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф ~КД', null, null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OST', 'N', 'Залишок~факт~04', 1.5, null, 4, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'LIM1', 'N', 'Вх.Ліміт~план~02', 1.5, null, 2, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'D9129', 'N', 'Поточна~Дельта~ для 9129', 1, null, 10, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'DAYSN', 'B', 'Тільки ~тіло', .8, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'UPD_FLAG', 'B', 'Зміни~ для~ всіх~ записів-1', .9, null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'cck_ui.GLK_UPD (2,:ND,:FDAT,:LIM2 , :D9129,:DAYSN ,:UPD_FLAG )');
@@ -153,7 +148,7 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 2, 'Балансування ГЛК та перерахунок %%', 'cck_ui.GLK_Bal (null,  null,0)', '', 'ONCE', 'Виконати балансування ГПК (тіло) в ост.дату ?', 'Виконано!', '57', '', '', 57);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'КД: ГПК для обраного КД', '', '', 'ONCE', '', '', '83', '', 'sPar=CC_W_LIM1_EXT[NSIFUNCTION][ACCESSCODE=>0][showDialogWindow=>false]', 83);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'КД: ГПК для обраного КД', '', '', 'ONCE', '', '', '83', '', 'sPar=CC_W_LIM1_EXT[NSIFUNCTION][PROC=>cck_ui.GPK_Bal (null,  null,0)][EXEC=>BEFORE][ACCESSCODE=>0][showDialogWindow=>false]', 83);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 5, 'Видалення записів', 'cck_ui.GLK_UPD (2,null,:FDAT,:LIM2 ,NULL)', '', 'EACH', '', '', '5', '', '', 5);

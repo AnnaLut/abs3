@@ -58,7 +58,7 @@ declare
 
 begin
 
-  l_tabsemantic := 'MSFZ9.Протокол Розполылу по 1 КД';
+  l_tabsemantic := 'MSFZ9.Протокол Розподілу по 1 КД / PR_MSFZ9';
   l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'PR_MSFZ9';

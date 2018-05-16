@@ -41,23 +41,25 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = select_sql;
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                   
-                    ProvideList r = new ProvideList();
-                    r.RNK = Convert.ToDecimal(reader.GetValue(0).ToString());
-                    r.NMK = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                    r.NMS = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                    r.NLS = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                    r.KV = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? 0 : reader.GetInt32(4);
-                    r.OST = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? 0: reader.GetDecimal(5);
-                    r.ACC = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetDecimal(6);
-                    r.PAWN = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetInt32(7);
-                    r.NAME = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                    r.OB22 = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
-                    provideList.Add(r);
+
+                    while (reader.Read())
+                    {
+
+                        ProvideList r = new ProvideList();
+                        r.RNK = Convert.ToDecimal(reader.GetValue(0).ToString());
+                        r.NMK = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        r.NMS = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+                        r.NLS = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
+                        r.KV = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? 0 : reader.GetInt32(4);
+                        r.OST = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? 0 : reader.GetDecimal(5);
+                        r.ACC = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetDecimal(6);
+                        r.PAWN = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetInt32(7);
+                        r.NAME = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
+                        r.OB22 = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? String.Empty : reader.GetString(9);
+                        provideList.Add(r);
+                    }
                 }
             }
             finally
@@ -86,35 +88,37 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = sql1;
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    ExistProvide r = new ExistProvide();
 
-                    r.RNK = Convert.ToDecimal(reader.GetValue(0).ToString());
-                    r.PAWN = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? 0 : reader.GetInt32(1);
-                    r.ACC = Convert.ToDecimal(reader.GetValue(2).ToString());
-                    r.NLS = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
-                    r.KV = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? 0 : reader.GetInt32(4);
-                    r.OB22 = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
-                    r.OSTB = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetDecimal(6);
-                    r.OSTC = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetDecimal(7);
-                    r.CC_IDZ = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
-                    r.SDATZ = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(9).ToString());
-                    r.MPAWN = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? (int?)null : reader.GetInt32(10);
-                    r.DEL = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? (int?)null : reader.GetInt32(11);
-                    r.DEPID = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (decimal?)null : reader.GetDecimal(12);
-                    r.PR_12 = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? (int?)null : reader.GetInt32(13);
-                    r.NREE = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
-                    r.SV = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? (decimal?)null : reader.GetDecimal(15);
-                    r.MDATE = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(16).ToString());
-                    r.DAZS = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(17).ToString());
-                    r.NAZN = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
-                    r.NMK = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
-                    r.NAME = String.IsNullOrEmpty(reader.GetValue(20).ToString()) ? String.Empty : reader.GetString(20);
+                    while (reader.Read())
+                    {
+                        ExistProvide r = new ExistProvide();
 
-                    provideList.Add(r);
+                        r.RNK = Convert.ToDecimal(reader.GetValue(0).ToString());
+                        r.PAWN = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? 0 : reader.GetInt32(1);
+                        r.ACC = Convert.ToDecimal(reader.GetValue(2).ToString());
+                        r.NLS = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetString(3);
+                        r.KV = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? 0 : reader.GetInt32(4);
+                        r.OB22 = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? String.Empty : reader.GetString(5);
+                        r.OSTB = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetDecimal(6);
+                        r.OSTC = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetDecimal(7);
+                        r.CC_IDZ = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? String.Empty : reader.GetString(8);
+                        r.SDATZ = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(9).ToString());
+                        r.MPAWN = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? (int?)null : reader.GetInt32(10);
+                        r.DEL = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? (int?)null : reader.GetInt32(11);
+                        r.DEPID = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (decimal?)null : reader.GetDecimal(12);
+                        r.PR_12 = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? (int?)null : reader.GetInt32(13);
+                        r.NREE = String.IsNullOrEmpty(reader.GetValue(14).ToString()) ? String.Empty : reader.GetString(14);
+                        r.SV = String.IsNullOrEmpty(reader.GetValue(15).ToString()) ? (decimal?)null : reader.GetDecimal(15);
+                        r.MDATE = String.IsNullOrEmpty(reader.GetValue(16).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(16).ToString());
+                        r.DAZS = String.IsNullOrEmpty(reader.GetValue(17).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(17).ToString());
+                        r.NAZN = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
+                        r.NMK = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
+                        r.NAME = String.IsNullOrEmpty(reader.GetValue(20).ToString()) ? String.Empty : reader.GetString(20);
+
+                        provideList.Add(r);
+                    }
                 }
             }
             finally
@@ -217,14 +221,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    PAWNList p = new PAWNList();
-                    p.PAWN = reader.GetInt32(0);
-                    p.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : "[ " + p.PAWN + " ] " + reader.GetString(1);
-                    lst.Add(p);
+
+                    while (reader.Read())
+                    {
+                        PAWNList p = new PAWNList();
+                        p.PAWN = reader.GetInt32(0);
+                        p.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : "[ " + p.PAWN + " ] " + reader.GetString(1);
+                        lst.Add(p);
+                    }
                 }
             }
             finally
@@ -250,14 +256,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    KVList k = new KVList();
-                    k.KV = reader.GetInt32(0);
-                    k.NAME = k.KV.ToString() + " " + reader.GetString(1);
-                    lst.Add(k);
+
+                    while (reader.Read())
+                    {
+                        KVList k = new KVList();
+                        k.KV = reader.GetInt32(0);
+                        k.NAME = k.KV.ToString() + " " + reader.GetString(1);
+                        lst.Add(k);
+                    }
                 }
             }
             finally
@@ -283,14 +291,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    MPAWNList m = new MPAWNList();
-                    m.MPAWN = reader.GetInt32(0);
-                    m.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                    lst.Add(m);
+
+                    while (reader.Read())
+                    {
+                        MPAWNList m = new MPAWNList();
+                        m.MPAWN = reader.GetInt32(0);
+                        m.NAME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        lst.Add(m);
+                    }
                 }
             }
             finally
@@ -316,14 +326,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    RNKList r = new RNKList();
-                    r.RNK = reader.GetDecimal(0);
-                    r.NMK = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                    lst.Add(r);
+
+                    while (reader.Read())
+                    {
+                        RNKList r = new RNKList();
+                        r.RNK = reader.GetDecimal(0);
+                        r.NMK = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        lst.Add(r);
+                    }
                 }
             }
             finally
@@ -348,14 +360,16 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    data.RNK = reader.GetDecimal(0);
-                    data.CC_ID = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
-                    data.NMK = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                    data.ND = refID;
+
+                    while (reader.Read())
+                    {
+                        data.RNK = reader.GetDecimal(0);
+                        data.CC_ID = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1);
+                        data.NMK = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+                        data.ND = refID;
+                    }
                 }
             }
             finally
@@ -381,15 +395,17 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    data.RNK = reader.GetDecimal(0);
-                    data.ACCS = reader.GetDecimal(1);
-                    data.NMK = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
-                    data.ND = (decimal)data.ACCS;
-                    data.CC_ID = refID.ToString();
+
+                    while (reader.Read())
+                    {
+                        data.RNK = reader.GetDecimal(0);
+                        data.ACCS = reader.GetDecimal(1);
+                        data.NMK = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? String.Empty : reader.GetString(2);
+                        data.ND = (decimal)data.ACCS;
+                        data.CC_ID = refID.ToString();
+                    }
                 }
             }
             finally
@@ -400,6 +416,29 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             }
             return data;
 
+        }
+
+        public string SendProvidesToND(decimal old_nd, decimal new_nd)
+        {
+            using(OracleConnection connection = OraConnector.Handler.UserConnection)
+            {
+                using (OracleCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = @"bars.cck_ui.p_update_new_acc_zastav";
+                    cmd.Parameters.Add("p_nd_old", OracleDbType.Decimal, old_nd, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_nd_new", OracleDbType.Decimal, new_nd, ParameterDirection.Input);
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception e)
+                    {
+                        return e.Message;
+                    }
+                }
+            }
+            return "ok";
         }
 
     }

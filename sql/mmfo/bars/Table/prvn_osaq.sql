@@ -49,11 +49,17 @@ end;
 /
 
 
-
-
 PROMPT *** ALTER_POLICIES to PRVN_OSAQ ***
  exec bpa.alter_policies('PRVN_OSAQ');
 
+begin
+ execute immediate   'alter table PRVN_OSAQ add (IRC_CCY NUMBER) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN PRVN_OSAQ.IRC_CCY IS 'IRC_CCY~РУХ~НЕприз.дох';
 
 COMMENT ON TABLE BARS.PRVN_OSAQ IS 'Стиснена Вітрина "Резерв-МСФЗ-екв"';
 COMMENT ON COLUMN BARS.PRVN_OSAQ.RNK IS 'RNK_CLIENT~РНК~клиента';

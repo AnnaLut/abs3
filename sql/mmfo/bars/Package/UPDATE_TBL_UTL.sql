@@ -22,9 +22,11 @@ is
     --                        ND_TXT      <-> ND_TXT_UPDATE
     --                        W4_ACC      <-> W4_ACC_UPDATE
     --                        BPK_ACC     <-> BPK_ACC_UPDATE
+    -- version 1.1 10.05.2018 (Kharin) Добавлены функции для таблиц:
+    --                        BPK_PARAMETERS  <-> BPK_PARAMETERS_UPDATE
     -----------------------------------------------------------------
 
-    G_HEADER_VERSION      constant varchar2(64)  := 'version 1.0 13.02.2018';
+    G_HEADER_VERSION      constant varchar2(64)  := 'version 1.1 10.05.2018';
 
     ----------------------------------------------------------------
     -- HEADER_VERSION()
@@ -88,6 +90,13 @@ is
     --------------------------------------------------------------------------------------------------------------------
     procedure CHECK_BPK_ACC_UPDATE;                                                     --9023
     procedure SYNC_BPK_ACC_UPDATE( p_id out number, p_rowcount out number);             --9123
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- BPK_PARAMETERS_UPDATE
+    --------------------------------------------------------------------------------------------------------------------
+    procedure CHECK_BPK_PARAMETERS_UPDATE;
+    procedure SYNC_BPK_PARAMETERS_UPDATE( p_id out number, p_rowcount out number);
+    procedure SYNC_BPK_PARAMETERS_UPDATE_DWH( p_id out number, p_rowcount out number);
 
 end;
 /
@@ -1844,13 +1853,202 @@ IS
             RAISE;
     END;
 
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- CHECK_BPK_PARAMETERS_UPDATE
+    --------------------------------------------------------------------------------------------------------------------
+    PROCEDURE CHECK_BPK_PARAMETERS_UPDATE
+    IS
+        l_tbl_name                    VARCHAR2(100) := 'BPK_PARAMETERS_UPDATE';
+        l_trace                       varchar2(500) := G_TRACE || 'CHECK_BPK_PARAMETERS_UPDATE: ';
+    BEGIN
+        start_process(l_tbl_name, 'CHECK');
+
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
+                                         STAT_ID,
+                                         FIELD_NAME,
+                                         FIELD_TYPE,
+                                         VALUE,
+                                         RUN_ID,
+                                         STARTDATE,
+                                         ENDDATE,
+                                         TBL_NAME)
+            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+                   G_STAT_ID,
+                   f1 AS field,
+                   'count_diff' type1,
+                   c1 AS CNTDIFF,
+                   G_RUN_ID,
+                   G_START_DT,
+                   G_END_DT,
+                   l_tbl_name
+              FROM (SELECT count(*) c1, coalesce(n.TAG, u.TAG) f1
+                      FROM (SELECT b.*, coalesce(w4.kf, bpk.kf) kf
+                              FROM BARS.BPK_PARAMETERS b
+                              left join bars.w4_acc  w4  on (w4.nd  = b.nd)
+                              left join bars.bpk_acc bpk on (bpk.nd = b.nd)
+                             WHERE w4.nd  is not null
+                                or bpk.nd is not null) n
+                      FULL OUTER JOIN (SELECT *
+                                         FROM BARS.BPK_PARAMETERS_UPDATE u1
+                                        WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
+                                                                  FROM BARS.BPK_PARAMETERS_UPDATE u2
+                                                                 GROUP BY u2.nd, u2.tag, u2.kf )
+                                          AND u1.CHGACTION <> 'D') u
+                          ON (n.kf = u.kf and n.nd = u.nd AND n.tag = u.tag)
+                     WHERE decode(n.value, u.value, 0, 1) = 1
+                        or n.nd is null
+                        or u.nd is null
+                      group by coalesce(n.TAG, u.TAG));
+        end_process(l_tbl_name, 'CHECK');
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            ROLLBACK;
+            error_process(l_tbl_name, 'ERR', substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 1000) );
+            RAISE;
+    END;
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- SYNC_BPK_PARAMETERS_UPDATE
+    --------------------------------------------------------------------------------------------------------------------
+    PROCEDURE SYNC_BPK_PARAMETERS_UPDATE( p_id OUT NUMBER, p_rowcount OUT NUMBER)
+    IS
+        l_tbl_name                    VARCHAR2(100) := 'BPK_PARAMETERS_UPDATE';
+        l_trace                       varchar2(500) := G_TRACE || 'SYNC_BPK_PARAMETERS_UPDATE: ';
+        l_staff_id                    bars.staff$base.id%type;
+        l_staff_nm                    bars.staff$base.logname%type;
+    BEGIN
+        start_process(l_tbl_name, 'SYNC');
+        SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
+        INSERT INTO BARS.BPK_PARAMETERS_UPDATE(ND,
+                                               TAG,
+                                               VALUE,
+                                               CHGDATE,
+                                               CHGACTION,
+                                               DONEBY,
+                                               IDUPD,
+                                               KF,
+                                               EFFECTDATE,
+                                               GLOBAL_BDATE)
+            SELECT DECODE(n.nd, NULL, u.nd, n.nd),
+                   DECODE(n.nd, NULL, u.tag, n.tag),
+                   DECODE(n.nd, NULL, u.value, n.value),
+                   SYSDATE,
+                   DECODE(n.nd, NULL, 'D', 'U'),
+                   l_staff_nm,
+                   bars.bars_sqnc.get_nextval('s_bpk_parameters_update', COALESCE(n.KF, u.KF)) IDUPD,
+                   DECODE(n.nd, NULL, u.kf, n.kf) KF,
+                   COALESCE(bars.gl.bd, bars.glb_bankdate) EFFECTDATE,
+                   bars.glb_bankdate GLOBAL_BDATE
+              FROM (SELECT b.*, coalesce(w4.kf, bpk.kf) kf
+                      FROM BARS.BPK_PARAMETERS b
+                      left join bars.w4_acc  w4  on (w4.nd  = b.nd)
+                      left join bars.bpk_acc bpk on (bpk.nd = b.nd)
+                     WHERE w4.nd  is not null
+                        or bpk.nd is not null) n
+              FULL OUTER JOIN (SELECT *
+                                 FROM BARS.BPK_PARAMETERS_UPDATE u1
+                                WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                       FROM BARS.BPK_PARAMETERS_UPDATE u2
+                                                      GROUP BY u2.nd, u2.tag, u2.kf)
+                                  AND u1.CHGACTION <> 'D') u
+                   ON (n.KF = u.KF AND n.nd = u.nd AND n.tag = u.tag)
+             WHERE (DECODE(n.ND,  u.ND,  1, 0) = 0
+                 OR DECODE(n.TAG, u.TAG, 1, 0) = 0
+                 OR DECODE(n.VALUE, u.VALUE, 1, 0) = 0
+                 OR DECODE(n.KF,  u.KF,  1, 0) = 0);
+
+        INS_STAT('rowcount',
+                 'SYNC',
+                 SQL%ROWCOUNT,
+                 l_tbl_name);
+        end_process(l_tbl_name, 'SYNC');
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            ROLLBACK;
+            error_process(l_tbl_name, 'ERR', substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 1000) );
+            RAISE;
+    END;
+
+    --------------------------------------------------------------------------------------------------------------------
+    -- SYNC_BPK_PARAMETERS_UPDATE_DWH
+    -- синхронизация только тех тегов, которые передаются в DWH
+    --------------------------------------------------------------------------------------------------------------------
+    PROCEDURE SYNC_BPK_PARAMETERS_UPDATE_DWH( p_id OUT NUMBER, p_rowcount OUT NUMBER)
+    IS
+        l_tbl_name                    VARCHAR2(100) := 'BPK_PARAMETERS_UPDATE';
+        l_trace                       varchar2(500) := G_TRACE || 'SYNC_BPK_PARAMETERS_UPDATE_DWH: ';
+        l_staff_id                    bars.staff$base.id%type;
+        l_staff_nm                    bars.staff$base.logname%type;
+    BEGIN
+        start_process(l_tbl_name, 'SYNC');
+        SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
+        INSERT INTO BARS.BPK_PARAMETERS_UPDATE(ND,
+                                       TAG,
+                                       VALUE,
+                                       CHGDATE,
+                                       CHGACTION,
+                                       DONEBY,
+                                       IDUPD,
+                                       KF,
+                                       EFFECTDATE,
+                                       GLOBAL_BDATE)
+            WITH tg as (select /*+ inline */ tag  from barsupl.upl_tag_lists where tag_table in ('BPK_TAGS'))
+            SELECT DECODE(n.nd, NULL, u.nd, n.nd) as ND,
+                   DECODE(n.nd, NULL, u.tag, n.tag) as TAG,
+                   DECODE(n.nd, NULL, u.value, n.value) as value,
+                   SYSDATE as CHGDATE,
+                   DECODE(n.nd, NULL, 'D', 'U') as CHGACTION,
+                   l_staff_nm as DONEBY,
+                   bars.bars_sqnc.get_nextval('s_bpk_parameters_update', COALESCE(n.KF, u.KF)) as IDUPD,
+                   DECODE(n.nd, NULL, u.kf, n.kf) as KF,
+                   COALESCE(bars.gl.bd, bars.glb_bankdate) as EFFECTDATE,
+                   bars.glb_bankdate as GLOBAL_BDATE
+              FROM (SELECT b.*, coalesce(w4.kf, bpk.kf) kf
+                      FROM BARS.BPK_PARAMETERS b
+                           join tg on (b.tag = tg.tag)
+                      left join bars.w4_acc  w4  on (w4.nd  = b.nd)
+                      left join bars.bpk_acc bpk on (bpk.nd = b.nd)
+                     WHERE w4.nd  is not null
+                        or bpk.nd is not null) n
+                   FULL OUTER JOIN (SELECT *
+                                      FROM BARS.BPK_PARAMETERS_UPDATE u1
+                                     WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                            FROM BARS.BPK_PARAMETERS_UPDATE u2, tg
+                                                           WHERE u2.tag = tg.tag
+                                                           GROUP BY u2.nd, u2.tag, u2.kf)
+                                       AND u1.CHGACTION <> 'D') u
+                       ON (n.KF = u.KF AND n.nd = u.nd AND n.tag = u.tag)
+             WHERE (DECODE(n.ND,    u.ND,    1, 0) = 0
+                 OR DECODE(n.TAG,   u.TAG,   1, 0) = 0
+                 OR DECODE(n.VALUE, u.VALUE, 1, 0) = 0
+                 OR DECODE(n.KF,    u.KF,    1, 0) = 0);
+
+        INS_STAT('rowcount',
+                 'SYNC',
+                 SQL%ROWCOUNT,
+                 l_tbl_name);
+        end_process(l_tbl_name, 'SYNC');
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS
+        THEN
+            ROLLBACK;
+            error_process(l_tbl_name, 'ERR', substr(dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace(), 1, 1000) );
+            RAISE;
+    END;
+
 END;
 /
 
 PROMPT *** Create  grants  UPDATE_TBL_UTL ***
-grant EXECUTE                                                                on UPDATE_TBL_UTL     to BARSUPL;
-grant EXECUTE                                                                on UPDATE_TBL_UTL     to BARS_ACCESS_USER;
-grant EXECUTE                                                                on UPDATE_TBL_UTL     to UPLD;
+grant EXECUTE                                                                on BARS.UPDATE_TBL_UTL     to BARSUPL;
+grant EXECUTE                                                                on BARS.UPDATE_TBL_UTL     to BARS_ACCESS_USER;
+grant EXECUTE                                                                on BARS.UPDATE_TBL_UTL     to UPLD;
 
 
 PROMPT =====================================================================================

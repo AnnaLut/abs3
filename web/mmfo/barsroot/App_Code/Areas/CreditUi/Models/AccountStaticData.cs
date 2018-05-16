@@ -24,6 +24,8 @@ namespace BarsWeb.Areas.CreditUi.Models
         public decimal OSTB_9129 { get; set; }
         public string Date_issuance { get; set; }
         public int CUSTYPE { get; set; }
+        public bool Avalible_provide { get; set; }
+        public decimal? NDR { get; set; }
 
     }
 }

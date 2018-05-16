@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_NF.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CCK_NF ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_NF ("ISP", "ND", "CC_ID", "VIDD", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "VIDD_NAME", "SOS_NAME", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "PROD", "SDOG", "NDI", "TR", "CHGDATE") AS 
-  SELECT x.isp
+CREATE OR REPLACE VIEW V_CCK_NF AS
+SELECT x.isp
       ,x.nd
       ,x.cc_id
       ,x.vidd
@@ -80,16 +71,4 @@ PROMPT *** Create  view V_CCK_NF ***
                    AND tag = 'CCSRC'
                    AND nd = d.nd)
            AND d.vidd IN (11, 12, 13)
-           AND d.sos = 0) x where x.branch like  SYS_CONTEXT ('bars_context', 'user_branch_mask')
-;
-
-PROMPT *** Create  grants  V_CCK_NF ***
-grant SELECT                                                                 on V_CCK_NF        to BARSREADER_ROLE;
-grant SELECT                                                                 on V_CCK_NF        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CCK_NF        to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_NF.sql =========*** End *** =====
-PROMPT ===================================================================================== 
+           AND d.sos = 0) x where x.branch like  SYS_CONTEXT ('bars_context', 'user_branch_mask');

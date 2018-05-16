@@ -79,6 +79,8 @@
                 $rootScope.credit.baseRateNameValue = null;
                 $scope.$apply();
             }
+            if ($scope.isSave)
+                bars.ui.alert({ text: "Не забудьте змінити валюту рахунків" });
         },
         filter: "startswith",
         dataTextField: "LCV",
@@ -491,5 +493,27 @@
     $scope.FillLim = function () {
         $rootScope.credit.lim = $rootScope.credit.sumValue;
     };
+
+    $scope.columnsInspector = [{
+        field: "ID",
+        width: 100
+    },
+   {
+       field: "FIO",
+       width: 400
+   }];
+
+    $scope.showInspectors = function (tabName, showFields, whereClause) {
+        bars.ui.handBook(tabName, function (data) {
+            $rootScope.credit.inspector_id = data[0].ID;
+            $scope.$apply();
+        },
+        {
+            multiSelect: false,
+            clause: "active = 1 and branch like sys_context('bars_context', 'user_branch') || '%'",
+            columns: $scope.columnsInspector,
+            ResizedColumns: true
+        });
+    }
 
 }]);

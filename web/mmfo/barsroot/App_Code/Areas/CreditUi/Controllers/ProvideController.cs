@@ -130,5 +130,10 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             return Json( _provideRepository.GetRNK().ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult SendProvidesToND(decimal old_nd, decimal new_nd)
+        {
+            return Json(new { Status = _provideRepository.SendProvidesToND(old_nd, new_nd) });
+        }
+
     }
 }

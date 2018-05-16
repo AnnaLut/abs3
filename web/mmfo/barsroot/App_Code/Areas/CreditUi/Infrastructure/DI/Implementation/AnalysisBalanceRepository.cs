@@ -35,13 +35,15 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                      where cd.rnk = c.rnk
                                        and cd.nd = :nd";
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    credit.CC_ID = reader.GetString(0);
-                    credit.OKPO = reader.GetString(1);
-                    credit.ND = reader.GetDecimal(2);
+
+                    while (reader.Read())
+                    {
+                        credit.CC_ID = reader.GetString(0);
+                        credit.OKPO = reader.GetString(1);
+                        credit.ND = reader.GetDecimal(2);
+                    }
                 }
             }
             finally
@@ -65,19 +67,21 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                       FROM VW_ASP_DEBIT_LIST t
                                      WHERE t.nd = :nd ";
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    AccKredit acc = new AccKredit();
-                    acc.ACC = reader.GetInt32(0);
-                    acc.TIP = reader.GetString(1);
-                    acc.KV = reader.GetInt16(2);
-                    acc.NLS = reader.GetString(3);
-                    acc.NMS = reader.GetString(4);
-                    acc.OSTB = reader.GetDecimal(5);
-                    acc.OSTC = reader.GetDecimal(6);
-                    accList.Add(acc);
+
+                    while (reader.Read())
+                    {
+                        AccKredit acc = new AccKredit();
+                        acc.ACC = reader.GetInt32(0);
+                        acc.TIP = reader.GetString(1);
+                        acc.KV = reader.GetInt16(2);
+                        acc.NLS = reader.GetString(3);
+                        acc.NMS = reader.GetString(4);
+                        acc.OSTB = reader.GetDecimal(5);
+                        acc.OSTC = reader.GetDecimal(6);
+                        accList.Add(acc);
+                    }
                 }
             }
             finally
@@ -103,41 +107,43 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     select t.dplan,t.FDAT,t.NPP,t.acc,t.tip,t.kv,t.nls,t.nms,t.ostb,t.ostc 
                     from VW_ASP_CREDIT_LIST t where nd=:nd";
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    AccKredit acc = new AccKredit();
-                    acc.DPLAN = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (DateTime?)null : reader.GetDateTime(0);
-                    acc.FDAT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (DateTime?)null : reader.GetDateTime(1);
-                    acc.NPP = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
-                    acc.ACC = reader.GetInt32(3);
-                    acc.TIP = reader.GetString(4);
-                    acc.KV = reader.GetInt16(5);
-                    acc.NLS = reader.GetString(6);
-                    acc.NMS = reader.GetString(7);
-                    acc.OSTB = reader.GetDecimal(8);
-                    acc.OSTC = reader.GetDecimal(9);
-                    switch (acc.TIP)
+
+                    while (reader.Read())
                     {
-                        case "SS ": acc.NAZN = "Погашення основного боргу"; break;
-                        case "SN ": acc.NAZN = "Погашення процентного боргу"; break;
-                        case "SP ": acc.NAZN = "Погашення проср.осн.боргу"; break;
-                        case "SPN": acc.NAZN = "Погашення проср.проц.боргу"; break;
-                        case "SL ": acc.NAZN = "Погашення сумн.осн.боргу"; break;
-                        case "SLN": acc.NAZN = "Погашення сумн.проц.боргу"; break;
-                        case "SK0": acc.NAZN = "Погашення нарах. комісії"; break;
-                        case "SK9": acc.NAZN = "Погашення проср.нарах.комісії"; break;
-                        case "SN8": acc.NAZN = "Погашення нарах.пені"; break;
-                        case "ISG": acc.NAZN = "Зарахування на доходи майб.періодів"; break;
-                        case "SDI": acc.NAZN = "Перерахування на дисконт"; break;
-                        default: break;
+                        AccKredit acc = new AccKredit();
+                        acc.DPLAN = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (DateTime?)null : reader.GetDateTime(0);
+                        acc.FDAT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (DateTime?)null : reader.GetDateTime(1);
+                        acc.NPP = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
+                        acc.ACC = reader.GetInt32(3);
+                        acc.TIP = reader.GetString(4);
+                        acc.KV = reader.GetInt16(5);
+                        acc.NLS = reader.GetString(6);
+                        acc.NMS = reader.GetString(7);
+                        acc.OSTB = reader.GetDecimal(8);
+                        acc.OSTC = reader.GetDecimal(9);
+                        switch (acc.TIP)
+                        {
+                            case "SS ": acc.NAZN = "Погашення основного боргу"; break;
+                            case "SN ": acc.NAZN = "Погашення процентного боргу"; break;
+                            case "SP ": acc.NAZN = "Погашення проср.осн.боргу"; break;
+                            case "SPN": acc.NAZN = "Погашення проср.проц.боргу"; break;
+                            case "SL ": acc.NAZN = "Погашення сумн.осн.боргу"; break;
+                            case "SLN": acc.NAZN = "Погашення сумн.проц.боргу"; break;
+                            case "SK0": acc.NAZN = "Погашення нарах. комісії"; break;
+                            case "SK9": acc.NAZN = "Погашення проср.нарах.комісії"; break;
+                            case "SN8": acc.NAZN = "Погашення нарах.пені"; break;
+                            case "ISG": acc.NAZN = "Зарахування на доходи майб.періодів"; break;
+                            case "SDI": acc.NAZN = "Перерахування на дисконт"; break;
+                            default: break;
+                        }
+                        if (!String.IsNullOrEmpty(acc.NAZN))
+                        {
+                            acc.NAZN += " зг. КД " + ccId;
+                        }
+                        accList.Add(acc);
                     }
-                    if (!String.IsNullOrEmpty(acc.NAZN))
-                    {
-                        acc.NAZN += " зг. КД " + ccId;
-                    }
-                    accList.Add(acc);
                 }
             }
             finally
