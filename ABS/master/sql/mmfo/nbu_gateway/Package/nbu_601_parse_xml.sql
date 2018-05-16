@@ -2007,7 +2007,7 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
              
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).KLASSTR:=to_number(dbms_xslprocessor.valueOf(l_row,'KLASSTR/text()'));
              
-             l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).DAYPROCTR:=to_number(dbms_xslprocessor.valueOf(l_row,'RISKTR/text()'));
+             l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).RISKTR:=trim(dbms_xslprocessor.valueOf(l_row,'RISKTR/text()'));
              
              END LOOP;
 
