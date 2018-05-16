@@ -4,7 +4,6 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_SMS is
 create or replace package bars_sms is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
@@ -207,8 +206,8 @@ procedure submit_messages is
   l_task           varchar2(35) := 'PCD_SMS'||to_char(current_timestamp,'ddmmyyyyhh24missff');
   l_useparallelexec params$global.val%type;  
 begin
-  logger.trace('bars_sms.submit_messages: start');
-  --
+    logger.trace('bars_sms.submit_messages: start');
+    --
   begin
     l_useparallelexec := trim(get_global_param('USEPAREXECSMS'));
   exception
