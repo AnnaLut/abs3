@@ -388,10 +388,34 @@ create or replace package body nbu_601_request_data_ru is
                           group by p.rnk, p.codedrpou) z_dat
                   where z_dat is not null) loop
 
-            l_sales     := get_indicator(i.codedrpou, i.z_dat, 'SALES');
-            l_ebit      := get_indicator(i.codedrpou, i.z_dat, 'EBIT');
-            l_ebitda    := get_indicator(i.codedrpou, i.z_dat, 'EBITDA');
-            l_totaldebt := get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT');
+            begin    
+            l_sales:= nvl(get_indicator(i.codedrpou, i.z_dat, 'SALES'),0);
+            exception when others  then
+             if 
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_sales- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+             end if;
+           end;   
+           begin  
+            l_ebit:= nvl(get_indicator(i.codedrpou, i.z_dat, 'EBIT'),0);
+            exception  when others  then 
+             if 
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_ebit- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+             end if;
+           end;
+           begin 
+            l_ebitda:= nvl(get_indicator(i.codedrpou, i.z_dat, 'EBITDA'),0);
+            exception  when others  then 
+             if 
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_ebitda- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+             end if;
+           end;
+           begin 
+            l_totaldebt:= nvl(get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT'),0);
+              exception  when others  then 
+              if 
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_total_debt- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+              end if;
+            end;
 
             insert into bars.nbu_finperformance_uo
             values (i.rnk,                -- rnk       number(38),
@@ -725,12 +749,12 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                bpk.kv as r030,
                                proc.proccredit,
                                sum_lim.sumpay as sumpay,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
+                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6,'2',6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
                                        dt.tag = 'FREQ') as periodbase,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
+                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6,'2',6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
@@ -865,8 +889,8 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      ad.kv as r030,
                                      proc.proccredit,
                                      sum_lim.sumpay as sumpay,
-                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,
-                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproc,
+                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,
+                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproc,
                                      sumarrears.sum_ost as sumarrears,
                                      nbu23_rez.daybase,
                                      nbu23_rez.daybase as dayproc,
