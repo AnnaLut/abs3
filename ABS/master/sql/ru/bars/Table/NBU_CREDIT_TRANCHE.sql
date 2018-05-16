@@ -93,5 +93,11 @@ COMMENT ON COLUMN BARS.NBU_CREDIT_TRANCHE.status_message IS 'Статус помилок';
 COMMENT ON COLUMN BARS.NBU_CREDIT_TRANCHE.kf IS 'Код филиала';
 
 exec bpa.alter_policies('NBU_CREDIT_TRANCHE');
+/
+PROMPT *** MODIFY COLUMN  klasstr***
+begin   
+ execute immediate 'ALTER TABLE BARS.NBU_CREDIT_TRANCHE MODIFY klasstr VARCHAR2(2)';
+ end;
+/
 
 grant all on NBU_CREDIT_TRANCHE to BARS_ACCESS_DEFROLE;
