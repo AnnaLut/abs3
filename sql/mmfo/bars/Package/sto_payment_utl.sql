@@ -1048,6 +1048,76 @@ create or replace package body sto_payment_utl as
                                       where  o.ref = l.document_id and
                                              o.sos = sto_payment_utl.DOCUMENT_STATE_COMPLETED));
     end;
+
+    procedure auto_storno
+    is
+        l_n number;
+        l_s varchar2(250);
+        l_dk oper.dk%type;
+    begin
+     bc.go('/'||f_ourmfo_g||'/');
+     for k in (
+        SELECT o.ref, sp.order_id, sp.id, o.dk
+          FROM sto_payment sp, STO_PAYMENT_DOCUMENT_LINK spdl, oper o
+          where spdl.payment_id = sp.id
+          and o.ref = spdl.document_id
+          and o.sos not in (-1, 5)
+          and sp.state = 10
+          and o.pdat <= gl.bd - wait_days)
+     loop
+        begin
+          savepoint sp_dg;
+          begin
+           select dk
+             into l_dk
+             from ow_pkk_que
+            where ref = k.ref;
+          bars_ow.del_pkkque(k.ref, l_dk);
+          exception when no_data_found then null;
+          end;
+          p_back_dok (k.ref,
+                      lev_      => 5,
+                      reasonid_ => 3, -- технолог.ошибка
+                      par2_     => l_n,
+                      par3_     => l_s,
+                      fullback_ => 1);
+
+          update sto_payment
+             set state = sto_payment_utl.DOCUMENT_STATE_STORNED
+           where id = k.id;
+        exception
+          when others then
+          rollback to sp_dg;
+          bars_audit.error('ошибка сторнирования документа '||k.ref||' - '||substr(sqlerrm,1,1070));
+       end;
+     end loop;
+    end;
+
+    procedure auto_try
+    is
+    begin
+     bc.go('/'||f_ourmfo_g||'/');
+     for k in (
+       SELECT o.ref, sp.order_id, sp.id, spdl.payment_id, p.f_n, p.dk
+          FROM sto_payment sp, STO_PAYMENT_DOCUMENT_LINK spdl, oper o, ow_pkk_que p
+          where spdl.payment_id = sp.id
+          and o.ref = spdl.document_id
+          and o.sos not in (-1, 5)
+          and sp.state = 10
+          and gl.bd - trunc(o.pdat) between 1 and try_days
+          and p.ref = o.ref
+          and upper(p.resp_class) = 'ERROR'
+          )
+     loop
+     bars_ow.unform_iic_doc( p_filename => k.f_n,
+                             p_ref      => k.ref,
+                             p_dk       => k.dk);
+     track_payment_state (k.payment_id, STO_PM_STATE_READY_TO_WITHDRAW,'Файл на ПЦ розформовано, нова спроба відправки.' );
+     end loop;
+
+    end;
+
+
 end;
 /
 show err;
