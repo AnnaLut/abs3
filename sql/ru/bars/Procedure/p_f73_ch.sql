@@ -2,11 +2,12 @@ CREATE OR REPLACE PROCEDURE BARS.P_F73_CH (Dat1_ Date, Dat_ Date) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура дозаполнения кодов "DDD" для файла #73 
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 07/09/2017 (16/06/2017, 26/05/2017)
+% VERSION     : 08/05/2018 (04/12/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat1_ - начальная дата периода отчета
            Dat_  - конечная  дата периода отчета
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+08.05.2018 для операций 'Z16','TOU' будет формироваться D#73='000'
 07.09.2017 для проводок Дт 2628, 2638 Кт 100* будет формироваться код 341 
            вместо кода 370 
 13.06.2017 на 01.07.2017 нові показники для операцій конверсії 248, 348
@@ -44,18 +45,18 @@ BEGIN
 
    for k in (select a.*, w1.ref ref1, w1.d020 val1, w2.d020 val2, w3.d020 val3
                 from (
-                    select o.pdat, p.fdat, p.ref, p.tt, p.accd, p.nlsd, p.kv, p.acck, 
-                          p.nlsk, p.nazn, o.sos, 
+                    select /*+ leading(p.ad) index(p.o.od, IDX_OPLDOK_KF_FDAT_ACC)  dynamic_sampling(p 0) */
+                          p.pdat, p.fdat, p.ref, p.tt, p.accd, p.nlsd, p.kv, p.acck, 
+                          p.nlsk, p.nazn, p.soso sos, 
                           NVL(p.ob22d,'00') ob22d, NVL(p.ob22k,'00') ob22k  
-                   from provodki_otc p, oper o  
-                   where p.fdat BETWEEN Dat1_ and Dat_ 
+                   from provodki_otc p
+                   where p.fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ and Dat_) 
                      and p.kv<>980 
-                     and ( (p.nbsd LIKE '100%' and p.nbsk NOT LIKE '1007%') OR
-                           (p.nbsd NOT LIKE '1007%' and p.nbsk LIKE '100%') OR
+                     and ( (p.nlsd LIKE '100%' and p.nlsk NOT LIKE '1007%') OR
+                           (p.nlsd NOT LIKE '1007%' and p.nlsk LIKE '100%') OR
                            (p.nlsd LIKE '1101%' or p.nlsd LIKE '1102%') OR 
                            (p.nlsk LIKE '1101%' or p.nlsk LIKE '1102%')
                          )
-                     and p.ref=o.ref
                     order by 1,2,3) a
                 left outer join
                 (select ref, tag, trim(substr(value,1,3)) d020
@@ -559,6 +560,22 @@ BEGIN
          
       end if;
 
+      if k.nlsd like '110%' and k.nlsk LIKE '3800%' and
+         k.kv in (959,961,962,964) and k.tt in ('Z16','TOU') 
+      then
+         update operw a set a.value='000'
+         where a.tag='D#73' 
+           and (a.value is null or a.value NOT LIKE '000%') 
+           and a.ref=k.ref
+           and k.tt not in (SELECT substr(tag,-3) FROM op_rules 
+                               WHERE tag LIKE '73%'); 
+
+         update operw a set a.value='000'
+         where a.tag='73'||k.tt
+           and (a.value is null or a.value NOT LIKE '000%') 
+           and a.ref=k.ref;
+      end if;
+
       -- розрахунки за IВ прийняту на миттєве iнкасо та на iнкасо, заставнi за чек 
       if k.nlsd LIKE '100%' and k.nlsk LIKE '2909%' and ob22_ in ('19','34') 
          and k.nlsk NOT LIKE '2909____000000%' then
@@ -1050,6 +1067,22 @@ BEGIN
             end if;
          end if;
       end if;
+
+      if k.nlsd LIKE '3800%' and k.nlsk like '110%' and 
+         k.kv in (959,961,962,964) and k.tt in ('Z16','TOU')  
+      then
+         update operw a set a.value='000'
+         where a.tag='D#73' 
+           and (a.value is null or a.value NOT LIKE '000%') 
+           and a.ref=k.ref
+           and k.tt not in (SELECT substr(tag,-3) FROM op_rules 
+                               WHERE tag LIKE '73%'); 
+
+         update operw a set a.value='000'
+         where a.tag='73'||k.tt 
+           and (a.value is null or a.value NOT LIKE '000%') 
+           and a.ref=k.ref;
+      end if; 
             
       -- конверсiя валюти
       if k.nlsd LIKE '3800%' and k.nlsk LIKE '100%' and 
