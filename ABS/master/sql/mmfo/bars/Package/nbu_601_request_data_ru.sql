@@ -749,12 +749,12 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                bpk.kv as r030,
                                proc.proccredit,
                                sum_lim.sumpay as sumpay,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
+                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6,'2',6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
                                        dt.tag = 'FREQ') as periodbase,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
+                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6,'2',6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
@@ -889,8 +889,8 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      ad.kv as r030,
                                      proc.proccredit,
                                      sum_lim.sumpay as sumpay,
-                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,
-                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproc,
+                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,
+                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproc,
                                      sumarrears.sum_ost as sumarrears,
                                      nbu23_rez.daybase,
                                      nbu23_rez.daybase as dayproc,
