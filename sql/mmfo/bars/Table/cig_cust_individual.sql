@@ -67,8 +67,10 @@ exception when others then
 end; 
 /
 
-
-
+begin   
+ execute immediate 'alter table CIG_CUST_INDIVIDUAL modify passp_organ VARCHAR2(150)';
+ end;
+/
 
 PROMPT *** ALTER_POLICIES to CIG_CUST_INDIVIDUAL ***
  exec bpa.alter_policies('CIG_CUST_INDIVIDUAL');
