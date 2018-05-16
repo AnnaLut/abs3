@@ -2808,7 +2808,7 @@ null;
        AND aa.tip = 'SK0'
        OR aa.nbs = '9129'
        AND aa.tip = 'CR9' THEN
-	 if aa.tip = 'SPN' or aa.tip = 'SNO' then -- Временно для разделения линий
+	 if aa.tip = 'SPN' or aa.tip = 'SNO' or aa.tip = 'SS ' or aa.tip = 'SP ' or aa.tip = 'SN '  then -- Временно для разделения линий
          null;
      else	  
       raise_application_error(g_errn

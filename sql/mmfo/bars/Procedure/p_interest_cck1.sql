@@ -304,7 +304,7 @@ BEGIN
 
 -- add by VPogoda 2018-01-16, COBUMMFO-6039
 -- амортизация дисконта выполняется только по тем договорам, по которым была выдача.            
-        select count(1) into l_num
+/*        select count(1) into l_num
           from (select 1 from accounts ac, nd_acc n
           where n.nd = dd.nd
             and n.acc = ac.acc
@@ -315,7 +315,7 @@ BEGIN
                           where cd.nd = dd.nd
                             and cd.vidd in (1,2,3,4))
         union select 1 from cc_deal cd where cd.nd = dd.nd and cd.vidd not in (1,2,3,4));
-        if l_num != 0 then
+        if l_num != 0 then*/
           acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
 
           l_nazn := substr('Амортизація рах.(пропорц.) ' || p.nls /*||
@@ -323,9 +323,9 @@ BEGIN
                            ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
                           ,1
                           ,160);
-        else
+/*        else
           bars_audit.info('Договор [ref = '||dd.nd||'] не має залишків на рахунках основної заборгованості, амортизація дисконту не виконується!');
-        end if;
+        end if;*/
       ELSIF p.id = 1
             AND p.metr = 4
             AND p.tip IN ('SDI') THEN
