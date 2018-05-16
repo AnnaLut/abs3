@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #C9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 16/03/2018 (11/12/2017, 14/11/2017)
+% VERSION     : 15/05/2018 (16/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -13,6 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fc9_nn ( dat_     DATE,
                (классификатор KOD_C9_1) и D2#70 - DC#70.
                Нужен доп.пармаметр DC#70 - номер ВМД.%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+14.05.2018 для проводок Дт 2909 Кт 2924 (в бух.моделе для данного REF  
+                                         еще и Дт 2924 Кт 2625)  
+           (в OPER NLSA='2909...' NLSB='2625...') будем выбирать 
+           первоначальную сумму из документа и ОКПО для счета 2625
+           (добавлено для MFO=331467 Полтава)
 16.03.2018 для проводок Дт 2909 Кт 2924 из OPERW и TAG='59' определяем
            номер лиц.счета 2625 и по нему определяем ОКПО клиента
 11.12.2017 для проводок Дт 2909 Кт 2924 добавил условие поиска RNK 
@@ -1257,32 +1262,54 @@ BEGIN
                   into rnk_
                from provodki_otc p
                where p.fdat = Dat_ 
+                 and p.ref = k.ref 
                  and p.nlsd like k.nlsk || '%'
                  and p.nlsk like '2625%'
                  and p.kv = k.kv 
                  and p.s*100 = k.s_nom
                  and rownum = 1;
+
+                 update otcn_f70_temp t set t.rnk = rnk_
+                 where t.ref = k.ref
+                   and t.nlsd like '2909%' 
+                   and t.nlsk like '2924%'; 
             exception when no_data_found then
                BEGIN
-                  select p.rnkk 
+                  select a.rnk 
                      into rnk_
-                  from provodki_otc p, operw w
-                  where p.fdat = dat_ 
-                    and ( (p.nlsd like '2924%' and p.nlsk like '2625%') OR 
-                          (p.nlsd like '3739%' and p.nlsk like '2909%')
-                        )
-                    and p.kv = k.kv 
-                    and p.s*100 = k.s_nom 
-                    and w.ref = k.ref 
-                    and w.tag like '59%' 
-                    and p.nlsk = substr(w.value,2,14); 
-   
+                  from oper o, accounts a 
+                  where o.vdat = dat_ 
+                    and o.ref = k.ref
+                    and trim(o.nlsb) = trim(a.nls)
+                    and o.nlsb like '2625%'
+                    and o.kv = a.kv;
+
                  update otcn_f70_temp t set t.rnk = rnk_
                  where t.ref = k.ref
                    and t.nlsd like '2909%' 
                    and t.nlsk like '2924%'; 
                exception when no_data_found then
-                  null;
+                  BEGIN
+                     select p.rnkk 
+                        into rnk_
+                     from provodki_otc p, operw w
+                     where p.fdat = dat_ 
+                       and ( (p.nlsd like '2924%' and p.nlsk like '2625%') OR 
+                             (p.nlsd like '3739%' and p.nlsk like '2909%')
+                           )
+                       and p.kv = k.kv 
+                       and p.s*100 = k.s_nom 
+                       and w.ref = k.ref 
+                       and w.tag like '59%' 
+                       and p.nlsk = substr(w.value,2,14); 
+   
+                    update otcn_f70_temp t set t.rnk = rnk_
+                    where t.ref = k.ref
+                      and t.nlsd like '2909%' 
+                      and t.nlsk like '2924%'; 
+                  exception when no_data_found then
+                     null;
+                  END;
                END;
             end;
       end loop;
