@@ -161,10 +161,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SPARAMLIST_BRANCH_NN ***
+PROMPT *** Create  constraint CC_SPARAMLIST_INUSE ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (BRANCH CONSTRAINT CC_SPARAMLIST_BRANCH_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_INUSE CHECK (inuse in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -173,70 +173,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_SPARAMLIST_CODE_NN ***
+PROMPT *** Create  constraint CC_SPARAMLIST_DELONNULL ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (CODE CONSTRAINT CC_SPARAMLIST_CODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_INUSE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (INUSE CONSTRAINT CC_SPARAMLIST_INUSE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_TYPE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (TYPE CONSTRAINT CC_SPARAMLIST_TYPE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_TABNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (TABNAME CONSTRAINT CC_SPARAMLIST_TABNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_SEMANTIC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (SEMANTIC CONSTRAINT CC_SPARAMLIST_SEMANTIC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_SPARAMLIST_NAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST MODIFY (NAME CONSTRAINT CC_SPARAMLIST_NAME_NN NOT NULL ENABLE)';
+  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_DELONNULL CHECK (delonnull in (0,1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -257,11 +197,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SPARAMLIST_CODES ***
+PROMPT *** Create  constraint CC_SPARAMLIST_NAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT FK_SPARAMLIST_CODES FOREIGN KEY (CODE)
-	  REFERENCES BARS.SPARAM_CODES (CODE) ENABLE';
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (NAME CONSTRAINT CC_SPARAMLIST_NAME_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -270,11 +209,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SPARAMLIST_METACOLTYPES ***
+PROMPT *** Create  constraint CC_SPARAMLIST_SEMANTIC_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT FK_SPARAMLIST_METACOLTYPES FOREIGN KEY (TYPE)
-	  REFERENCES BARS.META_COLTYPES (COLTYPE) ENABLE';
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (SEMANTIC CONSTRAINT CC_SPARAMLIST_SEMANTIC_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -283,11 +221,68 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint FK_SPARAMLIST_BRANCH ***
+PROMPT *** Create  constraint CC_SPARAMLIST_TABNAME_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT FK_SPARAMLIST_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE';
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (TABNAME CONSTRAINT CC_SPARAMLIST_TABNAME_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SPARAMLIST_TYPE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (TYPE CONSTRAINT CC_SPARAMLIST_TYPE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SPARAMLIST_INUSE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (INUSE CONSTRAINT CC_SPARAMLIST_INUSE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SPARAMLIST_CODE_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (CODE CONSTRAINT CC_SPARAMLIST_CODE_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_SPARAMLIST_BRANCH_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST MODIFY (BRANCH CONSTRAINT CC_SPARAMLIST_BRANCH_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+PROMPT *** Create  constraint CC_SPARAMLIST_INUSE ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.SPARAM_LIST ADD CONSTRAINT CC_SPARAMLIST_INUSE CHECK (inuse in (0, 1)) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -319,11 +314,13 @@ end;
 
 PROMPT *** Create  grants  SPARAM_LIST ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPARAM_LIST     to ABS_ADMIN;
+grant SELECT                                                                 on SPARAM_LIST     to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPARAM_LIST     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on SPARAM_LIST     to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPARAM_LIST     to CUST001;
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPARAM_LIST     to SPARAM;
 grant SELECT                                                                 on SPARAM_LIST     to START1;
+grant SELECT                                                                 on SPARAM_LIST     to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on SPARAM_LIST     to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on SPARAM_LIST     to WR_REFREAD;
 grant SELECT                                                                 on SPARAM_LIST     to WR_VIEWACC;

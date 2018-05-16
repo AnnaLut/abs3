@@ -262,13 +262,19 @@ is
 */
 
         -- якщо для КД заповнений референс первинної угоди NDI – виконувати порівняння поточного ВКР на угоді з первинним ВКР на первинній угоді.
-        select min(ND)
+        -- Мы рабочей группой решили что пойдем по рекомендации Делойт.
+        -- Все события должны фиксироваться на уровне ГД и распространяться на каждый субдоговор
+        SELECT CASE
+                  WHEN ndg IS NOT NULL THEN NDG
+                  WHEN NDI IS NOT NULL THEN NDI
+                  ELSE ND
+               END
+                  ndi
           into l_ndi
-          from ( SELECT ND, NDI
-                   -- , LEVEL
-                   FROM BARS.CC_DEAL
-                  START WITH ND = p_nd
-                CONNECT BY NOCYCLE ND = PRIOR NDI );
+          FROM (SELECT ND, NDI, NDG
+
+                  FROM BARS.CC_DEAL
+                 WHERE ND = p_nd);
 
         l_ndi := nvl(l_ndi,p_nd);
 
@@ -707,9 +713,14 @@ begin
 
    <<Defolt_YES>>   -- Есть событие дефолта «Реструктуризация»
     ------------------------------------------------------------
+ ---Установка по Ген.договору или обычному
         select vidd into l_vidd from cc_deal where nd = x.nd ;
         set_event ( p_date, x.nd, x.rnk, 3, x.FDAT, g_CCK, x.fdat_end, p_create_date, l_ZO , l_vidd );
-
+    -- Пошук підв'язаних договорів якщо це Ген. угода і запис події
+     for cur in (select nd, vidd from cc_deal where  ndg = x.nd and nd <> ndg and sos <15)
+      loop
+      set_event ( p_date, cur.nd, x.rnk, 3, x.FDAT, g_CCK, x.fdat_end, p_create_date, l_ZO , cur.vidd );
+      end loop;
    <<RecNext_>> null;
    ------------------
 

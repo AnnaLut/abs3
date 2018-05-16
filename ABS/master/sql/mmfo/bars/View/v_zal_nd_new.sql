@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NEW.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_ZAL_ND_NEW ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_ZAL_ND_NEW ("PAP", "ND", "PR_12", "ACC", "NLS", "KV", "OSTB", "OSTC", "PAWN", "MPAWN", "NREE", "DEPID", "CC_IDZ", "SDATZ", "RNK", "SV", "OB22", "MDATE", "DAZS", "DEL", "NAZN", "NMK", "NAME") AS 
-  SELECT DISTINCT pap
+CREATE OR REPLACE VIEW V_ZAL_ND_NEW AS
+SELECT DISTINCT pap
                ,nd
                ,pr_12
                ,acc
@@ -33,8 +24,7 @@ PROMPT *** Create  view V_ZAL_ND_NEW ***
                ,name
   FROM (SELECT 1 pap
               ,p.nd nd
-              --,p.pr_12 --COBUMMFO-6284
-			  ,first_value(p.pr_12) OVER (PARTITION BY p.acc, sz.cc_idz, az.kv ORDER BY p.acc, p.pr_12 DESC NULLS LAST) pr_12
+              ,p.pr_12
               ,az.acc
               ,az.nls
               ,az.kv
@@ -59,19 +49,7 @@ PROMPT *** Create  view V_ZAL_ND_NEW ***
           and cp.pawn=sz.pawn
           and  az.acc = sz.acc
            AND az.acc = p.acc(+)
-		   --AND p.pr_12 is not null --COBUMMFO-6284 commented cause cut values
            AND p.accs IN
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
                                                 ,p_splitting_symbol => ','))));
-
-PROMPT *** Create  grants  V_ZAL_ND_NEW ***
-grant SELECT                                                                 on V_ZAL_ND_NEW    to BARSREADER_ROLE;
-grant SELECT                                                                 on V_ZAL_ND_NEW    to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_ZAL_ND_NEW    to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NEW.sql =========*** End *** =
-PROMPT ===================================================================================== 

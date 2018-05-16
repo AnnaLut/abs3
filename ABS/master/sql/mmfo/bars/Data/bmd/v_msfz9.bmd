@@ -58,7 +58,7 @@ declare
 
 begin
 
-  l_tabsemantic := 'MSFZ9. КП ЮО. Розподіл складних КД на прості.';
+  l_tabsemantic := 'MSFZ9. КП ЮО. Розподіл складних КД на прості / V_MSFZ9';
   l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'V_MSFZ9';
@@ -151,6 +151,7 @@ begin
   bars_metabase.add_column(l_tabid, 25, 'SNO1', 'N', 'Сума~SNO', '.8', null, 18, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 26, 'SDI1', 'N', 'Сума~SDI', '.8', null, 20, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 27, 'S361', 'N', 'Сума~S36', '.8', null, 22, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'SX', 'N', 'Кіл~SS*', '.3', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=ACCOUNT1[CONDITIONS=>( ACCOUNT1.TIP=''SS '' and ACCOUNT1.DAZS is null and ACCOUNT1.ACC in (select acc from nd_acc where ND =:ND))][ACCESSCODE=>1][showDialogWindow=>false]', 'FunNSIEditFFiltered("ACCOUNT1",1, "KV="||Str(:KV)||" and TIP=''SS '' and DAZS is null and ACC in (select acc from nd_acc where ND="||Str(:ND)))', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
@@ -178,6 +179,9 @@ begin
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 2, 'Перегляд останнього протоколу Об`єднання/Розділу КД ', '', '', 'EACH', '', '', '', '', 'sPar=PR_MSFZ9[ACCESSCODE=>1][showDialogWindow=>false]', 98);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 4, 'Відмінити розподіл КД', 'MSFZ9.step_x ( :N ) ', ':N(SEM=Ген_Дог,TYPE=N) ', 'ONCE', '', '', '', '', '', 3);
 
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 2, null, ':SS > 1 and :SS1 =0 ', 2, 'COLOR_LightGreen');

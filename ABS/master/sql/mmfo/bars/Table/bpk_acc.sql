@@ -382,6 +382,16 @@ exception when others then
 
 
 
+
+begin 
+   execute immediate 'create index XIE_bpk_ACC_dat_close on bpk_acc(dat_close) tablespace brsmdld';
+exception when others then
+  if  sqlcode=-955 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  BPK_ACC ***
 grant SELECT                                                                 on BPK_ACC         to BARSDWH_ACCESS_USER;
 grant SELECT                                                                 on BPK_ACC         to BARSREADER_ROLE;

@@ -19,6 +19,7 @@ $(document).ready(function () {
     toolbar.push({ template: " | " });
     toolbar.push({ name: "btToValidate", type: "button", text: "<span class='pf-icon pf-16 pf-accept_doc'></span> Групове проведення" });
     toolbar.push({ name: "btDiff", type: "button", text: "<span class='pf-icon pf-16 pf-report_open-import'></span> Диференційне проведення" });
+    toolbar.push({ name: "btSendProvides", type: "button", text: "<span class='pf-icon pf-16 pf-list-arrow_right'></span> Передати застави на інший КД" });
 
     var grid = $("#gridExistProvide").kendoGrid({
         toolbar: toolbar,
@@ -347,6 +348,15 @@ $(document).ready(function () {
     }).data("kendoWindow");
     dialog.center();
 
+    var dialogSendProvides = $("#dialogSendProvides").kendoWindow({
+        title: "Передати застави на іншний КД",
+        modal: true,
+        draggable: false,
+        visible: false,
+        width: 280
+    }).data("kendoWindow");
+    dialogSendProvides.center();
+
     /////////////////////////////////////////////////////////////////////////////////////
     var toolbar = [];
     toolbar.push({ name: "btChange", type: "button", text: "<span class='pf-icon pf-16 pf-add_button'></span> Прив'язати договір забезпечення до КД"});
@@ -534,6 +544,21 @@ $(document).ready(function () {
         var grid = $("#gridExistProvide").data().kendoGrid;
         grid.editRow(grid.select());
     });
+
+    $(".k-grid-btSendProvides").click(function () {
+        $("#sendprovides_nd").kendoNumericTextBox({ spinners: false, format: "#" });
+        dialogSendProvides.open();
+    });
+
+    $("#bt_send_provides_ok").click(function () {
+        if ($("#sendprovides_nd").val() !== "") {
+            SendProvidesToND($("#sendprovides_nd").val());
+            dialogSendProvides.close();
+        }
+        else
+            bars.ui.error({ text : "Введіть номер КД!"});
+    });
+
     //////////////buttons grid below
     $("#gridListProvide").kendoTooltip({
         filter: "td:nth-child(6)",
@@ -958,4 +983,25 @@ function SendGroupToEdit(grid,del) {
         list_provide.push(provide);
     });
     Edit_Provide(list_provide, "Проведення успішно здійснене");
+}
+
+function SendProvidesToND(_nd) {
+    $.ajax({
+        async: true,
+        type: 'POST',
+        url: bars.config.urlContent('/CreditUI/Provide/SendProvidesToND'),
+        dataType: 'json',
+        data: { old_nd: globalID, new_nd :_nd  },
+        success: function (data) {
+            if (CatchErrors(data)) {
+                bars.ui.alert({ 
+                    text: "Проведення успішно передані на КД: <b>" + _nd + "</b>"
+                });
+                bars.ui.loader('body', true);
+                $("#gridExistProvide").data("kendoGrid").dataSource.read();
+                $("#gridExistProvide").data("kendoGrid").refresh();
+                bars.ui.loader('body', false);
+            }
+        }
+    });
 }

@@ -1,4 +1,3 @@
-
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck_ui.sql =========*** Run *** ====
@@ -6,16 +5,18 @@
  
   CREATE OR REPLACE PACKAGE BARS.CCK_UI IS
 
-  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.1. 20.07.2017';
+ g_header_version CONSTANT VARCHAR2(64) := 'ver.3.3 03.03.2018';
 /*
-  20.07.2016 Sta COBUMMFO-4088  розділення  PROCEDURE trs_upd   та об'єднання траншів  PROCEDURE trs_add
+  03.03.2018 Sta Добавлена процедура OP_OFR (p_acc) для открытия счета OFR.Прострочена Фін.дебіторка	          для произвольного счета фин.деб ( не SK0) = p_acc
+
+  20.07.2017 Sta COBUMMFO-4088  розділення  PROCEDURE trs_upd   та об'єднання траншів  PROCEDURE trs_add
   20.06.2017 LSO acc_add добавлен OB22 если приходит из формы то проставляем с проверкой
 */
-
-
-  PROCEDURE p_gpk_default(nd         CC_DEAL.ND%TYPE DEFAULT NULL,
-                          GPK_TYPE   NUMBER,
-                          ROUND_TYPE NUMBER);
+type row_tip_ndg is record(l_tips CCK_NDG_TIP.TIPS_NDG%TYPE);
+type tbl_tip_ndg is table of row_tip_ndg;
+  --------------------------------------------------------
+  PROCEDURE OP_OFR (p_ACC NUMBER);  -- для открытия счета OFR =Прострочена Фін.дебіторка=  для произвольного счета фин.деб ( не SK0) = p_acc
+  PROCEDURE p_gpk_default(nd         CC_DEAL.ND%TYPE DEFAULT NULL,    GPK_TYPE   NUMBER,     ROUND_TYPE NUMBER);
   PROCEDURE pass_dop(p_tag VARCHAR2, p_txt VARCHAR2);
   --------------------------------------------------------
  --Зміна призначення платежу при нарахуванні % в портфелі ССKF i CCKU
@@ -60,6 +61,9 @@
                ,p_freq     INT
                ,p_sys      INT);
 
+  -- проверка типа продукта для заявки 6353. Используется для правильного открытия счета SK0. Может еще и для дальнейших процессов
+  function check_product_6353 (p_prod in varchar2)
+    return integer;
   ---- получение прогноз- № счета
   FUNCTION na_nls
   (
@@ -253,6 +257,9 @@
    ,p_nd   NUMBER
    ,p_dat  DATE
   ); ---- Розрахунок ЕПС
+  FUNCTION tip_NDG (P_ND NUMBER)
+   RETURN tbl_tip_ndg
+   PIPELINED;  ---- Доступные типы счетов
 
 	PROCEDURE p_repay_multi_ss --COBUMMFO-5666  погашення по мультивалютній лінії залишку в валюті
   (p_nd in CC_DEAL.ND%TYPE);
@@ -260,6 +267,10 @@
   (p_nd_old IN cc_deal.nd%TYPE, p_nd_new IN cc_deal.nd%TYPE);
   PROCEDURE p_change_responsible_executor --COBUMMFO-5524 зміна відповідального виконавця по договору КД ЮО
   (p_nd in CC_DEAL.ND%TYPE, p_userid IN cc_deal.user_id%TYPE);
+	PROCEDURE p_update_cc_lim(p_nd in cc_deal.nd%TYPE, p_date in cc_deal.wdate%TYPE); --was on web-form COBUMMFO-6146
+  --
+  procedure calc_comission_4_gpk (p_nd in number);
+
   ------------------
   FUNCTION header_version RETURN VARCHAR2;
   FUNCTION body_version RETURN VARCHAR2;
@@ -268,11 +279,15 @@ END cck_ui;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.5 PLAN 24.01.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.6 PLAN 03.03.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
 /*
+  16.03.2018 STA По открытию счета просрочки 3578 (фин.дебиторка) попросили изменить формирование названия счета на такое :
+                 <Номер договора><Название заемщика>+ <номер счета 3578 основного оdb>. Слово "просроченный" убрать.
+
+  03.03.2018 Sta Добавлена процедура OP_OFR (p_acc) для открытия счета OFR.Прострочена Фін.дебіторка	          для произвольного счета фин.деб ( не SK0) = p_acc
   LSO ver.3.3 10.10.2017 Функция на вычитку доступных типов счетов
   LSO ver.3.2 04.10.2017 COBUPRVNIX-2 Зміна умов авторизації
   20.07.2016 Sta COBUMMFO-4088  розділення  PROCEDURE trs_upd   та об'єднання траншів  PROCEDURE trs_add
@@ -285,12 +300,64 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 */
   nlchr CHAR(2) := chr(13) || chr(10);
   --------------------------------------
-  PROCEDURE pass_dop
-  (
-    p_tag VARCHAR2
-   ,p_txt VARCHAR2
-  ) IS
-    l_nd NUMBER;
+  PROCEDURE OP_OFR (p_ACC NUMBER) Is  -- для открытия счета OFR =Прострочена Фін.дебіторка=  для произвольного счета фин.деб ( не SK0) = p_acc
+    a8 accounts%rowtype ; 
+    a9 accounts%rowtype ; 
+    s_Err1 varchar2(50) := 'ACC='|| p_ACC;
+    XX PRVN_FIN_DEB%rowtype ;    ff FIN_DEBT %rowtype;  
+    nTmp_ number ;
+    l_Count int  := 1 ;
+    x_nd number  ;
+  begin
+
+    begin select * into a8 from accounts where acc = p_acc ; s_Err1 := 'Рах.' ||a8.nls||'/'||a8.KV ;
+          If a8.dazs is NOT null         then raise_application_error(g_errn,g_errs ||s_Err1 || ' закрито '|| to_char(a8.dazs, 'dd.mm.yyyy')  ); end if;
+          If a8.tip in ('SK0','SK9')     then raise_application_error(g_errn,g_errs ||s_Err1 || ' має тип модуля '||  a8.tip                  ); end if;
+
+          begin select * into xx from PRVN_FIN_DEB where acc_ss = p_acc;
+                If xx.acc_sp is not null then raise_application_error(g_errn,g_errs ||s_Err1 || ' уже має рах OFR'                            ); end if;
+          EXCEPTION  WHEN NO_DATA_FOUND  THEN null;
+          end ;
+
+          begin select * into FF from FIN_DEBT where NBS_N = a8.NBS || a8.ob22 ;      a9.nbs := Substr(ff.NBS_P,1,4) ; a9.ob22 := Substr(ff.NBS_P,5,2) ;
+          EXCEPTION  WHEN NO_DATA_FOUND  THEN raise_application_error(g_errn,g_errs ||s_Err1 ||' '|| a8.ob22||' відсутній в довіднику "ФІН.ДЕБІТОРКА"');
+          end ;
+          --------по случайному числу----------------------------------------------------------
+          While 1<2
+          loop  nTmp_  := trunc ( dbms_random.value(1, 999999999));    a9.nls := a9.nbs ||'_'||nTmp_ ;
+                begin select 1 into nTmp_ from accounts where nls like a9.nls ;
+                EXCEPTION  WHEN NO_DATA_FOUND THEN  a9.nls := vkrzn ( Substr(gl.aMfo,1,5), a9.nLs);  EXIT ;
+                end;
+                l_Count := l_Count + 1 ;
+                If l_Count > 500         then raise_application_error(g_errn,g_errs ||s_Err1 || ' НЕможливо отримати рах.OFR до 500 ітерацій' ); end if;
+           end loop ;
+
+---------- a9.nms := Substr('Простроч.'||a8.nms,1,70) ;
+--16.03.2018 STA По открытию счета просрочки 3578 (фин.дебиторка) попросили изменить формирование названия счета на такое :
+-----            <Номер договора><Название заемщика>+ <номер счета 3578 основного оdb>. Слово "просроченный" убрать.
+           Select max(nd) into x_ND from nd_acc where acc = p_acc ;
+           begin select d.cc_id || ' '   into a9.nms  from cc_deal d where d.nd = x_ND;
+           EXCEPTION  WHEN NO_DATA_FOUND THEN a9.nms := null ;
+           end ;
+
+           select Substr(a9.nms||c.nmk||' '||a8.nls, 1, 70 ) into a9.nms from customer c where c.rnk = a8.RNK ;
+           op_reg_ex(mod_=>99, p1_=>0, p2_=>0, p3_=>a8.grp, p4_=>nTmp_, rnk_=>a8.rnk, nls_=>a9.nls, kv_=>a8.kv, nms_=>a9.nms, tip_=>'OFR', isp_=>a8.isp,accR_=>a9.acc, tobo_ =>a8.branch);
+           Accreg.setAccountSParam(a9.Acc, 'OB22',  a9.ob22);
+
+           If x_ND is not null then  insert into nd_acc (nd, acc) select n.nd, a9.acc from nd_acc n where acc = p_acc; end if; 
+
+           If xx.acc_ss is not null then update PRVN_FIN_DEB set acc_sp = a9.acc, AGRM_ID = nvl(AGRM_ID, x_ND) where acc_ss = xx.acc_ss ;
+           else                     Insert into PRVN_FIN_DEB(ACC_SS,acc_sp, AGRM_ID) values (p_acc, a9.acc, x_ND) ;
+           end if;
+
+    EXCEPTION  WHEN NO_DATA_FOUND        THEN raise_application_error(g_errn,g_errs ||s_Err1 || ' не знайдено в accounts'  );
+    end;
+
+  end op_OFR;
+  ------------------
+
+
+  PROCEDURE pass_dop  (    p_tag VARCHAR2   ,p_txt VARCHAR2  ) IS    l_nd NUMBER;
   BEGIN
     l_nd := to_number(pul.get('ND'));
     logger.info('DOP*' || l_nd || '*');
@@ -777,6 +844,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
   END sob;
 
+
+  function check_product_6353 (p_prod in varchar2)
+    return integer
+    is
+    v_ret integer;
+  begin
+    select count(1) into v_ret
+      from dual
+      where getglobaloption('COBUSUPABS6353') like '%'||p_prod||'%';
+bars_audit.info('6353 Check product result : '||v_ret);
+    return v_ret;
+  exception
+    when others then 
+      return 0;
+  end;
   ----------------------- получение № счета -----------------------------
 
   FUNCTION na_nls
@@ -831,7 +913,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
       ELSIF x_tip = 'S36' THEN
         l_nbs := '3600';
       ELSIF x_tip = 'SK0' THEN
-        l_nbs := '3578';
+        -- COBUSUPABS-6353. Для "вказаних продуктів" комісія нараховується на рахунок 2208, а не 3578
+        if check_product_6353(x_prod) = 1 then
+          l_nbs := '2208';
+        else
+          l_nbs := '3578';
+        end if;
       ELSIF x_tip = 'SK9' THEN
         if NEWNBS.GET_STATE = 1 then
          l_nbs := '3578';
@@ -847,6 +934,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
         l_nbs := '3648';
       ELSIF x_tip = 'ISG' THEN
         l_nbs := '3600';
+      ELSIF x_tip = 'ODB' THEN -- Открытие счетов ODB ДЛЯ MSFZ9
+        l_nbs := '3578';
       END IF; -- SS   SS  Основний борг
       /*9023 (один в валюті договору)
       3578 (декілька, в будь-яких валютах)
@@ -899,7 +988,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
     l_x_mfob := x_mfob;
     IF x_sos NOT IN (10, 11, 12, 13)
        OR x_dazs IS NOT NULL
-       OR x_tip NOT IN ('SS ', 'SP ', 'SPN', 'SK9', 'SN8')
+       OR x_tip NOT IN ('SS ', 'SP ', 'SPN', 'SK9', 'SN8','OFR')
        OR x_nls IS NULL
        OR x_nls LIKE 'N%'
        OR x_nls LIKE '9%' THEN
@@ -909,10 +998,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
     IF x_tip = 'SS '
        AND x_lim + x_ostc > 0 THEN
 
-      IF l_x_mfob = sys_context('bars_context', 'user_mfo') and x_nlsb IS   not null THEN
-        stmp_ := 'KK1';
-      ELSE
-        stmp_ := 'KK2';
+      IF l_x_mfob = sys_context('bars_context', 'user_mfo') and x_nlsb IS   not null THEN        stmp_ := 'KK1';
+      ELSE                                                                                       stmp_ := 'KK2';
       END IF;
       --20/03/2017 Pivanova
      /* IF c IS NULL
@@ -1025,38 +1112,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
       END;
     END IF;
 
-    IF x_tip = 'SK9' THEN
-      BEGIN
-        SELECT q.nls
-          INTO stmp_
-          FROM accounts q, nd_acc w
-         WHERE w.nd = x_nd
-           AND q.acc = w.acc
-           AND q.ostc < 0
-           AND q.kv = x_kv
-           AND q.dazs IS NULL
-           AND rownum = 1
-           AND q.tip = 'SK0';
-        url_ := make_docinput_url('KK1'
-                                 ,'<-Простр.коміс'
-                                 ,'DisR'
-                                 ,'1'
-                                 ,'Kv_A'
-                                 ,x_kv
-                                 ,'Nls_A'
-                                 ,x_nls
-                                 ,'Id_A'
-                                 ,x_okpo
-                                 ,'Nls_B'
-                                 ,stmp_
-                                 ,'Nazn'
-                                 ,'Перенесення на прострочку комісійного боргу угоди № ' ||
-                                  x_cc_id || ' від ' ||
-                                  to_char(x_sdate, 'dd/MM/yyyy'));
-      EXCEPTION
-        WHEN no_data_found THEN
-          NULL;
+    IF x_tip = 'SK9' or X_tip = 'OFR' THEN
+
+      BEGIN 
+        if x_tip= 'SK9' then 
+           SELECT q.nls INTO stmp_ FROM accounts q, nd_acc w  WHERE w.nd = x_nd  AND q.acc = w.acc  AND q.ostc < 0 AND q.kv = x_kv AND q.dazs IS NULL   AND rownum = 1  AND  q.tip = 'SK0' ;
+        else
+           SELECT q.nls INTO stmp_ FROM accounts q, PRVN_FIN_DEB w, accounts x WHERE w.AGRM_ID=x_nd AND q.acc=w.acc_ss AND q.ostc<0 AND q.kv=x_kv AND q.dazs IS NULL AND w.acc_sp=x.acc and x.kv=x_kv and x.nls=x_nls ;
+        end if;
+        url_ := make_docinput_url('KK1'  , '<-Простр.коміс', 'DisR' , '1'   ,
+                                  'Kv_A' , x_kv ,'Nls_A'   , x_nls  , 'Id_A', x_okpo,  'Nls_B'  ,stmp_ ,
+                                  'Nazn' , 'Перенесення на прострочку комісійного боргу угоди № ' ||  x_cc_id || ' від ' || to_char(x_sdate, 'dd/MM/yyyy'));
+      EXCEPTION    WHEN no_data_found THEN       NULL;
       END;
+
     END IF;
 
     IF x_tip = 'SN8' THEN
@@ -2739,10 +2808,14 @@ null;
        AND aa.tip = 'SK0'
        OR aa.nbs = '9129'
        AND aa.tip = 'CR9' THEN
+	 if aa.tip = 'SPN' or aa.tip = 'SNO' then -- Временно для разделения линий
+         null;
+     else	  
       raise_application_error(g_errn
                              ,g_errs || 'Рах.' || p_nls || '/' || p_kv || '/' ||
                               aa.tip ||
                               ' не допустимий для "ручного" приєднання');
+	 end if;
     END IF;
     INSERT INTO nd_acc (nd, acc) VALUES (l_nd, aa.acc);
 
@@ -2855,7 +2928,100 @@ null;
     --Call FunNSIEditF("PROT_IRR",2)
   END c_irr;
 
+  FUNCTION tip_NDG (P_ND NUMBER)
+   RETURN tbl_tip_ndg
+   PIPELINED
+  IS
+   l_ndg   NUMBER (24);
+--   l_tips_ndg t_tbl_tip_ndg;
+  BEGIN
+    BEGIN
+      SELECT ndg
+        INTO l_ndg
+        FROM cc_deal
+       WHERE nd = P_ND;
+    EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+        l_ndg:= NULL;
+    END;
 
+   IF l_ndg IS NOT NULL AND l_ndg = P_ND
+   THEN
+      FOR curr IN (    SELECT SUBSTR (a,
+                                        INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL)
+                                      + 1,
+                                        INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL + 1)
+                                      - INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL)
+                                      - 1)
+                                 a_i
+                         FROM (SELECT ',' || TIPS_NDG || ',' a
+                                 FROM CCK_NDG_TIP
+                                WHERE ID_PAR = 1)
+                   CONNECT BY LEVEL < LENGTH (a) - LENGTH (REPLACE (a, ',')))
+					LOOP
+         PIPE ROW (curr);
+        END LOOP;
+
+   ELSIF l_ndg IS NOT NULL AND l_ndg <> P_ND THEN
+     FOR curr IN (    SELECT SUBSTR (a,
+                                        INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL)
+                                      + 1,
+                                        INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL + 1)
+                                      - INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL)
+                                      - 1)
+                                 a_i
+                         FROM (SELECT ',' || TIPS_NDG || ',' a
+                                 FROM CCK_NDG_TIP
+                                WHERE ID_PAR = 2)
+                   CONNECT BY LEVEL < LENGTH (a) - LENGTH (REPLACE (a, ',')))
+         LOOP
+         PIPE ROW (curr);
+        END LOOP;
+      ELSE
+      FOR curr IN (    SELECT SUBSTR (a,
+                                        INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL)
+                                      + 1,
+                                        INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL + 1)
+                                      - INSTR (a,
+                                               ',',
+                                               1,
+                                               LEVEL)
+                                      - 1)
+                                 a_i
+                         FROM (SELECT ',' || TIPS_NDG || ',' a
+                                 FROM CCK_NDG_TIP
+                                WHERE ID_PAR = 0)
+                   CONNECT BY LEVEL < LENGTH (a) - LENGTH (REPLACE (a, ',')))
+       LOOP
+         PIPE ROW (curr);
+      END LOOP;
+   END IF;
+  END tip_NDG;
   ------------------------------------
     PROCEDURE p_check_userin_atrvalue
     (p_attribute_code IN branch_attribute_value.attribute_code%TYPE)
@@ -2947,7 +3113,7 @@ null;
       INTO v_accc_col_nd_txt
       FROM nd_txt nt
      WHERE nt.nd = p_nd
-       AND nt.tag = 'ACCC_VAL'
+       AND nt.tag = 'ACC_VAL'
        AND nt.kf = l_curr_kf
        AND nt.txt IS NOT NULL;
 
@@ -2961,11 +3127,11 @@ null;
         /* cc_tag script add
          FORALL c_accc IN v_accc_col.FIRST..v_accc_col.LAST
            insert into cc_tag t (tag, name, tagtype, table_name, type, nsisqlwhere, edit_in_form, not_to_edit, code)
-           values ('ACCC_VAL', 'Поле accc.accounts по вхідному нд', 'CCK', 'ACCOUNTS', 'N', v_accc_col(c_accc), 0, 1, null);
+           values ('ACC_VAL', 'Поле accc.accounts по вхідному нд', 'CCK', 'ACCOUNTS', 'N', v_accc_col(c_accc), 0, 1, null);
         */
 
         FOR c_accc IN v_accc_col.FIRST .. v_accc_col.LAST LOOP
-          cck_app.Set_ND_TXT(p_nd, 'ACCC_VAL', v_accc_col(c_accc).accc);
+          cck_app.Set_ND_TXT(p_nd, 'ACC_VAL', v_accc_col(c_accc).accc);
         END LOOP;
 
         --4
@@ -3012,7 +3178,7 @@ null;
         FOR i IN v_accc_col_nd_txt.FIRST .. v_accc_col_nd_txt.LAST --deleting tags
          LOOP
            --bars_audit.info('cck_app.Set_ND_TXT del p_nd= ' || p_nd);
-          cck_app.Set_ND_TXT(p_nd, 'ACCC_VAL', p_txt => NULL); --without p_txt del
+          cck_app.Set_ND_TXT(p_nd, 'ACC_VAL', p_txt => NULL); --without p_txt del
         END LOOP;
 
       ELSE
@@ -3124,24 +3290,26 @@ null;
     l_userid       cc_deal.user_id%TYPE;
   begin
 
+    --bars_audit.info('Start cck_ui.p_change_responsible_executor nd = ' || p_nd);
+
     --перевірка юзера
     --p_check_userin_atrvalue(p_attribute_code => 'ACC_USER');
-	
-	 BEGIN 
-			
-	 SELECT c.user_id 
+
+	 BEGIN
+
+	 SELECT c.user_id
 	   INTO l_userid
-	   FROM cc_deal c	
+	   FROM cc_deal c
 	  WHERE c.nd = p_nd
       AND c.kf = l_curr_kf;
-		
+
 	 EXCEPTION
       WHEN NO_DATA_FOUND THEN
         NULL;
       WHEN TOO_MANY_ROWS THEN
         NULL;
    END;
-    
+
 CASE WHEN (l_userid != p_userid)  THEN
 
     UPDATE cc_deal d
@@ -3159,10 +3327,11 @@ CASE WHEN (l_userid != p_userid)  THEN
       ELSE
         NULL;
     END CASE;
-	
-ELSE 
+
+ELSE
  NULL;
 END CASE;
+
     --bars_audit.info('Finish cck_ui.p_change_responsible_executor  nd = ' || p_nd);
 
   exception
@@ -3176,6 +3345,107 @@ END CASE;
                                              за договором КД ЮО.' ||
                               dbms_utility.format_error_stack());
   end p_change_responsible_executor;
+	
+	PROCEDURE p_update_cc_lim(p_nd in cc_deal.nd%TYPE, p_date in cc_deal.wdate%TYPE) 
+   IS
+   --was on web-form COBUMMFO-6146 
+   l_max_date date;
+   
+ BEGIN
+   
+   BEGIN
+        SELECT MAX(fdat)
+           INTO l_max_date 
+           FROM cc_lim 
+           WHERE nd = p_nd;
+   EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+      WHEN TOO_MANY_ROWS THEN
+        NULL;
+   END;
+   
+   BEGIN   
+  
+   UPDATE cc_lim 
+      SET fdat = p_date 
+    WHERE nd = p_nd 
+      AND fdat = l_max_date;
+  EXCEPTION
+     WHEN DUP_VAL_ON_INDEX THEN
+         raise_application_error(g_errn,
+                                 g_errs ||'p_update_cc_lim.' ||
+                                 'Операція неможлива. Остання дата ГПК max(cc_lim.fdat)-'||l_max_date||',нд ='
+                                 || p_nd ||', більша ніж дата завершення дії КД(cc_deal.wdate) - '||p_date);
+          END;
+  
+  
+ END p_update_cc_lim;
+	
+  procedure calc_comission_4_gpk (p_nd in number)
+    is
+    v_rate number;
+    v_amn  number;
+    v_dt   date;
+  begin
+--    return;
+bars_audit.info('ГПК, початок розрахунку комісій по договору [ref = '||p_nd||']');
+    begin
+      select r.ir
+        into v_rate
+        from int_ratn r,
+--             int_accn a,
+             nd_acc   n
+        where n.nd = p_nd
+--          and n.acc = a.acc
+          and n.acc = r.acc
+          and r.id = 2;
+    exception 
+      when no_data_found then
+        bars_audit.info('Не вдалося знайти відсоткову ставку для розрахунку комісії. Договор: '||p_nd);
+        return;
+    end;
+bars_audit.info('ГПК, комиссия, договор '||p_nd||', % ставка = '||v_rate);
+    for q in (select dt_lim, 
+                     nvl(prev_lim2,0) first_amn, 
+                     nvl(dt_pog,start_date)-start_date first_int,
+                     lim2 second_amn,
+                     last_date-nvl(dt_pog,start_date)+1 second_int
+                from (select lim2, prev_lim2, dt_lim, lag(dt_lim) over (order by dt_lim) dt_pog,
+                             start_date, last_date, fdat
+
+                   from (select lag(lim2) over (order by fdat) prev_lim2, lim2 lim2, lead(fdat) over (order by fdat) dt_lim,
+                               case sumg
+                                 when 0 then fdat
+                                 else trunc(fdat,'mm') 
+                               end start_date,
+                               case lim2
+                                 when 0 then fdat
+                                 else trunc(lead(fdat) over (order by fdat),'mm')-1 
+                               end last_date
+                               ,fdat
+                           from cc_lim c
+                           where nd = p_nd
+                        )
+                      )
+              )
+    loop
+
+      v_amn := round(((q.first_amn * q.first_int) + (q.second_amn * q.second_int)) * v_rate / 36500);
+      v_dt  := nvl(q.dt_lim, v_dt);
+      update cc_lim
+        set sumo = sumo + nvl(v_amn,0),
+            sumk = case 
+                     when q.dt_lim is null then sumk + nvl(v_amn,0)
+                     else nvl(v_amn,0)
+                   end
+        where nd = p_nd
+          and fdat = v_dt;
+      bars_audit.info('Обновляем ГПК для даты '||to_char(v_dt)||' суммой комиссии = '||v_amn||' (кол-во дней = '||q.first_int ||', лимит = '||q.first_amn||
+                                                                                                ',кол-во дней = '||q.second_int ||', лимит = '||q.second_amn||')');
+    end loop;
+  end;
+ 
   ------------------------------------------------------------------------------------------------
   FUNCTION header_version RETURN VARCHAR2 IS
   BEGIN

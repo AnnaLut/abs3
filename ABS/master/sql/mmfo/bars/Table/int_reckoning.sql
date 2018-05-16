@@ -85,18 +85,6 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint SYS_C00118456 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.INT_RECKONING MODIFY (ACCOUNT_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  constraint PK_INT_RECKONING ***
 begin   
  execute immediate '
@@ -111,14 +99,12 @@ exception when others then
 
 
 
-PROMPT *** Create  index I_INT_RECKONING_DEAL_ID ***
+PROMPT *** Create  constraint SYS_C00118456 ***
 begin   
  execute immediate '
-  CREATE INDEX BARS.I_INT_RECKONING_DEAL_ID ON BARS.INT_RECKONING (DEAL_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYNI ';
+  ALTER TABLE BARS.INT_RECKONING MODIFY (ACCOUNT_ID NOT NULL ENABLE)';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
@@ -151,10 +137,6 @@ exception when others then
 /
 
 
-
-PROMPT *** Create  grants  INT_RECKONING ***
-grant SELECT                                                                 on INT_RECKONING   to BARSREADER_ROLE;
-grant SELECT                                                                 on INT_RECKONING   to UPLD;
 
 
 

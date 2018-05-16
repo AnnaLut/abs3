@@ -68,9 +68,7 @@ COMMENT ON COLUMN BARS.T2_SNO.FDAT IS '';
 
 
 PROMPT *** Create  grants  T2_SNO ***
-grant SELECT                                                                 on T2_SNO          to BARSREADER_ROLE;
 grant INSERT,SELECT,UPDATE                                                   on T2_SNO          to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on T2_SNO          to UPLD;
 
 
 

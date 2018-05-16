@@ -4,6 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
  
+  CREATE OR REPLACE PACKAGE BARS.BARS_SMS is
 create or replace package bars_sms is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
@@ -55,7 +56,7 @@ procedure create_msg(
     p_phone             in      msg_submit_data.phone%type,
     p_encode            in      msg_submit_data.encode%type,
     p_msg_text          in      msg_submit_data.msg_text%type,
-    p_kf                in      msg_submit_data.kf%type);
+    p_kf                in      msg_submit_data.kf%type default bars_context.current_mfo());
 
 ----
 -- submit_msg - выполняет посылку сообщения
@@ -165,7 +166,7 @@ procedure create_msg(
     p_phone             in      msg_submit_data.phone%type,
     p_encode            in      msg_submit_data.encode%type,
     p_msg_text          in      msg_submit_data.msg_text%type,
-    p_kf                in      msg_submit_data.kf%type)
+    p_kf                in      msg_submit_data.kf%type default bars_context.current_mfo())
 is
 begin
     if p_msgid is null
@@ -339,11 +340,3 @@ begin
   init;
 end bars_sms;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 

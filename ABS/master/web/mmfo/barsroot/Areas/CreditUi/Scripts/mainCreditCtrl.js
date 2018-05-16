@@ -112,6 +112,8 @@
 
     $rootScope.whereForCust = $rootScope.custtype == 3 ? 'where custtype = 3 and date_off is null' : 'where (custtype = 2 or (custtype = 3 and k050 = 910)) and date_off is null';
 
+    $scope.AvalibleViddChange = $rootScope.custtype == 2 && $scope.isSave;
+
     $rootScope.credit = dataService.clearCredit();
 
     $rootScope.update = function (mode) {
@@ -121,8 +123,9 @@
             bars.ui.loader('body', true);
             url = '/creditui/newcredit/getDeal/?nd=' + $rootScope.nd;
             $http.get(bars.config.urlContent(url)).then(function (request) {
+                if (!$scope.validateRequest(request)) { return; }
                 var save = $rootScope.credit;
-                dataService.getDeal(save, request.data);
+                dataService.getDeal(save, request.data.Data);
                 if ($rootScope.isTagOnly) {
                     $scope.mainTabStrip.select(3);
                 }
@@ -349,6 +352,7 @@
                                 var output_err = request.data.Error_data != "Ok" ? request.data.Error_data : "";
                                 url = '/creditui/newcredit/afterSaveDeal';
                                 $http.post(bars.config.urlContent(url), dataService.afterSaveDeal($rootScope.ndtxtsave.nd, save)).then(function (request) {
+                                    if (!$scope.validateRequest(request)) { return; }
                                     url = "/creditui/newcredit/setMultiExtInt";
                                     $http.post(bars.config.urlContent(url), dataService.multiExtInt($rootScope.ndtxtsave.nd, save)).then(function (request) {
                                         $scope.isSave = true;

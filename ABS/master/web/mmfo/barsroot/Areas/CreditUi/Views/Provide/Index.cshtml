@@ -2,7 +2,7 @@
     ViewBag.Title = "Договора забезпечення";
 }
 <script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
-<script src="@Url.Content("~/Areas/CreditUi/Scripts/provide.js?v.1.0.1")"></script>
+<script src="@Url.Content("~/Areas/CreditUi/Scripts/provide.js?v.1.0.3")"></script>
 <script src="@Url.Content("~/Areas/CreditUi/Scripts/creditUI.js")"></script>
 <h1 style="padding-bottom: 0px;">@ViewBag.title</h1>
 <br />
@@ -174,13 +174,25 @@
     </div>
 </script>
 
+<div id="dialogSendProvides">
+    <div>
+        <label for="sendprovides_nd">Номер КД:   </label>
+        <input id="sendprovides_nd" />
+    </div>
+    <div>
+        <br><button id='bt_send_provides_ok' class='k-button' style="margin-left: 65px;">
+                <span class='pf-icon pf-16 pf-ok'></span> Передати застави
+            </button>
+    </div>
+</div>
+
 <table id="dataKD" class="">
     <tr>
         <td>
             <label for="ref" class="control-label" style="margin:5px">Референс угоди: </label>
         </td>
         <td>
-            <input type="text" id="ref" style="width:100px" disabled />
+            <input type="text" id="ref" style="width:100px" readonly />
         </td>
         <td>
             <label for="credit_name" class="control-label" style="margin:5px">Номер угоди: </label>

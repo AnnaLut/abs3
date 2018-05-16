@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cct.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CCT IS
+CREATE OR REPLACE PACKAGE CCT IS
 
 /******************************************************************************
    NAME:       CCT
@@ -160,15 +154,17 @@ procedure StartIO (p_mode int );
 
 END CCT;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
+CREATE OR REPLACE PACKAGE BODY CCT IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) := 'version 14.2 12/02/2016';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) := 'version 14.4 11/01/2018';
 
   -- глобальная дата в параметрах для начала наполнения траншами
   G_startdat date := to_date(nvl(GetGlobalOption('CCT_DAT'), '01/01/2008'),
                              'dd/mm/yyyy');
 
   /*
+    11/01/2018 Pivanova tranSh1 змінено 365 на 364 згідно заявки  COBUSUPABS-6465
+    11/10/2017 Сухова - Робота з траншами после разделения по МСФЗ-9 на субдоговора.
     27.03.2015 STA Дабавлено поддержку  CC_TRANS.ID0  = 'Iд.Поч.Траншу' в процедуре выноса на просрочку
     28.01.2015 DAV Добавил в процедуру p2067 формирования проводок по просрочке перенос платеженого дня если он попадал выходные на следующий банковский день.
     04.07.2014 Dav Возможность формирования отчетов по педварительным проводкам для  процедуры p2067 (использовать с пакетом ССК от 04/07/2014)
@@ -305,25 +301,36 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
   
     srok_ number(10, 3);
   
+    dd cc_deal%rowtype;
   BEGIN
     begin
-      --нормальный долг или просрочка. Дата погашения по умолчанию.
-    
-      select CASE
-               WHEN p_tip = 'SP ' THEN
-                p_fdat - 1
-               WHEN p_nbs like '2__2' or gl.amfo not in ('380764') THEN
-                least(p_mdate, p_fdat + 365)
-               ELSE
-                p_mdate
-             END
-        into l_dat1
+      -- 11/10/2017 Сухова - Робота з траншами после разделения по МСФЗ-9 на субдоговора.
+      select d.*
+        into dd
         from cc_deal d, nd_acc n
-       where d.vidd in (2, 3)
-         and nvl(to_number(cck_app.get_nd_txt_ex(d.nd, 'PR_TR', bankdate)),
-                 0) = 1
+       where d.vidd in (1, 2, 3)
          and n.acc = p_acc
          and n.nd = d.nd;
+      If dd.vidd = 1 and dd.ndg is null then
+        RETURN;
+      end if;
+    
+      If cck_app.get_nd_txt_ex(dd.ND, 'PR_TR', gl.Bdate) = '1' or
+         cck_app.get_nd_txt_ex(dd.ndG, 'PR_TR', gl.Bdate) = '1' then
+      
+        -- нормальный долг или просрочка. Дата погашения по умолчанию.
+        If p_tip = 'SP ' THEN
+          l_dat1 := p_fdat - 1;
+        ElsIf p_nbs like '2__2' THEN
+          l_dat1 := least(p_mdate, p_fdat + 364);
+        ELSE
+          l_dat1 := p_mdate;
+        END if;
+      
+      else
+        RETURN;
+      end if;
+    
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
         return;
@@ -753,20 +760,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
                      a.mdate,
                      a.tip,
                      a.accc,
-                     a.nbs
-                from accounts a, nd_acc n, cc_deal d
-               where d.vidd in (2, 3)
-                 and d.sos < 15
-                 and nvl(to_number(cck_app.get_nd_txt_ex(d.nd,
-                                                         'PR_TR',
-                                                         bankdate)),
-                         0) = 1
-                 and a.acc = n.acc
-                 and tip = 'SS '
-                 and n.nd = d.nd
-                 and d.nd = decode(p_MODE, 0, d.nd, p_mode))
-    
-     loop
+                     a.nbs,
+                     d.NDG
+                from (select * from accounts where tip = 'SS ') a,
+                     nd_acc n,
+                     (select *
+                        from cc_deal
+                       where nd = decode(p_MODE, 0, nd, p_mode)
+                         and sos < 14
+                         and (vidd = 1 and NDG is not null OR
+                             vidd in (1, 2, 3))) d
+               where a.acc = n.acc
+                 and n.nd = d.nd) loop
+      -- 11/10/2017 Сухова - Робота з траншами после разделения по МСФЗ-9 на субдоговора.
+      If NVL(cck_app.get_nd_txt_ex(k.ND, 'PR_TR', gl.bdate), '0') <> '1' and
+         NVL(cck_app.get_nd_txt_ex(k.NDG, 'PR_TR', gl.bdate), '0') <> '1' then
+        goto NO_TRANSH;
+      end if;
+      -------------------
       -- входящие остатки при миграции РУ
       select min(fdat) into l_fdat from saldoa where acc = k.acc;
       If l_fdat is not null then
@@ -811,7 +822,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
                     P_tip   => k.tip,
                     p_mdate => k.mdate,
                     p_accc  => k.accc);
-      end loop; -- r
+      end loop; ------------ r
     
       --ПСЕВДО-транши (выносы на просрочку) - в будущем они будут вставлЯтьсЯ собственно при выносе на просрочку
       for p in (select *
@@ -835,9 +846,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
                     from CC_TRANS
                    where ref = o.REF
                      and acc = o.ACC);
-      end loop; -- p
+      end loop; ------------ p
     
-    end loop; -- k
+      <<NO_TRANSH>>
+      null;
+    
+    end loop; --------------- k
   
     CCT.OTM(p_mode, p_notisg);
   
@@ -901,7 +915,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
                  l_nms
             from accounts a, nd_acc n, cc_deal d, specparam s
            where a.ostc = a.ostb
-             and d.sos<15
              and a.acc = m.acc
              and a.acc = n.acc
              and n.nd = d.nd
@@ -999,15 +1012,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCT IS
 
 END CCT;
 /
- show err;
- 
-PROMPT *** Create  grants  CCT ***
-grant EXECUTE                                                                on CCT             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CCT             to RCC_DEAL;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/cct.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 

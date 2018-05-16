@@ -50,7 +50,6 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -60,7 +59,6 @@ begin
 
   l_tabsemantic := 'V2. Портфель : SNO + GPP';
   l_tablinesdef := '';
-  l_tabselect_statement := '';
   l_tabname     := 'V11_SNO_FL';
 
   -- получаем код таблицы
@@ -73,7 +71,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -83,9 +81,6 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
-
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -124,24 +119,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC_сч SNO', '', null, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', '', null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CC_ID', 'C', 'Ид КД', '', null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал', '', null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'LIM', 'N', 'Остаток~осн.долга', '', null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Реф КД~~СЧЕТА ', '', null, 7, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from nd_acc where nd=:ND and acc=a.acc)")', 0);
-  bars_metabase.add_column(l_tabid, 7, 'NDI', 'N', 'Реф~связ. КД', '', null, 34, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Счет~рестр.~проц', '', null, 22, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'РНК', '', null, 4, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SDATE', 'D', 'Дата~начала', '', null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SNO', 'N', 'Остаток~рестр..проц~ГПК+ГПП', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CC_W_LIM", 0  , "ND="||Str(:ND) )', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SOS', 'N', 'Сос', '', null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'WDATE', 'D', 'Дата ~заверш', '', null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'REFP', 'N', 'Реф.док.~реструкруриз~ДОК ГПП', '', null, 23, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REFP)', 0);
-  bars_metabase.add_column(l_tabid, 17, 'VDAT', 'D', 'Дата~рестр.~проц', '', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SNOB', 'N', 'Сумма~Переплаты', '', null, 27, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'OTM1', 'B', 'Сократить~на переплату~ГПП', '', null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OTM2', 'B', 'Отменить~остаток~ГПП', '', null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'ACC_сч SNO', null, null, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч', null, null, 1, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'CC_ID', 'C', 'Ид КД', null, null, 10, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'KV', 'N', 'Вал', null, null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'LIM', 'N', 'Остаток~осн.долга', null, null, 30, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'ND', 'N', 'Реф КД~~СЧЕТА ', null, null, 7, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"exists(select 1 from nd_acc where nd=:ND and acc=a.acc)")', 0);
+  bars_metabase.add_column(l_tabid, 7, 'NDI', 'N', 'Реф~связ. КД', null, null, 34, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'NLS', 'C', 'Счет~рестр.~проц', null, null, 22, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'RNK', 'N', 'РНК', null, null, 4, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SDATE', 'D', 'Дата~начала', null, null, 13, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SNO', 'N', 'Остаток~рестр..проц~ГПК+ГПП', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', 'FunNSIEditFFiltered("CC_W_LIM", 0  , "ND="||Str(:ND) )', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SOS', 'N', 'Сос', null, null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'WDATE', 'D', 'Дата ~заверш', null, null, 16, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'REFP', 'N', 'Реф.док.~реструкруриз~ДОК ГПП', null, null, 23, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', 'DocViewContentsEx(hWndForm, :REFP)', 0);
+  bars_metabase.add_column(l_tabid, 17, 'VDAT', 'D', 'Дата~рестр.~проц', null, null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SNOB', 'N', 'Сумма~Переплаты', null, null, 27, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'OTM1', 'B', 'Сократить~на переплату~ГПП', null, null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OTM2', 'B', 'Отменить~остаток~ГПП', null, null, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');

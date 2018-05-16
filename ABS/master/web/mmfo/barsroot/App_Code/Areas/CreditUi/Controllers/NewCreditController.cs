@@ -215,8 +215,14 @@ namespace BarsWeb.Areas.CreditUi.Controllers
 
         public ActionResult getDeal(decimal nd)
         {
-            CreateDeal session = _creditRepository.getDeal(nd);
-            return Json(session, JsonRequestBehavior.AllowGet);
+            string Status = "OK";
+            try
+            {
+                CreateDeal session = _creditRepository.getDeal(nd);
+                return Json(new { Status = Status, Data = session }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetProlog(decimal nd)

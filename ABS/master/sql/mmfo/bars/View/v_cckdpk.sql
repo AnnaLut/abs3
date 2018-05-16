@@ -1,15 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCKDPK.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_CCKDPK ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCKDPK ("Z8", "RNK", "CC_ID", "SDATE", "BRANCH", "KV", "NLS", "ACCOUNT_BRANCH", "ND", "NBS", "WDATE", "NMK", "KN_DPK", "Z1", "Z2", "Z3", "SUM_COM", "Z4", "Z5", "R1", "R2", "K0", "K1", "MES", "DAT_MOD", "K2") AS 
-  SELECT /*cck_dpk.Z8 (ND)*/0 Z8,
-          RNK,
+CREATE OR REPLACE VIEW V_CCKDPK AS
+SELECT    RNK,
           CC_ID,
           SDATE,
           BRANCH,
@@ -37,8 +27,7 @@ PROMPT *** Create  view V_CCKDPK ***
           nvl(LEAST ( (LIM - Z3), (R1 - (Z1 + Z2 + Z3))),0) K1,
           --(Z1 + Z2 + Z3) as K1,
           ROUND (MONTHS_BETWEEN (wdate, gl.bd), 1) MES,
-          cck_dpk.DAT_MOD (ND) DAT_MOD,
-          /*cck_dpk.DAY_PL (ND)*/ 0 K2
+          cck_dpk.DAT_MOD (ND) DAT_MOD
      FROM (SELECT d.branch,
                   d.ND,
                   d.CC_ID,
@@ -56,7 +45,7 @@ PROMPT *** Create  view V_CCKDPK ***
                   cck_dpk.sum_SP_ALL (d.nd) / 100 Z1,
                   cck_dpk.sum_SN_all (a8.vid, d.nd) / 100 Z2,
                   cck_dpk.sum_SS_next (d.nd) / 100 Z3,
-                  /*cck_dpk.sum_SK_all ( d.nd) / 100*/0  sum_com
+                  /*cck_dpk.sum_SK_all ( d.nd) / 100*/ null  sum_com
              FROM customer c,
                   (SELECT *
                      FROM cc_deal
@@ -77,15 +66,3 @@ PROMPT *** Create  view V_CCKDPK ***
                   AND n8.acc = a8.acc)
 --where NOT ( Z1> 0 and  NBS ='2525') --  НЕ выполнять досрочное погашение с 2625 с перестроением ГПК при наличии ПРОСРОЧЕК.
 ;
-
-PROMPT *** Create  grants  V_CCKDPK ***
-grant SELECT                                                                 on V_CCKDPK        to BARSREADER_ROLE;
-grant FLASHBACK,SELECT                                                       on V_CCKDPK        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CCKDPK        to START1;
-grant SELECT                                                                 on V_CCKDPK        to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCKDPK.sql =========*** End *** =====
-PROMPT ===================================================================================== 

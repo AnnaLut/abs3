@@ -28,7 +28,7 @@ end;
 
 grant select, insert, update, delete on bars.cck_r011 to bars_access_defrole;
 
-comment on table bars.cck_r011 is 'РЎРїСЂР°РІРѕС‡РЅРёРє СЃРїРµС†РїР°СЂР°РјРµС‚СЂР° R011 РґР»СЏ РєСЂРµРґРёС‚РѕРІ (TIP = SS, SDI, SN)';
-comment on column bars.cck_r011.nbs is 'Р‘Р°Р»Р°РЅСЃ. СЃС‡РµС‚';
-comment on column bars.cck_r011.r011 is 'Р—РЅР°С‡РµРЅРёРµ СЃРїРµС†РїР°СЂР°РјРµС‚СЂР°';
-comment on column bars.cck_r011.module_specific is 'РЎРїРµС†РёС„РёРєР° РјРѕРґСѓР»СЏ (N - РЅРµ С‚СЂРµР±СѓРµС‚ РґРѕРї. СЂР°СЃС‡РµС‚РѕРІ)';
+comment on table bars.cck_r011 is 'Справочник спецпараметра R011 для кредитов (TIP = SS, SDI, SN)';
+comment on column bars.cck_r011.nbs is 'Баланс. счет';
+comment on column bars.cck_r011.r011 is 'Значение спецпараметра';
+comment on column bars.cck_r011.module_specific is 'Специфика модуля (N - не требует доп. расчетов)';

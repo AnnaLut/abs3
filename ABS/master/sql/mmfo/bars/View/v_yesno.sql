@@ -13,10 +13,8 @@ PROMPT *** Create  view V_YESNO ***
    SELECT 'ͳ' name, 0 id FROM DUAL;
 
 PROMPT *** Create  grants  V_YESNO ***
-grant SELECT                                                                 on V_YESNO         to BARSREADER_ROLE;
 grant SELECT                                                                 on V_YESNO         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on V_YESNO         to START1;
-grant SELECT                                                                 on V_YESNO         to UPLD;
 
 
 

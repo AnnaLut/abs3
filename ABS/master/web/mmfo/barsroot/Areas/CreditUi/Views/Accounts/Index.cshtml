@@ -1,10 +1,9 @@
 ﻿@{    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
-    ViewBag.Title = "Рахунки та операції, пов'язані з КД";
+
 }
 <script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
-<script src="@Url.Content("~/Areas/CreditUi/Scripts/accounts.js")"></script>
+<script src="@Url.Content("~/Areas/CreditUi/Scripts/accounts.js?v.1.0.4")"></script>
 <script src="@Url.Content("~/Areas/CreditUi/Scripts/creditUI.js")"></script>
-<h1 style="padding-bottom: 0px; padding-top: 0px;">@ViewBag.title</h1>
 <style>
     .k-grid .k-grid-header .k-header {
         white-space: normal;
@@ -76,7 +75,25 @@
     .row {
         padding-top: 5px;
     }
+    .main_contract {
+        background-color: #8FD7B1 !important;
+    }
+    .sub_contact {
+        background-color: #F2DB6A !important;
+    }
 </style>
+<div>
+    <div style="width: auto; display: inline-block; float:left">
+        <h1 style="padding-bottom: 0px;" id="header_text">Рахунки та операції, пов'язані з КД</h1>
+    </div>
+    <div style="display: inline-block; margin-left: 20px; float:left">
+        <input id="info" class="form-control" style="height: 23px; padding: 0px 10px; font-size: 14.5px; width: 180px; visibility:hidden" type="text" readonly>
+        
+    </div>
+    <div id="sub_button" style="display: inline-block; margin-left: 10px; visibility:hidden">
+        <a class="k-button k-button-icontext k-grid-btToSubs"><span class="pf-icon pf-16 pf-tree"></span> Субдоговори</a>
+    </div>
+</div>
 
 <div class="row" style="width: 1024px;">
 
@@ -124,7 +141,9 @@
                 <label class="control-label" for="date_end">Дата заверш. КД</label>
                 <br><input class="form-control" id="date_end" type="text" readonly>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 ref_gen" hidden>
+                <label class="control-label" for="date_end">Референс ген. КД</label>
+                <br><input class="form-control" id="ref_gen" type="text" readonly>
             </div>
         </div>
         <div class="row" style="padding-top: 5px;">
@@ -149,10 +168,11 @@
         </div>
     </div>
 </div>
-    <div>
-        <div id="gridAccounts" class="fixed_headers"></div>
-    </div>
-   
+
+<div>
+    <div id="gridAccounts" class="fixed_headers"></div>
+</div>
+
 <div id="dialogLink">
     <div align="center" style="margin-bottom:10px">
         <h2>Зв'язати з КД рахунок:</h2>
@@ -189,7 +209,7 @@
         </button>
     </div>
 </div>
-           
+
 <script id="popup-editor" type="text/x-kendo-template">
     <div align="center" style="margin-bottom:10px">
         <h2 id="popup_header">Відкрити рахунок:</h2>
@@ -210,11 +230,11 @@
                         <a class='k-button' onclick="showOB22('sb_ob22', 'R020,OB22,TXT', '')"><i class='pf-icon pf-16 pf-book'></i></a>
                     </div>
                 </div>
-            <div class="col-md-12">
-                <label class="control-label" for="KV">Валюта </label>
-                <input class="form-control" name="KV" id="KV" data-bind="value:KV" style="width:320px; margin-left: -15px;" required />
+                <div class="col-md-12">
+                    <label class="control-label" for="KV">Валюта </label>
+                    <input class="form-control" name="KV" id="KV" data-bind="value:KV" style="width:320px; margin-left: -15px;" required />
+                </div>
             </div>
         </div>
     </div>
-        </div>
 </script>

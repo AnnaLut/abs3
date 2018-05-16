@@ -38,23 +38,25 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.Parameters.Clear();
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
 
-                    GLK r = new GLK();
-                    r.ND = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (Decimal?)null : reader.GetDecimal(0);
-                    r.FDAT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(1).ToString());
-                    r.LIM2 = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (Decimal?)null : reader.GetDecimal(2);
-                    r.OST = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (Decimal?)null : reader.GetDecimal(3);
-                    r.DEL2 = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (Decimal?)null : reader.GetDecimal(4);
-                    r.LIM1 = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? (Decimal?)null : reader.GetDecimal(5);
-                    r.D9129 = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? (Decimal?)null : reader.GetDecimal(6);
-                    r.DAYSN = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? (int?)null : reader.GetInt32(7);
-                    r.NOT_9129 = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? (int?)null : reader.GetInt32(8);
-                    r.ACC = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? (decimal?)null : reader.GetDecimal(9);
-                    GLKList.Add(r);
+                    while (reader.Read())
+                    {
+
+                        GLK r = new GLK();
+                        r.ND = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (Decimal?)null : reader.GetDecimal(0);
+                        r.FDAT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(1).ToString());
+                        r.LIM2 = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (Decimal?)null : reader.GetDecimal(2);
+                        r.OST = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (Decimal?)null : reader.GetDecimal(3);
+                        r.DEL2 = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (Decimal?)null : reader.GetDecimal(4);
+                        r.LIM1 = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? (Decimal?)null : reader.GetDecimal(5);
+                        r.D9129 = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? (Decimal?)null : reader.GetDecimal(6);
+                        r.DAYSN = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? (int?)null : reader.GetInt32(7);
+                        r.NOT_9129 = String.IsNullOrEmpty(reader.GetValue(8).ToString()) ? (int?)null : reader.GetInt32(8);
+                        r.ACC = String.IsNullOrEmpty(reader.GetValue(9).ToString()) ? (decimal?)null : reader.GetDecimal(9);
+                        GLKList.Add(r);
+                    }
                 }
 
                 cmd.CommandText =  "Begin bars.PUL.PUT('ND',:nd); End;";
@@ -83,28 +85,31 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.CommandText = sql;
                 cmd.Parameters.Clear();
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                   
-                    data.CC_ID = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
-                    data.LIMIT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? 0 : reader.GetDecimal(1);
-                    data.SDOG = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? 0 : reader.GetDecimal(2);
-                    data.SDATE = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetDateTime(3).ToString("dd/MM/yyyy");
-                    data.NMK = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
-                    data.RNK = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? 0 : reader.GetDecimal(5);
-                    data.SOS = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetInt32(6);
-                    data.CUSTYPE = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetInt32(7);
+
+                    while (reader.Read())
+                    {
+
+                        data.CC_ID = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetString(0);
+                        data.LIMIT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? 0 : reader.GetDecimal(1);
+                        data.SDOG = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? 0 : reader.GetDecimal(2);
+                        data.SDATE = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? String.Empty : reader.GetDateTime(3).ToString("dd/MM/yyyy");
+                        data.NMK = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? String.Empty : reader.GetString(4);
+                        data.RNK = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? 0 : reader.GetDecimal(5);
+                        data.SOS = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? 0 : reader.GetInt32(6);
+                        data.CUSTYPE = String.IsNullOrEmpty(reader.GetValue(7).ToString()) ? 0 : reader.GetInt32(7);
+                    }
                 }
 
                 cmd.CommandText = get_bank_date;
                 cmd.Parameters.Clear();
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
-                    data.BANKDATE = Convert.ToDateTime(reader.GetValue(0).ToString()).ToString("dd/MM/yyyy");
+                    while (reader.Read())
+                    {
+                        data.BANKDATE = Convert.ToDateTime(reader.GetValue(0).ToString()).ToString("dd/MM/yyyy");
+                    }
                 }
 
                 cmd.CommandText = "Begin bars.PUL.PUT('ND',:nd); End;";
@@ -225,17 +230,19 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.Parameters.Clear();
                 cmd.Parameters.Add("nd", OracleDbType.Decimal, nd, System.Data.ParameterDirection.Input);
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
 
-                    glkArchive r = new glkArchive();
-                    r.ID = reader.GetDecimal(0);
-                    r.ND = reader.GetDecimal(1);
-                    r.OPER_DATE = Convert.ToDateTime(reader.GetValue(2).ToString());
-                    r.FIO = reader.GetString(3);
-                    GLKList.Add(r);
+                    while (reader.Read())
+                    {
+
+                        glkArchive r = new glkArchive();
+                        r.ID = reader.GetDecimal(0);
+                        r.ND = reader.GetDecimal(1);
+                        r.OPER_DATE = Convert.ToDateTime(reader.GetValue(2).ToString());
+                        r.FIO = reader.GetString(3);
+                        GLKList.Add(r);
+                    }
                 }
 
             }
@@ -264,20 +271,22 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                 cmd.Parameters.Clear();
                 cmd.Parameters.Add("id", OracleDbType.Decimal, id, System.Data.ParameterDirection.Input);
 
-                OracleDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (OracleDataReader reader = cmd.ExecuteReader())
                 {
 
-                    glkArchiveBody r = new glkArchiveBody();
-                    r.FDAT = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(0).ToString());
-                    r.LIM2 = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (Decimal?)null : reader.GetDecimal(1);
-                    r.SUMG = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (Decimal?)null : reader.GetDecimal(2);
-                    r.SUMO = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (Decimal?)null : reader.GetDecimal(3);
-                    r.OTM = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (int?)null: reader.GetInt32(4);
-                    r.SUMK = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? (decimal?)null : reader.GetDecimal(5);
-                    r.NOT_SN = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? (int?)null : reader.GetInt32(6);
-                    GLKList.Add(r);
+                    while (reader.Read())
+                    {
+
+                        glkArchiveBody r = new glkArchiveBody();
+                        r.FDAT = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(0).ToString());
+                        r.LIM2 = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (Decimal?)null : reader.GetDecimal(1);
+                        r.SUMG = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (Decimal?)null : reader.GetDecimal(2);
+                        r.SUMO = String.IsNullOrEmpty(reader.GetValue(3).ToString()) ? (Decimal?)null : reader.GetDecimal(3);
+                        r.OTM = String.IsNullOrEmpty(reader.GetValue(4).ToString()) ? (int?)null : reader.GetInt32(4);
+                        r.SUMK = String.IsNullOrEmpty(reader.GetValue(5).ToString()) ? (decimal?)null : reader.GetDecimal(5);
+                        r.NOT_SN = String.IsNullOrEmpty(reader.GetValue(6).ToString()) ? (int?)null : reader.GetInt32(6);
+                        GLKList.Add(r);
+                    }
                 }
 
             }
