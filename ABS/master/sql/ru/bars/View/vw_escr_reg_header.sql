@@ -482,6 +482,12 @@ SELECT rez.CUSTOMER_ID,
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (4)
+                     WHEN     EXTRACT (YEAR FROM t.sdate) >= 2017
+                          AND SUBSTR (t.prod, 1, 6) NOT IN ('220257',
+                                                            '220347'
+                                                            , '220373')
+                     THEN
+                        TO_NUMBER (6)
                      WHEN     cs.subs_numb IS NULL
                           AND EXTRACT (YEAR FROM t.sdate) <> 2017
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
@@ -499,12 +505,6 @@ SELECT rez.CUSTOMER_ID,
                           AND t.sdate >= TO_DATE ('19/09/2016', 'dd/mm/yyyy')
                      THEN
                         TO_NUMBER (5)
-                     WHEN     EXTRACT (YEAR FROM t.sdate) >= 2017
-                          AND SUBSTR (t.prod, 1, 6) NOT IN ('220257',
-                                                            '220347'
-                                                            , '220373')
-                     THEN
-                        TO_NUMBER (6)
                   END
                      reg_kind_id,
                   CASE
