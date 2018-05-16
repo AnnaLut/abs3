@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="09/06/2017 13:42:49" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="04/19/2018 19:30:15" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHzPfbhMU3HSoU5H4mPft3vz8taAlDt+IhNNihRk7Ec2+Q==">
-      <TableDataSource Name="Table" Alias="ByRec" DataType="System.Int32" Enabled="true" SelectCommand="SELECT r.rec,&#13;&#10;       r.mfoa,&#13;&#10;       r.mfob,&#13;&#10;       r.nlsa,&#13;&#10;       r.nlsb,&#13;&#10;       r.nam_a,&#13;&#10;       r.nam_b,&#13;&#10;       TO_CHAR (r.s / 100,&#13;&#10;                'FM999G999G999G999G990D00',&#13;&#10;                'NLS_NUMERIC_CHARACTERS = ''. ''')&#13;&#10;          AS s,&#13;&#10;       BARS.f_sumpr (r.s, r.kv, 'F') AS sprop,&#13;&#10;       t.lcv,&#13;&#10;       r.nazn,&#13;&#10;       r.dat_a,&#13;&#10;       r.datp,&#13;&#10;       r.fn_a,&#13;&#10;       r.id_a,&#13;&#10;       r.id_b,&#13;&#10;       f_dat_lit (r.dat_a) AS dat_prop,&#13;&#10;       (SELECT nb&#13;&#10;          FROM banks&#13;&#10;         WHERE mfo = r.mfoa)&#13;&#10;          AS bank_a,&#13;&#10;       (SELECT nb&#13;&#10;          FROM banks&#13;&#10;         WHERE mfo = r.mfob)&#13;&#10;          AS bank_b,&#13;&#10;       CASE&#13;&#10;          WHEN r.dk IN (0, 1)&#13;&#10;          THEN&#13;&#10;             UPPER (v.name)&#13;&#10;          WHEN r.dk IN (2, 3)&#13;&#10;          THEN&#13;&#10;             'ІНФОРМАЦІЙНЕ ПОВІДОМЛЕННЯ'&#13;&#10;       END&#13;&#10;          AS vob_name,&#13;&#10;       a.DAT_2,&#13;&#10;       f_dat_lit (a.DATK) AS DATK,&#13;&#10;       r.ND&#13;&#10;  --a.*,                                     --b.*&#13;&#10;  FROM arc_rrp r,&#13;&#10;       rec_que q,&#13;&#10;       tabval t,&#13;&#10;       vob v,&#13;&#10;       zag_a a,&#13;&#10;       zag_b b&#13;&#10; WHERE     r.kv = t.kv&#13;&#10;       AND r.s &gt; 0&#13;&#10;       AND r.rec = q.rec(+)&#13;&#10;       AND r.vob = v.vob&#13;&#10;       AND r.REF IS NULL&#13;&#10;       AND r.rec = :p_rec&#13;&#10;       AND r.fn_a = A.FN(+)&#13;&#10;       AND R.DAT_A = a.dat(+)&#13;&#10;       AND r.fn_b = b.FN(+)&#13;&#10;       AND R.DAT_B = b.dat(+)">
+    <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlq4prl5GMBG12x0q4xIbdAwh3QWQEu7hE8ZMwKaqn9iJXZmdp8Fg8xuMsQ02Emagi/izogfpiZ78PrI/gtDqVJLfEUHCjjUYQRYf0vaSt3r8I=">
+      <TableDataSource Name="Table" Alias="ByRec" DataType="System.Int32" Enabled="true" SelectCommand="SELECT r.rec,&#13;&#10;       r.mfoa,&#13;&#10;       r.mfob,&#13;&#10;       r.nlsa,&#13;&#10;       r.nlsb,&#13;&#10;       r.nam_a,&#13;&#10;       r.nam_b,&#13;&#10;       TO_CHAR (r.s / 100,&#13;&#10;                'FM999G999G999G999G990D00',&#13;&#10;                'NLS_NUMERIC_CHARACTERS = ''. ''')&#13;&#10;          AS s,&#13;&#10;       BARS.f_sumpr (r.s, r.kv, 'F') AS sprop,&#13;&#10;       t.lcv,&#13;&#10;       r.nazn,&#13;&#10;       r.dat_a,&#13;&#10;       r.datp,&#13;&#10;       r.fn_a,&#13;&#10;       r.id_a,&#13;&#10;       r.id_b,&#13;&#10;       f_dat_lit (r.dat_a) AS dat_prop,&#13;&#10;       (SELECT nb&#13;&#10;          FROM banks&#13;&#10;         WHERE mfo = r.mfoa)&#13;&#10;          AS bank_a,&#13;&#10;       (SELECT nb&#13;&#10;          FROM banks&#13;&#10;         WHERE mfo = r.mfob)&#13;&#10;          AS bank_b,&#13;&#10;       CASE&#13;&#10;          WHEN r.dk IN (0, 1)&#13;&#10;          THEN&#13;&#10;             UPPER (v.name)&#13;&#10;          WHEN r.dk IN (2, 3)&#13;&#10;          THEN&#13;&#10;             'ІНФОРМАЦІЙНЕ ПОВІДОМЛЕННЯ'&#13;&#10;       END&#13;&#10;          AS vob_name,&#13;&#10;       a.DAT_2,&#13;&#10;       f_dat_lit (a.DATK) AS DATK,&#13;&#10;       r.ND&#13;&#10;  --a.*,                                     --b.*&#13;&#10;  FROM arc_rrp r,&#13;&#10;       rec_que q,&#13;&#10;       tabval t,&#13;&#10;       vob v,&#13;&#10;       zag_a a,&#13;&#10;       zag_b b&#13;&#10; WHERE     r.kv = t.kv&#13;&#10;       AND r.s &gt; 0&#13;&#10;       AND r.rec = q.rec(+)&#13;&#10;       AND r.vob = v.vob&#13;&#10;      -- AND r.REF IS NULL&#13;&#10;       AND r.rec = :p_rec&#13;&#10;       AND r.fn_a = A.FN(+)&#13;&#10;       AND R.DAT_A = a.dat(+)&#13;&#10;       AND r.fn_b = b.FN(+)&#13;&#10;       AND R.DAT_B = b.dat(+)">
         <Column Name="REC" DataType="System.Decimal"/>
         <Column Name="MFOA" DataType="System.String"/>
         <Column Name="MFOB" DataType="System.String"/>
@@ -33,60 +33,59 @@
         <CommandParameter Name="p_rec" DataType="107" Expression="[p_rec]" DefaultValue="75312824601"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_rec" DataType="System.Decimal" Expression="[p_rec]"/>
+    <Parameter Name="p_rec" DataType="System.Int64" Expression="93754001211"/>
   </Dictionary>
-  <ReportPage Name="Page1" Guides="652.05">
+  <ReportPage Name="Page1" Guides="689.85">
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="28.35">
-      <TextObject Name="Text41" Left="-9.45" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text41" Left="28.35" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" HorzAlign="Center" VertAlign="Center"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="32.35" Width="718.2" Height="567">
+    <DataBand Name="Data1" Top="31.21" Width="718.2" Height="567">
       <TextObject Name="Text4" Top="75.6" Width="368.55" Height="47.25" Text="Платник [ByRec.NAM_A]"/>
       <TextObject Name="Text5" Top="94.5" Width="132.3" Height="28.35" Text="Код " VertAlign="Center"/>
       <TextObject Name="Text6" Left="47.25" Top="94.5" Width="94.5" Height="28.35" Border.Lines="All" Border.Width="2" Text="[ByRec.ID_A]" HorzAlign="Center" VertAlign="Center"/>
       <TextObject Name="Text7" Top="141.75" Width="330.75" Height="37.8" Border.Lines="Bottom" Border.Width="1.5" Text="Банк платника"/>
-      <TextObject Name="Text8" Left="282.7" Top="140.15" Width="75.6" Height="18.9" Text="код банку"/>
-      <TextObject Name="Text9" Left="283.5" Top="160.65" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="2" Text="[ByRec.MFOA]" HorzAlign="Center"/>
+      <TextObject Name="Text8" Left="339.4" Top="140.15" Width="75.6" Height="18.9" Text="код банку"/>
+      <TextObject Name="Text9" Left="321.3" Top="160.65" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="2" Text="[ByRec.MFOA]" HorzAlign="Center"/>
       <TextObject Name="Text11" Top="179.55" Width="368.55" Height="37.8" Text="Одержувач [ByRec.NAM_B]" VertAlign="Center"/>
       <TextObject Name="Text12" Top="217.35" Width="141.75" Height="28.35" Text="Код " VertAlign="Center"/>
       <TextObject Name="Text13" Left="47.25" Top="217.35" Width="94.5" Height="28.35" Border.Lines="All" Border.Width="2" Text="[ByRec.ID_B]" HorzAlign="Center" VertAlign="Center"/>
       <TextObject Name="Text14" Top="255.15" Width="567" Height="37.8" Border.Lines="Bottom" Border.Width="1.5" Text="Банк отримувача"/>
-      <TextObject Name="Text15" Left="283.5" Top="255.15" Width="75.6" Height="18.9" Text="код банку"/>
-      <TextObject Name="Text16" Left="283.5" Top="274.05" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="2" Text="[ByRec.MFOB]" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text17" Top="292.95" Width="548.1" Height="18.9" Text="Сума словами: [ByRec.SPROP]" VertAlign="Center"/>
-      <TextObject Name="Text10" Top="321.3" Width="548.1" Height="37.8" Text="Призначення платежу: [ByRec.NAZN]"/>
-      <TextObject Name="Text18" Top="151.2" Width="330.75" Height="28.35" Text="[ByRec.BANK_A]" VertAlign="Center"/>
-      <TextObject Name="Text27" Top="274.05" Width="255.15" Height="18.9" Text="[ByRec.BANK_B]"/>
-      <TextObject Name="Text35" Left="510.3" Top="160.65" Width="141.75" Height="132.3" Border.Lines="All" Border.Width="2" Text="[ByRec.S]&#13;&#10;[ByRec.LCV]" HorzAlign="Right"/>
+      <TextObject Name="Text15" Left="340.2" Top="255.15" Width="75.6" Height="18.9" Text="код банку"/>
+      <TextObject Name="Text16" Left="321.3" Top="274.05" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="2" Text="[ByRec.MFOB]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text17" Left="18.9" Top="292.95" Width="670.95" Height="28.35" Text="Сума словами: [ByRec.SPROP]" VertAlign="Center"/>
+      <TextObject Name="Text10" Left="18.9" Top="321.3" Width="670.95" Height="37.8" Text="Призначення платежу: [ByRec.NAZN]"/>
+      <TextObject Name="Text18" Top="151.2" Width="302.4" Height="28.35" Text="[ByRec.BANK_A]" VertAlign="Center"/>
+      <TextObject Name="Text27" Top="274.05" Width="321.3" Height="18.9" Text="[ByRec.BANK_B]"/>
+      <TextObject Name="Text35" Left="548.1" Top="160.65" Width="141.75" Height="132.3" Border.Lines="All" Border.Width="2" Text="[ByRec.S]&#13;&#10;[ByRec.LCV]" HorzAlign="Right"/>
       <TextObject Name="Text1" Left="104" Top="29.95" Width="406.35" Height="37.8" Text="[ByRec.VOB_NAME]  N [ByRec.ND]&#13;&#10;від [ByRec.DATK]"/>
-      <TextObject Name="Text32" Left="519.75" Top="28.35" Width="75.6" Height="28.35" Border.Lines="All" Border.Width="2" Text="0410009" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text32" Left="529.2" Top="28.35" Width="75.6" Height="28.35" Border.Lines="All" Border.Width="2" Text="0410009" HorzAlign="Center" VertAlign="Center"/>
       <TextObject Name="Text23" Top="387.45" Width="103.95" Height="37.8" Text="ДР" VertAlign="Center"/>
       <TextObject Name="Text25" Left="47.25" Top="387.45" Width="132.3" Height="37.8" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
       <TextObject Name="Text33" Left="75.6" Top="463.05" Width="85.05" Height="18.9" Border.Lines="Bottom"/>
       <TextObject Name="Text19" Top="463.05" Width="66.15" Height="18.9" Text="Підписи"/>
       <TextObject Name="Text24" Left="463.05" Top="463.05" Width="103.95" Height="18.9" Text="Штамп банку"/>
       <TextObject Name="Text34" Left="75.6" Top="491.4" Width="85.05" Height="18.9" Border.Lines="Bottom"/>
-      <TextObject Name="Text22" Left="378" Top="160.65" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" Text=" [ByRec.NLSA]" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text26" Left="378" Top="274.05" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
-      <TextObject Name="Text28" Left="378" Top="255.15" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" Text=" [ByRec.NLSB]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text22" Left="415.8" Top="160.65" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" Text=" [ByRec.NLSA]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text26" Left="415.8" Top="274.05" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
+      <TextObject Name="Text28" Left="415.8" Top="255.15" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" Text=" [ByRec.NLSB]" HorzAlign="Center" VertAlign="Center"/>
       <TextObject Name="Text29" Left="396.9" Top="141.75" Width="132.3" Height="18.9" Text="ДЕБЕТ рах. N" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text37" Left="396.9" Top="236.25" Width="132.3" Height="18.9" Text="КРЕДИТ рах. N" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text38" Left="510.3" Top="274.05" Width="141.75" Height="18.9" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
-      <TextObject Name="Text39" Left="557.55" Top="378" Width="94.5" Height="37.8" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
-      <TextObject Name="Text21" Left="557.55" Top="141.75" Width="94.5" Height="18.9" Text="СУМА" HorzAlign="Center"/>
-      <TextObject Name="Text2" Left="-9.45" Top="538.65" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text40" Left="-9.45" Top="340.2" Width="661.5" Height="18.9" Border.Lines="Bottom" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text20" Top="359.1" Width="652.05" Height="18.9" VertAlign="Center"/>
-      <TextObject Name="Text30" Left="-9.45" Top="425.25" Width="661.5" Height="37.8" VertAlign="Center"/>
-      <TextObject Name="Text36" Left="-9.45" Top="510.3" Width="661.5" Height="47.25" VertAlign="Center"/>
+      <TextObject Name="Text37" Left="415.8" Top="236.25" Width="132.3" Height="18.9" Text="КРЕДИТ рах. N" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text38" Left="548.1" Top="274.05" Width="141.75" Height="18.9" VertAlign="Center"/>
+      <TextObject Name="Text39" Left="595.35" Top="378" Width="94.5" Height="37.8" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
+      <TextObject Name="Text21" Left="595.35" Top="141.75" Width="94.5" Height="18.9" Text="СУМА" HorzAlign="Center"/>
+      <TextObject Name="Text2" Left="28.35" Top="538.65" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text20" Left="18.9" Top="359.1" Width="670.95" Height="18.9" VertAlign="Center"/>
+      <TextObject Name="Text30" Left="28.35" Top="425.25" Width="661.5" Height="37.8" VertAlign="Center"/>
+      <TextObject Name="Text36" Left="28.35" Top="510.3" Width="661.5" Height="47.25" VertAlign="Center"/>
     </DataBand>
-    <DataBand Name="Data2" Top="626.25" Width="718.2" Height="18.9" DataSource="Table2">
+    <DataBand Name="Data2" Top="622.82" Width="718.2" Height="18.9" DataSource="Table2">
       <TableObject Name="Table4" Width="368.55" Height="18.9">
         <TableColumn Name="Column3" Width="368.55"/>
         <TableRow Name="Row3">
           <TableCell Name="Cell3" Text="[bis.BIS]"/>
         </TableRow>
       </TableObject>
-      <DataHeaderBand Name="DataHeader1" Top="603.35" Width="718.2" Height="18.9">
+      <DataHeaderBand Name="DataHeader1" Top="601.06" Width="718.2" Height="18.9">
         <TableObject Name="Table1" Width="368.55" Height="18.9">
           <TableColumn Name="Column1" Width="368.55"/>
           <TableRow Name="Row1">
@@ -95,6 +94,6 @@
         </TableObject>
       </DataHeaderBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="649.15" Width="718.2" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="644.58" Width="718.2" Height="18.9"/>
   </ReportPage>
 </Report>
