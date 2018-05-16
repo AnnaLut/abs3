@@ -194,7 +194,7 @@ END pkg_escr_reg_utl;
 CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
 
   g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.4 19/12/2017';
-  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.2 18/12/2017';
+  g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.3 05/05/2018';
 
   c_err_txt VARCHAR2(4000);
   --константи
@@ -963,7 +963,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
         BULK COLLECT
         INTO l_boiler_count, l_material_count, l_customer_okpo
         FROM escr_reg_header t
-       WHERE extract(YEAR FROM t.deal_date_from) = '2017'
+       WHERE extract(YEAR FROM t.deal_date_from) >= '2017'
        GROUP BY t.customer_okpo
       HAVING COUNT(*) > 1;
     END;
@@ -976,7 +976,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
           FROM escr_reg_header t
          WHERE substr(t.deal_product, 1, 6) IN
                ('220258', '220348', '220374')
-           AND extract(YEAR FROM t.deal_date_from) = '2017'
+           AND extract(YEAR FROM t.deal_date_from) >= '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
       IF l_deal_id.count > 0 THEN
@@ -999,7 +999,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_escr_reg_utl IS
           FROM escr_reg_header t
          WHERE substr(t.deal_product, 1, 6) IN
                ('220347', '220257', '220373')
-           AND extract(YEAR FROM t.deal_date_from) = '2017'
+           AND extract(YEAR FROM t.deal_date_from) >= '2017'
            AND t.customer_okpo IN (SELECT * FROM TABLE(l_customer_okpo));
       END;
       IF l_deal_id.count > 0 THEN
