@@ -1,8 +1,10 @@
 CREATE OR REPLACE PACKAGE cck IS
 
-  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.24.2  25/01/2018 ';
+  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.25  16/05/2018 ';
 
   /*
+   16.05.2018 Sta Вынос на просрочку тела КЛ после разделения   PROCEDURE cc_asp
+
    14.02.2018 Sta Анализ НЕ-нул.остатка комиссии перед выдачей кредита (при наличии доп.реквизита по комиссии)
    23.01.2017 LSO Додано призначення платежу для ручного розбіру
    15.02.2016 Sta Контроль пл.инструкций
@@ -1162,7 +1164,7 @@ END cck;
 CREATE OR REPLACE PACKAGE BODY cck IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.10  26/02/2018  ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.11  16.05.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -1179,6 +1181,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   /*
+16.05.2018 Sta Вынос на просрочку тела КЛ после разделения   PROCEDURE cc_asp
 26.02.2018 Sta Код вал Суб.дог определять не по счету SS, а по счету LIM
 
 22.02.2018 LSO Добавление субдоговоров для пролонгации CC_PROLONG
@@ -14567,68 +14570,34 @@ end if;
   BEGIN
 
     SELECT MAX(fdat) INTO l_dat1 FROM fdat WHERE fdat < gl.bdate; -- прошлый раб день
-    IF l_dat1 IS NULL THEN
-      RETURN;
-    END IF;
+    IF l_dat1 IS NULL THEN      RETURN;    END IF;
     SELECT MAX(fdat) INTO l_dat2 FROM fdat WHERE fdat < l_dat1; -- поза-прошлый раб день
-    IF l_dat2 IS NULL THEN
-      RETURN;
-    END IF;
+    IF l_dat2 IS NULL THEN      RETURN;    END IF;
     --------------------------------------
     pul.set_mas_ini('SP_KOL', to_char(l_kol), 'Кол.просроч.');
 
-    IF p_nd = -1 THEN
-      nd_    := 0;
-      l_vidd := 1;
-    ELSIF p_nd = -11 THEN
-      nd_    := 0;
-      l_vidd := 11;
-    ELSE
-      nd_    := p_nd;
-      l_vidd := NULL;
+    IF    p_nd = -1  THEN      nd_    := 0;      l_vidd := 1;
+    ELSIF p_nd = -11 THEN      nd_    := 0;      l_vidd := 11;
+    ELSE                       nd_    := p_nd;   l_vidd := NULL;
     END IF;
 
     dat7_    := gl.bdate - day_;
     l_branch := substr(pul.get_mas_ini_val('BRANCH'), 1, 30);
 
     --определение VOB для КД в инвалюте
-    BEGIN
-      SELECT vob
-        INTO l_vob46
-        FROM tts_vob
-       WHERE tt = 'ASP'
-         AND ord = 2;
-    EXCEPTION
-      WHEN no_data_found THEN
-        NULL;
+    BEGIN SELECT vob INTO l_vob46  FROM tts_vob   WHERE tt = 'ASP'  AND ord = 2;
+    EXCEPTION  WHEN no_data_found  THEN NULL;
     END;
 
     --цикл по договорам, которые имели факт просрочки в DAT7_  и имеют ее сейчас
     -- По ГПК !!!!
-    FOR k IN (SELECT a.acc8,
-                     a.ost,
-                     a.kv8,
-                     a.rnk,
-                     d.nd,
-                     d.cc_id,
-                     d.sdate,
-                     a.tobo,
-                     d.vidd
-                FROM cc_deal d,
-                     nd_acc n,
-                     (SELECT tobo, acc acc8, -ostc ost, kv kv8, rnk
-                        FROM accounts
-                       WHERE tip = 'LIM'
-                         AND ostc = ostb
-                         AND ostc < 0
-                         AND ostx <= 0) a
-               WHERE nd_ IN (0, d.nd)
-                 AND d.nd = n.nd
-                 AND n.acc = a.acc8
-                 AND nvl(d.branch, 0) LIKE
-                     nvl(l_branch || '%', nvl(d.branch, 0))
-                 AND (l_vidd IS NULL OR l_vidd = 1 AND d.vidd IN (1, 2, 3) OR
-                     l_vidd = 11 AND d.vidd IN (11, 12, 13))) LOOP
+    FOR k IN (SELECT a.acc8, a.ost, a.kv8, a.rnk, d.nd, d.cc_id, d.sdate, a.tobo, d.vidd, d.NDG 
+              FROM cc_deal d,  nd_acc n,   (SELECT tobo, acc acc8, -ostc ost, kv kv8, rnk FROM accounts WHERE tip = 'LIM'  AND ostc = ostb  AND ostc < 0 AND ostx <= 0) a
+              WHERE nd_ IN (0, d.nd)       AND d.nd = n.nd    AND n.acc = a.acc8
+                AND nvl(d.branch, 0) LIKE  nvl(l_branch || '%', nvl(d.branch, 0))
+                AND (l_vidd IS NULL OR l_vidd = 1 AND d.vidd IN (1, 2, 3) OR   l_vidd = 11 AND d.vidd IN (11, 12, 13))
+             ) 
+    LOOP
       /*
       --   условия обхода выноса на просрочку
       00  З канікулами. % за попередній день
@@ -14638,15 +14607,8 @@ end if;
       02  З канікулами. % альтернативний день
       12  Без каникул   % альтернативний день
       */
-      BEGIN
-        SELECT substr(t.txt, 1, 1)
-          INTO k_flags
-          FROM nd_txt t
-         WHERE t.nd = k.nd
-           AND t.tag = 'FLAGS';
-      EXCEPTION
-        WHEN no_data_found THEN
-          k_flags := '0';
+      BEGIN  SELECT substr(t.txt, 1, 1) INTO k_flags  FROM nd_txt t  WHERE t.nd = k.nd  AND t.tag = 'FLAGS';
+      EXCEPTION     WHEN no_data_found  THEN k_flags := '0';
       END;
 
       BEGIN
@@ -14656,27 +14618,11 @@ end if;
         --          ll.fdat  = пл.день по ГКП     = 03.08.2013 - суббота
         --          не выносим на просрочку
         -- ll - это платеж. кот орый должен состояться
-        SELECT l.*
-          INTO ll
-          FROM cc_lim l
-         WHERE nd = k.nd
-           AND fdat = (SELECT nvl(MAX(fdat), k.sdate)
-                         FROM cc_lim
-                        WHERE nd = l.nd
-                          AND fdat < gl.bdate);
-        IF NOT
-            (ll.fdat > l_dat2 AND ll.fdat <= l_dat1 AND ll.fdat <> k.sdate) THEN
-          GOTO nexrec;
-        END IF;
-      EXCEPTION
-        WHEN no_data_found THEN
-          GOTO nexrec;
+        SELECT l.* INTO ll FROM cc_lim l WHERE nd = k.nd AND fdat = (SELECT nvl(MAX(fdat), k.sdate)  FROM cc_lim  WHERE nd = l.nd AND fdat < gl.bdate);
+        IF NOT  (ll.fdat > l_dat2 AND ll.fdat <= l_dat1  AND ll.fdat <> k.sdate) THEN GOTO nexrec;   END IF;
+      EXCEPTION    WHEN no_data_found THEN                                            GOTO nexrec;
       END;
-      -- нет просрочки по сумме и нет обязательности платежа
-      IF NOT (k.ost > ll.lim2 OR k_flags = '1') THEN
-        GOTO nexrec;
-      END IF;
-
+      IF NOT (k.ost > ll.lim2 OR k_flags = '1') THEN                                  GOTO nexrec;   END IF; --- нет просрочки по сумме и нет обязательности платежа
       -------------------------------------------
       --общая сумма просрочки ПО СУММЕ и лимиту(перенесенной + неперенесенной)
       s7_ := k.ost - ll.lim2;
@@ -14684,205 +14630,106 @@ end if;
       -- ПРОВЕРКА ПО ЛИМИТУ
       --минус сумму, уже перенесенную на просрочку ранее
 
-      SELECT gl.p_ncurval(k.kv8,
-                          SUM(gl.p_icurval(a.kv, a.ostc, gl.bdate)),
-                          gl.bdate)
-        INTO s8_
-        FROM accounts a, nd_acc n
-       WHERE a.tip = 'SP '
-         AND a.accc = k.acc8
-         AND a.acc = n.acc
-         AND n.nd = k.nd;
+--Sta 16.05.2018
+      SELECT gl.p_ncurval(k.kv8,  SUM(gl.p_icurval(a.kv, a.ostc, gl.bdate)),   gl.bdate)    INTO s8_   FROM accounts a, nd_acc n
+      WHERE a.tip = 'SP '  AND a.acc = n.acc  AND n.nd in ( select x.nd from cc_deal x where k.nd = NVL( x.NDG, x.ND) ) ;  -- AND a.accc = k.acc8
+
       s8_ := nvl(s8_, 0);
       s7_ := s7_ + s8_;
 
       -- ПРОВЕРКА ПО ПЛАТЕЖУ
       IF k_flags = '1' THEN
-        -- PLAN_POG_
-        -- узнаем сколько погашено относительно последнего платежа
-        -- с контролем что перплачено и выдаем отриц-ное число или 0
+         -- PLAN_POG_
+         -- узнаем сколько погашено относительно последнего платежа
+         -- с контролем что перплачено и выдаем отриц-ное число или 0
+         -- столько ожидали ll.sumg
+         -- Пред плат.день (Учет вых.дней, которые м.б. в только ГПК ФЛ)
 
-        --столько ожидали ll.sumg
+         SELECT nvl(MAX(fdat), k.sdate)  INTO k_fdat1  FROM cc_lim  WHERE nd = k.nd   AND fdat < ll.fdat      AND sumg > 0;
+         IF k.vidd IN (11, 12, 13)       THEN k_fdat1 := cck_app.correctdate2(980, k_fdat1, 1);  END IF;
 
-        -- Пред плат.день (Учет вых.дней, которые м.б. в только ГПК ФЛ)
-        SELECT nvl(MAX(fdat), k.sdate)
-          INTO k_fdat1
-          FROM cc_lim
-         WHERE nd = k.nd
-           AND fdat < ll.fdat
-           AND sumg > 0;
+         -- столько реально погашено за платежный период  (ТОЛЬКО НОРМАЛЬНОЕ ТЕЛО !!!)
 
-        IF k.vidd IN (11, 12, 13) THEN
-          k_fdat1 := cck_app.correctdate2(980, k_fdat1, 1);
-        END IF;
+--Sta 16.05.2018
+         SELECT nvl ( SUM ( gl.p_icurval(a.kv,  decode(a.tip, 'SS ', s.kos, 0),  gl.bdate)),    0) 
+              - nvl ( SUM ( gl.p_icurval(a.kv,  decode(a.tip, 'SP ', s.dos, 0),  gl.bdate)),    0)
+         INTO l_s_pay
+         FROM accounts a, nd_acc n, saldoa s
+          WHERE n.nd  in ( select x.nd from cc_deal x where k.nd = NVL( x.NDG, x.ND) )   -- AND a.accc = k.acc8 k.nd
+            AND n.acc = a.acc    AND a.tip IN ('SS ', 'SP ')  AND s.acc = a.acc    AND s.fdat > k_fdat1  AND s.fdat <= ll.fdat;
 
-        -- столько реально погашено за платежный период  (ТОЛЬКО НОРМАЛЬНОЕ ТЕЛО !!!)
-        SELECT nvl(SUM(gl.p_icurval(a.kv,
-                                    decode(a.tip, 'SS ', s.kos, 0),
-                                    gl.bdate)),
-                   0) - nvl(SUM(gl.p_icurval(a.kv,
-                                             decode(a.tip, 'SP ', s.dos, 0),
-                                             gl.bdate)),
-                            0)
-          INTO l_s_pay
-          FROM accounts a, nd_acc n, saldoa s
-         WHERE n.nd = k.nd
-           AND n.acc = a.acc
-           AND a.tip IN ('SS ', 'SP ')
-           AND s.acc = a.acc
-           AND s.fdat > k_fdat1
-           AND s.fdat <= ll.fdat;
+         l_s_pay := greatest(nvl(l_s_pay, 0), 0);
+         IF l_s_pay <> 0 AND k.kv8 <> gl.baseval THEN       l_s_pay := gl.p_ncurval(k.kv8, l_s_pay, gl.bdate);     END IF;
 
-        l_s_pay := greatest(nvl(l_s_pay, 0), 0);
+         -- Клиент недогасил и проверяем что уже данный платеж мы не выносили
+         s8_ := 0;
 
-        IF l_s_pay <> 0 AND k.kv8 <> gl.baseval THEN
-          l_s_pay := gl.p_ncurval(k.kv8, l_s_pay, gl.bdate);
-        END IF;
-        -- Клиент недогасил и проверяем что уже данный платеж мы не выносили
-        s8_ := 0;
-
-        IF ll.sumg > l_s_pay THEN
-
-          SELECT nvl(SUM(gl.p_icurval(a.kv, s.kos, gl.bdate)), 0)
-            INTO s8_
-            FROM accounts a, nd_acc n, saldoa s
-           WHERE n.nd = k.nd
-             AND n.acc = a.acc
-             AND a.tip = 'SS '
-             AND s.acc = a.acc
-             AND s.fdat > ll.fdat;
-          IF s8_ <> 0 AND k.kv8 <> gl.baseval THEN
-            s8_ := gl.p_ncurval(k.kv8, s8_, gl.bdate);
-          END IF;
-
-        END IF;
-        s7_ := greatest(s7_, (ll.sumg - l_s_pay - s8_), 0);
+         IF ll.sumg > l_s_pay THEN
+-- Sta 16.05.2018
+            SELECT nvl(SUM(gl.p_icurval(a.kv, s.kos, gl.bdate)), 0)        INTO s8_       FROM accounts a, nd_acc n, saldoa s
+            WHERE n.nd in ( select x.nd from cc_deal x where k.nd = NVL( x.NDG, x.ND) )   -- AND a.accc = k.acc8 k.nd 
+              AND n.acc = a.acc   AND a.tip = 'SS '   AND s.acc = a.acc   AND s.fdat > ll.fdat;
+            IF s8_ <> 0 AND k.kv8 <> gl.baseval THEN    s8_ := gl.p_ncurval(k.kv8, s8_, gl.bdate);    END IF;
+         END IF;
+         s7_ := greatest(s7_, (ll.sumg - l_s_pay - s8_), 0);
       END IF;
-      IF s7_ <= 0 THEN
-        GOTO nexrec;
-      END IF;
+
+      IF s7_ <= 0 THEN   GOTO nexrec;   END IF;
       --------------------------
+
       --есть чего еще переносить
       UPDATE cc_deal SET sos = 13 WHERE nd = k.nd;
+--Sta 16.05.2018
+      FOR p IN (SELECT a.kv, a.nls nlsk, substr(a.nms,1,38) nmsk, least(- (s.ostf-s.dos+s.kos), -a.ostc) ss, a.isp, a.grp, p.s080, a.mdate, a.acc, n.ND , a.ACCC
+                FROM accounts a, saldoa s, specparam p, nd_acc n
+                WHERE a.acc = p.acc(+)  AND a.tip  = 'SS '   AND a.acc   = s.acc   AND a.acc = n.acc    AND a.ostc < 0   AND s.ostf-s.dos+s.kos < 0  
+                  AND n.nd in (select nd from cc_deal where NVL( ndg,nd ) = k.nd )
+--                AND a.accc = k.acc8  
+                  AND a.ostc = a.ostb  AND s.fdat = (SELECT MAX(fdat)  FROM saldoa  WHERE acc = s.acc  AND fdat <= dat7_  )
+                ORDER BY  a.mdate, s.fdat
+                ) 
+      LOOP  -- S7_ уменьшаемая сумма несделенной просрочки в вал LIM
+         IF s7_ <= 0 THEN    EXIT;     END IF; --больше не надо.
+         ----------------------------------------------------
+         --уменьшаемая сумма несделенной просрочки в вал SS
+         IF    p.kv  = k.kv8      THEN          q7_ := s7_;
+         ELSIF p.kv  = gl.baseval THEN          q7_ := gl.p_icurval(k.kv8, s7_, gl.bdate);
+         ELSIF k.kv8 = gl.baseval THEN          q7_ := gl.p_ncurval(p.kv , s7_, gl.bdate);
+         ELSE                                   q7_ := gl.p_ncurval(p.kv , gl.p_icurval(k.kv8, s7_, gl.bdate),    gl.bdate);
+         END IF;
+         s_ := least(p.ss, q7_);
 
-      --цикл по счетам SS данного договора
-      FOR p IN (SELECT a.kv,
-                       a.nls nlsk,
-                       substr(a.nms, 1, 38) nmsk,
-                       least(- (s.ostf - s.dos + s.kos), -a.ostc) ss,
-                       a.isp,
-                       a.grp,
-                       p.s080,
-                       a.mdate,
-                       a.acc
-                  FROM accounts a, saldoa s, specparam p, nd_acc n
-                 WHERE a.acc = p.acc(+)
-                   AND a.tip = 'SS '
-                   AND a.acc = s.acc
-                   AND a.acc = n.acc
-                   AND n.nd = k.nd
-                   AND a.ostc < 0
-                   AND s.ostf - s.dos + s.kos < 0
-                   AND a.accc = k.acc8
-                   AND a.ostc = a.ostb
-                   AND (s.acc, s.fdat) = (SELECT acc, MAX(fdat)
-                                            FROM saldoa
-                                           WHERE acc = s.acc
-                                             AND fdat <= dat7_
-                                           GROUP BY acc)
-                 ORDER BY a.mdate, s.fdat) LOOP
+         --Сумма в вал LIM, которую можно еще перенести на просрочку
+         IF    k.kv8 = p.kv       THEN          q_ := s_;
+         ELSIF k.kv8 = gl.baseval THEN          q_ := gl.p_icurval(p.kv , s_, gl.bdate);
+         ELSIF p.kv  = gl.baseval THEN          q_ := gl.p_ncurval(k.kv8, s_, gl.bdate);
+         ELSE                                   q_ := gl.p_ncurval(k.kv8, gl.p_icurval(p.kv, s_, gl.bdate),    gl.bdate);
+         END IF;
 
-        -- S7_ уменьшаемая сумма несделенной просрочки в вал LIM
-        IF s7_ <= 0 THEN
-          EXIT;
-        END IF; --больше не надо.
-        ----------------------------------------------------
-        --уменьшаемая сумма несделенной просрочки в вал SS
-        IF p.kv = k.kv8 THEN
-          q7_ := s7_;
-        ELSIF p.kv = gl.baseval THEN
-          q7_ := gl.p_icurval(k.kv8, s7_, gl.bdate);
-        ELSIF k.kv8 = gl.baseval THEN
-          q7_ := gl.p_ncurval(p.kv, s7_, gl.bdate);
-        ELSE
-          q7_ := gl.p_ncurval(p.kv,
-                              gl.p_icurval(k.kv8, s7_, gl.bdate),
-                              gl.bdate);
-        END IF;
-
-        s_ := least(p.ss, q7_);
-
-        --Сумма в вал LIM, которую можно еще перенести на просрочку
-        IF k.kv8 = p.kv THEN
-          q_ := s_;
-        ELSIF k.kv8 = gl.baseval THEN
-          q_ := gl.p_icurval(p.kv, s_, gl.bdate);
-        ELSIF p.kv = gl.baseval THEN
-          q_ := gl.p_ncurval(k.kv8, s_, gl.bdate);
-        ELSE
-          q_ := gl.p_ncurval(k.kv8,
-                             gl.p_icurval(p.kv, s_, gl.bdate),
-                             gl.bdate);
-        END IF;
-
-        --начало транзакции
-        SAVEPOINT do_pr7;
-        BEGIN
-          cck.cc_asp111(cc_kvsd8,
-                        dat7_,
-                        l_vob46,
-                        k.nd,
-                        k.acc8,
-                        p.kv,
-                        p.isp,
-                        p.grp,
-                        p.s080,
-                        p.mdate,
-                        p.nmsk,
-                        p.nlsk,
-                        k.cc_id,
-                        k.sdate,
-                        s_);
-          s7_      := s7_ - q_;
-          i_commit := i_commit + 1;
-        EXCEPTION
-          WHEN OTHERS THEN
-            ROLLBACK TO do_pr7;
-            BEGIN
-              logger.info('CCK_ASP ош.реф КД=' || k.nd);
-              GOTO kin7_;
-            END;
-        END;
-        --конец транзакции---------------
-        <<kin7_>>
-        NULL;
-
+         --начало транзакции
+         SAVEPOINT do_pr7;
+         BEGIN
+--Sta 16.05.2018
+--          cck.cc_asp111(cc_kvsd8, dat7_, l_vob46, k.nd, k.acc8, p.kv, p.isp, p.grp, p.s080, p.mdate, p.nmsk, p.nlsk, k.cc_id, k.sdate, s_ );
+            cck.cc_asp111(cc_kvsd8, dat7_, l_vob46, P.nd, p.ACCC, p.kv, p.isp, p.grp, p.s080, p.mdate, p.nmsk, p.nlsk, k.cc_id, k.sdate, s_ );
+            s7_      := s7_ - q_;
+            i_commit := i_commit + 1;
+         EXCEPTION  WHEN OTHERS THEN   ROLLBACK TO do_pr7;
+            BEGIN  logger.info('CCK_ASP ош.реф КД=' || k.nd);  GOTO kin7_;  END;
+         END;
+         --конец транзакции---------------
+         <<kin7_>>    NULL;
       END LOOP; --конец цикла по счетам SS одного договора
 
-      IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN
-        COMMIT;
-        l_kol    := l_kol + i_commit;
-        i_commit := 0;
-      END IF;
-
-      <<nexrec>>
-      NULL;
+      IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN    COMMIT;    l_kol    := l_kol + i_commit;     i_commit := 0;   END IF;
+      <<nexrec>>  NULL;
     END LOOP; --конец цикла по ДОГОВОРАМ по ГПК
     ------------------------------------------------
-    IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN
-      COMMIT;
-      l_kol    := l_kol + i_commit;
-      i_commit := 0;
-    END IF;
-
+    IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN      COMMIT;    l_kol    := l_kol + i_commit;     i_commit := 0;   END IF;
     l_kol := l_kol + i_commit;
 
-    IF nvl(g_reports, 0) = 0 THEN
-      COMMIT;
-    END IF;
-
+    IF nvl(g_reports, 0) = 0 THEN      COMMIT;    END IF;
     pul.set_mas_ini('SP_KOL', to_char(l_kol), 'Кол.просроч.');
-
     i_commit := 0;
 
   END cc_asp;
