@@ -1738,7 +1738,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
        WHERE (acc = p_acc OR kv = p_kv AND nls = p_nls);
       --      If aa.tip = 'LIM'      then  raise_application_error(  -(20203), '\ Виведення рах '||aa.nls||'*LIM недопустимо!' );  end if ;
       IF (aa.nbs LIKE '20_%' OR aa.nbs LIKE '22_%' OR aa.tip = 'LIM') THEN
-       if aa.tip = 'SPN' or aa.tip = 'SNO' then -- Временно для разделения линий
+       if aa.tip = 'SPN' or aa.tip = 'SNO' or aa.tip = 'SS ' or aa.tip = 'SP ' or aa.tip = 'SN ' then -- Временно для разделения линий
          null;
        else	   
         raise_application_error(-20203,
