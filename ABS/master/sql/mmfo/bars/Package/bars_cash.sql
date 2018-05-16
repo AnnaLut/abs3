@@ -16,7 +16,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_HEAD      constant varchar2(64)  := 'version 2.1  31.05.2011';
+    VERSION_BODY      constant varchar2(64)  := 'version 6.4 15.05.2018';
 
     -----------------------------------------------------------------
     -- Переменные
@@ -278,7 +278,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 6.2 15.03.2018';
+    VERSION_BODY      constant varchar2(64)  := 'version 6.4 15.05.2018';
     G_MODULE          constant varchar2(4)   := 'CSH';
     G_CASH_JOURNAL    constant varchar2(4)   := 'CJ';
     G_SVOD_DAY        constant varchar2(4)   := 'SD';
