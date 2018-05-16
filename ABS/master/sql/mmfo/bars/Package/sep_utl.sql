@@ -46,8 +46,6 @@ procedure unlock_by_sum_blk(p_sum number,
 procedure  copy_operw ( p_ref_new operw.ref%TYPE,p_ref_old operw.ref%TYPE);
 end;
 /
-
-
 CREATE OR REPLACE PACKAGE BODY BARS."SEP_UTL" is
 --***************************************************************--
 --              Communication with NBU Payment System
@@ -582,10 +580,10 @@ begin
       from operw w
      where w.ref = p_ref_old;
 begin
-select mfoa,mfob into l_mfoa_new,l_mfob_new from oper where ref= p_ref_new;
+select /*mfoa,*/mfob into /*l_mfoa_new,*/l_mfob_new from oper where ref= p_ref_new;
 exception
       when no_data_found then
-        l_mfoa_new:=null;
+        --l_mfoa_new:=null;
         l_mfob_new:=null;
 end;
   for i in (select *
@@ -595,7 +593,7 @@ end;
              where o.ref = p_ref_old
                and o.d_rec like ('%#fMT%')
                and t.otm = 0) loop
-   if l_mfob_new ='300465' and l_mfoa_new ='300465' then
+   if l_mfob_new ='300465' /*and l_mfoa_new ='300465'*/ then
     begin
           insert into operw
         (ref, tag, value)
