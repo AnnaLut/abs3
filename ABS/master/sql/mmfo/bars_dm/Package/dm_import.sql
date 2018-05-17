@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 4.0.1 27/03/2018 '; -- DIY-parallel
+    g_header_version  constant varchar2(64)  := 'version 4.0.2 17/05/2018 '; -- DIY-parallel
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -223,7 +223,7 @@ Show errors;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 4.0.4 19/03/2018';
+    g_body_version constant varchar2(64) := 'Version 4.0.2 17/05/2018';
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
 	-- # COBUMMFO-6343
@@ -4488,7 +4488,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         l_ourmfo       varchar2(6) := sys_context('bars_context', 'user_mfo');
         
         -- общий запрос
-        q_str          varchar2(32000);
+        q_str      clob:='';    --varchar2(32000);
         -- цель для вставки
         q_insert       varchar2(10000);
         -- измененные записи (дельта)

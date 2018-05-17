@@ -56,23 +56,69 @@ alter table bars_dm.test_customers_plt modify merried varchar2(500);
 prompt alter column adr_work_adr modify varchar2(100)
 alter table bars_dm.test_customers_plt modify ADR_WORK_ADR VARCHAR2(100);
 
-prompt copy data to temp table
+prompt make partition with period
 begin
-    for rec in (select distinct per_id from bars_dm.CUSTOMERS_PLT order by per_id)
+    for rec in (select distinct per_id from bars_dm.CUSTOMERS_PLT where per_id>=1192 order by per_id)
         loop
             execute immediate 'alter table bars_dm.test_CUSTOMERS_PLT add partition P'||rec.per_id||' values ('||rec.per_id||')';
-            insert into bars_dm.test_CUSTOMERS_PLT select * from bars_dm.CUSTOMERS_PLT where per_id = rec.per_id;
-            commit;
         end loop;
 end;
 /
+prompt begin insert into table bars_dm.test_CUSTOMERS_PLT in parallels
+
+declare
+ task_doesnt_exist exception;
+ pragma exception_init(task_doesnt_exist, -29498);
+ l_errmsg    varchar2(512);
+ l_mfo_cnt    number; 
+ c_task_name  constant varchar2(32) := 'LOAD';
+ l_chunk_stmt varchar2(128) := 'select kf as START_ID, kf as END_ID from bars.mv_kf';
+ l_task_statement varchar2(4000) := '
+ begin
+      insert into bars_dm.test_CUSTOMERS_PLT select * from bars_dm.CUSTOMERS_PLT where per_id>=1192 and kf between :START_ID and :END_ID;
+      commit;
+ end; '; 
+begin
+     -- получаем число МФО для паралеллизма
+     select count(*) into l_mfo_cnt from bars.mv_kf;      
+     -- drop task if exists
+     begin
+          DBMS_PARALLEL_EXECUTE.DROP_TASK (c_task_name); 
+     exception
+              when task_doesnt_exist then 
+              null;
+     end;
+     -- step 0
+     dbms_parallel_execute.create_task(c_task_name);
+     -- step 1
+     dbms_parallel_execute.create_chunks_by_sql(task_name => c_task_name,
+                                                sql_stmt  => l_chunk_stmt,
+                                                by_rowid  => false);
+     -- step 2                                         
+     dbms_parallel_execute.run_task(task_name => c_task_name,
+                                    sql_stmt  => l_task_statement,
+                                    language_flag  => dbms_sql.native,
+                                    parallel_level => l_mfo_cnt+1);
+exception
+     when others then
+     -- если что-то случилось с паралеллизмом - удаляем задачу и логируем ошибку *  
+     DBMS_PARALLEL_EXECUTE.DROP_TASK (c_task_name); 
+     l_errmsg :=substr(' Error: '
+                              ||dbms_utility.format_error_stack()||chr(10)
+                              ||dbms_utility.format_error_backtrace()
+                              , 1, 512);
+     bars.bars_audit.error(l_errmsg);
+end;
+/
+
+prompt end insert into table bars_dm.test_CUSTOMERS_PLT in parallels
 
 prompt drop original table and rename temp to original
 declare
 l_orig_cnt number;
 l_tmp_cnt number;
 begin
-    select count(*) into l_orig_cnt from bars_dm.CUSTOMERS_PLT;
+    select count(*) into l_orig_cnt from bars_dm.CUSTOMERS_PLT where  per_id>=1192;
     select count(*) into l_tmp_cnt from bars_dm.test_CUSTOMERS_PLT;
     dbms_output.put_line('CUSTOMERS_PLT COUNT = ' || l_orig_cnt);
     dbms_output.put_line('TEST_CUSTOMERS_PLT COUNT = ' || l_tmp_cnt);
