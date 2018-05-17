@@ -88,12 +88,11 @@ BEGIN
            l_err := l_err ||'7-';
           -- обновляем параметры депозита 
            begin
-              INSERT INTO dpt_depositw (dpt_id, tag, value, branch)
-              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval), i.branch);
+              INSERT INTO dpt_depositw (dpt_id, tag, value)
+              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval));
            exception when dup_val_on_index then
               update dpt_depositw
-              set value = to_char(l_bonusval),
-               branch = i.branch
+              set value = to_char(l_bonusval)
               where tag = 'BONUS' and dpt_id = i.deposit_id;
             end;
             l_err := l_err ||'8-';

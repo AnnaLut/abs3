@@ -385,7 +385,7 @@ BEGIN
     WHERE rnk = p_rnk
       AND NBS = 2625
       AND OB22 IN ('24', '27', '31')
-      AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'));
+      AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'))-1;
     
     l_ZPcard_count := l_ZPcard_count + l_cnt;
    /* bars_audit.trace('%s кол-во ЗП-карт = %s', l_title, to_char(l_cnt));
