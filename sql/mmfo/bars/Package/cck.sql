@@ -11632,7 +11632,7 @@ end if;
     cck.cc_gpk_lim(nd_, l_acc, l_bdat_1, l_datn_, l_sum1_);
 
 --  cck_ui.gpk_bal(nd_, NULL);
-    EXECUTE IMMEDIATE  'begin cck_ui.gpk_bal( :nd, NULL) end;'    USING nd_;
+    EXECUTE IMMEDIATE  'begin cck_ui.gpk_bal( :nd, NULL); end;'    USING nd_;
 
     /*    bars_audit.info('cck.cc_gpk_lim nd_=' || nd_ || ', l_acc=' || l_acc ||
     ' ,L_bdat_1=' || l_bdat_1 || ' ,l_datn_=' || l_datn_ ||
