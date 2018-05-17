@@ -1164,7 +1164,7 @@ END cck;
 CREATE OR REPLACE PACKAGE BODY cck IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.2.11  16.05.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.05  17.05.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -1181,9 +1181,10 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   /*
+17.05.2018 Sta  PROCEDURE cc_day_lim + PROCEDURE lim_bdate  Обновление cc_deal.limit, cc_add.s, accounts.ostx по суб.дог
+
 16.05.2018 Sta Вынос на просрочку тела КЛ после разделения   PROCEDURE cc_asp
 26.02.2018 Sta Код вал Суб.дог определять не по счету SS, а по счету LIM
-
 22.02.2018 LSO Добавление субдоговоров для пролонгации CC_PROLONG
 22.02.2018 Sta Манипуляции псо счетом SG
   29.12.2016 Sta COBUSUPABS-5046
@@ -2021,29 +2022,26 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   ------------------------------------------------------
 
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
-  PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS
-    ll cc_lim%ROWTYPE;
+  PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS    ll cc_lim%ROWTYPE; l_Kv8 int; 
+       
   BEGIN
-    BEGIN
-      /* есть изменение лимита */
-      SELECT l.*
-        INTO ll
-        FROM cc_lim l
-       WHERE l.nd = p_nd
-         AND l.fdat = (SELECT MAX(fdat)
-                         FROM cc_lim
-                        WHERE nd = p_nd
-                          AND fdat <= nvl(p_dat, gl.bdate));
-      UPDATE accounts SET ostx = -ll.lim2, pap = 1 WHERE acc = ll.acc;
-      UPDATE cc_deal SET LIMIT = ll.lim2 / 100 WHERE nd = p_nd;
-      UPDATE cc_add
-         SET s = ll.lim2 / 100
-       WHERE nd = p_nd
-         AND adds = 0;
-    EXCEPTION
-      WHEN no_data_found THEN
-        NULL;
+    BEGIN SELECT l.* INTO ll    FROM cc_lim l WHERE l.nd = p_nd AND l.fdat = (SELECT MAX(fdat) FROM cc_lim WHERE nd = p_nd  AND fdat <= nvl(p_dat, gl.bdate));  ---       есть изменение лимита 
+          UPDATE accounts SET   ostx  = -ll.lim2, pap = 1 WHERE acc = ll.acc;
+          UPDATE cc_deal  SET   LIMIT =  ll.lim2 / 100    WHERE nd = p_nd;
+          UPDATE cc_add   SET   s     =  ll.lim2 / 100    WHERE nd = p_nd  AND adds = 0;
+
+          select ND  into  ll.ND from cc_deal   where nd  = p_ND and ndg= nd;
+          select kv  into  l_KV8 from accounts  where acc = ll.acc ;
+          for d in (select a.kv , a.acc, a.ostx, x.nd FROM cc_deal x, accounts a , nd_acc n where x.ndg != x.nd and n.nd = x.nd and a.acc = n.acc and a.tip ='LIM' and x.ndg = p_ND)
+          loop  d.ostx := gl.p_Ncurval( d.KV , gl.p_icurval( l_kv8, -ll.lim2, gl.bdate) , gl.bdate) ;
+                update accounts set ostx  = d.ostx , pap = 3  where acc = d.acc ;
+                d.ostx := - d.ostx /100;
+                update cc_deal  set limit = d.ostx where nd = d.nd;
+                update cc_add   set s     = d.ostx where nd = d.nd;          
+          end loop  ;  -- d
+    EXCEPTION  WHEN no_data_found THEN     NULL;  
     END;
+
   END lim_bdate;
 
   -- расчет суммы процентов в удельном весе по ГПК за период ( рекомендовано для ануитета)
@@ -9367,6 +9365,33 @@ end if;
   END multi_int;
   ----------------------------------------------------------------------------------------------------------
 
+  Procedure RE_ost8 (p_nd number)   is l_ostc number ;
+  begin
+
+    -- простые КД
+    FOR d1 in ( SELECT d.nd, a.acc, a.ostc FROM cc_deal d, nd_acc n, accounts a  
+                WHERE  d.vidd in (1,11) and n.nd = d.nd  AND n.acc = a.acc  AND a.tip ='LIM' and d.sos >=10 and d.sos <14 
+                  and  p_nd in ( 0, d.nd )  and d.nd <> nvl( d.ndg,0)
+              )
+    loop l_ostc := 0;
+       for s1 in (select a.acc, nvl(a.accc,0) ACCC, a.OSTC FROM nd_acc n, accounts a WHERE n.nd = d1.nd  AND n.acc = a.acc  AND a.tip IN ('SS ', 'SP' ) )
+       loop l_ostc := l_ostC + s1.ostc ; 
+            If s1.ACCC <> d1.ACC then  update accounts a set a.accc = d1.acc where a.acc = s1.acc ; end if ;
+       end loop; -- s1
+       If l_ostc <> d1.ostc      then  update accounts a set a.ostc = l_ostc where a.acc = d1.acc ; end if ;
+    end loop ; -- d1
+
+    -- Сложные простые КД
+    FOR d2 in ( SELECT d.nd, a.kv, a.acc, a.ostc FROM cc_deal d, nd_acc n, accounts a  
+                WHERE  d.vidd not in (1,11) and n.nd = d.nd  AND n.acc = a.acc  AND a.tip ='LIM' and d.sos >=10 and d.sos <14 
+                  and  p_nd in ( 0, d.nd )  and d.nd = d.ndg
+              )
+    loop select nvl( sum(  gl.p_Ncurval ( d2.kv, gl.p_icurval ( s2.kv, s2.ostc, gl.bdate),  gl.bdate ) ), 0 )  into l_ostc from accounts s2 where  accc = d2.acc;
+         If l_ostc <> d2.ostc   then  update accounts a set a.ostc = l_ostc where a.acc = d2.acc ; end if ;
+    end loop ; -- d2
+  end ;
+  ------------------------------------
+
   PROCEDURE cc_day_lim(fdat_ DATE, nn_ INT) IS
 
     /* 1. Актуализация текущим лимитом дня.
@@ -9377,7 +9402,6 @@ end if;
     a8     accounts%ROWTYPE;
     s_     NUMBER;
     ss_    NUMBER;
-    datp_  DATE := fdat_ - 1; -- прошлый раб.день
     par_   CHAR(1) := nvl(getglobaloption('CC_GPK'), '0');
     par1_  CHAR(1);
     s1_    NUMBER;
@@ -9388,228 +9412,81 @@ end if;
     ibank_ CHAR(1) := nvl(getglobaloption('IBANK'), '0');
     l_cnt  NUMBER;
     l_accs NUMBER;
+
+
   BEGIN
-    BEGIN
-      SELECT MAX(fdat) INTO datp_ FROM fdat WHERE fdat < fdat_;
-    EXCEPTION
-      WHEN no_data_found THEN
-        datp_ := fdat_ - 1;
-    END;
 
-    -- 0. Аварийное Исправление остатка на счете 8999
-    IF nn_ = 0 THEN
-      FOR k1 IN (SELECT d.nd, a8.acc acc8
-                   FROM cc_deal d, nd_acc n8, accounts a8
-                 -------------where d.sos >= 10 and d.sos < 14 and d.vidd in (1,2,3,11,12,13) ---- по согласованис с Новиков --- 08.01.2015
-                  WHERE d.sos >= 10
-                    AND d.sos < 14
-                    AND d.vidd IN (1, 2, 11, 12)
-                    AND d.nd = n8.nd -- была опечатка
-                    AND n8.acc = a8.acc
-                    AND a8.tip = 'LIM'
-                    AND a8.ostc <>
-                        (SELECT SUM(ostc)
-                           FROM nd_acc n, accounts a
-                          WHERE n.nd = d.nd -- была опечатка
-                            AND n.acc = a.acc
-                            AND a.tip IN ('SS ', 'SP', 'SL '))) LOOP
-        FOR s1 IN (SELECT a.*
-                     FROM accounts a, nd_acc n
-                    WHERE n.nd = k1.nd
-                      AND n.acc = a.acc
-                      AND a.dazs IS NULL) LOOP
-          -- сделать «полную ревизию»  на правильность установки АССС и типа счета:
-          IF s1.tip IN ('SS ', 'SP ', 'SL ') THEN
-            --- 1) Установить АССС для типов SS, SP, SL
-            IF nvl(s1.accc, 0) <> k1.acc8 THEN
-              UPDATE accounts SET accc = k1.acc8 WHERE acc = s1.acc;
-            END IF;
-          ELSE
-            --- 2) Отменить АССС всех для типов, кроме SS, SP, SL
-            IF s1.accc = k1.acc8 THEN
-              UPDATE accounts SET accc = NULL WHERE acc = s1.acc;
-            END IF;
+    -- IF nn_ = 0 THEN  RE_ost8 (0) ;  END IF; -- 0. Аварийное Исправление остатка на счете 8999
+    -----------------------------------------------------
+    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_)) 
+    LOOP
+       cck.set_floating_rate(p_nd => k.nd);                -- пересмотр плавающей % ставки
+       cck.lim_bdate(p_nd => k.nd, p_dat => fdat_);        -- установка cc_deal.limit,  cc_add.s, accounts.ostx
+
+       ---  Обновление cc_add.ACCS
+       SELECT MIN(a.acc)  INTO l_accs  FROM accounts a, nd_acc n WHERE a.acc = n.acc  AND n.nd = k.nd  AND a.tip IN ('SS ', 'SP ')   AND dazs IS NULL;
+       IF l_accs IS NOT NULL THEN   UPDATE cc_add  SET accs = l_accs   WHERE nd = k.nd   AND adds = 0    AND nvl(accs, 0) <> l_accs ;  END IF;
+
+       -- пересмотр поля SOS
+       IF k.sos >= 10 THEN   
+          SELECT nvl(SUM(a.ostc), 0), nvl(SUM(a.ostb), 0)  INTO s_, ss_ FROM accounts a, nd_acc n WHERE n.nd = k.nd   AND n.acc = a.acc AND a.tip IN ('SP ', 'SPN', 'SK9', 'SL ', 'SLN', 'SLK');
+          IF s_ = ss_ THEN   
+             IF s_ = 0 AND k.wdate - fdat_ >= 0 AND k.sos > 10  THEN    UPDATE cc_deal SET sos = 10 WHERE nd = k.nd;  END IF;
+             IF k.sos = 10 AND (s_ != 0 OR k.wdate - fdat_ < 0) THEN    UPDATE cc_deal SET sos = 13 WHERE nd = k.nd;  END IF;
           END IF;
-        END LOOP;
+       END IF;
 
-        cc_start(k1.nd);
+       -- Все-таки найти ACC8_
+       BEGIN  SELECT acc INTO a8.acc FROM cc_lim   WHERE nd  = k.nd   AND rownum = 1;
+              SELECT *   INTO a8     FROM accounts WHERE acc = a8.acc ;
+       EXCEPTION  WHEN no_data_found THEN  GOTO kin_k;
+       END;
 
-      END LOOP;
-    END IF;
+       IF ibank_ = '1' THEN
+          -- Реально предназначено для транспортировки в "интернет-банкинг"
+          BEGIN SELECT l.fdat, l.sumg  INTO datg_, sumg_  FROM cc_lim l  WHERE l.nd = k.nd    AND  l.fdat = (SELECT MIN(fdat) FROM cc_lim  WHERE nd = l.nd   AND fdat >= fdat_ );
+                UPDATE cc_sparam SET datg = datg_, sumg = sumg_ WHERE acc = a8.acc;
+                IF SQL%ROWCOUNT = 0    THEN  INSERT INTO cc_sparam  (acc,datg,sumg) VALUES (a8.acc,datg_,sumg_); END IF ;
+          EXCEPTION WHEN no_data_found THEN  UPDATE      cc_sparam   SET datg = NULL, sumg = NULL  WHERE acc = a8.acc   ;
+          END;
+       END IF; -- ibank_ = '1' 
 
-    FOR k IN (SELECT *
-                FROM cc_deal d
-               WHERE sos < 14
-                 AND vidd IN (1, 2, 3, 11, 12, 13)
-                 AND (nn_ = 0 OR nd = nn_)) LOOP
-      -- пересмотр плавающей % ставки
-      cck.set_floating_rate(p_nd => k.nd);
-      -- установка cc_deal.limit,  cc_add.s, accounts.ostx
-      cck.lim_bdate(p_nd => k.nd, p_dat => fdat_);
+       --   3.Переоц родит.сч при доч. в другой вал   Делаем  для VIDD 3,13 либо 2,12, если счетов SS несколько
+       IF k.vidd IN (2, 3, 12, 13) THEN
+          SELECT COUNT(*) INTO l_cnt  FROM accounts  WHERE accc = a8.acc AND kv <> a8.kv;
+          IF   l_cnt > 0  THEN cck.rate_lim(a8.acc); END IF;
+       END IF;
+ 
+       --   4. Отметки в ГПК о вып.платежей
+       SELECT nvl(SUM(kos - dos), 0)  INTO s1_  FROM saldoa  WHERE acc = a8.acc  AND kos > dos   AND kos > 0; -- всего погашено по сумме
+       SELECT nvl(SUM(sumg), 0)       INTO s2_  FROM cc_pog  WHERE nd = k.nd     AND otm = 1;                 -- всего погашено по ГПК 
+       s1_ := s1_ - s2_ ; IF s1_ <= 0 THEN      GOTO kin_k ; END IF;
 
-      ---  Обновление cc_add.ACCS
-      SELECT MIN(a.acc)
-        INTO l_accs
-        FROM accounts a, nd_acc n
-       WHERE a.acc = n.acc
-         AND n.nd = k.nd
-         AND a.tip IN ('SS ', 'SP ')
-         AND dazs IS NULL;
-      IF l_accs IS NOT NULL THEN
-        UPDATE cc_add
-           SET accs = l_accs
-         WHERE nd = k.nd
-           AND adds = 0
-           AND nvl(accs, 0) <> l_accs;
-      END IF;
+       ------- отметим погашенные ПЛАНОВЫЕ платежи до тек дня
+       FOR p IN (SELECT sumg, fdat  FROM cc_pog WHERE nd = k.nd   AND fdat > k.sdate   AND fdat < gl.bdate   AND nvl(otm, 0) <> 1 ORDER BY fdat) 
+       LOOP
+          IF s1_ <= 0 OR s1_ < p.sumg THEN  s1_ := 0;  EXIT ;     END IF ;
+          UPDATE cc_pog  SET otm = 1  WHERE nd = k.nd  AND fdat = p.fdat ;
+          s1_ := s1_ - p.sumg;
+       END LOOP;  -- p
+       IF s1_ <= 0 THEN   GOTO kin_k ;  END IF;
 
-      -- пересмотр поля SOS
-      IF k.sos >= 10 THEN
-        SELECT nvl(SUM(a.ostc), 0), nvl(SUM(a.ostb), 0)
-          INTO s_, ss_
-          FROM accounts a, nd_acc n
-         WHERE n.nd = k.nd
-           AND n.acc = a.acc
-           AND a.tip IN ('SP ', 'SPN', 'SK9', 'SL ', 'SLN', 'SLK');
-        IF s_ = ss_ THEN
-          IF s_ = 0 AND k.wdate - fdat_ >= 0 AND k.sos > 10 THEN
-            UPDATE cc_deal SET sos = 10 WHERE nd = k.nd;
-          END IF;
-          IF k.sos = 10 AND (s_ != 0 OR k.wdate - fdat_ < 0) THEN
-            UPDATE cc_deal SET sos = 13 WHERE nd = k.nd;
-          END IF;
-        END IF;
-      END IF;
+       ------- отметим погашенные ДОСРОЧНЕ платежи от тек дня
+       BEGIN SELECT substr(txt,1,1)  INTO  par1_   FROM nd_txt  WHERE nd = k.nd   AND tag = 'FLAGS';
+       EXCEPTION  WHEN no_data_found THEN  par1_:= NULL;
+       END;
+       IF par1_ IS NULL THEN  par1_ := par_; END IF;
+                                                   
+       FOR p IN (SELECT sumg, fdat   FROM cc_pog   WHERE nd = k.nd AND fdat >= gl.bdate  AND nvl(otm, 0) <> 1 ORDER BY decode(par1_, '0', -1, +1) * (k.wdate - fdat)) 
+       LOOP
+          IF s1_ <= 0 OR s1_< p.sumg THEN s1_:= 0; EXIT;   END IF;
+          UPDATE cc_pog  SET otm = 1 WHERE nd = k.nd  AND fdat = p.fdat;
+          s1_ := s1_ - p.sumg;
+       END LOOP;
+       ---------------------------------
+       <<kin_k>>  NULL;
 
-      -- Все-таки найти ACC8_
-      BEGIN
-        SELECT acc
-          INTO a8.acc
-          FROM cc_lim
-         WHERE nd = k.nd
-           AND rownum = 1;
-        SELECT * INTO a8 FROM accounts WHERE acc = a8.acc;
-      EXCEPTION
-        WHEN no_data_found THEN
-          GOTO kin_k;
-      END;
-
-      IF ibank_ = '1' THEN
-        -- Реально предназначено для транспортировки в "интернет-банкинг"
-        BEGIN
-          SELECT l.fdat, l.sumg
-            INTO datg_, sumg_
-            FROM cc_lim l
-           WHERE l.nd = k.nd
-             AND (l.nd, l.fdat) = (SELECT nd, MIN(fdat)
-                                     FROM cc_lim
-                                    WHERE nd = l.nd
-                                      AND fdat >= fdat_
-                                    GROUP BY nd);
-          UPDATE cc_sparam
-             SET datg = datg_, sumg = sumg_
-           WHERE acc = a8.acc;
-          IF SQL%ROWCOUNT = 0 THEN
-            INSERT INTO cc_sparam
-              (acc, datg, sumg)
-            VALUES
-              (a8.acc, datg_, sumg_);
-          END IF;
-        EXCEPTION
-          WHEN no_data_found THEN
-            UPDATE cc_sparam
-               SET datg = NULL, sumg = NULL
-             WHERE acc = a8.acc;
-        END;
-      END IF;
-
-      --   3.Переоц родит.сч при доч. в другой вал   Делаем  для VIDD 3,13 либо 2,12, если счетов SS несколько
-      IF k.vidd IN (2, 3, 12, 13) THEN
-        SELECT COUNT(*)
-          INTO l_cnt
-          FROM accounts
-         WHERE accc = a8.acc
-           AND kv <> a8.kv;
-        IF l_cnt > 0 THEN
-          cck.rate_lim(a8.acc);
-        END IF;
-      END IF;
-      --   4. Отметки в ГПК о вып.платежей
-      SELECT nvl(SUM(kos - dos), 0)
-        INTO s1_ /* всего погашено по сумме */
-        FROM saldoa
-       WHERE acc = a8.acc
-         AND kos > dos
-         AND kos > 0;
-
-      SELECT nvl(SUM(sumg), 0)
-        INTO s2_ /* всего погашено по ГПК */
-        FROM cc_pog
-       WHERE nd = k.nd
-         AND otm = 1;
-      s1_ := s1_ - s2_;
-      IF s1_ <= 0 THEN
-        GOTO kin_k;
-      END IF;
-
-      ------- отметим погашенные ПЛАНОВЫЕ платежи до тек дня
-      FOR p IN (SELECT sumg, fdat
-                  FROM cc_pog
-                 WHERE nd = k.nd
-                   AND fdat > k.sdate
-                   AND fdat < gl.bdate
-                   AND nvl(otm, 0) <> 1
-                 ORDER BY fdat) LOOP
-        IF s1_ <= 0 OR s1_ < p.sumg THEN
-          s1_ := 0;
-          EXIT;
-        END IF;
-        UPDATE cc_pog
-           SET otm = 1
-         WHERE nd = k.nd
-           AND fdat = p.fdat;
-        s1_ := s1_ - p.sumg;
-      END LOOP;
-      IF s1_ <= 0 THEN
-        GOTO kin_k;
-      END IF;
-      ------- отметим погашенные ДОСРОЧНЕ платежи от тек дня
-      BEGIN
-        SELECT substr(txt, 1, 1)
-          INTO par1_
-          FROM nd_txt
-         WHERE nd = k.nd
-           AND tag = 'FLAGS';
-      EXCEPTION
-        WHEN no_data_found THEN
-          par1_ := NULL;
-      END;
-
-      IF par1_ IS NULL THEN
-        par1_ := par_;
-      END IF;
-
-      FOR p IN (SELECT sumg, fdat
-                  FROM cc_pog
-                 WHERE nd = k.nd
-                   AND fdat >= gl.bdate
-                   AND nvl(otm, 0) <> 1
-                 ORDER BY decode(par1_, '0', -1, +1) * (k.wdate - fdat)) LOOP
-        IF s1_ <= 0 OR s1_ < p.sumg THEN
-          s1_ := 0;
-          EXIT;
-        END IF;
-        UPDATE cc_pog
-           SET otm = 1
-         WHERE nd = k.nd
-           AND fdat = p.fdat;
-        s1_ := s1_ - p.sumg;
-      END LOOP;
-      ---------------------------------
-      <<kin_k>>
-      NULL;
-
-    END LOOP;
+    END LOOP;  -- k
 
     -- 5. Установка плановых пролонгаций КД
     cck.cc_prolong(0, fdat_);
