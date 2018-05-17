@@ -48,12 +48,13 @@ BEGIN
               dd.branch,
               dd.cnt_dubl,
               dd.dat_end,
+              dd.datz,
               dt.type_code, 
               dt.type_id,
               bs.val,
               nvl(dv.extension_id, 0) ext_id,
               dv.duration,
-	      op.pdat
+        op.pdat
        FROM bars.dpt_deposit  dd,
             bars.dpt_vidd     dv,
             bars.dpt_types    dt,
@@ -129,7 +130,16 @@ BEGIN
             select *
               into l_indrate --индивидуальная ставка для этого кол-ва пролонгаций
               from bars.Dpt_Vidd_Extdesc dve
-             where dve.base_rate = l_brate
+             where 1=1
+              and case when method_id not in (5, 9) then base_rate
+                       else (select v.br_id 
+                             from bars.dpt_vidd_update v 
+                             where v.vidd = i.vidd
+                                  and dateu = (select max(dateu) 
+                                               from bars.dpt_vidd_update v
+                                               where v.vidd = i.vidd
+                                                and dateu <= i.datz + 0.99999))
+                           end = l_brate
                and dve.ext_num = i.cnt_dubl
                and dve.type_id = i.ext_id;
 
@@ -157,12 +167,11 @@ BEGIN
           end;
 
            begin
-              INSERT INTO dpt_depositw (dpt_id, tag, value, branch)
-              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval), i.branch);
+              INSERT INTO dpt_depositw (dpt_id, tag, value)
+              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval));
            exception when dup_val_on_index then
               update dpt_depositw
-              set value = to_char(l_bonusval),
-               branch = i.branch
+              set value = to_char(l_bonusval)
               where tag = 'BONUS' and dpt_id = i.deposit_id;
             end;
             bars_audit.trace('%s значение бонуса записано в доп.реквизиты вклада', l_title);
