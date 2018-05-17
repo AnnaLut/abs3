@@ -2070,7 +2070,9 @@ procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 numb
   l_BAZP  int  := 36500;
 
 begin
-  bars.bars_login.login_user(sys_guid,p_User,null,null);
+  if p_User is not null then
+    bars.bars_login.login_user(sys_guid,p_User,null,null);
+  end if;
   If p_mode not in (0,1) then RETURN; end if;
 
   If p_mode = 0  and ( p_dat2 is null  or p_dat1 > p_dat2 ) then
@@ -2225,12 +2227,16 @@ begin
 
   end loop ; -- a8
   commit;
+  if p_User is not null then
    bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО ! Перегляньте результат ' , dbms_aq.no_delay, dbms_aq.never, p_User );   
    bars.bars_login.logout_user;  
+  end if; 
 exception when others
-  then  
+  then
+   if p_User is not null then  
    bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО З ПОМИЛКОЮ! -'||SQLERRM , dbms_aq.no_delay, dbms_aq.never, p_User );   
    bars.bars_login.logout_user; 
+   end if;
 end intxJ ;
 -----------------
 procedure INTB  (p_mode int) is  --- Генерация проводок согласно итоговому протоколу
@@ -2892,7 +2898,7 @@ BEGIN
   end;
 
   -- 1) доначислить проценты по дату завершения включительно
-  ovrn.INTX (p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
+  ovrn.INTXj (p_User => null,p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
 
 
   -- 0) ДОПЛАТА ФОРВАРДНОЙ КОМИССИИ ПРИ ДОСРОЧНОМ ЗАКРЫТИИ
@@ -2953,6 +2959,7 @@ BEGIN
   for k in (select * from accounts   where acc in (select acc from nd_acc where nd = dd.nd)  and dazs is null      )
   loop 
      If    k.nbs in ('2600','2650','2602','2603','2604')     then  update accounts set lim = 0, accc = null where acc = k.ACC;  -- эти БС в 2017 не меняются
+                                                                   update accounts set ostc = ostc - k.ostc where acc = k.accc;
      elsIf k.nbs in ('2608','2658')                          then  null;                                                        -- эти БС в 2017 не меняются
      elsIf k.tip in ('OVN')                                  then  update accounts set dazs = l_bDat_Next where acc = k.ACC; 
      elsIf k.tip in ('SN ') and k.ostc =0                    then  update accounts set dazs = l_bDat_Next where acc = k.ACC; 
