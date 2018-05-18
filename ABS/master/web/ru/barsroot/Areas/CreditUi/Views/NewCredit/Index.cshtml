@@ -2,13 +2,13 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
     //ViewBag.Title = "";
 }
-<script src="~/Areas/CreditUi/Scripts/creditUiServices.js?v1.0.1"></script>
+<script src="~/Areas/CreditUi/Scripts/creditUiServices.js?v1.0.2"></script>
 <script src="~/Areas/CreditUi/Scripts/maskedDatePicker.js"></script>
-<script src="~/Areas/CreditUi/Scripts/mainCreditCtrl.js"></script>
-<script src="~/Areas/CreditUi/Scripts/creditParamsCtrl.js"></script>
+<script src="~/Areas/CreditUi/Scripts/mainCreditCtrl.js?v1.0.2"></script>
+<script src="~/Areas/CreditUi/Scripts/creditParamsCtrl.js?v1.0.2"></script>
 <script src="~/Areas/CreditUi/Scripts/dataMaturityCtrl.js"></script>
 <script src="~/Areas/CreditUi/Scripts/commitionLimitCtrl.js"></script>
-<script src="~/Areas/CreditUi/Scripts/moreCreditParamsCtrl.js?v1.0.1"></script>
+<script src="~/Areas/CreditUi/Scripts/moreCreditParamsCtrl.js?v1.0.2"></script>
 <div ng-controller="CreditUi.mainCreditCtrl">
     <h1>{{Title}}</h1>
     <div kendo-tool-bar="mainTool">
@@ -26,13 +26,13 @@
                     <li>Дод. параметри КД</li>
                 </ul>
                 <div>
-                    <div ng-include="'/barsroot/CreditUi/newcredit/creditparams'" ng-disabled="isSave"></div>
+                    <div ng-include="'/barsroot/CreditUi/newcredit/creditparams'" ></div>
                 </div>
                 <div>
-                    <div ng-include="'/barsroot/CreditUi/newcredit/datamaturity'" ng-click="datamaturityopen()" ng-disabled="isSave"></div>
+                    <div ng-include="'/barsroot/CreditUi/newcredit/datamaturity'" ng-click="datamaturityopen()"></div>
                 </div>
                 <div>
-                    <div ng-include="'/barsroot/CreditUi/newcredit/commitionlimit'" ng-disabled="isSave"></div>
+                    <div ng-include="'/barsroot/CreditUi/newcredit/commitionlimit'"></div>
                 </div>
                 <div>
                     <div ng-include="'/barsroot/CreditUi/newcredit/morecreditparams'"></div>

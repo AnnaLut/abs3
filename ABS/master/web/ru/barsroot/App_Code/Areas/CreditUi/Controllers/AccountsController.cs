@@ -127,5 +127,27 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             _accountsRepository.setMasIni(nd);
         }
 
+        public ActionResult FinDebit(decimal acc)
+        {
+            string Status = "ok";
+            try
+            {
+                _accountsRepository.FinDebit(acc);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status });
+        }
+
+        public ActionResult GetTabId()
+        {
+            string Status = "ok", tabid = "";
+            try
+            {
+                tabid = _accountsRepository.GetTabId();
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status, TabId = tabid });
+        }
+
     }
 }

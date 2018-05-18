@@ -195,6 +195,8 @@ $(document).ready(function () {
         dataBound: function (e) {
             bars.ui.loader('body', true);
             $(".checkboxExist").bind("change", function (e) {
+                $('tr.k-state-selected').find('[class=checkboxExist]').prop('checked', false);
+                $('tr.k-state-selected').removeClass("k-state-selected");
                 $(e.target).closest("tr").toggleClass("k-state-selected");
                 DisabledButtons();
                
@@ -212,10 +214,9 @@ $(document).ready(function () {
             bars.ui.loader('body', false);
         },
         change: function (e) {
-            DisabledButtons();
-
             $('tr').find('[class=checkboxExist]').prop('checked', false);
             $('tr.k-state-selected').find('[class=checkboxExist]').prop('checked', true);
+            DisabledButtons();
         },
         excel: {
             fileName: "Кредитний Портфель ЮО.xlsx",
@@ -246,7 +247,7 @@ $(document).ready(function () {
     $(".k-grid-btGLK").click(function () {
         var grid = $("#gridPortfolio").data("kendoGrid");
         var selected_items = grid.select();
-        window.open(bars.config.urlContent('/CreditUI/glk/Index/?id=' + grid.dataItem(selected_items).ND), '_blank');
+        window.open(bars.config.urlContent('/CreditUI/glk/Index/?id=' + grid.dataItem(selected_items).ND) + '&readonly=1', '_blank');
     });
 
     $(".k-grid-btProvide").click(function () {

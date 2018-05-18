@@ -604,8 +604,8 @@ function CheckButtons()
     var selected_items = grid.select();
     var selected_first = selected_items.first();
     var enable = grid.dataItem(selected_first).FDAT >= kendo.parseDate(staticData.BANKDATE);
-    disabledButtons(readonly && ((selected_items.length > 0) && enable), ".k-grid-btDel");
-    disabledButtons(readonly && ((selected_items.length == 1) && enable), ".k-grid-btEdit");
+    disabledButtons(!readonly && ((selected_items.length > 0) && enable), ".k-grid-btDel");
+    disabledButtons(!readonly && ((selected_items.length == 1) && enable), ".k-grid-btEdit");
 }
 
 function selectArchiveBody()
