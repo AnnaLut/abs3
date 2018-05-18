@@ -1134,6 +1134,32 @@ BEGIN
 
    CLOSE c_main;
 
+------------------------------------------------------------
+--                                    зеркальные операции для 2620, 2625, 2630
+   if mfou_ =300465 and mfo_ !=300465  then
+
+     for u in ( SELECT kv, sum(s_nom-nvl(s_kom,0)) sum0
+                  FROM OTCN_PROV_TEMP 
+                 WHERE ko ='2' and 
+                      ( nlsk like '2620%' or nlsk like '2625%' or nlsk like '2630%' ) and
+                        nlsd like '3800%' 
+                 GROUP BY kv
+     ) loop
+          nnnn_ := nnnn_+1;
+          p_ins (nnnn_, 'F091', '3');
+          p_ins (nnnn_, 'R030', LPAD (u.kv, 3,'0'));
+          p_ins (nnnn_, 'T071', TO_CHAR (u.sum0));
+          p_ins (nnnn_, 'K020', '0000000006');
+          p_ins (nnnn_, 'K021', '3');
+          p_ins (nnnn_, 'Q024', '1');
+          p_ins (nnnn_, 'D100', '01');
+          p_ins (nnnn_, 'S180', '#');
+          p_ins (nnnn_, 'F089', '1');
+          p_ins (nnnn_, 'F092', '164');
+     end loop;
+
+   end if;
+------------------------------------------------------------
    DELETE FROM tmp_nbu
          WHERE kodf = kodf_ AND datf = dat_;
 
@@ -1154,8 +1180,8 @@ BEGIN
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
                         where  f091 ='4' and f092 ='216'
-                           and ( f089 ='1' or f089 ='2' and t071<kons_sum_)
-                     )          
+                           and ( f089 ='1' or f089 ='2' and t071<kons_sum_/f_cur(dat_,r030) )
+                     )
                group by f091, r030, f092
    ) loop
           nnnn_ := nnnn_+1;
@@ -1190,7 +1216,7 @@ BEGIN
                                                  'Q003' as Q003, 'Q007' as Q007, 'Q006' as Q006 )
                               )   
                         where  f091 ='4' and f092 ='216' and r030 =u.r030
-                           and ( f089 ='1' or f089 ='2' and t071<kons_sum_)
+                           and ( f089 ='1' or f089 ='2' and t071<kons_sum_/f_cur(dat_,r030) )
                                       ) );
                                     
    end loop;
