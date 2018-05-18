@@ -45,7 +45,7 @@ TYPE t_nbu_finperformancepr_uo IS TABLE OF core_finperformancepr_uo%ROWTYPE;
 TYPE t_nbu_credit_tranche       IS TABLE OF core_credit_tranche%rowtype;
 --2
 l_date varchar(10) :='dd.mm.yyyy';
-l_cur_user varchar2(10);
+l_cur_user varchar2(30);
 l_data_rep date;
 l_str1 varchar2(100);
 l_date_cur date;
@@ -879,7 +879,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
         dbms_xslprocessor.valueof(l_header, 'USER_KF/text()',l_kf);
         l_person_kf:=trim (l_kf);
 
-        l_check_id:=nbu_gateway.nbu_core_service.get_active_data_request_id('COMPANY_GROUP_PERFORMANCE',l_person_kf,l_date_cur,l_cur_user,l_data_rep);
+        l_check_id:=nbu_gateway.nbu_core_service.get_active_data_request_id('COMPANY_PARTNER_PERFORMANCE',l_person_kf,l_date_cur,l_cur_user,l_data_rep);
 
         Begin
         --формируем список строк

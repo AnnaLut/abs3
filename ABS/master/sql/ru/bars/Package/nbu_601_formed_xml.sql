@@ -139,7 +139,7 @@ function get_xml_person_uo  return clob
                                xmlelement("NAMEUR", p.nameur),
                                xmlelement("ISREZ", p.isrez),
                                xmlelement("CODEDRPOU", p.codedrpou),
-                               xmlelement("REGISTRDAY", to_char(p.registryday,'dd.mm.yyyy')),
+                               xmlelement("REGISTRYDAY", to_char(p.registryday,'dd.mm.yyyy')),
                                xmlelement("NUMBERREGISTRY", p.numberregistry),
                                xmlelement("K110", p.k110),
                                xmlelement("EC_YEAR",to_char(p.ec_year,'dd.mm.yyyy')),

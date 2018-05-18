@@ -93,7 +93,7 @@ create or replace package body nbu_601_request_data_ru is
     is
     begin
         select min(f.ved) keep (dense_rank last order by f.fdat) ,
-               trunc(max(f.fdat) - 1, 'YEAR') 
+               trunc(max(f.fdat) - 1, 'YEAR')
         into   p_k110, p_ec_year
         from   fin_fm f
         where  f.okpo = p_okpo and
@@ -318,16 +318,16 @@ create or replace package body nbu_601_request_data_ru is
 
            fill_company_k110(ur.okpo, l_k110, l_ec_year);
 
-         
+
           if l_k110 is null then
             begin
               select distinct c.ved into l_ved from customer c,cc_deal d  where c.okpo=ur.okpo and c.rnk=ur.rnk and ur.rnk=d.rnk;
-              exception 
+              exception
                 when others then
                   bars.logger.info('nbu_person_uo='||l_ved||' ' ||l_k110||' '||ur.okpo||' '||ur.rnk);
               end;
              end if;
-        
+
 
             insert into bars.nbu_person_uo
             values (ur.rnk,               -- rnk             number(38),
@@ -388,34 +388,10 @@ create or replace package body nbu_601_request_data_ru is
                           group by p.rnk, p.codedrpou) z_dat
                   where z_dat is not null) loop
 
-            begin    
-            l_sales:= nvl(get_indicator(i.codedrpou, i.z_dat, 'SALES'),0);
-            exception when others  then
-             if 
-               sqlcode=-20000 then bars.logger.info('finperformance_uo_sales- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
-             end if;
-           end;   
-           begin  
-            l_ebit:= nvl(get_indicator(i.codedrpou, i.z_dat, 'EBIT'),0);
-            exception  when others  then 
-             if 
-               sqlcode=-20000 then bars.logger.info('finperformance_uo_ebit- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
-             end if;
-           end;
-           begin 
-            l_ebitda:= nvl(get_indicator(i.codedrpou, i.z_dat, 'EBITDA'),0);
-            exception  when others  then 
-             if 
-               sqlcode=-20000 then bars.logger.info('finperformance_uo_ebitda- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
-             end if;
-           end;
-           begin 
-            l_totaldebt:= nvl(get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT'),0);
-              exception  when others  then 
-              if 
-               sqlcode=-20000 then bars.logger.info('finperformance_uo_total_debt- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
-              end if;
-            end;
+            l_sales     := get_indicator(i.codedrpou, i.z_dat, 'SALES');
+            l_ebit      := get_indicator(i.codedrpou, i.z_dat, 'EBIT');
+            l_ebitda    := get_indicator(i.codedrpou, i.z_dat, 'EBITDA');
+            l_totaldebt := get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT');
 
             insert into bars.nbu_finperformance_uo
             values (i.rnk,                -- rnk       number(38),
@@ -749,12 +725,12 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                bpk.kv as r030,
                                proc.proccredit,
                                sum_lim.sumpay as sumpay,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6,'2',6) as freq
+                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
                                        dt.tag = 'FREQ') as periodbase,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6,'2',6) as freq
+                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
@@ -863,16 +839,18 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                       from   cc_vidd t
                                       where  d.vidd=t.vidd) as flagosoba,
                                      case when (d.prod like '2062%' or  d.prod like '2202%') and ad.aim=62 and d.vidd in(1,11)  then '01'
-                                          when  (d.prod like '2063%' or  d.prod like '2203%') and ad.aim=62 and d.vidd in(1,11)  then '02'
+                                          when  (d.prod like '2063%' or  d.prod like '2203%') and ad.aim in (62,40) and d.vidd in(1,11)  then '02'
                                           when  (d.prod like '207%' or  d.prod like '221%') then '03'
                                           when   d.prod like '203%' then '04'
                                           when  (d.prod like '202%' or  d.prod like '222%') then '05'
                                           when  (d.prod like '2082%' or  d.prod like '2232%') then '06'
                                           when  (d.prod like '2083%' or  d.prod like '2233%') then '07'
                                           when  d.vidd in(10,110)  then '08'
+                                          when  d.prod like '220%' and ad.aim=0  then '07'
+                                          when  d.prod like '210%' and ad.aim=210 and d.vidd=2  then '09'
                                           when  (d.prod like '206%' or  d.prod like '220%')  and d.vidd in(2,3,12,13)  then '09'
-                                          when  d.prod like '9020%' and ad.aim=98 then '10'
-                                          when  d.prod like '9023%' and ad.aim=97 then '12'
+                                          when  (d.prod like '9020%' or d.prod like '9000%') and ad.aim=98 then '10'
+                                          when  (d.prod like '9023%' or d.prod like '9003%') and ad.aim=97 then '12'
                                           when  d.prod like '9122%' and ad.aim=99 then '13'
                                      end typecredit,
                                      'cc_deal' as table_name,
@@ -889,8 +867,8 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      ad.kv as r030,
                                      proc.proccredit,
                                      sum_lim.sumpay as sumpay,
-                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,
-                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproc,
+                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbase,
+                                     (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproc,
                                      sumarrears.sum_ost as sumarrears,
                                      nbu23_rez.daybase,
                                      nbu23_rez.daybase as dayproc,
@@ -1314,6 +1292,7 @@ end;
     end;
 */
 end;
+
 /
 grant execute on nbu_601_request_data_ru to barstrans;
 grant execute on nbu_601_request_data_ru to bars_access_defrole;
