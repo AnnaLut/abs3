@@ -674,44 +674,73 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             -- з 29.12.2017 новий показник
             --  назва Бенефіціару
             
-            if D2#E2_ is not null and D3#E2_ is not null then
-               select substr(MAX(trim(benef_name)), 1,135)
-               into d53#E2_
-               from v_cim_all_contracts
-               where upper(num) = upper(cont_num_) and
-                     open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                     status_id in (0, 8) and
-                     lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
-                     contr_type = (case when d1#E2_ = '36' then 0 
-                                        when d1#E2_ in ('23','24','34','35') then 2 
-                                        else 1 
-                                   end);        
-                     
-                if d53#E2_ is null then
-                   select substr(MAX(trim(benef_name)), 1,135)
-                   into d53#E2_
-                   from v_cim_all_contracts
-                   where upper(num) = upper(cont_num_) and
-                         open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                         status_id = 1 and
-                         lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
-                         contr_type = (case when d1#E2_ = '36' then 0 
-                                        when d1#E2_ in ('23','24','34','35') then 2 
-                                        else 1 
-                                   end);          
+            if D2#E2_ is not null and D3#E2_ is not null 
+            then
 
-                    if d53#E2_ is null then
-                       select substr(MAX(trim(benef_name)), 1,135)
-                       into d53#E2_
-                       from v_cim_all_contracts
-                       where upper(num) = upper(cont_num_) and
-                             open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                             status_id in (0, 1, 8) and
-                             lpad(okpo, 10, '0') = lpad(okpo_, 10, '0');          
-                    end if;    
+              begin
+                select substr(MAX(trim(benef_name)), 1,135)
+                  into d53#E2_
+                  from V_CIM_ALL_CONTRACTS
+                 where upper(num) = upper(cont_num_)
+                   and open_date = to_date(cont_dat_, 'ddmmyyyy')
+                   and status_id in (0, 8)
+                   and lpad(okpo, 10, '0') = lpad(okpo_, 10, '0')
+                   and contr_type = case 
+                                    when d1#E2_ = '36' then 0 
+                                    when d1#E2_ in ('23','24','34','35') then 2 
+                                    else 1
+                                    end;
+              exception
+                when OTHERS then
+                  bars_audit.error( 'P_FE2_NN: cont_num_='||cont_num_||', cont_dat_='||cont_dat_||chr(10)||sqlerrm );
+                  d53#E2_ := null;
+              end;
+
+              if ( d53#E2_ is null )
+              then
+
+                begin
+                  select substr(MAX(trim(benef_name)), 1,135)
+                    into d53#E2_
+                    from V_CIM_ALL_CONTRACTS
+                   where upper(num) = upper(cont_num_)
+                     and open_date = to_date(cont_dat_, 'ddmmyyyy')
+                     and status_id = 1
+                     and lpad(okpo, 10, '0') = lpad(okpo_, 10, '0')
+                     and contr_type = case
+                                      when d1#E2_ = '36' then 0
+                                      when d1#E2_ in ('23','24','34','35') then 2
+                                      else 1
+                                      end;
+                exception
+                  when OTHERS then
+                    bars_audit.error( 'P_FE2_NN: cont_num_='||cont_num_||', cont_dat_='||cont_dat_||chr(10)||sqlerrm );
+                    d53#E2_ := null;
+                end;
+
+                if d53#E2_ is null
+                then
+
+                  begin
+                    select substr(MAX(trim(benef_name)), 1,135)
+                      into d53#E2_
+                      from v_cim_all_contracts
+                     where upper(num) = upper(cont_num_) and
+                           open_date = to_date(cont_dat_, 'ddmmyyyy')  and
+                           status_id in (0, 1, 8) and
+                           lpad(okpo, 10, '0') = lpad(okpo_, 10, '0');
+                  exception
+                    when OTHERS then
+                      bars_audit.error( 'P_FE2_NN: cont_num_='||cont_num_||', cont_dat_='||cont_dat_||chr(10)||sqlerrm );
+                      d53#E2_ := null;
+                  end;
+
                 end if;
+
+              end if;
+
             end if;
-            
+
             if d53#E2_ is null then
                d53#E2_ := f_get_swift_benef(ref_); 
             end if;
@@ -1805,3 +1834,4 @@ BEGIN
 END p_fe2_nn;
 /
 
+show errors;
