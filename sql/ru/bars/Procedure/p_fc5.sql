@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.026  10/05/2018 (17/04/2018)
+% VERSION     : v.17.026         16/05/2018 (17/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -313,26 +313,6 @@ IS
        then
           s580_ := '9';
        end if;
-
---       if r020_ in ('1500','1502','1508','1509',
---                    '1510','1512','1513','1515','1516','1517','1518','1519',
---                    '1520','1521','1523','1524','1525','1526','1528')
---       then
---           begin
---             select nvl(trim(VALUE), '2')
---             into invk_
---             from customerw
---             where rnk = rnk_ and
---                   tag = 'INVCL';
---           exception
---                when no_data_found then
---                    invk_:= null;
---           end;
---       else
---           invk_:= null;
---       end if;
---
---       invk_:= nvl(invk_, '2');
     end;
 
     procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
@@ -411,7 +391,7 @@ BEGIN
        select max(report_date)
        into datd_
        from NBUR_TMP_A7_S245
-       where report_date < dat_beg_;
+       where report_date < dat_end_;
    end if;
 
    select count(*)
@@ -761,49 +741,6 @@ BEGIN
              END IF;
           END IF;
 
-          if not (nbs_ like '150_'
-             or  nbs_ like '34__' or  nbs_ like '36__'
-             or  nbs_ like '44__' or  nbs_ like '45__'
-             or  nbs_ like '9___'
-             or  nbs_ in ('2920','3500'))
-          then
-              begin
-                  select sum(decode(s245, '0', ost, 0)),
-                         sum(decode(s245, '1', ost, 0)),
-                         sum(decode(s245, '2', ost, 0))
-                  into sum_z0, sum_z1, sum_z2
-                  from NBUR_TMP_A7_S245
-                  where report_date = dat_ and
-                        acc_id = acc_;
-              exception
-                when no_data_found then
-                    sum_z0:=0;
-                    sum_z1:=0;
-                    sum_z2:=0;
-              end;
-
-              koef_z1 := sum_z1 / se_;
-              koef_z2 := sum_z2 / se_;
-              koef_z0 := sum_z0 / se_;
-
-              if sum_z1 <> 0 then
-                 s245_ := '1';
-                 koef_z1 := 1;
-              elsif sum_z2 <> 0 then
-                 s245_ := '2';
-                 koef_z2 := 1;
-              elsif sum_z0 <> 0 then
-
-                 koef_z0 := 1;
-              end if;
-          else
-              s245_ := '0';
-
-              sum_z0:=sn_;
-              sum_z1:=0;
-              sum_z2:=0;
-          end if;
-
           if nbs_ not in ('1200','1203','3500','4400','4409','4410','4419','4430','4431','4500','4509','4530') or
              nbs_ is null
           then
@@ -1052,7 +989,6 @@ BEGIN
      sz_        number := 0;
      sz0_       number := 0;
      sz1_       number := 0;
-     sz2_       number := 0;
      sk_all_    number := 0;
      ostc_      number := 0;
      s02_       number := 0;
@@ -1076,13 +1012,10 @@ BEGIN
        loop
           acc_ := p.acc;
           rnk_ := p.rnk;
-          se_ := to_number(p.znap);
-          
           sk_ := 0;
           sz_ := 0;
           sz0_ := 0;
-          sz1_ := 0;
-          sz2_ := 0;
+          se_ := to_number(p.znap);
 
          -- сумма активов, которые обеспечивает данный залог (т.е. к которым он ""привязан")
           begin
@@ -1119,24 +1052,19 @@ BEGIN
                from sal s
                where s.fdat=dat_
                  AND s.acc in (select d.acc
-                               from nd_acc d, accounts s
-                               where d.acc<>acc_ and
-                                     d.nd = k.nd and
-                                     d.acc=s.acc and
-                                     s.rnk=rnk_  and
+                               from accounts s, nd_acc d, cc_deal c
+                               where nvl(c.ndg, c.nd) = nd_ and
+                                     c.nd = d.nd and
+                                     d.acc <> acc_ and
+                                     d.acc = s.acc and
+                                     s.rnk = rnk_  and
                                      substr(s.nbs,4,1) in ('5','6','9')
                                      and substr(s.nbs,1,3)=substr(k.nbs,1,3));
              EXCEPTION WHEN NO_DATA_FOUND THEN
                s04_ := 0;
              END;
 
-             if abs(k.ost) < abs(sk_all_) then -- не один актив
-                sz2_ := round(abs(k.ost / sk_all_) * s04_, 0);
-             else
-                sz2_ :=  s04_;
-             end if;
-
-             ostc_ := abs(k.ost + sz2_);
+             ostc_ := abs(k.ost + NVL(s04_,0));
 
              -- депозиты, которые выступают залогами, привязаны к другим РНК
              if k.rnk <> rnk_ then
@@ -1223,28 +1151,25 @@ BEGIN
                      kodp = substr(kodp,1,10) || '9' || substr(kodp,12)
                  where recid = p.recid;
              else -- забезпечення не перекриває актив
-                 for k in (select substr(r.kodp,11,1) s580a, 
-                                  substr(r.kodp,16,1) s245a, 
-                                  sum(T.OST_EQV) ost,
-                                  nvl((count(*) over (partition by substr(r.kodp,11,1), substr(r.kodp,16,1))), 0) cnt,
-                                  DENSE_RANK() over (partition by substr(r.kodp,11,1), substr(r.kodp,16,1) order by substr(r.kodp,11,1), substr(r.kodp,16,1)) rnum
+                 for k in (select substr(r.kodp,11,1) s580a, sum(T.OST_EQV) ost,
+                                  nvl((count(*) over (partition by substr(r.kodp,11,1))), 0) cnt,
+                                  DENSE_RANK() over (partition by substr(r.kodp,11,1) order by substr(r.kodp,11,1)) rnum
                            from otcn_f42_temp t, rnbu_trace r
                            where t.acc = p.acc and
-                                 t.accc = r.acc  and
-                                 substr(r.nls,1,4) = substr(r.kodp,2,4)
-                          group by substr(r.kodp,11,1), substr(r.kodp,16,1))
+                                 t.accc = r.acc
+                          group by substr(r.kodp,11,1))
                  loop
                     if k.cnt = 1 or k.rnum = 1 then
                        update rnbu_trace
                        set znap = to_char(k.ost),
                            comm = substr(comm || ' + розбивка по активу (3)',1,200),
                            nd = nd_,
-                           kodp = substr(kodp,1,10)|| k.s580a || substr(kodp,12, 4) || k.s245a || substr(kodp,17)
+                           kodp = substr(kodp,1,10)|| k.s580a ||substr(kodp,12)
                        where recid = p.recid;
                     else
                        INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
                        VALUES (s_rnbu_record.nextval, userid_, p.nls, p.kv, p.odate,
-                            substr(p.kodp,1,10)|| k.s580a ||substr(p.kodp,12, 4) || k.s245a || substr(p.kodp,17), to_char(k.ost), rnk_, acc_,
+                            substr(p.kodp,1,10)|| k.s580a ||substr(p.kodp,12), to_char(k.ost), rnk_, acc_,
                         'Розбивка по активу (4)', p.nbuc, p.isp, p.tobo, nd_);
                     end if;
                  end loop;
@@ -1256,7 +1181,7 @@ BEGIN
    insert into TMP_KOD_R020 values ('9001');
 
    for k in (select acc, nls, kv, rnk, s080, szq, szq_30, isp, mdate, tobo, nbs, kodp, sump, suma,
-                    cnt, rnum, decode(suma, 0, 1, sump / suma) koef, r013, s245, rz, discont, prem,
+                    cnt, rnum, decode(suma, 0, 1, sump / suma) koef, r013, rz, discont, prem,
                     round(discont * decode(suma, 0, 1, sump / suma)) discont_row,
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
                     nd, id, ob22, custtype, accr, accr_30, tip
@@ -1268,21 +1193,21 @@ BEGIN
                         nvl(s.kodp, '00000000000') kodp, nvl(s.sump, 0) sump,
                         nvl((sum(s.sump) over (partition by s.acc)), 0) suma,
                         nvl((count( * ) over (partition by s.acc)), 0) cnt,
-                        DENSE_RANK() over (partition by s.acc order by s.r013, s.s245) rnum,
-                        s.r013, s.s245, t.rz,
+                        DENSE_RANK() over (partition by s.acc order by s.r013) rnum,
+                        s.r013, t.rz,
                         nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                         t.nd, t.id,
                         a.ob22, c.custtype, t.accr, t.accr_30, a.tip
                  from v_tmp_rez_risk_c5 t,
-                      (select acc, kodp, substr(kodp,7,1) R013, substr(kodp,16,1) S245, sum(to_number(znap)) sump
+                      (select acc, kodp, substr(kodp,7,1) R013, sum(to_number(znap)) sump
                        from rnbu_trace
                        where substr(kodp,1,5) not in ('21600','22600','22605','22620','22625','22650','22655',
                                                       '11419','11429','11519','11529',
                                                       '12039','12069','12089',
                                                       '12109','12119','12129','12139',
                                                       '12209','12239' )
-                       group by acc, kodp, substr(kodp,7,1), substr(kodp,16,1)) s,
+                       group by acc, kodp, substr(kodp,7,1)) s,
                        accounts a, customer c
                   where t.dat = datr_ and
                       t.id not like 'NLO%' and
@@ -1428,6 +1353,7 @@ BEGIN
           end if;
 
           if srezp_ <> 0 and not TP_SND and k.cnt = k.rnum then
+
              if srezp_ <> 0  then
                 r012_:='B';
 
@@ -1498,7 +1424,7 @@ BEGIN
                          and a.kv = to_number(l.r030)
                          and nvl(a.nbs, substr(a.nls,1,4)) not in ('2924')
                          and substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('410','420')
-                         and (  mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_
+                         and (   mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_
                               or
                                 mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_ )
                       union
@@ -1529,7 +1455,7 @@ BEGIN
                          and a.kv = to_number(l.r030)
                          and nvl(a.nbs, substr(a.nls,1,4)) not in ('2924')
                          and substr(nvl(a.nbs, substr(a.nls,1,4)),1,3) not in ('410','420')
-                         and (  mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_
+                         and (   mfo_ = 300465 and nvl(t.dat_mi, dat_)<= dat_
                               or
                                 mfo_ <> 300465 and nvl(t.dat_mi, dat_+1) > dat_)
                         )
@@ -2041,7 +1967,6 @@ BEGIN
    commit;
 
    DELETE FROM OTC_C5_PROC WHERE datf = dat_;
-   commit;
 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
@@ -2066,7 +1991,6 @@ BEGIN
              v.seg_02 like '___9')
         )
     order by seg_02, seg_01, acc_num;
-	commit;
     -----------------------------------------------------
 
 
@@ -2087,7 +2011,7 @@ BEGIN
         )
     order by seg_02, seg_01, acc_num;
     -----------------------------------------------------
-    commit;
+
 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
@@ -2125,7 +2049,6 @@ BEGIN
         v.seg_02 = '3040' and v.seg_03 in ('2', '4')
         )
     order by seg_02, seg_01, acc_num;
-	commit;
     -----------------------------------------------------
 
 
@@ -2169,7 +2092,6 @@ BEGIN
         v.seg_02 = '3119' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
         )
     order by seg_02, seg_01, acc_num;
-	commit;
     -----------------------------------------------------
 
 
@@ -2203,7 +2125,6 @@ BEGIN
         v.seg_02 = '3219' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         )
     order by seg_02, seg_01, acc_num;
-	commit;
     -----------------------------------------------------
 
    INSERT INTO otc_c5_proc
@@ -2234,7 +2155,6 @@ BEGIN
         v.seg_02 in ('1819', '2809', '3049', '3519','3548')
         )
     order by seg_02, seg_01, acc_num;
-	commit;
    -----------------------------------------------------
 
    INSERT INTO otc_c5_proc
@@ -2249,7 +2169,6 @@ BEGIN
         v.acc_id = s.acc and
         nvl(trim(s.r013), '0') = '1'
     order by seg_02, seg_01, acc_num;
-	commit;
     -----------------------------------------------------
 
     delete
@@ -2263,10 +2182,8 @@ BEGIN
                             '2319','2329','2339','2349','2359','2369','2379',
                             '2409','2419','2429','2439','2609','2629','2659',
                             '2890','3119','3219','3569','3590','3599','3690','3692') and
-       acc in (select /*+ index(s, XPK_SNAP_BALANCES)*/
-                    acc
-               from snap_balances s
-               where fdat = dat_ and ost=0);
+       acc in (select acc from snap_balances where fdat = dat_ and ost=0);
+
     commit;
 
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
