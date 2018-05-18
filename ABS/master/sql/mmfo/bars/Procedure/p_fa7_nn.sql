@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.008  05/04/2018 (04/04/2018)
+% VERSION     :  v.18.010  16/05/2018 (14/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -142,6 +142,7 @@ IS
    rnk_            NUMBER;
    isp_            NUMBER;
    nd_             NUMBER;
+   ndg_            NUMBER;
    zm_date_        DATE                  := TO_DATE ('01072006', 'ddmmyyyy');
    zm_date2_       DATE                  := TO_DATE ('21122012', 'ddmmyyyy');
    zm_date3_       DATE                  := TO_DATE ('30092013', 'ddmmyyyy');
@@ -312,7 +313,8 @@ IS
          sdate_ date,
          freq#           NUMBER,
          s#              NUMBER,
-         apl_dat#        DATE
+         apl_dat#        DATE,
+         ndg_            NUMBER
         );
 
    TYPE rec_t IS TABLE OF rec_type;
@@ -651,14 +653,14 @@ BEGIN
 
       case
           when dc_ <= 10
-          then 
+          then
                datp_ := trunc(dat_,'MM');
                datn_ := trunc(dat_,'MM') + 9;
           when dc_ <= 20
-          then 
+          then
                datp_ := trunc(dat_,'MM') + 10;
                datn_ := trunc(dat_,'MM') + 19;
-          else 
+          else
                datp_ := trunc(dat_,'MM') + 20;
                datn_ := last_day(dat_);
       end case;
@@ -671,7 +673,7 @@ BEGIN
    then
       datn_ := LAST_DAY (dat_);
    end if;
-   
+
    if pmode_ = 2 then -- для файлу @77
       p_arc_otcn (dat_, 0);
    else
@@ -961,7 +963,7 @@ BEGIN
    end if;
 
    cursor_sql := 'select t.*
-                  from (select a.*, d.nd, d.sdate, v.freq, v.s, v.apl_dat
+                  from (select a.*, d.nd, d.sdate, v.freq, v.s, v.apl_dat, d.ndg
                        from (
                        SELECT a.acc, a.nls, a.kv, a.fdat, a.nbs, a.tip, p.s240, p.s180, p.s181,
                              p.r011, nvl(trim(p.r013), ''0'') r013, l.r031, a.mdate, a.ost, a.ostq, a.rnk, a.isp,
@@ -989,7 +991,7 @@ BEGIN
                          AND a.kv = TO_NUMBER (l.r030)
                          AND a.acc = p.acc(+)
                          AND a.rnk = c.rnk) a
-                         left outer join (select n.acc, max(n.nd) nd, max(c.sdate) sdate
+                         left outer join (select n.acc, max(n.nd) nd, max(c.sdate) sdate, max(c.ndg) ndg
                                               from nd_acc n, cc_deal c
                                               where n.nd = c.nd and
                                                         c.sdate <= :dat_
@@ -1043,7 +1045,8 @@ BEGIN
           sdate_  :=    l_rec_t(i).sdate_;
           freq#_  :=    l_rec_t(i).freq#;
           s#_     :=    l_rec_t(i).s#;
-          apl_dat#_ :=    l_rec_t(i).apl_dat#;
+          apl_dat#_ :=  l_rec_t(i).apl_dat#;
+          ndg_      :=  l_rec_t(i).ndg_;
 
           p240_ := NVL (TRIM (p240_), '0');
           s180_ := NVL (TRIM (s180_), '0');
@@ -1061,6 +1064,11 @@ BEGIN
           s190_ :='0';
 
           tips_ := TRIM (tips_);
+          
+          -- для того, щоб по гарантіях не брати графік
+          if tips_ = 'SS' and nls_ like '9000%' then
+             tips_ := 'ODB';
+          end if;
 
           ap_ := (case when ap_ = 3 then (case when sign(sn_) = -1 then 1 else 2 end) else ap_ end);
 
@@ -1126,7 +1134,7 @@ BEGIN
               select nvl(kol,0)  into kol_351_
                 from kol_nd_dat
                where dat =pdat_
-                 and nd = nd_
+                 and nd = nvl(ndg_, nd_)
                  and rownum = 1;
 
           exception
@@ -2850,16 +2858,17 @@ BEGIN
 
             -- определяем остаток счетов дисконта или премии
              BEGIN
-               select SUM(NVL(Gl.P_Icurval( s.KV, s.ost, dat_ ) ,0))
+               select SUM(NVL(Gl.P_Icurval(s.KV, s.ost, dat_) ,0))
                   INTO s04_
                from sal s
                where s.fdat=dat_
                  AND s.acc in (select d.acc
-                               from nd_acc d, accounts s
-                               where d.acc<>acc_ and
-                                     d.nd = k.nd and
-                                     d.acc=s.acc and
-                                     s.rnk=rnk_  and
+                               from accounts s, nd_acc d, cc_deal c
+                               where nvl(c.ndg, c.nd) = nd_ and
+                                     c.nd = d.nd and
+                                     d.acc <> acc_ and
+                                     d.acc = s.acc and
+                                     s.rnk = rnk_  and
                                      substr(s.nbs,4,1) in ('5','6','9')
                                      and substr(s.nbs,1,3)=substr(k.nbs,1,3));
              EXCEPTION WHEN NO_DATA_FOUND THEN
@@ -4326,7 +4335,7 @@ BEGIN
                                             t020||'0'||nbs||lpad(kv, 3, '0'), nbuc, typ_)
                              end) ostq
                        from (
-                           select nbuc, decode(t020, -1, '1', '2') t020, rez, 
+                           select nbuc, decode(t020, -1, '1', '2') t020, rez,
                                 replace(nbs, '86','26') nbs, kv, abs(ostq) ostq
                            from (
                              select  /*+ parallel(8) */
@@ -4345,7 +4354,7 @@ BEGIN
                                            '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
                                           '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
-                                          '2139','2209','2239','2609','2629','2659','3119','3219') 
+                                          '2139','2209','2239','2609','2629','2659','3119','3219')
                                 and tip <> 'NL8'
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
@@ -4433,15 +4442,15 @@ BEGIN
                             '2319','2329','2339','2349','2359','2369','2379',
                             '2409','2419','2429','2439','2609','2629','2659',
                             '2890','3119','3219','3569','3590','3599','3690','3692') and
-                  k.t020 = '2' and 
-                  k.rizn > 0  
-               then 
-                   insert into rnbu_trace(recid, userid, nls, kv, odate, kodp, znap, nbuc, 
+                  k.t020 = '2' and
+                  k.rizn > 0
+               then
+                   insert into rnbu_trace(recid, userid, nls, kv, odate, kodp, znap, nbuc,
                         isp, rnk, acc, ref, comm, nd, mdate, tobo)
-                   select s_rnbu_record.nextval, userid, nls, kv, odate, 
-                        substr(kodp, 1, 8)||'Z'||substr(kodp, 10), 
-                        to_char(k.rizn) znap, nbuc, 
-                        isp, rnk, acc, ref, 'Вирів-ня з балансом на '||to_char(k.rizn) comm, 
+                   select s_rnbu_record.nextval, userid, nls, kv, odate,
+                        substr(kodp, 1, 8)||'Z'||substr(kodp, 10),
+                        to_char(k.rizn) znap, nbuc,
+                        isp, rnk, acc, ref, 'Вирів-ня з балансом на '||to_char(k.rizn) comm,
                         nd, mdate, tobo
                    from rnbu_trace
                    where recid = recid_;
@@ -4454,7 +4463,7 @@ BEGIN
             end if;
         end loop;
     end;
-                      
+
     if pmode_ = 0 then
         declare
            recid_    number;
@@ -4466,7 +4475,7 @@ BEGIN
                              R013_s580, R013_s580_A
                      from (select nbuc, rez, t020, nbs, kv, ostq
                            from (
-                               select nbuc, decode(t020, -1, '1', '2') t020, rez, 
+                               select nbuc, decode(t020, -1, '1', '2') t020, rez,
                                     nbs, kv, abs(ostq) ostq
                                from (
                                  select (case when typ_ > 0
@@ -4477,8 +4486,8 @@ BEGIN
                                      s.nbs, s.kv,
                                      sum(decode(s.kv, 980, a.ost, a.ostq)) ostq
                                  from snap_balances a, accounts s, customer c
-                                 where  a.fdat = dat_ 
-                                    and s.nbs in ('2610','2615','2651','2652') 
+                                 where  a.fdat = dat_
+                                    and s.nbs in ('2610','2615','2651','2652')
                                     and a.acc = s.acc
                                     and s.rnk = c.rnk
                                  group by (case when typ_ > 0
