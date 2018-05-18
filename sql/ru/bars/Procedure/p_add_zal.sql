@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE p_add_zal
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ADD_ZAL.sql =========*** Run ***
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_ADD_ZAL ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_ADD_ZAL 
 (
   p_nd   NUMBER
  , --дог.займа займа
@@ -20,15 +29,17 @@ CREATE OR REPLACE PROCEDURE p_add_zal
  ,p_mpawn  INT
  ,p_pr_12  INT
  ,p_nazn   VARCHAR2 DEFAULT NULL
+ ,p_ob22   VARCHAR2 DEFAULT NULL
+ ,p_R013   VARCHAR2 DEFAULT NULL
 ) IS
   --ввод новых залогов
   -- 07/12/2016 -- COBUMMFOTEST-361 Назначение платежа из формы
   --11/10/2016 Sta Расширение процедуры для работы по ACCS, а не только по ND. Использую такжк в МБДК
-  -- Работа с ПАСС 
+  -- Работа с ПАСС
 
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(5) := 'PAWN:';
-  ------------------- 
+  -------------------
   az     accounts%ROWTYPE;
   dd     cc_deal%ROWTYPE;
   aa     accounts%ROWTYPE;
@@ -39,6 +50,8 @@ CREATE OR REPLACE PROCEDURE p_add_zal
   acc8_  NUMBER;
   l_pawn NUMBER;
 BEGIN
+  /*raise_application_error(g_errn
+                               ,g_errs || p_pawn);*/
 if p_rnk is not null and p_acc is not null then
   if p_sv is null  and p_del is null then
      raise_application_error(g_errn
@@ -49,15 +62,15 @@ elsif  p_acc is  null then
      raise_application_error(g_errn
                                ,'При додаванні нового забезпечення поле ''Справ.варт.забезп'' повинне буде пусте!');
   end if;
-end if; 
-  bars.bars_audit.info('P_ADD_ZAl params.p_nd=' || p_nd || ' ,p_ACCS' ||
+end if;
+ /* bars.bars_audit.info('P_ADD_ZAl params.p_nd=' || p_nd || ' ,p_ACCS' ||
                        p_accs || ' ,p_RNK=' || p_rnk || ' ,p_pawn=' ||
                        p_pawn || ' ,p_ACC=' || p_acc || ' ,p_kv' || p_kv ||
                        ' ,p_sv=' || p_sv || ' ,p_del=' || p_del || ' ,p_cc_idz=' || p_cc_idz || ' ,p_sdatz=' ||
                        p_sdatz || ' ,p_mdate=' || p_mdate || ' ,p_nree=' ||
                        p_nree || ' ,p_Depid=' || p_depid || ' ,p_mpawn=' ||
                        p_mpawn || ' ,p_PR_12=' || p_pr_12 || ' ,p_nazn=' ||
-                       p_nazn);
+                       p_nazn);*/
   IF pul.get_mas_ini_val('PAP') = 2 THEN
     l_pawn := 999999;
   ELSE
@@ -70,12 +83,12 @@ end if;
     l_accs := nvl(p_accs, to_number(pul.get_mas_ini_val('ACC')));
   END IF;
   ---------------------------
-  IF nvl(l_nd, 0) <= 0
+/*  IF nvl(l_nd, 0) <= 0
      AND nvl(l_accs, 0) <= 0 THEN
     raise_application_error(g_errn
                            ,g_errs ||
                             'Не знайдено ні договору, ні рах позики');
-  END IF;
+  END IF;*/
   ---------------------------
   IF l_nd > 0 THEN
     BEGIN
@@ -127,7 +140,7 @@ end if;
 
   IF p_acc IS NULL THEN
     -- Новый(insert) -- Открыть счет обеспечения с PAWN_ACC Дополнить его спец.параметрами (PAWN_ACC)
-  
+
     BEGIN
       SELECT substr(nmk || ' Забезпечення.', 1, 38)
         INTO az.nms
@@ -139,7 +152,7 @@ end if;
                                ,g_errs || 'Не знайдено РНК заставодавця =' ||
                                 az.rnk);
     END;
-  
+
     BEGIN
       SELECT f_newnls2(nvl(acc8_, l_accs)
                       ,'ZAL'
@@ -160,7 +173,7 @@ end if;
                                ,g_errs || 'Не знайдено Код забесп pawn=' ||
                                 l_pawn);
     END;
-  
+
     az.nls := vkrzn(substr(gl.amfo, 1, 5), az.nls);
     op_reg(2
           ,l_nd
@@ -174,7 +187,7 @@ end if;
           ,'ZAL'
           ,az.isp
           ,az.acc);
-  
+
     UPDATE accounts
        SET mdate = p_mdate, tobo = az.branch
      WHERE acc = az.acc;
@@ -187,9 +200,21 @@ end if;
     IF l_nd > 0 THEN
       INSERT INTO nd_acc (nd, acc) VALUES (l_nd, az.acc);
     END IF;
-  
-  END IF;
 
+  END IF;
+ if p_R013 is not null then
+       accreg.setAccountSParam(az.acc, 'R013', p_R013);
+ end if;
+ UPDATE PAWN_ACC SET pawn=l_pawn WHERE acc=az.acc;
+ if p_ob22 is not null then
+ /*BEGIN
+   INSERT INTO specparam_int (acc, ob22) VALUES (az.acc, p_ob22);
+ EXCEPTION
+   WHEN dup_val_on_index THEN
+     UPDATE specparam_int SET ob22 = p_ob22 WHERE acc = az.acc;
+ END;*/
+      accreg.setAccountSParam(az.acc, 'OB22', p_ob22);
+end if;
   BEGIN
     SELECT * INTO az FROM accounts WHERE acc = az.acc;
   EXCEPTION
@@ -216,14 +241,15 @@ end if;
              ,NULL
              ,p_sv
              ,p_depid
-             ,p_pr_12);
+             ,p_pr_12
+             ,p_pawn);
   END LOOP;
   -----------------------------
   IF nvl(p_del, 0) = 0 THEN
     RETURN;
   END IF;
 
-  BEGIN
+/*  BEGIN
     SELECT nls, substr(nms, 1, 38)
       INTO oo.nlsb, oo.nam_b
       FROM accounts
@@ -235,7 +261,19 @@ end if;
     WHEN no_data_found THEN
       raise_application_error(g_errn
                              ,g_errs || 'Не знайдено контр/рах.9900*');
-  END;
+  END;*/
+
+
+BEGIN
+SELECT t.nls,substr(t.nms ,1,38) INTO oo.nlsb, oo.nam_b
+      FROM accounts t
+     WHERE t.kv =az.kv
+      and t.nls = BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);
+  EXCEPTION
+    WHEN no_data_found THEN
+      raise_application_error(g_errn
+                             ,g_errs || 'Не визначено рахунко кредит для операції!');
+ END;
 
   IF p_del > 0 THEN
     IF az.pap = 2 THEN
@@ -324,3 +362,14 @@ end if;
 
 END p_add_zal;
 /
+show err;
+
+PROMPT *** Create  grants  P_ADD_ZAL ***
+grant EXECUTE                                                                on P_ADD_ZAL       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_ADD_ZAL       to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ADD_ZAL.sql =========*** End ***
+PROMPT ===================================================================================== 

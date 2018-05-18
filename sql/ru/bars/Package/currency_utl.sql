@@ -1,4 +1,67 @@
-create or replace package body currency_utl as
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/currency_utl.sql =========*** Run **
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CURRENCY_UTL is
+
+    type t_currency_id_directory is table of tabval$global%rowtype index by pls_integer;
+    type t_currency_code_directory is table of tabval$global%rowtype index by varchar2(3 char);
+
+    g_currency_id_directory t_currency_id_directory;
+    g_currency_code_directory t_currency_code_directory;
+
+    function read_currency(
+        p_currency_id in integer,
+        p_raise_ndf in boolean default true,
+        p_use_cache in boolean default true)
+    return tabval$global%rowtype;
+
+    function read_currency(
+        p_currency_code in varchar2,
+        p_raise_ndf in boolean default true,
+        p_use_cache in boolean default true)
+    return tabval$global%rowtype;
+
+    function get_currency_lcv(
+        p_currency_id in integer)
+    return varchar2;
+
+    function get_currency_scale(
+        p_currency_id in integer)
+    return integer;
+
+    function get_currency_scale(
+        p_currency_code in varchar2)
+    return integer;
+
+    -- приводить суму в базових одиниц€х вим≥ру валюти (гривн≥, долари, унц≥њ) до найменших одиниць вим≥ру (коп≥йки, центи, тис€чн≥ дол≥ унц≥й ≥ т.п.)
+    function to_fractional_units(
+        p_amount in number,
+        p_currency_id in integer)
+    return integer;
+
+    -- приводить суму в найменших одиниц€х вим≥ру валюти (коп≥йки, центи, тис€чн≥ дол≥ унц≥й) до базових одиниць вим≥ру (гривн≥, долари, унц≥њ ≥ т.п.)
+    function from_fractional_units(
+        p_amount in integer,
+        p_currency_id in integer)
+    return number;
+
+    --  онвертуЇ суму з одн≥Їњ валюти в ≥ншу за оф≥ц≥йним курсом ЌЅ”
+    -- «а замовчанн€м, суми вказуютьс€ в найменших одиниц€х вим≥ру (коп≥йках, центах, сотих ≥ тис€чних унц≥њ ≥ т.п.)
+    -- у раз≥ необх≥дност≥ конвертувати суму в базових одиниц€х вим≥ру, необх≥дно пов≥домити про це функц≥ю за допомогою
+    -- параметра p_value_is_fractional = 'N', в цьому випадку результат також буде повертатис€ в базових одиниц€х
+    function convert_amount(
+        p_amount in number,
+        p_from_currency_id in integer,
+        p_to_currency_id in integer,
+        p_bank_date in date default bankdate(),
+        p_value_is_fractional in char default 'Y')
+    return number;
+end;
+/
+CREATE OR REPLACE PACKAGE BODY BARS.CURRENCY_UTL as
 
     procedure flush_directories_cache
     is
@@ -165,4 +228,11 @@ create or replace package body currency_utl as
     end;
 end;
 /
-show err
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/currency_utl.sql =========*** End **
+ PROMPT ===================================================================================== 
+ 

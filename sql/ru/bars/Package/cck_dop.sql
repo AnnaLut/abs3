@@ -197,9 +197,13 @@ END CCK_DOP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.cck_dop IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.00 PLAN 08/11/2017';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.01 PLAN 15/03/2018';
 
   /*
+  15/03/2018 LSO Вернуться в свою область видимости пи авторизауии так как GL работает по STAFF
+  27.11.2017 Sta+Вика Семенова : При авторизации кред.линий (Ген.договора - VIDD=2,3) при типе авторизации 1 (полная авторизация)
+              автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами Ген.договора (валюта, % ставка, база начисления)
+
   28/03/2017 Приведение дисконта в формат NNNNNN.NN
   02/03/2017 вызов стандартной процедуры авторизации перенесен после открытия счетов
   15/02/2017 COBUSUPABS-5326 
@@ -1493,8 +1497,9 @@ end builder_gpk;
     end loop;
   end open_an_account;
 
------ Авторизация КД-------------------------
-procedure cc_autor(p_nd   in number,
+-----------------
+      procedure cc_autor_ex
+        (p_nd   in number,
                    p_saim in varchar2 default null,
                    p_urov in varchar2 default null
                    ) is
@@ -1521,30 +1526,30 @@ begin
   select * into l_cd_row from cc_deal where nd = p_nd;
   if l_cd_row.sos > 5 then     RETURN;  end if;
   ----------------------------------------------
- 
+
   -- COBUSUPABS-4863
-  If l_cd_row.vidd in (11,12,13) then 
-   
-     -- 3.1. Для кредитів ФО, забезпечити контроль обов’язковості заповнення додаткового параметру кредитного договору «Наявність партнера» 
-     If CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PARTN') in ('YES','Taк')  then  
+  If l_cd_row.vidd in (11,12,13) then
 
-        -- У випадку заповнення параметру «Наявність партнера» - «Так», 
-        -- параметр «Партнер» теж повинен бути обов’язковим для заповнення 
+     -- 3.1. Для кредитів ФО, забезпечити контроль обов’язковості заповнення додаткового параметру кредитного договору «Наявність партнера»
+     If CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PARTN') in ('YES','Taк')  then
+
+        -- У випадку заповнення параметру «Наявність партнера» - «Так»,
+        -- параметр «Партнер» теж повинен бути обов’язковим для заповнення
         l_PAR_N := CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'PAR_N') ;
-        If l_PAR_N is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Партнер» ' );  end if; 
+        If l_PAR_N is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Партнер» ' );  end if;
 
-        --У випадку, якщо в параметрі «Партнер» заповнено «ТОВ Ромстал Україна» (TABLE - WCS_PARTNERS_ALL, PTN_NLS = 26002003045900, PTN_OKPO = 32346937) 
-        -- контролюється обов’язковість заповнення полів: 
-        Begin select * into ww from  WCS_PARTNERS_ALL where to_char (id) = trim(l_PAR_N) and PTN_OKPO = '32346937' ;   
+        --У випадку, якщо в параметрі «Партнер» заповнено «ТОВ Ромстал Україна» (TABLE - WCS_PARTNERS_ALL, PTN_NLS = 26002003045900, PTN_OKPO = 32346937)
+        -- контролюється обов’язковість заповнення полів:
+        Begin select * into ww from  WCS_PARTNERS_ALL where to_char (id) = trim(l_PAR_N) and PTN_OKPO = '32346937' ;
 
            --ES001    Вартість товару (держ.програма)
            l_ES001 := CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG =>'ES001') ;
-           If l_ES001 is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Вартість товару (держ.програма)»' );  end if; 
+           If l_ES001 is null then raise_application_error(  -20203, 'НЕ заповнно параметр «Вартість товару (держ.програма)»' );  end if;
 
            ---«Енергоефективний захід» (одного із - ES104 or ES110 or ES116 or …)
-           begin select 1 into l_RomStal from nd_txt 
+           begin select 1 into l_RomStal from nd_txt
                  where nd =  l_cd_row.ND and rownum = 1  and tag in (select tag from cc_tag where tag like 'ES1%' AND TABLE_NAME = 'VW_ESCR_EVENTS_CENTURA' );
-           EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(  -20203, 'НЕ заповнно жодний параметр «Енергоефективний захід»' ); 
+           EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(  -20203, 'НЕ заповнно жодний параметр «Енергоефективний захід»' );
            end;
 
         EXCEPTION WHEN NO_DATA_FOUND THEN  l_RomStal  := 0;
@@ -1552,21 +1557,21 @@ begin
      end if ;
   end if ;  -- COBUSUPABS-4863
 
-  
+
 
 /*  -- Если это дог гарантий выходим (защита от дурака)
   if substr (l_cd_row.prod,1,1)='9' then    return;  end if;*/
 
   If l_RomStal  = 1 then  ---- COBUSUPABS-4863 увеличим сумму дисконта на расчетную
-     --Сума даної комісії повинна враховуватись при розрахунку ЕПС, разом з сумою комісії за надання, яку сплачує позичальник та в подальшому амортизуватись. 
+     --Сума даної комісії повинна враховуватись при розрахунку ЕПС, разом з сумою комісії за надання, яку сплачує позичальник та в подальшому амортизуватись.
      --Сума комісії розраховується за формулою:    0,5/6 * Вт , де: Вт - значення параметру «Вартість товару(держ. програма)».
      begin l_SDI_add := round(to_number (l_ES001) * 1/12 ,2) ;
-           l_SDI     := to_number (CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG => 'S_SDI' ) ); 
-           l_SDI     := Nvl(l_SDI,0);           
-           l_SDI     := l_SDI + l_SDI_add; 
+           l_SDI     := to_number (CCK_APP.Get_ND_TXT (p_ND => l_cd_row.ND, p_TAG => 'S_SDI' ) );
+           l_SDI     := Nvl(l_SDI,0);
+           l_SDI     := l_SDI + l_SDI_add;
            CCK_APP.Set_ND_TXT (p_ND => l_cd_row.ND, p_TAG => 'S_SDI'  ,p_TXT => to_char(l_SDI) ) ;
-     exception when others then raise_application_error(  -20203, 'НЕможливо розрахувати додатковий дисконт від варт.товару='||l_ES001 ); 
-     end ;  
+     exception when others then raise_application_error(  -20203, 'НЕможливо розрахувати додатковий дисконт від варт.товару='||l_ES001 );
+     end ;
   end if ;  --- COBUSUPABS-4863
 
   -- Построение потоков и расчет Эф. ставки
@@ -1633,14 +1638,14 @@ begin
         if l_force_open = 1 then   cck_dop.open_account(p_nd, cur.tip);    end if;
      end loop;
   end;
- 
+
   If l_RomStal  = 1 and l_SDI_add > 0 then ---- COBUSUPABS-4863
      --3.2. Забезпечити, при авторизації кредитного договору, який відповідає умовам (3.1.) автоматичне формування проводки:
      -- Дт. 3578 (05)* – Кт. 2206 (SDI)**
      --* - рахунок 3578 (ОБ22=05) відкривається в рамках кожного РУ для клієнта «ТОВ Ромстал Україна» (ОКПО = 32346937). У випадку, якщо клієнта з таким ОКПО не знайдено, або в нього відсутній відкритий рахунок 3578 (05). Система повинна видавати відповідне повідомлення і блокувати авторизацію договору;
      --** - рахунок дисконту для даного кредитного договору;
      declare oo oper%rowtype;
-     begin 
+     begin
         oo.dk   := 1 ;
         oo.kv   := gl.Baseval ;
         oo.nd   := substr( l_cd_row.cc_id,1,10) ;
@@ -1648,9 +1653,9 @@ begin
         oo.s    := l_SDI_add *100;
         oo.nazn := Substr(  'Нарахування комісійних доходів за договором '|| l_cd_row.cc_id || ' від '|| to_char(l_cd_row.sdate,'dd.mm.yyyy'), 1, 160 );
 
-        begin select a.nls, substr(a.nms,1,38), c.okpo     into oo.nlsa, oo.nam_a , oo.id_a   from accounts a, customer c 
+        begin select a.nls, substr(a.nms,1,38), c.okpo     into oo.nlsa, oo.nam_a , oo.id_a   from accounts a, customer c
               where c.okpo = ww.PTN_OKPO  and a.rnk = c.rnk and rownum = 1 and a.kv = oo.kv  and a.nbs = '3578' and a.ob22 ='05' and a.dazs is null ;
-        EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(  -20203, 'НЕ знайдено рах 3578/05 для '||ww.PTN_NAME|| ', Ід.код='||ww.PTN_OKPO  ); 
+        EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(  -20203, 'НЕ знайдено рах 3578/05 для '||ww.PTN_NAME|| ', Ід.код='||ww.PTN_OKPO  );
         end;
 
         begin select a.nls, substr(a.nms,1,38), c.okpo     into oo.nlsb, oo.nam_b, oo.id_b    from accounts a, customer c , nd_acc n
@@ -1658,12 +1663,12 @@ begin
         EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(  -20203, 'НЕ знайдено рах SDI  для КД '||l_cd_row.ND);
         end;
 
-        GL.REF ( oo.REF) ;  
-        gl.in_doc3(ref_=>oo.REF  , tt_  =>oo.tt  , vob_ => 6      , nd_   => oo.nd   , pdat_=> SYSDATE, vdat_=> gl.BDATE, 
+        GL.REF ( oo.REF) ;
+        gl.in_doc3(ref_=>oo.REF  , tt_  =>oo.tt  , vob_ => 6      , nd_   => oo.nd   , pdat_=> SYSDATE, vdat_=> gl.BDATE,
                    dk_ =>oo.dk   , kv_  =>oo.kv  , s_   => oo.s   , kv2_  => oo.kv   , s2_  => oo.s   , sk_  => null, data_=> gl.BDATE , datp_=> gl.bdate,
-                 nam_a_=>oo.nam_a, nlsa_=>oo.nlsa, mfoa_=> gl.aMfo, nam_b_=> oo.nam_b, nlsb_=> oo.nlsb, mfob_=> gl.aMfo , 
+                 nam_a_=>oo.nam_a, nlsa_=>oo.nlsa, mfoa_=> gl.aMfo, nam_b_=> oo.nam_b, nlsb_=> oo.nlsb, mfob_=> gl.aMfo ,
                  nazn_ =>oo.nazn ,d_rec_=> null  , id_a_=> oo.id_a, id_b_ => oo.id_b , id_o_=> null   , sign_=> null, sos_=>1, prty_=>null, uid_=>null) ;
-        gl.payV ( 0, oo.REF, gl.BDATE , oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.s );  
+        gl.payV ( 0, oo.REF, gl.BDATE , oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.s );
         gl.pay  ( 2, oo.REF, gl.BDATE);
      end ;
   end If ;  ---- COBUSUPABS-4863
@@ -1684,7 +1689,7 @@ begin
      end loop;
      RETURN;
   end if;
-  
+
 /*     if p_nd=5911154601 then
       raise_application_error(-20005,'cck.AUTOR');
     end if;*/
@@ -1706,15 +1711,16 @@ begin
                 sys_context('bars_context','user_branch');
 
   begin
+    
      -- параметры кредита
      select * into l_ccv from cc_v where nd = p_nd;
-
+ 
      -- установить доступ уровня договора для возможности постановки виз
      -- прользователей уровня договора       -- bc.set_context;
      bc.subst_branch(l_ccv.branch);
 
      --l_sb_row.id := cck_dop.get_isp_by_branch( l_ccv.branch);
-     l_sb_row.id := sys_context('bars_global', 'user_id');      
+     l_sb_row.id := sys_context('bars_global', 'user_id');
 
      -- ищем контр счет для обеспечения
      select nlsm,substr(flags,38,1) into l_nls9,l_fl_opl from tts where tt='ZAL';
@@ -1722,10 +1728,15 @@ begin
      if substr(l_nls9, 1, 2) = '#(' then      -- dynamic account number present
         execute immediate 'select '||substr(l_nls9,3,length(l_nls9)-3)||' from dual' into l_nls9;
      end if;
-
+     
+    l_nls9:= BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);
+   
      -- его наименование
+    begin
      select substr(nms,1,38) into l_nms9 from accounts where nls=l_nls9 and kv=gl.baseval;
-
+     exception when no_data_found then
+         RAise_application_error(-20008,'Для бранча  '||l_ccv.branch ||' не знайдено контррахунок для обліку забезпечення!');
+     end;
      -- поочередно перебираем сохраненніе в допреквизитах параметры обеспечения
      for k in
         (SELECT cck_app.to_number2(txt)                          as PAWN,
@@ -1755,7 +1766,7 @@ begin
               l_sb_row.id,  l_new_acc);
 
        update pawn_acc set sv = k.sum where acc = l_new_acc;
-       
+
        -- 05.07.2012 Sta OB22  для залогов и гарантий
        If ( k.nbsz like '9500' )
        then
@@ -1798,9 +1809,9 @@ begin
           end if;
 
        end if;
-       
+
        Accreg.setAccountSParam( l_new_acc, 'OB22', l_ob22 );
-       
+
        update pawn_acc set sv = k.sum where acc = l_new_acc;
 
        -- привязка счета к счетам договора
@@ -1821,7 +1832,7 @@ begin
        end if;
 
        begin
-
+         bc.subst_branch(l_branch); --Танцы вернуться в свою область видимости так как GL работает по STAFF
          gl.ref(ref_);
          gl.in_doc3
            (ref_,'ZAL', l_vob, ref_, sysdate , gl.bdate, l_dk, gl.baseval,
@@ -1829,25 +1840,57 @@ begin
             substr(l_nms_zal,1,38),l_new_nls , gl.amfo,
             substr(l_nms9,   1,38),l_nls9    , gl.amfo, substr(nazn_,1,160),
             null , l_okpo,  l_okpo, null,null, 0,null , l_ccv.id);
-
-       exception when others then
-         -- вернуться в свою область видимости
-         bc.subst_branch(l_branch);
-         -- исключение бросаем дальше
-         raise_application_error(-20000,sqlerrm || chr(10) ||
-                                 dbms_utility.format_error_backtrace(), true);
+         bc.subst_branch(l_ccv.branch);
+       exception when others then         -- вернуться в свою область видимости
+         bc.subst_branch(l_branch);      -- исключение бросаем дальше
+         raise_application_error(-20000,sqlerrm || chr(10) ||  dbms_utility.format_error_backtrace(), true);
        end;
-
        gl.payv(l_fl_opl, ref_, gl.bdate, 'ZAL', l_dk,  gl.baseval,l_new_nls,   k.sum,  gl.baseval,   l_nls9,   k.sum);
-
      end loop;
-    
+
      -- вернуться в свою область видимости
      bc.subst_branch(l_branch);
 
-  end;
+     --27.11.2017 Sta+Вика Семенова : При авторизации кред.линий (Ген.договора - VIDD=2,3) при типе авторизации 1 (полная авторизация)
+     --               автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами Ген.договора (валюта, % ставка, база начисления)
+     If l_cd_row.vidd in (2,3) and l_cd_row.NDG = l_cd_row.ND then
 
-end cc_autor;
+        declare  l_kv8 int ; l_bs8 int ; l_IR8  number;
+        begin
+
+            select a.kv, i.basey, (select ir from int_ratn where id = 0 and acc = a.acc and rownum = 1) IR
+            ----- acrn.fPROCN(0, a.acc, gl.bdate) IR
+            into l_kv8, l_bs8, l_IR8
+            from accounts a, int_accn i, nd_acc n
+            where a.tip = 'LIM' and a.acc = n.acc and n.nd =l_cd_row.ND and a.acc = i.acc and i.id =  0;
+
+            EXECUTE IMMEDIATE 'begin MSFZ9.OPN1 ( :NDG, :KV, :IR, :BS, null, null ) ; end ;'      USING l_cd_row.ND, l_KV8, l_IR8,  l_BS8 ;
+
+            If l_cd_row.vidd =3 then
+               for x in (select substr(tag,2,3)+0 KV, to_number(txt) IR from nd_txt where nd=l_cd_row.ND and tag in ('P643','P840','P978','P980','P987') and substr(tag,2,3)+0<>l_KV8)
+               loop  EXECUTE IMMEDIATE 'begin MSFZ9.OPN1 ( :NDG, :KV, :IR, :BS, null, null ) ; end ;'      USING l_cd_row.ND, x.KV, x.IR,  l_BS8 ;    end loop ;---x
+            end if ;
+
+        EXCEPTION WHEN NO_DATA_FOUND THEN null;
+        end ;
+
+     end if;  -- vidd in (2,3)
+
+  end; --- -- вызов стандартной процедуры авторизации
+
+end cc_autor_ex;
+----- Авторизация КД-------------------------
+procedure cc_autor(p_nd   in number,  p_saim in varchar2 default null,    p_urov in varchar2 default null) is
+
+
+begin
+    CCK_DOP.cc_autor_ex (p_nd ,  p_saim,  p_urov );
+    for dd in (select nd from cc_deal where nd <> ndg and ndg =p_nd)
+    loop update cc_deal set sos =0 where nd = dd.nd;
+         CCK_DOP.cc_autor_ex (dd.nd ,  p_saim,  p_urov );
+    end loop ;
+end cc_autor ;
+-----------------------------------
 
 function get_prod_old(p_prod varchar2) return varchar2 is
 l_prod_old varchar2(6);

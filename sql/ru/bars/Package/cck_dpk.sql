@@ -5,142 +5,168 @@
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.CCK_DPK IS
-  g_header_version CONSTANT VARCHAR2(64) := 'ver.1.0  19/09/2017 ';
-/*
- 12.06.2015 Сухова. Разделено на две процедура: Возврат ГПК MODI_RET_GPK и сторно док
- 28.04.2015 COBUSUPABS-3441:   Есть 2620+2625+SG
- 22.01.2014 Сверка план-факт отс
-*/
+  g_header_version CONSTANT VARCHAR2(64) := 'ver.2.0  26/12/2017 ';
+  /*
+   21.12.2017 Закоментовано зміну шаблону при ДПК
+   07.04.2016 Sta   Гл.перем TT_W4 вынесла в "голову" пакеджа  для использования  в др приложениях
+   26.02.2016 Сухова проверка на своевременность выноса на просрочку тела
+   22.02.2016 Sta cobupabs-4219 Функция пл.дня
+   12.06.2015 Сухова. Разделено на две процедура: Возврат ГПК MODI_RET_GPK и сторно док
+   28.04.2015 COBUSUPABS-3441:   Есть 2620+2625+SG
+   22.01.2014 Сверка план-факт отс
+  */
 
---Блок сбора инф.
-  K0_ number    ;  -- 1-Ануитет. 0 - Класс
-  K1_ number    ;  -- Сумма для досрочного пог
-  K2_ number    ;  -- Платежный день
-  K3_ number    ;  -- 1=с сохранением суммы одного платежа, 2=с перерасчетом суммы до последней даты
-  ACR_DAT_ date ;
+  TT_W4 tts.tt%type := 'W4Y'; ---  W4.Списання с БПК для достр. погашення заборг. (Вместо W4X )
 
----------------------------------------
--- На перестроенном ГПК выровнять проценты в первом платеже
-PROCEDURE PROC1    ( p_ND IN number, p_datn date) ;
-------------------------------------
+  --Блок сбора инф.
+  K0_      number; -- 1-Ануитет. 0 - Класс
+  K1_      number; -- Сумма для досрочного пог
+  K2_      number; -- Платежный день
+  K3_      number; -- 1=с сохранением суммы одного платежа, 2=с перерасчетом суммы до последней даты
+  ACR_DAT_ date;
+  ----------------------------------
+  function Z8(p_nd cc_deal.nd%type) return int; -- проверка на своевременность выноса на просрочку тела
+  ----------------------------------------------------------------------
+  function Day_PL(p_nd cc_deal.nd%type) return int; -- определение K2_ по умолчанию   ;  -- Платежный день
+  ---------------------------------------
+  -- На перестроенном ГПК выровнять проценты в первом платеже
+  PROCEDURE PROC1(p_ND IN number, p_datn date);
+  ------------------------------------
 
--- перевод ГПК на носую схему - без платежей
-PROCEDURE REST_GPK ( p_ND IN number) ;
-------------------------------------
+  -- перевод ГПК на носую схему - без платежей
+  PROCEDURE REST_GPK(p_ND IN number);
+  ------------------------------------
 
--- Попытка предварительно что-то выпoнить, например, разобрать счет гашения  в части просрочек
-PROCEDURE PREV ( p_ND IN number, p_acc2620 number ) ;
----------------------------------------
-PROCEDURE REF_2620
-( p_ND   IN     number, -- реф КД
-  p_acc  in out number  -- acc 2620
- ) ;
--- подвязка к КД=p_ND  заданного счета  асс_2620
--- или с авто-подбором счета (если p_acс2620 = 0 или null)
--- и возвратом рез.
+  -- Попытка предварительно что-то выпoнить, например, разобрать счет гашения  в части просрочек
+  PROCEDURE PREV(p_ND IN number, p_acc2620 number);
+  ---------------------------------------
+  PROCEDURE REF_2620(p_ND  IN number, -- реф КД
+                     p_acc in out number -- acc 2620
+                     );
+  -- подвязка к КД=p_ND  заданного счета  асс_2620
+  -- или с авто-подбором счета (если p_acс2620 = 0 или null)
+  -- и возвратом рез.
 
--- cck_dpk.sum_SP_ALL (d.nd)         Z1,
--- cck_dpk.sum_SN_all (a8.vid, d.nd) Z2,
--- cck_dpk.sum_SS_next (d.nd)        Z3,
-----------------------------------------------------------------------
---DAT_MOD.Определение предыдущей даты модификации ГПК
-function DAT_MOD ( p_nd cc_deal.nd%type) return cc_lim_arc.MDAT%type ;
-----------------------------------------------------------------------
+  -- cck_dpk.sum_SP_ALL (d.nd)         Z1,
+  -- cck_dpk.sum_SN_all (a8.vid, d.nd) Z2,
+  -- cck_dpk.sum_SS_next (d.nd)        Z3,
+  ----------------------------------------------------------------------
+  --DAT_MOD.Определение предыдущей даты модификации ГПК
+  function DAT_MOD(p_nd cc_deal.nd%type) return cc_lim_arc.MDAT%type;
+  ----------------------------------------------------------------------
 
---Z1.Определение суммы разных просрочек
-function sum_SP_all  ( p_nd cc_deal.nd%type) return number;
+  --Z1.Определение суммы разных просрочек
+  function sum_SP_all(p_nd cc_deal.nd%type) return number;
 
--------------------------------------------------
---Z2.Определение суммы проц текущих+доначисленн
-function sum_SN_all ( p_vid int, p_nd cc_deal.nd%type) return number;
+  -------------------------------------------------
+  --Z2.Определение суммы проц текущих+доначисленн
+  function sum_SN_all(p_vid int, p_nd cc_deal.nd%type) return number;
 
------------------------------------------
---Z3.Определение суммы след.платежа по телу
-function sum_SS_next ( p_nd cc_deal.nd%type) return number;
------------------------------------------
+  -----------------------------------------
+  --Z3.Определение суммы след.платежа по телу
+  function sum_SS_next(p_nd cc_deal.nd%type) return number;
+  -----------------------------------------
+  function SUM_SK_ALL(p_nd cc_deal.nd%type) return number;
+  -----------------------------------------
+  -- Вычитать пред.сумму 1-го платежа
+  function prev_SUM1(p_nd number) return number;
+  ------------------------------------------------
 
--- Вычитать пред.сумму 1-го платежа
-function prev_SUM1 (p_nd number) return  number;
-------------------------------------------------
+  PROCEDURE PLAN_FAKT(p_nd number);
+  ------------------------------------------------
 
-PROCEDURE PLAN_FAKT (p_nd number)              ;
-------------------------------------------------
+  --Модификация ГПК при доср.погаш
 
+  PROCEDURE DPK(p_mode IN int, -- 0 - справка,
+                -- 1 - модификация
+                -- 2 - только модификация ГПК
+                p_ND      IN number, -- реф КД
+                p_acc2620 IN number, -- счет гашения (2620/2625/SG)
+                --=== Блок сбора инф.
+                p_K0 IN OUT number, -- 1-Ануитет. 0 - Класс
+                p_K1 IN number, -- <Сумма для досрочного пог>, по умолч = R2,
+                p_K2 IN number, -- <Платежный день>, по умол = DD от текущего банк.дня
+                p_K3 IN number, -- 1=ДА ,<с сохранением суммы одного платежа?>
+                -- 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
+                --
+                --==--Инфо-блок <Задолженности>
+                p_Z1 OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
+                p_Z2 OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
+                p_Z3 OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
+                p_Z4 OUT number, --ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
+                p_Z5 OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
+                --
+                --== Инфо-Брок <Рессурс>
+                p_R1 OUT number, -- Общий ресурс (ост на SG(2620)
+                p_R2 OUT number, --  Свободный ресурс R2 =  R1 - z4
+                p_P1 OUT number, --  Реф.платежа
+                p_p2 out number,
+                p_p3 OUT NUMBER);
+  --------------------------------
+  PROCEDURE MODI_INFO(p_mode IN int, -- 0 - справка, без блокировок
+                      -- 1 - досрочное пог.+модификация ГПК
+                      -- 2 - только модификация ГПК
+                      p_ND      IN number, -- реф КД
+                      p_acc2620 IN number, -- счет гашения (2620/2625/SG)
+                      --==--Инфо-блок <Задолженности>
+                      p_Z1 OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
+                      p_Z2 OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
+                      p_Z3 OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
+                      p_Z4 OUT number, --ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
+                      p_Z5 OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
+                      --
+                      --== Инфо-Брок <Рессурс>
+                      p_R1 OUT number, -- Общий ресурс (ост на SG(2620)
+                      p_R2 OUT number --  Свободный ресурс R2 =  R1 - z4
+                      );
+  --------------------------------------------------
+  PROCEDURE MODI_pay(p_ND IN number, p_acc2620 IN number);
+  --------------------------------------------------
 
---Модификация ГПК при доср.погаш
+  PROCEDURE MODI_gpk(p_ND IN number); -- реф КД.
+  ---------------------------------------------------
+  PROCEDURE modi_ret(p_nd   IN cc_deal.nd%TYPE,
+                     p_ref  IN OUT oper.ref%TYPE,
+                     p_ref2 IN OUT oper.ref%TYPE,
+                     p_ref3 IN OUT oper.ref%TYPE);
+  ---------------------------------------------------
 
-PROCEDURE DPK
-(p_mode IN  int   , -- 0 - справка,
-                    -- 1 - модификация
-                    -- 2 - только модификация ГПК
- p_ND   IN     number, -- реф КД
- p_acc2620 IN  number, -- счет гашения (2620/2625/SG)
-                    --=== Блок сбора инф.
- p_K0   IN OUT number, -- 1-Ануитет. 0 - Класс
- p_K1   IN     number, -- <Сумма для досрочного пог>, по умолч = R2,
- p_K2   IN     number, -- <Платежный день>, по умол = DD от текущего банк.дня
- p_K3   IN     number, -- 1=ДА ,<с сохранением суммы одного платежа?>
-                       -- 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
-                       --
-                       --==--Инфо-блок <Задолженности>
- p_Z1      OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
- p_Z2      OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
- p_Z3      OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
- p_Z4      OUT number, --ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
- p_Z5      OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
-                    --
-                    --== Инфо-Брок <Рессурс>
- p_R1      OUT number, -- Общий ресурс (ост на SG(2620)
- p_R2      OUT number,  --  Свободный ресурс R2 =  R1 - z4
- p_P1      OUT number  --  Реф.платежа
-  ) ;
---------------------------------
-PROCEDURE MODI_INFO
-(p_mode IN  int   , -- 0 - справка, без блокировок
-                    -- 1 - досрочное пог.+модификация ГПК
-                    -- 2 - только модификация ГПК
- p_ND   IN  number, -- реф КД
- p_acc2620 IN  number, -- счет гашения (2620/2625/SG)
-                    --==--Инфо-блок <Задолженности>
- p_Z1   OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
- p_Z2   OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
- p_Z3   OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
- p_Z4   OUT number, --ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
- p_Z5   OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
-                    --
-                    --== Инфо-Брок <Рессурс>
- p_R1   OUT number, -- Общий ресурс (ост на SG(2620)
- p_R2   OUT number  --  Свободный ресурс R2 =  R1 - z4
-  );
---------------------------------------------------
-PROCEDURE MODI_pay ( p_ND  IN  number, p_acc2620 IN number );
---------------------------------------------------
+  PROCEDURE modi_ret_ex(p_nd   IN cc_deal.nd%TYPE,
+                        p_ref  IN OUT oper.ref%TYPE,
+                        p_mdat IN DATE,
+                        p_ref2 IN OUT oper.ref%TYPE,
+                        p_ref3 in OUT oper.ref%TYPE);
 
+  procedure RET_GPK(p_Nd   IN cc_deal.nd%type,
+                    p_REF  IN oper.ref%type,
+                    p_mdat IN date);
+  ---------------------------------------------------
+  FUNCTION header_version RETURN VARCHAR2;
 
-PROCEDURE MODI_gpk ( p_ND  IN  number) ; -- реф КД.
----------------------------------------------------
-procedure MODI_RET( p_Nd  IN     cc_deal.nd%type,
-                    p_REF IN OUT oper.ref%type
-                  );
-
-procedure MODI_RET_EX( p_Nd   IN     cc_deal.nd%type,
-                       p_REF  IN OUT oper.ref%type ,
-                       p_mdat IN date
-                   );
-
-procedure RET_GPK ( p_Nd   IN cc_deal.nd%type,
-                    p_REF  IN oper.ref%type ,
-                    p_mdat IN date
-                   );
----------------------------------------------------
-END ;
+  /**
+  * body_version - возвращает версию тела пакета CCK
+  */
+  FUNCTION body_version RETURN VARCHAR2;
+END;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.1.0.0  19/09/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.2.1.0 26/12/2017 ';
   ------------------------------------------------------------------
   /*
-  19/09/2017 COBUSUPABS-6420
+  10/09/2016 LSO COBUSUPABS-4327 Змінено вид документу на меморіальний ордер
+  06/09/2016 Sta COBUSUPABS-4219 Щодо виконання дострокового погашення в платіжну дату у випадку.
+                 Номер пл.дня  беремо з умов КД
+
+  31.05.2016 Sta Определение CCK_DPK.NLS_6397 для любого уровня
+  18.05.2016 Sta Убрала commit
+  07.04.2016 Sta   Гл.перем TT_W4 вынесла в "голову" пакеджа  для использования  в др приложениях
+  24.03.2016 Sta Подмена процедуры (в части погашения - для идентичности)
+     CCK_DPK.PREV на CCK.CC_ASG( - ND )
+
+  03-03-2016 Sta Учет будущей СТОП-даты как БД-1
+  26.02.2016 Сухова проверка на своевременность выноса на просрочку тела
+  22.02.2016 Sta cobupabs-4219 Функция пл.дня
   21.10.2015 Sta Досрочное погаш для ЮЛ по теме ОСББ
   23-09-2015 Sta СТОП-дата =  проценты начисляются. как за последний день периода !!!!
   12.06.2015 Сухова. Разделено на две процедура:
@@ -157,10 +183,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
   29.04.2015 COBUSUPABS-3441:  p_acc2620 IN  number, -- счет гашения (2620/2625/SG)
   1. Доопрацювати функцію «Дострокове погашення тіла кредиту (перебудова ГПК)»:
   додати можливість вибору варіанту проведення дострокового погашення:
-  - 2620
-  - SG=3739
-  - 2625
-  для 2625 функція  відмінності:
+  - 2620- SG=3739- 2625  для 2625 функція  відмінності:
   > - не повинна аналізувати залишок рахунку 2625 для перевірки можливості здійснення дострокового погашення;
 
   > - сума дострокового погашення повинна бути у вигляді одного документа (зі складною бух-ой моделлю) з використанням транзитного рахунку 2924, а також мати окремий тип операції з групою контролю «2 Контролер підрозділу».;
@@ -176,31 +199,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
              врахування це значення при здійсненні донарахування.
   Пока блокировано спис ание с 2625*
   -------------------------------------
-
-  22.12.2014 Sta Использование 2625 наравне с 2620.
-  02.12.2014 Сухова. Перестроение ГПК по требованию (без одновременной досрочки).
-                     Пересчет проц для класс ГПК при наличии НЕПЛАНОВОГО платежа накануне
-                     Проверены 6 вариантов
-  Д3 = Платежная дата в ГПК
-  Д1 = Банк-дата
-  Д2 = Неплановы платеж
-
-  1.1. Д3 > Д1 > Д2
-  1.2. Д3 > Д1 = Д2
-  2.1. Д3 = Д1 > Д2
-  2.2. Д3 = Д1 > Д2
-  3.1. Д1 > Д2 > Д3
-  3.2. Д1 = Д2 > Д3
-
-    21.11.2014 Перестроить ГПК без факта досрочного погаш. Но при наличии досроски . сделанной накануне.
-    11.06.2014 Восстановление даты завершения после восстановления из архива ГПК ( ош из Винницы )----
-    10.04.2014 Sta CCK_DPK.prev_SUM1 - для показывания суммы 1-го платежа.
-          надо брать не ближайший прошлый (без тек.дня), ближайший будущий с учетом тек дня.
-          Важно для более рдной досрочки в течепнии одного мес
-
-    07.04.2014 Sta + Novikov
-       l_txt := '90'; l_basem :=1;  -- 1 -Ануитет, Без канікул, % за попередній день \
-       l_txt := '91'; l_basem :=0;  -- 0- Класс, Без канікул, % за попередній місяць / для размежевания со старыми КД
   */
 
   --cck_dpk.sum_SP_ALL (d.nd)         Z1,
@@ -208,8 +206,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
   --cck_dpk.sum_SS_next (d.nd)        Z3,
 
   ----------------------------------------
-  TT_W4 char(3) := 'W4Y'; --  Досрочное, код операции новый    =  'W4Y' = W4.Списання с БПК для достр. погашення заборг. (Вместо W4X )
-
   II    int_accn%rowtype; -- проц.карточка счета SS /II.basem=1 это АНУИТЕТ. иначе классика
   IR_   number; -- проц.ставка
   acc8_ accounts.accc%type;
@@ -235,11 +231,88 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
   R1_ number; -- Общий ресурс (ост на SG(2620/2625) R1
   R2_ number; -- Свободный ресурс R2 =  R1 - z4
   RR1 oper%rowtype;
+  rr2 oper%rowtype;
+  RR3 oper%rowtype;
+  RR4 oper%rowtype;
   --------------
   nls_8006 accounts.nls%type;
   nls_6397 accounts.nls%type;
 
-  ---------------------------------------
+  ----------------------------
+  function Z8(p_nd cc_deal.nd%type) return int IS
+    -- проверка на своевременность выноса на просрочку тела
+    ll      cc_lim%rowtype;
+    PLAN_sp number;
+    FAKT_sp number;
+  begin
+
+    begin
+      select *
+        into ll
+        from cc_lim
+       where nd = p_nd
+         and fdat = (select max(fdat)
+                       from cc_lim
+                      where nd = p_nd
+                        and fdat < gl.bdate);
+      select LEAST(ostc + ll.lim2, 0)
+        into PLAN_sp
+        from accounts
+       where acc = ll.acc;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        return 0; -- raise_application_error(-(20203), ' Не знайдено попереднього ГПК для КД реф=' || p_nd );
+    end;
+
+    select nvl(sum(a.ostc), 0)
+      into FAKT_SP
+      from accounts a, nd_acc n
+     where a.acc = n.acc
+       and n.nd = p_nd
+       and tip = 'SP ';
+    If PLAN_sp <> FAKT_sp then
+      RETURN 0; --raise_application_error(-(20203), ' Невідповідність PLAN_SP та FAKT_SP для КД реф=' || p_nd );
+    end if;
+    RETURN 1;
+  end Z8;
+  -----------------
+
+  function Day_PL(p_nd cc_deal.nd%type) return int is
+    -- определение K2_ number    ;  -- Платежный день
+    l_dat date;
+    l_K2  int;
+  begin
+    begin
+      select i.s
+        into l_k2
+        from int_accn i, accounts a, nd_acc n
+       where n.nd = p_ND
+         and n.acc = a.acc
+         and a.tip = 'LIM'
+         and a.acc = i.acc
+         and i.id = 0
+         and i.s > 0
+         and i.s <= 31;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        Select max(fdat)
+          into l_dat
+          from cc_lim
+         where nd = p_nd
+           and fdat < gl.BD;
+        If l_dat is null then
+          Select NVL(min(fdat), gl.BD)
+            into l_dat
+            from cc_lim
+           where nd = p_nd
+             and fdat > gl.BD;
+        end if;
+        l_K2 := to_number(to_char(l_dat, 'DD'));
+    end;
+
+    RETURN l_K2;
+
+  end Day_PL;
   -- На перестроенном ГПК выровнять проценты в первом платеже
   PROCEDURE PROC1(p_ND IN number, p_datn date) is
     l_acc     number;
@@ -375,6 +448,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     -- Первая пл.дата ишется начиная с текущей - так в ОБ. Согласовано с Долинченко
     s_dd  char(2);
     nTmp_ int;
+
   begin
 
     --CCK_DPK.PREV ( p_nd)   ; -- вызываем из приложения
@@ -382,6 +456,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     --cck_dpk.K3_ :=  1      ;  -- с сохранением суммы одного платежа
     -----------------------------
     begin
+
       select a8.acc,
              least(-a8.ostx, -a8.ostc),
              a8.mdate,
@@ -392,27 +467,36 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
          and n8.acc = a8.acc
          and a8.tip = 'LIM'
          and a8.ostc = a8.ostb
-         and a8.ostb < 0
-         and a8.mdate > gl.bdate;
+         and a8.ostb < 0;
 
-      If Lim2_ = 0 then
+      If datk_ < gl.bdate then
         raise_application_error(- (20203),
-                                ' Не визначено сумму для ГПК КД реф=' || p_nd,
-                                TRUE);
+                                ' КД реф=' || p_nd || ' 100% просрочено ');
       end if;
-
-      select *
-        into II
-        from int_accn
-       where acc = acc8_
-         and id = 0;
 
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
         raise_application_error(- (20203),
                                 ' Не знайдено рах.8999 для КД реф=' || p_nd ||
-                                ', або його проц.картка',
-                                TRUE);
+                                ', або план НЕ= факт');
+    end;
+
+    If Lim2_ = 0 then
+      raise_application_error(- (20203),
+                              ' Не визначено сумму для ГПК КД реф=' || p_nd,
+                              TRUE);
+    end if;
+
+    begin
+      select *
+        into II
+        from int_accn
+       where acc = acc8_
+         and id = 0;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        raise_application_error(- (20203),
+                                ' Не знайдено проц.картка(id=0) для рах.8999_' || p_nd);
     end;
 
     select count(*), min(fdat)
@@ -461,168 +545,54 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     nls_2924 varchar2(15);
     S_       number := 0;
   begin
-    begin
-      select d.rnk, c.okpo
-        into l_rnk, oo.id_a
-        from cc_deal d, customer c
-       where d.nd = p_nd
-         and d.rnk = c.rnk;
-    EXCEPTION
-      WHEN NO_DATA_FOUND THEN
-        RETURN;
-    end;
+    CCK.CC_ASG(-p_ND);
+
+    /* ********************************
+      begin  select d.rnk, c.okpo into l_rnk, oo.id_a from cc_deal d, customer c where d.nd  = p_nd  and d.rnk = c.rnk  ;  EXCEPTION WHEN NO_DATA_FOUND THEN RETURN;  end;
     -- 1) разбор счета гашения - вдруг былa досрочка по всем КД клиента
     -- цикл по счетам ресурса для погашения пока только 1 счет
-    for g in (select *
-                from accounts
-               where acc = p_acc2620
-                 and (ostc > 0 and ostc = ostb OR nbs = '2625')) loop
-      oo.tt  := 'ASG';
-      oo.vob := 6;
-      oo.ref := null;
-      -- цикл по счетам просроченного долга всех КД данного клиента
-      for p in (select a.*
-                  from accounts a, nd_acc n, cc_deal d
-                 where d.rnk = l_rnk
-                   and d.sos >= 10
-                   and d.sos < 14
-                   and n.nd = d.nd
-                   and n.acc = a.acc
-                   and a.kv = g.kv
-                   and a.tip in ('SPN', 'SP ', 'SK9', 'SN8')
-                   and a.ostc < 0
-                   and a.ostc = a.ostb) loop
-        if g.ostc <= 0 then
-          EXIT;
-        end if;
-        ----------------------------------------------------------------------------------- в валюте тек счета 262*
-        If g.KV = p.KV then
-          oo.s  := least(g.ostc, -p.ostc);
-          oo.s2 := gl.p_icurval(g.kv, oo.s, gl.bdate); -- задолженность в валюте счета гашения
-        else
-          oo.s  := least(g.ostc, gl.p_Ncurval(g.KV, -p.ostc, gl.bdate));
-          oo.s2 := -p.ostc; -- пеня. она может начисляться в грн
-        end if;
-        --------------------------------
-        g.ostc := g.ostc - oo.s;
-        If oo.ref is null then
-          GL.REF(oo.ref);
-          oo.NAZN := 'Списання просроченої заборгованостi згiдно кред/угоди';
-          if g.nbs in ('2600', '2620', '2625') then
-            oo.NAZN := 'Договiрне ' || oo.nazn;
+    for g in ( select * from accounts where acc = p_acc2620 and (ostc > 0 and ostc = ostb  OR nbs='2625')  )
+    loop oo.tt  := 'ASG';    oo.vob := 6 ;  oo.ref := null ;
+       -- цикл по счетам просроченного долга всех КД данного клиента
+       for p in (select a.* from accounts a, nd_acc n, cc_deal d where d.rnk=l_rnk and d.sos >=10 and d.sos<14 and n.nd=d.nd and n.acc=a.acc and a.kv=g.kv and a.tip in ('SPN','SP ','SK9','SN8') and a.ostc<0 and a.ostc=a.ostb)
+       loop     if g.ostc <= 0 then EXIT;    end if;
+          ----------------------------------------------------------------------------------- в валюте тек счета 262*
+          If  g.KV = p.KV then oo.s := least(g.ostc,                    -p.ostc            ); oo.s2 := gl.p_icurval (g.kv, oo.s, gl.bdate) ; -- задолженность в валюте счета гашения
+          else                 oo.s := least(g.ostc, gl.p_Ncurval( g.KV,-p.ostc, gl.bdate) ); oo.s2 := -p.ostc                             ; -- пеня. она может начисляться в грн
           end if;
-          if g.nbs = '2625' then
-            oo.tt    := cck_dpk.TT_W4;
-            nls_2924 := bpk_get_transit('20', p.nls, g.nls, g.kv);
-          else
-            oo.tt    := 'ASG';
-            nls_2924 := g.nls;
+          --------------------------------
+          g.ostc :=  g.ostc  - oo.s;
+          If oo.ref is null then      GL.REF (oo.ref);      oo.NAZN  := 'Списання просроченої заборгованостi згiдно кред/угоди' ;
+             if g.nbs in ('2600','2620','2625') then        oo.NAZN  := 'Договiрне ' || oo.nazn ;     end if ;
+             if g.nbs='2625' then   oo.tt := cck_dpk.TT_W4; nls_2924 := bpk_get_transit('20', p.nls, g.nls, g.kv  ) ;
+             else                   oo.tt := 'ASG'        ; nls_2924 := g.nls ;
+             end if ;
+             gl.in_doc3(ref_  => oo.REF ,   tt_=>oo.tt, vob_=> oo.vob, nd_ => to_char(p_ND), pdat_ => SYSDATE, vdat_=>gl.BDATE, dk_ => 1, kv_ => g.kv , s_=> oo.s,
+                        kv2_  => g.kv   ,   s2_=>oo.s , sk_ => null  , data_=> gl.BDATE, datp_ => gl.bdate,
+                        nam_a_=>substr(g.nms,1,38) , nlsa_=> g.nls   , mfoa_=> gl.aMfo ,
+                        nam_b_=>substr(p.nms,1,38) , nlsb_=> p.nls   , mfob_=> gl.aMfo , nazn_ => oo.nazn ,
+                        d_rec_=> null   , id_a_ => oo.id_a, id_b_=>gl.aOkpo, id_o_ => null, sign_=> null, sos_  => 1, prty_ => null, uid_ => null) ;
+          end if ;
+          S_ := S_ - p.ostc ;
+          If p.tip ='SN8' then  -- БЕЗАКЦЕПТНОЕ СПИСАНИЕ ПЕНИ -- счет для дох 6397 по пене эмит КД
+               --сворачивание пени 8006 - 8008
+               If g.kv  <> p.kv then   gl.payv(0, oo.REF, gl.bDATE, oo.tt, 1, p.kv, CCK_DPK.NLS_8006, oo.s2, p.kv,  p.nls, oo.s2 );
+               else                    gl.payv(0, oo.REF, gl.bDATE, oo.tt, 1, p.kv, CCK_DPK.NLS_8006, oo.s , p.kv,  p.nls, oo.s  );
+               end if;
+               gl.payv ( 0, oo.REF, gl.bDATE, oo.TT, 1, g.kv, nls_2924, oo.s, gl.baseval, CCK_DPK.NLS_6397, oo.s2 );   ----\  -- частная проводка
+          else gl.PAYv ( 0, oo.REF, gl.bDATE, oo.tt, 1, g.kv, nls_2924, oo.s, g.kv      ,  p.nls          , oo.s  );   ----/
           end if;
-          gl.in_doc3(ref_   => oo.REF,
-                     tt_    => oo.tt,
-                     vob_   => oo.vob,
-                     nd_    => to_char(p_ND),
-                     pdat_  => SYSDATE,
-                     vdat_  => gl.BDATE,
-                     dk_    => 1,
-                     kv_    => g.kv,
-                     s_     => oo.s,
-                     kv2_   => g.kv,
-                     s2_    => oo.s,
-                     sk_    => null,
-                     data_  => gl.BDATE,
-                     datp_  => gl.bdate,
-                     nam_a_ => substr(g.nms, 1, 38),
-                     nlsa_  => g.nls,
-                     mfoa_  => gl.aMfo,
-                     nam_b_ => substr(p.nms, 1, 38),
-                     nlsb_  => p.nls,
-                     mfob_  => gl.aMfo,
-                     nazn_  => oo.nazn,
-                     d_rec_ => null,
-                     id_a_  => oo.id_a,
-                     id_b_  => gl.aOkpo,
-                     id_o_  => null,
-                     sign_  => null,
-                     sos_   => 1,
-                     prty_  => null,
-                     uid_   => null);
-        end if;
-        S_ := S_ - p.ostc;
-        If p.tip = 'SN8' then
-          -- БЕЗАКЦЕПТНОЕ СПИСАНИЕ ПЕНИ -- счет для дох 6397 по пене эмит КД
-          --сворачивание пени 8006 - 8008
-          If g.kv <> p.kv then
-            gl.payv(0,
-                    oo.REF,
-                    gl.bDATE,
-                    oo.tt,
-                    1,
-                    p.kv,
-                    CCK_DPK.NLS_8006,
-                    oo.s2,
-                    p.kv,
-                    p.nls,
-                    oo.s2);
-          else
-            gl.payv(0,
-                    oo.REF,
-                    gl.bDATE,
-                    oo.tt,
-                    1,
-                    p.kv,
-                    CCK_DPK.NLS_8006,
-                    oo.s,
-                    p.kv,
-                    p.nls,
-                    oo.s);
-          end if;
-          gl.payv(0,
-                  oo.REF,
-                  gl.bDATE,
-                  oo.TT,
-                  1,
-                  g.kv,
-                  nls_2924,
-                  oo.s,
-                  gl.baseval,
-                  CCK_DPK.NLS_6397,
-                  oo.s2); ----\  -- частная проводка
-        else
-          gl.PAYv(0,
-                  oo.REF,
-                  gl.bDATE,
-                  oo.tt,
-                  1,
-                  g.kv,
-                  nls_2924,
-                  oo.s,
-                  g.kv,
-                  p.nls,
-                  oo.s); ----/
-        end if;
-      end loop; --- P
-      if oo.ref is not null then
-        Update oper set s = S_, s2 = S_ where ref = oo.REF;
-        If oo.tt <> cck_dpk.TT_W4 then
-          gl.pay(2, oo.REF, gl.bDATE);
-        Else
-          gl.payv(0,
-                  oo.REF,
-                  gl.bDATE,
-                  oo.TT,
-                  0,
-                  g.kv,
-                  nls_2924,
-                  S_,
-                  g.kv,
-                  g.nls,
-                  S_); ------ итоговая проводка
-        end if;
-      end if;
+       end loop; --- P
+       if oo.ref is not null then
+          Update oper set s = S_, s2 = S_ where ref =  oo.REF ;
+          If oo.tt <> cck_dpk.TT_W4 then gl.pay ( 2, oo.REF, gl.bDATE);
+          Else                           gl.payv (0, oo.REF, gl.bDATE, oo.TT, 0, g.kv, nls_2924, S_, g.kv, g.nls, S_ );   ------ итоговая проводка
+          end if ;
+       end if    ;
 
-    end loop; -- G
-
+    end loop;  -- G
+    ****************************
+    */
     -- 2) доначислить проц по вчера
     null;
   end PREV;
@@ -695,7 +665,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     return l_mdat;
   end DAT_MOD;
   ------------------------------------------------------
-
   --Z1.Определение суммы разных просрочек
   function sum_SP_ALL(p_nd cc_deal.nd%type) return number IS
     -- Z1_- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
@@ -724,6 +693,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
        where n.ACC = a.acc
          and n.nd = p_nd
          and a.tip = 'SK0';
+
       select i.*
         into II
         from int_accn i, nd_acc n, accounts ss
@@ -733,7 +703,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
          and i.id = 0
          and i.acc = ss.ACC
          and ss.ostb < 0;
+
       ii.STP_DAT := least(NVL(ii.STP_DAT, gl.bdate - 1), gl.bdate - 1);
+
       CCK_DPK.ACR_DAT_ := ii.acr_dat;
       -- Z2n_-  Норм.проценты   положит число
       select -ostb into Z2N_ from accounts where ACC = II.acra;
@@ -832,9 +804,125 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
 
   end sum_SN_all;
   -------------------------------------------------
-  --Z3.Определение суммы след.платежа по телу
-  function sum_SS_next(p_nd cc_deal.nd%type) return number IS
+
+  function SUM_SK_ALL(p_nd cc_deal.nd%type) return number IS
+    v_estimate_value number;
+    v_rate           number;
   begin
+    select -nvl(sum(a.ostb), 0)
+      into Z2K_
+      from accounts a, nd_acc n
+     where n.ACC = a.acc
+       and n.nd = p_nd
+       and a.tip = 'SK0';
+
+    /* расчёт прогноза комиссии при досрочном погашении.
+       расчёт выполняется по фактическому остатку счёта учёта основной задолженности.
+       мабуть, надо будет уточнить касательно начисления комиссии при просрочке
+    */
+    declare
+      v_rec int_accn%rowtype;
+    begin
+      select i.*
+        into v_rec
+        from int_accn i, nd_acc n, accounts ss
+       where n.nd = p_ND
+         and N.acc = ss.acc
+         and ss.tip = 'LIM'
+         and i.id = 2
+         and i.acc = ss.ACC
+         and ss.ostb < 0;
+      if v_rec.stp_dat is null then
+/*        select cd.wdate-1
+          into v_rec.stp_dat
+          from cc_deal cd
+          where cd.nd = p_nd;*/
+          v_rec.stp_dat := gl.bDATE-1;
+      end if;
+--      bars_audit.info('v_rec.acr_dat = '||v_rec.acr_dat||', v_rec.STP_DAT = '||v_rec.STP_DAT);
+
+      select nvl(sum(acrn.FPROCN(a.acc, 2, gl.bDATE)), 0)
+        into v_rate
+        from accounts a, nd_acc n
+       where n.ACC = a.acc
+         and n.nd = p_nd
+         and a.tip = 'LIM';
+
+      for r in (select (v_rec.acr_dat) + c.num fDAT
+                  from conductor c
+                 where v_rec.acr_dat + c.num <= v_rec.STP_DAT) loop
+        v_estimate_value := nvl(v_estimate_value, 0) +
+                            calp(-fost(v_rec.acc, r.fdat),
+                                 v_rate,
+                                 r.fdat,
+                                 r.fdat,
+                                 v_rec.basey);
+        bars_audit.info(r.fdat || ' - ' || v_estimate_value);
+      end loop;
+      /*    select NVL(sum(calp(-fost(ii.acc, z.fdat) * 1000000,
+                        v_rate,
+                        z.fdat,
+                        z.fdat,
+                        v_rec.basey)),
+               0) / 1000000
+      into v_estimate_value
+      from (select (v_rec.acr_dat) + c.num fDAT
+              from conductor c
+             where v_rec.acr_dat + c.num <= v_rec.STP_DAT) z;*/
+    exception
+      when others then
+        v_estimate_value := 0;
+    end;
+    bars_audit.info('Сума комісії - ' || z2k_ || ', сума прогнозна - ' ||
+                    v_estimate_value);
+
+    z2k_ := z2k_ + nvl(v_estimate_value, 0);
+    bars_audit.info('Сума комісії - ' || z2k_ || ', сума прогнозна - ' ||
+                    v_estimate_value);
+    -- положительное число
+    Return(cck_dpk.Z2K_);
+  end SUM_SK_ALL;
+  --Z3.Определение суммы след.платежа по телу
+
+  function sum_SS_next(p_nd cc_deal.nd%type) return number IS
+    l_Del  number;
+    l_SumG number;
+  begin
+    Z3_ := 0;
+
+    /*  begin
+      select -a.ostx + a.ostb
+        into l_Del
+        from accounts a, nd_acc n
+       where n.nd = p_ND
+         and n.acc = a.acc
+         and a.tip = 'LIM';
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        raise_application_error(- (20203),
+                                ' КД ' || p_nd || ' Не знайдено рах.LIM*');
+    end;
+
+    If l_Del < 0 then
+      l_Del := -l_Del;
+      begin
+        select sumg
+          into l_SumG
+          from cc_lim
+         where nd = p_ND
+           and fdat = (select min(fdat)
+                         from cc_lim
+                        where nd = p_ND
+                          and fdat >= gl.BDate);
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          l_SumG := 0;
+      end;
+      z3_ := Least(l_SumG, l_Del);
+    end if;
+
+    -- полож число
+    Return(Z3_);*/
     begin
       select lb.sumg
         into Z3_
@@ -857,7 +945,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     Return(Z3_);
 
   end sum_SS_next;
-
   -----------------------------------------
 
   /*  Вычитать .сумму 1-го платежа - используется для показывания суммы 1-го платежа.
@@ -968,8 +1055,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
                 --== Инфо-Брок <Рессурс>
                 p_R1 OUT number, -- Общий ресурс (ост на SG(262*)
                 p_R2 OUT number, --  Свободный ресурс R2 =  R1 - z4
-                p_P1 OUT number --  Реф.платежа
-                ) is
+                p_P1 OUT number, --  Реф.платежа
+                p_p2 OUT NUMBER,
+                p_p3 out number) is
     ------------------------
   begin
 
@@ -982,6 +1070,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     */
 
     p_P1        := null;
+    p_p2        := NULL;
     CCK_DPK.k2_ := nvl(p_K2, to_number(to_char(gl.bdate, 'DD')));
     CCK_DPK.k3_ := nvl(p_K3, 1);
     CCK_DPK.MODI_INFO(p_mode,
@@ -1014,14 +1103,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
                                 p_param2  => to_char(p_K1 / 100));
       end if;
       CCK_DPK.K1_ := p_k1 + Z3_;
-      lim2_       := Z5_ - p_K1;
+
+      lim2_ := Z5_ - p_K1;
 
       CCK_DPK.MODI_pay(p_ND, p_acc2620);
 
-      If Z5_ > 0 then
+      If Z5_ >= 0 then
         CCK_DPK.MODI_gpk(p_ND);
         p_P1 := RR1.ref;
-      end if;
+        p_p2 := rr3.ref;
+        p_p3 := rr4.ref;
+      END IF;
 
     ElsIf p_mode = 2 then
       -- только изменение ГПК, без досрочного погашения.
@@ -1164,6 +1256,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     -- (Z1_Просрочки) + (Z2_Проценты_и_донач_проц_и_комис) + (Z3_ближ.Платеж)
     cck_dpk.Z1_ := cck_dpk.sum_SP_ALL(p_nd);
     cck_dpk.Z2_ := cck_dpk.sum_SN_all(vid_, p_nd);
+    cck_dpk.z2k_:= cck_dpk.SUM_SK_ALL(p_nd => p_nd);
     cck_dpk.Z3_ := cck_dpk.sum_SS_next(p_nd);
     cck_dpk.Z4_ := cck_dpk.Z1_ + cck_dpk.Z2_ + cck_dpk.Z3_;
 
@@ -1198,165 +1291,277 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
 
   END MODI_INFO;
   ----------------------------------------
-  PROCEDURE MODI_pay(p_ND IN number, p_acc2620 IN number) is
-    RR2      oper%rowtype;
-    dd       cc_deal%rowtype;
-    ostc_    number;
-    ostb_    number;
-    l_tt     tts.tt%type; -- код операции для доср.погаш. Настроить операцию!
-    nls_2924 accounts.nls%type;
-  begin
-    begin
-      select d.cc_id,
+  PROCEDURE modi_pay(p_nd IN NUMBER, p_acc2620 IN NUMBER) IS
+
+    dd       cc_deal%ROWTYPE;
+    ostc_    NUMBER;
+    ostb_    NUMBER;
+    l_tt     tts.tt%TYPE; -- код операции для доср.погаш. Настроить операцию!
+    nls_2924 accounts.nls%TYPE;
+  BEGIN
+    BEGIN
+      SELECT d.cc_id,
              d.sdate,
              c.okpo,
-             SG.nls,
-             substr(SG.nms, 1, 38),
+             sg.nls,
+             substr(sg.nms, 1, 38),
              sg.kv,
-             SS.nls,
-             substr(SS.nms, 1, 38),
+             ss.nls,
+             substr(ss.nms, 1, 38),
              ss.ostc,
              ss.ostb,
              substr('Дострокове погаш КД № ' || d.cc_id || ' вiд ' ||
                     to_char(d.sdate, 'dd.mm.yyyy') || '. ( Зі збереженням ' ||
-                    Decode(CCK_DPK.k3_,
+                    decode(cck_dpk.k3_,
                            1,
                            'суми 1-го платежу',
                            'кiнцевого термiну') || ' )',
                     1,
+                    160),
+             substr('Сплата нарахованих процентів при достроковому погашенні КД № ' ||
+                    d.cc_id || ' вiд ' || to_char(d.sdate, 'dd.mm.yyyy'),
+                    1,
                     160)
-        into dd.cc_id,
+        INTO dd.cc_id,
              dd.sdate,
-             RR1.id_a,
-             RR1.nlsa,
-             RR1.nam_a,
-             RR1.kv,
-             RR1.nlsb,
-             RR1.nam_b,
+             rr1.id_a,
+             rr1.nlsa,
+             rr1.nam_a,
+             rr1.kv,
+             rr1.nlsb,
+             rr1.nam_b,
              ostc_,
              ostb_,
-             RR1.nazn
-        from accounts SG,
-             nd_acc   NSG,
-             accounts SS,
-             nd_acc   NSS,
+             rr1.nazn,
+             rr3.nazn
+        FROM accounts sg,
+             nd_acc   nsg,
+             accounts ss,
+             nd_acc   nss,
              customer c,
              cc_deal  d
-       where d.nd = p_ND
-         and d.rnk = c.rnk
-         and NSG.nd = d.ND
-         and NSG.acc = SG.acc
-         and SG.acc = p_acc2620
-         and SG.dazs is null
-         and NSS.nd = d.ND
-         and NSS.acc = SS.acc
-         and SS.tip = 'SS '
-         and SS.dazs is null;
+       WHERE d.nd = p_nd
+         AND d.rnk = c.rnk
+         AND nsg.nd = d.nd
+         AND nsg.acc = sg.acc
+         AND sg.acc = p_acc2620
+         AND sg.dazs IS NULL
+         AND nss.nd = d.nd
+         AND nss.acc = ss.acc
+         AND ss.tip = 'SS '
+         AND ss.dazs IS NULL;
 
-      if ostc_ <> ostb_ then
+      IF ostc_ <> ostb_ THEN
         bars_error.raise_nerror(p_errmod  => 'CCK',
                                 p_errname => 'PLAN#FAKT',
                                 p_param1  => to_char(p_nd),
-                                p_param2  => RR1.nlsb);
-      end if;
+                                p_param2  => rr1.nlsb);
+      END IF;
     EXCEPTION
-      WHEN NO_DATA_FOUND THEN
+      WHEN no_data_found THEN
         raise_application_error(- (20203),
                                 'НЕ знайдено рах. p_acc2620=' || p_acc2620 ||
-                                ' або SS по КД =' || p_ND);
-    end;
+                                ' або SS по КД =' || p_nd);
+    END;
 
     --- для доначис и пог %
-    begin
-      select SN.nls,
-             SD.nls,
-             substr(SN.nms, 1, 38),
-             substr(SD.nms, 1, 38),
-             SN.KV,
-             SD.KV,
-             -SN.ostb
-        into RR2.nlsa,
-             RR2.nlsb,
-             RR2.nam_a,
-             RR2.nam_b,
-             RR2.kv,
-             RR2.kv2,
-             RR2.s
-        from accounts SN, accounts SD
-       where SN.acc = II.acra
-         and SD.acc = II.acrb
-         and SN.dazs is null
-         and SD.dazs is null;
+    BEGIN
+      SELECT sn.nls,
+             sd.nls,
+             substr(sn.nms, 1, 38),
+             substr(sd.nms, 1, 38),
+             sn.kv,
+             sd.kv,
+             -sn.ostb
+        INTO rr2.nlsa,
+             rr2.nlsb,
+             rr2.nam_a,
+             rr2.nam_b,
+             rr2.kv,
+             rr2.kv2,
+             rr2.s
+        FROM accounts sn, accounts sd
+       WHERE sn.acc = ii.acra
+         AND sd.acc = ii.acrb
+         AND sn.dazs IS NULL
+         AND sd.dazs IS NULL;
     EXCEPTION
-      WHEN NO_DATA_FOUND THEN
+      WHEN no_data_found THEN
         raise_application_error(- (20203),
                                 'НЕ знайдено рах. з проц.картки по К ');
-    end;
+    END;
 
-    If II.acr_dat < NVL(II.stp_dat, (gl.bdate - 1)) and ZN_ > 0 then
+    IF ii.acr_dat < nvl(ii.stp_dat, (gl.bdate - 1)) AND zn_ > 0 THEN
 
       -- доначислить %  ZN
-      gl.ref(RR2.REF);
-      gl.in_doc3(ref_   => RR2.REF,
+      gl.ref(rr2.ref);
+      gl.in_doc3(ref_   => rr2.ref,
                  tt_    => '%%1',
                  vob_   => 6,
-                 nd_    => substr(to_char(RR2.REF), -10),
+                 nd_    => substr(to_char(rr2.ref), -10),
                  pdat_  => SYSDATE,
-                 vdat_  => gl.BDATE,
+                 vdat_  => gl.bdate,
                  dk_    => 1,
-                 kv_    => RR2.kv,
-                 s_     => ZN_,
-                 kv2_   => RR2.kv,
-                 s2_    => ZN_,
-                 sk_    => null,
-                 data_  => gl.BDATE,
+                 kv_    => rr2.kv,
+                 s_     => zn_,
+                 kv2_   => rr2.kv,
+                 s2_    => zn_,
+                 sk_    => NULL,
+                 data_  => gl.bdate,
                  datp_  => gl.bdate,
-                 nam_a_ => RR2.nam_a,
-                 nlsa_  => RR2.nlsa,
-                 mfoa_  => gl.aMfo,
-                 nam_b_ => RR2.nam_b,
-                 nlsb_  => RR2.nlsb,
-                 mfob_  => gl.aMfo,
-                 nazn_  => Substr('Донарахування вiдсоткiв з ' ||
-                                  to_char(II.acr_dat + 1, 'dd.mm.yyyy') ||
+                 nam_a_ => rr2.nam_a,
+                 nlsa_  => rr2.nlsa,
+                 mfoa_  => gl.amfo,
+                 nam_b_ => rr2.nam_b,
+                 nlsb_  => rr2.nlsb,
+                 mfob_  => gl.amfo,
+                 nazn_  => substr('Донарахування вiдсоткiв з ' ||
+                                  to_char(ii.acr_dat + 1, 'dd.mm.yyyy') ||
                                   ' по ' ||
-                                  to_char(ii.STP_dat, 'dd.mm.yyyy') ||
+                                  to_char(ii.stp_dat, 'dd.mm.yyyy') ||
                                   ' в зв`язку з достроковим погаш КД № ' ||
                                   dd.cc_id || ' вiд ' ||
                                   to_char(dd.sdate, 'dd.mm.yyyy'),
                                   1,
                                   160),
-                 d_rec_ => null,
-                 id_a_  => RR1.id_a,
-                 id_b_  => gl.aOkpo,
-                 id_o_  => null,
-                 sign_  => null,
+                 d_rec_ => NULL,
+                 id_a_  => rr1.id_a,
+                 id_b_  => gl.aokpo,
+                 id_o_  => NULL,
+                 sign_  => NULL,
                  sos_   => 1,
-                 prty_  => null,
-                 uid_   => null);
-
+                 prty_  => NULL,
+                 uid_   => NULL);
+      rr3.nazn := substr(rr3.nazn || ' з ' ||
+                         to_char(ii.acr_dat + 1, 'dd.mm.yyyy') || ' по ' ||
+                         to_char(ii.stp_dat, 'dd.mm.yyyy'),
+                         1,
+                         160);
       gl.payv(0,
-              RR2.REF,
-              gl.bDATE,
+              rr2.ref,
+              gl.bdate,
               '%%1',
               1,
-              RR2.kv,
-              RR2.nlsa,
-              ZN_,
-              RR2.kv2,
-              RR2.nlsb,
-              ZN_);
+              rr2.kv,
+              rr2.nlsa,
+              zn_,
+              rr2.kv2,
+              rr2.nlsb,
+              zn_);
 
       -- проставить дату, по кот % уже начислены
-      update int_accn
-         set acr_dat = NVL(II.stp_dat, (gl.bdate - 1))
-       where id = 0
-         and acc in (select a.acc
-                       from nd_acc n, accounts a
-                      where n.nd = p_nd
-                        and n.acc = a.acc
-                        and tip in ('SS ', 'SP '));
-      gl.pay(2, RR2.REF, gl.bDATE);
+      UPDATE int_accn
+         SET acr_dat = nvl(ii.stp_dat, (gl.bdate - 1))
+       WHERE id = 0
+         AND acc IN (SELECT a.acc
+                       FROM nd_acc n, accounts a
+                      WHERE n.nd = p_nd
+                        AND n.acc = a.acc
+                        AND tip IN ('SS ', 'SP '));
+      gl.pay(2, rr2.ref, gl.bdate);
+    END IF;
+
+    begin
+      select *
+        into II
+        from int_accn
+       where acc = acc8_
+         and id = 2;
+    EXCEPTION
+      WHEN no_data_found THEN
+        null;
+    END;
+    if II.ACC is not null then
+      BEGIN
+        SELECT sn.nls,
+               sd.nls,
+               substr(sn.nms, 1, 38),
+               substr(sd.nms, 1, 38),
+               sn.kv,
+               sd.kv,
+               -sn.ostb
+          INTO rr4.nlsa,
+               rr4.nlsb,
+               rr4.nam_a,
+               rr4.nam_b,
+               rr4.kv,
+               rr4.kv2,
+               rr4.s
+          FROM accounts sn, accounts sd
+         WHERE sn.acc = ii.acra
+           AND sd.acc = ii.acrb
+           AND sn.dazs IS NULL
+           AND sd.dazs IS NULL;
+      EXCEPTION
+        WHEN no_data_found THEN
+          raise_application_error(- (20203),
+                                  '% картка по комісії не повна ');
+      END;
+      IF ii.acr_dat < nvl(ii.stp_dat, (gl.bdate - 1)) AND z2K_ > 0 THEN
+
+        -- доначислить %  z2K_
+        gl.ref(rr4.ref);
+        gl.in_doc3(ref_   => rr4.ref,
+                   tt_    => '%%1',
+                   vob_   => 6,
+                   nd_    => substr(to_char(rr4.ref), -10),
+                   pdat_  => SYSDATE,
+                   vdat_  => gl.bdate,
+                   dk_    => 1,
+                   kv_    => rr4.kv,
+                   s_     => z2K_,
+                   kv2_   => rr4.kv,
+                   s2_    => z2K_,
+                   sk_    => NULL,
+                   data_  => gl.bdate,
+                   datp_  => gl.bdate,
+                   nam_a_ => rr4.nam_a,
+                   nlsa_  => rr4.nlsa,
+                   mfoa_  => gl.amfo,
+                   nam_b_ => rr4.nam_b,
+                   nlsb_  => rr4.nlsb,
+                   mfob_  => gl.amfo,
+                   nazn_  => substr('Донарахування комісії з ' ||
+                                    to_char(ii.acr_dat + 1, 'dd.mm.yyyy') ||
+                                    ' по ' ||
+                                    to_char(ii.stp_dat, 'dd.mm.yyyy') ||
+                                    ' в зв`язку з достроковим погаш КД № ' ||
+                                    dd.cc_id || ' вiд ' ||
+                                    to_char(dd.sdate, 'dd.mm.yyyy'),
+                                    1,
+                                    160),
+                   d_rec_ => NULL,
+                   id_a_  => rr1.id_a, ------уточнити
+                   id_b_  => gl.aokpo,
+                   id_o_  => NULL,
+                   sign_  => NULL,
+                   sos_   => 1,
+                   prty_  => NULL,
+                   uid_   => NULL);
+
+        gl.payv(0,
+                rr4.ref,
+                gl.bdate,
+                '%%1',
+                1,
+                rr4.kv,
+                rr4.nlsa,
+                z2K_,
+                rr4.kv2,
+                rr4.nlsb,
+                z2K_);
+
+        -- проставить дату, по кот % уже начислены
+        UPDATE int_accn
+           SET acr_dat = nvl(ii.stp_dat, (gl.bdate - 1))
+         WHERE id = 2
+           AND acc IN (SELECT a.acc
+                         FROM nd_acc n, accounts a
+                        WHERE n.nd = p_nd
+                          AND n.acc = a.acc
+                          AND tip IN ('LIM'));
+        gl.pay(2, rr4.ref, gl.bdate);
+      END IF;
     end if;
     -----------------------------------------------
     --- снять сумму досрочки по телу CCK_DPK.K1_
@@ -1364,13 +1569,20 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     --  +  погасить все комис                Z2K_,
     --  +  погасить все просрочки            Z1_ - только для БПК  - верим на слово, что на карточке достаточно денег
 
-    If RR1.nlsa like '2625%' then
-      l_tt  := cck_dpk.TT_W4;
-      rr1.s := CCK_DPK.K1_ + cck_dpk.Z2N_ + cck_dpk.Z2K_ + cck_dpk.Z1_; -- 29.05.2015
-    else
+    IF (rr1.nlsa LIKE '2625%' /*or rr1.nlsa LIKE '2620%'*/
+       ) THEN
+      l_tt  := cck_dpk.tt_w4;
+      rr1.s := cck_dpk.k1_ + /* cck_dpk.z2n_ +*/
+               cck_dpk.z2k_ + cck_dpk.z1_; -- 29.05.2015*/
+
+      rr3.s := cck_dpk.z2n_;
+    ELSE
       l_tt  := 'ASD';
-      rr1.s := CCK_DPK.K1_ + cck_dpk.Z2N_ + cck_dpk.Z2K_;
-    end if;
+      rr1.s := cck_dpk.k1_ /*+ cck_dpk.z2n_ */
+               +cck_dpk.z2k_;
+      rr3.s :=  /*cck_dpk.k1_ + */
+       cck_dpk.z2n_;
+    END IF;
     /*
     logger.info('AAAA ' || RR1.nlsa  ||' ' || l_tt ||
        ' K1_=' || CCK_DPK.K1_  ||
@@ -1380,199 +1592,231 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     '= rr1.S=' || rr1.S );
     */
 
-    If rr1.S <= 0 then
-      Return;
-    end if;
-
-    gl.ref(RR1.REF);
-    gl.in_doc3(ref_   => RR1.REF,
+    IF rr1.s <= 0 THEN
+      RETURN;
+    END IF;
+    --Розділяємо на два проведення
+    gl.ref(rr1.ref);
+    gl.ref(rr3.ref);
+    gl.in_doc3(ref_   => rr1.ref,
                tt_    => l_tt,
-               vob_   => 1,
+               vob_   => 6,
                nd_    => substr(dd.cc_id, 1, 10),
                pdat_  => SYSDATE,
-               vdat_  => gl.BDATE,
+               vdat_  => gl.bdate,
                dk_    => 1,
-               kv_    => RR1.kv,
+               kv_    => rr1.kv,
                s_     => rr1.s,
-               kv2_   => RR1.kv,
+               kv2_   => rr1.kv,
                s2_    => rr1.s,
-               sk_    => null,
-               data_  => gl.BDATE,
+               sk_    => NULL,
+               data_  => gl.bdate,
                datp_  => gl.bdate,
-               nam_a_ => RR1.nam_a,
-               nlsa_  => RR1.nlsa,
-               mfoa_  => gl.aMfo,
-               nam_b_ => RR1.nam_b,
-               nlsb_  => RR1.nlsb,
-               mfob_  => gl.aMfo,
-               nazn_  => RR1.nazn,
-               d_rec_ => null,
-               id_a_  => RR1.id_a,
-               id_b_  => RR1.id_a,
-               id_o_  => null,
-               sign_  => null,
+               nam_a_ => rr1.nam_a,
+               nlsa_  => rr1.nlsa,
+               mfoa_  => gl.amfo,
+               nam_b_ => rr1.nam_b,
+               nlsb_  => rr1.nlsb,
+               mfob_  => gl.amfo,
+               nazn_  => rr1.nazn,
+               d_rec_ => NULL,
+               id_a_  => rr1.id_a,
+               id_b_  => rr1.id_a,
+               id_o_  => NULL,
+               sign_  => NULL,
                sos_   => 1,
-               prty_  => null,
-               uid_   => null);
-    insert into operw
-      (REF, TAG, VALUE)
-    values
-      (RR1.REF, 'ND   ', to_char(p_ND)); -- Дата дострокового погашення DD.MM.YYYY
-    insert into operw
-      (REF, TAG, VALUE)
-    values
-      (RR1.REF, 'MDATE', to_char(gl.bdate, 'dd.mm.yyyy')); -- Реф KД
+               prty_  => NULL,
+               uid_   => NULL);
+    gl.in_doc3(ref_   => rr3.ref,
+               tt_    => l_tt,
+               vob_   => 6,
+               nd_    => substr(dd.cc_id, 1, 10),
+               pdat_  => SYSDATE,
+               vdat_  => gl.bdate,
+               dk_    => 1,
+               kv_    => rr1.kv,
+               s_     => rr3.s,
+               kv2_   => rr1.kv,
+               s2_    => rr3.s,
+               sk_    => NULL,
+               data_  => gl.bdate,
+               datp_  => gl.bdate,
+               nam_a_ => rr1.nam_a,
+               nlsa_  => rr1.nlsa,
+               mfoa_  => gl.amfo,
+               nam_b_ => rr2.nam_a,
+               nlsb_  => rr2.nlsa,
+               mfob_  => gl.amfo,
+               nazn_  => rr3.nazn,
+               d_rec_ => NULL,
+               id_a_  => rr1.id_a,
+               id_b_  => rr1.id_a,
+               id_o_  => NULL,
+               sign_  => NULL,
+               sos_   => 1,
+               prty_  => NULL,
+               uid_   => NULL);
+    INSERT INTO operw
+      (REF, tag, VALUE)
+    VALUES
+      (rr1.ref, 'ND   ', to_char(p_nd)); -- Дата дострокового погашення DD.MM.YYYY
+    INSERT INTO operw
+      (REF, tag, VALUE)
+    VALUES
+      (rr1.ref, 'MDATE', to_char(gl.bdate, 'dd.mm.yyyy')); -- Реф KД
 
-    If l_tt = cck_dpk.TT_W4 then
-      nls_2924 := bpk_get_transit('20', RR1.nlsb, RR1.nlsa, RR1.kv);
+    IF l_tt = cck_dpk.tt_w4 THEN
+      nls_2924 := bpk_get_transit('20', rr1.nlsb, rr1.nlsa, rr1.kv);
       gl.payv(0,
-              RR1.REF,
-              gl.BDATE,
+              rr1.ref,
+              gl.bdate,
               l_tt,
               1,
-              RR1.kv,
-              RR1.nlsa,
+              rr1.kv,
+              rr1.nlsa,
               rr1.s,
-              RR1.kv,
+              rr1.kv,
               nls_2924,
               rr1.s); ---------- итоговая проводка
 
-      iF cck_dpk.Z1_ > 0 THEN
+      IF cck_dpk.z1_ > 0 THEN
         -- 29.05.2015 ПРОСРОЧКИ в том же реф =  -NVL(sum(a.ostb),0) into cck_dpk.Z1_  -- положительное число
 
-        for x in (select a.*
-                    from accounts a, nd_acc n
-                   where n.nd = p_ND
-                     and n.acc = a.acc
-                     and ostb < 0
-                     and a.kv = RR1.kv
-                     and (a.tip in
+        FOR x IN (SELECT a.*
+                    FROM accounts a, nd_acc n
+                   WHERE n.nd = p_nd
+                     AND n.acc = a.acc
+                     AND ostb < 0
+                     AND a.kv = rr1.kv
+                     AND (a.tip IN
                          ('SP ', 'SL ', 'SPN', 'SK9', 'SLN', 'SLK') OR
-                         a.tip in ('SN8') and RR1.kv = gl.baseval)) loop
-          if x.TIP = 'SPN' then
+                         a.tip IN ('SN8') AND rr1.kv = gl.baseval)) LOOP
+          IF x.tip = 'SPN' THEN
             rr1.d_rec := 'Погашення просрочених вiдсоткiв';
-          elsIF x.TIP = 'SK9' then
+          ELSIF x.tip = 'SK9' THEN
             rr1.d_rec := 'Погашення просроченої комiсiї';
-          elsIF x.TIP = 'SP ' then
+          ELSIF x.tip = 'SP ' THEN
             rr1.d_rec := 'Погашення просроченого осн.боргу';
-          elsIF x.TIP = 'SL ' then
+          ELSIF x.tip = 'SL ' THEN
             rr1.d_rec := 'Погашення сумнiвного осн.боргу';
-          elsIF x.TIP = 'SLN' then
+          ELSIF x.tip = 'SLN' THEN
             rr1.d_rec := 'Погашення сумнiвного проц.боргу';
-          elsIF x.TIP = 'SLK' then
+          ELSIF x.tip = 'SLK' THEN
             rr1.d_rec := 'Погашення сумнiвного комiс.боргу';
-          elsIF x.TIP = 'SN8' then
+          ELSIF x.tip = 'SN8' THEN
             rr1.d_rec := 'Погашення пенi';
             gl.payv(0,
-                    RR1.REF,
-                    GL.BDATE,
+                    rr1.ref,
+                    gl.bdate,
                     'ASG',
                     1,
                     x.kv,
-                    cck_dpk.NLS_8006,
+                    cck_dpk.nls_8006,
                     -x.ostb,
                     x.kv,
                     x.nls,
                     -x.ostb); -- сворачиваем пеню
-            x.nls := cck_dpk.NLS_6397;
-          end if;
+            x.nls := cck_dpk.nls_6397;
+          END IF;
 
           gl.payv(0,
-                  RR1.REF,
-                  gl.BDATE,
+                  rr1.ref,
+                  gl.bdate,
                   l_tt,
                   1,
-                  RR1.kv,
+                  rr1.kv,
                   nls_2924,
                   -x.ostb,
-                  RR1.kv,
+                  rr1.kv,
                   x.nls,
                   -x.ostb);
-          update opldok
-             set txt = rr1.d_rec
-           where ref = RR1.REF
-             and stmt = gl.aStmt;
+          UPDATE opldok
+             SET txt = rr1.d_rec
+           WHERE REF = rr1.ref
+             AND stmt = gl.astmt;
 
-        end loop;
-      end if;
-    Else
-      nls_2924 := RR1.nlsa;
-    End if;
+        END LOOP;
+      END IF;
+    ELSE
+      nls_2924 := rr1.nlsa;
+    END IF;
 
-    If CCK_DPK.K1_ > 0 then
+    IF cck_dpk.k1_ > 0 THEN
       ---- частная проводка по 2203
       gl.payv(0,
-              RR1.REF,
-              gl.BDATE,
+              rr1.ref,
+              gl.bdate,
               l_tt,
               1,
-              RR1.kv,
+              rr1.kv,
               nls_2924,
-              CCK_DPK.K1_,
-              RR1.kv,
-              RR1.nlsb,
-              CCK_DPK.K1_);
-      update opldok
-         set txt = 'K1. Сума для дострокового погашення'
-       where ref = RR1.REF
-         and stmt = gl.aStmt;
-    end if;
+              rr1.s,
+              rr1.kv,
+              rr1.nlsb,
+              rr1.s);
+      UPDATE opldok
+         SET txt = 'K1. Сума для дострокового погашення'
+       WHERE REF = rr1.ref
+         AND stmt = gl.astmt;
+    END IF;
 
-    If CCK_DPK.Z2N_ > 0 then
+    IF cck_dpk.z2n_ > 0 THEN
       ---- частная проводка по 2208
       gl.payv(0,
-              RR1.REF,
-              gl.BDATE,
+              rr3.ref,
+              gl.bdate,
               l_tt,
               1,
-              RR1.kv,
+              rr1.kv,
               nls_2924,
-              CCK_DPK.Z2N_,
-              RR1.kv,
-              RR2.nlsa,
-              CCK_DPK.Z2N_);
-      update opldok
-         set txt = 'Z2N_. погасить все %%'
-       where ref = RR1.REF
-         and stmt = gl.aStmt;
-    end if;
-
-    If CCK_DPK.Z2K_ > 0 then
+              rr3.s,
+              rr1.kv,
+              rr2.nlsa,
+              rr3.s);
+      UPDATE opldok
+         SET txt = 'Z2N_. погасить все %%'
+       WHERE REF = rr3.ref
+         AND stmt = gl.astmt;
+    END IF;
+    ---Розібратися
+    IF cck_dpk.z2k_ > 0 THEN
       ---- частная проводка по 3578
-      begin
-        select Sk.nls, Sk.KV, -Sk.ostb
-          into RR2.nlsa, RR2.kv, RR2.s
-          from accounts Sk, nd_acc n
-         where Sk.acc = n.acc
-           and sk.tip = 'SK0'
-           and sk.ostb < 0
-           and n.nd = p_ND
-           and sk.kv = rr1.kv
-           and rownum = 1;
+      BEGIN
+        SELECT sk.nls, sk.kv, -sk.ostb
+          INTO rr2.nlsa, rr2.kv, rr2.s
+          FROM accounts sk, nd_acc n
+         WHERE sk.acc = n.acc
+           AND sk.tip = 'SK0'
+           AND sk.ostb < 0
+           AND n.nd = p_nd
+           AND sk.kv = rr1.kv
+           AND rownum = 1;
       EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-          null;
+        WHEN no_data_found THEN
+          NULL;
           raise_application_error(- (20203),
                                   'НЕ знайдено рах. з tip = SK0');
-      end;
+      END;
+
       gl.payv(0,
-              RR1.REF,
-              gl.BDATE,
+              rr1.ref,
+              gl.bdate,
               l_tt,
               1,
-              RR1.kv,
-              RR1.nlsa,
-              CCK_DPK.Z2K_,
-              RR1.kv,
-              RR2.nlsa,
-              CCK_DPK.Z2K_);
-      update opldok
-         set txt = 'Z2K_ погасить все комис'
-       where ref = RR1.REF
-         and stmt = gl.aStmt;
-    End if;
+              rr1.kv,
+              rr1.nlsa,
+              cck_dpk.z2k_,
+              rr1.kv,
+              rr2.nlsa,
+              cck_dpk.z2k_);
+      UPDATE opldok
+         SET txt = 'Z2K_ погасить все комис'
+       WHERE REF = rr1.ref
+         AND stmt = gl.astmt;
+    END IF;
 
-  end MODI_pay;
+  END modi_pay;
+
   --------------
 
   PROCEDURE MODI_gpk(p_ND IN number) is
@@ -1692,7 +1936,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
                    p_acrd  => II.acr_dat + 1, -- с какой даты начислять % acr_dat+1
                    p_basey => II.BASEY -- база для нач %%;
                    );
-    commit;
+    --commit;
 
     insert into cc_lim
       (ND, FDAT, LIM2, ACC, SUMG, SUMO, SUMK)
@@ -1850,24 +2094,43 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
   end modi_gpk;
 
   ---------------------
-  procedure MODI_RET(p_Nd IN cc_deal.nd%type, p_REF IN OUT oper.ref%type) is
-  begin
-    CCK_DPK.MODI_RET_EX(p_Nd => p_ND, p_REF => p_REF, p_mdat => gl.bdate);
-  end MODI_RET;
-  ---------------------
-  procedure MODI_RET_EX(p_Nd   IN cc_deal.nd%type,
-                        p_REF  IN OUT oper.ref%type,
-                        p_mdat IN date) is
-    l_p1 number;
-    l_p2 number;
-  begin
-    CCK_DPK.RET_GPK(p_ND, p_ref, p_mdat); -- откат ГПК
-    If p_ref is not null and p_ref <> 0 then
-      p_back_dok(p_ref, 5, null, l_p1, l_p2);
-      p_REF := null;
-    end if; -- откат проводок
-  end MODI_RET_EX;
+  PROCEDURE modi_ret_ex(p_nd   IN cc_deal.nd%TYPE,
+                        p_ref  IN OUT oper.ref%TYPE,
+                        p_mdat IN DATE,
+                        p_ref2 IN OUT oper.ref%TYPE,
+                        p_ref3 in OUT oper.ref%TYPE) IS
+    l_p1 NUMBER;
+    l_p2 NUMBER;
+    l_p3 NUMBER;
+  BEGIN
+    cck_dpk.ret_gpk(p_nd, p_ref, p_mdat); -- откат ГПК
+    IF p_ref IS NOT NULL AND p_ref <> 0 THEN
+      p_back_dok(p_ref, 5, NULL, l_p1, l_p2);
+      p_ref := NULL;
+    END IF; -- откат проводок
+    IF p_ref2 IS NOT NULL AND p_ref2 <> 0 THEN
+      p_back_dok(p_ref2, 5, NULL, l_p1, l_p2);
+      p_ref2 := NULL;
+    END IF;
+    IF p_ref3 IS NOT NULL AND p_ref3 <> 0 THEN
+      p_back_dok(p_ref3, 5, NULL, l_p1, l_p3);
+      p_ref3 := NULL;
+    END IF;
+  END modi_ret_ex;
   -------------------
+  PROCEDURE modi_ret(p_nd   IN cc_deal.nd%TYPE,
+                     p_ref  IN OUT oper.ref%TYPE,
+                     p_ref2 IN OUT oper.ref%TYPE,
+                     p_ref3 IN OUT oper.ref%TYPE) IS
+  BEGIN
+    cck_dpk.modi_ret_ex(p_nd => p_nd,
+
+                        p_ref  => p_ref,
+                        p_mdat => gl.bdate,
+                        p_ref2 => p_ref2,
+                        p_ref3 => p_ref3);
+  END modi_ret;
+
   procedure RET_GPK(p_Nd   IN cc_deal.nd%type,
                     p_REF  IN oper.ref%type,
                     p_mdat IN date) is
@@ -1949,10 +2212,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     end if;
 
   end RET_GPK;
-
----Аномимный блок --------------
+  FUNCTION header_version RETURN VARCHAR2 IS
+  BEGIN
+    RETURN 'Package header CCK ' || g_header_version;
+  END header_version;
+  FUNCTION body_version RETURN VARCHAR2 IS
+  BEGIN
+    RETURN 'Package body CCK ' || g_body_version;
+  END body_version;
+  ---Аномимный блок --------------
 begin
-  CCK_DPK.TT_W4 := 'W4Y'; --  Досрочное, код операции новый  =  'W4Y' = W4.Списання с БПК для достр. погашення заборг. (Вместо W4X )
 
   begin
     select nls
@@ -1969,23 +2238,9 @@ begin
                               ' Не знайдено контр рах. по пенi 8006*SD8');
   end;
 
-  begin
-    select a.nls
-      into CCK_DPK.NLS_6397
-      from accounts a, TOBO_PARAMS t
-     where t.tag = 'CC_6397'
-       and a.kv = gl.baseval
-       and t.val = a.nls
-       and a.dazs is null
-       and t.tobo = sys_context('bars_context', 'user_branch');
-  EXCEPTION
-    WHEN OTHERS THEN
-      raise_application_error(- (20203),
-                              'Не знайдено рах.6397 дох.по пенi для ' ||
-                              sys_context('bars_context', 'user_branch') || '.
-        Заповніть довідник  "Параметри підрозділів банку"(TOBO_PARAMS) Таг ="CC_6397"
- ');
-  end;
+  CCK_DPK.NLS_6397 := nbs_ob22_bra('6397',
+                                   '01',
+                                   sys_context('bars_context', 'user_branch'));
 
 end CCK_DPK;
 /

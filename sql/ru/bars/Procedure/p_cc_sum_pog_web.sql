@@ -1,4 +1,13 @@
-CREATE OR REPLACE PROCEDURE p_cc_sum_pog_web (DAT1_ date, DAT2_ date, nTip_Kl int ) IS
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_CC_SUM_POG_WEB.sql =========*** 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  procedure P_CC_SUM_POG_WEB ***
+
+  CREATE OR REPLACE PROCEDURE BARS.P_CC_SUM_POG_WEB (DAT1_ date, DAT2_ date, nTip_Kl int ) IS
 -- Расчет Прогноз суммы погашения за период работает НЕ  НА ВРЕМЕННой  ТАБЛИЦе
  CCK_NBU_ char(1) := GetGlobalOption('CCK_NBU');
  l_rec_id varchar2(32):= sys_guid();
@@ -39,5 +48,13 @@ pul.set_mas_ini('REC_ID', l_rec_id, '');
 
 end;
 /
+show err;
 
-grant execute on p_cc_Sum_POG_web to bars_access_defrole;
+PROMPT *** Create  grants  P_CC_SUM_POG_WEB ***
+grant EXECUTE                                                                on P_CC_SUM_POG_WEB to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_CC_SUM_POG_WEB.sql =========*** 
+PROMPT ===================================================================================== 

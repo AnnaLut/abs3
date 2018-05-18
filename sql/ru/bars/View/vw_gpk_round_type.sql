@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW VW_GPK_ROUND_TYPE AS
-SELECT 0 TYPE, '0.Коп 1123.45' NAME
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VW_GPK_ROUND_TYPE.sql =========*** Run 
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view VW_GPK_ROUND_TYPE ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.VW_GPK_ROUND_TYPE ("TYPE", "NAME") AS 
+  SELECT 0 TYPE, '0.Коп 1123.45' NAME
   FROM dual
 UNION ALL
 SELECT 1 TYPE, '1.10 "Коп" 1123.50' NAME
@@ -16,4 +25,12 @@ SELECT 4 TYPE, '4.10000 "Коп" 1100.00' NAME
 UNION ALL
 SELECT 5 TYPE, '5.100000 "Коп" 1000.00' NAME
   FROM dual;
-comment on  table bars.VW_GPK_ROUND_TYPE  is 'Типи заокруглень для процедури з пакету CCK.CC_GPK' ;
+
+PROMPT *** Create  grants  VW_GPK_ROUND_TYPE ***
+grant SELECT                                                                 on VW_GPK_ROUND_TYPE to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/VW_GPK_ROUND_TYPE.sql =========*** End 
+PROMPT ===================================================================================== 

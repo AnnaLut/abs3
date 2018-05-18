@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V_ZAL_ND AS
-SELECT DISTINCT PAP,
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAL_ND.sql =========*** Run *** =====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ZAL_ND ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAL_ND ("PAP", "ND", "ND1", "PR_12", "ACC", "NLS", "KV", "OSTB", "OSTC", "PAWN", "MPAWN", "NREE", "DEPID", "CC_IDZ", "SDATZ", "RNK", "SV", "OB22", "MDATE", "DAZS", "DEL", "NAZN") AS 
+  SELECT DISTINCT PAP,
                    nd,
                    nd1,
                    PR_12,
@@ -24,7 +33,7 @@ SELECT DISTINCT PAP,
      FROM (SELECT 1 PAP,
                   n.ND,
                   P.nd nd1,
-                  p.PR_12,
+                  1 PR_12,
                   Az.acc,
                   AZ.nls,
                   AZ.kv,
@@ -77,3 +86,13 @@ SELECT DISTINCT PAP,
                   AND az.acc = n.acc(+)
                   AND n.ND = TO_NUMBER (pul.Get_Mas_Ini_Val ('ND'))
                   AND pul.Get_Mas_Ini_Val ('PAP') = 2);
+
+PROMPT *** Create  grants  V_ZAL_ND ***
+grant SELECT                                                                 on V_ZAL_ND        to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAL_ND        to START1;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND.sql =========*** End *** =====
+PROMPT ===================================================================================== 

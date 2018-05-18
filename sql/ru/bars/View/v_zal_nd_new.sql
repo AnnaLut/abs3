@@ -21,6 +21,7 @@ SELECT DISTINCT pap
                ,0 del
                ,'' nazn
                ,nmk
+               ,name
   FROM (SELECT 1 pap
               ,p.nd nd
               ,p.pr_12
@@ -41,9 +42,11 @@ SELECT DISTINCT pap
               ,az.mdate
               ,az.dazs
               ,t.nmk
-          FROM accounts az, pawn_acc sz, cc_accp p,customer t
+              ,cp.name
+          FROM accounts az, pawn_acc sz, cc_accp p,customer t,CC_PAWN cp
          WHERE 1=1
           and t.rnk=az.rnk
+          and cp.pawn=sz.pawn
           and  az.acc = sz.acc
            AND az.acc = p.acc(+)
            AND p.accs IN

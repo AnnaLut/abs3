@@ -119,8 +119,8 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NBS', 'C', 'БР  ~тiла~кр', null, 4, 1, 1, 1, 1, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'OB22', 'C', 'ob22~SS~тiла~кр', null, 2, 2, 1, 1, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NBS', 'C', 'БР  ~тiла~кр', null, 4, 1, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'OB22', 'C', 'ob22~SS~тiла~кр', null, 2, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'S903', 'C', 'ob22~ZZI~для~903*', null, 2, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'S950', 'C', 'ob22~ZAL~для~950*', null, 8, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 5, 'S952', 'C', 'ob22~ZAL~для~952*', null, 2, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
@@ -148,8 +148,11 @@ begin
   bars_metabase.add_column(l_tabid, 32, 'SD_SK0', 'C', 'OB22~ рах. доходiв ~ для щомiсячної ~комiсiї', null, 2, 51, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 33, 'SD_9129', 'C', 'OB22~ рах. доходiв ~ для комiсiї~ на 9129''', null, 2, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 34, 'SD_SK4', 'C', 'OB22~ рах. доходiв ~ для комiсiї~ за достр. пог.', null, 2, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'S260', 'C', 'Продукт~ НБУ ~ S260', null, 2, 91, 0, 0, 1, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'S260', 'C', 'Продукт~ НБУ ~ S260', null, 2, 91, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 36, 'ISG', 'C', 'ob22~ISG~дох майб період', null, 2, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'KL1', 'B', 'Одно~ВЕКТ', '', 1, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'D_CLOSE', 'D', 'Де~активовано', '', 10, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('SB_OB22');

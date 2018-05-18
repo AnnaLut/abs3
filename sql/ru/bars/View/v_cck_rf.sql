@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V_CCK_RF AS
-SELECT x.isp
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_CCK_RF.sql =========*** Run *** =====
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_CCK_RF ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_RF ("ISP", "ND", "CC_ID", "VIDD", "RNK", "KV", "S", "GPK", "DSDATE", "DWDATE", "PR", "OSTC", "SOS", "NAMK", "ACC8", "DAZS", "BRANCH", "CUSTTYPE", "PROD", "SDOG", "NDI", "VIDD_NAME", "SOS_NAME", "NLS", "TR", "OPL_DAY") AS 
+  SELECT x.isp
       ,x.nd
       ,x.cc_id
       ,x.vidd
@@ -73,3 +82,12 @@ SELECT x.isp
            AND d.vidd IN (11, 12, 13)
            AND d.sos > 0
            AND d.sos < 14) x;
+
+PROMPT *** Create  grants  V_CCK_RF ***
+grant SELECT                                                                 on V_CCK_RF        to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_CCK_RF.sql =========*** End *** =====
+PROMPT ===================================================================================== 

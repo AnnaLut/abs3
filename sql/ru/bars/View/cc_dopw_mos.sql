@@ -1,12 +1,13 @@
-CREATE OR REPLACE FORCE VIEW BARS.CC_DOPW_MOS
-(
-   ND,
-   TAG,
-   NAME,
-   VAL,
-   SEM 
-)
-AS
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/CC_DOPW_MOS.sql =========*** Run *** ==
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view CC_DOPW_MOS ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.CC_DOPW_MOS ("ND", "TAG", "NAME", "VAL", "SEM") AS 
   SELECT TO_NUMBER (pul.Get_Mas_Ini_Val ('ND')) ND,
          t.TAG,
          t.name,
@@ -50,12 +51,12 @@ AS
             SEM
     FROM MOS_TAG t
 ORDER BY t.name;
-                  
 
-GRANT SELECT ON BARS.CC_DOPW_MOS TO BARS_ACCESS_DEFROLE;
+PROMPT *** Create  grants  CC_DOPW_MOS ***
+grant SELECT                                                                 on CC_DOPW_MOS     to BARS_ACCESS_DEFROLE;
 
-begin 
-execute immediate 'alter table ND_TXT_UPDATE modify TAG VARCHAR2(8 BYTE)';
-end;
-/
-commit;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/CC_DOPW_MOS.sql =========*** End *** ==
+PROMPT ===================================================================================== 
