@@ -58,7 +58,7 @@
             <param name="custId">customer code</param>
             <returns>list of Loans</returns>
         </member>
-        <member name="M:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller.Get(System.Int32,System.Int32)">
+        <member name="M:Bars.API.Loan.Server.Controllers.V1.LoansV1Controller.Get(System.Int32,System.Int64)">
             <summary>
                 Get single loan
             </summary>
@@ -100,7 +100,7 @@
             <param name="custId">customer code</param>
             <returns>list of loans</returns>
         </member>
-        <member name="M:Bars.API.Loan.Server.Controllers.LoansBaseController.Get(System.Int32,System.Int32)">
+        <member name="M:Bars.API.Loan.Server.Controllers.LoansBaseController.Get(System.Int32,System.Int64)">
             <summary>
                 Get single account
             </summary>
