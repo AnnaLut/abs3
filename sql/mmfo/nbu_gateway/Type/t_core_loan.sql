@@ -75,13 +75,13 @@ create or replace type body t_core_loan is
         numberdog        := l_core_loan_row.numdog;
         dogday           := l_core_loan_row.dogday;
         endday           := l_core_loan_row.endday;
-        sumzagal         := - l_core_loan_row.sumzagal;
+        sumzagal         := abs(l_core_loan_row.sumzagal);
         r030             := l_core_loan_row.r030;
         proccredit       := l_core_loan_row.proccredit;
-        sumpay           := - l_core_loan_row.sumpay;
+        sumpay           := abs(l_core_loan_row.sumpay);
         periodbase       := l_core_loan_row.periodbase;
         periodproc       := l_core_loan_row.periodproc;
-        sumarrears       := - l_core_loan_row.sumarrears;
+        sumarrears       := abs(l_core_loan_row.sumarrears);
         arrearbase       := l_core_loan_row.arrearbase;
         arrearproc       := l_core_loan_row.arrearproc;
         daybase          := l_core_loan_row.daybase;
@@ -396,5 +396,5 @@ create or replace type body t_core_loan is
 
         return l_clob;
     end;
-end;
+end;Û
 /
