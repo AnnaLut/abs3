@@ -141,7 +141,6 @@
                 }
             }
             if (!key) {
-                console.log('in key check');
                 $rootScope.ndtxtsave.txt.push({ tag: e.model.TAG, txt: e.model.TXT });
             }
         }

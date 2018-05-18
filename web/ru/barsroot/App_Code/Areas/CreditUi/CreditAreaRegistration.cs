@@ -39,12 +39,12 @@ namespace BarsWeb.Areas.CreditUi
         {
             var controllerFactory = ((NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory());
             var ninjectKernel = controllerFactory.NinjectKernel;
+            ninjectKernel.Bind<INewCreditRepository>().To<NewCreditRepository>();
             ninjectKernel.Bind<IAnalysisBalanceRepository>().To<AnalysisBalanceRepository>();
             ninjectKernel.Bind<IProvideRepository>().To<ProvideRepository>();
             ninjectKernel.Bind<IAccountsRepository>().To<AccountsRepository>();
             ninjectKernel.Bind<IglkRepository>().To<glkRepository>();
             ninjectKernel.Bind<IPortfolioRepository>().To<PortfolioRepository>();
-            ninjectKernel.Bind<INewCreditRepository>().To<NewCreditRepository>();
         }
     }
 }

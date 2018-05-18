@@ -64,7 +64,7 @@
                                            <i class='pf-icon pf-16 pf-book'></i>
                                         </a>*@
 
-                                        <kendo-button ng-disabled="isSaveFunc()" 
+                                        <kendo-button ng-disabled="isSave" 
                                                       ng-click="showReferCust('CUSTOMER','RNK,NMK,OKPO,CUSTTYPE,DATE_ON,DATE_OFF,TGR,C_DST,C_REG,ND,CODCAGENT,COUNTRY,PRINSIDER,STMT,SAB,ADR,VED,SED','')"
                                                       class="pf-icon pf-16 pf-book" >
                                         </kendo-button>
@@ -281,7 +281,7 @@
                                                class="k-textbox" 
                                                style="width: 50px;margin-left: 38px"/>
                                         <input kendo-numeric-text-box k-min="0" 
-                                               ng-disabled="isSaveFunc()"
+                                               ng-disabled="isSave"
                                                k-max="100" 
                                                k-ng-model="credit.rateAValue" 
                                                style="width: 70px"/>
@@ -296,7 +296,7 @@
                                                disabled/>
                                         @*<a class='k-button' ng-click="showReferBRate('BRATES','BR_ID,NAME','where br_id in (select br_id from br_normal where kv=980) order by br_id desc')" ng-show="custtype==3" ng-disabled="isSave"><i class='pf-icon pf-16 pf-book'></i></a>*@
                                         
-                                        <kendo-button ng-disabled="isSaveFunc()"
+                                        <kendo-button ng-disabled="isSave"
                                                       ng-click="showReferBRate('BRATES','BR_ID,NAME','')"
                                                       ng-show="custtype==3"
                                                       class="pf-icon pf-16 pf-book">
@@ -313,16 +313,16 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Очистити"
+                                        <kendo-button ng-disabled="isSave" title="Очистити"
                                                       ng-click="clearReferKv('currBValue', 'rateBValue')"
                                                       class="pf-icon pf-16 pf-delete">
                                         </kendo-button>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Довідник"
+                                        <kendo-button ng-disabled="isSave" title="Довідник"
                                                       ng-click="showReferKv('TABVAL','KV,NAME','where d_close is null order by KV DESC', 'currBValue')"
                                                       class="pf-icon pf-16 pf-book">
                                         </kendo-button>
                                         <input ng-model="credit.currBValue" class="k-textbox" style="width: 50px" ng-disabled="true" />
-                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateBValue" style="width: 70px" k-ng-disabled="isSaveFunc()" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateBValue" style="width: 70px" k-ng-disabled="isSave" />
                                     </td>
                                     <td>
                                         <label class="lbl-top">База нарахування</label>
@@ -330,15 +330,15 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Очистити"
+                                        <kendo-button ng-disabled="isSave" title="Очистити"
                                                       ng-click="clearReferKv('currCValue', 'rateCValue')"
                                                       class="pf-icon pf-16 pf-delete"></kendo-button>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Довідник"
+                                        <kendo-button ng-disabled="isSave" title="Довідник"
                                                       ng-click="showReferKv('TABVAL','KV,NAME','where d_close is null order by KV DESC', 'currCValue')"
                                                       class="pf-icon pf-16 pf-book">
                                         </kendo-button>
                                         <input ng-model="credit.currCValue" class="k-textbox" style="width: 50px" ng-disabled="true" />
-                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateCValue" style="width: 70px" k-ng-disabled="isSaveFunc()" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateCValue" style="width: 70px" k-ng-disabled="isSave" />
                                     </td>
                                     <td>
                                         <select kendo-drop-down-list name="ddlBAsey" id="ddlBAsey" style="width: 300px" k-ng-model="credit.baseyValue" k-options="ddlBaseyOptions"></select>
@@ -346,30 +346,30 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Очистити"
+                                        <kendo-button ng-disabled="isSave" title="Очистити"
                                                       ng-click="clearReferKv('currDValue', 'rateDValue')"
                                                       class="pf-icon pf-16 pf-delete"></kendo-button>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Довідник"
+                                        <kendo-button ng-disabled="isSave" title="Довідник"
                                                       ng-click="showReferKv('TABVAL','KV,NAME','where d_close is null order by KV DESC', 'currDValue')"
                                                       class="pf-icon pf-16 pf-book">
                                         </kendo-button>
                                         <input ng-model="credit.currDValue" class="k-textbox" style="width: 50px" ng-disabled="true" />
-                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateDValue" style="width: 70px" k-ng-disabled="isSaveFunc()" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateDValue" style="width: 70px" k-ng-disabled="isSave" />
                                     </td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Очистити"
+                                        <kendo-button ng-disabled="isSave" title="Очистити"
                                                       ng-click="clearReferKv('currEValue', 'rateEValue')"
                                                       class="pf-icon pf-16 pf-delete">
                                         </kendo-button>
-                                        <kendo-button ng-disabled="isSaveFunc()" title="Довідник"
+                                        <kendo-button ng-disabled="isSave" title="Довідник"
                                                       ng-click="showReferKv('TABVAL','KV,NAME','where d_close is null order by KV DESC', 'currEValue')"
                                                       class="pf-icon pf-16 pf-book">
                                         </kendo-button>
                                         <input ng-model="credit.currEValue" class="k-textbox" style="width: 50px" ng-disabled="true" />
-                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateEValue" style="width: 70px" k-ng-disabled="isSaveFunc()" />
+                                        <input kendo-numeric-text-box k-min="0" k-max="100" k-ng-model="credit.rateEValue" style="width: 70px" k-ng-disabled="isSave" />
                                     </td>
                                     <td></td>
                                 </tr>
@@ -392,7 +392,8 @@
                         id="ddlVidd" 
                         style="width: 200px" 
                         k-ng-model="credit.viddValue" 
-                        k-options="ddlViddOptions" >
+                        k-options="ddlViddOptions" 
+                        ng-disabled="AvalibleViddChange">
                 </select>
                 <span style="color: red" ng-show="!isDdlAimEnabled()">Оберіть позичальника</span>
                 <span style="color: red" ng-show="!isDdlViddValueValid() && isDdlAimEnabled()">Обов'язкове</span>
@@ -451,10 +452,13 @@
             <td></td>
         </tr>
         <tr>
-            <td><br /></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td colspan="4">
+                <label>Відповідальний інспектор по КД:</label>
+                <input type="text" ng-model="credit.inspector_id" class="k-textbox" style="width: 100px" disabled />
+
+                <kendo-button ng-click="showInspectors('staff$base','ID,FIO','')"
+                              class="pf-icon pf-16 pf-book">
+                </kendo-button>
         </tr>
         <tr>
             <td><br /></td>

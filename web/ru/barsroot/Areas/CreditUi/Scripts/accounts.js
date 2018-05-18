@@ -22,6 +22,7 @@ $(document).ready(function () {
     toolbar.push({ template: " | " });
     toolbar.push({ name: "btDel", type: "button", text: "<span class='pf-icon pf-16 pf-table_row-delete2'></span> Вивести без закриття" });
     toolbar.push({ name: "btToExcel", type: "button", text: "<span class='pf-icon pf-16 pf-exel'></span> Експорт в MS Excel" });
+    toolbar.push({ name: "btFinDebit", type: "button", text: "<span class='pf-icon pf-16 pf-add_button'></span> Створення пари ФінДебіторки", attr: { style: "visibility: hidden;" } });
 
 
     var grid = $("#gridAccounts").kendoGrid({
@@ -47,7 +48,10 @@ $(document).ready(function () {
             if (e.model.ACC != null) {
                 $("#NLS").attr("readonly", true);
                 $("#KV").data("kendoDropDownList").readonly();
+                $("#popup_header").text("Редагувати рахунок:");
             }
+            else
+                $("#popup_header").text("Відкрити рахунок:");
         },
         save: function (e) {
             var newAccount = {
@@ -73,7 +77,6 @@ $(document).ready(function () {
         },
         columns: [
             { 
-                //headerTemplate: '<input class="checkbox" type="checkbox" id="AllExsist">',
                 template: '<input class="checkboxExist" type="checkbox"/>',
                 width: 29
             },
@@ -101,7 +104,6 @@ $(document).ready(function () {
              width: 100,
              nullable: true,
              field: "TT_NAME",
-             //template: '<a onclick="window.open(this.href); return false;" href=#=TT#</a>'
              template: "<a onclick='ChooseType(${TT_HREF}); return false;'>${TT_NAME}</a>"
          },
          {
@@ -210,24 +212,12 @@ $(document).ready(function () {
                nullable: true,
                field: "BASEY"
            },
-         /*  {
-               title: "Реф КД",
-               width: 100,
-               nullable: true,
-               field: "ND"
-           },*/
           {
               title: "Відп\nВик",
               width: 64,
               nullable: true,
               field: "ISP"
           },
-          /* {
-               title: "Сорт",
-               width: 67,
-               nullable: true,
-               field: "ORD"
-           },*/
            {
                title: "ACC рах",
                width: 86,
@@ -250,6 +240,9 @@ $(document).ready(function () {
             });
 
             disabledButtons(false, ".k-grid-btDel");
+            disabledButtons(false, ".k-grid-btFinDebit");
+            disabledButtons(staticData.Avalible_provide, ".k-grid-btProvide");
+            disabledButtons(staticData.Avalible_provide, ".k-grid-btGLK");
         },
         change: function (e) {
             var grid = $("#gridAccounts").data("kendoGrid");
@@ -408,11 +401,13 @@ $(document).ready(function () {
     });
 
     $(".k-grid-btf9").click(function () {
-        bars.ui.confirm({
-            text: "Ви дійсно бажаєте виконати  переформування  9129 ?", func: function () {
-                Limit9129();
-            }
-        });
+        if (staticData.NDR == null || staticData.NDR == globalID) { //subs 
+            bars.ui.confirm({
+                text: "Ви дійсно бажаєте виконати  переформування  9129 ?", func: function () {
+                    Limit9129();
+                }
+            });
+        }
     });
 
     $(".k-grid-btDel").click(function () {
@@ -420,7 +415,7 @@ $(document).ready(function () {
         var selectedDataItem = grid.dataItem(grid.select());
         bars.ui.confirm({
             text: "Ви дійсно бажаєте Вивести рах "+ selectedDataItem.NLS+" / "+ selectedDataItem.KV +'  з-під КД '+ globalID+" ?", func: function () {
-                DelAccountWithoutClose(selectedDataItem.ACC, selectedDataItem.TIP); 
+                DelAccountWithoutClose(selectedDataItem.ACC, selectedDataItem.TIP);
             }
         });
     });
@@ -431,6 +426,28 @@ $(document).ready(function () {
 
     $("#bt_open_kk2").click(function () {
         OpenRef(2);
+    });
+
+    $(".k-grid-btToSubs").click(function () {
+        bars.ui.loader('body', true);
+        $.ajax({
+            async: true,
+            type: 'POST',
+            url: bars.config.urlContent('/CreditUI/Accounts/GetTabId/'),
+            success: function (data) {
+                if (CatchErrors(data)) {
+                    window.open(bars.config.urlContent('/ndi/referencebook/GetRefBookData/?nsiTableId=' + data.TabId + '&nsiFuncId=7&jsonSqlParams=[{"Name":"ND","Type":"N","SEMANTIC":"\u0420\u0435\u0444 \u041a\u0414~\u0432 \u0410\u0411\u0421~","Value":' + globalID + '}]'), '_blank');
+                }
+            },
+            complete: function () {
+                bars.ui.loader('body', false);
+            }
+        });
+    });
+
+    $(".k-grid-btFinDebit").click(function () {
+        var grid = $("#gridAccounts").data().kendoGrid;
+        TemplateQuery("/CreditUI/Accounts/FinDebit/", { acc: (grid.dataItem(grid.select())).ACC }, "Пару успішно створено");
     });
 
 })
@@ -535,6 +552,30 @@ function SetStatic(data) {
     var diff_limit = data.DIFF - Math.abs(data.OSTB_9129);
     $("#diff_9129").val(moneyFormat(diff_limit));
     $("#date_first_pay").val(data.Date_issuance);
+
+    if (data.NDR != null) {
+        $(".ref_gen").show();
+        $("#ref_gen").val(data.NDR);
+        var color, info_text, text;
+        if (data.NDR == globalID) {
+            color = "main_contract";
+            info_text = "Генеральний договір";
+            text = "Рахунки та операції ГУ " + globalID;
+            $("#sub_button").css({ "visibility": "visible" });
+            $(".k-grid-btFinDebit").css({ "visibility": "visible" });
+        }
+        else {
+            color = "sub_contact";
+            info_text = "Субдоговір";
+            text = "Рахунки та операції СД по ГУ " + data.NDR;
+            disabledButtons(false, ".k-grid-btf9");
+        }
+        $("#info").addClass(color);
+        $("#info").val(info_text);
+        $("#header_text").text(text);
+        $("#info").css({ "visibility": "visible" });
+    }
+
     //setstaticData();
     SetPul();
 }
@@ -592,6 +633,7 @@ function DisabledButtons() {
     var grid = $("#gridAccounts").data("kendoGrid");
     var selected_items = grid.select();
     disabledButtons(((selected_items.length == 1) && (grid.dataItem(selected_items).ACC != null) && (!(grid.dataItem(selected_items).NLS.match(/8999.*/)))), ".k-grid-btDel");
+    disabledButtons(((selected_items.length == 1) && (grid.dataItem(selected_items).ACC != null) && (grid.dataItem(selected_items).TIP === "ODB")), ".k-grid-btFinDebit");
 }
 
 function TemplateQuery(url, data_input, text) {
@@ -608,9 +650,11 @@ function TemplateQuery(url, data_input, text) {
                 });
                 createListAccounts();
             }
+        },
+        complete: function () {
+            bars.ui.loader('body', false);
         }
     });
-    bars.ui.loader('body', false);
 }
 
 function ChooseType(href) {
@@ -623,7 +667,6 @@ function ChooseType(href) {
 }
 function OpenRef(kk_num) {
     dialogOpenRef.close();
-    var tmp = _href[38];
     _href = _href.substr(0, 38) + kk_num + _href.substr(39);
     window.open(_href);
 }
