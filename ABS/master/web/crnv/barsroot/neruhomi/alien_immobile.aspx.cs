@@ -449,7 +449,7 @@ public partial class alien : Bars.BarsPage
               
 
               String summa = tbSUM_PART.Text;
-              ClearParameters();
+             /* ClearParameters();
               SetParameters("key_", DB_TYPE.Decimal, Request["KEY"], DIRECTION.Input);
               SetParameters("key2_", DB_TYPE.Decimal, Request["KEY"], DIRECTION.Input);
               SetParameters("nls_", DB_TYPE.Varchar2, tbNLS.Text, DIRECTION.Input);
@@ -469,8 +469,35 @@ public partial class alien : Bars.BarsPage
                                 where key=:key_;
                               insert into part_pay_immobile(key, pdat, nls, sum, userid, status, mfob, okpob, fio, owner_type, PASP_N, PASP_S, COMMENTS) 
                                 values(:key2_, sysdate, :nls_, to_number(:sum_)*100, user_id, 0, :mfob_, :okpob_, :fio_, :type_, :PASP_N_, :PASP_S_, COMMENTS_);
-                             end;"); 
-            }
+                             end;"); */
+			 ClearParameters();
+ 	          SetParameters("p_key_", DB_TYPE.Decimal, Request["KEY"], DIRECTION.Input);
+	          SetParameters("p_key2_", DB_TYPE.Decimal, Request["KEY"], DIRECTION.Input);
+              SetParameters("p_nls_", DB_TYPE.Varchar2, tbNLS.Text, DIRECTION.Input);
+              SetParameters("p_sum_", DB_TYPE.Varchar2, summa, DIRECTION.Input);
+              SetParameters("p_mfob_", DB_TYPE.Varchar2, lbMFO.Value, DIRECTION.Input);
+              SetParameters("p_okpob_", DB_TYPE.Varchar2, lbOKPO.Text, DIRECTION.Input);
+              SetParameters("p_fio_", DB_TYPE.Varchar2, lbNMK.Text, DIRECTION.Input);
+              SetParameters("p_type_", DB_TYPE.Varchar2, owner_type, DIRECTION.Input);
+              SetParameters("p_PASP_N_", DB_TYPE.Varchar2, txtNMK_PASPN.Text, DIRECTION.Input);	
+              SetParameters("p_PASP_S_", DB_TYPE.Varchar2, txtNMK_PASPS.Text, DIRECTION.Input);
+              SetParameters("p_COMMENTS_", DB_TYPE.Varchar2, tbPurposePayment.Text, DIRECTION.Input);
+ 
+              SQL_NONQUERY (@"begin
+									BARS.upd_asv_ins_part(:p_key_ ,   
+									:p_key2_ , 
+									:p_nls_  ,
+									:p_sum_  ,
+									:p_mfob_ ,
+									:p_okpob_ ,
+									:p_fio_   ,
+									:p_type_  ,
+									:p_PASP_N_ ,
+									:p_PASP_S_ ,
+									:p_COMMENTS);
+									end;");	
+           
+		   }
 
             
         }
