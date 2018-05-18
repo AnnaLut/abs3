@@ -18,7 +18,7 @@ PROMPT *** Create  view V_ND_ACC ***
             ob22,
             a.accc
      FROM   nd_acc n, accounts a
-    WHERE   a.dazs IS NULL AND a.acc = n.acc ;
+    WHERE   a.dazs IS NULL AND a.acc = n.acc;
 
 
 

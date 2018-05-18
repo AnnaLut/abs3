@@ -121,7 +121,7 @@ begin
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 1, 'FUNCNAME', 'C', 'Код функції', null, 100, null, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'NAME', 'C', 'Найменування', null, 70, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'Код звіту', null, 10, null, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ID', 'N', 'ID', null, 10, null, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

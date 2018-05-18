@@ -1,5 +1,14 @@
-create or replace view vc_sno as
-SELECT x.nd
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/VC_SNO.sql =========*** Run *** =======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view VC_SNO ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.VC_SNO ("ND", "ACC", "KV", "NLS", "DAT31", "S", "REF", "FDAT") AS 
+  SELECT x.nd
       ,a.acc
       ,a.kv
       ,a.nls
@@ -14,3 +23,12 @@ SELECT x.nd
       ,sno_ref r
  WHERE x.acc = a.acc
    AND r.acc = a.acc;
+
+PROMPT *** Create  grants  VC_SNO ***
+grant SELECT                                                                 on VC_SNO          to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/VC_SNO.sql =========*** End *** =======
+PROMPT ===================================================================================== 

@@ -26,7 +26,8 @@ begin
    (	DNI NUMBER(*,0), 
 	IR NUMBER, 
 	KV NUMBER(*,0), 
-	ID NUMBER(*,0)
+	ID NUMBER(*,0), 
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -48,6 +49,33 @@ COMMENT ON COLUMN BARS.INT_OVR.DNI IS 'Период (дни) беспрерывного пользования';
 COMMENT ON COLUMN BARS.INT_OVR.IR IS '% ставка';
 COMMENT ON COLUMN BARS.INT_OVR.KV IS 'Код вал';
 COMMENT ON COLUMN BARS.INT_OVR.ID IS 'Номер шкали';
+--COMMENT ON COLUMN BARS.INT_OVR.KF IS '';
+
+
+
+
+PROMPT *** Create  constraint XPK_INT_OVR ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_OVR ADD CONSTRAINT XPK_INT_OVR PRIMARY KEY (ID, DNI, KV)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint CC_INTOVR_KF_NN ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INT_OVR MODIFY (KF CONSTRAINT CC_INTOVR_KF_NN NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 
@@ -65,12 +93,11 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XPK_INT_OVR ***
+PROMPT *** Create  constraint FK_INTOVR_KF ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.INT_OVR ADD CONSTRAINT XPK_INT_OVR PRIMARY KEY (ID, DNI, KV)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  ALTER TABLE BARS.INT_OVR ADD CONSTRAINT FK_INTOVR_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -96,6 +123,7 @@ PROMPT *** Create  grants  INT_OVR ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR         to ABS_ADMIN;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR         to BARS010;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on INT_OVR         to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on INT_OVR         to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR         to REF0000;
 grant INSERT                                                                 on INT_OVR         to START1;
 grant DELETE,INSERT,SELECT,UPDATE                                            on INT_OVR         to TECH006;

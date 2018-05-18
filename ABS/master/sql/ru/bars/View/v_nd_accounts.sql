@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ND_ACCOUNTS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ND_ACCOUNTS ("ND", "ACC", "NLS", "NLSALT", "KV", "KF", "NBS", "NBS2", "DAOS", "DAPP", "ISP", "RNK", "NMS", "LIM", "OSTB", "OSTC", "OSTF", "OSTQ", "OSTX", "DOS", "KOS", "DOSQ", "KOSQ", "PAP", "TIP", "VID", "TRCN", "MDATE", "DAZS", "SEC", "ACCC", "BLKD", "BLKK", "POS", "SECI", "SECO", "GRP", "TOBO", "LCV", "DIG", "OST", "DENOM", "BRANCH", "OB22") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_ND_ACCOUNTS ("ND", "ACC", "NLS", "NLSALT", "KV", "KF", "NBS", "NBS2", "DAOS", "DAPP", "ISP", "RNK", "NMS", "LIM", "OSTB", "OSTC", "OSTF", "OSTQ", "OSTX", "DOS", "KOS", "DOSQ", "KOSQ", "PAP", "TIP", "VID", "TRCN", "MDATE", "DAZS", "SEC", "ACCC", "BLKD", "BLKK", "POS", "SECI", "SECO", "GRP", "TOBO", "LCV", "DIG", "OST", "DENOM", "BRANCH", "OB22", "FIO") AS 
   SELECT na.ND,
           a.ACC,
           a.NLS,
@@ -23,7 +23,7 @@ PROMPT *** Create  view V_ND_ACCOUNTS ***
           a.NMS,
           a.LIM,
           a.OSTB,
-          s.ost AS ostc,
+          s.ost ostc,
           a.OSTF,
           a.OSTQ,
           a.OSTX,
@@ -48,23 +48,23 @@ PROMPT *** Create  view V_ND_ACCOUNTS ***
           a.TOBO,
           v.LCV,
           v.DIG,
-          (s.OST + s.DOS - s.KOS) AS OST,
+          (s.OST + s.DOS - s.KOS) OST,
           v.denom,
           a.BRANCH,
           a.OB22
+          ,sb.fio
      FROM ACCOUNTS a,
           ND_ACC na,
-          CC_DEAL d,
           tabval$global v,
-          sal_branch s
-    WHERE     na.ND = d.ND
-          AND a.ACC = na.ACC
-          AND d.RNK = a.RNK
+          sal_branch s,
+          staff$base sb
+    WHERE     a.ACC = na.ACC
           AND v.KV = a.KV
           AND a.ACC = s.ACC(+)
           AND s.FDAT = gl.bd
-   UNION ALL
-   SELECT d.ND,
+          and a.isp=sb.id
+   UNION
+   SELECT cp.ND,
           a.ACC,
           a.NLS,
           a.NLSALT,
@@ -79,7 +79,7 @@ PROMPT *** Create  view V_ND_ACCOUNTS ***
           a.NMS,
           a.LIM,
           a.OSTB,
-          s.ost AS ostc,
+          s.ost ostc,
           a.OSTF,
           a.OSTQ,
           a.OSTX,
@@ -104,20 +104,24 @@ PROMPT *** Create  view V_ND_ACCOUNTS ***
           a.TOBO,
           v.LCV,
           v.DIG,
-          (s.OST + s.DOS - s.KOS) AS OST,
+          (s.OST + s.DOS - s.KOS) OST,
           v.denom,
           a.BRANCH,
-          a.OB22
+          a.OB22,
+          sb.fio
      FROM ACCOUNTS a,
           cc_accp cp,
           CC_add d,
           tabval$global v,
-          sal_branch s
+          sal_branch s,
+          staff$base sb
     WHERE     cp.accs = d.accs
           AND a.ACC = cp.ACC
           AND v.KV = a.KV
           AND a.ACC = s.ACC(+)
-          AND s.FDAT = gl.bd;
+          AND s.FDAT = gl.bd
+          and a.isp=sb.id
+;
 
 PROMPT *** Create  grants  V_ND_ACCOUNTS ***
 grant SELECT                                                                 on V_ND_ACCOUNTS   to BARS_ACCESS_DEFROLE;

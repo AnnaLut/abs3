@@ -29,6 +29,7 @@ SELECT x.isp
          ELSE
           0
        END tr
+     ,/*to_char(*/(Select min(cu.chgdate ) from cc_deal_update cu where cu.CHGACTION='I' and cu.nd=x.nd)/*,'YYYY-MM-DD HH:MM:SS')*/ chgdate
   FROM (SELECT d.user_id isp
               ,d.nd
               ,d.cc_id
@@ -70,4 +71,4 @@ SELECT x.isp
                    AND tag = 'CCSRC'
                    AND nd = d.nd)
            AND d.vidd IN (11, 12, 13)
-           AND d.sos = 0) x;
+           AND d.sos = 0) x where x.branch like  SYS_CONTEXT ('bars_context', 'user_branch_mask');

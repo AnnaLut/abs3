@@ -7,42 +7,9 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CCK_REP_LIST_FL ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_REP_LIST_FL ("ID", "NAME", "FUNCNAME") AS 
-  SELECT id, name, REPLACE( NVL (funcname, funcname2),'DAT','GL.BD') funcname
-     FROM (SELECT id,
-                  name,
-                  SUBSTR (funcname, 1, INSTR (funcname, ')')) funcname,
-                  REPLACE (SUBSTR (funcname2, 1, INSTR (funcname2, ')')),
-                           ':PARAM0',
-                           'null')
-                     funcname2
-             FROM (SELECT codeoper id,
-                          name,
-                          (CASE
-                              WHEN UPPER (funcname) LIKE 'F1_SELECT%'
-                              THEN
-                                 SUBSTR (UPPER (funcname),
-                                         INSTR (funcname, '"') + 1)
-                           END)
-                             funcname,
-                          (CASE
-                              WHEN UPPER (funcname) LIKE 'FUNNSIEDIT(%'
-                              THEN
-                                 SUBSTR (UPPER (funcname),
-                                         INSTR (funcname, '=>') + 2)
-                           END)
-                             funcname2
-                     FROM operlist
-                    WHERE     (   (    UPPER (funcname) LIKE 'F1_SELECT%'
-                                   AND (   UPPER (funcname) LIKE '%CCK.CC%'
-                                        OR UPPER (funcname) LIKE
-                                              '%CCT.START%'))
-                               OR (    UPPER (funcname) LIKE 'FUNNSIEDIT%'
-                                   AND UPPER (funcname) LIKE '%CCK_SBER%'))
-                          AND (   UPPER (semantic) = 'ASP_FL'
-                               --OR UPPER (semantic) = 'ASP'
-                               )
-                               ));
+  CREATE OR REPLACE FORCE VIEW BARS.V_CCK_REP_LIST_FL ("ID", "NAME", "FUNC", "TYPE") AS 
+  SELECT  "ID","NAME","FUNC","TYPE" from CCK_AUTO_PROC_LIST t where t.type=0
+;
 
 PROMPT *** Create  grants  V_CCK_REP_LIST_FL ***
 grant SELECT                                                                 on V_CCK_REP_LIST_FL to BARS_ACCESS_DEFROLE;

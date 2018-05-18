@@ -661,6 +661,19 @@ begin
        insert into nd_txt (nd, tag, txt) values (p_nd, p_tag, p_txt);
     end if;
   end if;
+  
+    -- Временно наследование из Веба mos_operw
+  if p_tag in ('CIG_D13','CIG_D16','CIG_D17') then
+      if p_txt is null then
+        delete from mos_operw where nd=p_nd and tag=p_tag;
+      else
+        update mos_operw set value=p_txt where nd=p_nd and tag=p_tag returning count(nd) into l_col;
+        if l_col=0 then
+           insert into mos_operw (nd, tag, value) values (p_nd, p_tag, p_txt);
+        end if;
+
+      end if;
+  end if;
 
   bars_audit.trace(g_pack_name || l_proc_name || ' TYPE_change='||to_char(l_col)||'Finish.');
 end;

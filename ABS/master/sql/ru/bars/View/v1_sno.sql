@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V1_SNO AS
-SELECT d.vidd
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V1_SNO.sql =========*** Run *** =======
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V1_SNO ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V1_SNO ("VIDD", "ND", "NDI", "SDATE", "WDATE", "SOS", "RNK", "BRANCH", "CC_ID", "KV", "NLS", "TIP", "ACC", "SNO", "SNOB", "LIM", "MDATE") AS 
+  SELECT d.vidd
       ,d.nd
       ,d.ndi
       ,d.sdate
@@ -28,3 +37,12 @@ SELECT d.vidd
    AND d.wdate > gl.bd
    AND (a.ostc < 0 AND a.ostf = 0)
    AND d.branch LIKE sys_context('bars_context', 'user_branch') || '%';
+
+PROMPT *** Create  grants  V1_SNO ***
+grant SELECT                                                                 on V1_SNO          to BARS_ACCESS_DEFROLE;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V1_SNO.sql =========*** End *** =======
+PROMPT ===================================================================================== 

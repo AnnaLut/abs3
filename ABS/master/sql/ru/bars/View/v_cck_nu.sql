@@ -34,6 +34,7 @@ SELECT x.isp
       ,x.FREQP
       ,x.opl_date
       ,x.opl_day
+      ,x.I_CR9
   FROM (SELECT d.user_id isp
               ,d.nd
               ,d.cc_id
@@ -69,13 +70,17 @@ SELECT x.isp
                   FROM bars.nd_txt t ,bars.FREQ FR
                  WHERE t.txt=fr.freq
                  and nd = d.nd
-                   AND t.tag = 'FREQ') FREQ    
+                   AND t.tag = 'FREQ') FREQ
                ,(SELECT fr.name
                   FROM bars.nd_txt t ,bars.FREQ FR
                  WHERE t.txt=fr.freq
                  and nd = d.nd
-                   AND t.tag = 'FREQP') FREQP    
-                 ,ia.apl_dat opl_date  
+                   AND t.tag = 'FREQP') FREQP
+                ,(SELECT decode(t.txt,0,'Відновлювана',1,'Невідновлювана')
+                  FROM bars.nd_txt t
+                 WHERE  nd = d.nd
+                   AND t.tag = 'I_CR9') I_CR9
+                 ,ia.apl_dat opl_date
                  ,ia.s opl_day
           FROM bars.cc_deal  d
               ,bars.customer c
@@ -100,5 +105,4 @@ SELECT x.isp
                    AND nd = d.nd)
            AND d.vidd IN (1, 2, 3)
            AND d.sos = 0
-           ) x
-           ;
+           ) x;

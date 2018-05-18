@@ -8,11 +8,27 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_CCK_RESTR ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_CCK_RESTR ("ND", "FDAT", "VID_RESTR", "TXT", "SUMR", "FDAT_END", "PR_NO") AS 
-  select ND, FDAT, VID_RESTR, TXT, SUMR, FDAT_END, PR_NO
-from cck_restr
-union all
-select -acc, FDAT, VID_RESTR, TXT, SUMR, FDAT_END, PR_NO
-from cck_restr_acc;
+  SELECT ND,
+          FDAT,
+          VID_RESTR,
+          TXT,
+          SUMR,
+          FDAT_END,
+          PR_NO
+     FROM cck_restr
+   UNION ALL
+   SELECT -acc,
+          FDAT,
+          VID_RESTR,
+          TXT,
+          SUMR,
+          FDAT_END,
+          PR_NO
+     FROM cck_restr_acc;
+
+PROMPT *** Create  grants  V_CCK_RESTR ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on V_CCK_RESTR     to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_CCK_RESTR     to START1;
 
 
 

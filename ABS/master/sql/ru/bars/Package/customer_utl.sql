@@ -1,12 +1,6 @@
+create or replace package customer_utl is
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/customer_utl.sql =========*** Run **
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CUSTOMER_UTL is
-
-    TAG_MAIN_MOBILE_PHONE          constant varchar2(5 char) := 'MPNO';
+    TAG_MAIN_MOBILE_PHONE          constant varchar2(5 char) := 'MPNO ';
 
     function read_customer(
         p_customer_id in integer,
@@ -23,6 +17,31 @@
         p_raise_ndf in boolean default true)
     return banks$base%rowtype;
 
+    function read_customer_bank(
+        p_customer_id in integer,
+        p_raise_ndf in boolean default true)
+    return custbank%rowtype;
+
+    function get_customer_name(
+        p_customer_id in integer)
+    return varchar2;
+
+    function get_customer_short_name(
+        p_customer_id in integer)
+    return varchar2;
+
+    function get_customer_okpo(
+        p_customer_id in integer)
+    return varchar2;
+
+    function get_customer_mfo(
+        p_customer_id in integer)
+    return varchar2;
+
+    function get_customer_bic(
+        p_customer_id in integer)
+    return varchar2;
+
     function get_customer_address_row(
         p_customer_id in integer,
         p_address_type in integer default null)
@@ -33,17 +52,26 @@
         p_address_type in integer default null)
     return varchar2;
 
+    function get_customer_mobile_phone(
+        p_customer_id in integer)
+    return varchar2;
+
+    function get_customer_mobile_phone(
+        p_object_id in integer,
+        p_attribute_id in integer,
+        p_value_date in date default null)
+    return varchar2;
+
+    function get_person_paper_line(
+        p_person_id in integer)
+    return varchar2;
     function get_element(
         p_customer_id in integer,
         p_element_code in varchar2)
     return varchar2;
-
-    function get_customer_mobile_phone(
-        p_customer_id in integer)
-    return varchar2;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CUSTOMER_UTL as
+create or replace package body customer_utl as
 
     function read_customer(
         p_customer_id in integer,
@@ -108,6 +136,72 @@ CREATE OR REPLACE PACKAGE BODY BARS.CUSTOMER_UTL as
              end if;
     end;
 
+    function read_customer_bank(
+        p_customer_id in integer,
+        p_raise_ndf in boolean default true)
+    return custbank%rowtype
+    is
+        l_customer_bank_row custbank%rowtype;
+    begin
+        select *
+        into   l_customer_bank_row
+        from   custbank b
+        where  b.rnk = p_customer_id;
+
+        return l_customer_bank_row;
+    exception
+        when no_data_found then
+             if (p_raise_ndf) then
+                raise_application_error(-20000, 'Банк з ідентифікатором {' || p_customer_id || '} не знайдений');
+             else return null;
+             end if;
+    end;
+
+    function get_customer_name(
+        p_customer_id in integer)
+    return varchar2
+    is
+    begin
+        return read_customer(p_customer_id, p_raise_ndf => false).nmk;
+    end;
+
+    function get_customer_short_name(
+        p_customer_id in integer)
+    return varchar2
+    is
+        l_customer_row customer%rowtype;
+    begin
+        l_customer_row := read_customer(p_customer_id, p_raise_ndf => false);
+
+        return case when l_customer_row.nmkk is null then substr(trim(l_customer_row.nmk), 1, 38)
+                    else l_customer_row.nmkk
+               end;
+    end;
+
+    function get_customer_okpo(
+        p_customer_id in integer)
+    return varchar2
+    is
+    begin
+        return read_customer(p_customer_id, p_raise_ndf => false).okpo;
+    end;
+
+    function get_customer_mfo(
+        p_customer_id in integer)
+    return varchar2
+    is
+    begin
+        return read_customer_bank(p_customer_id, p_raise_ndf => false).mfo;
+    end;
+
+    function get_customer_bic(
+        p_customer_id in integer)
+    return varchar2
+    is
+    begin
+        return read_customer_bank(p_customer_id, p_raise_ndf => false).bic;
+    end;
+
     function get_customer_address_row(
         p_customer_id in integer,
         p_address_type in integer default null)
@@ -156,6 +250,48 @@ CREATE OR REPLACE PACKAGE BODY BARS.CUSTOMER_UTL as
                     l_address_row.address);
     end;
 
+    function get_customer_mobile_phone(
+        p_customer_id in integer)
+    return varchar2
+    is
+        l_mobile_phone varchar2(3000 char);
+    begin
+        select c.value
+        into   l_mobile_phone
+        from   customerw c
+        where  c.rnk = p_customer_id and
+               c.tag = customer_utl.TAG_MAIN_MOBILE_PHONE;
+
+        return l_mobile_phone;
+    end;
+
+    function get_customer_mobile_phone(
+        p_object_id in integer,
+        p_attribute_id in integer,
+        p_value_date in date default null)
+    return varchar2
+    is
+    begin
+        return get_customer_mobile_phone(p_object_id);
+    end;
+
+    function get_person_paper_line(
+        p_person_id in integer)
+    return varchar2
+    is
+        l_person_row person%rowtype;
+    begin
+        l_person_row := read_person(p_person_id, p_raise_ndf => false);
+
+        if (l_person_row.rnk is null) then
+            return null;
+        end if;
+
+        return trim(l_person_row.ser || ' ' ||
+                    l_person_row.numdoc ||
+                    case when l_person_row.pdate is null then null else ' від ' || to_char(l_person_row.pdate, 'dd.mm.yyyy') end ||
+                    case when l_person_row.organ is null then null else ' виданий ' || l_person_row.organ end);
+    end;
     function get_element(
         p_customer_id in integer,
         p_element_code in varchar2)
@@ -174,21 +310,5 @@ CREATE OR REPLACE PACKAGE BODY BARS.CUSTOMER_UTL as
         when no_data_found then
              return null;
     end;
-
-    function get_customer_mobile_phone(
-        p_customer_id in integer)
-    return varchar2
-    is
-    begin
-        return get_element(p_customer_id, customer_utl.TAG_MAIN_MOBILE_PHONE);
-    end;
 end;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/customer_utl.sql =========*** End **
- PROMPT ===================================================================================== 
- 

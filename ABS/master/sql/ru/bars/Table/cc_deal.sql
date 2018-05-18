@@ -383,23 +383,6 @@ exception when others then
 /
 
 
-
-
-PROMPT *** Create  constraint CC_CCDEAL_PROD_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CC_DEAL ADD CONSTRAINT CC_CCDEAL_PROD_NN CHECK ( prod is not null
-         or
-         vidd not in (11,12,13,1,2,3)
-        ) DEFERRABLE INITIALLY DEFERRED ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index XIE_CC_DEAL_SKARB_ID ***
 begin   
  execute immediate '

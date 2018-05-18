@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/account_utl.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ACCOUNT_UTL is
+CREATE OR REPLACE PACKAGE ACCOUNT_UTL is
     function read_account(
         p_account_id in integer,
         p_lock in boolean default false,
@@ -61,14 +55,18 @@
         p_raise_ndf in boolean default true)
     return accounts%rowtype;
     
+    function get_account_currency_id(
+        p_account_id in integer)
+    return number;
+    
     function lock_account(
         p_account_id in integer,
         p_lock_mode in integer default 0,
         p_raise_ndf in boolean default true)
-    return accounts%rowtype;    
+    return accounts%rowtype;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
+CREATE OR REPLACE PACKAGE BODY ACCOUNT_UTL as
 
     function read_account(
         p_account_id in integer,
@@ -116,7 +114,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
             into   l_accounts_row
             from   accounts a
             where  (a.nls = p_account_number or
-                    a.nlsalt = p_account_number and 
+                    a.nlsalt = p_account_number and
                     a.dat_alt is not null) and
                    a.kv = p_currency and
                    a.kf = p_branch
@@ -168,6 +166,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
         return read_account(p_account_id, p_raise_ndf => false).ostc;
     end;
 
+  function get_account_currency_id(
+        p_account_id in integer)
+    return number
+    is
+    begin
+        return read_account(p_account_id, p_raise_ndf => false).kv;
+    end;
+    
     procedure check_account_before_close(
         p_account_row in accounts%rowtype)
     is
@@ -252,11 +258,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
     /* p_lock_mode 0 - wait
                    1 - no wait
                    2 - skip locked
-    */             
+    */
     is
         l_accounts_row accounts%rowtype;
         ora_lock exception;
-        pragma exception_init(ora_lock, -54);        
+        pragma exception_init(ora_lock, -54);
     begin
         if  p_lock_mode = 0 then
             select *
@@ -273,7 +279,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
             where  a.nls = p_account_number and
                    a.kv = p_currency_id and
                    a.kf = p_mfo
-            for update nowait;           
+            for update nowait;
         elsif p_lock_mode = 2 then
             select *
             into   l_accounts_row
@@ -281,7 +287,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
             where  a.nls = p_account_number and
                    a.kv = p_currency_id and
                    a.kf = p_mfo
-            for update skip locked;           
+            for update skip locked;
 
         end if;
 
@@ -317,13 +323,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
             into   l_accounts_row
             from   accounts a
             where  a.acc = p_account_id
-            for update nowait;           
+            for update nowait;
         elsif p_lock_mode = 2 then
             select *
             into   l_accounts_row
             from   accounts a
             where  a.acc = p_account_id
-            for update skip locked;           
+            for update skip locked;
         end if;
 
         return l_accounts_row;
@@ -334,14 +340,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
                                         'Рахунок з ідентифікатором {' || p_account_id || '} не знайдено');
              else return null;
              end if;
-    end;   
+    end;
 end;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/account_utl.sql =========*** End ***
- PROMPT ===================================================================================== 
- 

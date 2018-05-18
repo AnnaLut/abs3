@@ -162,6 +162,9 @@
         p_deal_id in integer,
         p_deal_comment in varchar2,
         p_error_message out varchar2);
+		
+    procedure pay_selected_interest(
+        p_reckoning_id in integer);
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR as
@@ -1187,6 +1190,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR as
     exception
         when others then
              p_error_message := sqlerrm || chr(10) || dbms_utility.format_error_backtrace();
+    end;
+	
+		    -- obsolete
+    procedure pay_selected_interest(
+        p_reckoning_id in integer)
+    is
+        l_int_reckoning_row int_reckoning%rowtype;
+    begin
+        --bars_audit.log_info('cdb_mediator.pay_selected_interest', 'p_reckoning_id : ' || p_reckoning_id);
+
+        l_int_reckoning_row := interest_utl.lock_reckoning_row(p_reckoning_id, p_skip_locked => true);
+
+        if (l_int_reckoning_row.id is not null) then
+            interest_utl.pay_int_reckoning_row(l_int_reckoning_row, p_silent_mode => true, p_do_not_store_interest_tails => true);
+        end if;
     end;
 end;
 /

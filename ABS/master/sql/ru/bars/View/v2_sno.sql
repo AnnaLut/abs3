@@ -7,12 +7,43 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V2_SNO ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V2_SNO ("OTM", "SPN", "ND", "KV", "NLS", "ID", "DAT", "S", "OST1", "OST2", "SA") AS 
-  SELECT t.OTM,  t.ir SPN, t.br ND, t.op KV, TO_CHAR (t.BRN) NLS,  t.ID,   t.DAT,     t.s/100  S,
-         (t.ostf - (SELECT NVL (SUM(s), 0) FROM tmp_sno WHERE dat <  t.dat))/ 100  OST1,
-         (t.ostf - (SELECT NVL (SUM(s), 0) FROM tmp_sno WHERE dat <= t.dat))/ 100  OST2,  t.sa/100  SA  FROM tmp_sno t ;
+  CREATE OR REPLACE FORCE VIEW BARS.V2_SNO ("VIDD", "REFP", "VDAT", "ND", "NDI", "SDATE", "WDATE", "SOS", "RNK", "BRANCH", "CC_ID", "KV", "NLS", "TIP", "ACC", "SNO", "SNO_PLAN", "SNO_GPP", "SNOB", "LIM") AS 
+  SELECT d.vidd
+      ,c.ref refp
+      ,o.vdat
+      ,d.nd
+      ,d.ndi
+      ,d.sdate
+      ,d.wdate
+      ,d.sos
+      ,d.rnk
+      ,d.branch
+      ,d.cc_id
+      ,a.kv
+      ,a.nls
+      ,a.tip
+      ,a.acc
+      ,a.ostc / 100 sno
+      ,a.ostb / 100 sno_plan
+      ,a.ostf / 100 sno_gpp
+      ,(a.ostf + a.ostc) / 100 snob
+      ,(SELECT ostc / 100
+          FROM accounts aa, nd_acc nn
+         WHERE nn.nd = d.nd
+           AND nn.acc = aa.acc
+           AND aa.tip = 'LIM') lim
+  FROM accounts a, cc_deal d, nd_acc n, sno_ref c, oper o
+ WHERE c.acc = a.acc
+   AND c.ref = o.ref
+   AND a.acc = n.acc
+   AND a.tip = 'SNO'
+   AND n.nd = d.nd
+   AND d.vidd IN (1, 2, 3, 11, 12, 13)
+   AND (a.ostc <> 0 OR a.ostf <> 0)
+   AND d.branch LIKE sys_context('bars_context', 'user_branch') || '%';
 
 PROMPT *** Create  grants  V2_SNO ***
+grant DELETE,INSERT,SELECT,UPDATE                                            on V2_SNO          to BARS_ACCESS_DEFROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on V2_SNO          to START1;
 
 

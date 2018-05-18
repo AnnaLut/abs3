@@ -46,12 +46,17 @@ exception when others then
 end; 
 /
 
-
-
+begin
+ execute immediate   'alter table PRVN_OSAQ add (IRC_CCY NUMBER) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN PRVN_OSAQ.IRC_CCY IS 'IRC_CCY~РУХ~НЕприз.дох';
 
 PROMPT *** ALTER_POLICIES to PRVN_OSAQ ***
  exec bpa.alter_policies('PRVN_OSAQ');
-
 
 COMMENT ON TABLE BARS.PRVN_OSAQ IS 'Стиснена Вітрина "Резерв-МСФЗ-екв"';
 COMMENT ON COLUMN BARS.PRVN_OSAQ.VIDD IS 'Вид кредиту';
@@ -69,12 +74,8 @@ COMMENT ON COLUMN BARS.PRVN_OSAQ.REZB_R IS 'Ручной~Резерв по~бал.акт';
 COMMENT ON COLUMN BARS.PRVN_OSAQ.REZ9_R IS 'Ручной~Резерв по~вне/бал.акт';
 COMMENT ON COLUMN BARS.PRVN_OSAQ.AIRC_CCY IS 'AIRC_CCY~Итого~НЕприз.дох';
 
-
-
 PROMPT *** Create  grants  PRVN_OSAQ ***
 grant SELECT,UPDATE                                                          on PRVN_OSAQ       to START1;
-
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/PRVN_OSAQ.sql =========*** End *** ===

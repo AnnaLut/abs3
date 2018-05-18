@@ -28,8 +28,8 @@ end;
 /
 grant select, insert, update, delete on bars.cck_r013 to bars_access_defrole;
 
-comment on table bars.cck_r013 is 'РЎРїСЂР°РІРѕС‡РЅРёРє СЃРїРµС†РїР°СЂР°РјРµС‚СЂР° R013 РґР»СЏ РєСЂРµРґРёС‚РѕРІ (TIP = SS, SDI, SN)';
-comment on column bars.cck_r013.nbs is 'Р‘Р°Р»Р°РЅСЃ. СЃС‡РµС‚';
-comment on column bars.cck_r013.ob22 is 'ob22 СЃС‡РµС‚Р°; "-" РµСЃР»Рё РЅРµ РёРјРµРµС‚ Р·РЅР°С‡РµРЅРёСЏ';
-comment on column bars.cck_r013.r013 is 'Р—РЅР°С‡РµРЅРёРµ СЃРїРµС†РїР°СЂР°РјРµС‚СЂР°';
-comment on column bars.cck_r013.module_specific is 'РЎРїРµС†РёС„РёРєР° РјРѕРґСѓР»СЏ (N - РЅРµ С‚СЂРµР±СѓРµС‚ РґРѕРї. СЂР°СЃС‡РµС‚РѕРІ)';
+comment on table bars.cck_r013 is 'Справочник спецпараметра R013 для кредитов (TIP = SS, SDI, SN)';
+comment on column bars.cck_r013.nbs is 'Баланс. счет';
+comment on column bars.cck_r013.ob22 is 'ob22 счета; "-" если не имеет значения';
+comment on column bars.cck_r013.r013 is 'Значение спецпараметра';
+comment on column bars.cck_r013.module_specific is 'Специфика модуля (N - не требует доп. расчетов)';

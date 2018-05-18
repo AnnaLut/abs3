@@ -1,5 +1,14 @@
-CREATE OR REPLACE VIEW V_ZAL_ND_NOT_NEW AS
-SELECT DISTINCT pc.acc
+
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NOT_NEW.sql =========*** Run *
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ZAL_ND_NOT_NEW ***
+
+  CREATE OR REPLACE FORCE VIEW BARS.V_ZAL_ND_NOT_NEW ("ACC", "PAWN", "NAME", "RNK", "NMK", "NMS", "NLS", "KV", "OST", "OB22") AS 
+  SELECT DISTINCT pc.acc
                ,ca.pawn
                ,ca.name
                ,a.rnk
@@ -24,3 +33,9 @@ SELECT DISTINCT pc.acc
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
                                                   ,p_splitting_symbol => ','))));
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NOT_NEW.sql =========*** End *
+PROMPT ===================================================================================== 

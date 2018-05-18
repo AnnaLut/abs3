@@ -1,13 +1,7 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_SUMPOG_1
-(
-   KV,
-   LCV,
-   NAME,
-   G1,
-   G2
-)
+CREATE OR REPLACE VIEW V_SUMPOG_1
+(kv, lcv, name, g1, g2)
 AS
-     SELECT g.KV,
+SELECT g.KV,
             t.lcv,
             t.name,
             SUM (G1) / 100,
@@ -18,6 +12,3 @@ AS
             AND g.rec_id = SYS_CONTEXT ('bars_pul', 'REC_ID')
    GROUP BY g.KV, t.lcv, t.name
    ORDER BY g.KV;
-
-
-GRANT SELECT ON BARS.V_SUMPOG_1 TO BARS_ACCESS_DEFROLE;

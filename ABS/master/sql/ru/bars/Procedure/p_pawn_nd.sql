@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_PAWN_ND.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_PAWN_ND ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_PAWN_ND 
+CREATE OR REPLACE PROCEDURE P_PAWN_ND
  (p_nd     number  , -- ref дог или 0 или null
   p_accZ   number  , -- счет залога
   p_ob22   varchar2,
@@ -20,11 +11,12 @@ PROMPT *** Create  procedure P_PAWN_ND ***
   p_idz    number  ,
   p_SV     number  ,
   p_dpt    varchar2,
-  p_12     number
+  p_12     number  ,
+  p_pawn   number default null
  ) is
 
 /*
- 13-07-2016 LUDA Овердрафты холдинга не установлены (изменена выборка)
+ 25/09/2017 LSO  Добавлено поиск счетов по cc_deal.ndg
  26-05-2016 LUDA Добавлены  Овердрафты холдинга
  25-08-2015 LUDA Добавлен "Термін дії залогу" пишется дата в ACCOUNTS(MDAT)
  18.02.2015 Sta  Вместе с C:\bars98\SQL\PATCHES.2\patch505_cp.sql - для тех МФО. где есть ЦБ
@@ -78,7 +70,7 @@ begin
   -- параметры счета обеспечения
   UPDATE accounts SET grp = p_grp, mdate = p_mdatz  where  acc = p_accZ;
   If p_dpt is not null then   begin l_dpt := to_number(trim(p_dpt));   exception when others then l_dpt := null;  end;  end if;
-  UPDATE pawn_acc SET nree=p_ree, cc_idz = p_cc_idz, sdatz = p_sdatz, idz=p_IDZ, SV = p_SV*100, deposit_id=l_dpt WHERE acc= p_accZ;
+  UPDATE pawn_acc SET nree=p_ree, cc_idz = p_cc_idz, sdatz = p_sdatz, idz=p_IDZ, SV = p_SV*100, deposit_id=l_dpt, pawn = nvl(p_pawn, pawn) WHERE acc= p_accZ;
   if getglobaloption('HAVETOBO') = 2 or gl.amfo ='300465' then
      begin                                 execute immediate 'INSERT INTO specparam_int (ACC,OB22) VALUES ('||p_accZ||','''||p_ob22||''' )';
      EXCEPTION WHEN DUP_VAL_ON_INDEX THEN  execute immediate 'UPDATE specparam_int SET OB22='''||p_ob22 ||''' WHERE  acc = '||p_accZ ;
@@ -89,9 +81,9 @@ begin
   If    nvl(p_nd,0) = 0 and p_accs > 0 then acc1( 0,p_accZ,p_accS,p_12); ------- Нет  Дог, но есть 1 счет счет актива
   elsIf     p_nd    > 0 and p_accs > 0 then ------------------------------------ Есть Дог, и есть хотя бы 1 счет актива
      FOR k in  (SELECT n.acc ACCS   FROM nd_acc n, accounts a, cc_deal d
-                WHERE n.nd=d.nd and n.acc = a.acc AND n.ND= p_nd  AND
-                     (d.vidd <> 10 AND a.tip     in ('SS ','SL ','SP ','CR9','SN ','SNO','SPN') or
-                      d.vidd =  10 AND a.tip not in ('OVN') )         -- Овердрафты холдинга
+                WHERE n.nd=d.nd and n.acc = a.acc  AND ( d.nd = p_nd or d.ndg= p_nd )   AND
+                     (d.vidd <> ovrn.vidd AND a.tip     in ('SS ','SL ','SP ','CR9','SN ','SNO','SPN') or
+                      d.vidd =  ovrn.vidd AND a.tip not in ('OVN') )         -- Овердрафты холдинга
                 Union ALL SELECT Acc          FROM acc_over WHERE nd = p_nd  -- Обычные Овердрафты
                 Union ALL SELECT Acc_9129     FROM acc_over WHERE Acc_9129 is not null and nd =p_ND )
      LOOP  acc1( p_nd, p_accZ,  k.ACCS,  p_12);
@@ -105,14 +97,3 @@ begin
 
 end p_pawn_nd;
 /
-show err;
-
-PROMPT *** Create  grants  P_PAWN_ND ***
-grant EXECUTE                                                                on P_PAWN_ND       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_PAWN_ND       to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_PAWN_ND.sql =========*** End ***
-PROMPT ===================================================================================== 
