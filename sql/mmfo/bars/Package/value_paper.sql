@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.20 10.05.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.19 20.04.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -536,7 +536,7 @@ TYPE r_many_grid
   procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null);
   
   --виплата дивідентів -населення таблиці
-  procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null);  
+  procedure make_pay_dividents_prepare(p_ref cp_deal.ref%type default null);  
 
   procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type);
   procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type);
@@ -548,7 +548,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.34 11.05.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.32 20.04.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -3184,7 +3184,7 @@ END;
 end;
  
   --виплата дивідентів -населення таблиці
-  procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null) as
+  procedure make_pay_dividents_prepare(p_ref cp_deal.ref%type default null) as
    l_ref           cp_deal.ref%type;    
   begin
      if p_ref is null then
@@ -3192,7 +3192,7 @@ end;
        else
          l_ref := p_ref;
      end if;
-     bars_audit.info('value_paper.make_pay_dividends_prepare START: REF=' || l_ref);
+     bars_audit.info('value_paper.make_pay_dividents_prepare START: REF=' || l_ref);
      if l_ref is null then
        raise_application_error(-20001,  'Вкажіть REF угоди по якій необхідно виплатити дивіденти');
      end if;
@@ -3200,7 +3200,7 @@ end;
      
      delete from cp_pay_dividents where user_id = user_id();
      insert into cp_pay_dividents(ref) values(l_ref);
-     bars_audit.info('value_paper.make_pay_dividends_prepare END');     
+     bars_audit.info('value_paper.make_pay_dividents_prepare END');     
   end;    
 
   --за основу функції взяті з нового пакету cp_rep_dgp
