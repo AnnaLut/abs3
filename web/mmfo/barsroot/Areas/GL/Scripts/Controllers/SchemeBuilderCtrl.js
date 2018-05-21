@@ -101,7 +101,7 @@
                 }
             };
 
-			vm.saveSchemeSideB = function (elem, editedRows) {
+            vm.saveSchemeSideB = function (elem, editedRows) {
                 if (elem)
                     vm.ssb = elem;
                 if (editedRows && editedRows.length > 0) {
@@ -114,8 +114,8 @@
                 else
                     if ($scope.validatorSB.validate() || elem) {
                         vm.ssb.OpType = unmaskKendoText(vm.ssb.OpType);
-						vm.ssb.OpCode = unmaskKendoText(vm.ssb.OpCode);
-						vm.ssb.RecipientBankId = (vm.ssb.RecipientBankId.length === 6) ? unmaskKendoText(vm.ssb.RecipientBankId) : unmaskKendoText(angular.element('#ssbRecipientBankId').val()); // bug with refreshing field in ie8 
+                        vm.ssb.OpCode = unmaskKendoText(vm.ssb.OpCode);
+                        vm.ssb.RecipientBankId = unmaskKendoText(vm.ssb.RecipientBankId);
                         vm.ssb.RecipientAccNum = unmaskKendoText(vm.ssb.RecipientAccNum);
                         vm.ssb.CurrId = unmaskKendoText(vm.ssb.CurrId);
                         vm.ssb.RecipienCustCode = unmaskKendoText(vm.ssb.RecipienCustCode);

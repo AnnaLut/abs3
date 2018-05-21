@@ -118,6 +118,7 @@ function InitDocuments() {
 function AfterLoadFunction() {
     // кол-во и сумма документов
     document.getElementById("lb_DocCount").innerText = '(к-ть: ' + returnServiceValue[2].text + '; сума: ' + returnServiceValue[3].text + ' грн.)';
+    insertXslRowSelectionTooltip();
 }
 
 function getCookie(par) {

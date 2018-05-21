@@ -41,6 +41,10 @@
             display: block;
         }
 
+        .selected {
+            background: #bdf;
+        }
+
         .messagepop {
             background-color: #FFFFFF;
             border: 1px solid #d9edf7;
