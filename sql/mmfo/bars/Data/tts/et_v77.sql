@@ -179,23 +179,23 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('58A  ', 'V77', 'O', 1, 33, null, null);
+    values ('58A  ', 'V77', 'M', 1, 33, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''58A  '', ''V77'', ''O'', 1, 33, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''58A  '', ''V77'', ''M'', 1, 33, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('58D  ', 'V77', 'O', 1, 34, null, null);
+    values ('58D  ', 'V77', 'M', 1, 34, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''58D  '', ''V77'', ''O'', 1, 34, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''58D  '', ''V77'', ''M'', 1, 34, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
