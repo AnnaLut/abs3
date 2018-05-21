@@ -68,7 +68,6 @@ function dealController($scope, paramsService) {
         dataBound: function () {
             this.select(0);
             checkVisibilityRB_AI();
-            //debugger;
             //if (this.dataSource.data()[this.select()])
             //    $scope.contractModel.PF = this.dataSource.data()[this.select()].PF;
         },
@@ -188,7 +187,6 @@ function dealController($scope, paramsService) {
             if (response.Error)
                 bars.ui.error({ text: response.Message });
             else {
-                debugger;                                
                 $scope.successMessage = response.Message;
                 $scope.contractModel.NAZN = response.NAZN;                
                 $scope.contractModel.REF_MAIN = response.REF_MAIN;                

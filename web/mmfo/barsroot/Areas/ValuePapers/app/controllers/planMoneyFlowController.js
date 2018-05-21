@@ -6,7 +6,6 @@ function planMoneyFlowController($scope, paramsService) {
     $scope.gridDate = {};
 
     //$('.k-grid-add').on('click', function () {
-    //    debugger;
     //    $scope.planMoneyFlowGrid.dataSource.options.schema.model.fields.P_FDAT.editable = true;
     //});
 

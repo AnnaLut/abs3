@@ -112,7 +112,44 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
             }
         }
+        /// <summary>
+        /// Довідник видів договору 
+        /// </summary>
+        public HttpResponseMessage GetCP_VDOGO([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request)
+        {
+            try
+            {
+                var data = _repo.CP_VDOGO();
 
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
+                    data.ToList().ToDataSourceResult(request));
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+            }
+        }
+        /// <summary>
+        /// Довідник Класифікації ЦП по типу емітента
+        /// </summary>
+        public HttpResponseMessage GetCP_KLCPE([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request)
+        {
+            try
+            {
+                var data = _repo.CP_KLCPE();
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
+                    data.ToList().ToDataSourceResult(request));
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+            }
+        }
         public HttpResponseMessage GetContractSaleWindowFixedParams()
         {
             try
@@ -455,7 +492,7 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
         {
             try
             {
-                var result = _repo.SetSpecparam(data.REF_MAIN, data.COD_I, data.COD_M, data.COD_F);
+                var result = _repo.SetSpecparam(data.REF_MAIN, data.COD_I, data.COD_M, data.COD_F, data.COD_V, data.COD_O);
 
                 if (String.IsNullOrEmpty(result) || result == "null")
                     return Request.CreateResponse(HttpStatusCode.OK);

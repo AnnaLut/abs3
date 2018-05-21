@@ -61,11 +61,19 @@ function specParamsController($scope, paramsService) {
     $scope.grid1Options = getGridOptions('GetCP_OB_INITIATOR');
     $scope.grid2Options = getGridOptions('GetCP_OB_MARKET');
     $scope.grid3Options = getGridOptions('GetCP_OB_FORM_CALC');
+    $scope.grid4Options = getGridOptions('GetCP_VDOGO');
+    $scope.grid5Options = getGridOptions('GetCP_KLCPE');
 
     $scope.$on('loadChangeBillGrids', function () {
         $scope.mode = document.getElementById('specParamsWindowMode').value;
-        $scope.grid1.dataSource.read();
-        $scope.grid2.dataSource.read();
+        if ($scope.mode == 1) {
+            $scope.grid1.dataSource.read();
+            $scope.grid2.dataSource.read();
+        }
+        if ($scope.mode == 2) {
+            $scope.grid4.dataSource.read();
+            $scope.grid5.dataSource.read();
+        }
         $scope.grid3.dataSource.read();
     });
 
@@ -73,7 +81,10 @@ function specParamsController($scope, paramsService) {
         var COD_I = $scope.mode == 1 ? $scope.grid1.dataItem($scope.grid1.select()).CODE : null,
             COD_M = $scope.mode == 1 ? $scope.grid2.dataItem($scope.grid2.select()).CODE : null,
             COD_F = $scope.grid3.dataItem($scope.grid3.select()).CODE;
-        paramsService.setSpecparams(paramsService.model.REF_MAIN || "", COD_I, COD_M, COD_F).then(function (result) {
+        var COD_V = $scope.mode == 2 ? $scope.grid4.dataItem($scope.grid4.select()).CODE : null,
+            COD_O = $scope.mode == 2 ? $scope.grid5.dataItem($scope.grid5.select()).CODE : null
+
+        paramsService.setSpecparams(paramsService.model.REF_MAIN || "", COD_I, COD_M, COD_F, COD_V, COD_O).then(function (result) {
             if (result == "") {
                 bars.ui.success({ text: "Операцію виконано успішно!" });
                 $scope.specParamsWindow.close();

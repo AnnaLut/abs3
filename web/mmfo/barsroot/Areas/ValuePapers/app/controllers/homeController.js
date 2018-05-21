@@ -196,7 +196,6 @@ function homeController($scope, paramsService, $window, LS) {
             if (filter_columns_str !== null && filter_columns_str !== "") {
                 filter_columns_array = filter_columns_str.split(',');
                 for (var i = 0; i < filter_columns_array.length; i++) {
-                    debugger;
                     tmp = filter_columns_array[i];
                     grid.hideColumn(filter_columns_array[i]);
                 }
@@ -428,7 +427,6 @@ function homeController($scope, paramsService, $window, LS) {
         }
         //$scope.$broadcast('initMoneyFlow', { REF: $scope.firstSelRow.REF });
         //$scope.moneyFlowWindow.center().open();
-        //debugger;
         $window.open('/barsroot/valuepapers/generalfolder/moneyflow?REF=' + $scope.firstSelRow.REF, '_blank');
         //$window.open($scope.moneyFlowWindow, '_blank');
         //$window.open($scope.moneyFlowWindow.open(),'_blank');

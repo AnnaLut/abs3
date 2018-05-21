@@ -17,6 +17,21 @@
                 <div kendo-grid="grid2" k-options="grid2Options"></div>
             </div>
         </div>
+        <div ng-hide="mode==1">
+            <div style="width: 400px; display: inline-block; padding: 5px 0;">
+                Вид договору
+            </div>
+            <div style="width: 400px; display: inline-block; padding: 5px 0;">
+                Класифікація ЦП по типу емітента
+            </div>
+
+            <div style="width: 400px; display: inline-block;">
+                <div kendo-grid="grid4" k-options="grid4Options"></div>
+            </div>
+            <div style="width: 400px; display: inline-block;">
+                <div kendo-grid="grid5" k-options="grid5Options"></div>
+            </div>
+        </div>
         <div style="width: 400px; display: inline-block; padding: 5px 0;">
             Форма проведення розрахунку
         </div>
@@ -31,7 +46,7 @@
         </div>
         <div>
             <div style="width: 400px; display: inline-block;">
-                <button style="float:right;" ng-disabled="lock.length!=3&&(mode==2&&lock.length!=1)" ng-click="setSpecparams()">Зберегти</button>
+                <button style="float:right;" ng-disabled="lock.length!=3&&(mode==2&&lock.length!=3)" ng-click="setSpecparams()">Зберегти</button>
             </div>
             <div style="width: 400px; display: inline-block;">
                 <button style="float:left;" ng-click="changeBillWindow.close()">Відмінити</button>
