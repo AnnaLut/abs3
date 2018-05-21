@@ -70,7 +70,7 @@ procedure Set_ost8   ( p_acc8 number) ;
 procedure OPL1       ( oo IN OUT oper%rowtype); -- опрлата
 procedure background ( p_ini int, p_mode int, p_ND number, p_date date); -- БЭК-сопровождение договора
 procedure INTX               ( p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- JOB-вызов расчет %%
-procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Собственно расчет  %%
+procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) ;  -- Собственно расчет  %%
 procedure INTB       ( p_mode int); --- Генерация проводок согласно итоговому протоколу
 procedure OP_3600    ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN OUT accounts%rowtype) ;   -- откр дисконта  3600
 procedure OP_SP      ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype, a69 IN OUT accounts%rowtype) ;   -- откр просрочки 2067 + 2069
@@ -2029,12 +2029,12 @@ begin
    s_Dat1  := to_char(p_Dat1,'dd.mm.yyyy');
    s_Dat2  := to_char(p_Dat2,'dd.mm.yyyy');
 
-   l_job_what :=  'OVRN.intXJ ('|| gl.aUid ||', '|| p_mode|| ', to_date ('''||s_Dat1||''',''dd.mm.yyyy''), to_date('''||s_Dat2||''',''dd.mm.yyyy''), ' || p_acc8 ||', '|| p_acc2 || ');';
+   l_job_what :=  'OVRN.intXJ ('|| gl.aUid ||', '''|| sys_context('bars_context','user_branch')|| ''', '|| p_mode|| ',  to_date ('''||s_Dat1||''',''dd.mm.yyyy''),  to_date('''||s_Dat2||''',''dd.mm.yyyy''), ' || p_acc8 ||', '|| p_acc2 || ');';
    bms.enqueue_msg( 'Розрах. %% по ОВР поставлено в чергу:' || l_job_what, dbms_aq.no_delay, dbms_aq.never, gl.aUid );
 
     -- стартуем job
    savepoint before_job_start;
-   dbms_job.submit(job       => l_job_id,
+   dbms_job.submit( job       => l_job_id,
                    what      => l_job_what,
                    next_date => sysdate,
                    interval  => null,
@@ -2042,7 +2042,7 @@ begin
 exception when others then    rollback to savepoint before_job_start;   bars_audit.info('ERROR'||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));    -- произошли ошибки
 end intx;
 
-procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) is   -- Собственно расчет  %%
+procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 number, p_acc2 number) is   -- Собственно расчет  %%
 --  p_mode = 0   3.0) Нарахування дох та витрат (%%, комісія) за ДОВІЛЬНИЙ період
 --                    OVRN.INTX(0, :B, :D,0,0)                :B(SEM=Вкл_З_дати,TYPE=D),:D(SEM=Вкл_ПО_дату,TYPE=D)
 --                    если  p_dat1  = Null = прогноз-нарахування
@@ -2072,6 +2072,7 @@ procedure INTXJ  ( p_User int, p_mode int ,p_dat1 date, p_dat2 date, p_acc8 numb
 begin
   if p_User is not null then
     bars.bars_login.login_user(sys_guid,p_User,null,null);
+      bars.bc.go(p_branch);
   end if;
   If p_mode not in (0,1) then RETURN; end if;
 
@@ -2226,7 +2227,7 @@ begin
      <<Rec_Next >> null;
 
   end loop ; -- a8
-  commit;
+ -- commit;
   if p_User is not null then
    bms.enqueue_msg( 'Розрахунок %% по ОВР користувача '|| p_User|| ' ЗАВЕРШЕНО ! Перегляньте результат ' , dbms_aq.no_delay, dbms_aq.never, p_User );   
    bars.bars_login.logout_user;  
@@ -2898,7 +2899,7 @@ BEGIN
   end;
 
   -- 1) доначислить проценты по дату завершения включительно
-  ovrn.INTXj (p_User => null,p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
+  ovrn.INTXj (p_User => null, p_branch => null, p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
 
 
   -- 0) ДОПЛАТА ФОРВАРДНОЙ КОМИССИИ ПРИ ДОСРОЧНОМ ЗАКРЫТИИ
