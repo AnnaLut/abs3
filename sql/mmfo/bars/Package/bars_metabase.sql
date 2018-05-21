@@ -1,16 +1,10 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_metabase.sql =========*** Run *
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_METABASE is
+CREATE OR REPLACE PACKAGE bars_metabase is
 
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 --| Пакет bars_metabase для работы с метаописанием таблиц комплекса |
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-g_header_version   constant varchar2(64)  := 'version 2.43 23/08/2017';
+g_header_version   constant varchar2(64)  := 'version 2.44 18/04/2018';
 g_header_defs      constant varchar2(512) := '';
 
 /**
@@ -278,12 +272,13 @@ procedure addTableToRef (
   p_refid  references.type%type);
 
 procedure add_tblcolor (
-  p_tabid      meta_tblcolor.tabid%type,
-  p_ord        meta_tblcolor.ord%type,
-  p_colid      meta_tblcolor.colid%type,
-  p_condition  meta_tblcolor.condition%type,
-  p_colorindex meta_tblcolor.color_index%type,
-  p_colorname  meta_tblcolor.color_name%type);
+  p_tabid         meta_tblcolor.tabid%type,
+  p_ord           meta_tblcolor.ord%type,
+  p_colid         meta_tblcolor.colid%type,
+  p_condition     meta_tblcolor.condition%type,
+  p_colorindex    meta_tblcolor.color_index%type,
+  p_colorname     meta_tblcolor.color_name%type,
+  p_colorsemantic meta_tblcolor.color_semantic%type default null);
 
 procedure delete_tblcolor (
   p_tabid meta_tblcolor.tabid%type);
@@ -308,14 +303,14 @@ procedure update_dyn_filter(p_tabid                in number,
 
 end bars_metabase;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_METABASE is
+CREATE OR REPLACE PACKAGE BODY bars_metabase is
 
 --***************************************************************************--
 --
 -- bars_metabase - пакет для работы с метаописанием таблиц комплекса
 --
 --***************************************************************************--
-g_body_version   constant varchar2(64)  := 'version 2.43 23/08/2017';
+g_body_version   constant varchar2(64)  := 'version 2.44 18/04/2018';
 g_body_defs      constant varchar2(512) := '';
 
 g_modcode        constant varchar2(3)   := 'BMD';
@@ -1365,16 +1360,17 @@ end addTableToRef;
 -- Описание:  добавление метаописания раскраски таблицы
 --***************************************************************************--
 procedure add_tblcolor (
-  p_tabid      meta_tblcolor.tabid%type,
-  p_ord        meta_tblcolor.ord%type,
-  p_colid      meta_tblcolor.colid%type,
-  p_condition  meta_tblcolor.condition%type,
-  p_colorindex meta_tblcolor.color_index%type,
-  p_colorname  meta_tblcolor.color_name%type)
+  p_tabid         meta_tblcolor.tabid%type,
+  p_ord           meta_tblcolor.ord%type,
+  p_colid         meta_tblcolor.colid%type,
+  p_condition     meta_tblcolor.condition%type,
+  p_colorindex    meta_tblcolor.color_index%type,
+  p_colorname     meta_tblcolor.color_name%type,
+  p_colorsemantic meta_tblcolor.color_semantic%type default null)
 is
 begin
-  insert into meta_tblcolor (tabid, ord, colid, condition, color_index, color_name)
-  values (p_tabid, p_ord, p_colid, p_condition, p_colorindex, p_colorname);
+  insert into meta_tblcolor (tabid, ord, colid, condition, color_index, color_name, color_semantic)
+  values (p_tabid, p_ord, p_colid, p_condition, p_colorindex, p_colorname, p_colorsemantic);
 end add_tblcolor;
 
 --***************************************************************************--
@@ -2296,16 +2292,3 @@ end;
 
 end bars_metabase;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_METABASE ***
-grant EXECUTE                                                                on BARS_METABASE   to ABS_ADMIN;
-grant EXECUTE                                                                on BARS_METABASE   to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_METABASE   to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_metabase.sql =========*** End *
- PROMPT ===================================================================================== 
- 

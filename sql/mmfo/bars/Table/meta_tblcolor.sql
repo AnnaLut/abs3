@@ -154,6 +154,14 @@ exception when others then
  end;
 /
 
+begin   
+ execute immediate 'alter table BARS.META_TBLCOLOR add COLOR_SEMANTIC varchar2(254)';
+exception when others then
+  if  sqlcode=-1430  then null; else raise; end if;
+ end;
+/
+
+COMMENT ON COLUMN BARS.META_TBLCOLOR.COLOR_SEMANTIC       is 'Опис значення кольору (легенда)';
 
 
 PROMPT *** Create  grants  META_TBLCOLOR ***
