@@ -238,7 +238,6 @@ angular.module("BarsWeb.Controllers")
 
 
             $scope.logger = function () {
-                debugger;
                 console.log("rb_ACT = " + $scope.contractModel.rb_ACT);
             }
 

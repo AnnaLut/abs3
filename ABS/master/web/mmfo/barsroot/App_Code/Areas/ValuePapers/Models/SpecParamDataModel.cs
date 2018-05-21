@@ -12,4 +12,6 @@ public class SpecParamDataModel
     public string COD_I { get; set; }
     public string COD_M { get; set; }
     public string COD_F { get; set; }
+    public string COD_V { get; set; }
+    public string COD_O { get; set; }
 }

@@ -21,7 +21,9 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Abstract
         IEnumerable<ChangeBillGrid> CP_OB_MARKET();
         IEnumerable<ChangeBillGrid> CP_OB_INITIATOR();
         IEnumerable<ChangeBillGrid> CP_OB_FORM_CALC();
-        string SetSpecparam(string REF_MAIN, string COD_I, string COD_M, string COD_F);
+        IEnumerable<ChangeBillGrid> CP_VDOGO();
+        IEnumerable<ChangeBillGrid> CP_KLCPE();
+        string SetSpecparam(string REF_MAIN, string COD_I, string COD_M, string COD_F, string COD_V, string COD_O);
         MoneyFlowModel PrepareMoneyFlow(decimal? REF);
         IList<MFGrid> MFGridData(decimal? REF, int? RB1, int? RB2, DateTime? DATE_ROZ);
         string CP_AMOR(string REF, decimal? ID, decimal? NGRP, DateTime? ADAT);

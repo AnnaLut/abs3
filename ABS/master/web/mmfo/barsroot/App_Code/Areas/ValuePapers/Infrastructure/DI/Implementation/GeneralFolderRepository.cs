@@ -125,7 +125,22 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
             string sqlText = @"select code,txt  from CP_OB_FORM_CALC   order by 1 ";
             return _entity.ExecuteStoreQuery<ChangeBillGrid>(sqlText);
         }
-
+        /// <summary>
+        /// Довідник видів договору 
+        /// </summary>
+        public IEnumerable<ChangeBillGrid> CP_VDOGO()
+        {
+            string sqlText = @"select id as code, title as txt from cp_vdogo order by 1 ";
+            return _entity.ExecuteStoreQuery<ChangeBillGrid>(sqlText);
+        }
+        /// <summary>
+        /// Довідник Класифікації ЦП по типу емітента
+        /// </summary>
+        public IEnumerable<ChangeBillGrid> CP_KLCPE()
+        {
+            string sqlText = @"select TO_CHAR(id) as code, title as txt from CP_KLCPE order by 1 ";
+            return _entity.ExecuteStoreQuery<ChangeBillGrid>(sqlText);
+        }
         public IEnumerable<Params> GetContractSaleWindowFixedParams()
         {
             string sqlText = @"select p.par as param,p.val as value
@@ -659,7 +674,7 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
 
         }
 
-        public string SetSpecparam(string REF_MAIN, string COD_I, string COD_M, string COD_F)
+        public string SetSpecparam(string REF_MAIN, string COD_I, string COD_M, string COD_F, string COD_V, string COD_O)
         {
             OracleConnection connection = OraConnector.Handler.UserConnection;
             try
@@ -672,13 +687,15 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
                 command.Parameters.Add(new OracleParameter { ParameterName = "RB_K_P", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_I });
                 command.Parameters.Add(new OracleParameter { ParameterName = "NOP", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_M });
                 command.Parameters.Add(new OracleParameter { ParameterName = "COD_F", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_F });
+                command.Parameters.Add(new OracleParameter { ParameterName = "COD_V", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_V });
+                command.Parameters.Add(new OracleParameter { ParameterName = "COD_O", Direction = ParameterDirection.Input, OracleDbType = OracleDbType.Decimal, Value = COD_O });
                 command.Parameters.Add(new OracleParameter { ParameterName = "SERR", Direction = ParameterDirection.Output, Size = 4000, OracleDbType = OracleDbType.Varchar2});
                
                 #endregion
 
                 command.ExecuteNonQuery();
 
-                return command.Parameters[4].Value.ToString();
+                return command.Parameters[6].Value.ToString();
             }
             finally
             {

@@ -232,7 +232,6 @@
         },
         rules: {
             number: function (input) {
-                //debugger;
                 var OnlyNumbers = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 if (input.is("[name=sum]")) {
                     if (!input.val().match(OnlyNumbers)) {
@@ -306,7 +305,6 @@
                         $scope.result = data.responseJSON;
                     }
         });
-        debugger;
         if ($scope.result.sErr === null && $scope.result.REF_MAIN !== null) {
             angular.element("#glasses").data("kendoButton").enable(true);
             angular.element("#print").data("kendoButton").enable(true);
