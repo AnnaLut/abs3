@@ -184,6 +184,12 @@ exception when others then
  end;
 /
 
+begin 
+   execute immediate 'create index xie_bms_message_exptime on bms_message(EXPIRATION_TIME) tablespace brssmli online';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  BMS_MESSAGE ***
