@@ -25,12 +25,188 @@ begin
   delete from op_rules where tt='V07';
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('57   ', 'V07', 'M', 1, null, '-1', null);
+    values ('21   ', 'V07', 'O', 1, 19, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''57   '', ''V07'', ''M'', 1, null, ''-1'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''21   '', ''V07'', ''O'', 1, 19, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('52A  ', 'V07', 'O', 1, 20, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''52A  '', ''V07'', ''O'', 1, 20, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('52D  ', 'V07', 'O', 1, 21, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''52D  '', ''V07'', ''O'', 1, 21, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('53A  ', 'V07', 'O', 1, 22, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''53A  '', ''V07'', ''O'', 1, 22, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('53B  ', 'V07', 'O', 1, 23, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''53B  '', ''V07'', ''O'', 1, 23, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('53D  ', 'V07', 'O', 1, 24, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''53D  '', ''V07'', ''O'', 1, 24, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('54A  ', 'V07', 'O', 1, 25, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''54A  '', ''V07'', ''O'', 1, 25, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('54B  ', 'V07', 'O', 1, 26, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''54B  '', ''V07'', ''O'', 1, 26, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('54D  ', 'V07', 'O', 1, 27, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''54D  '', ''V07'', ''O'', 1, 27, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('56A  ', 'V07', 'O', 1, 28, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''56A  '', ''V07'', ''O'', 1, 28, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('56D  ', 'V07', 'O', 1, 29, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''56D  '', ''V07'', ''O'', 1, 29, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('57A  ', 'V07', 'O', 1, 30, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''57A  '', ''V07'', ''O'', 1, 30, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('57B  ', 'V07', 'O', 1, 31, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''57B  '', ''V07'', ''O'', 1, 31, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('57D  ', 'V07', 'O', 1, 32, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''57D  '', ''V07'', ''O'', 1, 32, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('58A  ', 'V07', 'O', 1, 33, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''58A  '', ''V07'', ''O'', 1, 33, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('58D  ', 'V07', 'O', 1, 34, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''58D  '', ''V07'', ''O'', 1, 34, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('72   ', 'V07', 'M', 1, 35, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''72   '', ''V07'', ''M'', 1, 35, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -223,34 +399,34 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KOD_B', 'V07', 'O', 1, 1, null, null);
+    values ('KOD_B', 'V07', 'M', 1, 1, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_B'', ''V07'', ''O'', 1, 1, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_B'', ''V07'', ''M'', 1, 1, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KOD_G', 'V07', 'O', 1, 2, null, null);
+    values ('KOD_G', 'V07', 'M', 1, 2, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_G'', ''V07'', ''O'', 1, 2, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_G'', ''V07'', ''M'', 1, 2, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('KOD_N', 'V07', 'O', 1, 3, null, null);
+    values ('KOD_N', 'V07', 'M', 1, 3, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_N'', ''V07'', ''O'', 1, 3, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''KOD_N'', ''V07'', ''M'', 1, 3, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -284,6 +460,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (op_rules: ''ZAP1 '', ''V07'', ''M'', 1, 0, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('f    ', 'V07', 'M', 0, null, 'MT 202', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''f    '', ''V07'', ''M'', 0, null, ''MT 202'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
