@@ -552,11 +552,11 @@
                                      FROM bars.vw_escr_errors er)
                   AND t.sos IN (10, 13, 15)
                   AND t.vidd IN (11, 12, 13)
-                  AND SUBSTR (t.prod, 1, 6) IN ('220257',
-                                                '220258',
+                  AND SUBSTR (t.prod, 1, 6) IN (--'220257',
+                                                --'220258',
                                                 '220347',
                                                 '220348',
-                                                '220372',
+                                                --'220372',
                                                 '220373',
 												'220374')
                   AND t.branch LIKE
