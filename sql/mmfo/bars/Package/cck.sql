@@ -13564,7 +13564,8 @@ end if;
                  AND d.nd = n.nd
                  AND a.acc = n.acc
               ----------- AND a.ostC=a.ostB  -------------------------------------------------
-               ORDER BY d.sdate, d.wdate, d.sos DESC) LOOP
+               ORDER BY d.sdate, d.wdate, d.sos DESC,
+                        decode(a.nbs, '3739', 1, '2620', 2, 3)) LOOP
       --цикл по счетам гашения
 
       --перевірка mode_ на необхідність врахування рахунків 2625 як рах. погашення
