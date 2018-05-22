@@ -1181,6 +1181,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   /*
+22.05.2018 Sta PROCEDURE lim_bdate: Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
 17.05.2018 Sta  PROCEDURE cc_day_lim + PROCEDURE lim_bdate  Обновление cc_deal.limit, cc_add.s, accounts.ostx по суб.дог
 
 16.05.2018 Sta Вынос на просрочку тела КЛ после разделения   PROCEDURE cc_asp
@@ -2023,14 +2024,20 @@ CREATE OR REPLACE PACKAGE BODY cck IS
 
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
   PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS    ll cc_lim%ROWTYPE; l_Kv8 int; 
-       
+    l_NDG number ;   
   BEGIN
-    BEGIN SELECT l.* INTO ll    FROM cc_lim l WHERE l.nd = p_nd AND l.fdat = (SELECT MAX(fdat) FROM cc_lim WHERE nd = p_nd  AND fdat <= nvl(p_dat, gl.bdate));  ---       есть изменение лимита 
+
+    BEGIN --  22.05.2018 Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
+       select NDG  into  l_NDG from cc_deal   where nd  = p_ND and ( NDG is null OR NDG = ND ) ;
+
+       -- ШАГ-1. на заглавном КД
+       SELECT l.* INTO ll    FROM cc_lim l WHERE l.nd = p_nd AND l.fdat = (SELECT MAX(fdat) FROM cc_lim WHERE nd = p_nd  AND fdat <= nvl(p_dat, gl.bdate));  ---       есть изменение лимита 
           UPDATE accounts SET   ostx  = -ll.lim2, pap = 1 WHERE acc = ll.acc;
           UPDATE cc_deal  SET   LIMIT =  ll.lim2 / 100    WHERE nd = p_nd;
           UPDATE cc_add   SET   s     =  ll.lim2 / 100    WHERE nd = p_nd  AND adds = 0;
 
-          select ND  into  ll.ND from cc_deal   where nd  = p_ND and ndg= nd;
+       -- ШАГ-2. на его суб/дог, если они есть
+       If l_NDG = p_ND then
           select kv  into  l_KV8 from accounts  where acc = ll.acc ;
           for d in (select a.kv , a.acc, a.ostx, x.nd FROM cc_deal x, accounts a , nd_acc n where x.ndg != x.nd and n.nd = x.nd and a.acc = n.acc and a.tip ='LIM' and x.ndg = p_ND)
           loop  d.ostx := gl.p_Ncurval( d.KV , gl.p_icurval( l_kv8, -ll.lim2, gl.bdate) , gl.bdate) ;
@@ -2039,6 +2046,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                 update cc_deal  set limit = d.ostx where nd = d.nd;
                 update cc_add   set s     = d.ostx where nd = d.nd;          
           end loop  ;  -- d
+       end if ; -- l_NDG = p_ND
     EXCEPTION  WHEN no_data_found THEN     NULL;  
     END;
 
