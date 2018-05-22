@@ -136,7 +136,7 @@ public class CreditFactoryService : Bars.BarsWebService
 
     [WebMethod(EnableSession = true,Description="Список всіх кредитів по клієнту")]
     [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.InOut)]
-    public XmlNode KF_CREDITS_RemoteRequest(String OKPO, String PASPNUM, String BIRTHDATE)
+    public XmlNode KF_CREDITS_RemoteRequest(String OKPO, decimal DOCTYPE, String PASPNUM, String BIRTHDATE)
     {
         String userName = WsHeaderValue.UserName;
         String password = WsHeaderValue.Password;
@@ -161,6 +161,7 @@ public class CreditFactoryService : Bars.BarsWebService
             cmd.Parameters.Clear();
             cmd.Parameters.Add("p_responce", OracleDbType.Clob, System.Data.ParameterDirection.ReturnValue);
             cmd.Parameters.Add("p_okpo", OracleDbType.Varchar2, OKPO, System.Data.ParameterDirection.Input);
+			cmd.Parameters.Add("p_doctype", OracleDbType.Decimal, DOCTYPE, System.Data.ParameterDirection.Input);
             cmd.Parameters.Add("p_paspnum", OracleDbType.Varchar2, PASPNUM, System.Data.ParameterDirection.Input);
             cmd.Parameters.Add("p_bday", OracleDbType.Varchar2, /*Convert.ToDateTime(*/BIRTHDATE/*)*/, System.Data.ParameterDirection.Input);
 
