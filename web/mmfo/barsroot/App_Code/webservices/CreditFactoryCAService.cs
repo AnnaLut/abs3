@@ -71,6 +71,10 @@ public class CreditFactoryCAService : Bars.BarsWebService
         /// </summary>
         public String Okpo { get; set; }
         /// <summary>
+        /// Тип документу клієнта
+        /// </summary>
+        public decimal Doctype { get; set; }
+        /// <summary>
         /// Номер паспорту
         /// </summary>
         public String paspNum { get; set; }
@@ -289,7 +293,7 @@ public class CreditFactoryCAService : Bars.BarsWebService
 
     [WebMethod(EnableSession = true, Description = "Список всіх кредитів по клієнту")]
     [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.InOut)]
-    public XmlNode KF_CREDITS_RemoteRequest(String OKPO, String PASPNUM, String BIRTHDATE)
+    public XmlNode KF_CREDITS_RemoteRequest(String OKPO, decimal DOCTYPE, String PASPNUM, String BIRTHDATE)
     {
         String userName = WsHeaderValue.UserName;
         String password = WsHeaderValue.Password;
@@ -300,6 +304,7 @@ public class CreditFactoryCAService : Bars.BarsWebService
 
         ReqParams reqParams = new ReqParams();
         reqParams.Okpo = OKPO;
+	reqParams.Doctype = DOCTYPE;
         reqParams.paspNum = PASPNUM;
         reqParams.birthDate = BIRTHDATE;
 
@@ -373,7 +378,7 @@ public class CreditFactoryCAService : Bars.BarsWebService
 
                     factoryRU.Url = item.url;
 
-                    XmlNode resp = factoryRU.KF_CREDITS_RemoteRequest(reqParams.Okpo, reqParams.paspNum, reqParams.birthDate);
+                    XmlNode resp = factoryRU.KF_CREDITS_RemoteRequest(reqParams.Okpo, reqParams.Doctype, reqParams.paspNum, reqParams.birthDate);
 
                     mfoNum.InnerText = item.mfo;
                     var tmp = Encoding.UTF8.GetBytes(resp.InnerXml);

@@ -129,18 +129,20 @@ public partial class CreditFactoryService : System.Web.Services.Protocols.SoapHt
     /// <remarks/>
     [System.Web.Services.Protocols.SoapHeaderAttribute("WsHeaderValue", Direction=System.Web.Services.Protocols.SoapHeaderDirection.InOut)]
     [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/KF_CREDITS_RemoteRequest", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-    public System.Xml.XmlNode KF_CREDITS_RemoteRequest(string OKPO, string PASPNUM, string BIRTHDATE) {
+    public System.Xml.XmlNode KF_CREDITS_RemoteRequest(string OKPO, decimal DOCTYPE, string PASPNUM, string BIRTHDATE) {
         object[] results = this.Invoke("KF_CREDITS_RemoteRequest", new object[] {
                     OKPO,
+                    DOCTYPE,
                     PASPNUM,
                     BIRTHDATE});
         return ((System.Xml.XmlNode)(results[0]));
     }
     
     /// <remarks/>
-    public System.IAsyncResult BeginKF_CREDITS_RemoteRequest(string OKPO, string PASPNUM, string BIRTHDATE, System.AsyncCallback callback, object asyncState) {
+    public System.IAsyncResult BeginKF_CREDITS_RemoteRequest(string OKPO, decimal DOCTYPE, string PASPNUM, string BIRTHDATE, System.AsyncCallback callback, object asyncState) {
         return this.BeginInvoke("KF_CREDITS_RemoteRequest", new object[] {
                     OKPO,
+					DOCTYPE,
                     PASPNUM,
                     BIRTHDATE}, callback, asyncState);
     }
@@ -152,17 +154,18 @@ public partial class CreditFactoryService : System.Web.Services.Protocols.SoapHt
     }
     
     /// <remarks/>
-    public void KF_CREDITS_RemoteRequestAsync(string OKPO, string PASPNUM, string BIRTHDATE) {
-        this.KF_CREDITS_RemoteRequestAsync(OKPO, PASPNUM, BIRTHDATE, null);
+    public void KF_CREDITS_RemoteRequestAsync(string OKPO, decimal DOCTYPE, string PASPNUM, string BIRTHDATE) {
+        this.KF_CREDITS_RemoteRequestAsync(OKPO, DOCTYPE, PASPNUM, BIRTHDATE, null);
     }
     
     /// <remarks/>
-    public void KF_CREDITS_RemoteRequestAsync(string OKPO, string PASPNUM, string BIRTHDATE, object userState) {
+    public void KF_CREDITS_RemoteRequestAsync(string OKPO, decimal DOCTYPE, string PASPNUM, string BIRTHDATE, object userState) {
         if ((this.KF_CREDITS_RemoteRequestOperationCompleted == null)) {
             this.KF_CREDITS_RemoteRequestOperationCompleted = new System.Threading.SendOrPostCallback(this.OnKF_CREDITS_RemoteRequestOperationCompleted);
         }
         this.InvokeAsync("KF_CREDITS_RemoteRequest", new object[] {
                     OKPO,
+					DOCTYPE,
                     PASPNUM,
                     BIRTHDATE}, this.KF_CREDITS_RemoteRequestOperationCompleted, userState);
     }

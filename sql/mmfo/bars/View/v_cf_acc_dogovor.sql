@@ -7,33 +7,31 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CF_ACC_DOGOVOR ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CF_ACC_DOGOVOR ("ND", "ACCTYPE", "ACCNUM", "ACCAMOUNT", "ACCCUR", "ACCAMUAH", "ACCPDATE") AS 
-  SELECT kf.nd,
+  CREATE OR REPLACE FORCE VIEW BARS.V_CF_ACC_DOGOVOR ("ND", "ACCTYPE", "ACCNUM", "OB22", "ACCAMOUNT", "ACCCUR", "ACCAMUAH", "ACCPDATE") AS 
+   SELECT na.nd,
           a.tip AS acctype,
           a.nls AS accnum,
+          a.ob22 as ob22,
           fost (a.acc, SYSDATE) AS accamount,
           a.kv AS acccur,
           fost (a.acc, SYSDATE) AS accamuah,
-          A.DAPP
-             AS accpdate
-     FROM v_cf_dogovor kf, nd_acc na, accounts a
-    WHERE kf.nd = na.nd AND na.acc = a.acc
+          A.DAPP AS accpdate
+     FROM /*v_cf_dogovor kf,*/ nd_acc na, accounts a
+    WHERE /*kf.nd = na.nd AND*/ na.acc = a.acc
    UNION
-   SELECT kf.nd,
+   SELECT na.nd,
           a.tip AS acctype,
           a.nls AS accnum,
+          a.ob22 as ob22,
           fost (a.acc, SYSDATE) AS accamount,
           a.kv AS acccur,
           fost (a.acc, SYSDATE) AS accamuah,
-          A.DAPP
-             AS accpdate
-     FROM v_cf_dogovor kf, V_W4_ND_ACC na, accounts a
-    WHERE kf.nd = na.nd AND na.acc = a.acc AND a.dazs IS NULL;
+          A.DAPP AS accpdate
+     FROM /*v_cf_dogovor kf,*/ V_W4_ND_ACC na, accounts a
+    WHERE /*kf.nd = na.nd AND*/ na.acc = a.acc AND a.dazs IS NULL;
 
 PROMPT *** Create  grants  V_CF_ACC_DOGOVOR ***
-grant SELECT                                                                 on V_CF_ACC_DOGOVOR to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CF_ACC_DOGOVOR to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on V_CF_ACC_DOGOVOR to UPLD;
 
 
 

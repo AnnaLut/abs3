@@ -11,7 +11,7 @@ IS
    -- Purpose :
 
    -- Public constant declarations
-   g_header_version    CONSTANT VARCHAR2 (64) := 'version 1.03 04/08/2015';
+   g_header_version    CONSTANT VARCHAR2 (64) := 'version 2.00 10/04/2018';
    g_awk_header_defs   CONSTANT VARCHAR2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ IS
       RETURN VARCHAR2;
 
    FUNCTION get_crd_response (p_okpo     IN bars.customer.okpo%TYPE,
+                              p_doctype  in number,
                               p_numdoc   IN bars.person.numdoc%TYPE,
                               p_bday     IN varchar2)
       RETURN CLOB;
@@ -45,7 +46,7 @@ END bars_credit_factory;
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_CREDIT_FACTORY 
 IS
    -- Private constant declarations
-   g_body_version    CONSTANT VARCHAR2 (64) := 'version 1.11 07/10/2016';
+   g_body_version    CONSTANT VARCHAR2 (64) := 'version 2.00 10/04/2018';
    g_awk_body_defs   CONSTANT VARCHAR2 (512) := '';
    g_dbgcode         CONSTANT VARCHAR2 (20) := 'bars_credit_factory.';
 
@@ -145,18 +146,20 @@ IS
 
 
    FUNCTION get_crd_response (p_okpo     IN bars.customer.okpo%TYPE,
+                              p_doctype  IN number,
                               p_numdoc   IN bars.person.numdoc%TYPE,
                               p_bday     IN VARCHAR2)
       RETURN CLOB
    IS
       l_rnk            bars.customer.rnk%TYPE;
       l_res            XMLTYPE;
-
+      l_resd           XMLTYPE;
       l_tmp            VARCHAR2 (400);
       l_temp_clob      CLOB;
       l_temp_varchar   VARCHAR2 (2000);
       l_iterator       NUMBER := 1;
       l_str_length     NUMBER := 2000;
+      l_doctype        NUMBER;
    BEGIN
       BEGIN
          write_log (
@@ -164,6 +167,8 @@ IS
 
                'p_okpo='
             || TO_CHAR (p_okpo)
+            || ',p_doctype='
+            || TO_CHAR (p_doctype)
             || ',p_numdoc='
             || p_numdoc
             || ',p_bday='
@@ -177,6 +182,8 @@ IS
       DBMS_OUTPUT.put_line (
             'p_okpo='
          || TO_CHAR (p_okpo)
+         || ',p_doctype='
+         || TO_CHAR (p_doctype)
          || ',p_numdoc='
          || p_numdoc
          || ',p_bday='
@@ -185,10 +192,28 @@ IS
                  );
 
       BEGIN
+       SELECT md.type_abs
+         INTO l_doctype
+         FROM bars.cf_mapping_doctype md
+        WHERE md.type_cf = p_doctype;
+      EXCEPTION
+       WHEN NO_DATA_FOUND
+       THEN
+          bars_audit.info (
+                'bars_credit_factory.get_crd_response p_doctype - '
+             || p_doctype
+             || ' not defined for ABS');
+          RETURN '<Client>No list</Client>';
+      END;
+
+      BEGIN
          SELECT XMLAGG (
                    XMLELEMENT (
                       "Client",
                       XMLELEMENT ("FIO", v_cfd.fio),
+                      XMLELEMENT ("INSIDER", v_cfd.INSIDER),
+                      XMLELEMENT ("PUBLIC", v_cfd.PUB),
+		      XMLELEMENT ("RNKDATECR", TO_CHAR (v_cfd.RNKDATECR, g_date_format)),
                       XMLELEMENT ("RNK", v_cfd.rnk),
                       XMLELEMENT ("MFO", v_cfd.mfonum),
                       XMLELEMENT (
@@ -200,6 +225,7 @@ IS
                          XMLELEMENT ("DCUR", v_cfd.dcur),
                          XMLELEMENT ("DTAX", v_cfd.dtax),
                          XMLELEMENT ("DSUM", v_cfd.dsum),
+                         XMLELEMENT ("DNEXTPAYM", v_cfd.DNEXTPAYM),
                          XMLELEMENT (
                             "DSTARTDATE",
                             TO_CHAR (v_cfd.dstartdate, g_date_format)),
@@ -207,11 +233,14 @@ IS
                             "DFINISHDATE",
                             TO_CHAR (v_cfd.dfinishdate, g_date_format)),
                          XMLELEMENT ("DLMPAYMENT", v_cfd.dlmpayment),
+                         XMLELEMENT ("DPAWN", v_cfd.dpawn),
+                         XMLELEMENT ("DCODE", v_cfd.DCODE),
                          (SELECT XMLAGG (
                                     XMLELEMENT (
                                        "ACC",
                                        XMLELEMENT ("ACCTYPE", v_cad.acctype),
                                        XMLELEMENT ("ACCNUM", v_cad.accnum),
+                                       XMLELEMENT ("OB22", v_cad.ob22),
                                        XMLELEMENT ("ACCAMOUNT",
                                                    v_cad.accamount),
                                        XMLELEMENT ("ACCCUR", v_cad.acccur),
@@ -227,7 +256,65 @@ IS
            FROM v_cf_dogovor v_cfd
           WHERE     v_cfd.okpo = p_okpo
                 AND v_cfd.paspnum = p_numdoc
-                AND TRUNC (v_cfd.birthdate) = TO_DATE (p_bday, g_date_format);
+                AND v_cfd.doctype = l_doctype
+                AND TRUNC (v_cfd.birthdate) = TO_DATE (p_bday, g_date_format)                ;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            l_res:=null;
+      END;      
+          
+      begin
+            SELECT XMLAGG (
+                   XMLELEMENT (
+                      "Client",
+                      XMLELEMENT ("FIO", v_cdd.fio),
+                      XMLELEMENT ("INSIDER", v_cdd.INSIDER),
+                      XMLELEMENT ("PUBLIC", v_cdd.PUB),
+	              XMLELEMENT ("RNKDATECR", TO_CHAR (v_cdd.RNKDATECR, g_date_format)),
+                      XMLELEMENT ("RNK", v_cdd.rnk),
+                      XMLELEMENT ("MFO", v_cdd.mfonum),
+                           XMLELEMENT (
+                                       "DOGOVORDEPOSIT",
+                                       XMLELEMENT ("DDNUM", v_cdd.DDNUM),
+                                       XMLELEMENT ("DDPROD", v_cdd.DDPROD),
+                                       XMLELEMENT ("DDBRANCH", v_cdd.DDBRANCH),
+                                       XMLELEMENT ("DDSTATUS", v_cdd.DDSTATUS),
+                                       XMLELEMENT ("DDADDDOC", v_cdd.DDADDDOC),
+                                       XMLELEMENT ("DDCUR", v_cdd.DDCUR),
+                                       XMLELEMENT ("DDTAX", v_cdd.DDTAX),
+                                       XMLELEMENT ("DDSUM", v_cdd.DDSUM),
+                                       XMLELEMENT (
+                                          "DDSTARTDATE",
+                                          TO_CHAR (v_cdd.DDSTARTDATE,
+                                                   g_date_format)),
+                                       XMLELEMENT (
+                                          "DDLASTDATE",
+                                          TO_CHAR (v_cdd.DDLASTDATE,
+                                                   g_date_format)), 
+                                       XMLELEMENT (
+                                          "DDFINISHDATE",
+                                          TO_CHAR (v_cdd.DDFINISHDATE,
+                                                   g_date_format)),           
+                                       XMLELEMENT ("DDTERM", v_cdd.DDTERM),
+                                       XMLELEMENT ("DDPROLN", v_cdd.DDPROLN),
+                                       XMLELEMENT ("DACCAMUAH", v_cdd.DACCAMUAH),
+                                       XMLELEMENT ("DDACCAMOUNT", v_cdd.DDACCAMOUNT))))
+                           into l_resd
+                            FROM V_CF_DOGOVOR_DEPOSIT v_cdd
+                              WHERE     v_cdd.okpo = p_okpo
+                                AND v_cdd.paspnum = p_numdoc
+                                AND v_cdd.doctype = l_doctype
+                                AND TRUNC (v_cdd.birthdate) = TO_DATE (p_bday, g_date_format);
+      EXCEPTION
+              WHEN NO_DATA_FOUND
+                 THEN l_resd := null;
+      end;
+      
+
+      BEGIN
+         SELECT XMLCONCAT (l_res, l_resd) INTO l_res FROM DUAL;
+      END;
 
          /*танці з бубном: clob не конвертиться адекватно в utf-8, тому ми ріжемо його по 2000 в строку, конвертимо строку, строку клеїмо назад в clob*/
          /*IF (l_temp_clob IS NOT NULL)
@@ -257,11 +344,7 @@ IS
                     WHEN l_res IS NULL THEN '<Client>No list</Client>'
                     ELSE l_res
                  END);*/
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RETURN '<Client>No list</Client>';
-      END;
+
    END get_crd_response;
 
    PROCEDURE set_bpk_credit (p_nd        bars.CC_DEAL.ND%TYPE,
