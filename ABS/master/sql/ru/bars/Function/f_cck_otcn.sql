@@ -117,10 +117,12 @@ IS
 
   txt_sql7         varchar2(2000) :=
              'SELECT NVL( (SELECT MIN (fdat)
-                             FROM cc_lim
-                            WHERE nd = x.nd and fdat >= x.dat31
-                              and fdat between x.fdat-30 and x.fdat+30
-                              and NVL (NOT_SN, 0) <> 1),
+                             FROM cc_deal c, cc_lim l 
+                            WHERE c.nd = x.nd 
+                              and nvl(c.ndg, c.nd) = l.nd
+                              and l.fdat >= x.dat31
+                              and l.fdat between x.fdat-30 and x.fdat+30
+                              and NVL (l.NOT_SN, 0) <> 1),
                            a.mdate)  fdat,
                      x.sump1 S, x.nd
                 FROM accounts a,
