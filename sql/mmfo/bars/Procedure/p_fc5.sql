@@ -1967,6 +1967,7 @@ BEGIN
    commit;
 
    DELETE FROM OTC_C5_PROC WHERE datf = dat_;
+   commit;
 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
@@ -1991,6 +1992,7 @@ BEGIN
              v.seg_02 like '___9')
         )
     order by seg_02, seg_01, acc_num;
+	commit;
     -----------------------------------------------------
 
 
@@ -2011,6 +2013,7 @@ BEGIN
         )
     order by seg_02, seg_01, acc_num;
     -----------------------------------------------------
+    commit;
 
 
    INSERT INTO otc_c5_proc
@@ -2049,6 +2052,7 @@ BEGIN
         v.seg_02 = '3040' and v.seg_03 in ('2', '4')
         )
     order by seg_02, seg_01, acc_num;
+	commit;
     -----------------------------------------------------
 
 
@@ -2092,6 +2096,7 @@ BEGIN
         v.seg_02 = '3119' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
         )
     order by seg_02, seg_01, acc_num;
+	commit;
     -----------------------------------------------------
 
 
@@ -2125,6 +2130,7 @@ BEGIN
         v.seg_02 = '3219' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         )
     order by seg_02, seg_01, acc_num;
+	commit;
     -----------------------------------------------------
 
    INSERT INTO otc_c5_proc
@@ -2155,6 +2161,7 @@ BEGIN
         v.seg_02 in ('1819', '2809', '3049', '3519','3548')
         )
     order by seg_02, seg_01, acc_num;
+	commit;
    -----------------------------------------------------
 
    INSERT INTO otc_c5_proc
@@ -2169,6 +2176,7 @@ BEGIN
         v.acc_id = s.acc and
         nvl(trim(s.r013), '0') = '1'
     order by seg_02, seg_01, acc_num;
+	commit;
     -----------------------------------------------------
 
     delete
@@ -2182,8 +2190,10 @@ BEGIN
                             '2319','2329','2339','2349','2359','2369','2379',
                             '2409','2419','2429','2439','2609','2629','2659',
                             '2890','3119','3219','3569','3590','3599','3690','3692') and
-       acc in (select acc from snap_balances where fdat = dat_ and ost=0);
-
+       acc in (select /*+ index(s, XPK_SNAP_BALANCES)*/
+                    acc
+               from snap_balances s
+               where fdat = dat_ and ost=0);
     commit;
 
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
