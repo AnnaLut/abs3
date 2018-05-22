@@ -9,7 +9,7 @@ is
 % DESCRIPTION : Процедура формирования #C9 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.16.023 20/04/2018 (01/03/2018)
+% VERSION     : v.16.024 21/05/2018 (20/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показника DD NNN
@@ -53,7 +53,7 @@ BEGIN
      l_gr_sum_840 := 0; 
   end if;
   
-  l_gr_sum_980 := gl.p_icurval(840, 100000, p_report_date);  
+  l_gr_sum_980 := gl.p_icurval(840, 100000, p_report_date);            
       
   if p_report_date < to_date('05042017','ddmmyyyy') 
   then l_koef := 0.65;
@@ -146,7 +146,7 @@ BEGIN
                                               then '0'
                                               else '0'
                                             end) as P31,
-                                            (select trim(ser||' '||numdoc) from person where rnk=c.cust_id) p31_add,
+                                            (case when c.k030 = '2' then null else (select trim(ser||' '||numdoc) from person where rnk=c.cust_id) end) p31_add,
                                             c.K030 as P35,
                                             (case
                                               when trim(p.d1#C9) is not null
@@ -193,7 +193,10 @@ BEGIN
                                                 end
                                             end) as P40,
                                             '00' as P42,
-                                            (case when nvl(trim(w.value), '804') <> '804' then lpad(trim(w.value), 3, '0') else nvl(f_nbur_get_kod_g(t.ref, 1), '000') end) P62,
+                                            (case when nvl(trim(w.value), '804') <> '804' 
+                                                  then lpad(trim(w.value), 3, '0') 
+                                                  else nvl(f_nbur_get_kod_g(t.ref, 1), '000') 
+                                            end) P62,
                                             coalesce((case 
                                                       when t.KF = '300465' and
                                                            t.ACC_NUM_DB like '1500%' and
@@ -255,10 +258,10 @@ BEGIN
                                             (case when t.bal_uah > l_gr_sum_980 then 0 else 1 end) flag_kons
                                        from NBUR_DM_TRANSACTIONS t
                                        join NBUR_REF_SEL_TRANS r
-                                         on ( t.acc_num_db like r.acc_num_db||'%' and
-                                              t.acc_num_cr like r.acc_num_cr||'%' and
-                                              t.kf = nvl(r.mfo, t.kf) and
-                                              nvl(r.pr_del, 0) = 0 )
+                                         on (t.acc_num_db like r.acc_num_db||'%' and t.ob22_db = nvl(r.ob22_db, t.ob22_db) and
+                                             t.acc_num_cr like r.acc_num_cr||'%' and t.ob22_cr = nvl(r.ob22_cr, t.ob22_cr) and
+                                             t.kf = nvl(r.mfo, t.kf) and
+                                             nvl(r.pr_del, 0) = 0 )
                                        left outer
                                        join NBUR_DM_ADL_DOC_RPT_DTL p
                                          on ( p.report_date = p_report_date and
@@ -349,7 +352,7 @@ BEGIN
                                               then '0'
                                               else '0'
                                             end) as P31,
-                                            (select trim(ser||' '||numdoc) from person where rnk=c.cust_id) p31_add,
+                                            (case when c.k030 = '2' then null else (select trim(ser||' '||numdoc) from person where rnk=c.cust_id) end) p31_add,
                                             c.K030 as P35,
                                             (case
                                               when trim(p.d1#C9) is not null
@@ -396,7 +399,10 @@ BEGIN
                                                 end
                                             end) as P40,
                                             '00' as P42,
-                                            (case when nvl(trim(w.value), '804') <> '804' then lpad(trim(w.value), 3, '0') else nvl(f_nbur_get_kod_g(t.ref, 1), '000') end) P62,
+                                            (case when nvl(trim(w.value), '804') <> '804' 
+                                                  then lpad(trim(w.value), 3, '0') 
+                                                  else nvl(f_nbur_get_kod_g(t.ref, 1), '000') 
+                                            end) P62,
                                             coalesce((case 
                                                       when t.KF = '300465' and
                                                            t.ACC_NUM_DB like '1500%' and
