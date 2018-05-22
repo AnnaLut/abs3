@@ -136,7 +136,7 @@ PROMPT *** Create  view V_CUST_RELATIONS ***
                c.adr,
                cb.telr as tel,
                null as email,
-               1 as custtype,
+               3 as custtype,
                c.okpo,
                c.country,
                to_char(c.c_reg) as region,
