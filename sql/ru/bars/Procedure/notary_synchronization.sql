@@ -23,6 +23,7 @@ IS
   l_PASSPORTISSUED         date              ;
   l_CertIssueDate          date              ;
   l_CertCancDate           date              ;
+  l_PassportExpiry         date              ;
 --l_email                  varchar2(128)     ;
 --l_FIRST_NAME             varchar2(64)      ;
 --l_LAST_NAME              varchar2(64)      ;
@@ -307,6 +308,7 @@ begin
       l_close_DATE     := to_date(k.Accr_CloseDate ,'DD.MM.YYYY');
       l_CertIssueDate  := to_date(k.CertIssueDate  ,'DD.MM.YYYY');
       l_CertCancDate   := to_date(k.CertCancDate   ,'DD.MM.YYYY');
+      l_PassportExpiry := to_date(k.PASSPORT_EXPIRY,'DD.MM.YYYY');
 
 --    l_branches             := '''||k.Accr_branches||''';
 --    l_segments_of_business := '''||k.Accr_segments_of_business||''';
@@ -348,7 +350,7 @@ begin
                        k.DOCUMENT_TYPE        ,
                        k.IDCARD_DOCUMENT_NUMBER, 
                        k.IDCARD_NOTATION_NUMBER, 
-                       k.PASSPORT_EXPIRY,
+                       l_PassportExpiry,
                        l_err);
         if l_err is not null then
           bars_audit.error('notary_synchronization: (0) ошибка - id = '||k.Id||', '||l_err);
