@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.009  14.05.2018 (24.04.2018)
+% VERSION     : v.17.010  22.05.2018 (14.05.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -15,6 +15,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    NNN        условный порядковый номер
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+22.05.2018 добавлен блок "Exception" при обработке доп.параметра D3#70
+           (дата договора)
 14.05.2018 для проводок Дт 2909 Кт 3739 и OB22='35' будут формироваться 
            следующие значения для некоторых показателей 
            DD=31 "0', DD=32 - " ", DD=61 - переказ без ідентифікації 
@@ -674,44 +676,73 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             -- з 29.12.2017 новий показник
             --  назва Бенефіціару
             
-            if D2#E2_ is not null and D3#E2_ is not null then
-               select substr(MAX(trim(benef_name)), 1,135)
-               into d53#E2_
-               from v_cim_all_contracts
-               where upper(num) = upper(cont_num_) and
-                     open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                     status_id in (0, 8) and
-                     lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
-                     contr_type = (case when d1#E2_ = '36' then 0 
-                                        when d1#E2_ in ('23','24','34','35') then 2 
-                                        else 1 
-                                   end);        
-                     
-                if d53#E2_ is null then
-                   select substr(MAX(trim(benef_name)), 1,135)
-                   into d53#E2_
-                   from v_cim_all_contracts
-                   where upper(num) = upper(cont_num_) and
-                         open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                         status_id = 1 and
-                         lpad(okpo, 10, '0') = lpad(okpo_, 10, '0') and
-                         contr_type = (case when d1#E2_ = '36' then 0 
-                                        when d1#E2_ in ('23','24','34','35') then 2 
-                                        else 1 
-                                   end);          
+            if D2#E2_ is not null and D3#E2_ is not null 
+            then
 
-                    if d53#E2_ is null then
-                       select substr(MAX(trim(benef_name)), 1,135)
-                       into d53#E2_
-                       from v_cim_all_contracts
-                       where upper(num) = upper(cont_num_) and
-                             open_date = to_date(cont_dat_, 'ddmmyyyy')  and
-                             status_id in (0, 1, 8) and
-                             lpad(okpo, 10, '0') = lpad(okpo_, 10, '0');          
-                    end if;    
+              begin
+                select substr(MAX(trim(benef_name)), 1,135)
+                  into d53#E2_
+                  from V_CIM_ALL_CONTRACTS
+                 where upper(num) = upper(cont_num_)
+                   and open_date = to_date(cont_dat_, 'ddmmyyyy')
+                   and status_id in (0, 8)
+                   and lpad(okpo, 10, '0') = lpad(okpo_, 10, '0')
+                   and contr_type = case 
+                                    when d1#E2_ = '36' then 0 
+                                    when d1#E2_ in ('23','24','34','35') then 2 
+                                    else 1
+                                    end;
+              exception
+                when OTHERS then
+                  bars_audit.error( 'P_FE2_NN: cont_num_='||cont_num_||', cont_dat_='||cont_dat_||chr(10)||sqlerrm );
+                  d53#E2_ := null;
+              end;
+
+              if ( d53#E2_ is null )
+              then
+
+                begin
+                  select substr(MAX(trim(benef_name)), 1,135)
+                    into d53#E2_
+                    from V_CIM_ALL_CONTRACTS
+                   where upper(num) = upper(cont_num_)
+                     and open_date = to_date(cont_dat_, 'ddmmyyyy')
+                     and status_id = 1
+                     and lpad(okpo, 10, '0') = lpad(okpo_, 10, '0')
+                     and contr_type = case
+                                      when d1#E2_ = '36' then 0
+                                      when d1#E2_ in ('23','24','34','35') then 2
+                                      else 1
+                                      end;
+                exception
+                  when OTHERS then
+                    bars_audit.error( 'P_FE2_NN: cont_num_='||cont_num_||', cont_dat_='||cont_dat_||chr(10)||sqlerrm );
+                    d53#E2_ := null;
+                end;
+
+                if d53#E2_ is null
+                then
+
+                  begin
+                    select substr(MAX(trim(benef_name)), 1,135)
+                      into d53#E2_
+                      from v_cim_all_contracts
+                     where upper(num) = upper(cont_num_) and
+                           open_date = to_date(cont_dat_, 'ddmmyyyy')  and
+                           status_id in (0, 1, 8) and
+                           lpad(okpo, 10, '0') = lpad(okpo_, 10, '0');
+                  exception
+                    when OTHERS then
+                      bars_audit.error( 'P_FE2_NN: cont_num_='||cont_num_||', cont_dat_='||cont_dat_||chr(10)||sqlerrm );
+                      d53#E2_ := null;
+                  end;
+
                 end if;
+
+              end if;
+
             end if;
-            
+
             if d53#E2_ is null then
                d53#E2_ := f_get_swift_benef(ref_); 
             end if;
@@ -989,6 +1020,8 @@ BEGIN
               and o.ref = v.ref
               and lower(o.nazn) not like '%повернен%кошт%');
    end if;
+
+   commit;
    
    delete 
    from OTCN_PROV_TEMP
@@ -1805,3 +1838,4 @@ BEGIN
 END p_fe2_nn;
 /
 
+show errors;
