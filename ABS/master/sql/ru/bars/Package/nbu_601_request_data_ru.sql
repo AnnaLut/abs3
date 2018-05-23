@@ -274,6 +274,7 @@ create or replace package body nbu_601_request_data_ru is
         l_k110 varchar2(5 char);
         l_ec_year date;
         l_ved varchar2 (10);
+        l_cus_year date;
     begin
         bc.go (kf_);
 
@@ -321,11 +322,12 @@ create or replace package body nbu_601_request_data_ru is
 
           if l_k110 is null then
             begin
-              select distinct c.ved into l_ved from customer c,cc_deal d  where c.okpo=ur.okpo and c.rnk=ur.rnk and ur.rnk=d.rnk;
-              exception
+              select distinct c.ved,cw.value into l_ved, l_cus_year
+               from customer c,cc_deal d,customerw cw where c.okpo=ur.okpo and c.rnk=ur.rnk and ur.rnk=d.rnk and c.rnk=cw.rnk and cw.tag='IDDPR'; 
+            exception
                 when others then
                   bars.logger.info('nbu_person_uo='||l_ved||' ' ||l_k110||' '||ur.okpo||' '||ur.rnk);
-              end;
+            end;
              end if;
 
 
@@ -337,7 +339,7 @@ create or replace package body nbu_601_request_data_ru is
                     ur.datea,             -- registryday     date,
                     ur.rgadm,             -- numberregistry  varchar2(32),
                     nvl(l_k110,l_ved),    -- k110            varchar2(5),
-                    l_ec_year,            -- ec_year         date,
+                    nvl(l_ec_year,l_cus_year),  -- ec_year         date,
                     ur.country,           -- countrycodnerez varchar2(3),
                     ur.ismember,          -- ismember        varchar2(5),
                     ur.isController,      -- iscontroller    varchar2(5),
@@ -387,11 +389,38 @@ create or replace package body nbu_601_request_data_ru is
                                  p.codedrpou is not null
                           group by p.rnk, p.codedrpou) z_dat
                   where z_dat is not null) loop
-
-            l_sales     := get_indicator(i.codedrpou, i.z_dat, 'SALES');
+             begin
+            l_sales:= nvl(get_indicator(i.codedrpou, i.z_dat, 'SALES'),0);
+            exception when others  then
+             if
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_sales- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+             end if;
+           end;
+           begin
+            l_ebit:= nvl(get_indicator(i.codedrpou, i.z_dat, 'EBIT'),0);
+            exception  when others  then
+             if
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_ebit- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+             end if;
+           end;
+           begin
+            l_ebitda:= nvl(get_indicator(i.codedrpou, i.z_dat, 'EBITDA'),0);
+            exception  when others  then
+             if
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_ebitda- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+             end if;
+           end;
+           begin
+            l_totaldebt:= nvl(get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT'),0);
+              exception  when others  then
+              if
+               sqlcode=-20000 then bars.logger.info('finperformance_uo_total_debt- '||' '||i.codedrpou||' '||i.rnk||' '||i.z_dat);
+              end if;
+            end;      
+         /* l_sales     := get_indicator(i.codedrpou, i.z_dat, 'SALES');
             l_ebit      := get_indicator(i.codedrpou, i.z_dat, 'EBIT');
             l_ebitda    := get_indicator(i.codedrpou, i.z_dat, 'EBITDA');
-            l_totaldebt := get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT');
+            l_totaldebt := get_indicator(i.codedrpou, i.z_dat, 'TOTAL_NET_DEBT');*/
 
             insert into bars.nbu_finperformance_uo
             values (i.rnk,                -- rnk       number(38),
@@ -416,11 +445,13 @@ create or replace package body nbu_601_request_data_ru is
             execute immediate 'alter table nbu_groupur_uo truncate partition for (''' || kf_ || ''') reuse storage';
        end;
 
-       for groupur  in (select distinct  p.rnk, decode(c.codcagent,3,'true','false') isRezGr,c.okpo,nmk,country
+       for groupur  in (select distinct  p.rnk, decode(c.codcagent,3,'true','false') isRezGr,
+                                 null as whois,c.okpo,nmk,country
                            from  customer c, nbu_person_uo p,cust_bun b
                            where c.rnk=p.rnk and p.iscontroller is not null and p.rnk=b.rnka
                            union
-                           select distinct  p.rnk, decode (country,804,'true','false') isRezGr,c.okpo,name,c.country
+                           select distinct  p.rnk, decode (country,804,'true','false') isRezGr,
+                               case when p.ismember='true' and r.rel_id=51 then 1 end whois,c.okpo,name,c.country       
                            from  customer_extern c, nbu_person_uo p,customer_rel r
                            where p.rnk=r.rnk and r.rel_rnk=c.id and p.iscontroller is not null)loop
                           insert into nbu_groupur_uo (rnk,
@@ -433,7 +464,7 @@ create or replace package body nbu_601_request_data_ru is
                                                       status_message,
                                                       kf)
                                        values (groupur.rnk,
-                                               null,
+                                               groupur.whois,
                                                groupur.isRezGr,
                                                groupur.okpo,
                                                groupur.nmk,
@@ -495,11 +526,37 @@ create or replace package body nbu_601_request_data_ru is
                 into   z_dat
                 from   fin_fm
                 where  okpo = l_okpo_grp;
-
-                l_salesgr     :=  get_indicator(l_okpo_grp, z_dat, 'SALES');
-                l_ebitgr      :=  get_indicator(l_okpo_grp, z_dat, 'EBIT');
-                l_ebitdagr    :=  get_indicator(l_okpo_grp, z_dat, 'EBITDA');
-                l_totaldebtgr :=  get_indicator(l_okpo_grp, z_dat, 'TOTAL_NET_DEBT');
+                    
+ 
+          begin
+                l_salesgr:=  nvl(get_indicator(l_okpo_grp, z_dat, 'SALES'),0);
+                exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancegr_uo_sales- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+           end;
+           begin 
+                l_ebitgr:= nvl(get_indicator(l_okpo_grp, z_dat, 'EBIT'),0);
+                exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancegr_uo_ebit- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+           end;
+           begin
+                l_ebitdagr:=nvl(get_indicator(l_okpo_grp, z_dat, 'EBITDA'),0);
+                exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancegr_uo_ebitda- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+            end;
+            begin  
+                l_totaldebtgr:=nvl(get_indicator(l_okpo_grp, z_dat, 'TOTAL_NET_DEBT'),0);
+               exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancegr_uo_total_debt- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+            end; 
+                
 
                 insert into nbu_finperformancegr_uo
                 values (i.rnk,             -- rnk         number(38),
@@ -570,11 +627,35 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                 into   z_dat
                 from   fin_fm
                 where  okpo = l_okpo_pr;
-
-                l_salespr     :=  get_indicator(l_okpo_pr, z_dat, 'SALES');
-                l_ebitpr      :=  get_indicator(l_okpo_pr, z_dat, 'EBIT');
-                l_ebitdapr    :=  get_indicator(l_okpo_pr, z_dat, 'EBITDA');
-                l_totaldebtpr :=  get_indicator(l_okpo_pr, z_dat, 'TOTAL_NET_DEBT');
+                
+             begin 
+                l_salespr:=  nvl(get_indicator(l_okpo_pr, z_dat, 'SALES'),0);
+                 exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancepr_uo_sales- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+             end;
+              begin  
+                l_ebitpr := nvl(get_indicator(l_okpo_pr, z_dat, 'EBIT'),0);
+                exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancepr_uo_ebit- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+             end;  
+             begin
+                l_ebitdapr:=nvl(get_indicator(l_okpo_pr, z_dat, 'EBITDA'),0);
+                exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancepr_uo_ebitda- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+             end;
+             begin
+                l_totaldebtpr :=nvl(get_indicator(l_okpo_pr, z_dat, 'TOTAL_NET_DEBT'),0);
+                exception when others  then
+                  if
+                   sqlcode=-20000 then bars.logger.info('finperformancepr_uo_total_net_debt- '||' '||i.codedrpou||' '||i.rnk||' '||z_dat);
+                  end if;
+             end;
 
                 insert into nbu_finperformancepr_uo (rnk,
                                                      sales,
@@ -882,7 +963,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                           when  d.vidd in (3,26 ,237 ,102,17,2,1) then (select t.txt from nd_txt t where tag='NOSHOP' and t.nd=d.nd)
                                        end flagz,
                                      nbu23_rez.fin as klass,
-                                     nbu23_rez.cr as risk
+                                     nbu23_rez.cr as risk,                    
+                                    case when  (d.prod like '2082%' or  d.prod like '2232%') then 'true'
+                                         when  (d.prod like '2083%' or  d.prod like '2233%') then 'true'
+                                           end flagInsurance 
                      from (select rnk,kf from nbu_person_fo
                            union
                            select rnk,kf from nbu_person_uo) rnk_client ,
@@ -940,11 +1024,11 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
           loop
             begin
            insert into nbu_credit ( rnk,nd,ordernum,flagosoba,typecredit,numdog,dogday,endday,sumzagal,r030,proccredit,sumpay,arrearbase,periodbase ,periodproc, sumarrears,
-                                    daybase,dayproc,factendday,flagz,klass,risk ,status,kf)
+                                    daybase,dayproc,factendday,flagz,klass,risk,flagInsurance,status,kf)
                                   values
                               (person.rnk,person.nd,person.ordernum,person.flagosoba,person.typecredit,person.numberdog,person.dogday,person.endday,person.sumzagal,person.r030,
                                person.proccredit,person.sumpay,'',person.periodbase,person.periodproc,person.sumarrears,person.daybase,person.dayproc,person.factendday,person.flagz
-                               ,person.klass,person.risk,'',kf_);
+                               ,person.klass,person.risk,person.flagInsurance,'',kf_);
                                exception when dup_val_on_index then null;
              end;
 

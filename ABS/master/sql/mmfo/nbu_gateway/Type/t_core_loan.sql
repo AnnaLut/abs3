@@ -82,8 +82,8 @@ create or replace type body t_core_loan is
         periodbase       := l_core_loan_row.periodbase;
         periodproc       := l_core_loan_row.periodproc;
         sumarrears       := abs(l_core_loan_row.sumarrears);
-        arrearbase       := l_core_loan_row.arrearbase;
-        arrearproc       := l_core_loan_row.arrearproc;
+        arrearbase       := abs(l_core_loan_row.arrearbase);
+        arrearproc       := abs(l_core_loan_row.arrearproc);
         daybase          := l_core_loan_row.daybase;
         dayproc          := l_core_loan_row.dayproc;
         factendday       := l_core_loan_row.factendday;
@@ -396,5 +396,5 @@ create or replace type body t_core_loan is
 
         return l_clob;
     end;
-end;Û
+end;
 /

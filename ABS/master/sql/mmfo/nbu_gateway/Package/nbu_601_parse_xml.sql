@@ -201,11 +201,11 @@ end;*/
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -310,11 +310,11 @@ procedure p_parse_document_fo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -444,11 +444,11 @@ procedure p_parse_document_fo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -608,11 +608,11 @@ procedure p_parse_person_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -715,11 +715,11 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -829,11 +829,11 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 
@@ -939,11 +939,11 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1052,11 +1052,11 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1180,11 +1180,11 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1309,11 +1309,11 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1417,11 +1417,11 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1620,11 +1620,11 @@ procedure p_parse_credit (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+         --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -1730,11 +1730,11 @@ procedure p_parse_credit_pledge (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
          exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
       commit;
 end;
@@ -1915,11 +1915,11 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
              END;
             end if;
      nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-     BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+     --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
       commit;
 end;
@@ -2027,11 +2027,11 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
          exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
       commit;
 end;
