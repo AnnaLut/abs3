@@ -19,7 +19,7 @@ namespace BarsWeb.Areas.Cdnt.Models.Transport
         public DateTime? PassportIssued { get; set; }
         public decimal? IdcardDocumentNumber { get; set; }
         public string IdcardNotationNumber { get; set; }
-        public DateTime? PassportExpiry { get; set; }
+        public string PassportExpiry { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
         public string MobilePhoneNumber { get; set; }
