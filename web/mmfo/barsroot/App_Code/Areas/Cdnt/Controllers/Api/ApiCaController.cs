@@ -111,7 +111,7 @@ namespace BarsWeb.Areas.Cdnt.Controllers
             _repo.AlterAccreditationQuery(query);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-        
+
         [HttpPost]
         [POST("api/nota/add_profit")]
         public HttpResponseMessage ReceiveNotaryPrifit(V_NOTARY_PROFIT profit)
@@ -148,7 +148,7 @@ namespace BarsWeb.Areas.Cdnt.Controllers
                 DocumentType = n.DOCUMENT_TYPE,
                 IdcardDocumentNumber = n.IDCARD_DOCUMENT_NUMBER,
                 IdcardNotationNumber = n.IDCARD_NOTATION_NUMBER,
-                PassportExpiry = n.PASSPORT_EXPIRY
+                PassportExpiry = n.PASSPORT_EXPIRY != null ? n.PASSPORT_EXPIRY.Value.ToString(DateFormat) : null
             }).ToList();
 
             foreach (var resItem in result)
