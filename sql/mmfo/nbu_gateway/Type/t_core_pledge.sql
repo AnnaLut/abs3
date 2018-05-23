@@ -41,6 +41,7 @@ create or replace type t_core_pledge under t_core_object
     return clob
 )
 /
+
 create or replace type body t_core_pledge is
 
     constructor function t_core_pledge(
@@ -96,7 +97,7 @@ create or replace type body t_core_pledge is
 
             if (customer_id is not null) then
                 l_customer_object_row := nbu_object_utl.read_object(customer_id);
-                l_pledge_row := nbu_object_utl.read_pledge(customer_id, pledge_code, pledgeday, p_raise_ndf => false);
+                l_pledge_row := nbu_object_utl.read_pledge(customer_id, numberPledge, pledgeday, p_raise_ndf => false);
 
                 if (l_pledge_row.id is not null) then
                     l_pledge_object_row := nbu_object_utl.read_object(l_pledge_row.id);
@@ -136,7 +137,7 @@ create or replace type body t_core_pledge is
         if (p_core_object is of (t_core_pledge)) then
             l_core_pledge := treat(p_core_object as t_core_pledge);
 
-            l_equals := bars.tools.equals(l_core_pledge.pledge_code        , pledge_code        ) and
+            l_equals := bars.tools.equals(l_core_pledge.numberPledge       , numberPledge       ) and
                         bars.tools.equals(l_core_pledge.customer_id        , customer_id        ) and
                         bars.tools.equals(l_core_pledge.s031               , s031               ) and
                         bars.tools.equals(l_core_pledge.r030               , r030               ) and
@@ -217,7 +218,7 @@ create or replace type body t_core_pledge is
         l_attributes(1) := json_utl.make_json_value('orderNum', '1', p_mandatory => true);
         l_attributes(2) := json_utl.make_json_value('codZastava', nvl(codzastava, '0'), p_mandatory => true);
         l_attributes(3) := json_utl.make_json_value('codMan', codman, p_mandatory => true);
-        l_attributes(4) := json_utl.make_json_string('numberPledge', pledge_code, p_mandatory => true);
+        l_attributes(4) := json_utl.make_json_string('numberPledge', numberPledge, p_mandatory => true);
         l_attributes(5) := json_utl.make_json_date('pledgeDay', pledgeday, p_mandatory => true);
         l_attributes(6) := json_utl.make_json_string('s031', s031, p_mandatory => true);
         l_attributes(7) := json_utl.make_json_string('r030', r030, p_mandatory => false);
