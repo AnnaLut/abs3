@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.010  16/05/2018 (14/05/2018)
+% VERSION     :  v.18.011  23/05/2018 (16/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -486,25 +486,29 @@ end;
         comm_ := SUBSTR (comm_ || ' +Заміна (Контроль 1 НБУ)', 1, 200);
       end if;
 
-      -- 10/12/2015 (23/11/2015)
-      if (nbs_ in ('1600', '2605', '2600', '2620', '2625', '2650', '2655') and sn_ > 0)
+      if (nbs_ in ('1600', '2600', '2605', '2620', '2625', '2650', '2655') and sn_ > 0)
       then
-        if x_ <> '1' then
-           x_ := '1';
-        end if;
-
-         if nbs_||r011_ in ('16001', '26003', '26053', '26203', '26253', '26503', '26553') and
+         if nbs_||r011_ in ('16001', '16081') and
             daos_ >= to_date('06062015','ddmmyyyy')
          then
-             if s242_ not in ('1','2','3','4','5','I') then
+            if x_ <> '1' then
+               x_ := '1';
+            end if;
+            
+            if s242_ not in ('1','2','3','4','5','I') then
                 s242_ := 'I';
                 comm_ := SUBSTR (comm_ || ' +Заміна (Контроль 2 НБУ)', 1, 200);
-             end if;
-         else
+            end if;
+         elsif nbs_||r011_ in ('26001', '26051', '26201', '26251', '26501', '26551') then
+            if x_ <> '1' then
+               x_ := '1';
+            end if;
+              
             if s242_ <> '1' then
                s242_ := '1';
-               comm_ := SUBSTR (comm_ || ' +Заміна (Контроль 3 НБУ)', 1, 200);
             end if;
+             
+            comm_ := SUBSTR (comm_ || ' +Поточні рахунки', 1, 200);
          end if;
       end if;
 
@@ -1047,6 +1051,11 @@ BEGIN
           s#_     :=    l_rec_t(i).s#;
           apl_dat#_ :=  l_rec_t(i).apl_dat#;
           ndg_      :=  l_rec_t(i).ndg_;
+          
+          -- для @77 потрібно брати дату з архіву
+          if pmode_ = 2 then
+             mdate_ := nvl(f_mdate_hist(acc_, dat_), mdate_);
+          end if;
 
           p240_ := NVL (TRIM (p240_), '0');
           s180_ := NVL (TRIM (s180_), '0');
@@ -1562,10 +1571,6 @@ BEGIN
                       mdate_ := mdater_;
                    END IF;
 
-                   if mfou_ = 300120 and codc_ in (3, 4) and freq_ = 5 then
-                      mdate_ := Dat_Next_U (mdate_, 5);
-                   end if;
-
                    comm_ :=
                          comm_
                       || ' mdateR_='''
@@ -1646,10 +1651,7 @@ BEGIN
 
     ------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 IF    pr_ = '1' AND nbs_ LIKE '2%'
-                   OR     300120 IN (mfo_, mfou_)
-                      AND pr_ = '1'
-                   OR     300120 NOT IN (mfo_, mfou_)
-                      AND nbs_ IN ('1408','1418','1428','1438','1448','1508','1518','1528',
+                   OR nbs_ IN ('1408','1418','1428','1438','1448','1508','1518','1528',
                             '3108','3118','3570','3578')
                       and not (mfo_ = 300465 and rnk_ = 907973 and nbs_ in ('1418', '3118'))
                       and not (nbs_ in ('1408', '1418', '1428') and nvl(r011_, '0') = 'D')
@@ -1984,7 +1986,13 @@ BEGIN
                                 AND a.acc = p.acc(+)
                                 AND a.ost <> 0)
                    LOOP
-                      mdate_ := k.mdate;
+                      -- для мыячного файлу @77
+                      if pmode_ = 2 then
+                         mdate_ := nvl(f_mdate_hist(k.acc, dat_), k.mdate);
+                      else 
+                         mdate_ := k.mdate;
+                      end if; 
+                      
                       x_ := k.s181;
 
                       IF     x_ <> '2'
@@ -2160,7 +2168,6 @@ BEGIN
 
                    IF nbs_ = '9129'
                    THEN
-
                       BEGIN
                          FOR i IN (SELECT   DECODE (TRIM (s.s240),
                                                     NULL, fs240 (datn_, a.acc, dathb_, dathe_, a.mdate, s.s240),
@@ -2176,6 +2183,7 @@ BEGIN
                          LOOP
                             x_ := '1';
                             nd_ := i.nd;
+                            
                             if i.ostq <0  then
                                 mdate_ := i.mdate;
                                 s242_ := i.s240;
@@ -2270,29 +2278,15 @@ BEGIN
                        nbs_ IN ('2600', '2605', '2608', '2620', '2625', '2650') and sn_ < 0)
                       AND (s242_ = '0' OR NVL (x_, '0') = '0' OR x_ = '2')
                    THEN
-                      IF     (   ((300120 IN (mfo_, mfou_)) AND nbs_ LIKE '290%'
-                                 )
-                              OR 300120 IN (mfo_, mfou_) AND nbs_ = '2625'
-                             )
-                         AND x_ = '2'
-                      THEN
-                         NULL;                                -- ничего не меняем
-                      ELSE
-                         x_ := '1';
+                      x_ := '1';
 
-                         IF datn_ < zm_date_
-                         THEN
-                            s242_ := '5';
-                         ELSE
-                            s242_ := '1';
-                         END IF;
+                      IF datn_ < zm_date_
+                      THEN
+                         s242_ := '5';
+                      ELSE
+                         s242_ := '1';
                       END IF;
                    END IF;
-
---                   IF nbs_ = '2600' AND r013_ = '0' and sn_ < 0
---                   THEN
---                      r013_ := '9';
---                   END IF;
 
                    IF nbs_ = '2620' AND r013_ = '0' and sn_ < 0
                    THEN
@@ -2607,23 +2601,13 @@ BEGIN
                        nbs_ IN ('2600', '2605', '2608', '2620', '2625', '2650') and sn_ < 0)
                       AND (s242_ = '0' OR x_ IS NULL OR x_ = '0' OR x_ = '2')
                    THEN
-                      IF     (   (    (mfo_ = 322498 OR 300120 IN (mfo_, mfou_))
-                                  AND nbs_ LIKE '290%'
-                                 )
-                              OR 300120 IN (mfo_, mfou_) AND nbs_ = '2625'
-                             )
-                         AND x_ = '2'
-                      THEN
-                         NULL;                                -- ничего не меняем
-                      ELSE
-                         x_ := '1';
+                      x_ := '1';
 
-                         IF datn_ < zm_date_
-                         THEN
-                            s242_ := '5';
-                         ELSE
-                            s242_ := '1';
-                         END IF;
+                      IF datn_ < zm_date_
+                      THEN
+                         s242_ := '5';
+                      ELSE
+                         s242_ := '1';
                       END IF;
                    END IF;
 
@@ -2973,11 +2957,10 @@ BEGIN
                     round(discont * decode(suma, 0, 1, sump / suma)) discont_row,
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
                     nd, id, ob22, custtype, accr, accr_30, tip
-             from (
-                 select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
+             from (select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                         nvl(gl.p_icurval(t.kv, t.sz, dat_), 0) szq,
                         nvl(gl.p_icurval(t.kv, t.rez_30, dat_), 0) szq_30,
-                        a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
+                        a.isp, s.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
                         nvl(s.kodp, '00000000000') kodp, nvl(s.s240, '0') s240, nvl(s.sump, 0) sump,
                         nvl((sum(s.sump) over (partition by s.acc, t.s080)), 0) suma,
                         nvl((count(*) over (partition by s.acc)), 0) cnt,
@@ -2987,7 +2970,7 @@ BEGIN
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                         t.nd, t.id, a.ob22, c.custtype, t.accr, t.accr_30, a.tip
                  from v_tmp_rez_risk_c5_new t,
-                      (select acc, kodp, substr(kodp, 9, 1) s240,
+                      (select acc, mdate, kodp, substr(kodp, 9, 1) s240,
                             substr(kodp, 6, 1) R011,
                             substr(kodp, 7, 1) R013,
                             sum(to_number(znap)) sump
@@ -2997,7 +2980,7 @@ BEGIN
                                                       '12039','12069','12089',
                                                       '12109','12119','12129','12139',
                                                       '12209','12239' )
-                       group by acc, kodp, substr(kodp, 9, 1), substr(kodp, 6, 1), substr(kodp, 7, 1)) s,
+                       group by acc, mdate, kodp, substr(kodp, 9, 1), substr(kodp, 6, 1), substr(kodp, 7, 1)) s,
                        accounts a, customer c
                   where t.dat = datr_ and
                       t.id not like 'NLO%' and
@@ -3417,7 +3400,14 @@ BEGIN
          nbuc_ := nbuc1_;
       END IF;
 
-      s240_ := nvl(fs240 (datn_, k.acc, dathb_, dathe_, k.mdate, k.s240), '0');
+      -- для місячного файлу @77
+      if pmode_ = 2 then
+         mdate_ := nvl(f_mdate_hist(k.acc, dat_), k.mdate);
+      else 
+         mdate_ := k.mdate;
+      end if; 
+                      
+      s240_ := nvl(fs240 (datn_, k.acc, dathb_, dathe_, mdate_, k.s240), '0');
 
       if s240_ = '0' then
          s240_ := '1';
@@ -3619,7 +3609,7 @@ BEGIN
                           )
               VALUES (s_rnbu_record.NEXTVAL, userid_,
                      k.nls, k.kv, data_, kodp_,
-                     znap_, k.acc, k.rnk, k.isp, k.mdate,
+                     znap_, k.acc, k.rnk, k.isp, mdate_,
                      comm_, k.nd, nbuc_, k.tobo);
           end if;
 
@@ -3654,7 +3644,7 @@ BEGIN
                           )
              VALUES (s_rnbu_record.NEXTVAL, userid_,
                      k.nls, k.kv, data_, kodp_,
-                     znap_, k.acc, k.rnk, k.isp, k.mdate,
+                     znap_, k.acc, k.rnk, k.isp, mdate_,
                      comm_, k.nd, nbuc_, k.tobo);
           end if;
 
@@ -3990,7 +3980,7 @@ BEGIN
        over_    number := 0;
        rizn_    number := 0;
    begin
-       -- розбиваємо SNA залежності від активу
+       -- розбиваємо SNA в залежності від активу
        for k in (select s.*,
                     (case when s.suma_all <> 0 then round(s.sumd * s.suma / s.suma_all, 0) else 0 end) sumdp_k,
                     (case when s.suma_all <> 0 then s.suma / s.suma_all else 0 end) koef,
@@ -4142,7 +4132,7 @@ BEGIN
                              ' MDATE, ''З таблиці A_TPK_A7ADD'', :tobo_ '||
                        'from A_TPK_A7ADD where fdat = :dat_';
 
-      execute immediate sql_doda_ using userid_, dat_, dat_, dat_, dat_, tobo_, dat_;
+          execute immediate sql_doda_ using userid_, dat_, dat_, dat_, dat_, tobo_, dat_;
       else
           NULL;
 --!!   вставить  для новой структуры    З таблиці A_TPK_A7ADD
