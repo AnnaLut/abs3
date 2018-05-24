@@ -51,9 +51,10 @@ AS
             WHERE a.DPT_ID = d.DPT_ID),
           d.kv AS DDCUR,
           dpt_web.get_dptrate (d.acc,
-                       d.kv,
-                       d.LIMIT,
-                       TRUNC (SYSDATE))  AS DDTAX,
+                               d.kv,
+                               d.LIMIT,
+                               TRUNC (SYSDATE))
+             AS DDTAX,
           d.LIMIT / 100 AS DDSUM,
           d.datz AS DDSTARTDATE,
           d.dat_begin AS DDLASTDATE,
@@ -71,7 +72,7 @@ AS
                   d1.dat_begin,
                   d1.dat_end,
                   d1.LIMIT,
-                  nvl(d1.status,0) as status,
+                  NVL (d1.status, 0) AS status,
                   d1.comments,
                   d1.mfo_p,
                   d1.nls_p,
@@ -84,13 +85,10 @@ AS
                   d1.branch,
                   d1.wb,
                   dt.type_id AS product_code,
-                  d1.kv,                    
-                  nvl(d1.CNT_DUBL,0) as CNT_DUBL
-             FROM dpt_deposit d1,
-                  dpt_vidd v,
-                  dpt_types dt
-            where  d1.vidd = v.vidd
-                   AND v.type_cod = dt.type_code
+                  d1.kv,
+                  NVL (d1.CNT_DUBL, 0) AS CNT_DUBL
+             FROM dpt_deposit d1, dpt_vidd v, dpt_types dt
+            WHERE d1.vidd = v.vidd AND v.type_cod = dt.type_code
            UNION ALL
            SELECT dc.deposit_id,
                   dc.nd,
@@ -101,7 +99,7 @@ AS
                   dc.dat_begin,
                   dc.dat_end,
                   dc.LIMIT,
-                  -1 as status,
+                  -1 AS status,
                   dc.comments,
                   dc.mfo_p,
                   dc.nls_p,
@@ -115,23 +113,17 @@ AS
                   dc.wb,
                   dt.type_id AS product_code,
                   DC.KV,
-                  nvl(DC.CNT_DUBL,0) as CNT_DUBL
-             FROM dpt_deposit_clos dc,
-                  dpt_vidd v,
-                  dpt_types dt,
-                  (  SELECT MAX (idupd) idupd,
-                            deposit_id
-                       FROM dpt_deposit_clos
-                   GROUP BY deposit_id) dcm
-            WHERE     dc.idupd = dcm.idupd
-                  and dc.deposit_id = dcm.deposit_id
-                  and dc.vidd = v.vidd
+                  NVL (DC.CNT_DUBL, 0) AS CNT_DUBL
+             FROM dpt_deposit_clos dc, dpt_vidd v, dpt_types dt
+            WHERE     dc.action_id IN (1, 2)
+                  AND dc.vidd = v.vidd
                   AND v.type_cod = dt.type_code
                   AND NOT EXISTS
                          (SELECT 1
                             FROM dpt_deposit d
-                           WHERE d.deposit_id = dc.deposit_id)) d, 
-           bars.customer c, bars.person p
+                           WHERE d.deposit_id = dc.deposit_id)) d,
+          bars.customer c,
+          bars.person p
     WHERE d.rnk = c.rnk AND c.rnk = p.rnk;
 
 
