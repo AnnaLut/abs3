@@ -1076,7 +1076,6 @@ function insertXslRowSelectionTooltip(jQuery) {
     var LEFT_MOUSE_BUTTON = 1;
     var trs = $("tr[id^='r_']"); //table.children("tbody").children("tr");
     var cells = trs.children("td");
-    var startedOutsideTable = true;
 
     cells.each(function (idx, cell) {
         $(cell).mouseover(function (event) {
@@ -1107,19 +1106,15 @@ function insertXslRowSelectionTooltip(jQuery) {
             var row = trs[idx];
             if (selectionPivot && selectionPivot.rowIndex != row.rowIndex) {
                 selectRowsBetweenIndexes(selectionPivot.rowIndex, row.rowIndex);
+                if (selRange.removeAllRanges) {
+                    selRange.removeAllRanges();
+                } else if (document.selection.empty) {
+                    document.selection.empty();
+                }
             }
-
-            if (selRange.removeAllRanges) {
-                selRange.removeAllRanges();
-            } else if (document.selection.empty) {
-                document.selection.empty();
-            }
-
-            startedOutsideTable = true;
         });
 
         $(tRow).mousedown(function (event) {
-            startedOutsideTable = false;
             if (event.which != LEFT_MOUSE_BUTTON) {
                 clearAll();
                 return;
