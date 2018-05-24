@@ -1,18 +1,9 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F3B_NN.sql =========*** Run *** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_F3B_NN ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_F3B_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
+CREATE OR REPLACE PROCEDURE BARS.p_f3b_NN (Dat_ DATE, sheme_ varchar2 default 'G', pr_op_ Number default 1) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #3B для
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : 06.12.2017    (23.11.2017, 21.08.2017)
+% VERSION     : 24.05.2018 (23.05.2018, 17.05.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_    - отчетная дата
                sheme_  - код схемы
@@ -27,6 +18,13 @@ PROMPT *** Create  procedure P_F3B_NN ***
  11    ZZZZZZZZZZ   ОКПО предприятия
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+24.05.2018 добавлено удаление показателя 10PMKDDDDDZZZZZZZZZZ с нулевым
+           значением
+23.05.2018 не включаем контрагентов у которых сумма кредитов равна нулю
+           (BVQ из NBU23_REZ)
+17.05.2018 добавлено формирование показателя 11LLPMKDDDDDZZZZZZZZZZ
+           изменено формирование показателей 04 и 06 
+           (будут формироваться как в файле #3V) 
 06.12.2017 Ограниченние набора показателей DDDDD для формы 3
 23.11.2017 Сегмент LL=10 -oбработка данных формы 3 для клиентов
 21.08.2017 Изменено формирование показателя 05 (признак АТО)
@@ -42,9 +40,13 @@ PROMPT *** Create  procedure P_F3B_NN ***
     userid_  number;
     mfo_     number;
     mfou_    number;
+    ost_     number;
+    ost_96_  number;
+    s190_    varchar2(1); 
     dtb_     date;
     dte_     date;
     znap_    number;
+    p06_     varchar2(1);
     p04_     varchar2(1);
     fmt_     varchar2 (10)  := '9990D00';
 BEGIN
@@ -162,11 +164,11 @@ BEGIN
 
     --------------------------------------------------------
     -- блок для формування показників LL = '01','02','03','04','05','06','07','08','09'
-    for k in (select distinct nnnnn, okpo, nmk, p, pp, ll, koef_k, s190, pato,
+    for k in (select distinct nnnnn, rnk, okpo, nmk, p, pp, ll, koef_k, s190, pato,
                               psk, plink, pinvest
               from (
                select *
-               from ((select a.nnnnn, a.okpo, a.nmk,
+               from ((select a.nnnnn, c.rnk, a.okpo, a.nmk,
                              to_char(decode(nvl(d.fm,'R'),'N',1,'R',2,2)) p,
                              to_char(decode(nvl(f.fm,'R'),'N',1,'R',2,2)) pp,
                              '00000' ddddd, d.m,
@@ -174,7 +176,7 @@ BEGIN
                              trim(to_char(nvl(b.koef_k,0))) KOEF_K,
                              nvl(c.k111,'00') LL,
                              trim(to_char(nvl(b.s190,0))) s190,
-                             a.pmax, a.pato, a.psk, a.plink, pinvest,
+                             a.pmax, a.pato, b.psk, a.plink, pinvest,
                              round((fin_nbu.zn_rep(e.kod,e.idf, decode(d.m,2,dtb_,1,dte_),a.okpo)),1) znap
                       from (select nnnnn, edrpou okpo, txt nmk,
                                    decode(coalesce(par_max,0),1,0,1) pmax,
@@ -201,12 +203,16 @@ BEGIN
                             order by nnnnn
                            ) a
                            left join (select okpo, '00' k160, max(nvl(k,0)) k,
-                                             max(nvl(k,0)) koef_k,
-                                             max(nvl(obs,0)) s190
-                                      from (select okpo, k, kat, obs
-                                            from bars.nbu23_rez
-                                            where fdat = dte_
-                                              and ddd like '12%'
+                                             max(nvl(pd,0)) koef_k,
+                                             max(nvl(kol_351,1)) s190,
+                                             substr(max(nvl(kol24, '000')), 1, 70) psk
+                                      from (select n.okpo, n.k, n.kat, n.kol_351, r.pd, r.kol24
+                                            from bars.nbu23_rez n, rez_cr r
+                                            where n.fdat = dte_
+                                              and n.ddd like '12%'
+                                              and r.fdat = n.fdat
+                                              and r.acc = n.acc 
+                                              and r.rnk = n.rnk
                                             --  union all
                                             --select edrpou okpo, k, kat, obs
                                             --from bars.okpof659
@@ -215,7 +221,7 @@ BEGIN
                                       group by okpo
                                      ) b
                               on a.okpo = b.okpo
-                           left join (select okpo, k111
+                           left join (select c.okpo, c.rnk, kl.k111
                                       from customer c, kl_k110 kl
                                       where (kl.d_open <= dte_
                                         and (kl.d_close is null or kl.d_close >= dte_))
@@ -250,20 +256,45 @@ BEGIN
              order by 3, 1
              )
        loop
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '01'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.nmk, 'OKPO='||k.OKPO);
+                     '01'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.nmk, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '02'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.ll, 'OKPO='||k.OKPO);
+                     '02'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.ll, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          if k.s190 = 0 
+          then
+             s190_ := '0';
+          elsif k.s190 > 0 and k.s190 < 8 
+          then
+             s190_ := 'A';
+          elsif k.s190 < 31 
+          then
+             s190_ := 'B';
+          elsif k.s190 < 61
+          then
+             s190_ := 'C';
+          elsif k.s190 < 91
+          then
+             s190_ := 'D';
+          elsif k.s190 < 181 
+          then
+             s190_ := 'E';
+          elsif k.s190 < 361 
+          then
+             s190_ := 'F';
+          else
+             s190_ := 'G';
+          end if;
+
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '03'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.s190, 'OKPO='||k.OKPO);
+                     '03'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), s190_, 'OKPO='||k.OKPO, k.rnk);
 
           p04_ := '0';
           if k.p <> k.pp
@@ -271,42 +302,53 @@ BEGIN
              p04_ := '1';
           end if;
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '04'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), p04_, 'OKPO='||k.OKPO);
+                     '04'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), p04_, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '05'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pato, 'OKPO='||k.OKPO);
+                     '05'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pato, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          p06_ := '0';
+          if k.psk = '100'
+          then
+             p06_ := '1';
+          end if;
+
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '06'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.psk, 'OKPO='||k.OKPO);
+                     '06'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), p06_, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '07'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.plink, 'OKPO='||k.OKPO);
+                     '07'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.plink, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '08'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pinvest, 'OKPO='||k.OKPO);
+                     '08'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'), k.pinvest, 'OKPO='||k.OKPO, k.rnk);
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
                      '09'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'),
-                         LTRIM (to_char (ROUND (k.koef_k, 2), fmt_)), 'OKPO='||k.OKPO);
-
+                         LTRIM (to_char (ROUND (k.koef_k, 2), fmt_)), 'OKPO='||k.OKPO, k.rnk);
+          -- код 11
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
+             -- KODP = LL+P+1+M+DDDDD+ZZZZZZZZZZ
+             VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
+                     '11'||k.P||'1'||'0'||'00000'||LPAD(k.okpo, 10,'0'),
+                         '0', 'OKPO='||k.OKPO, k.rnk);
        end loop;
     --------------------------------------------------------
     -- блок для формування показників LL = '10'
     for t in (select *
-              from ( (select a.nnnnn, a.okpo, a.nmk, e.p, e.ddddd,
+              from ( (select a.nnnnn, a.okpo, c.rnk, a.nmk, e.p, e.ddddd,
                              d.m, trim(to_char(nvl(b.k160,0),'00')) II,
                              trim(to_char(nvl(b.s080,0))) T,
                              nvl(c.k111,'00') LL,
@@ -349,7 +391,7 @@ BEGIN
                                       group by okpo
                                      ) b
                               on a.okpo = b.okpo
-                           left join (select okpo, k111
+                           left join (select c.okpo, c.rnk, kl.k111
                                       from customer c, kl_k110 kl
                                       where (kl.d_open <= dte_
                                         and (kl.d_close is null or kl.d_close >= dte_))
@@ -396,9 +438,9 @@ BEGIN
              znap_ := - t.znap;
           end if;
 
-          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm)
+          INSERT INTO rnbu_trace (recid, userid, odate, kodp, znap, comm, rnk)
              VALUES (s_rnbu_record.NEXTVAL, userid_, dat_,
-                     '10'||t.P||t.M||'0'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(znap_), 'OKPO='||t.OKPO);
+                     '10'||t.P||t.M||'0'||t.DDDDD||LPAD(t.okpo,10,'0'), TO_CHAR(znap_), 'OKPO='||t.OKPO, t.rnk);
 
        end loop;
 
@@ -497,6 +539,31 @@ BEGIN
 
        delete from rnbu_trace where znap='0' and kodp like '10%';
 
+       -- LL=01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11 
+       -- формируем только если остатки по кредитам ненулевые  
+       for k in ( select * 
+                  from rnbu_trace 
+                  where kodp like '11%'
+                )
+          loop
+
+             select NVL(sum(bvq*100), 0)
+                into ost_
+             from nbu23_rez 
+             where fdat = dte_
+               and nls like '2%'
+               and rnk = k.rnk
+               and ddd like '12%';
+        
+             if ost_ = 0 
+             then
+                delete from rnbu_trace r
+                where substr(r.kodp,11,10) = substr(k.kodp,11,10)
+                  and substr(r.kodp,1,2) in ('01','02','03','04','05','06','07','08','09','10','11');
+             end if;
+
+       end loop;
+
        delete from rnbu_trace r
        where not exists (select 1
                          from rnbu_trace r1
@@ -511,7 +578,7 @@ BEGIN
     insert into tmp_nbu(kodf, datf, kodp, znap)
     select kodf_, dat_, kodp, znap
     from rnbu_trace
-    where substr(kodp,1,2) in ('01','02','03','04','05','06','07','08','09');
+    where substr(kodp,1,2) in ('01','02','03','04','05','06','07','08','09','11');
 
     insert into tmp_nbu(kodf, datf, kodp, znap)
     select kodf_, dat_, kodp, sum(znap) znap
@@ -521,14 +588,4 @@ BEGIN
 ------------------------------------------------------------------
 END p_f3b_NN;
 /
-show err;
 
-PROMPT *** Create  grants  P_F3B_NN ***
-grant EXECUTE                                                                on P_F3B_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F3B_NN        to RPBN002;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_F3B_NN.sql =========*** End *** 
-PROMPT ===================================================================================== 
