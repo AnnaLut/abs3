@@ -10,7 +10,7 @@ function homeController($scope, paramsService, $window, LS) {
 
     $scope.getGridFilter = function () {
         bars.ui.getFiltersByMetaTable(function (response) {
-            if (response.length > 0) {
+            if (response && response.length > 0) {
                 window.gridParams.strPar02 = response.join(' and ');
                 //   window.gridParams.strPar02 = 'ID = 439';
                 $scope.gridParams = window.gridParams;

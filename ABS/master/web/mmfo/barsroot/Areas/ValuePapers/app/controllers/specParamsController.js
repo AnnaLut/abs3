@@ -61,7 +61,7 @@ function specParamsController($scope, paramsService) {
     $scope.grid1Options = getGridOptions('GetCP_OB_INITIATOR');
     $scope.grid2Options = getGridOptions('GetCP_OB_MARKET');
     $scope.grid3Options = getGridOptions('GetCP_OB_FORM_CALC');
-    $scope.grid4Options = getGridOptions('GetCP_VDOGO');
+    $scope.grid4Options = getGridOptions('GetCP_V_OPER');
     $scope.grid5Options = getGridOptions('GetCP_KLCPE');
 
     $scope.$on('loadChangeBillGrids', function () {

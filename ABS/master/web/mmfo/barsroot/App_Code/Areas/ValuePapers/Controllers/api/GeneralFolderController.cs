@@ -109,17 +109,17 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
         /// <summary>
         /// Довідник видів договору 
         /// </summary>
-        public HttpResponseMessage GetCP_VDOGO([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request)
+        public HttpResponseMessage GetCP_V_OPER([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request)
         {
             try
             {
-                var data = _repo.CP_VDOGO();
+                var data = _repo.CP_VOPER();
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
                     data.ToList().ToDataSourceResult(request));
@@ -128,7 +128,7 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
         /// <summary>
@@ -147,7 +147,7 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
         public HttpResponseMessage GetContractSaleWindowFixedParams()
