@@ -128,9 +128,9 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
         /// <summary>
         /// Довідник видів договору 
         /// </summary>
-        public IEnumerable<ChangeBillGrid> CP_VDOGO()
+        public IEnumerable<ChangeBillGrid> CP_VOPER()
         {
-            string sqlText = @"select id as code, title as txt from cp_vdogo order by 1 ";
+            string sqlText = @"select id as code, title as txt from CP_VOPER order by 1 ";
             return _entity.ExecuteStoreQuery<ChangeBillGrid>(sqlText);
         }
         /// <summary>
