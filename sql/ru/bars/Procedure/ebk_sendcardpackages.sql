@@ -5,16 +5,16 @@ create or replace procedure EBK_SENDCARDPACKAGES
 ) is
   /**
   <b>EBK_SENDCARDPACKAGES</b> - Виклик WEB сервісу надсилання даних до ЄБК
-  %param p_action_name - 
-  %param p_cardsCount  - 
-  %param p_packSize    - 
-  
-  %version  2.4
-  %date     2018.02.12
+  %param p_action_name -
+  %param p_cardsCount  -
+  %param p_packSize    -
+
+  %version  2.5
+  %date     2018.05.16
   %modifier BAA
-  %usage   
+  %usage
   */
-  
+
   l_url          varchar2(128);
   l_ahr_val      varchar2(128);
   l_wallet_path  varchar2(128);
@@ -23,6 +23,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
   l_pkg_sz       number(8);
   l_rsp          number(1);
   l_kf           varchar2(6) := sys_context('bars_context','user_mfo');
+  l_atmt_num     number(1) := 0;
 
   --
   -- Возвращает параметр из web_config
@@ -78,7 +79,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
     end case;
 
     return l_q_sz;
-    
+
   end GET_QUEUE_SIZE;
 
   --
@@ -86,7 +87,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
   --
   function SET_REQUEST
   return number
-  -- 0 - все ок 
+  -- 0 - все ок
   -- 1 - проблема з бд
   -- 2 - проблема не з бд
   is
@@ -126,13 +127,19 @@ create or replace procedure EBK_SENDCARDPACKAGES
 
     loop
 
+      exit when ( l_atmt_num > 3 );
+
       l_qty := GET_QUEUE_SIZE();
 
+      bars_audit.trace( '%s: l_qty=%s.', $$PLSQL_UNIT, to_char(l_qty) );
+
+      exit when ( l_qty = 0 );
+ 
       l_rsp := SET_REQUEST();
 
-      exit when l_qty = 0 or l_rsp = 2;
+--    exit when l_qty = 0 or l_rsp = 2;
 
-      if ( l_rsp = 1 and l_qty = GET_QUEUE_SIZE() )
+      if ( l_qty = GET_QUEUE_SIZE() )
       then -- розмір черги не змінився
 
         if ( l_pkg_sz > 1 )
@@ -142,40 +149,49 @@ create or replace procedure EBK_SENDCARDPACKAGES
 
         else -- l_pkg_sz = 1
 
-          -- виключаємо "поганий" РНК з передачі в ЄБК
-          case p_action_name
-          when 'SendCardPackages'
+          if ( l_rsp = 1 )
           then
-            update EBK_QUEUE_UPDATECARD
-               set STATUS = 9
-             where ROWID = ( select min(ROWID)
-                               from EBK_QUEUE_UPDATECARD
-                              where KF = l_kf
-                                and STATUS = 0 );
-          when 'SendCardPackagesLegal'
-          then
-            update EBKC_QUEUE_UPDATECARD
-               set STATUS = 9
-             where ROWID = ( select min(ROWID)
-                             from EBKC_QUEUE_UPDATECARD
-                            where KF = l_kf
-                              and STATUS = 0
-                              and CUST_TYPE = 'L' );
-          when 'SendCardPackagesPrivateEn'
-          then
-            update EBKC_QUEUE_UPDATECARD
-               set STATUS = 9
-             where ROWID = ( select min(ROWID)
+ 
+            -- виключаємо "поганий" РНК з передачі в ЄБК
+            case p_action_name
+            when 'SendCardPackages'
+            then
+              update EBK_QUEUE_UPDATECARD
+                 set STATUS = 9
+               where ROWID = ( select min(ROWID)
+                                 from EBK_QUEUE_UPDATECARD
+                                where KF = l_kf
+                                  and STATUS = 0 );
+            when 'SendCardPackagesLegal'
+            then
+              update EBKC_QUEUE_UPDATECARD
+                 set STATUS = 9
+               where ROWID = ( select min(ROWID)
                                from EBKC_QUEUE_UPDATECARD
                               where KF = l_kf
                                 and STATUS = 0
-                                and CUST_TYPE = 'P' );
-          else
-            null;
-          end case;
+                                and CUST_TYPE = 'L' );
+            when 'SendCardPackagesPrivateEn'
+            then
+              update EBKC_QUEUE_UPDATECARD
+                 set STATUS = 9
+               where ROWID = ( select min(ROWID)
+                                 from EBKC_QUEUE_UPDATECARD
+                                where KF = l_kf
+                                  and STATUS = 0
+                                  and CUST_TYPE = 'P' );
+            else
+              null;
+            end case;
 
-          -- по наївності надіємося, що "поганий" РНК тільки один
-          l_pkg_sz := to_number( p_packSize );
+            -- по наївності надіємося, що "поганий" РНК тільки один
+            l_pkg_sz := to_number( p_packSize );
+            
+          else
+
+            l_atmt_num := l_atmt_num + 1;
+
+          end if;
 
         end if;
 
@@ -187,8 +203,8 @@ create or replace procedure EBK_SENDCARDPACKAGES
   ---
 begin
 
-  bars_audit.trace( '%s: Entry with ( p_action_name=%s, p_cardsCount=%s, p_packSize=%s ).'
-                  , $$PLSQL_UNIT, p_action_name, p_cardsCount, p_packSize );
+  bars_audit.trace( '%s: Entry with ( p_action_name=%s, p_cardsCount=%s, p_packSize=%s, l_kf=%s ).'
+                  , $$PLSQL_UNIT, p_action_name, p_cardsCount, p_packSize, l_kf );
 
   l_url     := get_param_webconfig('EBK.Url'); -- branch_attribute_utl.get_value( 'ABSBARS_WEB_IP_ADRESS' );
   l_ahr_val := get_param_webconfig('EBK.UserPassword');
@@ -203,9 +219,9 @@ begin
     l_wallet_pwd  := get_param_webconfig('EBK.WalletPass');
     utl_http.set_wallet( l_wallet_path, l_wallet_pwd );
   end if;
-  
+
   l_pkg_sz := to_number( p_packSize );
-  
+
   if ( l_kf Is Null )
   then
     for i in ( select KF
@@ -217,9 +233,9 @@ begin
   else
     SEND_CARDS;
   end if;
-  
+
   bars_audit.trace( '%s: Exit.', $$PLSQL_UNIT );
-  
+
 end EBK_SENDCARDPACKAGES;
 /
 
