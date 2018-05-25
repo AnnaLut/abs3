@@ -31,7 +31,7 @@ namespace BarsWeb.Areas.Clients.Infrastructure.Repository
 
         public static BarsSql Customers(CustomerType type, bool showClosed)
         {
-            if (type == CustomerType.Corp || type == CustomerType.Person)
+            if (type == CustomerType.Corp)
             {
                 return new BarsSql
                 {
@@ -42,11 +42,22 @@ namespace BarsWeb.Areas.Clients.Infrastructure.Repository
                     }
                 };
             }
+            if (type == CustomerType.Person)
+            {
+                return new BarsSql
+                {
+                    SqlText = string.Format(@"{0} where a.CUSTTYPE = :P_CUSTTYPE and A.SED = '00' and A.ISE not in ('14200','14100','14201','14101') {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null"),
+                    SqlParams = new object[]
+                    {
+                    new OracleParameter("P_CUSTTYPE", OracleDbType.Int32) {Value = (int)type}
+                    }
+                };
+            }
             if (type == CustomerType.PersonSpd)
             {
                 return new BarsSql
                 {
-                    SqlText = string.Format(@"{0} where A.SED = 91 and A.ISE in (14200, 14100, 14201, 14101) and nvl(a.ved , 00000) <> '00000' {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null")
+                    SqlText = string.Format(@"{0} where A.SED = 91 and A.ISE in (14200, 14100, 14201, 14101) and nvl(a.ved , 00000) != '00000' {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null")
                 };
             }
 
