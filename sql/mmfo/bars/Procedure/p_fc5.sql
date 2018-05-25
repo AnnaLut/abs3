@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.026         16/05/2018 (17/04/2018)
+% VERSION     : v.17.027  22/05/2018 (16/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -270,6 +270,7 @@ IS
            where r020 = r020_ and
                 (t020 = t020_ or t020 = '*') and
                 (r011 = r011_ or r011 = '*') and
+                (r013 = r013_ or r013 = '*') and
                 (S245 = s245_ or S245 = '*');
 
            s580_ := s580r_;
@@ -279,37 +280,8 @@ IS
           s580_ := '5';
        end if;
 
-       if r020_ = '9200' and t020_ = '1' then
-          s580_ := (case when r013_ in ('3', '8', 'A') then '1'
-                         when r013_ in ('4') then '3'
-                         when r013_ in ('5', '6') then '4'
-                         else '9'
-                    end);
-       end if;
-
-       if (r020_ in ('9201','9202','9204') or
-           r020_ between '9206' and '9208' or
-           r020_ between '9350' and '9359') and
-           t020_ = '1'
-       then
-          if r020_ <> '9355' and r013_ = '1' then
-              s580_ := '1';
-          elsif r013_ = '2' then
-              s580_ := '4';
-          else
-              s580_ := '9';
-          end if;
-       end if;
-
-       if r020_ = '9300' and t020_ = '1' then
-          s580_ := (case when r013_ in ('3') then '1'
-                         when r013_ in ('1', '2') then '5'
-                         else '9'
-                    end);
-       end if;
-
-       if r020_ in ('2602','2622','9030','9031','9036','9500') and
-          r020_ || r013_ not in ('26021','26221','90301','90311','90361','95001','95003')
+       if r020_ in ('1602','2602','2622','9030','9031','9036','9500') and
+          r020_ || r013_ not in ('16024','26021','26221','90301','90311','90361','95001','95003')
        then
           s580_ := '9';
        end if;
@@ -999,7 +971,7 @@ BEGIN
                z.acc, z.accs, z.nd, a.nbs, nvl(p.r013, '0'),
                gl.p_icurval (a.kv, a.ost, dat_) ost
           FROM cc_accp z, sal a, specparam p
-         WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
+         WHERE z.acc in (select acc from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('16024','26021','26221','90301','90311','90361','95001','95003'))
            AND z.accs = a.acc
            and a.fdat=dat_
            AND a.acc = p.acc
@@ -1008,7 +980,7 @@ BEGIN
            and a.ost<0;
 
        -- сумма задолженности, кот. покрывает данный залог
-       for p in (select * from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('26021','26221','90301','90311','90361','95001','95003'))
+       for p in (select * from rnbu_trace where substr(kodp,2,4)||substr(kodp,7,1) in ('16024','26021','26221','90301','90311','90361','95001','95003'))
        loop
           acc_ := p.acc;
           rnk_ := p.rnk;
@@ -1968,33 +1940,39 @@ BEGIN
 
    DELETE FROM OTC_C5_PROC WHERE datf = dat_;
    commit;
-
+ 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
     select /*+ parallel(8) */
         dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
     from V_NBUR_#C5_DTL_TMP v, kl_f3_29 k
     where k.kf = '42' and k.ddd = '001' and
-        v.seg_02 = k.r020 and
+         v.seg_02 = k.r020 and
         (v.seg_01 = k.r012 or k.r012 = '3') and
         (
         (v.seg_02 like '___8' or v.seg_02 in ('1607','2607','2627','2657')) and
-        v.seg_02 not in ('1508','3108','3108','3118','3218','3548','3578','3568') and
-        v.seg_04 = '2'
-        or
-        (v.seg_02 like '___9') and
-        v.seg_02 not in ('1509','1819','2809','3049','3119','3219','3519','3599','3569','9129') and
-        v.seg_04 in ('2', '4')
-        or
+         v.seg_02 not in ('1508','3108','3108','3118','3218','3548','3578','3568') and
+         v.seg_04 = '2'
+         or
+        (v.seg_02 like '___9' and
+         v.seg_02 not in ('1509','1819','2809','3049','3119','3219','3519','3599','3569','9129') 
+         or
+         v.seg_02 like '___6' and 
+         v.seg_02 not in ('2806','3116','3216')
+         or
+         v.seg_02 in ('1535','2387','2397','2457')
+         ) and 
+         v.seg_04 in ('2', '4')
+         or
         not (substr(v.seg_02,1,3) in ('150','300','301','310','311','321') or
-             v.seg_02 in ('1607','2607','2627','2657','3040', '3692') or
+             v.seg_02 in ('1535','1607','2387','2397','2457','2607','2627','2657','3040', '3692') or
+             v.seg_02 like '___6'  or
              v.seg_02 like '___8'  or
              v.seg_02 like '___9')
         )
     order by seg_02, seg_01, acc_num;
 	commit;
     -----------------------------------------------------
-
 
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
@@ -2029,7 +2007,7 @@ BEGIN
         or
         v.seg_02 = '3005' and v.seg_03 in ('B') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3007' and v.seg_03 in ('6', 'B') and v.seg_04 in ('9')
+        v.seg_02 = '3007' and v.seg_03 in ('6', 'B') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3008' and v.seg_03 in ('6', 'B') and v.seg_04 in ('2')
         or
@@ -2043,7 +2021,11 @@ BEGIN
         or
         v.seg_02 = '3014' and v.seg_03 in ('N','O') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('2','5','8','9','A','B','E','F','J','K','N','O') and v.seg_04 in ('9')
+        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        or
+        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('4') 
+        or
+        v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3018' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
@@ -2055,8 +2037,7 @@ BEGIN
 	commit;
     -----------------------------------------------------
 
-
-   INSERT INTO otc_c5_proc
+    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
     select /*+ parallel(8) */
         dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
@@ -2085,6 +2066,12 @@ BEGIN
         or
         v.seg_02 = '3115' and v.seg_03 in ('2','5','6','7','A','B','C','D','E','F','K','L') and v.seg_04 in ('9')
         or
+        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        or
+        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('4')
+        or
+        v.seg_02 = '3116' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
+        or
         v.seg_02 = '3118' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3118' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2')
@@ -2099,8 +2086,7 @@ BEGIN
 	commit;
     -----------------------------------------------------
 
-
-   INSERT INTO otc_c5_proc
+    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
     select /*+ parallel(8) */
         dat_, cust_id, nd, acc_id, acc_num, kv, field_code, field_value
@@ -2118,6 +2104,12 @@ BEGIN
         v.seg_02 = '3213' and v.seg_03 in ('5','6','7','8','9','A')
         or
         v.seg_02 = '3214' and v.seg_03 in ('B','C')
+        or
+        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        or
+        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('4') 
+        or
+        v.seg_02 = '3216' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3218' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
@@ -2149,6 +2141,8 @@ BEGIN
         v.seg_02 = '3599' and v.seg_03 in ('1') and v.seg_04 in ('2') and v.acc_num not like '3570%'
         or
         v.seg_02 = '3560' and v.seg_03 in ('1','3')
+        or
+        v.seg_02 = '3566' and v.seg_03 in ('1','3') and v.seg_04 in ('2','4')
         or
         v.seg_02 = '3568' and v.seg_03 in ('1','3') and v.seg_04 in ('2')
         or

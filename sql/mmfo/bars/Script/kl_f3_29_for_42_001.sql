@@ -26,6 +26,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '1516', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '1518', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -47,6 +51,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '1524', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '1526', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -86,6 +94,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '1546', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '1548', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -122,6 +134,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2016', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2018', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -134,6 +150,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2026', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2028', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -143,6 +163,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2030', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2036', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -178,6 +202,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2046', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2048', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -194,6 +222,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2066', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2068', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -203,6 +235,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2071', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2076', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -218,6 +254,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2086', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2088', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -227,6 +267,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2103', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2106', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -242,6 +286,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2116', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2118', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -254,6 +302,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2126', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2128', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -263,6 +315,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2133', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2136', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -290,6 +346,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2146', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2148', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -299,6 +359,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2203', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2206', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -314,6 +378,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2216', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2218', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -326,6 +394,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2226', '11', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2228', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -335,6 +407,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2233', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2236', '11', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -362,6 +438,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2246', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2248', '11', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -375,6 +455,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2303', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2306', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -398,6 +482,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2316', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2317', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -415,6 +503,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2321', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2326', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -438,6 +530,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2336', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2337', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -458,6 +554,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2346', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2347', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -475,6 +575,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2353', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2356', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -506,6 +610,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2366', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2367', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -531,6 +639,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2373', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2376', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -610,6 +722,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2406', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2407', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -627,6 +743,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2411', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2416', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -650,6 +770,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '2426', '11', '3', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '2427', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -667,6 +791,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '2433', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '2436', '11', '3', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
@@ -886,6 +1014,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '3116', '22', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '3118', '22', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -934,6 +1066,10 @@ Insert into BARS.KL_F3_29
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
+   ('42', '3216', '22', '2', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
    ('42', '3218', '22', '1', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
@@ -971,6 +1107,10 @@ Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
    ('42', '3560', '11', '1', '001');
+Insert into BARS.KL_F3_29
+   (KF, R020, R050, R012, DDD)
+ Values
+   ('42', '3566', '21', '2', '001');
 Insert into BARS.KL_F3_29
    (KF, R020, R050, R012, DDD)
  Values
