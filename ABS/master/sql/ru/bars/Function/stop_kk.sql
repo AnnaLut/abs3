@@ -1,4 +1,5 @@
 CREATE OR REPLACE function BARS.Stop_KK ( p_ref  number )  RETURN NUMBER IS
+--21.05.2017 Sta Для простых и сложных(после разделения) КД
 --28.10.2015 Сухова  Дополнение к cck.CC_STOP ( ref_  int )
   l_nd number;
 begin
@@ -11,8 +12,9 @@ begin
 -------- OR  a.nbs='2063' and a.ob22='10'   OR  a.nbs='2062' and a.ob22='20' -------
            )   and a.dapp is null and a.dos = 0 and a.kos = 0 and a.ostc =0  and a.acc = n.acc ;
 
-     begin select n.nd into l_ND  from accounts a, nd_acc n where a.tip in ('SDI','S36')   and  a.ostc > 0  and n.nd = l_nd  and a.acc = n.acc  and rownum = 1;
-     EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-(20203),'\8999 - cck_OSBB: КД '||l_ND|| ' Не внесено початкову комсію' ) ;
+     begin select n.nd into l_ND  from accounts a, nd_acc n, CC_DEAL D  
+           where a.tip in ('SDI','S36')   and  a.ostc > 0 and n.nd = D.NDG and a.acc = n.acc  and d.ND = l_nd and rownum = 1 ;
+     EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-(20203),'\8999 - cck_OSBB(STOP_KK): КД '||l_ND|| ' Не внесено початкову комсію' )  ;
      end ;
   EXCEPTION WHEN NO_DATA_FOUND THEN null;
   end ;

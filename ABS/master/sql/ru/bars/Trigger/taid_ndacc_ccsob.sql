@@ -7,40 +7,23 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAID_NDACC_CCSOB ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAID_NDACC_CCSOB 
-after insert or delete on nd_acc for each row
-declare
-   l_nls    varchar2(20);
-   l_vidd   number;
+CREATE OR REPLACE TRIGGER BARS.TAID_NDACC_CCSOB
+after insert or delete ON BARS.ND_ACC for each row
+
+-- 24.05.2018 Sta  
+-- Сохранения события отвязки/привязки счета к договору в события по КД НЕзависимо от vidd ( біло только для 1,2,3,11,12,13)
+
 begin
 
--- Если ND - из "Портфеля овердрафтов" - не проверяем:
-  Begin
-    Select 1 into l_vidd from ACC_OVER
-    where ( ND=:new.ND or ND=:old.ND ) and rownum=1;
-    Return;
-  Exception when NO_DATA_FOUND then
-    null;
-  End;
-
-
--- Сохранения события отвязки/привязки счета к договору в события по КД (для vidd 1,2,3,11,12,13)
   if deleting then
-           select vidd into l_vidd from cc_deal where nd = :old.ND;
-           if l_vidd in (1,2,3,11,12,13) then
-              select nls||'/'||kv into l_nls from accounts where acc = :old.acc;
-              Insert into BARS.CC_SOB (     ND,    FDAT,   ID,     ISP,                          TXT, OTM, FREQ)
-                               Values (:old.ND, sysdate, null, user_id, 'От КД отвязан счет '|| l_nls,  6,    2);
-           end if;
+     Insert into CC_SOB (ND,FDAT,ISP,OTM,FREQ,TXT) select :old.ND, sysdate,gl.auid, 6,2, 'От Дог отвязан счет '||kv||'/'||nls from accounts where acc= :old.acc;
   elsif inserting then
-           select vidd into l_vidd from cc_deal where nd = :new.ND;
-           if l_vidd in (1,2,3,11,12,13) then
-              select nls||'/'||kv into l_nls from accounts where acc = :new.acc;
-              Insert into BARS.CC_SOB (     ND,    FDAT,   ID,     ISP,                           TXT, OTM, FREQ)
-                               Values (:new.ND, sysdate, null, user_id, 'К КД привязан счет '|| l_nls,   6,    2);
-           end if;
+     Insert into CC_SOB (ND,FDAT,ISP,OTM,FREQ,TXT) select :new.ND, sysdate,gl.auid, 6,2, 'К Дог привязан счет '||kv||'/'||nls from accounts where acc= :new.acc;
   end if;
-end;
+
+end TAID_NDACC_CCSOB ;
+
+
 /
 ALTER TRIGGER BARS.TAID_NDACC_CCSOB ENABLE;
 
