@@ -33,6 +33,7 @@ END msfz9;
 CREATE OR REPLACE PACKAGE BODY BARS.MSFZ9 is
 --------------------------------------------------------
 /*
+25/05/2018 LitvinSO Добавлено отбражение залогов
 11.04.2018 LitvinSO  Исправлена ошибка при схлопывании КД, и наследование доп.параметров перенесено на процедуру
 27.03.2018 VPogoda  замена get_nls на get_nls4rnk для того, чтобы, по возможности, генерить счета по маске старого счёта
 26.03.2018 LitvinSO Пока снята проверка на нулевые остатки по гривне
@@ -110,7 +111,7 @@ S36 (доходи майбутніх періодів ) БР 3600  (ОБ 22 09, 10).
 procedure PUL9  ( p_NDG cc_deal.ndG%type ) is
 begin
    PUL.put('NDG',p_NDG);
-   PUL.put('WACC','A.ACC in (select n.acc from nd_acc n,cc_deal d where d.ND =n.ND and d.ndg='||p_ndg||')');
+   PUL.put('WACC','A.ACC in (select n.acc from nd_acc n,cc_deal d where d.ND =n.ND and d.ndg='||p_ndg||' union select n.acc FROM ACCOUNTS n,cc_accp cp,CC_add d, cc_deal dd WHERE cp.accs = d.accs AND n.ACC = cp.ACC and d.nd =dd.nd and dd.ndg ='||p_ndg||')');
 end PUL9;
 
 
