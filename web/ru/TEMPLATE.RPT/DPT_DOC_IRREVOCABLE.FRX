@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="03/10/2016 15:58:27" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="11/28/2016 14:35:50" ReportInfo.CreatorVersion="2013.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRntj4mcV3u5Goi4DFChIm8Kw==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnXxwmfbvmyVWA+0NRbzl5qQ==">
       <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       (select b.name from branch b where b.branch = a.branch) as branch_name,&#13;&#10;       fost(a.acc,to_date (sysdate))/100 as summ,&#13;&#10;       f_sumpr(fost(a.acc,to_date (sysdate)), d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;      decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;&#13;&#10;(select type_name from dpt_types t  where  t.type_id in (select type_id from dpt_vidd dd where dd.vidd=d.vidd))  as d_vidd,&#13;&#10;&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls,&#13;&#10;       nvl (f_get_custw_h(c.rnk, 'SN_GC', sysdate),c.nmk) as fio_r&#13;&#10;       from dpt_deposit d, tabval t, accounts a, banks b, dpt_vidd v,customer c&#13;&#10; where c.rnk = d.rnk and&#13;&#10;   d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = (select da.dpt_id&#13;&#10;                         from dpt_agreements da&#13;&#10;                        where da.agrmnt_id = :p_agrmnt_id)">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
@@ -45,7 +45,7 @@
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       nvl (f_get_custw_h(c.rnk, 'SN_GC', sysdate),c.nmk) as fio_r,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce(p.cellphone, p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10;&#13;&#10;where c.rnk = &#13;&#10;(case when exists (select di.INHERIT_CUSTID from DPT_INHERITORS di, dpt_deposit d where &#13;&#10;                        di.dpt_id=d.deposit_id and d.deposit_id = (select da.dpt_id&#13;&#10;                                                                   from dpt_agreements da&#13;&#10;                                                                  where da.agrmnt_id = :p_agrmnt_id)) &#13;&#10;then &#13;&#10;(select di.INHERIT_CUSTID from DPT_INHERITORS di, dpt_deposit d where &#13;&#10;                        di.dpt_id=d.deposit_id and d.deposit_id = (select da.dpt_id&#13;&#10;                                                                   from dpt_agreements da&#13;&#10;                                                                  where da.agrmnt_id = :p_agrmnt_id) and rownum=1)&#13;&#10;else  :p_rnk end)">
@@ -159,41 +159,41 @@
           <TableCell Name="Cell318" Text="_____________________&#13;&#10;(підпис керівника установи Банку*)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="Table7" Left="434.7" Top="75.6" Width="274.05" Height="94.5">
+      <TableObject Name="Table7" Left="434.7" Top="47.25" Width="274.05" Height="122.85" GrowToBottom="true">
         <TableColumn Name="Column4" Width="54.81"/>
         <TableColumn Name="Column5" Width="54.81"/>
         <TableColumn Name="Column6" Width="54.81"/>
         <TableColumn Name="Column7" Width="54.81"/>
         <TableColumn Name="Column8" Width="54.81"/>
-        <TableRow Name="Row126">
+        <TableRow Name="Row126" Height="24.57">
           <TableCell Name="Cell279" Text="Голові правління  АТ „Ощадбанк”&#13;&#10;&lt;b&gt;Пишному А.Г.&lt;/b&gt;&#13;&#10;від &lt;b&gt;[CLIENT_DATA.FIO_R]&lt;/b&gt;&#13;&#10;Паспорт &lt;b&gt;[CLIENT_DATA.PASP_NO]&lt;/b&gt;&#13;&#10;Виданий &lt;b&gt;[CLIENT_DATA.PASP_ATRT] [CLIENT_DATA.PASP_DATE]&lt;/b&gt;" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="5" RowSpan="5"/>
           <TableCell Name="Cell280"/>
           <TableCell Name="Cell281"/>
           <TableCell Name="Cell282" Font="Times New Roman, 10pt" HtmlTags="true"/>
           <TableCell Name="Cell283"/>
         </TableRow>
-        <TableRow Name="Row127">
+        <TableRow Name="Row127" Height="24.57">
           <TableCell Name="Cell284"/>
           <TableCell Name="Cell285"/>
           <TableCell Name="Cell286"/>
           <TableCell Name="Cell287"/>
           <TableCell Name="Cell288"/>
         </TableRow>
-        <TableRow Name="Row128">
+        <TableRow Name="Row128" Height="24.57">
           <TableCell Name="Cell289"/>
           <TableCell Name="Cell290"/>
           <TableCell Name="Cell291"/>
           <TableCell Name="Cell292"/>
           <TableCell Name="Cell293"/>
         </TableRow>
-        <TableRow Name="Row129">
+        <TableRow Name="Row129" Height="24.57">
           <TableCell Name="Cell294"/>
           <TableCell Name="Cell295"/>
           <TableCell Name="Cell296"/>
           <TableCell Name="Cell297"/>
           <TableCell Name="Cell298"/>
         </TableRow>
-        <TableRow Name="Row130">
+        <TableRow Name="Row130" Height="24.57">
           <TableCell Name="Cell299"/>
           <TableCell Name="Cell300"/>
           <TableCell Name="Cell301"/>
@@ -202,7 +202,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="616.92" Width="718.2" Height="47.25">
+    <PageFooterBand Name="PageFooter1" Top="618.25" Width="718.2" Height="47.25">
       <BarcodeObject Name="Barcode1" Left="96.52" Top="28.35" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
       <TextObject Name="Text3" Left="283.5" Top="28.35" Width="425.25" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
       <TableObject Name="Table8" Left="9.45" Width="463.05" Height="18.9">
