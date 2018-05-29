@@ -69,6 +69,18 @@ where t.kf = '322669' and t.nd <= 180036459;
 dbms_output.put_line('Updated '||sql%rowcount||' rows in table SKRYNKA_ND_ARC for kf 322669');
 end if;
 
+------------------SKRYNKA_ND_ACC_322669_ND
+l_err := 'SKRYNKA_ND_ACC_322669_ND';
+select count(*) into l_cou from SKRYNKA_ND_ACC t 
+where t.kf = '322669' and t.nd <= 180036459
+   and substr(t.nd,-2) not in (select tt.ru from kf_ru tt where tt.kf = t.kf);
+
+if l_cou>0 then
+update SKRYNKA_ND_ACC t
+set t.nd = t.nd * 100 + 11
+where t.kf = '322669' and t.nd <= 180036459;
+dbms_output.put_line('Updated '||sql%rowcount||' rows in table SKRYNKA_ND_ACC for kf 322669');
+end if;
 ------------- 
 commit;
 
