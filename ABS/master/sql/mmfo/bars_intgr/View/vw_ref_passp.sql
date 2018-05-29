@@ -2,7 +2,7 @@ prompt view/vw_ref_passp.sql
 create or replace force view bars_intgr.vw_ref_passp as
 select cast(bars.F_OURMFO_G as varchar2(6)) MFO, 
 PASSP, 
-t.NAME, 
+cast(t.NAME as varchar2(250)) as "NAME", 
 PSPTYP, 
 NRF, 
 REZID 
