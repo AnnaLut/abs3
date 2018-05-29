@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="04/30/2015 10:24:22" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="06/21/2016 20:40:33" ReportInfo.CreatorVersion="2013.2.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,8 +46,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnLPinq2B93jVCrLEdUJ9n5A==">
-      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnHS2EZaikwhc6UspvVPZc4w==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, trunc(sysdate)) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, trunc(sysdate)), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
         <Column Name="END_DATE" DataType="System.String"/>
@@ -88,10 +88,10 @@ namespace FastReport
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
-      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce((select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'MPNO '), p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce(p.cellphone, p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
         <Column Name="FIO" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="CODCAGENT" DataType="System.String"/>
@@ -222,8 +222,8 @@ namespace FastReport
           <TableCell Name="Cell348" Border.Lines="All" Text="Телефон  &lt;b&gt;[CLIENT_DATA.PHONE]&lt;/b&gt;&#13;&#10;Електронна пошта: &lt;b&gt;[CLIENT_DATA.EMAIL]&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row166" Height="28.35">
-          <TableCell Name="Cell349" Border.Lines="All" Text="     М. п&#13;&#10;                   Банк __________________________ Підпис" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
-          <TableCell Name="Cell350" Border.Lines="All" Text="&#13;&#10;               Вкладник_____________________ Підпис&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+          <TableCell Name="Cell349" Border.Lines="All" Text="     М. п&#13;&#10;                   Банк __________________________ПІБ, Підпис" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+          <TableCell Name="Cell350" Border.Lines="All" Text="&#13;&#10;               Вкладник_____________________ПІБ, Підпис&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
         </TableRow>
         <TableRow Name="Row167" Height="9.45">
           <TableCell Name="Cell351" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
@@ -235,7 +235,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="966.74" Width="718.2" Height="18.9">
+    <PageFooterBand Name="PageFooter1" Top="965.94" Width="718.2" Height="18.9">
       <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
       <TextObject Name="Text2" Left="264.6" Width="444.15" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
     </PageFooterBand>

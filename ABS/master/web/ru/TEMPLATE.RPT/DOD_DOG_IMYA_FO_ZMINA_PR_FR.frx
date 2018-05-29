@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="04/30/2015 11:41:08" ReportInfo.CreatorVersion="2013.3.2.0">
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="06/21/2016 21:16:05" ReportInfo.CreatorVersion="2013.2.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRn4Yngk2arrqs/YfgljdXmNA==">
-      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       upper(bt.type_name) as type_name,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b, dpt_vidd bv, dpt_types bt&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.vidd = BV.VIDD&#13;&#10;   and bv.type_id = bt.type_id&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqZLE460ApuhBq9nxfsVEDUjsnvJzXtSTPbWY4MKJi2yK6Cw7h6oGX20YJkb5YAkRnD4R6FgRYRk9g0ilsaQNq7Q==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       upper(bt.type_name) as type_name,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc,trunc(sysdate)) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc,trunc(sysdate)), '', 'M', 3) as rate_w,&#13;&#10;       decode(d.freq,&#13;&#10;              5,&#13;&#10;              'щомісячно',&#13;&#10;              7,&#13;&#10;              'щоквартально',&#13;&#10;              360,&#13;&#10;              'щорічно',&#13;&#10;              400,&#13;&#10;              'разом з поверненням Депозиту',&#13;&#10;              (select name from freq where freq = d.freq)) as freq_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b, dpt_vidd bv, dpt_types bt&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.vidd = BV.VIDD&#13;&#10;   and bv.type_id = bt.type_id&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
         <Column Name="ID" DataType="System.String"/>
         <Column Name="DEALDATE" DataType="System.String"/>
         <Column Name="END_DATE" DataType="System.String"/>
@@ -44,10 +44,10 @@
         <Column Name="CRT_BRANCH" DataType="System.String"/>
         <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
         <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
-        <Column Name="EA_STRUCT_ID" DataType="System.Decimal"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
         <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
       </TableDataSource>
-      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce((select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'MPNO '), p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       case c.codcagent&#13;&#10;         when 5 then 'резидент'&#13;&#10;         when 6 then 'нерезидент'&#13;&#10;         else '--'&#13;&#10;       end as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       f_customer_address(c.rnk, 1) as address_registration,&#13;&#10;       f_customer_address(c.rnk, 2) as address_residence,&#13;&#10;       coalesce(p.cellphone, p.teld, p.telw, '________') as phone,&#13;&#10;       (select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'EMAIL') as EMAIL&#13;&#10;  from customer c&#13;&#10;  left join person p on (p.rnk = c.rnk)&#13;&#10; where c.rnk = :p_rnk&#13;&#10;">
         <Column Name="FIO" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="CODCAGENT" DataType="System.String"/>
@@ -67,7 +67,7 @@
         <Column Name="IR_W" DataType="System.String"/>
         <CommandParameter Name="p_agr_id" DataType="113" Expression="[p_agr_id]" DefaultValue="-1"/>
       </TableDataSource>
-      <TableDataSource Name="Table9" Alias="AGRMNT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="SELECT da.agrmnt_id,&#13;&#10;       da.agrmnt_date,&#13;&#10;       f_dat_lit (da.agrmnt_date) AS agrmnt_date_w,&#13;&#10;       da.agrmnt_num,&#13;&#10;       NVL (da.date_begin, d.DAT_BEGIN) AS date_begin,&#13;&#10;       NVL (da.date_end, d.dat_end) AS date_end,&#13;&#10;       f_dat_lit (NVL (da.date_end, d.dat_end)) AS date_end_w,&#13;&#10;        F_DOC_ADD(da.agrmnt_id, 5) as term_calc,&#13;&#10;       NVL (F_DOC_ADD (da.agrmnt_id, 1), f_doc_dpt (d.deposit_id, 3, 2))&#13;&#10;          AS term_calc_w,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       DPT_WEB.GET_DPTRATE (d.acc,d.kv,d.limit,bankdate) as rate,&#13;&#10;       f_sumpr(DPT_WEB.GET_DPTRATE (d.acc,d.kv,d.limit,bankdate), '', 'M', 3) as rate_w&#13;&#10;  FROM dpt_agreements da, DPT_DEPOSIT d&#13;&#10; WHERE da.agrmnt_id = :p_agrmnt_id AND da.dpt_id = d.deposit_id">
+      <TableDataSource Name="Table9" Alias="AGRMNT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="SELECT da.agrmnt_id,&#13;&#10;       da.agrmnt_date,&#13;&#10;       f_dat_lit (da.agrmnt_date) AS agrmnt_date_w,&#13;&#10;       da.agrmnt_num,&#13;&#10;       NVL (da.date_begin, d.DAT_BEGIN) AS date_begin,&#13;&#10;       NVL (da.date_end, d.dat_end) AS date_end,&#13;&#10;       f_dat_lit (NVL (da.date_end, d.dat_end)) AS date_end_w,&#13;&#10;        F_DOC_ADD(da.agrmnt_id, 5) as term_calc,&#13;&#10;       NVL (F_DOC_ADD (da.agrmnt_id, 1), f_doc_dpt (d.deposit_id, 3, 2))&#13;&#10;          AS term_calc_w,&#13;&#10;       fost (D.ACC, bankdate) / 100 AS summ,&#13;&#10;       f_sumpr (fost (D.ACC, bankdate), d.kv, 'F') AS sum_w,&#13;&#10;       NVL (DA.RATE_VALUE, dpt.fproc (d.acc, bankdate)) AS rate,&#13;&#10;       f_sumpr (NVL (DA.RATE_VALUE, dpt.fproc (d.acc, bankdate)),&#13;&#10;                '',&#13;&#10;                'M',&#13;&#10;                3)&#13;&#10;          AS rate_w&#13;&#10;  FROM dpt_agreements da, DPT_DEPOSIT d&#13;&#10; WHERE da.agrmnt_id = :p_agrmnt_id AND da.dpt_id = d.deposit_id">
         <Column Name="AGRMNT_ID" DataType="System.Decimal"/>
         <Column Name="AGRMNT_DATE" DataType="System.DateTime"/>
         <Column Name="AGRMNT_NUM" DataType="System.Int64"/>
@@ -116,11 +116,11 @@
           <TableCell Name="Cell332"/>
         </TableRow>
         <TableRow Name="Row5" Height="66.15" AutoSize="true">
-          <TableCell Name="Cell21" Text="	«1.1. Вкладник вносить, а Банк приймає на вкладний (депозитний) рахунок № &lt;b&gt;[DPT_DATA.NLSD]&lt;/b&gt; (в подальшому – Рахунок) на умовах цього Договору кошти в сумі &lt;b&gt;[FormatNumber([AGRMNT_DATA.SUMM], 2)]&lt;/b&gt; (&lt;b&gt;[AGRMNT_DATA.SUM_W]&lt;/b&gt;) (в подальшому – Депозит) строком на &lt;b&gt; [AGRMNT_DATA.TERM_CALC]&lt;/b&gt;.&#13;&#10;	Днем повернення Депозиту є &lt;b&gt;[AGRMNT_DATA.DATE_END_W]&lt;/b&gt;." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell21" Text="	 «1.1. Вкладник вносить, а Банк приймає на вкладний (депозитний) рахунок № &lt;b&gt;[DPT_DATA.NLSD]&lt;/b&gt; (в подальшому – Рахунок) на умовах цього Договору кошти в сумі &lt;b&gt;[DPT_DATA.SUMM]&lt;/b&gt; (&lt;b&gt;[DPT_DATA.SUM_W]&lt;/b&gt;) &lt;b&gt;[DPT_DATA.KV]&lt;/b&gt; (в подальшому – Депозит) строком на &lt;b&gt;[DPT_DATA.TERM_CALC]&lt;/b&gt;.&#13;&#10;	Днем повернення Депозиту є &lt;b&gt;[DPT_DATA.END_DATE]&lt;/b&gt;.	" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
           <TableCell Name="Cell22" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row173" AutoSize="true">
-          <TableCell Name="Cell383" Text="	1.2. Процентна ставка за Депозитом встановлюється в розмірі &lt;b&gt;[AGRMNT_DATA.RATE]&lt;/b&gt; (&lt;b&gt;[AGRMNT_DATA.RATE_W]&lt;/b&gt;) % річних." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell383" Text="	1.2. Процентна ставка за Депозитом встановлюється в розмірі &lt;b&gt;[FormatNumber([DPT_DATA.RATE], 2)]&lt;/b&gt; (&lt;b&gt;[DPT_DATA.RATE_W]&lt;/b&gt;) % річних." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
           <TableCell Name="Cell384"/>
         </TableRow>
         <TableRow Name="Row174" Height="47.25">
@@ -145,7 +145,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="606.79" Width="718.2" Height="294.95">
+    <DataBand Name="Data2" Top="605.99" Width="718.2" Height="294.95">
       <TableObject Name="Table10" Left="9.45" Width="718.16" Height="294.95" CanBreak="false">
         <TableColumn Name="Column7" Width="359.08"/>
         <TableColumn Name="Column8" Width="359.08"/>
@@ -186,8 +186,8 @@
           <TableCell Name="Cell348" Border.Lines="All" Text="Телефон  &lt;b&gt;[CLIENT_DATA.PHONE]&lt;/b&gt;&#13;&#10;Електронна пошта: &lt;b&gt;[CLIENT_DATA.EMAIL]&lt;/b&gt;&#13;&#10;" Font="Times New Roman, 9pt" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row166" Height="28.35">
-          <TableCell Name="Cell349" Border.Lines="All" Text="     М. п&#13;&#10;                   Банк __________________________ Підпис" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
-          <TableCell Name="Cell350" Border.Lines="All" Text="&#13;&#10;               Вкладник_____________________ Підпис&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+          <TableCell Name="Cell349" Border.Lines="All" Text="     М. п&#13;&#10;                   Банк __________________________ПІБ, Підпис" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
+          <TableCell Name="Cell350" Border.Lines="All" Text="&#13;&#10;               Вкладник_____________________ПІБ, Підпис&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 9pt" RowSpan="2"/>
         </TableRow>
         <TableRow Name="Row167" Height="9.45">
           <TableCell Name="Cell351" Border.Lines="All" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
@@ -199,7 +199,7 @@
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="904.57" Width="718.2" Height="37.8">
+    <PageFooterBand Name="PageFooter1" Top="902.98" Width="718.2" Height="37.8">
       <BarcodeObject Name="Barcode1" Left="96.52" Top="18.9" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
       <TextObject Name="Text2" Left="481.95" Top="18.9" Width="217.35" Height="18.9" Text="Сторінка [Page] з [TotalPages]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
       <TableObject Name="Table5" Left="368.55" Width="330.75" Height="18.9">
