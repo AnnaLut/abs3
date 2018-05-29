@@ -1719,11 +1719,17 @@ namespace DocInput
                     rdr = cmd.ExecuteReader();
                     if (!rdr.Read()) throw new Exception("Операция " + TT + " не найдена, недоступна пользователю или запрещена для ручного ввода.");
                 }
+                
+
+                try { TT_Flags = Convert.ToString(rdr.GetValue(1)); }
+                catch (InvalidCastException) { TT_Flags = string.Empty; }
+                if(TT_Flags[13] == '1')
+                {
+                    throw new Exception("Операція " + TT + " створена автоматично - створення/дублювання документів заборонено");
+                }
 
                 try { TT_Name = rdr.GetOracleString(0).Value; }
                 catch (InvalidCastException) { TT_Name = string.Empty; }
-                try { TT_Flags = Convert.ToString(rdr.GetValue(1)); }
-                catch (InvalidCastException) { TT_Flags = string.Empty; }
                 try { TT_KvA = Convert.ToString(rdr.GetValue(2)).Trim(); }
                 catch (InvalidCastException) { TT_KvA = string.Empty; }
                 try { TT_KvB = Convert.ToString(rdr.GetValue(3)).Trim(); }
