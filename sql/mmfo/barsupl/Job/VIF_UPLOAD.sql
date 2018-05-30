@@ -12,7 +12,7 @@ begin
                                         p_hostname  => null,
                                         p_appname   => ''UPLD:VIF_UPLOAD_'||rec.kf||';group=15;null;'||rec.kf||''');
              bars.bc.go('''||rec.kf||''');
-             barsupl.bars_upload_usr.routine_for_job( trunc(sysdate)-1 , 15,1,0,1,1,'''||rec.kf||''');
+             barsupl.bars_upload_usr.routine_for_job( bars.dat_next_u(bars.gl.bd, -1) , 15,1,0,1,1,'''||rec.kf||''');
         end;',
                                         start_date          => to_date('10-02-2017 15:47:38', 'dd-mm-yyyy hh24:mi:ss'),
                                         repeat_interval     => 'Freq=DAILY;ByDay=MON,TUE,WED,THU,FRI;ByHour=13;ByMinute=00;BySecond=0',
@@ -25,6 +25,18 @@ begin
             when others then 
                 if sqlcode = -27477 then null; else raise; end if;
         end;
+        begin
+            sys.dbms_scheduler.set_attribute(name => 'BARSUPL.VIF_UPLOAD_'||rec.kf, attribute => 'job_action', value => 
+            'begin
+                   bars.bars_login.login_user(p_sessionid => substr(sys_guid(), 1, 32),
+                                              p_userid    => 220301,
+                                              p_hostname  => null,
+                                              p_appname   => ''UPLD:VIF_UPLOAD_'||rec.kf||';group=15;null;'||rec.kf||''');
+                   bars.bc.go('''||rec.kf||''');
+                   barsupl.bars_upload_usr.routine_for_job( bars.dat_next_u(bars.gl.bd, -1) , 15,1,0,1,1,'''||rec.kf||''');
+              end;');
+        end;
+
     end loop;
 end;
 /
