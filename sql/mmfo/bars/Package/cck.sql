@@ -1182,6 +1182,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
 
   /*
 22.05.2018 Sta PROCEDURE lim_bdate: Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
+               FUNCTION cc_stop: Для операции КК1 + дебет счета SS - для проверки нач.комиссии
 17.05.2018 Sta  PROCEDURE cc_day_lim + PROCEDURE lim_bdate  Обновление cc_deal.limit, cc_add.s, accounts.ostx по суб.дог
 
 16.05.2018 Sta Вынос на просрочку тела КЛ после разделения   PROCEDURE cc_asp
@@ -5322,9 +5323,12 @@ CREATE OR REPLACE PACKAGE BODY cck IS
 
      --  Проверка на выдачу дисконта    14.02.2018 Sta Анализ НЕ-нул.остатка комиссии перед выдачей кредита (при наличии доп.реквизита по комиссии)
     BEGIN   -- к какому дог привязан ссудный счет, с которого происходит выдача ? И есть ли на нем доп.реквизит про комиссию
-       SELECT cck_app.to_number2(t.txt), d.nd, d.ndG, d.vidd    INTO l_sdi, l_nd, l_ndG, l_vidd  FROM nd_txt t, accounts a, oper o, nd_acc n, cc_deal d
+        SELECT cck_app.to_number2(t.txt), d.nd, d.ndG, d.vidd    
+       INTO l_sdi, l_nd, l_ndG, l_vidd  
+       FROM nd_txt t, accounts a, oper o, nd_acc n, cc_deal d
        WHERE t.tag = 'S_SDI'  AND t.nd = n.nd  AND n.acc = a.acc
-         AND n.nd = d.nd      AND d.sos < 14   AND decode(o.dk, 1, o.nlsa, o.nlsb) = a.nls    AND decode(o.dk, 1, o.kv, o.kv2) = a.kv   AND o.ref = ref_;
+         AND n.nd  = d.nd     AND d.sos < 14   AND decode(o.dk, 1, o.nlsa, o.nlsb) = a.nls    AND decode(o.dk, 1, o.kv, o.kv2) = a.kv   AND o.ref = ref_
+         and a.tip = 'SS ' ;
     EXCEPTION  WHEN OTHERS THEN     l_sdi := 0;
 
 
