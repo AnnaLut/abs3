@@ -1,8 +1,6 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/branch_utl.sql =========*** Run *** 
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/branch_utl.sql =========*** Run *** 
+PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.BRANCH_UTL is
 
@@ -18,12 +16,16 @@
    --  константы
    ----------------------------------------------
 
-   G_HEADER_VERSION    constant varchar2(64) := 'version 1.0  08.02.2016';
+   G_HEADER_VERSION    constant varchar2(64) := 'version 1.1  30.05.2018';
 
    G_KF_LENGTH constant number:= 6; -- xxxxxx
    G_BRANCH_LV1_CODE_LENGTH constant number:= 8; -- /xxxxxx/
    G_BRANCH_LV2_CODE_LENGTH constant number:= 15; -- /xxxxxx/xxxxxx/
    G_BRANCH_LV3_CODE_LENGTH constant number:= 22; -- /xxxxxx/xxxxxx/xxxxxx/
+
+   G_BRANCH_LV1_CODE constant number:= 1;
+   G_BRANCH_LV2_CODE constant number:= 2;
+   G_BRANCH_LV3_CODE constant number:= 3;
 
    -----------------------------------------------------------------
    -- HEADER_VERSION()
@@ -53,6 +55,13 @@
                  p_opendate    date,
                  p_closedate   date);
 
+  --------------------------------------------------------------
+  --
+  --  GET_BRANCH_LEVEL
+  --
+  --  Отдать уровень ьранча
+  --
+  function get_branch_level(p_branch_code varchar2) return number;
 
     --------------------------------------------------------------
     --
@@ -116,7 +125,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BRANCH_UTL is
    --  константы
    ----------------------------------------------
 
-   G_BODY_VERSION    constant varchar2(64) := 'version 1.0  08.02.2016';
+   G_BODY_VERSION    constant varchar2(64) := 'version 1.1  30.05.2018';
    G_TRACE           constant varchar2(50) := 'branch_utl.';
    G_MODULE          constant varchar2(50) := 'BCH';
 
@@ -144,6 +153,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.BRANCH_UTL is
    begin
        return 'package body branch_utl: ' || G_BODY_VERSION;
    end body_version;
+
+
+  --------------------------------------------------------------
+  --
+  --  GET_BRANCH_LEVEL
+  --
+  --  Отдать уровень ьранча
+  --
+  function get_branch_level(p_branch_code varchar2) return number
+  is
+  begin
+    case length(p_branch_code) 
+         when   G_BRANCH_LV1_CODE_LENGTH then return G_BRANCH_LV1_CODE;
+         when   G_BRANCH_LV2_CODE_LENGTH then return G_BRANCH_LV2_CODE;
+         when   G_BRANCH_LV3_CODE_LENGTH then return G_BRANCH_LV3_CODE;
+         else return 0;
+    end case;          
+  end;
 
 
   --------------------------------------------------------------
@@ -283,14 +310,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.BRANCH_UTL is
     end;
 end;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  BRANCH_UTL ***
 grant EXECUTE                                                                on BRANCH_UTL      to BARS_ACCESS_DEFROLE;
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/branch_utl.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/branch_utl.sql =========*** End *** 
+PROMPT ===================================================================================== 

@@ -1,3 +1,4 @@
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Package/DPT_WEB.sql =============*** Run ***
 PROMPT ===================================================================================== 
@@ -7,7 +8,7 @@ is
   --
   -- основной пакет процедур для работы модуля "Вклады населения-WEB"
   --
-  g_header_version  constant varchar2(32)  := 'version 40.01  05.07.2017';
+  g_header_version  constant varchar2(32)  := 'version 40.02  30.05.2018';
   g_awk_header_defs constant varchar2(512) := 'расширенный функционал: '                              || chr(10) ||
                                               '  - учет доп.соглашений'                               || chr(10) ||
                                               '  - формирование запросов'                             || chr(10) ||
@@ -372,6 +373,14 @@ is
                               p_branch in dpt_deposit.branch%type, -- код подразделения
                               p_bdate  in fdat.fdat%type); -- текущая банковская дата
 
+  --
+  -- Закрытие депозитных договоров в архив (опт)
+  --
+  procedure auto_move2archive_opt
+  ( p_runid  in dpt_jobs_jrnl.run_id%type -- № запуска автомат.задания
+  , p_bdate  in fdat.fdat%type            -- текущая банковская дата
+  );
+  
   --
   -- Изменение процентной ставки на 0% по окончанию срока депозитных договоров
   --
@@ -1047,7 +1056,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.09  16.05.2018';
+  g_body_version  constant varchar2(32)  := 'version 48.10  30.05.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -1191,14 +1200,13 @@ is
                        when p_method = 0 then
                         '  where branch = :p_branch ' || nlchr
                        when p_method = 1 then
-                        '  where dat_end is not null  and branch = :p_branch ' ||
-                        nlchr
+                        '  where dat_end is not null  and branch = :p_branch ' || nlchr
                        when p_method = 2 then
-                        '  where dat_end is null and branch = :p_branch ' ||
-                        nlchr
+                        '  where dat_end is null and branch = :p_branch ' || nlchr
                        when p_method = 9 then
-                        '  where dat_end is not null and dat_end between :p_dat1 and :p_dat2 ' ||
-                        nlchr
+                        '  where dat_end is not null and dat_end between :p_dat1 and :p_dat2 ' || nlchr
+                       when p_method = 11 then
+                        '  where branch like :p_branch ' || nlchr
                      end || case
                        when p_method != 0 then
                         '    and rownum <= rownum + 1 ' || nlchr
@@ -2409,7 +2417,7 @@ is
     l_ea_id          ead_docs.id%type;
     l_ea_blob        blob := utl_raw.cast_to_raw(''); -- пустой BLOB для отправки в ЕА (идет не скан-документ, а сообщение о его необходимости)
     l_archdocid      number;
-	l_typecod        dpt_vidd.type_cod%type;
+  l_typecod        dpt_vidd.type_cod%type;
   begin
 
     l_valid_mobphone := bars.verify_cellphone_byrnk(p_rnk);
@@ -2800,53 +2808,55 @@ is
 
   end prolongation_create_text;
   -- ======================================================================================
-  function acc_closing_permitted(p_acc in accounts.acc%type,
-                                 p_sos in sos.sos%type) return number is
+  function acc_closing_permitted
+  ( p_acc  in  accounts.acc%type
+  , p_sos  in  sos.sos%type
+  ) return number is
     -- p_sos = 0 - НЕ допускается наличие никаких остатков
     --         1 - допускается наличие только планового остатка
     --         3 - допускается наличие планового/форвардного остатков
-    --         5 - допускается наличие плановых/форвардных/фактических остатков
-    --         9 - допускается наличие только фактического остатка и движений за сегодня
-    title   varchar2(60) := 'dptweb.accclospermit:';
+    title   varchar2(64) := 'dptweb.acc_closing_permitted:';
     l_flag  number(1) := 0;
-    l_bdate date := gl.bdate;
     l_dapp  date;
   begin
 
-    bars_audit.trace('%s entry, acc=>%s, sos=>%s, gl.bdate=>%s',
-                     title,
-                     to_char(p_acc),
-                     to_char(p_sos),
-                     to_char(l_bdate, 'dd.mm.yyyy'));
-
-    select max(fdat)
-      into l_dapp
-      from saldoa
-     where dos + kos > 0
-       and acc = p_acc;
+    bars_audit.trace( '%s entry, acc=>%s, sos=>%s, gl.bdate=>%s', title
+                    , to_char(p_acc), to_char(p_sos), to_char(gl.bdate, 'dd.mm.yyyy') );
 
     begin
       select 1
         into l_flag
-        from accounts
-       where acc = p_acc
-         and (p_sos = 0 and ostc = 0 and ostb = 0 and ostf = 0 and
-             (l_dapp is null or l_dapp < l_bdate) or
-             p_sos = 1 and ostc = 0 and ostf = 0 and
-             (l_dapp is null or l_dapp < l_bdate) or
-             p_sos = 3 and ostc = 0 and
-             (l_dapp is null or l_dapp < l_bdate) or p_sos = 5 or
-             p_sos = 9 and ostb = 0 and ostf = 0);
+        from ACCOUNTS
+       where ACC = p_acc
+         and ( p_sos = 0 and ostc = 0 and ostb = 0 and ostf = 0
+            or p_sos = 1 and ostc = 0 and ostf = 0
+            or p_sos = 3 and ostc = 0 );
     exception
       when no_data_found then
         l_flag := 0;
     end;
 
+    if ( l_flag = 1 ) then
+      select max(FDAT)
+        into l_dapp
+        from SALDOA
+       where DOS + KOS > 0
+         and ACC = p_acc;
+
+      if ( l_dapp >= gl.bdate )
+      then
+        l_flag := 0;
+      end if;
+    end if;
+
     bars_audit.trace('%s exit with %s', title, to_char(l_flag));
+
     return l_flag;
 
   end acc_closing_permitted;
-
+  
+  -- ======================================================================================
+  
   function dpt_closing_permitted(p_dpt in dpt_deposit.deposit_id%type)
     return number is
     title  varchar2(60) := 'dptweb.dpt_closing_permitted:';
@@ -2917,25 +2927,21 @@ is
   -- перевірка на належність вкладного рахунка до діючого кредитного договору
   --
   function check_belongs_credit(p_acc in accounts.acc%type) return number is
-    title  varchar2(60) := 'dptweb.check_belongs_credit: ';
-    l_flag number(1);
+   title  varchar2(64) := 'dptweb.check_belongs_credit';
+   l_flag number(1);
   begin
 
-    bars_audit.trace('%s entry, acc=>%s', title, to_char(p_acc));
+    bars_audit.trace('%s: Entry, acc=>%s', title, to_char(p_acc));
 
-    begin
-      select 1
-        into l_flag
-        from bars.cc_deal c, bars.nd_acc n
-       where n.acc = p_acc
-         and c.nd = n.nd
-         and c.sos < 14;
-    exception
-      when no_data_found then
-        l_flag := 0;
-    end;
+    select sign(count(1))
+      into l_flag
+      from CC_DEAL c
+      join ND_ACC  n
+        on ( n.ND = c.ND )
+     where n.ACC = p_acc
+       and c.SOS < 14;
 
-    bars_audit.trace('%s exit with %s', title, to_char(l_flag));
+    bars_audit.trace('%s: Exit with %s', title, to_char(l_flag));
 
     return l_flag;
 
@@ -3052,10 +3058,7 @@ is
     l_title varchar2(60) := 'dpt_web.close_to_archive: ';
   begin
     bars_audit.trace('%s тип закрытия = %s, договор № %s, счет acc=%s',
-                     l_title,
-                     p_type,
-                     to_char(p_dptid),
-                     to_char(p_accid));
+                     l_title, p_type, to_char(p_dptid), to_char(p_accid));
 
     if p_type = 'DPT' then
 
@@ -3066,32 +3069,29 @@ is
        where dpt_id = p_dptid
          and nvl(agrmnt_state, 9) > 0;
       if sql%rowcount > 0 then
-        bars_audit.trace('%s закрыты все доп.соглашения по договору № %s',
-                         l_title,
-                         to_char(p_dptid));
+        bars_audit.trace('%s закрыты все доп.соглашения по договору № %s', l_title, to_char(p_dptid));
       end if;
-      bars_audit.trace('%s закрытие необработанных запросов',
-                       l_title);
+      bars_audit.trace('%s закрытие необработанных запросов', l_title);
       close_requests(p_dptid    => p_dptid,
                      p_typecode => null,
                      p_delbonus => 0);
 
       -- закрытие договора
       delete from dpt_deposit where deposit_id = p_dptid;
-
+      -- видалення дод. реквізитів
+      delete DPT_DEPOSITW where DPT_ID = p_dptid;
+      
       if sql%rowcount = 0 then
         bars_error.raise_nerror(g_modcode,
                                 'DPT_CLOSE_ERR',
                                 to_char(p_dptid));
       else
-
         bars_audit.trace('%s закрыт договор № %s',
                          l_title,
                          to_char(p_dptid));
         close_sto_argmnt(p_dptid    => p_dptid,
                          p_accid    => null,
                          p_argmntid => null);
-
       end if;
 
     elsif p_type = 'ACC' then
@@ -3101,20 +3101,14 @@ is
          set dazs = decode(daos, p_dat, dat_next_u(p_dat, 1), p_dat)
        where acc = p_accid
          and dazs is null;
-
-      -- счет м.д. закрыт (последствия миграции)
-      -- IF SQL%ROWCOUNT = 0 THEN
-      --   bars_error.raise_nerror(g_modcode, 'ACC_CLOSE_ERR', to_char(p_accid));
-      -- ELSE
-      bars_audit.trace('%s закрыт счет acc = %s',
-                       l_title,
-                       to_char(p_accid));
-      -- END IF;
+     
+      if sql%rowcount > 0
+      then
+        bars_audit.trace( '%s закрыт счет acc = %s', l_title, to_char(p_accid) );
+      end if;
 
     else
-
       null;
-
     end if;
 
   end close_to_archive;
@@ -6534,7 +6528,13 @@ is
       return;
     end if;
 
-    l_method := 10; -- специальный метод начисления %% по всему массиву депозитов
+    if ( p_branch like '/______/______/' )
+    then --
+      l_method := 11;
+    else -- специальный метод начисления %% по всему массиву депозитов
+      l_method := 10;
+    end if;
+    
     --
     igen_intstatement(l_method, p_dptid, int_statement);
     --
@@ -6548,6 +6548,10 @@ is
     begin
       dbms_sql.parse(l_cursor, int_statement, dbms_sql.native);
       dbms_sql.bind_variable(l_cursor, 'p_acrdat', l_acrdate);
+      if ( l_method = 11 )
+      then
+        dbms_sql.bind_variable(l_cursor, 'p_branch', p_branch||'%');
+      end if;
       l_tmpnum := dbms_sql.execute(l_cursor);
       dbms_sql.close_cursor(l_cursor);
     exception
@@ -8026,15 +8030,15 @@ is
 
     --COBUMMFO-6387
     select ddd.deposit_id, ddd.nd, ddd.vidd, ddd.rnk, ddd.acc,
-		ia.acra,
+    ia.acra,
                (case
                  when dv.amr_metr > 0 then
                   ia.acrb
                  else
                   null
                end),
-	       a.nls,
-		a.kv,
+         a.nls,
+    a.kv,
                a.blkd
       bulk collect
       into l_dpt
@@ -8228,6 +8232,222 @@ is
     end if;
 
   end auto_move2archive;
+  
+  ------------------
+  procedure auto_move2archive_opt
+  ( p_runid  in  dpt_jobs_jrnl.run_id%type -- Ід. запуску автомат.завдання
+  , p_bdate  in  fdat.fdat%type            -- текущая банковская дата
+  ) is
+    title        constant varchar2(64) := $$PLSQL_UNIT||'AUTO_MOVE2ARCHIVE_OPT';
+    l_jobid      constant dpt_jobs_list.job_id%type := 249; -- Ідентифікатор завдання
+    l_runid      dpu_jobs_jrnl.run_id%type;                 -- Ідентификатор запуску
+    type t_dptaccrec is record
+    ( dptid      dpt_deposit.deposit_id%type
+    , dptnum     dpt_deposit.nd%type
+    , dptype     dpt_deposit.vidd%type
+    , custid     dpt_deposit.rnk%type
+    , depacc     accounts.acc%type
+    , intacc     accounts.acc%type
+    , amracc     accounts.acc%type
+    , accnum     accounts.nls%type
+    , curid      accounts.kv%type
+    , blkd       accounts.blkd%type
+    );
+    type t_dptacclist is table of t_dptaccrec;
+    t_dpt        t_dptacclist;
+    l_branch     dpt_deposit.branch%type;
+    l_errmsg     sec_audit.rec_message%type;
+    cursor c_dpt
+        is select d.DEPOSIT_ID, d.ND, d.VIDD, d.RNK, d.ACC
+                , i.ACRA, case when v.amr_metr > 0 then i.ACRB else null end
+                , a.NLS, a.KV, a.BLKD
+             from ( select d.KF, d.DEPOSIT_ID, d.ND, d.VIDD, d.RNK, d.ACC
+                      from DPT_DEPOSIT d
+                     where d.DAT_END <= p_bdate
+                     union all -- достроково повернуті
+                    select d.KF, d.DEPOSIT_ID, d.ND, d.VIDD, d.RNK, d.ACC
+                      from DPT_DEPOSIT d
+                      join DPT_DEPOSIT_CLOS c
+                        on ( c.KF = d.KF and c.DEPOSIT_ID = d.DEPOSIT_ID )
+                     where d.DAT_END > p_bdate
+                       and c.ACTION_ID = 5
+                     union all
+                    select d.KF, d.DEPOSIT_ID, d.ND, d.VIDD, d.RNK, d.ACC
+                      from DPT_DEPOSIT d
+                      join DPT_DEPOSITW w
+                        on ( w.KF = d.KF and w.DPT_ID = d.DEPOSIT_ID )
+                     where w.TAG   = '2CLOS'
+                       and w.VALUE = 'Y'
+                     union all -- Майбутнє дітям
+                    select d.KF, d.DEPOSIT_ID, d.nd, d.vidd, d.rnk, d.acc
+                      from DPT_DEPOSIT d
+                      join PERSON p
+                        on ( p.RNK = d.RNK )
+                     where d.VIDD in (53,14)
+                       and d.dat_begin < add_months(p.bday, 12)
+                       and p.bday is not null
+                       and FKOS(d.ACC,d.DATZ,p_bdate) = 0
+                       and add_months(p.BDAY,12) between DAT_NEXT_U(p_bdate,-1) and p_bdate
+                  ) d
+             join ACCOUNTS a
+               on ( a.KF = d.KF and a.ACC = d.ACC )
+             join INT_ACCN i
+               on ( i.KF = d.KF and i.ACC = d.ACC and i.ID = 1 )
+             join DPT_VIDD v
+               on ( v.VIDD = d.VIDD )
+            where a.OSTC = 0
+              and a.OSTB = 0
+              and a.OSTF = 0;
+  begin
+
+    bars_audit.trace( '%s: Entry, runid=>%s, bdate=>%s', title, to_char(p_runid), to_char(p_bdate,'dd.mm.yyyy') );
+
+    l_branch := sys_context('bars_context','user_branch');
+
+    if ( length(l_branch)=8 )
+    then
+      dbms_application_info.set_module( g_modcode, 'AUTO_MOVE2ARCHIVE');
+    else
+      RAISE_APPLICATION_ERROR( -20666, 'Забрононено виконання '||to_char((length(l_branch)-1)/7)||' рівні!', true );
+--    bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Забрононено виконання рівні /' ); 
+    end if;
+
+    if ( nvl(p_runid,0)=0 )
+    then -- фіксація старту виконання автоматичного завдання в журналі виконання
+      DPT_JOBS_AUDIT.P_START_JOB( p_modcode => g_modcode
+                                , p_jobid   => l_jobid
+                                , p_branch  => l_branch
+                                , p_bdate   => p_bdate
+                                , p_run_id  => l_runid );
+    else
+      l_runid := p_runid;
+    end if;
+
+    bars_audit.info( bars_msg.get_msg( g_modcode, 'AUTOCLOS_ENTRY', l_branch ) );
+
+    OPEN c_dpt;
+
+    << FETCH_CRSR >>
+    loop
+      fetch c_dpt
+       bulk collect
+       into t_dpt
+      limit 500;
+
+      exit when t_dpt.count = 0;
+
+      << CLS_DPT >>
+      for i in 1 .. t_dpt.count
+      loop
+
+        bars_audit.trace( '%s: deposit № %s', title, to_char(t_dpt(i).dptid) || '...' );
+
+        begin
+          l_errmsg := null;
+
+          case
+          when ( ACC_CLOSING_PERMITTED(t_dpt(i).depacc,0) = 0 )
+          then --
+            l_errmsg := 'Рахунок #' || to_char(t_dpt(i).depacc) || ' залишок <> 0';
+          when ( ACC_CLOSING_PERMITTED(t_dpt(i).intacc,0) = 0 )
+          then --
+            l_errmsg := 'Рахунок #' || to_char(t_dpt(i).intacc) || ' залишок <> 0';
+          when ( t_dpt(i).amracc Is Not Null and ACC_CLOSING_PERMITTED(t_dpt(i).amracc,0) = 0)
+          then --
+            l_errmsg := 'Рахунок #' || to_char(t_dpt(i).amracc) || ' залишок <> 0';
+          when ( t_dpt(i).accnum like '2620%' and CHECK_BELONGS_CREDIT(t_dpt(i).depacc) = 1 )
+          then -- рах. 2620 не закривається, якщо він є рах.погашення заборгованості в КД
+            l_errmsg := 'Рахунок ' || t_dpt(i).accnum ||' (dpt_id=' || to_char(t_dpt(i).dptid) ||') використовується в КД!';
+            delete DPT_DEPOSITW where DPT_ID = t_dpt(i).dptid and TAG = '2CLOS';
+          when ( t_dpt(i).blkd > 0 )
+          then -- 
+            l_errmsg := 'Рахунок ' || t_dpt(i).accnum ||' (dpt_id=' || to_char(t_dpt(i).dptid) ||') арештовано !';
+          else
+            savepoint del_ok;
+            begin
+              -- перенос вклада в архив
+              CLOSE_TO_ARCHIVE( p_type  => 'DPT'
+                              , p_dat   => p_bdate
+                              , p_dptid => t_dpt(i).dptid
+                              , p_accid => null );
+
+              -- закрытие основного счета
+              CLOSE_TO_ARCHIVE( p_type  => 'ACC'
+                              , p_dat   => p_bdate
+                              , p_dptid => null
+                              , p_accid => t_dpt(i).depacc );
+
+              -- закрытие счета начисленных процентов
+              CLOSE_TO_ARCHIVE( p_type  => 'ACC'
+                              , p_dat   => p_bdate
+                              , p_dptid => null
+                              , p_accid => t_dpt(i).intacc );
+            
+              -- закрытие счета амортизации (только для авансовых вкладов)
+              if ( t_dpt(i).amracc is not null )
+              then
+                CLOSE_TO_ARCHIVE( p_type  => 'ACC'
+                                , p_dat   => p_bdate
+                                , p_dptid => null
+                                , p_accid => t_dpt(i).amracc );
+              end if;
+            
+              bars_audit.trace( '%s: deposit № %s', title, to_char(t_dpt(i).dptid) || ' succ.closed.' );
+            exception
+              when others then
+                l_errmsg := substr( dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace(), 1, g_errmsg_dim );
+                bars_audit.error( 'Помилка при закритті деп.дог. № ' || t_dpt(i).dptnum || ' (' || to_char(t_dpt(i).dptid) || '): ' || l_errmsg );
+                rollback to del_ok;
+            end;
+          end case;
+
+          -- запись в журнал
+          DPT_JOBS_AUDIT.P_SAVE2LOG( p_runid      => l_runid
+                                   , p_dptid      => t_dpt(i).dptid
+                                   , p_dealnum    => t_dpt(i).dptnum
+                                   , p_branch     => l_branch
+                                   , p_ref        => null
+                                   , p_rnk        => t_dpt(i).custid
+                                   , p_nls        => t_dpt(i).accnum
+                                   , p_kv         => t_dpt(i).curid
+                                   , p_dptsum     => null
+                                   , p_intsum     => null
+                                   , p_status     => case when l_errmsg is null then 1 else -1 end
+                                   , p_errmsg     => l_errmsg
+                                   , p_contractid => null );
+
+        exception
+          when no_data_found then
+            bars_audit.trace( '%s: clos denied for deposit № %s', title, to_char(t_dpt(i).dptid) );
+        end;
+
+      end loop CLS_DPT;
+
+      commit;
+
+    end loop FETCH_CRSR;
+
+    CLOSE c_dpt;
+
+    if ( nvl(p_runid,0)=0 )
+    then -- фіксація успішного завершення автоматичного завдання в журналі
+      DPT_JOBS_AUDIT.P_FINISH_JOB( g_modcode, l_runid );
+    end if;
+
+    bars_audit.info( bars_msg.get_msg( g_modcode, 'AUTOCLOS_DONE', l_branch ) );
+
+    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_client_info(NULL);
+
+    --exception
+    --  when OTHERS then
+    --    bars_audit.error( title||chr(10)||dbms_utility.format_error_stack()||dbms_utility.format_error_backtrace() );
+    --    -- фіксація завершення автоматичного завдання з помилкою в журналі
+    --    DPT_JOBS_AUDIT.P_FINISH_JOB( g_modcode, l_runid, SubStr( dbms_utility.format_error_stack(), 1, g_errmsg_dim ) );
+    --    dbms_application_info.set_module(NULL, NULL);
+    --    dbms_application_info.set_client_info(NULL);
+  end auto_move2archive_opt;
+  
   --=======================================================================================
   procedure auto_rate_down(p_dptid  in dpt_deposit.deposit_id%type,
                            p_runid  in dpt_jobs_jrnl.run_id%type,
@@ -9946,7 +10166,7 @@ is
                                    );
 
               if (l_errmsg = 'Ok') then
-
+               begin
                 insert into bars.dpt_immobile
                   (dpt_id,
                    transfer_ref,
@@ -9955,11 +10175,18 @@ is
                    bank_date)
                 values
                   (r_immobile.dpt_id, l_ref, sysdate, user_id, l_bdate);
-
+                exception
+                  when DUP_VAL_ON_INDEX then
+                    update DPT_IMMOBILE
+                       set TRANSFER_REF    = l_ref
+                         , TRANSFER_DATE   = sysdate
+                         , TRANSFER_AUTHOR = user_id
+                         , BANK_DATE       = l_bdate
+                     where DPT_ID = r_immobile.dpt_id;
+                end;
+                  
               else
-
                 raise errors;
-
               end if;
 
             else

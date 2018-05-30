@@ -1,168 +1,104 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_JOBS_LIST.sql =========*** Run ***
 PROMPT ===================================================================================== 
 
-
 PROMPT *** ALTER_POLICY_INFO to DPT_JOBS_LIST ***
 
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''DPT_JOBS_LIST'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''DPT_JOBS_LIST'', ''FILIAL'' , ''d'', ''E'', ''E'', ''E'');
-               bpa.alter_policy_info(''DPT_JOBS_LIST'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  bpa.alter_policy_info( 'DPT_JOBS_LIST', 'CENTER', null, null, null, null );
+  bpa.alter_policy_info( 'DPT_JOBS_LIST', 'FILIAL',  'd',  'E',  'E',  'E' );
+  bpa.alter_policy_info( 'DPT_JOBS_LIST', 'WHOLE',  null, null, null, null );
+end;
 /
 
 PROMPT *** Create  table DPT_JOBS_LIST ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.DPT_JOBS_LIST 
-   (	JOB_ID NUMBER(38,0), 
-	JOB_CODE CHAR(8), 
-	JOB_NAME VARCHAR2(100), 
-	JOB_PROC VARCHAR2(128), 
-	ORD NUMBER(5,0), 
-	DELETED DATE
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+
+begin
+  execute immediate 'create table DPT_JOBS_LIST
+( JOB_ID     NUMBER(38)
+, JOB_CODE   CHAR(8)       constraint CC_DPTJOBSLIST_JOBCODE_NN NOT NULL
+, JOB_NAME   VARCHAR2(100) constraint CC_DPTJOBSLIST_JOBNAME_NN NOT NULL
+, JOB_PROC   VARCHAR2(128) constraint CC_DPTJOBSLIST_JOBPROC_NN NOT NULL
+, ORD        NUMBER(5)
+, DELETED    DATE
+, RUN_LVL    number(1) default 3
+, constraint PK_DPTJOBSLIST primary key (JOB_ID) using index tablespace BRSSMLI
+, constraint UK_DPTJOBSLIST unique (JOB_PROC) using index tablespace BRSSMLI
+, constraint UK_DPTJOBSLIST_JOBCODE unique (JOB_CODE) using index tablespace BRSSMLI
+) tablespace BRSSMLD';
+exception
+  when others then
+    if sqlcode=-955 then null; else raise; end if;
+end;
 /
 
+prompt -- ======================================================
+prompt -- Alter table
+prompt -- ======================================================
 
-
-
-PROMPT *** ALTER_POLICIES to DPT_JOBS_LIST ***
- exec bpa.alter_policies('DPT_JOBS_LIST');
-
-
-COMMENT ON TABLE BARS.DPT_JOBS_LIST IS 'Справочник автоматических операций';
-COMMENT ON COLUMN BARS.DPT_JOBS_LIST.JOB_ID IS '№ операции';
-COMMENT ON COLUMN BARS.DPT_JOBS_LIST.JOB_CODE IS 'Код операции';
-COMMENT ON COLUMN BARS.DPT_JOBS_LIST.JOB_NAME IS 'Наименование операции';
-COMMENT ON COLUMN BARS.DPT_JOBS_LIST.JOB_PROC IS 'Имя выполняемой процедуры';
-COMMENT ON COLUMN BARS.DPT_JOBS_LIST.ORD IS '№ п/п';
-COMMENT ON COLUMN BARS.DPT_JOBS_LIST.DELETED IS '';
-
-
-
-
-PROMPT *** Create  constraint PK_DPTJOBSLIST ***
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
 begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_LIST ADD CONSTRAINT PK_DPTJOBSLIST PRIMARY KEY (JOB_ID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+  execute immediate 'alter table DPT_JOBS_LIST add RUN_LVL number(1) default 3';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists
+  then null;
+end;
 /
 
+PROMPT *** Create constraint UK_DPTJOBSLIST_JOBCODE ***
 
-
-
-PROMPT *** Create  constraint UK_DPTJOBSLIST ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_LIST ADD CONSTRAINT UK_DPTJOBSLIST UNIQUE (JOB_PROC)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+declare
+  e_unq_key_exists  exception; -- e_uk_exists
+  pragma exception_init( e_unq_key_exists, -02261 );
+begin
+  execute immediate 'alter table DPT_JOBS_LIST add constraint UK_DPTJOBSLIST_JOBCODE unique (JOB_CODE) using index tablespace BRSSMLI';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_unq_key_exists 
+  then null;
+END;
 /
 
+prompt -- ======================================================
+prompt -- Indexes
+prompt -- ======================================================
 
+SET FEEDBACK ON
 
+prompt -- ======================================================
+prompt -- Apply policies
+prompt -- ======================================================
 
-PROMPT *** Create  constraint CC_DPTJOBSLIST_JOBCODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_LIST MODIFY (JOB_CODE CONSTRAINT CC_DPTJOBSLIST_JOBCODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+begin
+  bpa.alter_policies( 'DPT_JOBS_LIST' );
+end;
 /
 
+commit;
 
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
+comment on table  DPT_JOBS_LIST          is 'Справочник автоматических операций';
+comment on column DPT_JOBS_LIST.JOB_ID   is '№ операции';
+comment on column DPT_JOBS_LIST.JOB_CODE is 'Код операции';
+comment on column DPT_JOBS_LIST.JOB_NAME is 'Наименование операции';
+comment on column DPT_JOBS_LIST.JOB_PROC is 'Имя выполняемой процедуры';
+comment on column DPT_JOBS_LIST.ORD      is '№ п/п';
+comment on column DPT_JOBS_LIST.RUN_LVL  is 'Запуск завдання від: 0=слеша, 1=МФО, 2=бранчу 2-го рівня, 3=бранчу 3-го рівня';
 
-PROMPT *** Create  constraint CC_DPTJOBSLIST_JOBNAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_LIST MODIFY (JOB_NAME CONSTRAINT CC_DPTJOBSLIST_JOBNAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
+prompt -- ======================================================
+prompt -- Grants
+prompt -- ======================================================
 
-
-
-
-PROMPT *** Create  constraint CC_DPTJOBSLIST_JOBPROC_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.DPT_JOBS_LIST MODIFY (JOB_PROC CONSTRAINT CC_DPTJOBSLIST_JOBPROC_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index UK_DPTJOBSLIST ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_DPTJOBSLIST ON BARS.DPT_JOBS_LIST (JOB_PROC) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_DPTJOBSLIST ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_DPTJOBSLIST ON BARS.DPT_JOBS_LIST (JOB_ID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  DPT_JOBS_LIST ***
-grant SELECT                                                                 on DPT_JOBS_LIST   to BARSREADER_ROLE;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_JOBS_LIST   to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on DPT_JOBS_LIST   to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE                                            on DPT_JOBS_LIST   to DPT_ADMIN;
-grant SELECT                                                                 on DPT_JOBS_LIST   to RPBN001;
-grant SELECT                                                                 on DPT_JOBS_LIST   to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on DPT_JOBS_LIST   to WR_ALL_RIGHTS;
-grant FLASHBACK,SELECT                                                       on DPT_JOBS_LIST   to WR_REFREAD;
-
-
-
-PROMPT *** Create SYNONYM  to DPT_JOBS_LIST ***
-
-  CREATE OR REPLACE PUBLIC SYNONYM DPT_JOBS_LIST FOR BARS.DPT_JOBS_LIST;
+grant SELECT on DPT_JOBS_LIST to BARSREADER_ROLE;
+grant SELECT on DPT_JOBS_LIST to BARS_ACCESS_DEFROLE;
+grant SELECT on DPT_JOBS_LIST to BARS_DM;
+grant SELECT on DPT_JOBS_LIST to UPLD;
 
 
 PROMPT ===================================================================================== 

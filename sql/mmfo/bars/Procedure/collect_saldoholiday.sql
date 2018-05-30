@@ -1,71 +1,81 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/COLLECT_SALDOHOLIDAY.sql =========
 PROMPT ===================================================================================== 
 
-
-PROMPT *** Create  procedure COLLECT_SALDOHOLIDAY ***
-
-  CREATE OR REPLACE PROCEDURE BARS.COLLECT_SALDOHOLIDAY 
+create or replace procedure COLLECT_SALDOHOLIDAY
 is
-  c_title     constant varchar2(100) := 'collect_salho';
+  c_title     constant varchar2(64) := 'collect_salho';
   l_minacrdat date;
+  l_kf        varchar2(6);
+
+  -- version 2.0 -- изменено Андреем Билецким для оптимизации ВЗД. 
 begin
+ 
+  bars_audit.trace( '%s: Entry.', c_title );
 
-  bars_audit.trace( '%s: entry.', c_title );
+  l_kf := sys_context('bars_context','user_mfo');
 
-  select min(acr_dat)
+  select min(ACR_DAT)
     into l_minacrdat
-    from int_accn    i
-    join dpt_deposit d on (d.acc = i.acc)
-   where dat_end >= gl.bd
+    from INT_ACCN    i
+    join DPT_DEPOSIT d
+      on ( d.KF = i.KF and d.ACC = i.ACC )
+   where d.DAT_END >= GL.BD()
      and i.id = 1;
 
+  BARS_AUDIT.INFO( c_title||': min(INT_ACCN.ACR_DAT)='||to_char(l_minacrdat,'dd.mm.yyyy') );
+
+  l_minacrdat := greatest( l_minacrdat, ADD_MONTHS(trunc(GL.BD(),'MM')-1,-6) );
+
   -- Сбрасываем флаг работы по накопительной таблице
-  acrn.set_collect_salho(0);
+  ACRN.SET_COLLECT_SALHO(0);
 
   -- Очищаем таблицу
-  execute immediate 'truncate table saldo_holiday';
+  if ( l_kf Is Null )
+  then
+    execute immediate 'truncate table SALDO_HOLIDAY';
+  else
+    execute immediate 'alter table SALDO_HOLIDAY truncate partition P_'||l_kf;
+  end if;
+
   bars_audit.trace( '%s: table saldo_holiday cleared.', c_title );
 
-  -- execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
+  execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
 
   -- Наполняем таблицу
-  insert into saldo_holiday
-    ( fdat, cdat, acc, dos, kos )
-  select /*+ parallel */
-         pay_bankdate fdat,
-         trunc(pay_caldate) cdat,
-         l.acc,
-         nvl(sum(decode(dk, 0, s)), 0) dos,
-         nvl(sum(decode(dk, 1, s)), 0) kos
-    from ( select p.pay_caldate, pay_bankdate, o.acc, o.fdat, o.s, o.dk
-             from oper_ext p,
-                  opldok o
-            where p.ref = o.ref
-              and o.sos = 5
-              and p.pay_bankdate > l_minacrdat
-         ) l,
-         saldoa s
-   where s.acc(+) = l.acc
-     and s.fdat(+) = trunc(pay_caldate)
-     and s.acc is null
-  group by pay_bankdate, trunc(pay_caldate), l.acc;
+  execute immediate 'insert /*+ APPEND PARALLEL(24) */'
+         ||chr(10)||'  into SALDO_HOLIDAY' || case when l_kf Is Null then '' else ' partition ( P_'||l_kf||' )' end
+         ||chr(10)||'     ( KF, FDAT, CDAT, ACC, DOS, KOS )'
+         ||chr(10)||'select /*+ ORDERED FULL( e ) FULL( t ) FULL( d ) */'
+         ||chr(10)||'       t.KF, t.FDAT , trunc(e.PAY_CALDATE) as CDAT, t.ACC'
+         ||chr(10)||'     , nvl(sum(decode(t.DK,0,t.S)),0) as DOS'
+         ||chr(10)||'     , nvl(sum(decode(t.DK,1,t.S)),0) as KOS'
+         ||chr(10)||'  from OPER_EXT e'
+         ||chr(10)||'  join OPLDOK   t'
+         ||chr(10)||'    on ( t.KF = e.KF and t.REF = e.REF )'
+         ||chr(10)||'  join DPT_DEPOSIT d'
+         ||chr(10)||'    on ( d.KF = t.KF and d.ACC = t.ACC )'
+         ||chr(10)||' where e.PAY_BANKDATE > :l_minacrdat'
+         ||chr(10)||'   and t.FDAT > :l_minacrdat'
+         ||chr(10)||'   and t.SOS = 5'
+         ||chr(10)||'   and t.FDAT > e.PAY_CALDATE'
+         ||chr(10)||' group by  t.KF, t.FDAT, trunc(e.PAY_CALDATE), t.ACC' 
+    using l_minacrdat, l_minacrdat;
+
+  bars_audit.trace( '%s: %s rows created.', c_title, to_char(sql%rowcount) );
 
   commit;
 
+  -- Устанавливаем флаг работы по накопительной таблице
+  ACRN.SET_COLLECT_SALHO(1);
+
   bars_audit.trace( '%s: table saldo_holiday collected.', c_title );
 
-  -- Устанавливаем флаг работы по накопительной таблице
-  acrn.set_collect_salho(1);
-
-end collect_saldoholiday;
+end COLLECT_SALDOHOLIDAY;
 /
-show err;
 
-
+show errors;
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/COLLECT_SALDOHOLIDAY.sql =========
+PROMPT *** End *** ==== Scripts /Sql/BARS/Procedure/COLLECT_SALDOHOLIDAY.sql ==== *** End **
 PROMPT ===================================================================================== 
