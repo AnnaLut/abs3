@@ -1,20 +1,17 @@
+prompt -- ======================================================
+prompt -- create sequence S_DPT_DEPOSITW_UPDATE
+prompt -- ======================================================
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Sequence/S_DPT_DEPOSITW_UPDATE.sql =========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  sequence S_DPT_DEPOSITW_UPDATE ***
-
-   CREATE SEQUENCE  BARS.S_DPT_DEPOSITW_UPDATE  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 NOCACHE  ORDER  NOCYCLE ;
-
-PROMPT *** Create  grants  S_DPT_DEPOSITW_UPDATE ***
-grant SELECT                                                                 on S_DPT_DEPOSITW_UPDATE to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on S_DPT_DEPOSITW_UPDATE to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Sequence/S_DPT_DEPOSITW_UPDATE.sql =========
-PROMPT ===================================================================================== 
+declare
+  l_seq_nm               varchar2(30);
+  e_seq_exists           exception;
+  pragma exception_init( e_seq_exists, -00955 );
+begin
+  l_seq_nm := 'S_DPT_DEPOSITW_UPDATE';
+  execute immediate 'CREATE SEQUENCE BARS.'||l_seq_nm||' START WITH 1 INCREMENT BY 1 NOCYCLE NOCACHE ORDER';
+  dbms_output.put_line( 'Sequence "'||l_seq_nm||'" created.' );
+exception
+  when e_seq_exists then
+    dbms_output.put_line( 'Sequence "'||l_seq_nm||'" already exists.' );
+end;
+/

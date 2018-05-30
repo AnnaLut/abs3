@@ -22,6 +22,30 @@ prompt -- recreate table DPT_DEPOSIT
 prompt -- ======================================================
 
 declare
+  E_IDX_NOT_EXISTS        exception;
+  pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
+begin
+  execute immediate 'drop index I4_DPTDEPOSIT';
+  dbms_output.put_line( 'Index dropped.' );
+exception
+  when E_IDX_NOT_EXISTS
+  then null;
+end;
+/
+
+declare
+  e_cnstrn_not_exists    exception;
+  pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );
+begin
+  execute immediate 'alter table DPT_DEPOSIT drop constraint UK2_DPTDEPOSIT cascade drop index';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_cnstrn_not_exists
+  then null;
+end;
+/
+
+declare
   l_tab_nm            varchar2(30);
   l_ptsn_f            number(1);
   l_col_lst           varchar2(2048);
@@ -74,7 +98,8 @@ begin
       into l_col_lst
       from ALL_TAB_COLS t
      where OWNER = 'BARS' 
-       and TABLE_NAME = l_tab_nm;
+       and TABLE_NAME = l_tab_nm
+       and HIDDEN_COLUMN = 'NO';
 
     begin
       execute immediate 'alter table ' || l_tab_nm || ' read only';
@@ -418,5 +443,52 @@ begin
     when e_col_already_nn
     then dbms_output.put_line( 'Column "VIDD" is already NOT NULL.' );
   end;
+end;
+/
+
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate 'create index IDX_DPTDEPOSIT_DATEND on DPT_DEPOSIT (DAT_END,KF) tablespace BRSMDLI local';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+end;
+/
+
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+  e_dup_keys_found       exception;
+  pragma exception_init( e_dup_keys_found,  -01452 );
+begin
+  execute immediate 'create unique index UK_DPTDEPOSIT_DPTID on DPT_DEPOSIT (KF,DEPOSIT_ID) tablespace BRSMDLI local compress 1';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx
+  then dbms_output.put_line( 'Such column list already indexed.' );
+  when e_dup_keys_found
+  then dbms_output.put_line( 'Cannot create unique index: duplicate keys found' );
+end;
+/
+
+begin
+  DBMS_STATS.GATHER_TABLE_STATS
+  ( OwnName          => 'BARS'
+  , TabName          => 'DPT_DEPOSIT'
+  , Estimate_Percent => DBMS_STATS.AUTO_SAMPLE_SIZE
+  , Granularity      => 'AUTO'
+  , Cascade          => TRUE
+  );
 end;
 /

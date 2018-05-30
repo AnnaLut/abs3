@@ -1,5 +1,4 @@
 
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/DPT_REBRANCH.sql =========*** Run 
 PROMPT ===================================================================================== 
@@ -16,7 +15,6 @@ PROMPT *** Create  procedure DPT_REBRANCH ***
 /* Перенесення депозитного портфелю ТВБВ на інший бранч (тільки діючі договора) */
 /*==============================================================================*/
   NewBran2   varchar2(15);
-  OldBran2   varchar2(15);
   OldBrName  branch.name%type;
   NewBrName  branch.name%type;
 
@@ -63,10 +61,10 @@ begin
     end;
 
     -- перевіряєм чи бранчі відносяться до одного 2-го рівня
-    OldBran2 := subStr(OldBranch, 1, 15);
+
     NewBran2 := subStr(NewBranch, 1, 15);
 
-    if (OldBran2 != NewBran2)
+    if (NewBran2 != subStr(OldBranch, 1, 15))
     then
       update int_accn i
          set i.acrb = ( select a2.acc
@@ -112,16 +110,6 @@ begin
       dbms_output.put_line('DPT_DEPOSIT_ALL -> '||sql%rowcount);
     end if;
 
-    -- Хранилище доп.реквизитов вкладов
-    update DPT_DEPOSITW
-       set branch = NewBranch
-     where branch = OldBranch;
-
-    if p_trace = 1
-    then
-      dbms_output.put_line('DPT_DEPOSITW    -> '||sql%rowcount);
-    end if;
-
     -- Хранилище дополнительных соглашений (ДС) к деп.договорам ФЛ
     update DPT_AGREEMENTS
        set branch = NewBranch
@@ -138,16 +126,6 @@ begin
     if p_trace = 1
     then
       dbms_output.put_line('DPT_INHERITORS  -> '||sql%rowcount);
-    end if;
-
-    -- Хранилище платежей по депозитным договорам ФЛ
-    update DPT_PAYMENTS
-       set branch = NewBranch
-     where branch = OldBranch;
-
-    if p_trace = 1
-    then
-      dbms_output.put_line('DPT_PAYMENTS    -> '||sql%rowcount);
     end if;
 
     -- Депозитные договора. Запросы
@@ -210,7 +188,7 @@ end dpt_rebranch;
 /
 show err;
 
-
+GRANT EXECUTE ON DPT_REBRANCH2 TO BARS_ACCESS_DEFROLE;
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/DPT_REBRANCH.sql =========*** End 

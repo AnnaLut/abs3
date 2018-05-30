@@ -1,9 +1,9 @@
 -- ================================================================================
 -- Module : DPT
 -- Author : BAA
--- Date   : 22.11.2017
+-- Date   : 24.04.2018
 -- ================================== <Comments> ==================================
--- recreate table DPT_DEPOSIT_CLOS
+-- recreate table OPER_EXT
 -- ================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
@@ -18,56 +18,20 @@ SET TRIMSPOOL    ON
 SET VERIFY       OFF
 
 prompt -- ======================================================
-prompt -- recreate table DPT_DEPOSIT_CLOS
+prompt -- recreate table OPER_EXT
 prompt -- ======================================================
 
-declare
-  E_IDX_NOT_EXISTS        exception;
-  pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
-begin
-  execute immediate 'drop index I3_DPTDEPOSITCLOS';
-  dbms_output.put_line( 'Index dropped.' );
-exception
-  when E_IDX_NOT_EXISTS
-  then null;
-end;
-/
-
-declare
-  E_IDX_NOT_EXISTS        exception;
-  pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
-begin
-  execute immediate 'drop index I4_DPTDEPOSITCLOS';
-  dbms_output.put_line( 'Index dropped.' );
-exception
-  when E_IDX_NOT_EXISTS
-  then null;
-end;
-/
-
-declare
-  E_IDX_NOT_EXISTS        exception;
-  pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
-begin
-  execute immediate 'drop index I5_DPTDEPOSITCLOS';
-  dbms_output.put_line( 'Index dropped.' );
-exception
-  when E_IDX_NOT_EXISTS
-  then null;
-end;
-/
-
-declare
-  e_cnstrn_not_exists    exception;
-  pragma exception_init( E_CNSTRN_NOT_EXISTS, -02443 );
-begin
-  execute immediate 'alter table DPT_DEPOSIT_CLOS drop constraint UK2_DPTDEPOSITCLOS cascade drop index';
-  dbms_output.put_line( 'Table altered.' );
-exception
-  when e_cnstrn_not_exists
-  then null;
-end;
-/
+-- declare
+--   E_IDX_NOT_EXISTS        exception;
+--   pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
+-- begin
+--   execute immediate 'drop index IDX_OPEREXT_BANKDATE';
+--   dbms_output.put_line( 'Index dropped.' );
+-- exception
+--   when E_IDX_NOT_EXISTS
+--   then null;
+-- end;
+-- /
 
 declare
   l_tab_nm            varchar2(30);
@@ -89,7 +53,7 @@ declare
   pragma exception_init( e_col_already_nn, -01442 );
 begin
 
-  l_tab_nm := 'DPT_DEPOSIT_CLOS';
+  l_tab_nm := 'OPER_EXT';
 
   -- перевірка наяності SUBPARTITIONS
   select case
@@ -137,11 +101,10 @@ begin
 
     l_tab_stmt := 'create table TEST_' || l_tab_nm || chr(10) || '( ' ||
     replace( l_col_lst, 'KF,', q'[KF default sys_context('bars_context','user_mfo') not null,]' ) || q'[
-) tablespace BRSBIGD
-COMPRESS FOR OLTP
+) tablespace BRSMDLD
 PARALLEL 24
-STORAGE( INITIAL 256K NEXT 256K )
-PARTITION BY RANGE ("WHEN") INTERVAL( NUMTOYMINTERVAL(3,'MONTH'))
+STORAGE( INITIAL 32K NEXT 32K )
+PARTITION BY RANGE (PAY_BANKDATE) INTERVAL( NUMTOYMINTERVAL(1,'MONTH'))
 SUBPARTITION BY LIST (KF)
 SUBPARTITION TEMPLATE
 ( SUBPARTITION SP_300465 VALUES ('300465')
@@ -171,31 +134,29 @@ SUBPARTITION TEMPLATE
 , SUBPARTITION SP_354507 VALUES ('354507')
 , SUBPARTITION SP_356334 VALUES ('356334')
 )
-( PARTITION DEPCLS_Y2009    VALUES LESS THAN (TO_DATE(' 2010-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2010    VALUES LESS THAN (TO_DATE(' 2011-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2011    VALUES LESS THAN (TO_DATE(' 2012-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2012    VALUES LESS THAN (TO_DATE(' 2013-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2013    VALUES LESS THAN (TO_DATE(' 2014-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2014    VALUES LESS THAN (TO_DATE(' 2015-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2015_Q1 VALUES LESS THAN (TO_DATE(' 2015-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2015_Q2 VALUES LESS THAN (TO_DATE(' 2015-07-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2015_Q3 VALUES LESS THAN (TO_DATE(' 2015-10-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2015_Q4 VALUES LESS THAN (TO_DATE(' 2016-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2016_Q1 VALUES LESS THAN (TO_DATE(' 2016-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2016_Q2 VALUES LESS THAN (TO_DATE(' 2016-07-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2016_Q3 VALUES LESS THAN (TO_DATE(' 2016-10-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2016_Q4 VALUES LESS THAN (TO_DATE(' 2017-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2017_Q1 VALUES LESS THAN (TO_DATE(' 2017-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2017_Q2 VALUES LESS THAN (TO_DATE(' 2017-07-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2017_Q3 VALUES LESS THAN (TO_DATE(' 2017-10-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-, PARTITION DEPCLS_Y2017_Q4 VALUES LESS THAN (TO_DATE(' 2018-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
-)
-as
+( PARTITION OPEREXT_MINVALUE VALUES LESS THAN (TO_DATE(' 2015-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2015_Q1 VALUES LESS THAN (TO_DATE(' 2015-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2015_Q2 VALUES LESS THAN (TO_DATE(' 2015-07-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2015_Q3 VALUES LESS THAN (TO_DATE(' 2015-10-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2015_Q4 VALUES LESS THAN (TO_DATE(' 2016-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2016_Q1 VALUES LESS THAN (TO_DATE(' 2016-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2016_Q2 VALUES LESS THAN (TO_DATE(' 2016-07-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2016_Q3 VALUES LESS THAN (TO_DATE(' 2016-10-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2016_Q4 VALUES LESS THAN (TO_DATE(' 2017-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2017_Q1 VALUES LESS THAN (TO_DATE(' 2017-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2017_Q2 VALUES LESS THAN (TO_DATE(' 2017-07-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2017_Q3 VALUES LESS THAN (TO_DATE(' 2017-10-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2017_Q4 VALUES LESS THAN (TO_DATE(' 2018-01-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+, PARTITION OPEREXT_Y2018_Q1 VALUES LESS THAN (TO_DATE(' 2018-04-01 00:00:00', 'SYYYY-MM-DD HH24:MI:SS', 'NLS_CALENDAR=GREGORIAN')) COMPRESS BASIC PCTFREE 0
+) as
 select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
   from ]'|| l_tab_nm;
 
     execute immediate l_tab_stmt;
     dbms_output.put_line( 'Table "TEST_'||l_tab_nm||'" created.' );
+
+    execute immediate 'alter table TEST_' || l_tab_nm || ' drop partition OPEREXT_MINVALUE';
+    dbms_output.put_line( 'Table altered.' );
 
     -- ======================================================
     -- Default Values
@@ -203,7 +164,7 @@ select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
     begin
       dbms_output.put_line( 'Copying default column values from source table.' );
       for dv in ( select COLUMN_NAME, DATA_DEFAULT, DEFAULT_LENGTH
-                    from ALL_TAB_COLS
+                    from ALL_TAB_COLS t
                    where OWNER = 'BARS'
                      and TABLE_NAME = l_tab_nm
                      and COLUMN_NAME != 'KF'
@@ -398,7 +359,7 @@ select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
     commit;
 
   else -- якщо SUBPARTITIONS наявні
-    dbms_output.put_line( 'Table "'||l_tab_nm||'" already partitioned.' );
+    dbms_output.put_line( 'Table "'||l_tab_nm||'" already subpartitioned.' );
   end if;
 
   -- ======================================================
@@ -412,143 +373,11 @@ select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
 end;
 /
 
--- manual replacement of constraints such as "CHECK (... IS NOT NULL)" to "MODIFY ... NOT NULL"
-declare
-  e_col_already_nn  exception;
-  pragma exception_init( e_col_already_nn, -01442 );
-begin
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify ACC constraint CC_DPTDEPOSITCLOS_ACC_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "ACC" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify ACTION_ID constraint CC_DPTDEPOSITCLOS_ACTNID_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "ACTION_ID" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify ACTIION_AUTHOR constraint CC_DPTDEPOSITCLOS_ACTNAHR_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "ACTIION_AUTHOR" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify BRANCH constraint CC_DPTDEPOSITCLOS_BRANCH_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "BRANCH" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify DAT_BEGIN constraint CC_DPTDEPOSITCLOS_DATBEGIN_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "DAT_BEGIN" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify DATZ constraint CC_DPTDEPOSITCLOS_DATZ_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "DATZ" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify DEPOSIT_ID constraint CC_DPTDEPOSITCLOS_DEPOSITID_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "DEPOSIT_ID" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify KF constraint CC_DPTDEPOSITCLOS_KF_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "KF" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify KV constraint CC_DPTDEPOSITCLOS_KV_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "KV" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify RNK constraint CC_DPTDEPOSITCLOS_RNK_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "RNK" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify STOP_ID constraint CC_DPTDEPOSITCLOS_STOPID_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "STOP_ID" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify USERID constraint CC_DPTDEPOSITCLOS_USERID_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "USERID" is already NOT NULL.' );
-  end;
-  begin
-    execute immediate 'alter table DPT_DEPOSIT_CLOS modify VIDD constraint CC_DPTDEPOSITCLOS_VIDD_NN Not Null enable novalidate';
-    dbms_output.put_line( 'Table altered.' );
-  exception
-    when e_col_already_nn
-    then dbms_output.put_line( 'Column "VIDD" is already NOT NULL.' );
-  end;
-end;
-/
-
-declare
-  e_idx_exists           exception;
-  pragma exception_init( e_idx_exists,      -00955 );
-  e_col_already_idx      exception;
-  pragma exception_init( e_col_already_idx, -01408 );
-begin
-  execute immediate 'create index IDX_DPTDEPOSITCLOS_ACTNID on DPT_DEPOSIT_CLOS ( ACTION_ID, DEPOSIT_ID, KF ) tablespace BRSBIGI local compress 1';
-  dbms_output.put_line( 'Index created.' );
-exception
-  when e_idx_exists
-  then dbms_output.put_line( 'Name is already used by an existing object.' );
-  when e_col_already_idx 
-  then dbms_output.put_line( 'Such column list already indexed.' );
-end;
-/
-
-declare
-  e_idx_exists           exception;
-  pragma exception_init( e_idx_exists,      -00955 );
-  e_col_already_idx      exception;
-  pragma exception_init( e_col_already_idx, -01408 );
-begin
-  execute immediate 'create index IDX_DPTDEPOSITCLOS_BDATE on DPT_DEPOSIT_CLOS ( BDATE, KF, DEPOSIT_ID, IDUPD ) tablespace BRSBIGI compress 2';
-  dbms_output.put_line( 'Index created.' );
-exception
-  when e_idx_exists
-  then dbms_output.put_line( 'Name is already used by an existing object.' );
-  when e_col_already_idx
-  then dbms_output.put_line( 'Such column list already indexed.' );
-end;
-/
-
 begin
   DBMS_STATS.GATHER_TABLE_STATS
   ( OwnName          => 'BARS'
-  , TabName          => 'DPT_DEPOSIT_CLOS'
+  , TabName          => 'OPER_EXT'
   , Estimate_Percent => DBMS_STATS.AUTO_SAMPLE_SIZE
-  , Degree           => 24
   , Granularity      => 'AUTO'
   , Cascade          => TRUE
   );
