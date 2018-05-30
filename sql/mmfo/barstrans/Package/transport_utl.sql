@@ -87,7 +87,7 @@ CREATE OR REPLACE PACKAGE BODY "BARSTRANS"."TRANSPORT_UTL" is
       return null;
   end;
 
-  procedure track_transport(p_id               in integer,
+  procedure track_transport(p_id               in varchar2,
                             p_state_id         in integer,
                             p_tracking_comment in varchar2,
                             p_stack_trace      in clob) is
