@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.005     16.03.2018
+% VERSION     : v.18.006     30.05.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 30.05.2018  DDD=270 -залишок коштiв на дату введення санкцiй (дата-1)
  16.03.2018  адрес клиента заполняется отдельным скриптом
  06.02.2018  обязательное заполнение кода DDD=310 при  отсутствии операций
  31.01.2018  отсекаем закрытых клиентов 
@@ -379,7 +380,7 @@ select
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         to_char( round(fostq(a.acc,dat_rnbo_)) ) p_270,
+                         to_char( round(fostq(a.acc,dat_rnbo_-1)) ) p_270,
                          to_char( round(fostq(a.acc,dat_)) ) p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
