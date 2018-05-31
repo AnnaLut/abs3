@@ -401,8 +401,14 @@ create or replace package interest_utl is
     procedure recalculate_interest(
         p_reckoning_unit in out nocopy t_reckoning_unit);
 
+    procedure MONTHLY_INTEREST_ACCRUAL
+    ( p_payout_int        in boolean default false );
+
 end;
 /
+
+show err
+
 create or replace package body interest_utl as
 
     acc_form integer := 0;
@@ -4782,6 +4788,179 @@ create or replace package body interest_utl as
                      null);
     end;
 */
+
+  procedure MONTHLY_INTEREST_ACCRUAL
+  ( p_payout_int        in boolean default false
+  ) is
+    title    constant   varchar2(64) := $$PLSQL_UNIT||'.CALC_INT_DMD_ACC';
+    l_kf                varchar2(6);
+    l_bnk_dt            date;
+    l_reckoning_id      int_reckonings.id%type;
+    l_int_amnt          int_reckonings.interest_amount%type;
+  begin
+
+    BARS_AUDIT.TRACE( '%s: Entry with ( p_payout_int=%s ).', title, tools.boolean_to_string( p_payout_int ) );
+
+    l_kf     := GL.KF();
+    l_bnk_dt := GL.BD();
+
+    BARS_AUDIT.TRACE( '%s: l_kf=%s, l_bnk_dt=%s.', title, l_kf, to_char(l_bnk_dt,'dd.mm.yyyy') );
+
+    if ( l_bnk_dt = DAT_NEXT_U( last_day(l_bnk_dt)+1, -1 ) )
+    then -- ќстанн≥й робочий день м≥с€ц€
+
+      for c in ( select a.KF
+                      , a.ACC   as ACCOUNT_ID
+                      , a.NLS   as ACCOUNT_NUMBER
+                      , i.ID    as INTEREST_KIND
+                      , i.METR  as RECKONING_METHOD
+                      , i.BASEY as RECKONING_CALENDAR
+                      , greatest(i.ACR_DAT,a.DAOS)+1 as DATE_FROM
+                      , nvl2(i.STP_DAT,least(l_bnk_dt,STP_DAT),l_bnk_dt) as DATE_THROUGH
+  --                  , TT, ACRA, ACRB, S, TTB, KVB, NLSB, MFOB, NAMB, NAZN
+                   from ACCOUNTS a
+                   join INT_ACCN i
+                     on ( i.ACC = a.ACC and i.ID = 1 )
+                  where a.NBS in ( select NBS
+                                     from NOTPORTFOLIO_NBS
+                                    where PORTFOLIO_CODE = 'CURRENT_ACCOUNT'
+                                      and USERID is null )
+                    and a.DAZS Is Null
+                    and lnnvl( i.STP_DAT <= i.ACR_DAT )
+               )
+      loop
+
+--      BARS_AUDIT.TRACE( '%s: ACCOUNT_ID=%s, DATE_FROM=%s, DATE_THROUGH=%s.', title
+--                      , to_char(c.ACCOUNT_ID), to_char(c.DATE_FROM,'dd.mm.yyyy'), to_char(c.DATE_THROUGH,'dd.mm.yyyy') );
+
+        savepoint BEFORE_RECKONING;
+
+        begin
+
+          CLEAR_RECKONINGS
+          ( p_account_id       => c.ACCOUNT_ID
+          , p_interest_kind_id => c.INTEREST_KIND
+          , p_date_from        => c.DATE_FROM
+          );
+
+          delete ACR_INTN;
+
+          P_INT
+          ( acc_  => c.ACCOUNT_ID
+          , id_   => c.INTEREST_KIND
+          , dt1_  => c.DATE_FROM
+          , dt2_  => c.DATE_THROUGH
+          , int_  => l_int_amnt
+          , ost_  => null
+          , mode_ => 1
+          );
+
+          if ( l_int_amnt = 0 )
+          then -- сумма проц = 0, но дату закрыти€ периода acr_dat все-равно надо будет проставить
+
+            l_reckoning_id := CREATE_INTEREST_RECKONING
+                              ( p_reckoning_type_id => RECKONING_TYPE_ORDINARY_INT
+                              , p_account_id        => c.ACCOUNT_ID
+                              , p_interest_kind_id  => c.INTEREST_KIND
+                              , p_date_from         => c.DATE_FROM
+                              , p_date_through      => c.DATE_THROUGH
+                              , p_account_rest      => FOST( c.ACCOUNT_ID, c.DATE_FROM ) -- a.OSTC
+                              , p_interest_rate     => ACRN.FPROCN( c.ACCOUNT_ID, c.INTEREST_KIND, c.DATE_THROUGH )
+                              , p_interest_amount   => 0
+                              , p_interest_tail     => 0
+                              , p_is_grouping_unit  => 'N'
+                              , p_state_id          => null
+                              , p_deal_id           => null );
+
+          else
+
+            for i in ( select * from ACR_INTN order by ACC, ID, FDAT )
+            loop
+
+              bars_audit.trace( '%s: ACC=%s, FDAT=%s, TDAT=%s.', title
+                              , to_char(i.ACC), to_char(i.FDAT,'dd.mm.yyyy'), to_char(i.TDAT,'dd.mm.yyyy') );
+
+              l_reckoning_id := CREATE_INTEREST_RECKONING
+                                ( p_reckoning_type_id => RECKONING_TYPE_ORDINARY_INT
+                                , p_account_id        => i.ACC
+                                , p_interest_kind_id  => i.ID
+                                , p_date_from         => i.FDAT
+                                , p_date_through      => i.TDAT
+                                , p_account_rest      => i.OSTS / ACRN.DLTA( c.RECKONING_CALENDAR, i.FDAT, i.TDAT + 1)
+                                , p_interest_rate     => case when nvl(i.br, 0) = 0 then nvl(i.ir, 0) else i.br end
+                                , p_interest_amount   => abs(round(i.ACRD))
+                                , p_interest_tail     => i.REMI
+                                , p_is_grouping_unit  => 'N'
+                                , p_state_id          => null
+                                , p_deal_id           => null
+                                );
+
+              ACCRUE_INTEREST
+              ( p_reckoning_row => READ_RECKONING_ROW( l_reckoning_id ) -- , p_lock => true
+              , p_silent_mode   => true
+              );
+
+            end loop;
+
+            if ( p_payout_int )
+            then -- виплата в≥дсотк≥в
+              PAY_INTEREST
+              ( p_reckoning_row => READ_RECKONING_ROW( l_reckoning_id )
+              , p_silent_mode   => true
+              );
+            end if;
+
+          end if;
+
+          commit;
+
+        exception
+          when others then
+            rollback to before_reckoning;
+            BARS_AUDIT.LOG_ERROR
+            ( title
+            , ': account_id      : ' || c.ACCOUNT_ID         || chr(10) ||
+              ', account_number  : ' || c.ACCOUNT_NUMBER     || chr(10) ||
+              ', interest_kind   : ' || c.INTEREST_KIND      || chr(10) ||
+              ', interest_base   : ' || c.RECKONING_CALENDAR || chr(10) ||
+              ', interest_method : ' || c.RECKONING_METHOD   || chr(10) ||
+              ', date_from       : ' || c.DATE_FROM          || chr(10) ||
+              ', date_through    : ' || c.DATE_THROUGH       || chr(10) ||
+              sqlerrm || chr(10) || dbms_utility.format_error_backtrace()
+            );
+            l_reckoning_id := CREATE_INTEREST_RECKONING
+                              ( p_reckoning_type_id => RECKONING_TYPE_ORDINARY_INT
+                              , p_account_id        => c.ACCOUNT_ID
+                              , p_interest_kind_id  => c.INTEREST_KIND
+                              , p_date_from         => c.DATE_FROM
+                              , p_date_through      => c.DATE_THROUGH
+                              , p_account_rest      => null
+                              , p_interest_rate     => null
+                              , p_interest_amount   => null
+                              , p_interest_tail     => null
+                              , p_is_grouping_unit  => 'N'
+                              , p_state_id          => RECKONING_STATE_RECKONING_FAIL
+                              , p_deal_id           => null
+                              );
+            TRACK_RECKONING
+            ( p_reckoning_id     => l_reckoning_id
+            , p_state_id         => RECKONING_STATE_RECKONING_FAIL
+            , p_tracking_message => sqlerrm || chr(10) || dbms_utility.format_error_backtrace()
+            );
+        end;
+
+      end loop;
+
+    else
+      BARS_AUDIT.INFO( title||': банк≥вська дата '||to_char(l_bnk_dt,'dd.mm.yyyy')||' не Ї останн≥м робочим днем м≥с€ц€!' );
+    end if;
+
+    BARS_AUDIT.TRACE( '%s: Exit.', title );
+
+  end MONTHLY_INTEREST_ACCRUAL;
+
+
 end;
 /
+
 show err

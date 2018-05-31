@@ -1,5 +1,8 @@
-declare ID_ INT ;
-BEGIN suda; 
+declare
+  ID_ INT;
+  l_seq_num   tms_task.sequence_number%type;
+begin
+  bc.home;
 --------------------------------------
 id_ := TMS_UTL.create_or_replace_task
  (      p_task_code               => 'RKO1', -- унікальний код процедури (довідник TMS_TASK)
@@ -44,22 +47,37 @@ id_ := TMS_UTL.create_or_replace_task
 commit;
 
 --------------------------------------
-id_ := TMS_UTL.create_or_replace_task
- (      p_task_code               => 'CCK_UPD_SPARAMS', -- унікальний код процедури (довідник TMS_TASK)
-        p_task_group_id           => 1 ,  -- контекст банківської дати при виконанні процедури: 1 - фініш, 2 - старт, 3 - не встановлюється контекст дати
-        p_sequence_number         => 100,  -- порядковий номер виконання завдання (може дублюватися)
-        p_task_name               => 'Актуализация спецпараметров CCK',   -- назва завдання
-        p_task_description        => 'Ежедневная актуализация спецпараметров (R011) дочерних счетов кредита к основному',  -- додатковий текстовий опис завдання
-        p_separate_by_branch_mode => 3,  -- режим представлення РУ: 1 - виконувати процедуру на "/", 2 - кожна РУ обробляється по черзі, 3 - всі РУ обробляються паралельно
-        p_action_on_failure     => 1,  -- порядок дій у разі виникнення помилки: 1 - продовжити виконання процедур, 2 - зупинити виконання наступних процедур
-        p_task_statement          =>
-'begin
+  id_ := TMS_UTL.create_or_replace_task
+         ( p_task_code               => 'CCK_UPD_SPARAMS', -- унікальний код процедури (довідник TMS_TASK)
+           p_task_group_id           => 1 ,  -- контекст банківської дати при виконанні процедури: 1 - фініш, 2 - старт, 3 - не встановлюється контекст дати
+           p_sequence_number         => 100,  -- порядковий номер виконання завдання (може дублюватися)
+           p_task_name               => 'Актуализация спецпараметров CCK',   -- назва завдання
+           p_task_description        => 'Ежедневная актуализация спецпараметров (R011) дочерних счетов кредита к основному',  -- додатковий текстовий опис завдання
+           p_separate_by_branch_mode => 3,  -- режим представлення РУ: 1 - виконувати процедуру на "/", 2 - кожна РУ обробляється по черзі, 3 - всі РУ обробляються паралельно
+           p_action_on_failure       => 1,  -- порядок дій у разі виникнення помилки: 1 - продовжити виконання процедур, 2 - зупинити виконання наступних процедур
+           p_task_statement          => 'begin
    p_cck_update_sparams(gl.bd, gl.bd+1);
    commit;
  end ;' -- PL/SQL-блок, що виконується для даного завдання
    ) ;
---------------------------------------  
 commit;
------------------------------------
+----------------------------------------
+
+  select max(SEQUENCE_NUMBER)
+    into l_seq_num
+    from TMS_TASK;
+
+  id_ := TMS_UTL.CREATE_OR_REPLACE_TASK
+         ( p_task_code               => 'INT_ACR_MO'
+         , p_task_group_id           => TMS_UTL.TASK_GROUP_BEFORE_FINISH -- на фініші дня
+         , p_sequence_number         => l_seq_num + 1
+         , p_task_name               => 'INT. Нарахування %% по непортфельним рахунках'
+         , p_task_description        => 'Регламентні роботи по закриттю місяця'
+         , p_separate_by_branch_mode => 3 -- TMS_UTL.BRANCH_PROC_MODE_PARALLEL
+         , p_action_on_failure       => TMS_UTL.ACTION_ON_FAILURE_PROCEED
+         , p_task_statement          => 'begin INTEREST_UTL.MONTHLY_INTEREST_ACCRUAL( false ); end;'
+         );
+  commit;
+----------------------------------------
 end;
 /
