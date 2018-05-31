@@ -26,7 +26,8 @@ begin
   BARS_AUDIT.INFO( c_title||': min(INT_ACCN.ACR_DAT)='||to_char(l_minacrdat,'dd.mm.yyyy') );
 
   l_minacrdat := greatest( l_minacrdat, ADD_MONTHS(trunc(GL.BD(),'MM')-1,-6) );
-
+  
+  BARS_AUDIT.INFO( c_title||' Сбрасываем флаг работы по накопительной таблице - '||l_kf);
   -- Сбрасываем флаг работы по накопительной таблице
   ACRN.SET_COLLECT_SALHO(0);
 
@@ -34,14 +35,19 @@ begin
   if ( l_kf Is Null )
   then
     execute immediate 'truncate table SALDO_HOLIDAY';
+    BARS_AUDIT.INFO( c_title||' Очищаем всю таблицу saldo_holiday');
   else
+    BARS_AUDIT.INFO( c_title||' Очищаем таблицу saldo_holiday - '||l_kf);
     execute immediate 'alter table SALDO_HOLIDAY truncate partition P_'||l_kf;
   end if;
 
+
   bars_audit.trace( '%s: table saldo_holiday cleared.', c_title );
+  BARS_AUDIT.INFO( c_title||' table saldo_holiday cleared');
 
   execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
-
+  BARS_AUDIT.INFO( c_title||' parallel DML enabled');
+ 
   -- Наполняем таблицу
   execute immediate 'insert /*+ APPEND PARALLEL(24) */'
          ||chr(10)||'  into SALDO_HOLIDAY' || case when l_kf Is Null then '' else ' partition ( P_'||l_kf||' )' end
@@ -63,13 +69,14 @@ begin
     using l_minacrdat, l_minacrdat;
 
   bars_audit.trace( '%s: %s rows created.', c_title, to_char(sql%rowcount) );
-
+  BARS_AUDIT.INFO( c_title||' rows created - '||l_kf);
   commit;
 
   -- Устанавливаем флаг работы по накопительной таблице
   ACRN.SET_COLLECT_SALHO(1);
 
   bars_audit.trace( '%s: table saldo_holiday collected.', c_title );
+  BARS_AUDIT.INFO( c_title||' table saldo_holiday collected');
 
 end COLLECT_SALDOHOLIDAY;
 /
