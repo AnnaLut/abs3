@@ -30,6 +30,8 @@ CREATE OR REPLACE PROCEDURE DPT_EXECUTE_JOB(p_jobcode in dpt_jobs_list.job_code%
   l_saldoho_char  varchar2(100);
   l_last_mnth_dat date;
   l_skip          boolean := false;
+
+  -- version 2.0 -- изменено Лившицем для Оптимизации ВЗД (распараллеливание процессов по бранчам)
   --
   -- поиск банк.даты в данном мфо
   --
@@ -102,6 +104,7 @@ BEGIN
     from our_branch
    where branch <> '/';
 
+  -- определяем последнюю банк.дату месяца
   select dat_next_u(add_months(trunc(l_initbdate, 'MM'), 1), -1)
     into l_last_mnth_dat
     from dual;
@@ -141,9 +144,9 @@ BEGIN
            where do.nbs_exp like '7%'
              and do.nbs_exp = a.nbs
              and do.ob22_exp = a.ob22);
-   commit;
+  commit;
 
-   -- и для валютных счетов                
+  -- и для валютных счетов                
    update accounts a
      set opt = 1
    where (dazs is null or dazs > sysdate)
@@ -280,8 +283,8 @@ BEGIN
                     'L_BRANCH := to_char(:end_id);' || chr(10) ||
                     'SELECT ''/''||substr(l_branch,1,6)||''/''||substr(l_branch,7,6)||''/'' INTO L_BRANCH FROM DUAL;' || chr(10) ||
                     'BC.GO(L_BRANCH); ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     'GL.PL_DAT(L_BDATE); ' || chr(10) ||
+                    'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     l_jobrec.job_proc || '(0, ' || to_char(l_runid) ||', L_BRANCH, L_BDATE' ||
                     case
                       when p_jobmode is not null then
@@ -376,8 +379,8 @@ BEGIN
                     'L_BRANCH := to_char(:end_id);' || chr(10) ||
                     'SELECT ''/''||substr(l_branch,1,6)||''/''||substr(l_branch,7,6)||''/'' INTO L_BRANCH FROM DUAL;' || chr(10) ||
                     'BC.GO(L_BRANCH); ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     'GL.PL_DAT(L_BDATE); ' || chr(10) ||
+                    'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     'FOR BR IN (SELECT * FROM OUR_BRANCH WHERE (DATE_CLOSED IS NULL OR DATE_CLOSED > L_BDATE) AND BRANCH_UTL.GET_BRANCH_LEVEL(BRANCH) = 3) LOOP' || chr(10) ||
                     'BARS_AUDIT.INFO(''' || title ||' ---===--- branch ''||BR.BRANCH ); ' || chr(10) ||
                     l_jobrec.job_proc || '(0, ' || to_char(l_runid) ||', BR.BRANCH, L_BDATE' ||
@@ -472,8 +475,7 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on DPT_EXECUTE_JOB to DPT_ADMIN;
 grant EXECUTE                                                                on DPT_EXECUTE_JOB to WR_ALL_RIGHTS;
 
-
-
 PROMPT ===================================================================================== 
-PROMPT *** End *** ======= Scripts /Sql/BARS/Procedure/DPT_EXECUTE_JOB.sql =========*** End
+PROMPT *** End *** ===== Scripts /Sql/BARS/Procedure/DPT_EXECUTE_JOB.sql ========*** End ***
 PROMPT ===================================================================================== 
+
