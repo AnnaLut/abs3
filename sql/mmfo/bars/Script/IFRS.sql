@@ -157,7 +157,7 @@ BEGIN
 END;
 /
 
-
+prompt TRIGGER ON
 begin
    execute immediate 'alter trigger TAIUD_BPKPARAMETERS_UPDATE enable';
    execute immediate 'alter trigger TAIUD_ND_TXT_UPDATE enable';

@@ -80,6 +80,21 @@ for k in (select kf from mv_kf )
      COMMIT;
 end;  
 /
+prompt для accp 
+  begin 
+for k in (select kf from mv_kf )
+  loop
+    bc.go (k.kf);
+    insert into cp_refw
+     (ref,tag,value)  
+       select distinct  cp.ref,'BUS_MOD',5 from cp_deal cp, accounts a where cp.accp=a.acc and cp.dazs is null and 
+      substr(a.nls,1,4) in (3102, 3103, 3105)
+      and cp.ref not in (select ref from cp_refw where tag='BUS_MOD');
+      end loop;
+     COMMIT;
+end;  
+/
+
 prompt---666666666666666666666666666
 begin
 for m in (select kf from mv_kf)

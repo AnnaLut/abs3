@@ -17,7 +17,7 @@ BEGIN
          bars.logger.info(''run_sppi_yes_ndtxt-''||:START_ID||''/''||:END_ID||'' ''||f_ourmfo);
        insert /*+ignore_row_on_dupkey_index(nd_txt PK_NDTXT) */ into nd_txt
        (nd, tag, txt)
-        select nd,''SPPI'',''Так'' from nd_txt where tag=''BUS_MOD'' and txt in(1,6,7,8,9,10,11,12,14);;
+        select nd,''SPPI'',''Так'' from nd_txt where tag=''BUS_MOD'' and txt in(1,6,7,8,9,10,11,12,14);
        commit;
        end;';
 
