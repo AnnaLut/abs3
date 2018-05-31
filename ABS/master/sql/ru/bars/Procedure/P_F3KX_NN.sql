@@ -16,7 +16,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.008          27.04.2018
+% VERSION     :   v.18.009          30.05.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -29,6 +29,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+30.05.2018  расширение условий при определении K021=G
 27.04.2018  ревизия алгоритма определения параметра K021 для клиента
 13.04.2018  -исключена корреспонденция дт2630-кт3800
 10.04.2018  -новые корреспонденции дт2530/2531-кт2900
@@ -91,8 +92,9 @@ IS
    nmk_       varchar2(70);
    k040_      varchar2(3);
    adr_       varchar2(70);
-   k110_      varchar2(5);
    ise_       varchar2(5);
+   fs_        varchar2(2);
+   i_cnt_25_       number;                   --количество счетов раздела 25
 
    codc_      number;
    sum0_      number;
@@ -129,7 +131,7 @@ IS
       SELECT   t.ko,
                nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
                c.rnk, c.okpo, c.nmk, TO_CHAR (c.country), c.adr,
-               NVL (c.ved, '00000'), c.codcagent,
+               NVL (c.ise, '00000'), NVL (c.fs, '00'), c.codcagent,
                SUM (t.s_eqv),
                SUM (gl.p_icurval (t.kv, t.s_kom, dat_))     --сумма в формате грн.коп
           FROM OTCN_PROV_TEMP t, customer c, tobo b         --branch b
@@ -142,7 +144,7 @@ IS
                c.nmk,
                TO_CHAR (c.country),
                c.adr,
-               NVL (c.ved, '00000'),
+               NVL (c.ise, '00000'), NVL (c.fs, '00'),
                c.codcagent
       ORDER BY 2, 3;
 
@@ -655,7 +657,7 @@ BEGIN
 
    LOOP
       FETCH c_main
-       INTO ko_, kod_obl_, rnk_, okpo_, nmk_, k040_, adr_, k110_, codc_, sum1_, sumk1_;
+       INTO ko_, kod_obl_, rnk_, okpo_, nmk_, k040_, adr_, ise_, fs_, codc_, sum1_, sumk1_;
 
       EXIT WHEN c_main%NOTFOUND;
 
@@ -671,11 +673,16 @@ BEGIN
          THEN
             okpo_ := LPAD (okpo_, 10, '0');
             k021_ := '1';
-            select ise
-               into ise_
-            from customer
-            where rnk = rnk_;
-            if ise_ in ('13110','13120','13131','13132')
+
+            i_cnt_25_ :=0;
+            select count( * )  into i_cnt_25_
+              from accounts
+             where rnk =rnk_
+               and nls like '25%'
+               and dazs is null;
+
+            if   ise_ in ('13110','13120','13131','13132')
+               or fs_ ='31'  and  i_cnt_25_ >0
             then
                k021_ := 'G';
             end if;
@@ -1136,7 +1143,7 @@ BEGIN
 
 ------------------------------------------------------------
 --                                    зеркальные операции для 2620, 2625, 2630
-   if mfou_ =300465 and mfo_ !=300465  then
+   if mfou_ =300465  then             --and mfo_ !=300465  then
 
      for u in ( SELECT kv, sum(s_nom-nvl(s_kom,0)) sum0
                   FROM OTCN_PROV_TEMP 
