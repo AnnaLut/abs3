@@ -491,7 +491,7 @@ end;
 function get_xml_credit_tranche return clob
  is
  l_xml_credit_tranche xmltype;
- begin 
+ begin
     select xmlelement("ROOT",
            xmlelement("CURRENT_USER",get_user_name()) ,
            xmlelement("REPORTING_TIME",to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')),
@@ -527,7 +527,7 @@ function get_xml_credit_tranche return clob
        select XmlElement("CREDIT_TRANCHE",'NO DATA') into l_xml_credit_tranche from dual;
     end if;
     return l_xml_credit_tranche.getClobVal();
- end; 
+ end;
 
 procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
   is
@@ -717,8 +717,8 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
        when others then
          bars.nbu_601_migrate.set_data_request_state(l_request_id_groupur_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
      commit;
-    end; 
-    
+    end;
+
     begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_finperformancepr_uo(), params, 'NBU_FINPERFORMANCEPR_UO', KF, id);
      select id into l_request_id_finpr_uo from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=12 and kf=p_kf) and
@@ -729,8 +729,8 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
        when others then
          bars.nbu_601_migrate.set_data_request_state(l_request_id_finpr_uo,10,sqlerrm || dbms_utility.format_error_backtrace());
      commit;
-    end; 
-    
+    end;
+
     begin
     BARSTRANS.TRANSP_UTL.send(NBU_601_FORMED_XML.get_xml_credit_tranche(), params, 'NBU_CREDIT_TRANCHE', KF, id);
      select id into l_request_id_cred_tranch from nbu_data_request_601 t where  t.report_instance_id=(select max(report_instance_id) from nbu_data_request_601 where data_type_id=18 and kf=p_kf) and
@@ -741,33 +741,59 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
        when others then
          bars.nbu_601_migrate.set_data_request_state(l_request_id_cred_tranch,10,sqlerrm || dbms_utility.format_error_backtrace());
      commit;
-    end; 
+    end;
 
  end;
+ 
+procedure ensure_wrapper_job(p_job_name in varchar2)
+    is
+        l_job_existance_flag integer;
+    begin
+      select 1
+            into   l_job_existance_flag
+            from   user_scheduler_jobs t
+            where  t.job_name = p_job_name;
+        exception
+            when no_data_found then
+                 dbms_scheduler.create_job(job_name     => p_job_name,
+                                           program_name => 'RUN_FORMATED_XML_OBJECTS',
+                                           auto_drop    => false,
+                                           comments     => null,
+                                           enabled      => false);
+
+        end; 
+ 
 
 procedure run_formated_xml
   is
  current_kf varchar2(50):=sys_context('bars_context','user_mfo');
  current_id number:=user_id ();
+ l_job_name varchar2(100);
  job_is_runing exception;
- pragma exception_init (job_is_runing,-27478);   
-    
+ pragma exception_init (job_is_runing,-27478);
+
  begin
-      dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
+ 
+   l_job_name := 'RUN_FORMATED_XML_'||current_kf;
+   ensure_wrapper_job(l_job_name);
+
+ 
+      dbms_scheduler.set_job_argument_value(job_name  =>l_job_name,
                                          argument_position =>1,
                                          argument_value => current_kf );
 
-      dbms_scheduler.set_job_argument_value(job_name  =>'RUN_FORMATED_XML',
+      dbms_scheduler.set_job_argument_value(job_name  =>l_job_name,
                                          argument_position =>2,
                                          argument_value => current_id );
    begin
-   dbms_scheduler.run_job(job_name =>'RUN_FORMATED_XML', use_current_session => false);
-   exception when job_is_runing 
+   dbms_scheduler.run_job(job_name =>l_job_name, use_current_session => false);
+   exception when job_is_runing
              then null;
-   end;          
+   end;
 end;
 
 end;
+
 /
 grant execute on nbu_601_request_data_ru to barstrans;
 grant execute on nbu_601_request_data_ru to bars_access_defrole;

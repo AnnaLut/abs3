@@ -18,7 +18,8 @@ create or replace package nbu_601_migrate as
 
   procedure run_all_data_requests(
         p_report_id in integer,
-        p_kf varchar2);
+        p_kf varchar2,
+        p_user_id integer);
 
   procedure handle_data_request(
         p_request_id in integer);
@@ -260,12 +261,34 @@ procedure ensure_wrapper_job(
                                            comments     => p_description,
                                            enabled      => false);
         end;
+
 /*
         dbms_scheduler.set_attribute(name      => p_job_name,
                                      attribute => 'RAISE_EVENTS',
                                      value     => \*dbms_scheduler.JOB_SUCCEEDED + *\dbms_scheduler.JOB_FAILED + dbms_scheduler.JOB_STOPPED);
 */
 end;
+
+
+procedure job_collection_ru(p_job_name in varchar2)
+    is
+        l_job_existance_flag integer;
+    begin
+        begin
+            select 1
+            into   l_job_existance_flag
+            from   user_scheduler_jobs t
+            where  t.job_name = p_job_name;
+        exception
+            when no_data_found then
+                 dbms_scheduler.create_job(job_name     => p_job_name,
+                                           program_name =>'RUN_ALL_601_OBJECTS',
+                                           auto_drop    => false,
+                                           comments     => null,
+                                           enabled      => false);
+        end;
+end;
+
 
 procedure track_data_request(
         p_request_id in integer,
@@ -361,7 +384,8 @@ end;
 
 procedure run_all_data_requests(
         p_report_id in integer,
-        P_KF in varchar2)
+        P_KF in varchar2,
+        p_user_id in integer)
     is
     l_request_id_w4_bpk int;
     l_request_id_person_fo int;
@@ -379,6 +403,13 @@ procedure run_all_data_requests(
     l_request_id_credit_pledge int;
     l_request_id_credit_tranche int;
     begin
+     bars_login.login_user(p_sessionid =>sys_guid(),
+                         p_userid    =>p_user_id ,
+                         p_hostname  =>null ,
+                         p_appname   =>null );
+
+    bc.go(p_kf);
+    
      begin
        select id into l_request_id_w4_bpk from nbu_data_request_601 t where  t.report_instance_id= (select max(report_instance_id) from nbu_data_request_601 where data_type_id=19 and kf=p_kf) and
            data_type_id=19 and kf=p_kf;
@@ -462,8 +493,8 @@ procedure run_all_data_requests(
               set_data_request_state(l_request_id_fingr_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      begin 
+
+      begin
        select id
        into   l_request_id_groupur_uo
        from   nbu_data_request_601 t
@@ -476,8 +507,8 @@ procedure run_all_data_requests(
               set_data_request_state(l_request_id_groupur_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      begin   
+
+      begin
        select id
        into   l_request_id_partners_uo
        from   nbu_data_request_601 t
@@ -490,37 +521,37 @@ procedure run_all_data_requests(
               set_data_request_state(l_request_id_partners_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      
-      begin 
+
+
+      begin
        select id
        into   l_request_id_fingr_uo
        from   nbu_data_request_601 t
        where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=12 and kf=p_kf) and data_type_id=12 and kf=p_kf;
              bars.nbu_601_request_data_ru.p_nbu_finperformancepr_uo(P_KF);
-             set_data_request_state(l_request_id_fingr_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано'); 
+             set_data_request_state(l_request_id_fingr_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
            commit;
       exception
            when others then
               set_data_request_state(l_request_id_fingr_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      begin 
+
+      begin
        select id
        into   l_request_id_ownerpp_uo
        from   nbu_data_request_601 t
        where  t.report_instance_id= (select max(report_instance_id)from nbu_data_request_601 where data_type_id=13 and kf=p_kf) and data_type_id=13 and kf=p_kf;
              bars.nbu_601_request_data_ru.p_nbu_ownerpp_uo(P_KF);
-             set_data_request_state(l_request_id_ownerpp_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано'); 
+             set_data_request_state(l_request_id_ownerpp_uo,nbu_601_migrate.REQ_STATE_DATA_DELIVERED, 'Дані отримано');
            commit;
       exception
              when others then
               set_data_request_state(l_request_id_ownerpp_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      begin 
+
+      begin
        select id
        into  l_request_id_ownerjur_uo
        from  nbu_data_request_601 t
@@ -533,8 +564,8 @@ procedure run_all_data_requests(
               set_data_request_state(l_request_id_ownerjur_uo,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      begin 
+
+      begin
        select id
        into   l_request_id_pledge_dep
        from   nbu_data_request_601 t
@@ -548,7 +579,7 @@ procedure run_all_data_requests(
               commit;
       end;
 
-      begin 
+      begin
        select id
        into   l_request_id_credit
        from   nbu_data_request_601 t
@@ -561,8 +592,8 @@ procedure run_all_data_requests(
               set_data_request_state(l_request_id_credit,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      begin 
+
+      begin
        select id
        into   l_request_id_credit_pledge
        from   nbu_data_request_601 t
@@ -575,9 +606,9 @@ procedure run_all_data_requests(
               set_data_request_state(l_request_id_credit_pledge,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
       end;
-      
-      
-      begin 
+
+
+      begin
        select id
        into   l_request_id_credit_tranche
        from   nbu_data_request_601 t
@@ -589,12 +620,12 @@ procedure run_all_data_requests(
         when others then
               set_data_request_state(l_request_id_credit_tranche,8,sqlerrm ||' '|| dbms_utility.format_error_backtrace());
               commit;
-      end;    
+      end;
 
 /* for i in (select * from nbu_data_request_601 t
                   where  t.report_instance_id = p_report_id and
                          t.state_id = nbu_601_migrate.REQ_STATE_NEW and
-                         t.kf=p_kf 
+                         t.kf=p_kf
                           and
                          t.id not in (l_request_id_w4_bpk,l_request_id_person_fo,l_request_id_document_fo,l_request_id_address_fo,l_request_id_person_uo,l_request_id_fingr_uo,l_request_id_fin_uo)
                          ) loop
@@ -670,9 +701,11 @@ procedure create_data_request(P_KF in varchar2)
     is
     l_request_id int;
     l_instance_id integer ;
+    l_job_name varchar2(100);
+    l_current_id number:=user_id ();
     job_is_runing exception;
-    pragma exception_init (job_is_runing,-27478);    
-    
+    pragma exception_init (job_is_runing,-27478);
+
    begin
       select nvl(max(report_instance_id),0)+1 into l_instance_id from nbu_data_request_601 where kf=p_kf;
 
@@ -686,21 +719,32 @@ procedure create_data_request(P_KF in varchar2)
        end loop;
 
     commit;
-    dbms_scheduler.set_job_argument_value(job_name          =>'RUN_ALL_601',
+	
+    l_job_name:='RUN_ALL_601_'||p_kf;
+    job_collection_ru(l_job_name);
+    
+    dbms_scheduler.set_job_argument_value(job_name          =>l_job_name,
                                           argument_position =>1,
                                           argument_value    => l_instance_id );
-    dbms_scheduler.set_job_argument_value(job_name          =>'RUN_ALL_601',
+                                          
+    dbms_scheduler.set_job_argument_value(job_name          =>l_job_name,
                                          argument_position =>2,
                                          argument_value    => p_kf ) ;
+    
+    dbms_scheduler.set_job_argument_value(job_name          =>l_job_name,
+                                         argument_position =>3,
+                                         argument_value    => l_current_id ) ;
+                                         
 
     begin
-    dbms_scheduler.run_job(job_name =>'RUN_ALL_601', use_current_session => false);
-     exception when job_is_runing 
+    dbms_scheduler.run_job(job_name =>l_job_name, use_current_session => false);
+     exception when job_is_runing
                then null;
     end;
-    
+
  end;
 end;
+
 /
 
 grant execute on nbu_601_request_data_ru to barstrans;
