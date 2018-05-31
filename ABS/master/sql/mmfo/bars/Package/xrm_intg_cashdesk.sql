@@ -1,6 +1,6 @@
 create or replace package xrm_intg_cashdesk
 is
-   g_head_version   constant varchar2 (64) := 'version 1.6 17.04.2018';
+   g_head_version   constant varchar2 (64) := 'version 1.7 31.05.2018';
 
    --
    -- реализация функционала сервиса функционала сервиса  XRMIntegrationCreateDocuments
@@ -14,7 +14,7 @@ end xrm_intg_cashdesk;
 /
 create or replace package body xrm_intg_cashdesk
 is
-   g_body_version   constant varchar2 (64) := 'version 1.6 17.04.2018';
+   g_body_version   constant varchar2 (64) := 'version 1.7 31.05.2018';
 
    g_p_name         constant varchar2 (17) := 'xrm_intg_cashdesk';
 
@@ -74,7 +74,7 @@ is
       lcva    tabval.lcv%type,
       lcvb    tabval.lcv%type
    );
-   
+
    type l_dpt_par is record
    (
        l_dpt_amount                 DPT_DEPOSIT.Limit%TYPE,
@@ -87,15 +87,15 @@ is
        l_fl_avans_payoff            number(1),
        l_dat_end                    date,
        l_min_summ                   number,
-       l_denom                      number,  
+       l_denom                      number,
        l_dpt_acc                    accounts.acc%type,
        l_dpt_saldo                  accounts.acc%type,
        l_int_acc                    accounts.ostc%type,
        l_int_saldo                  accounts.ostc%type,
        l_int_saldo_pl               accounts.ostb%type,
        l_dpt_cur_denom              number
-   );   
-   
+   );
+
    procedure init
    is
    begin
@@ -740,7 +740,7 @@ is
                   id_b_    => l_oper.id_b,
                   id_o_    => null,
                   sign_    => null,
-                  sos_     => 1,
+                  sos_     => 0,
                   prty_    => null,
                   uid_     => null);
 
@@ -2332,7 +2332,7 @@ is
       l_ref             oper.ref%type;
 
       l_clob_data       clob;
-      l_tmp             varchar2(256);      
+      l_tmp             varchar2(256);
 
    begin
 
@@ -2396,11 +2396,11 @@ is
              where a.REF=l_ref
                and a.NLSA = aa.nls
                and a.kv     = aa.kv
-               and a.NLSB = ab.nls 
+               and a.NLSB = ab.nls
                and a.KV2  = ab.kv
                and a.USERID = b.user_id (+)    )
       loop
-        
+
        if c.dk = 0  --COBUXRMIII-63
        then
         l_tmp:=c.mfoa;
@@ -2418,14 +2418,14 @@ is
         l_tmp:=c.s;
         c.s := c.s2;
         c.s2 := l_tmp;
-        
+
         l_tmp:=c.id_a;
         c.id_a := c.id_b;
         c.id_b := l_tmp;
 
         l_tmp:=c.nam_a;
         c.nam_a := c.nam_b;
-        c.nam_b := l_tmp;          
+        c.nam_b := l_tmp;
       end if;
       l_node3 :=
          dbms_xmldom.appendchild (
@@ -2456,7 +2456,7 @@ is
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.username)));            
+            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.username)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2480,7 +2480,7 @@ is
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsa)));            
+            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsa)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2536,7 +2536,7 @@ is
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsb)));              
+            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsb)));
 /*      l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2854,7 +2854,7 @@ is
                and a.pdat < (to_date (l_dat2, 'dd/mm/yyyy') + 1)
                and a.NLSA = aa.nls
                and a.kv     = aa.kv
-               and a.NLSB = ab.nls 
+               and a.NLSB = ab.nls
                and a.KV2  = ab.kv
                and a.USERID = b.user_id(+)    )
       loop
@@ -2864,7 +2864,7 @@ is
         l_tmp:=c.mfoa;
         c.mfoa := c.mfob;
         c.mfob := l_tmp;
-               
+
         l_tmp:=c.nlsa;
         c.nlsa := c.nlsb;
         c.nlsb := l_tmp;
@@ -2876,14 +2876,14 @@ is
         l_tmp:=c.s;
         c.s := c.s2;
         c.s2 := l_tmp;
-        
+
         l_tmp:=c.id_a;
         c.id_a := c.id_b;
         c.id_b := l_tmp;
 
         l_tmp:=c.nam_a;
         c.nam_a := c.nam_b;
-        c.nam_b := l_tmp;        
+        c.nam_b := l_tmp;
       end if;
       l_node3 :=
          dbms_xmldom.appendchild (
@@ -2914,7 +2914,7 @@ is
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.username)));              
+            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.username)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2938,7 +2938,7 @@ is
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsa)));              
+            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsa)));
       l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -2994,7 +2994,7 @@ is
       l_element_tnode :=
          dbms_xmldom.appendchild (
             l_element_node,
-            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsb)));              
+            dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, c.nlsb)));
 /*      l_element_node :=
          dbms_xmldom.appendchild (
             l_node3,
@@ -3231,7 +3231,7 @@ is
       l_node2           dbms_xmldom.domnode;
       l_node3           dbms_xmldom.domnode;
       l_node4           dbms_xmldom.domnode;
-      l_node5           dbms_xmldom.domnode;      
+      l_node5           dbms_xmldom.domnode;
       l_clob_data       clob;
       l_oper            number(3);
       l_deposit_id      DPT_DEPOSIT.DEPOSIT_ID%TYPE;
@@ -3260,7 +3260,7 @@ is
       dbms_xmldom.freedocument (l_doc);
 
       l_deposit_id:=xrm_maintenance.add_ru_tail (l_deposit_id_tmp);
-      begin 
+      begin
           begin
             with oper_tt as (--(первинний внесок)
                               select 0 oper, 0 tt from dual
@@ -3310,12 +3310,12 @@ is
           end;
        if l_tts_ar.count <= 0 then
           l_errcode := -1;
-          raise_application_error(-20001,'Для депозитного договору '||l_deposit_id_tmp||' не знайдено операцій до виконання для дії із кодом '||l_oper||'!');  
-       end if;   
+          raise_application_error(-20001,'Для депозитного договору '||l_deposit_id_tmp||' не знайдено операцій до виконання для дії із кодом '||l_oper||'!');
+       end if;
        exception when others then
           l_errcode := -1;
-          l_errmsg := substr(SQLERRM,1,2000);   
-       end;   
+          l_errmsg := substr(SQLERRM,1,2000);
+       end;
 
 --формируем ответ
       l_domdoc := dbms_xmldom.newdomdocument;
@@ -3361,7 +3361,7 @@ is
                   l_element_node,
                   dbms_xmldom.makenode (
                      dbms_xmldom.createtextnode (l_domdoc,l_tts_ar (j).tt_cash)));*/
-                     
+
 
             l_node3 :=
                dbms_xmldom.appendchild (
@@ -3385,11 +3385,11 @@ is
                   l_element_node,
                   dbms_xmldom.makenode (
                      dbms_xmldom.createtextnode (l_domdoc,l_errmsg)));
-           if l_errcode <> - 1 then    
+           if l_errcode <> - 1 then
             if l_tts_ar.count > 0
             then
                for j in l_tts_ar.first .. l_tts_ar.last
-               loop        
+               loop
                 l_node4 :=
                    dbms_xmldom.appendchild (
                       l_node3,
@@ -3424,9 +3424,9 @@ is
                        dbms_xmldom.appendchild (
                           l_element_node,
                           dbms_xmldom.makenode (
-                             dbms_xmldom.createtextnode (l_domdoc,l_tts_ar (j).tt_cash))); 
-              end loop;           
-              end if;                              
+                             dbms_xmldom.createtextnode (l_domdoc,l_tts_ar (j).tt_cash)));
+              end loop;
+              end if;
              end if;
 
       dbms_lob.createtemporary (l_clob_data, false);
@@ -3465,19 +3465,19 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
       l_stmt            l_tts.nlsb%TYPE;
       l_chargedamount   number;
       l_errcode         number(1):= 0;
-      l_errmsg          varchar2(2000):= 'Ok';  
-      l_penalty_rate    number;  
-      l_penalty         number;    
-      l_commiss         number;   
-      l_commiss2        number; 
-      l_dptrest         number;    
+      l_errmsg          varchar2(2000):= 'Ok';
+      l_penalty_rate    number;
+      l_penalty         number;
+      l_commiss         number;
+      l_commiss2        number;
+      l_dptrest         number;
       l_intrest         number;
       l_int2pay_ing     number;
       l_trusteetype_id  dpt_trustee.id%type;
-      l_deposit_sum_to_pay    accounts.ostc%type;                 
-      l_percent_sum_to_pay    accounts.ostc%type;   
+      l_deposit_sum_to_pay    accounts.ostc%type;
+      l_percent_sum_to_pay    accounts.ostc%type;
       l_dpt             l_dpt_par;
-      
+
       function AllowedFlag (p_dptid in DPT_DEPOSIT.DEPOSIT_ID%TYPE, p_rnk in DPT_DEPOSIT.Rnk%TYPE, p_flag in number)
       return number
       is
@@ -3503,7 +3503,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
         end;
       return l_res;
       end;
-      
+
       function GetAllowedAmount (p_dptid in DPT_DEPOSIT.DEPOSIT_ID%TYPE, p_rnk in DPT_DEPOSIT.Rnk%TYPE)
       return number
       is
@@ -3512,13 +3512,13 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
       begin
         begin
          select LPAD(to_char(da.DENOM_COUNT),4,'0'), da.DENOM_AMOUNT
-         into l_flag, p_sum 
+         into l_flag, p_sum
                                   from DPT_AGREEMENTS da
-                                 inner join DPT_TRUSTEE dt on (dt.id = da.trustee_id and dt.dpt_id = da.dpt_id)    
+                                 inner join DPT_TRUSTEE dt on (dt.id = da.trustee_id and dt.dpt_id = da.dpt_id)
                                  where da.dpt_id = p_dptid
                                    and da.agrmnt_type = 12
                                    and da.agrmnt_state = 1
-                                   and da.date_end > TRUNC( SYSDATE ) 
+                                   and da.date_end > TRUNC( SYSDATE )
                                    and dt.typ_tr = 'T'
                                    and dt.rnk_tr = p_rnk
                                    and dt.fl_act = 1;
@@ -3529,9 +3529,9 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
           raise_application_error(-20001,'Довіреній особі не надано право отримання коштів по договору!');
         end if;
       return p_sum;
-      end;     
-      
-      
+      end;
+
+
 
        -- Схема виплати відсотків у відділенні: 1 - можна платити на касу, default = 0, платити на рахунок, відповідно до ЕБП.
       function  DPT_PAY_CASHDESK(p_tag in varchar)
@@ -3550,7 +3550,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
         end;
       return nval;
       end;
-      
+
       procedure get_dpt(p_deposit_id in DPT_DEPOSIT.DEPOSIT_ID%TYPE , p_dpt out l_dpt_par)
       is
       begin
@@ -3580,7 +3580,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                               FROM tabval$global
                              WHERE kv = NVL (a.kv, d.kv))
                               AS dpt_cur_denom
-          into p_dpt   
+          into p_dpt
         from dpt_deposit d,
              dpt_vidd    v,
              accounts    a,
@@ -3600,19 +3600,19 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
          when no_data_found
          then
             bars_error.raise_nerror ('DPT', 'DPT_NOT_FOUND');
-      end; 
-      
+      end;
+
 /*      function CheckCardPayoff (p_payoff_type in varchar, p_perc_nls in varchar2, p_currency in number, p_deposit_id in number, p_tt in varchar2)
       return number
       is
       begin
         if  p_payoff_type = 'D' then
           select op_type
-                from v_dpt_vidd_tts t, dpt_deposit d 
+                from v_dpt_vidd_tts t, dpt_deposit d
                 where d.deposit_id = :dpt_id and d.vidd = t.dpttype_id
                 and tt_id in (
       end; */
-      
+
 
   begin
       -- парсим хмл
@@ -3637,7 +3637,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
       l_rnk:=xrm_maintenance.add_ru_tail (l_rnk);
       --вычитка депозита
       get_dpt(l_deposit_id,l_dpt);
-      
+
     /*  begin
         select nvl(a1.ostb, a1.ostc)                         dpt_amount,
                nvl (dpt.f_dptw (d.deposit_id, 'NCASH'), '0') dpt_nocash,
@@ -3681,7 +3681,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                l_int_acc,
                l_int_saldo,
                l_int_saldo_pl,
-               l_dpt_cur_denom    
+               l_dpt_cur_denom
         from dpt_deposit d,
              dpt_vidd    v,
              accounts    a,
@@ -3702,19 +3702,19 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
          then
             bars_error.raise_nerror ('DPT', 'DPT_NOT_FOUND');
       end;*/
-      
+
       if l_trusteetype <> 'V' then  --тот ли, за кого себя выдает?!
-       begin 
-        select d.id 
-        into l_trusteetype_id  
+       begin
+        select d.id
+        into l_trusteetype_id
         from dpt_trustee d
         where d.dpt_id = l_deposit_id
           and d.typ_tr = l_trusteetype
           and d.rnk_tr    = l_rnk;
-        exception when others then  
+        exception when others then
           raise_application_error(-20001,'С XRM пришли несовместимые данные (договор,контрагент,3-е лицо по вкладу)!');
-        end;  
-      end if; 
+        end;
+      end if;
 
       if     l_oper = 0 then   --Первинний внесок на деп.рахунок
         if l_sum = 0 then
@@ -3780,7 +3780,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                               is_payoff       => null);
           elsif l_route = 1 then --transfer
             raise_application_error(-20001,'По логике веба, мы сюда никогда не зайдем!');
-          end if;   
+          end if;
           --перечитка депозита
            get_dpt(l_deposit_id,l_dpt);
       elsif  l_oper = 4 then   --close (выплата тела при досрочном расторжении)
@@ -3795,73 +3795,73 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
           elsif AllowedFlag(l_deposit_id,l_rnk,5) <> 1 then
              raise_application_error(-20001,'Довірена особа не може виконувати цю операцію!');
           elsif l_dpt.l_dat_end is not null and bankdate > l_dpt.l_dat_end then
-             raise_application_error(-20001,'Воспользуйтесь операцией выплаты вклада по завершению!');  
+             raise_application_error(-20001,'Воспользуйтесь операцией выплаты вклада по завершению!');
   /*        elsif l_dat_end <= bankdate then
-             raise_application_error(-20001,'Це не дострокова виплата!');*/     
+             raise_application_error(-20001,'Це не дострокова виплата!');*/
           elsif  l_trusteetype = 'H' and dpt_web.inherited_deal(l_deposit_id, 1) = 'Y' then  --перевірка на наявність зареєстрованих спадкоємців по депозиту
-             raise_application_error(-20001,'Дана функція заблокована. По депозитному договору є зареєстровані спадкоємці. Скористайтесь функцією \"Реєстрація свідоцтв про право на спадок!');        
+             raise_application_error(-20001,'Дана функція заблокована. По депозитному договору є зареєстровані спадкоємці. Скористайтесь функцією \"Реєстрація свідоцтв про право на спадок!');
           end if;
-          
+
           --штрафная % ставка
            l_penalty_rate :=nvl(dpt.f_shtraf_rate(l_deposit_id,bankdate),0);
-           dpt_web.global_penalty (l_deposit_id, 
-                                   bankdate, 
-                                   1, 
-                                   null, 
+           dpt_web.global_penalty (l_deposit_id,
+                                   bankdate,
+                                   1,
+                                   null,
                                    'RO',
                                    l_penalty,      --Сума штрафу
-                                   l_commiss,      --Сума комісії за РКО 
-                                   l_commiss2, 
+                                   l_commiss,      --Сума комісії за РКО
+                                   l_commiss2,
                                    l_dptrest,      --Сума комісії за прийом вітхих купюр
                                    l_intrest,
                                    l_int2pay_ing);  -- сумма процентов к выплате
           --перечитка депозита
           get_dpt(l_deposit_id,l_dpt);
-          
+
       elsif  l_oper = 6 then   --retutn (выплата тела по окончанию срока)
             if EBP.GET_ARCHIVE_DOCID(l_deposit_id) >0    ---ід депозитного договору в ЕАД (якщо = 0 - вклад відкривався не по ЕБП)  --(активность кнопки на вебе)
              and nvl(ebp.get_active_request(l_rnk, l_deposit_id),0)<=0  then --Перевірка наявності активного запиту
-               raise_application_error(-20001,'Вклад відкривався не по ЕБП!'); 
+               raise_application_error(-20001,'Вклад відкривався не по ЕБП!');
             elsif l_dpt.l_dat_end > bankdate then
                raise_application_error(-20001,'Термін дії депозитного договору №"'||l_deposit_id||'" ще не закінчився.  Операція зняття недоступна!');
             --перевірка на наявності депозиту в заставі по кредиту
             elsif  dpt_web.dpt_is_pawn(l_deposit_id) > 0 then
-              raise_application_error(-20001,'Депозит знаходиться в заставі. Операція заборонена!');  
+              raise_application_error(-20001,'Депозит знаходиться в заставі. Операція заборонена!');
             elsif dpt_irrevocable(l_deposit_id) + dpt_hasno35agrmnt(l_deposit_id)>=1 then
-              raise_application_error(-20001,'Вклад є невідкличним. Для дострокового повернення сформуйте запит на бек-офіс та сформуйте додаткову угоду на дострокове розірвання (35)!');                   
+              raise_application_error(-20001,'Вклад є невідкличним. Для дострокового повернення сформуйте запит на бек-офіс та сформуйте додаткову угоду на дострокове розірвання (35)!');
             elsif AllowedFlag(l_deposit_id,l_rnk,6) <> 1 then
-               raise_application_error(-20001,'Довірена особа не може виконувати цю операцію!');  
+               raise_application_error(-20001,'Довірена особа не може виконувати цю операцію!');
             elsif  l_trusteetype = 'H' and dpt_web.inherited_deal(l_deposit_id, 1) = 'Y' then  --перевірка на наявність зареєстрованих спадкоємців по депозиту
-               raise_application_error(-20001,'Дана функція заблокована. По депозитному договору є зареєстровані спадкоємці. Скористайтесь функцією \"Реєстрація свідоцтв про право на спадок!');                     
+               raise_application_error(-20001,'Дана функція заблокована. По депозитному договору є зареєстровані спадкоємці. Скористайтесь функцією \"Реєстрація свідоцтв про право на спадок!');
             elsif dpt_web.verify_depreturn(l_deposit_id, bankdate) <> 1 then --проверка допустимости возврата суммы вклада и процентов
-               raise_application_error(-20001,'11!'); 
+               raise_application_error(-20001,'11!');
             end if;
-           
-          --Донарахування %% при виплаті після завершення по системну дату 
+
+          --Донарахування %% при виплаті після завершення по системну дату
           dpt_charge_interest(p_dptid         => l_deposit_id,
                               p_chargedamount => l_chargedamount,
                               is_payoff       => 1);
            --перечитка депозита
-           get_dpt(l_deposit_id,l_dpt);                           
-           
+           get_dpt(l_deposit_id,l_dpt);
+
            l_deposit_sum_to_pay:=l_dpt.l_dpt_saldo; --сума до виплати з депозитного рахунку
            l_percent_sum_to_pay:=l_dpt.l_int_saldo; --сума до виплати з рахунку відсотків
-           
+
            if  l_trusteetype = 'H'  then
              l_deposit_sum_to_pay:=dpt_web.inherit_rest(l_deposit_id, l_rnk, l_dpt.l_dpt_acc);  --розрахунок суми вкладу що належить вплатити спадкоємцю
              l_percent_sum_to_pay:=dpt_web.inherit_rest(l_deposit_id, l_rnk, l_dpt.l_int_acc);  --розрахунок суми відсотків що належить вплатити спадкоємцю
-           end if;   
+           end if;
            if  l_trusteetype = 'T'  then
              if l_dpt.l_dpt_saldo>=GetAllowedAmount(l_deposit_id,l_rnk) then
-             --розрахунок суми вкладу що належить вплатити довіреній особі  
-             l_deposit_sum_to_pay:=l_dpt.l_dpt_saldo;  
+             --розрахунок суми вкладу що належить вплатити довіреній особі
+             l_deposit_sum_to_pay:=l_dpt.l_dpt_saldo;
              else
-             l_deposit_sum_to_pay:=0;  
+             l_deposit_sum_to_pay:=0;
              end if;
              l_percent_sum_to_pay:=0;            --розрахунок суми відсотків що належить вплатити довіреній особі
-           end if;       
-          
-          
+           end if;
+
+
       end if;
       exception when others
         THEN l_errcode := -1;
@@ -3902,7 +3902,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                   l_element_node,
                   dbms_xmldom.makenode (
                      dbms_xmldom.createtextnode (l_domdoc,l_errmsg)));
-            if l_errcode <> - 1 then            
+            if l_errcode <> - 1 then
             l_node4 :=
                dbms_xmldom.appendchild (
                   l_node3,
@@ -3928,7 +3928,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_dpt.l_int_saldo_pl)));                                              
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_dpt.l_int_saldo_pl)));
              elsif l_oper = 4 then
 
                  l_node5 :=
@@ -3942,7 +3942,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_penalty_rate)));  
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_penalty_rate)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -3950,7 +3950,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, (l_penalty+l_intrest)/l_dpt.l_dpt_cur_denom))); 
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, (l_penalty+l_intrest)/l_dpt.l_dpt_cur_denom)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -3958,7 +3958,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_int2pay_ing/l_dpt.l_dpt_cur_denom))); 
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_int2pay_ing/l_dpt.l_dpt_cur_denom)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -3966,7 +3966,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, (l_penalty-l_int2pay_ing)/l_dpt.l_dpt_cur_denom)));                                                          
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, (l_penalty-l_int2pay_ing)/l_dpt.l_dpt_cur_denom)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -3974,7 +3974,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_commiss/l_dpt.l_dpt_cur_denom))); 
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_commiss/l_dpt.l_dpt_cur_denom)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -3982,7 +3982,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_commiss2/l_dpt.l_dpt_cur_denom)));                                              
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_commiss2/l_dpt.l_dpt_cur_denom)));
              elsif l_oper = 6 then
 
                  l_node5 :=
@@ -3996,7 +3996,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_dpt.l_dpt_saldo/l_dpt.l_dpt_cur_denom)));  
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_dpt.l_dpt_saldo/l_dpt.l_dpt_cur_denom)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -4004,7 +4004,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_dpt.l_int_saldo/l_dpt.l_dpt_cur_denom)));  
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_dpt.l_int_saldo/l_dpt.l_dpt_cur_denom)));
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
@@ -4020,12 +4020,12 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
-                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_percent_sum_to_pay)));  
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_percent_sum_to_pay)));
                  if l_trusteetype = 'H' then
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
-                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'deposit_sum_to_pay_h')));                 
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'deposit_sum_to_pay_h')));
                    l_element_tnode :=
                       dbms_xmldom.appendchild (
                          l_element_node,
@@ -4037,12 +4037,12 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                    l_element_tnode :=
                       dbms_xmldom.appendchild (
                          l_element_node,
-                         dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_percent_sum_to_pay))); 
+                         dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_percent_sum_to_pay)));
                  elsif l_trusteetype = 'T' then
                  l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node5,
-                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'deposit_sum_to_pay_t')));                   
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'deposit_sum_to_pay_t')));
                    l_element_tnode :=
                       dbms_xmldom.appendchild (
                          l_element_node,
@@ -4054,12 +4054,12 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                    l_element_tnode :=
                       dbms_xmldom.appendchild (
                          l_element_node,
-                         dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_percent_sum_to_pay)));   
-                 end if;      
-                       
-                                                                                              
+                         dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, l_percent_sum_to_pay)));
+                 end if;
+
+
               end if;
-             end if; 
+             end if;
       dbms_lob.createtemporary (l_clob_data, false);
       dbms_xmldom.writetoclob (l_domdoc, l_clob_data);
       dbms_xmldom.freedocument (l_domdoc);
