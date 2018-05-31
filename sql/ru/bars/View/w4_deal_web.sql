@@ -7,7 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view W4_DEAL_WEB ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.W4_DEAL_WEB ("ND", "BRANCH", "CARD_CODE", "PRODUCT_CODE", "ACC_ACC", "ACC_NLS", "ACC_KV", "ACC_LCV", "ACC_OB22", "ACC_TIP", "ACC_TIPNAME", "ACC_OST", "ACC_DAOS", "ACC_DAZS", "CUST_RNK", "CUST_NAME", "CUST_OKPO", "CUST_TYPE", "CARD_IDAT", "CARD_IDAT2", "CARD_IDAT_BANKDATE", "DOC_ID", "BARCOD", "COBRANDID", "ISDKBO", "DKBO_ID", "DKBO_NUMBER", "DKBO_DATE_FROM", "DKBO_DATE_TO", "DEAL_TYPE_ID", "DEAL_STATE_ID", "CARD_DATE_FROM", "CARD_DATE_TO", "SED", "IS_ACC_CLOSE") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.W4_DEAL_WEB ("ND", "BRANCH", "CARD_CODE", "PRODUCT_CODE", "ACC_ACC", "ACC_NLS", "ACC_KV", "ACC_LCV", "ACC_OB22", "ACC_TIP", "ACC_TIPNAME", "ACC_OST", "ACC_DAOS", "ACC_DAZS", "CUST_RNK", "CUST_NAME", "CUST_OKPO", "CUST_TYPE", "CARD_IDAT", "CARD_IDAT2", "CARD_IDAT_BANKDATE", "DOC_ID", "BARCOD", "COBRANDID", "ISDKBO", "DKBO_ID", "DKBO_NUMBER", "DKBO_DATE_FROM", "DKBO_DATE_TO", "DEAL_TYPE_ID", "DEAL_STATE_ID", "CARD_DATE_FROM", "CARD_DATE_TO", "SED", "IS_ACC_CLOSE","PASS_DATE","PASS_STATE"
+) AS 
   SELECT o.nd,
           o.branch,
           o.card_code,
@@ -44,7 +45,9 @@ PROMPT *** Create  view W4_DEAL_WEB ***
           o.date_close  card_date_to,
           o.sed,
           case when o.dazs is null then 0
-         when  o.dazs is not null then 1 end is_acc_close
+         when  o.dazs is not null then 1 end is_acc_close,
+           o.pass_date,
+           o.pass_state
      FROM (SELECT o.nd,
                   a.branch,
                   o.card_code,
@@ -70,7 +73,9 @@ PROMPT *** Create  view W4_DEAL_WEB ***
                      doc_id,
                   cw.value workb,
                   wc.date_open,
-                  wc.date_close
+                  wc.date_close,
+                  o.pass_date,
+                  o.pass_state
              FROM w4_acc o,
                   accounts a,
                   customer c,
