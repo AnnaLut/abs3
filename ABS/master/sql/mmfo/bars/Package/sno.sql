@@ -65,11 +65,12 @@ procedure ATO2     ( p_ND number, p_dat date ) ;
 END SNO;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 4.0.1 , 27/03/2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 4.0.2 , 31/05/2018';
 
   SNO_31 char(1); -- гл.параметр = SNO_31 = 1 = Режим построения ГПП = Амортиз дата = посл.раб день пред мес перед платежной
   --              = иначе = 0 =                        Амортиз дата = платежной дате
   /*
+   31.05.2018 VPogoda обновление процедуры P1_SNO - связь с графиком гендоговора в случае работы с субдоговором.
    12.10.2016 Sta "31" числдо - по ГЛ.параетру
    18.08.2016   -- БЕК или снять с визы GPP    -- отмена. возврат назад. ---нет разбалансировки/ только передвижка вверх/вниз
    09.08.2016 MMFO  ВЕБ + Вибраний інтревал для ГПП
@@ -907,8 +908,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
     If l_Dat_End is null then
       select max(fdat)
         into l_Dat_End
-        from cc_lim
-       where nd = p_nd
+        from cc_lim c, cc_deal d
+       where d.nd = p_nd
+         and c.nd = nvl(d.ndg,d.nd)
          and Dat_Next_U(trunc(fdat, 'MM'), -1) > gl.BDate
          and nvl(NOT_SN, 0) <> 1;
     end if;
@@ -927,8 +929,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
       --------------------------------------- Требование Амортиз дата = платежной дате (ЦА ОБ, Стяжкина Л.+Русаков С.)
       select count(*)
         into kol_
-        from cc_lim
-       where nd = p_nd
+        from cc_lim c, cc_deal d
+       where d.nd = p_nd
+         and c.nd = nvl(d.ndg,d.nd)
          and nvl(NOT_SN, 0) <> 1
          and fdat >= l_Dat_Beg
          and fdat <= l_Dat_End;
@@ -951,8 +954,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
                p_sno,
                l_acc
           from (select FDAT
-                  from cc_lim
-                 where nd = p_nd
+                  from cc_lim c, cc_deal d
+                 where d.nd = p_nd
+                   and c.nd = nvl(d.ndg,d.nd)
                    and nvl(NOT_SN, 0) <> 1
                    and fdat >= l_Dat_Beg
                    and fdat <= l_Dat_End
@@ -962,8 +966,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
       --------------------------------- Здравый смысл: Режим построения ГПП = Амортиз дата = посл.раб день пред мес перед платежной
       select count(*)
         into kol_
-        from cc_lim
-       where nd = p_nd
+        from cc_lim c, cc_deal d
+       where d.nd = p_nd
+         and c.nd = nvl(d.ndg,d.nd)
          and nvl(NOT_SN, 0) <> 1
          and fdat >= l_Dat_Beg
          and fdat <= l_Dat_End
@@ -987,8 +992,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.SNO IS
                p_sno,
                l_acc
           from (select Dat_Next_U(trunc(fdat, 'MM'), -1) DAT31, FDAT
-                  from cc_lim
-                 where nd = p_nd
+                  from cc_lim c, cc_deal d
+                 where d.nd = p_nd
+                   and c.nd = nvl(d.ndg,d.nd)
                    and nvl(NOT_SN, 0) <> 1 -----------------------------  пл.день с процентами
                    and fdat >= l_Dat_Beg
                    and fdat <= l_Dat_End
