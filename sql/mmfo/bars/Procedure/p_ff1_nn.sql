@@ -7,16 +7,20 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FF1_NN ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
                                            sheme_   VARCHAR2 DEFAULT 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #F1 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 10/07/2017 (02/06/2017)
+% VERSION     : 01/06/2018 (10/07/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+01.06.2018 для проводок Дт 2909 Кт 2924 (в бух.моделе для данного REF  
+                                         еще и Дт 2924 Кт 2625)  
+           (в OPER NLSA='2909...' NLSB='2625...') будем выбирать 
+           первоначальную сумму из документа и ОКПО для счета 2625
 02.03.2017 добавлена обработка TAG='52A' для определения кода страны 
            бенефициара
 29.04.2015 не удаляем проводки Дт 2909 Кт 3739 и в кл-р KL_FF1 добавлены
@@ -527,7 +531,71 @@ BEGIN
       end loop;
    end if;
 
-      -- переказ коштiв фiз. особами за межi України (отримання коштiв фiз. особами)
+   -- замена RNK в OTCN_PROV_TEMP на RNK счета 2625
+   for k in ( select * from otcn_prov_temp
+                 where nlsd like '2909%'
+                   and nlsk like '2924%'
+               )
+         loop
+
+            begin
+               select p.rnkk 
+                  into rnk_
+               from provodki_otc p
+               where p.fdat = Dat_ 
+                 and p.ref = k.ref 
+                 and p.nlsd like k.nlsk || '%'
+                 and p.nlsk like '2625%'
+                 and p.kv = k.kv 
+                 and p.s*100 = k.s_nom
+                 and rownum = 1;
+
+                 update otcn_prov_temp t set t.rnk = rnk_
+                 where t.ref = k.ref
+                   and t.nlsd like '2909%' 
+                   and t.nlsk like '2924%'; 
+            exception when no_data_found then
+               BEGIN
+                  select a.rnk 
+                     into rnk_
+                  from oper o, accounts a 
+                  where o.vdat = dat_ 
+                    and o.ref = k.ref
+                    and trim(o.nlsb) = trim(a.nls)
+                    and o.nlsb like '2625%'
+                    and o.kv = a.kv;
+
+                 update otcn_prov_temp t set t.rnk = rnk_
+                 where t.ref = k.ref
+                   and t.nlsd like '2909%' 
+                   and t.nlsk like '2924%'; 
+               exception when no_data_found then
+                  BEGIN
+                     select p.rnkk 
+                        into rnk_
+                     from provodki_otc p, operw w
+                     where p.fdat = dat_ 
+                       and ( (p.nlsd like '2924%' and p.nlsk like '2625%') OR 
+                             (p.nlsd like '3739%' and p.nlsk like '2909%')
+                           )
+                       and p.kv = k.kv 
+                       and p.s*100 = k.s_nom 
+                       and w.ref = k.ref 
+                       and w.tag like '59%' 
+                       and p.nlsk = substr(w.value,2,14); 
+   
+                    update otcn_prov_temp t set t.rnk = rnk_
+                    where t.ref = k.ref
+                      and t.nlsd like '2909%' 
+                      and t.nlsk like '2924%'; 
+                  exception when no_data_found then
+                     null;
+                  END;
+               END;
+            end;
+      end loop;
+
+   -- переказ коштiв фiз. особами за межi України (отримання коштiв фiз. особами)
    OPEN opl_dok;
 
    LOOP
