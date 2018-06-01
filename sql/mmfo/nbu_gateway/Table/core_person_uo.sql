@@ -64,3 +64,17 @@ exception
          null;
 end;
 /
+
+begin
+	execute immediate'alter table core_person_uo add k020 VARCHAR2(20)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table core_person_uo add codDocum number(2)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/

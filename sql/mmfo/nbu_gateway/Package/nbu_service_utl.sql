@@ -534,6 +534,61 @@ create or replace package body nbu_service_utl as
                                   'HTTP-код помилки : ' || l_nbu_response.payload.general_http_status_code || bars.tools.crlf ||
                                   l_nbu_response.payload.general_err_comment);
             end if;
+            
+            
+
+            proceed_further_sessions(p_session_row);
+        end if;
+    exception
+        when others then
+             set_session_state(p_session_row.id, nbu_service_utl.SESSION_STATE_PROCESSING_FAIL,
+                               'Помилка обробки відповіді НБУ: ' || sqlerrm || chr(10) ||
+                               dbms_utility.format_error_backtrace());
+    end;
+
+ procedure process_put_response(
+        p_session_row in nbu_session%rowtype,
+        p_xml in xmltype)
+    is
+        l_response_code varchar2(32767 byte);
+        l_response_json clob;
+        l_nbu_response t_nbu_response;
+    begin
+        l_response_code := get_xml_string_value(p_xml, 'SendDataResponse/SendDataResult/ResponseCode/text()');
+        l_response_json := get_xml_clob_value(p_xml, 'SendDataResponse/SendDataResult/ResponseJSONString/text()');
+
+        bars_audit.log_trace('nbu_gateway.nbu_service_utl.process_post_response',
+                             '',
+                             p_object_id => p_session_row.id,
+                             p_auxiliary_info => l_response_json);
+
+        if (l_response_json is null) then
+            set_session_state(p_session_row.id, nbu_service_utl.SESSION_STATE_PROCESSING_FAIL,
+                              'Відсутні дані відповіді НБУ');
+        else
+            l_nbu_response := t_nbu_response(l_response_json);
+
+            if (l_nbu_response.payload.general_err_code = '0' or l_nbu_response.payload.general_err_comment like '"Запис вже існує в БД%') then
+                if (l_nbu_response.payload.response_units is not null or l_nbu_response.payload.response_units is not empty) then
+                    if (l_nbu_response.payload.response_units.count = 1 and l_nbu_response.payload.response_units(1) is not null) then
+                        set_session_state(p_session_row.id,
+                                          nbu_service_utl.SESSION_STATE_PROCESSED,
+                                          l_nbu_response.payload.general_err_comment,
+                                          null);
+                    else
+                        set_session_state(p_session_row.id, nbu_service_utl.SESSION_STATE_PROCESSING_FAIL,
+                                          'Неочікувана структура відповіді - перевишена кількість елементів у масиві "result_kvi"',
+                                          l_response_json);
+                    end if;
+                else
+                    set_session_state(p_session_row.id, nbu_service_utl.SESSION_STATE_PROCESSED, l_nbu_response.payload.general_err_comment, null);
+                end if;
+            else
+                set_session_state(p_session_row.id, nbu_service_utl.SESSION_STATE_DECLINED_BY_NBU,
+                                  'Код помилки : ' || l_nbu_response.payload.general_err_code || bars.tools.crlf ||
+                                  'HTTP-код помилки : ' || l_nbu_response.payload.general_http_status_code || bars.tools.crlf ||
+                                  l_nbu_response.payload.general_err_comment);
+            end if;
 
             proceed_further_sessions(p_session_row);
         end if;
@@ -594,7 +649,7 @@ create or replace package body nbu_service_utl as
                     if (p_session_row.request_type = 'POST') then
                         process_post_response(p_session_row, l_xml);
                     elsif (p_session_row.request_type = 'PUT') then
-                        null;
+                          process_put_response(p_session_row, l_xml);
                     elsif (p_session_row.request_type = 'DELETE') then
                         null;
                     elsif (p_session_row.request_type = 'GET') then
@@ -623,6 +678,7 @@ create or replace package body nbu_service_utl as
         for i in (select s.*
                   from   nbu_session s
                   where  s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED)
+				  and rownum<=100
                   /*for update*/) loop
             process_response(i);
         end loop;
