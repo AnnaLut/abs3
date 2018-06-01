@@ -98,6 +98,13 @@ create or replace package tools is
         p_ceiling_length in integer default null,
         p_ignore_nulls in char default 'N')
     return varchar2;
+	
+	function words_to_string(
+        p_words_list in varchar2_list,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
+    return varchar2;
 
     function string_to_words(
         p_string in varchar2,
@@ -105,7 +112,7 @@ create or replace package tools is
         p_trim_words in char default 'N',
         p_ignore_nulls in char default 'N')
     return string_list;
-
+		
     function string_to_number_list(
         p_string in varchar,
         p_number_format in varchar2 default null,
@@ -629,6 +636,59 @@ create or replace package body tools as
         return substrb(l_string, 1, l_current_length - l_splitter_length);
     end;
 
+	function words_to_string(
+        p_words_list in varchar2_list,
+        p_splitting_symbol in varchar2 default ';',
+        p_ceiling_length in integer default null,
+        p_ignore_nulls in char default 'N')
+    return varchar2
+    is
+        l integer;
+        l_string varchar2(32767 byte);
+        l_current_length integer;
+        l_item_length integer;
+        l_length_left integer;
+        l_splitter_length integer;
+        l_ceiling_length integer := nvl(p_ceiling_length, 32767);
+    begin
+        if (p_words_list is null) then
+            return null;
+        end if;
+
+        if (p_splitting_symbol is null) then
+            l_splitter_length := 0;
+        else
+            l_splitter_length := lengthb(p_splitting_symbol);
+        end if;
+
+        l := p_words_list.first;
+
+        l_current_length := 0;
+        while (l is not null) loop
+            if (p_words_list(l) is not null or nvl(p_ignore_nulls, 'N') <> 'Y') then
+                l_item_length := nvl(lengthb(p_words_list(l)), 0);-- + l_splitter_length;
+                l_length_left := l_ceiling_length - l_current_length;
+
+                if (l_item_length > l_length_left) then
+                    -- дос€гли меж≥ - можна повертати значенн€
+                    return rtrim(l_string, p_splitting_symbol);
+                elsif (l_item_length = l_length_left) then
+                    l_string := l_string || substrb(p_words_list(l), 1, l_length_left);
+                    -- дос€гли меж≥ - можна повертати значенн€
+                    return l_string;
+                else
+                    l_string := l_string || p_words_list(l) || p_splitting_symbol;
+                end if;
+
+                l_current_length := l_current_length + l_item_length + l_splitter_length;
+            end if;
+
+            l := p_words_list.next(l);
+        end loop;
+
+        return substrb(l_string, 1, l_current_length - l_splitter_length);
+    end;
+	
     function words_to_clob(
         p_words in string_list,
         p_splitting_symbol in varchar2 default ';',

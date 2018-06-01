@@ -21,7 +21,7 @@ begin
         countryCodNerez VARCHAR2(3),
         k060            VARCHAR2(2),
         status          VARCHAR2(30),
-	status_message  VARCHAR2(4000), 
+		status_message  VARCHAR2(4000), 
         kf              VARCHAR2(6)
     )
     TABLESPACE BRSMDLD
@@ -82,6 +82,20 @@ begin
 exception
     when name_already_used then
          null;
+end;
+/
+
+begin
+	execute immediate'alter table NBU_PERSON_FO add k020 VARCHAR2(20)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table NBU_PERSON_FO add codDocum number(2)';
+exception
+ when others then if sqlcode=-955 then null; end if;
 end;
 /
 
