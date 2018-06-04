@@ -50,7 +50,7 @@ begin
 , ACC   NUMBER(38)  CONSTRAINT CC_SALDOHOLIDAY_ACC_NN  NOT NULL
 , DOS   NUMBER(24)  CONSTRAINT CC_SALDOHOLIDAY_DOS_NN  NOT NULL
 , KOS   NUMBER(24)  CONSTRAINT CC_SALDOHOLIDAY_KOS_NN  NOT NULL
-) tablespace BRSBIGD
+) tablespace BRSDYND
 PARTITION BY LIST (KF)
 ( PARTITION P_300465 VALUES (''300465'')
 , PARTITION P_302076 VALUES (''302076'')
@@ -98,7 +98,23 @@ declare
   e_col_already_idx      exception;
   pragma exception_init( e_col_already_idx, -01408 );
 begin
-  execute immediate 'create unique index UK_SALDOHOLIDAY on SALDO_HOLIDAY ( KF, FDAT, CDAT, ACC ) tablespace BRSBIGI local compress 1';
+  execute immediate 'create unique index UK_SALDOHOLIDAY on SALDO_HOLIDAY ( KF, FDAT, CDAT, ACC ) tablespace BRSDYNI local compress 1';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+end;
+/
+
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate 'create index IDX_SALHOLIDAY_ACC on SALDO_HOLIDAY (ACC) tablespace BRSDYNI local'; -- compress 1
   dbms_output.put_line( 'Index created.' );
 exception
   when e_idx_exists
