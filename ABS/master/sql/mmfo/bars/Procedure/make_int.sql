@@ -1,11 +1,8 @@
-
-
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/MAKE_INT.sql =========*** Run *** 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/MAKE_INT.sql ========= *** Run *** 
 PROMPT ===================================================================================== 
 
-
-  CREATE OR REPLACE PROCEDURE BARS.MAKE_INT 
+create or replace procedure MAKE_INT
 ( p_dat2      in date,             -- граничная дата начисления процентов
   p_runmode   in number default 0, -- режим запуска (0 - начисление,1 - оплата)
   p_runid     in number default 0, -- № запуска
@@ -13,7 +10,7 @@ PROMPT =========================================================================
   p_errflg    out boolean          -- флаг ошибки                 (для 1-го счета)
 ) is
   -- ====================================================================================
-  -- процедура начисления процентов (прогноз +/- оплата) version 1.8.8 14.11.2017
+  -- процедура начисления процентов (прогноз +/- оплата) version 1.8.9  03.06.2018
   -- dptweb - расширенный функционал депозитной системы
   -- acr_dat - с возможностью сторно процентов
   -- sber - специфика сбербанка
@@ -134,6 +131,7 @@ PROMPT =========================================================================
   l_stpdat         date;
   l_cnt            number(38) := 0;
   l_is8            number := 0;
+  l_adj_f          boolean;
 
   --
   -- инициализация записи "заготовка платежа"
@@ -147,7 +145,6 @@ PROMPT =========================================================================
     p_docrec.tt     := null;
     p_docrec.nazn   := null;
     p_docrec.userid := null;
-    p_docrec.vdat   := null;
     p_docrec.s      := null;
     p_docrec.s2     := null;
     p_docrec.kv     := null;
@@ -160,7 +157,7 @@ PROMPT =========================================================================
     p_docrec.nam_b  := null;
     p_docrec.id_a   := null;
     p_docrec.id_b   := null;
-    p_docrec.tobo   := null;
+    p_docrec.branch := null;
   end init_docrec;
 
   --
@@ -181,13 +178,6 @@ PROMPT =========================================================================
                      to_char(p_opendat, 'dd/mm/yy'),
                      to_char(p_intid),
                      to_char(p_amount));
-
-    bars_audit.info(title || ' get_dates: запуск, (acr,stp,bd,open)=(' ||
-                    to_char(p_acrdat, 'dd/mm/yy') || ',' ||
-                    to_char(p_stpdat, 'dd/mm/yy') || ',' ||
-                    to_char(p_dat2, 'dd/mm/yy') || ',' ||
-                    to_char(p_opendat, 'dd/mm/yy') || '),id=' ||
-                    to_char(p_intid) || ', amount=' || to_char(p_amount));
 
     if (p_acrdat is null) or
        (p_acrdat is not null and p_acrdat < p_dat2 and p_stpdat is null) or
@@ -217,11 +207,9 @@ PROMPT =========================================================================
 
     bars_audit.trace('%s get_dates: период начисления %s-%s',
                      title,
-                     to_char(p_acrdat, 'dd/mm/yy'),
-                     to_char(p_stpdat, 'dd/mm/yy'));
-    bars_audit.info(title || ' get_dates: период начисления ' ||
-                    to_char(p_acrdat, 'dd/mm/yy') || '-' ||
-                    to_char(p_stpdat, 'dd/mm/yy'));
+                     to_char(p_acrdat, 'dd/mm/yyyy'),
+                     to_char(p_stpdat, 'dd/mm/yyyy'));
+
   end get_dates;
 
   --
@@ -299,21 +287,25 @@ PROMPT =========================================================================
                      to_char(p_docrec.kv2));
 
     p_docrec.dk := case
-                     when p_docrec.s > 0 then
-                      0
-                     else
-                      1
+                   when p_docrec.s > 0
+                   then 0
+                   else 1
                    end;
 
     if p_metr in (3, 4, 5) then
       p_docrec.dk := 1 - p_docrec.dk;
     end if;
 
-    p_docrec.vob := case
-                    when p_docrec.kv = p_docrec.kv2
-                    then 6
-                    else 16
-                    end;
+    if ( l_adj_f )
+    then -- нарахування %% за попередній міс. коригуючими док.
+      p_docrec.vob := 96;
+    else
+      p_docrec.vob := case
+                      when p_docrec.kv = p_docrec.kv2
+                      then 6
+                      else 16
+                      end;
+    end if;
 
     p_docrec.s := abs(p_docrec.s);
 
@@ -344,11 +336,8 @@ PROMPT =========================================================================
                                 160);
       else
         -- усі інші
-        p_docrec.nazn := substr(bars_msg.get_msg(modcode,
-                                                 'INT_DETAILS_TITLE') || ' ' ||
-                                p_intrec.acc_num || '/' || p_intrec.acc_iso,
-                                1,
-                                160);
+        p_docrec.nazn := substr(bars_msg.get_msg(modcode,'INT_DETAILS_TITLE')||' '||
+                                p_intrec.acc_num || '/' || p_intrec.acc_iso,1,160);
       end if;
     end if;
 
@@ -374,7 +363,8 @@ PROMPT =========================================================================
   --
   -- оплата документа
   --
-  function make_doc(p_docrec in oper%rowtype) return oper.ref%type is
+  function make_doc(p_docrec in oper%rowtype) return oper.ref%type
+  is
     l_ref oper.ref%type := null;
   begin
     bars_audit.trace('%s make_doc: запуск, %s -> %s, %s %s %s',
@@ -384,10 +374,8 @@ PROMPT =========================================================================
                      p_docrec.nlsb || ' (' || to_char(p_docrec.s2) || '/' ||
                      to_char(p_docrec.kv2) || ')',
                      p_docrec.tt,
-                     to_char(p_docrec.vdat, 'dd.mm.yy'),
+                     to_char(p_docrec.vdat,'dd.mm.yyyy'),
                      p_docrec.nazn);
-
-    bars_audit.info(title || ' make_doc: запуск ' || p_docrec.nazn);
 
     --if (p_docrec.branch <> sys_context ('bars_context', 'user_branch'))
     --then                                    -- змінюємо код бранча документа
@@ -409,8 +397,8 @@ PROMPT =========================================================================
                kv2_   => p_docrec.kv2,
                s2_    => p_docrec.s2,
                sk_    => null,
-               data_  => p_docrec.vdat,
-               datp_  => p_docrec.vdat,
+               data_  => l_bdate,
+               datp_  => l_bdate,
                nam_a_ => p_docrec.nam_a,
                nlsa_  => p_docrec.nlsa,
                mfoa_  => p_docrec.mfoa,
@@ -602,50 +590,28 @@ PROMPT =========================================================================
 
   end GET_MILNLS;
 
-  function get_content_of_tax_accounts
-  return clob
-  is
-      l_clob clob;
-      l accounts.branch%type;
-  begin
-      dbms_lob.createtemporary(l_clob, false);
-      dbms_lob.append(l_clob, 'Content of tax account collection' || chr(13) || chr(10));
-
-      l := g_taxnls_list.first;
-      while (l is not null) loop
-          dbms_lob.append(l_clob, rpad(l, 30) || ' ' || g_taxnls_list(l) || chr(13) || chr(10));
-          l := g_taxnls_list.next(l);
-      end loop;
-
-      dbms_lob.append(l_clob, 'Content of military tax account collection' || chr(13) || chr(10));
-
-      l := g_taxnls_list_military.first;
-      while (l is not null) loop
-          dbms_lob.append(l_clob, rpad(l, 30) || ' ' || g_taxnls_list_military(l) || chr(13) || chr(10));
-          l := g_taxnls_list_military.next(l);
-      end loop;
-
-      return l_clob;
-  end;
-
-
-  --
-  --
   -- ====================================================================================
 begin
-  bars_audit.trace('%s старт, начисление по %s, режим %s, запуск № %s',
-                   title,
-                   to_char(p_dat2, 'dd.mm.yy'),
-                   to_char(p_runmode),
-                   to_char(p_runid));
 
-  bars_audit.info(title || ' старт, начисление по ' ||
-                  to_char(p_dat2, 'dd.mm.yy') || ', режим ' ||
-                  to_char(p_runmode) || ', запуск № ' || to_char(p_runid));
+  bars_audit.trace( '%s старт, начисление по %s, режим %s, запуск № %s', title
+                  , to_char(p_dat2, 'dd.mm.yy'), to_char(p_runmode), to_char(p_runid));
 
   if ((p_runmode = 1) and (l_tax_method = 2 or l_tax_method = 3))
   then -- ініціалізація списку рахунків для сплати податку
     INIT_TAXNLS_LIST( sys_context('bars_context','user_mfo') );
+  end if;
+
+  if ( p_dat2    = trunc(sysdate,'MM')-1 -- останній календарний день попереднього міс.
+   and p_dat2    < gl.bd()               -- банківська дата здійснення нарахування належить наступному міс. 
+   and p_runmode = 1                     -- оплата
+     )
+  then
+    bars_audit.info( title||': Нарахування %% коригуючими!' );
+    l_adj_f       := true;
+    l_docrec.vdat := DAT_NEXT_U(trunc(l_bdate,'MM'),-1);
+  else
+    l_adj_f       := false;
+    l_docrec.vdat := l_bdate;
   end if;
 
   loop
@@ -670,7 +636,7 @@ begin
            rowid rw
       bulk collect
       into l_intlist
-      from int_queue
+      from INT_QUEUE
      where rownum <= rowslimit
      order by branch;
 
@@ -987,10 +953,8 @@ begin
 
               -- определение реквизитов документа
               l_docrec.s      := acr_list.acrd;
-              l_docrec.vdat   := l_bdate;
               l_docrec.mfoa   := l_intlist(i).kf;
               l_docrec.mfob   := l_intlist(i).kf;
-              l_docrec.tobo   := l_intlist(i).branch;
               l_docrec.branch := l_intlist(i).branch;
 
               -- пошук рахунків (а = рах. відсотків, б = рах. видатків)
@@ -1056,7 +1020,7 @@ begin
                   l_taxrow.int_date_begin := acr_list.fdat;
                   l_taxrow.int_date_end   := acr_list.tdat;
                   l_taxrow.int_s          := acr_list.acrd;
-                  l_taxrow.int_sq         := GL.p_icurval( l_taxrow.kv, acr_list.acrd, l_bdate );
+                  l_taxrow.int_sq         := GL.p_icurval( l_taxrow.kv, acr_list.acrd, l_docrec.vdat );
                   l_taxrow.tax_nls        := GET_TAXNLS( l_intlist(i).branch );
                   l_taxrow.tax_date_begin := acr_list.fdat;
                   l_taxrow.tax_date_end   := acr_list.tdat;
@@ -1071,7 +1035,7 @@ begin
                   l_taxrow_mil.int_date_begin := acr_list.fdat;
                   l_taxrow_mil.int_date_end   := acr_list.tdat;
                   l_taxrow_mil.int_s          := acr_list.acrd;
-                  l_taxrow_mil.int_sq         := gl.p_icurval( l_taxrow_mil.kv, acr_list.acrd, l_bdate );
+                  l_taxrow_mil.int_sq         := gl.p_icurval( l_taxrow_mil.kv, acr_list.acrd, l_docrec.vdat );
                   l_taxrow_mil.tax_nls        := GET_MILNLS( l_intlist(i).branch );
 
                   l_taxrow_mil.tax_date_begin := acr_list.fdat;
@@ -1601,22 +1565,9 @@ begin
 
                     l_taxrow.ref := l_docrec.ref;
 
-                    if (nvl(l_taxrow.tax_sq, 0) > 0) then
+                    if (nvl(l_taxrow.tax_sq, 0) > 0)
+                    then
 
-/*                      bars_audit.log_trace('make_int (tax paytt call)',
-                                           'l_taxrow.ref        : ' || l_taxrow.ref     || chr(10) ||
-                                           'l_docrec.vdat       : ' || l_docrec.vdat    || chr(10) ||
-                                           'tax_tt              : ' || tax_tt           || chr(10) ||
-                                           'l_docrec.kv         : ' || l_docrec.kv      || chr(10) ||
-                                           'l_docrec.nlsa       : ' || l_docrec.nlsa    || chr(10) ||
-                                           'l_taxrow.tax_s      : ' || l_taxrow.tax_s   || chr(10) ||
-                                           'l_basecur           : ' || l_basecur        || chr(10) ||
-                                           'l_taxrow.tax_nls    : ' || l_taxrow.tax_nls || chr(10) ||
-                                           'l_taxrow.tax_sq     : ' || l_taxrow.tax_sq  || chr(10) ||
-                                           'gl.bd               : ' || gl.bd()          || chr(10) ||
-                                           'l_intlist(i).branch : ' || l_intlist(i).branch,
-                                           p_make_context_snapshot => true);
-*/
                       begin
                           paytt(null,
                                 l_taxrow.ref,
@@ -1630,22 +1581,20 @@ begin
                                 l_taxrow.tax_nls,
                                 l_taxrow.tax_sq);
                       exception
-                          when others then
-                               bars_audit.log_error('make_int (tax paytt call exception)',
-                                                    'l_taxrow.ref        : ' || l_taxrow.ref        || chr(10) ||
-                                                    'l_docrec.vdat       : ' || l_docrec.vdat       || chr(10) ||
-                                                    'tax_tt              : ' || tax_tt              || chr(10) ||
-                                                    'l_docrec.kv         : ' || l_docrec.kv         || chr(10) ||
-                                                    'l_docrec.nlsa       : ' || l_docrec.nlsa       || chr(10) ||
-                                                    'l_taxrow.tax_s      : ' || l_taxrow.tax_s      || chr(10) ||
-                                                    'l_basecur           : ' || l_basecur           || chr(10) ||
-                                                    'l_taxrow.tax_nls    : ' || l_taxrow.tax_nls    || chr(10) ||
-                                                    'l_taxrow.tax_sq     : ' || l_taxrow.tax_sq     || chr(10) ||
-                                                    'gl.bd               : ' || gl.bd()             || chr(10) ||
-                                                    'l_intlist(i).branch : ' || l_intlist(i).branch || chr(10) ||
-                                                    sqlerrm || chr(10) || dbms_utility.format_error_backtrace(),
-                                                    p_auxiliary_info => get_content_of_tax_accounts(),
-                                                    p_make_context_snapshot => true);
+                        when others then
+                          bars_audit.error( title || ': l_taxrow.ref        : ' || l_taxrow.ref
+                                       || chr(10) || ', l_docrec.vdat       : ' || l_docrec.vdat
+                                       || chr(10) || ', tax_tt              : ' || tax_tt
+                                       || chr(10) || ', l_docrec.kv         : ' || l_docrec.kv
+                                       || chr(10) || ', l_docrec.nlsa       : ' || l_docrec.nlsa
+                                       || chr(10) || ', l_taxrow.tax_s      : ' || l_taxrow.tax_s
+                                       || chr(10) || ', l_basecur           : ' || l_basecur
+                                       || chr(10) || ', l_taxrow.tax_nls    : ' || l_taxrow.tax_nls
+                                       || chr(10) || ', l_taxrow.tax_sq     : ' || l_taxrow.tax_sq
+                                       || chr(10) || ', gl.bd               : ' || gl.bd()
+                                       || chr(10) || ', l_intlist(i).branch : ' || l_intlist(i).branch
+                                       || chr(10) || sqlerrm
+                                       || chr(10) || dbms_utility.format_error_backtrace() );
                           raise;
                       end;
 
@@ -1656,22 +1605,9 @@ begin
                                         to_char(l_taxrow.tax_s));
                     end if;
 
-                    if (nvl(l_taxrow_mil.tax_sq, 0) > 0) then
-/*
-                      bars_audit.log_trace('make_int (tax paytt call)',
-                                           'l_taxrow.ref         : ' || l_taxrow.ref         || chr(10) ||
-                                           'l_docrec.vdat        : ' || l_docrec.vdat        || chr(10) ||
-                                           'tax_mil_tt           : ' || tax_mil_tt           || chr(10) ||
-                                           'l_docrec.kv          : ' || l_docrec.kv          || chr(10) ||
-                                           'l_docrec.nlsa        : ' || l_docrec.nlsa        || chr(10) ||
-                                           'l_taxrow_mil.tax_s   : ' || l_taxrow_mil.tax_s   || chr(10) ||
-                                           'l_basecur            : ' || l_basecur            || chr(10) ||
-                                           'l_taxrow_mil.tax_nls : ' || l_taxrow_mil.tax_nls || chr(10) ||
-                                           'l_taxrow_mil.tax_sq  : ' || l_taxrow_mil.tax_sq  || chr(10) ||
-                                           'gl.bd                : ' || gl.bd()          || chr(10) ||
-                                           'l_intlist(i).branch : ' || l_intlist(i).branch,
-                                           p_make_context_snapshot => true);
-*/
+                    if (nvl(l_taxrow_mil.tax_sq, 0) > 0)
+                    then
+
                       begin
                           paytt(null,
                                 l_taxrow.ref,
@@ -1686,30 +1622,27 @@ begin
                                 l_taxrow_mil.tax_sq);
                       exception
                           when others then
-                               bars_audit.log_error('make_int (tax_mil paytt call exception)',
-                                                    'l_taxrow.ref         : ' || l_taxrow.ref         || chr(10) ||
-                                                    'l_docrec.vdat        : ' || l_docrec.vdat        || chr(10) ||
-                                                    'tax_mil_tt           : ' || tax_mil_tt           || chr(10) ||
-                                                    'l_docrec.kv          : ' || l_docrec.kv          || chr(10) ||
-                                                    'l_docrec.nlsa        : ' || l_docrec.nlsa        || chr(10) ||
-                                                    'l_taxrow_mil.tax_s   : ' || l_taxrow_mil.tax_s   || chr(10) ||
-                                                    'l_basecur            : ' || l_basecur            || chr(10) ||
-                                                    'l_taxrow_mil.tax_nls : ' || l_taxrow_mil.tax_nls || chr(10) ||
-                                                    'l_taxrow_mil.tax_sq  : ' || l_taxrow_mil.tax_sq  || chr(10) ||
-                                                    'gl.bd                : ' || gl.bd()              || chr(10) ||
-                                                    'l_intlist(i).branch  : ' || l_intlist(i).branch  || chr(10) ||
-                                                    sqlerrm || chr(10) || dbms_utility.format_error_backtrace(),
-                                                    p_auxiliary_info => get_content_of_tax_accounts(),
-                                                    p_make_context_snapshot => true);
+                               bars_audit.error( title || ': l_taxrow.ref         : ' || l_taxrow.ref
+                                            || chr(10) || ', l_docrec.vdat        : ' || l_docrec.vdat
+                                            || chr(10) || ', tax_mil_tt           : ' || tax_mil_tt
+                                            || chr(10) || ', l_docrec.kv          : ' || l_docrec.kv
+                                            || chr(10) || ', l_docrec.nlsa        : ' || l_docrec.nlsa
+                                            || chr(10) || ', l_taxrow_mil.tax_s   : ' || l_taxrow_mil.tax_s
+                                            || chr(10) || ', l_basecur            : ' || l_basecur
+                                            || chr(10) || ', l_taxrow_mil.tax_nls : ' || l_taxrow_mil.tax_nls
+                                            || chr(10) || ', l_taxrow_mil.tax_sq  : ' || l_taxrow_mil.tax_sq
+                                            || chr(10) || ', gl.bd                : ' || gl.bd()
+                                            || chr(10) || ', l_intlist(i).branch  : ' || l_intlist(i).branch
+                                            || chr(10) || sqlerrm 
+                                            || chr(10) || dbms_utility.format_error_backtrace() );
                           raise;
                       end;
 
-                      bars_audit.trace(title ||
-                                       ' за період з %s по %s сума відсотків = %s сума податку (Військовий збір) = %s.',
-                                       to_char(l_taxrow_mil.tax_date_begin,'dd/mm/yyyy'),
-                                       to_char(l_taxrow_mil.tax_date_end,'dd/mm/yyyy'),
-                                       to_char(l_taxrow_mil_tax_base_s),
-                                       to_char(l_taxrow_mil.tax_s));
+                      bars_audit.trace( '%s: за період з %s по %s сума відсотків = %s сума податку (Військовий збір) = %s.'
+                                      , title, to_char(l_taxrow_mil.tax_date_begin,'dd/mm/yyyy')
+                                      , to_char(l_taxrow_mil.tax_date_end,'dd/mm/yyyy')
+                                      , to_char(l_taxrow_mil_tax_base_s)
+                                      , to_char(l_taxrow_mil.tax_s) );
                     end if;
 
                   else
@@ -1725,15 +1658,9 @@ begin
                 exception
                   when others then
                     -- ошибка оплаты документа по счету %s/%s : %s
-                    l_errmsg := substr(bars_msg.get_msg(modcode,
-                                                        'INTPAY_FAILED',
-                                                        l_intlist     (i)
-                                                        .acc_num,
-                                                        l_intlist     (i)
-                                                        .acc_iso,
-                                                        sqlerrm || chr(10) || dbms_utility.format_error_backtrace()),
-                                       1,
-                                       errmsgdim);
+                    l_errmsg := substr(BARS_MSG.GET_MSG( modcode, 'INTPAY_FAILED', l_intlist(i).acc_num, l_intlist(i).acc_iso,
+                                                         sqlerrm || chr(10) || dbms_utility.format_error_backtrace() )
+                                      , 1, errmsgdim );
                     raise expt_int;
                 end;
 
@@ -1803,3 +1730,5 @@ begin
 
 end MAKE_INT;
 /
+
+show errors;
