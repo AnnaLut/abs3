@@ -382,6 +382,7 @@ BEGIN
                     'GL.PL_DAT(L_BDATE); ' || chr(10) ||
                     'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     'FOR BR IN (SELECT * FROM OUR_BRANCH WHERE (DATE_CLOSED IS NULL OR DATE_CLOSED > L_BDATE) AND BRANCH_UTL.GET_BRANCH_LEVEL(BRANCH) = 3) LOOP' || chr(10) ||
+		            'BC.GO(BR.BRANCH); ' || chr(10) ||
                     'BARS_AUDIT.INFO(''' || title ||' ---===--- branch ''||BR.BRANCH ); ' || chr(10) ||
                     l_jobrec.job_proc || '(0, ' || to_char(l_runid) ||', BR.BRANCH, L_BDATE' ||
                     case
