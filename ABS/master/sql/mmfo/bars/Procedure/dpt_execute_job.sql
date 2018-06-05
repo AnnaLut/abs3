@@ -66,7 +66,7 @@ BEGIN
   bars_audit.info(title || ' init gl.bdate - ' ||
                   to_char(l_initbdate, 'dd.mm.yyyy'));
 
-  -- поиск задания по символьному коду
+  --== поиск задания по символьному коду
   begin
     select * into l_jobrec from dpt_jobs_list where job_code = p_jobcode;
   exception
@@ -88,7 +88,7 @@ BEGIN
                     '(:dptid, :runid, :branch, :date, :mode); end;';
   end if;
 
-  -- фиксация запуска автомат.задания в журнале
+  --== фиксация запуска автомат.задания в журнале
   dpt_jobs_audit.p_start_job(p_jobid  => l_jobrec.job_id,
                              p_branch => sys_context('bars_context',
                                                      'user_branch'),
@@ -104,14 +104,14 @@ BEGIN
     from our_branch
    where branch <> '/';
 
-  -- определяем последнюю банк.дату месяца
+  --== определяем последнюю банк.дату месяца
   select dat_next_u(add_months(trunc(l_initbdate, 'MM'), 1), -1)
     into l_last_mnth_dat
     from dual;
 
-  -- накопление врем.таблицы saldo_holiday для ускорения работы процедуры
-  -- начисления процентов по календарным датам движения средств
-  -- выполняется только для процедуры начисления %% в конце месяца (и только, если это, действительно, конец месяца)
+  --== накопление врем.таблицы saldo_holiday для ускорения работы процедуры
+  --== начисления процентов по календарным датам движения средств
+  --== выполняется только для процедуры начисления %% в конце месяца (и только, если это, действительно, конец месяца)
   l_saldoho_char := 'acrn.set_collect_salho(0); ';
 
   IF p_jobcode = 'JOB_MINT' THEN
@@ -133,7 +133,7 @@ BEGIN
   END IF;
 
   bars_audit.info(title || ' start update accounts (class 7) set opt = 1');
-  -- устанавливаем пакетную оплату для 7-го класса счетов по депозитам
+  --== устанавливаем пакетную оплату для 7-го класса счетов по депозитам
   update accounts a
      set opt = 1
    where (dazs is null or dazs > sysdate)
@@ -146,7 +146,7 @@ BEGIN
              and do.ob22_exp = a.ob22);
   commit;
 
-  -- и для валютных счетов                
+  --== и для валютных счетов                
    update accounts a
      set opt = 1
    where (dazs is null or dazs > sysdate)
@@ -160,8 +160,8 @@ BEGIN
 
   IF NOT l_skip THEN
     IF l_jobrec.run_lvl = -1 THEN
-      -- lvl -1 -- старая методика без распараллеливания
-      -- цикл по подразделениям банка
+      --== lvl -1 -- старая методика без распараллеливания
+      --== цикл по подразделениям банка
       <<branch_loop>>
       for i in 1 .. l_branchlist.count loop
 
@@ -171,7 +171,7 @@ BEGIN
         begin
 
           l_kf := bars_context.extract_mfo(l_branchlist(i));
-          -- поиск банк.даты для 1-го подразделения очередного филиала
+          --== поиск банк.даты для 1-го подразделения очередного филиала
           if (l_curkf is null or l_curkf <> l_kf) then
             l_bdate  := get_bankdate(l_kf);
             l_curkf  := l_kf;
@@ -213,7 +213,7 @@ BEGIN
       end loop branch_loop;
 
     ELSIF l_jobrec.run_lvl = 1 THEN
-      -- lvl 1 -- запуск на уровне МФО
+      --== lvl 1 -- запуск на уровне МФО
       bars_audit.info(title || ' started');
       l_cursor := dbms_sql.open_cursor;
       begin
@@ -230,9 +230,9 @@ BEGIN
       bars_audit.info(title || ' finished ');
 
     ELSIF l_jobrec.run_lvl = 2 THEN
-      -- lvl 2   -- запуск задач на бранчах 2-го уровня
+      --== lvl 2   -- запуск задач на бранчах 2-го уровня
 
-      -- чтоб не слетала сессия (и, как результат, контекст), устанавливаем ей параметр для большого таймаута
+      --== чтоб не слетала сессия (и, как результат, контекст), устанавливаем ей параметр для большого таймаута
       bars_login.set_long_session();
       l_bdate := l_initbdate;
       bars_audit.trace('%s gl.bdate := %s',
@@ -240,9 +240,9 @@ BEGIN
                        to_char(l_bdate, 'dd.mm.yyyy'));
       bars_audit.info(title || ' jobcode = ' || p_jobcode ||
                       ' gl.bdate := ' || to_char(l_bdate, 'dd.mm.yyyy'));
-      -- определяем уникальное имя таски
+      --== определяем уникальное имя таски
       l_task_name := p_jobcode || '_' || bc.current_mfo;
-      -- проверяем, есть ли уже такая созданная
+      --== проверяем, есть ли уже такая созданная
       begin
         select dbms_parallel_execute.task_status(l_task_name)
           into l_task_status
@@ -251,29 +251,30 @@ BEGIN
         when others then
           l_task_status := -1;
       end;
-      -- если есть, удаляем
+      --== если есть, удаляем
       if l_task_status > 0 then
         dbms_parallel_execute.drop_task(l_task_name);
         bars_audit.info(title || ' task ' || l_task_name || ' droped');
       end if;
-      -- создаем таску
+      --== создаем таску
       dbms_parallel_execute.create_task(task_name => l_task_name);
 
       bars_audit.info(title || ' task ' || l_task_name || ' created');
-      -- определяем чанку - выборка бранчей второго уровня
+      --== определяем чанку - выборка бранчей второго уровня
       l_chunk_sql := 'SELECT DISTINCT REPLACE(BRANCH,''/'') BR, REPLACE(BRANCH,''/'') BR ' ||
                      'FROM OUR_BRANCH ' ||
                      'WHERE BRANCH <> ''/'' AND (DATE_CLOSED IS NULL OR DATE_CLOSED > SYSDATE) AND BARS.BRANCH_UTL.GET_BRANCH_LEVEL(BRANCH) = 2';
 
-      bars_audit.info(title || 'chunk sql = ' || l_chunk_sql);
-      -- создаем чанку
+      --bars_audit.info(title || 'chunk sql = ' || l_chunk_sql);
+      
+      --== создаем чанку
       dbms_parallel_execute.create_chunks_by_sql(task_name => l_task_name,
                                                  sql_stmt  => l_chunk_sql,
                                                  by_rowid  => false);
 
       bars_audit.info(title || ' chunks for task ' || l_task_name ||
                       'created');
-      -- код, который будет выполняться в параллели
+      --== код, который будет выполняться в параллели
       l_sql_stmt := 'DECLARE L_BRANCH VARCHAR2(32); ' || chr(10) ||
                     'L_BDATE DATE := to_date('''||to_char(l_bdate, 'DD.MM.YYYY') ||''',''DD.MM.YYYY''); ' || chr(10) ||
                     'BEGIN' || chr(10) ||
@@ -284,7 +285,7 @@ BEGIN
                     'SELECT ''/''||substr(l_branch,1,6)||''/''||substr(l_branch,7,6)||''/'' INTO L_BRANCH FROM DUAL;' || chr(10) ||
                     'BC.GO(L_BRANCH); ' || chr(10) ||
                     'GL.PL_DAT(L_BDATE); ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
+                    --'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     l_jobrec.job_proc || '(0, ' || to_char(l_runid) ||', L_BRANCH, L_BDATE' ||
                     case
                       when p_jobmode is not null then
@@ -292,7 +293,7 @@ BEGIN
                       else
                        ''
                       end || '); ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' - chunk finished with branch ''||L_BRANCH ); ' || chr(10) ||
+                    --'BARS_AUDIT.INFO(''' || title ||' - chunk finished with branch ''||L_BRANCH ); ' || chr(10) ||
                     'COMMIT; ' || chr(10) ||
                     'BC.HOME; ' || chr(10) ||
                     'BARS_LOGIN.LOGOUT_USER; ' || chr(10) ||
@@ -301,14 +302,14 @@ BEGIN
                     'BARS_LOGIN.LOGOUT_USER; ' || chr(10) ||
                     'END;';
 
-      bars_audit.info(title || 'sql_statement: ' || l_sql_stmt);
-      -- запуск таски
+      --bars_audit.info(title || 'sql_statement: ' || l_sql_stmt);
+      --== запуск таски
       dbms_parallel_execute.run_task(task_name      => l_task_name,
                                      sql_stmt       => l_sql_stmt,
                                      language_flag  => dbms_sql.native,
                                      parallel_level => 10);
       bars_audit.info(title || ' task runed');
-      -- проверка окончания работы таски
+      --== проверка окончания работы таски
       l_try    := 0;
       l_status := dbms_parallel_execute.task_status(l_task_name);
       while (l_try < 2 and l_status != dbms_parallel_execute.finished) loop
@@ -316,9 +317,9 @@ BEGIN
         dbms_parallel_execute.resume_task(l_task_name);
         l_status := dbms_parallel_execute.task_status(l_task_name);
       end loop;
-      -- удаляем таску
+      --== удаляем таску
       dbms_parallel_execute.drop_task(l_task_name);
-      -- возвращаем параметр сессии на обычный
+      --== возвращаем параметр сессии на обычный
       if bars_login.is_long_session then
         bars_login.cleare_long_session;
       end if;
@@ -326,8 +327,8 @@ BEGIN
       bars_audit.info(title || ' task ' || l_task_name || ' finished');
 
     ELSIF l_jobrec.run_lvl = 3 THEN
-      -- lvl 3 -- запуск задач на бранчах 3-го уровня
-      -- чтоб не слетала сессия (и, как результат, контекст), устанавливаем ей параметр для большого таймаута
+      --== lvl 3 -- запуск задач на бранчах 3-го уровня
+      --== чтоб не слетала сессия (и, как результат, контекст), устанавливаем ей параметр для большого таймаута
       bars_login.set_long_session();
       l_bdate := l_initbdate;
 
@@ -336,9 +337,9 @@ BEGIN
                        to_char(l_bdate, 'dd.mm.yyyy'));
       bars_audit.info(title || ' jobcode = ' || p_jobcode ||
                       ' gl.bdate := ' || to_char(l_bdate, 'dd.mm.yyyy'));
-      -- определяем уникальное имя таски
+      --== определяем уникальное имя таски
       l_task_name := p_jobcode || '_' || bc.current_mfo;
-      -- проверяем, есть ли уже такая созданная
+      --== проверяем, есть ли уже такая созданная
       begin
         select dbms_parallel_execute.task_status(l_task_name)
           into l_task_status
@@ -347,22 +348,22 @@ BEGIN
         when others then
           l_task_status := -1;
       end;
-      -- если есть, удаляем
+      --== если есть, удаляем
       if l_task_status > 0 then
         dbms_parallel_execute.drop_task(l_task_name);
         bars_audit.info(title || ' task ' || l_task_name || ' droped');
       end if;
-      -- создаем таску
+      --== создаем таску
       dbms_parallel_execute.create_task(task_name => l_task_name);
 
       bars_audit.info(title || ' task ' || l_task_name || ' created');
-      -- определяем чанку - выборка бранчей второго уровня
+      --== определяем чанку - выборка бранчей второго уровня
       l_chunk_sql := 'SELECT DISTINCT REPLACE(BRANCH,''/'') BR, REPLACE(BRANCH,''/'') BR ' ||
                      'FROM OUR_BRANCH ' ||
                      'WHERE BRANCH <> ''/'' AND (DATE_CLOSED IS NULL OR DATE_CLOSED > SYSDATE) AND BARS.BRANCH_UTL.GET_BRANCH_LEVEL(BRANCH) = 2';
 
-      bars_audit.info(title || 'chunk sql = ' || l_chunk_sql);
-      -- создаем чанку
+      --bars_audit.info(title || 'chunk sql = ' || l_chunk_sql);
+      --== создаем чанку
       dbms_parallel_execute.create_chunks_by_sql(task_name => l_task_name,
                                                  sql_stmt  => l_chunk_sql,
                                                  by_rowid  => false);
@@ -380,10 +381,10 @@ BEGIN
                     'SELECT ''/''||substr(l_branch,1,6)||''/''||substr(l_branch,7,6)||''/'' INTO L_BRANCH FROM DUAL;' || chr(10) ||
                     'BC.GO(L_BRANCH); ' || chr(10) ||
                     'GL.PL_DAT(L_BDATE); ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
+                    --'BARS_AUDIT.INFO(''' || title ||' - chunk start with branch ''||L_BRANCH ); ' || chr(10) ||
                     'FOR BR IN (SELECT * FROM OUR_BRANCH WHERE (DATE_CLOSED IS NULL OR DATE_CLOSED > L_BDATE) AND BRANCH_UTL.GET_BRANCH_LEVEL(BRANCH) = 3) LOOP' || chr(10) ||
-		            'BC.GO(BR.BRANCH); ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' ---===--- branch ''||BR.BRANCH ); ' || chr(10) ||
+		                'BC.GO(BR.BRANCH); ' || chr(10) ||
+                    --'BARS_AUDIT.INFO(''' || title ||' ---===--- branch ''||BR.BRANCH ); ' || chr(10) ||
                     l_jobrec.job_proc || '(0, ' || to_char(l_runid) ||', BR.BRANCH, L_BDATE' ||
                     case
                       when p_jobmode is not null then
@@ -392,7 +393,7 @@ BEGIN
                        ' '
                     end || '); ' || chr(10) ||
                     'END LOOP; ' || chr(10) ||
-                    'BARS_AUDIT.INFO(''' || title ||' - chunk finished with branch ''||L_BRANCH ); ' || chr(10) ||
+                    --'BARS_AUDIT.INFO(''' || title ||' - chunk finished with branch ''||L_BRANCH ); ' || chr(10) ||
                     'COMMIT; ' || chr(10) ||
                     'BC.HOME; ' || chr(10) ||
                     'BARS_LOGIN.LOGOUT_USER; ' || chr(10) ||
@@ -401,14 +402,14 @@ BEGIN
                     'BARS_LOGIN.LOGOUT_USER; ' || chr(10) ||
                     'END;';
 
-      bars_audit.info(title || 'sql_statement: ' || l_sql_stmt);
-      -- запуск таски
+      --bars_audit.info(title || 'sql_statement: ' || l_sql_stmt);
+      --== запуск таски
       dbms_parallel_execute.run_task(task_name      => l_task_name,
                                      sql_stmt       => l_sql_stmt,
                                      language_flag  => dbms_sql.native,
                                      parallel_level => 10);
       bars_audit.info(title || ' task runed');
-      -- проверка окончания работы таски
+      --== проверка окончания работы таски
       l_try    := 0;
       l_status := dbms_parallel_execute.task_status(l_task_name);
       while (l_try < 2 and l_status != dbms_parallel_execute.finished) loop
@@ -416,19 +417,19 @@ BEGIN
         dbms_parallel_execute.resume_task(l_task_name);
         l_status := dbms_parallel_execute.task_status(l_task_name);
       end loop;
-      -- удаляем таску
+      --== удаляем таску
       dbms_parallel_execute.drop_task(l_task_name);
-      -- возвращаем параметр сессии на обычный
+      --== возвращаем параметр сессии на обычный
       if bars_login.is_long_session then
         bars_login.cleare_long_session;
       end if;
 
       bars_audit.info(title || ' task ' || l_task_name || ' finished');
-    END IF; -- lvl
+    END IF; --== lvl
 
   ELSE
     bars_audit.info(title ||' Procedure skipped');
-  END IF; -- l_skip
+  END IF; --== l_skip
 
   bars_context.set_context;
   gl.bdate := l_initbdate;

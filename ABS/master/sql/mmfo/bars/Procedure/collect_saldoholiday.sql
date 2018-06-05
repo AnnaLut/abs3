@@ -1,10 +1,10 @@
 create or replace procedure COLLECT_SALDOHOLIDAY
 is
-  c_title     constant varchar2(64) := 'collect_salho';
-  l_minacrdat date;
-  l_kf        varchar2(6);
---                     exception;
---pragma exception_init( -00054);
+  c_title                constant varchar2(64) := 'collect_salho';
+  l_minacrdat            date;
+  l_kf                   varchar2(6);
+  e_rsrc_busy            exception;
+  pragma exception_init( e_rsrc_busy, -00054 );
 begin
   
   bars_audit.trace( '%s: Entry.', c_title );
@@ -34,8 +34,33 @@ begin
     begin
       execute immediate 'alter session SET DDL_LOCK_TIMEOUT=60';
       execute immediate 'alter table SALDO_HOLIDAY truncate partition P_'||l_kf;
---    exception
---      when
+    exception
+      when e_rsrc_busy
+      then -- find session that locked table
+        BARS_AUDIT.ERROR( c_title||sqlerrm );
+        for c in ( select l.SESSION_ID as SID
+                        , s.SERIAL#
+                        , NVL(l.ORACLE_USERNAME, '(oracle)') as USERNAME
+                        , Decode(l.LOCKED_MODE, 0, 'None'
+                                              , 1, 'Null (NULL)'
+                                              , 2, 'Row-S (SS)'
+                                              , 3, 'Row-X (SX)'
+                                              , 4, 'Share (S)'
+                                              , 5, 'S/Row-X (SSX)'
+                                              , 6, 'Exclusive (X)'
+                                              , l.LOCKED_MODE) as LOCKED_MODE
+                        , l.OS_USER_NAME
+                     from V$LOCKED_OBJECT l
+                     join DBA_OBJECTS o 
+                       on ( o.OBJECT_ID = l.OBJECT_ID )
+                     join V$SESSION s
+                       on ( s.sid = l.SESSION_ID )
+                    where o.OWNER = 'BARS'
+                      and o.OBJECT_NAME = 'SALDO_HOLIDAY' )
+        loop
+          BARS_AUDIT.ERROR( c_title||': SID='||to_char(c.SID)||', SERIAL#='||to_char(c.SERIAL#)||', USERNAME='||c.USERNAME
+                                   ||', LOCKED_MODE='||c.LOCKED_MODE||', OS_USER_NAME='||c.OS_USER_NAME||'' );
+        end loop;
     end;
   end if;
 
