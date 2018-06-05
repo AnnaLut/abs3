@@ -3852,7 +3852,7 @@ begin
                      substr('Невикор.ліміт ' || l_pk_nls, 1, 70)
                 else null
            end;*/
-  l_nms := replace(replace(replace(p_trmask.nms,'#NMS', l_pk_nms), '#NMK', l_pk_nmk), '#NLS', l_pk_nls);
+  l_nms := substr(replace(replace(replace(p_trmask.nms,'#NMS', l_pk_nms), '#NMK', l_pk_nmk), '#NLS', l_pk_nls), 1, 70);
   if l_nms is null then
      -- Неизвестный режим счета p_mode
      bars_audit.trace(h || 'Неизвестный режим счета ' || to_char(p_trmask.nbs)||p_trmask.tip);
