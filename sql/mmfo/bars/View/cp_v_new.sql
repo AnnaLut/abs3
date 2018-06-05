@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view CP_V_NEW ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.CP_V_NEW ("BAL_VAR", "KIL", "CENA", "SOS", "ND", "DATD", "SUMB", "DAZS", "TIP", "REF", "ID", "CP_ID", "MDATE", "IR", "ERAT", "RYN", "VIDD", "KV", "ACC", "ACCD", "ACCP", "ACCR", "ACCR2", "ACCR3", "ACCUNREC", "ACCS", "OSTA", "OSTD", "OSTP", "OSTR", "OSTR2", "OSTR3", "OSTUNREC", "OSTEXPN", "OSTEXPR", "OSTS", "OSTAB", "OSTAF", "EMI", "DOX", "RNK", "PF", "PFNAME", "DAPP", "DATP", "NO_PR", "OST_2VD", "OST_2VP", "ZAL", "COUNTRY", "NO_P", "ACTIVE") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.CP_V_NEW ("BAL_VAR", "KIL", "CENA", "SOS", "ND", "DATD", "SUMB", "DAZS", "TIP", "REF", "ID", "CP_ID", "MDATE", "IR", "ERAT", "RYN", "VIDD", "KV", "ACC", "ACCD", "ACCP", "ACCR", "ACCR2", "ACCR3", "ACCUNREC", "ACCS", "OSTA", "OSTD", "OSTP", "OSTR", "OSTR2", "OSTR3", "OSTUNREC", "OSTEXPN", "OSTEXPR", "OSTS", "OSTAB", "OSTAF", "EMI", "DOX", "RNK", "PF", "PFNAME", "DAPP", "DATP", "NO_PR", "OST_2VD", "OST_2VP", "ZAL", "COUNTRY", "NO_P", "ACTIVE", "OSTRD") AS 
   WITH dd
         AS (SELECT TO_DATE (pul.get ('cp_v_date'), 'dd.mm.yyyy') d FROM DUAL)
    SELECT (  osta
@@ -87,7 +87,8 @@ PROMPT *** Create  view CP_V_NEW ***
              zal,
           country,
           NO_P,
-          ACTIVE
+          ACTIVE,
+          (NVL (fost (acc_rd, COALESCE (dd.d, gl.bd)), 0) / 100) ostrd
      FROM dd,
           (SELECT o.sos,
                   o.nd,
@@ -173,7 +174,8 @@ PROMPT *** Create  view CP_V_NEW ***
                         WHEN o.sos < 0 THEN -1
                      END,
                      e.active)
-                     AS active
+                     AS active,
+                 (select cp_acc from cp_accounts where cp_acctype = 'RD' and cp_ref = e.ref ) acc_rd  
              FROM cp_kod k,
                   dd,
                   cp_deal e,
@@ -250,7 +252,8 @@ PROMPT *** Create  view CP_V_NEW ***
                   0 OST_2VP,
                   country,
                   0 no_p,
-                  e.active
+                  e.active,
+                  null acc_rd
              FROM cp_kod k,
                   cp_deal e,
                   accounts a,

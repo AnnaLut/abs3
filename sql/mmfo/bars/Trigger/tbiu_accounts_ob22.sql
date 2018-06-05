@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBIU_ACCOUNTS_OB22.sql =========*** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  trigger TBIU_ACCOUNTS_OB22 ***
-
-  CREATE OR REPLACE TRIGGER BARS.TBIU_ACCOUNTS_OB22 
+CREATE OR REPLACE TRIGGER TBIU_ACCOUNTS_OB22
 BEFORE INSERT OR UPDATE OF OB22 ON BARS.ACCOUNTS
 FOR EACH ROW
  WHEN (
@@ -38,16 +29,10 @@ begin
 
     exception
       when NO_DATA_FOUND then
-        raise_application_error(-20666, 'Код OB22 "'||:new.ob22||'" для бал.рах. "'||:new.NBS||'" не відсутній в довіднику!', true);
+        raise_application_error(-20666, 'Код OB22 "'||:new.ob22||'" для бал.рах. "'||:new.NBS||'" відсутній в довіднику!', true);
     end;
 
   end if;
 
 end TBIU_ACCOUNTS_OB22;
 /
-ALTER TRIGGER BARS.TBIU_ACCOUNTS_OB22 ENABLE;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Trigger/TBIU_ACCOUNTS_OB22.sql =========*** 
-PROMPT ===================================================================================== 

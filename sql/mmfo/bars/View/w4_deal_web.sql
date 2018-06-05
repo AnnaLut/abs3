@@ -200,7 +200,8 @@ AS
                    AND SUBSTR (a.nls, 1, 4) NOT IN ('2605',
                                                     '2655',
                                                     '2552',
-                                                    '2554')
+                                                    '2554',
+                                                    '2600')
                    AND c.rnk = cw.rnk(+)
                    AND cw.tag(+) = 'WORKB') o
            LEFT JOIN bpk_parameters bp1

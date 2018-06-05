@@ -49,6 +49,6 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Abstract
 
         bool CheckAcc(string mfo, string acc);
 
-        List<Bars.EAD.Structs.Result.DocumentData> CheckDocs(List<Bars.EAD.Structs.Result.DocumentData> val);
+        List<Bars.EAD.Structs.Result.DocumentData> CheckDocs(List<Bars.EAD.Structs.Result.DocumentData> val, List<string> filterCodes);
     }
 }

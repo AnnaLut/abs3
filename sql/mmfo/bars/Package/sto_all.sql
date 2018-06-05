@@ -1374,7 +1374,7 @@ create or replace package body sto_all is
      l_tts_REC r_tts_REC;
      begin
      bars_audit.trace ('get_TTS start');
-     FOR i IN ( select tt, tt||'('||name||')' as name_ from tts where tt in ('PKD', '310', '015', 'PKR', '440', '420', '445', 'K20', 'M19', '190', 'PKQ', 'W4W', 'PK!', 'W4T') )
+     FOR i IN ( select tt, tt||'('||name||')' as name_ from tts where tt in ('PKD', '310', '101','D66', 'PKR', '440', '420', '445', 'K20', 'M19', '190', 'PKQ', 'W4W', 'PK!', 'W4T') )
          LOOP
             l_tts_REC.tt := i.tt;
             l_tts_REC.name_ := i.name_;

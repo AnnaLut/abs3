@@ -19,5 +19,8 @@
         public string RecipientName { get; set; }
         public string RecipienCustCode { get; set; }
         public string Narrative { get; set; }
+
+        public int? Kod { get; set; }
+        public string Formula { get; set; }
     }
 }

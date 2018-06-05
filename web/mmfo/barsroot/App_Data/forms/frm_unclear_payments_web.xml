@@ -10,7 +10,7 @@
    2 - призначення платежу з перинного документа 
    3 - призначення платежу з схеми перекриття  +  з перинного документа 
  -->
-
+ 
   <grid id="tNlg2"  pagesize="5"  showpagesizebox="true"   title="Перекредитування сум на рахунок 2909/08 (WEB)"  width="2000" >
     <filters columnscount="3" caption="Фільтр" buttontext="Пошук" width="700">
       <filter id="fId1" caption="Рах. А"  condition="LikeBoth" columnindex="1" field="NLSA">

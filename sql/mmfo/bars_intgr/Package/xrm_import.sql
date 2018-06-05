@@ -3,9 +3,15 @@ prompt package bars_intgr.xrm_import
 create or replace package xrm_import
 is
     --
-    -- Наполнение витрин для псевдо-онлайн выгрузок в CRM
+    -- Работа с витринами для псевдо-онлайн выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 0.2.0 21/03/2018';
+    g_header_version  constant varchar2(64)  := 'version 0.9.1 23/05/2018';
+    
+    G_IMPORT_MODE_FULL  constant varchar2(5) := 'FULL';
+    G_IMPORT_MODE_DELTA constant varchar2(5) := 'DELTA';
+    G_STATS_ERROR constant varchar2(10) := 'ERROR';
+    G_STATS_INPROCESS constant varchar2(10) := 'INPROCESS';
+    G_STATS_SUCCESS constant varchar2(10) := 'INPROCESS';
 
     --
     -- header_version - возвращает версию заголовка пакета
@@ -18,12 +24,12 @@ is
     function body_version return varchar2;
 
 
-    function add38phone (p_phone in varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo')) return varchar2;
+    function add38phone (p_phone in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo')) return varchar2;
 
     --
     -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
     --
-    procedure reset_object_idupd(p_object_name varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo'));
+    procedure reset_object_idupd (p_object_name in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
 
     --
     -- Очистка витрины для дельты (ежедневная)
@@ -35,7 +41,19 @@ is
     -- Очистка всех витрин для дельты (ежедневная)
     -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрины полностью
     --
-    procedure clear_datamarts(p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
+    procedure clear_datamarts (p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
+
+    --
+    -- Установить режим выдачи данных (полная выгрузка / дельта) шине для объекта / для всех
+    -- При полной выгрузке используется витрина bars_dm, при дельте - bars_intgr
+    --
+    procedure set_import_mode (p_mode        in varchar2, 
+                               p_object_name in varchar2 default null);
+                               
+    --
+    -- Получение режима выдачи данных по объекту
+    --
+    function get_import_mode (p_object_name in varchar2) return varchar2;
 
     --
     -- Выгрузка CLIENTFO2 - физические лица
@@ -43,15 +61,36 @@ is
     procedure import_clientfo2 (p_rows_ok  out number,
                                 p_rows_err out number,
                                 p_status   out varchar2);
-
-    procedure import_client_address;
-
-    ---
-    --- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
-    ---
-    procedure imp_run_by_mfo(p_mfo          in     varchar2,
-                             p_object_proc  in     varchar2,
-                             p_id_event     in     number);
+    --
+    -- Выгрузка CLIENT_ADDRESS - адреса физлиц (коды)
+    --
+    procedure import_client_address (p_rows_ok  out number,
+                                     p_rows_err out number,
+                                     p_status   out varchar2);
+    --
+    -- Выгрузка ACCOUNTS - клиентские счета
+    --
+    procedure import_accounts (p_rows_ok  out number,
+                               p_rows_err out number,
+                               p_status   out varchar2);
+    --
+    -- Выгрузка BPK2 - договора БПК
+    --
+    procedure import_bpk2 (p_rows_ok  out number,
+                           p_rows_err out number,
+                           p_status   out varchar2);
+    --
+    -- Выгрузка DEPOSITS2 - депозитные договора
+    --
+    procedure import_deposits2 (p_rows_ok  out number,
+                                p_rows_err out number,
+                                p_status   out varchar2);
+    --
+    -- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
+    --
+    procedure imp_run_by_mfo (p_mfo          in     varchar2,
+                              p_object_proc  in     varchar2,
+                              p_id_event     in     number);
     --
     -- Общая процедура запуска выгрузки
     --
@@ -63,9 +102,10 @@ show errors;
 
 create or replace package body xrm_import
 is
-    g_body_version constant varchar2(64) := 'Version 0.2.0 21/03/2018';
+    g_body_version constant varchar2(64) := 'Version 0.9.1 23/05/2018';
     G_TRACE        constant varchar2(20) := 'xrm_import.';
-    G_IS_MMFO      constant number(1)    := 1;
+    G_IS_MMFO      number(1);
+    G_IS_TEST      number(1)    := 0;
 
     /** header_version -  */
     function header_version return varchar2 is
@@ -80,7 +120,7 @@ is
     end body_version;
 
     --
-    -- Логгирование статистики
+    -- Логирование статистики
     -- Не автономная транзакция, чтобы не было проблем с параллелью
     --
     procedure log_stat_event(p_changenumber number   default null,
@@ -90,7 +130,8 @@ is
                              p_rows_ok      number   default null,
                              p_rows_err     number   default null,
                              p_status       varchar2 default null,
-                             p_id    in out number) is
+                             p_id    in out number) 
+        is
     begin
         if (p_id is null) then
             insert into bars_intgr.intgr_stats
@@ -127,17 +168,18 @@ is
     --
     -- Возвращает список ключей (измененных записей) для дельты; не поддерживает составные ключи
     --
-    function get_changed_keys (p_object_name varchar2,
-                               p_kf varchar2 default sys_context('bars_context', 'user_mfo'))
+    function get_changed_keys (p_object_name in varchar2,
+                               p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
     return bars.number_list
-    is
+        is
     l_trace varchar2(150) := g_trace || 'get_changed_keys: ';
     l_keys bars.number_list;
     l_sql clob;
+    l_is_test_clause varchar2(50) := case when g_is_test = 1 then ' and rownum <= 1000 ' else '' end;
     begin
         bars.bars_audit.info(l_trace||'start.');
         -- конструируем запрос
-        select listagg ('select distinct '||key_column||' from bars.'||table_name||' where idupd>='||idupd||case when sql_predicate is not null then ' and '||sql_predicate end,
+        select listagg ('select distinct '||key_column||' from bars.'||table_name||' where idupd>='||idupd||case when sql_predicate is not null then ' and '||sql_predicate end || l_is_test_clause,
                ' union ' )
                within group (order by 1) q
         into l_sql
@@ -154,10 +196,10 @@ is
     --
     -- Инкрементирует и возвращает номер дельты в разрезе объекта и МФО; для слэша инкрементим все и возвращаем максимальный
     --
-    function increment_object_changenumber(p_object_name varchar2,
-                                           p_kf varchar2 default sys_context('bars_context', 'user_mfo'))
+    function increment_object_changenumber(p_object_name in varchar2,
+                                           p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
     return number
-    is
+        is
     l_ret number;
     begin
         update imp_object_mfo
@@ -171,7 +213,8 @@ is
     --
     -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
     --
-    procedure reset_object_idupd(p_object_name varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo'))
+    procedure reset_object_idupd(p_object_name in varchar2,
+                                 p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
         is
     l_max_idupd number;
     begin
@@ -192,7 +235,8 @@ is
     -- Очистка витрины для дельты (ежедневная)
     -- p_kf - МФО, для которого очищаем данные; для слэша очищаем витрину полностью
     --
-    procedure clear_datamart (p_datamart_name in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo'))
+    procedure clear_datamart (p_datamart_name in varchar2,
+                              p_kf            in varchar2 default sys_context('bars_context', 'user_mfo'))
         is
     l_trace varchar2(150) := g_trace || 'clear_datamart['||p_datamart_name||']: ';
     resourse_busy exception;
@@ -203,6 +247,7 @@ is
         else
             execute immediate 'alter table bars_intgr.'||p_datamart_name||' truncate partition for ('''||p_kf||''')';
         end if;
+        bars.bars_audit.info(l_trace||' витрина очищена');
     exception
         when resourse_busy then
             bars.bars_audit.error(l_trace || 'resourse busy; очистим в следующий раз');
@@ -214,17 +259,68 @@ is
     --
     procedure clear_datamarts(p_kf in varchar2 default sys_context('bars_context', 'user_mfo'))
         is
+    l_trace varchar2(150) := g_trace || 'clear_datamarts: ';
     begin
-        for rec in (select * from imp_object)
+        bars.bars_audit.info(l_trace||' Начало очистки витрин');
+        for rec in (select object_name from imp_object)
         loop
             clear_datamart(rec.object_name, p_kf);
         end loop;
+        bars.bars_audit.info(l_trace||' Завершение очистки витрин');
     end clear_datamarts;
 
     --
+    -- Установить режим выдачи данных (полная выгрузка / дельта) шине для объекта / для всех
+    -- При полной выгрузке используется витрина bars_dm, при дельте - bars_intgr
+    --
+    procedure set_import_mode (p_mode        in varchar2, 
+                               p_object_name in varchar2 default null)
+        is
+    l_trace varchar2(150) := g_trace || 'set_import_mode: ';
+    l_curr_mode imp_object.imp_mode%type;
+    begin
+        if p_mode in (G_IMPORT_MODE_FULL, G_IMPORT_MODE_DELTA) then
+            begin
+                select distinct imp_mode into l_curr_mode from imp_object where object_name = nvl(p_object_name, object_name);
+                
+                if l_curr_mode != p_mode then
+                    -- при переключении режима пишем в лог
+                    bars.bars_audit.info(l_trace || p_mode || ' for ' || nvl(p_object_name, 'all objects'));
+                end if;
+            exception
+                when too_many_rows then
+                    -- витрины в разных режимах, а процедура вызывалась для всех
+                    bars.bars_audit.warning(l_trace || p_mode || ' for ' || nvl(p_object_name, 'all objects') || ' - TMR');
+                when no_data_found then
+                    -- запрашиваемый объект не найден
+                    bars.bars_audit.warning(l_trace || p_mode || ' for ' || nvl(p_object_name, 'all objects') || ' - NDF');
+            end;
+            
+            update imp_object
+            set imp_mode = p_mode
+            where object_name = nvl(p_object_name, object_name);
+        else
+            bars.bars_audit.error(l_trace||'некорректное использование процедуры, mode='||p_mode);
+        end if;
+    end set_import_mode;
+    
+    --
+    -- Получение режима выдачи данных по объекту
+    --
+    function get_import_mode (p_object_name in varchar2)
+    return varchar2
+        is
+    l_result imp_object.imp_mode%type;
+    begin
+        select imp_mode into l_result from imp_object where object_name = p_object_name;
+        return l_result;
+    end get_import_mode;
+    
+    --
     -- add prefix '38' to phone number
     --
-    function add38phone (p_phone in varchar2, p_kf varchar2 default sys_context('bars_context', 'user_mfo'))
+    function add38phone (p_phone in varchar2,
+                         p_kf    in varchar2 default sys_context('bars_context', 'user_mfo'))
        return varchar2
     is
        l_phone     varchar2 (20);
@@ -272,9 +368,8 @@ is
 
     l_changelist bars.number_list;
 
-    l_test_log varchar2(4000);
     begin
-        bars.bars_audit.info(g_trace||' clientfo_imp start');
+        bars.bars_audit.info(g_trace||c_object_name||': start');
 
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
@@ -283,9 +378,6 @@ is
 
         savepoint imp_start;
 
-        select listagg(column_value, ',') within group (order by 1) into l_test_log from table(l_changelist) where rownum <= 15;
-        bars.bars_audit.info(g_trace||c_object_name||': rnks:'||substr(l_test_log, 1, 150));
-
         l_changenumber := increment_object_changenumber(c_object_name);
 
         /* выгрузка */
@@ -293,7 +385,7 @@ is
         merge into clientfo2 C
         using (
                 with delta as (select /*+ materialize*/ column_value as rnk from table(l_changelist))
-                  select l_changenumber as changenumber,
+                select l_changenumber as changenumber,
                        c.rnk,--РНК
                        c.branch,--відділення
                        c.kf,
@@ -500,66 +592,18 @@ is
                        a.au_region as j_region,
                        a.au_locality as j_locality,
                        a.au_adress as j_address,
-                       a.j_territory_id,
-                       a.j_locality_type,
-                       a.j_street_type,
-                       a.j_street,
-                       a.j_home_type,
-                       a.j_home,
-                       a.j_homepart_type,
-                       a.j_homepart,
-                       a.j_room_type,
-                       a.j_room,
-                       a.j_koatuu,
-                       a.j_region_id,
-                       a.j_area_id,
-                       a.j_settlement_id,
-                       a.j_street_id,
-                       a.j_house_id,
                        a.af_country as f_country,
                        a.af_zip as f_zip,
                        a.af_domain as f_domain,
                        a.af_region as f_region,
                        a.af_locality as f_locality,
                        a.af_adress as f_address,
-                       a.f_territory_id,
-                       a.f_locality_type,
-                       a.f_street_type,
-                       a.f_street,
-                       a.f_home_type,
-                       a.f_home,
-                       a.f_homepart_type,
-                       a.f_homepart,
-                       a.f_room_type,
-                       a.f_room,
-                       a.f_koatuu,
-                       a.f_region_id,
-                       a.f_area_id,
-                       a.f_settlement_id,
-                       a.f_street_id,
-                       a.f_house_id,
                        a.ap_country as p_country,
                        a.ap_zip as p_zip,
                        a.ap_domain as p_domain,
                        a.ap_region as p_region,
                        a.ap_locality as p_locality,
-                       a.ap_adress as p_address,
-                       a.p_territory_id,
-                       a.p_locality_type,
-                       a.p_street_type,
-                       a.p_street,
-                       a.p_home_type,
-                       a.p_home,
-                       a.p_homepart_type,
-                       a.p_homepart,
-                       a.p_room_type,
-                       a.p_room,
-                       a.p_koatuu,
-                       a.p_region_id,
-                       a.p_area_id,
-                       a.p_settlement_id,
-                       a.p_street_id,
-                       a.p_house_id
+                       a.ap_adress as p_address
                   from bars.customer c, bars.person p,
                          ( select rnk,
                                 "'1'_C1" au_country,
@@ -568,74 +612,22 @@ is
                                 "'1'_C4" au_region,
                                 "'1'_C5" au_locality,
                                 "'1'_C6" au_adress,
-                                "'1'_C7" j_territory_id,
-                                "'1'_C8" j_locality_type,
-                                "'1'_C9" j_street_type,
-                                "'1'_C10" j_street,
-                                "'1'_C11" j_home_type,
-                                "'1'_C12" j_home,
-                                "'1'_C13" j_homepart_type,
-                                "'1'_C14" j_homepart,
-                                "'1'_C15" j_room_type,
-                                "'1'_C16" j_room,
-                                "'1'_C17" j_koatuu,
-                                "'1'_C18" j_region_id,
-                                "'1'_C19" j_area_id,
-                                "'1'_C20" j_settlement_id,
-                                "'1'_C21" j_street_id,
-                                "'1'_C22" j_house_id,
                                 "'2'_C1" af_country,
                                 "'2'_C2" af_zip,
                                 "'2'_C3" af_domain,
                                 "'2'_C4" af_region,
                                 "'2'_C5" af_locality,
                                 "'2'_C6" af_adress,
-                                "'2'_C7" f_territory_id,
-                                "'2'_C8" f_locality_type,
-                                "'2'_C9" f_street_type,
-                                "'2'_C10" f_street,
-                                "'2'_C11" f_home_type,
-                                "'2'_C12" f_home,
-                                "'2'_C13" f_homepart_type,
-                                "'2'_C14" f_homepart,
-                                "'2'_C15" f_room_type,
-                                "'2'_C16" f_room,
-                                "'2'_C17" f_koatuu,
-                                "'2'_C18" f_region_id,
-                                "'2'_C19" f_area_id,
-                                "'2'_C20" f_settlement_id,
-                                "'2'_C21" f_street_id,
-                                "'2'_C22" f_house_id,
                                 "'3'_C1" ap_country,
                                 "'3'_C2" ap_zip,
                                 "'3'_C3" ap_domain,
                                 "'3'_C4" ap_region,
                                 "'3'_C5" ap_locality,
-                                "'3'_C6" ap_adress,
-                                "'3'_C7" p_territory_id,
-                                "'3'_C8" p_locality_type,
-                                "'3'_C9" p_street_type,
-                                "'3'_C10" p_street,
-                                "'3'_C11" p_home_type,
-                                "'3'_C12" p_home,
-                                "'3'_C13" p_homepart_type,
-                                "'3'_C14" p_homepart,
-                                "'3'_C15" p_room_type,
-                                "'3'_C16" p_room,
-                                "'3'_C17" p_koatuu,
-                                "'3'_C18" p_region_id,
-                                "'3'_C19" p_area_id,
-                                "'3'_C20" p_settlement_id,
-                                "'3'_C21" p_street_id,
-                                "'3'_C22" p_house_id
-                           from (select bars.customer_address.rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
-                                   street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id 
+                                "'3'_C6" ap_adress
+                           from (select bars.customer_address.rnk, type_id, country,zip, domain, region, locality, address
                                    from bars.customer_address
                                    join delta on bars.customer_address.rnk = delta.rnk)
-                          pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6, max(territory_id) c7,
-                          max(locality_type) c8, max(street_type) c9, max(street) c10, max(home_type) c11, max(home) c12, max(homepart_type) c13,
-                          max(homepart) c14,max(room_type) c15, max(room) c16, max(koatuu) c17, max(region_id) c18, max(area_id) c19, max(settlement_id) c20,
-                          max(street_id) c21, max(house_id) c22
+                          pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6
                                    for type_id in ('1', '2', '3')
                                 )
                           ) a,
@@ -814,9 +806,7 @@ is
             c.PDATE = q.PDATE,
             c.ORGAN = q.ORGAN,
             c.PASSP_EXPIRE_TO = q.ACTUAL_DATE,
-            c.PASSP_TO_BANK = null, --q.PASSP_TO_BANK,
-            --c.KF = q.KF,
-            --c.RNK = q.RNK,
+            c.PASSP_TO_BANK = null,
             c.OKPO = q.OKPO,
             c.CUST_STATUS = q.CUST_STATUS,
             c.CUST_ACTIVE = q.CUST_ACTIVE,
@@ -1031,29 +1021,787 @@ is
 
         reset_object_idupd(c_object_name);
 
-        p_status := 'SUCCESS';
+        p_status := G_STATS_SUCCESS;
 
         bars.bars_audit.info(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
-            p_status := 'ERROR';
+            p_status := G_STATS_ERROR;
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_clientfo2;
 
-    procedure import_client_address
-        is
+    procedure import_client_address (p_rows_ok  out number,
+                                     p_rows_err out number,
+                                     p_status   out varchar2)
+    is
+    c_object_name  constant varchar2(32) := 'CLIENT_ADDRESS';
+    l_changenumber number;
 
-	l_ourmfo varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_changelist bars.number_list;
+
+    l_ourmfo varchar2(6) := sys_context('bars_context', 'user_mfo');
     begin
-        null;
+        bars.bars_audit.info(g_trace||c_object_name||': start');
+
+        /* собираем измененные записи */
+        l_changelist := get_changed_keys(c_object_name);
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
+
+        savepoint imp_start;
+
+        l_changenumber := increment_object_changenumber(c_object_name);
+
+        /* выгрузка */
+        merge into client_address C
+        using (
+                with delta as (select /*+ materialize*/ column_value as rnk from table(l_changelist))
+                         select l_changenumber as changenumber,
+                                l_ourmfo as kf,
+                                rnk,
+                                "'1'_C1" au_country,
+                                "'1'_C2" au_zip,
+                                "'1'_C3" au_domain,
+                                "'1'_C4" au_region,
+                                "'1'_C5" au_locality,
+                                "'1'_C6" au_adress,
+                                "'1'_C7" j_territory_id,
+                                "'1'_C8" j_locality_type,
+                                "'1'_C9" j_street_type,
+                                "'1'_C10" j_street,
+                                "'1'_C11" j_home_type,
+                                "'1'_C12" j_home,
+                                "'1'_C13" j_homepart_type,
+                                "'1'_C14" j_homepart,
+                                "'1'_C15" j_room_type,
+                                "'1'_C16" j_room,
+                                "'1'_C17" j_koatuu,
+                                "'1'_C18" j_region_id,
+                                "'1'_C19" j_area_id,
+                                "'1'_C20" j_settlement_id,
+                                "'1'_C21" j_street_id,
+                                "'1'_C22" j_house_id,
+                                "'2'_C1" af_country,
+                                "'2'_C2" af_zip,
+                                "'2'_C3" af_domain,
+                                "'2'_C4" af_region,
+                                "'2'_C5" af_locality,
+                                "'2'_C6" af_adress,
+                                "'2'_C7" f_territory_id,
+                                "'2'_C8" f_locality_type,
+                                "'2'_C9" f_street_type,
+                                "'2'_C10" f_street,
+                                "'2'_C11" f_home_type,
+                                "'2'_C12" f_home,
+                                "'2'_C13" f_homepart_type,
+                                "'2'_C14" f_homepart,
+                                "'2'_C15" f_room_type,
+                                "'2'_C16" f_room,
+                                "'2'_C17" f_koatuu,
+                                "'2'_C18" f_region_id,
+                                "'2'_C19" f_area_id,
+                                "'2'_C20" f_settlement_id,
+                                "'2'_C21" f_street_id,
+                                "'2'_C22" f_house_id,
+                                "'3'_C1" ap_country,
+                                "'3'_C2" ap_zip,
+                                "'3'_C3" ap_domain,
+                                "'3'_C4" ap_region,
+                                "'3'_C5" ap_locality,
+                                "'3'_C6" ap_adress,
+                                "'3'_C7" p_territory_id,
+                                "'3'_C8" p_locality_type,
+                                "'3'_C9" p_street_type,
+                                "'3'_C10" p_street,
+                                "'3'_C11" p_home_type,
+                                "'3'_C12" p_home,
+                                "'3'_C13" p_homepart_type,
+                                "'3'_C14" p_homepart,
+                                "'3'_C15" p_room_type,
+                                "'3'_C16" p_room,
+                                "'3'_C17" p_koatuu,
+                                "'3'_C18" p_region_id,
+                                "'3'_C19" p_area_id,
+                                "'3'_C20" p_settlement_id,
+                                "'3'_C21" p_street_id,
+                                "'3'_C22" p_house_id
+                           from (select bars.customer_address.rnk, type_id, country,zip, domain, region, locality, address, territory_id, locality_type, street_type,
+                                   street, home_type, home, homepart_type, homepart, room_type, room, koatuu, region_id, area_id, settlement_id, street_id, house_id
+                                   from bars.customer_address
+                                   join delta on bars.customer_address.rnk = delta.rnk)
+                          pivot (max(country) c1, max(zip) c2, max(domain) c3, max(region) c4, max(locality) c5, max(address) c6, max(territory_id) c7,
+                          max(locality_type) c8, max(street_type) c9, max(street) c10, max(home_type) c11, max(home) c12, max(homepart_type) c13,
+                          max(homepart) c14,max(room_type) c15, max(room) c16, max(koatuu) c17, max(region_id) c18, max(area_id) c19, max(settlement_id) c20,
+                          max(street_id) c21, max(house_id) c22
+                                   for type_id in ('1', '2', '3')
+                                )
+              ) Q
+        on (c.rnk = Q.rnk and c.kf = q.kf)
+        when matched then
+            update
+            set changenumber = l_changenumber,
+                j_country = q.au_country,
+                j_zip = q.au_zip,
+                j_domain = q.au_domain,
+                j_region = q.au_region,
+                j_locality = q.au_locality,
+                j_address = q.au_adress,
+                j_territory_id = q.j_territory_id,
+                j_locality_type = q.j_locality_type,
+                j_street_type = q.j_street_type,
+                j_street = q.j_street,
+                j_home_type = q.j_home_type,
+                j_home = q.j_home,
+                j_homepart_type = q.j_homepart_type,
+                j_homepart = q.j_homepart,
+                j_room_type = q.j_room_type,
+                j_room = q.j_room,
+                j_koatuu = q.j_koatuu,
+                j_region_id = q.j_region_id,
+                j_area_id = q.j_area_id,
+                j_settlement_id = q.j_settlement_id,
+                j_street_id = q.j_street_id,
+                j_house_id = q.j_house_id,
+                f_country = q.af_country,
+                f_zip = q.af_zip,
+                f_domain = q.af_domain,
+                f_region = q.af_region,
+                f_locality = q.af_locality,
+                f_address = q.af_adress,
+                f_territory_id = q.f_territory_id,
+                f_locality_type = q.f_locality_type,
+                f_street_type = q.f_street_type,
+                f_street = q.f_street,
+                f_home_type = q.f_home_type,
+                f_home = q.f_home,
+                f_homepart_type = q.f_homepart_type,
+                f_homepart = q.f_homepart,
+                f_room_type = q.f_room_type,
+                f_room = q.f_room,
+                f_koatuu = q.f_koatuu,
+                f_region_id = q.f_region_id,
+                f_area_id = q.f_area_id,
+                f_settlement_id = q.f_settlement_id,
+                f_street_id = q.f_street_id,
+                f_house_id = q.f_house_id,
+                p_country = q.ap_country,
+                p_zip = q.ap_zip,
+                p_domain = q.ap_domain,
+                p_region = q.ap_region,
+                p_locality = q.ap_locality,
+                p_address = q.ap_adress,
+                p_territory_id = q.p_territory_id,
+                p_locality_type = q.p_locality_type,
+                p_street_type = q.p_street_type,
+                p_street = q.p_street,
+                p_home_type = q.p_home_type,
+                p_home = q.p_home,
+                p_homepart_type = q.p_homepart_type,
+                p_homepart = q.p_homepart,
+                p_room_type = q.p_room_type,
+                p_room = q.p_room,
+                p_koatuu = q.p_koatuu,
+                p_region_id = q.p_region_id,
+                p_area_id = q.p_area_id,
+                p_settlement_id = q.p_settlement_id,
+                p_street_id = q.p_street_id,
+                p_house_id = q.p_house_id
+            when not matched then insert
+            (changenumber, kf, rnk, j_country, j_zip, j_domain, j_region, j_locality, j_address, j_territory_id, j_locality_type, j_street_type, j_street, j_home_type, j_home, j_homepart_type, j_homepart, j_room_type, j_room, j_koatuu, j_region_id, j_area_id, j_settlement_id, j_street_id, j_house_id, f_country, f_zip, f_domain, f_region, f_locality, f_address, f_territory_id, f_locality_type, f_street_type, f_street, f_home_type, f_home, f_homepart_type, f_homepart, f_room_type, f_room, f_koatuu, f_region_id, f_area_id, f_settlement_id, f_street_id, f_house_id, p_country, p_zip, p_domain, p_region, p_locality, p_address, p_territory_id, p_locality_type, p_street_type, p_street, p_home_type, p_home, p_homepart_type, p_homepart, p_room_type, p_room, p_koatuu, p_region_id, p_area_id, p_settlement_id, p_street_id, p_house_id)
+            values
+            (l_changenumber, q.kf, q.rnk, q.au_country, q.au_zip, q.au_domain, q.au_region, q.au_locality, q.au_adress, q.j_territory_id, q.j_locality_type, q.j_street_type, q.j_street, q.j_home_type, q.j_home, q.j_homepart_type, q.j_homepart, q.j_room_type, q.j_room, q.j_koatuu, q.j_region_id, q.j_area_id, q.j_settlement_id, q.j_street_id, q.j_house_id, q.af_country, q.af_zip, q.af_domain, q.af_region, q.af_locality, q.af_adress, q.f_territory_id, q.f_locality_type, q.f_street_type, q.f_street, q.f_home_type, q.f_home, q.f_homepart_type, q.f_homepart, q.f_room_type, q.f_room, q.f_koatuu, q.f_region_id, q.f_area_id, q.f_settlement_id, q.f_street_id, q.f_house_id, q.ap_country, q.ap_zip, q.ap_domain, q.ap_region, q.ap_locality, q.ap_adress, q.p_territory_id, q.p_locality_type, q.p_street_type, q.p_street, q.p_home_type, q.p_home, q.p_homepart_type, q.p_homepart, q.p_room_type, q.p_room, q.p_koatuu, q.p_region_id, q.p_area_id, q.p_settlement_id, q.p_street_id, q.p_house_id)
+        log errors into ERR$_CLIENT_ADDRESS reject limit unlimited;
+
+        p_rows_ok := sql%rowcount;
+        select count(*) into p_rows_err from ERR$_CLIENT_ADDRESS where changenumber = l_changenumber;
+
+        reset_object_idupd(c_object_name);
+
+        p_status := G_STATS_SUCCESS;
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished');
+    exception
+        when others then
+            rollback to imp_start;
+            p_status := G_STATS_ERROR;
+            bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
+            raise;
     end import_client_address;
 
+    --
+    -- Выгрузка ACCOUNTS - клиентские счета
+    --
+    procedure import_accounts (p_rows_ok  out number,
+                               p_rows_err out number,
+                               p_status   out varchar2)
+        is
+    c_object_name  constant varchar2(32) := 'ACCOUNTS';
+    l_changenumber number;
 
-    ---
-    --- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
-    ---
+    l_changelist bars.number_list;
+
+    begin
+        bars.bars_audit.info(g_trace||c_object_name||': start');
+
+        /* собираем измененные записи */
+        l_changelist := get_changed_keys(c_object_name);
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+
+        savepoint imp_start;
+
+        l_changenumber := increment_object_changenumber(c_object_name);
+
+        /* выгрузка */
+
+        merge into accounts a
+        using (
+                with delta as (select /*+ materialize*/ column_value as acc from table(l_changelist))
+                select l_changenumber as changenumber,
+                       a.acc,
+                       a.branch,
+                       a.kf,
+                       a.rnk,
+                       a.nls,
+                       NVL (dd.vidd, 0) vidd,
+                       a.daos,
+                       a.kv,
+                       acrn.fproc (a.acc) intrate,
+                       0 massa,
+                       0 count_zl,
+                       a.ostc / 100 ostc,
+                       NVL ((SELECT (SUM (dos) + SUM (kos)) / 100
+                               FROM bars.saldoa
+                              WHERE acc = a.acc
+                                and fdat >= trunc(trunc(bars.gl.bd,'MONTH')-1,'MONTH') and fdat<= trunc(bars.gl.bd,'MONTH')-1),
+                            0
+                           ) ob_mon,
+                       (SELECT max(fdat)
+                             FROM bars.saldoa s
+                            WHERE s.acc = a.acc AND s.kos>0) last_add_date,
+                        (SELECT SUM (kos)/100
+                                     FROM bars.saldoa s
+                                    WHERE s.acc = a.acc AND fdat =(SELECT max(fdat)
+                                                                     FROM bars.saldoa s
+                                                                    WHERE s.acc = a.acc AND s.kos>0)
+                                                                    ) last_add_suma,
+                       a.dazs,
+                       decode(a.dazs,null,1,0) acc_status,
+                       a.blkd,
+                       a.blkk,
+                       a.ob22,
+                       a.nms
+                from bars.accounts a, bars.dpt_deposit dd, delta, bars.customer c
+                where a.acc = dd.acc(+) AND nbs = '2620'
+                and a.rnk = c.rnk
+                and c.custtype = 3 and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91')
+                and not exists (select 1 from bars.dpt_vidd dv where dd.VIDD=dv.vidd and dv.bsd = '2620' and dv.duration<>0)
+                and a.acc = delta.acc
+            ) Q on  (a.acc = Q.acc and a.kf = q.kf)
+            when matched then update
+            set changenumber = l_changenumber,
+                rnk = Q.rnk,
+                branch = Q.branch,
+                nls = Q.nls,
+                vidd = Q.vidd,
+                daos = Q.daos,
+                kv = Q.kv,
+                intrate = Q.intrate,
+                massa = Q.massa,
+                count_zl = Q.count_zl,
+                ostc = Q.ostc,
+                ob_mon = Q.ob_mon,
+                last_add_date = Q.last_add_date,
+                last_add_suma = Q.last_add_suma,
+                dazs = Q.dazs,
+                blkd = Q.blkd,
+                blkk = Q.blkk,
+                acc_status = Q.acc_status,
+                ob22 = Q.ob22,
+                nms = Q.nms
+            when not matched then insert
+            (changenumber, kf, acc, rnk, branch, nls, vidd, daos, kv, intrate, massa, count_zl, ostc, ob_mon, last_add_date, last_add_suma, dazs, blkd, blkk, acc_status, ob22, nms)
+            values
+            (l_changenumber, Q.kf, Q.acc, Q.rnk, Q.branch, Q.nls, Q.vidd, Q.daos, Q.kv, Q.intrate, Q.massa, Q.count_zl, Q.ostc, Q.ob_mon, Q.last_add_date, Q.last_add_suma, Q.dazs, Q.blkd, Q.blkk, Q.acc_status, Q.ob22, Q.nms)
+        log errors into ERR$_ACCOUNTS reject limit unlimited;
+
+        p_rows_ok := sql%rowcount;
+        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber;
+
+        reset_object_idupd(c_object_name);
+
+        p_status := G_STATS_SUCCESS;
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished');
+    exception
+        when others then
+            rollback to imp_start;
+            p_status := G_STATS_ERROR;
+            bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
+            raise;
+    end import_accounts;
+    
+    
+    --
+    -- Выгрузка BPK2 - договора БПК
+    --
+    procedure import_bpk2 (p_rows_ok  out number,
+                           p_rows_err out number,
+                           p_status   out varchar2)
+        is
+    c_object_name  constant varchar2(32) := 'BPK2';
+    l_changenumber number;
+
+    l_changelist bars.number_list;
+
+    begin
+        bars.bars_audit.info(g_trace||c_object_name||': start');
+
+        /* собираем измененные записи */
+        l_changelist := get_changed_keys(c_object_name);
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+
+        savepoint imp_start;
+
+        l_changenumber := increment_object_changenumber(c_object_name);
+
+        /* выгрузка */
+
+        merge into bpk2 a
+        using (
+        with delta as (select /*+ materialize*/ column_value as acc from table(l_changelist))
+                select a.branch      --відділення
+                      ,a.kf          --РУ
+                      ,a.rnk         --РНК
+                      ,w.nd          --Номер договору
+                      ,w.dat_begin   --Дата договору
+                      ,w.card_code as bpk_type --тип платіжної картки
+                      ,a.nls       --номер рахунку
+                      ,a.daos      --дата відкриття рахунку
+                      ,a.kv        --валюта рахунку
+                      ,bars.acrn.fproc (a.acc, trunc(sysdate)) intrate  --відсоткова ставка
+                      ,a.ostc/100 ostc --поточний залишок на рахунку
+                      ,(SELECT max(fdat)
+                               FROM bars.saldoa s
+                              WHERE s.acc = a.acc AND (s.kos+s.dos)>0) date_lastop  --дата останньої операції
+                      ,nvl2(w.acc_ovr,1,0) cred_line  --кредитна лінія
+                      ,a.lim/100  cred_lim            --сума встановленої кредитної лінії
+                      ,abs(ao.ostc/100) use_cred_sum  --використана сума кредитної лінії
+                      ,a.dazs           --дата закриття рахунку
+                      ,a.blkd           --код блокування рахунку по дебету
+                      ,a.blkk           --код блокування рахунку по кредиту
+                      ,decode(a.dazs,null,1,0) bpk_status        --статус договору по рахунку(1 - відкритий, 0 - закритий)
+                      ,pk_prct.okpo pk_okpo    --зарплатний проект, ЄДРПОУ організації
+                      ,pk_prct.name pk_name    --зарплатний проект, назва організації
+                      ,pk_prct.okpo_n pk_okpo_n  --зарплатний проект, код організації
+                      ,pk_prct.id as pk_oldnd -- номер договора по ЗП ?
+                      ,a.VID --????
+                      ,ww.lie_sum
+                      ,ww.lie_val
+                      ,ww.lie_date
+                      ,ww.lie_docn
+                      ,ww.lie_atrt
+                      ,ww.lie_doc
+                      ,ww.pk_term
+                      ,pk_work
+                      ,pk_cntrw
+                      ,pk_ofax
+                      ,pk_phone
+                      ,pk_pcodw
+                      ,pk_odat
+                      ,pk_strtw
+                      ,pk_cityw
+                      ,pk_offic
+                      ,nvl(d.CLOSE_DATE, d.EXPIRY_DATE) as dkbo_date_off
+                      ,d.START_DATE as dkbo_start_date
+                      ,d.DEAL_NUMBER as dkbo_deal_number
+                      ,s.KOS
+                      ,s.DOS
+                      ,w4_arsum
+                      ,w4_kproc
+                      ,w4_sec
+                      ,a.acc
+                      ,a.ob22
+                      ,a.nms
+                       from bars.accounts a, bars.accounts ao, bars.w4_acc w,
+                        (select aw.acc, p.id, p.name, p.okpo, p.product_code, p.okpo_n from bars.accountsw aw, bars.bpk_proect p
+                          where aw.tag = 'PK_PRCT'
+                            and to_number(aw.value)= p.id
+                            and regexp_replace(trim(aw.value), '\D') = trim(aw.value)) pk_prct,
+                            (select acc,
+                              "'LIE_SUM'_CC"  as lie_sum,
+                              "'LIE_VAL'_CC"  as lie_val,
+                              "'LIE_DATE'_CC"  as lie_date,
+                              "'LIE_DOCN'_CC"  as lie_docn,
+                              "'LIE_ATRT'_CC"  as lie_atrt,
+                              "'LIE_DOC'_CC"  as lie_doc,
+                              "'PK_TERM'_CC"  as pk_term,
+                              "'PK_WORK'_CC"  as pk_work,
+                              "'PK_CNTRW'_CC"  as pk_cntrw,
+                              "'PK_OFAX'_CC"  as pk_ofax,
+                              "'PK_PHONE'_CC"  as pk_phone,
+                              "'PK_PCODW'_CC"  as pk_pcodw,
+                              "'PK_ODAT'_CC"  as pk_odat,
+                              "'PK_STRTW'_CC"  as pk_strtw,
+                              "'PK_CITYW'_CC"  as pk_cityw,
+                              "'PK_OFFIC'_CC"  as pk_offic,
+                              "'W4_ARSUM'_CC"  as w4_arsum,
+                              "'W4_KPROC'_CC"  as w4_kproc,
+                              "'W4_SEC'_CC"  as w4_sec
+                         from (select w.acc, w.tag, w.value
+                                 from bars.accountsw w
+                                where tag in ('LIE_SUM','LIE_VAL','LIE_DATE','LIE_DOCN','LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC')
+                              )
+                       pivot ( max(value) cc for tag in ('LIE_SUM', 'LIE_VAL', 'LIE_DATE', 'LIE_DOCN', 'LIE_ATRT', 'LIE_DOC', 'PK_TERM', 'PK_WORK', 'PK_CNTRW', 'PK_OFAX', 'PK_PHONE', 'PK_PCODW', 'PK_ODAT', 'PK_STRTW', 'PK_CITYW', 'PK_OFFIC', 'W4_ARSUM', 'W4_KPROC', 'W4_SEC'))
+                                             ) ww,
+                         bars.deal d,
+                         (select acc, kos, dos from bars.saldoa where FDAT = trunc(sysdate)) S,
+                         delta
+                  where w.acc_pk = a.acc
+                   and w.acc_ovr = ao.acc(+)
+                   and w.acc_pk = pk_prct.acc(+)
+                   and a.ACC = ww.acc(+)
+                   and a.RNK = d.CUSTOMER_ID(+)
+                   and a.ACC = s.ACC(+)
+                   and a.acc = delta.acc
+        ) Q on  (a.acc = Q.acc and a.kf = q.kf)
+            when matched then update
+            set changenumber = l_changenumber,
+                branch = Q.branch,
+                rnk = Q.rnk,
+                nd = Q.nd,
+                dat_begin = Q.dat_begin,
+                bpk_type = Q.bpk_type,
+                nls = Q.nls,
+                daos = Q.daos,
+                kv = Q.kv,
+                intrate = Q.intrate,
+                ostc = Q.ostc,
+                date_lastop = Q.date_lastop,
+                cred_line = Q.cred_line,
+                cred_lim = Q.cred_lim,
+                use_cred_sum = Q.use_cred_sum,
+                dazs = Q.dazs,
+                blkd = Q.blkd,
+                blkk = Q.blkk,
+                bpk_status = Q.bpk_status,
+                pk_okpo = Q.pk_okpo,
+                pk_name = Q.pk_name,
+                pk_okpo_n = Q.pk_okpo_n,
+                vid = Q.vid,
+                lie_sum = Q.lie_sum,
+                lie_val = Q.lie_val,
+                lie_date = Q.lie_date,
+                lie_docn = Q.lie_docn,
+                lie_atrt = Q.lie_atrt,
+                lie_doc = Q.lie_doc,
+                pk_term = Q.pk_term,
+                pk_oldnd = Q.pk_oldnd,
+                pk_work = Q.pk_work,
+                pk_cntrw = Q.pk_cntrw,
+                pk_ofax = Q.pk_ofax,
+                pk_phone = Q.pk_phone,
+                pk_pcodw = Q.pk_pcodw,
+                pk_odat = Q.pk_odat,
+                pk_strtw = Q.pk_strtw,
+                pk_cityw = Q.pk_cityw,
+                pk_offic = Q.pk_offic,
+                dkbo_date_off = Q.dkbo_date_off,
+                dkbo_start_date = Q.dkbo_start_date,
+                dkbo_deal_number = Q.dkbo_deal_number,
+                kos = Q.kos,
+                dos = Q.dos,
+                w4_arsum = Q.w4_arsum,
+                w4_kproc = Q.w4_kproc,
+                w4_sec = Q.w4_sec,
+                ob22 = Q.ob22,
+                nms = Q.nms
+        when not matched then insert
+        (changenumber, kf, branch, rnk, nd, dat_begin, bpk_type, nls, daos, kv, intrate, ostc, date_lastop, cred_line, cred_lim, use_cred_sum, dazs, blkd, blkk, bpk_status, pk_okpo, pk_name, pk_okpo_n, vid, lie_sum, lie_val, lie_date, lie_docn, lie_atrt, lie_doc, pk_term, pk_oldnd, pk_work, pk_cntrw, pk_ofax, pk_phone, pk_pcodw, pk_odat, pk_strtw, pk_cityw, pk_offic, dkbo_date_off, dkbo_start_date, dkbo_deal_number, kos, dos, w4_arsum, w4_kproc, w4_sec, acc, ob22, nms)
+        values
+        (l_changenumber, Q.kf, Q.branch, Q.rnk, Q.nd, Q.dat_begin, Q.bpk_type, Q.nls, Q.daos, Q.kv, Q.intrate, Q.ostc, Q.date_lastop, Q.cred_line, Q.cred_lim, Q.use_cred_sum, Q.dazs, Q.blkd, Q.blkk, Q.bpk_status, Q.pk_okpo, Q.pk_name, Q.pk_okpo_n, Q.vid, Q.lie_sum, Q.lie_val, Q.lie_date, Q.lie_docn, Q.lie_atrt, Q.lie_doc, Q.pk_term, Q.pk_oldnd, Q.pk_work, Q.pk_cntrw, Q.pk_ofax, Q.pk_phone, Q.pk_pcodw, Q.pk_odat, Q.pk_strtw, Q.pk_cityw, Q.pk_offic, Q.dkbo_date_off, Q.dkbo_start_date, Q.dkbo_deal_number, Q.kos, Q.dos, Q.w4_arsum, Q.w4_kproc, Q.w4_sec, Q.acc, Q.ob22, Q.nms)
+        log errors into ERR$_BPK2 reject limit unlimited;
+
+        p_rows_ok := sql%rowcount;
+        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber;
+
+        reset_object_idupd(c_object_name);
+
+        p_status := G_STATS_SUCCESS;
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished');
+    exception
+        when others then
+            rollback to imp_start;
+            p_status := G_STATS_ERROR;
+            bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
+            raise;
+    end import_bpk2;
+
+    --
+    -- Выгрузка DEPOSITS2 - депозитные договора
+    --
+    procedure import_deposits2 (p_rows_ok  out number,
+                                p_rows_err out number,
+                                p_status   out varchar2)
+        is
+    c_object_name  constant varchar2(32) := 'DEPOSITS2';
+    l_changenumber number;
+
+    l_changelist bars.number_list;
+
+    begin
+        bars.bars_audit.info(g_trace||c_object_name||': start');
+
+        /* собираем измененные записи */
+        l_changelist := get_changed_keys(c_object_name);
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+
+        savepoint imp_start;
+
+        l_changenumber := increment_object_changenumber(c_object_name);
+
+        /* выгрузка */
+
+        merge into deposits2 a
+        using (
+        with delta as (select /*+ materialize*/ column_value as dpt_id from table(l_changelist))
+                   select
+                           d.deposit_id                                                         --ід депозиту
+                          ,d.branch                                                             --відділення
+                          ,d.kf                                                                 --РУ
+                          ,d.rnk                                                                --РНК
+                          ,d.nd                                                                 --номер договору
+                          ,d.dat_begin                                                          --договір від
+                          ,d.dat_end                                                            --дата закінчення договору
+                          ,a.nls                                                                --номер рахунку
+                          ,d.vidd                                                               --вид вкладу
+                          ,trunc(months_between(d.dat_end,d.dat_begin)) term                    --строк вкладу
+                          ,a.ostc/100 sdog                                                      --сума вкладу
+                          ,a.kv                                                                 --валюта вкладу
+                          ,bars.acrn.fproc(a.acc,sysdate) intrate                               --відсоткова ставка
+                          ,d.limit/100 sdog_begin                                               --початкова сума вкладу
+                          ,(select max(fdat)
+                                   from bars.saldoa s
+                                  where s.acc = a.acc and s.kos>0) last_dat                       --дата останнього поповнення
+                          ,(select sum (kos)/100
+                                   from bars.saldoa s
+                                  where s.acc = a.acc and fdat =(select max(fdat)
+                                                                   from bars.saldoa s
+                                                                  where s.acc = a.acc and s.kos>0)
+                                                                  ) last_sum                      --сума останнього поповнення
+                          ,a.ostc/100 ostc                                                        --поточний залишок
+                          ,(select sum (kos)/100
+                                   from bars.saldoa s
+                                  where s.acc = aproc.acc and fdat between aproc.daos and sysdate) sum_proc --поточна сума нарахованих відсотків
+                          ,0 suma_proc_plan                                                       --сума відсотків на планову дату виплати
+                          ,0 dpt_status                                                           --статус деп. договору - 0 - відкритий, 1 - закритий
+                          ,(select nvl(sum(s)/100,0)
+                             from bars.saldoa s, bars.opldok d
+                            where s.acc=d.acc and s.fdat=d.fdat and s.acc = aproc.acc and s.dos>0 and dk=0
+                              and not exists (select 1 from bars.opldok k where k.ref=d.ref and k.stmt = d.stmt and k.fdat=d.fdat and k.s=d.s and dk=1 and k.acc=a.acc)) suma_proc_payoff --сума випл. відсотків
+                          ,(select max(s.fdat)
+                             from bars.saldoa s, bars.opldok d
+                            where s.acc=d.acc and s.fdat=d.fdat and s.acc = aproc.acc and s.dos>0 and dk=0
+                              and not exists (select 1 from bars.opldok k where k.ref=d.ref and k.stmt = d.stmt and k.fdat=d.fdat and k.s=d.s and dk=1 and k.acc=a.acc)) date_proc_payoff --дата виплати відсотків(остання)
+                          ,(select max(fdat)
+                                   from bars.saldoa s
+                                  where s.acc = a.acc and s.dos>0) date_dep_payoff                       --дата виплати депозиту
+                          ,d.datz                                                                        --дата заключення вкладу
+                          ,a.dazs                                                                        --дата закриття рахунку
+                          ,a.blkd                                                                        --код блокування рахунку по дебету
+                          ,a.blkk                                                                        --код блокування рахунку по кредиту
+                          ,d.cnt_dubl                                                                    --кількість пролонгацій
+                          ,d.archdoc_id                                                                  --ідентифікатор депозитного договору в ЕАД
+                          ,dw.value as ncash                                                                      --нал/безнал
+                          ,(select cc.NMK from bars.accounts a left join bars.customer cc on a.rnk = cc.rnk where a.ACC = d.ACC_D)  as NAME_D
+                          ,d.OKPO_D                                                                      --код получателя депозита
+                          ,d.NLS_D                                                                       --номер счета получателя депозита
+                          ,d.MFO_D                                                                       --МФО счета получателя депозита
+                          ,d.NAME_P                                                                      --Получатель %
+                          ,d.OKPO_P                                                                      --код получателя %
+                          ,ia.NLSB                                                                       --номер счета получателя %
+                          ,ia.MFOB                                                                       --МФО счета получателя %
+                          ,(SELECT max(Ain.NLS) FROM bars.ACCOUNTS ain, bars.dpt_accounts dain, bars.dpt_deposit din
+                            where ain.acc = dain.accid
+                             and dain.accid != din.acc
+                             and dain.dptid = Din.DEPOSIT_ID
+                             and dain.dptid = d.DEPOSIT_ID
+                          ) as NLSP --счет % по депозитам
+                          ,case ddt.TYP_TR when 'M' then 1 end rosp_m  --на імєя малолітньої особи(розпорядник)
+                          ,case ddt.TYP_TR when 'C' then 1 end mal     --малолітня особа
+                          ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
+                          ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
+                          ,d.wb
+                          ,a.ob22
+                          ,a.nms
+              from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, delta, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
+              , bars.customer c
+              where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
+                and d.deposit_id = delta.dpt_id
+                and d.DEPOSIT_ID = dw.DPT_ID(+)
+                and dw.TAG(+) = 'NCASH'
+                and d.DEPOSIT_ID = ddt.DPT_ID(+)
+                and d.vidd = dv.VIDD(+)
+                and d.rnk = c.rnk and c.custtype = 3 and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
+                and a.nbs != '2620'
+              union
+               select
+                   d.deposit_id
+                  ,d.branch
+                  ,d.kf
+                  ,d.rnk
+                  ,d.nd
+                  ,d.dat_begin
+                  ,d.dat_end
+                  ,a.nls
+                  ,d.vidd
+                  ,trunc(months_between(d.dat_end,d.dat_begin)) term
+                  ,a.ostc/100 sdog
+                  ,a.kv
+                  ,bars.acrn.fproc(a.acc,sysdate) intrate
+                  ,d.limit/100 sdog_begin
+                  ,(select max(fdat)
+                           from bars.saldoa s
+                          where s.acc = a.acc and s.kos>0) last_dat
+                  ,(select sum (kos)/100
+                           from bars.saldoa s
+                          where s.acc = a.acc and fdat =(select max(fdat)
+                                                           from bars.saldoa s
+                                                          where s.acc = a.acc and s.kos>0)
+                                                          ) last_sum
+                  ,a.ostc/100 ostc
+                  ,(select sum (kos)/100
+                           from bars.saldoa s
+                          where s.acc = aproc.acc and fdat between aproc.daos and sysdate) sum_proc
+                  ,0 suma_proc_plan
+                  ,0 dpt_status
+                  ,(select nvl(sum(s)/100,0)
+                     from bars.saldoa s, bars.opldok d
+                    where s.acc=d.acc and s.fdat=d.fdat and s.acc = aproc.acc and s.dos>0 and dk=0
+                      and not exists (select 1 from bars.opldok k where k.ref=d.ref and k.stmt = d.stmt and k.fdat=d.fdat and k.s=d.s and dk=1 and k.acc=a.acc)) suma_proc_payoff
+                  ,(select max(s.fdat)
+                     from bars.saldoa s, bars.opldok d
+                    where s.acc=d.acc and s.fdat=d.fdat and s.acc = aproc.acc and s.dos>0 and dk=0
+                      and not exists (select 1 from bars.opldok k where k.ref=d.ref and k.stmt = d.stmt and k.fdat=d.fdat and k.s=d.s and dk=1 and k.acc=a.acc)) date_proc_payoff
+                  ,(select max(fdat)
+                           from bars.saldoa s
+                          where s.acc = a.acc and s.dos>0) date_dep_payoff
+                  ,d.datz
+                  ,a.dazs
+                  ,a.blkd
+                  ,a.blkk
+                  ,d.cnt_dubl
+                  ,d.archdoc_id
+                  ,dw.value as ncash                                                                      --нал/безнал
+                  ,(select cc.NMK from bars.accounts a left join bars.customer cc on a.rnk = cc.rnk where a.ACC = d.ACC_D)  as NAME_D
+                  ,d.OKPO_D                                                                      --код получателя депозита
+                  ,d.NLS_D                                                                       --номер счета получателя депозита
+                  ,d.MFO_D                                                                       --МФО счета получателя депозита
+                  ,d.NAME_P                                                                      --Получатель %
+                  ,d.OKPO_P                                                                      --код получателя %
+                  ,ia.NLSB                                                                       --номер счета получателя %
+                  ,ia.MFOB                                                                       --МФО счета получателя %
+                  ,(SELECT max(Ain.NLS) FROM bars.ACCOUNTS ain, bars.dpt_accounts dain, bars.dpt_deposit din
+                    where ain.acc = dain.accid
+                     and dain.accid != din.acc
+                     and dain.dptid = Din.DEPOSIT_ID
+                     and dain.dptid = d.DEPOSIT_ID
+                  ) as NLSP --счет % по депозитам
+                  ,case ddt.TYP_TR when 'M' then 1 end rosp_m  --на імєя малолітньої особи(розпорядник)
+                  ,case ddt.TYP_TR when 'C' then 1 end mal     --малолітня особа
+                  ,case ddt.TYP_TR when 'B' then 1 end ben     --бенефіціар
+                  ,dv.TYPE_NAME vidd_name   --вид вкладу(символьний)
+                  ,d.wb
+                  ,a.ob22
+                  ,a.nms
+              from bars.dpt_deposit d, bars.accounts a, bars.int_accn ia, bars.accounts aproc, bars.DPT_DEPOSITW dw, bars.DPT_TRUSTEE ddt, bars.DPT_VIDD dv
+              , bars.customer c, delta
+              where d.acc=a.acc and ia.acc=a.acc and ia.acra=aproc.acc
+              and d.DEPOSIT_ID = dw.DPT_ID(+)
+              and dw.TAG(+) = 'NCASH'
+              and d.DEPOSIT_ID = ddt.DPT_ID(+)
+              and d.vidd = dv.VIDD(+)
+              and d.rnk = c.rnk and c.custtype = 3 and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов
+              and a.nbs != '2620'
+              and d.deposit_id = delta.dpt_id
+        ) Q on  (a.deposit_id = Q.deposit_id and a.kf = q.kf)
+            when matched then update
+            set changenumber = l_changenumber,
+                branch = Q.branch,
+                rnk = Q.rnk,
+                nd = Q.nd,
+                dat_begin = Q.dat_begin,
+                dat_end = Q.dat_end,
+                nls = Q.nls,
+                vidd_name = Q.vidd_name,
+                term = Q.term,
+                sdog = Q.sdog,
+                massa = null,
+                kv = Q.kv,
+                intrate = Q.intrate,
+                sdog_begin = Q.sdog_begin,
+                last_add_date = Q.last_dat,
+                last_add_suma = Q.last_sum,
+                ostc = Q.ostc,
+                suma_proc = Q.sum_proc,
+                suma_proc_plan = Q.suma_proc_plan,
+                dpt_status = Q.dpt_status,
+                suma_proc_payoff = Q.suma_proc_payoff,
+                date_proc_payoff = Q.date_proc_payoff,
+                date_dep_payoff = Q.date_dep_payoff,
+                datz = Q.datz,
+                dazs = Q.dazs,
+                blkd = Q.blkd,
+                blkk = Q.blkk,
+                cnt_dubl = Q.cnt_dubl,
+                archdoc_id = Q.archdoc_id,
+                ncash = Q.ncash,
+                name_d = Q.name_d,
+                okpo_d = Q.okpo_d,
+                nls_d = Q.nls_d,
+                mfo_d = Q.mfo_d,
+                name_p = Q.name_p,
+                okpo_p = Q.okpo_p,
+                nlsb = Q.nlsb,
+                mfob = Q.mfob,
+                nlsp = Q.nlsp,
+                rosp_m = Q.rosp_m,
+                mal = Q.mal,
+                ben = Q.ben,
+                vidd = Q.vidd,
+                wb = Q.wb,
+                ob22 = Q.ob22,
+                nms = Q.nms
+        when not matched then insert
+        (changenumber, kf, branch, rnk, nd, dat_begin, dat_end, nls, vidd_name, term, sdog, massa, kv, intrate, sdog_begin, last_add_date, last_add_suma, ostc, suma_proc, suma_proc_plan, deposit_id, dpt_status, suma_proc_payoff, date_proc_payoff, date_dep_payoff, datz, dazs, blkd, blkk, cnt_dubl, archdoc_id, ncash, name_d, okpo_d, nls_d, mfo_d, name_p, okpo_p, nlsb, mfob, nlsp, rosp_m, mal, ben, vidd, wb, ob22, nms)
+        values
+        (l_changenumber, q.kf, q.branch,q.rnk,q.nd,q.dat_begin,q.dat_end,q.nls,q.vidd_name,q.term,q.sdog,null,q.kv,q.intrate,q.sdog_begin,q.last_dat,q.last_sum,q.ostc,q.sum_proc,q.suma_proc_plan,q.deposit_id,q.dpt_status,q.suma_proc_payoff,q.date_proc_payoff,q.date_dep_payoff,q.datz,q.dazs,q.blkd,q.blkk,q.cnt_dubl,q.archdoc_id,q.ncash,q.name_d,q.okpo_d,q.NLS_D,q.MFO_D,q.NAME_P,q.OKPO_P,q.NLSB,q.MFOB,q.NLSP,q.ROSP_M,q.MAL,q.BEN,q.vidd,q.WB, Q.ob22, Q.nms)
+        log errors into ERR$_DEPOSITS2 reject limit unlimited;
+
+        p_rows_ok := sql%rowcount;
+        select count(*) into p_rows_err from ERR$_DEPOSITS2 where changenumber = l_changenumber;
+
+        reset_object_idupd(c_object_name);
+
+        p_status := G_STATS_SUCCESS;
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished');
+    exception
+        when others then
+            rollback to imp_start;
+            p_status := G_STATS_ERROR;
+            bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
+            raise;
+    end import_deposits2;
+
+    --
+    -- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
+    --
     procedure imp_run_by_mfo(p_mfo          in     varchar2,
                              p_object_proc  in     varchar2,
                              p_id_event     in     number)
@@ -1070,13 +1818,18 @@ is
         execute immediate 'begin ' || p_object_proc || '(:p1, :p2, :p3); end;'
         using in out l_rows_ok, in out l_rows_err, in out l_status;
 
+        -- переключаем режим выдачи на дельту
+        set_import_mode(G_IMPORT_MODE_DELTA);
+       
         commit;
 
         -- лочим строку статистики и обновляем статус (кроме ERROR) и инкрементно выгруженные строки
         select * into l_stats_current_row from intgr_stats where id = p_id_event for update;
         log_stat_event(p_rows_ok    => nvl(l_stats_current_row.rows_ok, 0) + l_rows_ok,
                        p_rows_err   => nvl(l_stats_current_row.rows_err, 0) + l_rows_err,
-                       p_status     => case when l_stats_current_row.status in ('ERROR', 'INPROCESS') and l_status != 'ERROR' then l_stats_current_row.status else l_status end,
+                       p_status     => case when l_stats_current_row.status in (G_STATS_ERROR, G_STATS_INPROCESS) and l_status != G_STATS_ERROR then l_stats_current_row.status 
+                                            else l_status 
+                                       end,
                        p_id         => l_stats_current_row.id);
     exception
         when others then
@@ -1087,7 +1840,7 @@ is
             bars.bars_audit.error(l_errmsg);
             -- лочим строку статистики и ставим статус ошибки
             select * into l_stats_current_row from intgr_stats where id = p_id_event for update;
-            log_stat_event(p_id => l_stats_current_row.id, p_status => 'ERROR');
+            log_stat_event(p_id => l_stats_current_row.id, p_status => G_STATS_ERROR);
     end imp_run_by_mfo;
 
     --
@@ -1136,6 +1889,8 @@ is
         -- кем логинимся
         select id into l_usr_id from bars.staff$base t where t.logname = 'BARS_INTGR';
         l_task_statement := replace(l_task_statement, ':usr_id', l_usr_id);
+        -- переключаемся на импорт дельты
+        xrm_import.set_import_mode(p_mode => bars_intgr.xrm_import.G_IMPORT_MODE_DELTA);
 
         for cur in (select object_name, object_proc from imp_object where active = 1 order by imp_order)
         loop
@@ -1152,7 +1907,7 @@ is
                                 p_object_name => cur.object_name,
                                 p_rows_ok => null,
                                 p_rows_err => null,
-                                p_status => 'INPROCESS',
+                                p_status => G_STATS_INPROCESS,
                                 p_id => l_id_event );
 
 
@@ -1171,7 +1926,7 @@ is
 
 
                 -- лог окончания
-                select case when status = 'ERROR' then 'ERROR' else 'SUCCESS' end into l_final_status from intgr_stats where id = l_id_event;
+                select case when status = G_STATS_ERROR then G_STATS_ERROR else G_STATS_SUCCESS end into l_final_status from intgr_stats where id = l_id_event;
                 log_stat_event(p_stop_time => sysdate,
                                p_id        => l_id_event,
                                p_status    => l_final_status);
@@ -1186,8 +1941,8 @@ is
                     bars.bars_audit.error(l_errmsg);
                     drop_import_task;
                     log_stat_event(p_stop_time  => sysdate,
-                                   p_status => 'ERROR',
-                                   p_id => l_id_event);
+                                   p_status     => G_STATS_ERROR,
+                                   p_id         => l_id_event);
 
             end;
             -- обнуляем id выгрузки объекта
@@ -1204,3 +1959,5 @@ begin
 end;
 /
 show errors;
+
+grant execute on xrm_import to bars_dm;

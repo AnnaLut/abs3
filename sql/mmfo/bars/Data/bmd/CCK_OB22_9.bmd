@@ -58,8 +58,8 @@ declare
 
 begin
 
-  l_tabsemantic := 'Додаток (МСФЗ-9) до CCK_Ob22';
-  l_tablinesdef := '';
+  l_tabsemantic := '6.Додаток (МСФЗ-9) до CCK_Ob22 / CCK_OB22_9';
+  l_tablinesdef := '10';
   l_tabselect_statement := '';
   l_tabname     := 'CCK_OB22_9';
 
@@ -124,98 +124,46 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid,  1, 'NBS', 'C', 'БР~тiла'                         , '', 4,  1, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid,  2, 'OB22', 'C', 'ob22~тiла'                      , '', 2,  2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid,   1, 'NBS' , 'C', 'БР~тiла'  , '', 4, 1, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid,   2, 'OB22', 'C', 'ob22~тiла', '', 2, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
-  bars_metabase.add_column(l_tabid,  3, 'SDF', 'C', 'БС+Об22~Д/П до справедл~FV_ADJ'  , '', 6,  3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid,  4, 'D6F', 'C', 'БС+Об22~6 кл.до справедл~FV_ADJ' , '', 6,  4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid,  5, 'D7F', 'C', 'БС+Об22~7 кл.до справедл~FV_ADJ' , '', 6,  5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  11, 'S1NP', 'C', 'БС+Об22~NEW_FEE~плюс S1 грн~до спрв~FV_ADJ' , '', 6, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  12, 'S1NM', 'C', 'БС+Об22~NEW_FEE~мінус S1 грн~до спрв~FV_ADJ', '', 6, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  13, 'S1VP', 'C', 'БС+Об22~NEW_FEE~плюс S1 вал~до спрв~FV_ADJ' , '', 6, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  14, 'S1VM', 'C', 'БС+Об22~NEW_FEE~мінус S1 вал~до спрв~FV_ADJ', '', 6, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
-  bars_metabase.add_column(l_tabid,  6, 'SDM', 'C', 'БС+Об22~Д/П від модифік~MODIF'   , '', 6,  6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid,  7, 'D6M', 'C', 'БС+Об22~6 кл.від модифік~MODIF'  , '', 6,  7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid,  8, 'D7M', 'C', 'БС+Об22~7 кл.від модифік~MODIF'  , '', 6,  8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  21, 'S3NP', 'C', 'БС+Об22~NEW_FEE~плюс S3 грн~від модф~MODIF' , '', 6, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  22, 'S3NM', 'C', 'БС+Об22~NEW_FEE~мінус S3 грн~від модф~MODIF', '', 6, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  23, 'S3VP', 'C', 'БС+Об22~NEW_FEE~плюс S3 вал~від модф~MODIF' , '', 6, 23, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  24, 'S3VM', 'C', 'БС+Об22~NEW_FEE~мінус S3 вал~від модф~MODIF', '', 6, 24, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
-  bars_metabase.add_column(l_tabid,  9, 'SDI', 'C', 'БС+Об22~Д/П "грошовий"~GENERAL'  , '', 6,  9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'D6I', 'C', 'БС+Об22~6 кл."грошовий"~GENERAL' , '', 6, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'D7I', 'C', 'БС+Об22~7 кл."грошовий"~GENERAL' , '', 6, 11, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  31, 'SRR' , 'C', 'БС+Об22~Рахунок~Переоц.~від XLS' , '', 6, 31, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  32, 'R6R' , 'C', 'БС+Об22~Мінус~Переоц.~від XLS', '', 6, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,  33, 'R7R' , 'C', 'БС+Об22~Плюс~Переоц.~від XLS' , '', 6, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
-  bars_metabase.add_column(l_tabid, 12, 'SDA', 'C', 'БС+Об22~Д/П "технічний"~ACCRUAL' , '', 6, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'D6A', 'C', 'БС+Об22~6 кл."технічний"~ACCRUAL', '', 6, 13, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'D7A', 'C', 'БС+Об22~7 кл."технічний"~ACCRUAL', '', 6, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
-  bars_metabase.add_column(l_tabid, 15, 'SNA', 'C', 'БС+Об22~Невизн.дох~AIRC_CCY'     , '', 6, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'N6A', 'C', 'БС+Об22~6 кл.Невизн.~AIRC_CCY'   , '', 6, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'N7A', 'C', 'БС+Об22~7 кл.Невизн.~AIRC_CCY'   , '', 6, 17, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-
-  bars_metabase.add_column(l_tabid, 18, 'SRR', 'C', 'БС+Об22~Переоц.~XLS'             , '', 6, 18, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'R6R', 'C', 'БС+Об22~6 кл.Переоц.~XLS'        , '', 6, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'R7R', 'C', 'БС+Об22~7 кл.Переоц.~XLS'        , '', 6, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
-
-  -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 2, 'ASC ');
 
-  -- очищаем описание функций на справочник
-  bars_metabase.delete_nsifunction(l_tabid);
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'NBS');  if (l_newcolid is not null) then    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, '1 = 1', 2, 'COLOR_Yellow');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'OB22'); if (l_newcolid is not null) then    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, '1 = 1', 2, 'COLOR_Yellow');  end if;
 
-  -- восстанавливаем ссылки сложных полей других таблиц
-  for i in 1..l_extrnval.count loop
-    l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
-    if (l_newcolid is not null) then
-      bars_metabase.add_extrnval(
-        l_extrnval(i).tabid,
-        l_extrnval(i).colid,
-        l_tabid,
-        l_newcolid,
-        l_extrnval(i).tab_alias,
-        l_extrnval(i).tab_cond,
-        l_extrnval(i).src_cond,
-        l_extrnval(i).col_dyn_tabname);
-    end if;
-  end loop;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S1NP');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 11, l_newcolid, '1 = 1', 2, 'COLOR_LightAqua');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S1NM');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 12, l_newcolid, '1 = 1', 2, 'COLOR_LightAqua');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S1VP');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 13, l_newcolid, '1 = 1', 2, 'COLOR_Sky');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S1VM');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 14, l_newcolid, '1 = 1', 2, 'COLOR_Sky');  end if;
 
-  -- восстанавливаем ссылки полей для условий фильтра других таблиц
-  for i in 1..l_browsetbl.count loop
-    l_newcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).addcolname);
-    l_varcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).varcolname);
-    if (l_newcolid is not null and l_varcolid is not null) then
-      bars_metabase.add_browsetbl( 
-        l_browsetbl(i).hosttabid,
-        l_tabid,
-        l_browsetbl(i).addtabalias,
-        l_browsetbl(i).hostcolid,
-        l_newcolid,
-        l_varcolid,
-        l_browsetbl(i).cond_tag);
-    end if;
-  end loop;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S3NP');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 21, l_newcolid, '1 = 1', 2, 'COLOR_LightGreen');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S3NM');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 22, l_newcolid, '1 = 1', 2, 'COLOR_LightGreen');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S3VP');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 23, l_newcolid, '1 = 1', 2, 'COLOR_Green');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'S3VM');  if (l_newcolid is not null) then   bars_metabase.add_tblcolor(l_tabid, 24, l_newcolid, '1 = 1', 2, 'COLOR_Green');  end if;
 
-  -- восстанавливаем ссылки полей других таблиц на нашу вложенную таблицу
-  for i in 1..l_filtertbl.count loop
-    bars_metabase.add_filtertbl(
-      l_filtertbl(i).tabid,
-      l_filtertbl(i).colid,
-      l_tabid,
-      l_filtertbl(i).fltcode,
-      l_filtertbl(i).flag_ins,
-      l_filtertbl(i).flag_del,
-      l_filtertbl(i).flag_upd);
-  end loop;
-
-  -- восстанавливаем зависимости между колонками таблицы
-  for i in 1..l_dependency.count loop
-    bars_metabase.add_dependency(
-      l_dependency(i).tabid,
-      l_dependency(i).colid,
-      l_dependency(i).event ,
-      l_dependency(i).depcolid  ,
-      l_dependency(i).action_type ,
-      l_dependency(i).action_name ,
-      l_dependency(i).default_value ,
-      l_dependency(i).condition );
-  end loop;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'SRR');  if (l_newcolid is not null) then    bars_metabase.add_tblcolor(l_tabid, 31, l_newcolid, '1 = 1', 2, 'COLOR_Orchid');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'R6R');  if (l_newcolid is not null) then    bars_metabase.add_tblcolor(l_tabid, 32, l_newcolid, '1 = 1', 2, 'COLOR_Orchid');  end if;
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'R7R');  if (l_newcolid is not null) then    bars_metabase.add_tblcolor(l_tabid, 33, l_newcolid, '1 = 1', 2, 'COLOR_Orchid');  end if;
 
 end;
 /

@@ -12,7 +12,7 @@ CREATE OR REPLACE PACKAGE BARS.ins_ewa_mgr is
   -- Public type declarations
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64)  := 'version 3.21 23/02/2018';
+  g_header_version  constant varchar2(64)  := 'version 3.22 13/03/2018';
 
   -- Public function and procedure declarations
 
@@ -195,7 +195,7 @@ type gt_response is record(
 
   -- Private constant declarations
   g_package_name constant varchar2(160) := 'ins_ewa_mgr';
-  g_body_version  constant varchar2(64)  := 'version 3.21bf 06/03/2018';
+  g_body_version  constant varchar2(64)  := 'version 3.23 26/03/2018';
 
   --3.0
 --исправлены мелкие ошибки при создании договоров страхования (формат полей таблиц модуля страхования, проверкуи на корректность данных и и.п.)
@@ -267,7 +267,7 @@ end get_branch;
     end if;
     IF regexp_like(retval,'^\d{4}-\d{2}-\d{2}$') and p_to_date = 1 then --дата типу yyyy-mm-dd
        retval:= to_char(to_date(retval,'yyyy-mm-dd'),'dd.mm.yyyy'); 
-    elsif regexp_like(retval,'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}\+\d{4}$') and p_to_date = 1 then --дата типу yyyy-mm-ddThh24:mi:ss.000+0000
+    elsif regexp_like(retval,'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{4}$') and p_to_date = 1 then --дата типу yyyy-mm-ddThh24:mi:ss.000+0000
           retval:= to_char(cast(to_timestamp_tz(retval,'YYYY-MM-DD"T"HH24:MI:SS.FF3TZHTZM') at time zone 'Europe/Kiev' as date),'dd.mm.yyyy');
   end if;
     return retval;
@@ -284,6 +284,8 @@ end get_branch;
                        p_type        number default 0) is --0 JSON для отримання призначення платежу та референсу, 1 JSON для створення договору
   l_paydat gt_paydat;  
   l_imp_val gt_imp_val;
+  l_deal_id number;
+  l_deal_number varchar2(50);
   l_str varchar2(3200);
   l_path varchar2(255);
   l_test_path varchar2(255);
@@ -334,8 +336,8 @@ end get_branch;
   
   p_imp_val:=l_imp_val;
   end if;
-   
-                l_paydat.id:=to_number(l_xml_extract(p_xml, l_contr_path||'id/text()')); --ід договора
+                l_deal_id:=to_number(l_xml_extract(p_xml, l_contr_path||'id/text()')); --ід договора
+                l_paydat.id:=l_deal_id; --ід договора
                 l_paydat.branch:=l_xml_extract(p_xml, l_contr_path||'salePoint/code/text()'); --бранч
                 l_paydat.user_name:=l_xml_extract(p_xml, l_contr_path||'customFields/item[code="m1"]/value/text()'); --табельний номер
                 l_paydat.mfob:=l_xml_extract(p_xml, l_pay_path||'recipientBankMfo/text()'); --МФО банку страхової
@@ -345,16 +347,19 @@ end get_branch;
                 l_paydat.ammount:=to_number(l_xml_extract(p_xml, l_pay_path||'payment/text()'))*100; --Сума(вартість) страховкі
                 l_paydat.commission:=to_number(l_xml_extract(p_xml, l_pay_path||'commission/text()'))*100; --Сума комісії
                 l_paydat.commission_type:=l_xml_extract(p_xml, l_pay_path||'commissionType/text()'); --тип комісії
-                l_paydat.d_number:=l_xml_extract(p_xml, l_contr_path||'number/text()'); --№ документу
-                    if l_paydat.d_number is null then
-                    l_paydat.d_number:=l_xml_extract(p_xml, l_contr_path||'code/text()'); --символьний № документу
+                l_deal_number:=l_xml_extract(p_xml, l_contr_path||'number/text()'); --№ документу
+                    if l_deal_number is null then
+                    l_deal_number:=l_xml_extract(p_xml, l_contr_path||'code/text()'); --символьний № документу
                     end if;
+                l_paydat.d_number:=l_deal_number;
              begin
                 l_paydat.date_from:=to_date(l_xml_extract(p_xml, l_contr_path||'dateFrom/text()',1),'dd.mm.yyyy'); --дата початоку дії страховкі
                     exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
                     p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати початоку дії договору "'||l_xml_extract(p_xml, l_contr_path||'dateFrom/text()')||'".';
+                    p_paydat.id:=l_deal_id;
+                    p_paydat.d_number:=l_deal_number;
                     return;
              end;
              begin
@@ -363,14 +368,18 @@ end get_branch;
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
                     p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати кінця дії договору "'||l_xml_extract(p_xml, l_contr_path||'dateTo/text()')||'".';
+                    p_paydat.id:=l_deal_id;
+                    p_paydat.d_number:=l_deal_number;
                     return;
              end;
              begin
-                l_paydat.d_date:=to_date(l_xml_extract(p_xml, l_contr_path||'date/text()',1),'dd.mm.yyyy'); --дата заключення договору
+                l_paydat.d_date:=to_date(l_xml_extract(p_xml, l_pay_path||'date/text()',1),'dd.mm.yyyy'); --дата заключення договору
                      exception when others then
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
                     p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати заключення договору "'||l_xml_extract(p_xml, l_contr_path||'date/text()')||'".';
+                    p_paydat.id:=l_deal_id;
+                    p_paydat.d_number:=l_deal_number;
                     return;
              end;
                 l_paydat.purpose:=l_xml_extract(p_xml, l_pay_path||'purpose/text()'); --рпизначення платежу
@@ -385,6 +394,8 @@ end get_branch;
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
                     p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати заключення договору "'||l_xml_extract(p_xml, l_contr_path||'customer/document/date/text()')||'".';
+                    p_paydat.id:=l_deal_id;
+                    p_paydat.d_number:=l_deal_number;
                     return;
              end;
                 l_paydat.cust_doc_issued:=l_xml_extract(p_xml, l_contr_path||'customer/document/issuedBy/text()'); --ким виданий паспорт
@@ -394,6 +405,8 @@ end get_branch;
                     p_resp.purpose    := null;
                     p_resp.errcode    := -20001;
                     p_resp.errmessage := upper(g_package_name)||'. Помилка при конвертації дати народження "'||l_xml_extract(p_xml, l_contr_path||'customer/birthDate/text()')||'".';
+                    p_paydat.id:=l_deal_id;
+                    p_paydat.d_number:=l_deal_number;
                     return;
              end;
                 l_paydat.cust_phone:=l_xml_extract(p_xml, l_contr_path||'customer/phone/text()'); --№ телефону клієнта
@@ -673,7 +686,7 @@ begin
       p_errcode:=l_resp.errcode;
       p_errmessage:=l_resp.errmessage;
 
-      logger.info('INS get_purpose created in '||to_char(localtimestamp -l_start_time)||' for deal id: '||l_paydat.id||' code: '||l_paydat.d_number||'.PURPOSE :'||l_resp.purpose);
+      logger.info('INS get_purpose created in '||to_char(localtimestamp -l_start_time)||' for deal id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.PURPOSE :'||l_resp.purpose);
   else
     p_purpose:=l_resp.purpose;
     p_errcode:=l_resp.errcode;
@@ -1265,7 +1278,6 @@ end get_purpose;
             p_ref        := -1;
             p_errcode    := sqlcode;
             p_errmessage := substr(sqlerrm, 1, 4000);
-            p_errmessage:=l_errmsg;
             call_logger(l_paydat, l_errmsg||' Договір id: '||to_char(l_paydat.id)||' code: '||l_paydat.d_number||'.');
             bars_login.logout_user;
             rollback to savepoint sp_paystart;

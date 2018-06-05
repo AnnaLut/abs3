@@ -143,7 +143,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.XOZ IS
    g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  29.09.2017-1';
 --------------------------------------------
 
-/*29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
+/*
+  20.04.2018 Sta Протоколирование закрытия хоз.деб вs sec_AUDIT c принзаком XOZ_AUDIT
+  29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
   29.08.2017 Сухова  --простановка отметки о закрытии этим реф2 = oo.ref (от авто-квитовки отказались)
   18.08.2017 СУХОВА. БЕК частичногозакрытия из МОДУЛЯ
   14.08.2017 СУХОВА. Добавлен протокол квитовки. Удаление установленной связи
@@ -219,6 +221,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.XOZ IS
 */
 -------------------------------------
 nlchr char(2) := chr(13)||chr(10) ;
+
+XOZ_AUDIT varchar2(15) :='XOZ_AUDIT:';
 --------------------------------------------------------------------
 procedure CLS  (p_acc number ) is --- Авто-Закриття по закритим рахункам
 begin
@@ -629,6 +633,9 @@ begin
 
  update XOZ_ref set fdat = p_fdat, mdate = p_mdate, notp = p_notp where ref1 = p_ref1 and stmt1 = p_stmt1;
 
+ LOGGER.INFO( XOZ_AUDIT || 'ref1='||p_ref1||' and stmt1='||p_stmt1||
+    ' : Корекція картотеки: БУЛО fdat='||to_char(xx.fdat,'dd.mm.yyyy') || ' , mdate='||to_char(xx.mdate,'dd.mm.yyyy') || 
+                      ' -> СТАЛО fdat='||to_char( p_fdat,'dd.mm.yyyy') || ' , mdate='||to_char( p_mdate,'dd.mm.yyyy') ) ;
 end ;
 --------------------------
 
@@ -643,37 +650,46 @@ procedure OPL_REF_H2
     p_ZO    int                ,  -- приз корр
     p_SP    number             ,  -- сума закриття
     p_DV2   date               )  -- нова дата визнання
-IS  l_Ref2 number ; l_datz date ; l_s number ; gl_stmt number; l_DV2 date ; l_POG number;
+IS  l_Ref2 number ; l_datz date ; l_s number ; gl_stmt number; l_DV2 date ; l_POG number; x_Txt varchar2(250); l_mdate date ;
 begin
 
    If p_s < p_SP then raise_application_error(-20000, 'XOZ/Реф.1='||p_REF1||'Сума визнання='||p_s||' МЕНША суми закриття='||p_sp );  end if;
-
    xoz.NOT_RD (p_acc, p_DV1, p_DV2 )   ;
+   x_Txt := 'ref1='||p_ref1||' and stmt1='||p_stmt1||' : ЗАКРИТТЯ картотеки';
 
    If p_REF2 > 0 then l_ref2 := P_ref2 ; -- проверить на допустимость этого реф-2 на закрытие
-
       begin select o.vdat  into l_datz from oper o, opldok p where o.ref = p_ref2  and p.ref =o.ref and p.acc = p_acc and p.dk =1 and rownum=1 ;  --and p.s <= p_SP*100 
       EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-20000, 'XOZ/Реф.2=' || p_REF2 || ' не може закривати Реф.1='|| p_ref1 );
-      end ;
-
-   else l_Ref2 := 0 ;
-      If p_zo = 1 then l_datz := dat_next_u(trunc(gl.BDATE, 'MM'),-1);
-      else             l_datz := gl.BDATE;
+      end ;             x_Txt  := x_Txt ||' АВТОМАТИЧНЕ ref2='||P_ref2 ;
+   else l_Ref2 := 0;    x_Txt  := x_Txt ||' РУЧНЕ ref2=0';
+      If p_zo = 1 then  x_Txt  := x_Txt || ' корр.' ; 
+                        l_datz := dat_next_u(trunc(gl.BDATE, 'MM'),-1);                         
+      else              l_datz := gl.BDATE;
       end if;
    end if ;
-
+   x_Txt := x_Txt ||' datz='|| to_char(l_datz, 'dd.mm.yyyy');
  ---------------------------------------------------
    If    p_s = nvl(p_SP, p_s) then   null ; -- повне закриття  (обнулення)
          update xoz_ref SET ref2 = nvl(p_REF2,0), datz = l_datz  where ref1=p_ref1 and stmt1=p_stmt1;  -- старую запись закрыть
-   Else
+         x_Txt := x_Txt || ' ПОВНЕ '   ||(p_S  * 100) ;
+   Else  x_Txt := x_Txt || ' ЧАСТКОВЕ '||(p_sp * 100) ;
       l_S := (p_S - p_sp) * 100 ;   -- визначення залишку
       -- породження ногого запису для залишку
       l_DV2 := NVL( p_DV2, p_DV1) ;-- -- новой записи установить дату возникновения
       gl_stmt := bars_sqnc.get_nextval('s_stmt') ;
-      INSERT INTO XOZ_ref (acc, ref1, stmt1,s, s0, fdat, mdate ) values (p_acc, p_ref1, gl_stmt, l_s, l_s, l_DV2, xoz.MDATE( p_acc,l_DV2 ) );
-      update xoz_ref SET ref2 = nvl(p_REF2,0), datz = l_datz, s0 = p_sp*100  where ref1=p_ref1 and stmt1=p_stmt1;  -- старую запись закрыть
-   end if;
 
+      x_Txt := x_Txt ||' залишок  stmt1='||gl_stmt||', сума=' ||l_s|| ', Дати визн та план-погаш.' ;
+
+      If l_DV2 = p_DV1 then  x_Txt := x_Txt || ' ЗБЕРЕЖЕНО =' ; select mdate into l_mdate from xoz_ref   where ref1=p_ref1 and stmt1=p_stmt1;
+      else                   x_Txt := x_Txt || ' ЗМІНЕНО ='   ;                   l_mdate :=   xoz.MDATE ( p_acc,l_DV2 ) ;
+      end if; 
+      x_Txt := x_Txt || to_char(l_DV2,'dd.mm.yyyy') || ' та ' || to_char(l_mdate,'dd.mm.yyyy' );
+
+      INSERT INTO XOZ_ref (acc, ref1,   stmt1,   s,  s0,  fdat, mdate ) values ( p_acc, p_ref1, gl_stmt, l_s, l_s, l_DV2, l_mdate ); 
+      update xoz_ref SET ref2 = nvl(p_REF2,0), datz = l_datz, s0 = p_sp*100  where ref1=p_ref1 and stmt1=p_stmt1;  -- старую запись закрыть
+
+   end if;
+   LOGGER.INFO( XOZ_AUDIT ||x_Txt );
 end OPL_REF_H2 ;
 -----------------------------------------------------------------
 

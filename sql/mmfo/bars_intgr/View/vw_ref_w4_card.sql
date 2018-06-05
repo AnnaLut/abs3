@@ -1,6 +1,6 @@
 prompt view/vw_ref_w4_card.sql
 create or replace force view bars_intgr.vw_ref_w4_card as
-select cast(bars.F_OURMFO_G as varchar2(6)) MFO,
+select KF MFO,
 t.CODE,
 PRODUCT_CODE,
 SUB_CODE,

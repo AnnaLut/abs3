@@ -33,7 +33,7 @@ public partial class Swift : Bars.BarsPage
             SetParameters("pref", DB_TYPE.Decimal, Ref, DIRECTION.Input);
             SQL_Reader_Exec(@"SELECT j.mt, j.io_ind, 
 								j.sender,  NVL(b1.name,'No data'), b1.office, 
-								j.receiver,NVL(b2.name,'No data'), b2.office, j.swref  
+								j.receiver,NVL(b2.name,'No data'), b2.office, j.swref, j.sti, j.uetr, case when j.cov is not null then to_char(j.mt)||j.cov else to_char(j.mt) end as mt
 								FROM sw_journal j, sw_banks b1, sw_banks b2, sw_oper o
 								WHERE j.swref = o.swref AND o.ref=:pref and
 								b1.bic(+)  = j.sender  AND 
@@ -42,6 +42,7 @@ public partial class Swift : Bars.BarsPage
             {
                 decimal SWCurId = -1;
                 string MT = "";
+		string MT_COV = "";
                 string Ind = "";
                 string Sender = "";
                 string SndrName = "";
@@ -50,6 +51,8 @@ public partial class Swift : Bars.BarsPage
                 string RcvrName = "";
                 string RcvrAdr = "";
                 string fldName = "";
+				string fldSTI = "";
+				string fldUETR = "";
                 do
                 {
                     var rows = SQL_Reader_GetValues();
@@ -62,9 +65,12 @@ public partial class Swift : Bars.BarsPage
                     RcvrName = Convert.ToString(rows[6]);
                     RcvrAdr = Convert.ToString(rows[7]);
                     SWCurId = Convert.ToDecimal(rows[8]);
+		    fldSTI  = Convert.ToString(rows[9]);
+		    fldUETR = Convert.ToString(rows[10]);
+		    MT_COV= Convert.ToString(rows[11]);
 
                     edMain.InnerText += "------------------------------------------------------------" + Environment.NewLine;
-                    edMain.InnerText += "Message : MT" + MT + " (" + Ind + ")" + Environment.NewLine;
+                    edMain.InnerText += "Message : MT" + MT_COV + " (" + Ind + ")" + Environment.NewLine;
                     edMain.InnerText += "Sender  : " + Sender + Environment.NewLine;
                     edMain.InnerText += "          " + SndrName + Environment.NewLine;
                     if(!string.IsNullOrEmpty(SndrAdr))
@@ -73,6 +79,12 @@ public partial class Swift : Bars.BarsPage
                     edMain.InnerText += "          " + RcvrName + Environment.NewLine;
                     if (!string.IsNullOrEmpty(RcvrAdr))
                         edMain.InnerText += "          " + RcvrAdr + Environment.NewLine;
+					
+					if (!string.IsNullOrEmpty(fldSTI))
+                            edMain.InnerText += "STI     : " + fldSTI + Environment.NewLine;
+					if (!string.IsNullOrEmpty(fldUETR))
+                            edMain.InnerText += "UETR    : " + fldUETR + Environment.NewLine;
+						
                     edMain.InnerText += "------------------------------------------------------------" + Environment.NewLine;
                     edMain.InnerText += "Message Body" + Environment.NewLine;
 

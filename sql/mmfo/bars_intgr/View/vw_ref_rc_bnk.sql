@@ -6,4 +6,4 @@ b010,
 name
 from bars.rc_bnk t;
 
-comment on table vw_ref_rc_bnk is 'РљРѕРґРё Р±Р°РЅРєС–РІ (TAG_VALUE)';
+comment on table vw_ref_rc_bnk is 'Коди банків (TAG_VALUE)';

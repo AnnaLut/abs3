@@ -105,6 +105,8 @@ IS
    ern   CONSTANT POSITIVE := 803;
    err            EXCEPTION;
    erm            VARCHAR2 (1024);
+   l_nlsa         oper.nlsa%type;
+   l_nlsb         oper.nlsb%type;
 --
 BEGIN
    bars_audit.trace (
@@ -3148,9 +3150,9 @@ BEGIN
        and a.nls = NLS_
        and a.kv = l_kv
        and dd.vidd = v.vidd;
-exception when no_data_found then 
+exception when no_data_found then
 return 0;
-end ; 
+end ;
       l_term_add1 := to_number(floor(l_term_add));
 
       bars_audit.trace('1478 ' || l_deposit || ' ' || l_term_add1 || ' ' ||
@@ -3255,7 +3257,7 @@ end ;
       bars_audit.trace('1478 l_sum:' || l_sum || ' l_limit: ' || l_limit);
 
       l_is_bnal := bars.dpt.f_dptw(l_deposit, 'NCASH');
-        
+
       bars_audit.trace('1478 безнал: ' || l_is_bnal);
 
       if (l_count_mm = 0) and (l_is_bnal = '1') then -- первый месяц и безнал
@@ -3271,7 +3273,7 @@ end ;
         else
           null;
         end if;
-       end if; 
+	   end if; 
       elsif l_sum > l_limit then
         bars_audit.trace('1478 ' || 'Перевищено сумму ліміту!');
         erm := '******Перевищено сумму ліміту ' || to_char(l_limit) ||
@@ -3283,8 +3285,110 @@ end ;
       end if;
 
     end; -- end of 1478
+    
+   ELSIF KOD_ = 9999 THEN
+      select t.nlsa, t.nlsb
+        into l_nlsa, l_nlsb
+        from oper t
+       where t.ref = p_ref;
 
-  end if;
+   ELSIF KOD_ = 9999 THEN
+      select t.nlsa, t.nlsb
+        into l_nlsa, l_nlsb
+        from oper t
+       where t.ref = p_ref;
+
+      select count(*)
+        into l_cnt
+        from accounts t
+       where t.tip like 'W4%'
+         and t.nls in (l_nlsa, l_nlsb);
+
+      IF l_cnt > 0
+      THEN
+         bars_audit.info ('!f_stop#9999 Заборонено проведення операції по рахункам БПК');
+         erm := 'Заборонено проведення операції по рахункам БПК';
+         RAISE err;
+      END IF;
+      
+      ELSIF KOD_ = 9998 THEN
+        begin
+          select trim(t.value)
+            into l_nlsa
+            from operw t 
+           where t.ref = p_ref
+             and t.tag = 'NLSO';
+        exception 
+          when NO_DATA_FOUND 
+            then 
+              l_nlsa:= null;
+        end;
+        
+        begin
+          select trim(lower(t.value))
+            into l_fio
+            from operw t
+           where t.ref = p_ref
+             and t.tag = 'FIO';
+        exception 
+          when NO_DATA_FOUND 
+            then 
+              l_fio:= null;
+        end;
+        
+        begin
+          select trim(lower(t.value))
+            into l_fio_t
+            from operw t
+           where t.ref = p_ref
+             and t.tag = 'OTRIM';
+        exception 
+          when NO_DATA_FOUND 
+            then 
+              l_fio_t:= null;
+        end;
+        
+        if l_fio is null 
+          or l_fio_t is null 
+            or l_fio != l_fio_t 
+              then 
+                bars_audit.info ('!f_stop#9998 Відправник платежу не є власником рахунку '||l_nlsa);
+                erm := 'Відправник платежу не є власником рахунку '||l_nlsa;
+                RAISE err;
+        end if;
+        
+        begin
+          select trim(t.value)
+            into l_okpo
+            from operw t 
+           where t.ref = p_ref
+             and t.tag = 'OOKPO';
+        exception 
+          when NO_DATA_FOUND 
+            then 
+               l_okpo:=null;
+        end;   
+      
+        begin
+          select trim(t.value)
+            into l_txt
+            from operw t 
+           where t.ref = p_ref
+             and t.tag = 'IDA';
+        exception 
+          when NO_DATA_FOUND 
+            then 
+               l_txt:=null;
+        end;
+        
+        if l_okpo != l_txt
+          then 
+            bars_audit.info ('!f_stop#9998 Відправник платежу не є власником рахунку '||l_nlsa);
+                erm := 'Відправник платежу не є власником рахунку '||l_nlsa;
+            RAISE err;
+        end if;
+      
+  end if;-- end 9998
 
 
    RETURN 0;
@@ -3302,9 +3406,11 @@ EXCEPTION
          TRUE);
 END f_STOP;
 /
-
-
-grant execute on f_stop to bars_access_defrole; 
+  GRANT EXECUTE ON "BARS"."F_STOP" TO "WR_DOC_INPUT";
+  GRANT EXECUTE ON "BARS"."F_STOP" TO "WR_ALL_RIGHTS";
+  GRANT EXECUTE ON "BARS"."F_STOP" TO "PYOD001";
+  GRANT EXECUTE ON "BARS"."F_STOP" TO "OPERKKK";
+  GRANT EXECUTE ON "BARS"."F_STOP" TO "BARS_ACCESS_DEFROLE";
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ============ Scripts /Sql/BARS/function/f_stop.sql ===========*** End ***

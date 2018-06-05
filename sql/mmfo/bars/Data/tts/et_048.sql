@@ -45,49 +45,6 @@ begin
   delete from folders_tts where tt='!!3';
 end;
 /
-prompt Создание / Обновление операции !50
-prompt Наименование операции: !50 STOP-правило по ВАЛ только внутри ВПС
-declare
-  cnt_  number;
-begin
-  --------------------------------
-  -- Основные свойства операции --
-  --------------------------------
-  begin
-    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('!50', '!50 STOP-правило по ВАЛ только внутри ВПС', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(5,#(MFOB),#(MFOB),0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
-  exception
-    when dup_val_on_index then 
-      update tts
-         set tt='!50', name='!50 STOP-правило по ВАЛ только внутри ВПС', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(5,#(MFOB),#(MFOB),0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
-       where tt='!50';
-  end;
-  --------------------------------
-  ----------- Реквизиты ----------
-  --------------------------------
-  delete from op_rules where tt='!50';
-  --------------------------------
-  ------ Связанные операции ------
-  --------------------------------
-  delete from ttsap where tt='!50';
-  --------------------------------
-  ------- Балансовые счета -------
-  --------------------------------
-  delete from ps_tts where tt='!50';
-  --------------------------------
-  -------- Виды документов -------
-  --------------------------------
-  delete from tts_vob where tt='!50';
-  --------------------------------
-  -------- Группы контроля -------
-  --------------------------------
-  delete from chklist_tts where tt='!50';
-  --------------------------------
-  ------------- Папки ------------
-  --------------------------------
-  delete from folders_tts where tt='!50';
-end;
-/
 prompt Создание / Обновление операции HO4
 prompt Наименование операции: HO4 d: Прийом готівки (СК=29)
 declare
@@ -240,6 +197,135 @@ begin
   delete from folders_tts where tt='K48';
 end;
 /
+prompt Создание / Обновление операции !48
+prompt Наименование операции: !48 STOP правило для 048 (дод. реквізити)
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('!48', '!48 STOP правило для 048 (дод. реквізити)', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(''9998'',#(KVA),#(NLSB),#(S),#(REF))', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='!48', name='!48 STOP правило для 048 (дод. реквізити)', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(''9998'',#(KVA),#(NLSB),#(S),#(REF))', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+       where tt='!48';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!48';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!48';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!48';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!48';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!48';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!48';
+end;
+/
+prompt Создание / Обновление операции !50
+prompt Наименование операции: !50 STOP-правило по ВАЛ только внутри ВПС
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('!50', '!50 STOP-правило по ВАЛ только внутри ВПС', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'F_STOP(5,#(MFOB),#(MFOB),0)', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='!50', name='!50 STOP-правило по ВАЛ только внутри ВПС', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='F_STOP(5,#(MFOB),#(MFOB),0)', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+       where tt='!50';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!50';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!50';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!50';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!50';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!50';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!50';
+end;
+/
+prompt Создание / Обновление операции !DJ
+prompt Наименование операции: !DJ Заповнення дод.реквізитів
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('!DJ', '!DJ Заповнення дод.реквізитів', 1, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 'f_check_tag(#(REF),''REZID'')', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='!DJ', name='!DJ Заповнення дод.реквізитів', dk=1, nlsm=null, kv=null, nlsk=null, kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='f_check_tag(#(REF),''REZID'')', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+       where tt='!DJ';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='!DJ';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='!DJ';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='!DJ';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='!DJ';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='!DJ';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='!DJ';
+end;
+/
 prompt Создание / Обновление операции 048
 prompt Наименование операции: 048-Поповнення картрахунку в USD в iншу установу ОБ (з комiсiєю)
 declare
@@ -250,11 +336,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('048', '048-Поповнення картрахунку в USD в iншу установу ОБ (з комiсiєю)', 1, '#(nbs_ob22(''2909'',''35''))', 840, '#(get_proc_nls(''T00'',#(KVA)))', 840, null, '#(nbs_ob22(''2909'',''35''))', null, null, 1, 1, 0, 0, null, null, null, null, null, null, '1201100000000000000001000000000000110000000000000000000000000000', 'Поповнення ПК MasterCard в USD по системі ОБ (з комісією)');
+    values ('048', '048-Поповнення картрахунку в USD в iншу установу ОБ (з комiсiєю)', 1, '#(nbs_ob22(''2909'',''35''))', 840, '#(get_proc_nls(''T00'',#(KVA)))', 840, null, '#(nbs_ob22(''2909'',''35''))', null, null, 1, 1, 0, 0, null, null, null, null, null, null, '1001100000000000000001000000000000110000000000000000000000000000', 'Поповнення ПК MasterCard в USD по системі ОБ (з комісією)');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='048', name='048-Поповнення картрахунку в USD в iншу установу ОБ (з комiсiєю)', dk=1, nlsm='#(nbs_ob22(''2909'',''35''))', kv=840, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=840, nlss=null, nlsa='#(nbs_ob22(''2909'',''35''))', nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1201100000000000000001000000000000110000000000000000000000000000', nazn='Поповнення ПК MasterCard в USD по системі ОБ (з комісією)'
+         set tt='048', name='048-Поповнення картрахунку в USD в iншу установу ОБ (з комiсiєю)', dk=1, nlsm='#(nbs_ob22(''2909'',''35''))', kv=840, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=840, nlss=null, nlsa='#(nbs_ob22(''2909'',''35''))', nlsb=null, mfob=null, flc=1, fli=1, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='1001100000000000000001000000000000110000000000000000000000000000', nazn='Поповнення ПК MasterCard в USD по системі ОБ (з комісією)'
        where tt='048';
   end;
   --------------------------------
@@ -307,6 +393,17 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('DJNR ', '048', 'O', 1, 13, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''DJNR '', ''048'', ''O'', 1, 13, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('DT_R ', '048', 'O', 1, 12, null, null);
   exception
     when dup_val_on_index then null;
@@ -318,23 +415,23 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('FIO  ', '048', 'O', 1, 1, null, null);
+    values ('FIO  ', '048', 'M', 1, 1, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''FIO  '', ''048'', ''O'', 1, 1, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''FIO  '', ''048'', ''M'', 1, 1, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('IDA  ', '048', 'O', 1, 7, null, null);
+    values ('IDA  ', '048', 'M', 1, 7, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''IDA  '', ''048'', ''O'', 1, 7, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''IDA  '', ''048'', ''M'', 1, 7, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -406,6 +503,17 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('REZID', '048', 'M', 1, 13, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''REZID'', ''048'', ''M'', 1, 13, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('П    ', '048', 'O', 1, 16, null, null);
   exception
     when dup_val_on_index then null;
@@ -432,17 +540,6 @@ begin
   end;
   begin
     insert into ttsap(ttap, tt, dk)
-    values ('!50', '048', 0);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!50'', ''048'', 0) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into ttsap(ttap, tt, dk)
     values ('HO4', '048', 0);
   exception
     when dup_val_on_index then null;
@@ -460,6 +557,39 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ttsap: ''K48'', ''048'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!48', '048', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!48'', ''048'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!50', '048', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!50'', ''048'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('!DJ', '048', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''!DJ'', ''048'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;

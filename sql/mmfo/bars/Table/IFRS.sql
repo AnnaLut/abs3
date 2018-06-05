@@ -25,7 +25,8 @@ begin
   execute immediate '
   CREATE TABLE BARS.IFRS 
    (	IFRS_ID VARCHAR2(15), 
-	IFRS_NAME VARCHAR2(100)
+	IFRS_NAME VARCHAR2(100),
+        k9 integer
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -42,12 +43,15 @@ PROMPT *** ALTER_POLICIES to IFRS ***
  exec bpa.alter_policies('IFRS');
 
 
-COMMENT ON TABLE BARS.IFRS IS 'Класифікаіція за МСФЗ';
-COMMENT ON COLUMN BARS.IFRS.IFRS_ID IS 'Параметр';
-COMMENT ON COLUMN BARS.IFRS.IFRS_NAME IS 'Наименование параметра';
+begin EXECUTE IMMEDIATE 'alter table bars.IFRS add ( K9 int ) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
 
-
-
+COMMENT ON TABLE  BARS.IFRS           IS 'Класифікатор принципів обліку Активів по МСФЗ-9';
+COMMENT ON COLUMN BARS.IFRS.K9        IS 'Числовой код по IFRS ("корзина")';
+COMMENT ON COLUMN BARS.IFRS.IFRS_ID   IS 'Символьний код по IFRS корзины'  ;
+COMMENT ON COLUMN BARS.IFRS.IFRS_NAME IS 'Опис принципу обліку Активів по МСФЗ-9';
 
 PROMPT *** Create  constraint SYS_C00139604 ***
 begin   
@@ -57,9 +61,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint PK_IFRS ***
 begin   

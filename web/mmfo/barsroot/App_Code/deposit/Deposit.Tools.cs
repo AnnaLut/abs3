@@ -473,7 +473,7 @@ public class Tools
 
             OracleCommand cmd = connect.CreateCommand();
 
-            cmd.CommandText = " select count(acc) from accounts where nbs = '2625' and rnk = :p_rnk and dazs is null ";
+            cmd.CommandText = " select count(acc) from accounts where tip like 'W4%' and rnk = :p_rnk and dazs is null ";
 
             cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, cust_id, ParameterDirection.Input);
 

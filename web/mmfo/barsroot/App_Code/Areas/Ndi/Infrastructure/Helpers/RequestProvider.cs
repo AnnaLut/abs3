@@ -58,6 +58,18 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             }
             MainOptionsViewModel tableViwModel = new MainOptionsViewModel();
+            if (requestModel.Code != null)
+            {
+                if (requestModel.ExternalFuncOnly)
+                    return BuildFunctionOnlyRequest(requestModel);
+                else
+                {
+                    MetaCallSettings colSettings = _repository.GetMetaCallSettingsByCode(requestModel.Code);
+                    if (!string.IsNullOrEmpty(colSettings.WEB_FORM_NAME))
+                        nsiEditParams = new FunNSIEditFParams(colSettings.WEB_FORM_NAME);
+                    tableViwModel.Code = colSettings.CODE;
+                }
+            }
             requestModel.TableName = nsiEditParams == null || string.IsNullOrEmpty(nsiEditParams.TableName) ? requestModel.TableName : nsiEditParams.TableName;
            
                 if (string.IsNullOrEmpty(requestModel.TableName) && nsiEditParams != null &&
@@ -65,16 +77,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 {
                     return BuildFunctionOnlyRequest(requestModel);
                 }
-            if (requestModel.Code != null)
-            {
-                if(requestModel.ExternalFuncOnly)
-                    return BuildFunctionOnlyRequest(requestModel);
-                else
-                {
-                    MetaCallSettings colSettings = _repository.GetMetaCallSettingsByCode(requestModel.Code);
-                    tableViwModel.Code = colSettings.CODE;
-                }
-            }
+
 
             var metaTable = _repository.GetMetaTableByName(requestModel.TableName.Trim().ToUpper());
            

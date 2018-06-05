@@ -22,6 +22,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public int? ColumnId { get; set; }
         public decimal? ICON_ID { get; set; }
         public string TableName { get; set; }
+        public string TableSemantic { get; set;}
 
         public bool isFuncOnly = true;
         public string BtnDysplayName { get; set; }

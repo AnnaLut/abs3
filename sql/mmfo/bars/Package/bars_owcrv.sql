@@ -571,6 +571,7 @@ is
   i      number;
   l_bpk_firstname varchar2(100);
   l_bpk_lastname  varchar2(100);
+  l_trmask bars_ow.t_trmask;
 begin
 
   l_mfo := gl.amfo;
@@ -618,7 +619,9 @@ begin
   add_deal(l_acc, l_nd);
 
   -- specparams:
-  bars_ow.set_sparam('2625', l_acc);
+  l_trmask.a_w4_acc := 'ACC_PK';
+  l_trmask.nbs := substr(account_utl.read_account(l_acc).nls,1,4);  
+  bars_ow.set_sparam('1', l_acc, l_trmask);
 
   -- specparam_int: OB22
   accreg.setAccountSParam(l_acc, 'OB22', g_lc_ob22);

@@ -31,16 +31,12 @@ PROMPT *** Create  view V_CC_989917 ***
                     F_DOP (C.REF1, 'FIO') FIO,
                     F_DOP (C.REF1, 'ND') ND,
                     O.NAZN
-               FROM CC_989917_REF c, OPER O
-              WHERE
-                    C.ref2 IS NULL
-                    AND EXISTS  (SELECT 1
-                                   FROM accounts
-                                  WHERE  acc = c.acc
-                                    AND  branch LIKE  DECODE ( SYS_CONTEXT ('bars_context','user_branch'),
-                                                               '/' || f_ourmfo || '/000000/', '%',
-                                                               cash_sxo.bs ))
+               FROM accounts a, CC_989917_REF c, OPER O
+              WHERE a.branch LIKE  DECODE (SYS_CONTEXT ('bars_context','user_branch'),KASZ.SX (TAG_ => 'BRN'), '/'||f_ourmfo||'%',cash_sxo.bs) 
+                    and nbs = '9899' and ob22 = '17'
+                    AND c.acc = a.acc
                     AND C.REF1 = O.REF
+                    and C.ref2 IS NULL
                     AND SOS = 5)
    ORDER BY BRANCH,
             fio,

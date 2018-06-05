@@ -16,14 +16,14 @@ namespace BarsWeb.Areas.Ndi.Models
 {
     public class FunNSIEditFParams
     {
+
         public FunNSIEditFParams(string stringFunNSIEditFParams)
         {
-
             this.FunNSIEditFParamsArray = GetParamArrayByString(stringFunNSIEditFParams);
             this.ParsParams(this.FunNSIEditFParamsArray);
             BuildParams();
-        }
 
+        }
         public FunNSIEditFParams(MetaCallSettings settings)
         {
             this.ACCESS_CODE = settings.ACCESSCODE ?? 1;
@@ -38,7 +38,12 @@ namespace BarsWeb.Areas.Ndi.Models
             this.SummVisibleRows = settings.SUMM_VISIBLE == 1 ? "TRUE" : "FALSE";
             this.Conditions = settings.CONDITIONS ?? "";
             BuildParams();
+
+
         }
+        const string patternForParamsNames = @":\w+";
+        Regex regForParamsNames;
+
         public string EditMode = "ROW_EDIT"; //"MULTI_EDIT"; // 
 
         [MainOptionAttribute("INSERT_ROW_AFTER", true)]
@@ -49,6 +54,7 @@ namespace BarsWeb.Areas.Ndi.Models
         public string SaveColumns { get; set; }
         public int? CodeOper { get; set; }
         public string TableName { get; set; }
+        public string TableSemantic { get; set; }
         public string[] FunNSIEditFParamsArray { get; set; }
         List<ParamMetaInfo> FunNSIEditFParamsInfo { get; set; }
         ThrowParams ThrowNsiParams { get; set; }
@@ -111,6 +117,8 @@ namespace BarsWeb.Areas.Ndi.Models
                 this.TableName = SqlStatementParamsParser.ReplaceParamsToValuesInSqlString(this.TableName, rowParams);
             if (!string.IsNullOrEmpty(this.Conditions) && this.Conditions.Contains("|:"))
                 this.Conditions = SqlStatementParamsParser.ReplaceParamsInSqlSelect(this.Conditions, rowParams);
+            if (!string.IsNullOrEmpty(this.TableSemantic) && this.TableSemantic.Contains("|:"))
+                this.TableSemantic = SqlStatementParamsParser.ReplaceParamsToValuesInSqlString(this.TableSemantic, rowParams);
 
         }
         private void ParsParams(string[] paramsArray)
@@ -235,6 +243,8 @@ namespace BarsWeb.Areas.Ndi.Models
             this.ParamsNames = new List<string>();
             this.RowParamNames = new List<string>();
             this.InputParamaNames = new List<string>();
+            regForParamsNames = new Regex(patternForParamsNames);
+
             CollectConditionsParams();
 
             BuildAddEditInform();
@@ -279,7 +289,7 @@ namespace BarsWeb.Areas.Ndi.Models
                 this.EditMode = addEditRowsInform.EditorMode;
             }
         }
-        public CallFunctionMetaInfo BuildToCallFunctionMetaInfo(CallFunctionMetaInfo func)
+        public CallFunctionMetaInfo BuildToCallFunctionMetaInfo(CallFunctionMetaInfo func = null)
         {
             if (func == null)
                 func = new CallFunctionMetaInfo();
@@ -384,74 +394,31 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public void CollectConditionsParams()
         {
-            const string pattern = @":\w+";
-            Regex reg = new Regex(pattern);
-            if (this.TableName.Contains(':'))
-            {
-                MatchCollection collConditionsParams = reg.Matches(this.TableName);
-                foreach (Match item in collConditionsParams)
-                {
-                    //this.RowParamsNames += item.Value + "|";
-                    this.ParamsNames.Add(item.Value.Replace(":", ""));
-                }
-            }
+            AddItemToParamsNames(this.TableName, this.TableSemantic, this.QST, this.DESCR, this.MSG, this.Conditions, this.PROC);
 
-            if (!string.IsNullOrEmpty(this.QST) && this.QST.Contains(':'))
-            {
-                MatchCollection collConditionsParams = reg.Matches(this.QST);
-                foreach (Match item in collConditionsParams)
-                {
-                    //this.RowParamsNames += item.Value + "|";
-                    this.ParamsNames.Add(item.Value.Replace(":", ""));
-                }
-            }
-
-            if (!string.IsNullOrEmpty(this.DESCR) && this.DESCR.Contains(':'))
-            {
-                MatchCollection collConditionsParams = reg.Matches(this.DESCR);
-                foreach (Match item in collConditionsParams)
-                {
-                    //this.RowParamsNames += item.Value + "|";
-                    this.ParamsNames.Add(item.Value.Replace(":", ""));
-                }
-            }
-
-            if (!string.IsNullOrEmpty(this.MSG) && this.MSG.Contains(':'))
-            {
-                MatchCollection collConditionsParams = reg.Matches(this.MSG);
-                foreach (Match item in collConditionsParams)
-                {
-                    //this.RowParamsNames += item.Value + "|";
-                    this.ParamsNames.Add(item.Value.Replace(":", ""));
-                }
-            }
-
-            if (!string.IsNullOrEmpty(this.Conditions) && this.Conditions.Contains(":"))
-            {
-                MatchCollection collConditionsParams = reg.Matches(this.Conditions);
-                foreach (Match item in collConditionsParams)
-                {
-                    //this.RowParamsNames += item.Value + "|";
-                    this.ParamsNames.Add(item.Value.Replace(":", ""));
-                }
-            }
-
-            if (!string.IsNullOrEmpty(this.PROC) && this.PROC.Contains(":"))
-            {
-                MatchCollection collProcParams = reg.Matches(this.PROC + " " + this.MSG + " " + this.QST);
-                foreach (Match item in collProcParams)
-                {
-                    //this.RowParamsNames += item.Value + "|";
-                    this.ParamsNames.Add(item.Value.Replace(":", ""));
-                }
-
-            }
             if (this.ParamsNames.Count > 0)
                 this.ParamsNames = this.ParamsNames.Distinct().ToList();
             if (this.ParamsNames != null && this.ParamsNames.Count > 0 && this.InputParamaNames != null)
                 this.RowParamNames = this.ParamsNames.Where(x => !this.InputParamaNames.Contains(x)).ToList();
 
 
+        }
+
+        public void AddItemToParamsNames(params string[] param)
+        {
+            foreach (var item in param)
+            {
+                if (!string.IsNullOrEmpty(item) && item.Contains(':'))
+                {
+                    MatchCollection collConditionsParams = regForParamsNames.Matches(item);
+                    foreach (Match i in collConditionsParams)
+                    {
+                        //this.RowParamsNames += item.Value + "|";
+                        this.ParamsNames.Add(i.Value.Replace(":", ""));
+                    }
+                }
+            }
+         
         }
 
     }

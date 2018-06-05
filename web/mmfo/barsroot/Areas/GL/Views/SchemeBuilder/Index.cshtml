@@ -1,6 +1,6 @@
-﻿<link rel="stylesheet" href="~/Areas/GL/CSS/style.css" />
-<script src="~/Areas/GL/Scripts/Services/SchemeBuilderService.js?v1.2"></script>
-<script src="~/Areas/GL/Scripts/Controllers/SchemeBuilderCtrl.js?v1.4"></script>
+﻿<link rel="stylesheet" href="~/Areas/GL/CSS/style.css?29_12_2017__17_13_25" />
+<script src="~/Areas/GL/Scripts/Services/SchemeBuilderService.js?29_12_2017__17_13_25"></script>
+<script src="~/Areas/GL/Scripts/Controllers/SchemeBuilderCtrl.js?29_12_2017__17_13_25"></script>
 
 <div ng-controller="SchemeBuilder as sbCtrl">
     <h1 class="">Конструювання схем перекриття/розчеплення</h1>
@@ -27,7 +27,8 @@
                 </div>
                 <div class="panel-body" style="padding: 0px;">
                     <div data-kendo-toolbar="sbCtrl.schemeBuilderDetailGridToolbar" k-options="sbCtrl.schemeBuilderDetailGridToolbarOptions"></div>
-                    <div data-kendo-grid="sbCtrl.schemeBuilderDetailGrid" data-options="sbCtrl.schemeBuilderDetailGridOptions"></div>
+                    <div id="detailsGrid" data-kendo-grid="sbCtrl.schemeBuilderDetailGrid" data-options="sbCtrl.schemeBuilderDetailGridOptions"></div>
+                    <label>Поле "Формула" заповнюється формулою розрахунку суми, або сумою у <strong>копійках</strong>.</label>
                 </div>
             </div>
         </div>
@@ -38,13 +39,13 @@
             <ul id="fieldlist">
                 <li>
                     <label for="saAccNum">Рахунок:</label>
-                    <input kendo-masked-text-box ng-model="sbCtrl.sa.AccNum" id="saAccNum" name="saAccNum"  k-mask="'00000000000000'" placeholder="Вкажіть рахунок" required validationMessage="Вкажіть рахунок" style="width: 180px;" />
+                    <input kendo-masked-text-box ng-model="sbCtrl.sa.AccNum" id="saAccNum" name="saAccNum" k-mask="'00000000000000'" placeholder="Вкажіть рахунок" required validationMessage="Вкажіть рахунок" style="width: 180px;" />
                 </li>
                 <li>
                     <label for="saCurrId">Валюта:</label>
                     <input kendo-masked-text-box ng-model="sbCtrl.sa.CurrId" id="saCurrId" name="saCurrId" k-mask="'000'" placeholder="Валюта" required validationMessage="Вкажіть валюту" style="width: 50px" />
                     <select kendo-drop-down-list ng-model="sbCtrl.sa.CurrId" k-data-text-field="'Name'" k-data-value-field="'CurrId'" k-data-source="currDataSource"
-                            k-options="currOptions" style="width: 200px" ></select>
+                            k-options="currOptions" style="width: 200px"></select>
                 </li>
                 <li>
                     <label for="saName">Назва рахунку:</label>
@@ -108,10 +109,27 @@
                     <label for="ssbRecipienCustCode">ОКПО отримувача:</label>
                     <input kendo-masked-text-box ng-model="sbCtrl.ssb.RecipienCustCode" id="ssbRecipienCustCode" required validationMessage="Вкажіть ОКПО" name="ssbRecipienCustCode" k-mask="'0000000000'" style="width: 120px;" maxlength="10" />
                 </li>
+
+                <li>
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="width:50%;">
+                                <label for="ssbFormula">Формула:</label>
+                                <input kendo-masked-text-box ng-model="sbCtrl.ssb.Formula" id="ssbFormula" name="ssbFormula" style="width: 90%;" ng-change="sbCtrl.editFormulaChange(sbCtrl.ssb.Formula)" title="Заповнюється формулою розрахунку суми, або сумою у копійках." />
+                            </td>
+                            <td style="width:50%;">
+                                <label for="ssbKod">Пріоритет розрахунку:</label>
+                                <input kendo-numeric-text-box k-min="1" k-max="9" k-step="1" k-ng-model="sbCtrl.ssb.Kod" id="ssbKod" name="ssbKod" style="width: 120px;" k-options="sbCtrl.kodOptions" title="Пріоритет розрахунку повинен бути унікальним у розрізі однієї схеми." />
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+
                 <li>
                     <label for="ssbScale">Рівень:</label>
                     <input kendo-masked-text-box ng-model="sbCtrl.ssb.Scale" id="ssbScale" name="ssbScale" k-mask="'000'" style="width: 90px;" />
                 </li>
+
                 <li class="btns">
                     <button class="k-primary" ng-click="sbCtrl.saveSchemeSideB()"><span class="k-icon k-i-tick"></span> Зберегти</button>
                     <button ng-click="editSchemeSideBWindow.close()"><span class="k-icon k-i-cancel"></span> Відмінити</button>

@@ -43,7 +43,7 @@ ADR_WORK_COUNTRY VARCHAR2(55),
 ADR_WORK_DOMAIN VARCHAR2(30),
 ADR_WORK_REGION VARCHAR2(30),
 ADR_WORK_LOC VARCHAR2(30),
-ADR_WORK_ADR VARCHAR2(55),
+ADR_WORK_ADR VARCHAR2(100),
 ADR_WORK_ZIP VARCHAR2(20),
 BRANCH VARCHAR2(30),
 NEGATIV_STATUS VARCHAR2(10),
@@ -436,6 +436,9 @@ comment on column bars_intgr.clientfo2.RVPH2 is q'[ЦРВ. Телефон-2]';
 comment on column bars_intgr.clientfo2.RVPH3 is q'[ЦРВ. Телефон-3]';
 comment on column bars_intgr.clientfo2.SAB is q'[Електронний код клієнта]';
 comment on column bars_intgr.clientfo2.VIP_ACCOUNT_MANAGER is q'[Аккаунт vip-менеджера в AD]';
+
+prompt modify adr_work_adr varchar2(100)
+alter table bars_intgr.clientfo2 modify adr_work_adr varchar2(100);
 
 prompt create unique index XPK_CLIENFO2
 

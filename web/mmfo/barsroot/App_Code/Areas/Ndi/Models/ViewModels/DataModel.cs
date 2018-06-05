@@ -35,6 +35,8 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
 
         public int Start { get; set; }
 
+        public string Code { get; set; }
+
     }
 
     public class TestClass

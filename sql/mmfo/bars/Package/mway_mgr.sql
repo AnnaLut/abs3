@@ -12,7 +12,7 @@ is
   --
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64)  := 'version 4.6  13/02/2018';
+  g_header_version  constant varchar2(64)  := 'version 4.7  18/05/2018';
   g_awk_header_defs constant varchar2(512) := '';
 
   --------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.7 07/05/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.7  18/05/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -187,6 +187,7 @@ is
   G_ABS_DEPOSIT constant varchar2(50) := 'ABS_DEPOSIT';
   G_ABS_DEPOSIT_REFILL constant varchar2(50) := 'ABS_DEPOSIT_REFILL';
   G_TRANSFER_CARD_ACC constant varchar2(50) := 'TRANSFER_CARD_ACC';--Перевод карта –> текущий счет в АБС
+  G_TRANSFER_CARD_ACC_SSD constant varchar2(50) := 'TRANSFER_CARD_ACC_SSD';--Операція карта - поточний рахунок в АБС через ІПТ
   G_TRANSFER_ACC_CARD constant varchar2(50) := 'TRANSFER_ACC_CARD';--Перевод текущий счет в АБС –> карта
   G_TRANSFER_CARD_DEP_ACC constant varchar2(50) := 'TRANSFER_CARD_DEP_ACC';--Перевод карта – депозит
   G_TRANSFER_CARD_CREDIT constant varchar2(50) := 'TRANSFER_CARD_CREDIT';--Перевод карта – кредит
@@ -1516,7 +1517,7 @@ is
       logger.trace('WAY4 logger: result select TT '||l_th||' time: '||to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')||' l_sum='||to_char(l_sum));
       logger.trace('WAY4 logger: start select acc '||l_th||' time: '||to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')||' l_sum='||to_char(l_sum));
       case
-        when l_servicecode = G_TRANSFER_CARD_ACC then
+        when l_servicecode = G_TRANSFER_CARD_ACC or l_servicecode = G_TRANSFER_CARD_ACC_SSD then
           if p_transcode not in ('04200P','04200F') then
             begin
               l_obj_operation := get_transprop_codeval(p_xml,'OperationProperties','DESTINATION');

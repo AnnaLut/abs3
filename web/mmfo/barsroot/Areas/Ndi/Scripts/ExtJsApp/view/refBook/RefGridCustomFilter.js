@@ -26,9 +26,6 @@
 
         //поля модели, вместо модели используем свойство store.fields, которое построит динамическую модель
         var modelFields = new Array();
-        //поля для формы редактирования
-        var formFields = new Array();
-        //
         //цикл по метаданным колонок
         Ext.each(customFilterGrid.metadata.filtersMetainfo.FiltersMetaColumns, function () {
             var colMetaInfo = this;
@@ -40,8 +37,6 @@
             if (colMetaInfo.NOT_TO_SHOW == 0) {
                 //заполняем колонки грида
                 customFilterGrid.columns.push(customFilterGrid.configGridColumn(colMetaInfo));
-                //заполняем поля формы редактирования
-                formFields.push(ExtApp.utils.RefBookUtils.configFormField(colMetaInfo));
             }
         });
 
@@ -97,38 +92,6 @@
                     tableName: customFilterGrid.metadata.filtersMetainfo.TABNAME === 'undefined' ? '' : customFilterGrid.metadata.filtersMetainfo.TABNAME,
                     filterTblId: customFilterGrid.metadata.tableInfo.TABID === 'undefined' ? '' : customFilterGrid.metadata.tableInfo.TABID,
                     kindOfFilter: 'CustomFilter'
-                }
-            },
-            listeners: {
-                load: function (store) {
-                 
-
-                    //if (customFilterGrid.metadata.saveFilterLocal) {
-                    //    var filters = customFilterGrid.thisController.controllerMetadata.applyFilters.CustomBeforeFilters;
-                    //    var controller = customFilterGrid.metadata.thisController;
-                    //    controller.SetFiltersByApplyFilters(customFilterGrid, filters);
-                    //}
-
-                    //всегда выбирать первую строку
-                    //referenceGrid.getSelectionModel().select(0);
-                    //устанавливать доступность кнопки сброса фильтра
-                    //referenceGrid.down('button#removeFilterButton').setDisabled(true);
-                    //referenceGrid.down('button#whereClauseButton').setDisabled(true);
-                    //var clearFiltersBtn = referenceGrid.down('button#clearFilterButton');
-                    //var anyFilter = referenceGrid.store.proxy.extraParams.externalFilter != null &&
-                    //    referenceGrid.store.proxy.extraParams.externalFilter.length > 0 ||
-                    //    referenceGrid.filters.getFilterData().length > 0;
-                    //clearFiltersBtn.setDisabled(!anyFilter);
-                    //выключим альтернативный индикатор загрузки в заголовке грида
-
-                    //Ext.select('.x-panel-header-text:first').removeCls('x-mask-msg-text');
-
-                },
-                afterload: function () {
-
-
-                },
-                beforeload: function () {
                 }
             }
         });
@@ -255,13 +218,6 @@
 
         //получаем элемент для редактирования поля в зависимости от типа данных
         gridColumn.editor = { xtype: ExtApp.utils.RefBookUtils.getFieldEditor(colMetaInfo.COLTYPE) };
-        //если при редактировании данные должны выбираться из справочника, то editor грида ставим комбобокс, а так же указываем откуда брать данные
-        if (colMetaInfo.SrcTableName) {
-            gridColumn.editor.xtype = "refCombobox";
-            gridColumn.editor.SrcTableName = colMetaInfo.SrcTableName;
-            gridColumn.editor.SrcColName = colMetaInfo.SrcColName;
-            gridColumn.editor.SrcTextColName = colMetaInfo.SrcTextColName;
-        }
 
         if (colMetaInfo.COLTYPE == "B") {
             //если тип колонки bool, представляем в виде чекбокс
@@ -325,34 +281,6 @@
         return gridColumn;
     },
 
-    //updateApplyFilters: function () {
-    //    
-    //    var customFilterGrid = this;
-    //    
-    //    var customBeforeFilters = [];
-    //    customFilterGrid.getStore().each(function (record) {
-    //        if (record.data['IsApplyFilter'] == 1)
-    //            customBeforeFilters.push({
-    //                //к имени поля добавляем имя таблицы
-    //                FILTER_ID: record.data['FILTER_ID'],
-    //                Where_clause: record.data['Where_clause']
-    //            });
-    //    });
-    //    if (customBeforeFilters.length) {
-    //        var cleareFilterBtn = Ext.getCmp('clareFilersInDialogId');
-    //        if(cleareFilterBtn)
-    //            cleareFilterBtn.setDisable(false);
-    //    }
-
-    //    customFilterGrid.thisController.controllerMetadata.applyFilters.CustomBeforeFilters = customBeforeFilters;
-    //    customFilterGrid.thisController.setFiltersToLocalStorage();
-    //    customFilterGrid.thisController.setDisableCleareFiltersBtn();
-    //    customFilterGrid.thisController.controllerMetadata.mainGrid = Ext.getCmp('mainReferenceGrid');
-    //    if (customFilterGrid.thisController.controllerMetadata.mainGrid)
-    //        customFilterGrid.thisController.updateGridByFilters();
-
-    //},
-
     getFilterType: function (codeType) {
         switch (codeType) {
             case "N": return 'numeric';
@@ -394,6 +322,7 @@
     //cellInfo - информация о текущей ячейке, которая рендерится
     //record - текущая строка таблицы со всеми данными
     gridColumnRenderer: function (value, cellInfo, record) {
+        
         //если колонка рендерится в редакторе а не в гриде - ничего не делаем
         if (!cellInfo.column) {
             return value;

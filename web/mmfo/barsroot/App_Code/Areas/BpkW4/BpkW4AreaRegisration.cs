@@ -29,17 +29,19 @@ namespace BarsWeb.Areas.BpkW4
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional },
                 constraints: new { lang = Constants.RouteLang }
             );
+
+            context.Routes.MapHttpRoute(
+                name: AreaName + "_api",
+                routeTemplate: "api/" + AreaName + "/{controller}/{action}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+
             context.MapRoute(
                 AreaName + "_default",
                 AreaName + "/{controller}/{action}/{id}",
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
 
-            context.Routes.MapHttpRoute(
-                name: AreaName + "_api",
-                routeTemplate: "api/" + AreaName + "/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
 
             //все несистемные привязки
             BindAreaDI();

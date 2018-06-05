@@ -178,7 +178,7 @@
       </customfields>
       <buttons defaulttype="Button">
         <button id="btnOpenCard" caption="Зареєструвати картку" hint="Реєстрація картки">
-          <command type="PlSqlBlock" successmessage="Картку зареєстровано" successurl="/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio_uo">
+          <command type="PlSqlBlock" successmessage="Картку зареєстровано" successurl="/barsroot/way4bpk/way4bpk?custtype=2">
             <sql>
               declare
               l_nd number;
@@ -221,7 +221,7 @@
           </command>
         </button>
         <button id="btnBackToPortfolio" caption="Повернутися до портфелю" hint="Повернутися до портфелю">
-          <command type="Redirect" url="/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.portfolio_uo"></command>
+          <command type="Redirect" url="/barsroot/way4bpk/way4bpk?custtype=2"></command>
         </button>
       </buttons>
     </customform>

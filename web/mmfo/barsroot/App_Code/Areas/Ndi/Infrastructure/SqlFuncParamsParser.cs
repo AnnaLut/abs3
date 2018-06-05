@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using Bars.Classes;
 using BarsWeb.Areas.Ndi.Models;
 using Oracle.DataAccess.Client;
-using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using System;
 using System.Data;
 using BarsWeb.Areas.Ndi.Models.DbModels;
@@ -606,9 +605,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             foreach (var item in paramValues)
             {
-                var resValue = Convert.ChangeType(item.Value, SqlStatementParamsParser.GetCsTypeCode(item.Type));
-                sqlString = sqlString.Replace("|:" + item.Name + "|", resValue.ToString());
-                sqlString = sqlString.Replace(":" + item.Name, resValue.ToString());
+               string resValue = FormatConverter.ConvertFieldValueFromJsToSharpFormat(item);
+                sqlString = sqlString.Replace("|:" + item.Name + "|", resValue);
+                sqlString = sqlString.Replace(":" + item.Name, resValue);
             }
             return sqlString;
         }

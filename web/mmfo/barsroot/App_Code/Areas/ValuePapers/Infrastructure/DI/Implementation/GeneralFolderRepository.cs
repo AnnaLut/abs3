@@ -43,22 +43,22 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
                     ParameterName = "nGrp",
                     Direction = ParameterDirection.Input,
                     OracleDbType = OracleDbType.Decimal,
-                    Value = initParams.nMode
+                    Value = initParams.nGrp
                 },
                 new OracleParameter(){
-                    ParameterName = "nGrp",
+                    ParameterName = "strPar01",
                     Direction = ParameterDirection.Input,
                     OracleDbType = OracleDbType.Varchar2,
                     Value = initParams.strPar01
                 },
                 new OracleParameter(){
-                    ParameterName = "nGrp",
+                    ParameterName = "strPar02",
                     Direction = ParameterDirection.Input,
                     OracleDbType = OracleDbType.Varchar2,
                     Value = initParams.strPar02
                 },
                 new OracleParameter(){
-                    ParameterName = "nGrp",
+                    ParameterName = "p_date",
                     Direction = ParameterDirection.Input,
                     OracleDbType = OracleDbType.Date,
                     Value = initParams.P_DATE

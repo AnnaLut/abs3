@@ -1,4 +1,5 @@
-﻿function showViewEADocsForm(selectedItem) {
+﻿function showViewEADocsForm(selectedItem, eadStructTypes) {
+    eadStructTypes = eadStructTypes || [];
 
     var viewDocsWindow = $('<div id="viewEaDocsWindow"/>').kendoWindow({
         actions: ["Close"],
@@ -32,7 +33,8 @@
 
     var obj = {
         rnk: selectedItem.rnk,
-        zpId: selectedItem.id
+        zpId: selectedItem.id,
+        structCodes: eadStructTypes.join(',')
     };
 
     $.ajax({
@@ -51,7 +53,6 @@
 
                 if (data.ResultObj.length > 0) {
                     for (var i = 0; i < data.ResultObj.length; i++) {
-                        //if (data.ResultObj[i].doc_link != null && data.ResultObj[i].doc_link != undefined && data.ResultObj[i].doc_link != '') {
                         var linkTemplate = '<tr>'
                             + '                 <td>'
                             + '                     <a class="btn custom-btn custom-btn-ea-view-doc" title="Переглянути документ &#013;&#8220;' + data.ResultObj[i].struct_name + '&#8221;" target="_blank" href="' + data.ResultObj[i].doc_link + '"></a>'
@@ -62,7 +63,6 @@
                             + '             </tr>';
                         tBody.append(linkTemplate + separator);
                         tBody.find('#noRecordsTr').remove();
-                        //}
                     }
                     tBody.find('hr:last').remove();
 
@@ -76,7 +76,6 @@
             bars.ui.loader('body', false);
         }
     });
-
 
     function getTemplate() {
         return headerTmp() + templateButtons();

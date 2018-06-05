@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Areas.Ndi.Models;
-using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 using BarsWeb.Areas.Ndi.Models;
 using Oracle.DataAccess.Client;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
-using BarsWeb.Areas.Ndi.Models.DbModels;
-using BarsWeb.Areas.Ndi.Infrastructure.Constants;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -136,88 +132,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         }
 
 
-        public static List<ColumnMetaInfo> DbColumnsToMetaColumns(List<MetaColumnsDbModel> columnList)
-        {
-            bool isFuncOnly;
-            CallFunctionMetaInfo functionMetaInfo;
-            List<string> paramNames = new List<string>();
+    
 
-            List<ColumnMetaInfo> columnsInfo = new List<ColumnMetaInfo>();
-            foreach (var item in columnList)
-            {
-                var col = new ColumnMetaInfo();
 
-                col.COLID = Convert.ToInt32(item.COLID);
-                col.COLNAME = string.IsNullOrEmpty(item.COLNAME) ? item.COLNAME : item.COLNAME.Trim();
-                col.COLTYPE = string.IsNullOrEmpty(item.COLTYPE) ? item.COLTYPE : item.COLTYPE.Trim();
-                col.SEMANTIC = string.IsNullOrEmpty(item.SEMANTIC) ? item.SEMANTIC : item.SEMANTIC.Trim();
-                col.SHOWWIDTH = Convert.ToInt32(item.SHOWWIDTH);
-                col.SHOWMAXCHAR = Convert.ToInt32(item.SHOWMAXCHAR);
-                col.SHOWFORMAT = string.IsNullOrEmpty(item.SHOWFORMAT) ? item.SHOWFORMAT : item.SHOWFORMAT.Trim();
-                col.SHOWIN_FLTR = item.SHOWIN_FLTR;
-                col.NOT_TO_EDIT = item.NOT_TO_EDIT;
-                col.NOT_TO_SHOW = item.NOT_TO_SHOW;
-                col.EXTRNVAL = item.EXTRNVAL;
-                col.SHOWPOS = item.SHOWPOS;
-                col.SHOWRESULT = item.SHOWRESULT;
-                col.TABID = Convert.ToInt32(item.TABID);
-                col.IsPk = item.SHOWRETVAL;
-                col.InputInNewRecord = item.INPUT_IN_NEW_RECORD;
-                col.WEB_FORM_NAME = ReplaceParameter(item.WEB_FORM_NAME, "sPar=", Convert.ToInt32(item.COLID), Convert.ToInt32(item.TABID),
-                    out isFuncOnly, out functionMetaInfo, out paramNames);
-                col.IsFuncOnly = isFuncOnly;
-                col.FunctionMetaInfo = functionMetaInfo;
-                col.ParamsNames = paramNames.ToList();
-                columnsInfo.Add(col);
-
-            }
-            foreach (var column in columnsInfo)
-            {
-                if (!string.IsNullOrEmpty(column.SHOWFORMAT))
-                {
-                    if (column.COLTYPE == "N" || column.COLTYPE == "E")
-                    {
-                        column.SHOWFORMAT = FormatConverter.ConvertToExtJsDecimalFormat(column.SHOWFORMAT);
-                    }
-                    if (column.COLTYPE == "D")
-                    {
-                        column.SHOWFORMAT = FormatConverter.ConvertToExtJsDateFormat(column.SHOWFORMAT);
-                    }
-                }
-            }
-            return columnsInfo;
-        }
-
-        public static string ReplaceParameter(string url, string searchParam, int? sParColumn, int? nativeTabelId, out bool isFuncOnly, out CallFunctionMetaInfo function, out List<string> paramNames)
-        {
-            isFuncOnly = false;
-            FunNSIEditFParams parameters = null;
-            function = null;
-            string res;
-            paramNames = new List<string>();
-            if (string.IsNullOrEmpty(url) || url.IndexOf(searchParam) != 0)
-                return url;
-            string searchparamValue = url.Substring(url.IndexOf(searchParam) + searchParam.Length);
-            if (url.Contains("sPar=["))
-            {
-                isFuncOnly = true;
-                function = new FunNSIEditFParams(searchparamValue).BuildToCallFunctionMetaInfo(function);
-                function.TABID = nativeTabelId;
-                function.PROC_EXEC = "SELECTED_ONE";
-                function.ColumnId = Convert.ToInt32(sParColumn);
-            }
-            res = UrlTamplates.MainUrlTemplate + "?" + "sParColumn" + "=" + sParColumn + "&" + "nativeTabelId" + "=" + nativeTabelId;
-
-            if (url.IndexOf(":") != 0)
-            {
-                parameters = new FunNSIEditFParams(searchparamValue);
-                paramNames = parameters.ParamsNames;
-            }
-            //string paramvalue = url.Substring(url.LastIndexOf(firstParamName) + firstParamName.Length);
-            //string addParam = string.IsNullOrEmpty(additionParameterName) && string.IsNullOrEmpty(additionParameterValue) ? "" : "&" + additionParameterName + "=" + additionParameterValue;
-            //string resWebName = url.Replace(paramvalue, firstPramValue) + addParam;
-            return res.Trim();
-        }
 
         public static List<ColumnMetaInfo> ReplaseDivisionColumnNames(List<ColumnMetaInfo> columns)
         {

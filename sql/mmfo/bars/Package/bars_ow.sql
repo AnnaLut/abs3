@@ -7,8 +7,10 @@
   CREATE OR REPLACE PACKAGE BARS.BARS_OW 
 is
 
-g_header_version  constant varchar2(64)  := 'version 4.286_nb 14/11/2017';
+g_header_version  constant varchar2(64)  := 'version 4.287 31/01/2018';
 g_header_defs     constant varchar2(512) := '';
+
+subtype t_trmask is OW_TRANSNLSMASK%rowtype;                      
 
 -- header_version - возвращает версию заголовка пакета
 function header_version return varchar2;
@@ -185,7 +187,7 @@ procedure add_deal_to_cmque (
 procedure set_accounts_rate (p_par number);
 
 -- процедура установки спецпараметров счетов
-procedure set_sparam (p_mode varchar2, p_acc number);
+procedure set_sparam (p_mode varchar2, p_acc number, p_trmask t_trmask);
 
 -- процедура изменения типа карточки
 procedure cng_card ( p_nd number, p_card varchar2 );
@@ -423,7 +425,7 @@ procedure set_cck_sob (
   p_transfer_flag number,
   p_sucs_flag     boolean );
 
-function get_new_nbs(p_nbs in varchar2) return varchar2;
+--function get_new_nbs(p_nbs in varchar2) return varchar2;
 
 end;
 /
@@ -433,7 +435,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.020 15/01/2018';
+g_body_version    constant varchar2(64)  := 'version 6.021 31/01/2017';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -536,7 +538,7 @@ type t_insurance is record(nd         w4_acc.nd%type,
                            datefrom   date,
                            dateto     date,
                            ext_id     ins_w4_deals.ins_ext_id%type,
-                           ext_code   ins_mapping_purpose.ext_code%type,
+                           ext_code   INS_EWA_PROD_PACK.EWA_TYPE_ID%type,
                            haveins    number,
                            haveoldins number,
                            ins_ukr_id number,
@@ -588,7 +590,7 @@ exception
     return l_newnb;
 end;
 
-function get_new_nbs(p_nbs in varchar2) return varchar2
+/*function get_new_nbs(p_nbs in varchar2) return varchar2
   is
 begin
   return case substr(p_nbs, 1, 4)
@@ -603,7 +605,7 @@ begin
                 else
                  substr(p_nbs, 1, 4)
          end;
-end;
+end;*/
 -------------------------------------------------------------------------------
 --процедура для проставления счетам 2924 признака пакетной оплаты
 procedure setoptfor2924w4 is
@@ -826,13 +828,12 @@ begin
             wd.ins_ukr_id, wd.ins_wrd_id, a.nls, a.branch;
 
   --отримання реквізитів страхової компанії
-  select min(p.nls), min(p.mfo), min(im.ext_code), min(c.okpo), min(p.name)
-    into l_insurance.ins_nls, l_insurance.ins_mfo, l_insurance.ext_code, l_insurance.ins_okpo, l_insurance.ins_name
-    from ins_partners p
-    join customer c
-      on p.rnk = c.rnk
-    join ins_mapping_purpose im
-      on im.okpo_ic = c.okpo and im.ext_id = l_insurance.ext_id;
+    ins_ewa_mgr.get_prodpack_ins_k(l_insurance.ext_id,
+                                   l_insurance.ins_nls,
+                                   l_insurance.ins_mfo,
+                                   l_insurance.ext_code,
+                                   l_insurance.ins_okpo,
+                                   l_insurance.ins_name);
 
   return l_insurance;
 end;
@@ -3622,7 +3623,7 @@ end iparse_riic_file;
 -- set_sparam
 -- процедура установки спецпараметров счетов
 --
-procedure set_sparam (p_mode varchar2, p_acc number)
+procedure set_sparam (p_mode varchar2, p_acc number, p_trmask t_trmask)
 is
   l_nd         number;
   l_pk_tip     accounts.tip%type;
@@ -3636,16 +3637,11 @@ is
   h varchar2(100) := 'bars_ow.set_sparam. ';
 begin
 
-  bars_audit.trace(h || 'Start: p_mode=>' || to_char(p_mode) || ' p_acc=>' || to_char(p_acc));
+  bars_audit.trace(h || 'Start: nbs=>' || p_trmask.nbs || ' p_acc=>' || to_char(p_acc));
 
   -- читаем параметры карточного счета
   begin
-    execute immediate
-    'select o.nd, a.tip, nvl(a.nbs, substr(a.nls,1,4)), a.ob22, p.grp_code
-       from w4_acc o, accounts a, w4_card c, w4_product p
-      where o.acc_pk = a.acc
-        and :p_acc = ' ||
-            case p_mode
+/*            case p_mode
                when '2625'  then 'o.acc_pk'
                when 'OVR'   then 'o.acc_ovr'
                when '2202'  then 'o.acc_ovr'
@@ -3672,21 +3668,27 @@ begin
                when '3579'  then 'o.acc_3579'
                when '9129'  then 'o.acc_9129'
                else ''''''
-            end || '
+            end*/     
+    execute immediate
+    'select o.nd, a.tip, nvl(a.nbs, substr(a.nls,1,4)), a.ob22, p.grp_code
+       from w4_acc o, accounts a, w4_card c, w4_product p
+      where o.acc_pk = a.acc
+        and :p_acc = o.' ||p_trmask.a_w4_acc|| '
         and o.card_code = c.code
         and c.product_code = p.code'
        into l_nd, l_pk_tip, l_pk_nbs, l_pk_ob22, l_grpcode
       using p_acc;
   exception when no_data_found then
      -- Для режима p_mode не найден счет ACC=p_acc
-     bars_audit.trace(h || 'Для режима ' || to_char(p_mode) || ' не найден счет ACC=' || to_char(p_acc));
-     bars_error.raise_nerror(g_modcode, 'MODEANDACC_NOT_FOUND', p_mode, to_char(p_acc));
+     bars_audit.error(h || 'Для режима ' || p_trmask.nbs || ' не найден счет ACC=' || to_char(p_acc));
+     bars_error.raise_nerror(g_modcode, 'MODEANDACC_NOT_FOUND', p_trmask.nbs, to_char(p_acc));
   end;
 
   -- читаем ОБ22
-  if p_mode <> '2625' then
+  if p_mode = '0' then
      begin
-        select decode(p_mode,
+/*
+decode(p_mode,
                'OVR',   ob_ovr,
                '2202',  ob_ovr,
                '2203',  ob_ovr,
@@ -3711,16 +3713,20 @@ begin
                '2069',  ob_2209,
                '3579',  ob_3579,
                '9129',  ob_9129, null)
+*/  
+       execute immediate
+        'select '||p_trmask.a_w4_nbs_ob22|| 
+          ' from w4_nbs_ob22
+         where tip  = :pk_tip
+           and nbs  = :pk_nbs
+           and ob22 = :pk_ob22'
           into l_ob22
-          from w4_nbs_ob22
-         where tip  = l_pk_tip
-           and nbs  = l_pk_nbs
-           and ob22 = l_pk_ob22;
+         using l_pk_tip, l_pk_nbs, l_pk_ob22;
      exception when no_data_found then
         l_ob22 := null;
      end;
      -- для счетов 2625D, 2625X ОБ22 как для карточного счета
-     if p_mode like '2625%' and l_ob22 is null then
+     if p_trmask.nbs in('2620', '2625') and l_ob22 is null then
         l_ob22 := l_pk_ob22;
      end if;
      accreg.setAccountSParam(p_acc, 'NKD', 'БПК_' || l_nd);
@@ -3732,9 +3738,11 @@ begin
                from w4_sparam
               where grp_code = l_grpcode
                 and tip = l_pk_tip
-                and nbs =substr(p_mode, 1, 4)
+                and nbs = p_trmask.nbs
                 and sp_id is not null
-                and value is not null )
+                and value is not null
+                and(p_mode = '1' or (p_mode = '0' and tipad = p_trmask.tip))
+                 )
   loop
      begin
         select name, tabname, tag into l_sp_name, l_sp_tabname, l_sp_tag
@@ -3760,7 +3768,7 @@ end set_sparam;
 --
 procedure open_acc (
   p_pk_acc  number,
-  p_mode    varchar2,
+  p_trmask  t_trmask,
   p_acc out number )
 is
   l_cardcode     w4_acc.card_code%type;
@@ -3786,11 +3794,11 @@ is
   l_mdate        date   := null;
   l_p4           number;
   l_pap          number := null;
-
+  l_sql          varchar2(4000);
   h varchar2(100) := 'bars_ow.open_acc. ';
 begin
 
-  bars_audit.trace(h || 'Start: p_pk_acc=>' || to_char(p_pk_acc) || ' p_mode=>' || to_char(p_mode));
+  bars_audit.trace(h || 'Start: p_pk_acc=>' || to_char(p_pk_acc) || ' nbs=>' || to_char(p_trmask.nbs)||' tip=>'||p_trmask.tip);
 
   l_mfo := gl.amfo;
 
@@ -3798,7 +3806,7 @@ begin
   begin
      select o.nd, o.card_code, o.dat_end, c.rnk, c.nmk,
             case
-              when a.nbs = '2625' then 3
+              when a.nbs in('2625', '2620') then 3
               else 2
             end custtype, a.acc, a.nls, a.nbs, a.nms, a.kv, a.daos, a.isp, a.tobo
        into l_nd, l_cardcode, l_edat, l_pk_rnk, l_pk_nmk, l_pk_custtype,
@@ -3815,12 +3823,12 @@ begin
 
   -- определение БС
 
-  if newnbs.g_state = 1 then
+/*  if newnbs.g_state = 1 then
      l_nbs := get_new_nbs(substr(p_mode,1,4));
   else
      l_nbs := substr(p_mode,1,4);
-  end if;
-  l_nms := case when p_mode in ('2202', '2203', '2062', '2063') then
+  end if;*/
+/*  l_nms := case when p_mode in ('2202', '2203', '2062', '2063') then
                      substr('Кред. ' || l_pk_nms, 1, 70)
                 when p_mode in ('2208', '2068') then
                      substr('Нарах.дох.за кред. ' || l_pk_nms, 1, 70)
@@ -3843,17 +3851,18 @@ begin
                 when p_mode = '9129' then
                      substr('Невикор.ліміт ' || l_pk_nls, 1, 70)
                 else null
-           end;
+           end;*/
+  l_nms := replace(replace(replace(p_trmask.nms,'#NMS', l_pk_nms), '#NMK', l_pk_nmk), '#NLS', l_pk_nls);
   if l_nms is null then
      -- Неизвестный режим счета p_mode
-     bars_audit.trace(h || 'Неизвестный режим счета ' || to_char(p_mode));
-     bars_error.raise_nerror(g_modcode, 'UNKNOWN_MODE', p_mode);
+     bars_audit.trace(h || 'Неизвестный режим счета ' || to_char(p_trmask.nbs)||p_trmask.tip);
+     bars_error.raise_nerror(g_modcode, 'UNKNOWN_MODE', to_char(p_trmask.nbs)||p_trmask.tip);
   end if;
 
   -- mdate для 2202/2203/2062/2063, 2208/2068, 2207/2067, 2209/2069, 9129
-  if p_mode in ('2202', '2203', '2062', '2063', '2208', '2068', '2207', '2067', '2209', '2069', '9129') then
+  if p_trmask.nbs in ('2202', '2203', '2062', '2063', '2208', '2068', '2207', '2067', '2209', '2069', '9129') then
      l_mdate := l_edat;
-     if p_mode = '2208' then
+     if p_trmask.nbs = '2208' then
         l_pap := 1;
      end if;
   end if;
@@ -3863,10 +3872,10 @@ begin
   --   если он занят, ищем свободный по порядку
   begin
      -- сначала ищем по маске карточного счета pk_nls
-     l_nls := vkrzn(substr(l_mfo,1,5), l_nbs || '0' || substr(l_pk_nls,6,9));
+     l_nls := vkrzn(substr(l_mfo,1,5), p_trmask.nbs || '0' || substr(l_pk_nls,6,9));
      select 1 into l_tmp from accounts where nls = l_nls and kv = l_pk_kv;
      -- счет нашли, он занят, определяем свободный
-     l_nls := get_newaccountnumber(l_pk_rnk, l_nbs);
+     l_nls := get_newaccountnumber(l_pk_rnk, p_trmask.nbs);
   exception when no_data_found then null;
   end;
 
@@ -3881,7 +3890,7 @@ begin
   if l_mdate is not null then
      update accounts set mdate = l_mdate where acc = l_acc;
   end if;
-
+/*
   -- добавление в таблицу договоров по БПК
   if p_mode in ('2202', '2203', '2062', '2063') then
      update w4_acc set acc_ovr = l_acc where acc_pk = p_pk_acc;
@@ -3904,15 +3913,18 @@ begin
   elsif p_mode = '3579' then
      update w4_acc set acc_3579 = l_acc where acc_pk = p_pk_acc;
   elsif p_mode = '9129' then
-     update w4_acc set acc_9129 = l_acc where acc_pk = p_pk_acc;
+     update w4_acc set acc_9129 = l_acc where acc_pk = p_pk_acc;*/
+  if p_trmask.a_w4_acc is not null then
+     l_sql := 'update w4_acc set '|| p_trmask.a_w4_acc||' = :acc where acc_pk = :acc_pkk';
+     execute immediate l_sql using l_acc, p_pk_acc;
   else
      -- Неизвестный режим счета p_mode
-     bars_audit.trace(h || 'Неизвестный режим счета ' || to_char(p_mode));
-     bars_error.raise_nerror(g_modcode, 'UNKNOWN_MODE', p_mode);
+     bars_audit.error(h || 'Неизвестный режим счета ' ||  to_char(p_trmask.nbs)||p_trmask.tip);
+     bars_error.raise_nerror(g_modcode, 'UNKNOWN_MODE',  to_char(p_trmask.nbs)||p_trmask.tip);
   end if;
 
   -- спецпараметры
-  set_sparam(p_mode, l_acc);
+  set_sparam(0, l_acc, p_trmask);
   bars_audit.trace(h || 'Specparams for account ' || l_nls || '/' || to_char(l_pk_kv) || ' set.');
 
   p_acc := l_acc;
@@ -4005,7 +4017,7 @@ begin
      if l_mfo <> p_mfob then
         l_nlsb := get_proc_nls('T00', p_kv);
      else
-        if substr(p_nlsb, 1, 4) in ('2625', '2605', '2655', '2520', '2541', '2542', '3550', '3551') then
+        if substr(p_nlsb, 1, 4) in ('2625', '2605', '2655', '2620', '2600', '2650', '2520', '2541', '2542', '3550', '3551') then
            select acc into l_acc from accounts where nls = p_nlsb and rownum = 1;
            l_nlsb := get_transit(l_acc);
         else
@@ -5068,8 +5080,8 @@ is
         and exists ( select 1 from ow_match_tt where code = a.doc_descr and tt is not null )
          -- только по карточным счетам
          -- исключаем документы погашения задолженности по кредиту
-        and ( (substr(debit_anlaccount,1,4)  in (select unique nbs from w4_nbs_ob22) and not regexp_like (credit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_2625+'))
-           or (substr(credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) and not regexp_like (debit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_2625+')));
+        and ( (substr(debit_anlaccount,1,4)  in (select unique nbs from w4_nbs_ob22) and not regexp_like (credit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+'))
+           or (substr(credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) and not regexp_like (debit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+')));
 
      bars_audit.info(l || 'l_atrn.count=>' || l_atrn.count);
 
@@ -5301,13 +5313,19 @@ is
    l_nls     varchar2(100) := null;
    l_acc     number;
    l_nls_tip varchar2(20);
+   l_trmask  t_trmask;
+   l_sql     varchar2(4000);  
 begin
 
    if p_nls like 'NLS\_%\_%' escape '\' and p_pk_acc is not null then
+      begin 
+        select * into l_trmask from OW_TRANSNLSMASK t where p_nls like mask||'%';
 
-      l_nls_tip := substr(replace(p_nls,'NLS_',''),1,instr(replace(p_nls,'NLS_',''),'_')-1);
+        --l_nls_tip := substr(replace(p_nls,'NLS_',''),1,instr(replace(p_nls,'NLS_',''),'_')-1);
 
-      begin
+
+      
+  /*      begin
          select decode(l_nls_tip,
                 '2202',  w.acc_ovr,
                 '2203',  w.acc_ovr,
@@ -5337,11 +5355,18 @@ begin
           where w.acc_pk = p_pk_acc;
       exception when no_data_found then
          bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', p_pk_acc);
+        end;*/
+        l_sql :='select '||l_trmask.a_w4_acc||' from w4_acc w where w.acc_pk = :p_pk_acc';
+        begin
+          execute immediate l_sql
+             into l_acc
+            using p_pk_acc;
+        exception when no_data_found then
+           bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', p_pk_acc);
       end;
-
       -- открываем счет
       if l_acc is null then
-         open_acc(p_pk_acc, l_nls_tip, l_acc);
+           open_acc(p_pk_acc, l_trmask, l_acc);
       end if;
 
       begin
@@ -5349,7 +5374,10 @@ begin
       exception when no_data_found then
          l_nls := null;
       end;
-
+      exception
+        when no_data_found then
+          l_nls := null;
+      end; 
    end if;
 
    return l_nls;
@@ -6584,6 +6612,11 @@ is
    l_nls_trans    varchar2(15);
    l_ref_add      number;
    l_cur_bdate    date;
+   l_errumsg      varchar2(1000);
+   l_erracode     varchar2(1000);
+   l_erramsg      varchar2(1000);
+   l_acc_row      accounts%rowtype;
+
    l_newnb        t_newnb;
 begin
 
@@ -6601,7 +6634,7 @@ begin
        -- исключаем операции пополнения/списания, инициированные 3-ей системой, кроме гашения задолженности по кредиту
         and (not exists ( select 1 from ow_match_tt where code = a.doc_descr ) or
              (exists ( select 1 from ow_match_tt where code = a.doc_descr ) and
-             (regexp_like(debit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_2625+') or regexp_like(credit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_2625+'))))
+             (regexp_like(debit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+') or regexp_like(credit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+'))))
        -- 2625% or NLS_%_2625%
       and ( substr(debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
          or substr(debit_anlaccount, instr(debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
@@ -6752,6 +6785,38 @@ begin
             l_sk  := 58;
          end if;
 
+         begin
+            if l_atrn(i).debit_anlaccount = 'NLS_LOCPAY' then
+               ipay_doc (l_tt, l_vob, l_dk, l_sk,
+                  l_nam_a, l_nlsa, null, l_id_a,
+                  l_nam_b, l_nlsb, null, l_id_b,
+                  l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref, 4);
+            else
+               ipay_doc (l_tt, l_vob, l_dk, l_sk,
+                  l_nam_a, l_nlsa, null, l_id_a,
+                  l_nam_b, l_nlsb, null, l_id_b,
+                  l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref);
+            end if;
+         exception
+            when others then
+              bars_error.get_error_info(p_errtxt   => sqlerrm ,
+                                        p_errumsg  => l_errumsg,
+                                        p_erracode => l_erracode,
+                                        p_erramsg  => l_erramsg);
+              -- Якщо помилка, що рахунок закрито пробуємо реанімувати інакше помилка
+              if l_erracode = 'BRS-09303' then
+                 l_acc_row := account_utl.read_account(p_account_number => l_nlsa,
+                                                       p_currency_id    => l_kv1);
+                 if l_acc_row.tip like 'W4%' and l_acc_row.nbs is not null and l_acc_row.dazs is not null then
+                    accreg.p_acc_restore(l_acc_row.acc);
+                 end if;
+                 
+                 l_acc_row := account_utl.read_account(p_account_number => l_nlsb,
+                                                       p_currency_id    => l_kv2);
+                 if l_acc_row.tip like 'W4%' and l_acc_row.nbs is not null and l_acc_row.dazs is not null then
+                    accreg.p_acc_restore(l_acc_row.acc);
+                 end if;
+                 -- Якщо все ок відкриваємо рахунок
          if l_atrn(i).debit_anlaccount = 'NLS_LOCPAY' then
             ipay_doc (l_tt, l_vob, l_dk, l_sk,
                l_nam_a, l_nlsa, null, l_id_a,
@@ -6763,6 +6828,10 @@ begin
                l_nam_b, l_nlsb, null, l_id_b,
                l_kv1, l_s1, l_kv2, l_s2, l_nazn, l_ref);
          end if;
+              else
+                 raise;
+              end if;
+         end;
 
          if l_atrn(i).credit_anlaccount = 'NLS_LOCPAY_FEE' then
             update ow_locpay_match t
@@ -8094,7 +8163,7 @@ begin
               l_tt := 'OW1';
            end if;
            -- проверка на 2605 PK/W4
-           if l_nlsb like '2605%' then
+           if l_nlsb like '2605%' or l_nlsb like '2600%'  then
               begin
                  select tip into l_tip_pk
                    from accounts
@@ -8874,7 +8943,7 @@ begin
   if p_okpo is null
   or substr(p_okpo,1,5) = '99999'
   or substr(p_okpo,1,5) = '00000'
-  or p_paspser is null
+  or (p_paspser is null and length(p_paspnum)<>9)
   or p_paspnum is null then
 
      l_rnk := null;
@@ -8891,7 +8960,7 @@ begin
      -- ищем клиентов с паспортными данными
      select count(*) into l_count_passp
        from person p, customer c
-      where p.ser = p_paspser
+      where nvl(p.ser,'0') = nvl(p_paspser,'0')
         and p.numdoc = p_paspnum
         and p.rnk = c.rnk
         and ( p_spd = 0 and nvl(trim(c.sed),'00') <> '91'
@@ -8909,7 +8978,7 @@ begin
               select c.rnk, c.date_off into l_rnk, l_date_off
                 from customer c, person p
                where c.okpo   = p_okpo
-                 and p.ser    = p_paspser
+                 and nvl(p.ser,'0') = nvl(p_paspser,'0')
                  and p.numdoc = p_paspnum
                  and c.rnk = p.rnk
                  and ( p_spd = 0 and nvl(trim(c.sed),'00') <> '91'
@@ -8930,7 +8999,7 @@ begin
            select max(c.rnk) into l_rnk
              from customer c, person p
             where c.okpo   = p_okpo
-              and p.ser    = p_paspser
+              and nvl(p.ser,'0') = nvl(p_paspser,'0')
               and p.numdoc = p_paspnum
               and c.rnk = p.rnk
               and c.date_off is null
@@ -8943,7 +9012,7 @@ begin
               select max(c.rnk) into l_rnk
                 from customer c, person p
                where c.okpo   = p_okpo
-                 and p.ser    = p_paspser
+                 and nvl(p.ser,'0') = nvl(p_paspser,'0')
                  and p.numdoc = p_paspnum
                  and c.rnk = p.rnk
                  and c.date_off is not null
@@ -11475,7 +11544,7 @@ begin
         select count(*) into i
           from accounts a, customerw w
          where a.rnk = p_rnk
-           and a.nbs = '2625' and tip = 'W4V' and ob22 = '22'
+           and a.nbs IN( '2625','2620') and tip = 'W4V' and ob22 = '22'
            and a.rnk = w.rnk and w.tag = 'RV_XA' and w.value like 'XA%';
      end if;
 
@@ -11716,8 +11785,8 @@ begin
   end;
 
   begin
-     select min(decode(tag,decode(l_pk_nbs,'2625','W4_EFN','W4_ECN'),value,null)) embfirstname,
-            min(decode(tag,decode(l_pk_nbs,'2625','W4_ELN','W4_CPN'),value,null)) emblastname,
+     select min(decode(tag,decode(l_pk_nbs,'2625','W4_EFN','2620','W4_EFN','W4_ECN'),value,null)) embfirstname,
+            min(decode(tag,decode(l_pk_nbs,'2625','W4_ELN','2620','W4_ELN','W4_CPN'),value,null)) emblastname,
             min(decode(tag,'W4_SEC',  value,null)) secname
        into l_embfirstname, l_emblastname, l_secname
        from accountsw
@@ -11846,7 +11915,7 @@ begin
      l_vid := 1;
   end if;
 
-  if p_nls like '2605%'  then
+  if  p_product.custtype <> 1 then
     -- Переводимо рахунок в статус Підтвердження бек-офісом
      update w4_acc_instant t
      set t.state = 1,
@@ -11855,7 +11924,7 @@ begin
 
      update accounts
         set rnk = p_customer.rnk,
-            nms = substr('БПК ' || p_customer.nmk || ' ' || p_product.card_code,1,70),
+            nms = p_customer.nmk,
             vid = l_vid,
             tobo = p_branch,
             daos = bankdate,
@@ -11923,16 +11992,16 @@ begin
      l_vid := 0;
   -- юр. лицо / физ. лицо-предприниматель
   else
-     l_vid := 1;
+     l_vid := 3;
   end if;
 
   -- открытие карточного счета
   op_reg_lock(99, 0, 0, l_grp, l_tmp, p_customer.rnk, l_nls, p_product.kv, l_nms,
-     p_product.tip, user_id, l_acc, case when p_product.custtype = 1 then '1' else null end, null,
+     p_product.tip, user_id, l_acc, 1, null,
      l_vid, null, null, null, null, case when p_product.custtype = 1 then null else 26 end, null, null, null, null, p_branch);
   -- по ЮО закриваємо рахунок і ставимо його в чергу на підтвердження
   if p_product.custtype <> 1 then
-     update accounts a set a.dazs = bankdate where a.acc = l_acc;
+     update accounts a set a.dazs = bankdate, a.nbs = null where a.acc = l_acc;
      insert into w4_acc_instant
        (acc, card_code, batchid, state, rnk)
      values
@@ -12261,14 +12330,33 @@ begin
 end;
 
 function add_query_to_log(p_rnk in number,
-                          p_nd  in number) return number is
+                          p_nd       in number,
+                          p_respcode in number default null,
+                          p_resptext in varchar2 default null,
+                          p_reqbody  in clob default null,
+                          p_respbody in clob default null,
+                          p_reqid    in number default null,
+                          p_err_text in varchar2 default null) return number is
+  pragma autonomous_transaction;
   l_reqid number;
 begin
+if p_reqid is null then
   insert into ow_query_log
     (reqid, rnk, nd)
   values
     (bars_sqnc.get_nextval('S_OW_QUERY_LOG'), p_rnk, p_nd)
   returning reqid into l_reqid;
+else
+ update ow_query_log t
+       set t.respcode = p_respcode,
+           t.resptext = p_resptext,
+           t.reqbody  = p_reqbody,
+           t.respbody = p_respbody,
+           t.err_text = p_err_text
+     where t.reqid    = p_reqid;
+l_reqid:=p_reqid;
+end if;
+ commit;
   return l_reqid;
 end;
 
@@ -12298,8 +12386,8 @@ begin
 end;
 
 function pers_instant_card(p_nd in number, p_cmclient in cm_client_que%rowtype)
-  return boolean is
-  l_isok boolean := true;
+  return varchar2 is
+  l_err varchar2(4000) := null;
   l_xml xmltype;
   l_body clob;
   l_reqid number;
@@ -12329,12 +12417,8 @@ begin
     l_respcode := to_number(extract(l_respxml,'UFXMsg/@resp_code', null));
     l_resptext := extract(l_respxml,'UFXMsg/@resp_text', null);
 
-    update ow_query_log t
-       set t.respcode = l_respcode,
-           t.resptext = l_resptext,
-           t.reqbody = l_body,
-           t.respbody = l_response.cdoc
-     where t.reqid = l_reqid;
+    l_reqid :=add_query_to_log(p_cmclient.rnk, p_nd, l_respcode, l_resptext, l_body, l_response.cdoc, l_reqid);
+	
   else
     l_xml := get_pers_xml(2, p_cmclient, l_reqid);
     l_body := l_xml.getClobVal();
@@ -12345,12 +12429,8 @@ begin
     l_respcode := to_number(extract(l_respxml,'UFXMsg/@resp_code', null));
     l_resptext := extract(l_respxml,'UFXMsg/@resp_text', null);
 
-    update ow_query_log t
-       set t.respcode = l_respcode,
-           t.resptext = l_resptext,
-           t.reqbody = l_body,
-           t.respbody = l_response.cdoc
-     where t.reqid = l_reqid;
+    l_reqid :=add_query_to_log(p_cmclient.rnk, p_nd, l_respcode, l_resptext, l_body, l_response.cdoc, l_reqid);
+	
     if l_respcode = 0 then
 
       l_reqid := add_query_to_log(p_cmclient.rnk, p_nd);
@@ -12362,29 +12442,23 @@ begin
       l_respcode := to_number(extract(l_respxml,'UFXMsg/@resp_code', null));
       l_resptext := extract(l_respxml,'UFXMsg/@resp_text', null);
 
-      update ow_query_log t
-         set t.respcode = l_respcode,
-             t.resptext = l_resptext,
-             t.reqbody = l_body,
-             t.respbody = l_response.cdoc
-       where t.reqid = l_reqid;
+      l_reqid :=add_query_to_log(p_cmclient.rnk, p_nd, l_respcode, l_resptext, l_body, l_response.cdoc, l_reqid);
 
     end if;
   end if;
-  if l_respcode <> 0 then
-     l_isok := false;
+  if l_respcode = 0 then
+     l_err:='OK';
+  else
+     l_err := l_resptext;
   end if;
-  return l_isok;
+  return l_err;
 exception
   when others then
-    update ow_query_log t
-       set t.err_text = substr(dbms_utility.format_error_stack() || chr(10) ||
-                        dbms_utility.format_error_backtrace(), 1, 4000),
-           t.reqbody = l_body,
-           t.respbody = l_response.cdoc
-     where t.reqid = l_reqid;
-    l_isok := false;
-    return l_isok;
+    l_err := substr(dbms_utility.format_error_stack() || chr(10) ||
+                  dbms_utility.format_error_backtrace(), 1, 4000);
+    l_reqid :=add_query_to_log(null,null,null, null, l_body, l_response.cdoc, l_reqid, l_err);
+  
+    return l_err;
 end;
 
 -------------------------------------------------------------------------------
@@ -12421,12 +12495,13 @@ is
   l_opertype   number;
   i number;
   l_cmclient   cm_client_que%rowtype;
-  l_isok       boolean;
+  l_pers_err       varchar2(4000);
   l_dkbo_deal  number;
   h varchar2(100) := 'bars_ow.open_card. ';
   l_sendsms    varchar2(3);
   l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');
-l_salaryproect bpk_proect.id%type;
+  l_salaryproect bpk_proect.id%type;
+  l_trmask t_trmask;
 begin
 
   bars_audit.info(h || 'Start.');
@@ -12496,7 +12571,7 @@ begin
 
      link_instant_card(p_nls, l_customer, l_product, p_branch, l_acc);
 
-     if p_nls like '2605%' then
+     if l_ctype = 2  then
      -- тип заявки opertype = 12 - перепривязка счета Instant_MMSB
        l_opertype := 12;
        if p_secname is null then
@@ -12521,7 +12596,12 @@ begin
   -- устанавливаем такой же как VNCRP в поточний (VNCRR)
   -- поточний ВНКР   --VNCRR
   set_bpk_parameter(l_nd, 'VNCRR', get_customer_vncrp(p_rnk, bankdate));
-
+ 
+ --устанавливаем доп.параметры BUS_MOD,IFRS,SPPI.
+   set_bpk_parameter(l_nd, 'BUS_MOD', '13');
+   set_bpk_parameter(l_nd, 'SPPI', 'Так');
+   set_bpk_parameter(l_nd, 'IFRS', 'AC');
+  
   -- ідентифікатор і штрих-код кобренду
   if p_cobrandid is not null and p_barcode is not null then
 /*     if not regexp_like(p_cobrandid, '^[A-Z]{4}[A-Z0-9]{7}+$') then
@@ -12544,8 +12624,11 @@ begin
      accreg.setAccountSParam(l_acc, 'OB22', l_product.ob22);
   end if;
 
+  l_trmask.a_w4_acc := 'ACC_PK';
+  l_trmask.nbs := substr(account_utl.read_account(l_acc).nls,1,4);
+  
   -- specparams:
-  set_sparam('2625', l_acc);
+  set_sparam('1', l_acc, l_trmask);
 
   -- rate
   if l_product.rate is not null then
@@ -12639,13 +12722,14 @@ begin
   -- отправляем запрос на W4 по персонализации карты
   if l_opertype = 6 and l_iscrm = '0' then
 
-     l_isok := pers_instant_card(l_nd, l_cmclient);
-     if l_isok then
+     l_pers_err := pers_instant_card(l_nd, l_cmclient);
+     if l_pers_err = 'OK' then
         update cm_client_que
   set add_info = replace(add_info, '<SEND_INSTANT>Y</SEND_INSTANT>', '<SEND_INSTANT>N</SEND_INSTANT>')
          where id = l_cmclient.id;
-/*     else
-       delete from cm_client_que where id = l_cmclient.id; */
+     else
+		 raise_application_error(-20000, 'Помилка при персоналізації Instant карти: '||substr(l_pers_err,1,100));
+/*       delete from cm_client_que where id = l_cmclient.id; */
      end if;
   end if;
   bars_audit.info(h || 'Finish.');
@@ -12969,7 +13053,7 @@ begin
   or p_project.first_name is null
   or p_project.last_name is null
   or p_project.type_doc is null
-  or p_project.paspseries is null
+  or (p_project.paspseries is null and nvl(p_project.type_doc,0) = 1)
   or p_project.paspnum is null
   or p_project.paspissuer is null
   or p_project.paspdate is null
@@ -13016,8 +13100,10 @@ begin
      (p_project.paspseries <> upper(p_project.paspseries) or length(p_project.paspseries) <> 2) then
      append_msg('Невірно заповнено серію паспорту');
   end if;
-  if nvl(p_project.type_doc,0) = 1 and
-     (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 6) then
+  if (nvl(p_project.type_doc,0) = 1 and
+     (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 6)) or
+     (nvl(p_project.type_doc,0) = 7 and
+     (not check_digit(p_project.paspnum) or length(p_project.paspnum) <> 9)) then
      append_msg('Невірно заповнено номер паспорту');
   end if;
   if p_project.email is not null and not check_email(upper(p_project.email)) then
@@ -13981,8 +14067,8 @@ begin
   end if;
 
   begin
-     select min(decode(tag,decode(l_card_nbs,'2625','W4_EFN','W4_ECN'),value,null)) embfirstname,
-            min(decode(tag,decode(l_card_nbs,'2625','W4_ELN','W4_CPN'),value,null)) emblastname,
+     select min(decode(tag,decode(l_card_nbs,'2625','W4_EFN','2620','W4_EFN','W4_ECN'),value,null)) embfirstname,
+            min(decode(tag,decode(l_card_nbs,'2625','W4_ELN','2620','W4_ELN','W4_CPN'),value,null)) emblastname,
             min(decode(tag,'W4_SEC',  value,null)) secname,
             min(decode(tag,'PK_WORK', value,null)) work,
             min(decode(tag,'PK_OFFIC',value,null)) office,
@@ -14954,7 +15040,7 @@ is
   l_name_new             bpk_proect.name%type;
   l_bpk_proect_id_old    number;
   l_name_old             bpk_proect.name%type;
-
+  l_trmask               t_trmask;
 
   h varchar2(100) := 'bars_ow.cm_alter_acc. ';
 
@@ -14978,10 +15064,11 @@ is
      l_dk      number := 1;
      l_s       number;
      l_nazn    varchar2(160) := 'Перенесення залишків коштів, в зв''язку зі зміною банківського продукту';
+     l_trmask t_trmask;
   begin
-
+     select * into l_trmask from ow_transnlsmask t where t.nbs = p_newnbs and t.tip = 'KSS' and rownum = 1;
      -- открываем счет
-     open_acc(p_pk_acc, p_newnbs, l_acc);
+     open_acc(p_pk_acc, l_trmask, l_acc);
 
      -- остаток на счете
      l_ost := fost(p_oldacc, l_bdate);
@@ -15162,8 +15249,10 @@ begin
         if l_old_tip <> l_new_tip then
            -- меняем тип карточного счета
            update accounts set tip = l_new_tip where acc = l_acc;
+           l_trmask.a_w4_acc := 'ACC_PK';
+           l_trmask.nbs := substr(z.contract_number,1,4);           
            -- меняем спецпараметры карточного счета
-           set_sparam('2625', l_acc);
+           set_sparam('1', l_acc, l_trmask);
         end if;
 
         -- меняем ОБ22 карточного счета
@@ -15232,7 +15321,7 @@ begin
         -- спецпараметры по счетам договора
         if l_old_ob22 <> l_new_ob22
         or l_old_tip  <> l_new_tip then
-           for x in ( select substr(w.name,5) name, w.acc
+           for x in ( select substr(w.name,5) name, w.acc, a.tip, a.nbs
                         from v_w4_nd_acc w, accounts a
                        where w.nd = l_nd
                           -- для acc_pk и acc_ovr уже все поменяли
@@ -15240,8 +15329,14 @@ begin
                          and w.acc = a.acc
                          and a.dazs is null )
            loop
+             begin
+               select * into l_trmask from ow_transnlsmask t where t.nbs = x.nbs and t.tip = x.tip and rownum = 1;
+             exception
+               when no_data_found then 
+                 l_trmask := null;
+             end;
               -- меняем спецпараметры
-              set_sparam(x.name, x.acc);
+              set_sparam('0', x.acc, l_trmask);
            end loop;
         end if;
 

@@ -1,6 +1,6 @@
 prompt user/bars_intgr.sql
 prompt create a new one
--- create user bars_intgr 
+--  create user bars_intgr 
 declare
 l_res number;
 begin
