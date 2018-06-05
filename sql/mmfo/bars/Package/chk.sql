@@ -1443,37 +1443,56 @@ begin
   fsig_ := visa_flag4check(ref_,lev_);
 end;
 
-/*
- * visa_flag4sign() вычисление флага ЭЦП визы для операции и группы контроля
- */
-procedure visa_flag4sign(tt_ varchar2, grp_ number, fsig_ out integer) is
-fres_ SMALLINT :=0;
-begin
-  logger.trace('visa_flag4sign: start ');
 
-  if mode_visa_sign=1 then
-    logger.trace('tt='||tt_||',grp='||grp_);
-    if grp_ is null then
-      select to_number(substr(flags,2,1)) into fsig_ from tts where tt=tt_;
-    else
-      begin
-        select bitand(f_in_charge,3),NVL(bitand(flags,1),0) into fsig_,fres_ from chklist_tts where tt=tt_ and idchk=grp_;
-      exception when no_data_found then
-        fsig_ := null;
-      end;
-      if fsig_ is null then
-        select f_in_charge into fsig_ from chklist where idchk=grp_;
-      end if;
-    end if;
-    fsig_ := bitand(fsig_,3)+fres_*4;
-  else
-    fsig_ := 0;
-  end if;
-  logger.trace('fsig='||fsig_);
-exception when others then
-  logger.error('visa_flag4sign():'||SQLERRM);
-  raise;
-end;
+   ---------------------------------------------------------------------
+   --  visa_flag4sign - вычислить флаг ЭЦП
+   --
+   --  Т.е. вычислить какая именно подпись должна быть на документе на текущий момент в цепочке визирования
+   --
+   --  данный флаг принимает значения:
+   --  = 0 - отсутсвует,   т.е. поля oper.sign  =  null и oper_visa.sign = null
+   --  = 1 - внутр,        т.е. поля oper.sign  =  null и oper_visa.sign <> null
+   --  = 2 - СЕП,          т.е. поля oper.sign  <> null и oper_visa.sign = null
+   --  = 3 - внутр + СЕП,  т.е. поля oper.sign  <> null и oper_visa.sign <> null
+   --
+   --  Если група контроля передана пустая, флаг берется на операции в поле flags во второй позиции
+   --  Если передана группа контроля (из цепочки), тогда флаг вычисляется из составля
+   ---------------------------------------------------------------------
+
+  procedure visa_flag4sign(tt_ varchar2, grp_ number, fsig_ out integer) is
+     fres_ SMALLINT :=0;
+  begin
+     logger.trace('visa_flag4sign: start ');
+
+     if mode_visa_sign=1 then
+        logger.trace('tt='||tt_||',grp='||grp_);
+        -- пустая группа означает просто вставку документа в oper_visa
+        if grp_ is null then
+           select to_number(substr(flags,2,1)) into fsig_ from tts where tt=tt_;
+        else
+           begin
+              select bitand(f_in_charge,3), 
+                     NVL(bitand(flags,1),0) 
+                into fsig_,fres_ 
+                from chklist_tts 
+               where tt = tt_ 
+                 and idchk = grp_;
+           exception when no_data_found then
+              fsig_ := null;
+           end;
+           if fsig_ is null then
+              select f_in_charge into fsig_ from chklist where idchk=grp_;
+           end if;
+        end if;
+        fsig_ := bitand(fsig_,3) + fres_ * 4;
+     else
+        fsig_ := 0;
+     end if;
+     logger.trace('fsig='||fsig_);
+  exception when others then
+     logger.error('visa_flag4sign():'||SQLERRM);
+     raise;
+  end;
 
 /*
  * lock_doc - процедура блокировки записи документа для визирования
