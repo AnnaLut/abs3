@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.22 22.05.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.23 24.05.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -564,7 +564,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.36 22.05.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.37 24.05.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -3267,6 +3267,7 @@ end;
   is
     l_PFCombo r_PFCombo;
   begin
+    bars_audit.info('value_paper.getPFcombo: p_id='||p_id);    
     for k in (SELECT p.PF, v.VIDD || '/' || p.NAME AS VAL, v.VIDD
                 FROM CP_PF p, CP_VIDD v
                WHERE     p.PF = v.PF
@@ -3298,6 +3299,7 @@ end;
  is
    l_RYNCombo r_RYNCombo;
  begin
+   bars_audit.info('value_paper.getRYNcombo: p_vidd='||p_vidd||' p_id='||p_id);   
    for k in (SELECT RYN, NAME
               FROM CP_RYN
              WHERE ryn IN (SELECT v.ryn
@@ -3323,6 +3325,7 @@ end;
  is
    l_PFCombo r_PFCombo;
  begin
+   bars_audit.info('value_paper.getPFcomboEmi: p_emi='||p_emi||' p_dox='||p_dox||' p_pf='||p_pf);
    for k in (  SELECT p.PF, v.VIDD || '/' || p.NAME AS VAL, v.VIDD
                 FROM CP_PF p, CP_VIDD v
                WHERE     p.PF = v.PF
@@ -3348,6 +3351,7 @@ end;
  is
    l_RYNCombo r_RYNCombo;
  begin
+   bars_audit.info('value_paper.getRYNcomboEmi: p_emi='||p_emi||' p_dox='||p_dox||' p_vidd='||p_vidd);   
    for k in (SELECT RYN, NAME
               FROM CP_RYN
              WHERE RYN IN (SELECT a.ryn
