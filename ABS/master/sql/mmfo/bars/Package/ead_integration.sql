@@ -3,7 +3,7 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql ====
 PROMPT ===================================================================================== 
 
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.0 01.02.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-43 3.1 04.06.2018 MMFO';
    g_type_id  object_type.id%type;
    g_state_id object_state.state_id%type;
 
@@ -21,6 +21,10 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
                      p_deal_number out deal.deal_number%type,
                      p_start_date  out deal.start_date%type,
                      p_state_id    out deal.state_id%type);
+ 
+function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
+                               p_tip  varchar2,
+                               p_ob22 varchar2 ) return number;                     
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Dict.GetData
    -----------------------------------------------------------------------
@@ -610,6 +614,50 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                 null;
         end;
    end get_dkbo;
+ 
+ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
+                                p_tip  varchar2,
+                                p_ob22 varchar2 ) return number is 
+ l_nbs varchar2(14);  
+ l_id  number(10);   
+                      
+begin
+ l_nbs := substr(p_nbs,1,4); 
+     begin 
+   
+ for rec in (select e.id,
+                e.nbs,
+                e.tip,
+                e.ob22,
+                case when e.tip is null and e.ob22 is null then e.id end clear , 
+                count(e.nbs) over(partition by e.nbs ) coun
+           from ead_nbs e
+          where e.nbs = l_nbs
+               
+           )
+ loop
+
+     dbms_output.put_line(' 1 ->'||rec.id ); 
+    if     nvl(rec.tip,'0')  = p_tip and nvl(rec.ob22,'0')  = p_ob22  then l_id:= rec.id ; 
+    elsif nvl(rec.tip,'0')  = p_tip  and nvl(rec.ob22,'0') <> p_ob22 then l_id:= rec.id ; 
+    elsif nvl(rec.tip,'0')  <> p_tip  and    nvl(rec.ob22,'0') = p_ob22 then l_id:= rec.id ;
+    end if;      
+
+ end loop;
+ 
+  if l_id is null  then 
+      select e.id
+           into l_id  
+           from ead_nbs e
+          where e.nbs = l_nbs 
+           and e.tip is null
+           and e.ob22 is null;         
+  end if; 
+ 
+    return l_id;
+       end;
+end  ead_nbs_check_param;
+ 
 
     procedure get_accagr_param(p_acc in accounts.acc%type) is
         l_agr_type ead_nbs.agr_type%type;
@@ -639,8 +687,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                    l_custtype,
                    l_nbs
               FROM accounts a, ead_nbs e
-             WHERE a.acc = p_acc
-               and e.nbs(+) = nvl(a.nbs,substr(nls,1,4));
+             WHERE a.acc  = p_acc
+               and e.id   = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22);
         end;
 
         -- Визначаємо статус угоди. По звичайним рахункам угода зберігається в SpecParam.
@@ -751,8 +799,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                    rAccAgrParam.agr_status,
                    l_custtype,
                    l_nbs
-              from accounts_rsrv a left outer join ead_nbs e on substr(a.nls,1,4) = e.nbs
-             where a.rsrv_id = p_rsrv_id;
+              from accounts_rsrv a, ead_nbs e
+             where a.rsrv_id = p_rsrv_id
+               and e.id      = ead_integration.ead_nbs_check_param(a.nls,null,a.ob22);
 
       if (l_custtype = 2) -- для ДБО
       then
@@ -1522,7 +1571,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         for i in (  SELECT kf, agr_code, rnk, changed, daos AS created,
                            branch AS branch_id, user_login, user_fio,
                            NVL ( rAccAgrParam.agr_type, 'pr_uo') AS agr_type,
-                           NVL ( rAccAgrParam.agr_status, CASE WHEN dazs IS NULL OR dazs > SYSDATE THEN 1 ELSE 0 END) AS agr_status,
+                           NVL ( rAccAgrParam.agr_status, CASE WHEN dazs IS NULL OR dazs > SYSDATE THEN 1
+                                                               when dazs = DAOS then 10
+                                                               ELSE 0 END) AS agr_status,
 --                           agr_code as  agr_number,
                            NVL (TO_DATE ( rAccAgrParam.agr_date, 'dd.mm.yyyy'), daos) AS agr_date_open,
                            CASE WHEN dazs IS NULL OR dazs > SYSDATE THEN TO_DATE (NULL) ELSE dazs END AS agr_date_close
@@ -1553,7 +1604,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
             l_UAgrACC_Instance_Rec.agr_status      := i.agr_status;
             l_UAgrACC_Instance_Rec.agr_number      := i.agr_code;
             l_UAgrACC_Instance_Rec.agr_date_open   := i.agr_date_open;
-            l_UAgrACC_Instance_Rec.agr_date_close  := i.agr_date_close;
+            l_UAgrACC_Instance_Rec.agr_date_close  := case when i.agr_status = 10 then null else i.agr_date_close end;
 
             PIPE ROW (l_UAgrACC_Instance_Rec);
         end loop;
@@ -1938,6 +1989,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                        AND au.idupd = (SELECT MAX (au0.idupd)
                                          FROM accounts_update au0
                                         WHERE au0.acc = a.acc)
+      and a.nbs = case when a.nbs = '2620' and substr(a.tip,1,2) <> 'W4' then null else a.nbs end                                              
                        AND au.doneby = sb.logname(+))
         loop
           l_ACC_Instance_Rec.rnk                       := ead_integration.split_key(i.rnk, i.kf);

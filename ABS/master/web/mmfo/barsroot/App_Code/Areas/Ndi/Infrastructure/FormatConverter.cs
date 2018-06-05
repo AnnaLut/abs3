@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using ibank.core;
 using System.Web;
+using BarsWeb.Areas.Ndi.Models;
+using System.Globalization;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -108,7 +110,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             Color color;
             if (hex.ToUpper().Contains("RGB"))
             {
-                string rgbstr = hex.Substring(hex.IndexOf('(') + 1, hex.IndexOf(')') - hex.IndexOf('(') -1);
+                string rgbstr = hex.Substring(hex.IndexOf('(') + 1, hex.IndexOf(')') - hex.IndexOf('(') - 1);
                 string[] strArray = rgbstr.Split(',');
                 color = Color.FromArgb(Convert.ToInt32(strArray[0]), Convert.ToInt32(strArray[1]), Convert.ToInt32(strArray[2]));
 
@@ -125,6 +127,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         /// <returns></returns>
         public static string ConvertToExtJsDateFormat(string netDateFormat)
         {
+            if (string.IsNullOrEmpty(netDateFormat))
+                return string.Empty;
             var final = new StringBuilder(128);
 
             switch (netDateFormat.Trim())
@@ -227,6 +231,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         /// <returns>Понятный для extjs формат десятичных чисел</returns>
         public static string ConvertToExtJsDecimalFormat(string decimalFormat)
         {
+            if (string.IsNullOrEmpty(decimalFormat))
+                return string.Empty;
             return decimalFormat
                 .Replace(',', '.')
                 .Replace(' ', ',');
@@ -270,8 +276,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             string res = string.Empty;
             if (!string.IsNullOrEmpty(base64String))
             {
-                var  bytes = Convert.FromBase64String(base64String);
-                res =  Encoding.UTF8.GetString(bytes);
+                var bytes = Convert.FromBase64String(base64String);
+                res = Encoding.UTF8.GetString(bytes);
             }
             return res;
         }
@@ -287,7 +293,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
             return res;
         }
-            
+
 
         public static string ConvertFromUrlBase64UTF8(string param)
         {
@@ -298,6 +304,23 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 res = Encoding.UTF8.GetString(bytes);
             }
             return res;
+        }
+
+        public static string ConvertFieldValueFromJsToSharpFormat(FieldProperties field)
+        {
+            if (string.IsNullOrEmpty(field.Value))
+                return "";
+            var res = Convert.ChangeType(field.Value, SqlStatementParamsParser.GetCsTypeCode(field.Type));
+            if (res == null)
+                return "";
+            if (field.Type == "D")
+            {
+                DateTime resule = (DateTime)res;
+                return resule.ToString("d",CultureInfo.CreateSpecificCulture("de-DE"));
+                
+            }
+            else
+                return res.ToString();
         }
     }
 }

@@ -11,7 +11,7 @@
         </parameters>
       </datasource>
       <rowselection method="SingleRow" />
-      
+       
       <buttons>
         <button caption="Перегляд вх.докум." id="Bt1" type="Button" imagename="folder" hint="Відкрит карточку вхідного документа">
           <command  type="Redirect" url="/barsroot/documentview/default.aspx" target="Blank">
@@ -59,7 +59,13 @@
           </form>
         </field>
         <field name="TT" key="false" datatype="String" sort="default">
-          <column show="true" caption="Код операції" align="left" />
+          <column show="true" caption="Код операції" align="Center" width="50" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="S" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Сума вхідного документа" align="Right" width="90"  />
           <form show="true" rwmode="RW" required="true">
             <uicontrol type="Text" />
           </form>
@@ -89,7 +95,13 @@
           </form>
         </field>
         <field name="TT2" key="false" datatype="String" sort="default">
-          <column show="true" caption="Код операції" align="left" />
+          <column show="true" caption="Код операції" align="Center" width="50" />
+          <form show="true" rwmode="RW" required="true">
+            <uicontrol type="Text" />
+          </form>
+        </field>
+        <field name="S2" key="false" datatype="Decimal" sort="default">
+          <column show="true" caption="Сума вихідного документа" align="Right" width="90" />
           <form show="true" rwmode="RW" required="true">
             <uicontrol type="Text" />
           </form>

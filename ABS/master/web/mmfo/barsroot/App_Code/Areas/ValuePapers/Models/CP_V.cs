@@ -27,6 +27,7 @@ public class CP_V
     public decimal? OSTP { get; set; }
     public decimal? OST_2VP { get; set; }
     public decimal? OSTR { get; set; }
+    public decimal? OSTRD { get; set; }
     public decimal? OSTR2 { get; set; }
     public decimal? OSTR3 { get; set; }
     public decimal? OSTUNREC { get; set; }

@@ -8,12 +8,34 @@
         function ($scope, config, service) {
             'use strict';
             var vm = this;
-
             //*** helper functions -----------------------------------
 
             // remove all mask symbols from kendoMaskedTextBox
             var unmaskKendoText = function (str) {
                 return (str + '').replace(/[()\s-_]/g, "");
+            };
+
+            var checkIfArrHasDuplicates = function (arr) {
+                var tmp = {};
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] == null) continue;
+                    if (tmp[arr[i]]) {
+                        return true;
+                    } else {
+                        tmp[arr[i]] = 1;
+                    }
+                }
+            };
+
+            var checkCoefAndKodes = function (coef, kodesArr) {
+                if (coef !== 1 && coef !== 0) {
+                    bars.ui.error({ title: 'Помилка', text: 'Сума усіх коефіцієнтів повинна дорівнювати 1 або 0, поточна сума - ' + coef });
+                    return false;
+                } else if (checkIfArrHasDuplicates(kodesArr)) {
+                    bars.ui.error({ title: 'Помилка', text: 'Поле "Пріоритет розрах." повинно містити унікальні значення.' });
+                    return false;
+                }
+                return true;
             };
 
             //------------------------------------------------------------------------
@@ -102,32 +124,50 @@
             };
 
             vm.saveSchemeSideB = function (elem, editedRows) {
+                vm.ssb.Kod = $('#ssbKod').data('kendoNumericTextBox').value();
+
+                var data = vm.schemeBuilderDetailGrid.dataSource.data();
+                var totalCoefficient = 0;
+                var kodesArr = [];
+                for (var i = 0; i < data.length; i++) {
+                    if (!data[i].Formula) {
+                        totalCoefficient += data[i].Coefficient;
+                    } else {
+                        kodesArr.push(data[i].Kod);
+                    }
+                }
+                if (!vm.ssb.editMode) kodesArr.push(vm.ssb.Kod);
+
+                totalCoefficient = Math.round(totalCoefficient * 10000000) / 10000000;
+
+                if (!checkCoefAndKodes(totalCoefficient, kodesArr)) return;
+
                 if (elem)
                     vm.ssb = elem;
                 if (editedRows && editedRows.length > 0) {
                     service.batchEditSchemeSideB(editedRows).then(
                         function (result) {
                             vm.schemeBuilderDetailGrid.dataSource.read();
-                            bars.ui.notify('Статус', 'Зміни успішно збережено!', 'success');
+                            bars.ui.notify('Статус', 'Зміни успішно збережено!', 'success', { autoHideAfter: 3000 });
+                        });
+                } else if ($scope.validatorSB.validate() || elem) {
+                    vm.ssb.OpType = unmaskKendoText(vm.ssb.OpType);
+
+                    vm.ssb.OpCode = unmaskKendoText(vm.ssb.OpCode);
+                        vm.ssb.RecipientBankId = unmaskKendoText(vm.ssb.RecipientBankId);
+                    vm.ssb.RecipientAccNum = unmaskKendoText(vm.ssb.RecipientAccNum);
+                    vm.ssb.CurrId = unmaskKendoText(vm.ssb.CurrId);
+                    vm.ssb.RecipienCustCode = unmaskKendoText(vm.ssb.RecipienCustCode);
+                    vm.ssb.Scale = unmaskKendoText(vm.ssb.Scale);
+                    vm.ssb.SchemaId = vm.schemeBuilderDetailFilter.schemeId;
+
+                    service.editSchemeSideB(vm.ssb).then(
+                        function () {
+                            bars.ui.notify('Статус', 'Отримувача з рахунком ' + vm.ssb.RecipientAccNum + '(' + vm.ssb.CurrId + ') успішно ' + (vm.ssb.Id ? 'змінено' : 'добавлено') + ' у схемі перекриття.', 'success');
+                            vm.schemeBuilderDetailGrid.dataSource.read();
+                            $scope.editSchemeSideBWindow.close();
                         });
                 }
-                else
-                    if ($scope.validatorSB.validate() || elem) {
-                        vm.ssb.OpType = unmaskKendoText(vm.ssb.OpType);
-                        vm.ssb.OpCode = unmaskKendoText(vm.ssb.OpCode);
-                        vm.ssb.RecipientBankId = unmaskKendoText(vm.ssb.RecipientBankId);
-                        vm.ssb.RecipientAccNum = unmaskKendoText(vm.ssb.RecipientAccNum);
-                        vm.ssb.CurrId = unmaskKendoText(vm.ssb.CurrId);
-                        vm.ssb.RecipienCustCode = unmaskKendoText(vm.ssb.RecipienCustCode);
-                        vm.ssb.Scale = unmaskKendoText(vm.ssb.Scale);
-                        vm.ssb.SchemaId = vm.schemeBuilderDetailFilter.schemeId;
-                        service.editSchemeSideB(vm.ssb).then(
-                            function () {
-                                bars.ui.notify('Статус', 'Отримувача з рахунком ' + vm.ssb.RecipientAccNum + '(' + vm.ssb.CurrId + ') успішно ' + (vm.ssb.Id ? 'змінено' : 'добавлено') + ' у схемі перекриття.', 'success');
-                                vm.schemeBuilderDetailGrid.dataSource.read();
-                                $scope.editSchemeSideBWindow.close();
-                            });
-                    }
             }
 
             // edit window for scheme account
@@ -145,10 +185,54 @@
             vm.showEditSsbWindow = function (editMode, title, row) {
                 vm.ssb = row || { CurrId: selectedSBRow().CurrId };
                 vm.ssb.editMode = editMode;
+
                 $scope.$apply();
                 $scope.validatorSB.hideMessages();
                 $scope.editSchemeSideBWindow.setOptions({ title: title });
                 $scope.editSchemeSideBWindow.center().open();
+
+                vm.selectedDetailRow = selectedSBDRow()
+
+                vm.editFormulaChange($('#ssbFormula').val());
+            };
+
+            vm.selectedDetailRow = undefined;
+            vm.editFormulaChange = function (val) {
+                //var grid = $('#detailsGrid').data("kendoGrid");
+                //var data = grid.dataItem(grid.select());
+
+                var data = vm.selectedDetailRow;
+
+                if (val) {
+                    $('#ssbCoefficient').data('kendoNumericTextBox').enable(false);
+                    $('#ssbKod').data('kendoNumericTextBox').enable(true);
+
+                    var _val = $('#ssbKod').data('kendoNumericTextBox').value();;
+                    if (!_val) {
+                        var newKod = getNextKodValue();
+                        $('#ssbKod').data('kendoNumericTextBox').value(newKod);
+                        if (vm.ssb.editMode)
+                            data.set("Kod", newKod);
+                    }
+                    $('#ssbCoefficient').data('kendoNumericTextBox').value(1);
+                    vm.ssb.Coefficient = 1;
+                    if (vm.ssb.editMode)
+                        data.set("Coefficient", 1);
+                } else {
+                    $('#ssbKod').data('kendoNumericTextBox').value('');
+                    $('#ssbKod').data('kendoNumericTextBox').enable(false);
+
+                    $('#ssbCoefficient').data('kendoNumericTextBox').enable(true);
+                    $('#ssbCoefficient').data('kendoNumericTextBox').value(0);
+
+                    vm.ssb.Coefficient = 0;
+                    vm.ssb.Kod = null;
+
+                    if (vm.ssb.editMode) {
+                        data.set("Coefficient", 0);
+                        data.set("Kod", '');
+                    }
+                }
             };
 
             // main grid toolbar
@@ -219,22 +303,26 @@
                         type: 'button',
                         text: '<i class="pf-icon pf-16 pf-save"></i> Зберегти',
                         click: function () {
+                            vm.ssb.editMode = true;
                             var data = vm.schemeBuilderDetailGrid.dataSource.data();
                             var totalCoefficient = 0;
                             var editedRows = [];
+                            var kodesArr = [];
                             for (var i = 0; i < data.length; i++) {
-                                totalCoefficient += data[i].Coefficient;
+                                if (!data[i].Formula) {
+                                    totalCoefficient += data[i].Coefficient;
+                                } else {
+                                    kodesArr.push(data[i].Kod);
+                                }
                                 if (data[i].dirty)
                                     editedRows.push(data[i]);
                             }
-			    totalCoefficient = Math.round(totalCoefficient * 10000000) / 10000000;
-                            if (totalCoefficient !== 1) {
-                                bars.ui.error({ title: 'Помилка', text: 'Сума усіх коефіцієнтів повинна дорівнювати 1, поточна сума - ' + totalCoefficient });
-                            }
-                            else {
+                            totalCoefficient = Math.round(totalCoefficient * 10000000) / 10000000;
+
+                            if (checkCoefAndKodes(totalCoefficient, kodesArr)) {
                                 if (editedRows.length > 0)
                                     vm.saveSchemeSideB(null, editedRows);
-                                else 
+                                else
                                     bars.ui.alert({ title: 'Збереження', text: 'Відсутні данні для збереження!' });
                             }
                         }
@@ -330,31 +418,31 @@
                     }
                 },
                 columns: [
-                   {
-                       field: 'AccNum',
-                       title: 'Рахунок',
-                       width: '120px'
-                   }, {
-                       field: 'CurrId',
-                       title: 'Валюта',
-                       width: '30px'
-                   }, {
-                       field: 'Name',
-                       title: 'Назва рахунку',
-                       width: '200px'
-                   }, {
-                       field: 'CustCode',
-                       title: 'ОКПО',
-                       width: '100px'
-                   }, {
-                       field: 'SchemaId',
-                       title: 'Номер схеми',
-                       width: '160px'
-                   }, {
-                       field: 'CalcMethod',
-                       title: 'Спосіб обрахування суми',
-                       width: '80px'
-                   }
+                    {
+                        field: 'AccNum',
+                        title: 'Рахунок',
+                        width: '120px'
+                    }, {
+                        field: 'CurrId',
+                        title: 'Валюта',
+                        width: '30px'
+                    }, {
+                        field: 'Name',
+                        title: 'Назва рахунку',
+                        width: '200px'
+                    }, {
+                        field: 'CustCode',
+                        title: 'ОКПО',
+                        width: '100px'
+                    }, {
+                        field: 'SchemaId',
+                        title: 'Номер схеми',
+                        width: '160px'
+                    }, {
+                        field: 'CalcMethod',
+                        title: 'Спосіб обрахування суми',
+                        width: '80px'
+                    }
                 ]
             };
 
@@ -363,6 +451,13 @@
                 decimals: 10,
                 restrictDecimals: true,
                 step: 0.01
+            };
+
+            vm.kodOptions = {
+                format: "n0",
+                decimals: 0,
+                restrictDecimals: true,
+                step: 1
             };
 
             // setting detail scheme grid
@@ -419,83 +514,170 @@
                                 RecipientAccNum: { type: 'string', editable: false },
                                 RecipientName: { type: 'string', editable: true },
                                 RecipienCustCode: { type: 'string' },
-                                Narrative: { type: 'string' }
+                                Narrative: { type: 'string' },
+                                Kod: { type: 'number' },
+                                Formula: { type: 'string' }
                             }
                         }
                     }
                 },
                 editable: true,
                 columns: [
-                   {
-                       field: 'OpType',
-                       title: 'Вид док.',
-                       width: '5%'
-                   }, {
-                       field: 'OpCode',
-                       title: 'Код оп.',
-                       width: '5%'
-                   }, {
-                       field: 'RecipientBankId',
-                       title: 'МФО отримувача',
-                       width: '10%'
-                   }, {
-                       field: 'RecipientAccNum',
-                       title: 'Рахунок отимувача',
-                       width: '10%',
-                   }, {
-                       field: 'CurrId',
-                       title: 'Валюта',
-                       width: '5%',
-                   }, {
-                       field: 'Coefficient',
-                       title: 'Коефіціент',
-                       width: '10%',
-                       format: "{0:n10}",
-                       editor: numberEditor,
-                   }, {
-                       field: 'RecipientName',
-                       title: 'Отримувач',
-                       width: '20%',
-                       editor: stringEditor,
-                   }, {
-                       field: 'Narrative',
-                       title: 'Призначення платежу',
-                       width: '25%',
-                       editor: stringEditor,
-                   }, {
-                       field: 'RecipienCustCode',
-                       title: 'ОКПО отримувача',
-                       width: '10%',
-                       editor: stringEditor
-                   }, {
-                       field: 'Scale',
-                       title: 'Рівень',
-                       width: '10%'
-                   }
+                    {
+                        field: 'OpType',
+                        title: 'Вид док.',
+                        width: 100
+                    }, {
+                        field: 'OpCode',
+                        title: 'Код оп.',
+                        width: 100
+                    }, {
+                        field: 'RecipientBankId',
+                        title: 'МФО отримувача',
+                        width: 155
+                    }, {
+                        field: 'RecipientAccNum',
+                        title: 'Рахунок отимувача',
+                        width: 165
+                    }, {
+                        field: 'CurrId',
+                        title: 'Валюта',
+                        width: 95
+                    }, {
+                        field: 'Coefficient',
+                        title: 'Коефіціент',
+                        width: 120,
+                        format: "{0:n10}",
+                        editor: numberEditor,
+                    }, {
+                        field: 'RecipientName',
+                        title: 'Отримувач',
+                        width: 220,
+                        editor: stringEditor,
+                    }, {
+                        field: 'Narrative',
+                        title: 'Призначення платежу',
+                        width: 300,
+                        editor: stringEditor,
+                    }, {
+                        field: 'RecipienCustCode',
+                        title: 'ОКПО отримувача',
+                        width: 160,
+                        editor: stringEditor
+                    }, {
+                        field: 'Formula',
+                        width: 110,
+                        title: 'Формула',
+                        headerAttributes: {
+                            title: 'Заповнюється формулою розрахунку суми, або сумою у КОПІЙКАХ!'
+                        },
+                        editor: formulaEditor
+                    }, {
+                        field: 'Kod',
+                        width: 160,
+                        title: 'Пріоритет розрах.',
+                        editor: kodEditor
+                    }, {
+                        field: 'Scale',
+                        title: 'Рівень',
+                        width: 90
+                    }
                 ]
             };
 
-            function numberEditor(container, options) {
+            function kodEditor(container, options) {
                 $('<input ng-model="sbCtrl.ssb.' + options.field + '" name="' + options.field + '"/>')
-                        .appendTo(container)
-                        .kendoNumericTextBox({
-                            format: "{0:n10}",
-                            decimals: 10,
-                            restrictDecimals: true,
-                            min: 0,
-                            max: 1,
-                            step: 0.01
-                            //,change: onInlineFieldChange,
-                        });
+                    .appendTo(container)
+                    .kendoNumericTextBox({
+                        format: "n0",
+                        decimals: 0,
+                        restrictDecimals: true,
+                        min: 1,
+                        max: 9,
+                        step: 1
+                    });
+            }
+
+            function numberEditor(container, options) {
+                var gridWidget = $('#detailsGrid').data("kendoGrid");
+                var tr = $(container).closest('tr');
+                var selectedItem = gridWidget.dataItem(tr);
+
+                if (selectedItem.Formula) {
+                    gridWidget.closeCell();
+                    return;
+                }
+
+                $('<input ng-model="sbCtrl.ssb.' + options.field + '" name="' + options.field + '"/>')
+                    .appendTo(container)
+                    .kendoNumericTextBox({
+                        format: "{0:n10}",
+                        decimals: 10,
+                        restrictDecimals: true,
+                        min: 0,
+                        max: 1,
+                        step: 0.01,
+                        change: function (e) {
+                            var selectedItem = gridWidget.dataItem(tr);
+
+                            if (selectedItem.Formula) {
+                                selectedItem.Coefficient = 1;
+                                $(this).val(1);
+                                bars.ui.alert({ text: 'У даному рядку заповнено поле формула.<br/>Для редагування коефіцієнту видаліть формулу.' });
+                            }
+                        }
+                    });
             }
             function stringEditor(container, options) {
                 $('<input ng-model="sbCtrl.ssb.' + options.field + '" name="' + options.field + '" class="k-textbox" />')
                     .change(onInlineFieldChange)
-                        .appendTo(container);
+                    .appendTo(container);
             }
 
+            function formulaEditor(container, options) {
+                $('<input ng-model="sbCtrl.ssb.' + options.field + '" name="' + options.field + '" class="k-textbox" />')
+                    .change(function () {
+                        var val = $(this).val();
+
+                        var grid = $(this).closest('.k-grid.k-widget').data("kendoGrid");
+                        var tr = $(this).closest("tr");
+                        var data = grid.dataItem(tr);
+
+                        if (val) {
+                            if (!data.Kod)
+                                data.set('Kod', getNextKodValue());
+                            data.set("Coefficient", 1);
+                        } else {
+                            data.set('Kod', '');
+                            data.set("Coefficient", 0);
+                        }
+                    })
+                    .appendTo(container);
+            };
+            function getNextKodValue() {
+                var curData = $('#detailsGrid').data("kendoGrid").dataSource.view();
+                var curKodes = [];
+
+                for (var i = 0; i < curData.length; i++) {
+                    curKodes.push(curData[i].Kod);
+                }
+                for (var i = 1; i < 10; i++) {
+                    if (!isInArray(i, curKodes)) return i;
+                }
+
+                function isInArray(item, arr) {
+                    for (var i = 0; i < arr.length; i++) {
+                        if (item == arr[i])
+                            return true;
+                    }
+                    return false;
+                };
+
+                return 0;
+            };
 
             function onInlineFieldChange() {
+                vm.ssb.editMode = true;
                 vm.saveSchemeSideB(selectedSBDRow());
             }
 

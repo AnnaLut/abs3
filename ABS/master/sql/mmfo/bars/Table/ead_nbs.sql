@@ -38,6 +38,15 @@ begin
   for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'ACC_TYPE')) loop
     execute immediate 'alter table EAD_NBS add acc_type varchar2(100)';
   end loop;
+   for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'TIP')) loop
+    execute immediate 'alter table EAD_NBS add tip varchar2(3)';
+  end loop;
+    for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'OB22')) loop
+    execute immediate 'alter table EAD_NBS add ob22 varchar2(3)';
+  end loop;
+    for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'ID')) loop
+    execute immediate 'alter table EAD_NBS add id varchar2(3)';
+  end loop;  
 end;
 /
 
@@ -46,22 +55,27 @@ PROMPT *** ALTER_POLICIES to EAD_NBS ***
 execute bpa.alter_policies('EAD_NBS');
 
 
-COMMENT ON TABLE EAD_NBS IS 'Балансові рахунки для синхронізації з ЕА';
-COMMENT ON COLUMN EAD_NBS.NBS IS 'Балансовий рахунок до відправки';
+COMMENT ON TABLE EAD_NBS           IS 'Балансові рахунки для синхронізації з ЕА';
+COMMENT ON COLUMN EAD_NBS.NBS      IS 'Балансовий рахунок до відправки';
 COMMENT ON COLUMN EAD_NBS.CUSTTYPE IS 'Групування для різних типів клієнта';
 COMMENT ON COLUMN EAD_NBS.AGR_TYPE IS 'Тип угоди, якщо безумовний, якщо є варіанті - не заповнювати';
 COMMENT ON COLUMN EAD_NBS.ACC_TYPE IS 'Тип рахунку, якщо безумовний, якщо є варіанті - не заповнювати';
-
+COMMENT ON COLUMN EAD_NBS.TIP      IS 'Тип счета (или маска -  TIP%)  с учетом справочника TIPS';
+COMMENT ON COLUMN EAD_NBS.OB22     IS 'Аналiтика рах. Розширення БР. (accounts.ob22)';
+COMMENT ON COLUMN EAD_NBS.id       IS 'Локальный идентификатор';
 
 PROMPT *** Create  index PK_EADNBS ***
 begin
-  execute immediate 'CREATE UNIQUE INDEX PK_EADNBS ON EAD_NBS (NBS,CUSTTYPE) TABLESPACE brssmli';
+  execute immediate 'drop INDEX PK_EADNBS';
 exception when others then if (sqlcode = -955) then null; else raise; end if;
 end;
 /
-
-
-
+begin
+--  execute immediate 'drop INDEX PK_EADNBS';
+  execute immediate 'CREATE UNIQUE INDEX PK_EADNBS ON EAD_NBS (NBS, CUSTTYPE, TIP, ACC_TYPE, OB22) TABLESPACE brssmli';
+exception when others then if (sqlcode = -955) then null; else raise; end if;
+end;
+/
 PROMPT *** Create  grants  EAD_NBS ***
 GRANT SELECT ON EAD_NBS TO BARS_ACCESS_DEFROLE;
 

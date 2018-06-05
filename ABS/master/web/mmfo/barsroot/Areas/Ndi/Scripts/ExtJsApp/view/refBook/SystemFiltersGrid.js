@@ -41,8 +41,6 @@ Ext.define('ExtApp.view.refBook.SystemFiltersGrid', {
 
         //поля модели, вместо модели используем свойство store.fields, которое построит динамическую модель
         var modelFields = new Array();
-        //поля для формы редактирования
-        var formFields = new Array();
         //цикл по метаданным колонок
         Ext.each(grid.metadata.filtersMetainfo.FiltersMetaColumns, function () {
             var colMetaInfo = this;
@@ -54,8 +52,6 @@ Ext.define('ExtApp.view.refBook.SystemFiltersGrid', {
             if (colMetaInfo.NOT_TO_SHOW == 0) {
                 //заполняем колонки грида
                 grid.columns.push(grid.configGridColumn(colMetaInfo));
-                //заполняем поля формы редактирования
-                formFields.push(ExtApp.utils.RefBookUtils.configFormField(colMetaInfo));
             }
         });
 

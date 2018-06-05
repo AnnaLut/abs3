@@ -94,6 +94,7 @@ function homeController($scope, paramsService, $window, LS) {
                     OSTP: { type: "number" },
                     OST_2VP: { type: "number" },
                     OSTR: { type: "number" },
+                    OSTRD: { type: "number" },
                     OSTR2: { type: "number" },
                     OSTR3: { type: "number" },
                     OSTEXPN: { type: "number" },
@@ -163,6 +164,7 @@ function homeController($scope, paramsService, $window, LS) {
             { field: "OSTP", title: "Сума<br>премії<br>Р", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTP,'n2')#</div>" },
             { field: "OST_2VP", title: "Сума<br>премії<br>2VР", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OST_2VP,'n2')#</div>" },
             { field: "OSTR", title: "Сума<br>нарах.%<br>R", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTR,'n2')#</div>" },
+            { field: "OSTRD", title: "Сума<br>нарах.%<br>дивідентів", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTRD,'n2')#</div>" },
             { field: "OSTR2", title: "Сума<br>куплених.%<br>R2", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTR2,'n2')#</div>" },
             { field: "OSTR3", title: "Сума<br>куплених.%<br>R3", width: 90, template: "<div style='text-align:right;'>#=kendo.toString(OSTR3,'n2')#</div>" },
             { field: "OSTUNREC", title: "Остат.<br>невизн.куп.%<br>доходів", width: 100 },
@@ -349,6 +351,21 @@ function homeController($scope, paramsService, $window, LS) {
         });
     }
 
+    $scope.openMetaTableWithRef = function () {
+        debugger;
+        var options = {
+            jsonSqlParams: "[{\"Name\":\"P_REF\",\"Type\":\"S\",\"Value\":" + $scope.firstSelRow.REF+ "}]",
+            code: "V_CP_INT_DIVIDENTS",
+            hasCallbackFunction: false//,
+            // externelFuncOnly: true,
+        };
+
+
+        bars.ui.getMetaDataNdiTable("", function () {
+
+        }, options);
+
+    }
     $scope.getBMD = function () {
         bars.ui.getMetaDataNdiTable("CP_KOD", function (response) {
             bars.ui.dialog({

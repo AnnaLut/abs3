@@ -43,7 +43,7 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 

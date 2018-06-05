@@ -90,9 +90,9 @@
             "referenceGrid pagingtoolbar button#clearFilterButton": {
                 click: this.onClearFilterClick
             },
-            "referenceGrid pagingtoolbar button#applyFilterButton": {
-                click: this.onapplyFilterButtonClick
-            },
+            //"referenceGrid pagingtoolbar button#applyFilterButton": {
+            //    click: this.onapplyFilterButtonClick
+            //},
             "GridCustomFilter toolbar button#removeFilterButton": {
                 click: this.onremoveFilterButtonClick
             },
@@ -698,23 +698,23 @@
         Ext.MessageBox.show({ title: 'умови фільтра', msg: Where_clause, buttons: Ext.MessageBox.OK });
     },
 
-    onapplyFilterButtonClick: function (button, e) {
-        
-        var thisController = this;
-        var referenceGrid = thisController.getGrid();
-        var metadata = referenceGrid.metadata;
-        //metadata.startFilter = [];
-
-        // var formFields = [];
-        //var CustomFilters = [];
-        //если есть информация о начальных фильтрах
-        if (metadata.filtersMetainfo.CustomFilters && metadata.filtersMetainfo.CustomFilters.length > 0
-            || metadata.filtersMetainfo.SystemFilters && metadata.filtersMetainfo.SystemFilters.length > 0) {
-            thisController.showBeforeFilterDialog(metadata, referenceGrid);
-        } else {
-            referenceGrid.store.reload();
-        }
-    },
+    //onapplyFilterButtonClick: function (button, e) {
+    //
+    //    var thisController = this;
+    //    var referenceGrid = thisController.getGrid();
+    //    var metadata = referenceGrid.metadata;
+    //    //metadata.startFilter = [];
+//
+    //    // var formFields = [];
+    //    //var CustomFilters = [];
+    //    //если есть информация о начальных фильтрах
+    //    if (metadata.filtersMetainfo.CustomFilters && metadata.filtersMetainfo.CustomFilters.length > 0
+    //        || metadata.filtersMetainfo.SystemFilters && metadata.filtersMetainfo.SystemFilters.length > 0) {
+    //        thisController.showBeforeFilterDialog(metadata, referenceGrid);
+    //    } else {
+    //        referenceGrid.store.reload();
+    //    }
+    //},
 
     onViewInfo: function (button) {
         this.onFormViewBtnClick(button);
@@ -1578,7 +1578,7 @@
     },
 
     showBeforeFilterDialog: function (metadata, referenceGrid) {
-
+        
         var thisController = this;
         metadata = thisController.setAccessLevel(metadata);
         thisController.controllerMetadata = metadata;
@@ -1618,9 +1618,10 @@
 
         var hasCustomFilter = controllerMetadata.filtersMetainfo.CustomFilters && controllerMetadata.filtersMetainfo.CustomFilters.length > 0;
         var hasSystemFilter = controllerMetadata.filtersMetainfo.SystemFilters && controllerMetadata.filtersMetainfo.SystemFilters.length > 0;
+        var hasGridColors = controllerMetadata.colorsForGrid && controllerMetadata.colorsForGrid.length && controllerMetadata.colorsForGrid.length > 0;
         ////если есть информация о начальных фильтрах
         controllerMetadata.SympleFilters = ExtApp.utils.RefBookUtils.configFieldsForeSympleFilters(controllerMetadata.filtersMetainfo.FilterColumns);
-
+        
         if (controllerMetadata.filtersMetainfo.ShowFilterWindow != 'false' || hasCustomFilter || hasSystemFilter) {
             //if (controllerMetadata.filtersMetainfo.CustomFilters && controllerMetadata.filtersMetainfo.CustomFilters.length > 0
             //    || controllerMetadata.filtersMetainfo.SystemFilters && controllerMetadata.filtersMetainfo.SystemFilters.length > 0) {
@@ -1642,7 +1643,6 @@
                 ]
             });
 
-
             if (hasSystemFilter) {
                 tab.add({
                     title: 'Системні',
@@ -1652,6 +1652,7 @@
                     maxHeight: 600
                 });
             }
+
             //if (controllerMetadata.filtersMetainfo.CustomFilters && controllerMetadata.filtersMetainfo.CustomFilters.length > 0)
             tab.add(
                {
@@ -1695,6 +1696,16 @@
                 width: '100%',
                 maxHeight: 600
             });
+            if(hasGridColors)
+            tab.add(
+                {
+                    title: 'Опис кольорів',
+                    id: 'ColorTabId',
+                    items: Ext.create('ExtApp.view.refBook.ColorSemanticGrid', { thisController: thisController }),
+                    minHeight: 100,
+                    width: '100%',
+                    maxHeight: 600
+                });
             //показываем диалог
             var wind = Ext.create('ExtApp.view.refBook.FilterWindow',
             {
@@ -1715,13 +1726,11 @@
                 }
 
             });
-
-
-            tab.setActiveTab(3);
-            tab.setActiveTab(2);
+            
+            for (var i = 0; i < tab.items.length; i++) {
+                tab.setActiveTab(i);
+            }
             wind.setSize(500, 400);
-            tab.setActiveTab(1);
-            tab.setActiveTab(0);
             tab.setActiveTab('ConstructorTabId');
             // if (applyFilters && applyFilters.DynamicBeforeFilters.length > 0)
             thisController.insertDefaultFiltersValues();
@@ -1729,7 +1738,7 @@
         } else {
             Ext.create('ExtApp.view.refBook.RefGrid', { metadata: controllerMetadata });
         }
-
+        thisController.insertClorsSemantic();
     },
 
     filterDialogOkBtnHandler: function (btn) {
@@ -2073,8 +2082,8 @@
     },
 
     insertDefaultFiltersValues: function () {
+        
         var thisController = this;
-
         var applyFilters = thisController.controllerMetadata.applyFilters;
         if (!applyFilters)
             return false;
@@ -2153,6 +2162,27 @@
         thisController.controllerMetadata.mainGrid = Ext.getCmp('mainReferenceGrid');
         if (thisController.controllerMetadata.mainGrid)
             thisController.updateGridByFilters();
+    },
+
+    insertClorsSemantic: function () {
+        
+        var  thisController = this;
+        var colorRows =  thisController.controllerMetadata.colorsForGrid;
+        if(colorRows && colorRows.length && colorRows.length > 0)
+        var colorGrid = Ext.getCmp('ColorSemanticGridId');
+        if ( !colorGrid || !colorRows || colorRows.length < 1)
+            return false;
+        var store = colorGrid.getStore();
+
+        Ext.each(colorRows,
+            function (row) {
+                var model = ExtApp.utils.RefBookUtils.createGridModel('rowColorMdoel');
+                model.data['COLOR_NAME'] = row.COLOR_NAME;
+                model.data['COLOR_SEMANTIC'] = row.COLOR_SEMANTIC;
+                var count = store.getCount();
+                store.insert(count, model.data);
+            });
+        
     },
 
     updateDynamiFilterFromGrid: function () {

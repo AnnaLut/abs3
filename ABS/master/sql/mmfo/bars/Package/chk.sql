@@ -1,10 +1,8 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/chk.sql =========*** Run *** =======
+PROMPT ===================================================================================== 
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/chk.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CHK IS
+CREATE OR REPLACE PACKAGE BARS.CHK IS
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
 -- *                Unity-Bars (c) 2000-2009                          *
@@ -341,7 +339,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CHK IS
    -- VISASIGN                         Демарк (уточнить, нужен ли макрос FM)
 */
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.55 2017-04-06';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.56 2018-05-22';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -4204,20 +4202,16 @@ begin
             -- для кассовых операций смотрим на бранчи кассовых счетов в проводках
             select substr( max( sys_connect_by_path(branch, ',') ) || ',' , 2 )
               into l_next_visa_branches
-              from
-              (
-                select rownum rn, branch
-                  from
-                  (
-                    select unique a.branch
-                      from opldok p, accounts a
-                     where p.ref = chk.doc.ref
-                       and p.acc = a.acc
-                       and a.nbs in ('1001', '1002', '1101', '1102', '1004', '1005',
-                                     '9812','9819','9820','9821','9890','9891','9892',
-                                     '9893','9898','9899','9830','9831')
-                  )
-              )
+              from ( select rownum rn, branch
+                       from ( select unique a.branch
+                                from opldok p, accounts a
+                               where p.ref = chk.doc.ref
+                                 and p.acc = a.acc
+                                 and a.nbs in ('1001','1002','1004','1005','1101','1102'
+                                              ,'9810','9812','9819','9820','9821','9830','9831'
+                                              ,'9890','9891','9892','9893','9898','9899')
+                            )
+                   )
             connect by prior rn+1=rn
               start with rn=1;
             --
@@ -4228,29 +4222,25 @@ begin
                 --
                 select substr( max( sys_connect_by_path(branch, ',') ) || ',' , 2 )
                   into l_next_visa_branches
-                  from
-                  (
-                    select rownum rn, branch
-                      from
-                      (
-                        select branch
-                          from accounts
-                         where nls = chk.doc.nlsa
-                           and kv = chk.doc.kv
-                           and nbs in ('1001', '1002', '1101', '1102', '1004', '1005',
-                                         '9812','9819','9820','9821','9890','9891','9892',
-                                         '9893','9898','9899','9830','9831')
-                        union all
-                        select branch
-                          from accounts
-                         where nls = chk.doc.nlsb
-                           and kv = chk.doc.kv
-                           and nbs in ('1001', '1002', '1101', '1102', '1004', '1005',
-                                         '9812','9819','9820','9821','9890','9891','9892',
-                                         '9893','9898','9899','9830','9831')
-                      )
-                  )
-                  connect by prior rn+1=rn
+                  from ( select rownum rn, branch
+                           from ( select branch
+                                    from accounts
+                                   where nls = chk.doc.nlsa
+                                     and kv = chk.doc.kv
+                                     and nbs in ('1001','1002','1004','1005','1101','1102'
+                                                ,'9810','9812','9819','9820','9821','9830','9831'
+                                                ,'9890','9891','9892','9893','9898','9899')
+                                   union all
+                                  select branch
+                                    from accounts
+                                   where nls = chk.doc.nlsb
+                                     and kv = chk.doc.kv
+                                     and nbs in ('1001','1002','1004','1005','1101','1102'
+                                                ,'9810','9812','9819','9820','9821','9830','9831'
+                                                ,'9890','9891','9892','9893','9898','9899')
+                                )
+                       )
+                connect by prior rn+1=rn
                   start with rn=1;
             end if;
             --
@@ -4270,37 +4260,36 @@ BEGIN
 
 END chk;
 /
- show err;
- 
-PROMPT *** Create  grants  CHK ***
-grant EXECUTE                                                                on CHK             to ABS_ADMIN;
-grant EXECUTE                                                                on CHK             to BARS009;
-grant EXECUTE                                                                on CHK             to BARS010;
-grant EXECUTE                                                                on CHK             to BARS014;
-grant EXECUTE                                                                on CHK             to BARSAQ with grant option;
-grant EXECUTE                                                                on CHK             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on CHK             to CHCK;
-grant EXECUTE                                                                on CHK             to JBOSS_USR;
-grant EXECUTE                                                                on CHK             to OPER000;
-grant EXECUTE                                                                on CHK             to OPERKKK;
-grant EXECUTE                                                                on CHK             to OW;
-grant EXECUTE                                                                on CHK             to PYOD001;
-grant EXECUTE                                                                on CHK             to START1;
-grant EXECUTE                                                                on CHK             to TOSS;
-grant EXECUTE                                                                on CHK             to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on CHK             to WR_CHCKINNR_ALL;
-grant EXECUTE                                                                on CHK             to WR_CHCKINNR_CASH;
-grant EXECUTE                                                                on CHK             to WR_CHCKINNR_SELF;
-grant EXECUTE                                                                on CHK             to WR_CHCKINNR_SUBTOBO;
-grant EXECUTE                                                                on CHK             to WR_CHCKINNR_TOBO;
-grant EXECUTE                                                                on CHK             to WR_DOCVIEW;
-grant EXECUTE                                                                on CHK             to WR_DOC_INPUT;
-grant EXECUTE                                                                on CHK             to WR_IMPEXP;
-grant EXECUTE                                                                on CHK             to WR_VERIFDOC;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/chk.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 
+show err;
+
+PROMPT *** Create  grants  CHK ***
+
+grant EXECUTE on CHK to ABS_ADMIN;
+grant EXECUTE on CHK to BARS009;
+grant EXECUTE on CHK to BARS010;
+grant EXECUTE on CHK to BARS014;
+grant EXECUTE on CHK to BARSAQ with grant option;
+grant EXECUTE on CHK to BARS_ACCESS_DEFROLE;
+grant EXECUTE on CHK to CHCK;
+grant EXECUTE on CHK to JBOSS_USR;
+grant EXECUTE on CHK to OPER000;
+grant EXECUTE on CHK to OPERKKK;
+grant EXECUTE on CHK to OW;
+grant EXECUTE on CHK to PYOD001;
+grant EXECUTE on CHK to START1;
+grant EXECUTE on CHK to TOSS;
+grant EXECUTE on CHK to WR_ALL_RIGHTS;
+grant EXECUTE on CHK to WR_CHCKINNR_ALL;
+grant EXECUTE on CHK to WR_CHCKINNR_CASH;
+grant EXECUTE on CHK to WR_CHCKINNR_SELF;
+grant EXECUTE on CHK to WR_CHCKINNR_SUBTOBO;
+grant EXECUTE on CHK to WR_CHCKINNR_TOBO;
+grant EXECUTE on CHK to WR_DOCVIEW;
+grant EXECUTE on CHK to WR_DOC_INPUT;
+grant EXECUTE on CHK to WR_IMPEXP;
+grant EXECUTE on CHK to WR_VERIFDOC;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/chk.sql =========*** End *** =======
+PROMPT ===================================================================================== 

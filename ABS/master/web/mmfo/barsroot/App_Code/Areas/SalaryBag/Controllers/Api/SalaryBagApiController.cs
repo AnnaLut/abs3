@@ -912,7 +912,7 @@ namespace BarsWeb.Areas.SalaryBag.Controllers.Api
 
         #region EA
         [HttpGet]
-        public HttpResponseMessage GetDocumentsFromEA(string rnk, string zpId)
+        public HttpResponseMessage GetDocumentsFromEA(string rnk, string zpId, string structCodes)
         {
             zpId = zpId.Substring(0, zpId.Length - 2);
             rnk = rnk.Substring(0, rnk.Length - 2);
@@ -933,7 +933,7 @@ namespace BarsWeb.Areas.SalaryBag.Controllers.Api
 
                 List<Bars.EAD.Structs.Result.DocumentData> eaDocs = EADService.GetDocumentData("", Convert.ToDecimal(rnk), Convert.ToDouble(zpId), null, null, null, null, null, null, Kf);
 
-                return Request.CreateResponse(HttpStatusCode.OK, new ResponseSB() { ResultObj = _repo.CheckDocs(eaDocs) });
+                return Request.CreateResponse(HttpStatusCode.OK, new ResponseSB() { ResultObj = _repo.CheckDocs(eaDocs, string.IsNullOrWhiteSpace(structCodes) ? null : structCodes.Split(',').ToList()) });
             }
             catch (Exception ex)
             {

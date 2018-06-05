@@ -45,31 +45,32 @@ PROMPT *** Create  trigger TIU_BLKD11 ***
       RETURN INT
    IS
    BEGIN
-      BEGIN
-         SELECT 1
-           INTO is_dp
-           FROM dpt_accounts
-          WHERE accid = p_acc;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            IF p_nbs IN ('2620',
-                         '2628',
-                         '2630',
-                         '2635',
-                         '2638',
-                         '2610',
-                         '2618',
-                         '2615',
-                         '2650',
-                         '2658')
-            THEN
-               is_dp := 1;
-            ELSE
-               is_dp := 0;
-            END IF;
-      END;
-
+      IF :OLD.TIP NOT LIKE 'W4%' THEN
+        BEGIN
+           SELECT 1
+             INTO is_dp
+             FROM dpt_accounts
+            WHERE accid = p_acc;
+        EXCEPTION
+           WHEN NO_DATA_FOUND
+           THEN
+              IF p_nbs IN ('2620',
+                           '2628',
+                           '2630',
+                           '2635',
+                           '2638',
+                           '2610',
+                           '2618',
+                           '2615',
+                           '2650',
+                           '2658')
+              THEN
+                 is_dp := 1;
+              ELSE
+                 is_dp := 0;
+              END IF;
+        END;
+      END IF;
       RETURN is_dp;
    END;
 BEGIN

@@ -9,7 +9,7 @@ IS
 
    TYPE t_cursor IS REF CURSOR;
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.61 12.04.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.62 23.05.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -650,11 +650,23 @@ procedure request_forbackoff(p_transactionid in number,
 procedure request_frombackoff(p_req_id     in cust_requests.req_id%type,
                               resultstate     out number,
                               result_comments out varchar2);
+ -- Отримання номеру запиту(ReqId)                             
+   procedure request_access_req(
+                                p_type         in   cust_requests.req_type%type,
+                                p_trustee      in   cust_requests.trustee_type%type,
+                                p_rnk          in   cust_requests.trustee_rnk%type,
+                                p_cert_num     in   cust_requests.certif_num%type,
+                                p_cert_date    in   cust_requests.certif_date%type,
+                                p_date_start   in   cust_requests.date_start%type,
+                                p_date_finish  in   cust_requests.date_finish%type,
+                                p_access_info  in   XMLType,
+                                p_reqid        out  cust_requests.req_id%type
+                                );
 end;
 /
 CREATE OR REPLACE PACKAGE BODY XRM_INTEGRATION_OE
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.95 11.04.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.62 23.05.2018';
    g_null_date      CONSTANT DATE := null;
 
    FUNCTION body_version
@@ -1329,7 +1341,7 @@ IS
       ResultCode := 0;
       ResultMessage := 'Ok';
       bc.go (p_branch);
-      l_verified_docs := GET_VERIFIED_STATE(l_rnk);
+      l_verified_docs := GET_VERIFIED_STATE(p_rnk);
     bars_audit.trace (title || 'dpt_web.l_verified_docs =' || to_char(l_verified_docs));
       if l_verified_docs = 1
       then
@@ -2812,7 +2824,7 @@ IS
     dbms_session.set_context('clientcontext','iscrm','1');
     ebp.CREATE_ACCESS_REQUEST
       ( p_type         =>  p_type,
-        p_trustee      =>  bars_sqnc.rukey(p_trustee),
+        p_trustee      =>  p_trustee,
         p_rnk          =>  bars_sqnc.rukey(p_rnk),
         p_cert_num     =>  p_cert_num,
         p_cert_date    =>  p_cert_date,
@@ -3795,8 +3807,19 @@ PROCEDURE CreateDepositAgreement (
     ow_utl.acc_req_file_processing;
 
     l_ticketdata := to_blob('0');
-    FOR rec_tr_unit IN (SELECT *
+    FOR rec_tr_unit IN (SELECT t.id,
+                               t.unit_type_id,
+                               ob.id external_file_id,
+                               t.receiver_url,
+                               t.request_data,
+                               t.response_data,
+                               t.state_id,
+                               t.failures_count,
+                               t.kf
                           FROM barstrans.transport_unit t
+                          JOIN barstrans.transport_unit_type tt 
+                          on tt.id = t.unit_type_id
+                          join OW_BATCH_FILETYPES ob on tt.transport_type_code = ob.code    
                          WHERE t.state_id IN
                                (barstrans.transport_utl.trans_state_new
                                ,barstrans.transport_utl.trans_state_failed)
@@ -3806,10 +3829,11 @@ PROCEDURE CreateDepositAgreement (
                            AND t.unit_type_id IN (3, 4, 5, 6))
     LOOP
       BEGIN
+        bc.go(rec_tr_unit.kf);
         bars.ow_batch_opening.batch_get_process(p_filename         => '0'
                                                ,p_filebody         => rec_tr_unit.request_data
                                                ,p_external_file_id => rec_tr_unit.external_file_id
-                                               ,p_filetype         => rec_tr_unit.unit_type_id
+                                               ,p_filetype         => rec_tr_unit.external_file_id
                                                ,p_ticketdata       => l_ticketdata);
 
         barstrans.transport_utl.save_response(p_id        => rec_tr_unit.id
@@ -3821,9 +3845,11 @@ PROCEDURE CreateDepositAgreement (
                                                      ,p_tracking_comment => 'Успешно сохранён ответ'
                                                      ,p_stack_trace      => barstrans.file_utl.encode_base64(l_ticketdata));
         END IF;
+         bc.home;
         dbms_lob.freetemporary(l_ticketdata);
       EXCEPTION
         WHEN OTHERS THEN
+          bc.home;
           barstrans.transport_utl.set_transport_failure(p_id            => rec_tr_unit.id
                                                        ,p_error_message => SQLERRM
                                                        ,p_stack_trace   => dbms_utility.format_error_stack() ||
@@ -4359,6 +4385,7 @@ procedure check_skrynka_menu(p_dat           in  date   default null,
   when no_data_found then
     p_resultcode    := -1;
     p_resultmessage := 'Не знайдено операції №' || p_mode;
+    RETURN;   
  end;
 
     if      l_datename1  = case when l_datename1 = 0 then 0
@@ -4423,9 +4450,9 @@ begin
       -- Call the procedure
       skrn.p_dep_skrn(dat_     => p_dat,
                       dat2_    => p_dat2,
-                      n_sk_    => p_n_sk,
+                      n_sk_    => bars_sqnc.rukey(p_n_sk),
                       mode_    => p_mode,
-                      par_     => p_nd,
+                      par_     => bars_sqnc.rukey(p_nd),
                       p_userid => bars_sqnc.rukey(p_userid),
                       p_sum    => p_sum,
                       p_extnd  => p_ndoc);
@@ -4528,16 +4555,15 @@ procedure Сlose_ContractLease(p_n_sk        in number default null, -- код ячейк
                                    p_cancel_date in varchar2) is
  l_rnk NUMBER(38);                                   
    begin
-    
-    begin 
-      select  count (c.rnk)
+      begin
+      select c.rnk
         into l_rnk
-            from customer c 
-         where c.rnk = p_rnk ; 
+            from customer c
+         where c.rnk = bars_Sqnc.rukey(p_rnk);
        exception
         when no_data_found then
           raise_application_error(-20001,
-                                  'Контрагента з таким номером не існує');
+                                  'Контрагента з таким номером не існує '||'rnk='||p_rnk);
       end;
   
  
@@ -4783,6 +4809,35 @@ exception
 
 end request_frombackoff;
 
+procedure request_access_req(
+                                p_type         in   cust_requests.req_type%type,
+                                p_trustee      in   cust_requests.trustee_type%type,
+                                p_rnk          in   cust_requests.trustee_rnk%type,
+                                p_cert_num     in   cust_requests.certif_num%type,
+                                p_cert_date    in   cust_requests.certif_date%type,
+                                p_date_start   in   cust_requests.date_start%type,
+                                p_date_finish  in   cust_requests.date_finish%type,
+                                p_access_info  in   XMLType,
+                                p_reqid        out  cust_requests.req_id%type
+                               )
+   is
+   begin
+   begin
+    dbms_session.set_context('clientcontext','iscrm','1');
+    ebp.CREATE_ACCESS_REQUEST
+      ( p_type         =>  p_type,
+        p_trustee      =>  p_trustee,
+        p_rnk          =>  bars_sqnc.rukey(p_rnk),
+        p_cert_num     =>  p_cert_num,
+        p_cert_date    =>  p_cert_date,
+        p_date_start   =>  p_date_start,
+        p_date_finish  =>  p_date_finish,
+        p_access_info  =>  p_access_info,
+        p_reqid        =>  p_reqid);
+    p_reqid := get_old_key(p_reqid);
+   end;
+    dbms_session.clear_context('clientcontext','iscrm');
+   end request_access_req;
 end;
 /
 

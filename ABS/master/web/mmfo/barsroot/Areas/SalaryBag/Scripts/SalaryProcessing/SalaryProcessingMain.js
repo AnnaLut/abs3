@@ -32,7 +32,7 @@
                 $(".custom-btn-payroll-view, .custom-btn-payroll-edit, .custom-btn-payroll-delete, .custom-btn-payroll-create, .custom-btn-payroll-ok").removeClass('invisible');
                 break;
             default:
-                $(".custom-btn-payroll-view, .custom-btn-payroll-enrollment, .custom-btn-payroll-reject").removeClass('invisible');
+                $(".custom-btn-payroll-view, .custom-btn-payroll-enrollment, .custom-btn-payroll-reject, .custom-btn-separated-watch-archive").removeClass('invisible');
                 break;
         }
     },
@@ -283,7 +283,10 @@ function getGridOptions(options, dataSourse, showSign, sosFilterDs) {
             },
             serverFiltering: true,
             serverPaging: true,
-            serverSorting: true
+            serverSorting: true,
+            requestEnd: function () {
+                enableElem('.btn.custom-btn', true);
+            }
         },
         dataSourse
     );
@@ -315,7 +318,7 @@ function mainGridChangeEventHandler() {
     }
 
     if (selectedItems.length > 1) {
-        enableElem('.custom-btn-payroll-view, .custom-btn-print, .custom-btn-payroll-reject, .custom-btn-payroll-edit, .custom-btn-payroll-ok', false);
+        enableElem('.custom-btn-payroll-view, .custom-btn-print, .custom-btn-payroll-reject, .custom-btn-payroll-edit, .custom-btn-payroll-ok, .custom-btn-ea-view', false);
         enableElem('.custom-btn-payroll-enrollment', true);
 
         if (formCfg.currentGridName == 'accepted') {
@@ -330,7 +333,7 @@ function mainGridChangeEventHandler() {
         }
         selectedItems = this.select();
     } else if (selectedItems.length > 0) {
-        enableElem('.custom-btn-payroll-delete, .custom-btn-payroll-edit, .custom-btn-payroll-view, .custom-btn-payroll-ok, .custom-btn-print', true);
+        enableElem('.custom-btn-payroll-delete, .custom-btn-payroll-edit, .custom-btn-payroll-view, .custom-btn-payroll-ok, .custom-btn-print, .custom-btn-ea-view', true);
         var sos = +this.dataItem(this.select()).sos;
         var src = +this.dataItem(this.select()).src;
 
@@ -564,9 +567,6 @@ function addEventListenersToButtons() {
             }
         });
     });
-    //$('#processed_grid').on('dblclick', 'tr:not(:first)', function() {
-    //    $('.custom-btn-payroll-view').click();
-    //});
 
     $('#date_from, #date_to').on('change', dateChangeFn);
 
@@ -630,17 +630,29 @@ function addEventListenersToButtons() {
             printPayroll(this[0]);
         });
     });
+
+    $('.custom-btn-ea-view').on('click', function () {
+        checkIfRowIsSelected(function () {
+            var zpId = this[0].zp_id;
+            var rnk = this[0].rnk;
+
+            for (var i = 0; i < this.length; i++) {
+                if (zpId != this[i].zp_id) {
+                    bars.ui.error({ text: 'Не можливо показати документи ЕА по відомостям з різних ЗП договорів.' });
+                    return;
+                }
+            }
+
+            showViewEADocsForm({ id: zpId, rnk: rnk }, ['001030001']);
+        });
+    });
 };
 
 function dateChangeFn() {
     var _value = $(this).val();
 
     _value = _value.replace(/ |,|-|\//g, '.');
-    //_value = _value.replace(/,/g, '.');
-    //_value = _value.replace(/-/g, '.');
-    //_value = _value.replace(/\//g, '.');
 
-    //var regex = /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
     var regex = /^(0[1-9]|[12][0-9]|3[01])[-/.](0[1-9]|1[012])[-/.](19|20)\d\d$/;
     if (!_value.match(regex)) {
         $(this).val('');

@@ -58,7 +58,7 @@ declare
 
 begin
 
-  l_tabsemantic := 'Відповідність критерію SPPI';
+  l_tabsemantic := '2.Відповідність критерію SPPI /  SPPI ';
   l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'SPPI';

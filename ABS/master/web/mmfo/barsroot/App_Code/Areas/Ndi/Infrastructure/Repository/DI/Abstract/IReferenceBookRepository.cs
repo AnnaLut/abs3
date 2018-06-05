@@ -144,7 +144,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         /// </summary>
         /// <exception cref="Exception"></exception>
         /// <returns></returns>
-        string GetFunNSIEditFParamsString(int? tableId, int? codeOper, int? metacolumnId, int? nativeTabelId,int? nsiTableId, int? nsiFuncId= null);
+        string GetFunNSIEditFParamsString(int? tableId, int? codeOper, int? metacolumnId, int? nativeTabelId,int? nsiTableId, int? nsiFuncId= null,string code = null);
 
         /// <summary>
         /// Получить метаданные справочников

@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_swift_msg.sql =========*** Run 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_SWIFT_MSG 
+CREATE OR REPLACE PACKAGE BARS.bars_swift_msg
 is
 
 --**************************************************************--
@@ -14,7 +8,7 @@ is
 --**************************************************************--
 
 
-    VERSION_HEADER       constant varchar2(64)  := 'version 1.08 22.10.2009';
+    VERSION_HEADER       constant varchar2(64)  := 'version 1.11 21.05.2018';
     VERSION_HEADER_DEFS  constant varchar2(512) := '';
 
     -- Устаревшие типы
@@ -314,8 +308,24 @@ is
                   p_docref       in  oper.ref%type,
                   p_rcv103bic    in  varchar2,
                   p_rcv202bic    in  varchar2     );
-
-
+       
+    -----------------------------------------------------------------
+    -- GENMSG_MT199()
+    --
+    --     Генерация MT199 - статус свифт сообщения в GPI
+    --
+    --     Параметры:
+    --
+    --         p_swref        Референс родительской свифтовки
+    --
+    --         p_statusid     Ид статуса из справочника SW_STATUSES
+    --
+ 
+--    procedure genmsg_mt199(p_swref    in sw_journal.swref%type,
+--                           p_statusid in number);
+--
+--    procedure job_send_mt199;
+--
 
 
 
@@ -342,14 +352,13 @@ is
 
 
 end bars_swift_msg;
- 
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SWIFT_MSG 
+
+CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 is
 
-    VERSION_BODY      constant varchar2(64)  := 'version 1.27 10.12.2014';
-    VERSION_BODY_DEFS constant varchar2(512) := ''
-;
+    VERSION_BODY      constant varchar2(64)  := 'version 1.36 21.05.2018';
+    VERSION_BODY_DEFS constant varchar2(512) := '';
     type t_strlist  is table of sw_operw.value%type;
     type t_reflist  is table of oper.ref%type;
 
@@ -1008,6 +1017,7 @@ is
     l_currCode  tabval.kv%type;              /*      Поле 32A:    код валюты */
     l_docAccA   oper.nlsa%type;              /*      Поле 50K:  счет клиента */
     l_accNostro accounts.acc%type;           /*    Код подобранного корсчета */
+    
 
     begin
 
@@ -1036,6 +1046,7 @@ is
                 and o.kv  = t.kv;
 
             l_value := l_value || bars_swift.AmountToSwift(l_amount, l_currCode, true, true);
+            
 
         elsif (    p_model.mt = 103
                and p_model.tag = '23'
@@ -1565,8 +1576,11 @@ is
     l_opt         sw_operw.opt%type;         /*                    Опция тега записи */
 
     l_msgAppHdrFlags sw_journal.app_flag%type; /*                    флаги сообщения */
+    
+    l_guid varchar2(36);
 
     begin
+       
 
         bars_audit.trace('genmsg_abstract: entry point');
         bars_audit.trace('par[0]=>%s par[1]=%s', to_char(p_ref), p_flag);
@@ -1732,6 +1746,9 @@ is
         --
         -- создаем заголовок (заменить)
         --
+        
+        l_guid:=bars_swift.generate_uetr;
+        
         bars_swift.In_SwJournalInt(
              ret_        => l_retCode,
              swref_      => l_swRef,
@@ -1752,7 +1769,9 @@ is
              idat_       => to_char(sysdate,  'YYYY-MM-DD HH24:MI'),
              flag_       => 'L',
              trans_      => l_transTable,
-             apphdrflg_  => l_msgAppHdrFlags );
+             apphdrflg_  => l_msgAppHdrFlags,
+             sti_        =>'001',
+             uetr_       => lower(l_guid));
 
         -- Устанавливаем признак уже оплаченного документа
         update sw_journal
@@ -1854,15 +1873,20 @@ is
     l_mt103rcv    char(11);                  /*   BIC код получателя сообщения MT103 */
     l_mt202rcv    char(11);                  /*   BIC код получателя сообщения MT202 */
     l_fld56a      sw_operw.value%type;       /*    Значение поля 56A сообщения МТ103 */
+    l_fld52a      sw_operw.value%type;       /*    Значение поля 52A сообщения МТ103 */
     l_fld56bic    char(11);                  /*             BIC код посредника (56А) */
     l_fld57a      sw_operw.value%type;       /*    Значение поля 57A сообщения МТ103 */
     l_fld59a      sw_operw.value%type;       /*    Значение поля 59A сообщения МТ103 */
+    l_guid varchar2(36);
 
     begin
 
         bars_audit.trace('genmsg_mt103: entry point');
         bars_audit.trace('par[0]=>%s par[1]=%s', to_char(p_ref), p_flag);
         bars_audit.info('Создание SWIFT-сообщения MT103 из документа ref=' || to_char(p_ref) || '...');
+        
+        
+          l_guid :=bars_swift.generate_uetr;
 
         -- Реализация функции подразумевает обязательное наличие (флаг = '2')
         if (p_flag is null or p_flag != '2') then
@@ -1989,7 +2013,8 @@ is
 
 
         bars_audit.trace('create message MT103 header ...');
-
+            
+        
         --
         -- создаем заголовок (заменить)
         --
@@ -2013,7 +2038,9 @@ is
              idat_       => to_char(sysdate,  'YYYY-MM-DD HH24:MI'),
              flag_       => 'L',
              trans_      => l_transTable,
-             apphdrflg_  => l_msgAppHdrFlags );
+             apphdrflg_  => l_msgAppHdrFlags,
+             sti_        =>'001',
+             uetr_       => lower(l_guid) );
 
         -- Устанавливаем признак уже оплаченного документа
         update sw_journal
@@ -2062,28 +2089,33 @@ is
                 l_opt   := 'A';
                 l_value := l_mt202rcv;
                 genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
-
+            --
             elsif (l_recModel.tag = '54' and l_recModel.opt = 'a') then
-
-                if (l_fld56a is not null and l_mt202rcv != l_fld56bic) then
-                    l_opt   := 'A';
-                    l_value := l_fld56a;
-                    genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
-                 else
-                    l_opt   := 'A';
-                    l_value := l_fld57a;
-                    genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
-                end if;
+            
+                    if (l_fld56a is not null and l_mt202rcv != l_fld56bic) then
+                                l_opt   := 'A';
+                                l_value := l_fld56a;
+                                genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+                   /* else
+                                l_opt   := 'A';
+                                l_value := l_fld57a;
+                                genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+                    */
+                    end if;
             elsif (l_recModel.tag = '56' and l_recModel.opt = 'a' and l_fld56a is not null) then
 
                 -- Поле 56 не заполняем
                 null;
 
-            elsif (l_recModel.tag = '57' and l_recModel.opt = 'a' and l_fld57a is not null) then
-
-                -- Поле 57 не заполняем
-                null;
-
+            elsif (l_recModel.tag = '57' and l_recModel.opt = 'a' and l_fld56a is not null) then
+                     -- logger.info('SWIFT l_fld56a='||l_fld56a);
+                -- Поле 57 заполняем c 56A
+                --l_value := l_fld56a;
+                
+                --l_opt   := 'A';
+                --genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+                
+                 null;
             else
 
                 --
@@ -2102,9 +2134,13 @@ is
                     null;
                   elsif (l_recModel.Tag='59') then
                        l_opt:='';
-                       l_fld59a:=substr(genmsg_document_getvalue(p_ref, '59'), instr(genmsg_document_getvalue(p_ref, '59'), chr(10))+1);
+                      -- l_fld59a:=substr(genmsg_document_getvalue(p_ref, '59'), instr(genmsg_document_getvalue(p_ref, '59'), chr(10))+1);
+                       l_fld59a:=genmsg_document_getvalue(p_ref, '59');
                        genmsg_document_instag(l_recModel, l_swRef, null, l_recno, l_opt, l_fld59a, true, l_useTrans, l_transTable);
-                 else
+                  elsif (l_recModel.Tag='57' --and l_fld56a is null 
+                  ) then
+                      null;     
+                  else
                     genmsg_document_instag(l_recModel, l_swRef, p_ref, l_recno, null, null, null, l_useTrans, l_transTable);
                   end if;
                 end if;
@@ -2122,7 +2158,9 @@ is
         -- Формируем заголовок сообщения (MT202)
         --
         bars_audit.trace('create message MT202 header ...');
-
+        --guid має бути такий як в 103
+         --l_sources_guid :=sys_guid(); /* GUID*/
+         --l_guid :=substr(l_sources_guid,1,8)||'-'||substr(l_sources_guid,9,4)||'-'||substr(l_sources_guid,13,4)||'-'||substr(l_sources_guid,17,4)||'-'||substr(l_sources_guid,21) ;
         --
         -- создаем заголовок (заменить)
         --
@@ -2146,7 +2184,10 @@ is
              idat_       => to_char(sysdate,  'YYYY-MM-DD HH24:MI'),
              flag_       => 'L',
              trans_      => l_transTable,
-             apphdrflg_  => l_msgAppHdrFlags );
+             apphdrflg_  => l_msgAppHdrFlags,
+         --    sti_        => '001',
+         --    uetr_       => lower(l_guid),
+             cov_        => 'COV' );
 
         -- Устанавливаем признак уже оплаченного документа
         update sw_journal
@@ -2193,58 +2234,107 @@ is
                 l_opt   := l_recModel.opt;
 
                 genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
-
-            elsif (l_recModel.tag = '52' and l_recModel.opt = 'a') then
+             /*
+              В sw_model для 202 додаємо 50 поле
+              з 52D робимо 50F
+             */    
+                --            elsif (l_recModel.tag = '52' and l_recModel.opt = 'a') then
+                --
+                --                select opt, value into l_opt, l_value
+                --                  from sw_operw
+                --                 where swref = l_swRef
+                --                   and tag   = '50';
+                --
+                --                if (l_opt in ('K', 'F')) then l_opt := 'D';
+                --                end if;
+                --                genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+            elsif (l_recModel.tag = '50' and l_recModel.opt = 'a') then
 
                 select opt, value into l_opt, l_value
                   from sw_operw
                  where swref = l_swRef
                    and tag   = '50';
 
-                if (l_opt in ('K', 'F')) then l_opt := 'D';
+                if (l_opt in ('K', 'F')) then l_opt := 'F';
                 end if;
                 genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+             elsif (l_recModel.tag = '52' and l_recModel.opt = 'a') then   
+                  l_fld52a := genmsg_document_getvalue(p_ref, '52A');  
+                
+                 if (l_fld52a is not null) then
+                                l_opt   := 'A';
+                                l_value := l_fld52a;
+                                genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+                 end if;
+            elsif (l_recModel.tag = '57' and l_recModel.opt = 'a' and l_fld56a is not null) then  
+                                l_opt   := 'A';
+                                l_value := l_fld56a;
+                                genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);      
+
+            -- 57A не заповнюэмо так як з MT103 54A прибираємо
+            --            elsif (l_recModel.tag = '57' and l_recModel.opt = 'a') then
+            --
+            --                -- Получаем значение поля 54 сообщения МТ103
+            --                begin
+            --                    select opt, value into l_opt, l_value
+            --                      from sw_operw
+            --                     where swref = l_swRef
+            --                       and tag   = '54';
+            --                exception
+            --                    when NO_DATA_FOUND then l_value := null;
+            --                end;
+            --
+            --                if (l_opt != 'A') then
+            --                    bars_audit.trace('Error! message 103 has option A in field 54');
+            --                    raise_application_error(-20781, '\998 Нет описания для конвертации опции '||l_opt||' поля 54а в поле 57 сообщения MT202');
+            --                end if;
+            --
+            --                if (l_value is not null) then
+            --                    genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+            --                end if;
 
 
-            elsif (l_recModel.tag = '57' and l_recModel.opt = 'a') then
-
-                -- Получаем значение поля 54 сообщения МТ103
-                begin
-                    select opt, value into l_opt, l_value
-                      from sw_operw
-                     where swref = l_swRef
-                       and tag   = '54';
-                exception
-                    when NO_DATA_FOUND then l_value := null;
-                end;
-
-                if (l_opt != 'A') then
-                    bars_audit.trace('Error! message 103 has option A in field 54');
-                    raise_application_error(-20781, '\998 Нет описания для конвертации опции '||l_opt||' поля 54а в поле 57 сообщения MT202');
-                end if;
-
-                if (l_value is not null) then
-                    genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
-                end if;
-
+            -- залишаємо тільки BIC
             elsif (l_recModel.tag = '58' and l_recModel.opt = 'a') then
 
-                 l_value:= substr(genmsg_document_getvalue(p_ref, '59'),1,instr(genmsg_document_getvalue(p_ref, '59'), chr(13)))||chr(10)||l_mt103rcv;
+                 --l_value:= substr(genmsg_document_getvalue(p_ref, '59'),1,instr(genmsg_document_getvalue(p_ref, '59'), chr(13)))||chr(10)||l_mt103rcv;
+                 l_value:=l_mt103rcv;
+               --
+                 l_opt := 'A';
+                 genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+            
+            -- 72 нахер
+            --            elsif (l_recModel.tag = '72') then
+            --
+            --                -- Получаем реф. сообщения МТ103
+            --                select trn into l_value
+            --                  from sw_journal
+            --                 where swref = l_swRef;
+            --
+            --                l_opt := '';
+            --                l_value := '/BNF/COVER OF OUR MT103' || CRLF || 'REF ' || l_value;
+            --                genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+            
+            elsif (l_recModel.tag = '59' and l_recModel.opt = 'a') then
+                -- l_value:=l_mt103rcv;
+                l_value:=genmsg_document_getvalue(p_ref, '59');
                --
                  l_opt := 'A';
                  genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
 
-            elsif (l_recModel.tag = '72') then
-
-                -- Получаем реф. сообщения МТ103
-                select trn into l_value
-                  from sw_journal
-                 where swref = l_swRef;
-
-                l_opt := '';
-                l_value := '/BNF/COVER OF OUR MT103' || CRLF || 'REF ' || l_value;
+            -- Додаємо 59A і 70 теги
+            elsif (l_recModel.tag = '70') then
+                l_value:=genmsg_document_getvalue(p_ref, '70');
+                l_opt   := l_recModel.opt;
                 genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
-
+            elsif (l_recModel.tag = '72') then
+                l_value:=genmsg_document_getvalue(p_ref, '72');
+                if (l_value is not null) then 
+                    l_opt   := l_recModel.opt;
+                    genmsg_document_instag(l_recModel, l_swRef2, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);  
+                end if;      
+            
+            
             end if;
 
         end loop;
@@ -2475,9 +2565,9 @@ is
 
         end if;
 
-		 if (p_stmt = 910 and l_currCode=643) then
-		    l_isUse50 := true;
-		 end if;
+         if (p_stmt = 910 and l_currCode=643) then
+            l_isUse50 := true;
+         end if;
 
         -- 52
         if (not l_isUse50) then
@@ -2500,8 +2590,8 @@ is
 
    -- 52 для 643 по просьбі Климентьева(заповнювати його навіть якщо заповнено 50)
         if (l_currCode=643) then
-		 if (p_stmt = 910)
-		  then
+         if (p_stmt = 910)
+          then
             begin
               select opt, value into l_opt, l_value
                     from sw_operw
@@ -2530,36 +2620,36 @@ is
                  exception when no_data_found then null;
                 end;
             end;
-		 else
-			 begin
-				  select opt, value into l_opt, l_value
-						from sw_operw
-					   where swref = l_swRefSrc
-						 and tag   = '52'
-						 and opt  in ('A', 'D');
+         else
+             begin
+                  select opt, value into l_opt, l_value
+                        from sw_operw
+                       where swref = l_swRefSrc
+                         and tag   = '52'
+                         and opt  in ('A', 'D');
 
-					bars_swift.in_swoperw(l_swRef, '52', 'A', l_recno, l_opt, l_value);
-
-
-					l_recno := l_recno + 1;
-
-				exception
-					when NO_DATA_FOUND then
-
-					begin
-					 select c.bic into l_value from sw_oper so, oper o, custbank c
-						where so.swref=l_swRefSrc
-						and so.ref=o.ref
-						and o.mfoa=c.mfo;
-
-					   bars_swift.in_swoperw(l_swRef, '52', 'A', l_recno, 'A', l_value);
+                    bars_swift.in_swoperw(l_swRef, '52', 'A', l_recno, l_opt, l_value);
 
 
-					  l_recno := l_recno + 1;
-					 exception when no_data_found then null;
-					end;
-				end;
-			end if;
+                    l_recno := l_recno + 1;
+
+                exception
+                    when NO_DATA_FOUND then
+
+                    begin
+                     select c.bic into l_value from sw_oper so, oper o, custbank c
+                        where so.swref=l_swRefSrc
+                        and so.ref=o.ref
+                        and o.mfoa=c.mfo;
+
+                       bars_swift.in_swoperw(l_swRef, '52', 'A', l_recno, 'A', l_value);
+
+
+                      l_recno := l_recno + 1;
+                     exception when no_data_found then null;
+                    end;
+                end;
+            end if;
         end if;
 
 
@@ -2585,8 +2675,8 @@ is
 
         end if;
 
-	  if (p_stmt = 910 and l_currCode=643) then
-	     begin
+      if (p_stmt = 910 and l_currCode=643) then
+         begin
 
             select value into l_value
               from sw_operw
@@ -2600,7 +2690,7 @@ is
         exception
             when NO_DATA_FOUND then null;
         end;
-	  else
+      else
         -- 72
         begin
 
@@ -2616,7 +2706,7 @@ is
         exception
             when NO_DATA_FOUND then null;
         end;
-		end if;
+        end if;
 
     else --СВІФТовку не знайшли - формуємо по новому алгоритму
 
@@ -6187,6 +6277,175 @@ is
 
     end docmsg_document_set103covhdr;
 
+    -----------------------------------------------------------------
+    -- GENMSG_MT199()
+    --
+    --     Генерация MT199 - статус свифт сообщения в GPI
+    --
+    --     Параметры:
+    --
+    --         p_swref        Референс родительской свифтовки
+    --
+    --         p_statusid     Ид статуса из справочника SW_STATUSES
+    --
+ 
+--    procedure genmsg_mt199(p_swref    in sw_journal.swref%type,
+--                           p_statusid in number)
+--    is
+--       cursor cursModel(p_mt in number)
+--        is
+--        select *
+--          from sw_model
+--         where mt = p_mt;
+--      l_sw_journal sw_journal%rowtype;
+--      l_swref_new sw_journal.swref%type;
+--      l_ret number;
+--      l_mt          sw_mt.mt%type  := 199;     /*           Тип сообщения */
+--      l_recModel    sw_model%rowtype;          /*               Строка модели сообщния */
+--      l_cnt         number;                    /*                       просто счетчик */
+--      l_useTrans    boolean;                   /*     Флаг использования перекодировки */
+--      l_transTable  sw_chrsets.setid%type;     /*            Код таблицы перекодировки */
+--      l_20fld       sw_operw.value%type;
+--      l_value       sw_operw.value%type;       /*                        Значение тега */
+--      l_recno       sw_operw.n%type;           /*              Порядковый номер записи */
+--      l_opt         sw_operw.opt%type;         /*                    Опция тега записи */
+--      l_pos         number;                    /*                              позиция */
+--      l_currCode    tabval.kv%type;            /*                 Код валюты документа */
+--      l_status      sw_statuses.value%type;
+--    begin
+--        --
+--        -- Проверяем есть ли метаописание
+--        --
+--        select count(*) into l_cnt
+--          from sw_model
+--         where mt = l_mt;
+--
+--        if (l_cnt = 0) then
+--            bars_audit.trace('Error! message description not found');
+--            raise_application_error(-20781, '\998 Нет метаописания сообщения MT199');
+--        end if;
+--
+--        bars_audit.trace('message MT199 description found.');
+--            
+--        select s.* into l_sw_journal from sw_journal s where s.swref=p_swref;
+--            
+--        begin
+--        select t.value into l_20fld from sw_operw t where t.swref=p_swref and t.tag='20';
+--        exception when no_data_found then 
+--        raise_application_error(-20782, 'Нет поля 20 для SwRef='||to_char(p_swref));
+--        end;
+--            
+--        begin
+--            select value into l_status from sw_statuses where id = p_statusid;
+--        exception when no_data_found then 
+--        raise_application_error(-20782, 'Не найден статус'||to_char(p_statusid));    
+--        end;
+--            
+--        begin
+--        select kv into l_currCode from tabval where lcv = l_sw_journal.currency;
+--        exception when no_data_found then 
+--        raise_application_error(-20782, 'Не найдена валюта '||l_sw_journal.currency);
+--        end;
+--           --
+--           -- Нормальный метод определения перекодировки - по банку
+--           -- получателю сообщения определяем таблицу перекодировки
+--           --
+--         l_transTable := 'TRANS';
+--         l_useTrans   := true;
+--            
+--
+--            BARS_SWIFT.In_SwJournalInt(ret_      => l_ret,
+--                        swref_    => l_swref_new,
+--                        mt_       => '199',
+--                        mid_      => null,
+--                        page_     => null,
+--                        io_       => 'I',
+--                        sender_   => l_sw_journal.receiver,
+--                        receiver_ => 'TRCKCHZZXXX',
+--                        transit_  => l_sw_journal.transit,
+--                        payer_    => null,
+--                        payee_    => l_sw_journal.payee,
+--                        ccy_      => l_sw_journal.currency,
+--                        amount_   => l_sw_journal.amount,
+--                        accd_     => l_sw_journal.accd,
+--                        acck_     => null,
+--                        vdat_     => null,
+--                        idat_     => to_char(sysdate,  'YYYY-MM-DD HH24:MI'),
+--                        flag_     => 'L',
+--                        sti_      => '001',
+--                        uetr_     => l_sw_journal.uetr 
+--                        );
+--          update sw_journal set date_pay = sysdate, date_out = null where swref=l_swref_new;
+--              
+--          bars_audit.trace('message MT199 header created SwRef=> %s', to_char(l_swref_new));
+--              
+--          --------------------------------------------------------------
+--          bars_audit.trace('write message MT199 details ...');
+--
+--        -- Открываем модель сообщения
+--        open cursModel(l_mt);
+--        l_recno := 1;
+--
+--        loop
+--            fetch cursModel into l_recModel;
+--            exit when cursModel%notfound;
+--
+--
+--            --
+--            -- Отдельно формируем поля
+--            --
+--            if    (l_recModel.tag = '20') then
+--
+--                l_opt   := '';
+--                l_value := l_20fld||'A';
+--                genmsg_document_instag(l_recModel, l_swref_new, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+--            --
+--            elsif (l_recModel.tag = '21') then
+--                
+--                l_opt   := '';
+--                l_value := l_20fld;
+--                genmsg_document_instag(l_recModel, l_swref_new, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+--                    
+--            elsif (l_recModel.tag = '79') then
+--                    
+--                l_opt   := '';
+--                    
+--                l_value:='//'||to_char(sysdate,'YYMMDDHH24MI')||replace(sessiontimezone,':','')||CRLF
+--                ||'//'||l_status||CRLF
+--                ||'//'||l_sw_journal.sender||'/'||l_sw_journal.receiver||CRLF
+--                ||'//'||bars_swift.AmountToSwift(l_sw_journal.amount, l_currCode, true, true);
+--                    
+--                 genmsg_document_instag(l_recModel, l_swref_new, null, l_recno, l_opt, l_value, true, l_useTrans, l_transTable);
+--
+--            end if;
+--
+--        end loop;
+--
+--        close cursModel;
+--
+--        bars_audit.trace('message MT199 generated swref=%s.', to_char(l_swref_new));
+--        bars_audit.info('Сформировано сообщение SwRef=' || to_char(l_swref_new));
+--          --------------------------------------------------------------
+--              
+--    end genmsg_mt199;
+--        
+--        
+--        procedure job_send_mt199
+--        is
+--        begin
+--        bc.go(300465);
+--        for c in(select s.swref, o.ref, o.sos from sw_oper_queue s, oper o
+--                    where s.ref=o.ref
+--                    and o.pdat>=sysdate-5
+--                    and o.sos in(5,-1,-2)
+--                    and nvl(s.send_mt199,0)!=1)
+--            loop
+--                bars_swift_msg.genmsg_mt199(c.swref,case c.sos when 5 then 1 else 2 end);
+--                update sw_oper_queue set send_mt199=1 where swref=c.swref;
+--            end loop;
+--        bc.home();    
+--        end job_send_mt199;
+
 
 
 
@@ -6231,16 +6490,3 @@ begin
 
 end bars_swift_msg;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_SWIFT_MSG ***
-grant EXECUTE                                                                on BARS_SWIFT_MSG  to BARS013;
-grant EXECUTE                                                                on BARS_SWIFT_MSG  to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_SWIFT_MSG  to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_swift_msg.sql =========*** End 
- PROMPT ===================================================================================== 
- 

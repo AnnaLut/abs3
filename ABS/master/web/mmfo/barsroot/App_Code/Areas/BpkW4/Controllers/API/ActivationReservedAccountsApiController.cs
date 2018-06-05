@@ -21,7 +21,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         public ActivationReservedAccountsApiController(IActivationReservedAccountsRepository repository) { _repo = repository; }
 
         [HttpPost]
-        [POST("/api/BpkW4/ActivationReservedAccountsApi/active")]
+        //[POST("/api/BpkW4/ActivationReservedAccountsApi/active")]
         public HttpResponseMessage Active(ActivationAccounts acc)
         {
             try
@@ -47,7 +47,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         }
 
         [HttpGet]
-        [GET("/api/BpkW4/ActivationReservedAccountsApi/activationreservedaccounts")]
+        //[GET("/api/BpkW4/ActivationReservedAccountsApi/activationreservedaccounts")]
         public HttpResponseMessage ActivationReservedAccounts([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request)
         {
             try

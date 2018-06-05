@@ -10,7 +10,7 @@
 
 angular.module(globalSettings.modulesAreas)
     .factory('schemeBuilderService',
-        ['$http', '$q', 'SchemeBuilderConfig',
+    ['$http', '$q', 'SchemeBuilderConfig',
         function ($http, $q, config) {
 
             var apiUrl = bars.config.urlContent(config.baseApiUrl);
@@ -161,7 +161,7 @@ angular.module(globalSettings.modulesAreas)
             factory.getAccount = getAccount;
             factory.deleteSchemeSideB = deleteSchemeSideB;
             factory.deleteSchemeAccount = deleteSchemeAccount;
-            
+
             factory.editSchemeAccount = editSchemeAccount;
             factory.editSchemeSideB = editSchemeSideB;
             factory.batchEditSchemeSideB = batchEditSchemeSideB;
@@ -171,4 +171,4 @@ angular.module(globalSettings.modulesAreas)
 
             return factory;
         }
-        ]);
+    ]);

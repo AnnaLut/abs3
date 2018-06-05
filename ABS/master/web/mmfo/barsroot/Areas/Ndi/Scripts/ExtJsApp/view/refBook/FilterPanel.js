@@ -51,6 +51,7 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
         return this;
     },
     initComponent: function () {
+        
         var self = this
         if (metadataFunc.filtersMetainfo.ShowFilterWindow != 'false' ||
             (metadataFunc.filtersMetainfo.CustomFilters && metadataFunc.filtersMetainfo.CustomFilters.length > 0) 
@@ -66,11 +67,12 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
             ExtApp.view.refBook.FilterPanel.superclass.initComponent.call(this);
             return this;
         }
-            
+
+
         
-       
         var  thisController = thisControllerFunc;
-        var metadata = self.controllerMetadata;
+        var metadata = thisController.controllerMetadata;
+        var hasGridColors = metadata.colorsForGrid && metadata.colorsForGrid.length && metadata.colorsForGrid.length > 0;
         var tab = Ext.create('Ext.tab.Panel', {
             width: '100%',
             minHeight: 200,
@@ -93,35 +95,30 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
             {
                 title: 'звичайні',
                 items: Ext.create('ExtApp.view.refBook.SimpleFilterPanel', { thisController: thisController }),
-                //    items: thisController.controllerMetadata.SympleFilters,
-                //    height: 300,
-                //    fieldDefaults: {
-                //        labelAlign: 'left',
-                //        labelWidth: 200
-                //    }
-                //}),
                 id: 'SympleFilterTub',
                 minHeight: 100,
                 width: '100%',
                 maxHeight: 600,
                 maxWidth: 600
             });
-        //var myTabPanel = metadata.metadata.tabPanel;
-       
+        if(hasGridColors)
+            tab.add(
+                {
+                    title: 'Опис кольорів',
+                    id: 'ColorTabId',
+                    items: Ext.create('ExtApp.view.refBook.ColorSemanticGrid', { thisController: thisController }),
+                    minHeight: 100,
+                    width: '100%',
+                    maxHeight: 600
+                });
+
+        
         self.items = tab;
-        if (tab.items.length > 4)
-            tab.setActiveTab(4);
-        if (tab.items.length > 3)
-            tab.setActiveTab(3);
-        if (tab.items.length > 2)
-            tab.setActiveTab(2);
-        if (tab.items.length > 1)
-            tab.setActiveTab(1);
-        tab.setActiveTab(0);
-        
+        for (var i =  0; i < tab.items.length; i++) {
+            tab.setActiveTab(i);
+        }
+        tab.setActiveTab('ConstructorTabId');
         ExtApp.view.refBook.FilterPanel.superclass.initComponent.call(this);
-        
-       // self.doLayout();
     },
     thisControllerFunc: function()
     {

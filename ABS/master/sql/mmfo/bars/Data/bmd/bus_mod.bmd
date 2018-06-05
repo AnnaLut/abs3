@@ -58,7 +58,7 @@ declare
 
 begin
 
-  l_tabsemantic := 'Тип бізнес моделі для договору';
+  l_tabsemantic := '1.Тип бізнес моделі для договору / BUS_MOD';
   l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'BUS_MOD';

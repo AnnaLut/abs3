@@ -53,8 +53,8 @@ show errors
 
 
 
-CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
-  g_body_version     CONSTANT VARCHAR2(64) := 'version 6.0 01/12/2018';
+CREATE OR REPLACE PACKAGE BODY pkg_dkbo_utl IS
+  g_body_version     CONSTANT VARCHAR2(64) := 'version 6.01 03/04/2018';
   lc_new_line        CONSTANT VARCHAR2(5) := chr(13) || chr(10);
   lc_acc_list        CONSTANT attribute_kind.attribute_code%TYPE := 'DKBO_ACC_LIST';
   lc_date_format     CONSTANT VARCHAR2(10) := 'dd/mm/yyyy';
@@ -229,14 +229,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
   PROCEDURE p_get_all_cust_acc
   (
     p_customer_id IN customer.rnk%TYPE
-   ,p_nbs         IN accounts.nbs%TYPE
    ,out_acc_list  OUT number_list
   ) IS
   BEGIN
     SELECT DISTINCT a.acc BULK COLLECT
       INTO out_acc_list
       FROM accounts a
-     WHERE a.nbs = p_nbs
+     WHERE a.nbs in ('2620', 2625)
        AND a.tip LIKE 'W4%'
        AND a.rnk = p_customer_id
        AND a.dazs IS NULL;
@@ -372,7 +371,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
     p_customer_id IN customer.rnk%TYPE
    ,p_deal_id     IN deal.id%TYPE
    ,p_acc_list    IN number_list
-   ,p_acc_nbs     IN accounts.nbs%TYPE
   ) IS
     l_all_acc_list   number_list;
     l_acc_list_union number_list;
@@ -384,7 +382,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
    IF p_in_acc_list IS NULL THEN
  --Визначаємо всі активні рахунки клієнта
       p_get_all_cust_acc(p_customer_id => p_customer_id
-                        ,p_nbs         => p_acc_nbs
+                        --,p_nbs         => p_acc_nbs
                         ,out_acc_list  => l_all_acc_list);
   --Визначаємо всі рахунки клієнта ,включені в ДКБО
     l_dkbo_acc_list  := bars.attribute_utl.get_number_values(p_object_id      => deal_id
@@ -446,15 +444,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
     l_in_acc_nbs accounts.nbs%TYPE:=in_acc_nbs;
   BEGIN
     --блокирую контрагента
-   if l_in_acc_nbs is null then
-     l_in_acc_nbs:='2625';
-   end if;
-
    OPEN get_rnk(in_customer_id);
 
      --Визначаємо всі активні  рахунки клієнта (чтобы не создавать за зря, если приходит с BARS_OW)
     p_get_all_cust_acc(p_customer_id => in_customer_id
-                      ,p_nbs         => l_in_acc_nbs
                       ,out_acc_list  => l_all_acc_list);
     p_get_deal_id(p_customer_id => in_customer_id, out_deal_id => deal_id);
     if  l_all_acc_list.count>=1 then
@@ -492,7 +485,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.pkg_dkbo_utl IS
           p_acc_ins(p_customer_id => in_customer_id
                    ,p_deal_id     => deal_id
                    ,p_acc_list    => in_acc_list
-                   ,p_acc_nbs     => l_in_acc_nbs);
+                   );
       END IF;
           out_deal_id := deal_id;
 

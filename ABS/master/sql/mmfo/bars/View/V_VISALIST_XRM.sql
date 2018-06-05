@@ -6,11 +6,11 @@ SELECT o.REF AS REF,                                            -- кто ввел
           0 AS MarkID,
           NULL AS CheckGroup_id,
           NULL AS CheckGroup,
-          s.fio AS UserName,
+          s.active_directory_name AS UserName,
           pdat AS Dat,
           0 AS Incharge
-     FROM oper o, staff$base s
-    WHERE o.userid = s.id
+     FROM oper o, staff_ad_user s
+    WHERE o.userid = s.user_id 
    UNION ALL
    SELECT o.REF AS REF,                                     -- наложенные визы
           ct.priority AS Counter,
@@ -24,15 +24,16 @@ SELECT o.REF AS REF,                                            -- кто ввел
           DECODE (status,  1, 1,  2, 2,  3, 3,  NULL) AS MarkID,
           ov.groupid AS CheckGroup_id,
           ov.groupname AS CheckGroup,
-          ov.username AS UserName,
+          s.active_directory_name AS UserName,
           ov.dat AS Dat,
           ov.F_IN_CHARGE AS Incharge
-     FROM oper o, oper_visa ov, chklist_tts ct
+     FROM oper o, oper_visa ov, chklist_tts ct, staff_ad_user s
     WHERE     o.REF = ov.REF
           AND ov.passive IS NULL
           AND ov.status IN (1, 2, 3)
           AND ov.GROUPID = ct.IDCHK
           AND o.tt = ct.TT
+          and s.user_id = ov.userid
    UNION ALL
    SELECT o.REF AS REF,                 -- визы на упр. к/с, при сторнировании
           NULL AS Counter,
@@ -46,13 +47,14 @@ SELECT o.REF AS REF,                                            -- кто ввел
           DECODE (status,  1, 1,  2, 2,  3, 3,  NULL) AS MarkID,
           ov.groupid AS CheckGroup_id,
           ov.groupname AS CheckGroup,
-          ov.username AS UserName,
+          s.active_directory_name AS UserName,
           ov.dat AS Dat,
           ov.F_IN_CHARGE AS Incharge
-     FROM oper o, oper_visa ov
+     FROM oper o, oper_visa ov, staff_ad_user s
     WHERE     o.REF = ov.REF
           AND ov.passive IS NULL
           AND ov.status IN (1, 2, 3)
+          and s.user_id = ov.userid
           AND (   ov.groupid IS NULL
                OR ov.groupid NOT IN (SELECT idchk
                                        FROM chklist_tts

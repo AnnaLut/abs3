@@ -1,4 +1,5 @@
-﻿using BarsWeb.Areas.Ndi.Models.ViewModels;
+﻿using BarsWeb.Areas.Ndi.Models.DbModels;
+using BarsWeb.Areas.Ndi.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -127,10 +128,52 @@ namespace BarsWeb.Areas.Ndi.Models
             return this.MemberwiseClone();
         }
 
-        /// <summary>
-        /// Информация о проваливании для колонки
-        /// </summary>
-        // public FallDownColumnInfo FallDownInfo { get; set; }
+        public  string BuildWebFormName(string webFormName, string searchParam, int? sParColumn, int? nativeTabelId, string baseUrl)
+        {
+            string res;
+            if (string.IsNullOrEmpty(webFormName) || webFormName.IndexOf(searchParam) != 0)
+                return webFormName;
+            string funNsiEditFParamsString = webFormName.Substring(webFormName.IndexOf(searchParam) + searchParam.Length);
+            FunNSIEditFParams par = new FunNSIEditFParams(funNsiEditFParamsString);
+            CallFunctionMetaInfo function = par.BuildToCallFunctionMetaInfo();
+            function.TABID = nativeTabelId;
+            function.ColumnId = Convert.ToInt32(sParColumn);
+
+            if (webFormName.Contains("sPar=["))
+                function.PROC_EXEC = "SELECTED_ONE";
+
+            res = baseUrl + "?" + "sParColumn" + "=" + sParColumn + "&" + "nativeTabelId" + "=" + nativeTabelId;
+            
+            this.IsFuncOnly = par.IsFuncOnly;
+            this.FunctionMetaInfo = function;
+            this.ParamsNames = par.ParamsNames;
+            //string paramvalue = url.Substring(url.LastIndexOf(firstParamName) + firstParamName.Length);
+            //string addParam = string.IsNullOrEmpty(additionParameterName) && string.IsNullOrEmpty(additionParameterValue) ? "" : "&" + additionParameterName + "=" + additionParameterValue;
+            //string resWebName = url.Replace(paramvalue, firstPramValue) + addParam;
+            return res.Trim();
+        }
+
+        public void BuildFromDbColumn(MetaColumnsDbModel dbColumn)
+        {
+           
+
+            this.COLID = Convert.ToInt32(dbColumn.COLID);
+            this.COLNAME = string.IsNullOrEmpty(dbColumn.COLNAME) ? dbColumn.COLNAME : dbColumn.COLNAME.Trim();
+            this.COLTYPE = string.IsNullOrEmpty(dbColumn.COLTYPE) ? dbColumn.COLTYPE : dbColumn.COLTYPE.Trim();
+            this.SEMANTIC = string.IsNullOrEmpty(dbColumn.SEMANTIC) ? dbColumn.SEMANTIC : dbColumn.SEMANTIC.Trim();
+            this.SHOWWIDTH = Convert.ToInt32(dbColumn.SHOWWIDTH);
+            this.SHOWMAXCHAR = Convert.ToInt32(dbColumn.SHOWMAXCHAR);
+            this.SHOWFORMAT = string.IsNullOrEmpty(dbColumn.SHOWFORMAT) ? dbColumn.SHOWFORMAT : dbColumn.SHOWFORMAT.Trim();
+            this.SHOWIN_FLTR = dbColumn.SHOWIN_FLTR;
+            this.NOT_TO_EDIT = dbColumn.NOT_TO_EDIT;
+            this.NOT_TO_SHOW = dbColumn.NOT_TO_SHOW;
+            this.EXTRNVAL = dbColumn.EXTRNVAL;
+            this.SHOWPOS = dbColumn.SHOWPOS;
+            this.SHOWRESULT = dbColumn.SHOWRESULT;
+            this.TABID = Convert.ToInt32(dbColumn.TABID);
+            this.IsPk = dbColumn.SHOWRETVAL;
+            this.InputInNewRecord = dbColumn.INPUT_IN_NEW_RECORD;
+        }
 
 
     }

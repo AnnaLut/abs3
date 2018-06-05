@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 4.0.2 17/05/2018 '; -- DIY-parallel
+    g_header_version  constant varchar2(64)  := 'version 5.0.1 07/05/2018 '; -- BARS_INTGR Integration
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -223,12 +223,13 @@ Show errors;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    g_body_version constant varchar2(64) := 'Version 4.0.2 17/05/2018';
+    
+    g_body_version constant varchar2(64) := 'Version 5.0.1 07/05/2018';
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
-	-- # COBUMMFO-6343
+	-- BARS_INTGR - integration
     -- DIY - parallel
-    -- partitioned: segments, credits_stat, custur
+    -- partitioned: segments, credits_stat, custur, customers_plt
     c_cntdays constant number := 40; -- кількість днів, за які зберігаємо дані у вітринах
 
     /** header_version -  */
@@ -5695,7 +5696,12 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         -- кем логинимся
         select id into l_usr_id from bars.staff$base t where t.logname = 'BARS_DM';
         l_task_statement := replace(l_task_statement, ':usr_id', l_usr_id);
-
+		
+		-- Если полная выгрузка - переключаем вьюшки BARS_INTGR на витрины BARS_DM
+		if p_periodtype = C_FULLIMP then
+			bars_intgr.xrm_import.set_import_mode(p_mode => bars_intgr.xrm_import.G_IMPORT_MODE_FULL);
+		end if;
+		
         for cur in (select obj_name, obj_proc, parallel_flag from dm_obj where imp_type = p_periodtype and active = 1 order by imp_order)
         loop
             begin
@@ -5709,7 +5715,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                 p_rows_err => null,
                                 p_status => 'INPROCESS',
                                 p_id => l_id_event );
-
+								
                 if cur.parallel_flag='Y' then
                     -- удаляем предыдущую задачу
                     drop_import_task;
@@ -5757,6 +5763,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_id_event := null;
             l_final_status := null;
         end loop;
+		
+		commit;
 
     end imp_run;
 
@@ -5764,5 +5772,5 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  DM_IMPORT ***
-grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
+grant execute on dm_import to barsupl;
+grant execute on dm_import to bars_intgr with grant option;

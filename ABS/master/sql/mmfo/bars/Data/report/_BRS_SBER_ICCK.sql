@@ -54,7 +54,7 @@ begin
     l_zpr.bind_sql     := ':BRANCH=''BRANCH|BRANCH|NAME|WHERE length(branch)=15 order by branch ''';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'SELECT I.BRANCH, I.S_02, I.S_83, I.S_79,I.S_03,I.S_I3, I.S_B8, E.SDATE, E.CC_ID, E.RNK, E.NMK, I.ND, I.K_02, I.K_83, I.K_79,I.K_03,I.K_I3,I.K_B8, e.branch as branch_kd  
-FROM (select TO_CHAR(d.nd) nd, d.rnk, d.cc_id, d.sdate, c.nmk, d.sos, d.branch from V_CC_DEAL D, CUSTOMER C where d.rnk=c.rnk and d.branch like decode(SYS_CONTEXT (''bars_context'', ''user_branch''), ''/''||f_ourmfo||''/000000/'',''%'',SYS_CONTEXT (''bars_context'', ''user_branch'')||''%'')) E,
+FROM (select TO_CHAR(d.nd) nd, d.rnk, d.cc_id, d.sdate, c.nmk, d.sos, d.branch from V_CC_DEAL D, CUSTOMER C where d.rnk=c.rnk and d.branch like decode(SYS_CONTEXT (''bars_context'', ''user_branch''), KASZ.SX (TAG_ => ''BRN''),''%'',SYS_CONTEXT (''bars_context'', ''user_branch'')||''%'')) E,
   (SELECT S.BRANCH, S.S_02, S.S_83, S.S_79,S.S_03, S.S_I3, S.S_B8,  NVL(K.ND,0) ND, K.K_02, K.K_83, K.K_79, K.K_03, K.K_I3, K.K_B8
    FROM  (SELECT BRANCH, -SUM(DECODE (OB22,''02'',OSTC,0))/100 S_02,
                          -SUM(DECODE (OB22,''83'',OSTC,0))/100 S_83, 

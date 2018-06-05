@@ -27,8 +27,12 @@ namespace BarsWeb.Areas.Ndi.Models.DbModels
         public decimal? LINESDEF { get; set; }
 
         public string SELECT_STATEMENT { get; set; }
-        
-        public List<string> SemanticParamNames { get; set; }
+
+        public List<string> SemanticParamNames
+        {
+            get;
+            set;
+        }
 
     }
 }

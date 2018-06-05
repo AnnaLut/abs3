@@ -162,16 +162,6 @@ Ext.onReady(function () {
                 allowBlank: true
             }
         },
-        //{
-        //    id: 'SemanticColumn',
-        //    header: 'Семантика значения',
-        //    dataIndex: 'Semantic',
-        //    width: 55,
-        //    flex: 1,
-        //    editor: {
-        //        allowBlank: true
-        //    }
-        //},
         {
             xtype: 'actioncolumn',
             width: 6,
@@ -272,53 +262,14 @@ Ext.onReady(function () {
             }
         }],
         listeners: {
-            beforerender: function () {
-               
-                //thisGrid.metadata = thisGrid.thisController.controllerMetadata;
-                //var store = thisGrid.getStore().reload();
-                //var columns = thisGrid.columnManager.getColumns();
-                //var col1 = columns[1];
-                //col1.editor.sore.data.items = [
-                //        ['И', 'И'],
-                //        ['ИЛИ', 'ИЛИ']
-                //];
-                //thisGrid.CreateComponents = 'sdfsd';
-            },
             beforeedit: function (row, cell) {
                 if (row.context.colIdx == 0 && cell.rowIdx == 0)
                     return false;
                 // alert("   " + cellindex);
-            },
-            afterrender: function () {
-                
-                
-                //thisController.thisGrid = this;
-                //
-                //var grid = this.up('grid');
-                //var count = 0;
-                //store.insert(count, model);
-                //cellEditing.startEditByPosition({ row: 0, column: 0 });
             }
         },
         plugins: [cellEditing]
     });
-
-   
-    // manually trigger the data store load
-    //store.load({
-       
-    //    // store loading is asynchronous, use a load listener or callback to handle results
-    //    callback: function () {
-    //        
-    //        //Ext.Msg.show({
-    //        //    title: 'Store Load Callback',
-    //        //    msg: 'store was loaded, data available for processing',
-    //        //    modal: false,
-    //        //    icon: Ext.Msg.INFO,
-    //        //    buttons: Ext.Msg.OK
-    //        //});
-    //    }
-    //});
   
    
 });

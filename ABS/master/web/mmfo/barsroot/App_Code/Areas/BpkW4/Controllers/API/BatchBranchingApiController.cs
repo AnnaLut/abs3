@@ -28,7 +28,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
             _branches = branches;
         }
 
-        [GET("api/BpkW4/BatchBranchingApi/GetAllFiles")]
+        //[GET("api/BpkW4/BatchBranchingApi/GetAllFiles")]
         public HttpResponseMessage GetAllFiles([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request)
         {
             Kendo.Mvc.SortDescriptor sort = new Kendo.Mvc.SortDescriptor();
@@ -44,7 +44,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
             return Request.CreateResponse(HttpStatusCode.OK, fileList.ToDataSourceResult(request));
         }
 
-        [GET("api/BpkW4/BatchBranchingApi/GetContentFile")]
+        //[GET("api/BpkW4/BatchBranchingApi/GetContentFile")]
         public HttpResponseMessage GetFileContent([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, decimal? id)
         {
             var fileQuery = _repository.GetFileContent(id);
@@ -53,7 +53,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
         }
 
 
-        [POST("api/BpkW4/BatchBranchingApi/Upload")]
+        //[POST("api/BpkW4/BatchBranchingApi/Upload")]
         public HttpResponseMessage Upload()
         {
             HttpPostedFile file = HttpContext.Current.Request.Files[0];

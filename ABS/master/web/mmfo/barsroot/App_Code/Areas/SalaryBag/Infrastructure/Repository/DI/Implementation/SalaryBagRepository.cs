@@ -473,14 +473,17 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
         #endregion
 
         #region EA
-        public List<Bars.EAD.Structs.Result.DocumentData> CheckDocs(List<Bars.EAD.Structs.Result.DocumentData> val)
+        public List<Bars.EAD.Structs.Result.DocumentData> CheckDocs(List<Bars.EAD.Structs.Result.DocumentData> val, List<string> filterCodes)
         {
             List<Bars.EAD.Structs.Result.DocumentData> res = new List<Bars.EAD.Structs.Result.DocumentData>();
             if (val.Count <= 0) return res;
             for (int i = 0; i < val.Count; i++)
             {
                 if (!string.IsNullOrWhiteSpace(val[i].DocLink) && !string.IsNullOrWhiteSpace(val[i].Struct_Name))
-                    res.Add(val[i]);
+                {
+                    if (null == filterCodes || filterCodes.Contains(val[i].Struct_Code))
+                        res.Add(val[i]);
+                }
             }
             return res;
         }

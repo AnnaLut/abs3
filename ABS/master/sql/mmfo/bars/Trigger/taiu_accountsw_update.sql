@@ -7,138 +7,79 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAIU_ACCOUNTSW_UPDATE ***
 
-  CREATE OR REPLACE TRIGGER BARS.TAIU_ACCOUNTSW_UPDATE 
-   AFTER INSERT OR DELETE OR UPDATE OF VALUE, tag, acc
-   ON ACCOUNTSW
-   FOR EACH ROW
-DECLARE
-   l_bankdate    DATE;
-   l_chgaction   CHAR (1);
-   l_idupd       NUMBER;
-BEGIN
-   l_bankdate := bars.gl.bd;
+CREATE OR REPLACE TRIGGER TAIU_ACCOUNTSW_UPDATE
+AFTER INSERT OR UPDATE OR DELETE OF VALUE, TAG, ACC ON BARS.ACCOUNTSW
+for each row
+declare
+-- Author : V.Kharin
+-- Date   : 03/04/2018
+  l_rec  ACCOUNTSW_UPDATE%rowtype;
+  ---
+  procedure SAVE_CHANGES
+  is
+    l_old_key varchar2(38);
+  begin
 
-   IF l_bankdate IS NULL
-   THEN
-      SELECT TO_DATE (val, 'mm/dd/yyyy')
-        INTO l_bankdate
-        FROM params
-       WHERE par = 'BANKDATE';
-   END IF;
+    if ( l_rec.CHGACTION = 'D' )
+    then
+        l_rec.acc  := :old.acc;  l_rec.tag  := trim(:old.tag);   l_rec.value  := :old.value;
+    else
+        l_rec.acc  := :new.acc;  l_rec.tag  := trim(:new.tag);   l_rec.value  := :new.value;
+    end if;
+    bars_sqnc.split_key(l_rec.acc, l_old_key, l_rec.KF);
+    l_rec.IDUPD         := bars_sqnc.get_nextval('s_accountsw_update', l_rec.KF);
+    l_rec.EFFECTDATE    := COALESCE(gl.bd, glb_bankdate);
+    --l_rec.GLOBAL_BDATE  := glb_bankdate;    -- sysdate
+    l_rec.DONEBY        := user_id; --gl.aUID;  user_name;
+    l_rec.CHGDATE       := sysdate;
 
-   IF DELETING
-   THEN
-      l_chgaction := 'D';
-      l_idupd     := bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, :old.kf);
-      INSERT INTO accountsw_update (idupd,
-                                    chgaction,
-                                    effectdate,
-                                    chgdate,
-                                    doneby,
-                                    acc,
-                                    tag,
-                                    VALUE,
-                                    kf)
-           VALUES (l_idupd,
-                   l_chgaction,
-                   l_bankdate,
-                   SYSDATE,
-                   user_id,
-                   :old.acc,
-                   :old.tag,
-                   :old.VALUE,
-                   :old.kf);
-   ELSIF INSERTING
-   THEN
-      l_chgaction := 'I';
-      l_idupd     := bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, :new.kf);
-      INSERT INTO accountsw_update (idupd,
-                                    chgaction,
-                                    effectdate,
-                                    chgdate,
-                                    doneby,
-                                    acc,
-                                    tag,
-                                    VALUE,
-                                    kf)
-           VALUES (l_idupd,
-                   l_chgaction,
-                   l_bankdate,
-                   SYSDATE,
-                   user_id,
-                   :new.acc,
-                   :new.tag,
-                   :new.VALUE,
-                   :new.kf);
-   ELSIF UPDATING AND (:old.tag <> :new.tag OR :old.acc <> :new.acc OR :old.kf <> :new.kf)
-   THEN
-      l_chgaction := 'D';
-      l_idupd     := bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, :old.kf);
-      INSERT INTO accountsw_update (idupd,
-                                    chgaction,
-                                    effectdate,
-                                    chgdate,
-                                    doneby,
-                                    acc,
-                                    tag,
-                                    VALUE,
-                                    kf)
-           VALUES (l_idupd,
-                   l_chgaction,
-                   l_bankdate,
-                   SYSDATE,
-                   user_id,
-                   :old.acc,
-                   :old.tag,
-                   :old.VALUE,
-                   :old.kf);
+    insert into BARS.ACCOUNTSW_UPDATE values l_rec;
 
-      l_chgaction := 'I';
-      l_idupd     := bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, :new.kf);
-      INSERT INTO accountsw_update (idupd,
-                                    chgaction,
-                                    effectdate,
-                                    chgdate,
-                                    doneby,
-                                    acc,
-                                    tag,
-                                    VALUE,
-                                    kf)
-           VALUES (l_idupd,
-                   l_chgaction,
-                   l_bankdate,
-                   SYSDATE,
-                   user_id,
-                   :new.acc,
-                   :new.tag,
-                   :new.VALUE,
-                   :new.kf);
-   ELSIF UPDATING AND :old.VALUE <> :new.VALUE
-   THEN
-      l_chgaction := 'U';
-      l_idupd     := bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, :new.kf);
-      INSERT INTO accountsw_update (idupd,
-                                    chgaction,
-                                    effectdate,
-                                    chgdate,
-                                    doneby,
-                                    acc,
-                                    tag,
-                                    VALUE,
-                                    kf)
-           VALUES (l_idupd,
-                   l_chgaction,
-                   l_bankdate,
-                   SYSDATE,
-                   user_id,
-                   :new.acc,
-                   :new.tag,
-                   :new.VALUE,
-                   :new.kf
-                   );
-   END IF;
-END;
+  end SAVE_CHANGES;
+  ---
+begin
+  case
+    when inserting
+    then
+      l_rec.CHGACTION := 'I';
+      SAVE_CHANGES;
+
+    when deleting
+    then
+      l_rec.CHGACTION := 'D';
+      SAVE_CHANGES;
+
+    when updating
+    then
+      case
+        when (:old.acc <> :new.acc or :old.tag <> :new.tag) -- !!! analize changing PRIMARY KEY - columns
+        then -- При зміні значеннь полів, що входять в PRIMARY KEY (для правильного відображення при вивантаженні даних до DWH)
+          -- породжуємо в історії запис про видалення
+          l_rec.CHGACTION := 'D';
+          SAVE_CHANGES;
+
+          -- породжуємо в історії запис про вставку
+          l_rec.CHGACTION := 'I';
+          SAVE_CHANGES;
+
+        when (     :old.ACC != :new.ACC
+                OR :old.TAG != :new.TAG
+                OR :old.VALUE <> :new.VALUE
+                OR (:old.VALUE IS     NULL AND :new.VALUE IS NOT NULL)
+                OR (:old.VALUE IS NOT NULL AND :new.VALUE IS     NULL)
+             )
+        then -- При зміні значеннь полів, що НЕ входять в PRIMARY KEY
+          l_rec.CHGACTION := 'U';
+          SAVE_CHANGES;
+        else
+          Null;
+      end case;
+    else
+      null;
+  end case;
+end;
 /
+
 ALTER TRIGGER BARS.TAIU_ACCOUNTSW_UPDATE ENABLE;
 
 

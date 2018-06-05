@@ -178,23 +178,23 @@ begin
   delete from tts_vob where tt='820';
   begin
     insert into tts_vob(vob, tt, ord)
-    values (6, '820', 6);
+    values (6, '820', 2);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 6, ''820'', 6) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 6, ''820'', 2) - первичный ключ не найден!');
       else raise;
       end if;
   end;
   begin
     insert into tts_vob(vob, tt, ord)
-    values (138, '820', null);
+    values (138, '820', 1);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (tts_vob: 138, ''820'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 138, ''820'', 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;

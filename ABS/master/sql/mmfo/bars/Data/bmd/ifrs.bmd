@@ -58,7 +58,7 @@ declare
 
 begin
 
-  l_tabsemantic := 'Класифікаіція за МСФЗ';
+  l_tabsemantic := '3.Класифікатор принципів обліку Активів / IFRS';
   l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'IFRS';
@@ -124,8 +124,9 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'IFRS_ID', 'C', 'Код', '1', 4, 1, 1, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'IFRS_NAME', 'C', 'Найменування', '', null, 2, 1, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'IFRS_ID', 'C', 'Симв.код~IFRS', '1', 4, 1, 1, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'IFRS_NAME', 'C', 'Опис принципу~обліку Активів ', '', null, 2, 1, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'K9', 'N', 'Числовой код~по IFRS~("корзина")', '', null, 3, 1, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

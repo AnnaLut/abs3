@@ -26,6 +26,10 @@
   function get_respfile(p_fileid in number) return blob;
 
   procedure pfu_files_processing;
+  
+  procedure pfu_files_ebp_processing;
+     
+  procedure pfu_files_blk_processing;
 
   procedure cm_error_process;
 
@@ -1713,49 +1717,72 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
     for i in (select *
                 from pfu_ca_files t
                where t.state = 0
-               order by t.kf
-                 for update skip locked) loop
+               order by t.kf) loop
       begin
-      if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
-        l_kf := i.kf;
-        bars.bc.go(i.kf);
-        bars.bars_ow.ow_init;
-      end if;
-      if i.file_type = 1 then
-        epp_processing(i.file_data, i.id);
-      elsif i.file_type = 2 then
-        issuecard_processing(i.file_data, i.id);
-      elsif i.file_type = 3 then
-        activateacc_procesing(i.file_data, i.id);
-      elsif i.file_type in ( 4, 13,19) then
-        pfu_ru_file_utl.ref_state_processing(i.file_data, i.id);
-      elsif i.file_type = 5 then
+        if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
+          l_kf := i.kf;
+          bars.bc.go(i.kf);
+          bars.bars_ow.ow_init;
+        end if;
+        if i.file_type = 1 then
+          epp_processing(i.file_data, i.id);
+        elsif i.file_type = 2 then
+          issuecard_processing(i.file_data, i.id);
+        elsif i.file_type = 3 then
+          activateacc_procesing(i.file_data, i.id);
+        elsif i.file_type in ( 4, 13,19) then
+          pfu_ru_file_utl.ref_state_processing(i.file_data, i.id);
+        elsif i.file_type = 6 then
+          pfu_ru_file_utl.get_create_paym_processing(i.file_data, i.id);
+        elsif i.file_type = 7 then
+          pfu_ru_file_utl.get_cardkill_processing(i.file_data, i.id);
+        elsif i.file_type = 8 then
+          pfu_ru_file_utl.get_cm_error_processing(i.file_data, i.id);
+        elsif i.file_type in (9,18) then
+          pfu_ru_file_utl.get_acc_rest_processing(i.file_data, i.id);
+        elsif i.file_type = 10 then
+          pfu_ru_file_utl.get_epp_state_processing(i.file_data, i.id);
+        elsif i.file_type = 11 then
+          pfu_ru_file_utl.get_restart_epp_processing(i.file_data, i.id);
+        elsif i.file_type = 12 then
+          pfu_ru_file_utl.get_branch_processing(i.file_data, i.id);
+        elsif i.file_type = 14 then
+          pfu_ru_file_utl.get_report_processing(i.file_data, i.id);
+        elsif i.file_type = 16 then
+          pfu_ru_file_utl.set_destruct_processing(i.file_data, i.id);
+        elsif (i.file_type not in (5,15,17)) then -- типы файлов обрабатываемые отдельно
+          set_file_state(i.id, 99, 'Невірний тип файлу');
+        end if;
+        commit;
+      exception
+        when others then
+          set_file_state(i.id,
+                         98,
+                         'Помилка при обробці файлу' ||
+                         dbms_utility.format_error_stack() || chr(10) ||
+                         dbms_utility.format_error_backtrace());
+      end;
+    end loop;
+  end;
+  
+  procedure pfu_files_ebp_processing is
+    l_kf pfu_ca_files.kf%type;
+  begin
+    for i in (select *
+                from pfu_ca_files t
+               where t.state = 0
+                 and t.file_type = 5
+               order by t.kf) loop
+      begin
+
+        if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
+          l_kf := i.kf;
+          bars.bc.go(i.kf);
+          bars.bars_ow.ow_init;
+        end if;
+      
         pfu_ru_file_utl.get_ebp_processing(i.file_data, i.id);
-      elsif i.file_type = 6 then
-        pfu_ru_file_utl.get_create_paym_processing(i.file_data, i.id);
-      elsif i.file_type = 7 then
-        pfu_ru_file_utl.get_cardkill_processing(i.file_data, i.id);
-      elsif i.file_type = 8 then
-        pfu_ru_file_utl.get_cm_error_processing(i.file_data, i.id);
-      elsif i.file_type in (9,18) then
-        pfu_ru_file_utl.get_acc_rest_processing(i.file_data, i.id);
-      elsif i.file_type = 10 then
-        pfu_ru_file_utl.get_epp_state_processing(i.file_data, i.id);
-      elsif i.file_type = 11 then
-        pfu_ru_file_utl.get_restart_epp_processing(i.file_data, i.id);
-      elsif i.file_type = 12 then
-        pfu_ru_file_utl.get_branch_processing(i.file_data, i.id);
-      elsif i.file_type = 14 then
-        pfu_ru_file_utl.get_report_processing(i.file_data, i.id);
-      elsif i.file_type = 15 then
-        pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
-      elsif i.file_type = 16 then
-        pfu_ru_file_utl.set_destruct_processing(i.file_data, i.id);
-      elsif i.file_type = 17 then
-       	pfu_ru_file_utl.set_card_unblock_processing(i.file_data, i.id);
-      else
-        set_file_state(i.id, 99, 'Невірний тип файлу');
-      end if;
+     
       commit;
       exception
         when others then
@@ -1765,7 +1792,37 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                          dbms_utility.format_error_stack() || chr(10) ||
                          dbms_utility.format_error_backtrace());
       end;
-      --commit;
+    end loop;
+  end;
+  
+  procedure pfu_files_blk_processing is
+    l_kf pfu_ca_files.kf%type;
+  begin
+    for i in (select *
+                from pfu_ca_files t
+               where t.state = 0
+                 and t.file_type in (15,17)
+               order by t.kf) loop
+      begin
+        if (l_kf is not null and l_kf != i.kf) or (l_kf is null) then
+          l_kf := i.kf;
+          bars.bc.go(i.kf);
+          bars.bars_ow.ow_init;
+        end if;
+        if i.file_type = 15 then
+          pfu_ru_file_utl.set_card_block_processing(i.file_data, i.id);
+        elsif i.file_type = 17 then
+          pfu_ru_file_utl.set_card_unblock_processing(i.file_data, i.id);
+        end if;
+        commit;
+      exception
+        when others then
+          set_file_state(i.id,
+                         98,
+                         'Помилка при обробці файлу' ||
+                         dbms_utility.format_error_stack() || chr(10) ||
+                         dbms_utility.format_error_backtrace());
+      end;
     end loop;
   end;
 

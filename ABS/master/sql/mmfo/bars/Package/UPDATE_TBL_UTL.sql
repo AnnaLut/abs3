@@ -26,9 +26,10 @@ is
     --                        BPK_PARAMETERS  <-> BPK_PARAMETERS_UPDATE
     -- version 1.2 16.05.2018 (Kharin) ƒобавлены функции дл€ таблиц:
     --                        CC_DEAL  <-> CC_DEAL_UPDATE
+    -- version 1.3 18.05.2018 (Kharin) »справлена процедура SYNC_BPK_PARAMETERS_UPDATE
     -----------------------------------------------------------------
 
-    G_HEADER_VERSION      constant varchar2(64)  := 'version 1.2 16.05.2018';
+    G_HEADER_VERSION      constant varchar2(64)  := 'version 1.3 18.05.2018';
 
     ----------------------------------------------------------------
     -- HEADER_VERSION()
@@ -111,7 +112,7 @@ end;
 
 CREATE OR REPLACE PACKAGE BODY BARS.UPDATE_TBL_UTL
 IS
-    G_BODY_VERSION       constant varchar2(64) := 'version 1.2 16.05.2018';
+    G_BODY_VERSION       constant varchar2(64) := 'version 1.3 18.05.2018';
     G_TRACE              constant varchar2(20) := 'BARS.UPDATE_TBL_UTL.';
     G_MODULE             constant varchar2(3)  := 'UPL';
 
@@ -175,26 +176,8 @@ IS
                 end if;
         end;
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME,
-                                         KF)
-             VALUES (l_id,
-                     G_STAT_ID,
-                     p_FIELD_NAME,
-                     p_FIELD_TYPE,
-                     p_value,
-                     G_RUN_ID,
-                     G_START_DT,
-                     G_END_DT,
-                     p_tbl,
-                     bars.gl.kf);
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME, KF)
+               VALUES (l_id, G_STAT_ID, p_FIELD_NAME, p_FIELD_TYPE, p_value, G_RUN_ID, G_START_DT, G_END_DT, p_tbl, bars.gl.kf);
 
         if lower(p_FIELD_NAME) = 'end_process'
         then
@@ -280,113 +263,106 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   DECODE(t_pivot.i,
-                          30, fld30,
-                          1,  fld1,   2, fld2,    3,  fld3,   4, fld4,
-                          5,  fld5,   6, fld6,    7,  fld7,   8, fld8,
-                          9,  fld9,   10, fld10,  11, fld11,  12, fld12,
-                          13, fld13,  14, fld14,  15, fld15,  16, fld16,
-                          17, fld17,  18, fld18,  19, fld19,  20, fld20,
-                          21, fld21,  22, fld22,  23, fld23,  24, fld24,
-                          25, fld25,  26, fld26,  27, fld27,  28, fld28,
-                          29, fld29)                       AS field,
-                   'count_diff' type1,
-                   DECODE(t_pivot.i,
-                          30, decode(c30, null, 0, c30),
-                          1,  c1,   2,  c2,   3,  c3,   4,  c4,
-                          5,  c5,   6,  c6,   7,  c7,   8,  c8,
-                          9,  c9,   10, c10,  11, c11,  12, c12,
-                          13, c13,  14, c14,  15, c15,  16, c16,
-                          17, c17,  18, c18,  19, c19,  20, c20,
-                          21, c21,  22, c22,  23, c23,  24, c24,
-                          25, c25,  26, c26,  27, c27,  28, c28,
-                          29, c29)  AS CNT,
-                   G_RUN_ID,
-                   G_START_DT,
-                   G_END_DT,
-                   l_tbl_name
-              FROM (    SELECT ROWNUM AS i
-                          FROM DUAL
-                    CONNECT BY LEVEL <= 30) t_pivot,
-                   (SELECT /*+ no_index(acu PK_ACCOUNTSUPD) */
-                          'TOTAL_ROWS' fld30,  SUM(1) c30,
-                           'acc' fld1,         SUM(DECODE(ac.acc, acu.acc, 0, 1)) c1,
-                           'KF' fld2,          SUM(DECODE(ac.KF, acu.KF, 0, 1)) c2,
-                           'NLS' fld3,         SUM(DECODE(ac.NLS, acu.NLS, 0, 1)) c3,
-                           'KV' fld4,          SUM(DECODE(ac.KV, acu.KV, 0, 1)) c4,
-                           'BRANCH' fld5,      SUM(DECODE(ac.BRANCH, acu.BRANCH, 0, 1)) c5,
-                           'NLSALT' fld6,      SUM(DECODE(ac.NLSALT, acu.NLSALT, 0, 1)) c6,
-                           'NBS' fld7,         SUM(DECODE(ac.NBS, acu.NBS, 0, 1)) c7,
-                           'NBS2' fld8,        SUM(DECODE(ac.NBS2, acu.NBS2, 0, 1)) c8,
-                           'DAOS' fld9,        SUM(DECODE(ac.DAOS, acu.DAOS, 0, 1)) c9,
-                           'ISP' fld10,        SUM(DECODE(ac.ISP, acu.ISP, 0, 1)) c10,
-                           'NMS' fld11,        SUM(DECODE(ac.NMS, acu.NMS, 0, 1)) c11,
-                           'LIM' fld12,        SUM(DECODE(ac.LIM, acu.LIM, 0, 1)) c12,
-                           'PAP' fld13,        SUM(DECODE(ac.PAP, acu.PAP, 0, 1)) c13,
-                           'TIP' fld14,        SUM(DECODE(ac.TIP, acu.TIP, 0, 1)) c14,
-                           'VID' fld15,        SUM(DECODE(ac.VID, acu.VID, 0, 1)) c15,
-                           'MDATE' fld16,      SUM(DECODE(ac.MDATE, acu.MDATE, 0, 1)) c16,
-                           'DAZS' fld17,       SUM(DECODE(ac.DAZS, acu.DAZS, 0, 1)) c17,
-                           'ACCC' fld18,       SUM(DECODE(ac.ACCC, acu.ACCC, 0, 1)) c18,
-                           'BLKD' fld19,       SUM(DECODE(ac.BLKD, acu.BLKD, 0, 1)) c19,
-                           'BLKK' fld20,       SUM(DECODE(ac.BLKK, acu.BLKK, 0, 1)) c20,
-                           'POS' fld21,        SUM(DECODE(ac.POS, acu.POS, 0, 1)) c21,
-                           'SECI' fld22,       SUM(DECODE(ac.SECI, acu.SECI, 0, 1)) c22,
-                           'SECO' fld23,       SUM(DECODE(ac.SECO, acu.SECO, 0, 1)) c23,
-                           'GRP' fld24,        SUM(DECODE(ac.GRP, acu.GRP, 0, 1)) c24,
-                           'OSTX' fld25,       SUM(DECODE(ac.OSTX, acu.OSTX, 0, 1)) c25,
-                           'RNK' fld26,        SUM(DECODE(ac.RNK, acu.RNK, 0, 1)) c26,
-                           'TOBO' fld27,       SUM(DECODE(ac.TOBO, acu.TOBO, 0, 1)) c27,
-                           'OB22' fld28,       SUM(DECODE(ac.OB22, acu.OB22, 0, 1)) c28,
-                           'SEND_SMS' fld29,   SUM(DECODE(ac.SEND_SMS, acu.SEND_SMS, 0, 1)) c29
-                      FROM BARS.ACCOUNTS ac
-                      LEFT JOIN BARS.ACCOUNTS_UPDATE acu ON (ac.acc = acu.acc AND ac.kf = acu.kf)
-                     WHERE (DECODE(ac.acc, acu.acc, 1, 0) = 0
-                         OR DECODE(ac.KF, acu.KF, 1, 0) = 0
-                         OR DECODE(ac.NLS, acu.NLS, 1, 0) = 0
-                         OR DECODE(ac.KV, acu.KV, 1, 0) = 0
-                         OR DECODE(ac.BRANCH, acu.BRANCH, 1, 0) = 0
-                         OR DECODE(ac.NLSALT, acu.NLSALT, 1, 0) = 0
-                         OR DECODE(ac.NBS, acu.NBS, 1, 0) = 0
-                         OR DECODE(ac.NBS2, acu.NBS2, 1, 0) = 0
-                         OR DECODE(ac.DAOS, acu.DAOS, 1, 0) = 0
-                         OR DECODE(ac.ISP, acu.ISP, 1, 0) = 0
-                         OR DECODE(ac.NMS, acu.NMS, 1, 0) = 0
-                         OR DECODE(ac.LIM, acu.LIM, 1, 0) = 0
-                         OR DECODE(ac.PAP, acu.PAP, 1, 0) = 0
-                         OR DECODE(ac.TIP, acu.TIP, 1, 0) = 0
-                         OR DECODE(ac.VID, acu.VID, 1, 0) = 0
-                         OR DECODE(ac.MDATE, acu.MDATE, 1, 0) = 0
-                         OR DECODE(ac.DAZS, acu.DAZS, 1, 0) = 0
-                         OR DECODE(ac.ACCC, acu.ACCC, 1, 0) = 0
-                         OR DECODE(ac.BLKD, acu.BLKD, 1, 0) = 0
-                         OR DECODE(ac.BLKK, acu.BLKK, 1, 0) = 0
-                         OR DECODE(ac.POS, acu.POS, 1, 0) = 0
-                         OR DECODE(ac.SECI, acu.SECI, 1, 0) = 0
-                         OR DECODE(ac.SECO, acu.SECO, 1, 0) = 0
-                         OR DECODE(ac.GRP, acu.GRP, 1, 0) = 0
-                         OR DECODE(ac.OSTX, acu.OSTX, 1, 0) = 0
-                         OR DECODE(ac.RNK, acu.RNK, 1, 0) = 0
-                         OR DECODE(ac.TOBO, acu.TOBO, 1, 0) = 0
-                         OR DECODE(ac.OB22, acu.OB22, 1, 0) = 0
-                         OR DECODE(ac.SEND_SMS, acu.SEND_SMS, 1, 0) = 0)
-                       and acu.IDUPD IN (  SELECT /*+ no_index(upd2 PK_ACCOUNTSUPD) */
-                                                  MAX(upd2.IDUPD)
-                                             FROM BARS.ACCOUNTS_UPDATE upd2
-                                            where upd2.kf = bars.gl.kf
-                                            GROUP BY upd2.acc)
-                       AND ac.KF = bars.gl.kf);
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+        SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+               G_STAT_ID,
+               DECODE(t_pivot.i,
+                      30, fld30,
+                      1,  fld1,   2, fld2,    3,  fld3,   4, fld4,
+                      5,  fld5,   6, fld6,    7,  fld7,   8, fld8,
+                      9,  fld9,   10, fld10,  11, fld11,  12, fld12,
+                      13, fld13,  14, fld14,  15, fld15,  16, fld16,
+                      17, fld17,  18, fld18,  19, fld19,  20, fld20,
+                      21, fld21,  22, fld22,  23, fld23,  24, fld24,
+                      25, fld25,  26, fld26,  27, fld27,  28, fld28,
+                      29, fld29)                       AS field,
+               'count_diff' type1,
+               DECODE(t_pivot.i,
+                      30, decode(c30, null, 0, c30),
+                      1,  c1,   2,  c2,   3,  c3,   4,  c4,
+                      5,  c5,   6,  c6,   7,  c7,   8,  c8,
+                      9,  c9,   10, c10,  11, c11,  12, c12,
+                      13, c13,  14, c14,  15, c15,  16, c16,
+                      17, c17,  18, c18,  19, c19,  20, c20,
+                      21, c21,  22, c22,  23, c23,  24, c24,
+                      25, c25,  26, c26,  27, c27,  28, c28,
+                      29, c29)  AS CNT,
+               G_RUN_ID,
+               G_START_DT,
+               G_END_DT,
+               l_tbl_name
+          FROM (    SELECT ROWNUM AS i
+                      FROM DUAL
+                CONNECT BY LEVEL <= 30) t_pivot,
+               (SELECT /*+ no_index(acu PK_ACCOUNTSUPD) */
+                      'TOTAL_ROWS' fld30,  SUM(1) c30,
+                       'acc' fld1,         SUM(DECODE(ac.acc, acu.acc, 0, 1)) c1,
+                       'KF' fld2,          SUM(DECODE(ac.KF, acu.KF, 0, 1)) c2,
+                       'NLS' fld3,         SUM(DECODE(ac.NLS, acu.NLS, 0, 1)) c3,
+                       'KV' fld4,          SUM(DECODE(ac.KV, acu.KV, 0, 1)) c4,
+                       'BRANCH' fld5,      SUM(DECODE(ac.BRANCH, acu.BRANCH, 0, 1)) c5,
+                       'NLSALT' fld6,      SUM(DECODE(ac.NLSALT, acu.NLSALT, 0, 1)) c6,
+                       'NBS' fld7,         SUM(DECODE(ac.NBS, acu.NBS, 0, 1)) c7,
+                       'NBS2' fld8,        SUM(DECODE(ac.NBS2, acu.NBS2, 0, 1)) c8,
+                       'DAOS' fld9,        SUM(DECODE(ac.DAOS, acu.DAOS, 0, 1)) c9,
+                       'ISP' fld10,        SUM(DECODE(ac.ISP, acu.ISP, 0, 1)) c10,
+                       'NMS' fld11,        SUM(DECODE(ac.NMS, acu.NMS, 0, 1)) c11,
+                       'LIM' fld12,        SUM(DECODE(ac.LIM, acu.LIM, 0, 1)) c12,
+                       'PAP' fld13,        SUM(DECODE(ac.PAP, acu.PAP, 0, 1)) c13,
+                       'TIP' fld14,        SUM(DECODE(ac.TIP, acu.TIP, 0, 1)) c14,
+                       'VID' fld15,        SUM(DECODE(ac.VID, acu.VID, 0, 1)) c15,
+                       'MDATE' fld16,      SUM(DECODE(ac.MDATE, acu.MDATE, 0, 1)) c16,
+                       'DAZS' fld17,       SUM(DECODE(ac.DAZS, acu.DAZS, 0, 1)) c17,
+                       'ACCC' fld18,       SUM(DECODE(ac.ACCC, acu.ACCC, 0, 1)) c18,
+                       'BLKD' fld19,       SUM(DECODE(ac.BLKD, acu.BLKD, 0, 1)) c19,
+                       'BLKK' fld20,       SUM(DECODE(ac.BLKK, acu.BLKK, 0, 1)) c20,
+                       'POS' fld21,        SUM(DECODE(ac.POS, acu.POS, 0, 1)) c21,
+                       'SECI' fld22,       SUM(DECODE(ac.SECI, acu.SECI, 0, 1)) c22,
+                       'SECO' fld23,       SUM(DECODE(ac.SECO, acu.SECO, 0, 1)) c23,
+                       'GRP' fld24,        SUM(DECODE(ac.GRP, acu.GRP, 0, 1)) c24,
+                       'OSTX' fld25,       SUM(DECODE(ac.OSTX, acu.OSTX, 0, 1)) c25,
+                       'RNK' fld26,        SUM(DECODE(ac.RNK, acu.RNK, 0, 1)) c26,
+                       'TOBO' fld27,       SUM(DECODE(ac.TOBO, acu.TOBO, 0, 1)) c27,
+                       'OB22' fld28,       SUM(DECODE(ac.OB22, acu.OB22, 0, 1)) c28,
+                       'SEND_SMS' fld29,   SUM(DECODE(ac.SEND_SMS, acu.SEND_SMS, 0, 1)) c29
+                  FROM BARS.ACCOUNTS ac
+                  LEFT JOIN BARS.ACCOUNTS_UPDATE acu ON (ac.acc = acu.acc AND ac.kf = acu.kf)
+                 WHERE (DECODE(ac.acc, acu.acc, 1, 0) = 0
+                     OR DECODE(ac.KF, acu.KF, 1, 0) = 0
+                     OR DECODE(ac.NLS, acu.NLS, 1, 0) = 0
+                     OR DECODE(ac.KV, acu.KV, 1, 0) = 0
+                     OR DECODE(ac.BRANCH, acu.BRANCH, 1, 0) = 0
+                     OR DECODE(ac.NLSALT, acu.NLSALT, 1, 0) = 0
+                     OR DECODE(ac.NBS, acu.NBS, 1, 0) = 0
+                     OR DECODE(ac.NBS2, acu.NBS2, 1, 0) = 0
+                     OR DECODE(ac.DAOS, acu.DAOS, 1, 0) = 0
+                     OR DECODE(ac.ISP, acu.ISP, 1, 0) = 0
+                     OR DECODE(ac.NMS, acu.NMS, 1, 0) = 0
+                     OR DECODE(ac.LIM, acu.LIM, 1, 0) = 0
+                     OR DECODE(ac.PAP, acu.PAP, 1, 0) = 0
+                     OR DECODE(ac.TIP, acu.TIP, 1, 0) = 0
+                     OR DECODE(ac.VID, acu.VID, 1, 0) = 0
+                     OR DECODE(ac.MDATE, acu.MDATE, 1, 0) = 0
+                     OR DECODE(ac.DAZS, acu.DAZS, 1, 0) = 0
+                     OR DECODE(ac.ACCC, acu.ACCC, 1, 0) = 0
+                     OR DECODE(ac.BLKD, acu.BLKD, 1, 0) = 0
+                     OR DECODE(ac.BLKK, acu.BLKK, 1, 0) = 0
+                     OR DECODE(ac.POS, acu.POS, 1, 0) = 0
+                     OR DECODE(ac.SECI, acu.SECI, 1, 0) = 0
+                     OR DECODE(ac.SECO, acu.SECO, 1, 0) = 0
+                     OR DECODE(ac.GRP, acu.GRP, 1, 0) = 0
+                     OR DECODE(ac.OSTX, acu.OSTX, 1, 0) = 0
+                     OR DECODE(ac.RNK, acu.RNK, 1, 0) = 0
+                     OR DECODE(ac.TOBO, acu.TOBO, 1, 0) = 0
+                     OR DECODE(ac.OB22, acu.OB22, 1, 0) = 0
+                     OR DECODE(ac.SEND_SMS, acu.SEND_SMS, 1, 0) = 0)
+                   and acu.IDUPD IN (  SELECT /*+ no_index(upd2 PK_ACCOUNTSUPD) */
+                                              MAX(upd2.IDUPD)
+                                         FROM BARS.ACCOUNTS_UPDATE upd2
+                                        where upd2.kf = bars.gl.kf
+                                        GROUP BY upd2.acc)
+                   AND ac.KF = bars.gl.kf);
+
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -521,104 +497,96 @@ IS
     BEGIN
        start_process(l_tbl_name, 'CHECK');
  
-       INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                        STAT_ID,
-                                        FIELD_NAME,
-                                        FIELD_TYPE,
-                                        VALUE,
-                                        RUN_ID,
-                                        STARTDATE,
-                                        ENDDATE,
-                                        TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   DECODE ( t_pivot.i,
-                            1, f1,    2, f2,    3, f3,    4, f4,    5, f5,
-                            6, f6,    7, f7,    8, f8,    9, f9,    10, f10,
-                           11, f11,  12, f12,  13, f13,  14, f14,   15, f15,
-                           16, f16,  17, f17,  18, f18,  19, f19,   20, f20,
-                           21, f21,  22, f22,  23, f23,  24, f24,   25, f25,
-                           26, f26,  27, f27,  28, f28 ) AS field,
-                   'count_diff' type1,
-                   DECODE ( t_pivot.i,
-                            1, c1,    2, c2,    3, c3,    4, c4,    5, c5,
-                            6, c6,    7, c7,    8, c8,    9, c9,   10, c10,
-                            11, c11, 12, c12,  13, c13,  14, c14,  15, c15,
-                            16, c16, 17, c17,  18, c18,  19, c19,  20, c20,
-                            21, c21, 22, c22,  23, c23,  24, c24,  25, c25,
-                            26, c26, 27, c27,  28, decode(c28, null, 0, c28) ) AS CNT,
-                  G_RUN_ID,
-                  G_START_DT,
-                  G_END_DT,
-                  l_tbl_name
-              FROM ( SELECT ROWNUM AS i FROM DUAL CONNECT BY LEVEL <= 28) t_pivot,
-                   ( SELECT SUM ( DECODE ( ccd.ND, ccd_upd.ND, 0, 1 ) ) c1,                             'ND' f1,
-                            SUM ( DECODE ( ccd.SOS, ccd_upd.SOS, 0, 1 ) ) c2,                           'SOS' f2,
-                            SUM ( DECODE ( ccd.CC_ID, ccd_upd.CC_ID, 0, 1 ) ) c3,                       'CC_ID' f3,
-                            SUM ( DECODE ( ccd.SDATE, ccd_upd.SDATE, 0, 1 ) ) c4,                       'SDATE' f4,
-                            SUM ( DECODE ( ccd.WDATE, ccd_upd.WDATE, 0, 1 ) ) c5,                       'WDATE' f5,
-                            SUM ( DECODE ( ccd.RNK, ccd_upd.RNK, 0, 1 ) ) c6,                           'RNK' f6,
-                            SUM ( DECODE ( ccd.VIDD, ccd_upd.VIDD, 0, 1 ) ) c7,                         'VIDD' f7,
-                            SUM ( DECODE ( ccd.LIMIT, ccd_upd.LIMIT, 0, 1 ) ) c8,                       'LIMIT' f8,
-                            SUM ( DECODE ( ccd.KPROLOG, ccd_upd.KPROLOG, 0, 1 ) ) c9,                   'KPROLOG' f9,
-                            SUM ( DECODE ( ccd.USER_ID, ccd_upd.USER_ID, 0, 1 ) ) c10,                  'USER_ID' f10,
-                            SUM ( DECODE ( ccd.OBS, ccd_upd.OBS, 0, 1 ) ) c11,                          'OBS' f11,
-                            SUM ( DECODE ( ccd.BRANCH, ccd_upd.BRANCH, 0, 1 ) ) c12,                    'BRANCH' f12,
-                            SUM ( DECODE ( ccd.KF, ccd_upd.KF, 0, 1 ) ) c13,                            'KF' f13,
-                            SUM ( DECODE ( ccd.IR, ccd_upd.IR, 0, 1 ) ) c14,                            'IR' f14,
-                            SUM ( DECODE ( ccd.PROD, ccd_upd.PROD, 0, 1 ) ) c15,                        'PROD' f15,
-                            SUM ( DECODE ( ccd.SDOG, ccd_upd.SDOG, 0, 1 ) ) c16,                        'SDOG' f16,
-                            SUM ( DECODE ( ccd.SKARB_ID, ccd_upd.SKARB_ID, 0, 1 ) ) c17,                'SKARB_ID' f17,
-                            SUM ( DECODE ( ccd.FIN, ccd_upd.FIN, 0, 1 ) ) c18,                          'FIN' f18,
-                            SUM ( DECODE ( ccd.NDI, ccd_upd.NDI, 0, 1 ) ) c19,                          'NDI' f19,
-                            SUM ( DECODE ( ccd.FIN23, ccd_upd.FIN23, 0, 1 ) ) c20,                      'FIN23' f20,
-                            SUM ( DECODE ( ccd.OBS23, ccd_upd.OBS23, 0, 1 ) ) c21,                      'OBS23' f21,
-                            SUM ( DECODE ( ccd.KAT23, ccd_upd.KAT23, 0, 1 ) ) c22,                      'KAT23' f22,
-                            SUM ( DECODE ( ccd.K23, ccd_upd.K23, 0, 1 ) ) c23,                          'K23' f23,
-                            SUM ( DECODE ( ccd.KOL_SP, ccd_upd.KOL_SP, 0, 1 ) ) c24,                    'KOL_SP' f24,
-                            SUM ( DECODE ( ccd.S250, ccd_upd.S250, 0, 1 ) ) c25,                        'S250' f25,
-                            SUM ( DECODE ( ccd.GRP, ccd_upd.GRP, 0, 1 ) ) c26,                          'GRP' f26,
-                            SUM ( DECODE ( ccd.NDG, ccd_upd.NDG, 0, 1 ) ) c27,                          'NDG' f27,
-                            SUM ( 1 ) c28,                                                              'TOTAL_ROWS' f28
-                       FROM BARS.CC_DEAL ccd
-                            FULL OUTER JOIN
-                            ( SELECT *
-                                FROM BARS.CC_DEAL_UPDATE ccd_upd1
-                               WHERE     ccd_upd1.IDUPD IN (  SELECT MAX (
-                                                                           ccd_upd2.IDUPD )
-                                                                FROM BARS.CC_DEAL_UPDATE ccd_upd2
-                                                            GROUP BY ccd_upd2.ND )
-                                     AND ccd_upd1.CHGACTION <> 'D' ) ccd_upd
-                               ON ( ccd.ND = ccd_upd.ND AND ccd.kf = ccd_upd.kf )
-                      WHERE     (    DECODE ( ccd.ND, ccd_upd.ND, 1, 0 ) = 0
-                                  OR DECODE ( ccd.SOS, ccd_upd.SOS, 1, 0 ) = 0
-                                  OR DECODE ( ccd.CC_ID, ccd_upd.CC_ID, 1, 0 ) = 0
-                                  OR DECODE ( ccd.SDATE, ccd_upd.SDATE, 1, 0 ) = 0
-                                  OR DECODE ( ccd.WDATE, ccd_upd.WDATE, 1, 0 ) = 0
-                                  OR DECODE ( ccd.RNK, ccd_upd.RNK, 1, 0 ) = 0
-                                  OR DECODE ( ccd.VIDD, ccd_upd.VIDD, 1, 0 ) = 0
-                                  OR DECODE ( ccd.LIMIT, ccd_upd.LIMIT, 1, 0 ) = 0
-                                  OR DECODE ( ccd.KPROLOG, ccd_upd.KPROLOG, 1, 0 ) = 0
-                                  OR DECODE ( ccd.USER_ID, ccd_upd.USER_ID, 1, 0 ) = 0
-                                  OR DECODE ( ccd.OBS, ccd_upd.OBS, 1, 0 ) = 0
-                                  OR DECODE ( ccd.BRANCH, ccd_upd.BRANCH, 1, 0 ) = 0
-                                  OR DECODE ( ccd.KF, ccd_upd.KF, 1, 0 ) = 0
-                                  OR DECODE ( ccd.IR, ccd_upd.IR, 1, 0 ) = 0
-                                  OR DECODE ( ccd.PROD, ccd_upd.PROD, 1, 0 ) = 0
-                                  OR DECODE ( ccd.SDOG, ccd_upd.SDOG, 1, 0 ) = 0
-                                  OR DECODE ( ccd.SKARB_ID, ccd_upd.SKARB_ID, 1, 0 ) = 0
-                                  OR DECODE ( ccd.FIN, ccd_upd.FIN, 1, 0 ) = 0
-                                  OR DECODE ( ccd.NDI, ccd_upd.NDI, 1, 0 ) = 0
-                                  OR DECODE ( ccd.FIN23, ccd_upd.FIN23, 1, 0 ) = 0
-                                  OR DECODE ( ccd.OBS23, ccd_upd.OBS23, 1, 0 ) = 0
-                                  OR DECODE ( ccd.KAT23, ccd_upd.KAT23, 1, 0 ) = 0
-                                  OR DECODE ( ccd.K23, ccd_upd.K23, 1, 0 ) = 0
-                                  OR DECODE ( ccd.KOL_SP, ccd_upd.KOL_SP, 1, 0 ) = 0
-                                  OR DECODE ( ccd.S250, ccd_upd.S250, 1, 0 ) = 0
-                                  OR DECODE ( ccd.GRP, ccd_upd.GRP, 1, 0 ) = 0
-                                  OR DECODE ( ccd.NDG, ccd_upd.NDG, 1, 0 ) = 0)
-                            AND ccd.KF = bars.gl.kf
-                            AND ccd_upd.KF = bars.gl.kf );
+       INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+       SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+              G_STAT_ID,
+              DECODE ( t_pivot.i,
+                       1, f1,    2, f2,    3, f3,    4, f4,    5, f5,
+                       6, f6,    7, f7,    8, f8,    9, f9,    10, f10,
+                      11, f11,  12, f12,  13, f13,  14, f14,   15, f15,
+                      16, f16,  17, f17,  18, f18,  19, f19,   20, f20,
+                      21, f21,  22, f22,  23, f23,  24, f24,   25, f25,
+                      26, f26,  27, f27,  28, f28 ) AS field,
+              'count_diff' type1,
+              DECODE ( t_pivot.i,
+                       1, c1,    2, c2,    3, c3,    4, c4,    5, c5,
+                       6, c6,    7, c7,    8, c8,    9, c9,   10, c10,
+                       11, c11, 12, c12,  13, c13,  14, c14,  15, c15,
+                       16, c16, 17, c17,  18, c18,  19, c19,  20, c20,
+                       21, c21, 22, c22,  23, c23,  24, c24,  25, c25,
+                       26, c26, 27, c27,  28, decode(c28, null, 0, c28) ) AS CNT,
+             G_RUN_ID,
+             G_START_DT,
+             G_END_DT,
+             l_tbl_name
+         FROM ( SELECT ROWNUM AS i FROM DUAL CONNECT BY LEVEL <= 28) t_pivot,
+              ( SELECT SUM ( DECODE ( ccd.ND, ccd_upd.ND, 0, 1 ) ) c1,                             'ND' f1,
+                       SUM ( DECODE ( ccd.SOS, ccd_upd.SOS, 0, 1 ) ) c2,                           'SOS' f2,
+                       SUM ( DECODE ( ccd.CC_ID, ccd_upd.CC_ID, 0, 1 ) ) c3,                       'CC_ID' f3,
+                       SUM ( DECODE ( ccd.SDATE, ccd_upd.SDATE, 0, 1 ) ) c4,                       'SDATE' f4,
+                       SUM ( DECODE ( ccd.WDATE, ccd_upd.WDATE, 0, 1 ) ) c5,                       'WDATE' f5,
+                       SUM ( DECODE ( ccd.RNK, ccd_upd.RNK, 0, 1 ) ) c6,                           'RNK' f6,
+                       SUM ( DECODE ( ccd.VIDD, ccd_upd.VIDD, 0, 1 ) ) c7,                         'VIDD' f7,
+                       SUM ( DECODE ( ccd.LIMIT, ccd_upd.LIMIT, 0, 1 ) ) c8,                       'LIMIT' f8,
+                       SUM ( DECODE ( ccd.KPROLOG, ccd_upd.KPROLOG, 0, 1 ) ) c9,                   'KPROLOG' f9,
+                       SUM ( DECODE ( ccd.USER_ID, ccd_upd.USER_ID, 0, 1 ) ) c10,                  'USER_ID' f10,
+                       SUM ( DECODE ( ccd.OBS, ccd_upd.OBS, 0, 1 ) ) c11,                          'OBS' f11,
+                       SUM ( DECODE ( ccd.BRANCH, ccd_upd.BRANCH, 0, 1 ) ) c12,                    'BRANCH' f12,
+                       SUM ( DECODE ( ccd.KF, ccd_upd.KF, 0, 1 ) ) c13,                            'KF' f13,
+                       SUM ( DECODE ( ccd.IR, ccd_upd.IR, 0, 1 ) ) c14,                            'IR' f14,
+                       SUM ( DECODE ( ccd.PROD, ccd_upd.PROD, 0, 1 ) ) c15,                        'PROD' f15,
+                       SUM ( DECODE ( ccd.SDOG, ccd_upd.SDOG, 0, 1 ) ) c16,                        'SDOG' f16,
+                       SUM ( DECODE ( ccd.SKARB_ID, ccd_upd.SKARB_ID, 0, 1 ) ) c17,                'SKARB_ID' f17,
+                       SUM ( DECODE ( ccd.FIN, ccd_upd.FIN, 0, 1 ) ) c18,                          'FIN' f18,
+                       SUM ( DECODE ( ccd.NDI, ccd_upd.NDI, 0, 1 ) ) c19,                          'NDI' f19,
+                       SUM ( DECODE ( ccd.FIN23, ccd_upd.FIN23, 0, 1 ) ) c20,                      'FIN23' f20,
+                       SUM ( DECODE ( ccd.OBS23, ccd_upd.OBS23, 0, 1 ) ) c21,                      'OBS23' f21,
+                       SUM ( DECODE ( ccd.KAT23, ccd_upd.KAT23, 0, 1 ) ) c22,                      'KAT23' f22,
+                       SUM ( DECODE ( ccd.K23, ccd_upd.K23, 0, 1 ) ) c23,                          'K23' f23,
+                       SUM ( DECODE ( ccd.KOL_SP, ccd_upd.KOL_SP, 0, 1 ) ) c24,                    'KOL_SP' f24,
+                       SUM ( DECODE ( ccd.S250, ccd_upd.S250, 0, 1 ) ) c25,                        'S250' f25,
+                       SUM ( DECODE ( ccd.GRP, ccd_upd.GRP, 0, 1 ) ) c26,                          'GRP' f26,
+                       SUM ( DECODE ( ccd.NDG, ccd_upd.NDG, 0, 1 ) ) c27,                          'NDG' f27,
+                       SUM ( 1 ) c28,                                                              'TOTAL_ROWS' f28
+                  FROM BARS.CC_DEAL ccd
+                       FULL OUTER JOIN
+                       ( SELECT *
+                           FROM BARS.CC_DEAL_UPDATE ccd_upd1
+                          WHERE     ccd_upd1.IDUPD IN (  SELECT MAX (
+                                                                      ccd_upd2.IDUPD )
+                                                           FROM BARS.CC_DEAL_UPDATE ccd_upd2
+                                                       GROUP BY ccd_upd2.ND )
+                                AND ccd_upd1.CHGACTION <> 'D' ) ccd_upd
+                          ON ( ccd.ND = ccd_upd.ND AND ccd.kf = ccd_upd.kf )
+                 WHERE     (    DECODE ( ccd.ND, ccd_upd.ND, 1, 0 ) = 0
+                             OR DECODE ( ccd.SOS, ccd_upd.SOS, 1, 0 ) = 0
+                             OR DECODE ( ccd.CC_ID, ccd_upd.CC_ID, 1, 0 ) = 0
+                             OR DECODE ( ccd.SDATE, ccd_upd.SDATE, 1, 0 ) = 0
+                             OR DECODE ( ccd.WDATE, ccd_upd.WDATE, 1, 0 ) = 0
+                             OR DECODE ( ccd.RNK, ccd_upd.RNK, 1, 0 ) = 0
+                             OR DECODE ( ccd.VIDD, ccd_upd.VIDD, 1, 0 ) = 0
+                             OR DECODE ( ccd.LIMIT, ccd_upd.LIMIT, 1, 0 ) = 0
+                             OR DECODE ( ccd.KPROLOG, ccd_upd.KPROLOG, 1, 0 ) = 0
+                             OR DECODE ( ccd.USER_ID, ccd_upd.USER_ID, 1, 0 ) = 0
+                             OR DECODE ( ccd.OBS, ccd_upd.OBS, 1, 0 ) = 0
+                             OR DECODE ( ccd.BRANCH, ccd_upd.BRANCH, 1, 0 ) = 0
+                             OR DECODE ( ccd.KF, ccd_upd.KF, 1, 0 ) = 0
+                             OR DECODE ( ccd.IR, ccd_upd.IR, 1, 0 ) = 0
+                             OR DECODE ( ccd.PROD, ccd_upd.PROD, 1, 0 ) = 0
+                             OR DECODE ( ccd.SDOG, ccd_upd.SDOG, 1, 0 ) = 0
+                             OR DECODE ( ccd.SKARB_ID, ccd_upd.SKARB_ID, 1, 0 ) = 0
+                             OR DECODE ( ccd.FIN, ccd_upd.FIN, 1, 0 ) = 0
+                             OR DECODE ( ccd.NDI, ccd_upd.NDI, 1, 0 ) = 0
+                             OR DECODE ( ccd.FIN23, ccd_upd.FIN23, 1, 0 ) = 0
+                             OR DECODE ( ccd.OBS23, ccd_upd.OBS23, 1, 0 ) = 0
+                             OR DECODE ( ccd.KAT23, ccd_upd.KAT23, 1, 0 ) = 0
+                             OR DECODE ( ccd.K23, ccd_upd.K23, 1, 0 ) = 0
+                             OR DECODE ( ccd.KOL_SP, ccd_upd.KOL_SP, 1, 0 ) = 0
+                             OR DECODE ( ccd.S250, ccd_upd.S250, 1, 0 ) = 0
+                             OR DECODE ( ccd.GRP, ccd_upd.GRP, 1, 0 ) = 0
+                             OR DECODE ( ccd.NDG, ccd_upd.NDG, 1, 0 ) = 0)
+                       AND ccd.KF = bars.gl.kf
+                       AND ccd_upd.KF = bars.gl.kf );
 
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
@@ -648,74 +616,74 @@ IS
                                          ND, SOS, CC_ID, SDATE, WDATE, RNK, VIDD, LIMIT, KPROLOG, USER_ID,
                                          OBS, BRANCH, KF, IR, PROD, SDOG, SKARB_ID, FIN, NDI, FIN23, OBS23,
                                          KAT23, K23, KOL_SP, S250, GRP, NDG )
-          SELECT bars.bars_sqnc.get_nextval ( 'S_CCDEAL_UPDATE', COALESCE(ccd.KF, u.KF) ),
-                 DECODE ( ccd.ND, NULL, 'D', 'U' ),
-                 COALESCE ( bars.gl.bd, bars.glb_bankdate ),
-                 SYSDATE,
-                 l_staff_id,
-                 DECODE ( ccd.nd, NULL, u.ND, ccd.ND ),
-                 DECODE ( ccd.nd, NULL, u.SOS, ccd.SOS ),
-                 DECODE ( ccd.nd, NULL, u.CC_ID, ccd.CC_ID ),
-                 DECODE ( ccd.nd, NULL, u.SDATE, ccd.SDATE ),
-                 DECODE ( ccd.nd, NULL, u.WDATE, ccd.WDATE ),
-                 DECODE ( ccd.nd, NULL, u.RNK, ccd.RNK ),
-                 DECODE ( ccd.nd, NULL, u.VIDD, ccd.VIDD ),
-                 DECODE ( ccd.nd, NULL, u.LIMIT, ccd.LIMIT ),
-                 DECODE ( ccd.nd, NULL, u.KPROLOG, ccd.KPROLOG ),
-                 DECODE ( ccd.nd, NULL, u.USER_ID, ccd.USER_ID ),
-                 DECODE ( ccd.nd, NULL, u.OBS, ccd.OBS ),
-                 DECODE ( ccd.nd, NULL, u.BRANCH, ccd.BRANCH ),
-                 DECODE ( ccd.nd, NULL, u.KF, ccd.KF ),
-                 DECODE ( ccd.nd, NULL, u.IR, ccd.IR ),
-                 DECODE ( ccd.nd, NULL, u.PROD, ccd.PROD ),
-                 DECODE ( ccd.nd, NULL, u.SDOG, ccd.SDOG ),
-                 DECODE ( ccd.nd, NULL, u.SKARB_ID, ccd.SKARB_ID ),
-                 DECODE ( ccd.nd, NULL, u.FIN, ccd.FIN ),
-                 DECODE ( ccd.nd, NULL, u.NDI, ccd.NDI ),
-                 DECODE ( ccd.nd, NULL, u.FIN23, ccd.FIN23 ),
-                 DECODE ( ccd.nd, NULL, u.OBS23, ccd.OBS23 ),
-                 DECODE ( ccd.nd, NULL, u.KAT23, ccd.KAT23 ),
-                 DECODE ( ccd.nd, NULL, u.K23, ccd.K23 ),
-                 DECODE ( ccd.nd, NULL, u.KOL_SP, ccd.KOL_SP ),
-                 DECODE ( ccd.nd, NULL, u.S250, ccd.S250 ),
-                 DECODE ( ccd.nd, NULL, u.GRP, ccd.GRP ),
-                 DECODE ( ccd.nd, NULL, u.NDG, ccd.NDG )
-            FROM BARS.CC_DEAL ccd
-                 FULL OUTER JOIN
-                 ( SELECT *
-                     FROM BARS.CC_DEAL_UPDATE u1
-                    WHERE u1.IDUPD IN (  SELECT MAX ( u2.IDUPD )
-                                           FROM BARS.CC_DEAL_UPDATE u2
-                                          GROUP BY u2.ND )
-                      AND u1.CHGACTION <> 'D' ) u
-                    ON ( ccd.ND = u.ND AND ccd.kf = u.kf )
-           WHERE (    DECODE ( ccd.ND,       u.ND, 1, 0 ) = 0
-                   OR DECODE ( ccd.SOS,      u.SOS, 1, 0 ) = 0
-                   OR DECODE ( ccd.CC_ID,    u.CC_ID, 1, 0 ) = 0
-                   OR DECODE ( ccd.SDATE,    u.SDATE, 1, 0 ) = 0
-                   OR DECODE ( ccd.WDATE,    u.WDATE, 1, 0 ) = 0
-                   OR DECODE ( ccd.RNK,      u.RNK, 1, 0 ) = 0
-                   OR DECODE ( ccd.VIDD,     u.VIDD, 1, 0 ) = 0
-                   OR DECODE ( ccd.LIMIT,    u.LIMIT, 1, 0 ) = 0
-                   OR DECODE ( ccd.KPROLOG,  u.KPROLOG, 1, 0 ) = 0
-                   OR DECODE ( ccd.USER_ID,  u.USER_ID, 1, 0 ) = 0
-                   OR DECODE ( ccd.OBS,      u.OBS, 1, 0 ) = 0
-                   OR DECODE ( ccd.BRANCH,   u.BRANCH, 1, 0 ) = 0
-                   OR DECODE ( ccd.KF,       u.KF, 1, 0 ) = 0
-                   OR DECODE ( ccd.IR,       u.IR, 1, 0 ) = 0
-                   OR DECODE ( ccd.PROD,     u.PROD, 1, 0 ) = 0
-                   OR DECODE ( ccd.SDOG,     u.SDOG, 1, 0 ) = 0
-                   OR DECODE ( ccd.SKARB_ID, u.SKARB_ID, 1, 0 ) = 0
-                   OR DECODE ( ccd.FIN,      u.FIN, 1, 0 ) = 0
-                   OR DECODE ( ccd.NDI,      u.NDI, 1, 0 ) = 0
-                   OR DECODE ( ccd.FIN23,    u.FIN23, 1, 0 ) = 0
-                   OR DECODE ( ccd.OBS23,    u.OBS23, 1, 0 ) = 0
-                   OR DECODE ( ccd.KAT23,    u.KAT23, 1, 0 ) = 0
-                   OR DECODE ( ccd.K23,      u.K23, 1, 0 ) = 0
-                   OR DECODE ( ccd.KOL_SP,   u.KOL_SP, 1, 0 ) = 0
-                   OR DECODE ( ccd.S250,     u.S250, 1, 0 ) = 0
-                   OR DECODE ( ccd.GRP,      u.GRP, 1, 0 ) = 0
-                   OR DECODE ( ccd.NDG,      u.NDG, 1, 0 ) = 0 );
+       SELECT bars.bars_sqnc.get_nextval ( 'S_CCDEAL_UPDATE', COALESCE(ccd.KF, u.KF) ),
+              DECODE ( ccd.ND, NULL, 'D', 'U' ),
+              COALESCE ( bars.gl.bd, bars.glb_bankdate ),
+              SYSDATE,
+              l_staff_id,
+              DECODE ( ccd.nd, NULL, u.ND, ccd.ND ),
+              DECODE ( ccd.nd, NULL, u.SOS, ccd.SOS ),
+              DECODE ( ccd.nd, NULL, u.CC_ID, ccd.CC_ID ),
+              DECODE ( ccd.nd, NULL, u.SDATE, ccd.SDATE ),
+              DECODE ( ccd.nd, NULL, u.WDATE, ccd.WDATE ),
+              DECODE ( ccd.nd, NULL, u.RNK, ccd.RNK ),
+              DECODE ( ccd.nd, NULL, u.VIDD, ccd.VIDD ),
+              DECODE ( ccd.nd, NULL, u.LIMIT, ccd.LIMIT ),
+              DECODE ( ccd.nd, NULL, u.KPROLOG, ccd.KPROLOG ),
+              DECODE ( ccd.nd, NULL, u.USER_ID, ccd.USER_ID ),
+              DECODE ( ccd.nd, NULL, u.OBS, ccd.OBS ),
+              DECODE ( ccd.nd, NULL, u.BRANCH, ccd.BRANCH ),
+              DECODE ( ccd.nd, NULL, u.KF, ccd.KF ),
+              DECODE ( ccd.nd, NULL, u.IR, ccd.IR ),
+              DECODE ( ccd.nd, NULL, u.PROD, ccd.PROD ),
+              DECODE ( ccd.nd, NULL, u.SDOG, ccd.SDOG ),
+              DECODE ( ccd.nd, NULL, u.SKARB_ID, ccd.SKARB_ID ),
+              DECODE ( ccd.nd, NULL, u.FIN, ccd.FIN ),
+              DECODE ( ccd.nd, NULL, u.NDI, ccd.NDI ),
+              DECODE ( ccd.nd, NULL, u.FIN23, ccd.FIN23 ),
+              DECODE ( ccd.nd, NULL, u.OBS23, ccd.OBS23 ),
+              DECODE ( ccd.nd, NULL, u.KAT23, ccd.KAT23 ),
+              DECODE ( ccd.nd, NULL, u.K23, ccd.K23 ),
+              DECODE ( ccd.nd, NULL, u.KOL_SP, ccd.KOL_SP ),
+              DECODE ( ccd.nd, NULL, u.S250, ccd.S250 ),
+              DECODE ( ccd.nd, NULL, u.GRP, ccd.GRP ),
+              DECODE ( ccd.nd, NULL, u.NDG, ccd.NDG )
+         FROM BARS.CC_DEAL ccd
+              FULL OUTER JOIN
+              ( SELECT *
+                  FROM BARS.CC_DEAL_UPDATE u1
+                 WHERE u1.IDUPD IN (  SELECT MAX ( u2.IDUPD )
+                                        FROM BARS.CC_DEAL_UPDATE u2
+                                       GROUP BY u2.ND )
+                   AND u1.CHGACTION <> 'D' ) u
+                 ON ( ccd.ND = u.ND AND ccd.kf = u.kf )
+        WHERE (    DECODE ( ccd.ND,       u.ND, 1, 0 ) = 0
+                OR DECODE ( ccd.SOS,      u.SOS, 1, 0 ) = 0
+                OR DECODE ( ccd.CC_ID,    u.CC_ID, 1, 0 ) = 0
+                OR DECODE ( ccd.SDATE,    u.SDATE, 1, 0 ) = 0
+                OR DECODE ( ccd.WDATE,    u.WDATE, 1, 0 ) = 0
+                OR DECODE ( ccd.RNK,      u.RNK, 1, 0 ) = 0
+                OR DECODE ( ccd.VIDD,     u.VIDD, 1, 0 ) = 0
+                OR DECODE ( ccd.LIMIT,    u.LIMIT, 1, 0 ) = 0
+                OR DECODE ( ccd.KPROLOG,  u.KPROLOG, 1, 0 ) = 0
+                OR DECODE ( ccd.USER_ID,  u.USER_ID, 1, 0 ) = 0
+                OR DECODE ( ccd.OBS,      u.OBS, 1, 0 ) = 0
+                OR DECODE ( ccd.BRANCH,   u.BRANCH, 1, 0 ) = 0
+                OR DECODE ( ccd.KF,       u.KF, 1, 0 ) = 0
+                OR DECODE ( ccd.IR,       u.IR, 1, 0 ) = 0
+                OR DECODE ( ccd.PROD,     u.PROD, 1, 0 ) = 0
+                OR DECODE ( ccd.SDOG,     u.SDOG, 1, 0 ) = 0
+                OR DECODE ( ccd.SKARB_ID, u.SKARB_ID, 1, 0 ) = 0
+                OR DECODE ( ccd.FIN,      u.FIN, 1, 0 ) = 0
+                OR DECODE ( ccd.NDI,      u.NDI, 1, 0 ) = 0
+                OR DECODE ( ccd.FIN23,    u.FIN23, 1, 0 ) = 0
+                OR DECODE ( ccd.OBS23,    u.OBS23, 1, 0 ) = 0
+                OR DECODE ( ccd.KAT23,    u.KAT23, 1, 0 ) = 0
+                OR DECODE ( ccd.K23,      u.K23, 1, 0 ) = 0
+                OR DECODE ( ccd.KOL_SP,   u.KOL_SP, 1, 0 ) = 0
+                OR DECODE ( ccd.S250,     u.S250, 1, 0 ) = 0
+                OR DECODE ( ccd.GRP,      u.GRP, 1, 0 ) = 0
+                OR DECODE ( ccd.NDG,      u.NDG, 1, 0 ) = 0 );
  
         INS_STAT('rowcount',
                  'SYNC',
@@ -742,128 +710,121 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   DECODE(t_pivot.i,
-                          1,  f1,   2,  f2,   3,  f3,   4,  f4,
-                          5,  f5,   6,  f6,   7,  f7,   8,  f8,
-                          9,  f9,   10, f10,  11, f11,  12, f12,
-                          13, f13,  14, f14,  15, f15,  16, f16,
-                          17, f17,  18, f18,  19, f19,  20, f20,
-                          21, f21,  22, f22,  23, f23,  24, f24,
-                          25, f25,  26, f26,  27, f27,  28, f28,
-                          29, f29,  30, f30,  31, f31,  32, f32,
-                          33, f33,  34, f34,  35, f35)  AS field,
-                   'count_diff' type1,
-                   DECODE(t_pivot.i,
-                          1,  c1,   2,  c2,   3,  c3,   4,  c4,
-                          5,  c5,   6,  c6,   7,  c7,   8,  c8,
-                          9,  c9,   10, c10,  11, c11,  12, c12,
-                          13, c13,  14, c14,  15, c15,  16, c16,
-                          17, c17,  18, c18,  19, c19,  20, c20,
-                          21, c21,  22, c22,  23, c23,  24, c24,
-                          25, c25,  26, c26,  27, c27,  28, c28,
-                          29, c29,  30, c30,  31, c31,  32, c32,
-                          33, c33,  34, c34,  35, decode(c35, null, 0, c35))  AS CNTDIFF,
-                   G_RUN_ID,
-                   G_START_DT,
-                   G_END_DT,
-                   l_tbl_name
-              FROM (    SELECT ROWNUM AS i
-                          FROM DUAL
-                    CONNECT BY LEVEL <= 35) t_pivot,
-                   (SELECT SUM(1) c35,
-                           'TOTAL_ROWS' f35,
-                           SUM(DECODE(d.WB, u.WB, 0, 1)) c1,                              'WB' f1,
-                           SUM(DECODE(d.DEPOSIT_ID, u.DEPOSIT_ID, 0, 1)) c2,              'DEPOSIT_ID' f2,
-                           SUM(DECODE(d.VIDD, u.VIDD, 0, 1)) c3,                          'VIDD' f3,
-                           SUM(DECODE(d.ACC, u.ACC, 0, 1)) c4,                            'ACC' f4,
-                           SUM(DECODE(d.KV, u.KV, 0, 1)) c5,                              'KV' f5,
-                           SUM(DECODE(d.RNK, u.RNK, 0, 1)) c6,                            'RNK' f6,
-                           SUM(DECODE(d.DAT_BEGIN, u.DAT_BEGIN, 0, 1)) c7,                'DAT_BEGIN' f7,
-                           SUM(DECODE(d.DAT_END, u.DAT_END, 0, 1)) c8,                    'DAT_END' f8,
-                           SUM(DECODE(d.COMMENTS, u.COMMENTS, 0, 1)) c9,                  'COMMENTS' f9,
-                           SUM(DECODE(d.MFO_P, u.MFO_P, 0, 1)) c10,                       'MFO_P' f10,
-                           SUM(DECODE(d.NLS_P, u.NLS_P, 0, 1)) c11,                       'NLS_P' f11,
-                           SUM(DECODE(d.LIMIT, u.LIMIT, 0, 1)) c12,                       'LIMIT' f12,
-                           SUM(DECODE(d.DEPOSIT_COD, u.DEPOSIT_COD, 0, 1)) c13,           'DEPOSIT_COD' f13,
-                           SUM(DECODE(d.NAME_P, u.NAME_P, 0, 1)) c14,                     'NAME_P' f14,
-                           SUM(DECODE(d.DATZ, u.DATZ, 0, 1)) c15,                         'DATZ' f15,
-                           SUM(DECODE(d.OKPO_P, u.OKPO_P, 0, 1)) c16,                     'OKPO_P' f16,
-                           SUM(DECODE(d.DAT_EXT_INT, u.DAT_EXT_INT, 0, 1)) c17,           'DAT_EXT_INT' f17,
-                           SUM(DECODE(d.CNT_DUBL, u.CNT_DUBL, 0, 1)) c18,                 'CNT_DUBL' f18,
-                           SUM(DECODE(d.CNT_EXT_INT, u.CNT_EXT_INT, 0, 1)) c19,           'CNT_EXT_INT' f19,
-                           SUM(DECODE(d.FREQ, u.FREQ, 0, 1)) c20,                         'FREQ' f20,
-                           SUM(DECODE(d.ND, u.ND, 0, 1)) c21,                             'ND' f21,
-                           SUM(DECODE(d.BRANCH, u.BRANCH, 0, 1)) c22,                     'BRANCH' f22,
-                           SUM(DECODE(d.DPT_D, u.DPT_D, 0, 1)) c23,                       'DPT_D' f23,
-                           SUM(DECODE(d.ACC_D, u.ACC_D, 0, 1)) c24,                       'ACC_D' f24,
-                           SUM(DECODE(d.MFO_D, u.MFO_D, 0, 1)) c25,                       'MFO_D' f25,
-                           SUM(DECODE(d.NLS_D, u.NLS_D, 0, 1)) c26,                       'NLS_D' f26,
-                           SUM(DECODE(d.NMS_D, u.NMS_D, 0, 1)) c27,                       'NMS_D' f27,
-                           SUM(DECODE(d.OKPO_D, u.OKPO_D, 0, 1)) c28,                     'OKPO_D' f28,
-                           SUM(DECODE(d.DAT_END_ALT, u.DAT_END_ALT, 0, 1)) c29,           'DAT_END_ALT' f29,
-                           SUM(DECODE(d.STOP_ID, u.STOP_ID, 0, 1)) c30,                   'STOP_ID' f30,
-                           SUM(DECODE(d.KF, u.KF, 0, 1)) c31,                             'KF' f31,
-                           SUM(DECODE(d.USERID, u.USERID, 0, 1)) c32,                     'USERID' f32,
-                           SUM(DECODE(d.ARCHDOC_ID, u.ARCHDOC_ID, 0, 1)) c33,             'ARCHDOC_ID' f33,
-                           SUM(DECODE(d.FORBID_EXTENSION, u.FORBID_EXTENSION, 0, 1)) c34, 'FORBID_EXTENSION' f34
-                      FROM BARS.DPT_DEPOSIT d
-                           JOIN (SELECT *
-                                   FROM BARS.DPT_DEPOSIT_CLOS u1
-                                  WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
-                                                        FROM BARS.DPT_DEPOSIT_CLOS u2
-                                                       where kf = bars.gl.kf
-                                                       GROUP BY u2.DEPOSIT_ID
-                                                      --having max(decode(action_id, 1, 2, 2, 2, 0)) = 0
-                                                    )
-                                 ) u
-                               ON (d.KF = u.KF AND d.DEPOSIT_ID = u.DEPOSIT_ID)
-                     WHERE (DECODE(d.WB, u.WB, 1, 0) = 0
-                         OR DECODE(d.DEPOSIT_ID, u.DEPOSIT_ID, 1, 0) = 0
-                         OR DECODE(d.VIDD, u.VIDD, 1, 0) = 0
-                         OR DECODE(d.ACC, u.ACC, 1, 0) = 0
-                         OR DECODE(d.KV, u.KV, 1, 0) = 0
-                         OR DECODE(d.RNK, u.RNK, 1, 0) = 0
-                         OR DECODE(d.DAT_BEGIN, u.DAT_BEGIN, 1, 0) = 0
-                         OR DECODE(d.DAT_END, u.DAT_END, 1, 0) = 0
-                         OR DECODE(d.COMMENTS, u.COMMENTS, 1, 0) = 0
-                         OR DECODE(d.MFO_P, u.MFO_P, 1, 0) = 0
-                         OR DECODE(d.NLS_P, u.NLS_P, 1, 0) = 0
-                         OR DECODE(d.LIMIT, u.LIMIT, 1, 0) = 0
-                         OR DECODE(d.DEPOSIT_COD, u.DEPOSIT_COD, 1, 0) = 0
-                         OR DECODE(d.NAME_P, u.NAME_P, 1, 0) = 0
-                         OR DECODE(d.DATZ, u.DATZ, 1, 0) = 0
-                         OR DECODE(d.OKPO_P, u.OKPO_P, 1, 0) = 0
-                         OR DECODE(d.DAT_EXT_INT, u.DAT_EXT_INT, 1, 0) = 0
-                         OR DECODE(d.CNT_DUBL, u.CNT_DUBL, 1, 0) = 0
-                         OR DECODE(d.CNT_EXT_INT, u.CNT_EXT_INT, 1, 0) = 0
-                         OR DECODE(d.FREQ, u.FREQ, 1, 0) = 0
-                         OR DECODE(d.ND, u.ND, 1, 0) = 0
-                         OR DECODE(d.BRANCH, u.BRANCH, 1, 0) = 0
-                         OR DECODE(d.DPT_D, u.DPT_D, 1, 0) = 0
-                         OR DECODE(d.ACC_D, u.ACC_D, 1, 0) = 0
-                         OR DECODE(d.MFO_D, u.MFO_D, 1, 0) = 0
-                         OR DECODE(d.NLS_D, u.NLS_D, 1, 0) = 0
-                         OR DECODE(d.NMS_D, u.NMS_D, 1, 0) = 0
-                         OR DECODE(d.OKPO_D, u.OKPO_D, 1, 0) = 0
-                         OR DECODE(d.DAT_END_ALT, u.DAT_END_ALT, 1, 0) = 0
-                         OR DECODE(d.STOP_ID, u.STOP_ID, 1, 0) = 0
-                         OR DECODE(d.KF, u.KF, 1, 0) = 0
-                         OR DECODE(d.USERID, u.USERID, 1, 0) = 0
-                         OR DECODE(d.ARCHDOC_ID, u.ARCHDOC_ID, 1, 0) = 0
-                         OR DECODE(d.FORBID_EXTENSION, u.FORBID_EXTENSION, 1, 0) = 0)
-                       AND d.KF = bars.gl.kf
-                       AND u.KF = bars.gl.kf);
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+        SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+               G_STAT_ID,
+               DECODE(t_pivot.i,
+                      1,  f1,   2,  f2,   3,  f3,   4,  f4,
+                      5,  f5,   6,  f6,   7,  f7,   8,  f8,
+                      9,  f9,   10, f10,  11, f11,  12, f12,
+                      13, f13,  14, f14,  15, f15,  16, f16,
+                      17, f17,  18, f18,  19, f19,  20, f20,
+                      21, f21,  22, f22,  23, f23,  24, f24,
+                      25, f25,  26, f26,  27, f27,  28, f28,
+                      29, f29,  30, f30,  31, f31,  32, f32,
+                      33, f33,  34, f34,  35, f35)  AS field,
+               'count_diff' type1,
+               DECODE(t_pivot.i,
+                      1,  c1,   2,  c2,   3,  c3,   4,  c4,
+                      5,  c5,   6,  c6,   7,  c7,   8,  c8,
+                      9,  c9,   10, c10,  11, c11,  12, c12,
+                      13, c13,  14, c14,  15, c15,  16, c16,
+                      17, c17,  18, c18,  19, c19,  20, c20,
+                      21, c21,  22, c22,  23, c23,  24, c24,
+                      25, c25,  26, c26,  27, c27,  28, c28,
+                      29, c29,  30, c30,  31, c31,  32, c32,
+                      33, c33,  34, c34,  35, decode(c35, null, 0, c35))  AS CNTDIFF,
+               G_RUN_ID,
+               G_START_DT,
+               G_END_DT,
+               l_tbl_name
+          FROM (    SELECT ROWNUM AS i
+                      FROM DUAL
+                CONNECT BY LEVEL <= 35) t_pivot,
+               (SELECT SUM(1) c35,
+                       'TOTAL_ROWS' f35,
+                       SUM(DECODE(d.WB, u.WB, 0, 1)) c1,                              'WB' f1,
+                       SUM(DECODE(d.DEPOSIT_ID, u.DEPOSIT_ID, 0, 1)) c2,              'DEPOSIT_ID' f2,
+                       SUM(DECODE(d.VIDD, u.VIDD, 0, 1)) c3,                          'VIDD' f3,
+                       SUM(DECODE(d.ACC, u.ACC, 0, 1)) c4,                            'ACC' f4,
+                       SUM(DECODE(d.KV, u.KV, 0, 1)) c5,                              'KV' f5,
+                       SUM(DECODE(d.RNK, u.RNK, 0, 1)) c6,                            'RNK' f6,
+                       SUM(DECODE(d.DAT_BEGIN, u.DAT_BEGIN, 0, 1)) c7,                'DAT_BEGIN' f7,
+                       SUM(DECODE(d.DAT_END, u.DAT_END, 0, 1)) c8,                    'DAT_END' f8,
+                       SUM(DECODE(d.COMMENTS, u.COMMENTS, 0, 1)) c9,                  'COMMENTS' f9,
+                       SUM(DECODE(d.MFO_P, u.MFO_P, 0, 1)) c10,                       'MFO_P' f10,
+                       SUM(DECODE(d.NLS_P, u.NLS_P, 0, 1)) c11,                       'NLS_P' f11,
+                       SUM(DECODE(d.LIMIT, u.LIMIT, 0, 1)) c12,                       'LIMIT' f12,
+                       SUM(DECODE(d.DEPOSIT_COD, u.DEPOSIT_COD, 0, 1)) c13,           'DEPOSIT_COD' f13,
+                       SUM(DECODE(d.NAME_P, u.NAME_P, 0, 1)) c14,                     'NAME_P' f14,
+                       SUM(DECODE(d.DATZ, u.DATZ, 0, 1)) c15,                         'DATZ' f15,
+                       SUM(DECODE(d.OKPO_P, u.OKPO_P, 0, 1)) c16,                     'OKPO_P' f16,
+                       SUM(DECODE(d.DAT_EXT_INT, u.DAT_EXT_INT, 0, 1)) c17,           'DAT_EXT_INT' f17,
+                       SUM(DECODE(d.CNT_DUBL, u.CNT_DUBL, 0, 1)) c18,                 'CNT_DUBL' f18,
+                       SUM(DECODE(d.CNT_EXT_INT, u.CNT_EXT_INT, 0, 1)) c19,           'CNT_EXT_INT' f19,
+                       SUM(DECODE(d.FREQ, u.FREQ, 0, 1)) c20,                         'FREQ' f20,
+                       SUM(DECODE(d.ND, u.ND, 0, 1)) c21,                             'ND' f21,
+                       SUM(DECODE(d.BRANCH, u.BRANCH, 0, 1)) c22,                     'BRANCH' f22,
+                       SUM(DECODE(d.DPT_D, u.DPT_D, 0, 1)) c23,                       'DPT_D' f23,
+                       SUM(DECODE(d.ACC_D, u.ACC_D, 0, 1)) c24,                       'ACC_D' f24,
+                       SUM(DECODE(d.MFO_D, u.MFO_D, 0, 1)) c25,                       'MFO_D' f25,
+                       SUM(DECODE(d.NLS_D, u.NLS_D, 0, 1)) c26,                       'NLS_D' f26,
+                       SUM(DECODE(d.NMS_D, u.NMS_D, 0, 1)) c27,                       'NMS_D' f27,
+                       SUM(DECODE(d.OKPO_D, u.OKPO_D, 0, 1)) c28,                     'OKPO_D' f28,
+                       SUM(DECODE(d.DAT_END_ALT, u.DAT_END_ALT, 0, 1)) c29,           'DAT_END_ALT' f29,
+                       SUM(DECODE(d.STOP_ID, u.STOP_ID, 0, 1)) c30,                   'STOP_ID' f30,
+                       SUM(DECODE(d.KF, u.KF, 0, 1)) c31,                             'KF' f31,
+                       SUM(DECODE(d.USERID, u.USERID, 0, 1)) c32,                     'USERID' f32,
+                       SUM(DECODE(d.ARCHDOC_ID, u.ARCHDOC_ID, 0, 1)) c33,             'ARCHDOC_ID' f33,
+                       SUM(DECODE(d.FORBID_EXTENSION, u.FORBID_EXTENSION, 0, 1)) c34, 'FORBID_EXTENSION' f34
+                  FROM BARS.DPT_DEPOSIT d
+                       JOIN (SELECT *
+                               FROM BARS.DPT_DEPOSIT_CLOS u1
+                              WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
+                                                    FROM BARS.DPT_DEPOSIT_CLOS u2
+                                                   where kf = bars.gl.kf
+                                                   GROUP BY u2.DEPOSIT_ID
+                                                  --having max(decode(action_id, 1, 2, 2, 2, 0)) = 0
+                                                )
+                             ) u
+                           ON (d.KF = u.KF AND d.DEPOSIT_ID = u.DEPOSIT_ID)
+                 WHERE (DECODE(d.WB, u.WB, 1, 0) = 0
+                     OR DECODE(d.DEPOSIT_ID, u.DEPOSIT_ID, 1, 0) = 0
+                     OR DECODE(d.VIDD, u.VIDD, 1, 0) = 0
+                     OR DECODE(d.ACC, u.ACC, 1, 0) = 0
+                     OR DECODE(d.KV, u.KV, 1, 0) = 0
+                     OR DECODE(d.RNK, u.RNK, 1, 0) = 0
+                     OR DECODE(d.DAT_BEGIN, u.DAT_BEGIN, 1, 0) = 0
+                     OR DECODE(d.DAT_END, u.DAT_END, 1, 0) = 0
+                     OR DECODE(d.COMMENTS, u.COMMENTS, 1, 0) = 0
+                     OR DECODE(d.MFO_P, u.MFO_P, 1, 0) = 0
+                     OR DECODE(d.NLS_P, u.NLS_P, 1, 0) = 0
+                     OR DECODE(d.LIMIT, u.LIMIT, 1, 0) = 0
+                     OR DECODE(d.DEPOSIT_COD, u.DEPOSIT_COD, 1, 0) = 0
+                     OR DECODE(d.NAME_P, u.NAME_P, 1, 0) = 0
+                     OR DECODE(d.DATZ, u.DATZ, 1, 0) = 0
+                     OR DECODE(d.OKPO_P, u.OKPO_P, 1, 0) = 0
+                     OR DECODE(d.DAT_EXT_INT, u.DAT_EXT_INT, 1, 0) = 0
+                     OR DECODE(d.CNT_DUBL, u.CNT_DUBL, 1, 0) = 0
+                     OR DECODE(d.CNT_EXT_INT, u.CNT_EXT_INT, 1, 0) = 0
+                     OR DECODE(d.FREQ, u.FREQ, 1, 0) = 0
+                     OR DECODE(d.ND, u.ND, 1, 0) = 0
+                     OR DECODE(d.BRANCH, u.BRANCH, 1, 0) = 0
+                     OR DECODE(d.DPT_D, u.DPT_D, 1, 0) = 0
+                     OR DECODE(d.ACC_D, u.ACC_D, 1, 0) = 0
+                     OR DECODE(d.MFO_D, u.MFO_D, 1, 0) = 0
+                     OR DECODE(d.NLS_D, u.NLS_D, 1, 0) = 0
+                     OR DECODE(d.NMS_D, u.NMS_D, 1, 0) = 0
+                     OR DECODE(d.OKPO_D, u.OKPO_D, 1, 0) = 0
+                     OR DECODE(d.DAT_END_ALT, u.DAT_END_ALT, 1, 0) = 0
+                     OR DECODE(d.STOP_ID, u.STOP_ID, 1, 0) = 0
+                     OR DECODE(d.KF, u.KF, 1, 0) = 0
+                     OR DECODE(d.USERID, u.USERID, 1, 0) = 0
+                     OR DECODE(d.ARCHDOC_ID, u.ARCHDOC_ID, 1, 0) = 0
+                     OR DECODE(d.FORBID_EXTENSION, u.FORBID_EXTENSION, 1, 0) = 0)
+                   AND d.KF = bars.gl.kf
+                   AND u.KF = bars.gl.kf);
+
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -886,45 +847,11 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO dpt_deposit_clos(idupd,
-                                     deposit_id,
-                                     nd,
-                                     vidd,
-                                     acc,
-                                     kv,
-                                     rnk,
-                                     freq,
-                                     datz,
-                                     dat_begin,
-                                     dat_end,
-                                     dat_end_alt,
-                                     mfo_p,
-                                     nls_p,
-                                     name_p,
-                                     okpo_p,
-                                     dpt_d,
-                                     acc_d,
-                                     mfo_d,
-                                     nls_d,
-                                     nms_d,
-                                     okpo_d,
-                                     LIMIT,
-                                     deposit_cod,
-                                     comments,
-                                     action_id,
-                                     actiion_author,
-                                     "WHEN",
-                                     bdate,
-                                     stop_id,
-                                     kf,
-                                     cnt_dubl,
-                                     cnt_ext_int,
-                                     dat_ext_int,
-                                     userid,
-                                     archdoc_id,
-                                     forbid_extension,
-                                     branch,
-                                     wb)
+        INSERT INTO dpt_deposit_clos(idupd, deposit_id, nd, vidd, acc, kv, rnk, freq, datz, dat_begin, dat_end,
+                                     dat_end_alt, mfo_p, nls_p, name_p, okpo_p, dpt_d, acc_d, mfo_d, nls_d,
+                                     nms_d, okpo_d, LIMIT, deposit_cod, comments, action_id, actiion_author,
+                                     "WHEN", bdate, stop_id, kf, cnt_dubl, cnt_ext_int, dat_ext_int, userid,
+                                     archdoc_id, forbid_extension, branch, wb)
             SELECT bars_sqnc.get_nextval('s_dpt_deposit_clos') as IDUPD,
                    DECODE(d.DEPOSIT_ID, NULL, u.DEPOSIT_ID, d.DEPOSIT_ID),
                    DECODE(d.DEPOSIT_ID, NULL, u.ND, d.ND),
@@ -1049,39 +976,32 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   f1 AS field,
-                   'count_diff' type1,
-                   c1 AS CNTDIFF,
-                   G_RUN_ID,
-                   G_START_DT,
-                   G_END_DT,
-                   l_tbl_name
-              FROM ( select count(*) c1, coalesce(cw.TAG, wu.TAG) f1
-                       from BARS.CUSTOMERW     cw
-                            join BARS.CUSTOMER c on (cw.rnk = c.rnk)
-                       full outer join (select u1.rnk, cast(u1.tag as char(5)) as tag, u1.value,u1.isp
-                                          from BARS.CUSTOMERW_UPDATE u1 
-                                         where u1.IDUPD in (select max(u2.IDUPD)
-                                                              from BARS.CUSTOMERW_UPDATE u2
-                                                             group by trim(u2.tag), u2.rnk
-                                                           ) 
-                                           and u1.CHGACTION <> 3
-                                       ) wu on ( cw.rnk = wu.rnk and cw.tag = wu.tag )
-                      where decode(wu.value, cw.value, 0, 1) = 1
-                         or wu.rnk is null
-                         or cw.rnk is null
-                      group by coalesce(cw.TAG, wu.TAG));
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+        SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+               G_STAT_ID,
+               f1 AS field,
+               'count_diff' type1,
+               c1 AS CNTDIFF,
+               G_RUN_ID,
+               G_START_DT,
+               G_END_DT,
+               l_tbl_name
+          FROM ( select count(*) c1, coalesce(cw.TAG, wu.TAG) f1
+                   from BARS.CUSTOMERW     cw
+                        join BARS.CUSTOMER c on (cw.rnk = c.rnk)
+                   full outer join (select u1.rnk, cast(u1.tag as char(5)) as tag, u1.value,u1.isp
+                                      from BARS.CUSTOMERW_UPDATE u1 
+                                     where u1.IDUPD in (select max(u2.IDUPD)
+                                                          from BARS.CUSTOMERW_UPDATE u2
+                                                         group by trim(u2.tag), u2.rnk
+                                                       ) 
+                                       and u1.CHGACTION <> 3
+                                   ) wu on ( cw.rnk = wu.rnk and cw.tag = wu.tag )
+                  where decode(wu.value, cw.value, 0, 1) = 1
+                     or wu.rnk is null
+                     or cw.rnk is null
+                  group by coalesce(cw.TAG, wu.TAG));
+
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -1104,16 +1024,8 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.CUSTOMERW_UPDATE(IDUPD,
-                                          EFFECTDATE,
-                                          DONEBY,
-                                          CHGDATE,
-                                          CHGACTION,
-                                          tag,
-                                          RNK,
-                                          ISP,
-                                          VALUE,
-                                          kf)
+
+        INSERT INTO BARS.CUSTOMERW_UPDATE(IDUPD, EFFECTDATE, DONEBY, CHGDATE, CHGACTION, tag, RNK, ISP, VALUE, kf)
             SELECT bars_sqnc.get_nextval('s_customerw_update', coalesce (custw.kf, cwu.kf)) as IDUPD,
                    COALESCE(bars.gl.bd, bars.glb_bankdate),
                    l_staff_nm,
@@ -1130,13 +1042,13 @@ IS
                    FULL OUTER JOIN (SELECT  u1.rnk, cast(u1.tag as char(5)) as tag_char, u1.value, u1.isp, u1.kf, u1.tag as tag
                                       FROM BARS.CUSTOMERW_UPDATE u1
                                      WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                                    FROM BARS.CUSTOMERW_UPDATE u2
-                                                                GROUP BY trim(u2.tag), u2.rnk)
+                                                            FROM BARS.CUSTOMERW_UPDATE u2
+                                                           GROUP BY trim(u2.tag), u2.rnk)
                                        AND u1.CHGACTION <> '3') cwu
                        ON (custw.rnk = cwu.rnk AND custw.tag = cwu.tag_char)
              WHERE (DECODE(custw.VALUE, cwu.VALUE, 1, 0) = 0
-                 or   cwu.rnk is null
-                 or custw.rnk is null);
+                or  cwu.rnk is null
+                or  custw.rnk is null);
 
         INS_STAT('rowcount',
                  'SYNC',
@@ -1165,42 +1077,35 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.CUSTOMERW_UPDATE(IDUPD,
-                                          EFFECTDATE,
-                                          DONEBY,
-                                          CHGDATE,
-                                          CHGACTION,
-                                          tag,
-                                          RNK,
-                                          ISP,
-                                          VALUE,
-                                          kf)
-            WITH tg as (select /*+ inline */ tag, cast(tag as char(5)) as tag_char from barsupl.upl_tag_lists where tag_table = 'CUST_FIELD')
-            SELECT bars_sqnc.get_nextval('s_customerw_update', coalesce (custw.kf, cwu.kf)) as IDUPD,
-                   COALESCE(bars.gl.bd, bars.glb_bankdate),
-                   l_staff_nm,
-                   SYSDATE,
-                   DECODE(custw.rnk, NULL, 3, 2) CHGACTION,
-                   DECODE(custw.rnk, NULL, cwu.TAG, trim(custw.tag)),
-                   DECODE(custw.rnk, NULL, cwu.RNK, custw.RNK),
-                   DECODE(custw.rnk, NULL, cwu.ISP, custw.ISP),
-                   DECODE(custw.rnk, NULL, cwu.VALUE, custw.VALUE),
-                   coalesce (custw.kf, cwu.kf) as KF
-              FROM (SELECT cw.*, c.kf
-                      FROM BARS.CUSTOMER c, BARS.CUSTOMERW cw, tg
-                     WHERE cw.rnk = c.rnk
-                       and cw.tag = tg.tag_char) custw
-                   FULL OUTER JOIN (SELECT  u1.rnk, cast(u1.tag as char(5)) as tag_char, u1.value, u1.isp, u1.kf, u1.tag as tag
-                                      FROM BARS.CUSTOMERW_UPDATE u1
-                                     WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                            FROM BARS.CUSTOMERW_UPDATE u2, tg
-                                                           where u2.tag = tg.tag
-                                                           GROUP BY trim(u2.tag), u2.rnk)
-                                       AND u1.CHGACTION <> '3') cwu
-                       ON (custw.rnk = cwu.rnk AND custw.tag = cwu.tag_char)
-             WHERE (DECODE(custw.VALUE, cwu.VALUE, 1, 0) = 0
-                 or   cwu.rnk is null
-                 or custw.rnk is null);
+
+        INSERT INTO BARS.CUSTOMERW_UPDATE(IDUPD, EFFECTDATE, DONEBY, CHGDATE, CHGACTION, tag, RNK, ISP, VALUE, kf)
+        WITH tg as (select /*+ inline */ tag, cast(tag as char(5)) as tag_char from barsupl.upl_tag_lists where tag_table = 'CUST_FIELD')
+        SELECT bars_sqnc.get_nextval('s_customerw_update', coalesce (custw.kf, cwu.kf)) as IDUPD,
+               COALESCE(bars.gl.bd, bars.glb_bankdate),
+               l_staff_nm,
+               SYSDATE,
+               DECODE(custw.rnk, NULL, 3, 2) CHGACTION,
+               DECODE(custw.rnk, NULL, cwu.TAG, trim(custw.tag)),
+               DECODE(custw.rnk, NULL, cwu.RNK, custw.RNK),
+               DECODE(custw.rnk, NULL, cwu.ISP, custw.ISP),
+               DECODE(custw.rnk, NULL, cwu.VALUE, custw.VALUE),
+               coalesce (custw.kf, cwu.kf) as KF
+          FROM (SELECT cw.*, c.kf
+                  FROM BARS.CUSTOMER c, BARS.CUSTOMERW cw, tg
+                 WHERE cw.rnk = c.rnk
+                   and cw.tag = tg.tag_char) custw
+               FULL OUTER JOIN (SELECT  u1.rnk, cast(u1.tag as char(5)) as tag_char, u1.value, u1.isp, u1.kf, u1.tag as tag
+                                  FROM BARS.CUSTOMERW_UPDATE u1
+                                 WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                        FROM BARS.CUSTOMERW_UPDATE u2, tg
+                                                       where u2.tag = tg.tag
+                                                       GROUP BY trim(u2.tag), u2.rnk)
+                                   AND u1.CHGACTION <> '3') cwu
+                   ON (custw.rnk = cwu.rnk AND custw.tag = cwu.tag_char)
+         WHERE (DECODE(custw.VALUE, cwu.VALUE, 1, 0) = 0
+             or   cwu.rnk is null
+             or custw.rnk is null);
+
         INS_STAT('rowcount',
                  'SYNC',
                  SQL%ROWCOUNT,
@@ -1225,40 +1130,33 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   f1 AS field,
-                   'count_diff' type1,
-                   c1 AS CNTDIFF,
-                   G_RUN_ID,
-                   G_START_DT,
-                   G_END_DT,
-                   l_tbl_name
-              FROM (SELECT count(*) c1, coalesce(w.TAG, u.TAG) f1
-                      FROM (select w1.* from BARS.ACCOUNTSW w1 where w1.kf = bars.gl.kf) w
-                           FULL OUTER JOIN (SELECT *
-                                              FROM BARS.ACCOUNTSW_UPDATE u1
-                                             WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                                     FROM BARS.ACCOUNTSW_UPDATE u2
-                                                                    where u2.KF = bars.gl.kf
-                                                                 GROUP BY u2.acc, u2.tag)
-                                               AND u1.chgaction != 'D'
-                                               and u1.KF = bars.gl.kf
-                                           ) u
-                               ON (w.acc = u.acc AND w.kf = u.kf AND w.tag = u.tag)
-                     WHERE ( DECODE(w.ACC, u.ACC, 1, 0) = 0
-                        or DECODE(w.TAG, u.TAG, 1, 0) = 0
-                        or decode(w.VALUE, u.VALUE, 1, 0) = 0)
-                     group by coalesce(w.tag, u.tag));
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+        SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+               G_STAT_ID,
+               f1 AS field,
+               'count_diff' type1,
+               c1 AS CNTDIFF,
+               G_RUN_ID,
+               G_START_DT,
+               G_END_DT,
+               l_tbl_name
+          FROM (SELECT count(*) c1, coalesce(w.TAG, u.TAG) f1
+                  FROM (select w1.* from BARS.ACCOUNTSW w1 where w1.kf = bars.gl.kf) w
+                       FULL OUTER JOIN (SELECT *
+                                          FROM BARS.ACCOUNTSW_UPDATE u1
+                                         WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                                 FROM BARS.ACCOUNTSW_UPDATE u2
+                                                                where u2.KF = bars.gl.kf
+                                                             GROUP BY u2.acc, u2.tag)
+                                           AND u1.chgaction != 'D'
+                                           and u1.KF = bars.gl.kf
+                                       ) u
+                           ON (w.acc = u.acc AND w.kf = u.kf AND w.tag = u.tag)
+                 WHERE ( DECODE(w.ACC, u.ACC, 1, 0) = 0
+                    or DECODE(w.TAG, u.TAG, 1, 0) = 0
+                    or decode(w.VALUE, u.VALUE, 1, 0) = 0)
+                 group by coalesce(w.tag, u.tag));
+
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -1281,38 +1179,31 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.ACCOUNTSW_UPDATE(IDUPD,
-                                          CHGACTION,
-                                          EFFECTDATE,
-                                          CHGDATE,
-                                          DONEBY,
-                                          ACC,
-                                          TAG,
-                                          VALUE,
-                                          KF)
-            SELECT bars.bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, COALESCE(w.KF, u.KF)),
-                   DECODE(w.acc, NULL, 'D', 'U'),
-                   bars.gl.bd,
-                   SYSDATE,
-                   l_staff_id,
-                   DECODE(w.acc, NULL, u.ACC, w.ACC),
-                   DECODE(w.acc, NULL, u.TAG, w.TAG),
-                   DECODE(w.acc, NULL, u.VALUE, w.VALUE),
-                   DECODE(w.acc, NULL, u.KF, w.KF)
-              FROM (select w1.* from BARS.ACCOUNTSW w1 where w1.kf = bars.gl.kf) w
-                   FULL OUTER JOIN (SELECT *
-                                      FROM BARS.ACCOUNTSW_UPDATE u1
-                                     WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                            FROM BARS.ACCOUNTSW_UPDATE u2
-                                                           where u2.KF = bars.gl.kf
-                                                           GROUP BY u2.acc, u2.tag)
-                                       and u1.KF = bars.gl.kf
-                                       AND u1.CHGACTION <> 'D') u
-                       ON (w.acc = u.acc AND w.tag = u.tag AND w.kf = u.kf)
-             WHERE (DECODE(w.ACC, u.ACC, 1, 0) = 0
-                 OR DECODE(w.TAG, u.TAG, 1, 0) = 0
-                 OR DECODE(w.VALUE, u.VALUE, 1, 0) = 0
-                 OR DECODE(w.KF, u.KF, 1, 0) = 0);
+
+        INSERT INTO BARS.ACCOUNTSW_UPDATE(IDUPD, CHGACTION, EFFECTDATE, CHGDATE, DONEBY, ACC, TAG, VALUE, KF)
+        SELECT bars.bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, COALESCE(w.KF, u.KF)),
+               DECODE(w.acc, NULL, 'D', 'U'),
+               bars.gl.bd,
+               SYSDATE,
+               l_staff_id,
+               DECODE(w.acc, NULL, u.ACC, w.ACC),
+               DECODE(w.acc, NULL, u.TAG, w.TAG),
+               DECODE(w.acc, NULL, u.VALUE, w.VALUE),
+               DECODE(w.acc, NULL, u.KF, w.KF)
+          FROM (select w1.* from BARS.ACCOUNTSW w1 where w1.kf = bars.gl.kf) w
+               FULL OUTER JOIN (SELECT *
+                                  FROM BARS.ACCOUNTSW_UPDATE u1
+                                 WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                        FROM BARS.ACCOUNTSW_UPDATE u2
+                                                       where u2.KF = bars.gl.kf
+                                                       GROUP BY u2.acc, u2.tag)
+                                   and u1.KF = bars.gl.kf
+                                   AND u1.CHGACTION <> 'D') u
+                   ON (w.acc = u.acc AND w.tag = u.tag AND w.kf = u.kf)
+         WHERE (DECODE(w.ACC, u.ACC, 1, 0) = 0
+             OR DECODE(w.TAG, u.TAG, 1, 0) = 0
+             OR DECODE(w.VALUE, u.VALUE, 1, 0) = 0
+             OR DECODE(w.KF, u.KF, 1, 0) = 0);
 
         INS_STAT('rowcount',
                  'SYNC',
@@ -1341,40 +1232,33 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.ACCOUNTSW_UPDATE(IDUPD,
-                                          CHGACTION,
-                                          EFFECTDATE,
-                                          CHGDATE,
-                                          DONEBY,
-                                          ACC,
-                                          TAG,
-                                          VALUE,
-                                          KF)
-            WITH tg as (select /*+ inline */ tag from barsupl.upl_tag_lists where tag_table = 'ACC_FIELD')
-            SELECT bars.bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, COALESCE(w.KF, u.KF)),
-                   DECODE(w.acc, NULL, 'D', 'U'),
-                   bars.gl.bd,
-                   SYSDATE,
-                   l_staff_id,
-                   DECODE(w.acc, NULL, u.ACC, w.ACC),
-                   DECODE(w.acc, NULL, u.TAG, w.TAG),
-                   DECODE(w.acc, NULL, u.VALUE, w.VALUE),
-                   DECODE(w.acc, NULL, u.KF, w.KF)
-              FROM (select w1.* from BARS.ACCOUNTSW w1, tg where w1.kf = bars.gl.kf and w1.tag = tg.tag) w
-                   FULL OUTER JOIN (SELECT *
-                                      FROM BARS.ACCOUNTSW_UPDATE u1
-                                     WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                            FROM BARS.ACCOUNTSW_UPDATE u2, tg
-                                                           where u2.KF = bars.gl.kf
-                                                             and u2.tag = tg.tag
-                                                           GROUP BY u2.acc, u2.tag)
-                                       and u1.KF = bars.gl.kf
-                                       AND u1.CHGACTION <> 'D') u
-                       ON (w.acc = u.acc AND w.tag = u.tag AND w.kf = u.kf)
-             WHERE (DECODE(w.ACC, u.ACC, 1, 0) = 0
-                 OR DECODE(w.TAG, u.TAG, 1, 0) = 0
-                 OR DECODE(w.VALUE, u.VALUE, 1, 0) = 0
-                 OR DECODE(w.KF, u.KF, 1, 0) = 0);
+
+        INSERT INTO BARS.ACCOUNTSW_UPDATE(IDUPD, CHGACTION, EFFECTDATE, CHGDATE, DONEBY, ACC, TAG, VALUE, KF)
+        WITH tg as (select /*+ inline */ tag from barsupl.upl_tag_lists where tag_table = 'ACC_FIELD')
+        SELECT bars.bars_sqnc.get_nextval(s_accountsw_update.NEXTVAL, COALESCE(w.KF, u.KF)),
+               DECODE(w.acc, NULL, 'D', 'U'),
+               bars.gl.bd,
+               SYSDATE,
+               l_staff_id,
+               DECODE(w.acc, NULL, u.ACC, w.ACC),
+               DECODE(w.acc, NULL, u.TAG, w.TAG),
+               DECODE(w.acc, NULL, u.VALUE, w.VALUE),
+               DECODE(w.acc, NULL, u.KF, w.KF)
+          FROM (select w1.* from BARS.ACCOUNTSW w1, tg where w1.kf = bars.gl.kf and w1.tag = tg.tag) w
+               FULL OUTER JOIN (SELECT *
+                                  FROM BARS.ACCOUNTSW_UPDATE u1
+                                 WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                        FROM BARS.ACCOUNTSW_UPDATE u2, tg
+                                                       where u2.KF = bars.gl.kf
+                                                         and u2.tag = tg.tag
+                                                       GROUP BY u2.acc, u2.tag)
+                                   and u1.KF = bars.gl.kf
+                                   AND u1.CHGACTION <> 'D') u
+                   ON (w.acc = u.acc AND w.tag = u.tag AND w.kf = u.kf)
+         WHERE (DECODE(w.ACC, u.ACC, 1, 0) = 0
+             OR DECODE(w.TAG, u.TAG, 1, 0) = 0
+             OR DECODE(w.VALUE, u.VALUE, 1, 0) = 0
+             OR DECODE(w.KF, u.KF, 1, 0) = 0);
 
         INS_STAT('rowcount',
                  'SYNC',
@@ -1400,37 +1284,29 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   f1 AS field,
-                   'count_diff' type1,
-                   c1 AS CNTDIFF,
-                   G_RUN_ID,
-                   G_START_DT,
-                   G_END_DT,
-                   l_tbl_name
-              FROM (SELECT count(*) c1, coalesce(n.TAG, u.TAG) f1
-                      FROM BARS.ND_TXT n
-                      FULL OUTER JOIN (SELECT *
-                                         FROM BARS.ND_TXT_UPDATE u1
-                                        WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
-                                                                  FROM BARS.ND_TXT_UPDATE u2
-                                                                 GROUP BY u2.nd, u2.tag, u2.kf )
-                                          AND u1.CHGACTION <> 3) u
-                          ON (n.kf = u.kf AND n.nd = u.nd AND n.tag = u.tag)
-                     WHERE decode(n.txt, u.txt, 0, 1) = 1
-                        or n.nd is null
-                        or u.nd is null
-                      group by coalesce(n.TAG, u.TAG));
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+        SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+               G_STAT_ID,
+               f1 AS field,
+               'count_diff' type1,
+               c1 AS CNTDIFF,
+               G_RUN_ID,
+               G_START_DT,
+               G_END_DT,
+               l_tbl_name
+          FROM (SELECT count(*) c1, coalesce(n.TAG, u.TAG) f1
+                  FROM BARS.ND_TXT n
+                  FULL OUTER JOIN (SELECT *
+                                     FROM BARS.ND_TXT_UPDATE u1
+                                    WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
+                                                          FROM BARS.ND_TXT_UPDATE u2
+                                                         GROUP BY u2.nd, u2.tag, u2.kf )
+                                      AND u1.CHGACTION <> 3) u
+                      ON (n.kf = u.kf AND n.nd = u.nd AND n.tag = u.tag)
+                 WHERE decode(n.txt, u.txt, 0, 1) = 1
+                    or n.nd is null
+                    or u.nd is null
+                 group by coalesce(n.TAG, u.TAG));
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -1453,38 +1329,30 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.ND_TXT_UPDATE(ND,
-                                       TAG,
-                                       TXT,
-                                       CHGDATE,
-                                       CHGACTION,
-                                       DONEBY,
-                                       IDUPD,
-                                       KF,
-                                       EFFECTDATE,
-                                       GLOBAL_BDATE)
-            SELECT DECODE(n.nd, NULL, u.nd, n.nd),
-                   DECODE(n.nd, NULL, u.tag, n.tag),
-                   DECODE(n.nd, NULL, u.txt, n.txt),
-                   SYSDATE,
-                   DECODE(n.nd, NULL, 3, 2),
-                   l_staff_nm,
-                   bars.bars_sqnc.get_nextval('s_nd_txt_update', COALESCE(n.KF, u.KF)),
-                   DECODE(n.nd, NULL, u.kf, n.kf),
-                   COALESCE(bars.gl.bd, bars.glb_bankdate) EFFECTDATE,
-                   bars.glb_bankdate GLOBAL_BDATE
-              FROM BARS.ND_TXT n
-                   FULL OUTER JOIN (SELECT *
-                                      FROM BARS.ND_TXT_UPDATE u1
-                                     WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                            FROM BARS.ND_TXT_UPDATE u2
-                                                           GROUP BY u2.nd, u2.tag, u2.kf)
-                                       AND u1.CHGACTION <> 3) u
-                       ON (n.KF = u.KF AND n.nd = u.nd AND n.tag = u.tag)
-             WHERE (DECODE(n.ND,  u.ND,  1, 0) = 0
-                 OR DECODE(n.TAG, u.TAG, 1, 0) = 0
-                 OR DECODE(n.TXT, u.TXT, 1, 0) = 0
-                 OR DECODE(n.KF,  u.KF,  1, 0) = 0);
+
+        INSERT INTO BARS.ND_TXT_UPDATE(ND, TAG, TXT, CHGDATE, CHGACTION, DONEBY, IDUPD, KF, EFFECTDATE, GLOBAL_BDATE)
+        SELECT DECODE(n.nd, NULL, u.nd, n.nd),
+               DECODE(n.nd, NULL, u.tag, n.tag),
+               DECODE(n.nd, NULL, u.txt, n.txt),
+               SYSDATE,
+               DECODE(n.nd, NULL, 3, 2),
+               l_staff_nm,
+               bars.bars_sqnc.get_nextval('s_nd_txt_update', COALESCE(n.KF, u.KF)),
+               DECODE(n.nd, NULL, u.kf, n.kf),
+               COALESCE(bars.gl.bd, bars.glb_bankdate) EFFECTDATE,
+               bars.glb_bankdate GLOBAL_BDATE
+          FROM BARS.ND_TXT n
+               FULL OUTER JOIN (SELECT *
+                                  FROM BARS.ND_TXT_UPDATE u1
+                                 WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                        FROM BARS.ND_TXT_UPDATE u2
+                                                       GROUP BY u2.nd, u2.tag, u2.kf)
+                                   AND u1.CHGACTION <> 3) u
+                   ON (n.KF = u.KF AND n.nd = u.nd AND n.tag = u.tag)
+         WHERE (DECODE(n.ND,  u.ND,  1, 0) = 0
+             OR DECODE(n.TAG, u.TAG, 1, 0) = 0
+             OR DECODE(n.TXT, u.TXT, 1, 0) = 0
+             OR DECODE(n.KF,  u.KF,  1, 0) = 0);
 
         INS_STAT('rowcount',
                  'SYNC',
@@ -1513,41 +1381,33 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.ND_TXT_UPDATE(ND,
-                                       TAG,
-                                       TXT,
-                                       CHGDATE,
-                                       CHGACTION,
-                                       DONEBY,
-                                       IDUPD,
-                                       KF,
-                                       EFFECTDATE,
-                                       GLOBAL_BDATE)
-            WITH tg as (select /*+ inline */ tag  from barsupl.upl_tag_lists where tag_table in ('CC_TAGS', 'CD_TAGS'))
-            SELECT DECODE(n.nd, NULL, u.nd, n.nd) as ND,
-                   DECODE(n.nd, NULL, u.tag, n.tag) as TAG,
-                   DECODE(n.nd, NULL, u.txt, n.txt) as TXT,
-                   SYSDATE as CHGDATE,
-                   DECODE(n.nd, NULL, 3, 2) as CHGACTION,
-                   l_staff_nm as DONEBY,
-                   bars.bars_sqnc.get_nextval('s_nd_txt_update', COALESCE(n.KF, u.KF)) as IDUPD,
-                   DECODE(n.nd, NULL, u.kf, n.kf) as KF,
-                   COALESCE(bars.gl.bd, bars.glb_bankdate) as EFFECTDATE,
-                   bars.glb_bankdate as GLOBAL_BDATE
-              FROM BARS.ND_TXT n
-                   JOIN tg on (n.tag = tg.tag)
-                   FULL OUTER JOIN (SELECT *
-                                      FROM BARS.ND_TXT_UPDATE u1
-                                     WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
-                                                            FROM BARS.ND_TXT_UPDATE u2, tg
-                                                           WHERE u2.tag = tg.tag
-                                                           GROUP BY u2.nd, u2.tag, u2.kf)
-                                       AND u1.CHGACTION <> 3) u
-                       ON (n.KF = u.KF AND n.nd = u.nd AND n.tag = u.tag)
-             WHERE (DECODE(n.ND,  u.ND,  1, 0) = 0
-                 OR DECODE(n.TAG, u.TAG, 1, 0) = 0
-                 OR DECODE(n.TXT, u.TXT, 1, 0) = 0
-                 OR DECODE(n.KF,  u.KF,  1, 0) = 0);
+
+        INSERT INTO BARS.ND_TXT_UPDATE(ND, TAG, TXT, CHGDATE, CHGACTION, DONEBY, IDUPD, KF, EFFECTDATE, GLOBAL_BDATE)
+        WITH tg as (select /*+ inline */ tag  from barsupl.upl_tag_lists where tag_table in ('CC_TAGS', 'CD_TAGS'))
+        SELECT DECODE(n.nd, NULL, u.nd, n.nd) as ND,
+               DECODE(n.nd, NULL, u.tag, n.tag) as TAG,
+               DECODE(n.nd, NULL, u.txt, n.txt) as TXT,
+               SYSDATE as CHGDATE,
+               DECODE(n.nd, NULL, 3, 2) as CHGACTION,
+               l_staff_nm as DONEBY,
+               bars.bars_sqnc.get_nextval('s_nd_txt_update', COALESCE(n.KF, u.KF)) as IDUPD,
+               DECODE(n.nd, NULL, u.kf, n.kf) as KF,
+               COALESCE(bars.gl.bd, bars.glb_bankdate) as EFFECTDATE,
+               bars.glb_bankdate as GLOBAL_BDATE
+          FROM BARS.ND_TXT n
+               JOIN tg on (n.tag = tg.tag)
+               FULL OUTER JOIN (SELECT *
+                                  FROM BARS.ND_TXT_UPDATE u1
+                                 WHERE u1.IDUPD IN (  SELECT MAX(u2.IDUPD)
+                                                        FROM BARS.ND_TXT_UPDATE u2, tg
+                                                       WHERE u2.tag = tg.tag
+                                                       GROUP BY u2.nd, u2.tag, u2.kf)
+                                   AND u1.CHGACTION <> 3) u
+                   ON (n.KF = u.KF AND n.nd = u.nd AND n.tag = u.tag)
+         WHERE (DECODE(n.ND,  u.ND,  1, 0) = 0
+            OR  DECODE(n.TAG, u.TAG, 1, 0) = 0
+            OR  DECODE(n.TXT, u.TXT, 1, 0) = 0
+            OR  DECODE(n.KF,  u.KF,  1, 0) = 0);
 
         INS_STAT('rowcount',
                  'SYNC',
@@ -1573,15 +1433,7 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
             SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
                    G_STAT_ID,
                    DECODE(t_pivot.i,
@@ -1701,62 +1553,19 @@ IS
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
         INSERT /*+ APPEND */
-              INTO  BARS.W4_ACC_UPDATE(idupd,
-                                       chgaction,
-                                       effectdate,
-                                       chgdate,
-                                       doneby,
-                                       nd,
-                                       acc_pk,
-                                       acc_ovr,
-                                       acc_9129,
-                                       acc_3570,
-                                       acc_2208,
-                                       acc_2627,
-                                       acc_2207,
-                                       acc_3579,
-                                       acc_2209,
-                                       card_code,
-                                       acc_2625x,
-                                       acc_2627x,
-                                       acc_2625d,
-                                       acc_2628,
-                                       acc_2203,
-                                       fin,
-                                       fin23,
-                                       obs23,
-                                       kat23,
-                                       k23,
-                                       dat_begin,
-                                       dat_end,
-                                       dat_close,
-                                       pass_date,
-                                       pass_state,
-                                       kol_sp,
-                                       s250,
-                                       grp,
-                                       global_bdate,
-                                       kf)
+              INTO  BARS.W4_ACC_UPDATE(idupd, chgaction, effectdate, chgdate, doneby,
+                                       nd, acc_pk, acc_ovr, acc_9129, acc_3570, acc_2208, acc_2627, acc_2207,
+                                       acc_3579, acc_2209, card_code, acc_2625x, acc_2627x, acc_2625d, acc_2628,
+                                       acc_2203, fin, fin23, obs23, kat23, k23, dat_begin, dat_end, dat_close,
+                                       pass_date, pass_state, kol_sp, s250, grp, global_bdate, kf)
             SELECT /*+ no_index(u PK_W4ACC_UPDATE) */
                   bars_sqnc.get_nextval('s_w4acc_update', COALESCE(n.KF, u.KF)) AS idupd,
                    CASE WHEN n.nd IS NULL THEN 'D' ELSE 'U' END AS chgaction,
                    NVL(GREATEST(COALESCE(u.EFFECTDATE, TO_DATE('01/01/1900', 'dd/mm/yyyy')),                                 -- максимальный из update
                                 (SELECT MAX(a.daos) dt                                                        -- либо максимальна€ дата открыти€ счета
                                    FROM bars.accounts a
-                                  WHERE a.acc IN (n.acc_pk,
-                                                  n.acc_ovr,
-                                                  n.acc_9129,
-                                                  n.acc_3570,
-                                                  n.acc_2208,
-                                                  n.acc_2627,
-                                                  n.acc_2207,
-                                                  n.acc_3579,
-                                                  n.acc_2209,
-                                                  n.acc_2625x,
-                                                  n.acc_2627x,
-                                                  n.acc_2625d,
-                                                  n.acc_2628,
-                                                  n.acc_2203))),
+                                  WHERE a.acc IN (n.acc_pk, n.acc_ovr, n.acc_9129, n.acc_3570, n.acc_2208, n.acc_2627, n.acc_2207,
+                                                  n.acc_3579, n.acc_2209, n.acc_2625x, n.acc_2627x, n.acc_2625d, n.acc_2628, n.acc_2203))),
                        bars.gl.bd)
                        AS effectdate,                                                                                   -- либо текуща€ (по умолчанию)
                    SYSDATE AS chgdate,
@@ -1855,15 +1664,7 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
             SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
                    G_STAT_ID,
                    DECODE(t_pivot.i,
@@ -1943,6 +1744,7 @@ IS
                          OR DECODE(n.DAT_CLOSE, u.DAT_CLOSE, 1, 0) = 0)
                        AND n.KF = bars.gl.kf
                        AND u.KF = bars.gl.kf);
+
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -1966,50 +1768,16 @@ IS
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
         INSERT /*+ APPEND */
-              INTO  BARS.BPK_ACC_UPDATE(idupd,
-                                        chgaction,
-                                        effectdate,
-                                        chgdate,
-                                        doneby,
-                                        ND,
-                                        ACC_PK,
-                                        ACC_OVR,
-                                        ACC_9129,
-                                        ACC_TOVR,
-                                        KF,
-                                        ACC_3570,
-                                        ACC_2208,
-                                        PRODUCT_ID,
-                                        ACC_2207,
-                                        ACC_3579,
-                                        ACC_2209,
-                                        ACC_W4,
-                                        FIN,
-                                        FIN23,
-                                        OBS23,
-                                        KAT23,
-                                        K23,
-                                        DAT_END,
-                                        KOL_SP,
-                                        S250,
-                                        GRP,
-                                        GLOBAL_BDATE,
-                                        DAT_CLOSE)
+              INTO  BARS.BPK_ACC_UPDATE(idupd, chgaction, effectdate, chgdate, doneby,
+                                        ND, ACC_PK, ACC_OVR, ACC_9129, ACC_TOVR, KF, ACC_3570, ACC_2208, PRODUCT_ID,
+                                        ACC_2207, ACC_3579, ACC_2209, ACC_W4, FIN, FIN23, OBS23, KAT23, K23, DAT_END,
+                                        KOL_SP, S250, GRP, GLOBAL_BDATE, DAT_CLOSE)
             SELECT bars_sqnc.get_nextval('s_bpkacc_update', COALESCE(n.KF, u.KF)) AS idupd,
                    CASE WHEN n.nd IS NULL THEN 'D' ELSE DECODE(u.chgaction, NULL, 'I', 'U') END AS chgaction,
-                   NVL(GREATEST(COALESCE(u.EFFECTDATE, TO_DATE('01/01/1900', 'dd/mm/yyyy')),                                 -- максимальный из update
+                   NVL(GREATEST(COALESCE(u.EFFECTDATE, TO_DATE('01/01/1900', 'dd/mm/yyyy')),                  -- максимальный из update
                                 (SELECT MAX(a.daos) dt                                                        -- либо максимальна€ дата открыти€ счета
                                    FROM bars.accounts a
-                                  WHERE a.acc IN (n.acc_w4,
-                                                  n.acc_pk,
-                                                  n.acc_ovr,
-                                                  n.acc_9129,
-                                                  n.acc_tovr,
-                                                  n.acc_3570,
-                                                  n.acc_2208,
-                                                  n.acc_2207,
-                                                  n.acc_3579,
-                                                  n.acc_2209))),
+                                  WHERE a.acc IN (n.acc_w4, n.acc_pk, n.acc_ovr, n.acc_9129, n.acc_tovr, n.acc_3570, n.acc_2208, n.acc_2207, n.acc_3579, n.acc_2209))),
                        bars.gl.bd)
                        AS effectdate,                                                                                   -- либо текуща€ (по умолчанию)
                    SYSDATE AS chgdate,
@@ -2040,9 +1808,9 @@ IS
                    DECODE(n.nd, NULL, u.DAT_CLOSE, n.DAT_CLOSE) AS DAT_CLOSE
               FROM (SELECT *
                       FROM BARS.BPK_ACC_UPDATE
-                     WHERE IDUPD IN (  SELECT MAX(IDUPD)
-                                         FROM BARS.BPK_ACC_UPDATE
-                                     GROUP BY nd)
+                     WHERE IDUPD IN ( SELECT MAX(IDUPD)
+                                        FROM BARS.BPK_ACC_UPDATE
+                                       GROUP BY nd)
                        AND chgaction != 'D') u
                    FULL OUTER JOIN BARS.BPK_ACC n ON (u.nd = n.nd AND u.kf = n.kf)
              WHERE (DECODE(n.ACC_PK, u.ACC_PK, 1, 0) = 0
@@ -2093,42 +1861,35 @@ IS
     BEGIN
         start_process(l_tbl_name, 'CHECK');
 
-        INSERT INTO BARS.UPDATE_TBL_STAT(ID,
-                                         STAT_ID,
-                                         FIELD_NAME,
-                                         FIELD_TYPE,
-                                         VALUE,
-                                         RUN_ID,
-                                         STARTDATE,
-                                         ENDDATE,
-                                         TBL_NAME)
-            SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
-                   G_STAT_ID,
-                   f1 AS field,
-                   'count_diff' type1,
-                   c1 AS CNTDIFF,
-                   G_RUN_ID,
-                   G_START_DT,
-                   G_END_DT,
-                   l_tbl_name
-              FROM (SELECT count(*) c1, coalesce(n.TAG, u.TAG) f1
-                      FROM (SELECT b.*, coalesce(w4.kf, bpk.kf) kf
-                              FROM BARS.BPK_PARAMETERS b
-                              left join bars.w4_acc  w4  on (w4.nd  = b.nd)
-                              left join bars.bpk_acc bpk on (bpk.nd = b.nd)
-                             WHERE w4.nd  is not null
-                                or bpk.nd is not null) n
-                      FULL OUTER JOIN (SELECT *
-                                         FROM BARS.BPK_PARAMETERS_UPDATE u1
-                                        WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
-                                                                  FROM BARS.BPK_PARAMETERS_UPDATE u2
-                                                                 GROUP BY u2.nd, u2.tag, u2.kf )
-                                          AND u1.CHGACTION <> 'D') u
-                          ON (n.kf = u.kf and n.nd = u.nd AND n.tag = u.tag)
-                     WHERE decode(n.value, u.value, 0, 1) = 1
-                        or n.nd is null
-                        or u.nd is null
-                      group by coalesce(n.TAG, u.TAG));
+        INSERT INTO BARS.UPDATE_TBL_STAT(ID, STAT_ID, FIELD_NAME, FIELD_TYPE, VALUE, RUN_ID, STARTDATE, ENDDATE, TBL_NAME)
+        SELECT BARS.S_UPDATE_TBL_STAT.NEXTVAL,
+               G_STAT_ID,
+               f1 AS field,
+               'count_diff' type1,
+               c1 AS CNTDIFF,
+               G_RUN_ID,
+               G_START_DT,
+               G_END_DT,
+               l_tbl_name
+          FROM (SELECT count(*) c1, coalesce(n.TAG, u.TAG) f1
+                  FROM (SELECT b.*, coalesce(w4.kf, bpk.kf) kf
+                          FROM BARS.BPK_PARAMETERS b
+                          left join bars.w4_acc  w4  on (w4.nd  = b.nd)
+                          left join bars.bpk_acc bpk on (bpk.nd = b.nd)
+                         WHERE w4.nd  is not null
+                            or bpk.nd is not null) n
+                  FULL OUTER JOIN (SELECT *
+                                     FROM BARS.BPK_PARAMETERS_UPDATE u1
+                                    WHERE u1.IDUPD IN ( SELECT MAX(u2.IDUPD)
+                                                              FROM BARS.BPK_PARAMETERS_UPDATE u2
+                                                             GROUP BY u2.nd, u2.tag, u2.kf )
+                                      AND u1.CHGACTION <> 'D') u
+                      ON (n.kf = u.kf and n.nd = u.nd AND n.tag = u.tag)
+                 WHERE decode(n.value, u.value, 0, 1) = 1
+                    or n.nd is null
+                    or u.nd is null
+                  group by coalesce(n.TAG, u.TAG));
+
         end_process(l_tbl_name, 'CHECK');
         COMMIT;
     EXCEPTION
@@ -2151,26 +1912,18 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.BPK_PARAMETERS_UPDATE(ND,
-                                               TAG,
-                                               VALUE,
-                                               CHGDATE,
-                                               CHGACTION,
-                                               DONEBY,
-                                               IDUPD,
-                                               KF,
-                                               EFFECTDATE,
-                                               GLOBAL_BDATE)
-            SELECT DECODE(n.nd, NULL, u.nd, n.nd),
-                   DECODE(n.nd, NULL, u.tag, n.tag),
-                   DECODE(n.nd, NULL, u.value, n.value),
-                   SYSDATE,
-                   DECODE(n.nd, NULL, 'D', 'U'),
-                   l_staff_nm,
-                   bars.bars_sqnc.get_nextval('s_bpk_parameters_update', COALESCE(n.KF, u.KF)) IDUPD,
-                   DECODE(n.nd, NULL, u.kf, n.kf) KF,
-                   COALESCE(bars.gl.bd, bars.glb_bankdate) EFFECTDATE,
-                   bars.glb_bankdate GLOBAL_BDATE
+
+        INSERT INTO BARS.BPK_PARAMETERS_UPDATE(ND, TAG, VALUE, CHGDATE, CHGACTION, DONEBY, IDUPD, KF, EFFECTDATE, GLOBAL_BDATE)
+            SELECT DECODE(n.nd, NULL, u.nd, n.nd) as ND,
+                   DECODE(n.nd, NULL, u.tag, n.tag) as TAG,
+                   DECODE(n.nd, NULL, u.value, n.value) as VALUE,
+                   SYSDATE as CHGDATE,
+                   DECODE(n.nd, NULL, 'D', 'U') as CHGACTION,
+                   l_staff_id as DONEBY,
+                   bars.bars_sqnc.get_nextval('s_bpk_parameters_update', COALESCE(n.KF, u.KF)) as IDUPD,
+                   DECODE(n.nd, NULL, u.kf, n.kf) as KF,
+                   COALESCE(bars.gl.bd, bars.glb_bankdate) as EFFECTDATE,
+                   bars.glb_bankdate as GLOBAL_BDATE
               FROM (SELECT b.*, coalesce(w4.kf, bpk.kf) kf
                       FROM BARS.BPK_PARAMETERS b
                       left join bars.w4_acc  w4  on (w4.nd  = b.nd)
@@ -2216,23 +1969,14 @@ IS
     BEGIN
         start_process(l_tbl_name, 'SYNC');
         SELECT id, logname into l_staff_id, l_staff_nm FROM bars.staff$base WHERE logname = G_LOGNAME;
-        INSERT INTO BARS.BPK_PARAMETERS_UPDATE(ND,
-                                       TAG,
-                                       VALUE,
-                                       CHGDATE,
-                                       CHGACTION,
-                                       DONEBY,
-                                       IDUPD,
-                                       KF,
-                                       EFFECTDATE,
-                                       GLOBAL_BDATE)
+        INSERT INTO BARS.BPK_PARAMETERS_UPDATE(ND, TAG, VALUE, CHGDATE, CHGACTION, DONEBY, IDUPD, KF, EFFECTDATE, GLOBAL_BDATE)
             WITH tg as (select /*+ inline */ tag  from barsupl.upl_tag_lists where tag_table in ('BPK_TAGS'))
             SELECT DECODE(n.nd, NULL, u.nd, n.nd) as ND,
                    DECODE(n.nd, NULL, u.tag, n.tag) as TAG,
                    DECODE(n.nd, NULL, u.value, n.value) as value,
                    SYSDATE as CHGDATE,
                    DECODE(n.nd, NULL, 'D', 'U') as CHGACTION,
-                   l_staff_nm as DONEBY,
+                   l_staff_id as DONEBY,
                    bars.bars_sqnc.get_nextval('s_bpk_parameters_update', COALESCE(n.KF, u.KF)) as IDUPD,
                    DECODE(n.nd, NULL, u.kf, n.kf) as KF,
                    COALESCE(bars.gl.bd, bars.glb_bankdate) as EFFECTDATE,

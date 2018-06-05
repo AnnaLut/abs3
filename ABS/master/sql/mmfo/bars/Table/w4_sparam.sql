@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/W4_SPARAM.sql =========*** Run *** ===
 PROMPT ===================================================================================== 
@@ -39,6 +37,15 @@ end;
 /
 
 
+begin
+    execute immediate 'alter table W4_SPARAM add tipad CHAR(3)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
 
 
 PROMPT *** ALTER_POLICIES to W4_SPARAM ***
@@ -51,6 +58,7 @@ COMMENT ON COLUMN BARS.W4_SPARAM.TIP IS 'Тип счета';
 COMMENT ON COLUMN BARS.W4_SPARAM.NBS IS 'НБС';
 COMMENT ON COLUMN BARS.W4_SPARAM.SP_ID IS 'Ид. спецпараметра';
 COMMENT ON COLUMN BARS.W4_SPARAM.VALUE IS 'Значение спецпараметра';
+COMMENT ON COLUMN BARS.W4_SPARAM.TIPAD IS '';
 
 
 
@@ -58,9 +66,9 @@ COMMENT ON COLUMN BARS.W4_SPARAM.VALUE IS 'Значение спецпараметра';
 PROMPT *** Create  constraint PK_W4SPARAM ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.W4_SPARAM ADD CONSTRAINT PK_W4SPARAM PRIMARY KEY (GRP_CODE, TIP, NBS, SP_ID)
+  ALTER TABLE BARS.W4_SPARAM ADD CONSTRAINT PK_W4SPARAM PRIMARY KEY (GRP_CODE, TIP, NBS, SP_ID, TIPAD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -72,14 +80,13 @@ exception when others then
 PROMPT *** Create  index PK_W4SPARAM ***
 begin   
  execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_W4SPARAM ON BARS.W4_SPARAM (GRP_CODE, TIP, NBS, SP_ID) 
+  CREATE UNIQUE INDEX BARS.PK_W4SPARAM ON BARS.W4_SPARAM (GRP_CODE, TIP, NBS, SP_ID, TIPAD) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD ';
+  TABLESPACE BRSDYND ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
 
 
 PROMPT *** Create  grants  W4_SPARAM ***

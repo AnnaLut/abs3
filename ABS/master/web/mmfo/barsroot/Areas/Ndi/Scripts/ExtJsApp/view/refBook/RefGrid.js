@@ -187,7 +187,7 @@ Ext.onReady(function () {
             }
 
 
-            
+           
             var getDataUrl = '/barsroot/ndi/ReferenceBook/GetData/?' +
                 'tableid=' +
                 getDataObj.TableId +
@@ -268,7 +268,8 @@ Ext.onReady(function () {
                         //CustomFilters: Ext.encode(referenceGrid.metadata.CustomFilters),
                         jsonSqlProcParams: window.jsonSqlProcParams === undefined ? "" : window.jsonSqlProcParams,
                         base64jsonSqlProcParams: window.base64jsonSqlProcParams === undefined ? "" : window.base64jsonSqlProcParams,
-                        isResetPages: false
+                        isResetPages: false,
+                        code: window.Code
                         //Ext.encode(referenceGrid.metadata.startFilter)
                         //передаем параметр с информацией о доп. фильтрации вычитки данных (используется для проваливания в другие справочники)
 
@@ -823,8 +824,6 @@ Ext.onReady(function () {
         },
 
         getColor: function (raw, colid, colorType) {
-
-         
             var colors = {};
             for (var k in raw) {
                 var key = k.toString();
@@ -876,7 +875,6 @@ Ext.onReady(function () {
                     return;
                 }
             });
-            
             var bgColorColumn = referenceGrid.getColor(record.raw, colMetaInfo.COLID, 2);
             var fontColorColumn = referenceGrid.getColor(record.raw, colMetaInfo.COLID, 1);
 

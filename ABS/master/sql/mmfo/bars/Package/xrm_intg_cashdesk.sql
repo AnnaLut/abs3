@@ -163,7 +163,7 @@ is
                               p_nms       out accounts.nms%type)
       is
       begin
-         select c.okpo, c.nmk, a.nms
+         select c.okpo, substr(c.nmk,1,38), a.nms
            into p_okpo, p_namb, p_nms
            from accounts a, customer c
           where a.rnk = c.rnk and a.kv = p_kv and a.nls = p_nls;

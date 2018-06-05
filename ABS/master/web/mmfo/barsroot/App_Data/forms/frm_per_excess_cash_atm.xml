@@ -11,7 +11,7 @@
       </sql>
       </datasource>
     <rowselection method="SingleRowServer"/>
-
+ 
     <buttons>
       <!--******перегляд оборотыв по рахунку      -->
       <button caption="    Історія рахунка   " id="Bt1_a" type="Image" imagename="notebook_preferences"  hint="Показати історію оборотів по рахунку">

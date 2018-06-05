@@ -167,7 +167,7 @@
                 transport: {
                     read: {
                         type: 'GET',
-                        url: bars.config.urlContent("/api/BpkW4/BatchBranchingApi/GetContentFile") + "?id=" + dataItem.ID
+                        url: bars.config.urlContent("/api/BpkW4/BatchBranchingApi/GetFileContent") + "?id=" + dataItem.ID
                     }
                 },
                 pageSize: 5,

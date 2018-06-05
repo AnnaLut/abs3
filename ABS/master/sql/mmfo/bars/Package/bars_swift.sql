@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_swift.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-CREATE OR REPLACE PACKAGE BARS.bars_swift
+CREATE OR REPLACE PACKAGE BARS.BARS_SWIFT
 is
 
 --**************************************************************--
@@ -24,7 +18,7 @@ is
 
     CRLF              constant char(2)       := chr(13) || chr(10);
 
-    g_headerVersion   constant varchar2(64)  := 'version 3.41 23.01.2017';
+    g_headerVersion   constant varchar2(64)  := 'version 3.44 13.04.2018';
     g_headerDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -217,7 +211,10 @@ PROCEDURE In_SwJournal(
     accd_       IN  NUMBER,
     acck_       IN  NUMBER,
     vdat_       IN  VARCHAR2,
-    idat_       IN  VARCHAR2);
+    idat_       IN  VARCHAR2,
+    sti_        IN  VARCHAR2  DEFAULT NULL,
+    uetr_       IN  VARCHAR2  DEFAULT NULL,
+    cov_        IN  VARCHAR2  DEFAULT NULL);
 
 --**************************************************************--
 -- Вставка в журнал сообщений (SW_JOURNAL)
@@ -241,7 +238,10 @@ PROCEDURE In_SwJournalEx(
     acck_       IN  NUMBER,
     vdat_       IN  VARCHAR2,
     idat_       IN  VARCHAR2,
-    flag_       IN  VARCHAR2 );
+    flag_       IN  VARCHAR2,
+    sti_        IN  VARCHAR2  DEFAULT NULL,
+    uetr_       IN  VARCHAR2  DEFAULT NULL,
+    cov_        IN  VARCHAR2  DEFAULT NULL );
 
 --**************************************************************--
 -- Вставка в журнал тела сообщения (SW_OPERW)
@@ -733,7 +733,10 @@ PROCEDURE In_SwJournalInt(
     idat_       IN  VARCHAR2,
     flag_       IN  VARCHAR2,
     trans_      IN  VARCHAR2  DEFAULT NULL,
-    apphdrflg_  IN  VARCHAR2  DEFAULT NULL);
+    apphdrflg_  IN  VARCHAR2  DEFAULT NULL,
+    sti_        IN  VARCHAR2  DEFAULT NULL,
+    uetr_       IN  VARCHAR2  DEFAULT NULL,
+    cov_        IN  VARCHAR2  DEFAULT NULL);
 
 FUNCTION AmountToSWIFT(
     Amount_             IN NUMBER,
@@ -1026,7 +1029,7 @@ procedure stmt_unlink_doc(
     procedure impmsg_document_link(
                   p_docRef    in  oper.ref%type,
                   p_swRef     in  sw_journal.swref%type );
-   
+
        procedure impmsg_document_link_all(
                   p_docRef    in  oper.ref%type,
                   p_swRef     in  sw_journal.swref%type );
@@ -1556,12 +1559,14 @@ procedure stmt_unlink_doc(
     procedure pay_190_stmt( p_docref number, p_swref number);
 
     procedure auto_create_swt(p_ref oper.ref%type, p_swref sw_journal.swref%type);
+    
+    function generate_uetr return varchar2;
 
 
 end bars_swift;
 /
 
-CREATE OR REPLACE PACKAGE BODY BARS.bars_swift
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_SWIFT
 is
 
 --**************************************************************--
@@ -1579,7 +1584,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.82 28.11.2017';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.89 25.05.2018';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -1820,13 +1825,13 @@ is
         -- в референсе должен быть "+"
         --
         if (l_charset = 'RUR6') then
-		   --COBUMMFO-5564
+           --COBUMMFO-5564
            -- l_trn := '+' || l_trn || '-' || substr(p_receiver, 1, 4) || '-';
-		   l_trn := '+' || substr(p_receiver, 1, 4) || '-';
+           l_trn := '+' || substr(p_receiver, 1, 4) || '-';
         else
-		    --COBUMMFO-5564
+            --COBUMMFO-5564
             --l_trn := l_trn || '-' || substr(p_receiver, 1, 4) || '-';
-			l_trn := substr(p_receiver, 1, 4) || '-';
+            l_trn := substr(p_receiver, 1, 4) || '-';
         end if;
         l_trn := l_trn || substr('0000000000' || to_char(p_swref), -16+length(l_trn));
 
@@ -1931,15 +1936,16 @@ IS
     return_val  NUMBER;
     mtid        VARCHAR2(16);
     l_msgAppHdrFlg sw_journal.app_flag%type  := 'N';
+    
 
 BEGIN
     SELECT s_sw_journal.NEXTVAL INTO return_val FROM dual;
     mtid := GetSWIFTField20(return_val, receiver_);
 
     INSERT INTO sw_journal
-        (swref,mt,io_ind,trn,page,date_in,sender,receiver, app_flag, flags)
+        (swref,mt,io_ind,trn,page,date_in,sender,receiver, app_flag, flags, sti, uetr)
     VALUES
-        ( return_val, mt_, 'I', mtid, SUBSTR('000'||page_no_,-3), sysdate, sender_, receiver_, l_msgAppHdrFlg, 'L');
+        ( return_val, mt_, 'I', mtid, SUBSTR('000'||page_no_,-3), sysdate, sender_, receiver_, l_msgAppHdrFlg, 'L', '001', bars_swift.generate_uetr);
 
     RETURN return_val;
 
@@ -2595,7 +2601,7 @@ BEGIN
            i>2 and SUBSTR(Value_,i-1,2)=chr(10)||'/'  then
            if x=0 then x:=1;tmpStr:=tmpStr||'/'''; end if;
         elsif i>2 and SUBSTR(Value_,i,1)='/'  then
-           if x=1 then x:=0;tmpStr:=tmpStr||'''/'; end if;
+           if x=1 then x:=0;tmpStr:=tmpStr||'''/'; else  tmpStr:=tmpStr||SUBSTR(Value_,i,1); end if;  --else оставляем / внутри строки если есть
         elsif SUBSTR(Value_,i,1)=chr(10) and x=1 then
            tmpStr:=tmpStr||SUBSTR(Value_,i,1)||''''; x:=0;
         else
@@ -3288,6 +3294,7 @@ IS
             field_contents:=  field_contents || 'S' || c_all_acc.swtt;
             field_contents:=  field_contents || c_all_acc.trn || '//' || c_all_acc.ref;
         ELSE
+
             --Transaction originated by bank
             field_contents:=  field_contents || 'N' || c_all_acc.tt;
             field_contents:=  field_contents || c_all_acc.ref;
@@ -3700,7 +3707,10 @@ PROCEDURE In_SwJournalInt(
     idat_       IN  VARCHAR2,
     flag_       IN  VARCHAR2,
     trans_      IN  VARCHAR2  DEFAULT NULL,
-    apphdrflg_  IN  VARCHAR2  DEFAULT NULL  )
+    apphdrflg_  IN  VARCHAR2  DEFAULT NULL,
+    sti_        IN  VARCHAR2  DEFAULT NULL,
+    uetr_       IN  VARCHAR2  DEFAULT NULL,
+    cov_        IN  VARCHAR2  DEFAULT NULL)
 IS
     l_accd      NUMBER  := NULL;
     l_acck      NUMBER  := NULL;
@@ -3711,6 +3721,7 @@ IS
     l_dateOut   date;
     l_trn       varchar2(16);
     l_msgAppHdrFlg sw_journal.app_flag%type;
+
 
 BEGIN
     ret_   := 0;
@@ -3829,11 +3840,11 @@ BEGIN
 
     INSERT INTO sw_journal
         ( swref,mt,trn,page,io_ind,sender,receiver,payer,payee,
-          currency,amount,accd,acck,date_in,date_out,vdate,transit, flags, app_flag )
+          currency,amount,accd,acck,date_in,date_out,vdate,transit, flags, app_flag,sti,uetr, cov )
     VALUES
             ( swref_,mt_,l_trn,l_page,io_,sender_,receiver_,payer_,payee_,
               l_ccy,nvl(amount_, 0),l_accd,l_acck,l_idate, l_dateOut,
-              nvl(TO_DATE(vdat_,'MM/DD/YYYY'), gl.bd), transit_, flag_, l_msgAppHdrFlg );
+              nvl(TO_DATE(vdat_,'MM/DD/YYYY'), gl.bd), transit_, flag_, l_msgAppHdrFlg, sti_, uetr_, cov_);
 
     EXCEPTION
          WHEN DUP_VAL_ON_INDEX THEN
@@ -3864,7 +3875,11 @@ PROCEDURE In_SwJournal(
     accd_       IN  NUMBER,
     acck_       IN  NUMBER,
     vdat_       IN  VARCHAR2,
-    idat_       IN  VARCHAR2)
+    idat_       IN  VARCHAR2,
+    sti_        IN  VARCHAR2  DEFAULT NULL,
+    uetr_       IN  VARCHAR2  DEFAULT NULL,
+    cov_        IN  VARCHAR2  DEFAULT NULL
+    )
 IS
 BEGIN
 
@@ -3886,7 +3901,10 @@ BEGIN
         acck_      => acck_,
         vdat_      => vdat_,
         idat_      => idat_,
-        flag_      => null    );
+        flag_      => null,
+        sti_       => sti_,
+        uetr_      => uetr_,
+        cov_       => cov_);
 
 END In_SwJournal;
 
@@ -3908,7 +3926,10 @@ PROCEDURE In_SwJournalEx(
     acck_       IN  NUMBER,
     vdat_       IN  VARCHAR2,
     idat_       IN  VARCHAR2,
-    flag_       IN  VARCHAR2 )
+    flag_       IN  VARCHAR2,
+    sti_        IN  VARCHAR2  DEFAULT NULL,
+    uetr_       IN  VARCHAR2  DEFAULT NULL,
+    cov_        IN  VARCHAR2  DEFAULT NULL )
 IS
     l_accd      NUMBER  := NULL;
     l_acck      NUMBER  := NULL;
@@ -3937,7 +3958,10 @@ BEGIN
         acck_      => acck_,
         vdat_      => vdat_,
         idat_      => idat_,
-        flag_      => flag_    );
+        flag_      => flag_,
+        sti_       => sti_,
+        uetr_      => uetr_,
+        cov_       => cov_ );
 
 END In_SwJournalEx;
 
@@ -4061,6 +4085,7 @@ p_mt     number;     -- Тип создаваемого сообщения (аналог mt_)
 l_ins70  boolean := false;
 
 l_pos     number;
+l_guid varchar2(36);
 
 BEGIN
 
@@ -4193,7 +4218,9 @@ BEGIN
                l_fld70 := l_fld70 || substr(l_tmpFld70, i*33+1, 33) || chr(13) || chr(10);
            end if;
        end loop;
-
+       
+            
+            l_guid :=bars_swift.generate_uetr;
         -- Создаем заголовок сообщения
         In_SwJournalInt(
             ret_        => l_retCode,
@@ -4212,8 +4239,11 @@ BEGIN
             accd_       => null,
             acck_       => acck_,
             vdat_       => to_char(gl.bDate, 'MM/DD/YYYY'),
+
             idat_       => to_char(sysdate, 'YYYY-MM-DD HH24:MI'),
-            flag_       => null      );
+            flag_       => null,
+            sti_        =>'001',
+            uetr_       =>lower(l_guid)      );
 
         -- Привязываем сообщение к документу
         insert into sw_oper(ref, swref)
@@ -5184,6 +5214,7 @@ l_amn32       number;         -- сумма для поле 32H
 
 l_swiId       varchar2(16) := null;     -- Ref входящего сообщения
 
+
 begin
 
     -----------------------------------------------------------------
@@ -5211,7 +5242,7 @@ begin
         if (p_swmsg.altPartyB is null and p_swmsg.bicPartyB is null) then
             raise_application_error(-20780, '\114 Не указан BIC-код или счет по стороне Б');
         end if;
-
+        
     --                                                             --
     -- *** Конец блока проверок заполнения основных реквизитов *** --
     -----------------------------------------------------------------
@@ -5242,7 +5273,7 @@ begin
             acck_     => null,
             vdat_     => to_char(p_swmsg.valueDate, 'MM/DD/YYYY'),  -- Дата валютирования сообщения
             idat_     => to_char(sysdate, 'YYYY-MM-DD HH24:MI'),    -- Дата создания сообщения
-            flag_     => nvl(p_msgFlag, 'L') );
+            flag_     => nvl(p_msgFlag, 'L'));
 
 
         l_fld20 := getSwiftField20(l_ref, p_swmsg.bicReceiver);
@@ -5347,7 +5378,7 @@ begin
         In_SwOperw(l_Ref, '87', 'A',  l_recno, 'A', substr(p_swmsg.bicReceiver, 1, 8)); l_recno := l_recno + 1;
 
         if (p_swmsg.agreementNum is not null or p_swmsg.agreementDate is not null) then
-            In_SwOperw(l_Ref, '77', 'A',  l_recno, 'D', 'GEN AGR ' || PrepStr(p_swmsg.agreementNum) || ' '|| to_char(p_swmsg.agreementDate, 'yyyymmdd')); l_recno := l_recno + 1;
+            In_SwOperw(l_Ref, '77', 'A',  l_recno, 'D', 'GEN AGR ' || PrepStr(p_swmsg.agreementNum) || ' DD '|| to_char(p_swmsg.agreementDate, 'dd.mm.yyyy')); l_recno := l_recno + 1;
         end if;
 
         --
@@ -5691,8 +5722,21 @@ BEGIN
     exception when no_data_found then
         l_swmsg.baseyCode := null;
     end;
-    l_swmsg.agreementNum  := l_fxswap2.agrmnt_num;
-    l_swmsg.agreementDate := l_fxswap2.agrmnt_date;
+    
+    begin
+        select nvl(substr(value,1,20),l_fxswap2.agrmnt_num) into l_swmsg.agreementNum from customerw where rnk=l_fxswap1.rnk and tag = 'BGD';
+    exception when no_data_found then
+       l_swmsg.agreementNum  := l_fxswap2.agrmnt_num;     
+    end;
+    
+    begin
+        select nvl(to_date(value, 'dd/mm/yyyy'),l_fxswap2.agrmnt_date) into l_swmsg.agreementDate from customerw where rnk=l_fxswap1.rnk and tag = 'DGD';
+    exception when no_data_found then
+        l_swmsg.agreementDate := l_fxswap2.agrmnt_date;    
+    end;
+    
+    
+   
     l_swmsg.swiRef        := l_fxswap1.swi_ref;
     l_swmsg.bicPartyA     := l_fxswap1.swi_bic;
     l_swmsg.accPartyA     := l_fxswap1.swi_acc;
@@ -6229,7 +6273,7 @@ l_currCodeA   number;           -- Код валюты А
 l_currAmountB number;           -- Сумма валюты Б
 l_currCodeB   number;           -- Код валюты Б
 
-l_agreementNum   varchar2(10);  -- Номер ген.соглашения
+l_agreementNum   varchar2(20);  -- Номер ген.соглашения
 l_agreementDate  date;          -- Дата ген.соглашения
 
 
@@ -6253,6 +6297,7 @@ l_baseCurr    varchar2(1);      -- Признак базовой валюты сделки
 
 l_swaptag     number;
 i             number;
+l_rnk         number;
 
 
 BEGIN
@@ -6279,7 +6324,8 @@ BEGIN
                swo_acc               partyb_acc,
                alt_partyb            partyb_alt,
                interm_b              intermb,
-               swap_tag
+               swap_tag, 
+               rnk
           into l_bicReceiver,
                l_dealDate,
                l_valueDate,
@@ -6298,13 +6344,26 @@ BEGIN
                l_accPartyB,
                l_altPartyB,
                l_intermB,
-               l_swaptag
+               l_swaptag,
+               l_rnk
           FROM fx_deal
          WHERE deal_tag = p_dealRef;
 
     exception
         when NO_DATA_FOUND then
             raise_application_error(-20780, '\110 Договор или параметры договора с реф. ' || to_char(p_dealRef) || ' не найдены (FOREX)');
+    end;
+
+       begin
+            select nvl(substr(value,1,20),l_agreementNum) into l_agreementNum from customerw where rnk=l_rnk and tag = 'BGD';
+          exception when no_data_found then
+           null;     
+       end;
+        
+    begin
+        select nvl(to_date(value,'dd/mm/yyyy'),l_agreementDate) into l_agreementDate from customerw where rnk=l_rnk and tag = 'DGD';
+    exception when no_data_found then
+      null;     
     end;
 
     if l_swoRef is not null then
@@ -6518,7 +6577,7 @@ BEGIN
         In_SwOperw(l_Ref, '87', 'A',  l_recno, 'A', substr(l_bicReceiver, 1, 8)); l_recno := l_recno + 1;
 
         if (l_agreementNum is not null or l_agreementDate is not null) then
-            In_SwOperw(l_Ref, '77', 'A',  l_recno, 'D', 'GEN AGR ' || PrepStr(l_agreementNum) || ' '|| to_char(l_agreementDate, 'yyyymmdd')); l_recno := l_recno + 1;
+            In_SwOperw(l_Ref, '77', 'A',  l_recno, 'D', 'GEN AGR ' || PrepStr(l_agreementNum) || ' DD '|| to_char(l_agreementDate, 'dd.mm.yyyy')); l_recno := l_recno + 1;
         end if;
 
         --
@@ -6658,6 +6717,7 @@ IS
 
 l_swmsg t_swmsg;
 l_ref   number;         -- Реф. создаваемого сообщения
+l_rnk   number;
 
 BEGIN
 
@@ -6688,7 +6748,8 @@ BEGIN
                a.int_partya         interest_partya,
                a.int_interma        interest_intermediary_a,
                a.int_partyb         interest_partyb,
-               a.int_intermb        interest_intermediary_b
+               a.int_intermb        interest_intermediary_b,
+               d.rnk                rnk
           into l_swmsg.bicReceiver,
                l_swmsg.tradeDate,
                l_swmsg.valueDate,
@@ -6712,7 +6773,8 @@ BEGIN
                l_swmsg.intPartyA,
                l_swmsg.intIntermA,
                l_swmsg.intPartyB,
-               l_swmsg.intIntermB
+               l_swmsg.intIntermB,
+               l_rnk
           from cc_deal d, cc_add a, custbank b, cc_vidd v, int_ratn r, int_accn n, customer c
          where d.nd    = p_dealRef
            and d.nd    = a.nd
@@ -6744,6 +6806,19 @@ BEGIN
     if (p_msgOption = 'MATU' and l_swmsg.prevSwRef is null) then
         return;
     end if;
+    
+    begin
+        select substr(value,1,20) into l_swmsg.agreementNum from customerw where rnk=l_rnk and tag = 'BGD';
+    exception when no_data_found then
+       null;     
+    end;
+    
+    begin
+        select to_date(value, 'dd/mm/yyyy') into l_swmsg.agreementDate from customerw where rnk=l_rnk and tag = 'DGD';
+    exception when no_data_found then
+        null; 
+    end;
+    
 
     -- формирование сообщения
     igen_mt320_message(l_swmsg, p_msgFlag, p_msgOption, l_ref);
@@ -8714,6 +8789,7 @@ begin
                 order by n)
          where rownum < 2;
 
+
         l_list.extend;
         l_list(l_cnt) := l_value;
         l_cnt := l_cnt + 1;
@@ -9535,7 +9611,7 @@ begin
         end if;
 
     elsif (p_opt = 'A' and p_tag in ('50', '59')) then
-
+    
         --
         -- Format: [/34x]
         --         BIC
@@ -9545,24 +9621,25 @@ begin
 
             l_pos := instr(p_value, l_crln);
 
-            if (l_pos = 0) then
-                raise_application_error(-20782, '\902 Неверный формат поля, не найден BIC. Поле '|| p_tag || p_opt);
-            end if;
+        --            if (l_pos = 0) then
+        --                raise_application_error(-20782, '\902 Неверный формат поля, не найден BIC. Поле '|| p_tag || p_opt);
+        --            end if;
 
             l_value := substr(p_value, 1, l_pos-1);
 
 
             validate_acc(p_tag, p_opt, l_value);
-/*
-            if (length(l_value) > 35) then
-                raise_application_error(-20782, '\902 Неверный формат поля ' || p_tag || p_opt);
-            end if;
-*/
-            validate_bic(p_tag, substr(p_value, l_pos+2));
+         --
+         --           if (length(l_value) > 35) then
+         --               raise_application_error(-20782, '\902 Неверный формат поля ' || p_tag || p_opt);
+         --           end if;
+         --
+            --validate_bic(p_tag, substr(p_value, l_pos+2));
 
         else
             validate_bic(p_tag, p_value);
         end if;
+        
 
     elsif (p_opt = 'F' and p_tag = '50') then
 
@@ -9840,7 +9917,7 @@ begin
             raise_application_error(-20782, 'T43: Превышен максимальная длина суммы в поле ' || p_tag || p_opt);
         end if;
 
-    elsif (p_opt is null and p_tag = '61') then
+    elsif (p_opt is null and p_tag in ('61')) then
 
         null; -- пока не проверяю
 
@@ -11523,6 +11600,8 @@ end impmsg_delete_message;
 
      l_recno    number;
      l_rec      arc_rrp.rec%type;
+            l_guid varchar2(36);
+
 
      begin
          bars_audit.trace('swt.stmprcinfdoc: entry point par[0]=>%s', to_char(g_curinfrec));
@@ -11587,6 +11666,8 @@ end impmsg_delete_message;
          l_mt := to_number(substr(l_addinf, instr(l_addinf, '#f')+4,3));
          bars_audit.trace('swt.stmprcinfdoc: mt=%s', to_char(l_mt));
 
+
+         l_guid :=bars_swift.generate_uetr;
          -- Создаем заголовок сообщения SWIFT
          in_swjournal(
              ret_      => l_result,
@@ -11605,7 +11686,9 @@ end impmsg_delete_message;
              accd_     => null,
              acck_     => null,
              vdat_     => null,
-             idat_     => to_char(sysdate, 'YYYY-MM-DD HH24:MI'));
+             idat_     => to_char(sysdate, 'YYYY-MM-DD HH24:MI'),
+             sti_      =>'001',
+             uetr_     =>lower(l_guid));
 
          bars_audit.trace('swt.stmprcinfdoc: message header swref=%s created.', to_char(l_swref));
 
@@ -12104,6 +12187,7 @@ end impmsg_delete_message;
 
         forall i in 1..p_listref.count
             insert into sw_oper (ref, swref) values (p_listref(i), p_swRef);
+          
         bars_audit.trace('Document linked with message.');
 
         if (l_msgPayDate is null) then
@@ -12132,7 +12216,7 @@ end impmsg_delete_message;
         bars_audit.trace('Document Ref=%s successfully linked with message SwRef=%s.', '<list>', to_char(p_swRef));
 
     end impmsgi_document_link;
-    
+
 
     -----------------------------------------------------------------
     -- IMPMSGI_DOCUMENT_LINK()
@@ -12312,8 +12396,8 @@ end impmsg_delete_message;
         bars_audit.trace('Document Ref=%s successfully linked with message SwRef=%s.', to_char(p_docRef), to_char(p_swRef));
 
     end impmsgi_document_link;
-    
-    
+
+
     -----------------------------------------------------------------
     -- IMPMSGI_DOCUMENT_LINK_ALL()
     --
@@ -15948,6 +16032,7 @@ end process_auth_message;
 
         bars_audit.trace('Linking document Ref=%s with main message SwRef=%s ...', to_char(p_docRef), to_char(p_swRef));
         impmsgi_document_link(p_docRef, p_swRef);
+        /*insert into sw_oper_queue (ref, swref,status) values (p_docRef, p_swRef,0);*/
         bars_audit.trace('Document Ref=%s successfully linked with main message SwRef=%s.', to_char(p_docRef), to_char(p_swRef));
 
         -- Смотрим есть ли строка выписки
@@ -16608,6 +16693,8 @@ is
   l_swref_new sw_journal.swref%type;
   l_ret number;
   l_transit varchar2(11);
+  l_guid varchar2(36);
+
 begin
 select s.* into l_sw_journal from sw_journal s where s.swref=p_swref;
 select o.* into l_oper from oper o where o.ref=p_ref;
@@ -16654,7 +16741,9 @@ select o.* into l_oper from oper o where o.ref=p_ref;
 
  if ((l_oper.dk=1 and substr(l_oper.nlsa,1,4)='1500' and substr(l_oper.nlsb,1,4)='1600' and l_oper.mfob=gl.aMFO)
  or (l_oper.dk=0 and substr(l_oper.nlsa,1,4)='1600' and l_oper.mfoa=gl.aMFO and substr(l_oper.nlsb,1,4)='1500')) then
-
+            
+            l_guid :=bars_swift.generate_uetr;
+            
     BARS_SWIFT.In_SwJournalInt(ret_      => l_ret,
                         swref_    => l_swref_new,
                         mt_       => l_sw_journal.mt,
@@ -16672,8 +16761,11 @@ select o.* into l_oper from oper o where o.ref=p_ref;
                         acck_     => null,
                         vdat_     => null,
                         idat_     => to_char(sysdate,  'YYYY-MM-DD HH24:MI'),
-                        flag_     => 'L' );
-
+                        flag_     => 'L',
+                        sti_      => '001',
+                        uetr_     => lower(l_guid) 
+                        );
+ update sw_journal set date_pay = sysdate, date_out = null where swref=l_swref_new;
 
  insert into sw_operw(swref,
                       tag,
@@ -16701,24 +16793,34 @@ if (l_sw_journal.mt in('103','202')) then
   values(p_ref, l_swref_new);
  end if;
 end;
+
+function generate_uetr
+return varchar2
+is 
+l_sources_guid varchar2(32); /* GUID*/
+l_guid varchar2(36);
+x varchar2(1);
+
+begin
+
+/*
+xxxxxxxx-xxxx- 4xxx-yxxx-xxxxxxxxxxxx
+x = any lowercase hexadecimal character y = one of 8,9,a or b
+*/
+    select CASE round(dbms_random.value(1,4)) 
+            WHEN 1 THEN '8' 
+            WHEN 2 THEN '9' 
+            WHEN 3 THEN 'a' 
+            WHEN 4 THEN 'b' 
+       END into x
+    FROM dual;
+
+   l_sources_guid:=sys_guid();
+   l_guid:=substr(l_sources_guid,1,8)||'-'||substr(l_sources_guid,9,4)||'-4'||substr(l_sources_guid,14,3)||'-'||x||substr(l_sources_guid,18,3)||'-'||substr(l_sources_guid,21) ;
+   return lower(l_guid);     
+end;
 --**********************************************************************
 begin
     g_notifylist := t_doclist();
 end bars_swift;
 /
-
-
- 
-PROMPT *** Create  grants  BARS_SWIFT ***
-grant EXECUTE                                                                on BARS_SWIFT      to BARS013;
-grant EXECUTE                                                                on BARS_SWIFT      to BARSAQ with grant option;
-grant EXECUTE                                                                on BARS_SWIFT      to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_SWIFT      to SWTOSS;
-grant EXECUTE                                                                on BARS_SWIFT      to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_swift.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 

@@ -1,9 +1,8 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sps.sql =========*** Run *** =======
+PROMPT ===================================================================================== 
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sps.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
+
   CREATE OR REPLACE PACKAGE BARS.SPS is
 
   --
@@ -14,7 +13,7 @@
   --
 
   -- Public constant declarations
-  g_header_version constant varchar2(64) := 'version 1.0.1 19/01/2017';
+  g_header_version constant varchar2(64) := 'version 1.0.2 20/02/2018';
 
   --------------------------------------------------------------------------------
   -- header_version - возвращает версию заголовка пакета
@@ -58,7 +57,9 @@
                               p_polu      in perekr_b.polu%type,
                               p_nazn      in perekr_b.nazn%type,
                               p_okpo      in perekr_b.okpo%type,
-                              p_idr       in perekr_b.idr%type);
+                              p_idr       in perekr_b.idr%type,
+                              p_kod       in perekr_b.kod%type default null,
+                              p_formula   in perekr_b.formula%type default null);
 
   ------------------------------------------------------------------------------
   -- sel015 --процедура вибору рахунків і розрахунку перекриття
@@ -131,9 +132,13 @@ PROCEDURE PAY_PEREKR023(
                tabn_   VARCHAR2
 );
 
+--процедура оплати груп рахунків (для технологів)
+procedure pay_some_perekr (p_union_id number);
+
 end sps;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.SPS is
+
+CREATE OR REPLACE PACKAGE BODY BARS.sps is
 
   ------------------------------------------------------------------------------
   --  Author : yurii.hrytsenia, sergey.gorobets
@@ -142,7 +147,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.SPS is
   ------------------------------------------------------------------------------
 
   -- Private constant declarations
-  g_body_version constant varchar2(64) := 'version 1.0.2 17/01/2017';
+  g_body_version constant varchar2(64) := 'version 1.0.2 20/02/2018';
   g_log_prefix   constant varchar2(20) := 'sps:: ';
 
   ------------------------------------------------------------------------------
@@ -218,44 +223,47 @@ CREATE OR REPLACE PACKAGE BODY BARS.SPS is
                               p_polu      in perekr_b.polu%type,
                               p_nazn      in perekr_b.nazn%type,
                               p_okpo      in perekr_b.okpo%type,
-                              p_idr       in perekr_b.idr%type) is
+                              p_idr       in perekr_b.idr%type,
+                              p_kod       in perekr_b.kod%type default null,
+                              p_formula   in perekr_b.formula%type default null) is
+  /*
+  29.01.2018 додано можливість додавати формули через інтерфейс програми:
+                              p_kod       in perekr_b.kod%type default null, - порядок сортування (пріорітет виконання) формули
+                              p_formula   in perekr_b.formula%type default null); - формула
+  */
   begin
     if p_id is null then
-      insert into perekr_b (ids, vob, tt, mfob, nlsb, kv, koef, polu, nazn, okpo, idr) values (p_scheme_id, p_op_type, p_op_code, p_mfob, p_nlsb, p_kv, p_koef, p_polu, p_nazn, p_okpo, p_idr);
+      insert into perekr_b (ids, vob, tt, mfob, nlsb, kv, koef, polu, nazn, okpo, idr, kod, formula) values (p_scheme_id, p_op_type, p_op_code, p_mfob, p_nlsb, p_kv, p_koef, p_polu, p_nazn, p_okpo, p_idr, p_kod, p_formula);
       logger.info(g_log_prefix || 'Вставка нового отримувача по схемі перекриття ids=' || p_scheme_id);
     else
       update perekr_b p
-         set p.vob = p_op_type, p.tt = p_op_code, p.mfob = p_mfob, p.nlsb = p_nlsb, p.kv = p_kv, p.koef = p_koef, p.polu = p_polu, p.nazn = p_nazn, p.okpo = p_okpo, p.idr = p_idr
+         set p.vob = p_op_type, p.tt = p_op_code, p.mfob = p_mfob, p.nlsb = p_nlsb, p.kv = p_kv, p.koef = p_koef, p.polu = p_polu, p.nazn = p_nazn, p.okpo = p_okpo, p.idr = p_idr, p.kod = p_kod, p.formula = p_formula
        where id = p_id;
       logger.info(g_log_prefix || 'Оновлення отримувача perekr_b.id=' || p_id || ' по схемі перекриття ids=' || p_scheme_id);
     end if;
   end;
-
   ------------------------------------------------------------------------------
   -- sel015 -
-  --
 PROCEDURE SEL015
 ( Mode_ int, Grp  int, sSps varchar2 default '', sParS varchar2 default 'A', isp number default 0)
 is
-
-/*
-***************************************************************************
-24.03.2017 Додано трансляцію призначень платежу. Тобто можна в призначенні платежу використоувавати 
+/****************************************************************************
+24.03.2017 Додано трансляцію призначень платежу. Тобто можна в призначенні платежу використоувавати
 деякі значення з самого платежу:
-#(S)', - зашальний залишок рахунку  
-#(S2)', -   суму платежу 
-#(NLSA)',  - рахунок А
-#(NLSB)',  - рахунок Б
-#(MFOA)', -  МФО А
-#(MFOB)',  - МФО Б
-#(KV)',   -  вал. А
-#(KV2)',  -  вал. Б
-#(TT)',   -  код операції
-#(KOEF)',' -  коефіцієнт
+ #(S)', - зашальний залишок рахунку
+ #(S2)', -   суму платежу
+ #(NLSA)',  - рахунок А
+ #(NLSB)',  - рахунок Б
+ #(MFOA)', -  МФО А
+ #(MFOB)',  - МФО Б
+ #(KV)',   -  вал. А
+ #(KV2)',  -  вал. Б
+ #(TT)',   -  код операції
+ #(KOEF)',' -  коефіцієнт
 Також в призначенні можна використовувати формлу виду:  #{F_DOG_PER (1)}
 функція F_DOG_PER (1) вибирає значення з таблиці perekr_dog відповідно до ID (в нашому випадку це 1)
-Інших інтерпритацій не передбачено. При не правильному записі формули вона не буде 
-трансльована і передасться в призначення як є, тобто помилковий запис формули. 
+Інших інтерпритацій не передбачено. При не правильному записі формули вона не буде
+трансльована і передасться в призначення як є, тобто помилковий запис формули.
 19.01.2017 введено додатковий параметр "isp number default 0" в процедуру, який буде визначати
 чи необхідно до загальної виборки додавати умову відбору рахунків по виконавцю. Введено для
 реалізації функцій виду: Sel015(hWndMDI,1,2, 'S','a.isp='||Str(GetUserId()))
@@ -265,33 +273,24 @@ is
 29.07.2016 дані в таблиці записються і відбираються з sys_context('bars_global','user_id')
 07.07.2016 додано обробку формул для перекриттів SEL015.
 18.06.2016 додає в призначення % перерахованих коштів (н-д 33%)
-
 17.06.2016 добавлено перевірку на закритий рахунок по поточному МФО
 (select dazs from accounts where nls=pb.nlsb and kv=pb.kv and PB.MFOB=bars.f_ourmfo()) is null
-
 16.06.2016
 добавив поле ID NUMBER (38),
 (з таблиці perekr_b), добавив поле MFOA (з таблиць accounts or saldo)
 треба для проводок
-
 Mode_ - параметр, який у виборці відповідає за те чи відбирати рахунки з
 відслідковуванням планових залишків (плановий залитшок = фактичному Mode_= 1)
 або без відслідковування (плановий залишок не довівнює фактичному Mode_= 1)
-
 GRP - номер групи перекриття
-
 sParS - Параметр який задає чи буде виборка робитися з таблиці saldo (не має
 політик доступу на таблиці saldo) замість accounts (
 по суті доступ до рахунків по наданим правам)
-
 sSps - Параметр який задає спосіб обчислення суми документу для перерахування
 (01,29,763)
-
 формула виводиться у виборку завжди (таб, perekr_b поле formula)
-
 (pb.formula - формула,pb.kod - порядок сортування (буде першим списуватися
 з формулою потім з коефіцієнтом))
-
 /*****************************************************************/
 /*Логіка для перекриттів яка включає обрахунок сум документів
 при використанні формул.
@@ -307,7 +306,6 @@ sSps - Параметр який задає спосіб обчислення суми документу для перерахування
 KOD=1,2,3...
 */
 /*****************************************************************/
-
   sSql        varchar2(4000); --загальний запит
   l_mfo       char(6);        --поточне мфо
   strTabN     varchar2(30);   --в залежності від параметрів saldo or accounts
@@ -323,10 +321,10 @@ KOD=1,2,3...
   num    number;
  -------------змінні для трансляції призначення платежу
  l_nazn     varchar2(4000); --перепризначене призначення
- l_s        varchar2(4000); -- проміжні значення формул 
+ l_s        varchar2(4000); -- проміжні значення формул
  s_nazn     varchar2(4000); --значення формули
- l_s1       varchar2(4000); -- проміжні значення формул 
- n1         number; --позиція початку входження формули 
+ l_s1       varchar2(4000); -- проміжні значення формул
+ n1         number; --позиція початку входження формули
  n2         number;--позиція кінця входження формули
  n3         number; --позиція початку входження формули
  n4         number; --позиція кінця входження формули
@@ -589,7 +587,7 @@ BEGIN
                           /*logger.info('SPS debug A.NLSA: '    ||A.NLSA);
                           logger.info('SPS debug A.KVA: '     ||A.KVA);
                           logger.info('SPS debug A.suma_sps: '||A.suma_sps);
-                          logger.info('SPS debug s2: '        ||s2);                          
+                          logger.info('SPS debug s2: '        ||s2);
                           logger.info('SPS debug s2 B.NLSB: ' ||B.NLSB);
                           logger.info('SPS debug s2 B.NLSA: ' ||B.NLSA);
                           logger.info('SPS debug s2 B.KVB: '  ||B.KVB);*/
@@ -625,30 +623,30 @@ BEGIN
       end loop; --кінець циклу А
     COMMIT;
 
--------------------------------------- ТРАНСЛЯЦІЯ ПРИЗНАЧЕНЬ 
+-------------------------------------- ТРАНСЛЯЦІЯ ПРИЗНАЧЕНЬ
 begin
 for k in (select * from TSEL015 where US_ID=SYS_CONTEXT('bars_global','user_id'))
  loop
   l_nazn:=k.nazn;
-  --------розбір формул виду #{F_DOG_PER (1)}
+  --розбір формул виду #{F_DOG_PER (1)}
   if regexp_like(l_nazn, '#') then
-   
+
     begin
         --На#(MFOA)--#(MFOB)--#(KV)--#(KV2)--#(TT)--#(KOEF) вик.п.НКРЕ #{F_DOG_PER(1)}, в т.ч.ПДВ--#{F_DOG_PER (1)}--#(S), #(NLSA)--#(NLSb)
        --тільки для ЦА
-       if regexp_like(l_nazn,'F_DOG_PER') then 
+       if regexp_like(l_nazn,'F_DOG_PER') then
                                                begin
                                                -- цикли забрали, проходимо по призначенню тільки один раз.
-                                              -- while regexp_like(l_nazn,'(#{)')
-                                              -- loop
+                                                -- while regexp_like(l_nazn,'(#{)')
+                                                -- loop
                                                --вирізаємо запис формули для replace
-                                               n1:=regexp_instr(l_nazn,'(#{)',1);-- позиція першого входження # 
+                                               n1:=regexp_instr(l_nazn,'(#{)',1);-- позиція першого входження #
                                                --DBMS_OUTPUT.PUT_LINE('N1: '||n1);
                                                 --#{F_DOG_PER (1)}
                                                n2:=regexp_instr(l_nazn,'\)}',1); --позиція першого входження }
                                                --DBMS_OUTPUT.PUT_LINE('N2: '||n2);
                                                --s1:=substr(l_nazn, regexp_instr(l_nazn,'#',1), 16);
-                                               l_s1:=substr(l_nazn, n1,n2-n1+2); --вирізаємо повну форму формули 
+                                               l_s1:=substr(l_nazn, n1,n2-n1+2); --вирізаємо повну форму формули
                                                --DBMS_OUTPUT.PUT_LINE('Формула -1: '||s1);
                                                -------------------------------------------------
                                                --з запису вирізаємо саму формулу для обрахунку
@@ -657,7 +655,7 @@ for k in (select * from TSEL015 where US_ID=SYS_CONTEXT('bars_global','user_id')
                                                --DBMS_OUTPUT.PUT_LINE('S1: '||s1);
                                                n4:=regexp_instr(l_s1,'\)}',1)-2;
                                                --DBMS_OUTPUT.PUT_LINE('N4: '||n4);
-                                               
+
                                                l_s:=substr(l_s1, n3, n4);
                                                --DBMS_OUTPUT.PUT_LINE('Формула: '||s);
                                                --обрахунок значення по формулі
@@ -673,18 +671,18 @@ for k in (select * from TSEL015 where US_ID=SYS_CONTEXT('bars_global','user_id')
                                                l_nazn:= replace(l_nazn, l_s1 , s_nazn);
                                                --DBMS_OUTPUT.PUT_LINE('Формула 1: '||l_nazn);
                                                --end loop;
-                                               
+
                                                end;
-                                               
+
        end if; --закінчення IF  по формулі #{F_DOG_PER (1)}
-     
+
        -----------------------розбір формул реквізитів документу
-     if regexp_like(l_nazn, '#') then    
+     if regexp_like(l_nazn, '#') then
        begin
       -- while regexp_like(l_nazn,'#')
       --loop
-     
-      IF SUBSTR(l_nazn, regexp_instr(l_nazn,'#',1), 2)='#(' THEN 
+
+      IF SUBSTR(l_nazn, regexp_instr(l_nazn,'#',1), 2)='#(' THEN
          BEGIN
            l_nazn := REPLACE(UPPER(l_nazn),'#(S)',                    TO_CHAR(k.suma_sps));
            l_nazn := REPLACE(UPPER(l_nazn),'#(S2)',                       TO_CHAR(k.suma));
@@ -696,65 +694,64 @@ for k in (select * from TSEL015 where US_ID=SYS_CONTEXT('bars_global','user_id')
            l_nazn := REPLACE(UPPER(l_nazn),'#(KV2)',                       TO_CHAR(k.kvb));
            l_nazn := REPLACE(UPPER(l_nazn),'#(TT)',                      ''''||k.tt||'''');
            l_nazn := REPLACE(UPPER(l_nazn),'#(KOEF)',''''||TO_CHAR(k.koef,'0D0000')||'''');
-           
-         END; 
-           
+
+         END;
+
       end if;
-            
+
     --end loop;
-    
+
    end;
-     end if; 
-     
+     end if;
+
      --DBMS_OUTPUT.PUT_LINE('Призначення full:     '||l_nazn);
       l_nazn:= substr(l_nazn,1,160); --обрізаємо наформоване призначення платежу до 160 символів
      --DBMS_OUTPUT.PUT_LINE('Призначення shot:  '||l_nazn);
-     --апдейтимо призначення для стрічки  
+     --апдейтимо призначення для стрічки
        update TSEL015
        set nazn= l_nazn
        where US_ID=SYS_CONTEXT('bars_global','user_id')
              and U_ID=k.U_ID;
        commit;
-       
+
      end;
-     
+
     end if;  --загальний IF
-  
+
  end loop;
 end;
--------------------------------- 
-   
-    
+--------------------------------
+
+
 end;
 end SEL015;
 procedure pay_perekr  (
-               tt_     CHAR,   --код операції
-               vob_    NUMBER, --код документу
-               nd_     VARCHAR2, --ID запису nd_  => substr(B.id,1,10) а таблиці perekr_b
-               pdat_   DATE DEFAULT SYSDATE, --pdat_=> SYSDATE
-               vdat_   DATE DEFAULT SYSDATE, --vdat_=> gl.BDATE
-               dk_     NUMBER, --dk передаємо
-               kv_     NUMBER,  ---KVA
-               s_      NUMBER, --SUMA
-               kv2_    NUMBER, ---KVB
-               s2_     NUMBER, ---еквівалент SUMA, оскільки грн основна сума, передаємо просто SUMA
-               sk_     NUMBER, --симол кас плана NULL
-               mfoa_   VARCHAR2, --MFOA
-               nam_a_  VARCHAR2, --назва рахунку NMS
-               nlsa_   VARCHAR2, --NLSA
-               nam_b_  VARCHAR2, --NMKB
-               nlsb_   VARCHAR2, --NLSB
-               mfob_   VARCHAR2, --MFOB
-               nazn_   VARCHAR2, --NAZN
-               id_a_   VARCHAR2, --OKPOA
-               id_b_   VARCHAR2, --OKPOB
-               id_o_   VARCHAR2, --id_o_ => null
-               sign_   RAW,      --sign_=> null
-               sos_    NUMBER,     -- Doc status sos_=> 1
-               prty_   NUMBER,     -- Doc priority prty_=> null
-               uid_    NUMBER DEFAULT NULL,
-               koef_   NUMBER
-)
+                       tt_     CHAR,   --код операції
+                       vob_    NUMBER, --код документу
+                       nd_     VARCHAR2, --ID запису nd_  => substr(B.id,1,10) а таблиці perekr_b
+                       pdat_   DATE DEFAULT SYSDATE, --pdat_=> SYSDATE
+                       vdat_   DATE DEFAULT SYSDATE, --vdat_=> gl.BDATE
+                       dk_     NUMBER, --dk передаємо
+                       kv_     NUMBER,  ---KVA
+                       s_      NUMBER, --SUMA
+                       kv2_    NUMBER, ---KVB
+                       s2_     NUMBER, ---еквівалент SUMA, оскільки грн основна сума, передаємо просто SUMA
+                       sk_     NUMBER, --симол кас плана NULL
+                       mfoa_   VARCHAR2, --MFOA
+                       nam_a_  VARCHAR2, --назва рахунку NMS
+                       nlsa_   VARCHAR2, --NLSA
+                       nam_b_  VARCHAR2, --NMKB
+                       nlsb_   VARCHAR2, --NLSB
+                       mfob_   VARCHAR2, --MFOB
+                       nazn_   VARCHAR2, --NAZN
+                       id_a_   VARCHAR2, --OKPOA
+                       id_b_   VARCHAR2, --OKPOB
+                       id_o_   VARCHAR2, --id_o_ => null
+                       sign_   RAW,      --sign_=> null
+                       sos_    NUMBER,     -- Doc status sos_=> 1
+                       prty_   NUMBER,     -- Doc priority prty_=> null
+                       uid_    NUMBER DEFAULT NULL,
+                       koef_   NUMBER)
 IS
  REF_  number ; --референс
  data_   DATE ; --data_=> gl.BDATE,
@@ -772,7 +769,6 @@ l_nazn:=nazn_;
 --формування призначення
 --IF length (nazn_)<=148 then l_NAZN:=l_NAZN||' ('||KOEF_*100||'%)';
 --else l_d_rec:='#П ('||KOEF_*100||'%)'||'#'; end if;
-/* Formatted on 21.03.2017 15:26:27 (QP5 v5.227.12220.39724) */
 
         BEGIN
            SELECT SUBSTR (flags, 38, 1)
@@ -1036,17 +1032,112 @@ mfoa:=gl.amfo;
     end if;
 
 END;
+
+--процедура оплати груп рахунків (для технологів)
+procedure pay_some_perekr (p_union_id number)
+is
+/*
+02.04.2018 - для таблиці SPS_GROUP_RU додано колонку ID
+для черговості виконання розрахунків перекриття по групам
+(н-д: треба щоб спочатку виконалося перекриття по 104 групі, 
+а потім по 105 групі в межах одного МФО. В таблицю пропишемо наступне:
+1/104/322669/1
+2/105/322669/1)
+21.02.2018:
+в таблицю SPS_GROUP_RU внесено додаткове
+поле UNION_ID (номер об'єднання груп) для виконання
+того чи іншого об'єднання груп перегриттів відповідно
+до потреб. Наразі будемо використовувати два значення
+об'єднання груп 1 і 2, для технологів рознесемо
+виконання на окремі функції 1 буде виконуватися перед
+закриття дня інша раніше. (запуски функції: sps.pay_some_perekr(1),
+sps.pay_some_perekr(2))
+20.02.2018:
+http://jira.unity-bars.com:11000/browse/COBUMMFO-5368
+процедура виконується технологами в кінці робочого дня
+для чітко визначених груп рахунків та РУ (SPS_GROUP_RU)
+Представляється кожним РУ з довідника - проводить розрахунок
+сум для відповідних груп - оплачує документи.
+В процесі виконання процедури ведеться лог роботи, записується
+в SPS_GR_PROTOCOL, дані витираються через 7 днів
+----exec bars_login.login_user('******',1,'','');
+*/
+l_branch    varchar2(8);
+l           number;
+l_date      date;
+l_err       varchar2(4000);
+l_union_id  number;
+
+begin
+ --bc.home; --прибрати при відправці в прод
+ l_branch:= sys_context('bars_context', 'user_branch');
+ -- перевірка чи функція запускається з рівня /
+  if l_branch <> '/' then  RAISE_APPLICATION_ERROR (-20000,' Перейдіть на бранч /  '); end if ;
+ l_union_id:=p_union_id;
+ for c in (select distinct ru from SPS_GROUP_RU) --цикл по РУ, які прописані в довіднику
+  loop
+    bc.go( c.ru ); --представлення відділенням
+     --прохід по всім групам відповідно до МФО РУ
+     for k in (select group_sps from SPS_GROUP_RU where ru = c.ru and union_id = l_union_id order by id )
+       loop
+        insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps); --log
+        --DBMS_OUTPUT.PUT_LINE('SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps);
+        logger.info('SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps);
+        --перевірка чи існує група на рівні РУ, яку прописали в довіднику
+        begin
+        select 1 into l from PEREKR_G where idg = k.group_sps;
+         exception when no_data_found then begin
+                                            logger.info ('SPS: Заданої групи: '||k.group_sps||' не існує на рівні МФО: '||c.ru);
+                                            insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: Заданої групи: '||k.group_sps||' не існує на рівні МФО: '||c.ru); --log
+                                            end;
+          continue; --якщо групи не має, пишемо запис в sec_audit і пропускаємо ітерацію
+        end;
+        --формування перекриття
+        SPS.SEL015(11,k.group_sps,01,'A');
+        --оплата кожної стрічки розрахунків
+        for p in (select * from TSEL015 where us_id = sys_context('bars_global','user_id') )
+          loop
+
+              p.TT:= case when p.MFOA=p.MFOB  then 'PSG'
+                          when p.MFOA<>p.MFOB then 'PS5'
+                          else p.TT
+                     end;
+              --оплата
+              begin
+               SPS.PAY_PEREKR (p.TT,p.VOB,p.ID,SYSDATE,SYSDATE,p.DK,p.KVA,p.SUMA,p.KVB,p.SUMA,NULL,p.MFOA,p.NMS,p.NLSA,p.NMKB,p.NLSB,p.MFOB,p.NAZN,p.OKPOA,p.OKPOB,NULL,NULL,1,NULL,NULL,p.KOEF);
+                if sqlcode = 0 then
+                         insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: Розрахунок для RU: ' ||c.ru||' та GROUP_RU: '|| k.group_sps||' - OK!');
+                end if;
+               exception when others then
+                l_err:=sqlerrm;
+                insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps, 'SPS: '||l_err); --log
+                l_err:='SPS: NLSA: '||p.NLSA||' MFOA: '||p.MFOA||' KVA: '||p.KVA||' SUMA: '||p.SUMA/100||' NLSB: '||p.NLSB||' MFOB: '||p.MFOB||' KVB: '||p.KVB;
+                insert into SPS_GR_PROTOCOL (RU, GROUP_SPS, MESSAGE) values (c.ru, k.group_sps,l_err ); --log
+              end;
+          end loop; --цикл по платежах
+       end loop; --цикл по групах рахунків
+  end loop; --цикл по МФО
+  bc.home; --вертаємся на "/"
+  --видалення протоколів роботи функції старших 7 днів
+  select max(trunc(time_sps)) into l_date from SPS_GR_PROTOCOL;
+  delete SPS_GR_PROTOCOL where trunc(time_sps) < l_date -7;
+  commit;
+  -----
+end;
+
 end sps;
 /
- show err;
+
+show err;
  
 PROMPT *** Create  grants  SPS ***
+
 grant EXECUTE                                                                on SPS             to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on SPS             to START1;
 
  
  
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/sps.sql =========*** End *** =======
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/sps.sql =========*** End *** =======
+PROMPT ===================================================================================== 
  

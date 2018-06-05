@@ -8,7 +8,7 @@ namespace BarsWeb.Areas.Ndi.Models
     /// <summary>
     /// Summary description for OracleDbModel
     /// </summary>
-    public class OracleDbModel// : IDisposable
+    public class OracleDbModel : IDisposable
     {
         public OracleDbModel()
         {
