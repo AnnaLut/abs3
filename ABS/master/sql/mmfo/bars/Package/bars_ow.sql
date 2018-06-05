@@ -7,7 +7,7 @@
   CREATE OR REPLACE PACKAGE BARS.BARS_OW 
 is
 
-g_header_version  constant varchar2(64)  := 'version 4.287 31/01/2018';
+g_header_version  constant varchar2(64)  := 'version 4.288 05/06/2018';
 g_header_defs     constant varchar2(512) := '';
 
 subtype t_trmask is OW_TRANSNLSMASK%rowtype;                      
@@ -435,7 +435,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.021 31/01/2017';
+g_body_version    constant varchar2(64)  := 'version 6.022 06/05/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -11935,7 +11935,8 @@ begin
      update accounts
         set rnk = p_customer.rnk,
             nms = substr('БПК ' || p_customer.nmk || ' ' || p_product.card_code,1,70),
-            nbs = p_product.nbs,
+            -- Костиль для карток інтстант випущенних до заміни плану рахунків
+            nbs = case when p_product.nbs = substr(p_nls, 1, 4) then p_product.nbs else substr(p_nls, 1, 4) end,
             tip = p_product.tip,
             vid = l_vid,
             tobo = p_branch,
@@ -16951,7 +16952,7 @@ begin
         iget_product(l_cardcode, l_term, l_product);
             -- привязываем счет к клиенту
         update accounts
-           set nbs = l_product.nbs,
+           set nbs = case when l_product.nbs = substr(nls, 1, 4) then l_product.nbs else substr(nls, 1, 4) end,
                tip = l_product.tip,
                daos = decode(dapp,null,bankdate, daos),
                dazs = null
