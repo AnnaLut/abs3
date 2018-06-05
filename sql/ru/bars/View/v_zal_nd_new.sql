@@ -53,3 +53,5 @@ SELECT DISTINCT pap
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
                                                 ,p_splitting_symbol => ','))));
+
+grant select on v_Zal_Nd_New to bars_access_defrole;

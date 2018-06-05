@@ -5,7 +5,7 @@ tuda;
     insert into nd_txt
      (nd, tag, txt)
      select nd,'SPPI','връ' from nd_txt where tag='BUS_MOD' and txt in(1,6,7,8,9,10,11,12,14)
-      and nd not in( select nd from nd_txt where tag='SPPI' and txt='връ');
+      and nd not in( select nd from nd_txt where tag='SPPI');
    COMMIT;
 end; 
 / 
@@ -38,7 +38,7 @@ tuda;
               select nd,dat_close from w4_acc where dat_close is null 
               union all
               select nd,dat_close from bpk_acc where dat_close is null )
-      where nd not in (select nd from bpk_parameters  where tag='SPPI' and value is not null);
+      where nd not in (select nd from bpk_parameters  where tag='SPPI');
   commit;
 end;
 /
@@ -50,7 +50,7 @@ tuda;
      insert into accountsw
      (acc, tag, value)
      select acc,'SPPI','ЭГ' from accountsw where tag='BUS_MOD' and value=2 
-      and acc not in (select acc from accountsw where tag='SPPI' and value='ЭГ');
+      and acc not in (select acc from accountsw where tag='SPPI');
     COMMIT;
 end;  
 /   
@@ -60,7 +60,7 @@ tuda;
      insert into accountsw
      (acc, tag, value)
        select acc,'SPPI','връ' from accountsw where tag='BUS_MOD' and value=15 
-       and acc not in (select acc from accountsw where tag='SPPI' and value='връ'); 
+       and acc not in (select acc from accountsw where tag='SPPI'); 
    COMMIT;
 end;  
 / 
@@ -70,7 +70,7 @@ tuda;
      insert into accountsw
      (acc, tag, value)
      select acc,'SPPI','връ' from accountsw where tag='BUS_MOD' and value in(6,7,8,9,10,11,14)
-       and acc not in (select acc from accountsw where tag='SPPI' and value='връ'); 
+       and acc not in (select acc from accountsw where tag='SPPI'); 
     COMMIT;
 end;  
 /  

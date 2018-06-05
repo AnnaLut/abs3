@@ -35,7 +35,7 @@ PROMPT *** Create  view V_ZAL_ND_NOT_NEW ***
                                                   ,p_splitting_symbol => ','))));
 
 
-
+grant select on v_zal_nd_not_new to bars_access_defrole;
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NOT_NEW.sql =========*** End *
 PROMPT ===================================================================================== 
