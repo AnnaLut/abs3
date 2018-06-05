@@ -1,3 +1,9 @@
+prompt TRIGGER OFF
+begin
+execute immediate 'alter trigger TAIUD_ND_TXT_UPDATE disable';
+end;
+/
+
 prompt для accp bus_mod
   begin 
 for k in (select kf from mv_kf )
@@ -28,7 +34,7 @@ BEGIN
                                             p_hostname  =>null ,
                                             p_appname   =>null);
          bc.go(:START_ID);
-         bars.logger.info(''run_sppi_yes_ndtxt-''||:START_ID||''/''||:END_ID||'' ''||f_ourmfo);
+         bars.logger.info(''run_sppi_yes_ndtxt-''||:START_ID||''/''||:END_ID||'' ''||f_ourmfo||''date:''||to_char(sysdate,''dd.mm.hh24:mi:ss''));
        insert /*+ignore_row_on_dupkey_index(nd_txt PK_NDTXT) */ into nd_txt
        (nd, tag, txt)
         select nd,''SPPI'',''Так'' from nd_txt where tag=''BUS_MOD'' and txt in(1,6,7,8,9,10,11,12,14);
@@ -65,7 +71,7 @@ BEGIN
                                             p_hostname  =>null ,
                                             p_appname   =>null);
          bc.go(:START_ID);
-         bars.logger.info(''run_sppi_yes_ndtxt-''||:START_ID||''/''||:END_ID||'' ''||f_ourmfo);
+         bars.logger.info(''ifrs_task_ndtxt-''||:START_ID||''/''||:END_ID||'' ''||f_ourmfo||''date:''||to_char(sysdate,''dd.mm.hh24:mi:ss''));
        insert /*+ignore_row_on_dupkey_index(nd_txt PK_NDTXT) */ into nd_txt
        (nd, tag, txt)
          select nd,''IFRS'',''AC'' from nd_txt where ((tag=''BUS_MOD'' and txt in(1,6,7,8,9,10,11,12,14) )or (tag=''SPPI'' and txt=''Так'')) 
@@ -88,3 +94,9 @@ BEGIN
 
 END;
 / 
+
+prompt TRIGGER ON
+begin
+execute immediate 'alter trigger TAIUD_ND_TXT_UPDATE enable';
+end;
+/
