@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''CP_VIDD'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CP_VIDD'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
+               bpa.alter_policy_info(''CP_VIDD'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''CP_VIDD'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
