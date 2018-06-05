@@ -1,0 +1,305 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/26/2016 14:33:40" ReportInfo.Modified="03/02/2017 09:54:44" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+     
+    private void Page1_FinishPage(object sender, EventArgs e)
+    {
+      if (((Decimal)Report.GetColumnValue(&quot;Table.F_REPO&quot;))== 1)
+      {
+       
+        Page1.Delete();
+        
+      }
+    }
+
+    private void Page2_FinishPage(object sender, EventArgs e)
+    {
+      if (((Decimal)Report.GetColumnValue(&quot;Table.F_REPO&quot;))== 0)
+      {
+       
+        Page2.Delete();
+        
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="TSTSUM" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf3ttkIeWFbjDPFNXfIUKAeA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="-- список розрахункових рахунків за минулу дату, яких немає в К-файлах за поточну дату,&#13;&#10;--   та список розрахункових рахунків за поточну дату, яких немає в К-файлах за минулу дату &#13;&#10;-- !!! тимчасова редакція підзапиту до наведення порядку з полем FILE_DATE &#13;&#10;--          в таблицях OB_CORPORATION_SESSION та OB_CORPORATION_DATA&#13;&#10;with h_d_repo as (&#13;&#10;-- дата, за яку звіряється файл&#13;&#10;-- !!! якщо за вказану дату К-файлів не було - беремо найсвіжішу дату до замовленої :sFdat&#13;&#10;    select max(cd.file_date) d_repo &#13;&#10;    from bars.ob_corporation_data cd&#13;&#10;    where kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;    and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;    and cd.corporation_id=to_number(:Param1) and cd.rowtype=0 and trunc(cd.file_date) &lt;= trunc(to_date(:sFdat1,'dd.mm.yyyy'))&#13;&#10;)&#13;&#10;--select * from h_d_repo&#13;&#10;, h_d_last2 as (&#13;&#10;-- попередня дата, з якою звіряються дані за звітну дату&#13;&#10;    select 0 f_repo, max(cd.file_date) file_date &#13;&#10;        from bars.ob_corporation_data cd, h_d_repo h  &#13;&#10;        where cd.corporation_id=to_number(:Param1) and cd.rowtype=0 and cd.file_date &lt; h.d_repo&#13;&#10;         and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;    and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;    union all select 1 f_repo, d_repo file_date from h_d_repo&#13;&#10;)&#13;&#10;--select * from h_d_last2&#13;&#10;, h_d_last as (&#13;&#10;    select h.f_repo, cd.file_date file_date, cd.kf, max(cd.session_id) session_id&#13;&#10;    from bars.ob_corporation_data cd join h_d_last2 h on cd.file_date=h.file_date&#13;&#10;    where&#13;&#10;     cd.corporation_id=to_number(:Param1) and cd.rowtype=0 &#13;&#10;     and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;    and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;    group by h.f_repo, cd.file_date, cd.kf&#13;&#10;)&#13;&#10;--select * from h_d_last&#13;&#10;, h_diff as (&#13;&#10;-- рахунки, присутні ЛИШЕ в одній із двох аналізованих дат&#13;&#10;    select cd.kf, cd.nls, cd.kv, count(*) k_nls, max(cd.session_id) session_id&#13;&#10;    from bars.ob_corporation_data cd join h_d_last h on cd.session_id=h.session_id&#13;&#10;    where cd.corporation_id=to_number(:Param1) and cd.rowtype=0&#13;&#10;         and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;    and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;    group by cd.kf, cd.nls, cd.kv&#13;&#10;    having count(*)=1&#13;&#10;)&#13;&#10;--select * from h_diff&#13;&#10;select h2.file_date file_date, cd.kf ourmfo, cd.corporation_id, cd.okpo, h.nls, h.kv, cd.kod_analyt, cd.kod_ustan, &#13;&#10;-- безпосередньо дані для звіту&#13;&#10;    ost-obkr+obdb ost_in, cd.obdb, cd.obkr, cd.ost, h2.f_repo&#13;&#10;-- foreign-key-поля&#13;&#10;    , c.corporation_name, m.ord, m.name nm_mfo, :sFdat1 as docdate    &#13;&#10;from h_diff h join bars.ob_corporation_data cd &#13;&#10;        on h.session_id=cd.session_id and h.nls=cd.nls and h.kv=cd.kv&#13;&#10;    join h_d_last h2 on h.session_id=h2.session_id&#13;&#10;-- foreign-key-поля&#13;&#10;    join bars.ob_corporation c on c.id=:Param1&#13;&#10;    join bars.clim_mfo m on cd.kf=m.mfo&#13;&#10;where cd.corporation_id=to_number(:Param1) and cd.rowtype=0&#13;&#10; and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;    and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;order by h2.file_date, h.nls, h.kv">
+        <Column Name="FILE_DATE" DataType="System.DateTime"/>
+        <Column Name="OURMFO" DataType="System.String"/>
+        <Column Name="CORPORATION_ID" DataType="System.Int32"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="KOD_USTAN" DataType="System.Decimal"/>
+        <Column Name="OST_IN" DataType="System.Decimal"/>
+        <Column Name="OBDB" DataType="System.Decimal"/>
+        <Column Name="OBKR" DataType="System.Decimal"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="F_REPO" DataType="System.Decimal"/>
+        <Column Name="CORPORATION_NAME" DataType="System.String"/>
+        <Column Name="ORD" DataType="System.Int16"/>
+        <Column Name="NM_MFO" DataType="System.String"/>
+        <Column Name="DOCDATE" DataType="System.String"/>
+        <CommandParameter Name="Param1" DataType="126" Expression="[Param1]" DefaultValue="2"/>
+        <CommandParameter Name="sFdat1" DataType="126" DefaultValue="29.11.2016"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Param1" DataType="System.String"/>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="300" FirstPageSource="15" OtherPagesSource="15" Guides="1030.05" FinishPageEvent="Page1_FinishPage">
+    <ReportTitleBand Name="ReportTitle1" Width="1058.4" Height="103.95">
+      <TableObject Name="Table4" Width="1028.35" Height="103.95">
+        <TableColumn Name="Column147" Width="34.02"/>
+        <TableColumn Name="Column148" Width="34.02"/>
+        <TableColumn Name="Column149" Width="34.02"/>
+        <TableColumn Name="Column150" Width="467.87"/>
+        <TableColumn Name="Column151" Width="458.42"/>
+        <TableRow Name="Row16" Height="20.79">
+          <TableCell Name="Cell514" Border.Lines="All" Text="Протокол перевірки даних за [Table.DOCDATE]			&#13;&#10;  по корпоративному клієнту № [Table.CORPORATION_ID][Table.CORPORATION_NAME]										&#13;&#10;       Рахунки минулого дня, відсутні в поточному									&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 14pt, style=Bold" ColSpan="5" RowSpan="5">
+            <Formats>
+              <DateFormat/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell515"/>
+          <TableCell Name="Cell516"/>
+          <TableCell Name="Cell517"/>
+          <TableCell Name="Cell518"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="20.79">
+          <TableCell Name="Cell519"/>
+          <TableCell Name="Cell520"/>
+          <TableCell Name="Cell521"/>
+          <TableCell Name="Cell522"/>
+          <TableCell Name="Cell523"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="20.79">
+          <TableCell Name="Cell524"/>
+          <TableCell Name="Cell525"/>
+          <TableCell Name="Cell526"/>
+          <TableCell Name="Cell527"/>
+          <TableCell Name="Cell528"/>
+        </TableRow>
+        <TableRow Name="Row19" Height="20.79">
+          <TableCell Name="Cell529"/>
+          <TableCell Name="Cell530"/>
+          <TableCell Name="Cell531"/>
+          <TableCell Name="Cell532"/>
+          <TableCell Name="Cell533"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="20.79">
+          <TableCell Name="Cell534"/>
+          <TableCell Name="Cell535"/>
+          <TableCell Name="Cell536"/>
+          <TableCell Name="Cell537"/>
+          <TableCell Name="Cell538"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="107.15" Width="1058.4" Height="116.39" Guides="113.4,113.4,113.4,113.4,103.95,103.95,103.95,122.85">
+      <TableObject Name="Table1" Top="1.1" Width="1030.05" Height="105.84" Border.Lines="All">
+        <TableColumn Name="Column119" Width="105.84"/>
+        <TableColumn Name="Column120" Width="124.74"/>
+        <TableColumn Name="Column121" Width="162.54"/>
+        <TableColumn Name="Column122" Width="143.64"/>
+        <TableColumn Name="Column123" Width="143.64"/>
+        <TableColumn Name="Column124" Width="132.3"/>
+        <TableColumn Name="Column125" Width="217.35"/>
+        <TableRow Name="Row8" Height="60.48">
+          <TableCell Name="Cell428" Border.Lines="All" Text="МФО&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell429" Border.Lines="All" Text="Код ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell430" Border.Lines="All" Text="Р/р" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell431" Border.Lines="All" Text="Вал" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell432" Border.Lines="All" Text="Код аналітичного обліку&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell453" Border.Lines="All" Text="Код установи" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell454" Border.Lines="All" Text="Вихідний залишок&#13;&#10;[Table.FILE_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="22.68">
+          <TableCell Name="Cell433" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell434" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell435" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell436" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell437" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell455" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell456" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row10" Height="22.68">
+          <TableCell Name="Cell438" Border.Lines="All" Fill.Color="LawnGreen" Text="[Table.ORD]:[Table.NM_MFO]" HorzAlign="Center" VertAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell439" Border.Lines="All"/>
+          <TableCell Name="Cell440" Border.Lines="All"/>
+          <TableCell Name="Cell441" Border.Lines="All"/>
+          <TableCell Name="Cell442" Border.Lines="All"/>
+          <TableCell Name="Cell457" Border.Lines="All"/>
+          <TableCell Name="Cell458" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="226.74" Width="1058.4" Height="41.89" CanGrow="true" CanShrink="true" CanBreak="true" Guides="47.25,47.25" DataSource="Table">
+      <TableObject Name="Table3" Top="4.09" Width="1031.05" Height="37.8">
+        <TableColumn Name="Column126" Width="105.57"/>
+        <TableColumn Name="Column127" Width="124.47"/>
+        <TableColumn Name="Column128" Width="162.27"/>
+        <TableColumn Name="Column129" Width="133.92"/>
+        <TableColumn Name="Column130" Width="144.37"/>
+        <TableColumn Name="Column131" Width="137.7"/>
+        <TableColumn Name="Column132" Width="222.75"/>
+        <TableRow Name="Row11" Height="37.8">
+          <TableCell Name="Cell459" Border.Lines="All" Text="[Table.OURMFO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell460" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell461" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell462" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell463" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell484" Border.Lines="All" Text="[Table.KOD_USTAN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell485" Border.Lines="All" Text="[Table.OST_IN]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="271.83" Width="1058.4"/>
+  </ReportPage>
+  <ReportPage Name="Page2" PaperWidth="430" FirstPageSource="15" OtherPagesSource="15" FinishPageEvent="Page2_FinishPage">
+    <ReportTitleBand Name="ReportTitle2" Top="20" Width="1549.8" Height="94.5">
+      <TableObject Name="Table1" Width="1523.53" Height="94.5">
+        <TableColumn Name="Column178" Width="175.77"/>
+        <TableColumn Name="Column179" Width="175.77"/>
+        <TableColumn Name="Column180" Width="175.77"/>
+        <TableColumn Name="Column181" Width="498.11"/>
+        <TableColumn Name="Column182" Width="498.11"/>
+        <TableRow Name="Row25">
+          <TableCell Name="Cell591" Border.Lines="All" Text="Протокол перевірки даних за [Table.DOCDATE]									&#13;&#10;по корпоративному клієнту № [Table.CORPORATION_ID][Table.CORPORATION_NAME]								&#13;&#10;									&#13;&#10;Рахунки поточного дня, відсутні в минулому								&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 14pt, style=Bold" ColSpan="5" RowSpan="5"/>
+          <TableCell Name="Cell592"/>
+          <TableCell Name="Cell593"/>
+          <TableCell Name="Cell594"/>
+          <TableCell Name="Cell595"/>
+        </TableRow>
+        <TableRow Name="Row26">
+          <TableCell Name="Cell596"/>
+          <TableCell Name="Cell597"/>
+          <TableCell Name="Cell598"/>
+          <TableCell Name="Cell599"/>
+          <TableCell Name="Cell600"/>
+        </TableRow>
+        <TableRow Name="Row27">
+          <TableCell Name="Cell601"/>
+          <TableCell Name="Cell602"/>
+          <TableCell Name="Cell603"/>
+          <TableCell Name="Cell604"/>
+          <TableCell Name="Cell605"/>
+        </TableRow>
+        <TableRow Name="Row28">
+          <TableCell Name="Cell606"/>
+          <TableCell Name="Cell607"/>
+          <TableCell Name="Cell608"/>
+          <TableCell Name="Cell609"/>
+          <TableCell Name="Cell610"/>
+        </TableRow>
+        <TableRow Name="Row29">
+          <TableCell Name="Cell611"/>
+          <TableCell Name="Cell612"/>
+          <TableCell Name="Cell613"/>
+          <TableCell Name="Cell614"/>
+          <TableCell Name="Cell615"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader2" Top="134.5" Width="1549.8" Height="115.29">
+      <TableObject Name="Table1" Width="1530.9" Height="115.29" Border.Lines="All">
+        <TableColumn Name="Column158" Width="105.84"/>
+        <TableColumn Name="Column159" Width="124.74"/>
+        <TableColumn Name="Column160" Width="162.54"/>
+        <TableColumn Name="Column161" Width="143.64"/>
+        <TableColumn Name="Column162" Width="143.64"/>
+        <TableColumn Name="Column163" Width="132.3"/>
+        <TableColumn Name="Column164" Width="207.9"/>
+        <TableColumn Name="Column165" Width="151.2"/>
+        <TableColumn Name="Column166" Width="122.85"/>
+        <TableColumn Name="Column167" Width="236.25"/>
+        <TableRow Name="Row21" Height="51.03">
+          <TableCell Name="Cell551" Border.Lines="All" Text="МФО&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell552" Border.Lines="All" Text="Код ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell553" Border.Lines="All" Text="Р/р" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell554" Border.Lines="All" Text="Вал" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell555" Border.Lines="All" Text="Код аналітичного обліку&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell556" Border.Lines="All" Text="Код установи" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell557" Border.Lines="All" Text="Вихідний залишок&#13;&#10;[Table.FILE_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell558" Border.Lines="All" Text="Обороти по дебету" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell559" Border.Lines="All" Text="Обороти по кредиту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell560" Border.Lines="All" Text="Примітка" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="22.68">
+          <TableCell Name="Cell561" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell562" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell563" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell564" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell565" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell566" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell567" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell568" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell569" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell570" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row23" Height="41.58">
+          <TableCell Name="Cell571" Border.Lines="All" Fill.Color="LawnGreen" Text="[Table.ORD]:[Table.NM_MFO]" HorzAlign="Center" VertAlign="Center" ColSpan="10"/>
+          <TableCell Name="Cell572" Border.Lines="All"/>
+          <TableCell Name="Cell573" Border.Lines="All"/>
+          <TableCell Name="Cell574" Border.Lines="All"/>
+          <TableCell Name="Cell575" Border.Lines="All"/>
+          <TableCell Name="Cell576" Border.Lines="All"/>
+          <TableCell Name="Cell577" Border.Lines="All"/>
+          <TableCell Name="Cell578" Border.Lines="All"/>
+          <TableCell Name="Cell579" Border.Lines="All"/>
+          <TableCell Name="Cell580" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data2" Top="269.79" Width="1549.8" Height="37.8">
+      <TableObject Name="Table1" Width="1532.26" Height="37.8">
+        <TableColumn Name="Column168" Width="104.67"/>
+        <TableColumn Name="Column169" Width="123.56"/>
+        <TableColumn Name="Column170" Width="161.36"/>
+        <TableColumn Name="Column171" Width="142.46"/>
+        <TableColumn Name="Column172" Width="152.91"/>
+        <TableColumn Name="Column173" Width="127.34"/>
+        <TableColumn Name="Column174" Width="212.39"/>
+        <TableColumn Name="Column175" Width="150.29"/>
+        <TableColumn Name="Column176" Width="121.94"/>
+        <TableColumn Name="Column177" Width="235.34"/>
+        <TableRow Name="Row24" Height="37.8">
+          <TableCell Name="Cell581" Border.Lines="All" Text="[Table.OURMFO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell582" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell583" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell584" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell585" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell586" Border.Lines="All" Text="[Table.KOD_USTAN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell587" Border.Lines="All" Text="[Table.OST_IN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell588" Border.Lines="All" Text="[Table.OBDB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell589" Border.Lines="All" Text="[Table.OBKR]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell590" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter2" Top="327.59" Width="1549.8" Height="274.05"/>
+  </ReportPage>
+</Report>

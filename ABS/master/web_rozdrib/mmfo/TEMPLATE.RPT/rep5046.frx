@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/14/2017 12:43:32" ReportInfo.Modified="02/17/2017 17:23:29" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf9iumuPGB7KhPd/SJRmBa0w==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;       char00 corp_name,&#13;&#10;       char01 okpo,&#13;&#10;       char02 nbs,&#13;&#10;       char03 kod_analyt,&#13;&#10;       num00 cnt_acc,&#13;&#10;       num01 inn,&#13;&#10;       num02 db,&#13;&#10;       num03 cr,&#13;&#10;       num04 outt,   &#13;&#10;       num05 doc,   &#13;&#10;       num06 docdb,   &#13;&#10;       num07 doccr,   &#13;&#10;       char04 dt1,&#13;&#10;       char05 dt2,&#13;&#10;      char06 namk, &#13;&#10;      char07 cod_ustan&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+        <Column Name="CORP_NAME" DataType="System.String"/>
+        <Column Name="COD_USTAN" DataType="System.String"/>
+        <Column Name="NBS" DataType="System.String"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="CNT_ACC" DataType="System.Decimal"/>
+        <Column Name="INN" DataType="System.Decimal"/>
+        <Column Name="DB" DataType="System.Decimal"/>
+        <Column Name="CR" DataType="System.Decimal"/>
+        <Column Name="OUTT" DataType="System.Decimal"/>
+        <Column Name="DOC" DataType="System.Decimal"/>
+        <Column Name="DOCDB" DataType="System.Decimal"/>
+        <Column Name="DOCCR" DataType="System.Decimal"/>
+        <Column Name="DT1" DataType="System.String"/>
+        <Column Name="DT2" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NAMK" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]" DefaultValue="1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Total Name="inn" Expression="[Table.INN]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="db" Expression="[Table.DB]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="cr" Expression="[Table.CR]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="outt" Expression="[Table.OUTT]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="acc" Expression="[Table.CNT_ACC]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="doc" Expression="[Table.DOC]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="docdb" Expression="[Table.DOCDB]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="doccr" Expression="[Table.DOCCR]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="280">
+    <ReportTitleBand Name="ReportTitle1" Width="982.8" Height="66.15">
+      <TextObject Name="Text1" Left="170.1" Width="557.55" Height="56.7" Text="Звіт про рух коштів в розрізі підрозділів&#13;&#10;корпоративного клієнта [Table.CORP_NAME]&#13;&#10;з [Table.DT1] по [Table.DT2]" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="69.35" Width="982.8" Height="66.15">
+      <TableObject Name="Table1" Width="989.4" Height="66.15" Border.Lines="All">
+        <TableColumn Name="Column1" Width="98.94"/>
+        <TableColumn Name="Column2" Width="98.94"/>
+        <TableColumn Name="Column3" Width="98.94"/>
+        <TableColumn Name="Column4" Width="98.94"/>
+        <TableColumn Name="Column5" Width="98.94"/>
+        <TableColumn Name="Column6" Width="98.94"/>
+        <TableColumn Name="Column7" Width="98.94"/>
+        <TableColumn Name="Column8" Width="98.94"/>
+        <TableColumn Name="Column9" Width="98.94"/>
+        <TableColumn Name="Column10" Width="98.94"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Gray" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Gray" Text="Код аналітичного обліку" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Gray" Text="Кількість рахунків" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Fill.Color="Gray" Text="Залишок коштів на початок дня" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Fill.Color="Gray" Text="Обороти коштів по дебету" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Gray" Text="Обороти коштів по кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Gray" Text="Залишок коштів на кінець дня" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Gray" Text="Кількість документів" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Fill.Color="Gray" Text="Кількість документів по дебету" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Gray" Text="Кількість документів по кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Gray" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Gray" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Gray" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Gray" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Gray" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Fill.Color="Gray" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Gray" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Gray" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Fill.Color="Gray" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Fill.Color="Gray" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="138.7" Width="982.8" Height="18.9" Condition="[Table.OKPO]" SortOrder="Descending">
+      <TableObject Name="Table2" Width="982.76" Height="18.9">
+        <TableColumn Name="Column21" Width="491.38"/>
+        <TableColumn Name="Column22" Width="491.38"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Gray" Text="[Table.COD_USTAN] [[Table.OKPO]] Всього:" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell49" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="160.8" Width="982.8" Height="18.9" DataSource="Table">
+        <TableObject Name="Table1" Width="989.4" Height="18.9" Border.Lines="All">
+          <TableColumn Name="Column11" Width="98.94"/>
+          <TableColumn Name="Column12" Width="98.94"/>
+          <TableColumn Name="Column13" Width="98.94"/>
+          <TableColumn Name="Column14" Width="98.94"/>
+          <TableColumn Name="Column15" Width="98.94"/>
+          <TableColumn Name="Column16" Width="98.94"/>
+          <TableColumn Name="Column17" Width="98.94"/>
+          <TableColumn Name="Column18" Width="98.94"/>
+          <TableColumn Name="Column19" Width="98.94"/>
+          <TableColumn Name="Column20" Width="98.94"/>
+          <TableRow Name="Row3">
+            <TableCell Name="Cell38" Border.Lines="All" Fill.Color="White" Text="[Table.NBS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell39" Border.Lines="All" Fill.Color="White" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell40" Border.Lines="All" Fill.Color="White" Text="[Table.CNT_ACC]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell41" Border.Lines="All" Fill.Color="White" Text="[Table.INN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell42" Border.Lines="All" Fill.Color="White" Text="[Table.DB]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell43" Border.Lines="All" Fill.Color="White" Text="[Table.CR]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell44" Border.Lines="All" Fill.Color="White" Text="[Table.OUTT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell45" Border.Lines="All" Fill.Color="White" Text="[Table.DOC]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell46" Border.Lines="All" Fill.Color="White" Text="[Table.DOCDB]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell47" Border.Lines="All" Fill.Color="White" Text="[Table.DOCCR]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="182.9" Width="982.8" Height="18.9">
+        <TableObject Name="Table1" Width="989.4" Height="18.9" Border.Lines="All">
+          <TableColumn Name="Column23" Width="98.94"/>
+          <TableColumn Name="Column24" Width="98.94"/>
+          <TableColumn Name="Column25" Width="98.94"/>
+          <TableColumn Name="Column26" Width="98.94"/>
+          <TableColumn Name="Column27" Width="98.94"/>
+          <TableColumn Name="Column28" Width="98.94"/>
+          <TableColumn Name="Column29" Width="98.94"/>
+          <TableColumn Name="Column30" Width="98.94"/>
+          <TableColumn Name="Column31" Width="98.94"/>
+          <TableColumn Name="Column32" Width="98.94"/>
+          <TableRow Name="Row5">
+            <TableCell Name="Cell50" Border.Lines="All" Fill.Color="Aquamarine" Text="Всього:" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" ColSpan="2"/>
+            <TableCell Name="Cell51" Border.Lines="All" Fill.Color="Aquamarine" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell52" Border.Lines="All" Fill.Color="Aquamarine" Text="[acc]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell53" Border.Lines="All" Fill.Color="Aquamarine" Text="[inn]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell54" Border.Lines="All" Fill.Color="Aquamarine" Text="[db]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell55" Border.Lines="All" Fill.Color="Aquamarine" Text="[cr]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Aquamarine" Text="[outt]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Aquamarine" Text="[doc]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Aquamarine" Text="[docdb]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+            <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Aquamarine" Text="[doccr]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="205" Width="982.8" Height="18.9"/>
+  </ReportPage>
+</Report>

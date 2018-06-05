@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/17/2016 16:56:36" ReportInfo.Modified="09/19/2016 15:50:57" ReportInfo.CreatorVersion="2013.2.2.0" PrintSettings.PrintOnSheetWidth="297" PrintSettings.PrintOnSheetHeight="210">
+  <Dictionary>
+    <OracleDataConnection Name="cobummfo_core" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnKeZmNckkVgwDxq0qmoLseKdycC7BQF0b0aCKF7cFz+Ox9uKyhhhJmncNfl45Xpayw==">
+      <TableDataSource Name="Table2" Alias="head" DataType="System.Int32" Enabled="true" SelectCommand="select fio from staff$base where id = user_id">
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="CAType" DataType="System.Int32" Enabled="true" SelectCommand="select mfo, nb, nls, daos, vid, tvo, name_blok,&#13;&#10;                    fio_blok, fio_isp, inf_isp, addr, okpo&#13;&#10;                    from v_cvk_ca&#13;&#10;                      where daos = to_date(:entereddate,'dd/mm/yyyy')">
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="NB" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="DAOS" DataType="System.DateTime"/>
+        <Column Name="VID" DataType="System.String"/>
+        <Column Name="TVO" DataType="System.String"/>
+        <Column Name="NAME_BLOK" DataType="System.String"/>
+        <Column Name="FIO_BLOK" DataType="System.String"/>
+        <Column Name="FIO_ISP" DataType="System.String"/>
+        <Column Name="INF_ISP" DataType="System.String"/>
+        <Column Name="ADDR" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <CommandParameter Name="entereddate" DataType="126"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="entereddate" DataType="System.String"/>
+    <Parameter Name="fileName" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="9.45">
+    <PageHeaderBand Name="PageHeader1" Width="1047.06" Height="52.92"/>
+    <DataBand Name="Data2" Top="56.92" Width="1047.06" Height="113.4" DataSource="Table2">
+      <TextObject Name="Text2" Left="9.45" Top="37.8" Width="302.4" Height="18.9" Text="Дата і час друку: [FormatDateTime([Date],&quot;dd/MM/yyyy hh:mm:ss&quot;)]" Font="Arial, 6pt"/>
+      <TextObject Name="Text1" Left="9.45" Top="18.9" Width="292.95" Height="18.9" Text="Користувач [head.FIO]" Font="Arial, 6pt"/>
+      <TextObject Name="Text3" Left="9.45" Top="56.7" Width="292.95" Height="18.9" Text="Звіт для файл [fileName]" Font="Arial, 6pt"/>
+      <TableObject Name="Table3" Left="9.45" Top="94.5" Width="1023.67" Height="18.9">
+        <TableColumn Name="Column12" Width="51.17"/>
+        <TableColumn Name="Column13" Width="202.37"/>
+        <TableColumn Name="Column14" Width="70.07"/>
+        <TableColumn Name="Column15" Width="60.62"/>
+        <TableColumn Name="Column16" Width="22.82"/>
+        <TableColumn Name="Column17" Width="32.27"/>
+        <TableColumn Name="Column18" Width="31.82"/>
+        <TableColumn Name="Column19" Width="135.77"/>
+        <TableColumn Name="Column20" Width="126.32"/>
+        <TableColumn Name="Column21" Width="97.97"/>
+        <TableColumn Name="Column22" Width="126.32"/>
+        <TableColumn Name="Column24"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell12" Border.Lines="All" Text="МФО" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="Банк" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell14" Border.Lines="All" Text="Рахунок" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell15" Border.Lines="All" Text="Дата відкриття&#13;&#10;" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell16" Border.Lines="All" Text="Вид" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="ТВО" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="Ім'я блоку" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="ФІО Блоку" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="ФІО" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell21" Border.Lines="All" Text="Інф." HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="Адреса" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell24" Border.Lines="All" Text="ЗКПО" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data1" Top="174.32" Width="1047.06" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Left="9.45" Width="1023.67" Height="18.9">
+        <TableColumn Name="Column1" Width="51.17"/>
+        <TableColumn Name="Column2" Width="202.37"/>
+        <TableColumn Name="Column3" Width="70.07"/>
+        <TableColumn Name="Column4" Width="60.62"/>
+        <TableColumn Name="Column5" Width="22.82"/>
+        <TableColumn Name="Column6" Width="32.27"/>
+        <TableColumn Name="Column7" Width="31.82"/>
+        <TableColumn Name="Column8" Width="135.77"/>
+        <TableColumn Name="Column9" Width="126.32"/>
+        <TableColumn Name="Column10" Width="97.97"/>
+        <TableColumn Name="Column11" Width="126.32"/>
+        <TableColumn Name="Column23"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[CAType.MFO]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[CAType.NB]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[CAType.NLS]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[CAType.DAOS]" Format="Date" Format.Format="MM/dd/yy" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[CAType.VID]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell6" Border.Lines="All" Text="[CAType.TVO]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[CAType.NAME_BLOK]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[CAType.FIO_BLOK]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[CAType.FIO_ISP]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="[CAType.INF_ISP]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell11" Border.Lines="All" Text="[CAType.ADDR]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell23" Border.Lines="All" Text="[CAType.OKPO]" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="197.22" Width="1047.06" Height="18.9"/>
+  </ReportPage>
+</Report>

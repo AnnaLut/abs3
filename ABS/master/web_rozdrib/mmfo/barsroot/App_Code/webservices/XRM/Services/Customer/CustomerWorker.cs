@@ -2,15 +2,6 @@
 using System.Data;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
-using System.Collections.Generic;
-using Bars.WebServices.XRM.Services.Card.Models;
-using System.IO;
-using System.Linq;
-using Bars.Oracle;
-using System.Xml;
-using Bars.Web.Report;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
 using System.Web;
 using BarsWeb.Core.Logger;
 using Bars.WebServices.XRM.Services.Customer.Models;
@@ -152,7 +143,13 @@ namespace Bars.WebServices.XRM.Services.Customer
             AdditionalInfo _AdditionalInfo = new AdditionalInfo(); if (_ClientCommonReq.AdditionalInfo != null) { _AdditionalInfo = _ClientCommonReq.AdditionalInfo; }
             EconomicIndicators _EconomicIndicators = new EconomicIndicators(); if (_ClientCommonReq.EconomicIndicators != null) { _EconomicIndicators = _ClientCommonReq.EconomicIndicators; }
             TaxIndicators _TaxIndicators = new TaxIndicators(); if (_ClientCommonReq.TaxIndicators != null) { _TaxIndicators = _ClientCommonReq.TaxIndicators; }
-            Person _ClientPerson = new Person(); if (_ClientCommonReq.ClientPerson != null) { _ClientPerson = _ClientCommonReq.ClientPerson; }
+
+            Person _ClientPerson = new Person();
+            if (_ClientCommonReq.ClientPerson != null)
+            {
+                _ClientPerson = _ClientCommonReq.ClientPerson;
+            }
+
             NMK _NMKSplit = new NMK(); if (_ClientCommonReq.NMKSplit != null) { _NMKSplit = _ClientCommonReq.NMKSplit; }
 
             CustAddress _ClientAddressLegal = new CustAddress(); if (_ClientCommonReq.ClientAddressLegal != null) { _ClientAddressLegal = _ClientCommonReq.ClientAddressLegal; }

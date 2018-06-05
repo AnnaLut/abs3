@@ -9,7 +9,6 @@ using Bars.Classes;
 using Oracle.DataAccess.Client;
 using System.IO;
 using System.Web;
-using System.Text;
 using System.Xml;
 using System.Runtime.Serialization.Json;
 using Oracle.DataAccess.Types;
@@ -24,18 +23,14 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
             PaymentsResponse response = new PaymentsResponse() { success = true, message = "Ok" };
             string p_xml = String.Empty;
 
-            using (StreamReader ReqStream = new StreamReader(HttpContext.Current.Request.InputStream))
-            using (MemoryStream MemStream = new MemoryStream())
+            using (StringWriter XmlStrWriter = new StringWriter())
+            using (XmlTextWriter XmlWriter = new XmlTextWriter(XmlStrWriter))
             {
                 XmlDocument xml = new XmlDocument();
-                xml.Load(JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(ReqStream.ReadToEnd() as string), new XmlDictionaryReaderQuotas()));
-                xml.Save(MemStream);
-                MemStream.Position = 0;
+                xml.Load(JsonReaderWriterFactory.CreateJsonReader(HttpContext.Current.Request.InputStream, new XmlDictionaryReaderQuotas()));
+                xml.Save(XmlWriter);
 
-                using (StreamReader XmlStrRead = new StreamReader(MemStream))
-                {
-                    p_xml = XmlStrRead.ReadToEnd();
-                }
+                p_xml = XmlStrWriter.ToString();
             }
 
             using (OracleConnection con = OraConnector.Handler.UserConnection)

@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/05/2015 15:58:46" ReportInfo.Modified="03/18/2015 14:56:16" ReportInfo.CreatorVersion="2013.2.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {            
+
+    private void Data2_BeforePrint(object sender, EventArgs e)
+    {
+       // if (string.IsNullOrEmpty(((String)Report.GetColumnValue(&quot;Table.DAT1&quot;))))  Cell11.Text = &quot;&quot;;
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="coobmmfo" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnEQWiK8SQhsWDPMpCsry+zWhQeBbANOg072LKEsCrBsIZ4Tw3q66nRSRygjEXKMsPA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 ZAG1, CHAR01 NAME, NUM00 KV, CHAR02 DAT1, CHAR03 DAT2, CHAR04 NMK, CHAR05 NLS, NUM01 S, NUM02 IR, NUM03 RNK from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ZAG1" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="IR" DataType="System.Decimal"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page2">
+    <GroupHeaderBand Name="GroupHeader1" Width="718.2" Height="103.95" StartNewPage="true" Condition="[Table.ZAG1]" SortOrder="None">
+      <TextObject Name="Text1" Width="710.64" Height="56.7" Text="ПЛАТІЖНИЙ КАЛЕНДАР&#13;&#10;[[Table.ZAG1]]&#13;&#10;станом за [sFdat1]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt, style=Bold">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+      <TableObject Name="Table1" Top="56.7" Width="710.64" Height="47.25">
+        <TableColumn Name="Column1" Width="75.6"/>
+        <TableColumn Name="Column2" Width="75.6"/>
+        <TableColumn Name="Column3" Width="219.24"/>
+        <TableColumn Name="Column4" Width="56.7"/>
+        <TableColumn Name="Column5" Width="113.4"/>
+        <TableColumn Name="Column6" Width="113.4"/>
+        <TableColumn Name="Column7" Width="56.7"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Дата &#13;&#10;надання" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Дата&#13;&#10;повернення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Назва&#13;&#10;банку-позичальника" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell6" Border.Lines="All" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="%%&#13;&#10;ставка" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data2" Top="107.8" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
+        <TableObject Name="Table2" Width="710.64" Height="18.9">
+          <TableColumn Name="Column8" Width="75.6"/>
+          <TableColumn Name="Column9" Width="75.6"/>
+          <TableColumn Name="Column10" Width="219.24"/>
+          <TableColumn Name="Column11" Width="56.7"/>
+          <TableColumn Name="Column12" Width="113.4"/>
+          <TableColumn Name="Column13" Width="113.4"/>
+          <TableColumn Name="Column14" Width="56.7"/>
+          <TableRow Name="Row2" AutoSize="true">
+            <TableCell Name="Cell8" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" Text="[Table.DAT1]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell9" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" Text="[Table.DAT2]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Formats>
+                <GeneralFormat/>
+                <GeneralFormat/>
+              </Formats>
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell10" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" Text="[Table.NMK]" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell11" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" BeforePrintEvent="Data2_BeforePrint" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell12" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" Text="[Table.NLS]" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell13" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" Text="[Table.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell14" Border.Lines="All" Border.Style="Dash" Border.Width="0.25" Text="[Table.IR]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt">
+              <Formats>
+                <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+                <GeneralFormat/>
+              </Formats>
+              <Highlight>
+                <Condition Expression="[Table.DAT1]==&quot;&quot;&amp;&amp;[Table.NMK]!=&quot;  &quot;" Border.Lines="All" Border.Color="Gainsboro" Fill.Color="Gainsboro" TextFill.Color="Black" Font="Times New Roman, 9pt, style=Bold, Italic" ApplyFill="true" ApplyFont="true"/>
+              </Highlight>
+            </TableCell>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="130.54" Width="718.2" CanGrow="true" CanShrink="true" CanBreak="true"/>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

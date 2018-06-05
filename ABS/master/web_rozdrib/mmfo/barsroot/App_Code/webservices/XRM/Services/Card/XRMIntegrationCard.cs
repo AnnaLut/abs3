@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using Oracle.DataAccess.Client;
@@ -7,7 +6,6 @@ using BarsWeb.Core.Logger;
 using System.Xml;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using Bars.WebServices.XRM.Services.Card;
 using Bars.WebServices.XRM.Models;
 using Bars.WebServices.XRM.Services.Card.Models;
 
@@ -25,43 +23,12 @@ namespace Bars.WebServices.XRM.Services.Card
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [System.Web.Script.Services.ScriptService]
-    public class XRMIntegrationCard : BarsWebService
+    public class XRMIntegrationCard : XrmBaseWebService
     {
         private const int ErrorResCode = -1;
         public WsHeader WsHeaderValue;
         private IDbLogger _dbLogger;
-        static Dictionary<string, int> kfru;
 
-        public static int Kfru(string _mfo)
-        {
-            if (kfru == null)
-                kfru = new Dictionary<string, int>();
-
-            if (kfru.Count == 0)
-            {
-                using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
-                using (OracleCommand command = con.CreateCommand())
-                {
-                    command.CommandText = "select kf, to_number(ru) ru from kf_ru";
-                    using (OracleDataReader reader = command.ExecuteReader())
-                    {
-                        int kf_index = reader.GetOrdinal("KF");
-                        int ru_index = reader.GetOrdinal("RU");
-                        if (!reader.HasRows) throw new System.Exception("Невдалося визначити код регіону");
-                        while (reader.Read())
-                        {
-                            kfru[reader.GetString(kf_index)] = reader.GetInt32(ru_index);
-                        }
-                    }
-                }
-            }
-
-            if (kfru.ContainsKey(_mfo))
-                return kfru[_mfo];
-
-            return 0;
-
-        }
         public XRMIntegrationCard()
         {
             moduleName = "XRMIntegrationCard";
@@ -246,10 +213,9 @@ namespace Bars.WebServices.XRM.Services.Card
                     TransSuccess = TransactionCheck(con, XRMCardCreditReq.TransactionId, out responseBytes);
                     if (TransSuccess == 0)
                     {
-                        int k_ru = Kfru(XRMCardCreditReq.KF.ToString());
                         for (int i = 0; i < XRMCardCreditReq.acc.Length; i++)
                         {
-                            XRMCardCreditReq.acc[i] = XRMCardCreditReq.acc[i] * 100 + k_ru;
+                            XRMCardCreditReq.acc[i] = XRMCardCreditReq.acc[i].AddRuTail(XRMCardCreditReq.KF.ToString());
                         }
                         TransactionCreate(con, XRMCardCreditReq.TransactionId, XRMCardCreditReq.UserLogin, XRMCardCreditReq.OperationType);
                         XRMCardCreditRes = CardWorker.SetCardCredit(XRMCardCreditReq, con);

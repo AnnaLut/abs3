@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2018 18:05:49" ReportInfo.Modified="02/14/2018 10:49:48" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQNBjotoaB2uCokUsxNHgcWQ=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 BRANCH, NUM00 SD_ALL, NUM01 SD_ZAP, NUM02 SD_WAY from rs_tmp_report_data where session_id=:session_id order by id">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="SD_ALL" DataType="System.Decimal"/>
+        <Column Name="SD_ZAP" DataType="System.Decimal"/>
+        <Column Name="SD_WAY" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="28.35">
+      <TextObject Name="Text1" Width="708.75" Height="18.9" Text="СДЗ 2620, 2622, 2625 (в розрізі ТВБВ)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="32.35" Width="718.2" Height="37.8" DataSource="Table">
+      <TableObject Name="Table1" Width="708.75" Height="37.8">
+        <TableColumn Name="Column1" Width="189"/>
+        <TableColumn Name="Column2" Width="151.2"/>
+        <TableColumn Name="Column3" Width="160.65"/>
+        <TableColumn Name="Column4" Width="207.9"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Text="[Table.BRANCH]" VertAlign="Center"/>
+          <TableCell Name="Cell2" Text="[Table.SD_ALL]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center"/>
+          <TableCell Name="Cell3" Text="[Table.SD_ZAP]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center"/>
+          <TableCell Name="Cell4" Text="[Table.SD_WAY]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

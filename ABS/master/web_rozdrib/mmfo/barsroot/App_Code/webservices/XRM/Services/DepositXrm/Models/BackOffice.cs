@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Bars.WebServices.XRM.Services.DepositXrm.Models
 {
@@ -30,10 +31,27 @@ namespace Bars.WebServices.XRM.Services.DepositXrm.Models
 
     public class AccessRequestRes
     {
+        public AccessRequestRes()
+        {
+            Templates = new List<TemplateDoc>();
+        }
+
         public Int16 ResultCode;
         public String ResultMessage;
         public Decimal ReqId;
+
+        public List<TemplateDoc> Templates { get; set; }
     }
+
+    public class TemplateDoc
+    {
+        public string Name { get; set; }
+        /// <summary>
+        /// Base64 content of pdf file
+        /// </summary>
+        public string Content { get; set; }
+    }
+
 
     public class BackOfficeGetAccessReq
     {

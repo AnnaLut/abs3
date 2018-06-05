@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/17/2016 16:56:36" ReportInfo.Modified="09/19/2016 18:07:07" ReportInfo.CreatorVersion="2013.2.2.0" PrintSettings.PrintOnSheetWidth="297" PrintSettings.PrintOnSheetHeight="210">
+  <Dictionary>
+    <OracleDataConnection Name="cobummfo_core" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnKeZmNckkVgwDxq0qmoLseKdycC7BQF0b0aCKF7cFz+OLfjYFx1ytCi0EH3Sqx24Mg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select t.rowid as idrow, t.id_a, t.rt,  t.ot, &#13;&#10;                        t.odat, t.nls, t.kv, t.c_ag, t.nmk, &#13;&#10;                        c.adr,t.c_reg, t.c_dst, s.kod_reg, t.rec_o&#13;&#10;                   from bars.ree_tmp  t, &#13;&#10;                        bars.accounts a,&#13;&#10;                        bars.dpa_nbs  d,&#13;&#10;                        bars.spr_obl  s,&#13;&#10;                        bars.customer c  &#13;&#10;                  where t.odat &lt;= to_date(:entereddate,'dd/mm/yyyy')&#13;&#10;                    and a.nls = t.nls &#13;&#10;                    and a.kv = t.kv&#13;&#10;                    and a.kf = t.mfo &#13;&#10;                    and substr(t.nls,1,4) = d.nbs&#13;&#10;                    and d.type='DPA'&#13;&#10;                    and t.ot = d.taxotype&#13;&#10;                    and c.c_reg = s.c_reg&#13;&#10;                    and a.rnk = c.rnk">
+        <Column Name="IDROW" DataType="System.String"/>
+        <Column Name="ID_A" DataType="System.String"/>
+        <Column Name="RT" DataType="System.String"/>
+        <Column Name="OT" DataType="System.String"/>
+        <Column Name="ODAT" DataType="System.DateTime"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="C_AG" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="C_REG" DataType="System.Decimal"/>
+        <Column Name="C_DST" DataType="System.Decimal"/>
+        <Column Name="KOD_REG" DataType="System.String"/>
+        <Column Name="REC_O" DataType="System.Decimal"/>
+        <CommandParameter Name="entereddate" DataType="126" DefaultValue="30/09/2016"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="head" DataType="System.Int32" Enabled="true" SelectCommand="select fio from staff$base where id = user_id">
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="entereddate" DataType="System.String"/>
+    <Parameter Name="fileName" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="9.45">
+    <PageHeaderBand Name="PageHeader1" Width="1047.06" Height="52.92"/>
+    <DataBand Name="Data2" Top="56.92" Width="1047.06" Height="113.4" DataSource="Table2">
+      <TextObject Name="Text2" Left="9.45" Top="37.8" Width="302.4" Height="18.9" Text="Дата і час друку: [FormatDateTime([Date],&quot;dd/MM/yyyy hh:mm:ss&quot;)]" Font="Arial, 6pt"/>
+      <TextObject Name="Text1" Left="9.45" Top="18.9" Width="292.95" Height="18.9" Text="Користувач [head.FIO]" Font="Arial, 6pt"/>
+      <TextObject Name="Text3" Left="9.45" Top="56.7" Width="292.95" Height="18.9" Text="Звіт для файл [fileName]" Font="Arial, 6pt"/>
+      <TableObject Name="Table3" Left="9.45" Top="94.5" Width="1023.67" Height="18.9">
+        <TableColumn Name="Column12" Width="88.97"/>
+        <TableColumn Name="Column13" Width="41.72"/>
+        <TableColumn Name="Column14" Width="51.17"/>
+        <TableColumn Name="Column15" Width="60.62"/>
+        <TableColumn Name="Column16" Width="88.97"/>
+        <TableColumn Name="Column17" Width="41.72"/>
+        <TableColumn Name="Column18" Width="31.82"/>
+        <TableColumn Name="Column19" Width="192.47"/>
+        <TableColumn Name="Column20" Width="277.52"/>
+        <TableColumn Name="Column21" Width="50.72"/>
+        <TableColumn Name="Column22" Width="97.97"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell12" Border.Lines="All" Text="ЗКПО" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="Реєстр" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell14" Border.Lines="All" Text="Операція" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell15" Border.Lines="All" Text="Дата операції&#13;&#10;" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell16" Border.Lines="All" Text="Рахунок клієнта" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell17" Border.Lines="All" Text="Валюта" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="Рез.&#13;&#10;" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell19" Border.Lines="All" Text="Назва" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="Адреса" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell21" Border.Lines="All" Text="Код ДПА" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="Код органу реєстрації" HorzAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data1" Top="174.32" Width="1047.06" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Left="9.45" Width="1023.67" Height="18.9">
+        <TableColumn Name="Column1" Width="88.97"/>
+        <TableColumn Name="Column2" Width="41.72"/>
+        <TableColumn Name="Column3" Width="51.17"/>
+        <TableColumn Name="Column4" Width="60.62"/>
+        <TableColumn Name="Column5" Width="88.97"/>
+        <TableColumn Name="Column6" Width="41.72"/>
+        <TableColumn Name="Column7" Width="31.82"/>
+        <TableColumn Name="Column8" Width="192.47"/>
+        <TableColumn Name="Column9" Width="277.52"/>
+        <TableColumn Name="Column10" Width="50.72"/>
+        <TableColumn Name="Column11" Width="97.97"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[Table.ID_A]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[Table.RT]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[Table.OT]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[Table.ODAT]&#13;&#10;" Format="Date" Format.Format="MM/dd/yy" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell6" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="[Table.C_AG]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="[Table.NMK]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="[Table.ADR]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="[Table.C_REG]" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell11" Border.Lines="All" Text="[Table.C_DST]" HorzAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="197.22" Width="1047.06" Height="18.9"/>
+  </ReportPage>
+</Report>

@@ -1,0 +1,1140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/27/2013 14:51:01" ReportInfo.Modified="04/18/2013 15:33:05" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="vinnbars" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF1/AGuYvIoAMS3Xiow+EiNjSiBFpnGq+JCDIppOUFevKKBKBVVhu5fOo1sC+9IvseS7pdgXQwPVr5QlHaat3/t1w=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ACC_W4, NUM01 RNKW, CHAR00 PRODUCT, CHAR01 ACC_BPK_ADDRESS, CHAR02 ACC_BPK_BDAY, CHAR03 ACC_BPK_BPLACE, CHAR04 ACC_BPK_COND_SET, CHAR05 ACC_BPK_DAOS, DAT00 WDAOS, CHAR06 ACC_BPK_DAOS_OLD, CHAR07 ACC_BPK_DOVER, CHAR08 ACC_BPK_F, CHAR09 ACC_BPK_I, CHAR10 ACC_BPK_ISP_NAME_S, CHAR11 ACC_BPK_LIM, CHAR12 ACC_BPK_LIM_LIT, CHAR13 ACC_BPK_LIM_LIT_OLD, CHAR14 ACC_BPK_LIM_OLD, CHAR15 ACC_BPK_M, CHAR16 ACC_BPK_MOB_TEL, NUM02 ACC_BPK_ND, NUM03 ACC_BPK_ND_OLD, CHAR17 ACC_BPK_NLS, CHAR18 ACC_BPK_NMK, CHAR19 ACC_BPK_NMKK, CHAR20 ACC_BPK_O, CHAR21 ACC_BPK_OKPO, CHAR22 ACC_BPK_PASP_ATRT, CHAR23 ACC_BPK_PASP_DATE, CHAR24 ACC_BPK_PASP_NO, CHAR25 ACC_BPK_PHON_BRANCH, CHAR26 ACC_BPK_PHONE, CHAR27 ACC_BPK_POSADA_R, CHAR28 ACC_BPK_PROC, CHAR29 ACC_BPK_PROC_LIT, CHAR30 ACC_BPK_PSGR, CHAR31 ACC_BPK_PSGR_LIT, CHAR32 ACC_BPK_PSKR, CHAR33 ACC_BPK_PSKR_LIT, CHAR34 ACC_BPK_PSMZ, CHAR35 ACC_BPK_PSMZ_LIT, CHAR36 ACC_BPK_PSNO, CHAR37 ACC_BPK_PSNO_LIT, CHAR38 ACC_BPK_PSNVK, CHAR39 ACC_BPK_PSNVK_LIT, CHAR40 ACC_BPK_PSYS, CHAR41 ACC_BPK_REZID, CHAR42 ACC_BPK_TDK, CHAR43 ACC_BPK_TIP, NUM04 ACC_BPK_TOVR_RATE, CHAR44 ACC_BPK_TOWN, CHAR45 ACC_BPK_TRANSF, CHAR46 ACC_BPK_TRANSI, CHAR47 ACC_BPK_TRANZIT, CHAR48 ACC_BPK_TRWAY4, CHAR49 ACC_BPK_ZPASP_ATRT, CHAR50 ACC_BPK_ZPASP_NO, CHAR51 ACC_BPK_ZPASP_STOP_DATE, CHAR52 ZORG, CHAR53 BR from rs_tmp_report_data where session_id=:session_id order by id">
+        <Column Name="RNKW" DataType="System.Decimal"/>
+        <Column Name="PRODUCT" DataType="System.String"/>
+        <Column Name="ACC_BPK_ADDRESS" DataType="System.String"/>
+        <Column Name="ACC_BPK_BDAY" DataType="System.String"/>
+        <Column Name="ACC_BPK_BPLACE" DataType="System.String"/>
+        <Column Name="ACC_BPK_COND_SET" DataType="System.String"/>
+        <Column Name="ACC_BPK_DAOS" DataType="System.String"/>
+        <Column Name="WDAOS" DataType="System.DateTime"/>
+        <Column Name="ACC_BPK_DAOS_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_DOVER" DataType="System.String"/>
+        <Column Name="ACC_BPK_F" DataType="System.String"/>
+        <Column Name="ACC_BPK_I" DataType="System.String"/>
+        <Column Name="ACC_BPK_ISP_NAME_S" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_LIT_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_LIM_OLD" DataType="System.String"/>
+        <Column Name="ACC_BPK_M" DataType="System.String"/>
+        <Column Name="ACC_BPK_MOB_TEL" DataType="System.String"/>
+        <Column Name="ACC_BPK_ND" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_ND_OLD" DataType="System.Int64"/>
+        <Column Name="ACC_BPK_NLS" DataType="System.String"/>
+        <Column Name="ACC_BPK_NMK" DataType="System.String"/>
+        <Column Name="ACC_BPK_NMKK" DataType="System.String"/>
+        <Column Name="ACC_BPK_O" DataType="System.String"/>
+        <Column Name="ACC_BPK_OKPO" DataType="System.String"/>
+        <Column Name="ACC_BPK_PASP_ATRT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PASP_DATE" DataType="System.String"/>
+        <Column Name="ACC_BPK_PASP_NO" DataType="System.String"/>
+        <Column Name="ACC_BPK_PHON_BRANCH" DataType="System.String"/>
+        <Column Name="ACC_BPK_PHONE" DataType="System.String"/>
+        <Column Name="ACC_BPK_POSADA_R" DataType="System.String"/>
+        <Column Name="ACC_BPK_PROC" DataType="System.String"/>
+        <Column Name="ACC_BPK_PROC_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSGR" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSGR_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSKR" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSKR_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSMZ" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSMZ_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNO" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNO_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNVK" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSNVK_LIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_PSYS" DataType="System.String"/>
+        <Column Name="ACC_BPK_REZID" DataType="System.String"/>
+        <Column Name="ACC_BPK_TDK" DataType="System.String"/>
+        <Column Name="ACC_BPK_TIP" DataType="System.String"/>
+        <Column Name="ACC_BPK_TOVR_RATE" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_TOWN" DataType="System.String"/>
+        <Column Name="ACC_BPK_TRANSF" DataType="System.String"/>
+        <Column Name="ACC_BPK_TRANZIT" DataType="System.String"/>
+        <Column Name="ACC_BPK_TRWAY4" DataType="System.String"/>
+        <Column Name="ACC_BPK_ZPASP_ATRT" DataType="System.String"/>
+        <Column Name="ACC_BPK_ZPASP_NO" DataType="System.String"/>
+        <Column Name="ACC_BPK_ZPASP_STOP_DATE" DataType="System.String"/>
+        <Column Name="BR" DataType="System.String"/>
+        <Column Name="ACC_W4" DataType="System.Decimal"/>
+        <Column Name="ACC_BPK_TRANSI" DataType="System.String"/>
+        <Column Name="ZORG" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='0.1.0') ACC_BPK_T0_1_0,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='0.1.1') ACC_BPK_T0_1_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='0.1.2') ACC_BPK_T0_1_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.1.1') ACC_BPK_T1_1_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.1.2') ACC_BPK_T1_1_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.1.3') ACC_BPK_T1_1_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.2.1') ACC_BPK_T1_2_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.2.2') ACC_BPK_T1_2_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.2.3') ACC_BPK_T1_2_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.3.1') ACC_BPK_T1_3_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.3.2') ACC_BPK_T1_3_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.4.1') ACC_BPK_T1_4_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.5.1') ACC_BPK_T1_5_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='1.6.1') ACC_BPK_T1_6_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.1.1') ACC_BPK_T2_1_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.1.2') ACC_BPK_T2_1_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.2.1') ACC_BPK_T2_2_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.2.2') ACC_BPK_T2_2_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.2.3') ACC_BPK_T2_2_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.2.4') ACC_BPK_T2_2_4,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.2.5') ACC_BPK_T2_2_5,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='2.2.6') ACC_BPK_T2_2_6,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.1.1') ACC_BPK_T3_1_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.1') ACC_BPK_T3_2_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.10') ACC_BPK_T3_2_10,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.11') ACC_BPK_T3_2_11,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.12') ACC_BPK_T3_2_12,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.2') ACC_BPK_T3_2_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.3') ACC_BPK_T3_2_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.4') ACC_BPK_T3_2_4,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.5') ACC_BPK_T3_2_5,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.6') ACC_BPK_T3_2_6,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.7') ACC_BPK_T3_2_7,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.8') ACC_BPK_T3_2_8,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.2.9') ACC_BPK_T3_2_9,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.3.1') ACC_BPK_T3_3_1,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.3.2') ACC_BPK_T3_3_2,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='3.3.3') ACC_BPK_T3_3_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.10.1') ACC_BPK_T4_10_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.10.2') ACC_BPK_T4_10_2,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.10.3') ACC_BPK_T4_10_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.1.1') ACC_BPK_T4_1_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.11.1') ACC_BPK_T4_11_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.11.2') ACC_BPK_T4_11_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.1.2') ACC_BPK_T4_1_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.12.1') ACC_BPK_T4_12_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.1.3') ACC_BPK_T4_1_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.13.1') ACC_BPK_T4_13_1,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.13.2') ACC_BPK_T4_13_2,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.13.3') ACC_BPK_T4_13_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.1.4') ACC_BPK_T4_1_4,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.14.1') ACC_BPK_T4_14_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.14.2') ACC_BPK_T4_14_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.14.3') ACC_BPK_T4_14_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.14.4') ACC_BPK_T4_14_4,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.15.1') ACC_BPK_T4_15_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.15.2') ACC_BPK_T4_15_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.15.3') ACC_BPK_T4_15_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.16.1') ACC_BPK_T4_16_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.16.2') ACC_BPK_T4_16_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.16.3') ACC_BPK_T4_16_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.16.4') ACC_BPK_T4_16_4,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.17.1') ACC_BPK_T4_17_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.17.2') ACC_BPK_T4_17_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.18.1') ACC_BPK_T4_18_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.19.1') ACC_BPK_T4_19_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.2.1') ACC_BPK_T4_2_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.2.2') ACC_BPK_T4_2_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.2.3') ACC_BPK_T4_2_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.3.1') ACC_BPK_T4_3_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.3.2') ACC_BPK_T4_3_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.4.1') ACC_BPK_T4_4_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.4.2') ACC_BPK_T4_4_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.5.1') ACC_BPK_T4_5_1,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.5.2') ACC_BPK_T4_5_2,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.5.3') ACC_BPK_T4_5_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.6.1') ACC_BPK_T4_6_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.6.2') ACC_BPK_T4_6_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.6.3') ACC_BPK_T4_6_3,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.7.1') ACC_BPK_T4_7_1,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.7.2') ACC_BPK_T4_7_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.8.1') ACC_BPK_T4_8_1,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.8.2') ACC_BPK_T4_8_2,&#13;&#10;    (select tarif_val   from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.9.1') ACC_BPK_T4_9_1,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.9.2') ACC_BPK_T4_9_2,&#13;&#10;    (select tarif_val from v_w4_tarif k where product_groups=bpk_get_product(bbb.acc_w4)  and card = bpk_get_card(bbb.acc_w4) and tarif_code='4.9.3') ACC_BPK_T4_9_3,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_CITYW') ACC_BPK_DMORG_ADR_CITY,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_PCODW') ACC_BPK_DMORG_ADR_PCODE,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_STRTW') ACC_BPK_DMORG_ADR_STREET,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_WORK') ACC_BPK_DMORG_NAME,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_OFFIC') ACC_BPK_DMORG_POS,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_PHONE') ACC_BPK_DMORG_TEL,&#13;&#10;    (SELECT val  from branch_parameters WHERE branch=bbb.branch and tag='PHONES') ACC_BPK_ISP_PHONE,&#13;&#10;    (SELECT nvl(min(demand_kk),chr(160))  from specparam_int WHERE acc=bbb.acc_w4) ACC_BPK_KK,&#13;&#10;    (SELECT t.lcv  from accounts a, tabval t WHERE a.kv=t.kv AND a.acc=bbb.acc_w4) ACC_BPK_KV_ISO,&#13;&#10;    (SELECT t.name  from accounts a, tabval t WHERE a.kv=t.kv AND a.acc=bbb.acc_w4) ACC_BPK_KV_NAME,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_ODAT') ACC_BPK_ORG_DAT,&#13;&#10;    (SELECT nvl(min(value),chr(160))  from accountsw WHERE acc=bbb.acc_w4 and tag='PK_OFAX') ACC_BPK_ORG_FAX,&#13;&#10;    (SELECT val  from branch_parameters WHERE branch=bbb.branch and tag='BPK_BOSS_FIO') ACC_BPK_FIO,&#13;&#10;    (SELECT val  from branch_parameters WHERE branch=bbb.branch and tag='BPK_BOSS_FIOR') ACC_BPK_FIO_R&#13;&#10;from &#13;&#10;        (select :acc_w4 as acc_w4, :barnch as branch from dual) bbb">
+        <Column Name="ACC_BPK_T0_1_0" DataType="System.String"/>
+        <Column Name="ACC_BPK_T0_1_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T0_1_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_1_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_1_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_1_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_2_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_2_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_2_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_3_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_3_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_4_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_5_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T1_6_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_1_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_1_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_2_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_2_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_2_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_2_4" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_2_5" DataType="System.String"/>
+        <Column Name="ACC_BPK_T2_2_6" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_1_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_10" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_11" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_12" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_4" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_5" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_6" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_7" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_8" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_2_9" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_3_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_3_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T3_3_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_10_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_10_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_10_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_1_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_11_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_11_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_1_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_12_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_1_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_13_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_13_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_13_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_1_4" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_14_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_14_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_14_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_14_4" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_15_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_15_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_15_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_16_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_16_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_16_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_16_4" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_17_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_17_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_18_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_19_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_2_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_2_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_2_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_3_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_3_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_4_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_4_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_5_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_5_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_5_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_6_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_6_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_6_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_7_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_7_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_8_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_8_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_9_1" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_9_2" DataType="System.String"/>
+        <Column Name="ACC_BPK_T4_9_3" DataType="System.String"/>
+        <Column Name="ACC_BPK_DMORG_ADR_CITY" DataType="System.String"/>
+        <Column Name="ACC_BPK_DMORG_ADR_PCODE" DataType="System.String"/>
+        <Column Name="ACC_BPK_DMORG_ADR_STREET" DataType="System.String"/>
+        <Column Name="ACC_BPK_DMORG_NAME" DataType="System.String"/>
+        <Column Name="ACC_BPK_DMORG_POS" DataType="System.String"/>
+        <Column Name="ACC_BPK_DMORG_TEL" DataType="System.String"/>
+        <Column Name="ACC_BPK_ISP_PHONE" DataType="System.String"/>
+        <Column Name="ACC_BPK_KK" DataType="System.String"/>
+        <Column Name="ACC_BPK_KV_ISO" DataType="System.String"/>
+        <Column Name="ACC_BPK_KV_NAME" DataType="System.String"/>
+        <Column Name="ACC_BPK_ORG_DAT" DataType="System.String"/>
+        <Column Name="ACC_BPK_ORG_FAX" DataType="System.String"/>
+        <Column Name="ACC_BPK_FIO" DataType="System.String"/>
+        <Column Name="ACC_BPK_FIO_R" DataType="System.String"/>
+        <CommandParameter Name="acc_w4" DataType="107" Expression="[Table.ACC_W4]" DefaultValue="-1"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[Table.BR]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="OKPO" DataType="System.String"/>
+    <Parameter Name="session_id" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="8660" PaperHeight="210" LeftMargin="0" TopMargin="0" FirstPageSource="15" OtherPagesSource="15" Guides="0,17760.35,75.6,170.1,321.3,425.25,472.5,519.75,567,614.25,661.5,708.75,756,803.25,850.5,897.75,1020.6,1086.75,1247.4,1408.05,1578.15,1653.75,1738.8,1823.85,1937.25,2041.2,2126.25,2268,2362.5,2494.8,2683.8,2797.2,2891.7,2976.75,3014.55,3052.35,3090.15,3127.95,3165.75,3203.55,3241.35,3279.15,3316.95,3354.75,3392.55,3430.35,3468.15,3505.95,3543.75,3581.55,3619.35,3657.15,3694.95,3732.75,3798.9,3865.05,3931.2,3997.35,4120.2,4261.95,4365.9,4469.85,4554.9,4621.05,4687.2,4810.05,4999.05,5121.9,5235.3,5320.35,5373.27,5429.97,5486.67,5543.37,5600.07,5656.77,5713.47,5770.17,5826.87,5883.57,5987.52,6091.47,6289.92,6384.42,6488.37,6582.87,6667.92,6800.22,6970.32,7140.42,7301.07,7433.37,7565.67,7679.07,7792.47,7905.87,8019.27,8142.12,8368.92,8595.72,8718.569,8794.17,8898.12,9002.07,9124.92,9209.97,9304.47,9342.27,9380.069,9417.87,9455.67,9493.47,9531.27,9569.069,9606.87,9644.67,9682.47,9720.27,9758.069,9795.87,9833.67,9871.47,9909.27,9947.069,9984.87,10022.67,10060.47,10107.72,10145.52,10183.32,10221.12,10258.92,10296.72,10334.52,10372.32,10410.12,10447.92,10485.72,10523.51,10561.31,10599.11,10636.91,10674.71,10712.51,10750.31,10788.11,10825.91,10967.66,11156.66,11392.91,11459.06,11525.21,11591.36,11657.51,11723.66,11789.82,11855.97,11922.12,11988.27,12054.42,12186.72,12252.87,12319.02,12385.17,12451.32,12517.47,12583.62,12649.77,12715.92,12782.07,12848.22,12914.37,12980.52,13046.67,13112.82,13178.97,13245.12,13311.27,13377.42,13443.57,13509.72,13575.87,13642.03,13708.18,13774.33,13840.48,13906.63,13972.78,14038.93,14105.08,14171.23,14237.38,14303.53,14369.68,14435.83,14501.98,14568.13,14634.28,14700.43,14766.58,14832.73,14898.88,14965.03,15031.18,15097.33,15163.48,15229.63,15295.78,15361.94,15428.09,15494.24,15560.39,15626.54,15692.69,15758.84,15824.99,15891.14,15957.29,16023.44,16089.59,16155.74,16221.89,16288.04,16354.19,16524.29,16590.44,16656.59,16722.74,16788.89,16855.04,16921.19,16987.34,17053.49,17204.69,17355.89,17516.54,17620.49">
+    <ReportTitleBand Name="ReportTitle1" Width="32697" Height="18.9" Guides="0,18.9">
+      <TableObject Name="Table2" Width="32700.78" Height="18.9">
+        <TableColumn Name="Column121" Width="75.6"/>
+        <TableColumn Name="Column122" Width="94.5"/>
+        <TableColumn Name="Column123" Width="151.2"/>
+        <TableColumn Name="Column124" Width="103.95"/>
+        <TableColumn Name="Column239" Width="122.85"/>
+        <TableColumn Name="Column240" Width="122.85"/>
+        <TableColumn Name="Column241" Width="122.85"/>
+        <TableColumn Name="Column242" Width="122.85"/>
+        <TableColumn Name="Column243" Width="122.85"/>
+        <TableColumn Name="Column244" Width="122.85"/>
+        <TableColumn Name="Column248" Width="122.85"/>
+        <TableColumn Name="Column247" Width="122.85"/>
+        <TableColumn Name="Column246" Width="122.85"/>
+        <TableColumn Name="Column245" Width="122.85"/>
+        <TableColumn Name="Column125" Width="151.2"/>
+        <TableColumn Name="Column126" Width="170.1"/>
+        <TableColumn Name="Column127" Width="160.65"/>
+        <TableColumn Name="Column128" Width="160.65"/>
+        <TableColumn Name="Column129" Width="170.1"/>
+        <TableColumn Name="Column259" Width="217.35"/>
+        <TableColumn Name="Column261" Width="217.35"/>
+        <TableColumn Name="Column263" Width="245.7"/>
+        <TableColumn Name="Column265" Width="179.55"/>
+        <TableColumn Name="Column267" Width="170.1"/>
+        <TableColumn Name="Column479" Width="170.1"/>
+        <TableColumn Name="Column130" Width="160.65"/>
+        <TableColumn Name="Column131" Width="94.5"/>
+        <TableColumn Name="Column481" Width="132.3"/>
+        <TableColumn Name="Column483" Width="189"/>
+        <TableColumn Name="Column132" Width="113.4"/>
+        <TableColumn Name="Column133" Width="179.55"/>
+        <TableColumn Name="Column269" Width="160.65"/>
+        <TableColumn Name="Column271" Width="75.6"/>
+        <TableColumn Name="Column273" Width="85.05"/>
+        <TableColumn Name="Column274" Width="85.05"/>
+        <TableColumn Name="Column291" Width="85.05"/>
+        <TableColumn Name="Column290" Width="85.05"/>
+        <TableColumn Name="Column288" Width="85.05"/>
+        <TableColumn Name="Column289" Width="85.05"/>
+        <TableColumn Name="Column287" Width="85.05"/>
+        <TableColumn Name="Column286" Width="85.05"/>
+        <TableColumn Name="Column285" Width="85.05"/>
+        <TableColumn Name="Column284" Width="85.05"/>
+        <TableColumn Name="Column283" Width="85.05"/>
+        <TableColumn Name="Column282" Width="85.05"/>
+        <TableColumn Name="Column281" Width="85.05"/>
+        <TableColumn Name="Column279" Width="85.05"/>
+        <TableColumn Name="Column280" Width="85.05"/>
+        <TableColumn Name="Column278" Width="85.05"/>
+        <TableColumn Name="Column275" Width="85.05"/>
+        <TableColumn Name="Column276" Width="85.05"/>
+        <TableColumn Name="Column277" Width="85.05"/>
+        <TableColumn Name="Column311" Width="103.95"/>
+        <TableColumn Name="Column313" Width="122.85"/>
+        <TableColumn Name="Column315" Width="151.2"/>
+        <TableColumn Name="Column134" Width="113.4"/>
+        <TableColumn Name="Column316" Width="132.3"/>
+        <TableColumn Name="Column135" Width="141.75"/>
+        <TableColumn Name="Column136" Width="103.95"/>
+        <TableColumn Name="Column137" Width="103.95"/>
+        <TableColumn Name="Column138" Width="141.75"/>
+        <TableColumn Name="Column139" Width="113.4"/>
+        <TableColumn Name="Column140" Width="151.2"/>
+        <TableColumn Name="Column141" Width="122.85"/>
+        <TableColumn Name="Column142" Width="189"/>
+        <TableColumn Name="Column143" Width="160.65"/>
+        <TableColumn Name="Column144" Width="151.2"/>
+        <TableColumn Name="Column145" Width="141.75"/>
+        <TableColumn Name="Column318" Width="137.97"/>
+        <TableColumn Name="Column324" Width="151.2"/>
+        <TableColumn Name="Column323" Width="198.45"/>
+        <TableColumn Name="Column322" Width="189"/>
+        <TableColumn Name="Column320" Width="189"/>
+        <TableColumn Name="Column321" Width="198.45"/>
+        <TableColumn Name="Column319" Width="179.55"/>
+        <TableColumn Name="Column326" Width="189"/>
+        <TableColumn Name="Column325" Width="189"/>
+        <TableColumn Name="Column398" Width="189"/>
+        <TableColumn Name="Column487" Width="189"/>
+        <TableColumn Name="Column485" Width="151.2"/>
+        <TableColumn Name="Column146" Width="198.45"/>
+        <TableColumn Name="Column147" Width="179.55"/>
+        <TableColumn Name="Column148" Width="151.2"/>
+        <TableColumn Name="Column149" Width="170.1"/>
+        <TableColumn Name="Column150" Width="141.75"/>
+        <TableColumn Name="Column151" Width="132.3"/>
+        <TableColumn Name="Column152" Width="170.1"/>
+        <TableColumn Name="Column153" Width="170.1"/>
+        <TableColumn Name="Column154" Width="160.65"/>
+        <TableColumn Name="Column155" Width="132.3"/>
+        <TableColumn Name="Column159" Width="132.3"/>
+        <TableColumn Name="Column160" Width="113.4"/>
+        <TableColumn Name="Column161" Width="113.4"/>
+        <TableColumn Name="Column162" Width="113.4"/>
+        <TableColumn Name="Column163" Width="113.4"/>
+        <TableColumn Name="Column164" Width="122.85"/>
+        <TableColumn Name="Column165" Width="226.8"/>
+        <TableColumn Name="Column166" Width="226.8"/>
+        <TableColumn Name="Column167" Width="122.85"/>
+        <TableColumn Name="Column168" Width="75.6"/>
+        <TableColumn Name="Column169" Width="103.95"/>
+        <TableColumn Name="Column170" Width="103.95"/>
+        <TableColumn Name="Column171" Width="170.1"/>
+        <TableColumn Name="Column172" Width="132.3"/>
+        <TableColumn Name="Column173" Width="122.85"/>
+        <TableColumn Name="Column336" Width="170.18"/>
+        <TableColumn Name="Column337" Width="160.59"/>
+        <TableColumn Name="Column338" Width="170.1"/>
+        <TableColumn Name="Column339" Width="170.1"/>
+        <TableColumn Name="Column340" Width="170.1"/>
+        <TableColumn Name="Column341" Width="170.1"/>
+        <TableColumn Name="Column342" Width="170.1"/>
+        <TableColumn Name="Column343" Width="170.1"/>
+        <TableColumn Name="Column344" Width="170.1"/>
+        <TableColumn Name="Column345" Width="170.1"/>
+        <TableColumn Name="Column346" Width="170.1"/>
+        <TableColumn Name="Column400" Width="170.1"/>
+        <TableColumn Name="Column401" Width="170.1"/>
+        <TableColumn Name="Column402" Width="170.1"/>
+        <TableColumn Name="Column403" Width="170.1"/>
+        <TableColumn Name="Column404" Width="170.1"/>
+        <TableColumn Name="Column405" Width="170.1"/>
+        <TableColumn Name="Column406" Width="170.1"/>
+        <TableColumn Name="Column407" Width="170.1"/>
+        <TableColumn Name="Column408" Width="170.1"/>
+        <TableColumn Name="Column358" Width="189"/>
+        <TableColumn Name="Column370" Width="198.45"/>
+        <TableColumn Name="Column371" Width="198.45"/>
+        <TableColumn Name="Column372" Width="207.9"/>
+        <TableColumn Name="Column373" Width="198.45"/>
+        <TableColumn Name="Column374" Width="198.45"/>
+        <TableColumn Name="Column375" Width="207.9"/>
+        <TableColumn Name="Column376" Width="198.45"/>
+        <TableColumn Name="Column377" Width="198.45"/>
+        <TableColumn Name="Column360" Width="198.45"/>
+        <TableColumn Name="Column361" Width="198.45"/>
+        <TableColumn Name="Column362" Width="198.45"/>
+        <TableColumn Name="Column363" Width="179.55"/>
+        <TableColumn Name="Column364" Width="179.55"/>
+        <TableColumn Name="Column365" Width="207.9"/>
+        <TableColumn Name="Column366" Width="179.55"/>
+        <TableColumn Name="Column367" Width="179.55"/>
+        <TableColumn Name="Column368" Width="160.65"/>
+        <TableColumn Name="Column369" Width="160.65"/>
+        <TableColumn Name="Column378" Width="160.65"/>
+        <TableColumn Name="Column174" Width="113.4"/>
+        <TableColumn Name="Column175" Width="132.3"/>
+        <TableColumn Name="Column181" Width="160.65"/>
+        <TableColumn Name="Column182" Width="141.75"/>
+        <TableColumn Name="Column183" Width="141.75"/>
+        <TableColumn Name="Column184" Width="141.75"/>
+        <TableColumn Name="Column185" Width="151.2"/>
+        <TableColumn Name="Column186" Width="160.65"/>
+        <TableColumn Name="Column187" Width="160.65"/>
+        <TableColumn Name="Column188" Width="151.2"/>
+        <TableColumn Name="Column189" Width="141.75"/>
+        <TableColumn Name="Column190" Width="132.3"/>
+        <TableColumn Name="Column191" Width="141.75"/>
+        <TableColumn Name="Column192" Width="141.75"/>
+        <TableColumn Name="Column193" Width="141.75"/>
+        <TableColumn Name="Column194" Width="141.75"/>
+        <TableColumn Name="Column195" Width="141.75"/>
+        <TableColumn Name="Column196" Width="132.3"/>
+        <TableColumn Name="Column197" Width="141.75"/>
+        <TableColumn Name="Column198" Width="132.3"/>
+        <TableColumn Name="Column199" Width="132.3"/>
+        <TableColumn Name="Column200" Width="141.75"/>
+        <TableColumn Name="Column201" Width="151.2"/>
+        <TableColumn Name="Column202" Width="151.2"/>
+        <TableColumn Name="Column203" Width="141.75"/>
+        <TableColumn Name="Column204" Width="132.3"/>
+        <TableColumn Name="Column205" Width="141.75"/>
+        <TableColumn Name="Column206" Width="151.2"/>
+        <TableColumn Name="Column207" Width="132.3"/>
+        <TableColumn Name="Column208" Width="132.3"/>
+        <TableColumn Name="Column209" Width="113.4"/>
+        <TableColumn Name="Column210" Width="122.85"/>
+        <TableColumn Name="Column211" Width="122.85"/>
+        <TableColumn Name="Column212" Width="132.3"/>
+        <TableColumn Name="Column213" Width="141.75"/>
+        <TableColumn Name="Column214" Width="141.75"/>
+        <TableColumn Name="Column215" Width="141.75"/>
+        <TableColumn Name="Column216" Width="132.3"/>
+        <TableColumn Name="Column217" Width="141.75"/>
+        <TableColumn Name="Column218" Width="160.65"/>
+        <TableColumn Name="Column219" Width="151.2"/>
+        <TableColumn Name="Column220" Width="151.2"/>
+        <TableColumn Name="Column221" Width="151.2"/>
+        <TableColumn Name="Column222" Width="141.75"/>
+        <TableColumn Name="Column223" Width="151.2"/>
+        <TableColumn Name="Column224" Width="160.65"/>
+        <TableColumn Name="Column225" Width="132.3"/>
+        <TableColumn Name="Column226" Width="113.4"/>
+        <TableColumn Name="Column227" Width="113.4"/>
+        <TableColumn Name="Column228" Width="132.3"/>
+        <TableColumn Name="Column229" Width="113.4"/>
+        <TableColumn Name="Column230" Width="132.3"/>
+        <TableColumn Name="Column231" Width="94.5"/>
+        <TableColumn Name="Column232" Width="94.5"/>
+        <TableColumn Name="Column233" Width="113.4"/>
+        <TableColumn Name="Column234" Width="103.95"/>
+        <TableColumn Name="Column235" Width="113.4"/>
+        <TableColumn Name="Column236" Width="113.4"/>
+        <TableColumn Name="Column237" Width="122.85"/>
+        <TableColumn Name="Column238" Width="113.4"/>
+        <TableColumn Name="Column446" Width="122.85"/>
+        <TableColumn Name="Column447" Width="141.75"/>
+        <TableColumn Name="Column448" Width="132.3"/>
+        <TableColumn Name="Column449" Width="122.85"/>
+        <TableColumn Name="Column450" Width="122.85"/>
+        <TableColumn Name="Column451" Width="151.2"/>
+        <TableColumn Name="Column452" Width="141.75"/>
+        <TableColumn Name="Column453" Width="75.6"/>
+        <TableColumn Name="Column454" Width="75.6"/>
+        <TableColumn Name="Column455" Width="75.6"/>
+        <TableColumn Name="Column456" Width="75.6"/>
+        <TableColumn Name="Column457" Width="75.6"/>
+        <TableColumn Name="Column458" Width="75.6"/>
+        <TableColumn Name="Column459" Width="75.6"/>
+        <TableColumn Name="Column460" Width="75.6"/>
+        <TableColumn Name="Column493" Width="75.6"/>
+        <TableColumn Name="Column461" Width="75.6"/>
+        <TableColumn Name="Column462" Width="75.6"/>
+        <TableColumn Name="Column463" Width="75.6"/>
+        <TableColumn Name="Column464" Width="75.6"/>
+        <TableColumn Name="Column465" Width="75.6"/>
+        <TableColumn Name="Column466" Width="85.05"/>
+        <TableColumn Name="Column467" Width="75.6"/>
+        <TableColumn Name="Column468" Width="75.6"/>
+        <TableColumn Name="Column492" Width="75.6"/>
+        <TableColumn Name="Column469" Width="75.6"/>
+        <TableColumn Name="Column470" Width="75.6"/>
+        <TableColumn Name="Column471" Width="75.6"/>
+        <TableColumn Name="Column472" Width="113.4"/>
+        <TableColumn Name="Column473" Width="151.2"/>
+        <TableColumn Name="Column474" Width="151.2"/>
+        <TableColumn Name="Column489" Width="158.76"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell121" Text="RNKW&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell122" Text="PRODUCT&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell123" Text="ACC_BPK_ADDRESS" HorzAlign="Center"/>
+          <TableCell Name="Cell124" Text="ACC_BPK_BDAY" HorzAlign="Center"/>
+          <TableCell Name="Cell239" Text="ACC_BPK_BDAY_SYMB01" HorzAlign="Center"/>
+          <TableCell Name="Cell240" Text="ACC_BPK_BDAY_SYMB02" HorzAlign="Center"/>
+          <TableCell Name="Cell241" Text="ACC_BPK_BDAY_SYMB03" HorzAlign="Center"/>
+          <TableCell Name="Cell242" Text="ACC_BPK_BDAY_SYMB04" HorzAlign="Center"/>
+          <TableCell Name="Cell243" Text="ACC_BPK_BDAY_SYMB05&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell244" Text="ACC_BPK_BDAY_SYMB06" HorzAlign="Center"/>
+          <TableCell Name="Cell248" Text="ACC_BPK_BDAY_SYMB07" HorzAlign="Center"/>
+          <TableCell Name="Cell247" Text="ACC_BPK_BDAY_SYMB08" HorzAlign="Center"/>
+          <TableCell Name="Cell246" Text="ACC_BPK_BDAY_SYMB09" HorzAlign="Center"/>
+          <TableCell Name="Cell245" Text="ACC_BPK_BDAY_SYMB10" HorzAlign="Center"/>
+          <TableCell Name="Cell125" Text="ACC_BPK_BPLACE" HorzAlign="Center"/>
+          <TableCell Name="Cell126" Text="ACC_BPK_COND_SET" HorzAlign="Center"/>
+          <TableCell Name="Cell127" Text="ACC_BPK_DAOS" HorzAlign="Center"/>
+          <TableCell Name="Cell128" Text="WDAOS" HorzAlign="Center"/>
+          <TableCell Name="Cell129" Text="ACC_BPK_DAOS_OLD" HorzAlign="Center"/>
+          <TableCell Name="Cell259" Text="ACC_BPK_DMORG_ADR_CITY" HorzAlign="Center"/>
+          <TableCell Name="Cell261" Text="ACC_BPK_DMORG_ADR_PCODE" HorzAlign="Center"/>
+          <TableCell Name="Cell263" Text="ACC_BPK_DMORG_ADR_STREET" HorzAlign="Center"/>
+          <TableCell Name="Cell265" Text="ACC_BPK_DMORG_NAME" HorzAlign="Center"/>
+          <TableCell Name="Cell267" Text="ACC_BPK_DMORG_POS" HorzAlign="Center"/>
+          <TableCell Name="Cell479" Text="ACC_BPK_DMORG_TEL" HorzAlign="Center"/>
+          <TableCell Name="Cell130" Text="ACC_BPK_DOVER" HorzAlign="Center"/>
+          <TableCell Name="Cell131" Text="ACC_BPK_F" HorzAlign="Center"/>
+          <TableCell Name="Cell481" Text="ACC_BPK_FIO" HorzAlign="Center"/>
+          <TableCell Name="Cell483" Text="ACC_BPK_FIO_R" HorzAlign="Center"/>
+          <TableCell Name="Cell132" Text="ACC_BPK_I&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell133" Text="ACC_BPK_ISP_NAME_S" HorzAlign="Center"/>
+          <TableCell Name="Cell269" Text="ACC_BPK_ISP_PHONE"/>
+          <TableCell Name="Cell271" Text="ACC_BPK_I_SYMB01" HorzAlign="Center"/>
+          <TableCell Name="Cell273" Text="ACC_BPK_I_SYMB02" HorzAlign="Center"/>
+          <TableCell Name="Cell274" Text="ACC_BPK_I_SYMB03" HorzAlign="Center"/>
+          <TableCell Name="Cell291" Text="ACC_BPK_I_SYMB04" HorzAlign="Center"/>
+          <TableCell Name="Cell290" Text="ACC_BPK_I_SYMB05" HorzAlign="Center"/>
+          <TableCell Name="Cell288" Text="ACC_BPK_I_SYMB06" HorzAlign="Center"/>
+          <TableCell Name="Cell289" Text="ACC_BPK_I_SYMB07" HorzAlign="Center"/>
+          <TableCell Name="Cell287" Text="ACC_BPK_I_SYMB08" HorzAlign="Center"/>
+          <TableCell Name="Cell286" Text="ACC_BPK_I_SYMB09" HorzAlign="Center"/>
+          <TableCell Name="Cell285" Text="ACC_BPK_I_SYMB10" HorzAlign="Center"/>
+          <TableCell Name="Cell284" Text="ACC_BPK_I_SYMB11" HorzAlign="Center"/>
+          <TableCell Name="Cell283" Text="ACC_BPK_I_SYMB12" HorzAlign="Center"/>
+          <TableCell Name="Cell282" Text="ACC_BPK_I_SYMB13" HorzAlign="Center"/>
+          <TableCell Name="Cell281" Text="ACC_BPK_I_SYMB14" HorzAlign="Center"/>
+          <TableCell Name="Cell279" Text="ACC_BPK_I_SYMB15" HorzAlign="Center"/>
+          <TableCell Name="Cell280" Text="ACC_BPK_I_SYMB16" HorzAlign="Center"/>
+          <TableCell Name="Cell278" Text="ACC_BPK_I_SYMB17" HorzAlign="Center"/>
+          <TableCell Name="Cell275" Text="ACC_BPK_I_SYMB18" HorzAlign="Center"/>
+          <TableCell Name="Cell276" Text="ACC_BPK_I_SYMB19" HorzAlign="Center"/>
+          <TableCell Name="Cell277" Text="ACC_BPK_I_SYMB20" HorzAlign="Center"/>
+          <TableCell Name="Cell311" Text="ACC_BPK_KK"/>
+          <TableCell Name="Cell313" Text="ACC_BPK_KV_ISO&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell315" Text="ACC_BPK_KV_NAME" HorzAlign="Center"/>
+          <TableCell Name="Cell134" Text="ACC_BPK_LIM&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell316" Text="ACC_BPK_LIM_LIT&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell135" Text="ACC_BPK_LIM_LIT_OLD&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell136" Text="ACC_BPK_LIM_LIT_OLD&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell137" Text="ACC_BPK_M" HorzAlign="Center"/>
+          <TableCell Name="Cell138" Text="ACC_BPK_MOB_TEL" HorzAlign="Center"/>
+          <TableCell Name="Cell139" Text="ACC_BPK_ND&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell140" Text="ACC_BPK_ND_OLD&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell141" Text="ACC_BPK_NLS" HorzAlign="Center"/>
+          <TableCell Name="Cell142" Text="ACC_BPK_NMK&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell143" Text="ACC_BPK_NMKK" HorzAlign="Center"/>
+          <TableCell Name="Cell144" Text="ACC_BPK_O" HorzAlign="Center"/>
+          <TableCell Name="Cell145" Text="ACC_BPK_OKPO" HorzAlign="Center"/>
+          <TableCell Name="Cell318" Text="ACC_BPK_OKPO_SYMB01"/>
+          <TableCell Name="Cell324" Text="ACC_BPK_OKPO_SYMB02"/>
+          <TableCell Name="Cell323" Text="ACC_BPK_OKPO_SYMB03" HorzAlign="Center"/>
+          <TableCell Name="Cell322" Text="ACC_BPK_OKPO_SYMB04" HorzAlign="Center"/>
+          <TableCell Name="Cell320" Text="ACC_BPK_OKPO_SYMB05" HorzAlign="Center"/>
+          <TableCell Name="Cell321" Text="ACC_BPK_OKPO_SYMB06" HorzAlign="Center"/>
+          <TableCell Name="Cell319" Text="ACC_BPK_OKPO_SYMB07" HorzAlign="Center"/>
+          <TableCell Name="Cell326" Text="ACC_BPK_OKPO_SYMB08" HorzAlign="Center"/>
+          <TableCell Name="Cell325" Text="ACC_BPK_OKPO_SYMB09" HorzAlign="Center"/>
+          <TableCell Name="Cell398" Text="ACC_BPK_OKPO_SYMB10" HorzAlign="Center"/>
+          <TableCell Name="Cell487" Text="ACC_BPK_ORG_DAT" HorzAlign="Center"/>
+          <TableCell Name="Cell485" Text="ACC_BPK_ORG_FAX" HorzAlign="Center"/>
+          <TableCell Name="Cell146" Text="ACC_BPK_PASP_ATRT" HorzAlign="Center"/>
+          <TableCell Name="Cell147" Text="ACC_BPK_PASP_DATE" HorzAlign="Center"/>
+          <TableCell Name="Cell148" Text="ACC_BPK_PASP_NO" HorzAlign="Center"/>
+          <TableCell Name="Cell149" Text="ACC_BPK_PHON_BRANCH" HorzAlign="Center"/>
+          <TableCell Name="Cell150" Text="ACC_BPK_PHONE" HorzAlign="Center"/>
+          <TableCell Name="Cell151" Text="ACC_BPK_POSADA_R" HorzAlign="Center"/>
+          <TableCell Name="Cell152" Text="ACC_BPK_PROC" HorzAlign="Center"/>
+          <TableCell Name="Cell153" Text="ACC_BPK_PROC_LIT" HorzAlign="Center"/>
+          <TableCell Name="Cell154" Text="ACC_BPK_PSGR" HorzAlign="Center"/>
+          <TableCell Name="Cell155" Text="ACC_BPK_PSGR_LIT"/>
+          <TableCell Name="Cell159" Text="ACC_BPK_PSKR" HorzAlign="Center"/>
+          <TableCell Name="Cell160" Text="ACC_BPK_PSKR_LIT" HorzAlign="Center"/>
+          <TableCell Name="Cell161" Text="ACC_BPK_PSMZ&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell162" Text="ACC_BPK_PSMZ_LIT" HorzAlign="Center"/>
+          <TableCell Name="Cell163" Text="ACC_BPK_PSNO" HorzAlign="Center"/>
+          <TableCell Name="Cell164" Text="ACC_BPK_PSNO_LIT"/>
+          <TableCell Name="Cell165" Text="ACC_BPK_PSNVK" HorzAlign="Center"/>
+          <TableCell Name="Cell166" Text="ACC_BPK_PSNVK_LIT" HorzAlign="Center"/>
+          <TableCell Name="Cell167" Text="ACC_BPK_PSYS" HorzAlign="Center"/>
+          <TableCell Name="Cell168" Text="ACC_BPK_REZID" HorzAlign="Center"/>
+          <TableCell Name="Cell169" Text="ACC_BPK_TDK" HorzAlign="Center"/>
+          <TableCell Name="Cell170" Text="ACC_BPK_TIP" HorzAlign="Center"/>
+          <TableCell Name="Cell171" Text="ACC_BPK_TOVR_RATE"/>
+          <TableCell Name="Cell172" Text="ACC_BPK_TOWN" HorzAlign="Center"/>
+          <TableCell Name="Cell173" Text="ACC_BPK_TRANSF" HorzAlign="Center"/>
+          <TableCell Name="Cell336" Text="ACC_BPK_TRANSF_SYMB01" HorzAlign="Center"/>
+          <TableCell Name="Cell337" Text="ACC_BPK_TRANSF_SYMB02" HorzAlign="Center"/>
+          <TableCell Name="Cell338" Text="ACC_BPK_TRANSF_SYMB03" HorzAlign="Center"/>
+          <TableCell Name="Cell339" Text="ACC_BPK_TRANSF_SYMB04" HorzAlign="Center"/>
+          <TableCell Name="Cell340" Text="ACC_BPK_TRANSF_SYMB05" HorzAlign="Center"/>
+          <TableCell Name="Cell341" Text="ACC_BPK_TRANSF_SYMB06" HorzAlign="Center"/>
+          <TableCell Name="Cell342" Text="ACC_BPK_TRANSF_SYMB07" HorzAlign="Center"/>
+          <TableCell Name="Cell343" Text="ACC_BPK_TRANSF_SYMB08" HorzAlign="Center"/>
+          <TableCell Name="Cell344" Text="ACC_BPK_TRANSF_SYMB09" HorzAlign="Center"/>
+          <TableCell Name="Cell345" Text="ACC_BPK_TRANSF_SYMB10" HorzAlign="Center"/>
+          <TableCell Name="Cell346" Text="ACC_BPK_TRANSF_SYMB11" HorzAlign="Center"/>
+          <TableCell Name="Cell400" Text="ACC_BPK_TRANSF_SYMB12" HorzAlign="Center"/>
+          <TableCell Name="Cell401" Text="ACC_BPK_TRANSF_SYMB13" HorzAlign="Center"/>
+          <TableCell Name="Cell402" Text="ACC_BPK_TRANSF_SYMB14" HorzAlign="Center"/>
+          <TableCell Name="Cell403" Text="ACC_BPK_TRANSF_SYMB15" HorzAlign="Center"/>
+          <TableCell Name="Cell404" Text="ACC_BPK_TRANSF_SYMB16" HorzAlign="Center"/>
+          <TableCell Name="Cell405" Text="ACC_BPK_TRANSF_SYMB17" HorzAlign="Center"/>
+          <TableCell Name="Cell406" Text="ACC_BPK_TRANSF_SYMB18" HorzAlign="Center"/>
+          <TableCell Name="Cell407" Text="ACC_BPK_TRANSF_SYMB19" HorzAlign="Center"/>
+          <TableCell Name="Cell408" Text="ACC_BPK_TRANSF_SYMB20" HorzAlign="Center"/>
+          <TableCell Name="Cell358" Text="ACC_BPK_TRANSI_SYMB01" HorzAlign="Center"/>
+          <TableCell Name="Cell370" Text="ACC_BPK_TRANSI_SYMB02" HorzAlign="Center"/>
+          <TableCell Name="Cell371" Text="ACC_BPK_TRANSI_SYMB03" HorzAlign="Center"/>
+          <TableCell Name="Cell372" Text="ACC_BPK_TRANSI_SYMB04" HorzAlign="Center"/>
+          <TableCell Name="Cell373" Text="ACC_BPK_TRANSI_SYMB05" HorzAlign="Center"/>
+          <TableCell Name="Cell374" Text="ACC_BPK_TRANSI_SYMB06" HorzAlign="Center"/>
+          <TableCell Name="Cell375" Text="ACC_BPK_TRANSI_SYMB07" HorzAlign="Center"/>
+          <TableCell Name="Cell376" Text="ACC_BPK_TRANSI_SYMB08" HorzAlign="Center"/>
+          <TableCell Name="Cell377" Text="ACC_BPK_TRANSI_SYMB09" HorzAlign="Center"/>
+          <TableCell Name="Cell360" Text="ACC_BPK_TRANSI_SYMB10" HorzAlign="Center"/>
+          <TableCell Name="Cell361" Text="ACC_BPK_TRANSI_SYMB11" HorzAlign="Center"/>
+          <TableCell Name="Cell362" Text="ACC_BPK_TRANSI_SYMB12" HorzAlign="Center"/>
+          <TableCell Name="Cell363" Text="ACC_BPK_TRANSI_SYMB13" HorzAlign="Center"/>
+          <TableCell Name="Cell364" Text="ACC_BPK_TRANSI_SYMB14" HorzAlign="Center"/>
+          <TableCell Name="Cell365" Text="ACC_BPK_TRANSI_SYMB15" HorzAlign="Center"/>
+          <TableCell Name="Cell366" Text="ACC_BPK_TRANSI_SYMB16" HorzAlign="Center"/>
+          <TableCell Name="Cell367" Text="ACC_BPK_TRANSI_SYMB17" HorzAlign="Center"/>
+          <TableCell Name="Cell368" Text="ACC_BPK_TRANSI_SYMB18" HorzAlign="Center"/>
+          <TableCell Name="Cell369" Text="ACC_BPK_TRANSI_SYMB19" HorzAlign="Center"/>
+          <TableCell Name="Cell378" Text="ACC_BPK_TRANSI_SYMB20" HorzAlign="Center"/>
+          <TableCell Name="Cell174" Text="ACC_BPK_TRANZIT" HorzAlign="Center"/>
+          <TableCell Name="Cell175" Text="ACC_BPK_TRWAY4" HorzAlign="Center"/>
+          <TableCell Name="Cell181" Text="ACC_BPK_T0_1_0" HorzAlign="Center"/>
+          <TableCell Name="Cell182" Text="ACC_BPK_T0_1_1" HorzAlign="Center"/>
+          <TableCell Name="Cell183" Text="ACC_BPK_T0_1_2" HorzAlign="Center"/>
+          <TableCell Name="Cell184" Text="ACC_BPK_T1_1_1" HorzAlign="Center"/>
+          <TableCell Name="Cell185" Text="ACC_BPK_T1_1_2" HorzAlign="Center"/>
+          <TableCell Name="Cell186" Text="ACC_BPK_T1_1_3" HorzAlign="Center"/>
+          <TableCell Name="Cell187" Text="ACC_BPK_T1_2_1" HorzAlign="Center"/>
+          <TableCell Name="Cell188" Text="ACC_BPK_T1_2_2" HorzAlign="Center"/>
+          <TableCell Name="Cell189" Text="ACC_BPK_T1_2_3" HorzAlign="Center"/>
+          <TableCell Name="Cell190" Text="ACC_BPK_T1_3_1" HorzAlign="Center"/>
+          <TableCell Name="Cell191" Text="ACC_BPK_T1_3_2" HorzAlign="Center"/>
+          <TableCell Name="Cell192" Text="ACC_BPK_T1_4_1" HorzAlign="Center"/>
+          <TableCell Name="Cell193" Text="ACC_BPK_T1_5_1" HorzAlign="Center"/>
+          <TableCell Name="Cell194" Text="ACC_BPK_T1_6_1" HorzAlign="Center"/>
+          <TableCell Name="Cell195" Text="ACC_BPK_T2_1_1" HorzAlign="Center"/>
+          <TableCell Name="Cell196" Text="ACC_BPK_T2_1_2" HorzAlign="Center"/>
+          <TableCell Name="Cell197" Text="ACC_BPK_T2_2_1" HorzAlign="Center"/>
+          <TableCell Name="Cell198" Text="ACC_BPK_T2_2_2" HorzAlign="Center"/>
+          <TableCell Name="Cell199" Text="ACC_BPK_T2_2_3" HorzAlign="Center"/>
+          <TableCell Name="Cell200" Text="ACC_BPK_T2_2_4" HorzAlign="Center"/>
+          <TableCell Name="Cell201" Text="ACC_BPK_T2_2_5" HorzAlign="Center"/>
+          <TableCell Name="Cell202" Text="ACC_BPK_T2_2_6" HorzAlign="Center"/>
+          <TableCell Name="Cell203" Text="ACC_BPK_T3_1_1" HorzAlign="Center"/>
+          <TableCell Name="Cell204" Text="ACC_BPK_T3_2_1" HorzAlign="Center"/>
+          <TableCell Name="Cell205" Text="ACC_BPK_T3_2_10" HorzAlign="Center"/>
+          <TableCell Name="Cell206" Text="ACC_BPK_T3_2_11" HorzAlign="Center"/>
+          <TableCell Name="Cell207" Text="ACC_BPK_T3_2_12" HorzAlign="Center"/>
+          <TableCell Name="Cell208" Text="ACC_BPK_T3_2_2" HorzAlign="Center"/>
+          <TableCell Name="Cell209" Text="ACC_BPK_T3_2_3" HorzAlign="Center"/>
+          <TableCell Name="Cell210" Text="ACC_BPK_T3_2_4" HorzAlign="Center"/>
+          <TableCell Name="Cell211" Text="ACC_BPK_T3_2_5" HorzAlign="Center"/>
+          <TableCell Name="Cell212" Text="ACC_BPK_T3_2_6" HorzAlign="Center"/>
+          <TableCell Name="Cell213" Text="ACC_BPK_T3_2_7" HorzAlign="Center"/>
+          <TableCell Name="Cell214" Text="ACC_BPK_T3_2_8" HorzAlign="Center"/>
+          <TableCell Name="Cell215" Text="ACC_BPK_T3_2_9" HorzAlign="Center"/>
+          <TableCell Name="Cell216" Text="ACC_BPK_T3_3_1" HorzAlign="Center"/>
+          <TableCell Name="Cell217" Text="ACC_BPK_T3_3_2" HorzAlign="Center"/>
+          <TableCell Name="Cell218" Text="ACC_BPK_T3_3_3" HorzAlign="Center"/>
+          <TableCell Name="Cell219" Text="ACC_BPK_T4_10_1" HorzAlign="Center"/>
+          <TableCell Name="Cell220" Text="ACC_BPK_T4_10_2" HorzAlign="Center"/>
+          <TableCell Name="Cell221" Text="ACC_BPK_T4_10_3" HorzAlign="Center"/>
+          <TableCell Name="Cell222" Text="ACC_BPK_T4_1_1" HorzAlign="Center"/>
+          <TableCell Name="Cell223" Text="ACC_BPK_T4_11_1" HorzAlign="Center"/>
+          <TableCell Name="Cell224" Text="ACC_BPK_T4_11_2" HorzAlign="Center"/>
+          <TableCell Name="Cell225" Text="ACC_BPK_T4_1_2" HorzAlign="Center"/>
+          <TableCell Name="Cell226" Text="ACC_BPK_T4_12_1" HorzAlign="Center"/>
+          <TableCell Name="Cell227" Text="ACC_BPK_T4_1_3" HorzAlign="Center"/>
+          <TableCell Name="Cell228" Text="ACC_BPK_T4_13_1" HorzAlign="Center"/>
+          <TableCell Name="Cell229" Text="ACC_BPK_T4_13_2" HorzAlign="Center"/>
+          <TableCell Name="Cell230" Text="ACC_BPK_T4_13_3" HorzAlign="Center"/>
+          <TableCell Name="Cell231" Text="ACC_BPK_T4_1_4" HorzAlign="Center"/>
+          <TableCell Name="Cell232" Text="ACC_BPK_T4_14_1" HorzAlign="Center"/>
+          <TableCell Name="Cell233" Text="ACC_BPK_T4_14_2" HorzAlign="Center"/>
+          <TableCell Name="Cell234" Text="ACC_BPK_T4_14_3" HorzAlign="Center"/>
+          <TableCell Name="Cell235" Text="ACC_BPK_T4_14_4" HorzAlign="Center"/>
+          <TableCell Name="Cell236" Text="ACC_BPK_T4_15_1" HorzAlign="Center"/>
+          <TableCell Name="Cell237" Text="ACC_BPK_T4_15_2" HorzAlign="Center"/>
+          <TableCell Name="Cell238" Text="ACC_BPK_T4_15_3" HorzAlign="Center"/>
+          <TableCell Name="Cell446" Text="ACC_BPK_T4_16_1" HorzAlign="Center"/>
+          <TableCell Name="Cell447" Text="ACC_BPK_T4_16_2" HorzAlign="Center"/>
+          <TableCell Name="Cell448" Text="ACC_BPK_T4_16_3" HorzAlign="Center"/>
+          <TableCell Name="Cell449" Text="ACC_BPK_T4_16_4" HorzAlign="Center"/>
+          <TableCell Name="Cell450" Text="ACC_BPK_T4_17_1" HorzAlign="Center"/>
+          <TableCell Name="Cell451" Text="ACC_BPK_T4_17_2" HorzAlign="Center"/>
+          <TableCell Name="Cell452" Text="ACC_BPK_T4_18_1&#13;&#10;" HorzAlign="Center"/>
+          <TableCell Name="Cell453" Text="ACC_BPK_T4_19_1" HorzAlign="Center"/>
+          <TableCell Name="Cell454" Text="ACC_BPK_T4_2_1" HorzAlign="Center"/>
+          <TableCell Name="Cell455" Text="ACC_BPK_T4_2_2" HorzAlign="Center"/>
+          <TableCell Name="Cell456" Text="ACC_BPK_T4_2_3" HorzAlign="Center"/>
+          <TableCell Name="Cell457" Text="ACC_BPK_T4_3_1" HorzAlign="Center"/>
+          <TableCell Name="Cell458" Text="ACC_BPK_T4_3_2" HorzAlign="Center"/>
+          <TableCell Name="Cell459" Text="ACC_BPK_T4_4_1" HorzAlign="Center"/>
+          <TableCell Name="Cell460" Text="ACC_BPK_T4_4_2" HorzAlign="Center"/>
+          <TableCell Name="Cell493" Text="ACC_BPK_T4_5_1" HorzAlign="Center"/>
+          <TableCell Name="Cell461" Text="ACC_BPK_T4_5_2" HorzAlign="Center"/>
+          <TableCell Name="Cell462" Text="ACC_BPK_T4_5_3" HorzAlign="Center"/>
+          <TableCell Name="Cell463" Text="ACC_BPK_T4_6_1" HorzAlign="Center"/>
+          <TableCell Name="Cell464" Text="ACC_BPK_T4_6_2" HorzAlign="Center"/>
+          <TableCell Name="Cell465" Text="ACC_BPK_T4_6_3" HorzAlign="Center"/>
+          <TableCell Name="Cell466" Text="ACC_BPK_T4_7_1" HorzAlign="Center"/>
+          <TableCell Name="Cell467" Text="ACC_BPK_T4_7_2" HorzAlign="Center"/>
+          <TableCell Name="Cell468" Text="ACC_BPK_T4_8_1" HorzAlign="Center"/>
+          <TableCell Name="Cell492" Text="ACC_BPK_T4_8_2"/>
+          <TableCell Name="Cell469" Text="ACC_BPK_T4_9_1" HorzAlign="Center"/>
+          <TableCell Name="Cell470" Text="ACC_BPK_T4_9_2" HorzAlign="Center"/>
+          <TableCell Name="Cell471" Text="ACC_BPK_T4_9_3" HorzAlign="Center"/>
+          <TableCell Name="Cell472" Text="ACC_BPK_ZPASP_ATRT" HorzAlign="Center"/>
+          <TableCell Name="Cell473" Text="ACC_BPK_ZPASP_NO" HorzAlign="Center"/>
+          <TableCell Name="Cell474" Text="ACC_BPK_ZPASP_STOP_DATE" HorzAlign="Center"/>
+          <TableCell Name="Cell489" Text="BR" HorzAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="22.9" Width="32697" Height="18.9" Guides="0,18.9" DataSource="Table">
+      <TableObject Name="Table2" Width="32700.78" Height="18.9">
+        <TableColumn Name="Column1" Width="75.6"/>
+        <TableColumn Name="Column2" Width="94.5"/>
+        <TableColumn Name="Column3" Width="151.2"/>
+        <TableColumn Name="Column4" Width="103.95"/>
+        <TableColumn Name="Column249" Width="122.85"/>
+        <TableColumn Name="Column251" Width="122.85"/>
+        <TableColumn Name="Column253" Width="122.85"/>
+        <TableColumn Name="Column254" Width="122.85"/>
+        <TableColumn Name="Column255" Width="122.85"/>
+        <TableColumn Name="Column256" Width="122.85"/>
+        <TableColumn Name="Column257" Width="122.85"/>
+        <TableColumn Name="Column258" Width="122.85"/>
+        <TableColumn Name="Column252" Width="122.85"/>
+        <TableColumn Name="Column250" Width="122.85"/>
+        <TableColumn Name="Column5" Width="151.2"/>
+        <TableColumn Name="Column7" Width="170.1"/>
+        <TableColumn Name="Column8" Width="160.65"/>
+        <TableColumn Name="Column9" Width="160.65"/>
+        <TableColumn Name="Column10" Width="170.1"/>
+        <TableColumn Name="Column260" Width="217.35"/>
+        <TableColumn Name="Column262" Width="217.35"/>
+        <TableColumn Name="Column264" Width="245.7"/>
+        <TableColumn Name="Column266" Width="179.55"/>
+        <TableColumn Name="Column268" Width="170.1"/>
+        <TableColumn Name="Column480" Width="170.1"/>
+        <TableColumn Name="Column11" Width="160.65"/>
+        <TableColumn Name="Column12" Width="94.5"/>
+        <TableColumn Name="Column482" Width="132.3"/>
+        <TableColumn Name="Column484" Width="189"/>
+        <TableColumn Name="Column14" Width="113.4"/>
+        <TableColumn Name="Column15" Width="179.55"/>
+        <TableColumn Name="Column270" Width="160.65"/>
+        <TableColumn Name="Column272" Width="75.6"/>
+        <TableColumn Name="Column295" Width="85.05"/>
+        <TableColumn Name="Column297" Width="85.05"/>
+        <TableColumn Name="Column299" Width="85.05"/>
+        <TableColumn Name="Column301" Width="85.05"/>
+        <TableColumn Name="Column304" Width="85.05"/>
+        <TableColumn Name="Column302" Width="85.05"/>
+        <TableColumn Name="Column303" Width="85.05"/>
+        <TableColumn Name="Column300" Width="85.05"/>
+        <TableColumn Name="Column298" Width="85.05"/>
+        <TableColumn Name="Column296" Width="85.05"/>
+        <TableColumn Name="Column294" Width="85.05"/>
+        <TableColumn Name="Column293" Width="85.05"/>
+        <TableColumn Name="Column292" Width="85.05"/>
+        <TableColumn Name="Column306" Width="85.05"/>
+        <TableColumn Name="Column310" Width="85.05"/>
+        <TableColumn Name="Column309" Width="85.05"/>
+        <TableColumn Name="Column307" Width="85.05"/>
+        <TableColumn Name="Column308" Width="85.05"/>
+        <TableColumn Name="Column305" Width="85.05"/>
+        <TableColumn Name="Column312" Width="103.95"/>
+        <TableColumn Name="Column314" Width="122.85"/>
+        <TableColumn Name="Column16" Width="151.2"/>
+        <TableColumn Name="Column17" Width="113.4"/>
+        <TableColumn Name="Column317" Width="132.3"/>
+        <TableColumn Name="Column18" Width="141.75"/>
+        <TableColumn Name="Column19" Width="103.95"/>
+        <TableColumn Name="Column20" Width="103.95"/>
+        <TableColumn Name="Column21" Width="141.75"/>
+        <TableColumn Name="Column22" Width="113.4"/>
+        <TableColumn Name="Column23" Width="151.2"/>
+        <TableColumn Name="Column24" Width="122.85"/>
+        <TableColumn Name="Column25" Width="189"/>
+        <TableColumn Name="Column26" Width="160.65"/>
+        <TableColumn Name="Column27" Width="151.2"/>
+        <TableColumn Name="Column28" Width="141.75"/>
+        <TableColumn Name="Column327" Width="137.97"/>
+        <TableColumn Name="Column328" Width="151.2"/>
+        <TableColumn Name="Column329" Width="198.45"/>
+        <TableColumn Name="Column330" Width="189"/>
+        <TableColumn Name="Column331" Width="189"/>
+        <TableColumn Name="Column333" Width="198.45"/>
+        <TableColumn Name="Column334" Width="179.55"/>
+        <TableColumn Name="Column335" Width="189"/>
+        <TableColumn Name="Column332" Width="189"/>
+        <TableColumn Name="Column399" Width="189"/>
+        <TableColumn Name="Column486" Width="189"/>
+        <TableColumn Name="Column488" Width="151.2"/>
+        <TableColumn Name="Column29" Width="198.45"/>
+        <TableColumn Name="Column30" Width="179.55"/>
+        <TableColumn Name="Column31" Width="151.2"/>
+        <TableColumn Name="Column32" Width="170.1"/>
+        <TableColumn Name="Column33" Width="141.75"/>
+        <TableColumn Name="Column34" Width="132.3"/>
+        <TableColumn Name="Column35" Width="170.1"/>
+        <TableColumn Name="Column36" Width="170.1"/>
+        <TableColumn Name="Column37" Width="160.65"/>
+        <TableColumn Name="Column38" Width="132.3"/>
+        <TableColumn Name="Column41" Width="132.3"/>
+        <TableColumn Name="Column42" Width="113.4"/>
+        <TableColumn Name="Column43" Width="113.4"/>
+        <TableColumn Name="Column44" Width="113.4"/>
+        <TableColumn Name="Column45" Width="113.4"/>
+        <TableColumn Name="Column46" Width="122.85"/>
+        <TableColumn Name="Column47" Width="226.8"/>
+        <TableColumn Name="Column48" Width="226.8"/>
+        <TableColumn Name="Column49" Width="122.85"/>
+        <TableColumn Name="Column50" Width="75.6"/>
+        <TableColumn Name="Column51" Width="103.95"/>
+        <TableColumn Name="Column52" Width="103.95"/>
+        <TableColumn Name="Column53" Width="170.1"/>
+        <TableColumn Name="Column54" Width="132.3"/>
+        <TableColumn Name="Column55" Width="122.85"/>
+        <TableColumn Name="Column347" Width="170.22"/>
+        <TableColumn Name="Column348" Width="160.55"/>
+        <TableColumn Name="Column349" Width="170.1"/>
+        <TableColumn Name="Column351" Width="170.1"/>
+        <TableColumn Name="Column352" Width="170.1"/>
+        <TableColumn Name="Column353" Width="170.1"/>
+        <TableColumn Name="Column354" Width="170.1"/>
+        <TableColumn Name="Column355" Width="170.1"/>
+        <TableColumn Name="Column356" Width="170.1"/>
+        <TableColumn Name="Column357" Width="170.1"/>
+        <TableColumn Name="Column350" Width="170.1"/>
+        <TableColumn Name="Column359" Width="170.1"/>
+        <TableColumn Name="Column379" Width="170.1"/>
+        <TableColumn Name="Column380" Width="170.1"/>
+        <TableColumn Name="Column381" Width="170.1"/>
+        <TableColumn Name="Column382" Width="170.1"/>
+        <TableColumn Name="Column383" Width="170.1"/>
+        <TableColumn Name="Column384" Width="170.1"/>
+        <TableColumn Name="Column385" Width="170.1"/>
+        <TableColumn Name="Column409" Width="170.1"/>
+        <TableColumn Name="Column386" Width="189"/>
+        <TableColumn Name="Column387" Width="198.45"/>
+        <TableColumn Name="Column388" Width="198.45"/>
+        <TableColumn Name="Column389" Width="207.9"/>
+        <TableColumn Name="Column390" Width="198.45"/>
+        <TableColumn Name="Column391" Width="198.45"/>
+        <TableColumn Name="Column392" Width="207.9"/>
+        <TableColumn Name="Column393" Width="198.45"/>
+        <TableColumn Name="Column394" Width="198.45"/>
+        <TableColumn Name="Column395" Width="198.45"/>
+        <TableColumn Name="Column396" Width="198.45"/>
+        <TableColumn Name="Column410" Width="198.45"/>
+        <TableColumn Name="Column411" Width="179.55"/>
+        <TableColumn Name="Column412" Width="179.55"/>
+        <TableColumn Name="Column413" Width="207.9"/>
+        <TableColumn Name="Column414" Width="179.55"/>
+        <TableColumn Name="Column415" Width="179.55"/>
+        <TableColumn Name="Column416" Width="160.65"/>
+        <TableColumn Name="Column417" Width="160.65"/>
+        <TableColumn Name="Column418" Width="160.65"/>
+        <TableColumn Name="Column56" Width="113.4"/>
+        <TableColumn Name="Column57" Width="132.3"/>
+        <TableColumn Name="Column63" Width="160.65"/>
+        <TableColumn Name="Column64" Width="141.75"/>
+        <TableColumn Name="Column65" Width="141.75"/>
+        <TableColumn Name="Column66" Width="141.75"/>
+        <TableColumn Name="Column67" Width="151.2"/>
+        <TableColumn Name="Column68" Width="160.65"/>
+        <TableColumn Name="Column69" Width="160.65"/>
+        <TableColumn Name="Column70" Width="151.2"/>
+        <TableColumn Name="Column71" Width="141.75"/>
+        <TableColumn Name="Column72" Width="132.3"/>
+        <TableColumn Name="Column73" Width="141.75"/>
+        <TableColumn Name="Column74" Width="141.75"/>
+        <TableColumn Name="Column75" Width="141.75"/>
+        <TableColumn Name="Column76" Width="141.75"/>
+        <TableColumn Name="Column77" Width="141.75"/>
+        <TableColumn Name="Column78" Width="132.3"/>
+        <TableColumn Name="Column79" Width="141.75"/>
+        <TableColumn Name="Column80" Width="132.3"/>
+        <TableColumn Name="Column81" Width="132.3"/>
+        <TableColumn Name="Column82" Width="141.75"/>
+        <TableColumn Name="Column83" Width="151.2"/>
+        <TableColumn Name="Column84" Width="151.2"/>
+        <TableColumn Name="Column85" Width="141.75"/>
+        <TableColumn Name="Column86" Width="132.3"/>
+        <TableColumn Name="Column87" Width="141.75"/>
+        <TableColumn Name="Column88" Width="151.2"/>
+        <TableColumn Name="Column89" Width="132.3"/>
+        <TableColumn Name="Column90" Width="132.3"/>
+        <TableColumn Name="Column91" Width="113.4"/>
+        <TableColumn Name="Column92" Width="122.85"/>
+        <TableColumn Name="Column93" Width="122.85"/>
+        <TableColumn Name="Column94" Width="132.3"/>
+        <TableColumn Name="Column95" Width="141.75"/>
+        <TableColumn Name="Column96" Width="141.75"/>
+        <TableColumn Name="Column97" Width="141.75"/>
+        <TableColumn Name="Column98" Width="132.3"/>
+        <TableColumn Name="Column99" Width="141.75"/>
+        <TableColumn Name="Column100" Width="160.65"/>
+        <TableColumn Name="Column101" Width="151.2"/>
+        <TableColumn Name="Column102" Width="151.2"/>
+        <TableColumn Name="Column103" Width="151.2"/>
+        <TableColumn Name="Column104" Width="141.75"/>
+        <TableColumn Name="Column106" Width="151.2"/>
+        <TableColumn Name="Column107" Width="160.65"/>
+        <TableColumn Name="Column108" Width="132.3"/>
+        <TableColumn Name="Column109" Width="113.4"/>
+        <TableColumn Name="Column110" Width="113.4"/>
+        <TableColumn Name="Column111" Width="132.3"/>
+        <TableColumn Name="Column112" Width="113.4"/>
+        <TableColumn Name="Column113" Width="132.3"/>
+        <TableColumn Name="Column114" Width="94.5"/>
+        <TableColumn Name="Column115" Width="94.5"/>
+        <TableColumn Name="Column116" Width="113.4"/>
+        <TableColumn Name="Column117" Width="103.95"/>
+        <TableColumn Name="Column118" Width="113.4"/>
+        <TableColumn Name="Column119" Width="113.4"/>
+        <TableColumn Name="Column120" Width="122.85"/>
+        <TableColumn Name="Column419" Width="113.4"/>
+        <TableColumn Name="Column420" Width="122.85"/>
+        <TableColumn Name="Column421" Width="141.75"/>
+        <TableColumn Name="Column422" Width="132.3"/>
+        <TableColumn Name="Column423" Width="122.85"/>
+        <TableColumn Name="Column424" Width="122.85"/>
+        <TableColumn Name="Column425" Width="151.2"/>
+        <TableColumn Name="Column426" Width="141.75"/>
+        <TableColumn Name="Column427" Width="75.6"/>
+        <TableColumn Name="Column428" Width="75.6"/>
+        <TableColumn Name="Column429" Width="75.6"/>
+        <TableColumn Name="Column430" Width="75.6"/>
+        <TableColumn Name="Column431" Width="75.6"/>
+        <TableColumn Name="Column432" Width="75.6"/>
+        <TableColumn Name="Column433" Width="75.6"/>
+        <TableColumn Name="Column494" Width="75.6"/>
+        <TableColumn Name="Column434" Width="75.6"/>
+        <TableColumn Name="Column435" Width="75.6"/>
+        <TableColumn Name="Column495" Width="75.6"/>
+        <TableColumn Name="Column437" Width="75.6"/>
+        <TableColumn Name="Column438" Width="75.6"/>
+        <TableColumn Name="Column439" Width="75.6"/>
+        <TableColumn Name="Column440" Width="85.05"/>
+        <TableColumn Name="Column441" Width="75.6"/>
+        <TableColumn Name="Column442" Width="75.6"/>
+        <TableColumn Name="Column491" Width="75.6"/>
+        <TableColumn Name="Column443" Width="75.6"/>
+        <TableColumn Name="Column444" Width="75.6"/>
+        <TableColumn Name="Column445" Width="75.6"/>
+        <TableColumn Name="Column436" Width="113.4"/>
+        <TableColumn Name="Column476" Width="151.2"/>
+        <TableColumn Name="Column477" Width="151.2"/>
+        <TableColumn Name="Column478" Width="158.76"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Text="[Table.RNKW]" HorzAlign="Center"/>
+          <TableCell Name="Cell2" Text="[Table.PRODUCT]" HorzAlign="Center"/>
+          <TableCell Name="Cell3" Text="[Table.ACC_BPK_ADDRESS]"/>
+          <TableCell Name="Cell4" Text="[Table.ACC_BPK_BDAY]" HorzAlign="Center"/>
+          <TableCell Name="Cell249" Text="[Substring([Table.ACC_BPK_BDAY],0,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell251" Text="[Substring([Table.ACC_BPK_BDAY],1,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell253" Text="[Substring([Table.ACC_BPK_BDAY],2,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell254" Text="[Substring([Table.ACC_BPK_BDAY],3,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell255" Text="[Substring([Table.ACC_BPK_BDAY],4,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell256" Text="[Substring([Table.ACC_BPK_BDAY],5,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell257" Text="[Substring([Table.ACC_BPK_BDAY],6,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell258" Text="[Substring([Table.ACC_BPK_BDAY],7,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell252" Text="[Substring([Table.ACC_BPK_BDAY],8,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell250" Text="[Substring([Table.ACC_BPK_BDAY],9,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell5" Text="[Table.ACC_BPK_BPLACE]"/>
+          <TableCell Name="Cell7" Text="[Table.ACC_BPK_COND_SET]" HorzAlign="Right"/>
+          <TableCell Name="Cell8" Text="[Table.ACC_BPK_DAOS]" HorzAlign="Right"/>
+          <TableCell Name="Cell9" Text="[Table.WDAOS]" HorzAlign="Right"/>
+          <TableCell Name="Cell10" Text="[Table.ACC_BPK_DAOS_OLD]" HorzAlign="Right"/>
+          <TableCell Name="Cell260" Text="[Table2.ACC_BPK_DMORG_ADR_CITY]"/>
+          <TableCell Name="Cell262" Text="[Table2.ACC_BPK_DMORG_ADR_PCODE]"/>
+          <TableCell Name="Cell264" Text="[Table2.ACC_BPK_DMORG_ADR_STREET]"/>
+          <TableCell Name="Cell266" Text="[Table2.ACC_BPK_DMORG_NAME]"/>
+          <TableCell Name="Cell268" Text="[Table2.ACC_BPK_DMORG_POS]"/>
+          <TableCell Name="Cell480" Text="[Table2.ACC_BPK_DMORG_TEL]"/>
+          <TableCell Name="Cell11" Text="[Table.ACC_BPK_DOVER]"/>
+          <TableCell Name="Cell12" Text="[Table.ACC_BPK_F]"/>
+          <TableCell Name="Cell482" Text="[Table2.ACC_BPK_FIO]"/>
+          <TableCell Name="Cell484" Text="[Table2.ACC_BPK_FIO_R]"/>
+          <TableCell Name="Cell14" Text="[Table.ACC_BPK_I]"/>
+          <TableCell Name="Cell15" Text="[Table.ACC_BPK_ISP_NAME_S]"/>
+          <TableCell Name="Cell270" Text="[Table2.ACC_BPK_ISP_PHONE]"/>
+          <TableCell Name="Cell272" Text="[Substring([Table.ACC_BPK_I],0,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell295" Text="[Substring([Table.ACC_BPK_I],1,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell297" Text="[Substring([Table.ACC_BPK_I],2,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell299" Text="[Substring([Table.ACC_BPK_I],3,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell301" Text="[Substring([Table.ACC_BPK_I],4,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell304" Text="[Substring([Table.ACC_BPK_I],5,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell302" Text="[Substring([Table.ACC_BPK_I],6,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell303" Text="[Substring([Table.ACC_BPK_I],7,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell300" Text="[Substring([Table.ACC_BPK_I],8,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell298" Text="[Substring([Table.ACC_BPK_I],9,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell296" Text="[Substring([Table.ACC_BPK_I],9,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell294" Text="[Substring([Table.ACC_BPK_I],10,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell293" Text="[Substring([Table.ACC_BPK_I],11,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell292" Text="[Substring([Table.ACC_BPK_I],12,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell306" Text="[Substring([Table.ACC_BPK_I],13,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell310" Text="[Substring([Table.ACC_BPK_I],14,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell309" Text="[Substring([Table.ACC_BPK_I],15,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell307" Text="[Substring([Table.ACC_BPK_I],16,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell308" Text="[Substring([Table.ACC_BPK_I],17,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell305" Text="[Substring([Table.ACC_BPK_I],18,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell312" Text="[Table2.ACC_BPK_KK]"/>
+          <TableCell Name="Cell314" Text="[Table2.ACC_BPK_KV_ISO]" HorzAlign="Center"/>
+          <TableCell Name="Cell16" Text="[Table2.ACC_BPK_KV_NAME]" HorzAlign="Center"/>
+          <TableCell Name="Cell17" Text="[Table.ACC_BPK_LIM]" Format="Number" Format.UseLocale="true" HorzAlign="Center"/>
+          <TableCell Name="Cell317" Text="[Table.ACC_BPK_LIM_LIT]" Format="Number" Format.UseLocale="true" HorzAlign="Center"/>
+          <TableCell Name="Cell18" Text="[Table.ACC_BPK_LIM_LIT_OLD]" Format="Number" Format.UseLocale="true"/>
+          <TableCell Name="Cell19" Text="[Table.ACC_BPK_LIM_OLD]" Format="Number" Format.UseLocale="true" HorzAlign="Right"/>
+          <TableCell Name="Cell20" Text="[Table.ACC_BPK_M]"/>
+          <TableCell Name="Cell21" Text="[Table.ACC_BPK_MOB_TEL]" HorzAlign="Right"/>
+          <TableCell Name="Cell22" Text="[Table.ACC_BPK_ND]" HorzAlign="Right"/>
+          <TableCell Name="Cell23" Text="[Table.ACC_BPK_ND_OLD]" HorzAlign="Right"/>
+          <TableCell Name="Cell24" Text="[Table.ACC_BPK_NLS]" HorzAlign="Right"/>
+          <TableCell Name="Cell25" Text="[Table.ACC_BPK_NMK]"/>
+          <TableCell Name="Cell26" Text="[Table.ACC_BPK_NMKK]"/>
+          <TableCell Name="Cell27" Text="[Table.ACC_BPK_O]"/>
+          <TableCell Name="Cell28" Text="[Table.ACC_BPK_OKPO]" HorzAlign="Right"/>
+          <TableCell Name="Cell327" Text="[Substring([Table.ACC_BPK_OKPO],0,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell328" Text="[Substring([Table.ACC_BPK_OKPO],1,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell329" Text="[Substring([Table.ACC_BPK_OKPO],2,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell330" Text="[Substring([Table.ACC_BPK_OKPO],3,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell331" Text="[Substring([Table.ACC_BPK_OKPO],4,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell333" Text="[Substring([Table.ACC_BPK_OKPO],5,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell334" Text="[Substring([Table.ACC_BPK_OKPO],6,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell335" Text="[Substring([Table.ACC_BPK_OKPO],7,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell332" Text="[Substring([Table.ACC_BPK_OKPO],8,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell399" Text="[Substring([Table.ACC_BPK_OKPO],9,1)]" HorzAlign="Right"/>
+          <TableCell Name="Cell486" Text="[Table2.ACC_BPK_ORG_DAT]" HorzAlign="Center"/>
+          <TableCell Name="Cell488" Text="[Table2.ACC_BPK_ORG_FAX]"/>
+          <TableCell Name="Cell29" Text="[Table.ACC_BPK_PASP_ATRT]"/>
+          <TableCell Name="Cell30" Text="[Table.ACC_BPK_PASP_DATE]" HorzAlign="Center"/>
+          <TableCell Name="Cell31" Text="[Table.ACC_BPK_PASP_NO]" HorzAlign="Center"/>
+          <TableCell Name="Cell32" Text="[Table.ACC_BPK_PHON_BRANCH]"/>
+          <TableCell Name="Cell33" Text="[Table.ACC_BPK_PHONE]"/>
+          <TableCell Name="Cell34" Text="[Table.ACC_BPK_POSADA_R]"/>
+          <TableCell Name="Cell35" Text="[Table.ACC_BPK_PROC]" HorzAlign="Right"/>
+          <TableCell Name="Cell36" Text="[Table.ACC_BPK_PROC_LIT]" HorzAlign="Right"/>
+          <TableCell Name="Cell37" Text="[Table.ACC_BPK_PSGR]" HorzAlign="Right"/>
+          <TableCell Name="Cell38" Text="[Table.ACC_BPK_PSGR_LIT]"/>
+          <TableCell Name="Cell41" Text="[Table.ACC_BPK_PSKR]" HorzAlign="Right"/>
+          <TableCell Name="Cell42" Text="[Table.ACC_BPK_PSKR_LIT]" HorzAlign="Right"/>
+          <TableCell Name="Cell43" Text="[Table.ACC_BPK_PSMZ]" HorzAlign="Right"/>
+          <TableCell Name="Cell44" Text="[Table.ACC_BPK_PSMZ_LIT]" HorzAlign="Center"/>
+          <TableCell Name="Cell45" Text="[Table.ACC_BPK_PSNO]" HorzAlign="Right"/>
+          <TableCell Name="Cell46" Text="[Table.ACC_BPK_PSNO_LIT]"/>
+          <TableCell Name="Cell47" Text="[Table.ACC_BPK_PSNVK]" HorzAlign="Right"/>
+          <TableCell Name="Cell48" Text="[Table.ACC_BPK_PSNVK_LIT]" HorzAlign="Center"/>
+          <TableCell Name="Cell49" Text="[Table.ACC_BPK_PSYS]"/>
+          <TableCell Name="Cell50" Text="[Table.ACC_BPK_REZID]" HorzAlign="Center"/>
+          <TableCell Name="Cell51" Text="[Table.ACC_BPK_TDK]" HorzAlign="Center"/>
+          <TableCell Name="Cell52" Text="[Table.ACC_BPK_TIP]"/>
+          <TableCell Name="Cell53" Text="[Table.ACC_BPK_TOVR_RATE]" HorzAlign="Right"/>
+          <TableCell Name="Cell54" Text="[Table.ACC_BPK_TOWN]"/>
+          <TableCell Name="Cell55" Text="[Table.ACC_BPK_TRANSF]"/>
+          <TableCell Name="Cell347" Text="[Substring([Table.ACC_BPK_TRANSF],0,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell348" Text="[Substring([Table.ACC_BPK_TRANSF],1,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell349" Text="[Substring([Table.ACC_BPK_TRANSF],2,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell351" Text="[Substring([Table.ACC_BPK_TRANSF],3,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell352" Text="[Substring([Table.ACC_BPK_TRANSF],4,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell353" Text="[Substring([Table.ACC_BPK_TRANSF],5,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell354" Text="[Substring([Table.ACC_BPK_TRANSF],6,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell355" Text="[Substring([Table.ACC_BPK_TRANSF],7,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell356" Text="[Substring([Table.ACC_BPK_TRANSF],8,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell357" Text="[Substring([Table.ACC_BPK_TRANSF],9,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell350" Text="[Substring([Table.ACC_BPK_TRANSF],10,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell359" Text="[Substring([Table.ACC_BPK_TRANSF],11,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell379" Text="[Substring([Table.ACC_BPK_TRANSF],12,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell380" Text="[Substring([Table.ACC_BPK_TRANSF],13,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell381" Text="[Substring([Table.ACC_BPK_TRANSF],14,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell382" Text="[Substring([Table.ACC_BPK_TRANSF],15,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell383" Text="[Substring([Table.ACC_BPK_TRANSF],16,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell384" Text="[Substring([Table.ACC_BPK_TRANSF],17,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell385" Text="[Substring([Table.ACC_BPK_TRANSF],18,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell409" Text="[Substring([Table.ACC_BPK_TRANSF],19,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell386" Text="[Substring([Table.ACC_BPK_TRANSI],0,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell387" Text="[Substring([Table.ACC_BPK_TRANSI],1,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell388" Text="[Substring([Table.ACC_BPK_TRANSI],2,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell389" Text="[Substring([Table.ACC_BPK_TRANSI],3,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell390" Text="[Substring([Table.ACC_BPK_TRANSI],4,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell391" Text="[Substring([Table.ACC_BPK_TRANSI],5,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell392" Text="[Substring([Table.ACC_BPK_TRANSI],6,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell393" Text="[Substring([Table.ACC_BPK_TRANSI],7,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell394" Text="[Substring([Table.ACC_BPK_TRANSI],8,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell395" Text="[Substring([Table.ACC_BPK_TRANSI],9,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell396" Text="[Substring([Table.ACC_BPK_TRANSI],10,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell410" Text="[Substring([Table.ACC_BPK_TRANSI],11,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell411" Text="[Substring([Table.ACC_BPK_TRANSI],12,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell412" Text="[Substring([Table.ACC_BPK_TRANSI],13,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell413" Text="[Substring([Table.ACC_BPK_TRANSI],14,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell414" Text="[Substring([Table.ACC_BPK_TRANSI],15,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell415" Text="[Substring([Table.ACC_BPK_TRANSI],16,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell416" Text="[Substring([Table.ACC_BPK_TRANSI],17,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell417" Text="[Substring([Table.ACC_BPK_TRANSI],18,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell418" Text="[Substring([Table.ACC_BPK_TRANSI],19,1)]" HorzAlign="Center"/>
+          <TableCell Name="Cell56" Text="[Table.ACC_BPK_TRANZIT]" HorzAlign="Right"/>
+          <TableCell Name="Cell57" Text="[Table.ACC_BPK_TRWAY4]" HorzAlign="Right"/>
+          <TableCell Name="Cell63" Text="[Table2.ACC_BPK_T0_1_0]" HorzAlign="Center"/>
+          <TableCell Name="Cell64" Text="[Table2.ACC_BPK_T0_1_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell65" Text="[Table2.ACC_BPK_T0_1_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell66" Text="[Table2.ACC_BPK_T1_1_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell67" Text="[Table2.ACC_BPK_T1_1_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell68" Text="[Table2.ACC_BPK_T1_1_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell69" Text="[Table2.ACC_BPK_T1_2_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell70" Text="[Table2.ACC_BPK_T1_2_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell71" Text="[Table2.ACC_BPK_T1_2_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell72" Text="[Table2.ACC_BPK_T1_3_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell73" Text="[Table2.ACC_BPK_T1_3_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell74" Text="[Table2.ACC_BPK_T1_4_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell75" Text="[Table2.ACC_BPK_T1_5_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell76" Text="[Table2.ACC_BPK_T1_6_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell77" Text="[Table2.ACC_BPK_T2_1_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell78" Text="[Table2.ACC_BPK_T2_1_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell79" Text="[Table2.ACC_BPK_T2_2_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell80" Text="[Table2.ACC_BPK_T2_2_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell81" Text="[Table2.ACC_BPK_T2_2_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell82" Text="[Table2.ACC_BPK_T2_2_4]" HorzAlign="Center"/>
+          <TableCell Name="Cell83" Text="[Table2.ACC_BPK_T2_2_5]" HorzAlign="Center"/>
+          <TableCell Name="Cell84" Text="[Table2.ACC_BPK_T2_2_6]" HorzAlign="Center"/>
+          <TableCell Name="Cell85" Text="[Table2.ACC_BPK_T3_1_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell86" Text="[Table2.ACC_BPK_T3_2_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell87" Text="[Table2.ACC_BPK_T3_2_10]" HorzAlign="Center"/>
+          <TableCell Name="Cell88" Text="[Table2.ACC_BPK_T3_2_11]" HorzAlign="Center"/>
+          <TableCell Name="Cell89" Text="[Table2.ACC_BPK_T3_2_12]" HorzAlign="Center"/>
+          <TableCell Name="Cell90" Text="[Table2.ACC_BPK_T3_2_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell91" Text="[Table2.ACC_BPK_T3_2_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell92" Text="[Table2.ACC_BPK_T3_2_4]" HorzAlign="Center"/>
+          <TableCell Name="Cell93" Text="[Table2.ACC_BPK_T3_2_5]" HorzAlign="Center"/>
+          <TableCell Name="Cell94" Text="[Table2.ACC_BPK_T3_2_6]" HorzAlign="Center"/>
+          <TableCell Name="Cell95" Text="[Table2.ACC_BPK_T3_2_7]" HorzAlign="Center"/>
+          <TableCell Name="Cell96" Text="[Table2.ACC_BPK_T3_2_8]" HorzAlign="Center"/>
+          <TableCell Name="Cell97" Text="[Table2.ACC_BPK_T3_2_9]" HorzAlign="Center"/>
+          <TableCell Name="Cell98" Text="[Table2.ACC_BPK_T3_3_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell99" Text="[Table2.ACC_BPK_T3_3_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell100" Text="[Table2.ACC_BPK_T3_3_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell101" Text="[Table2.ACC_BPK_T4_10_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell102" Text="[Table2.ACC_BPK_T4_10_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell103" Text="[Table2.ACC_BPK_T4_10_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell104" Text="[Table2.ACC_BPK_T4_1_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell106" Text="[Table2.ACC_BPK_T4_11_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell107" Text="[Table2.ACC_BPK_T4_11_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell108" Text="[Table2.ACC_BPK_T4_1_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell109" Text="[Table2.ACC_BPK_T4_12_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell110" Text="[Table2.ACC_BPK_T4_1_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell111" Text="[Table2.ACC_BPK_T4_13_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell112" Text="[Table2.ACC_BPK_T4_13_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell113" Text="[Table2.ACC_BPK_T4_13_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell114" Text="[Table2.ACC_BPK_T4_1_4]" HorzAlign="Center"/>
+          <TableCell Name="Cell115" Text="[Table2.ACC_BPK_T4_14_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell116" Text="[Table2.ACC_BPK_T4_14_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell117" Text="[Table2.ACC_BPK_T4_14_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell118" Text="[Table2.ACC_BPK_T4_14_4]" HorzAlign="Center"/>
+          <TableCell Name="Cell119" Text="[Table2.ACC_BPK_T4_15_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell120" Text="[Table2.ACC_BPK_T4_15_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell419" Text="[Table2.ACC_BPK_T4_15_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell420" Text="[Table2.ACC_BPK_T4_16_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell421" Text="[Table2.ACC_BPK_T4_16_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell422" Text="[Table2.ACC_BPK_T4_16_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell423" Text="[Table2.ACC_BPK_T4_16_4]" HorzAlign="Center"/>
+          <TableCell Name="Cell424" Text="[Table2.ACC_BPK_T4_17_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell425" Text="[Table2.ACC_BPK_T4_17_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell426" Text="[Table2.ACC_BPK_T4_18_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell427" Text="[Table2.ACC_BPK_T4_19_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell428" Text="[Table2.ACC_BPK_T4_2_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell429" Text="[Table2.ACC_BPK_T4_2_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell430" Text="[Table2.ACC_BPK_T4_2_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell431" Text="[Table2.ACC_BPK_T4_3_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell432" Text="[Table2.ACC_BPK_T4_3_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell433" Text="[Table2.ACC_BPK_T4_4_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell494" Text="[Table2.ACC_BPK_T4_4_2]"/>
+          <TableCell Name="Cell434" Text="[Table2.ACC_BPK_T4_5_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell435" Text="[Table2.ACC_BPK_T4_5_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell495" Text="[Table2.ACC_BPK_T4_5_3]"/>
+          <TableCell Name="Cell437" Text="[Table2.ACC_BPK_T4_6_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell438" Text="[Table2.ACC_BPK_T4_6_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell439" Text="[Table2.ACC_BPK_T4_6_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell440" Text="[Table2.ACC_BPK_T4_7_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell441" Text="[Table2.ACC_BPK_T4_7_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell442" Text="[Table2.ACC_BPK_T4_8_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell491" Text="[Table2.ACC_BPK_T4_8_2]"/>
+          <TableCell Name="Cell443" Text="[Table2.ACC_BPK_T4_9_1]" HorzAlign="Center"/>
+          <TableCell Name="Cell444" Text="[Table2.ACC_BPK_T4_9_2]" HorzAlign="Center"/>
+          <TableCell Name="Cell445" Text="[Table2.ACC_BPK_T4_9_3]" HorzAlign="Center"/>
+          <TableCell Name="Cell436" Text="[Table.ACC_BPK_ZPASP_ATRT]"/>
+          <TableCell Name="Cell476" Text="[Table.ACC_BPK_ZPASP_NO]"/>
+          <TableCell Name="Cell477" Text="[Table.ACC_BPK_ZPASP_STOP_DATE]"/>
+          <TableCell Name="Cell478" Text="[Table.BR]" HorzAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

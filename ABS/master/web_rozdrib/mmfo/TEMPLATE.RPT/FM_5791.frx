@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/15/2017 09:54:13" ReportInfo.Modified="12/15/2017 10:53:39" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQDS5Lavlh8PrBfIypJR2Kj8=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum,&#13;&#10;      x.rnk,&#13;&#10;       x.nmk,&#13;&#10;       x.bday,&#13;&#10;       x.date_on,&#13;&#10;            (select case when count(risk_id)&gt;=1 then 'Так' else 'Ні' end &#13;&#10;             from  customer_risk&#13;&#10;             where rnk = x.rnk and risk_id in  (2, 3, 62, 63, 64, 65)&#13;&#10;             and  dat_begin &lt;= x.dapp and (dat_end is null or dat_end &gt; x.dapp)) &#13;&#10;         publ,&#13;&#10;       x.okpo,&#13;&#10;       to_char(x.dos,'FM999999999999999999999999999990D09','NLS_NUMERIC_CHARACTERS = '',.''') dos,&#13;&#10;       to_char(x.kos,'FM999999999999999999999999999990D09','NLS_NUMERIC_CHARACTERS = '',.''') kos,&#13;&#10;       to_char(x.ost,'FM999999999999999999999999999990D09','NLS_NUMERIC_CHARACTERS = '',.''') ost,&#13;&#10;       x.branch,&#13;&#10;       x.k030,&#13;&#10;       x.k060,&#13;&#10;       null datb,  -- 14 Дата народ.&#13;&#10;       null work_p, --15 Місце роботи, посада&#13;&#10;       null nls_in_cp, -- 16 Наянвість рахунку в ЦП&#13;&#10;       null dat_fm, -- 17 Дата первинного завовнення анкети ФМ&#13;&#10;       null rizik_cr, --18 Рівень ризику&#13;&#10;       null o_rep, --19 Оціка репутації&#13;&#10;       null  finstan--, --20 Оцінка фінстану  &#13;&#10;from( select c.rnk,&#13;&#10;       c.nmk,&#13;&#10;       p.bday,&#13;&#10;       c.date_on,&#13;&#10;       c.okpo,&#13;&#10;       sum(case when a.DOSPQ&gt;0 then a.DOSPQ/100   else 0 end) dos,&#13;&#10;       sum(case when a.KOSPQ&gt;0 then a.KOSPQ/100   else 0 end) kos,&#13;&#10;       sum(case when a.OSTPIQ&gt;0 then a.OSTPIQ/100 else 0 end) ost,&#13;&#10;       c.branch,      &#13;&#10;       co.rezid k030,&#13;&#10;       c.prinsider k060,&#13;&#10;       a.dapp&#13;&#10; from  tmp_lic a,&#13;&#10;       customer c,&#13;&#10;       codcagent co,&#13;&#10;       person   p&#13;&#10; where  c.rnk=a.id &#13;&#10;   and co.codcagent=c.codcagent&#13;&#10;   and c.custtype = 3 &#13;&#10;   and p.rnk=c.rnk&#13;&#10;   group by  c.rnk, c.nmk, p.bday, c.date_on,&#13;&#10;             c.okpo, c.branch, c.k050, co.rezid, &#13;&#10;             c.prinsider, a.dapp ) x">
+        <Column Name="ROWNUM" DataType="System.Decimal"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="BDAY" DataType="System.DateTime"/>
+        <Column Name="DATE_ON" DataType="System.DateTime"/>
+        <Column Name="PUBL" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="DOS" DataType="System.String"/>
+        <Column Name="KOS" DataType="System.String"/>
+        <Column Name="OST" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="K030" DataType="System.Int16"/>
+        <Column Name="K060" DataType="System.Decimal"/>
+        <Column Name="DATB" DataType="System.String"/>
+        <Column Name="WORK_P" DataType="System.String"/>
+        <Column Name="NLS_IN_CP" DataType="System.String"/>
+        <Column Name="DAT_FM" DataType="System.String"/>
+        <Column Name="RIZIK_CR" DataType="System.String"/>
+        <Column Name="O_REP" DataType="System.String"/>
+        <Column Name="FINSTAN" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="400" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1436.4" Height="226.8" CanShrink="true" Guides="122.85,122.85,122.85,122.85">
+      <TextObject Name="Text1" Width="1436.4" Height="18.9" Text="Клієнти-фізичні особи" HorzAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+      <TableObject Name="Table1" Top="18.9" Width="1436.87" Height="103.95" Border.Lines="All">
+        <TableColumn Name="Column1" Width="27.71"/>
+        <TableColumn Name="Column2" Width="188.35"/>
+        <TableColumn Name="Column3" Width="84.41"/>
+        <TableColumn Name="Column4" Width="103.31"/>
+        <TableColumn Name="Column5" Width="112.76"/>
+        <TableColumn Name="Column6" Width="74.96"/>
+        <TableColumn Name="Column7" Width="150.56"/>
+        <TableColumn Name="Column8" Width="150.56"/>
+        <TableColumn Name="Column9" Width="74.96"/>
+        <TableColumn Name="Column10" Width="141.1"/>
+        <TableColumn Name="Column11" Width="93.86"/>
+        <TableColumn Name="Column12" Width="84.41"/>
+        <TableColumn Name="Column13" Width="74.96"/>
+        <TableColumn Name="Column14" Width="74.96"/>
+        <TableRow Name="Row1" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№ з/п" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Прізвище, ім'я, по-батькові " HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Дата народження" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Дата відкриття першого рахунку (2620, 2625, 2630, 2635)&#13;&#10;" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Публічна особа / особа, близька або пов'язана із публічною особою (Так/Ні)" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="РНОКПП " HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="Обсяг фінансових операцій із зарахування коштів на рахунки клієнта за попередній місяць (тис.грн.)" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Обсяг фінансових операцій із списання коштів з рахунків клієнта за попередній місяць (тис.грн.)" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="Залишок коштів на рахунках клієнта (тис.грн.)&#13;&#10;" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="Бранч відділення / відокремленого підрозділу, в якому відкрито рахунки" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="Резидентність (К030)" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="Ознака пов'язаності з Банком (К060)" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="Місце роботи, посада" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="Критерії ризику" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="11" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="12" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="13" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="14" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="228.63" Width="1436.4" Height="141.75" Guides="0" DataSource="Table">
+      <TableObject Name="Table2" Width="1436.87" Height="85.05" Border.Lines="All">
+        <TableColumn Name="Column15" Width="27.71"/>
+        <TableColumn Name="Column16" Width="188.35"/>
+        <TableColumn Name="Column17" Width="84.41"/>
+        <TableColumn Name="Column18" Width="103.31"/>
+        <TableColumn Name="Column19" Width="112.76"/>
+        <TableColumn Name="Column20" Width="74.96"/>
+        <TableColumn Name="Column21" Width="150.56"/>
+        <TableColumn Name="Column22" Width="150.56"/>
+        <TableColumn Name="Column23" Width="74.96"/>
+        <TableColumn Name="Column24" Width="141.1"/>
+        <TableColumn Name="Column25" Width="93.86"/>
+        <TableColumn Name="Column26" Width="84.41"/>
+        <TableColumn Name="Column27" Width="74.96"/>
+        <TableColumn Name="Column28" Width="74.96"/>
+        <TableRow Name="Row3" Height="85.05" AutoSize="true">
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Table.ROWNUM]№ з/п" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.DATB]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.DATE_ON]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.PUBL]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[Table.DOS]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="[Table.KOS]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.OST]&#13;&#10;" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[Table.K030]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[Table.K060]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Table.WORK_P]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[Table.RIZIK_CR]" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

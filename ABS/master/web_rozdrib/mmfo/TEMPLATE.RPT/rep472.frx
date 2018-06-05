@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/06/2017 11:18:42" ReportInfo.Modified="03/15/2017 16:34:02" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _FinishReport(object sender, EventArgs e)
+    {
+     
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE4SfRUo0gAvZZlixYq2Z3og3QOijqP8xYymRQ1qbWL4xQ==">
+      <TableDataSource Name="Table" Alias="rep" DataType="System.Int32" Enabled="true" SelectCommand="select t.name,  c.kv, c.bsum,&#13;&#10;		               to_char(c.RATE_o) RATE_O,&#13;&#10;     		               to_char(c.RATE_B) RATE_B,&#13;&#10;		               to_char(c.RATE_S) RATE_S&#13;&#10;			     from tabval t,cur_rates c&#13;&#10;                            where c.vdate=(select max(fdat) from fdat) and &#13;&#10;			      c.kv=t.kv and &#13;&#10;			      c.RATE_B is not null">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="BSUM" DataType="System.Double"/>
+        <Column Name="RATE_O" DataType="System.String"/>
+        <Column Name="RATE_B" DataType="System.String"/>
+        <Column Name="RATE_S" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="1000" FirstPageSource="15" OtherPagesSource="15" Guides="3685.5,3694.95,3685.5,3694.95,3685.5,3685.5,3694.95,3694.95">
+    <DataBand Name="Data1" Width="3704.4" Height="18.9" CanGrow="true" DataSource="Table">
+      <TextObject Name="Text1" Width="292.95" Height="18.9" Text="[rep.NAME]"/>
+      <TextObject Name="Text2" Left="292.95" Width="37.8" Height="18.9" Text="|[rep.KV]"/>
+      <TextObject Name="Text3" Left="330.75" Width="94.5" Height="18.9" Text="|[rep.BSUM]"/>
+      <TextObject Name="Text4" Left="425.25" Width="94.5" Height="18.9" Text="|[rep.RATE_O]"/>
+      <TextObject Name="Text5" Left="519.75" Width="94.5" Height="18.9" Text="|[rep.RATE_B]"/>
+      <TextObject Name="Text6" Left="614.25" Width="94.5" Height="18.9" Text="|[rep.RATE_S]"/>
+    </DataBand>
+  </ReportPage>
+</Report>

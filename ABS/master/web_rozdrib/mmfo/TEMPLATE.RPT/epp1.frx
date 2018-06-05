@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/08/2017 16:05:30" ReportInfo.Modified="06/09/2017 13:58:37" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="mmfo" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRBNuIc30XdbrG872kNe1o0HrIRrgQvipjQflb1C0/iiN+72RPKNXTpBRLnSgS4IcBw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;NUM00 RNUM,&#13;&#10;CHAR00 BRANCH,&#13;&#10;NUM01 RNK,&#13;&#10;CHAR01 FIO, &#13;&#10;CHAR02 NLS,&#13;&#10;CHAR03 idkod,&#13;&#10;CHAR04 epp_number,&#13;&#10;CHAR05 passport,&#13;&#10;NUM02 STATE_ID,&#13;&#10;CHAR06 TXT&#13;&#10;from rs_tmp_report_data where session_id=:SESSION_ID order by id&#13;&#10;">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Int32"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="IDKOD" DataType="System.String"/>
+        <Column Name="EPP_NUMBER" DataType="System.String"/>
+        <Column Name="PASSPORT" DataType="System.String"/>
+        <Column Name="STATE_ID" DataType="System.Int32"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <Column Name="RNUM" DataType="System.Int32"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="Head" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;sys_context ('bars_context', 'user_branch') branch,b.name as branch_name,s.fio                                               &#13;&#10;from staff$base s, branch b&#13;&#10;where s.id = user_id&#13;&#10;and b.branch = sys_context ('bars_context', 'user_branch')&#13;&#10;">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Total Name="Total" Expression="[Table.RNUM]" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="297" PaperHeight="210" LeftMargin="5" RightMargin="5">
+    <ReportTitleBand Name="ReportTitle1" Width="1084.86" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader1" Top="41.25" Width="1084.86" Height="66.15">
+      <TableObject Name="Table4" Left="7.56" Width="1065.96" Height="37.8">
+        <TableColumn Name="Column14" Width="355.32"/>
+        <TableColumn Name="Column15" Width="355.32"/>
+        <TableColumn Name="Column16" Width="355.32"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell20"/>
+          <TableCell Name="Cell21"/>
+          <TableCell Name="Cell22" Text="Звіт про помилкові ЕПП" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell25" Border.Lines="Bottom" Text="Користувач: [Head.FIO]" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+          <TableCell Name="Cell26" Border.Lines="Bottom"/>
+          <TableCell Name="Cell27" Border.Lines="Bottom" Text="Надруковано: [Date]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="7.56" Top="47.25" Width="1067.85" Height="18.9" Border.Lines="All">
+        <TableColumn Name="Column17" Width="56.7"/>
+        <TableColumn Name="Column18" Width="143.64"/>
+        <TableColumn Name="Column19" Width="88.83"/>
+        <TableColumn Name="Column20" Width="154.98"/>
+        <TableColumn Name="Column21" Width="98.28"/>
+        <TableColumn Name="Column22" Width="88.83"/>
+        <TableColumn Name="Column23" Width="98.28"/>
+        <TableColumn Name="Column24" Width="88.83"/>
+        <TableColumn Name="Column25" Width="45.36"/>
+        <TableColumn Name="Column26" Width="204.12"/>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell28" Border.Lines="Right" Fill.Color="Gainsboro" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell29" Border.Lines="Right" Fill.Color="Gainsboro" Text="Бранч" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell30" Border.Lines="Right" Fill.Color="Gainsboro" Text="РНК" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell31" Border.Lines="Right" Fill.Color="Gainsboro" Text="ПІБ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell32" Border.Lines="Right" Fill.Color="Gainsboro" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell33" Border.Lines="Right" Fill.Color="Gainsboro" Text="ІНН" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell34" Border.Lines="Right" Fill.Color="Gainsboro" Text="ЕПП" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell35" Border.Lines="Right" Fill.Color="Gainsboro" Text="Паспорт" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell36" Border.Lines="Right" Fill.Color="Gainsboro" Text="Статус" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell37" Border.Lines="Right" Fill.Color="Gainsboro" Text="Коментар" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="110.85" Width="1084.86" Height="18.9" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table1" Left="7.56" Width="1067.85" Height="18.9" Border.Lines="All" GrowToBottom="true">
+        <TableColumn Name="Column10" Width="56.7"/>
+        <TableColumn Name="Column1" Width="143.64"/>
+        <TableColumn Name="Column2" Width="88.83"/>
+        <TableColumn Name="Column3" Width="154.98"/>
+        <TableColumn Name="Column4" Width="98.28"/>
+        <TableColumn Name="Column5" Width="88.83"/>
+        <TableColumn Name="Column6" Width="98.28"/>
+        <TableColumn Name="Column7" Width="88.83"/>
+        <TableColumn Name="Column8" Width="45.36"/>
+        <TableColumn Name="Column9" Width="204.12"/>
+        <TableRow Name="Row1" AutoSize="true">
+          <TableCell Name="Cell10" Border.Lines="Right" Text="[Table.RNUM]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1" Border.Lines="Right" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell2" Border.Lines="Right" Text="[Table.RNK]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell3" Border.Lines="Right" Text="[Table.FIO]" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell4" Border.Lines="Right" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell5" Border.Lines="Right" Text="[Table.IDKOD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell6" Border.Lines="Right" Text="[Table.EPP_NUMBER]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell7" Border.Lines="Right" Text="[Table.PASSPORT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell8" Border.Lines="Right" Text="[Table.STATE_ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell9" Text="[Table.TXT]" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="133.19" Width="1084.86" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="155.54" Width="1084.86" Height="47.25">
+      <TableObject Name="Table2" Left="7.56" Top="9.45" Width="1069.74" Height="37.8">
+        <TableColumn Name="Column11" Width="289.17"/>
+        <TableColumn Name="Column12" Width="317.52"/>
+        <TableColumn Name="Column13" Width="463.05"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell11" Border.Lines="Top" RowSpan="2"/>
+          <TableCell Name="Cell12" Border.Lines="Top"/>
+          <TableCell Name="Cell18" Border.Lines="Top" Text="Сторінка [Page#] з [TotalPages#]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell16"/>
+          <TableCell Name="Cell17"/>
+          <TableCell Name="Cell19" Text="[Head.BRANCH_NAME]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt, style=Italic"/>
+        </TableRow>
+      </TableObject>
+      <PictureObject Name="Picture1" Left="1.89" Top="11.34" Width="75.6" Height="30.24" Image="iVBORw0KGgoAAAANSUhEUgAAAKYAAABTCAYAAAAV13zdAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAABI1JREFUeF7tlmGKHjkQQ78rzSXC3v8IgZxjFv8QaIXK3U6718UgwWNsvXKThErI5/PPr+8Q2mHLEE5jyxBOY8sQTmPLEE5jyxBOY8sQTmPLEE5jyxBOY8sQTmPLEE5jyxBOY8sQTmPLEE5jy40g1V3RzGaqfkRdxcqsgjg3WI37hnJnjuP8gFP1I+wUxLnH2HITSOVcP+DMfNWPqKtAnLuC4/yA4/wAcU5BnGM4q56jDiDObcGWG0CcGyDODZAVx1FXgTh3Bcd5gDg3QJxjOM4znCd+1W3Dlg/hOA+QXY6jzqFxMxUaNwMQ5waIcwzHeYbzxN/tt2PLhyDOMZzKaT9zHHUOzCHqZ2AeUc8gzt0F0XMF54m/6l7Dlg/gOM9wKqf9zHHUKTzD4ZkKRM8ViHN34fcIe4XzxFf317HlAzjOM5zKaT9zHHUKz3B4pkLnEO4YFzdXgVR3x0ruvndzr2HLB3CcZziV037mOOoY5znqGOSqYxDXIewU5xHtAeeJ5/OIzr2GLR/AcZ7hVE77meOoY5znqGOc56hjP3MjM3+3B5wnXu8jPPcatnwI4hzDqZz2M8dRx1zFvRkgb7iRK1/l6t0T77oR7l/Blg/hOA84ldN+5jjqwJUbcW6AzNxI5bQHiOu1A5w3fdWPqNuKLR/CcX7AmfkVx1EHZm6A3O0Bp3LasxtxTjuGs+JW/MyNOL8FW26AM/PODZAVx1EH73qG43ruFI7rubtyiPYMZ8Wt+JkbcX4LttxIFTfL7Ip+k+8OjuvupvqmC8/qG+cYzp1+1Ts30LiZR9jyB4A4t8rqd1bng8GWPwDEuVVWv7M6Hwy2/AEgzq2y+p3V+WCwZQinsWUIp7FlCKexZQinsWUIp7FlCKexZQinsWUIp7FlCKexZQinsWUIp/nz++s7hG5kMUNLspihJVnM0JIsZmhJFjO0JIsZWpLFDC3JYoaWZDFDS7KYoSVZzNCSLGZoSRYztKTVYn4+n//gZsI+Ov9Z51/M0JLXFtP9LeRO/6ZezWvPVDNXnb6/8hV3Zgb4XjXPfjajd3Q4c6ezrkPv3rk3s34Xry6m+02iU6+zVTfrGf0+Or1zp2edr3CzV3ft+Bt8Vqo3zuHMnfbcVZ7v3FduB//bYuKOznmcnVfneoC3Osc9w57n0F/hvjO7c89n3Kt5OPzUGb5XftbhrPC8zqnbxav/x+RfvP5m+Iw7n9Uz7N0MOvW4K86juwPm+Sd/o/oez+HM6DzPzRzDjmf0DZ8VzPIbnle/g1cWU3/hCrvqDXeKvnN3hh3OPKt37WfwLL91Pb+renRu/spXbwb8juf4rg6d3hX2u3h1MXHGvTrzXTucGffOOfUzxx49uwqeu3Nmqq6ah8dPnbl6w3d01Zlnr+7a7aDdYuKOju/cM9q7WZwrpx4OHTtGZ9yZ7wo8ZniWHeBe5+68wR1ddeZZPjuv3Q5e/T9mCH9LFjO0JIsZWpLFDC3JYoaWZDFDS7KYoSVZzNCSLGZoSRYztCSLGVqSxQwtyWKGlmQxQ0uymKElWczQkixmaEkWMzTk6/tftczhtQ/8utMAAAAASUVORK5CYII="/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

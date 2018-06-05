@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/11/2013 17:00:06" ReportInfo.Modified="04/13/2013 20:45:46" ReportInfo.CreatorVersion="1.9.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiU/8YG//r3sk2NeJlmO7mmg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum ID, daos DAT, nmk NMK, nd ND, null PAWN_ND&#13;&#10;from (&#13;&#10;select a.daos, c.nmk, o.nd||', '||d.name nd&#13;&#10;  from w4_acc o, accounts a, customer c, w4_card w, w4_subproduct d&#13;&#10; where o.acc_pk = a.acc&#13;&#10;   and a.rnk = c.rnk   &#13;&#10;   and o.card_code = w.code and w.sub_code = d.code&#13;&#10;   and a.nls like '2625%'&#13;&#10;   and a.daos &gt;= :sFdat and a.daos &lt;= :sFdat2&#13;&#10;   and a.branch like sys_context ('bars_context', 'user_branch_mask')&#13;&#10; order by a.daos, c.nmk )">
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="DAT" DataType="System.DateTime"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="PAWN_ND" DataType="System.String"/>
+        <CommandParameter Name="sFdat" DataType="106" Expression="[sFdat]" DefaultValue="01.01.2012"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="12.10.2012"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat" DataType="System.String"/>
+    <Parameter Name="sFdat2" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="132.3">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="699.3" Height="37.8" Text="Книга реєстрації Договорів про відкриття рахунку та обслуговування платіжних карток (для фізичних осіб)." HorzAlign="Center" Font="Arial, 11pt, style=Bold"/>
+      <TableObject Name="Table1" Left="9.45" Top="66.15" Width="704.97" Height="66.15" Border.Lines="All">
+        <TableColumn Name="Column1" Width="45.36"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3" Width="120.96"/>
+        <TableColumn Name="Column4" Width="75.6"/>
+        <TableColumn Name="Column17"/>
+        <TableColumn Name="Column5" Width="75.6"/>
+        <TableColumn Name="Column7" Width="75.6"/>
+        <TableColumn Name="Column8" Width="113.4"/>
+        <TableColumn Name="Column6"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№&#13;&#10;п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="П. І. Б. клієнта&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="№ договору, тип плат. картки&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="№ договору&#13;&#10;застави&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Дата&#13;&#10;підписання&#13;&#10;договорів&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="Дата&#13;&#10;отримання&#13;&#10;договорів&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="Примітки" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell26" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell9" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="5" HorzAlign="Center"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="136.3" Width="718.2" Height="28.35" CanGrow="true" DataSource="Table">
+      <TableObject Name="Table2" Left="9.45" Width="704.97" Height="28.35" Border.Lines="All" GrowToBottom="true">
+        <TableColumn Name="Column9" Width="45.36"/>
+        <TableColumn Name="Column10"/>
+        <TableColumn Name="Column11" Width="120.96"/>
+        <TableColumn Name="Column12" Width="75.6"/>
+        <TableColumn Name="Column18"/>
+        <TableColumn Name="Column13" Width="75.6"/>
+        <TableColumn Name="Column14" Width="75.6"/>
+        <TableColumn Name="Column15" Width="113.4"/>
+        <TableColumn Name="Column16"/>
+        <TableRow Name="Row4" Height="28.35">
+          <TableCell Name="Cell46" Border.Lines="All" Text="[Table.ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[Table.DAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.NMK]" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[Table.PAWN_ND]" Font="Arial, 7pt"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.DAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell51" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell52" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

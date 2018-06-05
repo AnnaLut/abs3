@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/17/2016 16:56:36" ReportInfo.Modified="09/19/2016 15:51:15" ReportInfo.CreatorVersion="2013.2.2.0" PrintSettings.PrintOnSheetWidth="297" PrintSettings.PrintOnSheetHeight="210">
+  <Dictionary>
+    <OracleDataConnection Name="cobummfo_core" ConnectionString="rijcmlq/aVeGBEd5IyArDSDpS1mnKeZmNckkVgwDxq0qmoLseKdycC7BQF0b0aCKF7cFz+O8NxC7YImOqm+63xecx214g==">
+      <TableDataSource Name="Table2" Alias="head" DataType="System.Int32" Enabled="true" SelectCommand="select fio from staff$base where id = user_id">
+        <Column Name="FIO" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="CVType" DataType="System.Int32" Enabled="true" SelectCommand="select nls, vid, opldok_ref, fdat, mfo_d, &#13;&#10;                            nls_d,&#13;&#10;                            mfo_k,&#13;&#10;                            nls_k,&#13;&#10;                            dk, s, vob, nd,&#13;&#10;                            kv, datd, datp, &#13;&#10;                            nam_a,&#13;&#10;                            nam_b,&#13;&#10;                            nazn,&#13;&#10;                            d_rec, &#13;&#10;                            naznk, &#13;&#10;                            nazns, &#13;&#10;                            id_d,&#13;&#10;                            id_k,&#13;&#10;                            ref, &#13;&#10;                            dat_a, &#13;&#10;                            dat_b&#13;&#10;                       from v_dpa_cv&#13;&#10;                        where fdat = to_date(:entereddate,'dd/mm/yyyy')&#13;&#10;                        order by nls">
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="VID" DataType="System.Int16"/>
+        <Column Name="OPLDOK_REF" DataType="System.Decimal"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="MFO_D" DataType="System.String"/>
+        <Column Name="NLS_D" DataType="System.String"/>
+        <Column Name="MFO_K" DataType="System.String"/>
+        <Column Name="NLS_K" DataType="System.String"/>
+        <Column Name="DK" DataType="System.Int16"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="VOB" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="DATD" DataType="System.DateTime"/>
+        <Column Name="DATP" DataType="System.DateTime"/>
+        <Column Name="NAM_A" DataType="System.String"/>
+        <Column Name="NAM_B" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="D_REC" DataType="System.String"/>
+        <Column Name="NAZNK" DataType="System.String"/>
+        <Column Name="NAZNS" DataType="System.String"/>
+        <Column Name="ID_D" DataType="System.String"/>
+        <Column Name="ID_K" DataType="System.String"/>
+        <Column Name="REF" DataType="System.String"/>
+        <Column Name="DAT_A" DataType="System.DateTime"/>
+        <Column Name="DAT_B" DataType="System.DateTime"/>
+        <CommandParameter Name="entereddate" DataType="126"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="entereddate" DataType="System.String"/>
+    <Parameter Name="fileName" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="9.45">
+    <PageHeaderBand Name="PageHeader1" Width="1047.06" Height="52.92"/>
+    <DataBand Name="Data2" Top="56.92" Width="1047.06" Height="113.4" DataSource="Table2">
+      <TextObject Name="Text2" Left="9.45" Top="37.8" Width="302.4" Height="18.9" Text="Дата і час друку: [FormatDateTime([Date],&quot;dd/MM/yyyy hh:mm:ss&quot;)]" Font="Arial, 6pt"/>
+      <TextObject Name="Text1" Left="9.45" Top="18.9" Width="292.95" Height="18.9" Text="Користувач [head.FIO]" Font="Arial, 6pt"/>
+      <TextObject Name="Text3" Left="9.45" Top="56.7" Width="292.95" Height="18.9" Text="Звіт для файл [fileName]" Font="Arial, 6pt"/>
+      <TableObject Name="Table5" Left="9.45" Top="94.5" Width="1024.17" Height="18.9">
+        <TableColumn Name="Column63" Width="40.15"/>
+        <TableColumn Name="Column64" Width="30.7"/>
+        <TableColumn Name="Column65" Width="49.6"/>
+        <TableColumn Name="Column66" Width="49.6"/>
+        <TableColumn Name="Column67" Width="49.6"/>
+        <TableColumn Name="Column68" Width="40.15"/>
+        <TableColumn Name="Column69" Width="30.25"/>
+        <TableColumn Name="Column70" Width="30.25"/>
+        <TableColumn Name="Column71" Width="58.6"/>
+        <TableColumn Name="Column72" Width="49.15"/>
+        <TableColumn Name="Column73" Width="58.6"/>
+        <TableColumn Name="Column74" Width="39.7"/>
+        <TableColumn Name="Column75" Width="30.25"/>
+        <TableColumn Name="Column76" Width="49.15"/>
+        <TableColumn Name="Column77" Width="39.7"/>
+        <TableColumn Name="Column78" Width="39.7"/>
+        <TableColumn Name="Column79" Width="39.7"/>
+        <TableColumn Name="Column80" Width="39.7"/>
+        <TableColumn Name="Column81" Width="39.7"/>
+        <TableColumn Name="Column82" Width="39.7"/>
+        <TableColumn Name="Column83" Width="30.25"/>
+        <TableColumn Name="Column84" Width="39.7"/>
+        <TableColumn Name="Column85" Width="30.25"/>
+        <TableColumn Name="Column86" Width="49.15"/>
+        <TableColumn Name="Column87" Width="30.87"/>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell63" Border.Lines="All" Text="Рахунок&#13;&#10;" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Text="ВІД" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="Дата" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell66" Border.Lines="All" Text="МФО А" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="Рахунок А" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell68" Border.Lines="All" Text="МФО Б" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="Рахунок Б" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell70" Border.Lines="All" Text="ДК" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="Сума" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="Вид" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="№ док." HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell74" Border.Lines="All" Text="Валюта" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="Дата док." HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="Дата сплати" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="Платник" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell78" Border.Lines="All" Text="Отримувач" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell79" Border.Lines="All" Text="Призначення" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell80" Border.Lines="All" Text="Дод. реквізит" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell81" Border.Lines="All" Text="Призн. до" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell82" Border.Lines="All" Text="Призн. з" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell83" Border.Lines="All" Text="ЗКПО А" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell84" Border.Lines="All" Text="ЗКПО Б" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell85" Border.Lines="All" Text="Реф. " HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell86" Border.Lines="All" Text="Дата А" HorzAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell87" Border.Lines="All" Text="Дата Б" HorzAlign="Center" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data1" Top="174.32" Width="1047.06" Height="18.9" DataSource="Table4">
+      <TableObject Name="Table5" Left="9.45" Width="1024.17" Height="18.9">
+        <TableColumn Name="Column37" Width="40.15"/>
+        <TableColumn Name="Column38" Width="30.7"/>
+        <TableColumn Name="Column39" Width="49.6"/>
+        <TableColumn Name="Column40" Width="49.6"/>
+        <TableColumn Name="Column41" Width="49.6"/>
+        <TableColumn Name="Column42" Width="40.15"/>
+        <TableColumn Name="Column43" Width="30.25"/>
+        <TableColumn Name="Column44" Width="30.25"/>
+        <TableColumn Name="Column45" Width="58.6"/>
+        <TableColumn Name="Column46" Width="49.15"/>
+        <TableColumn Name="Column47" Width="58.6"/>
+        <TableColumn Name="Column48" Width="39.7"/>
+        <TableColumn Name="Column49" Width="30.25"/>
+        <TableColumn Name="Column50" Width="49.15"/>
+        <TableColumn Name="Column51" Width="39.7"/>
+        <TableColumn Name="Column52" Width="39.7"/>
+        <TableColumn Name="Column53" Width="39.7"/>
+        <TableColumn Name="Column54" Width="39.7"/>
+        <TableColumn Name="Column55" Width="39.7"/>
+        <TableColumn Name="Column56" Width="39.7"/>
+        <TableColumn Name="Column57" Width="30.25"/>
+        <TableColumn Name="Column58" Width="39.7"/>
+        <TableColumn Name="Column59" Width="30.25"/>
+        <TableColumn Name="Column60" Width="49.15"/>
+        <TableColumn Name="Column61" Width="30.87"/>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell37" Border.Lines="All" Text="[CVType.NLS]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[CVType.VID]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[CVType.FDAT]" Format="Date" Format.Format="d" Font="Arial, 6pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[CVType.MFO_D]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[CVType.NLS_D]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[CVType.MFO_K]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[CVType.NLS_K]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[CVType.DK]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[CVType.S]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="[CVType.VOB]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="[CVType.ND]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[CVType.KV]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[CVType.DATD]" Format="Date" Format.Format="d" Font="Arial, 6pt"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[CVType.DATP]" Format="Date" Format.Format="d" Font="Arial, 6pt"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[CVType.NAM_A]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[CVType.NAM_B]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="[CVType.NAZN]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[CVType.D_REC]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="[CVType.NAZNK]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[CVType.NAZNS]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[CVType.ID_D]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[CVType.ID_K]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[CVType.REF]" Font="Arial, 6pt"/>
+          <TableCell Name="Cell60" Border.Lines="All" Text="[CVType.DAT_A]" Format="Date" Format.Format="d" Font="Arial, 6pt"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="[CVType.DAT_B]" Format="Date" Format.Format="d" Font="Arial, 6pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="197.22" Width="1047.06" Height="151.2"/>
+  </ReportPage>
+</Report>

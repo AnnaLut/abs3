@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/26/2011 14:55:15" ReportInfo.Modified="11/05/2012 14:40:02" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF15TE2eO7inhdLIlr+Rbwy/GgnU+vHq81YWUF8rPvJ16PX4HV5dkQ+zo/anfNuFKSfJNe+oUZH0ef9EP6l8hzd08=">
+      <TableDataSource Name="Table12" Alias="Branch_Info" DataType="System.Int32" Enabled="true" SelectCommand="select e.BRANCH, e.SEK, e.GRP, e.KOEF, e.ID, e.NAME, t.N1, t.N2, t.N1*e.KOEF Q1, t.N2*e.KOEF Q2, e.NAMEB&#13;&#10;from (select  c.branch, b.SEK, b.GRP, b.KOEF, b.ID, b.NAME, c.name NAMEB &#13;&#10;      from bs0 b, branch c where length(branch) =15 and b.nrep = 2 ) e , &#13;&#10;     (select  substr(BRANCH,1,15) branch,  To_number(substr(nls,10,5)) ID , &#13;&#10;          Sum(fost(acc, to_date(:sFdat1,'dd.mm.yyyy') -1)) N1,&#13;&#10;          Sum(fost(acc, to_date(:sFdat2,'dd.mm.yyyy')  )) N2 &#13;&#10;      from v_gl where kv=980 and nls like '0000%' and nbs is null and length(branch) &gt;8 &#13;&#10;      group by substr(BRANCH,1,15), To_number(substr(nls,10,5)) &#13;&#10;     ) t &#13;&#10;where  abs(e.id) = t.id (+) and  e.branch = t.branch (+)  &#13;&#10;order by  e.SEK,  e.GRP, e.BRANCH  ">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="GRP" DataType="System.Decimal"/>
+        <Column Name="SEK" DataType="System.Decimal"/>
+        <Column Name="KOEF" DataType="System.Decimal"/>
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="N1" DataType="System.Decimal"/>
+        <Column Name="N2" DataType="System.Decimal"/>
+        <Column Name="Q1" DataType="System.Decimal"/>
+        <Column Name="Q2" DataType="System.Decimal"/>
+        <Column Name="NAMEB" DataType="System.String"/>
+        <CommandParameter Name="N1" DataType="106" Expression="[sFdat1]" DefaultValue="12.12.2001"/>
+        <CommandParameter Name="N2" DataType="106" Expression="[sFdat2]" DefaultValue="12.12.2001"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page2">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader1" Top="42.1" Width="718.2" Height="28.35">
+      <TextObject Name="Text2" Left="359.1" Width="94.5" Height="18.9" Text="KOEF"/>
+      <TextObject Name="Text3" Left="47.25" Width="94.5" Height="18.9" Text="NAME"/>
+    </PageHeaderBand>
+    <DataBand Name="Data2" Top="74.75" Width="718.2" Height="75.6" DataSource="Table12">
+      <TextObject Name="Text1" Left="47.25" Top="9.45" Width="226.8" Height="18.9" Text="[Branch_Info.NAME]"/>
+      <TextObject Name="Text4" Left="368.55" Top="18.9" Width="94.5" Height="18.9" Text="[Branch_Info.Q2]" Format="Currency" Format.UseLocale="true" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter2" Top="154.65" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

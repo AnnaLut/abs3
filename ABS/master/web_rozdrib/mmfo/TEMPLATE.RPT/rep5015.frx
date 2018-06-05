@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="11/03/2015 17:18:22" ReportInfo.Modified="04/25/2017 14:08:40" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    public String Data_Exists
+    {
+      get
+      {
+        return (string.IsNullOrEmpty(Report.GetColumnValueNullable(&quot;Table.OURMFO&quot;).ToString())) ? &quot;відсутній&quot; : (String.Empty);
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfJRnej3n0gWzebxtNAvwOVQ==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name, t1.ord, t3.kf ourmfo, nvl(t3.count_2560_2565,0) count_2560_2565, &#13;&#10;nvl(t3.count_2560,0) count_2560, &#13;&#10;nvl(t3.count_2565,0)count_2565,&#13;&#10;nvl( t2.count_2560_10,0)count_2560_10, &#13;&#10;nvl(t2.count_2560_20,0)count_2560_20, &#13;&#10;nvl(t2.count_2560_30,0)count_2560_30, &#13;&#10;nvl(t2.count_2560_40,0) count_2560_40, &#13;&#10;nvl(t2.count_2560_other,0) count_2560_other,&#13;&#10;nvl(t3.count_okpo,0) count_okpo,&#13;&#10; nvl(t3.count_id,0) count_id,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;             LEFT JOIN&#13;&#10;         (  SELECT cd.kf,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '10', 1, 0)) count_2560_10,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '20', 1, 0)) count_2560_20,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '30', 1, 0)) count_2560_30,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '40', 1, 0)) count_2560_40,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '10', 0, '20', 0, '30', 0, '40', 0, 1)) count_2560_other&#13;&#10;              FROM ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   AND cd.rowtype = 0&#13;&#10;                   AND cd.nls LIKE '2560%'&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND trunc(cd.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(cd.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')&#13;&#10;          GROUP BY cd.kf) t2&#13;&#10;            ON t1.mfo = t2.kf&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT cd.kf,&#13;&#10;                   COUNT (DISTINCT cd.okpo) count_okpo, &#13;&#10;                   COUNT (DISTINCT cd.kod_ustan) count_id,&#13;&#10;                   SUM (DECODE (substr(cd.nls,1,4), '2560', 1, '2565', 1, 0)) count_2560_2565,&#13;&#10;                   SUM (DECODE (substr(cd.nls,1,4), '2560', 1, 0)) count_2560,&#13;&#10;                   SUM (DECODE (substr(cd.nls,1,4), '2565', 1, 0)) count_2565&#13;&#10;              FROM ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   AND cd.rowtype = 0&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND trunc(cd.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(cd.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')&#13;&#10;          GROUP BY cd.kf) t3&#13;&#10;            ON t1.mfo = t3.kf &#13;&#10;ORDER BY t1.ord&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;&#13;&#10;">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="ORD" DataType="System.Int16"/>
+        <Column Name="OURMFO" DataType="System.String"/>
+        <Column Name="COUNT_2560_2565" DataType="System.Decimal"/>
+        <Column Name="COUNT_2560" DataType="System.Decimal"/>
+        <Column Name="COUNT_2565" DataType="System.Decimal"/>
+        <Column Name="COUNT_2560_10" DataType="System.Decimal"/>
+        <Column Name="COUNT_2560_20" DataType="System.Decimal"/>
+        <Column Name="COUNT_2560_30" DataType="System.Decimal"/>
+        <Column Name="COUNT_2560_40" DataType="System.Decimal"/>
+        <Column Name="COUNT_2560_OTHER" DataType="System.Decimal"/>
+        <Column Name="COUNT_OKPO" DataType="System.Decimal"/>
+        <Column Name="COUNT_ID" DataType="System.Decimal"/>
+        <Column Name="KOD_S" DataType="System.String"/>
+        <CommandParameter Name="rpt_date" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Relation Name="Table2_Table1" ParentDataSource="null" ChildDataSource="null" ParentColumns="ID" ChildColumns="KOD_USTAN" Enabled="true"/>
+    <Relation Name="Table2_Table" ParentDataSource="null" ChildDataSource="null" ParentColumns="ID" ChildColumns="KOD_USTAN" Enabled="true"/>
+    <Relation Name="Table2_Table6" ParentDataSource="null" ChildDataSource="null" ParentColumns="ID" ChildColumns="KOD_USTAN" Enabled="true"/>
+    <Relation Name="Table2_Table7" ParentDataSource="null" ChildDataSource="null" ParentColumns="ID" ChildColumns="KOD_USTAN" Enabled="true"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Total Name="Total_2560_2565" Expression="[Table.COUNT_2560_2565]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2560" Expression="[Table.COUNT_2560]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2565" Expression="[Table.COUNT_2565]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2560_10" Expression="[Table.COUNT_2560_10]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2560_20" Expression="[Table.COUNT_2560_20]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2560_30" Expression="[Table.COUNT_2560_30]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2560_40" Expression="[Table.COUNT_2560_40]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_2560_other" Expression="[Table.COUNT_2560_OTHER]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_OKPO" Expression="[Table.COUNT_OKPO]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_ID" Expression="[Table.COUNT_ID]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" LeftMargin="20" TopMargin="12" RightMargin="15" BottomMargin="12" FirstPageSource="1" OtherPagesSource="1">
+    <ReportTitleBand Name="ReportTitle1" Width="990.36" Height="236.25">
+      <TableObject Name="Table4" Top="75.6" Width="982.8" Height="160.65">
+        <TableColumn Name="Column6" Width="28.35"/>
+        <TableColumn Name="Column7" Width="37.8"/>
+        <TableColumn Name="Column8" Width="170.1"/>
+        <TableColumn Name="Column9" Width="85.05"/>
+        <TableColumn Name="Column10"/>
+        <TableColumn Name="Column11"/>
+        <TableColumn Name="Column12"/>
+        <TableColumn Name="Column13"/>
+        <TableColumn Name="Column14"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16"/>
+        <TableColumn Name="Column17"/>
+        <TableColumn Name="Column18"/>
+        <TableColumn Name="Column19"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Silver" Text="№ регіону" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Silver" Text="код" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Silver" Text="Регіональне управління" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Silver" Text="Наявність/  відсутність файлу" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Silver" Text="ВСЬОГО рахунків" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="3"/>
+          <TableCell Name="Cell21" Border.Lines="All" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell22" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="All" Fill.Color="Silver" Text="2560 (за кодами аналітичного обліку)" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell24" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell25" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell36" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell37" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell38" Border.Lines="All" Fill.Color="Silver" Text="Кількість установ ПФУ" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell39" Fill.Color="Silver" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="122.85">
+          <TableCell Name="Cell11" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell12" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell13" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell14" Fill.Color="Silver" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell15" Fill.Color="Silver" Text="ВСЬОГО" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Silver" Text="2560" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Silver" Text="2565" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Silver" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="All" Fill.Color="Silver" Text="20" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Silver" Text="30" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell41" Border.Lines="All" Fill.Color="Silver" Text="40" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell42" Border.Lines="All" Fill.Color="Silver" Text="Інші" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell43" Border.Lines="All" Fill.Color="Silver" Text="за ЄДРПОУ" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell44" Border.Lines="All" Fill.Color="Silver" Text="за кодом установи" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Border.Lines="All" Fill.Color="Silver" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell17" Border.Lines="All" Fill.Color="Silver" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" Fill.Color="Silver" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="All" Fill.Color="Silver" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="All" Fill.Color="Silver" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell31" Border.Lines="All" Fill.Color="Silver" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell32" Border.Lines="All" Fill.Color="Silver" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell33" Border.Lines="All" Fill.Color="Silver" Text="8" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Silver" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Silver" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell46" Border.Lines="All" Fill.Color="Silver" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" Fill.Color="Silver" Text="12" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Silver" Text="13" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell49" Border.Lines="All" Fill.Color="Silver" Text="14" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Width="982.8" Height="18.9" Text="ІНФОРМАЦІЯ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Top="18.9" Width="982.8" Height="37.8" Text="щодо кількості рахунків установ ПФУ&#13;&#10;станом на [sFdat1] р." Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="239.45" Width="990.36" Height="18.9" DataSource="Table">
+      <TableObject Name="Table3" Width="982.8" Height="18.9">
+        <TableColumn Name="Column1" Width="28.35"/>
+        <TableColumn Name="Column2" Width="37.8"/>
+        <TableColumn Name="Column3" Width="170.1"/>
+        <TableColumn Name="Column4" Width="85.05"/>
+        <TableColumn Name="Column5"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column22"/>
+        <TableColumn Name="Column23"/>
+        <TableColumn Name="Column24"/>
+        <TableColumn Name="Column25"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27"/>
+        <TableColumn Name="Column28"/>
+        <TableColumn Name="Column29"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="[Table.ORD]" HorzAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="[Table.KOD_S]"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="[Table.NAME]"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="[Data_Exists]" HorzAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="[Table.COUNT_2560_2565]" HorzAlign="Right"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[Table.COUNT_2560]" HorzAlign="Right"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="[Table.COUNT_2565]" HorzAlign="Right"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="[Table.COUNT_2560_10]" HorzAlign="Right"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.COUNT_2560_20]" HorzAlign="Right"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="[Table.COUNT_2560_30]" HorzAlign="Right"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[Table.COUNT_2560_40]" HorzAlign="Right"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[Table.COUNT_2560_OTHER]" HorzAlign="Right"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Table.COUNT_OKPO]" HorzAlign="Right"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[Table.COUNT_ID]" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="261.55" Width="990.36" Height="18.9">
+      <TableObject Name="Table5" Width="982.8" Height="18.9">
+        <TableColumn Name="Column31" Width="28.35"/>
+        <TableColumn Name="Column32" Width="37.8"/>
+        <TableColumn Name="Column33" Width="170.1"/>
+        <TableColumn Name="Column34" Width="85.05"/>
+        <TableColumn Name="Column35"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column37"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41"/>
+        <TableColumn Name="Column42"/>
+        <TableColumn Name="Column43"/>
+        <TableColumn Name="Column44"/>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell61"/>
+          <TableCell Name="Cell62"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="Aquamarine" Text="Разом"/>
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="Aquamarine"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560_2565]" HorzAlign="Right"/>
+          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560]" HorzAlign="Right"/>
+          <TableCell Name="Cell87" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2565]" HorzAlign="Right"/>
+          <TableCell Name="Cell88" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560_10]" HorzAlign="Right"/>
+          <TableCell Name="Cell89" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560_20]" HorzAlign="Right"/>
+          <TableCell Name="Cell90" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560_30]" HorzAlign="Right"/>
+          <TableCell Name="Cell91" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560_40]" HorzAlign="Right"/>
+          <TableCell Name="Cell92" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_2560_other]" HorzAlign="Right"/>
+          <TableCell Name="Cell93" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_OKPO]" HorzAlign="Right"/>
+          <TableCell Name="Cell94" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_ID]" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

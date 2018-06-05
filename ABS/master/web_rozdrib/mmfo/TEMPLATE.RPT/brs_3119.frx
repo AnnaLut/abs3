@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/11/2016 18:07:09" ReportInfo.Modified="01/19/2017 17:34:28" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqLVSZklSjxWfjSYe2WpN8fNUWXgXKvTX+3Vd6b1se0CZCZtpjtfOdFRV84Cd1otBcJ/v8zUW9W7OLHi3rsv4VtA==">
+      <TableDataSource Name="Table" Alias="zap" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT CHAR00 MFO,&#13;&#10;         CHAR01 TVBV,&#13;&#10;         CHAR02 BRANCH,&#13;&#10;         CHAR03 OB22,&#13;&#10;         NUM00 SUMCA,&#13;&#10;         NUM01 SUMCRKR,&#13;&#10;         NUM02 DIFF&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :session_id&#13;&#10;ORDER BY id">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="OB22" DataType="System.String"/>
+        <Column Name="SUMCA" DataType="System.Decimal"/>
+        <Column Name="SUMCRKR" DataType="System.Decimal"/>
+        <Column Name="DIFF" DataType="System.Decimal"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="TVBV" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="Hed" DataType="System.Int32" Enabled="true" SelectCommand="select name from banks_ru where mfo = :branch">
+        <Column Name="NAME" DataType="System.String"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[p_branch]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Expression="185403"/>
+    <Parameter Name="p_branch" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="170.1">
+      <TableObject Name="Table1" Width="699.3" Height="160.65">
+        <TableColumn Name="Column7" Width="75.6"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column8" Width="151.2"/>
+        <TableColumn Name="Column9"/>
+        <TableColumn Name="Column10" Width="113.4"/>
+        <TableColumn Name="Column11" Width="113.4"/>
+        <TableColumn Name="Column12" Width="113.4"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell7"/>
+          <TableCell Name="Cell55"/>
+          <TableCell Name="Cell8" ColSpan="5"/>
+          <TableCell Name="Cell9"/>
+          <TableCell Name="Cell10"/>
+          <TableCell Name="Cell11"/>
+          <TableCell Name="Cell12"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell13"/>
+          <TableCell Name="Cell56"/>
+          <TableCell Name="Cell14" Text="Протокол" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell15" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell16" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell17" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell18" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell19"/>
+          <TableCell Name="Cell57"/>
+          <TableCell Name="Cell20" Text="звірки міграції компенсаціних вкладів " HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell21" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell22" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell23" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell24" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell25"/>
+          <TableCell Name="Cell58"/>
+          <TableCell Name="Cell26" Text="по мфо [p_branch] ([Hed.NAME])" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell27" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell28" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell29" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell30" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell31"/>
+          <TableCell Name="Cell59"/>
+          <TableCell Name="Cell32" Text="[Date]" HorzAlign="Right" Font="Arial, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell33"/>
+          <TableCell Name="Cell34"/>
+          <TableCell Name="Cell35"/>
+          <TableCell Name="Cell36"/>
+        </TableRow>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell37"/>
+          <TableCell Name="Cell60"/>
+          <TableCell Name="Cell38"/>
+          <TableCell Name="Cell39"/>
+          <TableCell Name="Cell40"/>
+          <TableCell Name="Cell41"/>
+          <TableCell Name="Cell42"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="47.25">
+          <TableCell Name="Cell43"/>
+          <TableCell Name="Cell61" Border.Lines="All" Border.Width="0.5" Text="ТВБВ" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Border.Width="0.5" Text="БРАНЧ" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Border.Width="0.5" Text="Об22" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Width="0.5" Text="Сума ЦА" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell47" Border.Lines="All" Border.Width="0.5" Text="Сума ЦРКР" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" Border.Width="0.5" Text="Відхилення" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="172.77" Width="718.2" Height="28.35" Visible="false"/>
+    <DataBand Name="Data1" Top="203.78" Width="718.2" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Width="699.3" Height="18.9">
+        <TableColumn Name="Column6" Width="75.6"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column1" Width="151.2"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3" Width="113.4"/>
+        <TableColumn Name="Column4" Width="113.4"/>
+        <TableColumn Name="Column5" Width="113.4"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell6"/>
+          <TableCell Name="Cell62" Text="[zap.TVBV]" Font="Arial, 9pt">
+            <Highlight>
+              <Condition Expression="[zap.DIFF] != 0" Fill.Color="Bisque" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell1" Text="[zap.BRANCH]" Font="Arial, 9pt">
+            <Highlight>
+              <Condition Expression="[zap.DIFF] != 0" Fill.Color="Bisque" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell2" Text="[zap.OB22]" HorzAlign="Center" Font="Arial, 9pt">
+            <Highlight>
+              <Condition Expression="[zap.DIFF] != 0" Fill.Color="Bisque" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell3" Text="[zap.SUMCA]" HorzAlign="Right" Font="Arial, 9pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[zap.DIFF] != 0" Fill.Color="Bisque" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell4" Text="[zap.SUMCRKR]" HorzAlign="Right" Font="Arial, 9pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[zap.DIFF] != 0" Fill.Color="Bisque" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell5" Text="[zap.DIFF]" HorzAlign="Right" Font="Arial, 9pt">
+            <Formats>
+              <NumberFormat UseLocale="false" GroupSeparator=" " NegativePattern="1"/>
+              <GeneralFormat/>
+            </Formats>
+            <Highlight>
+              <Condition Expression="[zap.DIFF] != 0" Fill.Color="Bisque" ApplyFill="true" ApplyTextFill="false"/>
+            </Highlight>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="225.35" Width="718.2" Height="18.9">
+      <TableObject Name="Table1" Width="699.3" Height="18.9">
+        <TableColumn Name="Column13" Width="75.6"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column14" Width="151.2"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16" Width="113.4"/>
+        <TableColumn Name="Column17" Width="113.4"/>
+        <TableColumn Name="Column18" Width="113.4"/>
+        <TableRow Name="Row9">
+          <TableCell Name="Cell49" Font="Arial, 7pt"/>
+          <TableCell Name="Cell63"/>
+          <TableCell Name="Cell50" Text="Звіт №3119" Font="Arial, 7pt"/>
+          <TableCell Name="Cell51" HorzAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell52" HorzAlign="Right" Font="Arial, 7pt"/>
+          <TableCell Name="Cell53" Text="[Date]" HorzAlign="Right" Font="Arial, 7pt" ColSpan="2"/>
+          <TableCell Name="Cell54" HorzAlign="Right" Font="Arial, 7pt"/>
+        </TableRow>
+      </TableObject>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="04/03/2013 17:58:27" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiTjchFHs2Uddz4BZE5s3K1w==">
+      <TableDataSource Name="Table" Alias="BPK_BIDS" DataType="System.Int32" Enabled="true" SelectCommand="select b.branch,&#13;&#10;       row_number() over(partition by b.branch order by b.fio) as rwn,&#13;&#10;       b.fio,&#13;&#10;       wcs_utl.get_answ_text(b.bid_id, 'CL_7') as doc_ser,&#13;&#10;       wcs_utl.get_answ_text(b.bid_id, 'CL_8') as doc_num,&#13;&#10;       b.inn,&#13;&#10;       b.summ,&#13;&#10;       wcs_utl.get_answ_list_text(b.bid_id, 'CL_BPK_PACK') as bpk_pack,&#13;&#10;       wcs_utl.get_answ_date(b.bid_id, 'IQ_CC_DECISION_Q1', 'SRV_RU', 0) as cc_des_date,&#13;&#10;       wcs_utl.get_answ_text(b.bid_id, 'IQ_CC_DECISION_Q2', 'SRV_RU', 0) as cc_des_num&#13;&#10;  from v_wcs_bids b, v_wcs_subproducts s&#13;&#10; where b.crt_date between add_months(:sFdat1, -1) and&#13;&#10;       add_months(:sFdat2, 1)&#13;&#10;   and wcs_utl.get_answ_date(b.bid_id, 'IQ_CC_DECISION_Q1', 'SRV_RU', 0) between&#13;&#10;       :sFdat1 and :sFdat2&#13;&#10;   and b.subproduct_id = s.subproduct_id&#13;&#10;   and s.product_id = 'PRD_BPK'&#13;&#10;   and exists (select 1&#13;&#10;          from v_wcs_bid_states bs&#13;&#10;         where bs.bid_id = b.bid_id&#13;&#10;           and bs.state_id = 'NEW_DONE')">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="RWN" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="DOC_SER" DataType="System.String"/>
+        <Column Name="DOC_NUM" DataType="System.String"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="BPK_PACK" DataType="System.String"/>
+        <Column Name="CC_DES_DATE" DataType="System.DateTime"/>
+        <Column Name="CC_DES_NUM" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.2013"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.03.2013"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="BPK_BRANCHES" DataType="System.Int32" Enabled="true" SelectCommand="select distinct b.branch&#13;&#10;  from v_wcs_bids b, v_wcs_subproducts s&#13;&#10; where b.crt_date between add_months(:sFdat1, -1) and&#13;&#10;       add_months(:sFdat2, 1)&#13;&#10;   and wcs_utl.get_answ_date(b.bid_id, 'IQ_CC_DECISION_Q1', 'SRV_RU', 0) between&#13;&#10;       :sFdat1 and :sFdat2&#13;&#10;   and b.subproduct_id = s.subproduct_id&#13;&#10;   and s.product_id = 'PRD_BPK'&#13;&#10;   and exists (select 1&#13;&#10;          from v_wcs_bid_states bs&#13;&#10;         where bs.bid_id = b.bid_id&#13;&#10;           and bs.state_id = 'NEW_DONE')">
+        <Column Name="BRANCH" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.2013"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.2013"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Relation Name="Table4_Table" ParentDataSource="Table4" ChildDataSource="Table" ParentColumns="BRANCH" ChildColumns="BRANCH" Enabled="true"/>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Expression="AddMonths([Date],-1)"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime" Expression="AddMonths([Date],1)"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="title" Width="1047.06" Height="75.6">
+      <TableObject Name="Table2" Left="9.45" Top="9.45" Width="1030.05" Height="56.7">
+        <TableColumn Name="Column13" Width="343.35"/>
+        <TableColumn Name="Column14" Width="343.35"/>
+        <TableColumn Name="Column15" Width="343.35"/>
+        <TableRow Name="Row32" Height="37.8">
+          <TableCell Name="Cell104" Text="РЕЄСТР&#13;&#10;" Font="Times New Roman, 14pt" ColSpan="3"/>
+          <TableCell Name="Cell105" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell106" Font="Times New Roman, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row33">
+          <TableCell Name="Cell109" Text="погоджених лімітів по БПК за період з [FormatDateTime([sFdat1],&quot;Short Date&quot;)]р. по [FormatDateTime([sFdat2],&quot;Short Date&quot;)]р." Font="Times New Roman, 11pt" ColSpan="3"/>
+          <TableCell Name="Cell110" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell111" Font="Times New Roman, 11pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="142.97" Width="1047.06" Height="28.35" DataSource="Table4">
+      <TableObject Name="Table1" Left="9.45" Width="1030.05" Height="28.35">
+        <TableColumn Name="Column16" Width="54.81"/>
+        <TableColumn Name="Column17" Width="177.66"/>
+        <TableColumn Name="Column24" Width="85.05"/>
+        <TableColumn Name="Column23" Width="113.4"/>
+        <TableColumn Name="Column22" Width="94.5"/>
+        <TableColumn Name="Column21" Width="132.3"/>
+        <TableColumn Name="Column18" Width="168.21"/>
+        <TableColumn Name="Column19" Width="102.06"/>
+        <TableColumn Name="Column20" Width="102.06"/>
+        <TableRow Name="Row35" Height="28.35">
+          <TableCell Name="Cell117" Border.Lines="All" Text="ТВБВ №[BPK_BRANCHES.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt" ColSpan="9"/>
+          <TableCell Name="Cell118" Border.Lines="All"/>
+          <TableCell Name="Cell153" Border.Lines="All"/>
+          <TableCell Name="Cell148" Border.Lines="All"/>
+          <TableCell Name="Cell143" Border.Lines="All"/>
+          <TableCell Name="Cell138" Border.Lines="All"/>
+          <TableCell Name="Cell119" Border.Lines="All"/>
+          <TableCell Name="Cell120" Border.Lines="All"/>
+          <TableCell Name="Cell121" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader2" Top="80.93" Width="1047.06" Height="56.7">
+        <TableObject Name="Table1" Left="9.45" Width="1030.03" Height="56.7" Border.Lines="All">
+          <TableColumn Name="Column43" Width="57.17"/>
+          <TableColumn Name="Column44" Width="236.72"/>
+          <TableColumn Name="Column45" Width="106.31"/>
+          <TableColumn Name="Column47" Width="125.21"/>
+          <TableColumn Name="Column48" Width="134.66"/>
+          <TableColumn Name="Column49" Width="142.22"/>
+          <TableColumn Name="Column50" Width="123.32"/>
+          <TableColumn Name="Column51" Width="104.42"/>
+          <TableRow Name="Row45" Height="56.7">
+            <TableCell Name="Cell211" Border.Lines="All" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell212" Border.Lines="All" Text="Прізвище, ім’я держателя БПК" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell213" Border.Lines="All" Text="Серія/Номер паспорта" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell215" Border.Lines="All" Text="ІНН" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell216" Border.Lines="All" Text="Розмір кредитного ліміту" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell217" Border.Lines="All" Text="Пакет" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell218" Border.Lines="All" Text="Номер рішення КК" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+            <TableCell Name="Cell219" Border.Lines="All" Text="Дата рішення КК" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+      <DataBand Name="Data3" Top="176.65" Width="1047.06" Height="18.9" DataSource="Table">
+        <TableObject Name="Table5" Left="9.45" Width="1030.03" Height="18.9" Border.Lines="All">
+          <TableColumn Name="Column66" Width="57.17"/>
+          <TableColumn Name="Column67" Width="236.72"/>
+          <TableColumn Name="Column68" Width="106.31"/>
+          <TableColumn Name="Column69" Width="125.21"/>
+          <TableColumn Name="Column70" Width="134.66"/>
+          <TableColumn Name="Column71" Width="142.22"/>
+          <TableColumn Name="Column72" Width="123.32"/>
+          <TableColumn Name="Column73" Width="104.42"/>
+          <TableRow Name="Row53">
+            <TableCell Name="Cell259" Border.Lines="All" Text="[BPK_BIDS.RWN]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell260" Border.Lines="All" Text="[BPK_BIDS.FIO]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell261" Border.Lines="All" Text="[BPK_BIDS.DOC_SER][BPK_BIDS.DOC_NUM]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell262" Border.Lines="All" Text="[BPK_BIDS.INN]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell263" Border.Lines="All" Text="[FormatNumber([BPK_BIDS.SUMM],2)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell264" Border.Lines="All" Text="[BPK_BIDS.BPK_PACK]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell265" Border.Lines="All" Text="[BPK_BIDS.CC_DES_NUM]" VertAlign="Center" Font="Times New Roman, 11pt"/>
+            <TableCell Name="Cell266" Border.Lines="All" Text="[FormatDateTime([BPK_BIDS.CC_DES_DATE],&quot;Short Date&quot;)]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="200.88" Width="1047.06" Height="255.15">
+      <TableObject Name="Table6" Left="9.45" Top="9.45" Width="1022.49" Height="226.8">
+        <TableColumn Name="Column61" Width="168.21"/>
+        <TableColumn Name="Column62" Width="234.36"/>
+        <TableColumn Name="Column63" Width="234.36"/>
+        <TableColumn Name="Column65" Width="385.56"/>
+        <TableRow Name="Row47" Height="37.8">
+          <TableCell Name="Cell229" Text="Виконавець:" VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell230" Text="_________________________" VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell231" Text="_________________________" VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell233"/>
+        </TableRow>
+        <TableRow Name="Row48">
+          <TableCell Name="Cell234" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell235" Text="Прізвище, ініціали" HorzAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell236" Text="Підпис" HorzAlign="Center" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell238"/>
+        </TableRow>
+        <TableRow Name="Row49" Height="37.8">
+          <TableCell Name="Cell239" Text="Дата: " VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell240" Text="”___” ______________201_ р." VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell241" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell243"/>
+        </TableRow>
+        <TableRow Name="Row50" Height="37.8">
+          <TableCell Name="Cell244" Text="Час:" VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell245" Text="_____ г. ______ хв." VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell246" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell248"/>
+        </TableRow>
+        <TableRow Name="Row51" Height="37.8">
+          <TableCell Name="Cell249" Text="Службові примітки:" VertAlign="Bottom" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell250" Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell251" Text=" " Font="Times New Roman, 11pt"/>
+          <TableCell Name="Cell253"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="56.7">
+          <TableCell Name="Cell254" Border.Lines="All" ColSpan="4"/>
+          <TableCell Name="Cell255" Border.Lines="All"/>
+          <TableCell Name="Cell256" Border.Lines="All"/>
+          <TableCell Name="Cell258" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

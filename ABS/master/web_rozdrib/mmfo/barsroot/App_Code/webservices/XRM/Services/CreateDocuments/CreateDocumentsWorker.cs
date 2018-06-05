@@ -1,12 +1,8 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
-using System.Collections.Generic;
-using Bars.WebServices.XRM.Services.SKRN.Models;
 using Bars.WebServices.XRM.Models;
 using Bars.WebServices.XRM.Services.CreateDocuments.Models;
-using System.IO;
 
 namespace Bars.WebServices.XRM.Services.CreateDocuments
 {

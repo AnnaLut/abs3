@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2017 10:05:43" ReportInfo.Modified="03/16/2017 13:57:01" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Styles>
+    <Style Name="Стиль1" Fill.Color="WhiteSmoke" ApplyBorder="false" ApplyTextFill="false" ApplyFont="false"/>
+  </Styles>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoV5kRmkY5+8+wtlwh9so613yjQ78Mrmr3aDN98kTMnSwQ==" CommandTimeout="300">
+      <TableDataSource Name="Table" Alias="rep_5710" DataType="System.Int32" Enabled="true" SelectCommand="with zap as (select &#13;&#10;TO_CHAR(p.file_id) FILE_ID, &#13;&#10;TO_NUMBER(p.mfo) MFO, &#13;&#10;count(*) as count_col, &#13;&#10;sum(p.sum_pay)/100 as sum_pay,&#13;&#10;count(case when p.state in (0,20,10,19) then 1 else null end ) as valid,&#13;&#10;sum(case when p.state in (0,20,10,19) then p.sum_pay/100 else 0 end ) as suma_valid,&#13;&#10;count(case when p.state =10 then 1 else null end ) as count_zarax,&#13;&#10;sum(case when p.state = 10 then p.sum_pay/100 else 0 end ) as suma_zarax,&#13;&#10;count(case when p.state in (19,20) then 1 else null end ) as count_ru,&#13;&#10;sum(case when p.state in (19,20) then p.sum_pay/100 else 0 end ) as suma_ru&#13;&#10;from pfu.pfu_file f, pfu.pfu_file_records p&#13;&#10;where   (F.STATE in ('CHECKING_PAY','IN_PAY') or (F.STATE in ('PAYED') and trunc(f.pay_date)=trunc(sysdate))) &#13;&#10;  and p.file_id=F.ID&#13;&#10;  and trunc(p.sys_date) between to_date(:sFdat1,'dd.mm.yyyy') and to_date(:sFdat2,'dd.mm.yyyy')&#13;&#10;  and F.ID like :file_id&#13;&#10;group by p.file_id, p.mfo)&#13;&#10;select '1' ord, a.*  from zap a&#13;&#10;union all&#13;&#10;select '2' ord, 'Разом: ', count(distinct mfo), sum(count_col), sum(sum_pay), sum(valid),&#13;&#10;   sum(suma_valid), sum(count_zarax),   sum(suma_zarax), sum(count_ru), sum(suma_ru)&#13;&#10;   from zap&#13;&#10;order by 2&#13;&#10;">
+        <Column Name="ORD" DataType="System.String"/>
+        <Column Name="FILE_ID" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.Decimal"/>
+        <Column Name="COUNT_COL" DataType="System.Decimal"/>
+        <Column Name="SUM_PAY" DataType="System.Decimal"/>
+        <Column Name="VALID" DataType="System.Decimal"/>
+        <Column Name="SUMA_VALID" DataType="System.Decimal"/>
+        <Column Name="COUNT_ZARAX" DataType="System.Decimal"/>
+        <Column Name="SUMA_ZARAX" DataType="System.Decimal"/>
+        <Column Name="COUNT_RU" DataType="System.Decimal"/>
+        <Column Name="SUMA_RU" DataType="System.Decimal"/>
+        <CommandParameter Name="sFdat1" DataType="126" DefaultValue="01.01.2011"/>
+        <CommandParameter Name="sFdat2" DataType="126" DefaultValue="01.01.2020"/>
+        <CommandParameter Name="file_id" DataType="126" DefaultValue="%"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+    <Parameter Name="sFdat2" DataType="System.String"/>
+    <Parameter Name="file_id" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="252" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="876.96" Height="75.6" CanGrow="true" CanShrink="true">
+      <TableObject Name="Table1" Width="876.92" Height="75.6">
+        <TableColumn Name="Column11" Width="86.93"/>
+        <TableColumn Name="Column12" Width="56.7"/>
+        <TableColumn Name="Column13" Width="56.7"/>
+        <TableColumn Name="Column14" Width="105.84"/>
+        <TableColumn Name="Column15" Width="86.93"/>
+        <TableColumn Name="Column16" Width="105.84"/>
+        <TableColumn Name="Column17" Width="86.93"/>
+        <TableColumn Name="Column18" Width="105.84"/>
+        <TableColumn Name="Column19" Width="86.93"/>
+        <TableColumn Name="Column20" Width="98.28"/>
+        <TableRow Name="Row10" Height="75.6">
+          <TableCell Name="Cell91" Border.Lines="All" Border.Width="0.5" Text="ID реєстру" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell92" Border.Lines="All" Border.Width="0.5" Text="МФО" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell93" Border.Lines="All" Border.Width="0.5" Text="Кількість рядків у реєстрі" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell94" Border.Lines="All" Border.Width="0.5" Text="Сума реєстру" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell95" Border.Lines="All" Border.Width="0.5" Text="Кількість успішно провалідованих рядків (до сплати)" HorzAlign="Center" VertAlign="Center" Font="Arial, 7.8pt"/>
+          <TableCell Name="Cell96" Border.Lines="All" Border.Width="0.5" Text="Сума успішно провалідованих рядків" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell97" Border.Lines="All" Border.Width="0.5" Text="Кількість успішно зарахованих платежів" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell98" Border.Lines="All" Border.Width="0.5" Text="Сума успішно зарахованих платежів" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell99" Border.Lines="All" Border.Width="0.5" Text="Кількість платежів, що очікують оплати на РУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell100" Border.Lines="All" Border.Width="0.5" Text="Сума платежів, що очікують зарахування на РУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="78.27" Width="876.96" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table1" Width="876.92" Height="18.9" EvenStyle="Стиль1" EvenStylePriority="UseAll">
+        <TableColumn Name="Column1" Width="86.93"/>
+        <TableColumn Name="Column2" Width="56.7"/>
+        <TableColumn Name="Column3" Width="56.7"/>
+        <TableColumn Name="Column4" Width="105.84"/>
+        <TableColumn Name="Column5" Width="86.93"/>
+        <TableColumn Name="Column10" Width="105.84"/>
+        <TableColumn Name="Column9" Width="86.93"/>
+        <TableColumn Name="Column8" Width="105.84"/>
+        <TableColumn Name="Column7" Width="86.93"/>
+        <TableColumn Name="Column6" Width="98.28"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.FILE_ID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell2" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.MFO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell3" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.COUNT_COL]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell4" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.SUM_PAY]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell5" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.VALID]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.SUMA_VALID]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell41" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.COUNT_ZARAX]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell36" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.SUMA_ZARAX]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell31" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.COUNT_RU]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+          <TableCell Name="Cell26" Border.Lines="All" Border.Color="Silver" Border.Width="0.25" Text="[rep_5710.SUMA_RU]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt">
+            <Highlight>
+              <Condition Expression="[rep_5710.ORD]==&quot;2&quot;" Fill.Color="LightGray" Font="Arial, 8.25pt, style=Bold" ApplyFill="true" ApplyTextFill="false" ApplyFont="true"/>
+            </Highlight>
+          </TableCell>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="99.83" Width="876.96" Height="28.35"/>
+  </ReportPage>
+</Report>
