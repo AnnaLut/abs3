@@ -56,4 +56,23 @@ Insert into BARS.NLK_TT
 exception when dup_val_on_index then  null;
 end;
 /
+
+begin
+Insert into BARS.NLK_TT
+   (ID, TT)
+ Values
+   ('99', '830');
+exception when dup_val_on_index then  null;
+end;
+/
+
+begin
+Insert into BARS.NLK_TT
+   (ID, TT)
+ Values
+   ('99', 'C14');
+exception when dup_val_on_index then  null;
+end;
+/
+
 COMMIT;
