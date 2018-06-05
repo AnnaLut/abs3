@@ -67,7 +67,7 @@ COMMENT ON COLUMN BARS.ERR$_INT_RATN.KF IS '';
 
 
 
-
+grant select, insert, update on ERR$_INT_RATN  to bars_access_defrole;
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ERR$_INT_RATN.sql =========*** End ***

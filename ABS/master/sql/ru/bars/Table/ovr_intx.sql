@@ -60,6 +60,21 @@ end;
 PROMPT *** ALTER_POLICIES to OVR_INTX ***
  exec bpa.alter_policies('OVR_INTX');
 
+declare 
+  v_num integer;
+begin  
+  select count(1) into v_num
+   from user_tab_columns
+   where table_name = 'OVR_INTX'
+     and column_name = 'ISP';
+  if v_num = 0 then
+     EXECUTE IMMEDIATE 'ALTER TABLE  OVR_INTX ADD  (ISP int) ' ;
+  end if;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
+
+
 
 COMMENT ON TABLE BARS.OVR_INTX IS 'Протокол розрахунку проц по солідарному ОВР';
 COMMENT ON COLUMN BARS.OVR_INTX.CDAT IS 'Календ.дата';

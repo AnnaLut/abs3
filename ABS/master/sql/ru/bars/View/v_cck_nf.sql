@@ -72,3 +72,4 @@ SELECT x.isp
                    AND nd = d.nd)
            AND d.vidd IN (11, 12, 13)
            AND d.sos = 0) x where x.branch like  SYS_CONTEXT ('bars_context', 'user_branch_mask');
+grant select on v_cck_nf to bars_access_defrole;

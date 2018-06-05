@@ -1867,7 +1867,7 @@ begin
             EXECUTE IMMEDIATE 'begin MSFZ9.OPN1 ( :NDG, :KV, :IR, :BS, null, null ) ; end ;'      USING l_cd_row.ND, l_KV8, l_IR8,  l_BS8 ;
 
             If l_cd_row.vidd =3 then
-               for x in (select substr(tag,2,3)+0 KV, to_number(txt) IR from nd_txt where nd=l_cd_row.ND and tag in ('P643','P840','P978','P980','P987') and substr(tag,2,3)+0<>l_KV8)
+               for x in (select substr(tag,2,3)+0 KV, to_number(txt) IR from nd_txt where nd=l_cd_row.ND and tag in ('P643','P840','P978','P980','P987') and substr(tag,2,3)+0<>trim(to_char(l_KV8)))
                loop  EXECUTE IMMEDIATE 'begin MSFZ9.OPN1 ( :NDG, :KV, :IR, :BS, null, null ) ; end ;'      USING l_cd_row.ND, x.KV, x.IR,  l_BS8 ;    end loop ;---x
             end if ;
 

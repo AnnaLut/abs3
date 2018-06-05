@@ -5,7 +5,7 @@ tuda;
      (nd, tag, txt)
       select distinct dd.nd,'BUS_MOD',1 from cc_deal dd, nd_acc na,accounts a where dd.nd=na.nd and na.acc=a.acc and a.dazs is null
       and nbs in ('1500', '1502', '1510','1513','1520', '1521', '1522', '1524', '1211', '1212') and dd.SOS <>15
-  and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=1);
+  and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
    COMMIT;
 end; 
 /
@@ -14,7 +14,7 @@ begin
      insert into accountsw
      (acc, tag, value)
      select a.acc,'BUS_MOD',2 from  accounts a where a.nbs in ('3040', '3041', '3042','3043','3044') and a.dazs is null
-  and a.acc not in (select acc from accountsw where tag='BUS_MOD' and value=2);
+  and a.acc not in (select acc from accountsw where tag='BUS_MOD');
  COMMIT;
 end;  
 /
@@ -25,7 +25,7 @@ tuda;
      (acc, tag, value)
   select cp.ref,'BUS_MOD',3  from cp_deal cp, accounts a where cp.acc=a.acc and cp.dazs is null and 
         substr(a.nls,1,4) in (1410, 1420, 1430, 1440, 1411, 1421)
-        and cp.ref not in (select ref from cp_refw where tag='BUS_MOD' and value=3);
+        and cp.ref not in (select ref from cp_refw where tag='BUS_MOD');
    COMMIT;
  end;  
 /
@@ -36,7 +36,7 @@ tuda;
     (ref,tag,value) 
     select cp.ref,'BUS_MOD',4 from cp_deal cp, accounts a where cp.acc=a.acc and cp.dazs is null and 
     substr(a.nls,1,4) in (1400, 1401, 1402, 3010, 3011, 3012, 3013, 3014)
-    and cp.ref not in (select ref from cp_refw where tag='BUS_MOD' and value=4);
+    and cp.ref not in (select ref from cp_refw where tag='BUS_MOD');
    COMMIT;
 end;  
 /
@@ -47,7 +47,7 @@ tuda;
      (ref,tag,value)  
     select cp.ref,'BUS_MOD',5 from cp_deal cp, accounts a where cp.acc=a.acc and cp.dazs is null and 
       substr(a.nls,1,4) in (1412, 1413, 1414, 1422, 1423, 1424, 3110, 3111, 3112, 3113, 3114, 3210, 3211, 3212, 3213, 3214, 3102, 3103, 3105)
-      and cp.ref not in (select ref from cp_refw where tag='BUS_MOD' and value=5);
+      and cp.ref not in (select ref from cp_refw where tag='BUS_MOD');
  COMMIT;
 end;  
 /
@@ -60,7 +60,7 @@ begin
       and a.rnk in ( select cw.rnk from  customerw cw,customer c ,KL_K110 k1 where k1.K110=c.ved and cw.tag='BUSSL' and cw.value='1' and c.date_off is null 
       and cw.rnk=c.rnk and k1.k111 in('35'))
       and a.nbs in ('2020','2030','2060','2063','2071','2083','2103','2113','2123','2133')	  
-     and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=6);
+     and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
  COMMIT;
 end; 
 /
@@ -73,7 +73,7 @@ tuda;
       and a.rnk in (select cw.rnk from  customerw cw,customer c ,KL_K110 k1 where k1.K110=c.ved and cw.tag='BUSSL' and cw.value='1' and c.date_off is null 
       and cw.rnk=c.rnk and k1.k111 in('41','42','43','49','50','51','52'))
       and a.nbs in ('2020','2030','2060','2063','2071','2083','2103','2113','2123','2133')
-     and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=7);
+     and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
  COMMIT;
 end; 
 /
@@ -86,7 +86,7 @@ tuda;
       and a.rnk in (select cw.rnk from  customerw cw,customer c,KL_K110 k1  where k1.K110=c.ved and cw.tag='BUSSL' and cw.value='1' and c.date_off is null 
       and cw.rnk=c.rnk and k1.k111 in('01','02','03','10','11','12'))   
       and a.nbs in ('2020', '2030','2060','2063','2071','2083','2103','2113','2123','2133')
-  and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=8);
+  and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
  COMMIT;
 end; 
 /
@@ -101,7 +101,7 @@ tuda;
        group by cw.rnk
        having count(*)>1) 
        and a.nbs in ('2020','2030','2060','2063','2071','2083','2103','2113','2123','2133')
-       and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=9);
+       and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
  COMMIT;
 end; 
 /
@@ -116,7 +116,7 @@ tuda;
       group by cw.rnk
       having count(*)>1) 
       and a.nbs in ('2020','2030','2060','2063','2071','2083','2103','2113','2123','2133')
-     and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=10);
+     and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
  COMMIT;
 end; 
 /
@@ -131,7 +131,7 @@ tuda;
       group by cw.rnk
       having count(*)>1) 
       and a.nbs in ('2020','2030','2060','2063','2071','2083','2103','2113','2123','2133')
-      and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=11);
+      and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
     COMMIT;
 end; 
 /
@@ -141,7 +141,7 @@ tuda;
     insert into nd_txt
      (nd, tag, txt)
      select nd,'BUS_MOD',12 from cc_deal where vidd in (11,12,13) and SOS <>15
-     and nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=12);
+     and nd not in( select nd from nd_txt where tag='BUS_MOD');
   COMMIT;
 end; 
 /
@@ -153,7 +153,7 @@ tuda;
        select distinct nd,acc_pk,dat_close from w4_acc where dat_close is null 
        union 
        select distinct  nd,acc_pk,dat_close from bpk_acc where dat_close is null)t
-       where t.nd not in( select nd from bars.bpk_parameters where tag='BUS_MOD' and value=13);
+       where t.nd not in( select nd from bars.bpk_parameters where tag='BUS_MOD');
  COMMIT;
 end;
 /
@@ -166,7 +166,7 @@ tuda;
       and a.rnk in (select cw.rnk from  customerw cw,customer c,KL_K110 k1 where k1.K110=c.ved and cw.tag='BUSSL' and cw.value='1' and c.date_off is null 
       and cw.rnk=c.rnk and k1.k111 not in('01','02','03','10','11','12','35','41','42','43','49','50','51','52')) 
       and a.nbs in ('2020','2030','2060','2063','2071','2083','2103','2113','2123','2133')
-      and dd.nd not in( select nd from nd_txt where tag='BUS_MOD' and txt=14);
+      and dd.nd not in( select nd from nd_txt where tag='BUS_MOD');
  COMMIT;
 end; 
 /
@@ -175,10 +175,9 @@ begin
 tuda;
      insert into accountsw
      (acc, tag, value)
-  (select acc,'BUS_MOD',15 from  accounts where dazs is null and nbs in ('1811','1819','2800','2801','2805','2806','2809','3548','3570','3578','3541','3710')
-	union 
-   select acc  from  accounts  where nbs in ('3540') and OB22 in (01,03) and dazs is null)a
-       and a.acc not in (select acc from accountsw  where tag='BUS_MOD' and value is not null);
+     select distinct a.acc,'BUS_MOD',15 from
+      (select acc from  accounts   where dazs is null and (nbs in (1811,1819,2800,2801,2805,2806,2809,3548,3570,3578,3541,3710) or (nbs=3540 and OB22 in 	(01,03))))a
+       where a.acc not in (select acc from accountsw  where tag='BUS_MOD');
  COMMIT;
 end;  
 /
@@ -200,7 +199,7 @@ tuda;
                       and c.date_off is null
                       and cw.rnk = c.rnk
                       and k1.k111 in ('35'))
-      and o.acc not in( select acc from accountsw where tag='BUS_MOD' and value=6);
+      and o.acc not in( select acc from accountsw where tag='BUS_MOD');
     COMMIT;
 end; 
 /
@@ -222,7 +221,7 @@ tuda;
            and c.date_off is null
            and cw.rnk = c.rnk
            and k1.k111 in ('41', '42', '43', '49', '50', '51', '52'))
-      and o.acc not in( select acc from accountsw where tag='BUS_MOD' and value=7);
+      and o.acc not in( select acc from accountsw where tag='BUS_MOD');
     COMMIT;
 end; 
 /
@@ -237,7 +236,7 @@ tuda;
     and a.dazs is null
     and a.rnk in ( select cw.rnk from  customerw cw,customer c,KL_K110 k1  where k1.K110=c.ved and cw.tag='BUSSL' and cw.value='1' and c.date_off is null 
     and cw.rnk=c.rnk and k1.k111 in('01','02','03','10','11','12'))
-    and o.acc not in( select acc from accountsw where tag='BUS_MOD' and value=8);
+    and o.acc not in( select acc from accountsw where tag='BUS_MOD');
       COMMIT;
 end; 
 /
@@ -254,7 +253,7 @@ tuda;
      and c.date_off is null and cw.rnk=c.rnk
      group by cw.rnk
      having count(*)>1)
-     and o.acc not in(select acc from accountsw where tag='BUS_MOD' and value=9);
+     and o.acc not in(select acc from accountsw where tag='BUS_MOD');
   COMMIT;
 end; 
 /
@@ -271,7 +270,7 @@ tuda;
     and c.date_off is null and cw.rnk=c.rnk
     group by cw.rnk
     having count(*)>1)  
-    and o.acc not in(select acc from accountsw where tag='BUS_MOD' and value=10);
+    and o.acc not in(select acc from accountsw where tag='BUS_MOD');
    COMMIT;
 end; 
 /
@@ -288,7 +287,7 @@ tuda;
       and c.date_off is null and cw.rnk=c.rnk
       group by cw.rnk
       having count(*)>1) 
-      and a.acc not in(select acc from accountsw where tag='BUS_MOD' and value=11);
+      and a.acc not in(select acc from accountsw where tag='BUS_MOD');
      COMMIT;
 end; 
 /      
@@ -303,7 +302,7 @@ tuda;
      and a.dazs is null
      and a.rnk in (select cw.rnk from  customerw cw,customer c,KL_K110 k1 where k1.K110=c.ved and cw.tag='BUSSL' and cw.value='1' and c.date_off is null 
      and cw.rnk=c.rnk and k1.k111 not in('01','02','03','10','11','12','35','41','42','43','49','50','51','52'))
-     and a.acc not in(select acc from accountsw where tag='BUS_MOD' and value=14);
+     and a.acc not in(select acc from accountsw where tag='BUS_MOD');
    COMMIT;
 end; 
 /  

@@ -106,3 +106,4 @@ SELECT x.isp
            AND d.vidd IN (1, 2, 3)
            AND d.sos = 0
            ) x;
+grant select on v_cck_nu to bars_access_defrole;

@@ -59,15 +59,13 @@ begin
  COMMIT;
 end;  
 /
-
 begin
 tuda;
-     insert into accountsw
+    insert /*+ ignore_row_on_dupkey_index(accountsw PK_ACCOUNTSW )*/ into accountsw
      (acc, tag, value)
-   select acc,'IFRS','AC' from accountsw where ((tag='BUS_MOD' and value=15) or (tag='SPPI' and value='връ')) and kf=m.kf
+   select acc,'IFRS','AC' from accountsw where ((tag='BUS_MOD' and value=15) or (tag='SPPI' and value='връ')) 
        group by acc
-        having count(*)>1  
-  and acc not in (select acc from accountsw where tag='IFRS' and value='AC');       
+        having count(*)>1;      
  COMMIT;
 end;  
 /   
@@ -75,25 +73,22 @@ end;
 ---IFRS accountsw
 begin
 tuda;
-    insert into accountsw
+    insert /*+ ignore_row_on_dupkey_index(accountsw PK_ACCOUNTSW )*/ into accountsw
      (acc, tag, value)
      select a.acc,'IFRS','AC' from
-       (select distinct acc from  accounts where dazs is null and nbs in ('1811','1819','2800','2801','2805','2806','2809','3548','3570','3578','3541','3710')
-       union 
-       select distinct acc  from  accounts where nbs in ('3540') and OB22 in (01,03) and dazs is null)a
-   where a.acc not in (select acc from accountsw where tag='IFRS'); 
+       (select acc from  accounts   where dazs is null and (nbs in (1811,1819,2800,2801,2805,2806,2809,3548,3570,3578,3541,3710)
+        or (nbs=3540 and OB22 in (01,03))))a;
   commit;
   end;
 /       
 ---- оЫ Accounts
 begin
 tuda;
-     insert into accountsw
+     insert /*+ ignore_row_on_dupkey_index(accountsw PK_ACCOUNTSW )*/ into accountsw
      (acc, tag, value)
       select distinct acc,'IFRS','AC' from accountsw where (tag='BUS_MOD' and value in(6,7,8,9,10,11,14) or (tag='SPPI' and value='връ'))
        group by acc
-       having count(*)>1  
-       and acc not in (select acc from accountsw where tag='IFRS'); 
+       having count(*)>1 ;
     COMMIT;
 end;  
 /  

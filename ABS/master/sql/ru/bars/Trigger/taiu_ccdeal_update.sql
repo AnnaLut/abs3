@@ -45,6 +45,7 @@ begin
     l_rec.KOL_SP    := :old.KOL_SP;
     l_rec.S250      := :old.S250;
     l_rec.GRP       := :old.GRP;
+    l_rec.NDG       := :old.NDG;
 
   else
 
@@ -139,6 +140,10 @@ begin
            (:old.GRP          != :new.GRP) or
            (:old.GRP is Null AND :new.GRP is Not Null) or
            (:new.GRP is Null AND :old.GRP is Not Null)
+           OR
+           (:old.NDG          != :new.NDG) or
+           (:old.NDG is Null AND :new.NDG is Not Null) or
+           (:new.NDG is Null AND :old.NDG is Not Null)
          )
       then
         l_rec.CHGACTION := 'U';
@@ -174,6 +179,7 @@ begin
     l_rec.KOL_SP    := :new.KOL_SP;
     l_rec.S250      := :new.S250;
     l_rec.GRP       := :new.GRP;
+    l_rec.NDG       := :new.NDG;
 
   end if;
 

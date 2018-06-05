@@ -5,8 +5,7 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Trigger/TBU_CCDEAL_EIB10.sql ===
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  trigger TBU_CCDEAL_EIB10 ***
-
+PROMPT *** 
 CREATE OR REPLACE TRIGGER TBU_CCDEAL_EIB10
   before update of sos ON CC_DEAL
   for each row
@@ -14,7 +13,7 @@ CREATE OR REPLACE TRIGGER TBU_CCDEAL_EIB10
 declare
   l_cc_deal  cc_deal%rowtype;
   l_cprod    nd_txt.txt%type;
-  l_cig_d13  varchar2(250);
+  l_cig_d13  nd_txt.txt%type;
   l_eibis    fm_yesno.id%type;
   l_nd_txt   nd_txt.nd%type;
   l_tag      nd_txt.tag%type;
@@ -29,9 +28,9 @@ begin
   if (l_cusstype = 2 or (l_cusstype = 3 and l_sed = '910')) and
      :new.VIDD <> 26 then
     begin
-      select value
+      select txt
         into l_cig_d13
-        from mos_operw
+        from nd_txt
        where nd = :new.nd
          and tag = 'CIG_D13';
     exception
@@ -101,7 +100,6 @@ begin
   end if;
 
 end tbu_ccdeal_eib10;
-
 /
 ALTER TRIGGER BARS.TBU_CCDEAL_EIB10 ENABLE;
 
