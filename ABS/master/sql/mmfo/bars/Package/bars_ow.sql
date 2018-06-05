@@ -3881,7 +3881,7 @@ begin
 
   -- открытие счета
   op_reg_ex(99, 0, 0, null, l_p4, l_pk_rnk,
-     l_nls, l_pk_kv, l_nms, 'ODB', l_pk_isp, l_acc,
+     l_nls, l_pk_kv, l_nms, p_trmask.tip, l_pk_isp, l_acc,
      '1', l_pap, null, null, null, null, null, null, null, null, null, null,
      l_pk_tobo);
 
