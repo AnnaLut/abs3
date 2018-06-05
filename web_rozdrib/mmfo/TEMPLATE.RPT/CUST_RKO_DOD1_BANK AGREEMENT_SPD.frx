@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" ReportInfo.Created="04/07/2017 12:57:04" ReportInfo.Modified="04/26/2017 17:03:58" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+using System.Data.Sql;
+using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    public string TicDoc_attr(string Var)
+    {
+      // Обработка параметрів
+      Parameter p_rnk = Report.GetParameter(&quot;rnk&quot;);
+      Parameter p_adds = Report.GetParameter(&quot;adds&quot;);
+      String p_value1 = &quot;&quot;;
+      String p_value2 = &quot;&quot;;
+      String p_value3 = &quot;&quot;;
+      
+      OracleDataConnection frxcon = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection con = (OracleConnection)frxcon.GetConnection();
+      OracleCommand cmd = con.CreateCommand();
+      
+      cmd.CommandType = CommandType.StoredProcedure;
+      cmd.CommandText = &quot;cc_doc_get_var_value2&quot;;
+         
+      cmd.Parameters.Add(&quot;p_tag&quot;,     OracleDbType.Varchar2, Var,           ParameterDirection.Input);       //0
+      cmd.Parameters.Add(&quot;p_dealnum&quot;, OracleDbType.Decimal, p_rnk.Value,     ParameterDirection.Input);       //1
+      cmd.Parameters.Add(&quot;p_agrmnum&quot;, OracleDbType.Decimal, p_adds.Value,             ParameterDirection.Input);        //2
+      cmd.Parameters.Add(&quot;p_value1&quot;, OracleDbType.Varchar2, 2000, p_value1, ParameterDirection.InputOutput); //3
+      cmd.Parameters.Add(&quot;p_value2&quot;, OracleDbType.Varchar2, 2000, p_value2, ParameterDirection.InputOutput); //4
+      cmd.Parameters.Add(&quot;p_value3&quot;, OracleDbType.Varchar2, 2000, p_value3, ParameterDirection.InputOutput); //5
+      
+      con.Open();
+      try
+      {
+        cmd.ExecuteNonQuery();
+        
+        p_value1 = cmd.Parameters[&quot;p_value1&quot;].Value.ToString();
+        p_value2 = cmd.Parameters[&quot;p_value2&quot;].Value.ToString();
+        p_value2 = cmd.Parameters[&quot;p_value3&quot;].Value.ToString();
+
+      }
+      finally
+      {
+        con.Close();
+      }
+      
+      return   p_value1;
+      
+    }
+    
+    
+    // Получение значения параметра тикета
+    public string GetVal(string Var)
+    {
+      try
+      {
+        string p_val = TicDoc_attr(Var);
+        
+        if (!String.IsNullOrEmpty(p_val) &amp;&amp; p_val != &quot;null&quot;)
+          return p_val;
+        else 
+          return &quot;&quot;;
+      }
+      catch (Exception) {  return &quot;&quot;; }
+    }
+    
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE4SfRUo0gAvZZlixYq2Z3ogfraLREh1tqQDbBypq2J1og==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select 1 from dual">
+        <Column Name="1" DataType="System.Decimal"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="rnk" DataType="System.String"/>
+    <Parameter Name="adds" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="66.15" CanGrow="true" CanShrink="true" CanBreak="true">
+      <PictureObject Name="Picture1" Left="9.45" Width="140.25" Height="56.45" CanGrow="true" CanShrink="true" GrowToBottom="true" SizeMode="CenterImage" Image="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"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="69.35" Width="718.2" Height="973.33" CanGrow="true" CanShrink="true" CanBreak="true" KeepTogether="true">
+      <TableObject Name="Table1" Width="718.2" Height="494.76" Dock="Top" GrowToBottom="true">
+        <TableColumn Name="Column6" Width="48.95" AutoSize="true"/>
+        <TableColumn Name="Column1" Width="334.91"/>
+        <TableColumn Name="Column5" Width="324.9"/>
+        <TableRow Name="Row1" Height="31.67" AutoSize="true">
+          <TableCell Name="Cell114"/>
+          <TableCell Name="Cell1" Text="Додатковий договір № ____&#13;&#10;до Договору банківського обслуговування № [GetVal(&quot;CUST_DKBO&quot;)] від [GetVal(&quot;CUST_DDBO_LIT&quot;)]" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell5"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="22.22" AutoSize="true">
+          <TableCell Name="Cell115"/>
+          <TableCell Name="Cell6" Text="[GetVal(&quot;BANK_LOCATION&quot;)] (Україна)	" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell10" Text="[GetVal(&quot;CUST_DDBO_LIT&quot;)]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="97.82" AutoSize="true">
+          <TableCell Name="Cell116"/>
+          <TableCell Name="Cell11" Text="&lt;b&gt;Сторона 1:&lt;/b&gt; Юридична особа за законодавством України – публічне акціонерне товариство &quot;Державний ощадний банк України&quot; (далі – Банк), в особі [GetVal(&quot;CUST_RKO_POSNMGEN&quot;)], який(а) діє на підставі [GetVal(&quot;CUST_RKO_D_GEN&quot;)] від [GetVal(&quot;CUST_RKO_ATTORNEY_DT&quot;)] року, посвідченої [GetVal(&quot;CUST_RKO_NOTARY_TP&quot;)] нотаріусом [GetVal(&quot;CUST_RKO_NOTARY_DIST&quot;)] [GetVal(&quot;CUST_RKO_NOTARY_NM&quot;)] та зареєстрованої в реєстрі за № [GetVal(&quot;CUST_RKO_ATTOR_NUM&quot;)] з однієї сторони, та&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell15"/>
+        </TableRow>
+        <TableRow Name="Row16" Height="82.7" AutoSize="true">
+          <TableCell Name="Cell117"/>
+          <TableCell Name="Cell46" Text="&lt;b&gt;Сторона 2:&lt;/b&gt; [GetVal(&quot;CUST_NMK&quot;)], дата та номер запису в Єдиному державному реєстрі юридичних осіб, фізичних осіб-підприємців та громадських формувань [GetVal(&quot;CUST_DATEA_LIT&quot;)] № [GetVal(&quot;CUST_RGADM&quot;)], з другої сторони (далі разом – Сторони, а окремо – Сторона), уклали цей Додатковий договір № ___ від &quot;___&quot; ______________ _____ р. до Договору банківського обслуговування № [GetVal(&quot;CUST_DKBO&quot;)] від [GetVal(&quot;CUST_DDBO_LIT&quot;)] (далі – Додатковий договір) про наступне:" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell47"/>
+        </TableRow>
+        <TableRow Name="Row42" Height="16.55" AutoSize="true">
+          <TableCell Name="Cell118"/>
+          <TableCell Name="Cell98" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell99" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row17" Height="44.9">
+          <TableCell Name="Cell119" Text="1." Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell48" Text="Сторони погодили наступні строки приймання готівкових коштів на поточний рахунок Клієнта:" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell49" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row11" Height="16.55">
+          <TableCell Name="Cell120"/>
+          <TableCell Name="Cell36" Border.Lines="Top, Bottom" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell37" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row13" Height="16.55">
+          <TableCell Name="Cell121"/>
+          <TableCell Name="Cell40" Border.Lines="Top, Bottom" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell41" Border.Lines="Top, Bottom" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row14" Height="16.55">
+          <TableCell Name="Cell122"/>
+          <TableCell Name="Cell42" Border.Lines="Top, Bottom" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell43" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row18" Height="16.55">
+          <TableCell Name="Cell123"/>
+          <TableCell Name="Cell50" Border.Lines="Top, Bottom" HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell51" Border.Lines="Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row43" Height="16.55">
+          <TableCell Name="Cell124"/>
+          <TableCell Name="Cell100" Border.Lines="Top, Bottom" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell101" Border.Lines="Top, Bottom" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row15" Height="14.3">
+          <TableCell Name="Cell126"/>
+          <TableCell Name="Cell44" HorzAlign="Center" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell45" HorzAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row22" Height="35.45" AutoSize="true">
+          <TableCell Name="Cell127" Text="2." Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell58" Text="Даний Додатковий договір набирає чинності з дати її підписання уповноваженими представниками Сторін та скріплення їх підписів печатками Сторін (за наявності)." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell59"/>
+        </TableRow>
+        <TableRow Name="Row21" Height="30.95" AutoSize="true">
+          <TableCell Name="Cell128" Text="3." Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell56" Text="З дати набрання чинності даного Додаткового договору втрачають чинність усі раніше погоджені Сторонами умови щодо строку здавання Клієнтом готівкової виручки." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell57"/>
+        </TableRow>
+        <TableRow Name="Row20" Height="35.45" AutoSize="true">
+          <TableCell Name="Cell129" Text="4." Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell54" Text="Цей Додатковий договір укладено в двох оригінальних примірниках українською мовою, по одному для кожної Сторони. Всі примірники мають однакову юридичну силу." HorzAlign="Justify" Font="Times New Roman, 10pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell55"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table1" Left="9.45" Top="500.85" Width="695.08" Height="472.48" GrowToBottom="true" CanBreak="false">
+        <TableColumn Name="Column31" Width="261.78"/>
+        <TableColumn Name="Column32" Width="58.12"/>
+        <TableColumn Name="Column33" Width="309.03"/>
+        <TableColumn Name="Column34"/>
+        <TableRow Name="Row93" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell345" Text="5.	Реквізити та підписи Сторін" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="4"/>
+          <TableCell Name="Cell346"/>
+          <TableCell Name="Cell347" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell348"/>
+        </TableRow>
+        <TableRow Name="Row94" Height="28.35">
+          <TableCell Name="Cell349" Text="Сторона 1. Банк" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell350"/>
+          <TableCell Name="Cell351" Text="Сторона 2. Клієнт" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell352"/>
+        </TableRow>
+        <TableRow Name="Row95" Height="28.35" AutoSize="true">
+          <TableCell Name="Cell353" Text="Публічне акціонерне товариство &quot;Державний ощадний банк України&quot; &#13;&#10;Філія - [GetVal(&quot;BANK_NAME&quot;)]" Font="Times New Roman, 10pt" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell354"/>
+          <TableCell Name="Cell355" Text="[GetVal(&quot;CUST_NMK&quot;)]" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell356"/>
+        </TableRow>
+        <TableRow Name="Row96" Height="37.79" AutoSize="true">
+          <TableCell Name="Cell357"/>
+          <TableCell Name="Cell358"/>
+          <TableCell Name="Cell359" Text="паспорт серії [GetVal(&quot;CUST_RKO_SERNUMD&quot;)], &#13;&#10;виданий [GetVal(&quot;CUST_RKO_ORGDAT&quot;)]." Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell360"/>
+        </TableRow>
+        <TableRow Name="Row97" Height="37.79">
+          <TableCell Name="Cell361" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell362"/>
+          <TableCell Name="Cell363" Text="Реєстраційний номер облікової картки [GetVal(&quot;CUST_OKPO&quot;)]" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell364"/>
+        </TableRow>
+        <TableRow Name="Row98" Height="56.71" AutoSize="true">
+          <TableCell Name="Cell365" Text="Адреса місцезнаходження:&#13;&#10;[GetVal(&quot;ADR1&quot;)]" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell366"/>
+          <TableCell Name="Cell367" Text="Адреса місця проживання: [GetVal(&quot;CUST_ADRU&quot;)]" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell368"/>
+        </TableRow>
+        <TableRow Name="Row99" Height="66.14" AutoSize="true">
+          <TableCell Name="Cell369" Text="Код банку [GetVal(&quot;BANK_MFO&quot;)] , Код ЄДРПОУ  [GetVal(&quot;BANK_OKPO&quot;)]" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell370"/>
+          <TableCell Name="Cell371" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell372"/>
+        </TableRow>
+        <TableRow Name="Row100">
+          <TableCell Name="Cell373" Border.Lines="Bottom" Text="[GetVal(&quot;CUST_RKO_SHORT_NM&quot;)]" VertAlign="Bottom"/>
+          <TableCell Name="Cell374" Text="(підпис)" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell375" Border.Lines="Bottom" Text="[GetVal(&quot;CUST_RKO_SHORT_NM_C&quot;)]" VertAlign="Bottom"/>
+          <TableCell Name="Cell376" Text="(підпис)" Font="Times New Roman, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row101" Height="66.15">
+          <TableCell Name="Cell377" Text="&#13;&#10;&#13;&#10;&lt;b&gt;М.П.&lt;/b&gt;" Font="Times New Roman, 10pt" HtmlTags="true"/>
+          <TableCell Name="Cell378"/>
+          <TableCell Name="Cell379" Text="&#13;&#10;&#13;&#10;&lt;b&gt;М.П.&lt;/b&gt;" Font="Times New Roman, 10pt, style=Bold" HtmlTags="true"/>
+          <TableCell Name="Cell380"/>
+        </TableRow>
+        <TableRow Name="Row102" Height="103.95">
+          <TableCell Name="Cell381" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell382" Text="Примірник договору отримав __________________/ _____________&#13;&#10;				(ПІБ)                      (підпис)" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell383"/>
+          <TableCell Name="Cell384"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

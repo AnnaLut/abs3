@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Data;
 using System.IO;
-using System.Text;
 using BarsWeb;
 using BarsWeb.Areas.InsUi.Models.Transport;
 using Bars.Classes;
@@ -22,31 +21,26 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
         public HttpResponseMessage Post()
         {
             CreateDealResponse response = new CreateDealResponse() { success = true, message = "Ok" };
-
             string p_xml = String.Empty;
 
-            using (StreamReader ReqStream = new StreamReader(HttpContext.Current.Request.InputStream))
-            using (MemoryStream MemStream = new MemoryStream())
+            using (StringWriter XmlStrWriter = new StringWriter())
+            using (XmlTextWriter XmlWriter = new XmlTextWriter(XmlStrWriter))
             {
                 XmlDocument xml = new XmlDocument();
-                xml.Load(JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(ReqStream.ReadToEnd() as string), new XmlDictionaryReaderQuotas()));
-                xml.Save(MemStream);
-                MemStream.Position = 0;
+                xml.Load(JsonReaderWriterFactory.CreateJsonReader(HttpContext.Current.Request.InputStream, new XmlDictionaryReaderQuotas()));
+                xml.Save(XmlWriter);
 
-                using (StreamReader XmlStrRead = new StreamReader(MemStream))
-                {
-                    p_xml = XmlStrRead.ReadToEnd();
-                }
+                p_xml = XmlStrWriter.ToString();
             }
 
             using (OracleConnection con = OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = con.CreateCommand())
             {
-                cmd.CommandType = CommandType.StoredProcedure;
                 try
                 {
                     using (OracleXmlType _pXml = new OracleXmlType(con, p_xml))
                     {
+                        cmd.CommandType = CommandType.StoredProcedure;
                         cmd.CommandText = "bars.ins_ewa_mgr.create_deal";
                         cmd.Parameters.Add("p_params", OracleDbType.XmlType, _pXml, ParameterDirection.Input);
                         cmd.Parameters.Add("p_deal_number", OracleDbType.Decimal, ParameterDirection.Output);

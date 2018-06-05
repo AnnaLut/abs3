@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/14/2017 18:09:48" ReportInfo.Modified="11/14/2017 09:44:54" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfTa8Y76f2dO30xanMWipwcw==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum ID, zpd.NAMB, zpd.OKPOB, zpd.MFOB, zpd.NLSB, zpd.S/100 S from ZP_PAYROLL_DOC zpd &#13;&#10;where zpd.id_pr = :zp_id order by 1">
+        <Column Name="S" DataType="System.Int32"/>
+        <Column Name="ID" DataType="System.Int32"/>
+        <Column Name="NAMB" DataType="System.String"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="OKPOB" DataType="System.String"/>
+        <Column Name="MFOB" DataType="System.String"/>
+        <CommandParameter Name="zp_id" DataType="112" Expression="[zp_id]"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="Header" DataType="System.Int32" Enabled="true" SelectCommand="select zp.NAZN NAZN, to_char(zp.crt_date, 'dd.mm.yyyy') CRT_DATE, zp.PAYROLL_NUM PAYROLL_NUM, (select c.nmk from customer c where c.rnk = zp.rnk) NMK, (select b.name from branch b where b.branch = zp.branch) BANK_NAME, vzp.okpo OKPO, vzp.nls_2909 NLS_2909 from ZP_PAYROLL zp, V_ZP_DEALS vzp &#13;&#10;where vzp.id = zp.zp_id and zp.id = :zp_id">
+        <Column Name="PAYROLL_NUM" DataType="System.String"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.String"/>
+        <Column Name="BANK_NAME" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NLS_2909" DataType="System.String"/>
+        <CommandParameter Name="zp_id" DataType="112" Expression="[zp_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="zp_id" DataType="System.Int32"/>
+    <Total Name="Total_S" Expression="[Table.S]" Evaluator="Data2" PrintOn="ColumnFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="233" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle2" Width="805.14" Height="28.35">
+      <TextObject Name="Text1" Width="803.25" Height="28.35" Text="Зведена відомість сум для зарахування на картрахунки" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="32.35" Width="805.14" Height="189" DataSource="Table1">
+      <TableObject Name="Table2" Top="9.45" Width="642.6" Height="132.3">
+        <TableColumn Name="Column60" Width="226.8"/>
+        <TableColumn Name="Column61" Width="415.8"/>
+        <TableRow Name="Row67">
+          <TableCell Name="Cell308" Text="Номер списку"/>
+          <TableCell Name="Cell309" Text="[Header.PAYROLL_NUM]"/>
+        </TableRow>
+        <TableRow Name="Row68">
+          <TableCell Name="Cell313" Text="Назва організації"/>
+          <TableCell Name="Cell314" Text="[Header.NMK]"/>
+        </TableRow>
+        <TableRow Name="Row77">
+          <TableCell Name="Cell354" Text="Код ЄДРПОУ"/>
+          <TableCell Name="Cell355" Text="[Header.OKPO]"/>
+        </TableRow>
+        <TableRow Name="Row69">
+          <TableCell Name="Cell318" Text="Дата"/>
+          <TableCell Name="Cell319" Text="[Header.CRT_DATE]"/>
+        </TableRow>
+        <TableRow Name="Row70">
+          <TableCell Name="Cell323" Text="Назва та № установи Ощадбанку"/>
+          <TableCell Name="Cell324" Text="[Header.BANK_NAME]"/>
+        </TableRow>
+        <TableRow Name="Row78">
+          <TableCell Name="Cell356" Text="Рахунок 2909"/>
+          <TableCell Name="Cell357" Text="[Header.NLS_2909]"/>
+        </TableRow>
+        <TableRow Name="Row71">
+          <TableCell Name="Cell328" Text="Призначення платежу"/>
+          <TableCell Name="Cell329" Text="[Header.NAZN]"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table3" Top="151.2" Width="802.84" Height="37.8">
+        <TableColumn Name="Column62" Width="54.23"/>
+        <TableColumn Name="Column63" Width="262.12"/>
+        <TableColumn Name="Column66" Width="113.4"/>
+        <TableColumn Name="Column67"/>
+        <TableColumn Name="Column64" Width="139.29"/>
+        <TableColumn Name="Column65" Width="167.65"/>
+        <TableRow Name="Row76" Height="37.8">
+          <TableCell Name="Cell350" Border.Lines="All" Fill.Color="LightSkyBlue" Text="№ з/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell351" Border.Lines="All" Fill.Color="LightSkyBlue" Text="Прізвище, ім'я та по батькові працівника" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell358" Border.Lines="All" Fill.Color="LightSkyBlue" Text="ІНН" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell359" Border.Lines="All" Fill.Color="LightSkyBlue" Text="МФО" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell352" Border.Lines="All" Fill.Color="LightSkyBlue" Text="№ картрахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell353" Border.Lines="All" Fill.Color="LightSkyBlue" Text="Сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data2" Top="225.35" Width="805.14" Height="18.9" DataSource="Table">
+        <TableObject Name="Table4" Width="802.82" Height="18.9">
+          <TableColumn Name="Column56" Width="54.23"/>
+          <TableColumn Name="Column57" Width="262.13"/>
+          <TableColumn Name="Column68" Width="113.4"/>
+          <TableColumn Name="Column69"/>
+          <TableColumn Name="Column58" Width="139.28"/>
+          <TableColumn Name="Column59" Width="167.63"/>
+          <TableRow Name="Row66">
+            <TableCell Name="Cell304" Border.Lines="All" Text="[Table.ID]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+            <TableCell Name="Cell305" Border.Lines="All" Text="[Table.NAMB]"/>
+            <TableCell Name="Cell360" Border.Lines="All" Text="[Table.OKPOB]" HorzAlign="Center"/>
+            <TableCell Name="Cell361" Border.Lines="All" Text="[Table.MFOB]" HorzAlign="Center"/>
+            <TableCell Name="Cell306" Border.Lines="All" Text="[Table.NLSB]" HorzAlign="Center"/>
+            <TableCell Name="Cell307" Border.Lines="All" Text="[Table.S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+    </DataBand>
+    <ColumnFooterBand Name="ColumnFooter1" Top="248.25" Width="805.14" Height="18.9">
+      <TableObject Name="Table2" Width="802.82" Height="18.9">
+        <TableColumn Name="Column70" Width="54.23"/>
+        <TableColumn Name="Column71" Width="262.13"/>
+        <TableColumn Name="Column72" Width="113.4"/>
+        <TableColumn Name="Column73"/>
+        <TableColumn Name="Column74" Width="139.28"/>
+        <TableColumn Name="Column75" Width="167.63"/>
+        <TableRow Name="Row79">
+          <TableCell Name="Cell362" Border.Lines="All" Text="Всього" HorzAlign="Right" Font="Arial, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell363" Border.Lines="All"/>
+          <TableCell Name="Cell364" Border.Lines="All"/>
+          <TableCell Name="Cell365" Border.Lines="All"/>
+          <TableCell Name="Cell366" Border.Lines="All" HorzAlign="Center"/>
+          <TableCell Name="Cell367" Border.Lines="All" Text="[Total_S]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+    </ColumnFooterBand>
+    <PageFooterBand Name="PageFooter1" Top="271.15" Width="805.14" Height="18.9">
+      <TextObject Name="Text2" Left="708.75" Width="94.5" Height="18.9" Text="[Page#]" HorzAlign="Right" VertAlign="Center"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

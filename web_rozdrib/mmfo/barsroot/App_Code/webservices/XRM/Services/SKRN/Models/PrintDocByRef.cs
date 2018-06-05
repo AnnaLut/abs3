@@ -1,7 +1,4 @@
-﻿using System;
-using System.Xml.Serialization;
-
-namespace Bars.WebServices.XRM.Services.SKRN.Models
+﻿namespace Bars.WebServices.XRM.Services.SKRN.Models
 {
     public class PrintDocByRefRequest
     {

@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/24/2017 11:39:35" ReportInfo.Modified="07/28/2017 12:56:22" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfhUceVFp0/RBLNJ/jEP9m8Q==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT DAT00 DATGEN,&#13;&#10;         DAT01 DAT1,&#13;&#10;         DAT02 DAT2,&#13;&#10;         CHAR00 MFO,&#13;&#10;         CHAR01 BRANCH,&#13;&#10;         NUM00 RNK,&#13;&#10;         CHAR02 OKPO,&#13;&#10;         DAT03 DATE_ON,&#13;&#10;         DAT04 DATE_OFF,&#13;&#10;         CHAR03 NMKU,&#13;&#10;         CHAR04 NMKK,&#13;&#10;         CHAR05 ADR,&#13;&#10;         NUM01 COUNTRY,&#13;&#10;         NUM02 PRINSIDER,&#13;&#10;         CHAR06 ISE,&#13;&#10;         CHAR07 FS,&#13;&#10;         CHAR08 VED,&#13;&#10;         CHAR09 K050,&#13;&#10;         CHAR10 RUK,&#13;&#10;         CHAR11 ISP,&#13;&#10;         CHAR12 IDDPD,&#13;&#10;         CHAR13 IDDPL,&#13;&#10;         CHAR14 FSKPR,&#13;&#10;         CHAR15 FSPOR,&#13;&#10;         CHAR16 FSZOP,&#13;&#10;         CHAR17 FSOVR,&#13;&#10;         CHAR18 FSRSK,&#13;&#10;         CHAR19 SUTD,&#13;&#10;         CHAR20 CCVED,&#13;&#10;         CHAR21 UUDV,&#13;&#10;         CHAR22 TYPDIST,&#13;&#10;         NUM03 CUSTTYPE,&#13;&#10;         CHAR23 KVPKK&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :session_id&#13;&#10;ORDER BY id">
+        <Column Name="DATGEN" DataType="System.DateTime"/>
+        <Column Name="DAT1" DataType="System.DateTime"/>
+        <Column Name="DAT2" DataType="System.DateTime"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="DATE_ON" DataType="System.DateTime"/>
+        <Column Name="DATE_OFF" DataType="System.DateTime"/>
+        <Column Name="NMKU" DataType="System.String"/>
+        <Column Name="NMKK" DataType="System.String"/>
+        <Column Name="ADR" DataType="System.String"/>
+        <Column Name="COUNTRY" DataType="System.Int16"/>
+        <Column Name="PRINSIDER" DataType="System.Decimal"/>
+        <Column Name="ISE" DataType="System.String"/>
+        <Column Name="FS" DataType="System.String"/>
+        <Column Name="VED" DataType="System.String"/>
+        <Column Name="K050" DataType="System.String"/>
+        <Column Name="RUK" DataType="System.String"/>
+        <Column Name="ISP" DataType="System.String"/>
+        <Column Name="IDDPD" DataType="System.String"/>
+        <Column Name="IDDPL" DataType="System.String"/>
+        <Column Name="FSKPR" DataType="System.String"/>
+        <Column Name="FSPOR" DataType="System.String"/>
+        <Column Name="FSZOP" DataType="System.String"/>
+        <Column Name="FSOVR" DataType="System.String"/>
+        <Column Name="FSRSK" DataType="System.String"/>
+        <Column Name="SUTD" DataType="System.String"/>
+        <Column Name="CCVED" DataType="System.String"/>
+        <Column Name="UUDV" DataType="System.String"/>
+        <Column Name="TYPDIST" DataType="System.String"/>
+        <Column Name="CUSTTYPE" DataType="System.Decimal"/>
+        <Column Name="KVPKK" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="112" DefaultValue="392267"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int16"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="600">
+    <ReportTitleBand Name="ReportTitle1" Width="2192.4" Height="37.8">
+      <TextObject Name="Text1" Left="18.9" Top="9.45" Width="585.9" Height="18.9" Text="Щомісячний звіт по корпоративним клієнтам" Font="Arial, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41" Width="2192.4" Height="122.85">
+      <TableObject Name="Table1" Width="2182.95" Height="122.85">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableColumn Name="Column6"/>
+        <TableColumn Name="Column7"/>
+        <TableColumn Name="Column8"/>
+        <TableColumn Name="Column9"/>
+        <TableColumn Name="Column10"/>
+        <TableColumn Name="Column11"/>
+        <TableColumn Name="Column12"/>
+        <TableColumn Name="Column13"/>
+        <TableColumn Name="Column14"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16"/>
+        <TableColumn Name="Column17"/>
+        <TableColumn Name="Column18"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column22"/>
+        <TableColumn Name="Column23"/>
+        <TableColumn Name="Column24"/>
+        <TableColumn Name="Column25"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27"/>
+        <TableColumn Name="Column28"/>
+        <TableColumn Name="Column29"/>
+        <TableColumn Name="Column30"/>
+        <TableColumn Name="Column31"/>
+        <TableColumn Name="Column32"/>
+        <TableColumn Name="Column33"/>
+        <TableRow Name="Row1" Height="122.85">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Звітна дата" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="З" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="По" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="МФО" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Бранч" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="РНК" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="ОКПО" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Дата відкриття" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="Дата закриття" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="Повна назва" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="Назва клієнта" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="Адреса" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="Код країни" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="Код інсайдера" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="Код сектора економіки" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="Форма власності" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="Вид економісної діяльності" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="К050" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="Керівник - ФІО" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="Менеджер клієнта" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="Дата внесення до анкети останніх змін" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="Дата планової iдентифiкацiї" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="Оцінка фiн.стану: Кiлькість штатних працiвникiв" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="Оцінка фiн.стану: Прибуток за останній фінансовий рiк" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="Оцінка фiн.стану: Збиток за останній фінансовий рiк" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="Оцінка фiн.стану: Обсяг виручки за останній фінансовий рік" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="Оцінка фiн.стану: Розмiр статутного капiталу" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="Характеристика суті діяльності" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="Вид (види) господарської (економічної) діяльності" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="Частка державної власності" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="Тип системи обслуговування" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="Тип клієнта" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell53" Border.Lines="All" Text="Код відокремленого підрозділу корп. клієнта" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="167.05" Width="2192.4" Height="18.9" DataSource="Table">
+      <TableObject Name="Table1" Width="2182.95" Height="18.9">
+        <TableColumn Name="Column34"/>
+        <TableColumn Name="Column35"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column37"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41"/>
+        <TableColumn Name="Column42"/>
+        <TableColumn Name="Column43"/>
+        <TableColumn Name="Column44"/>
+        <TableColumn Name="Column45"/>
+        <TableColumn Name="Column46"/>
+        <TableColumn Name="Column47"/>
+        <TableColumn Name="Column48"/>
+        <TableColumn Name="Column49"/>
+        <TableColumn Name="Column50"/>
+        <TableColumn Name="Column51"/>
+        <TableColumn Name="Column52"/>
+        <TableColumn Name="Column53"/>
+        <TableColumn Name="Column54"/>
+        <TableColumn Name="Column55"/>
+        <TableColumn Name="Column56"/>
+        <TableColumn Name="Column57"/>
+        <TableColumn Name="Column58"/>
+        <TableColumn Name="Column59"/>
+        <TableColumn Name="Column60"/>
+        <TableColumn Name="Column61"/>
+        <TableColumn Name="Column62"/>
+        <TableColumn Name="Column63"/>
+        <TableColumn Name="Column64"/>
+        <TableColumn Name="Column65"/>
+        <TableColumn Name="Column66"/>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell54" Border.Lines="All" Text="[Table.DATGEN]" HorzAlign="Center"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="[Table.DAT1]" HorzAlign="Center"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[Table.DAT2]" HorzAlign="Center"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[Table.MFO]" HorzAlign="Center"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[Table.BRANCH]" HorzAlign="Center"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Center"/>
+          <TableCell Name="Cell60" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="[Table.DATE_ON]" HorzAlign="Center"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="[Table.DATE_OFF]" HorzAlign="Center"/>
+          <TableCell Name="Cell63" Border.Lines="All" Text="[Table.NMKU]" HorzAlign="Center"/>
+          <TableCell Name="Cell64" Border.Lines="All" Text="[Table.NMKK]" HorzAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Text="[Table.ADR]" HorzAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Text="[Table.COUNTRY]" HorzAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="[Table.PRINSIDER]" HorzAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Text="[Table.ISE]" HorzAlign="Center"/>
+          <TableCell Name="Cell69" Border.Lines="All" Text="[Table.FS]" HorzAlign="Center"/>
+          <TableCell Name="Cell70" Border.Lines="All" Text="[Table.VED]" HorzAlign="Center"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="[Table.K050]" HorzAlign="Center"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="[Table.RUK]" HorzAlign="Center"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="[Table.ISP]" HorzAlign="Center"/>
+          <TableCell Name="Cell74" Border.Lines="All" Text="[Table.IDDPD]" HorzAlign="Center"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="[Table.IDDPL]" HorzAlign="Center"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="[Table.FSKPR]" HorzAlign="Center"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="[Table.FSPOR]" HorzAlign="Center"/>
+          <TableCell Name="Cell78" Border.Lines="All" Text="[Table.FSZOP]" HorzAlign="Center"/>
+          <TableCell Name="Cell79" Border.Lines="All" Text="[Table.FSOVR]" HorzAlign="Center"/>
+          <TableCell Name="Cell80" Border.Lines="All" Text="[Table.FSRSK]" HorzAlign="Center"/>
+          <TableCell Name="Cell81" Border.Lines="All" Text="[Table.SUTD]" HorzAlign="Center"/>
+          <TableCell Name="Cell82" Border.Lines="All" Text="[Table.CCVED]" HorzAlign="Center"/>
+          <TableCell Name="Cell83" Border.Lines="All" Text="[Table.UUDV]" HorzAlign="Center"/>
+          <TableCell Name="Cell84" Border.Lines="All" Text="[Table.TYPDIST]" HorzAlign="Center"/>
+          <TableCell Name="Cell85" Border.Lines="All" Text="[Table.CUSTTYPE]" HorzAlign="Center"/>
+          <TableCell Name="Cell86" Border.Lines="All" Text="[Table.KVPKK]" HorzAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="189.15" Width="2192.4" Height="18.9"/>
+  </ReportPage>
+</Report>

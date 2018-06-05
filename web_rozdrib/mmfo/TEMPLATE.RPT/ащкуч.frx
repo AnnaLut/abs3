@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/24/2015 10:52:20" ReportInfo.Modified="07/24/2015 11:10:48" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="obummfo" ConnectionString="rijcmlqNizv1VN/sKjy0pSfxyrRTpfQ4jO//2XeRViIY7yX+ZC30F2GVPRp8k5fa2foUXZxlxYy5Np69UVMH2WohEG6GQ=="/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="400" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1436.4" Height="47.25">
+      <TextObject Name="Text1" Top="9.45" Width="1313.55" Height="37.8" Text="КОНСОЛІДОВАНИЙ ПЛАТІЖНИЙ КАЛЕНДАР ПО DEPO-SWAP&#13;&#10;станом на" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="51.37" Width="1436.4" Height="151.2">
+      <TableObject Name="Table1" Width="1323" Height="151.2">
+        <TableColumn Name="Column1"/>
+        <TableColumn Name="Column2" Width="113.4"/>
+        <TableColumn Name="Column3"/>
+        <TableColumn Name="Column4"/>
+        <TableColumn Name="Column5"/>
+        <TableColumn Name="Column9" Width="122.85"/>
+        <TableColumn Name="Column14" Width="122.85"/>
+        <TableColumn Name="Column13" Width="122.85"/>
+        <TableColumn Name="Column12" Width="94.5"/>
+        <TableColumn Name="Column11"/>
+        <TableColumn Name="Column10" Width="122.85"/>
+        <TableColumn Name="Column8" Width="122.85"/>
+        <TableColumn Name="Column15" Width="103.95"/>
+        <TableColumn Name="Column16"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Дата угоди" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Контрагент" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Дата 1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Дата 2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" RowSpan="2"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Залучення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell41" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell66" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell56" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="Розміщення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="5"/>
+          <TableCell Name="Cell46" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell36" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell71" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell76" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="94.5">
+          <TableCell Name="Cell6" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Text="Вал1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="Сума 1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="Сума 2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell62" Border.Lines="All" Text="Результат, номінал (кол.6+кол.7) " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="%  (розраховується) " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell52" Border.Lines="All" Text="Вал2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" Text="Сума 1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="Сума 2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="Результат (кол.9+кол.10) " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="%  (розраховується) " HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="WhiteSmoke" Text="1" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="WhiteSmoke" Text="2" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="WhiteSmoke" Text="3" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="WhiteSmoke" Text="4" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="WhiteSmoke" Text="5" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell43" Border.Lines="All" Fill.Color="WhiteSmoke" Text="6" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="WhiteSmoke" Text="7" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="WhiteSmoke" Text="8" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="WhiteSmoke" Text="9" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell53" Border.Lines="All" Fill.Color="WhiteSmoke" Text="10" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="WhiteSmoke" Text="11" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell38" Border.Lines="All" Fill.Color="WhiteSmoke" Text="12" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell73" Border.Lines="All" Fill.Color="WhiteSmoke" Text="13" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell78" Border.Lines="All" Fill.Color="WhiteSmoke" Text="14" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell17" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell18" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell19" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell20" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell44" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell69" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell54" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell49" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell74" Border.Lines="All" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell79" Border.Lines="All" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/25/2017 10:39:26" ReportInfo.Modified="06/09/2017 10:04:39" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfxCAhrxKJ4Ftdum9O7gR2Qg==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00 l,&#13;&#10;          num00 sq,&#13;&#10;          num01 sq_eur,&#13;&#10;          num02 eur,&#13;&#10;          num03 usd_eur,&#13;&#10;          char01 dt1,&#13;&#10;          char02 dt2&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+        <Column Name="L" DataType="System.String"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="SQ_EUR" DataType="System.Decimal"/>
+        <Column Name="EUR" DataType="System.Decimal"/>
+        <Column Name="USD_EUR" DataType="System.Decimal"/>
+        <Column Name="DT1" DataType="System.String"/>
+        <Column Name="DT2" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Total Name="Total_sq" Expression="[Table.SQ]" Evaluator="Data1" PrintOn="PageFooter1"/>
+    <Total Name="Total_eur" Expression="[Table.SQ_EUR]" Evaluator="Data1" PrintOn="PageFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="444.15" Height="18.9" Text="Надходження коштів за період [Table.DT1]-[Table.DT2]"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="43.13" Width="718.2"/>
+    <DataBand Name="Data1" Top="48.47" Width="718.2" Height="18.9" DataSource="Table" KeepTogether="true">
+      <TextObject Name="Text2" Left="9.45" Width="198.45" Height="18.9" Text="[Table.L]"/>
+      <TextObject Name="Text4" Left="226.8" Width="217.35" Height="18.9" Text="[Table.SQ]" Format="Number" Format.UseLocale="true" WordWrap="false" Trimming="EllipsisCharacter"/>
+    </DataBand>
+    <ColumnFooterBand Name="ColumnFooter1" Top="72.7" Width="718.2" Height="75.6">
+      <TextObject Name="Text3" Left="226.8" Width="217.35" Height="18.9" Text="[Total_sq]" Format="Number" Format.UseLocale="true"/>
+      <TextObject Name="Text6" Left="9.45" Width="198.45" Height="18.9" Text="Всього:"/>
+      <TextObject Name="Text5" Left="226.8" Top="18.9" Width="217.35" Height="18.9" Text="[Total_eur]" Format="Number" Format.UseLocale="true"/>
+      <TextObject Name="Text7" Left="9.45" Top="18.9" Width="198.45" Height="18.9" Text="Еквівалент в Євро:"/>
+      <TextObject Name="Text8" Left="9.45" Top="37.8" Width="217.35" Height="18.9" Text="Середній курс за період:1€      ="/>
+      <TextObject Name="Text9" Left="226.8" Top="37.8" Width="75.6" Height="18.9" Text="[Table.EUR]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="4" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text11" Left="226.8" Top="56.7" Width="75.6" Height="18.9" Text="[Table.USD_EUR]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="4" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text12" Left="103.95" Top="56.7" Width="94.5" Height="18.9" Text="1$/1€ =" HorzAlign="Right"/>
+      <TextObject Name="Text10" Left="302.4" Top="37.8" Width="94.5" Height="18.9" Text="грн."/>
+    </ColumnFooterBand>
+    <PageFooterBand Name="PageFooter1" Top="153.63" Width="718.2"/>
+  </ReportPage>
+</Report>

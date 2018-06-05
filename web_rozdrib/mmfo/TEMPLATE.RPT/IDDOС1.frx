@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="01/25/2017 12:54:32" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoVns6ffiXRmCcS4bnzDLLiAGr9DROutrGFgh0D2ONV/8Q==">
+      <TableDataSource Name="Table" Alias="ByRec" DataType="System.Int32" Enabled="true" SelectCommand="select  r.rec,&#13;&#10;                                    r.mfoa,&#13;&#10;                                    r.mfob,&#13;&#10;                                    r.nlsa,&#13;&#10;                                    r.nlsb,&#13;&#10;                                    r.nam_a,&#13;&#10;                                    r.nam_b,&#13;&#10;                                   to_char(r.s/100,'FM999G999G999G999G990D00', 'NLS_NUMERIC_CHARACTERS = ''. ''' )  as s,&#13;&#10;                                    BARS.f_sumpr (r.s,r.kv,'F') as sprop,&#13;&#10;                                    t.lcv,&#13;&#10;                                    r.nazn,&#13;&#10;                                    r.dat_a,&#13;&#10;                                    r.datp,&#13;&#10;                                    r.fn_a,&#13;&#10;                                    r.id_a,&#13;&#10;                                    r.id_b,&#13;&#10;                                    f_dat_lit(r.dat_a) as dat_prop,&#13;&#10;                                    (select nb from banks where mfo = r.mfoa) as bank_a,&#13;&#10;                                    (select nb from banks where mfo = r.mfob) as bank_b,&#13;&#10;                                     case when r.dk in(0,1) then UPPER (v.name) when r.dk in(2,3) then 'ІНФОРМАЦІЙНЕ ПОВІДОМЛЕННЯ' end AS vob_name,&#13;&#10;                                    a.DAT_2,f_dat_lit(a.DATK) as DATK&#13;&#10;                                    --a.*,&#13;&#10;                                    --b.*     &#13;&#10;                                from arc_rrp r,&#13;&#10;                                    rec_que q,&#13;&#10;                                    tabval t,&#13;&#10;                                    vob v,&#13;&#10;                                    zag_a a,&#13;&#10;                                    zag_b b&#13;&#10;                                where r.kv = t.kv&#13;&#10;                                and r.s &gt; 0&#13;&#10;                                and r.blk &gt;= 0&#13;&#10;                                and r.fn_b IS NULL&#13;&#10;                                and r.rec = q.rec(+)&#13;&#10;                                and r.vob = v.vob&#13;&#10;                                and r.ref is null&#13;&#10;                                and r.rec = :p_rec&#13;&#10;                                and r.fn_a = A.FN(+) and R.DAT_A = a.dat(+)&#13;&#10;                                and r.fn_b = b.FN(+) and R.DAT_B = b.dat(+) ">
+        <Column Name="REC" DataType="System.Decimal"/>
+        <Column Name="MFOA" DataType="System.String"/>
+        <Column Name="MFOB" DataType="System.String"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="NAM_A" DataType="System.String"/>
+        <Column Name="NAM_B" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="SPROP" DataType="System.String"/>
+        <Column Name="LCV" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="DAT_A" DataType="System.DateTime"/>
+        <Column Name="DATP" DataType="System.DateTime"/>
+        <Column Name="FN_A" DataType="System.String"/>
+        <Column Name="ID_A" DataType="System.String"/>
+        <Column Name="ID_B" DataType="System.String"/>
+        <Column Name="DAT_PROP" DataType="System.String"/>
+        <Column Name="BANK_A" DataType="System.String"/>
+        <Column Name="BANK_B" DataType="System.String"/>
+        <Column Name="VOB_NAME" DataType="System.String"/>
+        <Column Name="DAT_2" DataType="System.DateTime"/>
+        <Column Name="DATK" DataType="System.String"/>
+        <CommandParameter Name="p_rec" DataType="107" Expression="[p_rec]" DefaultValue="75312824601"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="bis" DataType="System.Int32" Enabled="true" SelectCommand="SELECT b.nazn||decode(b.nazns,33,b.d_rec,'') as bis&#13;&#10;                         FROM arc_rrp a, arc_rrp b &#13;&#10;                         WHERE a.rec= :p_rec&#13;&#10;                               and (b.ref = a.ref or (a.fn_a = b.fn_a  and (a.rec_a-a.bis) = (b.rec_a-b.bis) )   ) &#13;&#10;                               and a.bis=1 &#13;&#10;                               and (   a.fn_a is not null AND a.fn_a=b.fn_a AND a.dat_a=b.dat_a &#13;&#10;                                     OR a.fn_a is null AND a.dat_a=b.dat_a &#13;&#10;                                     OR a.fn_a is null AND a.dat_a is null AND a.fn_b=b.fn_b AND a.dat_b=b.dat_b&#13;&#10;                                   )&#13;&#10;                               and a.rec&lt;&gt;b.rec AND a.bis&lt;b.bis AND b.bis&gt;0 &#13;&#10;                         ORDER BY b.bis">
+        <Column Name="BIS" DataType="System.String"/>
+        <CommandParameter Name="p_rec" DataType="107" Expression="[p_rec]" DefaultValue="75312824601"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_rec" DataType="System.Decimal" Expression="[p_rec]"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="652.05">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="28.35">
+      <TextObject Name="Text41" Left="-9.45" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" HorzAlign="Center" VertAlign="Center"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="31.55" Width="718.2" Height="567">
+      <TextObject Name="Text4" Top="75.6" Width="368.55" Height="47.25" Text="Платник [ByRec.NAM_A]"/>
+      <TextObject Name="Text5" Top="94.5" Width="132.3" Height="28.35" Text="Код " VertAlign="Center"/>
+      <TextObject Name="Text6" Left="47.25" Top="94.5" Width="94.5" Height="28.35" Border.Lines="All" Border.Width="2" Text="[ByRec.ID_A]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text7" Top="141.75" Width="330.75" Height="37.8" Border.Lines="Bottom" Border.Width="1.5" Text="Банк платника"/>
+      <TextObject Name="Text8" Left="282.7" Top="140.15" Width="75.6" Height="18.9" Text="код банку"/>
+      <TextObject Name="Text9" Left="283.5" Top="160.65" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="2" Text="[ByRec.MFOA]" HorzAlign="Center"/>
+      <TextObject Name="Text11" Top="179.55" Width="368.55" Height="37.8" Text="Одержувач [ByRec.NAM_B]" VertAlign="Center"/>
+      <TextObject Name="Text12" Top="217.35" Width="141.75" Height="28.35" Text="Код " VertAlign="Center"/>
+      <TextObject Name="Text13" Left="47.25" Top="217.35" Width="94.5" Height="28.35" Border.Lines="All" Border.Width="2" Text="[ByRec.ID_B]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text14" Top="255.15" Width="567" Height="37.8" Border.Lines="Bottom" Border.Width="1.5" Text="Банк отримувача"/>
+      <TextObject Name="Text15" Left="283.5" Top="255.15" Width="75.6" Height="18.9" Text="код банку"/>
+      <TextObject Name="Text16" Left="283.5" Top="274.05" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="2" Text="[ByRec.MFOB]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text17" Top="292.95" Width="548.1" Height="18.9" Text="Сума словами: [ByRec.SPROP]" VertAlign="Center"/>
+      <TextObject Name="Text10" Top="321.3" Width="548.1" Height="37.8" Text="Призначення платежу: [ByRec.NAZN]"/>
+      <TextObject Name="Text18" Top="151.2" Width="330.75" Height="28.35" Text="[ByRec.BANK_A]" VertAlign="Center"/>
+      <TextObject Name="Text27" Top="274.05" Width="255.15" Height="18.9" Text="[ByRec.BANK_B]"/>
+      <TextObject Name="Text35" Left="510.3" Top="160.65" Width="141.75" Height="132.3" Border.Lines="All" Border.Width="2" Text="[ByRec.S]&#13;&#10;[ByRec.LCV]" HorzAlign="Right"/>
+      <TextObject Name="Text1" Left="104" Top="29.95" Width="406.35" Height="37.8" Text="[ByRec.VOB_NAME]  N [ByRec.REC]&#13;&#10;від [ByRec.DATK]"/>
+      <TextObject Name="Text32" Left="519.75" Top="28.35" Width="75.6" Height="28.35" Border.Lines="All" Border.Width="2" Text="0410009" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text23" Top="387.45" Width="103.95" Height="37.8" Text="ДР" VertAlign="Center"/>
+      <TextObject Name="Text25" Left="47.25" Top="387.45" Width="132.3" Height="37.8" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
+      <TextObject Name="Text33" Left="75.6" Top="463.05" Width="85.05" Height="18.9" Border.Lines="Bottom"/>
+      <TextObject Name="Text19" Top="463.05" Width="66.15" Height="18.9" Text="Підписи"/>
+      <TextObject Name="Text24" Left="463.05" Top="463.05" Width="103.95" Height="18.9" Text="Штамп банку"/>
+      <TextObject Name="Text34" Left="75.6" Top="491.4" Width="85.05" Height="18.9" Border.Lines="Bottom"/>
+      <TextObject Name="Text22" Left="378" Top="160.65" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" Text=" [ByRec.NLSA]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text26" Left="378" Top="274.05" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
+      <TextObject Name="Text28" Left="378" Top="255.15" Width="132.3" Height="18.9" Border.Lines="All" Border.Width="2" Text=" [ByRec.NLSB]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text29" Left="396.9" Top="141.75" Width="132.3" Height="18.9" Text="ДЕБЕТ рах. N" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text37" Left="396.9" Top="236.25" Width="132.3" Height="18.9" Text="КРЕДИТ рах. N" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text38" Left="510.3" Top="274.05" Width="141.75" Height="18.9" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
+      <TextObject Name="Text39" Left="557.55" Top="378" Width="94.5" Height="37.8" Border.Lines="All" Border.Width="2" VertAlign="Center"/>
+      <TextObject Name="Text21" Left="557.55" Top="141.75" Width="94.5" Height="18.9" Text="СУМА" HorzAlign="Center"/>
+      <TextObject Name="Text2" Left="-9.45" Top="538.65" Width="661.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text40" Left="-9.45" Top="340.2" Width="661.5" Height="18.9" Border.Lines="Bottom" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text20" Top="359.1" Width="652.05" Height="18.9" VertAlign="Center"/>
+      <TextObject Name="Text30" Left="-9.45" Top="425.25" Width="661.5" Height="37.8" VertAlign="Center"/>
+      <TextObject Name="Text36" Left="-9.45" Top="510.3" Width="661.5" Height="47.25" VertAlign="Center"/>
+    </DataBand>
+    <DataBand Name="Data2" Top="623.85" Width="718.2" Height="18.9" DataSource="Table2">
+      <TableObject Name="Table4" Width="368.55" Height="18.9">
+        <TableColumn Name="Column3" Width="368.55"/>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell3" Text="[bis.BIS]"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="601.75" Width="718.2" Height="18.9">
+        <TableObject Name="Table1" Width="368.55" Height="18.9">
+          <TableColumn Name="Column1" Width="368.55"/>
+          <TableRow Name="Row1">
+            <TableCell Name="Cell1" Text="БІРи"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="645.95" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

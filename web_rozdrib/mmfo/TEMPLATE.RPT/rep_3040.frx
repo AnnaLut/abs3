@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/26/2016 12:45:06" ReportInfo.Modified="02/11/2016 17:01:40" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE7fZmMxoAeKqIz2gmiyZm0SsG/8wskKRYtlAn19GNV3zQ==">
+      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ID, CHAR00 FIO, CHAR01 LOGN, NUM01 ISP, CHAR02 TABN, CHAR03 NNP, CHAR04 KODP, CHAR05 NAMEP, NUM02 SECG, DAT00 DAT from rs_tmp_report_data where session_id=:SESSION_ID order by id      &#13;&#10;">
+        <Column Name="ID" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="LOGN" DataType="System.String"/>
+        <Column Name="ISP" DataType="System.Int16"/>
+        <Column Name="TABN" DataType="System.String"/>
+        <Column Name="NNP" DataType="System.String"/>
+        <Column Name="KODP" DataType="System.String"/>
+        <Column Name="NAMEP" DataType="System.String"/>
+        <Column Name="SECG" DataType="System.Decimal"/>
+        <Column Name="DAT" DataType="System.DateTime"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="75.8" Guides="44,62.9,4,22.9">
+      <TextObject Name="Text1" Left="116" Top="44" Width="487.5" Height="18.9" Text="Карточки користувачів (власні ресурси)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text2" Left="433" Top="4" Width="262.5" Height="18.9" Text="[Table1.DAT]" HorzAlign="Right" VertAlign="Center"/>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="79.8" Width="718.2" Height="19.95" Guides="1.05,19.95" Condition="[Table1.ID]">
+      <TextObject Name="Text3" Left="2" Top="1.05" Width="717.5" Height="18.9" Border.Lines="Bottom" Border.Style="Double" Text="[Table1.ID]        [Table1.FIO]         [Table1.LOGN]        [Table1.TABN]" Font="Arial, 12pt, style=Bold, Italic"/>
+      <GroupHeaderBand Name="GroupHeader1" Top="103.75" Width="718.2" Height="30.95" Border.Lines="Bottom" Border.Style="Dot" Guides="13,31.9,6.05,24.95,0,18.9" Condition="[Table1.NNP]">
+        <TableObject Name="Table1" Top="7.05" Width="661.6" Height="18.9">
+          <TableColumn Name="Column14"/>
+          <TableColumn Name="Column15" Width="500"/>
+          <TableColumn Name="Column16" Width="37.15"/>
+          <TableColumn Name="Column17" Width="28.15"/>
+          <TableColumn Name="Column18" Width="30.15"/>
+          <TableRow Name="Row5">
+            <TableCell Name="Cell14" Text="[[Table1.NNP]]" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+            <TableCell Name="Cell15"/>
+            <TableCell Name="Cell16" Text="П-д">
+              <Highlight>
+                <Condition Expression="[Table1.NNP]!= &quot;ГРУПИ ДОСТУПУ КОРИСТУВАЧІВ&quot;" Visible="false" TextFill.Color="CornflowerBlue"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell17" Text="ДБ">
+              <Highlight>
+                <Condition Expression="[Table1.NNP]!= &quot;ГРУПИ ДОСТУПУ КОРИСТУВАЧІВ&quot;" Visible="false" TextFill.Color="CornflowerBlue"/>
+              </Highlight>
+            </TableCell>
+            <TableCell Name="Cell18" Text="КР">
+              <Highlight>
+                <Condition Expression="[Table1.NNP]!= &quot;ГРУПИ ДОСТУПУ КОРИСТУВАЧІВ&quot;" Visible="false" TextFill.Color="CornflowerBlue"/>
+              </Highlight>
+            </TableCell>
+          </TableRow>
+        </TableObject>
+        <DataBand Name="Data1" Top="138.7" Width="718.2" Height="25.6" CanGrow="true" Guides="1.05,22.95,0,21.9,1.25,20.15,18.9,35.7,130.2,37.8,56.7,75.6,94.5" DataSource="Table">
+          <TableObject Name="Table3" Left="2" Top="6.7" Width="657.6" Height="18.9">
+            <TableColumn Name="Column9"/>
+            <TableColumn Name="Column10" Width="495"/>
+            <TableColumn Name="Column11" Width="37.15"/>
+            <TableColumn Name="Column12" Width="27.15"/>
+            <TableColumn Name="Column13" Width="32.15"/>
+            <TableRow Name="Row4">
+              <TableCell Name="Cell9" Text="[Table1.KODP]"/>
+              <TableCell Name="Cell10" Text="[Table1.NAMEP]"/>
+              <TableCell Name="Cell11" Text="[IIf(([Table1.SECG]-4)*([Table1.SECG]-5)*([Table1.SECG]-6)*([Table1.SECG]-7)==0,&quot;*&quot;,&quot;&quot;)]"/>
+              <TableCell Name="Cell12" Text="[IIf(([Table1.SECG]-2)*([Table1.SECG]-3)*([Table1.SECG]-6)*([Table1.SECG]-7)==0,&quot;*&quot;,&quot;&quot;)]"/>
+              <TableCell Name="Cell13" Text="[IIf(([Table1.SECG]-1)*([Table1.SECG]-3)*([Table1.SECG]-5)*([Table1.SECG]-7)==0,&quot;*&quot;,&quot;&quot;)]"/>
+            </TableRow>
+          </TableObject>
+        </DataBand>
+      </GroupHeaderBand>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="168.3" Width="718.2" Height="19.8" Guides="0.9,19.8">
+      <TextObject Name="Text5" Left="0.8" Top="0.9" Width="226.5" Height="18.9" Text="[PageN]" Font="Arial, 10pt, style=Bold, Italic"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

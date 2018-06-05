@@ -1,19 +1,6 @@
 ﻿using System;
-using System.Data;
-using System.Web;
-using System.Web.Services;
 using Oracle.DataAccess.Client;
-using Oracle.DataAccess.Types;
-using barsroot.core;
-using BarsWeb.Core.Logger;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Web.Services.Protocols;
 using Bars.WebServices.XRM.Models;
-using System.IO;
-using System.Text;
-using Ionic.Zlib;
-using Bars.Oracle;
 
 namespace Bars.WebServices.XRM.Services
 {

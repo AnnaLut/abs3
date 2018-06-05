@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Data;
-using System.Web;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using Oracle.DataAccess.Client;
-using Oracle.DataAccess.Types;
 using BarsWeb.Core.Logger;
 using System.Collections.Generic;
 using Bars.WebServices.XRM.Services.Customer.Models;
@@ -22,7 +19,7 @@ namespace Bars.WebServices.XRM.Services.Customer
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [System.Web.Script.Services.ScriptService]
-    public class XRMIntegrationCustomer : BarsWebService
+    public class XRMIntegrationCustomer : XrmBaseWebService
     {
         public WsHeader WsHeaderValue;
         private IDbLogger _dbLogger;

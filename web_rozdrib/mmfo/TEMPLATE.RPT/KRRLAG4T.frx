@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/16/2014 10:45:29" ReportInfo.Modified="03/02/2017 10:17:12" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void ListBox1_Click(object sender, EventArgs e)
+    {
+      
+    }
+
+    private void TextBox1_Click(object sender, EventArgs e)
+    {
+      
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="TSTSUM" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf9AzgKs41K3NmSIYDYk16CA==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT cd.ROWTYPE, cd.kf OURMFO, cd.NLS, cd.KV, cd.OKPO, cd.OBDB, cd.OBDBQ, cd.OBKR,&#13;&#10;-- перегляд К-файлу &#13;&#10;    cd.OBKRQ, cd.OST, cd.OSTQ, cd.KOD_CORP, cd.KOD_USTAN, cd.KOD_ANALYT, cd.DAPP,&#13;&#10;    cd.POSTDAT, cd.DOCDAT, cd.VALDAT, cd.ND, &#13;&#10;    cd.VOB, cd.DK, cd.MFOA, cd.NLSA, cd.KVA, cd.NAMA, cd.OKPOA, cd.MFOB, cd.NLSB, &#13;&#10;    cd.KVB, cd.NAMB, cd.OKPOB, cd.S, cd.DOCKV, cd.SQ, cd.NAZN, cd.DOCTYPE, &#13;&#10;    cd.POSTTIME, cd.NAMK, cd.NMS, cast(null as varchar2(60)) rezerve2&#13;&#10;FROM BARS.ob_corporation_data cd&#13;&#10;WHERE cd.corporation_id=to_number(:Param1)&#13;&#10;and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;and trunc(file_date)=:sFdat1&#13;&#10;and kf=:Param2&#13;&#10;">
+        <Column Name="ROWTYPE" DataType="System.Decimal"/>
+        <Column Name="OURMFO" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="OBDB" DataType="System.Decimal"/>
+        <Column Name="OBDBQ" DataType="System.Decimal"/>
+        <Column Name="OBKR" DataType="System.Decimal"/>
+        <Column Name="OBKRQ" DataType="System.Decimal"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="OSTQ" DataType="System.Decimal"/>
+        <Column Name="KOD_CORP" DataType="System.Decimal"/>
+        <Column Name="KOD_USTAN" DataType="System.Decimal"/>
+        <Column Name="KOD_ANALYT" DataType="System.String"/>
+        <Column Name="DAPP" DataType="System.DateTime"/>
+        <Column Name="POSTDAT" DataType="System.DateTime"/>
+        <Column Name="DOCDAT" DataType="System.DateTime"/>
+        <Column Name="VALDAT" DataType="System.DateTime"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="VOB" DataType="System.Decimal"/>
+        <Column Name="DK" DataType="System.Decimal"/>
+        <Column Name="MFOA" DataType="System.String"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="KVA" DataType="System.Decimal"/>
+        <Column Name="NAMA" DataType="System.String"/>
+        <Column Name="OKPOA" DataType="System.String"/>
+        <Column Name="MFOB" DataType="System.String"/>
+        <Column Name="NLSB" DataType="System.String"/>
+        <Column Name="KVB" DataType="System.Decimal"/>
+        <Column Name="NAMB" DataType="System.String"/>
+        <Column Name="OKPOB" DataType="System.String"/>
+        <Column Name="S" DataType="System.Decimal"/>
+        <Column Name="DOCKV" DataType="System.Decimal"/>
+        <Column Name="SQ" DataType="System.Decimal"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="DOCTYPE" DataType="System.Decimal"/>
+        <Column Name="POSTTIME" DataType="System.DateTime"/>
+        <Column Name="NAMK" DataType="System.String"/>
+        <Column Name="NMS" DataType="System.String"/>
+        <Column Name="REZERVE2" DataType="System.String"/>
+        <CommandParameter Name="Param1" DataType="111" Expression="[Param1]" DefaultValue="0"/>
+        <CommandParameter Name="Param2" DataType="126" Expression="[Param2]" DefaultValue="0"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.Char"/>
+    <Parameter Name="Param1" DataType="System.Int32"/>
+    <Parameter Name="Param2" DataType="System.Char"/>
+  </Dictionary>
+  <ReportPage Name="Page2" PaperWidth="2410" PaperHeight="2097" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle2" Width="9034.2"/>
+    <PageHeaderBand Name="PageHeader1" Top="3.2" Width="9034.2"/>
+    <DataBand Name="Data1" Top="6.4" Width="9034.2" Height="37.8" DataSource="Table">
+      <TableObject Name="Table1" Width="4639.95" Height="37.8" Border.Lines="All">
+        <TableColumn Name="Column193" Width="81.27"/>
+        <TableColumn Name="Column194" Width="90.72"/>
+        <TableColumn Name="Column195" Width="100.17"/>
+        <TableColumn Name="Column196" Width="128.52"/>
+        <TableColumn Name="Column197" Width="90.72"/>
+        <TableColumn Name="Column198" Width="94.5"/>
+        <TableColumn Name="Column199" Width="94.5"/>
+        <TableColumn Name="Column200" Width="132.3"/>
+        <TableColumn Name="Column201" Width="122.85"/>
+        <TableColumn Name="Column202" Width="113.4"/>
+        <TableColumn Name="Column203" Width="141.75"/>
+        <TableColumn Name="Column204" Width="160.65"/>
+        <TableColumn Name="Column205" Width="122.85"/>
+        <TableColumn Name="Column206" Width="122.85"/>
+        <TableColumn Name="Column207" Width="141.75"/>
+        <TableColumn Name="Column208" Width="151.2"/>
+        <TableColumn Name="Column209" Width="122.85"/>
+        <TableColumn Name="Column210" Width="141.75"/>
+        <TableColumn Name="Column211" Width="122.85"/>
+        <TableColumn Name="Column212" Width="122.85"/>
+        <TableColumn Name="Column213" Width="103.95"/>
+        <TableColumn Name="Column214" Width="103.95"/>
+        <TableColumn Name="Column215" Width="94.5"/>
+        <TableColumn Name="Column216" Width="94.5"/>
+        <TableColumn Name="Column217" Width="94.5"/>
+        <TableColumn Name="Column218" Width="94.5"/>
+        <TableColumn Name="Column219" Width="94.5"/>
+        <TableColumn Name="Column220" Width="113.4"/>
+        <TableColumn Name="Column221" Width="103.95"/>
+        <TableColumn Name="Column222" Width="103.95"/>
+        <TableColumn Name="Column223" Width="103.95"/>
+        <TableColumn Name="Column224" Width="113.4"/>
+        <TableColumn Name="Column225" Width="122.85"/>
+        <TableColumn Name="Column226" Width="113.4"/>
+        <TableColumn Name="Column227" Width="103.95"/>
+        <TableColumn Name="Column228" Width="113.4"/>
+        <TableColumn Name="Column229" Width="132.3"/>
+        <TableColumn Name="Column230" Width="103.95"/>
+        <TableColumn Name="Column231" Width="113.4"/>
+        <TableColumn Name="Column232" Width="103.95"/>
+        <TableColumn Name="Column233" Width="113.4"/>
+        <TableRow Name="Row22" Height="37.8">
+          <TableCell Name="Cell600" Border.Lines="All" Text="[Table.ROWTYPE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell601" Border.Lines="All" Text="[Table.OURMFO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell602" Border.Lines="All" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell603" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell604" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell605" Border.Lines="All" Text="[Table.OBDB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell606" Border.Lines="All" Text="[Table.OBDBQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell607" Border.Lines="All" Text="[Table.OBKR]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell608" Border.Lines="All" Text="[Table.OBKRQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell609" Border.Lines="All" Text="[Table.OST]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell610" Border.Lines="All" Text="[Table.OSTQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell611" Border.Lines="All" Text="[Table.KOD_CORP]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell612" Border.Lines="All" Text="[Table.KOD_USTAN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell613" Border.Lines="All" Text="[Table.KOD_ANALYT]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell614" Border.Lines="All" Text="[Table.DAPP]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell615" Border.Lines="All" Text="[Table.POSTDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell616" Border.Lines="All" Text="[Table.VALDAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell617" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell618" Border.Lines="All" Text="[Table.VOB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell619" Border.Lines="All" Text="[Table.DK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell620" Border.Lines="All" Text="[Table.DK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell621" Border.Lines="All" Text="[Table.MFOA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell622" Border.Lines="All" Text="[Table.NLSA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell623" Border.Lines="All" Text="[Table.KVA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell624" Border.Lines="All" Text="[Table.NAMA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell625" Border.Lines="All" Text="[Table.OKPOA]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell626" Border.Lines="All" Text="[Table.MFOB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell627" Border.Lines="All" Text="[Table.NLSB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell628" Border.Lines="All" Text="[Table.KVB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell629" Border.Lines="All" Text="[Table.NAMB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell630" Border.Lines="All" Text="[Table.OKPOB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell631" Border.Lines="All" Text="[Table.S]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell632" Border.Lines="All" Text="[Table.DOCKV]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell633" Border.Lines="All" Text="[Table.SQ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell634" Border.Lines="All" Text="[Table.NAZN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell635" Border.Lines="All" Text="[Table.DOCTYPE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell636" Border.Lines="All" Text="[Table.POSTTIME]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell637" Border.Lines="All" Text="[Table.NAMK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell638" Border.Lines="All" Text="[Table.NMS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell639" Border.Lines="All" Text="[Table.REZERVE2]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell640" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="47.4" Width="9034.2" Height="343.19"/>
+  </ReportPage>
+</Report>

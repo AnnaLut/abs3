@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="12/14/2015 11:17:06" ReportInfo.Modified="04/14/2016 15:48:53" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Y3Neg7DvdR2Vu1DbZYHDJIJHEDEQst4kKpqTLmpSao9GGNkg1juqVTwHytmJQCOjqsrpPAxYPF+fbDQqtzhfgY=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select * from table(accp_reports.GetDataRep4(:okpo))">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="NDOG" DataType="System.String"/>
+        <Column Name="DDOG" DataType="System.DateTime"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="SCOPE_DOG" DataType="System.Decimal"/>
+        <Column Name="ORDER_FEE" DataType="System.Decimal"/>
+        <Column Name="AMOUNT_FEE" DataType="System.Decimal"/>
+        <Column Name="FEE_MFO" DataType="System.String"/>
+        <Column Name="FEE_NLS" DataType="System.String"/>
+        <Column Name="FEE_OKPO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="SUM_PAYS" DataType="System.Decimal"/>
+        <Column Name="SUM_RET_PAYS" DataType="System.Decimal"/>
+        <Column Name="SUM_FEE" DataType="System.Decimal"/>
+        <Column Name="SUM_RET_FEE" DataType="System.Decimal"/>
+        <Column Name="CNT_PAYS" DataType="System.Decimal"/>
+        <Column Name="PERIOD_START" DataType="System.DateTime"/>
+        <Column Name="PERIOD_END" DataType="System.DateTime"/>
+        <Column Name="SF_1" DataType="System.Decimal"/>
+        <Column Name="SF_2" DataType="System.Decimal"/>
+        <Column Name="SF_3" DataType="System.Decimal"/>
+        <CommandParameter Name="okpo" DataType="126" Expression="[Param0]" DefaultValue="39592941"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="Param0" DataType="System.String"/>
+    <Total Name="Total_Pays" Expression="[Table.SUM_PAYS]" Evaluator="Data1" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="Total_Ret_Peys" Expression="[Table.SUM_RET_PAYS]" Evaluator="Data1" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+    <Total Name="Total_Ret_Fee" Expression="[Table.SUM_RET_FEE]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_Fee" Expression="[Table.SUM_FEE]" Evaluator="Data1" PrintOn="ReportSummary1" ResetOnReprint="true"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="519.75">
+      <TableObject Name="Table1" Left="18.9" Top="9.45" Width="661.5" Height="207.9">
+        <TableColumn Name="Column1" Width="359.1"/>
+        <TableColumn Name="Column2" Width="302.4"/>
+        <TableRow Name="Row1" Height="85.05">
+          <TableCell Name="Cell1" Text="Комунальне підприємство&#13;&#10;„Головний інформаційно-&#13;&#10;обчислювальний центр”" Font="Arial, 10pt, style=Bold, Italic"/>
+          <TableCell Name="Cell2" Text="&lt;b&gt;Публічне акціонерне товариство&#13;&#10;&quot;Державний ощадний банк України&quot;&lt;/b&gt;&#13;&#10;01001, м. Київ, вул. Госпітальна, 12-Г&#13;&#10;філія - Головне управління по м. Києву&#13;&#10;та Київській області АТ &quot;Ощадбанк&quot;" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="37.8">
+          <TableCell Name="Cell6" Text="Адреса: м. Київ, 02192, вул. Космічна,&#13;&#10;буд. 12-А,"/>
+          <TableCell Name="Cell7" Text="Адреса: 01001, м. Київ,&#13;&#10;вул. Володимирська, 27"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="47.25">
+          <TableCell Name="Cell11" Text="п/р 260088106&#13;&#10;ПАТ „КБ „Хрещатик”"/>
+          <TableCell Name="Cell12" Text="п/р  3901401 в ОПЕРУ&#13;&#10;філія Головне управління по м. Києву та&#13;&#10;Київської області АТ &quot;Ощадбанк&quot;"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell16" Text="Код банку 300670"/>
+          <TableCell Name="Cell17" Text="Код банку 322669"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell21" Text="ЄДРПОУ 04013755"/>
+          <TableCell Name="Cell22" Text="ЄДРПОУ 09322277"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="9.45" Top="236.25" Width="699.3" Height="75.6" Text="А К Т  № _____&#13;&#10;&#13;&#10;згідно договору № &lt;u&gt;[Table.NDOG]&lt;/u&gt; від &lt;u&gt;[Table.DDOG]&lt;/u&gt; р.&#13;&#10;за звітний період з [Table.PERIOD_START] р. по [Table.PERIOD_END] р.&#13;&#10;" HorzAlign="Center" HtmlTags="true">
+        <Formats>
+          <GeneralFormat/>
+          <DateFormat/>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+      <TextObject Name="Text2" Left="9.45" Top="321.3" Width="66.15" Height="18.9" Text="м. Київ"/>
+      <TextObject Name="Text3" Left="529.2" Top="321.3" Width="179.55" Height="18.9" Text="___ _________ 201__ р." HorzAlign="Right"/>
+      <TextObject Name="Text4" Left="9.45" Top="349.65" Width="699.3" Height="66.15" CanGrow="true" CanBreak="false" Text="     Ми, що нижче підписалися, представник КП ГІОЦ і представник БАНКУ, уклали цей акт про те, що КП ГІОЦ отримало від [Table.NAME] на розподільчий рахунок КП ГІОЦ кошти для забезпечення здійснення розрахунків з БАНКОМ за надані споживачам послуги з приймання та перерахування платежів, в наступних розмірах, що підлягають перерахуванню:" HorzAlign="Justify"/>
+      <TableObject Name="Table2" Top="425.25" Width="718.2" Height="94.5">
+        <TableColumn Name="Column3" Width="113.4"/>
+        <TableColumn Name="Column4" Width="132.3"/>
+        <TableColumn Name="Column5" Width="141.75"/>
+        <TableColumn Name="Column6" Width="113.4"/>
+        <TableColumn Name="Column7" Width="103.95"/>
+        <TableColumn Name="Column8" Width="113.4"/>
+        <TableRow Name="Row6" Height="94.5">
+          <TableCell Name="Cell23" Border.Lines="All" Text="№ ТВБВ" HorzAlign="Center"/>
+          <TableCell Name="Cell24" Border.Lines="All" Text="№ поточного рахунку із спеціальним режимом використання" HorzAlign="Center"/>
+          <TableCell Name="Cell25" Border.Lines="All" Text="Сума коштів, що надійшла на відповідний рахунок [Table.NAME]" HorzAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="Сума коштів, що була повернута, у звітному періоді" HorzAlign="Center"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="Комісійна винагорода з повернутих коштів" HorzAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="Комісійна винагорода, що підлягає перерахуванню БАНКУ ([Table.AMOUNT_FEE]%)" HorzAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="522.95" Width="718.2" Condition="[Table.BRANCH]">
+      <DataBand Name="Data1" Top="526.15" Width="718.2" Height="18.9" CanGrow="true" DataSource="Table">
+        <TableObject Name="Table3" Width="718.2" Height="18.9">
+          <TableColumn Name="Column9" Width="113.4"/>
+          <TableColumn Name="Column10" Width="132.3"/>
+          <TableColumn Name="Column11" Width="141.75"/>
+          <TableColumn Name="Column12" Width="113.4"/>
+          <TableColumn Name="Column13" Width="103.95"/>
+          <TableColumn Name="Column20" Width="113.4"/>
+          <TableRow Name="Row7" AutoSize="true">
+            <TableCell Name="Cell49" Border.Lines="All" Text="[IIf([Row#]==1,[Table.BRANCH],&quot;&quot;)]"/>
+            <TableCell Name="Cell50" Border.Lines="All" Text="[Table.NLS]"/>
+            <TableCell Name="Cell51" Border.Lines="All" Text="[Table.SUM_PAYS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+            <TableCell Name="Cell52" Border.Lines="All" Text="[Table.SUM_RET_PAYS]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+            <TableCell Name="Cell53" Border.Lines="All" Text="[Table.SUM_RET_FEE]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+            <TableCell Name="Cell100" Border.Lines="All" Text="[Table.SUM_FEE]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          </TableRow>
+        </TableObject>
+        <Sort>
+          <Sort Expression="[Table.BRANCH]"/>
+        </Sort>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="548.25" Width="718.2" CanGrow="true"/>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="551.45" Width="718.2" Height="217.35">
+      <TextObject Name="Text6" Left="9.45" Top="189" Width="519.75" Height="18.9" Text="Увага! Другий примірник акта просимо повернути протягом 5-ти днів!" HorzAlign="Justify" Font="Arial, 10pt, style=Bold, Italic"/>
+      <TextObject Name="Text7" Left="9.45" Top="113.4" Width="94.5" Height="18.9" Text="від КП ГІОЦ:" HorzAlign="Justify" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text8" Left="368.55" Top="113.4" Width="94.5" Height="18.9" Text="від БАНКУ:" HorzAlign="Justify" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text9" Left="9.45" Top="151.2" Width="94.5" Height="18.9" Border.Lines="Top" Text="(посада)" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text10" Left="113.4" Top="151.2" Width="85.05" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text11" Left="207.9" Top="151.2" Width="141.75" Height="18.9" Border.Lines="Top" Text="(прізвище, І.Б.)" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text12" Left="368.55" Top="151.2" Width="94.5" Height="18.9" Border.Lines="Top" Text="(посада)" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text13" Left="472.5" Top="151.2" Width="85.05" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Text14" Left="567" Top="151.2" Width="141.75" Height="18.9" Border.Lines="Top" Text="(прізвище, І.Б.)" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TableObject Name="Table4" Width="718.2" Height="18.9">
+        <TableColumn Name="Column14" Width="113.4"/>
+        <TableColumn Name="Column15" Width="132.3"/>
+        <TableColumn Name="Column16" Width="141.75"/>
+        <TableColumn Name="Column17" Width="113.4"/>
+        <TableColumn Name="Column18" Width="103.95"/>
+        <TableColumn Name="Column19" Width="113.4"/>
+        <TableRow Name="Row12" AutoSize="true">
+          <TableCell Name="Cell74" Border.Lines="All" Text="Всього:"/>
+          <TableCell Name="Cell75" Border.Lines="All"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="[Total_Pays]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="[Total_Ret_Peys]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell78" Border.Lines="All" Text="[Total_Ret_Fee]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell99" Border.Lines="All" Text="[Total_Fee]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text5" Left="9.45" Top="28.35" Width="699.3" Height="66.15" CanGrow="true" CanBreak="false" Text="     КП ГІОЦ повинен перерахувати з розподільчого рахунку на поточний рахунок БАНКУ &lt;b&gt;№ [Table.FEE_NLS], код банку [Table.FEE_MFO], код за ЄДРПОУ [Table.FEE_OKPO]&lt;/b&gt; вартість послуг БАНКУ у розмірі [Total_Fee] грн. без ПДВ за ________  201_ р.&#13;&#10;     Сторони претензій одна до одної не мають.&#13;&#10;" HorzAlign="Justify" HtmlTags="true">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <NumberFormat UseLocale="false" DecimalSeparator="," GroupSeparator=" "/>
+        </Formats>
+      </TextObject>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

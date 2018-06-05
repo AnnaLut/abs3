@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="03/28/2014 13:43:41" ReportInfo.Modified="03/28/2014 15:44:49" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiDVFFaTytxY4P5UdOJqUY1w==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select xoz_ref.PRG    code_project      , &#13;&#10;       xoz_prg.name   name_project    , &#13;&#10;       xoz_prg.DETALI   details_project   ,&#13;&#10;       xoz_ref.BU     code_bud_one   ,   &#13;&#10;       branch.name    name_bud_one  ,   &#13;&#10;       oper.id_b      code_provider,&#13;&#10;       oper.nam_b     provider,&#13;&#10;       oper.nazn        nazn_pay  ,&#13;&#10;       xoz_ref.s0/100  sum_pay     ,&#13;&#10;       xoz_ref.fdat   date_pay     ,&#13;&#10;       xoz_ref.ref1   ref_pay     ,&#13;&#10;       xoz_ref.ref2   ref_deb_zab      &#13;&#10;FROM  xoz_ref,  oper,  xoz_prg,  branch&#13;&#10;WHERE xoz_ref.ref1  = oper.REF  &#13;&#10;  and xoz_ref.PRG is not null  and  xoz_ref.PRG = xoz_prg.PRG&#13;&#10;  and xoz_ref.BU is  not null  and  xoz_ref.BU  = branch.branch&#13;&#10;  and xoz_ref.fdat &gt;= :dat1 and xoz_ref.fdat &lt;= :dat2&#13;&#10;order by xoz_ref.PRG, xoz_ref.BU, oper.id_b, xoz_ref.fdat, xoz_ref.ref1">
+        <Column Name="CODE_PROJECT" DataType="System.Decimal"/>
+        <Column Name="NAME_PROJECT" DataType="System.String"/>
+        <Column Name="DETAILS_PROJECT" DataType="System.String"/>
+        <Column Name="CODE_BUD_ONE" DataType="System.String"/>
+        <Column Name="NAME_BUD_ONE" DataType="System.String"/>
+        <Column Name="CODE_PROVIDER" DataType="System.String"/>
+        <Column Name="PROVIDER" DataType="System.String"/>
+        <Column Name="NAZN_PAY" DataType="System.String"/>
+        <Column Name="SUM_PAY" DataType="System.Decimal"/>
+        <Column Name="DATE_PAY" DataType="System.DateTime"/>
+        <Column Name="REF_PAY" DataType="System.Decimal"/>
+        <Column Name="REF_DEB_ZAB" DataType="System.Decimal"/>
+        <CommandParameter Name="dat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="dat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Total Name="Total" Expression="[Table.SUM_PAY]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Guides="236.25,198.45,340.2">
+    <GroupHeaderBand Name="GroupHeader1" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true" StartNewPage="true" Condition="[Table.CODE_PROJECT]">
+      <TextObject Name="Text1" Left="9.45" Width="699.3" Height="47.25" Text="Звіт про фактичні витрати за проектом [Table.NAME_PROJECT] &#13;&#10;за період з [sFdat1] по [sFdat2]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 11pt, style=Bold">
+        <Formats>
+          <GeneralFormat/>
+          <DateFormat Format="dd.MM.yyyy"/>
+          <DateFormat Format="dd.MM.yyyy"/>
+        </Formats>
+      </TextObject>
+      <TableObject Name="Table1" Left="9.45" Top="47.25" Width="701.19" Height="18.9">
+        <TableColumn Name="Column11" Width="189"/>
+        <TableColumn Name="Column12" Width="141.75"/>
+        <TableColumn Name="Column13" Width="179.55"/>
+        <TableColumn Name="Column14" Width="103.95"/>
+        <TableColumn Name="Column15" Width="86.94"/>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell31" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell32" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell33" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell34" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell35" Text=" тис.грн." HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt, style=Italic"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table1" Left="9.45" Top="66.15" Width="701.19" Height="37.8">
+        <TableColumn Name="Column6" Width="189"/>
+        <TableColumn Name="Column7" Width="141.75"/>
+        <TableColumn Name="Column8" Width="179.55"/>
+        <TableColumn Name="Column9" Width="103.95"/>
+        <TableColumn Name="Column10" Width="86.94"/>
+        <TableRow Name="Row6" Height="37.8">
+          <TableCell Name="Cell26" Border.Lines="All" Text="Підрозділ-власник бюджету" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="Постачальник &#13;&#10;(контрагент)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="Сума &#13;&#10;платежу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="Дата &#13;&#10;платежу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader2" Top="107.99" Width="718.2" StartNewPage="true" Condition="[Table.NAME_PROJECT]">
+        <DataBand Name="Data1" Top="112.03" Width="718.2" Height="15.12" CanGrow="true" CanShrink="true" CanBreak="true" DataSource="Table">
+          <TableObject Name="Table1" Left="9.45" Width="701.19" Height="15.12" GrowToBottom="true">
+            <TableColumn Name="Column1" Width="189"/>
+            <TableColumn Name="Column2" Width="141.75"/>
+            <TableColumn Name="Column3" Width="179.55"/>
+            <TableColumn Name="Column4" Width="103.95"/>
+            <TableColumn Name="Column5" Width="86.94"/>
+            <TableRow Name="Row2" Height="15.12" AutoSize="true">
+              <TableCell Name="Cell6" Border.Lines="All" Text="[Table.NAME_BUD_ONE]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+              <TableCell Name="Cell7" Border.Lines="All" Text="[Table.PROVIDER]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+              <TableCell Name="Cell8" Border.Lines="All" Text="[Table.NAZN_PAY]" VertAlign="Center" Font="Times New Roman, 8pt"/>
+              <TableCell Name="Cell9" Border.Lines="All" Text="[Table.SUM_PAY]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="8" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 8pt"/>
+              <TableCell Name="Cell10" Border.Lines="All" Text="[Table.DATE_PAY]" Format="Date" Format.Format="dd.MM.yyyy" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+            </TableRow>
+          </TableObject>
+        </DataBand>
+        <GroupFooterBand Name="GroupFooter2" Top="131.19" Width="718.2"/>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter1" Top="135.23" Width="718.2" Height="56.7" CanGrow="true" CanShrink="true" CanBreak="true">
+        <TableObject Name="Table1" Left="9.45" Width="701.19" Height="18.9">
+          <TableColumn Name="Column16" Width="189"/>
+          <TableColumn Name="Column17" Width="141.75"/>
+          <TableColumn Name="Column18" Width="179.55"/>
+          <TableColumn Name="Column19" Width="103.95"/>
+          <TableColumn Name="Column20" Width="86.94"/>
+          <TableRow Name="Row8">
+            <TableCell Name="Cell36" Border.Lines="All" Text="Всього за проектом" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt, style=Bold"/>
+            <TableCell Name="Cell37" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell38" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell39" Border.Lines="All" Text="[Total]" Format="Currency" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.CurrencySymbol="" Format.PositivePattern="1" Format.NegativePattern="8" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 9pt"/>
+            <TableCell Name="Cell40" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

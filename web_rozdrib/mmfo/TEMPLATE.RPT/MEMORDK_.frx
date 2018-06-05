@@ -1,0 +1,3531 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/18/2013 18:20:22" ReportInfo.Modified="04/25/2013 18:31:57" ReportInfo.CreatorVersion="1.9.1.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _StartReport(object sender, EventArgs e)
+    {
+      Parameter buh = Report.GetParameter(&quot;p_buh&quot;);
+      BUH_MODEL_H.Visible = (Convert.ToInt32(buh.Value) == 1 ? true : false);
+      BUH_MODEL_B.Visible = (Convert.ToInt32(buh.Value) == 1 ? true : false);
+
+    }
+    
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF18t3N5WTocA0ARXAZ2I9tsXqxlsPHbqkZZ8j2333FaUp7NEZKfwRzqgcHIjxaWbZy1w8iSq0YLB6Gv7c42nod/Y=">
+      <TableDataSource Name="Table2" Alias="TIC" DataType="System.Int32" Enabled="true" SelectCommand="SELECT &#13;&#10;   tic.get_static_attr ('BANKO',   o.REF)   AS &quot;BANKO&quot;,&#13;&#10;   tic.get_static_attr ('DR_OB40', o.REF)   AS &quot;DR_OB40&quot;,&#13;&#10;   tic.get_static_attr ('FIO1',    o.REF)   AS &quot;FIO1&quot;,&#13;&#10;   tic.get_static_attr ('FIO2',    o.REF)   AS &quot;FIO2&quot;,&#13;&#10;   tic.get_static_attr ('KURS4',   o.REF)   AS &quot;KURS4&quot;,&#13;&#10;   tic.get_static_attr ('KV_SK0',  o.REF)   AS &quot;KV_SK0&quot;,&#13;&#10;   tic.get_static_attr ('MFOBO',   o.REF)   AS &quot;MFOBO&quot;,&#13;&#10;   tic.get_static_attr ('NAME_TT', o.REF)   AS &quot;NAME_TT&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INK9D', o.REF) AS &quot;NLS_INK9D&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INK9K', o.REF) AS &quot;NLS_INK9K&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INKD', o.REF)  AS &quot;NLS_INKD&quot;,&#13;&#10;   tic.get_static_attr ('NLS_INKK', o.REF)  AS &quot;NLS_INKK&quot;,&#13;&#10;   tic.get_static_attr ('NLS_KOM6', o.REF)  AS &quot;NLS_KOM6&quot;,&#13;&#10;   tic.get_static_attr ('NLS_KONV', o.REF)  AS &quot;NLS_KONV&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SG',   o.REF)  AS &quot;NLS_SG&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SG_980', o.REF) AS &quot;NLS_SG_980&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SK0',  o.REF)  AS &quot;NLS_SK0&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SK1', o.REF)   AS &quot;NLS_SK1&quot;,&#13;&#10;   tic.get_static_attr ('NLS_SK9', o.REF)   AS &quot;NLS_SK9&quot;,&#13;&#10;   tic.get_static_attr ('OAccMan', o.REF)   AS &quot;OAccMan&quot;,&#13;&#10;   tic.get_static_attr ('OBank-A', o.REF)   AS &quot;OBank-A&quot;,&#13;&#10;   tic.get_static_attr ('OBank-B', o.REF)   AS &quot;OBank-B&quot;,&#13;&#10;   tic.get_static_attr ('OBoss',   o.REF)   AS &quot;OBoss&quot;,&#13;&#10;   tic.get_static_attr ('OBSumm',  o.REF)   AS &quot;OBSumm&quot;,&#13;&#10;   tic.get_static_attr ('OCashSymb', o.REF) AS &quot;OCashSymb&quot;,&#13;&#10;   tic.get_static_attr ('OCcyCode', o.REF)  AS &quot;OCcyCode &quot;,&#13;&#10;   tic.get_static_attr ('OCcyCode-B', o.REF) AS &quot;OCcyCode-B&quot;,&#13;&#10;   tic.get_static_attr ('OCcyISO',   o.REF) AS &quot;OCcyISO&quot;,&#13;&#10;   tic.get_static_attr ('OCcyISO-B', o.REF) AS &quot;OCcyISO-B&quot;,&#13;&#10;   tic.get_static_attr ('ODay',      o.REF) AS &quot;ODay&quot;,&#13;&#10;   tic.get_static_attr ('ODocProp', o.REF)  AS &quot;ODocProp&quot;,&#13;&#10;   tic.get_static_attr ('ODocument', o.REF) AS &quot;ODocument&quot;,&#13;&#10;   tic.get_static_attr ('OFSumm', o.REF)    AS &quot;OFSumm&quot;,&#13;&#10;   tic.get_static_attr ('OFSumm2', o.REF)   AS &quot;OFSumm2&quot;,&#13;&#10;   tic.get_static_attr ('OFSummLit', o.REF) AS &quot;OFSummLit&quot;,&#13;&#10;   tic.get_static_attr ('OFSummLit2', o.REF) AS &quot;OFSummLit2&quot;,&#13;&#10;   tic.get_static_attr ('OKMonth',  o.REF)   AS &quot;OKMonth&quot;,&#13;&#10;   tic.get_static_attr ('OKYear',   o.REF)   AS &quot;OKYear&quot;,&#13;&#10;   tic.get_static_attr ('OMFO-A',   o.REF)   AS &quot;OMFO-A&quot;,&#13;&#10;   tic.get_static_attr ('OMFO-B',   o.REF)   AS &quot;OMFO-B&quot;,&#13;&#10;   tic.get_static_attr ('OMonth',   o.REF)   AS &quot;OMonth&quot;,&#13;&#10;   tic.get_static_attr ('OMyBankAdres', o.REF) AS &quot;OMyBankAdres&quot;,&#13;&#10;   tic.get_static_attr ('OMyBankMFO', o.REF)   AS &quot;OMyBankMFO &quot;,&#13;&#10;   tic.get_static_attr ('OMyBankName', o.REF)  AS &quot;OMyBankName &quot;,&#13;&#10;   tic.get_static_attr ('ONazn',   o.REF)   AS &quot;ONazn&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-A',  o.REF)   AS &quot;ONLS-A&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-Aa', o.REF)   AS &quot;ONLS-Aa&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-B',  o.REF)   AS &quot;ONLS-B&quot;,&#13;&#10;   tic.get_static_attr ('ONLS-Ba', o.REF)   AS &quot;ONLS-Ba&quot;,&#13;&#10;   tic.get_static_attr ('ONMS-Aa', o.REF)   AS &quot;ONMS-Aa&quot;,&#13;&#10;   tic.get_static_attr ('ONMS-Ba', o.REF)   AS &quot;ONMS-Ba&quot;,&#13;&#10;   tic.get_static_attr ('ONumber', o.REF)   AS &quot;ONumber&quot;,&#13;&#10;   tic.get_static_attr ('OOKPO',   o.REF)   AS &quot;OOKPO&quot;,&#13;&#10;   tic.get_static_attr ('OOKPO-A', o.REF)   AS &quot;OOKPO-A&quot;,&#13;&#10;   tic.get_static_attr ('OOKPO-B', o.REF)   AS &quot;OOKPO-B&quot;,&#13;&#10;   tic.get_static_attr ('OPAdres', o.REF)   AS &quot;OPAdres&quot;,&#13;&#10;   tic.get_static_attr ('OPayer',  o.REF)   AS &quot;OPayer&quot;,&#13;&#10;   tic.get_static_attr ('OPayer2', o.REF)   AS &quot;OPayer2&quot;,&#13;&#10;   tic.get_static_attr ('OPBrDate', o.REF)  AS &quot;OPBrDate&quot;,&#13;&#10;   tic.get_static_attr ('OPDat',   o.REF)   AS &quot;OPDat&quot;,&#13;&#10;   tic.get_static_attr ('OPmtDet', o.REF)   AS &quot;OPmtDet&quot;,&#13;&#10;   tic.get_static_attr ('OPOKPO',  o.REF)   AS &quot;OPOKPO&quot;,&#13;&#10;   tic.get_static_attr ('OPrintStamp', o.REF) AS &quot;OPrintStamp&quot;,&#13;&#10;   tic.get_static_attr ('OPTime',  o.REF)   AS &quot;OPTime&quot;,&#13;&#10;   tic.get_static_attr ('ORat2',   o.REF)   AS &quot;ORat2&quot;,&#13;&#10;   tic.get_static_attr ('ORatB',   o.REF)   AS &quot;ORatB&quot;,&#13;&#10;   tic.get_static_attr ('ORatBA',  o.REF)   AS &quot;ORatBA&quot;,&#13;&#10;   tic.get_static_attr ('ORatBB',  o.REF)   AS &quot;ORatBB&quot;,&#13;&#10;   tic.get_static_attr ('ORatBV',  o.REF)   AS &quot;ORatBV&quot;,&#13;&#10;   tic.get_static_attr ('ORatBVA', o.REF)   AS &quot;ORatBVA&quot;,&#13;&#10;   tic.get_static_attr ('ORatBVB', o.REF)   AS &quot;ORatBVB&quot;,&#13;&#10;   tic.get_static_attr ('ORatO',   o.REF)   AS &quot;ORatO&quot;,&#13;&#10;   tic.get_static_attr ('ORatOA',  o.REF)   AS &quot;ORatOA&quot;,&#13;&#10;   tic.get_static_attr ('ORatOB',  o.REF)   AS &quot;ORatOB&quot;,&#13;&#10;   tic.get_static_attr ('ORatOVA', o.REF)   AS &quot;ORatOVA&quot;,&#13;&#10;   tic.get_static_attr ('ORatOVB', o.REF)   AS &quot;ORatOVB&quot;,&#13;&#10;   tic.get_static_attr ('ORatSA',  o.REF)   AS &quot;ORatSA&quot;,&#13;&#10;   tic.get_static_attr ('ORatSB',  o.REF)   AS &quot;ORatSB&quot;,&#13;&#10;   tic.get_static_attr ('ORatSORatOV', o.REF) AS &quot;ORatSORatOV&quot;,&#13;&#10;   tic.get_static_attr ('ORatSVA', o.REF)   AS &quot;ORatSVA&quot;,&#13;&#10;   tic.get_static_attr ('ORatSVB', o.REF)   AS &quot;ORatSVB&quot;,&#13;&#10;   tic.get_static_attr ('ORatSVORat1', o.REF) AS &quot;ORatSVORat1&quot;,&#13;&#10;   tic.get_static_attr ('OReceiver', o.REF) AS &quot;OReceiver&quot;,&#13;&#10;   tic.get_static_attr ('OS3800', o.REF)    AS &quot;OS3800&quot;,&#13;&#10;   tic.get_static_attr ('OS3801', o.REF)    AS &quot;OS3801&quot;,&#13;&#10;   tic.get_static_attr ('OS3801B', o.REF)   AS &quot;OS3801B&quot;,&#13;&#10;   tic.get_static_attr ('OSender', o.REF)   AS &quot;OSender&quot;,&#13;&#10;   tic.get_static_attr ('OSumm', o.REF)     AS &quot;OSumm&quot;,&#13;&#10;   tic.get_static_attr ('OSumm-B', o.REF)   AS &quot;OSumm-B&quot;,&#13;&#10;   tic.get_static_attr ('OSummLit', o.REF)  AS &quot;OSummLit&quot;,&#13;&#10;   tic.get_static_attr ('OSummLit-B', o.REF) AS &quot;OSummLit-B&quot;,&#13;&#10;   tic.get_static_attr ('oTest', o.REF)     AS &quot;oTest&quot;,&#13;&#10;   tic.get_static_attr ('OTRIM', o.REF)     AS &quot;OTRIM&quot;,&#13;&#10;   tic.get_static_attr ('OUserID', o.REF)   AS &quot;OUserID&quot;,&#13;&#10;   tic.get_static_attr ('OUserName', o.REF) AS &quot;OUserName&quot;,&#13;&#10;   tic.get_static_attr ('OValDate', o.REF)  AS &quot;OValDate&quot;,&#13;&#10;   tic.get_static_attr ('OVDay', o.REF)     AS &quot;OVDay&quot;,&#13;&#10;   tic.get_static_attr ('OVMonth', o.REF)   AS &quot;OVMonth&quot;,&#13;&#10;   tic.get_static_attr ('OVSumm', o.REF)    AS &quot;OVSumm&quot;,&#13;&#10;   tic.get_static_attr ('OVSumm2', o.REF)   AS &quot;OVSumm2&quot;,&#13;&#10;   tic.get_static_attr ('OVSummLit', o.REF) AS &quot;OVSummLit&quot;,&#13;&#10;   tic.get_static_attr ('OVSummLit2', o.REF) AS &quot;OVSummLit2&quot;,&#13;&#10;   tic.get_static_attr ('OVYear', o.REF)    AS &quot;OVYear&quot;,&#13;&#10;   tic.get_static_attr ('OYear', o.REF)     AS &quot;OYear&quot;,&#13;&#10;   tic.get_static_attr ('OZvitDate', o.REF) AS &quot;OZvitDate&quot;,&#13;&#10;   tic.get_static_attr ('R_SD8', o.REF)     AS &quot;R_SD8&quot;,&#13;&#10;   tic.get_static_attr ('R_SD8Lit', o.REF)  AS &quot;R_SD8Lit&quot;,&#13;&#10;   tic.get_static_attr ('R_SK0Lit', o.REF)  AS &quot;R_SK0Lit&quot;,&#13;&#10;   tic.get_static_attr ('R_SK1Lit', o.REF)  AS &quot;R_SK1Lit&quot;,&#13;&#10;   tic.get_static_attr ('R_SK9Lit', o.REF)  AS &quot;R_SK9Lit&quot;,&#13;&#10;   tic.get_static_attr ('REZIDN', o.REF)    AS &quot;REZIDN&quot;,&#13;&#10;   tic.get_static_attr ('S_INKK', o.REF)    AS &quot;S_INKK&quot;,&#13;&#10;   tic.get_static_attr ('S_INKKLit', o.REF) AS &quot;S_INKKLit&quot;,&#13;&#10;   tic.get_static_attr ('S_KONV', o.REF)    AS &quot;S_KONV&quot;,&#13;&#10;   tic.get_static_attr ('S_KONVLit', o.REF) AS &quot;S_KONVLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SD8', o.REF)     AS &quot;S_SD8&quot;,&#13;&#10;   tic.get_static_attr ('S_SG', o.REF)      AS &quot;S_SG&quot;,&#13;&#10;   tic.get_static_attr ('S_SGLit', o.REF)   AS &quot;S_SGLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SGQ', o.REF)     AS &quot;S_SGQ&quot;,&#13;&#10;   tic.get_static_attr ('S_SGQLit', o.REF)  AS &quot;S_SGQLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SK0', o.REF)     AS &quot;S_SK0&quot;,&#13;&#10;   tic.get_static_attr ('S_SK0Q', o.REF)    AS &quot;S_SK0Q&quot;,&#13;&#10;   tic.get_static_attr ('S_SK0QLit', o.REF) AS &quot;S_SK0QLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SK1', o.REF)     AS &quot;S_SK1&quot;,&#13;&#10;   tic.get_static_attr ('S_SK1Q', o.REF)    AS &quot;S_SK1Q&quot;,&#13;&#10;   tic.get_static_attr ('S_SK9', o.REF)     AS &quot;S_SK9&quot;,&#13;&#10;   tic.get_static_attr ('S_SK9Q', o.REF)    AS &quot;S_SK9Q&quot;,&#13;&#10;   tic.get_static_attr ('S_SK9QLit', o.REF) AS &quot;S_SK9QLit&quot;,&#13;&#10;   tic.get_static_attr ('S_SN', o.REF)      AS &quot;S_SN&quot;,&#13;&#10;   tic.get_static_attr ('S_SNM', o.REF)     AS &quot;S_SNM&quot;,&#13;&#10;   tic.get_static_attr ('S_SS', o.REF)      AS &quot;S_SS&quot;,&#13;&#10;   tic.get_static_attr ('SG_SG', o.REF)     AS &quot;SG_SG&quot;,&#13;&#10;   tic.get_static_attr ('SG_SG_980', o.REF) AS &quot;SG_SG_980&quot;,&#13;&#10;   tic.get_static_attr ('SG_SG_980LIT', o.REF) AS &quot;SG_SG_980LIT&quot;,&#13;&#10;   tic.get_static_attr ('SG_SGLIT', o.REF)  AS &quot;SG_SGLIT&quot;,&#13;&#10;   tic.get_static_attr ('SK_CC8', o.REF)    AS &quot;SK_CC8&quot;,&#13;&#10;   tic.get_static_attr ('SK_CCD', o.REF)    AS &quot;SK_CCD&quot;,&#13;&#10;   tic.get_static_attr ('SK_CCK', o.REF)    AS &quot;SK_CCK&quot;,&#13;&#10;   tic.get_static_attr ('UBR_ADR', o.REF)   AS &quot;UBR_ADR&quot;,&#13;&#10;   tic.get_static_attr ('UBR_NAME', o.REF)  AS &quot;UBR_NAME&quot;,&#13;&#10;   tic.get_static_attr ('UCashSymbO', o.REF) AS &quot;UCashSymbO&quot;,&#13;&#10;   tic.get_static_attr ('UCDAC', o.REF)     AS &quot;UCDAC&quot;,&#13;&#10;   tic.get_static_attr ('UDATE', o.REF)     AS &quot;UDATE&quot;,&#13;&#10;   tic.get_static_attr ('UISO2', o.REF)     AS &quot;UISO2&quot;,&#13;&#10;   tic.get_static_attr ('UKURSV2', o.REF)   AS &quot;UKURSV2&quot;,&#13;&#10;   tic.get_static_attr ('UKV2', o.REF)      AS &quot;UKV2&quot;,&#13;&#10;   tic.get_static_attr ('UNAMKV', o.REF)    AS &quot;UNAMKV&quot;,&#13;&#10;   tic.get_static_attr ('UNazF1', o.REF)    AS &quot;UNazF1&quot;,&#13;&#10;   tic.get_static_attr ('UNazF2', o.REF)    AS &quot;UNazF2&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P', o.REF)   AS &quot;UNAZN_P&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P1', o.REF)  AS &quot;UNAZN_P1&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P2', o.REF)  AS &quot;UNAZN_P2&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P3', o.REF)  AS &quot;UNAZN_P3&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN_P4', o.REF)  AS &quot;UNAZN_P4&quot;,&#13;&#10;   tic.get_static_attr ('UNazn1', o.REF)    AS &quot;UNazn1&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN1L', o.REF)   AS &quot;UNAZN1L&quot;,&#13;&#10;   tic.get_static_attr ('UNazn2', o.REF)    AS &quot;UNazn2&quot;,&#13;&#10;   tic.get_static_attr ('UNAZN2L', o.REF)   AS &quot;UNAZN2L&quot;,&#13;&#10;   tic.get_static_attr ('UNazn3', o.REF)    AS &quot;UNazn3&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO1', o.REF)    AS &quot;UNKTO1&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO2', o.REF)    AS &quot;UNKTO2&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO3', o.REF)    AS &quot;UNKTO3&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO4', o.REF)    AS &quot;UNKTO4&quot;,&#13;&#10;   tic.get_static_attr ('UNKTO5', o.REF)    AS &quot;UNKTO5&quot;,&#13;&#10;   tic.get_static_attr ('UNLS3800', o.REF)  AS &quot;UNLS3800&quot;,&#13;&#10;   tic.get_static_attr ('UNLS3801', o.REF)  AS &quot;UNLS3801 &quot;,&#13;&#10;   tic.get_static_attr ('UNLS6110', o.REF)  AS &quot;UNLS6110&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH1', o.REF)    AS &quot;UNMCH1&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH2', o.REF)    AS &quot;UNMCH2&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH3', o.REF)    AS &quot;UNMCH3&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH4', o.REF)    AS &quot;UNMCH4&quot;,&#13;&#10;   tic.get_static_attr ('UNMCH5', o.REF)    AS &quot;UNMCH5&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH1', o.REF)    AS &quot;UNNCH1&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH2', o.REF)    AS &quot;UNNCH2&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH3', o.REF)    AS &quot;UNNCH3&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH4', o.REF)    AS &quot;UNNCH4&quot;,&#13;&#10;   tic.get_static_attr ('UNNCH5', o.REF)    AS &quot;UNNCH5&quot;,&#13;&#10;   tic.get_static_attr ('UORndSumD', o.REF) AS &quot;UORndSumD&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDKo', o.REF) AS &quot;UOSummDKo&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDKq', o.REF) AS &quot;UOSummDKq&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDKqLit', o.REF) AS &quot;UOSummDKqLit&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDo', o.REF)  AS &quot;UOSummDo&quot;,&#13;&#10;   tic.get_static_attr ('UOSummDoLit', o.REF) AS &quot;UOSummDoLit&quot;,&#13;&#10;   tic.get_static_attr ('UPO_K1', o.REF)    AS &quot;UPO_K1&quot;,&#13;&#10;   tic.get_static_attr ('UReceiver', o.REF) AS &quot;UReceiver&quot;,&#13;&#10;   tic.get_static_attr ('USUM6110',  o.REF)  AS &quot;USUM6110&quot;,&#13;&#10;   tic.get_static_attr ('USumC',     o.REF)  AS &quot;USumC&quot;,&#13;&#10;   tic.get_static_attr ('USumCN',    o.REF)  AS &quot;USumCN&quot;,&#13;&#10;   tic.get_static_attr ('USumCNLit', o.REF)  AS &quot;USumCNLit&quot;,&#13;&#10;   tic.get_static_attr ('USummD2',   o.REF)   AS &quot;USummD2&quot;,&#13;&#10;   tic.get_static_attr ('USummD2Lit', o.REF) AS &quot;USummD2Lit&quot;,&#13;&#10;   tic.get_static_attr ('USummDQ2',   o.REF) AS &quot;USummDQ2&quot;,&#13;&#10;   tic.get_static_attr ('USummDQ2Lit', o.REF) AS &quot;USummDQ2Lit&quot;,&#13;&#10;   tic.get_static_attr ('USUMPR6110', o.REF)  AS &quot;USUMPR6110&quot;,&#13;&#10;   tic.get_static_attr ('UTARDCH', o.REF)  AS &quot;UTARDCH&quot;,&#13;&#10;   tic.get_static_attr ('UTARSMIN', o.REF) AS &quot;UTARSMIN&quot;,&#13;&#10;   tic.get_static_attr ('UTIME', o.REF)    AS &quot;UTIME&quot;,&#13;&#10;   tic.get_static_attr ('Uvdat', o.REF)    AS &quot;Uvdat&quot;,&#13;&#10;   tic.get_static_attr ('VA_KK', o.REF)    AS &quot;VA_KK&quot;,&#13;&#10;   tic.get_static_attr ('VA_NC', o.REF)    AS &quot;VA_NC&quot;,&#13;&#10;   tic.get_static_attr ('SK_CCM', o.REF)   AS &quot;SK_CCM&quot;&#13;&#10;  FROM oper o&#13;&#10;  where o.ref=:p_ref">
+        <Column Name="BANKO" DataType="System.String"/>
+        <Column Name="FIO1" DataType="System.String"/>
+        <Column Name="FIO2" DataType="System.String"/>
+        <Column Name="KURS4" DataType="System.String"/>
+        <Column Name="KV_SK0" DataType="System.String"/>
+        <Column Name="MFOBO" DataType="System.String"/>
+        <Column Name="NAME_TT" DataType="System.String"/>
+        <Column Name="NLS_INK9D" DataType="System.String"/>
+        <Column Name="NLS_INK9K" DataType="System.String"/>
+        <Column Name="NLS_INKD" DataType="System.String"/>
+        <Column Name="NLS_KOM6" DataType="System.String"/>
+        <Column Name="NLS_KONV" DataType="System.String"/>
+        <Column Name="NLS_SG" DataType="System.String"/>
+        <Column Name="NLS_SG_980" DataType="System.String"/>
+        <Column Name="NLS_SK0" DataType="System.String"/>
+        <Column Name="NLS_SK1" DataType="System.String"/>
+        <Column Name="NLS_SK9" DataType="System.String"/>
+        <Column Name="OAccMan" DataType="System.String"/>
+        <Column Name="OBank-A" DataType="System.String"/>
+        <Column Name="OBank-B" DataType="System.String"/>
+        <Column Name="OBoss" DataType="System.String"/>
+        <Column Name="OBSumm" DataType="System.String"/>
+        <Column Name="OCashSymb" DataType="System.String"/>
+        <Column Name="OCcyCode " DataType="System.String"/>
+        <Column Name="OCcyCode-B" DataType="System.String"/>
+        <Column Name="OCcyISO" DataType="System.String"/>
+        <Column Name="OCcyISO-B" DataType="System.String"/>
+        <Column Name="ODay" DataType="System.String"/>
+        <Column Name="ODocProp" DataType="System.String"/>
+        <Column Name="ODocument" DataType="System.String"/>
+        <Column Name="OFSumm" DataType="System.String"/>
+        <Column Name="OFSumm2" DataType="System.String"/>
+        <Column Name="OFSummLit" DataType="System.String"/>
+        <Column Name="OFSummLit2" DataType="System.String"/>
+        <Column Name="OKMonth" DataType="System.String"/>
+        <Column Name="OKYear" DataType="System.String"/>
+        <Column Name="OMFO-A" DataType="System.String"/>
+        <Column Name="OMFO-B" DataType="System.String"/>
+        <Column Name="OMonth" DataType="System.String"/>
+        <Column Name="OMyBankAdres" DataType="System.String"/>
+        <Column Name="OMyBankMFO " DataType="System.String"/>
+        <Column Name="OMyBankName " DataType="System.String"/>
+        <Column Name="ONazn" DataType="System.String"/>
+        <Column Name="ONLS-A" DataType="System.String"/>
+        <Column Name="ONLS-Aa" DataType="System.String"/>
+        <Column Name="ONLS-B" DataType="System.String"/>
+        <Column Name="ONMS-Aa" DataType="System.String"/>
+        <Column Name="UNLS3800" DataType="System.String"/>
+        <Column Name="UNLS3801 " DataType="System.String"/>
+        <Column Name="USummDQ2" DataType="System.String"/>
+        <Column Name="UTARDCH" DataType="System.String"/>
+        <Column Name="UTIME" DataType="System.String"/>
+        <Column Name="Uvdat" DataType="System.String"/>
+        <Column Name="VA_KK" DataType="System.String"/>
+        <Column Name="VA_NC" DataType="System.String"/>
+        <Column Name="SK_CCM" DataType="System.String"/>
+        <Column Name="ONMS-Ba" DataType="System.String"/>
+        <Column Name="OOKPO-A" DataType="System.String"/>
+        <Column Name="OOKPO-B" DataType="System.String"/>
+        <Column Name="OPAdres" DataType="System.String"/>
+        <Column Name="OPayer" DataType="System.String"/>
+        <Column Name="OPayer2" DataType="System.String"/>
+        <Column Name="OPBrDate" DataType="System.String"/>
+        <Column Name="OPDat" DataType="System.String"/>
+        <Column Name="OPmtDet" DataType="System.String"/>
+        <Column Name="OPOKPO" DataType="System.String"/>
+        <Column Name="OPrintStamp" DataType="System.String"/>
+        <Column Name="OPTime" DataType="System.String"/>
+        <Column Name="ORat2" DataType="System.String"/>
+        <Column Name="ORatB" DataType="System.String"/>
+        <Column Name="ORatBA" DataType="System.String"/>
+        <Column Name="ORatBB" DataType="System.String"/>
+        <Column Name="ORatBV" DataType="System.String"/>
+        <Column Name="ORatBVA" DataType="System.String"/>
+        <Column Name="ORatBVB" DataType="System.String"/>
+        <Column Name="ORatO" DataType="System.String"/>
+        <Column Name="ORatOA" DataType="System.String"/>
+        <Column Name="ORatOB" DataType="System.String"/>
+        <Column Name="ORatOVA" DataType="System.String"/>
+        <Column Name="ORatOVB" DataType="System.String"/>
+        <Column Name="ORatSA" DataType="System.String"/>
+        <Column Name="ORatSB" DataType="System.String"/>
+        <Column Name="ORatSORatOV" DataType="System.String"/>
+        <Column Name="ORatSVA" DataType="System.String"/>
+        <Column Name="ORatSVB" DataType="System.String"/>
+        <Column Name="ORatSVORat1" DataType="System.String"/>
+        <Column Name="OReceiver" DataType="System.String"/>
+        <Column Name="OS3800" DataType="System.String"/>
+        <Column Name="OS3801" DataType="System.String"/>
+        <Column Name="OS3801B" DataType="System.String"/>
+        <Column Name="OSender" DataType="System.String"/>
+        <Column Name="OSumm" DataType="System.String"/>
+        <Column Name="OSumm-B" DataType="System.String"/>
+        <Column Name="OSummLit" DataType="System.String"/>
+        <Column Name="OSummLit-B" DataType="System.String"/>
+        <Column Name="oTest" DataType="System.String"/>
+        <Column Name="OTRIM" DataType="System.String"/>
+        <Column Name="OUserID" DataType="System.String"/>
+        <Column Name="OUserName" DataType="System.String"/>
+        <Column Name="OValDate" DataType="System.String"/>
+        <Column Name="OVDay" DataType="System.String"/>
+        <Column Name="OVMonth" DataType="System.String"/>
+        <Column Name="OVSumm" DataType="System.String"/>
+        <Column Name="OVSumm2" DataType="System.String"/>
+        <Column Name="OVSummLit" DataType="System.String"/>
+        <Column Name="OVSummLit2" DataType="System.String"/>
+        <Column Name="OVYear" DataType="System.String"/>
+        <Column Name="OYear" DataType="System.String"/>
+        <Column Name="OZvitDate" DataType="System.String"/>
+        <Column Name="R_SD8" DataType="System.String"/>
+        <Column Name="R_SD8Lit" DataType="System.String"/>
+        <Column Name="R_SK0Lit" DataType="System.String"/>
+        <Column Name="R_SK1Lit" DataType="System.String"/>
+        <Column Name="R_SK9Lit" DataType="System.String"/>
+        <Column Name="REZIDN" DataType="System.String"/>
+        <Column Name="S_INKK" DataType="System.String"/>
+        <Column Name="S_INKKLit" DataType="System.String"/>
+        <Column Name="S_KONV" DataType="System.String"/>
+        <Column Name="S_KONVLit" DataType="System.String"/>
+        <Column Name="S_SD8" DataType="System.String"/>
+        <Column Name="S_SG" DataType="System.String"/>
+        <Column Name="S_SGLit" DataType="System.String"/>
+        <Column Name="S_SGQ" DataType="System.String"/>
+        <Column Name="S_SGQLit" DataType="System.String"/>
+        <Column Name="S_SK0" DataType="System.String"/>
+        <Column Name="S_SK0Q" DataType="System.String"/>
+        <Column Name="S_SK0QLit" DataType="System.String"/>
+        <Column Name="S_SK1" DataType="System.String"/>
+        <Column Name="S_SK1Q" DataType="System.String"/>
+        <Column Name="S_SK9" DataType="System.String"/>
+        <Column Name="S_SK9Q" DataType="System.String"/>
+        <Column Name="S_SK9QLit" DataType="System.String"/>
+        <Column Name="S_SN" DataType="System.String"/>
+        <Column Name="S_SNM" DataType="System.String"/>
+        <Column Name="S_SS" DataType="System.String"/>
+        <Column Name="SG_SG" DataType="System.String"/>
+        <Column Name="SG_SG_980" DataType="System.String"/>
+        <Column Name="SG_SG_980LIT" DataType="System.String"/>
+        <Column Name="SG_SGLIT" DataType="System.String"/>
+        <Column Name="SK_CC8" DataType="System.String"/>
+        <Column Name="SK_CCD" DataType="System.String"/>
+        <Column Name="SK_CCK" DataType="System.String"/>
+        <Column Name="UBR_ADR" DataType="System.String"/>
+        <Column Name="UBR_NAME" DataType="System.String"/>
+        <Column Name="UCashSymbO" DataType="System.String"/>
+        <Column Name="UCDAC" DataType="System.String"/>
+        <Column Name="UDATE" DataType="System.String"/>
+        <Column Name="UISO2" DataType="System.String"/>
+        <Column Name="UKURSV2" DataType="System.String"/>
+        <Column Name="UKV2" DataType="System.String"/>
+        <Column Name="UNAMKV" DataType="System.String"/>
+        <Column Name="UNazF1" DataType="System.String"/>
+        <Column Name="UNazF2" DataType="System.String"/>
+        <Column Name="UNAZN_P" DataType="System.String"/>
+        <Column Name="UNAZN_P1" DataType="System.String"/>
+        <Column Name="UNAZN_P2" DataType="System.String"/>
+        <Column Name="UNAZN_P3" DataType="System.String"/>
+        <Column Name="UNAZN_P4" DataType="System.String"/>
+        <Column Name="UNazn1" DataType="System.String"/>
+        <Column Name="UNAZN1L" DataType="System.String"/>
+        <Column Name="UNazn2" DataType="System.String"/>
+        <Column Name="UNAZN2L" DataType="System.String"/>
+        <Column Name="UNazn3" DataType="System.String"/>
+        <Column Name="UNKTO1" DataType="System.String"/>
+        <Column Name="UNKTO2" DataType="System.String"/>
+        <Column Name="UNKTO3" DataType="System.String"/>
+        <Column Name="UNKTO4" DataType="System.String"/>
+        <Column Name="UNKTO5" DataType="System.String"/>
+        <Column Name="UNMCH1" DataType="System.String"/>
+        <Column Name="UNMCH2" DataType="System.String"/>
+        <Column Name="UNMCH3" DataType="System.String"/>
+        <Column Name="UNMCH4" DataType="System.String"/>
+        <Column Name="UNMCH5" DataType="System.String"/>
+        <Column Name="UNNCH1" DataType="System.String"/>
+        <Column Name="UNNCH2" DataType="System.String"/>
+        <Column Name="UNNCH3" DataType="System.String"/>
+        <Column Name="UNNCH4" DataType="System.String"/>
+        <Column Name="UNNCH5" DataType="System.String"/>
+        <Column Name="UORndSumD" DataType="System.String"/>
+        <Column Name="UOSummDKo" DataType="System.String"/>
+        <Column Name="UOSummDKq" DataType="System.String"/>
+        <Column Name="UOSummDKqLit" DataType="System.String"/>
+        <Column Name="UOSummDo" DataType="System.String"/>
+        <Column Name="UOSummDoLit" DataType="System.String"/>
+        <Column Name="UPO_K1" DataType="System.String"/>
+        <Column Name="UReceiver" DataType="System.String"/>
+        <Column Name="USUM6110" DataType="System.String"/>
+        <Column Name="USumC" DataType="System.String"/>
+        <Column Name="USumCN" DataType="System.String"/>
+        <Column Name="USumCNLit" DataType="System.String"/>
+        <Column Name="USummD2" DataType="System.String"/>
+        <Column Name="USummD2Lit" DataType="System.String"/>
+        <Column Name="USummDQ2Lit" DataType="System.String"/>
+        <Column Name="USUMPR6110" DataType="System.String"/>
+        <Column Name="DR_OB40" DataType="System.String"/>
+        <Column Name="NLS_INKK" DataType="System.String"/>
+        <Column Name="ONLS-Ba" DataType="System.String"/>
+        <Column Name="ONumber" DataType="System.String"/>
+        <Column Name="OOKPO" DataType="System.String"/>
+        <Column Name="UNLS6110" DataType="System.String"/>
+        <Column Name="UTARSMIN" DataType="System.String"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table" Alias="BUH_MODEL" DataType="System.Int32" Enabled="true" SelectCommand="SELECT o.tt,o.dk,a.nls,a.kv,t.dig, trunc(o.fdat) fdat1,o.s/t.denom,gl.p_icurval(a.kv, o.s, o.fdat)/100,o.txt,r.nls,r.kv&#13;&#10;                                             FROM opldok o, accounts a, tabval$global t, accounts r &#13;&#10;                                             WHERE t.kv=a.kv and a.acc=o.acc and r.acc(+)=a.accc and o.ref=:p_ref and o.sos is not null&#13;&#10;                                             ORDER BY o.fdat, a.kv, o.stmt, o.tt, o.dk">
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="DK" DataType="System.Int16"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="DIG" DataType="System.Int64"/>
+        <Column Name="FDAT1" DataType="System.DateTime"/>
+        <Column Name="O.S/T.DENOM" DataType="System.Decimal"/>
+        <Column Name="GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100" DataType="System.Decimal"/>
+        <Column Name="TXT" DataType="System.String"/>
+        <Column Name="NLS1" DataType="System.String"/>
+        <Column Name="KV1" DataType="System.Int16"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table6" Alias="DK" DataType="System.Int32" Enabled="true" SelectCommand="select o.dk as &quot;DK&quot; &#13;&#10;    from oper o&#13;&#10;where o.ref=:p_ref">
+        <Column Name="DK" DataType="System.Int16"/>
+        <CommandParameter Name="p_ref" DataType="107" Expression="[p_ref]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_ref" DataType="System.Int32" Expression="9378203"/>
+    <Parameter Name="p_buh" DataType="System.Int32" Expression="1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" StartPageEvent="_StartReport">
+    <DataBand Name="Data1" Width="718.2" Height="519.75" DataSource="Table2">
+      <TableObject Name="Table7" Left="9.45" Top="9.45" Width="681.4" Height="508.04" GrowToBottom="true">
+        <TableColumn Name="Column97" Width="18.9"/>
+        <TableColumn Name="Column98" Width="18.9"/>
+        <TableColumn Name="Column99" Width="18.9"/>
+        <TableColumn Name="Column100" Width="18.9"/>
+        <TableColumn Name="Column101" Width="18.9"/>
+        <TableColumn Name="Column102" Width="18.9"/>
+        <TableColumn Name="Column103" Width="18.9"/>
+        <TableColumn Name="Column104" Width="18.9"/>
+        <TableColumn Name="Column105" Width="18.9"/>
+        <TableColumn Name="Column106" Width="18.9"/>
+        <TableColumn Name="Column107" Width="18.9"/>
+        <TableColumn Name="Column108" Width="18.9"/>
+        <TableColumn Name="Column109" Width="18.9"/>
+        <TableColumn Name="Column110" Width="18.9"/>
+        <TableColumn Name="Column111" Width="18.9"/>
+        <TableColumn Name="Column112" Width="18.9"/>
+        <TableColumn Name="Column113" Width="18.9"/>
+        <TableColumn Name="Column114" Width="18.9"/>
+        <TableColumn Name="Column115" Width="18.9"/>
+        <TableColumn Name="Column116" Width="18.9"/>
+        <TableColumn Name="Column117" Width="18.9"/>
+        <TableColumn Name="Column118" Width="18.9"/>
+        <TableColumn Name="Column119" Width="18.9"/>
+        <TableColumn Name="Column120" Width="18.9"/>
+        <TableColumn Name="Column121" Width="18.9"/>
+        <TableColumn Name="Column122" Width="18.9"/>
+        <TableColumn Name="Column123" Width="18.9"/>
+        <TableColumn Name="Column124" Width="18.9"/>
+        <TableColumn Name="Column125" Width="18.9"/>
+        <TableColumn Name="Column126" Width="18.9"/>
+        <TableColumn Name="Column127" Width="18.9"/>
+        <TableColumn Name="Column128" Width="18.9"/>
+        <TableColumn Name="Column129" Width="19.9"/>
+        <TableColumn Name="Column130" Width="18.9"/>
+        <TableColumn Name="Column131" Width="18.9"/>
+        <TableColumn Name="Column132" Width="18.9"/>
+        <TableRow Name="Row95">
+          <TableCell Name="Cell2056"/>
+          <TableCell Name="Cell2057"/>
+          <TableCell Name="Cell2058"/>
+          <TableCell Name="Cell2059"/>
+          <TableCell Name="Cell2060"/>
+          <TableCell Name="Cell2061"/>
+          <TableCell Name="Cell2062"/>
+          <TableCell Name="Cell2063"/>
+          <TableCell Name="Cell2064"/>
+          <TableCell Name="Cell2065"/>
+          <TableCell Name="Cell2066"/>
+          <TableCell Name="Cell2067"/>
+          <TableCell Name="Cell2068"/>
+          <TableCell Name="Cell2069"/>
+          <TableCell Name="Cell2070"/>
+          <TableCell Name="Cell2071"/>
+          <TableCell Name="Cell2072"/>
+          <TableCell Name="Cell2073"/>
+          <TableCell Name="Cell2074"/>
+          <TableCell Name="Cell2075"/>
+          <TableCell Name="Cell2076"/>
+          <TableCell Name="Cell2077"/>
+          <TableCell Name="Cell2078"/>
+          <TableCell Name="Cell2079"/>
+          <TableCell Name="Cell2080"/>
+          <TableCell Name="Cell2081"/>
+          <TableCell Name="Cell2082"/>
+          <TableCell Name="Cell2083"/>
+          <TableCell Name="Cell2084"/>
+          <TableCell Name="Cell2085"/>
+          <TableCell Name="Cell2086"/>
+          <TableCell Name="Cell2087"/>
+          <TableCell Name="Cell2088"/>
+          <TableCell Name="Cell2089"/>
+          <TableCell Name="Cell2090"/>
+          <TableCell Name="Cell2091"/>
+        </TableRow>
+        <TableRow Name="Row96" Height="13.99">
+          <TableCell Name="Cell2092"/>
+          <TableCell Name="Cell2093"/>
+          <TableCell Name="Cell2094" Text="МЕМОРIАЛЬНИЙ ОРДЕР N [TIC.ONumber]" HorzAlign="Right" VertAlign="Center" ColSpan="18" RowSpan="2"/>
+          <TableCell Name="Cell2095" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2096" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2097" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2098" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2099" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2100" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2101" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2102" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2103" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2104" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2105" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2106" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2107" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2108" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2109" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2110"/>
+          <TableCell Name="Cell2111"/>
+          <TableCell Name="Cell2112"/>
+          <TableCell Name="Cell2113"/>
+          <TableCell Name="Cell2114"/>
+          <TableCell Name="Cell2115"/>
+          <TableCell Name="Cell2116"/>
+          <TableCell Name="Cell2117"/>
+          <TableCell Name="Cell2118"/>
+          <TableCell Name="Cell2119" Border.Lines="All" Border.Width="1.5" Text="0410009" HorzAlign="Center" VertAlign="Center" ColSpan="4" RowSpan="2"/>
+          <TableCell Name="Cell2120" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2121" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2122" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2123"/>
+          <TableCell Name="Cell2124"/>
+          <TableCell Name="Cell2125"/>
+          <TableCell Name="Cell2126"/>
+          <TableCell Name="Cell2127"/>
+        </TableRow>
+        <TableRow Name="Row97" Height="13.99">
+          <TableCell Name="Cell2128"/>
+          <TableCell Name="Cell2129"/>
+          <TableCell Name="Cell2130" VertAlign="Center"/>
+          <TableCell Name="Cell2131" VertAlign="Center"/>
+          <TableCell Name="Cell2132" VertAlign="Center"/>
+          <TableCell Name="Cell2133" VertAlign="Center"/>
+          <TableCell Name="Cell2134" VertAlign="Center"/>
+          <TableCell Name="Cell2135" VertAlign="Center"/>
+          <TableCell Name="Cell2136" VertAlign="Center"/>
+          <TableCell Name="Cell2137" VertAlign="Center"/>
+          <TableCell Name="Cell2138" VertAlign="Center"/>
+          <TableCell Name="Cell2139" VertAlign="Center"/>
+          <TableCell Name="Cell2140" VertAlign="Center"/>
+          <TableCell Name="Cell2141" VertAlign="Center"/>
+          <TableCell Name="Cell2142" VertAlign="Center"/>
+          <TableCell Name="Cell2143" VertAlign="Center"/>
+          <TableCell Name="Cell2144" VertAlign="Center"/>
+          <TableCell Name="Cell2145" VertAlign="Center"/>
+          <TableCell Name="Cell2146"/>
+          <TableCell Name="Cell2147"/>
+          <TableCell Name="Cell2148"/>
+          <TableCell Name="Cell2149"/>
+          <TableCell Name="Cell2150"/>
+          <TableCell Name="Cell2151"/>
+          <TableCell Name="Cell2152"/>
+          <TableCell Name="Cell2153"/>
+          <TableCell Name="Cell2154"/>
+          <TableCell Name="Cell2155" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2156" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2157" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2158" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2159"/>
+          <TableCell Name="Cell2160"/>
+          <TableCell Name="Cell2161"/>
+          <TableCell Name="Cell2162"/>
+          <TableCell Name="Cell2163"/>
+        </TableRow>
+        <TableRow Name="Row98">
+          <TableCell Name="Cell2164"/>
+          <TableCell Name="Cell2165"/>
+          <TableCell Name="Cell2166"/>
+          <TableCell Name="Cell2167"/>
+          <TableCell Name="Cell2168"/>
+          <TableCell Name="Cell2169" Text="вiд [TIC.UDATE]" HorzAlign="Center" ColSpan="12"/>
+          <TableCell Name="Cell2170"/>
+          <TableCell Name="Cell2171"/>
+          <TableCell Name="Cell2172"/>
+          <TableCell Name="Cell2173"/>
+          <TableCell Name="Cell2174"/>
+          <TableCell Name="Cell2175"/>
+          <TableCell Name="Cell2176"/>
+          <TableCell Name="Cell2177"/>
+          <TableCell Name="Cell2178"/>
+          <TableCell Name="Cell2179"/>
+          <TableCell Name="Cell2180"/>
+          <TableCell Name="Cell2181"/>
+          <TableCell Name="Cell2182"/>
+          <TableCell Name="Cell2183"/>
+          <TableCell Name="Cell2184"/>
+          <TableCell Name="Cell2185"/>
+          <TableCell Name="Cell2186"/>
+          <TableCell Name="Cell2187"/>
+          <TableCell Name="Cell2188"/>
+          <TableCell Name="Cell2189"/>
+          <TableCell Name="Cell2190"/>
+          <TableCell Name="Cell2191"/>
+          <TableCell Name="Cell2192"/>
+          <TableCell Name="Cell2193"/>
+          <TableCell Name="Cell2194"/>
+          <TableCell Name="Cell2195"/>
+          <TableCell Name="Cell2196"/>
+          <TableCell Name="Cell2197"/>
+          <TableCell Name="Cell2198"/>
+          <TableCell Name="Cell2199"/>
+        </TableRow>
+        <TableRow Name="Row99">
+          <TableCell Name="Cell2200"/>
+          <TableCell Name="Cell2201"/>
+          <TableCell Name="Cell2202"/>
+          <TableCell Name="Cell2203"/>
+          <TableCell Name="Cell2204"/>
+          <TableCell Name="Cell2205"/>
+          <TableCell Name="Cell2206"/>
+          <TableCell Name="Cell2207"/>
+          <TableCell Name="Cell2208"/>
+          <TableCell Name="Cell2209"/>
+          <TableCell Name="Cell2210"/>
+          <TableCell Name="Cell2211"/>
+          <TableCell Name="Cell2212"/>
+          <TableCell Name="Cell2213"/>
+          <TableCell Name="Cell2214"/>
+          <TableCell Name="Cell2215"/>
+          <TableCell Name="Cell2216"/>
+          <TableCell Name="Cell2217"/>
+          <TableCell Name="Cell2218"/>
+          <TableCell Name="Cell2219"/>
+          <TableCell Name="Cell2220"/>
+          <TableCell Name="Cell2221"/>
+          <TableCell Name="Cell2222"/>
+          <TableCell Name="Cell2223"/>
+          <TableCell Name="Cell2224"/>
+          <TableCell Name="Cell2225"/>
+          <TableCell Name="Cell2226"/>
+          <TableCell Name="Cell2227"/>
+          <TableCell Name="Cell2228"/>
+          <TableCell Name="Cell2229"/>
+          <TableCell Name="Cell2230"/>
+          <TableCell Name="Cell2231"/>
+          <TableCell Name="Cell2232"/>
+          <TableCell Name="Cell2233"/>
+          <TableCell Name="Cell2234"/>
+          <TableCell Name="Cell2235"/>
+        </TableRow>
+        <TableRow Name="Row100">
+          <TableCell Name="Cell2236" Text="Платник [TIC.OSender]" ColSpan="14"/>
+          <TableCell Name="Cell2237"/>
+          <TableCell Name="Cell2238"/>
+          <TableCell Name="Cell2239"/>
+          <TableCell Name="Cell2240"/>
+          <TableCell Name="Cell2241"/>
+          <TableCell Name="Cell2242"/>
+          <TableCell Name="Cell2243"/>
+          <TableCell Name="Cell2244"/>
+          <TableCell Name="Cell2245"/>
+          <TableCell Name="Cell2246"/>
+          <TableCell Name="Cell2247"/>
+          <TableCell Name="Cell2248"/>
+          <TableCell Name="Cell2249"/>
+          <TableCell Name="Cell2250"/>
+          <TableCell Name="Cell2251"/>
+          <TableCell Name="Cell2252"/>
+          <TableCell Name="Cell2253"/>
+          <TableCell Name="Cell2254"/>
+          <TableCell Name="Cell2255"/>
+          <TableCell Name="Cell2256"/>
+          <TableCell Name="Cell2257"/>
+          <TableCell Name="Cell2258"/>
+          <TableCell Name="Cell2259"/>
+          <TableCell Name="Cell2260"/>
+          <TableCell Name="Cell2261"/>
+          <TableCell Name="Cell2262"/>
+          <TableCell Name="Cell2263"/>
+          <TableCell Name="Cell2264"/>
+          <TableCell Name="Cell2265"/>
+          <TableCell Name="Cell2266"/>
+          <TableCell Name="Cell2267"/>
+          <TableCell Name="Cell2268"/>
+          <TableCell Name="Cell2269"/>
+          <TableCell Name="Cell2270"/>
+          <TableCell Name="Cell2271"/>
+        </TableRow>
+        <TableRow Name="Row101" Height="13.23">
+          <TableCell Name="Cell2272" Text="Код" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell2273" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2274" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-A],[TIC.OOKPO-B])]" HorzAlign="Center" VertAlign="Center" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell2275" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2276" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2277" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2278" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2279"/>
+          <TableCell Name="Cell2280"/>
+          <TableCell Name="Cell2281"/>
+          <TableCell Name="Cell2282"/>
+          <TableCell Name="Cell2283"/>
+          <TableCell Name="Cell2284"/>
+          <TableCell Name="Cell2285"/>
+          <TableCell Name="Cell2286"/>
+          <TableCell Name="Cell2287"/>
+          <TableCell Name="Cell2288"/>
+          <TableCell Name="Cell2289"/>
+          <TableCell Name="Cell2290"/>
+          <TableCell Name="Cell2291"/>
+          <TableCell Name="Cell2292"/>
+          <TableCell Name="Cell2293"/>
+          <TableCell Name="Cell2294"/>
+          <TableCell Name="Cell2295"/>
+          <TableCell Name="Cell2296"/>
+          <TableCell Name="Cell2297"/>
+          <TableCell Name="Cell2298"/>
+          <TableCell Name="Cell2299"/>
+          <TableCell Name="Cell2300"/>
+          <TableCell Name="Cell2301"/>
+          <TableCell Name="Cell2302"/>
+          <TableCell Name="Cell2303"/>
+          <TableCell Name="Cell2304"/>
+          <TableCell Name="Cell2305"/>
+          <TableCell Name="Cell2306"/>
+          <TableCell Name="Cell2307"/>
+        </TableRow>
+        <TableRow Name="Row102" Height="13.23">
+          <TableCell Name="Cell2308" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2309" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2310" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2311" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2312" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2313" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2314" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2315"/>
+          <TableCell Name="Cell2316"/>
+          <TableCell Name="Cell2317"/>
+          <TableCell Name="Cell2318"/>
+          <TableCell Name="Cell2319"/>
+          <TableCell Name="Cell2320"/>
+          <TableCell Name="Cell2321"/>
+          <TableCell Name="Cell2322"/>
+          <TableCell Name="Cell2323"/>
+          <TableCell Name="Cell2324"/>
+          <TableCell Name="Cell2325"/>
+          <TableCell Name="Cell2326"/>
+          <TableCell Name="Cell2327"/>
+          <TableCell Name="Cell2328"/>
+          <TableCell Name="Cell2329"/>
+          <TableCell Name="Cell2330"/>
+          <TableCell Name="Cell2331"/>
+          <TableCell Name="Cell2332"/>
+          <TableCell Name="Cell2333"/>
+          <TableCell Name="Cell2334"/>
+          <TableCell Name="Cell2335"/>
+          <TableCell Name="Cell2336"/>
+          <TableCell Name="Cell2337"/>
+          <TableCell Name="Cell2338"/>
+          <TableCell Name="Cell2339"/>
+          <TableCell Name="Cell2340"/>
+          <TableCell Name="Cell2341"/>
+          <TableCell Name="Cell2342"/>
+          <TableCell Name="Cell2343"/>
+        </TableRow>
+        <TableRow Name="Row103">
+          <TableCell Name="Cell2344"/>
+          <TableCell Name="Cell2345"/>
+          <TableCell Name="Cell2346"/>
+          <TableCell Name="Cell2347"/>
+          <TableCell Name="Cell2348"/>
+          <TableCell Name="Cell2349"/>
+          <TableCell Name="Cell2350"/>
+          <TableCell Name="Cell2351"/>
+          <TableCell Name="Cell2352"/>
+          <TableCell Name="Cell2353"/>
+          <TableCell Name="Cell2354"/>
+          <TableCell Name="Cell2355"/>
+          <TableCell Name="Cell2356"/>
+          <TableCell Name="Cell2357"/>
+          <TableCell Name="Cell2358"/>
+          <TableCell Name="Cell2359"/>
+          <TableCell Name="Cell2360"/>
+          <TableCell Name="Cell2361"/>
+          <TableCell Name="Cell2362"/>
+          <TableCell Name="Cell2363"/>
+          <TableCell Name="Cell2364"/>
+          <TableCell Name="Cell2365"/>
+          <TableCell Name="Cell2366"/>
+          <TableCell Name="Cell2367"/>
+          <TableCell Name="Cell2368"/>
+          <TableCell Name="Cell2369"/>
+          <TableCell Name="Cell2370"/>
+          <TableCell Name="Cell2371"/>
+          <TableCell Name="Cell2372"/>
+          <TableCell Name="Cell2373"/>
+          <TableCell Name="Cell2374"/>
+          <TableCell Name="Cell2375"/>
+          <TableCell Name="Cell2376"/>
+          <TableCell Name="Cell2377"/>
+          <TableCell Name="Cell2378"/>
+          <TableCell Name="Cell2379"/>
+        </TableRow>
+        <TableRow Name="Row104">
+          <TableCell Name="Cell2380" Text="Банк платника" ColSpan="7"/>
+          <TableCell Name="Cell2381"/>
+          <TableCell Name="Cell2382"/>
+          <TableCell Name="Cell2383"/>
+          <TableCell Name="Cell2384"/>
+          <TableCell Name="Cell2385"/>
+          <TableCell Name="Cell2386"/>
+          <TableCell Name="Cell2387"/>
+          <TableCell Name="Cell2388"/>
+          <TableCell Name="Cell2389"/>
+          <TableCell Name="Cell2390"/>
+          <TableCell Name="Cell2391"/>
+          <TableCell Name="Cell2392"/>
+          <TableCell Name="Cell2393"/>
+          <TableCell Name="Cell2394"/>
+          <TableCell Name="Cell2395"/>
+          <TableCell Name="Cell2396"/>
+          <TableCell Name="Cell2397" Text="Код банку" ColSpan="4"/>
+          <TableCell Name="Cell2398"/>
+          <TableCell Name="Cell2399"/>
+          <TableCell Name="Cell2400"/>
+          <TableCell Name="Cell2401"/>
+          <TableCell Name="Cell2402" Text="ДЕБЕТ рах. N" HorzAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell2403"/>
+          <TableCell Name="Cell2404"/>
+          <TableCell Name="Cell2405"/>
+          <TableCell Name="Cell2406"/>
+          <TableCell Name="Cell2407"/>
+          <TableCell Name="Cell2408"/>
+          <TableCell Name="Cell2409" Text="СУМА" HorzAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell2410" HorzAlign="Center"/>
+          <TableCell Name="Cell2411" HorzAlign="Center"/>
+          <TableCell Name="Cell2412" HorzAlign="Center"/>
+          <TableCell Name="Cell2413" HorzAlign="Center"/>
+          <TableCell Name="Cell2414"/>
+          <TableCell Name="Cell2415"/>
+        </TableRow>
+        <TableRow Name="Row105" Height="22.68">
+          <TableCell Name="Cell2416" Border.Lines="Bottom" Text="[IIf([DK.DK]==1,[TIC.OBank-A],[TIC.OBank-B])]" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="17"/>
+          <TableCell Name="Cell2417"/>
+          <TableCell Name="Cell2418"/>
+          <TableCell Name="Cell2419"/>
+          <TableCell Name="Cell2420"/>
+          <TableCell Name="Cell2421"/>
+          <TableCell Name="Cell2422"/>
+          <TableCell Name="Cell2423"/>
+          <TableCell Name="Cell2424"/>
+          <TableCell Name="Cell2425"/>
+          <TableCell Name="Cell2426"/>
+          <TableCell Name="Cell2427"/>
+          <TableCell Name="Cell2428"/>
+          <TableCell Name="Cell2429"/>
+          <TableCell Name="Cell2430"/>
+          <TableCell Name="Cell2431"/>
+          <TableCell Name="Cell2432"/>
+          <TableCell Name="Cell2433" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OMFO-A],[TIC.OMFO-B])]" HorzAlign="Center" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell2434" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2435" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2436" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2437"/>
+          <TableCell Name="Cell2438" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.ONLS-A],[TIC.ONLS-B])]" HorzAlign="Center" VertAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell2439" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2440" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2441" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2442" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2443" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2444" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2445" Border.Lines="Left, Right, Top" Border.Width="1.5" Text="[TIC.OSumm]" HorzAlign="Right" VertAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell2446" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2447" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2448" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2449" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2450"/>
+          <TableCell Name="Cell2451"/>
+        </TableRow>
+        <TableRow Name="Row106">
+          <TableCell Name="Cell2452" Border.Lines="Top" Text="Одержувач [TIC.OReceiver]" ColSpan="16"/>
+          <TableCell Name="Cell2453" Border.Lines="Top"/>
+          <TableCell Name="Cell2454" Border.Lines="Top"/>
+          <TableCell Name="Cell2455" Border.Lines="Top"/>
+          <TableCell Name="Cell2456" Border.Lines="Top"/>
+          <TableCell Name="Cell2457" Border.Lines="Top"/>
+          <TableCell Name="Cell2458" Border.Lines="Top"/>
+          <TableCell Name="Cell2459" Border.Lines="Top"/>
+          <TableCell Name="Cell2460" Border.Lines="Top"/>
+          <TableCell Name="Cell2461" Border.Lines="Top"/>
+          <TableCell Name="Cell2462" Border.Lines="Top"/>
+          <TableCell Name="Cell2463" Border.Lines="Top"/>
+          <TableCell Name="Cell2464" Border.Lines="Top"/>
+          <TableCell Name="Cell2465" Border.Lines="Top"/>
+          <TableCell Name="Cell2466" Border.Lines="Top"/>
+          <TableCell Name="Cell2467" Border.Lines="Top"/>
+          <TableCell Name="Cell2468" Border.Lines="Top"/>
+          <TableCell Name="Cell2469"/>
+          <TableCell Name="Cell2470"/>
+          <TableCell Name="Cell2471"/>
+          <TableCell Name="Cell2472"/>
+          <TableCell Name="Cell2473"/>
+          <TableCell Name="Cell2474"/>
+          <TableCell Name="Cell2475"/>
+          <TableCell Name="Cell2476"/>
+          <TableCell Name="Cell2477"/>
+          <TableCell Name="Cell2478"/>
+          <TableCell Name="Cell2479"/>
+          <TableCell Name="Cell2480"/>
+          <TableCell Name="Cell2481" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell2482"/>
+          <TableCell Name="Cell2483"/>
+          <TableCell Name="Cell2484"/>
+          <TableCell Name="Cell2485" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell2486"/>
+          <TableCell Name="Cell2487"/>
+        </TableRow>
+        <TableRow Name="Row107">
+          <TableCell Name="Cell2488"/>
+          <TableCell Name="Cell2489"/>
+          <TableCell Name="Cell2490"/>
+          <TableCell Name="Cell2491"/>
+          <TableCell Name="Cell2492"/>
+          <TableCell Name="Cell2493"/>
+          <TableCell Name="Cell2494"/>
+          <TableCell Name="Cell2495"/>
+          <TableCell Name="Cell2496"/>
+          <TableCell Name="Cell2497"/>
+          <TableCell Name="Cell2498"/>
+          <TableCell Name="Cell2499"/>
+          <TableCell Name="Cell2500"/>
+          <TableCell Name="Cell2501"/>
+          <TableCell Name="Cell2502"/>
+          <TableCell Name="Cell2503"/>
+          <TableCell Name="Cell2504"/>
+          <TableCell Name="Cell2505"/>
+          <TableCell Name="Cell2506"/>
+          <TableCell Name="Cell2507"/>
+          <TableCell Name="Cell2508"/>
+          <TableCell Name="Cell2509"/>
+          <TableCell Name="Cell2510"/>
+          <TableCell Name="Cell2511"/>
+          <TableCell Name="Cell2512"/>
+          <TableCell Name="Cell2513"/>
+          <TableCell Name="Cell2514"/>
+          <TableCell Name="Cell2515"/>
+          <TableCell Name="Cell2516"/>
+          <TableCell Name="Cell2517" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell2518"/>
+          <TableCell Name="Cell2519"/>
+          <TableCell Name="Cell2520"/>
+          <TableCell Name="Cell2521" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell2522"/>
+          <TableCell Name="Cell2523"/>
+        </TableRow>
+        <TableRow Name="Row108" Height="13.23">
+          <TableCell Name="Cell2524" Text="Код" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell2525" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2526" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-B],[TIC.OOKPO-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell2527" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2528" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2529" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2530" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2531"/>
+          <TableCell Name="Cell2532"/>
+          <TableCell Name="Cell2533"/>
+          <TableCell Name="Cell2534"/>
+          <TableCell Name="Cell2535"/>
+          <TableCell Name="Cell2536"/>
+          <TableCell Name="Cell2537"/>
+          <TableCell Name="Cell2538"/>
+          <TableCell Name="Cell2539"/>
+          <TableCell Name="Cell2540"/>
+          <TableCell Name="Cell2541"/>
+          <TableCell Name="Cell2542"/>
+          <TableCell Name="Cell2543"/>
+          <TableCell Name="Cell2544"/>
+          <TableCell Name="Cell2545"/>
+          <TableCell Name="Cell2546" Text="КРЕДИТ рах. N" HorzAlign="Center" VertAlign="Bottom" ColSpan="7" RowSpan="2"/>
+          <TableCell Name="Cell2547"/>
+          <TableCell Name="Cell2548"/>
+          <TableCell Name="Cell2549"/>
+          <TableCell Name="Cell2550"/>
+          <TableCell Name="Cell2551"/>
+          <TableCell Name="Cell2552"/>
+          <TableCell Name="Cell2553" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell2554"/>
+          <TableCell Name="Cell2555"/>
+          <TableCell Name="Cell2556"/>
+          <TableCell Name="Cell2557" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell2558"/>
+          <TableCell Name="Cell2559"/>
+        </TableRow>
+        <TableRow Name="Row109" Height="13.23">
+          <TableCell Name="Cell2560" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2561" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2562" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2563" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2564" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2565" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2566" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2567"/>
+          <TableCell Name="Cell2568"/>
+          <TableCell Name="Cell2569"/>
+          <TableCell Name="Cell2570"/>
+          <TableCell Name="Cell2571"/>
+          <TableCell Name="Cell2572"/>
+          <TableCell Name="Cell2573"/>
+          <TableCell Name="Cell2574"/>
+          <TableCell Name="Cell2575"/>
+          <TableCell Name="Cell2576"/>
+          <TableCell Name="Cell2577"/>
+          <TableCell Name="Cell2578"/>
+          <TableCell Name="Cell2579"/>
+          <TableCell Name="Cell2580"/>
+          <TableCell Name="Cell2581"/>
+          <TableCell Name="Cell2582"/>
+          <TableCell Name="Cell2583"/>
+          <TableCell Name="Cell2584"/>
+          <TableCell Name="Cell2585"/>
+          <TableCell Name="Cell2586"/>
+          <TableCell Name="Cell2587"/>
+          <TableCell Name="Cell2588"/>
+          <TableCell Name="Cell2589" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell2590"/>
+          <TableCell Name="Cell2591"/>
+          <TableCell Name="Cell2592"/>
+          <TableCell Name="Cell2593" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell2594"/>
+          <TableCell Name="Cell2595"/>
+        </TableRow>
+        <TableRow Name="Row110" Height="22.68">
+          <TableCell Name="Cell2596" Text="Банк отримувача" VertAlign="Bottom" ColSpan="7"/>
+          <TableCell Name="Cell2597"/>
+          <TableCell Name="Cell2598"/>
+          <TableCell Name="Cell2599"/>
+          <TableCell Name="Cell2600"/>
+          <TableCell Name="Cell2601"/>
+          <TableCell Name="Cell2602"/>
+          <TableCell Name="Cell2603"/>
+          <TableCell Name="Cell2604"/>
+          <TableCell Name="Cell2605"/>
+          <TableCell Name="Cell2606"/>
+          <TableCell Name="Cell2607"/>
+          <TableCell Name="Cell2608"/>
+          <TableCell Name="Cell2609"/>
+          <TableCell Name="Cell2610"/>
+          <TableCell Name="Cell2611"/>
+          <TableCell Name="Cell2612"/>
+          <TableCell Name="Cell2613" Text="Код банку" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell2614"/>
+          <TableCell Name="Cell2615"/>
+          <TableCell Name="Cell2616"/>
+          <TableCell Name="Cell2617"/>
+          <TableCell Name="Cell2618" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.ONLS-B],[TIC.ONLS-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell2619" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2620" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2621" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2622" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2623" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2624" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2625" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell2626"/>
+          <TableCell Name="Cell2627"/>
+          <TableCell Name="Cell2628"/>
+          <TableCell Name="Cell2629" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell2630"/>
+          <TableCell Name="Cell2631"/>
+        </TableRow>
+        <TableRow Name="Row111" Height="22.68">
+          <TableCell Name="Cell2632" Border.Lines="Bottom" Text="[IIf([DK.DK]==1,[TIC.OBank-B],[TIC.OBank-A])]" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="17"/>
+          <TableCell Name="Cell2633" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2634" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2635" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2636" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2637" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2638" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2639" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2640" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2641" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2642" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2643" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2644" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2645" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2646" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2647" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2648" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2649" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OMFO-B],[TIC.OMFO-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell2650" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2651" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2652" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2653"/>
+          <TableCell Name="Cell2654" Border.Lines="Left, Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2655" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2656" Border.Lines="Bottom" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2657" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2658" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2659" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2660" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2661" Border.Lines="Left, Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2662" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2663" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2664" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2665" Border.Lines="Right, Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell2666"/>
+          <TableCell Name="Cell2667"/>
+        </TableRow>
+        <TableRow Name="Row112">
+          <TableCell Name="Cell2668" Text="Сума словами" ColSpan="6"/>
+          <TableCell Name="Cell2669"/>
+          <TableCell Name="Cell2670"/>
+          <TableCell Name="Cell2671"/>
+          <TableCell Name="Cell2672"/>
+          <TableCell Name="Cell2673"/>
+          <TableCell Name="Cell2674"/>
+          <TableCell Name="Cell2675"/>
+          <TableCell Name="Cell2676"/>
+          <TableCell Name="Cell2677"/>
+          <TableCell Name="Cell2678"/>
+          <TableCell Name="Cell2679"/>
+          <TableCell Name="Cell2680"/>
+          <TableCell Name="Cell2681"/>
+          <TableCell Name="Cell2682"/>
+          <TableCell Name="Cell2683"/>
+          <TableCell Name="Cell2684"/>
+          <TableCell Name="Cell2685"/>
+          <TableCell Name="Cell2686"/>
+          <TableCell Name="Cell2687"/>
+          <TableCell Name="Cell2688"/>
+          <TableCell Name="Cell2689"/>
+          <TableCell Name="Cell2690"/>
+          <TableCell Name="Cell2691"/>
+          <TableCell Name="Cell2692"/>
+          <TableCell Name="Cell2693"/>
+          <TableCell Name="Cell2694"/>
+          <TableCell Name="Cell2695"/>
+          <TableCell Name="Cell2696"/>
+          <TableCell Name="Cell2697"/>
+          <TableCell Name="Cell2698"/>
+          <TableCell Name="Cell2699"/>
+          <TableCell Name="Cell2700"/>
+          <TableCell Name="Cell2701"/>
+          <TableCell Name="Cell2702"/>
+          <TableCell Name="Cell2703"/>
+        </TableRow>
+        <TableRow Name="Row113">
+          <TableCell Name="Cell2704" Border.Lines="Bottom" Text="[TIC.OSummLit]" ColSpan="22"/>
+          <TableCell Name="Cell2705" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2706" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2707" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2708" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2709" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2710" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2711" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2712" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2713" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2714" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2715" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2716" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2717" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2718" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2719" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2720" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2721" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2722" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2723" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2724" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2725" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2726"/>
+          <TableCell Name="Cell2727"/>
+          <TableCell Name="Cell2728"/>
+          <TableCell Name="Cell2729"/>
+          <TableCell Name="Cell2730"/>
+          <TableCell Name="Cell2731"/>
+          <TableCell Name="Cell2732"/>
+          <TableCell Name="Cell2733"/>
+          <TableCell Name="Cell2734"/>
+          <TableCell Name="Cell2735"/>
+          <TableCell Name="Cell2736"/>
+          <TableCell Name="Cell2737"/>
+          <TableCell Name="Cell2738"/>
+          <TableCell Name="Cell2739"/>
+        </TableRow>
+        <TableRow Name="Row114">
+          <TableCell Name="Cell2740" Text="Призначення платежу" ColSpan="12"/>
+          <TableCell Name="Cell2741"/>
+          <TableCell Name="Cell2742"/>
+          <TableCell Name="Cell2743"/>
+          <TableCell Name="Cell2744"/>
+          <TableCell Name="Cell2745"/>
+          <TableCell Name="Cell2746"/>
+          <TableCell Name="Cell2747"/>
+          <TableCell Name="Cell2748"/>
+          <TableCell Name="Cell2749"/>
+          <TableCell Name="Cell2750"/>
+          <TableCell Name="Cell2751"/>
+          <TableCell Name="Cell2752"/>
+          <TableCell Name="Cell2753"/>
+          <TableCell Name="Cell2754"/>
+          <TableCell Name="Cell2755"/>
+          <TableCell Name="Cell2756"/>
+          <TableCell Name="Cell2757"/>
+          <TableCell Name="Cell2758"/>
+          <TableCell Name="Cell2759"/>
+          <TableCell Name="Cell2760"/>
+          <TableCell Name="Cell2761"/>
+          <TableCell Name="Cell2762"/>
+          <TableCell Name="Cell2763"/>
+          <TableCell Name="Cell2764"/>
+          <TableCell Name="Cell2765"/>
+          <TableCell Name="Cell2766"/>
+          <TableCell Name="Cell2767"/>
+          <TableCell Name="Cell2768"/>
+          <TableCell Name="Cell2769"/>
+          <TableCell Name="Cell2770"/>
+          <TableCell Name="Cell2771"/>
+          <TableCell Name="Cell2772"/>
+          <TableCell Name="Cell2773"/>
+          <TableCell Name="Cell2774"/>
+          <TableCell Name="Cell2775"/>
+        </TableRow>
+        <TableRow Name="Row115" AutoSize="true">
+          <TableCell Name="Cell2776" Text="[TIC.ONazn]" ColSpan="22"/>
+          <TableCell Name="Cell2777"/>
+          <TableCell Name="Cell2778"/>
+          <TableCell Name="Cell2779"/>
+          <TableCell Name="Cell2780"/>
+          <TableCell Name="Cell2781"/>
+          <TableCell Name="Cell2782"/>
+          <TableCell Name="Cell2783"/>
+          <TableCell Name="Cell2784"/>
+          <TableCell Name="Cell2785"/>
+          <TableCell Name="Cell2786"/>
+          <TableCell Name="Cell2787"/>
+          <TableCell Name="Cell2788"/>
+          <TableCell Name="Cell2789"/>
+          <TableCell Name="Cell2790"/>
+          <TableCell Name="Cell2791"/>
+          <TableCell Name="Cell2792"/>
+          <TableCell Name="Cell2793"/>
+          <TableCell Name="Cell2794"/>
+          <TableCell Name="Cell2795"/>
+          <TableCell Name="Cell2796"/>
+          <TableCell Name="Cell2797"/>
+          <TableCell Name="Cell2798"/>
+          <TableCell Name="Cell2799"/>
+          <TableCell Name="Cell2800"/>
+          <TableCell Name="Cell2801"/>
+          <TableCell Name="Cell2802"/>
+          <TableCell Name="Cell2803"/>
+          <TableCell Name="Cell2804"/>
+          <TableCell Name="Cell2805" Border.Lines="All" Border.Width="1.5" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell2806" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2807" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2808" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2809" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2810"/>
+          <TableCell Name="Cell2811"/>
+        </TableRow>
+        <TableRow Name="Row116">
+          <TableCell Name="Cell2812"/>
+          <TableCell Name="Cell2813"/>
+          <TableCell Name="Cell2814"/>
+          <TableCell Name="Cell2815"/>
+          <TableCell Name="Cell2816"/>
+          <TableCell Name="Cell2817"/>
+          <TableCell Name="Cell2818"/>
+          <TableCell Name="Cell2819"/>
+          <TableCell Name="Cell2820"/>
+          <TableCell Name="Cell2821"/>
+          <TableCell Name="Cell2822"/>
+          <TableCell Name="Cell2823"/>
+          <TableCell Name="Cell2824"/>
+          <TableCell Name="Cell2825"/>
+          <TableCell Name="Cell2826"/>
+          <TableCell Name="Cell2827"/>
+          <TableCell Name="Cell2828"/>
+          <TableCell Name="Cell2829"/>
+          <TableCell Name="Cell2830"/>
+          <TableCell Name="Cell2831"/>
+          <TableCell Name="Cell2832"/>
+          <TableCell Name="Cell2833"/>
+          <TableCell Name="Cell2834"/>
+          <TableCell Name="Cell2835"/>
+          <TableCell Name="Cell2836"/>
+          <TableCell Name="Cell2837"/>
+          <TableCell Name="Cell2838"/>
+          <TableCell Name="Cell2839"/>
+          <TableCell Name="Cell2840"/>
+          <TableCell Name="Cell2841" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2842" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2843" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2844" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2845" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2846"/>
+          <TableCell Name="Cell2847"/>
+        </TableRow>
+        <TableRow Name="Row117">
+          <TableCell Name="Cell2848" Text="ДР" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell2849" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2850" Border.Lines="All" Border.Width="1.5" ColSpan="7" RowSpan="2"/>
+          <TableCell Name="Cell2851" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2852" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2853" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2854" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2855" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2856" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2857"/>
+          <TableCell Name="Cell2858"/>
+          <TableCell Name="Cell2859"/>
+          <TableCell Name="Cell2860"/>
+          <TableCell Name="Cell2861"/>
+          <TableCell Name="Cell2862"/>
+          <TableCell Name="Cell2863"/>
+          <TableCell Name="Cell2864"/>
+          <TableCell Name="Cell2865"/>
+          <TableCell Name="Cell2866"/>
+          <TableCell Name="Cell2867"/>
+          <TableCell Name="Cell2868"/>
+          <TableCell Name="Cell2869"/>
+          <TableCell Name="Cell2870"/>
+          <TableCell Name="Cell2871"/>
+          <TableCell Name="Cell2872"/>
+          <TableCell Name="Cell2873"/>
+          <TableCell Name="Cell2874"/>
+          <TableCell Name="Cell2875"/>
+          <TableCell Name="Cell2876"/>
+          <TableCell Name="Cell2877"/>
+          <TableCell Name="Cell2878"/>
+          <TableCell Name="Cell2879"/>
+          <TableCell Name="Cell2880"/>
+          <TableCell Name="Cell2881"/>
+          <TableCell Name="Cell2882"/>
+          <TableCell Name="Cell2883"/>
+        </TableRow>
+        <TableRow Name="Row118">
+          <TableCell Name="Cell2884" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2885" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2886" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2887" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2888" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2889" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2890" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2891" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2892" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell2893"/>
+          <TableCell Name="Cell2894"/>
+          <TableCell Name="Cell2895"/>
+          <TableCell Name="Cell2896"/>
+          <TableCell Name="Cell2897"/>
+          <TableCell Name="Cell2898"/>
+          <TableCell Name="Cell2899"/>
+          <TableCell Name="Cell2900"/>
+          <TableCell Name="Cell2901"/>
+          <TableCell Name="Cell2902"/>
+          <TableCell Name="Cell2903"/>
+          <TableCell Name="Cell2904"/>
+          <TableCell Name="Cell2905"/>
+          <TableCell Name="Cell2906"/>
+          <TableCell Name="Cell2907"/>
+          <TableCell Name="Cell2908"/>
+          <TableCell Name="Cell2909"/>
+          <TableCell Name="Cell2910"/>
+          <TableCell Name="Cell2911"/>
+          <TableCell Name="Cell2912"/>
+          <TableCell Name="Cell2913"/>
+          <TableCell Name="Cell2914"/>
+          <TableCell Name="Cell2915"/>
+          <TableCell Name="Cell2916"/>
+          <TableCell Name="Cell2917"/>
+          <TableCell Name="Cell2918"/>
+          <TableCell Name="Cell2919"/>
+        </TableRow>
+        <TableRow Name="Row119">
+          <TableCell Name="Cell2920"/>
+          <TableCell Name="Cell2921"/>
+          <TableCell Name="Cell2922"/>
+          <TableCell Name="Cell2923"/>
+          <TableCell Name="Cell2924"/>
+          <TableCell Name="Cell2925"/>
+          <TableCell Name="Cell2926"/>
+          <TableCell Name="Cell2927"/>
+          <TableCell Name="Cell2928"/>
+          <TableCell Name="Cell2929"/>
+          <TableCell Name="Cell2930"/>
+          <TableCell Name="Cell2931"/>
+          <TableCell Name="Cell2932"/>
+          <TableCell Name="Cell2933"/>
+          <TableCell Name="Cell2934"/>
+          <TableCell Name="Cell2935"/>
+          <TableCell Name="Cell2936"/>
+          <TableCell Name="Cell2937"/>
+          <TableCell Name="Cell2938"/>
+          <TableCell Name="Cell2939"/>
+          <TableCell Name="Cell2940"/>
+          <TableCell Name="Cell2941"/>
+          <TableCell Name="Cell2942"/>
+          <TableCell Name="Cell2943"/>
+          <TableCell Name="Cell2944"/>
+          <TableCell Name="Cell2945"/>
+          <TableCell Name="Cell2946"/>
+          <TableCell Name="Cell2947"/>
+          <TableCell Name="Cell2948"/>
+          <TableCell Name="Cell2949"/>
+          <TableCell Name="Cell2950"/>
+          <TableCell Name="Cell2951"/>
+          <TableCell Name="Cell2952"/>
+          <TableCell Name="Cell2953"/>
+          <TableCell Name="Cell2954"/>
+          <TableCell Name="Cell2955"/>
+        </TableRow>
+        <TableRow Name="Row120">
+          <TableCell Name="Cell2956" Text="Підписи" ColSpan="4"/>
+          <TableCell Name="Cell2957"/>
+          <TableCell Name="Cell2958"/>
+          <TableCell Name="Cell2959"/>
+          <TableCell Name="Cell2960" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2961" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2962" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2963" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2964"/>
+          <TableCell Name="Cell2965"/>
+          <TableCell Name="Cell2966"/>
+          <TableCell Name="Cell2967"/>
+          <TableCell Name="Cell2968"/>
+          <TableCell Name="Cell2969"/>
+          <TableCell Name="Cell2970"/>
+          <TableCell Name="Cell2971"/>
+          <TableCell Name="Cell2972"/>
+          <TableCell Name="Cell2973"/>
+          <TableCell Name="Cell2974"/>
+          <TableCell Name="Cell2975"/>
+          <TableCell Name="Cell2976"/>
+          <TableCell Name="Cell2977"/>
+          <TableCell Name="Cell2978"/>
+          <TableCell Name="Cell2979"/>
+          <TableCell Name="Cell2980" Text="Штамп банку" ColSpan="5"/>
+          <TableCell Name="Cell2981"/>
+          <TableCell Name="Cell2982"/>
+          <TableCell Name="Cell2983"/>
+          <TableCell Name="Cell2984"/>
+          <TableCell Name="Cell2985"/>
+          <TableCell Name="Cell2986"/>
+          <TableCell Name="Cell2987"/>
+          <TableCell Name="Cell2988"/>
+          <TableCell Name="Cell2989"/>
+          <TableCell Name="Cell2990"/>
+          <TableCell Name="Cell2991"/>
+        </TableRow>
+        <TableRow Name="Row121">
+          <TableCell Name="Cell2992"/>
+          <TableCell Name="Cell2993"/>
+          <TableCell Name="Cell2994"/>
+          <TableCell Name="Cell2995"/>
+          <TableCell Name="Cell2996" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2997" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2998" Border.Lines="Bottom"/>
+          <TableCell Name="Cell2999" Border.Lines="Bottom"/>
+          <TableCell Name="Cell3000"/>
+          <TableCell Name="Cell3001"/>
+          <TableCell Name="Cell3002"/>
+          <TableCell Name="Cell3003"/>
+          <TableCell Name="Cell3004"/>
+          <TableCell Name="Cell3005"/>
+          <TableCell Name="Cell3006"/>
+          <TableCell Name="Cell3007"/>
+          <TableCell Name="Cell3008"/>
+          <TableCell Name="Cell3009"/>
+          <TableCell Name="Cell3010"/>
+          <TableCell Name="Cell3011"/>
+          <TableCell Name="Cell3012"/>
+          <TableCell Name="Cell3013"/>
+          <TableCell Name="Cell3014"/>
+          <TableCell Name="Cell3015"/>
+          <TableCell Name="Cell3016"/>
+          <TableCell Name="Cell3017"/>
+          <TableCell Name="Cell3018"/>
+          <TableCell Name="Cell3019"/>
+          <TableCell Name="Cell3020"/>
+          <TableCell Name="Cell3021"/>
+          <TableCell Name="Cell3022"/>
+          <TableCell Name="Cell3023"/>
+          <TableCell Name="Cell3024"/>
+          <TableCell Name="Cell3025"/>
+          <TableCell Name="Cell3026"/>
+          <TableCell Name="Cell3027"/>
+        </TableRow>
+        <TableRow Name="Row122">
+          <TableCell Name="Cell3028"/>
+          <TableCell Name="Cell3029"/>
+          <TableCell Name="Cell3030"/>
+          <TableCell Name="Cell3031"/>
+          <TableCell Name="Cell3032"/>
+          <TableCell Name="Cell3033"/>
+          <TableCell Name="Cell3034"/>
+          <TableCell Name="Cell3035"/>
+          <TableCell Name="Cell3036"/>
+          <TableCell Name="Cell3037"/>
+          <TableCell Name="Cell3038"/>
+          <TableCell Name="Cell3039"/>
+          <TableCell Name="Cell3040"/>
+          <TableCell Name="Cell3041"/>
+          <TableCell Name="Cell3042"/>
+          <TableCell Name="Cell3043"/>
+          <TableCell Name="Cell3044"/>
+          <TableCell Name="Cell3045"/>
+          <TableCell Name="Cell3046"/>
+          <TableCell Name="Cell3047"/>
+          <TableCell Name="Cell3048"/>
+          <TableCell Name="Cell3049"/>
+          <TableCell Name="Cell3050"/>
+          <TableCell Name="Cell3051"/>
+          <TableCell Name="Cell3052"/>
+          <TableCell Name="Cell3053"/>
+          <TableCell Name="Cell3054"/>
+          <TableCell Name="Cell3055"/>
+          <TableCell Name="Cell3056"/>
+          <TableCell Name="Cell3057"/>
+          <TableCell Name="Cell3058"/>
+          <TableCell Name="Cell3059"/>
+          <TableCell Name="Cell3060"/>
+          <TableCell Name="Cell3061"/>
+          <TableCell Name="Cell3062"/>
+          <TableCell Name="Cell3063"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="BUH_MODEL_B" Top="593.9" Width="718.2" Height="18.9" DataSource="Table">
+      <TextObject Name="Text1" Left="9.45" Width="66.15" Height="18.9" Border.Lines="All" Text="[BUH_MODEL.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text3" Left="75.98" Width="86.94" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.FDAT1]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text4" Left="162.54" Width="113.4" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.NLS]" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
+      <TextObject Name="Text2" Left="275.56" Width="66.15" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text5" Left="342.09" Width="122.85" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,[BUH_MODEL.O.S/T.DENOM],null)]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text6" Left="464.56" Width="124.74" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,null,[BUH_MODEL.O.S/T.DENOM])]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text7" Left="589.3" Width="121.34" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <DataHeaderBand Name="BUH_MODEL_H" Top="523.75" Width="718.2" Height="66.15">
+        <TextObject Name="Text15" Left="9.45" Top="9.45" Width="699.3" Height="28.35" Border.Lines="Top" Border.Style="Dash" Text="     Перелік транзакцій для документа # [p_ref]" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text8" Left="9.45" Top="37.8" Width="66.15" Height="28.35" Border.Lines="All" Text="Тип&#13;&#10;трн." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text9" Left="75.6" Top="37.8" Width="86.94" Height="28.35" Border.Lines="Top, Bottom" Text="Дата &#13;&#10;валютування" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text10" Left="162.54" Top="37.8" Width="113.4" Height="28.35" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
+        <TextObject Name="Text11" Left="275.56" Top="37.8" Width="66.15" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text12" Left="340.2" Top="37.8" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Дебет" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text13" Left="464.56" Top="37.8" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Кредит" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text14" Left="585.9" Top="37.8" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Еквівалент" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      </DataHeaderBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="616.8" Width="718.2" Height="18.9"/>
+  </ReportPage>
+  <ReportPage Name="Page3">
+    <DataBand Name="Data3" Width="718.2" Height="576.45">
+      <TextObject Name="Text19" Left="9.45" Width="463.05" Height="28.35" Text="МЕМОРIАЛЬНИЙ ОРДЕР N [TIC.ONumber]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text20" Left="472.5" Width="103.95" Height="28.35" Border.Lines="All" Border.Width="2" Text="0410009" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text21" Left="9.45" Top="28.35" Width="340.2" Height="47.25" Text="вiд [TIC.UDATE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text23" Left="9.45" Top="75.6" Width="642.6" Height="28.35" Text="Платник [TIC.OSender]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text18" Left="9.45" Top="103.95" Width="37.8" Height="28.35" Text="Код" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text24" Left="47.25" Top="103.95" Width="85.05" Height="28.35" Border.Lines="All" Border.Width="1.5" Text="[TIC.OOKPO-A]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text16" Left="9.45" Top="132.3" Width="340.2" Height="28.35" Text="Банк платника " VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text25" Left="349.65" Top="132.3" Width="94.5" Height="28.35" Text="Код банку" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text26" Left="444.15" Top="132.3" Width="103.95" Height="28.35" Text="ДЕБЕТ рах. N" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text27" Left="548.1" Top="132.3" Width="103.95" Height="28.35" Text="СУМА" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text28" Left="9.45" Top="160.65" Width="340.2" Height="18.9" Border.Lines="Bottom" Text="[TIC.OBank-A]" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text29" Left="349.65" Top="160.65" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="1.5" Text="[TIC.OMFO-A]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text30" Left="444.15" Top="160.65" Width="103.95" Height="18.9" Border.Lines="All" Border.Width="1.5" Text="[TIC.ONLS-A]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text31" Left="548.1" Top="160.65" Width="103.95" Height="18.9" Border.Lines="Left, Right, Top" Border.Width="1.5" Text="[TIC.OSumm]" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text32" Left="9.45" Top="179.55" Width="538.65" Height="37.8" Text="Одержувач [TIC.OReceiver]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text33" Left="9.45" Top="217.35" Width="37.8" Height="28.35" Text="Код" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text34" Left="47.25" Top="217.35" Width="85.05" Height="28.35" Border.Lines="All" Border.Width="1.5" Text="[TIC.OOKPO-A]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text35" Left="444.15" Top="217.35" Width="103.95" Height="28.35" Text="ДЕБЕТ рах. N" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text36" Left="444.15" Top="245.7" Width="103.95" Height="18.9" Border.Lines="Left, Top, Bottom" Border.Width="1.5" Text="[TIC.ONLS-B]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text37" Left="349.65" Top="245.7" Width="94.5" Height="18.9" Text="Код банку" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text38" Left="349.65" Top="264.6" Width="94.5" Height="18.9" Border.Lines="All" Border.Width="1.5" Text="[TIC.OMFO-B]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text39" Left="444.15" Top="264.6" Width="103.95" Height="18.9" Border.Lines="Left, Top, Bottom" Border.Width="1.5" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text40" Left="548.1" Top="179.55" Width="103.95" Height="103.95" Border.Lines="Left, Right, Bottom" Border.Width="1.5" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text41" Left="9.45" Top="245.7" Width="340.2" Height="18.9" Text="Банк отримувача" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text42" Left="9.45" Top="264.6" Width="340.2" Height="18.9" Border.Lines="Bottom" Text="[TIC.OBank-B]" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text43" Left="9.45" Top="283.5" Width="340.2" Height="28.35" Border.Lines="Bottom" Text="Сума словами&#13;&#10;[TIC.OSummLit]" Font="Arial, 9pt"/>
+      <TextObject Name="Text44" Left="9.45" Top="311.85" Width="340.2" Height="28.35" Text="Призначення платежу:&#13;&#10;[TIC.ONazn]" Font="Arial, 9pt"/>
+      <TextObject Name="Text45" Left="548.1" Top="311.85" Width="103.95" Height="28.35" Border.Lines="All" Border.Width="1.5" Font="Arial, 9pt"/>
+      <TextObject Name="Text46" Left="66.15" Top="359.1" Width="179.55" Height="37.8" Border.Lines="All" Border.Width="1.5" Font="Arial, 9pt"/>
+      <TextObject Name="Text47" Left="9.45" Top="359.1" Width="56.7" Height="37.8" Text="ДР" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text48" Left="9.45" Top="396.9" Width="56.7" Height="47.25" Text="Підписи" VertAlign="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text49" Left="113.4" Top="396.9" Width="132.3" Height="37.8" Border.Lines="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text50" Left="113.4" Top="434.7" Width="132.3" Height="18.9" Border.Lines="Bottom" Font="Arial, 9pt"/>
+      <TextObject Name="Text51" Left="453.6" Top="396.9" Width="113.4" Height="37.8" Text="Штамп банку" VertAlign="Bottom" Font="Arial, 9pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter3" Top="580.45" Width="718.2" Height="18.9"/>
+  </ReportPage>
+  <ReportPage Name="Page2" Guides="18.9,670.95,56.7,396.9,85.05,463.05,576.45,330.75,94.5,132.3,113.4,198.45,264.6">
+    <DataBand Name="Data2" Width="718.2" Height="514.3" CanGrow="true" Guides="18.9,514.3,0,37.8,56.7,85.05,28.35,115.4,1,134.3,153.2,172.1,200.45,209.9,240.25,9.45,219.35,220.35,19.9,259.15,278.05,315.85,353.65,372.55,391.45,410.35,429.25,448.15,476.5,495.4">
+      <TableObject Name="Table4" Left="18.9" Top="18.9" Width="652.05" Height="495.4">
+        <TableColumn Name="Column13" Width="37.8" AutoSize="true"/>
+        <TableColumn Name="Column14" Width="75.6"/>
+        <TableColumn Name="Column15"/>
+        <TableColumn Name="Column16"/>
+        <TableColumn Name="Column21"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column22" Width="113.4"/>
+        <TableColumn Name="Column18" Width="94.5"/>
+        <TableRow Name="Row49" Height="37.8">
+          <TableCell Name="Cell359"/>
+          <TableCell Name="Cell360" Text="МЕМОРIАЛЬНИЙ ОРДЕР N [TIC.ONumber]" HorzAlign="Center" VertAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell361"/>
+          <TableCell Name="Cell362"/>
+          <TableCell Name="Cell363"/>
+          <TableCell Name="Cell364"/>
+          <TableCell Name="Cell365"/>
+          <TableCell Name="Cell366" Border.Lines="All" Border.Width="1.5" Text="0410009" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell367"/>
+        </TableRow>
+        <TableRow Name="Row24">
+          <TableCell Name="Cell124"/>
+          <TableCell Name="Cell125" Text="вiд [TIC.UDATE]" HorzAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell126" HorzAlign="Center"/>
+          <TableCell Name="Cell127" HorzAlign="Center"/>
+          <TableCell Name="Cell164" HorzAlign="Center"/>
+          <TableCell Name="Cell159"/>
+          <TableCell Name="Cell154"/>
+          <TableCell Name="Cell214"/>
+          <TableCell Name="Cell149"/>
+        </TableRow>
+        <TableRow Name="Row25" Height="28.35">
+          <TableCell Name="Cell129" Text="Платник [TIC.OSender]" VertAlign="Center" ColSpan="6"/>
+          <TableCell Name="Cell130" VertAlign="Center"/>
+          <TableCell Name="Cell131" VertAlign="Center"/>
+          <TableCell Name="Cell132" VertAlign="Center"/>
+          <TableCell Name="Cell165" VertAlign="Center"/>
+          <TableCell Name="Cell160" VertAlign="Center"/>
+          <TableCell Name="Cell155"/>
+          <TableCell Name="Cell215"/>
+          <TableCell Name="Cell150"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="28.35">
+          <TableCell Name="Cell134" Text="Код" VertAlign="Center" RowSpan="3"/>
+          <TableCell Name="Cell135" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-A],[TIC.OOKPO-B])]" HorzAlign="Center" VertAlign="Center" RowSpan="3"/>
+          <TableCell Name="Cell136" ColSpan="7" RowSpan="3"/>
+          <TableCell Name="Cell137"/>
+          <TableCell Name="Cell166"/>
+          <TableCell Name="Cell161"/>
+          <TableCell Name="Cell156"/>
+          <TableCell Name="Cell216"/>
+          <TableCell Name="Cell151"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="1">
+          <TableCell Name="Cell139"/>
+          <TableCell Name="Cell140"/>
+          <TableCell Name="Cell141"/>
+          <TableCell Name="Cell142"/>
+          <TableCell Name="Cell167"/>
+          <TableCell Name="Cell162"/>
+          <TableCell Name="Cell157"/>
+          <TableCell Name="Cell217"/>
+          <TableCell Name="Cell152"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="1">
+          <TableCell Name="Cell144"/>
+          <TableCell Name="Cell145"/>
+          <TableCell Name="Cell146"/>
+          <TableCell Name="Cell147"/>
+          <TableCell Name="Cell168"/>
+          <TableCell Name="Cell163"/>
+          <TableCell Name="Cell158"/>
+          <TableCell Name="Cell218"/>
+          <TableCell Name="Cell153"/>
+        </TableRow>
+        <TableRow Name="Row34">
+          <TableCell Name="Cell224"/>
+          <TableCell Name="Cell225"/>
+          <TableCell Name="Cell226"/>
+          <TableCell Name="Cell227"/>
+          <TableCell Name="Cell228"/>
+          <TableCell Name="Cell229"/>
+          <TableCell Name="Cell230"/>
+          <TableCell Name="Cell231"/>
+          <TableCell Name="Cell232"/>
+        </TableRow>
+        <TableRow Name="Row29">
+          <TableCell Name="Cell169" Text="Банк платника" ColSpan="2"/>
+          <TableCell Name="Cell170"/>
+          <TableCell Name="Cell171"/>
+          <TableCell Name="Cell172"/>
+          <TableCell Name="Cell173"/>
+          <TableCell Name="Cell174"/>
+          <TableCell Name="Cell175" Text="Код банку" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell219" Text="ДЕБЕТ рах. N" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell176" Text="СУМА" HorzAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row30">
+          <TableCell Name="Cell178" Border.Lines="Bottom" Text="[IIf([DK.DK]==1,[TIC.OBank-A],[TIC.OBank-B])]" ColSpan="6"/>
+          <TableCell Name="Cell179" Border.Lines="Bottom"/>
+          <TableCell Name="Cell180" Border.Lines="Bottom"/>
+          <TableCell Name="Cell181" Border.Lines="Bottom"/>
+          <TableCell Name="Cell182" Border.Lines="Bottom"/>
+          <TableCell Name="Cell183" Border.Lines="Bottom"/>
+          <TableCell Name="Cell184" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OMFO-A],[TIC.OMFO-B])]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell220" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.ONLS-A],[TIC.ONLS-B])]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell185" Border.Lines="Left, Right, Top" Border.Width="1.5" Text="[TIC.OSumm]" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="28.35">
+          <TableCell Name="Cell187" Text="Одержувач [TIC.OReceiver]" VertAlign="Center" ColSpan="6"/>
+          <TableCell Name="Cell188" VertAlign="Center"/>
+          <TableCell Name="Cell189" VertAlign="Center"/>
+          <TableCell Name="Cell190" VertAlign="Center"/>
+          <TableCell Name="Cell191" VertAlign="Center"/>
+          <TableCell Name="Cell192" VertAlign="Center"/>
+          <TableCell Name="Cell193"/>
+          <TableCell Name="Cell221"/>
+          <TableCell Name="Cell194" Border.Lines="Left, Right" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="9.45">
+          <TableCell Name="Cell196"/>
+          <TableCell Name="Cell197"/>
+          <TableCell Name="Cell198"/>
+          <TableCell Name="Cell199"/>
+          <TableCell Name="Cell200"/>
+          <TableCell Name="Cell201"/>
+          <TableCell Name="Cell202"/>
+          <TableCell Name="Cell222"/>
+          <TableCell Name="Cell203" Border.Lines="Left, Right" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row36" Height="9.45">
+          <TableCell Name="Cell242" Text="Код" VertAlign="Center" RowSpan="3"/>
+          <TableCell Name="Cell243" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-B],[TIC.OOKPO-A])]" HorzAlign="Center" VertAlign="Center" RowSpan="3"/>
+          <TableCell Name="Cell244" ColSpan="4" RowSpan="3"/>
+          <TableCell Name="Cell245"/>
+          <TableCell Name="Cell246"/>
+          <TableCell Name="Cell247"/>
+          <TableCell Name="Cell248"/>
+          <TableCell Name="Cell249"/>
+          <TableCell Name="Cell250" Border.Lines="Left, Right" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="1">
+          <TableCell Name="Cell251"/>
+          <TableCell Name="Cell252"/>
+          <TableCell Name="Cell253"/>
+          <TableCell Name="Cell254"/>
+          <TableCell Name="Cell255"/>
+          <TableCell Name="Cell256"/>
+          <TableCell Name="Cell257"/>
+          <TableCell Name="Cell258"/>
+          <TableCell Name="Cell259"/>
+        </TableRow>
+        <TableRow Name="Row39" Height="19.9">
+          <TableCell Name="Cell269"/>
+          <TableCell Name="Cell270"/>
+          <TableCell Name="Cell271"/>
+          <TableCell Name="Cell272"/>
+          <TableCell Name="Cell273"/>
+          <TableCell Name="Cell274"/>
+          <TableCell Name="Cell275"/>
+          <TableCell Name="Cell276" Text="КРЕДИТ рах. N" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell277" Border.Lines="Left, Right" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row38">
+          <TableCell Name="Cell260" Text="Банк отримувача" Font="Arial, 9pt" ColSpan="2"/>
+          <TableCell Name="Cell261" Font="Arial, 9pt"/>
+          <TableCell Name="Cell262"/>
+          <TableCell Name="Cell263"/>
+          <TableCell Name="Cell264"/>
+          <TableCell Name="Cell265"/>
+          <TableCell Name="Cell266" Text="Код банку"/>
+          <TableCell Name="Cell267" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.ONLS-B],[TIC.ONLS-A])]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell268" Border.Lines="Right" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row35">
+          <TableCell Name="Cell233" Border.Lines="Bottom" Text="[IIf([DK.DK]==1,[TIC.OBank-B],[TIC.OBank-A])]" ColSpan="6"/>
+          <TableCell Name="Cell234" Border.Lines="Bottom"/>
+          <TableCell Name="Cell235" Border.Lines="Bottom"/>
+          <TableCell Name="Cell236" Border.Lines="Bottom"/>
+          <TableCell Name="Cell237" Border.Lines="Bottom"/>
+          <TableCell Name="Cell238" Border.Lines="Bottom"/>
+          <TableCell Name="Cell239" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OMFO-B],[TIC.OMFO-A])]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell240" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell241" Border.Lines="Right, Bottom" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="37.8">
+          <TableCell Name="Cell205" Text="Сума словами&#13;&#10;[TIC.OSummLit]" ColSpan="6"/>
+          <TableCell Name="Cell206"/>
+          <TableCell Name="Cell207"/>
+          <TableCell Name="Cell208"/>
+          <TableCell Name="Cell209"/>
+          <TableCell Name="Cell210"/>
+          <TableCell Name="Cell211"/>
+          <TableCell Name="Cell223"/>
+          <TableCell Name="Cell212"/>
+        </TableRow>
+        <TableRow Name="Row40" Height="37.8" AutoSize="true">
+          <TableCell Name="Cell278" Border.Lines="Top" Text="Призначення платежу&#13;&#10;[TIC.ONazn]" ColSpan="7"/>
+          <TableCell Name="Cell279" Border.Lines="Top"/>
+          <TableCell Name="Cell280" Border.Lines="Top"/>
+          <TableCell Name="Cell281" Border.Lines="Top"/>
+          <TableCell Name="Cell282" Border.Lines="Top"/>
+          <TableCell Name="Cell283" Border.Lines="Top"/>
+          <TableCell Name="Cell284"/>
+          <TableCell Name="Cell285"/>
+          <TableCell Name="Cell286" Border.Lines="All" Border.Width="1.5"/>
+        </TableRow>
+        <TableRow Name="Row41">
+          <TableCell Name="Cell287"/>
+          <TableCell Name="Cell288"/>
+          <TableCell Name="Cell289"/>
+          <TableCell Name="Cell290"/>
+          <TableCell Name="Cell291"/>
+          <TableCell Name="Cell292"/>
+          <TableCell Name="Cell293"/>
+          <TableCell Name="Cell294"/>
+          <TableCell Name="Cell295"/>
+        </TableRow>
+        <TableRow Name="Row42">
+          <TableCell Name="Cell296"/>
+          <TableCell Name="Cell297" Text="ДР" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell298" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell299" Border.Lines="All"/>
+          <TableCell Name="Cell300"/>
+          <TableCell Name="Cell301"/>
+          <TableCell Name="Cell302"/>
+          <TableCell Name="Cell303"/>
+          <TableCell Name="Cell304"/>
+        </TableRow>
+        <TableRow Name="Row43">
+          <TableCell Name="Cell305"/>
+          <TableCell Name="Cell306"/>
+          <TableCell Name="Cell307" Border.Lines="All"/>
+          <TableCell Name="Cell308" Border.Lines="All"/>
+          <TableCell Name="Cell309"/>
+          <TableCell Name="Cell310"/>
+          <TableCell Name="Cell311"/>
+          <TableCell Name="Cell312" Text="[DK.DK]"/>
+          <TableCell Name="Cell313" Text="[TIC.ONLS-A]" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row44">
+          <TableCell Name="Cell314"/>
+          <TableCell Name="Cell315"/>
+          <TableCell Name="Cell316"/>
+          <TableCell Name="Cell317"/>
+          <TableCell Name="Cell318"/>
+          <TableCell Name="Cell319"/>
+          <TableCell Name="Cell320"/>
+          <TableCell Name="Cell321"/>
+          <TableCell Name="Cell322"/>
+        </TableRow>
+        <TableRow Name="Row45">
+          <TableCell Name="Cell323"/>
+          <TableCell Name="Cell324" Text="Підписи" HorzAlign="Right"/>
+          <TableCell Name="Cell325" Border.Lines="Bottom"/>
+          <TableCell Name="Cell326" Border.Lines="Bottom"/>
+          <TableCell Name="Cell327"/>
+          <TableCell Name="Cell328"/>
+          <TableCell Name="Cell329"/>
+          <TableCell Name="Cell330" Text="Штамп банку"/>
+          <TableCell Name="Cell331"/>
+        </TableRow>
+        <TableRow Name="Row46" Height="28.35">
+          <TableCell Name="Cell332"/>
+          <TableCell Name="Cell333"/>
+          <TableCell Name="Cell334" Border.Lines="Bottom"/>
+          <TableCell Name="Cell335" Border.Lines="Bottom"/>
+          <TableCell Name="Cell336"/>
+          <TableCell Name="Cell337"/>
+          <TableCell Name="Cell338"/>
+          <TableCell Name="Cell339"/>
+          <TableCell Name="Cell340"/>
+        </TableRow>
+        <TableRow Name="Row47">
+          <TableCell Name="Cell341"/>
+          <TableCell Name="Cell342"/>
+          <TableCell Name="Cell343"/>
+          <TableCell Name="Cell344"/>
+          <TableCell Name="Cell345"/>
+          <TableCell Name="Cell346"/>
+          <TableCell Name="Cell347"/>
+          <TableCell Name="Cell348"/>
+          <TableCell Name="Cell349"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+  <ReportPage Name="Page4">
+    <DataBand Name="Data4" Width="718.2" Height="623.7" CanGrow="true" DataSource="Table2">
+      <TableObject Name="Table5" Left="9.45" Top="9.45" Width="681.4" Height="508.04" GrowToBottom="true">
+        <TableColumn Name="Column23" Width="18.9"/>
+        <TableColumn Name="Column24" Width="18.9"/>
+        <TableColumn Name="Column28" Width="18.9"/>
+        <TableColumn Name="Column25" Width="18.9"/>
+        <TableColumn Name="Column26" Width="18.9"/>
+        <TableColumn Name="Column27" Width="18.9"/>
+        <TableColumn Name="Column30" Width="18.9"/>
+        <TableColumn Name="Column32" Width="18.9"/>
+        <TableColumn Name="Column31" Width="18.9"/>
+        <TableColumn Name="Column29" Width="18.9"/>
+        <TableColumn Name="Column33" Width="18.9"/>
+        <TableColumn Name="Column34" Width="18.9"/>
+        <TableColumn Name="Column35" Width="18.9"/>
+        <TableColumn Name="Column36" Width="18.9"/>
+        <TableColumn Name="Column37" Width="18.9"/>
+        <TableColumn Name="Column38" Width="18.9"/>
+        <TableColumn Name="Column39" Width="18.9"/>
+        <TableColumn Name="Column40" Width="18.9"/>
+        <TableColumn Name="Column41" Width="18.9"/>
+        <TableColumn Name="Column42" Width="18.9"/>
+        <TableColumn Name="Column43" Width="18.9"/>
+        <TableColumn Name="Column44" Width="18.9"/>
+        <TableColumn Name="Column56" Width="18.9"/>
+        <TableColumn Name="Column45" Width="18.9"/>
+        <TableColumn Name="Column55" Width="18.9"/>
+        <TableColumn Name="Column59" Width="18.9"/>
+        <TableColumn Name="Column46" Width="18.9"/>
+        <TableColumn Name="Column57" Width="18.9"/>
+        <TableColumn Name="Column52" Width="18.9"/>
+        <TableColumn Name="Column53" Width="18.9"/>
+        <TableColumn Name="Column58" Width="18.9"/>
+        <TableColumn Name="Column47" Width="18.9"/>
+        <TableColumn Name="Column48" Width="19.9"/>
+        <TableColumn Name="Column49" Width="18.9"/>
+        <TableColumn Name="Column51" Width="18.9"/>
+        <TableColumn Name="Column50" Width="18.9"/>
+        <TableRow Name="Row50">
+          <TableCell Name="Cell368"/>
+          <TableCell Name="Cell369"/>
+          <TableCell Name="Cell393"/>
+          <TableCell Name="Cell370"/>
+          <TableCell Name="Cell371"/>
+          <TableCell Name="Cell372"/>
+          <TableCell Name="Cell403"/>
+          <TableCell Name="Cell413"/>
+          <TableCell Name="Cell408"/>
+          <TableCell Name="Cell398"/>
+          <TableCell Name="Cell418"/>
+          <TableCell Name="Cell423"/>
+          <TableCell Name="Cell428"/>
+          <TableCell Name="Cell433"/>
+          <TableCell Name="Cell438"/>
+          <TableCell Name="Cell443"/>
+          <TableCell Name="Cell448"/>
+          <TableCell Name="Cell640"/>
+          <TableCell Name="Cell656"/>
+          <TableCell Name="Cell672"/>
+          <TableCell Name="Cell688"/>
+          <TableCell Name="Cell704"/>
+          <TableCell Name="Cell896"/>
+          <TableCell Name="Cell720"/>
+          <TableCell Name="Cell880"/>
+          <TableCell Name="Cell944"/>
+          <TableCell Name="Cell736"/>
+          <TableCell Name="Cell912"/>
+          <TableCell Name="Cell832"/>
+          <TableCell Name="Cell848"/>
+          <TableCell Name="Cell928"/>
+          <TableCell Name="Cell752"/>
+          <TableCell Name="Cell768"/>
+          <TableCell Name="Cell784"/>
+          <TableCell Name="Cell816"/>
+          <TableCell Name="Cell800"/>
+        </TableRow>
+        <TableRow Name="Row88" Height="13.99">
+          <TableCell Name="Cell1774"/>
+          <TableCell Name="Cell1775"/>
+          <TableCell Name="Cell1776" Text="МЕМОРIАЛЬНИЙ ОРДЕР N [TIC.ONumber]" HorzAlign="Center" VertAlign="Center" ColSpan="18" RowSpan="2"/>
+          <TableCell Name="Cell1777" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1778" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1779" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1780" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1781" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1782" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1783" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1784" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1785" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1786" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1787" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1788" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1789" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1790" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1791" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1792"/>
+          <TableCell Name="Cell1793"/>
+          <TableCell Name="Cell1794"/>
+          <TableCell Name="Cell1795"/>
+          <TableCell Name="Cell1796"/>
+          <TableCell Name="Cell1797"/>
+          <TableCell Name="Cell1798"/>
+          <TableCell Name="Cell1799"/>
+          <TableCell Name="Cell1800"/>
+          <TableCell Name="Cell1801" Border.Lines="All" Border.Width="1.5" Text="0410009" HorzAlign="Center" VertAlign="Center" ColSpan="4" RowSpan="2"/>
+          <TableCell Name="Cell1802" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1803" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1804" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1805"/>
+          <TableCell Name="Cell1806"/>
+          <TableCell Name="Cell1807"/>
+          <TableCell Name="Cell1808"/>
+          <TableCell Name="Cell1810"/>
+        </TableRow>
+        <TableRow Name="Row89" Height="13.99">
+          <TableCell Name="Cell1811"/>
+          <TableCell Name="Cell1812"/>
+          <TableCell Name="Cell1813" VertAlign="Center"/>
+          <TableCell Name="Cell1814" VertAlign="Center"/>
+          <TableCell Name="Cell1815" VertAlign="Center"/>
+          <TableCell Name="Cell1816" VertAlign="Center"/>
+          <TableCell Name="Cell1817" VertAlign="Center"/>
+          <TableCell Name="Cell1818" VertAlign="Center"/>
+          <TableCell Name="Cell1819" VertAlign="Center"/>
+          <TableCell Name="Cell1820" VertAlign="Center"/>
+          <TableCell Name="Cell1821" VertAlign="Center"/>
+          <TableCell Name="Cell1822" VertAlign="Center"/>
+          <TableCell Name="Cell1823" VertAlign="Center"/>
+          <TableCell Name="Cell1824" VertAlign="Center"/>
+          <TableCell Name="Cell1825" VertAlign="Center"/>
+          <TableCell Name="Cell1826" VertAlign="Center"/>
+          <TableCell Name="Cell1827" VertAlign="Center"/>
+          <TableCell Name="Cell1828" VertAlign="Center"/>
+          <TableCell Name="Cell1829"/>
+          <TableCell Name="Cell1830"/>
+          <TableCell Name="Cell1831"/>
+          <TableCell Name="Cell1832"/>
+          <TableCell Name="Cell1833"/>
+          <TableCell Name="Cell1834"/>
+          <TableCell Name="Cell1835"/>
+          <TableCell Name="Cell1836"/>
+          <TableCell Name="Cell1837"/>
+          <TableCell Name="Cell1838" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1839" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1840" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1841" Border.Lines="All" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1842"/>
+          <TableCell Name="Cell1843"/>
+          <TableCell Name="Cell1844"/>
+          <TableCell Name="Cell1845"/>
+          <TableCell Name="Cell1847"/>
+        </TableRow>
+        <TableRow Name="Row87">
+          <TableCell Name="Cell1737"/>
+          <TableCell Name="Cell1738"/>
+          <TableCell Name="Cell1739"/>
+          <TableCell Name="Cell1740"/>
+          <TableCell Name="Cell1741"/>
+          <TableCell Name="Cell1742" Text="вiд [TIC.UDATE]" ColSpan="12"/>
+          <TableCell Name="Cell1743"/>
+          <TableCell Name="Cell1744"/>
+          <TableCell Name="Cell1745"/>
+          <TableCell Name="Cell1746"/>
+          <TableCell Name="Cell1747"/>
+          <TableCell Name="Cell1748"/>
+          <TableCell Name="Cell1749"/>
+          <TableCell Name="Cell1750"/>
+          <TableCell Name="Cell1751"/>
+          <TableCell Name="Cell1752"/>
+          <TableCell Name="Cell1753"/>
+          <TableCell Name="Cell1754"/>
+          <TableCell Name="Cell1755"/>
+          <TableCell Name="Cell1756"/>
+          <TableCell Name="Cell1757"/>
+          <TableCell Name="Cell1758"/>
+          <TableCell Name="Cell1759"/>
+          <TableCell Name="Cell1760"/>
+          <TableCell Name="Cell1761"/>
+          <TableCell Name="Cell1762"/>
+          <TableCell Name="Cell1763"/>
+          <TableCell Name="Cell1764"/>
+          <TableCell Name="Cell1765"/>
+          <TableCell Name="Cell1766"/>
+          <TableCell Name="Cell1767"/>
+          <TableCell Name="Cell1768"/>
+          <TableCell Name="Cell1769"/>
+          <TableCell Name="Cell1770"/>
+          <TableCell Name="Cell1771"/>
+          <TableCell Name="Cell1773"/>
+        </TableRow>
+        <TableRow Name="Row84">
+          <TableCell Name="Cell1626"/>
+          <TableCell Name="Cell1627"/>
+          <TableCell Name="Cell1628"/>
+          <TableCell Name="Cell1629"/>
+          <TableCell Name="Cell1630"/>
+          <TableCell Name="Cell1631"/>
+          <TableCell Name="Cell1632"/>
+          <TableCell Name="Cell1633"/>
+          <TableCell Name="Cell1634"/>
+          <TableCell Name="Cell1635"/>
+          <TableCell Name="Cell1636"/>
+          <TableCell Name="Cell1637"/>
+          <TableCell Name="Cell1638"/>
+          <TableCell Name="Cell1639"/>
+          <TableCell Name="Cell1640"/>
+          <TableCell Name="Cell1641"/>
+          <TableCell Name="Cell1642"/>
+          <TableCell Name="Cell1643"/>
+          <TableCell Name="Cell1644"/>
+          <TableCell Name="Cell1645"/>
+          <TableCell Name="Cell1646"/>
+          <TableCell Name="Cell1647"/>
+          <TableCell Name="Cell1648"/>
+          <TableCell Name="Cell1649"/>
+          <TableCell Name="Cell1650"/>
+          <TableCell Name="Cell1651"/>
+          <TableCell Name="Cell1652"/>
+          <TableCell Name="Cell1653"/>
+          <TableCell Name="Cell1654"/>
+          <TableCell Name="Cell1655"/>
+          <TableCell Name="Cell1656"/>
+          <TableCell Name="Cell1657"/>
+          <TableCell Name="Cell1658"/>
+          <TableCell Name="Cell1659"/>
+          <TableCell Name="Cell1660"/>
+          <TableCell Name="Cell1662"/>
+        </TableRow>
+        <TableRow Name="Row85">
+          <TableCell Name="Cell1663" Text="Платник [TIC.OSender]" ColSpan="14"/>
+          <TableCell Name="Cell1664"/>
+          <TableCell Name="Cell1665"/>
+          <TableCell Name="Cell1666"/>
+          <TableCell Name="Cell1667"/>
+          <TableCell Name="Cell1668"/>
+          <TableCell Name="Cell1669"/>
+          <TableCell Name="Cell1670"/>
+          <TableCell Name="Cell1671"/>
+          <TableCell Name="Cell1672"/>
+          <TableCell Name="Cell1673"/>
+          <TableCell Name="Cell1674"/>
+          <TableCell Name="Cell1675"/>
+          <TableCell Name="Cell1676"/>
+          <TableCell Name="Cell1677"/>
+          <TableCell Name="Cell1678"/>
+          <TableCell Name="Cell1679"/>
+          <TableCell Name="Cell1680"/>
+          <TableCell Name="Cell1681"/>
+          <TableCell Name="Cell1682"/>
+          <TableCell Name="Cell1683"/>
+          <TableCell Name="Cell1684"/>
+          <TableCell Name="Cell1685"/>
+          <TableCell Name="Cell1686"/>
+          <TableCell Name="Cell1687"/>
+          <TableCell Name="Cell1688"/>
+          <TableCell Name="Cell1689"/>
+          <TableCell Name="Cell1690"/>
+          <TableCell Name="Cell1691"/>
+          <TableCell Name="Cell1692"/>
+          <TableCell Name="Cell1693"/>
+          <TableCell Name="Cell1694"/>
+          <TableCell Name="Cell1695"/>
+          <TableCell Name="Cell1696"/>
+          <TableCell Name="Cell1697"/>
+          <TableCell Name="Cell1699"/>
+        </TableRow>
+        <TableRow Name="Row86" Height="13.23">
+          <TableCell Name="Cell1700" Text="Код" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell1701" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1702" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-A],[TIC.OOKPO-B])]" HorzAlign="Center" VertAlign="Center" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell1703" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1704" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1705" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1706" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1707"/>
+          <TableCell Name="Cell1708"/>
+          <TableCell Name="Cell1709"/>
+          <TableCell Name="Cell1710"/>
+          <TableCell Name="Cell1711"/>
+          <TableCell Name="Cell1712"/>
+          <TableCell Name="Cell1713"/>
+          <TableCell Name="Cell1714"/>
+          <TableCell Name="Cell1715"/>
+          <TableCell Name="Cell1716"/>
+          <TableCell Name="Cell1717"/>
+          <TableCell Name="Cell1718"/>
+          <TableCell Name="Cell1719"/>
+          <TableCell Name="Cell1720"/>
+          <TableCell Name="Cell1721"/>
+          <TableCell Name="Cell1722"/>
+          <TableCell Name="Cell1723"/>
+          <TableCell Name="Cell1724"/>
+          <TableCell Name="Cell1725"/>
+          <TableCell Name="Cell1726"/>
+          <TableCell Name="Cell1727"/>
+          <TableCell Name="Cell1728"/>
+          <TableCell Name="Cell1729"/>
+          <TableCell Name="Cell1730"/>
+          <TableCell Name="Cell1731"/>
+          <TableCell Name="Cell1732"/>
+          <TableCell Name="Cell1733"/>
+          <TableCell Name="Cell1734"/>
+          <TableCell Name="Cell1736"/>
+        </TableRow>
+        <TableRow Name="Row51" Height="13.23">
+          <TableCell Name="Cell373" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell374" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell394" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell375" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell376" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell377" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell404" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell414"/>
+          <TableCell Name="Cell409"/>
+          <TableCell Name="Cell399"/>
+          <TableCell Name="Cell419"/>
+          <TableCell Name="Cell424"/>
+          <TableCell Name="Cell429"/>
+          <TableCell Name="Cell434"/>
+          <TableCell Name="Cell439"/>
+          <TableCell Name="Cell444"/>
+          <TableCell Name="Cell449"/>
+          <TableCell Name="Cell641"/>
+          <TableCell Name="Cell657"/>
+          <TableCell Name="Cell673"/>
+          <TableCell Name="Cell689"/>
+          <TableCell Name="Cell705"/>
+          <TableCell Name="Cell897"/>
+          <TableCell Name="Cell721"/>
+          <TableCell Name="Cell881"/>
+          <TableCell Name="Cell945"/>
+          <TableCell Name="Cell737"/>
+          <TableCell Name="Cell913"/>
+          <TableCell Name="Cell833"/>
+          <TableCell Name="Cell849"/>
+          <TableCell Name="Cell929"/>
+          <TableCell Name="Cell753"/>
+          <TableCell Name="Cell769"/>
+          <TableCell Name="Cell785"/>
+          <TableCell Name="Cell817"/>
+          <TableCell Name="Cell801"/>
+        </TableRow>
+        <TableRow Name="Row52">
+          <TableCell Name="Cell378"/>
+          <TableCell Name="Cell379"/>
+          <TableCell Name="Cell395"/>
+          <TableCell Name="Cell380"/>
+          <TableCell Name="Cell381"/>
+          <TableCell Name="Cell382"/>
+          <TableCell Name="Cell405"/>
+          <TableCell Name="Cell415"/>
+          <TableCell Name="Cell410"/>
+          <TableCell Name="Cell400"/>
+          <TableCell Name="Cell420"/>
+          <TableCell Name="Cell425"/>
+          <TableCell Name="Cell430"/>
+          <TableCell Name="Cell435"/>
+          <TableCell Name="Cell440"/>
+          <TableCell Name="Cell445"/>
+          <TableCell Name="Cell450"/>
+          <TableCell Name="Cell642"/>
+          <TableCell Name="Cell658"/>
+          <TableCell Name="Cell674"/>
+          <TableCell Name="Cell690"/>
+          <TableCell Name="Cell706"/>
+          <TableCell Name="Cell898"/>
+          <TableCell Name="Cell722"/>
+          <TableCell Name="Cell882"/>
+          <TableCell Name="Cell946"/>
+          <TableCell Name="Cell738"/>
+          <TableCell Name="Cell914"/>
+          <TableCell Name="Cell834"/>
+          <TableCell Name="Cell850"/>
+          <TableCell Name="Cell930"/>
+          <TableCell Name="Cell754"/>
+          <TableCell Name="Cell770"/>
+          <TableCell Name="Cell786"/>
+          <TableCell Name="Cell818"/>
+          <TableCell Name="Cell802"/>
+        </TableRow>
+        <TableRow Name="Row53">
+          <TableCell Name="Cell383" Text="Банк платника" ColSpan="7"/>
+          <TableCell Name="Cell384"/>
+          <TableCell Name="Cell396"/>
+          <TableCell Name="Cell385"/>
+          <TableCell Name="Cell386"/>
+          <TableCell Name="Cell387"/>
+          <TableCell Name="Cell406"/>
+          <TableCell Name="Cell416"/>
+          <TableCell Name="Cell411"/>
+          <TableCell Name="Cell401"/>
+          <TableCell Name="Cell421"/>
+          <TableCell Name="Cell426"/>
+          <TableCell Name="Cell431"/>
+          <TableCell Name="Cell436"/>
+          <TableCell Name="Cell441"/>
+          <TableCell Name="Cell446"/>
+          <TableCell Name="Cell451"/>
+          <TableCell Name="Cell643" Text="Код банку" ColSpan="4"/>
+          <TableCell Name="Cell659"/>
+          <TableCell Name="Cell675"/>
+          <TableCell Name="Cell691"/>
+          <TableCell Name="Cell707"/>
+          <TableCell Name="Cell899" Text="ДЕБЕТ рах. N" HorzAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell723"/>
+          <TableCell Name="Cell883"/>
+          <TableCell Name="Cell947"/>
+          <TableCell Name="Cell739"/>
+          <TableCell Name="Cell915"/>
+          <TableCell Name="Cell835"/>
+          <TableCell Name="Cell851" Text="СУМА" HorzAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell931" HorzAlign="Center"/>
+          <TableCell Name="Cell755" HorzAlign="Center"/>
+          <TableCell Name="Cell771" HorzAlign="Center"/>
+          <TableCell Name="Cell787" HorzAlign="Center"/>
+          <TableCell Name="Cell819"/>
+          <TableCell Name="Cell803"/>
+        </TableRow>
+        <TableRow Name="Row54" Height="22.68">
+          <TableCell Name="Cell388" Border.Lines="Bottom" Text="[IIf([DK.DK]==1,[TIC.OBank-A],[TIC.OBank-B])]" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="17"/>
+          <TableCell Name="Cell389"/>
+          <TableCell Name="Cell397"/>
+          <TableCell Name="Cell390"/>
+          <TableCell Name="Cell391"/>
+          <TableCell Name="Cell392"/>
+          <TableCell Name="Cell407"/>
+          <TableCell Name="Cell417"/>
+          <TableCell Name="Cell412"/>
+          <TableCell Name="Cell402"/>
+          <TableCell Name="Cell422"/>
+          <TableCell Name="Cell427"/>
+          <TableCell Name="Cell432"/>
+          <TableCell Name="Cell437"/>
+          <TableCell Name="Cell442"/>
+          <TableCell Name="Cell447"/>
+          <TableCell Name="Cell452"/>
+          <TableCell Name="Cell644" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OMFO-A],[TIC.OMFO-B])]" HorzAlign="Center" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell660" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell676" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell692" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell708"/>
+          <TableCell Name="Cell900" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.ONLS-A],[TIC.ONLS-B])]" HorzAlign="Center" VertAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell724" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell884" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell948" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell740" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell916" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell836" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell852" Border.Lines="Left, Right, Top" Border.Width="1.5" Text="[TIC.OSumm]" HorzAlign="Right" VertAlign="Center" ColSpan="5"/>
+          <TableCell Name="Cell932" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell756" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell772" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell788" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell820"/>
+          <TableCell Name="Cell804"/>
+        </TableRow>
+        <TableRow Name="Row66">
+          <TableCell Name="Cell960" Border.Lines="Top" Text="Одержувач [TIC.OReceiver]" ColSpan="16"/>
+          <TableCell Name="Cell961" Border.Lines="Top"/>
+          <TableCell Name="Cell962" Border.Lines="Top"/>
+          <TableCell Name="Cell963" Border.Lines="Top"/>
+          <TableCell Name="Cell964" Border.Lines="Top"/>
+          <TableCell Name="Cell965" Border.Lines="Top"/>
+          <TableCell Name="Cell966" Border.Lines="Top"/>
+          <TableCell Name="Cell967" Border.Lines="Top"/>
+          <TableCell Name="Cell968" Border.Lines="Top"/>
+          <TableCell Name="Cell969" Border.Lines="Top"/>
+          <TableCell Name="Cell970" Border.Lines="Top"/>
+          <TableCell Name="Cell971" Border.Lines="Top"/>
+          <TableCell Name="Cell972" Border.Lines="Top"/>
+          <TableCell Name="Cell973" Border.Lines="Top"/>
+          <TableCell Name="Cell974" Border.Lines="Top"/>
+          <TableCell Name="Cell975" Border.Lines="Top"/>
+          <TableCell Name="Cell976" Border.Lines="Top"/>
+          <TableCell Name="Cell977"/>
+          <TableCell Name="Cell978"/>
+          <TableCell Name="Cell979"/>
+          <TableCell Name="Cell980"/>
+          <TableCell Name="Cell981"/>
+          <TableCell Name="Cell982"/>
+          <TableCell Name="Cell983"/>
+          <TableCell Name="Cell984"/>
+          <TableCell Name="Cell985"/>
+          <TableCell Name="Cell986"/>
+          <TableCell Name="Cell987"/>
+          <TableCell Name="Cell988"/>
+          <TableCell Name="Cell989" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell990"/>
+          <TableCell Name="Cell991"/>
+          <TableCell Name="Cell992"/>
+          <TableCell Name="Cell993" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell994"/>
+          <TableCell Name="Cell996"/>
+        </TableRow>
+        <TableRow Name="Row55">
+          <TableCell Name="Cell453"/>
+          <TableCell Name="Cell454"/>
+          <TableCell Name="Cell455"/>
+          <TableCell Name="Cell456"/>
+          <TableCell Name="Cell457"/>
+          <TableCell Name="Cell458"/>
+          <TableCell Name="Cell459"/>
+          <TableCell Name="Cell460"/>
+          <TableCell Name="Cell461"/>
+          <TableCell Name="Cell462"/>
+          <TableCell Name="Cell463"/>
+          <TableCell Name="Cell464"/>
+          <TableCell Name="Cell465"/>
+          <TableCell Name="Cell466"/>
+          <TableCell Name="Cell467"/>
+          <TableCell Name="Cell468"/>
+          <TableCell Name="Cell469"/>
+          <TableCell Name="Cell645"/>
+          <TableCell Name="Cell661"/>
+          <TableCell Name="Cell677"/>
+          <TableCell Name="Cell693"/>
+          <TableCell Name="Cell709"/>
+          <TableCell Name="Cell901"/>
+          <TableCell Name="Cell725"/>
+          <TableCell Name="Cell885"/>
+          <TableCell Name="Cell949"/>
+          <TableCell Name="Cell741"/>
+          <TableCell Name="Cell917"/>
+          <TableCell Name="Cell837"/>
+          <TableCell Name="Cell853" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell933"/>
+          <TableCell Name="Cell757"/>
+          <TableCell Name="Cell773"/>
+          <TableCell Name="Cell789" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell821"/>
+          <TableCell Name="Cell805"/>
+        </TableRow>
+        <TableRow Name="Row56" Height="13.23">
+          <TableCell Name="Cell470" Text="Код" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell471" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell472" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-B],[TIC.OOKPO-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell473" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell474" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell475" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell476" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell477"/>
+          <TableCell Name="Cell478"/>
+          <TableCell Name="Cell479"/>
+          <TableCell Name="Cell480"/>
+          <TableCell Name="Cell481"/>
+          <TableCell Name="Cell482"/>
+          <TableCell Name="Cell483"/>
+          <TableCell Name="Cell484"/>
+          <TableCell Name="Cell485"/>
+          <TableCell Name="Cell486"/>
+          <TableCell Name="Cell646"/>
+          <TableCell Name="Cell662"/>
+          <TableCell Name="Cell678"/>
+          <TableCell Name="Cell694"/>
+          <TableCell Name="Cell710"/>
+          <TableCell Name="Cell902" Text="КРЕДИТ рах. N" HorzAlign="Center" VertAlign="Bottom" ColSpan="7" RowSpan="2"/>
+          <TableCell Name="Cell726"/>
+          <TableCell Name="Cell886"/>
+          <TableCell Name="Cell950"/>
+          <TableCell Name="Cell742"/>
+          <TableCell Name="Cell918"/>
+          <TableCell Name="Cell838"/>
+          <TableCell Name="Cell854" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell934"/>
+          <TableCell Name="Cell758"/>
+          <TableCell Name="Cell774"/>
+          <TableCell Name="Cell790" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell822"/>
+          <TableCell Name="Cell806"/>
+        </TableRow>
+        <TableRow Name="Row57" Height="13.23">
+          <TableCell Name="Cell487" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell488" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell489" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell490" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell491" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell492" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell493" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell494"/>
+          <TableCell Name="Cell495"/>
+          <TableCell Name="Cell496"/>
+          <TableCell Name="Cell497"/>
+          <TableCell Name="Cell498"/>
+          <TableCell Name="Cell499"/>
+          <TableCell Name="Cell500"/>
+          <TableCell Name="Cell501"/>
+          <TableCell Name="Cell502"/>
+          <TableCell Name="Cell503"/>
+          <TableCell Name="Cell647"/>
+          <TableCell Name="Cell663"/>
+          <TableCell Name="Cell679"/>
+          <TableCell Name="Cell695"/>
+          <TableCell Name="Cell711"/>
+          <TableCell Name="Cell903"/>
+          <TableCell Name="Cell727"/>
+          <TableCell Name="Cell887"/>
+          <TableCell Name="Cell951"/>
+          <TableCell Name="Cell743"/>
+          <TableCell Name="Cell919"/>
+          <TableCell Name="Cell839"/>
+          <TableCell Name="Cell855" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell935"/>
+          <TableCell Name="Cell759"/>
+          <TableCell Name="Cell775"/>
+          <TableCell Name="Cell791" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell823"/>
+          <TableCell Name="Cell807"/>
+        </TableRow>
+        <TableRow Name="Row58" Height="22.68">
+          <TableCell Name="Cell504" Text="Банк отримувача" VertAlign="Bottom" ColSpan="7"/>
+          <TableCell Name="Cell505"/>
+          <TableCell Name="Cell506"/>
+          <TableCell Name="Cell507"/>
+          <TableCell Name="Cell508"/>
+          <TableCell Name="Cell509"/>
+          <TableCell Name="Cell510"/>
+          <TableCell Name="Cell511"/>
+          <TableCell Name="Cell512"/>
+          <TableCell Name="Cell513"/>
+          <TableCell Name="Cell514"/>
+          <TableCell Name="Cell515"/>
+          <TableCell Name="Cell516"/>
+          <TableCell Name="Cell517"/>
+          <TableCell Name="Cell518"/>
+          <TableCell Name="Cell519"/>
+          <TableCell Name="Cell520"/>
+          <TableCell Name="Cell648" Text="Код банку" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell664"/>
+          <TableCell Name="Cell680"/>
+          <TableCell Name="Cell696"/>
+          <TableCell Name="Cell712"/>
+          <TableCell Name="Cell904" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.ONLS-B],[TIC.ONLS-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="7"/>
+          <TableCell Name="Cell728" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell888" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell952" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell744" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell920" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell840" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell856" Border.Lines="Left" Border.Width="1.5"/>
+          <TableCell Name="Cell936"/>
+          <TableCell Name="Cell760"/>
+          <TableCell Name="Cell776"/>
+          <TableCell Name="Cell792" Border.Lines="Right" Border.Width="1.5"/>
+          <TableCell Name="Cell824"/>
+          <TableCell Name="Cell808"/>
+        </TableRow>
+        <TableRow Name="Row59" Height="22.68">
+          <TableCell Name="Cell521" Border.Lines="Bottom" Text="[IIf([DK.DK]==1,[TIC.OBank-B],[TIC.OBank-A])]" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="17"/>
+          <TableCell Name="Cell522" Border.Lines="Bottom"/>
+          <TableCell Name="Cell523" Border.Lines="Bottom"/>
+          <TableCell Name="Cell524" Border.Lines="Bottom"/>
+          <TableCell Name="Cell525" Border.Lines="Bottom"/>
+          <TableCell Name="Cell526" Border.Lines="Bottom"/>
+          <TableCell Name="Cell527" Border.Lines="Bottom"/>
+          <TableCell Name="Cell528" Border.Lines="Bottom"/>
+          <TableCell Name="Cell529" Border.Lines="Bottom"/>
+          <TableCell Name="Cell530" Border.Lines="Bottom"/>
+          <TableCell Name="Cell531" Border.Lines="Bottom"/>
+          <TableCell Name="Cell532" Border.Lines="Bottom"/>
+          <TableCell Name="Cell533" Border.Lines="Bottom"/>
+          <TableCell Name="Cell534" Border.Lines="Bottom"/>
+          <TableCell Name="Cell535" Border.Lines="Bottom"/>
+          <TableCell Name="Cell536" Border.Lines="Bottom"/>
+          <TableCell Name="Cell537" Border.Lines="Bottom"/>
+          <TableCell Name="Cell649" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OMFO-B],[TIC.OMFO-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell665" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell681" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell697" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell713"/>
+          <TableCell Name="Cell905" Border.Lines="Left, Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell729" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell889" Border.Lines="Bottom" Border.Width="1.5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell953" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell745" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell921" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell841" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell857" Border.Lines="Left, Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell937" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell761" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell777" Border.Lines="Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell793" Border.Lines="Right, Bottom" Border.Width="1.5"/>
+          <TableCell Name="Cell825"/>
+          <TableCell Name="Cell809"/>
+        </TableRow>
+        <TableRow Name="Row60">
+          <TableCell Name="Cell538" Text="Сума словами" ColSpan="6"/>
+          <TableCell Name="Cell539"/>
+          <TableCell Name="Cell540"/>
+          <TableCell Name="Cell541"/>
+          <TableCell Name="Cell542"/>
+          <TableCell Name="Cell543"/>
+          <TableCell Name="Cell544"/>
+          <TableCell Name="Cell545"/>
+          <TableCell Name="Cell546"/>
+          <TableCell Name="Cell547"/>
+          <TableCell Name="Cell548"/>
+          <TableCell Name="Cell549"/>
+          <TableCell Name="Cell550"/>
+          <TableCell Name="Cell551"/>
+          <TableCell Name="Cell552"/>
+          <TableCell Name="Cell553"/>
+          <TableCell Name="Cell554"/>
+          <TableCell Name="Cell650"/>
+          <TableCell Name="Cell666"/>
+          <TableCell Name="Cell682"/>
+          <TableCell Name="Cell698"/>
+          <TableCell Name="Cell714"/>
+          <TableCell Name="Cell906"/>
+          <TableCell Name="Cell730"/>
+          <TableCell Name="Cell890"/>
+          <TableCell Name="Cell954"/>
+          <TableCell Name="Cell746"/>
+          <TableCell Name="Cell922"/>
+          <TableCell Name="Cell842"/>
+          <TableCell Name="Cell858"/>
+          <TableCell Name="Cell938"/>
+          <TableCell Name="Cell762"/>
+          <TableCell Name="Cell778"/>
+          <TableCell Name="Cell794"/>
+          <TableCell Name="Cell826"/>
+          <TableCell Name="Cell810"/>
+        </TableRow>
+        <TableRow Name="Row61">
+          <TableCell Name="Cell555" Border.Lines="Bottom" Text="[TIC.OSummLit]" ColSpan="22"/>
+          <TableCell Name="Cell556" Border.Lines="Bottom"/>
+          <TableCell Name="Cell557" Border.Lines="Bottom"/>
+          <TableCell Name="Cell558" Border.Lines="Bottom"/>
+          <TableCell Name="Cell559" Border.Lines="Bottom"/>
+          <TableCell Name="Cell560" Border.Lines="Bottom"/>
+          <TableCell Name="Cell561" Border.Lines="Bottom"/>
+          <TableCell Name="Cell562" Border.Lines="Bottom"/>
+          <TableCell Name="Cell563" Border.Lines="Bottom"/>
+          <TableCell Name="Cell564" Border.Lines="Bottom"/>
+          <TableCell Name="Cell565" Border.Lines="Bottom"/>
+          <TableCell Name="Cell566" Border.Lines="Bottom"/>
+          <TableCell Name="Cell567" Border.Lines="Bottom"/>
+          <TableCell Name="Cell568" Border.Lines="Bottom"/>
+          <TableCell Name="Cell569" Border.Lines="Bottom"/>
+          <TableCell Name="Cell570" Border.Lines="Bottom"/>
+          <TableCell Name="Cell571" Border.Lines="Bottom"/>
+          <TableCell Name="Cell651" Border.Lines="Bottom"/>
+          <TableCell Name="Cell667" Border.Lines="Bottom"/>
+          <TableCell Name="Cell683" Border.Lines="Bottom"/>
+          <TableCell Name="Cell699" Border.Lines="Bottom"/>
+          <TableCell Name="Cell715" Border.Lines="Bottom"/>
+          <TableCell Name="Cell907"/>
+          <TableCell Name="Cell731"/>
+          <TableCell Name="Cell891"/>
+          <TableCell Name="Cell955"/>
+          <TableCell Name="Cell747"/>
+          <TableCell Name="Cell923"/>
+          <TableCell Name="Cell843"/>
+          <TableCell Name="Cell859"/>
+          <TableCell Name="Cell939"/>
+          <TableCell Name="Cell763"/>
+          <TableCell Name="Cell779"/>
+          <TableCell Name="Cell795"/>
+          <TableCell Name="Cell827"/>
+          <TableCell Name="Cell811"/>
+        </TableRow>
+        <TableRow Name="Row62">
+          <TableCell Name="Cell572" Text="Призначення платежу" ColSpan="12"/>
+          <TableCell Name="Cell573"/>
+          <TableCell Name="Cell574"/>
+          <TableCell Name="Cell575"/>
+          <TableCell Name="Cell576"/>
+          <TableCell Name="Cell577"/>
+          <TableCell Name="Cell578"/>
+          <TableCell Name="Cell579"/>
+          <TableCell Name="Cell580"/>
+          <TableCell Name="Cell581"/>
+          <TableCell Name="Cell582"/>
+          <TableCell Name="Cell583"/>
+          <TableCell Name="Cell584"/>
+          <TableCell Name="Cell585"/>
+          <TableCell Name="Cell586"/>
+          <TableCell Name="Cell587"/>
+          <TableCell Name="Cell588"/>
+          <TableCell Name="Cell652"/>
+          <TableCell Name="Cell668"/>
+          <TableCell Name="Cell684"/>
+          <TableCell Name="Cell700"/>
+          <TableCell Name="Cell716"/>
+          <TableCell Name="Cell908"/>
+          <TableCell Name="Cell732"/>
+          <TableCell Name="Cell892"/>
+          <TableCell Name="Cell956"/>
+          <TableCell Name="Cell748"/>
+          <TableCell Name="Cell924"/>
+          <TableCell Name="Cell844"/>
+          <TableCell Name="Cell860"/>
+          <TableCell Name="Cell940"/>
+          <TableCell Name="Cell764"/>
+          <TableCell Name="Cell780"/>
+          <TableCell Name="Cell796"/>
+          <TableCell Name="Cell828"/>
+          <TableCell Name="Cell812"/>
+        </TableRow>
+        <TableRow Name="Row63" AutoSize="true">
+          <TableCell Name="Cell589" Text="[TIC.ONazn]" ColSpan="22"/>
+          <TableCell Name="Cell590"/>
+          <TableCell Name="Cell591"/>
+          <TableCell Name="Cell592"/>
+          <TableCell Name="Cell593"/>
+          <TableCell Name="Cell594"/>
+          <TableCell Name="Cell595"/>
+          <TableCell Name="Cell596"/>
+          <TableCell Name="Cell597"/>
+          <TableCell Name="Cell598"/>
+          <TableCell Name="Cell599"/>
+          <TableCell Name="Cell600"/>
+          <TableCell Name="Cell601"/>
+          <TableCell Name="Cell602"/>
+          <TableCell Name="Cell603"/>
+          <TableCell Name="Cell604"/>
+          <TableCell Name="Cell605"/>
+          <TableCell Name="Cell653"/>
+          <TableCell Name="Cell669"/>
+          <TableCell Name="Cell685"/>
+          <TableCell Name="Cell701"/>
+          <TableCell Name="Cell717"/>
+          <TableCell Name="Cell909"/>
+          <TableCell Name="Cell733"/>
+          <TableCell Name="Cell893"/>
+          <TableCell Name="Cell957"/>
+          <TableCell Name="Cell749"/>
+          <TableCell Name="Cell925"/>
+          <TableCell Name="Cell845"/>
+          <TableCell Name="Cell861" Border.Lines="All" Border.Width="1.5" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell941" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell765" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell781" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell797" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell829"/>
+          <TableCell Name="Cell813"/>
+        </TableRow>
+        <TableRow Name="Row64">
+          <TableCell Name="Cell606"/>
+          <TableCell Name="Cell607"/>
+          <TableCell Name="Cell608"/>
+          <TableCell Name="Cell609"/>
+          <TableCell Name="Cell610"/>
+          <TableCell Name="Cell611"/>
+          <TableCell Name="Cell612"/>
+          <TableCell Name="Cell613"/>
+          <TableCell Name="Cell614"/>
+          <TableCell Name="Cell615"/>
+          <TableCell Name="Cell616"/>
+          <TableCell Name="Cell617"/>
+          <TableCell Name="Cell618"/>
+          <TableCell Name="Cell619"/>
+          <TableCell Name="Cell620"/>
+          <TableCell Name="Cell621"/>
+          <TableCell Name="Cell622"/>
+          <TableCell Name="Cell654"/>
+          <TableCell Name="Cell670"/>
+          <TableCell Name="Cell686"/>
+          <TableCell Name="Cell702"/>
+          <TableCell Name="Cell718"/>
+          <TableCell Name="Cell910"/>
+          <TableCell Name="Cell734"/>
+          <TableCell Name="Cell894"/>
+          <TableCell Name="Cell958"/>
+          <TableCell Name="Cell750"/>
+          <TableCell Name="Cell926"/>
+          <TableCell Name="Cell846"/>
+          <TableCell Name="Cell862" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell942" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell766" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell782" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell798" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell830"/>
+          <TableCell Name="Cell814"/>
+        </TableRow>
+        <TableRow Name="Row65">
+          <TableCell Name="Cell623" Text="ДР" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell624" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell625" Border.Lines="All" Border.Width="1.5" ColSpan="7" RowSpan="2"/>
+          <TableCell Name="Cell626" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell627" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell628" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell629" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell630" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell631" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell632"/>
+          <TableCell Name="Cell633"/>
+          <TableCell Name="Cell634"/>
+          <TableCell Name="Cell635"/>
+          <TableCell Name="Cell636"/>
+          <TableCell Name="Cell637"/>
+          <TableCell Name="Cell638"/>
+          <TableCell Name="Cell639"/>
+          <TableCell Name="Cell655"/>
+          <TableCell Name="Cell671"/>
+          <TableCell Name="Cell687"/>
+          <TableCell Name="Cell703"/>
+          <TableCell Name="Cell719"/>
+          <TableCell Name="Cell911"/>
+          <TableCell Name="Cell735"/>
+          <TableCell Name="Cell895"/>
+          <TableCell Name="Cell959"/>
+          <TableCell Name="Cell751"/>
+          <TableCell Name="Cell927"/>
+          <TableCell Name="Cell847"/>
+          <TableCell Name="Cell863"/>
+          <TableCell Name="Cell943"/>
+          <TableCell Name="Cell767"/>
+          <TableCell Name="Cell783"/>
+          <TableCell Name="Cell799"/>
+          <TableCell Name="Cell831"/>
+          <TableCell Name="Cell815"/>
+        </TableRow>
+        <TableRow Name="Row90">
+          <TableCell Name="Cell1871" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1872" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1873" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1874" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1875" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1876" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1877" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1878" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1879" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1880"/>
+          <TableCell Name="Cell1881"/>
+          <TableCell Name="Cell1882"/>
+          <TableCell Name="Cell1883"/>
+          <TableCell Name="Cell1884"/>
+          <TableCell Name="Cell1885"/>
+          <TableCell Name="Cell1886"/>
+          <TableCell Name="Cell1887"/>
+          <TableCell Name="Cell1889"/>
+          <TableCell Name="Cell1890"/>
+          <TableCell Name="Cell1891"/>
+          <TableCell Name="Cell1892"/>
+          <TableCell Name="Cell1893"/>
+          <TableCell Name="Cell1894"/>
+          <TableCell Name="Cell1895"/>
+          <TableCell Name="Cell1896"/>
+          <TableCell Name="Cell1897"/>
+          <TableCell Name="Cell1898"/>
+          <TableCell Name="Cell1899"/>
+          <TableCell Name="Cell1900"/>
+          <TableCell Name="Cell1901"/>
+          <TableCell Name="Cell1902"/>
+          <TableCell Name="Cell1903"/>
+          <TableCell Name="Cell1904"/>
+          <TableCell Name="Cell1905"/>
+          <TableCell Name="Cell1906"/>
+          <TableCell Name="Cell1907"/>
+        </TableRow>
+        <TableRow Name="Row91">
+          <TableCell Name="Cell1908"/>
+          <TableCell Name="Cell1909"/>
+          <TableCell Name="Cell1910"/>
+          <TableCell Name="Cell1911"/>
+          <TableCell Name="Cell1912"/>
+          <TableCell Name="Cell1913"/>
+          <TableCell Name="Cell1914"/>
+          <TableCell Name="Cell1915"/>
+          <TableCell Name="Cell1916"/>
+          <TableCell Name="Cell1917"/>
+          <TableCell Name="Cell1918"/>
+          <TableCell Name="Cell1919"/>
+          <TableCell Name="Cell1920"/>
+          <TableCell Name="Cell1921"/>
+          <TableCell Name="Cell1922"/>
+          <TableCell Name="Cell1923"/>
+          <TableCell Name="Cell1924"/>
+          <TableCell Name="Cell1926"/>
+          <TableCell Name="Cell1927"/>
+          <TableCell Name="Cell1928"/>
+          <TableCell Name="Cell1929"/>
+          <TableCell Name="Cell1930"/>
+          <TableCell Name="Cell1931"/>
+          <TableCell Name="Cell1932"/>
+          <TableCell Name="Cell1933"/>
+          <TableCell Name="Cell1934"/>
+          <TableCell Name="Cell1935"/>
+          <TableCell Name="Cell1936"/>
+          <TableCell Name="Cell1937"/>
+          <TableCell Name="Cell1938"/>
+          <TableCell Name="Cell1939"/>
+          <TableCell Name="Cell1940"/>
+          <TableCell Name="Cell1941"/>
+          <TableCell Name="Cell1942"/>
+          <TableCell Name="Cell1943"/>
+          <TableCell Name="Cell1944"/>
+        </TableRow>
+        <TableRow Name="Row92">
+          <TableCell Name="Cell1945" Text="Підписи" ColSpan="4"/>
+          <TableCell Name="Cell1946"/>
+          <TableCell Name="Cell1947"/>
+          <TableCell Name="Cell1948"/>
+          <TableCell Name="Cell1949" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1950" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1951" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1952" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1953"/>
+          <TableCell Name="Cell1954"/>
+          <TableCell Name="Cell1955"/>
+          <TableCell Name="Cell1956"/>
+          <TableCell Name="Cell1957"/>
+          <TableCell Name="Cell1958"/>
+          <TableCell Name="Cell1959"/>
+          <TableCell Name="Cell1960"/>
+          <TableCell Name="Cell1961"/>
+          <TableCell Name="Cell1963"/>
+          <TableCell Name="Cell1964"/>
+          <TableCell Name="Cell1965"/>
+          <TableCell Name="Cell1966"/>
+          <TableCell Name="Cell1967"/>
+          <TableCell Name="Cell1968"/>
+          <TableCell Name="Cell1969"/>
+          <TableCell Name="Cell1970" Text="Штамп банку" ColSpan="5"/>
+          <TableCell Name="Cell1971"/>
+          <TableCell Name="Cell1972"/>
+          <TableCell Name="Cell1973"/>
+          <TableCell Name="Cell1974"/>
+          <TableCell Name="Cell1975"/>
+          <TableCell Name="Cell1976"/>
+          <TableCell Name="Cell1977"/>
+          <TableCell Name="Cell1978"/>
+          <TableCell Name="Cell1979"/>
+          <TableCell Name="Cell1980"/>
+          <TableCell Name="Cell1981"/>
+        </TableRow>
+        <TableRow Name="Row93">
+          <TableCell Name="Cell1982"/>
+          <TableCell Name="Cell1983"/>
+          <TableCell Name="Cell1984"/>
+          <TableCell Name="Cell1985"/>
+          <TableCell Name="Cell1986" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1987" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1988" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1989" Border.Lines="Bottom"/>
+          <TableCell Name="Cell1990"/>
+          <TableCell Name="Cell1991"/>
+          <TableCell Name="Cell1992"/>
+          <TableCell Name="Cell1993"/>
+          <TableCell Name="Cell1994"/>
+          <TableCell Name="Cell1995"/>
+          <TableCell Name="Cell1996"/>
+          <TableCell Name="Cell1997"/>
+          <TableCell Name="Cell1998"/>
+          <TableCell Name="Cell2000"/>
+          <TableCell Name="Cell2001"/>
+          <TableCell Name="Cell2002"/>
+          <TableCell Name="Cell2003"/>
+          <TableCell Name="Cell2004"/>
+          <TableCell Name="Cell2005"/>
+          <TableCell Name="Cell2006"/>
+          <TableCell Name="Cell2007"/>
+          <TableCell Name="Cell2008"/>
+          <TableCell Name="Cell2009"/>
+          <TableCell Name="Cell2010"/>
+          <TableCell Name="Cell2011"/>
+          <TableCell Name="Cell2012"/>
+          <TableCell Name="Cell2013"/>
+          <TableCell Name="Cell2014"/>
+          <TableCell Name="Cell2015"/>
+          <TableCell Name="Cell2016"/>
+          <TableCell Name="Cell2017"/>
+          <TableCell Name="Cell2018"/>
+        </TableRow>
+        <TableRow Name="Row94">
+          <TableCell Name="Cell2019"/>
+          <TableCell Name="Cell2020"/>
+          <TableCell Name="Cell2021"/>
+          <TableCell Name="Cell2022"/>
+          <TableCell Name="Cell2023"/>
+          <TableCell Name="Cell2024"/>
+          <TableCell Name="Cell2025"/>
+          <TableCell Name="Cell2026"/>
+          <TableCell Name="Cell2027"/>
+          <TableCell Name="Cell2028"/>
+          <TableCell Name="Cell2029"/>
+          <TableCell Name="Cell2030"/>
+          <TableCell Name="Cell2031"/>
+          <TableCell Name="Cell2032"/>
+          <TableCell Name="Cell2033"/>
+          <TableCell Name="Cell2034"/>
+          <TableCell Name="Cell2035"/>
+          <TableCell Name="Cell2037"/>
+          <TableCell Name="Cell2038"/>
+          <TableCell Name="Cell2039"/>
+          <TableCell Name="Cell2040"/>
+          <TableCell Name="Cell2041"/>
+          <TableCell Name="Cell2042"/>
+          <TableCell Name="Cell2043"/>
+          <TableCell Name="Cell2044"/>
+          <TableCell Name="Cell2045"/>
+          <TableCell Name="Cell2046"/>
+          <TableCell Name="Cell2047"/>
+          <TableCell Name="Cell2048"/>
+          <TableCell Name="Cell2049"/>
+          <TableCell Name="Cell2050"/>
+          <TableCell Name="Cell2051"/>
+          <TableCell Name="Cell2052"/>
+          <TableCell Name="Cell2053"/>
+          <TableCell Name="Cell2054"/>
+          <TableCell Name="Cell2055"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter2" Top="627.7" Width="718.2" Height="18.9"/>
+  </ReportPage>
+  <ReportPage Name="Page5">
+    <ReportTitleBand Name="ReportTitle2" Width="718.2" Height="37.8"/>
+    <PageHeaderBand Name="PageHeader2" Top="41.8" Width="718.2" Height="28.35"/>
+    <DataBand Name="Data5" Top="74.15" Width="718.2" Height="463.05">
+      <TableObject Name="Table7" Left="18.9" Top="28.35" Width="699.3" Height="309.96">
+        <TableColumn Name="Column60" Width="18.9"/>
+        <TableColumn Name="Column61" Width="18.9"/>
+        <TableColumn Name="Column62" Width="18.9"/>
+        <TableColumn Name="Column63" Width="18.9"/>
+        <TableColumn Name="Column64" Width="18.9"/>
+        <TableColumn Name="Column65" Width="18.9"/>
+        <TableColumn Name="Column66" Width="18.9"/>
+        <TableColumn Name="Column67" Width="18.9"/>
+        <TableColumn Name="Column68" Width="18.9"/>
+        <TableColumn Name="Column69" Width="18.9"/>
+        <TableColumn Name="Column70" Width="18.9"/>
+        <TableColumn Name="Column71" Width="18.9"/>
+        <TableColumn Name="Column72" Width="18.9"/>
+        <TableColumn Name="Column73" Width="18.9"/>
+        <TableColumn Name="Column74" Width="18.9"/>
+        <TableColumn Name="Column75" Width="18.9"/>
+        <TableColumn Name="Column76" Width="18.9"/>
+        <TableColumn Name="Column77" Width="18.9"/>
+        <TableColumn Name="Column78" Width="18.9"/>
+        <TableColumn Name="Column79" Width="18.9"/>
+        <TableColumn Name="Column80" Width="18.9"/>
+        <TableColumn Name="Column81" Width="18.9"/>
+        <TableColumn Name="Column82" Width="18.9"/>
+        <TableColumn Name="Column83" Width="18.9"/>
+        <TableColumn Name="Column84" Width="18.9"/>
+        <TableColumn Name="Column85" Width="18.9"/>
+        <TableColumn Name="Column86" Width="18.9"/>
+        <TableColumn Name="Column87" Width="18.9"/>
+        <TableColumn Name="Column88" Width="18.9"/>
+        <TableColumn Name="Column89" Width="18.9"/>
+        <TableColumn Name="Column90" Width="18.9"/>
+        <TableColumn Name="Column91" Width="18.9"/>
+        <TableColumn Name="Column92" Width="18.9"/>
+        <TableColumn Name="Column93" Width="18.9"/>
+        <TableColumn Name="Column94" Width="18.9"/>
+        <TableColumn Name="Column95" Width="18.9"/>
+        <TableColumn Name="Column96" Width="18.9"/>
+        <TableRow Name="Row67">
+          <TableCell Name="Cell997"/>
+          <TableCell Name="Cell998"/>
+          <TableCell Name="Cell999"/>
+          <TableCell Name="Cell1000"/>
+          <TableCell Name="Cell1001"/>
+          <TableCell Name="Cell1002"/>
+          <TableCell Name="Cell1003"/>
+          <TableCell Name="Cell1004"/>
+          <TableCell Name="Cell1005"/>
+          <TableCell Name="Cell1006"/>
+          <TableCell Name="Cell1007"/>
+          <TableCell Name="Cell1008"/>
+          <TableCell Name="Cell1009"/>
+          <TableCell Name="Cell1010"/>
+          <TableCell Name="Cell1011"/>
+          <TableCell Name="Cell1012"/>
+          <TableCell Name="Cell1013"/>
+          <TableCell Name="Cell1014"/>
+          <TableCell Name="Cell1015"/>
+          <TableCell Name="Cell1016"/>
+          <TableCell Name="Cell1017"/>
+          <TableCell Name="Cell1018"/>
+          <TableCell Name="Cell1019"/>
+          <TableCell Name="Cell1020"/>
+          <TableCell Name="Cell1021"/>
+          <TableCell Name="Cell1022"/>
+          <TableCell Name="Cell1023"/>
+          <TableCell Name="Cell1024"/>
+          <TableCell Name="Cell1025"/>
+          <TableCell Name="Cell1026"/>
+          <TableCell Name="Cell1027"/>
+          <TableCell Name="Cell1028"/>
+          <TableCell Name="Cell1029"/>
+          <TableCell Name="Cell1030"/>
+          <TableCell Name="Cell1031"/>
+          <TableCell Name="Cell1032"/>
+          <TableCell Name="Cell1033"/>
+        </TableRow>
+        <TableRow Name="Row68">
+          <TableCell Name="Cell1034"/>
+          <TableCell Name="Cell1035"/>
+          <TableCell Name="Cell1036"/>
+          <TableCell Name="Cell1037"/>
+          <TableCell Name="Cell1038"/>
+          <TableCell Name="Cell1039"/>
+          <TableCell Name="Cell1040"/>
+          <TableCell Name="Cell1041"/>
+          <TableCell Name="Cell1042"/>
+          <TableCell Name="Cell1043"/>
+          <TableCell Name="Cell1044"/>
+          <TableCell Name="Cell1045"/>
+          <TableCell Name="Cell1046"/>
+          <TableCell Name="Cell1047"/>
+          <TableCell Name="Cell1048"/>
+          <TableCell Name="Cell1049"/>
+          <TableCell Name="Cell1050"/>
+          <TableCell Name="Cell1051"/>
+          <TableCell Name="Cell1052"/>
+          <TableCell Name="Cell1053"/>
+          <TableCell Name="Cell1054"/>
+          <TableCell Name="Cell1055"/>
+          <TableCell Name="Cell1056"/>
+          <TableCell Name="Cell1057"/>
+          <TableCell Name="Cell1058"/>
+          <TableCell Name="Cell1059"/>
+          <TableCell Name="Cell1060"/>
+          <TableCell Name="Cell1061"/>
+          <TableCell Name="Cell1062"/>
+          <TableCell Name="Cell1063"/>
+          <TableCell Name="Cell1064"/>
+          <TableCell Name="Cell1065"/>
+          <TableCell Name="Cell1066"/>
+          <TableCell Name="Cell1067"/>
+          <TableCell Name="Cell1068"/>
+          <TableCell Name="Cell1069"/>
+          <TableCell Name="Cell1070"/>
+        </TableRow>
+        <TableRow Name="Row69">
+          <TableCell Name="Cell1071"/>
+          <TableCell Name="Cell1072"/>
+          <TableCell Name="Cell1073"/>
+          <TableCell Name="Cell1074"/>
+          <TableCell Name="Cell1075"/>
+          <TableCell Name="Cell1076"/>
+          <TableCell Name="Cell1077"/>
+          <TableCell Name="Cell1078"/>
+          <TableCell Name="Cell1079"/>
+          <TableCell Name="Cell1080"/>
+          <TableCell Name="Cell1081"/>
+          <TableCell Name="Cell1082"/>
+          <TableCell Name="Cell1083"/>
+          <TableCell Name="Cell1084"/>
+          <TableCell Name="Cell1085"/>
+          <TableCell Name="Cell1086"/>
+          <TableCell Name="Cell1087"/>
+          <TableCell Name="Cell1088"/>
+          <TableCell Name="Cell1089"/>
+          <TableCell Name="Cell1090"/>
+          <TableCell Name="Cell1091"/>
+          <TableCell Name="Cell1092"/>
+          <TableCell Name="Cell1093"/>
+          <TableCell Name="Cell1094"/>
+          <TableCell Name="Cell1095"/>
+          <TableCell Name="Cell1096"/>
+          <TableCell Name="Cell1097"/>
+          <TableCell Name="Cell1098"/>
+          <TableCell Name="Cell1099"/>
+          <TableCell Name="Cell1100"/>
+          <TableCell Name="Cell1101"/>
+          <TableCell Name="Cell1102"/>
+          <TableCell Name="Cell1103"/>
+          <TableCell Name="Cell1104"/>
+          <TableCell Name="Cell1105"/>
+          <TableCell Name="Cell1106"/>
+          <TableCell Name="Cell1107"/>
+        </TableRow>
+        <TableRow Name="Row70">
+          <TableCell Name="Cell1108"/>
+          <TableCell Name="Cell1109"/>
+          <TableCell Name="Cell1110"/>
+          <TableCell Name="Cell1111"/>
+          <TableCell Name="Cell1112"/>
+          <TableCell Name="Cell1113"/>
+          <TableCell Name="Cell1114"/>
+          <TableCell Name="Cell1115"/>
+          <TableCell Name="Cell1116"/>
+          <TableCell Name="Cell1117"/>
+          <TableCell Name="Cell1118"/>
+          <TableCell Name="Cell1119"/>
+          <TableCell Name="Cell1120"/>
+          <TableCell Name="Cell1121"/>
+          <TableCell Name="Cell1122"/>
+          <TableCell Name="Cell1123"/>
+          <TableCell Name="Cell1124"/>
+          <TableCell Name="Cell1125"/>
+          <TableCell Name="Cell1126"/>
+          <TableCell Name="Cell1127"/>
+          <TableCell Name="Cell1128"/>
+          <TableCell Name="Cell1129"/>
+          <TableCell Name="Cell1130"/>
+          <TableCell Name="Cell1131"/>
+          <TableCell Name="Cell1132"/>
+          <TableCell Name="Cell1133"/>
+          <TableCell Name="Cell1134"/>
+          <TableCell Name="Cell1135"/>
+          <TableCell Name="Cell1136"/>
+          <TableCell Name="Cell1137"/>
+          <TableCell Name="Cell1138"/>
+          <TableCell Name="Cell1139"/>
+          <TableCell Name="Cell1140"/>
+          <TableCell Name="Cell1141"/>
+          <TableCell Name="Cell1142"/>
+          <TableCell Name="Cell1143"/>
+          <TableCell Name="Cell1144"/>
+        </TableRow>
+        <TableRow Name="Row71">
+          <TableCell Name="Cell1145"/>
+          <TableCell Name="Cell1146"/>
+          <TableCell Name="Cell1147"/>
+          <TableCell Name="Cell1148"/>
+          <TableCell Name="Cell1149"/>
+          <TableCell Name="Cell1150"/>
+          <TableCell Name="Cell1151"/>
+          <TableCell Name="Cell1152"/>
+          <TableCell Name="Cell1153"/>
+          <TableCell Name="Cell1154"/>
+          <TableCell Name="Cell1155"/>
+          <TableCell Name="Cell1156"/>
+          <TableCell Name="Cell1157"/>
+          <TableCell Name="Cell1158"/>
+          <TableCell Name="Cell1159"/>
+          <TableCell Name="Cell1160"/>
+          <TableCell Name="Cell1161"/>
+          <TableCell Name="Cell1162" Border.Lines="All" Border.Width="1.5" ColSpan="4"/>
+          <TableCell Name="Cell1163" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1164" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1165" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1166"/>
+          <TableCell Name="Cell1167"/>
+          <TableCell Name="Cell1168"/>
+          <TableCell Name="Cell1169"/>
+          <TableCell Name="Cell1170"/>
+          <TableCell Name="Cell1171"/>
+          <TableCell Name="Cell1172"/>
+          <TableCell Name="Cell1173"/>
+          <TableCell Name="Cell1174"/>
+          <TableCell Name="Cell1175"/>
+          <TableCell Name="Cell1176"/>
+          <TableCell Name="Cell1177"/>
+          <TableCell Name="Cell1178"/>
+          <TableCell Name="Cell1179"/>
+          <TableCell Name="Cell1180"/>
+          <TableCell Name="Cell1181"/>
+        </TableRow>
+        <TableRow Name="Row72">
+          <TableCell Name="Cell1182" Border.Lines="Top" Text="Одержувач [TIC.OReceiver]" ColSpan="16"/>
+          <TableCell Name="Cell1183" Border.Lines="Top"/>
+          <TableCell Name="Cell1184" Border.Lines="Top"/>
+          <TableCell Name="Cell1185" Border.Lines="Top"/>
+          <TableCell Name="Cell1186" Border.Lines="Top"/>
+          <TableCell Name="Cell1187" Border.Lines="Top"/>
+          <TableCell Name="Cell1188" Border.Lines="Top"/>
+          <TableCell Name="Cell1189" Border.Lines="Top"/>
+          <TableCell Name="Cell1190" Border.Lines="Top"/>
+          <TableCell Name="Cell1191" Border.Lines="Top"/>
+          <TableCell Name="Cell1192" Border.Lines="Top"/>
+          <TableCell Name="Cell1193" Border.Lines="Top"/>
+          <TableCell Name="Cell1194" Border.Lines="Top"/>
+          <TableCell Name="Cell1195" Border.Lines="Top"/>
+          <TableCell Name="Cell1196" Border.Lines="Top"/>
+          <TableCell Name="Cell1197" Border.Lines="Top"/>
+          <TableCell Name="Cell1198" Border.Lines="Top"/>
+          <TableCell Name="Cell1199" Border.Lines="Top"/>
+          <TableCell Name="Cell1200" Border.Lines="Top"/>
+          <TableCell Name="Cell1201" Border.Lines="Top"/>
+          <TableCell Name="Cell1202" Border.Lines="Top"/>
+          <TableCell Name="Cell1203" Border.Lines="Top"/>
+          <TableCell Name="Cell1204" Border.Lines="Top"/>
+          <TableCell Name="Cell1205" Border.Lines="Top"/>
+          <TableCell Name="Cell1206" Border.Lines="Top"/>
+          <TableCell Name="Cell1207"/>
+          <TableCell Name="Cell1208"/>
+          <TableCell Name="Cell1209"/>
+          <TableCell Name="Cell1210"/>
+          <TableCell Name="Cell1211"/>
+          <TableCell Name="Cell1212"/>
+          <TableCell Name="Cell1213"/>
+          <TableCell Name="Cell1214"/>
+          <TableCell Name="Cell1215"/>
+          <TableCell Name="Cell1216"/>
+          <TableCell Name="Cell1217"/>
+          <TableCell Name="Cell1218"/>
+        </TableRow>
+        <TableRow Name="Row73">
+          <TableCell Name="Cell1219"/>
+          <TableCell Name="Cell1220"/>
+          <TableCell Name="Cell1221"/>
+          <TableCell Name="Cell1222"/>
+          <TableCell Name="Cell1223"/>
+          <TableCell Name="Cell1224"/>
+          <TableCell Name="Cell1225"/>
+          <TableCell Name="Cell1226"/>
+          <TableCell Name="Cell1227"/>
+          <TableCell Name="Cell1228"/>
+          <TableCell Name="Cell1229"/>
+          <TableCell Name="Cell1230"/>
+          <TableCell Name="Cell1231"/>
+          <TableCell Name="Cell1232"/>
+          <TableCell Name="Cell1233"/>
+          <TableCell Name="Cell1234"/>
+          <TableCell Name="Cell1235"/>
+          <TableCell Name="Cell1236"/>
+          <TableCell Name="Cell1237"/>
+          <TableCell Name="Cell1238"/>
+          <TableCell Name="Cell1239"/>
+          <TableCell Name="Cell1240"/>
+          <TableCell Name="Cell1241"/>
+          <TableCell Name="Cell1242"/>
+          <TableCell Name="Cell1243"/>
+          <TableCell Name="Cell1244"/>
+          <TableCell Name="Cell1245"/>
+          <TableCell Name="Cell1246"/>
+          <TableCell Name="Cell1247"/>
+          <TableCell Name="Cell1248"/>
+          <TableCell Name="Cell1249"/>
+          <TableCell Name="Cell1250"/>
+          <TableCell Name="Cell1251"/>
+          <TableCell Name="Cell1252"/>
+          <TableCell Name="Cell1253"/>
+          <TableCell Name="Cell1254"/>
+          <TableCell Name="Cell1255"/>
+        </TableRow>
+        <TableRow Name="Row74" Height="13.23">
+          <TableCell Name="Cell1256" Text="Код" HorzAlign="Center" VertAlign="Center" ColSpan="2" RowSpan="2"/>
+          <TableCell Name="Cell1257" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1258" Border.Lines="All" Border.Width="1.5" Text="[IIf([DK.DK]==1,[TIC.OOKPO-B],[TIC.OOKPO-A])]" HorzAlign="Center" VertAlign="Center" ColSpan="5" RowSpan="2"/>
+          <TableCell Name="Cell1259" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1260" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1261" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1262" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1263"/>
+          <TableCell Name="Cell1264"/>
+          <TableCell Name="Cell1265"/>
+          <TableCell Name="Cell1266"/>
+          <TableCell Name="Cell1267"/>
+          <TableCell Name="Cell1268"/>
+          <TableCell Name="Cell1269"/>
+          <TableCell Name="Cell1270"/>
+          <TableCell Name="Cell1271"/>
+          <TableCell Name="Cell1272"/>
+          <TableCell Name="Cell1273"/>
+          <TableCell Name="Cell1274"/>
+          <TableCell Name="Cell1275"/>
+          <TableCell Name="Cell1276"/>
+          <TableCell Name="Cell1277"/>
+          <TableCell Name="Cell1278"/>
+          <TableCell Name="Cell1279"/>
+          <TableCell Name="Cell1280"/>
+          <TableCell Name="Cell1281"/>
+          <TableCell Name="Cell1282"/>
+          <TableCell Name="Cell1283"/>
+          <TableCell Name="Cell1284"/>
+          <TableCell Name="Cell1285"/>
+          <TableCell Name="Cell1286"/>
+          <TableCell Name="Cell1287"/>
+          <TableCell Name="Cell1288"/>
+          <TableCell Name="Cell1289"/>
+          <TableCell Name="Cell1290"/>
+          <TableCell Name="Cell1291"/>
+          <TableCell Name="Cell1292"/>
+        </TableRow>
+        <TableRow Name="Row75" Height="13.23">
+          <TableCell Name="Cell1293" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1294" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1295" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1296" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1297" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1298" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1299" Border.Lines="All" Border.Width="1.5"/>
+          <TableCell Name="Cell1300"/>
+          <TableCell Name="Cell1301"/>
+          <TableCell Name="Cell1302"/>
+          <TableCell Name="Cell1303"/>
+          <TableCell Name="Cell1304"/>
+          <TableCell Name="Cell1305"/>
+          <TableCell Name="Cell1306"/>
+          <TableCell Name="Cell1307"/>
+          <TableCell Name="Cell1308"/>
+          <TableCell Name="Cell1309"/>
+          <TableCell Name="Cell1310"/>
+          <TableCell Name="Cell1311"/>
+          <TableCell Name="Cell1312"/>
+          <TableCell Name="Cell1313"/>
+          <TableCell Name="Cell1314"/>
+          <TableCell Name="Cell1315"/>
+          <TableCell Name="Cell1316"/>
+          <TableCell Name="Cell1317"/>
+          <TableCell Name="Cell1318"/>
+          <TableCell Name="Cell1319"/>
+          <TableCell Name="Cell1320"/>
+          <TableCell Name="Cell1321"/>
+          <TableCell Name="Cell1322"/>
+          <TableCell Name="Cell1323"/>
+          <TableCell Name="Cell1324"/>
+          <TableCell Name="Cell1325"/>
+          <TableCell Name="Cell1326"/>
+          <TableCell Name="Cell1327"/>
+          <TableCell Name="Cell1328"/>
+          <TableCell Name="Cell1329"/>
+        </TableRow>
+        <TableRow Name="Row76">
+          <TableCell Name="Cell1330"/>
+          <TableCell Name="Cell1331"/>
+          <TableCell Name="Cell1332"/>
+          <TableCell Name="Cell1333"/>
+          <TableCell Name="Cell1334"/>
+          <TableCell Name="Cell1335"/>
+          <TableCell Name="Cell1336"/>
+          <TableCell Name="Cell1337"/>
+          <TableCell Name="Cell1338"/>
+          <TableCell Name="Cell1339"/>
+          <TableCell Name="Cell1340"/>
+          <TableCell Name="Cell1341"/>
+          <TableCell Name="Cell1342"/>
+          <TableCell Name="Cell1343"/>
+          <TableCell Name="Cell1344"/>
+          <TableCell Name="Cell1345"/>
+          <TableCell Name="Cell1346"/>
+          <TableCell Name="Cell1347"/>
+          <TableCell Name="Cell1348"/>
+          <TableCell Name="Cell1349"/>
+          <TableCell Name="Cell1350"/>
+          <TableCell Name="Cell1351"/>
+          <TableCell Name="Cell1352"/>
+          <TableCell Name="Cell1353"/>
+          <TableCell Name="Cell1354"/>
+          <TableCell Name="Cell1355"/>
+          <TableCell Name="Cell1356"/>
+          <TableCell Name="Cell1357"/>
+          <TableCell Name="Cell1358"/>
+          <TableCell Name="Cell1359"/>
+          <TableCell Name="Cell1360"/>
+          <TableCell Name="Cell1361"/>
+          <TableCell Name="Cell1362"/>
+          <TableCell Name="Cell1363"/>
+          <TableCell Name="Cell1364"/>
+          <TableCell Name="Cell1365"/>
+          <TableCell Name="Cell1366"/>
+        </TableRow>
+        <TableRow Name="Row77">
+          <TableCell Name="Cell1367"/>
+          <TableCell Name="Cell1368"/>
+          <TableCell Name="Cell1369"/>
+          <TableCell Name="Cell1370"/>
+          <TableCell Name="Cell1371"/>
+          <TableCell Name="Cell1372"/>
+          <TableCell Name="Cell1373"/>
+          <TableCell Name="Cell1374"/>
+          <TableCell Name="Cell1375"/>
+          <TableCell Name="Cell1376"/>
+          <TableCell Name="Cell1377"/>
+          <TableCell Name="Cell1378"/>
+          <TableCell Name="Cell1379"/>
+          <TableCell Name="Cell1380"/>
+          <TableCell Name="Cell1381"/>
+          <TableCell Name="Cell1382"/>
+          <TableCell Name="Cell1383"/>
+          <TableCell Name="Cell1384"/>
+          <TableCell Name="Cell1385"/>
+          <TableCell Name="Cell1386"/>
+          <TableCell Name="Cell1387"/>
+          <TableCell Name="Cell1388"/>
+          <TableCell Name="Cell1389"/>
+          <TableCell Name="Cell1390"/>
+          <TableCell Name="Cell1391"/>
+          <TableCell Name="Cell1392"/>
+          <TableCell Name="Cell1393"/>
+          <TableCell Name="Cell1394"/>
+          <TableCell Name="Cell1395"/>
+          <TableCell Name="Cell1396"/>
+          <TableCell Name="Cell1397"/>
+          <TableCell Name="Cell1398"/>
+          <TableCell Name="Cell1399"/>
+          <TableCell Name="Cell1400"/>
+          <TableCell Name="Cell1401"/>
+          <TableCell Name="Cell1402"/>
+          <TableCell Name="Cell1403"/>
+        </TableRow>
+        <TableRow Name="Row78">
+          <TableCell Name="Cell1404"/>
+          <TableCell Name="Cell1405"/>
+          <TableCell Name="Cell1406"/>
+          <TableCell Name="Cell1407"/>
+          <TableCell Name="Cell1408"/>
+          <TableCell Name="Cell1409"/>
+          <TableCell Name="Cell1410"/>
+          <TableCell Name="Cell1411"/>
+          <TableCell Name="Cell1412"/>
+          <TableCell Name="Cell1413"/>
+          <TableCell Name="Cell1414"/>
+          <TableCell Name="Cell1415"/>
+          <TableCell Name="Cell1416"/>
+          <TableCell Name="Cell1417"/>
+          <TableCell Name="Cell1418"/>
+          <TableCell Name="Cell1419"/>
+          <TableCell Name="Cell1420"/>
+          <TableCell Name="Cell1421"/>
+          <TableCell Name="Cell1422"/>
+          <TableCell Name="Cell1423"/>
+          <TableCell Name="Cell1424"/>
+          <TableCell Name="Cell1425"/>
+          <TableCell Name="Cell1426"/>
+          <TableCell Name="Cell1427"/>
+          <TableCell Name="Cell1428"/>
+          <TableCell Name="Cell1429"/>
+          <TableCell Name="Cell1430"/>
+          <TableCell Name="Cell1431"/>
+          <TableCell Name="Cell1432"/>
+          <TableCell Name="Cell1433"/>
+          <TableCell Name="Cell1434"/>
+          <TableCell Name="Cell1435"/>
+          <TableCell Name="Cell1436"/>
+          <TableCell Name="Cell1437"/>
+          <TableCell Name="Cell1438"/>
+          <TableCell Name="Cell1439"/>
+          <TableCell Name="Cell1440"/>
+        </TableRow>
+        <TableRow Name="Row79">
+          <TableCell Name="Cell1441"/>
+          <TableCell Name="Cell1442"/>
+          <TableCell Name="Cell1443"/>
+          <TableCell Name="Cell1444"/>
+          <TableCell Name="Cell1445"/>
+          <TableCell Name="Cell1446"/>
+          <TableCell Name="Cell1447"/>
+          <TableCell Name="Cell1448"/>
+          <TableCell Name="Cell1449"/>
+          <TableCell Name="Cell1450"/>
+          <TableCell Name="Cell1451"/>
+          <TableCell Name="Cell1452"/>
+          <TableCell Name="Cell1453"/>
+          <TableCell Name="Cell1454"/>
+          <TableCell Name="Cell1455"/>
+          <TableCell Name="Cell1456"/>
+          <TableCell Name="Cell1457"/>
+          <TableCell Name="Cell1458"/>
+          <TableCell Name="Cell1459"/>
+          <TableCell Name="Cell1460"/>
+          <TableCell Name="Cell1461"/>
+          <TableCell Name="Cell1462"/>
+          <TableCell Name="Cell1463"/>
+          <TableCell Name="Cell1464"/>
+          <TableCell Name="Cell1465"/>
+          <TableCell Name="Cell1466"/>
+          <TableCell Name="Cell1467"/>
+          <TableCell Name="Cell1468"/>
+          <TableCell Name="Cell1469"/>
+          <TableCell Name="Cell1470"/>
+          <TableCell Name="Cell1471"/>
+          <TableCell Name="Cell1472"/>
+          <TableCell Name="Cell1473"/>
+          <TableCell Name="Cell1474"/>
+          <TableCell Name="Cell1475"/>
+          <TableCell Name="Cell1476"/>
+          <TableCell Name="Cell1477"/>
+        </TableRow>
+        <TableRow Name="Row80">
+          <TableCell Name="Cell1478"/>
+          <TableCell Name="Cell1479"/>
+          <TableCell Name="Cell1480"/>
+          <TableCell Name="Cell1481"/>
+          <TableCell Name="Cell1482"/>
+          <TableCell Name="Cell1483"/>
+          <TableCell Name="Cell1484"/>
+          <TableCell Name="Cell1485"/>
+          <TableCell Name="Cell1486"/>
+          <TableCell Name="Cell1487"/>
+          <TableCell Name="Cell1488"/>
+          <TableCell Name="Cell1489"/>
+          <TableCell Name="Cell1490"/>
+          <TableCell Name="Cell1491"/>
+          <TableCell Name="Cell1492"/>
+          <TableCell Name="Cell1493"/>
+          <TableCell Name="Cell1494"/>
+          <TableCell Name="Cell1495"/>
+          <TableCell Name="Cell1496"/>
+          <TableCell Name="Cell1497"/>
+          <TableCell Name="Cell1498"/>
+          <TableCell Name="Cell1499"/>
+          <TableCell Name="Cell1500"/>
+          <TableCell Name="Cell1501"/>
+          <TableCell Name="Cell1502"/>
+          <TableCell Name="Cell1503"/>
+          <TableCell Name="Cell1504"/>
+          <TableCell Name="Cell1505"/>
+          <TableCell Name="Cell1506"/>
+          <TableCell Name="Cell1507"/>
+          <TableCell Name="Cell1508"/>
+          <TableCell Name="Cell1509"/>
+          <TableCell Name="Cell1510"/>
+          <TableCell Name="Cell1511"/>
+          <TableCell Name="Cell1512"/>
+          <TableCell Name="Cell1513"/>
+          <TableCell Name="Cell1514"/>
+        </TableRow>
+        <TableRow Name="Row81">
+          <TableCell Name="Cell1515"/>
+          <TableCell Name="Cell1516"/>
+          <TableCell Name="Cell1517"/>
+          <TableCell Name="Cell1518"/>
+          <TableCell Name="Cell1519"/>
+          <TableCell Name="Cell1520"/>
+          <TableCell Name="Cell1521"/>
+          <TableCell Name="Cell1522"/>
+          <TableCell Name="Cell1523"/>
+          <TableCell Name="Cell1524"/>
+          <TableCell Name="Cell1525"/>
+          <TableCell Name="Cell1526"/>
+          <TableCell Name="Cell1527"/>
+          <TableCell Name="Cell1528"/>
+          <TableCell Name="Cell1529"/>
+          <TableCell Name="Cell1530"/>
+          <TableCell Name="Cell1531"/>
+          <TableCell Name="Cell1532"/>
+          <TableCell Name="Cell1533"/>
+          <TableCell Name="Cell1534"/>
+          <TableCell Name="Cell1535"/>
+          <TableCell Name="Cell1536"/>
+          <TableCell Name="Cell1537"/>
+          <TableCell Name="Cell1538"/>
+          <TableCell Name="Cell1539"/>
+          <TableCell Name="Cell1540"/>
+          <TableCell Name="Cell1541"/>
+          <TableCell Name="Cell1542"/>
+          <TableCell Name="Cell1543"/>
+          <TableCell Name="Cell1544"/>
+          <TableCell Name="Cell1545"/>
+          <TableCell Name="Cell1546"/>
+          <TableCell Name="Cell1547"/>
+          <TableCell Name="Cell1548"/>
+          <TableCell Name="Cell1549"/>
+          <TableCell Name="Cell1550"/>
+          <TableCell Name="Cell1551"/>
+        </TableRow>
+        <TableRow Name="Row82">
+          <TableCell Name="Cell1552"/>
+          <TableCell Name="Cell1553"/>
+          <TableCell Name="Cell1554"/>
+          <TableCell Name="Cell1555"/>
+          <TableCell Name="Cell1556"/>
+          <TableCell Name="Cell1557"/>
+          <TableCell Name="Cell1558"/>
+          <TableCell Name="Cell1559"/>
+          <TableCell Name="Cell1560"/>
+          <TableCell Name="Cell1561"/>
+          <TableCell Name="Cell1562"/>
+          <TableCell Name="Cell1563"/>
+          <TableCell Name="Cell1564"/>
+          <TableCell Name="Cell1565"/>
+          <TableCell Name="Cell1566"/>
+          <TableCell Name="Cell1567"/>
+          <TableCell Name="Cell1568"/>
+          <TableCell Name="Cell1569"/>
+          <TableCell Name="Cell1570"/>
+          <TableCell Name="Cell1571"/>
+          <TableCell Name="Cell1572"/>
+          <TableCell Name="Cell1573"/>
+          <TableCell Name="Cell1574"/>
+          <TableCell Name="Cell1575"/>
+          <TableCell Name="Cell1576"/>
+          <TableCell Name="Cell1577"/>
+          <TableCell Name="Cell1578"/>
+          <TableCell Name="Cell1579"/>
+          <TableCell Name="Cell1580"/>
+          <TableCell Name="Cell1581"/>
+          <TableCell Name="Cell1582"/>
+          <TableCell Name="Cell1583"/>
+          <TableCell Name="Cell1584"/>
+          <TableCell Name="Cell1585"/>
+          <TableCell Name="Cell1586"/>
+          <TableCell Name="Cell1587"/>
+          <TableCell Name="Cell1588"/>
+        </TableRow>
+        <TableRow Name="Row83">
+          <TableCell Name="Cell1589"/>
+          <TableCell Name="Cell1590"/>
+          <TableCell Name="Cell1591"/>
+          <TableCell Name="Cell1592"/>
+          <TableCell Name="Cell1593"/>
+          <TableCell Name="Cell1594"/>
+          <TableCell Name="Cell1595"/>
+          <TableCell Name="Cell1596"/>
+          <TableCell Name="Cell1597"/>
+          <TableCell Name="Cell1598"/>
+          <TableCell Name="Cell1599"/>
+          <TableCell Name="Cell1600"/>
+          <TableCell Name="Cell1601"/>
+          <TableCell Name="Cell1602"/>
+          <TableCell Name="Cell1603"/>
+          <TableCell Name="Cell1604"/>
+          <TableCell Name="Cell1605"/>
+          <TableCell Name="Cell1606"/>
+          <TableCell Name="Cell1607"/>
+          <TableCell Name="Cell1608"/>
+          <TableCell Name="Cell1609"/>
+          <TableCell Name="Cell1610"/>
+          <TableCell Name="Cell1611"/>
+          <TableCell Name="Cell1612"/>
+          <TableCell Name="Cell1613"/>
+          <TableCell Name="Cell1614"/>
+          <TableCell Name="Cell1615"/>
+          <TableCell Name="Cell1616"/>
+          <TableCell Name="Cell1617"/>
+          <TableCell Name="Cell1618"/>
+          <TableCell Name="Cell1619"/>
+          <TableCell Name="Cell1620"/>
+          <TableCell Name="Cell1621"/>
+          <TableCell Name="Cell1622"/>
+          <TableCell Name="Cell1623"/>
+          <TableCell Name="Cell1624"/>
+          <TableCell Name="Cell1625"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter4" Top="541.2" Width="718.2" Height="18.9"/>
+  </ReportPage>
+</Report>

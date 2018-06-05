@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/06/2017 16:28:21" ReportInfo.Modified="04/17/2018 12:35:18" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="OBMMFO6_DEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQCShlcDV/bjmNdvrfE7Q/d4=">
+      <TableDataSource Name="Table" Alias="ReportData" DataType="System.Int32" Enabled="true" SelectCommand="select sx.*, &#13;&#10;dpt_bonus.get_MMFO_ZPcard_count(sx.rnk, sx.dep_dat_begin) cnt_zp,&#13;&#10;nvl(sx.bonus_wb,0) + greatest(nvl(sx.bonus_zp,0), nvl(sx.bonus_excl,0)) BONUS &#13;&#10;from (&#13;&#10;SELECT&#13;&#10;dd.deposit_id            &#13;&#10;, dd.dat_begin         &#13;&#10;, dd.kv                   &#13;&#10;, dd.acc                  &#13;&#10;, dv.vidd                 &#13;&#10;, dv.type_name            &#13;&#10;, dd.rnk                  &#13;&#10;, trunc(ir.bdat) bdat      &#13;&#10;, nvl(ir.ir, 0) ir        &#13;&#10;, nvl(ir.br, 0) br        &#13;&#10;, dd.kf                   &#13;&#10;, dd.wb                   &#13;&#10;, brwb.bonus_value_fact BONUS_WB &#13;&#10;, case when dv.type_cod = 'MPRG' then&#13;&#10;   (select nvl(max(ddc.dat_begin), dd.dat_begin)&#13;&#10;   from bars.dpt_deposit_clos ddc&#13;&#10;   where ddc.deposit_id = dd.deposit_id&#13;&#10;   and nvl(ddc.cnt_dubl,0) = trunc(nvl(dd.cnt_dubl,0)/12) * 12)&#13;&#10;   else dd.dat_begin end dep_dat_begin&#13;&#10;, brzp.bonus_value_fact BONUS_ZP &#13;&#10;, (select coalesce(to_char(min(t1.daos),'dd.mm.yyyy'),' - ') FROM bars.accounts t1 WHERE t1.rnk = dd.rnk&#13;&#10;   AND T1.NBS = '2625' AND T1.OB22 IN ('24', '27', '31') and (t1.dazs is null or t1.dazs &gt;:sFdat1) ) DAT_MIN_OPEN_ZP &#13;&#10;, (select coalesce(to_char(max(t2.dazs),'dd.mm.yyyy'),' - ') FROM bars.accounts t2 WHERE t2.rnk = dd.rnk&#13;&#10;   AND T2.NBS = '2625' AND T2.OB22 IN ('24', '27', '31')) DAT_MAX_CLOS_ZP &#13;&#10;, bars.kost(dd.acc, :sFdat1) OST &#13;&#10;, brsm.bonus_value_fact BONUS_EXCL &#13;&#10;, (lead(ir.bdat, 1, to_date('31.12.4999', 'DD.MM.YYYY')) over (partition by ir.acc order by ir.bdat))-1 pdat&#13;&#10;, nvl(lag(ir.ir, 1) over (partition by ir.acc order by ir.bdat),0) ex_ir&#13;&#10;, nvl(lag(ir.br, 1) over (partition by ir.acc order by ir.bdat),0) ex_br&#13;&#10;, nvl(lag(ir.bdat, 1) over (partition by ir.acc order by ir.bdat), ir.bdat) ex_bdat   &#13;&#10;FROM&#13;&#10;bars.dpt_deposit dd &#13;&#10;inner join bars.dpt_vidd dv on dv.vidd = dd.vidd&#13;&#10;left join (select * from  bars.dpt_bonus_requests br1&#13;&#10;          where br1.bonus_id = dpt_bonus.get_bonus_id('DPWB') and &#13;&#10;          trunc(br1.request_date) = :sFdat1 and br1.request_state = 'ALLOW' and br1.request_deleted = 'N') brwb on brwb.dpt_id = dd.deposit_id&#13;&#10;left join (select * from  bars.dpt_bonus_requests br2&#13;&#10;          where br2.bonus_id = dpt_bonus.get_bonus_id('DPZP') and&#13;&#10;          trunc(br2.request_date) = :sFdat1 and br2.request_state = 'ALLOW' and br2.request_deleted = 'N') brzp on brzp.dpt_id = dd.deposit_id&#13;&#10;left join (select * from  bars.dpt_bonus_requests br3 &#13;&#10;          where br3.bonus_id = dpt_bonus.get_bonus_id('EXCL') and&#13;&#10;          trunc(br3.request_date) = :sFdat1 and br3.request_state = 'ALLOW' and br3.request_deleted = 'N') brsm on brsm.dpt_id = dd.deposit_id  &#13;&#10;left join bars.int_ratn ir on ir.acc = dd.acc and id = 1         &#13;&#10;WHERE&#13;&#10;dd.deposit_id in ( select dpt_id from bars.dpt_bonus_requests dbr&#13;&#10;  where request_state = 'ALLOW'&#13;&#10;  and request_deleted = 'N'&#13;&#10;  and request_user = 1&#13;&#10;  and trunc(request_date) = :sFdat1&#13;&#10;  and dbr.kf = dd.kf ) &#13;&#10;) sx&#13;&#10;where sx.bdat between :sFdat1 and :sFdat1 + 1">
+        <Column Name="DEPOSIT_ID" DataType="System.Double" Format="Number"/>
+        <Column Name="DAT_BEGIN" DataType="System.DateTime"/>
+        <Column Name="KV" DataType="System.Int16"/>
+        <Column Name="ACC" DataType="System.Int64" Format="Number"/>
+        <Column Name="VIDD" DataType="System.Decimal"/>
+        <Column Name="TYPE_NAME" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="BDAT" DataType="System.DateTime" Format="Date"/>
+        <Column Name="IR" DataType="System.Decimal"/>
+        <Column Name="BR" DataType="System.Decimal"/>
+        <Column Name="KF" DataType="System.String"/>
+        <Column Name="WB" DataType="System.String"/>
+        <Column Name="BONUS_WB" DataType="System.Decimal"/>
+        <Column Name="CNT_ZP" DataType="System.Decimal"/>
+        <Column Name="BONUS_ZP" DataType="System.Decimal"/>
+        <Column Name="DAT_MIN_OPEN_ZP" DataType="System.Char"/>
+        <Column Name="DAT_MAX_CLOS_ZP" DataType="System.Char"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="BONUS_EXCL" DataType="System.Decimal"/>
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <Column Name="BONUS" DataType="System.Decimal"/>
+        <Column Name="EX_IR" DataType="System.Decimal"/>
+        <Column Name="EX_BR" DataType="System.Decimal"/>
+        <Column Name="EX_BDAT" DataType="System.DateTime"/>
+        <Column Name="DEP_DAT_BEGIN" DataType="System.DateTime"/>
+        <CommandParameter Name=":sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="22.02.2018"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="500" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15" Guides="1039.5">
+    <ReportTitleBand Name="ReportTitle1" Width="1814.4" Height="115.29">
+      <TextObject Name="Text2" Left="179.55" Top="9.45" Width="1266.3" Height="37.8" Text="Протокол установки бонусов к процентным ставкам по депозитам физ.лиц согласно пакета услуг &quot;Эксклюзивный&quot;" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TableObject Name="Table1" Top="66.15" Width="1786.05" Height="49.14" Border.Lines="Left, Right, Bottom" Border.Width="2">
+        <TableColumn Name="Column16" Width="47.25"/>
+        <TableColumn Name="Column17" Width="85.05"/>
+        <TableColumn Name="Column18" Width="75.6"/>
+        <TableColumn Name="Column19"/>
+        <TableColumn Name="Column66" Width="85.05"/>
+        <TableColumn Name="Column20" Width="217.35"/>
+        <TableColumn Name="Column21" Width="103.95"/>
+        <TableColumn Name="Column22" Width="103.95"/>
+        <TableColumn Name="Column23" Width="75.6"/>
+        <TableColumn Name="Column24"/>
+        <TableColumn Name="Column25" Width="75.6"/>
+        <TableColumn Name="Column26"/>
+        <TableColumn Name="Column27"/>
+        <TableColumn Name="Column28"/>
+        <TableColumn Name="Column29"/>
+        <TableColumn Name="Column30" Width="75.6"/>
+        <TableColumn Name="Column46"/>
+        <TableColumn Name="Column47" Width="85.05"/>
+        <TableColumn Name="Column48" Width="85.05"/>
+        <TableColumn Name="Column49" Width="75.6"/>
+        <TableColumn Name="Column50"/>
+        <TableColumn Name="Column51"/>
+        <TableRow Name="Row2" Height="49.14">
+          <TableCell Name="Cell16" Border.Lines="All" Border.Width="2" Text="Н/П" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell17" Border.Lines="All" Border.Width="2" Text="ID депозита" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" Border.Width="2" Text="Дата открытия" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="All" Border.Width="2" Text="Код валюты" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell66" Border.Lines="All" Border.Width="2" Text="ACC cчетa" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="All" Border.Width="2" Text="Вид вклада" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell21" Border.Lines="All" Border.Width="2" Text="РНК Клиента" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell22" Border.Lines="All" Text="Дата установки последней ставки" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="Left, Right, Top" Text="Инд. сост. (бонусы)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell24" Border.Lines="Left, Top" Text="Код базовой ставки" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell25" Border.Lines="All" Border.Width="2" Text="Инд. сост. (бонусы)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell26" Border.Lines="All" Border.Width="2" Text="Код базовой ставки" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="All" Border.Width="2" Text="МФО" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Border.Width="2" Text="WEB-банкинг" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="All" Border.Width="2" Text="Бонус за WEB" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="All" Border.Width="2" Text="Кол-во открытых ЗП-карт" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Width="2" Text="Бонус за ЗП" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" Border.Width="2" Text="Мин. из дат открытия ЗП-карты" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell48" Border.Lines="All" Border.Width="2" Text="Макс. из дат закрытия ЗП-карты" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell49" Border.Lines="All" Border.Width="2" Text="Остаток на счету" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell50" Border.Lines="All" Border.Width="2" Text="Бонус за сумму" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+          <TableCell Name="Cell51" Border.Lines="All" Border.Width="2" Text="Бонус (итог)" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="680.4" Top="47.25" Width="245.7" Height="18.9" Border.Lines="Left, Right, Top" Border.Width="2" Text="до работы джоба" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+      <TextObject Name="Text3" Left="1625.4" Top="18.9" Width="160.65" Height="18.9" Anchor="Top, Right" Text="[ReportData.BDAT]" Format="Date" Format.Format="d" HorzAlign="Right" Font="Arial, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="120.62" Width="1814.4" Height="20.79" CanGrow="true" CanShrink="true" Guides="37.8,0" DataSource="Table" KeepTogether="true">
+      <TableObject Name="Table1" Width="1786.05" Height="20.79" Border.Lines="All">
+        <TableColumn Name="Column31" Width="47.25"/>
+        <TableColumn Name="Column32" Width="85.05"/>
+        <TableColumn Name="Column33" Width="75.6"/>
+        <TableColumn Name="Column34"/>
+        <TableColumn Name="Column67" Width="85.05"/>
+        <TableColumn Name="Column35" Width="217.35"/>
+        <TableColumn Name="Column36" Width="103.95"/>
+        <TableColumn Name="Column37" Width="103.95"/>
+        <TableColumn Name="Column38" Width="75.6"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40" Width="75.6"/>
+        <TableColumn Name="Column41"/>
+        <TableColumn Name="Column42"/>
+        <TableColumn Name="Column43"/>
+        <TableColumn Name="Column44"/>
+        <TableColumn Name="Column45" Width="75.6"/>
+        <TableColumn Name="Column56"/>
+        <TableColumn Name="Column57" Width="85.05"/>
+        <TableColumn Name="Column58" Width="85.05"/>
+        <TableColumn Name="Column59" Width="75.6"/>
+        <TableColumn Name="Column60"/>
+        <TableColumn Name="Column61"/>
+        <TableRow Name="Row3" Height="20.79">
+          <TableCell Name="Cell31" Border.Lines="All" Text="[Row#]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="[ReportData.DEPOSIT_ID]" Font="Arial, 9pt"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="[ReportData.DAT_BEGIN]" Format="Date" Format.Format="d" Font="Arial, 9pt"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="[ReportData.KV]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell67" Border.Lines="All" Text="[ReportData.ACC]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" Font="Arial, 9pt"/>
+          <TableCell Name="Cell35" Border.Lines="All" Text="[ReportData.TYPE_NAME]" Font="Arial, 9pt"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="[ReportData.RNK]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" Font="Arial, 9pt"/>
+          <TableCell Name="Cell37" Border.Lines="All" Text="[ReportData.EX_BDAT]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="[ReportData.EX_IR]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="[ReportData.EX_BR]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="[ReportData.IR]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="[ReportData.BR]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="[ReportData.KF]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="[ReportData.WB]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="[ReportData.BONUS_WB]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="[ReportData.CNT_ZP]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell56" Border.Lines="All" Text="[ReportData.BONUS_ZP]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell57" Border.Lines="All" Text="[ReportData.DAT_MIN_OPEN_ZP]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell58" Border.Lines="All" Text="[ReportData.DAT_MAX_CLOS_ZP]" Format="Date" Format.Format="d" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="[ReportData.OST]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell60" Border.Lines="All" Text="[ReportData.BONUS_EXCL]" HorzAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell61" Border.Lines="All" Text="[ReportData.BONUS]" HorzAlign="Center" Font="Arial, 9pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>
