@@ -1,6 +1,10 @@
 prompt TRIGGER OFF
 begin
 execute immediate 'alter trigger TAIUD_ND_TXT_UPDATE disable';
+execute immediate 'alter trigger TBIU_NDTXT disable';
+execute immediate 'alter trigger TGR_ND_TXT disable';
+execute immediate 'alter trigger TIU_ND_TXT_CHECK disable';
+execute immediate 'alter trigger TI_ND_TXT_INS_VKR disable';
 end;
 /
 
@@ -98,5 +102,9 @@ END;
 prompt TRIGGER ON
 begin
 execute immediate 'alter trigger TAIUD_ND_TXT_UPDATE enable';
+execute immediate 'alter trigger TBIU_NDTXT enable';
+execute immediate 'alter trigger TGR_ND_TXT enable';
+execute immediate 'alter trigger TIU_ND_TXT_CHECK enable';
+execute immediate 'alter trigger TI_ND_TXT_INS_VKR enable';
 end;
 /
