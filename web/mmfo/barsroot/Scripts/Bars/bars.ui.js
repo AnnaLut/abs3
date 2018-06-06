@@ -506,7 +506,7 @@ bars.ui.handBook = function(tableName, func, options) {
 
 bars.ui.getMetaDataNdiTable = function (tableName, func, options) {
  options.accessCode = options.accessCode || 1;
-    options.hasCallbackFunction = options.hasCallbackFunction || true;
+    options.hasCallbackFunction = options.hasCallbackFunction === false ? false : true;
     options.funcId = options.funcId || '';
     options.filterCode = options.filterCode || '';
     options.code = options.code || '';
@@ -520,7 +520,7 @@ bars.ui.getMetaDataNdiTable = function (tableName, func, options) {
 
     else
         if (options.code)
-            url = bars.config.urlContent('/ndi/referencebook/GetRefBookData/?Code=') + options.code + '&externalFuncOnly=' + true + '&hasCallbackFunction=' + options.hasCallbackFunction + '&jsonSqlParams=' + options.jsonSqlParams;
+            url = bars.config.urlContent('/ndi/referencebook/GetRefBookData/?Code=') + options.code + '&externalFuncOnly=' + options.externalFuncOnly + '&hasCallbackFunction=' + options.hasCallbackFunction + '&jsonSqlParams=' + options.jsonSqlParams;
         else
         url = bars.config.urlContent('/ndi/referencebook/GetRefBookData/?accessCode=') + options.accessCode + '&tableName=' + tableName + '&hasCallbackFunction=' + options.hasCallbackFunction + '&jsonSqlParams=' + options.jsonSqlParams + '&nsiFuncId=' + options.funcId + '&filterCode=' + options.filterCode;
     if (options && options.width && options.height)
