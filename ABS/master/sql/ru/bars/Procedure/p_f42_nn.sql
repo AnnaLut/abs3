@@ -14,7 +14,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :  05/05/2018 (03/05/2018)
+% VERSION     :  06/09/2018 (05/05/2018)
 %------------------------------------------------------------------------
 % 02/03/2017 - для МФО=380388 (Платинум банк) изменил признак PR_BANK
 %              со значения "T" (временнаяй адм.) на "Л" (ликвидация)
@@ -194,7 +194,7 @@ IS
    link_code_     d8_cust_link_groups.link_code%type;
    link_codepp_   d8_cust_link_groups.link_code%type;
    link_codep1_   d8_cust_link_groups.link_code%type;
-   
+
    link_name_     d8_cust_link_groups.groupname%type;
 
    ---Остатки код 01, 02, 03, 04, 06
@@ -209,12 +209,12 @@ IS
         from otc_c5_proc o
         join customer c
         on (c.rnk = o.rnk)
-        left outer join d8_cust_link_groups d       
+        left outer join d8_cust_link_groups d
         on (trim(c.okpo) = trim(d.okpo))
         where o.datf = dat_
-        group by NVL(d.link_group, c.rnk), 
-                 NVL(d.link_code, '000'), 
-                 NVL(d.groupname, c.nmk), 
+        group by NVL(d.link_group, c.rnk),
+                 NVL(d.link_code, '000'),
+                 NVL(d.groupname, c.nmk),
                  DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)
         having sum(decode(substr(kodp, 1, 1), '1', -1, 1)*znap)<0)
             union all
@@ -245,10 +245,10 @@ IS
                  (our_okpo_ = '0' or NVL(ltrim(c.okpo, '0'),'X') <> our_okpo_ or a.ddd='006' and (a.nls like '3%' or a.nls like '4%')) AND
                  (prnk_ IS NULL OR c.rnk = prnk_) and
                  a.ddd='006'
-           GROUP BY a.ddd, 
-                    NVL(d.link_group, c.rnk), 
+           GROUP BY a.ddd,
+                    NVL(d.link_group, c.rnk),
                     NVL(d.link_code, '000'),
-                    NVL(d.groupname, c.nmk),  
+                    NVL(d.groupname, c.nmk),
                     DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)) a
     ) s
     group by  s.ddd, s.rnk, s.link_code, s.link_name, s.prins
@@ -779,14 +779,14 @@ BEGIN
            txt = TO_CHAR (rnk_);
 
          pr_f8b_ := 0;
-         
+
          if link_code_ <> '000' then
              SELECT COUNT (*)
                 INTO pr_f8b_
              FROM KL_F8B
              WHERE nvl(link_group, rnk) = rnk_;
          end if;
-         
+
          if rnk_ = 90092301 then
             pr_f8b_ := 1;
          end if;
@@ -901,7 +901,7 @@ BEGIN
                          else
                             kodp_ := '05' || LPAD (nnnn01_, 4, '0') || '000';
                          end if;
-                         
+
                          INSERT INTO RNBU_TRACE
                                   (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
                            VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
@@ -1526,19 +1526,19 @@ BEGIN
 
    IF TO_NUMBER (znapp_) > 0
    THEN
-      kodpp_ := '01' || LPAD (TO_CHAR (nnnn01_ + 1), 4, '0');
+      kodpp_ := '01' || LPAD (TO_CHAR (nnnn01_ + 1), 4, '0') || '000';
 
       INSERT INTO RNBU_TRACE
                   (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm
                   )
            VALUES (nlspp_, 0, dat_, kodpp_, znapp_, rnkp_, rnkp_, link_codepp_, comm_pp_
                   );
-                  
+
     --- 03.11.2008 - по замечанию Петрокомерца не нужно формировать показатель 05 для максимального заемщика,
     --- который меньше 25%
 
       IF s_zalp_ >= 0 THEN
-         kodpp_ := '05' || LPAD (TO_CHAR (nnnn01_ + 1), 4, '0');
+         kodpp_ := '05' || LPAD (TO_CHAR (nnnn01_ + 1), 4, '0') || '000';
 
          INSERT INTO RNBU_TRACE
                   (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm
@@ -1553,7 +1553,7 @@ BEGIN
    --- который меньше 25% и нет обеспечения
    IF TO_NUMBER (znapp1_) > 0
    THEN
-      kodpp_ := '01' || LPAD (TO_CHAR (nnnn01_ + 2), 4, '0');
+      kodpp_ := '01' || LPAD (TO_CHAR (nnnn01_ + 2), 4, '0') || '000';
 
       INSERT INTO RNBU_TRACE
                   (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm
@@ -1561,7 +1561,7 @@ BEGIN
            VALUES (nlspp1_, 0, dat_, kodpp_, znapp1_, rnkp1_, rnkp1_, link_codep1_, comm_pp1_
                   );
 
-         kodpp_ := '05' || LPAD (TO_CHAR (nnnn01_ + 2), 4, '0');
+         kodpp_ := '05' || LPAD (TO_CHAR (nnnn01_ + 2), 4, '0') || '000';
 
          INSERT INTO RNBU_TRACE
                   (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm
@@ -1866,9 +1866,9 @@ BEGIN
               order by substr(kodp,1,2), to_number(znap) DESC, rnk )
     loop
         -- в поле COMM (комментарий) заполняем название клиента
-        update rnbu_trace 
-        set comm = substr((case when nvl(nbuc, '000') = '000' 
-                                then (select c.nmk 
+        update rnbu_trace
+        set comm = substr((case when nvl(nbuc, '000') = '000'
+                                then (select c.nmk
                                       from customer c
                                       where c.rnk = k.rnk)||' '
                                 else ''
@@ -1879,7 +1879,7 @@ BEGIN
         then
            if substr(k.kodp,1,2) = '01' then
               nnnn01_ := nnnn01_ + 1;
-              
+
               if Dat_ < dat_Zm4_ then
                  update rnbu_trace set
                     kodp = substr(k.kodp,1,2)||LPAD (TO_CHAR (nnnn01_), 4, '0')
@@ -1898,7 +1898,7 @@ BEGIN
                     substr(kodp,1,2) in ('01','03') and
                     substr(kodp,1,2) <> substr(k.kodp,1,2) and
                     rownum = 1 ;
-                    
+
                     if type_ <> 0 then
                        nnnn01_ := nnnn01_+1;
                        nnnn1_ := nnnn01_;
@@ -1907,7 +1907,7 @@ BEGIN
                     nnnn01_ := nnnn01_+1;
                     nnnn1_ := nnnn01_;
                  END;
-                 
+
                  if Dat_ < dat_Zm4_ then
                     update rnbu_trace set
                        kodp=substr(k.kodp,1,2)||LPAD (TO_CHAR (nnnn1_), 4, '0')
@@ -1974,7 +1974,7 @@ BEGIN
     select /*+ leading(o) */
          dat_ odate, o.nls, o.kv, b.kodp,
          decode(substr(o.kodp,1,1),'1', -1, 1) * o.znap znap,
-         o.rnk, nvl(d.link_code, '000'), o.nd, b.group_num ref, o.acc, 
+         o.rnk, nvl(d.link_code, '000'), o.nd, b.group_num ref, o.acc,
          (case when (substr(o.kodp,2,4) like '___9' or
                      substr(o.kodp,2,4) in ('1890','2890','3590','3690','3692')) and
                      substr(o.kodp,1,1) = '2'
