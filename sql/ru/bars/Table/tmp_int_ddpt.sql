@@ -12,7 +12,7 @@ BEGIN
 
  begin
    execute immediate 'CREATE TABLE tmp_int_ddpt AS
-(select d.deposit_id, d.dat_begin, d.vidd, d.acc, d.kv, d.rnk, d.kf, d.branch, d.cnt_dubl,
+(select d.deposit_id, d.dat_begin, d.vidd, d.acc, d.kv, d.rnk, d.kf, d.branch, nvl(d.cnt_dubl,0) cnt_dubl,
 -999 open_zp_cnt,
 d.wb,
 ir.br,
@@ -22,16 +22,16 @@ dv.extension_id ext_id,
 -999 bonus,
 ''                                                                                                                                                                                                                 '' note
 from bars.dpt_deposit d
-inner join bars.accounts ac on ac.acc = d.acc and ac.kf = d.kf
+inner join bars.accounts ac on ac.acc = d.acc and ac.kf = d.kf and ac.nbs = ''2630''
 inner join bars.int_ratn ir on ir.acc = d.acc and ir.br is not null
-inner join bars.brates br on br.br_id = ir.br 
+inner join bars.brates br on br.br_id = ir.br and br.br_type = 1
 inner join bars.dpt_vidd dv on dv.vidd = d.vidd
-inner join bars.dpt_types dt on dt.type_id = dv.type_id and dt.type_code <> ''AKC''
-where d.dat_begin >= to_date(''28.02.2017'',''DD.MM.YYYY'')
+inner join bars.dpt_types dt on dt.type_id = dv.type_id 
+where 1=1
+and d.dat_begin >= to_date(''28.02.2017'',''DD.MM.YYYY'')
 and (d.dat_end is null or d.dat_end > trunc(sysdate))
-and ir.bdat = (select max(bdat) from bars.int_ratn where acc = ir.acc)
-and br.br_type = 1
-and ac.nbs = ''2630'')';
+and ir.bdat = (select max(bdat) from bars.int_ratn where acc = ir.acc))';
+and dt.type_code not in (''AKC'',''MPRG'')
 
 exception
   when OTHERS then 

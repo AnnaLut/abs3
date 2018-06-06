@@ -6,6 +6,7 @@ PROMPT =========================================================================
 create or replace procedure dpt_bonus_addit is
   l_title constant varchar2(16) := 'dpt_bonus_addit:';
   l_bonusval  number;
+  l_totalbonus number;
   l_bonus_cnt number;
   p_dat       DATE := trunc(sysdate);
   l_prev_bdat Date := dat_next_u(trunc(sysdate) , -1);
@@ -16,9 +17,11 @@ create or replace procedure dpt_bonus_addit is
 
   -- v 1.3 13.09.2017 - by Petrishe
   -- v 2.9 01.03.2018 - by Livshyts
-  -- v 3.0 16.03.2018 - by Livshyts 
+  -- v 3.0 16.03.2018 - by Livshyts
   --== Переделан основной запрос, отбирающий депозиты, чтобы выбирались не все, у кого сумма изменилась и попала в бонусную сетку,
   --== а только те, что "перескочили ступеньку" и у них должен поменяться бонус
+  -- v 3.1 24.05.2018 - by Livshyts
+  --== Добавлено условие - для ступенчатых ставок бонус не должен уменьшаться
 
 BEGIN
   bc.go('/');
@@ -26,7 +29,7 @@ BEGIN
     bc.go(cur.kf);
     bars_audit.trace('%s РУ = %s', l_title, cur.kf);
 
-    For i in ( 
+    For i in (
        with op as (select distinct dp.dpt_id, case when trunc(o.pdat) = o.bdat then o.bdat else trunc(o.pdat) end pdat
                    from bars.dpt_payments dp,
                         bars.oper         o
@@ -48,12 +51,13 @@ BEGIN
               dd.branch,
               dd.cnt_dubl,
               dd.dat_end,
-              dt.type_code, 
+              dd.datz,
+              dt.type_code,
               dt.type_id,
               bs.val,
               nvl(dv.extension_id, 0) ext_id,
               dv.duration,
-	      op.pdat
+        op.pdat
        FROM bars.dpt_deposit  dd,
             bars.dpt_vidd     dv,
             bars.dpt_types    dt,
@@ -62,7 +66,7 @@ BEGIN
        WHERE dd.vidd = dv.vidd
          and dt.type_id = dv.type_id
          and dt.type_code <> 'AKC'      -- не акционный
-         and dd.deposit_id = op.dpt_id 
+         and dd.deposit_id = op.dpt_id
          and (dd.dat_end is null or dd.dat_end > p_dat)
          and bs.dpt_type = dt.type_id
          and bs.kv = dd.kv
@@ -99,11 +103,11 @@ BEGIN
                     to_char(l_brate), to_char(l_irate), to_char(l_brtype));
 
     if l_brate > 0 then      -- #1 исключаем индивидуальные ставки
-      if (l_brtype = 'TIER' and l_irate > 0.5) then        --#2 должно быть: если ступенчатая и бонус больше 0.5 , то пропускаем. 
+      if (l_brtype = 'TIER' and l_irate > 0.5) then        --#2 должно быть: если ступенчатая и бонус больше 0.5 , то пропускаем.
         null;
       elsif l_brtype = 'FORMULA' then        --#2
         null;
-      else --#2 плоские ставки и ступенчатые с бонусом 0.5 и меньше 
+      else --#2 плоские ставки и ступенчатые с бонусом 0.5 и меньше
 
         l_bonusval := 0;
         bc.go(i.kf);
@@ -112,16 +116,30 @@ BEGIN
         dpt_bonus.set_bonus(i.deposit_id); -- рассчитываем бонус
         commit;
         bars_audit.trace('%s льготы рассчитаны', l_title);
-        bars_audit.trace('%s поиск бонусной процентной ставки, не требующей подтверждения', l_title);
-
-        delete from dpt_depositw
+        
+        SELECT nvl(sum(bonus_value_fact),0)
+         INTO l_totalbonus
+         FROM dpt_bonus_requests
+         WHERE dpt_id = i.deposit_id
+           AND request_state = 'ALLOW'
+           AND request_deleted = 'N';
+         bars_audit.trace('%s суммарная льгота = %s', l_title, to_char(l_totalbonus));
+         
+        -- если депозит ступенчатый, ставка не должна уменьшаться
+        if (l_brtype = 'TIER' and l_totalbonus > l_irate) or (l_brtype <> 'TIER') then 
+        --поэтому, если ставка ступенчата и бонус больше, чем есть или ставка не ступенчатая
+        --устанавливаем бонус
+         delete from dpt_depositw
            where tag = 'BONUS'
              and DPT_ID = i.deposit_id;
         DPT_BONUS.SET_BONUS_RATE(i.deposit_id, i.pdat + 1, l_bonusval);
         bars_audit.trace('%s встановлена бонусна ставка = %s',
                            l_title,
                            to_char(l_bonusval));
-
+        else 
+          null;                   
+        end if;  
+        
         -- если прогрессивный
         if i.type_code = 'MPRG' then       --#3
 
@@ -129,7 +147,16 @@ BEGIN
             select *
               into l_indrate --индивидуальная ставка для этого кол-ва пролонгаций
               from bars.Dpt_Vidd_Extdesc dve
-             where dve.base_rate = l_brate
+             where 1=1
+              and case when method_id not in (5, 9) then base_rate
+                       else (select v.br_id
+                             from bars.dpt_vidd_update v
+                             where v.vidd = i.vidd
+                                  and dateu = (select max(dateu)
+                                               from bars.dpt_vidd_update v
+                                               where v.vidd = i.vidd
+                                                and dateu <= i.datz + 0.99999))
+                           end = l_brate
                and dve.ext_num = i.cnt_dubl
                and dve.type_id = i.ext_id;
 
@@ -157,12 +184,11 @@ BEGIN
           end;
 
            begin
-              INSERT INTO dpt_depositw (dpt_id, tag, value, branch)
-              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval), i.branch);
+              INSERT INTO dpt_depositw (dpt_id, tag, value)
+              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval));
            exception when dup_val_on_index then
               update dpt_depositw
-              set value = to_char(l_bonusval),
-               branch = i.branch
+              set value = to_char(l_bonusval)
               where tag = 'BONUS' and dpt_id = i.deposit_id;
             end;
             bars_audit.trace('%s значение бонуса записано в доп.реквизиты вклада', l_title);
