@@ -36,7 +36,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         private ICLRelatedCustomersRepository _relaredCustRepository;
         private ICLRelatedCustomerValidator _relCustValidator;
         private IUserCertificateService _userCertificateService;
-        //private readonly IDbLogger _logger;
+        private readonly IDbLogger _logger;
 
         public CLRelatedCustomersController(
             ICustomersRepository custRepository,
@@ -44,14 +44,14 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             ICLRelatedCustomersRepository relaredCustRepository,
             ICLRelatedCustomerValidator relCustValidator,
             IUserCertificateService userCertificateService
-            /*,IDbLogger logger*/)
+            , IDbLogger logger)
         {
             _commonrelaredCustRepository = commonRelatedCustomerRepository;
             _relaredCustRepository = relaredCustRepository;
             _relCustValidator = relCustValidator;
             _custRepository = custRepository;
             _userCertificateService = userCertificateService;
-            //logger = logger;
+            _logger = logger;
         }
 
         //HACK: Moved to Common
@@ -215,9 +215,13 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                 }
 
                 _relaredCustRepository.Add(relatedCustomer);
-                //_logger.Info(string.Format(
-                //    "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
-                //    relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
+                _logger.Info(string.Format(
+                    "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
+                    relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
+
+                _logger.Info(string.Format(
+                    "Користувачу Id:{0} надано доступ до клієнта RNK:{1}, номер підпису:{2}",
+                    relatedCustomer.Id, relatedCustomer.CustId, relatedCustomer.SignNumber));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -261,9 +265,9 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
 
                 _relaredCustRepository.Update(relatedCustomer);
 
-                //_logger.Info(string.Format(
-                //    "Відредаговано дані користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
-                //    id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
+                _logger.Info(string.Format(
+                    "Відредаговано дані користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
+                    id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -293,9 +297,9 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                         "Користувач вже прикріплений до клієнта");
                 }
                 _relaredCustRepository.MapRelatedCustomerToUser(null, custId, id, signNumber);
-                //_logger.Info(string.Format(
-                //    "Користувачу Id:{0} надано доступ до клієнта RNK:{1}, номер підпису:{2}",
-                //    id, custId, signNumber));
+                _logger.Info(string.Format(
+                    "Користувачу Id:{0} надано доступ до клієнта RNK:{1}, номер підпису:{2}",
+                    id, custId, signNumber));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -319,8 +323,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             {
                 _relaredCustRepository.SetRelatedCustomerApproved(id, custId, false, "delete");
 
-                //_logger.Info(string.Format(
-                //    "Підтверджено видалення користувача Id:{0}", id));
+                _logger.Info(string.Format(
+                    "Підтверджено видалення користувача Id:{0}", id));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -373,8 +377,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
 
                 _relaredCustRepository.VisaMapedRelatedCustomerToUser(id, custId);
 
-                //_logger.Info(string.Format(
-                //    "Бек офісом підтверджено картку клієнта Id:{0}, RNK:{1}", id, custId));
+                _logger.Info(string.Format(
+                    "Бек офісом підтверджено картку нового користувача Id:{0}, RNK:{1}", id, custId));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -412,8 +416,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
 
                 _relaredCustRepository.VisaMapedRelatedCustomerToExistUser(id, custId, userId);
 
-                //_logger.Info(string.Format(
-                //    "Бек офісом підтверджено картку клієнта Id:{0}, RNK:{1}, userId:{2}", id, custId, userId));
+                _logger.Info(string.Format(
+                    "Бек офісом підтверджено картку користувача Id:{0}, RNK:{1}, userId:{2}", id, custId, userId));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -428,23 +432,23 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [DELETE("api/cdo/corplight/RelatedCustomers/{id}")]
-        public HttpResponseMessage Delete(decimal id)
-        {
-            try
-            {
-                _relaredCustRepository.Delete(id);
+        //[HttpDelete]
+        //[DELETE("api/cdo/corplight/RelatedCustomers/{id}")]
+        //public HttpResponseMessage Delete(decimal id)
+        //{
+        //    try
+        //    {
+        //        _relaredCustRepository.Delete(id);
 
-                //_logger.Info(string.Format(
-                //    "Видалено користувача Id:{0}", id));
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
+        //        _logger.Info(string.Format(
+        //            "Видалено користувача Id:{0}", id));
+        //        return Request.CreateResponse(HttpStatusCode.OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
 
         [HttpPost]
         [POST("api/cdo/corplight/RelatedCustomers/requestCertificate/{relCustId}")]
@@ -467,8 +471,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             {
                 _relaredCustRepository.SetRelatedCustomerApproved(relCustId, customerId, false, "rejected");
 
-                //_logger.Info(string.Format(
-                //    "Відхилено запит на підтвердження змін по користувачу Id:{0}", relCustId));
+                _logger.Info(string.Format(
+                    "Відхилено запит на підтвердження змін по користувачу Id:{0}", relCustId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

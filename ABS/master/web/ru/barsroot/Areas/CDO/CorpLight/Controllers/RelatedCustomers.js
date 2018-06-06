@@ -169,7 +169,7 @@ angular.module(globalSettings.modulesAreas)
                         if (response) {
                             vm.currentUser = response;
                             vm.currentUser.isConfirmedPhone = true;
-                            vm.currentUser.isExistUser = true;
+                            vm.currentUser.isExistUser = !!response.UserId;
                             SetDropDocListValue();
                             if (calbackFunc) {
                                 calbackFunc.apply();
@@ -435,56 +435,56 @@ angular.module(globalSettings.modulesAreas)
                     }
                 }
             }
+            //Знаходиться в CommonRelCustController.js
+            //var visaExistingUser = function (relCustId, custId, userId) {
+            //    bars.ui.loader('body', true);
+            //    relatedCustomersService.visaExistingUser(relCustId, custId, userId)
+            //        .then(
+            //        function (response) {
+            //            bars.ui.loader('body', false);
+            //            bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+            //            vm.relatedCustomersGrid.dataSource.read();
 
-            var visaExistingUser = function (relCustId, custId, userId) {
-                bars.ui.loader('body', true);
-                relatedCustomersService.visaExistingUser(relCustId, custId, userId)
-                    .then(
-                    function (response) {
-                        bars.ui.loader('body', false);
-                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                        vm.relatedCustomersGrid.dataSource.read();
-
-                    },
-                    function (response) {
-                        bars.ui.loader('body', false);
-                        bars.ui.notify('Помилка',
-                            response.ExceptionMessage || response.Message || response,
-                            'error');
-                    }
-                    );
-            }
-
-            $scope.visaMapedCustomers = vm.visaMapedCustomers =
-                function (relCustId, custId) {
-                    vm.currentUser = vm.relatedCustomersGrid.dataSource.get(relCustId);
-                    vm.currentUser.isConfirmedPhone = true;
-                    if (validate()) {
-                        bars.ui.loader('body', true);
-                        relatedCustomersService.visaMapedCustomer(relCustId, custId)
-                            .then(
-                            function (response) {
-                                bars.ui.loader('body', false);
-                                if (response.Status === 'ERROR' && response.Data) {
-                                    bars.ui.confirm({ text: response.Message + ' Бажаєте надати доступ цьому користувачеві?' },
-                                        function () {
-                                            visaExistingUser(relCustId, custId, response.Data.Id);
-                                        });
-                                } else {
-                                    bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                                    vm.relatedCustomersGrid.dataSource.read();
-                                }
-                            },
-                            function (response) {
-                                bars.ui.loader('body', false);
-                                bars.ui.notify('Помилка',
-                                    response.ExceptionMessage || response.Message || response,
-                                    'error');
-                            }
-                            );
-                    }
-                    vm.currentUser = new RelatedCustomer();
-                }
+            //        },
+            //        function (response) {
+            //            bars.ui.loader('body', false);
+            //            bars.ui.notify('Помилка',
+            //                response.ExceptionMessage || response.Message || response,
+            //                'error');
+            //        }
+            //        );
+            //}
+            //Знаходиться в CommonRelCustController.js
+            //$scope.visaMapedCustomers = vm.visaMapedCustomers =
+            //    function (relCustId, custId) {
+            //        vm.currentUser = vm.relatedCustomersGrid.dataSource.get(relCustId);
+            //        vm.currentUser.isConfirmedPhone = true;
+            //        if (validate()) {
+            //            bars.ui.loader('body', true);
+            //            relatedCustomersService.visaMapedCustomer(relCustId, custId)
+            //                .then(
+            //                function (response) {
+            //                    bars.ui.loader('body', false);
+            //                    if (response.Status === 'ERROR' && response.Data) {
+            //                        bars.ui.confirm({ text: response.Message + ' Бажаєте надати доступ цьому користувачеві?' },
+            //                            function () {
+            //                                visaExistingUser(relCustId, custId, response.Data.Id);
+            //                            });
+            //                    } else {
+            //                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+            //                        vm.relatedCustomersGrid.dataSource.read();
+            //                    }
+            //                },
+            //                function (response) {
+            //                    bars.ui.loader('body', false);
+            //                    bars.ui.notify('Помилка',
+            //                        response.ExceptionMessage || response.Message || response,
+            //                        'error');
+            //                }
+            //                );
+            //        }
+            //        vm.currentUser = new RelatedCustomer();
+            //    }
 
             vm.showClUserForm = function (custId,
                 userId,
@@ -737,23 +737,23 @@ angular.module(globalSettings.modulesAreas)
                     );
                 });
             }
-
-            $scope.deleteRequest = vm.deleteRequest = function (id, customerId) {
-                bars.ui.confirm({ text: 'Видалити запит на підтвердження даних?' }, function () {
-                    relatedCustomersService.deleteRequest(id, customerId).then(
-                        function () {
-                            bars.ui.notify('Успішно', 'Зміни збережено', 'success');
-                            vm.relatedCustomersGrid.dataSource.read();
-                        },
-                        function (response) {
-                            bars.ui.notify('Помилка',
-                                'Помилка обробки запиту <small>' +
-                                (response.Message || response.ErrorMessage || '') + '</small>',
-                                'error');
-                        }
-                    );
-                });
-            }
+            //Знаходиться в CommonRelCustController.js
+            //$scope.deleteRequest = vm.deleteRequest = function (id, customerId) {
+            //    bars.ui.confirm({ text: 'Видалити запит на підтвердження даних?' }, function () {
+            //        relatedCustomersService.deleteRequest(id, customerId).then(
+            //            function () {
+            //                bars.ui.notify('Успішно', 'Зміни збережено', 'success');
+            //                vm.relatedCustomersGrid.dataSource.read();
+            //            },
+            //            function (response) {
+            //                bars.ui.notify('Помилка',
+            //                    'Помилка обробки запиту <small>' +
+            //                    (response.Message || response.ErrorMessage || '') + '</small>',
+            //                    'error');
+            //            }
+            //        );
+            //    });
+            //}
 
             vm.requestCertificate = $scope.requestCertificate = function (relCustId) {
                 if (relCustId) {

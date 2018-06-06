@@ -23,17 +23,17 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         private IUserCertificateService _certeficateService;
         private ICLRelatedCustomersRepository _relCustRopository;
         private IProfileSignRepository _profileSignRepository;
-        //private readonly IDbLogger _logger;
+        private readonly IDbLogger _logger;
         public CLProfileSignController(
             IUserCertificateService certeficateService,
             ICLRelatedCustomersRepository relCustRopository,
             IProfileSignRepository profileSignRepository
-            /*,IDbLogger logger*/)
+            , IDbLogger logger)
         {
             _certeficateService = certeficateService;
             _relCustRopository = relCustRopository;
             _profileSignRepository = profileSignRepository;
-            //_logger = logger;
+            _logger = logger;
         }
         /// <summary>
         /// Get related customer
@@ -130,9 +130,9 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                 profileSignature.VisaDate = DateTime.Now;
                 profileSignature.UserId = User.Identity.Name;
                 _profileSignRepository.Add(profileSignature);
-                //_logger.Info(String.Format(
-                //    "Накладено підпис на профіль користувача CustomerId:{0}, VisaId:{1}, UserId:{2}", 
-                //    profileSignature.CustomerId, profileSignature.VisaId, profileSignature.UserId));
+                _logger.Info(String.Format(
+                    "Накладено підпис на профіль користувача CustomerId:{0}, VisaId:{1}, UserId:{2}",
+                    profileSignature.CustomerId, profileSignature.VisaId, profileSignature.UserId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -155,9 +155,9 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             {
                 _profileSignRepository.Delete(custId, visaId);
 
-                //_logger.Info(String.Format(
-                //    "Видалено підпис з профіля користувача CustomerId:{0}, VisaId:{1}",
-                //    custId, visaId));
+                _logger.Info(String.Format(
+                    "Видалено підпис з профіля користувача CustomerId:{0}, VisaId:{1}",
+                    custId, visaId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

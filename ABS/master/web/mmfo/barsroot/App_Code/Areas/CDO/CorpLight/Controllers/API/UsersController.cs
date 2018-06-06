@@ -36,7 +36,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         private readonly IUsersManage<string, string> _usersManage;
         private readonly ICLRelatedCustomersRepository _relatedCustRepository;
         private readonly IBanksRepository _bankRepository;
-        //private readonly IDbLogger _logger;
+        private readonly IDbLogger _logger;
         private readonly ICLCustomersRepository _customersRepository;
         private readonly string corpLightExMessage = "Виникла помилка під час запросу до сервісу CorpLight. Зверніться до адміністратора.";
 
@@ -44,13 +44,13 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             ICLRelatedCustomersRepository relatedCustomersRepository,
             IBanksRepository bankRepository,
             ICorpLightUserManageService corpLightUserManageService,
-            //IDbLogger logger,
+            IDbLogger logger,
             ICLCustomersRepository customersRepository)
         {
             _relatedCustRepository = relatedCustomersRepository;
             _bankRepository = bankRepository;
             _usersManage = corpLightUserManageService.GetCorpLightUserManage();
-            //_logger = logger;
+            _logger = logger;
             _customersRepository = customersRepository;
             SslValidation();
         }
@@ -211,76 +211,76 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        [HttpPost]
-        [POST("api/cdo/corplight/Users/AddNewUser")]
-        public BankingUser AddNewUser(CreateUserModel user)
-        {
-            try
-            {
-                var customer = _customersRepository.Get(user.CustId.Value);
-                user.Customers[0].EDRPO = customer.CL_OKPO;
+        //[HttpPost]
+        //[POST("api/cdo/corplight/Users/AddNewUser")]
+        //public BankingUser AddNewUser(CreateUserModel user)
+        //{
+        //    try
+        //    {
+        //        var customer = _customersRepository.Get(user.CustId.Value);
+        //        user.Customers[0].EDRPO = customer.CL_OKPO;
 
-                BankingUser result = null;
-                try
-                {
-                    result = _usersManage.AddUser(user, ((long)user.CustId).ToString());
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
-                }
-                //_logger.Info(string.Format(
-                //    "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
-                //    result.Id, result.TaxCode, result.PhoneNumber, result.Email));
+        //        BankingUser result = null;
+        //        try
+        //        {
+        //            result = _usersManage.AddUser(user, ((long)user.CustId).ToString());
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
+        //        }
+        //        //_logger.Info(string.Format(
+        //        //    "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
+        //        //    result.Id, result.TaxCode, result.PhoneNumber, result.Email));
 
-                var rnk = Convert.ToDecimal(user.CustId);
-                _relatedCustRepository.MapRelatedCustomerToUser(
-                    result.Id,
-                    rnk,
-                    user.RelatedCustId.Value,
-                    user.IsExistCust.Value);
+        //        var rnk = Convert.ToDecimal(user.CustId);
+        //        _relatedCustRepository.MapRelatedCustomerToUser(
+        //            result.Id,
+        //            rnk,
+        //            user.RelatedCustId.Value,
+        //            user.IsExistCust.Value);
 
-                //_logger.Info(string.Format(
-                //    "Користувачу ID:{0} надано доступ до клієнта RNK:{1}", result.Id, rnk));
+        //        //_logger.Info(string.Format(
+        //        //    "Користувачу ID:{0} надано доступ до клієнта RNK:{1}", result.Id, rnk));
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
-        /// <summary>
-        /// Update user
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [PUT("api/cdo/corplight/Users/UpdateUser/{customerId}")]
-        public BankingUser UpdateUser(CreateUserModel user, string customerId)
-        {
-            try
-            {
-                // TODO update client part !
-                var customer = _customersRepository.Get(user.CustId.Value);
-                user.Customers[0].EDRPO = customer.CL_OKPO;
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
+        ///// <summary>
+        ///// Update user
+        ///// </summary>
+        ///// <param name="user"></param>
+        ///// <returns></returns>
+        //[HttpPut]
+        //[PUT("api/cdo/corplight/Users/UpdateUser/{customerId}")]
+        //public BankingUser UpdateUser(CreateUserModel user, string customerId)
+        //{
+        //    try
+        //    {
+        //        // TODO update client part !
+        //        var customer = _customersRepository.Get(user.CustId.Value);
+        //        user.Customers[0].EDRPO = customer.CL_OKPO;
 
-                try
-                {
-                    var result = _usersManage.UpdateUser(user, customerId);
-                    //_logger.Info(string.Format("Оновлено дані по користувачу ID:{0}", result.Id));
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
+        //        try
+        //        {
+        //            var result = _usersManage.UpdateUser(user, customerId);
+        //            //_logger.Info(string.Format("Оновлено дані по користувачу ID:{0}", result.Id));
+        //            return result;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
 
         /// <summary>
         /// Lock user
@@ -296,8 +296,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             {
                 _usersManage.LockUserCustomer(userId, customerId);
 
-                //_logger.Info(string.Format(
-                //    "Користувачу ID:{0} заблоковано доступ до клієнта RNK:{1}", userId, customerId));
+                _logger.Info(string.Format(
+                    "Користувачу ID:{0} заблоковано доступ до клієнта RNK:{1}", userId, customerId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -320,8 +320,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             try
             {
                 _usersManage.UnLockUserCustomer(userId, customerId);
-                //_logger.Info(string.Format(
-                //    "Користувачу ID:{0} розблоковано доступ до клієнта RNK:{1}", userId, customerId));
+                _logger.Info(string.Format(
+                    "Користувачу ID:{0} розблоковано доступ до клієнта RNK:{1}", userId, customerId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -349,17 +349,18 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                     try
                     {
                         _usersManage.DeleteUserCustomer(userId, customerId.ToString());
+                        _logger.Info(string.Format(
+                        "Користувачу ID:{0} видалено доступ до клієнта RNK:{1}", userId, customerId));
                     }
                     catch (Exception ex)
                     {
                         throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
-                    }//_logger.Info(string.Format(
-                    //    "Користувачу ID:{0} видалено доступ до клієнта RNK:{1}", userId, customerId));
+                    }
                 }
 
                 _relatedCustRepository.RemoveRelatedCustomer(relCustId, customerId);
-                //_logger.Info(string.Format(
-                //    "Видалено користувач relCustId:{0} прикріпленого до клієнта RNK:{1}", relCustId, customerId));
+                _logger.Info(string.Format(
+                    "Видалено користувач relCustId:{0} прикріпленого до клієнта RNK:{1}", relCustId, customerId));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
 
