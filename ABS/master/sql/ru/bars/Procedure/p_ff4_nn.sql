@@ -3,11 +3,13 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 05/01/2018 (04/01/2018, 03/01/2018, 14/11/2017)
+% VERSION     : 05/06/2018 (05/01/2018, 04/01/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+05/06/2018 - тимчасово добавлено блок для перевірки наявності показника
+             в TMP_NBU файлу #3A за дату для рахунків овердрафтів
 05/01/2018 - перекодируем старые балансовые счета на новые и для 
              нерезидентов заполняем K072 значениями N3 или N7 или N8 
 04/01/2018 - параметры K072 и D020 будут формироваться 2-х значными 
@@ -106,7 +108,7 @@ CURSOR SaldoAOd IS
            nvl(trim(P.R013), '0') r013, 
            fs180(c.acc, substr(c.nls,1,1), a.odate) s180R, d.codcagent
     FROM rnbu_history a, accounts c, specparam p, customer d
-    WHERE a.odate between DAT1_ + 1 and Dat_
+    WHERE a.odate between DAT1_ and Dat_
      AND (a.dos+a.kos != 0 OR a.ost != 0)
      AND nvl(a.ints,0) >= 0
      and a.acc = c.acc
@@ -129,7 +131,7 @@ CURSOR SaldoAOd IS
 	 AND a.acc = c.acc
 	 AND (a.dos+a.kos != 0  OR   a.ost != 0)
 	 AND nvl(a.ints,0)>=0
-	 AND a.odate between DAT1_ + 1 and Dat_
+	 AND a.odate between DAT1_ and Dat_
 	 AND c.acc=p.acc(+) 
      and c.rnk = d.rnk) b
    left outer join 
@@ -213,7 +215,7 @@ logger.info ('P_FF4_NN: Begin ');
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
-Dat1_ := TRUNC(Dat_,'MM') - 1;
+Dat1_ := TRUNC(Dat_,'MM');
 Dat2_ := TRUNC(Dat_ + 28);
 
 p_proc_set(kodf_,sheme_,nbuc1_,typ_);
@@ -267,17 +269,6 @@ LOOP
        END;
     end if;
 
-    if Data_ < to_date('26122017','ddmmyyyy') and 
-      (nls_ like '2202%' and s180_ > 'B' or nls_ like '2203%' and s180_ <= 'B') then
-        if nls_ like '2202%' and s180R_ <= 'B' or 
-           nls_ like '2203%' and s180R_  > 'B'
-        then   
-           s180_ := S180R_; 
-        else
-           s180_ := (case when nls_ like '2202%' then 'B' else 'C' end);
-        end if;
-    end if;
-    
     if cntr_ = 0 then 
        k072_ := '00';
        if dat_ >= dat_Izm2 
@@ -381,11 +372,11 @@ LOOP
             OR
         (nbs_ = '2600' and r013_ in ('1','7','8','A') and dat_ < dat_Izm2)
             OR
-        (nbs_ = '2600' and r011_ = '3' and dat_ >= dat_Izm2)
+        (nbs_ = '2600' and r011_ = '3' and spcnt_ <> 0 and dat_ >= dat_Izm2)
             OR
         (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ( '1','3') and dat_ < dat_Izm2)
             OR
-        (mfo_ <> 324805 and nbs_ = '2605' and r011_ = '3' and dat_ >= dat_Izm2)
+        (mfo_ <> 324805 and nbs_ = '2605' and r011_ = '3' and spcnt_ <> 0 and dat_ >= dat_Izm2)
             OR
         (mfo_ <> 324805 and nbs_ = '2655' and r013_ = '3' and dat_ < dat_Izm2)
             OR
@@ -491,6 +482,21 @@ LOOP
               nbs_=r020  AND r050='11';
 
        IF f04_ > 0 THEN
+
+       -- добавлен пока что временно блок  для 
+       -- наличия данных бал.счетов в TMP_NBU за дату
+       BEGIN
+          select kodp
+             into kodp_ 
+          from tmp_nbu 
+          where kodf = '3A'
+            and datf = data_
+            and kodp like '1%' 
+            and substr(kodp,3,4) = nbs_ 
+            and substr(kodp,12,3) = Kv_
+            and znap <> 0
+            and rownum = 1;
+
           IF 1=1  THEN
 
              if nbs_ = '8025' then
@@ -537,6 +543,11 @@ LOOP
                 p_ins ('3' || kodp_, TO_CHAR (ABS(se_)*ROUND(spcnt_,4)));
              end if;
           END IF;
+       EXCEPTION
+          WHEN NO_DATA_FOUND
+          THEN
+          null;
+       END;
        END IF;
     END IF;
 
@@ -748,7 +759,7 @@ LOOP
             OR
         (nbs_ = '2600' and r013_ in ('1','7','8','A') and dat_ < dat_Izm2)
             OR
-        (nbs_ = '2600' and r011_ = '3' and dat_ > dat_Izm2)
+        (nbs_ = '2600' and r011_ = '3' and dat_ >= dat_Izm2)
             OR
         (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ('1','3') and dat_ < dat_Izm2)
             OR
