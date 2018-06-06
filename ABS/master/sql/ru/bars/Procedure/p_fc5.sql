@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.027  22/05/2018 (16/05/2018)
+% VERSION     : v.17.028  04/06/2018 (22/05/2018, 16/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
 
@@ -1125,7 +1125,7 @@ BEGIN
              else -- забезпечення не перекриває актив
                  for k in (select substr(r.kodp,11,1) s580a, sum(T.OST_EQV) ost,
                                   nvl((count(*) over (partition by substr(r.kodp,11,1))), 0) cnt,
-                                  DENSE_RANK() over (partition by substr(r.kodp,11,1) order by substr(r.kodp,11,1)) rnum
+                                  row_number() over (partition by substr(r.kodp,11,1) order by substr(r.kodp,11,1)) rnum
                            from otcn_f42_temp t, rnbu_trace r
                            where t.acc = p.acc and
                                  t.accc = r.acc
@@ -1165,7 +1165,7 @@ BEGIN
                         nvl(s.kodp, '00000000000') kodp, nvl(s.sump, 0) sump,
                         nvl((sum(s.sump) over (partition by s.acc)), 0) suma,
                         nvl((count( * ) over (partition by s.acc)), 0) cnt,
-                        DENSE_RANK() over (partition by s.acc order by s.r013) rnum,
+                        row_number() over (partition by s.acc order by s.r013) rnum,
                         s.r013, t.rz,
                         nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
@@ -1745,7 +1745,7 @@ BEGIN
            end if;
        end loop;
    end;
---------------------------------------------------
+------------------------------------------------
    declare
       recid_    number;
       granica_  number := 1000;
@@ -1804,7 +1804,7 @@ BEGIN
                         group by r.nbuc, substr(r.kodp, 1, 1), 2-MOD(c.codcagent,2),substr(r.kodp, 2, 4), r.kv) b
                     on (a.nbuc = b.nbuc and a.t020 = b.t020 and a.rez = b.rez and a.nbs = b.nbs and a.kv = b.kv)
                 where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
-                order by 1, 2 )
+                order by 1, 2, 3, 4, 9 )
        loop
           begin
                select r.recid
@@ -1940,7 +1940,7 @@ BEGIN
 
    DELETE FROM OTC_C5_PROC WHERE datf = dat_;
    commit;
- 
+
    INSERT INTO otc_c5_proc
             (datf, rnk, nd, acc, nls, kv, kodp, znap )
     select /*+ parallel(8) */
@@ -1955,13 +1955,13 @@ BEGIN
          v.seg_04 = '2'
          or
         (v.seg_02 like '___9' and
-         v.seg_02 not in ('1509','1819','2809','3049','3119','3219','3519','3599','3569','9129') 
+         v.seg_02 not in ('1509','1819','2809','3049','3119','3219','3519','3599','3569','9129')
          or
-         v.seg_02 like '___6' and 
+         v.seg_02 like '___6' and
          v.seg_02 not in ('2806','3116','3216')
          or
          v.seg_02 in ('1535','2387','2397','2457')
-         ) and 
+         ) and
          v.seg_04 in ('2', '4')
          or
         not (substr(v.seg_02,1,3) in ('150','300','301','310','311','321') or
@@ -2023,7 +2023,7 @@ BEGIN
         or
         v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('4') 
+        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('4')
         or
         v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
@@ -2107,7 +2107,7 @@ BEGIN
         or
         v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('4') 
+        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('4')
         or
         v.seg_02 = '3216' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         or

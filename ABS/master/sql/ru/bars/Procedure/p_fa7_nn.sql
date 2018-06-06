@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.011  23/05/2018 (16/05/2018)
+% VERSION     :  v.18.012  04/06/2018 (23/05/2018, 16/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -488,13 +488,14 @@ end;
 
       if (nbs_ in ('1600', '2600', '2605', '2620', '2625', '2650', '2655') and sn_ > 0)
       then
-         if nbs_||r011_ in ('16001', '16081') and
+         if (nbs_||r011_ in ('16001', '16081') or
+             nbs_||r013_ in ('26001', '26051', '26201', '26251', '26501', '26551')) and
             daos_ >= to_date('06062015','ddmmyyyy')
          then
             if x_ <> '1' then
                x_ := '1';
             end if;
-            
+
             if s242_ not in ('1','2','3','4','5','I') then
                 s242_ := 'I';
                 comm_ := SUBSTR (comm_ || ' +Заміна (Контроль 2 НБУ)', 1, 200);
@@ -503,11 +504,11 @@ end;
             if x_ <> '1' then
                x_ := '1';
             end if;
-              
+
             if s242_ <> '1' then
                s242_ := '1';
             end if;
-             
+
             comm_ := SUBSTR (comm_ || ' +Поточні рахунки', 1, 200);
          end if;
       end if;
@@ -1051,7 +1052,7 @@ BEGIN
           s#_     :=    l_rec_t(i).s#;
           apl_dat#_ :=  l_rec_t(i).apl_dat#;
           ndg_      :=  l_rec_t(i).ndg_;
-          
+
           -- для @77 потрібно брати дату з архіву
           if pmode_ = 2 then
              mdate_ := nvl(f_mdate_hist(acc_, dat_), mdate_);
@@ -1073,7 +1074,7 @@ BEGIN
           s190_ :='0';
 
           tips_ := TRIM (tips_);
-          
+
           -- для того, щоб по гарантіях не брати графік
           if tips_ = 'SS' and nls_ like '9000%' then
              tips_ := 'ODB';
@@ -1989,10 +1990,10 @@ BEGIN
                       -- для мыячного файлу @77
                       if pmode_ = 2 then
                          mdate_ := nvl(f_mdate_hist(k.acc, dat_), k.mdate);
-                      else 
+                      else
                          mdate_ := k.mdate;
-                      end if; 
-                      
+                      end if;
+
                       x_ := k.s181;
 
                       IF     x_ <> '2'
@@ -2183,7 +2184,7 @@ BEGIN
                          LOOP
                             x_ := '1';
                             nd_ := i.nd;
-                            
+
                             if i.ostq <0  then
                                 mdate_ := i.mdate;
                                 s242_ := i.s240;
@@ -2964,7 +2965,7 @@ BEGIN
                         nvl(s.kodp, '00000000000') kodp, nvl(s.s240, '0') s240, nvl(s.sump, 0) sump,
                         nvl((sum(s.sump) over (partition by s.acc, t.s080)), 0) suma,
                         nvl((count(*) over (partition by s.acc)), 0) cnt,
-                        DENSE_RANK() over (partition by s.acc order by s240, s.r013) rnum,
+                        row_number() over (partition by s.acc order by s240, s.r013) rnum,
                         s.r011, s.r013, NVL (DECODE (c.country, 804, '1', '2'), '1') rz,
                         nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                         nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
@@ -3403,10 +3404,10 @@ BEGIN
       -- для місячного файлу @77
       if pmode_ = 2 then
          mdate_ := nvl(f_mdate_hist(k.acc, dat_), k.mdate);
-      else 
+      else
          mdate_ := k.mdate;
-      end if; 
-                      
+      end if;
+
       s240_ := nvl(fs240 (datn_, k.acc, dathb_, dathe_, mdate_, k.s240), '0');
 
       if s240_ = '0' then
@@ -3960,7 +3961,7 @@ BEGIN
     select a.*,
         (a.suma/nvl((sum(a.znap) over (partition by a.acc)), 0)) koef,
         nvl((count(*) over (partition by a.acc)), 0) cnt,
-        DENSE_RANK() over (partition by a.acc order by a.kodp ) rnum
+        row_number() over (partition by a.acc order by a.kodp ) rnum
     from (
     select nd, acc, nls, kv, kodp, sum(to_number(znap)) znap, sum(to_number(znap)) suma
     from rnbu_trace r
@@ -4308,7 +4309,7 @@ BEGIN
 
    end loop;
 
--------------------
+-----------------
     declare
        recid_    number;
        granica_  number := 1000;
@@ -4375,7 +4376,7 @@ BEGIN
                          group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                      on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
                  where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
-                 order by 1, 2 )
+                 order by 1, 2, 3, 4, 9)
         loop
             begin
                begin
@@ -4582,7 +4583,7 @@ BEGIN
 
     update rnbu_trace
        set kodp =substr(kodp,1,8)||'I'||substr(kodp,10)
-     where substr(kodp,9,1) in ('3','4','5');
+     where substr(kodp,9,1) in ('3','4','5','9');
 
 --------------------------------------------------
    IF pmode_ = 0
