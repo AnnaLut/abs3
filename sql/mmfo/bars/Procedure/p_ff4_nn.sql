@@ -3,16 +3,18 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF4_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	Процедура формирования #F4
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 2009.  All Rights Reserved.
-% VERSION     : 05/01/2018 (04/01/2018, 03/01/2018, 14/11/2017)
+% VERSION     : 05/06/2018 (05/01/2018, 04/01/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-05/01/2018 - перекодируем старые балансовые счета на новые и для 
-             нерезидентов заполняем K072 значениями N3 или N7 или N8 
-04/01/2018 - параметры K072 и D020 будут формироваться 2-х значными 
-03/01/2018 - новая структура показателя (вместо R013 будет R011 и 
-             параметр K072 уже 2-х значный вместо однозначного) 
+05/06/2018 - тимчасово добавлено блок для перевірки наявності показника
+             в TMP_NBU файлу #3A за дату для рахунків овердрафтів
+05/01/2018 - перекодируем старые балансовые счета на новые и для
+             нерезидентов заполняем K072 значениями N3 или N7 или N8
+04/01/2018 - параметры K072 и D020 будут формироваться 2-х значными
+03/01/2018 - новая структура показателя (вместо R013 будет R011 и
+             параметр K072 уже 2-х значный вместо однозначного)
 14/11/2017 - изменил вызов процедуры P_POPULATE_KOR для разных отчетных
              месяцев (было на ММФО)
 06/07/2017 - для некоторых значений K072 устанавливаем K140='9'
@@ -54,7 +56,7 @@ sPCnt_   number;
 sPCnt1_  varchar2(20);
 Kv_      number;
 Nbs_     varchar2(4);
-codcagent_ number; 
+codcagent_ number;
 Cntr_    number;
 Cntr1_   varchar2(1);
 rnk_     number;
@@ -91,7 +93,7 @@ branch_   varchar2(100);
 CURSOR SaldoAOd IS
   select b.acc, b.nls, b.kv, b.codc, b.odate, b.s180, NVL(trim(k.k112),'0') k112,
          b.d020, b.ints,
-         b.r011, 
+         b.r011,
          (case when b.mb = '0' and b.r013 <> '0' then b.r013 else b.mb end) r013,
          NVL(trim(e.k072),'00') k072,
          b.mdate, b.dos, b.kos, b.ost, b.nbs, b.rnk, b.s180R, b.branch, b.codcagent
@@ -103,12 +105,12 @@ CURSOR SaldoAOd IS
            NVL(trim(p.k072),'00') k072, c.mdate,
            a.dos, a.kos, a.ost, c.nbs,
            d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
-           nvl(trim(P.R011), '0') r011, 
-           nvl(trim(P.R013), '0') r013, 
+           nvl(trim(P.R011), '0') r011,
+           nvl(trim(P.R013), '0') r013,
            fs180(c.acc, substr(c.nls,1,1), a.odate) s180R,
            c.branch, d.codcagent
     FROM rnbu_history a, accounts c, specparam p, customer d
-    WHERE a.kf = to_char(mfo_) and a.odate between DAT1_ + 1 and Dat_
+    WHERE a.kf = to_char(mfo_) and a.odate between DAT1_ and Dat_  
      AND (a.dos+a.kos != 0 OR a.ost != 0)
      AND nvl(a.ints,0) >= 0
      and a.acc = c.acc
@@ -123,17 +125,17 @@ CURSOR SaldoAOd IS
            NVL(trim(p.k072),'00') k072, c.mdate,
            a.dos, a.kos, a.ost, '2'||substr(c.nbs,2) nbs,
            d.rnk, nvl(trim(d.ise), '00000') k070, nvl(trim(d.ved), '00000') k110,
-           nvl(trim(P.R011), '0') r011, 
-           nvl(trim(P.R013), '0') r013, 
+           nvl(trim(P.R011), '0') r011,
+           nvl(trim(P.R013), '0') r013,
            fs180(c.acc, substr(c.nls,1,1), a.odate) s180R,
            c.branch, d.codcagent
     FROM rnbu_history a, accounts c, specparam p, customer d
     WHERE a.kf = to_char(mfo_)
-     and a.nls like '86%'
+         AND a.nls like '86%'
 	 AND a.acc = c.acc
 	 AND (a.dos+a.kos != 0  OR   a.ost != 0)
 	 AND nvl(a.ints,0)>=0
-	 AND a.odate between DAT1_ + 1 and Dat_
+	 AND a.odate between DAT1_ and Dat_
 	 AND c.acc=p.acc(+)
      and c.rnk = d.rnk) b
    left outer join
@@ -151,8 +153,8 @@ CURSOR SaldoKor IS
   from (
     SELECT s.acc, s.nls, s.kv, a.fdat, s.nbs,
            DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180) s180,
-	   NVL(trim(p.r011),'0') r011, 
-           NVL(trim(p.r013),'0') r013, 
+	   NVL(trim(p.r011),'0') r011,
+           NVL(trim(p.r013),'0') r013,
            NVL(trim(p.k072),'00') k072,
            MOD(c.codcagent, 2) codc, c.rnk,
            nvl(trim(c.ise), '00000') k070, nvl(trim(c.ved), '00000') k110,
@@ -171,7 +173,7 @@ CURSOR SaldoKor IS
       AND s.rnk=c.rnk
     GROUP BY s.acc, s.nls, s.kv, a.fdat, s.nbs,
              DECODE(trim(p.s180), NULL, FS180(a.acc), p.s180),
-             NVL(trim(p.r011),'0'), NVL(trim(p.r013),'0'), 
+             NVL(trim(p.r011),'0'), NVL(trim(p.r013),'0'),
              NVL(trim(p.k072),'00'),
              MOD(c.codcagent, 2), c.rnk, nvl(trim(c.ise), '00000'),
              nvl(trim(c.ved), '00000'), NVL(to_char(to_number(p.d020)),'01'),
@@ -217,7 +219,7 @@ logger.info ('P_FF4_NN: Begin ');
 userid_ := user_id;
 EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 -------------------------------------------------------------------
-Dat1_ := TRUNC(Dat_,'MM') - 1;
+Dat1_ := TRUNC(Dat_,'MM');
 Dat2_ := TRUNC(Dat_ + 28);
 
 p_proc_set(kodf_,sheme_,nbuc1_,typ_);
@@ -233,7 +235,7 @@ mfo_:=F_OURMFO();
 OPEN SaldoAOd;
 LOOP
     FETCH SaldoAOd INTO acc_, nls_, Kv_, Cntr_, data_, S180_, K112_, d020_,
-                        sPCnt_, r011_, r013_, k072_, mdate_, sDos_, sKos_, se_, 
+                        sPCnt_, r011_, r013_, k072_, mdate_, sDos_, sKos_, se_,
                         nbs_, rnk_, S180R_, branch_, codcagent_;
     EXIT WHEN SaldoAOd%NOTFOUND;
 
@@ -271,27 +273,17 @@ LOOP
        END;
     end if;
 
---    if (nls_ like '2202%' and s180_ > 'B' or nls_ like '2203%' and s180_ <= 'B') and mfo_<>351823 then
---        if nls_ like '2202%' and s180R_ <= 'B' or
---           nls_ like '2203%' and s180R_  > 'B'
---        then
---           s180_ := S180R_;
---        else
---           s180_ := (case when nls_ like '2202%' then 'B' else 'C' end);
---        end if;
---    end if;
-
     if cntr_ = 0 then
        k072_ := '00';
-       if dat_ >= dat_Izm2 
-       then   
+       if dat_ >= dat_Izm2
+       then
           if codcagent_ = 2 then
              k072_ := 'N3';
           elsif codcagent_ = 4 then
              k072_ := 'N7';
           elsif codcagent_ = 6 then
              k072_ := 'N8';
-          else 
+          else
              null;
           end if;
        end if;
@@ -346,13 +338,13 @@ LOOP
                        s180_ || to_char(2-Cntr_) || d020_ ||
                        lpad(Kv_, 3, '0');
           else
-             if dat_ < dat_Izm2 
+             if dat_ < dat_Izm2
              then
                 kodp_ := '5' || nbs_ || r013_ || K112_ || K072_ ||
                           s180_ || to_char(2-Cntr_) || d020_ ||
                           lpad(Kv_, 3, '0') || k140_;
-             else 
-                if nbs_ = '2062' then 
+             else
+                if nbs_ = '2062' then
                    nbs_ := '2063';
                 elsif nbs_ = '2202' then
                    nbs_ := '2203';
@@ -371,7 +363,7 @@ LOOP
                 kodp_ := '5' || nbs_ || r011_ || K112_ || K072_ ||
                           s180_ || to_char(2-Cntr_) || d020_ ||
                           lpad(Kv_, 3, '0') || k140_;
-             end if; 
+             end if;
           end if;
 
           -- Дб. обороты
@@ -388,18 +380,18 @@ LOOP
             OR
         (nbs_ = '2600' and r013_ in ('1','7','8','A') and dat_ < dat_Izm2)
             OR
-        (nbs_ = '2600' and r011_ = '3' and dat_ >= dat_Izm2)
+        (nbs_ = '2600' and r011_ = '3' and spcnt_ <> 0 and dat_ >= dat_Izm2)
             OR
         (mfo_ <> 324805 and nbs_ = '2605' and r013_ in ( '1','3') and dat_ < dat_Izm2)
             OR
-        (mfo_ <> 324805 and nbs_ = '2605' and r011_ = '3' and dat_ >= dat_Izm2)
+        (mfo_ <> 324805 and nbs_ = '2605' and r011_ = '3' and spcnt_ <> 0 and dat_ >= dat_Izm2)
             OR
         (mfo_ <> 324805 and nbs_ = '2655' and r013_ = '3' and dat_ < dat_Izm2)
             OR
         (mfo_ <> 324805 and nbs_ = '2655' and r011_ = '3' and dat_ >= dat_Izm2)
             OR
          mfo_ = 324805 and -- не включаем такие счета с нулевой проц. ставкой для Крыма
-        ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0 and dat_ < dat_Izm2)   
+        ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0 and dat_ < dat_Izm2)
             OR
          (nbs_ = '2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0 and dat_ >= dat_Izm2)
             OR
@@ -410,7 +402,7 @@ LOOP
             OR
          (nbs_ = '2650' and r013_ in ('1','3','8') and dat_ < dat_Izm2)
             OR
-         (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2) 
+         (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2)
         ) AND
         sKos_>0 AND sPCnt_>=0
     THEN
@@ -443,7 +435,7 @@ LOOP
                        s180_ || to_char(2-Cntr_) || d020_ ||
                        lpad(Kv_, 3, '0');
           else
-             if dat_ < dat_Izm2 
+             if dat_ < dat_Izm2
              then
                 kodp_ := '6' || nbs_ || r013_ || K112_ || K072_ ||
                           s180_ || to_char(2-Cntr_) || d020_ ||
@@ -498,6 +490,21 @@ LOOP
               nbs_=r020  AND r050='11';
 
        IF f04_ > 0 THEN
+
+       -- добавлен пока что временно блок  для 
+       -- наличия данных бал.счетов в TMP_NBU за дату
+       BEGIN
+          select kodp
+             into kodp_ 
+          from tmp_nbu 
+          where kodf = '3A'
+            and datf = data_
+            and kodp like '1%' 
+            and substr(kodp,3,4) = nbs_ 
+            and substr(kodp,12,3) = Kv_
+            and znap <> 0
+            and rownum = 1;
+
           IF 1=1  THEN
 
              if nbs_ = '8025' then
@@ -544,6 +551,11 @@ LOOP
                 p_ins ('3' || kodp_, TO_CHAR (ABS(se_)*ROUND(spcnt_,4)));
              end if;
           END IF;
+       EXCEPTION
+          WHEN NO_DATA_FOUND
+          THEN
+          null;
+       END;
        END IF;
     END IF;
 
@@ -633,7 +645,7 @@ CLOSE SaldoAOd;
 OPEN SaldoKor;
 LOOP
     FETCH SaldoKor INTO acc_, nls_, Kv_, data_, nbs_, S180_, r011_, r013_,
-                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_, 
+                        k072_, Cntr_, rnk_, d020_, mdate_, sDos_, sKos_, k112_,
                         branch_, codcagent_;
 
     EXIT WHEN SaldoKor%NOTFOUND;
@@ -685,15 +697,15 @@ LOOP
 
     if cntr_ = 0 then
        k072_ := '00';
-       if dat_ >= dat_Izm2 
-       then   
+       if dat_ >= dat_Izm2
+       then
           if codcagent_ = 2 then
              k072_ := 'N3';
           elsif codcagent_ = 4 then
              k072_ := 'N7';
           elsif codcagent_ = 6 then
              k072_ := 'N8';
-          else 
+          else
              null;
           end if;
        end if;
@@ -719,7 +731,7 @@ LOOP
                          s180_ || to_char(2-Cntr_) || d020_ ||
                          lpad(Kv_, 3, '0') || k140_;
              else
-                if nbs_ = '2062' then 
+                if nbs_ = '2062' then
                    nbs_ := '2063';
                 elsif nbs_ = '2202' then
                    nbs_ := '2203';
@@ -766,7 +778,7 @@ LOOP
         (mfo_ <> 324805 and nbs_ = '2655' and r011_ = '3' and dat_ >= dat_Izm2)
             OR
          mfo_ = 324805 and -- не включаем такие счета с нулевой проц. ставкой для Крыма
-        ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0 and dat_ < dat_Izm2)   
+        ((nbs_ = '2605' and r013_ in ('1','3') and skos_ > 0 and spcnt_ <> 0 and dat_ < dat_Izm2)
             OR
          (nbs_ = '2605' and r011_ = '3' and skos_ > 0 and spcnt_ <> 0 and dat_ >= dat_Izm2)
             OR
@@ -777,7 +789,7 @@ LOOP
             OR
          (nbs_ = '2650' and r013_ in ('1','3','8') and dat_ < dat_Izm2)
             OR
-         (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2) 
+         (nbs_ = '2650' and r011_ = '3' and dat_ >= dat_Izm2)
         ) AND
         sKos_>0 AND sPCnt_>=0
     THEN
