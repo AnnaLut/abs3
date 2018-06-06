@@ -169,7 +169,7 @@ PROMPT =========================================================================
 
 CREATE OR REPLACE PACKAGE BODY dpt_bonus
 IS
-g_body_version  CONSTANT varchar2(64)  := 'version 1.16 24/02/2018';
+g_body_version  CONSTANT varchar2(64)  := 'version 1.17 30/05/2018';
 g_awk_body_defs CONSTANT varchar2(512) := ' ';
 g_modcode       CONSTANT varchar2(3)   := 'DPT';
 g_reqtype       CONSTANT char(5)       := 'BONUS';
@@ -385,7 +385,7 @@ BEGIN
     WHERE rnk = p_rnk
       AND NBS = 2625
       AND OB22 IN ('24', '27', '31')
-      AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'));
+      AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'))-1;
     
     l_ZPcard_count := l_ZPcard_count + l_cnt;
    /* bars_audit.trace('%s кол-во ЗП-карт = %s', l_title, to_char(l_cnt));
@@ -766,7 +766,7 @@ BEGIN
             end if;  
           l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query, l_bonusdate);
          else 
-           l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
+         l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
          end if;  
        EXCEPTION
          WHEN bars_error.err THEN
@@ -1159,7 +1159,7 @@ BEGIN
             end if;  
         l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query, l_datbegin);
       else 
-        l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
+      l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
       end if;
     EXCEPTION
       WHEN bars_error.err THEN
@@ -1391,12 +1391,11 @@ BEGIN
 
   p_bonusval := l_totalbonus;
   begin
-  INSERT INTO dpt_depositw (dpt_id, tag, value, branch)
-  VALUES (p_dptid, 'BONUS', to_char(l_totalbonus), l_branch);
+  INSERT INTO dpt_depositw (dpt_id, tag, value)
+  VALUES (p_dptid, 'BONUS', to_char(l_totalbonus));
   exception when dup_val_on_index then
   update dpt_depositw
-     set value = to_char(l_totalbonus),
-         branch = l_branch
+     set value = to_char(l_totalbonus)
    where tag = 'BONUS' and dpt_id = p_dptid;
   end;
   bars_audit.trace('%s значение бонуса записано в доп.реквизиты вклада', l_title);
@@ -1498,7 +1497,7 @@ EXCEPTION
     -- ошибка управления привязкой льготы к виду договора
     bars_error.raise_nerror(g_modcode, 'ADD_VIDD2BONUS_FAILED',
                             to_char(p_bonusid), to_char(p_typeid), to_char(p_rang),
-                            substr(SQLERRM,1,g_errmsg_dim	));
+                            substr(SQLERRM,1,g_errmsg_dim  ));
 END manage_dptviddbonus;
 --
 --
