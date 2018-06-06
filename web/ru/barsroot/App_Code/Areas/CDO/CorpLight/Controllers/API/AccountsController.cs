@@ -19,11 +19,11 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
     public class AccountsController : ApiController
     {
         private INbsAccTypesRepository _nbsAccTypesRepository;
-        //private readonly IDbLogger _logger;
-        public AccountsController(INbsAccTypesRepository nbsAccTypesRepository/*, IDbLogger logger*/)
+        private readonly IDbLogger _logger;
+        public AccountsController(INbsAccTypesRepository nbsAccTypesRepository, IDbLogger logger)
         {
             _nbsAccTypesRepository = nbsAccTypesRepository;
-            //_logger = logger;
+            _logger = logger;
         }
 
 
@@ -62,8 +62,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             try
             {
                 _nbsAccTypesRepository.Add(accType);
-                //_logger.Info(string.Format("Додано новий рахунок до рахунків CorpLight NBS:{0}, TypeId:{1}", 
-                //    accType.Nbs, accType.TypeId));
+                _logger.Info(string.Format("Додано новий рахунок до рахунків CorpLight NBS:{0}, TypeId:{1}",
+                    accType.Nbs, accType.TypeId));
                 return Request.CreateResponse(HttpStatusCode.OK, new { }); 
             }
             catch (Exception ex)
@@ -88,8 +88,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             {
                 _nbsAccTypesRepository.Update(accType);
 
-                //_logger.Info(string.Format("Оновлено дані про рахунок CorpLight NBS:{0}, TypeId:{1}",
-                //    accType.Nbs, accType.TypeId));
+                _logger.Info(string.Format("Оновлено дані про рахунок CorpLight NBS:{0}, TypeId:{1}",
+                    accType.Nbs, accType.TypeId));
                 return Request.CreateResponse(HttpStatusCode.OK, new { }); 
             }
             catch (Exception ex)
@@ -113,8 +113,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             try
             {
                 _nbsAccTypesRepository.Delete(accType);
-                //_logger.Info(string.Format("Видалено рахунок з доступних в CorpLight NBS:{0}, TypeId:{1}",
-                //    accType.Nbs, accType.TypeId));
+                _logger.Info(string.Format("Видалено рахунок з доступних в CorpLight NBS:{0}, TypeId:{1}",
+                    accType.Nbs, accType.TypeId));
                 return Request.CreateResponse(HttpStatusCode.OK, new {}); 
             }
             catch (Exception ex)
