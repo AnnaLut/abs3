@@ -3972,6 +3972,7 @@ is
   l_nlsb   oper.nlsb%type;
   l_sos    number := null;
   l_acc    number;
+  l_tip    accounts.tip%type;
 begin
 
   l_bdate := gl.bdate;
@@ -4018,8 +4019,12 @@ begin
         l_nlsb := get_proc_nls('T00', p_kv);
      else
         if substr(p_nlsb, 1, 4) in ('2625', '2605', '2655', '2620', '2600', '2650', '2520', '2541', '2542', '3550', '3551') then
-           select acc into l_acc from accounts where nls = p_nlsb and rownum = 1;
-           l_nlsb := get_transit(l_acc);
+           select acc, tip into l_acc, l_tip from accounts where nls = p_nlsb and rownum = 1;
+           if l_tip like 'W4%' then
+              l_nlsb := get_transit(l_acc);
+           else
+              l_nlsb := p_nlsb;
+           end if;
         else
            l_nlsb := p_nlsb;
      end if;
@@ -8172,7 +8177,11 @@ begin
                     and (tip like 'PK%' or tip like 'W4%');
                  l_tt := 'PKR';
               exception when no_data_found then
-                 l_tt := 'OW1';
+                   if l_doc(i).work_flag = 0 then
+                      l_tt := 'OW5';
+                   else
+                      l_tt := 'OW1';
+                   end if;
               end;
            end if;
         else
