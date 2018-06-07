@@ -154,7 +154,7 @@
                     vm.ssb.OpType = unmaskKendoText(vm.ssb.OpType);
 
                     vm.ssb.OpCode = unmaskKendoText(vm.ssb.OpCode);
-                        vm.ssb.RecipientBankId = unmaskKendoText(vm.ssb.RecipientBankId);
+                    vm.ssb.RecipientBankId = unmaskKendoText(vm.ssb.RecipientBankId);
                     vm.ssb.RecipientAccNum = unmaskKendoText(vm.ssb.RecipientAccNum);
                     vm.ssb.CurrId = unmaskKendoText(vm.ssb.CurrId);
                     vm.ssb.RecipienCustCode = unmaskKendoText(vm.ssb.RecipienCustCode);
@@ -193,14 +193,11 @@
 
                 vm.selectedDetailRow = selectedSBDRow()
 
-                vm.editFormulaChange($('#ssbFormula').val());
+                vm.editFormulaChange(vm.ssb.Formula);                
             };
 
             vm.selectedDetailRow = undefined;
             vm.editFormulaChange = function (val) {
-                //var grid = $('#detailsGrid').data("kendoGrid");
-                //var data = grid.dataItem(grid.select());
-
                 var data = vm.selectedDetailRow;
 
                 if (val) {
@@ -223,13 +220,9 @@
                     $('#ssbKod').data('kendoNumericTextBox').enable(false);
 
                     $('#ssbCoefficient').data('kendoNumericTextBox').enable(true);
-                    $('#ssbCoefficient').data('kendoNumericTextBox').value(0);
-
-                    vm.ssb.Coefficient = 0;
                     vm.ssb.Kod = null;
 
                     if (vm.ssb.editMode) {
-                        data.set("Coefficient", 0);
                         data.set("Kod", '');
                     }
                 }
