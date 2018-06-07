@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/user_utl.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.USER_UTL is
+create or replace package user_utl is
 
     OBJ_TYPE_USER                  constant varchar2(30 char) := 'STAFF_USER';
 
@@ -188,7 +182,8 @@
         p_user_id in integer);
 
     procedure close_user(
-        p_user_row in staff$base%rowtype);
+        p_user_row in staff$base%rowtype,
+        p_force in boolean default false);
 
     function check_if_ora_user_exists(
         p_login_name in varchar2)
@@ -231,7 +226,7 @@
     return integer;
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.USER_UTL as
+create or replace package body user_utl as
 
     user_doesnt_exists exception;
     pragma exception_init(user_doesnt_exists, -1918);
@@ -1383,12 +1378,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.USER_UTL as
     end;
 
     procedure close_user(
-        p_user_row in staff$base%rowtype)
+        p_user_row in staff$base%rowtype,
+        p_force in boolean default false)
     is
     begin
         update staff$base t
         set    t.active = 0
         where  t.id = p_user_row.id;
+
+        if (p_force) then
+            for i in (select t.client_id
+                      from   user_login_sessions t
+                      where  t.user_id = p_user_row.id) loop
+                bars_login.clear_session(i.client_id, p_kill_session => 1);
+            end loop;
+        end if;
     end;
 
     function get_user_adm_comments(
@@ -1467,10 +1471,3 @@ CREATE OR REPLACE PACKAGE BODY BARS.USER_UTL as
 end;
 /
  show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/user_utl.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 

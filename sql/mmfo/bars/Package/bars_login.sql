@@ -1,5 +1,4 @@
-prompt create package BARS_LOGIN 
-  CREATE OR REPLACE PACKAGE BARS.BARS_LOGIN 
+CREATE OR REPLACE PACKAGE BARS_LOGIN
 is
 
 /**
@@ -166,7 +165,7 @@ is
     function is_long_session return boolean;
 end bars_login;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_LOGIN 
+CREATE OR REPLACE PACKAGE BODY BARS_LOGIN
 is
 
 /**
@@ -252,7 +251,6 @@ is
                           when (p_errcode = ERR_BANKDATE_CLOSED) then 'Bankdate is closed'
                           when (p_errcode = ERR_USER_NOTALLOWED) then 'Schema change for this user not allowed'
                           when (p_errcode = ERR_INVALID_SCHEMA)  then 'Invalid application schema'
-                          when (p_errcode = ERR_BANKDATE_CLOSED) then 'Bankdate is closed'
                           when (p_errcode = ERR_USER_IS_CLOSED)  then 'User is closed'
                           else 'Unhandled application error'
                       end);
@@ -432,7 +430,15 @@ $end
 $if $$trace2alert $then
         sys.dbms_system.ksdwrt(3, 'bars_login.clear_session_context() invoked, client_id='||sys_context('userenv','client_identifier'));
 $end
-
+        bars_lic.clear_session_context();
+        sec.clear_session_context();
+        gl.clear_session_context();
+        bars_audit.clear_session_context();
+        bars_context.clear_session_context();
+        pul.clear_session_context();
+        gl.clear_session_context();
+        monex.clear_session_context();
+/*
         -- Проходим по всем глобальным контекстам
         for c in (select package
                     from dba_context
@@ -446,7 +452,7 @@ $end
                 when OTHERS then null;
             end;
         end loop;
-
+*/
         -- Выполняем очистку нашего контекста
         sys.dbms_session.clear_context(GLOBAL_CTX, client_id=> get_session_clientid);
     end clear_session_context;
@@ -592,6 +598,10 @@ $end
 
             l_hostname  := nvl(p_hostname, 'NOT AVAILABLE');
             l_session_id := substr(p_sessionid, 1, 32);
+        end if;
+
+        if (l_user_row.active = 0) then
+            raise_internal_error(ERR_USER_IS_CLOSED);
         end if;
 
         l_exculsive_mode_flag := branch_attribute_utl.get_value('/', 'EXCLUSIVE_MODE');
@@ -1190,8 +1200,6 @@ $end
         p_kill_session in integer default 1)
     is
         l_my_client_id varchar2(64 char);
-        l_sid varchar2(30 char);
-        l_serial varchar2(30 char);
     begin
         /*bars_audit.log_security('bars_login.clear_session',
                                 'Завершення сесії користувача {' || p_client_id || '}',
