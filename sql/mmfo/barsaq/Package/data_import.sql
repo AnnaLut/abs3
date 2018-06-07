@@ -133,6 +133,13 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure import_documents;
 
   ----
+  -- import_documents - выполняет импорт документов по конкретному подразделению
+  --
+  -- @p_kf        - id документа
+  --
+  procedure import_documents_kf(p_kf  bars.mv_kf.kf%type);
+
+  ----
   -- import_document - выполняет импорт 1-го документа
   -- @p_docid        - id документа
   --
@@ -1031,7 +1038,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
   -- get_individual - возвращает строку для core.cust_individuals
   --
   function get_individual(p_kf in varchar2, p_rnk in integer) return cust_individuals%rowtype is
-      l_individual      cust_individuals%rowtype;
+      l_individual      barsaq.cust_individuals%rowtype;
   begin
     begin
         select
@@ -1041,7 +1048,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
             ser             id_serial,
             numdoc            id_number,
             pdate            id_date,
-            organ            id_issuer,
+            substr(organ,1,70) id_issuer,
             bday            birthday,
             bplace            birthplace,
             teld            phone_home,
@@ -3317,8 +3324,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     );*/
     --
     -- точка отсчета
-    
-    
+
+
     if p_acc is null
     then -- по всем счетам до текущей точки
         l_scn := dbms_flashback.get_system_change_number();
@@ -3744,6 +3751,44 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     raise;
   end import_documents;
 
+    ----
+  -- import_documents - выполняет импорт документов
+  --
+  procedure import_documents_kf(p_kf  bars.mv_kf.kf%type) is
+    l_scn           number;
+    l_time          date;
+    l_period        number;
+  begin
+    
+    l_time := sysdate;
+    l_scn  := dbms_flashback.get_system_change_number();
+    
+    delete from import_activity where start_time<sysdate-1;
+    -- пишем время начала работы
+    insert into import_activity(start_time, start_scn, kf)
+    values(l_time, l_scn, p_kf);
+    commit;
+    
+    g_docs_count := 0;
+
+    bars_sync.subst_mfo(p_kf);
+    import_documents_int;
+    
+    -- вывод результатов
+    -- фиксируем завершение работы
+    l_period := round((sysdate-l_time)*24*60*60);
+    l_scn    := dbms_flashback.get_system_change_number();
+    
+    update import_activity set working_period=decode(l_period,0,1,l_period), finish_scn=l_scn, system_error=null, docs_count=g_docs_count
+    where start_time=l_time;
+    commit;
+
+    bars_sync.set_context;
+  exception when others then
+    bars_sync.set_context;
+    raise;
+  end import_documents_kf;
+
   ----
   -- Возвращает значение атрибута в виде строки
   --
@@ -3988,7 +4033,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.s         := get_attr_number(l_body, 'DOC_SUM')*l_denom;
     -- назначение платежа
     l_doc.nazn      := substr(get_attr_varchar2(l_body, 'DOC_NARRATIVE'),1,160);
-    
+
     -- дата документа
     l_doc.datd      := get_attr_date(l_body, 'DOC_DATE');
     -- номер документа
@@ -4019,7 +4064,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.ext_ref   := to_char(l_docid);
     -- и другие общие параметры
     begin
-        select acc, isp into l_acc, l_doc.userid from v_kf_accounts
+        select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
         where kf=l_doc.mfo_a and nls=l_doc.nls_a and kv=l_doc.kv;
         if l_doc.userid is null then
             raise_application_error(-20000, 'Караул! Рахунок без виконавця: kf='||l_doc.mfo_a||', nls='||l_doc.nls_a||', kv='||l_doc.kv, true);
@@ -4940,9 +4985,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_erracode  varchar2(4000);
     l_erramsg   varchar2(4000);
     l_pos       integer;
-    counter     integer;
+    counter     integer := 0 ;
   begin
-    logger.trace('%s: start', l_title);
+    logger.trace('%s: start '||sysdate, l_title);
     for c in (
         select * from doc_import where
         case
@@ -4988,15 +5033,17 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             end if; */
             --
             -- фиксируем транзакцию каждые 500 документов
-            if mod(counter, 500) = 0 then
+            /*if mod(counter, 500) = 0 then
                 commit;
-            end if;
+            end if;*/
             --
+            counter := counter + 1;
             logger.info('Інтернет-банкінг повідомлено про статус док-та: EXT_REF='||c.ext_ref||', REF='||c.ref);
         end if;
     end loop;
     commit;
-    logger.trace('%s: finish', l_title);
+    logger.trace('%s: doc_count '||counter, l_title);
+    logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
 
   ----
@@ -5580,8 +5627,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   procedure get_doc_export_old_state
     is
   begin
-    insert into tmp_old_state
-    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45;
+    execute immediate 'insert into tmp_old_state
+    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45';
     logger.info('doc_export_old_state'||sql%rowcount);
   end;
   

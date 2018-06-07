@@ -649,8 +649,9 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
     l_ignore_error  boolean;
     l_branch        varchar2(30);
     l_branch_isp    varchar2(30);
+    l_doc_count     integer := 0;
   begin
-    bars.bars_audit.trace('bars_docsync.async_pay_documents: start');
+    bars.bars_audit.trace('bars_docsync.async_pay_documents: start '|| sysdate);
     -- цикл по документам
     for d in (select * from doc_import where
               case
@@ -672,7 +673,6 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
 
                 select branch into l_branch from bars.accounts
                 where nls = d.nls_a and kv = d.kv and kf = d.mfo_a;
-                
                 --COBUMMFO-4647 согласно заявки докмент создается в бранче привязки счета. Бранч исполнителя не проверяется(код заккоментирован)
                 -- Ищем бранч пользователя-операциониста
                 -- select branch into l_branch_isp from bars.staff$base where id=d.userid;
@@ -690,6 +690,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                 --
                 pay_document(d);
                 --
+                l_doc_count := l_doc_count + 1;
             exception when others then
                 rollback to sp_before_pay;
                 -- удаляем информацию о свифтовке со справочника sw_template в АБС
@@ -737,7 +738,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
     -- возвращаемся в свой контекст для мульти-мфо
     bars_sync.set_context();
     --
-    bars.bars_audit.trace('bars_docsync.async_pay_documents: finish');
+    bars.bars_audit.trace('bars_docsync.async_pay_documents: doc_count '|| l_doc_count);
+    bars.bars_audit.trace('bars_docsync.async_pay_documents: finish '|| sysdate);
   end async_pay_documents;
 
   ----

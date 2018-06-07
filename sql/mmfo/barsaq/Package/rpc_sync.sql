@@ -897,7 +897,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
               where case when status_id=35 then bank_id else null end = :p_bankid
                 and type_id in ('||p_type_list||')
               order by doc_id)
-      where rownum <= 300'
+      where rownum <= 1000'
     bulk collect into p_docs
     using p_bankid;
     --
