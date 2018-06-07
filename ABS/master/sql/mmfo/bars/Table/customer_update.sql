@@ -363,6 +363,46 @@ exception when others then
  end;
 /
 
+prompt CREATE UQ INDEX CUSTOMER_UPDATE : I_KF_IDUPD_RNK_CUSTSUPD (KF, IDUPD, RNK)
+begin
+    execute immediate q'[
+create unique index I_KF_IDUPD_RNK_CUSTSUPD on customer_update (kf, idupd, rnk) 
+GLOBAL PARTITION BY RANGE (KF)
+( PARTITION CUSTUPD_MIN values less than ('300465')
+, PARTITION CUSTUPD_300465 values less than ('302076')
+, PARTITION CUSTUPD_302076 values less than ('303398')
+, PARTITION CUSTUPD_303398 values less than ('304665')
+, PARTITION CUSTUPD_304665 values less than ('305482')
+, PARTITION CUSTUPD_305482 values less than ('311647')
+, PARTITION CUSTUPD_311647 values less than ('312356')
+, PARTITION CUSTUPD_312356 values less than ('313957')
+, PARTITION CUSTUPD_313957 values less than ('315784')
+, PARTITION CUSTUPD_315784 values less than ('322669')
+, PARTITION CUSTUPD_322669 values less than ('323475')
+, PARTITION CUSTUPD_323475 values less than ('324805')
+, PARTITION CUSTUPD_324805 values less than ('325796')
+, PARTITION CUSTUPD_325796 values less than ('326461')
+, PARTITION CUSTUPD_326461 values less than ('328845')
+, PARTITION CUSTUPD_328845 values less than ('331467')
+, PARTITION CUSTUPD_331467 values less than ('333368')
+, PARTITION CUSTUPD_333368 values less than ('335106')
+, PARTITION CUSTUPD_335106 values less than ('336503')
+, PARTITION CUSTUPD_336503 values less than ('337568')
+, PARTITION CUSTUPD_337568 values less than ('338545')
+, PARTITION CUSTUPD_338545 values less than ('351823')
+, PARTITION CUSTUPD_351823 values less than ('352457')
+, PARTITION CUSTUPD_352457 values less than ('353553')
+, PARTITION CUSTUPD_353553 values less than ('354507')
+, PARTITION CUSTUPD_354507 values less than ('356334')
+, PARTITION CUSTUPD_356334 values less than (maxvalue)
+)
+tablespace brsbigi compress 1
+online]';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  CUSTOMER_UPDATE ***

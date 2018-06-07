@@ -158,6 +158,46 @@ exception when others then
  end;
 /
 
+prompt CREATE UQ INDEX CUSTBANK_UPDATE : I_KF_IDUPD_RNK_CUSTBNKUPD (KF, IDUPD, RNK)
+begin
+    execute immediate q'[
+create unique index I_KF_IDUPD_RNK_CUSTBNKUPD on custbank_update (kf, idupd, rnk) 
+GLOBAL PARTITION BY RANGE (KF)
+( PARTITION CUSTBNKUPD_MIN values less than ('300465')
+, PARTITION CUSTBNKUPD_300465 values less than ('302076')
+, PARTITION CUSTBNKUPD_302076 values less than ('303398')
+, PARTITION CUSTBNKUPD_303398 values less than ('304665')
+, PARTITION CUSTBNKUPD_304665 values less than ('305482')
+, PARTITION CUSTBNKUPD_305482 values less than ('311647')
+, PARTITION CUSTBNKUPD_311647 values less than ('312356')
+, PARTITION CUSTBNKUPD_312356 values less than ('313957')
+, PARTITION CUSTBNKUPD_313957 values less than ('315784')
+, PARTITION CUSTBNKUPD_315784 values less than ('322669')
+, PARTITION CUSTBNKUPD_322669 values less than ('323475')
+, PARTITION CUSTBNKUPD_323475 values less than ('324805')
+, PARTITION CUSTBNKUPD_324805 values less than ('325796')
+, PARTITION CUSTBNKUPD_325796 values less than ('326461')
+, PARTITION CUSTBNKUPD_326461 values less than ('328845')
+, PARTITION CUSTBNKUPD_328845 values less than ('331467')
+, PARTITION CUSTBNKUPD_331467 values less than ('333368')
+, PARTITION CUSTBNKUPD_333368 values less than ('335106')
+, PARTITION CUSTBNKUPD_335106 values less than ('336503')
+, PARTITION CUSTBNKUPD_336503 values less than ('337568')
+, PARTITION CUSTBNKUPD_337568 values less than ('338545')
+, PARTITION CUSTBNKUPD_338545 values less than ('351823')
+, PARTITION CUSTBNKUPD_351823 values less than ('352457')
+, PARTITION CUSTBNKUPD_352457 values less than ('353553')
+, PARTITION CUSTBNKUPD_353553 values less than ('354507')
+, PARTITION CUSTBNKUPD_354507 values less than ('356334')
+, PARTITION CUSTBNKUPD_356334 values less than (maxvalue)
+)
+tablespace brsmdli compress 1
+online]';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  CUSTBANK_UPDATE ***

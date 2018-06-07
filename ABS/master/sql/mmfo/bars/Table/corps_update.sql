@@ -196,6 +196,46 @@ exception when others then
  end;
 /
 
+prompt CREATE UQ INDEX CORPS_UPDATE : I_KF_IDUPD_RNK_CORPSUPD (KF, IDUPD, RNK)
+begin
+    execute immediate q'[
+create unique index I_KF_IDUPD_RNK_CORPSUPD on corps_update (kf, idupd, rnk) 
+GLOBAL PARTITION BY RANGE (KF)
+( PARTITION CORPSUPD_MIN values less than ('300465')
+, PARTITION CORPSUPD_300465 values less than ('302076')
+, PARTITION CORPSUPD_302076 values less than ('303398')
+, PARTITION CORPSUPD_303398 values less than ('304665')
+, PARTITION CORPSUPD_304665 values less than ('305482')
+, PARTITION CORPSUPD_305482 values less than ('311647')
+, PARTITION CORPSUPD_311647 values less than ('312356')
+, PARTITION CORPSUPD_312356 values less than ('313957')
+, PARTITION CORPSUPD_313957 values less than ('315784')
+, PARTITION CORPSUPD_315784 values less than ('322669')
+, PARTITION CORPSUPD_322669 values less than ('323475')
+, PARTITION CORPSUPD_323475 values less than ('324805')
+, PARTITION CORPSUPD_324805 values less than ('325796')
+, PARTITION CORPSUPD_325796 values less than ('326461')
+, PARTITION CORPSUPD_326461 values less than ('328845')
+, PARTITION CORPSUPD_328845 values less than ('331467')
+, PARTITION CORPSUPD_331467 values less than ('333368')
+, PARTITION CORPSUPD_333368 values less than ('335106')
+, PARTITION CORPSUPD_335106 values less than ('336503')
+, PARTITION CORPSUPD_336503 values less than ('337568')
+, PARTITION CORPSUPD_337568 values less than ('338545')
+, PARTITION CORPSUPD_338545 values less than ('351823')
+, PARTITION CORPSUPD_351823 values less than ('352457')
+, PARTITION CORPSUPD_352457 values less than ('353553')
+, PARTITION CORPSUPD_353553 values less than ('354507')
+, PARTITION CORPSUPD_354507 values less than ('356334')
+, PARTITION CORPSUPD_356334 values less than (maxvalue)
+)
+tablespace brsmdli compress 1
+online]';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  CORPS_UPDATE ***

@@ -360,3 +360,44 @@ begin
     end if; 
 end;
 /
+
+prompt CREATE UQ INDEX CUSTOMER_ADDRESS_UPDATE : I_KF_IDUPD_RNK_CUSTADRSUPD (KF, IDUPD, rnk)
+begin
+    execute immediate q'[
+create unique index I_KF_IDUPD_RNK_CUSTADRSUPD on customer_address_update (kf, idupd, rnk) 
+GLOBAL PARTITION BY RANGE (KF)
+( PARTITION CUSTADRUPD_MIN values less than ('300465')
+, PARTITION CUSTADRUPD_300465 values less than ('302076')
+, PARTITION CUSTADRUPD_302076 values less than ('303398')
+, PARTITION CUSTADRUPD_303398 values less than ('304665')
+, PARTITION CUSTADRUPD_304665 values less than ('305482')
+, PARTITION CUSTADRUPD_305482 values less than ('311647')
+, PARTITION CUSTADRUPD_311647 values less than ('312356')
+, PARTITION CUSTADRUPD_312356 values less than ('313957')
+, PARTITION CUSTADRUPD_313957 values less than ('315784')
+, PARTITION CUSTADRUPD_315784 values less than ('322669')
+, PARTITION CUSTADRUPD_322669 values less than ('323475')
+, PARTITION CUSTADRUPD_323475 values less than ('324805')
+, PARTITION CUSTADRUPD_324805 values less than ('325796')
+, PARTITION CUSTADRUPD_325796 values less than ('326461')
+, PARTITION CUSTADRUPD_326461 values less than ('328845')
+, PARTITION CUSTADRUPD_328845 values less than ('331467')
+, PARTITION CUSTADRUPD_331467 values less than ('333368')
+, PARTITION CUSTADRUPD_333368 values less than ('335106')
+, PARTITION CUSTADRUPD_335106 values less than ('336503')
+, PARTITION CUSTADRUPD_336503 values less than ('337568')
+, PARTITION CUSTADRUPD_337568 values less than ('338545')
+, PARTITION CUSTADRUPD_338545 values less than ('351823')
+, PARTITION CUSTADRUPD_351823 values less than ('352457')
+, PARTITION CUSTADRUPD_352457 values less than ('353553')
+, PARTITION CUSTADRUPD_353553 values less than ('354507')
+, PARTITION CUSTADRUPD_354507 values less than ('356334')
+, PARTITION CUSTADRUPD_356334 values less than (maxvalue)
+)
+tablespace brsbigi compress 1
+online]';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/

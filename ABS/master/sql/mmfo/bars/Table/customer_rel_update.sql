@@ -302,6 +302,46 @@ exception when others then
  end;
 /
 
+prompt CREATE UQ INDEX CUSTOMER_REL_UPDATE : I_KF_IDUPD_KEY_CUSTRELSUPD (KF, IDUPD, RNK, REL_RNK, REL_ID, REL_INTEXT)
+begin
+    execute immediate q'[
+create unique index I_KF_IDUPD_KEY_CUSTRELSUPD on customer_rel_update (kf, idupd, rnk, rel_rnk, rel_id, rel_intext) 
+GLOBAL PARTITION BY RANGE (KF)
+( PARTITION CUSTRELUPD_MIN values less than ('300465')
+, PARTITION CUSTRELUPD_300465 values less than ('302076')
+, PARTITION CUSTRELUPD_302076 values less than ('303398')
+, PARTITION CUSTRELUPD_303398 values less than ('304665')
+, PARTITION CUSTRELUPD_304665 values less than ('305482')
+, PARTITION CUSTRELUPD_305482 values less than ('311647')
+, PARTITION CUSTRELUPD_311647 values less than ('312356')
+, PARTITION CUSTRELUPD_312356 values less than ('313957')
+, PARTITION CUSTRELUPD_313957 values less than ('315784')
+, PARTITION CUSTRELUPD_315784 values less than ('322669')
+, PARTITION CUSTRELUPD_322669 values less than ('323475')
+, PARTITION CUSTRELUPD_323475 values less than ('324805')
+, PARTITION CUSTRELUPD_324805 values less than ('325796')
+, PARTITION CUSTRELUPD_325796 values less than ('326461')
+, PARTITION CUSTRELUPD_326461 values less than ('328845')
+, PARTITION CUSTRELUPD_328845 values less than ('331467')
+, PARTITION CUSTRELUPD_331467 values less than ('333368')
+, PARTITION CUSTRELUPD_333368 values less than ('335106')
+, PARTITION CUSTRELUPD_335106 values less than ('336503')
+, PARTITION CUSTRELUPD_336503 values less than ('337568')
+, PARTITION CUSTRELUPD_337568 values less than ('338545')
+, PARTITION CUSTRELUPD_338545 values less than ('351823')
+, PARTITION CUSTRELUPD_351823 values less than ('352457')
+, PARTITION CUSTRELUPD_352457 values less than ('353553')
+, PARTITION CUSTRELUPD_353553 values less than ('354507')
+, PARTITION CUSTRELUPD_354507 values less than ('356334')
+, PARTITION CUSTRELUPD_356334 values less than (maxvalue)
+)
+tablespace brsbigi compress 1
+online]';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  CUSTOMER_REL_UPDATE ***

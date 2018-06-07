@@ -244,6 +244,46 @@ exception when others then
  end;
 /
 
+prompt CREATE UQ INDEX W4_ACC_UPDATE : I_KF_IDUPD_ACC_W4ACCSUPD (KF, IDUPD, ACC_PK)
+begin
+    execute immediate q'[
+create unique index I_KF_IDUPD_ACC_W4ACCSUPD on w4_acc_update (kf, idupd, acc_pk) 
+GLOBAL PARTITION BY RANGE (KF)
+( PARTITION W4ACCUPD_MIN values less than ('300465')
+, PARTITION W4ACCUPD_300465 values less than ('302076')
+, PARTITION W4ACCUPD_302076 values less than ('303398')
+, PARTITION W4ACCUPD_303398 values less than ('304665')
+, PARTITION W4ACCUPD_304665 values less than ('305482')
+, PARTITION W4ACCUPD_305482 values less than ('311647')
+, PARTITION W4ACCUPD_311647 values less than ('312356')
+, PARTITION W4ACCUPD_312356 values less than ('313957')
+, PARTITION W4ACCUPD_313957 values less than ('315784')
+, PARTITION W4ACCUPD_315784 values less than ('322669')
+, PARTITION W4ACCUPD_322669 values less than ('323475')
+, PARTITION W4ACCUPD_323475 values less than ('324805')
+, PARTITION W4ACCUPD_324805 values less than ('325796')
+, PARTITION W4ACCUPD_325796 values less than ('326461')
+, PARTITION W4ACCUPD_326461 values less than ('328845')
+, PARTITION W4ACCUPD_328845 values less than ('331467')
+, PARTITION W4ACCUPD_331467 values less than ('333368')
+, PARTITION W4ACCUPD_333368 values less than ('335106')
+, PARTITION W4ACCUPD_335106 values less than ('336503')
+, PARTITION W4ACCUPD_336503 values less than ('337568')
+, PARTITION W4ACCUPD_337568 values less than ('338545')
+, PARTITION W4ACCUPD_338545 values less than ('351823')
+, PARTITION W4ACCUPD_351823 values less than ('352457')
+, PARTITION W4ACCUPD_352457 values less than ('353553')
+, PARTITION W4ACCUPD_353553 values less than ('354507')
+, PARTITION W4ACCUPD_354507 values less than ('356334')
+, PARTITION W4ACCUPD_356334 values less than (maxvalue)
+)
+tablespace brsbigi compress 1
+online]';
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  W4_ACC_UPDATE ***
