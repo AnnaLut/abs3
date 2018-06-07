@@ -88,6 +88,39 @@ exception when others then
 /
 
 
+begin   
+ execute immediate '
+   alter table BARSAQ.IMPORT_ACTIVITY add kf VARCHAR2(6)';
+exception when others then
+  if  sqlcode=-1430  then null; else raise; end if;
+ end;
+/
+
+
+begin   
+ execute immediate 'alter table BARSAQ.IMPORT_ACTIVITY
+  drop constraint PK_IMPACT cascade';
+exception when others then
+  if  sqlcode=-2443  then null; else raise; end if;
+ end;
+/
+
+begin   
+ execute immediate 'drop index barsaq.PK_IMPACT';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+
+begin   
+ execute immediate 'alter table BARSAQ.IMPORT_ACTIVITY
+  add constraint PK_IMPACT primary key (START_TIME, KF)';
+exception when others then
+  if  sqlcode=-2260  then null; else raise; end if;
+ end;
+/
+
 
 PROMPT *** Create  grants  IMPORT_ACTIVITY ***
 grant SELECT                                                                 on IMPORT_ACTIVITY to BARSREADER_ROLE;
