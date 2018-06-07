@@ -1,4 +1,3 @@
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Package/DPT_WEB.sql =============*** Run ***
 PROMPT ===================================================================================== 
@@ -1056,7 +1055,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.10  30.05.2018';
+  g_body_version  constant varchar2(32)  := 'version 48.11  07.06.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -2807,56 +2806,107 @@ is
     end if;
 
   end prolongation_create_text;
+
   -- ======================================================================================
-  function acc_closing_permitted
+  -- перевірка на належність вкладного рахунка до діючого кредитного договору
+  --
+  function check_belongs_credit(p_acc in accounts.acc%type) return number is
+   title  varchar2(64) := 'dptweb.check_belongs_credit';
+   l_flag number(1);
+  begin
+
+    bars_audit.trace('%s: Entry, acc=>%s', title, to_char(p_acc));
+
+    select sign(count(1))
+      into l_flag
+      from CC_DEAL c
+      join ND_ACC  n
+        on ( n.ND = c.ND )
+     where n.ACC = p_acc
+       and c.SOS < 14;
+
+    bars_audit.trace('%s: Exit with %s', title, to_char(l_flag));
+
+    return l_flag;
+
+  end check_belongs_credit;
+
+  -- ======================================================================================
+  --
+  --
+  function ACC_CLOSING_PERMITTED
   ( p_acc  in  accounts.acc%type
   , p_sos  in  sos.sos%type
   ) return number is
     -- p_sos = 0 - НЕ допускается наличие никаких остатков
     --         1 - допускается наличие только планового остатка
     --         3 - допускается наличие планового/форвардного остатков
-    title   varchar2(64) := 'dptweb.acc_closing_permitted:';
-    l_flag  number(1) := 0;
-    l_dapp  date;
+    --         9 - допускается наличие только фактического остатка и движений за сегодня
+    title   varchar2(64) := 'dptweb.acc_closing_permitted';
+    l_flag  number(1);
   begin
 
-    bars_audit.trace( '%s entry, acc=>%s, sos=>%s, gl.bdate=>%s', title
+    bars_audit.trace( '%s: Entry, acc=>%s, sos=>%s, gl.bdate=>%s', title
                     , to_char(p_acc), to_char(p_sos), to_char(gl.bdate, 'dd.mm.yyyy') );
 
-    begin
-      select 1
-        into l_flag
-        from ACCOUNTS
-       where ACC = p_acc
-         and ( p_sos = 0 and ostc = 0 and ostb = 0 and ostf = 0
-            or p_sos = 1 and ostc = 0 and ostf = 0
-            or p_sos = 3 and ostc = 0 );
-    exception
-      when no_data_found then
-        l_flag := 0;
-    end;
+    if ( CHECK_BELONGS_CREDIT(p_acc) = 1 )
+    then
 
-    if ( l_flag = 1 ) then
-      select max(FDAT)
-        into l_dapp
-        from SALDOA
-       where DOS + KOS > 0
-         and ACC = p_acc;
+      l_flag := 0;
 
-      if ( l_dapp >= gl.bdate )
+      bars_audit.error( title||': account #'||to_char(p_acc)||' is used by a loan agreement.' );
+
+    else
+
+      begin
+        select 1
+          into l_flag
+          from ACCOUNTS
+         where ACC = p_acc
+           and ( p_sos = 0 and ostc = 0 and ostb = 0 and ostf = 0
+              or p_sos = 1 and ostc = 0 and ostf = 0
+              or p_sos = 3 and ostc = 0
+              or p_sos = 9 and ostb = 0 and ostf = 0 );
+      exception
+        when no_data_found then
+          l_flag := 0;
+      end;
+
+      if ( p_sos = 9 )
       then
-        l_flag := 0;
+        null;
+      else
+
+        if ( l_flag = 1 )
+        then
+
+          select case
+                 when EXISTS( select 1
+                                from SALDOA
+                               where ACC = p_acc
+                                 and FDAT >= GL.bdate
+                                 and DOS + KOS > 0 )
+                 then 0
+                 else 1
+                 end
+            into l_flag
+            from dual;
+
+        end if;
+
       end if;
+
     end if;
 
-    bars_audit.trace('%s exit with %s', title, to_char(l_flag));
+    bars_audit.trace('%s: Exit with %s', title, to_char(l_flag));
 
     return l_flag;
 
-  end acc_closing_permitted;
-  
+  end ACC_CLOSING_PERMITTED;
+
   -- ======================================================================================
-  
+  --
+  --
   function dpt_closing_permitted(p_dpt in dpt_deposit.deposit_id%type)
     return number is
     title  varchar2(60) := 'dptweb.dpt_closing_permitted:';
@@ -2885,6 +2935,7 @@ is
     end if;
     return l_flag;
   end dpt_closing_permitted;
+
   -- ======================================================================================
   --
   --
@@ -2922,30 +2973,6 @@ is
     return l_flag;
 
   end closing_permitted;
-
-  -- ======================================================================================
-  -- перевірка на належність вкладного рахунка до діючого кредитного договору
-  --
-  function check_belongs_credit(p_acc in accounts.acc%type) return number is
-   title  varchar2(64) := 'dptweb.check_belongs_credit';
-   l_flag number(1);
-  begin
-
-    bars_audit.trace('%s: Entry, acc=>%s', title, to_char(p_acc));
-
-    select sign(count(1))
-      into l_flag
-      from CC_DEAL c
-      join ND_ACC  n
-        on ( n.ND = c.ND )
-     where n.ACC = p_acc
-       and c.SOS < 14;
-
-    bars_audit.trace('%s: Exit with %s', title, to_char(l_flag));
-
-    return l_flag;
-
-  end check_belongs_credit;
 
   -- ======================================================================================
   --
@@ -6097,7 +6124,7 @@ is
       if ((l_allow = 1) and (substr(d.nls, 1, 4) = '2620') and
          (check_belongs_credit(d.accd) = 1)) then
         l_allow := 0;
-        bars_audit.trace('%s account %s belongs to the credit.',
+        bars_audit.trace('%s account %s belongs to a loan agreement.',
                          title,
                          d.nls);
       end if;
@@ -19452,10 +19479,6 @@ end dpt_web;
 /
 
 show errors;
-
-PROMPT ===================================================================================== 
-PROMPT *** Grants *** ======= Scripts /Sql/BARS/Package/DPT_WEB.sql ==========*** Grants ***
-PROMPT ===================================================================================== 
 
 grant EXECUTE on DPT_WEB to ABS_ADMIN;
 grant EXECUTE on DPT_WEB to BARSUPL;
