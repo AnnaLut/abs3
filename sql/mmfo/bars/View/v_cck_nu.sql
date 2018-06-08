@@ -105,4 +105,5 @@ SELECT x.isp
                    AND nd = d.nd)
            AND d.vidd IN (1, 2, 3)
            AND d.sos = 0
+		   and d.nd = nvl(d.ndg,d.nd) --COBUPRVNIX-148 
            ) x;
