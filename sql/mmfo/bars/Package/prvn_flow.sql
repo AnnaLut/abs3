@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 10.8  13.03.2018';
+  g_body_version  constant varchar2(64) := 'version 10.8  05.06.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
