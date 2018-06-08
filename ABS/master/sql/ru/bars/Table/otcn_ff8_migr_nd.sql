@@ -19,11 +19,20 @@ BEGIN
 END; 
 /
 
+PROMPT *** drop table OTCN_FF8_MIGR_ND ***
+begin 
+  execute immediate '
+  DROP TABLE BARS.OTCN_FF8_MIGR_ND ';
+exception when others then       
+  if sqlcode=-942 then null; else raise; end if; 
+end;
+
 PROMPT *** Create  table OTCN_FF8_MIGR_ND ***
 begin 
   execute immediate '
   CREATE GLOBAL TEMPORARY TABLE BARS.OTCN_FF8_MIGR_ND 
-   (	ND VARCHAR2(40)
+   (	ND VARCHAR2(40), 
+	VID NUMBER
    ) ON COMMIT PRESERVE ROWS ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 

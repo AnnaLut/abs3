@@ -1474,7 +1474,7 @@ from (
                   from (select f.DATF, f.ACC, f.ACCC, f.NBS, f.SGN, f.NLS, f.KV, f.KV_DOG, f.NMS, f.DAOS, 
                                f.DAZS, f.OST, f.OSTQ, f.DOSQ, f.KOSQ, f.ND, f.NKD, f.SDATE, f.WDATE, f.SOS, 
                                f.RNK, f.STAFF, f.TOBO, f.S260, f.K110, f.K111, f.S031, f.S032, f.CC, f.TIP, 
-                               f.OSTQ_KD, f.R_DOS, f.CC_ID, f.TPA, f.S080, f.KF, f.R011, f.S245
+                               f.OSTQ_KD, f.R_DOS, f.CC_ID, f.TPA, f.S080, f.R011, f.S245
                           from OTC_FF7_HISTORY_ACC f
                           where f.datf = dat_
                                 and (f.tpa in (1, 4) or
