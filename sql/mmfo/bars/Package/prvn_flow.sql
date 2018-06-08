@@ -3227,13 +3227,15 @@ end nos_del;
                     r_shd.SNO := agr.sar_dtl(a).int_dfr;
                   end if;
 
-                  r_shd.IR  := agr.sar_dtl(a).sar_rate;
                   r_shd.SN1 := r_shd.LMT_INPT          * r_shd.IR                / 100 / 365 * l_day_qty;
                   r_shd.SN2 := agr.sar_dtl(a).dbt_odue * agr.sar_dtl(a).sar_fine / 100 / 365 * l_day_qty;
 
                   -- 
                   agr.sar_dtl.delete(a);
 
+                else
+                  r_shd.SSP := 0;
+                  r_shd.SNP := 0;
                 end if;
 
                 if ( ( r_shd.SS + r_shd.SSP + r_shd.SN + r_shd.SNO + r_shd.SNP + r_shd.SN1 + r_shd.SN2 ) > 0 )
@@ -3361,7 +3363,7 @@ end nos_del;
            and a8.TIP = 'LIM'
            and a8.DAOS < l_rpt_dt
            and lnnvl( a8.DAZS < l_rpt_dt )
-           and ( b8.OST + l_adj_f * ( b8.CRKOS - b8.CRDOS ) ) < 0
+--         and ( b8.OST + l_adj_f * ( b8.CRKOS - b8.CRDOS ) ) < 0
          order by nvl( a8.ACCC, a8.ACC ), a8.ACC;
 
     insert
