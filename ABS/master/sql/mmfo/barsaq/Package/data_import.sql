@@ -3948,6 +3948,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_creatingdate  date;
     l_date          date;
     l_acc           bars.accounts.acc%type;
+    l_acc_a_rec     bars.accounts%rowtype;
+    l_acc_b_rec     bars.accounts%rowtype;
     l_narrative_rows    integer;
     l_narrative_rownum  varchar2(2);
     l_narrative_attr    varchar2(30);
@@ -3966,6 +3968,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_sideB_tag     doc_import_props.tag%type := 'ф';
     l_blank_ser     varchar2(100);
     l_blank_num     varchar2(100);
+    l_bank_id       varchar2(100);
     l_is_nls_closed number(1);
     --
     numeric_value_error exception;
@@ -4149,25 +4152,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- внутренний документ
     if     l_typeid = 'P_INT' then
         logger.trace('internal document');
-        --
-        -- вычисляем код операции
-        if    l_nbsa in ('2605','2625') and l_nbsb in ('2605','2625')
-        then
-            l_doc.tt := 'IB6'; -- Internet-Banking: Переказ між карт.рахунками
-            --
-        elsif l_nbsa in ('2605','2625') and l_nbsb not in ('2605','2625')
-        then
-            l_doc.tt := 'IB3'; -- Internet-Banking: Списання з карт.рахунку внутрішнє
-            --
-        elsif l_nbsa not in ('2605','2625') and l_nbsb in ('2605','2625','2655')
-        then
-            l_doc.tt := 'IB5'; -- Internet-Banking: Поповнення карт.рахунку внутрішнє
-            --
-        else
-            l_doc.tt := 'IB1'; -- Internet-Banking: Внутрішня
-            --
-        end if;
-        -- дата вставки
+        
         l_doc.insertion_date := sysdate;
         -- контроль идентификационного кода получателя
         declare
@@ -4184,6 +4169,39 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             raise_application_error(-20000, 'Отримувача не знайдено: Банк='
                 ||l_doc.mfo_b||', Рахунок='||l_doc.nls_b||', Валюта='||l_doc.kv, true);
         end;
+        select *
+          into l_acc_a_rec
+          from bars.accounts
+         where nls = l_doc.nls_a
+           and kv = l_doc.kv;
+        select *
+          into l_acc_b_rec
+          from bars.accounts
+         where nls = l_doc.nls_b
+           and kv = nvl(l_doc.kv2, l_doc.kv);
+        --
+        -- вычисляем код операции
+       -- if    l_nbsa in ('2605','2625') and l_nbsb in ('2605','2625')
+        if l_acc_a_rec.tip like 'W4%' and l_acc_b_rec.tip like 'W4%'
+        then
+            l_doc.tt := 'IB6'; -- Internet-Banking: Переказ між карт.рахунками
+            --
+      --  elsif l_nbsa in ('2605','2625') and l_nbsb not in ('2605','2625')
+        elsif l_acc_a_rec.tip like 'W4%' and l_acc_b_rec.tip not like 'W4%'
+        then
+            l_doc.tt := 'IB3'; -- Internet-Banking: Списання з карт.рахунку внутрішнє
+            --
+       -- elsif l_nbsa not in ('2605','2625') and l_nbsb in ('2605','2625','2655')
+        elsif l_acc_a_rec.tip not like 'W4%' and l_acc_b_rec.tip like 'W4%'
+        then
+            l_doc.tt := 'IB5'; -- Internet-Banking: Поповнення карт.рахунку внутрішнє
+            --
+        else
+            l_doc.tt := 'IB1'; -- Internet-Banking: Внутрішня
+            --
+        end if;
+        -- дата вставки
+        
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
     -- документ в СЭП/ВПС
@@ -4191,9 +4209,17 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         logger.trace('interbank document');
         -- проверка наличия обязательных только для данной операции атрибутов
         check_mandatory_attr(l_body, 'PAYEE_BANK_CODE');
+
+        select *
+          into l_acc_a_rec
+          from bars.accounts a
+         where a.nls = l_doc.nls_a
+           and a.kv = l_doc.kv
+           and a.dazs is null;
         --
         -- вычисляем код операции
-        if l_nbsa in ('2605','2625')
+       -- if l_nbsa in ('2605','2625')
+        if l_acc_a_rec.tip like 'W4%'
         then
             l_doc.tt := 'IB4'; -- Internet-Banking: Списання з карт.рахунку міжбанк
             --
