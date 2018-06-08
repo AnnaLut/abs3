@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 10.8  05.06.2018';
+  g_body_version  constant varchar2(64) := 'version 10.9  05.06.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -2371,11 +2371,11 @@ end nos_del;
 --       , t_del_rows(r).EFFECTDATE, t_del_rows(r).AGRM_ID );
 --    
 --  end if;
-    
+
     commit;
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.CLN_FIN_DEB: Exit.' );
-    
+
   end CLN_FIN_DEB;
 
   ---
@@ -2387,9 +2387,10 @@ end nos_del;
     title   constant   varchar2(64) := $$PLSQL_UNIT||'.ADD_FIN_DEB';
     fd                 prvn_fin_deb%rowtype;
     l_eff_dt           date;
+    l_kf               varchar2(6) := sys_context('bars_context','user_mfo');
     l_chg_dt           prvn_fin_deb_arch.chg_dt%type;
     l_cls_dt           prvn_fin_deb_arch.cls_dt%type;
-    l_err_tag          varchar2(30) := to_char(p_dat,'yyyymmdd')||'_'||to_char(sysdate,'yyyymmddhh24miss');
+    l_err_tag          varchar2(40) := l_kf||'_'||to_char(p_dat,'yyyymmdd')||'_'||to_char(sysdate,'yyyymmddhh24miss');
     cursor err_log
     is
     select cast( ACC_SS as number(24) )  as ACC_SS
@@ -2403,23 +2404,31 @@ end nos_del;
        and ORA_ERR_MESG$ like '%UK_PRVNFINDEB_ACCSS%'
        for update;
   begin
-    
-    bars_audit.trace( '%s: Entry with ( p_dat=%s ).', title, to_char(p_dat,'dd.mm.yyyy') );
-    
+
+    bars_audit.trace( '%s: Entry with ( p_dat=%s, l_kf=%s ).', title, to_char(p_dat,'dd.mm.yyyy'), l_kf );
+
+--  execute immediate q'[alter session set NLS_DATE_FORMAT='dd/mm/yyyy hh24:mi:ss']';
+
     l_eff_dt  := nvl(to_date(sys_context('bars_gl','bankdate'),'mm/dd/yyyy'),trunc(sysdate));
-    
+
     l_chg_dt := sysdate;
     l_cls_dt := GL.BD();
-    
+
     -- "закриття" зв`язку рахунків
     CLN_FIN_DEB( p_chg_dt => l_chg_dt 
                , p_cls_dt => l_cls_dt );
-    
+
     if ( BARS_LOSS_EVENTS.G_RECEIVABLES )
     then
-      
+
       bars_audit.info( title || ': BARS_LOSS_EVENTS.G_RECEIVABLES = TRUE' );
-      
+
+      -- clear old errors --
+      delete PRVN_FIN_DEB_ERRLOG
+       where ORA_ERR_TAG$ like '%'||l_kf||'%';
+
+      bars_audit.info( title || ': '||to_char(sql%rowcount)||' row(s) deleted.' );
+
       -- Рах. фін. деб. кредитних договорів ('SK0','SK9')
       insert 
         into PRVN_FIN_DEB
@@ -2445,9 +2454,9 @@ end nos_del;
          log errors
         into PRVN_FIN_DEB_ERRLOG( 'CCK_'||l_err_tag )
       REJECT LIMIT UNLIMITED;
-      
+
       bars_audit.info( title || ': CCK (SK0+SK9) '||to_char(sql%rowcount)||' row(s) inserted.' );
-      
+
       -- Рах. фін. деб. Кредитних Договорів ('ODB')
       merge
         into PRVN_FIN_DEB d
@@ -2548,24 +2557,24 @@ end nos_del;
          log errors
         into PRVN_FIN_DEB_ERRLOG( 'BPK_'||l_err_tag )
       REJECT LIMIT UNLIMITED;
-      
+
       bars_audit.info( title || ': BPK '||to_char(sql%rowcount)||' row(s) inserted.' );
-      
+
       --------------------
       -- parsing errors --
       --------------------
-      
+
       open err_log;
-      
+
       loop
-        
+
         fetch err_log
          into fd;
-         
+
         exit when err_log%NOTFOUND;
-        
+
         savepoint SP_ERRLOG;
-        
+
         begin
 
           -- 1) insert into PRVN_FIN_DEB_ARCH from PRVN_FIN_DEB
@@ -2577,18 +2586,16 @@ end nos_del;
                 , fd.KF, fd.ACC_SS, fd.ACC_SP, fd.EFFECTDATE, fd.AGRM_ID );
 
           -- 2) delete from PRVN_FIN_DEB
-          delete
-            from PRVN_FIN_DEB
+          delete PRVN_FIN_DEB
            where ACC_SS = fd.ACC_SS;
-          
+
           -- 3) insert into PRVN_FIN_DEB from PRVN_FIN_DEB_ERRLOG
           insert
             into PRVN_FIN_DEB
           values fd;
           
           -- 4) delete from PRVN_FIN_DEB_ERRLOG ( where current of )
-          delete 
-            from PRVN_FIN_DEB_ERRLOG
+          delete PRVN_FIN_DEB_ERRLOG
            where current of err_log;
           
         exception
@@ -2598,9 +2605,9 @@ end nos_del;
         end;
         
       end loop;
-      
+
       close err_log;
-      
+
       -- all ACC_SS
       insert 
         into PRVN_FIN_DEB
