@@ -10,7 +10,7 @@ create or replace procedure MAKE_INT
   p_errflg    out boolean          -- флаг ошибки                 (дл€ 1-го счета)
 ) is
   -- ====================================================================================
-  -- процедура начислени€ процентов (прогноз +/- оплата) version 1.8.9  03.06.2018
+  -- процедура начислени€ процентов (прогноз +/- оплата) version 1.9.0  07.06.2018
   -- dptweb - расширенный функционал депозитной системы
   -- acr_dat - с возможностью сторно процентов
   -- sber - специфика сбербанка
@@ -58,7 +58,7 @@ create or replace procedure MAKE_INT
     tax_int           number, -- % налога;
     tax_date_begin    date,   -- начало действи€ периода налогообложени€;
     tax_date_end      date    -- конец  действи€ периода налогообложени€ пост 4110; если дата конца действи€ постановы не установлена, то принимаем, +1 мес€ц от сегодн€
-    );
+  );
 
   type t_taxdata is table of t_tax_settings;
 
@@ -67,7 +67,7 @@ create or replace procedure MAKE_INT
     soc_factor number, -- коэффициент социальной составл€ющей остатка;
     date_begin date,   -- начало действи€ периода раздел€емого остатка;
     date_end   date    -- конец  действи€ периода раздел€емого остатка;
-    );
+  );
 
   type t_soc_turns_data is table of t_soc_turns_rec;
 
@@ -103,14 +103,17 @@ create or replace procedure MAKE_INT
     int_details varchar2(160),
     int_tt      char(3),
     mod_code    char(3),
-    rw          rowid);
+    rw          rowid
+  );
 
   type t_intdata is table of t_intrec;
 
   --
   -- исключение
   --
-  expt_int exception;
+  expt_int               exception;
+  e_rsrc_busy            exception;
+  pragma exception_init( e_rsrc_busy, -00054 );
 
   --
   -- переменные
@@ -596,6 +599,8 @@ begin
   bars_audit.trace( '%s старт, начисление по %s, режим %s, запуск є %s', title
                   , to_char(p_dat2, 'dd.mm.yy'), to_char(p_runmode), to_char(p_runid));
 
+  dbms_application_info.set_action( 'MAKE_INT' );
+
   if ((p_runmode = 1) and (l_tax_method = 2 or l_tax_method = 3))
   then -- ≥н≥ц≥ал≥зац≥€ списку рахунк≥в дл€ сплати податку
     INIT_TAXNLS_LIST( sys_context('bars_context','user_mfo') );
@@ -664,52 +669,69 @@ begin
         l_cleared   := false; -- флаг очистки ведомости начисленных процентов
         l_errmsg    := null; -- сообщение об ошибке
 
-        bars_audit.trace('%s счет %s/%s',
-                         title,
-                         l_intlist         (i).acc_num,
-                         l_intlist         (i).acc_iso);
-        bars_audit.info(title || ' счет ' || l_intlist(i).acc_num || '/' || l_intlist(i)
-                        .acc_iso);
+        bars_audit.trace( '%s счет %s/%s', title, l_intlist(i).acc_num, l_intlist(i).acc_iso );
+
         -- чтение и блокировка процентной карточки
         begin
           select *
             into l_cardrow
-            from int_accn
+            from INT_ACCN
            where acc = l_intlist(i).acc_id
-             and id = l_intlist(i).int_id
+             and id  = l_intlist(i).int_id
              for update nowait;
         exception
-          when no_data_found then
-            -- не найдена проц.карточка є %s по счету %s/%s
-            l_errmsg := substr(bars_msg.get_msg(modcode,
-                                                'INTCARD_NOT_FOUND',
-                                                to_char(l_intlist(i).int_id),
-                                                l_intlist(i).acc_num,
-                                                l_intlist(i).acc_iso),
-                               1,
-                               errmsgdim);
+          when no_data_found
+          then -- не найдена проц.карточка є %s по счету %s/%s
+            l_errmsg := substr(bars_msg.get_msg( modcode, 'INTCARD_NOT_FOUND', to_char(l_intlist(i).int_id)
+                                               , l_intlist(i).acc_num, l_intlist(i).acc_iso )
+                              , 1, errmsgdim );
             raise expt_int;
-          when others then
-            -- ошибка чтени€ и блокировки проц.карточки є %s по счету %s/%s : %s
-            l_errmsg := substr(bars_msg.get_msg(modcode,
-                                                'INTCARD_READ_FAILED',
-                                                to_char(l_intlist(i).int_id),
-                                                l_intlist(i).acc_num,
-                                                l_intlist(i).acc_iso,
-                                                sqlerrm || chr(10) || dbms_utility.format_error_backtrace()),
-                               1,
-                               errmsgdim);
+          when e_rsrc_busy
+          then -- ошибка чтени€ и блокировки проц.карточки є %s по счету %s/%s : %s
+            l_errmsg := substr( BARS_MSG.GET_MSG( modcode, 'INTCARD_READ_FAILED', to_char(l_intlist(i).int_id)
+                                                , l_intlist(i).acc_num, l_intlist(i).acc_iso, sqlerrm )
+                              , 1, errmsgdim );
+            raise expt_int;
+          when others
+          then --
+            l_errmsg := substr( dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace(), 1, errmsgdim );
+--          if ( BARS_AUDIT.TRACE_ENABLED() )
+--          then
+              for c in ( select l.SESSION_ID as SID
+                              , s.SERIAL#
+                              , NVL(l.ORACLE_USERNAME, '(oracle)') as USERNAME
+                              , Decode(l.LOCKED_MODE, 0, 'None'
+                                                    , 1, 'Null (NULL)'
+                                                    , 2, 'Row-S (SS)'
+                                                    , 3, 'Row-X (SX)'
+                                                    , 4, 'Share (S)'
+                                                    , 5, 'S/Row-X (SSX)'
+                                                    , 6, 'Exclusive (X)'
+                                                    , l.LOCKED_MODE) as LOCKED_MODE
+                              , l.OS_USER_NAME
+                              , s.ACTION
+                              , s.MACHINE
+                              , s.CLIENT_IDENTIFIER
+                           from V$LOCKED_OBJECT l
+                           join DBA_OBJECTS o 
+                             on ( o.OBJECT_ID = l.OBJECT_ID )
+                           join V$SESSION s
+                             on ( s.sid = l.SESSION_ID )
+                          where o.OWNER = 'BARS'
+                            and o.OBJECT_NAME = 'INT_ACCN' )
+              loop
+                BARS_AUDIT.ERROR( title||': SID='||to_char(c.SID) ||', SERIAL#='          ||to_char(c.SERIAL#)
+                                       ||', USERNAME='||c.USERNAME||', LOCKED_MODE='      ||c.LOCKED_MODE
+                                       ||', ACTION='  ||c.ACTION  ||', OS_USER_NAME='     ||c.OS_USER_NAME
+                                       ||', MACHINE=' ||c.MACHINE ||', CLIENT_IDENTIFIER='||c.CLIENT_IDENTIFIER );
+              end loop;
+--          end if;
             raise expt_int;
         end;
 
-        bars_audit.trace('%s (acra, acrb, acrdat, stpdat) = (%s, %s, %s, %s)',
-                         title,
-                         to_char(l_cardrow.acra),
-                         to_char(l_cardrow.acrb),
-                         to_char(l_cardrow.acr_dat, 'dd.mm.yy'),
-                         to_char(l_cardrow.stp_dat, 'dd.mm.yy'));
-
-        bars_audit.info(title || 'чтение и блокировка процентной карточки');
+        bars_audit.trace( '%s (acra, acrb, acrdat, stpdat) = (%s, %s, %s, %s)'
+                        , title, to_char(l_cardrow.acra), to_char(l_cardrow.acrb)
+                        , to_char(l_cardrow.acr_dat,'dd.mm.yyyy'), to_char(l_cardrow.stp_dat, 'dd.mm.yyyy') );
 
         -- проверка метода начислени€
         if l_cardrow.metr not in (0, 1, 2, 4, 5) then
@@ -1724,6 +1746,8 @@ begin
 
     l_rwlist.delete;
   end loop;
+
+  dbms_application_info.set_action( null );
 
   bars_audit.trace( '%s финиш, начисление по %s, режим %s, запуск є %s'
                   , title, to_char(p_dat2, 'dd.mm.yy'), to_char(p_runmode), to_char(p_runid) );
