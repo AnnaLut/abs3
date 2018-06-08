@@ -9121,6 +9121,12 @@ end if;
       END IF;
     END IF;
     UPDATE cc_deal SET sos = 10 WHERE nd = nd_;
+	
+	--COBUPRVNIX-148 При авторизации Кред.линии ЮО - необходимо авторизировать все его суб.договора
+	if dd.vidd in (1, 2, 3) then 
+		UPDATE cc_deal SET sos = 10 WHERE ndg = nd_;
+	end if;
+    --COBUPRVNIX-148 
 
     FOR k IN (SELECT a.acc
                 FROM accounts a, nd_acc n
