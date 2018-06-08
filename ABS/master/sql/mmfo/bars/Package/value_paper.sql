@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.23 24.05.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.24 08.06.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -50,7 +50,8 @@ IS
       ERAT       NUMBER,
       NO_P       NUMBER,
       ACTIVE     NUMBER,
-      OSTRD      NUMBER
+      OSTRD      NUMBER,
+      OSTS2      NUMBER      
    );
 
    TYPE t_cp_v_set IS TABLE OF r_cp_v;
@@ -277,8 +278,8 @@ PROCEDURE F_SAVE (p_fl_END      IN     INT,
                          p_COD_I      IN     VARCHAR2,
                          p_COD_M      IN     VARCHAR2,
                          p_COD_F      IN     VARCHAR2,
-                         p_COD_V      IN     VARCHAR2, 
-                         p_COD_O      IN     VARCHAR2,                                                                          
+                         p_COD_V      IN     VARCHAR2,
+                         p_COD_O      IN     VARCHAR2,
                          p_sErr          OUT VARCHAR2);
 
 
@@ -535,36 +536,36 @@ TYPE r_many_grid
  --Ця ж функція для можливості нарахування дивідентів (інший рахунок чим звичайне нарахування, суму вкажуть вручну)
  --Ньюанс - якщо для угоди невідкритий внесистемний рахунок дивідентів, то відкрити його та підвязати до угоди.
   procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null);
-  
+
   --виплата дивідентів -населення таблиці
-  procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null);  
+  procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null);
 
   procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type);
   procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type);
 
   function get_cena_voprosa(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type)   return number;
   function get_count_cp(p_id cp_kod.id%type, p_date date, p_cena cp_kod.cena%type, p_cena_start cp_kod.cena_start%type, p_acc cp_deal.acc%type) return number;
-  
+
   type r_PFCombo is record (pf cp_pf.pf%type,
                             val varchar2(100),
                             vidd ps.nbs%type);
-  type t_PFCombo is table of r_PFCombo;             
-                   
+  type t_PFCombo is table of r_PFCombo;
+
   function getPFcombo(p_id in cp_kod.id%type) return t_PFCombo pipelined;
-  function getPFcomboEmi(p_emi in cp_kod.emi%type, p_dox in cp_kod.dox%type, p_pf in cp_pf.pf%type) return t_PFCombo pipelined; 
-  
+  function getPFcomboEmi(p_emi in cp_kod.emi%type, p_dox in cp_kod.dox%type, p_pf in cp_pf.pf%type) return t_PFCombo pipelined;
+
   type r_RYNCombo is record (RYN cp_RYN.RYN%type,
                             name varchar2(100));
   type t_RYNCombo is table of r_RYNCombo;
   function getRYNcombo(p_vidd in ps.nbs%type, p_id in cp_kod.id%type) return t_RYNCombo pipelined;
   function getRYNcomboEmi(p_emi in cp_kod.emi%type, p_dox in cp_kod.dox%type, p_vidd in ps.nbs%type) return t_RYNCombo pipelined;
-  
+
 
 END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.37 24.05.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.39 08.06.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -621,7 +622,7 @@ IS
       if (p_active = 0) then l_active := '-1'; end if;
       if (p_active = 1) then l_active := '0,1';end if;
       v_stmt_str :=
-            'select DATD, nvl(ND,''-'') ND, SUMB, REF, ID, CP_ID, KV, VIDD, PFNAME, RYN, MDATE as DATP, nvl(NO_PR,0.00) NO_PR, BAL_VAR, KIL, CENA, nvl(ZAL,0) ZAL, OSTA, OSTAB, OSTAF, OSTD, OST_2VD, OSTP, OST_2VP, OSTR, OSTR2, OSTR3, OSTUNREC, OSTEXPN, OSTEXPR, OSTS, ERAT, NO_P, ACTIVE, OSTRD from CP_V_NEW where '
+            'select DATD, nvl(ND,''-'') ND, SUMB, REF, ID, CP_ID, KV, VIDD, PFNAME, RYN, MDATE as DATP, nvl(NO_PR,0.00) NO_PR, BAL_VAR, KIL, CENA, nvl(ZAL,0) ZAL, OSTA, OSTAB, OSTAF, OSTD, OST_2VD, OSTP, OST_2VP, OSTR, OSTR2, OSTR3, OSTUNREC, OSTEXPN, OSTEXPR, OSTS, ERAT, NO_P, ACTIVE, OSTRD, OSTS2 from CP_V_NEW where '
          || '(' || l_filtr_id ||') '
          || ' and active in ('
          || l_active || ')';
@@ -1921,7 +1922,7 @@ END;
                          p_COD_M      IN     VARCHAR2,  --РИНОК
                          p_COD_F      IN     VARCHAR2,  --Форма проведення розрахунку
                          p_COD_V      IN     VARCHAR2,  --Вид операції
-                         p_COD_O      IN     VARCHAR2,  --Вид договору                                                
+                         p_COD_O      IN     VARCHAR2,  --Вид договору
                          p_sErr          OUT VARCHAR2)
   is
   begin
@@ -1946,14 +1947,14 @@ END;
         if  p_COD_V is not null then
           insert into operw (ref, tag, value)
            values (p_REF_MAIN, 'CP_VO', p_COD_V);
-        end if;      
+        end if;
         if  p_COD_O is not null then
           insert into operw (ref, tag, value)
            values (p_REF_MAIN, 'CP_VD', p_COD_O);
-        end if;           
-  exception when others then   
+        end if;
+  exception when others then
     p_sErr := '!!!'||sqlerrm;
-    bars_audit.error('value_paper.setSpecparam p_REF_MAIN =' || p_REF_MAIN || 'error: '||p_sErr); 
+    bars_audit.error('value_paper.setSpecparam p_REF_MAIN =' || p_REF_MAIN || 'error: '||p_sErr);
   end;
 
   function prepare_cpr_wnd( strPar01   IN VARCHAR2,
@@ -3200,10 +3201,10 @@ END;
 
     bars_audit.info('value_paper.make_oper_cp_int_dividends END');
 end;
- 
+
   --виплата дивідентів -населення таблиці
   procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null) as
-   l_ref           cp_deal.ref%type;    
+   l_ref           cp_deal.ref%type;
   begin
      if p_ref is null then
        l_ref := to_number(bars.pul.get('cp_ref_dividents'));
@@ -3214,12 +3215,12 @@ end;
      if l_ref is null then
        raise_application_error(-20001,  'Вкажіть REF угоди по якій необхідно виплатити дивіденти');
      end if;
-     
-     
+
+
      delete from cp_pay_dividents where user_id = user_id();
      insert into cp_pay_dividents(ref) values(l_ref);
-     bars_audit.info('value_paper.make_pay_dividends_prepare END');     
-  end;    
+     bars_audit.info('value_paper.make_pay_dividends_prepare END');
+  end;
 
   --за основу функції взяті з нового пакету cp_rep_dgp
   --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.
@@ -3262,12 +3263,12 @@ end;
 
     return l_cnt_cp;
   end get_count_cp;
-  
+
   function getPFcombo(p_id in cp_kod.id%type) return t_PFCombo pipelined
   is
     l_PFCombo r_PFCombo;
   begin
-    bars_audit.info('value_paper.getPFcombo: p_id='||p_id);    
+    bars_audit.info('value_paper.getPFcombo: p_id='||p_id);
     for k in (SELECT p.PF, v.VIDD || '/' || p.NAME AS VAL, v.VIDD
                 FROM CP_PF p, CP_VIDD v
                WHERE     p.PF = v.PF
@@ -3291,15 +3292,15 @@ end;
       l_PFCombo.pf     := k.pf;
       l_PFCombo.val    := k.val;
       l_PFCombo.vidd   := k.vidd;
+      pipe row (l_PFCombo);      
     end loop;
-    pipe row (l_PFCombo); 
  end;
-  
+
  function getRYNcombo(p_vidd in ps.nbs%type, p_id in cp_kod.id%type) return t_RYNCombo pipelined
  is
    l_RYNCombo r_RYNCombo;
  begin
-   bars_audit.info('value_paper.getRYNcombo: p_vidd='||p_vidd||' p_id='||p_id);   
+   bars_audit.info('value_paper.getRYNcombo: p_vidd='||p_vidd||' p_id='||p_id);
    for k in (SELECT RYN, NAME
               FROM CP_RYN
              WHERE ryn IN (SELECT v.ryn
@@ -3317,10 +3318,10 @@ end;
    loop
      l_RYNCombo.ryn     := k.ryn;
      l_RYNCombo.name    := k.name;
+     pipe row (l_RYNCombo);     
    end loop;
-   pipe row (l_RYNCombo); 
  end;
- 
+
  function getPFcomboEmi(p_emi in cp_kod.emi%type, p_dox in cp_kod.dox%type, p_pf in cp_pf.pf%type) return t_PFCombo pipelined
  is
    l_PFCombo r_PFCombo;
@@ -3343,15 +3344,15 @@ end;
      l_PFCombo.pf     := k.pf;
      l_PFCombo.val    := k.val;
      l_PFCombo.vidd   := k.vidd;
+     pipe row (l_PFCombo);     
    end loop;
-   pipe row (l_PFCombo); 
  end;
- 
+
  function getRYNcomboEmi(p_emi in cp_kod.emi%type, p_dox in cp_kod.dox%type,p_vidd in ps.nbs%type) return t_RYNCombo pipelined
  is
    l_RYNCombo r_RYNCombo;
  begin
-   bars_audit.info('value_paper.getRYNcomboEmi: p_emi='||p_emi||' p_dox='||p_dox||' p_vidd='||p_vidd);   
+   bars_audit.info('value_paper.getRYNcomboEmi: p_emi='||p_emi||' p_dox='||p_dox||' p_vidd='||p_vidd);
    for k in (SELECT RYN, NAME
               FROM CP_RYN
              WHERE RYN IN (SELECT a.ryn
@@ -3365,10 +3366,10 @@ end;
    loop
      l_RYNCombo.ryn     := k.ryn;
      l_RYNCombo.name    := k.name;
+     pipe row (l_RYNCombo);     
    end loop;
-   pipe row (l_RYNCombo); 
  end;
- 
+
 
 END value_paper;
 /
