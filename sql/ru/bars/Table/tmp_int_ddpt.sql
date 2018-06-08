@@ -30,8 +30,8 @@ inner join bars.dpt_types dt on dt.type_id = dv.type_id
 where 1=1
 and d.dat_begin >= to_date(''28.02.2017'',''DD.MM.YYYY'')
 and (d.dat_end is null or d.dat_end > trunc(sysdate))
-and ir.bdat = (select max(bdat) from bars.int_ratn where acc = ir.acc))';
-and dt.type_code not in (''AKC'',''MPRG'')
+and ir.bdat = (select max(bdat) from bars.int_ratn where acc = ir.acc)
+and dt.type_code not in (''AKC'',''MPRG'')) ';
 
 exception
   when OTHERS then 
