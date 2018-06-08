@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_ANI34.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_ANI34 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_ANI34 (
+CREATE OR REPLACE PROCEDURE BARS.p_ani34 (
   p_mode int ,  -----------         ------|34 = № 3. Фін.результат за період по похідним фін.інструментам
                                     ------|35 = № 3` Фінансовий результат за період по "коротким" Форекс-угодам   COBUMMFO-4428
   p_dat1 date,  -- Дата З                 |          Розробка нового звіту за операціями ФОРЕКС на умовах СПОТ
@@ -68,7 +59,8 @@ PROMPT *** Create  procedure P_ANI34 ***
 
   -----------------------------------------------
   CURSOR C_35 IS select X.kod, x.deal_tag,  x.dat, x.ntik,  x.rnk,  x.dat_a, x.dat_b, x.KVA,  x.suma, x.kvb, x.sumb, x.ref
-                 from (SELECT forex.get_forextype (dat,dat_a,dat_b) KOD,  XX.*
+                   from (SELECT forex.get_forextype3 (xx.DEAL_TAG) KOD,  XX.* 
+                -- forex.get_forextype (dat,dat_a,dat_b) KOD,  XX.*
                        FROM fx_deal XX
                        WHERE nvl(xx.SWAP_TAG,0)=0 AND  NVL(l_tag,0) in (0, XX.deal_tag ) AND XX.SOS >0  and   least (xx.dat_a, xx.dat_b) <= l_dat2  and greatest (xx.dat_a, xx.dat_b) >= l_dat1
                       ) x
@@ -199,14 +191,3 @@ begin
 end p_ani34;
 ------------------------------------------------------------------------------
 /
-show err;
-
-PROMPT *** Create  grants  P_ANI34 ***
-grant EXECUTE                                                                on P_ANI34         to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_ANI34         to START1;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_ANI34.sql =========*** End *** =
-PROMPT ===================================================================================== 
