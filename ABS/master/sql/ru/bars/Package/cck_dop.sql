@@ -1377,6 +1377,23 @@ end builder_gpk;
 
       return get_isp_by_branch(l_sb_row.branch);
   end get_isp_by_user;
+  
+   -- получение генерального договора для субдоговора
+  function get_gen_nd(p_ndg in cc_deal.nd%type)
+    return cc_deal.nd%type is
+    l_nd cc_deal.nd%type;
+  begin
+
+    select nd into l_nd
+      from cc_deal t
+			 where t.nd = p_ndg
+			 and rownum = 1;		
+
+    return l_nd;
+  exception
+    when no_data_found then
+      return l_nd;
+  end get_gen_nd;
 
   -- Открытие счета КД по типу
   procedure open_account(p_nd  in cc_deal.nd%type,
@@ -1577,6 +1594,12 @@ begin
   -- Построение потоков и расчет Эф. ставки
   if l_cd_row.vidd in (2,3,12,13) then
          logger.info('CCK_DOP.CALC_SDI VIDD =' || l_cd_row.vidd ||'для договору  ND=' || to_char(l_cd_row.nd) ||'кредитних лінй значення ЕФ.ставки не розраховується');
+  
+  --COBUPRVNIX-151 При авторизації Ген.договора по суб.договору надо убрать расчет эффект.ставки
+	elsif get_gen_nd(l_cd_row.nd) is not null then
+	  logger.info('CCK_DOP.cc_autor vidd ='||l_cd_row.vidd||', для субдоговору  nd='||to_char(l_cd_row.nd)||' ЕФ.ставки не розраховуються');
+  --COBUPRVNIX-151	
+  
   else
       select count(*) into l_tmp_cnt from cc_many where nd = p_nd ;
       if (l_tmp_cnt = 0) then      calc_sdi( p_nd, null);  end if ;
