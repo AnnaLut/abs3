@@ -587,9 +587,9 @@ begin
                               least(k.wdate, dat_);
                   
            insert into otc_ff7_history_acc (DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, OST, OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, 
-                STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, OSTQ_KD, R_DOS, CC_ID, TPA, S080, KF, R011, S245)
+                STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, OSTQ_KD, R_DOS, CC_ID, TPA, S080, R011, S245)
            select DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, 0, 0, doso_, koso_, k.nd, NKD, k.sdate, k.wdate, k.sos, RNK, 
-                STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, 0, r_doso_, CC_ID, TPA, S080, KF, R011, S245
+                STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, 0, r_doso_, CC_ID, TPA, S080, R011, S245
            from otc_ff7_history_acc 
            where datf = dat_ and
                  ltrim(nd, '-') = to_char(k.cur_nd) and
