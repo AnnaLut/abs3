@@ -3485,20 +3485,34 @@ begin
               and dk  = l_dk
            returning acc into l_acc;
            -- если не нашли, смотрим на уже сквитованные документы
-           if sql%rowcount = 0 then
-              update ow_pkk_history
+           if sql%rowcount = 0 then 
+
+              -- якщо регіон не втягнув всі файли до міграції в ммфо
+              -- добавляємо ключ до референса.
+              update ow_pkk_que
                  set drn = l_drn,
                      resp_class = l_resp_class,
                      resp_code  = l_resp_code,
                      resp_text  = l_resp_text
                where f_n = l_iic_filename
-                 and ref = l_srn
+                 and ref = bars_sqnc.rukey(to_char(l_srn))
                  and dk  = l_dk
-              returning acc into l_acc;
+              returning acc into l_acc;                            
               if sql%rowcount = 0 then
-                 l_err := 'Квитовка док. ' || l_srn || ' - док. не відправлявся в файлі ' || l_iic_filename ||';';
-                 bars_audit.info(h || p_filename || ': ' || l_err);
-                 l_msg := substr(l_msg || l_err, 1, 254);
+                 update ow_pkk_history
+                    set drn = l_drn,
+                        resp_class = l_resp_class,
+                        resp_code  = l_resp_code,
+                        resp_text  = l_resp_text
+                  where f_n = l_iic_filename
+                    and ref = l_srn
+                    and dk  = l_dk
+                 returning acc into l_acc;
+                 if sql%rowcount = 0 then
+                    l_err := 'Квитовка док. ' || l_srn || ' - док. не відправлявся в файлі ' || l_iic_filename ||';';
+                    bars_audit.info(h || p_filename || ': ' || l_err);
+                    l_msg := substr(l_msg || l_err, 1, 254);
+                 end if;
               end if;
            end if;
 
@@ -3508,7 +3522,16 @@ begin
                where o.ref = l_srn
                  and o.tt = t.tt
                  and t.dk = l_dk;
-           exception when no_data_found then null;
+           exception when no_data_found then 
+              begin
+              l_srn :=  to_number(bars_sqnc.rukey(to_char(l_srn)));
+              select t.pay_flag, o.tt into l_payflag, l_tt
+                from obpc_trans_out t, oper o
+               where o.ref = l_srn
+                 and o.tt = t.tt
+                 and t.dk = l_dk;
+              exception when no_data_found then null;
+              end;
            end;
 
            -- оплата/сторнирование при квитовке
