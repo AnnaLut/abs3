@@ -26,6 +26,7 @@ begin
 exception when others then       
   if sqlcode=-942 then null; else raise; end if; 
 end;
+/
 
 PROMPT *** Create  table OTCN_FF8_MIGR_ND ***
 begin 
