@@ -1,33 +1,37 @@
-prompt ====================================
-prompt Create job sto_pm_auto_try 
-prompt ====================================
-
-
-BEGIN
-  SYS.DBMS_SCHEDULER.DROP_JOB
-    (job_name  => 'BARS.STO_PM_AUTO_TRY');
-EXCEPTION
-   WHEN OTHERS
-   THEN
-      IF SQLCODE = -27475
-      THEN
-         NULL;
-      ELSE
-         RAISE;
-      END IF;  
-END;
-/
+--Job STO_PM_AUTO_TRY 
+  /*drop old job is exists*/
 
 begin
+    dbms_scheduler.drop_job(job_name => 'BARS.STO_PM_AUTO_TRY');
+  exception when others then
+    if sqlcode = -27475 then 
+      null;
+    elsif sqlcode = -27478 then -- is running
+      dbms_scheduler.stop_job(job_name => 'BARS.STO_PM_AUTO_TRY', force => true);
+      dbms_scheduler.drop_job(job_name => 'BARS.STO_PM_AUTO_TRY');
+    else 
+      raise; 
+    end if;
+end;    
+/ 
+---create new-----
+begin
   sys.dbms_scheduler.create_job(job_name            => 'BARS.STO_PM_AUTO_TRY',
-                                job_type            => 'STORED_PROCEDURE',
-                                job_action          => 'bars.sto_payment_utl.auto_try',
+                                job_type            => 'PLSQL_BLOCK',
+                                job_action          => 'begin
+                                                         for i in (select kf from mv_kf) loop
+                                                                 bc.go(i.kf);
+                                                                 bars.sto_payment_utl.auto_try;
+                                                                 commit;
+                                                           end loop;
+                                                        end',
                                 start_date          => to_date('01-01-2000 00:00:00', 'dd-mm-yyyy hh24:mi:ss'),
                                 repeat_interval     => 'Freq=Daily;Interval=1',
                                 end_date            => to_date(null),
                                 job_class           => 'DEFAULT_JOB_CLASS',
-                                enabled             => false,
+                                enabled             => true,
                                 auto_drop           => false,
-                                comments            => '');
+                                comments            => 'Посторна відправка документів до ПЦ');
+                          
 end;
 /
