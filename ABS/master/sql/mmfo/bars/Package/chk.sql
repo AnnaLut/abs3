@@ -2883,7 +2883,7 @@ end make_data4visa_ext_xml;
             dbms_xmldom.setAttribute(l_xmlDocElement,
                                      'erm',
                                      '13 - ' || substr(sqlerrm,22, instr(substr(sqlerrm,22),'ORA-06512')-1));
-          elsif (sqlcode > 19999 and sqlcode < 20999) then
+          elsif (sqlcode between -20999 and -20000) then
             rollback to before_locknput_visa;
             declare
                 l_errumsg  varchar2(4000);
@@ -3644,7 +3644,7 @@ end make_data4visa_ext_xml;
                          substr(sqlerrm,
                                 22,
                                 instr(substr(sqlerrm, 22), 'ORA-06512') - 1));
-          elsif (sqlcode > 19999 and sqlcode < 20999) then
+          elsif (sqlcode between -20999 and -20000) then
             rollback to before_locknput_visa;
             declare
               l_errumsg  varchar2(4000);
