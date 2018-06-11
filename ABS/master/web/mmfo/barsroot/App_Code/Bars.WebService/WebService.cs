@@ -19,6 +19,9 @@ using CommandType = System.Data.CommandType;
 using barsroot.core;
 using System.Linq;
 using BarsWeb.Core.Logger;
+using System.IO;
+using Bars.Configuration;
+using System.Security.Principal;
 
 namespace Bars
 {
@@ -379,7 +382,7 @@ namespace Bars
                 //бывает просто перечень полей для сортировки через запятую
                 if (data[3].IndexOf(", ") >= 0)
                 {
-                    string[] sort = data[3].Split(new[] {", "}, StringSplitOptions.None);
+                    string[] sort = data[3].Split(new[] { ", " }, StringSplitOptions.None);
                     foreach (var sortItem in sort)
                     {
                         request.Sorts.Add(new SortDescriptor()
@@ -393,18 +396,18 @@ namespace Bars
                 {
                     //бывает название колонки - направление
                     string[] sort = data[3].Split(' ');
-                    
+
                     var orderParam = GetOrderParameter(query, sort[0]);
 
                     request.Sorts.Add(new SortDescriptor()
                     {
                         //Member = sort[0],
-                        
+
                         Member = orderParam,
-                        SortDirection = sort.Length>1 && sort[1].ToUpper() == "DESC" ? ListSortDirection.Descending : ListSortDirection.Ascending
+                        SortDirection = sort.Length > 1 && sort[1].ToUpper() == "DESC" ? ListSortDirection.Descending : ListSortDirection.Ascending
                     });
                 }
-                
+
             }
             //2. Создадим конвертер и произведем конвертацию
             KendoSqlTransformer sqlTransformer = new KendoSqlTransformer(null);
@@ -449,7 +452,7 @@ namespace Bars
             int endPosFrom = query.ToLower().IndexOf("from", startPos);
             int endPos = endPosComa < endPosFrom && endPosComa > 0 ? endPosComa : endPosFrom;
             string orderParamsStr = query.Substring(startPos, endPos - startPos);
-            string[] orderParams = orderParamsStr.Split(' ').Where(p=>!string.IsNullOrWhiteSpace(p)).ToArray();
+            string[] orderParams = orderParamsStr.Split(' ').Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
             string orderParam = string.Empty;
             if (orderParams.Length > 1)
             {
@@ -494,8 +497,8 @@ namespace Bars
             }
             return result;
         }
-		
-		protected string GetHostName()
+
+        protected string GetHostName()
         {
             string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
@@ -561,7 +564,77 @@ namespace Bars
             // Если выполнили установку параметров
             Session["UserLoggedIn"] = true;
         }
-		
+
+        public void LogOutUser()
+        {
+            var context = HttpContext.Current;
+            if (ConfigurationSettings.AppSettings["CustomAuthentication.UseSession"] != "On")
+            {
+                string port = (context.Request.ServerVariables["SERVER_PORT"] == "80") ? ("") : (context.Request.ServerVariables["SERVER_PORT"]);
+                string cookieName = ConfigurationSettings.AppSettings["CustomAuthentication.Cookie.Name"] + port;
+                HttpCookie cookie = context.Request.Cookies[cookieName.ToUpper()];
+                if (cookie != null)
+                {
+                    cookie.Expires = DateTime.Now.AddDays(-1);
+                    context.Response.Cookies.Add(cookie);
+                }
+            }
+            ClearSessionTmpDir();
+            // clear session in db
+            try
+            {
+                InitOraConnection();
+                SQL_PROCEDURE("bars.bars_login.logout_user");
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+
+            // clear context user
+            context.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
+        }
+        public void ClearSessionTmpDir()
+        {
+            var context = HttpContext.Current;
+            if (context != null && context.Session != null && context.Session.SessionID != null)
+            {
+                string strTempDir = Path.Combine(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath(),
+                    context.Session.SessionID);
+                DeletePatch(strTempDir);
+            }
+        }
+        private void DeletePatch(string dir)
+        {
+            if (Directory.Exists(dir))
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(dir);
+                foreach (var file in dirInfo.GetFiles())
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch (System.Exception)
+                    {
+                        //тушимо Exception на випадок якщо файл зайнятий
+                    }
+                }
+                foreach (var d in dirInfo.GetDirectories())
+                {
+                    DeletePatch(d.FullName);
+                }
+                try
+                {
+                    dirInfo.Delete();
+                }
+                catch (System.Exception)
+                {
+                    //тушимо Exception на випадок якщо каталог зайнятий
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -640,15 +713,15 @@ namespace Bars
 
 
             if (data[3] != string.Empty)
-            { 
+            {
                 query += " ORDER BY " + data[3];
             }
 
-            
+
             int startpos = Convert.ToInt32(data[4]);
             int pageSize = Convert.ToInt32(data[5]);
 
-                ds = SQL_SELECT_dataset(query, startpos, pageSize);
+            ds = SQL_SELECT_dataset(query, startpos, pageSize);
             obj[0] = ds.GetXml();
             obj[1] = count;
             return obj;
@@ -784,8 +857,8 @@ namespace Bars
                     reader = SQL_reader(string.Format("SELECT from_clause, where_clause FROM dyn_filter where filter_id {0} ({1})", seekOperator, idUserFilter));
                     for (int i = 0; i < reader.Count; i++)
                     {
-                        if (0==i%2 && Convert.ToString(reader[i]) != string.Empty) query += "," + reader[i].ToString().Replace("OUTER", "");
-                        if (0!=i%2 && Convert.ToString(reader[i]) != string.Empty) cond += " AND (" + Convert.ToString(reader[i]).Replace("$~~ALIAS~~$", TabAlias) + ") ";
+                        if (0 == i % 2 && Convert.ToString(reader[i]) != string.Empty) query += "," + reader[i].ToString().Replace("OUTER", "");
+                        if (0 != i % 2 && Convert.ToString(reader[i]) != string.Empty) cond += " AND (" + Convert.ToString(reader[i]).Replace("$~~ALIAS~~$", TabAlias) + ") ";
                     }
                 }
             }
@@ -855,13 +928,13 @@ namespace Bars
                     if (strWhere.Substring(0, 4).ToUpper() == "AND ")
                         strWhere = strWhere.Substring(4);
                 }
-                
+
                 query += " WHERE " + strWhere;
             }
-            
+
             //adding kv nbs ob22 cond
-            if(data.Length>=24)
-            { 
+            if (data.Length >= 24)
+            {
                 if (data[22] != "")
                     query += String.Format(" AND a.kv ={0}", data[22]);
                 if (data[23] != "")
