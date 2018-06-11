@@ -62,7 +62,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers
         }
 
         [HttpGet]
-        public ActionResult QuestItemsDisplay(int dealId, string customerRnk)
+        public ActionResult QuestItemsDisplay(decimal dealId, string customerRnk)
         {
             W4_DKBO_WEB_FilterParams fp = new W4_DKBO_WEB_FilterParams() { DEAL_ID = dealId, CUSTOMER_ID = customerRnk};
             return RedirectToAction("QuestItemsShow", fp);
