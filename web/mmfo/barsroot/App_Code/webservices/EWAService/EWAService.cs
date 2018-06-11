@@ -18,43 +18,6 @@ public class EWAService : BarsWebService
     public WsHeader WsHeaderValue;
 
     #region Приватные методы
-    private string GetHostName()
-    {
-        string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-
-        if (String.IsNullOrEmpty(userHost) || String.Compare(userHost, "unknown", true) == 0)
-            userHost = HttpContext.Current.Request.UserHostAddress;
-
-        if (String.Compare(userHost, HttpContext.Current.Request.UserHostName) != 0)
-            userHost += " (" + HttpContext.Current.Request.UserHostName + ")";
-
-        return userHost;
-    }
-
-    private void LoginUser(String userName)
-    {
-        // информация о текущем пользователе
-        UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
-
-        try
-        {
-            InitOraConnection();
-            // установка первичных параметров
-            SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
-            SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);
-            SetParameters("p_hostname", DB_TYPE.Varchar2, GetHostName(), DIRECTION.Input);
-            SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
-            SQL_PROCEDURE("bars.bars_login.login_user");
-        }
-        finally
-        {
-            DisposeOraConnection();
-        }
-
-        // Если выполнили установку параметров
-        Session["UserLoggedIn"] = true;
-    }
-
     private string SendAccStatusToEWA(Int32 id, String state)
     {
         //get email for logging to EWA
@@ -162,6 +125,10 @@ public class EWAService : BarsWebService
         {
             result.status = "ERROR";
             result.message = ex.Message + (ex.InnerException == null ? "" : ". " + ex.InnerException.Message);
+        }
+        finally
+        {
+            LogOutUser();
         }
         return result;
     }
