@@ -108,3 +108,76 @@ execute immediate 'alter trigger TIU_ND_TXT_CHECK enable';
 execute immediate 'alter trigger TI_ND_TXT_INS_VKR enable';
 end;
 /
+
+prompt --SYNC_ND_TXT_UPDATE haryn vasyl
+
+DECLARE
+
+  l_stmt varchar2(4000);
+
+  l_chunk varchar2(4000);
+
+  p_task varchar2 (100);
+
+BEGIN
+
+  p_task:='sync_nd_txt_update'||to_char(sysdate,'ddmmhh24miss');
+
+  l_chunk := 'select kf as START_ID, kf as END_ID from bars.mv_kf';
+
+  l_stmt := '
+
+         declare
+
+           l_id             number :=0;
+
+           l_cnt            number :=0;
+
+         begin
+
+           bars_login.login_user(p_sessionid => substr(sys_guid(), 1, 32),
+
+                                            p_userid    => 1,
+
+                                            p_hostname  =>null ,
+
+                                            p_appname   =>null);
+
+         bc.go(:START_ID);
+
+         bars.logger.info(''sync_nd_txt_update-''||:START_ID||''/''||:END_ID||'' ''||f_ourmfo||''date:''||to_char(sysdate,''dd.mm.hh24:mi:ss''));
+
+         BARS.UPDATE_TBL_UTL.SYNC_ND_TXT_UPDATE(l_id, l_cnt);
+
+       commit;
+
+       end;';
+
+ 
+
+dbms_parallel_execute.create_task(p_task);
+
+DBMS_PARALLEL_EXECUTE.create_chunks_by_sql(task_name => p_task,
+
+                                             sql_stmt  => l_chunk,
+
+                                             by_rowid  => FALSE);
+
+ 
+
+DBMS_PARALLEL_EXECUTE.run_task(task_name      => p_task,
+
+                                 sql_stmt       => l_stmt,
+
+                                 language_flag  => DBMS_SQL.NATIVE,
+
+                                 parallel_level => 10);
+
+ 
+
+   dbms_parallel_execute.drop_task(p_task);
+
+ 
+
+END;
+/
