@@ -348,12 +348,12 @@ begin
   delete from op_rules where tt='CN1';
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('ADRES', 'CN1', 'M', 1, 8, null, null);
+    values ('ADRS', 'CN1', 'M', 1, 8, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''ADRES'', ''CN1'', ''M'', 1, 8, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''ADRS'', ''CN1'', ''M'', 1, 8, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
