@@ -14,7 +14,7 @@ from   (select b.kf, b.branch_name, t.id data_type_id, t.data_type_name,
                        r.reporting_date = trunc(sysdate, 'mm')) last_request_id
         from   nbu_core_data_request_type t
         cross join nbu_core_branch b
-        where  t.is_active = 1 and t.id not in (4,5,6)) d
+        where  t.is_active = 1 and t.id not in (4,5)) d
 left join nbu_core_data_request s on s.id = d.last_request_id
 order by d.kf, d.data_type_id;
 
