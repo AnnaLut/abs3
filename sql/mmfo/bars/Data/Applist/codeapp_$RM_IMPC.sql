@@ -2,21 +2,24 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/Applist/codeapp_$RM_IMPC.sql =========*
 PROMPT ===================================================================================== 
 
-
 PROMPT *** Create/replace  ARM  $RM_IMPC ***
-  declare
-    l_application_code varchar2(10 char) := '$RM_IMPC';
-    l_application_name varchar2(300 char) := 'АРМ Імпорт файлів зарахувань';
-    l_application_type_id integer := user_menu_utl.APPLICATION_TYPE_WEB;
-    l_function_ids number_list := number_list();
-    l_function_codeoper     OPERLIST.CODEOPER%type;
-    l_function_deps         OPERLIST.CODEOPER%type;
-    l_application_id integer;
-    l_role_resource_type_id integer := resource_utl.get_resource_type_id(user_role_utl.RESOURCE_TYPE_ROLE);
-    l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
-    l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
-    l integer := 0;
-	d integer := 0;
+
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET DEFINE       OFF
+
+declare
+  l_application_code      varchar2(10 char) := '$RM_IMPC';
+  l_application_name      varchar2(300 char) := 'АРМ Імпорт файлів зарахувань';
+  l_application_type_id   integer := user_menu_utl.APPLICATION_TYPE_WEB;
+  l_function_ids number_list := number_list();
+  l_function_codeoper     OPERLIST.CODEOPER%type;
+  l_function_deps         OPERLIST.CODEOPER%type;
+  l_application_id        integer;
+  l_role_resource_type_id integer := resource_utl.get_resource_type_id(user_role_utl.RESOURCE_TYPE_ROLE);
+  l_arm_resource_type_id  integer := resource_utl.get_resource_type_id(user_menu_utl.get_arm_resource_type_code(l_application_type_id));
+  l_func_resource_type_id integer := resource_utl.get_resource_type_id(user_menu_utl.get_func_resource_type_code(l_application_type_id));
+  l integer := 0;
+  d integer := 0;
 begin
      DBMS_OUTPUT.PUT_LINE(' $RM_IMPC створюємо (або оновлюємо) АРМ АРМ Імпорт файлів зарахувань ');
      user_menu_utl.cor_arm(  P_ARM_CODE              => l_application_code,
@@ -273,27 +276,32 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт 6: ФАЙЛИ СБОН+ ********** ');
+    l := l + 1;
+    l_function_ids.extend(l);
+    l_function_ids(l) := abs_utils.add_func( p_name     => 'Iмпорт 6: ФАЙЛИ СБОН+',
+                                             p_funcname => '/barsroot/sberutls/importex.aspx?imptype=sbon',
+                                             p_rolename => 'WR_XMLIMP' ,
+                                             p_frontend => l_application_type_id
+                                           );
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Iмпорт : Розбiр документiв ********** ');
-          --  Створюємо функцію Iмпорт : Розбiр документiв
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Iмпорт : Розбiр документiв',
-                                                  p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
-                                                  p_rolename => 'WR_XMLIMP' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
+    --  Створюємо функцію Iмпорт : Розбiр документiв
+    l := l + 1;
+    l_function_ids.extend(l);
+    l_function_ids(l) := abs_utils.add_func( p_name     => 'Iмпорт : Розбiр документiв',
+                                             p_funcname => '/barsroot/sberutls/importproc.aspx?tp=1',
+                                             p_rolename => 'WR_XMLIMP' ,
+                                             p_frontend => l_application_type_id
+                                           );
 
-
-      --  Створюємо дочірню функцію Iмпорт : Редагування iмпортованого документа
-                     l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Iмпорт : Редагування iмпортованого документа',
-															  p_funcname => '/barsroot/sberutls/importproced.aspx\S*',
-															  p_rolename => 'WR_XMLIMP' ,
-															  p_frontend => l_application_type_id
-															  );
-					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+    -- Створюємо дочірню функцію Iмпорт : Редагування iмпортованого документа
+    l_function_deps := abs_utils.add_func( p_name     => 'Iмпорт : Редагування iмпортованого документа',
+                                           p_funcname => '/barsroot/sberutls/importproced.aspx\S*',
+                                           p_rolename => 'WR_XMLIMP',
+                                           p_frontend => l_application_type_id
+                                         );
+    abs_utils.add_func2deps( l_function_ids(l), l_function_deps );
 
       --  Створюємо дочірню функцію Iмпорт : Редагування iмпортованого документа
                      l_function_deps  :=   abs_utils.add_func(
