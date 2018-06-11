@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D8 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 11/05/2018 (19/04/2018, 17/04/2018)
+% VERSION     : 11/06/2018 (11/05/2018, 19/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                sheme_ - схема формирования
@@ -18,6 +18,7 @@ IS
     содержиться в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение для не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%11/06/2018 - на 01.06.2018 добавлено формирование показателя 134.......
 %11/05/2018 - для счетов дисконта 14_6,15_6,20_6,21_6,22_6,23_6,24_6,
               31_6,32_6,35_6 
               и параметра R013 in ('1','2','3','4')
@@ -333,6 +334,7 @@ IS
    smax_        NUMBER                := 200000000;
    -- максимальна сума на одного контрагента
    tip_         accounts.tip%TYPE;
+   mdate_       accounts.mdate%TYPE;
    dat1_        DATE;                               -- дата начала декады !!!
    dat2_        DATE;                      -- дата окончания пред. декады !!!
    dc_          INTEGER;
@@ -507,6 +509,7 @@ IS
    dat_izm5     date := to_date('30/12/2016','dd/mm/yyyy');
    dat_izm6     date := to_date('29/12/2017','dd/mm/yyyy');
    dat_izm7     date := to_date('27/04/2018','dd/mm/yyyy');
+   dat_izm8     date := to_date('31/05/2018','dd/mm/yyyy');
    n_trans      number;
    kod_mm       Varchar2(2);
    nls_9129_9   VARCHAR2 (15);
@@ -718,7 +721,7 @@ IS
               FROM rnbu_trace
              WHERE SUBSTR (kodp, 1, 3) IN
                          ('081','083','084','086', '118', '119', '121', '122', '123',
-                          '124','125','126','127','128','131','132'
+                          '124','125','126','127','128','131','132','134'
                          )
       GROUP BY kodp
       ORDER BY SUBSTR (kodp, 4, 10), SUBSTR (kodp, 33), SUBSTR (kodp, 1, 3);
@@ -2461,8 +2464,8 @@ BEGIN
    p_ins_log ('Статутний капiтал: ', sum_sk_);
    p_ins_log ('smax_  : ', smax_);
 
-                                                  -- месячный файл
-   dat1_ := TO_DATE ('01' || TO_CHAR (dat_, 'mmyyyy'), 'ddmmyyyy');
+   -- месячный файл
+   dat1_ := TRUNC(Dat_,'MM');
 
    -- к_нець попередньої м_сяця
    SELECT MAX (fdat)
@@ -3530,6 +3533,21 @@ BEGIN
          where  rnk = k.rnk;
    end loop;
 
+   -- изменяем поле ND (номер договора) в таблице OTCN_F71_TEMP, OTCN_F71_HISTORY
+   -- на номер Генерального договора (поле NDG в CC_DEAL)
+   FOR k IN ( select  * from cc_deal
+              where ndg is not null
+            )
+      LOOP
+
+         update otcn_f71_temp o set o.nd = k.ndg 
+         where o.nd = k.nd;
+
+         update otcn_f71_history o set o.nd = k.ndg 
+         where o.nd = k.nd;
+
+   END LOOP;
+   
    logger.info ('P_FD8_NN: End etap 3 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
    OPEN c_cust;
@@ -4891,15 +4909,22 @@ BEGIN
                                   if Dat_ >= dat_izm5
                                   then
 
+                                     select NVL(sum(s*100), 0)
+                                        into s_v   
+                                     from provodki_otc 
+                                     where fdat between dat1_ and dat_
+                                       and tt like '024%'
+                                       and accd = acc_; 
+
                                      select NVL(sum(dos), 0) 
                                         into dos_spn_
                                      from saldoa 
                                      where fdat between dat_ - 90 and dat_
                                        and acc = acc_; 
 
-                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_, dat_)
+                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_ - s_v, dat_)
                                      then 
-                                        p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_, dat_);
+                                        p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_- s_v, dat_);
 
                                         p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                TO_CHAR (ABS (p131_)),
@@ -4913,12 +4938,13 @@ BEGIN
                          else
                             if ddd_ = '123' then
                                begin
-                                  select a.tip 
-                                     into tip_ 
+                                  select a.tip, a.mdate 
+                                     into tip_, mdate_ 
                                   from accounts a  
                                   where a.acc = acc_;
                                exception when no_data_found then
                                   tip_  := 'SN';
+                                  mdate_ := Dat_;
                                end;
 
                                if (p070_ in ('1408', '1418', '1428', '1508',
@@ -4949,20 +4975,23 @@ BEGIN
                                end if;
 
                                if dat_ >= dat_izm5 and
-                                  (p070_ in ('1408', '1418', '1428', '1508',
-                                             '1518', '1528', '1538', '1548',
-                                             '1607', '2018', '2028', '2038',
-                                             '2048', '2068', '2078', '2088',
-                                             '2108', '2118', '2128', '2138',
-                                             '2148', '2208', '2218', '2228',
-                                             '2238', '2248', '2308', '2318',
-                                             '2328', '2338', '2348', '2358',
-                                             '2368', '2378', '2388', '2398',
-                                             '2408', '2418', '2428', '2438',
-                                             '2458', '2607', '2627', '2657',
-                                             '3008', '3018', '3108', '3118',
-                                             '3218', '3418', '3428', '3568'
-                                            ) and p120_ < 0 ) AND tip_ = 'SPN'
+                                  ( (p070_ in ('1408', '1418', '1428', '1508',
+                                               '1518', '1528', '1538', '1548',
+                                               '1607', '2018', '2028', '2038',
+                                               '2048', '2068', '2078', '2088',
+                                               '2108', '2118', '2128', '2138',
+                                               '2148', '2208', '2218', '2228',
+                                               '2238', '2248', '2308', '2318',
+                                               '2328', '2338', '2348', '2358',
+                                               '2368', '2378', '2388', '2398',
+                                               '2408', '2418', '2428', '2438',
+                                               '2458', '2607', '2627', '2657',
+                                               '3008', '3018', '3108', '3118',
+                                               '3218', '3418', '3428', '3568'
+                                              ) and p120_ < 0 AND tip_ = 'SPN'
+                                    ) OR  
+                                    (p070_ = '3118' and p120_ < 0 and tip_ = 'ODB')
+                                  )
                                then
 
                                   w_ := '2';
@@ -4981,16 +5010,27 @@ BEGIN
                                   if Dat_ >= dat_izm5
                                   then
 
+                                     select NVL(sum(s*100), 0)
+                                        into s_v   
+                                     from provodki_otc 
+                                     where fdat between dat1_ and dat_
+                                       and tt like '024%'
+                                       and accd = acc_; 
+
                                      select NVL(sum(dos), 0) 
                                         into dos_spn_
                                      from saldoa 
                                      where fdat between dat_ - 90 and dat_
                                        and acc = acc_; 
 
-                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_, dat_)
+                                     if (ABS(p120_) > gl.p_icurval(kv_, dos_spn_ - s_v, dat_)) OR
+                                        (p070_ = '3118' and p120_ < 0  
+                                                    and tip_ = 'ODB'
+                                                    and Dat_ - mdate_ > 90
+                                        )
                                      then 
 
-                                        p132_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_, dat_);
+                                        p132_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_ - s_v, dat_);
 
                                         p_ins ('132' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                TO_CHAR (ABS (p132_)),
@@ -4999,6 +5039,22 @@ BEGIN
                                               );
                                      end if;
 
+                                     if Dat_ >= dat_izm8
+                                     then
+                                        if (tip_ = 'SPN' and mdate_ < dat_) OR
+                                           (p070_ = '3118' and p120_ < 0  
+                                                       and tip_ = 'ODB'
+                                                       and mdate_ < dat_
+                                           )
+                                        then 
+
+                                           p_ins ('134' || kod_okpo || kod_nnnn || p070_ || p140_,
+                                                  TO_CHAR (ABS (p120_)),
+                                                  nls_,
+                                                  null, k021_, w_, '00', H_, K140_
+                                                 );
+                                        end if;
+                                     end if;
                                   end if;
                                end if;
                             else
@@ -5030,15 +5086,22 @@ BEGIN
                                   if Dat_ >= dat_izm5
                                   then
 
+                                     select NVL(sum(s*100), 0)
+                                        into s_v   
+                                     from provodki_otc 
+                                     where fdat between dat1_ and dat_
+                                       and tt like '024%'
+                                       and accd = acc_; 
+
                                      select NVL(sum(dos), 0) 
                                         into dos_spn_
                                      from saldoa 
                                      where fdat between dat_ - 90 and dat_
                                        and acc = acc_; 
 
-                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_, dat_)
+                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_ - s_v, dat_)
                                      then 
-                                        p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_, dat_);
+                                        p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_ - s_v, dat_);
 
                                         p_ins ('131' || kod_okpo || kod_nnnn || p070_ || p140_,
                                                TO_CHAR (ABS (p131_)),
