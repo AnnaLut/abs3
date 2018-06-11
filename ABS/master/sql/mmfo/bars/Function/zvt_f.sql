@@ -13,10 +13,7 @@ CREATE OR REPLACE FUNCTION BARS.ZVT_F (NBSD_    VARCHAR2,          -- БС Дебет
                                                         )
    RETURN INT
    RESULT_CACHE
-
 IS
-
-
 /*
 21.02.2018 COBUMMFO-6627
 За балансовими рахунками 7301 
@@ -329,7 +326,6 @@ BEGIN
          AND NBSk_ LIKE '6%'
    THEN
       t_ := -84;                                                --АВТ.: Доходи
-
    ELSIF     (tt_ LIKE 'AR_' OR tt_ = '096')
          AND SUBSTR (NBSd_, 1, 2) IN ('77', '38')
          AND NBSk_ IN
@@ -362,14 +358,10 @@ BEGIN
                  '3690')
    THEN
       t_ := 87;
-
-ELSIF
-TT_='ARE' AND (nbsd_='7702' and nbsk_='2401')
+   ELSIF TT_ = 'ARE' AND (nbsd_ = '7702' AND nbsk_ = '2401')
   THEN
          t_ := -87;
-
-ELSIF
-TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
+   ELSIF TT_ = 'ARE' AND (nbsd_ = '2401' AND nbsk_ = '7702')
   THEN
          t_ := 87;
                                                --АВТ.: Резерви
@@ -410,26 +402,27 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    ELSIF tt_ = 'OVR'
    THEN
       t_ := 95;                                               -- АВТ:Овердрафт
-   ELSIF tt_ IN ('PKA', 'PKD', 'PKR','PKQ','OW4')           THEN      t_ := 36;   -- БПК:меморіальні ручні
+   ELSIF tt_ IN ('PKA', 'PKD', 'PKR', 'PKQ', 'OW4')
+   THEN      
+      t_ := 36;   -- БПК:меморіальні ручні
    -- заведомо старые БПК
-   ELSIF     NbSD_ IN ('2625', '2605')    AND NbSK_ = '2924'
-             AND SUBSTR (tt_, 1, 2) NOT IN ('KL')      THEN  t_ := -86;     -- БПК:(2924<->2625)
-   ELSIF     NbSK_ IN ('2625', '2605')    AND NbSD_ = '2924'
-             AND SUBSTR (tt_, 1, 2) NOT IN ('KL')      THEN  t_ :=  86;      -- БПК:(2924<->2625)
-
-
-
+   ELSIF     NbSD_ IN ('2625', '2605')
+         AND NbSK_ = '2924'
+         AND SUBSTR (tt_, 1, 2) NOT IN ('KL')
+   THEN  
+      t_ := -86;     -- БПК:(2924<->2625)
+   ELSIF     NbSK_ IN ('2625', '2605')
+         AND NbSD_ = '2924'
+         AND SUBSTR (tt_, 1, 2) NOT IN ('KL')      
+   THEN  
+      t_ :=86;-- БПК:(2924<->2625)
    --4.     Із папки 4 «Вклади ФО» (б/г) перенести в папку 13 «Кредити ФО» бухгалтерські проводки з кореспонденцією рахунків за дебетом 22 гр. і кредитом 2620; дебетом 2620 і кредитом 22 гр., 6397.
-   elsif (NBSd_ like '22%'
-         AND NBSk_ ='2620')
-   then t_:= 13;
-
-   elsif ((NBSk_ like '22%' or NBSk_='6397')
-         AND NBSd_ ='2620')
-   then t_:= -13;
-
-
-
+   ELSIF (NBSd_ LIKE '22%' AND NBSk_ = '2620')
+   THEN
+      t_ := 13;
+   ELSIF ( (NBSk_ LIKE '22%' OR NBSk_ = '6397') AND NBSd_ = '2620')
+   THEN
+      t_ := -13;
    --------- Заведомо ВКЛАДЫ -----
    ELSIF     NBSd_ IN ('3801', '7041')
          AND NBSk_ IN ('3801', '7041')
@@ -456,8 +449,8 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
       END IF;
   ELSIF ( ( tt_ IN ('ЧЕК')
           AND NBSd_ IN ('2570', '2571', '2572')
-          AND NBSk_ IN ('1001', '1002') )or
-       (    tt_ IN ('00J')
+              AND NBSk_ IN ('1001', '1002'))
+          OR (    tt_ IN ('00J')
           AND NBSk_ IN ('2570', '2571', '2572')
           AND NBSd_ IN ('1001', '1002')))
    THEN
@@ -494,40 +487,43 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    --08.05.2012
    --ElsIf  (nbsd_ ='2924' and nbsk_ ='2625')
    --       or (nbsk_ ='2924' and nbsd_ ='2625')                 then t_:= 86;
-   ELSIF tt_ in ('OW3','OWI')
+   ELSIF tt_ IN ('OW3', 'OWI')
    THEN
       t_ := 14;
-
    ELSIF tt_ LIKE 'OW_' --and NOT (nbsd_='2924' and nbsk_='2600')
          AND mfoa_ = mfob_
    THEN
       t_ := 14;                                                   --   ПЦ WEY4
    ELSIF (tt_ LIKE 'PK_' OR tt_ = 'R03') AND tt_ NOT IN ('PKK')
    THEN
-      IF nbsd_ = '7452' AND nbsk_ IN ('3550', '2924')          THEN  t_ := 27;     -- Витрати
+      IF nbsd_ = '7452' AND nbsk_ IN ('3550', '2924')
+      THEN
+         t_ := 27;                                                  -- Витрати
       -- 28-05-2010 у пап 96 АВТ: БПК
       -- виокремити  деб.7452  - крд 3550,2924
       -- та додати у папку 27 Витрати.
-      ELSIF tt_ IN  ('PKA', 'PKD', 'PKQ', 'PKG', 'PKH',
-                     'PKR', 'PKS', 'PKX', 'PKE', 'PKU',
-                     'PKY', 'PKZ')                             THEN   t_ := 86;                                                          --
-                                                               ELSE   t_ := 96;  -- АВТ:Проводки по БПК
+      ELSIF tt_ IN
+               ('PKA',
+                'PKD',
+                'PKQ',
+                'PKG',
+                'PKH',
+                'PKR',
+                'PKS',
+                'PKX',
+                'PKE',
+                'PKU',
+                'PKY',
+                'PKZ')
+      THEN
+         t_ := 86;                                                          --
+      ELSE
+         t_ := 96;                                      -- АВТ:Проводки по БПК
       END IF;
    -- Другое
    ELSIF     (NBSd_ LIKE '22%')
-         AND tt_ IN  ( '015', '013',
-                      'KK1', 'KK2', 'KK4', 'KK5', 'KL1',
-                      'KL2', 'IB1', 'IB2', 'SNO',
-                      '096')                                  THEN    t_ := 13;  --Кредити ФО
-   ELSIF     (NBSk_ LIKE '22%')
-         AND tt_ IN  ( '015', '013',
-                      'KK1', 'KK2', 'KK4', 'KK5', 'KL1',
-                      'KL2', 'IB1', 'IB2','SNO',
-                      '096')                                  THEN    t_ := -13; --Кредити ФО
-    ELSIF     (NBSd_ LIKE '20%' OR NBSd_ LIKE '21%')
          AND tt_ IN
-                (
-                 '015',
+                ('015',
                  '013',
                  'KK1',
                  'KK2',
@@ -537,15 +533,45 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
                  'KL2',
                  'IB1',
                  'IB2',
-
+                 'SNO',
+                 '096')
+   THEN
+      t_ := 13;                                                   --Кредити ФО
+   ELSIF     (NBSk_ LIKE '22%')
+         AND tt_ IN
+                ('015',
+                 '013',
+                 'KK1',
+                 'KK2',
+                 'KK4',
+                 'KK5',
+                 'KL1',
+                 'KL2',
+                 'IB1',
+                 'IB2',
+                 'SNO',
+                 '096')
+   THEN
+      t_ := -13;                                                  --Кредити ФО
+    ELSIF     (NBSd_ LIKE '20%' OR NBSd_ LIKE '21%')
+         AND tt_ IN
+                ('015',
+                 '013',
+                 'KK1',
+                 'KK2',
+                 'KK4',
+                 'KK5',
+                 'KL1',
+                 'KL2',
+                 'IB1',
+                 'IB2',
                  'SNO',
                  '096')
    THEN
       t_ := 15;                                                   --Кредити ЮО
    ELSIF     (NBSk_ LIKE '20%' OR NBSk_ LIKE '21%')
          AND tt_ IN
-                (
-                 '015',
+                ('015',
                  '013',
                  'KK1',
                  'KK2',
@@ -555,7 +581,6 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
                  'KL2',
                  'IB1',
                  'IB2',
-
                  'SNO',
                  '096')
    THEN
@@ -583,78 +608,87 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    --2016_04_28
    ELSIF TT_ IN ('455')
    THEN
-      t_ := 27;
+      if NBSd_ in ('7300', '7301') then
+       t_ := 39;
+     else
+       t_ := 27;
+     end if; 
 
    --07-10-2013
    ------
-   ELSIF regexp_like(nbsd_,'^(639[4,5,6]|64)')            then t_ :=-38;
-   elsif regexp_like(nbsk_,'^(639[4,5,6]|64)')            then t_ := 38;
-   ELSIF regexp_like(nbsd_,'^(739[2,4,5,6,7,9]|74|7900)') then t_ :=-39;
-   elsif regexp_like(nbsk_,'^(739[2,4,5,6,7,9]|74|7900)') then t_ := 39;
-
+   ELSIF REGEXP_LIKE (nbsd_, '^(639[4,5,6]|64)')
+   THEN
+      t_ := -38;
+   ELSIF REGEXP_LIKE (nbsk_, '^(639[4,5,6]|64)')
+   THEN
+      t_ := 38;
+   ELSIF REGEXP_LIKE (nbsd_, '^(739[2,4,5,6,7,9]|74|7900)')
+   THEN
+      t_ := -39;
+   ELSIF REGEXP_LIKE (nbsk_, '^(739[2,4,5,6,7,9]|74|7900)')
+   THEN
+      t_ := 39;
    ELSIF tt_= '101'
-         and   nbsd_ IN ('3570', '3739', '3600')
-         and   nbsk_ IN ('3570', '3739', '3600')
-        then  t_:= 35;
-
+         AND nbsd_ IN ('3570', '3739', '3600')
+         AND nbsk_ IN ('3570', '3739', '3600')
+   THEN
+      t_ := 35;
    --NG1 – при бухгалтерському зведенні операційного дня дана операція повинна попадати в папку 35
 
-   ELSIF tt_= 'NG1' then  t_:= 35;
-
+   ELSIF tt_ = 'NG1'
+   THEN
+      t_ := 35;
    ELSIF tt_= 'D66'
-         and   nbsd_ IN ('3579', '3739')
-         and   nbsk_ IN ('3579', '3739')
-         then t_ :=35;
-
-   ELSIF tt_= 'D07'
-         and   nbsd_ IN ('3800')
-         and   nbsk_ IN ('2924')
-   then t_ :=80;
-
-
-    --25/07/2015
+         AND nbsd_ IN ('3579', '3739')
+         AND nbsk_ IN ('3579', '3739')
+   THEN
+      t_ := 35;
+   ELSIF tt_ = 'D07' AND nbsd_ IN ('3800') AND nbsk_ IN ('2924')
+   THEN
+      t_ := 80;
+   --25/07/2015
     --   Папка 20 «Початкові внутрішні платежі на рахунки клієнтів»:
     --    бухгалтерські проводки з кореспонденцією рахунків БР за дебетом «3500, 3510, 3519, 3610, 3619, 3653, 3678»  та БР за кредитом схожий на «260%» виокремити з папки та перенести в нову папку «Початкові внутрішні за господарськими операціями»;
 
    ELSIF tt_ = 'PS1'
          AND (    SUBSTR (nbsd_, 1, 2) IN ('29', '35', '36')
               AND SUBSTR (nbsk_, 1, 2) IN ('26', '25'))
-         then
-
-        if nbsd_ IN ('3500', '3510', '3519', '3610', '3619', '3653', '3678') AND (   SUBSTR (nbsk_, 1, 3) ='260')
-           THEN
-           t_ := 23; -- 23 Початкові внутрішні за господарськими операціями
-           else
-           t_ := 97; -- 20 початкові внутрішні платежі на рахунок клієнтів свого РУ
-
-      end if;
-
-   ELSIF tt_ = 'PS1'
+   THEN
+      IF     nbsd_ IN
+                ('3500', '3510', '3519', '3610', '3619', '3653', '3678')
+         AND (SUBSTR (nbsk_, 1, 3) = '260')
+      THEN
+         t_ := 23;      -- 23 Початкові внутрішні за господарськими операціями
+      ELSE
+         t_ := 97; -- 20 початкові внутрішні платежі на рахунок клієнтів свого РУ
+      END IF;
+   ELSIF     tt_ = 'PS1'
          AND (SUBSTR (nbsd_, 1, 2) IN ('25','26') OR nbsd_ IN ('2909'))
          AND SUBSTR (nbsk_, 1, 2) IN ('25','26')
    THEN
       t_ := 97;
-
    ELSIF     tt_ NOT IN ('PS0', 'PS2', 'OW1', 'I00')
          AND MFOA_ = MFOB_
          AND (   SUBSTR (nbsk_, 1, 3) IN ('260', '265', '264')
               OR SUBSTR (nbsk_, 1, 2) IN ('25'))
    THEN
-
-            if nbsd_ IN ('3500', '3510', '3519', '3610', '3619', '3653', '3678') AND (   SUBSTR (nbsk_, 1, 3) ='260')
-              THEN
-                t_ := 23; -- 23 Початкові внутрішні за господарськими операціями
-              else
-              if tt_ = 'PS1' then
-              t_ := 97;
-              elsif tt_ = 'CL1' then
-              t_ := 25;                                            --Клієнт банк
-              else
-              t_ := 20; -- 20 початкові внутрішні платежі на рахунок клієнтів свого РУ\
-              end if;
-            end if;
-
-   ELSIF     (   NBSD_ LIKE '260%'
+      IF     nbsd_ IN
+                ('3500', '3510', '3519', '3610', '3619', '3653', '3678')
+         AND (SUBSTR (nbsk_, 1, 3) = '260')
+      THEN
+         t_ := 23;      -- 23 Початкові внутрішні за господарськими операціями
+      ELSE
+         IF tt_ = 'PS1'
+         THEN
+            t_ := 97;
+         ELSIF tt_ = 'CL1'
+         THEN
+            t_ := 25;                                            --Клієнт банк
+         ELSE
+            t_ := 20; -- 20 початкові внутрішні платежі на рахунок клієнтів свого РУ\
+         END IF;
+      END IF;
+  ELSIF     (   NBSD_ LIKE '260%'
               OR NBSD_ LIKE '25%'
               OR NBSD_ LIKE '265%'
               OR NBSD_ LIKE '264%')
@@ -736,19 +770,22 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    ELSIF NBSk_ LIKE '7%' AND tt_ NOT IN ('PS0')
    THEN
       t_ := -39;                                                        --Вирт
-
     --5.     Із папки 26 «Доходи за операціями з клієнтами» перенести в папку 84 «АВТ.: Доходи» операцію BN4 («дочірня» до BNY Реалізація ЮМ (не платіжні) за відпускною ціною ОБ (бух. модель Дт 2909 Кт 6399));
-   ELSIF NBSk_ = '6399' and NBSd_ = '2909' AND tt_  = ('BN4')
+   ELSIF NBSk_ = '6399' AND NBSd_ = '2909' AND tt_ = ('BN4')
    THEN
-      t_ := -84;    
-   --Із папки 26 «Доходи» перенести в папку 84 «АВТ.: Доходи» зв’язану (дочірню) операцію BM4 до операції BMY – бухмодель за дебетом рахунок 2909/23 і кредитом 6399/14.                    
-   ELSIF NBSk_ = '6399' and NBSd_ = '2909' AND tt_  = ('BM4')
+      t_ := -84;
+   --Із папки 26 «Доходи» перенести в папку 84 «АВТ.: Доходи» зв’язану (дочірню) операцію BM4 до операції BMY – бухмодель за дебетом рахунок 2909/23 і кредитом 6399/14.
+   ELSIF NBSk_ = '6399' AND NBSd_ = '2909' AND tt_ = ('BM4')
    THEN
-      t_ := 84; 
-
+      t_ := 84;
    ELSIF NBSk_ LIKE '6%' AND tt_ NOT IN ('PS0', 'K05','SN3' , 'K2K')
    THEN
-      t_ := -26;                                                         --Дох
+      IF tt_ = 'CNC' 
+	  THEN
+		t_ := 84;
+	  ELSE
+         t_ := -26;                                                         --Дох
+	  END IF;
    ELSIF NBSd_ LIKE '6%' AND tt_ NOT IN ('PS0', 'K05', 'K2K')
    THEN
       t_ := 26;                                                          --Дох
@@ -780,12 +817,25 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
             --            Папка 30 «Інші початкові СЕП»:
             --   бухгалтерські проводки з кореспонденцією рахунків БР за дебетом «3500, 3510, 3519, 3610, 3619, 3653, 3622, 3678» виокремити з папки та перенести в нову папку «Інші початкові СЕП (за господарськими операціями)».
 
-            if NBSd_ in('3500', '3510', '3519', '3610', '3619', '3653', '3622', '3678')
-            then
-            t_ := 33;--Інші початкові СЕП (за господарськими операціями)
-            else
-            t_ := 30;
-            end if;
+            IF NBSd_ IN
+                  ('3500',
+                   '3510',
+                   '3519',
+                   '3610',
+                   '3619',
+                   '3653',
+                   '3622',
+                   '3678')
+            THEN
+               t_ := 33;   --Інші початкові СЕП (за господарськими операціями)
+            ELSE
+			   IF tt_ = 'EW1'
+			   THEN
+			      t_ := 80;
+			   ELSE
+                  t_ := 30;
+			   END IF;
+            END IF;
                                                      -- СЕП-початк.
          ELSE
             t_ := 31;                                           -- СЕП-вiдпов.
@@ -801,7 +851,6 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    ELSIF tt_ IN ('PS0','PS2')
       THEN
       t_ := 97;
-
    ELSIF tt_ ='CV7'
       THEN
       t_ := 35;
@@ -816,47 +865,45 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    ELSIF (tt_ IN ('MUO') AND NBSd_ = '3739' AND NBSk_ = '3801')
    THEN
       t_ := 80;                                             -- АВТ:Меморiальнi
-
    ELSIF     tt_ IN ('ASG')
          AND nbsd_ IN ('3739')
          AND SUBSTR (nbsk_,1,3) IN ('357')
    THEN
       t_ := 80;
-
-   ELSIF tt_ IN ('K17')
-         AND nbsd_ IN ('3739')
-         AND nbsk_ IN ('2809')
+   ELSIF tt_ IN ('K17') AND nbsd_ IN ('3739') AND nbsk_ IN ('2809')
    THEN
       t_ := 80;
-
-   ELSIF tt_ IN ('%MB')
-         AND nbsd_ IN ('3904')
-         AND nbsk_ IN ('3800')
+   ELSIF tt_ IN ('%MB') AND nbsd_ IN ('3904') AND nbsk_ IN ('3800')
    THEN
       t_ := 80;
-
    ELSIF     tt_ = 'I00'
          AND nbsd_ IN ('2902')
          AND SUBSTR (nbsk_,1,2) IN ('26','26')
    THEN
       t_ := 32;
-
-   elsif  tt_ in ('I00','CND','K2P','%15','MIL')                   THEN t_ := 80;    -- АВТ:Меморiальнi
-
-   elsif  tt_ in ('301')                                           THEN t_ := 35;    -- папку 35 «Меморіальні (клієнтські) ручні»
-
-   elsif  tt_ in ('K2K') and nbsd_ = '3739' and nbsk_ = '3600'     THEN t_ := 80;    -- АВТ:Меморiальнi
-
-   elsif   (tt_ in ('K05') and nbsd_ = '3570' and nbsk_ = '6110')
-        or (tt_ in ('SN3') and  nbsk_ like '6%')                   THEN t_ := 84;    -- папку 26 «Доходи»
-
-   elsif  tt_ in ('901') and nbsd_ = '3720' and nbsk_ like '2%'    THEN t_ := 20;    -- в папку 20  «Початкові внутрішні на рахунки клієнтів»
-
-   elsif (NBSd_ like '3%' or NBSk_ = '3%' ) and tt_ = 'D06'        then  t_ := 80;
-
+   ELSIF tt_ IN ('I00', 'CND', 'K2P', '%15', 'MIL')
+   THEN
+      t_ := 80;                                             -- АВТ:Меморiальнi
+   ELSIF tt_ IN ('301')
+   THEN
+      t_ := 35;                   -- папку 35 «Меморіальні (клієнтські) ручні»
+   ELSIF tt_ IN ('K2K') AND nbsd_ = '3739' AND nbsk_ = '3600'
+   THEN
+      t_ := 80;                                             -- АВТ:Меморiальнi
+   ELSIF    (tt_ IN ('K05') AND nbsd_ = '3570' AND nbsk_ = '6110')
+         OR (tt_ IN ('SN3') AND nbsk_ LIKE '6%')
+   THEN
+      t_ := 84;                                           -- папку 26 «Доходи»
+   ELSIF tt_ IN ('901') AND nbsd_ = '3720' AND nbsk_ LIKE '2%'
+   THEN
+      t_ := 20;       -- в папку 20  «Початкові внутрішні на рахунки клієнтів»
+   ELSIF (NBSd_ LIKE '3%' OR NBSk_ = '3%') AND tt_ = 'D06'
+   THEN
+      t_ := 80;
      --  операцію 164 (бух. модель Дт 3907 Кт 1007) з папки 37 «Меморіальні (бухгалтерські) ручні» перенести в папку 35.
-   elsif (NBSd_ ='3907' and NBSk_ = '1007' and tt_='164')        then  t_ := 35;   -- в папку 35 «Меморіальні (клієнтські) ручні»
-
+   ELSIF (NBSd_ = '3907' AND NBSk_ = '1007' AND tt_ = '164')
+  THEN  
+t_ := 35;   -- в папку 35 «Меморіальні (клієнтські) ручні»
    ---    бухгалтерські проводки з кореспонденцією рахунків за дебетом та/або  кредитом 3 класу  перенести в нову папку 37 «Меморіальні  (бухгалтерські) ручні».
 
 
@@ -864,25 +911,39 @@ TT_='ARE' AND (nbsd_='2401' and nbsk_='7702')
    --по операції DOR – дочірня операція DO2 на суму ПДВ, при формуванні бухгалтерського зведення операційного дня, має попасти в папку 37 (зараз попадає в папку 80)
 
 
-   elsif tt_<>'38Z' and (((NBSd_ like '3%' or NBSk_ = '3%' ) and flag_ = '1') or tt_='DO2')         then  t_ := 37;   -- 37 «Меморіальні  (бухгалтерські) ручні»
-
-
-
-
-
+   ELSIF     tt_ <> '38Z'
+         AND (   ( (NBSd_ LIKE '3%' OR NBSk_ = '3%') AND flag_ = '1')
+              OR tt_ = 'DO2')
+   THEN 
+t_ := 37;   -- 37 «Меморіальні  (бухгалтерські) ручні»
    ELSE
-      IF    SUBSTR (tt_, 1, 2) IN ('AR', 'I0')   OR tt_ IN
-               ('VMO',  'KLR',  'R00',   'R01',
-                '809',  '812',  'D06',   'D07',
-                '437',  'K06',  'K07',   '%03',
-                '516',  '%MB',  '%15',   'ELT', 'D01')
-                                                                  THEN  t_ := 80;    -- АВТ:Меморiальнi
-      ELSIF flag_ = '0' AND tt_ NOT IN ('901')                    THEN  t_ := 80;    -- АВТ:Меморiальнi
-
-      ELSE                                                          t_ := 35;    -- Меморiальнi(ручнi)
-
+      IF    SUBSTR (tt_, 1, 2) IN ('AR', 'I0')
+         OR tt_ IN
+               ('VMO',
+                'KLR',
+                'R00',
+                'R01',
+                '809',
+                '812',
+                'D06',
+                'D07',
+                '437',
+                'K06',
+                'K07',
+                '%03',
+                '516',
+                '%MB',
+                '%15',
+                'ELT',
+                'D01')
+      THEN
+         t_ := 80;                                          -- АВТ:Меморiальнi
+      ELSIF flag_ = '0' AND tt_ NOT IN ('901')
+      THEN
+         t_ := 80;                                          -- АВТ:Меморiальнi
+      ELSE
+         t_ := 35;                                       -- Меморiальнi(ручнi)
       END IF;
-
    END IF;
 
 
