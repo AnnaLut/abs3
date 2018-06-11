@@ -1,5 +1,5 @@
 begin
-  dbms_scheduler.drop_job(job_name =>'RUN_FORMATED_XML');
+  dbms_scheduler.drop_job(job_name =>'RUN_ALL_601');
   dbms_scheduler.drop_program(program_name => 'RUN_ALL_601_OBJECTS');
    exception 
    when others then
