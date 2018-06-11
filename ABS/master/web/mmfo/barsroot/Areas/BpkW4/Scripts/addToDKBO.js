@@ -268,7 +268,7 @@ function addToDCBO() {
 
         $.ajax({
             type: "POST",
-            url: bars.config.urlContent("/api/BpkW4/DKBOApi"),
+            url: bars.config.urlContent("/api/BpkW4/DKBOApi/post"),
             data: JSON.stringify(selectedRows),
             contentType: 'application/json; charset=utf-8',
             dataType: "json",

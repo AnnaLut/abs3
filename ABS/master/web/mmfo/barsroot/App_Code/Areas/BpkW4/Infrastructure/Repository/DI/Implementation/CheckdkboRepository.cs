@@ -31,20 +31,18 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
 
         public CustomerFilter CreateDKBO(List<AddToDKBO> addToDKBO)
         {
-
-            int out_id = 0;
-
+            decimal out_id = 0;
             CustomerFilter custF = new CustomerFilter() { };
 
             object[] parameters =
                 {
-                   new OracleParameter("out_deal_id", OracleDbType.Decimal, out_id, ParameterDirection.Output),
+                   new OracleParameter("out_deal_id", OracleDbType.Decimal, out_id, ParameterDirection.Output)
                 };
 
             for (int i = 0; i < addToDKBO.Count; i++)
             {
                 string commandString = string.Format(@"
-                            declare                           
+                           declare                           
                                 out_deal_id integer; 
                            begin
                            pkg_dkbo_utl.p_acc_map_to_dkbo(
@@ -56,36 +54,16 @@ namespace BarsWeb.Areas.BpkW4.Infrastructure.Repository.DI.Implementation
                            in_dkbo_date_to => null,
                            out_deal_id => :out_deal_id);
                             commit;
-                           end;", addToDKBO[i].CustomerRnk , string.Join(",", addToDKBO[i].CustomerAccounts.ToArray()));
+                           end;", addToDKBO[i].CustomerRnk, string.Join(",", addToDKBO[i].CustomerAccounts.ToArray()));
 
 
                 _entities.ExecuteStoreCommand(commandString, parameters);
-                out_id = int.Parse(((OracleParameter)parameters[0]).Value.ToString());
+                out_id = decimal.Parse(((OracleParameter)parameters[0]).Value.ToString());
                 custF.DealId = out_id.ToString();
                 custF.CustomerRnk = addToDKBO[i].CustomerRnk;
             }
             return custF;
         }
-
-        //private void InitCreateDKBO_Sql(List<string> selectedcards, List<string> selectedRNK)
-        //{
-        //    string[] strAccArr = selectedcards.ToArray<string>();
-        //    _baseSql = new BarsSql()
-        //    {
-        //        SqlParams = new object[]
-        //       {
-        //           // new OracleParameter("p_strAccArr", OracleDbType.Array, strAccArr.Length, strAccArr, ParameterDirection.Input).UdtTypeName = "BARS.STRING_LIST"
-        //       },
-        //        SqlText = string.Format(@"
-        //                   begin
-        //                   pkg_dkbo_utl.p_acc_map_to_dkbo({0},
-        //                   number_list({1}),
-        //                   TO_DATE('{1}','dd/mm/rr'),
-        //                   TO_DATE('{1}','dd/mm/rr'))
-        //                   end"
-        //                   , selectedRNK.First(), strAccArr, DateTime.Now.ToString("dd.MM.yyyy"))
-        //    };
-        //}
 
         public IEnumerable<W4_DKBO_WEB_Result> Get_W4_DKBO_WEB(DataSourceRequest request)
         {
