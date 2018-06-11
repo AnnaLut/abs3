@@ -76,8 +76,12 @@ begin
                   and lim.tip = 'LIM'
                   and nvl(ss.accc,-1) != lim.acc
                   and cm.vidd in (2,3)
+                  and cm.sos <15
+                  and c.sos<15
                   and cm.nd = nvl(cm.ndg,-1)
-                  and cm.ndg = c.ndg)
+                  and cm.ndg = c.ndg
+                  and ss.dazs is null
+                  and lim.dazs is null)
                   
     loop
       update accounts 
@@ -118,6 +122,9 @@ begin
                   and cm.vidd in (2,3)
                   and cm.nd = cm.ndg
                   and c.ndg = cm.ndg
+                  and cm.sos<15
+                  and c.sos<15
+                  and lim.dazs is null
               )
     loop
       if r.ostc != r.sum_p then
@@ -156,7 +163,11 @@ begin
                   and ml.tip = 'LIM'
                   and sl.acc = sa.acc
                   and sl.tip = 'LIM'
-                  and nvl(sl.accc,-1) != ml.accc)
+                  and nvl(sl.accc,-1) != ml.accc
+                  and m.sos<15
+                  and s.sos<15
+                  and ml.dazs is null
+                  and sl.dazs is null)
     loop
       update accounts
         set accc = r.accc
@@ -171,9 +182,12 @@ begin
                      nd_acc n,
                      accounts a
                 where c.kf = br.kf
+                  and c.nd = c.ndg
                   and n.nd = c.ndg
                   and n.acc = a.acc
-                  and a.tip = 'LIM')
+                  and a.tip = 'LIM'
+                  and c.sos<15
+                  and a.dazs is null)
     loop
       if r.ostc != r.lims then
         v_rec.nlsa  := r.nls;
