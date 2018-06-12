@@ -94,10 +94,6 @@ public class EWAService : BarsWebService
     public Result SendAccStatus(Int32 id, String state)
     {
         Result result = new Result();
-        //get user`s login for logging in ABS
-        string UserLogin = Bars.Configuration.ConfigurationSettings.AppSettings["EWA.ABS_login"];
-        //loggin user to ABS
-        LoginUser(UserLogin);
         try
         {
             //call function for send status to EWA
@@ -125,10 +121,6 @@ public class EWAService : BarsWebService
         {
             result.status = "ERROR";
             result.message = ex.Message + (ex.InnerException == null ? "" : ". " + ex.InnerException.Message);
-        }
-        finally
-        {
-            LogOutUser();
         }
         return result;
     }
