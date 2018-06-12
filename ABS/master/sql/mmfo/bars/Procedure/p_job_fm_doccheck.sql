@@ -11,7 +11,7 @@ PROMPT *** Create  procedure P_JOB_FM_DOCCHECK ***
 is
 begin
   begin
-     p_fm_intdoccheck(null);
+     p_fm_intdoccheck_tmp(null);
      commit;
   exception when others then
      bars_audit.error('FM. job: error during execution procedure p_fm_intdoccheck: ' ||
