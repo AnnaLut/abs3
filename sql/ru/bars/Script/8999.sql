@@ -23,7 +23,7 @@ declare
                    nam_a_ => p_rec.nam_a,
                    nlsa_  => p_rec.nlsa,
                    mfoa_  => gl.aMfo, 
-                   nam_b_ => 'Контрарахунок для 8999',
+                   nam_b_ => 'Контррахунок для 8999',
                    nlsb_  => p_rec.nlsb, 
                    mfob_  => gl.aMfo ,
                    nazn_  =>'Вирівнювання залишків на позасистемних рах.8999*LIM',
@@ -104,48 +104,6 @@ begin
       CreateDoc(v_rec);*/
     end loop;
 
-
-    for r in (select lim.nls, substr(lim.nms,1,38) nms,
-                     (select nls from accounts ak where ak.nbs = '8006' and ak.dazs is null and ak.kv = lim.kv and rownum = 1) nlsb,
-                     lim.ostc,
-                     lim.kv,
-                     (select sum(ostc) from accounts ss where ss.accc = lim.acc and ss.tip in ('SS ','SP ')) sum_p
-                from cc_deal c,
-                     nd_acc nlim,
-                     accounts lim,
-                     cc_deal cm
-                where c.kf = br.kf
-                  and c.nd = nlim.nd
-                  and nlim.acc = lim.acc
-                  and lim.tip = 'LIM'
-                  and c.nd != nvl(c.ndg,c.nd)
-                  and cm.vidd in (2,3)
-                  and cm.nd = cm.ndg
-                  and c.ndg = cm.ndg
-                  and cm.sos<15
-                  and c.sos<15
-                  and lim.dazs is null
-              )
-    loop
-      if r.ostc != r.sum_p then
-        v_rec.dk := 1;
-        v_rec.s  :=  r.ostc - r.sum_p;
-        if v_rec.s <0 then 
-          v_rec.dk := 0;
-          v_rec.s := 0-v_rec.s;
-        end if;
-        v_rec.nlsa   := r.nls;
-        v_rec.nam_a  := r.nms;
-        v_rec.nlsb   := r.nlsb;
-        v_rec.kv     := r.kv;
-  logger.info('LIM_update SUB : nlsa = '||v_rec.nlsa||', nlsb = '||v_rec.nlsb||', s = '||v_rec.s);
-      CreateDoc(v_rec);
-      end if;
-    end loop;
-
-
-    v_rec.s := 0;
-    
     for r in (select ml.acc accc, sl.acc
                 from cc_deal m,
                      nd_acc ma,
@@ -163,21 +121,71 @@ begin
                   and ml.tip = 'LIM'
                   and sl.acc = sa.acc
                   and sl.tip = 'LIM'
-                  and nvl(sl.accc,-1) != ml.accc
+                  and nvl(sl.accc,-1) != ml.acc
                   and m.sos<15
                   and s.sos<15
                   and ml.dazs is null
                   and sl.dazs is null)
     loop
+      update accounts set pap = 3 where acc = r.accc;
+      if r.accc = 48568601 then
+        dbms_output.put_line('pap = 3');
+      end if;
       update accounts
         set accc = r.accc
         where acc = r.acc;
     end loop;
+
+    for r in (select lim.nls, substr(lim.nms,1,38) nms, lim.pap, lim.acc, lim.accc,
+                     (select nls from accounts ak where ak.nbs = '8006' and ak.dazs is null and ak.kv = lim.kv and rownum = 1) nlsb,
+                     lim.ostc,
+                     lim.kv,
+                     (select sum(ostc) from accounts ss where ss.accc = lim.acc and ss.tip in ('SS ','SP ')) sum_p
+                from cc_deal c,
+                     nd_acc nlim,
+                     accounts lim,
+                     cc_deal cm
+                where c.kf = br.kf
+                  and c.nd = nlim.nd
+                  and nlim.acc = lim.acc
+                  and lim.tip = 'LIM'
+                  and c.nd != nvl(c.ndg,c.nd)
+                  and cm.vidd in (2,3)
+                  and cm.nd = cm.ndg
+                  and c.ndg = cm.ndg
+                  and c.nd != c.ndg
+                  and cm.sos<15
+                  and c.sos<15
+                  and lim.dazs is null
+              )
+    loop
+      if r.ostc != r.sum_p then
+        v_rec.dk := 1;
+        v_rec.s  :=  r.ostc - r.sum_p;
+        if v_rec.s <0 then 
+          v_rec.dk := 0;
+          v_rec.s := 0-v_rec.s;
+        end if;
+        v_rec.nlsa   := r.nls;
+        v_rec.nam_a  := r.nms;
+        v_rec.nlsb   := r.nlsb;
+        v_rec.kv     := r.kv;
+        update accounts set pap = 3 where acc = r.acc;
+        update accounts set pap = 3 where acc = r.accc;
+        CreateDoc(v_rec);
+        update accounts set pap = r.pap where acc = r.acc;
+      end if;
+    end loop;
+
+
+    v_rec.s := 0;
+    
+
                   
     
     for r in (select a.nls, a.acc, substr(a.nms,1,38) nms, a.ostc, (select round(sum(gl.p_Ncurval(a.kv,gl.p_icurval(l.kv,ostc,gl.bdate),gl.bdate)),0) from accounts l where l.accc = a.acc) lims, 
                      (select nls from accounts ak where ak.nbs = '8006' and ak.dazs is null and ak.kv = a.kv and rownum = 1) nlsb,
-                     a.kv
+                     a.kv, a.pap
                 from cc_deal c,
                      nd_acc n,
                      accounts a
@@ -201,12 +209,19 @@ begin
         else 
           v_rec.dk := 1;
         end if;
-        logger.info('LIM_update MAIN: nlsa = '||v_rec.nlsa||', nlsb = '||v_rec.nlsb||', s = '||v_rec.s);
+        logger.info('LIM_update MAIN: nlsa = '||v_rec.nlsa||', nlsb = '||v_rec.nlsb||', s = '||v_rec.s||', dk = '||v_rec.dk);
+        update accounts set pap = 3 where acc = r.acc;
         CreateDoc(v_rec);
+        update accounts set pap = 1 where acc = r.acc;
       end if;
     end loop;
     commit;
   end loop;
   bc.home;
+exception 
+  when others then
+    logger.info('LIM_update error :'||sqlerrm);
+    rollback;
+    bc.home;
 end;
 /
