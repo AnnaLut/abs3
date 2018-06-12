@@ -9,7 +9,7 @@ PROMPT *** Create  procedure P_FM_INTDOCCHECK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_FM_INTDOCCHECK (p_ref number)
 --
--- Version 1.22 11/04/2017
+-- Version 1.3 12/06/2018
 --
 -- проверка начальных (исходящих) документов
 --   мультимфо
@@ -19,7 +19,7 @@ is
   -- код группы визирования "Заблокировано Фин.Мониторингом"
   c_grp   constant number := getglobaloption ('FM_GRP1');
   l_datr  date;
-
+  l_doc_lock_limit constant number := 100;
   ----
   -- fm_check - проверка по одному референсу
   --
@@ -156,7 +156,6 @@ is
      end if;
 
   end fm_check;
-
 begin
 
   if p_ref is not null then
@@ -173,9 +172,13 @@ begin
         bc.subst_mfo(b.kf);
 
 
-        for r in (select ref from ref_que where nvl(fmcheck, 0) = 0 )
+        for r in (select rownum rn, ref from ref_que where nvl(fmcheck, 0) = 0 )
         loop
            fm_check(r.ref);
+           -- коммитим (отпуская oper for update) каждые N проверенных документов
+           if mod(rn, l_doc_lock_limit) = 0 then
+               commit;
+           end;
         end loop;
 
 
