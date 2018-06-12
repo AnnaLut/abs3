@@ -176,9 +176,9 @@ begin
         loop
            fm_check(r.ref);
            -- коммитим (отпуская oper for update) каждые N проверенных документов
-           if mod(rn, l_doc_lock_limit) = 0 then
+           if mod(r.rn, l_doc_lock_limit) = 0 then
                commit;
-           end;
+           end if;
         end loop;
 
 
