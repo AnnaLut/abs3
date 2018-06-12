@@ -108,4 +108,18 @@ exception
          null;
 end;
 /
+
+begin 
+execute immediate 'alter table NBU_PLEDGE_DEP add sumBail NUMBER(32)'; 
+exception 
+	when others then if sqlcode=-955 then null; end if;
+end;
+/	
+
+begin 
+execute immediate 'alter table NBU_PLEDGE_DEP add sumGuarantee NUMBER(32)'; 
+exception 
+	when others then if sqlcode=-955 then null; end if;
+end;
+/	
 grant all on NBU_PLEDGE_DEP to BARS_ACCESS_DEFROLE;

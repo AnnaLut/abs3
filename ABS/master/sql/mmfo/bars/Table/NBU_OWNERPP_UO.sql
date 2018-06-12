@@ -21,8 +21,12 @@ begin
         countrycod VARCHAR2(3),
         percent    NUMBER(9,6),
         status     VARCHAR2(30),
-	status_message VARCHAR2(4000),
-        kf         VARCHAR2(6)
+		status_message VARCHAR2(4000),
+        kf         VARCHAR2(6),
+		zip		   VARCHAR2(4000),	
+		STREETADDRESS VARCHAR2(4000),
+		HOUSENO	   VARCHAR2(4000),
+		FLATNO 	   VARCHAR2(4000)
     )
     TABLESPACE BRSMDLD
     partition by list (kf)
@@ -83,6 +87,31 @@ begin
 exception
     when name_already_used then
          null;
+end;
+/
+
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add ZIP varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add STREETADDRESS varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add HOUSENO varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add FLATNO varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
 end;
 /
 

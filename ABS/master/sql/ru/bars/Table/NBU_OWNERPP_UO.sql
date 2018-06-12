@@ -86,4 +86,31 @@ exception
 end;
 /
 
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add ZIP varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add STREETADDRESS varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add HOUSENO varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  nbu_ownerpp_uo add FLATNO varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+
+
 grant all on NBU_OWNERPP_UO to BARS_ACCESS_DEFROLE;
