@@ -691,10 +691,6 @@ begin
             l_errmsg := substr( BARS_MSG.GET_MSG( modcode, 'INTCARD_READ_FAILED', to_char(l_intlist(i).int_id)
                                                 , l_intlist(i).acc_num, l_intlist(i).acc_iso, sqlerrm )
                               , 1, errmsgdim );
-            raise expt_int;
-          when others
-          then --
-            l_errmsg := substr( dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace(), 1, errmsgdim );
 --          if ( BARS_AUDIT.TRACE_ENABLED() )
 --          then
               for c in ( select l.SESSION_ID as SID
@@ -726,6 +722,10 @@ begin
                                        ||', MACHINE=' ||c.MACHINE ||', CLIENT_IDENTIFIER='||c.CLIENT_IDENTIFIER );
               end loop;
 --          end if;
+            raise expt_int;
+          when others
+          then --
+            l_errmsg := substr( dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace(), 1, errmsgdim );
             raise expt_int;
         end;
 
