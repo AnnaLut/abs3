@@ -48,7 +48,8 @@ end;
 /
 
 begin   
-   execute immediate 'alter table nbu_reported_object add pledge_type VARCHAR2(2)';
+   execute immediate 'alter table nbu_reported_pledge add pledge_type VARCHAR2(2)';
      exception when others then 
        if sqlcode=-955 then null; end if; 
 end;
+/
