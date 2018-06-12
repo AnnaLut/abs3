@@ -236,7 +236,7 @@ end msp_utl;
 /
 create or replace package body msp.msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.351 13.04.2018';
+  gc_body_version constant varchar2(64) := 'version 1.352 12.06.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -716,7 +716,7 @@ create or replace package body msp.msp_utl is
            to_number(trim(substr(line, 20, 5))), --filia_num,
            to_number(trim(substr(line, 25, 3))), --deposit_code,
            to_number(trim(substr(line, 28, 19))), --pay_sum,
-           trim(substr(line, 47, 100)), --full_name,
+           translate(trim(substr(line, 47, 100)), 'Ii', '²³'), --full_name,
            trim(substr(line, 147, 10)), --numident,
            trim(substr(line, 157, 2)), --pay_day,
            trim(substr(line, 159, 1)), --displaced
