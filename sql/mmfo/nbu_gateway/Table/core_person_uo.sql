@@ -78,3 +78,10 @@ exception
  when others then if sqlcode=-955 then null; end if;
 end;
 /
+
+begin
+	execute immediate'alter table core_person_uo add isKr number(1)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/

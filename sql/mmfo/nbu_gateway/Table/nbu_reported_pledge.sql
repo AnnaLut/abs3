@@ -13,7 +13,8 @@ begin
             pledge_amount number(38),
             pledge_currency_id number(3),
             core_pledge_kf varchar2(6 char),
-            core_pledge_id number(38)
+            core_pledge_id number(38),
+ 	    pledge_type VARCHAR2(2)
      )
      tablespace brsmdld';
 exception
@@ -45,3 +46,9 @@ exception
          null;
 end;
 /
+
+begin   
+   execute immediate 'alter table nbu_reported_object add pledge_type VARCHAR2(2)';
+     exception when others then 
+       if sqlcode=-955 then null; end if; 
+end;

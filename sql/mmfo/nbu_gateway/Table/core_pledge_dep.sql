@@ -74,3 +74,20 @@ exception
          null;
 end;
 /
+begin 
+execute immediate 'alter table core_pledge_dep add sumBail NUMBER(32)'; 
+exception 
+	when others then if sqlcode=-955 then null; end if;
+end;
+/	
+
+
+begin 
+execute immediate 'alter table core_pledge_dep add sumGuarantee NUMBER(32)'; 
+exception 
+	when others then if sqlcode=-955 then null; end if;
+end;
+/	
+
+
+

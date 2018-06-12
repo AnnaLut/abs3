@@ -28,7 +28,7 @@ end nbu_601_parse_xml;
 /
 create or replace package body nbu_601_parse_xml  as
 
-TYPE t_nbu_personal_fo         IS TABLE OF core_person_fo%ROWTYPE;
+TYPE t_nbu_personal_fo         IS TABLE OF core_person_fo%ROWTYPE;
 TYPE t_nbu_document_fo         IS TABLE OF core_document_fo%ROWTYPE;
 TYPE t_nbu_address_fo          IS TABLE OF core_address_fo%ROWTYPE;
 TYPE t_nbu_person_uo           IS TABLE OF core_person_uo%ROWTYPE;
@@ -105,7 +105,7 @@ end;*/
         l_rowlist := dbms_xmldom.getelementsbytagname(l_doc,'ROOT');
         l_header := dbms_xmldom.item(l_rowlist, 0);
         l_cur_user:=dbms_xslprocessor.valueof(l_header,'CURRENT_USER/text()');
-        
+
         dbms_xslprocessor.valueOf(l_header, 'REPORTING_TIME/text()',l_str);
         l_data_rep:=to_date(l_str,'dd.mm.yyyy hh24:mi:ss');
 
@@ -148,12 +148,16 @@ end;*/
              l_PERSON_FO (l_PERSON_FO.last).COUNTRYCODNEREZ:= to_number(dbms_xslprocessor.valueof(l_row, 'COUNTRYCODNEREZ/text()'),0);
 
              l_PERSON_FO (l_PERSON_FO.last).K060:=dbms_xslprocessor.valueof(l_row,'K060/text()');
-
+             
              dbms_xslprocessor.valueof(l_row,'STATUS/text()',l_str);
              l_PERSON_FO (l_PERSON_FO.last).STATUS:=trim(l_str);
 
              dbms_xslprocessor.valueof(l_row,'KF/text()',l_str);
              l_PERSON_FO(l_PERSON_FO.last).KF:=trim(l_str);
+             
+             l_PERSON_FO (l_PERSON_FO.last).K020:=trim(dbms_xslprocessor.valueOf(l_row,'K020/text()'));
+             
+             l_PERSON_FO (l_PERSON_FO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'coddocum/text()'));
 
          END LOOP;
 
@@ -181,7 +185,9 @@ end;*/
                                               countrycodnerez,
                                               k060,
                                               status,
-                                              kf)
+                                              kf,
+                                              k020,
+                                              coddocum)
                     VALUES (
                              l_check_id,
                              l_PERSON_FO(j).rnk,
@@ -194,18 +200,20 @@ end;*/
                              l_PERSON_FO(j).countrycodnerez,
                              l_PERSON_FO(j).k060,
                              l_PERSON_FO(j).status,
-                             l_PERSON_FO(j).kf
+                             l_PERSON_FO(j).kf,
+                             l_PERSON_FO(j).k020,
+                             l_PERSON_FO(j).coddocum
                            );
 
                end loop;
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+          --  BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -314,7 +322,7 @@ procedure p_parse_document_fo (p_id in  NUMBER)
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -444,7 +452,7 @@ procedure p_parse_document_fo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
@@ -546,9 +554,10 @@ procedure p_parse_person_uo (p_id in  NUMBER)
 
              --raise_application_error (-20001,dbms_xslprocessor.valueof(l_row,'K060/text()'));
              l_PERSON_UO (l_PERSON_UO.last).K060 :=dbms_xslprocessor.valueof(l_row,'K060/text()');
-
-             --dbms_xslprocessor.valueof(l_row, 'STATUS/text()', l_str);
-             --l_PERSON_UO (l_PERSON_UO.last).STATUS := trim(l_str);
+             
+             l_PERSON_UO (l_PERSON_UO.last).K020:=dbms_xslprocessor.valueOf(l_row,'K020/text()');
+             
+             l_PERSON_UO (l_PERSON_UO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'coddocum/text()'));
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_PERSON_UO (l_PERSON_UO.last).KF := trim(l_str);
@@ -582,8 +591,9 @@ procedure p_parse_person_uo (p_id in  NUMBER)
                                               ispartner,
                                               isaudit,
                                               k060,
-                                             -- status,
-                                              kf)
+                                              kf,
+                                              k020,
+                                              coddocum)
                     VALUES (l_check_id,
                              l_PERSON_UO(j).rnk,
                              l_PERSON_UO(j).nameur,
@@ -599,20 +609,21 @@ procedure p_parse_person_uo (p_id in  NUMBER)
                              l_PERSON_UO(j).ispartner,
                              l_PERSON_UO(j).isaudit,
                              l_PERSON_UO(j).k060,
-                             --l_PERSON_UO(j).status,
-                             l_PERSON_UO(j).kf
-                     );
+                             l_PERSON_UO(j).kf,
+                             l_PERSON_UO(j).k020,
+                             l_PERSON_UO(j).coddocum
+                            );
                      exception when dup_val_on_index then null;
                      end;
                end loop;
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL2.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+         --   BARSTRANS.TRANSP_UTL2.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -715,11 +726,11 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+          --  BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -833,7 +844,7 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 
@@ -939,7 +950,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
@@ -1056,7 +1067,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-            --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+          --  BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1180,7 +1191,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
@@ -1200,7 +1211,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
     l_header       dbms_xmldom.DOMNode;
     l_str         VARCHAR2(2000);
     l_OWNERPP_UO  t_nbu_ownerpp_uo :=t_nbu_ownerpp_uo ();
-    
+
   begin
    -- bars_audit.info(title || 'Start '||'p_id = '||p_id);
          begin
@@ -1265,6 +1276,14 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
 
              dbms_xslprocessor.valueof(l_row, 'PERCENT/text()', l_str);
              l_OWNERPP_UO (l_OWNERPP_UO.last).PERCENT:=to_number(l_str,'99990,99');
+              
+             l_OWNERPP_UO (l_OWNERPP_UO.last).ZIP :=dbms_xslprocessor.valueof(l_row,'ZIP/text()');
+             
+             l_OWNERPP_UO (l_OWNERPP_UO.last).STREETADDRESS := dbms_xslprocessor.valueof(l_row,'STREETADDRESS/text()');
+             
+             l_OWNERPP_UO (l_OWNERPP_UO.last).HOUSENO := dbms_xslprocessor.valueof(l_row,'HOUSENO/text()');
+             
+             l_OWNERPP_UO (l_OWNERPP_UO.last).FLATNO := dbms_xslprocessor.valueof(l_row,'FLATNO/text()');
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_OWNERPP_UO (l_OWNERPP_UO.last).KF := to_number(l_str);
@@ -1292,9 +1311,14 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
                                                 inn,
                                                 countrycod,
                                                 percent,
-                                                kf)
-                    VALUES ( l_check_id,
-                             l_OWNERPP_UO(j).rnk,
+                                                kf,
+                                                zip,
+                                                streetaddress,
+                                                houseno,
+                                                flatno
+                                                )
+                    VALUES (l_check_id,
+                            l_OWNERPP_UO(j).rnk,
                              l_OWNERPP_UO(j).rnkb,
                              l_OWNERPP_UO(j).lastname,
                              l_OWNERPP_UO(j).firstname,
@@ -1303,17 +1327,21 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
                              l_OWNERPP_UO(j).inn,
                              l_OWNERPP_UO(j).countrycod,
                              l_OWNERPP_UO(j).percent,
-                             l_OWNERPP_UO(j).kf
+                             l_OWNERPP_UO(j).kf,
+                             l_OWNERPP_UO(j).zip,
+                             l_OWNERPP_UO(j).streetaddress,
+                             l_OWNERPP_UO(j).houseno,
+                             l_OWNERPP_UO(j).flatno    
                             );
                end loop;
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-           -- BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+          --  BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
   end;
@@ -1417,7 +1445,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-        --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
@@ -1492,7 +1520,7 @@ procedure p_parse_credit (p_id in  NUMBER)
 
              dbms_xslprocessor.valueof(l_row, 'NUMDOG/text()', l_str);
              l_NBU_CREDIT (l_NBU_CREDIT.last).NUMDOG:= trim(l_str);
-             
+
              l_NBU_CREDIT (l_NBU_CREDIT.last).DOGDAY:=to_date(dbms_xslprocessor.valueof(l_row, 'DOGDAY/text()'), l_date);
 
              l_NBU_CREDIT (l_NBU_CREDIT.last).ENDDAY:=to_date(dbms_xslprocessor.valueof(l_row, 'ENDDAY/text()'), l_date);
@@ -1624,7 +1652,7 @@ procedure p_parse_credit (p_id in  NUMBER)
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
-         --BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
+         --   BARSTRANS.TRANSP_UTL.resive_status_err(p_id,'ERROR:' || DBMS_UTILITY.FORMAT_ERROR_STACK()||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
        end;
        commit;
 end;
@@ -1844,6 +1872,10 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
 
              dbms_xslprocessor.valueof(l_row, 'SUMDP/text()', l_str);
              l_NBU_PLEDGE_DEP (l_NBU_PLEDGE_DEP.last).SUMDP:= trim(l_str);
+             
+             l_NBU_PLEDGE_DEP(l_NBU_PLEDGE_DEP.last).SUMBAIL:=to_number(dbms_xslprocessor.valueOf(l_row,'SUMBAIL/text()'));
+               
+             l_NBU_PLEDGE_DEP(l_NBU_PLEDGE_DEP.last).SUMGUARANTEE:=trim(dbms_xslprocessor.valueOf(l_row,'SUMGUARANTEE/text()'));
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
              l_NBU_PLEDGE_DEP (l_NBU_PLEDGE_DEP.last).KF:= to_number(l_str);
@@ -1884,7 +1916,9 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
                                                 dogdaydp,
                                                 r030dp,
                                                 sumdp,
-                                                kf)
+                                                kf,
+                                                sumbail,
+                                                sumguarantee)
 
                     VALUES ( l_check_id,
                              l_NBU_PLEDGE_DEP(j).rnk,
@@ -1907,7 +1941,9 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
                              l_NBU_PLEDGE_DEP(j).dogdaydp,
                              l_NBU_PLEDGE_DEP(j).r030dp,
                              l_NBU_PLEDGE_DEP(j).sumdp,
-                             l_NBU_PLEDGE_DEP(j).kf
+                             l_NBU_PLEDGE_DEP(j).kf,
+                             l_NBU_PLEDGE_DEP(j).sumbail,
+                             l_NBU_PLEDGE_DEP(j).sumguarantee                             
                             );
 
 
@@ -1915,7 +1951,7 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
              END;
             end if;
      nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-     --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+    -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
         exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());
@@ -1941,7 +1977,7 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
         into l_clob
         from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
        end;
-       
+
         l_parser := dbms_xmlparser.newparser;
         dbms_xmlparser.parseclob(l_parser, l_clob);
        -- bars_audit.trace(title || 'clob loaded');
@@ -1970,45 +2006,45 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
         LOOP
              l_row := dbms_xmldom.item(l_rowlist, i);
              l_NBU_CREDIT_TRANCHE.extend;
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).REQUEST_ID:=l_check_id;
-              
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).RNK:= trim(dbms_xslprocessor.valueof(l_row, 'RNK/text()'));
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).ND:= trim(dbms_xslprocessor.valueof(l_row, 'ND/text()'));
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).NUMDOGTR:=to_number(dbms_xslprocessor.valueof(l_row, 'NUMDOGTR/text()'));
-            
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).DOGDAYTR:= to_date((dbms_xslprocessor.valueof(l_row, 'DOGDAYTR/text()')),'dd.mm.yy');
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).ENDDAYTR:= to_date((dbms_xslprocessor.valueof(l_row, 'ENDDAYTR/text()')),'dd.mm.yy');
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).SUMZAGALTR:=trim(dbms_xslprocessor.valueof(l_row,'SUMZAGALTR/text()'));
-               
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).R030TR:=to_number(dbms_xslprocessor.valueof(l_row, 'R030TR/text()'));
-            
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PROCCREDITTR:=to_number(dbms_xslprocessor.valueOf(l_row,'PROCCREDITTR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PERIODBASETR:=to_number(dbms_xslprocessor.valueOf(l_row,'PERIODBASETR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).PERIODPROCTR:=to_number(dbms_xslprocessor.valueOf(l_row,'PERIODPROCTR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).SUMARREARSTR:=to_number(dbms_xslprocessor.valueOf(l_row,'SUMARREARSTR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).ARREARBASETR:=to_number(dbms_xslprocessor.valueOf(l_row,'ARREARBASETR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).ARREARPROCTR:=to_number(dbms_xslprocessor.valueOf(l_row,'ARREARPROCTR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).DAYBASETR:=to_number(dbms_xslprocessor.valueOf(l_row,'DAYBASETR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).DAYPROCTR:=to_number(dbms_xslprocessor.valueOf(l_row,'DAYPROCTR/text()'));
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).FACTENDDAYTR:=to_date((dbms_xslprocessor.valueOf(l_row,'FACTENDDAYTR/text()')),'dd.mm.yy');
-             
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).KLASSTR:=to_number(dbms_xslprocessor.valueOf(l_row,'KLASSTR/text()'));
-             
+          
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).RISKTR:=trim(dbms_xslprocessor.valueOf(l_row,'RISKTR/text()'));
-             
+
              END LOOP;
 
              begin
@@ -2021,13 +2057,13 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
              if l_NBU_CREDIT_TRANCHE IS NOT EMPTY then
              BEGIN
                 FORALL j IN l_NBU_CREDIT_TRANCHE.first .. l_NBU_CREDIT_TRANCHE.last
-                    INSERT INTO core_credit_tranche         
-                           VALUES l_NBU_CREDIT_TRANCHE(j);            
+                    INSERT INTO core_credit_tranche
+                           VALUES l_NBU_CREDIT_TRANCHE(j);
                            l_NBU_CREDIT_TRANCHE.delete;
              END;
             end if;
         nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_DATA_DELIVERED,null);
-       --BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
+       -- BARSTRANS.TRANSP_UTL.resive_status_ok(p_id);
          exception
             when others then
             nbu_core_service.set_data_request_state(l_check_id,nbu_gateway.nbu_core_service.REQ_STATE_TRANSFER_DATA_FAIL,sqlerrm||' '||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE());

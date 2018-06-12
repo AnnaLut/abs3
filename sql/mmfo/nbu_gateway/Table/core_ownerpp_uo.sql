@@ -47,3 +47,27 @@ exception
          null;
 end;
 /
+begin
+execute immediate 'alter table  core_ownerpp_uo add zip varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  core_ownerpp_uo add STREETADDRESS varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  core_ownerpp_uo add HOUSENO varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/
+begin
+execute immediate 'alter table  core_ownerpp_uo add FLATNO varchar2(4000)';
+exception when others 
+          then if sqlcode=-955 then null; end if; 
+end;
+/

@@ -166,7 +166,15 @@ create or replace package body nbu_601_request_data_ru is
                            c.okpo,
                            p.bday,
                            decode(c.codcagent, 6, c.country, null) countrycodnerez,
-                           case when length(c.prinsider)=1 then  to_char(0||c.prinsider) else to_char(c.prinsider) end prinsider
+                           case when length(c.prinsider)=1 then  to_char(0||c.prinsider) else to_char(c.prinsider) end prinsider,
+                           case when c.codcagent in (5,6) and c.okpo is not null then c.okpo 
+                                when c.codcagent=6 and (OKPO is null or OKPO like '%0000000%') then ('I'||p.SER||p.NUMDOC)  
+                                 end K020,
+                           case when c.okpo is not null then 11 
+                                when c.okpo is null and c.codcagent in (5,6) then decode (p.passp, 1,14, 2,49, 3,49, 6,49, 4,49, 5,21, 11,15, 12,16, 13,32, 14,18, 99,49, 15,49, 16,49, 17,49, 7,12, 18,11) 
+                                when c.OKPO is null and p.passp is null and p.numdoc is null then 33               
+                             end codDocum      
+                                   
                     from   customer c
                     join   person p on p.rnk = c.rnk
                     where  c.sed <> 91 and
@@ -191,7 +199,10 @@ create or replace package body nbu_601_request_data_ru is
                     fiz.prinsider,                -- k060            varchar2(2),
                     null,                         -- status          varchar2(30),
                     null,
-					kf_);                         -- kf              varchar2(6) not null
+					          kf_,                          -- kf              varchar2(6) not null,
+                    fiz.K020,                     --К020             VARCHAR2(20),
+                    fiz.codDocum                  --codDocum         NUMBER(2)
+                    );                        
         end loop;
         commit;
         bars_context.home();
@@ -262,7 +273,7 @@ create or replace package body nbu_601_request_data_ru is
                     address.homepart,
                     address.room,
                     null,
-					null,
+					          null,
                     kf_);
         end loop;
 
@@ -310,7 +321,21 @@ create or replace package body nbu_601_request_data_ru is
                                from   d8_cust_link_groups d8
                                where  d8.okpo = c.okpo and
                                       rownum = 1), 'false') as ispartner,
-                          case when length(c.prinsider)=1 then  to_char(0||c.prinsider) else to_char(c.prinsider) end k060
+                          case when length(c.prinsider)=1 then  to_char(0||c.prinsider) else to_char(c.prinsider) end k060,
+                          ---
+                          case when (c.codcagent=3 
+                                    or (c.codcagent=5 and  c.sed=91 and c.ise in ('14200', '14100', '14201', '14101')))   
+                            then c.okpo 
+                               when (c.codcagent=4 
+                                 or (c.codcagent=6 and c.sed=91 and c.ise in ('14200', '14100', '14201', '14101'))) 
+                                 and (c.okpo  is null or c.okpo like '%0000000%')  then ('I'||c.OKPO) 
+                          end k020,
+                          case when c.okpo is not null and 
+                          (c.codcagent in (3,4) or (c.codcagent in (5,6) and c.sed=91 and c.ise in ('14200', '14100', '14201', '14101')))  
+                           then decode (c.tgr, 1,51,2,51, 3,52, 9,99)       
+                               when c.okpo is null then 62   
+                          end codDocum      
+                                
                    from   customer c
                    where  c.rnk in (select a.rnk
                                     from   accounts a
@@ -352,7 +377,10 @@ create or replace package body nbu_601_request_data_ru is
                     ur.k060,              -- k060            varchar2(2),
                     null,                 -- status          varchar2(30),
                     null,
-				            kf_);                 -- kf              varchar2(6)
+				            kf_,                  -- kf              varchar2(6),
+                    ur.K020,              --К020             VARCHAR2(20),
+                    ur.CODDOCUM           --CODDOCUM         NUMBER(2)
+                    );                 
         end loop;
 
         commit;
@@ -724,15 +752,34 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
          begin
         execute immediate 'alter table NBU_OWNERPP_UO truncate partition for (''' || kf_ || ''') reuse storage';
         end;
-        for n in (select rnka as rnk,rnkb,name,decode (country_u,804,'true','false') isrezoj,okpo_u,country_u,min(vaga1) as vaga1 ,' ' status
-                  from cust_bun
-                  where vaga1>10 and (edate>sysdate or edate is null) and custtype_u=2
+        for n in /*(select rnka as rnk,rnkb,name,decode (country_u,804,'true','false') isrezoj,okpo_u,country_u,min(vaga1) as vaga1 ,' ' status,
+                         ad.zip,nvl(ad.street,cw.street) street, nvl(ad.home,cw.buildnum) as home,ad.room
+                  from bars.customer_address ad, cust_bun c
+                       left join (select b.rnk, max(case when  tag='FGADR' then  regexp_substr(b.value,'[^,]+',1,1) else null end) as street,
+                                                                 max(case when  tag='W4KKB' then  b.value else null end) as buildnum
+                                                          from bars.customerw b where b.tag in ('FGADR','W4KKB')
+                                                          group by rnk) cw on cw.rnk=c.rnk   
+                  where c.rnka=ad.rnk and vaga1>10 and (edate>sysdate or edate is null) and custtype_u=2
                         and id_rel in (1,4)
-                group by rnka,rnkb,name,decode (country_u,804,'true','false'),okpo_u,country_u)-- физ
+                group by rnka,rnkb,name,decode (country_u,804,'true','false'),okpo_u,country_u)-- физ*/
+                
+                
+                
+                (select rnka as rnk,rnkb,name,decode (country_u,804,'true','false') isrezoj,okpo_u,country_u,min(vaga1) as vaga1 ,' ' status,
+                         ad.zip,nvl(ad.street,cw.street) street, nvl(ad.home,cw.buildnum) as home,ad.room 
+                  from cust_bun c, bars.customer_address ad
+                       left join (select b.rnk, max(case when  tag='FGADR' then  regexp_substr(b.value,'[^,]+',1,1) else null end) as street,
+                                                                 max(case when  tag='W4KKB' then  b.value else null end) as buildnum
+                                                          from bars.customerw b where b.tag in ('FGADR','W4KKB')
+                                                          group by rnk) cw on cw.rnk=ad.rnk   
+                  where c.rnka=ad.rnk and vaga1>10 and (edate>sysdate or edate is null) and custtype_u=2 and ad.type_id=1
+                        and id_rel in (1,4)
+                group by rnka,rnkb,name,decode (country_u,804,'true','false'),okpo_u,country_u, ad.zip,nvl(ad.street,cw.street), nvl(ad.home,cw.buildnum),ad.room)
+                
                   loop
                     begin
-                  insert into bars.nbu_ownerpp_uo  ( rnk,rnkb,lastname,isrez,inn,countrycod,percent,status,kf) values
-                         (n.rnk,n.rnkb,n.name,n.isrezoj,n.okpo_u,n.country_u,n.vaga1,n.status,kf_);
+                  insert into bars.nbu_ownerpp_uo  ( rnk,rnkb,lastname,isrez,inn,countrycod,percent,status,kf,zip,streetaddress,houseno,flatno) values
+                         (n.rnk,n.rnkb,n.name,n.isrezoj,n.okpo_u,n.country_u,n.vaga1,n.status,kf_,n.zip,n.street,n.home,n.room);
                          exception when dup_val_on_index then null;
                      end;
                    end loop;
@@ -978,8 +1025,19 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            cc_add ad
 
 	 	                left join --загальна сума (ліміт кредитної лінії)
-                          (select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
-                            from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv
+                          /*(select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
+                            from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv*/
+                            
+                            (select distinct cd.nd ,ca.kv, ((cd.limit*100)+b.amount_com) as  sum_zagal
+                                             from cc_add ca,cc_deal cd 
+                                             left join (select a.nd,sum(a.amount_com) as amount_com from( 
+                                                            select distinct ad.nd,na.acc,ad.kv,a.kv,
+                                                               case  when ad.kv<>a.kv then (select (abs(s.ostc)*(c.rate_o)) as amount_com from accounts s where s.acc=a.acc and s.kv=a.kv and s.kv=c.kv and c.vdate=trunc(sysdate,'dd'))
+                                                               else abs(a.ostc) end amount_com
+                                                            from accounts a, cur_rates c,nd_acc na,cc_add ad where ad.nd=na.nd and na.acc=a.acc and a.kv=c.kv and  nbs in (3578,3579))a
+                                                            group by a.nd) b on b.nd=cd.nd
+                                                       where ca.nd=cd.nd)sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv
+                            
 
                     left join--залишок заборгованості за кредитною операцією
                            (select nd ,kv, sum (sum_ost) as sum_ost
@@ -1007,6 +1065,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                        where fdat between  add_months(trunc(sysdate,'mm'),-1) and add_months(trunc(sysdate,'mm'),11) and sumo>0
                                        group by nd) sum_lim on sum_lim.nd=ad.nd ,
                           nd_acc n,
+                          nd_txt nt,
                           accounts a,
                           (select t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
                            from int_ratn t,
@@ -1023,7 +1082,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            a.tip = 'LIM' and
                            a.nls like '8999%' and
                            (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1)) and
-                           proc.acc = ad.accs)
+                           proc.acc = ad.accs
+                           and d.nd=nt.nd
+                           and nt.tag <>'PR_TR'-- убираем транши
+                           )
 
           loop
             begin
@@ -1107,7 +1169,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
 
 
     --заполнение залогов
-      procedure  p_nbu_pledge_dep (kf_ in varchar2)
+  procedure  p_nbu_pledge_dep (kf_ in varchar2)
     is
     begin
     bc.go(kf_);
@@ -1116,8 +1178,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         end;
      for n in (select distinct ac.rnk,ac.acc,'' as ordernum, p.cc_idz as numberpledge,p.sdatz as pledgeday, (select s031  from cc_pawn cp where cp.pawn=p.pawn) as s031 , ac.kv as r030,
                        fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  as sumppladge,p.sv as  pricepledge, '' as lastpledgeday ,'' as codrealty,'' as ziprealty
-                       ,'' as squarerealty,'' as real6income,'' as noreal6income,'' as flaginsurancepledge , dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,'' as kf
-
+                       ,'' as squarerealty,'' as real6income,'' as noreal6income,'' as flaginsurancepledge , dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,
+                       case when (select s031  from cc_pawn cp where cp.pawn=p.pawn)=34 then  fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  end sumBail, 
+                         case when (select s031  from cc_pawn cp where cp.pawn=p.pawn) in (11 , 12,  13, 14, 16, 20, 23, 31, 60, 61, 62, 63, 64, 65) then
+                             fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))end sumGuarantee
                    from   accounts ac  ,  pawn_acc p left join( select nd,d.acc,a.kv as kv ,dat_begin as date_begin , sum as limit , dpu_id as  deposit_id from dpu_deal d ,  accounts a
                                      where a.acc=d.acc
                                      union
@@ -1125,9 +1189,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                       where ac.acc=p.acc)
                       loop
     insert into  nbu_pledge_dep(rnk,acc,ordernum,numberpledge,pledgeday,s031,r030,sumpledge,pricepledge,lastpledgeday,codrealty,ziprealty,squarerealty, real6income,
-                                 noreal6income,flaginsurancepledge,numdogdp,dogdaydp,r030dp,sumdp,status,kf) values
+                                 noreal6income,flaginsurancepledge,numdogdp,dogdaydp,r030dp,sumdp,status,kf,sumBail,sumGuarantee) values
                                  (n.rnk,n.acc,n.ordernum, n.numberpledge,n.pledgeday,n.s031,n.r030,n.sumppladge,n.pricepledge,n.lastpledgeday ,n.codrealty,
-                                 n.ziprealty,n.squarerealty,n.real6income,n.noreal6income,n.flaginsurancepledge,n.numdogdp,n.dogdaydp,n.r030dp,n.sumdp,n.status,kf_) ;
+                                 n.ziprealty,n.squarerealty,n.real6income,n.noreal6income,n.flaginsurancepledge,n.numdogdp,n.dogdaydp,n.r030dp,n.sumdp,n.status,kf_,
+                                 n.sumBail,n.sumGuarantee) ;
                       end loop;
             commit;
         bars_context.home();
@@ -1143,9 +1208,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         begin
         execute immediate 'alter table NBU_CREDIT_TRANCHE truncate partition for (''' || kf_ || ''') reuse storage';
         end;
-        for tranche in (select distinct person.rnk,d.nd, tr.npp as numDogTr,tr.fdat as dogDayTr,  tr.sv as sumZagalTr ,tr.dapp as endDayTr, a.kv as r030Tr,proc.proccredit,
-                               (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbasetr,
-                               (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproctr,
+        for tranche in (select distinct person.rnk,d.nd, to_char(tr.npp) as numDogTr,
+                                tr.fdat as dogDayTr, tr.sv as sumZagalTr ,tr.dapp as endDayTr, a.kv as r030Tr,proc.proccredit,
+                               (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=300465 and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbasetr,
+                               (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=300465 and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproctr,
                                 sumarrears.sum_ost as  sumArrearsTr,
                                  nbu23_rez.daybase as  dayBaseTr,
                                  nbu23_rez.daybase as dayProcTr,
@@ -1188,7 +1254,84 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                             group by nd, kv) sumarrears on ad.nd = sumarrears.nd and ad.kv = sumarrears.kv
 
                    where person.rnk=d.rnk and person.kf=d.kf and d.nd=na.nd  and d.nd=ad.nd  and proc.acc = ad.accs
-                         and na.acc=a.acc and na.acc=tr.acc and nt.nd=d.nd and nt.tag ='PR_TR' and nt.txt=1 and tr.fdat>=add_months(trunc(sysdate,'mm'),-1) and tr.fdat<trunc(sysdate,'mm') )
+                         and na.acc=a.acc and na.acc=tr.acc and nt.nd=d.nd and nt.tag ='PR_TR' and nt.txt=1 and tr.fdat>=add_months(trunc(sysdate,'mm'),-1) and tr.fdat<trunc(sysdate,'mm') 
+            ----добавлено мультивалютные кредиты!!! COBUMMFO-7982
+            union 
+            select distinct person.rnk, d.nd, d.cc_id as numDogTr, 
+                                        case
+                                        when  d.sdate is not null then d.sdate
+                                          else (select a.daos from accounts a where a.acc=ad.accs)
+                                        end  dogDayTr,
+                                        sumzagal.sum_zagal as sumZagalTr,
+                                        case
+                                        when  d.wdate is not null then d.wdate
+                                          else (select a.mdate from accounts a where a.acc=ad.accs)
+                                        end endDayTr,
+                                        a.kv as r030Tr,
+                                        proc.proccredit,
+                               (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=300465 and dt.tag='FREQ' and regexp_like(dt.txt, '^\d{1,}$')) as periodbasetr,
+                               (select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=300465 and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproctr,
+                                sumarrears.sum_ost as  sumArrearsTr,
+                                 nbu23_rez.daybase as  dayBaseTr,
+                                 nbu23_rez.daybase as dayProcTr,
+                                 a.dazs as factEndDayTr,
+                                 nbu23_rez.fin as klasstr,
+                                 nbu23_rez.cr as risktr,
+                                 person.kf
+                              from (select rnk,kf from nbu_person_fo
+                              union
+                              select rnk, kf from  nbu_person_uo) person,
+                              (select t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
+                                                 from int_ratn t,
+                                                 accounts t2,
+                                                 nd_acc t4
+                                                 where  t.id = 0 and t4.acc = t2.acc and t2.tip = 'SS 'and t.acc=t4.acc  and bdat< trunc(sysdate,'mm')
+                                                 group by t.acc) proc --номінальна процентна ставка
+                                 ,cc_deal d
+               --klass
+                left join
+                          (select nd,
+                                  decode(max(kol_351), null, 0, max(kol_351)) daybase,
+                                  max(fin) fin,
+                                  sum(cr)*100 as cr
+                           from   nbu23_rez
+                           where  fdat = trunc(sysdate,'mm')
+                           group by nd) nbu23_rez on nbu23_rez.nd = d.nd
+
+                              ,nd_acc na, cc_trans tr,accounts a,  cc_add ad
+                              
+                              
+                left join --загальна сума (ліміт кредитної лінії)
+                         /* (select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
+                            from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv  */ 
+                            
+                            (select distinct cd.nd ,ca.kv, ((cd.limit*100)+b.amount_com) as  sum_zagal
+                                             from cc_add ca,cc_deal cd 
+                                             left join (select a.nd,sum(a.amount_com) as amount_com from( 
+                                                            select distinct ad.nd,na.acc,ad.kv,a.kv,
+                                                               case  when ad.kv<>a.kv then (select (abs(s.ostc)*(c.rate_o)) as amount_com from accounts s where s.acc=a.acc and s.kv=a.kv and s.kv=c.kv and c.vdate=trunc(sysdate,'dd'))
+                                                               else abs(a.ostc) end amount_com
+                                                            from accounts a, cur_rates c,nd_acc na,cc_add ad where ad.nd=na.nd and na.acc=a.acc and a.kv=c.kv and  nbs in (3578,3579))a
+                                                            group by a.nd) b on b.nd=cd.nd
+                                                       where ca.nd=cd.nd) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv
+                                    
+
+                --Залишок заборгованості за траншем
+                left join (select nd ,kv, sum (sum_ost) as sum_ost
+                            from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
+                                  from   agg_monbals ag,
+                                         nd_acc n,
+                                         accounts a2
+                                  where ag.fdat = add_months(trunc(sysdate,'mm'),-1) and
+                                        a2.tip in ('SS','SP') and
+                                        n.acc = a2.acc and
+                                        n.acc = ag.acc)
+                            group by nd, kv) sumarrears on ad.nd = sumarrears.nd and ad.kv = sumarrears.kv
+
+                   where person.rnk=d.rnk and person.kf=d.kf and d.nd=na.nd  and d.nd=ad.nd  and proc.acc = ad.accs
+                         and na.acc=a.acc and na.acc=tr.acc and d.ndg in (select ndg from cc_deal d where d.vidd in(2,3)  and d.ndg is not null) and
+                          (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1))                                       
+                 )
               loop
                        insert into nbu_credit_tranche(rnk,
                                                       nd,

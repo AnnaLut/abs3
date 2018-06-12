@@ -52,6 +52,8 @@ function get_xml_person_fo return clob
                            xmlelement("BIRTHDAY", to_char(p.birthday,'dd.mm.yyyy')),
                            xmlelement("CONTERYCODNEREZ", p.countrycodnerez),
                            xmlelement("K060", p.k060),
+                           xmlelement("K020",p.k020),
+                           xmlelement("coddocum",p.coddocum),
                            xmlelement("STATUS", p.status),
                            xmlelement("KF",p.kf)
                            ))
@@ -149,6 +151,8 @@ function get_xml_person_uo  return clob
                                xmlelement("ISPARTNER",p.ispartner),
                                xmlelement("ISAUDIT",p.isaudit),
                                xmlelement("k060",p.k060),
+                               xmlelement("K020",p.k020),
+                               xmlelement("coddocum",p.coddocum),
                                xmlelement("STATUS",p.status),
                                xmlelement("KF",p.kf)
                             )))
@@ -329,6 +333,10 @@ end;
                                xmlelement("INN",o.inn),
                                xmlelement("COUNTRYCOD",o.countrycod),
                                xmlelement("PERCENT",to_char(o.percent,'99990,99')),
+                               xmlelement("ZIP",o.zip),
+                               xmlelement("STREETADDRESS",o.streetaddress),
+                               xmlelement("HOUSENO",o.houseno),
+                               xmlelement("FLATNO",o.flatno),
                                xmlelement("STATUS",o.status),
                                xmlelement("KF",o.kf)
                              )))
@@ -476,6 +484,8 @@ function get_xml_pledge_dep return clob
                                 xmlelement("DOGDAYDP",to_char(c.dogdaydp,'dd.mm.yyyy')),
                                 xmlelement("R030DP",c.r030dp),
                                 xmlelement("SUMDP",c.sumdp),
+                                xmlelement("SUMBAIL",c.sumbail),
+                                xmlelement("SUMGUARANTEE",c.sumguarantee),  
                                 xmlelement("STATUS",c.status),
                                 xmlelement("KF",c.kf)
                               )))
@@ -744,7 +754,7 @@ procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
     end;
 
  end;
- 
+
 procedure ensure_wrapper_job(p_job_name in varchar2)
     is
         l_job_existance_flag integer;
@@ -761,8 +771,8 @@ procedure ensure_wrapper_job(p_job_name in varchar2)
                                            comments     => null,
                                            enabled      => false);
 
-        end; 
- 
+end;
+
 
 procedure run_formated_xml
   is
@@ -773,11 +783,11 @@ procedure run_formated_xml
  pragma exception_init (job_is_runing,-27478);
 
  begin
- 
+
    l_job_name := 'RUN_FORMATED_XML_'||current_kf;
    ensure_wrapper_job(l_job_name);
 
- 
+
       dbms_scheduler.set_job_argument_value(job_name  =>l_job_name,
                                          argument_position =>1,
                                          argument_value => current_kf );
@@ -793,7 +803,6 @@ procedure run_formated_xml
 end;
 
 end;
-
 /
 grant execute on nbu_601_request_data_ru to barstrans;
 grant execute on nbu_601_request_data_ru to bars_access_defrole;

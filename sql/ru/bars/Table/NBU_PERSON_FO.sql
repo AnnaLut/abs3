@@ -85,4 +85,18 @@ exception
 end;
 /
 
+begin
+	execute immediate'alter table NBU_PERSON_FO add k020 VARCHAR2(20)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
+begin
+	execute immediate'alter table NBU_PERSON_FO add codDocum number(2)';
+exception
+ when others then if sqlcode=-955 then null; end if;
+end;
+/
+
 grant all on NBU_PERSON_FO to BARS_ACCESS_DEFROLE;
