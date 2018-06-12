@@ -769,7 +769,7 @@ namespace Bars.EAD.Structs.Params
         public String agr_type;
         [JsonProperty("agr_code")]
         public String agr_code;
-//        [JsonProperty("agr_number")]
+        //        [JsonProperty("agr_number")]
         [JsonIgnoreAttribute]
         public String agr_number;
         [JsonProperty("account_type")]
@@ -786,7 +786,7 @@ namespace Bars.EAD.Structs.Params
         public DateTime? account_close_date;
         [JsonProperty("account_status")]
         public Byte account_status;
-//        [JsonProperty("account_is_remote_control")]
+        //        [JsonProperty("account_is_remote_control")]
         [JsonIgnoreAttribute]
         public bool? account_is_remote_control;
         [JsonProperty("created")]
@@ -897,7 +897,7 @@ namespace Bars.EAD.Structs.Params
             cmd.Parameters.Clear();
             cmd.BindByName = true;
             cmd.Parameters.Add("p_agr_type", OracleDbType.Varchar2, AgrType, ParameterDirection.Input);
-            if(ReservedAcc)
+            if (ReservedAcc)
             {
                 cmd.CommandText = @"select rnk, changed, created, user_login, user_fio, account_number, currency_code, mfo, branch_id, open_date, close_date, account_status, agr_number, agr_code, account_type, agr_type, remote_controled
                                  from TABLE (ead_integration.get_UACCRsrv_Instance_Set(:p_agr_type, :p_rsrv_id))";
@@ -1708,44 +1708,6 @@ namespace Bars.EAD
         */
         # endregion
 
-        # region Приватные методы
-        private string GetHostName()
-        {
-            string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-
-            if (String.IsNullOrEmpty(userHost) || String.Compare(userHost, "unknown", true) == 0)
-                userHost = HttpContext.Current.Request.UserHostAddress;
-
-            if (String.Compare(userHost, HttpContext.Current.Request.UserHostName) != 0)
-                userHost += " (" + HttpContext.Current.Request.UserHostName + ")";
-
-            return userHost;
-        }
-        private void LoginUser(String userName)
-        {
-            // информация о текущем пользователе
-            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
-
-            try
-            {
-                InitOraConnection();
-                // установка первичных параметров
-                SetParameters("p_session_id", DB_TYPE.Varchar2, Session.SessionID, DIRECTION.Input);
-                SetParameters("p_user_id", DB_TYPE.Varchar2, userMap.user_id, DIRECTION.Input);
-                SetParameters("p_hostname", DB_TYPE.Varchar2, GetHostName(), DIRECTION.Input);
-                SetParameters("p_appname", DB_TYPE.Varchar2, "barsroot", DIRECTION.Input);
-                SQL_PROCEDURE("bars.bars_login.login_user");
-            }
-            finally
-            {
-                DisposeOraConnection();
-            }
-
-            // Если выполнили установку параметров
-            Session["UserLoggedIn"] = true;
-        }
-        # endregion
-
         # region Веб-методы
         [WebMethod(EnableSession = true)]
         public void MsgProcess(Int64 ID, String WSProxyUserName, String WSProxyPassword, String kf)
@@ -1755,112 +1717,119 @@ namespace Bars.EAD
             if (isAuthenticated)
             {
                 LoginUser(WSProxyUserName);
-
             }
             else
             {
                 //_dbLogger.Info("WSProxyUserName= Noname" + WSProxyUserName);
             }
-            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
 
-            // Начинаем сессию взаимодействия и вычитываем сообщение
-            String SessionID;
-            SyncMessage msg;
-            if (con.State != ConnectionState.Open)
-                con.Open();
             try
             {
-                SessionID = StartSession(con, kf);
+                OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
 
-                // если синхронизация справочников то используем другой класс
-                if (SyncMessage.GetMethodByID(ID, con) == "SetDictionaryData")
+                // Начинаем сессию взаимодействия и вычитываем сообщение
+                String SessionID;
+                SyncMessage msg;
+                if (con.State != ConnectionState.Open)
+                    con.Open();
+                try
                 {
-                    msg = new DictMessage(ID, SessionID, con, kf);
-                }
-                else
-                {
-                    msg = new SyncMessage(ID, SessionID, con, kf);
-                }
-            }
-            finally
-            {
-                con.Close();
-            }
-            String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
-            // Формируем сообщение
-            String MessageID = msg.Message_ID;
-            DateTime MessageDate = DateTime.Now;
-            String Message = msg.GetJSONString();
+                    SessionID = StartSession(con, kf);
 
-            BbConnection bb_con = new BbConnection();
-            // пакет для записи в БД
-            EadPack ep = new EadPack(bb_con);
-
-            // устанавлдиваем статус
-            ep.MSG_SET_STATUS_SEND(ID, MessageID, MessageDate, Message, kf);
-
-            // отправляем запрос по Http
-            Response rsp;
-            try
-            {
-                String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
-                // сохраняем ответ
-                ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText, kf);
-
-                // парсим ответ
-                rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
-                ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp, kf);
-
-                // Анализируем ответ
-                if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
-                {
-                    // устанавлдиваем статус "Помилка"
-                    if (rsp.Result != null)
+                    // если синхронизация справочников то используем другой класс
+                    if (SyncMessage.GetMethodByID(ID, con) == "SetDictionaryData")
                     {
-                        Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
-                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
+                        msg = new DictMessage(ID, SessionID, con, kf);
                     }
                     else
                     {
-                        // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
-                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text), kf);
+                        msg = new SyncMessage(ID, SessionID, con, kf);
                     }
                 }
-                else
+                finally
                 {
-                    Boolean HasErrors = false;
+                    con.Close();
+                }
+                String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
+                // Формируем сообщение
+                String MessageID = msg.Message_ID;
+                DateTime MessageDate = DateTime.Now;
+                String Message = msg.GetJSONString();
 
-                    foreach (Newtonsoft.Json.Linq.JToken obj in (rsp.Result as Newtonsoft.Json.Linq.JArray))
+                BbConnection bb_con = new BbConnection();
+                // пакет для записи в БД
+                EadPack ep = new EadPack(bb_con);
+
+                // устанавлдиваем статус
+                ep.MSG_SET_STATUS_SEND(ID, MessageID, MessageDate, Message, kf);
+
+                // отправляем запрос по Http
+                Response rsp;
+                try
+                {
+                    String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
+                    // сохраняем ответ
+                    ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText, kf);
+
+                    // парсим ответ
+                    rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
+                    ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp, kf);
+
+                    // Анализируем ответ
+                    if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
                     {
-                        Structs.Result.SyncResult res = obj.ToObject<Structs.Result.SyncResult>();
-                        if (!String.IsNullOrEmpty(res.Error))
+                        // устанавлдиваем статус "Помилка"
+                        if (rsp.Result != null)
                         {
-                            // устанавлдиваем статус "Помилка"
-                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error), kf);
-                            HasErrors = true;
-                            break;
+                            Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
+                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
+                        }
+                        else
+                        {
+                            // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
+                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text), kf);
                         }
                     }
+                    else
+                    {
+                        Boolean HasErrors = false;
 
-                    if (!HasErrors)
-                        // устанавлдиваем статус "Виконано"
-                        ep.MSG_SET_STATUS_DONE(ID, kf);
+                        foreach (Newtonsoft.Json.Linq.JToken obj in (rsp.Result as Newtonsoft.Json.Linq.JArray))
+                        {
+                            Structs.Result.SyncResult res = obj.ToObject<Structs.Result.SyncResult>();
+                            if (!String.IsNullOrEmpty(res.Error))
+                            {
+                                // устанавлдиваем статус "Помилка"
+                                ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error), kf);
+                                HasErrors = true;
+                                break;
+                            }
+                        }
+
+                        if (!HasErrors)
+                            // устанавлдиваем статус "Виконано"
+                            ep.MSG_SET_STATUS_DONE(ID, kf);
+                    }
                 }
-            }
-            catch (System.Exception e)
-            {  // устанавливаем статус "Помилка" и выходим
-                ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі SEND: {0}, {1}", e.Message, e.StackTrace), kf);
-            }
+                catch (System.Exception e)
+                {  // устанавливаем статус "Помилка" и выходим
+                    ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі SEND: {0}, {1}", e.Message, e.StackTrace), kf);
+                }
 
-            // Заканчиваем сессию взаимодействия
-            if (con.State != ConnectionState.Open) con.Open();
-            try
-            {
-                CloseSession(SessionID, con, _EAServiceUrl);
+                // Заканчиваем сессию взаимодействия
+                if (con.State != ConnectionState.Open) con.Open();
+                try
+                {
+                    CloseSession(SessionID, con, _EAServiceUrl);
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
             finally
             {
-                con.Close();
+                LogOutUser();
             }
         }
         # endregion

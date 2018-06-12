@@ -565,7 +565,7 @@ namespace Bars
             Session["UserLoggedIn"] = true;
         }
 
-        public void LogOutUser()
+        protected void LogOutUser()
         {
             var context = HttpContext.Current;
             if (ConfigurationSettings.AppSettings["CustomAuthentication.UseSession"] != "On")
