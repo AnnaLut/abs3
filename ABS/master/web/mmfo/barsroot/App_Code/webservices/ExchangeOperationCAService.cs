@@ -258,7 +258,6 @@ public class ExchangeOperationCAService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }
@@ -315,7 +314,6 @@ public class ExchangeOperationCAService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }
@@ -358,7 +356,6 @@ public class ExchangeOperationCAService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             con.Close();
         }
     }
@@ -408,7 +405,6 @@ public class ExchangeOperationCAService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }
@@ -456,7 +452,6 @@ public class ExchangeOperationCAService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }

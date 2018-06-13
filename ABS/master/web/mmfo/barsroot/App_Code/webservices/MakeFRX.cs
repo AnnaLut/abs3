@@ -16,6 +16,14 @@ namespace Bars.WebServices
     {
         public WsHeader WsHeaderValue;
 
+        private void AuthenticateUser(String userName, String password)
+        {
+            // авторизация пользователя по хедеру
+            Boolean isAuthenticated = Bars.Application.CustomAuthentication.AuthenticateUser(userName, password, true);
+            if (isAuthenticated)
+                LoginUserInt(userName, "MakeFRX");
+        }
+
         public static void save_report(Int64? dpt_id, MemoryStream repstream, Int16 flags)
         {
             using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
@@ -32,38 +40,34 @@ namespace Bars.WebServices
         }
         protected string getDocTemplate(Int16 type_id, Int64? dpt_id, String userName, String password)
         {
-            try
+            AuthenticateUser(userName, password);
+            string Template = String.Empty;
+
+            using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleCommand cmd_findtemplate = con.CreateCommand())
             {
-                AuthenticateUser(userName, password);
-                string Template = String.Empty;
-
-                using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
-                using (OracleCommand cmd_findtemplate = con.CreateCommand())
+                if (type_id != 99)
                 {
-                    if (type_id != 99)
-                    {
-                        cmd_findtemplate.CommandText = "select dvc.id_fr id from bars.dpt_deposit d, bars.dpt_vidd_scheme dvc where d.deposit_id = :p_deposit_id and dvc.vidd = d.vidd and dvc.flags = :p_flags";
-                        cmd_findtemplate.Parameters.Add("p_deposit_id", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
-                        cmd_findtemplate.Parameters.Add("p_flags", OracleDbType.Decimal, type_id, ParameterDirection.Input);
+                    cmd_findtemplate.CommandText = "select dvc.id_fr id from bars.dpt_deposit d, bars.dpt_vidd_scheme dvc where d.deposit_id = :p_deposit_id and dvc.vidd = d.vidd and dvc.flags = :p_flags";
+                    cmd_findtemplate.Parameters.Add("p_deposit_id", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
+                    cmd_findtemplate.Parameters.Add("p_flags", OracleDbType.Decimal, type_id, ParameterDirection.Input);
 
-                        using (OracleDataReader rdr_findtemplate = cmd_findtemplate.ExecuteReader())
+                    using (OracleDataReader rdr_findtemplate = cmd_findtemplate.ExecuteReader())
+                    {
+                        if (rdr_findtemplate.Read())
                         {
-                            if (rdr_findtemplate.Read())
-                            {
-                                Template = Convert.ToString(rdr_findtemplate["id"]);
-                            }
-                            else
-                            {
-                                throw new System.Exception(String.Format("Не знайдено шаблон {0} у таблиці dpt_vidd_scheme.id_fr, або шаблон не описано як FastReport", Template));
-                            }
+                            Template = Convert.ToString(rdr_findtemplate["id"]);
+                        }
+                        else
+                        {
+                            throw new System.Exception(String.Format("Не знайдено шаблон {0} у таблиці dpt_vidd_scheme.id_fr, або шаблон не описано як FastReport", Template));
                         }
                     }
-                    else if (type_id != 99) Template = "DPT_FINMON_QUESTIONNAIRE";
-
-                    return Template;
                 }
+                else if (type_id != 99) Template = "DPT_FINMON_QUESTIONNAIRE";
+
+                return Template;
             }
-            finally { LogOutUser(); }
         }
 
 
