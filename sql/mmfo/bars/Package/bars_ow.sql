@@ -10678,7 +10678,8 @@ begin
      end if;
   end if;
 
-  if l_pk_dazs is not null and  l_nbs is not null then
+  --COBUMMFO-7787_1
+  if l_pk_dazs is not null and  l_nbs is not null and p_opertype<>3 then
      -- —чет %s/%s закрыт
      bars_error.raise_nerror(g_modcode, 'ACC_CLOSED', l_cmclient.contractnumber);
   end if;
