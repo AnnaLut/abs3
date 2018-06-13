@@ -25,7 +25,7 @@ using System.Security.Principal;
 
 namespace Bars
 {
-    public class BarsWebService : System.Web.Services.WebService
+    public class BarsWebService : WebService
     {
         IOraConnection _hsql;
         OracleConnection _connect;
@@ -497,6 +497,7 @@ namespace Bars
             }
             return result;
         }
+        #region login user
 
         protected string GetHostName()
         {
@@ -513,7 +514,7 @@ namespace Bars
         protected void LoginUser(String userName)
         {
             // информация о текущем пользователе
-            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+            UserMap userMap = ConfigurationSettings.GetUserInfo(userName);
 
             try
             {
@@ -533,11 +534,10 @@ namespace Bars
             // Если выполнили установку параметров
             Session["UserLoggedIn"] = true;
         }
-
         protected void LoginUserInt(String userName)
         {
             // информация о текущем пользователе
-            UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+            UserMap userMap = ConfigurationSettings.GetUserInfo(userName);
 
             try
             {
@@ -552,7 +552,7 @@ namespace Bars
 
                 ClearParameters();
                 SetParameters("p_info", DB_TYPE.Varchar2,
-                    String.Format("STOService: авторизация. Хост {0}, пользователь {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName),
+                    String.Format("WebService: авторизация. Хост {0}, пользователь {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName),
                     DIRECTION.Input);
                 SQL_PROCEDURE("bars_audit.info");
             }
@@ -591,8 +591,8 @@ namespace Bars
                 DisposeOraConnection();
             }
 
-            // clear context user
-            context.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
+            //clear context user
+            //context.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
         }
         public void ClearSessionTmpDir()
         {
@@ -635,6 +635,14 @@ namespace Bars
             }
         }
 
+        protected void AuthenticateUser(String userName, String password)
+        {
+            // авторизация пользователя по хедеру
+            Boolean isAuthenticated = Bars.Application.CustomAuthentication.AuthenticateUser(userName, password, true);
+            if (isAuthenticated)
+                LoginUserInt(userName);
+        }
+        #endregion
         /// <summary>
         /// 
         /// </summary>
