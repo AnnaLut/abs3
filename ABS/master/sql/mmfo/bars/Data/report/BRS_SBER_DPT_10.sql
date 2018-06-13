@@ -1,11 +1,6 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_DPT_10.sql =========*** Run *
-PROMPT ===================================================================================== 
-prompt ===================================== 
-prompt == Виписка з рахунку в нац.валюті (розширена)
-prompt ===================================== 
+prompt ================================================
+prompt == Виписка з рахунку в нац.валюті (розширена) ==
+prompt ================================================
 
 set serveroutput on
 set feed off       
@@ -51,7 +46,7 @@ begin
     l_zpr.rpt_template := 'DPT_35.QRP';
     l_zpr.form_proc    := 'gen_dptrpt(35, to_date(:sFdat1), to_date(:sFdat2), :Param0, 1)';
     l_zpr.default_vars := '';
-    l_zpr.bind_sql     := ':Param0=''V_DPTRPTPARAMS|DEALID|DEALNUM,DATBEG,DATEND,TYPENAME,CUSTID,CUSTNAME|WHERE MODCODE="DPT" AND CURRENCYID=980''';
+    l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
     l_zpr.txt          := 'select substr(f_dat_lit(trunc(sysdate)),1,50) DAT, 
        to_date(:sFdat1) DAT1, 
@@ -152,13 +147,7 @@ begin
        end;                                  
     end if;                                  
     bars_report.print_message(l_message);   
-end;                                        
-/                                           
-                                            
-commit;                                     
+end;
+/
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_DPT_10.sql =========*** End *
-PROMPT ===================================================================================== 
+commit;
