@@ -83,7 +83,6 @@ public class ExchangeOperationRUService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             con.Close();
         }
     }
@@ -126,7 +125,6 @@ public class ExchangeOperationRUService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             con.Close();
         }
     }
@@ -183,7 +181,6 @@ public class ExchangeOperationRUService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }
@@ -233,7 +230,6 @@ public class ExchangeOperationRUService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }
@@ -285,7 +281,6 @@ public class ExchangeOperationRUService : BarsWebService
         }
         finally
         {
-            LogOutUser();
             DisposeOraConnection();
         }
     }

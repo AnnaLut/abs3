@@ -534,7 +534,7 @@ namespace Bars
             // Если выполнили установку параметров
             Session["UserLoggedIn"] = true;
         }
-        protected void LoginUserInt(String userName)
+        protected void LoginUserInt(String userName, string srvName = "WebService")
         {
             // информация о текущем пользователе
             UserMap userMap = ConfigurationSettings.GetUserInfo(userName);
@@ -552,7 +552,7 @@ namespace Bars
 
                 ClearParameters();
                 SetParameters("p_info", DB_TYPE.Varchar2,
-                    String.Format("WebService: авторизация. Хост {0}, пользователь {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName),
+                    String.Format("{2}: авторизация. Хост {0}, пользователь {1}", RequestHelpers.GetClientIpAddress(HttpContext.Current.Request), userName, srvName),
                     DIRECTION.Input);
                 SQL_PROCEDURE("bars_audit.info");
             }
@@ -592,7 +592,7 @@ namespace Bars
             }
 
             //clear context user
-            //context.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
+            context.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
         }
         public void ClearSessionTmpDir()
         {
@@ -633,15 +633,7 @@ namespace Bars
                     //тушимо Exception на випадок якщо каталог зайнятий
                 }
             }
-        }
-
-        protected void AuthenticateUser(String userName, String password)
-        {
-            // авторизация пользователя по хедеру
-            Boolean isAuthenticated = Bars.Application.CustomAuthentication.AuthenticateUser(userName, password, true);
-            if (isAuthenticated)
-                LoginUserInt(userName);
-        }
+        }        
         #endregion
         /// <summary>
         /// 
