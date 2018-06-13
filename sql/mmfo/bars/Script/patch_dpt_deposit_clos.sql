@@ -1,7 +1,7 @@
 -- ================================================================================
 -- Module : DPT
 -- Author : BAA
--- Date   : 22.11.2017
+-- Date   : 13.06.2018
 -- ================================== <Comments> ==================================
 -- recreate table DPT_DEPOSIT_CLOS
 -- ================================================================================
@@ -65,6 +65,18 @@ begin
   dbms_output.put_line( 'Table altered.' );
 exception
   when e_cnstrn_not_exists
+  then null;
+end;
+/
+
+declare
+  E_IDX_NOT_EXISTS        exception;
+  pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
+begin
+  execute immediate 'drop index I_KF_IDUPD_DPTID_DPTDEPCLOS';
+  dbms_output.put_line( 'Index dropped.' );
+exception
+  when E_IDX_NOT_EXISTS
   then null;
 end;
 /
