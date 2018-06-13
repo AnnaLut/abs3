@@ -21,6 +21,41 @@ public class ExchangeOperationRUService : BarsWebService
     public WsHeader WsHeaderValue;
 
     #region private методы
+    private void LoginUser(String userName)
+    {
+        // Інформація про поточного користувача
+        UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+
+        OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
+        OracleCommand cmd = con.CreateCommand();
+        using (con)
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "bars.bars_login.login_user";
+
+            cmd.Parameters.Add("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input);
+            cmd.Parameters.Add("p_user_id", OracleDbType.Varchar2, userMap.user_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_hostname", OracleDbType.Varchar2, GetHostName(), ParameterDirection.Input);
+            cmd.Parameters.Add("p_appname", OracleDbType.Varchar2, "barsroot", ParameterDirection.Input);
+
+            cmd.ExecuteNonQuery();
+        }
+        Session["UserLoggedIn"] = true;
+    }
+
+    private string GetHostName()
+    {
+        string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+        if (String.IsNullOrEmpty(userHost) || String.Compare(userHost, "unknown", true) == 0)
+            userHost = HttpContext.Current.Request.UserHostAddress;
+
+        if (String.Compare(userHost, HttpContext.Current.Request.UserHostName) != 0)
+            userHost += " (" + HttpContext.Current.Request.UserHostName + ")";
+
+        return userHost;
+    }
+
     private DateTime? ParseDateFromString(string dateStr, string format)
     {
         DateTime result;
