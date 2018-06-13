@@ -16,7 +16,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.009          30.05.2018
+% VERSION     :   v.18.011          13.06.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -29,6 +29,8 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+13.06.2018  дополнительная обработка операций 2900-3739 для RNK ="наш банк"
+11.06.2018  исключение операций по маске "прoдаж не [здійснювався]"
 30.05.2018  расширение условий при определении K021=G
 27.04.2018  ревизия алгоритма определения параметра K021 для клиента
 13.04.2018  -исключена корреспонденция дт2630-кт3800
@@ -64,6 +66,12 @@ IS
    dat_1_           date;                 -- fx_deal.dat 
    dat_2_           date;                 -- fx_deal.dat_b
 
+   rnk_a      number;
+   codc_a     number;
+   okpo_a     varchar2(14);
+   nmk_a      varchar2(70);
+   k021_a     varchar2(1);
+
    sql_z      varchar2(200);
    typ_       number;
    rez_       number;
@@ -95,6 +103,7 @@ IS
    ise_       varchar2(5);
    fs_        varchar2(2);
    i_cnt_25_       number;                   --количество счетов раздела 25
+   is_our_bank_    varchar2(1);
 
    codc_      number;
    sum0_      number;
@@ -557,6 +566,7 @@ BEGIN
                             AND substr (o.nlsk, 1,4) ='3739'
                             AND mfou_ = 300465
                             AND LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
+                            AND instr(LOWER (o.nazn),'продаж не ') =0
                            )
                         OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2620','2625','2630','2525','2546')
                             AND substr (o.nlsk, 1,4) ='3800'
@@ -801,6 +811,11 @@ BEGIN
       THEN
 
          dig_ := f_ret_dig (kv_) * 100;   -- для отображения суммы в единицах валюты
+         if okpo_ = ourOKPO_ then 
+                  is_our_bank_  := 'Y';
+         else
+                  is_our_bank_  := 'N';
+         end if;
 
          ---Покупка/Продажа безналичной валюты
          OPEN opl_dok;
@@ -1047,13 +1062,111 @@ BEGIN
 
                   -- сума в  сотых валюты (код 11)
                   p_ins (nnnn_, 'T071', TO_CHAR ( sum0_ ));
---                  p_ins (nnnn_, 'T071', TO_CHAR (ROUND (sum0_ / dig_, 0)));
 
-	          p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
-	          p_ins (nnnn_, 'K021', k021_);
+                  rnk_a :=0;
+                  if mfou_ !=mfo_ and is_our_bank_ ='Y' and nls_ like '2900%'
+                                                        and nls_ like '3739%'
+                  then
+--  поиск корреспондирующей проводки с параметрами клиента -физ.лица
+                      begin
+                           select c.okpo, c.rnk, c.nmk, c.codcagent
+                             into okpo_a, rnk_a, nmk_a, codc_a
+                             from provodki_otc p, customer c
+                            where p.fdat =dat_
+                              and p.rnkk =rnk_
+                              and p.acck =acc_
+                              and p.kv =kv_
+                              and p.s =0.01*sum0_
+                              and p.nlsa like '2625%'
+                              and p.id_a = c.okpo and c.date_off is null
+                              and rownum = 1;
 
-                  p_ins (nnnn_, 'Q001', TRIM (nmk_));       -- назва клiєнта
-                  p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
+                      exception
+                         when others  then rnk_a :=0;
+                      end;
+
+                      IF codc_a = 5  and  rnk_a !=0  THEN               --фiз.особи резиденти      
+                
+                         -- наличие ИНН(ОКПО)
+                         IF nvl(ltrim(trim(okpo_a), '0'), 'Z') <> 'Z' AND 
+                            nvl(ltrim(trim(okpo_a), '9'), 'Z') <> 'Z'  
+                         THEN
+                            okpo_a := LPAD (okpo_a, 10, '0');
+                            k021_a := '2';
+                         END IF;
+                         -- отсутствие ИНН(ОКПО)
+                         IF nvl(ltrim(trim(okpo_a), '0'), 'Z') = 'Z' OR 
+                            nvl(ltrim(trim(okpo_a), '9'), 'Z') = 'Z'  
+                         THEN
+                            BEGIN
+                               SELECT LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 10),
+                                            10,
+                                            '0'
+                                           )
+                                 INTO okpo_a
+                                 FROM person
+                                WHERE rnk = rnk_a;
+                                k021_a := '6';
+                            EXCEPTION
+                               WHEN NO_DATA_FOUND
+                               THEN
+                                  okpo_a := LPAD (rnk_a, 10, '0');
+                                  k021_a := '9';
+                            END;
+                         END IF;
+----------------------------------------------------------------------------------------------
+                      ELSIF codc_a = 6  and  rnk_a !=0  THEN                    --фiз.особи нерезиденти      
+                
+                         -- наличие ИНН(ОКПО)
+                         IF nvl(ltrim(trim(okpo_a), '0'), 'Z') <> 'Z' AND 
+                            nvl(ltrim(trim(okpo_a), '9'), 'Z') <> 'Z'  
+                         THEN
+                            okpo_a := LPAD (okpo_a, 10, '0');
+                            k021_a := '2';
+                         END IF;
+                         -- отсутствие ИНН(ОКПО)
+                         IF nvl(ltrim(trim(okpo_a), '0'), 'Z') = 'Z' OR 
+                            nvl(ltrim(trim(okpo_a), '9'), 'Z') = 'Z'  
+                         THEN
+                            BEGIN
+                               SELECT 'I' || LPAD (SUBSTR (TRIM (ser) || TRIM (numdoc), 1, 9),
+                                            9,
+                                            '0'
+                                           )
+                                 INTO okpo_a
+                                 FROM person
+                                WHERE rnk = rnk_a;
+                                k021_a := 'B';
+                            EXCEPTION
+                               WHEN NO_DATA_FOUND
+                               THEN
+                                  okpo_a := 'I' || LPAD (TO_CHAR (rnk_), 9, '0');
+                                  k021_a := '9';
+                            END;
+                         END IF;
+                      ELSE
+                           rnk_a :=0;
+                      END IF;
+
+------------------------------------------------------------------------------
+                      if rnk_a !=0  then
+                        p_ins (nnnn_, 'K020', lpad(TRIM (okpo_a),10,'0'));
+                        p_ins (nnnn_, 'K021', k021_a);
+
+                        p_ins (nnnn_, 'Q001', TRIM (nmk_a));       -- назва клiєнта
+                        p_ins (nnnn_, 'Q024', '2');                -- тип контрагента
+                      end if;
+
+                  end if;
+
+                  if rnk_a =0 then
+                      p_ins (nnnn_, 'K020', lpad(TRIM (okpo_),10,'0'));
+                      p_ins (nnnn_, 'K021', k021_);
+
+                      p_ins (nnnn_, 'Q001', TRIM (nmk_));       -- назва клiєнта
+                      p_ins (nnnn_, 'Q024', q024_);             -- тип контрагента
+                  end if;
+
                   p_ins (nnnn_, 'D100', '00');              -- код умов валютної операції
                   p_ins (nnnn_, 'S180', '#');               -- строк валютної операції
                   p_ins (nnnn_, 'F089', f089_);             -- консолідація
