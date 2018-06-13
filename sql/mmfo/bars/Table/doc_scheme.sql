@@ -31,7 +31,7 @@ begin
 	HEADER CLOB, 
 	FOOTER CLOB, 
 	HEADER_EX CLOB, 
-	D_CLOSE DATE, 
+	D_CLOSE DATE, FR_PRINT_FORMAT number(3),
 	FR NUMBER(1,0) DEFAULT 0, 
 	FILE_NAME VARCHAR2(100)
    ) SEGMENT CREATION IMMEDIATE 
@@ -73,6 +73,7 @@ COMMENT ON COLUMN BARS.DOC_SCHEME.HEADER_EX IS 'Верхній розширений колонтитул';
 COMMENT ON COLUMN BARS.DOC_SCHEME.D_CLOSE IS 'Дата закрытия';
 COMMENT ON COLUMN BARS.DOC_SCHEME.FR IS '';
 COMMENT ON COLUMN BARS.DOC_SCHEME.FILE_NAME IS 'Имя файла шаблона из папки TEMPLATE.RPT';
+
 
 
 
@@ -162,6 +163,30 @@ exception when others then
  end;
 /
 
+PROMPT *** ADD FR_PRINT_FORMAT ***
+BEGIN 
+     execute immediate  
+       'ALTER TABLE BARS.DOC_SCHEME ADD FR_PRINT_FORMAT number(3)';
+exception when others then       
+  if sqlcode=-955 or sqlcode=-2275 or sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
+
+COMMENT ON COLUMN BARS.DOC_SCHEME.FR_PRINT_FORMAT IS 'Формат друку';
+
+PROMPT *** Create  constraint FK_DOCSCHEME ***
+BEGIN 
+     execute immediate  
+'ALTER TABLE BARS.DOC_SCHEME ADD 
+CONSTRAINT FK_DOCSCHEME
+ FOREIGN KEY (FR_PRINT_FORMAT)
+ REFERENCES BARS.FR_PRINT_FORMAT (ID)
+ ENABLE
+ VALIDATE';
+exception when others then       
+  if sqlcode=-955 or sqlcode=-2275 or sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
 
 
 PROMPT *** Create  grants  DOC_SCHEME ***
