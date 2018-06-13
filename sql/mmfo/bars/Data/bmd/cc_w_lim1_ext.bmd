@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Графік Погашення одного КД / CC_W_LIM1_EXT';
   l_tablinesdef := '1000';
+  l_tabselect_statement := '';
   l_tabname     := 'CC_W_LIM1_EXT';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,24 +124,24 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'План-дата~погашення~01', 1.5, null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'LIM2', 'N', 'План-Сума~ВИХ.залишку~04', 1.5, null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~КД~00', 1.5, null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SUMG', 'N', 'Погаш~осн.боргу~03', 1.5, null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMG)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SUMK', 'N', 'Погаш~комісії~06', 1.5, null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMK)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SUMO', 'N', 'Погаш~Разом~07= 03+05+06', 1.5, null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMO)', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SUMP', 'N', 'Погаш~нар. %%~05', 2, null, 8, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMP)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OST', 'N', 'Факт-Сума~ВИХ.залишку~13=10+11-12', 1.5, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SUMO1', 'N', 'Загальна до погаш.~План-сумма~09=07+08', 2.1, null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMO1)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SUMP1', 'N', 'Погаш~рест %%~08', .5, null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMP1)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SN', 'B', 'Тільки ~тіло', .3, null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'VST', 'N', 'Факт-Сума~ВХ.залишку~10', 1.5, null, 17, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'DOS', 'N', 'Факт-Сума~Деб.обор.~11', 1.5, null, 18, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'KOS', 'N', 'Факт-Сума~Крд.обор.~12', 1.5, null, 19, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'GRF', 'B', 'По~ГПК', .3, null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'OTM', 'B', 'Пог.', .3, null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'DELO', 'N', 'Простроч~НЕ вибрано~14= 13-04', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'VLIM', 'N', 'План-Сума~ВХ.залишку~02', 1.5, null, 3, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'FDAT', 'D', 'План-дата~погашення~01', '1.5', null, 2, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'LIM2', 'N', 'План-Сума~ВИХ.залишку~04', '1.5', null, 6, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'ND', 'N', 'Реф~КД~00', '1.5', null, 99, 0, 1, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SUMG', 'N', 'Погаш~осн.боргу~03', '1.5', null, 5, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMG)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SUMK', 'N', 'Погаш~комісії~06', '1.5', null, 9, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMK)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SUMO', 'N', 'Погаш~Разом~07= 03+05+06', '1.5', null, 10, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMO)', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SUMP', 'N', 'Погаш~нар. %%~05', '2', null, 8, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMP)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OST', 'N', 'Факт-Сума~ВИХ.залишку~13=10+11-12', '1.5', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SUMO1', 'N', 'Загальна до погаш.~План-сумма~09=07+08', '2.1', null, 12, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMO1)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SUMP1', 'N', 'Погаш~рест %%~08', '.5', null, 11, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(SUMP1)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SN', 'B', 'Тільки ~тіло', '.3', null, 7, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'VST', 'N', 'Факт-Сума~ВХ.залишку~10', '1.5', null, 17, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'DOS', 'N', 'Факт-Сума~Деб.обор.~11', '1.5', null, 18, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'KOS', 'N', 'Факт-Сума~Крд.обор.~12', '1.5', null, 19, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'GRF', 'B', 'По~ГПК', '.3', null, 0, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'OTM', 'B', 'Пог.', '.3', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'DELO', 'N', 'Простроч~НЕ вибрано~14= 13-04', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'VLIM', 'N', 'План-Сума~ВХ.залишку~02', '1.5', null, 3, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 2, 1, 'ASC ');
@@ -154,7 +159,7 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Створити Проект ГПК  для початкових умов', 'cck.cc_gpk(:GPK,pul.Get_Mas_Ini_Val (''ND''),null,null,null,null,null,null,null ,:TYPE,1)', ':GPK(SEM=Спосіб розбивки,TYPE=N,REF=CC_V_GPK),:TYPE(SEM=Спосіб заокруглення,TYPE=N,REF=VW_GPK_ROUND_TYPE)', 'ONCE', 'Виконати побудову проекту ГПК згідно умов ?', 'Виконано!', '80', '', '', 80);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Створити Проект ГПК  для початкових умов', 'cck_ui.p_gpk_default(pul.Get_Mas_Ini_Val (''ND''), :GPK, :TYPE)', ':GPK(SEM=Спосіб розбивки,TYPE=N,REF=CC_V_GPK),:TYPE(SEM=Спосіб заокруглення,TYPE=N,REF=VW_GPK_ROUND_TYPE)', 'ONCE', 'Виконати побудову проекту ГПК згідно умов ?', 'Виконано!', '80', '', '', 80);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 2, 'Балансування ГПК та перерахунок %%', 'cck_ui.GPK_Bal (null,  null,0)', '', 'ONCE', 'Виконати балансування ГПК (тіло) в ост.дату ?', 'Виконано!', '57', '', '', 57);
@@ -164,6 +169,9 @@ begin
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 15, 'КД: Графік лімітів кредитування', '', '', 'ONCE', '', '', '79', '', 'sPar=CC_W_GLK1[NSIFUNCTION][ACCESSCODE=>0][showDialogWindow=>false]', 79);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 16, 'КД (NEW): Розрахунок ГПК', 'cck_new.cc_gpk(0, pul.Get_Mas_Ini_Val (''ND''),0,0)', '', 'ONCE', 'Виконати побудову проекту ГПК згідно умов ?', 'Виконано!', '', '', '', null);
 
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 1, null, ':FDAT < gl.BD', 2, 'COLOR_LightGray');
