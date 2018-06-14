@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 10.9  05.06.2018';
+  g_body_version  constant varchar2(64) := 'version 11.0  14.06.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -215,7 +215,7 @@ is
                          sno number
                        );
   type many is table of many1 index by varchar2(8);
-  
+
   --
   -- Перевірка 100%-ї Готовністі НБУ-23
   --
@@ -224,17 +224,17 @@ is
   begin
 --  execute immediate 'truncate  table SREZERV_ERRORS';
     delete SREZERV_ERRORS;
-    
-    insert 
+
+    insert
       into srezerv_errors ( dat, error_type, error_txt, kv)
     select p_dat01, 1, 'Не виконан розрахунок забезпечення', max(row_id)
       from rez_log   where fdat=p_dat01 and kod = -14   having max(row_id) is null
      union all
     select p_dat01, 2, 'Не виконано Формування ЗАГАЛЬНОГО протоколу по 351 пост.', max(row_id)
       from rez_log   where fdat=p_dat01 and kod = -13 having max(row_id) is null ;
-    
+
     commit;
-    
+
     insert
       into srezerv_errors ( dat, error_type, nbs, kv, branch,  sz, error_txt )
     select p_dat01, 3, r.nbs||'/'||r.ob22, r.kv, substr(r.branch,1,15),          sum(r.rez23) sz,
@@ -247,9 +247,9 @@ is
                            and r.custtype = decode(o.custtype,'0',r.custtype,o.custtype)
                            and r.kv = decode(o.kv,'0',r.kv,o.kv) )
      group by r.nbs,r.ob22, r.kat,r.custtype, r.kv, substr(r.branch,1,15);
-    
+
     commit;
-    
+
   end err_23;
 -----------------------------------------------------------
 
@@ -302,7 +302,7 @@ procedure REC_23  ( p_dat01 date)  is
 begin
    l_msg:= '3) CR-351: *Пере-Формування Кредитного ризику НБУ-351';
    PRVN_FLOW.SeND_MSG (p_txt => 'BEG:'||l_msg );
-   l_res_kf := trim('RESERVE'||sys_context('bars_context','user_mfo')); 
+   l_res_kf := trim('RESERVE'||sys_context('bars_context','user_mfo'));
    -- защита от двойного старта
    SYS.DBMS_SESSION.CLEAR_IDENTIFIER;
    sid_:=SYS_CONTEXT('BARS_GLPARAM',l_res_kf);
@@ -367,47 +367,47 @@ is
   s_     accounts.ostc%type;
   l_zo   int;
 begin
-  
+
   begin
-  
+
     case
       when ( p_dat > gl.bdate OR p_dat > sysdate )
       then -- тек. остаток
-        
+
         select OSTC
           into s_
           from ACCOUNTS
          where ACC = p_acc;
-        
+
       when ( to_char(p_dat,'DD') = '01' )
       then -- из мес. снимков
-        
+
         l_zo := nvl( p_zo, 1 ); -- по умолчанию с корр
-        
+
         if ( l_zo <> 1 )
         then
           l_zo := 0;
         end if;
-        
+
         select OST + l_zo * (CRkos-CRdos)
           into s_
           from AGG_MONBALS
          where FDAT = add_months( p_dat, -1 )
            and ACC  = p_acc;
-        
+
       else
-        
+
         s_ := fost( p_acc, p_dat );
-        
+
     end case;
-        
+
   exception
     when NO_DATA_FOUND
     then s_ := 0;
   end;
-  
+
   return s_ ;
-  
+
 end QST_12;
 
 ------------------
@@ -422,10 +422,10 @@ is  -- получение суммы однотипных сч
   l_sum number;
   l_zo  int;
 begin
-  
+
   l_zo := nvl( p_zo ,1 );
-  
-  if p_tip = 'SDI' 
+
+  if p_tip = 'SDI'
   then
     select sum( - prvn_flow.qst_12( a.acc, p_dat01, a.nbs, l_zo ) )
       into l_sum
@@ -439,9 +439,9 @@ begin
       from nd_acc n, accounts a
      where a.tip = p_tip and a.kv = p_kv and a.acc = n.acc and n.nd = p_nd ;
   end if ;
-  
+
   RETURN nvl(l_sum,0);
-  
+
 end GET_SUM;
 -----------------------
 
@@ -617,10 +617,10 @@ begin
           else select acc, ostc into sn2.acc, l_ost from accounts where acc = cpD.ACCUNREC ;
           end if;
           l_kol := 1 ;
-       EXCEPTION WHEN NO_DATA_FOUND THEN 
-          if x.AIRC_CCY <> 0 or x.IRC_CCY <> 0  THEN  not_sna (x.tip, x.nd, x.RI, 'NOT in ACC.CP_deal') ;  
+       EXCEPTION WHEN NO_DATA_FOUND THEN
+          if x.AIRC_CCY <> 0 or x.IRC_CCY <> 0  THEN  not_sna (x.tip, x.nd, x.RI, 'NOT in ACC.CP_deal') ;
           else NULL;
-          end if;   
+          end if;
           goto Rec_Next;
 
        end;
@@ -656,7 +656,7 @@ begin
 Демкович Марія Степанівна <DemkovichMS@oschadbank.ua>
 Вт 06.03.2018 10:26
 
-*/        
+*/
           If    sn2.nbs = '1509' then sn2.ob22 := '07' ;
           elsIf sn2.nbs = '1529' then sn2.ob22 := '15' ;
           elsIf sn2.nbs = '2029' then sn2.ob22 := '15' ;
@@ -670,26 +670,26 @@ begin
           elsIf sn2.nbs = '2139' then sn2.ob22 := '39' ;
           elsIf sn2.nbs = '2209' then sn2.ob22 := 'J1' ;
           elsIf sn2.nbs = '2239' then sn2.ob22 := '70' ;
-          else                        sn2.ob22 := null ; 
+          else                        sn2.ob22 := null ;
           end if ;
 
           If sn2.ob22 is not null THEN Accreg.setAccountSParam(sn2.acc, 'OB22',  sn2.ob22 ) ; end if;
 
-/*          -- 14.03.2018 От спрапвочника CCK_OB22_9 - отказались !  
+/*          -- 14.03.2018 От спрапвочника CCK_OB22_9 - отказались !
           begin  select substr( SNA,5,2) into sn2.ob22 from cck_ob22_9  where substr(sna,1,4) = sn2.nbs  and rownum = 1 ;
-          EXCEPTION WHEN NO_DATA_FOUND THEN   sn2.ob22 := '01' ; -- 
+          EXCEPTION WHEN NO_DATA_FOUND THEN   sn2.ob22 := '01' ; --
           end;
           Accreg.setAccountSParam(SN2.Acc, 'OB22', sn2.ob22 );
 */
 
-/* 12.03.2018 
+/* 12.03.2018
 Вс 11.03.2018 15:06 Вікторія Семенова <viktoriia.semenova@unity-bars.com>
 Пока предварительный (еще банк не подтвердил)  вариант такой :
 2) при открытии новых счетов SNA -  параметры S080, S180, S190, S240, S260, mDate, R011 - наследуем с 'SS ', 'SN ', 'SP ', 'SPN' (с одного из).
 Параметр R013 - присваиваем значение "3"  для всех счетов - БС= 2209, 2239, 2069, 2089, 2079
 */
-          for s9 in (select s.* 
-                     from specparam s, accounts a, nd_acc n 
+          for s9 in (select s.*
+                     from specparam s, accounts a, nd_acc n
                      where s.acc= a.acc and a.acc = n.acc and n.nd = x.ND and a.kv = x.kv  and a.dazs is null and a.tip in ('SS ', 'SN ', 'SP ', 'SPN')
                      order by a.ostc desc
                      )
@@ -702,7 +702,7 @@ begin
               Accreg.setAccountSParam(SN2.Acc, 'R011', s9.R011 );
               Accreg.setAccountSParam(SN2.Acc, 'R013', '3'     );
               EXIT ;
-          end loop; 
+          end loop;
 
 /*           2208, 2238, 2068, 2088 з тип=SNA,
              присвоюється параметри: R011, R013, S080, S180, S190, S200, S240, S260, S270
@@ -872,9 +872,9 @@ procedure div39 ( p_mode int, p_dat01 date )   is   -- разделение рез-39 по КД в
    -- !!!! уже НЕТ p_mode = 0 -- принять файл и разнести по НБУ23
    --              p_mode = 1 -- только принять файл
    --              p_mode = 2 -- только разнести по НБУ23
-   z_dat01 date   ; l_dat31 date  ; l_dat31_fv date  ; 
-   l_max    number; l_min   number; l_num      number; l_nd  number; l_commit number; l_all   number; 
-   nTmp_    number; l_rez   number; l_acc      number; s_KB  number; s_BV     number; s_BVN   number; 
+   z_dat01 date   ; l_dat31 date  ; l_dat31_fv date  ;
+   l_max    number; l_min   number; l_num      number; l_nd  number; l_commit number; l_all   number;
+   nTmp_    number; l_rez   number; l_acc      number; s_KB  number; s_BV     number; s_BVN   number;
    l_SNA01  number; q_Rez   number; s_k9       number; n_Rez number; l_r9     number; l_r     number;
    s_KV     int   ; l_MMFO  int   ; l_count    int   ;
    l_id  varchar2(25);  sErr_   varchar2(100) := ''  ;  l_msg varchar2(250);  s_dat01   varchar2(10);
@@ -915,61 +915,61 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       end if;
 
       -- Определяем схема MMFO ?
-      begin 
+      begin
          select count(*) into l_MMFO from mv_kf;
          if l_MMFO > 1 THEN             l_MMFO := 1; -- схема    MMFO
-         ELSE                           l_MMFO := 0; -- схема не MMFO 
+         ELSE                           l_MMFO := 0; -- схема не MMFO
          end if;
       EXCEPTION WHEN NO_DATA_FOUND THEN l_MMFO := 0; -- схема не MMFO
       end ;
 
       -- сжатие витрины делойта по дог с учетом вал . Выбрасывание нулей
 --    execute immediate 'truncate table PRVN_OSA';
-      
+
       delete PRVN_OSAq;
-      
-      if l_MMFO = 1 THEN 
-         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,              REZB,              REZ9,                  AIRC_CCY,                 IRC_CCY,  
+
+      if l_MMFO = 1 THEN
+         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,              REZB,              REZ9,                  AIRC_CCY,                 IRC_CCY,
                                                     ID_PROV_TYPE,                    IS_DEFAULT,                             vidd )
-                       select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY, 
+                       select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY,
                               min (f.ID_PROV_TYPE ) ID_PROV_TYPE, max (f.IS_DEFAULT) IS_DEFAULT, decode(f.tip,3,d.vidd,null) vidd
-                       from  (select Id_currency LCV, 
-                                     --Rnk_client||decode(l_MMFO,1,r.code,'') RNK, 
+                       from  (select Id_currency LCV,
+                                     --Rnk_client||decode(l_MMFO,1,r.code,'') RNK,
                                      Rnk_client RNK,
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
-                                     --substr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), instr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), '/',1) +1 ) ND, 
-                                     substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND, 
-                                     nvl(Prov_Balance_CCY,0)    REZB, 
-                                     nvl(Prov_OffBalance_CCY,0) REZ9, 
-                                     nvl(AIRC_CCY,0) AIRC_CCY, 
-                                     nvl(IRC_CCY,0)  IRC_CCY , 
+                                     --substr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), instr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), '/',1) +1 ) ND,
+                                     substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND,
+                                     nvl(Prov_Balance_CCY,0)    REZB,
+                                     nvl(Prov_OffBalance_CCY,0) REZ9,
+                                     nvl(AIRC_CCY,0) AIRC_CCY,
+                                     nvl(IRC_CCY,0)  IRC_CCY ,
                                      ID_PROV_TYPE, -- Метка расчета резерва на индивидуальной или коллективной основе. "С" - колл, "І" - индивид
                                      IS_DEFAULT    -- Метка наличия дефолта по договору. 1 - дефолт, 0 - нет дефолта. Расчетный параметр Finevare
                               from OSA_V_PROV_RESULTS_OSH o, regions r
-                              where o.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') and 
+                              where o.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') and
                                   ( Prov_Balance_CCY > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY > 0  or  IRC_CCY <> 0 ) and ID_CALC_SET = l_num
                               ) F, tabval T,cc_deal d
-                        where t.lcv = f.lcv and f.nd=d.nd (+) 
+                        where t.lcv = f.lcv and f.nd=d.nd (+)
                         group by f.rnk, f.tip, f.ND, t.kv, d.vidd ;
       else
-         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,              REZB,              REZ9,                  AIRC_CCY,                 IRC_CCY,  
+         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,              REZB,              REZ9,                  AIRC_CCY,                 IRC_CCY,
                                                     ID_PROV_TYPE,                    IS_DEFAULT,                             vidd )
-                       select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY, 
+                       select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY,
                               min (f.ID_PROV_TYPE ) ID_PROV_TYPE, max (f.IS_DEFAULT) IS_DEFAULT, decode(f.tip,3,d.vidd,null) vidd
-                       from  (select Id_currency LCV, 
-                                     Rnk_client  RNK, 
+                       from  (select Id_currency LCV,
+                                     Rnk_client  RNK,
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
-                                     substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND, 
-                                     nvl(Prov_Balance_CCY,0)    REZB, 
-                                     nvl(Prov_OffBalance_CCY,0) REZ9, 
-                                     nvl(AIRC_CCY,0) AIRC_CCY, 
-                                     nvl(IRC_CCY,0)  IRC_CCY , 
+                                     substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND,
+                                     nvl(Prov_Balance_CCY,0)    REZB,
+                                     nvl(Prov_OffBalance_CCY,0) REZ9,
+                                     nvl(AIRC_CCY,0) AIRC_CCY,
+                                     nvl(IRC_CCY,0)  IRC_CCY ,
                                      ID_PROV_TYPE, -- Метка расчета резерва на индивидуальной или коллективной основе. "С" - колл, "І" - индивид
                                      IS_DEFAULT    -- Метка наличия дефолта по договору. 1 - дефолт, 0 - нет дефолта. Расчетный параметр Finevare
                               from OSA_V_PROV_RESULTS_OSH o
                               where ( Prov_Balance_CCY > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY > 0  or  IRC_CCY <> 0 ) and ID_CALC_SET = l_num
                               ) F, tabval T,cc_deal d
-                        where t.lcv = f.lcv and f.nd=d.nd (+) 
+                        where t.lcv = f.lcv and f.nd=d.nd (+)
                         group by f.rnk, f.tip, f.ND, t.kv, d.vidd ;
       end if;
 
@@ -979,37 +979,37 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
 
       -- сжатие витрины делойта в целом по дог в экв. для vidd not in (3,13)
 --    execute immediate 'truncate table PRVN_OSAQ';
-/*      
+/*
       delete PRVN_OSAQ;
-      
-      insert 
+
+      insert
         into PRVN_OSAq ( rnk, tip, ND, ID_PROV_TYPE, IS_DEFAULT,  REZB, REZ9, AIRC_CCY, vidd )
-      select rnk, tip, ND, ID_PROV_TYPE, IS_DEFAULT, SUM ( gl.p_icurval( KV,REZB    *100 ,l_dat31 ) ) /100 , 
-             SUM ( gl.p_icurval( KV,REZ9    *100 ,l_dat31 ) ) /100 , SUM ( gl.p_icurval( KV,AIRC_CCY*100 ,l_dat31 ) ) /100 , vidd 
-        from PRVN_OSA 
-       where vidd not in (3,13) or vidd is null or 
-                nd in (select distinct nd 
-                       from (select n.nd, kv from cc_deal e, accounts a, nd_acc n  
+      select rnk, tip, ND, ID_PROV_TYPE, IS_DEFAULT, SUM ( gl.p_icurval( KV,REZB    *100 ,l_dat31 ) ) /100 ,
+             SUM ( gl.p_icurval( KV,REZ9    *100 ,l_dat31 ) ) /100 , SUM ( gl.p_icurval( KV,AIRC_CCY*100 ,l_dat31 ) ) /100 , vidd
+        from PRVN_OSA
+       where vidd not in (3,13) or vidd is null or
+                nd in (select distinct nd
+                       from (select n.nd, kv from cc_deal e, accounts a, nd_acc n
                              where   e.VIDD IN (3,13)  AND e.SDATE < z_dat01  and  e.nd=n.nd  and  n.acc=a.acc and  tip in ('SK9','SK0')  ) x
-                       where x.kv not in (select distinct kv from cc_deal e, accounts a, nd_acc n  
-                                          where  e.nd=x.nd and e.VIDD IN (3,13)  AND e.SDATE < z_dat01  and  e.nd=n.nd  and  n.acc=a.acc and 
+                       where x.kv not in (select distinct kv from cc_deal e, accounts a, nd_acc n
+                                          where  e.nd=x.nd and e.VIDD IN (3,13)  AND e.SDATE < z_dat01  and  e.nd=n.nd  and  n.acc=a.acc and
                                                  a.tip in ('SN ','SNO','SP ','SPN','SS '))
                       )
         group by rnk, tip, ND, ID_PROV_TYPE,  IS_DEFAULT, vidd;
 
       -- сжатие витрины делойта по KV и дог в экв. для vidd in (3,13)
       insert into PRVN_OSAq ( rnk, tip, ND, ID_PROV_TYPE, IS_DEFAULT,  REZB, REZ9, AIRC_CCY ,vidd,kv)
-         select rnk, tip, ND, ID_PROV_TYPE, IS_DEFAULT, SUM ( gl.p_icurval( KV,REZB    *100 ,l_dat31 ) ) /100 , 
-                SUM ( gl.p_icurval( KV,REZ9 * 100 ,l_dat31 ) ) /100 , SUM ( gl.p_icurval( KV,AIRC_CCY*100 ,l_dat31 ) ) /100 , vidd, kv  
-         from   PRVN_OSA 
-         where  vidd in (3,13) and 
-                nd not in ( select distinct nd 
-                            from  (select n.nd, kv from cc_deal e, accounts a, nd_acc n  
+         select rnk, tip, ND, ID_PROV_TYPE, IS_DEFAULT, SUM ( gl.p_icurval( KV,REZB    *100 ,l_dat31 ) ) /100 ,
+                SUM ( gl.p_icurval( KV,REZ9 * 100 ,l_dat31 ) ) /100 , SUM ( gl.p_icurval( KV,AIRC_CCY*100 ,l_dat31 ) ) /100 , vidd, kv
+         from   PRVN_OSA
+         where  vidd in (3,13) and
+                nd not in ( select distinct nd
+                            from  (select n.nd, kv from cc_deal e, accounts a, nd_acc n
                                    where  e.VIDD IN (3,13)  AND e.SDATE < z_dat01  and  e.nd=n.nd  and  n.acc=a.acc and tip in ('SK9','SK0') ) x
-                            where x.kv not in (select distinct kv from cc_deal e, accounts a, nd_acc n  
-                                               where  e.nd=x.nd and e.VIDD IN (3,13)  AND e.SDATE < z_dat01  and  e.nd=n.nd  and  n.acc=a.acc and 
+                            where x.kv not in (select distinct kv from cc_deal e, accounts a, nd_acc n
+                                               where  e.nd=x.nd and e.VIDD IN (3,13)  AND e.SDATE < z_dat01  and  e.nd=n.nd  and  n.acc=a.acc and
                                                       a.tip in ('SN ','SNO','SP ','SPN','SS ')) )
-         group by kv, rnk, tip, ND, ID_PROV_TYPE,  IS_DEFAULT, vidd ;      
+         group by kv, rnk, tip, ND, ID_PROV_TYPE,  IS_DEFAULT, vidd ;
       commit;
       PRVN_FLOW.SeND_MSG (p_txt => 'END-eqv:'||l_msg );
 */
@@ -1111,7 +1111,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
        x.FV_ABS := 0;
        l_r9:= x.rez9;
        l_r := x.rezb;
-       
+
        LOOP FETCH s1 into s_tp_next, s_tp, s_RI , s_nls,  s_BV, s_KV, s_BVN, s_KB , s_k9 ;
        EXIT WHEN s1%NOTFOUND;
 
@@ -1125,11 +1125,11 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
             else               l_r  := l_r  - n_rez;
             end if;
             --LOGGER.INFO('PRV_OSA- 3 ND = ' ||x.nd || ' nls = ' || s_nls || ' l_r9 = ' ||l_r9 || ' l_r = ' ||l_r);
-            if    s_tp_next in ('9','-1') and s_tp not in ('9') and l_r  <> 0 THEN n_rez := LEAST ( n_rez + l_r , s_BVn) ; 
-            elsif s_tp_next in ('-1')     and s_tp     in ('9') and l_r9 <> 0 THEN n_rez := LEAST ( n_rez + l_r9, s_BVn) ; 
-            end if;   
-            --if s_tp =  '9' and abs(l_r9) <= 0.02 and l_r9 <>0 THEN n_rez := n_rez + l_r9; end if;  
-            --if s_tp <> '9' and abs(l_r ) <= 0.02 and l_r  <>0 THEN n_rez := n_rez + l_r ; end if;   
+            if    s_tp_next in ('9','-1') and s_tp not in ('9') and l_r  <> 0 THEN n_rez := LEAST ( n_rez + l_r , s_BVn) ;
+            elsif s_tp_next in ('-1')     and s_tp     in ('9') and l_r9 <> 0 THEN n_rez := LEAST ( n_rez + l_r9, s_BVn) ;
+            end if;
+            --if s_tp =  '9' and abs(l_r9) <= 0.02 and l_r9 <>0 THEN n_rez := n_rez + l_r9; end if;
+            --if s_tp <> '9' and abs(l_r ) <= 0.02 and l_r  <>0 THEN n_rez := n_rez + l_r ; end if;
             --LOGGER.INFO('PRV_OSA- 4 ND = ' ||x.nd || ' nls = ' || s_nls || ' n_REZ = ' ||n_REZ || ' l_r9 = ' || l_r9);
             --n_REZ := gl.p_Ncurval( s_kv, q_REZ*100, l_dat31)/100 ; -- приблизительный номинал
             --n_REZ := Least ( n_REZ, s_BVN) ;                       -- выровняный номинал
@@ -1139,7 +1139,7 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
             --LOGGER.INFO('PRV_OSA- 5 ND = ' ||x.nd || ' nls = ' || s_nls || ' x.FV_ABS = ' ||x.FV_ABS );
             l_count  := l_count  + 1 ;
        end loop;
-       
+
        CLOSE s1;
 
        If  l_count > 0 then sErr_ := 'OK '|| s_nls    ;
@@ -1191,7 +1191,7 @@ is
   l_dat01            date;
   l_dat31            date;
   l_rowcnt           pls_integer;
-  
+
 begin
 
   bars_audit.info( title||': Start running with p_mode='||to_char(p_mode)
@@ -1399,7 +1399,7 @@ procedure add2 ( p_mode int, p_id number, p_dat01 date, p_zo int  ) IS   -- Пост
       If k.tip in ('SP ','SS ')
       then
         begin
-           select least ( nvl( STP_DAT, G_DATE31) , G_DATE31) 
+           select least ( nvl( STP_DAT, G_DATE31) , G_DATE31)
              into dStop_ from int_accn where id = 0 and acc= k.acc;
            acrn.p_int ( k.acc, 0, G_DATE01, dStop_, sd1_, null, 0 );
            P_SD1 := P_SD1 + sd1_ ;
@@ -1419,7 +1419,7 @@ procedure add2 ( p_mode int, p_id number, p_dat01 date, p_zo int  ) IS   -- Пост
 
 begin
 
-  if p_dat01 is null   
+  if p_dat01 is null
   then l_dat01 := to_date(pul.get_mas_ini_val('sFdat1'), 'dd.mm.yyyy');
   else l_dat01 := p_dat01 ;
   end if;
@@ -1461,10 +1461,10 @@ begin
 
    end loop;
 
-  delete from prvn_flow_details D 
-    where (d.id=p_id or nvl(p_id,0)=0) and mdat= l_dat01 
+  delete from prvn_flow_details D
+    where (d.id=p_id or nvl(p_id,0)=0) and mdat= l_dat01
       and exists (select 1 from test_many_mbk where nd=D.nd);
-  
+
   insert into prvn_flow_details  ( MDAT,  ND,   ID,   FDAT,  SS, SPD, SN, SK )
   select l_dat01, m.nd, d.id, m.fdat, m.s, 0, m.s1, 0
     from TEST_MANY_MBK m, PRVN_FLOW_DEALS_CONST d,  PRVN_FLOW_DEALS_VAR   v
@@ -1481,13 +1481,13 @@ end if;
 
     for x0 in ( select * from prvn_flow_deals_const
                 where (id=p_id or nvl(p_id,0)=0)
-                  and ( vidd in ( 1, 2, 3) and p_mode in (20,0) 
+                  and ( vidd in ( 1, 2, 3) and p_mode in (20,0)
                      or vidd in (11,12,13) and p_mode in (22,0) )
               order by nd, kv, id )
    loop
      delete from prvn_flow_deals_var  where id = x0.id  and zdat = l_dat01 ;  -- заголовки
      delete from prvn_flow_details    where id = x0.id  and mdat = l_dat01 ;  -- детали
-     begin 
+     begin
        select dazs into l_DAZS              -- Вопрос: когда прекратить обработку  суб/дог ?
          from accounts where acc = x0.acc8; -- Ответ : КД ЗАКРЫТ ПО ВСЕМ СВОИМ ТРАНШАМ !!!!
 
@@ -1497,7 +1497,7 @@ end if;
         end if;
       exception when no_data_found then  goto NOT_ ;
       end;
-      
+
       select * into dd  from cc_deal  where nd = x0.nd;
       --------------------------------------------------
       If x0.wdate <> dd.wdate       then        Xx.wdate := dd.wdate ;
@@ -1519,7 +1519,7 @@ end if;
         xx.ost  := - prvn_flow.qst_12(x0.acc,l_dat01,'2',l_ZO);
         xx.ostq := gl.p_icurval(x0.kv, xx.ost,l_dat31 );
         xx.ir   := acrn.fprocn(x0.acc, 0,l_dat31);
-        
+
         If nd1_  <> x0.nd
         then
           sum_k := 0; -- обнуление
@@ -1550,13 +1550,13 @@ end if;
              from accounts a, nd_acc n
             where n.nd = x0.nd and a.kv = x0.kv -- залишок тіла по К.Д. (по валюті)
               and n.acc= a.acc and nbs like '2%'
-              and ( a.tip in ( 'SS '       ) and x0.tip =  'SS ' 
+              and ( a.tip in ( 'SS '       ) and x0.tip =  'SS '
                  or a.tip in ( 'SP ','SL ' ) and x0.tip <> 'SS ' );
            SUM_SS1 := nvl( SUM_SS1, 0);
          end if;
 
          If sum_k1 < 1 then
-           if SUM_SS1 = 0 
+           if SUM_SS1 = 0
            then xx.k1 := 1;
            else xx.k1 := least( 1-sum_k1, xx.ost /SUM_SS1);
            end if;
@@ -1585,7 +1585,7 @@ end if;
              (select txt from nd_txt where nd = dd.nd and tag  = 'PR_TR')
       from dual ;
 
---    if xx.k + xx.k1 > 0 
+--    if xx.k + xx.k1 > 0
 --    then -- детали
 --      prvn_flow.add2_ss ( x0, xx, l_dat31, l_dat01, l_fla, l_fl_nd_acc, l_ZO ) ;
 --    end if;
@@ -1607,37 +1607,37 @@ end add2;
     p_dat01     date,
     p_fla       int ,
     p_fl_nd_acc int,
-    p_zo        int 
+    p_zo        int
   ) IS -- Построение ден.потоков по КП
     l_ss    number;  l_lim number;      l_snz number   ; t_ss number  ; t_d_plan date; t_fdat date  ; l_k2 int     ;
     t_dat01 date  ;  l_pv0 number;      l_pv number    ; Fl2_   int   ; l_ir number  ; l_Datp date  ; psn_ int     ;
     tmp     many  ;  d8    varchar2(8); d9 varchar2(8) ; fdat_ date   ; lim1_ number ; sumg_ number ; lim2_ number ;
     l_sd    number;  l_s0  number;      l_ki  number   ; l_sno number ; l_spn number ; l_sdi number ; l_sn  number ;
     l_cr9   number;  l_sn8 number;      l_sk0 number   ; l_sk9 number ; l_s36 number ; l_sp  number ;
-    l_ZO    int   := NVL(p_ZO, 1);      
-    ii      int_accn%rowtype; 
+    l_ZO    int   := NVL(p_ZO, 1);
+    ii      int_accn%rowtype;
     k1      sys_refcursor;
     k2      sys_refcursor;
     ----------------------------------------------------------------------------------------------------
     F_Cust  number(1); -- = 3 розница. Потоки НЕ формировать ! = 2 Корп  Потоки Формировать !
     l_rcvb  number(1);
 begin
-  
-  -- 
+
+  --
   if ( BARS_LOSS_EVENTS.G_RECEIVABLES )
   then l_rcvb := 1;
   else l_rcvb := 0;
   end if;
-  
-  if x0.acc is null 
-  then  goto NOT_LIM1 ; 
+
+  if x0.acc is null
+  then  goto NOT_LIM1 ;
   end if ;
-  
+
   If    nvl( xx.vidd , x0.vidd ) in ( 1, 2, 3) then F_Cust := 2;
   ElsIf nvl( xx.vidd , x0.vidd ) in (11,12,13) then F_Cust := 3;
   Else                                              F_Cust := 1;
   end if;
-  
+
   l_ss  := xx.ost;
   l_lim := l_ss;
   --------------------------------------------
@@ -1647,37 +1647,37 @@ begin
   then GOTO End_FLOW_1;
   end if ;
   --------------------------------------------
-  begin  
+  begin
     select acra, basey, greatest ( (x0.daos-1),  nvl(acr_dat, (x0.daos-1) ) )
       into ii.acra, ii.basey, ii.acr_dat from int_accn where acc = x0.acc and id = 0 ;
   exception
     when no_data_found then null;
   end;
-  
+
   If ii.acr_dat > p_dat01 then
     select nvl( max(int_date), ii.acr_dat) into ii.acr_dat from ACR_DOCS where  acc = x0.acc and id = 0 and int_date < p_dat01;
   end if;
-  
+
   tmp.delete;
-  
+
   l_datp := p_dat31;
-  
+
   -- разметим даты: Для Всех КД (Даты), для НЕ-траншей: снижение лимита и расчетное погашение. Здесь еще никаких процентов пока нет
-  if p_fla=1 
+  if p_fla=1
   then open k1 for select greatest(fdat,p_dat01),  round(sumg*xx.k,0), not_sn
-                     from cc_lim_arc where mdat=p_dat01 and nd=x0.nd and fdat>p_dat31 
+                     from cc_lim_arc where mdat=p_dat01 and nd=x0.nd and fdat>p_dat31
                     order by fdat ; -- уже из архива ГПК
   else open k1 for select greatest(fdat,p_dat01), round(sumg*xx.k,0), not_sn
                      from cc_lim     where                  nd=x0.nd and fdat>p_dat31
                     order by fdat ; -- прямо из ГПК
   end if;
-  
+
   if not k1%isopen then return; end if;
-  
+
   loop
-    
+
     fetch k1 into fdat_, sumg_, psn_;
-    
+
     exit when k1%notfound;
 
     -- приведем вал.КД к вал счета
@@ -1688,14 +1688,14 @@ begin
     end if;
 
     -- сделаем расчет в переменные
-    if x0.pr_tr = 1 
+    if x0.pr_tr = 1
     then
       lim1_ := 0;
       sumg_ := 0;
       lim2_ := 0;
     else
       lim1_:= l_lim ;
-      if fdat_ >= xx.wdate 
+      if fdat_ >= xx.wdate
       then sumg_ := l_lim;               lim2_ := 0;
       else sumg_ := least (sumg_, l_ss); lim2_ := lim1_ - sumg_ ;
       end if;
@@ -1708,7 +1708,7 @@ begin
     tmp(d8).lim1 := lim1_   ;
     tmp(d8).lim2 := lim2_   ;
     tmp(d8).ss   := sumg_   ;
-    
+
     if lim2_ < 0 then
        sumg_ := sumg_ + lim2_;
        lim2_ := 0 ;
@@ -1718,7 +1718,7 @@ begin
     for r in (select * from int_ratn where bdat >= l_Datp and bdat < fdat_ and id = 0 and acc = x0.acc )
     loop
       d9 := to_char(r.bdat, 'yyyymmdd');
-      if not tmp.exists(d9) 
+      if not tmp.exists(d9)
       then
           tmp(d9).fdat := r.bdat ;
           tmp(d9).ss   := 0 ;
@@ -1731,7 +1731,7 @@ begin
     Fl2_ := nvl(x0.fl2,1)   ; -----  Fl2_ = 0   --Это проц по пред МЕСЯЦ !!
     ------------------------------------- вставка 01 числа (если надо
     t_dat01 := trunc (fdat_, 'MM');
-    if to_char (l_datp ,'yyyymm') <> to_char ( fdat_, 'yyyymm') and t_dat01  < fdat_ 
+    if to_char (l_datp ,'yyyymm') <> to_char ( fdat_, 'yyyymm') and t_dat01  < fdat_
     then
        d8 := to_char(t_dat01,'yyyymmdd') ;
        tmp(d8).fdat := t_dat01 ;
@@ -1753,21 +1753,21 @@ begin
     l_datp := tmp(d8).fdat ;
 
   end loop;
-  
+
   close k1;
-  
+
   ----------------------------------------------
   -- Для ТРАНШЕЙ  :
   if x0.pr_tr = 1
   then
-    
+
     begin
       select 1 into l_k2 from CC_TRANS_ARC  where acc = x0.acc and MDAT = p_dat01 and rownum = 1;
     exception
       when no_data_found then l_k2 := 0 ;
     end;
 
-    if l_k2 = 1 
+    if l_k2 = 1
     then open k2 for select d_plan, fdat, sv - nvl(sz,0) ss from  CC_TRANS_ARC
                       where fdat <= p_dat31 and acc=x0.acc and (sv-nvl(sz,0))>0 and MDAT= p_dat01
                       order by d_plan ; -- уже из архива траншей
@@ -1777,9 +1777,9 @@ begin
     end if;
 
     loop
-      
+
       fetch  k2 into t_d_plan, t_fdat, t_ss ;
-      
+
       exit when k2%notfound;
 
       If t_d_plan <= p_dat31 then  t_d_plan :=  xx.wdate ; end if  ;
@@ -1797,8 +1797,8 @@ begin
   <<NOT_LIM1>> null;
   -----------------
   -- на всякий случай - вставка последней даты
-  
-  If xx.wdate>p_dat31 
+
+  If xx.wdate>p_dat31
   then
      d8 :=  to_char(xx.wdate,'yyyymmdd');
      if not tmp.exists(d8) then
@@ -1823,10 +1823,10 @@ begin
   l_sk9 := 0 ; -- SK9    IS 'простроч Нарахована комісія';
   l_s36 := 0 ; -- S36    IS 'Дох.майбутніх періодів';
   l_sp  := 0 ; -- SP     IS 'Просрочка
-  
-  If xx.k > 0 or xx.k1 > 0 
+
+  If xx.k > 0 or xx.k1 > 0
   then
-    
+
     for k in ( select a.acc
                     , a.ostc as OST
                     , CASE WHEN a.tip = 'SL '  THEN 'SP '
@@ -1846,12 +1846,12 @@ begin
                     , a.kv
                     , a.nls
                  from accounts a
-                 join ( select ACC 
+                 join ( select ACC
                           from ND_ACC
                          where 0  = p_fl_nd_acc
                            and ND = x0.nd
                          union all
-                        select ACC 
+                        select ACC
                           from ND_ACC_ARC
                          where 1    = p_fl_nd_acc
                            and MDAT = p_dat01
@@ -1859,9 +1859,9 @@ begin
                       ) n
                    on ( n.ACC = a.ACC )
                 where ( a.nbs like '2%' and a.tip in ('SPN','SLN','SNO','SDI','SPI','SN ','SP ','SL ' ) and kv = NVL(x0.kv, a.kv)
-                   OR   a.nbs like '9%' and a.tip in ('CR9') 
+                   OR   a.nbs like '9%' and a.tip in ('CR9')
                    OR   a.nbs like '3%' and a.tip in ('SK0','SK9','ODB', 'OFR') and l_rcvb = 0
-                   OR   a.nbs like '8%' and a.tip in ('SN8','SLK','SLK') 
+                   OR   a.nbs like '8%' and a.tip in ('SN8','SLK','SLK')
                    OR   a.nbs = '3600' and ob22 = (CASE WHEN x0.vidd < 11  THEN '09' ELSE  '10' END ) -- для Корпор.Бизн 3600 с ОБ22 09, а для РБ - 3600 с ОБ22 10
                       )
              )
@@ -1869,26 +1869,26 @@ begin
 
       If p_fla = 1
       then  --- из архива ( из снимков )
-        If k.nbs like '8%' or k.nbs is null 
+        If k.nbs like '8%' or k.nbs is null
         then k.ost := fost ( k.acc, p_dat31) ;
         else k.ost := prvn_flow.qst_12 ( k.acc, p_dat01, k.nbs, l_ZO );
         end if ;
         k.ost := nvl( k.ost,0 ) ;
       end if ;
-      
+
       If    x0.kv = k.kv or x0.kv is null
       then  null;
       ElsIf x0.kv = gl.baseval then  k.ost := gl.p_Icurval( k.kv, k.ost, p_dat31 );
       ElsIf  k.kv = gl.baseval then  k.ost := gl.p_Ncurval(x0.kv, k.ost, p_dat31 );
       else                           k.ost := gl.p_Ncurval(x0.kv,gl.p_Icurval(k.kv, k.ost, p_dat31 ), p_dat31 );
       end if ;
-      
+
       If k.tip in ('CR9','SN8','SK0','SK9','S36')
       then k.ost := round ( k.ost * xx.k , 0 );
       else k.ost := round ( k.ost * xx.k1, 0 );
       end if ;
 
-      if k.ost <> 0 
+      if k.ost <> 0
       then
           If    k.tip  in ('SDI')    then   l_sdi := l_sdi - k.ost;
           ElsIf k.tip  in ('CR9')    then   l_cr9 := l_cr9 - k.ost;
@@ -1928,20 +1928,20 @@ begin
        end if ;
     end loop ;
   end if; -- xx.k >0
- 
+
   l_snz := nvl(l_sn, 0);
 
-  if x0.acc is null 
+  if x0.acc is null
   then
     goto NOT_LIM2;
   end if ;
-  
+
   --------------------------------------------------
   If ( F_Cust = 3 and individuals_shd = 0 )
-  then 
+  then
     goto End_FLOW_2;
   end if ;
-  
+
   -- пересчет процентов
   declare
     l_snD number := 0 ; -- проц за 1 период
@@ -1961,7 +1961,7 @@ begin
          tmp(d8).lim1 := l_ss ;  tmp(d8).ss   := nvl(tmp(d8).ss, 0);  tmp(d8).lim2 := tmp(d8).lim1 - tmp(d8).ss;   l_ss := tmp(d8).lim2 ;
       end if;
 
-      if tmp(d8).lim2 < 0 
+      if tmp(d8).lim2 < 0
       then  -- Лимит не может быть отрицательным
         tmp(d8).lim2 := 0    ;  tmp(d8).ss   := tmp(d8).lim1 ;
       end if;
@@ -2208,7 +2208,7 @@ is
   wdate_ date := to_date('31/12/2050','dd/mm/yyyy');
   aa1    accounts%rowtype;
 begin
-  
+
   begin
     select * into aa1 from accounts where kv =p_kv and nls = p_nls;
   exception
@@ -2223,26 +2223,26 @@ begin
   end;
 
   dd1.nd := bars_sqnc.get_nextval('S_CC_DEAL');
-  
+
   begin
     select max(d.ndi) into dd1.ndi from cc_deal d, nd_acc n, accounts a where d.vidd = 150 and d.nd = n.nd and n.acc= a.acc and a.nls = p_nls  ;
   exception
     when no_data_found then dd1.ndi := dd1.nd ;
   end;
 
-  insert into cc_deal (rnk, ndi, nd, CC_ID, SDATE, WDATE, LIMIT, SOS, IR, BRANCH, PROD, vidd ) 
+  insert into cc_deal (rnk, ndi, nd, CC_ID, SDATE, WDATE, LIMIT, SOS, IR, BRANCH, PROD, vidd )
   values (aa1.rnk, dd1.ndi, dd1.nd,  p_nls||'/'||p_kv, aa1.daos, nvl(aa1.mdate,wdate_), 0, 10, acrn.fprocn(aa1.acc,0,gl.bdate), aa1.branch, aa1.nbs||aa1.ob22, 150);
-  
+
   insert into nd_acc (nd, acc) values (dd1.nd, aa1.acc);
-  
+
 end nos_ins;
 
 -------------
-procedure nos_upd (p_nd    number, p_sos   int, p_CC_ID varchar2, p_SDATE date, p_WDATE   date , p_LIMIT number, 
+procedure nos_upd (p_nd    number, p_sos   int, p_CC_ID varchar2, p_SDATE date, p_WDATE   date , p_LIMIT number,
                    p_FIN23 int   , p_OBS23 int, p_KAT23 int     , p_pd    int , p_FIN_351 int  )  is
 begin
-  update cc_deal set sos   = p_sos  , cc_id = p_cc_id, SDATE = p_sdate, WDATE   = p_wdate, limit = p_limit, fin23 = p_FIN23, 
-                     obs23 = p_OBS23, kat23 = p_KAT23, pd    = p_pd   , FIN_351 = p_FIN_351 
+  update cc_deal set sos   = p_sos  , cc_id = p_cc_id, SDATE = p_sdate, WDATE   = p_wdate, limit = p_limit, fin23 = p_FIN23,
+                     obs23 = p_OBS23, kat23 = p_KAT23, pd    = p_pd   , FIN_351 = p_FIN_351
   where nd=p_nd and vidd = 150;
 end nos_upd;
 
@@ -2262,7 +2262,7 @@ end nos_del;
   ) is
   /**
   <b>CLN_FIN_DEB</b> - Перенесення в архів даних таблиці PRVN_FIN_DEB
-  %param 
+  %param
 
   %version 2.0
   %usage   Перенесення в архів записів з таблиці PRVN_FIN_DEB у випадку невідповідності довіднику FIN_DEBT ( по R020+OB22 ).
@@ -2270,10 +2270,10 @@ end nos_del;
     type t_del_type is table of prvn_fin_deb%rowtype;
     t_del_rows      t_del_type;
   begin
-    
+
     bars_audit.trace( $$PLSQL_UNIT||'.CLN_FIN_DEB: Entry.' );
 
-    insert 
+    insert
       into PRVN_FIN_DEB_ARCH
          ( CHG_ID, CHG_DT, CLS_DT, KF, ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID )
     select S_PRVN_FIN_DEB_ARCH.NextVal, p_chg_dt, p_cls_dt
@@ -2355,21 +2355,21 @@ end nos_del;
 --    BULK COLLECT
 --    INTO t_del_rows
 --  ;
---  
+--
 --  if ( t_del_rows.count > 0 )
 --  then
---    
+--
 --    bars_audit.info( $$PLSQL_UNIT||'.CLN_FIN_DEB: t_del_rows.count='||to_char(t_del_rows.count) );
---    
+--
 --    forall r in t_del_rows.first .. t_del_rows.last
---    insert 
+--    insert
 --    into PRVN_FIN_DEB_ARCH
 --       ( CHG_ID, CHG_DT, CLS_DT, KF, ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID )
 --    values
 --       ( S_PRVN_FIN_DEB_ARCH.NextVal, p_chg_dt, p_cls_dt
 --       , t_del_rows(r).KF, t_del_rows(r).ACC_SS, t_del_rows(r).ACC_SP
 --       , t_del_rows(r).EFFECTDATE, t_del_rows(r).AGRM_ID );
---    
+--
 --  end if;
 
     commit;
@@ -2415,7 +2415,7 @@ end nos_del;
     l_cls_dt := GL.BD();
 
     -- "закриття" зв`язку рахунків
-    CLN_FIN_DEB( p_chg_dt => l_chg_dt 
+    CLN_FIN_DEB( p_chg_dt => l_chg_dt
                , p_cls_dt => l_cls_dt );
 
     if ( BARS_LOSS_EVENTS.G_RECEIVABLES )
@@ -2430,7 +2430,7 @@ end nos_del;
       bars_audit.info( title || ': '||to_char(sql%rowcount)||' row(s) deleted.' );
 
       -- Рах. фін. деб. кредитних договорів ('SK0','SK9')
-      insert 
+      insert
         into PRVN_FIN_DEB
            ( ACC_SS, ACC_SP, KF, AGRM_ID )
       select nvl(ACC_SS,ACC_SP) as ACC_SS
@@ -2442,14 +2442,14 @@ end nos_del;
                  from ND_ACC   r
                  join ACCOUNTS a
                    on ( r.KF = a.KF and r.ACC = a.ACC )
-                 left 
+                 left
                  join PRVN_FIN_DEB d
                    on ( d.AGRM_ID = r.ND )
                 where a.TIP in ('SK0','SK9')
                   and a.NBS like '3%'
                   and a.DAOS <= p_dat
                   and ( a.DAZS is Null or a.DAZS > p_dat )
-                  and d.AGRM_ID IS Null 
+                  and d.AGRM_ID IS Null
              ) pivot ( max(ACC) for TIP in ( 'SK0' as ACC_SS, 'SK9' as ACC_SP ) )
          log errors
         into PRVN_FIN_DEB_ERRLOG( 'CCK_'||l_err_tag )
@@ -2473,13 +2473,13 @@ end nos_del;
                           from ND_ACC   r
                           join ACCOUNTS a
                             on ( r.KF = a.KF and r.ACC = a.ACC )
-                          left 
+                          left
                           join PRVN_FIN_DEB d
                             on ( d.KF = r.KF and d.AGRM_ID = r.ND and r.ACC = any(d.ACC_SS, d.ACC_SS) )
                           join ( with NBSOB22 as ( select rownum as ROW_NUM
                                                         , NBS_N, NBS_P
                                                         , SubStr(NBS_N,1,4) as SS_NBS
-                                                        , SubStr(NBS_N,5,2) as SS_OB22 
+                                                        , SubStr(NBS_N,5,2) as SS_OB22
                                                         , SubStr(NBS_P,1,4) as SP_NBS
                                                         , SubStr(NBS_P,5,2) as SP_OB22
                                                      from FIN_DEBT
@@ -2511,19 +2511,19 @@ end nos_del;
         then update -- зявився рахунок прострочки
                 set d.ACC_SP  = t.ACC_SP
 --                , d.AGRM_ID = t.ND
---                , d.EFFECTDATE = 
+--                , d.EFFECTDATE =
               where d.ACC_SP  = d.ACC_SS
-        when NOT MATCHED 
+        when NOT MATCHED
         then insert ( ACC_SS, ACC_SP, KF, AGRM_ID )
              values ( t.ACC_SS, t.ACC_SP, t.KF, t.ND )
          log errors
         into PRVN_FIN_DEB_ERRLOG( 'CCK_'||l_err_tag )
          REJECT LIMIT UNLIMITED;
-      
+
       bars_audit.info( title || ': CCK (ODB) '||to_char(sql%rowcount)||' row(s) merged.' );
-      
+
       -- Рах. фін. деб. БПК
-      insert 
+      insert
         into PRVN_FIN_DEB
            ( ACC_SS, ACC_SP, KF, AGRM_ID )
       select ACC_SS, ACC_SP, KF, ND
@@ -2593,23 +2593,23 @@ end nos_del;
           insert
             into PRVN_FIN_DEB
           values fd;
-          
+
           -- 4) delete from PRVN_FIN_DEB_ERRLOG ( where current of )
           delete PRVN_FIN_DEB_ERRLOG
            where current of err_log;
-          
+
         exception
           when OTHERS then
            bars_audit.error( title ||': ACC_SS='||to_char(fd.ACC_SS)||chr(10)||sqlerrm );
            rollback to SP_ERRLOG;
         end;
-        
+
       end loop;
 
       close err_log;
 
       -- all ACC_SS
-      insert 
+      insert
         into PRVN_FIN_DEB
            ( ACC_SS, EFFECTDATE, KF )
       select a.ACC, l_eff_dt, a.KF
@@ -2624,15 +2624,15 @@ end nos_del;
           on ( d.ACC_SS = a.ACC )
        where a.DAZS is Null
          and d.ACC_SS Is Null;
-      
+
       bars_audit.info( title || ': ACC '||to_char(sql%rowcount)||' row(s) inserted.' );
-    
+
     else
-      
+
       bars_audit.info( title || ': BARS_LOSS_EVENTS.G_RECEIVABLES = FALSE' );
-      
+
     end if;
-    
+
     for k in ( select a.KF, a.RNK, a.NBS, a.OB22, a.ACC as ACC_SP, a.KV, a.DAOS, a.BRANCH
                     , SubStr(NBS_N,1,4) as SS_NBS
                     , SubStr(NBS_N,5,2) as SS_OB22
@@ -2646,18 +2646,18 @@ end nos_del;
                 where f.MOD_ABS in ( 0, 1, 4, 5, 6 )
                   and lnnvl( p.ACC_SP <> p.ACC_SS ) -- p.ACC_SP Is Null or p.ACC_SP = p.ACC_SS
               )
-    loop 
-      
+    loop
+
       fd := null;
-      
+
       -- подбор по модулям и по РНК + ВАЛ
       begin
         if ( k.MOD_ABS = 4 )
         then -- 4 - Абонплата КДИ
           select a.KF, a.ACC
-            into fd.KF, fd.ACC_SS 
+            into fd.KF, fd.ACC_SS
             from ACCOUNTS a
-           where a.RNK  = k.RNK 
+           where a.RNK  = k.RNK
              and a.KV   = k.KV
              and a.NBS  = k.SS_NBS
              and a.OB22 = k.SS_OB22
@@ -2680,10 +2680,10 @@ end nos_del;
              and rownum = 1;
          end if;
       EXCEPTION
-        WHEN NO_DATA_FOUND THEN 
+        WHEN NO_DATA_FOUND THEN
           null;
       end;
-      
+
       -- подбор только по РНК + ВАЛ + БРАНЧ
       If ( fd.ACC_SS is null )
       then
@@ -2691,11 +2691,11 @@ end nos_del;
           select a.KF, a.ACC
             into fd.KF, fd.ACC_SS
             from ACCOUNTS a
-           where a.RNK    = k.RNK 
+           where a.RNK    = k.RNK
              and a.KV     = k.KV
              and a.NBS    = k.SS_NBS
              and a.OB22   = k.SS_OB22
-             and a.BRANCH = k.BRANCH 
+             and a.BRANCH = k.BRANCH
              and a.DAOS  <= k.DAOS
              and (a.dazs is null or a.dazs > p_dat)
              and not exists (select 1 from PRVN_FIN_DEB where ACC_SS = a.ACC)
@@ -2744,9 +2744,9 @@ end nos_del;
     l_cross_rate       number;
     l_branch           varchar2(8);
   begin
-    
+
     l_branch := substr( sys_context('bars_context','user_branch'), 1, 8 );
-    
+
     select t1.RATE/t2.RATE
       into l_cross_rate
       from ( select KV          as CCY_ID
@@ -2771,9 +2771,9 @@ end nos_del;
                                                 group by BRANCH, KV )
            ) t2
     ;
-    
+
     RETURN l_cross_rate;
-    
+
   end GET_CROSS_RATE;
 
   --
@@ -2799,7 +2799,7 @@ end nos_del;
                               , sar_ccy_id    number(3)   -- валюта траншу КД
                               , sar_rate      number(6,3) -- відсоткова ставка
                               , sar_fine      number(6,3) -- відсоткова ставка
-                              , gen_ccy_dbt   number(24)  --  
+                              , gen_ccy_dbt   number(24)  --
                               , dbt           number(24)  -- SS
                               , dbt_odue      number(24)  -- SP
                               , int           number(24)  -- SN
@@ -2815,7 +2815,7 @@ end nos_del;
                               , gen_end_dt    date       -- дата погашення на рах. 8999%
                               , tot_dbt       number(24) -- загальний борг (LIM) усіх трашів в вал. gen_ccy_id
                               , gen_shd       t_shd_type -- графік зниження кредитного ліміту
-                              , sar_dtl       t_sar_type --   
+                              , sar_dtl       t_sar_type --
                               );
 
     cur                p_cur%rowtype;
@@ -2853,7 +2853,7 @@ end nos_del;
 
         if ( cur.GEN_ID Is Null )
         then -- ген. дог. лінії / стандарт
-          
+
           agr.gen_id      := cur.AGR_ID;
           agr.gen_ccy_id  := cur.CCY_ID;
           agr.gen_end_dt  := cur.END_DT;
@@ -2898,18 +2898,18 @@ end nos_del;
           then  -- стандарт
 
             agr.sar_dtl.extend();
-            
+
             agr.sar_dtl(agr.sar_dtl.last).sar_id      := cur.AGR_ID;
             agr.sar_dtl(agr.sar_dtl.last).sar_ccy_id  := cur.CCY_ID;
 
             if ( cur.AGR_TP = 'AST' )
             then -- assets
 
-              select abs( sum( case TIP when 'SS ' then BAL else 0 end ) ) as BAL_SS
-                   , abs( sum( case TIP when 'SP ' then BAL else 0 end ) ) as BAL_SP
-                   , abs( sum( case TIP when 'SN ' then BAL else 0 end ) ) as BAL_SN
-                   , abs( sum( case TIP when 'SPN' then BAL else 0 end ) ) as BAL_SPN
-                   , abs( sum( case TIP when 'SNO' then BAL else 0 end ) ) as BAL_SNO
+              select nvl( abs( sum( case TIP when 'SS ' then BAL else 0 end ) ), 0 ) as BAL_SS
+                   , nvl( abs( sum( case TIP when 'SP ' then BAL else 0 end ) ), 0 ) as BAL_SP
+                   , nvl( abs( sum( case TIP when 'SN ' then BAL else 0 end ) ), 0 ) as BAL_SN
+                   , nvl( abs( sum( case TIP when 'SPN' then BAL else 0 end ) ), 0 ) as BAL_SPN
+                   , nvl( abs( sum( case TIP when 'SNO' then BAL else 0 end ) ), 0 ) as BAL_SNO
                    , max( case TIP when 'SS ' then ACRN.FPROCN( ACC, 0, p_rpt_dt-1 ) else 0 end ) as RATE_SS
                    , max( case TIP when 'SP ' then ACRN.FPROCN( ACC, 0, p_rpt_dt-1 ) else 0 end ) as RATE_SP
                 into agr.sar_dtl(agr.sar_dtl.last).dbt      -- SS
@@ -3029,6 +3029,12 @@ end nos_del;
           end if;
 
         end if;
+        
+        bars_audit.trace( title||': sar_id='  ||to_char(agr.sar_dtl(agr.sar_dtl.last).sar_id)
+                               ||', dbt='     ||to_char(agr.sar_dtl(agr.sar_dtl.last).dbt)
+                               ||', dbt_odue='||to_char(agr.sar_dtl(agr.sar_dtl.last).dbt_odue)
+                               ||', int='     ||to_char(agr.sar_dtl(agr.sar_dtl.last).int)
+                               ||', int_odue='||to_char(agr.sar_dtl(agr.sar_dtl.last).int_odue) );
 
         if ( agr.sar_dtl.count > 0 and
              agr.sar_dtl(agr.sar_dtl.last).int_dfr > 0 )
@@ -3073,7 +3079,8 @@ end nos_del;
         if ( cur.AGR_QTY = cur.AGR_NUM )
         then -- графіки
 
-          bars_audit.trace( title||': agr.gen_shd.count='||to_char(agr.gen_shd.count) );
+          bars_audit.trace( title||': agr.gen_shd.count='||to_char(agr.gen_shd.count)
+                                 ||', agr.sar_dtl.count='||to_char(agr.sar_dtl.count) );
 
           if ( agr.gen_shd.count > 0 )
           then
@@ -3113,21 +3120,32 @@ end nos_del;
                   agr.sar_dtl(a).int_dfr := greatest( agr.sar_dtl(a).int_dfr - r_shd.SNO, 0 );
                   agr.sar_dtl(a).SNO_SHD.delete(agr.sar_dtl(a).SNO_SHD.first);
 
+                else
+                
+                  r_shd.SNO := 0; 
+                
                 end if;
 
                  -- SN
                 if ( agr.gen_shd(r).SN > 0 )
                 then -- платіжна дата для нарахованих %%
 
-                  if ( r > agr.gen_shd.first )
+                  -- override interest amount
+                  r_shd.SN := agr.sar_dtl(a).int;
+                  
+                  if ( r_shd.SN = 0 )
                   then
-                    r_shd.SN  := 0;
                     r_shd.SN1 := r_shd.LMT_INPT * r_shd.IR / 100 / 365 * l_day_qty;
-                  else -- override interest amount
-                    r_shd.SN  := agr.sar_dtl(a).int;
+                  else
+                    r_shd.SN1 := 0;
+                    agr.sar_dtl(a).int := 0;
                   end if;
 
                   r_shd.SN2 := agr.sar_dtl(a).dbt_odue * agr.sar_dtl(a).sar_fine / 100 / 365 * l_day_qty;
+
+                else
+
+                  r_shd.SN := 0;
 
                 end if;
 
@@ -3159,12 +3177,12 @@ end nos_del;
                      r_shd.SS := agr.gen_shd(r).SS;
 
                   end case;
-
+/*
                   bars_audit.trace( title||': r_shd.ND='||r_shd.ND
                                          ||', r_shd.FDAT='||to_char(r_shd.FDAT,'dd/mm/yyyy')
                                          ||', r_shd.LMT_INPT='||r_shd.LMT_INPT
                                          ||', r_shd.SS='||r_shd.SS );
-
+*/
                   if ( agr.sar_dtl(a).sar_ccy_id = agr.gen_ccy_id )
                   then -- same currency
 
@@ -3200,7 +3218,8 @@ end nos_del;
 
                       r_shd.SS := agr.sar_dtl(a).dbt;
 
-                      l_amnt := round( r_shd.SS * GET_CROSS_RATE( agr.gen_ccy_id, agr.sar_dtl(a).sar_ccy_id, p_rpt_dt ) );
+--                    l_amnt := round( r_shd.SS * GET_CROSS_RATE( agr.gen_ccy_id, agr.sar_dtl(a).sar_ccy_id, p_rpt_dt ) );
+                      l_amnt := agr.sar_dtl(a).gen_ccy_dbt;
 
                       agr.gen_shd(r).SS := agr.gen_shd(r).SS - l_amnt;
 
@@ -3228,16 +3247,17 @@ end nos_del;
 
                   r_shd.SSP := agr.sar_dtl(a).dbt_odue;
                   r_shd.SNP := agr.sar_dtl(a).int_odue;
+                  r_shd.SNO := agr.sar_dtl(a).int_dfr;
 
-                  if ( agr.sar_dtl(a).int_dfr > 0)
-                  then
-                    r_shd.SNO := agr.sar_dtl(a).int_dfr;
-                  end if;
+                  if ( agr.sar_dtl(a).int > 0 )
+                  then -- для випадків коли в графіку відсутнє погашення %%
+                    r_shd.SN := agr.sar_dtl(a).int;
+                  end if;   
 
                   r_shd.SN1 := r_shd.LMT_INPT          * r_shd.IR                / 100 / 365 * l_day_qty;
                   r_shd.SN2 := agr.sar_dtl(a).dbt_odue * agr.sar_dtl(a).sar_fine / 100 / 365 * l_day_qty;
 
-                  -- 
+                  --
                   agr.sar_dtl.delete(a);
 
                 else
@@ -3245,8 +3265,33 @@ end nos_del;
                   r_shd.SNP := 0;
                 end if;
 
+                if ( r = agr.gen_shd.last )
+                then
+                  if ( r_shd.LMT_OTPT != 0 )
+                  then -- bad schedule
+                    bars_audit.error( title || ': bad schedule (exit with LMT_OTPT != 0 ).' );
+                    r_shd.SS       := r_shd.SS + agr.sar_dtl(a).dbt;
+                    r_shd.SN       := agr.sar_dtl(a).int;
+                    r_shd.SSP      := agr.sar_dtl(a).dbt_odue;
+                    r_shd.SNP      := agr.sar_dtl(a).int_odue;
+                    r_shd.SNO      := agr.sar_dtl(a).int_dfr;
+                    r_shd.LMT_OTPT := r_shd.LMT_INPT - r_shd.SS;
+                  end if;
+                end if;
+/*
+                bars_audit.trace( title||': r_shd.ND='      ||r_shd.ND
+                                       ||', r_shd.FDAT='    ||to_char(r_shd.FDAT,'dd/mm/yyyy')
+                                       ||', r_shd.LMT_OTPT='||to_char(r_shd.LMT_OTPT)
+                                       ||', r_shd.SS='      ||to_char(r_shd.SS)
+                                       ||', r_shd.SSP='     ||to_char(r_shd.SSP) 
+                                       ||', r_shd.SN='      ||to_char(r_shd.SN) 
+                                       ||', r_shd.SNO='     ||to_char(r_shd.SNO) 
+                                       ||', r_shd.SNP='     ||to_char(r_shd.SNP)
+                                       ||', r_shd.SN1='     ||to_char(r_shd.SN1)
+                                       ||', r_shd.SN2='     ||to_char(r_shd.SN2) );
+*/
                 if ( ( r_shd.SS + r_shd.SSP + r_shd.SN + r_shd.SNO + r_shd.SNP + r_shd.SN1 + r_shd.SN2 ) > 0 )
-                then -- 
+                then --
                   PIPE ROW ( r_shd );
                 end if;
 
@@ -3263,7 +3308,7 @@ end nos_del;
 
             agr.sar_dtl.delete();
 
-          else -- без графіка (відстутній або повністю прострочений КД) 
+          else -- без графіка (відстутній або повністю прострочений КД)
 
             << PRC_SAR >>
             for a in 1 .. agr.sar_dtl.count
@@ -3361,6 +3406,7 @@ end nos_del;
           from ACCOUNTS a8
           join ND_ACC   r8
             on ( r8.ACC = a8.ACC )
+          left outer
           join AGG_MONBALS b8
             on ( b8.ACC = a8.ACC and b8.FDAT = l_snp_dt )
           left outer
@@ -3442,7 +3488,7 @@ begin
 end PRVN_FLOW;
 /
 
-show err
+show errors;
 
 grant execute on PRVN_FLOW to BARS_ACCESS_DEFROLE;
 grant execute on PRVN_FLOW to RCC_DEAL;
