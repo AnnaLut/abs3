@@ -159,7 +159,8 @@
         p_id in integer);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.STO_SBON_UTL as
+
+CREATE OR REPLACE package body BARS.sto_sbon_utl as
 
   G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 2.0 01.05.2016';
 
@@ -212,12 +213,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.STO_SBON_UTL as
     is
         l_sbon_product_row sto_sbon_product%rowtype;
     begin
+        --згідно заявки http://jira.unity-bars.com:11000/browse/COBUMMFO-8080
+        SELECT p.*
+        into   l_sbon_product_row
+        FROM sto_product t JOIN sto_sbon_product p ON t.id = p.id
+        WHERE p.contract_id = p_sbon_contract_id;
+        /*
         select *
         into   l_sbon_product_row
         from   sto_sbon_product p
         where  p.contract_id = p_sbon_contract_id and
                p.id in (select id from sto_payment);
-
+        */
         return l_sbon_product_row;
     exception
         when no_data_found then
