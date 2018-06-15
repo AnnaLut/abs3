@@ -4,7 +4,7 @@ is
   --
   -- constants
   --
-  g_header_version  constant varchar2(64)  := 'version 17.5  2018.03.15';
+  g_header_version  constant varchar2(64)  := 'version 17.7  2018.05.17';
 
   --
   -- types
@@ -16,6 +16,15 @@ is
 
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2;
+
+  -- 
+  procedure SET_CRN_VRSN
+  ( p_vrsn_id      in     nbur_lst_versions.version_id%type
+  );
+
+  --
+  function GET_CRN_VRSN
+    return nbur_lst_versions.version_id%type;
 
   --
   --  получение идентификатора объекта по его имени
@@ -317,6 +326,32 @@ is
   );
 
   --
+  -- Наповнення консолідованиї вітрини даних додаткових реквізитів фінансових документів
+  --
+  --  p_report_date - Звітна дата
+  --  p_kf          - Код фiлiалу (МФО)
+  --  p_version_id  - Iдентифiкатор версії
+  --
+  procedure LOAD_ADL_DOC_RPT_DTL_CNSL
+  ( p_report_date  in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type default null
+  , p_version_id   in     nbur_lst_objects.version_id%type
+  );
+
+  --
+  -- Наповнення консолідованиї вітрини даних SWIFT реквізитів фінансових документів
+  --
+  --  p_report_date - Звітна дата
+  --  p_kf          - Код фiлiалу (МФО)
+  --  p_version_id  - Iдентифiкатор версії
+  --
+  procedure LOAD_ADL_DOC_SWT_DTL_CNSL
+  ( p_report_date  in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type default null
+  , p_version_id   in     nbur_lst_objects.version_id%type
+  );
+
+  --
   -- Наповнення вітрини даних нарахованих доходів та витрат за місяць
   --
   --  p_report_date - Звітна дата
@@ -445,7 +480,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 19.7  2018.03.27';
+  g_body_version  constant varchar2(64) := 'version 20.2  2018.06.12';
   fmt_dt          constant varchar2(10) := 'dd.mm.yyyy';
   fmt_tm          constant varchar2(21) := 'dd.mm.yyyy hh24:mi:ss';
 
@@ -466,10 +501,11 @@ is
   l_dop                pls_integer;
   t_tbl_lst            t_tbl_lst_type;
   l_err_tag            varchar2(30);
-  l_err_rec_id         pls_integer;
+  l_err_rec_id         number(38);
   l_frst_yr_dt         date;
   l_attempt_num        number(1);
   l_dm_tblsps          boolean;
+  l_crn_vrsn_id        nbur_lst_versions.version_id%type;
 
   --
   -- exceptions
@@ -494,6 +530,33 @@ is
   begin
     return 'Package '||$$PLSQL_UNIT||' body ' || g_body_version || '.';
   end body_version;
+
+  --
+  --
+  --
+  procedure SET_CRN_VRSN
+  ( p_vrsn_id      in     nbur_lst_versions.version_id%type
+  ) is
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.SET_CRN_VRSN';
+  begin
+    if ( p_vrsn_id Is Null )
+    then
+      bars_audit.error( title || ': crn_vrsn_id can`t be null' );
+    else
+      l_crn_vrsn_id := p_vrsn_id;
+      bars_audit.info( title || ': crn_vrsn_id=' || to_char(p_vrsn_id) );
+    end if;
+  end SET_CRN_VRSN;
+
+  --
+  --
+  --
+  function GET_CRN_VRSN
+    return nbur_lst_versions.version_id%type
+  is
+  begin
+    return l_crn_vrsn_id;
+  end GET_CRN_VRSN;
 
   --
   --
@@ -991,6 +1054,453 @@ is
   --
   --
   --
+  procedure CREATE_RANGE_PARTITION
+  ( p_dm_tab_nm    in     tbl_nm_subtype
+  , p_rpt_dt       in     nbur_dm_agrm_accounts_arch.report_date%type
+  , p_kf           in     nbur_dm_agrm_accounts_arch.kf%type
+  , p_vrsn_id      in     nbur_dm_agrm_accounts_arch.version_id%type default null
+  ) is
+  /**
+  <b>CREATE_RANGE_PARTITION</b> - створення сегменту таблиці
+  %param p_report_date - Звітна дата
+  %param p_kf          - Код фiлiалу (МФО)
+
+  %version 1.7 (03/08/2016)
+  %usage   Перенесення даних з оперативних (проміжних) таблиць в архів версій вітрин даних
+  */
+    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.crt_rng_partition';
+
+    l_add_stmt            varchar(1000);
+    l_spl_stmt            varchar(1000);
+    l_crt_stmt            varchar(1000);
+    l_rnm_stmt            varchar(1000);
+
+    e_ptsn_split          exception; -- Partition cannot be split along the specified high bound
+    pragma exception_init( e_ptsn_split, -14080 );
+
+    e_ptsn_nm_exsts       exception; -- New partition name must differ from the old partition name
+    pragma exception_init( e_ptsn_nm_exsts, -14081 );
+
+    e_ptsn_bound          exception; -- partition bound must collate higher than that of the last partition
+    pragma exception_init( e_ptsn_bound, -14074 );
+
+  begin
+
+    bars_audit.trace( '%s: Start running with ( dm_tab_nm=%s, rpt_dt=%s, kf=%s, vrsn_id=%s).'
+                    , title, p_dm_tab_nm, to_char(p_rpt_dt,fmt_dt), p_kf, to_char(p_vrsn_id) );
+
+    case
+      when ( p_vrsn_id > 0 )
+      then -- for multicolumn partition (by VERSION)
+
+        l_add_stmt := q'[ALTER TABLE BARS.%tabnm ADD PARTITION P_%rptdt_SP_%vrsnid VALUES LESS THAN (to_date('%rptdt','YYYYMMDD'),%vrsnid)]';
+
+        l_spl_stmt := q'[ALTER TABLE BARS.%tabnm SPLIT PARTITION FOR (to_date('%rptdt','YYYYMMDD'),%vrsnid) AT (to_date('%rptdt+1','YYYYMMDD'),%vrsnid)]';
+
+        l_rnm_stmt := q'[ALTER TABLE BARS.%tabnm RENAME PARTITION FOR (to_date('%rptdt','YYYYMMDD'),%vrsnid) TO P_%rptdt_SP_%vrsnid]';
+
+--      l_crt_stmt := q'[LOCK TABLE BARS.%tabnm PARTITION FOR (to_date('%rptdt','YYYYMMDD'),%vrsnid) IN SHARE MODE]';
+
+        l_add_stmt := replace( l_add_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
+
+        l_spl_stmt := replace( l_spl_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
+
+        l_rnm_stmt := replace( l_rnm_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
+
+--      l_crt_stmt := replace( l_crt_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
+
+      when ( p_kf is Not Null )
+      then -- for multicolumn partition (by KF)
+
+        l_add_stmt := q'[ALTER TABLE BARS.%tabnm ADD PARTITION P_%rptdt_SP_%kf VALUES LESS THAN (to_date('%rptdt+1','YYYYMMDD'),'%kf')]';
+
+        l_spl_stmt := q'[ALTER TABLE BARS.%tabnm SPLIT PARTITION FOR (to_date('%rptdt','YYYYMMDD'),'%kf') AT (to_date('%rptdt+1','YYYYMMDD'),'%kf')]';
+
+        l_rnm_stmt := q'[ALTER TABLE BARS.%tabnm RENAME PARTITION FOR (to_date('%rptdt','YYYYMMDD'),'%kf') TO P_%rptdt_SP_%kf]';
+
+        l_add_stmt := replace( l_add_stmt, '%kf', p_kf );
+
+        l_spl_stmt := replace( l_spl_stmt, '%kf', p_kf );
+
+        l_rnm_stmt := replace( l_rnm_stmt, '%kf', p_kf );
+
+      else -- for singlecolumn partition
+
+        l_add_stmt := q'[ALTER TABLE BARS.%tabnm ADD PARTITION P_%rptdt VALUES LESS THAN (to_date('%rptdt','YYYYMMDD'))]';
+
+        l_rnm_stmt := q'[ALTER TABLE BARS.%tabnm RENAME PARTITION FOR (to_date('%rptdt','YYYYMMDD')) TO P_%rptdt]';
+
+    end case;
+
+    l_add_stmt := replace( l_add_stmt, '%tabnm', p_dm_tab_nm );
+    l_spl_stmt := replace( l_spl_stmt, '%tabnm', p_dm_tab_nm );
+    l_rnm_stmt := replace( l_rnm_stmt, '%tabnm', p_dm_tab_nm );
+
+    l_add_stmt := replace( l_add_stmt, '%rptdt+1', to_char(p_rpt_dt+1,'YYYYMMDD') );
+    l_spl_stmt := replace( l_spl_stmt, '%rptdt+1', to_char(p_rpt_dt+1,'YYYYMMDD') );
+
+    l_add_stmt := replace( l_add_stmt, '%rptdt', to_char(p_rpt_dt,'YYYYMMDD') );
+    l_spl_stmt := replace( l_spl_stmt, '%rptdt', to_char(p_rpt_dt,'YYYYMMDD') );
+    l_rnm_stmt := replace( l_rnm_stmt, '%rptdt', to_char(p_rpt_dt,'YYYYMMDD') );
+
+    bars_audit.trace( title || ': add_stmt = ' || l_add_stmt );
+    bars_audit.trace( title || ': spl_stmt = ' || l_spl_stmt );
+    bars_audit.trace( title || ': rnm_stmt = ' || l_rnm_stmt );
+
+    begin
+      execute immediate l_add_stmt;
+    exception
+      when e_ptsn_bound then
+        -- split partition
+        begin
+          execute immediate l_spl_stmt;
+          -- rename partition
+          begin
+            execute immediate l_rnm_stmt;
+          exception
+            when e_ptsn_nm_exsts then
+              null;
+          end;
+        exception
+          when e_ptsn_split then
+            null;
+        end;
+    end;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end CREATE_RANGE_PARTITION;
+
+  --
+  --
+  --
+  function GET_TAB_COL_LIST
+  ( p_tab_nm       in     nbur_ref_objects.object_name%type
+  ) return varchar
+  DETERMINISTIC
+  RESULT_CACHE
+  is
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.GET_TAB_COL_LIST';
+    l_col_lst             varchar2(3072);
+    l_tab_nm              varchar2(30);
+  begin
+
+    l_tab_nm := upper(p_tab_nm);
+
+    begin
+      select listagg( COLUMN_NAME, ', ' ) WITHIN GROUP ( ORDER BY COLUMN_ID )
+        into l_col_lst
+        from ALL_TAB_COLS
+       where TABLE_NAME = l_tab_nm
+         and OWNER = 'BARS'
+         and VIRTUAL_COLUMN = 'NO';
+    exception
+      when NO_DATA_FOUND then
+        l_col_lst := null;
+    end;
+
+--  bars_audit.trace( '%s: Exit with ( %s ).', title, l_col_lst );
+
+    return l_col_lst;
+
+  end GET_TAB_COL_LIST;
+
+  --
+  --
+  --
+  procedure MOVE_DATA_TO_ARCH
+  ( p_obj_nm       in     nbur_ref_objects.object_name%type
+  , p_rpt_dt       in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type
+  , p_vrsn_id      in     nbur_lst_objects.version_id%type
+  ) is
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.MOVE_DATA_TO_ARCH';
+    l_arc_tab_nm          varchar2(30);
+    l_arc_col_lst         varchar2(3072);
+    l_obj_col_lst         varchar2(3072);
+    l_itrv                pls_integer;
+    l_sp_key_cnt          pls_integer;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( obj_nm=%s, kf=%s, vrsn_id=%s ).'
+                    , title, p_obj_nm, p_kf, to_char(p_vrsn_id) );
+
+    l_arc_tab_nm  := p_obj_nm||'_ARCH';
+
+    begin
+
+      select nvl2(INTERVAL,1,0)
+--         , PARTITIONING_KEY_COUNT as PTSN_KEY_CNT
+           , SUBPARTITIONING_KEY_COUNT
+        into l_itrv
+           , l_sp_key_cnt
+        from ALL_PART_TABLES
+       where OWNER = 'BARS'
+         and TABLE_NAME = l_arc_tab_nm
+         and PARTITIONING_TYPE = 'RANGE';
+
+      if ( l_itrv = 0 )
+      then
+
+        if ( l_sp_key_cnt = 1 )
+        then -- partition by REPORT_DATE and VERSION_ID (subpartition by KF)
+
+          CREATE_RANGE_PARTITION
+          ( p_dm_tab_nm => l_arc_tab_nm
+          , p_rpt_dt    => p_rpt_dt
+          , p_kf        => null
+          , p_vrsn_id   => p_vrsn_id
+          );
+
+        else -- partition by REPORT_DATE and KF
+
+          if ( p_kf Is Null )
+          then
+            for b in ( select KF
+                         from MV_KF
+                        order by KF )
+            loop
+              CREATE_RANGE_PARTITION
+              ( p_dm_tab_nm => l_arc_tab_nm
+              , p_rpt_dt    => p_rpt_dt
+              , p_kf        => b.KF
+              , p_vrsn_id   => Null
+              );
+            end loop;
+          else
+            CREATE_RANGE_PARTITION
+            ( p_dm_tab_nm => l_arc_tab_nm
+            , p_rpt_dt    => p_rpt_dt
+            , p_kf        => p_kf
+            , p_vrsn_id   => Null
+            );
+          end if;
+
+        end if;
+
+      end if;
+
+      l_arc_col_lst := GET_TAB_COL_LIST( l_arc_tab_nm );
+
+      l_obj_col_lst := replace( l_arc_col_lst, 'VERSION_ID', ':p_vrsn_id' );
+
+      dbms_application_info.set_client_info( 'Moving data into table '||l_arc_tab_nm );
+
+      begin
+
+        if ( p_kf Is Null )
+        then
+          if ( l_sp_key_cnt = 1 )
+          then -- partition by REPORT_DATE and VERSION_ID (subpartition by KF)
+            DM_UTL.EXCHANGE_PARTITION( p_source_table_nm => l_arc_tab_nm
+                                     , p_target_table_nm => p_obj_nm
+                                     , p_partition_nm    => 'P_'||to_char(p_rpt_dt,'YYYYMMDD')||'_'|| to_char(p_vrsn_id,'FM000') );
+          else
+            execute immediate 'insert /*+ APPEND */'
+                  ||chr(10)|| '  into '||l_arc_tab_nm
+                  ||chr(10)|| '     ( '||l_arc_col_lst||' )'
+                  ||chr(10)|| 'select /*+ PARALLEL( 16 ) */ '||l_obj_col_lst -- '/*+ PARALLEL( '||l_dop||' ) */'
+                  ||chr(10)|| '  from '||p_obj_nm
+            using p_vrsn_id;
+          end if;
+        else
+          execute immediate 'insert /*+ APPEND */'
+                ||chr(10)|| '  into '||l_arc_tab_nm
+                ||chr(10)|| '     ( '||l_arc_col_lst||' )'
+                ||chr(10)|| 'select /*+ PARALLEL( 8 ) */ '||l_obj_col_lst
+                ||chr(10)|| '  from '||p_obj_nm
+                ||chr(10)|| ' where KF = :p_kf'
+          using p_vrsn_id, p_kf;
+        end if;
+
+        commit;
+
+      exception
+        when OTHERS then
+          bars_audit.error( title||': ( obj_nm='||p_obj_nm||')'
+                                 ||chr(10)||dbms_utility.format_error_stack()
+                                 ||chr(10)||dbms_utility.format_error_backtrace() );
+      end;
+
+    exception
+      when NO_DATA_FOUND
+      then null;
+    end;
+
+    dbms_application_info.set_client_info( null );
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end MOVE_DATA_TO_ARCH;
+
+  --
+  --
+  --
+  procedure CHECK_OBJECT_EXISTENCE
+  ( p_obj_id       in     nbur_lst_objects.object_id%type
+  , p_kf           in     nbur_lst_objects.kf%type default null
+  , p_frst_rpt_dt  in     nbur_lst_objects.report_date%type
+  , p_last_rpt_dt  in     nbur_lst_objects.report_date%type
+  ) is
+  /**
+  <b>CHECK_OBJECT_EXISTENCE</b> - Перевіка наявності об'єктів за період
+  %param p_obj_id       - Iдентифiкатор об`єкту
+  %param p_kf           - Код фiлiалу (МФО)
+  %param p_frst_rpt_dt  - Звітна дата
+  %param p_last_rpt_dt  - Звітна дата
+
+  %version 1.0
+  %usage   Перевіка наявності сформованих DM, що необхідні для формування консолідованих DM 2-го рівня
+  */
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.CHK_OBJ_EXST';
+    l_pcd_nm              nbur_ref_objects.proc_insert%type;
+    l_vrsn_id             nbur_lst_versions.version_id%type;
+    type rpt_dt_lst_type is table of date;
+    t_rpt_dt_lst rpt_dt_lst_type;
+    e_exec_error           exception;
+    pragma exception_init( e_exec_error, -01418 );
+  begin
+
+    bars_audit.trace( '%s: Entry with ( obj_id=%s, kf=%s, p_frst_rpt_dt=%s, p_last_rpt_dt=%s ).'
+                    , title, to_char(p_obj_id), p_kf, to_char(p_frst_rpt_dt,fmt_dt), to_char(p_last_rpt_dt,fmt_dt) );
+
+    select t1.RPT_DT
+      bulk collect
+      into t_rpt_dt_lst
+      from ( select f.FDAT as RPT_DT
+               from FDAT f
+               left outer
+               join HOLIDAY h
+                 on ( h.HOLIDAY = f.FDAT and h.KV = 980 )
+              where f.FDAT between p_frst_rpt_dt and p_last_rpt_dt
+                and h.HOLIDAY Is Null
+           ) t1
+      left outer
+      join ( select REPORT_DATE, max(VERSION_ID)
+               from NBUR_LST_OBJECTS
+              where REPORT_DATE between p_frst_rpt_dt
+                                    and p_last_rpt_dt
+                and KF = p_kf
+                and OBJECT_ID = p_obj_id
+                and VLD = 0
+              group by REPORT_DATE
+           ) t2
+         on ( t2.REPORT_DATE = t1.RPT_DT )
+      where t2.REPORT_DATE Is Null
+      order by t1.RPT_DT;
+
+    if ( t_rpt_dt_lst.count() > 0 )
+    then
+
+      begin
+
+        select PROC_INSERT
+          into l_pcd_nm
+          from NBUR_REF_OBJECTS
+         where ID = p_obj_id
+           and PROC_INSERT Is Not Null;
+
+        for i in t_rpt_dt_lst.first .. t_rpt_dt_lst.last
+        loop
+
+          begin
+
+            select VERSION_ID
+              into l_vrsn_id
+              from NBUR_LST_VERSIONS
+             where REPORT_DATE = t_rpt_dt_lst(i)
+               and KF = p_kf
+               and STATUS = 'VALID';
+
+            begin
+
+              execute immediate 'begin '||l_pcd_nm||'( :p_rpt_dt, :p_kf, :p_vrsn_id ); end;'
+                using t_rpt_dt_lst(i), p_kf, l_vrsn_id;
+
+              MOVE_DATA_TO_ARCH( p_obj_nm  => F_GET_OBJECT_NAME_BY_ID(p_obj_id)
+                               , p_rpt_dt  => t_rpt_dt_lst(i)
+                               , p_kf      => p_kf
+                               , p_vrsn_id => l_vrsn_id );
+
+            exception
+              when e_exec_error
+              then raise_application_error( -20666, 'Процедура "'||l_pcd_nm||'" відсутня в БД', true );
+            end;
+
+          exception
+            when NO_DATA_FOUND then
+              raise_application_error( -20666, 'Не знайдено ід. версії для формування DM', true );
+          end;
+
+        end loop;
+
+      exception
+        when NO_DATA_FOUND then
+          raise_application_error( -20666, 'Не вказано назву процедури формування для DM '||F_GET_OBJECT_NAME_BY_ID(p_obj_id), true );
+      end;
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end CHECK_OBJECT_EXISTENCE;
+
+  --
+  -- перевірка 
+  --
+  function DATA_RELEVANCE
+  ( p_arch_obj_id  in     nbur_lst_objects.object_id%type
+  , p_cnsl_obj_id  in     nbur_lst_objects.object_id%type
+  , p_kf           in     nbur_lst_objects.kf%type default null
+  , p_frst_rpt_dt  in     nbur_lst_objects.report_date%type
+  , p_last_rpt_dt  in     nbur_lst_objects.report_date%type
+  ) return boolean
+  is
+    /**
+  <b>CHECK_OBJECT_EXISTENCE</b> - Перевіка актульності консолідованої вітрини
+  %param p_arch_obj_id  - Iдентифiкатор об`єкту
+  %param p_cnsl_obj_id  - Iдентифiкатор об`єкту
+  %param p_kf           - Код фiлiалу (МФО)
+  %param p_frst_rpt_dt  - Звітна дата
+  %param p_last_rpt_dt  - Звітна дата
+
+  %version 1.0
+  %usage   Перевіка актульності даних у консолідованій вітрині
+  */
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.DATA_RELEVANCE';
+    l_arch_tm             nbur_lst_objects.finish_time%type;
+    l_cnsl_tm             nbur_lst_objects.finish_time%type;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_arch_obj_id=%s, p_cnsl_obj_id=%s, p_kf=%s, p_frst_rpt_dt=%s, p_last_rpt_dt=%s ).'
+                    , title, to_char(p_arch_obj_id), to_char(p_cnsl_obj_id), p_kf
+                    , to_char(p_frst_rpt_dt,fmt_dt), to_char(p_last_rpt_dt,fmt_dt) );
+
+    select max(FINISH_TIME)
+      into l_arch_tm
+      from NBUR_LST_OBJECTS
+     where REPORT_DATE between p_frst_rpt_dt
+                           and p_last_rpt_dt
+       and KF = p_kf
+       and OBJECT_ID = p_arch_obj_id
+       and VLD = 0;
+
+    select max(FINISH_TIME)
+      into l_cnsl_tm
+      from NBUR_LST_OBJECTS
+     where REPORT_DATE between p_frst_rpt_dt
+                           and p_last_rpt_dt
+       and KF = p_kf
+       and OBJECT_ID = p_cnsl_obj_id
+       and VLD = 0;
+
+    return case when l_cnsl_tm > l_arch_tm then true else false end;
+
+  end DATA_RELEVANCE;
+
+  --
+  --
+  --
   procedure CHECK_OBJECT_DEPENDENCIES
   ( p_rpt_dt       in     nbur_lst_objects.report_date%type
   , p_kf           in     nbur_lst_objects.kf%type default null
@@ -1342,8 +1852,12 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   ) is
-    l_object_name       varchar2(100) := 'NBUR_DM_CUSTOMERS';
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.LOAD_CUSTOMERS';
+    l_object_name         varchar2(100) := 'NBUR_DM_CUSTOMERS';
   begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -1482,11 +1996,13 @@ is
 
     end if;
 
+    bars_audit.trace( '%s: Exit.', title );
+
   exception
     when OTHERS then
       LOG_ERRORS( l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
-  end p_load_customers;
+  end P_LOAD_CUSTOMERS;
 
   ---------------------------------------------------------------------
       -- P_LOAD_ACCOUNTS
@@ -1499,9 +2015,13 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   ) is
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.LOAD_ACCOUNTS';
     l_nbuc                varchar2(100);
     l_object_name         varchar2(100) := 'NBUR_DM_ACCOUNTS';
   begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -1566,7 +2086,7 @@ is
                       nvl(trim(S.S180), '0') S180,
                       nvl(trim(S.S240), '0') S240,
                       NVL(s.s580, '9') S580,
-                      b.OBL as NBUC,
+                      nvl(b.OBL,'00') NBUC,
                       lpad(nvl(trim(b.b040), '0'), 20, '0') b040
                  FROM ACCOUNTS a
                  JOIN NBUR_QUEUE_OBJECTS q
@@ -1657,7 +2177,7 @@ is
                       nvl(trim(S.S240), '0') S240,
                       NVL(s.s580, '9') S580,
                       s.OB22_ALT,
-                      b.OBL as NBUC,
+                      nvl(b.OBL,'00') NBUC,
                       lpad(nvl(trim(b.b040), '0'), 20, '0') b040
                  from ACCOUNTS a
                  left outer
@@ -1700,11 +2220,13 @@ is
 
     end if;
 
+    bars_audit.trace( '%s: Exit.', title );
+
   exception
     when others then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
-  end p_load_accounts;
+  end P_LOAD_ACCOUNTS;
 
   --
   -- check report date on the bank day
@@ -1801,6 +2323,8 @@ is
 
     end if;
 
+    bars_audit.trace( '%s: Exit.', title );
+
   end CRT_DLY_SNPST;
 
   ---------------------------------------------------------------------
@@ -1817,6 +2341,9 @@ is
     title     constant    varchar2(60)  := $$PLSQL_UNIT||'.LOAD_DAILYBAL';
     l_object_name         varchar2(100) := 'NBUR_DM_BALANCES_DAILY';
   begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -1904,6 +2431,8 @@ is
 
     end if;
 
+    bars_audit.trace( '%s: Exit.', title );
+
   exception
     when others then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
@@ -1954,6 +2483,8 @@ is
 
     end if;
 
+    bars_audit.trace( '%s: Exit.', title );
+
   end CRT_MO_SNPST;
 
   ---------------------------------------------------------------------
@@ -1967,8 +2498,12 @@ is
   , p_kf           in     nbur_lst_objects.kf%type default null
   , p_version_id   in     nbur_lst_objects.version_id%type
   ) is
+    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.LOAD_MONTHBAL';
     l_object_name         varchar2(100) := 'NBUR_DM_BALANCES_MONTHLY';
   begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -1986,13 +2521,15 @@ is
 
       insert /*+ APPEND */
         into NBUR_DM_BALANCES_MONTHLY
-           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS,
-             KOS, OST, DOSQ, KOSQ, OSTQ, CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS,
-             CUDOSQ, CUKOSQ, ADJ_BAL, ADJ_BAL_UAH )
-      select /*+ PARALLEL( 8 ) */ p_report_date, b.KF,
-             b.ACC, b.RNK, b.DOS, b.KOS, b.OST, b.DOSQ, b.KOSQ, b.OSTQ,
-             b.CRDOS, b.CRKOS, b.CRDOSQ, b.CRKOSQ, b.CUDOS, b.CUKOS, b.CUDOSQ, b.CUKOSQ,
-             b.OST - b.CRDOS + b.CRKOS, b.OSTQ - b.CRDOSQ + b.CRKOSQ
+           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS, KOS, OST, DOSQ, KOSQ, OSTQ
+           , CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ
+           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH, ADJ_BAL, ADJ_BAL_UAH )
+      select /*+ PARALLEL( 26 ) */ p_report_date, b.KF
+           , b.ACC, b.RNK, b.DOS, b.KOS, b.OST, b.DOSQ, b.KOSQ, b.OSTQ
+           , b.CRDOS, b.CRKOS, b.CRDOSQ, b.CRKOSQ, b.CUDOS, b.CUKOS, b.CUDOSQ, b.CUKOSQ
+           , b.YR_DOS, b.YR_DOS_UAH, b.YR_KOS, b.YR_KOS_UAH
+           , b.OST  - b.CRDOS  + b.CRKOS
+           , b.OSTQ - b.CRDOSQ + b.CRKOSQ
         from AGG_MONBALS b
         join NBUR_QUEUE_OBJECTS q
           on ( q.KF = b.KF and q.REPORT_DATE = b.FDAT and q.ID = l_object_id )
@@ -2002,16 +2539,18 @@ is
 
       insert /* APPEND */
         into NBUR_DM_BALANCES_MONTHLY
-           ( report_date, kf, acc_id, cust_id, dos,
-             kos, ost, dosq, kosq, ostq, crdos, crkos, crdosq, crkosq, cudos, cukos,
-             cudosq, cukosq, adj_bal, adj_bal_uah)
-      select /*+ PARALLEL( 4 )*/ p_report_date, kf,
-             acc, rnk, dos, kos, ost, dosq, kosq, ostq,
-             crdos, crkos, crdosq, crkosq, cudos, cukos, cudosq, cukosq,
-             ost - crdos + crkos, ostq - crdosq + crkosq
+           ( REPORT_DATE, KF, ACC_ID, CUST_ID, DOS, KOS, OST, DOSQ, KOSQ, OSTQ
+           , CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ
+           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH, ADJ_BAL, ADJ_BAL_UAH )
+      select /*+ PARALLEL( 4 )*/ p_report_date, KF
+           , ACC, RNK, DOS, KOS, OST, DOSQ, KOSQ, OSTQ
+           , CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ
+           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH
+           , OST  - CRDOS  + CRKOS
+           , OSTQ - CRDOSQ + CRKOSQ
         from AGG_MONBALS
        where FDAT = trunc(p_report_date,'mm')
-         and kf = p_kf;
+         and KF   = p_kf;
 
     end if;
 
@@ -2049,11 +2588,13 @@ is
 
     end if;
 
+    bars_audit.trace( '%s: Exit.', title );
+
   exception
     when others then
       LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
-  end p_load_monthbal;
+  end P_LOAD_MONTHBAL;
 
   --------------------------------------------------------------------------------
   --
@@ -2073,9 +2614,12 @@ is
   %version 1.0
   %usage   Наповнення оперативної (проміжної/non versioned) вітрини річних залишків та оборотів
   */
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.LOAD_ADL_DOC_RPT_DTL';
+    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.LOAD_BAL_YEARLY';
     l_object_name         varchar2(100) := 'NBUR_DM_BALANCES_YEARLY';
   begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
 
     l_object_id := f_get_object_id_by_name(l_object_name);
 
@@ -2131,6 +2675,8 @@ is
     else
       p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
     end if;
+
+    bars_audit.trace( '%s: Exit.', title );
 
   exception
     when others then
@@ -2201,12 +2747,12 @@ is
 
     else -- for one KF
 
-      insert /* APPEND */
+      insert /*+ APPEND */
         into NBUR_DM_TRANSACTIONS
            ( REPORT_DATE, KF, REF, STMT, SOS, TT, TXT, KV, BAL, BAL_UAH
            , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
            , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
-      select /*+ ORDERED USE_HASH( d k ) */ p_report_date, p_kf, d.REF, d.STMT, d.SOS, d.TT, d.TXT, d.KV, d.S, d.SQ
+      select /*+ ORDERED USE_HASH( d k ) PARALLEL( 16 ) */ p_report_date, p_kf, d.REF, d.STMT, d.SOS, d.TT, d.TXT, d.KV, d.S, d.SQ
            , d.CUST_ID as CUST_ID_DB, d.ACC as ACC_ID_DB, d.ACC_NUM as ACC_NUM_DB, d.ACC_TYPE as ACC_TYPE_DB, d.nbs as R020_DB, d.ob22 as OB22_DB, d.NBUC as NBUC_DB
            , k.CUST_ID as CUST_ID_CR, k.ACC as ACC_ID_CR, k.ACC_NUM as ACC_NUM_CR, k.ACC_TYPE as ACC_TYPE_CR, k.nbs as R020_CR, k.OB22 as OB22_CR, k.NBUC as NBUC_CR
         from ( select/*+ FULL( a ) USE_HASH( a p ) */ p.REF, p.STMT, p.ACC
@@ -2844,13 +3390,15 @@ is
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
-           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R )
+           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S )
       select p_report_date, KF, REF
            , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
            , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S
         from ( select w.KF
                     , w.REF
                     , w.TAG
@@ -2871,7 +3419,8 @@ is
                                ,'57C  ','57D  ','58   ','58A  ','58D  ','59   '
                                ,'59A  ','61   ','70   ','71A  ','71B  ','71F  '
                                ,'71G  ','72   ','76   ','77A  ','77B  ','77T  '
-                               ,'79   ','NOS_A','NOS_B','NOS_R','SWRCV')
+                               ,'79   ','NOS_A','NOS_B','NOS_R','SWRCV'
+                               ,'ASP_K','ASP_N','ASP_S')
              ) pivot ( max(VALUE) for TAG in ('11R  ' as SW11R, '11S  ' as SW11S, '13C  ' as SW13C
                                              ,'13С  ' as SW13С, '20   ' as SW20,  '21   ' as SW21
                                              ,'23B  ' as SW23B, '23E  ' as SW23E, '25   ' as SW25
@@ -2893,7 +3442,8 @@ is
                                              ,'71G  ' as SW71G, '72   ' as SW72,  '76   ' as SW76
                                              ,'77A  ' as SW77A, '77B  ' as SW77B, '77T  ' as SW77T
                                              ,'79   ' as SW79,  'SWRCV' as SWRCV
-                                             ,'NOS_A' as NOS_A, 'NOS_B' as NOS_B, 'NOS_R' as NOS_R)
+                                             ,'NOS_A' as NOS_A, 'NOS_B' as NOS_B, 'NOS_R' as NOS_R
+                                             ,'ASP_K' as ASP_K, 'ASP_N' as ASP_N, 'ASP_S' as ASP_S)
                      );
 
     else -- for one KF
@@ -2905,13 +3455,15 @@ is
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
-           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R )
+           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S )
       select /*+ PARALLEL( 8 ) */ p_report_date, KF, REF
            , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
            , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
            , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
            , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
            , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S
         from ( select w.KF
                     , w.REF
                     , w.TAG
@@ -2937,7 +3489,8 @@ is
                                ,'57C  ','57D  ','58   ','58A  ','58D  ','59   '
                                ,'59A  ','61   ','70   ','71A  ','71B  ','71F  '
                                ,'71G  ','72   ','76   ','77A  ','77B  ','77T  '
-                               ,'79   ','NOS_A','NOS_B','NOS_R','SWRCV')
+                               ,'79   ','NOS_A','NOS_B','NOS_R','SWRCV'
+                               ,'ASP_K','ASP_N','ASP_S')
              ) pivot ( max(VALUE) for TAG in ('11R  ' as SW11R, '11S  ' as SW11S, '13C  ' as SW13C
                                              ,'13С  ' as SW13С, '20   ' as SW20,  '21   ' as SW21
                                              ,'23B  ' as SW23B, '23E  ' as SW23E, '25   ' as SW25
@@ -2959,7 +3512,8 @@ is
                                              ,'71G  ' as SW71G, '72   ' as SW72,  '76   ' as SW76
                                              ,'77A  ' as SW77A, '77B  ' as SW77B, '77T  ' as SW77T
                                              ,'79   ' as SW79,  'SWRCV' as SWRCV
-                                             ,'NOS_A' as NOS_A, 'NOS_B' as NOS_B, 'NOS_R' as NOS_R)
+                                             ,'NOS_A' as NOS_A, 'NOS_B' as NOS_B, 'NOS_R' as NOS_R
+                                             ,'ASP_K' as ASP_K, 'ASP_N' as ASP_N, 'ASP_S' as ASP_S)
                      );
 
     end if;
@@ -4926,13 +5480,13 @@ is
   %param p_kf          - Код фiлiалу (МФО)
   %param p_version_id  - Iдентифiкатор версії
 
-  %version 1.0
+  %version 1.1
   %usage   Наповнення консолідованиї вітрини даних фінансових транзакцій за місяць, в т.ч. коригуючими
   */
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.LOAD_TRANSACTIONS_CNSL';
-    l_object_name         varchar2(100) := 'NBUR_DM_TRANSACTIONS_CNSL';
-    l_txn_dm_id           pls_integer   := f_get_object_id_by_name('NBUR_DM_TRANSACTIONS');
-
+    title      constant   varchar2(64) := $$PLSQL_UNIT||'.LOAD_TRANSACTIONS_CNSL';
+    obj_nm     constant   nbur_ref_objects.object_name%type := 'NBUR_DM_TRANSACTIONS_CNSL';
+    l_obj_id              nbur_ref_objects.id%type := F_GET_OBJECT_ID_BY_NAME( obj_nm );
+    l_txn_dm_id           nbur_ref_objects.id%type := F_GET_OBJECT_ID_BY_NAME('NBUR_DM_TRANSACTIONS');
     l_rpt_mo_frst_bnk_dt  date;
     l_rpt_mo_last_bnk_dt  date;
     l_nxt_mo_frst_bnk_dt  date;
@@ -4941,8 +5495,6 @@ is
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
                     , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
-
-    l_object_id := f_get_object_id_by_name(l_object_name);
 
 --  -- останній робочий день попереднього міс.
 --  l_prv_mo_last_bnk_dt := DAT_NEXT_U( trunc(p_report_date,'MM'), -1 );
@@ -4968,109 +5520,281 @@ is
                     , title, to_char(l_rpt_mo_frst_bnk_dt,fmt_dt), to_char(l_rpt_mo_last_bnk_dt,fmt_dt)
                            , to_char(l_nxt_mo_frst_bnk_dt,fmt_dt), to_char(l_nxt_mo_last_bnk_dt,fmt_dt) );
 
-    p_start_load_object( l_object_id, l_object_name, p_version_id, p_report_date, p_kf, systimestamp );
+    p_start_load_object( l_obj_id, obj_nm, p_version_id, p_report_date, p_kf, systimestamp );
 
     -- CHECK_OBJECT_DEPENDENCIES
     -- ( p_rpt_dt  => p_report_date
     -- , p_kf      => p_kf
     -- , p_vrsn_id => p_version_id
-    -- , p_obj_id  => l_object_id
+    -- , p_obj_id  => l_obj_id
     -- );
+
+    CHECK_OBJECT_EXISTENCE
+    ( p_obj_id      => l_txn_dm_id
+    , p_kf          => p_kf
+    , p_frst_rpt_dt => l_rpt_mo_frst_bnk_dt
+    , p_last_rpt_dt => l_rpt_mo_last_bnk_dt
+    );
+
+    if ( DATA_RELEVANCE( l_txn_dm_id, l_obj_id, p_kf, l_rpt_mo_frst_bnk_dt, l_rpt_mo_last_bnk_dt ) )
+    then
+
+      l_rowcount := null;
+
+    else
+
+      if ( ( p_kf Is Null ) AND ( l_usr_mfo Is Null ) )
+      then -- for all KF
+
+        insert /*+ APPEND */
+          into NBUR_DM_TRANSACTIONS_CNSL
+             ( REPORT_DATE, KF, REF, TT, CCY_ID, BAL, BAL_UAH, DOC_VAL_DT
+             , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+             , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
+        select /*+ PARALLEL( 26 ) */
+               txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH, doc.VDAT
+             , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+             , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
+          from NBUR_DM_TRANSACTIONS_ARCH txn
+          join NBUR_QUEUE_OBJECTS q
+            on ( q.KF   = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_obj_id )
+          join OPER doc
+            on ( doc.KF = txn.KF AND doc.REF = txn.REF )
+         where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select report_date, kf, max(version_id)
+                                                                  from NBUR_LST_OBJECTS
+                                                                 where REPORT_DATE between l_rpt_mo_frst_bnk_dt
+                                                                                       and l_rpt_mo_last_bnk_dt
+                                                                   and OBJECT_ID = l_txn_dm_id
+                                                                   and VLD = 0
+                                                                 group by report_date, kf )
+           and doc.VDAT between l_rpt_mo_frst_bnk_dt
+                            and l_rpt_mo_last_bnk_dt
+           and doc.VOB not in ( 96, 99 )
+           and doc.SOS = 5
+         union all
+        select /*+ PARALLEL( 26 ) */
+               txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH, doc.VDAT
+             , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+             , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
+          from NBUR_DM_TRANSACTIONS_ARCH txn
+          join NBUR_QUEUE_OBJECTS q
+            on ( q.KF   = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_obj_id )
+          join OPER doc
+            on ( doc.KF = txn.KF AND doc.REF = txn.REF )
+         where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
+                                                                  from NBUR_LST_OBJECTS
+                                                                 where REPORT_DATE between l_nxt_mo_frst_bnk_dt
+                                                                                       and l_nxt_mo_last_bnk_dt
+                                                                   and OBJECT_ID = l_txn_dm_id
+                                                                   and VLD = 0
+                                                                 group by report_date, kf )
+           and doc.VDAT = l_rpt_mo_last_bnk_dt
+           and doc.VOB in ( 96, 99 )
+           and doc.SOS = 5
+        ;
+
+        l_rowcount := sql%rowcount;
+
+      else -- for one KF
+
+        l_rowcount := 0;
+
+        for c in ( select REPORT_DATE as RPT_DT
+                        , KF
+                        , max(VERSION_ID) as VRSN_ID
+                     from NBUR_LST_OBJECTS
+                    where REPORT_DATE between l_rpt_mo_frst_bnk_dt
+                                          and l_rpt_mo_last_bnk_dt
+                      and KF        = p_kf
+                      and OBJECT_ID = l_txn_dm_id
+                      and VLD = 0
+                    group by REPORT_DATE, KF )
+        loop
+
+          insert /*+ APPEND */
+            into NBUR_DM_TRANSACTIONS_CNSL
+               ( REPORT_DATE, KF, REF, TT, CCY_ID, BAL, BAL_UAH, DOC_VAL_DT
+               , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+               , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
+          select /*+ ORDERED FULL( txn ) USE_HASH( doc ) */
+                 txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH, doc.VDAT
+               , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+               , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
+            from NBUR_DM_TRANSACTIONS_ARCH txn
+            join OPER doc
+              on ( doc.KF = txn.KF AND doc.REF = txn.REF )
+           where txn.REPORT_DATE = c.RPT_DT
+             and txn.KF          = c.KF
+             and txn.VERSION_ID  = c.VRSN_ID
+             and doc.VDAT       >= l_rpt_mo_frst_bnk_dt
+             and doc.VOB not in ( 96, 99 )
+             and doc.SOS = 5;
+
+          l_rowcount := l_rowcount + sql%rowcount;
+
+          commit;
+
+        end loop;
+
+        insert /*+ APPEND */
+          into NBUR_DM_TRANSACTIONS_CNSL
+             ( REPORT_DATE, KF, REF, TT, CCY_ID, BAL, BAL_UAH, DOC_VAL_DT
+             , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+             , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
+        select /*+ PARALLEL( 8 ) */
+               txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH, doc.VDAT
+             , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
+             , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
+          from NBUR_DM_TRANSACTIONS_ARCH txn
+          join OPER doc
+            on ( doc.KF = txn.KF AND doc.REF = txn.REF )
+         where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
+                                                                  from NBUR_LST_OBJECTS
+                                                                 where REPORT_DATE between l_nxt_mo_frst_bnk_dt
+                                                                                       and l_nxt_mo_last_bnk_dt
+                                                                   and KF        = p_kf
+                                                                   and OBJECT_ID = l_txn_dm_id
+                                                                   and VLD = 0
+                                                                 group by REPORT_DATE, KF )
+           and doc.VDAT = l_rpt_mo_last_bnk_dt
+           and doc.VOB in ( 96, 99 )
+           and doc.SOS = 5;
+
+        l_rowcount := l_rowcount + sql%rowcount;
+
+      end if;
+
+      commit;
+
+      bars_audit.trace( '%s: Inserted %s records.', title, to_char(l_rowcount) );
+
+    end if;
+
+    p_finish_load_object( l_obj_id, p_version_id, p_report_date, p_kf, l_rowcount );
+
+    ---
+    -- till procedure PARSING_QUEUE_OBJECTS is not finished
+    ---
+    if ( REQUIRED_GATHER_STATS( obj_nm, p_kf, l_rowcount ) )
+    then
+
+      GATHER_TABLE_STATS
+      ( p_tbl_nm => obj_nm
+      , p_kf     => p_kf );
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  exception
+    when OTHERS then
+      LOG_ERRORS( obj_nm||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      p_finish_load_object( l_obj_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
+  end LOAD_TRANSACTIONS_CNSL;
+
+  --
+  --
+  --
+  procedure LOAD_ADL_DOC_RPT_DTL_CNSL
+  ( p_report_date  in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type default null
+  , p_version_id   in     nbur_lst_objects.version_id%type
+  ) is
+    /**
+  <b>LOAD_PROFIT_AND_LOSS</b> - наповнення даними консолідованиї вітрини додаткових реквізитів фінансових документів
+  %param p_report_date - Звітна дата
+  %param p_kf          - Код фiлiалу (МФО)
+  %param p_version_id  - Iдентифiкатор версії
+
+  %version 1.1
+  %usage   Наповнення консолідованиї вітрини даних додаткових реквізитів фінансових документів
+  */
+    title      constant   varchar2(64) := $$PLSQL_UNIT||'.LOAD_ADL_DOC_RPT_DTL_CNSL';
+    obj_nm     constant   nbur_ref_objects.object_name%type := 'NBUR_DM_ADL_DOC_RPT_DTL_CNSL';
+    l_obj_id              nbur_ref_objects.id%type := F_GET_OBJECT_ID_BY_NAME( obj_nm );
+    l_dtl_dm_id           nbur_ref_objects.id%type := F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ADL_DOC_RPT_DTL');
+    l_rpt_mo_frst_bnk_dt  date;
+    l_rpt_mo_last_bnk_dt  date;
+--  l_nxt_mo_frst_bnk_dt  date;
+--  l_nxt_mo_last_bnk_dt  date;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+
+    -- перший робочий день звітного міс.
+    if ( trunc(p_report_date,'MM') = trunc(p_report_date,'YYYY') )
+    then -- без проводок перекриття року (завжди виконуються датою 01 січня)
+      l_rpt_mo_frst_bnk_dt := DAT_NEXT_U( trunc(p_report_date,'MM'), 1 );
+    else
+      l_rpt_mo_frst_bnk_dt := DAT_NEXT_U( trunc(p_report_date,'MM'), 0 );
+    end if;
+
+    -- останній робочий день звітного міс.
+    l_rpt_mo_last_bnk_dt := DAT_NEXT_U( add_months( trunc(p_report_date,'MM'), 1 ), -1 );
+
+    p_start_load_object( l_obj_id, obj_nm, p_version_id, p_report_date, p_kf, systimestamp );
+
+    CHECK_OBJECT_EXISTENCE
+    ( p_obj_id      => l_dtl_dm_id
+    , p_kf          => p_kf
+    , p_frst_rpt_dt => l_rpt_mo_frst_bnk_dt
+    , p_last_rpt_dt => l_rpt_mo_last_bnk_dt
+    );
 
     if ( ( p_kf Is Null ) AND ( l_usr_mfo Is Null ) )
     then -- for all KF
 
       insert /*+ APPEND */
-        into NBUR_DM_TRANSACTIONS_CNSL
-           ( REPORT_DATE, KF, REF, TT, CCY_ID, BAL, BAL_UAH
-           , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
-           , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
-      select /*+ PARALLEL( 16 ) */
-             txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH
-           , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
-           , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
-        from NBUR_DM_TRANSACTIONS_ARCH txn
-        join NBUR_QUEUE_OBJECTS q
-          on ( q.KF   = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_object_id )
-        join OPER doc
-          on ( doc.KF = txn.KF AND doc.REF = txn.REF )
-       where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select report_date, kf, max(version_id)
+        into NBUR_DM_ADL_DOC_RPT_DTL_CNSL
+           ( REPORT_DATE, KF, REF
+           , D1#70, D2#70, D3#70, D4#70, D5#70, D6#70, D7#70, D8#70, D9#70
+           , DA#70, DB#70, DD#70, D1#E2, D6#E2, D7#E2, D8#E2, D1#E9, D1#C9, D6#C9
+           , DE#C9, D1#D3, D1#F1, D1#27, D1#39, D1#44, D1#73, D2#73
+           , D020,  BM__C, KURS,  D1#2D, KOD_B, KOD_G, KOD_N, TRF_R, TRF_D
+           , DOC_T, DOC_A, DOC_S, DOC_N, DOC_D, REZID, NATIO, OKPO,  POKPO, OOKPO )
+      select /*+ PARALLEL( 26 ) */
+             dtl.REPORT_DATE, dtl.KF, dtl.REF
+           , D1#70, D2#70, D3#70, D4#70, D5#70, D6#70, D7#70, D8#70, D9#70
+           , DA#70, DB#70, DD#70, D1#E2, D6#E2, D7#E2, D8#E2, D1#E9, D1#C9, D6#C9
+           , DE#C9, D1#D3, D1#F1, D1#27, D1#39, D1#44, D1#73, D2#73
+           , D020,  BM__C, KURS,  D1#2D, KOD_B, KOD_G, KOD_N, TRF_R, TRF_D
+           , DOC_T, DOC_A, DOC_S, DOC_N, DOC_D, REZID, NATIO, OKPO,  POKPO, OOKPO
+        from NBUR_DM_ADL_DOC_RPT_DTL_ARCH dtl
+       where ( dtl.REPORT_DATE, dtl.KF, dtl.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
                                                                 from NBUR_LST_OBJECTS
                                                                where REPORT_DATE between l_rpt_mo_frst_bnk_dt
                                                                                      and l_rpt_mo_last_bnk_dt
-                                                                 and OBJECT_ID = l_txn_dm_id
+                                                                 and OBJECT_ID = l_dtl_dm_id
                                                                  and VLD = 0
-                                                               group by report_date, kf )
-         and doc.VDAT between l_rpt_mo_frst_bnk_dt
-                          and l_rpt_mo_last_bnk_dt
-         and doc.VOB not in ( 96, 99 )
-         and doc.SOS = 5
-       union all
-      select /*+ PARALLEL( 16 ) */
-             txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH
-           , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
-           , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
-        from NBUR_DM_TRANSACTIONS_ARCH txn
-        join NBUR_QUEUE_OBJECTS q
-          on ( q.KF   = txn.KF AND q.REPORT_DATE = p_report_date AND q.ID = l_object_id )
-        join OPER doc
-          on ( doc.KF = txn.KF AND doc.REF = txn.REF )
-       where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
-                                                                from NBUR_LST_OBJECTS
-                                                               where REPORT_DATE between l_nxt_mo_frst_bnk_dt
-                                                                                     and l_nxt_mo_last_bnk_dt
-                                                                 and OBJECT_ID = l_txn_dm_id
-                                                                 and VLD = 0
-                                                               group by report_date, kf )
-         and doc.VDAT = l_rpt_mo_last_bnk_dt
-         and doc.VOB in ( 96, 99 )
-         and doc.SOS = 5
+                                                               group by REPORT_DATE, KF )
       ;
 
     else -- for one KF
 
-      insert /* APPEND */
-        into NBUR_DM_TRANSACTIONS_CNSL
-           ( REPORT_DATE, KF, REF, TT, CCY_ID, BAL, BAL_UAH
-           , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
-           , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR )
-      select /*+ PARALLEL( 8 ) */
-             txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH
-           , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
-           , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
-        from NBUR_DM_TRANSACTIONS_ARCH txn
-        join OPER doc
-          on ( doc.KF = txn.KF AND doc.REF = txn.REF )
-       where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select REPORT_DATE, KF, max(version_id)
+      insert /*+ APPEND */
+        into NBUR_DM_ADL_DOC_RPT_DTL_CNSL
+           ( REPORT_DATE, KF, REF
+           , D1#70, D2#70, D3#70, D4#70, D5#70, D6#70, D7#70, D8#70, D9#70
+           , DA#70, DB#70, DD#70, D1#E2, D6#E2, D7#E2, D8#E2, D1#E9, D1#C9, D6#C9
+           , DE#C9, D1#D3, D1#F1, D1#27, D1#39, D1#44, D1#73, D2#73
+           , D020,  BM__C, KURS,  D1#2D, KOD_B, KOD_G, KOD_N, TRF_R, TRF_D
+           , DOC_T, DOC_A, DOC_S, DOC_N, DOC_D, REZID, NATIO, OKPO,  POKPO, OOKPO )
+      select /*+ PARALLEL( 16 ) */ 
+             dtl.REPORT_DATE, dtl.KF, dtl.REF
+           , D1#70, D2#70, D3#70, D4#70, D5#70, D6#70, D7#70, D8#70, D9#70
+           , DA#70, DB#70, DD#70, D1#E2, D6#E2, D7#E2, D8#E2, D1#E9, D1#C9, D6#C9
+           , DE#C9, D1#D3, D1#F1, D1#27, D1#39, D1#44, D1#73, D2#73
+           , D020,  BM__C, KURS,  D1#2D, KOD_B, KOD_G, KOD_N, TRF_R, TRF_D
+           , DOC_T, DOC_A, DOC_S, DOC_N, DOC_D, REZID, NATIO, OKPO,  POKPO, OOKPO
+        from NBUR_DM_ADL_DOC_RPT_DTL_ARCH dtl
+       where ( dtl.REPORT_DATE, dtl.KF, dtl.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
                                                                 from NBUR_LST_OBJECTS
-                                                               where report_date between l_rpt_mo_frst_bnk_dt
+                                                               where REPORT_DATE between l_rpt_mo_frst_bnk_dt
                                                                                      and l_rpt_mo_last_bnk_dt
-                                                                 and kf        = p_kf
-                                                                 and object_id = l_txn_dm_id
-                                                                 and OBJECT_STATUS in ('FINISHED','BLOCKED')
-                                                               group by report_date, kf )
-         and doc.VDAT >= l_rpt_mo_frst_bnk_dt
-         and doc.VOB not in ( 96, 99 )
-         and doc.SOS = 5
-       union all
-      select /*+ PARALLEL( 8 ) */
-             txn.REPORT_DATE, txn.KF, txn.REF, txn.TT, txn.KV, txn.BAL, txn.BAL_UAH
-           , CUST_ID_DB, ACC_ID_DB, ACC_NUM_DB, ACC_TYPE_DB, R020_DB, OB22_DB, NBUC_DB
-           , CUST_ID_CR, ACC_ID_CR, ACC_NUM_CR, ACC_TYPE_CR, R020_CR, OB22_CR, NBUC_CR
-        from NBUR_DM_TRANSACTIONS_ARCH txn
-        join OPER doc
-          on ( doc.KF = txn.KF AND doc.REF = txn.REF )
-       where ( txn.REPORT_DATE, txn.KF, txn.VERSION_ID ) in ( select report_date, kf, max(version_id)
-                                                                from NBUR_LST_OBJECTS
-                                                               where report_date between l_nxt_mo_frst_bnk_dt
-                                                                                     and l_nxt_mo_last_bnk_dt
-                                                                 and kf        = p_kf
-                                                                 and object_id = l_txn_dm_id
-                                                                 and OBJECT_STATUS in ('FINISHED','BLOCKED')
-                                                               group by report_date, kf )
-         and doc.VDAT = l_rpt_mo_last_bnk_dt
-         and doc.VOB in ( 96, 99 )
-         and doc.SOS = 5
+                                                                 and OBJECT_ID = l_dtl_dm_id
+                                                                 and VLD = 0
+                                                               group by REPORT_DATE, KF )
       ;
 
     end if;
@@ -5081,17 +5805,17 @@ is
 
     bars_audit.trace( '%s: Inserted %s records.', title, to_char(l_rowcount) );
 
-    p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, l_rowcount );
+    p_finish_load_object( l_obj_id, p_version_id, p_report_date, p_kf, l_rowcount );
 
     ---
     -- till procedure PARSING_QUEUE_OBJECTS is not finished
     ---
-    if ( REQUIRED_GATHER_STATS( l_object_name, p_kf, l_rowcount ) )
+    if ( REQUIRED_GATHER_STATS( obj_nm, p_kf, l_rowcount ) )
     then
 
       GATHER_TABLE_STATS
-      ( p_tbl_nm   => l_object_name
-      , p_kf       => p_kf );
+      ( p_tbl_nm => obj_nm
+      , p_kf     => p_kf );
 
     end if;
 
@@ -5099,9 +5823,148 @@ is
 
   exception
     when OTHERS then
-      LOG_ERRORS(l_object_name||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
-      p_finish_load_object( l_object_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
-  end LOAD_TRANSACTIONS_CNSL;
+      LOG_ERRORS( obj_nm||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      p_finish_load_object( l_obj_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
+  end LOAD_ADL_DOC_RPT_DTL_CNSL;
+
+  --
+  --
+  --
+  procedure LOAD_ADL_DOC_SWT_DTL_CNSL
+  ( p_report_date  in     nbur_lst_objects.report_date%type
+  , p_kf           in     nbur_lst_objects.kf%type default null
+  , p_version_id   in     nbur_lst_objects.version_id%type
+  ) is
+    /**
+  <b>LOAD_PROFIT_AND_LOSS</b> - наповнення даними консолідованиї вітрини SWIFT реквізитів фінансових документів
+  %param p_report_date - Звітна дата
+  %param p_kf          - Код фiлiалу (МФО)
+  %param p_version_id  - Iдентифiкатор версії
+
+  %version 1.1
+  %usage   Наповнення консолідованиї вітрини даних SWIFT реквізитів фінансових документів
+  */
+    title      constant   varchar2(64) := $$PLSQL_UNIT||'.LOAD_ADL_DOC_SWT_DTL_CNSL';
+    obj_nm     constant   nbur_ref_objects.object_name%type := 'NBUR_DM_ADL_DOC_SWT_DTL_CNSL';
+    l_obj_id              nbur_ref_objects.id%type := F_GET_OBJECT_ID_BY_NAME( obj_nm );
+    l_swt_dm_id           nbur_ref_objects.id%type := F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ADL_DOC_SWT_DTL');
+    l_rpt_mo_frst_bnk_dt  date;
+    l_rpt_mo_last_bnk_dt  date;
+--  l_nxt_mo_frst_bnk_dt  date;
+--  l_nxt_mo_last_bnk_dt  date;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s, version_id =%s ).'
+                    , title, to_char(p_report_date,fmt_dt), p_kf, to_char(p_version_id) );
+
+    -- перший робочий день звітного міс.
+    if ( trunc(p_report_date,'MM') = trunc(p_report_date,'YYYY') )
+    then -- без проводок перекриття року (завжди виконуються датою 01 січня)
+      l_rpt_mo_frst_bnk_dt := DAT_NEXT_U( trunc(p_report_date,'MM'), 1 );
+    else
+      l_rpt_mo_frst_bnk_dt := DAT_NEXT_U( trunc(p_report_date,'MM'), 0 );
+    end if;
+
+    -- останній робочий день звітного міс.
+    l_rpt_mo_last_bnk_dt := DAT_NEXT_U( add_months( trunc(p_report_date,'MM'), 1 ), -1 );
+
+    p_start_load_object( l_obj_id, obj_nm, p_version_id, p_report_date, p_kf, systimestamp );
+
+    CHECK_OBJECT_EXISTENCE
+    ( p_obj_id      => l_swt_dm_id
+    , p_kf          => p_kf
+    , p_frst_rpt_dt => l_rpt_mo_frst_bnk_dt
+    , p_last_rpt_dt => l_rpt_mo_last_bnk_dt
+    );
+
+    if ( ( p_kf Is Null ) AND ( l_usr_mfo Is Null ) )
+    then -- for all KF
+
+      insert /*+ APPEND */
+        into NBUR_DM_ADL_DOC_SWT_DTL_CNSL
+           ( REPORT_DATE, KF, REF
+           , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
+           , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
+           , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
+           , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
+           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S )
+      select /*+ PARALLEL( 26 ) */
+             dtl.REPORT_DATE, dtl.KF, dtl.REF
+           , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
+           , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
+           , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
+           , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
+           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S
+        from NBUR_DM_ADL_DOC_SWT_DTL_ARCH dtl
+       where ( dtl.REPORT_DATE, dtl.KF, dtl.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
+                                                                from NBUR_LST_OBJECTS
+                                                               where REPORT_DATE between l_rpt_mo_frst_bnk_dt
+                                                                                     and l_rpt_mo_last_bnk_dt
+                                                                 and OBJECT_ID = l_swt_dm_id
+                                                                 and VLD = 0
+                                                               group by REPORT_DATE, KF )
+      ;
+
+    else -- for one KF
+
+      insert /*+ APPEND */
+        into NBUR_DM_ADL_DOC_SWT_DTL_CNSL
+           ( REPORT_DATE, KF, REF
+           , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
+           , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
+           , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
+           , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
+           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S )
+      select /*+ PARALLEL( 16 ) */ 
+             dtl.REPORT_DATE, dtl.KF, dtl.REF
+           , SW11R, SW11S, SW13C, SW20,  SW21,  SW23B, SW23E, SW25,  SW26T, SW30,  SW32A, SW32B
+           , SW32C, SW32D, SW33B, SW36,  SW50,  SW50A, SW50F, SW50K, SW51A, SW52A, SW52B, SW52D, SW53A
+           , SW53B, SW53D, SW54,  SW54A, SW54B, SW54D, SW55A, SW55B, SW55D, SW56,  SW56A, SW56C, SW56D
+           , SW57,  SW57A, SW57B, SW57C, SW57D, SW58,  SW58A, SW58D, SW59,  SW59A, SW61,  SW70,  SW71A
+           , SW71B, SW71F, SW71G, SW72,  SW76,  SW77A, SW77B, SW77T, SW79,  SWRCV, NOS_A, NOS_B, NOS_R
+           , ASP_K, ASP_N, ASP_S
+        from NBUR_DM_ADL_DOC_SWT_DTL_ARCH dtl
+       where ( dtl.REPORT_DATE, dtl.KF, dtl.VERSION_ID ) in ( select REPORT_DATE, KF, max(VERSION_ID)
+                                                                from NBUR_LST_OBJECTS
+                                                               where REPORT_DATE between l_rpt_mo_frst_bnk_dt
+                                                                                     and l_rpt_mo_last_bnk_dt
+                                                                 and OBJECT_ID = l_swt_dm_id
+                                                                 and VLD = 0
+                                                               group by REPORT_DATE, KF )
+      ;
+
+    end if;
+
+    l_rowcount := sql%rowcount;
+
+    commit;
+
+    bars_audit.trace( '%s: Inserted %s records.', title, to_char(l_rowcount) );
+
+    p_finish_load_object( l_obj_id, p_version_id, p_report_date, p_kf, l_rowcount );
+
+    ---
+    -- till procedure PARSING_QUEUE_OBJECTS is not finished
+    ---
+    if ( REQUIRED_GATHER_STATS( obj_nm, p_kf, l_rowcount ) )
+    then
+
+      GATHER_TABLE_STATS
+      ( p_tbl_nm => obj_nm
+      , p_kf     => p_kf );
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  exception
+    when OTHERS then
+      LOG_ERRORS( obj_nm||' for vrsn_id='||p_version_id||' DAT='||to_char(p_report_date, fmt_dt)||' KF='||p_kf, l_err_rec_id );
+      p_finish_load_object( l_obj_id, p_version_id, p_report_date, p_kf, null, l_err_rec_id );
+  end LOAD_ADL_DOC_SWT_DTL_CNSL;
 
   --
   --
@@ -5344,7 +6207,7 @@ is
 --  %version 1.0
 --  %usage   Наповнення оперативної (проміжної/non versioned) вітрини ...
 --  */
---    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.LOAD_***';
+--    title     constant    varchar2(64)  := $$PLSQL_UNIT||'.LOAD_***';
 --    l_object_name         varchar2(100) := 'NBUR_DM_***';
 --  begin
 --
@@ -5375,7 +6238,7 @@ is
 --    else -- for one KF
 --
 --      insert /*+ APPEND */
---        into NBUR_DM_AGRM_RATES
+--        into NBUR_DM_***
 --           ( REPORT_DATE, KF
 --           )
 --      select p_report_date, a.KF
@@ -5403,217 +6266,6 @@ is
   --
   --
   --
-  function GET_TAB_COL_LIST
-  ( p_tab_nm       in     nbur_ref_objects.object_name%type
-  ) return varchar
-  DETERMINISTIC
-  RESULT_CACHE
-  is
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.GET_TAB_COL_LIST';
-    l_col_lst             varchar2(3072);
-    l_tab_nm              varchar2(30);
-  begin
-
-    l_tab_nm := upper(p_tab_nm);
-
-    begin
-      select listagg( COLUMN_NAME, ', ' ) WITHIN GROUP ( ORDER BY COLUMN_ID )
-        into l_col_lst
-        from ALL_TAB_COLS
-       where TABLE_NAME = l_tab_nm
-         and OWNER = 'BARS'
-         and VIRTUAL_COLUMN = 'NO';
-    exception
-      when NO_DATA_FOUND then
-        l_col_lst := null;
-    end;
-
---  bars_audit.trace( '%s: Exit with ( %s ).', title, l_col_lst );
-
-    return l_col_lst;
-
-  end GET_TAB_COL_LIST;
-
-  --
-  --
-  --
-  procedure MOVE_DATA_TO_ARCH
-  ( p_obj_nm       in     nbur_ref_objects.object_name%type
-  , p_kf           in     nbur_lst_objects.kf%type
-  , p_vrsn_id      in     nbur_lst_objects.version_id%type
-  ) is
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.MOVE_DATA_TO_ARCH';
-    l_arc_tab_nm          varchar2(30);
-    l_arc_col_lst         varchar2(3072);
-    l_obj_col_lst         varchar2(3072);
-  begin
-
-    bars_audit.trace( '%s: Entry with ( obj_nm=%s, kf=%s, vrsn_id=%s ).'
-                    , title, p_obj_nm, p_kf, to_char(p_vrsn_id) );
-
-    l_arc_tab_nm  := p_obj_nm||'_ARCH';
-
-    l_arc_col_lst := GET_TAB_COL_LIST( l_arc_tab_nm );
-
-    l_obj_col_lst := replace( l_arc_col_lst, 'VERSION_ID', ':p_vrsn_id' );
-
-    dbms_application_info.set_client_info( 'Moving data into table '||l_arc_tab_nm );
-
-    begin
-      if ( p_kf Is Null )
-      then
-        -- '/*+ PARALLEL( '||l_dop||' ) */'
-        execute immediate 'insert /*+ APPEND */'                       ||chr(10)||
-                          '  into '||l_arc_tab_nm                      ||chr(10)||
-                          '     ( '||l_arc_col_lst||' )'               ||chr(10)||
-                          'select /*+ PARALLEL( 8 ) */ '||l_obj_col_lst||chr(10)||
-                          '  from '||p_obj_nm
-        using p_vrsn_id;
-      else
-        execute immediate 'insert /* APPEND */'                        ||chr(10)||
-                          '  into '||l_arc_tab_nm                      ||chr(10)||
-                          '     ( '||l_arc_col_lst||' )'               ||chr(10)||
-                          'select /*+ PARALLEL( 8 ) */ '||l_obj_col_lst||chr(10)||
-                          '  from '||p_obj_nm                          ||chr(10)||
-                          ' where KF          = :p_kf'
-        using p_vrsn_id, p_kf;
-      end if;
-    exception
-      when OTHERS then
-        bars_audit.error( title||': ( obj_nm='||p_obj_nm||')'
-                               ||chr(10)||dbms_utility.format_error_stack()
-                               ||chr(10)||dbms_utility.format_error_backtrace() );
-    end;
-
-    dbms_application_info.set_client_info( null );
-
-    bars_audit.trace( '%s: Exit.', title );
-
-  end MOVE_DATA_TO_ARCH;
-
-  --
-  --
-  --
-  procedure CREATE_RANGE_PARTITION
-  ( p_dm_tab_nm    in     tbl_nm_subtype
-  , p_rpt_dt       in     nbur_dm_agrm_accounts_arch.report_date%type
-  , p_kf           in     nbur_dm_agrm_accounts_arch.kf%type
-  , p_vrsn_id      in     nbur_dm_agrm_accounts_arch.version_id%type default null
-  ) is
-  /**
-  <b>CREATE_RANGE_PARTITION</b> - створення сегменту таблиці
-  %param p_report_date - Звітна дата
-  %param p_kf          - Код фiлiалу (МФО)
-
-  %version 1.7 (03/08/2016)
-  %usage   Перенесення даних з оперативних (проміжних) таблиць в архів версій вітрин даних
-  */
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.crt_rng_partition';
-
-    l_add_stmt            varchar(1000);
-    l_spl_stmt            varchar(1000);
-    l_crt_stmt            varchar(1000);
-    l_rnm_stmt            varchar(1000);
-
-    e_ptsn_split          exception; -- Partition cannot be split along the specified high bound
-    pragma exception_init( e_ptsn_split, -14080 );
-
-    e_ptsn_nm_exsts       exception; -- New partition name must differ from the old partition name
-    pragma exception_init( e_ptsn_nm_exsts, -14081 );
-
-    e_ptsn_bound          exception; -- partition bound must collate higher than that of the last partition
-    pragma exception_init( e_ptsn_bound, -14074 );
-
-  begin
-
-    bars_audit.trace( '%s: Start running with ( dm_tab_nm=%s, rpt_dt=%s, kf=%s, vrsn_id=%s).'
-                    , title, p_dm_tab_nm, to_char(p_rpt_dt,fmt_dt), p_kf, to_char(p_vrsn_id) );
-
-    case
-      when ( p_vrsn_id > 0 )
-      then -- for multicolumn partition (by VERSION)
-
-        l_add_stmt := q'[ALTER TABLE BARS.%tabnm ADD PARTITION P_%rptdt_SP_%vrsnid VALUES LESS THAN (to_date('%rptdt','YYYYMMDD'),%vrsnid)]';
-
-        l_spl_stmt := q'[ALTER TABLE BARS.%tabnm SPLIT PARTITION FOR (to_date('%rptdt','YYYYMMDD'),%vrsnid) AT (to_date('%rptdt+1','YYYYMMDD'),%vrsnid)]';
-
-        l_rnm_stmt := q'[ALTER TABLE BARS.%tabnm RENAME PARTITION FOR (to_date('%rptdt','YYYYMMDD'),%vrsnid) TO P_%rptdt_SP_%vrsnid]';
-
---      l_crt_stmt := q'[LOCK TABLE BARS.%tabnm PARTITION FOR (to_date('%rptdt','YYYYMMDD'),%vrsnid) IN SHARE MODE]';
-
-        l_add_stmt := replace( l_add_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
-
-        l_spl_stmt := replace( l_spl_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
-
-        l_rnm_stmt := replace( l_rnm_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
-
---      l_crt_stmt := replace( l_crt_stmt, '%vrsnid', to_char(p_vrsn_id,'FM00') );
-
-      when ( p_kf is Not Null )
-      then -- for multicolumn partition (by KF)
-
-        l_add_stmt := q'[ALTER TABLE BARS.%tabnm ADD PARTITION P_%rptdt_SP_%kf VALUES LESS THAN (to_date('%rptdt+1','YYYYMMDD'),'%kf')]';
-
-        l_spl_stmt := q'[ALTER TABLE BARS.%tabnm SPLIT PARTITION FOR (to_date('%rptdt','YYYYMMDD'),'%kf') AT (to_date('%rptdt+1','YYYYMMDD'),'%kf')]';
-
-        l_rnm_stmt := q'[ALTER TABLE BARS.%tabnm RENAME PARTITION FOR (to_date('%rptdt','YYYYMMDD'),'%kf') TO P_%rptdt_SP_%kf]';
-
-        l_add_stmt := replace( l_add_stmt, '%kf', p_kf );
-
-        l_spl_stmt := replace( l_spl_stmt, '%kf', p_kf );
-
-        l_rnm_stmt := replace( l_rnm_stmt, '%kf', p_kf );
-
-      else -- for singlecolumn partition
-
-        l_add_stmt := q'[ALTER TABLE BARS.%tabnm ADD PARTITION P_%rptdt VALUES LESS THAN (to_date('%rptdt','YYYYMMDD'))]';
-
-        l_rnm_stmt := q'[ALTER TABLE BARS.%tabnm RENAME PARTITION FOR (to_date('%rptdt','YYYYMMDD')) TO P_%rptdt]';
-
-    end case;
-
-    l_add_stmt := replace( l_add_stmt, '%tabnm', p_dm_tab_nm );
-    l_spl_stmt := replace( l_spl_stmt, '%tabnm', p_dm_tab_nm );
-    l_rnm_stmt := replace( l_rnm_stmt, '%tabnm', p_dm_tab_nm );
-
-    l_add_stmt := replace( l_add_stmt, '%rptdt+1', to_char(p_rpt_dt+1,'YYYYMMDD') );
-    l_spl_stmt := replace( l_spl_stmt, '%rptdt+1', to_char(p_rpt_dt+1,'YYYYMMDD') );
-
-    l_add_stmt := replace( l_add_stmt, '%rptdt', to_char(p_rpt_dt,'YYYYMMDD') );
-    l_spl_stmt := replace( l_spl_stmt, '%rptdt', to_char(p_rpt_dt,'YYYYMMDD') );
-    l_rnm_stmt := replace( l_rnm_stmt, '%rptdt', to_char(p_rpt_dt,'YYYYMMDD') );
-
-    bars_audit.trace( title || ': add_stmt = ' || l_add_stmt );
-    bars_audit.trace( title || ': spl_stmt = ' || l_spl_stmt );
-    bars_audit.trace( title || ': rnm_stmt = ' || l_rnm_stmt );
-
-    begin
-      execute immediate l_add_stmt;
-    exception
-      when e_ptsn_bound then
-        -- split partition
-        begin
-          execute immediate l_spl_stmt;
-          -- rename partition
-          begin
-            execute immediate l_rnm_stmt;
-          exception
-            when e_ptsn_nm_exsts then
-              null;
-          end;
-        exception
-          when e_ptsn_split then
-            null;
-        end;
-    end;
-
-    bars_audit.trace( '%s: Exit.', title );
-
-  end CREATE_RANGE_PARTITION;
-
-  --
-  --
-  --
   procedure SAVE_VERSION
   ( p_report_date  in     nbur_lst_versions.report_date%type
   , p_kf           in     nbur_lst_versions.kf%type
@@ -5627,12 +6279,11 @@ is
   %version 1.8 (07/11/2016)
   %usage   Перенесення даних з оперативних (проміжних) таблиць в архів версій вітрин даних
   */
-    title     constant    varchar2(60)  := $$PLSQL_UNIT||'.SAVE_VERSION';
+    title      constant   varchar2(64)  := $$PLSQL_UNIT||'.SAVE_VERSION';
 
+    l_vrsn_id             nbur_lst_versions.version_id%type;
+    l_iot                 all_tables.iot_type%type;
 
-    l_vrsn_id   nbur_lst_versions.version_id%type;
-    l_iot       all_tables.iot_type%type;
-    ---
   begin
 
     bars_audit.trace( '%s: Entry with ( report_dt=%s, kf=%s ).'
@@ -5681,90 +6332,11 @@ is
       for i in t_tbl_lst.first .. t_tbl_lst.last
       loop
 
-        case t_tbl_lst(i)
-          when ( 'NBUR_DM_AGRM_ACCOUNTS' )
-          then
-            -- check table type
-            select count(1)
-              into l_iot
-              from ALL_TABLES
-             where OWNER = 'BARS'
-               and TABLE_NAME like 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
-               and IOT_TYPE Is Not Null;
-            if ( l_iot > 0 )
-            then -- for index-organized table create partition manually
-              if ( p_kf Is Null )
-              then
-                for b in ( select KF
-                             from MV_KF
-                            order by KF )
-                loop
-                  CREATE_RANGE_PARTITION
-                  ( p_dm_tab_nm => 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
-                  , p_rpt_dt    => p_report_date
-                  , p_kf        => b.KF
-                  , p_vrsn_id   => Null
-                  );
-                end loop;
-              else
-                CREATE_RANGE_PARTITION
-                ( p_dm_tab_nm => 'NBUR_DM_AGRM_ACCOUNTS_ARCH'
-                , p_rpt_dt    => p_report_date
-                , p_kf        => p_kf
-                , p_vrsn_id   => Null
-                );
-              end if;
-            end if;
-
-          when ( 'NBUR_DM_CHRON_AVG_BALS' )
-          then
-
-            CREATE_RANGE_PARTITION
-            ( p_dm_tab_nm => 'NBUR_DM_CHRON_AVG_BALS_ARCH'
-            , p_rpt_dt    => p_report_date
-            , p_kf        => null
-            , p_vrsn_id   => l_vrsn_id
-            );
-
-            if ( p_kf Is Null )
-            then -- for all KF
-
-              DM_UTL.EXCHANGE_PARTITION( p_source_table_nm => 'NBUR_DM_CHRON_AVG_BALS_ARCH'
-                                       , p_target_table_nm => 'NBUR_DM_CHRON_AVG_BALS'
-                                       , p_partition_nm    => 'P_'||to_char(p_report_date,'YYYYMMDD')||'_'|| to_char(l_vrsn_id,'FM000') );
-
-            else
-
-              insert /*+ APPEND */
-                into NBUR_DM_CHRON_AVG_BALS_ARCH
-                   ( REPORT_DATE, KF, VERSION_ID
-                   , ACC_ID, R020, R030, AVG_BAL, AVG_BAL_UAH
-                   , SUM_CR, SUM_CR_UAH, SUM_DB, SUM_DB_UAH )
-              select /*+ PARALLEL( 8 ) */ REPORT_DATE, KF, VERSION_ID
-                   , ACC_ID, R020, R030, AVG_BAL, AVG_BAL_UAH
-                   , SUM_CR, SUM_CR_UAH, SUM_DB, SUM_DB_UAH
-                from NBUR_DM_CHRON_AVG_BALS
-               where p_kf = KF;
-
-              commit;
-
-            end if;
-
-          else
-            null;
-
-        end case;
-
-        -- костиль (замінити на ознаку з поля в табл. NBUR_REF_OBJECTS коли таке появиться)
-        if ( t_tbl_lst(i) like '%CNSL' )
-        then -- for DM that contains consolidated data from another DM
-          null;
-        else
-          MOVE_DATA_TO_ARCH( p_obj_nm  => t_tbl_lst(i)
-                           , p_kf      => p_kf
-                           , p_vrsn_id => l_vrsn_id
-                           );
-        end if;
+        MOVE_DATA_TO_ARCH( p_obj_nm  => t_tbl_lst(i)
+                         , p_rpt_dt  => p_report_date
+                         , p_kf      => p_kf
+                         , p_vrsn_id => l_vrsn_id
+                         );
 
       end loop;
 
@@ -5797,6 +6369,9 @@ is
 
     FIXATION('NBUR_AGG_PROTOCOLS');
 
+$if $$PLSQL_Debug
+$then
+$else
     -- clear tables
     for r in t_tbl_lst.first .. t_tbl_lst.last
     loop
@@ -5814,6 +6389,7 @@ is
         then bars_audit.error( title || ': table_name=' || t_tbl_lst(r) || chr(10) || sqlerrm );
       end;
     end loop;
+$end
 
     t_tbl_lst.delete();
 

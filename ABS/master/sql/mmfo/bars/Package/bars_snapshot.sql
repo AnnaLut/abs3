@@ -65,7 +65,7 @@ is
   --
   -- constants
   --
-  g_body_version          constant varchar2(64)  := 'version 1.8  06.02.2018';
+  g_body_version          constant varchar2(64)  := 'version 2.0  19.04.2018';
 
   --
   -- types
@@ -173,9 +173,9 @@ is
                                , b0.OSTQ - b0.CRDOSQ + b0.CRKOSQ as ADJ_AMNT_3800_UAH
                                , b1.OST  - b1.CRDOS  + b1.CRKOS  as ADJ_AMNT_3801
                             from VP_LIST  v
-                            join AGG_MONBALS_EXCHANGE b0
+                            join AGG_MONBALS_INTR_TBL b0
                               on ( b0.FDAT = l_first_day and b0.KF = v.KF and b0.ACC = v.ACC3800 )
-                            join AGG_MONBALS_EXCHANGE b1
+                            join AGG_MONBALS_INTR_TBL b1
                               on ( b1.FDAT = l_first_day and b1.KF = v.KF and b1.ACC = v.ACC3801 )
                             join ACCOUNTS a
                               on ( a.acc = v.ACC3800 )
@@ -219,7 +219,7 @@ is
              , cur.KV_B, cur.NLS_B, l_amnt );
 
       -- 3801
-      update AGG_MONBALS_EXCHANGE
+      update AGG_MONBALS_INTR_TBL
          set CRDOS  = CRDOS  + case when l_dk = 0 then l_amnt else 0 end
            , CRDOSQ = CRDOSQ + case when l_dk = 0 then l_amnt else 0 end
            , CRKOS  = CRKOS  + case when l_dk = 1 then l_amnt else 0 end
@@ -229,7 +229,7 @@ is
          and ACC  = cur.ACC3801;
 
       -- 6204
-      update AGG_MONBALS_EXCHANGE
+      update AGG_MONBALS_INTR_TBL
          set CRDOS  = CRDOS  + case when l_dk = 0 then 0 else l_amnt end
            , CRDOSQ = CRDOSQ + case when l_dk = 0 then 0 else l_amnt end
            , CRKOS  = CRKOS  + case when l_dk = 1 then 0 else l_amnt end
@@ -348,7 +348,7 @@ is
 
     -- execute immediate 'TRUNCATE TABLE AGG_MONBALS_EXCHANGE';
 
-    -- gl.setp('MONBAL','',NULL); -- deprecated (for compatibility)
+
 
     BARS_UTL_SNAPSHOT.PURGE_RUNNING_FLAG();
 
@@ -375,11 +375,10 @@ is
   %param p_snapshot_dt - 
   %param p_auto_daily  - 
 
-  %version 1.0
+  %version 1.2
   %usage   створенн€ м≥с€чних зн≥мк≥в балансу.
   */
-    -- ћ≥с€чн≥ драпси Ver: 5.7  12/02/2016
-    title       constant   varchar2(60) := $$PLSQL_UNIT||'.CREATE_MONTHLY_SNAPSHOT';
+    title       constant   varchar2(64) := $$PLSQL_UNIT||'.CREATE_MONTHLY_SNAPSHOT';
     dat0_                  DATE; -- останн≥й банк≥вський день зв≥тного м≥с€ц€
     dat1_                  DATE; -- перший   календарний день зв≥тного м≥с€ц€
     dat2_                  DATE; -- останн≥й календарний день зв≥тного м≥с€ц€
@@ -450,7 +449,8 @@ is
       select max(FDAT)
         into dat0_
         from SNAP_BALANCES
-       where FDAT between dat1_ and dat2_;
+       where FDAT between dat1_ and dat2_
+         and KF = l_kf;
 
       IF ( dat0_ Is Null )
       THEN
@@ -458,80 +458,126 @@ is
       END IF;
 
       -- ѕерев≥рка на€вност≥ активного процесу формуванн€ зн≥мку
-      l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING('MONBALS');
+      l_errmsg := BARS_UTL_SNAPSHOT.CHECK_SNP_RUNNING( 'MONBALS', l_kf );
 
       if (l_errmsg is Not Null)
       then
-        raise_application_error( -20666, 'формуванн€ м≥с€чного зн≥мку балансу вже запущено користувачем ' || l_errmsg );
+        RAISE_APPLICATION_ERROR( -20666, 'формуванн€ м≥с€чного зн≥мку балансу вже запущено користувачем ' || l_errmsg );
       else -- Ѕлокуванн€ в≥д дек≥лькох запуск≥в
-        BARS_UTL_SNAPSHOT.SET_RUNNING_FLAG('MONBALS');
+        BARS_UTL_SNAPSHOT.SET_RUNNING_FLAG( 'MONBALS' );
       end if;
 
-      dbms_application_info.set_client_info( '‘ормуванн€ м≥с€чного зн≥мку балансу за ' || F_MONTH_LIT(dat1_,1,2) || 'м≥с.' );
+      dbms_application_info.set_client_info( '‘ормуванн€ м≥с€чного зн≥мку балансу дл€ '||l_kf||' за ' || F_MONTH_LIT(dat1_,1,2) || 'м≥с.' );
 
-      execute immediate 'TRUNCATE TABLE AGG_MONBALS_EXCHANGE';
-
-      -- ‘≥ксуЇмо SCN на €кому формуЇмо зн≥мок балансу по табл. SALDOZ
-      BARS_UTL_SNAPSHOT.SET_TABLE_SCN( 'SALDOZ', dat1_, l_kf, dbms_flashback.get_system_change_number() );
-
-      insert /*+ APPEND */
-        into AGG_MONBALS_EXCHANGE
-           ( FDAT, KF, ACC, RNK, OST, OSTQ, DOS, KOS, DOSQ, KOSQ,
-             CRDOS, CRKOS, CRDOSQ, CRKOSQ, CUDOS, CUKOS, CUDOSQ, CUKOSQ )
-      select dat1_,                 NVL(b.KF,z.KF) as KF,
-             NVL(b.ACC, z.ACC) acc, NVL(b.RNK,  1) as RNK,
-             NVL(b.OST,  0) ost,    NVL(b.OSTQ, 0) as OSTQ,
-             NVL(b.DOS,  0) dos,    NVL(b.KOS,  0) as KOS,
-             NVL(b.DOSQ, 0) dosq,   NVL(b.KOSQ, 0) as KOSQ,
-             NVL(z.RDOS, 0) crdos,  NVL(z.RKOS, 0) as CRKOS,
-             NVL(z.RDOSQ,0) crdosq, NVL(z.RKOSQ,0) as CRKOSQ,
-             NVL(z.UDOS, 0) cudos,  NVL(z.UKOS, 0) as CUKOS,
-             NVL(z.UDOSQ,0) cudosq, NVL(z.UKOSQ,0) as CUKOSQ
-        from ( select KF, ACC
-                    , sum(decode(fdat, dat0_, ost,  0)) ost
-                    , sum(decode(fdat, dat0_, ostq, 0)) ostq
-                    , sum(dos) dos, sum(dosq) dosq
-                    , sum(kos) kos, sum(kosq) kosq,
-                      abs(max(decode(fdat, dat0_, rnk, -rnk))) rnk
-                 from SNAP_BALANCES
-                where FDAT between dat1_ and dat2_
-                group by KF, ACC
-             ) b
-        full
-        join ( select nvl(r.KF, u.KF ) as KF
-                    , nvl(r.acc,u.acc) as ACC
-                    , r.dos as RDOS, r.dosq as RDOSQ
-                    , r.kos as RKOS, r.kosq as RKOSQ
-                    , u.dos as UDOS, u.dosq as UDOSQ
-                    , u.kos as UKOS, u.kosq as UKOSQ
-                 from ( select * from SALDOZ where FDAT = dat1_ ) r
-                 full
-                 join ( select * from SALDOZ where FDAT = dat3_ ) u
-                   on ( u.ACC = r.ACC )
-             ) z
-          on ( z.ACC = b.ACC );
-
-      bars_audit.trace( '%s: %s row created.', title, to_char(SQL%ROWCOUNT) );
-
-      COMMIT;
-
-      dbms_application_info.set_client_info( 'ѕереоц≥нка валютних позиц≥й м≥с€чного зн≥мку балансу за ' || F_MONTH_LIT(dat1_,1,2) );
-
-      -- переоц≥нка валютних позиц≥й (коригуюч≥ проводки + корекц≥€ даних в AGG_MONBALS_EXCHANGE)
-      BARS_SNAPSHOT.CURRENCY_REVALUATION( l_kf );
-
-      COMMIT;
+--    execute immediate 'alter table AGG_MONBALS_INTR_TBL truncate partition for ( '''||l_kf||''' )';
+      execute immediate 'alter table AGG_MONBALS_INTR_TBL truncate partition P_'||l_kf;
 
       l_condition := to_char(dat1_,'ddmmyyyy');
       l_condition := replace( q'[ (to_date('%dt','ddmmyyyy'),'%kf') ]', '%dt', l_condition );
       l_condition := replace( l_condition, '%kf', l_kf );
 
-      -- bypass the RLS policies
-      DM_UTL.EXCHANGE_SUBPARTITION_FOR( p_source_table_nm => 'AGG_MONBALS_EXCHANGE'
-                                      , p_target_table_nm => 'AGG_MONBALS'
-                                      , p_condition       => l_condition );
+--    execute immediate 'lock table SALDOZ subpartition for '||l_condition||' IN EXCLUSIVE MODE';
+      execute immediate 'lock table SALDOZ ( partition P_'||l_kf||') IN EXCLUSIVE MODE';
+      bars_audit.info( $$PLSQL_UNIT||': SALDOZ subpartition locked.' );
 
-      execute immediate 'truncate table AGG_MONBALS_EXCHANGE';
+      insert
+        into AGG_MONBALS_INTR_TBL
+           ( FDAT, KF, ACC, RNK, OST, OSTQ
+           , DOS,    DOSQ,       KOS,    KOSQ
+           , CRDOS,  CRDOSQ,     CRKOS,  CRKOSQ
+           , CUDOS,  CUDOSQ,     CUKOS,  CUKOSQ
+           , YR_DOS, YR_DOS_UAH, YR_KOS, YR_KOS_UAH 
+           )
+      select dat1_,                   NVL(b.KF,z.KF) as KF
+           , NVL(b.ACC, z.ACC) ACC,   NVL(b.RNK,  1) as RNK
+           , NVL(b.OST, 0) as OST,    NVL(b.OSTQ, 0) as OSTQ
+           , NVL(b.DOS, 0) as DOS,    NVL(b.DOSQ, 0) as DOSQ
+           , NVL(b.KOS, 0) as KOS,    NVL(b.KOSQ, 0) as KOSQ
+           , NVL(z.RDOS,0) as CRDOS,  NVL(z.RDOSQ,0) as CRDOSQ
+           , NVL(z.RKOS,0) as CRKOS,  NVL(z.RKOSQ,0) as CRKOSQ
+           , NVL(z.UDOS,0) as CUDOS,  NVL(z.UDOSQ,0) as CUDOSQ
+           , NVL(z.UKOS,0) as CUKOS,  NVL(z.UKOSQ,0) as CUKOSQ
+           , NVL(z.YDOS,0) as YR_DOS, NVL(z.YDOSQ,0) as YR_DOS_UAH
+           , NVL(z.YKOS,0) as YR_KOS, NVL(z.YKOSQ,0) as YR_KOS_UAH
+        from ( select KF, ACC
+                    , sum(decode(fdat, dat0_, ost,  0)) ost
+                    , sum(decode(fdat, dat0_, ostq, 0)) ostq
+                    , sum(dos) dos, sum(dosq) dosq
+                    , sum(kos) kos, sum(kosq) kosq
+                    , abs(max(decode(fdat, dat0_, rnk, -rnk))) rnk
+                 from SNAP_BALANCES
+                where FDAT between dat1_ and dat2_
+                  and KF = l_kf
+                group by KF, ACC
+             ) b
+        full
+        join ( select nvl(r.KF, u.KF ) as KF
+                    , nvl(r.acc,u.acc) as ACC
+                    , r.dos    as RDOS, r.dosq    as RDOSQ
+                    , r.kos    as RKOS, r.kosq    as RKOSQ
+                    , u.dos    as UDOS, u.dosq    as UDOSQ
+                    , u.kos    as UKOS, u.kosq    as UKOSQ
+                    , u.DOS_YR as YDOS, u.DOSQ_YR as YDOSQ
+                    , u.KOS_YR as YKOS, u.KOSQ_YR as YKOSQ
+                 from ( select KF, ACC, DOS, DOSQ, KOS, KOSQ
+                          from SALDOZ
+                         where FDAT = dat1_ -- перший календарний день зв≥тного м≥с€ц€ 
+                           and KF   = l_kf
+                      ) r
+                 full
+                 join ( select KF, ACC, DOS, DOSQ, KOS, KOSQ
+                             , DOS_YR, DOSQ_YR, KOS_YR, KOSQ_YR
+                          from SALDOZ
+                         where FDAT = dat3_ -- перший календарний день попереднього м≥с€ц€
+                           and KF   = l_kf
+                      ) u
+                   on ( u.KF = r.KF and u.ACC = r.ACC )
+             ) z
+          on ( z.KF = b.KF and z.ACC = b.ACC );
+
+      bars_audit.trace( '%s: %s row created.', title, to_char(SQL%ROWCOUNT) );
+
+      dbms_application_info.set_client_info( 'ѕереоц≥нка валютних позиц≥й м≥с€чного зн≥мку балансу дл€ '||l_kf||' за ' || F_MONTH_LIT(dat1_,1,2) );
+
+      -- переоц≥нка валютних позиц≥й (коригуюч≥ проводки + корекц≥€ даних в AGG_MONBALS_INTR_TBL)
+      BARS_SNAPSHOT.CURRENCY_REVALUATION( l_kf );
+
+      COMMIT;
+
+      -- ‘≥ксуЇмо SCN на €кому формуЇмо зн≥мок балансу по табл. SALDOZ
+      BARS_UTL_SNAPSHOT.SET_TABLE_SCN( p_table => 'SALDOZ'
+                                     , p_date  => dat1_
+                                     , p_kf    => l_kf
+                                     , p_scn   => DM_UTL.GET_LAST_SCN( 'AGG_MONBALS_INTR_TBL', 'BARS', null, l_kf ) );
+
+      BARS_AUDIT.INFO( $$PLSQL_UNIT||': lock requested.' );
+
+      if ( DBMS_LOCK.REQUEST( to_number( l_kf ), dbms_lock.x_mode, 600, FALSE ) = 0 )
+      then
+
+        BARS_AUDIT.INFO( $$PLSQL_UNIT||': lock acquired.' );
+
+        execute immediate 'truncate table AGG_MONBALS_EXCHANGE';
+
+        -- bypass the RLS policies
+        DM_UTL.EXCHANGE_PARTITION( p_source_table_nm => 'AGG_MONBALS_EXCHANGE'
+                                 , p_target_table_nm => 'AGG_MONBALS_INTR_TBL'
+                                 , p_partition_nm    => 'P_'||l_kf
+                                 , p_novalidate      => true );
+
+        -- bypass the RLS policies
+        DM_UTL.EXCHANGE_SUBPARTITION_FOR( p_source_table_nm => 'AGG_MONBALS_EXCHANGE'
+                                        , p_target_table_nm => 'AGG_MONBALS'
+                                        , p_condition       => l_condition );
+
+        if ( DBMS_LOCK.RELEASE( to_number( l_kf ) ) = 0 )
+        then
+          BARS_AUDIT.INFO( $$PLSQL_UNIT||': lock released.' );
+        end if;
+
+      else
+        BARS_AUDIT.INFO( $$PLSQL_UNIT||': lock was not acquired.' );
+      end if;
 
     end if;
 
@@ -541,6 +587,7 @@ is
 
   EXCEPTION
     WHEN OTHERS THEN
+      gl.fSOS0 := 0;
       BARS_UTL_SNAPSHOT.PURGE_RUNNING_FLAG();
       bars_audit.error( title || ': ' || dbms_utility.format_error_stack() ||
                               chr(10) || dbms_utility.format_error_backtrace() );
