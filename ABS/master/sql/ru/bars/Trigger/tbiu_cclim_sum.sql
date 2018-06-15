@@ -12,3 +12,6 @@ begin
    :new.SUMO := :new.SUMG;
   end if;
 end TBIU_CCLIM_SUM;
+/
+
+show errors;
