@@ -19,7 +19,7 @@ begin
            )   and a.dapp is null and a.dos = 0 and a.kos = 0 and a.ostc =0  and a.acc = n.acc ;
 
      begin select n.nd into l_ND  from accounts a, nd_acc n, CC_DEAL D  
-           where a.tip in ('SDI','S36')   and  a.ostc > 0 and n.nd = D.NDG and a.acc = n.acc  and d.ND = l_nd and rownum = 1 ;
+           where a.tip in ('SDI','S36')   and  a.ostc > 0 and n.nd in (D.ND,D.NDG) and a.acc = n.acc  and d.ND = l_nd and rownum = 1 ;
      EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-(20203),'\8999 - cck_OSBB(STOP_KK): КД '||l_ND|| ' Не внесено початкову комсію' )  ;
      end ;
   EXCEPTION WHEN NO_DATA_FOUND THEN null;
