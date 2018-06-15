@@ -1723,113 +1723,106 @@ namespace Bars.EAD
                 //_dbLogger.Info("WSProxyUserName= Noname" + WSProxyUserName);
             }
 
+            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
+
+            // Начинаем сессию взаимодействия и вычитываем сообщение
+            String SessionID;
+            SyncMessage msg;
+            if (con.State != ConnectionState.Open)
+                con.Open();
             try
             {
-                OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
+                SessionID = StartSession(con, kf);
 
-                // Начинаем сессию взаимодействия и вычитываем сообщение
-                String SessionID;
-                SyncMessage msg;
-                if (con.State != ConnectionState.Open)
-                    con.Open();
-                try
+                // если синхронизация справочников то используем другой класс
+                if (SyncMessage.GetMethodByID(ID, con) == "SetDictionaryData")
                 {
-                    SessionID = StartSession(con, kf);
-
-                    // если синхронизация справочников то используем другой класс
-                    if (SyncMessage.GetMethodByID(ID, con) == "SetDictionaryData")
-                    {
-                        msg = new DictMessage(ID, SessionID, con, kf);
-                    }
-                    else
-                    {
-                        msg = new SyncMessage(ID, SessionID, con, kf);
-                    }
+                    msg = new DictMessage(ID, SessionID, con, kf);
                 }
-                finally
+                else
                 {
-                    con.Close();
-                }
-                String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
-                // Формируем сообщение
-                String MessageID = msg.Message_ID;
-                DateTime MessageDate = DateTime.Now;
-                String Message = msg.GetJSONString();
-
-                BbConnection bb_con = new BbConnection();
-                // пакет для записи в БД
-                EadPack ep = new EadPack(bb_con);
-
-                // устанавлдиваем статус
-                ep.MSG_SET_STATUS_SEND(ID, MessageID, MessageDate, Message, kf);
-
-                // отправляем запрос по Http
-                Response rsp;
-                try
-                {
-                    String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
-                    // сохраняем ответ
-                    ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText, kf);
-
-                    // парсим ответ
-                    rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
-                    ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp, kf);
-
-                    // Анализируем ответ
-                    if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
-                    {
-                        // устанавлдиваем статус "Помилка"
-                        if (rsp.Result != null)
-                        {
-                            Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
-                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
-                        }
-                        else
-                        {
-                            // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
-                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text), kf);
-                        }
-                    }
-                    else
-                    {
-                        Boolean HasErrors = false;
-
-                        foreach (Newtonsoft.Json.Linq.JToken obj in (rsp.Result as Newtonsoft.Json.Linq.JArray))
-                        {
-                            Structs.Result.SyncResult res = obj.ToObject<Structs.Result.SyncResult>();
-                            if (!String.IsNullOrEmpty(res.Error))
-                            {
-                                // устанавлдиваем статус "Помилка"
-                                ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error), kf);
-                                HasErrors = true;
-                                break;
-                            }
-                        }
-
-                        if (!HasErrors)
-                            // устанавлдиваем статус "Виконано"
-                            ep.MSG_SET_STATUS_DONE(ID, kf);
-                    }
-                }
-                catch (System.Exception e)
-                {  // устанавливаем статус "Помилка" и выходим
-                    ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі SEND: {0}, {1}", e.Message, e.StackTrace), kf);
-                }
-
-                // Заканчиваем сессию взаимодействия
-                if (con.State != ConnectionState.Open) con.Open();
-                try
-                {
-                    CloseSession(SessionID, con, _EAServiceUrl);
-                }
-                finally
-                {
-                    con.Close();
+                    msg = new SyncMessage(ID, SessionID, con, kf);
                 }
             }
             finally
             {
-                LogOutUser();
+                con.Close();
+            }
+            String _EAServiceUrl = Convert.ToString(Bars.Configuration.ConfigurationSettings.AppSettings["ead.ServiceUrl" + kf]);
+            // Формируем сообщение
+            String MessageID = msg.Message_ID;
+            DateTime MessageDate = DateTime.Now;
+            String Message = msg.GetJSONString();
+
+            BbConnection bb_con = new BbConnection();
+            // пакет для записи в БД
+            EadPack ep = new EadPack(bb_con);
+
+            // устанавлдиваем статус
+            ep.MSG_SET_STATUS_SEND(ID, MessageID, MessageDate, Message, kf);
+
+            // отправляем запрос по Http
+            Response rsp;
+            try
+            {
+                String ResponseText = GetEAResponseText(Message, _EAServiceUrl);
+                // сохраняем ответ
+                ep.MSG_SET_STATUS_RECEIVED(ID, ResponseText, kf);
+
+                // парсим ответ
+                rsp = Response.CreateFromJSONString(msg.Method, ResponseText);
+                ep.MSG_SET_STATUS_PARSED(ID, rsp.Responce_ID, rsp.Current_Timestamp, kf);
+
+                // Анализируем ответ
+                if (rsp.Status == "ERROR" || String.IsNullOrEmpty(rsp.Status))
+                {
+                    // устанавлдиваем статус "Помилка"
+                    if (rsp.Result != null)
+                    {
+                        Structs.Result.Error err = (rsp.Result as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error>();
+                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", err.Error_Code, err.Error_Text), kf);
+                    }
+                    else
+                    {
+                        // Structs.Result.Error2 err2 = (rsp.error as Newtonsoft.Json.Linq.JToken).ToObject<Structs.Result.Error2>();
+                        ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}, {1}", rsp.error.Error_Code, rsp.error.Error_Text), kf);
+                    }
+                }
+                else
+                {
+                    Boolean HasErrors = false;
+
+                    foreach (Newtonsoft.Json.Linq.JToken obj in (rsp.Result as Newtonsoft.Json.Linq.JArray))
+                    {
+                        Structs.Result.SyncResult res = obj.ToObject<Structs.Result.SyncResult>();
+                        if (!String.IsNullOrEmpty(res.Error))
+                        {
+                            // устанавлдиваем статус "Помилка"
+                            ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі RECEIVED: {0}", res.Error), kf);
+                            HasErrors = true;
+                            break;
+                        }
+                    }
+
+                    if (!HasErrors)
+                        // устанавлдиваем статус "Виконано"
+                        ep.MSG_SET_STATUS_DONE(ID, kf);
+                }
+            }
+            catch (System.Exception e)
+            {  // устанавливаем статус "Помилка" и выходим
+                ep.MSG_SET_STATUS_ERROR(ID, String.Format("Помилка на статусі SEND: {0}, {1}", e.Message, e.StackTrace), kf);
+            }
+
+            // Заканчиваем сессию взаимодействия
+            if (con.State != ConnectionState.Open) con.Open();
+            try
+            {
+                CloseSession(SessionID, con, _EAServiceUrl);
+            }
+            finally
+            {
+                con.Close();
             }
         }
         # endregion
