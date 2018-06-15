@@ -111,6 +111,14 @@ namespace BarsWeb.Areas.SalaryBag.Controllers
             return File(content, "attachment", "Шаблон_іморт_ЗП_відомості.xlsx");
         }
 
+        [HttpPost]
+        public ActionResult ConvertBase64ToFileUrlDecoded(string base64, string contentType = "attachment", string fileName = "file")
+        {
+            fileName = HttpUtility.UrlDecode(fileName);
+
+            return ConvertBase64ToFile(base64, contentType, fileName);
+        }
+
         #region private methods
         private string ExeptionProcessing(Exception ex)
         {
