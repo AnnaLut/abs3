@@ -219,7 +219,6 @@ is
     title     constant   varchar2(64) := $$PLSQL_UNIT||'.GET_FILE_HEAD';
     l_okpo               varchar2(10);
     l_XmlText            varchar2(1024);
-    l_nbu_rpt_dt         date;
   begin
 
     bars_audit.trace( '%s: Entry with ( p_rpt_code=%s, p_rpt_date=%s, p_kf=%s ).'
@@ -232,7 +231,7 @@ $else
     l_okpo := F_OUROKPO();
 $end
 
-    l_nbu_rpt_dt := DAT_NEXT_U( p_rpt_date, 1 );
+    bars_audit.trace( '%s: l_okpo=%s, l_nbu_rpt_dt=%s.', title, l_okpo, to_char(p_rpt_date, g_dt_fmt) );
 
     bars_audit.trace( '%s: l_okpo=%s, l_nbu_rpt_dt=%s.', title, l_okpo, to_char(l_nbu_rpt_dt,g_dt_fmt) );
 
@@ -241,7 +240,7 @@ $end
     l_XmlText := l_XmlText || chr(10) || '  <HEAD>';
     l_XmlText := l_XmlText || chr(10) || '    <STATFORM>F'||p_rpt_code||'X</STATFORM>';
     l_XmlText := l_XmlText || chr(10) || '    <EDRPOU>'||l_okpo||'</EDRPOU>';
-    l_XmlText := l_XmlText || chr(10) || '    <REPORTDATE>'||to_char(l_nbu_rpt_dt,g_dt_fmt)||'</REPORTDATE>';
+    l_XmlText := l_XmlText || chr(10) || '    <REPORTDATE>'||to_char(p_rpt_date,g_dt_fmt)||'</REPORTDATE>';
     l_XmlText := l_XmlText || chr(10) || '  </HEAD>';
 
     bars_audit.trace( '%s: Exit with => %s', title,  chr(10)||l_XmlText );
@@ -981,6 +980,8 @@ $end
     l_xml                xmltype;
     l_errmsg             varchar2(2048);
     l_rpt_code           nbur_ref_files.file_code%type;
+    l_period_type        nbur_ref_files.period_type%type;
+    l_rpt_dt             nbur_lst_files.report_date%type;
   begin
 
     bars_audit.trace( '%s: Entry.', title );
