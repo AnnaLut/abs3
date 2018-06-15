@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.012  04/06/2018 (23/05/2018, 16/05/2018)
+% VERSION     :  v.18.014 15/06/2018 (11/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -241,9 +241,6 @@ IS
 
    nbs_r013_    varchar2(5);
 
-   -- балансовые счета дисконта
-   nbsdiscont_     VARCHAR2 (2000)
-      := '2016,2026,2036,2066,2076,2086,2106,2116,2126,2136,2206,2216,2226,2236,2706,3666,1626';
    -- балансовые счета премии
    nbspremiy_      VARCHAR2 (2000)
       := '2065,2075,2085,2105,2115,2125,2135,2205,2215,2235,';
@@ -1290,7 +1287,7 @@ BEGIN
                 END IF;
              END IF;
 
-             if instr(nbsdiscont_, nbs_) > 0 or
+             if tips_ in ('SDI', 'SDM', 'SDF', 'SDA') or
                 instr(nbspremiy_, nbs_) > 0 or
                 tips_ = 'SNA'
              then
@@ -1307,7 +1304,7 @@ BEGIN
                 end if;
 
                 insert into OTCN_FA7_REZ2(ND, ACC, PR, SUM)
-                values(nd_, acc_, (case when instr(nbsdiscont_, nbs_) > 0 then 1
+                values(nd_, acc_, (case when tips_ in ('SDI', 'SDM', 'SDF', 'SDA') then 1
                                         when instr(nbspremiy_, nbs_) > 0 then 2
                                         else 3 end), se_);
              end if;
@@ -4342,7 +4339,7 @@ BEGIN
                              from otcn_saldo a, otcn_acc s, customer c
                              where  nvl(a.nbs, substr(a.nls,1,4)) in ('1410','1412','1415','1416','1417','1418',
                                            '1490','1491','1492','1493','1590','1592','1890',
-                                           '2400','2401','2890','3190','3290','3590','3599','3690','3692',
+                                           '2400','2401','2600','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
                                           '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
                                           '2139','2209','2239','2609','2629','2659','3119','3219')
@@ -4368,7 +4365,7 @@ BEGIN
                          from rnbu_trace r
                          where substr(kodp, 2, 4) in ('1410','1412','1415','1416','1417','1418',
                                            '1490','1491','1492','1493','1590','1592','1890',
-                                           '2400','2401','2890','3190','3290','3590','3599','3690','3692',
+                                           '2400','2401','2600','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500',
                                           '1419','1429','1509','1519','1529','2039','2069','2089','2109','2119','2129',
                                           '2139','2209','2239','2609','2629',
@@ -4478,7 +4475,7 @@ BEGIN
                                      sum(decode(s.kv, 980, a.ost, a.ostq)) ostq
                                  from snap_balances a, accounts s, customer c
                                  where  a.fdat = dat_
-                                    and s.nbs in ('2610','2615','2651','2652')
+                                    and s.nbs in ('2600','2610','2615','2651','2652')
                                     and a.acc = s.acc
                                     and s.rnk = c.rnk
                                  group by (case when typ_ > 0
@@ -4496,7 +4493,7 @@ BEGIN
                                  min('1'||substr(kodp, 6, 2)) R013_s580,
                                  min('1'||substr(kodp, 6, 2)) R013_s580_A
                              from rnbu_trace r
-                             where substr(kodp, 2, 4) in ('2610','2615','2651','2652')
+                             where substr(kodp, 2, 4) in ('2600','2610','2615','2651','2652')
                              group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                          on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
                      where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
@@ -4637,7 +4634,8 @@ BEGIN
       insert into NBUR_TMP_A7_S245(report_date, acc_id, s245, ost)
       select dat_, acc, (case when substr(kodp,9,1)='Z' then '2' else '1' end) s245, sum(znap) ost
       from rnbu_trace
-      where (kodp like '_2610%' or
+      where (kodp like '_2600%' or
+             kodp like '_2610%' or
              kodp like '_2651%' or
              kodp like '_2890%' or
              kodp like '_3590%' or
