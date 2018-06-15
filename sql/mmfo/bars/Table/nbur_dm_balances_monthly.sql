@@ -56,12 +56,12 @@ begin
 , CUKOS           NUMBER(24)
 , CUDOSQ          NUMBER(24)
 , CUKOSQ          NUMBER(24)
+, ADJ_BAL         NUMBER(24) constraint CC_DMBALANCESMONTH_ADJBAL      NOT NULL
+, ADJ_BAL_UAH     NUMBER(24) constraint CC_DMBALANCESMONTH_ADJBALUAH   NOT NULL
 , YR_DOS          NUMBER(24) default 0
 , YR_DOS_UAH      NUMBER(24) default 0
 , YR_KOS          NUMBER(24) default 0
 , YR_KOS_UAH      NUMBER(24) default 0
-, ADJ_BAL         NUMBER(24) constraint CC_DMBALANCESMONTH_ADJBAL      NOT NULL
-, ADJ_BAL_UAH     NUMBER(24) constraint CC_DMBALANCESMONTH_ADJBALUAH   NOT NULL
 ) TABLESPACE BRSBIGD
 PARALLEL 8
 NOLOGGING
@@ -96,7 +96,7 @@ PARTITION BY LIST ( KF )
 , PARTITION P_354507 VALUES ('354507')
 , PARTITION P_356334 VALUES ('356334') )]';
 
-  dbms_output.put_line('table "NBUR_DM_BALANCES_MONTHLY" created.');
+  dbms_output.put_line( 'Table "NBUR_DM_BALANCES_MONTHLY" created.' );
 
 exception
   when e_tab_exists
@@ -143,10 +143,10 @@ COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.OST         IS 'Вихiдний залишок, ном
 COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.DOSQ        IS 'Оборот дебет, еквiвалент';
 COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.KOSQ        IS 'Оборот кредит, еквiвалент';
 COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.OSTQ        IS 'Вихiдний залишок, еквiвалент';
-COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRDOS       IS 'Коригуючі обороти дебет, номiнал';
-COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRKOS       IS 'Коригуючі обороти кредит, номiнал';
-COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRDOSQ      IS 'Коригуючі обороти дебет, еквiвалент';
-COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRKOSQ      IS 'Коригуючі обороти кредит, еквiвалент';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRDOS       IS 'MO_ADJ_AMNT_DB     - Коригуючі обороти дебет (номiнал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRDOSQ      IS 'MO_ADJ_AMNT_DB_UAH - Коригуючі обороти дебет  (гривневий еквiвалент)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRKOS       IS 'MO_ADJ_AMNT_CR     - Коригуючі обороти кредит (номiнал)';
+COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CRKOSQ      IS 'MO_ADJ_AMNT_CR_UAH - Коригуючі обороти кредит (гривневий еквiвалент)';
 COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CUDOS       IS 'Коригуючі обороти попереднього перiоду дебет  (номiнал)';
 COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CUKOS       IS 'Коригуючі обороти попереднього перiоду кредит (номiнал)';
 COMMENT ON COLUMN NBUR_DM_BALANCES_MONTHLY.CUDOSQ      IS 'Коригуючі обороти попереднього перiоду дебет  (гривневий еквiвалент)';

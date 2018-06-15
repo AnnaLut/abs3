@@ -38,31 +38,30 @@ declare
   e_tab_exists exception;
   pragma exception_init( e_tab_exists, -00955 );
 begin
-  
   execute immediate q'[create table AGG_MONBALS_INTR_TBL
-( FDAT       DATE       NOT NULL
-, KF         CHAR(6)    NOT NULL
-, ACC        INTEGER    NOT NULL
-, RNK        INTEGER    NOT NULL
-, OST        NUMBER(24) NOT NULL
-, OSTQ       NUMBER(24) NOT NULL
-, DOS        NUMBER(24) NOT NULL
-, DOSQ       NUMBER(24) NOT NULL
-, KOS        NUMBER(24) NOT NULL
-, KOSQ       NUMBER(24) NOT NULL
-, CRDOS      NUMBER(24) default 0
-, CRDOSQ     NUMBER(24) default 0
-, CRKOS      NUMBER(24) default 0
-, CRKOSQ     NUMBER(24) default 0
-, CUDOS      NUMBER(24) default 0
-, CUDOSQ     NUMBER(24) default 0
-, CUKOS      NUMBER(24) default 0
-, CUKOSQ     NUMBER(24) default 0
-, YR_DOS     NUMBER(24) default 0
-, YR_DOS_UAH NUMBER(24) default 0
-, YR_KOS     NUMBER(24) default 0
-, YR_KOS_UAH NUMBER(24) default 0
-, CALDT_ID   NUMBER  Generated Always as (TO_NUMBER(TO_CHAR("FDAT",'j'))-2447892)
+( FDAT       DATE        NOT NULL
+, KF         varCHAR2(6) NOT NULL
+, ACC        INTEGER     NOT NULL
+, RNK        INTEGER     NOT NULL
+, OST        NUMBER(24)  NOT NULL
+, OSTQ       NUMBER(24)  NOT NULL
+, DOS        NUMBER(24)  NOT NULL
+, DOSQ       NUMBER(24)  NOT NULL
+, KOS        NUMBER(24)  NOT NULL
+, KOSQ       NUMBER(24)  NOT NULL
+, CRDOS      NUMBER(24)  default 0
+, CRDOSQ     NUMBER(24)  default 0
+, CRKOS      NUMBER(24)  default 0
+, CRKOSQ     NUMBER(24)  default 0
+, CUDOS      NUMBER(24)  default 0
+, CUDOSQ     NUMBER(24)  default 0
+, CUKOS      NUMBER(24)  default 0
+, CUKOSQ     NUMBER(24)  default 0
+, CALDT_ID   NUMBER      Generated Always as (TO_NUMBER(TO_CHAR("FDAT",'j'))-2447892)
+, YR_DOS     NUMBER(24)  default 0
+, YR_DOS_UAH NUMBER(24)  default 0
+, YR_KOS     NUMBER(24)  default 0
+, YR_KOS_UAH NUMBER(24)  default 0
 ) TABLESPACE BRSACCM
 COMPRESS BASIC
 PARALLEL 26
@@ -145,7 +144,7 @@ prompt -- ======================================================
 prompt -- Comments
 prompt -- ======================================================
 
-COMMENT ON TABLE  AGG_MONBALS_INTR_TBL            IS 'Ќакопительные балансы за мес€ц';
+COMMENT ON TABLE  AGG_MONBALS_INTR_TBL            IS 'Ќакопительные балансы за м≥с€ць';
 
 COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.FDAT       IS 'ƒата балансу';
 COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.KF         IS ' од ф≥л≥алу (ћ‘ќ)';
@@ -165,11 +164,10 @@ COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.CUDOS      IS '—ума корегуючих дебетових 
 COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.CUDOSQ     IS '—ума корегуючих дебетових  оборот≥в минулого м≥с€ц€ (екв≥валент)';
 COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.CUKOS      IS '—ума корегуючих кредитових оборот≥в минулого м≥с€ц€ (ном≥нал)';
 COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.CUKOSQ     IS '—ума корегуючих кредитових оборот≥в минулого м≥с€ц€ (екв≥валент)';
-COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_DOS     IS '—ума р≥чних виправних ƒт. оборот≥в (номiнал)';
-COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_DOS_UAH IS '—ума р≥чних виправних ƒт. оборот≥в (гривневий еквiвалент)';
-COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_KOS     IS '—ума р≥чних виправних  т. оборот≥в (номiнал)';
-COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_KOS_UAH IS '—ума р≥чних виправних  т. оборот≥в (гривневий еквiвалент)';
-COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.CALDT_ID   IS '≤д. дати балансу (дл€ сум≥сност≥ ≥з попередньою верс≥Їю)';
+COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_DOS     IS 'ƒебетовi обороти по коригуючих рiчних';
+COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_DOS_UAH IS 'ƒебетовi обороти по коригуючих рiчних (в екв≥валент≥)';
+COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_KOS     IS ' редитовi обороти по коригуючих рiчних';
+COMMENT ON COLUMN AGG_MONBALS_INTR_TBL.YR_KOS_UAH IS ' редитовi обороти по коригуючих рiчних (в екв≥валент≥)';
 
 prompt -- ======================================================
 prompt -- Grants
