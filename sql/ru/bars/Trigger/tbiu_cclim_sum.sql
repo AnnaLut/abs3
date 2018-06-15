@@ -5,7 +5,9 @@ on CC_LIM
 for each row
 declare
 begin
-  if ( nvl(:new.SUMO,0) < nvl(:new.SUMG,0) )
+  :new.SUMO := nvl(:new.SUMO,0);
+  :new.SUMG := nvl(:new.SUMG,0);
+  if ( :new.SUMO < :new.SUMG )
   then
    :new.SUMO := :new.SUMG;
   end if;
