@@ -1,7 +1,7 @@
 create or replace package NBUR_FILES
 is
 
-  g_header_version  constant varchar2(64)  := 'version 3.5  2018.03.28';
+  g_header_version  constant varchar2(64)  := 'version 3.61  2018.05.25';
 
   --
   -- header_version - версія заголовку пакета
@@ -58,6 +58,21 @@ is
   function GET_FILE_CODE_ALT
   ( p_file_id       in     nbur_ref_files.id%type
   ) return nbur_ref_files.file_code_alt%type;
+
+  --
+  -- Формат файлу (TXT/XML) по ідентифікатору файлу
+  --
+  function GET_FILE_FMT
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.file_fmt%type;
+
+  --
+  -- Получение периода формирования файла по его идентификатору
+  --
+  function GET_FILE_PERIOD_TYPE
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.period_type %type;
+
 
   --
   -- повертає версію файлу
@@ -242,19 +257,34 @@ function f_get_file_clob (p_report_date  in date,
   --
   -- create dependencies
   --
-  procedure SET_FILE_DEPENDENCIES
+  procedure SET_OBJECT_DEPENDENCIES
   ( p_file_id          in     nbur_lnk_files_objects.file_id%type
   , p_obj_id           in     nbur_lnk_files_objects.object_id%type
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
   );
-  
+
+  --
+  --
+  --
+  procedure SET_OBJECT_DEPENDENCIES
+  ( p_file_code        in     nbur_ref_files.file_code%type
+  , p_obj_id           in     nbur_lnk_files_objects.object_id%type
+  , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
+  );
+
   --
   --
   --
   procedure SET_FILE_DEPENDENCIES
-  ( p_file_code        in     nbur_ref_files.file_code%type
-  , p_obj_id           in     nbur_lnk_files_objects.object_id%type
-  , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
+  ( p_file_id       in     nbur_lnk_files_files.file_id%type
+  , p_file_pid      in     nbur_lnk_files_files.file_dep_id%type
+--, p_strt_dt       in     nbur_lnk_files_files.start_date%type
+  );
+
+  procedure SET_FILE_DEPENDENCIES
+  ( p_file_code     in     nbur_ref_files.file_code%type
+  , p_file_pcode    in     nbur_ref_files.file_code%type
+--, p_strt_dt       in     nbur_lnk_files_files.start_date%type
   );
 
   --
@@ -287,7 +317,7 @@ show errors
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64) := 'version 6.5  2018.03.28';
+  g_body_version  constant varchar2(64) := 'version 6.61  2018.05.25';
 
   MODULE_PREFIX   constant varchar2(8) := 'NBUR';
 
@@ -487,7 +517,11 @@ end f_get_id_file;
   begin
 
     begin
-      select nvl( FILE_CODE_ALT, SubStr(FILE_CODE,2,2) )
+      select case FILE_FMT
+             when 'XML'
+             then SubStr(FILE_CODE,1,2)
+             else nvl( SubStr(FILE_CODE_ALT,1,2), SubStr(FILE_CODE,2,2) )
+             end
         into l_file_code_alt
         from NBUR_REF_FILES
        where ID = p_file_id;
@@ -500,6 +534,57 @@ end f_get_id_file;
     return l_file_code_alt;
 
   end GET_FILE_CODE_ALT;
+
+  --
+  -- Формат файлу (TXT/XML) по ідентифікатору файлу
+  --
+  function GET_FILE_FMT
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.file_fmt%type
+  is
+    l_file_fmt             nbur_ref_files.file_fmt%type;
+  begin
+
+    begin
+      select FILE_FMT
+        into l_file_fmt
+        from NBUR_REF_FILES
+       where ID = p_file_id;
+    exception
+      when NO_DATA_FOUND then
+        l_file_fmt := null;
+        raise_application_error( -20666, 'No file with ID ' || p_file_id || ' found!', true );
+    end;
+
+    return l_file_fmt;
+
+  end GET_FILE_FMT;
+
+  --
+  -- Получение периода формирования файла по его идентификатору
+  --
+  function GET_FILE_PERIOD_TYPE
+  ( p_file_id       in     nbur_ref_files.id%type
+  ) return nbur_ref_files.period_type %type
+  is
+    l_file_period_type   nbur_ref_files.period_type%type;
+  begin
+
+    begin
+      select PERIOD_TYPE
+        into 
+             l_file_period_type
+      from   NBUR_REF_FILES
+      where  ID = p_file_id;
+    exception
+      when NO_DATA_FOUND then
+        l_file_period_type := null;
+        raise_application_error( -20666, 'No file with ID ' || p_file_id || ' found!', true );
+    end;
+
+    return l_file_period_type;
+    
+  end GET_FILE_PERIOD_TYPE;
 
 --
 --
@@ -551,11 +636,11 @@ is
   l_file_hash     nbur_lst_files.file_hash%type;
   l_usr_id        staff$base.id%type;
 begin
-  
-  l_filename := nbur_forms.f_createfilename(p_file_id, p_report_date, p_kf, p_version_id);
-  
+
+  l_filename := NBUR_FORMS.F_CREATEFILENAME( p_file_id, p_report_date, p_kf, p_version_id );
+
   l_file_hash := SYS.DBMS_CRYPTO.Hash(l_empty_string, SYS.DBMS_CRYPTO.HASH_SH1);
-  
+
   if ( p_userid Is Null )
   then
     begin
@@ -570,7 +655,7 @@ begin
   else
     l_usr_id := p_userid;
   end if;
-  
+
   insert
     into NBUR_LST_FILES
        ( report_date, kf, version_id, file_id, file_name,
@@ -580,47 +665,57 @@ begin
          l_empty_string, l_file_hash, 'RUNNING', p_start_time, null, p_userid );
 
   return 0;
-  
+
 exception
    when others then
         p_errors_log('START_FORM_FILE error: '||sqlerrm||' '||
             sys_context('bars_context','user_mfo')||' '||user_id);
         return -1;
-end f_start_form_file;
+end F_START_FORM_FILE;
 
---   фиксация окончания процесса формирования отчетного файла в списке сформированных файлов
-function f_finish_form_file
+-- фиксация окончания процесса формирования отчетного файла в списке сформированных файлов
+function F_FINISH_FORM_FILE
 ( p_version_id     in     number,
   p_file_id        in     number,
   p_report_date    in     date,
   p_kf             in     varchar2,
-  p_status         in     varchar2 default 'FINISHED'  
+  p_status         in     varchar2 default 'FINISHED'
 ) return number
 is
-  l_file_body      clob;
-  l_file_hash      nbur_lst_files.file_hash%type;
+  title      constant     varchar2(64) := $$PLSQL_UNIT||'.FINISH_FORM_FILE';
+  l_file_body             clob; -- nbur_lst_files.file_body%type
+  l_file_hash             nbur_lst_files.file_hash%type;
 begin
-  l_file_body := nbur_forms.f_createfilebody (p_file_id, p_report_date, p_kf, p_version_id);
-  
-  l_file_hash := SYS.DBMS_CRYPTO.Hash(l_file_body, SYS.DBMS_CRYPTO.HASH_SH1 );
-  
+
+  l_file_body := NBUR_FORMS.F_CREATEFILEBODY( p_file_id, p_report_date, p_kf, p_version_id );
+
+  l_file_hash := SYS.DBMS_CRYPTO.Hash( l_file_body, SYS.DBMS_CRYPTO.HASH_SH1 );
+
   update NBUR_LST_FILES
-     set finish_time = systimestamp,
-         file_status = p_status,
-         file_body = l_file_body, 
-         file_hash = l_file_hash
-   where report_date  = p_report_date
-     and kf = p_kf
-     and version_id = p_version_id
-     and file_id = p_file_id;
-  
+     set FILE_STATUS = 'INVALID'
+   where REPORT_DATE = p_report_date
+     and KF          = p_kf
+     and FILE_ID     = p_file_id
+     and VERSION_ID  < p_version_id
+     and FILE_STATUS <> 'BLOCKED';
+
+  update NBUR_LST_FILES
+     set FINISH_TIME = systimestamp,
+         FILE_STATUS = p_status,
+         FILE_BODY   = l_file_body,
+         FILE_HASH   = l_file_hash
+   where REPORT_DATE = p_report_date
+     and KF          = p_kf
+     and VERSION_ID  = p_version_id
+     and FILE_ID     = p_file_id;
+
   return 0;
-  
+
 exception
   when others then
-    p_errors_log('FINISH_FORM_FILE error: '||sqlerrm );
+    p_errors_log( title||': error => '||sqlerrm );
     return -1;
-end f_finish_form_file;
+end F_FINISH_FORM_FILE;
 
 -- _нвал_дац_я файлу
 procedure p_set_invalid_file (p_file_id       in number, 
@@ -628,7 +723,7 @@ procedure p_set_invalid_file (p_file_id       in number,
                               p_kf            in varchar2,
                               p_version_id    in number) 
 is
-    l_version_id   number := p_version_id;                              
+    l_version_id   number := p_version_id;
 begin
     if l_version_id is null then
        l_version_id := f_get_version_file(p_file_id, p_report_date, p_kf);
@@ -895,7 +990,7 @@ end;
       return ID
         into p_file_id;
 
-      bars_audit.info( title ||': Created reporting file #'||to_char(p_file_id) );
+      bars_audit.trace( title ||': Created reporting file #'||to_char(p_file_id) );
 
     exception
       when DUP_VAL_ON_INDEX then
@@ -922,7 +1017,7 @@ end;
 
     end;
 
-    if ( p_file_tp = 1 )
+    if ( SubStr(p_file_code,1,1) = '#' )
     then -- для фалів звітності НБУ
       begin
         insert
@@ -930,7 +1025,7 @@ end;
              ( KODF, AA, A017, NN, PERIOD, PROCC, R, SEMANTIC, KODF_EXT, PR_TOBO, TYPE_ZNAP )
         values
              ( SubStr(p_file_code,2,2), p_scm_num, p_scm_code, p_unit_code, p_period_tp
-             , 'XXXXL', p_location_code, p_file_nm, p_file_code_alt, 0, p_val_tp_ind );
+             , 'XXXXL', p_location_code, SubStr(p_file_nm,1,70), p_file_code_alt, 0, p_val_tp_ind );
       exception
         when DUP_VAL_ON_INDEX then
           update KL_F00$GLOBAL
@@ -938,7 +1033,7 @@ end;
                , NN        = p_unit_code
                , PERIOD    = p_period_tp
                , R         = p_location_code
-               , SEMANTIC  = p_file_nm
+               , SEMANTIC  = SubStr(p_file_nm,1,70)
                , KODF_EXT  = p_file_code_alt
                , TYPE_ZNAP = p_val_tp_ind
            where KODF = SubStr(p_file_code,2,2)
@@ -947,7 +1042,7 @@ end;
     end if;
 
   end SET_FILE;
-  
+
   --
   --
   --
@@ -977,29 +1072,36 @@ end;
            and FILE_ID = p_file_id;
     end;
 
-    l_file_code := SubStr( F_GET_KODF( p_file_id ), 2, 2 );
+    l_file_code := F_GET_KODF( p_file_id );
 
-    begin
-      insert
-        into KL_F00$LOCAL
-           ( POLICY_GROUP, KODF, A017, UUU, ZZZ, PATH_O, BRANCH, KF )
-      values
-           ( 'FILIAL', l_file_code, 'C', p_e_address, p_nbuc, p_file_path, '/'||p_kf||'/', p_kf );
-    exception
-      when DUP_VAL_ON_INDEX then
-        update KL_F00$LOCAL
-           set UUU    = p_e_address
-             , ZZZ    = p_nbuc
-             , PATH_O = p_file_path
-         where KF           = p_kf
-           and POLICY_GROUP = 'FILIAL'
-           and BRANCH       = '/'||p_kf||'/'
-           and KODF         = l_file_code
-           and A017         = 'C';
-    end;
+    if ( SubStr(l_file_code,1,1) = '#' )
+    then
+
+      l_file_code := SubStr(l_file_code,2,2);
+
+      begin
+        insert
+          into KL_F00$LOCAL
+             ( POLICY_GROUP, KODF, A017, UUU, ZZZ, PATH_O, BRANCH, KF )
+        values
+             ( 'FILIAL', l_file_code, 'C', p_e_address, p_nbuc, p_file_path, '/'||p_kf||'/', p_kf );
+      exception
+        when DUP_VAL_ON_INDEX then
+          update KL_F00$LOCAL
+             set UUU    = p_e_address
+               , ZZZ    = p_nbuc
+               , PATH_O = p_file_path
+           where KF           = p_kf
+             and POLICY_GROUP = 'FILIAL'
+             and BRANCH       = '/'||p_kf||'/'
+             and KODF         = l_file_code
+             and A017         = 'C';
+      end;
+
+    end if;
 
   end SET_FILE_LOCAL;
-  
+
   --
   --
   --
@@ -1366,16 +1468,16 @@ end;
     when NO_DATA_FOUND then
       bars_audit.trace( '%s: Exit with error: file with id=%s has different type than TXT.', title, to_char(p_file_id) );
   end SET_FILE_VIEW;
-  
+
   --
   -- create dependencies
   --
-  procedure SET_FILE_DEPENDENCIES
+  procedure SET_OBJECT_DEPENDENCIES
   ( p_file_id          in     nbur_lnk_files_objects.file_id%type
   , p_obj_id           in     nbur_lnk_files_objects.object_id%type
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
   ) is
-    title        constant     varchar2(64)  := $$PLSQL_UNIT||'.SET_FILE_DPND';
+    title        constant     varchar2(64)  := $$PLSQL_UNIT||'.SET_OBJ_DPND';
   begin
     
     bars_audit.trace( '%s: Entry with ( file_id=%s, obj_id=%s ).'
@@ -1393,7 +1495,7 @@ end;
       
       begin
         
-        Insert 
+        Insert
           into BARS.NBUR_LNK_FILES_OBJECTS
              ( FILE_ID, OBJECT_ID, START_DATE )
         Values
@@ -1407,20 +1509,20 @@ end;
       end;
       
     end if;
-    
+
     bars_audit.trace( '%s: Exit.', title );
 
-  end SET_FILE_DEPENDENCIES;
-  
+  end SET_OBJECT_DEPENDENCIES;
+
   --
   -- create dependencies
   --
-  procedure SET_FILE_DEPENDENCIES
+  procedure SET_OBJECT_DEPENDENCIES
   ( p_file_code        in     nbur_ref_files.file_code%type
   , p_obj_id           in     nbur_lnk_files_objects.object_id%type
   , p_strt_dt          in     nbur_lnk_files_objects.start_date%type
     ) is
-    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_FILE_DPND';
+    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_OBJ_DPND';
     l_file_id                 nbur_ref_files.id%type;
   begin
     
@@ -1435,15 +1537,10 @@ end;
       then
         raise_application_error( -20666, 'Value for parameter [p_file_code] must contain 3 chars!', true );
       else
-        l_file_id := case SubStr(p_file_code,1,1)
-                       when '#' then '1'
-                       when '@' then '2'
-                       else '0' end
-                       || to_char(ASCII(SubStr(p_file_code,2,1)))
-                       || to_char(ASCII(SubStr(p_file_code,3,1)));
+        l_file_id := GET_FILE_ID( p_file_code );
     end case;
     
-    SET_FILE_DEPENDENCIES
+    SET_OBJECT_DEPENDENCIES
     ( p_file_id => l_file_id
     , p_obj_id  => p_obj_id
     , p_strt_dt => p_strt_dt
@@ -1451,6 +1548,96 @@ end;
     
     bars_audit.trace( '%s: Exit.', title );
     
+  end SET_OBJECT_DEPENDENCIES;
+
+  --
+  --
+  --
+  procedure SET_FILE_DEPENDENCIES
+  ( p_file_id       in     nbur_lnk_files_files.file_id%type
+  , p_file_pid      in     nbur_lnk_files_files.file_dep_id%type
+--, p_strt_dt       in     nbur_lnk_files_files.start_date%type
+  ) is
+    title        constant     varchar2(64) := $$PLSQL_UNIT||'.SET_FILE_DPND';
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_file_id=%s, p_file_pid=%s ).'
+                    , title, to_char(p_file_id), to_char(p_file_pid) );
+
+    case
+    when ( p_file_pid Is Null )
+    then -- видадення усіх залежностей для файлу
+
+      delete NBUR_LNK_FILES_FILES
+       where FILE_DEP_ID = p_file_id;
+
+      bars_audit.info( title || ': deleted all dependency for file #' || to_char(p_file_id) );
+
+    when ( p_file_id Is Null )
+    then -- видадення усіх залежностей для файлу
+
+      delete NBUR_LNK_FILES_FILES
+       where FILE_ID = p_file_pid;
+
+      bars_audit.info( title || ': deleted all dependency for file #' || to_char(p_file_pid) );
+
+    else -- вставка нової залежності для файлу
+
+      begin
+
+        insert
+          into NBUR_LNK_FILES_FILES
+             ( FILE_ID, FILE_DEP_ID, START_DATE, FINISH_DATE )
+        values
+             ( p_file_pid, p_file_id, trunc(sysdate,'YYYY'), null );
+
+        bars_audit.info( title || ': added new dependency for file #' || to_char(p_file_id) );
+
+      exception
+        when DUP_VAL_ON_INDEX
+        then null;
+      end;
+
+    end case;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end SET_FILE_DEPENDENCIES;
+
+    --
+  --
+  --
+  procedure SET_FILE_DEPENDENCIES
+  ( p_file_code     in     nbur_ref_files.file_code%type
+  , p_file_pcode    in     nbur_ref_files.file_code%type
+--, p_strt_dt       in     nbur_lnk_files_files.start_date%type
+  ) is
+    title     constant     varchar2(64) := $$PLSQL_UNIT||'.SET_FILE_DPND';
+    l_file_id              nbur_lnk_files_files.file_id%type;
+    l_file_pid             nbur_lnk_files_files.file_dep_id%type;
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_file_code=%s, p_file_pcode=%s ).'
+                    , title, p_file_code, p_file_pcode );
+
+    if ( p_file_code is Null )
+    then l_file_id := null;
+    else l_file_id := GET_FILE_ID( p_file_code );
+    end if;
+
+    if ( p_file_pcode is Null )
+    then l_file_pid := null;
+    else l_file_pid := GET_FILE_ID( p_file_pcode );
+    end if;
+
+    SET_FILE_DEPENDENCIES
+    ( p_file_id  => l_file_id
+    , p_file_pid => l_file_pid
+--  , p_strt_dt  => p_strt_dt
+    );
+
+    bars_audit.trace( '%s: Exit.', title );
+
   end SET_FILE_DEPENDENCIES;
 
   --
