@@ -239,7 +239,11 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             //for XML - use utf-8
 
             Encoding enc = fileFmt == "XML" ? Encoding.UTF8 : Encoding.GetEncoding(866);
-            fName = fileFmt != "XML" ? fName : string.Format("{0}X{1}.XML", fName.Substring(1, 2), fName.Substring(3).Replace(".",""));
+            fName = fileFmt != "XML"
+                ?fName
+                :(fName[0]=='#')
+                    ?string.Format("{0}X{1}.XML", fName.Substring(1, 2), fName.Substring(3).Replace(".",""))
+                    :string.Format("{0}X{1}.XML", fName.Substring(0, 2), fName.Substring(3).Replace(".",""));
             result.Content = new StringContent(fBody, enc, "text/plain");
             result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
             {
