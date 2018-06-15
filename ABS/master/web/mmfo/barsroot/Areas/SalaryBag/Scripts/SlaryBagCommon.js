@@ -250,10 +250,10 @@ function clearSelection() {
 //});
 
 function DownloadFileFromBase64(base64, fileName) {
-    var form = $('<form method="POST" action="' + bars.config.urlContent("/SalaryBag/SalaryBag/ConvertBase64ToFile") + '" id="download_form"></form>');
+    var form = $('<form method="POST" action="' + bars.config.urlContent("/SalaryBag/SalaryBag/ConvertBase64ToFileUrlDecoded") + '" id="download_form"></form>');
     form.append($('<input type="hidden" name="base64" value="' + base64 + '" />'));
     form.append($('<input type="hidden" name="contentType" value="attachment" />'));
-    form.append($('<input type="hidden" name="fileName" value="' + fileName + '" />'));
+    form.append($('<input type="hidden" name="fileName" value="' + encodeURIComponent(fileName) + '" />'));
     form.appendTo($('body'));
     form.submit();
 
