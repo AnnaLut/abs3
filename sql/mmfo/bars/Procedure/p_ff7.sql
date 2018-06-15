@@ -1,19 +1,13 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FF7.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FF7 ***
-
+--
+-- P_FF7  (Procedure) 
+--
 CREATE OR REPLACE PROCEDURE BARS.P_FF7 (Dat_ DATE, p_sheme_ varchar2 default 'G',
     typf_ number default 0, isf8_ number default 0)  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION       v.18.004  13/03/2018
+% VERSION       v.18.005  13/06/2018 (13/03/2018)
 %%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -270,7 +264,7 @@ from OTCN_SALDO s, OTCN_ACC o,
            a.nd ,
            b.sdate, b.wdate, b.sos, 0 ost_9129, b.cc_id, a.tip
     from
-         (select n.acc, max(n.nd) nd, 
+         (select n.acc, max(n.nd) nd,
                  decode(C.VIDD, 10, 'LVR', null) tip
              from nd_acc n, cc_deal c
              where n.nd=c.nd and c.sdate <= dat_  and
@@ -486,8 +480,8 @@ select dat_, o.acc, o.accc, substr(o.nls,1,4),
        f_get_s260(c.nd, o.acc, p.s260, o.rnk, o.nbs, default_) s260,
        z.ved, p.s031, 0, 0, k.tpa, nvl(p.s080,0), o.tip, nvl(trim(p.r011),'0'), '1'
 from   OTCN_ACC          o,
-       (select a.acc, a.nd, b.sdate, b.wdate, b.sos
-        from   (select n.acc, max(n.nd) nd
+       (select a.acc, a.nd, a.ndg, b.sdate, b.wdate, b.sos
+        from   (select n.acc, max(n.nd) nd, max(c.ndg) ndg
                 from   nd_acc n, cc_deal c
                 where  n.nd=c.nd and
                        c.sdate <= dat_ and
@@ -509,7 +503,7 @@ where  o.acc=c.acc(+)             and
        a.dapp is not null and a.dapp not in (c.sdate, a.daos) and a.dapp <= dat_ and -- перевірка чи видавався вже овердрафт
        exists (select 1
                from nd_acc n, sal s
-               where n.nd=c.nd and
+               where n.nd=nvl(c.ndg, c.nd) and
                      n.acc=s.acc and
                      s.fdat=dat_ and
                      s.nls like '9129%' and
@@ -543,32 +537,32 @@ where datf = dat_
 -- по овердрафтам може бути не один кредит в звітному періодіна одному й тому ж рахунку
 declare
     doso_       number;
-    koso_       number;   
+    koso_       number;
     r_doso_     number;
     doso_ALL_   number := 0;
-    koso_ALL_   number := 0;   
+    koso_ALL_   number := 0;
     r_doso_ALL_ number := 0;
 begin
-    for k in (select n.acc, c.nd, c.cc_id, c.sdate, 
-                     nvl(lead(c.sdate-1, 1) over (partition by n.acc order by c.sdate), c.wdate) wdate, 
+    for k in (select n.acc, c.nd, c.cc_id, c.sdate,
+                     nvl(lead(c.sdate-1, 1) over (partition by n.acc order by c.sdate), c.wdate) wdate,
                      nvl((count(*) over (partition by n.acc)), 0) cnt,
                      DENSE_RANK() over (partition by n.acc order by c.sdate) rnum,
-                     c.sos, t.nd cur_nd, t.kv  
-                from nd_acc n, cc_deal c, otc_ff7_history_acc t 
+                     c.sos, t.nd cur_nd, t.kv
+                from nd_acc n, cc_deal c, otc_ff7_history_acc t
                 where n.nd = c.nd and
                       n.acc = t.acc and
                       t.datf = dat_ and
                       c.vidd = 10 and
                       dat_ between c.sdate and (case when c.sos = 10 and c.wdate < dat_ then dat_ else c.wdate end) and
-                      n.acc in (select n.acc 
+                      n.acc in (select n.acc
                                 from nd_acc n, cc_deal c
-                                where n.nd=c.nd and 
+                                where n.nd=c.nd and
                                       c.vidd = 10 and
                                       dat_ between c.sdate and (case when c.sos = 10 and c.wdate < dat_ then dat_ else c.wdate end) and
-                                      n.acc in (select acc from otc_ff7_history_acc where datf=dat_ )      
-                                group by n.acc 
-                                having count(*) > 1)        
-                order by c.sdate)  
+                                      n.acc in (select acc from otc_ff7_history_acc where datf=dat_ )
+                                group by n.acc
+                                having count(*) > 1)
+                order by c.sdate)
     loop
         if k.cnt <> k.rnum then
            select nvl(sum(decode(r.kv, 980,
@@ -586,26 +580,26 @@ begin
                  r.nls like k.r020||'%' and
                  r.acc = k.acc
            group by r.acc;
-           
-           select decode(k.kv, 980, sum(dos), gl.p_icurval(k.kv, sum(dos), dat_)) dos, 
+
+           select decode(k.kv, 980, sum(dos), gl.p_icurval(k.kv, sum(dos), dat_)) dos,
                   decode(k.kv, 980, sum(kos), gl.p_icurval(k.kv, sum(kos), dat_)) kos
            into doso_, koso_
            from saldoa
            where acc = k.acc and
-                 fdat between greatest(k.sdate, trunc(dat_, 'mm')) and 
+                 fdat between greatest(k.sdate, trunc(dat_, 'mm')) and
                               least(k.wdate, dat_);
-                  
-           insert into otc_ff7_history_acc (DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, OST, OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK, 
+
+           insert into otc_ff7_history_acc (DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, OST, OSTQ, DOSQ, KOSQ, ND, NKD, SDATE, WDATE, SOS, RNK,
                 STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, OSTQ_KD, R_DOS, CC_ID, TPA, S080, KF, R011, S245)
-           select DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, 0, 0, doso_, koso_, k.nd, NKD, k.sdate, k.wdate, k.sos, RNK, 
+           select DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, 0, 0, doso_, koso_, k.nd, NKD, k.sdate, k.wdate, k.sos, RNK,
                 STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, 0, r_doso_, CC_ID, TPA, S080, KF, R011, S245
-           from otc_ff7_history_acc 
+           from otc_ff7_history_acc
            where datf = dat_ and
                  ltrim(nd, '-') = to_char(k.cur_nd) and
                  acc = k.acc;
-                 
+
            doso_ALL_ := doso_ALL_ + doso_;
-           koso_ALL_ := koso_ALL_ + koso_; 
+           koso_ALL_ := koso_ALL_ + koso_;
            r_doso_ALL_ := r_doso_ALL_ + r_doso_;
         else
            update otc_ff7_history_acc
@@ -616,8 +610,8 @@ begin
                  ltrim(nd, '-') = to_char(k.cur_nd) and
                  acc = k.acc;
         end if;
-    end loop;                
-end; 
+    end loop;
+end;
 
 logger.info ('P_FF7: etap 2 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
@@ -684,10 +678,7 @@ where O.DATF = dat_
   and od.fdat = ok.fdat
   and od.acc = ad.acc
   and (ad.nls like substr(o.nls,1,3)||'%' or
-       ok.tt = '024' and o.nls like '207%' and ad.nls like '206%' or
-       ok.tt = '024' and o.nls like '207%' and ad.nls like '208%' or
-       ok.tt = '024' and o.nls like '206%' and ad.nls like '207%' or
-       ok.tt = '024' and o.nls like '208%' and ad.nls like '207%' or
+       ok.tt = '024' or
        ok.tt = 'IRR' and o.nls like '2068%' and ad.nls like '6026%')
 group by O.ACC, O.DATF, O.KOSQ;
 
@@ -743,10 +734,7 @@ where O.DATF = dat_
   and od.fdat = ok.fdat
   and od.acc = ad.acc
   and (ad.nls like substr(o.nls,1,3)||'%' or
-       ok.tt = '024' and o.nls like '206%' and ad.nls like '207%' or
-       ok.tt = '024' and o.nls like '208%' and ad.nls like '207%' or
-       ok.tt = '024' and o.nls like '207%' and ad.nls like '206%' or
-       ok.tt = '024' and o.nls like '207%' and ad.nls like '208%' or
+       ok.tt = '024' or
        ok.tt = '015' and o.nls like '2068%' and ad.nls like '3739%')
 group by O.ACC, O.DATF, O.DOSQ;
 commit;
@@ -1144,7 +1132,7 @@ where o.s260='00'
 
 update otc_ff7_history_acc
    set s245 ='2'
- where tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA');
+ where datf = dat_ and tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA');
 
 logger.info ('P_FF7: etap 16 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
@@ -1650,14 +1638,4 @@ end if;
 logger.info ('P_FF7: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
-show err;
-
-PROMPT *** Create  grants  P_FF7 ***
-grant EXECUTE                                                                on P_FF7           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FF7           to RPBN002;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FF7.sql =========*** End *** ===
-PROMPT ===================================================================================== 
+SHOW ERRORS;

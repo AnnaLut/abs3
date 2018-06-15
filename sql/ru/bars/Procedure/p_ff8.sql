@@ -1,18 +1,9 @@
- 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_FF8.sql =========*** Run *** ===
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_FF8 ***
-
 CREATE OR REPLACE PROCEDURE BARS.P_FF8 (Dat_ DATE) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 DESCRIPTION : Процедура формирования файла #F8 для КБ
 COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 
-VERSION     :v.18.006  04/06/2018   (15/05/2018)
+VERSION     :v.18.007  14/06/2018 (04/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 
@@ -350,7 +341,7 @@ update otc_ff8_history_acc o
      ) loop
           update otc_ff8_history_acc
              set tip='SPN'
-           where nls = u.nls;
+           where datf = dat_ and nls = u.nls;
      end loop;
 --                          счета просроченного тела
      for u in ( select o.nls
@@ -369,12 +360,12 @@ update otc_ff8_history_acc o
      ) loop
           update otc_ff8_history_acc
              set tip='SP '
-           where nls = u.nls;
+           where datf = dat_ and nls = u.nls;
      end loop;
 --                          счета процентов
           update otc_ff8_history_acc
              set tip='SN '
-           where tip !='SN ' and tip !='SPN'
+           where datf = dat_ and tip !='SN ' and tip !='SPN'
              and (  nbs like '2__8'
                  or nbs like '15_8'
                  or nbs in ('1607','2607','2627','2657','3568') );
@@ -546,7 +537,7 @@ set kv_dog = null where datf = dat_;
 
 update otc_ff8_history_acc
    set s245 ='2'
- where tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA');
+ where datf = dat_ and tip in ('SK9','SP ','SPN','OFR','KSP','KK9','KPN','SNA');
 
 logger.info ('P_FF8: etap 9 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
@@ -570,7 +561,7 @@ from (
                          (case when f.nd<0 then
                            null
                          else
-                           f.nd
+                           nvl(to_char(c.ndg), f.nd)
                          end)                       nd  ,
                          f.rnk                            ,
                          'Кількість рахунків - '||
@@ -603,7 +594,11 @@ from (
                                )  and
                          f.ostq <> 0
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
-                           f.nd, f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
+                         (case when f.nd<0 then
+                           null
+                         else
+                           nvl(to_char(c.ndg), f.nd)
+                         end), f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '04'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
     from kred
 );
@@ -626,7 +621,7 @@ from (
                         (case when f.nd<0 then
                            null
                          else
-                           f.nd
+                           nvl(to_char(c.ndg), f.nd)
                          end)                       nd  ,
                          f.rnk                            ,
                          'Кількість рахунків - '||
@@ -656,7 +651,11 @@ from (
                                 ) and
                          f.ostq <> 0
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
-                           f.nd, f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
+                         (case when f.nd<0 then
+                           null
+                         else
+                           nvl(to_char(c.ndg), f.nd)
+                         end), f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '05'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
     from kred
 );
@@ -680,7 +679,7 @@ from (
                         (case when f.nd<0 then
                            null
                          else
-                           f.nd
+                           nvl(to_char(c.ndg), f.nd)
                          end)                       nd  ,
                          f.rnk                            ,
                          'Кількість рахунків - '||
@@ -710,7 +709,11 @@ from (
                                  ) and
                            f.ostq <> 0
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
-                           f.nd, f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
+                         (case when f.nd<0 then
+                           null
+                         else
+                           nvl(to_char(c.ndg), f.nd)
+                         end), f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '06'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
     from kred
 );
@@ -744,7 +747,7 @@ from (
                          1                          cnt ,
                          sum(ostq)                  ost,
                          p.sumr
-                  from   OTC_ff8_HISTORY_ACC f, cc_deal c, 
+                  from   OTC_ff8_HISTORY_ACC f, cc_deal c,
                          (select nd, sum(sumr) sumr
                           from   v_cck_restr b
                           where  b.vid_restr not in (3, 6) and
@@ -830,7 +833,7 @@ from (
                         (case when f.nd<0 then
                            null
                          else
-                           f.nd
+                           nvl(to_char(c.ndg), f.nd)
                          end)                       nd  ,
                          f.rnk                            ,
                          'Кількість рахунків - '||
@@ -841,7 +844,7 @@ from (
                          sum(ostq)                  ost
                   from   OTC_ff8_HISTORY_ACC f, cc_deal c
                   where  f.datf=dat_ and
-                         f.nd = to_char(c.nd(+)) and 
+                         f.nd = to_char(c.nd(+)) and
                          exists (select nd
                                   from v_cck_restr v
                                   where v.nd = nvl(to_char(c.ndg), f.nd)  and
@@ -855,7 +858,11 @@ from (
                                         )
                          and f.ostq <> 0
                   group by nvl(kv_dog,kv), substr(cc,1,2), k111, s080, lpad(nvl(kv_dog,kv),3,'0'),
-                           f.nd, f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
+                         (case when f.nd<0 then
+                           null
+                         else
+                           nvl(to_char(c.ndg), f.nd)
+                         end), f.rnk, decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), tobo)
     select nls, kv, dt, '10'||kodp, cnt znap, nd, rnk, comm, nbuc, tobo
     from kred
 );
@@ -891,7 +898,7 @@ from (
                          1                          cnt ,
                          sum(ostq)                  ost,
                          p.sumr
-                  from   OTC_ff8_HISTORY_ACC f, cc_deal c, 
+                  from   OTC_ff8_HISTORY_ACC f, cc_deal c,
                          (select nd,
                                 sum(case when fdat < datb_ then 1 else 0 end) p1,
                                 sum(case when fdat between datb_ and dat_ then 1 else 0 end) p2,
@@ -903,7 +910,7 @@ from (
                           group by nd) p
                   where  f.datf=dat_ and
                          f.tip in ('SS ', 'SP ') and -- счета осн. задож-сти и прострочки по осн. задолж-ти
-                         f.nd = to_char(c.nd(+)) and 
+                         f.nd = to_char(c.nd(+)) and
                          nvl(to_char(c.ndg), f.nd) = p.nd and
                          p.p1 = 0 and
                          p.p2 >= 1 and
@@ -950,7 +957,7 @@ from (
                          1                          cnt ,
                          sum(ostq)                  ost,
                          p.sumr
-                  from   OTC_ff8_HISTORY_ACC f, cc_deal c, 
+                  from   OTC_ff8_HISTORY_ACC f, cc_deal c,
                          (select nd,
                                 sum(case when fdat < datb_ then 1 else 0 end) p1,
                                 sum(case when fdat between datb_ and dat_ then 1 else 0 end) p2,
@@ -962,7 +969,7 @@ from (
                           group by nd) p
                   where  f.datf=dat_ and
                          f.tip in ('SN ','SPN') and -- счета начисл. %% -в и простроченных %% -в
-                         f.nd = to_char(c.nd(+)) and 
+                         f.nd = to_char(c.nd(+)) and
                          nvl(to_char(c.ndg), f.nd) = p.nd and
                          p.p1 = 0 and
                          p.p2 >= 1 and
@@ -1011,7 +1018,7 @@ from (
                   where  f.datf=dat_                  and
                          f.tip in ('SS ', 'SP ') and  -- счета осн. задож-сти и прострочки по осн. задолж-ти
                          f.nd = to_char(c.nd(+)) and
-                         nvl(to_char(c.ndg), f.nd) in 
+                         nvl(to_char(c.ndg), f.nd) in
                                  (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr not in (3, 6) and -- in (1,2,4,5,7,8) and -- Вирко 11/08/2010 --18/01/2010
@@ -1059,7 +1066,7 @@ from (
                   where  f.datf=dat_                  and
                          f.tip in ('SN ','SPN') and -- счета начисл. %% -в и простроченных %% -в
                          f.nd = to_char(c.nd(+)) and
-                         nvl(to_char(c.ndg), f.nd) in 
+                         nvl(to_char(c.ndg), f.nd) in
                                  (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr in (1, 3, 6) and -- Вирко 11/08/2010 --18/01/2010
@@ -1108,7 +1115,7 @@ from (
                   where  f.datf=dat_                  and
                          f.tip='SP ' and -- счета прострочки по осн. задож-сти
                          f.nd = to_char(c.nd(+)) and
-                         nvl(to_char(c.ndg), f.nd) in 
+                         nvl(to_char(c.ndg), f.nd) in
                                  (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr not in (3, 6) and -- in (1,2,4,5,7,8) and -- Вирко 11/08/2010 --18/01/2010
@@ -1154,7 +1161,7 @@ from (
                   where  f.datf=dat_                  and
                          f.tip='SPN' and -- счета простроч. начисл. %% -в
                          f.nd = to_char(c.nd(+)) and
-                         nvl(to_char(c.ndg), f.nd) in 
+                         nvl(to_char(c.ndg), f.nd) in
                                  (select nd
                                   from   v_cck_restr b
                                   where  b.vid_restr in (1, 3, 6) and -- Вирко 11/08/2010 --18/01/2010
@@ -1166,10 +1173,8 @@ from (
     select nls, kv, dt, '19'||kodp, -ost znap, nd, rnk, comm, nbuc, tobo
     from kred);
 
---if mfo_ <> 322669 then
 p_ff7(dat_,'G',0,1);
 commit;
---end if;
 
 update otc_ff7_history_acc o
 set o.s260 = '08'
@@ -1353,21 +1358,22 @@ logger.info ('P_FF8: etap 12-1 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nd, rnk, comm, nbuc, userid, isp)
 select *
 from (
-    with kred as (select min(f.nls) nls, nvl(f.kv_dog, f.kv) kv, dat_ dt, f.cc||f.k111 k1,
-                         max(f.s260) k2, max(f.s032) k3, lpad(nvl(f.kv_dog, f.kv),3,'0') k4, s245,
+    with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
+                         max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                          max((case substr(f.nd,1,1) when '№' then null when '-' then null else f.nd end)) nd, f.rnk,
                          nvl(f.nkd, f.nd) comm,
                          decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                          1 cnt,
-                         sum((case when substr(nls,1,4)='1502' then f.dosq else f.r_dos end)) ost -- выдача
-                         ,sum(f.kosq) kos -- погашення
-                         ,min (f.accc) isp, s080
-                    from OTC_FF7_HISTORY_ACC f, cc_deal c
+                         sum((case when substr(nls,1,4)='1502' then dosq else r_dos end)) ost -- выдача
+                         ,sum(kosq) kos -- погашення
+                         ,min (accc) isp, s080
+                    from OTC_FF7_HISTORY_ACC f
+                    left outer join cc_deal c
+                    on (f.nd = to_char(c.nd))
                     where f.datf=dat_
                           and f.tpa = 1
                           and (f.ostq_kd <> 0 or (f.ostq_kd=0 and f.dosq+f.kosq<>0))
-                          and f.daos <> to_date('01012011','ddmmyyyy')
-                          and f.nd = to_char(c.nd(+))
+                          and daos <> to_date('01012011','ddmmyyyy')
                           and nvl(f.nkd, nvl(to_char(c.ndg), f.nd)) not in
                           (select nvl(f1.nkd, f1.nd) from OTC_FF7_HISTORY_ACC f1 where f1.datf=datp_
                           -- если в прошлом месяце сумма по договору = 0, а в этом <> 0  - договор новый
@@ -1388,7 +1394,7 @@ from (
                                            )
                                    )
                                  or mfo_ <> '300465')
-                    group by nvl(f.kv_dog, f.kv), cc,k111, lpad(nvl(f.kv_dog, f.kv),3,'0'), s245, nvl(f.nkd, f.nd), f.rnk,
+                    group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(f.nkd,f.nd), f.rnk,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), s080
                     order by 1)
     select nls, kv, dt, 'A7'||k1||k2||k3||s080||'00'||k4||s245 kodp, cnt  znap, nd, rnk, comm, nbuc, userid_, isp
@@ -1408,13 +1414,15 @@ from (
     with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
                          max(f.s260) k2 ,
                          max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
-                         max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
-                         nvl(nkd,nd) comm,
+                         max((case substr(f.nd,1,1) when '№' then null when '-' then null else f.nd end)) nd, f.rnk,
+                         nvl(f.nkd,f.nd) comm,
                          decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                          1 cnt, sum(ostq) ost
                          ,sum(kosq) kos
                          ,min (accc)  isp, s080
                     from OTC_FF7_HISTORY_ACC f
+                    left outer join cc_deal c
+                    on (f.nd = to_char(c.nd))
                     where f.datf=dat_ and
                           f.nls not like '9129%' and
                           f.ostq_kd = 0 and
@@ -1426,12 +1434,13 @@ from (
                                             AND F1.OSTQ_KD <> 0)
                                              or
                            f.nkd is null and
-                           f.nd in (SELECT F1.ND
+                           nvl(to_char(c.ndg), f.nd) in 
+                                     (SELECT F1.ND
                                        FROM OTC_FF7_HISTORY_ACC F1
                                       WHERE  F1.DATF = datp_
                                             AND F1.OSTQ_KD <> 0) )
                            and f.nd not in (select nd from otcn_ff8_migr_nd)
-                    group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, tobo, nvl(nkd,nd), rnk,
+                    group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, tobo, nvl(f.nkd,f.nd), f.rnk,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), s080
                   )
     select nls, kv, dt, 'A8'||k1||k2||k3||s080||'00'||k4||s245 kodp, cnt  znap, nd, rnk, comm, nbuc, userid_,isp
@@ -1471,10 +1480,8 @@ from (
                                                   else decode(f.tip,'SS ',(dosq), 0)
                               end) kos1
                          ,min (accc)  isp
-                  from (select f.DATF, f.ACC, f.ACCC, f.NBS, f.SGN, f.NLS, f.KV, f.KV_DOG, f.NMS, f.DAOS, 
-                               f.DAZS, f.OST, f.OSTQ, f.DOSQ, f.KOSQ, f.ND, f.NKD, f.SDATE, f.WDATE, f.SOS, 
-                               f.RNK, f.STAFF, f.TOBO, f.S260, f.K110, f.K111, f.S031, f.S032, f.CC, f.TIP, 
-                               f.OSTQ_KD, f.R_DOS, f.CC_ID, f.TPA, f.S080, f.R011, f.S245
+                  from (select DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, OST, OSTQ, DOSQ, KOSQ, ND, NKD,
+                               SDATE, WDATE, SOS, RNK, STAFF, TOBO, S260, K110, K111, S031, S032, S080, CC, TIP, ostq_kd, s245
                           from OTC_FF7_HISTORY_ACC f
                           where f.datf = dat_
                                 and (f.tpa in (1, 4) or
@@ -1577,19 +1584,20 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
     INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nd, rnk, comm, nbuc, userid,isp)
     select *
     from (
-    with kred as (select min(f.nls) nls, nvl(f.kv_dog, f.kv) kv, dat_ dt, f.cc||f.k111 k1,
-                         max(f.s260) k2, max(s032) k3, lpad(nvl(f.kv_dog, f.kv),3,'0') k4, s245,
+    with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
+                         max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
                          max((case substr(f.nd,1,1) when '№' then null when '-' then null else f.nd end)) nd, f.rnk,
-                         nvl(f.nkd, f.nd) comm,
+                         nvl(f.nkd,f.nd) comm,
                          decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                          1 cnt,
-                         sum(decode(f_acc_type(f.nbs),'SN ',(f.dosq),'SPN',(f.dosq), 'DSK', (f.dosq), 0)) dos,
-                         sum(decode(f_acc_type(f.nbs),'SN ',(f.kosq),'SPN',(f.kosq), 'DSK', (f.kosq), 0)) kos,
-                         min (f.accc)  isp, f.s080
-                    from OTC_FF7_HISTORY_ACC f, cc_deal c
+                         sum(decode(f_acc_type(f.nbs),'SN ',(dosq),'SPN',(dosq), 'DSK', (dosq), 0)) dos,
+                         sum(decode(f_acc_type(f.nbs),'SN ',(kosq),'SPN',(kosq), 'DSK', (kosq), 0)) kos,
+                         min (accc)  isp, s080
+                    from OTC_FF7_HISTORY_ACC f
+                    left outer join cc_deal c
+                    on (f.nd = to_char(c.nd))                    
                     where f.datf=dat_
                       and f.tpa in (2, 3)
-                      and f.nd = to_char(c.nd(+))
                       and nvl(f.nkd, nvl(to_char(c.ndg), f.nd)) not in
                       (select nvl(f1.nkd, f1.nd) from OTC_FF7_HISTORY_ACC f1 where f1.datf=datp_
                                and ((f1.ostq_kd <> 0 ) -- если в прошлом месяце сумма по договору = 0, а в этом <> 0  - договор новый
@@ -1608,8 +1616,8 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                                            )
                                    )
                                  or mfo_ <> '300465')
-                    group by nvl(f.kv_dog, f.kv), f.cc, f.k111, lpad(nvl(f.kv_dog, f.kv),3,'0'), f.s245, nvl(f.nkd, f.nd), f.rnk,
-                             decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), f.s080
+                    group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(f.nkd,f.nd), f.rnk,
+                             decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), s080
                     order by 1)
     select nls, kv, dt, 'B2'||k1||k2||k3||s080||'00'||k4||s245 kodp, dos znap, nd, rnk, comm, nbuc, userid_,isp
     from kred
@@ -1657,13 +1665,15 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
     from (
         with kred as (select min(nls) nls, nvl(kv_dog, kv) kv, dat_ dt, cc||k111 k1,
                              max(f.s260) k2, max(s032) k3, lpad(nvl(kv_dog, kv),3,'0') k4, s245,
-                             max((case substr(nd,1,1) when '№' then null when '-' then null else nd end)) nd, rnk,
-                             nvl(nkd,nd) comm,
+                             max((case substr(f.nd,1,1) when '№' then null when '-' then null else f.nd end)) nd, f.rnk,
+                             nvl(f.nkd,f.nd) comm,
                              decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                              1 cnt,
                              sum(decode(f_acc_type(f.nbs),'SN ',(kosq), 'SPN', /*(-dosq+kosq)*/ (kosq), 'DSK', (kosq), 0)) kos
                              ,min (accc)  isp, s080
                         from OTC_FF7_HISTORY_ACC f
+                        left outer join cc_deal c
+                        on (f.nd = to_char(c.nd))                        
                         where f.datf=dat_ and
                           f.ostq_kd = 0 and
                           f.tpa in (2, 3) and
@@ -1674,12 +1684,13 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                                             AND F1.OSTQ_KD = 0)
                                              or
                            f.nkd is null and
-                           f.nd in (SELECT F1.ND
+                           nvl(to_char(c.ndg), f.nd) in 
+                                      (SELECT F1.ND
                                        FROM OTC_FF7_HISTORY_ACC F1
                                       WHERE  F1.DATF = datp_
                                             AND F1.OSTQ_KD = 0) )
                           and f.nd not in (select nd from otcn_ff8_migr_nd)
-                         group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(nkd,nd), rnk,
+                         group by nvl(kv_dog, kv), cc,k111, lpad(nvl(kv_dog, kv),3,'0'), s245, nvl(f.nkd,f.nd), f.rnk,
                                   decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_)), s080
                         order by 1)
         select nls, kv, dt, 'B4'||k1||k2||k3||s080||'00'||k4||s245 kodp, kos znap, nd, rnk, comm, nbuc, userid_,isp
@@ -1860,7 +1871,7 @@ FOR K IN
         AND dapp IS NOT NULL
         AND (dazs IS NULL OR dazs > dat_)
         AND o.acc NOT IN (SELECT acc FROM otcn_saldo)
-        and ndo.nd not in (select to_char(nd) from cc_deal where sos = 15 and wdate <= dat_ or ndg is not null and nd = ndg)
+        and ndo.nd not in (select to_char(nd) from cc_deal where sos = 15 and wdate <= dat_)
         AND nls LIKE '2%'
         AND nd IN (SELECT DISTINCT TO_CHAR (NVL (nd, 0))
                      FROM rnbu_trace
@@ -1907,9 +1918,9 @@ FOR K IN
                        dat_,
                        NULL,
                        nd)
-        || s080
+        || nvl(s080, '0')
         || '00'
-        || kv ||'1'
+        || lpad(kv, 3, '0') ||'1'
            kodp,
         1 znap,
         nd,
@@ -1927,7 +1938,7 @@ FOR K IN
         AND (dazs IS NULL OR dazs > dat_)
         AND nls NOT LIKE '9%'
         AND nd NOT IN (SELECT DISTINCT NVL (nd, 0) FROM rnbu_trace)
-        AND nd NOT IN (SELECT ND FROM cc_deal c WHERE c.nd = c.ndi or c.ndg is not null and c.nd = ndg)
+        AND nd NOT IN (SELECT ND FROM cc_deal c WHERE c.nd = c.ndi or c.nd = c.ndg)
         AND EXISTS
                (SELECT 1
                   FROM saldoa
@@ -1994,6 +2005,19 @@ delete from rnbu_trace where kodp like '20%' and kv = 980 and nd in (select nd f
 -- видалення перенесених (реструктуризованих) кредитів
 delete from rnbu_trace where kodp like '20%' and nd in (select nd from cc_deal where sos = 15);
 
+-- агрегація по ген. угодам кількісних показників
+insert into rnbu_trace (nls, kv, odate, kodp, znap, nbuc, isp, rnk, comm, nd)
+select max(r.nls), r.kv, max(r.odate), max(r.kodp), 1 znap, r.nbuc, max(r.isp), r.rnk, 'Ген. угода' comm, c.ndg
+from rnbu_trace r, cc_deal c
+where regexp_like (r.kodp, '^(20|04|05|06|10)') and 
+      r.nd = c.nd and
+      r.nd in (select nd from cc_deal where ndg is not null)
+group by r.rnk, c.ndg, r.kv, r.nbuc;
+
+delete 
+from rnbu_trace r 
+where regexp_like (r.kodp, '^(20|04|05|06|10)') and 
+      r.nd in (select nd from cc_deal where ndg is not null and ndg<>nd);
 ----------------------------------------------------
 if mfo_ = 380764 then
    update rnbu_trace
@@ -2024,14 +2048,3 @@ logger.info ('P_FF8: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 --        logger.info ('P_FF8: errors '||sqlerrm||' for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
-show err;
-
-PROMPT *** Create  grants  P_FF8 ***
-grant EXECUTE                                                                on P_FF8           to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FF8           to RPBN002;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_FF8.sql =========*** End *** ===
-PROMPT ===================================================================================== 
