@@ -4,7 +4,7 @@ is
   --
   -- constants
   --
-  g_header_version  constant varchar2(64)  := 'version 2.2  2018.03.03';
+  g_header_version  constant varchar2(64)  := 'version 2.3  2018.05.04';
 
   --
   -- types
@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.3  2018.04.18';
+  g_body_version  constant varchar2(64) := 'version 2.3  2018.05.04';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -885,6 +885,79 @@ $end
                                                  , '130' as "T090"
                                                  , '206' as "K014" ) );
 
+      when '2KX' then
+         open p_recordset
+         for                   
+            select 
+                   'A2K001' as EKP
+                   , Q003_1
+                   , Q001_1
+                   , Q002
+                   , K020_1
+                   , K021_1
+                   , Q003_2
+                   , Q003_3
+                   , Q030
+                   , Q006
+                   , F086
+                   , Q003_4
+                   , R030_1
+                   , Q007_1
+                   , Q007_2
+                   , Q031_1
+                   , T070_1
+                   , T070_2 
+                   , F088
+                   , Q007_3
+                   , Q003_5
+                   , Q001_2
+                   , K020_2
+                   , K021_2
+                   , Q001_3
+                   , T070_3
+                   , R030_2
+                   , Q032
+                   , Q031_2
+            from   (
+                      select substr(field_code, 1, 10) as zzzzzzzzzz
+                             , substr(field_code, 11, 4) as nnnn
+                             , substr(field_code, 15) as field_code
+                             , field_value
+                      from   nbur_detail_protocols
+                      where  report_date = p_rpt_dt
+                             and kf = p_kf
+                             and report_code = l_rpt_code
+                   )
+            pivot (max(field_value) for field_code in (
+                                                       'Q003_1' as Q003_1
+                                                       , 'Q001_1' as Q001_1
+                                                       , 'Q002' as Q002
+                                                       , 'K020_1' as K020_1
+                                                       , 'K021_1' as K021_1
+                                                       , 'Q003_2' as Q003_2
+                                                       , 'Q003_3' as Q003_3
+                                                       , 'Q030' as Q030
+                                                       , 'Q006' as Q006
+                                                       , 'F086' as F086
+                                                       , 'Q003_4' as Q003_4
+                                                       , 'R030_1' as R030_1
+                                                       , 'Q007_1' as Q007_1
+                                                       , 'Q007_2' as Q007_2
+                                                       , 'Q031_1' as Q031_1
+                                                       , 'T070_1' as T070_1
+                                                       , 'T070_2' as T070_2 
+                                                       , 'F088' as F088
+                                                       , 'Q007_3' as Q007_3
+                                                       , 'Q003_5' as Q003_5
+                                                       , 'Q001_2' as Q001_2
+                                                       , 'K020_2' as K020_2
+                                                       , 'K021_2' as K021_2
+                                                       , 'Q001_3' as Q001_3
+                                                       , 'T070_3' as T070_3
+                                                       , 'R030_2' as R030_2
+                                                       , 'Q032' as Q032
+                                                       , 'Q031_2' as Q031_2
+            ));   
     else
       null;
     end case;
@@ -959,6 +1032,10 @@ $end
       l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
       l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2)(></)', '\1 xsi:nil = "true" \2' );
       l_clob := REGEXP_REPLACE( l_clob, '(<Q006)(></)', '\1 xsi:nil = "true" \2' );
+    when '2K' 
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_3)(></)', '\1 xsi:nil = "true" \2' );
     else
       null;
     end case;
