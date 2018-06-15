@@ -12,8 +12,10 @@ PROMPT *** Create  procedure P_F12SB ***
 % FILE NAME   : otcn.sql
 % DESCRIPTION : ќтчетность —берЅанка: формирование файлов
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 2001.  All Rights Reserved.
-% VERSION     : 21/12/2013 (02/10/2013)
+% VERSION     : 15/06/2018 (21/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 12/01/2017 Ѕудем измен€ть симв.кассплана дл€ операций (027)
+%            c 30 на 32 и на 61 если код операции 'BAK'.
 % 02/10/2013 дл€ операции 416 в которой по одному REF есть проводки
 %            ƒт 1002  т 2909 и ƒт 2909  т 1002 и символ кассплана SK=32
 %            дл€ проводки ƒт 2909  т 1002 измен€ем символ на 61 (дл€
@@ -90,12 +92,11 @@ typ_     Number;
 nbuc1_   VARCHAR2(12);
 nbuc_    VARCHAR2(12);
 
-
 CURSOR OPERA IS
    SELECT  s.acc, s.nls, o.nlsa, o.kv, o.dk, p.fdat, p.ref, p.stmt,
            decode(p.tt, o.tt, o.sk, t.sk), p.s, o.tt, NVL(o.sk,0), p.dk,
            decode(p.tt, o.tt, 0, 1) pr -- признак дочерней операции
-   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t   --- KL_D010 k
+   FROM OPER o, OPLDOK p, ACCOUNTS s, tts t  
    WHERE p.acc=s.acc             AND
          s.tip='KAS'             AND
          s.nbs in ('1001','1002','1003','1004') AND
@@ -107,21 +108,19 @@ CURSOR OPERA IS
 
 --ќстатки
 CURSOR SALDO IS
-   SELECT  o.acc, o.nls, o.kv, sa.fdat, sa.ostf, sa.ostf+sa.kos-sa.dos,
+   SELECT  o.acc, o.nls, o.kv, sa.fdat, 
+           sa.ost-sa.kos+sa.dos ostf, sa.ost,
            o.tobo, o.nms
-   FROM saldoa sa, accounts o
+   FROM snap_balances sa, accounts o
    WHERE o.tip='KAS'
      and o.nbs in ('1001','1002','1003','1004')
      and o.kv=980
      and o.acc=sa.acc
-     and sa.fdat IN ( SELECT max ( bb.fdat )
-                      FROM  saldoa bb
-                      WHERE o.acc = bb.acc AND bb.fdat  <= Dat_) ;
+     and sa.fdat = Dat_ ;
 
 CURSOR BaseL IS
    SELECT kodp, nbuc, SUM (znap)
    FROM rnbu_trace
-   WHERE userid=userid_
    GROUP BY kodp, nbuc;
 
 BEGIN
@@ -146,19 +145,19 @@ LOOP
 
    -- вибираЇмо рахунок кореспондент дл€ рахунку каси
    BEGIN
-      select tt, nlsd, nlsk, substr(nazn,1,100)
-         into tt_pr, nlsd_, nlsk_, nazn_
-      from provodki
-      where ref = ref_
-        and fdat= Dat_
-        and kv  = 980
-        and nlsd= nls1_
-        and stmt=stmt_
-        and s*100=s_;
-      comm_ := comm_ || ' ƒт рах. = ' || nlsd_ || '  т рах. = ' || nlsk_ ||
-               '  ' || nazn_;
-   EXCEPTION WHEN NO_DATA_FOUND THEN
-      BEGIN
+      if dk_ = 0 then
+          select tt, nlsd, nlsk, substr(nazn,1,100)
+             into tt_pr, nlsd_, nlsk_, nazn_
+          from provodki
+          where ref = ref_
+            and fdat= Dat_
+            and kv  = 980
+            and nlsd= nls1_
+            and stmt=stmt_
+            and s*100=s_;
+          comm_ := comm_ || ' ƒт рах. = ' || nlsd_ || '  т рах. = ' || nlsk_ ||
+                   '  ' || nazn_;
+      else
          select tt, nlsd, nlsk, substr(nazn,1,100)
             into tt_pr, nlsd_, nlsk_, nazn_
          from provodki
@@ -170,9 +169,9 @@ LOOP
            and s*100=s_;
          comm_ := comm_ || ' ƒт рах. = ' || nlsd_ || '  т рах. = ' || nlsk_ ||
                   '  ' || nazn_;
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-         comm_ := comm_ || ' кореспондент не знайдений ';
-      END;
+      end if;
+   EXCEPTION WHEN NO_DATA_FOUND THEN
+      comm_ := comm_ || ' кореспондент не знайдений ';
    END;
 
    IF typ_>0 THEN
@@ -183,7 +182,8 @@ LOOP
 
    IF sk_ is null THEN
       begin
-         select to_number(substr(value,1,2))  into sk_
+         select to_number(substr(value,1,2))  
+         into sk_
          from operw where ref=ref_ and tag='SK';
          exception when others then sk_ := 0;
       end;
@@ -216,7 +216,7 @@ LOOP
       sk_:=66;
    END IF;
 
-   IF tt_ in ('025','K33','045','046','A22','150','151','AA3','AA4','AA5','AA6','AA7','AA8') then
+   IF tt_ in ('025','027','K33','045','046','A22','150','151','AA3','AA4','AA5','AA6','AA7','AA8') then
       BEGIN
          select count(*)
             into pr_bak
@@ -227,7 +227,7 @@ LOOP
          pr_bak := 0;
       END;
 
-      if tt_ in ('025','K33','045','046','A22','150','AA4','AA6','AA8') and pr_bak != 0 and sk_o_ < 40 then
+      if tt_ in ('025','027','K33','045','046','A22','150','AA4','AA6','AA8') and pr_bak != 0 and sk_o_ < 40 then
          if tt_ = tt_pr then
             comm_ := '!!! авт. замена ' || sk_o_  ||' на 32 '|| comm_;
             sk_ := 32;
@@ -260,16 +260,18 @@ LOOP
    IF s_<>0 THEN
       kodp_:= iif_N(sk_,10,'0','','') || TO_CHAR(sk_);
       znap_:= TO_CHAR(s_) ;
-      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
-                             (nls_, kv_, data_, kodp_, znap_, ref_, comm_, nbuc_);
+      
+      INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, ref, comm, nbuc) VALUES
+                             (acc_, nls_, kv_, data_, kodp_, znap_, ref_, comm_, nbuc_);
    END IF;
-	END LOOP;
+    END LOOP;
 CLOSE OPERA;
 
 OPEN SALDO;
 LOOP
    FETCH SALDO INTO acc_, nls_, kv_, data_, s35, s70, tobo_, nms_ ;
    EXIT WHEN SALDO%NOTFOUND;
+   
    comm_ := '';
    comm_ := substr(comm_ || tobo_ || '  ' || nms_, 1, 200);
 
@@ -284,25 +286,31 @@ LOOP
    ELSE
       s_ := s70 ;
    END IF ;
+   
    IF (s35 <> 0 OR s70 <> 0) THEN
       IF nbu_ = 1 THEN
          kodp_:= '34';
       ELSE
          kodp_:= '35';
       END IF;
+      
       znap_:= TO_CHAR(ABS(s_)) ;
-      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc) VALUES
-                             (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_);
+      
+      INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, comm, tobo, nbuc) VALUES
+                             (acc_, nls_, kv_, data_, kodp_, znap_, comm_, tobo_, nbuc_);
    END IF;
+   
    IF s70 <> 0 THEN
       IF nbu_ = 1 THEN
          kodp_:= '69';
       ELSE
          kodp_:= '70';
       END IF;
+      
       znap_:= ABS(s70) || '' ;
-      INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, acc, comm, tobo, nbuc) VALUES
-                             (nls_, kv_, data_, kodp_, znap_, acc_, comm_, tobo_, nbuc_);
+      
+      INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, comm, tobo, nbuc) VALUES
+                             (acc_, nls_, kv_, data_, kodp_, znap_, comm_, tobo_, nbuc_);
    END IF;
 END LOOP;
 CLOSE SALDO;
@@ -319,6 +327,7 @@ LOOP
         ('12', Dat_, kodp_, nbuc_, znap_);
 END LOOP;
 CLOSE BaseL;
+
 ----------------------------------------
 -- перевiрка на допустимiсть символiв по KL_D010
 -- а також залишку бал.рах.1007 та символiв 39 i 66
@@ -340,7 +349,6 @@ show err;
 PROMPT *** Create  grants  P_F12SB ***
 grant EXECUTE                                                                on P_F12SB         to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on P_F12SB         to RPBN002;
-grant EXECUTE                                                                on P_F12SB         to WR_ALL_RIGHTS;
 
 
 
