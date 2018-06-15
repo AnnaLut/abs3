@@ -311,7 +311,15 @@ end;
 
 PROMPT *** Create  index PK_EADSYNCQ1 ***
 begin   
- execute immediate '  CREATE INDEX ind_EADSYNCQ_DATE_RNK1 ON EAD_SYNC_QUEUE (CRT_DATE,RNK) LOCAL';
+ execute immediate '  CREATE INDEX ind_EADSYNCQ_DATE_RNK1 ON EAD_SYNC_QUEUE (CRT_DATE,RNK) LOCAL
+ (partition EAD_ST_NEW_P 
+,partition EAD_ST_PROC_P
+,partition EAD_ST_MSG_SEND_P 
+,partition EAD_ST_RSP_RECEIVED_P 
+,partition EAD_ST_RSP_PARSED_P   
+,partition EAD_ST_DONE_P    
+,partition EAD_ST_ERROR_P  
+,partition EAD_ST_OUTDATED_P)';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
 end;
@@ -360,18 +368,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
 end;
 /
-
-
-/*PROMPT *** Create  index I_EADSYNCQUEUE_TYPE_OBJ1 ***
-begin
-  for i in (select 1 from dual where not exists (select 1 from user_indexes where index_name = 'I_EADSYNCQUEUE_TYPE_OBJ1')) loop
-    execute immediate '
-      CREATE INDEX BARS.I_EADSYNCQUEUE_TYPE_OBJ1 ON BARS.EAD_SYNC_QUEUE (TYPE_ID, OBJ_ID) 
-      TABLESPACE BRSBIGI  LOCAL (PARTITION P_FIRST TABLESPACE BRSBIGI ) ';
-  end loop;
-end;
-/
-*/
 
 PROMPT *** Create  constraint FK_EADSYNCQUEUE_KF1 ***
 begin   
