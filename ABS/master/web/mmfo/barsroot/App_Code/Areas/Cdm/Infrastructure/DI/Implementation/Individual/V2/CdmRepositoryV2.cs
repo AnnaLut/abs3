@@ -25,6 +25,10 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
         protected const PersonType IndividualPerson = 0;
         protected CultureInfo Culture = CultureInfo.InvariantCulture;
 
+        protected override string LogMessagePrefix
+        {
+            get { return base.LogMessagePrefix + "v2"; }
+        }
 
         public override int SavePersonCardsFast(RequestFromEbkV2 request, int allowedCardsPerRequest)
         {
@@ -33,16 +37,17 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             if (request.Entries.Count <= allowedCardsPerRequest)
                 return InternalSavePersonCards(request);
 
-            var errorMsg = string.Format("{0} Отримана кількість карток у одному пакеті cтановить {1} і перевищує допустиму у {2} шт.", _logMessagePrefix, request.Entries.Count, allowedCardsPerRequest);
+            var errorMsg = string.Format("{0} Отримана кількість карток у одному пакеті cтановить {1} і перевищує допустиму у {2} шт.", LogMessagePrefix, request.Entries.Count, allowedCardsPerRequest);
             Logger.Error(errorMsg);
             throw new Exception(errorMsg);
         }
 
         public override decimal PackAndSendClientCards(int? cardsCount, int packSize, string kf)
         {
+            EbkStatusCode resultCode = EbkStatusCode.Ok; // Everything is ok
             UserLogin();
             Logger.Info(string.Format("{0} Розпочато надсилання карток клієнтів. Розмір пакету - {1}, KF - {2}.",
-                _logMessagePrefix, packSize, kf));
+                LogMessagePrefix, packSize, kf));
 
             var apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
                 ConfigurationManager.AppSettings["ebk.LoadCardsMethod.v2"];
@@ -67,7 +72,9 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 var package = new Card(kf, packNum.ToString(Culture), HomeRepo.GetUserParam().USER_FULLNAME, packBody);
 
                 xml = package.XmlSerialize(Encoding.UTF8);
-                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", _logMessagePrefix, xml));
+
+                string httpVerb = "POST";
+                Logger.Info(String.Format("{0} Метод: {1}, URL: {2}, Xml до надсилання: -={3}=-", LogMessagePrefix, httpVerb, apiUrl, xml));
 
                 // отправляем данные в ЕБК
                 byte[] bytes = Encoding.UTF8.GetBytes(xml);
@@ -77,7 +84,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 using (Stream responseStream = httpResponse.GetResponseStream())
                 {
                     responseStr = new StreamReader(responseStream, Encoding.UTF8).ReadToEnd();
-                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", LogMessagePrefix,
                         responseStr));
                 }
 
@@ -86,26 +93,40 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                     //записываем результаты отправки
                     packBody.ForEach(c => QueueRemoveCard(c.Rnk, c.Kf));
 
-                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, packSize));
+                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", LogMessagePrefix, packSize));
                 }
                 else
                 {
-                    Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, httpResponse.StatusCode));
+                    Logger.Error(string.Format("{0} Отримано помилковий код: {1}", LogMessagePrefix, httpResponse.StatusCode));
+                    resultCode = EbkStatusCode.RemoteErrorFromEbk;
                 }
+            }
+            catch (OracleException ex)
+            {
+                resultCode = EbkStatusCode.DbError;
 
+                Logger.Error(string.Format(
+                    "{0} Помилка пакетної доставки. {1} --- {2}",
+                    LogMessagePrefix,
+                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
+                    ex.StackTrace
+                ));
+                Logger.Error(string.Format("{0} - {1}", LogMessagePrefix, xml));
             }
             catch (Exception ex)
             {
+                resultCode = EbkStatusCode.OtherError;
+
                 Logger.Error(string.Format(
                     "{0} Помилка пакетної доставки. {1} --- {2}",
-                    _logMessagePrefix,
+                    LogMessagePrefix,
                     (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
                     ex.StackTrace
-                    ));
-                Logger.Error(string.Format("{0} - {1}", _logMessagePrefix, xml));
+                ));
+                Logger.Error(string.Format("{0} - {1}", LogMessagePrefix, xml));
             }
 
-            return packSize;
+            return (int)resultCode;
         }
 
         public override ActionStatus PackAndSendSingleCard(decimal rnk)
@@ -113,7 +134,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             var result = new ActionStatus(ActionStatusCode.Ok);
             var checks = new List<Analytics>();
 
-            Logger.Info(string.Format("{0} Ініційовано он-лайн запит по РНК {1}.", _logMessagePrefix, rnk));
+            Logger.Info(string.Format("{0} Ініційовано он-лайн запит по РНК {1}.", LogMessagePrefix, rnk));
 
             string apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
                             ConfigurationManager.AppSettings["ebk.LoadCardMethod.v2"];
@@ -131,7 +152,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 if (null == plainCard)
                 {
                     err = string.Format("{0} Не знайдено картку клієнта з РНК={1} у черзі на відправку до ЄБК.",
-                        _logMessagePrefix, rnk);
+                        LogMessagePrefix, rnk);
                     result.Status = ActionStatusCode.Error;
                     result.Message = err;
                     Logger.Error(err);
@@ -148,7 +169,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                     new SimpleCard(card.Kf, packNum.ToString(Culture), HomeRepo.GetUserParam().USER_FULLNAME, card);
 
                 string xml = simpleCard.XmlSerialize(Encoding.UTF8);
-                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", _logMessagePrefix, xml));
+                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", LogMessagePrefix, xml));
 
 
                 // отправляем данные в ЕБК
@@ -159,7 +180,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 using (Stream responseStream = httpResponse.GetResponseStream())
                 {
                     responseStr = new StreamReader(responseStream, Encoding.UTF8).ReadToEnd();
-                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", LogMessagePrefix,
                         responseStr));
                 }
 
@@ -186,7 +207,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
                         result.Message = "Дані відправлені і отримано рекомендації або дублікати по клієнту.";
                         Logger.Info(string.Format(
-                            "{0} Отримано рекомендації або дублікати по клієнту з РНК={1} он-лайн.", _logMessagePrefix,
+                            "{0} Отримано рекомендації або дублікати по клієнту з РНК={1} он-лайн.", LogMessagePrefix,
                             rnk));
                     }
                     else if (ResponseStatus.ERROR.ToString() == ebkResponse.Status)
@@ -229,14 +250,14 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                         }
                         Logger.Info(
                             string.Format("{0} Сервіс відхилив запит по клієнту з РНК={1} он-лайн.",
-                                _logMessagePrefix, rnk));
+                                LogMessagePrefix, rnk));
                     }
                 }
                 else
                 {
                     err = string.Format(
                         "{0} Віддалений сервіс відхилив он-лайн запит на перевірку картки з РНК={2}: <br />СТАТУС: {1}",
-                        _logMessagePrefix, httpResponse.StatusDescription, rnk);
+                        LogMessagePrefix, httpResponse.StatusDescription, rnk);
                     Logger.Error(err);
                     throw new Exception(err);
                 }
@@ -244,10 +265,10 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             catch (Exception e)
             {
                 err = string.Format("{0} Невідома помилка надсилання картки РНК={2} онлайн:  {1}",
-                    _logMessagePrefix, (e.InnerException != null ? e.InnerException.Message : e.Message), rnk);
+                    LogMessagePrefix, (e.InnerException != null ? e.InnerException.Message : e.Message), rnk);
                 Logger.Error(err);
                 throw new Exception(string.Format("{0} Невідома помилка надсилання картки РНК={1} ",
-                    _logMessagePrefix, rnk));
+                    LogMessagePrefix, rnk));
             }
             return result;
         }
@@ -278,7 +299,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 using (Stream responseStream = httpResponse.GetResponseStream())
                 {
                     responseStr = new StreamReader(responseStream, Encoding.UTF8).ReadToEnd();
-                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", LogMessagePrefix,
                         responseStr));
                 }
 
@@ -289,13 +310,13 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                     if (ResponseStatus.OK.ToString() != ebkResponse.Status)
                     {
                         err = string.Format("{0} Помилка закриття картки клієнта он-лайн. <br />Помилка: {1}",
-                            _logMessagePrefix, ebkResponse.Message);
+                            LogMessagePrefix, ebkResponse.Message);
                         Logger.Error(err);
                         return status;
                     }
 
                     Logger.Info(string.Format("{0} Віддалений сервіс успішно виконав команду закриття клієнта RNK={1}",
-                        _logMessagePrefix, rnk));
+                        LogMessagePrefix, rnk));
                     status = "OK";
 
                     return status;
@@ -303,7 +324,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
             }
             catch (Exception ex)
             {
-                err = string.Format("{0} Невідома помилка закриття картки РНК={2}  онлайн:  {1}", _logMessagePrefix,
+                err = string.Format("{0} Невідома помилка закриття картки РНК={2}  онлайн:  {1}", LogMessagePrefix,
                     (ex.InnerException != null ? ex.InnerException.Message : ex.Message), rnk);
                 Logger.Error(err);
                 return status;
@@ -327,7 +348,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 using (Stream responseStream = httpResponse.GetResponseStream())
                 {
                     responseStr = new StreamReader(responseStream, Encoding.UTF8).ReadToEnd();
-                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", LogMessagePrefix,
                         responseStr));
                 }
 
@@ -339,7 +360,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                     {
                         error = string.Format(
                             "{0} Помилка синхронізації картки клієнта ФО з віддаленим сервісом ЄБК. <br />Помилка: {1}",
-                            _logMessagePrefix, ebkResponse.Message);
+                            LogMessagePrefix, ebkResponse.Message);
                         Logger.Error(error);
                     }
                     else
@@ -348,7 +369,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
                         Logger.Info(string.Format(
                             "{0} Віддалений сервіс ЄБК успішно виконав команду синхронізації картки клієнта  ФО з RNK={1}",
-                            _logMessagePrefix, rnk));
+                            LogMessagePrefix, rnk));
                         status = "OK";
                     }
                 }
@@ -356,14 +377,14 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 {
                     error = string.Format(
                         "{0} Помилка синхронізації картки клієнта ФО з віддаленим сервісом ЄБК. <br />Помилка: {1}",
-                        _logMessagePrefix, httpResponse.StatusCode);
+                        LogMessagePrefix, httpResponse.StatusCode);
                     Logger.Error(error);
                 }
                 return status;
             }
             catch (Exception ex)
             {
-                error = string.Format("{0} Невідома помилка синхронізації картки ФО РНК={2}  онлайн:  {1}", _logMessagePrefix,
+                error = string.Format("{0} Невідома помилка синхронізації картки ФО РНК={2}  онлайн:  {1}", LogMessagePrefix,
                     (ex.InnerException != null ? ex.InnerException.Message : ex.Message), rnk);
                 Logger.Error(error);
                 return status;
@@ -420,7 +441,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 },
                 new OracleParameter("p_cust_tp", OracleDbType.Varchar2)
                 {
-                    Value = "L"
+                    Value = IndividualPerson.ToString()
                 }, 
                 new OracleParameter("p_gcif", OracleDbType.Varchar2)
                 {
@@ -674,5 +695,13 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
             return cardsCount;
         }
+    }
+
+    enum EbkStatusCode
+    {
+        Ok=0,
+        RemoteErrorFromEbk=1,
+        DbError=2,
+        OtherError=3
     }
 }

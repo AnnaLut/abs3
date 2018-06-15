@@ -43,6 +43,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
 
         public override decimal PackAndSendClientCards(int? cardsCount, int packSize, string kf)
         {
+            EbkStatusCode resultCode = EbkStatusCode.Ok; // Everything is ok
             UserLogin();
             Logger.Info(string.Format("{0} Розпочато надсилання карток клієнтів. Розмір пакету - {1}, KF - {2}.",
                 _logMessagePrefix, packSize, kf));
@@ -71,7 +72,9 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                     packBody);
 
                 xml = package.XmlSerialize(Encoding.UTF8);
-                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", _logMessagePrefix, xml));
+
+                string httpVerb = "POST";
+                Logger.Info(String.Format("{0} Метод: {1}, URL: {2}, Xml до надсилання: -={3}=-", _logMessagePrefix, httpVerb, apiUrl, xml));
 
                 //отправляем данные в ЕБК
                 byte[] bytes = Encoding.UTF8.GetBytes(xml);
@@ -97,10 +100,25 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                 {
                     Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix,
                         httpResponse.StatusCode));
+                    resultCode = EbkStatusCode.RemoteErrorFromEbk;
                 }
+            }
+            catch (OracleException ex)
+            {
+                resultCode = EbkStatusCode.DbError;
+
+                Logger.Error(string.Format(
+                    "{0} Помилка пакетної доставки. {1} --- {2}",
+                    _logMessagePrefix,
+                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
+                    ex.StackTrace
+                ));
+                Logger.Error(string.Format("{0} - {1}", _logMessagePrefix, xml));
             }
             catch (Exception ex)
             {
+                resultCode = EbkStatusCode.OtherError;
+
                 Logger.Error(string.Format(
                     "{0} Помилка пакетної доставки. {1} --- {2}",
                     _logMessagePrefix,
@@ -110,7 +128,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                 Logger.Error(string.Format("{0} - {1}", _logMessagePrefix, xml));
             }
 
-            return packSize;
+            return (int)resultCode;
         }
 
         public override ActionStatus PackAndSendSingleCard(decimal rnk)
@@ -436,7 +454,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                 },
                 new OracleParameter("p_cust_tp", OracleDbType.Varchar2)
                 {
-                    Value = ("P")
+                    Value = PrivateEntrepreneur.ToString()
                 }, 
                 new OracleParameter("p_gcif", OracleDbType.Varchar2)
                 {
@@ -697,5 +715,13 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
 
             return cardsCount;
         }
+    }
+
+    enum EbkStatusCode
+    {
+        Ok=0,
+        RemoteErrorFromEbk=1,
+        DbError=2,
+        OtherError=3
     }
 }

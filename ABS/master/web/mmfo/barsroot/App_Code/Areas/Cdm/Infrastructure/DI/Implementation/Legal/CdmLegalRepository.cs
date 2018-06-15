@@ -880,7 +880,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                     {
                         UdtTypeName = "BARS.T_REC_QLT_GRP",
                         Value = customer.CustomQualityGroups
-                    }
+                    }                
                 };
 
                 _entities.ExecuteStoreCommand(@"begin 
