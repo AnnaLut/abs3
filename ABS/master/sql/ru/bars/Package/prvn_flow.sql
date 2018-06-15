@@ -3496,4 +3496,3 @@ grant execute on PRVN_FLOW to BARS_ACCESS_DEFROLE;
 grant execute on PRVN_FLOW to RCC_DEAL;
 grant execute on PRVN_FLOW to START1;
 grant execute on PRVN_FLOW to BARSUPL, UPLD;
-grant execute on PRVN_FLOW to BARSREADER_ROLE;
