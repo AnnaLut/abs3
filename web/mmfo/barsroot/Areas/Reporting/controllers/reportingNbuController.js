@@ -28,13 +28,14 @@
                     $scope.report.PERIOD = data[0].PERIOD;
                     $scope.report.KF = data[0].KF;
                     $scope.report.FILE_TYPE = data[0].FILE_TYPE;
+                    $scope.report.FILE_FMT_LIST = data[0].FILE_FMT_LIST.split(",");
                     $scope.FileCodeBase64 = base64Helper.encode($scope.report.FILE_CODE);
                     $("#currentBase64page").text($scope.FileCodeBase64);
-                    if(isApply){
+                    if (isApply) {
                         $scope.$apply();
                     }
-                    
-                    if(isGetFileInfo){
+
+                    if (isGetFileInfo) {
                         getFileInfo($scope.FileCodeBase64, $scope.report.date, $scope.report.KF, $scope.report.SCHEME_CODE, versionId);
                     }
                 }
@@ -46,17 +47,17 @@
                 var _KF = bars.extension.getParamFromUrl('kf');
                 var _VERSION_ID = bars.extension.getParamFromUrl('versionId');
                 // console.log("_ID="+_ID+" _DATE="+_DATE+" _KF="+_KF + " _VERSION_ID="+_VERSION_ID);
-                if(_ID != null && _ID != "" && _DATE != null && _DATE != "" && _KF != null && _KF != ""){
+                if (_ID != null && _ID != "" && _DATE != null && _DATE != "" && _KF != null && _KF != "") {
                     $scope.report.date = _DATE;
 
-                    $http.get(bars.config.urlContent('/reporting/nbu/fileInitialInfo?id='+_ID+"&kf="+_KF)).
-                    success(function (data) {
-                        var versionId = _VERSION_ID != "" ? _VERSION_ID : null;
-                        $scope.fillReport(data, versionId, true, false);
-                    }).
-                    error(function () {
+                    $http.get(bars.config.urlContent('/reporting/nbu/fileInitialInfo?id=' + _ID + "&kf=" + _KF)).
+                        success(function (data) {
+                            var versionId = _VERSION_ID != "" ? _VERSION_ID : null;
+                            $scope.fillReport(data, versionId, true, false);
+                        }).
+                        error(function () {
 
-                    });
+                        });
                 }
             });
 
@@ -110,17 +111,17 @@
                             $scope.showReportNbuHandBook();
                         }
                     },
-                    {type: 'separator'},
+                    { type: 'separator' },
                     {
                         type: 'button',
                         text: '<i title="Оновити дані" class="pf-icon pf-16 pf-reload_rotate"></i>',
                         title: 'Оновити дані',
                         click: function () {
-                            if($scope.report.id != null){
+                            if ($scope.report.id != null) {
                                 //$scope.onChangeGridType();
                                 getFileInfo($scope.FileCodeBase64, $scope.report.date, $scope.report.KF, $scope.report.SCHEME_CODE, null);
                             }
-                            else{bars.ui.error({ text: 'Невибрано файл для формувавння.' });}
+                            else { bars.ui.error({ text: 'Невибрано файл для формувавння.' }); }
                         }
                     }
                     //,
@@ -135,11 +136,11 @@
             var startGenerateReport = function (reportDate, fileCodeBase64, schemeCode, fileType, kf) {
                 bars.ui.loader('body', true);
                 reportingNbuService.startGenerateReport(reportDate, fileCodeBase64, schemeCode, fileType, kf).then(
-                    function(response) {
+                    function (response) {
                         bars.ui.loader('body', false);
                         bars.ui.notify('Повідомлення', response.reponseMessage, 'success');
                     },
-                    function(response) {
+                    function (response) {
                         bars.ui.loader('body', false);
                         bars.ui.notify('Помилка', 'Сталась помилка при виконанні операції', 'error');
                         // console.log(response);
@@ -147,8 +148,8 @@
                 );
             }
             var confirmGenerateReport = function () {
-
-                startGenerateReport($scope.report.date, $scope.FileCodeBase64, $scope.report.SCHEME_CODE, $scope.report.FILE_TYPE, $scope.report.KF);
+                var fileCodeBase64 = base64Helper.encode($scope.report.FILE_CODE);
+                startGenerateReport($scope.report.date, fileCodeBase64, $scope.report.SCHEME_CODE, $scope.report.FILE_TYPE, $scope.report.KF);
                 return;
                 if ($scope.report.id == null) {
                     bars.ui.error({ text: 'Невибрано файл для формувавння.' });
@@ -157,19 +158,19 @@
                         //ручне формування
                     } else {
                         // перевіримо чи звіт уже формувася
-                        var grid  = $scope.getReportGrid();
+                        var grid = $scope.getReportGrid();
                         if (grid.dataSource.data().length > 0) {
                             bars.ui.confirm({
                                 text: String.format('Увага!<br> Звіт "{0}" за {1} вже був сформований.<br> Переформувати звіт?',
-                                                    $scope.report.id,
-                                                    $scope.report.date),
+                                    $scope.report.id,
+                                    $scope.report.date),
                                 func: function () { }
                             });
                         } else {
                             bars.ui.confirm({
                                 text: String.format('Запустити формування звіту "{0}" за {1} ?',
-                                                    $scope.report.id,
-                                                    $scope.report.date),
+                                    $scope.report.id,
+                                    $scope.report.date),
                                 func: function () {
                                     startGenerateReport($scope.report.id, $scope.report.date);
                                 }
@@ -219,37 +220,37 @@
             var showControlPointsMessages = function () {
                 if ($scope.selectedFileVersionInfo) {
                     bars.ui.handBook('V_NBUR_MESSAGES',
-                    {
-                        maximize: true,
-                        width: 800,
-                        clause: "REPORT_DATE=to_date('" +
-                            $scope.report.date +
-                            "','dd/mm/yyyy') " +
-                            " and kf='" +
-                            $scope.report.KF +
-                            "' and report_code='" +
-                            $scope.report.FILE_CODE +
-                            "' and version_id=" +
-                            $scope.selectedFileVersionInfo.VERSION_ID,
-                        columns: [
-                            {
-                                field: 'KF',
-                                width: 100
-                            }, {
-                                field: 'REPORT_CODE',
-                                width: 100
-                            }, {
-                                field: 'VERSION_ID',
-                                width: 100
-                            }, {
-                                field: 'REPORT_DATE',
-                                width: 100,
-                                template:
-                                    '<div title="#= kendo.toString(REPORT_DATE, \'dd.MM.yyyy\' ) #"><nobr>#=kendo.toString(REPORT_DATE, \'dd.MM.yyyy\' )#</nobr></div>'
-                            }
-                        ],
-                        gridOptions: {
-                            toolbar: [
+                        {
+                            maximize: true,
+                            width: 800,
+                            clause: "REPORT_DATE=to_date('" +
+                                $scope.report.date +
+                                "','dd/mm/yyyy') " +
+                                " and kf='" +
+                                $scope.report.KF +
+                                "' and report_code='" +
+                                $scope.report.FILE_CODE +
+                                "' and version_id=" +
+                                $scope.selectedFileVersionInfo.VERSION_ID,
+                            columns: [
+                                {
+                                    field: 'KF',
+                                    width: 100
+                                }, {
+                                    field: 'REPORT_CODE',
+                                    width: 100
+                                }, {
+                                    field: 'VERSION_ID',
+                                    width: 100
+                                }, {
+                                    field: 'REPORT_DATE',
+                                    width: 100,
+                                    template:
+                                        '<div title="#= kendo.toString(REPORT_DATE, \'dd.MM.yyyy\' ) #"><nobr>#=kendo.toString(REPORT_DATE, \'dd.MM.yyyy\' )#</nobr></div>'
+                                }
+                            ],
+                            gridOptions: {
+                                toolbar: [
                                     { name: 'excel', text: 'Завантажити в Excel' }
                                 ],
                                 excel: {
@@ -257,20 +258,20 @@
                                     allPages: true,
                                     filterable: false,
                                     proxyURL: bars.config.urlContent("/Reporting/Nbu/ConvertBase64ToFile/")
-                                    },
-                                }
+                                },
+                            }
                         });
-                    }
+                }
             }
 
 
-            var blockFile = function() {
+            var blockFile = function () {
                 bars.ui.loader('body', true);
                 reportingNbuService.blockFile($scope.report.date,
-                                                $scope.report.KF,
-                                                $scope.selectedFileVersionInfo.VERSION_ID,
-                                                $scope.selectedFileVersionInfo.FILE_ID)
-                .then(
+                    $scope.report.KF,
+                    $scope.selectedFileVersionInfo.VERSION_ID,
+                    $scope.selectedFileVersionInfo.FILE_ID)
+                    .then(
                     function () {
                         bars.ui.loader('body', false);
                         bars.ui.notify('Успішно', 'Файл успішно заблоковано', 'success');
@@ -281,12 +282,12 @@
                             'Помилка',
                             'Помилка блокування файала<br><small>' +
                             (response.Message || response.ErrorMessage || '')
-                             + '</small>',
+                            + '</small>',
                             'error'
                         );
                         // console.log(response);
                     }
-                );
+                    );
             }
 
             $scope.toolbarReportGridOptions = {
@@ -328,10 +329,10 @@
                                     }
                                     bars.ui.confirm({
                                         text: 'Файл ' + $scope.report.FILE_CODE +
-                                                ' (версії ' + $scope.selectedFileVersionInfo.VERSION_ID + 
-                                                ') та дані, на основі яких він сформований, ' +
-                                                'будуть заблоковані за дату ' + $scope.report.date + '. Ви згодні?',
-                                        func: function() {
+                                            ' (версії ' + $scope.selectedFileVersionInfo.VERSION_ID +
+                                            ') та дані, на основі яких він сформований, ' +
+                                            'будуть заблоковані за дату ' + $scope.report.date + '. Ви згодні?',
+                                        func: function () {
                                             blockFile();
                                         }
                                     });
@@ -339,7 +340,7 @@
                             }
                         ]
                     },
-                    
+
                     //{
                     //    type: "buttonGroup",
                     //    buttons: [
@@ -457,7 +458,7 @@
                                     }
                                     showControlPointsMessages();
                                 }
-                            },{
+                            }, {
                                 //enable: false,
                                 id: "ChkLogBtn",
                                 text: '<i class="pf-icon pf-16 pf-business_report"  title="Переглянути протокол перевірки файлу"></i>',
@@ -480,6 +481,51 @@
                             //     }
                             // }
                         ]
+                    },
+
+                    { type: 'separator' },
+
+                    {
+                        type: "buttonGroup",
+                        id: "fileFormatControls",
+                        enable: false,
+                        buttons: [
+                            {
+                                id: "FormatTXT",
+                                text: "<span title='Перегляд файлу звітності у форматі txt'>TXT</span>",
+                                togglable: true,
+                                group: "FormatGroup",
+                                hidden: true,
+                                toggle: function () {
+                                    if ($scope.report.id != null) {
+                                        $scope.FileCodeBase64 = 
+                                            $scope.report.FILE_CODE[0] === "#"
+                                            ? base64Helper.encode($scope.report.FILE_CODE)
+                                            : base64Helper.encode("#" + $scope.report.FILE_CODE.slice(0, $scope.report.FILE_CODE.length - 1));
+                                        getFileInfo($scope.FileCodeBase64, $scope.report.date, $scope.report.KF, $scope.report.SCHEME_CODE, null);
+                                    }
+                                    else { bars.ui.error({ text: 'Невибрано файл для формувавння.' }); }
+                                }
+                            },
+                            {
+                                id: "FormatXML",
+                                text: "<span title='Перегляд файлу звітності у форматі xml'>XML</span>",
+                                togglable: true,
+                                group: "FormatGroup",
+                                hidden: true,
+                                toggle: function () {
+                                    if ($scope.report.id != null) {
+                                        $scope.FileCodeBase64 = 
+                                            $scope.report.FILE_CODE[0] === "#"
+                                            ? base64Helper.encode($scope.report.FILE_CODE.slice(1) + "X")
+                                            : base64Helper.encode($scope.report.FILE_CODE);
+                                            //: base64Helper.encode("#" + $scope.report.FILE_CODE.slice(0, $scope.report.FILE_CODE.length - 1));
+                                        getFileInfo($scope.FileCodeBase64, $scope.report.date, $scope.report.KF, $scope.report.SCHEME_CODE, null);
+                                    }
+                                    else { bars.ui.error({ text: 'Невибрано файл для формувавння.' }); }
+                                }
+                            }
+                        ]
                     }
                 ]
             };
@@ -501,10 +547,10 @@
 
             $scope.reportGridInited = false;
             $scope.reCreateReportGrid = function (url, columns, fields) {
-                if($scope.reportGridInited){
+                if ($scope.reportGridInited) {
                     angular.element("#reportGrid").kendoGrid('destroy').empty();
                 }
-                else{
+                else {
                     $scope.reportGridInited = true;
                 }
                 angular.element("#reportGrid").kendoGrid($scope.reportGridOptions(url, columns, fields));
@@ -513,10 +559,10 @@
 
             $scope.detailedReportGridInited = false;
             $scope.reCreateDetailedReportGrid = function (url, columns, fields) {
-                if($scope.detailedReportGridInited){
+                if ($scope.detailedReportGridInited) {
                     angular.element("#detailedReportGrid").kendoGrid('destroy').empty();
                 }
-                else{
+                else {
                     $scope.detailedReportGridInited = true;
                 }
                 angular.element("#detailedReportGrid").kendoGrid($scope.reportDetailedGridOptions(url, columns, fields));
@@ -528,20 +574,20 @@
                 $scope.loading = true;
 
                 var url_prefix = $scope.getUrlPrefix(false);
-                var urlColumns = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdatacolumns?'+url_prefix);
-                var url = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdata?'+url_prefix);
+                var urlColumns = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdatacolumns?' + url_prefix);
+                var url = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdata?' + url_prefix);
 
                 $http.get(urlColumns)
                     .then(function (response) {
                         $scope.loading = false;
-                        if(response["data"] != null && response["data"]["Columns"] != null){
+                        if (response["data"] != null && response["data"]["Columns"] != null) {
                             var data = $scope.fillColumnsAndFields(response["data"]["Columns"]);
 
                             $scope.reCreateReportGrid(url, data['columns'], data['fields']);
                             $scope.setVisibilityReportGrid(true);
                         }
-                        else{
-                            bars.ui.notify("Інформація", "Дані відсутні!", "info", {autoHideAfter: 5*1000});
+                        else {
+                            bars.ui.notify("Інформація", "Дані відсутні!", "info", { autoHideAfter: 5 * 1000 });
                             $scope.setVisibilityReportGrid(false);
                         }
                     }, function () {
@@ -614,7 +660,7 @@
             $scope.$watch(
                 'selectedFileVersionInfo',
                 function handleFooChange(newValue, oldValue) {
-                    
+
                     if (!newValue && !oldValue) {
                         return;
                     }
@@ -633,6 +679,7 @@
                         toolBar.enable('#CheckRapBtn', true);
                         toolBar.enable('#CheckPointBtn', true);
                         //toolBar.enable('#ControlBtn', true);
+                        toolBar.toggle("#Format" + $scope.selectedFileVersionInfo.FILE_FMT, true);
                     } else {
                         toolBar.enable('#PrintBtn', false);
                         toolBar.enable('#GetFileBtn', false);
@@ -643,11 +690,29 @@
                 }
             );
 
+            $scope.$watch(
+                "report.FILE_FMT_LIST",
+                function (newValue, oldValue) {
+                    if (!newValue && !oldValue) {
+                        return;
+                    }
+
+                    var toolBar = $scope.appToolbarReportGridOptions;
+                    if (!newValue || newValue.length < 2) {
+                        toolBar.hide("#FormatTXT");
+                        toolBar.hide("#FormatXML");
+                    } else {
+                        toolBar.show("#FormatTXT");
+                        $("#FormatTXT").removeClass("k-group-end").addClass("k-group-start"); // костыль, но без него никак
+                        toolBar.show("#FormatXML");
+                    }
+                });
+
             $scope.parseDate = function (dateString, format) {
                 if (!dateString) {
                     return null;
                 }
-                if(format == undefined){
+                if (format == undefined) {
                     format = 'dd.MM.yyyy HH:mm:ss';
                 }
 
@@ -658,10 +723,10 @@
             };
 
             $scope.setVisibilityReportGrid = function (flag) {
-                if(flag){
+                if (flag) {
                     angular.element("#reportGrid").show();
                 }
-                else{
+                else {
                     angular.element("#reportGrid").hide();
                 }
             };
@@ -675,7 +740,7 @@
                         } else {
                             $scope.selectedFileVersionInfo = null;
                             $scope.setVisibilityReportGrid(false);
-                            bars.ui.notify("Інформація", "Дані відсутні!", "info", {autoHideAfter: 5*1000});
+                            bars.ui.notify("Інформація", "Дані відсутні!", "info", { autoHideAfter: 5 * 1000 });
                         }
                     },
                     function (response) {
@@ -828,20 +893,20 @@
                             }
                         }
                         $http.get(bars.config.urlContent('/reporting/nbu/rowdelete?datf=' + datf + '&kodf=' + kodf + '&kodp=' + kodp + '&nbuc=' + nbuc)).
-                        success(function (data) {
-                            if (data.status != "error") {
-                                bars.ui.alert({ text: 'Запис успішно видалено!' });
-                            } else {
+                            success(function (data) {
+                                if (data.status != "error") {
+                                    bars.ui.alert({ text: 'Запис успішно видалено!' });
+                                } else {
+                                    bars.ui.error({ text: 'Виникла помилка при спробі видалити запис!' });
+                                }
+                                clearArraysData();
+                                $scope.onChangeGridType();
+                            }).
+                            error(function () {
                                 bars.ui.error({ text: 'Виникла помилка при спробі видалити запис!' });
-                            }
-                            clearArraysData();
-                            $scope.onChangeGridType();
-                        }).
-                        error(function () {
-                            bars.ui.error({ text: 'Виникла помилка при спробі видалити запис!' });
-                            clearArraysData();
-                            $scope.onChangeGridType();
-                        });
+                                clearArraysData();
+                                $scope.onChangeGridType();
+                            });
                     } else {
                         bars.ui.alert({ text: 'Оберіть запис, будь ласка, що буде видалено!' });
                     }
@@ -896,22 +961,22 @@
                         var url = funcType == "rowupdate" ? updateUrl : insertUrl;
 
                         $http.get(bars.config.urlContent('/reporting/nbu/' + funcType + url)).
-                        success(function (data) {
-                            if (data.status != "error") {
-                                bars.ui.alert({ text: funcType == "rowinsert" ? 'Запис успішно додано!' : 'Запис успішно оновлено!' });
-                            } else {
+                            success(function (data) {
+                                if (data.status != "error") {
+                                    bars.ui.alert({ text: funcType == "rowinsert" ? 'Запис успішно додано!' : 'Запис успішно оновлено!' });
+                                } else {
+                                    bars.ui.error({ text: funcType == "rowinsert" ? 'Виникла помилка при спробі додати запис!' : 'Виникла помилка при спробі оновити запис!' });
+                                }
+                                clearArraysData();
+                                switchOn();
+                                $scope.onChangeGridType();
+                            }).
+                            error(function () {
                                 bars.ui.error({ text: funcType == "rowinsert" ? 'Виникла помилка при спробі додати запис!' : 'Виникла помилка при спробі оновити запис!' });
-                            }
-                            clearArraysData();
-                            switchOn();
-                            $scope.onChangeGridType();
-                        }).
-                        error(function () {
-                            bars.ui.error({ text: funcType == "rowinsert" ? 'Виникла помилка при спробі додати запис!' : 'Виникла помилка при спробі оновити запис!' });
-                            clearArraysData();
-                            switchOn();
-                            $scope.onChangeGridType();
-                        });
+                                clearArraysData();
+                                switchOn();
+                                $scope.onChangeGridType();
+                            });
                     } else {
                         bars.ui.alert({ text: 'Введені значення полів не відповідають вимогам валідності!' });
                         clearArraysData();
@@ -927,7 +992,7 @@
             $scope.reportGridColumns = [];
 
             var reportGridDataBound = function (e) {
-                
+
                 var grid = e.sender;
                 bars.ext.kendo.grid.noDataRow(e);
                 if (grid.dataSource.total() === 0) {
@@ -997,8 +1062,8 @@
                 serverFiltering: true,
                 pageSize: 10
             });
-            
-            $scope.selectFileVersion = function() { 
+
+            $scope.selectFileVersion = function () {
                 var row = $scope.VersionGrid.dataItem($scope.VersionGrid.select());
                 if (row) {
                     $scope.selectedFileVersionInfo = row;
@@ -1009,12 +1074,12 @@
                 }
             }
 
-            var resizeGridVersionGrid = function(e) {
+            var resizeGridVersionGrid = function (e) {
                 var gridElement = e.sender.element;
                 var dataArea = gridElement.find(".k-grid-content");
                 var newHeight = gridElement.parent().innerHeight() - 2;
                 var diff = gridElement.innerHeight() - dataArea.innerHeight();
-                
+
                 gridElement.height(newHeight - 60);
                 gridElement.find(".k-grid-content").height(newHeight - diff - 60);
                 kendo.resize(gridElement);
@@ -1022,7 +1087,7 @@
             $scope.VersionGridOptions = {
                 dataBound: resizeGridVersionGrid,
                 dataSource: $scope.VersionDatasours,
-                height:500,
+                height: 500,
                 autobind: false,
                 sortable: true,
                 filterable: true,
@@ -1128,31 +1193,31 @@
             $scope.VersionWindowOptions = createWindowOptions({ title: 'Список версій по файлу' });
 
             $scope.ChkLogWindowOptions = createWindowOptions({ title: 'Протокол перевірки файлу' });
-            
+
             $scope.ChkLogInit = function () {
                 var _ID = $scope.FileCodeBase64;
                 var _reportDate = $scope.report.date;
                 var _KF = $scope.report.KF;
                 var _schemeCode = $scope.report.SCHEME_CODE;
                 var _versionId = $scope.selectedFileVersionInfo.VERSION_ID || 'null';
-                var url = bars.config.urlContent('api/reporting/nbu/getchklog?fileCodeBase64='+_ID+"&kf="+_KF +
-                    "&reportDate="+_reportDate+"&schemeCode="+_schemeCode+"&versionId="+_versionId);
+                var url = bars.config.urlContent('api/reporting/nbu/getchklog?fileCodeBase64=' + _ID + "&kf=" + _KF +
+                    "&reportDate=" + _reportDate + "&schemeCode=" + _schemeCode + "&versionId=" + _versionId);
                 $scope.loading = true;
                 $http.get(url)
                     .then(function (response) {
                         $scope.loading = false;
-                        if(response.data.Data != null){
+                        if (response.data.Data != null) {
                             $scope.ChkLogWindow.center().open();
                             $scope.ChkLogText = response.data.Data;
                         }
-                        else{
-                            bars.ui.error({ text: 'Протокол відсутній' })
+                        else {
+                            bars.ui.alert({ text: 'Протокол відсутній' })
                         }
                     }, function () {
                         $scope.loading = false;
                     });
             };
-            
+
             function createWindowOptions(settings) {
                 var o = {
                     animation: false,
@@ -1176,7 +1241,7 @@
                 return o;
             }
 
-            $scope.reportGridOptions = function(url, columns, fields){
+            $scope.reportGridOptions = function (url, columns, fields) {
                 return {
                     dataBound: reportGridDataBound,
                     //autoBind: false,
@@ -1198,7 +1263,7 @@
                             total: "Total",
                             model: { fields: fields }
                         },
-                        error: function(e){
+                        error: function (e) {
                             $scope.loading = false;
                             $scope.$apply();
                         }
@@ -1215,11 +1280,11 @@
                 }
             };
 
-            $scope.reportDetailedGridOptions = function(url, columns, fields){
+            $scope.reportDetailedGridOptions = function (url, columns, fields) {
                 return {
                     dataBound: function (e) {
                         var grid = this;
-                        if(!$scope.detailedReportWindowOpened){
+                        if (!$scope.detailedReportWindowOpened) {
                             $scope.loading = false;
                             $scope.$apply();
                             $scope.detailedReportWindowOpened = true;
@@ -1232,7 +1297,7 @@
                     buttons: [
                         {
                             text: 'Відмінити',
-                            click: function() { this.close(); }
+                            click: function () { this.close(); }
                         }
                     ],
                     showNotActive: false,
@@ -1255,7 +1320,7 @@
                             total: "Total",
                             model: { fields: fields }
                         },
-                        error: function(e){
+                        error: function (e) {
                             $scope.loading = false;
                             $scope.$apply();
                         }
@@ -1430,7 +1495,7 @@
                     sort: grid.dataSource.sort(),
                     filters: grid.dataSource.filter()
                 });
-                url += "&gridData="+data;
+                url += "&gridData=" + data;
                 return url;
             };
 
@@ -1438,14 +1503,14 @@
                 var fields = {};
 
                 var descriptionColumnIndex = -1;
-                for(var i = 0; i < columns.length; i++){
-                    if(columns[i]['field'] == 'DESCRIPTION'){
+                for (var i = 0; i < columns.length; i++) {
+                    if (columns[i]['field'] == 'DESCRIPTION') {
                         descriptionColumnIndex = i;
                     }
                     columns[i]['width'] = 110;
-                    for(var k = 0; k < DETAILED_COLUMNS.length; k++){
-                        if(DETAILED_COLUMNS[k]['field'] == columns[i]['field']){
-                            for(var attr in DETAILED_COLUMNS[k]){
+                    for (var k = 0; k < DETAILED_COLUMNS.length; k++) {
+                        if (DETAILED_COLUMNS[k]['field'] == columns[i]['field']) {
+                            for (var attr in DETAILED_COLUMNS[k]) {
                                 columns[i][attr] = DETAILED_COLUMNS[k][attr];
                             }
                             break;
@@ -1453,16 +1518,16 @@
                     }
 
                     var type = DATE_COLUMNS.indexOf(columns[i]['field']) != -1 ? "date" : "string";
-                    fields[columns[i]['field']] = {type: type};
+                    fields[columns[i]['field']] = { type: type };
                 }
 
-                if(descriptionColumnIndex != -1){
+                if (descriptionColumnIndex != -1) {
                     var descriptionColumn = columns[descriptionColumnIndex];
                     columns.splice(descriptionColumnIndex, 1);
                     columns.push(descriptionColumn);
                 }
 
-                return {fields: fields, columns: columns};
+                return { fields: fields, columns: columns };
             };
 
             $scope.OpenDetailedReportGrid = function (isRowDetailed) {
@@ -1473,20 +1538,27 @@
 
                 $scope.isRowDetailed = isRowDetailed;
 
-                var grid  = $scope.getReportGrid();
+                var grid = $scope.getReportGrid();
                 $scope.selectRowForDetailedReport = grid.dataItem(grid.select());
 
                 var url_prefix = $scope.getUrlPrefix(true);
-                var urlColumns = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdatacolumns?'+url_prefix);
-                var url = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdata?'+url_prefix);
+                var urlColumns = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdatacolumns?' + url_prefix);
+                var url = bars.config.urlContent('/api/reporting/nbu/getdetailedrepdata?' + url_prefix);
 
                 $scope.loading = true;
 
                 $http.get(urlColumns)
                     .then(function (response) {
-                        if(response["data"] != null && response["data"]["Columns"] != null){
+                        if (response["data"] != null &&
+                            response["data"]["Columns"] != null &&
+                            response["data"]["Columns"].length > 0) {
                             var data = $scope.fillColumnsAndFields(response["data"]["Columns"]);
                             $scope.reCreateDetailedReportGrid(url, data['columns'], data['fields']);
+                        } else {
+                            bars.ui.alert({ text: "Для файлу " + 
+                                    (base64Helper.decode($scope.FileCodeBase64)) +
+                                    " протокол відсутній" });
+                            $scope.loading = false;
                         }
                     }, function () {
                         $scope.detailedReportWindow.center().open().maximize();
@@ -1506,7 +1578,7 @@
 
             };
 
-            $scope.showAccountDetailWindow = function(id) {
+            $scope.showAccountDetailWindow = function (id) {
                 var url = bars.config.urlContent('/viewaccounts/accountform.aspx?type=2&acc=' + id + '&rnk=&accessmode=0');
                 bars.ui.dialog({
                     iframe: true,
@@ -1518,7 +1590,7 @@
                 });
             }
 
-            $scope.showCustomerDetailWindow = function(id) {
+            $scope.showCustomerDetailWindow = function (id) {
                 var url = bars.config.urlContent('/clientregister/registration.aspx?readonly=0&rnk=' + id);
                 bars.ui.dialog({
                     iframe: true,
@@ -1560,10 +1632,10 @@
 
             $scope.getExcel = function (grid, isDtl) {
                 var progress = function (flag) {
-                    if(isDtl){
+                    if (isDtl) {
                         kendo.ui.progress($("#search"), flag);
                     }
-                    else{
+                    else {
                         $scope.loading = flag;
                     }
                 };
@@ -1574,11 +1646,11 @@
                 $http.get(bars.config.urlContent(url)).
                     success(function (data) {
                         progress(false);
-                        if(data["FileName"] != null){
-                            url = '/reporting/nbu/getexcel?fName='+data["FileName"];
+                        if (data["FileName"] != null) {
+                            url = '/reporting/nbu/getexcel?fName=' + data["FileName"];
                             window.location = bars.config.urlContent(url);
                         }
-                        else{
+                        else {
                             bars.ui.notify('Помилка', 'Невдала спроба завантажити файл, спробуйте повторно', 'error');
                         }
                     }).
@@ -1591,88 +1663,88 @@
             $scope.detailedReportGridToolbarOptions = {
                 resizable: false,
                 items: [{
-                        type: "button",
-                        name: 'excel',
-                        text: '<i class="pf-icon pf-16 pf-exel"></i> Завантажити в Excel',
-                        imageclass: 'pf-icon pf-16 pf-exel',
-                        click: function () {
-                            $scope.getExcel($scope.getDetailedReportGrid(), true);
-                        }
-                    },{
-                        type: "button",
-                        name: 'excel',
-                        text: 'Перегляд картки рахунку',
-                        click: function () {
-                            var grid = $scope.getDetailedReportGrid();
-                            var selectedRow = grid.dataItem(grid.select());
-                            if (!selectedRow) {
-                                bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
-                                return;
-                            }
-                            if (!selectedRow.ACC_ID) {
-                                bars.ui.notify('Помилка', 'Значення Ідентифікатор рахунку пусте', 'error');
-                                return;
-                            }
-                            $scope.showAccountDetailWindow(selectedRow.ACC_ID);
-                        }
-                    },{
-                        type: "button",
-                        name: 'excel',
-                        text: 'Перегляд картки клієнта',
-                        click: function () {
-                            var grid = $scope.getDetailedReportGrid();
-                            var selectedRow = grid.dataItem(grid.select());
-                            if (!selectedRow) {
-                                bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
-                                return;
-                            }
-                            if (!selectedRow.CUST_ID) {
-                                bars.ui.notify('Помилка', 'Значення РНК пусте', 'error');
-                                return;
-                            }
-                            $scope.showCustomerDetailWindow(selectedRow.CUST_ID);
-                        }
-                    },{
-                        type: "button",
-                        name: 'excel',
-                        text: 'Перегляд документу',
-                        click: function () {
-                            var grid = $scope.getDetailedReportGrid();
-                            var selectedRow = grid.dataItem(grid.select());
-                            if (!selectedRow) {
-                                bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
-                                return;
-                            }
-                            if (!selectedRow.REF) {
-                                bars.ui.notify('Помилка', 'Значення номер документу пусте', 'error');
-                                return;                                
-                            }
-                            $scope.showDocumentDetailWindow(selectedRow.REF);
-                        }
-                    },{
-                        type: "button",
-                        name: 'excel',
-                        text: 'Перегляд договору',
-                        click: function () {
-
-                            var grid = $scope.getDetailedReportGrid();
-                            var selectedRow = grid.dataItem(grid.select());
-                            if (!selectedRow) {
-                                bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
-                                return;
-                            }
-                            if (!selectedRow.ND) {
-                                bars.ui.notify('Помилка', 'Значення РЕФ кредитного договору пусте', 'error');
-                                return;
-                            }
-                            $scope.showLoanAgreementDetailWindow(selectedRow.ND);
-                        }
+                    type: "button",
+                    name: 'excel',
+                    text: '<i class="pf-icon pf-16 pf-exel"></i> Завантажити в Excel',
+                    imageclass: 'pf-icon pf-16 pf-exel',
+                    click: function () {
+                        $scope.getExcel($scope.getDetailedReportGrid(), true);
                     }
+                }, {
+                    type: "button",
+                    name: 'excel',
+                    text: 'Перегляд картки рахунку',
+                    click: function () {
+                        var grid = $scope.getDetailedReportGrid();
+                        var selectedRow = grid.dataItem(grid.select());
+                        if (!selectedRow) {
+                            bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
+                            return;
+                        }
+                        if (!selectedRow.ACC_ID) {
+                            bars.ui.notify('Помилка', 'Значення Ідентифікатор рахунку пусте', 'error');
+                            return;
+                        }
+                        $scope.showAccountDetailWindow(selectedRow.ACC_ID);
+                    }
+                }, {
+                    type: "button",
+                    name: 'excel',
+                    text: 'Перегляд картки клієнта',
+                    click: function () {
+                        var grid = $scope.getDetailedReportGrid();
+                        var selectedRow = grid.dataItem(grid.select());
+                        if (!selectedRow) {
+                            bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
+                            return;
+                        }
+                        if (!selectedRow.CUST_ID) {
+                            bars.ui.notify('Помилка', 'Значення РНК пусте', 'error');
+                            return;
+                        }
+                        $scope.showCustomerDetailWindow(selectedRow.CUST_ID);
+                    }
+                }, {
+                    type: "button",
+                    name: 'excel',
+                    text: 'Перегляд документу',
+                    click: function () {
+                        var grid = $scope.getDetailedReportGrid();
+                        var selectedRow = grid.dataItem(grid.select());
+                        if (!selectedRow) {
+                            bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
+                            return;
+                        }
+                        if (!selectedRow.REF) {
+                            bars.ui.notify('Помилка', 'Значення номер документу пусте', 'error');
+                            return;
+                        }
+                        $scope.showDocumentDetailWindow(selectedRow.REF);
+                    }
+                }, {
+                    type: "button",
+                    name: 'excel',
+                    text: 'Перегляд договору',
+                    click: function () {
+
+                        var grid = $scope.getDetailedReportGrid();
+                        var selectedRow = grid.dataItem(grid.select());
+                        if (!selectedRow) {
+                            bars.ui.notify('Помилка', 'Виберіть рядок', 'error');
+                            return;
+                        }
+                        if (!selectedRow.ND) {
+                            bars.ui.notify('Помилка', 'Значення РЕФ кредитного договору пусте', 'error');
+                            return;
+                        }
+                        $scope.showLoanAgreementDetailWindow(selectedRow.ND);
+                    }
+                }
 
                 ]
             };
 
-            var resizeGrid = function(e) {
+            var resizeGrid = function (e) {
                 var gridElement = e.sender.element;
                 var dataArea = gridElement.find(".k-grid-content");
                 var newHeight = gridElement.parent().innerHeight() - 2;
