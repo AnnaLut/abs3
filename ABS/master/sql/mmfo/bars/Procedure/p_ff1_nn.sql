@@ -7,20 +7,20 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_FF1_NN ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
-                                           sheme_   VARCHAR2 DEFAULT 'G') IS
+  CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN(
+                        dat_     DATE,
+                        sheme_   VARCHAR2 DEFAULT 'G',
+                        type_    varchar2 default ' ') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #F1 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 01/06/2018 (10/07/2017)
+% VERSION     : 10/07/2017 (02/06/2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
+           type_  - ' '/'X' -обычный файл / подготовка xml
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-01.06.2018 для проводок Дт 2909 Кт 2924 (в бух.моделе для данного REF  
-                                         еще и Дт 2924 Кт 2625)  
-           (в OPER NLSA='2909...' NLSB='2625...') будем выбирать 
-           первоначальную сумму из документа и ОКПО для счета 2625
+17.05.2018 для формирования xml -определение NBUC; не сохранение в TMP_NBU
 02.03.2017 добавлена обработка TAG='52A' для определения кода страны 
            бенефициара
 29.04.2015 не удаляем проводки Дт 2909 Кт 3739 и в кл-р KL_FF1 добавлены
@@ -104,6 +104,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
    nlsk1_     VARCHAR2 (15);
    nbuc1_     VARCHAR2 (20);
    nbuc_      VARCHAR2 (20);
+   nbuc_x     VARCHAR2 (20);
    country_   VARCHAR2 (3);
    d060_      NUMBER;
    rnk_       NUMBER;
@@ -182,7 +183,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
          (nls1_, kv_, fdat_, l_kodp_, p_znap_, nbuc_, ref_, rnk_, comm_, tobo_ ) ;
 
    END;
--------------------------------------------------------------------
+
 -----------------------------------------------------------------------------
 BEGIN
    commit;
@@ -267,6 +268,17 @@ BEGIN
    p_proc_set (kodf_, sheme_, nbuc1_, typ_);
    nbuc_ := nbuc1_;
 
+   if type_ ='X'  then
+         begin
+             select obl   into  nbuc_x
+              from branch
+             where branch ='/'||to_char(mfo_)||'/';
+         exception
+            when others  then  nbuc_x :='26';
+         end;
+         nbuc_ :=nbuc_x;
+   end if;
+
    -- отбор проводок, удовлетворяющих условию
    -- переказ коштiв по мiжнароднiй системi переказу коштiв або отримання переказу
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
@@ -275,7 +287,7 @@ BEGIN
        (ko, rnk, fdat, REF, tt, accd, nlsd, kv, acck, nlsk, s_nom, s_eqv, nazn, branch)
       SELECT *
         FROM ( -- перерахування переказiв
-               SELECT   1 ko,
+/*               SELECT   1 ko,
                        (case when o.nbsd IN ('2620','2902','2924') then o.rnkd else o.rnkk end) rnk,
                        o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                        o.acck, o.nlsk,
@@ -313,7 +325,7 @@ BEGIN
                     AND o.nlsd LIKE k.nlsd || '%'
                     AND o.nlsk LIKE k.nlsk || '%'
                     AND trim(k.ob22) is null
-              UNION
+              UNION     */
                   SELECT   1 ko, o.rnkk rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                        o.acck, o.nlsk,
                        o.s * 100 s_nom,
@@ -329,7 +341,7 @@ BEGIN
                     AND NVL(k.ob22, o.ob22k) = o.ob22k
               UNION
               -- надходження переказiв (видача переказiв)
-              SELECT   2 ko, o.rnkk rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
+/*              SELECT   2 ko, o.rnkk rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                        o.acck, o.nlsk,
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
@@ -373,7 +385,7 @@ BEGIN
                     AND o.nlsd LIKE k.nlsd || '%'
                     AND o.nlsk LIKE k.nlsk || '%'
                     AND trim(k.ob22) is null
-              UNION
+              UNION     */
                   SELECT   2 ko, o.rnkk rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                        o.acck, o.nlsk,
                        o.s * 100 s_nom,
@@ -531,71 +543,7 @@ BEGIN
       end loop;
    end if;
 
-   -- замена RNK в OTCN_PROV_TEMP на RNK счета 2625
-   for k in ( select * from otcn_prov_temp
-                 where nlsd like '2909%'
-                   and nlsk like '2924%'
-               )
-         loop
-
-            begin
-               select p.rnkk 
-                  into rnk_
-               from provodki_otc p
-               where p.fdat = Dat_ 
-                 and p.ref = k.ref 
-                 and p.nlsd like k.nlsk || '%'
-                 and p.nlsk like '2625%'
-                 and p.kv = k.kv 
-                 and p.s*100 = k.s_nom
-                 and rownum = 1;
-
-                 update otcn_prov_temp t set t.rnk = rnk_
-                 where t.ref = k.ref
-                   and t.nlsd like '2909%' 
-                   and t.nlsk like '2924%'; 
-            exception when no_data_found then
-               BEGIN
-                  select a.rnk 
-                     into rnk_
-                  from oper o, accounts a 
-                  where o.vdat = dat_ 
-                    and o.ref = k.ref
-                    and trim(o.nlsb) = trim(a.nls)
-                    and o.nlsb like '2625%'
-                    and o.kv = a.kv;
-
-                 update otcn_prov_temp t set t.rnk = rnk_
-                 where t.ref = k.ref
-                   and t.nlsd like '2909%' 
-                   and t.nlsk like '2924%'; 
-               exception when no_data_found then
-                  BEGIN
-                     select p.rnkk 
-                        into rnk_
-                     from provodki_otc p, operw w
-                     where p.fdat = dat_ 
-                       and ( (p.nlsd like '2924%' and p.nlsk like '2625%') OR 
-                             (p.nlsd like '3739%' and p.nlsk like '2909%')
-                           )
-                       and p.kv = k.kv 
-                       and p.s*100 = k.s_nom 
-                       and w.ref = k.ref 
-                       and w.tag like '59%' 
-                       and p.nlsk = substr(w.value,2,14); 
-   
-                    update otcn_prov_temp t set t.rnk = rnk_
-                    where t.ref = k.ref
-                      and t.nlsd like '2909%' 
-                      and t.nlsk like '2924%'; 
-                  exception when no_data_found then
-                     null;
-                  END;
-               END;
-            end;
-      end loop;
-
-   -- переказ коштiв фiз. особами за межi України (отримання коштiв фiз. особами)
+      -- переказ коштiв фiз. особами за межi України (отримання коштiв фiз. особами)
    OPEN opl_dok;
 
    LOOP
@@ -772,7 +720,19 @@ BEGIN
             ELSE
                nbuc_ := nbuc1_;
             END IF;
-            
+------------------------------------------------- для xml
+            if type_ ='X'  then
+                  begin
+                      select obl   into  nbuc_
+                       from branch
+                      where branch = (select branch  from accounts
+                                       where acc =acc1_);
+                  exception
+                     when others  then  nbuc_ :=nbuc_x;
+                  end;
+            end if;
+-------------------------------------------------            
+
             if nls_ like '2909%' then
                select ob22
                into ob22_
@@ -818,6 +778,18 @@ BEGIN
             ELSE
                nbuc_ := nbuc1_;
             END IF;
+------------------------------------------------- для xml
+            if type_ ='X'  then
+                  begin
+                      select obl   into  nbuc_
+                       from branch
+                      where branch = (select branch  from accounts
+                                       where acc =acc1_);
+                  exception
+                     when others  then  nbuc_ :=nbuc_x;
+                  end;
+            end if;
+-------------------------------------------------            
 
             if kod_g_ is null or (kod_g_ is not null and kod_g_ != '804') then
                if nlsk_ like '262%' or nlsk_ like '2900%' or nlsk_ like '2924%' then
@@ -836,22 +808,25 @@ BEGIN
 
    CLOSE opl_dok;
 ---------------------------------------------------
-   DELETE FROM tmp_nbu
-         WHERE kodf = kodf_ AND datf = dat_;
----------------------------------------------------
-   INSERT INTO tmp_nbu (kodp, datf, kodf, znap, nbuc)
-      SELECT kodp, dat_, kodf_, SUM(to_number(znap)), nbuc
-        FROM rnbu_trace
-       WHERE userid = userid_
-      GROUP BY KODP,NBUC;
+   if type_ != 'X'  then
+
+        DELETE FROM tmp_nbu
+              WHERE kodf = kodf_ AND datf = dat_;
+
+        INSERT INTO tmp_nbu (kodp, datf, kodf, znap, nbuc)
+           SELECT kodp, dat_, kodf_, SUM(to_number(znap)), nbuc
+             FROM rnbu_trace
+            WHERE userid = userid_
+           GROUP BY KODP,NBUC;
+   end if;
 ----------------------------------------
 END p_ff1_nn;
 /
 show err;
 
 PROMPT *** Create  grants  P_FF1_NN ***
-grant EXECUTE                                                                on P_FF1_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_FF1_NN        to WR_ALL_RIGHTS;
+grant EXECUTE                   on P_FF1_NN        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                   on P_FF1_NN        to WR_ALL_RIGHTS;
 
 
 
