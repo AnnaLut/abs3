@@ -233,8 +233,6 @@ $end
 
     bars_audit.trace( '%s: l_okpo=%s, l_nbu_rpt_dt=%s.', title, l_okpo, to_char(p_rpt_date, g_dt_fmt) );
 
-    bars_audit.trace( '%s: l_okpo=%s, l_nbu_rpt_dt=%s.', title, l_okpo, to_char(l_nbu_rpt_dt,g_dt_fmt) );
-
     l_XmlText := '<?xml version="1.0" encoding="utf-8" standalone="yes"?>';
     l_XmlText := l_XmlText || chr(10) || '<NBUSTATREPORT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
     l_XmlText := l_XmlText || chr(10) || '  <HEAD>';
@@ -827,62 +825,69 @@ $end
               and kf = p_kf                        -- Филиал
               and report_code = l_rpt_code;        -- Код отчета
 
-    when 'E8X' then
-
-      open p_recordset
-       for with t_data
-             as ( select substr(d.kodp, 1, 3)  as DDD
-                       , substr(d.kodp, 4, 10) as ZZZZZZZZZZ
-                       , substr(d.kodp, 14, 4) as NNNN --порядковий номер договору кредитора у звітному файлі
-                       , max(Replace(substr(d.kodp, 18, 4), '0000', '')) over (partition by  substr(d.kodp, 4, 10), substr(d.kodp, 14, 4), substr(d.kodp, 22, 3)) as BBBB --балансовий рахунок
-                       , substr(d.kodp, 22, 3) as VVV --код валюти
-                       , substr(d.kodp, 25, 1) as A
-                       , d.znap
-                    from tmp_nbu d
-                   where d.datf = p_rpt_dt
-                     and d.kf = p_kf
-                     and d.kodf = 'E8'
-                )
-           select 'AE8001' as EKP
-                , nvl(T070_1, 0) as T070_1
-                , nvl(T070_2, 0) as T070_2
-                , nvl(T070_3, 0) as T070_3
-                , T090
-                , K040
-                , KU_1
-                , K014
-                , K110
-                , K074  
-                , vvv as R030
-                , bbbb as R020
-                , Q020
-                , row_number() over (order by nnnn) as Q003_12
-                , Q001
-                , zzzzzzzzzz as K020
-                , Q029
-                , nnnn as Q003_1
-                , Q003_2
-                , Q007_1
-                , Q007_2
-                , a as K021
-             from ( select *
-                      from t_data t
-                     where t.ddd in ('010', '019', '021', '025', '050', '055', '060', '090', '111', '112', '121', '122', '123', '130', '206')
-                  ) pivot ( max(znap) for ddd in ( '010' as "Q001"
-                                                 , '019' as "Q029"
-                                                 , '021' as "K074"
-                                                 , '025' as "K110"
-                                                 , '050' as "K040"
-                                                 , '055' as "KU_1"
-                                                 , '060' as "Q020"
-                                                 , '090' as "Q003_2"
-                                                 , '111' as "Q007_1"
-                                                 , '112' as "Q007_2"
-                                                 , '121' as "T070_1"
-                                                 , '122' as "T070_2"
-                                                 , '123' as "T070_3"
-                                                 , '130' as "T090"
-                                                 , '206' as "K014" ) );
+       when 'E8X' then
+         open p_recordset
+         for
+            select 'AE8001' as EKP
+                   , K020
+                   , Q003_1
+                   , Q001
+                   , Q029
+                   , K074
+                   , K110
+                   , K040
+                   , KU_1
+                   , Q020
+                   , K014
+                   , Q003_2
+                   , Q007_1
+                   , Q007_2
+                   , T070_1
+                   , T070_2
+                   , T070_3
+                   , T070_4
+                   , T090 
+                   , R030
+                   , R020 
+                   , K021  
+                   , Q003_12    
+            from   (
+                      select *
+                      from   (
+                                select 
+                                      substr(field_code, 1, 10) as nnnn     
+                                       , substr(field_code, 11) as  field_code
+                                       , field_value
+                                from   nbur_detail_protocols
+                                where  report_date = p_rpt_dt
+                                       and report_code = l_rpt_code
+                                       and kf = p_kf
+                             )
+                      pivot (max(field_value) for field_code in (
+                                                                  'Q001' as Q001
+                                                                  , 'K020' as K020
+                                                                  , 'Q003_1' as Q003_1
+                                                                  , 'Q029' as Q029
+                                                                  , 'K074' as K074
+                                                                  , 'K110' as K110
+                                                                  , 'K040' as K040
+                                                                  , 'KU_1' as KU_1
+                                                                  , 'Q020' as Q020
+                                                                  , 'K014' as K014
+                                                                  , 'Q003_2' as Q003_2
+                                                                  , 'Q007_1' as Q007_1
+                                                                  , 'Q007_2' as Q007_2
+                                                                  , 'T070_1' as T070_1
+                                                                  , 'T070_2' as T070_2
+                                                                  , 'T070_3' as T070_3
+                                                                  , 'T070_4' as T070_4
+                                                                  , 'T090' as T090 
+                                                                  , 'R030' as R030
+                                                                  , 'R020' as R020 
+                                                                  , 'K021' as K021  
+                                                                  , 'Q003_12' as Q003_12                                                          
+                                                                ))
+                   );
 
       when '2KX' then
          open p_recordset
@@ -957,6 +962,140 @@ $end
                                                        , 'Q032' as Q032
                                                        , 'Q031_2' as Q031_2
             ));   
+
+       when '12X' then
+         open p_recordset
+         for
+           select 
+                  substr(field_code, 1, 6) as EKP --Реєстр показників
+                  , substr(field_code, 9, 2) as KU --Символи касових оборотів                  
+                  , substr(field_code, 7, 2) as D010 --Територія
+                  , field_value as T070 --Сума у нац.валюті
+           from   nbur_agg_protocols
+           where  report_date = p_rpt_dt
+                  and kf = p_kf
+                  and report_code = l_rpt_code; 
+
+       when '13X' then
+         open p_recordset
+         for
+           select 
+                  substr(field_code, 1, 6) as EKP --Реєстр показників
+                  , substr(field_code, 9, 2) as KU --Символи касових оборотів                  
+                  , substr(field_code, 7, 2) as D010 --Територія
+                  , field_value as T070 --Сума у нац.валюті
+           from   nbur_agg_protocols
+           where  report_date = p_rpt_dt
+                  and kf = p_kf
+                  and report_code = l_rpt_code; 
+
+       when '3AX' then
+         open p_recordset
+         for
+            select 
+                  EKP
+                  , KU
+                  , T020
+                  , R020
+                  , R011
+                  , R030
+                  , K030
+                  , S180
+                  , D020
+                  , sum(T070) as  T070
+                  , Round(sum(T070 * round(t090, 4)) / sum(T070), 4) as T090
+            from   nbur_log_f3ax
+            where  report_date = p_rpt_dt
+                   and kf = p_kf
+            group by      
+                  EKP
+                  , KU
+                  , T020
+                  , R020
+                  , R011
+                  , R030
+                  , K030
+                  , S180
+                  , D020; 
+
+       when 'E9X' then
+         open p_recordset
+         for
+            select (case when ekp_2='1' and ekp_8 ='804' and ekp_10 ='804'   then 'AE9001'
+                         when ekp_2='1' and ekp_8!='804' and ekp_10 ='804'   then 'AE9002'
+                         when ekp_2='1' and ekp_8 ='804' and ekp_10!='804'   then 'AE9003'
+                         when ekp_2='2' and ekp_8!='804' and ekp_10 ='804'
+                                        and d060_2 is not null               then 'AE9004'
+                         when ekp_2='2' and ekp_8!='804' and ekp_10 ='804'   then 'AE9005'
+                         when ekp_2='2' and ekp_8 ='804' and ekp_10!='804'
+                                        and d060_2 is not null               then 'AE9006'
+                         when ekp_2='2' and ekp_8 ='804' and ekp_10!='804'   then 'AE9007'
+                         when ekp_2='0'                                      then 'AE9008'
+                         else 'AE9000'
+                     end)  as ekp,
+                   ekp_3   as d060_1,
+                   ekp_6   as k020,
+                   ekp_5   as k021,
+                   ekp_4   as f001,
+                   decode(ekp_7,'000','#',ekp_7)   as r030,
+                   decode(ekp_8,'000','#',ekp_8)             as k040_1,
+                   decode(ekp_9,'000','#',ltrim(ekp_9,'0'))  as ku_1,
+                   decode(ekp_10,'000','#',ekp_10)             as k040_2,
+                   decode(ekp_11,'000','#',ltrim(ekp_11,'0'))  as ku_2,
+                   nvl(t071,0)     as t071,
+                   nvl(t080,0)     as t080,
+                   decode(d060_2, null,'#', d060_2)  d060_2,
+                   q001
+              from ( select substr(field_code,1,1) ekp_1,
+                            substr(field_code,2,1) ekp_2,
+                            substr(field_code,3,2) ekp_3,
+                            substr(field_code,5,1) ekp_4,
+                            substr(field_code,6,1) ekp_5,
+                            substr(field_code,7,10) ekp_6,
+                            substr(field_code,17,3) ekp_7,
+                            substr(field_code,20,3) ekp_8,
+                            substr(field_code,23,3) ekp_9,
+                            substr(field_code,26,3) ekp_10,
+                            substr(field_code,29,3) ekp_11,
+                            field_value
+                       from   nbur_agg_protocols t
+                      where  report_date = p_rpt_dt           --Дата отчета
+                        and  kf = p_kf                        --Филиал
+                        and  report_code = l_rpt_code        --Код отчета
+                  )
+                   pivot
+                  ( max(trim(field_value))
+                    for ekp_1 in ( '1' as T071, '3' as T080,
+                                   '8' as D060_2, '9' as Q001 )
+                  );                 
+
+     when '6EX' then
+         open p_recordset
+         for
+           select substr(t.FIELD_CODE, 1, 6) as EKP
+                  , substr(t.field_code, 7, 3) as R030
+                  , FIELD_VALUE as T100
+           from   NBUR_AGG_PROTOCOLS t
+           where  report_date = p_rpt_dt
+                  and kf = p_kf
+                  and report_code = l_rpt_code
+           order by
+                 FIELD_CODE;
+
+       when 'F1X' then
+         open p_recordset
+         for
+            select substr(field_code, 1, 6) as EKP    --Код показателя
+                   , f_get_ku_by_nbuc(t.nbuc) as KU   --Код области
+                   , substr(field_code, 7, 1) as K030 --Резидентность
+                   , substr(field_code, 8, 3) as R030 --Валюта
+                   , substr(field_code, 11, 3) as K040 --Код страны
+                   , field_value as T071         --Значение параметра
+            from   nbur_agg_protocols t
+            where  report_date = p_rpt_dt           --Дата отчета
+                   and kf = p_kf                    --Филиал
+                   and report_code = l_rpt_code;    --Код отчета
+
     else
       null;
     end case;
@@ -1037,6 +1176,19 @@ $end
     then
       l_clob := REGEXP_REPLACE( l_clob, '(<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
       l_clob := REGEXP_REPLACE( l_clob, '(<Q007_3)(></)', '\1 xsi:nil = "true" \2' );
+    when 'E8'
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<T090)(></)', '\1 xsi:nil = "true" \2' );      
+    when 'E9'
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q001)(></)', '\1 xsi:nil = "true" \2' );
+    when '1P'
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q001)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q004)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<K020)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<RCUKRU_GLB_1)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<RCUKRU_GLB_2)(></)', '\1 xsi:nil = "true" \2' );
     else
       null;
     end case;
