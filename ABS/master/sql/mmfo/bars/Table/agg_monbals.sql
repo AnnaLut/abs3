@@ -27,33 +27,32 @@ declare
   e_tab_exists exception;
   pragma exception_init( e_tab_exists, -00955 );
 begin
-  
   execute immediate q'[create table AGG_MONBALS
-( FDAT       DATE       constraint CC_AGG_MONBALS_FDAT_NN NOT NULL
-, KF         CHAR(6)    constraint CC_AGG_MONBALS_KF_NN   NOT NULL
-, ACC        INTEGER    constraint CC_AGG_MONBALS_ACC_NN  NOT NULL
-, RNK        INTEGER    constraint CC_AGG_MONBALS_RNK_NN  NOT NULL
-, OST        NUMBER(24) constraint CC_AGG_MONBALS_OST_NN  NOT NULL
-, OSTQ       NUMBER(24) constraint CC_AGG_MONBALS_OSTQ_NN NOT NULL
-, DOS        NUMBER(24) constraint CC_AGG_MONBALS_DOS_NN  NOT NULL
-, DOSQ       NUMBER(24) constraint CC_AGG_MONBALS_DOSQ_NN NOT NULL
-, KOS        NUMBER(24) constraint CC_AGG_MONBALS_KOS_NN  NOT NULL
-, KOSQ       NUMBER(24) constraint CC_AGG_MONBALS_KOSQ_NN NOT NULL
-, CRDOS      NUMBER(24) default 0
-, CRDOSQ     NUMBER(24) default 0
-, CRKOS      NUMBER(24) default 0
-, CRKOSQ     NUMBER(24) default 0
-, CUDOS      NUMBER(24) default 0
-, CUDOSQ     NUMBER(24) default 0
-, CUKOS      NUMBER(24) default 0
-, CUKOSQ     NUMBER(24) default 0
-, YR_DOS     NUMBER(24) default 0
-, YR_DOS_UAH NUMBER(24) default 0
-, YR_KOS     NUMBER(24) default 0
-, YR_KOS_UAH NUMBER(24) default 0
-, CALDT_ID   NUMBER Generated Always as (TO_NUMBER(TO_CHAR("FDAT",'j'))-2447892)
+( FDAT       date        constraint CC_AGG_MONBALS_FDAT_NN NOT NULL
+, KF         varchar2(6) constraint CC_AGG_MONBALS_KF_NN   NOT NULL
+, ACC        integer     constraint CC_AGG_MONBALS_ACC_NN  NOT NULL
+, RNK        integer     constraint CC_AGG_MONBALS_RNK_NN  NOT NULL
+, OST        number(24)  constraint CC_AGG_MONBALS_OST_NN  NOT NULL
+, OSTQ       number(24)  constraint CC_AGG_MONBALS_OSTQ_NN NOT NULL
+, DOS        number(24)  constraint CC_AGG_MONBALS_DOS_NN  NOT NULL
+, DOSQ       number(24)  constraint CC_AGG_MONBALS_DOSQ_NN NOT NULL
+, KOS        number(24)  constraint CC_AGG_MONBALS_KOS_NN  NOT NULL
+, KOSQ       number(24)  constraint CC_AGG_MONBALS_KOSQ_NN NOT NULL
+, CRDOS      number(24)  default 0
+, CRDOSQ     number(24)  default 0
+, CRKOS      number(24)  default 0
+, CRKOSQ     number(24)  default 0
+, CUDOS      number(24)  default 0
+, CUDOSQ     number(24)  default 0
+, CUKOS      number(24)  default 0
+, CUKOSQ     number(24)  default 0
+, CALDT_ID   number      Generated Always as (TO_NUMBER(TO_CHAR("FDAT",'j'))-2447892)
+, YR_DOS     number(24)  default 0
+, YR_DOS_UAH number(24)  default 0
+, YR_KOS     number(24)  default 0
+, YR_KOS_UAH number(24)  default 0
 ) TABLESPACE BRSACCM
-COMPRESS BASIC
+compress BASIC
 STORAGE( INITIAL 128K NEXT 128K )
 PCTUSED  0
 PCTFREE  0
@@ -159,14 +158,11 @@ prompt -- Indexes
 prompt -- ======================================================
 
 begin
-  
   execute immediate q'[create unique index UK_AGG_MONBALS on AGG_MONBALS ( FDAT, KF, ACC )
   TABLESPACE BRSACCM
   PCTFREE 0
   COMPRESS 2 ]';
-  
   dbms_output.put_line( 'Index "UK_AGG_MONBALS" created.' );
-  
 exception
   when OTHERS then 
     if (sqlcode = -00955)
