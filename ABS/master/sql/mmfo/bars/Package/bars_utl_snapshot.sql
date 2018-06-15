@@ -162,7 +162,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.3  06.03.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.4  10.06.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -277,19 +277,29 @@ is
     end case;
 
     begin
+/*    select case s.USERNAME
+             when 'BARS_ACCESS_USER'
+             then ( select VALUE
+                      from V$GLOBALCONTEXT
+                     where NAMESPACE = 'BARS_GLOBAL'
+                       and ATTRIBUTE = 'USER_NAME'
+                       and CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER
+                  )
+             else s.USERNAME
+             end || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
+*/
       select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
         into l_errmsg
         from V$SESSION s
-        left
-        join V$GLOBALCONTEXT c
-          on ( c.CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER and
-               c.NAMESPACE = 'BARS_CONTEXT' and
-               c.ATTRIBUTE = 'USER_MFO'
-             )
        where s.TYPE   = 'USER'
          and s.STATUS = 'ACTIVE'
          and s.ACTION = p_action
-         and c.VALUE  = p_kf;
+         and exists( select 1 
+                       from V$GLOBALCONTEXT c
+                      where c.CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER
+                        and c.NAMESPACE = 'BARS_CONTEXT'
+                        and c.ATTRIBUTE = 'USER_MFO'
+                        and c.VALUE     = p_kf );
     exception
       when NO_DATA_FOUND then
         l_errmsg := null;
