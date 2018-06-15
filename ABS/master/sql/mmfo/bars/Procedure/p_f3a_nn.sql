@@ -6,11 +6,13 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 05/06/2018 (18/05/2018, 10/05/2018)
+% VERSION     : 15/06/2018 (05/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+15/06/2018 - виключення оборотів по IF0,IF1,IF2,IF3,IF4,IF5,IF6 
+            (ручні операції по переклассифікації активів)
 05/06/2018 - для счетов оведрафтов убрал условие R011 = '3'
 18/05/2018 - не будут включаться Дт обороты выполненные операцией '024' 
 10/05/2018 - не будут включаться в файл Дт обороты которые были в
@@ -1059,6 +1061,36 @@ BEGIN
                       p_ins_del (acc_, nls_, kv_, '(операция 024)', sdos_, vost_);
 
                       p_ins_log (   '(операция 024) DK=1 r020='''
+                                 || nbs_
+                                 || ''' Счет='''
+                                 || nls_
+                                 || ''' вал='''
+                                 || kv_
+                                 || ''' дата='''
+                                 || data_
+                                 || ''' сумма=',
+                                 vost_);
+                   EXCEPTION
+                      WHEN NO_DATA_FOUND THEN
+                      vost_ := 0;
+                   END;
+
+                   sdos_ := sdos_ - vost_;
+                   
+                   -- перекласифікація активів
+                   BEGIN
+                      vost_ := 0;
+
+                      SELECT NVL(SUM(t.s*100), 0)
+                         INTO vost_
+                      FROM tmp_file03 t
+                      WHERE t.TT in ('IF0','IF1','IF2','IF3','IF4','IF5','IF6')
+                        AND t.FDAT = data_
+                        and t.accd = acc_;
+
+                      p_ins_del (acc_, nls_, kv_, '(перекласифікація активів)', sdos_, vost_);
+
+                      p_ins_log (   '(перекласифікація активів) DK=1 r020='''
                                  || nbs_
                                  || ''' Счет='''
                                  || nls_
@@ -2655,20 +2687,10 @@ BEGIN
                 -- кредитовые обороты
                 IF (skos_ > 0 AND r050_ = '22' and se_ >= 0) OR
                    (skos_ > 0 and se_ >= 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655') and r011_ = '3')
---                   (skos_ > 0 and se_ >= 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
---                   (skos_ > 0 and se_ >= 0 and nbs_ = '2655' and r013p_ = '3') OR
---                   (skos_ > 0 and se_ >= 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
                 THEN
-
                    skos_ := Gl.P_Icurval (kv_, skos_, data_);
-
-                   -- IF mfo_ = 300465 AND spcnt_ = 0
-                   -- THEN
-                   --    cntr1_ := 'X';
-                   -- ELSE
-                      cntr1_ := TO_CHAR (2 - cntr_);
-                   -- END IF;
-
+                   cntr1_ := TO_CHAR (2 - cntr_);
+ 
                    if dat_ < dat_izm1
                    then
                       kodp_ :=
@@ -2733,19 +2755,9 @@ BEGIN
                 -- обороты пролонгации
                 IF (s_prol_ > 0 AND r050_ = '22'  and se_ > 0) OR
                    (s_prol_ > 0 and se_ > 0 and nbs_ in ('2600', '2605', '2620', '2625','2650', '2655'))
---                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2605' and r013p_ in ('1','3')) OR
---                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2655' and r013p_ = '3') OR
---                   (s_prol_ > 0 and se_ > 0 and nbs_ = '2650' and r013p_ in ('1','3','8'))
                 THEN
-
                    s_prol_ := Gl.P_Icurval (kv_, s_prol_, data_);
-
-                   -- IF mfo_ = 300465 AND spcnt_ = 0
-                   -- THEN
-                   --    cntr1_ := 'X';
-                   -- ELSE
-                      cntr1_ := TO_CHAR (2 - cntr_);
-                   -- END IF;
+                   cntr1_ := TO_CHAR (2 - cntr_);
 
                    if dat_ < dat_izm1
                    then
@@ -2906,12 +2918,7 @@ BEGIN
                 END IF;
              END IF;
 
-             -- IF mfo_ = 300465 AND spcnt_ = 0
-             -- THEN
-             --    cntr1_ := 'X';
-             -- ELSE
-                cntr1_ := TO_CHAR (2 - cntr_);
-             -- END IF;
+             cntr1_ := TO_CHAR (2 - cntr_);
 
              if dat_ < dat_izm1
              then
