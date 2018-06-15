@@ -13,7 +13,7 @@ is
                             , AGR_ID  number(38)
                             , END_DT  date
                             , GEN_ID  number(38)
-                            , LIM_BAL number(24)
+--                          , LIM_BAL number(24)
                             , AGR_QTY number(3)
                             , AGR_NUM number(3)
                             , AGR_TP  varchar(3)
@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 11.0  14.06.2018';
+  g_body_version  constant varchar2(64) := 'version 11.0  15.06.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -2843,7 +2843,7 @@ end nos_del;
       exit when p_cur%NOTFOUND;
 
 --    bars_audit.trace( title||': GEN_ID=' ||cur.GEN_ID ||', AGR_ID=' ||cur.AGR_ID
---                           ||', CCY_ID=' ||cur.CCY_ID ||', LIM_BAL='||cur.LIM_BAL
+--                           ||', CCY_ID=' ||cur.CCY_ID
 --                           ||', AGR_QTY='||cur.AGR_QTY||', AGR_NUM='||cur.AGR_NUM );
 
 --    -- пропускаємо генугоди у яких відсутній активний залишок на 8999
@@ -3015,13 +3015,13 @@ end nos_del;
             else -- different currency
 
               agr.sar_dtl(agr.sar_dtl.last).gen_ccy_dbt := round( agr.sar_dtl(agr.sar_dtl.last).dbt * GET_CROSS_RATE( cur.CCY_ID, agr.gen_ccy_id, p_rpt_dt ) );
-
+/*
               bars_audit.trace( title||': sar_id='     ||to_char(agr.sar_dtl(agr.sar_dtl.last).sar_id)
                                      ||', gen_ccy_id=' ||to_char(agr.gen_ccy_id)
                                      ||', gen_ccy_dbt='||to_char(agr.sar_dtl(agr.sar_dtl.last).gen_ccy_dbt)
                                      ||', sar_ccy_id=' ||to_char(cur.CCY_ID)
                                      ||', sar_ccy_dbt='||to_char(agr.sar_dtl(agr.sar_dtl.last).dbt) );
-
+*/
             end if;
 
             agr.tot_dbt := agr.tot_dbt + agr.sar_dtl(agr.sar_dtl.last).gen_ccy_dbt;
@@ -3029,13 +3029,13 @@ end nos_del;
           end if;
 
         end if;
-        
+/*
         bars_audit.trace( title||': sar_id='  ||to_char(agr.sar_dtl(agr.sar_dtl.last).sar_id)
                                ||', dbt='     ||to_char(agr.sar_dtl(agr.sar_dtl.last).dbt)
                                ||', dbt_odue='||to_char(agr.sar_dtl(agr.sar_dtl.last).dbt_odue)
                                ||', int='     ||to_char(agr.sar_dtl(agr.sar_dtl.last).int)
                                ||', int_odue='||to_char(agr.sar_dtl(agr.sar_dtl.last).int_odue) );
-
+*/
         if ( agr.sar_dtl.count > 0 and
              agr.sar_dtl(agr.sar_dtl.last).int_dfr > 0 )
         then -- fill schedule of deferred interest
@@ -3152,7 +3152,7 @@ end nos_del;
                 -- SS
                 if ( agr.gen_shd(r).SS > 0 )
                 then -- платіжна дата для тіла кредиту
-
+/*
                   bars_audit.trace( title||': sar_id='||agr.sar_dtl(a).sar_id
                                          ||', agr.gen_shd(r).LMT_INPT='   ||to_char(agr.gen_shd(r).LMT_INPT)
                                          ||', agr.gen_shd(r).LMT_OTPT='   ||to_char(agr.gen_shd(r).LMT_OTPT)
@@ -3160,7 +3160,7 @@ end nos_del;
                                          ||', agr.sar_dtl(a).gen_ccy_dbt='||to_char(agr.sar_dtl(a).gen_ccy_dbt)
                                          ||', agr.sar_dtl(a).sar_ccy_id=' ||to_char(agr.sar_dtl(a).sar_ccy_id)
                                          ||', agr.sar_dtl(a).dbt='        ||to_char(agr.sar_dtl(a).dbt) );
-
+*/
                   case -- override debt amount
                   when ( agr.tot_dbt > agr.gen_shd(r).LMT_INPT )
                   then -- просрочка
@@ -3218,7 +3218,6 @@ end nos_del;
 
                       r_shd.SS := agr.sar_dtl(a).dbt;
 
---                    l_amnt := round( r_shd.SS * GET_CROSS_RATE( agr.gen_ccy_id, agr.sar_dtl(a).sar_ccy_id, p_rpt_dt ) );
                       l_amnt := agr.sar_dtl(a).gen_ccy_dbt;
 
                       agr.gen_shd(r).SS := agr.gen_shd(r).SS - l_amnt;
@@ -3247,12 +3246,16 @@ end nos_del;
 
                   r_shd.SSP := agr.sar_dtl(a).dbt_odue;
                   r_shd.SNP := agr.sar_dtl(a).int_odue;
-                  r_shd.SNO := agr.sar_dtl(a).int_dfr;
+
+                  if ( agr.sar_dtl(a).int_dfr > 0)
+                  then -- 
+                    r_shd.SNO := r_shd.SNO + agr.sar_dtl(a).int_dfr;
+                  end if;
 
                   if ( agr.sar_dtl(a).int > 0 )
                   then -- для випадків коли в графіку відсутнє погашення %%
                     r_shd.SN := agr.sar_dtl(a).int;
-                  end if;   
+                  end if;
 
                   r_shd.SN1 := r_shd.LMT_INPT          * r_shd.IR                / 100 / 365 * l_day_qty;
                   r_shd.SN2 := agr.sar_dtl(a).dbt_odue * agr.sar_dtl(a).sar_fine / 100 / 365 * l_day_qty;
@@ -3399,16 +3402,15 @@ end nos_del;
               , r8.ND    as AGR_ID
               , a8.MDATE as END_DT
               , p8.ND    as GEN_ID
-              , b8.OST + l_adj_f * ( b8.CRKOS - b8.CRDOS ) as LIM_BAL
+--            , b8.OST + l_adj_f * ( b8.CRKOS - b8.CRDOS ) as LIM_BAL
               , count(r8.ND) over ( partition by nvl( a8.ACCC, a8.ACC ) ) as AGR_QTY
               , row_number() over ( partition by nvl( a8.ACCC, a8.ACC ) order by a8.ACC ) as AGR_NUM
               , 'AST' as AGR_TP
           from ACCOUNTS a8
           join ND_ACC   r8
             on ( r8.ACC = a8.ACC )
-          left outer
-          join AGG_MONBALS b8
-            on ( b8.ACC = a8.ACC and b8.FDAT = l_snp_dt )
+--        join AGG_MONBALS b8
+--          on ( b8.ACC = a8.ACC and b8.FDAT = l_snp_dt )
           left outer
           join ND_ACC   p8
             on ( p8.ACC = a8.ACCC )
@@ -3432,7 +3434,7 @@ end nos_del;
               , r.ND    as AGR_ID
               , a.MDATE as END_DT
               , p.ND    as GEN_ID
-              , b.OST + l_adj_f * ( b.CRKOS - b.CRDOS ) as LIM_BAL
+--            , b.OST + l_adj_f * ( b.CRKOS - b.CRDOS ) as LIM_BAL
               , 1 as AGR_QTY
               , 1 as AGR_NUM
               , 'LBY' as AGR_TP -- case a.PAP when 2 then 'LBY' else 'AST' end as AGR_TP
@@ -3494,3 +3496,4 @@ grant execute on PRVN_FLOW to BARS_ACCESS_DEFROLE;
 grant execute on PRVN_FLOW to RCC_DEAL;
 grant execute on PRVN_FLOW to START1;
 grant execute on PRVN_FLOW to BARSUPL, UPLD;
+grant execute on PRVN_FLOW to BARSREADER_ROLE;
