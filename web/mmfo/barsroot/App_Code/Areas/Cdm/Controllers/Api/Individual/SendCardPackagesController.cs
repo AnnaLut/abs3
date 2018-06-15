@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using BarsWeb;
 using BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Abstract.Individual;
 using BarsWeb.Areas.Cdm.Models;
 
-namespace BarsWeb.Areas.Cdm.Controllers.Api.Individual
+namespace Areas.Cdm.Controllers.Api.Individual
 {
     [AuthorizeApi]
     public class SendCardPackagesController : ApiController
@@ -21,9 +22,8 @@ namespace BarsWeb.Areas.Cdm.Controllers.Api.Individual
             {
                 param.PackSize = 1000;
             }
-            _cdmRepository.PackAndSendClientCards(param.CardsCount, param.PackSize.Value, param.kf);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            int stausResult = (int)_cdmRepository.PackAndSendClientCards(param.CardsCount, param.PackSize.Value, param.kf);
+            return Request.CreateResponse(HttpStatusCode.OK, stausResult);
         }
-
     }
 }

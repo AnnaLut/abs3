@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using BarsWeb.Areas.Cdm.Infrastructure.DI.Abstract.PrivateEn;
 using BarsWeb;
+using BarsWeb.Areas.Cdm.Infrastructure.DI.Abstract.PrivateEn;
 using BarsWeb.Areas.Cdm.Models;
 
 namespace Areas.Cdm.Controllers.Api.PrivateEn
@@ -22,9 +22,8 @@ namespace Areas.Cdm.Controllers.Api.PrivateEn
             {
                 param.PackSize = 1000;
             }
-            _cdmRepository.PackAndSendClientCards(param.CardsCount, param.PackSize.Value, param.kf);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            int stausResult = (int)_cdmRepository.PackAndSendClientCards(param.CardsCount, param.PackSize.Value, param.kf);
+            return Request.CreateResponse(HttpStatusCode.OK, stausResult);
         }
-
     }
 }

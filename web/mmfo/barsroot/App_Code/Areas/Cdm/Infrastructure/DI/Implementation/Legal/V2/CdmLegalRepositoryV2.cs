@@ -22,7 +22,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
     /// </summary>
     public class CdmLegalRepositoryV2 : CdmLegalRepository
     {
-        protected const PersonType LegalPerson = (PersonType) 1;
+        protected const PersonType LegalPerson = (PersonType)1;
         protected CultureInfo Culture = CultureInfo.InvariantCulture;
 
 
@@ -41,6 +41,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
 
         public override decimal PackAndSendClientCards(int? cardsCount, int packSize, string kf)
         {
+            EbkStatusCode resultCode = EbkStatusCode.Ok; // Everything is ok
             UserLogin();
             Logger.Info(string.Format("{0} Розпочато надсилання карток клієнтів. Розмір пакету - {1}, KF - {2}.",
                 _logMessagePrefix, packSize, kf));
@@ -52,6 +53,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
             try
             {
                 List<LegalData> packPlaneBody = QueueGetCards(packSize, kf);
+
                 if (!packPlaneBody.Any())
                     throw new ArgumentException("База даних повернула порожню чергу карток на відправку.");
 
@@ -67,13 +69,15 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 //строим пакет
                 var package = new LegalCards(kf, packNum.ToString(Culture), HomeRepo.GetUserParam().USER_FULLNAME,
                     packBody);
-                //xml = SerializeToXml(package);
+
                 xml = package.XmlSerialize(Encoding.UTF8);
-                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", _logMessagePrefix, xml));
+                
+                string httpVerb = "POST";
+                Logger.Info(String.Format("{0} Метод: {1}, URL: {2}, Xml до надсилання: -={3}=-", _logMessagePrefix, httpVerb, apiUrl, xml));
 
                 // отправляем данные в ЕБК
                 var bytes = Encoding.UTF8.GetBytes(xml);
-                HttpWebResponse httpResponse = MakeRequest(apiUrl, bytes, "POST");
+                HttpWebResponse httpResponse = MakeRequest(apiUrl, bytes, httpVerb);
 
                 string responseStr;
                 using (Stream responseStream = httpResponse.GetResponseStream())
@@ -95,12 +99,25 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 {
                     Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix,
                         httpResponse.StatusCode));
+                    resultCode = EbkStatusCode.RemoteErrorFromEbk;
                 }
+            }
+            catch (OracleException ex)
+            {
+                resultCode = EbkStatusCode.DbError;
 
-
+                Logger.Error(string.Format(
+                    "{0} Помилка пакетної доставки. {1} --- {2}",
+                    _logMessagePrefix,
+                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
+                    ex.StackTrace
+                ));
+                Logger.Error(string.Format("{0} - {1}", _logMessagePrefix, xml));
             }
             catch (Exception ex)
             {
+                resultCode = EbkStatusCode.OtherError;
+
                 Logger.Error(string.Format(
                     "{0} Помилка пакетної доставки. {1} --- {2}",
                     _logMessagePrefix,
@@ -110,7 +127,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 Logger.Error(string.Format("{0} - {1}", _logMessagePrefix, xml));
             }
 
-            return packSize;
+            return (int)resultCode;
         }
 
         public override ActionStatus PackAndSendSingleCard(decimal rnk)
@@ -417,8 +434,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 }).ToList();
             }
 
-            var sqlParams = new OracleParameter[]
-            {
+            var sqlParams = new OracleParameter[]{
                 new OracleParameter("p_batchId", OracleDbType.Varchar2)
                 {
                     Value = (batchId)
@@ -437,7 +453,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 },
                 new OracleParameter("p_cust_tp", OracleDbType.Varchar2)
                 {
-                    Value = ("I")
+                    Value = LegalPerson.ToString()
                 },
                 new OracleParameter("p_gcif", OracleDbType.Varchar2)
                 {
@@ -488,7 +504,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
             {
                 BatchId = "-1",
                 BatchTimestamp = DateTime.Now,
-                Entries = new List<ResponseV2> {response}
+                Entries = new List<ResponseV2> { response }
             };
         }
 
@@ -506,7 +522,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 }
             }
 
-            var response = (HttpWebResponse) request.GetResponse();
+            var response = (HttpWebResponse)request.GetResponse();
             return response;
         }
 
@@ -696,5 +712,13 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
 
             return cardsCount;
         }
+    }
+
+    enum EbkStatusCode
+    {
+        Ok=0,
+        RemoteErrorFromEbk=1,
+        DbError=2,
+        OtherError=3
     }
 }
