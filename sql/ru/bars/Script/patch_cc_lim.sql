@@ -5,6 +5,7 @@
 -- ================================== <Comments> ==================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET FEEDBACK OFF
 
 begin
   for c in ( select KF from MV_KF )
@@ -57,8 +58,8 @@ begin
   execute immediate 'alter table CC_LIM modify SUMO constraint CC_CCLIM_SUMO_NN not null enable novalidate';
   dbms_output.put_line( 'Table altered.' );
 exception
-  when e_col_already_nn then 
-    dbms_output.put_line( 'Column GLOBAL_BDATE is already NOT NULL.' );
+  when e_col_already_nn
+  then null;
 end;
 /
 
@@ -86,3 +87,9 @@ exception
   then null;
 end;
 /
+
+SET FEEDBACK ON
+
+alter table CC_LIM modify SUMG default 0;
+
+alter table CC_LIM modify SUMO default 0;
