@@ -34,6 +34,7 @@ begin
 ( REPORT_DATE     DATE       constraint CC_DMAGRMSARCH_RPTDT_NN     NOT NULL
 , KF              CHAR(6)    constraint CC_DMAGRMSARCH_KF_NN        NOT NULL
 , VERSION_ID      NUMBER(3)  constraint CC_DMAGRMSARCH_VRSN_NN      NOT NULL
+, PRTFL_TP        CHAR(3)    constraint CC_DMAGRMSARCH_PRTFLTP_NN   NOT NULL
 , AGRM_ID         NUMBER(38) constraint CC_DMAGRMSARCH_AGRMID_NN    NOT NULL
 , AGRM_NUM        VARCHAR2(50)
 , AGRM_TP         NUMBER(38) constraint CC_DMAGRMSARCH_AGRMTP_NN    NOT NULL
@@ -48,7 +49,6 @@ begin
 , INT_FRQ_TP      NUMBER(3)  constraint CC_DMAGRMSARCH_INTFRQTP_NN  NOT NULL
 , INT_INL_DT      DATE
 , INT_MAT_DAY     NUMBER(2)
-, PRTFL_TP        CHAR(3)    constraint CC_DMAGRMSARCH_PRTFLTP_NN   NOT NULL
 , CCY_ID          NUMBER(3)  constraint CC_DMAGRMSARCH_CCYID_NN     NOT NULL
 , CUST_ID         NUMBER(38) constraint CC_DMAGRMSARCH_CUSTID_NN    NOT NULL
 ) TABLESPACE BRSMDLD
@@ -110,12 +110,24 @@ prompt -- ======================================================
 prompt -- Indexes
 prompt -- ======================================================
 
+declare
+  E_IDX_NOT_EXISTS       exception;
+  pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
 begin
-  execute immediate q'[CREATE UNIQUE INDEX BARS.UK_DMAGRMSARCH ON BARS.NBUR_DM_AGREEMENTS_ARCH ( REPORT_DATE, KF, VERSION_ID, AGRM_ID )
+  execute immediate 'drop index UK_DMAGRMSARCH';
+  dbms_output.put_line( 'Index dropped.' );
+exception
+  when E_IDX_NOT_EXISTS
+  then null;
+end;
+/
+
+begin
+  execute immediate q'[create unique index UK_DMAGRMSARCH ON BARS.NBUR_DM_AGREEMENTS_ARCH ( REPORT_DATE, KF, VERSION_ID, PRTFL_TP, AGRM_ID )
   TABLESPACE BRSMDLI
   PCTFREE 0 
   LOCAL 
-  COMPRESS 1 ]';
+  COMPRESS 4 ]';
   dbms_output.put_line( 'Index "UK_DMAGRMSARCH" created.' );
 exception
   when OTHERS then
@@ -123,7 +135,7 @@ exception
       when (sqlcode = -00955)
       then dbms_output.put_line( 'Index "UK_DMAGRMSARCH" already exists in the table.' );
       when (sqlcode = -01408)
-      then dbms_output.put_line( 'Column(s) "REPORT_DATE", "KF", "VERSION_ID", "AGRM_ID" already indexed.' );
+      then dbms_output.put_line( 'Column(s) "REPORT_DATE", "KF", "VERSION_ID", "PRTFL_TP", "AGRM_ID" already indexed.' );
       else raise;
     end case;
 end;
@@ -146,35 +158,35 @@ prompt -- ======================================================
 prompt -- Comments
 prompt -- ======================================================
 
-COMMENT ON TABLE  BARS.NBUR_DM_AGREEMENTS_ARCH             IS 'Зв`язок рахунків та договорів';
+COMMENT ON TABLE  NBUR_DM_AGREEMENTS_ARCH             IS 'Зв`язок рахунків та договорів';
 
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.REPORT_DATE IS 'Звітна дата';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.KF          IS 'Код філіалу (МФО)';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.VERSION_ID  IS 'Iдентифiкатор версії';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.AGRM_ID     IS 'Ідентифікатор договору';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.AGRM_NUM    IS 'Номер договору';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.AGRM_TP     IS 'Вид договору (CC_VIDD.VIDD)';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.AGRM_STE    IS 'Стан договору (CC_SOS.SOS)';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.BEG_DT      IS 'Дата початку';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.END_DT      IS 'Дата закінчення';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.INL_AMNT    IS 'Початкова сума по договору';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.CRN_AMNT    IS 'Поточна сума по договору';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.DBT_FRQ_TP  IS 'Періодичність погашення основного боргу';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.DBT_INL_DT  IS 'Дата початку погашення основного боргу';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.DBT_MAT_DAY IS 'День погашення основного боргу';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.INT_FRQ_TP  IS 'Періодичність погашення відсотків';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.INT_INL_DT  IS 'Дата початку погашення відсотків ';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.INT_MAT_DAY IS 'День погашення відсотків';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.PRTFL_TP    IS 'Тип портфеля договорів';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.CCY_ID      IS 'Валюта рахунку';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS_ARCH.CUST_ID     IS 'Iдентифiкатор контрагента';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.REPORT_DATE IS 'Звітна дата';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.KF          IS 'Код філіалу (МФО)';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.VERSION_ID  IS 'Iдентифiкатор версії';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.PRTFL_TP    IS 'Тип портфеля договорів';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.AGRM_ID     IS 'Ідентифікатор договору';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.AGRM_NUM    IS 'Номер договору';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.AGRM_TP     IS 'Вид договору (CC_VIDD.VIDD)';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.AGRM_STE    IS 'Стан договору (CC_SOS.SOS)';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.BEG_DT      IS 'Дата початку';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.END_DT      IS 'Дата закінчення';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.INL_AMNT    IS 'Початкова сума по договору';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.CRN_AMNT    IS 'Поточна сума по договору';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.DBT_FRQ_TP  IS 'Періодичність погашення основного боргу';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.DBT_INL_DT  IS 'Дата початку погашення основного боргу';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.DBT_MAT_DAY IS 'День погашення основного боргу';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.INT_FRQ_TP  IS 'Періодичність погашення відсотків';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.INT_INL_DT  IS 'Дата початку погашення відсотків ';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.INT_MAT_DAY IS 'День погашення відсотків';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.CCY_ID      IS 'Валюта рахунку';
+COMMENT ON COLUMN NBUR_DM_AGREEMENTS_ARCH.CUST_ID     IS 'Iдентифiкатор контрагента';
 
 prompt -- ======================================================
 prompt -- Grants
 prompt -- ======================================================
 
-GRANT SELECT ON BARS.NBUR_DM_AGREEMENTS_ARCH TO BARSUPL;
-GRANT SELECT ON BARS.NBUR_DM_AGREEMENTS_ARCH TO BARS_ACCESS_DEFROLE;
+GRANT SELECT ON NBUR_DM_AGREEMENTS_ARCH TO BARSUPL;
+GRANT SELECT ON NBUR_DM_AGREEMENTS_ARCH TO BARS_ACCESS_DEFROLE;
 
 prompt -- ======================================================
 prompt -- FINISH

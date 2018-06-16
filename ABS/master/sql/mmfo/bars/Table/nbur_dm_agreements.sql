@@ -25,7 +25,7 @@ end;
 /
 
 begin
-  EXECUTE IMMEDIATE 'drop table BARS.NBUR_DM_AGREEMENTS PURGE';
+  execute immediate 'drop table BARS.NBUR_DM_AGREEMENTS PURGE';
   dbms_output.put_line('Table dropped.');
 exception
   when OTHERS then
@@ -36,10 +36,14 @@ exception
 end;
 /
 
+declare
+  e_tab_exists           exception;
+  pragma exception_init( e_tab_exists, -00955 );
 begin
   execute immediate q'[CREATE TABLE BARS.NBUR_DM_AGREEMENTS
 ( REPORT_DATE     DATE       CONSTRAINT CC_DMAGREEMENTS_REPORTDT_NN  NOT NULL
 , KF              CHAR(6)    CONSTRAINT CC_DMAGREEMENTS_KF_NN        NOT NULL
+, PRTFL_TP        CHAR(3)    CONSTRAINT CC_DMAGREEMENTS_PRTFLTP_NN   NOT NULL
 , AGRM_ID         NUMBER(38) CONSTRAINT CC_DMAGREEMENTS_AGRMID_NN    NOT NULL
 , AGRM_NUM        VARCHAR2(50)
 , AGRM_TP         NUMBER(38) CONSTRAINT CC_DMAGREEMENTS_AGRMTP_NN    NOT NULL
@@ -54,7 +58,6 @@ begin
 , INT_FRQ_TP      NUMBER(3)  CONSTRAINT CC_DMAGREEMENTS_INTFRQTP_NN  NOT NULL
 , INT_INL_DT      DATE
 , INT_MAT_DAY     NUMBER(2)
-, PRTFL_TP        CHAR(3)    CONSTRAINT CC_DMAGREEMENTS_PRTFLTP_NN   NOT NULL
 , CCY_ID          NUMBER(3)  CONSTRAINT CC_DMAGREEMENTS_CCYID_NN     NOT NULL
 , CUST_ID         NUMBER(38) CONSTRAINT CC_DMAGREEMENTS_CUSTID_NN    NOT NULL
 ) TABLESPACE BRSMDLD
@@ -91,15 +94,12 @@ PARTITION BY LIST (KF)
 , PARTITION P_353553 VALUES ('353553')
 , PARTITION P_354507 VALUES ('354507')
 , PARTITION P_356334 VALUES ('356334') ) ]';
-  
-  dbms_output.put_line('table "NBUR_DM_AGREEMENTS" created.');
-  
+
+  dbms_output.put_line('Table "NBUR_DM_AGREEMENTS" created.');
+
 exception
-  when OTHERS then
-    if ( sqlcode = -00955 )
-    then dbms_output.put_line( 'Table "NBUR_DM_AGREEMENTS" already exists.' );
-    else raise;
-    end if;  
+  when e_tab_exists
+  then dbms_output.put_line( 'Table "NBUR_DM_AGREEMENTS" already exists.' );
 end;
 /
 
@@ -108,19 +108,19 @@ prompt -- Indexes
 prompt -- ======================================================
 
 begin
-  execute immediate q'[CREATE UNIQUE INDEX BARS.UK_DMAGREEMENTS ON BARS.NBUR_DM_AGREEMENTS ( KF, AGRM_ID )
+  execute immediate q'[create unique index UK_DMAGREEMENTS on NBUR_DM_AGREEMENTS ( KF, PRTFL_TP, AGRM_ID )
   TABLESPACE BRSMDLI
   PCTFREE 0 
   LOCAL 
   COMPRESS 1 ]';
-  dbms_output.put_line('index "UK_DMAGREEMENTS" created.');
+  dbms_output.put_line('Index "UK_DMAGREEMENTS" created.');
 exception
   when OTHERS then
     case
       when (sqlcode = -00955)
       then dbms_output.put_line('Index "UK_DMAGREEMENTS" already exists in the table.');
       when (sqlcode = -01408)
-      then dbms_output.put_line('Column(s) "KF", "AGRM_ID" already indexed.');
+      then dbms_output.put_line('Column(s) "KF", "PRTFL_TP", "AGRM_ID" already indexed.');
       else raise;
     end case;
 end;
@@ -147,6 +147,7 @@ COMMENT ON TABLE  BARS.NBUR_DM_AGREEMENTS             IS 'Зв`язок рахунків та до
 
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.REPORT_DATE IS 'Звітна дата';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.KF          IS 'Код філіалу (МФО)';
+COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.PRTFL_TP    IS 'Тип портфеля договорів';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.AGRM_ID     IS 'Ідентифікатор договору';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.AGRM_NUM    IS 'Номер договору';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.AGRM_TP     IS 'Вид договору (CC_VIDD.VIDD)';
@@ -161,7 +162,6 @@ COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.DBT_MAT_DAY IS 'День погашення основно
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.INT_FRQ_TP  IS 'Періодичність погашення відсотків';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.INT_INL_DT  IS 'Дата початку погашення відсотків ';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.INT_MAT_DAY IS 'День погашення відсотків';
-COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.PRTFL_TP    IS 'Тип портфеля договорів';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.CCY_ID      IS 'Валюта рахунку';
 COMMENT ON COLUMN BARS.NBUR_DM_AGREEMENTS.CUST_ID     IS 'Iдентифiкатор контрагента';
 
