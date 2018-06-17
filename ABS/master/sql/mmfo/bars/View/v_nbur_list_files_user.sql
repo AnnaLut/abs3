@@ -28,19 +28,28 @@ SELECT a.KF,
               , f.SCHEME_CODE
               , f.FILE_TYPE
               , f.FILE_NAME
-              , nvl2(NULLIF(x.FILE_FMT,f.FILE_FMT),(f.FILE_FMT||','||x.FILE_FMT),f.FILE_FMT) as FILE_FMT_LIST
+              , ff.FILE_FMT_LIST
               , p.DESCRIPTION as PERIOD
            from NBUR_REF_FILES f
            join NBUR_REF_FILES_LOCAL l
              on ( l.FILE_ID = f.ID )
            join NBUR_REF_PERIODS p
              on ( p.PERIOD_TYPE = f.PERIOD_TYPE )
-           left outer 
-           join nbur_lnk_files_files ff 
-           on (f.id = ff.file_id)
-           left outer
-           join NBUR_REF_FILES x
-             on ( x.id = ff.file_dep_id )
+           left join ( 
+                       select file_id
+                              , listagg(file_fmt, ',') within group(order by file_fmt) as FILE_FMT_LIST
+                       from   (
+                                select id as file_id, file_fmt
+                                from   nbur_ref_files
+                                union
+                                select lnk.file_id
+                                       , ff1.file_fmt
+                                from   nbur_lnk_files_files lnk
+                                       join nbur_ref_files ff1 on (lnk.file_dep_id = ff1.id)                                
+                              )
+                       group by
+                             file_id
+                     ) ff on (f.id = ff.file_id)
           where f.FILE_TYPE = 2 -- file_code LIKE '@%'
              or ( f.FILE_CODE, f.SCHEME_CODE ) in ( select FILE_CODE, A017
                                                       from V_NBUR_ROLE_USER_FILE
