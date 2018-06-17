@@ -1,61 +1,61 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/nbur_forms.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.NBUR_FORMS 
+create or replace package NBUR_FORMS 
 is
+  g_header_version  constant varchar2(64)  := 'version 1.2  2017.04.09';
+  g_header_defs     constant varchar2(512) := '';
 
-g_header_version  constant varchar2(64)  := 'version 1.2  2017.04.09';
-g_header_defs     constant varchar2(512) := '';
+  -- header_version - версія заголовку пакета
+  function HEADER_VERSION return varchar2;
 
--- header_version - версія заголовку пакета
-function header_version return varchar2;
+  -- body_version - версія тіла пакета
+  function BODY_VERSION return varchar2;
 
--- body_version - версія тіла пакета
-function body_version return varchar2;
+  function F_RET_EMPT_NBUC
+  ( p_type              number,
+    p_report_date       date,
+    p_report_code       varchar2,
+    p_kf                varchar2
+  ) return otcn_set_nbuc
+  pipelined;
 
-FUNCTION f_ret_empt_nbuc (p_type        NUMBER, 
-                          p_report_date DATE, 
-                          p_report_code VARCHAR2,
-                          p_kf          VARCHAR2
-                          )
-  RETURN otcn_set_nbuc PIPELINED;
+  -- отримання імені файлу
+  function F_CREATEFILENAME
+  ( p_file_id        in number,
+    p_report_date    in date,
+    p_kf             in varchar2,
+    p_version_id     in number
+  ) return varchar2;
 
+  -- отримання заголовного рядку файлу
+  function F_CREATEHEADLINE
+  ( p_file_id        in number,
+    p_report_date    in date,
+    p_kf             in varchar2,
+    p_version_id     in number
+  ) return varchar2;
 
--- отримання імені файлу
-function f_createfilename (p_file_id        in number,
-                           p_report_date    in date,
-                           p_kf             in varchar2,
-                           p_version_id     in number
-                           ) return varchar2;
+  -- отримання підзаголовного рядку файлу
+  function F_CREATEHEADLINEEX
+  ( p_file_id        in number,
+    p_report_date    in date,
+    p_kf             in varchar2,
+    p_version_id     in number,
+    p_nbuc           in varchar2
+  ) return varchar2;
 
--- отримання заголовного рядку файлу
-function f_createheadline (p_file_id        in number,
-                           p_report_date    in date,
-                           p_kf             in varchar2,
-                           p_version_id     in number
-                           ) return varchar2;
+  -- отримання текстового файлу
+  function F_CREATEFILEBODY
+  ( p_file_id        in number,
+    p_report_date    in date,
+    p_kf             in varchar2,
+    p_version_id     in number
+  ) return clob;
 
--- отримання підзаголовного рядку файлу
-function f_createheadlineex (p_file_id        in number,
-                             p_report_date    in date,
-                             p_kf             in varchar2,
-                             p_version_id     in number,
-                             p_nbuc           in varchar2
-                            ) return varchar2;
-
--- отримання текстового файлу
-function f_createfilebody (p_file_id        in number,
-                           p_report_date    in date,
-                           p_kf             in varchar2,
-                           p_version_id     in number
-                          ) return clob;
-
-end;
+end NBUR_FORMS;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.NBUR_FORMS 
+
+show errors;
+
+create or replace package body NBUR_FORMS 
 is
 
 g_body_version  constant varchar2(64)  := 'version 4.2 2017.07.13';
@@ -538,31 +538,32 @@ begin
 end f_createheadlineex;
 
 -- отримання текстового файлу
-function f_createfilebody (p_file_id        in number,
-                           p_report_date    in date,
-                           p_kf             in varchar2,
-                           p_version_id     in number
-                          ) return clob
+function F_CREATEFILEBODY
+( p_file_id        in number,
+  p_report_date    in date,
+  p_kf             in varchar2,
+  p_version_id     in number
+) return clob
 is
-    l_filebody      clob;
-    l_row           varchar2(2000);
-    l_report_code   varchar2(3);
-    l_nbucp         nbur_agg_protocols.nbuc%type := null;
-    l_cnt           number := 0;
-    l_nbuc_set      varchar2(20);
-    l_list_order    varchar2(20000);
-    l_cursor_sel    clob;
+  l_filebody      clob;
+  l_row           varchar2(2000);
+  l_rpt_code      nbur_ref_files.file_code%type;
+  l_nbucp         nbur_agg_protocols.nbuc%type := null;
+  l_cnt           number := 0;
+  l_nbuc_set      varchar2(20);
+  l_list_order    varchar2(20000);
+  l_cursor_sel    clob;
 
-    l_nbuc          nbur_agg_protocols.nbuc%type;
-    l_field_code    nbur_agg_protocols.field_code%type;
-    l_field_value   nbur_agg_protocols.field_value%type;
-    
-    l_file_fmt      varchar2(20);
-    l_len_pok     number;
-    l_type_cons     number;
-    
-    TYPE cursor_type IS REF CURSOR;
-    l_cursor         cursor_type;
+  l_nbuc          nbur_agg_protocols.nbuc%type;
+  l_field_code    nbur_agg_protocols.field_code%type;
+  l_field_value   nbur_agg_protocols.field_value%type;
+  
+  l_file_fmt      varchar2(20);
+  l_len_pok       number;
+  l_type_cons     number;
+  
+  TYPE cursor_type IS REF CURSOR;
+  l_cursor         cursor_type;
 begin
     -- формуємо службовий рядок
     l_filebody := lpad(' ', 100, ' ')||chr(13)||chr(10);
@@ -573,14 +574,15 @@ begin
     l_filebody := l_filebody||l_row||chr(13)||chr(10);
 
     begin
-        select a.file_code, l.nbuc, A.FILE_FMT, a.CONSOLIDATION_TYPE
-        into l_report_code, l_nbuc_set, l_file_fmt, l_type_cons
-        from NBUR_REF_FILES a, NBUR_REF_FILES_LOCAL l
-        where a.id = p_file_id and
-              a.id = l.file_id and
-              l.kf = p_kf;
+        select f.FILE_CODE, l.NBUC, f.FILE_FMT, f.CONSOLIDATION_TYPE
+          into l_rpt_code, l_nbuc_set, l_file_fmt, l_type_cons
+          from NBUR_REF_FILES f
+          join NBUR_REF_FILES_LOCAL l
+            on ( l.FILE_ID = f.ID and l.KF = p_kf )
+         where f.ID = p_file_id;
     exception
-        when no_data_found then return null;
+      when no_data_found then
+        return null;
     end;
 
     if l_file_fmt = 'XML'
@@ -606,12 +608,12 @@ begin
       end;
 
       -- довжина показника
-      if l_report_code like '#%' then
+      if l_rpt_code like '#%' then
           begin
               select max(length(trim(kod_ekpok)))
               into l_len_pok
               from ek_pok_1
-              where a010 = substr(l_report_code,2,2) and
+              where a010 = substr(l_rpt_code,2,2) and
                   data_c is null;
           exception
               when no_data_found then l_len_pok := 0;
@@ -626,12 +628,12 @@ begin
                           (case when l_len_pok > 0 then ',1,'||to_char(l_len_pok)||')' else '' end)||
                           ', field_value
                         from NBUR_AGG_PROTOCOLS
-                        where report_date = :p_report_date and
-                              kf = :p_kf and
-                              report_code = :l_report_code
-                        order by nbuc, '||nvl(l_list_order, 'field_code');
+                       where report_date = :p_report_date and
+                             kf = :p_kf and
+                             report_code = :l_rpt_code
+                       order by nbuc, '||nvl(l_list_order, 'field_code');
 
-      open l_cursor for l_cursor_sel using p_report_date, p_kf, l_report_code;
+      open l_cursor for l_cursor_sel using p_report_date, p_kf, l_rpt_code;
 
       loop
           FETCH l_cursor INTO l_nbuc, l_field_code, l_field_value;
@@ -656,9 +658,9 @@ begin
       -- формуємо пусті рядки для тих підрозділів, по яких немає даних
       if p_kf in ('324805', '322669') then
          if (l_type_cons <> '0' or l_cnt = 0) and 
-             not (p_kf = '322669' and l_report_code = '#E9') then
+             not (p_kf = '322669' and l_rpt_code = '#E9') then
              FOR k IN (SELECT nbuc
-                      FROM TABLE (f_ret_empt_nbuc (l_type_cons, p_report_date, l_report_code, p_kf)))
+                      FROM TABLE (f_ret_empt_nbuc (l_type_cons, p_report_date, l_rpt_code, p_kf)))
              LOOP
                l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, k.nbuc);
                l_filebody := l_filebody||l_row||chr(13)||chr(10);
@@ -668,7 +670,7 @@ begin
                 l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, l_nbuc_set);
                 l_filebody := l_filebody||l_row||chr(13)||chr(10);
              end if;
-         elsif p_kf = '322669' and l_report_code = '#E9' then
+         elsif p_kf = '322669' and l_rpt_code = '#E9' then
              if l_cnt = 0 then
                 l_row := f_createheadlineex (p_file_id, p_report_date, p_kf, p_version_id, l_nbuc_set);
                 l_filebody := l_filebody||l_row||chr(13)||chr(10);
@@ -689,19 +691,14 @@ begin
 
     return l_filebody;
 
-end f_createfilebody;
+  end F_CREATEFILEBODY;
 
-end;
+begin
+  null;
+end NBUR_FORMS;
 /
- show err;
- 
-PROMPT *** Create  grants  NBUR_FORMS ***
-grant EXECUTE                                                                on NBUR_FORMS      to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on NBUR_FORMS      to RPBN002;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/nbur_forms.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show err;
+
+grant EXECUTE on NBUR_FORMS to BARS_ACCESS_DEFROLE;
+grant EXECUTE on NBUR_FORMS to RPBN002;
