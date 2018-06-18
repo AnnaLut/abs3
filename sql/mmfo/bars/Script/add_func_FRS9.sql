@@ -2,7 +2,7 @@ set define off
 declare 
     l_funcid  operlist.codeoper%type;
     l_tabid   number;
-    l_codearm  VARCHAR2(10) := '$RM_WDOC';
+    l_codearm  VARCHAR2(10) := '$RM_PRVN';
 begin
     l_tabid:= get_tabid('V_FRS9');
     l_funcid:= abs_utils.add_func( p_name     => 'Рекласифікація активів',
