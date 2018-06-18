@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.3  2018.05.04';
+  g_body_version  constant varchar2(64) := 'version 2.4  2018.06.18';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -1128,6 +1128,14 @@ $end
     DBMS_LOB.CREATETEMPORARY( l_clob, TRUE /*, SYS.DBMS_LOB.TRANSACTION*/ );
 
     l_rpt_code := NBUR_FILES.GET_FILE_CODE_ALT( p_file_id );
+    l_period_type := nbur_files.GET_FILE_PERIOD_TYPE(p_file_id);
+
+    --Если месячный файл, то берем первый день календарного месяца
+    if (l_period_type = 'M') then
+      l_rpt_dt := last_day( p_rpt_dt ) + 1;
+    else      
+      l_rpt_dt := DAT_NEXT_U( p_rpt_dt, 1 );
+    end if;
 
     PREPARE_RECORDSET( p_file_id, p_rpt_dt, p_kf, p_vrsn_id, l_rcur );
 
@@ -1154,7 +1162,7 @@ $end
 
     CLOSE l_rcur;
 
-    l_clob := GET_FILE_HEAD( l_rpt_code, p_rpt_dt, p_kf ) || chr(10) || l_clob || '</NBUSTATREPORT>';
+    l_clob := GET_FILE_HEAD( l_rpt_code, l_rpt_dt, p_kf ) || chr(10) || l_clob || '</NBUSTATREPORT>';
 
     -----------
     -- КОСТИЛІ:
