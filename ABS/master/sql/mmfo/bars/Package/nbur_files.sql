@@ -317,7 +317,7 @@ show errors
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64) := 'version 6.61  2018.05.25';
+  g_body_version  constant varchar2(64) := 'version 6.7  2018.06.18';
 
   MODULE_PREFIX   constant varchar2(8) := 'NBUR';
 
@@ -519,7 +519,7 @@ end f_get_id_file;
     begin
       select case FILE_FMT
              when 'XML'
-             then SubStr(FILE_CODE,1,2)
+             then case when substr(file_code, 1, 1) = '#' then SubStr(FILE_CODE,2,2) else SubStr(FILE_CODE,1,2) end
              else nvl( SubStr(FILE_CODE_ALT,1,2), SubStr(FILE_CODE,2,2) )
              end
         into l_file_code_alt
