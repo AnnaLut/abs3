@@ -35,6 +35,26 @@ exception when others then
 end; 
 /
 
+begin 
+  execute immediate '
+alter table TMP_FRS9
+  add constraint TMP_FRS9_PK primary key (TTS)
+  using index 
+  tablespace BRSDYND
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );';
+exception when others then       
+  null;
+end; 
+/
 
 
 
