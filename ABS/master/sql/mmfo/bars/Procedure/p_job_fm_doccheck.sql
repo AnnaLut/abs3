@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_JOB_FM_DOCCHECK ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_JOB_FM_DOCCHECK 
+CREATE OR REPLACE PROCEDURE BARS.P_JOB_FM_DOCCHECK 
 is
 begin
   begin
@@ -19,7 +19,7 @@ begin
                       dbms_utility.format_error_backtrace());
   end;
   begin
-     p_fm_extdoccheck(null);
+     p_fm_extdoccheck_tmp(null);
      commit;
   exception when others then
      bars_audit.error('FM. job: error during execution procedure p_fm_extdoccheck: ' ||
