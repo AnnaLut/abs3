@@ -189,7 +189,7 @@ namespace DocInput
                 if ("0" == __DK.Value || "2" == __DK.Value)
                 {
                     //Если параметр TT_Flags[19] равен '1', то поле дебет всегда верху
-                    if ('1'==TT_Flags[19])
+                    if ('1' == TT_Flags[19])
                     {
                         //SideA.Style.Add("position", "absolute");
                         //SideB.Style.Add("position", "absolute");
@@ -370,7 +370,7 @@ namespace DocInput
                     cDocHandler.Bank bank = new cDocHandler.Bank(Context, TT_MfoB);
                     Bank_B.Text = bank.Nb;
 
-                    if (TT!="014" && TT!="902" && (TT_NlsB != string.Empty) && (TT_KvB != string.Empty))
+                    if (TT != "014" && TT != "902" && (TT_NlsB != string.Empty) && (TT_KvB != string.Empty))
                         GetNlsNameAlien(Id_B, Nam_B, TT_NlsB, Convert.ToDecimal(TT_KvB), TT_MfoB);
                 }
                 /// Для правексу виключаємо перевірку
@@ -746,7 +746,7 @@ namespace DocInput
             }
             else
                 s_dateD = bDATE.ToString("dd/MM/yyyy");
-            DocD_TextBox.Text = !string.IsNullOrEmpty(s_dateD)? s_dateD.Replace(".", "/"):PAR_SYSDATE;
+            DocD_TextBox.Text = !string.IsNullOrEmpty(s_dateD) ? s_dateD.Replace(".", "/") : PAR_SYSDATE;
         }
         /// <summary>
         /// Заполнение списка видов документов
@@ -842,13 +842,14 @@ namespace DocInput
                     lbDatVal.Visible = true;
                     DatV_TextBox.Visible = true;
                     bool valid_request_vdat = false;
+                    CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+                    cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+                    cinfo.DateTimeFormat.DateSeparator = "/";
+
+                    DateTime vdat_param = DateTime.Now;
+
                     try
                     {
-                        CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
-                        cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
-                        cinfo.DateTimeFormat.DateSeparator = "/";
-
-                        DateTime vdat_param = DateTime.Now;
                         if (Request["DATV_R"] != null)
                             vdat_param = Convert.ToDateTime(Request["DATV_R"], cinfo);
                         else
@@ -898,7 +899,7 @@ namespace DocInput
                     }
                     else if (Request["DatV"] != null && valid_request_vdat)
                     {
-                        DatV_TextBox.Text = Request["DatV"];
+                        DatV_TextBox.Text = vdat_param.ToShortDateString(); //Request["DatV"];
                     }
                     else if (Request["DATV_R"] != null && valid_request_vdat)
                     {
@@ -1719,11 +1720,11 @@ namespace DocInput
                     rdr = cmd.ExecuteReader();
                     if (!rdr.Read()) throw new Exception("Операция " + TT + " не найдена, недоступна пользователю или запрещена для ручного ввода.");
                 }
-                
+
 
                 try { TT_Flags = Convert.ToString(rdr.GetValue(1)); }
                 catch (InvalidCastException) { TT_Flags = string.Empty; }
-                if(TT_Flags[13] == '1')
+                if (TT_Flags[13] == '1')
                 {
                     throw new Exception("Операція " + TT + " створена автоматично - створення/дублювання документів заборонено");
                 }
@@ -2038,7 +2039,7 @@ namespace DocInput
                 Drec.Value = Request.Params["Drec"];
                 SetReadOnly(DocN, DocN.Text);
                 SetReadOnly(DocD_TextBox, DocD_TextBox.Text);
-                VobList.Enabled=false;
+                VobList.Enabled = false;
             }
 
             return;
