@@ -125,18 +125,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ZDAT', 'D', 'Зв.дата~01.ММ.РРРР', '', 10, 1, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KVD', 'N', 'Вал~Деб', '', 3, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLSD', 'C', 'Рахунок~Деб', '', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'SD', 'N', 'Сума~Деб', '', 22, 4, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KVK', 'N', 'Вал~Крд', '', 3, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSK', 'C', 'Рахунок~Крд', '', 14, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SK', 'N', 'Сума~Крд', '', 22, 7, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'Ob22~3800', '', 2, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'NAZN', 'C', 'Признач.пл', '', 60, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 0, 'NPP', 'N', '№ пп', '.5', 3, 0, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ZDAT', 'D', 'Зв.дата~01.ММ.РРРР', '1', 10, 1, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'KVD', 'N', 'Вал~Деб', '.5', 3, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLSD', 'C', 'Рахунок~Деб', '1.5', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'SD', 'N', 'Сума~Деб', '1', 22, 4, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'KVK', 'N', 'Вал~Крд', '.5', 3, 5, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NLSK', 'C', 'Рахунок~Крд', '1.5', 14, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SK', 'N', 'Сума~Крд', '1', 22, 7, 1, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'OB22', 'C', 'Ob22~3800', '.5', 2, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'NAZN', 'C', 'Признач.пл', '1.5', 60, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'REF', 'N', 'Реф.док', '1', 22, 10, 1, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '/barsroot/documentview/default.aspx?ref=:REF', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 10, 'Виконати проводки ', 'OPL9 (:NPP) ', '', 'EACH', 'Робимо ?', 'ОК !', '', '', '', 23);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
@@ -202,7 +207,7 @@ commit;
 
 begin  EXECUTE IMMEDIATE 
 'drop table test_o9' ;
-exception when others then   if SQLCODE = -00955 then null;   else raise; end if;   -- ORA-00955: name is already used by an existing object
+exception when others then   null;
 end;
 /
 commit;
@@ -258,16 +263,16 @@ declare
 BEGIN 
   nam_ := 'Макет для ввода ручних перехідних (МСФЗ-9) операцій';  
   lik_ := '%TEST_O9[NSIFUNCTION]%' ;
-  fun_ := '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0'||chr(38)||'sPar=TEST_O9[NSIFUNCTION][showDialogWindow=>false]'  ;
+  fun_ := '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0'||chr(38)||'sPar=TEST_O9[NSIFUNCTION][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]'  ;
   ADD_fun  (lik_) ;
 end;
 /
 commit;
 -----------------------------
 
-create or replace PROCEDURE Opl9 is oo oper%rowtype;
+create or replace PROCEDURE Opl9  (p_NPP int ) is oo oper%rowtype;
 begin 
- for k in (select t.rowid RI, t.* from test_O9 t )
+ for k in (select t.rowid RI, t.* from test_O9 t where ref is null  and npp = p_NPP )
  loop
 /*  
 --ZDAT	D	Зв.дата~01.ММ.РРРР
@@ -331,3 +336,4 @@ end Opl9 ;
 /
 show err;
 
+GRANT execute ON BARS.Opl9 TO BARS_ACCESS_DEFROLE;
