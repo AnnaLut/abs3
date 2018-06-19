@@ -1,7 +1,8 @@
 prompt ---------------------------------------------------------------
-prompt 14. BUSMOD_SPPI_IFRS  ADD
+prompt 12. function PROCEDURE BARS.OP_BS_OB1
 prompt ---------------------------------------------------------------
 
+begin
 begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (1, '1', 'AC');             exception when dup_val_on_index then  null;  end;  
 begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (1, '0', 'FVTPL/Other');    exception when dup_val_on_index then  null;  end;  
 begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (2, '1', 'FVTPL/Other');    exception when dup_val_on_index then  null;  end; 
@@ -32,6 +33,7 @@ begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (14, '1', 'A
 begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (14, '0', 'FVTPL/Other');   exception when dup_val_on_index then  null;  end;  
 begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (15, '1', 'AC');            exception when dup_val_on_index then  null;  end;  
 begin Insert into BUSMOD_SPPI_IFRS   (BUS_MOD, SPPI, IFRS) Values   (15, '0', 'FVTPL/Other');   exception when dup_val_on_index then  null;  end; 
+end;
 / 
 COMMIT;                                                                                                                                             
 
