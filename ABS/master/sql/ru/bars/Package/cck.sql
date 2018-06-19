@@ -3679,6 +3679,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.cck IS
     s3_      NUMBER;
 
   BEGIN
+
+    return; -- COBUPRVNIX-161 блокировка амортизации дисконта и
+
     BEGIN
       SELECT to_number(substr(flags, 38, 1))
         INTO fl_

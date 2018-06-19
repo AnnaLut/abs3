@@ -66,7 +66,7 @@ PROMPT *** Create  procedure P_IRR_BV ***
   end prot1;
  --------------
 begin
-
+return; -- cobuprvnix-161
   begin select SPID into l_SPID from SPARAM_LIST where tag = l_tag ;
   EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20000,'Не встановлено ПЗ. Не описан рекв.'||l_tag  );
   end;
