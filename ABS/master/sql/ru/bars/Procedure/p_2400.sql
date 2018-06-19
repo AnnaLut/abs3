@@ -1,15 +1,18 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_2400.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
+
 
 PROMPT *** Create  procedure P_2400 ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_2400 (Dat01_ DATE, NAL_ varchar2 ) IS
 --  Процедура заполнения счетов резервирования 2400, 3590 ...
 
-/* Версия 2.0 14-06-2017  23-05-2016 
+/* Версия 2.0 14-06-2017  23-05-2016
 
- 2) 14-06-2017  -   Update через ROWID 
+ 2) 14-06-2017  -   Update через ROWID
  1) 23-05-2016 LUDA Счета резерва по странам риска
 
 */
@@ -59,27 +62,27 @@ begin
          from  (select  r.rowid RI, c.country, r.id  , o.NBS_REZ     , o.OB22_REZ, o.NBS_7f, o.OB22_7f , o.NBS_7r  ,
                         o.OB22_7r , o.pr     , o.r013, nvl(r.rz,1) rz, r.KV      , null nd , null cc_id, null nd_cp,
                         rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/' branch,
-                        nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
+                        nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,to_char(r.kat) r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
                 join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=nal_  AND
                                         nvl(r.ob22,0) = decode(o.ob22,'0', nvl(r.ob22,0),o.ob22) and
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         r.custtype = decode(o.custtype,'0',r.custtype,o.custtype) and r.kv = decode(o.kv,'0',r.kv,o.kv) )
-         where fdat = dat01_ and substr(r.id,1,4) <> 'CACP' and 
+         where fdat = dat01_ and substr(r.id,1,4) <> 'CACP' and
                r.s250=decode(nal_,'8','8','A','8','B','8','C','8','D','8',decode(r.s250,'8','Z',r.s250)) and
                nvl(decode(nal_,'0', rezn  , 'A', rezn  , '2',rezn  ,
-                               '5', rez_30, 'C', rez_30, '6',rez_30, 
+                               '5', rez_30, 'C', rez_30, '6',rez_30,
                                'D', REz_30, '8', r.rez , decode(rez_30,0,r.rez-rezn,r.rez-rez_30)),0) <> 0 ) t
          --счет резерва
          left join v_gls080 ar on (t.NBS_REZ = ar.nbs    and ar.rz   = t.rz  and t.OB22_REZ = ar.ob22 and t.KV      = ar.kv and
                                    t.branch  = ar.BRANCH and ar.dazs is null and t.r_s080   = ar.s080 and t.country = ar.country
                                    )
-         group by t.ri    , t.country, t.id , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz, 
+         group by t.ri    , t.country, t.id , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz,
                   t.branch, t.sz     , t.szn, t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp;
    ELSIF nal_ in ('3','7') THEN
       OPEN c0 FOR
-         select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz,t.branch, 
+         select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz,t.branch,
                 t.sz, t.szn    , t.sz_30, t.s080   , t.pr      , t.r_s080, t.r013   , t.nd    , t.cc_id  , t.nd_cp,
                 substr(ConcatStr(ar.acc),1,999) r_acc, substr(ConcatStr(ar.nls),1,999) r_nls
          from (select r.rowid RI, c.country, r.id  , o.NBS_REZ     , o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r,
@@ -104,7 +107,7 @@ begin
                   t.branch, t.sz     , t.szn, t.sz_30  , t.s080    , t.pr    , t.r_s080 , t.r013  , t.nd     , t.cc_id, t.nd_cp;
    else
       OPEN c0 FOR
-         select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz,t.branch, 
+         select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz,t.branch,
                 t.sz, t.szn    , t.sz_30, t.s080   , t.pr      , t.r_s080, t.r013   , t.nd    , t.cc_id  , t.nd_cp,
                 substr(ConcatStr(ar.acc),1,999) r_acc, substr(ConcatStr(ar.nls),1,999) r_nls
          from (select r.rowid RI, c.country, r.id  , o.NBS_REZ     , o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r,
@@ -138,7 +141,7 @@ begin
             update nbu23_rez set nls_rez   = substr(k.r_nls,1,15), acc_rez   = k.r_acc,  ob22_rez  = k.ob22_rez  where ROWID = K.RI;
          elsif nal_ IN ('5','6','7','C','D') and k.sz_30<> 0     THEN
             update nbu23_rez set nls_rez_30= substr(k.r_nls,1,15), acc_rez_30= k.r_acc, ob22_rez_30= k.ob22_rez  where ROWID = K.RI;
-         else                                                      
+         else
             update nbu23_rez set nls_rez   = substr(k.r_nls,1,15), acc_rez   = k.r_acc, ob22_rez   = k.ob22_rez  where ROWID = K.RI;
          end if;
       end if;
@@ -148,11 +151,13 @@ end;
 end;
 /
 show err;
-/
 
-grant EXECUTE  on P_2400  to BARS_ACCESS_DEFROLE;
-grant EXECUTE  on P_2400  to RCC_DEAL;
-grant EXECUTE  on P_2400  to START1;
+PROMPT *** Create  grants  P_2400 ***
+grant EXECUTE                                                                on P_2400          to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_2400          to RCC_DEAL;
+grant EXECUTE                                                                on P_2400          to START1;
+
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_2400.sql =========*** End *** ==

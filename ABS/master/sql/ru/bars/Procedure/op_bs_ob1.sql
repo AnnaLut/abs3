@@ -1,17 +1,14 @@
+prompt ---------------------------------------------------------------
+prompt 12. function PROCEDURE BARS.OP_BS_OB1
+prompt ---------------------------------------------------------------
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB1.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure OP_BS_OB1 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB1 (PP_BRANCH varchar2,P_BBBOO varchar2 ) is
-
-
+CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB1
+( PP_BRANCH       varchar2
+, P_BBBOO         varchar2
+) is
 /*
-
+ 16.05.2017 - BAA: прикидаємся МФО на основі значення параметру PP_BRANCH
+ 26.10.2016 - BAA: ОБ22 переїхало в ACCOUNTS
  27-06-2013 Доб код вал, новый вызов
     Авто-вiдкр.рах. по БР+ОБ22 для бранчу 2,2+,3 рiвня
     FunNSIEdit("[PROC=>OP_BSOBV(1,:V,:A,:B,'''','''',''''  )][PAR=>:A(SEM=ББББОО,REF=V_NBSOB22),:B(SEM=Бранч,REF=BRANCH_VAR)][MSG=>OK]")
@@ -25,56 +22,66 @@ PROMPT *** Create  procedure OP_BS_OB1 ***
  Авто-вiдкр.рах. по БР+ОБ22 для бранчу 2,2+,3 рiвня
 
 */
-
-  NBS_  char(4)    := substr(P_BBBOO,1,4);
-  OB22_ char(2)    := substr(P_BBBOO,5,2);
-  acc_  number     ;
-  nls_ varchar2(15);
-  nms_ varchar2(38);
-  kv_ int          ;
-------------------------------------------------------------------------
+  NBS_  char(4) := substr(P_BBBOO,1,4);
+  OB22_ char(2) := substr(P_BBBOO,5,2);
+  acc_  number;
+  nls_  varchar2(15);
+  nms_  varchar2(38);
+  kv_   int;
 begin
 
-  kv_ := nvl ( to_number( pul.get_mas_ini_val ('OP_BSOB_KV') ), gl.baseval );
+  bars_audit.trace( $$PLSQL_UNIT||': Entry with ( PP_BRANCH=%s, P_BBBOO=%s ).', PP_BRANCH, P_BBBOO );
 
-  If GetGlobalOption('HAVETOBO') = '2' then   EXECUTE IMMEDIATE  'begin  tuda;  end; ';  end if;
+  kv_ := to_number( PUL.GET_MAS_INI_VAL('OP_BSOB_KV') );
 
-  execute immediate 'truncate TABLE CCK_AN_TMP';
+  if ( gl.aMFO Is Null )
+  then
+    bars_context.subst_mfo( bars_context.extract_mfo( PP_BRANCH ) );
+  else
+    if ( gl.aMFO <> BC.EXTRACT_MFO( PP_BRANCH ) )
+    then
+      raise_application_error( -20666, 'Вказаний код підрозділу '||PP_BRANCH||' належить іншому філіалу!', true );
+    end if;
+  end if;
 
-for p in (select branch from branch  where length(branch) in (15,22)  and branch like PP_BRANCH    and DATE_CLOSED is  null )
-loop
-   --  м.б. уже есть
-   begin
-     select a.acc into  acc_ from accounts a,  specparam_int s
-     where a.acc=s.acc and a.branch=p.BRANCH and a.nbs = NBS_ and s.ob22=ob22_ and a.dazs is null and a.kv = kv_ and rownum=1 ;
-     GOTO nexrec1;
-   EXCEPTION WHEN NO_DATA_FOUND THEN  null;
-   end;
+  kv_ := nvl( kv_, gl.baseval );
 
-   OP_BMASK (P.BRANCH, NBS_, OB22_, null, null, null, NLS_, ACC_);
+  ------execute immediate 'truncate table CCK_AN_TMP';
 
-   -- дополнительно к открытию счета
-   update accounts      set tobo = p.branch where acc=ACC_ ;
-   update specparam_int set ob22 = OB22_ where acc=ACC_ ;
-   if SQL%rowcount = 0 then
-      insert into specparam_int (acc, ob22) values (ACC_,OB22_);
-   end if;
-   ---------------------------
-   <<nexrec1>> null;
-   ----------------------------
+  for p in ( select branch
+               from branch
+              where length(branch) in (15,22)
+                and branch like PP_BRANCH
+                and DATE_CLOSED is null )
+  loop
+
+    begin
+      --  м.б. уже есть
+      select a.ACC
+        into acc_
+        from ACCOUNTS a
+       where a.branch = p.BRANCH
+         and a.nbs    = NBS_
+         and a.ob22   = ob22_
+         and a.kv     = kv_
+         and a.dazs is null
+         and rownum = 1;
+    exception
+      when NO_DATA_FOUND THEN
+        OP_BMASK( p.BRANCH, NBS_, OB22_, null, null, null, NLS_, ACC_ );
+        -- дополнительно к открытию счета
+        update BARS.ACCOUNTS
+           set TOBO = p.BRANCH
+             , OB22 = OB22_
+         where ACC  = ACC_;
+    end;
+
   end loop;
---  commit;
+
+  -- commit;
+
+  bars_audit.trace( $$PLSQL_UNIT||': Exit.' );
 
 end OP_BS_OB1;
 /
-show err;
-
-PROMPT *** Create  grants  OP_BS_OB1 ***
-grant EXECUTE                                                                on OP_BS_OB1       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on OP_BS_OB1       to CUST001;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB1.sql =========*** End ***
-PROMPT ===================================================================================== 
+SHOW ERR;
