@@ -436,7 +436,18 @@ namespace DocInput
                 if (TT_Flags[5] == '1')
                     __VDATE.Value = DateTime.Now.ToString("yyMMdd");
                 else
-                    __VDATE.Value = bDATE.ToString("yyMMdd");
+                {
+                    bool msfz = false;
+                    string[] msfz_operaions = { "IF0", "IF1", "IF2", "IF3", "IF4", "IF5" };
+                    foreach (string operation in msfz_operaions)
+                        if (Request.Params["tt"] == operation)
+                        {
+                            __VDATE.Value = DateTime.ParseExact(DatV_TextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyMMdd");
+                            msfz = true;
+                        }
+                    if(!msfz)
+                        __VDATE.Value = bDATE.ToString("yyMMdd");
+                }
 
                 //дата информационного запроса (используется при подписи документа)
                 if (!String.IsNullOrEmpty(Request.QueryString["datp"]))
@@ -821,13 +832,14 @@ namespace DocInput
                     lbDatVal.Visible = true;
                     DatV_TextBox.Visible = true;
                     bool valid_request_vdat = false;
+                    CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+                    cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+                    cinfo.DateTimeFormat.DateSeparator = "/";
+
+                    DateTime vdat_param = DateTime.Now;
+
                     try
                     {
-                        CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
-                        cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
-                        cinfo.DateTimeFormat.DateSeparator = "/";
-
-                        DateTime vdat_param = DateTime.Now;
                         if (Request["DATV_R"] != null)
                             vdat_param = Convert.ToDateTime(Request["DATV_R"], cinfo);
                         else
@@ -877,7 +889,7 @@ namespace DocInput
                     }
                     else if (Request["DatV"] != null && valid_request_vdat)
                     {
-                        DatV_TextBox.Text = Request["DatV"];
+                        DatV_TextBox.Text = vdat_param.ToShortDateString(); //Request["DatV"];
                     }
                     else if (Request["DATV_R"] != null && valid_request_vdat)
                     {

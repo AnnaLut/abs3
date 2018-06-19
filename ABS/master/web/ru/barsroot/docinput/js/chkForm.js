@@ -48,7 +48,7 @@ function Validate(form) {
         // Сергею Горобцу необходимо реализовать корректную работу с корректирующими проводками,
         // после чего восстановить проверки, см. Centura
         if (!chkDate("DocD_TextBox")) return false;
-        if (!chkDate("DatV_TextBox")) return false;
+        if (!isReclassification(form.__TT.value) && !chkDate("DatV_TextBox")) return false;
         if (!chkDate("DatV2_TextBox")) return false;
     }
 
@@ -108,6 +108,16 @@ function Validate(form) {
 
     return false;
 }
+reclassificationFuncNames = ["IF0", "IF1", "IF2", "IF3", "IF4", "IF5"];
+
+function isReclassification(operationName) {
+    for (var i = 0; i < reclassificationFuncNames.length; i++) {
+        if (operationName == reclassificationFuncNames[i])
+            return true;
+    }
+    return false;
+}
+
 /*Trim for string */
 //-------------------------------------
 function trim(stringToTrim) {
