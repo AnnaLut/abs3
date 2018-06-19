@@ -11,7 +11,6 @@ PROMPT *** ALTER_POLICY_INFO to CCK_OB22 ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''CCK_OB22'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''CCK_OB22'', ''FILIAL'' , null, null, null, null);
                bpa.alter_policy_info(''CCK_OB22'', ''WHOLE'' , null, null, null, null);
                null;
@@ -164,10 +163,21 @@ exception when others then
  end;
 /
 
+begin EXECUTE IMMEDIATE 'alter table bars.cck_ob22 add ( K9 int ) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
 
+COMMENT ON COLUMN BARS.CCK_OB22.K9    IS 'Числовой код по IFRS=принцип обліку по МСФЗ-9 ("корзина")';
+
+begin EXECUTE IMMEDIATE 'alter table bars.cck_ob22 add ( KL1 int ) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CCK_OB22.KL1    IS 'РЕЗЕРВНОЕ ПОЛЕ';
 
 PROMPT *** Create  grants  CCK_OB22 ***
-grant SELECT                                                                 on CCK_OB22        to BARSREADER_ROLE;
+
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_OB22        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CCK_OB22        to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CCK_OB22        to RCC_DEAL;

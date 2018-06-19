@@ -141,6 +141,7 @@ begin
   bars_metabase.add_column(l_tabid, 14, 'SPI', 'C', 'ob22~SPI~прем~***5', '', 2, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 15, 'SPN', 'C', 'ob22~SPN~прс.%~***9', '', 2, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 16, 'CR9', 'C', 'ob22~CR9~для~9129', '', 2, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'S36', 'C', 'ob22~S36', '', 2, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'SK0', 'C', 'ob22~SK0~нар.K~3578', '', 2, 75, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'SK9', 'C', 'ob22~SK9~прс.K~3579', '', 2, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 22, 'SG', 'C', 'ob22~SG~пог.~3739', '', 2, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);

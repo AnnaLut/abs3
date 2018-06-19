@@ -136,21 +136,28 @@ begin
   bars_metabase.add_column(l_tabid, 22, 'FV_ABS', 'N', 'FV мiнус~ABS~НЕ прийнято~резерву', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(FV_ABS) ', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'REZ9_R', 'N', 'Ручной~Резерв~ по~вне/бал.акт', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZ9_R) ', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'REZB_R', 'N', 'Ручной~Резерв~ по~бал.акт', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZB_R) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'KV', 'N', 'ID_CURRENCY~Код~валюти', '', null, 59, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'S1', 'N', 'FV_ADJ_NEW_FEE~Кориг.~бал.варт.~до справедливої~S1', '', null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'S2', 'N', 'FV_ADJ_AMORT~Амортиз.кориг.~бал.варт.~до справедливої~S2', '', null, 61, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'B1', 'N', 'FV_ADJ_BALANCE~Неамортиз.диск/прем.~за кориг.бал.варт.~до справедливої~B1', '', null, 62, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'S3', 'N', 'MODIF_NEW_FEE~Результат~від модиф.договору~~S3', '', null, 63, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'S4', 'N', 'MODIF_AMORT~Амортиз.~модиф.договору~~S4', '', null, 64, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'B3', 'N', 'MODIF_BALANCE ~Неамортиз.~диск/прем.~за модиф.договору~B3', '', null, 65, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'S5', 'N', 'GENERAL_NEW_FEE ~Формування~"грошового"~дисконту/премії~S5', '', null, 66, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'S6', 'N', 'GENERAL_FEE_AMORT ~Амортиз.~"грошового"~дисконту/премії~S6', '', null, 67, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'B5', 'N', 'GENERAL_FEE_BALANCE ~Неамортиз.~"грошовий"~дисконт/премія~B5', '', null, 68, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'S7', 'N', 'ACCRUAL_ADJ_DELTA ~Формування~"технічного"~дисконту/премії~S7', '', null, 69, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'S8', 'N', 'ACCRUAL_ADJ_AMORT ~Амортиз.~"технічного"~дисконту/премії~S8', '', null, 70, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'B7', 'N', 'ACCRUAL_ADJ_BALANCE ~Неамортиз.~"технічний"~дисконт/премія~B7', '', null, 71, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'F1', 'N', 'DERECOGNITION_FLAG ~Ознака припинення~визнання фінансового~інструменту~F1', '', null, 72, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'IRR', 'N', 'EIR ~Ефективна~процентна~ставка~IRR(E1)', '', null, 73, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'FV_CCY', 'N', 'FV_CCY ~Переоцінка~(залишок~на звітну дату)', '', null, 74, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'RNK');
   if (l_newtabid is not null and l_newcolid is not null) then
     bars_metabase.add_extrnval(l_tabid, 19, l_newtabid, l_newcolid, 'C', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица CUSTOMER для описания сложного поля таблицы PRVN_OSAQ.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('CUSTOMER');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ISP');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 20, l_newtabid, l_newcolid, 'PP', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица CUSTOMER для описания сложного поля таблицы PRVN_OSAQ.');
   end if;

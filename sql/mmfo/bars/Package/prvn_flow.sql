@@ -3,7 +3,7 @@ is
   --
   -- constants
   --
-  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 3.3  03.03.2018';
+  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 3.4  19.06.2018';
   G_SHOW_LOG                 BOOLEAN      := false;
 
   --
@@ -124,7 +124,7 @@ is
   function  BAD_CP  ( p_OSA VARCHAR2, z_dat01 date )  return varchar2 ;  
   procedure div39   ( p_mode int, p_dat01 date ); -- разделение рез-39 по КД в НБУ-23-РЕЗ.
   procedure del0    ( p_mode int)               ; -- отладочная процедура очистки всех таблиц
-
+  procedure FROM_SRR_XLS (p_ID_CALC_SET srr_xls.id_calc_set%type);
 -- -- ежедневная процедура добавки новых КД
 -- procedure add1
 -- ( p_dat01 date
@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 11.0  15.06.2018';
+  g_body_version  constant varchar2(64) := 'version 11.1  19.06.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -867,6 +867,16 @@ BEGIN
   RETURN s_nd;
 END  BAD_CP;
 -------------------------------------------------------------
+procedure FROM_SRR_XLS(p_ID_CALC_SET srr_xls.id_calc_set%type)  is
+begin
+   delete from PRVN_FV_REZ_IFRS9 where ID_CONTRACT = 'PREMIY' and id_calc_set = p_id_calc_set and id_branch = (select id from regions where kf = sys_context('bars_context','user_mfo'));
+   for xls in (select x.* from SRR_XLS x, regions r  where x.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') and x.id_calc_set = p_id_calc_set)
+   loop
+      insert into PRVN_FV_REZ_IFRS9 (     ID_CALC_SET,     UNIQUE_BARS_IS,     ID_BRANCH,     ID_CURRENCY,     DELTA_FV_CCY, ID_CONTRACT,     RNK_CLIENT)
+                             values ( xls.ID_CALC_SET, xls.UNIQUE_BARS_IS, xls.ID_BRANCH, xls.ID_CURRENCY, xls.FV_CCY      , 'PREMIY'   , xls.RNK_CLIENT);          
+   end LOOP;
+end FROM_SRR_XLS;
+-------------------------------------------------------------
 procedure div39 ( p_mode int, p_dat01 date )   is   -- разделение рез-39 по КД в НБУ-23-РЕЗ.
    -- Прийом витрины резервов по МСФЗ
    -- !!!! уже НЕТ p_mode = 0 -- принять файл и разнести по НБУ23
@@ -904,12 +914,12 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
       l_max := to_number ( to_char( l_dat31_fv , 'YYMMDD')||'99') ;
       ---------------------------------------- XXYYZZ-----WW -------------
 
-      select max (ID_CALC_SET)   into l_num   from OSA_V_PROV_RESULTS_OSH o, regions r
+      select max (ID_CALC_SET)   into l_num   from PRVN_FV_REZ_IFRS9 o, regions r
       where ID_CALC_SET >= l_min and ID_CALC_SET <= l_max and o.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') ;
 
       if l_num is null
       then
-        raise_application_error( -20333,'Вітрини з рез.МСФЗ OSA_V_PROV_RESULTS_OSH на дату='||to_char(l_dat31_fv,'dd.mm.yyyy') ||
+        raise_application_error( -20333,'Вітрини з рез.МСФЗ PRVN_FV_REZ_IFRS9 на дату='||to_char(l_dat31_fv,'dd.mm.yyyy') ||
                                 'по ф-лу:'|| sys_context('bars_context','user_mfo') ||' не знайдено');
         return;
       end if;
@@ -922,20 +932,19 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
          end if;
       EXCEPTION WHEN NO_DATA_FOUND THEN l_MMFO := 0; -- схема не MMFO
       end ;
-
-      -- сжатие витрины делойта по дог с учетом вал . Выбрасывание нулей
---    execute immediate 'truncate table PRVN_OSA';
-
+      FROM_SRR_XLS(l_num);  -- Прием XLS переоценки
+      -- сжатие витрины делойта по дог Выбрасывание нулей
+    
       delete PRVN_OSAq;
-
-      if l_MMFO = 1 THEN
-         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,              REZB,              REZ9,                  AIRC_CCY,                 IRC_CCY,
-                                                    ID_PROV_TYPE,                    IS_DEFAULT,                             vidd )
-                       select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY,
-                              min (f.ID_PROV_TYPE ) ID_PROV_TYPE, max (f.IS_DEFAULT) IS_DEFAULT, decode(f.tip,3,d.vidd,null) vidd
-                       from  (select Id_currency LCV,
-                                     --Rnk_client||decode(l_MMFO,1,r.code,'') RNK,
-                                     Rnk_client RNK,
+      
+      if l_MMFO = 1 THEN 
+         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,  REZB,    REZ9,  AIRC_CCY, IRC_CCY,  ID_PROV_TYPE, vidd ,
+                                 s1, s2, b1, s3, s4, b3, s5, s6, b5, s7, s8, b7, IRR , F1, FV_CCY)
+                          select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY, 
+                                 min (f.ID_PROV_TYPE ) ID_PROV_TYPE, decode(f.tip,3,d.vidd,null) vidd,
+                                 sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3)     b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5, 
+                                 sum(f.s7) s7, sum(f.s8) s8, sum(f.b7) b7, max(f.IRR) irr, max(f.F1) f1, sum(f.FV_CCY) FV_CCY
+                       from  (select Id_currency LCV, Rnk_client  RNK, 
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
                                      --substr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), instr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), '/',1) +1 ) ND,
                                      substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND,
@@ -944,20 +953,29 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                      nvl(AIRC_CCY,0) AIRC_CCY,
                                      nvl(IRC_CCY,0)  IRC_CCY ,
                                      ID_PROV_TYPE, -- Метка расчета резерва на индивидуальной или коллективной основе. "С" - колл, "І" - индивид
-                                     IS_DEFAULT    -- Метка наличия дефолта по договору. 1 - дефолт, 0 - нет дефолта. Расчетный параметр Finevare
-                              from OSA_V_PROV_RESULTS_OSH o, regions r
+                                     nvl(FV_ADJ_NEW_FEE,0)    s1 , nvl(FV_ADJ_AMORT,0)      s2, nvl(FV_ADJ_BALANCE,0)      b1 , 
+                                     nvl(MODIF_NEW_FEE,0)     s3 , nvl(MODIF_AMORT,0)       s4, nvl(MODIF_BALANCE,0)       b3, 
+                                     nvl(GENERAL_NEW_FEE,0)   s5 , nvl(GENERAL_FEE_AMORT,0) s6, nvl(GENERAL_FEE_BALANCE,0) b5, 
+                                     nvl(ACCRUAL_ADJ_DELTA,0) s7 , nvl(ACCRUAL_ADJ_AMORT,0) s8, nvl(ACCRUAL_ADJ_BALANCE,0) b7, 
+                                     EIR                      irr, DERECOGNITION_FLAG       f1, DELTA_FV_CCY               FV_CCY
+                              from PRVN_FV_REZ_IFRS9 o, regions r
                               where o.id_branch = r.id and r.kf = sys_context('bars_context','user_mfo') and
-                                  ( Prov_Balance_CCY > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY > 0  or  IRC_CCY <> 0 ) and ID_CALC_SET = l_num
+                                  ( Prov_Balance_CCY     > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY           > 0  or  IRC_CCY             <> 0 
+                                or  nvl(FV_ADJ_NEW_FEE,0)      <> 0  or  nvl(FV_ADJ_AMORT,0)       <> 0 or nvl(FV_ADJ_BALANCE,0)    <> 0  or  nvl(MODIF_NEW_FEE,0)       <> 0  
+                                or  nvl(MODIF_AMORT,0)         <> 0  or  nvl(MODIF_BALANCE,0)      <> 0 or nvl(GENERAL_NEW_FEE,0)   <> 0  or  nvl(GENERAL_FEE_AMORT,0)   <> 0      
+                                or  nvl(GENERAL_FEE_BALANCE,0) <> 0  or  nvl(ACCRUAL_ADJ_DELTA,0)  <> 0 or nvl(ACCRUAL_ADJ_AMORT,0) <> 0  or  nvl(ACCRUAL_ADJ_BALANCE,0) <> 0     
+                                or  nvl(DELTA_FV_CCY,0)        <> 0  or  nvl(DERECOGNITION_FLAG,0) <> 0 or nvl(EIR,0)               <> 0 ) and ID_CALC_SET = l_num
                               ) F, tabval T,cc_deal d
                         where t.lcv = f.lcv and f.nd=d.nd (+)
                         group by f.rnk, f.tip, f.ND, t.kv, d.vidd ;
       else
-         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv,              REZB,              REZ9,                  AIRC_CCY,                 IRC_CCY,
-                                                    ID_PROV_TYPE,                    IS_DEFAULT,                             vidd )
-                       select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY,
-                              min (f.ID_PROV_TYPE ) ID_PROV_TYPE, max (f.IS_DEFAULT) IS_DEFAULT, decode(f.tip,3,d.vidd,null) vidd
-                       from  (select Id_currency LCV,
-                                     Rnk_client  RNK,
+         insert into PRVN_OSAq ( rnk,   tip,   ND,   kv, REZB, REZ9,AIRC_CCY, IRC_CCY, ID_PROV_TYPE,  vidd,
+                                 s1, s2, b1, s3, s4, b3, s5, s6, b5, s7, s8, b7, IRR , F1, FV_CCY)
+                          select f.rnk, f.tip, f.ND, t.kv, sum (F.rezb) REZB, sum (F.rez9) REZ9, sum (F.AIRC_CCY) AIRC_CCY, sum (F.IRC_CCY) IRC_CCY, 
+                                 min (f.ID_PROV_TYPE ) ID_PROV_TYPE, decode(f.tip,3,d.vidd,null) vidd,
+                                 sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3) b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5, 
+                                 sum(f.s7) s7, sum(f.s8) s8, sum(f.b7) b7, max(f.IRR) irr, max(f.F1) f1, sum(f.FV_CCY) FV_CCY
+                       from  (select Id_currency LCV, Rnk_client  RNK, 
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
                                      substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND,
                                      nvl(Prov_Balance_CCY,0)    REZB,
@@ -965,10 +983,17 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                      nvl(AIRC_CCY,0) AIRC_CCY,
                                      nvl(IRC_CCY,0)  IRC_CCY ,
                                      ID_PROV_TYPE, -- Метка расчета резерва на индивидуальной или коллективной основе. "С" - колл, "І" - индивид
-                                     IS_DEFAULT    -- Метка наличия дефолта по договору. 1 - дефолт, 0 - нет дефолта. Расчетный параметр Finevare
-                              from OSA_V_PROV_RESULTS_OSH o
-                              where ( Prov_Balance_CCY > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY > 0  or  IRC_CCY <> 0 ) and ID_CALC_SET = l_num
-                              ) F, tabval T,cc_deal d
+                                     nvl(FV_ADJ_NEW_FEE,0)    s1 , nvl(FV_ADJ_AMORT,0)      s2, nvl(FV_ADJ_BALANCE,0)      b1, 
+                                     nvl(MODIF_NEW_FEE,0)     s3 , nvl(MODIF_AMORT,0)       s4, nvl(MODIF_BALANCE,0)       b3,   
+                                     nvl(GENERAL_NEW_FEE,0)   s5 , nvl(GENERAL_FEE_AMORT,0) s6, nvl(GENERAL_FEE_BALANCE,0) b5, 
+                                     nvl(ACCRUAL_ADJ_DELTA,0) s7 , nvl(ACCRUAL_ADJ_AMORT,0) s8, nvl(ACCRUAL_ADJ_BALANCE,0) b7,                                     
+                                     EIR                      irr, DERECOGNITION_FLAG       f1, nvl(DELTA_FV_CCY,0)        FV_CCY
+                              from PRVN_FV_REZ_IFRS9 o
+                              where ( Prov_Balance_CCY   > 0  or  Prov_OffBalance_CCY > 0 or AIRC_CCY           > 0  or  IRC_CCY             <> 0 
+                                or  FV_ADJ_NEW_FEE      <> 0  or  FV_ADJ_AMORT       <> 0 or FV_ADJ_BALANCE    <> 0  or  MODIF_NEW_FEE       <> 0  
+                                or  MODIF_AMORT         <> 0  or  MODIF_BALANCE      <> 0 or GENERAL_NEW_FEE   <> 0  or  GENERAL_FEE_AMORT   <> 0      
+                                or  GENERAL_FEE_BALANCE <> 0  or  ACCRUAL_ADJ_DELTA  <> 0 or ACCRUAL_ADJ_AMORT <> 0  or  ACCRUAL_ADJ_BALANCE <> 0     
+                                or  nvl(DELTA_FV_CCY,0) <> 0  or  DERECOGNITION_FLAG <> 0 or EIR               <> 0 ) and ID_CALC_SET = l_num )  F, tabval T,cc_deal d
                         where t.lcv = f.lcv and f.nd=d.nd (+)
                         group by f.rnk, f.tip, f.ND, t.kv, d.vidd ;
       end if;

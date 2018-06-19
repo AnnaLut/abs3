@@ -62,7 +62,7 @@ begin
          from  (select  r.rowid RI, c.country, r.id  , o.NBS_REZ     , o.OB22_REZ, o.NBS_7f, o.OB22_7f , o.NBS_7r  ,
                         o.OB22_7r , o.pr     , o.r013, nvl(r.rz,1) rz, r.KV      , null nd , null cc_id, null nd_cp,
                         rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/' branch,
-                        nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,r.kat r_s080
+                        nvl(r.rez*100,0) sz,nvl(r.rezn*100,0) szn,nvl(r.rez_30*100,0) sz_30, decode(r.kat,1,1,9,9,2) s080,to_char(r.kat) r_s080
                 from nbu23_rez r
                 join customer     c on (r.rnk = c.rnk)
                 join srezerv_ob22 o on (r.nbs = o.nbs and o.nal=nal_  AND

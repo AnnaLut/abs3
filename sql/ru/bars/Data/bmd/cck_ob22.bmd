@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -57,8 +58,9 @@ declare
 
 begin
 
-  l_tabsemantic := 'Довiдник ОБ22 в Крд.Портф. ЮО+ФО';
+  l_tabsemantic := '5.Довiдник ОБ22 в Крд.Портф. ЮО+ФО / CCK_OB22';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'CCK_OB22';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,66 +124,48 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'NBS', 'C', 'БР  ~тiла~кр', null, 4, 1, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'OB22', 'C', 'ob22~SS~тiла~кр', null, 2, 2, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'S903', 'C', 'ob22~ZZI~для~903*', null, 2, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'S950', 'C', 'ob22~ZAL~для~950*', null, 8, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'S952', 'C', 'ob22~ZAL~для~952*', null, 2, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SDI', 'C', 'ob22~SDI~диск~***6', null, 2, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SD_I', 'C', 'ob22~SD$~%  i~6***', null, 2, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SD_J', 'C', 'ob22~АM$~ i~6***', null, 2, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'SD_M', 'C', 'ob22~АM~ н~6***', null, 2, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'SD_N', 'C', 'ob22~SD~%  н~6***', null, 2, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'SLN', 'C', 'ob22~SLN~сом.%~***?', null, 2, 30, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'SN', 'C', 'ob22~SN~нар.% ~***8', null, 2, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'SP', 'C', 'ob22~SP~прс.T~***7', null, 2, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'SPI', 'C', 'ob22~SPI~прем~***5', null, 2, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'SPN', 'C', 'ob22~SPN~прс.%~***9', null, 2, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 16, 'CR9', 'C', 'ob22~CR9~для~9129', null, 2, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'SK0', 'C', 'ob22~SK0~нар.K~3578', null, 2, 75, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'SK9', 'C', 'ob22~SK9~прс.K~3579', null, 2, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'SG', 'C', 'ob22~SG~пог.~3739', null, 2, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'SPN_31', 'C', 'ob22~SPN~прс%~>30 дн', null, 2, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'SPN_61', 'C', 'ob22~SPN~прс%~>60 дн', null, 2, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 27, 'SPN_181', 'C', 'ob22~SPN~прс%~>181 дн', null, 2, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 28, 'SK9_31', 'C', 'ob22~SK9~прсK~>30 дн', null, 2, 81, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 29, 'SK9_61', 'C', 'ob22~SK9~прсK~>60 дн', null, 2, 82, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 30, 'SK9_181', 'C', 'ob22~SK9~прсK~>181 дн', null, 2, 83, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 31, 'SLK', 'C', 'ob22~SLK~сом.K~***?', null, 2, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'SD_SK0', 'C', 'OB22~ рах. доходiв ~ для щомiсячної ~комiсiї', null, 2, 51, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 33, 'SD_9129', 'C', 'OB22~ рах. доходiв ~ для комiсiї~ на 9129''', null, 2, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 34, 'SD_SK4', 'C', 'OB22~ рах. доходiв ~ для комiсiї~ за достр. пог.', null, 2, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 35, 'S260', 'C', 'Продукт~ НБУ ~ S260', null, 2, 91, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 36, 'ISG', 'C', 'ob22~ISG~дох майб період', null, 2, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 40, 'KL1', 'B', 'Одно~ВЕКТ', '', 1, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 0, 'K9', 'N', 'Код~Корзини', '', null, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NBS', 'C', 'БР  ~тiла~кр', '', 4, 1, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'OB22', 'C', 'ob22~SS~тiла~кр', '', 2, 2, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'S903', 'C', 'ob22~ZZI~для~903*', '', 2, 55, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'S950', 'C', 'ob22~ZAL~для~950*', '', 8, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'S952', 'C', 'ob22~ZAL~для~952*', '', 2, 70, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SDI', 'C', 'ob22~SDI~диск~***6', '', 2, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SD_I', 'C', 'ob22~SD$~%  i~6***', '', 2, 40, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SD_J', 'C', 'ob22~АM$~ i~6***', '', 2, 50, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SD_M', 'C', 'ob22~АM~ н~6***', '', 2, 45, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'SD_N', 'C', 'ob22~SD~%  н~6***', '', 2, 35, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'SLN', 'C', 'ob22~SLN~сом.%~***?', '', 2, 30, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'SN', 'C', 'ob22~SN~нар.% ~***8', '', 2, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'SP', 'C', 'ob22~SP~прс.T~***7', '', 2, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'SPI', 'C', 'ob22~SPI~прем~***5', '', 2, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'SPN', 'C', 'ob22~SPN~прс.%~***9', '', 2, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'CR9', 'C', 'ob22~CR9~для~9129', '', 2, 60, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'S36', 'C', 'ob22~S36', '', 2, 65, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'SK0', 'C', 'ob22~SK0~нар.K~3578', '', 2, 75, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'SK9', 'C', 'ob22~SK9~прс.K~3579', '', 2, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'SG', 'C', 'ob22~SG~пог.~3739', '', 2, 95, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'SPN_31', 'C', 'ob22~SPN~прс%~>30 дн', '', 2, 26, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'SPN_61', 'C', 'ob22~SPN~прс%~>60 дн', '', 2, 27, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'SPN_181', 'C', 'ob22~SPN~прс%~>181 дн', '', 2, 28, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'SK9_31', 'C', 'ob22~SK9~прсK~>30 дн', '', 2, 81, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'SK9_61', 'C', 'ob22~SK9~прсK~>60 дн', '', 2, 82, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'SK9_181', 'C', 'ob22~SK9~прсK~>181 дн', '', 2, 83, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'SLK', 'C', 'ob22~SLK~сом.K~***?', '', 2, 90, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'SD_SK0', 'C', 'OB22~ рах. доходiв ~ для щомiсячної ~комiсiї', '', 2, 51, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'SD_9129', 'C', 'OB22~ рах. доходiв ~ для комiсiї~ на 9129''', '', 2, 52, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'SD_SK4', 'C', 'OB22~ рах. доходiв ~ для комiсiї~ за достр. пог.', '', 2, 85, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'S260', 'C', 'Продукт~ НБУ ~ S260', '', 2, 91, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'ISG', 'C', 'ob22~ISG~дох майб період', '', 2, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 41, 'D_CLOSE', 'D', 'Де~активовано', '', 10, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
-
   -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('SB_OB22');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'R020');
+  l_newtabid := bars_metabase.get_tabid('K9');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'K9');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 1, l_newtabid, l_newcolid, '', '', '', '');
+    bars_metabase.add_extrnval(l_tabid, 0, l_newtabid, l_newcolid, 'K', '', '', '');
   else
-    dbms_output.put_line('В БМД не описана таблица SB_OB22 для описания сложного поля таблицы CCK_OB22.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('SB_OB22');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'OB22');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 2, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица SB_OB22 для описания сложного поля таблицы CCK_OB22.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('KL_S260');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'S260');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 35, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица KL_S260 для описания сложного поля таблицы CCK_OB22.');
+    dbms_output.put_line('В БМД не описана таблица K9 для описания сложного поля таблицы CCK_OB22.');
   end if;
 
   -- добавляем описание сортировки

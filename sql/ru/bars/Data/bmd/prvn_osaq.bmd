@@ -50,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -59,6 +60,7 @@ begin
 
   l_tabsemantic := 'Еквівалент-Вітрина "Резерв-МСФЗ"';
   l_tablinesdef := '';
+  l_tabselect_statement := '';
   l_tabname     := 'PRVN_OSAQ';
 
   -- получаем код таблицы
@@ -71,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +83,9 @@ begin
 
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,26 +124,40 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 2, 'TIP', 'N', 'UNIQUE_~BARS_IS~Тип_Акт/*~в АБС', null, null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'COMM', 'C', 'COMM~Протокол обр~NBU23_REZ', null, 100, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', 'FunNSIEditFFiltered("PRVN_NBU",2,"nd="||Str(:ND) )', 0);
-  bars_metabase.add_column(l_tabid, 8, 'ID_PROV_TYPE', 'C', 'ID_~PROV_TYPE~Кол/Инд~основа', null, null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'IS_DEFAULT', 'B', 'Метка~дефолта', null, null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 17, 'REZB', 'N', 'PROV_~BALANCE_q~Резерв по~бал.акт', null, null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZB) ', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 18, 'REZ9', 'N', 'PROV_~OFFBALANCE_q~Резерв по~вне/бал.акт', null, null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZ9)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'RNK_~CLIENT~РНК~клиента', null, null, 1, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 20, 'ND', 'N', 'UNIQUE_~BARS_IS~*/Реф_Дог~в АБС.Рах.', null, null, 3, 0, 0, 1, 0, '', '', 1, 0, '', 1, 0, 1, '', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"(:TIP=3 and a.acc in (select acc from nd_acc where nd=:ND) OR :TIP=9 and exists (select 1 from cp_deal where ref=:ND and a.acc in (acc,accd,accp,accr,accs,accr2,ACCEXPN,ACCEXPR,ACCR3,ACCUNREC)))" )', 0);
-  bars_metabase.add_column(l_tabid, 21, 'AIRC_CCY', 'N', 'AIRC_~q~Итого~НЕприз.дох', null, null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(AIRC_CCY)', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'FV_ABS', 'N', 'FV мiнус~ABS~НЕ прийнято~резерву', null, null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(FV_ABS) ', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'REZ9_R', 'N', 'Ручной~Резерв~ по~вне/бал.акт', null, null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 24, 'REZB_R', 'N', 'Ручной~Резерв~ по~бал.акт', null, null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'KV', 'N', 'Код~валюты', null, null, 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 26, 'VIDD', 'N', 'Вид кредита', null, null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'TIP', 'N', 'UNIQUE_~BARS_IS~Тип_Акт/*~в АБС', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'COMM', 'C', 'COMM~Протокол обр~NBU23_REZ', '', 100, 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, 'sPar=PRVN_NBU[CONDITIONS=>ND=:ND][ACCESSCODE=>5][EXEC=>BEFORE]', 'FunNSIEditFFiltered("PRVN_NBU",2,"nd="||Str(:ND) )', 0);
+  bars_metabase.add_column(l_tabid, 8, 'ID_PROV_TYPE', 'C', 'ID_~PROV_TYPE~Кол/Инд~основа', '', null, 51, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'IS_DEFAULT', 'B', 'Метка~дефолта', '', null, 50, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'REZB', 'N', 'PROV_~BALANCE_q~Резерв по~бал.акт', '', null, 20, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZB) ', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'REZ9', 'N', 'PROV_~OFFBALANCE_q~Резерв по~вне/бал.акт', '', null, 22, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZ9)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'RNK', 'N', 'RNK_~CLIENT~РНК~клиента', '', null, 1, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'ND', 'N', 'UNIQUE_~BARS_IS~*/Реф_Дог~в АБС.Рах.', '', null, 3, 0, 0, 1, 1, '', '', 1, 0, '', 1, 0, 1, '/barsroot/customerlist/custacc.aspx?type=3'||chr(38)||'nd=:ND', 'ShowAccList(0,AVIEW_ALL,AVIEW_ReadOnly|AVIEW_AllOptions,"(:TIP=3 and a.acc in (select acc from nd_acc where nd=:ND) OR :TIP=9 and exists (select 1 from cp_deal where ref=:ND and a.acc in (acc,accd,accp,accr,accs,accr2,ACCEXPN,ACCEXPR,ACCR3,ACCUNREC)))" )', 0);
+  bars_metabase.add_column(l_tabid, 21, 'AIRC_CCY', 'N', 'AIRC_~q~Итого~НЕприз.дох', '', null, 32, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(AIRC_CCY)', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'FV_ABS', 'N', 'FV мiнус~ABS~НЕ прийнято~резерву', '', null, 25, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(FV_ABS) ', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'REZ9_R', 'N', 'Ручной~Резерв~ по~вне/бал.акт', '', null, 23, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZ9_R) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'REZB_R', 'N', 'Ручной~Резерв~ по~бал.акт', '', null, 21, 0, 0, 0, 0, '', '# ##0.00', 1, 0, 'Sum(REZB_R) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'KV', 'N', 'ID_CURRENCY~Код~валюти', '', null, 59, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'S1', 'N', 'FV_ADJ_NEW_FEE~Кориг.~бал.варт.~до справедливої~S1', '', null, 60, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'S2', 'N', 'FV_ADJ_AMORT~Амортиз.кориг.~бал.варт.~до справедливої~S2', '', null, 61, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'B1', 'N', 'FV_ADJ_BALANCE~Неамортиз.диск/прем.~за кориг.бал.варт.~до справедливої~B1', '', null, 62, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'S3', 'N', 'MODIF_NEW_FEE~Результат~від модиф.договору~~S3', '', null, 63, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'S4', 'N', 'MODIF_AMORT~Амортиз.~модиф.договору~~S4', '', null, 64, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'B3', 'N', 'MODIF_BALANCE ~Неамортиз.~диск/прем.~за модиф.договору~B3', '', null, 65, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'S5', 'N', 'GENERAL_NEW_FEE ~Формування~"грошового"~дисконту/премії~S5', '', null, 66, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'S6', 'N', 'GENERAL_FEE_AMORT ~Амортиз.~"грошового"~дисконту/премії~S6', '', null, 67, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'B5', 'N', 'GENERAL_FEE_BALANCE ~Неамортиз.~"грошовий"~дисконт/премія~B5', '', null, 68, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'S7', 'N', 'ACCRUAL_ADJ_DELTA ~Формування~"технічного"~дисконту/премії~S7', '', null, 69, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'S8', 'N', 'ACCRUAL_ADJ_AMORT ~Амортиз.~"технічного"~дисконту/премії~S8', '', null, 70, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'B7', 'N', 'ACCRUAL_ADJ_BALANCE ~Неамортиз.~"технічний"~дисконт/премія~B7', '', null, 71, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'F1', 'N', 'DERECOGNITION_FLAG ~Ознака припинення~визнання фінансового~інструменту~F1', '', null, 72, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'IRR', 'N', 'EIR ~Ефективна~процентна~ставка~IRR(E1)', '', null, 73, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 44, 'FV_CCY', 'N', 'FV_CCY ~Переоцінка~(залишок~на звітну дату)', '', null, 74, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'RNK');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 19, l_newtabid, l_newcolid, '', '', '', '');
+    bars_metabase.add_extrnval(l_tabid, 19, l_newtabid, l_newcolid, 'C', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица CUSTOMER для описания сложного поля таблицы PRVN_OSAQ.');
   end if;
@@ -147,46 +166,46 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 10, '1) OSA: Прийом та стиснення', 'PRVN_FLOW.div39 ( 1, DATETIME_Null ) ', '', 'ONCE', 'Робимо ?', 'ОК !', '', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 10, '1) OSA: Прийом та стиснення інформації від FINEVARE', '', '', 'ONCE', 'Робимо ?', 'ОК !', 'FunNSIEdit("[PROC=>PRVN_FLOW.div39(1,:D)][PAR=>:D(SEM=Звітна_Дата>,TYPE=D)]")', '', 'sPar=[PROC=>PRVN_FLOW.div39(1,:D)][PAR=>:D(SEM=Звітна_Дата>,TYPE=D)][EXEC=>ONCE][DESCR=>1) OSA: Прийом та стиснення інформаціі від FINEVARE][ACCESSCODE=>2]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 20, '2) IRR: Формування проводок  по "НеВизнаним"', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'Виконано !', 'FunNSIEdit("[PROC=>PRVN_FLOW.D_SNA(:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 20, '2) IRR: Формування проводок  по "НеВизнаним"', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'Виконано !', 'FunNSIEdit("[PROC=>PRVN_FLOW.D_SNA(:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', 'sPar=[PROC=>PRVN_FLOW.D_SNA(:D)][PROC=>PRVN_FLOW.D_SNA(:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)][EXEC=>ONCE][DESCR=>2) IRR: Формування проводок  по "НеВизнаним"][ACCESSCODE=>1]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 30, '3) CR-351: *Пере-Формування Кредитного ризику НБУ-351', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'Виконано !', 'FunNSIEdit("[PROC=>PRVN_FLOW.REC_23(:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 30, '3) CR-351: *Пере-Формування Кредитного ризику НБУ-351', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'Виконано !', 'FunNSIEdit("[PROC=>PRVN_FLOW.REC_23(:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', 'sPar=[PROC=>PRVN_FLOW.REC_23(:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)][EXEC=>ONCE][DESCR=>3) CR-351: *Пере-Формування Кредитного ризику НБУ-351][ACCESSCODE=>2]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 40, '4) RR-351:  Тільки Розподіл + Рівчачок для проводок', '', '', 'ONCE ', 'Підтвердіть ЗВІТНУ дату !', 'ОК !', 'FunNSIEdit("[PROC=>PRVN_FLOW.div39( 2, :D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 40, '4) RR-351:  Тільки Розподіл + Рівчачок для проводок', '', '', 'ONCE ', 'Підтвердіть ЗВІТНУ дату !', 'ОК !', 'FunNSIEdit("[PROC=>PRVN_FLOW.div39( 2, :D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', 'sPar=[PROC=>PRVN_FLOW.div39( 2, :D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)][DESCR=>4) RR-351:  Тільки Розподіл + Рівчачок для проводок][EXEC=>ONCE]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 41, '4.1 для ЦА =  Тільки ПЕРЕ-Розподіл ручних + Рівчачок', '', '', 'ONCE', 'Робимо ?', 'ОК !', 'FunNSIEdit("[PROC=>PRVN_FLOW.div39( 12, :D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 41, '4.1 для ЦА =  Тільки ПЕРЕ-Розподіл ручних + Рівчачок', '', '', 'ONCE', 'Робимо ?', 'ОК !', 'FunNSIEdit("[PROC=>PRVN_FLOW.div39( 12, :D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', 'sPar=[PROC=>PRVN_FLOW.div39( 12, :D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)][accessCode=>2][DESCR=>4.1 для ЦА =  Тільки ПЕРЕ-Розподіл ручних + Рівчачок][EXEC=>ONCE]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 50, '5) MAK Створити/Переглянути Макет проводок по "Резерв-МСФЗ"', '', '', 'ONCE', 'Створити МАКЕТ ?', 'Виконано !', 'FunNSIEditFFiltered("REZ_DOC_MAKET[PROC=>PAY_23(:A,1,NUMBER_Null,0)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1,"DK>=0")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 50, '5) MAK: Створити/Переглянути Макет проводок по "Резерв-МСФЗ"', '', '', 'ONCE', 'Створити МАКЕТ ?', 'Виконано !', 'FunNSIEditFFiltered("REZ_DOC_MAKET[PROC=>PAY_23(:A,1,NUMBER_Null,0)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1,"DK>=0")', '', 'sPar=REZ_DOC_MAKET[PROC=>PAY_23(:A,1,null,0)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE][DESCR=>5) MAK: Створити/Переглянути Макет проводок по "Резерв-МСФЗ"][CONDITIONS=>DK>=0]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 55, '2902 - Звіт-помилки при формуванні резерву', '', '', 'ONCE', '', 'Перегляньте результат', 'FunNSIEditF("SREZERV_ERRORS",1) ', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 55, '2902 - Звіт-помилки при формуванні резерву', '', '', 'ONCE', '', 'Перегляньте результат', 'FunNSIEditF("SREZERV_ERRORS",1) ', '', 'sPar=SREZERV_ERRORS[DESCR=>2902 - Звіт-помилки при формуванні резерву][accessCode=>1]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 60, '6) ARE: Формування проводок по "Резерв-МСФЗ"', '', '', 'ONCE', 'Проводки виконуються по ФАКТУ. Сформувати ПРОВОДКИ = "ARE"  ?', 'Виконано !', 'FunNSIEditFFiltered("REZ_DOC_MAKET[PROC=>PAY_23(:A,0,NUMBER_Null,0)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1,"DK>=0")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 60, '6) ARE: Формування проводок по "Резерв-МСФЗ"', '', '', 'ONCE', 'Проводки виконуються по ФАКТУ. Сформувати ПРОВОДКИ = "ARE"  ?', 'Виконано !', 'FunNSIEditFFiltered("REZ_DOC_MAKET[PROC=>PAY_23(:A,0,NUMBER_Null,0)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1,"DK>=0")', '', 'sPar=REZ_DOC_MAKET[PROC=>PAY_23(:A,0,null,0)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE][CONDITIONS=>DK>=0][DESCR=>6) ARE: Формування проводок по "Резерв-МСФЗ"][ACCESSCODE=>1]', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 70, '7 ) #02 *Формування #02 ', '', '', 'ONCE', 'Підтвердіть  Остан робочий день ЗВІТНОГО місяця ', '', 'ShowFilesNbu(hWndMDI) ', '', '', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 79, '?) Підсумки з початку року', '', '', 'ONCE', '', '', 'FunNSIEditF("PRVN_ITOG_YYYY", 0)', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 79, '?) Підсумки з початку року', '', '', 'ONCE', '', '', 'FunNSIEditF("PRVN_ITOG_YYYY", 0)', '', 'sPar=PRVN_ITOG_YYYY[DESCR=>?) Підсумки з початку року][ACCESSCODE=>1]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 80, 'Звіт 97. Обсяг формування резерву', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'ОК !', 'FunNSIEditF("TEST_FINREZ[PROC=>finrez_SB(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1)', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 80, 'Звіт 97. Обсяг формування резерву', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'ОК !', 'FunNSIEditF("TEST_FINREZ[PROC=>finrez_SB(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][EXEC=>ONCE]",1)', '', 'sPar=TEST_FINREZ[PROC=>finrez_SB(:A)][PAR=>:A(SEM=Зв_дата_01,TYPE=D)][DESCR=>Звіт 97. Обсяг формування резерву][EXEC=>BEFORE][ACCESSCODE=>1]', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 91, 'n) Перевірка 100%-ї Готовністі', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'Перегляньте результат', 'FunNSIEditF("SREZERV_ERRORS[PROC=>PRVN_FLOW.ERR_23(:D)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1) ', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 91, 'n) Перевірка 100%-ї Готовністі', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'Перегляньте результат', 'FunNSIEditF("SREZERV_ERRORS[PROC=>PRVN_FLOW.ERR_23(:D)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][EXEC=>BEFORE]",1) ', '', 'sPar=SREZERV_ERRORS[PROC=>PRVN_FLOW.ERR_23(:D)][PAR=>:D(SEM=Зв_дата_01,TYPE=D)][DESCR=>n) Перевірка 100%-ї Готовністі][EXEC=>BEFORE][ACCESSCODE=>1]', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 92, 'd) Установити локальну Банк.Дату ', '', '', 'ONCE', 'Підтвердіть Лок. БАНКІВСЬКУ  дату для корр.проводок!', 'ОК !', 'FunNSIEdit("[PROC=>PRVN_FLOW.LOC_DAT(:D)][PAR=>:D(SEM=Лок.Банк-дата LD.mm.yyyy>,TYPE=D)]")', '', '', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 98, '-- Технічний пункт =  Тільки <<Рівчачок>> ', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'ОК !', 'FunNSIEdit("[PROC=>rezerv_23 (:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 98, '-- Технічний пункт =  Тільки <<Рівчачок>> ', '', '', 'ONCE', 'Підтвердіть ЗВІТНУ дату !', 'ОК !', 'FunNSIEdit("[PROC=>rezerv_23 (:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)]")', '', 'sPar=[PROC=>rezerv_23 (:D)][PAR=>:D(SEM=Звіт.дата 01.mm.yyyy>,TYPE=D)][EXEC=>ONCE][DESCR=>-- Технічний пункт =  Тільки <<Рівчачок>> ][ACCESSCODE=>1]', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 99, '-- Технічний пункт *) SNP: Пере-Формування місячного знімоку ', 'PRVN_FLOW.DRAPS02 (  DATETIME_Null )  ', '', 'ONCE', 'Робимо ?', 'Виконано !', '', '', '', null);

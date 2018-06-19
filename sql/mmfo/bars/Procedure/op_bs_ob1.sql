@@ -1,13 +1,8 @@
+prompt ---------------------------------------------------------------
+prompt 12. function PROCEDURE BARS.OP_BS_OB1
+prompt ---------------------------------------------------------------
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB1.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure OP_BS_OB1 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB1 
+CREATE OR REPLACE PROCEDURE BARS.OP_BS_OB1
 ( PP_BRANCH       varchar2
 , P_BBBOO         varchar2
 ) is
@@ -51,7 +46,7 @@ begin
 
   kv_ := nvl( kv_, gl.baseval );
 
-  execute immediate 'truncate table CCK_AN_TMP';
+  ------execute immediate 'truncate table CCK_AN_TMP';
 
   for p in ( select branch
                from branch
@@ -89,14 +84,4 @@ begin
 
 end OP_BS_OB1;
 /
-show err;
-
-PROMPT *** Create  grants  OP_BS_OB1 ***
-grant EXECUTE                                                                on OP_BS_OB1       to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on OP_BS_OB1       to CUST001;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/OP_BS_OB1.sql =========*** End ***
-PROMPT ===================================================================================== 
+SHOW ERR;
