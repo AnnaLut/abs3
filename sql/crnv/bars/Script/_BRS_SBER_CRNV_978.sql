@@ -66,14 +66,14 @@ begin
                            '            AS OST,'||nlchr||
                            '         a.ob22de ,'||nlchr||
                            '         A.SOURCE '||nlchr||
-                           '    FROM bars.asvo_immobile a, bars.banks_ru b,  (select o.ref, o.pdat,  os.fdat, o.sos from  oper o, opldok os where o.ref = os.ref and os.dk = 0) op'||nlchr||
+                           '    FROM bars.asvo_immobile a, bars.banks_ru b,  (select o.ref, o.pdat,  o.sos from  oper o) op'||nlchr||
                            '    WHERE    '||nlchr||
                            'SUBSTR (a.branch, 2, 6) = b.mfo'||nlchr||
                            '        and a.branch like :Param1'||nlchr||
                            '        and a.kv like :Param2'||nlchr||
                            '        and  A.REFPAY = op.ref(+)'||nlchr||
                            '         AND a.dzagr < TO_DATE ( :sFdat1)'||nlchr||
-                           '         AND (a.refpay IS NULL OR op.pdat > TO_DATE ( :sFdat1) or (op.fdat > TO_DATE ( :sFdat1)  and op.pdat <= TO_DATE ( :sFdat1)))'||nlchr||
+                           '         AND (a.refpay IS NULL or   (op.pdat <= TO_DATE ( :sFdat1) and op.sos = -1))'||nlchr||
                            '         AND A.FL IN (-6,'||nlchr||
                            '                      -5,'||nlchr||
                            '                      -4,'||nlchr||
