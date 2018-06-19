@@ -436,7 +436,18 @@ namespace DocInput
                 if (TT_Flags[5] == '1')
                     __VDATE.Value = DateTime.Now.ToString("yyMMdd");
                 else
-                    __VDATE.Value = bDATE.ToString("yyMMdd");
+                {
+                    bool msfz = false;
+                    string[] msfz_operaions = { "IF0", "IF1", "IF2", "IF3", "IF4", "IF5" };
+                    foreach (string operation in msfz_operaions)
+                        if (Request.Params["tt"] == operation)
+                        {
+                            __VDATE.Value = DateTime.ParseExact(DatV_TextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyMMdd");
+                            msfz = true;
+                        }
+                    if(!msfz)
+                        __VDATE.Value = bDATE.ToString("yyMMdd");
+                }
 
                 //дата информационного запроса (используется при подписи документа)
                 if (!String.IsNullOrEmpty(Request.QueryString["datp"]))
