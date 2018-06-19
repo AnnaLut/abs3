@@ -5,7 +5,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.CCK_UI IS
 
- g_header_version CONSTANT VARCHAR2(64) := 'ver.3.3 03.03.2018';
+ g_header_version CONSTANT VARCHAR2(64) := 'ver.3.4 02.04.2018';
 /*
   03.03.2018 Sta Добавлена процедура OP_OFR (p_acc) для открытия счета OFR.Прострочена Фін.дебіторка	          для произвольного счета фин.деб ( не SK0) = p_acc
 
@@ -279,7 +279,7 @@ END cck_ui;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.6 PLAN 03.03.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.9 17.06.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
@@ -611,7 +611,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
            AND p.tip = 'LIM' THEN
           cc_komissia(p.metr, p.acc, p.id, p.dat1, l_dat2, nint_, NULL, 0);
         ELSIF p.id = 1
-              AND p.tip IN ('SDI', 'S36') THEN
+              AND p.tip IN ('SDI') THEN
+          null;
+        ELSIF p.id = 1
+              AND p.tip IN ('S36') THEN
           acrn.p_int(p.acc, p.id, p.dat1, l_dat2, nint_, NULL, 0);
         END IF;
 
@@ -1977,12 +1980,13 @@ BEGIN
       ELSIF p.id = 1
             AND p.metr = 4
             AND p.tip IN ('SDI') THEN
-        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
-                l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
-                         '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
-                         ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
-                        ,1
-                        ,160);
+        null;
+--        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
+--                l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
+--                         '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
+--                         ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
+--                        ,1
+--                        ,160);
      ELSIF p.tip IN ('SP ', 'SPN', 'SK9')
             AND p.id = 2  THEN
         acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени

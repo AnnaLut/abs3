@@ -1,6 +1,12 @@
-CREATE OR REPLACE PACKAGE BARS.CCK_dop IS
 
-  G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'version 6.0 17.11.2016';
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck_dop.sql =========*** Run *** ===
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CCK_DOP IS
+
+  G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'version 6.2 17.06.2018';
 
   -- ===============================================================================================
   -- Public types declarations
@@ -197,7 +203,7 @@ END CCK_DOP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.cck_dop IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.01 PLAN 15/03/2018';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.05 17/06/2018';
 
   /*
   15/03/2018 LSO Вернуться в свою область видимости пи авторизауии так как GL работает по STAFF
@@ -292,13 +298,13 @@ BEGIN
     SDATE_ :=  SDATE;
 
     if prod_ is null then
-       ERR_Message := 'Не знайдений код продукту. Виїдете з функцiї й увiйдiть у неї ще раз';    ERR_Code    := 1;
+       ERR_Message := 'Не знайдений код продукту. Вийдіть з функцiї й увiйдiть у неї ще раз';    ERR_Code    := 1;
        raise STOP_PRC;
     elsif (WDATE_ - SDATE_ > 366) and substr(get_prod_old(prod_), 4, 1) = 2 then
-      ERR_Message := 'Для даного продукту не вiрно зазначений строк договору ' || to_char(WDATE_ - SDATE_) || ' дн.';
+      ERR_Message := 'Для даного продукту невiрно зазначений строк договору ' || to_char(WDATE_ - SDATE_) || ' дн.';
       ERR_Code    := 1;    raise STOP_PRC;
     elsif (WDATE_ - SDATE_ < 366) and substr(get_prod_old(prod_), 4, 1) = 3 then
-      ERR_Message := 'Для даного продукту не вiрно зазначений строк договору ' || to_char(WDATE_ - SDATE_) || ' дн.';
+      ERR_Message := 'Для даного продукту невiрно зазначений строк договору ' || to_char(WDATE_ - SDATE_) || ' дн.';
       ERR_Code    := 1;     raise STOP_PRC;
     end if;
     
@@ -321,7 +327,12 @@ BEGIN
     end if;
 
     -- вид кредита
-    if substr(prod_, 2, 1) = 0 then      Vid_ := 1;
+    if substr(prod_, 2, 1) = 0 then
+      if prod_ = '206309' then
+        Vid_ := 2;
+      else
+        Vid_ := 1;
+      end if;
     else                                 Vid_ := 11;
     end if;
 
@@ -445,7 +456,12 @@ BEGIN
 --  INSERT INTO nd_txt (ND, TAG, TXT) values (ND_, 'FLAGS', '00'); -- каникулы есть и по посл день
 
     -- Определяем и сохраняем S260
-    select s260 into s260_ from cc_potra where id=substr(prod_,1,6);
+    begin
+      select s260 into s260_ from cc_potra where id=substr(prod_,1,6);
+    exception
+      when no_data_found then
+        raise_application_error(-20101,'Не знайдено опис продукту в довіднику сс_potra!');
+    end;
     cck_app.set_nd_txt (ND_,'S260' ,s260_);
 
 
@@ -683,7 +699,7 @@ end builder_gpk;
     l_tt        int_accn.tt%type;
 
   begin
-
+return; -- cobuprvnix-161 
     logger.info('CCK_DOP.CALC_SDI run  nd=' || to_char(ND_) || ' sum_sdi=' ||
                 to_char(sum_sdi));
 
