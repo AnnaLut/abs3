@@ -327,67 +327,85 @@ BEGIN
           bars_audit.info('Договор [ref = '||dd.nd||'] не має залишків на рахунках основної заборгованості, амортизація дисконту не виконується!');
         end if;*/
       ELSIF p.id = 1
-            AND p.metr = 4
-            AND p.tip IN ('SDI') THEN
-        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
-                l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
-                         '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
-                         ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
-                        ,1
-                        ,160);
-     ELSIF p.tip IN ('SP ', 'SPN', 'SK9')
-            AND p.id = 2  THEN
-        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени
+        AND p.metr = 4
+        AND p.tip IN ('SDI') 
+        and 1=0    -- cobuprvnix-161 отключение амортизации дисконта
+        THEN
 
-        l_nazn := substr('Нарахування пені. КД № ' || dd.cc_id || ' від  ' ||
-                         to_char(dd.sdate, 'dd.mm.yyyy') || ', рах.' ||
-                         p.nls /*|| '. Період: з ' ||
-                         to_char(p.ddat1, 'dd.mm.yyyy') || ' по ' ||
-                         to_char(ddat2_, 'dd.mm.yyyy')*/
-                        ,1
-                        ,160);
+            acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
+            l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
+                             '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
+                             ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
+                            ,1
+                            ,160);
+      ELSIF p.tip IN ('SP ', 'SPN', 'SK9')
+        AND p.id = 2  THEN
 
-      ELSIF p.tip IN ('CR9')
-            AND p.id = 0 THEN
-        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени
+            acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени
+            l_nazn := substr('Нарахування пені. КД № ' || dd.cc_id || ' від  ' ||
+                             to_char(dd.sdate, 'dd.mm.yyyy') || ', рах.' ||
+                             p.nls /*|| '. Період: з ' ||
+                             to_char(p.ddat1, 'dd.mm.yyyy') || ' по ' ||
+                             to_char(ddat2_, 'dd.mm.yyyy')*/
+                            ,1
+                            ,160);
 
-        l_nazn := substr('Ком.за невикор.ліміт по рах. ' ||
-                         p.nls /*|| '. Період: з ' ||
-                         to_char(p.ddat1, 'dd.mm.yyyy') || ' по ' ||
-                         to_char(ddat2_, 'dd.mm.yyyy')||' вкл. '*/
-                        ,1
-                        ,160);
-      ELSIF p.metr > 90
-            AND p.id = 2
-            AND p.tip = 'LIM' THEN
-        cc_komissia(p.metr
-                   ,p.acc
-                   ,p.id
-                   ,p.ddat1
-                   ,ddat2_
-                   ,nint_
-                   ,NULL
-                   ,l_mode); -------- Начисление комиссий
+    -- add by VPogoda 2018-02-26
+        ELSIF p.tip IN ('LIM')
+          AND p.id = 2
+          and p.metr = 0 THEN
 
-        l_nazn := substr('Нарахування комісії. КД № ' || dd.cc_id ||
-                         ' від  ' || to_char(dd.sdate, 'dd.mm.yyyy') /*||
-                         '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
-                         ' по ' || to_char(ddat2_, 'dd.mm.yyyy')*/
-                        ,1
-                        ,160);
-      END IF;
+            acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление комиссии по методу "% от остатка"
 
-      ------------------
-      interest_utl.take_reckoning_data(p_base_year => p.basey
-                                      ,p_purpose   => l_nazn
-                                      ,p_deal_id   => dd.nd);
+            l_nazn := substr('Нарахування комісії. КД № ' || dd.cc_id || ' від  ' ||
+                             to_char(dd.sdate, 'dd.mm.yyyy') || ', рах.' ||
+                             p.nls /*|| '. Період: з ' ||
+                             to_char(p.ddat1, 'dd.mm.yyyy') || ' по ' ||
+                             to_char(ddat2_, 'dd.mm.yyyy')*/
+                            ,1
+                            ,160);
+
+          ELSIF p.tip IN ('CR9')
+                AND p.id = 0 THEN
+            acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени
+
+            l_nazn := substr('Ком.за невикор.ліміт по рах. ' ||
+                             p.nls /*|| '. Період: з ' ||
+                             to_char(p.ddat1, 'dd.mm.yyyy') || ' по ' ||
+                             to_char(ddat2_, 'dd.mm.yyyy')||' вкл. '*/
+                            ,1
+                            ,160);
+          ELSIF p.metr > 90
+                AND p.id = 2
+                AND p.tip = 'LIM' THEN
+            cc_komissia(p.metr
+                       ,p.acc
+                       ,p.id
+                       ,p.ddat1
+                       ,ddat2_
+                       ,nint_
+                       ,NULL
+                       ,l_mode); -------- Начисление комиссий
+
+            l_nazn := substr('Нарахування комісії. КД № ' || dd.cc_id ||
+                             ' від  ' || to_char(dd.sdate, 'dd.mm.yyyy') /*||
+                             '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
+                             ' по ' || to_char(ddat2_, 'dd.mm.yyyy')*/
+                            ,1
+                            ,160);
+          END IF;
+
+          ------------------
+          interest_utl.take_reckoning_data(p_base_year => p.basey
+                                          ,p_purpose   => l_nazn
+                                          ,p_deal_id   => dd.nd);
 
 
-    END LOOP; -- p\
-         update INT_RECKONING t set t.purpose =
-       t.purpose || ' Період: з ' || to_char(t.date_from, 'dd.mm.yyyy') ||
-       ' по ' || to_char(t.DATE_TO, 'dd.mm.yyyy') || ' вкл.'
-         where t.deal_id =dd.nd;
+        END LOOP; -- p\
+             update INT_RECKONING t set t.purpose =
+           t.purpose || ' Період: з ' || to_char(t.date_from, 'dd.mm.yyyy') ||
+           ' по ' || to_char(t.DATE_TO, 'dd.mm.yyyy') || ' вкл.'
+             where t.deal_id =dd.nd;
   END LOOP; --k1
 
 
