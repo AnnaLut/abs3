@@ -200,12 +200,20 @@ end;
 
 commit;
 
-
 begin  EXECUTE IMMEDIATE 
-'create table test_o9 (ZDAT date, KVD int, NLSD varchar2(15), SD number,   KVK int , NLSK varchar2(15), SK number, ob22 char (2), nazn varchar2(160) ) ' ;
+'drop table test_o9' ;
 exception when others then   if SQLCODE = -00955 then null;   else raise; end if;   -- ORA-00955: name is already used by an existing object
 end;
 /
+commit;
+
+begin  EXECUTE IMMEDIATE 
+'create table test_o9 (  zdat DATE,  kvd  INTEGER,  nlsd VARCHAR2(15),  sd   NUMBER,  kvk  INTEGER,  nlsk VARCHAR2(15),  sk   NUMBER,  ob22 CHAR(2),  nazn VARCHAR2(160),  ref  NUMBER,  npp  INTEGER) ' ;
+exception when others then   if SQLCODE = -00955 then null;   else raise; end if;   -- ORA-00955: name is already used by an existing object
+end;
+/
+commit;
+
 
 GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.test_o9 TO BARS_ACCESS_DEFROLE;
 ------------------------------------------------------------------------------
