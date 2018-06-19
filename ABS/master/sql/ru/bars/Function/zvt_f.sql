@@ -236,7 +236,12 @@ BEGIN
      FROM tts
     WHERE tt = tt_;
 
-
+   IF tt_ in ('IF0','IF1','IF2','IF3','IF4','IF5','IF6') 
+   THEN
+     t_ := 35;
+     RETURN t_;
+   END IF; 
+	
    IF NBSd_ LIKE '8%'
    THEN
       t_ := 99;
