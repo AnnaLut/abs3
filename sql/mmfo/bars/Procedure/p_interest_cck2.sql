@@ -271,7 +271,9 @@ BEGIN
                         ,160);
       ELSIF p.id = 1
             AND p.metr = 4
-            AND p.tip IN ('SDI') THEN
+            AND p.tip IN ('SDI')
+            and 1=0 -- cobuprvnix-161
+             THEN
         acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
                 l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
                          '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
