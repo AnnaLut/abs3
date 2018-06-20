@@ -3728,9 +3728,9 @@ BEGIN
    tmp_:=SUBSTR(d_rec_,3,18);
 
 select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_;
-   bars_audit.info('SEP.zap_reqv1 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));
+   /*bars_audit.info('SEP.zap_reqv1 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));*/
    IF /*dir_=3 AND */SUBSTR(d_rec_,2,1)='?' THEN   --  NBU Request
-     bars_audit.info('SEP.zap_reqv2 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));
+     /*bars_audit.info('SEP.zap_reqv2 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));*/
       BEGIN
          SELECT fn_a||LPAD(TO_CHAR(rec_a),6) INTO tmp_
            FROM arc_rrp
@@ -3750,7 +3750,7 @@ THEN -- Branch reply
       EXCEPTION WHEN OTHERS THEN NULL;
       END;
    END IF;
-   bars_audit.info('SEP.zap_reqv3 tmp_ = '||tmp_);
+   /*bars_audit.info('SEP.zap_reqv3 tmp_ = '||tmp_);*/
    RETURN SUBSTR(d_rec_,1,2)||tmp_||SUBSTR(d_rec_,21);
 
 END zap_reqv;
