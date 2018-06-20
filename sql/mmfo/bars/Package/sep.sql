@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/sep.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.SEP IS
+CREATE OR REPLACE PACKAGE BARS.SEP IS
 --***************************************************************--
 --            Communication with NBU Payment System
 --                   (C) Unity-BARS
@@ -315,7 +309,8 @@ procedure check_t902_dok(p_ref in number);
 
 END;
 /
-                                          CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
+
+CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
 --***************************************************************--
 --              Communication with NBU Payment System
 --                     (C) Unity-BARS (2000-2013)
@@ -328,7 +323,7 @@ END;
 
 --***************************************************************--
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 6.61 2018-04-10 vitalii.khomida$';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 6.62 2018-06-20 vitalii.khomida$';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -3731,11 +3726,11 @@ BEGIN
    IF mfob_=gl.aMFO OR INSTR('!+*-?',SUBSTR(d_rec_,2,1))=0 THEN RETURN d_rec_; END IF;
 
    tmp_:=SUBSTR(d_rec_,3,18);
-   
-   select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_;
 
-   IF dir_=3 AND SUBSTR(d_rec_,2,1)='?' THEN   --  NBU Request
-
+select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_;
+   bars_audit.info('SEP.zap_reqv1 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));
+   IF /*dir_=3 AND */SUBSTR(d_rec_,2,1)='?' THEN   --  NBU Request
+     bars_audit.info('SEP.zap_reqv2 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));
       BEGIN
          SELECT fn_a||LPAD(TO_CHAR(rec_a),6) INTO tmp_
            FROM arc_rrp
@@ -3743,8 +3738,9 @@ BEGIN
                                          AND dat_b>=ADD_MONTHS(gl.bDATE,-1);
       EXCEPTION WHEN OTHERS THEN NULL;
       END;
-   ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0 
-   and l_cnt = 0 THEN -- Branch reply
+   ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0
+ and l_cnt = 0 
+THEN -- Branch reply
 
       BEGIN
          SELECT fn_b||LPAD(TO_CHAR(rec_b),6) INTO tmp_
@@ -3752,9 +3748,9 @@ BEGIN
           WHERE fn_a=SUBSTR(d_rec_,3,12) AND rec_a=SUBSTR(d_rec_,15,6)
                                          AND dat_a>=ADD_MONTHS(gl.bDATE,-1);
       EXCEPTION WHEN OTHERS THEN NULL;
-      END; 
+      END;
    END IF;
-
+   bars_audit.info('SEP.zap_reqv3 tmp_ = '||tmp_);
    RETURN SUBSTR(d_rec_,1,2)||tmp_||SUBSTR(d_rec_,21);
 
 END zap_reqv;
@@ -4819,25 +4815,3 @@ MD32 := h2_rrp(TO_NUMBER(TO_CHAR(gl.bDATE,'MM')))||
         h2_rrp(TO_NUMBER(TO_CHAR(gl.bDATE,'DD')));
 END;
 /
- show err;
- 
-PROMPT *** Create  grants  SEP ***
-grant EXECUTE                                                                on SEP             to ABS_ADMIN;
-grant EXECUTE                                                                on SEP             to BARS014;
-grant EXECUTE                                                                on SEP             to BARS015;
-grant EXECUTE                                                                on SEP             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on SEP             to CHCK;
-grant EXECUTE                                                                on SEP             to CHCK002;
-grant EXECUTE                                                                on SEP             to OPERKKK;
-grant EXECUTE                                                                on SEP             to PYOD001;
-grant EXECUTE                                                                on SEP             to TECH002;
-grant EXECUTE                                                                on SEP             to TECH005;
-grant EXECUTE                                                                on SEP             to TOSS;
-grant EXECUTE                                                                on SEP             to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/sep.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 
