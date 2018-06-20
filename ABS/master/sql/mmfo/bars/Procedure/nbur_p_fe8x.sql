@@ -186,7 +186,7 @@ BEGIN
                                                                   when ac.nbs in ('2652', '8652') then '2651'
                                                                   when ac.nbs in ('8021') then '2620'
                                                                   when ac.nbs in ('8022') then '2625'
-                                                                  when ac.nbs like '860%' then '2' || substr(ac.nbs, 2, 3)
+                                                                  when ac.nbs like '8%' then '2' || substr(ac.nbs, 2, 3)                                                                   
                                                                 else
                                                                   ac.nbs
                                                                 end as p070
