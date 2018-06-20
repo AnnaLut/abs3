@@ -24,11 +24,11 @@ PROMPT *** Create  table STO_GRP ***
 begin 
   execute immediate '
   CREATE TABLE BARS.STO_GRP 
-   (	IDG NUMBER(*,0), 
-	NAME VARCHAR2(100), 
-	OTM CHAR(1), 
-	STMP DATE DEFAULT sysdate, 
-	TOBO VARCHAR2(12)
+   (  IDG NUMBER(*,0), 
+  NAME VARCHAR2(100), 
+  OTM CHAR(1), 
+  STMP DATE DEFAULT sysdate, 
+  TOBO VARCHAR2(12)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -103,6 +103,42 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+
+
+
+PROMPT *** DROP   constraint PK_STOGRP ***
+begin
+ execute immediate '
+   ALTER TABLE BARS.STO_GRP DROP CONSTRAINT PK_STOGRP
+   ';
+exception when others then 
+  if  sqlcode=-02443 then null; else raise; end if;
+end ;
+/
+
+PROMPT *** DROP  index PK_STOGRP ***
+begin
+ execute immediate '
+    DROP INDEX PK_STOGRP
+   ';
+exception when others then 
+  if  sqlcode=-02443 or sqlcode=-01418 then null; else raise; end if;
+end ;
+/
+
+
+PROMPT *** Create  constraint PK_STOGRP ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.STO_GRP ADD CONSTRAINT PK_STOGRP PRIMARY KEY (IDG,KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
 
 
 
