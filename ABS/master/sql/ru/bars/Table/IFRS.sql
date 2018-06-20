@@ -49,6 +49,19 @@ exception when others then
  end;
 /
 
+begin 
+  execute immediate 'ALTER TABLE BARS.IFRS DROP PRIMARY KEY CASCADE';
+exception when others then 
+  if sqlcode in (-942,-02441) then null; else raise; end if;
+end;
+/
+begin   
+ execute immediate 'drop index PK_IFRS';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
 PROMPT *** Create  constraint PK_IFRS ***
 begin   
  execute immediate '
