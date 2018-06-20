@@ -60,20 +60,21 @@ begin
    , p_date_start => trunc(sysdate,'YYYY')
   );
 
+  --Удаление старых привязок (убираем NBUR_DM_TRANSACTIONS_CNSL)
+  NBUR_FILES.SET_OBJECT_DEPENDENCIES
+  ( 
+    p_file_id => l_file_id
+    , p_obj_id  => null
+    , p_strt_dt => date '2015-01-01'
+  );
+
+
   NBUR_FILES.SET_OBJECT_DEPENDENCIES
   ( 
     p_file_id => l_file_id
     , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ACCOUNTS')
     , p_strt_dt => date '2015-01-01'
   );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_TRANSACTIONS_CNSL')
-    , p_strt_dt => date '2015-01-01'
-  );
-
 
   NBUR_FILES.SET_FILE_DEPENDENCIES
   ( p_file_id  => l_file_id
