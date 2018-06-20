@@ -1,6 +1,6 @@
 create or replace package xrm_intg_cashdesk
 is
-   g_head_version   constant varchar2 (64) := 'version 1.7 31.05.2018';
+   g_head_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
 
    --
    -- реализация функционала сервиса функционала сервиса  XRMIntegrationCreateDocuments
@@ -14,7 +14,7 @@ end xrm_intg_cashdesk;
 /
 create or replace package body xrm_intg_cashdesk
 is
-   g_body_version   constant varchar2 (64) := 'version 1.7 31.05.2018';
+   g_body_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
 
    g_p_name         constant varchar2 (17) := 'xrm_intg_cashdesk';
 
@@ -2737,8 +2737,16 @@ is
               l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node9,
-                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, t.tag)));
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tag')));         
                  l_element_tnode :=
+                    dbms_xmldom.appendchild (
+                       l_element_node,
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.tag)));
+              l_element_node :=
+                    dbms_xmldom.appendchild (
+                       l_node9,
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'value')));                          
+              l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.value)));
@@ -3195,8 +3203,16 @@ is
               l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node9,
-                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, t.tag)));
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tag')));         
                  l_element_tnode :=
+                    dbms_xmldom.appendchild (
+                       l_element_node,
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.tag)));
+              l_element_node :=
+                    dbms_xmldom.appendchild (
+                       l_node9,
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'value')));                          
+              l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.value)));

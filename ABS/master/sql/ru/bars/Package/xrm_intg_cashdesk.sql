@@ -1,6 +1,6 @@
 create or replace package xrm_intg_cashdesk
 is
-   g_head_version   constant varchar2 (64) := 'version 1.7 31.05.2018';
+   g_head_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
 
    --
    -- реализация функционала сервиса функционала сервиса  XRMIntegrationCreateDocuments
@@ -14,7 +14,7 @@ end xrm_intg_cashdesk;
 /
 create or replace package body xrm_intg_cashdesk
 is
-   g_body_version   constant varchar2 (64) := 'version 1.7 31.05.2018';
+   g_body_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
 
    g_p_name         constant varchar2 (17) := 'xrm_intg_cashdesk';
 
@@ -991,7 +991,7 @@ is
       type l_opldok is table of opl%rowtype;
 
       l_tab_opl         l_opldok := l_opldok ();
-      l_temp            varchar(4000);
+      l_temp            varchar(20000);
 
    begin
       -- парсим хмл
@@ -1588,10 +1588,10 @@ is
          ref              number,
          err              number,
          erm              varchar2 (4000),
-         int_buffer_hex   varchar2 (4000),
-         ext_buffer_hex   varchar2 (4000),
-         int_sign_hex     varchar2 (4000),
-         ext_sign_hex     varchar2 (4000)
+         int_buffer_hex   varchar2 (20000),
+         ext_buffer_hex   varchar2 (20000),
+         int_sign_hex     varchar2 (20000),
+         ext_sign_hex     varchar2 (20000)
       );
 
       type l_tab is table of l_rec;
@@ -2366,20 +2366,12 @@ is
                    a.nazn as nazn,
                    a.tobo as tobo,
                    a.sos as sos,
-                   aa.nms  nms_a,
-                   ab.nms  nms_b,
                    a.VOB,
                    to_char (a.pdat, 'dd/mm/yyyy') as pdat,
                    to_char (a.odat, 'dd/mm/yyyy') as odat
               from v_docs_tobo_out a,
-                   accounts aa,
-                   accounts ab,
                    staff_ad_user b
              where a.REF=l_ref
-               and a.NLSA = aa.nls
-               and a.kv     = aa.kv
-               and a.NLSB = ab.nls
-               and a.KV2  = ab.kv
                and a.USERID = b.user_id (+)       )
       loop
 
@@ -2719,7 +2711,15 @@ is
               l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node9,
-                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, t.tag)));
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tag')));         
+                 l_element_tnode :=
+                    dbms_xmldom.appendchild (
+                       l_element_node,
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.tag)));
+              l_element_node :=
+                    dbms_xmldom.appendchild (
+                       l_node9,
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'value')));                          
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
@@ -2823,21 +2823,13 @@ is
                    a.nazn as nazn,
                    a.tobo as tobo,
                    a.sos as sos,
-                   aa.nms  nms_a,
-                   ab.nms  nms_b,
                    a.VOB,
                    to_char (a.pdat, 'dd/mm/yyyy') as pdat,
                    to_char (a.odat, 'dd/mm/yyyy') as odat
               from v_docs_tobo_out a,
-                   accounts aa,
-                   accounts ab,
                    staff_ad_user b
              where a.pdat >= to_date (l_dat1, 'dd/mm/yyyy')
                and a.pdat < (to_date (l_dat2, 'dd/mm/yyyy') + 1)
-               and a.NLSA = aa.nls
-               and a.kv     = aa.kv
-               and a.NLSB = ab.nls
-               and a.KV2  = ab.kv
                and a.USERID = b.user_id(+)    )
       loop
 
@@ -3177,7 +3169,15 @@ is
               l_element_node :=
                     dbms_xmldom.appendchild (
                        l_node9,
-                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, t.tag)));
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tag')));         
+                 l_element_tnode :=
+                    dbms_xmldom.appendchild (
+                       l_element_node,
+                       dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.tag)));
+              l_element_node :=
+                    dbms_xmldom.appendchild (
+                       l_node9,
+                       dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'value')));                          
                  l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
