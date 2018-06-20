@@ -1,10 +1,8 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/crypto_utl.sql =========*** Run *** 
+PROMPT ===================================================================================== 
 
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/crypto_utl.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.CRYPTO_UTL is
+CREATE OR REPLACE PACKAGE BARS.CRYPTO_UTL is
 
   -- Author  : VITALII.KHOMIDA
   -- Created : 04.06.2016 11:21:53
@@ -45,6 +43,9 @@
 
 end crypto_utl;
 /
+
+show errors;
+
 CREATE OR REPLACE PACKAGE BODY BARS.CRYPTO_UTL is
 
   g_body_version constant varchar2(64) := 'version 1.00 04/06/2016';
@@ -222,14 +223,14 @@ end;
 
 end crypto_utl;
 /
- show err;
- 
-PROMPT *** Create  grants  CRYPTO_UTL ***
-grant EXECUTE                                                                on CRYPTO_UTL      to PFU;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/crypto_utl.sql =========*** End *** 
- PROMPT ===================================================================================== 
- 
+show err;
+
+PROMPT *** Create  grants  CRYPTO_UTL ***
+
+grant EXECUTE on CRYPTO_UTL to PFU;
+grant EXECUTE on CRYPTO_UTL to BARS_ACCESS_DEFROLE;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/crypto_utl.sql =========*** End *** 
+PROMPT ===================================================================================== 
