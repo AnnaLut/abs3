@@ -1,0 +1,149 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    if (ViewBag.IsRejectView)
+    {
+        ViewBag.Title = "SWIFT. Ручна відправка REJECT MT199";
+    }
+    else
+    {
+        ViewBag.Title = "GPI. Формування МТ199(статут ACSC)";
+    }
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/Main.css" />
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/SwiftKGrid.css" />
+
+
+<h2 id="title" style="color:darkolivegreen;margin: 5px 3px 5px 10px">@ViewBag.Title</h2>
+<div id="searchDiv" class="container" style="margin:20px 0px 20px 0px">
+    <div class="row">
+        <div class="col-md-5 col-lg-5">
+            <label for="UETRBox"><b>Введіть значення UETR:</b></label>
+        </div>
+        <div class="col-md-7 col-lg-7">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 col-lg-5">
+            <input type="text" class="form-control" id="UETRBox" placeholder="місце для UETR" style="width:350px" />
+        </div>
+        <div class="col-md-7 col-lg-7">
+            <button id="SearchBtn" type="button" class="btn btn-primary" onclick="Search();">
+                <i class="fa fa-search"></i> Пошук
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<script type="text/javascript">
+    function Search() {
+        var UETR_value = $("#UETRBox").val();
+
+        if (UETR_value == "") {
+            bars.ui.error({ title: "Помилка", text: "Не заповнене значення UETR для пошуку." });
+            return;
+        }
+        
+        bars.ui.loader($('#searchDiv'), true);
+        $.ajax({
+            url: bars.config.urlContent("/Swift/SwiftMT/GetSWREF?UETR=" + UETR_value),
+            dataType: "json",
+            method: "get",
+            success: function (response) {
+                if (response.status == 'ok') {
+                    var swrefCode = response.data;
+                    bars.ui.loader($('#searchDiv'), false);
+
+                    if (swrefCode != null) {
+                        docinput(swrefCode, UETR_value);
+                    }
+                    else {
+                        bars.ui.alert({ text: "Записів за даним кодом не знайдено!" });
+                        clearInput();
+                    }
+                }
+                else {
+                    bars.ui.loader($('#searchDiv'), false);
+                    clearInput();
+                    bars.ui.error({ title: "Помилка", text: response.message });
+                }
+            },
+            error: function (response) {
+                bars.ui.loader($('#searchDiv'), false);
+                bars.ui.error({ title: "Помилка", text: response.message });
+            }
+        });
+    }
+
+    function docinput(swrefCode, UETR_value) {
+        var title = "Текст повідомлення";
+        var urlText = "/documentview/view_swift.aspx?swref=" + swrefCode;
+
+        var isRejectView = false;
+        if (document.title.split('.')[0] == "SWIFT") //Header contains SWIFT. ...
+            isRejectView = true; // header contains GPI. ...
+
+        // if this is view for GPI. ... :
+        var buttonText = "Згенерувати ACSC";
+        var urlText = bars.config.urlContent("/Swift/SwiftMT/SendGenerateACSC?UETR=" + UETR_value);
+
+        // if this is view for SWIFT. ... :
+        if (isRejectView) {
+            buttonText = "Відправити Reject";
+            urlText = bars.config.urlContent("/Swift/SwiftMT/SendReject?UETR=" + UETR_value);
+        }
+
+        bars.ui.dialog({
+            title: title,
+            content: {
+                url: bars.config.urlContent("/documentview/view_swift.aspx?swref=" + swrefCode)
+            },
+            modal: false,
+            close: function () { },
+            iframe: true,
+            width: '650px',
+            height: '600px',
+            buttons: [{
+                text: 'Відмінити',
+                click: function () {
+                    var win = this;
+                    win.close();
+                    clearInput();
+                }
+            },
+            {
+                text: buttonText,
+                click: function () {
+                    var win = this;
+                    bars.ui.loader(this, true);
+                    $.ajax({
+                        url: urlText,
+                        dataType: "json",
+                        method: "get",
+                        success: function (response) {
+                            if (response.status == 'ok') {
+                                clearInput();
+                                bars.ui.loader(win, false);
+                                bars.ui.alert({ text: "Процедуру виконано успішно" });
+                            }
+                            else {
+                                bars.ui.loader(win, false);
+                                bars.ui.error({ title: "Помилка", text: response.message });
+                            }
+                        }
+                    });
+                    win.close();
+                }
+            }
+            ]
+        });
+    }
+
+    function clearInput() {
+        $("#UETRBox").val("");
+    }
+
+</script>
