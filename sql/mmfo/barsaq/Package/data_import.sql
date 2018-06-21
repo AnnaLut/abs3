@@ -154,6 +154,12 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   --
   procedure notify_ibank;
+  
+  ----
+  -- notify_ibank - уведомляет интернет-банкинг об оплате документов
+  -- p_kf
+  --
+  procedure notify_ibank_kf(p_kf  bars.mv_kf.kf%type);
 
   ----
   -- full_import - выполняет полный цикл по импорту документов
@@ -259,8 +265,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_doc_export(p_startdate in date default trunc(sysdate-1));
 
    ----
-  -- sync_doc_export - синхронизирует зависшие документы 
-  --  
+  -- sync_doc_export - синхронизирует зависшие документы
+  --
   procedure sync_doc_export_open;
 
   ----
@@ -464,11 +470,9 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   --
   procedure sync_acctariffs;
 
-
 procedure sync_acc_transactions2_TEST(
     p_startdate in date    default null,
     p_scn       in number  default null);
-
   ----
   -- sync_acctariffs - синхронизация клиентов
   --
@@ -480,7 +484,7 @@ end data_import;
 CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
 
   -- global consts
-  G_BODY_VERSION constant varchar2(64)  := 'version 1.97 14/03/2017';
+  G_BODY_VERSION constant varchar2(64)  := 'version 1.98 07/06/2018';
 
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
     ||'KF - схема с полем ''kf''' || chr(10)
@@ -1038,7 +1042,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
   -- get_individual - возвращает строку для core.cust_individuals
   --
   function get_individual(p_kf in varchar2, p_rnk in integer) return cust_individuals%rowtype is
-      l_individual      barsaq.cust_individuals%rowtype;
+      l_individual      cust_individuals%rowtype;
   begin
     begin
         select
@@ -2541,7 +2545,7 @@ procedure sync_acc_transactions2_TEST(
            and v.groupid (+) not in (77, 80, 81, 30, 130)
            and v.status (+) = 2)
            loop
-dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent'); 
+dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2620,7 +2624,7 @@ dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
           )
           loop
 
-dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld'); 
+dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2665,8 +2669,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   end sync_acc_transactions2_TEST;
 
 
-  ----
-  -- sync_acc_period_transactions2 - синхронизирует проводки в АБС для передачи в систему
+    ----
+  -- sync_acc_period_transactions2 - синхронизиреут проводки в АБС для передачи в систему
   --
   -- @p_acc [in] - id счета в АБС
   -- @p_startdate - банковская дата, начиная с которой будем синхронизировать записи
@@ -3324,8 +3328,6 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     );*/
     --
     -- точка отсчета
-
-
     if p_acc is null
     then -- по всем счетам до текущей точки
         l_scn := dbms_flashback.get_system_change_number();
@@ -3759,26 +3761,26 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_time          date;
     l_period        number;
   begin
-    
+
     l_time := sysdate;
     l_scn  := dbms_flashback.get_system_change_number();
-    
+
     delete from import_activity where start_time<sysdate-1;
     -- пишем время начала работы
     insert into import_activity(start_time, start_scn, kf)
     values(l_time, l_scn, p_kf);
     commit;
-    
+
     g_docs_count := 0;
 
     bars_sync.subst_mfo(p_kf);
     import_documents_int;
-    
+
     -- вывод результатов
     -- фиксируем завершение работы
     l_period := round((sysdate-l_time)*24*60*60);
     l_scn    := dbms_flashback.get_system_change_number();
-    
+
     update import_activity set working_period=decode(l_period,0,1,l_period), finish_scn=l_scn, system_error=null, docs_count=g_docs_count
     where start_time=l_time;
     commit;
@@ -3894,7 +3896,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- модифицируем удаленную таблицу
     if p_is_open = 1 then
       rpc_sync.update_doc_export_status_open(p_docid);
-    else 
+    else
       rpc_sync.update_doc_export_status(p_docid);
     end if;
     --
@@ -4036,7 +4038,6 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.s         := get_attr_number(l_body, 'DOC_SUM')*l_denom;
     -- назначение платежа
     l_doc.nazn      := substr(get_attr_varchar2(l_body, 'DOC_NARRATIVE'),1,160);
-
     -- дата документа
     l_doc.datd      := get_attr_date(l_body, 'DOC_DATE');
     -- номер документа
@@ -4152,7 +4153,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- внутренний документ
     if     l_typeid = 'P_INT' then
         logger.trace('internal document');
-        
+
+        -- дата вставки
         l_doc.insertion_date := sysdate;
         -- контроль идентификационного кода получателя
         declare
@@ -4169,7 +4171,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             raise_application_error(-20000, 'Отримувача не знайдено: Банк='
                 ||l_doc.mfo_b||', Рахунок='||l_doc.nls_b||', Валюта='||l_doc.kv, true);
         end;
-        select *
+
+		select *
           into l_acc_a_rec
           from bars.accounts
          where nls = l_doc.nls_a
@@ -4200,8 +4203,6 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_doc.tt := 'IB1'; -- Internet-Banking: Внутрішня
             --
         end if;
-        -- дата вставки
-        
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
     -- документ в СЭП/ВПС
@@ -5015,7 +5016,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     logger.trace('%s: start '||sysdate, l_title);
     for c in (
-        select * from doc_import where
+        select * from doc_import where 
         case
         when booking_flag is not null and notification_flag is null then 'Y'
         else null
@@ -5059,9 +5060,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             end if; */
             --
             -- фиксируем транзакцию каждые 500 документов
-            /*if mod(counter, 500) = 0 then
+            if mod(counter, 500) = 0 then
                 commit;
-            end if;*/
+            end if;
             --
             counter := counter + 1;
             logger.info('Інтернет-банкінг повідомлено про статус док-та: EXT_REF='||c.ext_ref||', REF='||c.ref);
@@ -5071,6 +5072,79 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     logger.trace('%s: doc_count '||counter, l_title);
     logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
+  
+  ----
+  -- notify_ibank - уведомляет интернет-банкинг об оплате документов
+  -- p_kf
+  --
+  procedure notify_ibank_kf(p_kf  bars.mv_kf.kf%type) is
+    l_title     constant varchar2(61) := 'data_import.notify_ibank';
+    l_docid     integer;
+    l_errtext   varchar2(4000);
+    l_errumsg   varchar2(4000);
+    l_erracode  varchar2(4000);
+    l_erramsg   varchar2(4000);
+    l_pos       integer;
+    counter     integer := 0 ;
+  begin
+    logger.trace('%s: start '||sysdate, l_title);
+    for c in (
+        select * from doc_import where mfo_a = p_kf and
+        case
+        when booking_flag is not null and notification_flag is null then 'Y'
+        else null
+        end = 'Y'
+        order by ext_ref)
+    loop
+        if lock_document4notify(c.ext_ref) then
+            --
+            l_docid := to_number(c.ext_ref);
+            --
+            if c.booking_flag='N' then
+                -- неуспешная оплата
+                l_pos := instr(c.booking_err_msg, chr(10));
+                if l_pos>0 then
+                    l_errtext := substr(c.booking_err_msg, 1, l_pos);
+                else
+                    l_errtext := c.booking_err_msg;
+                end if;
+                bars.bars_error.get_error_info(l_errtext, l_errumsg, l_erracode, l_erramsg);
+                --
+                set_status_info(l_docid,
+                    p_statusid              => STATUS_RJCT_BANK,
+                    p_status_change_time    => sysdate,
+                    p_bank_back_reason      => l_errumsg,
+                    p_bank_back_reason_aux  => c.booking_err_msg,
+                    p_bank_back_date        => c.booking_date);
+            else
+                -- успешная оплата
+                set_status_info(l_docid,
+                    p_statusid              => STATUS_VISA_BANK,
+                    p_status_change_time    => sysdate,
+                    p_bank_ref              => to_char(c.ref));
+            end if;
+            -- ставим флаг уведомления и дату
+            update doc_import set notification_flag='Y', notification_date=sysdate
+            where ext_ref=c.ext_ref;
+            -- переносим ref по файлам
+            update doc_export_files set bank_ref=c.ref where doc_id = to_number(c.ext_ref) and doc_file is not null;
+            /*if sql%rowcount=0 then -- если нет такого, удаляем
+              delete from doc_export_files where doc_id = to_number(c.ext_ref);
+            end if; */
+            --
+            -- фиксируем транзакцию каждые 500 документов
+            if mod(counter, 500) = 0 then
+                commit;
+            end if;
+            --
+            counter := counter + 1;
+            logger.info('Інтернет-банкінг повідомлено про статус док-та: EXT_REF='||c.ext_ref||', REF='||c.ref);
+        end if;
+    end loop;
+    commit;
+    logger.trace('%s: doc_count '||counter, l_title);
+    logger.trace('%s: finish '||sysdate, l_title);
+  end notify_ibank_kf;
 
   ----
   -- email_msg - посылка сообщения администраторам модуля синхронизации по e-mail
@@ -5566,6 +5640,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
+            
+            commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
         for c in (select *
@@ -5646,7 +5722,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export;
-  
+
   ---
   -- get_doc_export_old_state
   --
@@ -5657,7 +5733,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45';
     logger.info('doc_export_old_state'||sql%rowcount);
   end;
-  
+
   ----
   -- sync_doc_export_open - синхронизирует документы
   --
@@ -5678,7 +5754,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- точка отката
         savepoint sp;
         -- точка отсчета
-        
+
         --
         replace_tags(l_local_tag, l_remote_tag);
         --
@@ -5690,12 +5766,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             -- устанавливаем точку синхронизации для удаленной таблицы на текущий момент
             rpc_sync.manual_instantiate_now(TAB_DOC_EXPORT, c.kf);
         end loop;
-        
+
         -- загружаем зависшие статусы в временную таблицу
-        get_doc_export_old_state; 
-        
+        get_doc_export_old_state;
+
      --   l_scn := dbms_flashback.get_system_change_number();
-        
+
         -- идем по платежным документам
         for c in (select i.ref, e.doc_id, tos.status_id, e.bank_ref,
                        e.status_change_time, e.bank_accept_date, e.bank_back_date,
@@ -5736,7 +5812,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
                 p_bank_ref                => c.ref,
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
-                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end, 
+                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end,
                 p_is_open                 => 1
                 );
             commit;
