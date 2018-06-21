@@ -11,11 +11,11 @@ begin
    delete from nbu23_rez where fdat = p_dat01 and tip in ('SNA','SDI','SDA','SDM','SDF') and tipa=3;
 
    for k in ( select 'CCK2/'||n.nd||'/'||a.acc ID, a.rnk, a.nbs,a.kv, n.nd, d.cc_id, a.acc,a.nls,a.branch, -a.ostc/100 bv , decode(trim(c.sed),'91',3,c.custtype) custtype, 
-                      f_ddd(a.nbs) ddd, -decode(kv,980,ostc/100,p_icurval(a.kv,ostc,l_dat31)/100) bvq,  d.wdate, d.sdate, c.okpo, c.nmk, 
+                      f_ddd(a.nbs) ddd, -decode(kv,980,ostc/100,p_icurval(a.kv,ostc,l_dat31)/100) bvq,  d.wdate, d.sdate, c.okpo, substr(c.nmk,1,35) nmk, 
                      DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) rz, a.ob22, a.tip, 
                      0 rez23, 0 rezq23, 3 tipa,0 ead, 0eadq, 0 cr, 0 crq,3 tip_351
               from accounts a, nd_acc n, cc_deal d, customer c  
-              where tip in ('SNA','SDI','SDA','SDM','SDF') and ostc<>0 and a.acc=n.acc and n.nd=d.nd and  a.rnk=c.rnk and nbs not in ('3648'))
+              where tip in ('SNA','SDI','SDA','SDM','SDF') and ostc<>0 and a.acc=n.acc and n.nd=d.nd and  a.rnk=c.rnk and nbs not in ('3648','3666'))
    LOOP
       begin 
          select * into rc from rez_cr    where fdat = p_dat01 and nd = k.nd and pd_0 <> 1 and bv > 0 and rownum = 1;
@@ -72,7 +72,7 @@ end;
 /
 show err;
 
-PROMPT *** Create  grants  P_2400 ***
+PROMPT *** Create  grants SNA_SDI_ADD ***
 grant EXECUTE       on SNA_SDI_ADD        to BARS_ACCESS_DEFROLE;
 grant EXECUTE       on SNA_SDI_ADD        to RCC_DEAL;
 grant EXECUTE       on SNA_SDI_ADD        to START1;

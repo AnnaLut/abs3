@@ -40,6 +40,12 @@ exception when others then   if SQLCODE = -00955 then null;   else raise; end if
 end;
 /
 exec  bars.bpa.alter_policies('AGG_MONBALS9'); 
+
+begin EXECUTE IMMEDIATE 'alter table bars.AGG_MONBALS9 add ( tip char(3) ) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+
 commit;
 GRANT SELECT  ON BARS.AGG_MONBALS9 TO BARS_ACCESS_DEFROLE;
 -----------------------------------------------------------
