@@ -184,6 +184,15 @@ exception when others then
  end;
 /
 
+PROMPT *** DROP   constraint FK_STOLST_STOGRP ***
+begin
+ execute immediate '
+   ALTER TABLE BARS.STO_LST DROP CONSTRAINT FK_STOLST_STOGRP
+   ';
+exception when others then 
+  if  sqlcode=-02443 then null; else raise; end if;
+end ;
+/
 
 
 PROMPT *** Create  grants  STO_LST ***
