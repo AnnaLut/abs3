@@ -9,7 +9,7 @@ CREATE OR REPLACE PACKAGE "BARS"."OW_BATCH_OPENING" is
   -- Author  : VITALII.KHOMIDA
   -- Created : 13.04.2017 11:46:26
   -- Purpose :
-  g_header_version constant varchar2(64) := 'version 1.003 02/10/2017';
+  g_header_version constant varchar2(64) := 'version 1.005 20/06/2018';
 
   other_file  constant number := 0; -- будь-яке пакетне відкритя
   salary_file constant number := 1; -- зарплатні файли
@@ -72,7 +72,7 @@ end;
   
 CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
 
-  g_body_version constant varchar2(64) := 'version 1.004 02/10/2017';
+  g_body_version constant varchar2(64) := 'version 1.006 20/06/2018';
 
   g_modcode constant varchar2(3) := 'BPK';
 
@@ -1112,7 +1112,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                                                        ,addr2_bud VARCHAR2(50) PATH 'ADDR2_BUD'
                                                        ,WORK VARCHAR2(254) PATH 'WORK'
                                                        ,office VARCHAR2(32) PATH 'OFFICE'
-                                                       ,date_w DATE PATH 'DATE_W'
+                                                       ,date_w varchar2(30) PATH 'DATE_W'
                                                        ,okpo_w VARCHAR2(14) PATH 'OKPO_W'
                                                        ,pers_cat VARCHAR2(2) PATH 'PERS_CAT'
                                                        ,aver_sum NUMBER(12) PATH 'AVER_SUM'
@@ -1126,7 +1126,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                                                        ,kk_apartment VARCHAR2(32) PATH 'KK_APARTMENT'
                                                        ,kk_postcode VARCHAR2(5) PATH 'KK_POSTCODE'
                                                        ,max_term NUMBER PATH 'MAX_TERM'
-                                                       ,pasp_end_date DATE PATH 'PASP_END_DATE'
+                                                       ,pasp_end_date varchar2(30) PATH 'PASP_END_DATE'
                                                        ,pasp_eddrid_id VARCHAR2(14) PATH 'PASP_EDDRID_ID'
                                                        ,photo_data CLOB PATH 'PHOTO_DATA') xt)
           LOOP
@@ -1200,13 +1200,15 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
              l_batch_list(rec.ROWNUM).pasp_eddrid_id    := SUBSTR(rec.pasp_eddrid_id, 1, 14);
              l_batch_list(rec.ROWNUM).kf                := SYS_CONTEXT('bars_context', 'user_mfo');
              --\\ наполнение коллекции данных
-
-             --// наполнение коллеции фото
-             l_photo_list(rec.ROWNUM).id                := p_id;
-             l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
-             -- конвертнуть до нужного размера
-             l_photo_list(rec.ROWNUM).photo             := convert_photo_data(rec.photo_jpg);
-             --\\ наполнение коллеции фото
+             if rec.photo_jpg is not null then
+               --// наполнение коллеции фото
+               l_photo_list(rec.ROWNUM).id                := p_id;
+               l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
+               -- конвертнуть до нужного размера
+               l_photo_list(rec.ROWNUM).photo             := case when rec.photo_jpg is not null then  convert_photo_data(rec.photo_jpg) else null end;
+               l_photo_list(rec.ROWNUM).kf := sys_context('bars_context','user_mfo');
+             end if; 
+            --\\ наполнение коллеции фото
           END LOOP;
        END IF;
 
@@ -1794,6 +1796,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
     l_open          boolean;
     l_flag_kk       number;
     l_photo         blob;
+    l_iscrm         varchar2(1) := nvl(sys_context('CLIENTCONTEXT', 'ISCRM'), '0');  
     h varchar2(100) := 'ow_batch_opening.create_deal. ';
   begin
 
@@ -1801,12 +1804,21 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
        ' p_card_code=>' || p_card_code || ' p_branch=>' || p_branch || ' p_isp=>' || to_char(p_isp));
 
     if p_proect_id is not null then
-       begin
-          select okpo into l_proect_okpo from bpk_proect where id = p_proect_id;
-       exception when no_data_found then
-          bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
-          bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
-       end;
+       if l_iscrm = '1' then
+         begin
+            select okpo into l_proect_okpo from bpk_proect where  id_cm = p_proect_id;
+         exception when no_data_found then
+            bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
+            bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
+         end;         
+       else
+           begin
+              select okpo into l_proect_okpo from bpk_proect where id = p_proect_id;
+           exception when no_data_found then
+              bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
+              bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
+           end;
+        end if;
     end if;
 
     if p_proect_id is not null then
@@ -2012,8 +2024,6 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                   ,p_external_file_id => p_external_file_id
                   ,p_filetype         => p_filetype
                   ,p_fileid           => l_fileid);
-    -- если файл обработан, создаём сделки
-    IF SQL%FOUND THEN
       -- переменные для создания сделки
       SELECT t.id AS fileid
             ,t.proect_id
@@ -2030,7 +2040,6 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                  ,p_branch    => batch_files_rec.branch
                  ,p_isp       => batch_files_rec.isp);
       -- сделка создана, формируем тикет
-      IF SQL%FOUND THEN
         form_ticket(p_fileid     => l_fileid
                    ,p_ticketname => l_ticketname
                    ,p_ticketdata => l_ticketdata_clob);
@@ -2041,10 +2050,6 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                                 ,dst => l_compressed_blob);
       
         p_ticketdata := l_compressed_blob;
-      
-      END IF;
-    END IF;
-  
   END batch_get_process;
 end;
 /
