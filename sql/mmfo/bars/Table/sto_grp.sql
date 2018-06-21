@@ -130,14 +130,13 @@ end ;
 PROMPT *** Create  constraint PK_STOGRP ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.STO_GRP ADD CONSTRAINT PK_STOGRP PRIMARY KEY (IDG,KF)
+  ALTER TABLE BARS.STO_GRP ADD CONSTRAINT PK_STOGRP PRIMARY KEY (KF,IDG)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
+end;
 /
-
 
 
 
