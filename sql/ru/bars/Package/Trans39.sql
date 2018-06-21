@@ -135,7 +135,11 @@ procedure DEFORM ( p_acc accounts.ACC%type ) Is  -- расформирование на 01.01.201
     Else                   oo.tt    := 'IRR' ; 
     end if; 
 
-    if aa.dazs is not null then update accounts set dazs = null where acc= aa.acc; end if;
+     if aa.dazs is not null then 
+       update customer set DATE_OFF = null where rnk = aa.rnk and DATE_OFF is not null;
+       update accounts set dazs     = null where acc = aa.acc; 
+     end if;
+
 
     oo.ref  := null ; 
     oo.vdat := G_Dat31 ; ----- G_Dat01   ;
@@ -237,7 +241,7 @@ AND  CASE  WHEN (AA.tip ='SDI' and (p.nlsb like '6%' OR P.NLSB LIKE '7%') ) THEN
             )  
     loop 
        x_dat01 := add_months( xx.dat01, +1) ;
-       l_nazn2 := sUBSTR( 'R='|| XX.REF||':'|| XX.NAZN,1,160) ;
+       oo.nazn := sUBSTR( 'R='|| XX.REF||':'|| XX.NAZN,1,160) ;
        If xx.sX < 0 then   oo.dk := 1 ; 
        Else                oo.dk := 0 ; 
        end if;   
