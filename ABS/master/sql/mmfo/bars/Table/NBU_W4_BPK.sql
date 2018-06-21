@@ -74,7 +74,7 @@ declare
     name_already_used exception;
     pragma exception_init(name_already_used, -955);
 begin
-    execute immediate 'create unique index UI_NBU_W4_BPK on NBU_W4_BPK (kf, acc) TABLESPACE BRSMDLI local';
+    execute immediate 'create unique index UI_NBU_W4_BPK on NBU_W4_BPK (kf, acc,nd) TABLESPACE BRSMDLI local';
 exception
     when name_already_used then
          null;
