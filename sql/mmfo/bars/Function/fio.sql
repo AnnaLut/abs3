@@ -3,6 +3,7 @@ prompt function bars.fio
 IS
   l_1space NUMBER;
   l_2space NUMBER;
+  l_3space NUMBER;
   l_int    INTEGER;
   l_nmk    VARCHAR2(70);
   l_result VARCHAR2(70);
@@ -29,6 +30,19 @@ BEGIN
   -- позиция второго пробела
   l_2space := INSTR(SUBSTR(l_nmk, l_1space + 1), ' ');
   IF l_2space = 0 THEN
+     IF    p_par = 1 THEN
+        SELECT SUBSTR(l_nmk, 1, l_1space - 1) INTO l_result FROM dual;
+     ELSIF p_par = 2 THEN
+        SELECT substr(l_nmk, l_1space + 1)    INTO l_result FROM  dual;
+     ELSIF p_par = 3 THEN
+        l_result := '';
+     END IF;
+     RETURN l_result;
+  END IF;
+  
+  -- позиция третьего пробела
+  l_3space := INSTR(SUBSTR(l_nmk, l_2space + 2), ' ');  
+  IF l_3space = 0 THEN
      IF    p_par = 1 THEN
         SELECT SUBSTR(l_nmk, 1, l_1space - 1) INTO l_result FROM dual;
      ELSIF p_par = 2 THEN
