@@ -9,7 +9,7 @@ CREATE OR REPLACE PACKAGE "BARS"."OW_BATCH_OPENING" is
   -- Author  : VITALII.KHOMIDA
   -- Created : 13.04.2017 11:46:26
   -- Purpose :
-  g_header_version constant varchar2(64) := 'version 1.004 17/05/2018';
+  g_header_version constant varchar2(64) := 'version 1.005 20/06/2018';
 
   other_file  constant number := 0; -- будь-яке пакетне відкритя
   salary_file constant number := 1; -- зарплатні файли
@@ -70,9 +70,9 @@ end;
   grant DEBUG,EXECUTE  ON "BARS"."OW_BATCH_OPENING" TO "BARS_ACCESS_DEFROLE";
 /  
   
-CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
+CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
 
-  g_body_version constant varchar2(64) := 'version 1.005 17/05/2018';
+  g_body_version constant varchar2(64) := 'version 1.006 20/06/2018';
 
   g_modcode constant varchar2(3) := 'BPK';
 
@@ -1017,7 +1017,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
        -- ідентифікатор користувача
        IF regexp_like(l_tmp_isp, '^+[0-9]+$') then
           l_batch_header(1).isp :=l_tmp_isp;
-       -- ідентифікація через AD    
+       -- ідентифікація через AD
        elsif regexp_like(l_tmp_isp, '^+([A-z0-9.-]){4,64}\\([A-z0-9.-]){4,64}+$') then
          begin
            select t.user_id
@@ -1129,7 +1129,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                                                        ,addr2_bud VARCHAR2(50) PATH 'ADDR2_BUD'
                                                        ,WORK VARCHAR2(254) PATH 'WORK'
                                                        ,office VARCHAR2(32) PATH 'OFFICE'
-                                                       ,date_w DATE PATH 'DATE_W'
+                                                       ,date_w varchar2(30) PATH 'DATE_W'
                                                        ,okpo_w VARCHAR2(14) PATH 'OKPO_W'
                                                        ,pers_cat VARCHAR2(2) PATH 'PERS_CAT'
                                                        ,aver_sum NUMBER(12) PATH 'AVER_SUM'
@@ -1143,7 +1143,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                                                        ,kk_apartment VARCHAR2(32) PATH 'KK_APARTMENT'
                                                        ,kk_postcode VARCHAR2(5) PATH 'KK_POSTCODE'
                                                        ,max_term NUMBER PATH 'MAX_TERM'
-                                                       ,pasp_end_date DATE PATH 'PASP_END_DATE'
+                                                       ,pasp_end_date varchar2(30) PATH 'PASP_END_DATE'
                                                        ,pasp_eddrid_id VARCHAR2(14) PATH 'PASP_EDDRID_ID'
                                                        ,photo_data CLOB PATH 'PHOTO_DATA') xt)
           LOOP
@@ -1217,12 +1217,14 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
              l_batch_list(rec.ROWNUM).pasp_eddrid_id    := SUBSTR(rec.pasp_eddrid_id, 1, 14);
              l_batch_list(rec.ROWNUM).kf                := SYS_CONTEXT('bars_context', 'user_mfo');
              --\\ наполнение коллекции данных
-
-             --// наполнение коллеции фото
-             l_photo_list(rec.ROWNUM).id                := p_id;
-             l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
-             -- конвертнуть до нужного размера
-             l_photo_list(rec.ROWNUM).photo             := convert_photo_data(rec.photo_jpg);
+             if rec.photo_jpg is not null then
+               --// наполнение коллеции фото
+               l_photo_list(rec.ROWNUM).id                := p_id;
+               l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
+               -- конвертнуть до нужного размера
+               l_photo_list(rec.ROWNUM).photo             := case when rec.photo_jpg is not null then  convert_photo_data(rec.photo_jpg) else null end;
+               l_photo_list(rec.ROWNUM).kf := sys_context('bars_context','user_mfo');
+             end if;
              --\\ наполнение коллеции фото
           END LOOP;
        END IF;
@@ -1694,7 +1696,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                           ,xmlelement("NLS"
                                      ,v.nls)
                           ,xmlelement("ACC"
-                                     ,v.acc)                                     
+                                     ,v.acc)
                           ,xmlelement("RNK"
                                      ,v.rnk)
                           ,xmlelement("CODE"
@@ -1814,6 +1816,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
     l_open          boolean;
     l_flag_kk       number;
     l_photo         blob;
+    l_iscrm         varchar2(1) := nvl(sys_context('CLIENTCONTEXT', 'ISCRM'), '0');  
     h varchar2(100) := 'ow_batch_opening.create_deal. ';
   begin
 
@@ -1821,12 +1824,21 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
        ' p_card_code=>' || p_card_code || ' p_branch=>' || p_branch || ' p_isp=>' || to_char(p_isp));
 
     if p_proect_id is not null then
-       begin
-          select okpo into l_proect_okpo from bpk_proect where id = p_proect_id;
-       exception when no_data_found then
-          bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
-          bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
-       end;
+       if l_iscrm = '1' then
+         begin
+            select okpo into l_proect_okpo from bpk_proect where  id_cm = p_proect_id;
+         exception when no_data_found then
+            bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
+            bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
+         end;         
+       else
+         begin
+            select okpo into l_proect_okpo from bpk_proect where id = p_proect_id;
+         exception when no_data_found then
+            bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
+            bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
+         end;
+       end if;
     end if;
 
     if p_proect_id is not null then
@@ -2012,7 +2024,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
     l_compressed_blob   BLOB;
     l_uncompressed_blob BLOB;
     l_ticketdata_clob   CLOB;
-  
+
     TYPE batch_files_rectype IS RECORD(
        fileid    ow_batch_files.id%TYPE
       ,proect_id ow_batch_files.proect_id%TYPE
@@ -2025,46 +2037,39 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
     l_uncompressed_blob := to_blob('0');
     dbms_lob.createtemporary(l_ticketdata_clob
                             ,FALSE);
-  
+
     -- ипорт файла и его обработка
     import_file_gz(p_filename         => p_filename
                   ,p_filebody         => p_filebody
                   ,p_external_file_id => p_external_file_id
                   ,p_filetype         => p_filetype
                   ,p_fileid           => l_fileid);
-    -- если файл обработан, создаём сделки
-    IF SQL%FOUND THEN
-      -- переменные для создания сделки
-      SELECT t.id AS fileid
-            ,t.proect_id
-            ,t.card_code
-            ,t.branch
-            ,t.isp
-        INTO batch_files_rec
-        FROM ow_batch_files t
-       WHERE t.id = l_fileid;
-      -- создаём сделку
-      create_deal(p_fileid    => batch_files_rec.fileid
-                 ,p_proect_id => batch_files_rec.proect_id
-                 ,p_card_code => batch_files_rec.card_code
-                 ,p_branch    => batch_files_rec.branch
-                 ,p_isp       => batch_files_rec.isp);
-      -- сделка создана, формируем тикет
-      IF SQL%FOUND THEN
-        form_ticket(p_fileid     => l_fileid
-                   ,p_ticketname => l_ticketname
-                   ,p_ticketdata => l_ticketdata_clob);
-        -- преобразовать клоб в блоб
-        l_uncompressed_blob := clob_to_blob(l_ticketdata_clob);
-        -- заархивировать блоб
-        utl_compress.lz_compress(src => l_uncompressed_blob
-                                ,dst => l_compressed_blob);
-      
-        p_ticketdata := l_compressed_blob;
-      
-      END IF;
-    END IF;
-  
+    -- переменные для создания сделки
+    SELECT t.id AS fileid
+          ,t.proect_id
+          ,t.card_code
+          ,t.branch
+          ,t.isp
+      INTO batch_files_rec
+      FROM ow_batch_files t
+     WHERE t.id = l_fileid;
+    -- создаём сделку
+    create_deal(p_fileid    => batch_files_rec.fileid
+               ,p_proect_id => batch_files_rec.proect_id
+               ,p_card_code => batch_files_rec.card_code
+               ,p_branch    => batch_files_rec.branch
+               ,p_isp       => batch_files_rec.isp);
+  -- сделка создана, формируем тикет
+    form_ticket(p_fileid     => l_fileid
+               ,p_ticketname => l_ticketname
+               ,p_ticketdata => l_ticketdata_clob);
+    -- преобразовать клоб в блоб
+    l_uncompressed_blob := clob_to_blob(l_ticketdata_clob);
+    -- заархивировать блоб
+    utl_compress.lz_compress(src => l_uncompressed_blob
+                            ,dst => l_compressed_blob);
+
+    p_ticketdata := l_compressed_blob;
   END batch_get_process;
 end;
 /
@@ -2079,5 +2084,3 @@ PROMPT *** Create  grants  OW_BATCH_OPENING ***
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/OW_BATCH_OPENING.sql =========*** 
  PROMPT =====================================================================================  
- 
- 

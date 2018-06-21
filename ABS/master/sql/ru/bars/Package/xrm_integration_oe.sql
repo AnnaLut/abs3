@@ -5,7 +5,7 @@ IS
 
    TYPE t_cursor IS REF CURSOR;
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.59 02.10.2017';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.61 20.006.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -3721,6 +3721,7 @@ PROCEDURE CreateDepositAgreement (
   PROCEDURE process_transport_unit IS
     l_ticketdata BLOB;
   BEGIN
+    dbms_session.set_context('clientcontext','iscrm','1');
     -- обработка запросов unit_type_id IN (1, 2)
     ow_utl.acc_req_file_processing;
 
@@ -3744,13 +3745,11 @@ PROCEDURE CreateDepositAgreement (
 
         barstrans.transport_utl.save_response(p_id        => rec_tr_unit.id
                                              ,p_resp_data => l_ticketdata);
-        IF SQL%FOUND THEN
           -- установить статус об успешно обработаном запросе
           barstrans.transport_utl.set_transport_state(p_id               => rec_tr_unit.id
                                                      ,p_state_id         => barstrans.transport_utl.trans_state_done
                                                      ,p_tracking_comment => 'Успешно сохранён ответ'
                                                      ,p_stack_trace      => barstrans.file_utl.encode_base64(l_ticketdata));
-        END IF;
         dbms_lob.freetemporary(l_ticketdata);
       EXCEPTION
         WHEN OTHERS THEN
@@ -3761,6 +3760,7 @@ PROCEDURE CreateDepositAgreement (
                                                                            dbms_utility.format_error_backtrace());
       END;
     END LOOP;
+    dbms_session.clear_context('clientcontext','iscrm');
 
   END process_transport_unit;
 
