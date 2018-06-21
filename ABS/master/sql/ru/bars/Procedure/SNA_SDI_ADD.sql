@@ -27,7 +27,7 @@ begin
       end ; 
 
       sna.fdat    := p_dat01;
-      sna.kf      := sys_context('bars_context','user_mfo');
+      --sna.kf      := sys_context('bars_context','user_mfo');
       sna.id      := k.id; 
       sna.rnk     := k.rnk; 
       sna.nbs     := k.nbs;      
