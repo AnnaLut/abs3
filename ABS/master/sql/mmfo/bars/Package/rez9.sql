@@ -279,10 +279,11 @@ create or replace package body REZ9 is
      end;
      begin
         z23.to_log_rez (user_id , 37 , dat01_ ,'Распределение дисконта');
-        for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_ and bv<0)
+        for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_ 
+                  and tip in ('SNA','SDI','SDA','SDM','SDF')  and nbs not in ('3648','3666') )
         LOOP
             for s in (select rowid ri,nd, bv, sum(bv) over  (partition by nd) bv_all  from   nbu23_rez
-                      where fdat = dat01_ and  bv>0 and nd=k.nd and nbs not in ('9129'))
+                      where fdat = dat01_ and  tip not in ('SNA','SDI','SDA','SDM','SDF') and bv>0 and nd=k.nd and nbs not in ('9129'))
             LOOP
                L_diskont := round(s.bv/s.bv_all*k.bv_sna,2);
                update nbu23_rez set diskont  = l_diskont  where rowid=s.ri;
@@ -2175,10 +2176,10 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                  min (f.ID_PROV_TYPE ) ID_PROV_TYPE, decode(f.tip,3,d.vidd,null) vidd,
                                  sum(f.s1) s1, sum(f.s2) s2, sum(f.b1) b1, sum(f.s3)  s3 , sum(f.s4) s4, sum(f.b3)     b3, sum(f.s5) s5, sum(f.s6) s6, sum(f.b5) b5, 
                                  sum(f.s7) s7, sum(f.s8) s8, sum(f.b7) b7, max(f.IRR) irr, max(f.F1) f1, sum(f.FV_CCY) FV_CCY
-                       from  (select Id_currency LCV, Rnk_client  RNK, 
+                       from  (select Id_currency LCV, Rnk_client||f_kf_nn(p_dat01,sys_context('bars_context','user_mfo'))  RNK, 
                                      substr(Unique_Bars_is , 1 , instr(Unique_Bars_is, '/',1) -1 ) TIP,
                                      --substr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), instr(Unique_Bars_is||decode(l_MMFO,1,r.code,''), '/',1) +1 ) ND, 
-                                     substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 ) ND, 
+                                     substr(Unique_Bars_is, instr(Unique_Bars_is, '/',1) +1 )||f_kf_nn(p_dat01,sys_context('bars_context','user_mfo')) ND, 
                                      nvl(Prov_Balance_CCY,0)    REZB, 
                                      nvl(Prov_OffBalance_CCY,0) REZ9, 
                                      nvl(AIRC_CCY,0) AIRC_CCY, 
@@ -2301,6 +2302,11 @@ end div9_old;
 
      -------------------
      If p_mode in (2) then ---------------------------------- разнести по НБУ23 
+        z23.to_log_rez (user_id , 55 , p_dat01 ,'Заповнення нових SNA, SDI, ..... - Початок ');
+        SNA_SDI_ADD (p_DAT01 );
+        z23.to_log_rez (user_id , 55 , p_dat01 ,'Заповнення нових SNA, SDI, ..... - Кінець ');
+        z23.BV_upd(z_dat01); -- BVu = зкориг. бал.варт на суму невизнаних дох.SDI,SNA
+        ut2(z_dat01); -- Процедура урегулирования дисконта/невизнаних доходів для договора в разных валютах (NBU23_REZ (DISKONT <--> REZ23)
         z23.to_log_rez (user_id , 55 , p_dat01 ,'Розподіл FINEVARE - Початок ');
         update PRVN_OSAq set comm = null where rezb <> 0 or rez9<> 0;
         commit;
@@ -2364,7 +2370,7 @@ end div9_old;
          end;
 
          OPEN s1 FOR select ROWID, nls, BVuq, KV, BVu, Div0 (BVuq, sum(BVuq) over (partition by 1)), 0  from nbu23_rez
-                     where fdat= z_dat01 and BVuq >= 0 and ( rez9 = 0 or p_mode = 12 ) and acc in (x.ND,l_acc) AND ( id like 'DEB%') and tipa = 17;
+                     where fdat= z_dat01 and BVuq >= 0 and ( rez9 = 0 or p_mode = 12 ) and (acc in (x.ND,l_acc) or nd in (x.ND,l_acc))  AND ( id like 'DEB%') and tipa = 17;
 
       ElsIf x.TIP = 21 then
 
@@ -2414,9 +2420,12 @@ end div9_old;
         PRVN_FLOW.SeND_MSG (p_txt => 'END:'||l_msg );
      end if;
      z23.to_log_rez (user_id , 55 , p_dat01 ,'Розподіл FINEVARE - Кінець ');
-     z23.to_log_rez (user_id , 55 , p_dat01 ,'Заповнення нових SNA, SDI, ..... - Початок ');
-     SNA_SDI_ADD (p_DAT01 );
-     z23.to_log_rez (user_id , 55 , p_dat01 ,'Заповнення нових SNA, SDI, ..... - Кінець ');
+     begin EXECUTE IMMEDIATE 'drop table TEST_OSA_REZ_'|| to_char(z_dat01,'ddmmyyyy')||'_'||sys_context('bars_context','user_mfo') ;
+     exception when others then   if SQLCODE = -00942 then null;   else raise; end if;   -- ORA-00942: table or view does not exist
+     end;
+
+     EXECUTE IMMEDIATE '    create table TEST_OSA_REZ_'|| to_char(z_dat01,'ddmmyyyy') ||'_'|| sys_context('bars_context','user_mfo') || ' AS select * from PRVN_OSA '; 
+
   end;
 end;
 /

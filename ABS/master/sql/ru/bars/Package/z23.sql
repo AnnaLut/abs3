@@ -469,13 +469,20 @@ begin
    end LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'<> BVU = BV');
    commit;
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> BVU = 0');
+   for k in (select rowid RI from nbu23_rez where fdat=p_dat01 and tip in ('SDI','SDA','SDM','SDF') and bv>0)
+   LOOP
+      update nbu23_rez set bvu = 0, bvuq = 0 where rowid = k.ri;
+   end LOOP;
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'<> BVU = 0');
+   commit;
    l_commit := 0;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SNA');
    for x in (select nd, BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip ='SNA' and bv <0 and nls < '4')
    loop
       for  y in (select rowid RI, bv, tip, BVu    from nbu23_rez
                  where fdat = z_dat01 and kv = x.kv  and bv > 0 and nd= x.nd and id like x.ID||'%' and nls<'4'
-                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SPI',4, 'SP ',5, 'SS ',6, 10 ),bv
+                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),bv
                  )
       loop y.BVu := x.BV + y.BV;
            If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0;
@@ -493,11 +500,12 @@ begin
    --------------------------
    l_commit := 0;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDI');
-   for x in (select nd,  BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip ='SDI' and bv <0 and nls < '4')
+   for x in (select nd,  BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDI','SDA','SDM','SDF') and bv <>0 and nls < '4')
    loop
       for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu  from nbu23_rez
                  where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) > 0 and nd= x.nd and id like x.ID||'%' and nls < '4'
-                 order by  decode (tip, 'SP ',1, 'SS ',2, 'SPI',3, 'SPN',4, 'SNO',5, 'SN ',6, 10 )
+                 and tip not in ('SDI','SDA','SDM','SDF')     
+                 order by  decode (tip, 'SP ',1, 'SS ',2, 'SPN',4, 'SNO',5, 'SN ',6, 10 )
                  )
       loop y.BVu := x.BV + y.BV;
          If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0;
