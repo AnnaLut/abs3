@@ -375,12 +375,12 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                     }
                     else
                     {
-                        InternalSavePersonCards(AsEbkRequest(ebkResponse));
+                        int processedCardsCount = InternalSavePersonCards(AsEbkRequest(ebkResponse));
 
                         Logger.Info(string.Format(
                             "{0} Віддалений сервіс ЄБК успішно виконав команду синхронізації картки клієнта ЮО з RNK={1}",
                             _logMessagePrefix, rnk));
-                        status = "OK";
+                        status = processedCardsCount.ToString();
                     }
                 }
                 else

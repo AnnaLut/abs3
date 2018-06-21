@@ -365,12 +365,12 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                     }
                     else
                     {
-                        InternalSavePersonCards(AsEbkRequest(ebkResponse));
+                        int processedCardsCount = InternalSavePersonCards(AsEbkRequest(ebkResponse));
 
                         Logger.Info(string.Format(
                             "{0} Віддалений сервіс ЄБК успішно виконав команду синхронізації картки клієнта  ФО з RNK={1}",
                             LogMessagePrefix, rnk));
-                        status = "OK";
+                        status = processedCardsCount.ToString();
                     }
                 }
                 else
