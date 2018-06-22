@@ -14,9 +14,10 @@ IS
  --------  ----- ------------------------------------------------------------------------
  31.07.07  Инна  Создание пакета
  06.02.18  Геннадий Лившиц изменения в рамках задачи COBUMMFO-5176
+ 14.06.18  Геннадий Лившиц добавлена функция установки бонуса для депозитов (с учетом бонуса за кол-во пролонгаций)
 ****************************************************************************************/
 -- поддержка версионности пакета
-g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.02 24/02/2018';
+g_header_version  CONSTANT VARCHAR2(64)  := 'version 1.03 14/06/2018';
 g_awk_header_defs CONSTANT VARCHAR2(512) := '';
 
 -- фиксация типа данных и маск.размерности для текстов сообщений
@@ -54,7 +55,7 @@ FUNCTION estimate_bonus
 --
 FUNCTION get_bonus_id
   (p_bonus_code  bars.dpt_bonuses.bonus_code%type, -- код бонуса
-   p_date date default null) 
+   p_date date default null)
    RETURN number;
 
 --
@@ -64,15 +65,15 @@ FUNCTION get_MMFO_ZPcard_count
   (p_rnk IN customer.rnk%type,
    p_dat IN date default null)
    RETURN number;
---   
--- Вирахування бонуса 
+--
+-- Вирахування бонуса
 --
 FUNCTION get_bonus_value
   (p_bonusid     dpt_bonuses.bonus_id%type,
    p_bonusquery  dpt_bonuses.bonus_query%type default null,
    p_dat         date default null) -- если null, то на текущую дату
    RETURN number;
-   
+
 --
 -- установка запросов на получение льготы по договору
 --
@@ -138,6 +139,14 @@ PROCEDURE set_bonus_rate
    p_bonusval OUT ratetype);                           -- размер льготы по факту
 
 --
+-- окончательный расчет и установка бонусной %% ставки (с учетом бонуса за кол-во пролонгаций)
+--
+PROCEDURE set_bonus_rate_long
+   (p_dptid    IN dpt_deposit.deposit_id%type,
+    p_bdate    IN fdat.fdat%type,
+    p_bonusval OUT ratetype);
+
+--
 -- окончательный расчет и установка бонусной %-ной ставки (без ошибок)
 PROCEDURE set_bonus_rate_web
   (p_dptid    IN  dpt_deposit.deposit_id%type,         -- идентификатор договора
@@ -169,7 +178,7 @@ PROMPT =========================================================================
 
 CREATE OR REPLACE PACKAGE BODY dpt_bonus
 IS
-g_body_version  CONSTANT varchar2(64)  := 'version 1.17 30/05/2018';
+g_body_version  CONSTANT varchar2(64)  := 'version 1.17 14/06/2018';
 g_awk_body_defs CONSTANT varchar2(512) := ' ';
 g_modcode       CONSTANT varchar2(3)   := 'DPT';
 g_reqtype       CONSTANT char(5)       := 'BONUS';
@@ -273,27 +282,27 @@ BEGIN
 
   if p_dat is null then
     l_dat := trunc(sysdate);
-  else 
+  else
     l_dat := trunc(p_dat);
   end if;
-  
+
   if p_bonusquery is null then
-    begin 
-     select bonus_query 
+    begin
+     select bonus_query
      into l_bonusquery
      from dpt_bonuses
-     where bonus_id = p_bonusid; 
+     where bonus_id = p_bonusid;
     exception when no_data_found then
       -- Ошибка вычисления размера льготы
      bars_error.raise_nerror(g_modcode, 'BONUS_CALC_ERROR', substr(SQLERRM,1,g_errmsg_dim));
     end;
-  else 
+  else
     l_bonusquery := p_bonusquery;
-  end if;    
-     
+  end if;
+
   bars_audit.trace('%s льгота № %s, запрос для расчета = %s на дату %s' ,
                    l_title, to_char(p_bonusid), l_bonusquery, to_char(l_dat,'DD.MM.YYYY'));
-      
+
   EXECUTE IMMEDIATE l_bonusquery INTO l_bonusval USING l_dat;
   bars_audit.trace('%s льгота = %s', l_title, l_bonusval);
 
@@ -318,31 +327,31 @@ IS
   l_bonusid bars.dpt_bonuses.bonus_id%type;
   l_date date;
 BEGIN
-  
+
   begin
   if p_date is null then
 
-    select bonus_id 
+    select bonus_id
     into l_bonusid
-    from bars.dpt_bonuses 
-    where bonus_code = p_bonus_code 
-      and bonus_activity = 'Y' 
+    from bars.dpt_bonuses
+    where bonus_code = p_bonus_code
+      and bonus_activity = 'Y'
       and bonus_off is null;
 
-  else 
+  else
 
-    select bonus_id 
+    select bonus_id
     into l_bonusid
-    from bars.dpt_bonuses 
-    where bonus_code = p_bonus_code 
-      and bonus_activity = 'Y' 
+    from bars.dpt_bonuses
+    where bonus_code = p_bonus_code
+      and bonus_activity = 'Y'
       and p_date between bonus_on and nvl(bonus_off, to_date('31.12.4999','DD.MM.YYYY'));
 
-  end if;    
+  end if;
 
   exception when others then
     bars_error.raise_nerror(g_modcode, 'BONUS_CHECK_ERROR', substr(SQLERRM,1,g_errmsg_dim));
-  end;      
+  end;
 
   bars_audit.trace('%s bonus_id = %s', l_title, l_bonusid);
   RETURN l_bonusid;
@@ -357,7 +366,7 @@ FUNCTION get_MMFO_ZPcard_count
    RETURN number
 IS
   l_title      varchar2(60) := 'dpt_bonus(ZPcard_count): ';
-  l_ZPcard_count number(1)    := 0;
+  l_ZPcard_count number	      := 0;
   l_cnt          number       := 0;
   l_dat date;
   l_mfo mv_kf.kf%type;
@@ -365,33 +374,56 @@ BEGIN
   if p_dat is null then
     l_dat := trunc(sysdate);
   else
-    l_dat := trunc(p_dat);  
+    l_dat := trunc(p_dat);
   end if;
-  
+
   bars_audit.trace('%s RNK клиента = %s дата %s', l_title, p_rnk, l_dat);
-  
-  /* --Пока в ВЕБе нельзя перескакивать на соседние МФО. После изменения барс-контекста, можно будет
-  l_mfo := nvl(gl.aMFO,'/');
-    
-  --необходимо учитывать ЗП-проекты по всем МФО
-  bc.go('/');
-  FOR cur IN (SELECT kf FROM bars.mv_kf) LOOP --cur
-    bc.go(cur.kf);
-    bars_audit.trace('%s MFO = %s', l_title, cur.kf);
-  */    
-    SELECT count(acc)
-    INTO l_cnt
-    FROM accounts
-    WHERE rnk = p_rnk
-      AND NBS = 2625
-      AND OB22 IN ('24', '27', '31')
-      AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'))-1;
-    
-    l_ZPcard_count := l_ZPcard_count + l_cnt;
-   /* bars_audit.trace('%s кол-во ЗП-карт = %s', l_title, to_char(l_cnt));
-  END LOOP;
-  bc.go(l_mfo);
-  */    
+
+   /*
+     \* --Пока в ВЕБе нельзя перескакивать на соседние МФО. После изменения барс-контекста, можно будет
+     l_mfo := nvl(gl.aMFO,'/');
+
+     --необходимо учитывать ЗП-проекты по всем МФО
+     bc.go('/');
+     FOR cur IN (SELECT kf FROM bars.mv_kf) LOOP --cur
+       bc.go(cur.kf);
+       bars_audit.trace('%s MFO = %s', l_title, cur.kf);
+     *\
+       SELECT count(acc)
+       INTO l_cnt
+       FROM accounts
+       WHERE rnk = p_rnk
+         AND NBS = 2625
+         AND OB22 IN ('24', '27', '31')
+         AND l_dat between daos and nvl(dazs, to_date('31.12.4999','DD.MM.YYYY'))-1;
+
+       l_ZPcard_count := l_ZPcard_count + l_cnt;
+      \* bars_audit.trace('%s кол-во ЗП-карт = %s', l_title, to_char(l_cnt));
+     END LOOP;
+     bc.go(l_mfo);
+     *\
+    */
+    --COBUMMFO-8178
+    select count(*)
+      into l_ZPcard_count
+      from bars.accounts a
+      join bars.w4_Acc wa
+        on wa.acc_pk = a.acc
+--       and l_dat between nvl(wa.dat_begin, date '1991-01-01') and nvl(wa.dat_end, date '4991-01-01')
+      join bars.w4_Card wc
+        on wc.code = wa.card_code
+--       and l_dat between nvl(wc.date_open, date '1991-01-01') and nvl(wc.date_close, date '4991-01-01')
+      join bars.w4_product wp
+        on wp.code = wc.product_code
+       and wp.grp_code = 'SALARY'
+--       and l_dat between nvl(wc.date_open, date '1991-01-01') and nvl(wc.date_close, date '4991-01-01')
+     where 1 = 1
+       and wp.name not like '%STUD%'
+       and wa.card_code not like '%STUD%'
+       and a.rnk = p_rnk
+       and l_dat between daos and
+           nvl(dazs, to_date('31.12.4999', 'DD.MM.YYYY')) - 1;
+
   bars_audit.trace('%s Общее кол-во ЗП-карт = %s', l_title, to_char(l_ZPcard_count));
 
   RETURN l_ZPcard_count;
@@ -754,20 +786,20 @@ BEGIN
     IF l_bonuscheck = 'Y' THEN
        BEGIN
          -- COBUMMFO-5176
-         if b.bonus_code = 'DPWB' or b.bonus_code = 'DPZP' then  -- для он-лайн бонуса берем дату открытия договора
+         if b.bonus_code = 'DPWB' or b.bonus_code = 'DPZP' or b.bonus_code = 'EXTN' then  -- для он-лайн/ЗП/Пролонгация бонуса берем дату открытия договора
            if b.type_cod = 'MPRG' then -- но, если депозит прогрессивный, то берем дату открытия или каждой 12-й пролонгации
               select nvl(max(dat_begin), l_dpt.dat_begin)
               into l_bonusdate
               from bars.dpt_deposit_clos
               where deposit_id = l_dpt.deposit_id
               and nvl(cnt_dubl,0) = trunc(nvl(l_dpt.cnt_dubl,0)/12) * 12;
-            else 
+            else
               l_bonusdate := l_dpt.dat_begin;
-            end if;  
+            end if;
           l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query, l_bonusdate);
-         else 
-         l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
-         end if;  
+         else
+           l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
+         end if;
        EXCEPTION
          WHEN bars_error.err THEN
            IF bars_error.get_nerror_code(sqlerrm) = 'DPT-'||'BONUS_CALC_ERROR' THEN
@@ -1149,17 +1181,17 @@ BEGIN
     -- расчет значения льготы
     BEGIN
       --COBUMMFO-5176
-      if b.bonus_code = 'DPWB' or b.bonus_code = 'DPZP' then  -- для он-лайн бонуса берем дату открытия договора
+      if b.bonus_code = 'DPWB' or b.bonus_code = 'DPZP' or b.bonus_code = 'EXTN' then  -- для он-лайн бонуса берем дату открытия договора
            if l_typecode = 'MPRG' then -- но, если депозит прогрессивный, то берем дату открытия или каждой 12-й пролонгации
               select nvl(max(dat_begin), l_datbegin)
               into l_datbegin
               from bars.dpt_deposit_clos
               where deposit_id = p_dptid
               and nvl(cnt_dubl,0) = trunc(nvl(l_cntdubl,0)/12) * 12;
-            end if;  
+            end if;
         l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query, l_datbegin);
-      else 
-      l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
+      else
+        l_bonusvalue := get_bonus_value (b.bonus_id, b.bonus_query);
       end if;
     EXCEPTION
       WHEN bars_error.err THEN
@@ -1289,7 +1321,7 @@ BEGIN
 
   --IF NVL(l_totalbonus, 0) != 0 THEN
   -- 12/02/2018 закомментировано, т.к. если бонус уменьшился (стал равен 0), это также нужно записать
-  
+
     BEGIN
       SELECT acc, limit, kv
         INTO l_dptaccid, l_dptlimit, l_dptcur
@@ -1378,7 +1410,7 @@ BEGIN
            -- невозможно установить льготную %-ную ставку по договору (размер, дата)
            bars_error.raise_nerror(g_modcode, 'SET_BONUS_RATE_FAILED',
                                    to_char(p_dptid), to_char(l_totalbonus), to_char(p_bdate,'DD/MM/YYYY'));
-          
+
        END;
        bars_audit.trace('%s добавление ставки выполнено', l_title);
 
@@ -1403,6 +1435,259 @@ BEGIN
   bars_audit.trace('%s выход', l_title);
 
 END set_bonus_rate;
+
+--
+-- окончательный расчет и установка бонусной %% ставки (с учетом бонуса за кол-во пролонгаций)
+--
+PROCEDURE set_bonus_rate_long
+   (p_dptid    IN dpt_deposit.deposit_id%type,
+    p_bdate    IN fdat.fdat%type,
+    p_bonusval OUT ratetype)
+IS
+  l_title      varchar2(60)       := 'dpt_bonus(set_bonus_rate_long): ';
+  l_branch     branch.branch%type := sys_context('bars_context','user_branch');
+  l_totalbonus ratetype;
+  l_dptaccid   dpt_deposit.acc%type;
+  l_dptlimit   dpt_deposit.limit%type;
+  l_dptcur     dpt_deposit.kv%type;
+  l_dptrate    int_ratn%rowtype;
+  l_operation  int_op.op%type;
+  l_baserate   int_ratn.br%type;
+  l_indvrate   int_ratn.ir%type;
+  l_currrate   int_ratn.ir%type;
+  l_vdptt      tts.tt%type;
+  l_indrate    bars.Dpt_Vidd_Extdesc%rowtype;
+  l_dptvidd    dpt_deposit.vidd%type;
+  l_dptdatz    dpt_deposit.datz%type;
+  l_dptcntdbl  dpt_deposit.cnt_dubl%type;
+  l_viddext    dpt_vidd.extension_id%type;
+  l_viddtype   dpt_vidd.type_cod%type;
+  l_viddbr     dpt_vidd.br_id%type;
+  l_dptdatbeg  dpt_deposit.dat_begin%type;
+BEGIN
+
+  bars_audit.trace('%s старт с параметром № %s', l_title, to_char(p_dptid));
+
+  IF request_processing_done (p_dptid) != 'Y' THEN
+     -- невозможно рассчитать итоговую льготу: по договору есть необработанные запросы
+     bars_error.raise_nerror(g_modcode, 'DPT_BONUS_IN_WORK', to_char(p_dptid));
+  END IF;
+
+  IF bonus_fixed (p_dptid) = 'Y' THEN
+     bars_audit.trace('%s по договору № %s уже установлена бонусная ставка', l_title, to_char(p_dptid));
+     RETURN;
+  END IF;
+
+  SELECT nvl(sum(bonus_value_fact),0)
+    INTO l_totalbonus
+    FROM dpt_bonus_requests
+   WHERE dpt_id = p_dptid
+     AND request_state = 'ALLOW'
+     AND request_deleted = 'N';
+  bars_audit.trace('%s суммарная льгота = %s', l_title, to_char(l_totalbonus));
+  
+  
+    BEGIN
+      SELECT d.acc, d.limit, d.kv, d.vidd, d.datz, nvl(d.cnt_dubl,0), nvl(dv.extension_id, 0), d.dat_begin, dv.type_cod, dv.br_id
+        INTO l_dptaccid, l_dptlimit, l_dptcur, l_dptvidd, l_dptdatz, l_dptcntdbl, l_viddext, l_dptdatbeg, l_viddtype, l_viddbr
+        FROM dpt_deposit d,
+             dpt_vidd dv
+       WHERE deposit_id = p_dptid
+         and dv.vidd = d.vidd;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        -- не найден депозитный договор
+        bars_error.raise_nerror(g_modcode, 'DPT_NOT_FOUND', to_char(p_dptid));
+    END;
+    bars_audit.trace('%s внутр.№ деп.счета = %s', l_title, to_char(l_dptaccid));
+
+    BEGIN
+      SELECT i.*
+        INTO l_dptrate
+        FROM int_ratn i
+       WHERE i.acc = l_dptaccid
+         AND i.id = 1
+         AND i.bdat = (SELECT max(r.bdat) FROM int_ratn r
+                        WHERE r.acc = i.acc AND r.id = i.id AND r.bdat <= p_bdate);
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        -- не найдена базовая %-ная ставка по договору на дату
+        bars_error.raise_nerror(g_modcode, 'DPT_RATE_NOT FOUND',
+                                to_char(p_dptid), to_char(p_bdate,'DD/MM/YYYY'));
+    END;
+    bars_audit.trace('%s ставка без бонуса (ir, op, br) = (%s, %s, %s)', l_title,
+                     to_char(l_dptrate.ir), to_char(l_dptrate.op), to_char(l_dptrate.br));
+
+    BEGIN
+            select type_id
+                   ,ext_num
+                   ,term_mnth
+                   ,term_days
+                   ,indv_rate
+                   ,oper_id
+                   ,base_rate
+                   ,method_id
+            into l_indrate   --индивидуальная ставка для этого кол-ва пролонгаций
+            from (select indv_rate,
+                    type_id,
+                    oper_id,
+                    case when method_id not in (5, 9) then
+                          base_rate else
+                          (select v.br_id
+                          from dpt_vidd_update v
+                          where v.vidd = l_dptvidd
+                          and dateu =
+                              (select max(dateu)
+                              from dpt_vidd_update v
+                              where v.vidd = l_dptvidd
+                              and dateu <= l_dptdatz + 0.99999))
+                    end base_rate,
+                    method_id,
+                    ext_num,
+                    term_mnth,
+                    term_days,
+                    lead(ext_num) over(partition by type_id order by ext_num) - 1 next_num
+                  from dpt_vidd_extdesc
+                  where type_id = l_viddext) idve
+               where 1=1 --base_rate = l_dptrate.br
+                and ((l_dptcntdbl between ext_num and next_num)
+                      or (next_num is null and l_dptcntdbl >= ext_num));     
+               
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        -- не найдена базовая %-ная ставка для этого номера пролонгации по этому виду вклада
+        --      bars_error.raise_nerror(g_modcode, 'EXTENSION_RATE_NOT_FOUND',
+        --                        to_char(p_dptid), to_char(p_bdate,'DD/MM/YYYY'), ' vidd = '||to_char(l_dptvidd));
+              l_indrate := null;
+    END;
+    
+    bars_audit.trace('%s ставка за % пролонгаций для вида %s , метода %s = %s)', l_title,
+                     to_char(l_dptcntdbl), to_char(l_dptvidd), to_char(l_viddext), to_char(nvl(l_indrate.indv_rate,0)));  
+          
+    l_currrate := dpt_web.get_dptrate (l_dptaccid, l_dptcur, l_dptlimit, l_dptrate.bdat);
+    bars_audit.trace('%s значение текущей ставки по вкладу = %s', l_title, to_char(l_currrate));
+    
+    if l_indrate.oper_id is not null then
+       
+    l_totalbonus := case
+                    when l_indrate.oper_id = 1 then
+                              l_totalbonus + nvl(l_indrate.indv_rate,0)
+                    when l_indrate.oper_id = 2 then
+                              l_totalbonus - nvl(l_indrate.indv_rate,0)
+                    when l_indrate.oper_id = 3 then
+                              l_totalbonus * nvl(l_indrate.indv_rate,0)
+                    when l_indrate.oper_id = 4 then
+                      case when nvl(l_indrate.indv_rate,0) <> 0 then
+                              l_totalbonus / l_indrate.indv_rate
+                           else l_totalbonus end   
+                    end;
+    else 
+      l_totalbonus := l_totalbonus + nvl(l_indrate.indv_rate,0);                      
+      if l_totalbonus > 0 then
+	l_indrate.oper_id := nvl(l_dptrate.op, 1);                   
+      end if;
+    end if;
+
+    l_baserate :=
+      case when nvl(l_indrate.method_id,0) = 2 then
+            l_indrate.base_rate
+           when nvl(l_indrate.method_id,0) = 4 then
+            coalesce(l_viddbr, l_indrate.base_rate)  
+           when nvl(l_indrate.method_id,0) = 5 then
+            l_indrate.base_rate
+           when nvl(l_indrate.method_id,0) = 6 then
+            l_dptrate.br
+           when nvl(l_indrate.method_id,0) = 7 then
+            coalesce(l_viddbr, l_indrate.base_rate)
+           when nvl(l_indrate.method_id,0) = 8 then                 
+            case when l_viddtype = 'MPRG' then l_indrate.base_rate
+                 else coalesce(l_viddbr, l_indrate.base_rate)
+            end   
+           when nvl(l_indrate.method_id,0) = 9 then 
+             coalesce(l_viddbr, l_indrate.base_rate)
+           when nvl(l_indrate.method_id,0) = 10 then 
+             l_dptrate.br
+           else 
+             l_dptrate.br
+        end;  
+                               
+    IF nvl(l_baserate, 0) > 0 THEN
+       l_indvrate  := l_totalbonus;
+       l_operation := case when nvl(l_indrate.indv_rate, 0) != 0 and nvl(l_indrate.oper_id, 0) = 0 
+                           then 1
+                           else l_indrate.oper_id end;
+    ELSE
+       l_indvrate  := l_currrate + l_totalbonus;
+       l_operation := null;
+       l_baserate  := null;
+    END IF;
+    bars_audit.trace('%s ставка с бонусом (ir, op, br) = (%s, %s, %s)', l_title,
+                     to_char(l_indvrate), to_char(l_operation), to_char(l_baserate));
+
+    IF l_dptrate.bdat = p_bdate THEN
+
+       bars_audit.trace('%s изменение ставки, установленной %s', l_title, to_char(p_bdate,'DD/MM/YYYY'));
+
+       BEGIN
+         UPDATE int_ratn
+            SET  br = l_baserate,
+                 ir = l_indvrate,
+                 op = l_operation
+          WHERE acc = l_dptaccid
+            AND id = 1
+            AND bdat = l_dptrate.bdat;
+       EXCEPTION
+         WHEN OTHERS THEN
+           -- невозможно установить льготную %-ную ставку по договору (размер, дата)
+           bars_error.raise_nerror(g_modcode, 'SET_BONUS_RATE_FAILED',
+                                   to_char(p_dptid), to_char(l_totalbonus), to_char(p_bdate,'DD/MM/YYYY'));
+
+       END;
+       IF SQL%ROWCOUNT = 0 THEN
+          -- невозможно установить льготную %-ную ставку по договору (размер, дата)
+          bars_error.raise_nerror(g_modcode, 'SET_BONUS_RATE_FAILED',
+                                  to_char(p_dptid), to_char(l_totalbonus), to_char(p_bdate,'DD/MM/YYYY'));
+       END IF;
+       bars_audit.trace('%s изменение ставки выполнено', l_title);
+
+    ELSE
+       bars_audit.trace('%s добавление ставки, установленной %s', l_title, to_char(p_bdate,'DD/MM/YYYY'));
+
+       BEGIN
+         INSERT INTO int_ratn (acc, id, bdat, ir, br, op)
+         VALUES (l_dptaccid, 1, p_bdate, l_indvrate, l_baserate, l_operation);
+       EXCEPTION
+        when dup_val_on_index then
+        UPDATE int_ratn
+            SET  br = l_baserate,
+                 ir = l_indvrate,
+                 op = l_operation
+          WHERE acc = l_dptaccid
+            AND id = 1
+            AND bdat = l_dptrate.bdat;
+         WHEN OTHERS THEN
+           -- невозможно установить льготную %-ную ставку по договору (размер, дата)
+           bars_error.raise_nerror(g_modcode, 'SET_BONUS_RATE_FAILED',
+                                   to_char(p_dptid), to_char(l_totalbonus), to_char(p_bdate,'DD/MM/YYYY'));
+
+       END;
+       bars_audit.trace('%s добавление ставки выполнено', l_title);
+
+    END IF;
+
+  p_bonusval := l_totalbonus;
+  begin
+  INSERT INTO dpt_depositw (dpt_id, tag, value)
+  VALUES (p_dptid, 'BONUS', to_char(l_totalbonus));
+  exception when dup_val_on_index then
+  update dpt_depositw
+     set value = to_char(l_totalbonus)
+   where tag = 'BONUS' and dpt_id = p_dptid;
+  end;
+  bars_audit.trace('%s значение бонуса записано в доп.реквизиты вклада', l_title);
+
+  bars_audit.trace('%s выход', l_title);
+
+END set_bonus_rate_long;
 --
 --
 --
@@ -1497,7 +1782,7 @@ EXCEPTION
     -- ошибка управления привязкой льготы к виду договора
     bars_error.raise_nerror(g_modcode, 'ADD_VIDD2BONUS_FAILED',
                             to_char(p_bonusid), to_char(p_typeid), to_char(p_rang),
-                            substr(SQLERRM,1,g_errmsg_dim  ));
+                            substr(SQLERRM,1,g_errmsg_dim	));
 END manage_dptviddbonus;
 --
 --
@@ -1522,6 +1807,7 @@ END body_version;
 
 END dpt_bonus;
 /
+
 show err;
 
 PROMPT *** Create  grants  DPT_BONUS ***
@@ -1529,6 +1815,7 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on DPT_BONUS       to DPT_ADMIN;
 grant EXECUTE                                                                on DPT_BONUS       to DPT_ROLE;
 grant EXECUTE                                                                on DPT_BONUS       to WR_ALL_RIGHTS;
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_bonus.sql =========*** End *** =

@@ -3,6 +3,8 @@ PROMPT =========================================================================
 PROMPT *** Run *** ====== Scripts /Sql/BARS/Procedure/dpt_bonus_addit.sql =======*** Run ***
 PROMPT ===================================================================================== 
 
+PROMPT *** Create  procedure dpt_bonus_addit ***
+
 create or replace procedure dpt_bonus_addit is
   l_title constant varchar2(16) := 'dpt_bonus_addit:';
   l_bonusval  number;
@@ -20,8 +22,8 @@ create or replace procedure dpt_bonus_addit is
   -- v 3.0 16.03.2018 - by Livshyts
   --== Переделан основной запрос, отбирающий депозиты, чтобы выбирались не все, у кого сумма изменилась и попала в бонусную сетку,
   --== а только те, что "перескочили ступеньку" и у них должен поменяться бонус
-  -- v 3.1 24.05.2018 - by Livshyts
-  --== Добавлено условие - для ступенчатых ставок бонус не должен уменьшаться
+  -- v 3.1 24.05.2018 - by Livshyts --== Добавлено условие - для ступенчатых ставок бонус не должен уменьшаться
+  -- v 3.3 14.06.2018 - by Livshyts --== Бонус рассчитывается с учетом бонуса за пролонгацию 
 
 BEGIN
   bc.go('/');
@@ -116,7 +118,7 @@ BEGIN
         dpt_bonus.set_bonus(i.deposit_id); -- рассчитываем бонус
         commit;
         bars_audit.trace('%s льготы рассчитаны', l_title);
-        
+
         SELECT nvl(sum(bonus_value_fact),0)
          INTO l_totalbonus
          FROM dpt_bonus_requests
@@ -124,77 +126,24 @@ BEGIN
            AND request_state = 'ALLOW'
            AND request_deleted = 'N';
          bars_audit.trace('%s суммарная льгота = %s', l_title, to_char(l_totalbonus));
-         
+
         -- если депозит ступенчатый, ставка не должна уменьшаться
-        if (l_brtype = 'TIER' and l_totalbonus > l_irate) or (l_brtype <> 'TIER') then 
+        if (l_brtype = 'TIER' and l_totalbonus > l_irate) or (l_brtype <> 'TIER') then
         --поэтому, если ставка ступенчата и бонус больше, чем есть или ставка не ступенчатая
         --устанавливаем бонус
+         
          delete from dpt_depositw
-           where tag = 'BONUS'
-             and DPT_ID = i.deposit_id;
-        DPT_BONUS.SET_BONUS_RATE(i.deposit_id, i.pdat + 1, l_bonusval);
-        bars_audit.trace('%s встановлена бонусна ставка = %s',
+          where tag = 'BONUS'
+            and DPT_ID = i.deposit_id;
+
+         DPT_BONUS.SET_BONUS_RATE_LONG(i.deposit_id, i.pdat + 1, l_bonusval);
+        
+         bars_audit.trace('%s встановлена бонусна ставка = %s',
                            l_title,
                            to_char(l_bonusval));
-        else 
-          null;                   
-        end if;  
-        
-        -- если прогрессивный
-        if i.type_code = 'MPRG' then       --#3
-
-          begin
-            select *
-              into l_indrate --индивидуальная ставка для этого кол-ва пролонгаций
-              from bars.Dpt_Vidd_Extdesc dve
-             where 1=1
-              and case when method_id not in (5, 9) then base_rate
-                       else (select v.br_id
-                             from bars.dpt_vidd_update v
-                             where v.vidd = i.vidd
-                                  and dateu = (select max(dateu)
-                                               from bars.dpt_vidd_update v
-                                               where v.vidd = i.vidd
-                                                and dateu <= i.datz + 0.99999))
-                           end = l_brate
-               and dve.ext_num = i.cnt_dubl
-               and dve.type_id = i.ext_id;
-
-          exception
-            when others then
-              l_indrate := null;
-          end;
-
-         if nvl(l_indrate.indv_rate,0) <> 0 --#4
-         then
-           l_bonusval := l_bonusval + l_indrate.indv_rate;
-
-         begin
-          insert into bars.Int_Ratn (acc, id, bdat, ir, br, op)
-          values(i.acc, 1, i.pdat + 1, l_bonusval, l_indrate.base_rate, l_indrate.oper_id);
-         exception when dup_val_on_index then
-          update bars.int_ratn
-          set ir = l_bonusval,
-              op = case when nvl(l_indrate.indv_rate, 0) != 0 and nvl(l_indrate.oper_id, 0) = 0
-                   then 1  else l_indrate.oper_id end
-          where acc = i.acc and bdat = i.pdat + 1 and id = 1;
-         when others then
-             bars_error.raise_nerror('DPT', 'SET_BONUS_RATE_FAILED',
-              ' acc = '||to_char(i.acc), ' ir = '||to_char(l_bonusval), ' dat = '||to_char(p_dat+1 ,'DD/MM/YYYY'));
-          end;
-
-           begin
-              INSERT INTO dpt_depositw (dpt_id, tag, value)
-              VALUES (i.deposit_id, 'BONUS', to_char(l_bonusval));
-           exception when dup_val_on_index then
-              update dpt_depositw
-              set value = to_char(l_bonusval)
-              where tag = 'BONUS' and dpt_id = i.deposit_id;
-            end;
-            bars_audit.trace('%s значение бонуса записано в доп.реквизиты вклада', l_title);
-
-          end if; --#4
-        end if; --#3
+        else
+          null;
+        end if;
 
       end if; --#2
     end if; --#1
@@ -208,14 +157,12 @@ BEGIN
 
 end;
 /
-
 show err;
 
 PROMPT *** Create  grants  dpt_bonus_addit ***
 grant EXECUTE                                 on dpt_bonus_addit      to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                 on dpt_bonus_addit      to ABS_ADMIN;
 grant EXECUTE                                 on dpt_bonus_addit      to WR_ALL_RIGHTS;
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ======= Scripts /Sql/BARS/Procedure/dpt_bonus_addit.sql ======*** End ***
