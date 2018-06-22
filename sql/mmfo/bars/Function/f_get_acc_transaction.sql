@@ -119,27 +119,27 @@ begin
                                  , c.SOS_OPERATION                        --SOS
                                  , c.STMT                                 --STMT
                                  , c.Tt                                   --TT
-                                 , c.TXT                                  --TXT
+                                 , substr(c.TXT, 1, 70)                   --TXT
                                  , c.kv                                   --KV
                                  , c.s                                    --BAL
                                  , c.sq                                   --BAL_UAH
                                  , null                                   --CUST_ID_DB
-                                 , c.nam_a                                --CUST_NAME_DB
-                                 , c.okpo_a                               --CUST_OKPO_DB
+                                 , substr(c.nam_a, 1, 255)                --CUST_NAME_DB
+                                 , substr(c.okpo_a, 1, 15)                --CUST_OKPO_DB
                                  , c.accd                                 --ACC_ID_DB
-                                 , c.nlsa                                 --ACC_NUM_DB
+                                 , substr(c.nlsa, 1, 15)                  --ACC_NUM_DB
                                  , nvl(c.nbsd, substr(c.nlsa, 1, 4))      --R020_DB
                                  , null                                   --CUST_ID_CR
-                                 , c.nam_b                                --CUST_NAME_CR
-                                 , c.okpo_b                               --OKPO_CR
+                                 , substr(c.nam_b, 1, 255)                --CUST_NAME_CR
+                                 , substr(c.okpo_b, 1, 15)                --OKPO_CR
                                  , c.acck                                 --ACC_ID_CR
-                                 , c.nlsb                                 --ACC_NUM_CR
+                                 , substr(c.nlsb, 1, 15)                  --ACC_NUM_CR
                                  , nvl(c.nbsk, substr(c.nlsb, 1, 4))      --R020_CR
-                                 , c.mfoa                                 --MFO_DB
-                                 , c.namb_a                               --BANK_NAME_DB
-                                 , c.mfob                                 --MFO_CR
-                                 , c.namb_b                               --BANK_NAME_CR
-                                 , c.nazn                                 --PURPOSE_OF_PAYMENT
+                                 , substr(c.mfoa, 1, 6)                   --MFO_DB
+                                 , substr(c.namb_a, 1, 255)               --BANK_NAME_DB
+                                 , substr(c.mfob, 1, 6)                   --MFO_CR
+                                 , substr(c.namb_b, 1, 255)               --BANK_NAME_CR
+                                 , substr(c.nazn, 1, 255)                 --PURPOSE_OF_PAYMENT
                                  , c.pdat                                 --OPERATION_DATE
                                );  
    
