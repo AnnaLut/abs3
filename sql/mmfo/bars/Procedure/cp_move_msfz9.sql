@@ -1,5 +1,5 @@
 create or replace procedure cp_move_msfz9 is
-   -- v.1.2 22.06.2018
+   -- v.1.3 22.06.2018
    l_title    constant varchar2(15) := 'CP_MOVE_MSFZ9';
    l_valdate  constant date         := to_date('29.12.2017','DD.MM.YYYY');  
    B_4621     constant varchar2(15) := '37392555';
@@ -199,16 +199,18 @@ begin
     update accounts set mdate=kk.DATP,accc=ACCC_, seci=4, pos=1, daos=l_valdate, pap=3  where acc=accs_;   
     cp.cp_inherit_specparam (accs_, accc_, 0);    
     --S2
-    begin 
-      select acc, substr(nls,1,5)||'1'||s8_, substr(cm.cp_id||'/'||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsS2 and kv=kk.KV;
-      exception 
-        when NO_DATA_FOUND then 
-          bars_audit.error(l_title||' REF '||cm.ref||' Стоп, Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ '||ac2.nlsS2);
-          raise_application_error(-20001, ' Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ  '||ac2.nlsS2);    
-    end;     
-    cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK, NLS_,kk.KV,NMS_,'ODB',gl.aUid,accs2_);
-    update accounts set mdate=kk.DATP,accc=ACCC_, seci=4, pos=1, daos=l_valdate, pap=3  where acc=accs2_;   
-    cp.cp_inherit_specparam (accs2_, accc_, 0);
+    if nNBS2_ = '1400' then
+      begin 
+        select acc, substr(nls,1,5)||'1'||s8_, substr(cm.cp_id||'/'||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsS2 and kv=kk.KV;
+        exception 
+          when NO_DATA_FOUND then 
+            bars_audit.error(l_title||' REF '||cm.ref||' Стоп, Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ '||ac2.nlsS2);
+            raise_application_error(-20001, ' Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ  '||ac2.nlsS2);    
+      end;     
+      cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK, NLS_,kk.KV,NMS_,'ODB',gl.aUid,accs2_);
+      update accounts set mdate=kk.DATP,accc=ACCC_, seci=4, pos=1, daos=l_valdate, pap=3  where acc=accs2_;   
+      cp.cp_inherit_specparam (accs2_, accc_, 0);
+    end if;  
     --R
     begin 
       select acc, substr(nls,1,5)||'0'||s8_, substr(cm.cp_id||'/'||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsR and kv=kk.kv;

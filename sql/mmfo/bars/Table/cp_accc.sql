@@ -248,6 +248,21 @@ end;
 /
 COMMENT ON COLUMN BARS.CP_ACCC.NLSRD_6 IS 'Рах дох.6300 нарах. % дивідентів';
 
+begin 
+  EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add (NLSS2 VARCHAR2(15)) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CP_ACCC.NLSS2 IS 'Рах переоцінки по опціону';
+
+begin 
+  EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add (NLSS2_6 VARCHAR2(15)) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CP_ACCC.NLSS2_6 IS 'Рах 6 класу для переоцінки по опціону';
+
+
 PROMPT *** Create  grants  CP_ACCC ***
 grant SELECT                                                                 on CP_ACCC         to BARSUPL;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on CP_ACCC         to BARS_ACCESS_DEFROLE;
