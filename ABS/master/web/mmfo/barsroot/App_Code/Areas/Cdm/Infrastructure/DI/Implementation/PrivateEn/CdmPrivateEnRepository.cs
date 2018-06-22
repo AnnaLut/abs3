@@ -675,7 +675,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                             new OracleParameter("p_rnk", OracleDbType.Decimal) {Value = (rnk)},
                             new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = (kf)}
                         };
-            _entities.ExecuteStoreCommand("delete from EBKC_QUEUE_UPDATECARD where RNK = bars.ebk_wforms_utl.get_rnk(:p_rnk,:p_kf)",
+            _entities.ExecuteStoreCommand("EBKC_PACK.DEQUEUE( ebk_wforms_utl.get_rnk(:p_rnk,:p_kf) )",
                 sqlUpdParams);
         }
 
