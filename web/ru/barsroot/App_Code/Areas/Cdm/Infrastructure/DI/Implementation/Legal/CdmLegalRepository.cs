@@ -679,7 +679,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                             new OracleParameter("p_rnk", OracleDbType.Decimal) {Value = (rnk)},
                             new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = (kf)}
                         };
-            _entities.ExecuteStoreCommand("delete from ebkc_queue_updatecard where RNK = bars.ebkc_wforms_utl.get_rnk(:p_rnk,:p_kf)",
+            _entities.ExecuteStoreCommand("EBKC_PACK.DEQUEUE( ebk_wforms_utl.get_rnk(:p_rnk,:p_kf) )",
                 sqlUpdParams);
         }
 
