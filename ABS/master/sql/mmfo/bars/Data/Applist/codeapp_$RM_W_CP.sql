@@ -680,7 +680,7 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Нарахування дивидентів по угоді ********** ');
+--    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Нарахування дивидентів по угоді ********** ');
     --
     delete from operlist a where  a.name = 'ЦП Нарахування дивидентів по угоді (тимчасово)';
           --  Створюємо функцію ЦП 
@@ -694,6 +694,21 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 */
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо ТИМЧАСОВО функцію ЦП Переміщення по угодам (МСФЗ9) ********** ');
+
+    delete from operlist a where  a.name = 'ЦП Переміщення угод МСФЗ9 (тимчасово)';
+          --  Створюємо функцію ЦП 
+
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'ЦП Переміщення угод МСФЗ9 (тимчасово)',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_CP_MOVE_MSFZ9[NSIFUNCTION][showDialogWindow=>false]',
+                                                  p_rolename => 'CP_ROLE' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
 
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_W_CP) - АРМ Цінні папери  ');
