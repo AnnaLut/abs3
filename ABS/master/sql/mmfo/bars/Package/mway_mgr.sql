@@ -169,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 4.7  18/05/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.8  22/06/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -1685,18 +1685,9 @@ is
                   select * into l_cusb from customer where rnk = l_accb.rnk;
 
                   --l_nlsa := nbs_ob22(2924,'26');
-                  if substr(l_acc26,1,4) = '2620' then -- Костыль так как вей передает в одном сервисе и 2620 и 2625
+                 if substr(l_acc26,1,4) = '2620' then -- Костыль так как вей передает в одном сервисе и 2620 и 2625 + Пошли 2620 карточные
                     begin
-                       select tt into l_tt from mway_pay_tt where service_code = 'TRANSFER_ACC_DEPOSIT' and is_fee = 0;
-                    exception
-                         when no_data_found then
-                         --711 Операції не існує
-                         rollback to savepoint sp_paystart;
-                         get_error(711,l_obj_operation,p_error_code,p_error_message);
-                         return;
-                    end;
-                    begin
-                       select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.branch like '/'||p_mfo||'/' and a.nls = l_acc26 and t.lcv = l_lcv;
+                       select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.nls = l_acc26 and t.lcv = l_lcv;
                        select * into l_cusa from customer where rnk = l_acca.rnk;
                     exception
                           when no_data_found then
@@ -1705,18 +1696,59 @@ is
                           get_error(701,l_obj_operation,p_error_code,p_error_message);
                           return;
                     end;
-                  else
-                  select a.*
-                    into l_acca
-                    from accounts a,
-                         tabval$global t
-                   where a.kv = t.kv
-                     and a.nbs = '2924'
-                     and a.ob22 = '26'
-                     and a.branch like '/'||p_mfo||'/'
-                     and a.dazs is null
-                     and t.lcv = l_lcv;
-                  select * into l_cusa from customer where rnk = l_acca.rnk;
+                    
+                     if l_acca.tip  like 'W4%' then
+                      begin
+                       select a.*
+                        into l_acca
+                        from accounts a,
+                             tabval$global t
+                       where a.kv = t.kv
+                         and a.nbs = '2924'
+                         and a.ob22 = '26'
+                         and a.branch like '/'||p_mfo||'/'
+                         and a.dazs is null
+                         and t.lcv = l_lcv;
+                       select * into l_cusa from customer where rnk = l_acca.rnk;
+                      exception
+                          when no_data_found then
+                          --702 Не знайдено транзитний рахунок
+                          rollback to savepoint sp_paystart;
+                          get_error(702,l_obj_operation,p_error_code,p_error_message);
+                          return;
+                      end;
+                     else
+                        begin
+                           select tt into l_tt from mway_pay_tt where service_code = 'TRANSFER_ACC_DEPOSIT' and is_fee = 0;
+                        exception
+                             when no_data_found then
+                             --711 Операції не існує
+                             rollback to savepoint sp_paystart;
+                             get_error(711,l_obj_operation,p_error_code,p_error_message);
+                             return;
+                        end;            
+                     end if;
+
+                 else
+                   begin
+                      select a.*
+                        into l_acca
+                        from accounts a,
+                             tabval$global t
+                       where a.kv = t.kv
+                         and a.nbs = '2924'
+                         and a.ob22 = '26'
+                         and a.branch like '/'||p_mfo||'/'
+                         and a.dazs is null
+                         and t.lcv = l_lcv;
+                      select * into l_cusa from customer where rnk = l_acca.rnk;
+                   exception
+                          when no_data_found then
+                          --702 Не знайдено транзитний рахунок
+                          rollback to savepoint sp_paystart;
+                          get_error(702,l_obj_operation,p_error_code,p_error_message);
+                          return;
+                   end;
                   end if;
 
                   bc.subst_branch(l_accb.branch);
