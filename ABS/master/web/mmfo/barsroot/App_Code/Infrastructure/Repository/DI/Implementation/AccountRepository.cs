@@ -111,9 +111,10 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
             // Если выполнили установку параметров
             HttpContext.Current.Session["UserLoggedIn"] = true;
             HttpContext.Current.Session[Constants.UserId] = userMap.user_id;
-            _dbLogger.Info(string.Format("Веб-користувач [ {0} ] розпочав роботу в глобальній банківській даті - {1}",
+            _dbLogger.Info(string.Format("Веб-користувач [ {0} ] розпочав роботу в глобальній банківській даті - {1}, робоча станція: {2}",
                                                     userName, 
-                                                    userMap.bank_date.ToString("dd.MM.yyyy")));
+                                                    userMap.bank_date.ToString("dd.MM.yyyy"),
+                                                    GetUserIp() ));
 
             return result;
         }
@@ -217,6 +218,17 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
 
             return userHost;
         }
+        private static string GetUserIp()
+        {
+            var ip = (HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != null
+                      && HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != "")
+                ? HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+                : HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+            if (ip.Contains(","))
+                ip = ip.Split(',').First().Trim();
+            return ip;
+        }
+
         public void ClearSessionTmpDir()
         {
             var context = HttpContext.Current;
