@@ -18,9 +18,9 @@ is
 % DESCRIPTION : ѕроцедура формировани€ 2KX дл€ ќщадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.004  14/16/2017
+% VERSION     :  v.27.005  22/06/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := 'v.27.004  27/04/2018';
+  ver_            char(30)  := 'v.27.005  22/06/2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -89,7 +89,7 @@ BEGIN
                                  , cust.cust_adr as Q002
                                  , cust.rnbor as Q003_2
                                  , coalesce(cust.rnbou, 'немае даних') as Q003_3
-                                 , coalesce(cust.rnbos, 'немае даних') as Q030
+                                 , coalesce(Replace(cust.rnbos, ' ', ''), 'немае даних') as Q030 --22.06.2018 добавил убираение пробелов
                                  , case
                                      when cust.k070 like '13%'  then 'G'
                                      when cust.k070 in ('ZZZZZ', 'YYYYY') then 'D'
