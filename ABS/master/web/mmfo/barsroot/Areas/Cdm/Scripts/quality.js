@@ -169,6 +169,11 @@ bars.quality = bars.quality || {
     loadGroups: function (callback, params) {
 
         var type = GetPersonType();
+        if (!type) {
+            bars.ui.loader('body', false);
+            bars.ui.error({ text: "У посиланні функції відсутній тип особи." });
+            return;
+        }
 
         bars.ui.loader('body', true);
         $.get(bars.config.urlContent('/Cdm/Quality/GetGroups?isAdminMode=' + bars.quality.isAdminMode + '&type=' + type)).done(function (data) {
