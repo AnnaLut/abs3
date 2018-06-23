@@ -1587,8 +1587,8 @@ BEGIN
       end if;
     end if;
 
-    l_baserate :=
-      case when nvl(l_indrate.method_id,0) = 2 then
+    l_baserate := l_dptrate.br ;
+     /* case when nvl(l_indrate.method_id,0) = 2 then
             l_indrate.base_rate
            when nvl(l_indrate.method_id,0) = 4 then
             coalesce(l_viddbr, l_indrate.base_rate)  
@@ -1608,7 +1608,7 @@ BEGIN
              l_dptrate.br
            else 
              l_dptrate.br
-        end;  
+        end;  */
                                
     IF nvl(l_baserate, 0) > 0 THEN
        l_indvrate  := l_totalbonus;
