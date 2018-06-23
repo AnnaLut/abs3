@@ -16,6 +16,7 @@ using Models;
 using Oracle.DataAccess.Client;
 using BarsWeb.Infrastructure.Repository.DI.Abstract;
 using System.Security.Principal;
+using System.Text;
 using System.Web.Security;
 
 namespace BarsWeb.Infrastructure.Repository.DI.Implementation
@@ -111,10 +112,12 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
             // Если выполнили установку параметров
             HttpContext.Current.Session["UserLoggedIn"] = true;
             HttpContext.Current.Session[Constants.UserId] = userMap.user_id;
-            _dbLogger.Info(string.Format("Веб-користувач [ {0} ] розпочав роботу в глобальній банківській даті - {1}, робоча станція: {2}",
-                                                    userName, 
-                                                    userMap.bank_date.ToString("dd.MM.yyyy"),
-                                                    GetUserIp() ));
+            _dbLogger.Info(string.Format(
+                "Веб-користувач [ {0} ] розпочав роботу в глобальній банківській даті - {1}, робоча станція: {2}, GetHostName(): {3}",
+                userName,
+                userMap.bank_date.ToString("dd.MM.yyyy"),
+                GetUserIpAll(),
+                GetHostName() ));
 
             return result;
         }
@@ -227,6 +230,18 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
             if (ip.Contains(","))
                 ip = ip.Split(',').First().Trim();
             return ip;
+        }
+
+        public string GetUserIpAll()
+        {
+            StringBuilder sb = new StringBuilder()
+                .AppendFormat("HTTP_X_FORWARDED_FOR {0}; ",
+                    HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]??"null")
+                .AppendFormat("REMOTE_ADDR {0}; ", HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"])
+                .AppendFormat("Request.UserHostAddress {0}; ", HttpContext.Current.Request.UserHostAddress)
+                .AppendFormat("Request.UserHostName {0}.", HttpContext.Current.Request.UserHostName);
+
+            return sb.ToString();
         }
 
         public void ClearSessionTmpDir()
