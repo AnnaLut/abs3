@@ -113,6 +113,7 @@ PROMPT *** Create  procedure CC_RMANY ***
   Flag36_ int := 0 ; -- / =1 в след месяце
 
 begin
+  return;  --COBUPRVNIX-161 Блокування існуючої функціональності амортизації дисконту/премії 
   bars_audit.info('=======> 1');
    bars_audit.trace('%s 0.Зашли: ND_=>%s, DAT_=>%s,  MODE_=>%s', l_title, to_char(ND_), to_char(DAT_), to_char(MODE_));
 
