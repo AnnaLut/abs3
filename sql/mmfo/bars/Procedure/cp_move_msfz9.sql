@@ -395,7 +395,8 @@ begin
                              p_s       => l_cp_warrantyset(w).s,           -- сумма гарантии
                              p_ccnd    => l_cp_warrantyset(w).CC_IDZ,      -- номер договора гарантии
                              p_sdate   => l_cp_warrantyset(w).sdatz,       -- дата договора гарантии
-                             p_nls     => l_cp_warrantyset(w).nls);        -- счет 9 класса
+                             p_nls     => l_cp_warrantyset(w).nls,        -- счет 9 класса
+                             p_valdate => l_valdate);
           -- на новый пакет открываем
             p_cp_addwarranty(p_mode    => 0,                               -- 0-вставка, 1-изменение, 2-удаление, 3-пропорциональное уменьшение
                              p_ref     => ref_,                            -- референс сделки с ÷ѕ
@@ -407,7 +408,8 @@ begin
                              p_s       => l_cp_warrantyset(w).s/100,       -- сумма гарантии (обычно она заводитс€ с интерфейса в гривнах, но тут - копейки - делим на 100)
                              p_ccnd    => l_cp_warrantyset(w).CC_IDZ,      -- номер договора гарантии
                              p_sdate   => l_cp_warrantyset(w).sdatz,       -- дата договора гарантии
-                             p_nls     => l_cp_warrantyset(w).nls);        -- счет 9 класса
+                             p_nls     => l_cp_warrantyset(w).nls,        -- счет 9 класса
+                             p_valdate => l_valdate);
         bars_audit.trace('CP_MOVE_MSFZ9: пересмотрена гаранти€ пакета REF='|| to_char(l_cp_warrantyset(w).ref_)|| ' на сумму '|| to_char(l_cp_warrantyset(w).s) || ' по счету '|| l_cp_warrantyset(w).nls);
       end loop;
     end if;
