@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_CP_ADDWARRANTY ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_CP_ADDWARRANTY (p_mode    IN INT,                     -- 0-вставка, 1-изменение
+CREATE OR REPLACE PROCEDURE P_CP_ADDWARRANTY (p_mode    IN INT,                     -- 0-вставка, 1-изменение
                                                   p_ref     IN cp_deal.ref%type,        -- референс сделки с ЦП
                                                   p_pawn    IN CC_PAWN.pawn%type,       -- вид обеспечения                                                   |
                                                   p_kv      IN accounts.kv%type,        -- валюта                                                            | для открытия счета гарантии
@@ -17,9 +17,10 @@ PROMPT *** Create  procedure P_CP_ADDWARRANTY ***
                                                   p_s       IN NUMBER,                  -- сумма гарантии
                                                   p_ccnd    IN pawn_acc.cc_idz%type,    -- номер договора гарантии
                                                   p_sdate   IN pawn_acc.SDATZ%type,     -- дата договора гарантии
-                                                  p_nls     IN accounts.nls%type default null)     -- счет 9 класса
+                                                  p_nls     IN accounts.nls%type default null,     -- счет 9 класса
+                                                  p_valdate IN oper.vdat%type default null) --потрібно при переводі на МСФЗ 9
 IS
- /*version 3 2017/05/27*/
+ /*version 4 2018/06/24*/
    /*
    Процедура открывает счет гарантии, вставляет данные в cc_accp, водит документ на оприходование гарантии на 9 класс
    */
@@ -177,7 +178,7 @@ IS
        p_oo.tt    := 'CPG';
        p_oo.vob   := 6;
        p_oo.pdat  := gl.bd;
-       p_oo.vdat  := p_oo.pdat;
+       p_oo.vdat  := nvl(p_valdate, p_oo.pdat);
 
        p_oo.kv    := p_kv;
        p_oo.kv2   := p_kv;
@@ -255,7 +256,7 @@ IS
     (  ref_    => l_ref,
        tt_     => p_oo.tt,
        vob_    => p_oo.vob,
-       nd_     => l_ref,
+       nd_     => case p_valdate when null then substr(l_ref, 1, 10) else 'FRS9$'||substr(l_ref, -5) end,
        pdat_   => p_oo.pdat,
        vdat_   => p_oo.vdat,
        dk_     => p_oo.dk,

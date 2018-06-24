@@ -10,15 +10,17 @@ select * from
              r3.nls nlsr3, nvl(fost(r3.acc,gl.bd), 0)/100 ostr3,
              (select listagg(a.nls, ',') within group (order by a.nls) as nls from cp_accounts gar, accounts a where gar.cp_acc = a.acc and gar.cp_acctype = 'GAR' and gar.cp_ref = d.ref) nlsgar,
              (select sum(nvl(fost(a.acc,gl.bd), 0)/100) as ostgar from cp_accounts gar, accounts a where gar.cp_acc = a.acc and gar.cp_acctype = 'GAR' and gar.cp_ref = d.ref) ostgar,
-             dm.ref ref_move, 
+             dm.ref ref_move,
              (select least (CASE
                              WHEN o.sos > 0 AND o.sos < 5 THEN 0
                              WHEN o.sos = 5 THEN 1
                              WHEN o.sos < 0 THEN -1
                            END,
-                           dm.active) 
-                from oper o 
-                where o.ref=dm.ref) as active_move
+                           dm.active)
+                from oper o
+                where o.ref=dm.ref) as active_move,
+             d.initial_ref,
+             d.op   
       from cp_deal d, cp_kod k, accounts a,
            accounts p, accounts s, accounts di, accounts r, accounts r2, accounts r3,
            (select * from cp_accounts s2, accounts as2 where s2.cp_acc = as2.acc and s2.cp_acctype = 'S2') s2,
@@ -31,7 +33,7 @@ select * from
         and d.accr = r.acc (+)
         and d.accr2 = r2.acc (+)
         and d.accr3 = r3.acc (+)
-        and d.ref = dm.initial_ref (+)
+        and decode(d.op, 3, d.initial_ref,d.ref ) = dm.initial_ref (+)
         and d.ref in (47243380501,
                       47243435101,
                       47243305401,
@@ -50,8 +52,8 @@ select * from
                       50126769501
                       )
          ) ug
-where nvl(ug.ref_move, 0) = 
-      (select nvl(max(ref), 0) from cp_deal where ug.ref = initial_ref)  
+where nvl(ug.ref_move, 0) =
+      (select nvl(max(ref), 0) from cp_deal where decode(ug.op, 3, ug.initial_ref, ug.ref) = initial_ref)
 order by ug.nlsn;
 
 
