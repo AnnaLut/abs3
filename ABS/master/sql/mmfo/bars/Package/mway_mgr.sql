@@ -169,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 4.8  22/06/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.81  25/06/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -740,6 +740,7 @@ is
       and a.rnk = c.rnk
       and c.rnk = p.rnk
       and a.nbs='2620'
+      and a.tip not like 'W4%'
       and c.rnk = p_rnk
       and a.dazs is null;
 
@@ -956,7 +957,7 @@ is
              from dpt_deposit t1) r
     where d.cust_id = p_rnk
       and a.acc=d.dpt_accid
-      and a.nbs!=2620
+      and a.nbs!='2620'
       and d.dpt_id = r.deposit_id
       and p_is_replanish is null;
 
@@ -1072,7 +1073,7 @@ is
     where d.cust_id = p_rnk
       and d.dpt_id = p_deposit_id
       and a.acc=d.dpt_accid
-      and a.nbs!=2620
+      and a.nbs!='2620'
       and d.dpt_id = r.deposit_id;
 
     bars_audit.trace('%s: done', l_th);
@@ -2560,7 +2561,7 @@ is
        where d.dpt_accnum = p_nls
          and a.kv = (select t.kv from tabval$global t where t.lcv = p_dpt_lcv)
          and d.dpt_accid = a.acc
-         and a.nbs!=2620
+         and a.nbs!='2620'
          and a.kf = p_mfo;
     exception
       when no_data_found then
@@ -2826,7 +2827,15 @@ is
     l_is_nls accounts.nbs%type;
   begin
     begin
-      select nbs into l_is_nls from accounts a, tabval$global t where a.nls=p_nls and t.kv=a.kv and t.lcv=p_acc_lcv and a.nbs=2620 and a.kf = p_mfo;
+     select nbs
+       into l_is_nls
+       from accounts a, tabval$global t
+      where a.nls = p_nls
+        and t.kv = a.kv
+        and t.lcv = p_acc_lcv
+        and a.nbs = '2620'
+        and a.tip not like 'W4%'
+        and a.kf = p_mfo;
     exception
       when no_data_found then
         return null;
