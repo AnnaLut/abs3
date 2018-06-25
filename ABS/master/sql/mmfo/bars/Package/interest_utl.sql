@@ -1,5 +1,5 @@
-create or replace package interest_utl is
-
+create or replace package INTEREST_UTL
+is
     -- вид відсоткової картки (int_idn)
     INTEREST_KIND_EFFECTIVE_RATE   constant integer := -2; -- Ефективна відсоткова ставка (активи)
     INTEREST_KIND_ASSETS           constant integer :=  0; -- Активи
@@ -402,15 +402,17 @@ create or replace package interest_utl is
         p_reckoning_unit in out nocopy t_reckoning_unit);
 
     procedure MONTHLY_INTEREST_ACCRUAL
-    ( p_payout_int        in boolean default false );
+    ( p_payout_int        in boolean default false
+    , p_grouping_mode     in integer default GROUPING_MODE_GROUP_ALL
+    );
 
 end;
 /
 
 show err
 
-create or replace package body interest_utl as
-
+create or replace package body INTEREST_UTL
+is
     acc_form integer := 0;
     g_acc integer := 0;
 
@@ -3178,7 +3180,7 @@ create or replace package body interest_utl as
                              (i.acr_dat is null or i.acr_dat < p_date_through);
 
         reckon_interest(l_reckoning_units);
-    end;
+    end reckon_deal_interest;
 
     procedure group_reckonings(
         p_accounts in number_list,
@@ -3232,9 +3234,11 @@ create or replace package body interest_utl as
                     l_grouped_set := number_list(i.id);
                 else
                     if (l_interest_kind_id <> i.interest_kind_id or
-                        (p_grouping_mode_id = interest_utl.GROUPING_MODE_GROUP_BY_RATES and i.interest_rate <> l_interest_line_rate)) then
+                        (p_grouping_mode_id = interest_utl.GROUPING_MODE_GROUP_BY_RATES and i.interest_rate <> l_interest_line_rate))
+                    then
 
-                        if (l_interest_line_amount > 0) then
+                        if (l_interest_line_amount > 0)
+                        then
                             l_grouping_line_id := create_interest_reckoning(p_line_type,
                                                       i.account_id,
                                                       i.interest_kind_id,
@@ -3269,15 +3273,15 @@ create or replace package body interest_utl as
 
                             l_grouped_set := number_list(i.id);
                         end if;
-                   else
-                       l_date_through := i.date_through;
-                       l_interest_line_tail := i.interest_tail;
-                       l_interest_line_amount := l_interest_line_amount + i.interest_amount;
-                       l_interest_line_account_rest := i.account_rest;
+                    else
+                        l_date_through := i.date_through;
+                        l_interest_line_tail := i.interest_tail;
+                        l_interest_line_amount := l_interest_line_amount + i.interest_amount;
+                        l_interest_line_account_rest := i.account_rest;
 
-                       l_grouped_set.extend(1);
-                       l_grouped_set(l_grouped_set.last) := i.id;
-                   end if;
+                        l_grouped_set.extend(1);
+                        l_grouped_set(l_grouped_set.last) := i.id;
+                    end if;
                 end if;
 
                 if (i.line_number = i.total_lines_count and l_interest_line_amount > 0) then
@@ -3308,7 +3312,7 @@ create or replace package body interest_utl as
             end loop;
             l := p_accounts.next(l);
         end loop;
-    end;
+    end group_reckonings;
 
     procedure check_if_prev_line_accrued(
         p_account_id in integer,
@@ -4791,11 +4795,21 @@ create or replace package body interest_utl as
 
   procedure MONTHLY_INTEREST_ACCRUAL
   ( p_payout_int        in boolean default false
+  , p_grouping_mode     in integer default GROUPING_MODE_GROUP_ALL
   ) is
+  /**
+  <b>MONTHLY_INTEREST_ACCRUAL</b> - Нарахування %% по непортфельним рахунках
+  %param p_payout_int - флаг виплати %% разом з нарахуванням
+
+  %version 1.1
+  %usage   Нарахування %% по непортфельним рахунках при регламентних роботах по закриттю місяця
+  */
     title    constant   varchar2(64) := $$PLSQL_UNIT||'.CALC_INT_DMD_ACC';
     l_kf                varchar2(6);
     l_bnk_dt            date;
+    l_acr_dt            date;
     l_reckoning_id      int_reckonings.id%type;
+    l_grouping_id       int_reckonings.id%type;
     l_int_amnt          int_reckonings.interest_amount%type;
   begin
 
@@ -4803,10 +4817,12 @@ create or replace package body interest_utl as
 
     l_kf     := GL.KF();
     l_bnk_dt := GL.BD();
+    l_acr_dt := last_day(l_bnk_dt);
 
-    BARS_AUDIT.TRACE( '%s: l_kf=%s, l_bnk_dt=%s.', title, l_kf, to_char(l_bnk_dt,'dd.mm.yyyy') );
+    BARS_AUDIT.TRACE( '%s: l_kf=%s, l_bnk_dt=%s, l_acr_dt=%s.', title, l_kf
+                    , to_char(l_bnk_dt,'dd.mm.yyyy'), to_char(l_acr_dt,'dd.mm.yyyy') );
 
-    if ( l_bnk_dt = DAT_NEXT_U( last_day(l_bnk_dt)+1, -1 ) )
+    if ( l_bnk_dt = DAT_NEXT_U( l_acr_dt+1, -1 ) )
     then -- Останній робочий день місяця
 
       for c in ( select a.KF
@@ -4816,7 +4832,7 @@ create or replace package body interest_utl as
                       , i.METR  as RECKONING_METHOD
                       , i.BASEY as RECKONING_CALENDAR
                       , greatest(i.ACR_DAT,a.DAOS)+1 as DATE_FROM
-                      , nvl2(i.STP_DAT,least(l_bnk_dt,STP_DAT),l_bnk_dt) as DATE_THROUGH
+                      , nvl2(i.STP_DAT,least(l_acr_dt,STP_DAT),l_acr_dt) as DATE_THROUGH
   --                  , TT, ACRA, ACRB, S, TTB, KVB, NLSB, MFOB, NAMB, NAZN
                    from ACCOUNTS a
                    join INT_ACCN i
@@ -4874,6 +4890,8 @@ create or replace package body interest_utl as
 
           else
 
+            l_grouping_id := null;
+
             for i in ( select * from ACR_INTN order by ACC, ID, FDAT )
             loop
 
@@ -4895,19 +4913,74 @@ create or replace package body interest_utl as
                                 , p_deal_id           => null
                                 );
 
-              ACCRUE_INTEREST
-              ( p_reckoning_row => READ_RECKONING_ROW( l_reckoning_id ) -- , p_lock => true
-              , p_silent_mode   => true
-              );
+              if ( p_grouping_mode = GROUPING_MODE_GROUP_ALL )
+              then
+
+                if ( l_grouping_id Is Null )
+                then
+                  l_grouping_id := CREATE_INTEREST_RECKONING
+                                   ( p_reckoning_type_id => RECKONING_TYPE_ORDINARY_INT
+                                   , p_account_id        => i.ACC
+                                   , p_interest_kind_id  => i.ID
+                                   , p_date_from         => i.FDAT
+                                   , p_date_through      => i.TDAT
+                                   , p_account_rest      => i.OSTS / ACRN.DLTA( c.RECKONING_CALENDAR, i.FDAT, i.TDAT + 1)
+                                   , p_interest_rate     => case when nvl(i.br, 0) = 0 then nvl(i.ir, 0) else i.br end
+                                   , p_interest_amount   => l_int_amnt
+                                   , p_interest_tail     => i.REMI
+                                   , p_is_grouping_unit  => 'Y'
+                                   , p_state_id          => null
+                                   , p_deal_id           => null
+                                   );
+                else
+
+                  update INT_RECKONINGS
+                     set DATE_THROUGH    = i.TDAT
+                       , ACCOUNT_REST    = i.OSTS
+                       , INTEREST_TAIL   = i.REMI
+                   where ID = l_grouping_id;
+                end if;
+
+                update INT_RECKONINGS
+                   set GROUPING_LINE_ID = l_grouping_id
+                     , STATE_ID         = RECKONING_STATE_GROUPED
+                 where ID = l_reckoning_id;
+
+              else
+
+                ACCRUE_INTEREST
+                ( p_reckoning_row => READ_RECKONING_ROW( l_reckoning_id )
+                , p_silent_mode   => true
+                );
+
+                if ( p_payout_int )
+                then -- виплата відсотків
+                  PAY_INTEREST
+                  ( p_reckoning_row => READ_RECKONING_ROW( l_grouping_id )
+                  , p_silent_mode   => true
+                  );
+                end if;
+
+              end if;
 
             end loop;
 
-            if ( p_payout_int )
-            then -- виплата відсотків
-              PAY_INTEREST
-              ( p_reckoning_row => READ_RECKONING_ROW( l_reckoning_id )
+            if ( p_grouping_mode = GROUPING_MODE_GROUP_ALL )
+            then
+
+              ACCRUE_INTEREST
+              ( p_reckoning_row => READ_RECKONING_ROW( l_grouping_id ) --, p_lock => p_payout_int )
               , p_silent_mode   => true
               );
+
+              if ( p_payout_int )
+              then -- виплата відсотків
+                PAY_INTEREST
+                ( p_reckoning_row => READ_RECKONING_ROW( l_grouping_id )
+                , p_silent_mode   => true
+                );
+              end if;
+
             end if;
 
           end if;
