@@ -13,7 +13,7 @@ prompt ...
 begin
     execute immediate 'create table SW_OWN
 (
-  kf          VARCHAR2(6),
+  kf          VARCHAR2(6) not null,
   ref         NUMBER(38) not null,
   tt          CHAR(3),
   tt_name     VARCHAR2(70),
@@ -34,7 +34,7 @@ begin
   nazn        VARCHAR2(160),
   sk          NUMBER(24,2)
 )
-partition by list (compare_id)
+partition by list (COMPARE_ID)
 (
   partition COMPARE_NO values (0)
     tablespace BRSDYND
@@ -44,6 +44,7 @@ partition by list (compare_id)
     storage
     (
       initial 64K
+      next 1M
       minextents 1
       maxextents unlimited
     ),
@@ -55,11 +56,11 @@ partition by list (compare_id)
     storage
     (
       initial 64K
+      next 1M
       minextents 1
       maxextents unlimited
     )
- )
- ENABLE ROW MOVEMENT';
+)';
  exception when others then 
     if sqlcode = -955 then null; else raise; 
     end if; 
@@ -105,7 +106,7 @@ comment on column SW_OWN.nazn
 comment on column SW_OWN.sk
   is 'сумма комиссии';
 
-
+-- Create/Rebegin
 begin
     execute immediate 'create index I_SW_OWN_COMPAREID on SW_OWN (COMPARE_ID)
   nologging  local';
@@ -177,7 +178,67 @@ end;
 
 
 begin
+    execute immediate 'create index I_SW_OWN_PDAT on SW_OWN (PDAT)
+  tablespace BRSDYNI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'create index I_SW_OWN_PRNFILE on SW_OWN (PRN_FILE)
+  tablespace BRSDYNI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
     execute immediate 'create index I_SW_OWN_TRFDAT on SW_OWN (TRUNC(FDAT))
+  tablespace BRSDYNI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'create index I_SW_OWN_TRPDAT on SW_OWN (TRUNC(PDAT))
   tablespace BRSDYNI
   pctfree 10
   initrans 2
@@ -199,7 +260,7 @@ end;
 -- Create/Recreate primary, unique and foreign key constraints 
 begin
     execute immediate 'alter table SW_OWN
-  add constraint PK_SW_OWN primary key (REF, DK)
+  add constraint PK_SW_OWN primary key (REF, KF, DK)
   using index 
   tablespace BRSDYNI
   pctfree 10
@@ -228,8 +289,6 @@ begin
     end if; 
 end;
 / 
-
-
 
 -- Grant/Revoke object privileges 
 grant select, insert, update on SW_OWN to BARS_ACCESS_DEFROLE;
