@@ -62,9 +62,9 @@ namespace BarsWeb.Areas.BpkW4.Controllers
         }
 
         [HttpGet]
-        public ActionResult QuestItemsDisplay(int dealId, string customerRnk)
+        public ActionResult QuestItemsDisplay(decimal dealId, string customerRnk)
         {
-            W4_DKBO_WEB_FilterParams fp = new W4_DKBO_WEB_FilterParams() { DEAL_ID = dealId, CUSTOMER_ID = customerRnk};
+            W4_DKBO_WEB_FilterParams fp = new W4_DKBO_WEB_FilterParams() { DEAL_ID = dealId, CUSTOMER_ID = customerRnk };
             return RedirectToAction("QuestItemsShow", fp);
         }
 
@@ -159,7 +159,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers
                     {
                         if (descriptor.Member == "CUSTOMER_NAME" || descriptor.Member == "PASS_SERIAL" || descriptor.Member == "NAME_SAL_PR")
                         {
-                           descriptor.Value = descriptor.Value.ToString().ToUpper();
+                            descriptor.Value = descriptor.Value.ToString().ToUpper();
                         }
                     }
                     else if (filter is CompositeFilterDescriptor)
