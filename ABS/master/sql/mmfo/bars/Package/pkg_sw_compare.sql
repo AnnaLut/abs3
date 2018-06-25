@@ -944,7 +944,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
             (id,pid,kf, file_data , state,message ,sign, ddate , sdate )
           values
             (S_SW_CA_FILES.NEXTVAL,p_id,p_mfo,p_clob, 1, null,null, l_date, sysdate)
-          return id into l_id;  
+          return id into l_id;
           p_state :=1; --успешно прошел только импорт
         exception
               when others then
@@ -1321,7 +1321,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           delete from SW_IMPORT o where o.prn_file =  cur.id;
           delete from SW_files where ID = cur.id;
 
-           update SW_OWN i set i.compare_id = 0 where i.prn_file in (select distinct prn_file_import from SW_COMPARE where prn_file_import =cur.id);
+           update SW_OWN i set i.compare_id = 0 where i.prn_file in (select distinct prn_file_own  from SW_COMPARE where prn_file_import =cur.id);
 
            delete from SW_COMPARE c where c.prn_file_import = cur.id;
 
