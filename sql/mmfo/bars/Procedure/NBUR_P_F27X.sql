@@ -1,9 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F27X.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-PROMPT *** Create  procedure NBUR_P_F27X ***
-
 CREATE OR REPLACE PROCEDURE NBUR_P_F27X (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
@@ -15,39 +9,27 @@ is
 % DESCRIPTION : Процедура формирования 27X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.004  14/16/2017
+% VERSION     :  v.1.100  25/06/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.004  14/16/2017';
-/*
-   Структура показника  D BBBB 00 VVV
+  ver_          char(30)  := 'v.1.100  25/06/2018';
+  c_title       varchar2(100 char) := $$PLSQL_UNIT || '.';
 
-   D    -    може приймати значення:
-        5 - списано коштів
-        6 - зараховано коштів
-        7 – у тому числі списано для обов’язкового продажу іноземної валюти
-             (з 22.11.2012)
-   BBBB    -    балансовий рахунок;
-   00    -    частина сегменту, заповнена нулями (до 01.03.2006 відповідала
-              значенням поля D020 довідника KL_D020)
-   VVV    -    код валюти;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-    l_nbuc          varchar2(20);
-    l_type          number;
-    l_datez         date := p_report_date + 1;
-    l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
-    l_koef          number; --Коэффициент обязательной продажи валюты
+  l_nbuc        varchar2(20);
+  l_type        number;
+  l_datez       date := p_report_date + 1;
+  l_file_code   varchar2(2) := substr(p_file_code, 2, 2);
+  l_koef        number; --Коэффициент обязательной продажи валюты
 BEGIN
-    logger.info ('NBUR_P_F27X begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
+    logger.info (c_title || 'begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 
     -- определение начальных параметров (код области или МФО или подразделение)
     nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
 
-    --Определяем коэф. обязательной продажи
+    --Коефициент обязательной продажи
     if p_report_date < date '2017-04-05'
-    then
+    then 
       l_koef := 0.65;
-    else
+    else 
       l_koef := 0.50;
     end if;
 
@@ -113,30 +95,17 @@ BEGIN
             UNPIVOT (VALUE FOR colname IN  (s5, s6)) d
         WHERE abs(d.value) <> 0;
     EXCEPTION
-       WHEN OTHERS
-       THEN
-          logger.info (
-                'NBUR_P_F27X error: '
-             || SQLERRM
-             || ' for date = '
-             || TO_CHAR (p_report_date, 'dd.mm.yyyy'));
+      WHEN OTHERS THEN
+          logger.error(c_title || ' error on step 1: ' || SQLERRM || ' for date = ' || TO_CHAR (p_report_date, 'dd.mm.yyyy'));
     END;
 
     BEGIN
-      insert all
-         --Вставка первого параметра "списано для обов’язкового продажу іноземної валюти" (код 7)
-         into nbur_detail_protocols (report_date, kf, report_code, nbuc, field_code, field_value, description, acc_id, acc_num, kv, maturity_date, cust_id, REF, nd, branch)
-         values(report_date, kf, p_file_code, nbuc, '7' || field_code, field_value, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-         --Вставка параметра "зараховано надходження в іноземній валюті, що є базою для розрахунку суми обов'язкового продажу" (код 8)
-         into nbur_detail_protocols (report_date, kf, report_code, nbuc, field_code, field_value, description, acc_id, acc_num, kv, maturity_date, cust_id, REF, nd, branch)
-         values(report_date, kf, p_file_code, nbuc, '8' || field_code, trunc(field_value / l_koef), description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-
+      insert into nbur_detail_protocols (report_date, kf, report_code, nbuc, field_code, field_value, description, acc_id, acc_num, kv, maturity_date, cust_id, REF, nd, branch)
         SELECT d.report_date
                , d.kf
                , p_file_code
                , to_char(to_number(a.nbuc)) as nbuc
-               , d.nbs
-                 || lpad(d.kv, 3, '0') field_code
+               , '7' || d.nbs || lpad(d.kv, 3, '0') field_code
                , d.sump field_value
                , NULL description
                , d.acc_id
@@ -209,14 +178,54 @@ BEGIN
                                           and (a.kf = p_kod_filii)
                                           and (a.acc_id = d.acc_id);
     EXCEPTION
-       WHEN OTHERS
-       THEN
-          logger.info (
-                'NBUR_P_F27X error: '
-             || SQLERRM
-             || ' for date = '
-             || TO_CHAR (p_report_date, 'dd.mm.yyyy'));
+      WHEN OTHERS THEN
+        logger.error (c_title || ' error on step 2: ' || SQLERRM|| ' for date = ' || TO_CHAR (p_report_date, 'dd.mm.yyyy'));
     END;
+
+    begin
+      --Формирование показателя "зарахування надходження в іноземній валюті, що є базою для розрахунку суми обов'язкового продажу"
+      insert into nbur_detail_protocols (report_date, kf, report_code, nbuc, field_code, field_value, description, acc_id, acc_num, kv, maturity_date, cust_id, REF, nd, branch)
+        SELECT d.report_date
+               , d.kf
+               , p_file_code
+               , to_char(to_number(a.nbuc)) as nbuc
+               , '8' || d.nbs || lpad(d.kv, 3, '0') field_code
+               , d.bal field_value
+               , NULL description
+               , d.acc_id
+               , d.acc_num
+               , d.kv
+               , null maturity_date
+               , d.cust_id
+               , d.ref
+               , NULL nd
+               , null branch
+        from   (
+                 select t.report_date
+                        , t.kf
+                        , t.r020_cr nbs
+                        , t.acc_id_cr as acc_id
+                        , t.acc_num_cr as acc_num
+                        , t.kv
+                        , t.cust_id_cr as cust_id
+                        , t.ref as ref
+                        , nvl(round((z.s2 / l_koef), 0), 0) as bal
+                 from   nbur_dm_transactions t
+                        left join zayavka z on (t.ref = z.refoper)
+                                               and (z.dk = 2)
+                                               and (z.obz = 1)
+                 where  t.report_date = p_report_date
+                        and t.kf = p_kod_filii
+                        and t.R020_CR = '2603'
+                        and t.kv <> 980
+               ) d
+               join NBUR_DM_ACCOUNTS a on (a.report_date = p_report_date)
+                                          and (a.kf = p_kod_filii)
+                                          and (a.acc_id = d.acc_id);
+    exception
+      when others then
+        logger.error(c_title || ' error on step 3: '  || sqlerrm || ' for date = ' || TO_CHAR (p_report_date, 'dd.mm.yyyy'));
+    end;
 
     -- формирование показателей файла  в  nbur_agg_protocols
     INSERT INTO nbur_agg_protocols (
@@ -252,10 +261,6 @@ BEGIN
                        , field_code
              );
 
-    logger.info ('NBUR_P_F27X end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
-
+    logger.info (c_title || 'end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END;
 /
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F27X.sql =========*** End *** =
-PROMPT ===================================================================================== 
