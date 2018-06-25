@@ -27,6 +27,7 @@ declare
       l_rec.PR_12      := :old.PR_12;
       l_rec.IDZ        := :old.IDZ;
       l_rec.KF         := :old.KF;
+      l_rec.RNK        := :old.RNK;
     else
       l_rec.ACC        := :new.ACC;
       l_rec.ACCS       := :new.ACCS;
@@ -34,6 +35,7 @@ declare
       l_rec.PR_12      := :new.PR_12;
       l_rec.IDZ        := :new.IDZ;
       l_rec.KF         := :new.KF;
+      l_rec.RNK        := :new.RNK;
     end if;
 
     l_rec.IDUPD        := bars_sqnc.get_nextval(S_CCACCP_UPDATE.NextVal);
