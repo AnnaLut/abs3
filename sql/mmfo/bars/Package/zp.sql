@@ -2,8 +2,8 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /sql/bars/package/zp.sql =========*** Run *** 
 PROMPT ===================================================================================== 
 
-create or replace package zp is
-  g_head_version  constant varchar2(64)  := 'version 1.1 18.09.2017';
+create or replace package bars.zp is
+  g_head_version  constant varchar2(64)  := 'version 1.2 18.06.2018';
 
   --
   -- определение версии заголовка пакета
@@ -22,7 +22,8 @@ create or replace package zp is
                       p_central        zp_deals.central%type,
                       p_kod_tarif      zp_deals.kod_tarif%type,
                       p_acc            number   default null,
-                      p_fs             zp_deals.fs%type default 2
+                      p_fs             zp_deals.fs%type default 2,
+                      p_branch         branch.branch%type default null
                       );
 
   procedure approve_deal(p_id zp_deals.id%type, p_comm_reject zp_deals.comm_reject%type);
@@ -34,7 +35,8 @@ create or replace package zp is
                       p_central        zp_deals.central%type,
                       p_kod_tarif      zp_deals.kod_tarif%type,
                       p_fs             zp_deals.fs%type default 1,
-                      p_acc_3570       zp_deals.acc_3570%type default null
+                      p_acc_3570       zp_deals.acc_3570%type default null,
+                      p_branch         branch.branch%type default null
                       );
   procedure del_deal(p_id  zp_deals.id%type );
   procedure authorize_deal(p_id  zp_deals.id%type );
@@ -109,10 +111,10 @@ procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number);
 end;
 /
 
-create or replace package body zp
+create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.17 20.03.2018';
+g_body_version   constant varchar2(64)   := 'version 1.18 18.06.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -707,7 +709,8 @@ procedure create_deal(p_rnk            customer.rnk%type,
                       p_central        zp_deals.central%type,
                       p_kod_tarif      zp_deals.kod_tarif%type,
                       p_acc            number,
-                      p_fs             zp_deals.fs%type
+                      p_fs             zp_deals.fs%type,
+                      p_branch         branch.branch%type default null
                       )
 is
 l_zp_deals   zp_deals%rowtype;
@@ -779,6 +782,9 @@ begin
     l_zp_deals.upd_date     := sysdate;
     l_zp_deals.fs           := p_fs;
 
+    if p_branch is not null then
+      l_zp_deals.branch := p_branch;
+    end if;
     --"резервирование" счета 2909
 
      if nvl(p_acc,0)=0
@@ -897,7 +903,8 @@ procedure update_deal(p_id             zp_deals.id%type,
                       p_central        zp_deals.central%type,
                       p_kod_tarif      zp_deals.kod_tarif%type,
                       p_fs             zp_deals.fs%type default 1,
-                      p_acc_3570       zp_deals.acc_3570%type default null
+                      p_acc_3570       zp_deals.acc_3570%type default null,
+                      p_branch         branch.branch%type default null
                       )
 is
 
@@ -925,6 +932,12 @@ begin
    exception when no_data_found then
              raise_application_error(-20000, 'Код тарифу - '||p_kod_tarif||', не можливий для зарплатних догворів.');
    end;
+
+   if p_branch is not null then
+     update zp_deals
+        set branch = p_branch
+      where id= p_id;
+   end if;
 
    if l_zp_deals.sos in (0,2,7)  then
 
@@ -1791,6 +1804,7 @@ is
 
   n              number;
   l_doc_is_error boolean := false;
+  l_acc_b_rec    accounts%rowtype;
 begin
 
 
@@ -1940,7 +1954,7 @@ begin
               begin
                 select substr(nms,1,38), rnk into l_oper_zp.nam_b, l_rnk from accounts where nls=l_oper_zp.nlsb and kv=980 and dazs is null;
               exception
-                when no_data_found then 
+                when no_data_found then
                   rollback to sp_payroll;
                   raise_application_error(-20000, 'Не знайдено рахунок  - '|| c.nlsb||', або рахунок закрито.') ;
               end;
@@ -1956,31 +1970,43 @@ begin
                 l_oper_zp.nam_b:=substr(c.namb,1,38);
             end if;
 
-            if     c.mfob=gl.amfo and substr(c.nlsb,1,4)='2625' and  l_zp_payroll.corp2_id is null
-              then
-               l_oper_zp.tt    := 'PKS';
+            if c.mfob=gl.amfo then
 
-            elsif  c.mfob=gl.amfo and substr(c.nlsb,1,4)='2620' and l_zp_payroll.corp2_id is null
-              then
-               l_oper_zp.tt    := 'DBF';
+                  select *
+                    into l_acc_b_rec
+                    from bars.accounts
+                   where nls = l_oper_zp.nlsb
+                     and kv = l_accounts_2909.kv;
+              
+              if l_acc_b_rec.tip like 'W4%' and  l_zp_payroll.corp2_id is null 
+                then
+                  l_oper_zp.tt    := 'PKS';
+              elsif l_acc_b_rec.tip not like 'W4%' and l_zp_payroll.corp2_id is null
+                then
+                 l_oper_zp.tt    := 'DBF';
 
-            elsif c.mfob<>gl.amfo  and substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is null
-              then
-               l_oper_zp.tt    := '310';
-            elsif     c.mfob=gl.amfo and substr(c.nlsb,1,4)='2625' and  l_zp_payroll.corp2_id is not null
-              then
-               l_oper_zp.tt    := 'IB5';
+              elsif l_acc_b_rec.tip like 'W4%' and  l_zp_payroll.corp2_id is not null
+                then
+                 l_oper_zp.tt    := 'IB5';
 
-            elsif  c.mfob=gl.amfo and substr(c.nlsb,1,4)='2620' and l_zp_payroll.corp2_id is  not null
-              then
-               l_oper_zp.tt    := 'IB1';
-
-            elsif c.mfob<>gl.amfo  and substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is  not null
-              then
-               l_oper_zp.tt    := 'IB2';
+              elsif l_acc_b_rec.tip not like 'W4%' and l_zp_payroll.corp2_id is  not null
+                then
+                 l_oper_zp.tt    := 'IB1';
+              else
+                 rollback to sp_payroll;
+                 raise_application_error(-20000, 'Номер рахунку отримувача не 2625/20') ;
+              end if;
             else
-               rollback to sp_payroll;
-               raise_application_error(-20000, 'Номер рахунку отримувача не 2625/20') ;
+              if substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is null 
+                then
+                 l_oper_zp.tt    := '310';
+              elsif substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is  not null
+                then
+                 l_oper_zp.tt    := 'IB2';
+              else
+                 rollback to sp_payroll;
+                 raise_application_error(-20000, 'Номер рахунку отримувача не 2625/20') ;
+              end if;              
             end if;
 
 
