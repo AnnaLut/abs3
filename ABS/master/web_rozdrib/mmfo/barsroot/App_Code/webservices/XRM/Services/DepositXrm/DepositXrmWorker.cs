@@ -472,7 +472,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                                 case 2: // 2(депозит на імя малолітньої особи); 
                                     dpt_agreement = DepositAgreement.Create(dpt_id, 12, rnk,
                                        RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
-                                       null, null, 11111111, 0, con);
+                                       null, Tools.CreateCommisRequest(dpt_id, 12), 11111111, 0, con);
                                     dpt_agreement = DepositAgreement.Create(dpt_id, 26, rnk,
                                        RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
