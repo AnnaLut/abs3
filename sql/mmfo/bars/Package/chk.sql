@@ -1462,36 +1462,36 @@ end;
   procedure visa_flag4sign(tt_ varchar2, grp_ number, fsig_ out integer) is
      fres_ SMALLINT :=0;
   begin
-     logger.trace('visa_flag4sign: start ');
+  logger.trace('visa_flag4sign: start ');
 
-     if mode_visa_sign=1 then
-        logger.trace('tt='||tt_||',grp='||grp_);
+  if mode_visa_sign=1 then
+    logger.trace('tt='||tt_||',grp='||grp_);
         -- пустая группа означает просто вставку документа в oper_visa
-        if grp_ is null then
-           select to_number(substr(flags,2,1)) into fsig_ from tts where tt=tt_;
-        else
-           begin
+    if grp_ is null then
+      select to_number(substr(flags,2,1)) into fsig_ from tts where tt=tt_;
+    else
+      begin
               select bitand(f_in_charge,3), 
                      NVL(bitand(flags,1),0) 
                 into fsig_,fres_ 
                 from chklist_tts 
                where tt = tt_ 
                  and idchk = grp_;
-           exception when no_data_found then
-              fsig_ := null;
-           end;
-           if fsig_ is null then
-              select f_in_charge into fsig_ from chklist where idchk=grp_;
-           end if;
-        end if;
+      exception when no_data_found then
+        fsig_ := null;
+      end;
+      if fsig_ is null then
+        select f_in_charge into fsig_ from chklist where idchk=grp_;
+      end if;
+    end if;
         fsig_ := bitand(fsig_,3) + fres_ * 4;
-     else
-        fsig_ := 0;
-     end if;
-     logger.trace('fsig='||fsig_);
+  else
+    fsig_ := 0;
+  end if;
+  logger.trace('fsig='||fsig_);
   exception when others then
-     logger.error('visa_flag4sign():'||SQLERRM);
-     raise;
+  logger.error('visa_flag4sign():'||SQLERRM);
+  raise;
   end;
 
 /*

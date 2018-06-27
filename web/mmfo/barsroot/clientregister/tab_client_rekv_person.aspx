@@ -108,7 +108,8 @@
                             <tr id="trIDRecordNum" style="display: none">
                                 <td>Унік. номер запису в ЄДДР</td>
                                 <td>
-                                    <input class="edit" id="ed_ID_RecordNum" tabindex="3" type="text" maxlength="14" />
+                                    <input class="edit" id="ed_ID_RecordNum" tabindex="3" type="text" maxlength="14" 
+                                        onchange="ValidateIDRecordNum();" />
                                     <div class="required">*</div>
                                 </td>
 

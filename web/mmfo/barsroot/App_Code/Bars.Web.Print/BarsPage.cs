@@ -50,30 +50,50 @@ namespace Bars.Web.Print
                 if (Request["filename"] != null)
                 {
                     filename = Convert.ToString(Request["filename"]);
-                    bool isRtf = (Path.GetExtension(filename).ToLower() == ".rtf") ? (true) : (false);
+                    string fileExtention = Path.GetExtension(filename).ToLower();
+                    string mimeType = MimeTypeMap.GetMimeType(fileExtention);
+                    bool isRtf = (fileExtention == ".rtf") ? (true) : (false);
+                    bool isPdf = (fileExtention == ".pdf") ? (true) : (false);
+                    bool idDocx = (fileExtention == ".doc") ? (true) : (false);
+
+                    bool isDefault = !isRtf && !isPdf && !idDocx;
+
                     Response.Charset = "windows-1251";
                     Response.ContentEncoding = Encoding.GetEncoding(Response.Charset);
-                    if (isRtf)
+                    //Response.ContentEncoding = Encoding.UTF8;
+                    if (!isDefault)
                     {
                         if (Request["attach"] != null)
                         {
                             PrintRtfFile(filename, context, trace);
                             return;
                         }
-                        Response.AddHeader("Content-Disposition", "inline;filename=Contract.rtf");
-                        Response.ContentType = "application/octet-stream";
+                        //Response.AddHeader("Content-Disposition", "inline;filename=Contract"+fileExtention);
+                        Response.AddHeader("Content-Disposition", "attachment;filename=Contract" + fileExtention);
+                        //Response.ContentType = "application/octet-stream";
+                        Response.ContentType = mimeType;
                     }
                     else
                     {
-                        Response.AddHeader("Content-Disposition", "inline;filename=Report.txt");
+                        //if we need to show text before downloading - change charset to next - proper one:
+                        //Response.Charset = "utf-8";
+                        //Response.ContentEncoding = Encoding.UTF8;
+                        if (Request["frxConvertedTxt"] != null)
+                        {
+                            Response.AddHeader("Content-Disposition", "attachment;filename=Report.txt");
+                        }
+                        else
+                        {
+                            Response.AddHeader("Content-Disposition", "inline;filename=Report.txt");
+                        }
                         Response.ContentType = "text/html";
                     }
 
-                    if(!isRtf) Response.Write("<PRE>");
+                    if (isDefault) Response.Write("<PRE>");
                     Response.WriteFile(filename, true);
 
-                    if (!isRtf) Response.Write("</PRE>");
-                    
+                    if (isDefault) Response.Write("</PRE>");
+
                     // Response.Flush();
                 }
                 /// 

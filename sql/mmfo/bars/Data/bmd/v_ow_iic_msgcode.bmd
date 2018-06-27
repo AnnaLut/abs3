@@ -124,10 +124,12 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'TT', 'C', 'Код операції', '', 3, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'MFOA', 'C', 'МФО відправника коштів', '', 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLSA', 'C', 'Рахунок списання коштів', '', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MSGCODE', 'C', 'Код проводки', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'TT', 'C', 'Код~операції', '', 3, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'MFOA', 'C', 'МФО~відправника~коштів', '', 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NLSA', 'C', 'Рахунок~списання~коштів', '', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MSGCODE', 'C', 'Код~проводки', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NBS', 'C', 'Номер~балансового~рахунку', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'OB22','C', 'ОБ 22', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');
@@ -222,14 +224,9 @@ exception when dup_val_on_index then null;
 end;
 /
 commit;
--- прописываем правильные политики
+-- дропаем политики
 begin
-	bpa.remove_policies('V_OW_IIC_MSGCODE');
-    execute immediate 'delete  from policy_table p where p.table_name = ''V_OW_IIC_MSGCODE''';
-    bpa.alter_policy_info('V_OW_IIC_MSGCODE', 'FILIAL' , null, 'E', 'E', 'E');
-    bpa.alter_policy_info('V_OW_IIC_MSGCODE', 'WHOLE' , null, null, null, null);
-    bpa.alter_policies('V_OW_IIC_MSGCODE');
-    bpa.enable_policies('V_OW_IIC_MSGCODE');
+bpa.remove_policies('V_OW_IIC_MSGCODE');
 end;
 /
 commit;

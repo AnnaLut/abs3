@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''FILIAL'' , null, ''E'', ''E'', ''E'');
                bpa.alter_policy_info(''OW_IIC_MSGCODE'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -24,10 +24,10 @@ PROMPT *** Create  table OW_IIC_MSGCODE ***
 begin 
   execute immediate '
   CREATE TABLE BARS.OW_IIC_MSGCODE 
-   (	TT CHAR(3), 
-	MFOA VARCHAR2(6), 
-	NLSA VARCHAR2(14), 
-	MSGCODE VARCHAR2(100)
+   (  TT CHAR(3), 
+  MFOA VARCHAR2(6), 
+  NLSA VARCHAR2(14), 
+  MSGCODE VARCHAR2(100)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -37,7 +37,18 @@ exception when others then
 end; 
 /
 
-
+PROMPT *** Add column COBUMMFO-8228 ***
+begin
+  execute immediate '
+            ALTER TABLE BARS.OW_IIC_MSGCODE add (
+            NBS char(4),
+            OB22  char(2) 
+            )
+  ';
+  exception when others then       
+    if sqlcode=-01430 then null;else raise;end if;    
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to OW_IIC_MSGCODE ***
@@ -49,6 +60,8 @@ COMMENT ON COLUMN BARS.OW_IIC_MSGCODE.TT IS 'Оп.';
 COMMENT ON COLUMN BARS.OW_IIC_MSGCODE.MFOA IS 'МФО-А';
 COMMENT ON COLUMN BARS.OW_IIC_MSGCODE.NLSA IS 'Счет-А';
 COMMENT ON COLUMN BARS.OW_IIC_MSGCODE.MSGCODE IS 'Код проводки';
+COMMENT ON COLUMN BARS.OW_IIC_MSGCODE.NBS IS 'Номер балансового рахунку';
+COMMENT ON COLUMN BARS.OW_IIC_MSGCODE.OB22 IS 'Код ОБ22';  
 
 
 
@@ -129,12 +142,9 @@ exception when others then
 
 
 PROMPT *** Create  grants  OW_IIC_MSGCODE ***
-grant SELECT                                                                 on OW_IIC_MSGCODE  to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_IIC_MSGCODE  to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_IIC_MSGCODE  to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on OW_IIC_MSGCODE  to OW;
-grant SELECT                                                                 on OW_IIC_MSGCODE  to UPLD;
-grant FLASHBACK,SELECT                                                       on OW_IIC_MSGCODE  to WR_REFREAD;
 
 
 

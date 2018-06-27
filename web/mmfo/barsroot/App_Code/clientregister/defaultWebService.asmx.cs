@@ -184,21 +184,33 @@ namespace clientregister
         /// </summary>
         /// <param name="rnk">РНК клиента</param>
         /// <param name="templateID">Код шаблона</param>
+        /// return ValidationResult where Status field defines "ok" or "error",
+        /// Message contains error message in case of error,
+        /// Text contains fileName
         [WebMethod(EnableSession = true)]
-        public string GetFileForPrint(string rnk, string templateID, string adds)
+        public ValidationResult GetFileForPrint(string rnk, string templateID, string adds)
         {
-            string fileName = string.Empty;
-            RtfReporter rep = new RtfReporter(Context);
-            rep.RoleList = "reporter,cc_doc";
-            rep.ContractNumber = Convert.ToInt64(rnk);
+            ValidationResult res = new ValidationResult();
+            res.Status = "ok";
+            try
+            {
+                RtfReporter rep = new RtfReporter(Context);
+                rep.RoleList = "reporter,cc_doc";
+                rep.ContractNumber = Convert.ToInt64(rnk);
 
-            rep.TemplateID = templateID;
-            if (!string.IsNullOrEmpty(adds))
-                rep.ADDS = Convert.ToInt64(adds);
-            rep.Generate();
-            fileName = rep.ReportFile;
+                rep.TemplateID = templateID;
+                if (!string.IsNullOrEmpty(adds))
+                    rep.ADDS = Convert.ToInt64(adds);
+                rep.Generate();
+                res.Text = rep.ReportFile;
+            }
+            catch (Exception ex)
+            {
+                res.Status = "error";
+                res.Message = "Помилка при отриманні шаблону для друку: " + ex.Message;
+            }
 
-            return fileName;
+            return res;
         }
         /// <summary>
         /// Вычитка Характеристика клиента (К010)

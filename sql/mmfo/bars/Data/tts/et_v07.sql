@@ -4,6 +4,7 @@ set serveroutput on size 1000000
 
 prompt Создание / Обновление операции V07
 prompt Наименование операции: V07-МБК+Форекс валюта через 1500
+
 declare
   cnt_  number;
 begin

@@ -41,28 +41,28 @@ namespace Bars.WebServices.XRM.Services
         }
 
         #region add tail
-        public static long AddRuTail(this long? val, string mfo)
+        public static long? AddRuTail(this long? val, string mfo)
         {
-            if (null == val) return 0;
-            return (long)val * 100 + Kfru(mfo);
+            if (null == val) return null;
+            return val * 100 + Kfru(mfo);
         }
         public static long AddRuTail(this long val, string mfo)
         {
             return val * 100 + Kfru(mfo);
         }
-        public static decimal AddRuTail(this decimal? val, string mfo)
+        public static decimal? AddRuTail(this decimal? val, string mfo)
         {
-            if (null == val) return 0;
-            return (decimal)val * 100 + Kfru(mfo);
+            if (null == val) return null;
+            return val * 100 + Kfru(mfo);
         }
         public static decimal AddRuTail(this decimal val, string mfo)
         {
             return val * 100 + Kfru(mfo);
         }
-        public static int AddRuTail(this int? val, string mfo)
+        public static int? AddRuTail(this int? val, string mfo)
         {
-            if (null == val) return 0;
-            return (int)val * 100 + Kfru(mfo);
+            if (null == val) return null;
+            return val * 100 + Kfru(mfo);
         }
         public static int AddRuTail(this int val, string mfo)
         {
@@ -70,6 +70,7 @@ namespace Bars.WebServices.XRM.Services
         }
         public static string AddRuTail(this string val, string mfo)
         {
+            if (string.IsNullOrWhiteSpace(val)) return val;
             return val + Kfru(mfo).ToString();
         }
         #endregion
@@ -115,25 +116,25 @@ namespace Bars.WebServices.XRM.Services
 
         #region ru
         //#region add tail
-        //public static long? AddRuTail(this long? val, string mfo)
+        //public static long AddRuTail(this long? val, string mfo)
         //{
-        //    return val;
+        //    return null == val ? 0 : (long)val;
         //}
         //public static long AddRuTail(this long val, string mfo)
         //{
         //    return val;
         //}
-        //public static decimal? AddRuTail(this decimal? val, string mfo)
+        //public static decimal AddRuTail(this decimal? val, string mfo)
         //{
-        //    return val;
+        //    return null == val ? 0 : (decimal)val;
         //}
         //public static decimal AddRuTail(this decimal val, string mfo)
         //{
         //    return val;
         //}
-        //public static int? AddRuTail(this int? val, string mfo)
+        //public static int AddRuTail(this int? val, string mfo)
         //{
-        //    return val;
+        //    return null == val ? 0 : (int)val;
         //}
         //public static int AddRuTail(this int val, string mfo)
         //{
@@ -141,30 +142,30 @@ namespace Bars.WebServices.XRM.Services
         //}
         //public static string AddRuTail(this string val, string mfo)
         //{
-        //    return val;
+        //    return null == val ? "" : val;
         //}
         //#endregion
 
         //#region cut tail
-        //public static decimal? CutRuTail(this decimal? val)
+        //public static decimal CutRuTail(this decimal? val)
         //{
-        //    return val;
+        //    return null == val ? 0 : (decimal)val;
         //}
         //public static decimal CutRuTail(this decimal val)
         //{
         //    return val;
         //}
-        //public static long? CutRuTail(this long? val)
+        //public static long CutRuTail(this long? val)
         //{
-        //    return val;
+        //    return null == val ? 0 : (long)val;
         //}
         //public static long CutRuTail(this long val)
         //{
         //    return val;
         //}
-        //public static int? CutRuTail(this int? val)
+        //public static int CutRuTail(this int? val)
         //{
-        //    return val;
+        //    return null == val ? 0 : (int)val;
         //}
         //public static int CutRuTail(this int val)
         //{

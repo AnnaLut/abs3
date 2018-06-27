@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Name="5500998" ReportInfo.Created="03/29/2018 10:51:00" ReportInfo.Modified="04/23/2018 09:54:46" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQDLieBsIU6NMMG6KQBDhXSk=" CommandTimeout="10000">
+      <TableDataSource Name="Table" Alias="qryData" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 ZV_DAT, CHAR01 PC, NUM00 ND, DAT00 DAT_END_CARD, CHAR02 NLS_2625, NUM01 KV_2625, CHAR03 DATE_OPEN_2625, NUM02 LIM, CHAR04 CARD_CODE, CHAR05 BRANCH, NUM03 RNK, CHAR06 NMK, CHAR07 OKPO, DAT01 BDAY, CHAR08 M_WORK, CHAR09 MOB_TEL, CHAR10 DOM_TEL, CHAR11 WORK_TEL, CHAR12 MOB_DOD_TEL, CHAR13 IND, CHAR14 OBL, CHAR15 RAION, CHAR16 TYPE_NP, CHAR17 LOCALITY, CHAR18 TYPE_EDI, CHAR19 STREET, CHAR20 HOME, CHAR21 HOMEPART, CHAR22 ROOM, CHAR23 ADDRESS, CHAR24 F_IND, CHAR25 F_OBL, CHAR26 F_RAION, CHAR27 F_TYPE_NP, CHAR28 F_LOCALITY, CHAR29 F_TYPE_EDI, CHAR30 F_STREET, CHAR31 F_HOME, CHAR32 F_HOMEPART, CHAR33 F_ROOM, CHAR34 F_ADDRESS, NUM04 OST_2202, NUM05 OST_2207, NUM06 OST_2208, NUM07 OST_2209, DAT02 DAT_PR_2207, DAT03 DAT_PR_2209, CHAR35 T_PENS, NUM08 ACC_OVR, CHAR36 NLS_2924, CHAR37 ZKP, CHAR38 RAH_PR, NUM09 DAY_PR_2207, NUM10 DAY_PR_2209, NUM11 INSUR_SUM, NUM12 INSUR_PAY, NUM13 INSUR_SUM7, NUM14 INSUR_PAY7, NUM15 IR, NUM16 KFC, DAT04 D1, DAT05 D2 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ZV_DAT" DataType="System.String"/>
+        <Column Name="PC" DataType="System.String"/>
+        <Column Name="ND" DataType="System.Decimal"/>
+        <Column Name="DAT_END_CARD" DataType="System.DateTime"/>
+        <Column Name="NLS_2625" DataType="System.String"/>
+        <Column Name="KV_2625" DataType="System.Int16"/>
+        <Column Name="DATE_OPEN_2625" DataType="System.String"/>
+        <Column Name="LIM" DataType="System.Decimal"/>
+        <Column Name="CARD_CODE" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="BDAY" DataType="System.DateTime"/>
+        <Column Name="M_WORK" DataType="System.String"/>
+        <Column Name="MOB_TEL" DataType="System.String"/>
+        <Column Name="DOM_TEL" DataType="System.String"/>
+        <Column Name="WORK_TEL" DataType="System.String"/>
+        <Column Name="MOB_DOD_TEL" DataType="System.String"/>
+        <Column Name="IND" DataType="System.String"/>
+        <Column Name="OBL" DataType="System.String"/>
+        <Column Name="RAION" DataType="System.String"/>
+        <Column Name="TYPE_NP" DataType="System.String"/>
+        <Column Name="LOCALITY" DataType="System.String"/>
+        <Column Name="TYPE_EDI" DataType="System.String"/>
+        <Column Name="STREET" DataType="System.String"/>
+        <Column Name="HOME" DataType="System.String"/>
+        <Column Name="HOMEPART" DataType="System.String"/>
+        <Column Name="ROOM" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="F_IND" DataType="System.String"/>
+        <Column Name="F_OBL" DataType="System.String"/>
+        <Column Name="F_RAION" DataType="System.String"/>
+        <Column Name="F_TYPE_NP" DataType="System.String"/>
+        <Column Name="F_LOCALITY" DataType="System.String"/>
+        <Column Name="F_TYPE_EDI" DataType="System.String"/>
+        <Column Name="F_STREET" DataType="System.String"/>
+        <Column Name="F_HOME" DataType="System.String"/>
+        <Column Name="F_HOMEPART" DataType="System.String"/>
+        <Column Name="F_ROOM" DataType="System.String"/>
+        <Column Name="F_ADDRESS" DataType="System.String"/>
+        <Column Name="OST_2202" DataType="System.Decimal"/>
+        <Column Name="OST_2207" DataType="System.Decimal"/>
+        <Column Name="OST_2208" DataType="System.Decimal"/>
+        <Column Name="OST_2209" DataType="System.Decimal"/>
+        <Column Name="DAT_PR_2207" DataType="System.DateTime"/>
+        <Column Name="DAT_PR_2209" DataType="System.DateTime"/>
+        <Column Name="T_PENS" DataType="System.String"/>
+        <Column Name="ACC_OVR" DataType="System.Decimal"/>
+        <Column Name="NLS_2924" DataType="System.String"/>
+        <Column Name="ZKP" DataType="System.String"/>
+        <Column Name="RAH_PR" DataType="System.String"/>
+        <Column Name="DAY_PR_2207" DataType="System.Decimal"/>
+        <Column Name="DAY_PR_2209" DataType="System.Decimal"/>
+        <Column Name="INSUR_SUM" DataType="System.Decimal"/>
+        <Column Name="INSUR_PAY" DataType="System.Decimal"/>
+        <Column Name="INSUR_SUM7" DataType="System.Decimal"/>
+        <Column Name="INSUR_PAY7" DataType="System.Decimal"/>
+        <Column Name="IR" DataType="System.Decimal"/>
+        <Column Name="KFC" DataType="System.Decimal"/>
+        <Column Name="D1" DataType="System.DateTime"/>
+        <Column Name="D2" DataType="System.DateTime"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="1900">
+    <ReportTitleBand Name="ReportTitle1" Width="7106.4" Height="103.96">
+      <TextObject Name="Text1" Left="103.95" Top="85.05" Width="170.1" Height="18.9" Text="звіт № [Report.ReportInfo.Name]" Font="Arial, 8pt"/>
+      <TextObject Name="Text2" Left="103.95" Top="9.45" Width="387.45" Height="75.6" Text="&#13;&#10;БПК (інформація для СК) ! зміна коеф&#13;&#10;станом на [sFdat1]" Format="Date" Format.Format="dd.MM.yyyy" Font="Arial, 12pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="110.21" Width="7106.4" Height="103.95">
+      <TableObject Name="Table1" Width="6921.18" Height="103.95">
+        <TableColumn Name="Column1" Width="103.95"/>
+        <TableColumn Name="Column2" Width="85.05"/>
+        <TableColumn Name="Column3" Width="85.05"/>
+        <TableColumn Name="Column4" Width="85.05"/>
+        <TableColumn Name="Column5" Width="132.3"/>
+        <TableColumn Name="Column6"/>
+        <TableColumn Name="Column7" Width="103.95"/>
+        <TableColumn Name="Column8"/>
+        <TableColumn Name="Column9" Width="132.3"/>
+        <TableColumn Name="Column10" Width="198.45"/>
+        <TableColumn Name="Column11" Width="85.05"/>
+        <TableColumn Name="Column12" Width="264.6"/>
+        <TableColumn Name="Column13" Width="94.5"/>
+        <TableColumn Name="Column14" Width="94.5"/>
+        <TableColumn Name="Column15" Width="264.6"/>
+        <TableColumn Name="Column16" Width="9.45"/>
+        <TableColumn Name="Column17" Width="103.95"/>
+        <TableColumn Name="Column18" Width="103.95"/>
+        <TableColumn Name="Column19" Width="15.12"/>
+        <TableColumn Name="Column20"/>
+        <TableColumn Name="Column21" Width="160.65"/>
+        <TableColumn Name="Column22" Width="179.55"/>
+        <TableColumn Name="Column23" Width="94.5"/>
+        <TableColumn Name="Column24" Width="198.45"/>
+        <TableColumn Name="Column25" Width="85.05"/>
+        <TableColumn Name="Column26" Width="160.65"/>
+        <TableColumn Name="Column27"/>
+        <TableColumn Name="Column28" Width="58.59"/>
+        <TableColumn Name="Column29" Width="73.71"/>
+        <TableColumn Name="Column30" Width="264.6"/>
+        <TableColumn Name="Column31"/>
+        <TableColumn Name="Column32" Width="198.45"/>
+        <TableColumn Name="Column33" Width="198.45"/>
+        <TableColumn Name="Column34"/>
+        <TableColumn Name="Column35" Width="132.3"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column37" Width="132.3"/>
+        <TableColumn Name="Column38"/>
+        <TableColumn Name="Column39"/>
+        <TableColumn Name="Column40"/>
+        <TableColumn Name="Column41" Width="170.1"/>
+        <TableColumn Name="Column42" Width="103.95"/>
+        <TableColumn Name="Column43" Width="113.4"/>
+        <TableColumn Name="Column44" Width="103.95"/>
+        <TableColumn Name="Column45" Width="103.95"/>
+        <TableColumn Name="Column46" Width="103.95"/>
+        <TableColumn Name="Column47" Width="103.95"/>
+        <TableColumn Name="Column48"/>
+        <TableColumn Name="Column49" Width="141.75"/>
+        <TableColumn Name="Column50" Width="132.3"/>
+        <TableColumn Name="Column51" Width="236.25"/>
+        <TableColumn Name="Column52" Width="103.95"/>
+        <TableColumn Name="Column53" Width="113.4"/>
+        <TableColumn Name="Column54" Width="85.05"/>
+        <TableColumn Name="Column55" Width="94.5"/>
+        <TableColumn Name="Column56" Width="85.05"/>
+        <TableColumn Name="Column57" Width="85.05"/>
+        <TableColumn Name="Column58"/>
+        <TableColumn Name="Column59" Width="94.5"/>
+        <TableColumn Name="Column60" Width="94.5"/>
+        <TableColumn Name="Column61" Width="77.49"/>
+        <TableColumn Name="Column62" Width="81.27"/>
+        <TableRow Name="Row1" Height="103.95">
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата формування" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Gainsboro" Text="Процесингова система" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Gainsboro" Text="Номер угоди в АБС &quot;Барс&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell4" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата закінчення БПК" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell5" Border.Lines="All" Fill.Color="Gainsboro" Text="Картковий рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Gainsboro" Text="Код валюти, 2625" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата відкриття карткового рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Gainsboro" Text="Код карткового продукту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Gainsboro" Text="ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="Gainsboro" Text="РНК клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="Gainsboro" Text="ПІБ Клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="Gainsboro" Text="Код ЕДРПОУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата народження" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="Gainsboro" Text="Місце роботи" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell16" Border.Lines="Left, Top, Bottom" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell17" Border.Lines="Right, Top, Bottom" Fill.Color="Gainsboro" Text="Домашній телефон" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell18" Border.Lines="All" Fill.Color="Gainsboro" Text="Робочий телефон" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell19" Border.Lines="Left, Top, Bottom" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell20" Border.Lines="Right, Top, Bottom" Fill.Color="Gainsboro" Text="Індекс" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell21" Border.Lines="All" Fill.Color="Gainsboro" Text="Область" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell22" Border.Lines="All" Fill.Color="Gainsboro" Text="Район " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell23" Border.Lines="All" Fill.Color="Gainsboro" Text="Тип населеного пункту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell24" Border.Lines="All" Fill.Color="Gainsboro" Text="Населений пункт" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell25" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell26" Border.Lines="Right, Top, Bottom" Fill.Color="Gainsboro" Text="Вулиця" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell27" Border.Lines="Left, Top, Bottom" Fill.Color="Gainsboro" Text="Номер будинку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="Top, Bottom" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell29" Border.Lines="Right, Top, Bottom" Fill.Color="Gainsboro" Text="Квартира" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Gainsboro" Text="Адреса" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell31" Border.Lines="All" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Індекс" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell32" Border.Lines="All" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Область" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell33" Border.Lines="All" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Район" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell34" Border.Lines="Left, Top, Bottom" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell35" Border.Lines="Right, Top, Bottom" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Нас. пункт" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell36" Border.Lines="Left, Top, Bottom" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell37" Border.Lines="Right, Top, Bottom" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Вулиця" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell38" Border.Lines="All" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Номер будинку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell39" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell40" Border.Lines="All" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Квартира" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell41" Border.Lines="All" Fill.Color="Gainsboro" Text="Факт. адреса &#13;&#10;Адреса" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell42" Border.Lines="All" Fill.Color="Gainsboro" Text="Використана частина кредитного ліміту 2202/2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell43" Border.Lines="All" Fill.Color="Gainsboro" Text="Залишок по рахунку 2207/по новому плану рахунків 2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell44" Border.Lines="All" Fill.Color="Gainsboro" Text="Нараховані відсотки за користування кредитним лімітом " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell45" Border.Lines="All" Fill.Color="Gainsboro" Text="Залишок по рахунку 2209/по новому плану рахунків 2208" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell46" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата виникнення прострочки по 2207/по новому плану рахунків 2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell47" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата виникнення прострочки по 2209/по новому плану рахунків 2208" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Gainsboro" Text="Продукт (ЗП, Пенс, інший)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell49" Border.Lines="All" Fill.Color="Gainsboro" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell50" Border.Lines="All" Fill.Color="Gainsboro" Text="Транзитний разхунок для зарахування" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell51" Border.Lines="All" Fill.Color="Gainsboro" Text="Місце роботи" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell52" Border.Lines="All" Fill.Color="Gainsboro" Text="Наявність інших рахунків в АТ Ощадбанк" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell53" Border.Lines="All" Fill.Color="Gainsboro" Text="Кількість днів прострочки на 2207/ по новому плану рахунків 2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell54" Border.Lines="All" Fill.Color="Gainsboro" Text="Кількість днів прострочки на 2209" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell55" Border.Lines="All" Fill.Color="Gainsboro" Text="Страхова сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Gainsboro" Text="Страховий платіж по відсоткам" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Gainsboro" Text="Страхова сума" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Gainsboro" Text="Страховий платіж по тілу кредиту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Gainsboro" Text="% ставка" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="Gainsboro" Text="Коефіціент для страхової компанії" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата початку періоду" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата кінця періоду" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="220.41" Width="7106.4" Height="30.24" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TableObject Name="Table2" Width="6921.18" Height="30.24" Border.Lines="All">
+        <TableColumn Name="Column73" Width="103.95"/>
+        <TableColumn Name="Column74" Width="85.05"/>
+        <TableColumn Name="Column75" Width="85.05"/>
+        <TableColumn Name="Column76" Width="85.05"/>
+        <TableColumn Name="Column77" Width="132.3"/>
+        <TableColumn Name="Column78"/>
+        <TableColumn Name="Column79" Width="103.95"/>
+        <TableColumn Name="Column80"/>
+        <TableColumn Name="Column81" Width="132.3"/>
+        <TableColumn Name="Column82" Width="198.45"/>
+        <TableColumn Name="Column83" Width="85.05"/>
+        <TableColumn Name="Column84" Width="264.6"/>
+        <TableColumn Name="Column85" Width="94.5"/>
+        <TableColumn Name="Column86" Width="94.5"/>
+        <TableColumn Name="Column87" Width="264.6"/>
+        <TableColumn Name="Column88" Width="9.45"/>
+        <TableColumn Name="Column89" Width="103.95"/>
+        <TableColumn Name="Column90" Width="103.95"/>
+        <TableColumn Name="Column91" Width="15.12"/>
+        <TableColumn Name="Column92"/>
+        <TableColumn Name="Column93" Width="160.65"/>
+        <TableColumn Name="Column94" Width="179.55"/>
+        <TableColumn Name="Column95" Width="94.5"/>
+        <TableColumn Name="Column96" Width="198.45"/>
+        <TableColumn Name="Column97" Width="85.05"/>
+        <TableColumn Name="Column98" Width="160.65"/>
+        <TableColumn Name="Column99"/>
+        <TableColumn Name="Column100" Width="58.59"/>
+        <TableColumn Name="Column101" Width="73.71"/>
+        <TableColumn Name="Column102" Width="264.6"/>
+        <TableColumn Name="Column103"/>
+        <TableColumn Name="Column104" Width="198.45"/>
+        <TableColumn Name="Column105" Width="198.45"/>
+        <TableColumn Name="Column106"/>
+        <TableColumn Name="Column107" Width="132.3"/>
+        <TableColumn Name="Column108"/>
+        <TableColumn Name="Column109" Width="132.3"/>
+        <TableColumn Name="Column110"/>
+        <TableColumn Name="Column111"/>
+        <TableColumn Name="Column112"/>
+        <TableColumn Name="Column113" Width="170.1"/>
+        <TableColumn Name="Column114" Width="103.95"/>
+        <TableColumn Name="Column115" Width="113.4"/>
+        <TableColumn Name="Column116" Width="103.95"/>
+        <TableColumn Name="Column117" Width="103.95"/>
+        <TableColumn Name="Column118" Width="103.95"/>
+        <TableColumn Name="Column119" Width="103.95"/>
+        <TableColumn Name="Column120"/>
+        <TableColumn Name="Column121" Width="141.75"/>
+        <TableColumn Name="Column122" Width="132.3"/>
+        <TableColumn Name="Column123" Width="236.25"/>
+        <TableColumn Name="Column124" Width="103.95"/>
+        <TableColumn Name="Column125" Width="113.4"/>
+        <TableColumn Name="Column126" Width="85.05"/>
+        <TableColumn Name="Column127" Width="94.5"/>
+        <TableColumn Name="Column128" Width="85.05"/>
+        <TableColumn Name="Column129" Width="85.05"/>
+        <TableColumn Name="Column130"/>
+        <TableColumn Name="Column131" Width="94.5"/>
+        <TableColumn Name="Column132" Width="94.5"/>
+        <TableColumn Name="Column133" Width="77.49"/>
+        <TableColumn Name="Column134" Width="81.27"/>
+        <TableRow Name="Row5" Height="30.24">
+          <TableCell Name="Cell99" Border.Lines="Right" Text="[qryData.ZV_DAT]"/>
+          <TableCell Name="Cell100" Border.Lines="Right" Text="[qryData.PC]"/>
+          <TableCell Name="Cell101" Border.Lines="Right" Text="[qryData.ND]"/>
+          <TableCell Name="Cell102" Border.Lines="Right" Text="[qryData.DAT_END_CARD]" Format="Date" Format.Format="dd.MM.yyyy"/>
+          <TableCell Name="Cell103" Border.Lines="Right" Text="[qryData.NLS_2625]"/>
+          <TableCell Name="Cell124" Border.Lines="Right" Text="[qryData.KV_2625]"/>
+          <TableCell Name="Cell125" Border.Lines="Right" Text="[qryData.DATE_OPEN_2625]"/>
+          <TableCell Name="Cell126" Border.Lines="Right" Text="[qryData.LIM]" HorzAlign="Center"/>
+          <TableCell Name="Cell127" Border.Lines="Right" Text="[qryData.CARD_CODE]"/>
+          <TableCell Name="Cell128" Border.Lines="Right" Text="[qryData.BRANCH]"/>
+          <TableCell Name="Cell129" Border.Lines="Right" Text="[qryData.RNK]"/>
+          <TableCell Name="Cell130" Border.Lines="Right" Text="[qryData.NMK]"/>
+          <TableCell Name="Cell131" Border.Lines="Right" Text="[qryData.OKPO]"/>
+          <TableCell Name="Cell132" Border.Lines="Right" Text="[qryData.BDAY]" Format="Date" Format.Format="dd.MM.yyyy"/>
+          <TableCell Name="Cell133" Border.Lines="Right" Text="[qryData.M_WORK]"/>
+          <TableCell Name="Cell134"/>
+          <TableCell Name="Cell135" Border.Lines="Right" Text="[qryData.DOM_TEL]"/>
+          <TableCell Name="Cell136" Border.Lines="Right" Text="[qryData.WORK_TEL]"/>
+          <TableCell Name="Cell137"/>
+          <TableCell Name="Cell138" Border.Lines="Right" Text="[qryData.IND]"/>
+          <TableCell Name="Cell139" Border.Lines="Right" Text="[qryData.OBL]"/>
+          <TableCell Name="Cell140" Border.Lines="Right" Text="[qryData.RAION]"/>
+          <TableCell Name="Cell141" Border.Lines="Right" Text="[qryData.TYPE_NP]"/>
+          <TableCell Name="Cell142" Border.Lines="Right" Text="[qryData.LOCALITY]"/>
+          <TableCell Name="Cell143" Border.Lines="Right" Text="[qryData.TYPE_EDI]"/>
+          <TableCell Name="Cell144" Border.Lines="Right" Text="[qryData.STREET]"/>
+          <TableCell Name="Cell145" Border.Lines="Right" Text="[qryData.F_HOME]"/>
+          <TableCell Name="Cell146" Border.Lines="Right" Text="[qryData.F_HOMEPART]"/>
+          <TableCell Name="Cell147" Border.Lines="Right" Text="[qryData.F_ROOM]"/>
+          <TableCell Name="Cell148" Border.Lines="Right" Text="[qryData.ADDRESS]"/>
+          <TableCell Name="Cell149" Border.Lines="Right" Text="[qryData.F_IND]"/>
+          <TableCell Name="Cell150" Border.Lines="Right" Text="[qryData.F_OBL]"/>
+          <TableCell Name="Cell151" Border.Lines="Right" Text="[qryData.F_RAION]"/>
+          <TableCell Name="Cell152" Border.Lines="Right" Text="[qryData.F_TYPE_NP]"/>
+          <TableCell Name="Cell153" Border.Lines="Right" Text="[qryData.F_LOCALITY]"/>
+          <TableCell Name="Cell154" Border.Lines="Right" Text="[qryData.F_TYPE_EDI]"/>
+          <TableCell Name="Cell155" Border.Lines="Right" Text="[qryData.F_STREET]"/>
+          <TableCell Name="Cell156" Border.Lines="Right" Text="[qryData.HOME]"/>
+          <TableCell Name="Cell157" Border.Lines="Right" Text="[qryData.F_HOMEPART]"/>
+          <TableCell Name="Cell158" Border.Lines="Right" Text="[qryData.F_ROOM]"/>
+          <TableCell Name="Cell159" Border.Lines="Right" Text="[qryData.F_ADDRESS]"/>
+          <TableCell Name="Cell160" Border.Lines="Right" Text="[qryData.OST_2202]"/>
+          <TableCell Name="Cell161" Border.Lines="Right" Text="[qryData.OST_2207]"/>
+          <TableCell Name="Cell162" Border.Lines="Right" Text="[qryData.OST_2208]"/>
+          <TableCell Name="Cell163" Border.Lines="Right" Text="[qryData.OST_2209]"/>
+          <TableCell Name="Cell164" Border.Lines="Right" Text="[qryData.DAT_PR_2207]" Format="Date" Format.Format="dd.MM.yyyy"/>
+          <TableCell Name="Cell165" Border.Lines="Right" Text="[qryData.DAT_PR_2209]" Format="Date" Format.Format="dd.MM.yyyy"/>
+          <TableCell Name="Cell166" Border.Lines="Right" Text="[qryData.T_PENS]"/>
+          <TableCell Name="Cell167" Border.Lines="Right" Text="[qryData.ACC_OVR]"/>
+          <TableCell Name="Cell168" Border.Lines="Right" Text="[qryData.NLS_2924]"/>
+          <TableCell Name="Cell169" Border.Lines="Right" Text="[qryData.ZKP]"/>
+          <TableCell Name="Cell170" Border.Lines="Right" Text="[qryData.RAH_PR]" HorzAlign="Center"/>
+          <TableCell Name="Cell171" Border.Lines="Right" Text="[qryData.DAY_PR_2207]" HorzAlign="Center"/>
+          <TableCell Name="Cell172" Border.Lines="Right" Text="[qryData.DAY_PR_2209]"/>
+          <TableCell Name="Cell173" Border.Lines="Right" Text="[qryData.INSUR_SUM]" HorzAlign="Right"/>
+          <TableCell Name="Cell174" Border.Lines="Right" Text="[qryData.INSUR_PAY]" HorzAlign="Right"/>
+          <TableCell Name="Cell175" Border.Lines="Right" Text="[qryData.INSUR_SUM7]" HorzAlign="Right"/>
+          <TableCell Name="Cell176" Border.Lines="Right" Text="[qryData.INSUR_PAY7]" HorzAlign="Center"/>
+          <TableCell Name="Cell177" Border.Lines="Right" Text="[qryData.IR]" HorzAlign="Center"/>
+          <TableCell Name="Cell178" Border.Lines="Right" Text="[qryData.KFC]"/>
+          <TableCell Name="Cell179" Border.Lines="Right" Text="[qryData.D1]" Format="Date" Format.Format="dd.MM.yyyy"/>
+          <TableCell Name="Cell180" Text="[qryData.D2]" Format="Date" Format.Format="dd.MM.yyyy"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="256.9" Width="7106.4" Height="18.9"/>
+  </ReportPage>
+</Report>

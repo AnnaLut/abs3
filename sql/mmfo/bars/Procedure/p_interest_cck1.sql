@@ -11,6 +11,7 @@
 ) IS
 
   /*
+    26/02/2018  Pogoda   додано розрахунок комісії по методу "відсоток від залишку"
     05/11/2017  Pivanova додано умову для нарахування basey=2 i basem=0
     18/07/2017  Pivanova додано додаткові умови для нрахування по ануїтету
     27/05/2017  Pivanova додано опцію по нарахуванню % в регламенті
@@ -46,7 +47,7 @@
 BEGIN
 
   IF p_type >= 0
-     AND p_type NOT IN (1, 2, 3, 4, 11, 12, 13, 14, 15, 15,17) THEN
+     AND p_type NOT IN (1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 17) THEN
     RETURN;
   END IF;
   interest_utl.start_reckoning;
@@ -226,15 +227,15 @@ BEGIN
                     ,n.nd
 
                 FROM accounts a, int_accn i, nd_acc n
-               WHERE n.nd = dd.nd
-                 AND n.acc = a.acc
-                 AND a.acc = i.acc
-                 AND (i.stp_dat IS NULL or i.stp_dat >=ddat2_)
-                 AND (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9','CR9') AND
-                     i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
-                 AND i.acra IS NOT NULL
-                 AND i.acrb IS NOT NULL
-                 AND i.acr_dat < ddat2_
+                  WHERE n.nd = dd.nd
+                    AND n.acc = a.acc
+                    AND a.acc = i.acc
+                    AND (i.stp_dat IS NULL or i.stp_dat >=ddat2_)
+                    AND (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9','CR9') AND
+                         i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
+                    AND i.acra IS NOT NULL
+                    AND i.acrb IS NOT NULL
+                    AND i.acr_dat < ddat2_
               union
               SELECT a.nls,
                      a.accc,
@@ -247,90 +248,107 @@ BEGIN
                      i.id,
                      n.nd
                 FROM accounts a, int_accn i, nd_acc n,cc_deal d
-               WHERE n.acc = a.acc
-                 and d.nd=n.nd
-                 AND d.ndg=dd.nd
-                 AND a.acc = i.acc
-                 AND (i.stp_dat IS NULL or i.stp_dat >= ddat2_)
-                 AND (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9', 'CR9') AND
-                     i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
-                 AND i.acra IS NOT NULL
-                 AND i.acrb IS NOT NULL
-                 AND i.acr_dat < ddat2_) LOOP
+                  WHERE n.acc = a.acc
+                    and d.nd=n.nd
+                    AND d.ndg=dd.nd
+                    AND a.acc = i.acc
+                    AND (i.stp_dat IS NULL or i.stp_dat >= ddat2_)
+                    AND (a.tip IN ('SS ', 'SP ', 'LIM', 'SPN', 'SK9', 'CR9') AND
+                        i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
+                    AND i.acra IS NOT NULL
+                    AND i.acrb IS NOT NULL
+                    AND i.acr_dat < ddat2_) 
+    LOOP
       DELETE FROM acr_intn;
+
       l_nazn := NULL;
-   if p.tip in('SS ', 'SP ') and p.nd =dd.nd and p.id =0 and p.basey<>2 and p.basem<>1 then
-      acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode);
-   elsif p.tip in('SS ', 'SP ') and p.nd =dd.nd and p.id =0 and p.basey<>2 and p.basem is null then
-      acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode);
-   elsif
-     p.tip IN ('SS ')
-         AND p.accc IS NOT NULL
-         AND p.basey = 2
-         AND p.basem = 1
-         AND p.id = 0 THEN
-        cck.int_metr_a(p.accc
-                      ,p.acc
-                      ,p.id
-                      ,p.ddat1
-                      ,ddat2_
-                      ,nint_
-                      ,NULL
-                      ,l_mode); ------ начисление по ануитету
- elsif
-     p.tip IN ('SS ')
-         AND p.accc IS NOT NULL
-         AND p.basey = 2
-         AND p.basem = 0
-         AND p.id = 0 THEN
-        cck.int_metr_a(p.accc
-                      ,p.acc
-                      ,p.id
-                      ,p.ddat1
-                      ,ddat2_
-                      ,nint_
-                      ,NULL
-                      ,l_mode); ------ начисление по ануитету
+      
+      if p.tip in('SS ', 'SP ') and 
+         p.nd =dd.nd and 
+         p.id =0 and 
+         p.basey<>2 
+         and p.basem<>1 then
+
+        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode);
+      elsif p.tip in('SS ', 'SP ') and 
+            p.nd =dd.nd and 
+            p.id =0 and 
+            p.basey<>2 and 
+            p.basem is null then
+
+         acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode);
+      elsif p.tip IN ('SS ')
+        AND p.accc IS NOT NULL
+        AND p.basey = 2
+        AND p.basem = 1
+        AND p.id = 0 THEN
+
+          cck.int_metr_a(p.accc
+                        ,p.acc
+                        ,p.id
+                        ,p.ddat1
+                        ,ddat2_
+                        ,nint_
+                        ,NULL
+                        ,l_mode); ------ начисление по ануитету
+      elsif p.tip IN ('SS ')
+        AND p.accc IS NOT NULL
+        AND p.basey = 2
+        AND p.basem = 0
+        AND p.id = 0 THEN
+
+          cck.int_metr_a(p.accc
+                        ,p.acc
+                        ,p.id
+                        ,p.ddat1
+                        ,ddat2_
+                        ,nint_
+                        ,NULL
+                        ,l_mode); ------ начисление по ануитету
       ELSIF p.tip IN ('SS ', 'SP ')
-            AND p.accc IS NOT NULL
-            AND p.id = 0
-            AND p.basey <> 2
-            AND p.basem <> 1 THEN
-        acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское
+        AND p.accc IS NOT NULL
+        AND p.id = 0
+        AND p.basey <> 2
+        AND p.basem <> 1 THEN
+
+          acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское
       ELSIF p.id = 1
-            AND p.metr = 4
-            AND p.tip IN ('S36') THEN
+        AND p.metr = 4
+        AND p.tip IN ('S36') THEN
 
+    -- add by VPogoda 2018-01-16, COBUMMFO-6039
+    -- амортизация дисконта выполняется только по тем договорам, по которым была выдача.
+    -- add by VPogoda 2018-01-16, COBUMMFO-6039
+    -- амортизация дисконта выполняется только по тем договорам, по которым была выдача.
+            select count(1) into l_num
+              from (select 1 from accounts ac, nd_acc n, cc_deal cd
+              where nvl(cd.ndg,cd.nd) = nvl(dd.ndg,dd.nd)
+                and n.nd = cd.nd
+                and n.acc = ac.acc
+                and ac.tip = 'SS '
+                and ac.dapp is not null
+    --            and ac.ostb != 0
+                and exists (select 1 from cc_deal cd
+                              where cd.nd = dd.nd
+                                and cd.vidd in (1,2,3,4))
+            union select 1 from cc_deal cd where cd.nd = dd.nd and cd.vidd not in (1,2,3,4));
+            if l_num != 0 then
+              acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
 
--- add by VPogoda 2018-01-16, COBUMMFO-6039
--- амортизация дисконта выполняется только по тем договорам, по которым была выдача.            
-/*        select count(1) into l_num
-          from (select 1 from accounts ac, nd_acc n
-          where n.nd = dd.nd
-            and n.acc = ac.acc
-            and ac.tip = 'SS '
-            and ac.dapp is not null
---            and ac.ostb != 0
-            and exists (select 1 from cc_deal cd 
-                          where cd.nd = dd.nd
-                            and cd.vidd in (1,2,3,4))
-        union select 1 from cc_deal cd where cd.nd = dd.nd and cd.vidd not in (1,2,3,4));
-        if l_num != 0 then*/
-          acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
-
-          l_nazn := substr('Амортизація рах.(пропорц.) ' || p.nls /*||
-                           '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
-                           ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
-                          ,1
-                          ,160);
-/*        else
-          bars_audit.info('Договор [ref = '||dd.nd||'] не має залишків на рахунках основної заборгованості, амортизація дисконту не виконується!');
-        end if;*/
+              l_nazn := substr('Амортизація рах.(пропорц.) ' || p.nls /*||
+                               '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
+                               ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
+                              ,1
+                              ,160);
+            else
+              bars_audit.info('Договор [ref = '||dd.nd||'] не має залишків на рахунках основної заборгованості, амортизація дисконту не виконується!');
+            end if;
       ELSIF p.id = 1
         AND p.metr = 4
         AND p.tip IN ('SDI') 
         and 1=0    -- cobuprvnix-161 отключение амортизации дисконта
         THEN
+
 
             acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
             l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
@@ -412,6 +430,7 @@ BEGIN
   CLOSE k1;
 
 END p_interest_cck1;
+
 /
  show err;
  

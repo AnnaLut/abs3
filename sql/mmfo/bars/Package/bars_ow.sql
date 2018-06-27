@@ -3498,6 +3498,16 @@ begin
                  and ref = bars_sqnc.rukey(to_char(l_srn))
                  and dk  = l_dk
               returning acc into l_acc;                            
+           if sql%rowcount = 0 then
+              update ow_pkk_history
+                 set drn = l_drn,
+                     resp_class = l_resp_class,
+                     resp_code  = l_resp_code,
+                     resp_text  = l_resp_text
+               where f_n = l_iic_filename
+                 and ref = bars_sqnc.rukey(to_char(l_srn))
+                 and dk  = l_dk
+              returning acc into l_acc;                            
               if sql%rowcount = 0 then
                  update ow_pkk_history
                     set drn = l_drn,
@@ -3515,6 +3525,7 @@ begin
                  end if;
               end if;
            end if;
+           end if;
 
            begin
               select t.pay_flag, o.tt into l_payflag, l_tt
@@ -3530,8 +3541,8 @@ begin
                where o.ref = l_srn
                  and o.tt = t.tt
                  and t.dk = l_dk;
-              exception when no_data_found then null;
-              end;
+           exception when no_data_found then null;
+           end;
            end;
 
            -- оплата/сторнирование при квитовке
@@ -4048,6 +4059,9 @@ begin
            else
               l_nlsb := p_nlsb;
            end if;
+        else
+           l_nlsb := p_nlsb;
+     end if;
         else
            l_nlsb := p_nlsb;
      end if;

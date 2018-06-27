@@ -70,7 +70,9 @@ namespace BarsWeb.Areas.Finmon.Controllers
         public ActionResult PrintFmForm(decimal refDoc)
         {
             var service = new defaultWebService();
-            string fileName = service.GetFileForPrint(refDoc.ToString(CultureInfo.CurrentCulture), "OPER_REF_FM", null);
+            var serviceResult = service.GetFileForPrint(refDoc.ToString(CultureInfo.CurrentCulture), "OPER_REF_FM", null);
+
+            string fileName = serviceResult.Text;
             return File(fileName, "application/force-download", String.Format("Finmon_{0}.rtf", refDoc));
         }
 

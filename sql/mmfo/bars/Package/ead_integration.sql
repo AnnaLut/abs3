@@ -5,7 +5,7 @@ PROMPT =========================================================================
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-43 3.1 04.06.2018 MMFO';
    g_type_id  object_type.id%type;
-   g_state_id object_state.state_id%type;
+   g_state_id number;
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    /*ТОЛЬКО ДЛЯ МЕТОДА SetDocumentData (функция get_Doc_Instance) в связи с внедрением ДКБО и печатных документов к нему, требуется определять тип сделки и тип счета по ead_docs*/
    function get_agr_type(p_agr_id in EAD_DOCS.AGR_ID%type) return varchar2;
    function get_acc_type(p_agr_id in EAD_DOCS.AGR_ID%type, p_acc in EAD_DOCS.acc%type) return varchar2;
-   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out object_state.state_id%type);
+   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out number);
   procedure get_dkbo(p_acc         in accounts.acc%type,
                      p_id          out deal.id%type,
                      p_deal_number out deal.deal_number%type,
@@ -53,7 +53,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
       doc_binary_data       ead_docs.scan_data%TYPE,
       doc_request_number    CUST_REQUESTS.REQ_ID%TYPE,
       agr_code              ead_docs.agr_id%TYPE,
-      agr_type              varchar2(50),
+      agr_type              ead_nbs.agr_type%type,
       account_type          varchar2(50), -- размерность 50 - от себя
       account_number        accounts.nls%TYPE,
       account_currency      accounts.kv%TYPE,
@@ -171,9 +171,9 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
    -----------------------------------------------------------------------
    TYPE AgrDPT_Instance_Rec IS RECORD
    (  rnk              customer.rnk%TYPE,
-      parent_agr_type  varchar2(10),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
+      parent_agr_type  varchar2(50),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
       parent_agr_code  deal.deal_number%type, -- это поле заполняется номером ДКБО только для депозитов онлайн
-      agr_type         varchar2(50),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         dpt_deposit_clos.deposit_id%TYPE,
       agr_number       dpt_deposit_clos.nd%TYPE,
       agr_status       SMALLINT,
@@ -207,9 +207,9 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
    TYPE AgrBPK_Instance_Rec IS RECORD
    (
       rnk              customer.rnk%TYPE,
-      parent_agr_type  varchar2(10),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
+      parent_agr_type  varchar2(50),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
       parent_agr_code  deal.DEAL_NUMBER%type, -- это поле заполняется номером ДКБО только для депозитов онлайн
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         dpt_deposit_clos.deposit_id%TYPE,
       agr_number       dpt_deposit_clos.nd%TYPE,
       agr_status       SMALLINT,
@@ -230,9 +230,9 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
   ---- DKBO 22/05/2017
    TYPE AgrDKBO_Instance_Rec IS RECORD
    (  rnk              customer.rnk%TYPE,
-      parent_agr_type  varchar(10),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
+      parent_agr_type  varchar(50),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
       parent_agr_code  deal.DEAL_NUMBER%type, -- это поле заполняется номером ДКБО только для депозитов онлайн
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         deal.id%TYPE,
       agr_number       deal.deal_number%TYPE,
       agr_status       SMALLINT,
@@ -259,7 +259,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
    (
 
       rnk              customer.rnk%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         varchar2(50),
       agr_number       dpu_deal.nd%TYPE,
       agr_status       SMALLINT,
@@ -282,7 +282,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
    (
 
       rnk              customer.rnk%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         specparam.nkd%TYPE,
       agr_number       specparam.nkd%TYPE,
       agr_status       SMALLINT,
@@ -312,7 +312,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
       branch_id        branch.branch%TYPE,
       user_login       staff$base.logname%TYPE,
       user_fio         staff$base.fio%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_status       SMALLINT,
       agr_number       specparam.nkd%TYPE,
       agr_date_open    accounts.daos%TYPE,
@@ -335,7 +335,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
       branch_id        branch.branch%TYPE,
       user_login       staff$base.logname%TYPE,
       user_fio         staff$base.fio%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_status       int,
       agr_number       varchar2(100),
       agr_date_open    accounts.daos%TYPE,
@@ -351,7 +351,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
    TYPE UAgrSalary_Instance_Rec IS RECORD
    (
       rnk              customer.rnk%TYPE,
-      agr_type         varchar2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         zp_deals.id%type,
       agr_number       zp_deals.deal_id%type,
       agr_status       number,
@@ -391,7 +391,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
       agr_number       specparam.nkd%TYPE,
       agr_code         VARCHAR2 (500),
       account_type     VARCHAR2 (500),
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       remote_controled number(1)
    );
 
@@ -401,7 +401,7 @@ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так 
 
   TYPE ACC_Instance_Rec IS RECORD(
     rnk                       customer.rnk%TYPE,
-    agr_type                  VARCHAR2(20),
+    agr_type                  ead_nbs.agr_type%type,
     agr_code                  VARCHAR2(500),
     agr_number                specparam.nkd%TYPE,
     account_type              VARCHAR2(500),
@@ -459,7 +459,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
      agr_code  specparam.nkd%type,
      agr_number  string(50),
      acc_type  string(50),
-     agr_type  string(50),
+     agr_type  ead_nbs.agr_type%type,
      agr_date  string(50),
      agr_status  number,
 --     p_parent_agr_code out varchar2,
@@ -523,7 +523,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
    function get_acc_type(p_agr_id in EAD_DOCS.AGR_ID%type, p_acc in EAD_DOCS.acc%type) return varchar2
    is
    l_res varchar2(50) := null;
-   l_agr_type varchar2(50);
+   l_agr_type ead_nbs.agr_type%type;
    begin
     l_agr_type := get_agr_type(p_agr_id);
 
@@ -544,15 +544,67 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
     return l_res;
    end get_acc_type;
 
-   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out object_state.state_id%type) is
+   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out number) is
+      invalid_identifier_state_id exception;
+      pragma exception_init(invalid_identifier_state_id, -904);
+      
+      
+      l_sql_template    varchar2(500) := 
+                        q'#
+                     FROM object_type ot,  object_state os
+                    WHERE ot.type_code = 'DKBO'
+                      and OT.ID = OS.OBJECT_TYPE_ID
+                      and OS.STATE_CODE = 'CONNECTED'#';
+  
    begin
-     SELECT ot.id, os.state_id
+
+     /* -- старый код + нижний exception
+      SELECT ot.id, os.state_id
        into l_type_id, l_state_id
        FROM object_type ot,  object_state os
       WHERE ot.type_code = 'DKBO'
         and OT.ID = OS.OBJECT_TYPE_ID
         and OS.STATE_CODE = 'CONNECTED';
-  exception when no_data_found then
+        */
+   
+      -- зависимости между разработками
+      -- сделали рефакторинг OBJECT_STATE, но не понятно когда релиз
+       
+      -- оставляем для dependency (запрос пустышка) 
+      SELECT max(null)
+        into l_type_id      
+        FROM object_type ot,  object_state os
+       WHERE ot.type_code = 'DKBO'
+         and OT.ID = OS.OBJECT_TYPE_ID
+         and OS.STATE_CODE = 'CONNECTED'
+         and 1 = 0; -- 
+       
+        begin
+            -- попытка выполнить запрос с возвращением поля STATE_ID из OBJECT_STATE
+            execute immediate 'SELECT ot.id, os.state_id '||
+                              l_sql_template  
+              into l_type_id, l_state_id;
+            -- выполнилось без ошибки выходим   
+            return;  
+        exception
+           when invalid_identifier_state_id then
+              null;
+           when others then
+              raise;  
+        end;
+        begin
+            -- попытка выполнить запрос с возвращением поля ID из OBJECT_STATE
+            execute immediate 'SELECT ot.id, os.id state_id '||
+                              l_sql_template
+              into l_type_id, l_state_id;
+            return;  
+        exception
+           when invalid_identifier_state_id then
+              null;
+           when others then
+              raise;  
+        end;
+   exception when no_data_found then
       bars_audit.error('EBP.GET_ARCHIVE_DKBO_DOCID : Не описаний тип/статуси угоди ДКБО');
       when too_many_rows then
       bars_audit.error('EBP.GET_ARCHIVE_DKBO_DOCID : Не коректно описаний тип/статуси угоди ДКБО (дублювання налаштувань)');
@@ -787,7 +839,7 @@ end  ead_nbs_check_param;
                    rnk,
                    e.acc_type,
                    e.agr_type,
-                   1,
+                   10,
                    e.custtype,
                    substr(nls,1,4)
               into l_daos,
@@ -1516,7 +1568,7 @@ end  ead_nbs_check_param;
     is
        l_UAgrDBO_Instance_Rec   UAgrDBO_Instance_Rec;
         l_agr_code specparam.nkd%type;
-        l_agr_type varchar2(10);
+        l_agr_type ead_nbs.agr_type%type;
         l_agr_date varchar2(10);
         l_agr_status number(2);
      begin

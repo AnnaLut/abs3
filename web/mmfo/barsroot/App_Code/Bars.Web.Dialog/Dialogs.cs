@@ -102,31 +102,46 @@ namespace Bars.Web.Dialog
                         break;
                     }
                     case "show_rtf_file":
-                    {
-                        String FileName = Convert.ToString(Request.Params.Get("filename"));
-                        String ReportName = Convert.ToString(Request.Params.Get("reportname"));
-
-                        if (FileName != "")
                         {
-                            Response.ClearContent();
-                            Response.ClearHeaders();
-                            Response.Charset = "windows-1251";
-                            Response.ContentEncoding = Encoding.GetEncoding(Response.Charset);
-                            if (FileName.Contains(".csv"))
-                            {
-                                Response.AddHeader("Content-Disposition", String.Format("inline;filename={0}.csv", ReportName));
-                                Response.ContentType = "application/ms-excel";
-                            }
-                            else
-                            {
-                                Response.AddHeader("Content-Disposition", String.Format("inline;filename={0}.rtf", ReportName));
-                                Response.ContentType = "application/rtf";
-                            }
-                            Response.WriteFile(FileName, true);
-                        }
+                            String FileName = Convert.ToString(Request.Params.Get("filename"));
+                            String ReportName = Convert.ToString(Request.Params.Get("reportname"));
 
-                        break;
-                    }
+                            if (FileName != "")
+                            {
+                                Response.ClearContent();
+                                Response.ClearHeaders();
+                                Response.Charset = "windows-1251";
+                                Response.ContentEncoding = Encoding.GetEncoding(Response.Charset);
+                                //Response.ContentEncoding = Encoding.UTF8;
+                                string fileExtention = Path.GetExtension(FileName).ToLower();
+                                string mimeType = MimeTypeMap.GetMimeType(fileExtention);
+                                if (FileName.Contains(".csv"))
+                                {
+                                    Response.AddHeader("Content-Disposition", String.Format("inline;filename={0}{1}", ReportName, fileExtention));
+                                    Response.ContentType = "application/ms-excel";
+                                }
+                                else if (FileName.Contains(".pdf"))
+                                {
+                                    Response.AddHeader("Content-Disposition", String.Format("attachment;filename={0}{1}", ReportName, fileExtention));
+                                }
+                                else if (FileName.Contains(".doc"))
+                                {
+                                    Response.AddHeader("Content-Disposition", String.Format("attachment;filename={0}{1}", ReportName, fileExtention));
+                                }
+                                else if (FileName.Contains(".rtf"))
+                                {
+                                    Response.AddHeader("Content-Disposition", String.Format("inline;filename={0}{1}", ReportName, fileExtention));
+                                }
+                                else
+                                {
+                                    Response.AddHeader("Content-Disposition", String.Format("attachment;filename={0}{1}", ReportName, fileExtention));
+                                }
+                                Response.ContentType = mimeType;
+                                Response.WriteFile(FileName, true);
+                            }
+
+                            break;
+                        }
                     case "print_file":
                     {
                         string fileName = Request.Params.Get("filename");

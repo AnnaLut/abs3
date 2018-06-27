@@ -27,8 +27,9 @@ PROMPT *** Create  view V_CLIM_BRANCH ***
           bra.sab,
           bra.obl
      FROM bars.branch bra
-    WHERE LENGTH (branch) > 1;
-
+    WHERE LENGTH (branch) > 1
+          AND branch LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask');
+		  
 PROMPT *** Create  grants  V_CLIM_BRANCH ***
 grant SELECT                                                                 on V_CLIM_BRANCH   to BARSREADER_ROLE;
 grant SELECT                                                                 on V_CLIM_BRANCH   to BARS_ACCESS_DEFROLE;

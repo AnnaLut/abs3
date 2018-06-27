@@ -439,8 +439,9 @@ namespace BarsWeb.Controllers
         public string GetFileForPrint(string id, string templateId)
         {
             var service = new defaultWebService();
-            string fileName = service.GetFileForPrint(id, templateId, null);
-            return fileName;
+            var serviceResult = service.GetFileForPrint(id, templateId, null);
+
+            return serviceResult.Text;
         }
 
         public JsonResult CreateReportFile(long[] ids, string[] templates, string date = "")

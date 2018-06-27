@@ -4,6 +4,7 @@ set serveroutput on size 1000000
 
 prompt Создание / Обновление операции V77
 prompt Наименование операции: V77-МБК+Форекс зовнішні запозичення (валюта через 1500)
+
 declare
   cnt_  number;
 begin

@@ -59,7 +59,7 @@ declare
 begin
 
   l_tabsemantic := 'Розрахунок простроч.заборгованості за КД, в т.ч. за пенею та 3% річних ';
-  l_tablinesdef := '10';
+  l_tablinesdef := '';
   l_tabselect_statement := '';
   l_tabname     := 'V_605';
 
@@ -140,28 +140,34 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 0, 'Вибрати кредитну угоду з КП', 'Z605.XXX( 1, :N, 0, '''' , :R )', ':N(SEM=Реф_Дог_в_КП,TYPE=N),:R(SEM=Розмір_пені,TYPE=N)', 'ONCE', '', '', '63', '', '', 84);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Вибрати кредитну угоду з БПК', 'Z605.XXX( 3, :N, 0, '''' , :R )', ':N(SEM=Реф_Дог_в_БПК,TYPE=N),:R(SEM=Розмір_пені,TYPE=N)', 'ONCE', '', '', '4', '', '', 85);
+  bars_metabase.add_nsifunction(l_tabid, 0, 'Вибрати кредитну угоду з КП', 'Z605.XXX( 1, :N, 0, '''' , :R )', ':N(SEM=Реф_Дог_в_КП,TYPE=N),:R(SEM=Розмір_пені,TYPE=N)', 'ONCE', '', '', '63', '', '', 85);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 2, 'Виконати розрахунок по ДОГОВОРУ в цілому з КП', 'z605.FRM  ( 1, 0, 0, '''', 0, 3) ', '', 'EACH', 'Виконати розрахунок  по КД  реф= :ND  № = :CC_ID  :NMK ?', 'Виконано!', '', '', '', 19);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Виконати розрахунок по ОДНОМУ рах. КД з КП', 'z605.FRM  ( 2,:ND,:KV,:NLS, null, 3) ', '', 'EACH', 'Виконати розрахунок  по КД  , вал = :KV рах = :NLS  :NMK  ?', 'Виконано!', '', '', '', 21);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Виконати розрахунок по ОДНОМУ рах. КД з КП', 'z605.FRM  ( 2,0,:KV,:NLS, null, 3) ', ':NLS(SEM=Рахунок,TYPE=С),:KV(SEM=Валюта,TYPE=N)', 'ONCE', 'Виконати розрахунок  по рахунку ?', 'Виконано!', '', '', '', 21);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 10, 'Протокол розрахуноку за основним боргом', '', '', 'ONCE', '', '', '', '', 'sPar=TMP_T605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>TMP_T605.ND=to_number(pul.get(''ND_605'')) and TMP_T605.MD=to_number(pul.get(''MOD_605''))]', 77);
+  bars_metabase.add_nsifunction(l_tabid, 7, 'Вибрати кредитну угоду з БПК', 'Z605.XXX( 3, :N, :V, :L , :R )', ':N(SEM=Реф_Дог_в_БПК/або_пусто,TYPE=N),:V(SEM=Код_вал/або_пусто,TYPE=N),:L(SEM=Карт_рах/або_пусто),:R(SEM=Розмір_пені/або_пусто,TYPE=N)', 'ONCE', '', '', '4', '', '', 84);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 11, 'Протокол розрахуноку за процентами  ', '', '', 'ONCE', '', '', '', '', 'sPar=TMP_P605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>TMP_P605.ND=to_number(pul.get(''ND_605'')) and TMP_P605.MD=to_number(pul.get(''MOD_605''))]', 52);
+  bars_metabase.add_nsifunction(l_tabid, 8, 'Виконати розрахунок по ОДНОМУ ДОГ з БПК', 'z605.FRM  ( 3, 0, 0, '''', 0, 3) ', '', 'EACH', 'Виконати розрахунок  по Дог  :ND  з БПК , вал = :KV рах = :NLS  :NMK  ?', 'Виконано!', '', '', '', 33);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 12, 'Протокол розрахуноку за комісією', '', '', 'ONCE', '', '', '', '', 'sPar=TMP_K605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>TMP_K605.ND=to_number(pul.get(''ND_605'')) and TMP_K605.MD=to_number(pul.get(''MOD_605''))]', 53);
+  bars_metabase.add_nsifunction(l_tabid, 10, 'Протокол розрахуноку за основним боргом', '', '', 'ONCE', '', '', '', '', 'sPar=V_TMP_T605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_TMP_T605.ND=to_number(pul.get(''ND_605'')) and V_TMP_T605.MD=to_number(pul.get(''MOD_605''))]', 77);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 15, 'Друк звіту', '', '', 'ONCE', '', 'Виконано!', '', '', '', 118);
+  bars_metabase.add_nsifunction(l_tabid, 11, 'Протокол розрахуноку за процентами  ', '', '', 'ONCE', '', '', '', '', 'sPar=V_TMP_P605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_TMP_P605.ND=to_number(pul.get(''ND_605'')) and V_TMP_P605.MD=to_number(pul.get(''MOD_605''))]', 52);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 12, 'Протокол розрахуноку за комісією', '', '', 'ONCE', '', '', '', '', 'sPar=V_TMP_K605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_TMP_K605.ND=to_number(pul.get(''ND_605'')) and V_TMP_K605.MD=to_number(pul.get(''MOD_605''))]', 53);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 13, 'Протокол розрахунку за інфляцією', '', '', 'ONCE', '', '', '', '', 'sPar=V_INFLATION_ALL[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false]', 73);
+  
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 15, 'Друк звіту', 'z605.rep( :D11, :D12, :D21, :D22)', ':D11(SEM=Звіт_З_Дати,TYPE=D),:D12(SEM=Звіт_ПО_Дату,TYPE=D),:D21(SEM=Пеня_З_Дати,TYPE=D),:D22(SEM=Пеня_ПО_Дату,TYPE=D)', 'ONCE', '', 'Виконано!', '', '', '/barsroot/cbirep/rep_list.aspx', 118);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
