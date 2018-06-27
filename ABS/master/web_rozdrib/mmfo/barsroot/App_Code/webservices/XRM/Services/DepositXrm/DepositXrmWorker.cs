@@ -364,6 +364,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                         DepositParams.Rnk = DepositParams.RNKInfant;
                         DepositParams.RNKTrustee = RNK;
                     }
+
                     // открываем депозитный договор
                     cmd.CommandText = "bars.xrm_integration_oe.open_deposit";
                     cmd.CommandType = CommandType.StoredProcedure;

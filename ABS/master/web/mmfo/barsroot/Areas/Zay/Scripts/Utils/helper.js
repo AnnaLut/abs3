@@ -509,6 +509,7 @@ bars.helper = bars.helper || {
     validateForm: function () {
         var contract = $.trim($('#contract').val());
         var dat2_vmd = $.trim($('#dat2_vmd').val());
+        var f092_text = $.trim($('#f092_text').val());
         var benef_country = $('#benef_country').val();
 
         var aim = $("#meta_aim_name").data("kendoDropDownList").dataItem().AIM_CODE;
@@ -547,6 +548,10 @@ bars.helper = bars.helper || {
         }
         else if (dat2_vmd === "" || dat2_vmd === null) {
             bars.ui.error({ text: "Не вказано дату контракту " });
+            return false;
+        }
+        else if (f092_text === "" || f092_text === null) {
+            bars.ui.error({ text: 'Не вказано "Підставу для купівлі (510) "' });
             return false;
         }
         else {

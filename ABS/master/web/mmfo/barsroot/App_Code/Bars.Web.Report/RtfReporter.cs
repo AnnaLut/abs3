@@ -25,6 +25,7 @@ namespace Bars.Web.Report
         /// Імена одержаних файлів
         /// Якщо імя порожне - файла немає.
         /// </summary>
+        protected int _defaultFileFormat; //формат, в якому необхідно друкувати файл з frx-шаблону
         protected string _strReportFile;	    // имя файла готового отчета
         protected string _strHeaderFile;      // імя файлу верхнього колонтитула
         protected string _strFooterFile;      // імя файлу нижнього колонтитула
@@ -210,15 +211,24 @@ namespace Bars.Web.Report
                 {
                     throw new ReportException("Помилка шаблон '" + _strTemplateID + "' не найден!");
                 }
-                //_cmd.CommandText = "SELECT id, template FROM doc_scheme WHERE upper(ID)=upper('" + _strTemplateID + "')";
-                //_reader = _cmd.ExecuteReader();
+
                 var fileNameObj = _reader["FILE_NAME"];
-             // clob.Value;
-                if (fileNameObj != null && !string.IsNullOrEmpty(Convert.ToString(fileNameObj)))
+
+                if (fileNameObj != null && !string.IsNullOrEmpty(Convert.ToString(fileNameObj)))  //Exist frx file, print from it
                 {
 
                     string filename = Convert.ToString(fileNameObj);
-                  
+
+                    //get file extention from DB:
+                    _cmd.CommandText = "select f.id from fr_print_format f, doc_scheme d where d.fr_print_format = f.id and d.id = :p_template_id";
+                    _cmd.Parameters.Add("p_template_id", OracleDbType.Varchar2, _strTemplateID, ParameterDirection.Input);
+                    _reader = _cmd.ExecuteReader();
+                    if (!_reader.Read())
+                    {
+                        _defaultFileFormat = 9; //Rtf, according to FrxExportTypes enum
+                    }
+                    else
+                        _defaultFileFormat = Convert.ToInt32(_reader[0]);
 
                     FrxParameters pars = new FrxParameters();
                     pars.Add(new FrxParameter("rnk", TypeCode.String, Convert.ToString(this.ContractNumber)));
@@ -228,12 +238,8 @@ namespace Bars.Web.Report
                           FrxDoc.GetTemplatePathByFileName(filename),
                               pars,
                             null);
-                    
-                    using (var str = new MemoryStream())
-                    {
-                        doc.ExportToMemoryStream(FrxExportTypes.Rtf, str);
-                        _strBuf = Encoding.UTF8.GetString((str as MemoryStream).ToArray());
-                    }
+                    _strReportFile = doc.Export((FrxExportTypes)_defaultFileFormat);
+                    return;
                 }
                 else
                 {
@@ -241,11 +247,11 @@ namespace Bars.Web.Report
 
                     if (clob.IsNull || clob.IsEmpty)
                     {
-                        throw new ApplicationException("Помилка шаблон '" + _strTemplateID + "' пуст!");
+                        throw new ApplicationException("Шаблон '" + _strTemplateID + "' порожній!");
                     }
                     _strBuf = clob.Value;
                 }
-               
+
 
                 //-- смотрим на первые байты шаблона и если они равны 504B, 
                 //-- то расматриваем шаблон как сжетый					
@@ -259,30 +265,27 @@ namespace Bars.Web.Report
                 // генерим финальный файл на основании шаблона и данных
                 MakeReport(_strReportFile);
             }
-           
-           catch (System.Exception)
-           {	// пока бросаем дальше
-               throw;
-           }
+
+            catch (System.Exception)
+            {   // пока бросаем дальше
+                throw;
+            }
             finally
             {
-                if(clob != null)
+                if (clob != null)
                 {
                     clob.Close();
                     clob.Dispose();
                 }
 
 
-                if (_reader != null)
-                {
-                    _reader.Close();
-                    _reader.Dispose();
-                }
+                _reader.Close();
+                _reader.Dispose();
                 _cmd.Dispose();
                 if (_con.State != ConnectionState.Closed) _con.Close();
                 _con.Dispose();
             }
-           
+
         }
 
 

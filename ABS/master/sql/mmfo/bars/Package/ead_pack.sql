@@ -11,7 +11,7 @@
 
   -- Public type declarations
   -- type <TypeName> is <Datatype>;
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.0  01.02.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.2  20.06.2018 MMFO';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -22,6 +22,20 @@
   g_transfer_timeout constant number := 180;
   function g_process_actual_time return number;
 
+  -- Сброс (обнуление) Сиквенсов в базе
+  procedure reset_seq(p_seq_name in varchar2);
+  -- Сброс (обнуление) Сиквенсов.
+  -- Если год обновления в справочнике отличается от текущего года  sysdate - обнуляем все сиквенсы из справочника EAD_GENSEQUENCEKF
+  procedure ead_reset_seq;
+
+   -- Добивает спереди строку нулями.
+  function add_0_num (p_InNum number,
+                      p_0Num  number default 8) return varchar2;
+
+   -- Унікальний № друку.
+  function print_number (p_kf  IN ead_sync_queue.kf%TYPE,
+                         p_num in number --10	АБС «БАРС», 20	Card Management, 99	Електронний архів (ІМС)
+                         ) return  varchar2;
   -- Public variable declarations
   -- <VariableName> <Datatype>;
 
@@ -140,7 +154,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
-   g_body_version constant varchar2(64) := 'version 3.0  01.02.2018 MMFO';
+   g_body_version constant varchar2(64) := 'version 3.2  20.06.2018 MMFO';
    kflist bars.string_list; -- Список рабочих kf
    gn_dummy   number;  -- Для возвратов функций
 
@@ -223,6 +237,108 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
    -- < VariableName > < Datatype >;
 
    -- Function and procedure implementations
+
+   -- Обнуление сиквенсов в БД
+  procedure reset_seq(p_seq_name in varchar2) is
+    l_val number;
+  begin
+    execute immediate 'select ' || p_seq_name || '.nextval from dual'
+      INTO l_val;
+
+    execute immediate 'alter sequence ' || p_seq_name || ' increment by -' ||
+                      l_val || ' minvalue 0';
+
+    execute immediate 'select ' || p_seq_name || '.nextval from dual'
+      INTO l_val;
+
+    execute immediate 'alter sequence ' || p_seq_name ||
+                      ' increment by 1 minvalue 0';
+  end;
+
+  -- Обнуление Сиквенсов.
+  -- Если год обновления в справочнике отличается от текущего года  sysdate - обнуляем все сиквенсы из справочника EAD_GENSEQUENCEKF
+  procedure ead_reset_seq is
+      l_yestaryear varchar2(4);
+      l_year       varchar2(4);
+
+  begin
+   begin
+
+  for rec in (  select sq.sequence, sq.id, extract(year from sysdate) sys_date ,extract(year from sq.date_update) seq_date
+                     from EAD_GENSEQUENCEKF sq
+                       where extract(year from sq.date_update) <> extract(year from sysdate)
+      )
+ loop
+
+ begin
+   -- Обнуляем сиквенс
+   ead_pack.reset_seq(p_seq_name => rec.sequence);
+
+   update EAD_GENSEQUENCEKF sq set sq.date_update = sysdate where sq.sequence = rec.sequence ;
+      exception
+        when others then
+          bars_audit.info('ead_pack.ead_reset_seq: Ошибка при обнулении сиквенса' || rec.sequence||':->'||sqlerrm);
+      end;
+
+ end loop;
+/* if SQL%NOTFOUND  then  null; end if; */
+       end;
+ end ead_reset_seq;
+
+   -- Функция добивает спереди строку нулями.
+ function add_0_num (p_InNum  number, p_0Num number default 8) return varchar2 is
+   l_InNum   varchar2(15);
+   l_LengRef number(15);
+  begin
+    begin
+
+  select  length(p_InNum)
+   into  l_LengRef
+   from dual;
+
+   if  l_LengRef < p_0Num then
+    l_InNum := lpad(p_InNum, p_0Num,0);
+   else
+      l_InNum := p_InNum;
+   end if;
+
+   return l_InNum;
+     end;
+  end add_0_num;
+
+
+   -- Унікальний № друку.
+  function print_number (p_kf  IN ead_sync_queue.kf%TYPE,
+                         p_num in number --10	АБС «БАРС», 20	Card Management, 99	Електронний архів (ІМС)
+                         ) return  varchar2 is
+
+   l_kf       varchar2(6);
+   l_prn_num  varchar2(225);
+   l_point    varchar2(1):='.'; -- куда-то терялась точка в номере. По этому сделал так....
+   l_sequence varchar2(255);
+   l_ru_num   varchar2(5):='01';  --- Справочник (- код РУ, у відділенні якого співробітник формував документ )
+   l_date     varchar2(10):= to_char(gl.bd,'YY');
+    begin
+     begin
+   l_kf := nvl(p_kf, sys_context ('bars_context', 'user_mfo'));
+
+  -- обнуляем сиквенсы, если необходимо.
+   ead_pack.ead_reset_seq;
+
+  --  <- Справочник сюда!
+  select  s.sequence, s.id
+  into l_sequence, l_ru_num
+    from EAD_GENSEQUENCEKF s where s.kf = nvl(p_kf,l_kf);
+
+  -- l_ru_num Генерим последовательный номер и добиваем 0(в начале строки) до необходимого количества символов = 7
+  execute immediate 'select '||p_num||l_ru_num||l_date||'||ead_pack.add_0_num( '||l_sequence||'.Nextval,7) from dual'
+                       into l_prn_num;
+
+
+   return substr(l_prn_num,1,6)||l_point||substr(l_prn_num,7,7);
+
+     end;
+   end;
 
    -- ==== Надруковані документи ====
    -- Створити надрукований документ
@@ -1510,6 +1626,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       END IF;
 
       --перероблено на одну відпрвку по одному рахунку при змінах в accounts or specparam
+/*  -- 23/03/2018 Лесняк С.Б.
     for cur in (select distinct 'ACC' as agr_type,
                        au.acc as acc,
                        au.rnk as rnk,
@@ -1555,6 +1672,31 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                    )
                  )
       LOOP
+*/
+ for cur in (
+                select distinct 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
+                  from accounts_update au
+                 where au.idupd > l_cdc_lastkey_acc and au.idupd <= l_cdc_newkey_acc and au.kf member of kflist
+                       and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) and ead_pack.get_custtype(au.rnk) = 2
+                       and not exists (select 1 from dpu_accounts da where da.accid = au.acc)
+                       and exists ( select 1
+                                      from accounts a
+                                     where a.acc = au.acc and a.kf = au.kf
+                                           and ( ead_pack.get_acc_nbs(a.acc) in ( select nbs from EAD_NBS e where custtype = 2 and e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22) ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
+                                                or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10') )
+                       and au.tip not in ('DEP', 'DEN', 'NL8') )
+          union
+                select distinct 'ACC' as agr_type, su.acc as acc, a.rnk as rnk, su.kf
+                  from specparam_update su
+                       join accounts a on a.acc = su.acc and a.kf = su.kf and ead_pack.get_custtype(a.rnk) = 2 and a.tip not in ('DEP', 'DEN', 'NL8')
+                                          and ( ead_pack.get_acc_nbs(a.acc) in (select nbs from EAD_NBS e where custtype = 2 and e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22) ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
+                                                or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10') )
+                 where su.idupd > l_cdc_lastkey_specparam
+                   and su.idupd <= l_cdc_newkey_specparam
+                   and su.kf member of kflist
+                   and not exists (select 1 from dpu_accounts da where da.accid = su.acc)
+                 )
+      LOOP
          -- на всякий передаем клиента
          ead_pack.msg_create ('UCLIENT', TO_CHAR (cur.rnk), cur.rnk, cur.kf);
          -- за ним сделку, если это "старый счет" = не в рамках ДБО
@@ -1569,7 +1711,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       -- сохранение ключей захвата изменений
       set_cdc_newkeys (l_cdc_newkey_dpt,
                        l_cdc_newkey_acc,
-                       l_cdc_newkey_dpt_old,
+                       l_cdc_newkey_acc,
                        l_cdc_newkey_specparam);
 
       COMMIT;
@@ -1775,13 +1917,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     l_s_row.sync_start := sysdate;
       --кол-во строк за один пробег
     begin
-      select nvl(val, 1000)
+      select nvl(val, 500)
         into l_rows
         from PARAMS$GLOBAL
        where par = 'EAD_ROWS';
       EXCEPTION
       WHEN NO_DATA_FOUND then
-            l_rows := 1000;
+            l_rows := 500;
     end;
       -- обработка каждого запроса по отдельности
       for cur in (select * from (select id, crt_date, type_id, status_id, kf,
@@ -1790,13 +1932,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                             FROM bars.ead_sync_queue
                            WHERE type_id = p_type_id
                              AND status_id IN ('NEW', 'ERROR')
-                             AND err_count < 30
+                             AND err_count < 15
 --                             and regexp_like(err_text, 'rnk \d+ not found', 'i')
                              and kf = p_kf
 --                             AND crt_date > ADD_MONTHS(SYSDATE, -g_process_actual_time)
-                             and crt_date > sysdate - interval '15' day
+                             and crt_date > sysdate - interval '3' day
                            order by status_id  desc, trans_date asc, id asc)
-                   where ROWNUM < NVL(l_rows, 1000)
+                   where ROWNUM < NVL(l_rows, 500)
 --                     and trans_date <= l_s_row.sync_start)
                      and trans_date <= sysdate)
       loop
@@ -1840,21 +1982,26 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       l_ndbo     VARCHAR2 (50);
       l_sdbo     VARCHAR2 (50);
       l_daos     DATE;
+      l_agr_type ead_nbs.agr_type%type;
+      l_acc_type ead_nbs.acc_type%type;
    BEGIN
       -- узнать, является ли счет - счетом в рамках ДБО
       --1) наличие у клиента ДБО-договора
-      SELECT kl.get_customerw (rnk, 'NDBO'),
-             kl.get_customerw (rnk, 'DDBO'),
-             daos
-        INTO l_ndbo, l_sdbo, l_daos
-        FROM accounts
-       WHERE acc = p_acc;
+      SELECT kl.get_customerw (a.rnk, 'NDBO'),
+             kl.get_customerw (a.rnk, 'DDBO'),
+             a.daos,
+             e.agr_type,
+             e.acc_type
+        INTO l_ndbo, l_sdbo, l_daos, l_agr_type, l_acc_type
+        FROM accounts a, ead_nbs e
+             WHERE a.acc  = p_acc
+               and e.id   = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22);
 
       --2) если нет договора ДБО - то точно это обычный, резалт еще 0
       --3) если ДБО оформлен, счет может быть открыт до ДБО, его считаем "старым"
       IF (    l_ndbo IS NOT NULL
-          AND TRUNC (l_daos) >=
-                 TO_DATE (REPLACE (l_sdbo, '.', '/'), 'dd/mm/yyyy'))
+          AND TRUNC (l_daos) >= TO_DATE (REPLACE (l_sdbo, '.', '/'), 'dd/mm/yyyy')
+          and l_agr_type not in ( 'acquiring_uo', 'salary_uo' ) ) -- Если на счете acquiring_uo, надо возвращать 0. (cdc_agr_u -> ead_pack.msg_create ('UAGR', cur.agr_type || ';' || TO_CHAR (cur.acc), cur.rnk, cur.kf);)
       THEN
          l_result := 1;
       END IF;

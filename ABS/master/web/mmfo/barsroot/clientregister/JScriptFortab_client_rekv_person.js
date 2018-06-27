@@ -25,7 +25,8 @@ $(function () {
     } else {
     }
     $('#ed_PDATE,#ed_BDAY,#ed_DATE_PHOTO,#ed_ID_ReceiveDate,#ed_ID_ExpireDate').mask("99.99.9999");
-    $('#ed_ID_RecordNum').numberMask({ beforePoint: 14, pattern: /^[-0-9]*$/ });
+    $('#ed_ID_Number').mask("999999999");
+    $('#ed_ID_RecordNum').mask("99999999-99999");
     $('#phoneConfirmSms').numberMask({ beforePoint: 6, pattern: /^[0-9]*$/ });
 
     $('#notUseTelm').on('change', function () {
@@ -348,6 +349,48 @@ function checkDocType(type) {
         $('#trIDNumber,#trIDRecordNum,#trIDOrgan,#trIDDate').hide();
     }
 }
+/// Перевірка Номера запису в ЄДДР для Паспорта ID-картки
+/// Аналогічна перевірка продубльована в JScriptForregistration.js -> Check_ClientRekvPerson()
+function ValidateIDRecordNum() {
+    var strAlert = '';
+    var ed_ID_RecordNumElem = getEl('ed_ID_RecordNum');
+    var strRecNum = ed_ID_RecordNumElem.value;
+    var strBDate = getEl('ed_BDAY').value;
+    var strSEX = getEl('ddl_SEX').selectedIndex;
+
+    if (!strRecNum)
+        strAlert += '«Унік.номер запису в ЄДДР» необхідно заповнити\n';
+    else if (strRecNum.length != 14)
+        strAlert += '«Унік. номер запису в ЄДДР» має бути довжиною в 14 символів\n';
+    else if (!strBDate)
+        strAlert += 'Заповніть спочатку дату народження\n';
+    else if (!strSEX)
+        strAlert += 'Необхідно вказати стать клієнта\n';
+    else if (strRecNum.substr(0, 4) != strBDate.substr(6, 4) ||
+             strRecNum.substr(4, 2) != strBDate.substr(3, 2) ||
+             strRecNum.substr(6, 2) != strBDate.substr(0, 2))
+        strAlert += 'Помилка. Перевірте значення у полях «Унік. номер запису в ЄДДР» та «Дата народження»\n';
+    else {
+        var iSerNum = parseInt(strRecNum.substr(9, 4),10);
+        if ((strSEX == '2' && iSerNum % 2 != 0) ||
+            (strSEX == '1' && iSerNum % 2 == 0) ||
+            (                 iSerNum     == 0))
+            strAlert += 'Помилка. Перевірте значення у полях «Унік. номер запису в ЄДДР» та «Стать»\n';
+    }
+    var oID_RecordNum =  $('#ed_ID_RecordNum')
+    if (strAlert.length > 0) {
+        barsUiError({ text: strAlert });
+        oID_RecordNum.addClass('error');
+        oID_RecordNum.eq(0).focus();
+        oID_RecordNum.eq(0).select();
+        return false;
+    }
+    else
+        $('#ed_ID_RecordNum').removeClass('error');
+    return true;
+}
+
+
 // Функция проверки наличия документа в БД
 function ValidateDocument(ddlPassp, edSer, edNumDoc) {
     var type = ddlPassp.item(ddlPassp.selectedIndex).value;
@@ -490,7 +533,6 @@ function CheckDocSeries(edSeriesID, ddlTypeID) {
     // Ми щось виділили в TextBox - прибираємо перевірку на довжину
     var selection = document.selection || window.getSelection();
     if (selection.type === "Text" || selection.type === "Range") val_full = val;
-
 
     switch ($('#' + ddlTypeID).val()) {
         case "1":
@@ -784,8 +826,10 @@ function GetCODEtelList(elem, table) {
     }*/
     // $get('ed_COUNTRYCd').value = $get('ddl_COUNTRY').item($get('ddl_COUNTRY').selectedIndex).value;
 }
-//Візуально приховуємо ознаку обов'язковості дом телефону для фоп спд
+
 $(document).ready(function () {
+    var arrDocTypesUA = ['1']; // типи документів по яким потрібне перекодування в кирилицю
+    //Візуально приховуємо ознаку обов'язковості дом телефону для фоп спд
     if (parent.obj_Parameters['CUSTTYPE'] === 'person' && parent.isCustomerSpd()) {   
         $("#ed_TELD_star").hide();
     }
@@ -795,13 +839,20 @@ $(document).ready(function () {
             $("#ed_TELM").attr('disabled', true);
         }
     }
+    // для перекодування на кирилицю 
     $("#ed_SER").keydown(function (e) {
-        if ($("#ed_SER").val().length < 2) {
+        // 
+        var docType = $('#ddl_PASSP');
+        if (docType && jQuery.inArray(docType.val(), arrDocTypesUA) >= 0 && $("#ed_SER").val().length < 2) {
             initTranslate(e);
         }
         return true;
     });
-    $("#ed_ORGAN").keydown(function (e) { initTranslate(e); return true; });
+    $("#ed_ORGAN").keydown(function (e) {
+        var docType = $('#ddl_PASSP');
+        if (docType && jQuery.inArray(docType.val(), arrDocTypesUA) >= 0 ) { initTranslate(e); }
+        return true;
+    });
     $("#ed_BPLACE").keydown(function (e) { initTranslate(e); return true; });
 
     initShowHidePhoneButton();

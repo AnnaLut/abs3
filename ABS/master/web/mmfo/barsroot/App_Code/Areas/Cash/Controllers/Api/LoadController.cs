@@ -58,7 +58,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
         /// <returns></returns>
         [HttpGet]
         [GET("api/cash/load/accountsrest")]
-        public AccountsRestResponse AccountsRest(string bankdate, string mfoCode = null) // mfo
+        public AccountsRestResponse AccountsRest(string bankdate) // mfo
         {
             var response = new AccountsRestResponse
             {
@@ -70,7 +70,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
                 DateTime? date = StringToDate(bankdate);
                 if (date != null)
                 {
-                    IEnumerable<RegionAccountRest> accountsRests = _regionAccountRepository.GetAccountRests((DateTime)date).Where(x => x.Mfo == mfoCode);
+                    IEnumerable<RegionAccountRest> accountsRests = _regionAccountRepository.GetAccountRests((DateTime)date);
                     response.AccountsRests = accountsRests;
                 }
             }
@@ -90,7 +90,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
         /// <returns></returns>
         [HttpGet]
         [GET("api/cash/load/accounts")]
-        public AccountsResponse Accounts(bool @new = false, string mfoCode = null) // add string mfo
+        public AccountsResponse Accounts(bool @new = false) // add string mfo
         {
             var response = new AccountsResponse
             {
@@ -105,7 +105,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
                     bankDate = _regionAccountRepository.GetBankDate();
                 }
 
-                IEnumerable<RegionAccount> accounts = GetAccountsFromDb(bankDate).Where(x => x.Mfo == mfoCode); // where kf = 
+                IEnumerable<RegionAccount> accounts = GetAccountsFromDb(bankDate); // where kf = 
                 response.BankDate = bankDate;
                 response.Accounts = accounts;
             }
@@ -121,7 +121,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
         /// </summary>
         [HttpGet]
         [GET("api/cash/load/Branches")]
-        public BranchesResponse Branches(string mfoCode = null) // mfo
+        public BranchesResponse Branches() // mfo
         {
             var response = new BranchesResponse
             {
@@ -129,7 +129,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
             };
             try
             {
-                response.Branches = GetBranchesFromDb().Where(x => x.Branch == mfoCode);
+                response.Branches = GetBranchesFromDb();
             }
             catch (Exception ex)
             {
@@ -144,7 +144,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
         /// </summary>
         [HttpGet]
         [GET("api/cash/load/Transactions")]
-        public TransactionsResponse Transactions(string bankdate, string mfoCode = null) // mfo
+        public TransactionsResponse Transactions(string bankdate) // mfo
         {
             var response = new TransactionsResponse
             {
@@ -155,7 +155,7 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
                 DateTime? date = StringToDate(bankdate);
                 if (date != null)
                 {
-                    IEnumerable<RegionTransaction> transactions = _regionAccountRepository.GetTransactions((DateTime) date).Where(x => x.Mfo == mfoCode);
+                    IEnumerable<RegionTransaction> transactions = _regionAccountRepository.GetTransactions((DateTime) date);
                     response.Transactions = transactions;
                 }
             }
@@ -166,9 +166,9 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
             }
             return response;
         }
-        private IEnumerable<RegionAccount> GetAccountsFromDb(DateTime? bankdate = null, string mfoCode = null)
+        private IEnumerable<RegionAccount> GetAccountsFromDb(DateTime? bankdate = null)
         {
-            IQueryable<V_CLIM_ACCOUNTS> dbRecords = _regionAccountRepository.GetAccounts().Where(x => x.BRANCH == mfoCode);
+            IQueryable<V_CLIM_ACCOUNTS> dbRecords = _regionAccountRepository.GetAccounts();
 
             if (bankdate.HasValue)
             {
@@ -178,9 +178,9 @@ namespace BarsWeb.Areas.Cash.Controllers.Api
             IQueryable<RegionAccount> viewRecords = ModelConverter.ToViewModel(dbRecords);
             return viewRecords;
         }
-        private IEnumerable<RegionBranch> GetBranchesFromDb(string mfoCode = null)
+        private IEnumerable<RegionBranch> GetBranchesFromDb()
         {
-            IQueryable<V_CLIM_BRANCH> dbRecords = _regionAccountRepository.GetBranches().Where(x => x.BRANCH == mfoCode);
+            IQueryable<V_CLIM_BRANCH> dbRecords = _regionAccountRepository.GetBranches();
             IQueryable<RegionBranch> viewRecords = ModelConverter.ToViewModel(dbRecords);
             return viewRecords;
         }

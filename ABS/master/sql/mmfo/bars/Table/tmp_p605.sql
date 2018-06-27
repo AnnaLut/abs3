@@ -1,78 +1,26 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/TMP_P605.sql =========*** Run *** ====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** ALTER_POLICY_INFO to TMP_P605 ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               null;
-           end; 
-          '; 
-END; 
+begin execute immediate 'CREATE TABLE tmp_P605 (  md int, nd number , G01 date , G02 number, G03 number,  G04 number, G05 number,  G06 number, G07 int,  G08 number,  G09 number, G10 number, G11 number,NCOL int) ' ;
+exception when others then   if SQLCODE = - 00955 then null;   else raise; end if; --ORA-00955: name is already used by an existing object
+end;
 /
 
-PROMPT *** Create  table TMP_P605 ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.TMP_P605 
-   (	MD NUMBER(*,0), 
-	ND NUMBER, 
-	G01 DATE, 
-	G02 NUMBER, 
-	G03 NUMBER, 
-	G04 NUMBER, 
-	G05 NUMBER, 
-	G06 NUMBER, 
-	G07 NUMBER(*,0), 
-	G08 NUMBER, 
-	G09 NUMBER, 
-	G10 NUMBER, 
-	G11 NUMBER
-   ) SEGMENT CREATION DEFERRED 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSDYND ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
+begin   execute immediate 'alter table    TMP_p605  add ( NCOL int )';
+exception when others then     if sqlcode= -01430 then null; else raise; end if; -- ORA-01430: column being added already exists in table
 end; 
 /
 
+COMMENT ON TABLE  tmp_p605      IS 'COBUSUPABS-5819.Розрахунок простроченої заборгованості за процентами ';
+COMMENT ON COLUMN tmp_p605.ND   IS 'Реф дог';                                        
+COMMENT ON COLUMN tmp_p605.G01  IS 'Дата операції';                                        
+COMMENT ON COLUMN tmp_p605.G02  IS 'Сума нарахованих процентів за користування кредитом';                                        
+COMMENT ON COLUMN tmp_p605.G03  IS 'Сума чергового платежу по процентах, що підлягала сплаті, згідно ГПК';                                        
+COMMENT ON COLUMN tmp_p605.G04  IS 'Сума погашених процентів';                                        
+COMMENT ON COLUMN tmp_p605.G05  IS 'Залишок заборгованості';                                        
+COMMENT ON COLUMN tmp_p605.G06  IS 'Залишок простроченої заборгованості';                                        
+COMMENT ON COLUMN tmp_p605.G07  IS 'К-ть днів прострочки';                                        
+COMMENT ON COLUMN tmp_p605.G08  IS 'Розмір пені';                                        
+COMMENT ON COLUMN tmp_p605.G09  IS 'Сума пені';                                        
+COMMENT ON COLUMN tmp_p605.G10  IS '3% річних';                                        
+COMMENT ON COLUMN tmp_p605.G11  IS 'Сума 3% річних';
+COMMENT ON COLUMN TMP_p605.NCOL IS 'цвет строки';                                      
 
-
-
-PROMPT *** ALTER_POLICIES to TMP_P605 ***
- exec bpa.alter_policies('TMP_P605');
-
-
-COMMENT ON TABLE BARS.TMP_P605 IS 'COBUSUPABS-5819.Р РѕР·СЂР°С…СѓРЅРѕРє РїСЂРѕСЃС‚СЂРѕС‡РµРЅРѕС— Р·Р°Р±РѕСЂРіРѕРІР°РЅРѕСЃС‚С– Р·Р° РїСЂРѕС†РµРЅС‚Р°РјРё ';
-COMMENT ON COLUMN BARS.TMP_P605.MD IS '';
-COMMENT ON COLUMN BARS.TMP_P605.ND IS 'Р РµС„ РґРѕРі';
-COMMENT ON COLUMN BARS.TMP_P605.G01 IS 'Р”Р°С‚Р° РѕРїРµСЂР°С†С–С—';
-COMMENT ON COLUMN BARS.TMP_P605.G02 IS 'РЎСѓРјР° РЅР°СЂР°С…РѕРІР°РЅРёС… РїСЂРѕС†РµРЅС‚С–РІ Р·Р° РєРѕСЂРёСЃС‚СѓРІР°РЅРЅСЏ РєСЂРµРґРёС‚РѕРј';
-COMMENT ON COLUMN BARS.TMP_P605.G03 IS 'РЎСѓРјР° С‡РµСЂРіРѕРІРѕРіРѕ РїР»Р°С‚РµР¶Сѓ РїРѕ РїСЂРѕС†РµРЅС‚Р°С…, С‰Рѕ РїС–РґР»СЏРіР°Р»Р° СЃРїР»Р°С‚С–, Р·РіС–РґРЅРѕ Р“РџРљ';
-COMMENT ON COLUMN BARS.TMP_P605.G04 IS 'РЎСѓРјР° РїРѕРіР°С€РµРЅРёС… РїСЂРѕС†РµРЅС‚С–РІ';
-COMMENT ON COLUMN BARS.TMP_P605.G05 IS 'Р—Р°Р»РёС€РѕРє Р·Р°Р±РѕСЂРіРѕРІР°РЅРѕСЃС‚С–';
-COMMENT ON COLUMN BARS.TMP_P605.G06 IS 'Р—Р°Р»РёС€РѕРє РїСЂРѕСЃС‚СЂРѕС‡РµРЅРѕС— Р·Р°Р±РѕСЂРіРѕРІР°РЅРѕСЃС‚С–';
-COMMENT ON COLUMN BARS.TMP_P605.G07 IS 'Рљ-С‚СЊ РґРЅС–РІ РїСЂРѕСЃС‚СЂРѕС‡РєРё';
-COMMENT ON COLUMN BARS.TMP_P605.G08 IS 'Р РѕР·РјС–СЂ РїРµРЅС–';
-COMMENT ON COLUMN BARS.TMP_P605.G09 IS 'РЎСѓРјР° РїРµРЅС–';
-COMMENT ON COLUMN BARS.TMP_P605.G10 IS '3% СЂС–С‡РЅРёС…';
-COMMENT ON COLUMN BARS.TMP_P605.G11 IS 'РЎСѓРјР° 3% СЂС–С‡РЅРёС…';
-
-
-
-PROMPT *** Create  grants  TMP_P605 ***
-grant SELECT                                                                 on TMP_P605        to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_P605        to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/TMP_P605.sql =========*** End *** ====
-PROMPT ===================================================================================== 
+grant select on  tmp_p605 to BARS_ACCESS_DEFROLE ;

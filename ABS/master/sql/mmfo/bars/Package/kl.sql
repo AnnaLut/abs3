@@ -5,7 +5,7 @@ IS
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.4 06/10/2017';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.5 29/05/2018';
 G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ  - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -191,21 +191,23 @@ procedure setCorpAttr (
 -- description	: процедура регистрации клиента-физ.лица/обновления реквизитов
 --***************************************************************************--
 procedure setPersonAttr (
-  Rnk_      person.rnk%type,
-  Sex_      person.sex%type,
-  Passp_    person.passp%type,
-  Ser_      person.ser%type,
-  Numdoc_   person.numdoc%type,
-  Pdate_    person.pdate%type,
-  Organ_    person.organ%type,
-  Bday_     person.bday%type,
-  Bplace_   person.bplace%type,
-  Teld_     person.teld%type,
-  Telw_     person.telw%type,
+  Rnk_          person.rnk%type,
+  Sex_          person.sex%type,
+  Passp_        person.passp%type,
+  Ser_          person.ser%type,
+  Numdoc_       person.numdoc%type,
+  Pdate_        person.pdate%type,
+  Organ_        person.organ%type,
+  Bday_         person.bday%type,
+  Bplace_       person.bplace%type,
+  Teld_         person.teld%type,
+  Telw_         person.telw%type,
   Telm_         person.cellphone%type default null,
   actual_date_  person.actual_date%type default null,
   eddr_id_      person.eddr_id%type default null,
-  p_flag_visa number default 0 );
+  p_flag_visa   number default 0,
+  Fdate_        person.date_photo%type default null
+);
 
 
 --***************************************************************************--
@@ -577,7 +579,7 @@ is
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.0  28/03/2018';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.1  29/05/2018';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -1586,43 +1588,48 @@ END setCorpAttr;
 -- DESCRIPTION	: процедура регистрации клиента-физ.лица/обновления реквизитов
 --***************************************************************************--
 PROCEDURE setPersonAttr
-( Rnk_      person.rnk%type,
-  Sex_      person.sex%type,
-  Passp_    person.passp%type,
-  Ser_      person.ser%type,
-  Numdoc_   person.numdoc%type,
-  Pdate_    person.pdate%type,
-  Organ_    person.organ%type,
-  Bday_     person.bday%type,
-  Bplace_   person.bplace%type,
-  Teld_     person.teld%type,
-  Telw_     person.telw%type,
+( Rnk_          person.rnk%type,
+  Sex_          person.sex%type,
+  Passp_        person.passp%type,
+  Ser_          person.ser%type,
+  Numdoc_       person.numdoc%type,
+  Pdate_        person.pdate%type,
+  Organ_        person.organ%type,
+  Bday_         person.bday%type,
+  Bplace_       person.bplace%type,
+  Teld_         person.teld%type,
+  Telw_         person.telw%type,
   Telm_         person.cellphone%type default null,
   actual_date_  person.actual_date%type default null,
   eddr_id_      person.eddr_id%type default null,
-  p_flag_visa   number default 0)
-IS
+  p_flag_visa   number default 0,
+  Fdate_        person.date_photo%type default null
+) IS
   l_fdate   date;
 BEGIN
 
-  If ((Passp_ = 1) And (Bday_ is Not Null) And (Pdate_ is Not Null)) Then
+  If (Passp_ = 1) 
+  Then
 
-    -- Умови при яких дата вклеювання фото = даті видачі паспорту
-    If (add_months(Bday_,300) < trunc(sysdate)) then
-    -- клієнтові менше 25 років
-      l_fdate := Pdate_;
-
-    ElsIf ((add_months(Bday_,540) < trunc(sysdate)) And (Pdate_ > add_months(Bday_,300)))then
-    -- клієнтові менше 45 років і дата видачі більша за дату його 25 ліття
-      l_fdate := Pdate_;
-
-    ElsIf (Pdate_ > add_months(Bday_,540)) Then
-    -- дата видачі більша за дату 45 ліття клієнта
-      l_fdate := Pdate_;
-
-    Else
-      l_fdate := null;
-
+    l_fdate := Fdate_;
+	
+	if ( ( l_fdate is Null ) and (Bday_ is Not Null) And (Pdate_ is Not Null) ) 
+    then -- Умови при яких дата вклеювання фото = даті видачі паспорту
+      
+	  If (add_months(Bday_,300) < trunc(sysdate))
+	  then -- клієнтові менше 25 років
+        l_fdate := Pdate_;
+      
+      ElsIf ((add_months(Bday_,540) < trunc(sysdate)) And (Pdate_ > add_months(Bday_,300)))
+		then -- клієнтові менше 45 років і дата видачі більша за дату його 25 ліття
+        l_fdate := Pdate_;
+      
+      ElsIf (Pdate_ > add_months(Bday_,540)) Then
+      -- дата видачі більша за дату 45 ліття клієнта
+        l_fdate := Pdate_;
+      
+      End if;
+      
     End If;
 
   Else
@@ -1630,7 +1637,8 @@ BEGIN
   End If;
 
   if p_flag_visa = 0
-  or p_flag_visa = 1 and not is_customer_visa(Rnk_) then
+  or p_flag_visa = 1 and not is_customer_visa(Rnk_) 
+  then
      setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_,Pdate_,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
 $if KL_PARAMS.CLV $then
   else

@@ -674,6 +674,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.BARS_DOCSYNC is
                 select branch into l_branch from bars.accounts
                 where nls = d.nls_a and kv = d.kv and kf = d.mfo_a;
                 --COBUMMFO-4647 согласно заявки докмент создается в бранче привязки счета. Бранч исполнителя не проверяется(код заккоментирован)
+                --COBUMMFO-4647 согласно заявки докмент создается в бранче привязки счета. Бранч исполнителя не проверяется(код заккоментирован)
                 -- Ищем бранч пользователя-операциониста
                 -- select branch into l_branch_isp from bars.staff$base where id=d.userid;
                 -- Для пользователя на '/' будет подставляться МФО плательщика

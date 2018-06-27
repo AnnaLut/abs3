@@ -59,8 +59,6 @@ exception when others then
 /
 
 
-
-
 PROMPT *** Create  constraint PK_SPPI ***
 begin   
  execute immediate '
@@ -72,10 +70,7 @@ exception when others then
  end;
 /
 
-
-
-
-PROMPT *** Create  index PK_SPPI ***
+PROMPT *** Create index PK_SPPI ***
 begin   
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_SPPI ON BARS.SPPI (SPPI_ID) 
@@ -86,7 +81,15 @@ exception when others then
  end;
 /
 
-
+PROMPT *** ADD COLUMN sppi_value***
+begin
+execute immediate '
+ alter table sppi add sppi_value number(1)';
+ exception when others then 
+    if sqlcode=-01430 then null;
+    end if;
+end;
+/
 
 PROMPT *** Create  grants  SPPI ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on SPPI            to BARS_ACCESS_DEFROLE;

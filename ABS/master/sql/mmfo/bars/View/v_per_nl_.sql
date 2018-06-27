@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_PER_NL_ ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_PER_NL_ ("REF", "NLSA", "S", "DATD", "NAZNO", "BPROC", "APROC", "ACC", "KVA", "TIP") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_PER_NL_ AS 
   SELECT   REF,
             nlsa,
             s / 100 s,
@@ -17,7 +17,8 @@ PROMPT *** Create  view V_PER_NL_ ***
             utl_url.escape(url=> 'BEGIN NULL; END;@NLK_REF_WEB('|| REF|| ',:REF,'||acc||',2);', url_charset=>'AL32UTF8') APROC,
             ACC,
             KVA,
-            TIP
+            TIP,
+            country
        FROM (SELECT a.nls nlsa,
                     a.kv kva,
                     (SELECT datd FROM oper WHERE REF = o.REF) datd,
@@ -25,7 +26,8 @@ PROMPT *** Create  view V_PER_NL_ ***
                     (SELECT nazn FROM oper WHERE REF = o.REF) nazno,
                     o.REF,
                     n.acc,
-                    a.tip
+                    a.tip,
+                    (select substr(d_rec,instr(d_rec,'#n')+2,4) from oper where ref = o.ref) country
                FROM opldok o,
                    (select * from nlk_ref nn where REF2 IS NULL
                      or exists (select 1 from oper where ref = nn.REF2 and sos < 0)

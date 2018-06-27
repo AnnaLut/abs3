@@ -59,7 +59,7 @@ declare
 begin
 
   l_tabsemantic := 'Розрахунок простроченої заборгованості з комісії';
-  l_tablinesdef := '10';
+  l_tablinesdef := '50';
   l_tabselect_statement := '';
   l_tabname     := 'TMP_K605';
 
@@ -135,7 +135,9 @@ begin
   bars_metabase.add_column(l_tabid, 9, 'G09', 'N', 'Сума~пені~09', '', null, 9, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'G10', 'N', '3% ~річних~10', '', null, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'G11', 'N', 'Сума 3%~річних~11', '', null, 11, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'ND', 'N', 'Реф~дог~00', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'ND', 'N', 'Реф~дог~00', '', null, 80, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'NCOL', 'N', 'NCOL', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'MD', 'N', 'ND', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');
@@ -145,6 +147,54 @@ begin
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G01');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, 'NCOL  = 1 and G03 <> 0 and MD < 2', 2, 'COLOR_Sky');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G01');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, 'NCOL  = 2 and MD < 2', 2, 'COLOR_LightGreen');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G01');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 3, l_newcolid, 'NCOL  = 3 and G02 = 0 and MD < 2', 2, 'COLOR_Orchid');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G01');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 4, l_newcolid, 'NCOL  = 3 and G02 <> 0 and MD < 2', 2, 'COLOR_LightGray');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G03');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 5, l_newcolid, 'G03 <> 0 and MD < 2', 2, 'COLOR_Sky');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G02');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 7, l_newcolid, 'G02 <> 0 and MD < 2', 2, 'COLOR_LightGray');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G04');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 8, l_newcolid, 'G04 <> 0 and NCOL  = 2 and MD < 2', 2, 'COLOR_LightGreen');
+  end if;
+
+  -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'G04');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 9, l_newcolid, 'G04 <> 0 and NCOL  <> 2 and MD < 2', 2, 'COLOR_Orchid');
+  end if;
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

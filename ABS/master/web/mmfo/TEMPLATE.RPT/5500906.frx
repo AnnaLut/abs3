@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Name="5500906" ReportInfo.Created="03/29/2018 09:18:21" ReportInfo.Modified="04/23/2018 09:40:46" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJERr2eM8tb+1dqyABZ0kqA=" CommandTimeout="10000">
+      <TableDataSource Name="Table" Alias="qryData" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 ZV_DAT, CHAR01 PC, NUM00 ND, CHAR02 NLS_2625, NUM01 KV_2625, CHAR03 DATE_OPEN_2625, CHAR04 BRANCH, NUM02 RNK, CHAR05 NMK, CHAR06 MOB_TEL, CHAR07 DOM_TEL, CHAR08 WORK_TEL, CHAR09 MOB_DOD_TEL, CHAR10 IND, CHAR11 OBL, CHAR12 RAION, CHAR13 TYPE_NP, CHAR14 LOCALITY, CHAR15 TYPE_EDI, CHAR16 STREET, CHAR17 HOME, CHAR18 HOMEPART, CHAR19 ROOM, CHAR20 ADDRESS, CHAR21 DAT_END, CHAR22 DATE_LAST_OP, CHAR23 DATE_LAST_ADD, CHAR24 PROD_KAT, CHAR25 NLS_2207, NUM03 KV_2207, NUM04 OST_2207, NUM05 DAY_PR_2207, CHAR26 NLS_2209, NUM06 KV_2209, NUM07 OST_2209, NUM08 DAY_PR_2209, NUM09 FULL_LIMIT, NUM10 CUR_LIMIT, NUM11 PENS, CHAR27 ZAP_TXT from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ZV_DAT" DataType="System.DateTime"/>
+        <Column Name="PC" DataType="System.String"/>
+        <Column Name="ND" DataType="System.Decimal"/>
+        <Column Name="NLS_2625" DataType="System.String"/>
+        <Column Name="KV_2625" DataType="System.Int16"/>
+        <Column Name="DATE_OPEN_2625" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="MOB_TEL" DataType="System.String"/>
+        <Column Name="DOM_TEL" DataType="System.String"/>
+        <Column Name="WORK_TEL" DataType="System.String"/>
+        <Column Name="MOB_DOD_TEL" DataType="System.String"/>
+        <Column Name="IND" DataType="System.String"/>
+        <Column Name="OBL" DataType="System.String"/>
+        <Column Name="RAION" DataType="System.String"/>
+        <Column Name="TYPE_NP" DataType="System.String"/>
+        <Column Name="LOCALITY" DataType="System.String"/>
+        <Column Name="TYPE_EDI" DataType="System.String"/>
+        <Column Name="STREET" DataType="System.String"/>
+        <Column Name="HOME" DataType="System.String"/>
+        <Column Name="HOMEPART" DataType="System.String"/>
+        <Column Name="ROOM" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="DAT_END" DataType="System.String"/>
+        <Column Name="DATE_LAST_OP" DataType="System.String"/>
+        <Column Name="DATE_LAST_ADD" DataType="System.String"/>
+        <Column Name="PROD_KAT" DataType="System.String"/>
+        <Column Name="NLS_2207" DataType="System.String"/>
+        <Column Name="KV_2207" DataType="System.Int16"/>
+        <Column Name="OST_2207" DataType="System.Decimal"/>
+        <Column Name="DAY_PR_2207" DataType="System.Decimal"/>
+        <Column Name="NLS_2209" DataType="System.String"/>
+        <Column Name="KV_2209" DataType="System.Int16"/>
+        <Column Name="OST_2209" DataType="System.Decimal"/>
+        <Column Name="DAY_PR_2209" DataType="System.Decimal"/>
+        <Column Name="FULL_LIMIT" DataType="System.Decimal"/>
+        <Column Name="CUR_LIMIT" DataType="System.Decimal"/>
+        <Column Name="PENS" DataType="System.Decimal"/>
+        <Column Name="ZAP_TXT" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="112" Expression="[session_id]" DefaultValue="665781"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Parameter Name="sFdat1" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="1350">
+    <ReportTitleBand Name="ReportTitle1" Width="5027.4" Height="120.96">
+      <TextObject Name="Text2" Left="98.28" Top="7.56" Width="362.88" Height="90.72" Text="Прострочення за БПК&#13;&#10;станом на [sFdat1]" Format="Date" Format.Format="dd.MM.yyyy" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text3" Left="98.28" Top="98.28" Width="362.88" Height="22.68" Text="звіт № [Report.ReportInfo.Name]" VertAlign="Bottom" Font="Arial, 7pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="127.21" Width="5027.4" Height="83.16" CanGrow="true">
+      <TextObject Name="Text4" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата формування" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text6" Left="98.28" Width="68.04" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Процесингова система" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text8" Left="166.32" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Номер угоди в АБС &quot;Барс&quot;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text10" Left="264.6" Width="128.52" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="NLS_2625" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text12" Left="393.12" Width="68.04" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Код валюти, 2625" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text14" Left="461.16" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата відкриття картрахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text16" Left="559.44" Width="166.32" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="ТВБВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text18" Left="725.76" Width="90.72" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="РНК клієнта" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text20" Left="816.48" Width="332.64" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="ПІБ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text24" Left="1149.12" Top="45.36" Width="158.76" Height="37.8" Border.Lines="All" Fill.Color="Gainsboro" Text="Домашній" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text26" Left="1307.88" Top="45.36" Width="143.64" Height="37.8" Border.Lines="All" Fill.Color="Gainsboro" Text="Робочий" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text29" Left="1149.12" Width="302.4" Height="45.36" Border.Lines="All" Fill.Color="Gainsboro" Text="Контактні телефони" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text31" Left="1451.52" Width="60.48" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Індекс" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text33" Left="1512" Width="143.64" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Область" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text35" Left="1655.64" Width="143.64" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Район" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text39" Left="1799.28" Width="166.32" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Населений пункт" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text42" Left="1965.6" Width="249.48" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Вулиця" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text46" Left="2215.08" Width="151.2" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Номер будинку" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text47" Left="2366.28" Width="332.64" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Адреса" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text49" Left="2698.92" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата закриття договору " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text51" Left="2797.2" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата останнього руху коштів" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text53" Left="2895.48" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Дата останнього зарахування" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text55" Left="2993.76" Width="430.92" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Категорія продукту" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text57" Left="3424.68" Width="128.52" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Рахунок простроченої заборгованості/по новому плану рахунків 2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text59" Left="3553.2" Width="60.48" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Код валюти, 2207" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text61" Left="3613.68" Width="113.4" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Залишок по рахунку 2207/по новому плану рахунків 2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text63" Left="3727.08" Width="113.4" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Кількість днів прострочки на 2207/ по новому плану рахунків 2203" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text65" Left="3840.48" Width="181.44" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Рахунок прострочених нарахованих доходів/ по новому плану рахунків 2208" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text67" Left="4021.92" Width="60.48" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Код валюти, 2209" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text69" Left="4082.4" Width="113.4" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Залишок по рахунку 2209/по новому плану рахунків 2208" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text71" Left="4195.8" Width="113.4" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Кількість днів прострочки на 2209/по новому плану рахунків 2208" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text73" Left="4309.2" Width="90.72" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Кредитний ліміт (9129+2202;2203)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text75" Left="4399.92" Width="98.28" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Доступна сума кредитного ліміту (9129)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text77" Left="4498.2" Width="120.96" Height="83.16" Border.Lines="All" Fill.Color="Gainsboro" Text="Ознака клієнта         (0-зарплатний проект тощо; 1- пенсіонер)" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="216.62" Width="5027.4" Height="22.68" CanGrow="true" DataSource="Table">
+      <TextObject Name="Text1" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.ZV_DAT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text5" Left="98.28" Width="68.04" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.PC]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text7" Left="166.32" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.ND]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text9" Left="264.6" Width="128.52" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.NLS_2625]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text11" Left="393.12" Width="68.04" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.KV_2625]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text13" Left="461.16" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DATE_OPEN_2625]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text15" Left="559.44" Width="166.32" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.BRANCH]" VertAlign="Center"/>
+      <TextObject Name="Text17" Left="725.76" Width="90.72" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.RNK]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text19" Left="816.48" Width="332.64" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.NMK]" VertAlign="Center"/>
+      <TextObject Name="Text23" Left="1149.12" Width="158.76" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DOM_TEL]" VertAlign="Center"/>
+      <TextObject Name="Text25" Left="1307.88" Width="143.64" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.WORK_TEL]" VertAlign="Center"/>
+      <TextObject Name="Text30" Left="1451.52" Width="60.48" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.IND]" VertAlign="Center"/>
+      <TextObject Name="Text32" Left="1512" Width="143.64" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.OBL]" VertAlign="Center"/>
+      <TextObject Name="Text34" Left="1655.64" Width="143.64" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.RAION]" VertAlign="Center"/>
+      <TextObject Name="Text36" Left="1799.28" Width="52.92" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.TYPE_NP]" VertAlign="Center"/>
+      <TextObject Name="Text38" Left="1852.2" Width="113.4" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.LOCALITY]" VertAlign="Center"/>
+      <TextObject Name="Text37" Left="1965.6" Width="98.28" Height="15.12" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.TYPE_EDI]" VertAlign="Center"/>
+      <TextObject Name="Text41" Left="2063.88" Width="151.2" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.STREET]" VertAlign="Center"/>
+      <TextObject Name="Text40" Left="2215.08" Width="52.92" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.HOME]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text44" Left="2268" Width="45.36" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.HOMEPART]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text45" Left="2313.36" Width="52.92" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.ROOM]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text43" Left="2366.28" Width="332.64" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.ADDRESS]" VertAlign="Center"/>
+      <TextObject Name="Text48" Left="2698.92" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DAT_END]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text50" Left="2797.2" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DATE_LAST_OP]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text52" Left="2895.48" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DATE_LAST_ADD]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text54" Left="2993.76" Width="430.92" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.PROD_KAT]" VertAlign="Center"/>
+      <TextObject Name="Text56" Left="3424.68" Width="128.52" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.NLS_2207]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text58" Left="3553.2" Width="60.48" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.KV_2209]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text60" Left="3613.68" Width="113.4" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.OST_2207]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text62" Left="3727.08" Width="113.4" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DAY_PR_2207]" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text64" Left="3840.48" Width="181.44" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.NLS_2209]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text66" Left="4021.92" Width="60.48" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.KV_2209]" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text68" Left="4082.4" Width="113.4" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.OST_2209]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text70" Left="4195.8" Width="113.4" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.DAY_PR_2209]" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text72" Left="4309.2" Width="90.72" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.FULL_LIMIT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text74" Left="4399.92" Width="98.28" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.CUR_LIMIT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text76" Left="4498.2" Width="120.96" Height="22.68" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[qryData.PENS]" HorzAlign="Right" VertAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="245.55" Width="5027.4" Height="37.8"/>
+  </ReportPage>
+</Report>
