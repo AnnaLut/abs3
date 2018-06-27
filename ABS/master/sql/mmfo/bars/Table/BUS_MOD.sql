@@ -35,8 +35,16 @@ exception when others then
 end; 
 /
 
+begin
+  execute immediate 
+  'alter table bus_mod add (bus_mod_id_ifrs varchar2(3))';
+exception
+  when others then
+   if (sqlcode = -1430) then null; else raise; end if; 
+end;
+/ 
 
-
+COMMENT ON COLUMN BARS.BUS_MOD.BUS_MOD_ID_IFRS IS 'Код параметра согл.методике';
 
 PROMPT *** ALTER_POLICIES to BUS_MOD ***
  exec bpa.alter_policies('BUS_MOD');
