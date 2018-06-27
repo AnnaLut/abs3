@@ -124,8 +124,9 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BUS_MOD_ID', 'N', 'Код', '1', 4, 1, 1, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'BUS_MOD_NAME', 'C', 'Найменування', '', null, 2, 1, 1, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'BUS_MOD_ID', 'N', 'Код',                   '1', 4, 1, 1, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'BUS_MOD_NAME', 'C', 'Найменування',        '', null, 2, 1, 1, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'BUS_MOD_ID_IFRS', 'C', 'Код за методикою', '', null, 2, 1, 1, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
