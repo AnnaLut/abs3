@@ -145,4 +145,7 @@ values ('2600', 2, null, 'kpk_uo', 'W4', null, 26);
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2650', 2, null, 'kpk_uo', 'W4', null, 43);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2565', 2, null, 'pr_uo', null, null, 52);
+
 commit;
