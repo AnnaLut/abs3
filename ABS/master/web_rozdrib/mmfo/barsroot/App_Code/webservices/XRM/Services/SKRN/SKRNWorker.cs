@@ -45,7 +45,7 @@ namespace Bars.WebServices.XRM.Services.SKRN
         public static XRMResponseDetailed<string> TemplatesCreation(OracleConnection con, XRMRequest<TemplatesCrtRequest> request)
         {
             string mfo = XrmHelper.GetMfo(con);
-            long nd = request.AdditionalData.Nd.AddRuTail(mfo);
+            long nd = (long)request.AdditionalData.Nd.AddRuTail(mfo);
 
             using (OracleCommand cmd = con.CreateCommand())
             {
