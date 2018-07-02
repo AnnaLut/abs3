@@ -73,7 +73,7 @@ begin
                            '        and a.kv like :Param2'||nlchr||
                            '        and  A.REFPAY = op.ref(+)'||nlchr||
                            '         AND a.dzagr < TO_DATE ( :sFdat1)'||nlchr||
-                           '         AND (a.refpay IS NULL or   (op.pdat <= TO_DATE ( :sFdat1) and op.sos = -1))'||nlchr||
+                           '         AND (a.refpay IS NULL or   (op.pdat <= TO_DATE ( :sFdat1) and op.sos <5))'||nlchr||
                            '         AND A.FL IN (-6,'||nlchr||
                            '                      -5,'||nlchr||
                            '                      -4,'||nlchr||
