@@ -455,8 +455,10 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
 
                     if (ODepositRes.DptId != null)
                     {
-                        decimal dpt_id = ODepositRes.DptId.AddRuTail(DepositParams.KF);
+                        decimal dpt_id = (decimal)ODepositRes.DptId.AddRuTail(DepositParams.KF);
                         long rnk = DepositParams.Rnk.AddRuTail(DepositParams.KF);
+                        long rnkTrustee = DepositParams.RNKTrustee.AddRuTail(DepositParams.KF);
+                        long _RNK = RNK.AddRuTail(DepositParams.KF);
 
                         decimal dpt_agreement = 0;
 
@@ -472,10 +474,10 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                                     break;
                                 case 2: // 2(депозит на імя малолітньої особи); 
                                     dpt_agreement = DepositAgreement.Create(dpt_id, 12, rnk,
-                                       RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
+                                       _RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, Tools.CreateCommisRequest(dpt_id, 12), 11111111, 0, con);
                                     dpt_agreement = DepositAgreement.Create(dpt_id, 26, rnk,
-                                       RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
+                                       _RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
                                     break;
                                 case 3: //3(депозит на користь малолітньої особи);
@@ -483,13 +485,13 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                                        DepositParams.RNKInfant.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
                                     dpt_agreement = DepositAgreement.Create(dpt_id, 27, rnk,
-                                       DepositParams.RNKTrustee.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
+                                       rnkTrustee, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
                                     break;
                                 case 4: //4(відкритий по довіреності) 
                                     decimal commisrequest = Tools.CreateCommisRequest(dpt_id, 12);
                                     dpt_agreement = DepositAgreement.Create(dpt_id, 12, rnk,
-                                        DepositParams.RNKTrustee.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
+                                        rnkTrustee, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                         null, commisrequest, 11111111, 0, con);
                                     break;
                             }
