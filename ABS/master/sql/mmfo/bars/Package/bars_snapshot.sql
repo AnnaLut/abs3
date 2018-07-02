@@ -477,7 +477,7 @@ is
       l_condition := replace( l_condition, '%kf', l_kf );
 
 --    execute immediate 'lock table SALDOZ subpartition for '||l_condition||' IN EXCLUSIVE MODE';
-      execute immediate 'lock table SALDOZ ( partition P_'||l_kf||') IN EXCLUSIVE MODE';
+      execute immediate 'lock table SALDOZ partition ( P_'||l_kf||' ) IN EXCLUSIVE MODE';
       bars_audit.info( $$PLSQL_UNIT||': SALDOZ subpartition locked.' );
 
       insert
