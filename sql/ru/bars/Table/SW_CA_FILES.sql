@@ -40,36 +40,6 @@ tablespace BRSDYND
 end;
 / 
 
--- Add comments to the table 
-comment on table SW_CA_FILES
-  is 'Файли єдиного вікна, прйняті від РУ';
--- Add comments to the columns 
-comment on column SW_CA_FILES.id
-  is 'Внутренний дентифікатор файла';
-comment on column SW_CA_FILES.state
-  is 'Статус обробки файлу (
-0 - сбой при записи в SW_CA_FILES,
-1 - успешно прошел только импорт,
-2 - загрузка с ошибками,
-3 - успешно,
-4 - сбой при загрузке,
-5 - принудительная перегрузка,
-10 - неопознанная ошибка в recive_data,
--99 - ошибка на вебсервисе)';
-comment on column SW_CA_FILES.message
-  is 'Повідомлення';
-comment on column SW_CA_FILES.sign
-  is 'Ідентифікатор ключа підпису';
-comment on column SW_CA_FILES.ddate
-  is 'Дата даних';
-comment on column SW_CA_FILES.file_data
-  is 'дані';
-comment on column SW_CA_FILES.sdate
-  is 'дата запису файлу';
-comment on column SW_CA_FILES.pid
-  is 'Внешний дентифікатор файла';
-
-
 begin
   execute immediate q'[ALTER TABLE BARS.SW_CA_FILES ADD pid NUMBER]';
   dbms_output.put_line('Table altered.');
@@ -81,6 +51,8 @@ exception
     end if;
 end;
 /
+
+
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin
@@ -125,6 +97,35 @@ begin
     end if; 
 end;
 / 
+
+-- Add comments to the table 
+comment on table SW_CA_FILES
+  is 'Файли єдиного вікна, прйняті від РУ';
+-- Add comments to the columns 
+comment on column SW_CA_FILES.id
+  is 'Внутренний дентифікатор файла';
+comment on column SW_CA_FILES.state
+  is 'Статус обробки файлу (
+0 - сбой при записи в SW_CA_FILES,
+1 - успешно прошел только импорт,
+2 - загрузка с ошибками,
+3 - успешно,
+4 - сбой при загрузке,
+5 - принудительная перегрузка,
+10 - неопознанная ошибка в recive_data,
+-99 - ошибка на вебсервисе)';
+comment on column SW_CA_FILES.message
+  is 'Повідомлення';
+comment on column SW_CA_FILES.sign
+  is 'Ідентифікатор ключа підпису';
+comment on column SW_CA_FILES.ddate
+  is 'Дата даних';
+comment on column SW_CA_FILES.file_data
+  is 'дані';
+comment on column SW_CA_FILES.sdate
+  is 'дата запису файлу';
+comment on column SW_CA_FILES.pid
+  is 'Внешний дентифікатор файла';
 
 -- Grant/Revoke object privileges 
 grant select, insert, update on SW_CA_FILES to BARS_ACCESS_DEFROLE;

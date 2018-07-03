@@ -22,3 +22,10 @@ exception when others then
   if  sqlcode in (-1418,-2429)  then null; else raise; end if;
  end;
 /
+
+begin   
+ execute immediate 'drop index PK_SW_CA_FILES';
+exception when others then
+  if  sqlcode in (-1418,-2429)  then null; else raise; end if;
+ end;
+/
