@@ -12,7 +12,7 @@ is
                           p_resultmessage      out varchar2);
 end xrm_intg_cashdesk;
 /
-create or replace package body xrm_intg_cashdesk
+create or replace package body XRM_INTG_CASHDESK
 is
    g_body_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
 
@@ -991,7 +991,7 @@ is
       type l_opldok is table of opl%rowtype;
 
       l_tab_opl         l_opldok := l_opldok ();
-      l_temp            varchar(4000);
+      l_temp            varchar(20000);
       l_branch          varchar2(256);
    begin
       -- парсим хмл
@@ -1597,10 +1597,10 @@ is
          ref              number,
          err              number,
          erm              varchar2 (4000),
-         int_buffer_hex   varchar2 (4000),
-         ext_buffer_hex   varchar2 (4000),
-         int_sign_hex     varchar2 (4000),
-         ext_sign_hex     varchar2 (4000)
+         int_buffer_hex   varchar2 (20000),
+         ext_buffer_hex   varchar2 (20000),
+         int_sign_hex     varchar2 (20000),
+         ext_sign_hex     varchar2 (20000)
       );
 
       type l_tab is table of l_rec;
@@ -2328,6 +2328,8 @@ is
       l_node7           dbms_xmldom.domnode;
       l_node8           dbms_xmldom.domnode;
       l_node9           dbms_xmldom.domnode;
+      l_node10          dbms_xmldom.domnode;
+      l_node11          dbms_xmldom.domnode;
 
       l_ref             oper.ref%type;
 
@@ -2384,20 +2386,12 @@ is
                    a.nazn as nazn,
                    a.tobo as tobo,
                    a.sos as sos,
-                   aa.nms  nms_a,
-                   ab.nms  nms_b,
                    a.VOB,
                    to_char (a.pdat, 'dd/mm/yyyy') as pdat,
                    to_char (a.odat, 'dd/mm/yyyy') as odat
               from v_docs_tobo_out a,
-                   accounts aa,
-                   accounts ab,
                    staff_ad_user b
              where a.REF=l_ref
-               and a.NLSA = aa.nls
-               and a.kv     = aa.kv
-               and a.NLSB = ab.nls
-               and a.KV2  = ab.kv
                and a.USERID = b.user_id (+)    )
       loop
 
@@ -2738,7 +2732,7 @@ is
                     dbms_xmldom.appendchild (
                        l_node9,
                        dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tag')));         
-                 l_element_tnode :=
+              l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.tag)));
@@ -2751,6 +2745,92 @@ is
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.value)));
         end loop;
+
+        l_node10 :=
+           dbms_xmldom.appendchild (
+              l_node3,
+              dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'acc_model')));
+          for j in (select * from opl
+                    where ref = c.ref )
+          loop
+             l_node11 :=
+                dbms_xmldom.appendchild (
+                   l_node10,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'row')));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tt')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.tt)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'dk')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.dk)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nls')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.nls)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'sum')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.s)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'sumeq')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.sq)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'state')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.sos)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'fdat')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode ( dbms_xmldom.createtextnode (l_domdoc, to_char (j.fdat, 'DD/MM/YYYY'))));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'kv')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.kv)));
+             l_element_node :=
+                dbms_xmldom.appendchild (
+                   l_node11,
+                   dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'nlsname')));
+             l_element_tnode :=
+                dbms_xmldom.appendchild (
+                   l_element_node,
+                   dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, j.nms)));
+          end loop;
+
       end loop;
 ---e
 
@@ -2849,21 +2929,13 @@ is
                    a.nazn as nazn,
                    a.tobo as tobo,
                    a.sos as sos,
-                   aa.nms  nms_a,
-                   ab.nms  nms_b,
                    a.VOB,
                    to_char (a.pdat, 'dd/mm/yyyy') as pdat,
                    to_char (a.odat, 'dd/mm/yyyy') as odat
               from v_docs_tobo_out a,
-                   accounts aa,
-                   accounts ab,
                    staff_ad_user b
              where a.pdat >= to_date (l_dat1, 'dd/mm/yyyy')
                and a.pdat < (to_date (l_dat2, 'dd/mm/yyyy') + 1)
-               and a.NLSA = aa.nls
-               and a.kv     = aa.kv
-               and a.NLSB = ab.nls
-               and a.KV2  = ab.kv
                and a.USERID = b.user_id(+)    )
       loop
 
@@ -3204,7 +3276,7 @@ is
                     dbms_xmldom.appendchild (
                        l_node9,
                        dbms_xmldom.makenode (dbms_xmldom.createelement (l_domdoc, 'tag')));         
-                 l_element_tnode :=
+              l_element_tnode :=
                     dbms_xmldom.appendchild (
                        l_element_node,
                        dbms_xmldom.makenode (dbms_xmldom.createtextnode (l_domdoc, t.tag)));
