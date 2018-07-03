@@ -21,6 +21,40 @@ public class ExchangeOperationRUService : BarsWebService
     public WsHeader WsHeaderValue;
 
     #region private методы
+    private void LoginUser(String userName)
+    {
+        // Інформація про поточного користувача
+        UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+
+        using (OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection())
+        using (OracleCommand cmd = con.CreateCommand())
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "bars.bars_login.login_user";
+
+            cmd.Parameters.Add("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input);
+            cmd.Parameters.Add("p_user_id", OracleDbType.Varchar2, userMap.user_id, ParameterDirection.Input);
+            cmd.Parameters.Add("p_hostname", OracleDbType.Varchar2, GetHostName(), ParameterDirection.Input);
+            cmd.Parameters.Add("p_appname", OracleDbType.Varchar2, "barsroot", ParameterDirection.Input);
+
+            cmd.ExecuteNonQuery();
+        }
+        Session["UserLoggedIn"] = true;
+    }
+
+    private string GetHostName()
+    {
+        string userHost = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+        if (String.IsNullOrEmpty(userHost) || String.Compare(userHost, "unknown", true) == 0)
+            userHost = HttpContext.Current.Request.UserHostAddress;
+
+        if (String.Compare(userHost, HttpContext.Current.Request.UserHostName) != 0)
+            userHost += " (" + HttpContext.Current.Request.UserHostName + ")";
+
+        return userHost;
+    }
+
     private DateTime? ParseDateFromString(string dateStr, string format)
     {
         DateTime result;
@@ -32,6 +66,7 @@ public class ExchangeOperationRUService : BarsWebService
         //иначе возвращаем null
         return null;
     }
+
     #endregion
 
     #region методы веб-сервиса
@@ -55,35 +90,34 @@ public class ExchangeOperationRUService : BarsWebService
         Boolean isAuthenticated = CustomAuthentication.AuthenticateUser(barsUserName, barsPassword, true);
         if (isAuthenticated) LoginUser(barsUserName);
 
-        OracleConnection con = OraConnector.Handler.UserConnection;
-        try
+        using (OracleConnection con = OraConnector.Handler.UserConnection)
+        using (OracleCommand cmd = con.CreateCommand())
         {
-            OracleCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "bars_zay.iparse_dilerkurs";
-            cmd.Parameters.Add(new OracleParameter("p_kurs_clob", OracleDbType.Clob) { Value = xmlDealerCourse });
-            cmd.Parameters.Add(new OracleParameter("p_conv_clob", OracleDbType.Clob) { Value = xmlDealerCourseConv });
-            cmd.Parameters.Add(new OracleParameter("p_dat", OracleDbType.Varchar2) { Value = currentDate });
-            cmd.ExecuteNonQuery();
-            return new Response<string>
+            try
             {
-                Status = "ok",
-                ErrorMessage = "",
-                Data = null
-            };
-        }
-        catch (Exception e)
-        {
-            return new Response<string>
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "bars_zay.iparse_dilerkurs";
+                cmd.Parameters.Add(new OracleParameter("p_kurs_clob", OracleDbType.Clob) { Value = xmlDealerCourse });
+                cmd.Parameters.Add(
+                    new OracleParameter("p_conv_clob", OracleDbType.Clob) { Value = xmlDealerCourseConv });
+                cmd.Parameters.Add(new OracleParameter("p_dat", OracleDbType.Varchar2) { Value = currentDate });
+                cmd.ExecuteNonQuery();
+                return new Response<string>
+                {
+                    Status = "ok",
+                    ErrorMessage = "",
+                    Data = null
+                };
+            }
+            catch (Exception e)
             {
-                Status = "error",
-                ErrorMessage = e.Message + (e.InnerException == null ? "" : ". " + e.InnerException.Message),
-                Data = null
-            };
-        }
-        finally
-        {
-            con.Close();
+                return new Response<string>
+                {
+                    Status = "error",
+                    ErrorMessage = e.Message + (e.InnerException == null ? "" : ". " + e.InnerException.Message),
+                    Data = null
+                };
+            }
         }
     }
 
@@ -99,33 +133,33 @@ public class ExchangeOperationRUService : BarsWebService
         Boolean isAuthenticated = CustomAuthentication.AuthenticateUser(barsUserName, barsPassword, true);
         if (isAuthenticated) LoginUser(barsUserName);
 
-        OracleConnection con = OraConnector.Handler.UserConnection;
-        try
+        using (OracleConnection con = OraConnector.Handler.UserConnection)
+        using (OracleCommand cmd = con.CreateCommand())
         {
-            OracleCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "SetDealerCourse";
-            cmd.Parameters.Add(new OracleParameter("SetDealerCourseFact", OracleDbType.Date) { Value = xmlDealerCourseFact });
-            cmd.ExecuteNonQuery();
-            return new Response<string>
+            try
             {
-                Status = "ok",
-                ErrorMessage = "",
-                Data = null
-            };
-        }
-        catch (Exception e)
-        {
-            return new Response<string>
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "SetDealerCourse";
+                cmd.Parameters.Add(
+                    new OracleParameter("SetDealerCourseFact", OracleDbType.Date) {Value = xmlDealerCourseFact});
+                cmd.ExecuteNonQuery();
+                return new Response<string>
+                {
+                    Status = "ok",
+                    ErrorMessage = "",
+                    Data = null
+                };
+            }
+            catch (Exception e)
             {
-                Status = "error",
-                ErrorMessage = e.Message + (e.InnerException == null ? "" : ". " + e.InnerException.Message),
-                Data = null
-            };
-        }
-        finally
-        {
-            con.Close();
+                return new Response<string>
+                {
+                    Status = "error",
+                    ErrorMessage = e.Message + (e.InnerException == null ? "" : ". " + e.InnerException.Message),
+                    Data = null
+                };
+            }
         }
     }
 
