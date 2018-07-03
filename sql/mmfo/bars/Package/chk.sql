@@ -339,7 +339,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CHK IS
    -- VISASIGN                         Демарк (уточнить, нужен ли макрос FM)
 */
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.56 2018-05-22';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 3.57 2018-07-03';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -1563,6 +1563,8 @@ BEGIN
       WHEN OTHERS THEN
         -- Невозможно заблокировать документ REF=%s на визе № %s
         ers := 'ERR_BLOCK_DOC';
+        bars_audit.error(p_msg => MODCODE||' chk.lock_doc(): ref='||to_char(ref_)||', visagrp='||to_char(grp_)||
+                         '# error:'||dbms_utility.format_error_stack||dbms_utility.format_error_backtrace);
         if SQLCODE=-54 then
 
           -- 'Невозможно заблокировать документ REF=%s на визе № %s: Документ заблокирован другим пользователем'
