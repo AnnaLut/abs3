@@ -12,9 +12,9 @@ PROMPT *** Create  view BR_TIER_EX ***
           "KV",
           "S",
           "RATE"
-     FROM br_tier t
+     FROM br_tier_edit t
     WHERE t.bdate = (SELECT MAX (bdate)
-                       FROM br_tier
+                       FROM br_tier_edit
                       WHERE bdate <= sysdate AND br_id = t.br_id AND kv = t.kv)
    UNION ALL
    SELECT DISTINCT bn.br_id,
