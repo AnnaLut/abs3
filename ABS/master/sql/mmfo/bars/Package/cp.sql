@@ -483,7 +483,7 @@ CREATE OR REPLACE PACKAGE body CP IS
 --  Пакет пр-р CP. Работа с цінними паперами
 --  Версія для КБ пізніше 05/2016
 ----------------------------------------------------------------------
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.90.9  16/02/2018';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.91.0  13/06/2018';
     G_TRACE             constant varchar2(20) := 'cp.';  -- 'v.2.90.4'
     G_MODULE            constant varchar2(20) := 'CPN';
     G_PAY_CUPON         constant number(1):= 1;
@@ -3083,6 +3083,8 @@ PROCEDURE CP_MOVE
  accS6_  NUMBER ; S6_ number         ; nlss6_ accounts.nls%type;
  accR9_ int;
  accN_exp int;
+ accRD_ number;
+ accS2_ number;
 
 
  ACRB_D int     ;   ACRB_P int    ;    REF_  int         ; NLS_FXP_1 varchar2(15) ;
@@ -3696,6 +3698,78 @@ begin
                  1);
   end if;
 
+  --Нарах. Дивіденти
+  begin --!н.д.1
+    select a.*
+      into aa
+    from cp_accounts ca, accounts a
+    where ca.cp_ref = nREF_ and ca.cp_acctype = 'RD'
+      and ca.cp_acc = a.acc and a.ostc != 0;
+      
+    --звернути 
+    if aa.ostc > 0 then dk_  := 1 ; else dk_ := 0 ; s_ := - s_;  end if;
+    payTT(0,ref_,VDAT_,FXB_, dk_ , aa.kv ,aa.NLS, S_ , aa.KV , B_4621 , S_ );    
+      
+    begin --!н.д.2
+      select acc, substr(nls,1,5)||'0'||s8_, substr(cp_id_r||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsRD and kv=kk.KV;
+      exception 
+        when NO_DATA_FOUND then --!н.д.2   
+          sERR:='36.Невказаний рах. нарах. дивідентів ИСХ в ФУ'; 
+          return;
+    end;
+
+    -- відкрити рахунок 
+    cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK, NLS_,kk.KV,NMS_,'ODB',gl.aUid,accrd_);
+    update accounts set mdate=kk.DATP,accc=ACCC_, seci=4, pos=1, daos=VDAT_, pap=3  where acc=accrd_;   
+    cp_inherit_specparam (accrd_, accc_, 0);
+    --та розвернути  
+    dk_ := case dk_ 
+             when 0 then 1 
+             when 1 then 0 
+           end;
+    payTT(0,ref_,VDAT_,FXB_, dk_ , kk.KV ,NLS_, S_ , kk.KV , B_4621 , S_ );
+    
+    exception --!н.д.1
+      when NO_DATA_FOUND then
+        null; --ок. не має або нульовий  
+  end;  
+    
+  --Переоцінка хитра додаткова S2 (опціон)
+  begin --!н.д.1
+    select a.*
+      into aa
+    from cp_accounts ca, accounts a
+    where ca.cp_ref = nREF_ and ca.cp_acctype = 'S2'
+      and ca.cp_acc = a.acc and a.ostc != 0;
+      
+    --звернути 
+    if aa.ostc > 0 then dk_  := 1 ; else dk_ := 0 ; s_ := - s_;  end if;
+    payTT(0,ref_,VDAT_,FXB_, dk_ , aa.kv ,aa.NLS, S_ , aa.KV , B_4621 , S_ );    
+      
+    begin --!н.д.2
+      select acc, substr(nls,1,5)||'0'||s8_, substr(cp_id_r||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsS2 and kv=kk.KV;
+      exception 
+        when NO_DATA_FOUND then --!н.д.2   
+          sERR:='37.Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ'; 
+          return;
+    end;
+
+    -- відкрити рахунок 
+    cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK, NLS_,kk.KV,NMS_,'ODB',gl.aUid,accs2_);
+    update accounts set mdate=kk.DATP,accc=ACCC_, seci=4, pos=1, daos=VDAT_, pap=3  where acc=accs2_;   
+    cp_inherit_specparam (accs2_, accc_, 0);
+    --та розвернути  
+    dk_ := case dk_ 
+             when 0 then 1 
+             when 1 then 0 
+           end;
+    payTT(0,ref_,VDAT_,FXB_, dk_ , kk.KV ,NLS_, S_ , kk.KV , B_4621 , S_ );
+    
+    exception --!н.д.1
+      when NO_DATA_FOUND then
+        null; --ок. не має або нульовий  
+  end;    
+
   --  годовой купон               -- годовой дисконт
   --   SN_*RATE_/100               -- DP_*365 / (kk.DATP - GL.BDATE)
 --  S_   := SN_ + DP_ + VDP_ + SR_ ; ---"цена перемещения"  -- 05-01-2009 эф.ставка
@@ -3725,7 +3799,12 @@ begin
             union all
             select ref, 'R3', accr3 from cp_deal where ref=ref_  and accr3 is not null
             union all
-            select ref, 'UNREC', accunrec from cp_deal where ref=ref_  and accunrec is not null)
+            select ref, 'UNREC', accunrec from cp_deal where ref=ref_  and accunrec is not null
+            union all
+            select ref_, 'RD', accrd_ from dual where accrd_ is not null
+            union all
+            select ref_, 'S2', accs2_ from dual where accs2_ is not null
+            )
 
  loop
      INS_CP_ACCOUNTS (p_ref =>ref_, p_type =>k8.l_type, p_acc =>k8.acc);

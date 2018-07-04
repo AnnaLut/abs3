@@ -169,13 +169,25 @@ begin
   bars_metabase.add_column(l_tabid, 43, 'QUOT_SIGN', 'B', 'Оз~нака~кот-ки', '', null, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 44, 'DATP_A', 'D', 'Дата~продажу', '', null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 45, 'FL_REPO', 'B', 'Флаг~РЕПО', '', null, 36, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 46, 'FL_ALG', 'N', 'Алгo~ритм~переоц', '', null, 21, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 46, 'FL_ALG', 'N', 'Алгo~ритм~переоц', '', null, 21, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 47, 'OSTS_P', 'N', 'План. зал-к~переоцінки', '', null, 35, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 48, 'NAME', 'C', 'Назва емітента', '', null, 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 49, 'DATREZ23', 'D', 'Зв.дата~РЕЗЕРВ23', '', null, -1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 50, 'REZ23', 'N', 'Коти~ровка~угоди по~23 постанові', '', null, 0, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 51, 'PEREOC23', 'N', 'Переоцінка~по~23 постанові', '', null, 0, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 52, 'FL_ALG23', 'N', 'Алгo~ритм~переоц.~23 пост.', '', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 53, 'OPCION', 'N', 'Переоц-ка~пакет~ по опціону', '', null, 24, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 54, 'S2', 'N', 'Факт. зал-к~переоц.~опц. S2', '', null, 36, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 55, 'S2_P', 'N', 'План. зал-к~переоц.~опц. S2', '', null, 36, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '', '', 0);
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('V_CP_TYPE_ALG_REVAL');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 46, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица V_CP_TYPE_ALG_REVAL для описания сложного поля таблицы CP_PEREOC_V.');
+  end if;
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 7, 1, 'ASC ');
