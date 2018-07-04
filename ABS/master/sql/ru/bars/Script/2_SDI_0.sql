@@ -19,7 +19,7 @@ begin
   exception when others then    if sqlcode=-955 then null; else raise; end if; -- ORA-00955: name is already used by an existing object
   end; 
 
-  for k in (select * from mv_kf where kf <> '300465' -- уже сделано )
+  for k in (select * from mv_kf where kf <> '300465' )
   loop bc.go ( k.KF);
      ------------------------------------------------------------------------------------------------------------------
      ow.kf  := gl.aMfo   ;
@@ -29,7 +29,7 @@ begin
      DAT0_  := DAT9_ - 1 ;
      --------------------------------------------------------------------------------------------------------------
      For x in ( select * 
-                from ( select (select round(b5*100,0) from prvn_osaq where nd = xx.nd and tip = 3 and kf = gl.KF ) B5, 
+                from ( select (select round(b5*100,0) from prvn_osaq where nd = xx.nd and tip = 3 ) B5, 
                                xx.* 
                        from ( select  d.ndg, d.nd, d.vidd, a.acc, a.kv, a.tip, fost(a.acc, DAT0_) vost ,a.ostc , a.dapp 
                               from accounts a, nd_acc n , cc_deal d 
