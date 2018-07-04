@@ -7,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view CP_PEREOC_V ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.CP_PEREOC_V ("SOS", "ND", "DATD", "SUMB", "DAZS", "DATP_A", "FL_REPO", "TIP", "REF", "ID", "NAME", "CP_ID", "MDATE", "CENA", "IR", "ERAT", "RYN", "VIDD", "KV", "KOL", "KOL_CP", "N", "N1", "D", "D1", "P", "P1", "R", "R1", "R2", "S", "BAL_VAR", "UNREC1", "R21", "R31", "EXPR1", "EXPN1", "KOLK", "BAL_VAR1", "NKD1", "RATE_B", "K20", "K21", "K22", "OSTR", "OSTR_F", "OSTAF", "OSTS_P", "EMI", "DOX", "RNK", "PF", "PFNAME", "DAT_ZV", "DAPP", "DATP", "QUOT_SIGN", "FL_ALG", "DATREZ23", "REZ23", "PEREOC23", "FL_ALG23") AS 
-  SELECT SOS,
+  CREATE OR REPLACE FORCE VIEW BARS.CP_PEREOC_V ("SOS", "ND", "DATD", "SUMB", "DAZS", "DATP_A", "FL_REPO", "TIP", "REF", "ID", "NAME", "CP_ID", "MDATE", "CENA", "IR", "ERAT", "RYN", "VIDD", "KV", "KOL", "KOL_CP", "N", "N1", "D", "D1", "P", "P1", "R", "R1", "R2", "S", "BAL_VAR", "UNREC1", "R21", "R31", "EXPR1", "EXPN1", "KOLK", "BAL_VAR1", "NKD1", "RATE_B", "K20", "K21", "K22", "OSTR", "OSTR_F", "OSTAF", "OSTS_P", "EMI", "DOX", "RNK", "PF", "PFNAME", "DAT_ZV", "DAPP", "DATP", "QUOT_SIGN", "FL_ALG", "DATREZ23", "REZ23", "PEREOC23", "FL_ALG23", "OPCION", "NLS", "S2", "S2_P") AS 
+SELECT SOS,
           ND,
           DATD,
           SUMB,
@@ -165,7 +165,12 @@ PROMPT *** Create  view CP_PEREOC_V ***
                          p_cena       => cena,
                          p_kolk       => kolk)
              PEREOC23,
-          fl_alg23
+          fl_alg23,
+--          round(DECODE (fl_alg, 3, (rate_b - abs(s2))*kol1, 0),6) OPCION,--переоцінку будемо робити не нарізницю, а з розформуванням попередньої
+          round(DECODE (fl_alg, 3, rate_b*kol1, 0),6) OPCION,   
+          NLS,
+          S2,
+          S2_P
      FROM (SELECT o.sos,
                   o.nd,
                   o.datd,
@@ -282,7 +287,10 @@ PROMPT *** Create  view CP_PEREOC_V ***
                   NVL (c.quot_sign, 0) quot_sign,
                   NVL (c.fl_alg, 0) FL_ALG,
                   f_cp_pereoc (e.REF, ROUND (gl.bd, 'MM'), 1) FL_ALG23,
-                  f_cp_pereoc (e.REF, ROUND (gl.bd, 'MM'), 2) REZ23
+                  f_cp_pereoc (e.REF, ROUND (gl.bd, 'MM'), 2) REZ23,
+                  a.nls,
+                  NVL (s2.ostc, 0) / 100 S2,
+                  NVL (s2.ostb, 0) / 100 S2_P
              FROM cp_kod k,
                   cp_deal e,
                   accounts a,
@@ -298,7 +306,8 @@ PROMPT *** Create  view CP_PEREOC_V ***
                   cp_rates_sb c,
                   cp_vidd v,
                   cp_pf cp,
-                  oper o
+                  oper o,
+                  (select a.ostc, a.ostb ,ca.cp_ref from cp_accounts ca, accounts a where ca.cp_acc = a.acc and ca.cp_acctype = 'S2') s2
             WHERE v.vidd IN
                      (SUBSTR (a.nls, 1, 4), NVL (SUBSTR (p.nls, 1, 4), ''))
                   AND o.REF = e.REF
@@ -321,7 +330,8 @@ PROMPT *** Create  view CP_PEREOC_V ***
                   AND cp.NO_P IS NULL
                   AND e.REF = c.REF(+)
                   AND v.pf = cp.pf
-                  AND v.emi = k.emi) t;
+                  AND v.emi = k.emi
+                  and e.ref = s2.cp_ref (+) ) t;
 
 PROMPT *** Create  grants  CP_PEREOC_V ***
 grant SELECT                                                                 on CP_PEREOC_V     to BARSREADER_ROLE;
