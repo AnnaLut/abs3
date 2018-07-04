@@ -101,6 +101,7 @@ function homeController($scope, paramsService, $window, LS) {
                     OSTEXPR: { type: "number" },
                     OSTUNREC: { type: "number" },
                     OSTS: { type: "number" },
+                    OSTS2: { type: "number" },
                     ERAT: { type: "number" },
                     NO_P: { type: "number" }
                 }
@@ -171,6 +172,7 @@ function homeController($scope, paramsService, $window, LS) {
             { field: "OSTEXPN", title: "Сума<br>прострочки<br>номіналу", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTEXPN,'n2')#</div>" },
             { field: "OSTEXPR", title: "Сума<br>прострочки<br>нарах.купону", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTEXPR,'n2')#</div>" },
             { field: "OSTS", title: "Сума<br>переоц.<br>S", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTS,'n2')#</div>" },
+            { field: "OSTS2", title: "Сума<br>переоц.<br>S2", width: 100, template: "<div style='text-align:right;'>#=kendo.toString(OSTS2,'n2')#</div>" },
             { field: "ERAT", title: "Ефект<br>ставка %", width: 100, template: "<div style='text-align:right;'>#=ERAT#</div>" },
             { field: "NO_P", title: "Приз<br>НЕ<br>переоц.", width: 90 }
         ],
