@@ -34,6 +34,7 @@ public class CP_V
     public decimal? OSTEXPN { get; set; }
     public decimal? OSTEXPR { get; set; }
     public decimal? OSTS { get; set; }
+    public decimal? OSTS2 { get; set; }
     public decimal? ERAT { get; set; }
     public decimal? NO_P { get; set; }
 
