@@ -2,7 +2,7 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/chk.sql =========*** Run *** =======
 PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PACKAGE BARS.CHK IS
+CREATE OR REPLACE PACKAGE CHK IS
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
 -- *                Unity-Bars (c) 2000-2009                          *
@@ -251,7 +251,7 @@ procedure make_data4visa_ext_xml(inDataClob in CLOB, outDataXml out CLOB);
  */
 procedure put_visas_xml(inDataClob in CLOB, outDataXml out CLOB);
 
-procedure put_visas_xml_ext(inDataClob in CLOB, outDataXml out CLOB);
+procedure put_visas_xml_ext(inDataClob in CLOB, outDataXml out CLOB, enableCommit in number default 0);
 
 /**
  * update_check_sign - модификация информации о проверке ЭЦП на визе
@@ -325,8 +325,9 @@ function get_next_visa_branches return oper.next_visa_branches%type;
 
 
 END chk;
+
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CHK IS
+CREATE OR REPLACE PACKAGE BODY CHK IS
 
 -- ****************************************************************
 -- *            Financial cheks functions package                 *
@@ -1158,7 +1159,7 @@ begin
                           p_key_id    => l_keyid,
                           p_sign_hex  => l_sign_hex_clob);
     l_sign_hex := dbms_lob.substr(l_sign_hex_clob);
-  
+
     -- формуємо буффер для накладення наступної ЕЦП конкатенацією попередніх підписів
     p_buffer_hex := p_buffer_hex || chk.to_hex(l_keyid) || l_sign_hex;
   end loop;
@@ -1182,7 +1183,7 @@ procedure get_int_ecp(p_ref          in oper_visa.ref%type,
   l_key_id        sgn_data.key_id%type := null;
   l_sign_hex_clob sgn_data.sign_hex%type;
   l_sign_type     sgn_data.sign_type%type;
-  
+
 begin
   -- отримання буферу документу
   chk.make_int_docbuf(p_ref, l_buffer);
@@ -1228,7 +1229,7 @@ begin
   p_sign_type := l_sign_type;
   p_key_id    := l_key_id;
   p_sign_hex := l_sign_hex;
-  
+
 end get_int_ecp;
 
 -- Отримання переліку накладених внутрішніх підписів
@@ -1266,7 +1267,7 @@ begin
                   p_buffer_hex => l_ecp_obj.buffer_hex,
                   p_key_id     => l_ecp_obj.key_id,
                   p_sign_hex   => l_ecp_obj.sign_hex);
-    
+
       l_ecp_array(c.rwn + 1) := l_ecp_obj;
     end;
   end loop;
@@ -1299,7 +1300,7 @@ begin
   l_ecp_obj.sign_hex := dbms_lob.substr(l_sign_hex);
   l_ecp_obj.id := 0;
 
-  -- получаем буфер документа  
+  -- получаем буфер документа
   docsign.retrievesepbuffer(p_ref, l_ecp_obj.key_id, l_buffer);
   l_ecp_obj.buffer_hex := rawtohex(utl_raw.cast_to_raw(l_buffer));
 
@@ -1471,11 +1472,11 @@ end;
       select to_number(substr(flags,2,1)) into fsig_ from tts where tt=tt_;
     else
       begin
-              select bitand(f_in_charge,3), 
-                     NVL(bitand(flags,1),0) 
-                into fsig_,fres_ 
-                from chklist_tts 
-               where tt = tt_ 
+              select bitand(f_in_charge,3),
+                     NVL(bitand(flags,1),0)
+                into fsig_,fres_
+                from chklist_tts
+               where tt = tt_
                  and idchk = grp_;
       exception when no_data_found then
         fsig_ := null;
@@ -1854,11 +1855,11 @@ begin
     visa_obj.err := 0;
     visa_obj.erm := null;
     visa_obj.grp := p_grp;
-  
+
     visa_obj.f_pay   := null;
     visa_obj.f_sign  := null;
     visa_obj.f_check := null;
-  
+
     -- проверка может ли пользователь накладывать визу на этот документ
     select userid into l_uid from oper where ref = p_refs(i);
     if p_grp = self_grp_ then
@@ -1872,14 +1873,14 @@ begin
           l_staff staff$base%rowtype;
         begin
           select * into l_staff from staff$base s where s.id = uid_;
-        
+
           visa_obj.err := 2;
           visa_obj.erm := '2 - Документ не може бути завізовано\повернуто користувачем (' ||
                           l_staff.logname || '), який створив документ.';
         end;
       end if;
     end if;
-  
+
     -- если нет ошибки то продолжаем
     if visa_obj.err = 0 then
       -- получаем параметры визы документа
@@ -1888,13 +1889,13 @@ begin
         visa_obj.f_pay  := f_pay;
         visa_obj.f_sign := f_sign;
         visa_obj.f_check := 0;
-        
+
         -- внутреняя подпись
         if bitand(f_sign, chk.def_int_sign) <> 0 then
           chk.get_int_buffer_hex(p_refs(i), 99, visa_obj.int_buffer_hex);
           visa_obj.int_ecp := get_int_ecps(p_refs(i), 99);
-          if(visa_obj.int_ecp is not null) then 
-              visa_obj.f_check := 1; 
+          if(visa_obj.int_ecp is not null) then
+              visa_obj.f_check := 1;
           end if;
         else
           declare
@@ -1909,24 +1910,24 @@ begin
           docsign.retrievesepbuffer(p_refs(i), p_key, sep_buf);
           visa_obj.ext_buffer_hex := rawtohex(utl_raw.cast_to_raw(sep_buf));
           visa_obj.ext_ecp        := get_ext_ecp_obj(p_refs(i));
-          if(visa_obj.ext_ecp.id is not null) then 
-            if (visa_obj.f_check = 0) then                  
-                 visa_obj.f_check := 2; 
-            else 
+          if(visa_obj.ext_ecp.id is not null) then
+            if (visa_obj.f_check = 0) then
+                 visa_obj.f_check := 2;
+            else
                visa_obj.f_check := 3;
-            end if;     
+            end if;
           end if;
         else
           visa_obj.ext_buffer_hex := null;
           visa_obj.ext_ecp        := null;
         end if;
-      
+
       exception
         when err_visa_exception then
           visa_obj.err := 3;
           visa_obj.erm := '3 - Состояние документа было изменено и он не может быть визирован, обновите данные';
       end;
-    
+
       -- Смотрим нужнали проверка ЭЦП
       /*if (visa_obj.int_buffer_hex is not null ) then
         visa_obj.f_check := 1;
@@ -2138,14 +2139,14 @@ begin
     -- загружаем xml из clob
     dbms_xmlparser.parseclob(l_xmlparser, indataclob);
     l_xmldoc := dbms_xmlparser.getdocument(l_xmlparser);
-  
+
     -- берем рут єлемент и читаем параметры
     l_xmlrootelement := dbms_xmldom.getdocumentelement(l_xmldoc);
     l_grp            := to_number(dbms_xmldom.getattribute(l_xmlrootelement, 'grpid'));
     l_sign_type      := dbms_xmldom.getattribute(l_xmlrootelement, 'sign_type');
     l_key_id         := dbms_xmldom.getattribute(l_xmlrootelement, 'key');
     l_key_hash       := dbms_xmldom.getattribute(l_xmlrootelement, 'key_hash');
-  
+
     /*
     TODO: owner="andriy.sukhov" category="Review" priority="2 - Medium" created="17.08.2016"
     text="Корректно отработать ключи VEGA2"
@@ -2154,18 +2155,18 @@ begin
     if (length(l_key_id) = 8) then
       l_key_id := substr(l_key_id, 3);
     end if;
-  
+
     bars_audit.trace(g_pack_name || l_proc_name ||
                      'Process. l_grp=%s, l_key_id=%s',
                      l_grp,
                      l_key_id);
-  
+
     -- перебираем все документы
     l_xmldocnodes := dbms_xmldom.getelementsbytagname(l_xmldoc, 'doc');
     for i in 0 .. dbms_xmldom.getlength(l_xmldocnodes) - 1 loop
       l_xmldocnode    := dbms_xmldom.item(l_xmldocnodes, i);
       l_xmldocelement := dbms_xmldom.makeelement(l_xmldocnode);
-    
+
       -- референс
       l_refs(i) := to_number(dbms_xmldom.getattribute(l_xmldocelement,
                                                       'ref'));
@@ -2174,7 +2175,7 @@ begin
                        i,
                        l_refs(i));
     end loop;
-  
+
     -- отчищаем память от парсера и документа
     dbms_xmlparser.freeparser(l_xmlparser);
     dbms_xmldom.freedocument(l_xmldoc);
@@ -2183,7 +2184,7 @@ begin
       -- отчищаем память от парсера и документа
       dbms_xmlparser.freeparser(l_xmlparser);
       dbms_xmldom.freedocument(l_xmldoc);
-    
+
       -- бросаем ошибку дальше
       raise_application_error(-20000,
                               substr(sqlerrm || chr(10) ||
@@ -2210,14 +2211,14 @@ begin
     l_xmldocelement := dbms_xmldom.createelement(l_xmldoc, 'doc');
     l_xmlnode       := dbms_xmldom.appendchild(dbms_xmldom.makenode(l_xmlrootelement),
                                                dbms_xmldom.makenode(l_xmldocelement));
-  
+
     dbms_xmldom.setattribute(l_xmldocelement, 'ref', l_visadata(i).ref);
     dbms_xmldom.setattribute(l_xmldocelement, 'err', l_visadata(i).err);
     dbms_xmldom.setattribute(l_xmldocelement, 'erm', l_visadata(i).erm);
     bars_audit.trace(g_pack_name || l_proc_name || 'Process. i=' || i ||
                      ', ref=' || l_visadata(i).ref || ', err=' || l_visadata(i).err ||
                      ', erm=' || l_visadata(i).erm);
-  
+
     if (l_visadata(i).err = 0) then
       dbms_xmldom.setattribute(l_xmldocelement, 'grp', l_visadata(i).grp);
       dbms_xmldom.setattribute(l_xmldocelement,
@@ -2229,16 +2230,16 @@ begin
       dbms_xmldom.setattribute(l_xmldocelement,
                                'f_check',
                                l_visadata(i).f_check);
-    
+
       -- блок данных для ЭЦП
-      -- внутрішній підпис      
+      -- внутрішній підпис
       l_xmlintecpelement := createelement('int_ecp',
                                           l_xmldoc,
                                           l_xmldocelement);
       setattribute(l_xmlintecpelement,
                    'int_buffer_hex',
                    l_visadata(i).int_buffer_hex);
-      if(l_visadata(i).int_ecp.first is not null) then              
+      if(l_visadata(i).int_ecp.first is not null) then
         for i0 in l_visadata(i).int_ecp.first .. l_visadata(i).int_ecp.last loop
           if (l_visadata(i).int_ecp(i0).id is not null) then
             l_xmlecpelement := createelement('ecp',
@@ -2260,14 +2261,14 @@ begin
           end if;
         end loop;
       end if;
-      -- зовнішній підпис      
+      -- зовнішній підпис
       l_xmlextecpelement := createelement('ext_ecp',
                                           l_xmldoc,
                                           l_xmldocelement);
       setattribute(l_xmlextecpelement,
                    'ext_buffer_hex',
                    l_visadata(i).ext_buffer_hex);
-    
+
       if (l_visadata(i).ext_ecp.id is not null) then
         l_xmlecpelement := createelement('ecp',
                                          l_xmldoc,
@@ -2636,7 +2637,7 @@ end make_data4visa_ext_xml;
                       if (l_oper_row.bis = 1) then
                         -- ошибка: Невозможно передать в СЭП документ с блоком информ. сообщений.
                         -- bars_error.raise_error('BRS-00201');
-                        -- TODO 
+                        -- TODO
                         null;
                       end if;
 
@@ -2926,9 +2927,9 @@ end make_data4visa_ext_xml;
     dbms_xmldom.freeDocument(l_xmlDoc);
   end put_visas_xml;
 
-  procedure put_visas_xml_ext(inDataClob in clob, outDataXml out clob) is
+  procedure put_visas_xml_ext(inDataClob in clob, outDataXml out clob, enableCommit in number default 0) is
     l_proc_name varchar2(100) := 'put_visas_xml_ext. ';
-  
+
     l_xmlParser      dbms_xmlparser.Parser;
     l_xmlDoc         dbms_xmldom.DOMDocument;
     l_xmlNode        dbms_xmldom.DOMNode;
@@ -2940,14 +2941,14 @@ end make_data4visa_ext_xml;
     l_xmlBufsElement dbms_xmldom.DOMElement;
     l_xmlECPsNode    dbms_xmldom.DOMNode;
     l_xmlECPsElement dbms_xmldom.DOMElement;
-  
+
     l_grp number;
     l_par number;
     l_sqnc oper_visa.sqnc%type;
-  
+
     l_visa_obj   tt_visa_obj_ext ;
     l_visa_array tt_visa_array_ext;
-  
+
     err_lock_visa_exception exception;
     pragma exception_init(err_lock_visa_exception, -20721);
     err_put_visa_exception exception;
@@ -2956,42 +2957,42 @@ end make_data4visa_ext_xml;
     pragma exception_init(err_pay_doc_exception, -20203);
     err_doc_storno_exception exception;
     pragma exception_init(err_doc_storno_exception, -20101);
-  
+
     -- Повернення на одну візу назад
     procedure p_oneback(p_ref     in number,
                         l_userid  in oper_visa.userid%type,
                         l_groupid in oper_visa.groupid%type) is
-     l_rec_id  oper_visa.sqnc%type;                  
+     l_rec_id  oper_visa.sqnc%type;
     begin
       update oper o
          set o.chk = substr(o.chk, 1, length(rtrim(o.chk)) - 6)
        where o.ref = p_ref;
-    
+
       select max(sqnc) into l_rec_id from oper_visa where ref = p_ref;
       -- видаляємо підпис зі сховища спочатку
       sgn_mgr.del_int_sign(p_ref, l_rec_id);
-      -- видаляємо саму візу   
+      -- видаляємо саму візу
       delete from oper_visa ov
        where ov.sqnc = l_rec_id;
-    
+
       insert into oper_visa
         (ref, dat, userid, groupid, status, passive)
       values
         (p_ref, sysdate, l_userid, l_groupid, 0, 1);
     end p_oneback;
-  
-    -- Оплата        
+
+    -- Оплата
     procedure p_pay(p_ref           in number,
                     l_xmlDocElement in dbms_xmldom.DOMElement) is
       l_oper_row oper%rowtype;
       l_refl     number := p_ref;
-    
+
       l_isSepDoc  integer;
       l_flags35   varchar(10);
       l_flags38   varchar(10);
       l_anazn     tt_str_array;
       l_req_value varchar2(1024);
-      l_index     integer := 0; 
+      l_index     integer := 0;
       l_bis       integer := 0;
     begin
       while (l_refl is not null) loop
@@ -3002,13 +3003,13 @@ end make_data4visa_ext_xml;
         -- достаем из опера данные
         select o.* into l_oper_row from oper o where o.ref = l_refl;
         l_refl := l_oper_row.refl;
-      
+
         -- берем парметры операции
         select tt.fli, substr(tt.flags, 35, 1), substr(tt.flags, 38, 1)
           into l_isSepDoc, l_flags35, l_flags38
           from tts tt
          where tt.tt = l_oper_row.tt;
-      
+
         -- документ СЕП
         if (l_isSepDoc = 1 and l_oper_row.mfoa != l_oper_row.mfob and
            (l_flags38 = 0 or l_flags38 = 1 or l_flags38 = 3)) then
@@ -3021,14 +3022,14 @@ end make_data4visa_ext_xml;
           begin
             -- документ оплачен по факту ?
             if l_oper_row.sos = 5 then
-            
+
               -- определяем nazns
               if trim(l_oper_row.d_rec) is not null then
                 l_arc_row.nazns := '11';
               else
                 l_arc_row.nazns := '10';
               end if;
- 
+
               l_arc_row.dat_a := to_date(to_char(l_oper_row.datp,
                                                  'DD-MM-YYYY') || ' ' ||
                                          to_char(sysdate, 'HH24:MI'),
@@ -3061,10 +3062,10 @@ end make_data4visa_ext_xml;
                   l_oper_row.vob := l_vob_bad;
                 end if;
               end if;
-            
+
               l_err         := -1;
               l_arc_row.rec := 0;
-              
+
               l_index := 0;
               l_anazn.delete;
               -- если есть swift реквизит mt или включено формирование бис-ов
@@ -3073,41 +3074,41 @@ end make_data4visa_ext_xml;
                           from operw w, op_field v
                           where w.ref=l_oper_row.ref and w.tag=v.tag and v.vspo_char in ('F','П','C') order by v.vspo_char,w.tag)
                 loop
-                  for v in (select regexp_substr(c.value ,'[^'|| chr(13)||chr(10) ||']+', 1, level) value 
+                  for v in (select regexp_substr(c.value ,'[^'|| chr(13)||chr(10) ||']+', 1, level) value
                             from dual
-                            connect by regexp_substr(c.value , '[^'|| chr(13)||chr(10) ||']+', 1, level) is not null)  
-                  loop  
-                    l_index := l_index + 1; 
-                    if c.vspo_char = 'F' then 
+                            connect by regexp_substr(c.value , '[^'|| chr(13)||chr(10) ||']+', 1, level) is not null)
+                  loop
+                    l_index := l_index + 1;
+                    if c.vspo_char = 'F' then
                        l_req_value := '#F' || trim(c.tag) || ':' || rpad(trim(v.value) || '#', 158);
                     else
                        l_req_value := '#' || c.vspo_char || rpad(trim(v.value) || '#', 218);
                     end if;
                     l_anazn(l_index) := l_req_value;
                   end loop;
-                end loop;  
-              end if;  
-              
-              -- есть БИС строки 
+                end loop;
+              end if;
+
+              -- есть БИС строки
               if l_index > 0 then
                 l_bis := 1;
                 l_arc_row.rec := 0;
                 while l_bis <= l_index + 1
                 loop
-                  if l_bis = 1 then -- первая строка 
+                  if l_bis = 1 then -- первая строка
                     l_arc_row.d_rec := '#B' || lpad(l_index + 1, 2, '0') || nvl(l_oper_row.d_rec, '#');
                     l_arc_row.nazns := '11';
                   else              -- остальные строки
-                    l_arc_row.nazns := '33';    
+                    l_arc_row.nazns := '33';
                     l_oper_row.s := 0;
                     l_oper_row.dk := case l_oper_row.dk when 0 then 2 when 1 then 3 else l_oper_row.dk end;
                     l_req_value := l_anazn(l_bis - 1); -- берем из колекции
                     if length(l_req_value) > 160 then
                        l_arc_row.d_rec := substr(l_req_value, 161, 60);
                        l_oper_row.nazn := substr(l_req_value, 1, 160);
-                    else 
+                    else
                        l_arc_row.d_rec := '';
-                       l_oper_row.nazn := substr(l_req_value, 1, 160);   
+                       l_oper_row.nazn := substr(l_req_value, 1, 160);
                     end if;
                   end if;
                   sep.in_sep(l_err,
@@ -3171,7 +3172,7 @@ end make_data4visa_ext_xml;
                 setAttribute(l_xmlDocElement, 'err', '0');
                 setAttribute(l_xmlDocElement,
                              'erm',
-                             'Документ успішно візовано та оплачено. Передано у СЕП.');    
+                             'Документ успішно візовано та оплачено. Передано у СЕП.');
                 --
               else -- помещаем в СЭП без БИС-ов
                 sep.in_sep(l_err,
@@ -3203,7 +3204,7 @@ end make_data4visa_ext_xml;
                            l_arc_row.dat_a,
                            l_oper_row.d_rec,
                            0,
-                           l_oper_row.ref);  
+                           l_oper_row.ref);
                 if l_err = 0 then
                   -- если документ пришел из OFFLINE-отделения, у него должен быть реквизит REF_F
                   -- значение реквизита REF_F проставляем в поле arc_rrp.ref_a
@@ -3243,18 +3244,18 @@ end make_data4visa_ext_xml;
                     when no_data_found then
                       null;
                   end;
-                
+
                   -- ошибка: Невозможно передать в СЭП. Ошибка : %s
                   bars_error.raise_error('BRS-00200', l_n_er);
-                end if;          
+                end if;
               end if;
-              
+
             end if;
           end;
         end if;
       end loop;
     end p_pay;
-  
+
   begin
     bars_audit.trace(g_pack_name || l_proc_name ||
                      'Start. Params: inDataClob=%s',
@@ -3276,20 +3277,20 @@ end make_data4visa_ext_xml;
       -- загружаем xml из clob
       dbms_xmlparser.parseClob(l_xmlParser, inDataClob);
       l_xmlDoc := dbms_xmlparser.getDocument(l_xmlParser);
-    
+
       -- берем рут єлемент и читаем параметры l_grp и l_par
       l_xmlRootElement := dbms_xmldom.getDocumentElement(l_xmlDoc);
       l_grp            := to_number(dbms_xmldom.getAttribute(l_xmlRootElement,
                                                              'grpid'));
       l_par            := to_number(dbms_xmldom.getAttribute(l_xmlRootElement,
                                                              'par'));
-    
+
       -- перебираем все документы
       l_xmlDocNodes := dbms_xmldom.getElementsByTagName(l_xmlDoc, 'doc');
       for i in 0 .. dbms_xmldom.getLength(l_xmlDocNodes) - 1 loop
         l_xmlDocNode    := dbms_xmldom.item(l_xmlDocNodes, i);
         l_xmlDocElement := dbms_xmldom.makeElement(l_xmlDocNode);
-      
+
         -- референс, ключ, тип подписи
         l_visa_obj.ref          := to_number(dbms_xmldom.getAttribute(l_xmlDocElement,
                                                                       'ref'));
@@ -3297,7 +3298,7 @@ end make_data4visa_ext_xml;
                                                             'key_id');
         l_visa_obj.sgntype_code := dbms_xmldom.getAttribute(l_xmlDocElement,
                                                             'sign_type');
-      
+
         -- внутр и внеш буфер
         l_xmlBufsNode             := dbms_xmldom.item(dbms_xmldom.getElementsByTagName(l_xmlDocElement,
                                                                                        'bufs'),
@@ -3307,7 +3308,7 @@ end make_data4visa_ext_xml;
                                                               'inner_buf');
         l_visa_obj.ext_buffer_hex := dbms_xmldom.getAttribute(l_xmlBufsElement,
                                                               'outer_buf');
-      
+
         -- внутр и внеш подпись
         l_xmlECPsNode           := dbms_xmldom.item(dbms_xmldom.getElementsByTagName(l_xmlDocElement,
                                                                                      'ecps'),
@@ -3317,21 +3318,21 @@ end make_data4visa_ext_xml;
                                                             'inner_ecp');
         l_visa_obj.ext_sign_hex := dbms_xmldom.getAttribute(l_xmlECPsElement,
                                                             'outer_ecp');
-      
+
         -- добавляем текущий объект в масив
         l_visa_array(i) := l_visa_obj;
       end loop;
-    
+
       -- отчищаем память от парсера и документа
       dbms_xmlparser.freeParser(l_xmlParser);
       dbms_xmldom.freeDocument(l_xmlDoc);
     exception
       when others then
-      
+
         -- отчищаем память от парсера и документа
         dbms_xmlparser.freeParser(l_xmlParser);
         dbms_xmldom.freeDocument(l_xmlDoc);
-      
+
         -- бросаем ошибку дальше
         raise_application_error(-20000,
                                 substr(sqlerrm || chr(10) ||
@@ -3340,7 +3341,7 @@ end make_data4visa_ext_xml;
                                        4000),
                                 true);
     end;
-  
+
     -- формируем ответ
     -- !!!! <?xml version="1.0" encoding="windows-1251" ?>
     l_xmlDoc         := dbms_xmldom.newDOMDocument;
@@ -3359,33 +3360,33 @@ end make_data4visa_ext_xml;
         l_int_sign_hex   varchar2(32676) := l_visa_array(j).int_sign_hex;
         l_ext_buffer_hex varchar2(32676) := l_visa_array(j).ext_buffer_hex;
         l_ext_sign_hex   varchar2(32676) := l_visa_array(j).ext_sign_hex;
-      
+
         l_mode varchar2(300); -- режим обработки документа
-      
+
         l_tt        oper.tt%type;
         l_pay_flag  integer;
         l_sign_flag integer;
-      
+
         l_cur_ext_buffer     varchar2(32767);
         l_cur_ext_buffer_hex varchar2(32767);
         l_cur_int_buffer_hex varchar2(32767);
-      
+
         l_int_check number := 1;
         l_sep_check number := 1;
       begin
-        --if(length(l_keyid) = 8) then 
+        --if(length(l_keyid) = 8) then
         --   l_keyid := substr(l_keyid, 3, 6);
         --end if;
         -- точка отката в случае неудачного визирования
         savepoint before_locknput_visa;
-      
+
         -- элемент документа
         l_xmlDocElement := createElement('doc', l_xmlDoc, l_xmlRootElement);
         setAttribute(l_xmlDocElement, 'ref', l_ref);
-      
+
         -- получаем параметры визы документа
         chk.lock_doc(l_ref, l_grp, l_pay_flag, l_sign_flag);
-      
+
         -- определяем режим обработки документа
         /*
         ONEBACK - Повернення на одну візу назад
@@ -3403,7 +3404,7 @@ end make_data4visa_ext_xml;
           else
             l_mode := 'STORNO';
         end case;
-      
+
         -- формируем сообщение
         case l_mode
           when 'ONEBACK' then
@@ -3427,7 +3428,7 @@ end make_data4visa_ext_xml;
                          'erm',
                          'Документ успішно сторновано');
         end case;
-      
+
         -- сверяем внеш буффер
         if bitand(l_sign_flag, chk.DEF_EXT_SIGN) <> 0 then
           Docsign.RetrieveSEPBuffer(l_ref, l_keyid, l_cur_ext_buffer);
@@ -3439,7 +3440,7 @@ end make_data4visa_ext_xml;
             l_sep_check := 0;
           end if;
         end if;
-      
+
         -- сверяем внутр буффер
         if bitand(l_sign_flag, chk.DEF_INT_SIGN) <> 0 then
           chk.get_int_buffer_hex(l_ref, 99, l_cur_int_buffer_hex);
@@ -3450,17 +3451,17 @@ end make_data4visa_ext_xml;
             l_int_check := 0;
           end if;
         end if;
-      
+
         -- обрабатываем документ
         if (l_int_check = 1 and l_sep_check = 1) then
           -- читаем тип операции
           select o.tt into l_tt from oper o where o.ref = l_ref;
-        
+
           -- Повернення на одну візу назад
           if (l_mode = 'ONEBACK') then
             p_oneback(l_ref, uid_, l_grp);
           end if;
-        
+
           -- Візування
           if (l_mode = 'VISA') then
             chk.put_visa_out(l_ref,
@@ -3471,14 +3472,14 @@ end make_data4visa_ext_xml;
                           null,
                           null,
                           l_sqnc);
-            if(l_int_sign_hex is not null) then               
-               sgn_mgr.store_int_sign(l_ref, l_sqnc, l_sgntype_code, l_keyid, l_int_sign_hex);                
+            if(l_int_sign_hex is not null) then
+               sgn_mgr.store_int_sign(l_ref, l_sqnc, l_sgntype_code, l_keyid, l_int_sign_hex);
             end if;
-            if(l_ext_sign_hex is not null) then               
-               sgn_mgr.store_sep_sign(l_ref, l_sgntype_code, l_keyid, l_ext_sign_hex);                
+            if(l_ext_sign_hex is not null) then
+               sgn_mgr.store_sep_sign(l_ref, l_sgntype_code, l_keyid, l_ext_sign_hex);
             end if;
           end if;
-        
+
           -- Візування та оплата
           if (l_mode = 'VISAPAY') then
             -- виза
@@ -3490,16 +3491,16 @@ end make_data4visa_ext_xml;
                           null,
                           null,
                           l_sqnc);
-            if(l_int_sign_hex is not null) then              
-               sgn_mgr.store_int_sign(l_ref, l_sqnc, l_sgntype_code, l_keyid, l_int_sign_hex); 
-            end if;   
-            if(l_ext_sign_hex is not null) then               
-               sgn_mgr.store_sep_sign(l_ref, l_sgntype_code, l_keyid, l_ext_sign_hex);                
+            if(l_int_sign_hex is not null) then
+               sgn_mgr.store_int_sign(l_ref, l_sqnc, l_sgntype_code, l_keyid, l_int_sign_hex);
+            end if;
+            if(l_ext_sign_hex is not null) then
+               sgn_mgr.store_sep_sign(l_ref, l_sgntype_code, l_keyid, l_ext_sign_hex);
             end if;
             -- оплата
             p_pay(l_ref, l_xmlDocElement);
           end if;
-        
+
           -- Cторновання
           if (l_mode = 'STORNO') then
             declare
@@ -3508,7 +3509,7 @@ end make_data4visa_ext_xml;
             begin
               p_back_dok(l_ref, 5, l_par, l_par2, l_par3, 0);
             end;
-          
+
             chk.put_visa_out(l_ref,
                           l_tt,
                           l_grp,
@@ -3517,23 +3518,23 @@ end make_data4visa_ext_xml;
                           null,
                           null,
                           l_sqnc);
-            if(l_int_sign_hex is not null) then                            
-               sgn_mgr.store_int_sign(l_ref, l_sqnc, l_sgntype_code, l_keyid, l_int_sign_hex);               
+            if(l_int_sign_hex is not null) then
+               sgn_mgr.store_int_sign(l_ref, l_sqnc, l_sgntype_code, l_keyid, l_int_sign_hex);
             end if;
-            if(l_ext_sign_hex is not null) then               
-               sgn_mgr.store_sep_sign(l_ref, l_sgntype_code, l_keyid, l_ext_sign_hex);                
-            end if;   
+            if(l_ext_sign_hex is not null) then
+               sgn_mgr.store_sep_sign(l_ref, l_sgntype_code, l_keyid, l_ext_sign_hex);
+            end if;
           end if;
-          
+
           -- trace sign
           if sgn_mgr.g_trace_enabled = 1 then
             sgn_mgr.trace_sign(l_ref, null, l_keyid, l_mode, 'int', l_cur_int_buffer_hex, l_int_sign_hex, 0, null);
             if(l_ext_sign_hex is not null) then
                sgn_mgr.trace_sign(l_ref, null, l_keyid, l_mode, 'ext', l_cur_ext_buffer_hex, l_ext_sign_hex, 0, null);
-            end if;   
+            end if;
           end if;
         end if;
-      
+
         -- делаем запись в исходящий xml
         case
           when (l_int_check = 0) then
@@ -3555,7 +3556,7 @@ end make_data4visa_ext_xml;
             -- ошибки нет
             null;
         end case;
-      
+
       exception
         when err_lock_visa_exception then
           rollback to before_locknput_visa;
@@ -3580,7 +3581,7 @@ end make_data4visa_ext_xml;
                                       l_errumsg,
                                       l_erracode,
                                       l_erramsg);
-          
+
             setAttribute(l_xmlDocElement, 'err', '6');
             setAttribute(l_xmlDocElement,
                          'erm',
@@ -3672,22 +3673,25 @@ end make_data4visa_ext_xml;
                                     true);
           end if;
       end;
+      if mod(j, 100) = 0 and enableCommit = 1 then
+        commit;
+      end if;
     end loop;
-  
+
     /* Структура исходящего XML outDataXml:
     <docs4visa grpid="grpId" par="par">
       <doc ref="ref" err="1" erm="ффффф" />
     </docs4visa>
     */
 
-  
+
     -- конвертируем xml в clob и возвращаем его
     dbms_lob.createtemporary(outDataXml, true);
     dbms_xmldom.writeToClob(l_xmlDoc, outDataXml);
     dbms_xmldom.freeDocument(l_xmlDoc);
-  end put_visas_xml_ext;  
-  
-  
+  end put_visas_xml_ext;
+
+
 /**
  * update_check_sign - модификация информации о проверке ЭЦП на визе
  * @param p_sqnc in - глобальный номер визы
