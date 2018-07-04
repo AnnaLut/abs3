@@ -635,7 +635,7 @@ namespace BarsWeb.CheckInner
                 }
 
                 // собираем клоб и передаем в процедуру, разбираем результат
-                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.put_visas_xml_ext(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
+                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.put_visas_xml_ext(l_in_data, l_out_data, 1); bars_lob.export_clob(l_out_data); end;";
                 cmd.Parameters.Clear();
                 cmd.ExecuteNonQuery();
 
