@@ -27,6 +27,7 @@ begin
   tuda ;
 
   ow.kf := gl.kf;
+  begin
   select nls, substr(nms,1,38) into qq.nlsB, qq.nam_b  From accounts  where kv = gl.baseval and nls like '5031_03';
   select min(s.fdat) into DAT9_ from saldoa s, accounts a where a.nls like '5031_03' and a.kv = 980 and a.acc= s.acc 
             and s.fdat >= to_date('22-06-2018', 'dd-mm-yyyy');
@@ -68,6 +69,8 @@ begin
        gl.payv(0, oo.REF, oo.vdat, oo.tt, oo.dk, oo.kv, oo.nlsA, oo.s, oo.kv2, oo.nlsB, oo.s2);
        gl.pay (2, oo.ref, gl.bdate);  -- по факту
   end loop; --x
+  EXCEPTION WHEN NO_DATA_FOUND THEN null;
+  end;
   commit ;
 end;
 /
