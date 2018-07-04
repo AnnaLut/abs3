@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/segmentation_pack.sql =========*** R
  PROMPT ===================================================================================== 
@@ -765,6 +763,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.SEGMENTATION_PACK IS
     for i in (SELECT package_id FROM dwh_log where package_status = 'DELIVERED' order by package_id) loop
       bars.bars_audit.info('segmentation_pack.parsing package_id ' || i.package_id || ' - start');
       parse(i.package_id);
+      commit;
       bars.bars_audit.info('segmentation_pack.parsing package_id ' || i.package_id || ' - stop');
     end loop;
 
