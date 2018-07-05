@@ -36,7 +36,7 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
 
         public IEnumerable<FileInitialInfo> GetFileInitialInfo(int id, string kf)
         {
-            const string sql = @"select FILE_ID, FILE_NAME, SCHEME_CODE, FILE_CODE, PERIOD, KF, FILE_TYPE
+            const string sql = @"select FILE_ID, FILE_NAME, SCHEME_CODE, FILE_CODE, PERIOD, KF, FILE_TYPE, FILE_FMT_LIST
                                     from V_NBUR_LIST_FILES_USER t 
                                     where T.FILE_ID = :P_FILE_ID 
                                     and T.KF = :P_KF";
