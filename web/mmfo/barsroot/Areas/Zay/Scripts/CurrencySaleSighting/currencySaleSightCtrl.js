@@ -225,6 +225,21 @@
 
     // *** grid ***
 
+    function isValidItem(itemId) {
+        $.ajax({
+            url: bars.config.urlContent("/api/zay/kodd31/checkitem"),
+            data: { id: itemId },
+            type: "GET",
+            success: function(data) {
+                if (data === 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+    }
+
     function dataContext() {
         var grid = $("#grid").data("kendoGrid");
         var dk = 2;
@@ -280,6 +295,7 @@
                         DIG: { type: "number", editable: false },
                         KOM: { type: "number", editable: false },
                         SKOM: { type: "number", editable: false },
+                        META_AIM_NAME: { type: "string", editable: true },
                         VIZA: { type: "number", editable: false },
                         PRIORITY: { type: "number", editable: false },
                         PRIORNAME: { type: "string" },
@@ -287,6 +303,8 @@
                         COVER_ID: { type: "number", editable: false },
                         VERIFY_OPT: { type: "number", editable: false },
                         OBZ: { type: "number", editable: false },
+                        AIMS_CODE: { type: "number", editable: false }, // centura має можливість редагувати, у вебі сказали не треба, лише dropList
+                        TXT: { type: "string" },
                         KV_CONV: { type: "number", editable: false },
                         REQ_TYPE: { type: "number", editable: false },
                         SUP_DOC: { type: "boolean" },
@@ -476,10 +494,68 @@
                                 row = grid.dataItem(grid.select());
 
                             row.PRIORNAME = priorityName;
+                            // ToDo: 
+                            // row.ID + new aimCode....
                         }
                     }).appendTo(container);
                 }
-            }, 
+            }, {
+                field: "META_AIM_NAME",
+                title: "Мета",
+                width: 150,
+                editor: function(container, options) {
+                    var input = $('<input data-text-field="AIM_NAME" data-value-field="AIM_CODE" data-bind="value:' + options.field + '"/>');
+                    input.appendTo(container);
+
+                    input.kendoDropDownList({
+                        autobind: true,
+                        width:300,
+                        dataTextField: "AIM_NAME",
+                        dataValueField: "AIM_CODE",
+                        optionLabel: "Змінити на...",
+                        valueTemplate: '<span>#:AIM_CODE + " " + AIM_NAME#</span>',
+                        template: '<span style="font-size:0.8em">#:AIM_CODE + " " + AIM_NAME#</span>',
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    type: "GET",
+                                    dataType: "json",
+                                    data: { isBuying: false },
+                                    url: bars.config.urlContent("/api/zay/aims/get")
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total:"Total"
+                            },
+                            requestEnd: function(e) {
+                                e.response.Data.sort(function(a, b) {
+                                    if (a.AIM_CODE > b.AIM_CODE) return 1;
+                                    if (a.AIM_CODE < b.AIM_CODE) return -1;
+                                });
+                                e.response.Data = e.response.Data.filter(function(elem) { return elem.AIM_CODE > 0 });
+                            }
+                        },
+                        change: function(e) {
+                            var metaAimCode = this.value(),
+                                metaAimName = this.text(),
+                                grid = $("#grid").data("kendoGrid"),
+                                row = grid.dataItem(grid.select());
+
+                            row.META_AIM_NAME = metaAimName;
+                            row.AIMS_CODE = metaAimCode;
+                        }
+                    }).appendTo(container);
+
+                    var dropdownlist = input.data("kendoDropDownList");
+                    dropdownlist.list.width(340);
+                }
+            }, {
+                field: "AIMS_CODE",
+                title: "Цифровий код<br/>цілі продажу",
+                hidden: true,
+                width: 100
+            },
             {
                 field: "F092_Text",
                 title: "Мета продажу (510)",
@@ -521,7 +597,51 @@
                     dropdownlist.list.width(360);
                 }
             },
-             {
+            {
+                field: "TXT",
+                title: "Опис коду<br/>цілі продажу",
+                hidden:true,
+                width: 300,
+                editor: function (container, options) {
+                    var input = $('<input data-text-field="TXT" data-value-field="P40" data-bind="value:' + options.field + '"/>');
+                    input.appendTo(container);
+
+                    // init block of dropdownlist:
+                    input.kendoDropDownList({
+                        autoBind: true,
+                        dataTextField: "TXT",
+                        dataValueField: "P40",
+                        optionLabel: "Змінити на...",
+                        valueTemplate: '<span>#:TXT#</span>',
+                        template: '<span class="k-state-default"></span>' +
+                                                  '<span class="k-state-default">#:TXT#</span>',
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    type: "GET",
+                                    dataType: "json",
+                                    url: bars.config.urlContent("/api/zay/kodd31/get")
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total"
+                            }
+                        },
+                        change: function(e) {
+                            var aimCode = this.value(),
+                                grid = $("#grid").data("kendoGrid"),
+                                row = grid.dataItem(grid.select()),
+                                model = grid.dataItem(this.element.closest("tr"));
+                             
+                            model.set("AIMS_CODE", parseInt(aimCode));
+                            //model.set('TXT', this.text());
+                            row.TXT = this.text();
+                            //grid.select(0);
+                        }
+                    }).appendTo(container);
+                }
+            }, {
                 field: "SUP_DOC",
                 title: "Наявність<br/>затвердж.<br/>документів",
                 width: 50,
@@ -562,6 +682,20 @@
             input.keyup(function () {
                 value = input.val();
             });
+            $("[name='AIMS_CODE']", e.container).blur(function () {
+                var input = $(this);
+                //$("#log").html(input.attr('name') + " blurred : " + value);
+                var grid = $("#grid").data("kendoGrid");
+                var row = $(this).closest("tr");
+                var item = grid.dataItem(row);
+                if (isValidItem(input.val())) {
+
+                } else {
+                    bars.ui.alert({ text: 'Увага!!! Такого коду цілі не знайдено!' });
+                }
+                //alert("TXT is : " + item.TXT);
+            });
+            
         }
     });
 
