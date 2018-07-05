@@ -169,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 4.81  25/06/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.82  05/07/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -740,7 +740,7 @@ is
       and a.rnk = c.rnk
       and c.rnk = p.rnk
       and a.nbs='2620'
-      and a.tip not like 'W4%'
+      and not ( a.tip  like 'KW%' or a.tip like 'W4%' )
       and c.rnk = p_rnk
       and a.dazs is null;
 
