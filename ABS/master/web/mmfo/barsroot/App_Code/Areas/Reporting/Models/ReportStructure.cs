@@ -51,6 +51,7 @@ namespace BarsWeb.Areas.Reporting.Models
         public string FILE_CODE { get; set; }
         public string PERIOD { get; set; }
         public string KF { get; set; }
-        public string FILE_TYPE { get; set; }        
+        public string FILE_TYPE { get; set; }
+        public string FILE_FMT_LIST { get; set; }
     }
 }
