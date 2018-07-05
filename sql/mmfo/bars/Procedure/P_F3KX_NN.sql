@@ -1,5 +1,4 @@
 
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql =========*** Run ***
 PROMPT ===================================================================================== 
@@ -16,7 +15,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.011          13.06.2018
+% VERSION     :   v.18.012          22.06.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -29,6 +28,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+22.06.2018  операции forex: анализ доп.параметра FOREX
 13.06.2018  дополнительная обработка операций 2900-3739 для RNK ="наш банк"
 11.06.2018  исключение операций по маске "прoдаж не [здійснювався]"
 30.05.2018  расширение условий при определении K021=G
@@ -71,6 +71,7 @@ IS
    okpo_a     varchar2(14);
    nmk_a      varchar2(70);
    k021_a     varchar2(1);
+   op_spot_   number;
 
    sql_z      varchar2(200);
    typ_       number;
@@ -1352,7 +1353,9 @@ BEGIN
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
           ||'               else       ''00'' '
-          ||'          end) d100, dat_a, dat, ref '
+          ||'          end) d100, dat_a, dat, ref, '
+          ||'       (select count(*) from operw o where o.ref=f.ref '
+          ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
           ||'   from fx_deal f'
           ||'  where dat =:1 '
           ||'    and kva != 980   and kvb =980 '
@@ -1363,7 +1366,9 @@ BEGIN
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
           ||'               else       ''00'' '
-          ||'          end) d100, dat_b, dat, ref '
+          ||'          end) d100, dat_b, dat, ref, '
+          ||'       (select count(*) from operw o where o.ref=f.ref '
+          ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
           ||'   from fx_deal f'
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
@@ -1373,7 +1378,9 @@ BEGIN
             ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
-          ||'         ''00''  d100, dat_a, dat, ref '
+          ||'         ''00''  d100, dat_a, dat, ref, '
+          ||'       (select count(*) from operw o where o.ref=f.ref '
+          ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
           ||'   from fx_deal f'
           ||'  where dat =:1 '
           ||'    and kva != 980     and kvb =980 '
@@ -1382,7 +1389,9 @@ BEGIN
           ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
           ||'        decode(kodb,''300001'',''3'',''2'') q024, '
-          ||'        ''00'' d100, dat_b, dat, ref '
+          ||'        ''00'' d100, dat_b, dat, ref, '
+          ||'       (select count(*) from operw o where o.ref=f.ref '
+          ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
           ||'   from fx_deal f'
           ||'  where dat =:2 '
           ||'    and kva = 980     and kvb !=980 '
@@ -1393,20 +1402,25 @@ BEGIN
     OPEN rfc1_  FOR v_sql_  USING dat_, dat_;
     LOOP
        FETCH rfc1_
-          INTO  f091_, r030_, t071_, k020_, k021_, q001_, q024_, d100_, dat_2_, dat_1_, ref_;
+          INTO  f091_, r030_, t071_, k020_, k021_, q001_, q024_, d100_, dat_2_, dat_1_, ref_, op_spot_;
        EXIT WHEN rfc1_%NOTFOUND;
 
          nnnn_ :=nnnn_+1;
          dig_ := f_ret_dig (r030_) * 100;      -- для отображения суммы в единицах валюты
 
-           begin
-              select dat_2_ - dat_1_ - (select count(*)  from holiday
-                                         where kv=980 and holiday between dat_1_ and dat_2_ )
-                into k_days_
-                from dual;
-           exception
-              when others  then  k_days_ :=0;
-           end;
+         begin
+            select dat_2_ - dat_1_ - (select count(*)  from holiday
+                                       where kv=980 and holiday between dat_1_ and dat_2_ )
+              into k_days_
+              from dual;
+         exception
+            when others  then  k_days_ :=0;
+         end;
+
+       if op_spot_ = 1 and k_days_ !=1
+       then
+           d100_ :='03';
+       else
          if d100_ ='00'  then
            if     k_days_ >2  then  d100_ :='04';
            elsif  k_days_ =2  then  d100_ :='03';
@@ -1415,6 +1429,7 @@ BEGIN
            end if;
 
          end if;
+       end if;
 
          nls_ := null;
          rnk_ := null;
