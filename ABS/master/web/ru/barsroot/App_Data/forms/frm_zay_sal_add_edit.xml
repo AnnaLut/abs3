@@ -16,7 +16,7 @@
               l_mfo0 varchar2(20) := :P_MFO0;
               l_kom number := :P_KOM;
               l_skom number := :P_SKOM;
-              l_meta number := :P_META;
+              l_meta number := null;
               l_f092 char(3):= :P_F092;
               l_contract varchar2(128) := :P_CONTRACT;
               l_datc date := :P_DATC;
@@ -159,7 +159,7 @@
               <parameter type="FormField" name="P_MFO0" />
               <parameter type="FormField" name="P_KOM" />
               <parameter type="FormField" name="P_SKOM" />
-              <parameter type="FormField" name="P_META" />
+              <!--<parameter type="FormField" name="P_META" />-->
               <parameter type="FormField" name="P_F092" />
               <parameter type="FormField" name="P_CONTRACT" />
               <parameter type="FormField" name="P_DATC" />
@@ -259,9 +259,9 @@
         <customfield name="P_KURS_Z" label="Курс заяви" datatype="Decimal" datasourcefield="KURS_Z" columnindex="2" index="4">
           <uicontrol type="DecimalInput" controlwidth="148" />
         </customfield>
-        <customfield name="P_META" label="Мета" datatype="Decimal" required="true" datasourcefield="META" columnindex="2" index="5">
+        <!--<customfield name="P_META" label="Мета" datatype="Decimal" required="true" datasourcefield="META" columnindex="2" index="5">
           <uicontrol type="DropDownList"  addemptyitem="true" keyfield="AIM" valuefield="NAME" table="( select AIM, to_char(aim,'09')||' '||NAME name from ZAY_AIMS where type = 2)" controlwidth="157" ></uicontrol>
-        </customfield>
+        </customfield>-->
         <customfield name="P_F092" label="Мета продажу (510)" datatype="String" required="true" size="50" datasourcefield="F092" columnindex="2" index="6">
           <uicontrol type="DropDownList" addemptyitem="true" table="(select f092 as id, f092||' '||txt as name  from f092 where to_number(f092,'999')&gt;200)" keyfield="id" valuefield="name" controlwidth="157"></uicontrol>
         </customfield>
