@@ -1,16 +1,19 @@
+
+
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/PAY_23.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
 
+
 PROMPT *** Create  procedure PAY_23 ***
 
-CREATE OR REPLACE PROCEDURE BARS.PAY_23 (P_dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null, nal_ number)  IS
+  CREATE OR REPLACE PROCEDURE BARS.PAY_23 (P_dat01_ DATE, mode_ NUMBER DEFAULT 0, p_user number default null, nal_ number)  IS
 
-/* Версия 3.0 19-06-2017 20-01-2017   26-07-2016  18-05-2016 (24-02-2016, 04-01-2016, 18-09-2015)
+/* Версия 3.1 03-07-2018  19-06-2017 20-01-2017   26-07-2016  18-05-2016 (24-02-2016, 04-01-2016, 18-09-2015)
 
    Формування макету/проводок по резерву
    -------------------------------------
-
+9) 03-07-2017 (3.1) При переносе в NBU23_REZ_OTCN добавлены REZ9, REZQ9 
 8) 19-06-2017  -   Списание с капитала уценки по ЦБ перенесено в PRVN_FLOW (cp_ucenka)
 ----------------- 351 --------------------
 7) 20-01-2017  -   Зміни по постанові 351
@@ -230,7 +233,7 @@ begin
              OB22_REZ_30, BV_0 , BVQ_0 , REZ_0  , REZQ_0  , REZ39    , KAT39  , REZQ39  , S250_39, REZ23   , KAT23   , REZQ23    , S250_23   ,
              DAT_MI     , TIPA , BVU   , BVUQ   , EAD     , EADQ     , CR     , CRQ     , KOL_351, FIN_351 , KPZ     , KL_351    , LGD       ,
              OVKR       , P_DEF, OVD   , OPD    , RC      , RCQ      , ZAL_351, ZALQ_351, CCF    , TIP_351 , PD_0    , FIN_Z     , ISTVAL_351,
-             RPB
+             RPB        , REZ9 , REZQ9
             )
       select l_ref      , FDAT , ID    , RNK    , NBS     , KV       , ND     , CC_ID   , ACC    , NLS     , BRANCH  , FIN       , OBS       ,
              KAT        , K    , IRR   , ZAL    , BV      , PV       , REZ    , REZQ    , DD     , DDD     , BVQ     , CUSTTYPE  , IDR       ,
@@ -241,7 +244,7 @@ begin
              OB22_REZ_30, BV_0 , BVQ_0 , REZ_0  , REZQ_0  , REZ39    , KAT39  , REZQ39  , S250_39, REZ23   , KAT23   , REZQ23    , S250_23   ,
              DAT_MI     , TIPA , BVU   , BVUQ   , EAD     , EADQ     , CR     , CRQ     , KOL_351, FIN_351 , KPZ     , KL_351    , LGD       ,
              OVKR       , P_DEF, OVD   , OPD    , RC      , RCQ      , ZAL_351, ZALQ_351, CCF    , TIP_351 , PD_0    , FIN_Z     , ISTVAL_351,
-             RPB
+             RPB        , REZ9 , REZQ9
       From   nbu23_rez
       where  fdat=dat01_ and nd = decode(p_user, null, nd, -1, nd, p_user);
 
@@ -265,6 +268,8 @@ PROMPT *** Create  grants  PAY_23 ***
 grant EXECUTE                                                                on PAY_23          to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on PAY_23          to RCC_DEAL;
 grant EXECUTE                                                                on PAY_23          to START1;
+
+
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/PAY_23.sql =========*** End *** ==
