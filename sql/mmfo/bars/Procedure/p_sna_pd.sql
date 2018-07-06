@@ -9,24 +9,25 @@ PROMPT *** Create  procedure P_SNA_PD ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_SNA_PD (p_dat01 date) IS
 
-/* Версия 1.0 23-02-2017
+/* Версия 1.1 05-07-2018   23-02-2017
    Заполнение PD
+   05-07-2018 (1.1) - Добавлены счета ('SNA','SDI','SDA','SDM','SDF','SRR')
    -------------------------------------
 */
 
-l_pd number; l_lgd number;
+l_pd rez_cr.pd%type; l_lgd rez_cr.lgd%type; l_idf rez_cr.idf%type;
 
 begin
-   for i in (select r.rowid RI, r.* from rez_cr r  where  r.fdat=p_dat01 and r.tip in ('SNA','SDI','SPI') )
+   for i in (select r.rowid RI, r.* from rez_cr r  where  r.fdat=p_dat01 and r.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') )
    LOOP
       begin
-         select pd,lgd into l_pd,l_lgd
-         from ( select distinct nd,kv,pd,lgd
+         select pd, lgd, idf into l_pd, l_lgd, l_idf
+         from ( select distinct nd, kv, pd, lgd, idf
                 from rez_cr
-                where fdat=p_dat01 and nbs<>'9129' and bv>0 and nd = i.nd and kv = i.kv and rownum = 1 );
-      EXCEPTION WHEN NO_DATA_FOUND THEN l_pd := NULL; l_lgd := NULL;
+                where fdat=p_dat01 and nbs<>'9129' and nd = i.nd and kv = i.kv and tip not in ('SNA','SDI','SDA','SDM','SDF','SRR')  and rownum = 1 );
+         update rez_cr set pd  = l_pd, lgd = l_lgd, idf = l_idf where rowid=i.RI ;
+      EXCEPTION WHEN NO_DATA_FOUND THEN l_pd := NULL; l_lgd := NULL; l_idf := NULL;
       END;
-      update rez_cr set pd  = l_pd, lgd=l_lgd where rowid=i.RI ;
    END LOOP;
 end;
 /

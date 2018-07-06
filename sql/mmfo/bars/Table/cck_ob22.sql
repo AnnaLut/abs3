@@ -176,6 +176,12 @@ end;
 /
 COMMENT ON COLUMN BARS.CCK_OB22.KL1    IS 'пегепбмне онке';
 
+begin EXECUTE IMMEDIATE 'alter table bars.cck_ob22 add ( SNA char(6) ) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+
+
 PROMPT *** Create  grants  CCK_OB22 ***
 
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CCK_OB22        to BARS_ACCESS_DEFROLE;

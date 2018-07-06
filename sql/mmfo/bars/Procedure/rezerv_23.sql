@@ -71,14 +71,14 @@ begin
    l_rez      := 0;
 
    if l_finevare = 1 THEN
-      begin select sum(nvl(rez39,0)) into l_rez from nbu23_rez where fdat=dat01_;
+      begin select sum(nvl(rez9,0)) into l_rez from nbu23_rez where fdat=dat01_;
       EXCEPTION WHEN NO_DATA_FOUND THEN l_finevare := 0;
       end;
       if l_rez = 0 THEN
          l_finevare := 0; -- пока не загрузили FINEVARE, беру REZ23
       end if;
       begin
-         select sum(nvl(rez39,0)) into l_rez from nbu23_rez where fdat=dat01_ and (id like 'DEBH%' or id like 'XOZ%') ;
+         select sum(nvl(rez9,0)) into l_rez from nbu23_rez where fdat=dat01_ and (id like 'DEBH%' or id like 'XOZ%') ;
       EXCEPTION WHEN NO_DATA_FOUND THEN l_rez := 0;
       end;
       if l_rez = 0 THEN
@@ -91,12 +91,13 @@ begin
    z23.to_log_rez (user_id , 33 , dat01_ ,'Рівчачок - Початок ');
    l_mfo := gl.aMfo;
    If (getglobaloption('MFOP') = '300465' ) or l_mfo = '300465' THEN l_oschad := true; else l_oschad := false; end if; -- ОЩАД
-   for k in (select substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv, a.tip     , n.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
+   for k in (select /*+ INDEX (s PK_SPECPARAM) */
+                    substr(n.id,1,4) ID, n.id idkod, n.nd    , n.acc     , n.bvu bv, a.tip     , n.ob22  , n.rz  , n.cc_id   , n.rnk, a.accc, nd_cp,
                     n.kv, n.nbs, n.nls , n.r013    , n.branch, n.ROWID RI, 1 kat   , s.istval, n.tipa, n.custtype,
                     -- Если FINEVARE в резерв берется рез.39, только по DEBH - REZ23
                     -- (Совещание в Делойте 12-01-2016, Костенко Г.С.)
-                    decode( l_finevare, 1, nvl(n.rez39 ,0), NVL(n.rez23 ,0) ) rez ,
-                    decode( l_finevare, 1, nvl(n.rezq39,0), NVL(n.rezq23,0) ) rezq,
+                    decode( l_finevare, 1, nvl(n.rez9 ,0), NVL(n.rez23 ,0) ) rez ,
+                    decode( l_finevare, 1, nvl(n.rezq9,0), NVL(n.rezq23,0) ) rezq,
                     n.rez23 rez23, n.rezq23 rezq23,
                     -- s250 - портфельный метод
                     --(если FINEVARE и то , что получили из FV:
@@ -406,10 +407,11 @@ begin
 
    begin
       z23.to_log_rez (user_id , 37 , dat01_ ,'Распределение дисконта');
-      for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_ and bv<0)
+      for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_
+                and tip in ('SNA','SDI','SDA','SDM','SDF')  and nbs not in ('3648','3666') )
       LOOP
           for s in (select rowid ri,nd, bv, sum(bv) over  (partition by nd) bv_all  from   nbu23_rez
-                    where fdat = dat01_ and  bv>0 and nd=k.nd and nbs not in ('9129'))
+                    where fdat = dat01_ and  tip not in ('SNA','SDI','SDA','SDM','SDF','SRR') and bv>0 and nd=k.nd and nbs not in ('9129'))
           LOOP
              L_diskont := round(s.bv/s.bv_all*k.bv_sna,2);
              update nbu23_rez set diskont  = l_diskont  where rowid=s.ri;
@@ -417,6 +419,36 @@ begin
       end LOOP;
    commit;
    end;
+   begin
+      z23.to_log_rez (user_id , 37 , dat01_ ,'Распределение SDF');
+      for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_
+                and tip in ('SDF')  and nbs not in ('3648','3666') )
+      LOOP
+          for s in (select rowid ri,nd, bv, sum(bv) over  (partition by nd) bv_all  from   nbu23_rez
+                    where fdat = dat01_ and  tip not in ('SNA','SDI','SDA','SDM','SDF','SRR') and bv>0 and nd=k.nd and nbs not in ('9129'))
+          LOOP
+             L_diskont := round(s.bv/s.bv_all*k.bv_sna,2);
+             update nbu23_rez set zpr  = l_diskont  where rowid=s.ri;
+          end loop;
+      end LOOP;
+   commit;
+   end;
+/*
+   begin
+      z23.to_log_rez (user_id , 37 , dat01_ ,'Распределение SNA');
+      for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_
+                and tip in ('SNA')  and nbs not in ('3648','3666') )
+      LOOP
+          for s in (select rowid ri,nd, bv, sum(bv) over  (partition by nd) bv_all  from   nbu23_rez
+                    where fdat = dat01_ and  tip not in ('SNA','SDI','SDA','SDM','SDF','SRR') and bv>0 and nd=k.nd and nbs not in ('9129'))
+          LOOP
+             L_diskont := round(s.bv/s.bv_all*k.bv_sna,2);
+             update nbu23_rez set pv  = l_diskont  where rowid=s.ri;
+          end loop;
+      end LOOP;
+   commit;
+   end;
+ */
    z23.to_log_rez (user_id , 38 , dat01_ ,'Рівчачок - Кінець ');
 end;
 /

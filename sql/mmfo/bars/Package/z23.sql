@@ -5,7 +5,7 @@
   CREATE OR REPLACE PACKAGE BARS.Z23 IS
 
 --***************************************************************--
---                 Резерв по НБУ-23                               --
+-- 22-06-2018  20:05      Резерв по НБУ-23                       --
 --***************************************************************--
 
 G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.02 21.07.2016';
@@ -233,10 +233,11 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.7 26-02-2018'; 
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.8 02-07-2018'; 
 
 /*
-115) 26-02-2018(23.7)/COBUMMFO-6811/ - В START_REZ - создание архива PRVN_FIN_DEB --> FIN_DEB_ARC 
+116) 02-07-2018(23.8) - BVU по  tip  in ('SDI','SDA','SDM','SDF')     
+115) 26-02-2018(23.7) - /COBUMMFO-6811/ - В START_REZ - создание архива PRVN_FIN_DEB --> FIN_DEB_ARC 
 114) 27-11-2017(23.6) - Убрала перепривязку задогов по ЦБ
 113) 20-11-2017(23.5) - добавлено в START_REZ - REZ_PAR_9200   убрала (01-12-2017)
 112) 26-10-2017(23.4) - финансовый лизинг (207*) - обеспечение само на себя по параметру кредитного договора ZAL_LIZ 
@@ -452,7 +453,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 -------------------------------------------------------------------
 procedure BV_upd (p_dat01 date) is z_dat01 date; s_dat01 varchar2(10) ;
 
-l_commit number;
+l_commit number; l_sna number;
 dat31_   date;
 begin
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> BV_UPD');
@@ -476,34 +477,13 @@ begin
    end LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'<> BVU = 0');
    commit;
-   l_commit := 0;
-   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SNA');
-   for x in (select nd, BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip ='SNA' and bv <0 and nls < '4')
-   loop
-      for  y in (select rowid RI, bv, tip, BVu    from nbu23_rez
-                 where fdat = z_dat01 and kv = x.kv  and bv > 0 and nd= x.nd and id like x.ID||'%' and nls<'4'
-                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),bv
-                 )
-      loop y.BVu := x.BV + y.BV;
-           If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0;
-           else               x.BV := 0     ;
-           end if;
-           If x.kv = gl.baseval then  update nbu23_rez set BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
-           else                       update nbu23_rez set BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
-           end if;
-         l_commit :=  l_commit + 1 ;
-         If l_commit >= 500 then  commit;  l_commit:= 0 ;  end if;
-
-      end loop; --y
-   end loop; -- x
-   z23.to_log_rez (user_id , 351 , p_dat01 ,'<> SNA');
    --------------------------
    l_commit := 0;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDI');
    for x in (select nd,  BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDI','SDA','SDM','SDF') and bv <>0 and nls < '4')
    loop
       for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu  from nbu23_rez
-                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) > 0 and nd= x.nd and id like x.ID||'%' and nls < '4'
+                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4'
                  and tip not in ('SDI','SDA','SDM','SDF')     
                  order by  decode (tip, 'SP ',1, 'SS ',2, 'SPN',4, 'SNO',5, 'SN ',6, 10 )
                  )
@@ -521,6 +501,38 @@ begin
       end loop; -- y
    end loop;    -- x
    z23.to_log_rez (user_id , 351 , p_dat01 ,'<> SDI');
+   l_commit := 0;
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SNA');
+   for x in (select nd, BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip ='SNA' and bv <0 and nls < '4')
+   loop
+      for  y in (select rowid RI, bv, tip, BVu    from nbu23_rez
+                 where fdat = z_dat01 and kv = x.kv  and bv > 0 and nd= x.nd and id like x.ID||'%' and nls<'4'
+                       and tip not in ('SDI','SDA','SDM','SDF')     
+                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),bv
+                 )
+      loop y.BVu := x.BV + y.BV;
+           logger.info ('SNA 1 nd =  ' || x.nd|| ' BV_SNA = '|| x.BV );
+           If y.BVu < 0 then  x.BV  := y.BVu ; y.BVu := 0; l_sna := y.bv;
+           logger.info ('SNA 2 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
+           else               --l_sna := 5 ;
+                              l_sna := - x.bv ; 
+                              x.BV  := 0;
+           logger.info ('SNA 3 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
+           end if;
+           If x.kv = gl.baseval then  
+           logger.info ('SNA 4 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
+              update nbu23_rez set pv = l_sna, BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
+           else
+           logger.info ('SNA 5 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
+              update nbu23_rez set pv = l_sna, BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
+           end if;
+         l_commit :=  l_commit + 1 ;
+         If l_commit >= 500 then  commit;  l_commit:= 0 ;  end if;
+
+      end loop; --y
+   end loop; -- x
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'<> SNA');
+
    -- Первоначально заполняется BV и BVQ
    -- update nbu23_rez set BVu = BV, BVuq =  BVq where  fdat = z_dat01 and BVu is null ;
 
@@ -2041,7 +2053,7 @@ begin
 
      begin
         for k in (select to_number(nvl(cck_app.Get_ND_TXT (nd, 'ZAL_LIZ'),'0')) pawn,n.nd ,  a.acc from nd_acc n, accounts a
-                  where a.nbs like '207%' and ost_korr(a.acc,dat31_,null,a.nbs)<>0 and a.acc = n.acc
+                  where (a.nbs like '207%' or a.nbs in ('2044')) and ost_korr(a.acc,dat31_,null,a.nbs)<>0 and a.acc = n.acc
                  )
         LOOP
            if k.pawn <>0 THEN
@@ -2086,7 +2098,7 @@ begin
      -- допривязка счетов нач процентов+9129 к залогам по КП
      for K1 in (select n.*, ost_korr(a.acc,dat31_,null,a.nbs) ostc from accounts a, nd_acc n 
                 where a.acc = n.acc 
-                 and a.tip not in ('SS ','DEP','DIU','SDI','SNA') 
+                 and a.tip not in ('SS ','DEP','DIU','SDI','SNA','SDA','SDF','SDM','SRR') 
                  and (a.nls <'3' or a.nbs='9129') and (a.dazs is null or a.dazs >=p_dat01) 
                  and not exists (select 1 from cc_accp where accs = a.acc)
               )

@@ -431,9 +431,7 @@ BEGIN
 
             end if;
          end if;
-         if fl <> 1 THEN
-            acc_ := k.r_acc;
-         end if;
+         if fl = 0 THEN   acc_ := k.r_acc;  end if;
 
          -- Определение параметров клиента и счета
          begin
