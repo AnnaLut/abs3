@@ -48,7 +48,7 @@ begin
   for k in (select * from mv_kf  )
   loop bc.go ( k.KF);   ow.kf  := gl.aMfo   ;
      select count(*) into CN from oper where vdat=to_date ('27-06-2018', 'dd-mm-yyyy') and vob=96 and tt='013' and ND = 'FRS9_ZO7_K'; 
-     if cn<>0 THEN RETURN; end if;
+     if cn = 0 THEN 
      --------------------------------------------------------------------------------------------------------------
      For x in ( select z.*, p2.dk, p2.s2, Get_NLS60 ( z.kv, z.nlsa)  NLS60
                 from ( select p.vdat, p.kv, p.nlsa, p.nazn, p.nlsb, count(*), max(p.ref) REF2  
@@ -95,6 +95,7 @@ begin
         
      end loop ; -- x
     commit ;
+    end if;
   end loop ; --k
 end;
 /
