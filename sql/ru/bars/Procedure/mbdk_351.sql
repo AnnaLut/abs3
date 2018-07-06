@@ -9,9 +9,10 @@ PROMPT *** Create  procedure MBDK_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.MBDK_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 11.0  05-04-2017  10-03-2017  06-03-2017  03-03-2017 08-02-2017  24-01-2017  10-01-2017  25-11-2016
+/* Версия 11.2  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 08-02-2017  24-01-2017  10-01-2017  25-11-2016
    Розрахунок кредитного ризику по МБДК + коррахунки
-
+13) 27-09-2017(11.2)  - Запись IDF <-- l_idf, было l_fp
+12) 14-09-2017 - PD по l_idf ,было по l_fp
 11) 05-04-2017 - rnk = 90931101
 10) 10-03-2017 - К-во дней (убрала проверку на дату окончания договора)
  9) 06-03-2017 - LGD (округление 8 знаков)
@@ -48,7 +49,7 @@ begin
    l_tip_fin := 1;
    if p_mode = 0 THEN p_kol_nd_MBDK(p_dat01, 0); end if;
    delete from REZ_CR where fdat=p_Dat01 and tipa in ( 5, 6);
-   for d in (SELECT d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, D.FIN23, D.BRANCH,f_get_nd_val (d.nd, p_dat01, 5, d.rnk) KOL, 5 tipa,
+   for d in (SELECT d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, D.FIN23, D.BRANCH,f_get_nd_val_n ('KOL', d.nd, p_dat01, 5, d.rnk) KOL, 5 tipa,
                     FIN_351, PD, f_vkr_MBDK(d.rnk) VKR, 'МБДК ' l_vkr
              FROM (select * from accounts where  nbs >'1500' and nbs < '1600') a,
                   (select e.* from cc_deal e,nd_open n
@@ -58,7 +59,7 @@ begin
                    d.nd=(select max(n.nd) from nd_acc n,cc_deal d1  where n.acc=a.acc and n.nd=d1.nd and (d1.vidd> 1500  and d1.vidd<  1600 )
                    and d1.vidd<>1502 and d1.sdate< p_dat01 and  (sos>9 and sos< 15 or d1.wdate >= l_dat31 ) )
              union all
-             select d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, nvl(d.fin23,1) FIN23, D.BRANCH, f_get_nd_val (d.nd, p_dat01, 6, d.rnk) KOL,6 tipa,
+             select d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, nvl(d.fin23,1) FIN23, D.BRANCH, f_get_nd_val_n ('KOL', d.nd, p_dat01, 6, d.rnk) KOL,6 tipa,
                     FIN_351, PD, cck_app.get_nd_txt(d.nd, 'VNCRR') VKR, 'Коррахунки ' l_vkr
              from  cc_deal d  where vidd = 150
             )
@@ -124,7 +125,7 @@ begin
             l_fin   := f_rnk_maxfin(p_dat01, s.rnk, l_tip_fin, d.nd, 1);
             l_pd    := d.pd;
             if l_pd is null  THEN
-               l_pd := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, d.VKR,l_fp);
+               l_pd := fin_nbu.get_pd(s.rnk, d.nd, p_dat01,l_fin, d.VKR,l_idf);
             else
                l_fp :=  NULL;
             end if;
@@ -171,15 +172,15 @@ begin
                                 cc_id    , pd_0  , vidd    , tip_zal  , LGD    , nbs    , tip   , custtype, RC     , BV02    , s080    , ddd_6B,
                                 tip_fin  , ob22  , bv02q   , KL_351   , RZ     )
                         VALUES (p_dat01  , s.RNK , s.NMK   , d.nd     , d.sdate, d.wdate, s.kv  , s.nls   , s.acc  , l_ead   , l_eadq  , l_fin ,
-                                l_pd     , l_CR  , l_CRQ   , l_bv     , l_bvq  , d.VKR  , l_fp  , d.kol   , d.fin23, null    , l_tipa  , z.pawn,
+                                l_pd     , l_CR  , l_CRQ   , l_bv     , l_bvq  , d.VKR  , l_idf , d.kol   , d.fin23, null    , l_tipa  , z.pawn,
                                 l_zal    , l_zalq, l_zal_bv, l_zal_bvq, z.kpz  , l_OVKR , l_PDEF, l_OVD   , l_OPD  , l_istval, l_CR_LGD, l_dv  ,
                                 d.cc_id  , 0     , d.vidd  , z.tip    , l_LGD  , s.nbs  , s.tip , s.cus   , l_RC   , l_bv02  , l_s080  , l_ddd ,
                                 l_tip_fin, s.ob22, l_bv02q , z.kl_351 , s.RZ   );
 
             for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV from nd_acc n,accounts a
-                      where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI') and nbs not in (3648))
+                      where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') and nbs not in (3648))
             LOOP
-               if i.BV < 0 THEN
+               if i.BV <> 0 THEN
                   l_ddd  := f_ddd_6B(i.nbs);
                   l_BV   := i.bv / 100;
                   l_BVQ  := p_icurval(i.kv,i.bv,l_dat31)/100;

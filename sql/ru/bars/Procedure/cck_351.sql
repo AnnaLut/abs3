@@ -137,8 +137,8 @@ begin
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed
                from   nd_acc n, accounts a, customer c
                where  n.nd = d.nd and n.acc = a.acc and nls not like '3%' and a.nbs not in ('2620','9611','9601')
-                 and  a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI')
-                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk;
+                 and  a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI','SDA','SDM','SDF','SRR')
+                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk order by a.tip desc;
 
          elsif d.tipa in ( 10 )  THEN
             OPEN c0 FOR
@@ -236,7 +236,7 @@ begin
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);
             --logger.info('S080 1 : nd = ' || d.nd || ' l_tip_fin = '||l_tip_fin || ' l_fin = ' || l_fin || ' s080 = ' || l_s080 ) ;
 
-          if s.s > 0 THEN
+          if s.s > 0 and s.tip not in ('SDI','SDA','SDM','SDF','SRR') THEN
             --logger.info('REZ_351 1 : nd = ' || d.nd || ' s.acc = '|| s.acc || ' VKR = ' || VKR_ || 'Остаток = ' || s.s) ;
             for z in ( select NVL(f_zal_accs (p_dat01, d.nd, a.acc),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02,
                               f_bv_sna   (p_dat01, d.nd ,a.acc, kv) osta, m.*
@@ -414,9 +414,9 @@ begin
             end LOOP;
            else
                 for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV from nd_acc n,accounts a
-                          where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI') and nbs not in (3648))
+                          where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') and nbs not in (3648))
                 LOOP
-                   if  i.bv < 0 THEN
+                   if  i.bv <> 0 THEN
                       l_ddd  := f_ddd_6B(i.nbs);
                       l_BV   := i.bv / 100;
                       l_BVQ  := p_icurval(i.kv,i.bv,l_dat31)/100;
