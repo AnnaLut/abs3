@@ -170,6 +170,12 @@ end;
 
 COMMENT ON COLUMN BARS.CCK_OB22.K9    IS 'Числовой код по IFRS=принцип обліку по МСФЗ-9 ("корзина")';
 
+begin EXECUTE IMMEDIATE 'alter table bars.cck_ob22 add ( SNA char(6) ) ';
+exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+
+
 begin EXECUTE IMMEDIATE 'alter table bars.cck_ob22 add ( KL1 int ) ';
 exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
 end;

@@ -254,7 +254,7 @@ begin
             end;
 
             for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV from nd_acc n,accounts a
-                      where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI') and nbs not in (3648))
+                      where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') and nbs not in (3648))
             LOOP
                l_ddd  := f_ddd_6B(i.nbs);
                l_BV   := i.bv / 100;

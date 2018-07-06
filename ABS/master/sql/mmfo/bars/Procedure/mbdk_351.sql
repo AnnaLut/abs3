@@ -178,9 +178,9 @@ begin
                                 l_tip_fin, s.ob22, l_bv02q , z.kl_351 , s.RZ   );
 
             for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV from nd_acc n,accounts a
-                      where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI') and nbs not in (3648))
+                      where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') and nbs not in (3648))
             LOOP
-               if i.BV < 0 THEN
+               if i.BV <> 0 THEN
                   l_ddd  := f_ddd_6B(i.nbs);
                   l_BV   := i.bv / 100;
                   l_BVQ  := p_icurval(i.kv,i.bv,l_dat31)/100;
