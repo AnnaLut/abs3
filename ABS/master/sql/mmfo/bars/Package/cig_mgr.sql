@@ -5349,7 +5349,8 @@ begin
  procedure create_job_cig_mmfo is
 
   begin
-    for rec in (select m.kf from mv_kf m where not exists ( select j.job_name from DBA_SCHEDULER_JOBS j where j.job_name like 'CIG_PVBKI_MMFO_'||m.kf))
+  null;
+   /* for rec in (select m.kf from mv_kf m where not exists ( select j.job_name from DBA_SCHEDULER_JOBS j where j.job_name like 'CIG_PVBKI_MMFO_'||m.kf))
 
     loop
         begin
@@ -5368,7 +5369,7 @@ begin
                   else raise;
                    end if;
     end;
-        end loop;
+        end loop;*/
 
  end;
 
