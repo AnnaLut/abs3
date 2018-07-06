@@ -19,6 +19,7 @@ declare
      insert into operw values ow;
      gl.payv(0, oo.REF, oo.vdat, oo.tt, oo.dk, oo.kv, oo.nlsA, oo.s, oo.kv2, oo.nlsB, oo.s2);
      gl.pay (2, oo.ref, gl.bdate);  -- по факту
+  EXCEPTION WHEN NO_DATA_FOUND THEN Null;
   end ;
 
 begin   
