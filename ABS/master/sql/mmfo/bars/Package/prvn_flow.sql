@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 11.1  19.06.2018';
+  g_body_version  constant varchar2(64) := 'version 11.3  05.07.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -2960,11 +2960,11 @@ end nos_del;
 
             else -- liabilities
 
-              select abs( sum( case TIP when 'DEP' then BAL else 0 end ) ) as BAL_DEP
---                 , abs( sum( case TIP when 'SP ' then BAL else 0 end ) ) as BAL_SP
-                   , abs( sum( case TIP when 'DEN' then BAL else 0 end ) ) as BAL_DEN
---                 , abs( sum( case TIP when 'SPN' then BAL else 0 end ) ) as BAL_SPN
---                 , abs( sum( case TIP when 'SNO' then BAL else 0 end ) ) as BAL_SNO
+              select nvl( abs( sum( case TIP when 'DEP' then BAL else 0 end ) ), 0 ) as BAL_DEP
+--                 , nvl( abs( sum( case TIP when 'SP ' then BAL else 0 end ) ), 0 ) as BAL_SP
+                   , nvl( abs( sum( case TIP when 'DEN' then BAL else 0 end ) ), 0 ) as BAL_DEN
+--                 , nvl( abs( sum( case TIP when 'SPN' then BAL else 0 end ) ), 0 ) as BAL_SPN
+--                 , nvl( abs( sum( case TIP when 'SNO' then BAL else 0 end ) ), 0 ) as BAL_SNO
                    , max( case TIP when 'DEP' then ACRN.FPROCN( ACC, 1, p_rpt_dt-1 ) else 0 end ) as RATE_DEP
 --                 , max( case TIP when 'SP ' then ACRN.FPROCN( ACC, 0, p_rpt_dt-1 ) else 0 end ) as RATE_SP
                 into agr.sar_dtl(agr.sar_dtl.last).dbt      -- DEP
@@ -3006,11 +3006,11 @@ end nos_del;
             agr.sar_dtl(agr.sar_dtl.last).sar_id      := cur.AGR_ID;
             agr.sar_dtl(agr.sar_dtl.last).sar_ccy_id  := cur.CCY_ID;
 
-            select abs( sum( case TIP when 'SS ' then BAL else 0 end ) ) as BAL_SS
-                 , abs( sum( case TIP when 'SP ' then BAL else 0 end ) ) as BAL_SP
-                 , abs( sum( case TIP when 'SN ' then BAL else 0 end ) ) as BAL_SN
-                 , abs( sum( case TIP when 'SPN' then BAL else 0 end ) ) as BAL_SPN
-                 , abs( sum( case TIP when 'SNO' then BAL else 0 end ) ) as BAL_SNO
+            select nvl( abs( sum( case TIP when 'SS ' then BAL else 0 end ) ), 0 ) as BAL_SS
+                 , nvl( abs( sum( case TIP when 'SP ' then BAL else 0 end ) ), 0 ) as BAL_SP
+                 , nvl( abs( sum( case TIP when 'SN ' then BAL else 0 end ) ), 0 ) as BAL_SN
+                 , nvl( abs( sum( case TIP when 'SPN' then BAL else 0 end ) ), 0 ) as BAL_SPN
+                 , nvl( abs( sum( case TIP when 'SNO' then BAL else 0 end ) ), 0 ) as BAL_SNO
                  , max( case TIP when 'SS ' then ACRN.FPROCN( ACC, 0, p_rpt_dt-1 ) else 0 end ) as RATE_SS
                  , max( case TIP when 'SP ' then ACRN.FPROCN( ACC, 0, p_rpt_dt-1 ) else 0 end ) as RATE_SP
               into agr.sar_dtl(agr.sar_dtl.last).dbt         -- SS
@@ -3136,7 +3136,7 @@ end nos_del;
 
                 -- SNO
                 if ( ( agr.sar_dtl(a).int_dfr > 0 )
---               and ( agr.sar_dtl(a).sno_shd.count > 0 )
+                 and ( agr.sar_dtl(a).sno_shd.count > 0 )
                  and ( r_shd.FDAT = agr.sar_dtl(a).SNO_SHD(agr.sar_dtl(a).SNO_SHD.first).RPT_DT )
                    )
                 then -- платіжна дата для відкладених %%
@@ -3192,14 +3192,19 @@ end nos_del;
 
                     r_shd.SS := agr.tot_dbt - agr.gen_shd(r).LMT_OTPT;
 
+                  when ( agr.tot_dbt = agr.gen_shd(r).LMT_INPT )
+                  then -- точно по графіку
+
+                     r_shd.SS := agr.gen_shd(r).SS;
+
                   when ( agr.tot_dbt > agr.gen_shd(r).LMT_OTPT )
                   then -- переплата
 
                     r_shd.SS := agr.tot_dbt - agr.gen_shd(r).LMT_OTPT;
 
-                  else
+                  else -- значна переплата
 
-                     r_shd.SS := agr.gen_shd(r).SS;
+                     r_shd.SS := 0;
 
                   end case;
 /*
@@ -3299,10 +3304,10 @@ end nos_del;
                   then -- bad schedule
                     bars_audit.error( title || ': bad schedule (exit with LMT_OTPT != 0 ).' );
                     r_shd.SS       := r_shd.SS + agr.sar_dtl(a).dbt;
-                    r_shd.SN       := agr.sar_dtl(a).int;
+                    r_shd.SN       := r_shd.SN + agr.sar_dtl(a).int;
                     r_shd.SSP      := agr.sar_dtl(a).dbt_odue;
                     r_shd.SNP      := agr.sar_dtl(a).int_odue;
-                    r_shd.SNO      := agr.sar_dtl(a).int_dfr;
+                    r_shd.SNO      := r_shd.SNO + agr.sar_dtl(a).int_dfr;
                     r_shd.LMT_OTPT := r_shd.LMT_INPT - r_shd.SS;
                   end if;
                 end if;
