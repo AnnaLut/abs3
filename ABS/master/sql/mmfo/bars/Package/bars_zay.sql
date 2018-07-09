@@ -102,7 +102,7 @@ is
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092	    in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
@@ -229,7 +229,7 @@ is
     p_mfo0          in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
     p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
-    p_meta          in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_meta          in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
     p_contract      in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_dat2_vmd      in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -3603,7 +3603,7 @@ procedure create_request_ex
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
@@ -4402,7 +4402,7 @@ BEGIN
            raise err;
       end if;
 
-   else
+/*   else
      select meta
        into l_aim
        from zayavka
@@ -4414,7 +4414,7 @@ BEGIN
            prm := p_id;
            bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
            raise err;
-      end if;
+      end if;*/
    end if;
 
 
@@ -4668,7 +4668,7 @@ procedure upd_request
     p_mfo0          in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
     p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
-    p_meta          in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_meta          in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092          in  zayavka.f092%type          default null,  -- код параметра f092
     p_contract      in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_dat2_vmd      in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
