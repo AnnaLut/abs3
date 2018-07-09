@@ -1,4 +1,5 @@
-PROMPT *** Run *** ====== ins_data_dpt_bonuses.sql =======*** Run ***
+PROMPT *** Run *** ====== extn_bonus.sql =======*** Run ***
+
 declare
 l_bonus_id number := 5;
 l_sql      varchar2(4000);
@@ -21,6 +22,7 @@ begin
      AND dv.type_id = dbs.dpt_type
      AND dv.kv = dbs.kv 
      AND nvl(d.cnt_dubl,0) >= 1
+     AND d.datz < dbs.dat_begin
      AND :pDat between dbs.dat_begin and nvl(dbs.dat_end, to_date(''31.12.4999'',''DD.MM.YYYY''))
      AND dbs.bonus_id = bid.b_id)';
 
@@ -30,7 +32,10 @@ begin
    values (l_bonus_id , 'Бонус за пролонгацію', 'EXTN', 'Y', 'N', 'N', l_sql, date'2018-07-01', null, null);
 
  exception when dup_val_on_index then 
-   null;
+  update dpt_bonuses 
+     set bonus_query = l_sql
+  where bonus_id = l_bonus_id;
+  -- null;
  end;   
                     
 end;
@@ -39,4 +44,4 @@ commit;
 /
 
 
-PROMPT *** End *** ====== ins_data_dpt_bonuses.sql =======*** End ***
+PROMPT *** End *** ====== extn_bonus.sql =======*** End ***
