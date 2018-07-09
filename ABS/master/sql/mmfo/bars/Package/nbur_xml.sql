@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.4  2018.06.18';
+  g_body_version  constant varchar2(64) := 'version 2.6  2018.06.22';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -961,7 +961,7 @@ $end
                                                        , 'R030_2' as R030_2
                                                        , 'Q032' as Q032
                                                        , 'Q031_2' as Q031_2
-            ));   
+            ));  
 
        when '12X' then
          open p_recordset
@@ -974,7 +974,7 @@ $end
            from   nbur_agg_protocols
            where  report_date = p_rpt_dt
                   and kf = p_kf
-                  and report_code = l_rpt_code; 
+                  and report_code = l_rpt_code;    
 
        when '13X' then
          open p_recordset
@@ -1096,6 +1096,112 @@ $end
                    and kf = p_kf                    --Филиал
                    and report_code = l_rpt_code;    --Код отчета
 
+       when '1PX' then
+         open p_recordset 
+         for
+            select p.EKP
+                   , p.K040_1
+                   , p.RCBNK_B010
+                   , p.RCBNK_NAME
+                   , p.K040_2
+                   , p.R030
+                   , p.R020
+                   , p.R040
+                   , p.T023
+                   , p.RCUKRU_GLB_2
+                   , coalesce(p.K018, '#') as K018
+                   , p.K020
+                   , p.Q001
+                   , p.RCUKRU_GLB_1
+                   , p.Q003_1
+                   , p.Q004
+                   , sum(p.T080) as T080
+                   , sum(p.T071) as T071
+            from   nbur_log_f1px p
+            where  p.report_date = p_rpt_dt
+                   and p.kf = p_kf
+            group by
+                  p.EKP
+                   , p.K040_1
+                   , p.RCBNK_B010
+                   , p.RCBNK_NAME
+                   , p.K040_2
+                   , p.R030
+                   , p.R020
+                   , p.R040
+                   , p.T023
+                   , p.RCUKRU_GLB_2
+                   , p.K018
+                   , p.K020
+                   , p.Q001
+                   , p.RCUKRU_GLB_1
+                   , p.Q003_1
+                   , p.Q004;
+
+       when 'C5X' then
+         open p_recordset for
+            select 
+                   ekp
+                   , a012
+                   , t020
+                   , r020
+                   , r011
+                   , r013
+                   , r030_1
+                   , r030_2
+                   , r017
+                   , k077
+                   , s245
+                   , s580
+                   , sum(t070) as t070
+            from  nbur_log_fc5x t
+            where report_date = p_rpt_dt
+                  and kf = p_kf
+            group by
+                   ekp
+                   , a012
+                   , t020
+                   , r020
+                   , r011
+                   , r013
+                   , r030_1
+                   , r030_2
+                   , r017
+                   , k077
+                   , s245
+                   , s580
+            having sum(t070) <> 0;
+
+       when 'A7X' then
+         open p_recordset for
+            select EKP
+                   , T020
+                   , R020
+                   , R011
+                   , R013
+                   , R030
+                   , K030
+                   , S181
+                   , S190
+                   , S240   
+                   , sum(T070) as T070
+            from   nbur_log_fa7x
+            where  report_date = p_rpt_dt
+                   and kf = p_kf
+            group by 
+                   EKP      
+                   , T020
+                   , R020
+                   , R011
+                   , R013
+                   , R030
+                   , K030
+                   , S181
+                   , S190
+                   , S240     
+            having 
+                   sum(T070) <> 0;
+
     else
       null;
     end case;
@@ -1136,6 +1242,7 @@ $end
     else      
       l_rpt_dt := DAT_NEXT_U( p_rpt_dt, 1 );
     end if;
+
 
     PREPARE_RECORDSET( p_file_id, p_rpt_dt, p_kf, p_vrsn_id, l_rcur );
 
@@ -1190,13 +1297,6 @@ $end
     when 'E9'
     then
       l_clob := REGEXP_REPLACE( l_clob, '(<Q001)(></)', '\1 xsi:nil = "true" \2' );
-    when '1P'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q001)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q004)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<K020)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<RCUKRU_GLB_1)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<RCUKRU_GLB_2)(></)', '\1 xsi:nil = "true" \2' );
     else
       null;
     end case;

@@ -2,7 +2,8 @@ CREATE OR REPLACE PROCEDURE BARS.p_fa7_nn (
    pdat_    DATE,
    pmode_   NUMBER DEFAULT 0,
    type_    NUMBER DEFAULT 1,
-   pnd_     NUMBER DEFAULT NULL
+   pnd_     NUMBER DEFAULT NULL,
+   p_emulate   boolean default false
 )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -4584,6 +4585,7 @@ BEGIN
 
 --------------------------------------------------
    IF pmode_ = 0
+      and not p_emulate --Не находимся в режиме эмуляции
    THEN
       DELETE FROM tmp_nbu
             WHERE kodf = kodf_ AND datf = dat_;
@@ -4614,7 +4616,10 @@ BEGIN
    END IF;
    commit;
 
-   if pmode_ <> 2 and pnd_ is null then
+   if pmode_ <> 2 and pnd_ is null 
+      and not p_emulate --Не находимся в режиме эмуляции
+   then
+
       begin
           otc_del_arch(kodf_, dat_, 0);
           OTC_SAVE_ARCH(kodf_, dat_, 0);
