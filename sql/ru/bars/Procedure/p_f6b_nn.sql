@@ -12,7 +12,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.006      08.05.2018
+ % VERSION     :   v.18.008      09.07.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -28,6 +28,9 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+09.07.2018  -обработка дисконтов 2046/SDF без учета r013
+            -значения СС=40 резервы могут быть отрицательными
+11.06.2018  формирование показателей по счетам SNA не присутствующим в nbu23_rez
 08.05.2018  снято умолчание сегмента I(S080)  для  счетов 2805/2806
 26.04.2018  обработка счетов дисконтов с r013=1,2,3,4 из nbu23_rez  (CC=40)
 11.04.2018  отдельная обработка  счетов 3-го класса и клиента  90593701
@@ -116,22 +119,7 @@ BEGIN
    dat1_ := TRUNC (add_months(dat_,1), 'MM');
    dat2_ := TRUNC (dat_ + 28);
    dato_:=add_months(Dat1_, -1);
--------------------------------------------------------------------
---   проверка наличия месячного баланса
-/*   select count( * )
-     into pr_
-     from agg_monbals
-    where fdat = dat1_;
-   if pr_ =0  then
 
-        BARS_UTL_SNAPSHOT.start_running;
-
-        BARS_UTL_SNAPSHOT.sync_month(dat1_);
-
-        BARS_UTL_SNAPSHOT.stop_running;
-
-   end if;
-*/
 --   определение начальных параметров (код области или МФО или подразделение)
    P_Proc_Set(kodf_,sheme_,nbuc1_,typ_);
 
@@ -463,7 +451,7 @@ BEGIN
 
     -- на индивидуальной основе
        -- розмір повернення боргу за рахунок реалізац.забезпечення (CV*k) СС=20
-       if H_ ='1' and k.nbs not like '9%' and
+       if H_ ='1' and        -- k.nbs not like '9%' and
              not ( ddd_ between '130' and '138' )  then
 
           CC_ := '20';
@@ -580,14 +568,10 @@ BEGIN
 
        -- розмір резерву за активами СС=40
        if k.rezq <> 0
-/*and ( (k.nbs like '9023%' and k.r013='9') or
-                            (k.nbs like '9129%' and k.r013='1') or
-                            (k.nbs not like '9023%' and k.nbs not like '9129%')
-                          )   */
        then
           CC_ := '40';
           kodp_:= CC_|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
-          znap_:= TO_CHAR(ABS(k.rezq));
+          znap_:= TO_CHAR(k.rezq);
 
              INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
              VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
@@ -758,7 +742,9 @@ BEGIN
                    and nb.kv = z.kv1
                    and nvl(nb.rz,0) = z.rz1
                    and nb.rnk = c.rnk
-                   and nvl(nb.r013,'0') in ('1','2','3','4')
+                   and ( nvl(nb.r013,'0') in ('1','2','3','4')
+                       or
+                         nb.nbs= '2046' and nb.tip ='SDF' )
                    and nb.nbs in ( select r020 from kl_r020
                                     where txt like '%дисконт%'
                                       and d_close is null
@@ -880,6 +866,50 @@ BEGIN
 
    end loop;
 
+----     поиск ненулевых SNA отсутствующих в nbu23_rez (по закрытым договорам)
+
+   for k in ( select  a.acc, a.nls, a.nbs, a.kv, a.rnk, a.tip,
+                      NVL(m.ostq-m.crdosq+m.crkosq, 0) BV,
+                      2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
+                      c.codcagent, c.custtype
+                from agg_monbals m, accounts a, customer c
+               where m.fdat=dato_
+                 and m.acc = a.acc
+                 and a.rnk = c.rnk
+                 and m.ost-m.crdos+m.crkos !=0
+                 and m.acc in ( select acc  from accounts  where tip='SNA' )
+                 and not exists ( select 1  from nbu23_rez n
+                                   where n.fdat=dat1_
+                                     and n.acc =m.acc and (-100)*n.bv = m.ost-m.crdos+m.crkos )
+                 and exists ( select 1  from nd_acc n, cc_deal d
+                               where n.acc =m.acc
+                                 and n.nd =d.nd
+                                 and d.wdate is not null and d.wdate <dat1_ )
+   ) loop
+         select max(ddd) into ddd_
+           from kl_f3_29
+          where kf='6B' and r020 like substr(k.nbs,1,3)||'%';
+
+         IF typ_>0 THEN
+            nbuc_ := NVL(F_Codobl_Tobo (k.acc, typ_), nbuc1_);
+         ELSE
+            nbuc_ := nbuc1_;
+         END IF;
+         comm_ := ' RNK='||k.rnk||' DDD='||ddd_||' TIP='||k.tip;
+         kv_ := lpad(to_char(k.kv),3,'0');
+
+         N_ := '1';                          --физ.лицо
+         I_ := 'M';
+         H_ := '2';
+
+         kodp_:= '40'|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
+         znap_:= TO_CHAR(ABS(k.bv));
+
+         INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, acc)
+         VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, comm_, k.acc);
+
+   end loop;
+
    -- для балансовых рахунків з пасивними залишками
    --   змінюємо код CC  з 11 на 40
 
@@ -888,8 +918,8 @@ BEGIN
         from ( select *
                  from rnbu_trace
                 where substr(nls, 1, 4) in (
-                       '2307','2317','2327','2337','2347','2367','2377',
-                       '2387','2397','2407','2417','2427','2437','2457',
+                       '2307','2317','2327','2337','2347','2357','2367','2377','2387','2397',
+                       '2407','2417','2427','2437','2457',
                        '1535','1545','1405','1415','1435','1455',
                        '3007','3015','3107','3115' )
              ) r, accounts a, agg_monbals m
