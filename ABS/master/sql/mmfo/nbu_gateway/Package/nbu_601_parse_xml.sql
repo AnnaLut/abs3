@@ -25,8 +25,7 @@ create or replace package nbu_601_parse_xml  as
 
 end nbu_601_parse_xml;
 
-/
-create or replace package body nbu_601_parse_xml  as
+/create or replace package body nbu_601_parse_xml  as
 
 TYPE t_nbu_personal_fo         IS TABLE OF core_person_fo%ROWTYPE;
 TYPE t_nbu_document_fo         IS TABLE OF core_document_fo%ROWTYPE;
@@ -148,15 +147,15 @@ end;*/
              l_PERSON_FO (l_PERSON_FO.last).COUNTRYCODNEREZ:= to_number(dbms_xslprocessor.valueof(l_row, 'COUNTRYCODNEREZ/text()'),0);
 
              l_PERSON_FO (l_PERSON_FO.last).K060:=dbms_xslprocessor.valueof(l_row,'K060/text()');
-             
+
              dbms_xslprocessor.valueof(l_row,'STATUS/text()',l_str);
              l_PERSON_FO (l_PERSON_FO.last).STATUS:=trim(l_str);
 
              dbms_xslprocessor.valueof(l_row,'KF/text()',l_str);
              l_PERSON_FO(l_PERSON_FO.last).KF:=trim(l_str);
-             
+
              l_PERSON_FO (l_PERSON_FO.last).K020:=trim(dbms_xslprocessor.valueOf(l_row,'K020/text()'));
-             
+
              l_PERSON_FO (l_PERSON_FO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'coddocum/text()'));
 
          END LOOP;
@@ -553,10 +552,10 @@ procedure p_parse_person_uo (p_id in  NUMBER)
              l_PERSON_UO (l_PERSON_UO.last).ISAUDIT:=trim(l_str);
 
              --raise_application_error (-20001,dbms_xslprocessor.valueof(l_row,'K060/text()'));
-             l_PERSON_UO (l_PERSON_UO.last).K060 :=dbms_xslprocessor.valueof(l_row,'K060/text()');
-             
+             l_PERSON_UO (l_PERSON_UO.last).K060 :=trim(dbms_xslprocessor.valueof(l_row,'k060/text()'));
+
              l_PERSON_UO (l_PERSON_UO.last).K020:=dbms_xslprocessor.valueOf(l_row,'K020/text()');
-             
+
              l_PERSON_UO (l_PERSON_UO.last).coddocum:=to_number(dbms_xslprocessor.valueOf(l_row,'coddocum/text()'));
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
@@ -1276,13 +1275,13 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
 
              dbms_xslprocessor.valueof(l_row, 'PERCENT/text()', l_str);
              l_OWNERPP_UO (l_OWNERPP_UO.last).PERCENT:=to_number(l_str,'99990,99');
-              
+
              l_OWNERPP_UO (l_OWNERPP_UO.last).ZIP :=dbms_xslprocessor.valueof(l_row,'ZIP/text()');
-             
+
              l_OWNERPP_UO (l_OWNERPP_UO.last).STREETADDRESS := dbms_xslprocessor.valueof(l_row,'STREETADDRESS/text()');
-             
+
              l_OWNERPP_UO (l_OWNERPP_UO.last).HOUSENO := dbms_xslprocessor.valueof(l_row,'HOUSENO/text()');
-             
+
              l_OWNERPP_UO (l_OWNERPP_UO.last).FLATNO := dbms_xslprocessor.valueof(l_row,'FLATNO/text()');
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
@@ -1331,7 +1330,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
                              l_OWNERPP_UO(j).zip,
                              l_OWNERPP_UO(j).streetaddress,
                              l_OWNERPP_UO(j).houseno,
-                             l_OWNERPP_UO(j).flatno    
+                             l_OWNERPP_UO(j).flatno
                             );
                end loop;
              END;
@@ -1872,9 +1871,9 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
 
              dbms_xslprocessor.valueof(l_row, 'SUMDP/text()', l_str);
              l_NBU_PLEDGE_DEP (l_NBU_PLEDGE_DEP.last).SUMDP:= trim(l_str);
-             
+
              l_NBU_PLEDGE_DEP(l_NBU_PLEDGE_DEP.last).SUMBAIL:=to_number(dbms_xslprocessor.valueOf(l_row,'SUMBAIL/text()'));
-               
+
              l_NBU_PLEDGE_DEP(l_NBU_PLEDGE_DEP.last).SUMGUARANTEE:=trim(dbms_xslprocessor.valueOf(l_row,'SUMGUARANTEE/text()'));
 
              dbms_xslprocessor.valueof(l_row, 'KF/text()', l_str);
@@ -1943,7 +1942,7 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
                              l_NBU_PLEDGE_DEP(j).sumdp,
                              l_NBU_PLEDGE_DEP(j).kf,
                              l_NBU_PLEDGE_DEP(j).sumbail,
-                             l_NBU_PLEDGE_DEP(j).sumguarantee                             
+                             l_NBU_PLEDGE_DEP(j).sumguarantee
                             );
 
 
@@ -2013,7 +2012,7 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).ND:= trim(dbms_xslprocessor.valueof(l_row, 'ND/text()'));
 
-             l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).NUMDOGTR:=to_number(dbms_xslprocessor.valueof(l_row, 'NUMDOGTR/text()'));
+             l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).NUMDOGTR:=trim(dbms_xslprocessor.valueof(l_row, 'NUMDOGTR/text()'));
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).DOGDAYTR:= to_date((dbms_xslprocessor.valueof(l_row, 'DOGDAYTR/text()')),'dd.mm.yy');
 
@@ -2042,7 +2041,7 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).FACTENDDAYTR:=to_date((dbms_xslprocessor.valueOf(l_row,'FACTENDDAYTR/text()')),'dd.mm.yy');
 
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).KLASSTR:=to_number(dbms_xslprocessor.valueOf(l_row,'KLASSTR/text()'));
-          
+
              l_NBU_CREDIT_TRANCHE (l_NBU_CREDIT_TRANCHE.last).RISKTR:=trim(dbms_xslprocessor.valueOf(l_row,'RISKTR/text()'));
 
              END LOOP;
