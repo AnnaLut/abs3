@@ -124,10 +124,10 @@ create or replace type body t_core_company is
          ebit            := l_company_performance_row.ebit;
          ebitda          := l_company_performance_row.ebitda;
          totaldebt       := l_company_performance_row.totaldebt;
-         
+
          coddocum        :=l_company_row.coddocum;
          k020            :=l_company_row.k020;
-         isKR            :=l_company_row.iskr; 
+         isKR            :=l_company_row.iskr;
 
          ismember        := l_company_row.ismember;
          iscontroller    := l_company_row.iscontroller;
@@ -210,7 +210,7 @@ create or replace type body t_core_company is
          l_attributes(3) := json_utl.make_json_string('codEdrpou', company_code);
          l_attributes(4):=json_utl.make_json_value('coddocum',coddocum);
          l_attributes(5):=json_utl.make_json_value('k020',k020);
-         
+
          l_attributes(6) := json_utl.make_json_string('nameUr', nameur, p_mandatory => true);
          l_attributes(7) := json_utl.make_json_date('registryDay', registryday, p_mandatory => true);
          l_attributes(8) := json_utl.make_json_string('numberRegistry', numberregistry, p_mandatory => true);
@@ -270,9 +270,9 @@ create or replace type body t_core_company is
 
          l_attributes(17) := json_utl.make_json_value('isAudit', nvl(isaudit, 'false'));
 
-         l_attributes(18) := json_utl.make_json_string('k060', case when k060 = '99' then null else k060 end, p_mandatory => true);
-         
-         l_attributes(19) := json_utl.make_json_value(nvl('isKr',0), isKr);   
+         l_attributes(18) := json_utl.make_json_string('k060', k060 , p_mandatory => true);
+
+         l_attributes(19) := json_utl.make_json_value('isKr',nvl(isKr,0));
 
          if (ownerpp is not null and ownerpp is not empty) then
              l_owner_persons.extend(ownerpp.count);
@@ -458,4 +458,5 @@ create or replace type body t_core_company is
          return l_equals;
      end;
  end;
+
 /
