@@ -5,7 +5,7 @@ before insert on NBUR_REF_FILES
 for each row
 begin
 
-  if ( :new.FILE_CODE is Null or length( :new.FILE_CODE ) != 3 )
+ if ( :new.FILE_CODE is Null or length( :new.FILE_CODE ) != 3 )
   then
     raise_application_error( -20666, 'Value for field [FILE_CODE] must be specified!', true );
   else
