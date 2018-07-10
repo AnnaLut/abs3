@@ -137,6 +137,7 @@ begin
   bars_metabase.add_column(l_tabid, 16, 'VIDD', 'C', 'Портфель~/Баланс~рах-к', null, null, 15, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
   bars_metabase.add_column(l_tabid, 17, 'RYN', 'C', 'СубПортфель~/Особовий~рах-к', null, null, 16, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
   bars_metabase.add_column(l_tabid, 18, 'ACC', 'N', 'Рах-к~номіналу~ACC', null, null, 18, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0 );
+  bars_metabase.add_column(l_tabid, 19, 'PRC2_ZAL', 'N', 'Обтяжена~переоцiнка~опціона', null, null, 12, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0 );
 
 
   
@@ -164,7 +165,7 @@ begin
    -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'REF');
   if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, ':REF in (select REF from CP_ZAL where ref = :REF and rnk is null and NVL(TO_DATE(PUL.get(''DAT_ZAL''),''dd.mm.yyyy''), gl.bd) between datz_from and datz_to)', 2, 'COLOR_Red');
+    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, ':REF in (select REF from CP_ZAL where ref = :REF and rnk is null and NVL(TO_DATE(PUL.get(''DAT_ZAL''),''dd.mm.yyyy''), gl.bd) between datz_from and datz_to)', 2, 'COLOR_Red', 'Незаповнений RNK');
   end if;
 
   -- восстанавливаем ссылки сложных полей других таблиц

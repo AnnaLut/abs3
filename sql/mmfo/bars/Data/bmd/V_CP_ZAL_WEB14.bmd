@@ -150,10 +150,10 @@ begin
   bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'CP.cp_zal_change(:REF, :RNK, :ID_CP_ZAL, :ID, :KOLZ, :DATZ_FROM, :DATZ_TO, 1)');
 
    -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 1, null, ':IN_ST = 1', 1, 'COLOR_Green');
+  bars_metabase.add_tblcolor(l_tabid, 1, null, ':IN_ST = 1', 1, 'COLOR_Green', 'Запис входить в проміжок на задану дату звіту');
   l_newcolid := bars_metabase.get_colid(l_tabid, 'RNK');
   if (l_newcolid is not null) then
-    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, ':RNK is NULL', 2, 'COLOR_Red');
+    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, ':RNK is NULL', 2, 'COLOR_Red', 'Незаповнений RNK');
   end if;
 
 
