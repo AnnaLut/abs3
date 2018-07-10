@@ -1034,20 +1034,21 @@ public class safe_deposit
             { connect.Close(); connect.Dispose(); }
         }
     }
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="m_nd"></param>
     /// <param name="template"></param>
-    public void InsertNewDoc(Decimal m_nd, String template)
+    public void InsertNewDoc(Decimal m_nd, String template, DateTime? datefrom = null, DateTime? dateto = null)
     {
         OracleConnection connect = new OracleConnection();
 
         try
         {
-            IOraConnection conn = (IOraConnection)HttpContext.Current.Application["OracleConnectClass"];
+            IOraConnection conn = (IOraConnection) HttpContext.Current.Application["OracleConnectClass"];
             connect = conn.GetUserConnection();
-            
+
 
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("dep_skrn");
@@ -1061,111 +1062,114 @@ public class safe_deposit
 
 
 
-                OracleCommand cmd = connect.CreateCommand();
-                cmd.CommandText = @"select file_name from DOC_SCHEME where id = :TemplateID";
-                cmd.Parameters.Add("TemplateID", OracleDbType.Varchar2, template, ParameterDirection.Input);
+            OracleCommand cmd = connect.CreateCommand();
+            cmd.CommandText = @"select file_name from DOC_SCHEME where id = :TemplateID";
+            cmd.Parameters.Add("TemplateID", OracleDbType.Varchar2, template, ParameterDirection.Input);
 
-                String p_file_name = Convert.ToString(cmd.ExecuteScalar());
+            String p_file_name = Convert.ToString(cmd.ExecuteScalar());
 
-                if (String.IsNullOrEmpty(p_file_name))
+            if (String.IsNullOrEmpty(p_file_name))
+            {
+                try
                 {
-                    try
-                    {
-                        rep.Generate();
+                    rep.Generate();
 
-                        StreamReader sr = new StreamReader(rep.ReportFile, System.Text.Encoding.GetEncoding(1251));
-                        char[] text = null;
-                        String str = sr.ReadToEnd();
-                        sr.Close();
-                        text = str.ToCharArray();
+                    StreamReader sr = new StreamReader(rep.ReportFile, System.Text.Encoding.GetEncoding(1251));
+                    char[] text = null;
+                    String str = sr.ReadToEnd();
+                    sr.Close();
+                    text = str.ToCharArray();
 
-                        File.Delete(rep.ReportFile);
+                    File.Delete(rep.ReportFile);
 
-                        repText.Write(text, 0, text.Length);
+                    repText.Write(text, 0, text.Length);
 
-                        OracleCommand cmdInsDoc = connect.CreateCommand();
+                    OracleCommand cmdInsDoc = connect.CreateCommand();
 
-                        cmdInsDoc.CommandText = "begin safe_deposit.INSERT_DOC(:P_ND,:P_TEMPLATE,:p_text); end;";
-                        cmdInsDoc.Parameters.Add("P_ND", OracleDbType.Decimal, m_nd, ParameterDirection.Input);
-                        cmdInsDoc.Parameters.Add("P_TEMPLATE", OracleDbType.Varchar2, template, ParameterDirection.Input);
-                        cmdInsDoc.Parameters.Add("p_text", OracleDbType.Clob, repText, ParameterDirection.Input);
+                    cmdInsDoc.CommandText = "begin safe_deposit.INSERT_DOC(:P_ND,:P_TEMPLATE,:p_text); end;";
+                    cmdInsDoc.Parameters.Add("P_ND", OracleDbType.Decimal, m_nd, ParameterDirection.Input);
+                    cmdInsDoc.Parameters.Add("P_TEMPLATE", OracleDbType.Varchar2, template, ParameterDirection.Input);
+                    cmdInsDoc.Parameters.Add("p_text", OracleDbType.Clob, repText, ParameterDirection.Input);
 
-                        cmdInsDoc.ExecuteNonQuery();
+                    cmdInsDoc.ExecuteNonQuery();
 
-                        cmdInsDoc.Dispose();
-                    }
-                    finally
-                    {
-                        repText.Close();
-                        repText.Dispose();
-
-                        rep.DeleteReportFiles();
-                    }
-
-
+                    cmdInsDoc.Dispose();
                 }
-
-                else
+                finally
                 {
+                    repText.Close();
+                    repText.Dispose();
 
-                    FrxParameters pars = new FrxParameters();
-
-                    pars.Add(new FrxParameter("p_nd", TypeCode.Decimal, m_nd));
-                    
-
-
-                    FrxDoc doc = new FrxDoc(
-                      FrxDoc.GetTemplatePathByFileName(FrxDoc.GetTemplateFileNameByID(p_file_name)) + p_file_name, pars, null);
-                    {
-                        try
-                        {
-                            
-                            StreamReader sr = new StreamReader(doc.Export(FrxExportTypes.Rtf), System.Text.Encoding.GetEncoding(1251));
-                            char[] text = null;
-                            String str = sr.ReadToEnd();
-                            sr.Close();
-                            text = str.ToCharArray();
-
-                            File.Delete(rep.ReportFile);
-
-                            repText.Write(text, 0, text.Length);
-
-                            OracleCommand cmdInsDoc = connect.CreateCommand();
-
-                            cmdInsDoc.CommandText = "begin safe_deposit.INSERT_DOC(:P_ND,:P_TEMPLATE,:p_text); end;";
-                            cmdInsDoc.Parameters.Add("P_ND", OracleDbType.Decimal, m_nd, ParameterDirection.Input);
-                            cmdInsDoc.Parameters.Add("P_TEMPLATE", OracleDbType.Varchar2, template, ParameterDirection.Input);
-                            cmdInsDoc.Parameters.Add("p_text", OracleDbType.Clob, repText, ParameterDirection.Input);
-
-                            cmdInsDoc.ExecuteNonQuery();
-
-                            cmdInsDoc.Dispose();
-                        }
-                        finally
-                        {
-                            repText.Close();
-                            repText.Dispose();
-
-                            rep.DeleteReportFiles();
-                        }
-                    
-                    }
-
-
-
+                    rep.DeleteReportFiles();
                 }
 
 
+            }
+            else
+            {
+                FrxParameters pars = new FrxParameters();
+
+                pars.Add(new FrxParameter("p_nd", TypeCode.Decimal, m_nd));
+
+                if (datefrom.HasValue && dateto.HasValue)
+                {
+                    pars.Add(new FrxParameter("date_from", TypeCode.String, datefrom.Value.ToShortDateString().Replace('/','.')));
+                    pars.Add(new FrxParameter("date_to", TypeCode.String, dateto.Value.ToShortDateString().Replace('/', '.')));
+                }
+
+                pars.Add(new FrxParameter("p_nd", TypeCode.Decimal, m_nd));
+
+
+
+                FrxDoc doc = new FrxDoc(
+                    FrxDoc.GetTemplatePathByFileName(FrxDoc.GetTemplateFileNameByID(p_file_name)) + p_file_name, pars,
+                    null);
+                try
+                {
+
+                    StreamReader sr = new StreamReader(doc.Export(FrxExportTypes.Rtf),
+                        System.Text.Encoding.GetEncoding(1251));
+                    char[] text = null;
+                    String str = sr.ReadToEnd();
+                    sr.Close();
+                    text = str.ToCharArray();
+
+                    File.Delete(rep.ReportFile);
+
+                    repText.Write(text, 0, text.Length);
+
+                    OracleCommand cmdInsDoc = connect.CreateCommand();
+
+                    cmdInsDoc.CommandText = "begin safe_deposit.INSERT_DOC(:P_ND,:P_TEMPLATE,:p_text); end;";
+                    cmdInsDoc.Parameters.Add("P_ND", OracleDbType.Decimal, m_nd, ParameterDirection.Input);
+                    cmdInsDoc.Parameters.Add("P_TEMPLATE", OracleDbType.Varchar2, template,
+                        ParameterDirection.Input);
+                    cmdInsDoc.Parameters.Add("p_text", OracleDbType.Clob, repText, ParameterDirection.Input);
+
+                    cmdInsDoc.ExecuteNonQuery();
+
+                    cmdInsDoc.Dispose();
+                }
+                finally
+                {
+                    repText.Close();
+                    repText.Dispose();
+
+                    rep.DeleteReportFiles();
+                }
+
+            }
         }
         finally
         {
             if (connect.State != ConnectionState.Closed)
-            { connect.Close(); connect.Dispose(); }
+            {
+                connect.Close();
+                connect.Dispose();
+            }
         }
-
-    
-
     }
+
     /// <summary>
     /// 
     /// </summary>

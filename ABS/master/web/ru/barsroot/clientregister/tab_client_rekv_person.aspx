@@ -110,7 +110,8 @@
                             <tr id="trIDRecordNum" style="display: none">
                                 <td>Унік. номер запису в ЄДДР</td>
                                 <td>
-                                    <input class="edit" id="ed_ID_RecordNum" tabindex="3" type="text" maxlength="14" />
+                                    <input class="edit" id="ed_ID_RecordNum" tabindex="3" type="text" maxlength="14" 
+                                        onchange="ValidateIDRecordNum();" />
                                     <div class="required">*</div>
                                 </td>
 
@@ -168,7 +169,7 @@
                                 <td>
                                     <input class="edit long" id="ed_ORGAN" tabindex="5" type="text" maxlength="150" />
                                     <button id="bt_help"
-                                        style="height: 24px"
+                                        style="height: 24px;padding:0px;width: 132px;"
                                         onclick="GetOrganHelp();ToDoOnChange();"
                                         title="довідник">
                                         <i class="pf-icon pf-16 pf-help"></i>
