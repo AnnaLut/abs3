@@ -507,7 +507,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
 
     exception
         when others then
-          commit;
+        commit;
+		bars_audit.error(sqlerrm);
+		raise_application_error (-20000, dbms_utility.format_error_backtrace);   
   end;
 
 
