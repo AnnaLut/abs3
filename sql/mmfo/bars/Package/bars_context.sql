@@ -299,7 +299,7 @@ is
     -- Константы
     --
     --
-    VERSION_BODY          constant varchar2(64)  := 'version 1.41 12.09.2012';
+    VERSION_BODY          constant varchar2(64)  := 'version 1.42 09.07.2018';
     VERSION_BODY_DEFS     constant varchar2(512) := ''
                           || 'KF            Мультифилиальная схема с полем ''KF'''                   || chr(10)
                           || 'POLICY_GROUP  Использование групп политик'                             || chr(10)
@@ -554,7 +554,8 @@ is
                 l_branch := l_selected_branch;
             else
                 -- подставляем текущий бранч из staff
-                if l_current_branch is not null
+                -- Тільки для / користувачів
+                if l_current_branch is not null and l_staff_branch = '/'
                 then
                        l_branch := l_current_branch;
                 end if;
