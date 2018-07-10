@@ -3140,14 +3140,17 @@ BEGIN
       l_kv := kv_;
 
       -- 1.вычисляем возможный срок пополения, если без срока = выходим
-  select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
-      into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
-      from dpt_deposit dd, accounts a, dpt_vidd v
-     where dd.acc = a.acc
-       and a.nls = NLS_
-       and a.kv = l_kv
-       and dd.vidd = v.vidd;
-
+		  select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc
+			  into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc
+			  from dpt_deposit dd, accounts a, dpt_vidd v
+			 where dd.acc = a.acc
+			   and a.nls = NLS_
+			   and a.kv = l_kv
+			   and dd.vidd = v.vidd;
+      exception
+		when no_data_found then
+			return 0;
+	  end;
       l_term_add1 := to_number(floor(l_term_add));
 
       bars_audit.trace('1478 ' || l_deposit || ' ' || l_term_add1 || ' ' ||

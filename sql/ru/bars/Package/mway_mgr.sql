@@ -12,7 +12,7 @@ is
   --
 
   -- Public constant declarations
-  g_header_version  constant varchar2(64)  := 'version 4.6 13/02/2018';
+  g_header_version  constant varchar2(64)  := 'version 4.7  18/05/2018';
   g_awk_header_defs constant varchar2(512) := '';
 
   --------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.7 07/05/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.81  25/06/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -739,6 +739,7 @@ is
       and a.rnk = c.rnk
       and c.rnk = p.rnk
       and a.nbs='2620'
+      and a.tip not like 'W4%'
       and c.rnk = p_rnk
       and a.dazs is null;
 
@@ -955,7 +956,7 @@ is
              from dpt_deposit t1) r
     where d.cust_id = p_rnk
       and a.acc=d.dpt_accid
-      and a.nbs!=2620
+      and a.nbs!='2620'
       and d.dpt_id = r.deposit_id
       and p_is_replanish is null;
 
@@ -1071,7 +1072,7 @@ is
     where d.cust_id = p_rnk
       and d.dpt_id = p_deposit_id
       and a.acc=d.dpt_accid
-      and a.nbs!=2620
+      and a.nbs!='2620'
       and d.dpt_id = r.deposit_id;
 
     bars_audit.trace('%s: done', l_th);
@@ -1199,7 +1200,7 @@ is
   is
   begin
     insert into mway_match(id,date_tr,sum_tr,lcv_tr,nls_tr,rrn_tr,drn_tr,state,ref_tr)
-    values (s_mwaymatch.nextval,trunc(p_date),p_sum,p_lcv,p_nls,p_rrn,p_drn,p_state,p_ref);
+    values (bars_sqnc.get_nextval('s_mwaymatch'),trunc(p_date),p_sum,p_lcv,p_nls,p_rrn,p_drn,p_state,p_ref);
   end set_transaction;
 
   --------------------------------------------------------------------------------
@@ -1684,27 +1685,52 @@ is
                   select * into l_cusb from customer where rnk = l_accb.rnk;
 
                   --l_nlsa := nbs_ob22(2924,'26');
-                  if substr(l_acc26,1,4) = '2620' then -- Костыль так как вей передает в одном сервисе и 2620 и 2625
+                 if substr(l_acc26,1,4) = '2620' then -- Костыль так как вей передает в одном сервисе и 2620 и 2625 + Пошли 2620 карточные
                     begin
-                       select tt into l_tt from mway_pay_tt where service_code = 'TRANSFER_ACC_DEPOSIT' and is_fee = 0;
+                       select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.nls = l_acc26 and t.lcv = l_lcv;
+                       select * into l_cusa from customer where rnk = l_acca.rnk;
                     exception
                          when no_data_found then
-                         --711 Операції не існує
+                          --701 Рахунок %s не належить клієнту
                          rollback to savepoint sp_paystart;
-                         get_error(711,l_obj_operation,p_error_code,p_error_message);
+                          get_error(701,l_obj_operation,p_error_code,p_error_message);
                          return;
                     end;
+                    
+                     if l_acca.tip  like 'W4%' then
                     begin
-                       select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.branch like '/'||p_mfo||'/' and a.nls = l_acc26 and t.lcv = l_lcv;
+                       select a.*
+                        into l_acca
+                        from accounts a,
+                             tabval$global t
+                       where a.kv = t.kv
+                         and a.nbs = '2924'
+                         and a.ob22 = '26'
+                         and a.branch like '/'||p_mfo||'/'
+                         and a.dazs is null
+                         and t.lcv = l_lcv;
                        select * into l_cusa from customer where rnk = l_acca.rnk;
                     exception
                           when no_data_found then
-                          --701 Рахунок %s не належить клієнту
+                          --702 Не знайдено транзитний рахунок
                           rollback to savepoint sp_paystart;
-                          get_error(701,l_obj_operation,p_error_code,p_error_message);
+                          get_error(702,l_obj_operation,p_error_code,p_error_message);
+                          return;
+                      end;
+                     else
+                        begin
+                           select tt into l_tt from mway_pay_tt where service_code = 'TRANSFER_ACC_DEPOSIT' and is_fee = 0;
+                        exception
+                             when no_data_found then
+                             --711 Операції не існує
+                          rollback to savepoint sp_paystart;
+                             get_error(711,l_obj_operation,p_error_code,p_error_message);
                           return;
                     end;
+                     end if;
+
                   else 
+                   begin
                   select a.*
                     into l_acca
                     from accounts a,
@@ -1716,6 +1742,13 @@ is
                      and a.dazs is null
                      and t.lcv = l_lcv;
                   select * into l_cusa from customer where rnk = l_acca.rnk;
+                   exception
+                          when no_data_found then
+                          --702 Не знайдено транзитний рахунок
+                          rollback to savepoint sp_paystart;
+                          get_error(702,l_obj_operation,p_error_code,p_error_message);
+                          return;
+                   end;
                   end if;
 
                   bc.subst_branch(l_accb.branch);
@@ -1981,6 +2014,7 @@ is
                       end if;
 
                       l_summ := l_sum_month + l_sum;
+                      
                       
                       if l_count_mm = 0 then -- первый месяц
                        if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
@@ -2526,7 +2560,7 @@ is
        where d.dpt_accnum = p_nls
          and a.kv = (select t.kv from tabval$global t where t.lcv = p_dpt_lcv)
          and d.dpt_accid = a.acc
-         and a.nbs!=2620
+         and a.nbs!='2620'
          and a.kf = p_mfo;
     exception
       when no_data_found then
@@ -2792,7 +2826,15 @@ is
     l_is_nls accounts.nbs%type;
   begin
     begin
-      select nbs into l_is_nls from accounts a, tabval$global t where a.nls=p_nls and t.kv=a.kv and t.lcv=p_acc_lcv and a.nbs=2620 and a.kf = p_mfo;
+     select nbs
+       into l_is_nls
+       from accounts a, tabval$global t
+      where a.nls = p_nls
+        and t.kv = a.kv
+        and t.lcv = p_acc_lcv
+        and a.nbs = '2620'
+        and a.tip not like 'W4%'
+        and a.kf = p_mfo;
     exception
       when no_data_found then
         return null;

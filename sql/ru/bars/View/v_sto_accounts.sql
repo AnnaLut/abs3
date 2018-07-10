@@ -18,13 +18,9 @@ PROMPT *** Create  view V_STO_ACCOUNTS ***
           a.ostc,
           a.tip
      FROM accounts a
-    WHERE     a.nbs IN ('2625')
+    WHERE     a.nbs IN ('2625', '2620')
           AND a.kv = 980
-          AND a.tip IN ('W4A',
-                        'W4B',
-                        'W4C',
-                        'W4V',
-                        'W4D')
+          AND a.tip LIKE 'W4%'
           AND a.dazs IS NULL
           AND a.kf = sys_context('bars_context', 'user_mfo');
 

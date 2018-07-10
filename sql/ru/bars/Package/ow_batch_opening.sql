@@ -995,6 +995,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
        l_photo_list   t_photo_list;
 
        l_batch_header t_batch_header;
+       l_tmp_isp varchar2(130);
     BEGIN
        IF p_file_data IS NOT NULL THEN
          -- парсинг хедера хмл, наполнение коллекции l_batch_header, для дальнейго сохранения в таблице OW_BATCH_FILES
@@ -1003,17 +1004,33 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                ,xt.projectid
                ,xt.cardcode
            into l_batch_header(1).branch
-               ,l_batch_header(1).isp
+               ,l_tmp_isp--l_batch_header(1).isp
                ,l_batch_header(1).PROECT_ID
                ,l_batch_header(1).CARD_CODE
            FROM XMLTABLE('/ROWSET/HEADER'
                          PASSING (SELECT xmltype(p_file_data) z
                                     FROM dual)
                          COLUMNS branch VARCHAR2(30) PATH 'BRANCH'
-                                ,isp NUMBER(22) PATH 'ISP'
+                                ,isp varchar2(130) PATH 'ISP'
                                 ,projectid NUMBER(22) PATH 'PROJECTID'
                                 ,cardcode VARCHAR2(32) PATH 'CARDCODE') xt;
-
+       -- ідентифікатор користувача
+       IF regexp_like(l_tmp_isp, '^+[0-9]+$') then
+          l_batch_header(1).isp :=l_tmp_isp;
+       -- ідентифікація через AD    
+       elsif regexp_like(l_tmp_isp, '^+([A-z0-9.-]){4,64}\\([A-z0-9.-]){4,64}+$') then
+         begin
+           select t.user_id
+             into l_batch_header(1).isp
+             from staff_ad_user t
+            where t.active_directory_name = upper(l_tmp_isp);
+         exception
+           when no_data_found then
+             l_batch_header(1).isp := null;
+         end;
+       else
+         l_batch_header(1).isp := null;
+       end if;
           -- парсинг входящего клоба в формате хмл, для наполнения l_batch_list и l_photo_list
           FOR rec IN (          SELECT ROWNUM
                                       ,xt.okpo
@@ -1201,14 +1218,14 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
              l_batch_list(rec.ROWNUM).kf                := SYS_CONTEXT('bars_context', 'user_mfo');
              --\\ наполнение коллекции данных
              if rec.photo_jpg is not null then
-               --// наполнение коллеции фото
-               l_photo_list(rec.ROWNUM).id                := p_id;
-               l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
-               -- конвертнуть до нужного размера
+             --// наполнение коллеции фото
+             l_photo_list(rec.ROWNUM).id                := p_id;
+             l_photo_list(rec.ROWNUM).idn               := rec.ROWNUM;
+             -- конвертнуть до нужного размера
                l_photo_list(rec.ROWNUM).photo             := case when rec.photo_jpg is not null then  convert_photo_data(rec.photo_jpg) else null end;
                l_photo_list(rec.ROWNUM).kf := sys_context('bars_context','user_mfo');
              end if; 
-            --\\ наполнение коллеции фото
+             --\\ наполнение коллеции фото
           END LOOP;
        END IF;
 
@@ -1505,7 +1522,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
         ,external_file_id
         )
       VALUES
-        (S_OW_BATCH_FILES.NEXTVAL -- bars_sqnc.get_nextval(p_sqnc => 'S_OW_BATCH_FILES'
+        (bars_sqnc.get_nextval(p_sqnc => 'S_OW_BATCH_FILES')
         ,p_zip_fname
         ,p_zip_fname
         ,SYSDATE
@@ -1657,6 +1674,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
 
     for v in (SELECT bf.external_file_id as ext_id
                     ,a.nls
+                    ,a.acc
                     ,ow_batch_opening.split_key(p.rnk) as rnk
                     ,(case when p.str_err is null then 1 else 0 end) as code
                     ,p.str_err
@@ -1677,6 +1695,8 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
                                      ,v.ext_id)
                           ,xmlelement("NLS"
                                      ,v.nls)
+                          ,xmlelement("ACC"
+                                     ,v.acc)                                     
                           ,xmlelement("RNK"
                                      ,v.rnk)
                           ,xmlelement("CODE"
@@ -1805,7 +1825,7 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
 
     if p_proect_id is not null then
        if l_iscrm = '1' then
-         begin
+       begin
             select okpo into l_proect_okpo from bpk_proect where  id_cm = p_proect_id;
          exception when no_data_found then
             bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
@@ -1813,12 +1833,12 @@ CREATE OR REPLACE PACKAGE BODY "BARS"."OW_BATCH_OPENING" is
          end;         
        else
            begin
-              select okpo into l_proect_okpo from bpk_proect where id = p_proect_id;
-           exception when no_data_found then
-              bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
-              bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
-           end;
-        end if;
+          select okpo into l_proect_okpo from bpk_proect where id = p_proect_id;
+       exception when no_data_found then
+          bars_audit.info(h || 'Не найден З/П проект с кодом '||to_char(p_proect_id));
+          bars_error.raise_nerror(g_modcode, 'PROECT_NOT_FOUND', to_char(p_proect_id));
+       end;
+    end if;
     end if;
 
     if p_proect_id is not null then

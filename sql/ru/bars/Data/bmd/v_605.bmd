@@ -58,10 +58,10 @@ declare
 
 begin
 
-  l_tabsemantic := 'Коди проводок для формування IIC';
+  l_tabsemantic := 'Розрахунок простроч.заборгованості за КД, в т.ч. за пенею та 3% річних ';
   l_tablinesdef := '';
   l_tabselect_statement := '';
-  l_tabname     := 'V_OW_IIC_MSGCODE';
+  l_tabname     := 'V_605';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
@@ -124,18 +124,50 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'TT', 'C', 'Код~операції', '', 3, 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'MFOA', 'C', 'МФО~відправника~коштів', '', 6, 2, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NLSA', 'C', 'Рахунок~списання~коштів', '', 14, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'MSGCODE', 'C', 'Код~проводки', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NBS', 'C', 'Номер~балансового~рахунку', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'OB22','C', 'ОБ 22', '', 100, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 1, 2, 'ASC ');
+  bars_metabase.add_column(l_tabid, 1, 'CC_ID', 'C', '№~КД', '1.5', null, 2, 0, 0, 1, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ND', 'N', 'Реф~КД', '1.5', null, 4, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NMK', 'C', 'Позичальник', '2', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'RNK', 'N', 'РНК~позичальника', '1.5', null, 22, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'SDATE', 'D', 'Дата поч.~КД', '1.5', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SOS', 'N', 'Стан~КД', '.5', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'VIDD', 'N', 'Вид~КД', '.5', null, 19, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'WDATE', 'D', 'Дата зав.~КД', '1.5', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'KV', 'N', 'Код~вал', '.5', null, 14, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'NLS', 'C', 'Рахунок', '1.5', null, 15, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'MD', 'N', 'Вибрано', '.5', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 0, 'Вибрати кредитну угоду з КП', 'Z605.XXX( 1, :N, 0, '''' , :R )', ':N(SEM=Реф_Дог_в_КП,TYPE=N),:R(SEM=Розмір_пені,TYPE=N)', 'ONCE', '', '', '63', '', '', 85);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Виконати розрахунок по ДОГОВОРУ в цілому з КП', 'z605.FRM  ( 1, 0, 0, '''', 0, 3) ', '', 'EACH', 'Виконати розрахунок  по КД  реф= :ND  № = :CC_ID  :NMK ?', 'Виконано!', '', '', '', 19);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Виконати розрахунок по ОДНОМУ рах. КД з КП', 'z605.FRM  ( 2,0,:KV,:NLS, null, 3) ', ':NLS(SEM=Рахунок,TYPE=С),:KV(SEM=Валюта,TYPE=N)', 'ONCE', 'Виконати розрахунок  по рахунку ?', 'Виконано!', '', '', '', 21);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 7, 'Вибрати кредитну угоду з БПК', 'Z605.XXX( 3, :N, :V, :L , :R )', ':N(SEM=Реф_Дог_в_БПК/або_пусто,TYPE=N),:V(SEM=Код_вал/або_пусто,TYPE=N),:L(SEM=Карт_рах/або_пусто),:R(SEM=Розмір_пені/або_пусто,TYPE=N)', 'ONCE', '', '', '4', '', '', 84);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 8, 'Виконати розрахунок по ОДНОМУ ДОГ з БПК', 'z605.FRM  ( 3, 0, 0, '''', 0, 3) ', '', 'EACH', 'Виконати розрахунок  по Дог  :ND  з БПК , вал = :KV рах = :NLS  :NMK  ?', 'Виконано!', '', '', '', 33);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 10, 'Протокол розрахуноку за основним боргом', '', '', 'ONCE', '', '', '', '', 'sPar=V_TMP_T605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_TMP_T605.ND=to_number(pul.get(''ND_605'')) and V_TMP_T605.MD=to_number(pul.get(''MOD_605''))]', 77);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 11, 'Протокол розрахуноку за процентами  ', '', '', 'ONCE', '', '', '', '', 'sPar=V_TMP_P605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_TMP_P605.ND=to_number(pul.get(''ND_605'')) and V_TMP_P605.MD=to_number(pul.get(''MOD_605''))]', 52);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 12, 'Протокол розрахуноку за комісією', '', '', 'ONCE', '', '', '', '', 'sPar=V_TMP_K605[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false][CONDITIONS=>V_TMP_K605.ND=to_number(pul.get(''ND_605'')) and V_TMP_K605.MD=to_number(pul.get(''MOD_605''))]', 53);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 13, 'Протокол розрахунку за інфляцією', '', '', 'ONCE', '', '', '', '', 'sPar=V_INFLATION_ALL[NSIFUNCTION][ACCESSCODE=>1][showDialogWindow=>false]', 73);
+  
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 15, 'Друк звіту', 'z605.rep( :D11, :D12, :D21, :D22)', ':D11(SEM=Звіт_З_Дати,TYPE=D),:D12(SEM=Звіт_ПО_Дату,TYPE=D),:D21(SEM=Пеня_З_Дати,TYPE=D),:D22(SEM=Пеня_ПО_Дату,TYPE=D)', 'ONCE', '', 'Виконано!', '', '', '/barsroot/cbirep/rep_list.aspx', 118);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
@@ -197,36 +229,4 @@ begin
 end;
 /
 
-commit;
---закидываем таблицу в справочники
-declare
-  l_tabid number:=get_tabid('V_OW_IIC_MSGCODE');
-begin   
- Insert into BARS.REFERENCES
-   (TABID, TYPE, ROLE2EDIT)
- Values
-   (l_tabid, 29, 'OW');
-exception when dup_val_on_index then null;
-End;
-/
-commit;
-
---добавляем в арм
-declare
-  l_tabid number:=get_tabid('V_OW_IIC_MSGCODE');
-begin 
-Insert into BARS.REFAPP
-   (TABID, CODEAPP, ACODE, APPROVE, REVOKED, 
-    GRANTOR)
- Values
-   (l_tabid, 'WVIP', 'RW', 1, 0, 1);
-exception when dup_val_on_index then null;
-end;
-/
-commit;
--- дропаем политики
-begin
-bpa.remove_policies('V_OW_IIC_MSGCODE');
-end;
-/
 commit;

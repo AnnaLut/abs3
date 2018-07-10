@@ -129,7 +129,7 @@ begin
 
          if l_restr = 0 THEN
             begin
-               select rnk,sum(ost) into rnk_,ost_
+               select sum(ost) into ost_
                from (select r.rnk,sum(-p_icurval(a.kv,ost_korr(a.acc,dat31_,null,a.nbs),dat31_)) ost
                      from   rez_w4_bpk r, accounts a where r.acc = a.acc and r.rnk = k.rnk and a.nbs not in ('3578','3579','3570') group  by r.rnk
                      union all
@@ -141,8 +141,8 @@ begin
                      select rnk,sum(-p_icurval(kv,ost_korr(acc,dat31_,null,nbs),dat31_))
                      from accounts where nbs in (select nbs from rez_deb where grupa = 1 and deb=1 and ( d_close is null or d_close > dat01_ ) )
                                          and (dazs is null or dazs>=dat01_)  and rnk = k.rnk  --('3578','3579','3570')
-                     group by rnk) f
-               where  rnk=k.rnk group by rnk; --f.ost<5000000
+                     group by rnk) f ; 
+               RNK_ := k.rnk;
             EXCEPTION WHEN NO_DATA_FOUND THEN rnk_ := null;
             end;
             if rnk_ is not null THEN
