@@ -585,7 +585,20 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
 
             foreach (var entry in request.Entries)
             {
-                if (entry.Status != ResponseStatus.OK.ToString()) continue;
+                if (entry.Status != ResponseStatus.OK.ToString())
+                {
+                    if (null != entry.Cards)
+                    {
+                        foreach (var card in entry.Cards)
+                        {
+                            Logger.Info(string.Format("card: kf={0}, rnk={1}, status={2}, message={3}",
+                                card.Kf, card.Rnk, entry.Status, entry.Message));
+                        }
+                    }
+
+                    continue;
+                }
+
                 if (null == entry.Cards) continue;
 
                 foreach (var card in entry.Cards)
