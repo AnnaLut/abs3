@@ -14,6 +14,9 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
     [DataContract]
     public class DuplicatesV2 : IOracleCustomType, INullable
     {
+        private string _gcif=string.Empty;
+        private string _masterGcif = string.Empty;
+
         // Код РУ (код МФО)
         [XmlAttribute("kf")]
         [DataMember(IsRequired = true)]
@@ -32,7 +35,10 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
         // Ідентифікатор майстер-запису
         [XmlAttribute("gcif")]
         [OracleObjectMapping("GCIF")]
-        public string Gcif { get; set; }
+        public string Gcif {
+            get { return _gcif; }
+            set { _gcif = value; }
+        }
         public bool ShouldSerializeGcif()
         {
             return !string.IsNullOrEmpty(Gcif);
@@ -41,7 +47,11 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
         // Ідентифікатор майстер-запису майстер-картки
         [XmlAttribute("masterGcif")]
         [OracleObjectMapping("MASTERGCIF")]
-        public string MasterGcif { get; set; }
+        public string MasterGcif
+        {
+            get { return _masterGcif;}
+            set { _masterGcif = value; }
+        }
         public bool ShouldSerializeMasterGcif()
         {
             return !string.IsNullOrEmpty(MasterGcif);
