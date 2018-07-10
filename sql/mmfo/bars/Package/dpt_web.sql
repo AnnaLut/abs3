@@ -3103,10 +3103,10 @@ is
                      p_typecode => null,
                      p_delbonus => 0);
 
-      -- закрытие договора
+	-- видалення дод. реквізитів
+      delete DPT_DEPOSITW where DPT_ID = p_dptid;      
+	-- закрытие договора
       delete from dpt_deposit where deposit_id = p_dptid;
-      -- видалення дод. реквізитів
-      delete DPT_DEPOSITW where DPT_ID = p_dptid;
       
       if sql%rowcount = 0 then
         bars_error.raise_nerror(g_modcode,
