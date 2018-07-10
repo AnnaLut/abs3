@@ -16,7 +16,7 @@ PROMPT *** Create  trigger TAU_STAFF_BRANCH ***
 
 
 /
-ALTER TRIGGER BARS.TAU_STAFF_BRANCH ENABLE;
+ALTER TRIGGER BARS.TAU_STAFF_BRANCH DISABLE;
 
 
 PROMPT ===================================================================================== 

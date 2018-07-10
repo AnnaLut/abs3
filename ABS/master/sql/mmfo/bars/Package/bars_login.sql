@@ -182,7 +182,7 @@ is
     WEB       - НБУ (мульти-мфо)
  */
 
-    VERSION_BODY       constant varchar2(64)  := 'version 1.20 21.03.2017';
+    VERSION_BODY       constant varchar2(64)  := 'version 1.21 9.07.2018';
     VERSION_BODY_DEFS  constant varchar2(512) := ''
                     || 'WEB      - расширение BARSWEB'                  || chr(10)
                     ;
@@ -942,6 +942,10 @@ $end
                 tools.hide_hint(branch_utl.read_branch(l_branch_code, p_raise_ndf => true).branch);
 
                 user_utl.set_user_branch(l_user_row, l_branch_code);
+                update staff$base t
+                set t.current_branch = null
+                where t.id = l_user_row.id;
+                
             end if;
 
             if (l_user_row.fio <> l_user_display_name) then
