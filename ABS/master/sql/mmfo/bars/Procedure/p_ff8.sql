@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF8 (Dat_ DATE) IS
 DESCRIPTION : Процедура формирования файла #F8 для КБ
 COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 
-VERSION     :v.18.007  14/06/2018 (04/06/2018)
+VERSION     :v.18.008  14/06/2018 (04/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 
@@ -1227,12 +1227,11 @@ loop
                    and s080_351 is not null;
               EXCEPTION WHEN NO_DATA_FOUND THEN
                  BEGIN
-                    select NVL(s080,'0')
+                    select max(NVL(s080,'0'))
                        into s080r_
                     from OTC_FF7_HISTORY_ACC
                     where datf = datp_
-                      and acc = k.acc
-                      and rownum = 1;
+                      and (acc = k.acc or nd = decode(is_number(k.nd),0,999999999,abs(k.nd)) or rnk = k.rnk);
                  EXCEPTION WHEN NO_DATA_FOUND THEN
                      s080r_ := '0';
                  END;
@@ -1434,7 +1433,7 @@ from (
                                             AND F1.OSTQ_KD <> 0)
                                              or
                            f.nkd is null and
-                           nvl(to_char(c.ndg), f.nd) in 
+                           nvl(to_char(c.ndg), f.nd) in
                                      (SELECT F1.ND
                                        FROM OTC_FF7_HISTORY_ACC F1
                                       WHERE  F1.DATF = datp_
@@ -1595,7 +1594,7 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                          min (accc)  isp, s080
                     from OTC_FF7_HISTORY_ACC f
                     left outer join cc_deal c
-                    on (f.nd = to_char(c.nd))                    
+                    on (f.nd = to_char(c.nd))
                     where f.datf=dat_
                       and f.tpa in (2, 3)
                       and nvl(f.nkd, nvl(to_char(c.ndg), f.nd)) not in
@@ -1673,7 +1672,7 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                              ,min (accc)  isp, s080
                         from OTC_FF7_HISTORY_ACC f
                         left outer join cc_deal c
-                        on (f.nd = to_char(c.nd))                        
+                        on (f.nd = to_char(c.nd))
                         where f.datf=dat_ and
                           f.ostq_kd = 0 and
                           f.tpa in (2, 3) and
@@ -1684,7 +1683,7 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                                             AND F1.OSTQ_KD = 0)
                                              or
                            f.nkd is null and
-                           nvl(to_char(c.ndg), f.nd) in 
+                           nvl(to_char(c.ndg), f.nd) in
                                       (SELECT F1.ND
                                        FROM OTC_FF7_HISTORY_ACC F1
                                       WHERE  F1.DATF = datp_
@@ -2009,14 +2008,14 @@ delete from rnbu_trace where kodp like '20%' and nd in (select nd from cc_deal w
 insert into rnbu_trace (nls, kv, odate, kodp, znap, nbuc, isp, rnk, comm, nd)
 select max(r.nls), r.kv, max(r.odate), max(r.kodp), 1 znap, r.nbuc, max(r.isp), r.rnk, 'Ген. угода' comm, c.ndg
 from rnbu_trace r, cc_deal c
-where regexp_like (r.kodp, '^(20|04|05|06|10)') and 
+where regexp_like (r.kodp, '^(20|04|05|06|10)') and
       r.nd = c.nd and
       r.nd in (select nd from cc_deal where ndg is not null)
 group by r.rnk, c.ndg, r.kv, r.nbuc;
 
-delete 
-from rnbu_trace r 
-where regexp_like (r.kodp, '^(20|04|05|06|10)') and 
+delete
+from rnbu_trace r
+where regexp_like (r.kodp, '^(20|04|05|06|10)') and
       r.nd in (select nd from cc_deal where ndg is not null and ndg<>nd);
 ----------------------------------------------------
 if mfo_ = 380764 then
