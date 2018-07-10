@@ -3750,6 +3750,7 @@ PROCEDURE CreateDepositAgreement (
                                                      ,p_state_id         => barstrans.transport_utl.trans_state_done
                                                      ,p_tracking_comment => 'Успешно сохранён ответ'
                                                      ,p_stack_trace      => barstrans.file_utl.encode_base64(l_ticketdata));
+         bc.home;
         dbms_lob.freetemporary(l_ticketdata);
       EXCEPTION
         WHEN OTHERS THEN

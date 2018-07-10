@@ -1,6 +1,6 @@
 Prompt Package EAD_INTEGRATION;
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.0 01.02.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.1 12.06.2018';
    g_type_id  object_type.id%type;
    g_state_id object_state.state_id%type;
 
@@ -18,6 +18,10 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
                      p_deal_number out deal.deal_number%type,
                      p_start_date  out deal.start_date%type,
                      p_state_id    out deal.state_id%type);
+                     
+  function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
+                               p_tip  varchar2,
+                               p_ob22 varchar2 ) return number;                         
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Dict.GetData
    -----------------------------------------------------------------------
@@ -448,7 +452,7 @@ GRANT EXECUTE ON BARS.EAD_INTEGRATION TO BARS_ACCESS_DEFROLE
 /
 Prompt Package Body EAD_INTEGRATION;
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
-   g_body_version constant varchar2(64) := 'version 3.0 01.02.2018';
+   g_body_version constant varchar2(64) := 'version 3.1 12.06.2018';
 
    type TAccAgrParam is record
    (
@@ -595,6 +599,49 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
      when no_data_found then
        null;
    end get_dkbo;
+ 
+ function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
+                                p_tip  varchar2,
+                                p_ob22 varchar2 ) return number is 
+ l_nbs varchar2(14);  
+ l_id  number(10);   
+                      
+begin
+ l_nbs := substr(p_nbs,1,4); 
+     begin 
+   
+ for rec in (select e.id,
+                e.nbs,
+                e.tip,
+                e.ob22,
+                case when e.tip is null and e.ob22 is null then e.id end clear , 
+                count(e.nbs) over(partition by e.nbs ) coun
+           from ead_nbs e
+          where e.nbs = l_nbs
+               
+           )
+ loop
+
+     dbms_output.put_line(' 1 ->'||rec.id ); 
+    if     nvl(rec.tip,'0')  = p_tip and nvl(rec.ob22,'0')  = p_ob22  then l_id:= rec.id ; 
+    elsif nvl(rec.tip,'0')  = p_tip  and nvl(rec.ob22,'0') <> p_ob22 then l_id:= rec.id ; 
+    elsif nvl(rec.tip,'0')  <> p_tip  and    nvl(rec.ob22,'0') = p_ob22 then l_id:= rec.id ;
+    end if;      
+
+ end loop;
+ 
+  if l_id is null  then 
+      select e.id
+           into l_id  
+           from ead_nbs e
+          where e.nbs = l_nbs 
+           and e.tip is null
+           and e.ob22 is null;         
+  end if; 
+ 
+    return l_id;
+       end;
+end  ead_nbs_check_param;
 
     procedure get_accagr_param(p_acc in accounts.acc%type) is
         l_agr_type ead_nbs.agr_type%type;
@@ -624,8 +671,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                    l_custtype,
                    l_nbs
               FROM accounts a, ead_nbs e
-             WHERE a.acc = p_acc
-               and e.nbs(+) = nvl(a.nbs,substr(nls,1,4));
+             WHERE a.acc  = p_acc
+               and e.id   = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22);
         end;
 
         -- Визначаємо статус угоди. По звичайним рахункам угода зберігається в SpecParam.
@@ -736,8 +783,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                    rAccAgrParam.agr_status,
                    l_custtype,
                    l_nbs
-              from accounts_rsrv a left outer join ead_nbs e on substr(a.nls,1,4) = e.nbs
-             where a.rsrv_id = p_rsrv_id;
+              from accounts_rsrv a, ead_nbs e
+             where a.rsrv_id = p_rsrv_id
+               and e.id      = ead_integration.ead_nbs_check_param(a.nls,null,a.ob22);
+
 
       if (l_custtype = 2) -- для ДБО
       then

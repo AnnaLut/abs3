@@ -11,7 +11,7 @@
 
   -- Public type declarations
   -- type <TypeName> is <Datatype>;
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.0  01.02.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.1  12.06.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -132,7 +132,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
-   g_body_version constant varchar2(64) := 'version 3.0  01.02.2018 MMFO';
+   g_body_version constant varchar2(64) := 'version 3.1  12.06.2018';
    gn_dummy   number;  -- Для возвратов функций
 
    function body_version return varchar2 is
@@ -1151,7 +1151,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                                  FROM accounts acc
                                 WHERE        DDU.ACC = acc.ACC
                                          AND ((  (acc.NBS = '2600' AND acc.ob22 = '05'))
-                                              OR (acc.NBS IN (select nbs from EAD_NBS where custtype = 2))) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
+                                              OR (acc.NBS IN (select e.nbs from EAD_NBS e where custtype = 2 and e.id   = ead_integration.ead_nbs_check_param(acc.nls,substr(acc.tip,1,2),acc.ob22)))) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
                                          AND acc.TIP = 'DEP')
                           or
                           exists(
@@ -1229,7 +1229,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                    and exists (select 1
                                  from accounts a
                                 where a.acc = au.acc
-                                  and (   ead_pack.get_acc_nbs(a.acc) in (select nbs from EAD_NBS where custtype = 2) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
+                                  and (   ead_pack.get_acc_nbs(a.acc) in (select e.nbs from EAD_NBS e where custtype = 2 and e.id   = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22)) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
                                        or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10')
                                       )
                    and au.tip not in ('DEP', 'DEN', 'NL8'))
@@ -1247,7 +1247,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                                   and get_custtype(a.rnk) = 2
                                   and REGEXP_LIKE(su.nkd ,'\d{7}-\d{6}-\d{6}')
                                   and a.tip not in ('DEP', 'DEN', 'NL8')
-                                  and (   ead_pack.get_acc_nbs(a.acc) in (select nbs from EAD_NBS where custtype = 2) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
+                                  and (   ead_pack.get_acc_nbs(a.acc) in (select e.nbs from EAD_NBS e where custtype = 2 and e.id   = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22)) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
                                        or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10')
                                       )
                    )
@@ -1338,7 +1338,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                                       WHERE t1.idupd > l_cdc_lastkey_acc
                                         AND CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)))                      
                        AND (   (get_acc_nbs (au.acc) = '2600')
-                            OR (get_acc_nbs (au.acc) IN (SELECT nbs FROM EAD_NBS WHERE custtype = 2))) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" 
+                            OR (get_acc_nbs (au.acc) IN (SELECT e.nbs FROM EAD_NBS e WHERE custtype = 2 and e.id   = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22) ))) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" 
                       ) t) 
            where agr_type is not null
      ) 
@@ -1556,12 +1556,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
    if (get_acc_info(p_acc) = 1) -- счет в рамках ДБО
    then
     begin
-		select rnk
+		select a.rnk
 		  into l_rnk
-		  from accounts
-		 where acc = p_acc
-		   and nbs is not null  -- это значит, что счет точно не в статусе "зарезервирован"
-		   and nbs in (select nbs from EAD_NBS);
+		  from accounts a
+		 where a.acc = p_acc
+		   and a.nbs is not null  -- это значит, что счет точно не в статусе "зарезервирован"
+		   and a.nbs in (select e.nbs from EAD_NBS e where e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22));
          EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
@@ -1571,13 +1571,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
     if l_rnk is not null
 	then
-	select count(acc)
+	select count(a.acc)
 	  into l_count
-	  from accounts
-	 where rnk = l_rnk
-	   and nbs in (select nbs from EAD_NBS) -- значит счет не в статусе "зарезервирован", раз у него есть НБС
-	   and get_acc_info(acc) = 1  -- значит другие счета относятся к договору ДБО
-	   and acc != p_acc;
+	  from accounts a
+	 where a.rnk = l_rnk
+	   and a.nbs in (select e.nbs from EAD_NBS e where e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22)) -- значит счет не в статусе "зарезервирован", раз у него есть НБС
+	   and get_acc_info(a.acc) = 1  -- значит другие счета относятся к договору ДБО
+	   and a.acc != p_acc;
     end if;
 
       IF l_count = 0 and kl.get_customerw (l_rnk, 'SDBO') is not null THEN
