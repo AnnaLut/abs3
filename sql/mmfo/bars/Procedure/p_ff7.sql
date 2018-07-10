@@ -1,13 +1,10 @@
---
--- P_FF7  (Procedure) 
---
 CREATE OR REPLACE PROCEDURE BARS.P_FF7 (Dat_ DATE, p_sheme_ varchar2 default 'G',
     typf_ number default 0, isf8_ number default 0)  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION       v.18.005  13/06/2018 (13/03/2018)
+% VERSION       v.18.006  09/07/2018 (13/06/2018)
 %%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1638,4 +1635,3 @@ end if;
 logger.info ('P_FF7: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
-SHOW ERRORS;

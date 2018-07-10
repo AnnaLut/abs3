@@ -1,13 +1,10 @@
---
--- P_FF7  (Procedure) 
---
 CREATE OR REPLACE PROCEDURE BARS.P_FF7 (Dat_ DATE, p_sheme_ varchar2 default 'G',
     typf_ number default 0, isf8_ number default 0)  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION       v.18.005  13/06/2018 (13/03/2018)
+% VERSION       v.18.006  09/07/2018 (13/06/2018)
 %%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -593,7 +590,7 @@ begin
                 STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, OSTQ_KD, R_DOS, CC_ID, TPA, S080, R011, S245)
            select DATF, ACC, ACCC, NBS, SGN, NLS, KV, KV_DOG, NMS, DAOS, DAZS, 0, 0, doso_, koso_, k.nd, NKD, k.sdate, k.wdate, k.sos, RNK, 
                 STAFF, TOBO, S260, K110, K111, S031, S032, CC, TIP, 0, r_doso_, CC_ID, TPA, S080, R011, S245
-           from otc_ff7_history_acc 
+           from otc_ff7_history_acc
            where datf = dat_ and
                  ltrim(nd, '-') = to_char(k.cur_nd) and
                  acc = k.acc;
@@ -767,7 +764,7 @@ update otc_ff7_history_acc o
                and rownum = 1
           ),trim(leading '-' from o.nd))
  where (nbs in ('2607','2627') or
-        nbs in ('2607','2627','2067','9129') and nd in (select to_char(nd) from cc_deal where vidd in (10, 110))) and
+        nbs in ('2607','2627','2067','9129') and nd in (select nd from cc_deal where vidd in (10, 110))) and
        datf = dat_;
 
 update otc_ff7_history_acc o
@@ -779,7 +776,7 @@ update otc_ff7_history_acc o
                and vv.datd(+) <= dat_
                and vv.datd2(+) >= trunc(dat_, 'mm')
                and vv.deldate(+) >= trunc(dat_,'mm')
-               and v.nd not in (select to_char(nd) from cc_deal where vidd in (10, 110))
+               and v.nd not in (select nd from cc_deal where vidd in (10, 110))
           ),trim(leading '№' from o.nd))
  where nbs in ('2600','2620','2625') and datf = dat_;
 
@@ -1638,4 +1635,3 @@ end if;
 logger.info ('P_FF7: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
-SHOW ERRORS;
