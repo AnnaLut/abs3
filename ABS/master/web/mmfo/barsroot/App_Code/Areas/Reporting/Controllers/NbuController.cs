@@ -212,7 +212,12 @@ namespace BarsWeb.Areas.Reporting.Controllers
             {
                 System.IO.File.Delete(fName);
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+                Logger.Error("GetExcel (reporting/nbu/getexcel): " + ex.Message);
+            }
+
             return File(fileBytes, "attachment", DETAILED_FILE);          
         }
     }    

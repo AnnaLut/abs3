@@ -18,6 +18,9 @@ using BarsWeb.Areas.Kernel.Infrastructure;
 using BarsWeb.Areas.Kernel.Models.KendoViewModels;
 using BarsWeb.Infrastructure.Helpers;
 using System.IO;
+using BarsWeb.Core.Logger;
+using Ninject;
+
 
 namespace BarsWeb.Areas.Reporting.Controllers.Api
 {
@@ -27,6 +30,10 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
     public class NbuController : ApiController
     {
         private readonly INbuRepository _repository;
+
+        [Inject]
+        public IDbLogger Logger { get; set; }
+
         public NbuController(INbuRepository repository)
         {
             _repository = repository;
@@ -46,6 +53,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception e)
             {
+                Logger.Exception(e);
+                Logger.Error("Get (api/reporting/nbu): " + e.Message);
                 return new DataSourceResult
                 {
                     Errors = e
@@ -71,6 +80,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception ex)
             {
+                Logger.Exception(ex);
+                Logger.Error("GetRepoData (api/reporting/nbu/getrepodata): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -92,7 +103,9 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception ex)
             {
-                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+                Logger.Exception(ex);
+                Logger.Error("GetDetaledRep (api/reporting/nbu/DetailedRep): " + ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -122,6 +135,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception ex)
             {
+                Logger.Exception(ex);
+                Logger.Error("GetDetaledRepDataСolumns (api/reporting/nbu/getdetailedrepdatacolumns): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -139,6 +154,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception ex)
             {
+                Logger.Exception(ex);
+                Logger.Error("GetChkLog (api/reporting/nbu/getchklog): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -168,6 +185,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception ex)
             {
+                Logger.Exception(ex);
+                Logger.Error("GetDetaledRepData (api/reporting/nbu/getdetailedrepdata): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -212,6 +231,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception e)
             {
+                Logger.Exception(e);
+                Logger.Error("GetFile (api/reporting/nbu/file): " + e.Message);
                 throw new Exception("Не вдалось отримати файл. Помилка: " + (e.InnerException == null ? e.Message : e.InnerException.Message));
             }
             //var textFile = _repository.GetReportFile(code, date);
@@ -222,6 +243,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception e)
             {
+                Logger.Exception(e);
+                Logger.Error("GetFile (api/reporting/nbu/file): " + e.Message);
                 throw new Exception("Не вдалось отримати назву файла. Помилка: " + (e.InnerException == null ? e.Message : e.InnerException.Message));
             }
 
@@ -232,6 +255,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception e)
             {
+                Logger.Exception(e);
+                Logger.Error("GetFile (api/reporting/nbu/file): " + e.Message);
                 throw new Exception("Не вдалось отримати назву файла. Помилка: " + (e.InnerException == null ? e.Message : e.InnerException.Message));
             }
 
@@ -350,6 +375,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             }
             catch (Exception ex)
             {
+                Logger.Exception(ex);
+                Logger.Error("GetExcel (api/reporting/nbu/getexcel): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
