@@ -8,7 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view CP_V_ZAL_WEB ***
 
   CREATE OR REPLACE VIEW CP_V_ZAL_WEB
-(fdat, ref, nd, acc, vdat, id, vidd, ryn, cena, kol_all, kol_zal, dat_zal, nom_all, nom_zal, dis_zal, pre_zal, kun_zal, kuk_zal, prc_zal, nls, kv)
+(fdat, ref, nd, acc, vdat, id, vidd, ryn, cena, kol_all, kol_zal, dat_zal, nom_all, nom_zal, dis_zal, pre_zal, kun_zal, kuk_zal, prc_zal, nls, kv, prc2_zal)
 AS
      SELECT x.b,
             x.ref,
@@ -32,7 +32,8 @@ AS
             ROUND((fost(x.accr2, x.b) * x.kolz * x.kf / x.kol_all), 2) kuk_zal,
             ROUND((fost(x.accs, x.b) * x.kolz * x.kf / x.kol_all), 2)  prc_zal,
             x.nls, 
-            x.kv
+            x.kv,
+            ROUND((fost(x.accs2, x.b) * x.kolz * x.kf / x.kol_all), 2)  prc_zal
        FROM oper o,
             (SELECT d.b,
                     0.01 kf,
@@ -51,7 +52,8 @@ AS
                     e.ryn,
                     e.acc,  
                     a.nls, 
-                    a.kv
+                    a.kv,
+                    (select ca.cp_acc from cp_accounts ca where ca.cp_ref = e.ref and ca.cp_acctype = 'S2') accs2
                FROM cp_deal e,
                     accounts a,
                     (SELECT NVL(TO_DATE(PUL.get('DAT_ZAL'),'dd.mm.yyyy'), gl.bd) B
@@ -85,6 +87,7 @@ comment on column CP_V_ZAL_WEB.KUK_ZAL is '---';
 comment on column CP_V_ZAL_WEB.PRC_ZAL is 'Обтяжена переоцінка';
 comment on column CP_V_ZAL_WEB.NLS is 'Номер лицевого счета (внешний)';
 comment on column CP_V_ZAL_WEB.KV is 'Валюта';
+comment on column CP_V_ZAL_WEB.PRC2_ZAL is 'Обтяжена переоцінка опціона';
 
 PROMPT *** Create  grants  CP_V_ZAL_WEB ***
 grant DELETE,SELECT,UPDATE                                                   on CP_V_ZAL_WEB    to BARS_ACCESS_DEFROLE;
