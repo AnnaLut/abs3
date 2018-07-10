@@ -2,15 +2,6 @@
 using System.Data;
 using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
-using System.Collections.Generic;
-using Bars.WebServices.XRM.Services.Card.Models;
-using System.IO;
-using System.Linq;
-using Bars.Oracle;
-using System.Xml;
-using Bars.Web.Report;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
 using System.Web;
 using BarsWeb.Core.Logger;
 using Bars.WebServices.XRM.Services.Customer.Models;

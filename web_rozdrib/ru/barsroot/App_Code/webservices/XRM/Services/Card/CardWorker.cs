@@ -7,7 +7,6 @@ using Bars.WebServices.XRM.Services.Card.Models;
 using System.IO;
 using System.Linq;
 using Bars.Oracle;
-using FastReport.Utils;
 using System.Xml;
 using Bars.Web.Report;
 using ICSharpCode.SharpZipLib.Zip;

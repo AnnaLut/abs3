@@ -1,0 +1,632 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="05/17/2013 18:06:00" ReportInfo.Modified="01/03/2018 08:53:09" ReportInfo.CreatorVersion="2013.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using Oracle.DataAccess.Client;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void _FinishReport(object sender, EventArgs e)
+    {
+      OracleDataConnection frxconn = (OracleDataConnection)Report.Dictionary.Connections[0];
+      OracleConnection connection = (OracleConnection)frxconn.GetConnection();
+      
+      OracleCommand command = connection.CreateCommand();
+      command.CommandType = CommandType.StoredProcedure;
+      command.CommandText = &quot;ead_pack.doc_page_count&quot;;
+      
+      Parameter DocID = Report.GetParameter(&quot;p_doc_id&quot;);
+      command.Parameters.Add(&quot;p_doc_id&quot;, DocID.Value);
+      command.Parameters.Add(&quot;p_page_count&quot;, Report.Engine.TotalPages);
+      
+      connection.Open();
+      try
+      {
+        command.ExecuteNonQuery();
+      }
+      finally
+      {
+        connection.Close();
+      }
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqXDNPX1eqkVhJtvHKAD0Djt/MITHTlpPj6G4OkulVf+40Fe1uiBSI9iD+ozDTQOd6yctuWBYdlwW5dx6ap3Bp/Q==">
+      <TableDataSource Name="Table" Alias="DPT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select nvl(d.nd, to_char(d.deposit_id)) as id,&#13;&#10;       f_dat_lit(d.datz) as dealdate,&#13;&#10;       f_dat_lit(d.dat_end) as end_date,&#13;&#10;       a.nls as nlsd,&#13;&#10;       d.limit / 100 as summ,&#13;&#10;       f_sumpr(d.limit, d.kv, 'F') as sum_w,&#13;&#10;       decode(d.kv, 980, 'грн.', t.lcv) as kv,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 1) as term_calc,&#13;&#10;       f_doc_dpt(d.deposit_id, 3, 2) as term_calc_w,&#13;&#10;       dpt.fproc(d.acc, bankdate) as rate,&#13;&#10;       f_sumpr(dpt.fproc(d.acc, bankdate), '', 'M', 3) as rate_w,&#13;&#10;       nvl(trim(d.mfo_p), '_________________') as paym_mfo,&#13;&#10;       nvl(trim(b.nb), '____') as paym_nb,&#13;&#10;       nvl(trim(d.nls_p), '_________________') as paym_nls&#13;&#10;  from dpt_deposit d, tabval t, accounts a, banks b&#13;&#10; where d.acc = a.acc&#13;&#10;   and d.kv = t.kv&#13;&#10;   and d.mfo_p = b.mfo(+)&#13;&#10;   and d.deposit_id = :p_agr_id">
+        <Column Name="ID" DataType="System.String"/>
+        <Column Name="DEALDATE" DataType="System.String"/>
+        <Column Name="END_DATE" DataType="System.String"/>
+        <Column Name="NLSD" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="SUM_W" DataType="System.String"/>
+        <Column Name="KV" DataType="System.String"/>
+        <Column Name="TERM_CALC" DataType="System.String"/>
+        <Column Name="TERM_CALC_W" DataType="System.String"/>
+        <Column Name="RATE" DataType="System.Decimal"/>
+        <Column Name="RATE_W" DataType="System.String"/>
+        <Column Name="PAYM_MFO" DataType="System.String"/>
+        <Column Name="PAYM_NB" DataType="System.String"/>
+        <Column Name="PAYM_NLS" DataType="System.String"/>
+        <CommandParameter Name="p_agr_id" DataType="113" Expression="[p_agr_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="COMMON_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select b.name as name_branch,&#13;&#10;       nvl(nvl(trim(d.adress), b.name), '___') as adres_branch,&#13;&#10;       tobopack.get_branch_param('DPT_PHON') as phones_branch,&#13;&#10;       nvl(d.dover, '________') as staff_dover,&#13;&#10;       nvl(d.fio_r, '________') as staff_fio_r,&#13;&#10;       NVL(d.posada_r, '________') as staff_status_r,&#13;&#10;       nvl(d.town, tobopack.get_branch_param('TOWN')) as staff_town,&#13;&#10;       f_dat_lit(trunc(sysdate)) as today_w&#13;&#10;  from branch b, dpt_staff d&#13;&#10; where b.branch = tobopack.get_branch&#13;&#10;   and d.userid(+) = user_id&#13;&#10;   and d.branch(+) = b.branch">
+        <Column Name="NAME_BRANCH" DataType="System.String"/>
+        <Column Name="ADRES_BRANCH" DataType="System.String"/>
+        <Column Name="PHONES_BRANCH" DataType="System.String"/>
+        <Column Name="STAFF_DOVER" DataType="System.String"/>
+        <Column Name="STAFF_FIO_R" DataType="System.String"/>
+        <Column Name="STAFF_STATUS_R" DataType="System.String"/>
+        <Column Name="STAFF_TOWN" DataType="System.String"/>
+        <Column Name="TODAY_W" DataType="System.String"/>
+      </TableDataSource>
+      <TableDataSource Name="Table3" Alias="TICKET_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select ed.doc_id,&#13;&#10;       ed.crt_date,&#13;&#10;       ed.ea_struct_id,&#13;&#10;       ed.rnk,&#13;&#10;       ed.cl_fio,&#13;&#10;       ed.agr_id,&#13;&#10;       ed.agr_num,&#13;&#10;       ed.crt_staff_logname,&#13;&#10;       ed.crt_staff_fio,&#13;&#10;       ed.crt_branch&#13;&#10;  from v_ead_docs ed&#13;&#10; where ed.doc_id = :p_doc_id">
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="DOC_ID" DataType="System.Decimal"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="CL_FIO" DataType="System.String"/>
+        <Column Name="AGR_ID" DataType="System.Decimal"/>
+        <Column Name="AGR_NUM" DataType="System.String"/>
+        <Column Name="CRT_BRANCH" DataType="System.String"/>
+        <Column Name="CRT_STAFF_LOGNAME" DataType="System.String"/>
+        <Column Name="CRT_STAFF_FIO" DataType="System.String"/>
+        <Column Name="EA_STRUCT_ID" DataType="System.String"/>
+        <CommandParameter Name="p_doc_id" DataType="113" Expression="[p_doc_id]" DefaultValue="-1"/>
+      </TableDataSource>
+      <TableDataSource Name="Table4" Alias="CLIENT_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select c.nmk as fio,&#13;&#10;       c.okpo as okpo,&#13;&#10;       decode(c.codcagent,&#13;&#10;              5,&#13;&#10;              'резидент',&#13;&#10;              6,&#13;&#10;              'нерезидент',&#13;&#10;              '--') as codcagent,&#13;&#10;       p.ser || ' ' || p.numdoc as pasp_no,&#13;&#10;       f_dat_lit(p.pdate) as pasp_date,&#13;&#10;       p.organ as pasp_atrt,&#13;&#10;       c.adr as address,&#13;&#10;      coalesce((select VALUE from CUSTOMERW where RNK = c.rnk and TAG = 'MPNO '), p.teld, p.telw, '________') as phone&#13;&#10;  from customer c, person p&#13;&#10; where c.rnk = p.rnk(+)&#13;&#10;   and c.rnk = :p_rnk">
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CODCAGENT" DataType="System.String"/>
+        <Column Name="PASP_NO" DataType="System.String"/>
+        <Column Name="PASP_DATE" DataType="System.String"/>
+        <Column Name="PASP_ATRT" DataType="System.String"/>
+        <Column Name="ADDRESS" DataType="System.String"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <CommandParameter Name="p_rnk" DataType="113" Expression="[p_rnk]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="1025"/>
+    <Parameter Name="p_rnk" DataType="System.Int32" Expression="1064574"/>
+    <Parameter Name="p_agr_id" DataType="System.Int64" Expression="7335001"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" TopMargin="5" BottomMargin="5">
+    <DataBand Name="Data1" Width="718.2" Height="1056.39" CanGrow="true" CanShrink="true" CanBreak="true" Guides="973.35" DataSource="Table4">
+      <TableObject Name="Table1" Left="9.45" Width="688.96" Height="292.95">
+        <TableColumn Name="Column1" Width="193.69"/>
+        <TableColumn Name="Column2" Width="495.27"/>
+        <TableRow Name="Row111" Height="103.95">
+          <TableCell Name="Cell233" Font="Times New Roman, 10pt" RowSpan="2">
+            <BarcodeObject Name="Barcode2" Left="18.9" Width="153.8" Height="153.8" AutoSize="false" Expression="[TICKET_DATA.DOC_ID]+&quot;;&quot;+FormatDateTime([TICKET_DATA.CRT_DATE])+&quot;;&quot;+[TICKET_DATA.EA_STRUCT_ID]+&quot;;&quot;+[TotalPages]+&quot;;&quot;+[TICKET_DATA.RNK]+&quot;;&quot;+[TICKET_DATA.CL_FIO]+&quot;;&quot;+[TICKET_DATA.AGR_ID]+&quot;;&quot;+[TICKET_DATA.AGR_NUM]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_LOGNAME]+&quot;;&quot;+[TICKET_DATA.CRT_STAFF_FIO]+&quot;;&quot;+[TICKET_DATA.CRT_BRANCH]" ShowText="false" Barcode="QR Code" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+          </TableCell>
+          <TableCell Name="Cell234" Text="AТ «ОЩАДБАНК»&#13;&#10;ОПИТУВАЛЬНИК ФІЗИЧНОЇ ОСОБИ&#13;&#10;" HorzAlign="Center" VertAlign="Bottom" Font="Times New Roman, 14pt, style=Bold">
+            <PictureObject Name="Picture1" Left="378" Width="132.3" Height="56.7" Image="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"/>
+          </TableCell>
+        </TableRow>
+        <TableRow Name="Row112" Height="47.25">
+          <TableCell Name="Cell235" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell236" HorzAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row235" Height="141.75">
+          <TableCell Name="Cell1044" Text="      З метою виконання вимог щодо ідентифікації, верифікації та вивчення клієнта, встановлених ст. 64 Закону України «Про банки і банківську діяльність», ст. 9 Закону України «Про запобігання та протидію легалізації (відмиванню) доходів, одержаних злочинним шляхом, фінансуванню тероризму та фінансуванню розповсюдження зброї масового знищення», розділу V Положення про здійснення банками фінансового моніторингу, затвердженого постановою Правління НБУ від 26.06.2015 № 417, просимо Вас зазначити нижченаведену інформацію.&#13;&#10;      Відповідно до ст. 64 Закону України «Про банки і банківську діяльність» банк має право витребувати, а клієнт (представник клієнта) зобов’язаний надати документи і відомості, необхідні для здійснення ідентифікації та/або верифікації (в тому числі встановлення ідентифікаційних даних кінцевих бенефіціарних власників (контролерів), аналізу та виявлення фінансових операцій, що підлягають фінансовому моніторингу, та інші передбачені законодавством документи та відомості, які витребує банк з метою виконання вимог законодавства, яке регулює відносини у сфері запобігання легалізації (відмиванню) доходів, одержаних злочинним шляхом, фінансуванню тероризму та фінансуванню розповсюдження зброї масового знищення. У разі ненадання клієнтом (представником клієнта) зазначених документів, відомостей, інформації рахунок не відкривається, договори  не укладаються, фінансові операції не здійснюються." HorzAlign="Justify" Font="Times New Roman, 7.9pt" ColSpan="2"/>
+          <TableCell Name="Cell1045"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table9" Left="9.45" Top="292.95" Width="690.85" Height="648.27" Border.Lines="All">
+        <TableColumn Name="Column132" Width="28.35"/>
+        <TableColumn Name="Column133"/>
+        <TableColumn Name="Column134"/>
+        <TableColumn Name="Column135" Width="170.1"/>
+        <TableColumn Name="Column136" Width="321.3"/>
+        <TableColumn Name="Column137" Width="38.8"/>
+        <TableRow Name="Row305">
+          <TableCell Name="Cell1424" Border.Lines="All" Text="Зазначте, будь ласка, до якої категорії клієнтів Ви належите:" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell1425"/>
+          <TableCell Name="Cell1426"/>
+          <TableCell Name="Cell1427"/>
+          <TableCell Name="Cell1428"/>
+          <TableCell Name="Cell1429"/>
+        </TableRow>
+        <TableRow Name="Row241">
+          <TableCell Name="Cell1071" Border.Lines="All" Text="Клієнт, що здійснює разову фінансову операцію без відкриття рахунку на значну суму (еквівалент 150 тис. грн. і більше)" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell1072"/>
+          <TableCell Name="Cell1073"/>
+          <TableCell Name="Cell1074"/>
+          <TableCell Name="Cell1075"/>
+          <TableCell Name="Cell1096" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row242">
+          <TableCell Name="Cell1076" Border.Lines="All" Text="Клієнт, що відкриває рахунок або укладає договір" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell1077"/>
+          <TableCell Name="Cell1078"/>
+          <TableCell Name="Cell1079"/>
+          <TableCell Name="Cell1080"/>
+          <TableCell Name="Cell1101" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row243">
+          <TableCell Name="Cell1081" Border.Lines="All" Text="Особа, що відкриває рахунок на користь третьої особи" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell1082"/>
+          <TableCell Name="Cell1083"/>
+          <TableCell Name="Cell1084"/>
+          <TableCell Name="Cell1085"/>
+          <TableCell Name="Cell1106" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row244">
+          <TableCell Name="Cell1086" Border.Lines="All" Text="Особа, що відкриває рахунок на ім’я іншої особи за довіреністю" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="5"/>
+          <TableCell Name="Cell1087"/>
+          <TableCell Name="Cell1088"/>
+          <TableCell Name="Cell1089"/>
+          <TableCell Name="Cell1090"/>
+          <TableCell Name="Cell1111" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row245" Height="15.12">
+          <TableCell Name="Cell1091" Border.Lines="All" Text="Частина 1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold" ColSpan="6"/>
+          <TableCell Name="Cell1092" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1093" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1094" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1095" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1116" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row246">
+          <TableCell Name="Cell1117" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1118" Border.Lines="All" Text="Прізвище, ім’я, по батькові (за наявності)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1119" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1120" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1121" Border.Lines="All" Text="[CLIENT_DATA.FIO]" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell1122" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row247">
+          <TableCell Name="Cell1123" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1124" Border.Lines="All" Text="Місце народження" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1125" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1126" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1127" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell1128" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row248">
+          <TableCell Name="Cell1129" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1130" Border.Lines="All" Text="Громадянство (для нерезидентів)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1131" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1132" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1133" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell1134" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row249">
+          <TableCell Name="Cell1135" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1136" Border.Lines="All" Text="Місце проживання або місце перебування" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1137" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1138" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1139" Border.Lines="All" Text="[CLIENT_DATA.ADDRESS]" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell1140" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row250" Height="28.35">
+          <TableCell Name="Cell1141" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1142" Border.Lines="All" Text="Місце тимчасового перебування на території Україні (для нерезидентів)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1143" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1144" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1145" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell1146" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row251">
+          <TableCell Name="Cell1147" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell1148" Border.Lines="All" Text="Номери контактних телефонів" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1149" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1150" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1151" Border.Lines="All" Text="[CLIENT_DATA.PHONE]" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell1152" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row252">
+          <TableCell Name="Cell1153" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1154" Border.Lines="All" Text="Адреса електронної пошти" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1155" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1156" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1157" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell1158" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row253">
+          <TableCell Name="Cell1159" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1160" Border.Lines="All" Text="Місце роботи, посада" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1161" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1162" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1163" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" ColSpan="2"/>
+          <TableCell Name="Cell1164" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row308" Height="236.25">
+          <TableCell Name="Cell1437"/>
+          <TableCell Name="Cell1438"/>
+          <TableCell Name="Cell1439"/>
+          <TableCell Name="Cell1440"/>
+          <TableCell Name="Cell1441"/>
+          <TableCell Name="Cell1442"/>
+        </TableRow>
+        <TableRow Name="Row258" Height="37.8">
+          <TableCell Name="Cell1189" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell1190" Border.Lines="All" Text="Дані про реєстрацію фізичної особи як підприємця (якщо Ви зареєстровані як фізична особа-підприємець)" HorzAlign="Justify" Font="Times New Roman, 8pt" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell1191" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1192" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1193" Border.Lines="All" Text="Дата реєстрації та реєстраційний номер:&#13;&#10;&#13;&#10;&#13;&#10;" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" ColSpan="2"/>
+          <TableCell Name="Cell1194" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row259" Height="37.8">
+          <TableCell Name="Cell1195" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1196" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1197" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1198" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1199" Border.Lines="All" Text="Вид підприємницької діяльності:&#13;&#10; &#13;&#10;&#13;&#10;" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" ColSpan="2"/>
+          <TableCell Name="Cell1200" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic"/>
+        </TableRow>
+        <TableRow Name="Row260" Height="28.35">
+          <TableCell Name="Cell1201" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1202" Border.Lines="All" Text="Види незалежної професійної діяльності (уразі, якщо Ви провадите незалежну професійну діяльність)" HorzAlign="Justify" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1203" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1204" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1205" Border.Lines="All"/>
+          <TableCell Name="Cell1206" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row261" Height="37.8">
+          <TableCell Name="Cell1207" Border.Lines="All" Text="11" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1208" Border.Lines="All" Text="Зазначте мету і характер майбутніх ділових відносин з Банком (для нових клієнтів). Зазначте, будь ласка, якими послугами Банку плануєте користуватись" Font="Times New Roman, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1209" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1210" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1211" Border.Lines="All"/>
+          <TableCell Name="Cell1212" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table10" Left="9.45" Top="563.22" Width="688.73" Height="236.25" Border.Lines="Left, Top, Bottom">
+        <TableColumn Name="Column159" Width="28.46"/>
+        <TableColumn Name="Column160" Width="264.71"/>
+        <TableColumn Name="Column161" Width="113.51"/>
+        <TableColumn Name="Column162" Width="66.26"/>
+        <TableColumn Name="Column163" Width="75.71"/>
+        <TableColumn Name="Column164" Width="70.04"/>
+        <TableColumn Name="Column165" Width="70.04"/>
+        <TableRow Name="Row309" Height="47.25">
+          <TableCell Name="Cell1443" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="5"/>
+          <TableCell Name="Cell1444" Border.Lines="All" Text="Зазначте джерела та обсяги середньомісячного доходу  &#13;&#10;(зазначте позначку у відповідному рядку)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="5"/>
+          <TableCell Name="Cell1445" Border.Lines="All"/>
+          <TableCell Name="Cell1446" Border.Lines="All" Text="До 5 тис. грн." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1447" Border.Lines="All" Text="5-10 тис. грн." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1468" Border.Lines="All" Text="10 -50 тис. грн." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1469" Border.Lines="Left, Top, Bottom" Text="більше 50 тис. грн." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row310" Height="47.25">
+          <TableCell Name="Cell1448" Border.Lines="All"/>
+          <TableCell Name="Cell1449" Border.Lines="All"/>
+          <TableCell Name="Cell1450" Border.Lines="All" Text="Заробітна плата (пенсія, соціальні виплати, стипендія)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1451" Border.Lines="All"/>
+          <TableCell Name="Cell1452" Border.Lines="All"/>
+          <TableCell Name="Cell1470" Border.Lines="All"/>
+          <TableCell Name="Cell1471" Border.Lines="Left, Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row311" Height="47.25">
+          <TableCell Name="Cell1453" Border.Lines="All"/>
+          <TableCell Name="Cell1454" Border.Lines="All"/>
+          <TableCell Name="Cell1455" Border.Lines="All" Text="Доходи від здійснення підприємницької діяльності" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1456" Border.Lines="All"/>
+          <TableCell Name="Cell1457" Border.Lines="All"/>
+          <TableCell Name="Cell1472" Border.Lines="All"/>
+          <TableCell Name="Cell1473" Border.Lines="Left, Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row312" Height="47.25">
+          <TableCell Name="Cell1458" Border.Lines="All"/>
+          <TableCell Name="Cell1459" Border.Lines="All"/>
+          <TableCell Name="Cell1460" Border.Lines="All" Text="Дивіденди (доходи від цінних паперів)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1461" Border.Lines="All"/>
+          <TableCell Name="Cell1462" Border.Lines="All"/>
+          <TableCell Name="Cell1474" Border.Lines="All"/>
+          <TableCell Name="Cell1475" Border.Lines="Left, Top, Bottom"/>
+        </TableRow>
+        <TableRow Name="Row313" Height="47.25">
+          <TableCell Name="Cell1463" Border.Lines="All"/>
+          <TableCell Name="Cell1464" Border.Lines="All"/>
+          <TableCell Name="Cell1465" Border.Lines="All" Text="Інші джерела (зазначте, які саме):" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1466" Border.Lines="All"/>
+          <TableCell Name="Cell1467" Border.Lines="All"/>
+          <TableCell Name="Cell1476" Border.Lines="All"/>
+          <TableCell Name="Cell1477" Border.Lines="Left, Top, Bottom"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="9.45" Top="941.22" Width="690.2" Height="105.76" Border.Lines="All">
+        <TableColumn Name="Column166" Width="28.4"/>
+        <TableColumn Name="Column167" Width="217.4"/>
+        <TableColumn Name="Column168" Width="255.2"/>
+        <TableColumn Name="Column169" Width="47.3"/>
+        <TableColumn Name="Column170" Width="47.3"/>
+        <TableColumn Name="Column171" Width="47.3"/>
+        <TableColumn Name="Column172" Width="47.3"/>
+        <TableRow Name="Row314" Height="26.44">
+          <TableCell Name="Cell1478" Border.Lines="All" Text="12" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="4"/>
+          <TableCell Name="Cell1479" Border.Lines="All" Text="Джерела та обсяги надходження коштів та інших цінностей на рахунок(ки)&#13;&#10;(зазначити позначку у відповідному рядку).           " VertAlign="Center" Font="Times New Roman, 8pt" RowSpan="4"/>
+          <TableCell Name="Cell1480" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1481" Border.Lines="All" Text="До 5 тис. грн." Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1482" Border.Lines="All" Text="5-10 тис. грн." Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1503" Border.Lines="All" Text="10 -50 тис. грн." Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1538" Border.Lines="All" Text="більше 50 тис. грн." Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row315" Height="26.44">
+          <TableCell Name="Cell1483" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1484" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1485" Border.Lines="All" Text="Заробітна плата (пенсія, соціальні виплати, стипендія)" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1486" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1487" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1504" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1539" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row316" Height="26.44">
+          <TableCell Name="Cell1488" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1489" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1490" Border.Lines="All" Text="Дохід від підприємницької діяльності, дохід від діяльності самозайнятої особи" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1491" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1492" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1505" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1540" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row317" Height="26.44">
+          <TableCell Name="Cell1493" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1494" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1495" Border.Lines="All" Text="Надходження у вигляді фінансової допомоги" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1496" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1497" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1506" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell1541" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data2" Top="1059.23" Width="718.2" Height="466.83">
+      <TableObject Name="Table6" Left="9.45" Top="151.2" Width="700.42" Height="160.65" Border.Lines="All">
+        <TableColumn Name="Column145" Width="37.96"/>
+        <TableColumn Name="Column146" Width="226.96"/>
+        <TableColumn Name="Column147" Width="170.26"/>
+        <TableColumn Name="Column148" Width="66.31"/>
+        <TableColumn Name="Column149" Width="66.31"/>
+        <TableColumn Name="Column150" Width="66.31"/>
+        <TableColumn Name="Column151" Width="66.31"/>
+      </TableObject>
+      <TableObject Name="Table7" Left="9.45" Top="160.65" Width="689.85" Height="303.4" Border.Lines="All">
+        <TableColumn Name="Column152" Width="28.35"/>
+        <TableColumn Name="Column153" Width="302.4"/>
+        <TableColumn Name="Column154" Width="321.3"/>
+        <TableColumn Name="Column155" Width="37.8"/>
+        <TableRow Name="Row280" Height="28.35">
+          <TableCell Name="Cell1331" Border.Lines="All" Text="13" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1332" Border.Lines="All" Text="Чи належите Ви до публічних діячів або осіб, близьких чи пов’язаних з публічними діячами*" HorzAlign="Justify" VertAlign="Bottom" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1333" Border.Lines="All" Text="Так _____          Ні _____" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell1334" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row281">
+          <TableCell Name="Cell1336" Border.Lines="All" Text="13.1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" RowSpan="5"/>
+          <TableCell Name="Cell1337" Border.Lines="All" Text="Якщо так, зазначте до якої саме категорії публічних діячів Ви належите" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true" RowSpan="5"/>
+          <TableCell Name="Cell1338" Border.Lines="All" Text="національний публічний діяч" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+          <TableCell Name="Cell1339" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row282">
+          <TableCell Name="Cell1341" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1342" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1343" Border.Lines="All" Text="іноземний публічний діяч" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+          <TableCell Name="Cell1344" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row283">
+          <TableCell Name="Cell1346" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1347" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1348" Border.Lines="All" Text="особа, що виконує політичні функції в міжнародних організаціях" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+          <TableCell Name="Cell1349" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row284" Height="75.6">
+          <TableCell Name="Cell1351" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1352" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1353" Border.Lines="All" Text="близька особа публічного діяча &#13;&#10;(зазначте дані публічного діяча, близькою особою якого Ви є) &#13;&#10;______________________________________&#13;&#10;______________________________________&#13;&#10;(прізвище, ім'я, по батькові та місце роботи&#13;&#10;і посада публічного діяча)" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+          <TableCell Name="Cell1354" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row285" Height="75.6">
+          <TableCell Name="Cell1355" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1356" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1357" Border.Lines="All" Text="особа, пов’язана з публічним діячем (зазначте дані публічного діяча, пов'язаною особою з яким Ви є) &#13;&#10;______________________________________&#13;&#10;______________________________________&#13;&#10;(прізвище, ім'я, по батькові та місце роботи&#13;&#10;і посада публічного діяча)&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+          <TableCell Name="Cell1358" Border.Lines="All"/>
+        </TableRow>
+        <TableRow Name="Row307" Height="67.15">
+          <TableCell Name="Cell1433" Border.Lines="All" Text="14" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1434" Border.Lines="All" Text="Чи є Ви особою, пов’язаною** з &#13;&#10;АТ «Ощадбанк»&#13;&#10;&#13;&#10;Якщо «Так», зазначте, будь ласка, до яких саме пов’язаних осіб Ви належите" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1435" Border.Lines="All" Text="Так _____          Ні _____&#13;&#10;&#13;&#10;&lt;b&gt;_____________________________________________________&lt;/b&gt;" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1436" Border.Lines="All"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table5" Left="9.45" Top="1.89" Width="689.5" Height="158.64" Border.Lines="All">
+        <TableColumn Name="Column231" Width="28.3"/>
+        <TableColumn Name="Column232" Width="217.3"/>
+        <TableColumn Name="Column233" Width="255.1"/>
+        <TableColumn Name="Column234" Width="47.2"/>
+        <TableColumn Name="Column235" Width="47.2"/>
+        <TableColumn Name="Column236" Width="47.2"/>
+        <TableColumn Name="Column237" Width="47.2"/>
+        <TableRow Name="Row428" Height="26.44">
+          <TableCell Name="Cell2111" Border.Lines="All" Font="Times New Roman, 8pt" RowSpan="6"/>
+          <TableCell Name="Cell2112" Border.Lines="All" Text="В разі, якщо зазначена в цьому пункті інформація не відповідатиме фінансовим операціям, які здійснюються/будуть здійснюватися по рахунку(ам), Банк має право витребувати додаткові документи/відомості або відмовити в проведенні фінансової операції. " Font="Times New Roman, 8pt" RowSpan="6"/>
+          <TableCell Name="Cell2113" Border.Lines="All" Text="Від продажу цінних паперів" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2114" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2115" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2116" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2117" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row429" Height="26.44">
+          <TableCell Name="Cell2118" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2119" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2120" Border.Lines="All" Text="Від продажу або відступлення права вимоги" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2121" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2122" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2123" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2124" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row430" Height="26.44">
+          <TableCell Name="Cell2125" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2126" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2127" Border.Lines="All" Text="Надходження у вигляді позики" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2128" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2129" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2130" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2131" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row431" Height="26.44">
+          <TableCell Name="Cell2132" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2133" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2134" Border.Lines="All" Text="Від укладання строкових контрактів або використання інших похідних фінансових інструментів та деривативів" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2135" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2136" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2137" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2138" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row432" Height="26.44">
+          <TableCell Name="Cell2139" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2140" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2141" Border.Lines="All" Text="Надходження готівкових коштів" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2142" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2143" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2144" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2145" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row433" Height="26.44">
+          <TableCell Name="Cell2146" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2147" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2148" Border.Lines="All" Text="Інші (зазначити які саме)" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2149" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2150" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2151" Border.Lines="All" Font="Times New Roman, 8pt"/>
+          <TableCell Name="Cell2152" Border.Lines="All" Font="Times New Roman, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="Data4" Top="1528.89" Width="718.2" Height="589.68">
+      <TextObject Name="Text3" Left="9.45" Top="37.8" Width="689.85" Height="37.8" Text="З метою виконання вимог щодо ідентифікації, верифікації та вивчення фінансової діяльності клієнта, встановлених п.2 частини 5 статті 6 Закону України «Про запобігання та протидію легалізації (відмиванню) доходів, одержаних злочинним шляхом, фінансуванню тероризму та фінансуванню розповсюдження зброї масового знищення», просимо Вас зазначити нижченаведену інформацію. " HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt"/>
+      <TableObject Name="Table5" Left="9.45" Top="85.05" Width="691.74" Height="504.63" Border.Lines="All">
+        <TableColumn Name="Column156" Width="28.98"/>
+        <TableColumn Name="Column157" Width="303.03"/>
+        <TableColumn Name="Column158" Width="359.73"/>
+        <TableRow Name="Row306" Height="28.35">
+          <TableCell Name="Cell1430" Border.Lines="All" Text="Дані щодо джерел походження коштів (активів, прав на такі активи тощо)&#13;&#10;публічного діяча (близької або пов’язаної особи)" HorzAlign="Center" Font="Times New Roman, 8pt, style=Bold" HtmlTags="true" ColSpan="3"/>
+          <TableCell Name="Cell1431"/>
+          <TableCell Name="Cell1432"/>
+        </TableRow>
+        <TableRow Name="Row286" Height="51.03">
+          <TableCell Name="Cell1359" Border.Lines="All" Text="15" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1360" Border.Lines="All" Text="Чи є ви власником/співвласником юридичної особи? (вкажіть назву юридичної особи, частку у статутному капіталі юридичної особи, якою Ви володієте (у %), та її грошовий еквівалент)" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1361" Border.Lines="All" Text="Назва юридичної особи, код за ЄДРПОУ:&#13;&#10;&#13;&#10;&#13;&#10;Розмір частки статутного капіталу:" HorzAlign="Justify" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row287" Height="122.85">
+          <TableCell Name="Cell1364" Border.Lines="All" Text="16" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1365" Border.Lines="All" Text="Чи подавали Ви електронну декларацію майнового стану відповідно до законодавства України? Якщо Ви відповіли «Ні», заповніть решту рядків&#13;&#10;Якщо Ви є близькою до публічного діяча особою та цей публічний діяч подавав відповідно до законодавства України електронну декларацію майнового стану, чи містить ця декларація інформацію щодо Ваших доходів та майнового стану чи ні?&#13;&#10;Якщо Ви відповіли «Ні» на обидва питання, заповніть решту рядків. " HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1366" Border.Lines="All" Text="Так _____          Ні _____&#13;&#10;&#13;&#10;&#13;&#10;Так _____          Ні _____" HorzAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row288">
+          <TableCell Name="Cell1369" Border.Lines="All" Text="17" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" RowSpan="10"/>
+          <TableCell Name="Cell1370" Border.Lines="All" Text="Відомості про кошти, одержані з усіх джерел за попередній рік (зазначити суму в тис. грошових одиниць та валюту)" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true" RowSpan="10"/>
+          <TableCell Name="Cell1371" Border.Lines="All" Text="Заробітна плата (пенсія, соціальні виплати):" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row289">
+          <TableCell Name="Cell1374" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1375" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1376" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row290">
+          <TableCell Name="Cell1379" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1380" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1381" Border.Lines="All" Text="Доходи від здійснення підприємницької діяльності:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row291">
+          <TableCell Name="Cell1382" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1383" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1384" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row292">
+          <TableCell Name="Cell1385" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1386" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1387" Border.Lines="All" Text="Дивіденди, проценти за депозитами:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row293">
+          <TableCell Name="Cell1388" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1389" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1390" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row294">
+          <TableCell Name="Cell1391" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1392" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1393" Border.Lines="All" Text="Від продажу власного майна:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row295">
+          <TableCell Name="Cell1394" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1395" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1396" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row296">
+          <TableCell Name="Cell1397" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1398" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1399" Border.Lines="All" Text="Інші види доходів (зазначте, які саме):" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row297">
+          <TableCell Name="Cell1400" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1401" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1402" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row298">
+          <TableCell Name="Cell1403" Border.Lines="All" Text="18" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true" RowSpan="6"/>
+          <TableCell Name="Cell1404" Border.Lines="All" Text="Вкажіть власність, якою Ви володієте (самостійно або спільно з іншими особами)" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true" RowSpan="6"/>
+          <TableCell Name="Cell1405" Border.Lines="All" Text="Рухоме майно:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row299">
+          <TableCell Name="Cell1406" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1407" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1408" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row300">
+          <TableCell Name="Cell1409" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1410" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1411" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row301">
+          <TableCell Name="Cell1412" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1413" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1414" Border.Lines="All" Text="Нерухоме майно:" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row302">
+          <TableCell Name="Cell1415" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1416" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1417" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+        <TableRow Name="Row303">
+          <TableCell Name="Cell1418" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1419" Border.Lines="All" HorzAlign="Justify" Font="Times New Roman, 8pt" HtmlTags="true"/>
+          <TableCell Name="Cell1420" Border.Lines="All" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt, style=Italic" HtmlTags="true"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text1" Left="9.45" Width="689.85" Height="28.35" Text="Частина 2&#13;&#10;(заповнюється у разі, якщо Ви є публічним діячем, близькою або пов’язаною особою)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 8pt, style=Bold"/>
+    </DataBand>
+    <DataBand Name="Data3" Top="2121.41" Width="718.2" Height="756">
+      <TextObject Name="Text6" Left="9.45" Top="204.12" Width="689.85" Height="245.7" Text="Директор Національного антикорупційного бюро України та його заступники;&#13;&#10;Голова Антимонопольного комітету України та його заступники;&#13;&#10;Голова та члени Рахункової палати;&#13;&#10;члени Національної ради з питань телебачення і радіомовлення України;&#13;&#10;надзвичайні і повноважні посли;&#13;&#10;Начальник Генерального штабу –- Головнокомандувач Збройних Сил України, начальники Сухопутних військ України, Повітряних Сил України, Військово-Морських Сил України;&#13;&#10;державні службовці, посади яких належать до категорії «А»;&#13;&#10;керівники обласних територіальних органів центральних органів виконавчої влади, керівники органів прокуратури, керівники обласних територіальних органів Служби безпеки України, голови та судді апеляційних судів;&#13;&#10;керівники адміністративних, управлінських чи наглядових органів державних та казенних підприємств, господарських товариств, державна частка у статутному капіталі яких перевищує 50 відсотків;&#13;&#10;керівники керівних органів політичних партій та члени їх центральних статутних органів.	&#13;&#10;      &lt;b&gt;* Особи, пов’язані з публічними діячами &lt;/b&gt;–- особи, з якими члени сім'ї національних, іноземних публічних діячів та діячів, що виконують політичні функції в міжнародних організаціях мають ділові або особисті зв'язки, а також юридичні особи, кінцевими бенефіціарними власниками (контролерами) яких є такі діячі чи їх члени сім'ї або особи, з якими такі діячі мають ділові або особисті зв'язки&#13;&#10;     &lt;b&gt;* Близькі особи &lt;/b&gt;–- особи, які спільно проживають, пов’язані спільним побутом і мають взаємні права та обов’язки, у тому числі особи, які спільно проживають, але не перебувають у шлюбі, а також - незалежно від зазначених умов - чоловік, дружина, батько, мати, вітчим, мачуха, син, дочка, пасинок, падчерка, рідний брат, рідна сестра, дід, баба, прадід, прабаба, внук, внучка, правнук, правнучка, зять, невістка, тесть, теща, свекор, свекруха, усиновлювач чи усиновлений, опікун чи піклувальник, особа, яка перебуває під опікою або піклуванням публічної особи.&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text8" Left="9.45" Top="614.25" Width="274.05" Height="28.35" Text="Дата заповнення: [COMMON_DATA.TODAY_W]" HorzAlign="Justify" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text9" Left="349.65" Top="614.25" Width="113.4" Height="28.35" Text="__________________&#13;&#10;          (підпис)&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text10" Left="529.2" Top="614.25" Width="151.2" Height="28.35" Text="_____________________&#13;&#10;    (прізвище, ініціали)&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text11" Left="9.45" Top="652.05" Width="122.85" Height="18.9" Text="Отримано Банком:" HorzAlign="Justify" Font="Times New Roman, 9pt, style=Bold"/>
+      <TextObject Name="Text12" Left="9.45" Top="689.85" Width="236.25" Height="18.9" Text="«___»__________20___р." HorzAlign="Justify" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text13" Left="349.65" Top="689.85" Width="113.4" Height="28.35" Text="__________________&#13;&#10;          (підпис)&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text14" Left="510.3" Top="689.85" Width="189" Height="28.35" Text="________________________________&#13;&#10;(прізвище, ініціали працівника Банку)&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 8pt"/>
+      <TextObject Name="Text15" Left="9.45" Top="449.82" Width="689.85" Height="151.2" Text="&lt;b&gt;** Особи, що пов’язані з АТ «Ощадбанк»:&lt;/b&gt;&#13;&#10;1) контролери АТ «Ощадбанк»;&#13;&#10;2) особи, які мають істотну участь у АТ «Ощадбанк», та особи, через яких ці особи здійснюють опосередковане володіння істотною участю у &#13;&#10;АТ «Ощадбанк»;&#13;&#10;3) керівники АТ «Ощадбанк», керівник служби внутрішнього аудиту, керівники та члени комітетів АТ «Ощадбанк»;&#13;&#10;4) споріднені та афілійовані особи АТ «Ощадбанк», у тому числі учасники банківської групи;&#13;&#10;5) особи, які мають істотну участь у споріднених та афілійованих особах АТ «Ощадбанк»;&#13;&#10;6) керівники юридичних осіб та керівники банків, які є спорідненими та афілійованими особами АТ «Ощадбанк», керівник служби внутрішнього аудиту, керівники та члени комітетів цих осіб;&#13;&#10;7) асоційовані особи фізичних осіб, зазначених у пунктах 1 – 6;&#13;&#10;8) будь-яка особа, через яку проводиться операція в інтересах зазначених вище осіб, та на яку здійснюють вплив під час проведення такої операції зазначені вище особи через трудові, цивільні та інші відносини.&#13;&#10;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text5" Left="9.45" Top="81.27" Width="689.85" Height="122.85" Text="&lt;b&gt;* Національні публічні діячі &lt;/b&gt; – фізичні особи, які виконують або виконували протягом останніх трьох років визначені публічні функції в Україні, а саме:&#13;&#10;Президент України, Прем'єр-міністр України, члени Кабінету Міністрів України;&#13;&#10;перші заступники та заступники міністрів, керівники інших центральних органів виконавчої влади, їх перші заступники і заступники;&#13;&#10;народні депутати України;&#13;&#10;Голова та члени Правління Національного банку України, члени Ради Національного банку України;&#13;&#10;голови та судді Конституційного Суду України, Верховного Суду України та вищих спеціалізованих судів;&#13;&#10;члени Вищої ради правосуддя, члени Вищої кваліфікаційної комісії суддів України, члени Кваліфікаційно-дисциплінарної комісії прокурорів;&#13;&#10;Генеральний прокурор та його заступники;&#13;&#10;Голова Служби безпеки України та його заступники;" HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+      <TextObject Name="Text4" Left="9.45" Top="3.78" Width="689.85" Height="75.6" Text="&lt;b&gt;* Іноземні публічні діячі &lt;/b&gt; – фізичні особи, які виконують або виконували протягом останніх трьох років визначені публічні функції в іноземних державах, а саме: глава держави, керівник уряду, міністри та їх заступники; депутати парламенту; голови та члени правлінь центральних банків; члени верховного суду, конституційного суду або інших судових органів, рішення яких не підлягають оскарженню, крім оскарження за виняткових обставин; надзвичайні та повноважні посли, повірені у справах та керівники центральних органів військового управління; керівники адміністративних, управлінських чи наглядових органів державних підприємств, що мають стратегічне значення; керівники керівних органів політичних партій, представлених у парламенті." HorzAlign="Justify" VertAlign="Center" Font="Times New Roman, 8pt" HtmlTags="true"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="2880.25" Width="718.2" Height="18.9">
+      <BarcodeObject Name="Barcode1" Left="96.52" Width="126.25" Height="18.9" Anchor="Top, Right" Expression="[TICKET_DATA.DOC_ID]+&quot;:&quot;+[TotalPages]+&quot;:&quot;+[Page]" ShowText="false" Barcode="Codabar"/>
+      <TextObject Name="Text2" Left="236.25" Width="472.5" Height="18.9" Text="№ друку [TICKET_DATA.DOC_ID] сторінка [Page] з [TotalPages]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>
