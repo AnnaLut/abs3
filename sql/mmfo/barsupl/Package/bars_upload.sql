@@ -12,10 +12,13 @@
     --
     --   created: anny (01-07-2012)
     --
-    -- version 5.2 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
+    --   version 5.2 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
+    --   version 5.3 05.07.2018 COBUMMFO-8453  Просимо доопрацювати вивантаження пакетів для сховища даних - винести параметри налаштувань вивантаження на інший рівень
+    --                          параметр UPL_METHOD обрабатывать на уровне файла, а не глобальной настрройки
+    --                          добавлены таблицы доп. параметров файлов с соответствующими методами set_file_param, get_file_param
     -----------------------------------------------------------------
 
-    G_HEADER_VERSION      constant varchar2(64)  := 'version 5.2 16.02.2018';
+    G_HEADER_VERSION      constant varchar2(64)  := 'version 5.3 16.02.2018';
 
     -----------------------------------------------------------------
     -- Константы
@@ -323,6 +326,21 @@
    function  set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2) return varchar2;
    procedure set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2);
 
+   -----------------------------------------------------------------
+   --    GET_FILE_PARAM
+   --
+   --    Получить параметр файла по коду файла
+   --
+   function get_file_param(file_id varchar2, p_param_name varchar2) return varchar2;
+
+   -----------------------------------------------------------------
+   --    SET_FILE_PARAM
+   --
+   --    Устанвить параметр файла по коду файла
+   --
+   function  set_file_param(file_id varchar2, p_param_name varchar2, p_value varchar2) return varchar2;
+   procedure set_file_param(file_id varchar2, p_param_name varchar2, p_value varchar2);
+
   -----------------------------------------------------------------
    --    GET_GROUP_PARAM
    --
@@ -363,6 +381,7 @@
 
 end;
 /
+
 CREATE OR REPLACE PACKAGE BODY BARSUPL.BARS_UPLOAD 
 is
     -----------------------------------------------------------------
@@ -379,6 +398,9 @@ is
     --                          для WIN по умолчанию 'xcopy.exe', для UNIX - '#!/bin/bash[10] cp'
     --                          [13] и [10] - будут заменены на соответствующие chr() символы
     --   version 5.5 16.02.2018 Добавлены функции установки параметров выгрузки set_param, set_job_param, set_group_param
+    --   version 5.6 05.07.2018 COBUMMFO-8453  Просимо доопрацювати вивантаження пакетів для сховища даних - винести параметри налаштувань вивантаження на інший рівень
+    --                          параметр UPL_METHOD обрабатывать на уровне файла, а не глобальной настрройки
+    --                          добавлены таблицы доп. параметров файлов с соответствующими методами set_file_param, get_file_param
     --                                                             --
     -----------------------------------------------------------------
 
@@ -386,7 +408,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    G_BODY_VERSION         constant varchar2(64)  := 'version 5.5 16.02.2018';
+    G_BODY_VERSION         constant varchar2(64)  := 'version 5.6 05.07.2018';
     G_TRACE                constant varchar2(20)  := 'bars_upload.';
     G_MODULE               constant varchar2(3)   := 'UPL';
 
@@ -416,11 +438,14 @@ is
     -----------------------------------------------------------------
 
     -- масив параметров джоба
-    type t_jobparam_list is table of upl_autojob_param_values.value%type   index by upl_autojob_param_values.param%type;
+    type t_jobparam_list  is table of upl_autojob_param_values.value%type   index by upl_autojob_param_values.param%type;
+    -- масив параметров файла
+    type t_fileparam_list is table of upl_file_param_values.value%type      index by upl_file_param_values.param%type;
 
     -- таблица с масивами параметров джоба с индексом - наименованием джоба
     type t_alljobparam_list is table of t_jobparam_list index by upl_autojobs.job_name%type;
-
+    -- таблица с масивами параметров файла с индексом по file_id
+    type t_allfileparam_list is table of t_fileparam_list index by varchar2(38); --upl_files.file_id%type;
 
     -- список параметров системы
     type t_params_list is table of upl_params.value%type              index by upl_params.param%type;
@@ -437,6 +462,19 @@ is
     G_STATUS_LIST          t_staus_list;
     G_JOBPARAM_LIST        t_alljobparam_list;
     G_JOBGROUP_LIST        t_jobsgroup_list;
+    G_FILEPARAM_LIST       t_allfileparam_list;
+--    -----------------------------------------------------------------
+--    -- LOG_STR()
+--    --     Функция логирования в процессе разработки
+--    procedure log_str(p_str    varchar2 )
+--    is
+--       pragma autonomous_transaction;
+--    begin
+--       insert into barsupl.tmp_log(str) values(p_str);
+--       commit;
+--    exception when others then null;
+--    end;
+
     -----------------------------------------------------------------
     -- HEADER_VERSION()
     --
@@ -1800,13 +1838,18 @@ is
       end;
 
       -- получить способ выгрузки
-      begin
-         select value into l_uplmethod
-           from upl_params
-          where param = 'UPL_METHOD';
-      exception when no_data_found then
-         bars.bars_error.raise_nerror(G_MODULE, 'NO_UPL_METHOD_PARAMETER');
-      end;
+      l_uplmethod := get_file_param(p_fileid, 'UPL_METHOD');
+--log_str('upload_file_data  get_file_param(p_fileid => ' || p_fileid || ', "UPL_METHOD")=' || l_uplmethod);
+      if l_uplmethod is null then
+         begin
+            select value into l_uplmethod
+              from upl_params
+             where param = 'UPL_METHOD';
+--log_str('upload_file_data  upl_params   (p_fileid => ' || p_fileid || ', "UPL_METHOD")=' || l_uplmethod);
+         exception when no_data_found then
+            bars.bars_error.raise_nerror(G_MODULE, 'NO_UPL_METHOD_PARAMETER');
+         end;
+      end if;
 
       -- получить префикс для фалов от конктретного РУ
       begin
@@ -2208,6 +2251,13 @@ is
                   order by critical_flg desc, order_id asc)
       loop
 
+        -- получить способ выгрузки
+--log_str('upload_file_group_1   get_file_param(p_fileid => ' || c.file_id || ', "UPL_METHOD")=' || get_file_param(c.file_id, 'UPL_METHOD'));
+        if get_file_param(c.file_id, 'UPL_METHOD') is null then
+           set_file_param(c.file_id, 'UPL_METHOD', get_group_param(p_filegroup, 'UPL_METHOD'));
+        end if;
+--log_str('upload_file_group_2   get_file_param(p_fileid => ' || c.file_id || ', "UPL_METHOD")=' || get_file_param(c.file_id, 'UPL_METHOD'));
+
         l_statfl_id := upload_file( p_filegroup => p_filegroup,
                                     p_parentid  => l_statgrp_id,
                                     p_defsqlid  => p_defsqlid,
@@ -2355,6 +2405,10 @@ is
           return 0;
        end;
 
+--log_str('upload_stat_file_1 p_fileid => ' || l_fileid || ', group=' || p_filegroup || ', group_param=' || get_group_param(p_filegroup, 'UPL_METHOD') || ', file_param=' || get_file_param(l_fileid, 'UPL_METHOD'));
+       set_file_param(l_fileid, 'UPL_METHOD', get_group_param(p_filegroup, 'UPL_METHOD')); --установить метод выгрузки с группы
+--log_str('upload_stat_file_2 p_fileid => ' || l_fileid || ', group=' || p_filegroup || ', group_param=' || get_group_param(p_filegroup, 'UPL_METHOD') || ', file_param=' || get_file_param(l_fileid, 'UPL_METHOD'));
+
        l_statfl_id := upload_file(
                       p_filegroup  => p_filegroup,
                       p_parentid   => p_parentid ,
@@ -2399,7 +2453,7 @@ is
 
    procedure set_param(p_param_name varchar2, p_value varchar2)
    is
-     l_ret_value  varchar2(1);
+        l_ret_value  barsupl.upl_params.value%type;
    begin
         l_ret_value := set_param(p_param_name, p_value);
    end;
@@ -2433,7 +2487,7 @@ is
 
    procedure set_job_param(p_job_name varchar2, p_param_name varchar2, p_value varchar2)
    is
-     l_ret_value  varchar2(1);
+        l_ret_value  barsupl.upl_autojob_param_values.value%type;
    begin
         l_ret_value := set_job_param(p_job_name, p_param_name, p_value);
    end;
@@ -2467,10 +2521,45 @@ is
 
    procedure set_group_param(p_groupid number, p_param_name varchar2, p_value varchar2)
    is
-     l_ret_value  varchar2(1);
+        l_ret_value  barsupl.upl_autojob_param_values.value%type;
    begin
         l_ret_value := set_group_param(p_groupid, p_param_name, p_value);
    end;
+
+   -----------------------------------------------------------------
+   --    GET_FILE_PARAM
+   --
+   --    Получить параметр файла по коду файла
+   --
+   function get_file_param(file_id varchar2, p_param_name varchar2) return varchar2
+   is
+   begin
+      return  G_FILEPARAM_LIST(file_id)(p_param_name);
+   exception when others then
+      return null;
+   end;
+
+   -----------------------------------------------------------------
+   --    SET_FILE_PARAM
+   --
+   --    Устанвить параметр файла по коду файла
+   --
+   function set_file_param(file_id varchar2, p_param_name varchar2, p_value varchar2) return varchar2
+   is
+   begin
+        G_FILEPARAM_LIST(file_id)(p_param_name) := p_value;
+        return p_value;
+   exception when others then
+      return null;
+   end;
+
+   procedure set_file_param(file_id varchar2, p_param_name varchar2, p_value varchar2)
+   is
+        l_ret_value  barsupl.upl_file_param_values.value%type;
+   begin
+        l_ret_value := set_file_param(file_id, p_param_name, p_value);
+   end;
+
    -----------------------------------------------------------------
    --    INIT_GLOBAL_PARAMS
    --
@@ -2744,6 +2833,10 @@ is
              l_job('HOLIDAY_CHECK_STATUS') := '0';
           end if;
 
+          if not l_job.exists('UPL_METHOD') or l_job.exists('UPL_METHOD') is null then
+             l_job('UPL_METHOD') := 'CLOB';
+          end if;
+--log_str('init_jobs_params   l_job(' || c.job_name || ')=' || l_job('UPL_METHOD'));
       end loop;
 
       if G_JOBGROUP_LIST.count  = 0 or p_force = 1 then
@@ -2751,10 +2844,31 @@ is
              G_JOBGROUP_LIST(G_JOBPARAM_LIST(c.job_name)('GROUPID'))  := c.job_name;
          end loop;
       end if;
-
-
    end;
 
+   -----------------------------------------------------------------
+   --    INIT_FILE_PARAMS
+   --
+   --    Функция для инициализации доп. параметров файлов
+   --
+   procedure init_file_params(p_force number)
+   is
+      l_trace varchar2(1000):= G_TRACE||'init_file_params: ';
+   begin
+      if G_FILEPARAM_LIST.count  = 0 or p_force = 1 then
+             for c in (select f.file_id, trim(t.param) param, trim(t.value) value
+                         from upl_file_param_values t,
+                              upl_files f
+                        where isactive = 1
+                          and f.file_id = t.file_id
+                        order by f.file_id, t.param
+                      ) loop
+                 G_FILEPARAM_LIST(c.file_id)(c.param) := c.value;
+--                 bars_audit.info(l_trace||c.file_id||': param '||c.param||' = '||c.value);
+--log_str('init_file_params   G_FILEPARAM_LIST(' || c.file_id || ')(' || c.param || ') ' || G_FILEPARAM_LIST(c.file_id)(c.param));
+             end loop;
+      end if;
+   end;
 
    -----------------------------------------------------------------
    --    INIT_PARAMS
@@ -2771,6 +2885,7 @@ is
       end if;
       init_global_params(p_force);
       init_jobs_params(p_force);
+      init_file_params(p_force);
       bars_upload_utl.check_kf(); --пользователь долженбыть на уровне МФО и настройки соответствуют представлению
    end;
 
