@@ -678,7 +678,7 @@ begin
             from INT_ACCN
            where acc = l_intlist(i).acc_id
              and id  = l_intlist(i).int_id
-             for update nowait;
+             for update; -- nowait;
         exception
           when no_data_found
           then -- не найдена проц.карточка № %s по счету %s/%s
