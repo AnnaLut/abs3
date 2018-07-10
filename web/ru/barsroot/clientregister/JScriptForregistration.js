@@ -162,8 +162,8 @@ function Check_MainRekv() {
     var curElement = '';
     var selCodAg = gE(curTab, 'ddl_CODCAGENT');
     var tmpSel = selCodAg.item(selCodAg.selectedIndex).value.substr(0, 1);
-    var fioMask = /^[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄ]{0,1}[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄ\-\`\']{1,69}$/;
-    var cyyrilycFioMask = /^[а-яА-Яа-яА-ЯіІїЇєЄ]{0,1}[а-яА-Яа-яА-ЯіІїЇєЄ\-\`\']{1,69}$/;
+    var fioMask = /^[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄґҐ]{0,1}[a-zA-Zа-яА-Яа-яА-ЯіІїЇєЄґҐ\ \-\`\']{1,69}$/;
+    var cyyrilycFioMask = /^[а-яА-Яа-яА-ЯіІїЇєЄґҐ]{0,1}[а-яА-Яа-яА-ЯіІїЇєЄґҐ\ \-\`\']{1,69}$/;
     var sameSymbolsMask = /^(.)\1+$/;
 
     if (obj_Parameters['CUSTTYPE'] === 'person' && !isCustomerSpd()) {
@@ -541,7 +541,11 @@ function Check_ClientRekvPerson() {
         if (isIDPassport && isEmpty(gE(curTab, 'ed_ID_Number'))) {
             isEmptyCheck(gE(curTab, 'ed_ID_Number'));
             return false;
-        }
+		}
+		if (isIDPassport && gE(curTab, 'ed_ID_Number').value.length != 9) {
+			alert('Довжина номеру паспорта-ID-картки повинна бути строго 9');
+			gE(curTab, 'ed_ID_Number').focus();
+		}
         if (isIDPassport && isEmpty(gE(curTab, 'ed_ID_RecordNum'))) {
             isEmptyCheck(gE(curTab, 'ed_ID_RecordNum'));
             return false;
@@ -601,6 +605,8 @@ function Check_ClientRekvPerson() {
             var expireDate = new Date(expireDateStr.substring(6, 10), parseInt(expireDateStr.substring(3, 5)) - 1, expireDateStr.substring(0, 2));
             var birthDateStr = gE(curTab, 'ed_BDAY').value;
             var birthDate = new Date(birthDateStr.substring(6, 10), parseInt(birthDateStr.substring(3, 5)) - 1, birthDateStr.substring(0, 2));
+            var strRecNum = gE(curTab, 'ed_ID_RecordNum').value;
+
             birthDate.setMinutes(birthDate.getMinutes() + 1200);
             if (receiveDate > toDay) {
                 alert(LocalizedString('Mes03') /*"Дата привышает допустимую"*/);
@@ -634,7 +640,49 @@ function Check_ClientRekvPerson() {
                 return false;
             }
 
-        }
+            // Перевірка Номера запису в ЄДДР для Паспорта ID-картки
+            // Аналогічна перевірка продубльована в JScriptFortab_client_rekv_person.js -> ValidateIDRecordNum()
+
+            if (!strRecNum) {
+                alert('«Унік.номер запису в ЄДДР» необхідно заповнити');
+                gE(curTab, 'ed_ID_RecordNum').focus();
+                return false;
+            }
+            if (strRecNum.length != 14 && strRecNum) {
+                alert('«Унік.номер запису в ЄДДР» має бути довжиною в 14 символів');
+                gE(curTab, 'ed_ID_RecordNum').focus();
+                return false;
+            }
+            var bIsRecNumValid = true;
+            var iSerNum = parseInt(strRecNum.substr(9, 4), 10);
+            var strSEX = gE(curTab, 'ddl_SEX').selectedIndex;
+            if ((strSEX == '2' && iSerNum % 2 != 0) ||
+                (strSEX == '1' && iSerNum % 2 == 0) ||
+                (iSerNum == 0)) {
+                bIsRecNumValid = false;
+            }
+            if (strRecNum.substr(0, 4) != birthDateStr.substr(6, 4) ||
+                     strRecNum.substr(4, 2) != birthDateStr.substr(3, 2) ||
+                     strRecNum.substr(6, 2) != birthDateStr.substr(0, 2)) {
+                bIsRecNumValid = false;
+            }
+            if (!bIsRecNumValid) {
+                var ddlSex = gE(curTab, 'ddl_SEX');
+                var sex = ddlSex.options[ddlSex.selectedIndex].text;
+                var newRecNum = prompt('«Унік. номер запису в ЄДДР» не відповідає даті народження (' + birthDateStr + ') або статі (' + sex + ') клієнта. Підтвердіть «Унік. номер запису в ЄДДР»:', '');
+                if (newRecNum) {
+                    if (newRecNum != strRecNum) {
+                        alert('«Унік. номер запису в ЄДДР» не співпадає з введеним раніше \n<' + newRecNum + '>\n<' + strRecNum + '>');
+                    } else {
+                        bIsRecNumValid = true;
+                    }
+                }
+                if (!bIsRecNumValid) {
+                    gE(curTab, 'ed_ID_RecordNum').focus();
+                    return bIsRecNumValid;
+                }
+            }
+		}
 
         if (!isIDPassport && !isTempDoc && isEmpty(gE(curTab, 'ed_DATE_PHOTO'))) {
 		    alert('"Дата вклеювання фото" не заповнена');
@@ -775,6 +823,10 @@ function Check_ClientRekvPhone(ignoreConfirmation) {
                     
                     var validationResult = ExecSync('ValidateMobilePhone', { rnk: (obj_Parameters['ID'] == '' ? 0 : obj_Parameters['ID']), phone: mobNum + "&" + gE(getFrame('Tab0'), 'ed_OKPO').value }).d;
 
+                    if (!validationResult) {
+                        alert('Необроблена помилка перевірки № тел. в ValidateMobilePhone');
+                        return false;
+                    }
                     if (validationResult.Code != 'OK') {
                         alert(validationResult.Text);
                         return false;
@@ -1112,11 +1164,9 @@ function saveCustomerToBase() {
         var mobPhone = gE(clientRekvTab, 'ed_TELM') != undefined ? gE(clientRekvTab, 'ed_TELM').value : undefined;
 
         //if mobile phone is masked - it was not changed and obj_Parameters['DopRekv_MPNO'] contains initial value
-        if (obj_Parameters['CUSTTYPE'] === 'person') {
-			if (mobPhone.indexOf("*****") !== -1) {
-				mobPhone = obj_Parameters['DopRekv_MPNO'];
-			}
-		}
+        if (mobPhone && mobPhone.indexOf("*****") !== -1) {
+            mobPhone = obj_Parameters['DopRekv_MPNO'];
+        }
 
         if (mobPhone) {
             custAttrList['MPNO'] = {
