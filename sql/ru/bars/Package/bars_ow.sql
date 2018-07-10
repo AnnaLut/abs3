@@ -4044,16 +4044,13 @@ begin
         if substr(p_nlsb, 1, 4) in ('2625', '2605', '2655', '2620', '2600', '2650', '2520', '2541', '2542', '3550', '3551') then
            select acc, tip into l_acc, l_tip from accounts where nls = p_nlsb and rownum = 1;
            if l_tip like 'W4%' then
-           l_nlsb := get_transit(l_acc);
+              l_nlsb := get_transit(l_acc);
+           else
+              l_nlsb := p_nlsb;
+           end if;
         else
-           l_nlsb := p_nlsb;
-     end if;
-        else
-           l_nlsb := p_nlsb;
-     end if;
-        else
-           l_nlsb := p_nlsb;
-     end if;
+          l_nlsb := p_nlsb;
+        end if;          
      end if;
      gl.payv(0, l_ref, l_bdate, p_tt, p_dk, p_kv, l_nlsa, p_s, p_kv2, l_nlsb, p_s2);
      if l_mfo = p_mfob and p_mode = 1 then
