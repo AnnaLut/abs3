@@ -1037,37 +1037,44 @@ $end
                    ekp_6   as k020,
                    ekp_5   as k021,
                    ekp_4   as f001,
-                   decode(ekp_7,'000','#',ekp_7)   as r030,
+                   decode(ekp_7,'000','#',ekp_7)             as r030,
                    decode(ekp_8,'000','#',ekp_8)             as k040_1,
                    decode(ekp_9,'000','#',ltrim(ekp_9,'0'))  as ku_1,
                    decode(ekp_10,'000','#',ekp_10)             as k040_2,
                    decode(ekp_11,'000','#',ltrim(ekp_11,'0'))  as ku_2,
-                   nvl(t071,0)     as t071,
-                   nvl(t080,0)     as t080,
+                   t071                as t071,
+                   t080                as t080,
                    decode(d060_2, null,'#', d060_2)  d060_2,
                    q001
-              from ( select substr(field_code,1,1) ekp_1,
-                            substr(field_code,2,1) ekp_2,
-                            substr(field_code,3,2) ekp_3,
-                            substr(field_code,5,1) ekp_4,
-                            substr(field_code,6,1) ekp_5,
-                            substr(field_code,7,10) ekp_6,
-                            substr(field_code,17,3) ekp_7,
-                            substr(field_code,20,3) ekp_8,
-                            substr(field_code,23,3) ekp_9,
-                            substr(field_code,26,3) ekp_10,
-                            substr(field_code,29,3) ekp_11,
-                            field_value
-                       from   nbur_agg_protocols t
-                      where  report_date = p_rpt_dt           --Дата отчета
-                        and  kf = p_kf                        --Филиал
-                        and  report_code = l_rpt_code        --Код отчета
-                  )
-                   pivot
-                  ( max(trim(field_value))
+              from (
+select  substr(ekp_2,1,1) ekp_2
+         , substr(ekp_2,2,2) ekp_3
+         , substr(ekp_2,4,1) ekp_4
+         , substr(ekp_2,5,1) ekp_5
+         , substr(ekp_2,6,10) ekp_6
+         , substr(ekp_2,16,3) ekp_7
+         , substr(ekp_2,19,3) ekp_8
+         , substr(ekp_2,22,3) ekp_9
+         , substr(ekp_2,25,3) ekp_10
+         , substr(ekp_2,28,3) ekp_11
+         , nvl(t071,0)   t071
+         , nvl(t080,0)   t080
+         , d060_2
+         , q001
+          from ( SELECT    substr(field_code,1,1) ekp_1
+                         , substr(field_code,2) ekp_2
+                         , field_value
+                    from  nbur_agg_protocols
+                   where  report_date = p_rpt_dt           --Дата отчета
+                     and  kf = p_kf                        --Филиал
+                     and  report_code = l_rpt_code        --Код отчета
+               )
+                pivot
+               ( max(trim(field_value))
                     for ekp_1 in ( '1' as T071, '3' as T080,
                                    '8' as D060_2, '9' as Q001 )
-                  );                 
+               )
+        ) ;
 
      when '6EX' then
          open p_recordset
