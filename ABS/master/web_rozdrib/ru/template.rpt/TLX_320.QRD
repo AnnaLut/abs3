@@ -1,0 +1,47 @@
+[WIDTH=60][LMARGIN=0]
+TO:[REF=TLXNUM_,C,20]
+
+FROM:  [REF=FROM_,C, 40]
+TO  :  [REF=TO_,  C, 40]
+DATE:  [REF=DATE_,C, 15]
+ATTIN: GEN AGR [REF=AGRNUM_,C,10] DD [REF=AGRDATE_,C,10]  REF:[REF=TICKET,C,10]
+MT:    MT320  Fixed Loan/Deposit Confirmation
+
+:15A: New Sequence
+:20 /TRANSACTION REFERENCE NO.    :[REF=F20_,C,16]
+:21 /RELATED REFERENCE            :[REF=F21_,C,16]
+:22ë /CODE/COMMON REFERENCE       :[REF=F22C_,C,16]
+:22A /Type of Operation           :[REF=F22A_,C,10]
+:22B /Type of Event               :[REF=F22B_,C,10]
+:82 /PARTY A                      :[REF=F82_,C,40]
+:87 /PARTY B                      :[REF=F87_,C,40]
+:15B: New Sequence
+:17 /PARTY'S A ROLE               :[REF=F17_,C,1]
+:30 /Trade Date                   :[REF=F30T_,C,12]
+:30 /Value Date                   :[REF=F30V_,C,12]
+:30 /Maturity Date                :[REF=F30P_,C,12]
+:32 /CURRENCY AND PRINCIPAL AMOUNT:[REF=F32_,C,20]
+:32ç /Amount to be Settled        :[REF=F32H_,C,20]
+:30ï/Next Interest Due Date       :[REF=F30X_,C,20]
+:34 /CURRENCY AND INTEREST AMOUNT :[REF=F34_,C,20]
+:37 /INTEREST RATE                :[REF=F37_,C,20]
+:14 /DAY COUNT FRACTION           :[REF=F14_,C,20]
+:15C: New Sequence
+:57/RECEIVING AGENT               :[REF=FC57_,C,200]
+:56 /Intermediary                 :[REF=FC56_,C,200]
+:15D: New Sequence
+:57A/ACCOUNT WITH INT - BIC       :[REF=FD57_,C,200]
+:56 /Intermediary                 :[REF=FD56_,C,200]
+:15E: New Sequence
+:57A/ACCOUNT WITH INT - BIC       :[REF=FE57_,C,200]
+:56 /Intermediary                 :[REF=FE56_,C,200]
+:15F: New Sequence
+:57A/ACCOUNT WITH INT - BIC       :[REF=FF57_,C,200]
+:56 /Intermediary                 :[REF=FF56_,C,200]
+
+PLEASE CONFIRM BY RETURN TELEX
+THANK YOU VERY MUCH FOR A DEAL
+BEST REGARDS,
+TREASURY DIVISION  
+Tell: (044)492-74-27 [REF=TELL_,C,15]
+     [REF=PODP_,C,35]

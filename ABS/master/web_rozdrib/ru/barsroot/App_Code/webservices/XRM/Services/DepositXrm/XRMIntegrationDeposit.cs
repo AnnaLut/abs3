@@ -21,7 +21,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [System.Web.Script.Services.ScriptService]
-    public class XRMIntegrationDeposit : BarsWebService
+    public class XRMIntegrationDeposit : XrmBaseWebService
     {
         public WsHeader WsHeaderValue;
         private IDbLogger _dbLogger;
@@ -52,6 +52,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                         {
                             TransactionCreate(con, DepositReq.TransactionId, DepositReq.UserLogin, DepositReq.OperationType);
                             DepositRes = DepositXrmWorker.ProcOpenDeposit(DepositReq, con);
+
                             WriteRequestResponseToLog(con, DepositReq.TransactionId, DepositReq, DepositRes);
                         }
                         else
@@ -365,6 +366,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                     if (TransSuccess == 0)
                     {
                         TransactionCreate(con, request.TransactionId, request.UserLogin, request.OperationType);
+
                         result.Doc = Convert.ToBase64String(DepositXrmWorker.GetDepositAdditionalAgreement(request));
                     }
                     else
@@ -565,7 +567,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
         {
             Decimal transSuccess = 0;
             Byte[] responseBytes;
-            var res = new BackOfficeGetAccessRes();
+            BackOfficeGetAccessRes res = new BackOfficeGetAccessRes();
 
             using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
             {

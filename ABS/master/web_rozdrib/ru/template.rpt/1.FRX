@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/27/2014 08:49:30" ReportInfo.Modified="04/14/2014 16:17:20" ReportInfo.CreatorVersion="2013.2.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiRb22Vd3VkvyX/rLDyIcfBQ==">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;    ac.branch,&#13;&#10;    ac.kv,&#13;&#10;    c.nmk,&#13;&#10;    m.phone,&#13;&#10;    c.rnk,&#13;&#10;    c.OKPO,&#13;&#10;    ac.nls,&#13;&#10;     CASE&#13;&#10;            WHEN m.status = 'SUBMITTED'&#13;&#10;            THEN&#13;&#10;               'Надіслано'&#13;&#10;            WHEN m.status = 'EXPIRED'&#13;&#10;            THEN&#13;&#10;               'Закінчився термін дії'&#13;&#10;            WHEN m.status = 'ERROR'&#13;&#10;            THEN&#13;&#10;               'Помилкових'&#13;&#10;         END&#13;&#10;            status, &#13;&#10;    count(*)  &#13;&#10;from &#13;&#10;    bars.acc_msg a, &#13;&#10;    bars.accounts ac, &#13;&#10;    bars.msg_submit_data m,&#13;&#10;    bars.customer c &#13;&#10;where &#13;&#10;    m.msg_id=a.msg_id &#13;&#10;    and ac.acc=a.acc&#13;&#10;    --and change_time between  to_date('01/03/2014_00:00','DD/MM/YYYY_HH24:MI')  AND to_date('31/03/2014_23:59','DD/MM/YYYY_HH24:MI')&#13;&#10;    and change_time between  :Dat1  AND :Dat2+1&#13;&#10;    and ac.rnk=c.rnk&#13;&#10;    AND ac.branch like  decode(:branch,'%',ac.branch, null,ac.branch,:branch)||'%'&#13;&#10;    AND c.rnk =  decode(:rnk,'%',c.rnk, null,c.rnk,:rnk)&#13;&#10;   &#13;&#10;    &#13;&#10;    &#13;&#10;group by &#13;&#10;    ac.nls,&#13;&#10;    c.rnk,&#13;&#10;    ac.branch,&#13;&#10;    c.OKPO, &#13;&#10;    ac.kv, &#13;&#10;    status,&#13;&#10;    m.phone,&#13;&#10;    c.nmk  &#13;&#10;ORDER BY 6">
+        <Column Name="RNK" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="PHONE" DataType="System.String"/>
+        <Column Name="STATUS" DataType="System.String"/>
+        <Column Name="COUNT(*)" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <CommandParameter Name="rnk" DataType="126" Expression="[rnk]"/>
+        <CommandParameter Name="rnk" DataType="126" Expression="[rnk]"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[branch]"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[branch]"/>
+        <CommandParameter Name="dat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.0001"/>
+        <CommandParameter Name="dat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.0001"/>
+        <CommandParameter Name="dat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.0001"/>
+        <CommandParameter Name="dat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.0001"/>
+        <CommandParameter Name="rnk" DataType="126" Expression="[rnk]"/>
+        <CommandParameter Name="branch" DataType="126" Expression="[branch]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime"/>
+    <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="rnk" DataType="System.String"/>
+    <Parameter Name="branch" DataType="System.String"/>
+    <Total Name="Total" Expression="[Table.STATUS]" Evaluator="Data3"/>
+    <Total Name="Total1" Expression="[Table.COUNT(*)]" Evaluator="Data3" PrintOn="GroupFooter12"/>
+    <Total Name="T_Branch" Expression="[Table.COUNT(*)]" Evaluator="Data3" PrintOn="GroupFooter10"/>
+    <Total Name="T_RNK" Expression="[Table.COUNT(*)]" Evaluator="Data3" PrintOn="GroupFooter11"/>
+  </Dictionary>
+  <ReportPage Name="Page3">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text3" Left="9.45" Width="548.1" Height="37.8" Text="Звіт про кількість надісланих смс повідомлень&#13;&#10;за період [sFdat1]р. по [sFdat2]р." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <GroupHeaderBand Name="GroupHeader10" Top="40.68" Width="718.2" Height="47.25" Condition="[Table.BRANCH]">
+      <TextObject Name="Text10" Left="103.95" Top="9.45" Width="453.6" Height="18.9" Text="[Table.BRANCH]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text11" Left="9.45" Top="9.45" Width="94.5" Height="18.9" Text="Відділення:" Font="Times New Roman, 10pt"/>
+      <TableObject Name="Table1" Left="9.45" Top="28.35" Width="549.99" Height="18.9">
+        <TableColumn Name="Column53" Width="105.84"/>
+        <TableColumn Name="Column54" Width="340.2"/>
+        <TableColumn Name="Column55" Width="103.95"/>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell53" Border.Lines="All" Text="РНК" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell54" Border.Lines="All" Text="Назва клієнта" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell55" Border.Lines="All" Text="ОКПО" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+      <GroupHeaderBand Name="GroupHeader11" Top="90.81" Width="718.2" Height="56.7" Condition="[Table.RNK]">
+        <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
+          <TableColumn Name="Column56" Width="105.84"/>
+          <TableColumn Name="Column57" Width="340.2"/>
+          <TableColumn Name="Column58" Width="103.95"/>
+          <TableRow Name="Row12">
+            <TableCell Name="Cell56" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell57" Border.Lines="All" Text="[Table.NMK]" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell58" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          </TableRow>
+        </TableObject>
+        <TableObject Name="Table1" Left="9.45" Top="18.9" Width="549.99" Height="37.8">
+          <TableColumn Name="Column59" Width="105.84"/>
+          <TableColumn Name="Column60" Width="94.5"/>
+          <TableColumn Name="Column61" Width="103.95"/>
+          <TableColumn Name="Column62" Width="141.75"/>
+          <TableColumn Name="Column63" Width="103.95"/>
+          <TableRow Name="Row13" Height="37.8">
+            <TableCell Name="Cell59" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell60" Border.Lines="All" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell61" Border.Lines="All" Text="Номер&#13;&#10;телефону" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell62" Border.Lines="All" Text="Статус&#13;&#10;повідомлення" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell63" Border.Lines="All" Text="Кількість&#13;&#10;повідомлень" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+        <GroupHeaderBand Name="GroupHeader12" Top="150.38" Width="718.2" Condition="[Table.STATUS]">
+          <GroupHeaderBand Name="GroupHeader13" Top="153.26" Width="718.2" Condition="[Table.NLS]">
+            <GroupHeaderBand Name="GroupHeader14" Top="156.14" Width="718.2" Condition="[Table.PHONE]">
+              <DataBand Name="Data3" Top="159.02" Width="718.2" Height="18.9" DataSource="Table">
+                <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
+                  <TableColumn Name="Column64" Width="105.84"/>
+                  <TableColumn Name="Column65" Width="94.5"/>
+                  <TableColumn Name="Column66" Width="103.95"/>
+                  <TableColumn Name="Column67" Width="141.75"/>
+                  <TableColumn Name="Column68" Width="103.95"/>
+                  <TableRow Name="Row14">
+                    <TableCell Name="Cell64" Border.Lines="All" Text="[Table.NLS]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+                    <TableCell Name="Cell65" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+                    <TableCell Name="Cell66" Border.Lines="All" Text="[Table.PHONE]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+                    <TableCell Name="Cell67" Border.Lines="All" Text="[Table.STATUS]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+                    <TableCell Name="Cell68" Border.Lines="All" Text="[Table.COUNT(*)]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+                  </TableRow>
+                </TableObject>
+              </DataBand>
+              <GroupFooterBand Name="GroupFooter14" Top="180.79" Width="718.2"/>
+            </GroupHeaderBand>
+            <GroupFooterBand Name="GroupFooter13" Top="183.67" Width="718.2"/>
+          </GroupHeaderBand>
+          <GroupFooterBand Name="GroupFooter12" Top="186.55" Width="718.2" Height="18.9">
+            <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
+              <TableColumn Name="Column69" Width="105.84"/>
+              <TableColumn Name="Column70" Width="94.5"/>
+              <TableColumn Name="Column71" Width="103.95"/>
+              <TableColumn Name="Column72" Width="141.75"/>
+              <TableColumn Name="Column73" Width="103.95"/>
+              <TableRow Name="Row15">
+                <TableCell Name="Cell69" Border.Lines="All" Text="Всього по &quot;[Table.STATUS]&quot; :" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="4"/>
+                <TableCell Name="Cell70" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+                <TableCell Name="Cell71" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+                <TableCell Name="Cell72" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+                <TableCell Name="Cell73" Border.Lines="All" Text="[Total1]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+              </TableRow>
+            </TableObject>
+          </GroupFooterBand>
+        </GroupHeaderBand>
+        <GroupFooterBand Name="GroupFooter11" Top="208.33" Width="718.2" Height="37.8">
+          <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
+            <TableColumn Name="Column79" Width="105.84"/>
+            <TableColumn Name="Column80" Width="94.5"/>
+            <TableColumn Name="Column81" Width="103.95"/>
+            <TableColumn Name="Column82" Width="141.75"/>
+            <TableColumn Name="Column83" Width="103.95"/>
+            <TableRow Name="Row17">
+              <TableCell Name="Cell79" Border.Lines="All" Text="Всього по клієнту:" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="4"/>
+              <TableCell Name="Cell80" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+              <TableCell Name="Cell81" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+              <TableCell Name="Cell82" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+              <TableCell Name="Cell83" Border.Lines="All" Text="[T_RNK]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            </TableRow>
+          </TableObject>
+        </GroupFooterBand>
+      </GroupHeaderBand>
+      <GroupFooterBand Name="GroupFooter10" Top="249" Width="718.2" Height="37.8">
+        <TableObject Name="Table1" Left="9.45" Width="549.99" Height="18.9">
+          <TableColumn Name="Column74" Width="105.84"/>
+          <TableColumn Name="Column75" Width="94.5"/>
+          <TableColumn Name="Column76" Width="103.95"/>
+          <TableColumn Name="Column77" Width="141.75"/>
+          <TableColumn Name="Column78" Width="103.95"/>
+          <TableRow Name="Row16">
+            <TableCell Name="Cell74" Border.Lines="All" Text="Всього по відділеню:" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" ColSpan="4"/>
+            <TableCell Name="Cell75" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell76" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell77" Border.Lines="All" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell78" Border.Lines="All" Text="[T_Branch]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/15/2011 18:11:20" ReportInfo.Modified="07/16/2012 09:28:42" ReportInfo.CreatorVersion="1.7.1.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqD6nWZEExUJ9MEhdFZpB1A6ZfSeiTM+6WLeB8pW5aURqkGwhV134I2SUIQGUGXcXiplhdDiyiJjyt0PKPe5KVfw==">
+      <TableDataSource Name="Table" Alias="WCS_IQ_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select wcs_utl.get_answ_date(b.id, 'IQ_CC_DECISION_Q1', w.id, 0) as q1,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q2', w.id, 0) as q2,&#13;&#10;       wcs_utl.get_answ_list_text(b.id, 'IQ_CC_DECISION_Q3', w.id, 0) as q3,&#13;&#10;       wcs_utl.get_answ_text(b.id, 'IQ_CC_DECISION_Q4', w.id, 0) as q4&#13;&#10;  from wcs_bids b, wcs_workspaces w&#13;&#10; where b.id = :p_bid_id&#13;&#10;   and w.id = :p_ws_id">
+        <Column Name="Q2" DataType="System.String"/>
+        <Column Name="Q3" DataType="System.String"/>
+        <Column Name="Q4" DataType="System.String"/>
+        <Column Name="Q1" DataType="System.DateTime"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+        <CommandParameter Name="p_ws_id" DataType="126" Expression="[p_ws_id]" DefaultValue="&quot;MAIN&quot;"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" Alias="WCS_BID_DATA" DataType="System.Int32" Enabled="true" SelectCommand="select * from v_wcs_bids b where b.bid_id = :p_bid_id">
+        <Column Name="BID_ID" DataType="System.Decimal"/>
+        <Column Name="SUBPRODUCT_ID" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_NAME" DataType="System.String"/>
+        <Column Name="CRT_DATE" DataType="System.DateTime"/>
+        <Column Name="F" DataType="System.String"/>
+        <Column Name="I" DataType="System.String"/>
+        <Column Name="O" DataType="System.String"/>
+        <Column Name="BDATE" DataType="System.DateTime"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="SUMM" DataType="System.Decimal"/>
+        <Column Name="OWN_FUNDS" DataType="System.Decimal"/>
+        <Column Name="TERM" DataType="System.String"/>
+        <Column Name="CREDIT_CURRENCY" DataType="System.Decimal"/>
+        <Column Name="SINGLE_FEE" DataType="System.Decimal"/>
+        <Column Name="MONTHLY_FEE" DataType="System.Decimal"/>
+        <Column Name="INTEREST_RATE" DataType="System.Decimal"/>
+        <Column Name="REPAYMENT_METHOD" DataType="System.String"/>
+        <Column Name="REPAYMENT_DAY" DataType="System.Decimal"/>
+        <Column Name="GARANTEES" DataType="System.String"/>
+        <Column Name="MGR_ID" DataType="System.Decimal"/>
+        <Column Name="MGR_FIO" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCH_NAME" DataType="System.String"/>
+        <Column Name="STATES" DataType="System.String"/>
+        <Column Name="SUBPRODUCT_DESC" DataType="System.String"/>
+        <Column Name="REPAYMENT_METHOD_TEXT" DataType="System.String"/>
+        <CommandParameter Name="p_bid_id" DataType="107" Expression="[p_bid_id]" DefaultValue="-1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="p_bid_id" DataType="System.Decimal" Expression="103128"/>
+    <Parameter Name="p_ws_id" DataType="System.String" Expression="&quot;SRV_RU&quot;"/>
+    <Parameter Name="p_ws_number" DataType="System.Decimal" Expression="0"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Width="718.2" Height="264.6" CanGrow="true" CanBreak="true">
+      <TextObject Name="Text1" Left="9.45" Top="9.45" Width="661.5" Height="37.8" Border.Lines="All" CanGrow="true" Text="V/І. РІШЕННЯ КРЕДИТНОГО КОМІТЕТУ УСТАНОВИ БАНКУ ЩОДО НАДАННЯ КРЕДИТУ ПОЗИЧАЛЬНИКУ [WCS_BID_DATA.F] [WCS_BID_DATA.I] [WCS_BID_DATA.O]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text2" Left="9.45" Top="47.25" Width="661.5" Height="66.15" Border.Lines="All" CanGrow="true" Text="&lt;b&gt;Номер і дата протоколу засідання кредитного комітету&lt;/b&gt;&#13;&#10;&#13;&#10;[WCS_IQ_DATA.Q2] [FormatDateTime([WCS_IQ_DATA.Q1],&quot;Short Date&quot;)]" HtmlTags="true"/>
+      <TextObject Name="Text4" Left="9.45" Top="113.4" Width="661.5" Height="85.05" Border.Lines="All" CanGrow="true" Text="&lt;b&gt;Прийняте рішення:&lt;/b&gt;&#13;&#10;&#13;&#10;[WCS_IQ_DATA.Q3]&#13;&#10;&#13;&#10;[WCS_IQ_DATA.Q4]" HtmlTags="true"/>
+      <TextObject Name="Text6" Left="9.45" Top="198.45" Width="330.75" Height="37.8" Border.Lines="All" CanGrow="true" Text="Дата [FormatDateTime([WCS_IQ_DATA.Q1],&quot;Short Date&quot;)]" Font="Arial, 10pt, style=Bold"/>
+      <TextObject Name="Text7" Left="340.2" Top="198.45" Width="330.75" Height="37.8" Border.Lines="All" CanGrow="true" Text="Підпис секретаря кредитного комітету" Font="Arial, 10pt, style=Bold"/>
+    </DataBand>
+  </ReportPage>
+</Report>

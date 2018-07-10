@@ -1,13 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Data;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using Oracle.DataAccess.Client;
 using BarsWeb.Core.Logger;
-using Oracle.DataAccess.Types;
 using System.Collections.Generic;
-using Bars.WebServices.XRM.Services.RegPayments;
 using Bars.WebServices.XRM.Services.RegPayments.Models;
 
 /// <summary>
@@ -23,7 +19,7 @@ namespace Bars.WebServices.XRM.Services.RegPayments
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [System.Web.Script.Services.ScriptService]
-    public class XRMIntegrationRegPay : BarsWebService
+    public class XRMIntegrationRegPay : XrmBaseWebService
     {
         public WsHeader WsHeaderValue;
         private IDbLogger _dbLogger;

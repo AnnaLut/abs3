@@ -4,14 +4,9 @@ using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Bars.Oracle;
 using System.Xml;
-using Bars.Web.Report;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
-using System.Web;
-using BarsWeb.Core.Logger;
 using Bars.WebServices.XRM.Services.DepositXrm.Models;
 using ibank.core;
 using Bars.EAD;
@@ -99,7 +94,33 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
             return res;
         }
         #endregion
-
+        private static int GetEaStructIdByTypeId(short typeId)
+        {
+            switch (typeId)
+            {
+                case 1: // основной договор
+                    return 212;
+                case 101: // осн.дог на бенеф
+                    return 212;
+                case 99: // тут анкета финмониторинга
+                    return 212;
+                // тут будут все додугоды
+                case 7:
+                    return 222;
+                case 8:
+                    return 223;
+                case 9:
+                    return 226;
+                case 12:
+                    return 222;
+                case 13:
+                    return 225;
+                case 18:
+                    return 211;
+                default:
+                    return 213;
+            }
+        }
         public static byte[] GetDepositAdditionalAgreement(XRMDepositAdditionalAgreementReq request)
         {
             EadPack ep = new EadPack(new BbConnection());
@@ -110,53 +131,12 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
             string TemplateID = "";
             byte[] bytes = null;
             string outfilename = "";
-            switch (request.TypeId)
-            {
-                case 1: // основной договор
-                    EAStructID = 212;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 101: // осн.дог на бенеф
-                    EAStructID = 212;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 99: // тут анкета финмониторинга
-                    EAStructID = 212;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                // тут будут все додугоды
-                case 7:
-                    EAStructID = 222;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 8:
-                    EAStructID = 223;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 9:
-                    EAStructID = 226;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 12:
-                    EAStructID = 222;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 13:
-                    EAStructID = 225;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                case 18:
-                    EAStructID = 211;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-                default:
-                    EAStructID = 213;
-                    TemplateID = getDocTemplate(request.TypeId, request.DptId);
-                    break;
-            }
+
+            EAStructID = GetEaStructIdByTypeId(request.TypeId);
+            TemplateID = getDocTemplate(request.TypeId, request.DptId, request.KF);
 
             if (EAStructID != -1)
-                _DocId = ep.DOC_CREATE("DOC", TemplateID, null, EAStructID, request.Rnk, request.DptId);
+                _DocId = ep.DOC_CREATE("DOC", TemplateID, null, EAStructID, request.Rnk.AddRuTail(request.KF), request.DptId.AddRuTail(request.KF));
 
 
             outfilename = TemplateID;
@@ -169,7 +149,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
 
             if (request.Rnk != null)
             {
-                pars.Add(new FrxParameter("p_rnk", TypeCode.Int64, request.Rnk));
+                pars.Add(new FrxParameter("p_rnk", TypeCode.Int64, request.Rnk.AddRuTail(request.KF)));
                 outfilename += "_RNK" + request.Rnk;
             }
             if (request.AgrId != null)
@@ -191,29 +171,27 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
             }
             return GetZipFile(bytes, outfilename).ToArray();
         }
-        public static string getDocTemplate(Int16 type_id, Int64? dpt_id)
+        public static string getDocTemplate(Int16 type_id, Int64? dpt_id, string kf)
         {
             string Template = String.Empty;
             if (type_id != 99)
             {
                 using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                using (OracleCommand cmd_findtemplate = con.CreateCommand())
                 {
-                    using (OracleCommand cmd_findtemplate = con.CreateCommand())
-                    {
-                        cmd_findtemplate.CommandText = "select dvc.id_fr id from dpt_deposit d, dpt_vidd_scheme dvc where d.deposit_id = :p_deposit_id and dvc.vidd = d.vidd and dvc.flags = :p_flags";
-                        cmd_findtemplate.Parameters.Add("p_deposit_id", OracleDbType.Decimal, dpt_id, ParameterDirection.Input);
-                        cmd_findtemplate.Parameters.Add("p_flags", OracleDbType.Decimal, type_id, ParameterDirection.Input);
+                    cmd_findtemplate.CommandText = "select dvc.id_fr id from dpt_deposit d, dpt_vidd_scheme dvc where d.deposit_id = :p_deposit_id and dvc.vidd = d.vidd and dvc.flags = :p_flags";
+                    cmd_findtemplate.Parameters.Add("p_deposit_id", OracleDbType.Decimal, dpt_id.AddRuTail(kf), ParameterDirection.Input);
+                    cmd_findtemplate.Parameters.Add("p_flags", OracleDbType.Decimal, type_id, ParameterDirection.Input);
 
-                        using (OracleDataReader rdr_findtemplate = cmd_findtemplate.ExecuteReader())
+                    using (OracleDataReader rdr_findtemplate = cmd_findtemplate.ExecuteReader())
+                    {
+                        if (rdr_findtemplate.Read())
                         {
-                            if (rdr_findtemplate.Read())
-                            {
-                                Template = Convert.ToString(rdr_findtemplate["id"]);
-                            }
-                            else
-                            {
-                                throw new System.Exception(String.Format("Не знайдено шаблон {0} у таблиці doc_scheme, або шаблон не описано як FastReport", Template));
-                            }
+                            Template = Convert.ToString(rdr_findtemplate["id"]);
+                        }
+                        else
+                        {
+                            throw new System.Exception(String.Format("Не знайдено шаблон {0} у таблиці doc_scheme, або шаблон не описано як FastReport", Template));
                         }
                     }
                 }
@@ -225,29 +203,6 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
             return Template;
         }
 
-        private static Boolean CkConditionIRREVOCABLE(Decimal DptID, Int32 AgrTypeID, OracleConnection con)
-        {
-            Boolean res = false;
-
-            using (OracleCommand cmd = con.CreateCommand())
-            {
-                cmd.CommandText = @"select dpt_irrevocable(:p_dpt_id) from dual";
-                cmd.Parameters.Add("p_dpt_id", OracleDbType.Decimal, DptID, ParameterDirection.Input);
-
-                using (OracleDataReader rdr = cmd.ExecuteReader())
-                {
-                    try
-                    {
-                        if (rdr.Read())
-                        {
-                            res = rdr.GetOracleDecimal(0).Value != 1;
-                        }
-                    }
-                    catch { }
-                }
-            }
-            return res;
-        }
         public static XRMDepositAgreementResult ProcDepositAgreement(XRMDepositAgreementReq DepositAgrmnt, OracleConnection con)
         {
             XRMDepositAgreementResult ODepositAgrRes = new XRMDepositAgreementResult();
@@ -499,7 +454,9 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
 
                     if (ODepositRes.DptId != null)
                     {
-                        decimal dpt_id = Convert.ToDecimal(ODepositRes.DptId);
+                        decimal dpt_id = ODepositRes.DptId.AddRuTail(DepositParams.KF);
+                        long rnk = DepositParams.Rnk.AddRuTail(DepositParams.KF);
+
                         decimal dpt_agreement = 0;
 
                         // проверки на третьих лиц
@@ -508,32 +465,31 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                             switch (DepositParams.DepositType)
                             {
                                 case 1: // 1(депозит на бенефіціара);
-                                    dpt_agreement = DepositAgreement.Create(dpt_id, 5, DepositParams.Rnk,
-                                        DepositParams.RNKBeneficiary, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, XRMIntegrationUtl.CXRMinfo()),
+                                    dpt_agreement = DepositAgreement.Create(dpt_id, 5, rnk,
+                                        DepositParams.RNKBeneficiary.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                         null, null, 11111111, 0, con);
                                     break;
                                 case 2: // 2(депозит на імя малолітньої особи); 
-                                    dpt_agreement = DepositAgreement.Create(dpt_id, 12, DepositParams.Rnk,
-                                       RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, XRMIntegrationUtl.CXRMinfo()),
+                                    dpt_agreement = DepositAgreement.Create(dpt_id, 12, rnk,
+                                       RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
-                                    dpt_agreement = DepositAgreement.Create(dpt_id, 26, DepositParams.Rnk,
-                                       RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, XRMIntegrationUtl.CXRMinfo()),
+                                    dpt_agreement = DepositAgreement.Create(dpt_id, 26, rnk,
+                                       RNK, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
                                     break;
                                 case 3: //3(депозит на користь малолітньої особи);
-                                    dpt_agreement = DepositAgreement.Create(dpt_id, 26, DepositParams.Rnk,
-                                       DepositParams.RNKInfant, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, XRMIntegrationUtl.CXRMinfo()),
+                                    dpt_agreement = DepositAgreement.Create(dpt_id, 26, rnk,
+                                       DepositParams.RNKInfant.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
-                                    dpt_agreement = DepositAgreement.Create(dpt_id, 27, DepositParams.Rnk,
-                                       DepositParams.RNKTrustee, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, XRMIntegrationUtl.CXRMinfo()),
+                                    dpt_agreement = DepositAgreement.Create(dpt_id, 27, rnk,
+                                       DepositParams.RNKTrustee.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                        null, null, 11111111, 0, con);
                                     break;
                                 case 4: //4(відкритий по довіреності) 
                                     decimal commisrequest = Tools.CreateCommisRequest(dpt_id, 12);
-                                    dpt_agreement = DepositAgreement.Create(dpt_id, 12, DepositParams.Rnk,
-                                        DepositParams.RNKTrustee, null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, XRMIntegrationUtl.CXRMinfo()),
+                                    dpt_agreement = DepositAgreement.Create(dpt_id, 12, rnk,
+                                        DepositParams.RNKTrustee.AddRuTail(DepositParams.KF), null, null, null, DepositParams.Datbegin, Convert.ToDateTime(ODepositRes.dat_end, BarsWebService.CXRMinfo()),
                                         null, commisrequest, 11111111, 0, con);
-                                    //Decimal? WarrantID = ep.DOC_CREATE("SCAN", null, scWarrant.Value, 222, Convert.ToDecimal(Request["rnk_tr"]), dpt.ID);
                                     break;
                             }
                         }
@@ -1143,7 +1099,7 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
             using (OracleXmlType _xml = new OracleXmlType(con, GetXML(req.AccessList).InnerXml))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "ebp.create_access_request";
+                cmd.CommandText = "XRM_INTEGRATION_OE.request_access_req";
                 cmd.BindByName = true;
 
                 cmd.Parameters.Add("p_type", OracleDbType.Decimal, req.Type, ParameterDirection.Input);
@@ -1160,7 +1116,37 @@ namespace Bars.WebServices.XRM.Services.DepositXrm
                 cmd.ExecuteNonQuery();
 
                 OracleDecimal req_id = (OracleDecimal)cmd.Parameters["p_reqid"].Value;
-                res.ReqId = req_id.IsNull ? -1 : req_id.Value;
+                if (req_id.IsNull)
+                {
+                    res.ReqId = -1;
+                }
+                else
+                {
+                    res.ReqId = req_id.Value;
+
+                    string mfo = XrmHelper.GetMfo(con);
+
+                    FrxParameters pars = new FrxParameters();
+                    pars.Add(new FrxParameter("p_req_id", TypeCode.Int64, req_id.Value.AddRuTail(mfo)));
+
+                    byte[] toDeposit = XrmHelper.CreateFrxFile(FrxDoc.GetTemplateFileNameByID("DPT_ACCESS_APPLICATION"), pars);
+
+                    res.Templates.Add(new TemplateDoc()
+                    {
+                        Content = Convert.ToBase64String(toDeposit),
+                        Name = "Заява на доступ до вкладного (депозитного) рахунку через бек-офіс"
+                    });
+
+                    if (req.TrusteeType.ToUpper() != "V")
+                    {
+                        byte[] toCard = XrmHelper.CreateFrxFile(FrxDoc.GetTemplateFileNameByID("DPT_ACCESS_APPLICATION_CARD"), pars);
+                        res.Templates.Add(new TemplateDoc()
+                        {
+                            Name = "Заява на доступ до картки клієнта через бек-офіс",
+                            Content = Convert.ToBase64String(toCard)
+                        });
+                    }
+                }
             }
             return res;
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using Oracle.DataAccess.Client;
@@ -7,7 +6,6 @@ using BarsWeb.Core.Logger;
 using System.Xml;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using Bars.WebServices.XRM.Services.Card;
 using Bars.WebServices.XRM.Models;
 using Bars.WebServices.XRM.Services.Card.Models;
 
@@ -25,11 +23,12 @@ namespace Bars.WebServices.XRM.Services.Card
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [System.Web.Script.Services.ScriptService]
-    public class XRMIntegrationCard : BarsWebService
+    public class XRMIntegrationCard : XrmBaseWebService
     {
         private const int ErrorResCode = -1;
         public WsHeader WsHeaderValue;
         private IDbLogger _dbLogger;
+
         public XRMIntegrationCard()
         {
             moduleName = "XRMIntegrationCard";
@@ -214,6 +213,10 @@ namespace Bars.WebServices.XRM.Services.Card
                     TransSuccess = TransactionCheck(con, XRMCardCreditReq.TransactionId, out responseBytes);
                     if (TransSuccess == 0)
                     {
+                        for (int i = 0; i < XRMCardCreditReq.acc.Length; i++)
+                        {
+                            XRMCardCreditReq.acc[i] = XRMCardCreditReq.acc[i].AddRuTail(XRMCardCreditReq.KF.ToString());
+                        }
                         TransactionCreate(con, XRMCardCreditReq.TransactionId, XRMCardCreditReq.UserLogin, XRMCardCreditReq.OperationType);
                         XRMCardCreditRes = CardWorker.SetCardCredit(XRMCardCreditReq, con);
                     }

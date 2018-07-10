@@ -4,11 +4,11 @@ using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using System.Collections.Generic;
 using Bars.WebServices.XRM.Services.SKRN.Models;
+using Bars.WebServices.XRM.Services;
 using Bars.WebServices.XRM.Models;
 using System.IO;
 using Bars.DocPrint;
 using System.Text;
-using Bars.Classes;
 
 namespace Bars.WebServices.XRM.Services.SKRN
 {
@@ -54,25 +54,15 @@ namespace Bars.WebServices.XRM.Services.SKRN
                 if (count <= 0) throw new System.Exception(string.Format("Договору з номером \"{0}\" не знайдено", request.AdditionalData.Nd));
             }
 
-            string templatePath;
-            string[] tmp = request.AdditionalData.TemplateId.Split('.');
-            if (tmp.Length == 2)
-                templatePath = FrxDoc.GetTemplatePathByFileName(request.AdditionalData.TemplateId + ".frx");
-            else
-                templatePath = FrxDoc.GetTemplatePathByFileName(tmp[0] + ".frx");
+            var ext = request.AdditionalData.TemplateId.Length <= 4 ? "" : request.AdditionalData.TemplateId.Substring(request.AdditionalData.TemplateId.Length - 4);
+            if (ext != ".frx") request.AdditionalData.TemplateId += ".frx";
 
+            string mfo = XrmHelper.GetMfo(con);
             FrxParameters pars = new FrxParameters();
-            pars.Add(new FrxParameter("p_nd", TypeCode.Int32, request.AdditionalData.Nd));
-            pars.Add(new FrxParameter("p_rnk", TypeCode.Int64, request.AdditionalData.Rnk));
+            pars.Add(new FrxParameter("p_nd", TypeCode.Int32, request.AdditionalData.Nd.AddRuTail(mfo)));
+            pars.Add(new FrxParameter("p_rnk", TypeCode.Int64, request.AdditionalData.Rnk.AddRuTail(mfo)));
 
-            FrxDoc doc = new FrxDoc(templatePath, pars, null);
-            byte[] content;
-
-            using (MemoryStream str = new MemoryStream())
-            {
-                doc.ExportToMemoryStream(FrxExportTypes.Pdf, str);
-                content = str.ToArray();
-            }
+            byte[] content = XrmHelper.CreateFrxFile(request.AdditionalData.TemplateId, pars);
 
             return new XRMResponseDetailed<string>()
             {
@@ -232,7 +222,6 @@ namespace Bars.WebServices.XRM.Services.SKRN
                     cmd.Parameters.Add(rMsg);
 
                     cmd.ExecuteNonQuery();
-
                     MessageProcessing(rMsg);
                 }
             }
@@ -280,40 +269,18 @@ namespace Bars.WebServices.XRM.Services.SKRN
                     Extension = "HTML"
                 }
             };
+            bool printBM = 1 == request.AdditionalData.PrintBuhModel;
 
+            string mfo = XrmHelper.GetMfo(con);
+            long _ref = long.Parse(request.AdditionalData.Reference).AddRuTail(mfo);
 
-            //XRMResponseDetailed<PrintDocByRefResponse> response = new XRMResponseDetailed<PrintDocByRefResponse>()
-            //{
-            //    Results = new PrintDocByRefResponse()
-            //    {
-            //        Extension = "PDF"
-            //    }
-            //};
-
-            //FrxParameters pars = new FrxParameters();
-            //pars.Add(new FrxParameter("p_ref_c", TypeCode.Decimal, request.AdditionalData.Reference));
-
-            //string frxName = DocInput.DocService.GetPdfFileName(Convert.ToDecimal(request.AdditionalData.Reference));
-
-            //if (!string.IsNullOrWhiteSpace(frxName))
-            //{
-            //    string templatePath = FrxDoc.GetTemplatePathByFileName(frxName);
-            //    FrxDoc doc = new FrxDoc(templatePath, pars, null);
-
-            //    using (MemoryStream str = new MemoryStream())
-            //    {
-            //        doc.ExportToMemoryStream(FrxExportTypes.Pdf, str);
-            //        response.Results.Content = Convert.ToBase64String(str.ToArray());
-            //    }
-            //}
-            //else
-            //{
-            cDocPrint ourTick = new cDocPrint(con, long.Parse(request.AdditionalData.Reference), FrxDoc.GetTemplatePathByFileName(""), true, false);
+            cDocPrint ourTick = new cDocPrint(con, _ref, FrxDoc.GetTemplatePathByFileName(""), printBM, false);
             response.Results.Content = Convert.ToBase64String(CreateHtmlF(ourTick.GetTicketFileName()));
-            //}
 
             return response;
         }
+
+
 
         private static byte[] CreateHtmlF(string tmpFile)
         {
