@@ -166,6 +166,7 @@ namespace CustomerList
                    round(sum(fost(:acc, f.fdat) ) /count(*),0) ix
             from  fdat f
             where fdat >= :dat1 and fdat <=:dat2
+            having COUNT (*) > 0
             union all
             select 
             0 acc,
