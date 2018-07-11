@@ -4532,13 +4532,15 @@ procedure del_ref_t902 (p_ref in number) is
 END;
 
 procedure check_t902_dok(p_ref in number) is
-  l_cnt number;
+  l_ref number;
 begin
-  select count(*) into l_cnt from t902 where ref = p_ref;
-  if l_cnt = 0 then
+  select ref into l_ref from t902 where ref = p_ref for update skip locked;
+
+exception
+  when no_data_found then
     raise_application_error(-20000,
                             'Документ вже оброблено!');
-  end if;
+  
 end;
 /**
  * mark_zag_k - помечает заголовок расформированного файла отметкой p_otm
