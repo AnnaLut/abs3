@@ -1,8 +1,7 @@
-PROMPT *** Refresh data ead_nbs ***
-
+prompt Importing table EAD_NBS...
+set feedback off
 delete from EAD_NBS;
-commit;
- 
+
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2512', 2, null, 'pr_uo', null, null, 1);
 
@@ -11,6 +10,9 @@ values ('2520', 2, null, 'pr_uo', null, null, 2);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2523', 2, null, 'pr_uo', null, null, 3);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2525', 2, 'dep_uo', 'dep_uo', null, null, 4);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2526', 2, null, 'pr_uo', null, null, 5);
@@ -32,6 +34,9 @@ values ('2544', 2, null, 'pr_uo', null, null, 10);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2545', 2, null, 'pr_uo', null, null, 11);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2546', 2, 'dep_uo', 'dep_uo', null, null, 12);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2550', 2, null, 'pr_uo', null, null, 13);
@@ -64,80 +69,91 @@ insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('2562', 2, null, 'pr_uo', null, null, 22);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2570', 2, null, 'pr_uo', null, null, 23);
+values ('2565', 2, null, 'pr_uo', null, null, 23);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2571', 2, null, 'pr_uo', null, null, 24);
+values ('2570', 2, null, 'pr_uo', null, null, 24);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2572', 2, null, 'pr_uo', null, null, 25);
+values ('2571', 2, null, 'pr_uo', null, null, 25);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2600', 2, null, 'pr_uo', null, null, 27);
+values ('2572', 2, null, 'pr_uo', null, null, 26);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2601', 2, null, 'pr_uo', null, null, 28);
+values ('2600', 2, null, 'kpk_uo', 'W4', null, 27);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2602', 2, null, 'pr_uo', null, null, 29);
+values ('2600', 2, null, 'pr_uo', null, null, 28);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2603', 2, null, 'pr_uo', null, null, 30);
+values ('2601', 2, null, 'pr_uo', null, null, 29);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2604', 2, null, 'pr_uo', null, null, 31);
+values ('2602', 2, null, 'pr_uo', null, null, 30);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2605', 2, null, 'kpk_uo', null, null, 32);
+values ('2603', 2, null, 'pr_uo', null, null, 31);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2640', 2, null, 'pr_uo', null, null, 38);
+values ('2604', 2, null, 'pr_uo', null, null, 32);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2641', 2, null, 'pr_uo', null, null, 39);
+values ('2605', 2, null, 'kpk_uo', null, null, 33);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2642', 2, null, 'pr_uo', null, null, 40);
+values ('2610', 2, 'dep_uo', 'dep_uo', null, null, 34);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2643', 2, null, 'pr_uo', null, null, 41);
+values ('2611', 2, null, 'pr_uo', null, null, 35);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2650', 2, null, 'pr_uo', null, null, 42);
+values ('2620', 3, null, 'bpk_fo', 'W4', null, 36);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2655', 2, null, 'kpk_uo', null, null, 45);
+values ('2625', 3, null, 'bpk_fo', null, null, 37);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2525', 2, 'dep_uo', 'dep_uo', null, null, 4);
+values ('2630', 3, null, null, null, null, 38);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2546', 2, 'dep_uo', 'dep_uo', null, null, 12);
+values ('2640', 2, null, 'pr_uo', null, null, 39);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2610', 2, 'dep_uo', 'dep_uo', null, null, 33);
+values ('2641', 2, null, 'pr_uo', null, null, 40);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2611', 2, null, 'pr_uo', null, null, 34);
+values ('2642', 2, null, 'pr_uo', null, null, 41);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2651', 2, 'dep_uo', 'dep_uo', null, null, 44);
+values ('2643', 2, null, 'pr_uo', null, null, 42);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2909', 2, null, 'transit_uo', null, null, 48);
+values ('2650', 2, null, 'pr_uo', null, null, 43);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2924', 2, null, 'transit_uo', null, null, 50);
+values ('2650', 2, null, 'kpk_uo', 'W4', null, 44);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2630', 3, null, null, null, null, 37);
+values ('2651', 2, 'dep_uo', 'dep_uo', null, null, 45);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2625', 3, null, 'bpk_fo', null, null, 36);
+values ('2655', 2, null, 'kpk_uo', null, null, 46);
+/*
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2909', 2, 'salary_uo', 'transit_uo', null, '11', 47);
+*/
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2924', 2, 'acquiring_uo', 'transit_uo', null, '16', 48);
+/*
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('3578', 2, 'encashment_uo', 'transit_uo', null, '17', 49);
 
 insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
-values ('2620', 3, null, null, null, null, 35);
+values ('3578', 3, 'encashment_fo', 'transit_uo', null, '15', 50);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('3578', 2, 'encashment_uo', 'transit_uo', null, '09', 51);
+*/
 commit;
-
-
-COMMIT;
+prompt Done.

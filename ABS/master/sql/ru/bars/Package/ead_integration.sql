@@ -1,8 +1,11 @@
-Prompt Package EAD_INTEGRATION;
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** Run
+PROMPT ===================================================================================== 
+Prompt Package Header EAD_INTEGRATION;
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.1 12.06.2018';
    g_type_id  object_type.id%type;
-   g_state_id object_state.state_id%type;
+   g_state_id number;
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -12,14 +15,14 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    /*ТОЛЬКО ДЛЯ МЕТОДА SetDocumentData (функция get_Doc_Instance) в связи с внедрением ДКБО и печатных документов к нему, требуется определять тип сделки и тип счета по ead_docs*/
    function get_agr_type(p_agr_id in EAD_DOCS.AGR_ID%type) return varchar2;
    function get_acc_type(p_agr_id in EAD_DOCS.AGR_ID%type, p_acc in EAD_DOCS.acc%type) return varchar2;
-   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out object_state.state_id%type);
+   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out number);
   procedure get_dkbo(p_acc         in accounts.acc%type,
                      p_id          out deal.id%type,
                      p_deal_number out deal.deal_number%type,
                      p_start_date  out deal.start_date%type,
                      p_state_id    out deal.state_id%type);
-                     
-  function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
+ 
+function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
                                p_tip  varchar2,
                                p_ob22 varchar2 ) return number;                         
    -----------------------------------------------------------------------
@@ -50,7 +53,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
       doc_binary_data       ead_docs.scan_data%TYPE,
       doc_request_number    CUST_REQUESTS.REQ_ID%TYPE,
       agr_code              ead_docs.agr_id%TYPE,
-      agr_type              varchar2(50),
+      agr_type              ead_nbs.agr_type%type,
       account_type          varchar2(50), -- размерность 50 - от себя
       account_number        accounts.nls%TYPE,
       account_currency      accounts.kv%TYPE,
@@ -168,9 +171,9 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    -----------------------------------------------------------------------
    TYPE AgrDPT_Instance_Rec IS RECORD
    (  rnk              customer.rnk%TYPE,
-      parent_agr_type  varchar2(10),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
+      parent_agr_type  varchar2(50),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
       parent_agr_code  deal.deal_number%type, -- это поле заполняется номером ДКБО только для депозитов онлайн
-      agr_type         varchar2(50),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         dpt_deposit_clos.deposit_id%TYPE,
       agr_number       dpt_deposit_clos.nd%TYPE,
       agr_status       SMALLINT,
@@ -204,9 +207,9 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    TYPE AgrBPK_Instance_Rec IS RECORD
    (
       rnk              customer.rnk%TYPE,
-      parent_agr_type  varchar2(10),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
+      parent_agr_type  varchar2(50),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
       parent_agr_code  deal.DEAL_NUMBER%type, -- это поле заполняется номером ДКБО только для депозитов онлайн
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         dpt_deposit_clos.deposit_id%TYPE,
       agr_number       dpt_deposit_clos.nd%TYPE,
       agr_status       SMALLINT,
@@ -227,9 +230,9 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
   ---- DKBO 22/05/2017
    TYPE AgrDKBO_Instance_Rec IS RECORD
    (  rnk              customer.rnk%TYPE,
-      parent_agr_type  varchar(10),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
+      parent_agr_type  varchar(50),           -- это поле заполняется типом dkbo_fo только для депозитов онлайн
       parent_agr_code  deal.DEAL_NUMBER%type, -- это поле заполняется номером ДКБО только для депозитов онлайн
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         deal.id%TYPE,
       agr_number       deal.deal_number%TYPE,
       agr_status       SMALLINT,
@@ -256,7 +259,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    (
 
       rnk              customer.rnk%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         varchar2(50),
       agr_number       dpu_deal.nd%TYPE,
       agr_status       SMALLINT,
@@ -279,7 +282,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    (
 
       rnk              customer.rnk%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         specparam.nkd%TYPE,
       agr_number       specparam.nkd%TYPE,
       agr_status       SMALLINT,
@@ -309,7 +312,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
       branch_id        branch.branch%TYPE,
       user_login       staff$base.logname%TYPE,
       user_fio         staff$base.fio%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_status       SMALLINT,
       agr_number       specparam.nkd%TYPE,
       agr_date_open    accounts.daos%TYPE,
@@ -332,7 +335,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
       branch_id        branch.branch%TYPE,
       user_login       staff$base.logname%TYPE,
       user_fio         staff$base.fio%TYPE,
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_status       int,
       agr_number       varchar2(100),
       agr_date_open    accounts.daos%TYPE,
@@ -348,7 +351,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    TYPE UAgrSalary_Instance_Rec IS RECORD
    (
       rnk              customer.rnk%TYPE,
-      agr_type         varchar2 (10),
+      agr_type         ead_nbs.agr_type%type,
       agr_code         zp_deals.id%type,
       agr_number       zp_deals.deal_id%type,
       agr_status       number,
@@ -388,7 +391,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
       agr_number       specparam.nkd%TYPE,
       agr_code         VARCHAR2 (500),
       account_type     VARCHAR2 (500),
-      agr_type         VARCHAR2 (10),
+      agr_type         ead_nbs.agr_type%type,
       remote_controled number(1)
    );
 
@@ -398,7 +401,7 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
 
   TYPE ACC_Instance_Rec IS RECORD(
     rnk                       customer.rnk%TYPE,
-    agr_type                  VARCHAR2(20),
+    agr_type                  ead_nbs.agr_type%type,
     agr_code                  VARCHAR2(500),
     agr_number                specparam.nkd%TYPE,
     account_type              VARCHAR2(500),
@@ -446,10 +449,6 @@ END ead_integration;
 /
 SHOW ERRORS;
 
-
-Prompt Grants on PACKAGE EAD_INTEGRATION TO BARS_ACCESS_DEFROLE to BARS_ACCESS_DEFROLE;
-GRANT EXECUTE ON BARS.EAD_INTEGRATION TO BARS_ACCESS_DEFROLE
-/
 Prompt Package Body EAD_INTEGRATION;
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
    g_body_version constant varchar2(64) := 'version 3.1 12.06.2018';
@@ -459,7 +458,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
      agr_code  specparam.nkd%type,
      agr_number  string(50),
      acc_type  string(50),
-     agr_type  string(50),
+     agr_type  ead_nbs.agr_type%type,
      agr_date  string(50),
      agr_status  number,
   --                               p_parent_agr_code out varchar2,
@@ -524,7 +523,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
    function get_acc_type(p_agr_id in EAD_DOCS.AGR_ID%type, p_acc in EAD_DOCS.acc%type) return varchar2
    is
    l_res varchar2(50) := null;
-   l_agr_type varchar2(50);
+   l_agr_type ead_nbs.agr_type%type;
    begin
     l_agr_type := get_agr_type(p_agr_id);
 
@@ -545,7 +544,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
     return l_res;
    end get_acc_type;
 
-   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out object_state.state_id%type) is
+   procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out number) is
    begin
      SELECT ot.id, os.state_id
        into l_type_id, l_state_id
@@ -771,7 +770,7 @@ end  ead_nbs_check_param;
                    rnk,
                    e.acc_type,
                    e.agr_type,
-                   1,
+                   10,
                    e.custtype,
                    substr(nls,1,4)
               into l_daos,
@@ -1129,7 +1128,7 @@ end  ead_nbs_check_param;
                     AND cu.idupd = (SELECT MAX (cu.idupd)
                                       FROM customer_update cu
                                      WHERE cu.rnk = c.rnk)
-                    AND cu.doneby = sb.logname)
+                    AND cu.doneby = sb.logname(+))
 
     loop
         l_UClient_Instance_Rec.branch_id                := i.branch_id;
@@ -1496,7 +1495,7 @@ end  ead_nbs_check_param;
     is
        l_UAgrDBO_Instance_Rec   UAgrDBO_Instance_Rec;
         l_agr_code specparam.nkd%type;
-        l_agr_type varchar2(10);
+        l_agr_type ead_nbs.agr_type%type;
         l_agr_date varchar2(10);
         l_agr_status number(2);
      begin
@@ -1554,7 +1553,7 @@ end  ead_nbs_check_param;
                                                                ELSE 0 END) AS agr_status,
 --                           agr_code as  agr_number,
                            NVL (TO_DATE ( rAccAgrParam.agr_date, 'dd.mm.yyyy'), daos) AS agr_date_open,
-                           CASE WHEN dazs IS NULL OR dazs > SYSDATE or DAOS = DAZS THEN TO_DATE (NULL) ELSE dazs END AS agr_date_close
+                           CASE WHEN dazs IS NULL OR dazs > SYSDATE THEN TO_DATE (NULL) ELSE dazs END AS agr_date_close
                       FROM (SELECT au.idupd, a.kf,
                                    MAX (au.idupd) OVER (ORDER BY au.acc, au.chgdate DESC) max_idupd,
                                    a.branch, a.rnk, TRUNC(a.daos) daos, a.dazs,
@@ -1582,7 +1581,7 @@ end  ead_nbs_check_param;
             l_UAgrACC_Instance_Rec.agr_status      := i.agr_status;
             l_UAgrACC_Instance_Rec.agr_number      := i.agr_code;
             l_UAgrACC_Instance_Rec.agr_date_open   := i.agr_date_open;
-            l_UAgrACC_Instance_Rec.agr_date_close  := i.agr_date_close;
+            l_UAgrACC_Instance_Rec.agr_date_close  := case when i.agr_status = 10 then null else i.agr_date_close end;
 
             PIPE ROW (l_UAgrACC_Instance_Rec);
         end loop;
@@ -1955,7 +1954,7 @@ end  ead_nbs_check_param;
                        CASE
                           WHEN (a.dazs IS NULL AND a.blkd = 0 AND a.blkk = 0) THEN 1                -- открыт
                           WHEN a.dazs IS NOT NULL and a.dazs != a.daos and a.nbs is not null THEN 2 -- закрыт
-                          /*WHEN a.dazs IS NOT NULL THEN 6*/
+                          WHEN a.dazs IS NOT NULL THEN 6
                           WHEN (a.blkd <> 0 AND a.blkk = 0) THEN 3
                           WHEN (a.blkk <> 0 AND a.blkd = 0) THEN 4
                           WHEN (a.blkd <> 0 AND a.blkd <> 0) THEN 5
@@ -1967,6 +1966,7 @@ end  ead_nbs_check_param;
                        AND au.idupd = (SELECT MAX (au0.idupd)
                                          FROM accounts_update au0
                                         WHERE au0.acc = a.acc)
+      and a.nbs = case when a.nbs = '2620' and substr(a.tip,1,2) <> 'W4' then null else a.nbs end                                              
                        AND au.doneby = sb.logname(+))
         loop
           l_ACC_Instance_Rec.rnk                       := ead_integration.split_key(i.rnk, i.kf);
@@ -2031,6 +2031,13 @@ END ead_integration;
 SHOW ERRORS;
 
 
+
+prompt ***  grants on ead_integration ***
 Prompt Grants on PACKAGE EAD_INTEGRATION TO BARS_ACCESS_DEFROLE to BARS_ACCESS_DEFROLE;
-GRANT EXECUTE ON BARS.EAD_INTEGRATION TO BARS_ACCESS_DEFROLE
-/
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** End
+ PROMPT ===================================================================================== 
+ 
