@@ -409,13 +409,16 @@ BEGIN
       from bars.accounts a
       join bars.w4_Acc wa
         on wa.acc_pk = a.acc
+        and wa.kf = a.kf
 --       and l_dat between nvl(wa.dat_begin, date '1991-01-01') and nvl(wa.dat_end, date '4991-01-01')
       join bars.w4_Card wc
         on wc.code = wa.card_code
+        and wc.kf = a.kf
 --       and l_dat between nvl(wc.date_open, date '1991-01-01') and nvl(wc.date_close, date '4991-01-01')
       join bars.w4_product wp
         on wp.code = wc.product_code
        and wp.grp_code = 'SALARY'
+       and wp.kf = a.kf
 --       and l_dat between nvl(wc.date_open, date '1991-01-01') and nvl(wc.date_close, date '4991-01-01')
      where 1 = 1
        and wp.name not like '%STUD%'

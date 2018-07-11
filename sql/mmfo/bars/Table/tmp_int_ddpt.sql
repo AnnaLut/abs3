@@ -1,3 +1,4 @@
+
 PROMPT ===================== *** drop table tmp_int_ddpt *** ===============================
 
 begin
@@ -7,9 +8,9 @@ begin
   end;
 end;
 /
+
 PROMPT =============== *** create and fill table tmp_int_ddpt *** ==========================
 BEGIN 
-
  begin
    execute immediate 'CREATE TABLE tmp_int_ddpt AS
 (select d.deposit_id, d.dat_begin, d.vidd, d.acc, d.kv, d.rnk, d.kf, d.branch, nvl(d.cnt_dubl,0) cnt_dubl,
@@ -28,10 +29,12 @@ inner join bars.brates br on br.br_id = ir.br and br.br_type = 1
 inner join bars.dpt_vidd dv on dv.vidd = d.vidd
 inner join bars.dpt_types dt on dt.type_id = dv.type_id 
 where 1=1
+and d.kf in (328845, 337568)
 and d.dat_begin >= to_date(''28.02.2017'',''DD.MM.YYYY'')
 and (d.dat_end is null or d.dat_end > trunc(sysdate))
-and ir.bdat = (select max(bdat) from bars.int_ratn where acc = ir.acc))';
-and dt.type_code not in (''AKC'',''MPRG'')
+and ir.bdat = (select max(bdat) from bars.int_ratn where acc = ir.acc)
+and dt.type_code not in (''AKC'',''MPRG'') 
+)';
 
 exception
   when OTHERS then 
