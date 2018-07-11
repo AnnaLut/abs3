@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_POSITIONER.sql =========*** Run 
 PROMPT ===================================================================================== 
@@ -7,12 +5,13 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_POSITIONER ***
 
-  CREATE OR REPLACE PROCEDURE BARS.P_POSITIONER (p_ref oper.ref%type, p_acc accounts.acc%type default null, p_type varchar2, p_103Bic varchar2 default null, p_202Bic varchar2 default null)
+create or replace procedure p_positioner(p_ref oper.ref%type, p_acc accounts.acc%type default null, p_type varchar2, p_103Bic varchar2 default null, p_202Bic varchar2 default null)
 is
   l_rowacc  v_sw_corracc%rowtype;
   l_rowdocs v_sw_corracc_docs%rowtype;
   l_okpo_b customer.okpo%type;
   l_ref number;
+  l_refl number;
   l_tabn staff$base.tabn%type;
 begin
   if p_acc is not null
@@ -20,8 +19,18 @@ begin
    select t.* into l_rowacc from  v_sw_corracc t
    where t.acc=p_acc;
   end if;
+  
+  begin
    select t.* into l_rowdocs from v_sw_corracc_docs t
    where t.ref=p_ref;
+  exception when no_data_found then
+    raise_application_error(-20000, 'Документ № '||to_char(p_ref)||' вже оброблено!');
+  end;
+   
+   select refl into l_refl from oper where ref=l_rowdocs.ref for update nowait;
+   
+  
+   
 
  if p_type='DEL' then
 
@@ -46,6 +55,10 @@ begin
 
    if l_rowacc.kv!= l_rowdocs.kv
     then return;
+   end if;
+   
+   if (l_refl is not null) then 
+    return;
    end if;
 
    begin
@@ -120,6 +133,11 @@ begin
 
    if l_rowacc.kv!= l_rowdocs.kv
     then return;
+   end if;
+   
+   if (l_refl is not null) then 
+    return;
+    --raise_application_error(-20000, 'Nononon!');
    end if;
 
       begin
