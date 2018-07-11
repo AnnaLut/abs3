@@ -1,7 +1,7 @@
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_pack.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
-
+ Prompt Package Header EAD_PACK;
  CREATE OR REPLACE PACKAGE BARS.EAD_PACK is
 
   -- Author  : TVSUKHOV
@@ -129,7 +129,7 @@ end ead_pack;
 /
 show errors
 
-
+Prompt Package BODY EAD_PACK;
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
    g_body_version constant varchar2(64) := 'version 3.1  12.06.2018';
@@ -1531,17 +1531,28 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
  l_ndbo varchar2(50);
  l_sdbo varchar2(50);
  l_daos date;
+      l_agr_type ead_nbs.agr_type%type;
+      l_acc_type ead_nbs.acc_type%type;
  begin
   -- узнать, является ли счет - счетом в рамках ДБО
   --1) наличие у клиента ДБО-договора
-  select kl.get_customerw (rnk, 'NDBO'), kl.get_customerw (rnk, 'DDBO'), daos
-    into l_ndbo, l_sdbo, l_daos
-	from accounts
-   where acc = p_acc;
+      SELECT kl.get_customerw (a.rnk, 'NDBO'),
+             kl.get_customerw (a.rnk, 'DDBO'),
+             a.daos,
+             e.agr_type,
+             e.acc_type
+        INTO l_ndbo, l_sdbo, l_daos, l_agr_type, l_acc_type
+        FROM accounts a, ead_nbs e
+             WHERE a.acc  = p_acc
+               and e.id   = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22);
+
   --2) если нет договора ДБО - то точно это обычный, резалт еще 0
   --3) если ДБО оформлен, счет может быть открыт до ДБО, его считаем "старым"
-    if (l_ndbo is not null and trunc(l_daos) >= to_date(replace(l_sdbo,'.','/'), 'dd/mm/yyyy'))
-	then l_result := 1;
+      IF (    l_ndbo IS NOT NULL
+          AND TRUNC (l_daos) >= TO_DATE (REPLACE (l_sdbo, '.', '/'), 'dd/mm/yyyy')
+          and l_agr_type not in ( 'acquiring_uo', 'salary_uo' ) ) -- Если на счете acquiring_uo, надо возвращать 0. (cdc_agr_u -> ead_pack.msg_create ('UAGR', cur.agr_type || ';' || TO_CHAR (cur.acc), cur.rnk, cur.kf);)
+      THEN
+         l_result := 1;
 	end if;
   return l_result;
  end;
