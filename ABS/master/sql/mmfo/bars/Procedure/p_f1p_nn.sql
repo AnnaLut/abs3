@@ -7,8 +7,10 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F1P_NN ***
 
-CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (dat_      DATE,
-                                           sheme_    VARCHAR2 DEFAULT 'D')
+CREATE OR REPLACE PROCEDURE BARS.P_F1P_NN (
+                        dat_      DATE,
+                        sheme_    VARCHAR2 DEFAULT 'D', 
+                        type_     varchar2 default ' ') 
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
@@ -2805,8 +2807,11 @@ BEGIN
    END LOOP;
 
    ----------------------------------------------------
+   if type_ != 'X'  then
+
    DELETE FROM tmp_nbu
          WHERE kodf = kodf_ AND datf = dat_;
+   end if;
 
    UPDATE rnbu_trace a
       SET a.znap = '777'
@@ -2880,127 +2885,132 @@ BEGIN
                                 )
      and substr(kodp, 17, 4) <> '1600';
 
-   OPEN basel;
+---------------------------------------------------
+   if type_ != 'X'  then
 
-   LOOP
-      FETCH basel
-         INTO kodp_, znap_;
-
-      EXIT WHEN basel%NOTFOUND;
-
-      BEGIN
-         IF TRIM (znap_) IS NOT NULL
-         THEN
-            SELECT COUNT (*)
-              INTO kol_
-              FROM tmp_nbu
-             WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
-
-            IF kol_ = 0
+      OPEN basel;
+   
+      LOOP
+         FETCH basel
+            INTO kodp_, znap_;
+   
+         EXIT WHEN basel%NOTFOUND;
+   
+         BEGIN
+            IF TRIM (znap_) IS NOT NULL
             THEN
-               INSERT INTO tmp_nbu (kodf,
-                                    datf,
-                                    kodp,
-                                    znap,
-                                    nbuc)
-                    VALUES (kodf_,
-                            dat_,
-                            kodp_,
-                            znap_,
-                            nbuc_);
+               SELECT COUNT (*)
+                 INTO kol_
+                 FROM tmp_nbu
+                WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
+   
+               IF kol_ = 0
+               THEN
+                  INSERT INTO tmp_nbu (kodf,
+                                       datf,
+                                       kodp,
+                                       znap,
+                                       nbuc)
+                       VALUES (kodf_,
+                               dat_,
+                               kodp_,
+                               znap_,
+                               nbuc_);
+               END IF;
             END IF;
-         END IF;
-      EXCEPTION
-         WHEN OTHERS
-         THEN
-            raise_application_error (
-               -20004,
-               'Ошибка: ' || SQLERRM || ' kodp:' || kodp_);
-      END;
-   END LOOP;
-
-   CLOSE basel;
-
-   -- формирование показателя DD='80' - кількість операцій
-   nnn_ := 0;
-
-   FOR k
-      IN (  SELECT DISTINCT
-                   kodp,
-                   znap,
-                   nbuc,
-                   NVL (
-                      COUNT (
-                         *)
-                      OVER (PARTITION BY kodp, znap, nbuc
-                            ORDER BY kodp, znap, nbuc),
-                      0)
-                      p80
-              FROM rnbu_trace
-             WHERE SUBSTR (kodp, 1, 2) IN ('99')
-          ORDER BY SUBSTR (kodp, 3, 28),
-                   SUBSTR (kodp, 31),
-                   SUBSTR (kodp, 1, 2))
-   LOOP
-      kodp_ := '80' || SUBSTR (k.kodp, 3, 31);
-
-      BEGIN
-         IF k.p80 IS NOT NULL
-         THEN
-            SELECT COUNT (*)
-              INTO kol_
-              FROM tmp_nbu
-             WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
-
-            IF kol_ = 0
+         EXCEPTION
+            WHEN OTHERS
             THEN
-               INSERT INTO tmp_nbu (kodf,
-                                    datf,
-                                    kodp,
-                                    znap,
-                                    nbuc)
-                    VALUES (kodf_,
-                            dat_,
-                            kodp_,
-                            k.p80,
-                            nbuc_);
+               raise_application_error (
+                  -20004,
+                  'Ошибка: ' || SQLERRM || ' kodp:' || kodp_);
+         END;
+      END LOOP;
+   
+      CLOSE basel;
+   
+      -- формирование показателя DD='80' - кількість операцій
+      nnn_ := 0;
+   
+      FOR k
+         IN (  SELECT DISTINCT
+                      kodp,
+                      znap,
+                      nbuc,
+                      NVL (
+                         COUNT (
+                            *)
+                         OVER (PARTITION BY kodp, znap, nbuc
+                               ORDER BY kodp, znap, nbuc),
+                         0)
+                         p80
+                 FROM rnbu_trace
+                WHERE SUBSTR (kodp, 1, 2) IN ('99')
+             ORDER BY SUBSTR (kodp, 3, 28),
+                      SUBSTR (kodp, 31),
+                      SUBSTR (kodp, 1, 2))
+      LOOP
+         kodp_ := '80' || SUBSTR (k.kodp, 3, 31);
+   
+         BEGIN
+            IF k.p80 IS NOT NULL
+            THEN
+               SELECT COUNT (*)
+                 INTO kol_
+                 FROM tmp_nbu
+                WHERE kodf = kodf_ AND datf = dat_ AND kodp = kodp_;
+   
+               IF kol_ = 0
+               THEN
+                  INSERT INTO tmp_nbu (kodf,
+                                       datf,
+                                       kodp,
+                                       znap,
+                                       nbuc)
+                       VALUES (kodf_,
+                               dat_,
+                               kodp_,
+                               k.p80,
+                               nbuc_);
+               END IF;
             END IF;
-         END IF;
-      EXCEPTION
-         WHEN OTHERS
-         THEN
-            raise_application_error (
-               -20004,
-               'Ошибка: ' || SQLERRM || ' kodp:' || kodp_);
-      END;
-   END LOOP;
-
-   INSERT INTO tmp_nbu (kodf,
-                        datf,
-                        kodp,
-                        znap,
-                        nbuc)
-        SELECT kodf_,
-               dat_,
-               kodp,
-               SUM (NVL (znap, '0')),
-               nbuc_
-          FROM rnbu_trace
-         WHERE SUBSTR (kodp, 1, 2) NOT IN
-                  ('03', '04', '05', '06', '07', '10', '80', '99')
-      GROUP BY kodf_,
-               dat_,
-               kodp,
-               nbuc_;
-
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               raise_application_error (
+                  -20004,
+                  'Ошибка: ' || SQLERRM || ' kodp:' || kodp_);
+         END;
+      END LOOP;
+   
+      INSERT INTO tmp_nbu (kodf,
+                           datf,
+                           kodp,
+                           znap,
+                           nbuc)
+           SELECT kodf_,
+                  dat_,
+                  kodp,
+                  SUM (NVL (znap, '0')),
+                  nbuc_
+             FROM rnbu_trace
+            WHERE SUBSTR (kodp, 1, 2) NOT IN
+                     ('03', '04', '05', '06', '07', '10', '80', '99')
+         GROUP BY kodf_,
+                  dat_,
+                  kodp,
+                  nbuc_;
+   end if;
+---------------------------------------------------
+   
    logger.info ('P_F1P_NN : End ');
 END p_f1p_nn;
 /
 show err;
 
 PROMPT *** Create  grants  P_F1P_NN ***
-grant EXECUTE                                                                on P_F1P_NN        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on P_F1P_NN        to RPBN002;
+grant EXECUTE                    on P_F1P_NN        to BARS_ACCESS_DEFROLE;
+grant EXECUTE                    on P_F1P_NN        to RPBN002;
 
 
 
