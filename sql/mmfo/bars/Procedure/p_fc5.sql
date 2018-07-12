@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE BARS.P_FC5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL)
+CREATE OR REPLACE PROCEDURE BARS.P_FC5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL, p_mode varchar2 default 'RUN')
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
@@ -1902,6 +1902,9 @@ BEGIN
    end if;
 
    --------------------------------------------------
+  --Что-бы не "пачкать" историю
+  if (p_mode = 'RUN')
+  then
    DELETE FROM tmp_nbu
          WHERE kodf = 'C5' AND datf = dat_;
 
@@ -2184,6 +2187,7 @@ BEGIN
                from snap_balances s
                where fdat = dat_ and ost=0);
     commit;
+   end if;
 
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
