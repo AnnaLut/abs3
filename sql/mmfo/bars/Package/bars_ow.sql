@@ -4061,11 +4061,9 @@ begin
            end if;
         else
            l_nlsb := p_nlsb;
+        end if;
      end if;
-        else
-           l_nlsb := p_nlsb;
-     end if;
-     end if;
+     
      gl.payv(0, l_ref, l_bdate, p_tt, p_dk, p_kv, l_nlsa, p_s, p_kv2, l_nlsb, p_s2);
      if l_mfo = p_mfob and p_mode = 1 then
         gl.pay(2, l_ref, l_bdate);
@@ -5254,42 +5252,43 @@ begin
         from accounts a,
              ( select case
                          when t.debit_anlaccount like tt.mask
-                           or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.debit_anlaccount
+                           or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.debit_anlaccount
                          when t.credit_anlaccount like tt.mask
-                           or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.credit_anlaccount
-                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
-                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
-                      end nls
+                           or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.credit_anlaccount
+                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
+                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
+                      end nls, t.kf
                  from ow_files f, ow_oic_atransfers_data t, ow_trans_mask tt
                 where f.id = t.id
                   and ( t.debit_anlaccount like tt.mask
-                     or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22)
                      or t.credit_anlaccount like tt.mask
-                     or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) )
+                     or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) )
                   and trunc(f.file_date) = p_dat
                   and t.doc_drn = p_drn
-               union
+               union all
                select case
                          when t.debit_anlaccount like tt.mask
-                           or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.debit_anlaccount
+                           or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.debit_anlaccount
                          when t.credit_anlaccount like tt.mask
-                           or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.credit_anlaccount
-                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
-                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
-                      end nls
+                           or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.credit_anlaccount
+                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
+                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
+                      end nls, t.kf
                  from ow_files f, ow_oic_atransfers_hist t, ow_trans_mask tt
                 where f.id = t.id
+				  and t.kf = sys_context('bars_context','user_mfo')
                   and ( t.debit_anlaccount like tt.mask
-                     or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22)
                      or t.credit_anlaccount like tt.mask
-                     or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) )
+                     or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) )
                   and trunc(f.file_date) = p_dat
                   and t.doc_drn = p_drn  ) t
-       where a.nls = t.nls;
+       where a.nls = t.nls and a.kf = t.kf;
    exception when no_data_found then
       l_branch := null;
    end;
@@ -5307,42 +5306,43 @@ begin
         from accounts a,
              ( select case
                          when t.debit_anlaccount like tt.mask
-                           or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.debit_anlaccount
+                           or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.debit_anlaccount
                          when t.credit_anlaccount like tt.mask
-                           or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.credit_anlaccount
-                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
-                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
-                      end nls
+                           or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.credit_anlaccount
+                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
+                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
+                      end nls, t.kf
                  from ow_files f, ow_oic_atransfers_data t, ow_trans_mask tt
                 where f.id = t.id
+				  and t.kf = sys_context('bars_context','user_mfo')				
                   and ( t.debit_anlaccount like tt.mask
-                     or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22)
                      or t.credit_anlaccount like tt.mask
-                     or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) )
+                     or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) )
                   and trunc(f.file_date) = p_dat
                   and t.doc_orn = p_orn
-               union
+               union all
                select case
                          when t.debit_anlaccount like tt.mask
-                           or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.debit_anlaccount
+                           or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.debit_anlaccount
                          when t.credit_anlaccount like tt.mask
-                           or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) then t.credit_anlaccount
-                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
-                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
-                      end nls
+                           or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22) then t.credit_anlaccount
+                         when substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.debit_anlaccount,instr(t.debit_anlaccount,'_',-1)+1)
+                         when substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) then substr(t.credit_anlaccount,instr(t.credit_anlaccount,'_',-1)+1)
+                      end nls, t.kf
                  from ow_files f, ow_oic_atransfers_hist t, ow_trans_mask tt
                 where f.id = t.id
                   and ( t.debit_anlaccount like tt.mask
-                     or substr(t.debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.debit_anlaccount, instr(t.debit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22)
                      or t.credit_anlaccount like tt.mask
-                     or substr(t.credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
-                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22) )
+                     or substr(t.credit_anlaccount,1,4) in (select nbs from w4_nbs_ob22)
+                     or substr(t.credit_anlaccount, instr(t.credit_anlaccount,'_',-1)+1,4) in (select nbs from w4_nbs_ob22) )
                   and trunc(f.file_date) = p_dat
                   and t.doc_orn = p_orn  ) t
-       where a.nls = t.nls;
+       where a.nls = t.nls and a.kf = t.kf;
    exception when no_data_found then
       l_branch := null;
    end;
