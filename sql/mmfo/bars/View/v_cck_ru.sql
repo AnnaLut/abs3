@@ -63,7 +63,10 @@ FROM (SELECT d.nd,
                 d.wdate dwdate,
                 acrn.fprocn(a8.acc, 0, gl.bd) pr,
                 -a8.ostc / 100 ostc,
-                d.sos,
+                case when d.nd in (select ndg from bars.cc_deal cd
+                                              where cd.sos = 13)
+                then 13
+                else d.sos end sos, 
                 c.nmk namk,
                 a8.acc acc8,
                 a8.dazs,
@@ -71,7 +74,10 @@ FROM (SELECT d.nd,
                 DECODE(d.vidd, 1, 2, 2, 2, 3, 2, 3) custtype,
                 d.sdog,
                 vid.name vidd_name,
-                sos.name sos_name,
+                case when d.nd in (select ndg from bars.cc_deal cd
+							                 where cd.sos = 13)
+				then 'Проcрочен субдоговор'
+				else sos.name end sos_name,
                 ia.apl_dat opl_date,
                 ia.s opl_day,
                 (SELECT txt
