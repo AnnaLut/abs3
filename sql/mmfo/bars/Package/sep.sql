@@ -308,8 +308,8 @@ procedure del_ref_t902 (p_ref in number);
 procedure check_t902_dok(p_ref in number);
 
 END;
-/
 
+/
 CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
 --***************************************************************--
 --              Communication with NBU Payment System
@@ -323,7 +323,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.SEP IS
 
 --***************************************************************--
 
-G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 6.62 2018-06-20 vitalii.khomida$';
+G_BODY_VERSION  CONSTANT VARCHAR2(100)  := '$Ver: 6.64 2018-07-13 vitalii.khomida$';
 
 G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 
@@ -3727,7 +3727,7 @@ BEGIN
 
    tmp_:=SUBSTR(d_rec_,3,18);
 
-select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_;
+select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_ and mfo<>'300001';
    /*bars_audit.info('SEP.zap_reqv1 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));*/
    IF /*dir_=3 AND */SUBSTR(d_rec_,2,1)='?' THEN   --  NBU Request
      /*bars_audit.info('SEP.zap_reqv2 dir_ = '||dir_||'SUBSTR(d_rec_,2,1) = '||SUBSTR(d_rec_,2,1));*/
@@ -3739,7 +3739,7 @@ select count(*) into l_cnt from banks where mfop='300465' and mfo = mfob_;
       EXCEPTION WHEN OTHERS THEN NULL;
       END;
    ELSIF dir_ IN (4,6,14) AND INSTR('!+*-',SUBSTR(d_rec_,2,1))>0
- and l_cnt = 0 
+ and l_cnt = 0
 THEN -- Branch reply
 
       BEGIN
