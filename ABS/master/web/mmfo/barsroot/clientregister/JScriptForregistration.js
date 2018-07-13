@@ -272,6 +272,20 @@ function Check_MainRekv() {
         if (curElement == '') curElement = 'ed_OKPO';
         valid = false;
     }
+    else if (gE(getFrame('Tab0'), 'ddl_TGR').value == '3') { // COBUMMFO-8414 -> 9 цифр при виборі Тимчасового реєстру без перевірки КР
+        var newOkpo = prompt('Введіть реєстраційний (обліковий) номер платника податків з Тимчасового реєстру ДПАУ для підтвердження', '');
+        var oldOkpo = gE(getFrame('Tab0'), 'ed_OKPO').value;
+        if (newOkpo) {
+            if (newOkpo != oldOkpo) {
+                alert('Підтвердження ТРДПАУ не співпадає з введеним раніше\r\n (' + newOkpo + ' <> ' + oldOkpo + ').');
+                valid = false;
+            } else {
+                valid = true;
+            }
+        } else {
+            valid = false;
+        }
+    }
     else if (!curWin.checkOKPO(gE(curTab, 'ed_OKPO'))) {
         addClass(gE(curTab, 'ed_OKPO'), 'err');
         if (curElement == '') curElement = 'ed_OKPO';
