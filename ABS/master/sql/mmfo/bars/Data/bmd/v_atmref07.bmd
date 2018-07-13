@@ -130,7 +130,7 @@ begin
   bars_metabase.add_column(l_tabid, 7, 'NLS', 'C', 'Рахунок~заборгованості', '', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 8, 'NMS', 'C', 'Назва~рах', '', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 9, 'OB22', 'C', 'Об22~рах', '', null, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'OSTC', 'N', 'Зал.рах~ІСТОРІЯ', '', null, 5, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=0', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'OSTC', 'N', 'Зал.рах~ІСТОРІЯ', '', null, 5, 0, 0, 0, 0, '', '# ##0.00', 0, 0, '', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=0', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'TIP', 'C', 'Тип~рах', '', null, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 15, 'KOL', 'N', 'Кіл оп.~ВИНИКНЕННЯ', '', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 16, 'DK', 'N', 'DK', '', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
@@ -142,7 +142,7 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку (кучку) по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF17[NSIFUNCTION][ACCESSCODE=>2][PROC=>pul.PUT(''ATM_NLS'',:NLS );pul.PUT(''ATM_ACC'',:ACC);pul.PUT(''ATM_DK'',:DK)][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', 55);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку (кучку) по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF17[NSIFUNCTION][ACCESSCODE=>2][PROC=>pul.PUT(''ATM_NLS'',:NLS );pul.PUT(''ATM_ACC'',:ACC);pul.PUT(''ATM_DK'',:DK);delete from atm_ref3 where acc = :ACC][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', 55);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 4, '=> на 6399/L9 на дату -1 міс по ВИБРАНОМУ рах ', 'KWT_2924.CLS_ATM ( :D , :ACC , 2 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'EACH', 'ЗАКРИТИ на доходи(6399/L9) НЕврегульвані залишки на дату :D-180 днів по рахунку :NLS  ?', 'ОК', '', '', '', 21);
