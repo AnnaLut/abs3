@@ -354,6 +354,8 @@ namespace Bars.Web.Dialog
                         break;
                     }
                 }
+            if (message.Contains("Pooled connection request timed out"))
+                Response.StatusCode = 408;
             Response.Write(resp_str);
             
         }
