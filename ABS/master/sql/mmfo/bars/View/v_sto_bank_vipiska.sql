@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_STO_BANK_VIPISKA.sql =========*** Run
 PROMPT ===================================================================================== 
@@ -79,7 +77,8 @@ PROMPT *** Create  view V_STO_BANK_VIPISKA ***
                                FROM sto_payment_document_link
                               WHERE payment_id = sp.payment_id)
                   AND dk = 1
-                  AND SUBSTR (nls, 1, 4) = '2924')
+                  AND SUBSTR (nls, 1, 4) = '2924'
+				  AND tt='ST1' )
              AS trans_acc_2924,
           payment_amount AS amount,
           payment_amount AS all_amount
