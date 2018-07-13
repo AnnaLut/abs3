@@ -165,7 +165,7 @@ namespace BarsWeb.Areas.Escr.Infrastructure.DI.Implementation
                     r.CREDIT_STATUS_CODE = String.IsNullOrEmpty(reader.GetValue(22).ToString()) ? String.Empty : reader.GetString(22);
                     r.CREDIT_COMMENT = String.IsNullOrEmpty(reader.GetValue(23).ToString()) ? String.Empty : reader.GetString(23);
                     r.STATE_FOR_UI = String.IsNullOrEmpty(reader.GetValue(24).ToString()) ? String.Empty : reader.GetString(24);
-
+					r.NLS = String.IsNullOrEmpty(reader.GetValue(26).ToString()) ? String.Empty : reader.GetString(26);
                     r.GOOD_COST = String.IsNullOrEmpty(reader.GetValue(25).ToString()) ? (decimal?)null : Convert.ToDecimal(reader.GetValue(25), cinfo);
                     r.ACC = Convert.ToDecimal(reader.GetValue(27).ToString());
                     r.DOC_DATE = String.IsNullOrEmpty(reader.GetValue(28).ToString()) ? (DateTime?)null : Convert.ToDateTime(reader.GetValue(28).ToString(), ci);
