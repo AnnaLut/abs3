@@ -76,6 +76,7 @@ procedure UPD3     (p_acc number, p_REF1 number, p_Del number, p_S3 number ) is 
 begin
  If p_S3 > p_Del then return; end if;
  ---------------------------------------
+ delete from ATM_REF3 where acc= p_acc and s is null;
  delete from ATM_REF3 where acc= p_acc and  REF1 = p_Ref1   ;
  insert into ATM_REF3 (s,ref1,acc) values (p_S3*100,p_Ref1, p_acc);
  select sum( s) into l_I3 from ATM_REF3 where acc= p_acc  ;
@@ -199,7 +200,8 @@ begin l_ACC  := NVL( p_acc, to_number( pul.get('ATM_ACC' ))) ;
          If gl.doc.tt in ('015'      )  and bb.ob22 = '81'  and gl.doc.nlsb like '2909%'                      OR 
             gl.doc.tt in ('015','013')  and bb.ob22 = '10'  and gl.doc.nazn like 'Спис.кошти по опрот.плат.%' OR
             gl.doc.tt in ('015'      )  and bb.ob22 = '08'  and gl.doc.nazn like 'Взаємозак%'                 OR 
-            gl.doc.tt in ('015'      )  and bb.ob22 = '07'  and gl.doc.nazn like 'Перенесено%' then null;
+            gl.doc.tt in ('015'      )  and bb.ob22 = '07'  and gl.doc.nazn like 'Перенесено%'                OR  
+			gl.doc.tt in ('310'      )                      and gl.doc.nazn like 'Кошти%'   then null;
          else                                                   x_Err := 'ATM_ERR2'; goto ERR_ ; -- '2)Рах.'||gl.doc.nlsb|| ' не відповідає призначенню'; 
          end if;
       end if ;
