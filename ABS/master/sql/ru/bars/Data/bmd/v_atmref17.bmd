@@ -142,11 +142,14 @@ begin
   bars_metabase.add_column(l_tabid, 16, 'NAZN_PKR', 'C', 'Шаблон-PKR', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 17, 'NAZN_015', 'C', 'Шаблон-015', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'NAZN_310', 'C', 'Шаблон-310', '', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 19, 'NLS_2909', 'C', 'NLS_2909', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'NLS_2909', 'C', '2909/81', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'CHK', 'C', 'CHK', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'CHK3', 'C', 'CHK3', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'S3', 'N', 'План-частка~суми заг.плат', '1.5', null, 8, 0, 0, 0, 0, '', '# ##9.99', 0, 0, 'Sum(S3) ', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 22, 'ITOG3', 'N', 'План-сума~для заг.плат', '1.5', null, 9, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'CHK3', 'C', 'CHK3', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 50, 'NAZX1', 'C', 'NAZX1', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 51, 'NAZX2', 'C', 'NAZX1', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 52, 'NAZX3', 'C', 'NAZX3', '', null, null, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
 
   -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
@@ -167,19 +170,28 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Перерахувати на КАРТКОВИЙ рахунок', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=PKR'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:S1'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_PKR', 165);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Перерахувати на КАРТКОВИЙ рахунок', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=PKR'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_PKR', 165);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Перерахувати на транзит для КАСИ (015)', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=015'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'Nls_B=:NLS_2909'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:S1'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_015', 116);
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Перерахувати на транзит для КАСИ (015)', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=015'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_015'||chr(38)||'Nls_B=:NLS_2909', 116);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Перерахувати на КАСУ (053)', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=053'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:S1'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_015', 27);
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Перерахувати на КАСУ (053)', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=053'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_015', 27);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 8, 'Перерахувати на інше МФО', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=310'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:S1'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_310', 102);
+  bars_metabase.add_nsifunction(l_tabid, 4, 'Перерахувати на інше МФО', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=310'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_310', 102);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 10, 'Вилучити документ виникнення Надлишку', 'KWT_2924.DEL_ATM1 ( :ACC , :REF1)', '', 'EACH', 'Вилучити з картотеки рахунку :NLS Документ реф-1= :REF1 на суму :S1 ?', 'OK', '', '', '', 54);
+  bars_metabase.add_nsifunction(l_tabid, 5, 'КТ 2924/10=Опротестування банків-емітентів', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=015'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZX1', 71);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 6, 'КТ 2924/08=Взаємозакриття нестачі', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=015'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZX2'||chr(38)||'reqv_REFX', 84);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 7, 'КТ 2924/07=Перенесення на інш.рах', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=015'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK'||chr(38)||'SumC=:DEL'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZX3', 76);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 20, 'Вилучити документ виникнення Надлишку', 'KWT_2924.DEL_ATM1 ( :ACC , :REF1)', '', 'EACH', 'Вилучити з картотеки рахунку :NLS Документ реф-1= :REF1 на суму :S1 ?', 'OK', '', '', '', 54);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 22, 'Добавити окремі документи на Закриття', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF2N[NSIFUNCTION][ACCESSCODE=>1][PROC=>pul.PUT( ''ATM_R1'', :REF1)][EXEC=>BEFORE][showDialogWindow=>false] ', 115);
@@ -197,7 +209,7 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 53, 'Перерахувати Заг.суму на КАСУ (053)', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=053'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK3'||chr(38)||'SumC=:ITOG3'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_015', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 58, 'Перерахувати Заг.суму на інше МФО', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=310'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK3'||chr(38)||'SumC=:ITOG3'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_310', null);
+  bars_metabase.add_nsifunction(l_tabid, 54, 'Перерахувати Заг.суму на інше МФО', '', '', 'EACH', '', '', '', '', '/barsroot/docinput/docinput.aspx?tt=310'||chr(38)||'Kv_A=980'||chr(38)||'Nls_A=:NLS'||chr(38)||'APROC=:CHK3'||chr(38)||'SumC=:ITOG3'||chr(38)||'flag_se=1'||chr(38)||'Nazn=:NAZN_310', null);
 
   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'OSTC');
