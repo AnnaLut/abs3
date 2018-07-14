@@ -146,16 +146,6 @@ namespace Bars.Application
                 GC.Collect();
             }
 
-            if (ex.Message.Contains("Pooled connection request timed out"))
-            {
-                //var response = HttpContext.Current.Response;
-                HttpContext.Current.Response.StatusCode = 408;
-                HttpContext.Current.Response.Redirect("~/errors/index/?type=HTTP_STATUS_REQUEST_TIMEOUT&_=" + DateTime.Now.Ticks);
-                HttpContext.Current.Session["AppError"] = ex;
-                HttpContext.Current.Application["AppError"] = ex;
-                return;
-            }
-
             if (HttpContext.Current.Session != null)
             {
                 // Сохраняем в сесии ошибку
