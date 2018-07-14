@@ -82,25 +82,25 @@ namespace Bars.Web.Dialog
                     case "metatab_base": resp_str = ShowMetaTableBase(Request.Params.Get("dk"), Request.Params.Get("role"), Request.Params.Get("nls"), Request.Params.Get("mfo"), Request.Params.Get("kv"), Request.Params.Get("tt")); break;
                     case "showdate": resp_str = ShowDateInput(Request.Params.Get("initdate")); break;
                     case "show_txt_file":
-                    {
-                        String FileName = Convert.ToString(Request.Params.Get("filename"));
-                        String ReportName = Convert.ToString(Request.Params.Get("reportname"));
-
-                        if (FileName != "")
                         {
-                            Response.ClearContent();
-                            Response.ClearHeaders();
-                            Response.Charset = "windows-1251";
-                            Response.ContentEncoding = Encoding.GetEncoding(Response.Charset);
-                            Response.AddHeader("Content-Disposition", String.Format("inline;filename={0}.txt", ReportName));
-                            Response.ContentType = "text/html";
-                            Response.Write("<PRE>");
-                            Response.WriteFile(FileName, true);
-                            Response.Write("</PRE>");
-                        }
+                            String FileName = Convert.ToString(Request.Params.Get("filename"));
+                            String ReportName = Convert.ToString(Request.Params.Get("reportname"));
 
-                        break;
-                    }
+                            if (FileName != "")
+                            {
+                                Response.ClearContent();
+                                Response.ClearHeaders();
+                                Response.Charset = "windows-1251";
+                                Response.ContentEncoding = Encoding.GetEncoding(Response.Charset);
+                                Response.AddHeader("Content-Disposition", String.Format("inline;filename={0}.txt", ReportName));
+                                Response.ContentType = "text/html";
+                                Response.Write("<PRE>");
+                                Response.WriteFile(FileName, true);
+                                Response.Write("</PRE>");
+                            }
+
+                            break;
+                        }
                     case "show_rtf_file":
                         {
                             String FileName = Convert.ToString(Request.Params.Get("filename"));
@@ -143,66 +143,93 @@ namespace Bars.Web.Dialog
                             break;
                         }
                     case "print_file":
-                    {
-                        string fileName = Request.Params.Get("filename");
-                        if (fileName == "selftest") {
-                            var sampleTicketFile = HttpContext.Current.Server.MapPath("/barsroot/App_Data/samples/ticket.txt");
-                            if(File.Exists(sampleTicketFile))
-                            {
-                               fileName = Path.GetTempFileName();
-                               File.WriteAllText(fileName, File.ReadAllText(sampleTicketFile, Encoding.GetEncoding(1251)), Encoding.GetEncoding(1251));
-                            }
-                        }
-
-                        if (Uri.IsWellFormedUriString(fileName, new UriKind()))
-                        {
-                            Response.Redirect(fileName);
-                        }
-                        else
-                        {
-                            Response.ClearContent();
-                            Response.ClearHeaders();
-                            Response.Charset = "windows-1251";
-                            Response.AppendHeader("content-disposition", "attachment;filename=ticket.barsprn");
-                            Response.ContentType = "application/octet-stream";
-                            Response.WriteFile(fileName, true);
-                            Response.Flush();
-                            Response.End();
-                            try
-                            {
-                                File.Delete(fileName);
-                            }
-                            catch{}
-                        }
-
-                        break;
-                    }
-                    case "print_tic":
-                    {
-                        if (Request.Params.Get("barsprn") == "yes")
                         {
                             string fileName = Request.Params.Get("filename");
-                            Response.ClearContent();
-                            Response.ClearHeaders();
-                            Response.Charset = "windows-1251";
-                            Response.AppendHeader("content-disposition", "attachment;filename=ticket.barsprn");
-                            Response.ContentType = "application/octet-stream";
-                            Response.WriteFile(Request.Params.Get("filename"), true);
-                            Response.Flush();
-                            Response.End();
-                            try
+                            if (fileName == "selftest")
                             {
-                                File.Delete(fileName);
+                                var sampleTicketFile = HttpContext.Current.Server.MapPath("/barsroot/App_Data/samples/ticket.txt");
+                                if (File.Exists(sampleTicketFile))
+                                {
+                                    fileName = Path.GetTempFileName();
+                                    File.WriteAllText(fileName, File.ReadAllText(sampleTicketFile, Encoding.GetEncoding(1251)), Encoding.GetEncoding(1251));
+                                }
                             }
-                            catch { }
+
+                            if (Uri.IsWellFormedUriString(fileName, new UriKind()))
+                            {
+                                Response.Redirect(fileName);
+                            }
+                            else
+                            {
+                                Response.ClearContent();
+                                Response.ClearHeaders();
+                                Response.Charset = "windows-1251";
+                                Response.AppendHeader("content-disposition", "attachment;filename=ticket.barsprn");
+                                Response.ContentType = "application/octet-stream";
+                                Response.WriteFile(fileName, true);
+                                Response.Flush();
+                                Response.End();
+                                try
+                                {
+                                    File.Delete(fileName);
+                                }
+                                catch { }
+                            }
+
+                            break;
                         }
-                        else
+                    case "print_tic":
                         {
-                            Response.Charset = "windows-1251";
-                            Response.ContentEncoding = Encoding.GetEncoding("windows-1251");
+                            if (Request.Params.Get("barsprn") == "yes")
+                            {
+                                string fileName = Request.Params.Get("filename");
+                                Response.ClearContent();
+                                Response.ClearHeaders();
+                                Response.Charset = "windows-1251";
+                                Response.AppendHeader("content-disposition", "attachment;filename=ticket.barsprn");
+                                Response.ContentType = "application/octet-stream";
+                                Response.WriteFile(Request.Params.Get("filename"), true);
+                                Response.Flush();
+                                Response.End();
+                                try
+                                {
+                                    File.Delete(fileName);
+                                }
+                                catch { }
+                            }
+                            else
+                            {
+                                Response.Charset = "windows-1251";
+                                Response.ContentEncoding = Encoding.GetEncoding("windows-1251");
+                                Response.AppendHeader("content-disposition", "inline;filename=ticket.txt");
+                                Response.ContentType = "text/html";
+                                Response.Write(@"<script language='JavaScript' src='\Common\Script\PrintPage.js'></script>");
+                                Response.Write("<STYLE>@media Screen{.print_action{DISPLAY: none}} @media Print{.screen_action {DISPLAY: none}}</STYLE>");
+                                Response.Write("<DIV align=center class=screen_action>");
+                                Response.Write("<div id=msg style=\"FONT-FAMILY:Verdana;FONT-SIZE:10px;COLOR:red;\"></div>");
+                                Response.Write("<INPUT id=btPrint type=\"button\" value=\"" + getResource("strPrint") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:red;font-weight:bold\" onclick=\"PrintPage()\"><BR>");
+                                Response.Write("<INPUT id=btSet type=\"button\" value=\"" + getResource("strOptions") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:navy;font-weight:bold\" onclick=\"SetupPage()\"><BR>");
+                                Response.Write("<INPUT id=btView type=\"button\" value=\"" + getResource("strView") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:green;font-weight:bold\" onclick=\"PreviewPage()\"><BR>");
+                                /// Реєстрація елемента ActiveX для друку
+                                Response.Write("<OBJECT id=\"BarsPrint\" classid=\"CLSID:0E21DB0E-5A6E-435B-885B-04D3D92AA3BE\" BORDER=0 VSPACE=0 HSPACE=0 ALIGN=TOP HEIGHT=0% WIDTH=0%></OBJECT>");
+                                Response.Write("</DIV>");
+                                Response.Write("<PRE class=print_action style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
+                                Response.WriteFile(Request.Params.Get("filename"), true);
+                                Response.Write("</PRE>");
+                                try
+                                {
+                                    File.Delete(Request.Params.Get("filename"));
+                                }
+                                catch { };
+                            }
+                            break;
+                        }
+                    case "print_html":
+                        {
                             Response.AppendHeader("content-disposition", "inline;filename=ticket.txt");
                             Response.ContentType = "text/html";
                             Response.Write(@"<script language='JavaScript' src='\Common\Script\PrintPage.js'></script>");
+                            Response.Write(@"<script language='JavaScript' src='\Common\Script\BarsIE.js'></script>");
                             Response.Write("<STYLE>@media Screen{.print_action{DISPLAY: none}} @media Print{.screen_action {DISPLAY: none}}</STYLE>");
                             Response.Write("<DIV align=center class=screen_action>");
                             Response.Write("<div id=msg style=\"FONT-FAMILY:Verdana;FONT-SIZE:10px;COLOR:red;\"></div>");
@@ -210,46 +237,20 @@ namespace Bars.Web.Dialog
                             Response.Write("<INPUT id=btSet type=\"button\" value=\"" + getResource("strOptions") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:navy;font-weight:bold\" onclick=\"SetupPage()\"><BR>");
                             Response.Write("<INPUT id=btView type=\"button\" value=\"" + getResource("strView") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:green;font-weight:bold\" onclick=\"PreviewPage()\"><BR>");
                             /// Реєстрація елемента ActiveX для друку
-                            Response.Write("<OBJECT id=\"BarsPrint\" classid=\"CLSID:0E21DB0E-5A6E-435B-885B-04D3D92AA3BE\" BORDER=0 VSPACE=0 HSPACE=0 ALIGN=TOP HEIGHT=0% WIDTH=0%></OBJECT>");
+                            //Response.Write("<OBJECT id=\"BarsPrint\" classid=\"CLSID:0E21DB0E-5A6E-435B-885B-04D3D92AA3BE\" BORDER=0 VSPACE=0 HSPACE=0 ALIGN=TOP HEIGHT=0% WIDTH=0%></OBJECT>");
                             Response.Write("</DIV>");
-                            Response.Write("<PRE class=print_action style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
+                            Response.Write("<DIV class=print_action>");
                             Response.WriteFile(Request.Params.Get("filename"), true);
-                            Response.Write("</PRE>");
-                            try
-                            {
-                                File.Delete(Request.Params.Get("filename"));
-                            }
+                            Response.Write("</DIV>");
+                            try { File.Delete(Request.Params.Get("filename")); }
                             catch { };
+                            break;
                         }
-                        break;
-                    }
-                    case "print_html":
-                    {
-                        Response.AppendHeader("content-disposition", "inline;filename=ticket.txt");
-                        Response.ContentType = "text/html";
-                        Response.Write(@"<script language='JavaScript' src='\Common\Script\PrintPage.js'></script>");
-                        Response.Write(@"<script language='JavaScript' src='\Common\Script\BarsIE.js'></script>");
-                        Response.Write("<STYLE>@media Screen{.print_action{DISPLAY: none}} @media Print{.screen_action {DISPLAY: none}}</STYLE>");
-                        Response.Write("<DIV align=center class=screen_action>");
-                        Response.Write("<div id=msg style=\"FONT-FAMILY:Verdana;FONT-SIZE:10px;COLOR:red;\"></div>");
-                        Response.Write("<INPUT id=btPrint type=\"button\" value=\"" + getResource("strPrint") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:red;font-weight:bold\" onclick=\"PrintPage()\"><BR>");
-                        Response.Write("<INPUT id=btSet type=\"button\" value=\"" + getResource("strOptions") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:navy;font-weight:bold\" onclick=\"SetupPage()\"><BR>");
-                        Response.Write("<INPUT id=btView type=\"button\" value=\"" + getResource("strView") + "\" style=\"FONT-SIZE:14px;WIDTH:100px;COLOR:green;font-weight:bold\" onclick=\"PreviewPage()\"><BR>");
-                        /// Реєстрація елемента ActiveX для друку
-                        //Response.Write("<OBJECT id=\"BarsPrint\" classid=\"CLSID:0E21DB0E-5A6E-435B-885B-04D3D92AA3BE\" BORDER=0 VSPACE=0 HSPACE=0 ALIGN=TOP HEIGHT=0% WIDTH=0%></OBJECT>");
-                        Response.Write("</DIV>");
-                        Response.Write("<DIV class=print_action>");
-                        Response.WriteFile(Request.Params.Get("filename"), true);
-                        Response.Write("</DIV>");
-                        try { File.Delete(Request.Params.Get("filename")); }
-                        catch { };
-                        break;
-                    }
                     case "print_url":
-                    {
-                        Response.ContentType = "text/html";
-                        Response.Write("<html><head>");
-                        Response.Write(@"<script language='javascript' type='text/jscript'>
+                        {
+                            Response.ContentType = "text/html";
+                            Response.Write("<html><head>");
+                            Response.Write(@"<script language='javascript' type='text/jscript'>
                                         function InitObjects()
                                         {
                                             window.frames['contents'].focus();
@@ -258,19 +259,19 @@ namespace Bars.Web.Dialog
                                             window.close();
                                         }
                                     </script>");
-                        Response.Write("</head><body>");
-                        Response.Write("<iframe id='contents' onload='InitObjects()' class=print_action frameborder='1' style='width: 1; height: 1' src='" + Request.Params.Get("filename") + "?rnd=" + (new Random(DateTime.Now.Millisecond)).Next(0, 1000000).ToString() + "'>");
-                        Response.Write("</iframe>");
-                        Response.Write("</body>");
-                        Response.Write("</html>");
+                            Response.Write("</head><body>");
+                            Response.Write("<iframe id='contents' onload='InitObjects()' class=print_action frameborder='1' style='width: 1; height: 1' src='" + Request.Params.Get("filename") + "?rnd=" + (new Random(DateTime.Now.Millisecond)).Next(0, 1000000).ToString() + "'>");
+                            Response.Write("</iframe>");
+                            Response.Write("</body>");
+                            Response.Write("</html>");
 
-                        break;
-                    }
+                            break;
+                        }
                     case "print_mht":
-                    {
-                        Response.ContentType = "text/html";
-                        Response.Write("<html><head>");
-                        Response.Write(@"<script language='javascript' type='text/jscript'>
+                        {
+                            Response.ContentType = "text/html";
+                            Response.Write("<html><head>");
+                            Response.Write(@"<script language='javascript' type='text/jscript'>
                                         function InitObjects()
                                         {
                                             window.frames['contents'].focus();
@@ -279,85 +280,87 @@ namespace Bars.Web.Dialog
                                             window.close();
                                         }
                                     </script>");
-                        Response.Write("</head><body>");
-                        Response.Write("<iframe id='contents' onload='InitObjects()' class=print_action frameborder='1' style='width: 1; height: 1' src='dialog.aspx?type=print_mht_file&filename=" + Request.Params.Get("filename") + "&rnd=" + (new Random(DateTime.Now.Millisecond)).Next(0, 1000000).ToString() + "'>");
-                        Response.Write("</iframe>");
-                        Response.Write("</body>");
-                        Response.Write("</html>");
+                            Response.Write("</head><body>");
+                            Response.Write("<iframe id='contents' onload='InitObjects()' class=print_action frameborder='1' style='width: 1; height: 1' src='dialog.aspx?type=print_mht_file&filename=" + Request.Params.Get("filename") + "&rnd=" + (new Random(DateTime.Now.Millisecond)).Next(0, 1000000).ToString() + "'>");
+                            Response.Write("</iframe>");
+                            Response.Write("</body>");
+                            Response.Write("</html>");
 
-                        break;
-                    }
+                            break;
+                        }
                     case "print_mht_file":
-                    {
-                        Response.ContentType = "message/rfc822";
-                        Response.WriteFile(Request.Params.Get("filename"), true);
+                        {
+                            Response.ContentType = "message/rfc822";
+                            Response.WriteFile(Request.Params.Get("filename"), true);
 
-                        break;
-                    }
+                            break;
+                        }
                     case "err":
-                    {
-                        Response.ContentEncoding = Encoding.GetEncoding("utf-8");
-                        Response.StatusDescription = "BRS-500";
-                        var appError = (System.Exception)HttpContext.Current.Session["AppError"];
-                        
-                        if (appError == null) {
-                            appError = new System.Exception("Була виконана переініціалізація сеансу. Спробуйте повторити операцію, або перезайдіть в систему.");
-                        }
-                        ErrorPageGenerator ergen = new ErrorPageGenerator(appError);
-                        bool fullInfo = (ConfigurationSettings.GetCurrentUserInfo.errormode == "1") ? (true) : (false);
-                        resp_str = ergen.GetHtmlErrorPage(fullInfo);
+                        {
+                            Response.ContentEncoding = Encoding.GetEncoding("utf-8");
+                            Response.StatusDescription = "BRS-500";
+                            var appError = (System.Exception)HttpContext.Current.Session["AppError"];
 
-                        /*if (HttpContext.Current.Session != null && HttpContext.Current.Session["AppError"] != null)
-                        {
+                            if (appError == null)
+                            {
+                                appError = new System.Exception("Була виконана переініціалізація сеансу. Спробуйте повторити операцію, або перезайдіть в систему.");
+                            }
+                            ErrorPageGenerator ergen = new ErrorPageGenerator(appError);
+                            bool fullInfo = (ConfigurationSettings.GetCurrentUserInfo.errormode == "1") ? (true) : (false);
                             resp_str = ergen.GetHtmlErrorPage(fullInfo);
-                            //HttpContext.Current.Session.Remove("AppError");
-                        }
-                        else
-                        {
-                            string hash = HttpContext.Current.Request.UserAgent;
-                            hash += HttpContext.Current.Request.UserHostAddress;
-                            hash += HttpContext.Current.Request.UserHostName;
-                            string key = hash.GetHashCode().ToString();
-                            if (Request.Params.Get("key") != null)
-                                key = HttpUtility.UrlDecode(Request.Params.Get("key"));
-                            if (AppDomain.CurrentDomain.GetData(key) != null)
+
+                            /*if (HttpContext.Current.Session != null && HttpContext.Current.Session["AppError"] != null)
                             {
                                 resp_str = ergen.GetHtmlErrorPage(fullInfo);
-                                AppDomain.CurrentDomain.SetData(key, null);
+                                //HttpContext.Current.Session.Remove("AppError");
                             }
                             else
-                                //HttpContext.Current.Response.Redirect("/barsroot/barsweb/default.aspx");
-                                resp_str = getResource("strNoDataFound");
-                        }*/
-                        break;
-                    }
+                            {
+                                string hash = HttpContext.Current.Request.UserAgent;
+                                hash += HttpContext.Current.Request.UserHostAddress;
+                                hash += HttpContext.Current.Request.UserHostName;
+                                string key = hash.GetHashCode().ToString();
+                                if (Request.Params.Get("key") != null)
+                                    key = HttpUtility.UrlDecode(Request.Params.Get("key"));
+                                if (AppDomain.CurrentDomain.GetData(key) != null)
+                                {
+                                    resp_str = ergen.GetHtmlErrorPage(fullInfo);
+                                    AppDomain.CurrentDomain.SetData(key, null);
+                                }
+                                else
+                                    //HttpContext.Current.Response.Redirect("/barsroot/barsweb/default.aspx");
+                                    resp_str = getResource("strNoDataFound");
+                            }*/
+                            break;
+                        }
                     case "errPage":
-                    {
-                        Response.ContentEncoding = Encoding.GetEncoding("utf-8");
-                        string key = HttpUtility.UrlDecode(Request.Params.Get("key"));
-                        resp_str = (string)AppDomain.CurrentDomain.GetData(key);
-                        if (resp_str == null)
-                            resp_str = getResource("strNoDataFound");//"Данные об ошибке не найдены!";
-                        AppDomain.CurrentDomain.SetData(key, null);
-                        break;
-                    }
+                        {
+                            Response.ContentEncoding = Encoding.GetEncoding("utf-8");
+                            string key = HttpUtility.UrlDecode(Request.Params.Get("key"));
+                            resp_str = (string)AppDomain.CurrentDomain.GetData(key);
+                            if (resp_str == null)
+                                resp_str = getResource("strNoDataFound");//"Данные об ошибке не найдены!";
+                            AppDomain.CurrentDomain.SetData(key, null);
+                            break;
+                        }
                     case "fullADR": resp_str = ShowfullADR(Request.Params.Get("message")); break;
                     case "passplist": resp_str = Showpasplist(); break;
                     case "BarsPayments":
-                    {
-                        WebServices.BarsPayments bp = new WebServices.BarsPayments();
-                        string login = Request.Params.Get("login");
-                        string xmlData = Request.Params.Get("xmlData");
-                        bool debug = false;
-                        Boolean.TryParse(Request.Params.Get("debug"), out debug);
-                        resp_str = bp.ImportXml(login, xmlData, debug).OuterXml;
-                        break;
-                    }
+                        {
+                            WebServices.BarsPayments bp = new WebServices.BarsPayments();
+                            string login = Request.Params.Get("login");
+                            string xmlData = Request.Params.Get("xmlData");
+                            bool debug = false;
+                            Boolean.TryParse(Request.Params.Get("debug"), out debug);
+                            resp_str = bp.ImportXml(login, xmlData, debug).OuterXml;
+                            break;
+                        }
                 }
-            if (message.Contains("Pooled connection request timed out"))
+
+            if (null != message && message.Contains("Pooled connection request timed out"))
                 Response.StatusCode = 408;
             Response.Write(resp_str);
-            
+
         }
         private string ShowDateInput(string initdate)
         {
