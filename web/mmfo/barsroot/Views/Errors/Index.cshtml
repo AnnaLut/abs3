@@ -113,13 +113,6 @@
 </div>
 @Scripts.Render("~/bundles/jquery")
 <script>
-    //debugger;
-    var url = parent.window.location.href;
-    //var fatal = @ViewBag.FatalError;
-    if (@ViewBag.FatalError) {
-        parent.window.location.href = "/barsroot/errors/index?type=fatal&_=" + @DateTime.Now.Ticks;
-    }
-
     var clicks = 0;
     var clicks2 = 0;
     $('#expand_detail').click(function () {
