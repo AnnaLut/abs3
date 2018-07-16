@@ -108,7 +108,8 @@ create or replace package body tms_webservices is
          end if;
      elsif  p_service_name = 'LoadCoursesService.asmx' then
          if instr(l_response_msg, '<status>Error</status>') > 0 then
-             raise_application_error (-20000, 'Помилка виконання: '||substr( l_response_msg, instr(l_response_msg, '<StackTrace>')+ 12,  instr(l_response_msg,'</StackTrace>')- instr(l_response_msg, '<StackTrace>') - 12  ) );
+             raise_application_error (-20000, 'Помилка виконання: Перевірте наявність файлів у каталозі '||branch_attribute_utl.get_attribute_value(p_attribute_code => 'EXCHANGE_RATES_DIR', p_branch_code => '/', p_check_exist => 1, p_parent_lookup => 1, p_raise_expt => 1)
+			 || chr(10) ||' Стек: '||substr( l_response_msg, instr(l_response_msg, '<StackTrace>')+ 12,  instr(l_response_msg,'</StackTrace>')- instr(l_response_msg, '<StackTrace>') - 12  ) );
          end if;       
      end if;
 
