@@ -221,7 +221,7 @@ END GERC_PAYMENTS;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.GERC_PAYMENTS IS
 
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.74 31.01.2018';
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.75 09.07.2018';
     TYPE t_cursor   IS REF CURSOR;
     function header_version return varchar2
     is
@@ -585,7 +585,7 @@ IS
 
         bars_audit.INFO(title||':  p_drec, p_operw. DONE');
 
-        if l_tt = 'G07' then
+        if l_tt in ('G02','G07') then
           gl.ref(l_ref);
           gl.in_doc3 (ref_     => l_ref,
                       tt_      => l_tt,
