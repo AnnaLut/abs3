@@ -208,7 +208,7 @@ public partial class DpuViddDetails : Bars.BarsPage
                                         , v.fl_add, v.fl_extend, v.fl_autoextend
                                         , v.basey, v.metr, v.br_id, tts.tt, tts.name
                                         , v.freq_v, id_stop, v.penya
-                                        , v.comproc, v.irrevocable, v.shablon, v.comments, v.FREQ_N
+                                        , v.comproc, v.IRVK, v.shablon, v.comments, v.FREQ_N
                                         , case 
                                             when exists ( select 0 from DPU_DEAL where vidd = v.vidd )
                                             then 1
