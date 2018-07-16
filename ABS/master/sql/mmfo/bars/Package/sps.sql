@@ -759,13 +759,7 @@ IS
  l_d_rec varchar2(60) ;
  l_nazn varchar2(160);
  l_flag number;
- l_sos number;
 
-/*
--- 10.07.2018 Одеса ввела не правильно перекриття. Для внутрішніх платежів 
-замість операції PS1 використала зовнішню операцію PS5, 
-додаю страховку замість paytt => gl.dyntt2
-*/ 
 begin
 l_d_rec:='';
 data_:=gl.BDATE;
@@ -796,26 +790,7 @@ l_nazn:=nazn_;
                nam_b_=> nam_b_, nlsb_ => nlsb_, mfob_=> mfob_ , nazn_ => l_nazn,
                d_rec_=> l_d_rec  , id_a_ => id_a_, id_b_=> id_b_ , id_o_ => id_o_, sign_=> sign_, sos_=> sos_, prty_=> prty_, uid_=> uid_);
 
-            gl.dyntt2(sos_   => l_sos,
-                      mod1_  => l_flag,
-                      mod2_  => 0,
-                      ref_   => REF_,
-                      vdat1_ => gl.bDATE,
-                      vdat2_ => null,
-                      tt0_   => TT_,
-                      dk_    => DK_,
-                      kva_   => kv_,
-                      mfoa_  => mfoa_,
-                      nlsa_  => nlsa_,
-                      sa_    => S_,
-                      kvb_   => kv2_,
-                      mfob_  => mfob_,
-                      nlsb_  => nlsb_,
-                      sb_    => S_,
-                      sq_    => null,
-                      nom_   => null);
-             --gl.dyntt (l_flag , REF_ , gl.bDATE , DK_ , kv_ ,nlsa_ ,S_ , kv2_ ,nlsb_ ,S_ );
-             --paytt (l_flag, REF_,  gl.bDATE, TT_, DK_, kv_, nlsa_, S_, kv2_, nlsb_, S_  );
+             paytt (l_flag, REF_,  gl.bDATE, TT_, DK_, kv_, nlsa_, S_, kv2_, nlsb_, S_  );
     end if;
 
     if ref_ is not null then
@@ -990,8 +965,6 @@ PROCEDURE PAY_PEREKR023(
 
 IS
 /*****************
--- 10.07.2018 Одеса ввела не правильно перекриття. Для внутрішніх платежів 
-використала завнішню операцію, додаю страховку замість paytt => gl.dyntt2
 --01.03.2017 Дадано видалення стрічок з таблиці TSEL023, які були оплачені.
 *********************/
 REF_    number ; --референс
@@ -999,7 +972,6 @@ data_   DATE ; --data_=> gl.BDATE,
 datp_   DATE ; --datp_=> gl.bdate,
 mfoa    number;
 l_tabn  varchar2(10);
-l_sos number;
 
 BEGIN
 data_:=gl.BDATE;
@@ -1015,26 +987,7 @@ mfoa:=gl.amfo;
                        nam_b_=> nam_b_, nlsb_ => nlsb_, mfob_=> mfob_ , nazn_ => nazn_,
                        d_rec_=> d_rec_  , id_a_ => id_a_, id_b_=> id_b_ , id_o_ => id_o_, sign_=> sign_, sos_=> sos_, prty_=> prty_, uid_=> uid_);
 
-                     gl.dyntt2(sos_   => l_sos,
-                              mod1_  => 0, -- flag 
-                              mod2_  => 0,
-                              ref_   => REF_,
-                              vdat1_ => gl.bDATE,
-                              vdat2_ => null,
-                              tt0_   => TT_,
-                              dk_    => DK_,
-                              kva_   => kv_,
-                              mfoa_  => mfoa,
-                              nlsa_  => nlsa_,
-                              sa_    => S_*100,
-                              kvb_   => kv2_,
-                              mfob_  => mfob_,
-                              nlsb_  => nlsb_,
-                              sb_    => S_*100,
-                              sq_    => null,
-                              nom_   => null);
-                     
-                    -- paytt (0, REF_,  gl.bDATE, TT_, DK_, kv_, nlsa_, S_*100, kv2_, nlsb_, S_*100  );
+                     paytt (0, REF_,  gl.bDATE, TT_, DK_, kv_, nlsa_, S_*100, kv2_, nlsb_, S_*100  );
             end if;
 
             execute immediate '
