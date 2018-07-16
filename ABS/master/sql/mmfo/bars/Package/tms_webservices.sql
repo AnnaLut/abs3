@@ -106,6 +106,10 @@ create or replace package body tms_webservices is
          if instr(l_response_msg, '<Status>ERROR</Status>') > 0 and instr(l_response_msg, '<Message>OK</Message>') = 0 then
              raise_application_error (-20000, 'Помилка виконання: '||substr( l_response_msg, instr(l_response_msg, '<Message>')+ 9,  instr(l_response_msg,'</Message>')- instr(l_response_msg, '<Message>') - 8  ) );
          end if;
+     elsif  p_service_name = 'LoadCoursesService.asmx' then
+         if instr(l_response_msg, '<status>Error</status>') > 0 then
+             raise_application_error (-20000, 'Помилка виконання: '||substr( l_response_msg, instr(l_response_msg, '<StackTrace>')+ 12,  instr(l_response_msg,'</StackTrace>')- instr(l_response_msg, '<StackTrace>') - 12  ) );
+         end if;       
      end if;
 
   end;
