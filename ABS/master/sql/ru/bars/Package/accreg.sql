@@ -265,7 +265,7 @@ is
   --***************************************************************************--
   g_modcode       constant varchar2(3) := 'CAC';
 
-  g_body_version  constant varchar2(64)  := 'version 2.91  02/05/2018';
+  g_body_version  constant varchar2(64)  := 'version 2.92  16/07/2018';
   g_body_defs     constant varchar2(512) := ''
 $if ACC_PARAMS.KOD_D6
 $then
@@ -584,6 +584,7 @@ procedure OPN_ACC
   l_tip                   accounts.tip%type;
   l_opn_dt                date;
   l_cls_dt                date;
+  l_daos                  date;
 begin
 
   bars_audit.trace( '%s: Entry with ( rnk=%s, nls=%s, kv=%s, nms=%s, ob22=%s ).'
@@ -749,8 +750,9 @@ $if ACC_PARAMS.MMFO
 $then
   if ( BARS_DPA.DPA_NBS( p_nbs, p_ob22 ) = 1 )
   then -- COBUMMFO-4028
+    select daos into l_daos from accounts where acc = p_acc;
     BARS_DPA.ACCOUNTS_TAX( p_acc  => p_acc
-                         , p_daos => trunc(SYSDATE)
+                         , p_daos => l_daos
                          , p_dazs => NULL
                          , p_kv   => p_kv
                          , p_nbs  => l_nbs
