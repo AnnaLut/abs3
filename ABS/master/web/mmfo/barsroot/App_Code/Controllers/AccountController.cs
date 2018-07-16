@@ -318,12 +318,10 @@ namespace BarsWeb.Controllers
                 }
 
                 _dbLogger.Info(
-                    string.Format(
-                        "Веб-користувач [{0}] розпочав роботу в локальній банківській даті - {1}, робоча станція: {2}, GetHostName(): {3}",
+                    string.Format("Веб-користувач [{0}] розпочав роботу в локальній банківській даті - {1}",
                         userName,
-                        date.ToString(dateFormat),
-                        GetUserIpAll(),
-                        _repository.GetHostName() ));
+                        date.ToString(dateFormat)));
+
                 if (Session["userIdentity"] != null && Request.Params.Get("changedate") != "on")
                 {
                     return Redirect(string.IsNullOrWhiteSpace(returnUrl) ? Url.Content("~/") : returnUrl);
@@ -439,18 +437,6 @@ namespace BarsWeb.Controllers
 
             var sha = new SHA1Managed();
             return StringHelper.ToBase64(sha.ComputeHash(target));
-        }
-
-        public string GetUserIpAll()
-        {
-            StringBuilder sb = new StringBuilder()
-                .AppendFormat("HTTP_X_FORWARDED_FOR {0}; ",
-                    System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]??"null")
-                .AppendFormat("REMOTE_ADDR {0}; ", System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"])
-                .AppendFormat("Request.UserHostAddress {0}; ", System.Web.HttpContext.Current.Request.UserHostAddress)
-                .AppendFormat("Request.UserHostName {0}.", System.Web.HttpContext.Current.Request.UserHostName);
-
-            return sb.ToString();
         }
         # endregion
     }

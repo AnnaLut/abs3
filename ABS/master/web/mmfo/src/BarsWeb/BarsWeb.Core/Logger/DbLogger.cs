@@ -1,12 +1,13 @@
-﻿using System;
+﻿using BarsWeb.Core.Infrastructure.Repository;
+using BarsWeb.Core.Models;
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Web;
-using BarsWeb.Core.Infrastructure.Repository;
-using BarsWeb.Core.Models;
 
 namespace BarsWeb.Core.Logger
 {
@@ -30,22 +31,41 @@ namespace BarsWeb.Core.Logger
             {
                 (message.Length > 4000 ? message.Substring(0, 4000) : message),
                 moduleName,
-                HttpContext.Current.Request.UserHostAddress,
+                GetClientIp(),
                 result
             };
-            var sql = string.Format(
-                        @"begin 
-                            bars_audit.{0}(
+            var sql = $@"begin 
+                            bars_audit.{name}(
                                 substr(:p_msg,1,4000),
                                 :p_module,
                                 substr(:p_machine,1,15),
                                 :p_ID);                            
-                         end;",
-                        name);
+                         end;";
 
             _dbContext.Database.ExecuteSqlCommand(sql, parameters);
             result = Convert.ToDecimal(Convert.ToString(parameters[3]));
             return result;
+        }
+
+        private static string GetClientIp()
+        {
+            // Nothing to do without any reliable information
+            if (string.IsNullOrWhiteSpace(HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"]))
+            {
+                // No REMOTE_ADDR provided
+                return "-";
+            }
+
+            const string proxyHeader = "HTTP_X_FORWARDED_FOR";
+            if (string.IsNullOrWhiteSpace(HttpContext.Current.Request.ServerVariables[proxyHeader]))
+                return "-"; // No proxyHeader provided
+
+            // Header can contain multiple IP-s of proxies that are passed through, separated by comma.
+            // Only the the first added IP can be the initiator's machine IP.
+            var ipList = HttpContext.Current.Request.ServerVariables[proxyHeader];
+            ipList = ipList.Contains(",") ? ipList.Split(',').First().Trim() : "";
+            return ipList;
+
         }
 
         /// <summary>
