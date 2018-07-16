@@ -264,15 +264,15 @@ loop
        l_dat01:= add_months( l_dat01, +1);
   END LOOP  ;    
  --------------------------
-  l_Viename := 'V_OSA_'||p_Mfo ;
-  execute immediate 
- ' CREATE OR REPLACE  VIEW '|| l_Viename || 
- ' AS  SELECT TO_DATE (''01012018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01012018_'|| p_Mfo ||' T  UNION ALL
-       SELECT TO_DATE (''01022018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01022018_'|| p_Mfo ||' T  UNION ALL
-       SELECT TO_DATE (''01032018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01032018_'|| p_Mfo ||' T  UNION ALL
-       SELECT TO_DATE (''01042018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01042018_'|| p_Mfo ||' T  UNION ALL
-       SELECT TO_DATE (''01052018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01052018_'|| p_Mfo ||' T  UNION ALL
-       SELECT TO_DATE (''01062018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01062018_'|| p_Mfo ||' T ';
+  --l_Viename := 'V_OSA_'||p_Mfo ;
+ -- execute immediate 
+ --' CREATE OR REPLACE  VIEW '|| l_Viename || 
+ --' AS  SELECT TO_DATE (''01012018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01012018_'|| p_Mfo ||' T  UNION ALL
+ --      SELECT TO_DATE (''01022018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01022018_'|| p_Mfo ||' T  UNION ALL
+ --      SELECT TO_DATE (''01032018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01032018_'|| p_Mfo ||' T  UNION ALL
+ --      SELECT TO_DATE (''01042018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01042018_'|| p_Mfo ||' T  UNION ALL
+ --      SELECT TO_DATE (''01052018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01052018_'|| p_Mfo ||' T  UNION ALL
+ --      SELECT TO_DATE (''01062018'', ''ddmmyyyy'') FDAT, T.*  FROM TEST_PRVN_OSAQ_01062018_'|| p_Mfo ||' T ';
 end loop; --  mfo 
 --------------------
 
