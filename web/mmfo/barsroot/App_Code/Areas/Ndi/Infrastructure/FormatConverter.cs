@@ -306,11 +306,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             string res = string.Empty;
             if (!string.IsNullOrEmpty(param))
             {
-                int mod4 = param.Length % 4;
-                if (mod4 > 0)
-                {
-                    param += new string('=', 4 - mod4);
-                }
+                //int mod4 = param.Length % 4;
+                //if (mod4 > 0)
+                //{
+                //    param += new string('=', 4 - mod4);
+                //}
 
                 var bytes = HttpServerUtility.UrlTokenDecode(param);
                 res = Encoding.UTF8.GetString(bytes);
