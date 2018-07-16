@@ -1,3 +1,7 @@
+prompt .........................................................................................................
+prompt 2) Компиляция процедуры построения снимков-9  PROCEDURE BARS.M9x 
+prompt .........................................................................................................
+
 CREATE OR REPLACE PROCEDURE BARS.M9x ( x_Mfo varchar2) is 
   p_Mfo varchar2 (6) ; ----- := x_Mfo ;
 
@@ -16,6 +20,7 @@ procedure snp9 ( P_DAT01 DATE )  IS  -- пОДГОТОВКА МЕСЯЧНОГО СНИМКА С УчЕТОМ ПЕР
                   
   M_DAT01 DATE; I_DAT01 int  ;  b_DAT  DATE ;  KF_ varchar2 (6);
   agg                    agg_monbals9%rowtype;
+
   e_ptsn_not_exsts       exception;
   pragma exception_init( e_ptsn_not_exsts, -02149 );
   ---------------------------------------------------
@@ -137,20 +142,21 @@ group by ACC, VDAT, KV, RNK, DK
 
  end loop;
  --------------------------
+ commit;
 
  DECLARE  -- p_dat01 date; -- 01/01/2018 = отч.дата
-    R_DAT01  date := add_months(p_DAT01, -1) ; -- 01/12/2017 =первый кал.день отч.мес  
-    M_DAT01  date := DAT_NEXT_U(p_dat01, -1) ; -- 29/12/2017=последний раб.день отч.мес    
+    M01_DAT  date := add_months(p_DAT01, -1) ; -- 01/12/2017, 01/01/2018, 01/02/2018, 01/03/2018, 01/04/2018, 01/05/2018  = первый кал.день отч.мес  
+    R31_DAT  date := DAT_NEXT_U(p_dat01, -1) ; -- 29/12/2017, 31/01/2018, 28/02/2018, 30/03/2018, 27/04/2018, 31/05/2018  = последний раб.день отч.мес    
  begin 
-    update  agg_monbals9  set OSTq  = gl.p_icurval ( kv, OST , R_DAT01 ) ,
-                              DOSq  = gl.p_icurval ( kv, DOS , R_DAT01 ) ,
-                              KOSq  = gl.p_icurval ( kv, KOS , R_DAT01 ) ,
-                              DOSq9 = gl.p_icurval ( kv, DOS9, R_DAT01 ) ,
-                              KOSq9 = gl.p_icurval ( kv, KOS9, R_DAT01 ) 
-    where kv <> 980 and kf = p_mfo and fdat = M_DAT01 ;
-
-  end ; 
-
+    update  agg_monbals9  set OSTq  = gl.p_icurval ( kv, OST , R31_DAT ) ,
+                              DOSq  = gl.p_icurval ( kv, DOS , R31_DAT ) ,
+                              KOSq  = gl.p_icurval ( kv, KOS , R31_DAT ) ,
+                              DOSq9 = gl.p_icurval ( kv, DOS9, R31_DAT ) ,
+                              KOSq9 = gl.p_icurval ( kv, KOS9, R31_DAT ) 
+    where kv <> 980 and kf = p_mfo and fdat = M01_DAT ;
+ 
+ end ; 
+  
 END ; -- снимок  за 1 месяц 
 ------------**************************************************************
 
@@ -178,6 +184,7 @@ logger.info ('AGG_MONBALS9*Truncate table BARS.AGG_MONBALS9' );
 
 For k in ( select  * from mv_KF where (x_Mfo is null or x_MFO = KF )   )
 loop 
+
 /*
   -- удалить партицию по всем датам+МФО
 
@@ -206,7 +213,6 @@ loop
  end;
 
 */
-logger.info ( 'AGG_MONBALS9*' || k.KF || ' удалить партиции по всем датам ' );
 
   BC.go( k.KF);
   -- добавить эти же партиции 
@@ -223,7 +229,7 @@ logger.info ( 'AGG_MONBALS9*' || k.KF || ' удалить партиции по всем датам ' );
                      ) ;
 
   commit;
-logger.info ('AGG_MONBALS9*'||k.KF|| ' добавить эти же партиции' );
+logger.info ('AGG_MONBALS9*'||k.KF|| ' добавить RU' );
    BC.go( '/');
 
 end loop ; --mfo
@@ -236,6 +242,8 @@ end loop ; --mfo
 logger.info ('AGG_MONBALS9*CREATE UNIQUE INDEX BARS.AGG_MONBALS9_IDX' );
 
 For mfo in ( select  * from mv_KF where (x_Mfo is null or x_MFO = KF ) )
+
+
 loop 
   p_Mfo := mfo.KF;
   ----------------
@@ -247,11 +255,11 @@ loop
   WHILE l_Dat01 <= End_Dat01   
   LOOP  s_Dat01 := to_char (l_Dat01, 'dd.mm.yyyy') ;
         l_Msg2 := '*Перестройка AGG_MONBALS, дата = '||s_Dat01 ;
-        SeND_MSG (p_txt => 'BEG:' || l_Msg1 || l_Msg2 );     
+        SeND_MSG (p_txt =>  l_Msg1 || '*BEG:' || l_Msg2 );     
         ------------------------------------------------------------------------------------
         SNP9 ( l_Dat01 ) ; 
         commit;                      
-        SeND_MSG (p_txt => 'END:' || l_Msg1 || l_Msg2 );
+        SeND_MSG (p_txt =>  l_Msg1 || '*END:' || l_Msg2 );
         ------------------------------------------------------------------------------------
        l_dat01:= add_months( l_dat01, +1);
   END LOOP  ;    
@@ -270,3 +278,14 @@ end loop; --  mfo
 
 end M9x ;
 /
+
+
+prompt .........................................................................................................
+prompt 3) И ее непосредственное выполнение , т.е. формирование снимков.
+prompt .........................................................................................................
+
+Exec  M9x ( x_Mfo => null ) ;
+
+prompt .........................................................................................................
+prompt 4) OK M9x ( x_Mfo => null )
+prompt .........................................................................................................
