@@ -1,9 +1,3 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_cck_otcn.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
 CREATE OR REPLACE FUNCTION BARS.F_CCK_OTCN (FDAT_ DATE, ACC_ INT, MDATE_ DATE,
              VST_ number, FAKT_ varchar2 default '00000000', PDAT_ date default null,
              typen_ number default 1,
@@ -15,7 +9,7 @@ IS
 % DESCRIPTION :    Вспомогательная функция для формирования #A7
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.007   16/05/2018 (23/04/2018)
+% VERSION     : v.17.008  03/07/2018 (16/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: FDAT_ - отчетная дата
             ACC_ - ид. счета основного долга
@@ -622,8 +616,8 @@ BEGIN
    else -- смотрим графики погашения
        BEGIN
           --есть ли в КП е есть ли ГПК  и какой вид договора
-          SELECT n.nd, c.VIDD, c.ndg
-          INTO ND_, vidd_, NDG_
+          SELECT max(c.ndg) ndg, max(n.nd) nd, max(c.VIDD) vidd
+          INTO NDG_, ND_, vidd_ 
           FROM ND_ACC n, OTC_ARC_CC_LIM l, cc_deal c
           WHERE n.acc=ACC_ AND
                 l.dat_otc = pdat_ and
@@ -636,11 +630,15 @@ BEGIN
                                GROUP BY nd) and
                  n.nd = c.nd and
                  c.sos in (10, 13);
+           
+          if NDG_ is null and ND_ is null and vidd_ is null then
+             raise no_data_found;
+          end if;
        EXCEPTION
           WHEN NO_DATA_FOUND THEN
               begin
-                  SELECT n.nd, c.VIDD, c.ndg
-                  INTO ND_, vidd_, NDG_
+                  SELECT max(c.ndg) ndg, max(n.nd) nd, max(c.VIDD) vidd 
+                  INTO NDG_, ND_, vidd_ 
                   FROM ND_ACC n, OTC_ARC_CC_LIM l, cc_deal c
                   WHERE n.acc=ACC_ AND
                         l.dat_otc = pdat_ and
@@ -652,26 +650,30 @@ BEGIN
                                              FDAT>=odat_
                                        GROUP BY nd) and
                          n.nd = c.nd;
-           EXCEPTION
-              WHEN NO_DATA_FOUND THEN
-                  begin
-                      SELECT n.nd, c.VIDD, c.ndg
-                      INTO ND_, vidd_, NDG_
-                      FROM ND_ACC n, OTC_ARC_CC_LIM l, cc_deal c
-                      WHERE n.acc=ACC_ AND
-                            l.dat_otc = pdat_ and
-                            n.nd=l.nd AND
-                            (l.nd,l.FDAT)=(SELECT nd, MAX(FDAT)
-                                           FROM OTC_ARC_CC_LIM
-                                           WHERE dat_otc = pdat_ and
-                                                 nd=l.ND AND
-                                                 FDAT<odat_
-                                           GROUP BY nd) and
-                             n.nd = c.nd;
-                  EXCEPTION WHEN NO_DATA_FOUND THEN DEL(OST_,MDATE_, i); pipe ROW(i); RETURN;
-                            WHEN too_many_rows then raise_application_error(-20001, 'Счет: '||nls_a7_||' вал. '||to_char(kv1_));
-                  end;
-              WHEN too_many_rows then raise_application_error(-20001, 'Счет: '||nls_a7_||' вал. '||to_char(kv1_));
+                         
+                  if NDG_ is null and ND_ is null and vidd_ is null then
+                     raise no_data_found;
+                  end if;
+              EXCEPTION
+                  WHEN NO_DATA_FOUND THEN
+                      begin
+                          SELECT max(c.ndg) ndg, max(n.nd) nd, max(c.VIDD) vidd 
+                          INTO NDG_, ND_, vidd_ 
+                          FROM ND_ACC n, OTC_ARC_CC_LIM l, cc_deal c
+                          WHERE n.acc=ACC_ AND
+                                l.dat_otc = pdat_ and
+                                n.nd=l.nd AND
+                                (l.nd,l.FDAT)=(SELECT nd, MAX(FDAT)
+                                               FROM OTC_ARC_CC_LIM
+                                               WHERE dat_otc = pdat_ and
+                                                     nd=l.ND AND
+                                                     FDAT<odat_
+                                               GROUP BY nd) and
+                                 n.nd = c.nd;
+                      EXCEPTION WHEN NO_DATA_FOUND THEN DEL(OST_,MDATE_, i); pipe ROW(i); RETURN;
+                                WHEN too_many_rows then raise_application_error(-20001, 'Счет: '||nls_a7_||' вал. '||to_char(kv1_));
+                      end;
+                  WHEN too_many_rows then raise_application_error(-20001, 'Счет: '||nls_a7_||' вал. '||to_char(kv1_));
               end;
           WHEN too_many_rows then raise_application_error(-20001, 'Счет: '||nls_a7_||' вал. '||to_char(kv1_));
        END;
@@ -732,7 +734,7 @@ BEGIN
                   SELECT d.kv
                   INTO  kv2_
                   FROM CC_ADD d
-                  WHERE d.nd = ndg_ AND
+                  WHERE d.nd = nvl(ndg_, nd_) AND
                         d.ADDS=0;
                EXCEPTION WHEN NO_DATA_FOUND THEN  DEL(OST_,MDATE_, i); pipe ROW(i); RETURN;
                END;
@@ -806,7 +808,7 @@ BEGIN
            FOR k IN (SELECT nvl(gl.p_icurval(kv2_, lim2, fdat_), 0) lim2, fdat
                      FROM otc_arc_cc_lim
                      WHERE dat_otc = pdat_ and
-                           nd=ndg_ and
+                           nd=nvl(ndg_, nd_) and
                            fdat between fdat_ and mdate_acc_
                      ORDER BY FDAT)
            LOOP
@@ -853,11 +855,3 @@ BEGIN
    RETURN;
 END;
 /
- show err;
- 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_cck_otcn.sql =========*** End ***
- PROMPT ===================================================================================== 
- 
