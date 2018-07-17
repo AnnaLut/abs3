@@ -44,10 +44,13 @@ namespace Bars.WebServices.XRM.Services.SKRN
 
         public static XRMResponseDetailed<string> TemplatesCreation(OracleConnection con, XRMRequest<TemplatesCrtRequest> request)
         {
+            string mfo = XrmHelper.GetMfo(con);
+            long nd = (long)request.AdditionalData.Nd.AddRuTail(mfo);
+
             using (OracleCommand cmd = con.CreateCommand())
             {
                 cmd.CommandText = @"select count(*) from SKRYNKA_ND where nd = :p_nd";
-                cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, nd, ParameterDirection.Input));
 
                 var _count = cmd.ExecuteScalar();
                 int count = null == _count ? 0 : Convert.ToInt32(_count);
@@ -57,9 +60,8 @@ namespace Bars.WebServices.XRM.Services.SKRN
             var ext = request.AdditionalData.TemplateId.Length <= 4 ? "" : request.AdditionalData.TemplateId.Substring(request.AdditionalData.TemplateId.Length - 4);
             if (ext != ".frx") request.AdditionalData.TemplateId += ".frx";
 
-            string mfo = XrmHelper.GetMfo(con);
             FrxParameters pars = new FrxParameters();
-            pars.Add(new FrxParameter("p_nd", TypeCode.Int32, request.AdditionalData.Nd.AddRuTail(mfo)));
+            pars.Add(new FrxParameter("p_nd", TypeCode.Int32, nd));
             pars.Add(new FrxParameter("p_rnk", TypeCode.Int64, request.AdditionalData.Rnk.AddRuTail(mfo)));
 
             byte[] content = XrmHelper.CreateFrxFile(request.AdditionalData.TemplateId, pars);
@@ -291,7 +293,8 @@ namespace Bars.WebServices.XRM.Services.SKRN
             htmlContent.AppendLine("<DIV align=center class=screen_action>");
             htmlContent.AppendLine("<INPUT id=btPrint type=\"button\" value=\"Надрукувати\" style=\"FONT-SIZE:14px;font-weight:bold\" onclick=\"window.print()\"><BR>");
             htmlContent.AppendLine("</DIV>");
-            htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
+            //htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
+            htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt;\">");
             htmlContent.Append(txtContent);
             htmlContent.AppendLine("</PRE>");
 

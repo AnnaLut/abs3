@@ -6,6 +6,7 @@
         /// ref документу
         /// </summary>
         public string Reference { get; set; }
+        public int? PrintBuhModel { get; set; }
     }
 
     public class PrintDocByRefResponse
