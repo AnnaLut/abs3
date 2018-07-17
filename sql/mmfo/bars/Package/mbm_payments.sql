@@ -963,7 +963,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
        when no_data_found then
           return 0;
     end;
-    
+
     function get_ref(p_cl_id number) return number is
       l_ref number;
     begin
@@ -973,7 +973,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
        where t.cl_id = p_cl_id;
        return l_ref;
     end;
-    
+
     procedure ins_cl_paym_id(p_cl_id number) is
       pragma autonomous_transaction;
     begin
@@ -1037,6 +1037,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
     l_tmp varchar2(32767);
     l_str varchar2(32767);
     l_acc accounts%rowtype;
+    l_ser    person.ser%type;
+    l_numdoc person.numdoc%type;
 
   begin
     bars_audit.trace('%s: entry point', l_th);
@@ -1061,10 +1063,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
               ', p_nd=>'||p_nd||chr(13)||chr(10)||
               ', p_cl_id=>'||p_cl_id||chr(13)||chr(10)||
               ', p_sign=>'||p_sign);
-              
+
     if (check_cl_id(p_cl_id) = 0) then
       ins_cl_paym_id(p_cl_id);
-      
+
           -- точка отката
           savepoint sp_paystart;
 
@@ -1095,7 +1097,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
                       raise_application_error(-20000, 'Рахунок відправника не знайдено!');
               end;
               -- представляемся отделением
-              
+
               --COBUMMFO-4647 согласно заявки докмент создается в бранче привязки счета. Бранч исполнителя не проверяется(код заккоментирован)
               /*if l_branch_usr = '/' then
                  l_branch_usr := case p_dk when 1 then '/'||p_mfoa||'/' else '/'||p_mfob||'/' end;
@@ -1123,10 +1125,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
 /*          select count(1) into l_nls_card
           from MBM_NBS_ACC_TYPES
           where TYPE_ID = 'CARD' and nbs = SUBSTR(p_nlsb,0,4);*/
-          
+
 
           if (p_mfoa = p_mfob) then
-            select * 
+            select *
               into l_acc
               from accounts a
              where a.nls = p_nlsb
@@ -1137,13 +1139,27 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
           end if;
 
           bars_audit.trace('%s: l_tt = %s', l_th, l_tt);
-          
+
           l_errcode := null;
           l_errmsg := null;
           l_ref := null;
           
-          
-          
+          -- Проверка заполнения серии и номера паспорта в карточке клиента
+          if (p_okpoa = '0000000000') then
+              select p.ser,
+                     p.numdoc
+                into l_ser,
+                     l_numdoc
+                from person p,
+                     accounts a
+               where a.rnk = p.rnk 
+                 and a.nls = p_nlsa
+                 and a.kv = l_kv;
+              if (l_ser is null and l_numdoc is null) then
+                 raise_application_error(-20000, 'Не заповнені паспортні данні в карточці клієнта!');
+              end if;
+          end if;
+
           l_impdoc.nd     := p_nd;
           l_impdoc.ref_a  := null ;
           l_impdoc.impref := null ;
@@ -1168,7 +1184,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
           l_impdoc.nazn   := p_nazn         ;
           l_impdoc.datp   := gl.bdate       ;
           l_impdoc.userid := l_userid       ;
-
           l_doc.doc  := l_impdoc;
           begin
               if p_drec is not null then
@@ -1198,12 +1213,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
           p_errcode:=l_errcode;
           p_errmsg:=l_errmsg;
 
+          if (p_okpoa = '0000000000') and l_ref is not null then
+             merge into bars.operw ow
+               using (select * from dual)
+                  on (ow.ref = l_ref and ow.tag = 'Ф')
+                when matched then
+              update set ow.value = l_ser||to_char(l_numdoc)
+                when not matched then
+              insert (ref, tag, value) values (l_ref,'Ф', l_ser||to_char(l_numdoc));
+             update oper op
+                set op.d_rec = d_rec || '#Ф'||l_ser||to_char(l_numdoc)||'#'
+              where op.ref = l_ref;
+          end if;
+
           bars_audit.trace('%s: pay_extern_doc done, l_errcode=%s, l_errmsg=%s',
              l_th, to_char(l_errcode), l_errmsg);
 
          -- возврат контекста
          bc.set_context;
-      
+
           exception when others then
               bars_audit.trace('%s: exception block entry point', l_th);
               bars_audit.trace('%s: error detected sqlerrcode=%s, sqlerrm=%s', l_th, to_char(sqlcode), sqlerrm);
@@ -1217,12 +1245,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
               rollback to savepoint sp_paystart;
               -- возврат контекста
           bc.set_context;
-       end;   
-    else 
+       end;
+    else
       bars_audit.info('Дублирующий документ: '|| p_cl_id);
       p_ref := get_ref(p_cl_id);
     end if;
-    
+
     bars_audit.info('corplight_pay_api(output parameters):
               p_ref=>'||to_char(p_ref)||chr(13)||chr(10)||
             ',p_errcode=>'||to_char(p_errcode)||chr(13)||chr(10)||
