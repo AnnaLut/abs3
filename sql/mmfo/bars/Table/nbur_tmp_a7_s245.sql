@@ -37,8 +37,16 @@ exception when others then
 end; 
 /
 
+begin 
+  execute immediate 'ALTER TABLE BARS.NBUR_TMP_A7_S245 ADD (NBS  VARCHAR2(4))';
+exception
+	when others then 
+		if sqlcode=-1430 then null; else raise; end if;
+end;		
+/
+
 PROMPT *** ALTER_POLICIES to NBUR_TMP_A7_S245 ***
- exec bpa.alter_policies('NBUR_TMP_A7_S245');
+exec bpa.alter_policies('NBUR_TMP_A7_S245');
 
 
 COMMENT ON TABLE BARS.NBUR_TMP_A7_S245 IS 'Таблиця для використання при формуванні С5';
@@ -47,6 +55,7 @@ COMMENT ON COLUMN BARS.NBUR_TMP_A7_S245.REPORT_DATE IS 'Звітна дата (дата перехо
 COMMENT ON COLUMN BARS.NBUR_TMP_A7_S245.KF IS 'Код філії';
 COMMENT ON COLUMN BARS.NBUR_TMP_A7_S245.ACC_ID IS 'Ід. рахунку';
 COMMENT ON COLUMN BARS.NBUR_TMP_A7_S245.S245 IS 'Параметр S245';
+COMMENT ON COLUMN BARS.NBUR_TMP_A7_S245.NBS IS 'Балансовий рахунок активу';
 COMMENT ON COLUMN BARS.NBUR_TMP_A7_S245.OST IS 'Залишок (ном) в день переходу';
 
 PROMPT *** Create  constraint CC_TMPA7S245_DATE_NN ***

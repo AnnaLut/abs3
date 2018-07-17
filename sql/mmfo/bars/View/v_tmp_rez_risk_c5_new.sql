@@ -1,14 +1,33 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_TMP_REZ_RISK_C5_NEW.sql =========*** 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_TMP_REZ_RISK_C5_NEW ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5_NEW ("DAT", "ACC", "NLS", "KV", "RNK", "ND", "ID", "S080", "SZ", "SZQ", "REZ_30", "REZQ_30", "RZ", "DISCONT", "PREM", "R013", "REZNQ", "BVQ", "TOBO", "ACCR", "ACCR_30", "DAT_MI") AS 
-  SELECT fdat dat,
+/* Formatted on 27/06/2018 20:39:22 (QP5 v5.227.12220.39724) */
+CREATE OR REPLACE FORCE VIEW BARS.V_TMP_REZ_RISK_C5_NEW
+(
+   DAT,
+   ACC,
+   NLS,
+   KV,
+   RNK,
+   ND,
+   ID,
+   S080,
+   SZ,
+   SZQ,
+   REZ_30,
+   REZQ_30,
+   RZ,
+   DISCONT,
+   PREM,
+   R013,
+   REZNQ,
+   BVQ,
+   TOBO,
+   ACCR,
+   ACCR_30,
+   DAT_MI,
+   ZPR,
+   NBS
+)
+AS
+     SELECT fdat dat,
             acc,
             nls,
             kv,
@@ -23,7 +42,7 @@ PROMPT *** Create  view V_TMP_REZ_RISK_C5_NEW ***
             SUM (ROUND (rez_30 * 100)) rez_30,
             SUM (ROUND (rezq_30 * 100)) rezq_30,
             MAX (rz) rz,
-            SUM (nvl(diskont, 0) * 100) discont,
+            SUM (NVL (diskont, 0) * 100) discont,
             0 prem,
             MAX (r013) r013,
             SUM (reznq * 100) reznq,
@@ -31,27 +50,28 @@ PROMPT *** Create  view V_TMP_REZ_RISK_C5_NEW ***
             branch,
             NVL (NVL (acc_rez, acc_rezn), acc_rez_30) accr,
             NVL (acc_rez_30, NVL (acc_rez, acc_rezn)) accr_30,
-            dat_mi
+            dat_mi,
+            SUM((case when nbs not like '204%' then 0 else nvl(zpr, 0) *100 end)) zpr,
+            nbs
        FROM nbu23_rez a
-      WHERE rez <> 0 OR diskont <> 0
-         or rez =0 and diskont =0
-                   and tip='SS' and sdate >add_months(fdat,-1)+1      
+      WHERE    rez <> 0
+            OR diskont <> 0
+            OR     rez = 0
+               AND diskont = 0
+               AND tip = 'SS'
+               AND sdate > ADD_MONTHS (fdat, -1) + 1
    GROUP BY fdat,
             acc,
             nls,
+            nbs,
             kv,
             rnk,
             branch,
             NVL (NVL (acc_rez, acc_rezn), acc_rez_30),
-            NVL (acc_rez_30, NVL (acc_rez, acc_rezn)), 
+            NVL (acc_rez_30, NVL (acc_rez, acc_rezn)),
             dat_mi;
 
-PROMPT *** Create  grants  V_TMP_REZ_RISK_C5_NEW ***
-grant SELECT                                                                 on V_TMP_REZ_RISK_C5_NEW to BARSREADER_ROLE;
-grant SELECT                                                                 on V_TMP_REZ_RISK_C5_NEW to UPLD;
 
+GRANT SELECT ON BARS.V_TMP_REZ_RISK_C5_NEW TO BARSREADER_ROLE;
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_TMP_REZ_RISK_C5_NEW.sql =========*** 
-PROMPT ===================================================================================== 
+GRANT SELECT ON BARS.V_TMP_REZ_RISK_C5_NEW TO UPLD;

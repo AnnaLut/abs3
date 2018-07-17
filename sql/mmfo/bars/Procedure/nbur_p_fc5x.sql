@@ -11,7 +11,7 @@ is
 % DESCRIPTION : Процедура формирования 5СX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.000  21/06/2018
+% VERSION     :  v.1.001  17/07/2018 (21/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   ver_              char(30)  := 'v.1.000  21/06/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
@@ -45,10 +45,9 @@ BEGIN
 
   --Определяем версию файла для хранения детальеного протокола
   l_version_id := coalesce(
-                            f_nbur_get_run_version(
-                                                    p_file_code => p_file_code
-                                                    , p_kf => p_kod_filii
-                                                    , p_report_date => p_report_date
+                            f_nbur_get_run_version(p_file_code => p_file_code, 
+                                                   p_kf => p_kod_filii, 
+                                                   p_report_date => p_report_date
                                                   )
                             , -1
                           );
@@ -58,10 +57,9 @@ BEGIN
   --Проверяем есть ли старая версия в очереди на формировании
   --Если нет, то запускаем старую процедуру и ожидаем когда наполнится витрина
   --Если да, то будем ждать, пока она закончится и мы сможем забрать сформированные ею данные
-  if f_nbur_check_file_in_queue(
-                                 p_file_code => c_old_file_code
-                                 , p_kf => p_kod_filii
-                                 , p_report_date => p_report_date
+  if f_nbur_check_file_in_queue(p_file_code => c_old_file_code
+                              , p_kf => p_kod_filii
+                              , p_report_date => p_report_date
                                )
   then
     logger.trace(c_title || ' The file ' || c_old_file_code || ' in queue. Waiting procedure and use it''s data');
@@ -71,10 +69,9 @@ BEGIN
       dbms_lock.sleep(seconds => c_sleep_time);
 
       --Выйдем когда файла в очереди уже нет
-      if f_nbur_check_file_in_queue(
-                                      p_file_code => c_old_file_code
-                                      , p_kf => p_kod_filii
-                                      , p_report_date => p_report_date
+      if f_nbur_check_file_in_queue(p_file_code => c_old_file_code,
+                                    p_kf => p_kod_filii,
+                                    p_report_date => p_report_date
                                     )
       then
         logger.trace(c_title || ' File ' || c_old_file_code || ' in queue. Waiting more...');
@@ -84,11 +81,7 @@ BEGIN
       end if ;
     end loop;
   end if;
-
-  logger.trace(c_title || ' We execute procedure for file ' || c_old_file_code || ' and waiting data');
-  p_fc5(p_report_date, null, 'EMULATE');
-  logger.trace(c_title || ' Execution of procedure for file ' || c_old_file_code || ' finished');
-
+   
   --Теперь сохрянем полученные данные в детальном протоколе
   insert into nbur_log_fc5x(report_date, kf, nbuc, version_id, ekp, a012, t020, r020, r011, r013, r030_1, r030_2, r017, k077, s245, s580, t070, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
       select       
@@ -127,36 +120,34 @@ BEGIN
             , null /*ref*/
             , t.nd /*nd*/
             , t.branch /*branch*/
-      from  (
-              select p.rnk
+      from  (select    p.cust_id rnk
                      , p.nd
-                     , p.acc
-                     , p.nls
+                     , p.acc_id acc
+                     , p.acc_num nls
                      , p.kv
-                     , p.znap
-                     , substr(kodp, 1, 1) as seg_d
-                     , substr(kodp, 2, 4) as seg_bbbb
-                     , substr(kodp, 6, 1) as seg_z
-                     , substr(kodp, 7, 1) as seg_p
-                     , substr(kodp, 8, 3) as seg_vvv
-                     , substr(kodp, 11, 1) as seg_y
-                     , substr(kodp, 12, 1) as seg_q
-                     , substr(kodp, 13, 3) as seg_www
-                     , substr(kodp, 16, 1) as seg_e
-                     , substr(kodp, 17, 1) as seg_k
-                     , p.kodp
-                     , ac.branch
-              from   rnbu_trace p
-                     left join accounts ac on (ac.kf = p_kod_filii)
-                                              and (p.acc = ac.acc)                          
+                     , p.field_value znap
+                     , p.seg_01 as seg_d
+                     , p.seg_02 as seg_bbbb
+                     , p.seg_03 as seg_z
+                     , p.seg_04 as seg_p
+                     , p.seg_05 as seg_vvv
+                     , p.seg_06 as seg_y
+                     , p.seg_07 as seg_q
+                     , p.seg_08 as seg_www
+                     , p.seg_09 as seg_e
+                     , p.seg_10 as seg_k
+                     , p.field_code kodp
+                     , p.branch
+              from v_nbur_#c5_dtl p 
+              where p.report_date = p_report_date and
+                    p.kf = p_kod_filii                        
              ) t
-             join (
-                    select r020, max(I010) I010
+             join (select r020, max(I010) I010
                     from   kl_r020
                     where  p_report_date between d_open and coalesce(d_close, date '4000-01-01')
-                    group by 
-                           r020
-                  ) kl on (t.seg_bbbb = kl.r020);
+                    group by r020
+                  ) kl 
+             on (t.seg_bbbb = kl.r020);
                              
   logger.info(c_title || ' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END;
