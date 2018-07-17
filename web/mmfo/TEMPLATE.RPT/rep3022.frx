@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="07/21/2015 16:10:52" ReportInfo.Modified="09/13/2017 22:09:44" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/21/2015 16:10:52" ReportInfo.Modified="07/11/2018 12:40:49" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHz/03L09idGFNzz+yYha3VW4KDagtMUwWrLigWH4JQRHw==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select  nvl(c.nmkv , f_translate_kmu(c.nmk)) fio1, a.acc,&#13;&#10;           nvl(p.ser||' '||p.numdoc,'_____') pasp,  &#13;&#10;           nvl( f_translate_kmu(p.organ),'_____') organ, &#13;&#10;           p.pdate , &#13;&#10;           nvl( f_translate_kmu(c.adr), '_____') adr, &#13;&#10;           okpo, &#13;&#10;           f_translate_kmu( b.name)     branch_name,&#13;&#10;           a.kf,&#13;&#10;           a.nls,&#13;&#10;           t.lcv, &#13;&#10;           fost(a.acc, :sFdat2)/100 s,&#13;&#10;           sumpr_en.toword_currency( fost(a.acc, :sFdat2)/100, t.kv)   spr ,&#13;&#10;           nvl(  (select card_code from  w4_acc  w4 where  w4.acc_pk=a.acc),'_____') card_tip,&#13;&#10;           f_translate_kmu ( (select val from  params where par like 'BOSS')) leader&#13;&#10;from   customer c, person p, &#13;&#10;          accounts a, branch b, &#13;&#10;          tabval t&#13;&#10;where c.rnk=p.rnk&#13;&#10;  and a.nls=:p_nls&#13;&#10;  and a.kv=:p_kv&#13;&#10;  and c.rnk=a.rnk&#13;&#10;  and a.nbs='2625'&#13;&#10;  and b.branch=a.branch&#13;&#10;  and t.kv=a.kv">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select  nvl(c.nmkv , f_translate_kmu(c.nmk)) fio1, a.acc,&#13;&#10;           nvl(p.ser||' '||p.numdoc,'_____') pasp,  &#13;&#10;           nvl( f_translate_kmu(p.organ),'_____') organ, &#13;&#10;           p.pdate , &#13;&#10;           nvl( f_translate_kmu(c.adr), '_____') adr, &#13;&#10;           okpo, &#13;&#10;           f_translate_kmu( b.name)     branch_name,&#13;&#10;           a.kf,&#13;&#10;           a.nls,&#13;&#10;           t.lcv, &#13;&#10;           fost(a.acc, :sFdat2)/100 s,&#13;&#10;           sumpr_en.toword_currency( fost(a.acc, :sFdat2)/100, t.kv)   spr ,&#13;&#10;           nvl(  (select card_code from  w4_acc  w4 where  w4.acc_pk=a.acc),'_____') card_tip,&#13;&#10;           f_translate_kmu ( (select val from  params where par like 'BOSS')) leader&#13;&#10;from   customer c, person p, &#13;&#10;          accounts a, branch b, &#13;&#10;          tabval t&#13;&#10;where c.rnk=p.rnk&#13;&#10;  and a.nls=:p_nls&#13;&#10;  and a.kv=:p_kv&#13;&#10;  and c.rnk=a.rnk&#13;&#10;  and ( a.nbs='2625' or (a.nbs='2620' and tip like 'W4%'))&#13;&#10;  and b.branch=a.branch&#13;&#10;  and t.kv=a.kv">
         <Column Name="PASP" DataType="System.String"/>
         <Column Name="ORGAN" DataType="System.String"/>
         <Column Name="ADR" DataType="System.String"/>
@@ -54,7 +54,7 @@
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="47.25">
       <TextObject Name="Text3" Width="708.75" Height="47.25" Text="C E R T I F I C A T E&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="49.92" Width="718.2" Height="368.57">
+    <DataBand Name="Data1" Top="51.25" Width="718.2" Height="368.57">
       <TableObject Name="Table4" Left="9.45" Top="198.45" Width="699.3" Height="141.77">
         <TableColumn Name="Column40" Width="368.55"/>
         <TableColumn Name="Column41" Width="330.75"/>
