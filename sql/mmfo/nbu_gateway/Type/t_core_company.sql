@@ -60,7 +60,7 @@ create or replace type t_core_company under t_core_object
                                                                     -- якщо боржник є фізичною особою–підприємцем, структура ownerpp не вказується
     ownerjur                t_core_company_owner_companies,         -- власники істотної участі – юридичні особи (структура ownerjur)
                                                                     -- якщо боржник - юридична особа є фізичною особою – підприємцем, структура ownerjur не вказується
-    k020                  VARCHAR2(20),
+    k020                  VARCHAR2(20 char),
     coddocum              number(2),
     isKr                  number(1), 
     
@@ -208,8 +208,8 @@ create or replace type body t_core_company is
          l_attributes(1) := json_utl.make_json_value('codMan', nvl(codman, '0'));
          l_attributes(2) := json_utl.make_json_value('isRez', nvl(isrez, 'true'), p_mandatory => true);
          l_attributes(3) := json_utl.make_json_string('codEdrpou', company_code);
-         l_attributes(4):=json_utl.make_json_value('coddocum',coddocum);
-         l_attributes(5):=json_utl.make_json_value('k020',k020);
+         l_attributes(4):=json_utl.make_json_value('codDocum',coddocum);
+         l_attributes(5):=json_utl.make_json_string('codK020',k020);
 
          l_attributes(6) := json_utl.make_json_string('nameUr', nameur, p_mandatory => true);
          l_attributes(7) := json_utl.make_json_date('registryDay', registryday, p_mandatory => true);
@@ -458,5 +458,4 @@ create or replace type body t_core_company is
          return l_equals;
      end;
  end;
-
 /
