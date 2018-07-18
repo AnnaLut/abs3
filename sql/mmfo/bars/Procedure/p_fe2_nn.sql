@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.010  22.05.2018 (14.05.2018)
+% VERSION     : v.17.012 17/07/2018 (04/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -17,9 +17,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 22.05.2018 добавлен блок "Exception" при обработке доп.параметра D3#70
            (дата договора)
-14.05.2018 для проводок Дт 2909 Кт 3739 и OB22='35' будут формироваться 
-           следующие значения для некоторых показателей 
-           DD=31 "0', DD=32 - " ", DD=61 - переказ без ідентифікації 
+14.05.2018 для проводок Дт 2909 Кт 3739 и OB22='35' будут формироваться
+           следующие значения для некоторых показателей
+           DD=31 "0', DD=32 - " ", DD=61 - переказ без ідентифікації
            DD=62 - "1"
 20.03.2018 для проводок Дт 3720 Кт 3739 из доп.реквизита "PASPN"
            по коду серии и по номеру паспорта определяем контрагента
@@ -30,74 +30,74 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             и возникала ошибка).
 29.01.2018 для формирования переменной D3#E2_ (дата контракта) добавил
            еще одно условие для формата даты 'DD-MM-YYYY'
-           (доп.параметр D3#70 был заполнен в таком виде и 
+           (доп.параметр D3#70 был заполнен в таком виде и
             и возникала ошибка).
-           Изменено формирование показателя 61NNN 
+           Изменено формирование показателя 61NNN
 22.01.2018 изменено формирование показателя 54NNN
 12.01.2018 изменено формирование показателя 53NNN
-03.01.2018 добавлено формирование показателя 32NNN и 
+03.01.2018 добавлено формирование показателя 32NNN и
            изменено формирование показателя 54NNN
 02.01.2018 на 01.01.2018 добавляются показатели 51, 52, 53, 54, 55
 07.11.2017 удалил блоки для закрытых МФО
 06.06.2017 будут включаться все суммы док-тов >= 0.01 (0.01 USD)
 30.05.2017 на 02.06.2017 будут включаться все суммы док-тов > 100 (1 USD)
 01.03.2017 для банка 344443 (расч.центр) дополнено проводкой Дт 3500 Кт 1500
-13.02.2017 для проводок Дт 1600 Кт 1500 и код страны контрагента для 
+13.02.2017 для проводок Дт 1600 Кт 1500 и код страны контрагента для
            1600 не равен 804 показатель 031 будем формировать с нулевым
-           значением 
-02.02.2017 не будем включать проводки Дт 1600 Кт 1500 и код страны 
-           контрагента для 1600 равен 804 
+           значением
+02.02.2017 не будем включать проводки Дт 1600 Кт 1500 и код страны
+           контрагента для 1600 равен 804
 13.01.2017 для банка 300465 и проводок Дт 3739,2924 Кт 1500
            проверяется наличие счета ДТ в справочнике систем переводов и
            если есть -DD=40 равен 37:розрахунки по платiжних системах
                      -DD=61 дополняется названием системы перевода из справочника
 08.11.2016 для банка 300465 дополнено проводкой Дт 3739 Кт 1502
 15.03.2016 с 21.03.2016 (на 22.03.2016) закрывается показатель 41NNN
-23.02.2016 протокол формирования будет сохраняться в таблицу 
+23.02.2016 протокол формирования будет сохраняться в таблицу
            OTCN_TRACE_70
-02.11.2015 для банка 300465 и проводок Дт 1600 Кт 1500 показатель 61 будем 
+02.11.2015 для банка 300465 и проводок Дт 1600 Кт 1500 показатель 61 будем
            формировать как "переказ коштів з рахунку лоро банку-нерезидента"
-12.10.2015 для 300465 показатель 61 (відомості про операцію) будем 
-           формировать в зависимости от кода меты покупки 
+12.10.2015 для 300465 показатель 61 (відомості про операцію) будем
+           формировать в зависимости от кода меты покупки
            (службова Рощиної 52-18/773 від 12.06.2015)
-21.09.2015 для РУ СБ проводки будут включаться только при наличии в 
+21.09.2015 для РУ СБ проводки будут включаться только при наличии в
            ARC_RRP
 11.08.2015 для всех РУ СБ при формировании будут включаться проводки
            Дт 2520,2530,2541,2542,2544,2545
-           Кт 1500, 1600, 3720, 3739, 3900, 2909  
-22.06.2015 для 300465 показатель 61 (відомості про операцію) будем 
-           формировать в зависимости от кода меты покупки 
+           Кт 1500, 1600, 3720, 3739, 3900, 2909
+22.06.2015 для 300465 показатель 61 (відомості про операцію) будем
+           формировать в зависимости от кода меты покупки
            (службова Рощиної 52-18/773 від 12.06.2015)
 06.02.2015 для всех РУ СБ будут включаться проводки Дт 2600,2620 Кт 1919
            кроме ГОУ а для Дт 2909 Кт 1919 только для Ровно
 04.02.2015 для 300465 будут включаться проводки Дт 1600 Кт 1500
 22.01.2015 для всех РУ СБ будут включаться проводки Дт 2600,2620 Кт 1919
            Дт 2909 Кт 1919
-15.01.2015 для показателя 40ХХХ и Дт 1600 Кт 1500 формируем значение = '31' 
+15.01.2015 для показателя 40ХХХ и Дт 1600 Кт 1500 формируем значение = '31'
 26.11.2014 дополнительно будем обрабатывать доп.реквизит 57A
-           для определения кода банка (B010) 
+           для определения кода банка (B010)
 25.11.2014 для определения кода страны дополнительно обрабатываем доп.
            реквизит "n"
 24.06.2014 вместо доп.реквизита 57A будем обрабатывать доп.реквизит 58A
            - SWIFT_CODE (после изменеия перечня доп.реквизитов)
 03.06.2014 для доп.реквизита tag like '59%' выбираем первых 3 символа
            из поля VALUE
-09.04.2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше 
-03.04.2014 будут отбираться суммы документов строго больше 1000$ 
-27.02.2014 для ОПЕРУ СБ не будем включать проводки вида 
+09.04.2014 включались суммы док-тов >=1001$ а необходимо 1000.01$ и больше
+03.04.2014 будут отбираться суммы документов строго больше 1000$
+27.02.2014 для ОПЕРУ СБ не будем включать проводки вида
            Дт '37396506' Кт '1500%' и назначение "розрахунки за чеками"
 19.02.2014 для физлиц резидентов не имеющих ОКРО определяем серию и номер
            паспорта
 13.02.2014 будут включаться док-ты с суммой не менее 1000.00$
-08.01.2014 для ОПЕРУ СБ будем включать проводки вида 
+08.01.2014 для ОПЕРУ СБ будем включать проводки вида
            Дт '37396506' Кт '1500%' и назначение "розрахунки за чеками"
-26.07.2013 код страны поступления валюты еще будем определять 
+26.07.2013 код страны поступления валюты еще будем определять
            по TAG='50F' и в значении проверяем символы 'UA'
            (не будем включать валютные переводы по Украине)
 22.07.2013 для ОПЕРУ СБ будем включать проводки вида
-           Дт похож на '292430003718%', '292460003717%' Кт на '1500%' 
+           Дт похож на '292430003718%', '292460003717%' Кт на '1500%'
 03.01.2013 для ОПЕРУ СБ будем включать проводки вида
-           Дт похож на '292490204%', '292460205%' Кт на '1500%' 
+           Дт похож на '292490204%', '292460205%' Кт на '1500%'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
    kodf_      VARCHAR2 (2)   := 'E2';
    sql_z      VARCHAR2 (200);
@@ -201,10 +201,10 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    kod_obl_   Varchar2 (2);
    ser_       person.ser%TYPE;
    numdoc_    person.numdoc%TYPE;
-   dat_Izm1_  DATE := TO_DATE('18032016','ddmmyyyy'); -- закривається показник 
+   dat_Izm1_  DATE := TO_DATE('18032016','ddmmyyyy'); -- закривається показник
                                                       -- 41000
-   dat_Izm2_  DATE := TO_DATE('01062017','ddmmyyyy'); -- нова сума для відбору 
-   dat_Izm3_  DATE := TO_DATE('29122017','ddmmyyyy'); -- нові показники 
+   dat_Izm2_  DATE := TO_DATE('01062017','ddmmyyyy'); -- нова сума для відбору
+   dat_Izm3_  DATE := TO_DATE('29122017','ddmmyyyy'); -- нові показники
 
    name_sp_        varchar2(30);
    exist_trans     NUMBER                 := 0;
@@ -212,19 +212,21 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
    cont_num_     varchar2(100);
    cont_dat_     varchar2(100);
    ob22_         varchar2(2);
+   
+   odat_         date;
 
 --курсор по контрагентам
    CURSOR c_main
    IS
-      SELECT   t.ko, decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)), 
+      SELECT   t.fdat, t.ko, decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),
                c.rnk, trim(c.okpo), c.nmk, TO_CHAR (c.country), c.adr,
                NVL (c.ved, '00000'), c.codcagent, NVL(SUM (t.s_eqv),0),
                NVL(SUM (gl.p_icurval (t.kv, t.s_kom, dat_)),0)
-          FROM OTCN_PROV_TEMP t, customer c, tobo b  
+          FROM OTCN_PROV_TEMP t, customer c, tobo b
          WHERE t.rnk = c.rnk
-           and c.tobo = b.tobo  
-      GROUP BY t.ko,
-               decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)), 
+           and c.tobo = b.tobo
+      GROUP BY t.fdat, t.ko,
+               decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),
                c.rnk,
                c.okpo,
                c.nmk,
@@ -344,14 +346,14 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                d1#E2_ := '37';    -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
             if nlsk_ like '1500%' and
-                nls_ in ('37394501547') --and  --,'37396506') 
+                nls_ in ('37394501547') --and  --,'37396506')
             then
                d1#E2_ := '31';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
 
 --  проверка наличия счета ДТ в справочнике систем переводов  13.01.2017
             if nlsk_ like '1500%' and
-               ( nls_ like '3739%' or nls_ like '2924%' ) 
+               ( nls_ like '3739%' or nls_ like '2924%' )
             then
                 if exist_trans >0 then
                   begin
@@ -368,7 +370,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                 end if;
             end if;
 
-            if nls_ like '1600%' and nlsk_ like '1500%' 
+            if nls_ like '1600%' and nlsk_ like '1500%'
             then
                d1#E2_ := '31';  -- с 16.01.2015 согласно письма Рощиной от 15.01.2015
             end if;
@@ -379,11 +381,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             if instr(lower(nazn_),'грош') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
-            
+
             if instr(lower(nazn_),'комерц') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
-            
+
             if instr(lower(nazn_),'соц_альний переказ') > 0 then
                d1#E2_ := '38';  -- с 26.07.2012 согласно письма Рощиной от 11.07.2012
             end if;
@@ -464,11 +466,11 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
          IF p_value_ is null THEN
             p_value_ := f_get_swift_country(REF_);
          end if;
-         
+
          country_ := NVL (LPAD (SUBSTR (TRIM (p_value_), 1, 3), 3, '0'), '000');
          p_value_ :=
             NVL (
-               LPAD (SUBSTR (TRIM (p_value_), 1, 70), 3, '0'), 
+               LPAD (SUBSTR (TRIM (p_value_), 1, 70), 3, '0'),
                'код краiни у яку переказана валюта');
       ELSIF p_i_ = 9
       THEN
@@ -529,7 +531,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 
          end if;
 
-         if p_value_ IS NULL AND trim(d8#E2_) is not null then  
+         if p_value_ IS NULL AND trim(d8#E2_) is not null then
             p_value_ := NVL (SUBSTR (TRIM (d8#E2_), 1, 70), 'назва банку');
             nb_ := p_value_;
          end if;
@@ -597,13 +599,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
          IF mfo_ = 300465 and d1#E2_ = '37'
          THEN
             if name_sp_ <> ''
-            then 
+            then
                p_value_ := substr(name_sp_, 1, 70);
             end if;
          END IF;
 
-         IF mfou_ = 300465 and mfou_ != mfo_ 
-         THEN 
+         IF mfou_ = 300465 and mfou_ != mfo_
+         THEN
             case
                when d1#E2_ = '20' then p_value_ := 'Участь у капіталі';
                when d1#E2_ = '21' then p_value_ := 'Імпорт товарів, робіт, послуг';
@@ -632,23 +634,23 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                when d1#E2_ = '45' then p_value_ := 'Імпорт товарів(продукції, робіт, послуг) на умовах поперед.оплати';
                when d1#E2_ = '46' then p_value_ := 'Повернення дивідентів';
 
-            else 
+            else
                null;
             end case;
          END IF;
 
-         if mfo_ = 300465 and nls_ like '1600%' and nlsk_ like '1500%' 
+         if mfo_ = 300465 and nls_ like '1600%' and nlsk_ like '1500%'
          then
             p_value_ := 'переказ коштів з рахунку лоро банку-нерезидента';  -- с 16.01.2015 согласно письма Рощиной от 15.01.2015
          end if;
 
          if nlsk_ like '3739%' and nls_ like '2909%' and ob22_ = '35'
-         then 
+         then
             p_value_ := 'переказ без ідентифікації';  -- с 14.05.2018 согласно замечаний 07.05.2018
          end if;
       ELSIF p_i_ = 14
       THEN
-         IF Dat_ <= dat_Izm1_ 
+         IF Dat_ <= dat_Izm1_
          THEN
             p_kodp_ := '41';
             -- з 01.06.2009 новий показник
@@ -670,13 +672,13 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
       -- новые коды с 01.01.2018
       ELSIF p_i_ = 15
       THEN
-         IF Dat_ >= dat_Izm3_ 
+         IF Dat_ >= dat_Izm3_
          THEN
             p_kodp_ := '53';
             -- з 29.12.2017 новий показник
             --  назва Бенефіціару
-            
-            if D2#E2_ is not null and D3#E2_ is not null 
+
+            if D2#E2_ is not null and D3#E2_ is not null
             then
 
               begin
@@ -687,9 +689,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
                    and open_date = to_date(cont_dat_, 'ddmmyyyy')
                    and status_id in (0, 8)
                    and lpad(okpo, 10, '0') = lpad(okpo_, 10, '0')
-                   and contr_type = case 
-                                    when d1#E2_ = '36' then 0 
-                                    when d1#E2_ in ('23','24','34','35') then 2 
+                   and contr_type = case
+                                    when d1#E2_ = '36' then 0
+                                    when d1#E2_ in ('23','24','34','35') then 2
                                     else 1
                                     end;
               exception
@@ -744,9 +746,9 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
             end if;
 
             if d53#E2_ is null then
-               d53#E2_ := f_get_swift_benef(ref_); 
+               d53#E2_ := f_get_swift_benef(ref_);
             end if;
-            
+
             if d53#E2_ is not null then
                p_value_ := NVL (SUBSTR (TRIM (d53#E2_), 1, 135), 'назва Бенефіціару');
             else
@@ -755,7 +757,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
          END IF;
       ELSIF p_i_ = 16
       THEN
-         IF Dat_ >= dat_Izm3_ 
+         IF Dat_ >= dat_Izm3_
          THEN
             p_kodp_ := '54';
             -- з 29.12.2017 новий показник
@@ -768,7 +770,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
          END IF;
       ELSIF p_i_ = 17
       THEN
-         IF Dat_ >= dat_Izm3_ 
+         IF Dat_ >= dat_Izm3_
          THEN
             p_kodp_ := '55';
             -- з 29.12.2017 новий показник
@@ -837,20 +839,20 @@ BEGIN
       gr_sum_ := 0;
    END IF;
 
-   -- з 01.06.2017 для переказу безгот.iнвалюти включаються операцii >=1.00$ 
+   -- з 01.06.2017 для переказу безгот.iнвалюти включаються операцii >=1.00$
    IF dat_ >= dat_Izm2_ THEN
       gr_sum_ := 1;
    END IF;
-   
+
    sum_kom := gl.p_icurval(840, 100000, dat_);  -- сума комiсiї
 
-   -- з 01.06.2017 для переказу безгот.iнвалюти включаються операцii >=1.00$ 
+   -- з 01.06.2017 для переказу безгот.iнвалюти включаються операцii >=1.00$
    IF dat_ >= dat_Izm2_ THEN
        sum_kom := gl.p_icurval(840, 100, dat_);  -- сума комiсiї
    END IF;
-    
+
    kol_ref_ := 0;
-   
+
    IF mfou_=300465 and mfo_ != mfou_ and Dat_ > to_date('28072009','ddmmyyyy')
    THEN
       select /*+ index(a, XIE_DAT_A_ARC_RRP) */ count(*)
@@ -869,11 +871,11 @@ BEGIN
         -- отбор проводок, удовлетворяющих условию
         -- надходження вiд нерезидентiв
         INSERT INTO OTCN_PROV_TEMP
-               (ko, rnk, REF, tt, accd, nlsd, kv, acck, nlsk, nazn,
+               (ko, rnk, REF, fdat, tt, accd, nlsd, kv, acck, nlsk, nazn,
                 s_nom, s_eqv)
         SELECT *
         FROM (
-              SELECT   '3' ko, ca.rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
+              SELECT   '3' ko, ca.rnk, o.REF, o.fdat, tt, o.accd, o.nlsd, o.kv, o.acck,
                        o.nlsk, o.nazn,
                        o.s * 100 s_nom,
                        gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
@@ -886,7 +888,7 @@ BEGIN
                         (mfou_=300465 and mfou_ <> mfo_) ) -- BAP
                    OR  (SUBSTR (o.nlsd, 1, 4) in ('2909') and
                         SUBSTR (o.nlsk, 1, 4) in ('1919','3739') and
-                        mfou_=333368 ) 
+                        mfou_=333368 )
                    OR  (SUBSTR (o.nlsd, 1, 4) IN
                                                 ('1502',
                                                  '1511',
@@ -937,7 +939,7 @@ BEGIN
                    OR (o.nlsd in ('37394501547') and  --,'37396506')
                        o.nlsk LIKE '1500%' and
                        mfo_ in (300465) )
-                   OR (o.nlsd like ('3739%') and 
+                   OR (o.nlsd like ('3739%') and
                        o.nlsk LIKE '1502%' and
                        mfo_ in (300465) )
                    OR (o.nlsd LIKE '15_8%'     and
@@ -951,15 +953,15 @@ BEGIN
                        mfo_ in (300465) )
                    OR ((o.nlsd LIKE '292430003718%' or o.nlsd LIKE '292460003717%') and  -- 22/07/2013
                         o.nlsk LIKE '1500%'  and
-                       mfo_ in (300465) )    
+                       mfo_ in (300465) )
                    OR ( o.nlsd like '3800%'   -- 29/07/2012
                         AND SUBSTR (o.nlsk, 1, 4) in ('1500','1600')
                         AND mfo_ in (300465)
-                        AND ref in (select ref 
-                                    from oper 
-                                    where ( ((nlsa like '70%' or nlsa like '71%') and 
+                        AND ref in (select ref
+                                    from oper
+                                    where ( ((nlsa like '70%' or nlsa like '71%') and
                                              (nlsb like '1500%' or nlsb like '1600%')) or
-                                            ((nlsa like '1500%' or nlsa like '1600%') and 
+                                            ((nlsa like '1500%' or nlsa like '1600%') and
                                             (nlsb like '70%' or nlsb like '71%')) )
                                    )
                         AND gl.p_icurval(o.kv, o.s*100, dat_) > sum_kom ) )
@@ -993,12 +995,12 @@ BEGIN
      -- отбор проводок, удовлетворяющих условию
      -- надходження вiд нерезидентiв
      INSERT INTO OTCN_PROV_TEMP
-           (ko, rnk, REF, tt, accd, nlsd, kv, acck, nlsk, nazn,
+           (ko, rnk, REF, fdat, tt, accd, nlsd, kv, acck, nlsk, nazn,
             s_nom, s_eqv)
         SELECT *
         FROM (
             SELECT /*+NO_MERGE(v) PUSH_PRED(v) */
-                  '3' ko, o.rnkd rnk, o.REF, tt, o.accd, o.nlsd, o.kv, o.acck,
+                  '3' ko, o.rnkd rnk, o.REF, fdat, tt, o.accd, o.nlsd, o.kv, o.acck,
                      o.nlsk, o.nazn,
                      o.s * 100 s_nom,
                      gl.p_icurval (o.kv, o.s * 100, dat_) s_eqv
@@ -1016,14 +1018,14 @@ BEGIN
                         o.kv = a.kv and
                         o.s = a.s) v
             WHERE o.kv != 980
-              and o.fdat between Dat_ - 10 and dat_
+              and o.fdat between Dat_ - 10 and dat_ + 1
               and o.ref = v.ref
               and lower(o.nazn) not like '%повернен%кошт%');
    end if;
 
    commit;
-   
-   delete 
+
+   delete
    from OTCN_PROV_TEMP
    where ref in (
         select ref
@@ -1036,7 +1038,7 @@ BEGIN
 
    LOOP
       FETCH c_main
-       INTO ko_, kod_obl_, rnk_, okpo1_, nmk_, k040_, adr_, k110_, codc_, sum1_, sumk1_;
+       INTO odat_, ko_, kod_obl_, rnk_, okpo1_, nmk_, k040_, adr_, k110_, codc_, sum1_, sumk1_;
 
       EXIT WHEN c_main%NOTFOUND;
       rez_ := MOD (codc_, 2);
@@ -1061,18 +1063,18 @@ BEGIN
          END;
       end if;
 
-      -- для физлиц резидентов не имеющих OKPO 
+      -- для физлиц резидентов не имеющих OKPO
       --определяем серию и номер паспорта из PERSON
       if codc_ = 5 and trim(okpo_) in ('99999','999999999','00000','000000000','0000000000')
       then
          BEGIN
-            select ser, numdoc 
+            select ser, numdoc
                into ser_, numdoc_
             from person
             where rnk = rnk_
               and rownum=1;
-         okpo_ := trim(ser_) || ' ' || trim(numdoc_);               
-         EXCEPTION WHEN NO_DATA_FOUND THEN 
+         okpo_ := trim(ser_) || ' ' || trim(numdoc_);
+         EXCEPTION WHEN NO_DATA_FOUND THEN
             null;
          END;
       end if;
@@ -1105,7 +1107,7 @@ BEGIN
             d53#E2_ := null;
             d54#E2_ := null;
             d55#E2_ := null;
- 
+
             kol_61 := 0;
 
             mbkOK_ := false;
@@ -1192,7 +1194,7 @@ BEGIN
                            into D1#E2_, D2#E2_, D3#E2_,
                                 D6#E2_, D7#E2_, D8#E2_, DB#E2_
                         from top_contracts t
-                        where t.pid=pid_ ;  
+                        where t.pid=pid_ ;
 
                         if length(trim(D7#E2_))=3 then
                            D7#E2_ := D7#E2_ ||'0000000';
@@ -1384,7 +1386,7 @@ BEGIN
                                        into D1#E2_, D2#E2_, D3#E2_,
                                             D6#E2_, D7#E2_, D8#E2_, DB#E2_
                                     from top_contracts t
-                                    where t.pid=pid_ ; 
+                                    where t.pid=pid_ ;
 
                                     if length(trim(D7#E2_))=3 then
                                        D7#E2_ := D7#E2_ ||'0000000';
@@ -1500,17 +1502,17 @@ BEGIN
                         end if;
                      end if;
 
-                     if nlsk_ like '3739%' and nls_ like '2909%' 
+                     if nlsk_ like '3739%' and nls_ like '2909%'
                      then
                         begin
                            select ob22d
                               into ob22_
                            from provodki_otc
-                           where fdat = Dat_
+                           where fdat = odat_
                              and ref = ref_;
                         exception
-                              when no_data_found then
-                           ob22_ := '00';
+                           when no_data_found then
+                                ob22_ := '00';
                         end;
                      end if;
 
@@ -1544,36 +1546,36 @@ BEGIN
                            END;
                         end if;
 
-                        if mfo_ = 300465 and 
+                        if mfo_ = 300465 and
                           (nlsk_ like '1500%' and  nls_ like '1600%')
                         then
                            p_ins (nnnn_, '31', lpad('0', 10, '0'));
-                        else 
-                           if nlsk_ like '3739%' and nls_ like '2909%' and ob22_ = '35'    
-                           then 
+                        else
+                           if nlsk_ like '3739%' and nls_ like '2909%' and ob22_ = '35'
+                           then
                               p_ins (nnnn_, '31', '0');
                            else
                               p_ins (nnnn_, '31', lpad(trim (okpo_), 10, '0'));
                            end if;
                         end if;
 
-                        if dat_ >= dat_izm3_ 
+                        if dat_ >= dat_izm3_
                         then
-                           if nlsk_ like '3739%' and nls_ like '2909%' and ob22_ = '35' 
-                           then 
+                           if nlsk_ like '3739%' and nls_ like '2909%' and ob22_ = '35'
+                           then
                               p_ins (nnnn_, '32', ' ');
                            else
                               p_ins (nnnn_, '32', substr(TRIM (nmk_),1,70));
                            end if;
-                        end if; 
-                       
+                        end if;
+
                         if okpo_='0' then
                            -- код резидентностi
                            p_ins (nnnn_, '62', '0');
                         else
                            -- код резидентностi
                            if nlsk_ like '3739%' and nls_ like '2909%' and ob22_ = '35'
-                           then 
+                           then
                               p_ins (nnnn_, '62', '1');
                            else
                               p_ins (nnnn_, '62', TO_CHAR(2 - mod(codc_,2)));
@@ -1610,13 +1612,13 @@ BEGIN
                            ELSIF i=13
                            THEN
                               tag_ := 'DA#E2';  --'DD#70';
-                           ELSIF i=15 
+                           ELSIF i=15
                            THEN
                               tag_ := '59F';
-                           ELSIF i=16 
+                           ELSIF i=16
                            THEN
                               tag_ := '12_2C';
-                           ELSIF i=17 
+                           ELSIF i=17
                            THEN
                               tag_ := 'F089';
                            ELSE
@@ -1632,14 +1634,14 @@ BEGIN
                         -- изменил 20.11.2007 добавлен доп.реквизит 13 - DD#70
                         -- (вiдомостi про операцiю)
                            IF ((dat_ < to_date('01062009','ddmmyyyy') and
-                               ko_ = 3 AND i IN (1, 2, 3, 4, 6, 9, 10, 11, 12, 13)) 
+                               ko_ = 3 AND i IN (1, 2, 3, 4, 6, 9, 10, 11, 12, 13))
                                   OR
                                (dat_ >= to_date('01062009','ddmmyyyy') and
                                ko_ = 3 AND i IN (1, 6, 9, 10, 13, 14)) and
                                 dat_ < dat_izm3_
                                   OR
                                (dat_ >= dat_izm3_ and
-                               ko_ = 3 AND i IN (1, 2, 3, 6, 9, 10, 13, 15, 16, 17)) 
+                               ko_ = 3 AND i IN (1, 2, 3, 6, 9, 10, 13, 15, 16, 17))
                                )
                            THEN
                               BEGIN
@@ -1700,7 +1702,7 @@ BEGIN
                                     from operw
                                     where ref=refd_
                                       and tag='D3#70';
-                                    
+
                                     if instr(D3#E2_, '/') > 0 then
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd/mm/yyyy'), 'ddmmyyyy');
                                     elsif instr(D3#E2_, '.') > 0 then
@@ -1709,7 +1711,7 @@ BEGIN
                                        D3#E2_ := to_char(to_date(replace(D3#E2_, ',','.'), 'dd.mm.yyyy'), 'ddmmyyyy');
                                     elsif instr(D3#E2_, '-') > 0 then
                                        D3#E2_ := to_char(to_date(D3#E2_, 'dd-mm-yyyy'), 'ddmmyyyy');
-                                    else 
+                                    else
                                        D3#E2_ := to_char(to_date(D3#E2_), 'ddmmyyyy');
                                     end if;
                                  exception
@@ -1719,7 +1721,7 @@ BEGIN
                                         null;
                                  end;
                               end if;
-                              
+
                               cont_dat_ := D3#E2_;
 
                               if i=6 and val_ is null and D6#E2_ is null then
@@ -1837,5 +1839,3 @@ BEGIN
     logger.info ('P_FE2_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END p_fe2_nn;
 /
-
-show errors;
