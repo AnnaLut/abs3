@@ -111,11 +111,11 @@ create or replace type body t_core_person is
          members         := l_person_family_row.members;
 
          k060            := bars.string_list(lpad(l_person_row.k060, 2, '0'));
-         
+
          k020            :=l_person_row.k020;
-         coddocum        :=l_person_row.coddocum; 
-         isKR            :=l_person_row.iskr; 
-         
+         coddocum        :=l_person_row.coddocum;
+         isKR            :=l_person_row.iskr;
+
          core_object_kf  := p_person_kf;
          core_object_id  := p_person_id;
 
@@ -148,8 +148,8 @@ create or replace type body t_core_person is
                                                                  json_utl.make_json_string('middleName', middleName, p_mandatory => true) ||
                                                             ' }');
          l_attributes(5) := json_utl.make_json_date('birthDay', birthDay);
-         l_attributes(6):=json_utl.make_json_value('coddocum',coddocum);
-         l_attributes(7):=json_utl.make_json_value('k020',k020);
+         l_attributes(6):=json_utl.make_json_value('codDocum',coddocum);
+         l_attributes(7):=json_utl.make_json_string('codK020',k020);
          if (documents is not null and documents is not empty) then
              l := documents.first;
              l_document_attributes.extend(documents.count);
@@ -208,8 +208,8 @@ create or replace type body t_core_person is
          l_attributes(12) := json_utl.make_json_value('k060',
                                                       '["' || nvl(bars.tools.words_to_string(k060, p_splitting_symbol => '", "', p_ignore_nulls => 'Y'), '99') || '"]',
                                                       p_mandatory => true);
-                                                      
-         l_attributes(13) := json_utl.make_json_value('isKr', isKr);                                             
+
+         l_attributes(13) := json_utl.make_json_value('isKr', isKr);
          dbms_lob.createtemporary(l_clob, false);
 
          dbms_lob.append(l_clob, '{ "data": { ');
@@ -396,4 +396,5 @@ create or replace type body t_core_person is
          end if;
      end;
  end;
+
 /

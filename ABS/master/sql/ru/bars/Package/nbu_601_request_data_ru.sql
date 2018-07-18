@@ -337,9 +337,7 @@ create or replace package body nbu_601_request_data_ru is
                           end codDocum
 
                    from   customer c
-                   where  --c.okpo='36806331' and 
-                    -- c.rnk=93950301 and
-                     c.rnk in (select a.rnk
+                   where  c.rnk in (select a.rnk
                                     from   accounts a
                                     where  a.kf = kf_ and
                                            (a.nbs member of g_balance_accounts or (a.nbs in ('2600', '2620', '2625', '2650', '2655') and a.ostq < 0)) and
@@ -859,16 +857,16 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                bpk.kv as r030,
                                proc.proccredit,
                                sum_lim.sumpay as sumpay,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
+                               nvl((select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
-                                       dt.tag = 'FREQ') as periodbase,
-                               (select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
+                                       dt.tag = 'FREQ'),1) as periodbase,
+                               nvl((select decode(dt.txt, '5', 1, '7', 2, '180', 3, '120', 4, '360', 4, '400', 5, '40', 6) as freq
                                 from   nd_txt dt
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
-                                       dt.tag = 'FREQP') as periodproc,
+                                       dt.tag = 'FREQP'),1) as periodproc,
                                sumarrears.sum_ost as sumarrears,
                                sp.sp_sum  as arrearbase ,
                                spn.spn_sum as arrearproc,
@@ -1030,7 +1028,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                           /*(select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
                             from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv*/
 
-                            (select distinct cd.nd ,ca.kv, ((cd.limit*100)+nvl(b.amount_com,0)) as  sum_zagal
+                            (select distinct cd.nd ,ca.kv, ((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
                                              from cc_add ca,cc_deal cd
                                              left join (select a.nd,sum(a.amount_com) as amount_com from(
                                                             select distinct ad.nd,na.acc,ad.kv,a.kv,
@@ -1307,7 +1305,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                          /* (select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
                             from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv  */
 
-                            (select distinct cd.nd ,ca.kv, ((cd.limit*100)+nvl(b.amount_com,0)) as  sum_zagal
+                            (select distinct cd.nd ,ca.kv, ((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
                                              from cc_add ca,cc_deal cd
                                              left join (select a.nd,sum(a.amount_com) as amount_com from(
                                                             select distinct ad.nd,na.acc,ad.kv,a.kv,
@@ -1456,12 +1454,9 @@ end;
                       from   accounts a
                       where  a.acc in (k.acc_pk, k.acc_ovr, k.acc_9129, k.acc_2208, k.acc_2207, k.acc_3579, k.acc_2209) and a.nbs not in ('3550', '3551') and
                              ost_korr(a.acc, l_dat31, to_char(trunc(l_dat31, 'MM'), 'J' ) - 2447892, a.nbs) < 0) loop
-               -- begin             
+
                 insert into nbu_w4_bpk (nd, kv, nls, nbs, ob22, acc, tip, tip_kart, fin23, rnk, sdate, wdate, acc_pk, kf, sum_zagal, dat_close)
                 values (k.nd, s.kv, s.nls, s.nbs, s.ob22, s.acc, s.tip, 41, k.fin23, s.rnk, null, k.dat_end, k.acc_pk, kf_, s.ost_korr, s.dat_close);
-            /*exception when others then 
-              dbms_output.put_line('nd: '||k.nd || ' ' ||  s.acc||'-'||kf_ );
-              end;*/
             end loop;
         end loop;
 
