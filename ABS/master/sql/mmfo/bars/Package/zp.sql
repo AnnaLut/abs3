@@ -114,7 +114,7 @@ end;
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.18 18.06.2018';
+g_body_version   constant varchar2(64)   := 'version 1.19 18.07.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -735,7 +735,7 @@ begin
     end if;
 
     begin
-    select okpo, nmkv into l_okpo,l_nmkv from customer where rnk=p_rnk;
+    select okpo, nmkk into l_okpo,l_nmkv from customer where rnk=p_rnk;
     exception when no_data_found then
              raise_application_error(-20000, 'Вказаного РНК - '||p_rnk||',  не існує.');
     end;
