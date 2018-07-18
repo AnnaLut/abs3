@@ -13548,6 +13548,7 @@ end if;
                           WHERE nd = d.nd
                             AND tag = 'DAYSN'),
                          to_char(lpad(i8.s, 2, '0'))) pl_day_sn
+                    ,a.dazs
                 FROM accounts a,
                      nd_acc n,
                      nd_acc n8,
@@ -13578,6 +13579,11 @@ end if;
                ORDER BY d.sdate, d.wdate, d.sos DESC,
                         decode(a.nbs, '3739', 1, '2620', 2, 3)) LOOP
       --цикл по счетам гашения
+
+      if k.dazs is not null and k.dazs>gl.bDATE then
+        logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' закритий '||to_char(k.dazs,'dd.mm.yyyy')||'. Списання неможливе. Пропускаємо');
+        continue;
+      end if;
 
       --перевірка mode_ на необхідність врахування рахунків 2625 як рах. погашення
       IF (mode_ = 2) AND (k.nlsd LIKE '2625%') THEN
