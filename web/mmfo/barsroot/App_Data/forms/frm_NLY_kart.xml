@@ -5,7 +5,11 @@
       <sql>
         select a.acc, a.kv, a.nls, a.nms, a.ostc/100 ost_fk, a.ostb/100 ost_pl, sum(o.s) sum_kar, count(*) kount_pl, case when a.ostb/100 = sum(o.s) then '0' else '1' end color
         FROM accounts a, v_per_nly o
-        where a.acc = o.acc
+        where a.acc = o.acc(+)
+          and a.ostc!=0
+          and a.tip = 'NLY'
+          and a.nbs = '2909'
+          and a.ob22 = '08'
         group by a.acc, a.kv, a.nls, a.nms, a.ostc/100, a.ostb/100
         order by a.nls, a.kv
       </sql>
