@@ -257,7 +257,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BRANCH_ATTRIBUTE_UTL is
                      null;
             end;
         else
-            select min(t.attribute_value) keep (dense_rank last order by length(t.branch_code))
+            select /*+ index(t IDX_BRANCH_ATTRIBUTE_VALUE)*/min(t.attribute_value) keep (dense_rank last order by length(t.branch_code))
             into   l_value
             from   branch_attribute_value t
             where  t.attribute_code = p_attribute_code and
