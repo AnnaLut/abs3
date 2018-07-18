@@ -29,7 +29,7 @@ END PAY_IMMOBILE;
 /
 
 CREATE OR REPLACE PACKAGE BODY BARS.PAY_IMMOBILE IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.36  22/11/2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.38  18/07/2018';
   g_mfo varchar2(9);
 
  function get_nls2924foracc(p_nls in varchar2)
@@ -132,7 +132,7 @@ end get_nls2924foracc;
                              when '2630' then
                               '2630_046' || substr(l_rec_asvo.branch, 2, 6)
                              when '2635' then
-                              '2635_038' || substr(l_rec_asvo.branch, 2, 6)
+                              '2635_038' || substr(l_rec_asvo.branch, 2, 6) --'2630_046' || substr(l_rec_asvo.branch, 2, 6)
                            end);
       l_nls_b_opl := vkrzn(substr(l_mfo_a, 1, 5),
                            '3739_' || substr(l_rec_asvo.bsd, 3, 2) ||
@@ -698,7 +698,7 @@ end get_nls2924foracc;
                              when '2630' then
                               '2630_046' || substr(l_rec_asvo.branch, 2, 6)
                              when '2635' then
-                              '2635_038' || substr(l_rec_asvo.branch, 2, 6)
+                              '2635_038' || substr(l_rec_asvo.branch, 2, 6) --'2630_046' || substr(l_rec_asvo.branch, 2, 6)
                            end);
       l_nls_b_opl := vkrzn(substr(l_mfo_a, 1, 5),
                            '3739_' || substr(l_rec_asvo.bsd, 3, 2) ||
