@@ -9,8 +9,8 @@ create or replace procedure EBK_SENDCARDPACKAGES
   %param p_cardsCount  -
   %param p_packSize    -
 
-  %version  2.5
-  %date     2018.05.16
+  %version  2.6
+  %date     2018.06.21
   %modifier BAA
   %usage
   */
@@ -55,9 +55,10 @@ create or replace procedure EBK_SENDCARDPACKAGES
     then
       select count(RNK)
         into l_q_sz
-        from EBK_QUEUE_UPDATECARD
+        from EBKC_QUEUE_UPDATECARD
        where KF = l_kf
-         and STATUS = 0;
+         and STATUS = 0
+         and CUST_TYPE = EBKC_PACK.INDIVIDUAL;
     when 'SendCardPackagesLegal'
     then
       select count(RNK)
@@ -65,7 +66,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
         from EBKC_QUEUE_UPDATECARD
        where KF = l_kf
          and STATUS = 0
-         and CUST_TYPE = 'L';
+         and CUST_TYPE = EBKC_PACK.LEGAL_ENTITY;
     when 'SendCardPackagesPrivateEn'
     then
       select count(RNK)
@@ -73,7 +74,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
         from EBKC_QUEUE_UPDATECARD
        where KF = l_kf
          and STATUS = 0
-         and CUST_TYPE = 'P';
+         and CUST_TYPE = EBKC_PACK.PRIVATE_ENT;
     else
       l_q_sz := 0;
     end case;
@@ -156,12 +157,13 @@ create or replace procedure EBK_SENDCARDPACKAGES
             case p_action_name
             when 'SendCardPackages'
             then
-              update EBK_QUEUE_UPDATECARD
+              update EBKC_QUEUE_UPDATECARD
                  set STATUS = 9
                where ROWID = ( select min(ROWID)
-                                 from EBK_QUEUE_UPDATECARD
+                                 from EBKC_QUEUE_UPDATECARD
                                 where KF = l_kf
-                                  and STATUS = 0 );
+                                  and STATUS = 0
+                                  and CUST_TYPE = EBKC_PACK.INDIVIDUAL );
             when 'SendCardPackagesLegal'
             then
               update EBKC_QUEUE_UPDATECARD
@@ -170,7 +172,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
                                from EBKC_QUEUE_UPDATECARD
                               where KF = l_kf
                                 and STATUS = 0
-                                and CUST_TYPE = 'L' );
+                                and CUST_TYPE = EBKC_PACK.LEGAL_ENTITY );
             when 'SendCardPackagesPrivateEn'
             then
               update EBKC_QUEUE_UPDATECARD
@@ -179,7 +181,7 @@ create or replace procedure EBK_SENDCARDPACKAGES
                                  from EBKC_QUEUE_UPDATECARD
                                 where KF = l_kf
                                   and STATUS = 0
-                                  and CUST_TYPE = 'P' );
+                                  and CUST_TYPE = EBKC_PACK.PRIVATE_ENT );
             else
               null;
             end case;

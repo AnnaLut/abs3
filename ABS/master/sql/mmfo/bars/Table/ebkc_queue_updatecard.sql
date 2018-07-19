@@ -5,7 +5,7 @@ PROMPT =========================================================================
 PROMPT *** ALTER_POLICY_INFO to EBKC_QUEUE_UPDATECARD ***
 
 begin
-  bpa.alter_policy_info( 'EBKC_QUEUE_UPDATECARD', 'CENTER', null,  'E',  'E',  'E' );
+  bpa.alter_policy_info( 'EBKC_QUEUE_UPDATECARD', 'CENTER', null, null, null, null );
   bpa.alter_policy_info( 'EBKC_QUEUE_UPDATECARD', 'FILIAL', null, null, null, null );
   bpa.alter_policy_info( 'EBKC_QUEUE_UPDATECARD', 'WHOLE' , null, null, null, null );
 end;
@@ -34,7 +34,7 @@ exec bpa.alter_policies('EBKC_QUEUE_UPDATECARD');
 
 COMMENT ON TABLE  EBKC_QUEUE_UPDATECARD IS 'Черга клієнтів (ЮО, ФОП) для формування пакету оновлень';
 
-COMMENT ON COLUMN EBKC_QUEUE_UPDATECARD.CUST_TYPE IS 'Тип клієнта: L - юрособа, P - ФОП';
+COMMENT ON COLUMN EBKC_QUEUE_UPDATECARD.CUST_TYPE IS 'Тип клієнта: L - ЮО, P - ФОП, I - ФО';
 COMMENT ON COLUMN EBKC_QUEUE_UPDATECARD.KF        IS 'Код філіалу (МФО)';
 
 PROMPT *** Create  constraint CHK_EBK_QUPDCARD_LP ***
@@ -113,9 +113,6 @@ PROMPT *** Create  grants  EBKC_QUEUE_UPDATECARD ***
 
 grant SELECT                      on EBKC_QUEUE_UPDATECARD to BARSREADER_ROLE;
 grant DELETE,INSERT,SELECT,UPDATE on EBKC_QUEUE_UPDATECARD to BARS_ACCESS_DEFROLE;
-grant SELECT                      on EBKC_QUEUE_UPDATECARD to BARS_DM;
-grant SELECT                      on EBKC_QUEUE_UPDATECARD to UPLD;
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/EBKC_QUEUE_UPDATECARD.sql =========***

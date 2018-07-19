@@ -1,7 +1,28 @@
-PROMPT *** Create  view EBK_QUEUE_RELATEDPERSON_V ***
+-- ======================================================================================
+-- Module : CDM (ªÁÊ)
+-- Author : BAA
+-- Date   : 21.06.2018
+-- ======================================================================================
+-- create view EBK_QUEUE_RELATEDPERSON_V
+-- ======================================================================================
 
-CREATE OR REPLACE FORCE VIEW BARS.EBK_QUEUE_RELATEDPERSON_V
-( "KF", "relId", "RELATEDNESS", "relIntext", "RNK", "relRnk", "NOTES"
+SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
+SET ECHO         OFF
+SET LINES        200
+SET PAGES        200
+
+prompt -- ======================================================
+prompt -- create view EBK_QUEUE_RELATEDPERSON_V
+prompt -- ======================================================
+
+create or replace force view EBK_QUEUE_RELATEDPERSON_V
+( "KF"
+, "relId"
+, "RELATEDNESS"
+, "relIntext"
+, "RNK"
+, "relRnk"
+, "NOTES"
 , CUST_ID
 ) AS
   select c.kf
@@ -11,25 +32,23 @@ CREATE OR REPLACE FORCE VIEW BARS.EBK_QUEUE_RELATEDPERSON_V
      , t.RNK
      , t.rel_rnk     as "relRnk"
      , t.notes
-     , t.RNK          as CUST_ID
-  from BARS.V_CUSTOMER_REL t
-     , BARS.CUST_REL r
-     , BARS.CUSTOMER c
+     , t.RNK         as CUST_ID
+  from V_CUSTOMER_REL t
+     , CUST_REL r
+     , CUSTOMER c
  where t.rel_id = r.id
    and t.rnk = c.rnk
    and c.CUSTTYPE = 3
    and (c.BC = 0 or c.BC is null)
    and (c.date_off is NULL or c.date_off > sysdate)
    and t.rnk <> t.rel_rnk
-   and exists (select null from EBK_QUEUE_UPDATECARD where rnk = c.rnk )
+   and exists ( select null from EBKC_QUEUE_UPDATECARD 
+                 where CUST_TYPE = 'I'
+                   and STATUS    = 0
+                   and KF        = c.KF
+                   and RNK = c.RNK )
 ;
 
 show errors;
 
 grant SELECT on EBK_QUEUE_RELATEDPERSON_V to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/EBK_QUEUE_RELATEDPERSON_V.sql =========
-PROMPT ===================================================================================== 

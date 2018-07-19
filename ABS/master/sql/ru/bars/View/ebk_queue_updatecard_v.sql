@@ -1,15 +1,15 @@
 -- ======================================================================================
 -- Module : CDM (ЄБК)
 -- Author : BAA
--- Date   : 12.02.2018
+-- Date   : 21.06.2018
 -- ======================================================================================
 -- create view EBK_QUEUE_UPDATECARD_V
 -- ======================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
 SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
+SET LINES        200
+SET PAGES        200
 
 prompt -- ======================================================
 prompt -- create view EBK_QUEUE_UPDATECARD_V
@@ -97,8 +97,8 @@ create or replace force view EBK_QUEUE_UPDATECARD_V
 , GCIF
 , RCIF
 ) AS 
-select eq.KF,                           -- Код РУ (код МФО)
-       eq.RNK,                          -- Реєстр. № (РНК)
+select q.KF,                            -- Код РУ (код МФО)
+       q.RNK,                           -- Реєстр. № (РНК)
        ecbi.date_ON  as dateON ,        -- Дата реєстрації
        ecbi.date_OFF as dateOFF,        -- Дата закриття
        ecbi.nmk,                        -- Найменування клієнта (нац.)
@@ -173,20 +173,21 @@ select eq.KF,                           -- Код РУ (код МФО)
        ecbi.deposit,
        ecbi.current_account as CurrentAccount,
        ecbi.other,
-       eq.INSERT_DATE as lastChangeDt,
-       eq.RNK as CUST_ID,
-       eg.GCIF,
+       nvl( g.ABS_MOD_TMS, q.INSERT_DATE ) as lastChangeDt,
+       q.RNK as CUST_ID,
+       g.GCIF,
        cast( null as number ) as RCIF
   from ( select KF, RNK, INSERT_DATE
-           from EBK_QUEUE_UPDATECARD
-          where STATUS = 0
+           from EBKC_QUEUE_UPDATECARD
+          where CUST_TYPE = 'I'
+            and STATUS    = 0
           order by ROWID
-       ) eq
-  left
-  join EBKC_GCIF eg
-    on ( eg.RNK = eq.RNK )
+       ) q
   join EBK_CUST_BD_INFO_V  ecbi
-    on ( ecbi.RNK = eq.RNK )
+    on ( ecbi.RNK = q.RNK )
+  left outer
+  join EBKC_GCIF g
+    on ( g.RNK = q.RNK )
 ;
 
 show errors;

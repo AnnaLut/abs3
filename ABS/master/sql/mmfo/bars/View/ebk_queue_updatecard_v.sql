@@ -1,15 +1,15 @@
 -- ======================================================================================
 -- Module : CDM (™¡ )
 -- Author : BAA
--- Date   : 12.02.2018
+-- Date   : 21.06.2018
 -- ======================================================================================
 -- create view EBK_QUEUE_UPDATECARD_V
 -- ======================================================================================
 
 SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
 SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
+SET LINES        200
+SET PAGES        200
 
 prompt -- ======================================================
 prompt -- create view EBK_QUEUE_UPDATECARD_V
@@ -177,13 +177,14 @@ select q.KF,                          --  Ó‰ –” (ÍÓ‰ Ã‘Œ)
        ecbi.deposit,
        ecbi.current_account as CurrentAccount,
        ecbi.other,
-       q.INSERT_DATE as lastChangeDt,
+       nvl( g.ABS_MOD_TMS, q.INSERT_DATE ) as lastChangeDt,
        q.RNK as CUST_ID,
        g.GCIF,
        cast( null as number ) as RCIF
   from ( select KF, RNK, INSERT_DATE
-           from EBK_QUEUE_UPDATECARD
-          where STATUS = 0
+           from EBKC_QUEUE_UPDATECARD
+          where CUST_TYPE = 'I'
+            and STATUS    = 0
           order by ROWID
        ) q
   join EBK_CUST_BD_INFO_V  ecbi

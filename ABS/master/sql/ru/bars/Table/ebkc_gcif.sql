@@ -35,7 +35,8 @@ begin
 , GCIF            VARCHAR2(30)    NOT NULL
 , CUST_TYPE       VARCHAR2(1)     NOT NULL
 , INSERT_DATE     DATE
-, MOD_TMS         TIMESTAMP(3) WITH TIME ZONE
+, EBK_MOD_TMS     TIMESTAMP(3) WITH TIME ZONE
+, ABS_MOD_TMS     TIMESTAMP(3) WITH TIME ZONE
 ) tablespace BRSMDLD';
 
   dbms_output.put_line( 'Table "EBKC_GCIF" created.' );
@@ -51,14 +52,42 @@ prompt -- Alter table
 prompt -- ======================================================
 
 declare
+  e_col_not_exists exception;
+  pragma exception_init( e_col_not_exists, -00904 );
+  e_dup_col_nm           exception;
+  pragma exception_init( e_dup_col_nm, -00957 );
+begin
+  execute immediate 'alter table EBKC_GCIF rename column MOD_TMS to EBK_MOD_TMS';
+  dbms_output.put_line('Table altered.');
+exception
+  when e_col_not_exists
+  then null;
+  when e_dup_col_nm
+  then null;
+end;
+/
+
+declare
   e_col_exists           exception;
   pragma exception_init( e_col_exists, -01430 );
 begin
-  execute immediate 'alter table EBKC_GCIF add ( MOD_TMS timestamp(3) WITH TIME ZONE )';
+  execute immediate 'alter table EBKC_GCIF add ( EBK_MOD_TMS timestamp(3) WITH TIME ZONE )';
   dbms_output.put_line( 'Table altered.' );
 exception
-  when e_col_exists then
-    dbms_output.put_line( 'Column "MOD_TMS" already exists in table.' );
+  when e_col_exists
+  then null;
+end;
+/
+
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate 'alter table EBKC_GCIF add ( ABS_MOD_TMS timestamp(3) WITH TIME ZONE )';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists 
+  then null;
 end;
 /
 
@@ -130,7 +159,8 @@ COMMENT ON COLUMN EBKC_GCIF.KF          IS 'Код філіалу (МФО)';
 COMMENT ON COLUMN EBKC_GCIF.RNK         IS 'Iдентифiкатор клієнта (РНК)';
 COMMENT ON COLUMN EBKC_GCIF.GCIF        IS 'Унікально непостійний ідентифiкатор клієнта в ЄБК';
 COMMENT ON COLUMN EBKC_GCIF.CUST_TYPE   IS 'Тип клієнта (I/P/L)';
-COMMENT ON COLUMN EBKC_GCIF.MOD_TMS     IS 'Дата модифікації в ЄБК';
+COMMENT ON COLUMN EBKC_GCIF.EBK_MOD_TMS IS 'Час модифікації в ЄБК';
+COMMENT ON COLUMN EBKC_GCIF.ABS_MOD_TMS IS 'Час останньої модифікації картки клієнта в АБС';
 
 prompt -- ======================================================
 prompt -- Grants
