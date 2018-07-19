@@ -4,7 +4,7 @@ is
   --
   -- constants
   --
-  g_header_version constant varchar2(64) := 'version 1.02  2016.08.20';
+  g_header_version constant varchar2(64) := 'version 1.03  2018.06.19';
 
   --
   function show_card_accord_quality( p_kf in varchar2,
@@ -38,7 +38,12 @@ is
                               p_attr_name in varchar2,
                               p_new_val in varchar2
                               );
-  procedure add_rnk_queue (p_rnk in number);
+
+  --
+  procedure ADD_RNK_QUEUE
+  ( p_rnk       in  number
+  , p_cust_tp   in  varchar2 default null
+  );
 
   --
   function get_db_value(p_rnk in number,p_attr_name in varchar2, p_cust_type in varchar2)  return varchar2 ;
@@ -150,7 +155,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.08  2018.03.14';
+  g_body_version  constant varchar2(64) := 'version 1.09  2018.06.19';
 
   --
   -- variables
@@ -300,31 +305,43 @@ is
   --
   --
   --
-  function get_cust_quantity_for_group(p_group_id in number, p_custtype in varchar2) return number
+  function GET_CUST_QUANTITY_FOR_GROUP
+  ( p_group_id in number
+  , p_custtype in varchar2
+  ) return number
+  is
+    l_qty  number;
+  begin
+
+    select count(1)
+      into l_qty
+      from EBKC_REQ_UPDATECARD  t
+     where t.group_id = p_group_id
+       and t.kf       = GL.KF()
+       and coalesce(t.CUST_TYPE,EBKC_PACK.GET_CUSTTYPE(t.RNK)) = p_custtype
+       and exists ( select null from CUSTOMER where RNK = t.RNK and DATE_OFF is null );
+
+    return l_qty;
+
+  end GET_CUST_QUANTITY_FOR_GROUP;
+
+  --
+  --
+  --
+  function get_legal_quantity_for_group(p_group_id in number ) return number
   is
   begin
-     for x in ( select count(1) as qty
-                  from EBKC_REQ_UPDATECARD  t
-                 where t.group_id = p_group_id
-                   and t.kf = gl.kf
-                   and nvl(cust_type,ebkc_pack.get_custtype(t.rnk)) = p_custtype
-                   and not exists (select null from customer where rnk = t.rnk and date_off is not null) )
-     loop
-      return x.qty;
-     end loop;
-  end get_cust_quantity_for_group;
- -- +
- function get_legal_quantity_for_group(p_group_id in number ) return number
- is
- begin
-   return GET_CUST_QUANTITY_FOR_GROUP( p_group_id, EBKC_PACK.LEGAL_ENTITY );
- end;
- -- +
- function get_priv_quantity_for_group(p_group_id in number ) return number
- is
- begin
-   return GET_CUST_QUANTITY_FOR_GROUP( p_group_id, EBKC_PACK.PRIVATE_ENT );
- end;
+    return GET_CUST_QUANTITY_FOR_GROUP( p_group_id, EBKC_PACK.LEGAL_ENTITY );
+  end;
+
+  --
+  --
+  --
+  function get_priv_quantity_for_group(p_group_id in number ) return number
+  is
+  begin
+    return GET_CUST_QUANTITY_FOR_GROUP( p_group_id, EBKC_PACK.PRIVATE_ENT );
+  end;
 
   function get_cust_quantity_for_subgr(p_group_id in number,
                                        p_subgr_id in number
@@ -459,28 +476,56 @@ is
       raise;
   end change_cust_attr;
 
-  procedure add_rnk_queue
+  --
+  -- ENQUEUE
+  --
+  procedure ADD_RNK_QUEUE
+  ( p_rnk       in  number
+  , p_cust_tp   in  varchar2 default null
+  ) is
+    l_cust_tp       varchar2(1);
+  begin
+
+    if ( p_cust_tp Is Null )
+    then
+      l_cust_tp := EBKC_PACK.GET_CUSTTYPE( p_rnk );
+    else
+      l_cust_tp := p_cust_tp;
+    end if;
+
+    EBKC_PACK.ENQUEUE( p_rnk, l_cust_tp );
+
+    update EBKC_GCIF
+       set ABS_MOD_TMS = cast( EBKC_PACK.GET_LAST_CHG_DT( p_rnk, l_cust_tp ) AS TIMESTAMP(3) WITH TIME ZONE ) -- systimestamp
+     where RNK = p_rnk;
+
+  end ADD_RNK_QUEUE;
+
+  --
+  -- DEQUEUE
+  --
+  procedure CLEAR_QUEUE_RNK
   ( p_rnk in number
   ) is
   begin
-    insert
-      into EBKC_QUEUE_UPDATECARD
-         ( RNK, CUST_TYPE )
-    select p_rnk, ebkc_pack.get_custtype( p_rnk )
-      from dual
-     where not exists (select null from EBKC_QUEUE_UPDATECARD  where rnk = p_rnk and status = 0);
-  end add_rnk_queue;
 
- procedure del_all_recomm(p_rnk in number, p_kf in varchar2 ) is
+    EBKC_PACK.DEQUEUE( p_rnk );
+
+  end CLEAR_QUEUE_RNK;
+
+ procedure del_all_recomm
+ ( p_rnk in number, p_kf in varchar2
+ ) is
  begin
-   delete
-     from EBKC_REQ_UPDATECARD
-    where kf = p_kf
-     and rnk = p_rnk;
 
-   delete from  EBKC_REQ_UPDCARD_ATTR
-       where kf = p_kf
-         and rnk = p_rnk;
+   delete EBKC_REQ_UPDATECARD
+    where kf  = p_kf
+      and rnk = p_rnk;
+
+   delete EBKC_REQ_UPDCARD_ATTR
+    where kf  = p_kf
+      and rnk = p_rnk;
+
  end del_all_recomm;
 
  procedure save_card_changes( p_kf in varchar2,

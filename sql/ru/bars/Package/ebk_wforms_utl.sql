@@ -92,7 +92,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.06  2017.11.21';
+  g_body_version  constant varchar2(64) := 'version 1.07  2018.06.19';
   g_cust_tp       constant varchar2(1)  := 'I';
   
   --
@@ -298,65 +298,79 @@ is
    
  end GET_CUST_SUBGRP;
 
- procedure change_cust_attr (p_rnk in number,
-                             p_attr_name in varchar2,
-                             p_new_val in varchar2
-                            )
- is
- l_theCursor integer;
- l_columnValue number default NULL;
- l_status integer;
- l_action ebk_card_attributes.action%type;
- begin
-   -- Клиент должен быть открытым
-   for x in (select date_off from customer where rnk = p_rnk)
-   loop
-       if x.date_off is not null then
+  procedure change_cust_attr (p_rnk in number,
+                              p_attr_name in varchar2,
+                              p_new_val in varchar2
+                             )
+  is
+    l_theCursor integer;
+    l_columnValue number default NULL;
+    l_status integer;
+    l_action ebk_card_attributes.action%type;
+  begin
+    -- Клиент должен быть открытым
+    for x in (select date_off from customer where rnk = p_rnk)
+    loop
+      if x.date_off is not null
+      then
         rollback;
         raise_application_error(-20000, 'Клиент rnk='||p_rnk||' закрыт, змінення над карткой заборонені!');
-       end if;
-   end loop;
-   --Определяем действие
-   select action into l_action
-     from ebk_card_attributes where name = p_attr_name;
- if l_action is not null then   -- есть действие над атрибутом
-   l_theCursor := dbms_sql.open_cursor;
+      end if;
+    end loop;
 
-   dbms_sql.parse(c => l_theCursor,
-                  statement => l_action,
-                  language_flag => dbms_sql.native);
+    -- Определяем действие
+    select action
+      into l_action
+      from ebk_card_attributes
+     where name = p_attr_name;
 
-   dbms_sql.bind_variable(c => l_theCursor,
-                           name => ':p_rnk',
-                           value => p_rnk);
+    if l_action is not null
+    then -- есть действие над атрибутом
 
-   dbms_sql.bind_variable(c => l_theCursor,
-                           name => ':p_new_val',
-                           value => p_new_val);
+      l_theCursor := dbms_sql.open_cursor;
 
-   l_status := dbms_sql.execute(l_theCursor);
+      dbms_sql.parse( c => l_theCursor,
+                      statement => l_action,
+                      language_flag => dbms_sql.native );
 
-   dbms_sql.close_cursor(l_theCursor);
-   -- save sysdate into change_log
-   add_card_qlt_log(p_rnk);
- end if;
- exception
-  when no_data_found  then null;
-  when others then
-    if DBMS_SQL.IS_OPEN (c => l_theCursor) then
-    dbms_sql.close_cursor(l_theCursor);
+      dbms_sql.bind_variable( c     => l_theCursor,
+                              name  => ':p_rnk',
+                              value => p_rnk );
+
+      dbms_sql.bind_variable( c     => l_theCursor,
+                              name  => ':p_new_val',
+                              value => p_new_val );
+
+      l_status := dbms_sql.execute(l_theCursor);
+
+      dbms_sql.close_cursor(l_theCursor);
+
+      -- save sysdate into change_log
+      add_card_qlt_log(p_rnk);
+
     end if;
-    rollback;
-    raise;
 
- end change_cust_attr;
+  exception
+    when no_data_found
+    then null;
+    when others
+    then
+      if DBMS_SQL.IS_OPEN (c => l_theCursor)
+      then
+        dbms_sql.close_cursor(l_theCursor);
+      end if;
+      rollback;
+      raise;
+  end change_cust_attr;
 
- procedure add_rnk_queue (p_rnk in number) is
- begin
-  insert into ebk_queue_updatecard (rnk)
-                            select p_rnk from dual
-                            where not exists (select null from ebk_queue_updatecard where rnk = p_rnk and status = 0);
- end add_rnk_queue;
+  procedure ADD_RNK_QUEUE
+  ( p_rnk   in  number
+  ) is
+  begin
+
+    EBKC_WFORMS_UTL.ADD_RNK_QUEUE( p_rnk, g_cust_tp );
+
+  end ADD_RNK_QUEUE;
 
  procedure del_all_recomm(p_rnk in number, p_kf in varchar2 ) is
  begin

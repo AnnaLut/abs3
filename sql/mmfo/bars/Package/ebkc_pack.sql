@@ -3,7 +3,7 @@ is
   --
   -- Customer Data Management (CDM)
   --
-  g_header_version constant varchar2(64) := 'version 1.02 11/05/2018';
+  g_header_version constant varchar2(64) := 'version 1.04 19/07/2018';
 
   -- типи клієнтів, що використовуються в ЕБК Корп
   LEGAL_ENTITY      constant varchar2(1) := 'L';   -- ЮО
@@ -16,86 +16,104 @@ is
   -- body_version - возвращает версию тела пакета
   function body_version return varchar2;
 
-  procedure save_into_hist(p_rnk in number);
-
-  procedure clear_queue_rnk(p_rnk in number);
-
   function get_custtype(p_rnk in number) return varchar2;
-
-  procedure sendcard_save_event(p_rnk in number);
 
   function get_wparam(p_key in varchar2) return varchar2;
 
-  function get_group_id(p_rnk in number,
-                      p_kf in varchar2) return number ;
+  function get_group_id( p_rnk in number, p_kf in varchar2 ) return number ;
 
-  function get_last_modifc_date(p_rnk in number) return date;
+  function GET_LAST_CHG_DT
+  ( p_rnk       in  number
+  , p_cust_tp   in  varchar2 default null
+  ) return date;
+
+  function GET_LAST_MODIFC_DATE
+  ( p_rnk       in  number
+  ) return date;
+
+  --
+  -- ENQUEUE
+  --
+  procedure ENQUEUE
+  ( p_rnk                 in  ebkc_queue_updatecard.rnk%type
+  , p_cust_tp             in  ebkc_queue_updatecard.cust_type%type );
+
+  --
+  -- DEQUEUE
+  --
+  procedure DEQUEUE
+  ( p_rnk                 in  ebkc_queue_updatecard.rnk%type );
+
+  --
+  -- DEQUEUE
+  --
+  procedure DEQUEUE
+  ( p_kf                  in  ebkc_queue_updatecard.kf%type
+  , p_rnk                 in  ebkc_queue_updatecard.rnk%type );
 
   procedure SEND_REQUEST
-  ( p_action              in varchar2
-  , p_session_id          in integer
-  , p_parameters          in varchar2_list
-  , p_values              in varchar2_list );
-
+  ( p_action              in  varchar2
+  , p_session_id          in  integer
+  , p_parameters          in  varchar2_list
+  , p_values              in  varchar2_list );
 
   procedure REQUEST_LEGAL_DUP_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_duplicate_ebk       in t_duplicate_ebk );
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_duplicate_ebk       in  t_duplicate_ebk );
 
   procedure REQUEST_PRIVATE_DUP_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_duplicate_ebk       in t_duplicate_ebk );
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_duplicate_ebk       in  t_duplicate_ebk );
 
   procedure REQUEST_INDIVIDUAL_DUP_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_duplicate_ebk       in t_duplicate_ebk );
-
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_duplicate_ebk       in  t_duplicate_ebk );
 
   procedure REQUEST_LEGAL_GCIF_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_gcif                in varchar2
-  , p_slave_client_ebk    in t_slave_client_ebk);
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_gcif                in  varchar2
+  , p_slave_client_ebk    in  t_slave_client_ebk );
 
   procedure REQUEST_PRIVATE_GCIF_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_gcif                in varchar2
-  , p_slave_client_ebk    in t_slave_client_ebk );
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_gcif                in  varchar2
+  , p_slave_client_ebk    in  t_slave_client_ebk );
 
   procedure REQUEST_INDIVIDUAL_GCIF_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_gcif                in varchar2
-  , p_slave_client_ebk    in t_slave_client_ebk );
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_gcif                in  varchar2
+  , p_slave_client_ebk    in  t_slave_client_ebk );
 
 
   procedure REQUEST_LEGAL_UPDATECARD_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_anls_quality        in number
-  , p_defaultGroupQuality in number
-  , p_tab_attr            in t_rec_ebk
-  , p_rec_qlt_grp         in t_rec_qlt_grp);
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_anls_quality        in  number
+  , p_defaultGroupQuality in  number
+  , p_tab_attr            in  t_rec_ebk
+  , p_rec_qlt_grp         in  t_rec_qlt_grp );
 
   procedure REQUEST_PRIVATE_UPDCARD_MASS
-  ( p_batchId             in varchar2
-  , p_kf                  in varchar2
-  , p_rnk                 in number
-  , p_anls_quality        in number
-  , p_defaultGroupQuality in number
-  , p_tab_attr            in t_rec_ebk
-  , p_rec_qlt_grp         in t_rec_qlt_grp );
+  ( p_batchId             in  varchar2
+  , p_kf                  in  varchar2
+  , p_rnk                 in  number
+  , p_anls_quality        in  number
+  , p_defaultGroupQuality in  number
+  , p_tab_attr            in  t_rec_ebk
+  , p_rec_qlt_grp         in  t_rec_qlt_grp );
 
   procedure REQUEST_INDIVIDUAL_UPDATECARD
   ( p_batchId             in  varchar2
@@ -117,7 +135,7 @@ create or replace package body EBKC_PACK
 is
 
   -- Версія пакету
-  g_body_version constant varchar2(64) := 'version 1.04 11/05/2018';
+  g_body_version constant varchar2(64) := 'version 1.07 19/07/2018';
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2 is
@@ -131,83 +149,180 @@ is
     return 'Package '||$$PLSQL_UNIT||' body '||g_body_version||'.';
   end body_version;
 
-  function get_custtype( p_rnk in number) return varchar2
+  function GET_CUSTTYPE
+  ( p_rnk       in  number
+  ) return varchar2
   is
-    l_ret varchar2(1);
+    title  constant varchar2(64) := $$PLSQL_UNIT||'.GET_CUSTTYPE';
+    l_cust_tp       varchar2(1);
   begin
     for x in ( select CUSTTYPE, trim(SED) as SED
                  from CUSTOMER
                 where RNK = p_rnk )
     loop
-      return case
-             when ( x.CUSTTYPE = 2 )
-             then LEGAL_ENTITY
-             when ( x.CUSTTYPE = 3 )
-             then case 
-                  when ( x.SED = '91' )
-                  then PRIVATE_ENT
-                  else INDIVIDUAL
-                  end
-             else null
-             end;
+      l_cust_tp := case
+                   when ( x.CUSTTYPE = 2 )
+                   then LEGAL_ENTITY
+                   when ( x.CUSTTYPE = 3 )
+                   then case 
+                        when ( x.SED = '91' )
+                        then PRIVATE_ENT
+                        else INDIVIDUAL
+                        end
+                   else null
+                   end;
     end loop;
+
+    if ( l_cust_tp Is Null )
+    then
+      bars_audit.error( title||': Exit with null for p_rnk='||to_char(p_rnk)
+                             ||chr(10)|| dbms_utility.format_call_stack() );
+    end if;
+
+    return l_cust_tp;
+
   end GET_CUSTTYPE;
 
-  procedure save_into_hist(p_rnk in number) is
+  function GET_LAST_CHG_DT
+  ( p_rnk       in  number
+  , p_cust_tp   in  varchar2 default null
+  ) return date
+  is
+    l_cust_tp       varchar2(1);
+    l_last_chg_dt   date;
   begin
-    insert into ebkc_sendcards_hist(rnk) values(p_rnk);
-  end;
 
-  procedure clear_queue_rnk(p_rnk in number) is
-  begin
-    delete from ebkc_queue_updatecard where rnk = p_rnk and status = 0;
-  end;
+    if ( p_cust_tp Is Null )
+    then
+      l_cust_tp := GET_CUSTTYPE( p_rnk );
+    else
+      l_cust_tp := p_cust_tp;
+    end if;
 
-  -- !!! для фоп брати person_update, для ЮО corps_update
-  function get_last_modifc_date(p_rnk in number) return date
+    case l_cust_tp
+    when LEGAL_ENTITY
+    then -- ЮО
+      select GREATEST( ( select max(CHGDATE) from CUSTOMER_UPDATE  where RNK = p_rnk )
+                     , ( select max(CHGDATE) from CUSTOMERW_UPDATE where RNK = p_rnk )
+                     , ( select max(CHGDATE) from CORPS_UPDATE     where RNK = p_rnk )
+                     , ( select max(CHGDATE)
+                           from CUSTOMER_ADDRESS_UPDATE
+                          where RNK = p_rnk
+                            and TYPE_ID in ('1','2') ) )
+        into l_last_chg_dt
+        from dual;
+    when PRIVATE_ENT
+    then -- ФОП
+      select GREATEST( ( select max(CHGDATE) from CUSTOMER_UPDATE  where RNK = p_rnk )
+                     , ( select max(CHGDATE) from CUSTOMERW_UPDATE where RNK = p_rnk )
+                     , ( select max(CHGDATE) from PERSON_UPDATE    where RNK = p_rnk )
+                     , ( select max(CHGDATE)
+                           from CUSTOMER_ADDRESS_UPDATE
+                          where RNK = p_rnk
+                            and TYPE_ID in ('1','2') ) )
+        into l_last_chg_dt
+        from dual;
+    when INDIVIDUAL
+    then -- ФО
+      select GREATEST( ( select max(CHGDATE) from CUSTOMER_UPDATE  where RNK = p_rnk )
+                     , ( select max(CHGDATE) from CUSTOMERW_UPDATE where RNK = p_rnk )
+                     , ( select max(CHGDATE) from PERSON_UPDATE    where RNK = p_rnk )
+                     , ( select max(CHGDATE)
+                           from CUSTOMER_ADDRESS_UPDATE
+                          where RNK = p_rnk
+                            and TYPE_ID = '1' ) )
+        into l_last_chg_dt
+        from dual;
+    else
+      l_last_chg_dt := null;
+    end case;
+
+    return l_last_chg_dt;
+
+  end GET_LAST_CHG_DT;
+
+  --
+  -- GET_LAST_MODIFC_DATE
+  --
+  function GET_LAST_MODIFC_DATE
+  ( p_rnk  in  number
+  ) return date
   is
   begin
-    for x in ( select greatest( ( select trunc(max(cu.chgdate))
-                                    from bars.customer_update cu
-                                   where rnk = p_rnk )
-                              , ( select trunc(max(cwu.chgdate))
-                                    from bars.customerw_update cwu
-                                   where rnk = p_rnk )
-                              , ( select trunc(max(pu.chgdate))
-                                    from bars.corps_update pu
-                                   where rnk = p_rnk )
-                              , ( select trunc(max(pu.chgdate))
-                                    from bars.person_update pu
-                                   where rnk = p_rnk )
-                              ) as last_modifc_date from dual )
-    loop
-      return x.last_modifc_date;
-    end loop;
+    return GET_LAST_CHG_DT( p_rnk, null );
+  end GET_LAST_MODIFC_DATE;
 
-  end get_last_modifc_date;
-
-  procedure sendcard_save_event(p_rnk in number) is
-  begin
-    save_into_hist(p_rnk);
-    clear_queue_rnk(p_rnk);
-  end;
-
-  function get_wparam(p_key in varchar2) return varchar2
+  --
+  --
+  --
+  function GET_WPARAM
+  ( p_key  in  varchar2
+  ) return varchar2
   is
-      l_value varchar2(4000 byte);
+    l_value varchar2(4000 byte);
   begin
-      select t.val
+    begin
+      select t.VAL
         into l_value
-        from web_barsconfig t
-       where t.key = p_key;
-
-       return l_value;
-  exception
+        from WEB_BARSCONFIG t
+       where t.KEY = p_key;
+    exception
       when no_data_found then
-           return null;
-  end;
+        l_value := null;
+    end;
+    return l_value;
+  end GET_WPARAM;
 
-  procedure send_request
+  --
+  -- ENQUEUE
+  --
+  procedure ENQUEUE
+  ( p_rnk       in  ebkc_queue_updatecard.rnk%type
+  , p_cust_tp   in  ebkc_queue_updatecard.cust_type%type
+  ) is
+  begin
+    begin
+      insert
+        into EBKC_QUEUE_UPDATECARD
+           ( RNK, CUST_TYPE )
+      values
+           ( p_rnk, p_cust_tp );
+    exception
+      when DUP_VAL_ON_INDEX then
+        update EBKC_QUEUE_UPDATECARD
+           set STATUS      = 0
+             , INSERT_DATE = trunc(sysdate)
+             , CUST_TYPE   = p_cust_tp
+         where RNK = p_rnk;
+    end;
+  end ENQUEUE;
+
+  --
+  -- DEQUEUE
+  --
+  procedure DEQUEUE
+  ( p_rnk       in  ebkc_queue_updatecard.rnk%type
+  ) is
+  begin
+    delete EBKC_QUEUE_UPDATECARD
+     where RNK = p_rnk;
+  end DEQUEUE;
+
+  --
+  -- DEQUEUE
+  --
+  procedure DEQUEUE
+  ( p_kf        in  ebkc_queue_updatecard.kf%type
+  , p_rnk       in  ebkc_queue_updatecard.rnk%type
+  ) is
+  begin
+    DEQUEUE( EBKC_WFORMS_UTL.GET_RNK( p_rnk, p_kf) );
+  end DEQUEUE;
+
+  --
+  -- SEND_REQUEST
+  --
+  procedure SEND_REQUEST
   ( p_action     in varchar2,
     p_session_id in integer,
     p_parameters in varchar2_list,

@@ -3,7 +3,7 @@ is
   --
   -- constants
   --
-  g_header_version      constant varchar2(64) := 'version 1.08  2017.12.01';
+  g_header_version      constant varchar2(64) := 'version 1.09  2018.07.18';
 
   g_correct_quality     constant char(1) := 'C';
   g_non_correct_quality constant char(1) := 'N';
@@ -52,15 +52,6 @@ is
     p_rec_qlt_grp t_rec_qlt_grp
   );
 
-  -- *******************
-  -- * Не используется *
-  -- *******************
-  -- procedure request_clientAnls_Err
-  -- ( p_batchId in varchar2,
-  --   p_kf in varchar2,
-  --   p_rec_cl_anls_err in t_rec_cl_anls_err
-  -- );
-
   procedure REQUEST_UPDATECARD_MASS
   ( p_batchId             in varchar2
   , p_mod_tms             in timestamp with time zone -- modificationTimestamp
@@ -97,6 +88,31 @@ is
   ( p_rnk              in     customer.rnk%type
   );
 
+  --
+  -- Запуск завдання по коду філіалу (МФО)
+  --
+  procedure RUN_TASK_BY_KF
+  ( p_start_id         in     number
+  , p_end_id           in     number
+  , p_pcd_nm           in     varchar2
+  );
+
+  --
+  --
+  --
+  procedure SYNC_CUST_CARDS;
+
+  procedure SYNC_CARDS
+  ( p_start_id         in     number
+  , p_end_id           in     number
+  , p_kf               in     varchar2
+  );
+
+  --
+  -- Виклик WEB сервісу надсилання даних до ЄБК
+  --
+  procedure SEND_CUST_CARDS;
+
 end EBK_REQUEST_UTL;
 /
 
@@ -110,14 +126,22 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.10  2018.03.03';
+  g_body_version  constant varchar2(64) := 'version 1.13  2018.07.18';
   g_cust_tp       constant varchar2(1)  := 'I'; -- ebkc_gcif.cust_type
   g_tms_fmt       constant varchar2(32) := 'DD.MM.YYYY HH24:MI:SSxFF TZH:TZM';
 
   --
   --
   --
-  l_mod_tms                timestamp with time zone;
+  l_ebk_mod_tms            timestamp with time zone;
+  l_abs_mod_tms            timestamp with time zone;
+  l_dop                    pls_integer;
+
+  --
+  --
+  --
+  e_task_not_found       exception;
+  pragma exception_init( e_task_not_found, -29498 );
 
   --
   -- GET_GROUP_ID
@@ -289,6 +313,8 @@ is
 
 $if EBK_PARAMS.CUT_RNK $then
     l_rnk := EBKC_WFORMS_UTL.GET_RNK(p_rnk,p_kf);
+
+    BC.SET_POLICY_GROUP('WHOLE');
 $else
     l_rnk := p_rnk;
 $end
@@ -388,13 +414,20 @@ $end
     
     commit;
 
+$if EBK_PARAMS.CUT_RNK $then
+    bc.set_context;
+$end
+
     bars_audit.trace( '%s: Exit.', title );
 
   exception
     when others then
       rollback;
+$if EBK_PARAMS.CUT_RNK $then
+      bc.set_context;
+$end
       bars_audit.error( title || ': p_batch='||p_batchid||', p_kf='||p_kf||', p_rnk='||to_char(p_rnk) );
-      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace() );
+      bars_audit.error( title || ': ' || dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace() );
       raise_application_error( -20666, title || ': ' || SQLERRM, true );
   end request_updatecard_mass;
 
@@ -440,14 +473,14 @@ $end
 
     -- validate p_mod_tms
     select max(MOD_TMS)
-      into l_mod_tms
+      into l_ebk_mod_tms
       from EBKC_REQ_UPDATECARD -- TMP_EBK_REQ_UPDATECARD
      where KF  = p_kf
        and RNK = l_rnk;
 
-    bars_audit.trace( '%s: ( l_rnk=%s, l_mod_tms=%s ).', title, to_char(l_rnk), to_char(l_mod_tms,g_tms_fmt) );
+    bars_audit.trace( '%s: ( l_rnk=%s, l_ebk_mod_tms=%s ).', title, to_char(l_rnk), to_char(l_ebk_mod_tms,g_tms_fmt) );
 
-    if ( ( l_mod_tms Is Null ) or ( l_mod_tms < p_mod_tms ) )
+    if ( ( l_ebk_mod_tms Is Null ) or ( l_ebk_mod_tms < p_mod_tms ) )
     then
 
       -- не храним предыдущие рекомендации по конкретному KF, RNK, 
@@ -597,6 +630,7 @@ $end
   procedure REQUEST_GCIF_MASS
   ( p_batchId          in     varchar2
   , p_mod_tms          in     TIMESTAMP WITH TIME ZONE -- modificationTimestamp
+--, p_abs_mod_tms      in     TIMESTAMP WITH TIME ZONE -- lastChangeDt
   , p_kf               in     varchar2
   , p_rnk              in     number
   , p_cust_tp          in     varchar2
@@ -635,18 +669,19 @@ $end
 
     -- validate p_mod_tms
     begin
-      select MOD_TMS
-        into l_mod_tms
-        from EBKC_GCIF
-       where RNK = l_rnk;
+      select g.EBK_MOD_TMS, g.ABS_MOD_TMS
+        into l_ebk_mod_tms, l_abs_mod_tms
+        from EBKC_GCIF g
+       where g.RNK = l_rnk;
     exception
       when NO_DATA_FOUND then
-        l_mod_tms := null;
+        l_ebk_mod_tms := null;
+        l_abs_mod_tms := null;
     end;
 
-    bars_audit.trace( '%s: ( l_rnk=%s, l_mod_tms=%s ).', title, to_char(l_rnk), to_char(l_mod_tms,g_tms_fmt) );
+    bars_audit.trace( '%s: ( l_rnk=%s, l_ebk_mod_tms=%s ).', title, to_char(l_rnk), to_char(l_ebk_mod_tms,g_tms_fmt) );
 
-    if ( ( l_mod_tms Is Null ) or ( l_mod_tms < p_mod_tms ) )
+    if ( ( l_ebk_mod_tms Is Null ) or ( l_ebk_mod_tms < p_mod_tms ) )
     then
 
       -- перед загрузкой мастер-записи с GCIF-ом и подчиненных записей, 
@@ -659,7 +694,7 @@ $end
 
       insert 
         into EBKC_GCIF
-           ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE, MOD_TMS )
+           ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE, EBK_MOD_TMS )
       values
           ( p_kf, l_rnk, p_gcif, p_cust_tp, l_sys_dt, p_mod_tms );
 
@@ -698,9 +733,21 @@ $end
       commit;
 
     else -- отримали застарілу інформацію від ЄБК
-      null;
+      bars_audit.error( title || ': отримали застарілу інформацію від ЄБК по РНК='||to_char(l_rnk) );
+    end if;
+/*
+    if ( l_abs_mod_tms Is Null )
+    then
+      l_abs_mod_tms := cast( EBKC_PACK.GET_LAST_CHG_DT( l_rnk, p_cust_tp ) AS TIMESTAMP(3) WITH TIME ZONE );
     end if;
 
+    if ( l_abs_mod_tms > p_abs_mod_tms )
+    then -- Якщо отримане значення атрибуту «Дата модифікації в АБС» менше 
+         -- ніж значення відповідного атрибуту збережене в АБС
+         -- АБС автоматично надсилає в ЄБК таку картку через пакетний інтерфейс
+      EBKC_PACK.ENQUEUE( l_rnk, p_cust_tp );
+    end if;
+*/
 $if EBK_PARAMS.CUT_RNK $then
     bc.set_context;
 $end
@@ -745,27 +792,6 @@ $end
       raise_application_error( -20666, $$PLSQL_UNIT||'.REQUEST_DEL_GCIF: '||sqlerrm, true );
   end REQUEST_DEL_GCIF;
 
-  --*******************************************************************************
-  --
-  --
-  procedure request_clientAnls_Err
-  ( p_batchId         in varchar2,
-    p_kf              in varchar2,
-    p_rec_cl_anls_err in t_rec_cl_anls_err
-  ) is
-    l_insert_date        date := sysdate;
-  begin 
-    
-    insert
-      into EBK_CLIENT_ANALYSIS_ERRORS
-         ( BATCHID, KF, RNK, CODE, MSG, INSERT_DATE ) 
-    select p_batchId, p_kf, err.rnk, err.code, err.msg, l_insert_date
-     from table(p_rec_cl_anls_err) err;
-    
-    commit;
-    
-  end request_clientAnls_Err;
-
   --
   -- SYNC_CUST_CARD
   --
@@ -775,7 +801,7 @@ $end
     /**
     <b>SYNC_CUST_CARD</b> - Виклик WEB сервісу синхронізації даних клієнта з ЄБК
     %param
-  
+
     %version  2.1
     %date     2017.12.01
     %modifier BAA
@@ -789,11 +815,11 @@ $end
     l_wallet_path             varchar2(128);
     l_wallet_pwd              varchar2(128);
     l_response                wsm_mgr.t_response;
-  
+
     --
     -- Возвращает параметр из web_config
     --
-    function f_get_param_webconfig
+    function get_param_webconfig
     ( par    varchar2
     ) return web_barsconfig.val%type
     is
@@ -804,14 +830,14 @@ $end
     exception
       when no_data_found then
         raise_application_error( -20000, 'Не найден KEY=' || par || ' в таблице web_barsconfig!' );
-    end f_get_param_webconfig;
+    end get_param_webconfig;
     ---
   begin
 
     bars_audit.trace( '%s.: Entry with ( p_pnk=%s ).', title, to_char(p_rnk) );
 
-    l_url     := f_get_param_webconfig('EBK.Url'); -- branch_attribute_utl.get_value( 'ABSBARS_WEB_IP_ADRESS' );
-    l_ahr_val := f_get_param_webconfig('EBK.UserPassword');
+    l_url     := get_param_webconfig('EBK.Url'); -- branch_attribute_utl.get_value( 'ABSBARS_WEB_IP_ADRESS' );
+    l_ahr_val := get_param_webconfig('EBK.UserPassword');
     l_ahr_val := 'Basic ' || utl_raw.cast_to_varchar2(utl_encode.base64_encode(utl_raw.cast_to_raw('wbarsebk:'||l_ahr_val)));
 
     bars_audit.trace( '%s: ( l_url=%s, l_ahr_val=%s ).', title, l_url, l_ahr_val );
@@ -819,11 +845,11 @@ $end
     -- SSL соединение выполняем через wallet
     if ( instr(lower(l_url), 'https://') > 0 )
     then
-      l_wallet_path := f_get_param_webconfig('EBK.WalletDir');
-      l_wallet_pwd  := f_get_param_webconfig('EBK.WalletPass');
+      l_wallet_path := get_param_webconfig('EBK.WalletDir');
+      l_wallet_pwd  := get_param_webconfig('EBK.WalletPass');
       utl_http.set_wallet( l_wallet_path, l_wallet_pwd );
     end if;
-  
+
     for x in ( select KF, RNK
                     , case
                       when ( c.CUSTTYPE = 2 ) then 'corp'
@@ -834,45 +860,436 @@ $end
                 where c.RNK = p_rnk
              )
     loop
-  
+
       bars_audit.trace( '%s: RNK=%s,', title, to_char(x.rnk) );
-  
+
       begin
-  
-        wsm_mgr.prepare_request
+
+        WSM_MGR.PREPARE_REQUEST
         ( p_url          => l_url,
           p_action       => g_actn_nm,
           p_http_method  => wsm_mgr.g_http_get,
           p_content_type => wsm_mgr.g_ct_json,
           p_wallet_path  => l_wallet_path,
           p_wallet_pwd   => l_wallet_pwd );
-  
+
         wsm_mgr.add_header( p_name => 'Authorization', p_value => l_ahr_val );
-  
+
         wsm_mgr.add_parameter( p_name => 'kf',       p_value => x.kf );
-        wsm_mgr.add_parameter( p_name => 'rnk',      p_value => to_char(x.rnk) );
+        wsm_mgr.add_parameter( p_name => 'rnk',      p_value => to_char( x.RNK ) );
         wsm_mgr.add_parameter( p_name => 'custtype', p_value => x.CUSTTYPE );
-  
+
         wsm_mgr.execute_request(l_response);
-  
+
       exception
         when others then
           bars_audit.error( title ||': '|| sqlerrm );
       end;
-  
+
     end loop;
-  
+
     bars_audit.trace( '%s: Exit.', title );
-  
+
   end SYNC_CUST_CARD;
+
+  --
+  --
+  --
+  procedure RUN_TASK_BY_KF
+  ( p_start_id         in     number
+  , p_end_id           in     number
+  , p_pcd_nm           in     varchar2
+  ) is
+  /**
+  <b>RUN_TASK_BY_KF</b> - Запуск завдання по коду філіалу (МФО)
+  %param p_start_id - Ід. РУ
+  %param p_end_id   - Ід. РУ
+  %param p_pcd_nm   - Назва процедури
+
+  %version 1.0
+  %usage   Виконання завдань в паралельному режимі (по діапазону МФО)
+  */
+    title            constant varchar2(64) := $$PLSQL_UNIT||'.RUN_TASK_BY_KF';
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_start_id=%s, p_end_id=%s, p_pcd_nm=%s ).'
+                    , title, to_char(p_start_id), to_char(p_end_id), p_pcd_nm );
+
+    if ( p_pcd_nm Is Null )
+    then
+      null;
+    else
+
+      dbms_application_info.set_action( title );
+
+      for c in ( select f.KF
+                   from MV_KF f
+                   join REGIONS r
+                     on ( r.KF = f.KF )
+                  where r.ID between p_start_id and p_end_id )
+      loop
+
+        dbms_application_info.set_client_info( 'KF='||c.KF );
+
+        BARS_CONTEXT.SUBST_MFO( c.KF );
+
+        case p_pcd_nm
+        when 'SEND_CUST_CARDS'
+        then
+          SEND_CUST_CARDS();
+        when 'SYNC_CUST_CARDS'
+        then
+          SYNC_CUST_CARDS();
+        else
+          execute immediate 'begin '||p_pcd_nm||'; end;';
+        end case;
+
+      end loop;
+
+      BARS_CONTEXT.SET_CONTEXT();
+
+      dbms_application_info.set_client_info( null );
+      dbms_application_info.set_action( null );
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end RUN_TASK_BY_KF;
+
+  --
+  --
+  --
+  procedure SYNC_CARDS
+  ( p_start_id         in     number
+  , p_end_id           in     number
+  , p_kf               in     varchar2
+  ) is
+    /**
+    <b>SYNC_CARDS</b> - Виклик WEB сервісу синхронізації даних клієнта з ЄБК
+    %param
+  
+    %version  1.0
+    %date     2018.06.20
+    %modifier BAA
+    %usage
+    */
+    title            constant varchar2(64) := $$PLSQL_UNIT||'.SYNC_CARDS';
+
+    l_url                     varchar2(128);
+    l_ahr_val                 varchar2(128);
+    l_wallet_path             varchar2(128);
+    l_wallet_pwd              varchar2(128);
+    l_response                wsm_mgr.t_response;
+    l_rec_id                  ebk_sync_log.id%type;
+    l_err_msg                 ebk_sync_log.err_msg%type;
+
+    function get_param_webconfig
+    ( par    varchar2
+    ) return web_barsconfig.val%type
+    is
+      l_res web_barsconfig.val%type;
+    begin
+      select val into l_res from web_barsconfig where key = par;
+      return trim(l_res);
+    exception
+      when no_data_found then
+        raise_application_error( -20000, 'Не найден KEY=' || par || ' в таблице web_barsconfig!' );
+    end get_param_webconfig;
+
+  begin
+
+    bars_audit.trace( '%s: Entry with ( p_start_id=%s, p_end_id=%s, p_kf=%s ).'
+                    , title, to_char(p_start_id), to_char(p_end_id), p_kf );
+
+    BARS_CONTEXT.SUBST_MFO( p_kf );
+
+    l_url     := get_param_webconfig('EBK.Url'); -- branch_attribute_utl.get_value( 'ABSBARS_WEB_IP_ADRESS' );
+    l_ahr_val := get_param_webconfig('EBK.UserPassword');
+    l_ahr_val := 'Basic ' || utl_raw.cast_to_varchar2(utl_encode.base64_encode(utl_raw.cast_to_raw('wbarsebk:'||l_ahr_val)));
+
+    bars_audit.trace( '%s: ( l_url=%s, l_ahr_val=%s ).', title, l_url, l_ahr_val );
+
+    -- SSL соединение выполняем через wallet
+    if ( instr(lower(l_url), 'https://') > 0 )
+    then
+      l_wallet_path := get_param_webconfig('EBK.WalletDir');
+      l_wallet_pwd  := get_param_webconfig('EBK.WalletPass');
+      utl_http.set_wallet( l_wallet_path, l_wallet_pwd );
+      bars_audit.trace( '%s: ( l_wallet_path=%s, l_wallet_pwd=%s ).', title, l_wallet_path, l_wallet_pwd );
+    end if;
+
+    dbms_application_info.set_action( title );
+
+    for c in ( select KF, CUST_ID, CUST_TP
+                 from V_EBK_SYNC_Q
+                where CUST_ID between p_start_id and p_end_id )
+    loop
+
+      dbms_application_info.set_client_info( 'CUST_ID='||to_char(c.CUST_ID) );
+
+      insert
+        into EBK_SYNC_LOG
+           ( CUST_ID, CUST_TP, SYNC_ST, STRT_TM, ID )
+      values
+           ( c.CUST_ID, c.CUST_TP, 0, systimestamp, S_EBK_SYNC_LOG.NEXTVAL )
+      return ID
+        into l_rec_id;
+
+      begin
+
+        wsm_mgr.prepare_request
+        ( p_url          => l_url,
+          p_action       => 'SyncCard',
+          p_http_method  => wsm_mgr.g_http_get,
+          p_content_type => wsm_mgr.g_ct_json,
+          p_wallet_path  => l_wallet_path,
+          p_wallet_pwd   => l_wallet_pwd );
+
+        wsm_mgr.add_header( p_name => 'Authorization', p_value => l_ahr_val );
+
+        wsm_mgr.add_parameter( p_name => 'kf',       p_value => c.KF );
+        wsm_mgr.add_parameter( p_name => 'rnk',      p_value => to_char( c.CUST_ID ) );
+        wsm_mgr.add_parameter( p_name => 'custtype', p_value => c.CUST_TP );
+
+        wsm_mgr.execute_request(l_response);
+
+        l_err_msg := trim(l_response.cdoc);
+
+        case l_err_msg
+        when '"ERROR"'
+        then l_err_msg := 'Помилка зв`язку з віддаленим сервісом ЄБК';
+        when '"0"'
+        then l_err_msg := 'Відповідь сервісу ЄБК не містить даних клієнта.';
+        else l_err_msg := null;
+        end case;
+
+      exception
+        when others then
+          l_err_msg := sqlerrm;
+          bars_audit.error( title || ': ' || l_err_msg || dbms_utility.format_error_backtrace() );
+      end;
+
+      update EBK_SYNC_LOG
+         set FNSH_TM = systimestamp
+           , SYNC_ST = nvl2( l_err_msg, -1, 1 )
+           , ERR_MSG = l_err_msg
+       where ID = l_rec_id;
+
+      commit;
+
+    end loop;
+
+    BARS_CONTEXT.SET_CONTEXT();
+
+    dbms_application_info.set_client_info( null );
+    dbms_application_info.set_action( null );
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end SYNC_CARDS;
+
+
+  procedure SYNC_CUST_CARDS
+  is
+    /**
+    <b>SYNC_CUST_CARDS</b> - Виклик WEB сервісу синхронізації даних клієнта з ЄБК
+    %param
+  
+    %version  1.0
+    %date     2018.06.20
+    %modifier BAA
+    %usage
+    */
+    title       constant   varchar2(64) := $$PLSQL_UNIT||'.SYNC_CUST_CARDS';
+
+    l_kf                   varchar2(6) := sys_context('bars_context','user_mfo');
+    l_task_nm              varchar2(30);
+    l_sql_stmt             varchar2(4000);
+
+  begin
+
+    bars_audit.trace( '%s.: Entry with ( l_kf=%s ).', title, to_char(l_kf) );
+
+    if ( l_kf Is Null )
+    then -- for all KF
+
+      l_task_nm := 'SYNC_CUST_CARDS';
+
+      begin
+        DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+      exception
+        when e_task_not_found
+        then null;
+      end;
+
+      DBMS_PARALLEL_EXECUTE.create_task( task_name => l_task_nm );
+
+      l_sql_stmt := 'select ID, ID from REGIONS r join MV_KF f on ( f.KF = r.KF )';
+--    l_sql_stmt := 'select min(ID), max(ID)'
+--               || '  from ( select ID, ntile('||to_char(l_dop)||') over (order by ID) as GRP_ID'
+--               || '           from REGIONS r join MV_KF f on ( f.KF = r.KF ) ) group by GRP_ID';
+
+      DBMS_PARALLEL_EXECUTE.create_chunks_by_sql( task_name => l_task_nm
+                                                , sql_stmt  => l_sql_stmt
+                                                , by_rowid  => FALSE );
+
+      l_sql_stmt := 'begin EBK_REQUEST_UTL.RUN_TASK_BY_KF( :start_id, :end_id, ''SYNC_CUST_CARDS'' ); end;';
+
+      DBMS_PARALLEL_EXECUTE.run_task( task_name      => l_task_nm
+                                    , sql_stmt       => l_sql_stmt
+                                    , language_flag  => DBMS_SQL.NATIVE
+                                    , parallel_level => l_dop );
+
+      DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+
+    else -- for one KF
+
+      begin
+
+        l_task_nm := 'SYNC_CUST_CARDS_'||l_kf;
+
+        begin
+          DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+        exception
+          when e_task_not_found
+          then null;
+        end;
+
+        DBMS_PARALLEL_EXECUTE.create_task( task_name => l_task_nm );
+
+        l_sql_stmt := 'select min(CUST_ID), max(CUST_ID) from ( select CUST_ID, ntile('||to_char(l_dop)||
+                      ') over (order by CUST_ID) as GRP_ID from V_EBK_SYNC_Q ) group by GRP_ID';
+
+        DBMS_PARALLEL_EXECUTE.create_chunks_by_sql( task_name => l_task_nm
+                                                  , sql_stmt  => l_sql_stmt
+                                                  , by_rowid  => FALSE );
+
+        l_sql_stmt := 'begin EBK_REQUEST_UTL.SYNC_CARDS( :start_id, :end_id, '''||l_kf||''' ); end;';
+
+        DBMS_PARALLEL_EXECUTE.run_task( task_name      => l_task_nm
+                                      , sql_stmt       => l_sql_stmt
+                                      , language_flag  => DBMS_SQL.NATIVE
+                                      , parallel_level => l_dop );
+
+        DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+
+      end;
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end SYNC_CUST_CARDS;
+
+  --
+  --
+  --
+  procedure SEND_CUST_CARDS
+  is
+    /**
+    <b>SEND_CUST_CARDS</b> - Виклик WEB сервісу надсилання даних до ЄБК
+    %param
+  
+    %version  1.0
+    %date     2018.07.18
+    %usage
+    */
+    title       constant   varchar2(64) := $$PLSQL_UNIT||'.SEND_CUST_CARDS';
+
+    l_kf                   varchar2(6) := sys_context('bars_context','user_mfo');
+    l_task_nm              varchar2(30);
+    l_sql_stmt             varchar2(4000);
+    l_lmt_dt               date := trunc(sysdate)-14;
+
+  begin
+
+    bars_audit.info( title||': Entry with ( l_kf='||l_kf||' ).' );
+
+    bars_audit.info( title||': '||to_char(sql%rowcount)||' row(s) deleted.' );
+
+    if ( l_kf Is Null )
+    then -- for all KF
+
+      -- cleaning the queue from old records
+      delete EBKC_QUEUE_UPDATECARD
+       where STATUS = 9
+         and INSERT_DATE < l_lmt_dt;
+
+      l_task_nm := 'SEND_CUST_CARDS';
+
+      begin
+        DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+      exception
+        when e_task_not_found
+        then null;
+      end;
+
+      DBMS_PARALLEL_EXECUTE.create_task( task_name => l_task_nm );
+
+      l_sql_stmt := 'select ID, ID from REGIONS r join MV_KF f on ( f.KF = r.KF )';
+
+      DBMS_PARALLEL_EXECUTE.create_chunks_by_sql( task_name => l_task_nm
+                                                , sql_stmt  => l_sql_stmt
+                                                , by_rowid  => FALSE );
+
+      l_sql_stmt := 'begin EBK_REQUEST_UTL.RUN_TASK_BY_KF( :start_id, :end_id, ''SEND_CUST_CARDS'' ); end;';
+
+      DBMS_PARALLEL_EXECUTE.run_task( task_name      => l_task_nm
+                                    , sql_stmt       => l_sql_stmt
+                                    , language_flag  => DBMS_SQL.NATIVE
+                                    , parallel_level => l_dop );
+
+      DBMS_PARALLEL_EXECUTE.drop_task( task_name => l_task_nm );
+
+    else -- for one KF
+
+      -- EBK_CARD_PACAKGES_JOB
+      begin
+        EBK_SENDCARDPACKAGES
+        ( p_action_name => 'SendCardPackages'
+        , p_cardsCount  => null
+        , p_packSize    => '100' );
+      exception
+        when OTHERS
+        then bars_audit.error( title || ': ' || sqlerrm || chr(10) || dbms_utility.format_error_backtrace() );
+      end;
+
+      -- EBKC_SEND_PRIV_CARDS
+      begin
+        EBK_SENDCARDPACKAGES
+        ( p_action_name => 'SendCardPackagesPrivateEn'
+        , p_cardsCount  => null
+        , p_packSize    => '100' );
+      exception
+        when OTHERS
+        then bars_audit.error( title || ': ' || sqlerrm || chr(10) || dbms_utility.format_error_backtrace() );
+      end;
+
+      -- EBKC_SEND_LEGAL_CARDS
+      begin
+        EBK_SENDCARDPACKAGES
+        ( p_action_name => 'SendCardPackagesLegal'
+        , p_cardsCount  => null
+        , p_packSize    => '100' );
+      exception
+        when OTHERS
+        then bars_audit.error( title || ': ' || sqlerrm || chr(10) || dbms_utility.format_error_backtrace() );
+      end;
+
+    end if;
+
+    bars_audit.trace( '%s: Exit.', title );
+
+  end SEND_CUST_CARDS;
 
 
 
 begin
-  null;
-end ebk_request_utl;
+  l_dop := 8;
+end EBK_REQUEST_UTL;
 /
 
 show err
 
-grant execute on ebk_request_utl to bars_access_defrole;
+grant execute on EBK_REQUEST_UTL to BARS_ACCESS_DEFROLE;
