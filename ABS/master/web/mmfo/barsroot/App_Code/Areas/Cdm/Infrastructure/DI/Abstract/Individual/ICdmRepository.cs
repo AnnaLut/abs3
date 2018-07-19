@@ -8,7 +8,6 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Abstract.Individual
     {
         void SaveRequestToTempTable(string packName, string packBody);// kf не добавляем, нет нужды
         decimal PackAndSendClientCards(int? cardsCount, int packSize, string kf);// kf добавляем
-        decimal PackAndSendRcifs(int? rcifsCount, int packSize, string kf);// kf добавляем
         ActionStatus PackAndSendSingleCard(decimal rnk); // kf не добавляем, там по РНК
         int SaveCardsAdvisoryFast(AdvisoryCards advisory);// kf не добавляем, нет нужды
         int SaveCardChangesOnline(SimpleCard card);// kf не добавляем, нет нужды
