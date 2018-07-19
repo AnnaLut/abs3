@@ -159,126 +159,6 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
             return packSize;
         }
 
-        public virtual decimal PackAndSendRcifs(int? rcifsCount, int packSize, string kf)
-        {
-            UserLogin();
-            decimal allCardsSended = 0;
-            Logger.Info(string.Format("{0} Розпочато надсилання RCIF клієнтів. Розмір пакету - {1}.", _logMessagePrefix, packSize));
-            var apiUrl = ConfigurationManager.AppSettings["ebk.ApiUri"] +
-                ConfigurationManager.AppSettings["ebk.RcifMethod"];
-
-            XmlWriterSettings settings = new XmlWriterSettings { OmitXmlDeclaration = true, CheckCharacters = false };
-            XmlSerializerNamespaces names = new XmlSerializerNamespaces();
-            names.Add("", "");
-            string xml = "";
-            try
-            {
-                while (rcifsCount == null || allCardsSended < rcifsCount)
-                {
-                    //посчитаем размер следующего пакета
-                    var currentPackSize = GetNextRcifCount(packSize, kf);
-                    if (currentPackSize == 0)
-                    {
-                        Logger.Info(string.Format("{0} Не знайдено Rcif.", _logMessagePrefix));
-                        break;
-                    }
-                    var sqlParams = new object[]
-                    {
-                        new OracleParameter("p_Size", OracleDbType.Int16)
-                        {
-                            Value = ((rcifsCount == null || rcifsCount > packSize) ? packSize : rcifsCount)
-                        },
-                        new OracleParameter("p_kf", OracleDbType.Varchar2)
-                        {
-                            Value = kf
-                        }
-                    };
-
-                    var packRcifs = _entities.ExecuteStoreQuery<decimal>(
-                        "select BARS.EBK_WFORMS_UTL.CUT_RNK(RCIF) as RCIF from EBK_RCIF where rownum <= :p_Size and KF = :p_kf and send = 0", sqlParams).ToList();
-
-                    //получаем параметры пакета
-                    decimal packNum = GetNextPackNumber();
-                    //string ourMfo = BanksRepository.GetOurMfo();
-
-                    //строим пакет
-                    Rcif package = new Rcif()
-                    {
-                        BatchId = packNum.ToString(),
-                        Kf = kf,
-                        Maker = HomeRepo.GetUserParam().USER_FULLNAME,
-                        RcifClients = packRcifs.Select(r =>
-                            new RcifClientsContainer()
-                            {
-                                RcifClient = new RcifClient()
-                                {
-                                    Kf = kf,
-                                    Rcif = r.ToString(),
-                                    Rnk = r
-                                }
-                            }).ToArray()
-                    };
-                    XmlSerializer ser = new XmlSerializer(typeof(Rcif));
-
-                    MemoryStream ms = new MemoryStream();
-                    XmlWriter writer = XmlWriter.Create(ms, settings);
-                    ser.Serialize(writer, package, names);
-                    writer.Close();
-                    ms.Flush();
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    StreamReader sr = new StreamReader(ms);
-                    xml = sr.ReadToEnd();
-
-                    //отправляем данные в ЕБК
-                    var bytes = Encoding.UTF8.GetBytes(xml);
-
-                    var request = WebRequest.Create(apiUrl);
-                    request.Method = "POST";
-                    request.ContentType = "application/xml;charset='utf-8'";
-                    request.ContentLength = bytes.Length;
-                    Stream requestStream = request.GetRequestStream();
-                    requestStream.Write(bytes, 0, bytes.Length);
-                    requestStream.Close();
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        Stream responseStream = response.GetResponseStream();
-                        string responseStr = new StreamReader(responseStream).ReadToEnd();
-                        Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
-                            responseStr));
-                    }
-                    else
-                    {
-                        Logger.Error(string.Format("{0} Отримано помилковий код: {1}", _logMessagePrefix, response.StatusCode));
-                        Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
-                    }
-
-                    //записываем результаты отправки
-                    foreach (var rnk in packRcifs)
-                    {
-                        RemoveRcifFromQueue(rnk);
-                    }
-                    Logger.Info(string.Format("{0} Успішно надіслано пакет карток розміром {1} шт.", _logMessagePrefix, currentPackSize));
-
-                    allCardsSended = allCardsSended + currentPackSize;
-
-                }
-                Logger.Info(string.Format("{0} Успішно надіслано {1} Rcif.", _logMessagePrefix, allCardsSended));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(string.Format(
-                    "{0} Помилка пакетної доставки. {1} --- {2}",
-                    _logMessagePrefix,
-                    (ex.InnerException != null ? ex.InnerException.Message : ex.Message),
-                    ex.StackTrace
-                    ));
-                Logger.Error(String.Format("{0} - {1}", _logMessagePrefix, xml));
-            }
-            return allCardsSended;
-        }
-        
         /// <summary>
         /// Отправляет карточку клиента по РНК на сервис ЕБК он-лайн с целью получения рекомендаций
         /// В случае успеха, записывает полученные рекомендации во временную табличку АРМа качества
@@ -675,17 +555,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                             new OracleParameter("p_rnk", OracleDbType.Decimal) {Value = (rnk)},
                             new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = (kf)}
                         };
-            _entities.ExecuteStoreCommand("EBKC_PACK.DEQUEUE( ebk_wforms_utl.get_rnk(:p_rnk,:p_kf) )",
-                sqlUpdParams);
-        }
-
-        protected virtual void RemoveRcifFromQueue(decimal rnk)
-        {
-            var sqlUpdParams = new object[]
-                        {
-                            new OracleParameter("p_rnk", OracleDbType.Decimal) {Value = (rnk)}
-                        };
-            _entities.ExecuteStoreCommand("update EBK_RCIF set SEND = 1 where RCIF = bars.ebk_wforms_utl.get_rnk(:p_rnk)",
+            _entities.ExecuteStoreCommand("begin EBKC_PACK.DEQUEUE( ebk_wforms_utl.get_rnk(:p_rnk,:p_kf) ); end;",
                 sqlUpdParams);
         }
 
@@ -697,16 +567,6 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.PrivateEn
                 new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = kf}
             };
             return _entities.ExecuteStoreQuery<decimal>("select count(*) from v_ebkc_queue_updcard_private where kf = :p_kf and rownum <= :p_Size", sqlParams).SingleOrDefault();
-        }
-
-        protected virtual decimal GetNextRcifCount(int packSize, string kf)
-        {
-            var sqlParams = new object[]
-            {
-                new OracleParameter("p_Size", OracleDbType.Int16) {Value = packSize},
-                new OracleParameter("p_kf", OracleDbType.Varchar2) {Value = kf}
-            };
-            return _entities.ExecuteStoreQuery<decimal>("select count(*) from ebk_rcif where rownum <= :p_Size and kf = :p_kf and send = 0", sqlParams).SingleOrDefault();
         }
 
         protected virtual AdvisoryCards ConvertOnlineAdvisoryToAdvisoryCards(OnlineAdvisory card)
