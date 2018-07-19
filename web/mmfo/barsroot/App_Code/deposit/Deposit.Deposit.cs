@@ -3338,7 +3338,7 @@ public class DepositAgreement
                                  where da.dpt_id = :p_dptid
                                    and da.agrmnt_type = 12
                                    and da.agrmnt_state = 1
-                                   and da.date_end > TRUNC( SYSDATE ) 
+                                   and da.date_end >= TRUNC( SYSDATE ) 
                                    and dt.typ_tr = 'T'
                                    and dt.rnk_tr = :p_rnk 
                                    and dt.fl_act = 1";
