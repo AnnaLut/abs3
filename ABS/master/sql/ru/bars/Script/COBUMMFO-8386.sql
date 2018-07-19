@@ -35,14 +35,36 @@ UPDATE SET
   A.USE_IN_ARCH = B.USE_IN_ARCH;
 
 COMMIT;
+/
 --добавляет тэг в указанные операции
-BEGIN
-    FOR k IN (SELECT TT FROM TTS WHERE TT IN ('045','AA3','AA4','AA5','AA6','AA7','AA8','AA9','AA0','AAB','AAC','AAE','AAK','AAL','AAM','AAN') )
+ declare
+                      p_tag  op_rules.tag%type;
+                      p_tt   op_rules.tt%type;
+                      p_opt  op_rules.opt%type;
+                      p_used op_rules.used4input%type;
+                      p_ord  op_rules.ord%type;
+                      p_val  op_rules.val%type;
+ BEGIN
+    FOR k IN (SELECT TT FROM TTS WHERE TT IN ('045','AA3','AA4','AA5','AA6','AA7','AA8','AA9','AA0','AAB','AAC','AAE','AAK','AAL','AAM','DPF','AAN') )
     LOOP
-        bars_ttsadm.set_rules(p_tag=>'CPYCL',p_tt=>k.TT,p_opt=>'M',p_ord=>8,p_used=>1,p_val=>null);
-    END LOOP;
 
-    COMMIT;
+     p_tag := 'CPYCL';
+     p_opt := 'M';
+     p_ord := 8;
+     p_used:=1;
+     p_val := null;    
+     UPDATE op_rules
+       SET opt = p_opt, used4input = p_used, ord = p_ord, val = p_val
+     WHERE tt = k.tt
+       AND tag = p_tag;
+    if sql%rowcount = 0 then
+      INSERT INTO op_rules
+        (tag, tt, opt, used4input, ord, val)
+      VALUES
+        (p_tag, k.tt, p_opt, p_used, p_ord, p_val);
+    end if;
+  END LOOP;
+  commit;
 END;
 /
 --добавляет новый параметр COPY_CLIENT для тикета
@@ -67,3 +89,4 @@ UPDATE SET
   A.MOD_CODE = B.MOD_CODE;
 
 COMMIT;
+/
