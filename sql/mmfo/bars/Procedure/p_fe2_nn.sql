@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE BARS.p_fe2_nn ( dat_     DATE,
 % DESCRIPTION : Процедура формирования #E2 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.17.012 17/07/2018 (04/07/2018)
+% VERSION     : v.17.013 18/07/2018 (17/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -1033,6 +1033,10 @@ BEGIN
         group by ref
         having count(*)>1) and
         nlsd like '2924%' and nlsk like  '3739%';
+        
+   delete
+   from OTCN_PROV_TEMP
+   where ref in (select ref from NBUR_TMP_DEL_70 where kodf = 'E2' and datf = dat_); 
 
    OPEN c_main;
 
