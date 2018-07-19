@@ -1,4 +1,4 @@
-create or replace package msp_pays is
+CREATE OR REPLACE package BARS.msp_pays is
 
   g_mfo  oper.mfoa%type  := '300465';
   -- g_nls  oper.nlsa%type := '290642012'; -- тест дев
@@ -36,7 +36,9 @@ create or replace package msp_pays is
 
 end msp_pays;
 /
-create or replace package body msp_pays is
+
+
+CREATE OR REPLACE package body BARS.msp_pays is
 
   -- Версiя пакету
   g_body_version constant varchar2(64) := 'version 1.02 11/01/2018';
@@ -402,7 +404,7 @@ create or replace package body msp_pays is
          end if;
 
       end;
-     
+
 
   end pay_social;
 
@@ -586,7 +588,7 @@ create or replace package body msp_pays is
   begin
 
     select o.tt, o.mfob into l_tt, mfob_ from oper o where o.ref = p_ref;
-	
+
     if (mfob_ != 300465 and l_tt not in ('PKX','024')) then
        chk.put_visa(p_ref, l_tt, null, 0, p_key, p_int_sign, p_sep_sign);
 
@@ -634,7 +636,11 @@ create or replace package body msp_pays is
 
     exception
         when others then
-          commit;
+        commit;
+		bars_audit.error(sqlerrm);
+		raise_application_error (-20000, dbms_utility.format_error_backtrace);   
+
+       --   commit;
   end;
 
 
