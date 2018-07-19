@@ -2081,14 +2081,14 @@ END p_cck_interest;
 
   BEGIN
 null;
-   /* IF p_type = 1 THEN
+    IF p_type = 1 THEN
 
       p_interest_cck1(11, NULL);
       cdb_mediator.pay_accrued_interest;
     ELSIF p_type = 2 THEN
       p_interest_cck1(1, NULL);
       cdb_mediator.pay_accrued_interest;
-    END IF;*/
+    END IF;
   END p_interest_cck;
   --Зміна призначення платежу при нарахуванні % в портфелі ССKF i CCKU
   PROCEDURE p_int_reckoning_nazn_edit
