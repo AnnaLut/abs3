@@ -653,6 +653,14 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
                     if (!string.IsNullOrWhiteSpace(gcif))
                     {
+                        var duplicates=new List<DuplicatesV2Dto>();
+                        duplicates.AddRange(card.Duplicates.Select(d=>new DuplicatesV2Dto()
+                        {
+                            Gcif = d.Gcif,
+                            Kf = d.Kf,
+                            MasterGcif = d.MasterGcif,
+                            Rnk = d.Rnk
+                        }));
                         sqlParams = new object[]
                         {
                             new OracleParameter(parameterName: "p_batchId", oraType: OracleDbType.Varchar2)
@@ -681,7 +689,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                                 direction: ParameterDirection.Input)
                             {
                                 UdtTypeName = "BARS.T_SLAVE_CLIENT_EBK",
-                                Value = card.Duplicates.ToArray()
+                                Value = duplicates.ToArray()
                             }
                         };
 
