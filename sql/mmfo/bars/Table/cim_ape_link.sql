@@ -82,7 +82,7 @@ exception when others then
 
 
 
-
+/*
 PROMPT *** Create  index CIMAPELINK_PAYMENTID_IDX ***
 begin   
  execute immediate '
@@ -91,6 +91,57 @@ begin
   TABLESPACE BRSMDLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+*/
+
+begin   
+ execute immediate 'drop index CIMAPELINK_PAYMENTID_IDX';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMAPELINK_PAYMENT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMAPELINK_PAYMENT ON BARS.CIM_APE_LINK (PAYMENT_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE brsmdli ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMAPELINK_FANTOM ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMAPELINK_FANTOM ON BARS.CIM_APE_LINK (FANTOM_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE brsmdli ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  constraint FK_CIMAPELINK_PAYMENT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_APE_LINK ADD CONSTRAINT FK_CIMAPELINK_PAYMENT FOREIGN KEY (PAYMENT_ID)
+	  REFERENCES BARS.CIM_PAYMENTS_BOUND (BOUND_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+PROMPT *** Create  constraint FK_CIMAPELINK_FANTOM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_APE_LINK ADD CONSTRAINT FK_CIMAPELINK_FANTOM FOREIGN KEY (FANTOM_ID)
+	  REFERENCES BARS.CIM_FANTOMS_BOUND (BOUND_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 
