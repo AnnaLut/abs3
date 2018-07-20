@@ -454,7 +454,6 @@ $(document).ready(function () {
                         return /^([0-9]{8,15})$/.test(input.val());
                     }
                 }
-                //debugger;
                 //паспорт ID картка
                 if (doctype === "7") {
                     if (input.is("[name=eddrid]")) {
@@ -470,8 +469,6 @@ $(document).ready(function () {
                             return /^[А-ЯA-Z]{2}$/.test(input.val());
                         else if (doctype === "3") //свідоцтво про народження
                             return /^(\d{1}[VX]{1,4}-[А-ЯЇЄҐ]{2})$/.test(input.val());
-                        else if (doctype === "13") //паспорт нерезидента
-                            return /^([0-9A-ZА-ЯІЇЄҐ-]{1,7})$/.test(input.val());
                         else if (doctype === "11") //закордонний паспорт
                             return /^[A-Z]{2}$/.test(input.val());
                         else if (doctype === "15") //тимчасове посвідчення особи
@@ -480,23 +477,39 @@ $(document).ready(function () {
                             return /^(\d{1}[VX]{1,4}-[А-ЯЇЄҐ]{2})$/.test(input.val());
                         else if (doctype === "95") //свідоцтво про смерть (закордонний)
                             return /^([A-Z0-9]{2,6})$/.test(input.val());
-                        else //свідоцтво про спадщину та заповіт
+                        else if (doctype !== "13") //паспорт нерезидента перевіряється у custom2
                             return /^([0-9A-ZА-ЯІЇЄҐ-]{2,6})$/.test(input.val());
                     }
                     if (input.is("[name=number]") && input.val() !== "") {
                         if (doctype === "13")//паспорт нерезидента
-                            return /^\d{8}$/.test(input.val());
-                        else if (doctype === "15")//тимчасове посвідчення особи
+                           return /^\d*$/.test(input.val());
+                        else
+                        if (doctype === "15")//тимчасове посвідчення особи
                             return /^\d{1,8}$/.test(input.val());
                         else
                             return /^\d{6}$/.test(input.val());
                     }
                 }          
                 return true;
+            },
+            custom2: function (input) {
+                var doctype = $("#docTypeDropList").data("kendoDropDownList").value();
+
+                if (input.is("[name=docserial]") && $('[name="heir"]:checked').val() == 0) {
+                    if (doctype === "13") //паспорт нерезидента
+                        return /^\s*\S+.*/.test(input.val());
+                }
+                if (input.is("[name=docnumber]") && $('[name="heir"]:checked').val() == 0) {
+                    if (doctype === "13")//паспорт нерезидента
+                        return /^\s*\S+.*/.test(input.val());
+                }
+
+                return true;
             }
         },
         messages: {
             "custom": "Некоректні дані!",
+            "custom2": "Це поле є обов'язковим!",
             "required": "Це поле є обов'язковим!"
 
         }
