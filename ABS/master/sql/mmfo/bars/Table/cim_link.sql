@@ -140,7 +140,7 @@ exception when others then
 
 
 
-
+/*
 PROMPT *** Create  index CIMLINK_PAYMENT_IDX ***
 begin   
  execute immediate '
@@ -151,10 +151,59 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
+*/
+begin   
+ execute immediate 'drop index CIMLINK_PAYMENT_IDX';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMLINK_PAYMENT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMLINK_PAYMENT ON BARS.CIM_LINK (PAYMENT_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE brsbigi ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMLINK_FANTOM ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMLINK_FANTOM ON BARS.CIM_LINK (FANTOM_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE brsbigi ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  constraint FK_CIMLINK_PAYMENT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_LINK ADD CONSTRAINT FK_CIMLINK_PAYMENT FOREIGN KEY (PAYMENT_ID)
+	  REFERENCES BARS.CIM_PAYMENTS_BOUND (BOUND_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
+PROMPT *** Create  constraint FK_CIMLINK_FANTOM ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_LINK ADD CONSTRAINT FK_CIMLINK_FANTOM FOREIGN KEY (FANTOM_ID)
+	  REFERENCES BARS.CIM_FANTOMS_BOUND (BOUND_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
+/*
 PROMPT *** Create  index CIMLINK_VMD_IDX ***
 begin   
  execute immediate '
@@ -163,6 +212,57 @@ begin
   TABLESPACE BRSMDLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+*/
+
+begin   
+ execute immediate 'drop index CIMLINK_VMD_IDX';
+exception when others then
+  if  sqlcode=-1418  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMLINK_VMD ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMLINK_VMD ON BARS.CIM_LINK (VMD_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE brsbigi ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_CIMLINK_ACT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMLINK_ACT ON BARS.CIM_LINK (ACT_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE brsbigi ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  constraint FK_CIMLINK_VMD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_LINK ADD CONSTRAINT FK_CIMLINK_VMD FOREIGN KEY (VMD_ID)
+	  REFERENCES BARS.CIM_VMD_BOUND (BOUND_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+PROMPT *** Create  constraint FK_CIMLINK_ACT ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_LINK ADD CONSTRAINT FK_CIMLINK_ACT FOREIGN KEY (ACT_ID)
+	  REFERENCES BARS.CIM_ACT_BOUND (BOUND_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
 

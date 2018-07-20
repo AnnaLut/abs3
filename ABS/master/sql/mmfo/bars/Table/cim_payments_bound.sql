@@ -59,7 +59,7 @@ PROMPT *** ALTER_POLICIES to CIM_PAYMENTS_BOUND ***
  exec bpa.alter_policies('CIM_PAYMENTS_BOUND');
 
 
-COMMENT ON TABLE BARS.CIM_PAYMENTS_BOUND IS 'Прив'язки реальних платежів до контрактів v1.0';
+COMMENT ON TABLE BARS.CIM_PAYMENTS_BOUND IS 'Прив''язки реальних платежів до контрактів v1.0';
 COMMENT ON COLUMN BARS.CIM_PAYMENTS_BOUND.BOUND_ID IS 'Ідентифікатор привязки';
 COMMENT ON COLUMN BARS.CIM_PAYMENTS_BOUND.DIRECT IS 'Напрям платежу (0 - вхідні, 1 - вихідні)';
 COMMENT ON COLUMN BARS.CIM_PAYMENTS_BOUND.REF IS 'Референс документу';
@@ -192,6 +192,24 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IDX_CIMPAYMENTS_CONTRID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMPAYMENTS_CONTRID ON BARS.CIM_PAYMENTS_BOUND (CONTR_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  constraint FK_CIMPAYMENTS_CONTRID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_PAYMENTS_BOUND ADD CONSTRAINT FK_CIMPAYMENTS_CONTRID FOREIGN KEY (CONTR_ID)
+	  REFERENCES BARS.CIM_CONTRACTS (CONTR_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_PAYMENTS_BOUND ***

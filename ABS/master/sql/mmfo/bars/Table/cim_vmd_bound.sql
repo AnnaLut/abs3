@@ -188,6 +188,24 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IDX_CIMVMD_CONTRID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_CIMVMD_CONTRID ON BARS.CIM_VMD_BOUND (CONTR_ID)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  constraint FK_CIMVMD_CONTRID ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_VMD_BOUND ADD CONSTRAINT FK_CIMVMD_CONTRID FOREIGN KEY (CONTR_ID)
+	  REFERENCES BARS.CIM_CONTRACTS (CONTR_ID) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_VMD_BOUND ***
