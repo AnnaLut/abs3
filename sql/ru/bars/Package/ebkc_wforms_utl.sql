@@ -155,7 +155,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.09  2018.06.19';
+  g_body_version  constant varchar2(64) := 'version 1.10  2018.07.20';
 
   --
   -- variables
@@ -582,59 +582,96 @@ is
      rollback; raise;
  end dell_one_recomm;
 
- procedure get_subgrp_count(p_group_id       in number default 1,
-                                 p_prc_quality_id in number default null, /* Подгруппы на первой стр.,null значит Все*/
-                                 p_nmk            in varchar2 default null,
-                                 p_rnk            in number default null,
-                                 p_okpo           in varchar2 default null,
-                                 p_ser            in varchar2 default null,
-                                 p_numdoc         in varchar2 default null,
-                                 p_quality_group  in varchar2 default null, /*Card, Default*/
-                                 p_percent        in number default null, /*Процент Качества*/
-                                 p_attr_qty       in number default null, /*Кол-во атрибутов для правки*/
-                                 p_branch         in varchar2 default null,
-                                 p_custtype       in varchar2,
-                                 p_count_row      out number) is
+ procedure GET_SUBGRP_COUNT
+ ( p_group_id       in     number   default 1
+ , p_prc_quality_id in     number   default null /* Подгруппы на первой стр.,null значит Все*/
+ , p_nmk            in     varchar2 default null
+ , p_rnk            in     number   default null
+ , p_okpo           in     varchar2 default null
+ , p_ser            in     varchar2 default null
+ , p_numdoc         in     varchar2 default null
+ , p_quality_group  in     varchar2 default null /*Card, Default*/
+ , p_percent        in     number   default null /*Процент Качества*/
+ , p_attr_qty       in     number   default null /*Кол-во атрибутов для правки*/
+ , p_branch         in     varchar2 default null
+ , p_custtype       in     varchar2
+ , p_count_row         out number
+ ) is
+   l_sql                   varchar2(2048);
  begin
-   select /*+ index(c PK_CUSTOMER) index(teru INDX_TERU_U1)*/
-    count(*)
-     into p_count_row
-     from EBKC_REQ_UPDATECARD teru, customer c,
-          (select gl.kf as kf from dual) ss_kf
-    where (p_rnk is null or p_rnk = c.rnk)
-      and teru.kf = ss_kf.kf
-      and c.rnk = teru.rnk
-      and c.date_off is null
-      and group_id = p_group_id
-         --24.09.2015 Irina.Ivanova
-         --and ebk_wforms_utl.show_card_accord_quality(ss_kf.kf, teru.rnk, p_quality_group, p_percent) = 1
-      and exists (select 1
-             from EBKC_QUALITYATTR_GROUPS g
-            where kf = teru.kf
-              and rnk = teru.rnk
-              and g.name = nvl(p_quality_group, 'card')
-              and g.quality <= nvl(p_percent, 1000)
-              and g.cust_type = p_custtype)
-      and (p_nmk is null or c.nmk like p_nmk)
-      and (p_okpo is null or c.okpo = p_okpo)
-      and (p_branch is null or c.branch = p_branch)
-      and (p_ser || p_numdoc is null or exists
-           (select 1
-              from person
-             where (ser = p_ser or p_ser is null)
-               and (numdoc = p_numdoc or p_numdoc is null)
-               and rnk = c.rnk))
-      and (p_prc_quality_id is null or ebkc_wforms_utl.get_subgrp(teru.group_id, teru.quality) = p_prc_quality_id)
-      and (p_attr_qty is null or
-          (select count(a.name)
-              from EBKC_REQ_UPDCARD_ATTR a
-             where a.kf = teru.kf
-               and a.rnk = teru.rnk
-               and a.cust_type = p_custtype
-                  --24.09.2015 Irina Ivanova
-                  --and quality <> 'C'
-               and (a.recommendvalue is not null or a.descr is not null)) = p_attr_qty);
- end get_subgrp_count;
+
+  bars_audit.trace( $$PLSQL_UNIT||'.GET_SUBGRP_COUNT: Entry whit ( p_group_id=%s, p_rnk=%s, p_prc_quality_id=%s, p_custtype=%s ).'
+                  , to_char(p_group_id), to_char(p_rnk), to_char(p_prc_quality_id), p_custtype );
+
+  l_sql := 'select count(*)'                                                       ||chr(10)
+        || '  from EBKC_REQ_UPDATECARD r'                                          ||chr(10)
+        || '  join CUSTOMER c'                                                     ||chr(10)
+        || '    on ( c.KF = r.KF and c.RNK = r.RNK )'                              ||chr(10)
+        || ' where r.GROUP_ID = '||to_char(p_group_id)                             ||chr(10)
+        || '   and c.DATE_OFF is null'                                             ||chr(10)
+        || '   and exists ( select 1'                                              ||chr(10)
+        || '                  from EBKC_QUALITYATTR_GROUPS g'                      ||chr(10)
+        || '                 where g.KF  = r.KF'                                   ||chr(10)
+        || '                   and g.RNK = r.RNK'                                  ||chr(10)
+        || '                   and g.NAME = '''||nvl(p_quality_group,'card')||'''' ||chr(10)
+        || '                   and g.QUALITY <= '||to_char(nvl(p_percent,1000))    ||chr(10)
+        || '                   and g.CUST_TYPE = '''||p_custtype||''' )'           ||chr(10)
+        || case
+           when (p_rnk is Not Null)
+           then '   and c.RNK = '     ||to_char(p_rnk)||chr(10)
+           else ''
+           end
+        || case
+           when (p_nmk is Not Null)
+           then '   and c.NMK like '''||p_nmk||''''||chr(10)
+           else ''
+           end
+        || case
+           when (p_okpo is Not Null)
+           then '   and c.OKPO = '''||p_okpo||''''||chr(10)
+           else ''
+           end
+        || case
+           when (p_branch is Not Null)
+           then '   and c.BRANCH = '''||p_branch||''''||chr(10)
+           else ''
+           end
+        || case
+           when (p_ser is Not Null and p_numdoc is Not Null)
+           then '   and exists ( select 1 from PERSON where RNK = c.RNK and SER = '''||p_ser||''' and NUMDOC = '''||p_numdoc||''' )'||chr(10)
+           else ''
+           end
+        || case
+           when (p_ser is Not Null and p_numdoc is Null)
+           then '   and exists ( select 1 from PERSON where RNK = c.RNK and SER = '''||p_ser||''' )'||chr(10)
+           else ''
+           end
+        || case
+           when (p_ser is Null and p_numdoc is Not Null)
+           then '   and exists ( select 1 from PERSON where RNK = c.RNK and NUMDOC = '''||p_numdoc||''' )'||chr(10)
+           else ''
+           end
+        || case
+           when (p_prc_quality_id is Not Null)
+           then '   and EBKC_WFORMS_UTL.GET_SUBGRP( r.GROUP_ID, r.QUALITY) = '||to_char(p_prc_quality_id)||chr(10)
+           else ''
+           end
+        || case
+           when (p_attr_qty is Not Null)
+           then '   and ( select count(a.NAME) from EBKC_REQ_UPDCARD_ATTR a
+                           where a.KF = r.KF and a.RNK = r.RNK and a.CUST_TYPE = '''||p_custtype||
+                ''' and (a.RECOMMENDVALUE is Not Null or a.DESCR is Not Null) )='||to_char(p_attr_qty)
+           else ''
+           end;
+
+  bars_audit.trace( $$PLSQL_UNIT||'.GET_SUBGRP_COUNT: '||l_sql );
+
+  execute immediate l_sql
+    into p_count_row;
+
+  bars_audit.trace( $$PLSQL_UNIT||'.GET_SUBGRP_COUNT: Exit whit ( p_count_row=%s ).', to_char(p_count_row) );
+
+ end GET_SUBGRP_COUNT;
 
   procedure get_legal_subgrp_count
   ( p_group_id       in  number default 1,
