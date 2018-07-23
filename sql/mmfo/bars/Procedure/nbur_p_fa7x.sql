@@ -11,7 +11,7 @@ is
 % DESCRIPTION : Процедура формирования A7X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.000  22/06/2018
+% VERSION     :  v.1.001  20/07/2018 (22/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   ver_              char(30)  := 'v.1.000  22/06/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
@@ -85,10 +85,6 @@ BEGIN
     end loop;
   end if;
 
-  logger.trace(c_title || ' We execute procedure for file ' || c_old_file_code || ' and waiting data');
-  p_fa7_nn(pdat_ => p_report_date, p_emulate => true); --Запускаем старый отчет в режиме эмуляции, чтобы забрать данные из RNBU_TRACE
-  logger.trace(c_title || ' Execution of procedure for file ' || c_old_file_code || ' finished');
-
   --Теперь сохрянем полученные данные в детальном протоколе
   insert into nbur_log_fa7x(report_date, kf, nbuc, version_id, ekp, t020, r020, r011, r013, r030, k030, s181, s190, s240, t070, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
      select
@@ -126,29 +122,29 @@ BEGIN
               , t.nd /*nd*/
               , t.branch /*branch*/
      from     (
-                select p.rnk
+                select p.cust_id   as rnk
                        , p.nd
-                       , p.acc
-                       , p.nls
+                       , p.acc_id  as acc
+                       , p.acc_num as nls
                        , p.kv
-                       , p.znap
-                       , p.kodp
+                       , p.field_value as znap
+                       , p.field_code as kodp
                        , p.ref
-                       , p.mdate
-                       , ac.branch
-                       , p.comm
-                       , substr(p.kodp, 1, 1) as seg_d
-                       , substr(p.kodp, 2, 4) as seg_bbbb
-                       , substr(p.kodp, 6, 1) as seg_z
-                       , substr(p.kodp, 7, 1) as seg_p
-                       , substr(p.kodp, 8, 1) as seg_x
-                       , substr(p.kodp, 9, 1) as seg_l
-                       , substr(p.kodp, 10, 1) as seg_r
-                       , substr(p.kodp, 11, 1) as seg_i
-                       , substr(p.kodp, 12, 3) as seg_vvv                        
-                from   rnbu_trace p
-                       left join accounts ac on (ac.kf = p_kod_filii)
-                                                and (p.acc = ac.acc)     
+                       , p.maturity_date as mdate
+                       , p.branch
+                       , p.description as comm
+                       , p.seg_01 as seg_d
+                       , p.seg_02 as seg_bbbb
+                       , p.seg_03 as seg_z
+                       , p.seg_04 as seg_p
+                       , p.seg_05 as seg_x
+                       , p.seg_06 as seg_l
+                       , p.seg_07 as seg_r
+                       , p.seg_08 as seg_i
+                       , p.seg_09 as seg_vvv                        
+              from v_nbur_#a7_dtl p 
+              where p.report_date = p_report_date and
+                    p.kf = p_kod_filii                        
               ) t
               join (
                     select r020, max(I010) I010
