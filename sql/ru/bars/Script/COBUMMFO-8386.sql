@@ -45,7 +45,7 @@ COMMIT;
                       p_ord  op_rules.ord%type;
                       p_val  op_rules.val%type;
  BEGIN
-    FOR k IN (SELECT TT FROM TTS WHERE TT IN ('045','AA3','AA4','AA5','AA6','AA7','AA8','AA9','AA0','AAB','AAC','AAE','AAK','AAL','AAM','DPF','AAN') )
+    FOR k IN (SELECT TT FROM TTS WHERE TT IN ('045','AA3','AA4','AA5','AA6','AA7','AA8','AA9','AA0','AAB','AAC','AAE','AAK','AAL','AAM','AAN') )
     LOOP
 
      p_tag := 'CPYCL';
