@@ -1,99 +1,158 @@
-prompt ===========================================
-prompt = создание таблицы EAD_NBS
-prompt = Балансові рахунки для синхронізації з ЕА
-prompt ===========================================
+prompt Importing table EAD_NBS...
+set feedback off
+delete from EAD_NBS;
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/EAD_NBS.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2512', 2, null, 'pr_uo', null, null, 1);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2520', 2, null, 'pr_uo', null, null, 2);
 
-PROMPT *** ALTER_POLICY_INFO to EAD_NBS ***
-execute bpa.alter_policy_info( 'EAD_NBS', 'WHOLE' , null, null, null, null ); 
-execute bpa.alter_policy_info( 'EAD_NBS', 'FILIAL', null, null, null, null );
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2523', 2, null, 'pr_uo', null, null, 3);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2525', 2, 'dep_uo', 'dep_uo', null, null, 4);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2526', 2, null, 'pr_uo', null, null, 5);
 
--- Create table
-begin
-  execute immediate '
-create table EAD_NBS
-(
-  nbs      CHAR(4) not null,
-  custtype INTEGER not null,
---SED_CONDITION    varchar2(100),
-  agr_type VARCHAR2(100),
-  acc_type VARCHAR2(100)
-)
-tablespace BRSSMLD';
-exception when others then if (sqlcode = -955) then null; else raise; end if;
-end;
-/
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2530', 2, null, 'pr_uo', null, null, 6);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2531', 2, null, 'pr_uo', null, null, 7);
 
--- Add/modify columns 
-begin
-  for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'AGR_TYPE')) loop
-    execute immediate 'alter table EAD_NBS add agr_type varchar2(100)';
-  end loop;
-  for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'ACC_TYPE')) loop
-    execute immediate 'alter table EAD_NBS add acc_type varchar2(100)';
-  end loop;
-   for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'TIP')) loop
-    execute immediate 'alter table EAD_NBS add tip varchar2(3)';
-  end loop;
-    for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'OB22')) loop
-    execute immediate 'alter table EAD_NBS add ob22 varchar2(3)';
-  end loop;
-    for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'ID')) loop
-    execute immediate 'alter table EAD_NBS add id varchar2(3)';
-  end loop;  
-end;
-/
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2541', 2, null, 'pr_uo', null, null, 8);
 
-PROMPT *** ALTER_POLICIES to EAD_NBS ***
-execute bpa.alter_policies('EAD_NBS');
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2542', 2, null, 'pr_uo', null, null, 9);
 
-COMMENT ON TABLE EAD_NBS           IS 'Балансові рахунки для синхронізації з ЕА';
-COMMENT ON COLUMN EAD_NBS.NBS      IS 'Балансовий рахунок до відправки';
-COMMENT ON COLUMN EAD_NBS.CUSTTYPE IS 'Групування для різних типів клієнта';
-COMMENT ON COLUMN EAD_NBS.AGR_TYPE IS 'Тип угоди, якщо безумовний, якщо є варіанті - не заповнювати';
-COMMENT ON COLUMN EAD_NBS.ACC_TYPE IS 'Тип рахунку, якщо безумовний, якщо є варіанті - не заповнювати';
-COMMENT ON COLUMN EAD_NBS.TIP      IS 'Тип счета (или маска -  TIP%)  с учетом справочника TIPS';
-COMMENT ON COLUMN EAD_NBS.OB22     IS 'Аналiтика рах. Розширення БР. (accounts.ob22)';
-COMMENT ON COLUMN EAD_NBS.id       IS 'Локальный идентификатор';
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2544', 2, null, 'pr_uo', null, null, 10);
 
-PROMPT *** Create  index PK_EADNBS ***
-begin
-  execute immediate 'drop INDEX PK_EADNBS';
-exception when others then if (sqlcode = -955) then null; else raise; end if;
-end;
-/
-begin
---  execute immediate 'drop INDEX PK_EADNBS';
-  execute immediate 'CREATE UNIQUE INDEX PK_EADNBS ON EAD_NBS (NBS, CUSTTYPE, TIP, ACC_TYPE, OB22) TABLESPACE brssmli';
-exception when others then if (sqlcode = -955) then null; else raise; end if;
-end;
-/
-begin
-  execute immediate 'ALTER TABLE EAD_NBS drop constraint UNQ_EAD_NBS';
-  commit;
-exception when others then if (sqlcode = -00900) or (sqlcode = -02443)  then null; else raise; end if;
-end;
-/
-begin
-  execute immediate 'alter table EAD_NBS  add constraint UNQ_EAD_NBS unique (ID)';
-  commit;
-exception when others then if (sqlcode = -02261) then null; else raise; end if;
-end;
-/
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2545', 2, null, 'pr_uo', null, null, 11);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2546', 2, 'dep_uo', 'dep_uo', null, null, 12);
 
-PROMPT *** Create  grants  EAD_NBS ***
-GRANT SELECT ON EAD_NBS TO BARS_ACCESS_DEFROLE;
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2550', 2, null, 'pr_uo', null, null, 13);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2551', 2, null, 'pr_uo', null, null, 14);
 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2552', 2, null, 'pr_uo', null, null, 15);
 
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/EAD_NBS.sql =========*** End *** =====
-PROMPT ===================================================================================== 
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2553', 2, null, 'pr_uo', null, null, 16);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2554', 2, null, 'pr_uo', null, null, 17);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2555', 2, null, 'pr_uo', null, null, 18);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2556', 2, null, 'pr_uo', null, null, 19);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2560', 2, null, 'pr_uo', null, null, 20);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2561', 2, null, 'pr_uo', null, null, 21);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2562', 2, null, 'pr_uo', null, null, 22);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2565', 2, null, 'pr_uo', null, null, 23);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2570', 2, null, 'pr_uo', null, null, 24);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2571', 2, null, 'pr_uo', null, null, 25);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2572', 2, null, 'pr_uo', null, null, 26);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2600', 2, null, 'kpk_uo', 'W4', null, 27);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2600', 2, null, 'pr_uo', null, null, 28);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2601', 2, null, 'pr_uo', null, null, 29);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2602', 2, null, 'pr_uo', null, null, 30);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2603', 2, null, 'pr_uo', null, null, 31);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2604', 2, null, 'pr_uo', null, null, 32);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2605', 2, null, 'kpk_uo', null, null, 33);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2610', 2, 'dep_uo', 'dep_uo', null, null, 34);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2611', 2, null, 'pr_uo', null, null, 35);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2620', 3, null, 'bpk_fo', 'W4', null, 36);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2625', 3, null, 'bpk_fo', null, null, 37);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2630', 3, null, null, null, null, 38);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2640', 2, null, 'pr_uo', null, null, 39);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2641', 2, null, 'pr_uo', null, null, 40);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2642', 2, null, 'pr_uo', null, null, 41);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2643', 2, null, 'pr_uo', null, null, 42);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2650', 2, null, 'pr_uo', null, null, 43);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2650', 2, null, 'kpk_uo', 'W4', null, 44);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2651', 2, 'dep_uo', 'dep_uo', null, null, 45);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2655', 2, null, 'kpk_uo', null, null, 46);
+/*
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2909', 2, 'salary_uo', 'transit_uo', null, '11', 47);
+*/
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('2924', 2, 'acquiring_uo', 'transit_uo', null, '16', 48);
+/*
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('3578', 2, 'encashment_uo', 'transit_uo', null, '17', 49);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('3578', 3, 'encashment_fo', 'transit_uo', null, '15', 50);
+
+insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
+values ('3578', 2, 'encashment_uo', 'transit_uo', null, '09', 51);
+*/
+commit;
