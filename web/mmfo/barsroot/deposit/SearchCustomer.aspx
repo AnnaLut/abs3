@@ -11,6 +11,8 @@
   <link href="../Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
   <link href="../Content/Themes/Kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet" />
   <link href="../Content/Themes/Kendo/Styles.css" rel="stylesheet" />
+  <link href="../deposit/style/default.css" rel="stylesheet" />
+
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
   <script src="../scripts/html5shiv.js"></script>
@@ -54,7 +56,7 @@
             <span id="lbNMK" runat="server" class="k-label">ПІБ</span>
           </td>
           <td style="width: 70%">
-            <input id="textClientName" runat="server" type="text" class="k-textbox" 
+            <input id="textClientName" runat="server" type="text" class="k-textbox regular_textbox" 
               maxlength="35" title="ПІБ клієнта" tabindex="1" style="width: 100%" />
           </td>
         </tr>
@@ -63,7 +65,7 @@
             <span id="lbId" class="k-label" runat="server">Ідентифікаційний код</span>
           </td>
           <td>
-            <input id="textClientCode" runat="server" class="k-textbox" title="Ідентифікаційний код"
+            <input id="textClientCode" runat="server" class="k-textbox regular_textbox" title="Ідентифікаційний код"
               maxlength="10" tabindex="2" />
           </td>
         </tr>
@@ -80,7 +82,7 @@
             <span id="lbDocSerial" class="k-label" runat="server">Серія документа</span>
           </td>
           <td>
-            <input id="textClientSerial" runat="server" class="k-textbox" title="Серія документа"
+            <input id="textClientSerial" runat="server" class="k-textbox regular_textbox" title="Серія документа"
               maxlength="10" tabindex="4" />
           </td>
         </tr>
@@ -89,7 +91,7 @@
             <span id="lbDocNumber" class="k-label" runat="server">Номер документа</span>
           </td>
           <td>
-            <input id="textClientNumber" runat="server" class="k-textbox" title="Номер документа"
+            <input id="textClientNumber" runat="server" class="k-textbox regular_textbox" title="Номер документа"
               maxlength="20" tabindex="5" />
           </td>
         </tr>

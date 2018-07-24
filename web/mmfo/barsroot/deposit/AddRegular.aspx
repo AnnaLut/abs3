@@ -11,6 +11,7 @@
   <link href="../Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
   <link href="../Content/Themes/Kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet" />
   <link href="../Content/Themes/Kendo/Styles.css" rel="stylesheet" />
+  <link href="../deposit/style/default.css" rel="stylesheet" />
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
   <script src="../scripts/html5shiv.js"></script>
@@ -71,7 +72,7 @@
                </td>
                <td class="style3">
                  <input ID="RNKtext" runat="server" 
-                        class="k-textbox" disabled maxlength="12" 
+                        class="k-textbox regular_textbox" disabled maxlength="12" 
                         TabIndex="2" style="width: 100px"/>    
                  <input type="hidden" id="RNK" name="RNK" runat="server" value=""/> 
                </td>
@@ -92,7 +93,7 @@
               </td>
               <td>
                 <div id="NLSblock" runat="server">
-                  <input id="NLStext" runat="server" class="k-textbox" disabled MaxLength="12" 
+                  <input id="NLStext" runat="server" class="k-textbox regular_textbox" disabled MaxLength="12" 
                        TabIndex="4" BackColor="WhiteSmoke" style="width: 200px"/>
                   <input type="hidden" id="NLS" value="" runat="server"/>
                   <input type="hidden" id="CodeVal" value="" runat="server"/>
@@ -177,6 +178,7 @@
                               //height: 550,
                               selectable:true,
                               sortable: true,
+                              scrollable: false,
                               columns: [{
                                 field: "ord",
                                 title: "Пріоритет",
