@@ -40,5 +40,7 @@ namespace BarsWeb.Areas.CreditUi.Models
         public string NAZN { get; set; }
         public string R013 { get; set; }
         public string OB22 { get; set; }
+
+        public byte? Z_POLIS { get; set; }
     }
 }
