@@ -156,3 +156,18 @@
 	width:     130px;
 	height:    20px;
 }
+
+.regular_textbox {
+    text-indent: 0px !important;
+}
+#seachCustomerGrid > .k-widget > .k-pager-nav > .k-icon {
+    margin-top: 5px;
+}
+.k-ie7 .k-dropdown-wrap .k-input {
+    text-indent: 5px;
+}
+
+.k-pager-sizes .k-dropdown.k-widget {
+    padding-top: 2px;
+    padding-left: 5px;
+}
