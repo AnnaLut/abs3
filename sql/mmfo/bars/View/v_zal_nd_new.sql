@@ -1,7 +1,16 @@
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NEW.sql =========*** Run *** =
+PROMPT ===================================================================================== 
+
+
+PROMPT *** Create  view V_ZAL_ND_NEW ***
+
+
 CREATE OR REPLACE VIEW V_ZAL_ND_NEW AS
-SELECT DISTINCT pap
+SELECT distinct pap
                ,nd
-               ,pr_12
+               ,(select max(pr_12) from cc_accp cp where t.acc = cp.acc and nd = t.nd)  pr_12
                ,acc
                ,nls
                ,kv
@@ -22,6 +31,8 @@ SELECT DISTINCT pap
                ,'' nazn
                ,nmk
                ,name
+               ,(select w.value from accountsW w where w.acc  = t.acc and w.tag  = 'Z_POLIS') Z_POLIS
+               ,(select r013 from specparam sp where sp.acc = t.acc) R013
   FROM (SELECT 1 pap
               ,p.nd nd
               ,p.pr_12
@@ -52,4 +63,17 @@ SELECT DISTINCT pap
            AND p.accs IN
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
-                                                ,p_splitting_symbol => ','))));
+                                                ,p_splitting_symbol => ',')))) t;
+
+
+PROMPT *** Create  grants  V_ZAL_ND_NEW ***
+grant SELECT                                                                 on V_ZAL_ND_NEW    to BARSREADER_ROLE;
+grant SELECT                                                                 on V_ZAL_ND_NEW    to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on V_ZAL_ND_NEW    to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_ZAL_ND_NEW.sql =========*** End *** =
+PROMPT ===================================================================================== 
+

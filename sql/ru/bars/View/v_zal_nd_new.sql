@@ -22,6 +22,8 @@ SELECT DISTINCT pap
                ,'' nazn
                ,nmk
                ,name
+               ,(select w.value from accountsW w where w.acc  = t.acc and w.tag  = 'Z_POLIS') Z_POLIS
+               ,(select r013 from specparam sp where sp.acc = t.acc) R013
   FROM (SELECT 1 pap
               ,p.nd nd
               ,p.pr_12
@@ -52,6 +54,6 @@ SELECT DISTINCT pap
            AND p.accs IN
                (SELECT column_value
                   FROM TABLE(tools.string_to_words(pul.get_mas_ini_val('ACC_LIST')
-                                                ,p_splitting_symbol => ','))));
+                                                ,p_splitting_symbol => ',')))) t;
 
 grant select on v_Zal_Nd_New to bars_access_defrole;
