@@ -78,7 +78,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
 
             List<ExistProvide> provideList = new List<ExistProvide>();
             var pooling_query = (tip == null || tip == 2) ? @"begin p_set_pawn_acc_list(deal_id => " + refID + "); end;" : @"begin pul.set_mas_ini('ACC_LIST', " + refID + ", NULL); end;";
-            var sql1 = @"select RNK,PAWN,ACC,NLS,KV,OB22,OSTB,OSTC, CC_IDZ,SDATZ,MPAWN,DEL, DEPID,PR_12,NREE,SV,MDATE,DAZS,NAZN,NMK,NAME  from v_Zal_Nd_New";
+            var sql1 = @"select RNK,PAWN,ACC,NLS,KV,OB22,OSTB,OSTC, CC_IDZ,SDATZ,MPAWN,DEL, DEPID,PR_12,NREE,SV,MDATE,DAZS,NAZN,NMK,NAME,Z_POLIS,R013  from v_Zal_Nd_New";
             if (tip == 2)
                 sql1 += " where nls " + ((balance == 1) ? "not" : "") + " like '9510%'";
             try
@@ -116,7 +116,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                         r.NAZN = String.IsNullOrEmpty(reader.GetValue(18).ToString()) ? String.Empty : reader.GetString(18);
                         r.NMK = String.IsNullOrEmpty(reader.GetValue(19).ToString()) ? String.Empty : reader.GetString(19);
                         r.NAME = String.IsNullOrEmpty(reader.GetValue(20).ToString()) ? String.Empty : reader.GetString(20);
-
+                        r.Z_POLIS = String.IsNullOrEmpty(reader.GetValue(21).ToString()) ? String.Empty : reader.GetString(21);
+                        r.R013 = String.IsNullOrEmpty(reader.GetValue(22).ToString()) ? String.Empty : reader.GetString(22);
                         provideList.Add(r);
                     }
                 }
@@ -155,50 +156,46 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             }
 
         }
-
         public void CreateOrEditGroupProvide(List<UpdateProvide> list_provide, decimal? id, decimal? accs, int? tip)
         {
-            OracleConnection connection = OraConnector.Handler.UserConnection;
-            OracleCommand cmd = connection.CreateCommand();
-            string sdatz, mdate, nree, depid, pr12, nazn,sv, del, cc_idz, ob22, r103,acc,id_str,accs_str,mpawn, proc_name;
-            try
+            using (OracleConnection connect = OraConnector.Handler.UserConnection)
+            using(OracleCommand cmd = connect.CreateCommand())
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                foreach (UpdateProvide provide in list_provide)
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = (tip == 2) ? @"bars.p_add_zal_mbdk" : @"bars.P_ADD_ZAl";
+                try
                 {
-                    sdatz = (provide.SDATZ == null) ? "null" : "TO_DATE('" + (Convert.ToDateTime(provide.SDATZ)).ToString("yyyy/MM/dd", ci) + "', 'yyyy/mm/dd')";
-                    mdate = (provide.MDATE == null) ? "null" : "TO_DATE('" + (Convert.ToDateTime(provide.MDATE)).ToString("yyyy/MM/dd", ci) + "', 'yyyy/mm/dd')";
-                    nree = (provide.NREE == "") ? "null" : "'" + provide.NREE + "'";
-                    del = (provide.DEL == null) ? "null" : provide.DEL.ToString().Replace(',', '.');
-                    cc_idz = (provide.CC_IDZ == "") ? "null" : "'" + provide.CC_IDZ + "'";
-                    depid = (provide.DEPID == null) ? "null" : provide.DEPID.ToString();
-                    pr12 = (provide.PR_12 == null) ? "null" : provide.PR_12.ToString();
-                    nazn = (provide.NAZN == "") ? "null" : "'" + provide.NAZN + "'";
-                    ob22 = (provide.OB22 == null) ? "null" : "'" + provide.OB22 + "'";
-                    r103 = (provide.R013 == null) ? "null" : "'" + provide.R013 + "'";
-                    sv = (provide.SV == null) ? "null" : provide.SV.ToString().Replace(',', '.');
-                    acc = (provide.ACC == null) ? "null" : provide.ACC.ToString();
-                    mpawn = (provide.MPAWN == null) ? "null" : provide.MPAWN.ToString();
-                    id_str = (id == null) ? "null" : id.ToString();
-                    accs_str = (accs == null) ? "null" : accs.ToString();
-                    proc_name = (tip == 2) ? "bars.p_add_zal_mbdk" : "bars.P_ADD_ZAl"  ; //tip==2 - МБДК
+                    foreach(UpdateProvide provide  in list_provide)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add("p_nd", OracleDbType.Decimal, id, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_accs", OracleDbType.Decimal, accs, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, provide.RNK, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_pawn", OracleDbType.Decimal, provide.PAWN, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_acc", OracleDbType.Decimal, provide.ACC, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_kv", OracleDbType.Int32, provide.KV, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_sv", OracleDbType.Decimal, provide.SV, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_del", OracleDbType.Decimal, provide.DEL, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_cc_idz", OracleDbType.Varchar2, provide.CC_IDZ != "" ? provide.CC_IDZ : null, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_sdatz", OracleDbType.Date, provide.SDATZ != null ? DateTime.ParseExact(provide.SDATZ,"dd/MM/yyyy", CultureInfo.InvariantCulture) : (DateTime?)null, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_mdate", OracleDbType.Date, provide.MDATE != null ? DateTime.ParseExact(provide.MDATE, "dd/MM/yyyy", CultureInfo.InvariantCulture) : (DateTime?)null, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_nree", OracleDbType.Varchar2, provide.NREE != "" ? provide.NREE : null, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_depid", OracleDbType.Decimal, provide.DEPID, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_mpawn", OracleDbType.Int32, provide.MPAWN, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_pr_12", OracleDbType.Int32, provide.PR_12, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_nazn", OracleDbType.Varchar2, provide.NAZN != "" ? provide.NAZN : null, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_ob22", OracleDbType.Varchar2, provide.OB22 != "" ? provide.OB22 : null, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_R013", OracleDbType.Varchar2, provide.R013 != "" ? provide.R013 : null, ParameterDirection.Input);
+                        if( tip != 2)
+                            cmd.Parameters.Add("p_strahz", OracleDbType.Int32, provide.Z_POLIS, ParameterDirection.Input);
 
-                    var sql = @"begin " +proc_name+ "(" + id_str + "," + accs_str + "," + provide.RNK + "," +
-                        provide.PAWN + "," + acc + "," + provide.KV + "," + sv + "," + del + "," + cc_idz + "," + sdatz + "," + mdate +
-                        "," + nree + "," + depid + "," + mpawn + "," + pr12 + "," + nazn + "," + ob22+ "," + r103+ "); end;";
-
-                    //original: P_ADD_ZAl(:ND,null,:RNK,:PAWN,:ACC,:KV,:SV,:DEL,:CC_IDZ,:SDATZ,:MDATE,:NREE,:DEPID,:MPAWN,:PR_12,:NAZN);
-
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
+                    }
                 }
-
-            }
-            finally
-            {
-                cmd.Dispose();
-                connection.Dispose();
-                connection.Close();
+                catch(Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
             }
         }
 

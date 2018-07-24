@@ -2,12 +2,13 @@
 var staticData = [];
 var diff_dialog;
 var globaltip;
+var preventCloseOnSave = true;
 $(document).ready(function () {
         
     globalID = bars.extension.getParamFromUrl('id', location.href);
     globaltip = bars.extension.getParamFromUrl('tip', location.href);
     balance = bars.extension.getParamFromUrl('balance', location.href);
-        
+    
     var toolbar = [];
     toolbar.push({ name: "btNew", type: "button", text: "<span class='pf-icon pf-16 pf-add'></span> Додати нове забезпечення" });
     toolbar.push({ name: "btReg", type: "button", text: "<span class='pf-icon pf-16 pf-gear'></span> Редагувати забезпечення",  className: "k-custom-edit" });
@@ -153,6 +154,14 @@ $(document).ready(function () {
                nullable: true,
                field: "DEPID"
            },
+           {
+               title: "Страх. заб",
+               width: 70,
+               nullable: true,
+               field: "Z_POLIS",
+               template: '#= (Z_POLIS !== "") ? (Z_POLIS === "1" ? "Так" : "Ні") : "" #'
+               
+           },
           {
               title: "Місцезнах.",
               width: 50,
@@ -181,21 +190,27 @@ $(document).ready(function () {
         ],
         edit: function (e) {
             var editWindow = this.editable.element.data("kendoWindow");
-
+            editWindow.bind("close", onWindowEditClose);
             $("#del").kendoNumericTextBox({
                 spinners: false
             });
-            $("#depid").kendoNumericTextBox({
-                spinners: false,
-                format: "#"
-            });
+
             $("#pr_12").kendoNumericTextBox({
                 spinners: false,
                 format: "#"
             });
+            if (globaltip === "2")
+                $('[id="polis_field"]').attr("hidden", "hidden");
+
 
             TemplateDropDown("#mpawn_list", '/CreditUI/Provide/GetMpawn', "NAME", "MPAWN", null, null);
-            TemplateDropDown("#kv_list", '/CreditUI/Provide/GetKV', "NAME", "KV", "startswith",null); 
+            TemplateDropDown("#kv_list", '/CreditUI/Provide/GetKV', "NAME", "KV", "startswith", null);
+            $("#polis_list").kendoDropDownList({
+                dataSource: { data: [{ Z_POLIS: 1, POLIS_NAME: "Так" }, { Z_POLIS: 0, POLIS_NAME: "Ні" } ] },
+                dataTextField: "POLIS_NAME",
+                dataValueField: "Z_POLIS",
+                optionLabel: " "
+            });
           
             $("#kv_list").data("kendoDropDownList").list.width(200);
             $("#kv_list").data("kendoDropDownList").value(980);
@@ -236,7 +251,12 @@ $(document).ready(function () {
                 $("#pawn_list").data("kendoDropDownList").value(e.model.PAWN);
                 $("#kv_list").data("kendoDropDownList").value(e.model.KV);
                 $("#mpawn_list").data("kendoDropDownList").value(e.model.MPAWN);
+                $("#polis_list").data("kendoDropDownList").value(e.model.Z_POLIS);
             }
+            $("#pawn_list").data("kendoDropDownList").bind("change", function () {
+                    $("#ob22").val("");
+                    $("#r013").val("");
+            });
         },
         editable: {
             mode: "popup",
@@ -244,7 +264,6 @@ $(document).ready(function () {
             update: true
         },
         save: function (e) {
-
             var provide = {
                 RNK: $("#RNK").val(),
                 PAWN : $("#pawn_list").data("kendoDropDownList").value(),
@@ -254,20 +273,22 @@ $(document).ready(function () {
                 MDATE : kendo.toString($("#MDATE").data("kendoDatePicker").value(), 'dd/MM/yyyy'),
                 MPAWN : $("#mpawn_list").data("kendoDropDownList").value(),
                 DEL : e.model.DEL,
-                DEPID : e.model.DEPID,
+                DEPID: $("#depid").val(),
                 PR_12 : e.model.PR_12,
                 NAZN : e.model.NAZN,
                 NREE : e.model.NREE,
                 OB22: $("#ob22").val(),
                 R013: $("#r013").val(),
                 SV: null,
-                ACC: null
+                ACC: null,
+                Z_POLIS: $("#polis_list").data("kendoDropDownList").value() !== "" ? $("#polis_list").data("kendoDropDownList").value() : null
             };
 
             if (e.model.isNew()) {
+                bars.ui.loader('.k-popup-edit-form', true);
                 $.ajax({
                     async: true,
-                    type: 'POST',
+                    type: 'POST', 
                     url: bars.config.urlContent('/CreditUI/Provide/AddProvide'),
                     dataType: 'json',
                     data: {
@@ -278,6 +299,7 @@ $(document).ready(function () {
                     },
                     success: function (data) {
                         if (CatchErrors(data)) {
+                            preventCloseOnSave = false;
                             bars.ui.loader('body', true);
                             createExistProvides();
                             bars.ui.loader('body', false);
@@ -285,6 +307,12 @@ $(document).ready(function () {
                                 text: "Застава успішно створена"
                             });
                         }
+                        else
+                            preventCloseOnSave = true;
+                    },
+                    complete: function(){
+                        bars.ui.loader('.k-popup-edit-form', false);
+
                     }
                 });
             }
@@ -318,7 +346,7 @@ $(document).ready(function () {
             disabledButtons(false, ".k-grid-btDel");
         },
         cancel: function (e) {
-            $('#gridExistProvide').data('kendoGrid').refresh();
+            $('#gridExistProvide').data('kendoGrid').dataSource.read();
         },
         dataBinding: function() {
             record = (this.dataSource.page() -1) * this.dataSource.pageSize();
@@ -338,6 +366,16 @@ $(document).ready(function () {
         }
     }).data("kendoGrid");
 
+    var onWindowEditClose = function (e) {
+        if (preventCloseOnSave) {
+            e.preventDefault();
+            preventCloseOnSave = false;
+        }
+    };
+
+    $(".k-grid-cancel").on("mousedown", function (e) {
+        preventCloseOnSave = false;
+    });
 
     var dialog = $("#dialogSetDEL").kendoWindow({
         title: "Групове проведення",
@@ -771,7 +809,8 @@ var columns = {
     NAZN: { type: "string" },
     PR_12: { type: "number", nullable: true },
     R013: { type: "string", nullable: true },
-    NAME: { type: "string" }
+    NAME: { type: "string" },
+    Z_POLIS: {type : "string", nullable: true}
 }
 //////////////////////////////////////
 
@@ -779,6 +818,7 @@ function showReferCust(tabName, showFields, whereClause) {
     bars.ui.handBook(tabName, function (data) {
         $("#RNK").val(data[0].RNK);
         $("#RNK_name").val(data[0].NMK);
+        $("#depid").val("");
     },
     {
         columns: showFields,
@@ -929,6 +969,8 @@ function Edit_Provide(provide, text) {
                 $("#gridExistProvide").data("kendoGrid").dataSource.filter(filters);
                 bars.ui.loader('body', false);
             }
+            else
+                preventCloseOnSave = true;
         }
     });
 }
@@ -978,7 +1020,8 @@ function SendGroupToEdit(grid,del) {
             OB22: grid.dataItem($(this)).OB22,
             R013: grid.dataItem($(this)).R013,
             ACC: grid.dataItem($(this)).ACC,
-            SV: grid.dataItem($(this)).SV
+            SV: grid.dataItem($(this)).SV,
+            Z_POLIS: grid.dataItem($(this)).Z_POLIS
         };
         list_provide.push(provide);
     });
@@ -1003,5 +1046,27 @@ function SendProvidesToND(_nd) {
                 bars.ui.loader('body', false);
             }
         }
+    });
+}
+
+function showDeposits() {
+    var grid = $("#gridExistProvide").data("kendoGrid");
+    if (grid.select().length > 0)
+        return;
+
+    bars.ui.handBook("V_DPT_DPU", function (data) {
+        $("#depid").val(data[0].ID);
+    },
+    {
+        columns: [
+			{ title: "РНК", field: "RNK", width: 100 },
+			{ title: "Найменування клієнта", field: "NMK", width: 200 },
+            { title: "Номер депозиту", field: "ID", width: 100 },
+            { title: "Дата початку",  field: "DAT_BEGIN", width: 100, template: "#= kendo.toString(kendo.parseDate(DAT_BEGIN, 'yyyy-MM-dd'), 'dd/MM/yyyy') #" },
+            { title: "Валюта", field: "KV", width: 50 },
+            { field: "Сума", width: 100, template: '#= kendo.toString(SUM, "n2") #' }],
+        multiSelect: false,
+        clause: "where dat_end is null and rnk = " + $("#RNK").val(),
+        ResizedColumns: true
     });
 }
