@@ -44,7 +44,7 @@ public partial class docinput_depository : Bars.BarsPage
 
             ddTts.Items.Insert(0, "");
 
-            ddBranches.DataSource = SQL_SELECT_dataset("select branch, name from branch where length(branch)=15 order by branch").Tables[0];
+            ddBranches.DataSource = SQL_SELECT_dataset("select branch, name from branch where branch like SYS_CONTEXT ('bars_context', 'user_branch_mask') and length(branch)=15 order by branch").Tables[0];
             ddBranches.DataTextField = "NAME";
             ddBranches.DataValueField = "BRANCH";
             ddBranches.DataBind();
