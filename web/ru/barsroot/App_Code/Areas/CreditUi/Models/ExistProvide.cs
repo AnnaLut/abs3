@@ -58,6 +58,6 @@ namespace BarsWeb.Areas.CreditUi.Models
 
         public string NAME { get; set; }
 
-
+        public string Z_POLIS { get; set; }
     }
 }
