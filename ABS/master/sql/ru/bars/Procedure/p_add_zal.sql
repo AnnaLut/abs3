@@ -31,6 +31,7 @@ PROMPT *** Create  procedure P_ADD_ZAL ***
  ,p_nazn   VARCHAR2 DEFAULT NULL
  ,p_ob22   VARCHAR2 DEFAULT NULL
  ,p_R013   VARCHAR2 DEFAULT NULL
+ ,p_strahz NUMBER DEFAULT NULL
 ) IS
   --ввод новых залогов
   -- 07/12/2016 -- COBUMMFOTEST-361 Назначение платежа из формы
@@ -215,6 +216,16 @@ end if;
  END;*/
       accreg.setAccountSParam(az.acc, 'OB22', p_ob22);
 end if;
+
+if (p_strahz  is null or  p_cc_idz is null or  p_sdatz is null) then
+      raise_application_error(g_errn
+                             ,g_errs || 'Всі три поля ("№ дог.заб","Дата дог. забез","Страхування застави") мають бути заповнені!');
+end if;    
+if p_strahz is not null then
+  accreg.setAccountwParam(az.acc, 'Z_POLIS', p_strahz);
+end if;
+
+
   BEGIN
     SELECT * INTO az FROM accounts WHERE acc = az.acc;
   EXCEPTION
