@@ -11,15 +11,17 @@ is
 % DESCRIPTION : Процедура формирования 3AX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.000  08/06/2018
+% VERSION     :  v.1.010  17/07/2018 (08/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   ver_              char(30)  := 'v.1.000  08/06/2018';
+  
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_A3A3F2          constant varchar2(6 char) := 'A3A3F2';
   c_A3A3F4          constant varchar2(6 char) := 'A3A3F4';
   c_A3A4F2          constant varchar2(6 char) := 'A3A4F2';
   c_A3A4F4          constant varchar2(6 char) := 'A3A4F4';
   c_XXXXXX          constant varchar2(6 char) := 'XXXXXX';
+  
   c_old_file_code   constant varchar2(3 char) := '#3A';
   c_sleep_time      constant number := 30; --Время ожидания между тактами проверки
 
@@ -66,13 +68,13 @@ BEGIN
                                  , p_kf => p_kod_filii
                                  , p_report_date => p_report_date
                                )
-  then  
-    logger.trace(c_title || ' The file ' || c_old_file_code || ' in queue. Waiting procedure and use it''s data');  
-  
+  then
+    logger.trace(c_title || ' The file ' || c_old_file_code || ' in queue. Waiting procedure and use it''s data');
+
     loop
       --Ждем пока закончится старая процедура наполнения данных
-      dbms_lock.sleep(seconds => c_sleep_time);  
-        
+      dbms_lock.sleep(seconds => c_sleep_time);
+
       --Выйдем когда файла в очереди уже нет
       if f_nbur_check_file_in_queue(
                                       p_file_code => c_old_file_code
@@ -83,18 +85,18 @@ BEGIN
         logger.trace(c_title || ' File ' || c_old_file_code || ' in queue. Waiting more...');
       else
         logger.trace(c_title || ' File ' || c_old_file_code || ' not in queue. Stop waiting and process it data');
-        exit;  
-      end if ;                            
+        exit;
+      end if ;
     end loop;
   else
     logger.trace(c_title || ' The file ' || c_old_file_code || ' not in queue. We execute it procedure and waiting data');
-    
+
     --Запуск старой процедуры, если ее нет в очереди для наполнения данных
     p_f3A_NN (p_report_date, 'C');
-    
-    logger.trace(c_title || ' Execution of procedure for file ' || c_old_file_code || ' finished');    
+
+    logger.trace(c_title || ' Execution of procedure for file ' || c_old_file_code || ' finished');
   end if;
-  
+
   --Теперь сохрянем полученные данные в детальном протоколе
   insert into nbur_log_f3ax(
                              report_date
@@ -122,27 +124,28 @@ BEGIN
                              , nd
                              , branch
                            )
-      select 
+      select
              report_date
              , kf
              , nbuc
              , l_version_id
              , case
-                 when T020 = '5' and R020 in ('1520', '1521', '1522', '1524', '1532', '1533', '1542', '1543', '2030', '2040', '2041', '2042', '2043', '2044', '2045', '2063', '2071', '2083', '2203', '2211', '2220', '2233', '2240', '2241', '2242', '2243', '2301', '2303', '2310', '2311', '2320', '2321', '2330', '2331', '2340', '2341', '2351', '2353', '2390', '2391', '2392', '2393', '2394', '2395', '2340', '2341', '2351', '2353', '2401', '2403', '2410', '2411', '2420', '2421', '2431', '2433', '2450', '2451', '2452', '2453') then c_A3A3F4                      
+                 when T020 = '5' and R020 in ('1520', '1521', '1522', '1524', '1532', '1533', '1542', '1543', '2030', '2040', '2041', '2042', '2043', '2044', '2045', '2063', '2071', '2083', '2203', '2211', '2220', '2233', '2240', '2241', '2242', '2243', '2301', '2303', '2310', '2311', '2320', '2321', '2330', '2331', '2340', '2341', '2351', '2353', '2390', '2391', '2392', '2393', '2394', '2395', '2340', '2341', '2351', '2353', '2401', '2403', '2410', '2411', '2420', '2421', '2431', '2433', '2450', '2451', '2452', '2453') then c_A3A3F4
                  when T020 = '5' and R020 in ('1502', '1510', '1513', '1600', '2600', '2605', '2620', '2625', '2650', '2655') then c_A3A3F2
                  when T020 = '6' and R020 in ('1621', '1622', '1623') then c_A3A4F4
                  when T020 = '6' and R020 in ('1602', '1610', '1613', '2600', '2605', '2610', '2611', '2620', '2625', '2630', '2650', '2651', '2655') then c_A3A4F2
-               end 
+                 else c_XXXXXX                 
+               end
              , f_get_ku_by_nbuc(nbuc)
              , t020
              , r020
              , r011
              , d020
-             , s180                          
+             , s180
              , r030
              , k030
              , sum(t070) as t070
-             , max(t090) as t090             
+             , max(t090) as t090
              , description
              , ACC_ID
              , ACC_NUM
@@ -151,9 +154,9 @@ BEGIN
              , CUST_ID
              , REF
              , ND
-             , BRANCH 
+             , BRANCH
       from   (
-                select 
+                select
                        datf as report_date
                        , kf
                        , nbuc
@@ -164,7 +167,7 @@ BEGIN
                        , substr(kodp, 9, 1) as k030
                        , substr(kodp, 8, 1) as s180
                        , substr(kodp, 10, 2) as d020
-                       , case when substr(kodp, 1, 1) = '1' then to_number(znap) end as t070       
+                       , case when substr(kodp, 1, 1) = '1' then to_number(znap) end as t070
                        , case when substr(kodp, 1, 1) = '2' then to_number(znap) end as t090
                        , comm as description
                        , acc as ACC_ID
@@ -199,8 +202,9 @@ BEGIN
                        , CUST_ID
                        , REF
                        , ND
-                       , BRANCH;   
+                       , BRANCH;
 
   logger.info(c_title || ' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END;
 /
+
