@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE P_FF7 (Dat_ DATE, p_sheme_ varchar2 default 'G',
+CREATE OR REPLACE PROCEDURE BARS.P_FF7 (Dat_ DATE, p_sheme_ varchar2 default 'G',
  typf_ number default 0, isf8_ number default 0) IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования файла #F7 для КБ
@@ -1639,3 +1639,4 @@ end if;
 logger.info ('P_FF7: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
+
