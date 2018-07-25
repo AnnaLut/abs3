@@ -5,7 +5,9 @@
             proccessedGridItem: {},
             noProccessedGrid: {},
             noProccessedGridItem: {},
-            proccessedRow: {}
+            proccessedRow: {}, 
+            DeletedGrid: {},
+            DeletedGridItem: {}
         };
     })
     .controller("Way.UploadCtrl", function ($scope, $http, $location, transport) {
@@ -24,6 +26,10 @@
         /* --- Btns defState --- */
         $scope.enableBtn = false;
         $scope.enableReloadFileBtn = false;
+        $scope.enableDelBtn = false;
+        $scope.enableRevBtn = false;
+
+
 
         function getYesterdaysDate() {
             var date = new Date();
@@ -37,8 +43,8 @@
         var dateFrom = getYesterdaysDate();
 
         var dateTo = (new Date().getDate() < 9 ? '0' + new Date().getDate() : new Date().getDate()) +
-                '/' + ((parseInt(new Date().getMonth(), 10) + 1) < 9 ? '0' + (parseInt(new Date().getMonth(), 10) + 1) : (parseInt(new Date().getMonth(), 10) + 1)) +
-                '/' + new Date().getFullYear();
+            '/' + ((parseInt(new Date().getMonth(), 10) + 1) < 9 ? '0' + (parseInt(new Date().getMonth(), 10) + 1) : (parseInt(new Date().getMonth(), 10) + 1)) +
+            '/' + new Date().getFullYear();
         $scope.dateObj = {
             dateFrom: dateFrom,
             dateTo: dateTo
@@ -47,6 +53,9 @@
 
         $scope.refreshGrid = function () {
             $scope.enableBtn = false;
+            $scope.enableReloadFileBtn = false;
+            $scope.enableDelBtn = false;
+            $scope.enableRevBtn = false;
             transport.gridItem = {};
             $scope._gridOptions.dataSource.read({
                 dateFrom: function () {
@@ -129,7 +138,7 @@
                     template: '<button class="k-button" title="Обробити файл повторно" ng-click="reloadFile()" ng-disabled="!enableReloadFileBtn"><i class="pf-icon pf-16 pf-application-update"></i></button>'
                 },
                 {
-                    template: '<button class="k-button" title="Видалити файл" ng-click="deleteFile()" ng-disabled="!enableBtn"><i class="pf-icon pf-16 pf-delete"></i></button>'
+                    template: '<button class="k-button" title="Вилучити файл" ng-click="deleteFile()" ng-disabled="!enableBtn"><i class="pf-icon pf-16 pf-delete"></i></button>'
                 },
                 {
                     template: '<button class="k-button" title="Оновити дані таблиці" ng-click="refreshGrid()"><i class="pf-icon pf-16 pf-reload_rotate"></i></button>'
@@ -147,14 +156,15 @@
             	}*/
                 {
                     template: '<button class="k-button" title="Завантажити файл" ng-click="showUploadWindow()" ng-show="isDownload"><i class="pf-icon pf-16 pf-arrow_download"></i> Завантажити файл</button>'
-                },{
+                }, {
                     template: '<button class="k-button"  title="Фільтри метаданних" ng-click="getMetaFilters()"><i class="pf-icon pf-16 pf-filter-ok"></i></button>'
                 }, {
                     template: '<button class="k-button"  title="Скинути Фільтри метаданних" ng-click="removeMetaFilters()"><i class="pf-icon pf-16 pf-filter-remove"></i></button>'
-                }
+                },
+                { template: '<a class="k-button" title="Вивантажити в Excel" ng-click="saveAsmaingrid(1)" ><i class="pf-icon pf-16 pf-exel"></i></a>' }
             ]
         };
-        
+
         var Base64 = {
             _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
             encode: function (e) {
@@ -177,6 +187,18 @@
         //    return window.metadataFiltersQuery;
         //};
 
+        $scope.saveAsmaingrid = function saveexcel(typeGrid) {
+            var grid;
+            if (typeGrid == 1)
+                grid = $scope.grid;
+            else if (typeGrid == 2)
+                grid = $('#proccessedGridId').data("kendoGrid");
+            else if (typeGrid == 3)
+                grid = $('#NoProccessedGridId').data("kendoGrid");
+            else if (typeGrid == 4)
+                grid = $('#DeletedGridId').data("kendoGrid");
+            grid.saveAsExcel();
+        };
         $scope.getMetaFilters = function getFilters() {
             var filters;
             bars.ui.getFiltersByMetaTable(function (response, success) {
@@ -199,7 +221,7 @@
         $scope.removeMetaFilters = function removeFilters() {
             $scope.base64Condition = '';
             $scope.refreshGrid();
-            
+
         };
         $scope.base64Condition = '';
         /* --- DataSource for grid --- */
@@ -212,12 +234,12 @@
                     dataType: 'json',
                     data: {
                         dateFrom: function () {
-                            return dateFrom;
+                            return kendo.toString(kendo.parseDate(dateFrom), 'dd/MM/yyyy') || dateFrom;
                         },
                         dateTo: function () {
-                            return dateTo;
+                            return kendo.toString(kendo.parseDate(dateTo), 'dd/MM/yyyy') || dateTo;
                         },
-                        condition:function () {
+                        condition: function () {
                             return $scope.base64Condition;
                         }
 
@@ -257,10 +279,10 @@
                 }
             },
             pageSize: 10,
-            resizable: true,
-            serverPaging: true,
-            serverSorting: true,
-            serverFiltering: true
+            resizable: true
+            //serverPaging: true,
+            //serverSorting: true,
+            //serverFiltering: true
         });
 
 
@@ -274,6 +296,18 @@
                 transport.gridItem = {};
                 $scope.enableBtn = false;
                 $scope.enableReloadFileBtn = false;
+            }
+        };
+
+        /* ---Additional Grids events --- */
+        $scope.onSelectionAdd = function (data, kendoEvent, btnName, grdItem) {
+            if (kendoEvent.sender.select().length > 0) {
+                //$scope.enableDelBtn = true;
+                $scope[btnName] = true;
+                transport[grdItem] = data;
+            } else {
+                $scope[btnName] = false;
+                transport[grdItem] = {};
             }
         };
 
@@ -302,7 +336,7 @@
 
         /* --- file delete --- */
         $scope.deleteFile = function () {
-            bars.ui.confirm({ text: 'Ви дійсно бажаєте видалити файл ID: ' + transport.gridItem.ID + ' ?' }, function () {
+            bars.ui.confirm({ text: 'Ви дійсно бажаєте вилучити файл ID: ' + transport.gridItem.ID + ' ?' }, function () {
 
                 var url = '/api/way/waydoc/delete?id=' + transport.gridItem.ID;
 
@@ -338,25 +372,25 @@
             },
             dataSource: $scope.dataSource,
             columns: [
-		        { field: "ID", title: "Ід. файлу", width: 100, filterable: true },
+                { field: "ID", title: "Ід. файлу", width: 100, filterable: true },
                 { field: "FILE_NAME", title: "Назва файлу", width: 350, filterable: true },
                 { field: "FILE_TYPE", title: "Тип файлу", width: 100, filterable: true },
 
                 //------Mine-------------
-               {
-                   field: "FILE_DATE", title: "Дата файлу",
-                   template: "<div>#=kendo.toString(kendo.parseDate(FILE_DATE),'dd.MM.yyyy HH:mm:ss')#</div>", width: 200,
-                   filterable: {
-                       cell: {
-                           template: function (args) {
-                               args.element.kendoDatePicker({
-                                   format: "{0:dd.MM.yyyy}",
-                                   parseFormats: "{0:dd.MM.yyyy}",
-                               });
-                           }
-                       }
-                   }
-               },
+                {
+                    field: "FILE_DATE", title: "Дата файлу",
+                    template: "<div>#=kendo.toString(kendo.parseDate(FILE_DATE),'dd.MM.yyyy HH:mm:ss')#</div>", width: 200,
+                    filterable: {
+                        cell: {
+                            template: function (args) {
+                                args.element.kendoDatePicker({
+                                    format: "{0:dd.MM.yyyy}",
+                                    parseFormats: "{0:dd.MM.yyyy}",
+                                });
+                            }
+                        }
+                    }
+                },
                 //-------------------
 
 
@@ -369,7 +403,7 @@
                 { field: "ERR_TEXT", title: "Опис помилки", width: 200 }
 
             ],
-            filterable: { mode: "row" },
+            filterable: true,
             dataBound: function () {
                 var dataSource = this.dataSource;
                 this.element.find('tr.k-master-row').each(function () {
@@ -393,6 +427,37 @@
             },
             onRegisterApi: function (gridApi) {
                 $scope.gridApi = gridApi;
+            },
+            excelExport: function (e) {
+
+
+                if (!exportFlag) {
+
+                    e.preventDefault();
+                    exportFlag = true;
+                    setTimeout(function () {
+                        e.sender.saveAsExcel();
+                    });
+
+
+
+                } else {
+                    var rows = e.workbook.sheets[0].rows;
+                    var row = rows[0];
+                    for (var ci = 0; ci < row.cells.length; ci++) {
+                        var cell = row.cells[ci];
+                        if (cell.value) {
+                            cell.value = cell.value.replace(/<br\/>/g, ' ');
+                        }
+                    }
+
+                    exportFlag = false;
+                }
+            },
+            excel: {
+                fileName: "FileList.xls",
+                proxyURL: bars.config.urlContent('/way/WayApp/ConvertBase64ToFile/'),
+                allPages: true
             }
         };
 
@@ -424,12 +489,45 @@
                     total: function (result) {
                         return result.Data.Total || 0;
                     },
-                    model: {}
+                    model: {
+                        fields: {
+                            MFOA: { type: "string" }, // МФО отправителя
+                            MFOB: { type: "string" }, // МФО получателя
+                            NLSA: { type: "string" }, // Счет отправителя
+                            NLSB: { type: "string" }, // Счет получателя
+                            Sgrn: { type: "number" }, // Сумма
+                            KV: { type: "number" }, // Код валюты
+                            LCV: { type: "string" }, // Симв Код
+                            DIG: { type: "number" }, // Коп
+                            Sgrn2: { type: "number" }, // Сумма документа 2
+                            KV2: { type: "number" }, // Код валюты 2
+                            LCV2: { type: "string" }, // Симв Код
+                            DIG2: { type: "number" }, // Коп
+                            SK: { type: "number" }, // Символ кассплана
+                            DK: { type: "number" }, // Д/К
+                            VOB: { type: "number" }, // Вид банковского документа
+                            DATD: { type: "date" }, // Дата документа
+                            VDAT: { type: "date" }, // Плановая дата валютирования
+                            TT: { type: "string" }, // Тип транзакции
+                            ID: { type: "number" }, // REF - Внутренний номер документа
+                            REF: { type: "number" }, // Внутренний номер документа
+                            SOS: { type: "number" }, // Состояние документа
+                            USERID: { type: "number" },
+                            ND: { type: "string" }, // Номер документа
+                            NAZN: { type: "string" }, // Назначение платежа
+                            ID_A: { type: "string" }, // Идент. код отправителя
+                            NAM_A: { type: "string" }, // Наименование отправителя
+                            ID_B: { type: "string" }, // Идент. код получателя
+                            NAM_B: { type: "string" }, // Наименование получателя
+                            TOBO: { type: "string" } // Код безбалансового отделения
+                        }
+
+                    }
                 },
                 pageSize: 10,
-                aggregate:[
-                    { field: "S", aggregate: "sum" },
-                     { field: "S2", aggregate: "sum" }
+                aggregate: [
+                    { field: "Sgrn", aggregate: "sum" },
+                    { field: "Sgrn2", aggregate: "sum" }
                 ],
                 resizable: true,
                 serverPaging: true,
@@ -443,29 +541,60 @@
                 sortable: true,
                 resizable: true,
                 pageable: {
-                    refresh: true,
+                    refresh: false,
                     pageSizes: [15, 30, 45, 60],
                     buttonCount: 5
                 },
+                excelExport: function (e) {
+
+
+                    if (!exportFlag) {
+                        e.preventDefault();
+                        exportFlag = true;
+                        setTimeout(function () {
+                            e.sender.saveAsExcel();
+                        });
+
+
+
+                    } else {
+                        var rows = e.workbook.sheets[0].rows;
+                        var row = rows[0];
+                        for (var ci = 0; ci < row.cells.length; ci++) {
+                            var cell = row.cells[ci];
+                            if (cell.value) {
+                                cell.value = cell.value.replace(/<br\/>/g, ' ');
+                            }
+                        }
+
+                        exportFlag = false;
+                    }
+                },
+                excel: {
+                    fileName: "ProccesedDocList.xls",
+                    proxyURL: bars.config.urlContent('/way/WayApp/ConvertBase64ToFile/'),
+                    allPages: true
+                },
                 dataSource: proccessedDataSource,
+                toolbar: [{ template: '<a class="k-button" title="Вивантажити в Excel" ng-click="saveAsmaingrid(2)" ><i class="pf-icon pf-16 pf-exel"></i></a>' }],
                 columns: [
                     /*{ field: "RefInfo", title: "REF_Info", template: "<button class='k-button' ng-click='refInfo()'><i class='pf-icon pf-16 pf-accept_doc'></i></button>" },*/
-					{
-					    field: "REF",
-					    title: "Внутрішній<br/>номер<br/>документа",
-					    template: "<a href='/barsroot/documentview/default.aspx?ref=#:REF#'><font color='6db8e6'>#:REF#</font></a>",
-					    footerTemplate: "Всього:",
-					    width: 100
-					},
+                    {
+                        field: "REF",
+                        title: "Внутрішній<br/>номер<br/>документа",
+                        template: "<a href='/barsroot/documentview/default.aspx?ref=#:REF#'><font color='6db8e6'>#:REF#</font></a>",
+                        footerTemplate: "Всього:",
+                        width: 100
+                    },
                     { field: "MFOA", title: "МФО<br/>відправника", width: 100 },
                     { field: "NLSA", title: "Рахунок<br/>відправника", width: 150 },
                     { field: "MFOB", title: "МФО<br/>отримувача", width: 100 },
                     { field: "NLSB", title: "Рахунок<br/>отримувача", width: 150 },
-                    { field: "S", title: "Сума в гривнях", template: "#=kendo.format('{0:n2}', S/100)#", footerTemplate: "<div style='text-align: right;'>#=kendo.toString(sum/100, 'N')#</div>", width: 120 },
+                    { field: "Sgrn", title: "Сума в гривнях", footerTemplate: "<div style='text-align: right;'>#=kendo.toString(sum, 'N')#</div>", width: 120 },
                     { field: "KV", title: "Код<br/>валюти", width: 75 },
                     { field: "LCV", title: "Симв. код", width: 75 },
-                   // { field: "DIG", title: "Коп", width: 75 },
-                    { field: "S2", title: "Сума<br/>еквіваленту", template: "#=kendo.format('{0:n2}', S2/100)# ", footerTemplate: "<div style='text-align: right;'>#=kendo.toString(sum/100, 'N')#</div>", width: 120 },
+                    // { field: "DIG", title: "Коп", width: 75 },
+                    { field: "Sgrn2", title: "Сума<br/>еквіваленту", footerTemplate: "<div style='text-align: right;'>#=kendo.toString(sum, 'N')#</div>", width: 120 },
                     { field: "KV2", title: "Код<br/>валюти<br/>еквіваленту", width: 80 },
                     { field: "LCV2", title: "Симв.<br/>код екв.<br/>Сума в гривнях", width: 90 },
                     //{ field: "DIG2", title: "Коп 2", width: 75 },
@@ -486,14 +615,15 @@
                     { field: "NAM_B", title: "Ім’я<br/>отримувача", width: 200 },
                     { field: "TOBO", title: "Код безбалансового<br/>віділення", width: 100 }
                 ],
+                filterable: true,
                 dataBound: function () {
                     var dataSource = this.dataSource;
-                   
+
                     this.element.find('tr.ng-scope').each(function () {
 
                         var row = $(this);
                         var data = dataSource.getByUid(row[0].attributes['data-uid'].value)
-                        
+
                         // disable details
                         //if (data.SOS === 1) {
                         //    row.find('.k-hierarchy-cell a').css({ opacity: 0.3, cursor: 'default' }).click(function (e) { e.stopImmediatePropagation(); return false; });
@@ -528,7 +658,7 @@
                                 break;
 
                         }
-                       
+
 
                     });
 
@@ -568,57 +698,61 @@
                 case 'ATRANSFERS':
                 case 'FTRANSFERS':
                     columns = [
-						{ field: "ID", width: 50, hidden: true },
+                        { field: "ID", width: 50, hidden: true },
                         { field: "URL", width: 125, template: "<i class='pf-icon pf-16 pf-document_header_footer-ok2'><span style='margin-left:20px;'>#=URL#</span></i>" },
-						{ field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
-						{ field: "SYNTHCODE", title: "Код синтетичнаої<br/>проводки", width: 75 },
-						{ field: "DOC_DRN", title: "Документ ДРН", width: 100 },
-						{ field: "DOC_ORN", title: "Документ ОРН", width: 100 },
-						//{ field: "DK", title: "Д/К", width: 75 },
-						{ field: "NLSA", title: "Рахунок<br/>відправника", width: 150 },
-						{ field: "S", title: "Сума <br/> в гривнях", template: "#=kendo.format('{0:n2}', S/100)#", width: 75 },
-						{ field: "KV", title: "Код валюти", width: 75 },
-						{ field: "NLSB", title: "Рахунок отримувача", width: 150 },
-						{ field: "S2", title: "Сума екв.",template: "#=kendo.format('{0:n2}', S2/100)#", width: 75 },
-						{ field: "KV2", title: "Код<br/> валюти екв.", width: 75 },
-						{ field: "NAZN", title: "Призначення платежу", width: 350 },
-						{ field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
+                        { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "SYNTHCODE", title: "Код синтетичнаої<br/>проводки", width: 75 },
+                        { field: "DOC_DRN", title: "Документ ДРН", width: 100 },
+                        { field: "DOC_ORN", title: "Документ ОРН", width: 100 },
+                        //{ field: "DK", title: "Д/К", width: 75 },
+                        { field: "NLSA", title: "Рахунок<br/>відправника", width: 150 },
+                        { field: "Sgrn", title: "Сума <br/> в гривнях", width: 75 },
+                        { field: "KV", title: "Код валюти", width: 75 },
+                        { field: "NLSB", title: "Рахунок отримувача", width: 150 },
+                        { field: "Sgrn2", title: "Сума екв.", width: 75 },
+                        { field: "KV2", title: "Код<br/> валюти екв.", width: 75 },
+                        { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
                     ];
                     break;
                 case 'DOCUMENTS':
                     columns = [
-						{ field: "ID", width: 50, hidden: true },
+                        { field: "ID", width: 50, hidden: true },
                         { field: "URL", width: 125, template: "<i class='pf-icon pf-16 pf-document_header_footer-ok2'><span style='margin-left:20px;'>#=URL#</span></i>" },
-						{ field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
-						{ field: "NLSA", title: "Рахунок відправника", width: 150 },
-						{ field: "S", title: "Сума",template: "#=kendo.format('{0:n2}', S/100)#", width: 75 },
-						{ field: "KV", title: "Код<br/>валюти", width: 75 },
-						{ field: "MFOB", title: "МФО отримувача", width: 100 },
-						{ field: "ID_B", title: "ІПН отримувача", width: 100 },
-						{ field: "NAM_B", title: "Ім’я отримувача", width: 200 },
-						{ field: "NLSB", title: "Рахунок отримувача", width: 150 },
-						{ field: "S2", title: "Сума 2", template: "#=kendo.format('{0:n2}', S2/100)#", width: 75 },
-						{ field: "KV2", title: "Код<br/>валюти 2", width: 75 },
-						{ field: "NAZN", title: "Призначення платежу", width: 350 },
-						{ field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
+                        { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "NLSA", title: "Рахунок відправника", width: 150 },
+                        { field: "Sgrn", title: "Сума", width: 75},
+                        { field: "KV", title: "Код<br/>валюти", width: 75 },
+                        { field: "MFOB", title: "МФО отримувача", width: 100 },
+                        { field: "ID_B", title: "ІПН отримувача", width: 100 },
+                        { field: "NAM_B", title: "Ім’я отримувача", width: 200 },
+                        { field: "NLSB", title: "Рахунок отримувача", width: 150 },
+                        { field: "Sgrn2", title: "Сума 2", width: 75 },
+                        { field: "KV2", title: "Код<br/>валюти 2", width: 75 },
+                        { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 },
+                        { field: "FAILURES_COUNT", title: "Кількість спроб<br/>обробки", width: 100 }
                     ];
                     break;
                 case 'STRANSFERS':
                     columns = [
-						{ field: "ID", width: 50, hidden: true },
+                        { field: "ID", width: 50, hidden: true },
                         { field: "URL", width: 125, template: "<i class='pf-icon pf-16 pf-document_header_footer-ok2'><span style='margin-left:20px;'>#=URL#</span></i>" },
-						{ field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
-						{ field: "NLSA", title: "Рахунок відправника", width: 150 },
-						{ field: "S", title: "Сума",template: "#=kendo.format('{0:n2}', S/100)#", width: 75 },
-						{ field: "KV", title: "Код<br/>валюти", width: 75 },
-						{ field: "NLSB", title: "Рахунок отримувача", width: 150 },
-						{ field: "S2", title: "Сума 2",template: "#=kendo.format('{0:n2}', S2/100)#", width: 75 },
-						{ field: "KV2", title: "Код<br/>валюти 2", width: 75 },
-						{ field: "NAZN", title: "Призначення платежу", width: 350 },
-						{ field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
+                        { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "NLSA", title: "Рахунок відправника", width: 150 },
+                        { field: "Sgrn", title: "Сума", width: 75 },
+                        { field: "KV", title: "Код<br/>валюти", width: 75 },
+                        { field: "NLSB", title: "Рахунок отримувача", width: 150 },
+                        { field: "Sgrn2", title: "Сума 2", width: 75 },
+                        { field: "KV2", title: "Код<br/>валюти 2", width: 75 },
+                        { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
                     ];
                     break;
             }
+            if (dataItem.FILE_NAME.indexOf('_LOCPAY_') === -1 && dataItem.FILE_TYPE == 'DOCUMENTS')
+                columns.splice(-1, 1);
+
 
             var noProccessedDataSource = new kendo.data.DataSource({
                 type: "aspnetmvc-ajax",
@@ -644,7 +778,28 @@
                     total: function (result) {
                         return result.Data.Total || 0;
                     },
-                    model: {}
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            IDN: { type: "number" },
+                            NLSA: { type: "string" },
+                            Sgrn: { type: "number" },
+                            KV: { type: "number" },
+                            MFOB: { type: "string" },
+                            ID_B: { type: "string" },
+                            NAM_B: { type: "string" },
+                            NLSB: { type: "string" },
+                            Sgrn2: { type: "number" },
+                            KV2: { type: "number" },
+                            NAZN: { type: "string" },
+                            ERR_TEXT: { type: "string" },
+                            URL: { type: "string" },
+                            FAILURES_COUNT: { type: "number" },
+                            SYNTHCODE: { type: "string" },
+                            DOC_DRN: { type: "number" },
+                            DOC_ORN: { type: "number" }
+                        }
+                    }
                 },
                 pageSize: 10,
                 resizable: true,
@@ -659,41 +814,255 @@
                 sortable: true,
                 resizable: true,
                 pageable: {
-                    refresh: true,
+                    refresh: false,
                     pageSizes: [15, 30, 45, 60],
                     buttonCount: 5
                 },
                 dataSource: noProccessedDataSource,
-                columns: columns
+                filterable: true,
+                columns: columns,
+                toolbar: [{ template: '<a class="k-button" title="Вивантажити в Excel" ng-click="saveAsmaingrid(3)" ><i class="pf-icon pf-16 pf-exel"></i></a>' },
+                { template: '<a class="k-button" title="Вилучити з обробки" ng-click="setRowState(99, \'Ви дійсно бажаєте вилучити з обробки запис №: \', \'noProccessedGridItem\')" ng-disabled="!enableDelBtn"><i class="pf-icon pf-16 pf-delete"></i></a>' }
+                ],
+                excelExport: function (e) {
+
+
+                    if (!exportFlag) {
+                        e.sender.hideColumn("URL");
+                        e.preventDefault();
+                        exportFlag = true;
+                        setTimeout(function () {
+                            e.sender.saveAsExcel();
+                        });
+
+
+
+                    } else {
+                        var rows = e.workbook.sheets[0].rows;
+                        var row = rows[0];
+                        for (var ci = 0; ci < row.cells.length; ci++) {
+                            var cell = row.cells[ci];
+                            if (cell.value) {
+                                cell.value = cell.value.replace(/<br\/>/g, ' ');
+                            }
+                        }
+                        e.sender.showColumn("URL");
+                        exportFlag = false;
+                    }
+                },
+                excel: {
+                    fileName: "NotProccesedDocList.xls",
+                    proxyURL: bars.config.urlContent('/way/WayApp/ConvertBase64ToFile/'),
+                    allPages: true
+                },
+
             }
 
             return options;
         };
-        //$scope.getMetaFilters();
-        /* --- tabstip ---*/
-        /*$scope._tabstripOptions = {
-            activate: function (e) {
-                e.item.innerText === "Оброблені" ?
-		        (function () {
-		            var gridOptions = $scope.detailGridOptions(transport.proccessedGridItem);
-		            gridOptions.dataSource.read({
-		                id: function () {
-		                    return transport.proccessedGridItem.ID;
-		                }
-		            });
-		        })() : (function () {
-		            var gridOptions = $scope.noProccessedOptions(transport.noProccessedGridItem);
 
-                    var grid = transport.noProccessedGrid;
+        /* --- Deleted Files Grid --- */
+        $scope.DeletedOptions = function (dataItem) {
 
-		            gridOptions.dataSource.read({
-		                id: function () {
-		                    return transport.noProccessedGridItem.ID;
-		                }, mode: function () {
-		                    return transport.noProccessedGridItem.FILE_TYPE;
-		                }
-		            });
-                })();
+            transport.DeletedGridItem = dataItem;
+            transport.DeletedGrid = $scope.DeletedGrid;
+
+            var columns = [];
+
+            switch (dataItem.FILE_TYPE) {
+                case 'ATRANSFERS':
+                case 'FTRANSFERS':
+                    columns = [
+                        { field: "ID", width: 50, hidden: true },
+                        { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "SYNTHCODE", title: "Код синтетичнаої<br/>проводки", width: 75 },
+                        { field: "DOC_DRN", title: "Документ ДРН", width: 100 },
+                        { field: "DOC_ORN", title: "Документ ОРН", width: 100 },
+                        //{ field: "DK", title: "Д/К", width: 75 },
+                        { field: "NLSA", title: "Рахунок<br/>відправника", width: 150 },
+                        { field: "Sgrn", title: "Сума <br/> в гривнях", width: 75 },
+                        { field: "KV", title: "Код валюти", width: 75 },
+                        { field: "NLSB", title: "Рахунок отримувача", width: 150 },
+                        { field: "Sgrn2", title: "Сума екв.", width: 75 },
+                        { field: "KV2", title: "Код<br/> валюти екв.", width: 75 },
+                        { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
+                    ];
+                    break;
+                case 'DOCUMENTS':
+                    columns = [
+                        { field: "ID", width: 50, hidden: true },
+                        { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "NLSA", title: "Рахунок відправника", width: 150 },
+                        { field: "Sgrn", title: "Сума", width: 75 },
+                        { field: "KV", title: "Код<br/>валюти", width: 75 },
+                        { field: "MFOB", title: "МФО отримувача", width: 100 },
+                        { field: "ID_B", title: "ІПН отримувача", width: 100 },
+                        { field: "NAM_B", title: "Ім’я отримувача", width: 200 },
+                        { field: "NLSB", title: "Рахунок отримувача", width: 150 },
+                        { field: "Sgrn2", title: "Сума 2", width: 75 },
+                        { field: "KV2", title: "Код<br/>валюти 2", width: 75 },
+                        { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
+                    ];
+                    break;
+                case 'STRANSFERS':
+                    columns = [
+                        { field: "ID", width: 50, hidden: true },
+                        { field: "IDN", title: "Ід. строки<br/>в файлі", width: 75 },
+                        { field: "NLSA", title: "Рахунок відправника", width: 150 },
+                        { field: "Sgrn", title: "Сума", width: 75 },
+                        { field: "KV", title: "Код<br/>валюти", width: 75 },
+                        { field: "NLSB", title: "Рахунок отримувача", width: 150 },
+                        { field: "Sgrn2", title: "Сума 2", width: 75 },
+                        { field: "KV2", title: "Код<br/>валюти 2", width: 75 },
+                        { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
+                    ];
+                    break;
             }
-        };*/
+
+
+            var DeletedDataSource = new kendo.data.DataSource({
+                type: "aspnetmvc-ajax",
+                transport: {
+                    read: {
+                        type: 'GET',
+                        url: bars.config.urlContent('/api/way/waydocdetails/get'),
+                        dataType: 'json',
+                        data: {
+                            id: function () {
+                                return transport.proccessedGridItem.ID;
+                            }, mode: dataItem.FILE_TYPE + "DEL"
+                        }
+                    }
+                },
+                schema: {
+                    data: function (result) {
+
+                        return result.Data.Data || (function () {
+                            return bars.ui.error({ text: 'Помилка отримання значень таблиці:<br/>' + result.Message });
+                        })();
+                    },
+                    total: function (result) {
+                        return result.Data.Total || 0;
+                    },
+                    model: {
+                        fields: {
+                            ID: { type: "number" },
+                            IDN: { type: "number" },
+                            NLSA: { type: "string" },
+                            Sgrn: { type: "number" },
+                            KV: { type: "number" },
+                            MFOB: { type: "string" },
+                            ID_B: { type: "string" },
+                            NAM_B: { type: "string" },
+                            NLSB: { type: "string" },
+                            Sgrn2: { type: "number" },
+                            KV2: { type: "number" },
+                            NAZN: { type: "string" },
+                            ERR_TEXT: { type: "string" },
+                            URL: { type: "string" },
+                            FAILURES_COUNT: { type: "number" },
+                            SYNTHCODE: { type: "string" },
+                            DOC_DRN: { type: "number" },
+                            DOC_ORN: { type: "number" }
+                        }
+                    }
+                },
+                pageSize: 10,
+                resizable: true,
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true
+            });
+
+            var options = {
+                autoBind: true,
+                selectable: 'row',
+                sortable: true,
+                resizable: true,
+                pageable: {
+                    refresh: false,
+                    pageSizes: [15, 30, 45, 60],
+                    buttonCount: 5
+                },
+                filterable: true,
+                dataSource: DeletedDataSource,
+                columns: columns,
+                toolbar: [{ template: '<a class="k-button" title="Вивантажити в Excel" ng-click="saveAsmaingrid(4)" ><i class="pf-icon pf-16 pf-exel"></i></a>' },
+                { template: '<a class="k-button" title="Повернути в обробку" ng-click="setRowState(0,\'Ви дійсно бажаєте повернути в обробку запис №: \', \'DeletedGridItem\')" ng-disabled="!enableRevBtn"><i class="pf-icon pf-16 pf-arrow_left"></i></a>' }
+                ],
+                excelExport: function (e) {
+
+
+                    if (!exportFlag) {
+                        e.preventDefault();
+                        exportFlag = true;
+                        setTimeout(function () {
+                            e.sender.saveAsExcel();
+                        });
+
+
+
+                    } else {
+                        var rows = e.workbook.sheets[0].rows;
+                        var row = rows[0];
+                        for (var ci = 0; ci < row.cells.length; ci++) {
+                            var cell = row.cells[ci];
+                            if (cell.value) {
+                                cell.value = cell.value.replace(/<br\/>/g, ' ');
+                            }
+                        }
+                        exportFlag = false;
+                    }
+                },
+                excel: {
+                    fileName: "DeletedDocList.xls",
+                    proxyURL: bars.config.urlContent('/way/WayApp/ConvertBase64ToFile/'),
+                    allPages: true
+                },
+
+            }
+
+            return options;
+        };
+
+        /* --- REfresh additionals grid--- */
+        $scope.refreshAdditionalGrid = function () {
+            $scope.enableDelBtn = false;
+            $scope.enableRevBtn = false
+            transport.noProccessedGridItem = {};
+            transport.DeletedGridItem = {};
+            $('#NoProccessedGridId').data("kendoGrid").dataSource.read();
+            $('#DeletedGridId').data("kendoGrid").dataSource.read();
+        };
+
+        /* --- set row state --- */
+        $scope.setRowState = function (state, txt, grdItem) {
+            bars.ui.confirm({ text: txt + transport[grdItem].IDN + ' ?' }, function () {
+
+                var url = '/api/way/waydoc/SetRowState?id=' + transport.proccessedGridItem.ID + '&idn=' + transport[grdItem].IDN + '&state=' + state;
+
+                var fileDeleteService = $http['put'](bars.config.urlContent(url));
+
+                bars.ui.loader('body', true);
+
+                fileDeleteService.success(function (result) {
+                    if (result.Data !== 0) {
+                        bars.ui.loader('body', false);
+                        //bars.ui.alert({ text: result.Message });
+                        $scope.refreshAdditionalGrid();
+                        bars.ui.notify(result.Message, '', 'success', { width: 'auto' });
+                    } else {
+                        bars.ui.loader('body', false);
+                        bars.ui.error({ text: 'Помилка : ' + result.Message });
+                        //bars.ui.notify('Помилка : ' + result.Message, '', 'error', { width: 'auto'});
+                    }
+                });
+            });
+        };
+
+
+        var exportFlag = false;
     });

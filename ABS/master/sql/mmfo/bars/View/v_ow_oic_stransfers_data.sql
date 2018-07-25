@@ -7,8 +7,10 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_OW_OIC_STRANSFERS_DATA ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_OW_OIC_STRANSFERS_DATA ("ID", "IDN", "NLSA", "S", "KV", "NLSB", "S2", "KV2", "NAZN", "ERR_TEXT", "URL") AS 
-  select id, idn, debit_syntaccount, debit_amount*100, debit_currency,
+create or replace view v_ow_oic_stransfers_data
+(id, idn, nlsa, s, kv, nlsb, s2, kv2, nazn, err_text, url, state)
+as
+select id, idn, debit_syntaccount, debit_amount*100, debit_currency,
        credit_syntaccount, credit_amount*100, credit_currency,
        substr(synth_trndescr,1,160), err_text,
        make_docinput_url(case
@@ -17,7 +19,7 @@ PROMPT *** Create  view V_OW_OIC_STRANSFERS_DATA ***
                            else
                             'OW2'
                          end,
-                         '¬веденн€ платежу',
+                         'Введення платежу',
                          'Kv_A',
                          a.debit_currency,
                          'Mfo_b',
@@ -32,7 +34,8 @@ PROMPT *** Create  view V_OW_OIC_STRANSFERS_DATA ***
                          'set role bars_access_defrole@begin bars_ow.check_bpdoc('||a.id||','||a.idn||');end;',
                          'APROC',
                          'set role bars_access_defrole@begin bars_ow.set_pay_flag('||a.id||','||a.idn||',:REF, 1);end;'
-                         )
+                         ),
+       a.state
   from ow_oic_stransfers_data a;
 
 PROMPT *** Create  grants  V_OW_OIC_STRANSFERS_DATA ***

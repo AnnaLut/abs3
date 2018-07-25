@@ -1,10 +1,4 @@
-
-
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/OW_BATCH_OPENING.sql =========*** 
- PROMPT ===================================================================================== 
- 
-CREATE OR REPLACE PACKAGE "BARS"."OW_BATCH_OPENING" is
+CREATE OR REPLACE PACKAGE BARS."OW_BATCH_OPENING" is
 
   -- Author  : VITALII.KHOMIDA
   -- Created : 13.04.2017 11:46:26
@@ -124,6 +118,9 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
                        ,p_old_key => l_old_key
                        ,p_kf      => p_kf);
     RETURN l_old_key;
+  exception 
+    when others then
+      return p_key;
   END split_key;
 
   -------------------------------------------------------------------------------
@@ -1088,6 +1085,7 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
                                       ,xt.pasp_eddrid_id
                                       -- преобразование бейс64 в фото
                                       ,barstrans.file_utl.decode_base64(xt.photo_data) AS photo_jpg
+                                      ,xt.ext_id
                                   FROM XMLTABLE('/ROWSET/ROW'
                                                 PASSING                                                                                          --xmltype
                                                        (SELECT xmltype(p_file_data) z
@@ -1145,7 +1143,8 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
                                                        ,max_term NUMBER PATH 'MAX_TERM'
                                                        ,pasp_end_date varchar2(30) PATH 'PASP_END_DATE'
                                                        ,pasp_eddrid_id VARCHAR2(14) PATH 'PASP_EDDRID_ID'
-                                                       ,photo_data CLOB PATH 'PHOTO_DATA') xt)
+                                                       ,photo_data CLOB PATH 'PHOTO_DATA'
+                                                       ,ext_id varchar2(300) PATH 'EXT_ID') xt)
           LOOP
              -- // наполнение коллекции данных
              l_batch_list(rec.ROWNUM).id                := p_id;
@@ -1166,8 +1165,8 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
              l_batch_list(rec.ROWNUM).phone_home        := check_phone(rec.phone_home);
              l_batch_list(rec.ROWNUM).phone_mob         := check_phone(rec.phone_mob);
              l_batch_list(rec.ROWNUM).email             := SUBSTR(rec.email, 1, 30);
-             l_batch_list(rec.ROWNUM).eng_first_name    := SUBSTR(rec.eng_first_name, 1, 30);
-             l_batch_list(rec.ROWNUM).eng_last_name     := SUBSTR(rec.eng_last_name, 1, 30);
+             l_batch_list(rec.ROWNUM).eng_first_name    := UPPER(SUBSTR(rec.eng_first_name, 1, 30));
+             l_batch_list(rec.ROWNUM).eng_last_name     := UPPER(SUBSTR(rec.eng_last_name, 1, 30));
              l_batch_list(rec.ROWNUM).mname             := SUBSTR(rec.mname, 1, 20);
              l_batch_list(rec.ROWNUM).addr1_cityname    := SUBSTR(rec.addr1_cityname, 1, 100);
              l_batch_list(rec.ROWNUM).addr1_pcode       := check_pcode(rec.addr1_pcode);
@@ -1216,6 +1215,7 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
              l_batch_list(rec.ROWNUM).pasp_end_date     := TO_DATE(rec.pasp_end_date, 'dd.mm.yyyy');
              l_batch_list(rec.ROWNUM).pasp_eddrid_id    := SUBSTR(rec.pasp_eddrid_id, 1, 14);
              l_batch_list(rec.ROWNUM).kf                := SYS_CONTEXT('bars_context', 'user_mfo');
+             l_batch_list(rec.ROWNUM).ext_id            := rec.ext_id;
              --\\ наполнение коллекции данных
              if rec.photo_jpg is not null then
                --// наполнение коллеции фото
@@ -1484,6 +1484,7 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
 
      l_n :=  l_batch_list.COUNT;
      update ow_batch_files t set t.file_n = l_n where t.id = l_id;
+     commit;
      p_fileid := l_id;
     end if;
   end;
@@ -1564,7 +1565,7 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
             ,t.proect_id = l_batch_header(1).PROECT_ID
             ,t.card_code = l_batch_header(1).CARD_CODE
        WHERE t.id = l_id;
-
+      commit;
       p_fileid := l_id;
     END IF;
   END processing_file;
@@ -1672,9 +1673,9 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
        bars_error.raise_nerror(g_modcode, 'FILE_NOT_FOUND');
     end;
 
-    for v in (SELECT bf.external_file_id as ext_id
+    for v in (SELECT p.ext_id as ext_id
                     ,a.nls
-                    ,a.acc
+                    ,ow_batch_opening.split_key(a.acc) as acc
                     ,ow_batch_opening.split_key(p.rnk) as rnk
                     ,(case when p.str_err is null then 1 else 0 end) as code
                     ,p.str_err
@@ -2008,6 +2009,7 @@ CREATE OR REPLACE PACKAGE BODY OW_BATCH_OPENING is
            isp = p_isp,
            proect_id = p_proect_id
      where id = p_fileid;
+    commit;
 
     bars_audit.info(h || 'Finish.');
 

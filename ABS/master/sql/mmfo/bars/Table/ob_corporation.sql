@@ -119,6 +119,34 @@ exception when others then
 
 
 
+
+PROMPT *** Create  index IND_OB_CORP_EXT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IND_OB_CORP_EXT ON BARS.OB_CORPORATION (EXTERNAL_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index IND_OB_CORP_PER_ID ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IND_OB_CORP_PER_ID ON BARS.OB_CORPORATION (PARENT_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYNI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
+
 PROMPT *** Create  grants  OB_CORPORATION ***
 grant SELECT                                                                 on OB_CORPORATION  to BARSREADER_ROLE;
 grant ALTER,DEBUG,DELETE,FLASHBACK,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on OB_CORPORATION  to BARS_ACCESS_DEFROLE;

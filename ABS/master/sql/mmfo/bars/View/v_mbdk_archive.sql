@@ -1,13 +1,9 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_MBDK_ARCHIVE.sql =========*** Run ***
 PROMPT ===================================================================================== 
-
-
 PROMPT *** Create  view V_MBDK_ARCHIVE ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_ARCHIVE ("ND", "DEAL_TYPE_ID", "DEAL_PRODUCT_ID", "MAIN_ACCOUNT_ID", "PARTNER_ID", "AGREEMENT_DATE", "START_DATE", "EXPIRY_DATE", "DEAL_NUMBER", "PARTNER_BIC", "PARTNER_NAME", "DEAL_AMOUNT", "CURRENCY_ID", "MAIN_ACCOUNT_NUMBER", "INTEREST_ACCOUNT_NUMBER", "INTEREST_RATE", "ACCRUED_INTEREST_AMOUNT", "PAYED_INTEREST_AMOUNT", "PARTNER_ACCOUNT", "USER_NAME") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_MBDK_ARCHIVE  AS 
   select d.nd,
        v.tipd                              deal_type_id,
        d.vidd                              deal_product_id,
@@ -37,7 +33,9 @@ PROMPT *** Create  view V_MBDK_ARCHIVE ***
                        s.fdat >= dd.bdate and
                        s.fdat <= d.wdate), 0), a.kv)  payed_interest_amount,
        dd.acckred                          partner_account,
-       user_utl.get_user_name(d.user_id)   user_name
+       user_utl.get_user_name(d.user_id)   user_name ,
+       p.code_product,
+       p.NAME_PRODUCT
 from   cc_deal d
 join   cc_add dd on dd.nd = d.nd and dd.adds = 0
 join   accounts a on a.acc = dd.accs
@@ -46,11 +44,12 @@ join   custbank cb on cb.rnk = c.rnk
 join   cc_vidd v on v.vidd = d.vidd
 left join int_accn i on i.acc = a.acc and i.id = a.pap - 1
 left join accounts ia on ia.acc = i.acra
+left join mbdk_product p on  d.prod  = p.code_product 
 where  d.sos = 15 and
        --mbk.check_if_deal_belong_to_mbdk(v.vidd) = 'Y'
-	    d.vidd in (1211, 1310, 1312,1322,1327,
-                  1510,1511,1512,1517,1521,1522,1523,1524,1527,
-                  1610,1611,1612,1613,1617,1621,1622,1623,1624,1627)
+       d.vidd in (1211, 1310, 1312,1322,1327,
+                  1510,1511,1512,1513,1517,1521,1522,1523,1524,1526,1527,
+                  1610,1611,1612,1613,1614,1617,1621,1622,1623,1624,1625,1626,1627)
 order by d.nd desc;
 
 PROMPT *** Create  grants  V_MBDK_ARCHIVE ***

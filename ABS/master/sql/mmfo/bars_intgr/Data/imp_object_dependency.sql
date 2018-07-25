@@ -15,6 +15,7 @@ begin
 		into bars_intgr.imp_object_dependency(KF, OBJECT_NAME, TABLE_NAME, KEY_COLUMN, SQL_PREDICATE, IDUPD) values (rec.kf, 'BPK2', 'w4_acc_update', 'ACC_PK', null, 1)
 		into bars_intgr.imp_object_dependency(KF, OBJECT_NAME, TABLE_NAME, KEY_COLUMN, SQL_PREDICATE, IDUPD) values (rec.kf, 'BPK2', 'accounts_update', 'ACC', null, 1)
         into bars_intgr.imp_object_dependency(KF, OBJECT_NAME, TABLE_NAME, KEY_COLUMN, SQL_PREDICATE, IDUPD) values (rec.kf, 'DEPOSITS2', 'dpt_deposit_clos', 'DEPOSIT_ID', null, 1)
+        into bars_intgr.imp_object_dependency(KF, OBJECT_NAME, TABLE_NAME, KEY_COLUMN, SQL_PREDICATE, IDUPD) values (rec.kf, 'ACCOUNTS_CASH', 'accounts_update', 'ACC', null, 1)
         select 1 from dual;
     end loop;
     commit;

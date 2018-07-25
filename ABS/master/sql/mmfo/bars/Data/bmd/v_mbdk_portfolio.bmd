@@ -1,5 +1,4 @@
 set serveroutput on
-
 declare
 
   type t_rec_extrnval is record (
@@ -251,7 +250,7 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 40002, 'Відв''язати вхідне повідомлення', 'SWIFT.UnLink3XXMsg(320,Null,:ND,''O'')', '', 'EACH', 'Відв''язати вхідний SWIFT?', 'Виконано!', '', '', '', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 50000, 'Друк шаблонів договорів', '', '', 'EACH', '', '', '', '', 'sPar=DOC_SCHEME[DESCR=>Друк договорів][CONDITIONS=>id=''MBDK_KREDIT_1521''][ACCESSCODE=>1][OpenInWindow]', null);
+  bars_metabase.add_nsifunction(l_tabid, 50000, 'Друк шаблонів договорів', '', '', 'EACH', '', '', '', '', 'sPar=DOC_SCHEME[DESCR=>Друк договорів][CONDITIONS=> 1=0][ACCESSCODE=>1][OpenInWindow]', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 60000, 'Параметри РЕПО', '', '', 'ONCE', '', '', '', '', 'sPar=V_MBK_CP[NSIFUNCTION][CONDITIONS=> nd=:ND][DESCR=>Параметри РЕПО][ACCESSCODE=>2][OpenInWindow]', null);
@@ -261,6 +260,9 @@ begin
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 80000, 'При`язати операцію застави', '', '', 'EACH', '', '', '', '', 'sPar=V_ZAL_ND[NSIFUNCTION][ACCESSCODE=>5][PROC=>PUL.PUT(''ND'',:ND);PUL.PUT(''ACC'',:ACC);PUL.PUT(''PAP'',:TIPD)][EXEC=>BEFORE][showDialogWindow=>false][OpenInWindow]', 42);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 90000, 'Перенести угоду в архів', 'BARS.MBK.clos_deal (:ND,1)', '', 'SELECTED_ONE', 'Перенести угоду в архів?', 'Виконано!', '', '', '', null);
 
   -- добавляем описание раскраски
   bars_metabase.add_tblcolor(l_tabid, 3, null, ':TIPD = 1', 1, 'COLOR_DarkRed');

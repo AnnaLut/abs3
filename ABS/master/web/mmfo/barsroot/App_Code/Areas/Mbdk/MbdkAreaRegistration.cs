@@ -59,6 +59,7 @@ namespace BarsWeb.Areas.Mbdk
             var controllerFactory = ((NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory());
             var ninjectKernel = controllerFactory.NinjectKernel;
             ninjectKernel.Bind<IDealRepository>().To<DealRepository>();
+            ninjectKernel.Bind<INostroRepository>().To<NostroRepository>();
 
         }
     }

@@ -27,7 +27,8 @@ begin
 	NAME VARCHAR2(50), 
 	ORD NUMBER(2,0), 
 	COD_OU VARCHAR2(2), 
-	KF VARCHAR2(6)
+	KF VARCHAR2(6), 
+	KOD_S VARCHAR2(4)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -36,8 +37,19 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
-
+PROMPT *** Add  columns KOD_S ***
+begin 
+execute immediate'
+alter table CLIM_MFO add (
+  KOD_S VARCHAR2(4 BYTE))';
+exception
+ when others 
+ then 
+ if sqlcode = -1430 then null; 
+ else raise;
+ end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to CLIM_MFO ***
@@ -45,6 +57,7 @@ PROMPT *** ALTER_POLICIES to CLIM_MFO ***
 
 
 COMMENT ON TABLE BARS.CLIM_MFO IS '';
+COMMENT ON COLUMN BARS.CLIM_MFO.KOD_S IS '';
 COMMENT ON COLUMN BARS.CLIM_MFO.MFO IS '';
 COMMENT ON COLUMN BARS.CLIM_MFO.NAME IS '';
 COMMENT ON COLUMN BARS.CLIM_MFO.ORD IS '';
@@ -54,12 +67,40 @@ COMMENT ON COLUMN BARS.CLIM_MFO.KF IS '';
 
 
 
-PROMPT *** Create  constraint SYS_C00109870 ***
+PROMPT *** Create  constraint PK_CLIM_MFO ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CLIM_MFO MODIFY (MFO NOT NULL ENABLE)';
+  ALTER TABLE BARS.CLIM_MFO ADD CONSTRAINT PK_CLIM_MFO PRIMARY KEY (KF)
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND  ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint SYS_C0016149 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CLIM_MFO MODIFY (MFO NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  index PK_CLIM_MFO ***
+begin   
+ execute immediate '
+  CREATE UNIQUE INDEX BARS.PK_CLIM_MFO ON BARS.CLIM_MFO (KF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
  end;
 /
 
@@ -75,3 +116,4 @@ grant SELECT                                                                 on 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CLIM_MFO.sql =========*** End *** ====
 PROMPT ===================================================================================== 
+

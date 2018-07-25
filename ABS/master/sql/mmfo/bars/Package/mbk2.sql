@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk2.sql =========*** Run *** ======
  PROMPT ===================================================================================== 
@@ -49,8 +47,7 @@ CREATE OR REPLACE PACKAGE BODY MBK2 IS
 */
 ---- Редактирование параметров
 procedure UPD1( p_ND  number ) is -- реф дог
-begin null;
-end UPD1;
+begin null; end UPD1;
 
 ----------Постороение ГПК ----------------------------------------
 procedure GPK (  p_mode  int, --- режим выполнения процедуры:
@@ -206,7 +203,6 @@ begin
  raise_application_error(-20000,'Дана заявка (COBUSUPABS-5245) втрачає актуальність з 1 грудня 2017р. у зв’язку з переходом на новий план рахунків. Додаткові роз’яснення щодо введення простроченої заборгованості будуть повідомлені пізніше');
 
  /* If NOT ( p_SS = 0 and p_SN = 1  and ( n_SPN<>0            )  OR
-
            p_SS = 1 and p_SN = 0  and (             n_SP<>0 )  OR
            p_SS = 1 and p_SN = 1  and ( n_SPN<>0 or n_SP<>0 )
          ) then   RETURN;
@@ -215,6 +211,8 @@ begin
   begin select * into dd from  cc_deal where nd = p_ND and vidd > 1000 and vidd < 2000 and sos <15;
   exception when no_data_found then raise_application_error(-(20203), 'Не знайдено угоду МБК. nd=' ||p_ND ) ;
   end;
+
+  MM := MBK.Get_MBDK (p_Vidd => dd.Vidd);
 
   begin
      -- найти все по существующему МБК
@@ -226,6 +224,8 @@ begin
    EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-(20203),'Не знайдено ' || sErr_);
    end;
 
+  a1527.nbs :=  substr(MM.SP,1,4) ;   a1527.ob22 :=  substr(MM.SP,5,2) ;
+
   -- Пометить МБК, как имеющий какую-либо просрочку
   update cc_deal set sos=13 where nd = DD.nd ;
   ----------------------------------------------
@@ -236,12 +236,11 @@ begin
   If l_id = 0 then -- Размещения   -- Найти свободную пару счетов по просрочке тела и процентов
      a1529.nbs :=  substr(a1523.nbs ,1,3) || '9';
      begin
-       SELECT a.acc   , n.acc   into a1527.acc , a1529.acc FROM accounts a, int_accn i, accounts n
-       WHERE a.nbs  = a1527.nbs AND a.kv   = a1523.kv  AND a.rnk  = a1523.rnk AND a.acc  = i.acc AND i.acra = n.acc
-         AND a.ostc = 0         AND a.ostb = 0         AND a.ostf = 0         AND n.ostc = 0     AND n.ostb = 0
-         AND n.ostf = 0         AND (a.mdate<bankdate_g OR a.mdate IS NULL)   AND a.dazs is null
-                                AND (n.mdate<bankdate_g OR n.mdate IS NULL)   AND n.dazs is null
-                                AND (a.dapp is null or a.dapp < bankdate-10)  and rownum = 1;
+        SELECT a.acc   , n.acc   into a1527.acc , a1529.acc 
+        FROM (select * from accounts where nbs=a1527.nbs AND ob22=a1527.ob22 and kv=a1523.kv AND rnk=a1523.rnk AND ostc=0 AND ostb=0 AND ostf=0 AND NVL(mdate,D10)< gl.Bdate AND dazs is null and NVL(dapp,D11)< D10) a, 
+             (select * from accounts where nbs=a1529.nbs AND ob22=a1529.ob22 and kv=a1523.kv AND rnk=a1523.rnk AND ostc=0 AND ostb=0 AND ostf=0 AND NVL(mdate,D10)< gl.Bdate AND dazs is null and NVL(dapp,D11)< D10) n, 
+            int_accn i
+        WHERE  a.acc  = i.acc AND i.acra = n.acc and rownum = 1;
      EXCEPTION WHEN NO_DATA_FOUND THEN -- автоматом открыть, если не нашли. Сначала смоделировать номерасчетов
        sTmp_     := Substr(MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
        -- открытие основного счета
@@ -252,16 +251,19 @@ begin
        a1529.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,16,15) ) );
        MBK.Op_Reg_ex_2017 (1,dd.ND,0,a1528.Grp,nTmp_,dd.RNK, a1529.NLS, a1528.kv, a1528.NMS,'SPN', a1528.isp, a1529.acc,'1',null,null,null);  -- KB  pos=1
 
+        a1529.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,16,15) ) );
+        Op_Reg_ex (1,dd.ND,0,a1528.Grp,nTmp_,dd.RNK, a1529.NLS, a1528.kv, a1528.NMS,'SPN', a1528.isp, a1529.acc,'1',null,null,null);  -- KB  pos=1
+        accreg.setAccountSParam( a1529.ACC, 'OB22', a1529.ob22) ;
+
      end;
   Else    -- Привлечения  -- Найти свободный счетов по просрочке тела (проценты - тот же счет !)
      begin
-       SELECT a.acc          into a1527.acc                FROM accounts a
-       WHERE a.nbs  = a1527.nbs AND a.kv   = a1523.kv  AND a.rnk  = a1523.rnk
-         AND a.ostc = 0         AND a.ostb = 0         AND a.ostf = 0         AND (a.mdate<bankdate_g OR a.mdate IS NULL)
-         AND a.dazs is null     AND (a.dapp is null or a.dapp < bankdate-10)  and rownum = 1;
+       SELECT acc into a1527.acc FROM accounts 
+       WHERE nbs=a1527.nbs AND kv=a1523.kv AND rnk=a1523.rnk and ob22=a1527.ob22 AND ostc=0 AND ostb=0 AND ostf=0 AND NVL(mdate,D10)< gl.Bdate AND dazs is null and NVL(dapp,D11)< D10 and rownum = 1;
+
      EXCEPTION WHEN NO_DATA_FOUND THEN  -- автоматом открыть, если не нашли. Сначала смоделировать номерасчетов
-       sTmp_     := Substr(MBK.F_NLS_MB( a1527.nbs, a1523.RNK, Null, a1523.kv, 'MBK'), 1, 30) ;
-       -- открытие основного счета
+
+       sTmp_     := Substr( MBK.F_NLS_MB( dd.Vidd, dd.RNK, Null, a1523.kv, 'SP'), 1, 30) ;
        a1527.nls := Vkrzn( substr(gl.aMfo, 1,5), trim( substr(sTmp_,01,15) ) );
         MBK.Op_Reg_ex_2017 (1,dd.ND,0,a1523.Grp,nTmp_,dd.RNK, a1527.NLS, a1523.Kv, a1523.NMS,'SP ', a1523.isp, a1527.ACC,'1',null,null,null);  -- KB  pos=1
      end;
@@ -357,7 +359,7 @@ begin  l_fakt := ABS( fost ( p_acc_ss, p_dat)) ;
 
 END MBK2;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  MBK2 ***
 grant EXECUTE                                                                on MBK2            to BARS_ACCESS_DEFROLE;

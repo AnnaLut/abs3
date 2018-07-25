@@ -4,7 +4,6 @@ using Oracle.DataAccess.Client;
 using Oracle.DataAccess.Types;
 using System.Collections.Generic;
 using Bars.WebServices.XRM.Services.SKRN.Models;
-using Bars.WebServices.XRM.Services;
 using Bars.WebServices.XRM.Models;
 using System.IO;
 using Bars.DocPrint;
@@ -282,8 +281,6 @@ namespace Bars.WebServices.XRM.Services.SKRN
             return response;
         }
 
-
-
         private static byte[] CreateHtmlF(string tmpFile)
         {
             StringBuilder htmlContent = new StringBuilder();
@@ -293,12 +290,10 @@ namespace Bars.WebServices.XRM.Services.SKRN
             htmlContent.AppendLine("<DIV align=center class=screen_action>");
             htmlContent.AppendLine("<INPUT id=btPrint type=\"button\" value=\"Надрукувати\" style=\"FONT-SIZE:14px;font-weight:bold\" onclick=\"window.print()\"><BR>");
             htmlContent.AppendLine("</DIV>");
-            //htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt; BACKGROUND-COLOR: gainsboro\">");
-            htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt; FONT-SIZE: 8pt; COLOR: black; FONT-FAMILY: 'Courier New'; WIDTH: 300pt;\">");
+            htmlContent.AppendLine("<PRE style=\"MARGIN-LEFT: 20pt;\">");
             htmlContent.Append(txtContent);
             htmlContent.AppendLine("</PRE>");
 
-            //File.WriteAllText(tmpFile)
             return Encoding.GetEncoding(1251).GetBytes(htmlContent.ToString());
         }
     }

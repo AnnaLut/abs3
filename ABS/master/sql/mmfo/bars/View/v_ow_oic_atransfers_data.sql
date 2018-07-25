@@ -7,8 +7,10 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_OW_OIC_ATRANSFERS_DATA ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_OW_OIC_ATRANSFERS_DATA ("ID", "IDN", "SYNTHCODE", "DOC_DRN", "DOC_ORN", "DK", "NLSA", "S", "KV", "NLSB", "S2", "KV2", "NAZN", "ERR_TEXT", "URL") AS 
-  select a.id, a.idn, a.anl_synthcode, a.doc_drn, a.doc_orn, w.dk,
+create or replace view v_ow_oic_atransfers_data
+(id, idn, synthcode, doc_drn, doc_orn, dk, nlsa, s, kv, nlsb, s2, kv2, nazn, err_text, url, state)
+as
+select a.id, a.idn, a.anl_synthcode, a.doc_drn, a.doc_orn, w.dk,
        a.debit_anlaccount, a.debit_amount*100, a.debit_currency,
        a.credit_anlaccount, a.credit_amount*100, a.credit_currency,
        substr(a.anl_trndescr, 1, 160), a.err_text,
@@ -18,7 +20,7 @@ PROMPT *** Create  view V_OW_OIC_ATRANSFERS_DATA ***
                            else
                             'OW2'
                          end,
-                         '¬веденн€ платежу',
+                         'Введення платежу',
                          'Nls_A',
                          a.debit_anlaccount,
                          'Kv_A',
@@ -37,10 +39,10 @@ PROMPT *** Create  view V_OW_OIC_ATRANSFERS_DATA ***
                          'set role bars_access_defrole@begin bars_ow.check_bpdoc('||a.id||','||a.idn||');end;',
                          'APROC',
                          'set role bars_access_defrole@begin bars_ow.set_pay_flag('||a.id||','||a.idn||',:REF, 1);end;'
-                         )
+                         ),
+       a.state
   from ow_oic_atransfers_data a, ow_msgcode w
- where a.anl_synthcode = w.synthcode(+)
-;
+ where a.anl_synthcode = w.synthcode(+);
 
 PROMPT *** Create  grants  V_OW_OIC_ATRANSFERS_DATA ***
 grant SELECT                                                                 on V_OW_OIC_ATRANSFERS_DATA to BARSREADER_ROLE;

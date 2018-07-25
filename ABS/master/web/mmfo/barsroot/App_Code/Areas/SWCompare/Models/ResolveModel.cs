@@ -8,6 +8,7 @@ namespace BarsWeb.Areas.SWCompare.Models
     public class ResolveModel
     {
         public decimal p_id { get; set; }
+        public string comment { get; set; }
     }
 
     public class HandModel

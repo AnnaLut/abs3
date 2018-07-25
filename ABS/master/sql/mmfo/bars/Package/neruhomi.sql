@@ -95,7 +95,7 @@ PROCEDURE PAY_JOB;
 END NERUHOMI;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.24mmfo  22/11/2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.25mmfo  23/05/2018';
   g_is_error     boolean := false;
   g_cur_rep_id   number := -1;
   g_cur_block_id number := -1;
@@ -779,12 +779,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
       select a.nls, substr(a.nms, 1, 38)
         into l_nls_a, l_nam_a
         from accounts a
-       where nls like case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end ||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end||substr(l_rec_asvo.branch,11,4)
+       where nls like case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end ||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '46' end||substr(l_rec_asvo.branch,11,4)
          and kv = l_rec_asvo.kv;
     exception
       when no_data_found then
         l_err := 'Не удалось найти счет ' ||
-        case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end || substr(l_rec_asvo.branch,11,4);
+        case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '46' end || substr(l_rec_asvo.branch,11,4);
 
         update batch_immobile b set b.status='ERROR', b.last_time_refresh=sysdate
         where b.id=l_rec_asvo.batch_id;
@@ -991,13 +991,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
       select a.nls
         into l_nls_a
         from accounts a
-       where nls like case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end||substr(l_rec_asvo.branch,11,4)
+       where nls like case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '46' end||substr(l_rec_asvo.branch,11,4)
          and kv = l_rec_asvo.kv;
        -- bars_audit.info('NER l_nls_a = '||l_nls_a);
     exception
       when no_data_found then
         l_err := 'Не удалось найти счет ' || case l_rec_asvo.bsd when '2635' then '2630' else l_rec_asvo.bsd end||'_00'
-                                          ||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '38' end
+                                          ||case l_rec_asvo.bsd when '2620' then '30' when '2630' then '46' when '2635' then '46' end
                                           ||substr(l_rec_asvo.branch,11,4);
       when others then
          l_err := sqlerrm;
@@ -1030,7 +1030,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
     case l_rec_asvo.bsd
         when '2620' then '2620_030'||l_mfo_a
         when '2630' then '2630_046'||l_mfo_a
-        when '2635' then '2630_038'||l_mfo_a
+        when '2635' then '2630_046'||l_mfo_a--when '2635' then '2630_038'||l_mfo_a
     end
     );
 

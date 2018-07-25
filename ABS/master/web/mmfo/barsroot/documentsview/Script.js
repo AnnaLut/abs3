@@ -135,6 +135,39 @@ function getCookie(par) {
 }
 /*******************************/
 var arrayForPrint = new Array();//масив з референсами відмічених документів
+var selectedSumsArray = new Array();
+function editSelectedSumsArray(elem) {
+    var amount = +$(elem).attr('data-sum');
+    var sum = 0;
+    if ($(elem).prop('checked')) {
+        selectedSumsArray.push(amount);
+        for (var i = 0; i < selectedSumsArray.length; i++) {
+            sum += selectedSumsArray[i];
+        }
+    } else {
+        var num = -1;
+        for (var i = 0; i < selectedSumsArray.length; i++) {
+            if (selectedSumsArray[i] === amount) {
+                num = i;
+            }
+            sum += selectedSumsArray[i];
+        }
+        if (num !== -1) {
+            sum -= selectedSumsArray[num];
+            selectedSumsArray.splice(num, 1);
+        }
+    }
+    if (selectedSumsArray.length > 0) {
+        document.getElementById('lb_DocCountSelected').innerText =
+            " Виділено: " + selectedSumsArray.length +
+            "; сума: " + sum.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        $("#lb_DocCountSelected").css("color", "red");
+        $("#lb_DocCountSelected").css("display", "inline");
+    }
+    else {
+        $("#lb_DocCountSelected").css("display", "none");
+    }
+}
 function addCheckbox() {
     arrayForPrint.splice(0, arrayForPrint.length);
     $('#printPanel').hide();
@@ -165,6 +198,7 @@ function editArrayForPrint(elem, ref) {
 }
 function selAllCheckbox(elem) {
     arrayForPrint.splice(0, arrayForPrint.length);
+    selectedSumsArray.splice(0, selectedSumsArray.length);
     if ($(elem).prop('checked')) {
         var allChBox = $('#oTable tr td input[type="checkbox"]');
         allChBox.attr('checked', 'checked');
@@ -172,13 +206,27 @@ function selAllCheckbox(elem) {
             if (index > 0) {
                 var ref = $(elem).attr('data-ref');
                 if (ref) arrayForPrint.push(ref);
+                var amount = +$(elem).attr('data-sum');
+                selectedSumsArray.push(amount);
             }
         });
         if (arrayForPrint.length > 0) $('#printPanel').show();
+        if (selectedSumsArray.length > 0) {
+            var sum = 0;
+            for (var i = 0; i < selectedSumsArray.length; i++) {
+                sum += selectedSumsArray[i];
+            }
+            document.getElementById('lb_DocCountSelected').innerText =
+                " Виділено: " + selectedSumsArray.length +
+                "; сума: " + sum.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            $("#lb_DocCountSelected").css("color", "red");
+            $("#lb_DocCountSelected").css("display", "inline");
+        }
     }
     else {
         $('#oTable tr td input[type="checkbox"]').removeAttr('checked');
         $('#printPanel').hide();
+        $("#lb_DocCountSelected").css("display", "none");
     }
 }
 function printSelDocum() {
@@ -236,6 +284,9 @@ function EditProps() {
 
 //--рефреш
 function RefreshButtonPressed() {
+    selectedSumsArray.splice(0, selectedSumsArray.length);
+    $("#lb_DocCountSelected").css("display", "none");
+
     ReInitGrid();
 }
 //--фильтр--

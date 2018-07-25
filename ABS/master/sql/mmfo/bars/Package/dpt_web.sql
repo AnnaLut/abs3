@@ -10082,7 +10082,7 @@ is
               end if;
 
               -- пошук котлового рахунка (нерухомі вклади для РНВ із залишками більше 10 одиниць)
-              l_nls := get_nls_immobile(r_immobile.nbs_term,  --r_immobile.nbs_dep,
+              l_nls := get_nls_immobile(r_immobile.nbs_dep, 
                                         r_immobile.kv,
                                         r_immobile.branch,
                                         null);

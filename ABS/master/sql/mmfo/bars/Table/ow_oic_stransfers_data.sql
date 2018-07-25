@@ -138,6 +138,16 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table OW_OIC_STRANSFERS_DATA add state number(5)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+comment on column OW_OIC_STRANSFERS_DATA.state
+  is 'Статус(0-в обробку, 99-вилучити з обробки)';
 
 
 PROMPT *** Create  grants  OW_OIC_STRANSFERS_DATA ***

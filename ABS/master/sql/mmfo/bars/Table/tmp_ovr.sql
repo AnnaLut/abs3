@@ -1,94 +1,88 @@
+prompt ... 
 
+exec bpa.alter_policy_info('TMP_OVR', 'FILIAL', 'M', 'M', 'M', 'M');
+exec bpa.alter_policy_info('TMP_OVR', 'WHOLE',  null, null, null, null );
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/TMP_OVR.sql =========*** Run *** =====
-PROMPT ===================================================================================== 
-
-
-PROMPT *** ALTER_POLICY_INFO to TMP_OVR ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''TMP_OVR'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''TMP_OVR'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''TMP_OVR'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
 /
 
-PROMPT *** Create  table TMP_OVR ***
+
+-- Create table
+begin
+    execute immediate 'create table TMP_OVR
+(
+  dat    DATE,
+  id     INTEGER,
+  dk     INTEGER,
+  nlsa   VARCHAR2(15),
+  nlsb   VARCHAR2(15),
+  s      NUMBER(38),
+  txt    VARCHAR2(35),
+  branch VARCHAR2(30) default sys_context(''bars_context'',''user_branch''),
+  kf     VARCHAR2(6) default sys_context(''bars_context'',''user_mfo'')
+)
+tablespace BRSMDLD
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 128K
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+-- Create/Recreate primary, unique and foreign key constraints 
+begin
+    execute immediate 'alter table TMP_OVR
+  add constraint FK_TMP_OVR_BRANCH foreign key (BRANCH)
+  references BRANCH (BRANCH)
+  deferrable
+  novalidate';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+-- Create/Recreate check constraints 
+begin
+    execute immediate 'alter table TMP_OVR
+  add constraint CC_TMPOVR_BRANCH_NN
+  check ("BRANCH" IS NOT NULL)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
 begin 
-  execute immediate '
-  CREATE TABLE BARS.TMP_OVR 
-   (	DAT DATE, 
-	ID NUMBER(*,0), 
-	DK NUMBER(*,0), 
-	NLSA VARCHAR2(15), 
-	NLSB VARCHAR2(15), 
-	S NUMBER(38,0), 
-	TXT VARCHAR2(35), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSMDLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+   execute immediate('alter table TMP_OVR add "KF" VARCHAR2(6 BYTE  ) ');
+   execute immediate 'alter table TMP_OVR MODIFY KF default sys_context(''bars_context'',''user_mfo'')';
+exception when others then 
+   null; 
+end;
 /
 
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on TMP_OVR to BARS009;
+grant select on TMP_OVR to BARSREADER_ROLE;
+grant select, insert, delete on TMP_OVR to BARS_ACCESS_DEFROLE;
+grant select on TMP_OVR to BARS_DM;
+grant select, insert, delete on TMP_OVR to ELT;
+grant select on TMP_OVR to RCC_DEAL;
+grant select on TMP_OVR to UPLD;
+grant select, insert, update, delete on TMP_OVR to WR_ALL_RIGHTS;
 
 
-
-PROMPT *** ALTER_POLICIES to TMP_OVR ***
- exec bpa.alter_policies('TMP_OVR');
+exec bpa.alter_policies('TMP_OVR');
 
 
-COMMENT ON TABLE BARS.TMP_OVR IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.DAT IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.ID IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.DK IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.NLSA IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.NLSB IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.S IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.TXT IS '';
-COMMENT ON COLUMN BARS.TMP_OVR.BRANCH IS '';
-
-
-
-
-PROMPT *** Create  constraint CC_TMPOVR_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.TMP_OVR MODIFY (BRANCH CONSTRAINT CC_TMPOVR_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  TMP_OVR ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on TMP_OVR         to BARS009;
-grant SELECT                                                                 on TMP_OVR         to BARSREADER_ROLE;
-grant DELETE,INSERT,SELECT                                                   on TMP_OVR         to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on TMP_OVR         to BARS_DM;
-grant DELETE,INSERT,SELECT                                                   on TMP_OVR         to ELT;
-grant SELECT                                                                 on TMP_OVR         to RCC_DEAL;
-grant SELECT                                                                 on TMP_OVR         to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on TMP_OVR         to WR_ALL_RIGHTS;
-
-
-
-PROMPT *** Create SYNONYM  to TMP_OVR ***
-
-  CREATE OR REPLACE PUBLIC SYNONYM TMP_OVR FOR BARS.TMP_OVR;
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/TMP_OVR.sql =========*** End *** =====
-PROMPT ===================================================================================== 

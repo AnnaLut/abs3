@@ -426,6 +426,13 @@ procedure set_cck_sob (
   p_sucs_flag     boolean );
 
 --function get_new_nbs(p_nbs in varchar2) return varchar2;
+procedure open_2203 (
+   p_pk_acc  in number,
+   p_oldacc  in number,
+   p_oldnls  in varchar2,
+   p_oldnms  in varchar2,
+   p_newnbs  in varchar2,
+   p_newacc out number);
 
 end;
 /
@@ -2427,7 +2434,7 @@ begin
   i := 0;
 
   l_rec.work_flag := 0;
-
+  l_rec.failures_count := 0;
   loop
 
      -- счетчик транзакций
@@ -4046,8 +4053,7 @@ begin
               prty_   => 0,
               uid_    => user_id);
 
-  if p_mode in(1, 3) then
-     l_nlsa := GetGlobalOption('NLS_292427_LOCPAY');
+  if p_mode in(1, 3) then     l_nlsa := GetGlobalOption('NLS_292427_LOCPAY');
 
      if l_mfo <> p_mfob then
         l_nlsb := get_proc_nls('T00', p_kv);
@@ -4059,8 +4065,6 @@ begin
            else
               l_nlsb := p_nlsb;
            end if;
-        else
-           l_nlsb := p_nlsb;
         end if;
      end if;
      
@@ -4091,7 +4095,7 @@ begin
                p_s2,
                null,
                null);
-elsif p_mode = 5 then
+  elsif p_mode = 5 then
      if l_mfo <> p_mfob then
         l_nlsb := get_proc_nls('T00', p_kv);
      else
@@ -8036,6 +8040,7 @@ is
   l_mode number;
   l_acc    accounts.acc%type;
   l_newnb t_newnb;
+  l_reverse boolean;
 begin
 
   bars_audit.info(h || 'Start.');
@@ -8045,7 +8050,8 @@ begin
     into l_doc
     from ow_oic_documents_data
    where id = p_id
-   order by idn;
+   order by idn
+    for update skip locked;
 
   bars_audit.info(h || 'l_doc.count=>' || l_doc.count);
 
@@ -8189,7 +8195,9 @@ begin
           exception
             when others then
             rollback to sp_pay_indef;
-            bars_audit.info(h || 'Error: ' ||
+            bars_audit.error(h||'Помилка формуваня платежу на вільні реквізити з рахунку:#'||l_doc(i).org_cbsnumber||
+                                ' на рахунок:#'||l_doc(i).cnt_contractnumber ||
+                                ' на суму:#'||l_doc(i).bill_amount||' DRN:#'||l_doc(i).doc_drn||':'||utl_tcp.CRLF||
                dbms_utility.format_error_stack() || chr(10) ||
                dbms_utility.format_error_backtrace());
           end;
@@ -8342,22 +8350,25 @@ begin
                  dbms_utility.format_error_backtrace(),1,254);
            end if;
            rollback to sp_pay;
-           update ow_oic_documents_data
-              set err_text = l_err
-            where id = p_id and idn = l_doc(i).idn;
             if l_doc(i).work_flag = 0 then
               begin
                 savepoint sp_pay_indef_1;
                 l_tt := 'OW7';
                 l_mode := 2;
+                l_reverse := true;
                 bars_error.get_error_info(p_errtxt => l_err,
                                           p_errumsg => l_errumsg,
                                           p_erracode => l_erracode,
                                           p_erramsg => l_erramsg);
                 if l_erracode not in ('BRS-09300','BRS-09301', 'BRS-09302', 'BRS-09303', 'BRS-09304','BRS-09305') then
                    l_errumsg := 'Відхилено по технічній причині';
- 		   bars_audit.info(h||l_err);
+                   l_reverse := false;                                 
                 end if;
+                bars_audit.error(h||'Помилка формуваня платежу на вільні реквізити з рахунку:#'||l_doc(i).org_cbsnumber||
+                                ' на рахунок:#'||l_doc(i).cnt_contractnumber ||
+                                ' на суму:#'||l_doc(i).bill_amount||' DRN:#'||l_doc(i).doc_drn||':'||utl_tcp.CRLF|| 
+                                dbms_utility.format_error_stack() || utl_tcp.CRLF || dbms_utility.format_error_backtrace());                  
+                if l_doc(i).failures_count > 99 or l_reverse then
                 l_nazn := substr('Відміна операції по причині: '||l_errumsg, 1, 160);
                 if newnbs.g_state = 1 then
                    l_newnb :=  get_new_nbs_ob22('2909', '80');
@@ -8386,10 +8397,18 @@ begin
                 insert into ow_locpay_match(ref, drn, rrn, revflag, doc_data, rev_message, acc)
                 values (l_ref, l_doc(i).doc_drn, l_doc(i).doc_rrn, 1, l_doc(i).doc_data, substr(l_errumsg, 1, 254), l_acc);
                 irec_oic_doc_to_arc(l_doc(i), l_ref);
+                else
+                  update ow_oic_documents_data
+                     set err_text = l_err,
+                         failures_count = failures_count + 1
+                   where id = p_id and idn = l_doc(i).idn;
+                end if;
               exception
                 when others then
                 rollback to sp_pay_indef_1;
-                bars_audit.info(h || 'Error: ' ||
+                bars_audit.error(h||'Помилка формуваня платежу на вільні реквізити з рахунку:#'||l_doc(i).org_cbsnumber||
+                                ' на рахунок:#'||l_doc(i).cnt_contractnumber ||
+                                ' на суму:#'||l_doc(i).bill_amount||' DRN:#'||l_doc(i).doc_drn||':'||utl_tcp.CRLF||
                    dbms_utility.format_error_stack() || chr(10) ||
                    dbms_utility.format_error_backtrace());
               end;
@@ -15100,6 +15119,8 @@ is
      p_newnbs  in varchar2,
      p_newacc out number)
   is
+   l_bdate         date;
+   l_mfo           varchar2(6);
      l_acc     number := null;
      l_ost     number;
      l_newnls  accounts.nls%type;
@@ -15181,6 +15202,44 @@ is
      p_newacc := l_acc;
 
   end open_2203;
+
+-------------------------------------------------------------------------------
+-- cm_alter_acc
+-- процедура модификации параметров договора по информации из CardMake
+--
+procedure cm_alter_acc(p_mode number default 0, p_cm_acc_req cm_acc_request%rowtype, p_msg out varchar2)
+is
+  l_bdate         date;
+  l_mfo           varchar2(6);
+  l_msg           cm_acc_request.abs_msg%type;
+  l_nd            number;
+  l_acc           number;
+  l_acc_ovr       number;
+  l_card_code     w4_acc.card_code%type;
+  l_old_nbs       w4_product.nbs%type;
+  l_old_kv        w4_product.kv%type;
+  l_old_ob22      w4_product.ob22%type;
+  l_old_tip       w4_product.tip%type;
+  l_new_nbs       w4_product.nbs%type;
+  l_new_kv        w4_product.kv%type;
+  l_new_ob22      w4_product.ob22%type;
+  l_new_tip       w4_product.tip%type;
+  l_ovr_old_nbs   accounts.nbs%type;
+  l_ovr_old_nls   accounts.nls%type;
+  l_ovr_old_nms   accounts.nms%type;
+  l_ovr_old_dazs  date;
+  l_ovr_old_ob22  accounts.ob22%type;
+  l_ovr_new_nbs   accounts.nbs%type;
+  l_ovr_new_acc   number;
+  l_ovr_new_ob22  accounts.ob22%type;
+  l_bpk_proect_id_new    number;
+  l_name_new             bpk_proect.name%type;
+  l_bpk_proect_id_old    number;
+  l_name_old             bpk_proect.name%type;
+  l_trmask               t_trmask;
+
+  h varchar2(100) := 'bars_ow.cm_alter_acc. ';
+
 
 begin
 
@@ -15298,7 +15357,7 @@ begin
            -- меняем тип карточного счета
            update accounts set tip = l_new_tip where acc = l_acc;
            l_trmask.a_w4_acc := 'ACC_PK';
-           l_trmask.nbs := substr(z.contract_number,1,4);           
+           l_trmask.nbs := substr(z.contract_number,1,4);
            -- меняем спецпараметры карточного счета
            set_sparam('1', l_acc, l_trmask);
         end if;

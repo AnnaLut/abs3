@@ -1,4 +1,4 @@
-﻿angular.module("BarsWeb.Areas").controller("KFiles.DataKFilesCtrl", ["$scope", "$http", "$location", "$element", function ($scope, $http, $location, $element) {
+﻿angular.module("BarsWeb.Areas", []).controller("KFiles.DataKFilesCtrl", ["$scope", function ($scope, $element) {
     $scope.Title = 'Перегляд даних';
 
     var data = angular.element('#dataview').val() == "" ? {} : eval("(" + angular.element('#dataview').val() + ")");
@@ -24,9 +24,9 @@
         namereceiver: null,
         sum: null,
         sumua: null,
-        sumfull: null
+        nazn: null
     };
-
+    
     $scope.model.nd = data.ND;
     $scope.model.vidd = data.VOB;
     $scope.model.time = data.T_DOC;
@@ -47,6 +47,6 @@
     $scope.model.namereceiver = data.NAMB;
     $scope.model.sum = data.S;
     $scope.model.sumua = data.SQ;
-    $scope.model.sumfull = data.SQ;
+    $scope.model.nazn = data.NAZN;
 
 }]);

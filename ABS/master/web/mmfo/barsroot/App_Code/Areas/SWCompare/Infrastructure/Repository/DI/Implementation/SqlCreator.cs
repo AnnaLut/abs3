@@ -72,11 +72,12 @@ namespace BarsWeb.Areas.SWCompare.Infrastructure.DI.Implementation
             return new BarsSql()
             {
                 SqlText = @"begin
-                                pkg_sw_compare.resolve_cause(:p_id);
+                                pkg_sw_compare.resolve_cause(:p_id, :comments);
                             end;",
                 SqlParams = new object[]
                 {
-                    new OracleParameter("p_id", OracleDbType.Decimal).Value = resolveModel.p_id
+                    new OracleParameter("p_id", OracleDbType.Decimal).Value = resolveModel.p_id,
+                    new OracleParameter("comments", OracleDbType.Varchar2).Value = resolveModel.comment
                 }
             };
         }

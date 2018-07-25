@@ -302,4 +302,20 @@ exception
 end;
 /
 
+-- SKRN_ZALOG_DAT update ssql
+-- old ssql = select 'від '||SUBSTR(F_DAT_LIT( r.bdate ),1,25) INTO :sValue from  skrynka_nd n, skrynka_nd_ref r, opldok o, skrynka_acc s where   n.nd = :ND and o.ref = r.ref and s.acc = o.acc and N.n_sk = s.n_sk and s.tip = 'M'
+begin
+  Insert
+    into DOC_ATTR ( ID, NAME, SSQL )
+  Values ( 'SKRN_ZALOG_DAT', 'Сейфы: дата документа залога',
+           'SELECT ''від ''|| SUBSTR (F_DAT_LIT (max(r.bdate)), 1, 25) INTO :sValue FROM bars.skrynka_nd n, bars.skrynka_acc s, bars.skrynka_nd_ref r, bars.oper o,bars.opldok od WHERE  n.nd = :ND and s.n_sk = n.n_sk AND s.tip = ''M'' and r.nd = r.nd AND od.REF = r.REF AND od.acc = s.acc and o.ref = od.ref and o.sos = 5 and lower(o.nazn) like ''%внесення застави за%''' );
+exception
+  when DUP_VAL_ON_INDEX then
+    update DOC_ATTR
+       set SSQL = 'SELECT ''від ''|| SUBSTR (F_DAT_LIT (max(r.bdate)), 1, 25) INTO :sValue FROM bars.skrynka_nd n, bars.skrynka_acc s, bars.skrynka_nd_ref r, bars.oper o,bars.opldok od WHERE  n.nd = :ND and s.n_sk = n.n_sk AND s.tip = ''M'' and r.nd = r.nd AND od.REF = r.REF AND od.acc = s.acc and o.ref = od.ref and o.sos = 5 and lower(o.nazn) like ''%внесення застави за%'''
+         , NAME = 'Сейфы: дата документа залога'
+     where ID   = 'SKRN_ZALOG_DAT';
+end;
+/
+
 COMMIT;

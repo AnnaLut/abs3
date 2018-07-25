@@ -2,7 +2,9 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
     //ViewBag.Title = "Way4. Імпорт та обробка файлів";
 }
-<script src="~/Areas/Way/Scripts/WayApp/Way.UploadCtrl.js?v1.0.3"></script>
+<script src="~/Areas/Way/Scripts/WayApp/Way.UploadCtrl.js?v1.0.161"></script>
+<script src="~/lib/jsZip/jszip.js"></script>
+
 <div ng-controller="Way.UploadCtrl">
     <div class="page-header">
         <h1>
@@ -18,7 +20,6 @@
                k-async="{ saveUrl: 'save', removeUrl: 'remove', autoUpload: true }"
                k-success="uploadSuccess" k-error="uploadError" k-upload="uploadOptions"/>
     </div-->
-
     <!-- toolbar section -->
     <div kendo-toolbar class="toolbarLayout" k-options="_toolbarOptions" style="margin-bottom: 10px;"></div>
 
@@ -29,12 +30,16 @@
                 <ul>
                     <li>Оброблені</li>
                     <li>Необроблені</li>
+                    <li>Вилучені</li>
                 </ul>
                 <div>
-                    <div kendo-grid="proccessedGrid" k-options="detailGridOptions(dataItem)" k-on-change="onDetailSelection(data, kendoEvent)"></div>
+                    <div kendo-grid="proccessedGrid" k-options="detailGridOptions(dataItem)" k-on-change="onDetailSelection(data, kendoEvent)" id="proccessedGridId"></div>
                 </div>
                 <div>
-                    <div kendo-grid="noProccessedGrid" k-options="noProccessedOptions(dataItem)"></div>
+                    <div kendo-grid="noProccessedGrid" k-options="noProccessedOptions(dataItem)" id="NoProccessedGridId" k-on-change="onSelectionAdd(data,kendoEvent, 'enableDelBtn', 'noProccessedGridItem')"></div>
+                </div>
+                <div>
+                    <div kendo-grid="DeletedGrid" k-options="DeletedOptions(dataItem)" id="DeletedGridId" k-on-change="onSelectionAdd(data,kendoEvent, 'enableRevBtn', 'DeletedGridItem')"></div>
                 </div>
             </div>
         </div>
@@ -43,10 +48,10 @@
 </div>
 
 <style>
-     .k-grid-header th.k-with-icon .k-link {
-         margin-right: 0px;
-         font-size: 11px;
-     }
+    .k-grid-header th.k-with-icon .k-link {
+        margin-right: 0px;
+        font-size: 11px;
+    }
 
     .k-header .k-link {
         text-align: center;
@@ -65,5 +70,24 @@
     #currencyUse.k-state-active {
         background-color: #32408f !important;
         color: white !important;
+    }
+
+    .k-grid TBODY .k-button {
+        min-width: 0px;
+    }
+
+
+    .k-state-active.k-grid-filter {
+        background-color: darkseagreen;
+    }
+
+    .k-filter-menu [type="submit"] {
+        width: 54% !important;
+        margin-right: 1% !important;
+    }
+
+    .k-filter-menu [type="reset"] {
+        width: 44% !important;
+        margin-left: 1% !important;
     }
 </style>

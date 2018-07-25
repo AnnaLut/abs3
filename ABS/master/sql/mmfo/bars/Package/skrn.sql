@@ -128,7 +128,7 @@ END skrn;
 CREATE OR REPLACE PACKAGE BODY SKRN
 -- *******************************************************************************
 IS
-   version_   constant  varchar2(30)   := 'version 6.17 15/03/2018';
+   version_   constant  varchar2(30)   := 'version 6.18 24/05/2018';
    body_awk   constant  varchar2(512)  := ''
     ||'IND_ACC' ||chr(10)
     ||'M_AMORT' ||chr(10)
@@ -165,6 +165,7 @@ IS
    nlss2909_       VARCHAR2 (15);
    nmss2909_       accounts.nms%TYPE;
    ostc2909_       NUMBER;
+   brnch2909name_  branch.name%TYPE;
 
    nlss3579_       VARCHAR2 (15);
    nmss3579_       accounts.nms%TYPE;
@@ -181,9 +182,11 @@ IS
    -- Рахунок прибутків теперішнього періоду (по старому плану счетов 6119)
    nls6519_        VARCHAR2 (15);
    nms6519_        accounts.nms%TYPE;
+   brnch6519name_  branch.name%TYPE;
    -- Рахунок прибутків майбутнього періоду
    nls3600_        VARCHAR2 (15);
    nms3600_        accounts.nms%TYPE;
+   brnch3600name_  branch.name%TYPE;
 
    nls8_           VARCHAR2 (15);
    nms8_           accounts.nms%TYPE;
@@ -506,11 +509,12 @@ IS
         then l_nbs := 6119;
       end if;
 
-     SELECT a.nls, a.nms
-       INTO nls6519_, nms6519_
-       FROM accounts a
+     SELECT a.nls, a.nms, b.name
+       INTO nls6519_, nms6519_, brnch6519name_
+       FROM accounts a, branch b
       WHERE a.nls = nbs_ob22(l_nbs, l_ob22)
-        and a.kv = 980;
+        and a.kv = 980
+        and b.branch = a.branch;
     EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
     END;
 
@@ -3693,14 +3697,15 @@ end;
         END IF;
 
         -- определяем счет 3600
-        SELECT SUBSTR(A.NMS, 1, 38), A.NLS, A.ACC
-          INTO NMS3600_, NLS3600_, ACC_3600
-          FROM SKRYNKA_ND_ACC S, ACCOUNTS A, SKRYNKA_ND N
+        SELECT SUBSTR(A.NMS, 1, 38), A.NLS, A.ACC, B.NAME
+          INTO NMS3600_, NLS3600_, ACC_3600, brnch3600name_
+          FROM SKRYNKA_ND_ACC S, ACCOUNTS A, SKRYNKA_ND N, BRANCH B
          WHERE S.TIP = 'D'
            AND S.ND = N.ND
            AND S.ACC = A.ACC
            AND N.ND = L_SKRN_AMORT.ND
-           AND N.SOS = 0;
+           AND N.SOS = 0
+           AND B.Branch = A.BRANCH;
 
         DBMS_OUTPUT.PUT_LINE(NMS3600_ || ' ' || NLS3600_ || ' ' ||
                              ACC_3600);
@@ -3719,11 +3724,13 @@ end;
 
           -- определяем переменные;
           NLSA_  := NLS3600_;
-          NAM_A_ := SUBSTR(NMS3600_, 1, 38);
+          --NAM_A_ := SUBSTR(NMS3600_, 1, 38);
+          NAM_A_ := SUBSTR(brnch3600name_, 1, 38);
           --okpoa_  := skrnd_.okpo1;
           MFOA_  := GL.AMFO;
           NLSB_  := NLS6519_;
-          NAM_B_ := SUBSTR(NMS6519_, 1, 38);
+          --NAM_B_ := SUBSTR(NMS6519_, 1, 38);
+          NAM_B_ := SUBSTR(brnch6519name_, 1, 38);
           --okpob_  := skrnd_.okpo1;
           OKPOB_ := F_OUROKPO;
           MFOB_  := GL.AMFO;

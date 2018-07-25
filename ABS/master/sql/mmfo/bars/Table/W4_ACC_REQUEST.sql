@@ -24,7 +24,7 @@ begin
   execute immediate '
   CREATE TABLE BARS.W4_ACC_REQUEST 
    (	ID NUMBER, 
-	EXT_FILE_ID NUMBER, 
+	EXT_FILE_ID varchar2(32), 
 	EXT_ID VARCHAR2(100), 
 	OPER_TYPE NUMBER(1,0), 
 	DATE_IN DATE DEFAULT sysdate, 
@@ -60,8 +60,6 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
-
 
 
 PROMPT *** ALTER_POLICIES to W4_ACC_REQUEST ***
@@ -154,7 +152,10 @@ exception when others then
  end;
 /
 
-
+begin
+execute immediate 'alter table W4_ACC_REQUEST modify ext_file_id varchar2(32) ';
+end;
+/
 
 
 

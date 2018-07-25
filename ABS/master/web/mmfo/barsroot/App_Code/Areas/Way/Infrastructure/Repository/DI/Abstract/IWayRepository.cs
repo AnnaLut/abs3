@@ -18,5 +18,10 @@ namespace BarsWeb.Areas.Way.Infrastructure.DI.Abstract
         IEnumerable<OwSalaryFilse> ArchFiles();
         TicketInfo DoFormSalaryTicket(decimal? fileid);
         string GetFileData(decimal? fileid);
+        IEnumerable<Documents> DeletedDocuments(decimal fileId);
+        void SetRowState(decimal id, decimal idn, decimal state);
+        IEnumerable<AFtransfers> DeletedAFtransfers(decimal fileId);
+        IEnumerable<Stransfers> DeletedStransfers(decimal fileId);
+        
     }
 }

@@ -31,8 +31,6 @@
                 }
             });
 
-
-
             $scope.actualRegionOptions = {
                 dataTextField: "REGION_NM",
                 dataValueField: "REGION_ID",
@@ -543,7 +541,7 @@
                 $scope.disabledHouse = !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME || actualModel.SECTION || actualModel.ROOM ? true : false;
                 $scope.disabledSection = !actualModel.HOUSE_NUM_FULL || !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME ? true : false;
                 $scope.disabledRoom = !actualModel.HOUSE_NUM_FULL || !actualModel.SETTLEMET_NAME || !actualModel.REGION_NAME ? true : false;
-
+				$scope.$apply();
             }
 
 

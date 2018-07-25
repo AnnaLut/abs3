@@ -32,7 +32,7 @@
 
     <script type="text/javascript"src="typingCheckerCtrl.js"></script>
 
-    <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t001"></script>
+    <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t002"></script>
 
     <script language="javascript" type="text/javascript" src="JScriptFortab_main_rekv_person.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t001"></script>
 

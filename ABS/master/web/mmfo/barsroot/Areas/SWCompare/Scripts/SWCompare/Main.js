@@ -331,7 +331,7 @@ function filterByButtons(period) {
 
 function getComments(comments) {
     var grid = $("#gridMain").data("kendoGrid");
-    var selectedItem = grid.dataItem(grid.select());
+    var selectedItem = grid.dataItem(grid.select()); 
 
     var postObj = {
         p_kod_nbu: selectedItem.KOD_NBU,
@@ -365,6 +365,31 @@ function getComments(comments) {
         }
     });
 };
+
+function ResovleDifference(_comment) {
+    var grid = $("#gridMain").data("kendoGrid");
+    var selectedItem = grid.dataItem(grid.select());
+    var postObj = { p_id: selectedItem.ID_C, comment: _comment };
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: bars.config.urlContent("/api/SWCompare/SWCompare/ResolveDifference"),
+        beforeSend: function () {
+            bars.ui.loader('body', true);
+        },
+        data: JSON.stringify(postObj),
+        success: function (data) {
+            if (data.Result != "OK") {
+                bars.ui.error({ text: data.ErrorMsg });
+            } else {
+                updateMainGrid();
+            }
+        },
+        complete: function () {
+            bars.ui.loader('body', false);
+        }
+    });
+}
 
 function initTicketsGrid(param) {
 
@@ -443,26 +468,24 @@ function initTicketsGrid(param) {
     $(formConfig.ticketsGrid).kendoGrid(gridOptions);
     $("#solveBtn").off();
     $("#solveBtn").on("click", function () {
-        var postObj = { p_id: param };
-        $.ajax({
-            type: "POST",
-            contentType: "application/json",
-            url: bars.config.urlContent("/api/SWCompare/SWCompare/ResolveDifference"),
-            beforeSend: function () {
-                bars.ui.loader('body', true);
-            },
-            data: JSON.stringify(postObj),
-            success: function (data) {
-                if (data.Result != "OK") {
-                    bars.ui.error({ text: data.ErrorMsg });
-                } else {
-                    updateMainGrid();
-                }
-            },
-            complete: function () {
-                bars.ui.loader('body', false);
-            }
-        });
+        var windowText = "<div class=\"k-container\" style=\"width:100%; font-size: 18px;\"><div style=\"width:100%; margin-top: 20px;\">Коментар: <input type=\"text\"  id=\"resolve_comments\" maxlength=\"100\" class='k-textbox' style=\"width:82%;\" " +
+            "onchange='if(this.value == \"\") { $(\"#okBtn\").prop(\"disabled\", true);} else{  $(\"#okBtn\").prop(\"disabled\", false); }' " +
+            "onkeyup = \"this.onchange();\" onpaste= \"this.onchange();\" oninput= \"this.onchange();\" oncut=\"this.onchange();\"></div>" +
+            "<div style=\"width:100%; margin-top: 20px;\"><button id='okBtn' type='button' class='k-button k-primary' onclick='ResovleDifference($(\"#resolve_comments\").val()); $(this).closest(\".k-window-content\").data(\"kendoWindow\").close();' autofocus disabled style=\"width:48%;\">" +
+            "Зберегти</button><button id='cancelBtn' type='button' class='k-button close-button' onclick='$(this).closest(\".k-window-content\").data(\"kendoWindow\").close();' style=\"width:48%; margin-left: 10px;\">Відміна</button></div></div>";
+
+        $('#resolveWindow').html(windowText);
+        $('#resolveWindow').kendoWindow({
+            resizable: false,
+            modal: true,
+            title: "Введіть коментар",
+            width: "590px",
+            height: "150px",
+            visible: false,
+        }).data("kendoWindow").center().open();
+
+        var winObject = $("#resolveWindow").data("kendoWindow");
+        winObject.wrapper.addClass("k-widget k-window");
     });
 
     $("#deleteBtn").off();

@@ -1,9 +1,4 @@
-
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/xrm_integration_oe.sql =========*** 
- PROMPT ===================================================================================== 
- 
-CREATE OR REPLACE PACKAGE "XRM_INTEGRATION_OE"
+CREATE OR REPLACE PACKAGE BARS."XRM_INTEGRATION_OE"
 IS
    title              CONSTANT VARCHAR2 (19) := 'xrm_integration_oe:';
 
@@ -258,7 +253,7 @@ IS
       p_status              OUT INT,
       p_status_code         OUT VARCHAR2,
       p_error_code          OUT VARCHAR2);
-   
+
    -- поиска клиента за данными документов, даты ДР
    PROCEDURE find_customer(p_Ser             IN person.ser%TYPE
                           ,p_Numdoc          IN person.numdoc%TYPE
@@ -267,7 +262,7 @@ IS
                           ,p_rnk             OUT person.rnk%TYPE
                           ,p_status_out      OUT VARCHAR2
                           ,p_status_code_out OUT VARCHAR2
-                          ,p_error_code_out  OUT VARCHAR2);														  
+                          ,p_error_code_out  OUT VARCHAR2);
 
    PROCEDURE SearchClient (p_in_RNK            IN     NUMBER DEFAULT NULL,
                            p_in_OKPO           IN     VARCHAR2 DEFAULT NULL,
@@ -550,7 +545,7 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
     -- запускается джобом кажые пол часа
     PROCEDURE process_transport_unit;
 
-  -- SKRN: Відмітка про підпис докуметів 
+  -- SKRN: Відмітка про підпис докуметів
   procedure setdocissigned_skrn(p_id             varchar2,
                                 p_nd             number,
                                 p_adds           number,
@@ -558,7 +553,7 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
                                 p_result_code    out number,
                                 p_result_message out varchar2);
 
-  -- SKRN: Запит на отримання «Документів по договору»                              
+  -- SKRN: Запит на отримання «Документів по договору»
   type xrm_ref_tp is record(
     ref  number,
     datd date,
@@ -574,13 +569,13 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
 
   function getdocsbydeal_skrn(p_nd in number) return xrm_ref_tb
     pipelined;
-	
+
 	procedure DatePeriod(p_date1   in date,
                        p_date2   in date,
                        p_calcDay in number default null,
                        p_Odate   out date);
-    
-     -- SKRN: Відкриття скриньки 
+
+     -- SKRN: Відкриття скриньки
   procedure open_safe_deposit(p_n_sk          in number, -- номер скриньки
                               p_o_sk          in number, --Вид скриньки
                               p_keynumber     in varchar2, --Номер ключа
@@ -593,14 +588,14 @@ function get_risklist (p_rnk IN NUMBER) return t_risks pipelined;
                               p_deal_id       out number,
                               p_resultcode    out int,
                               p_resultmessage out varchar2);
-                              
+
 --SKRN: -- Проверяет заполение обязательных параметров для Операций
 procedure check_skrynka_menu(p_dat           in  date   default null,
-                             p_dat2          in  date   default null, 
+                             p_dat2          in  date   default null,
                              p_sum           in  number default null,
                              p_mode          in  number,
                              p_resultcode    out number, -- 0 не все парам. заполнены, 1- все ок, -1 - операция не найдена
-                             p_resultmessage out varchar2);                              
+                             p_resultmessage out varchar2);
 
 --SKRN: операції по скринькам
 procedure oper_dep_skrn(p_dat           in date default null, -- обязательный datename1
@@ -613,8 +608,8 @@ procedure oper_dep_skrn(p_dat           in date default null, -- обязательный da
                         p_ndoc          in varchar2 default null,
                         p_resultcode    out int,
                         p_resultmessage out varchar2);
-                        
---SKRN: -- Закрытие депозитного договора (сейфа) 
+
+--SKRN: -- Закрытие депозитного договора (сейфа)
 procedure Сlose_ContractLease(p_n_sk          in number default null, -- код ячейки
                               p_nd            in number default null, -- код договора
                               p_userid        in number default null,
@@ -622,18 +617,18 @@ procedure Сlose_ContractLease(p_n_sk          in number default null, -- код яче
                               p_ndoc          in varchar2 default null,
                               p_resultcode    out int,
                               p_resultmessage out varchar2);
-                              
+
  -- Банківська довіреність
  --  Приєднання довіреної ФО до договору оренди сейфа
- --  Створення довіреності (банківської та нотаріальної) 
- --  Редагування (анулювання) довіреності (банківської та нотаріальної)                              
+ --  Створення довіреності (банківської та нотаріальної)
+ --  Редагування (анулювання) довіреності (банківської та нотаріальної)
 procedure Merge_Skrynka_Attorney( p_nd          in skrynka_attorney.nd%type,
                                   p_rnk         in skrynka_attorney.rnk%type,
                                   p_date_from   in varchar2,
                                   p_date_to     in varchar2,
                                   p_cancel_date in varchar2);
- 
- -- Запит на БЕК-ОФІС                                                                                     
+
+ -- Запит на БЕК-ОФІС
 procedure request_forbackoff(p_transactionid in number,
                              p_trustee       in cust_requests.trustee_type%type,
                              p_req_id        in cust_requests.req_id%type,
@@ -642,15 +637,15 @@ procedure request_forbackoff(p_transactionid in number,
                              p_scaccess      in clob,
                              p_scwarrant     in clob,
                              p_scsignscard   in clob,
-                             p_depositlist   in number_list, 
+                             p_depositlist   in number_list,
                              resultcode    out number,
                              resultmessage out varchar2);
-                             
+
  -- Відповідь від БЕК-ОФІСУ
 procedure request_frombackoff(p_req_id     in cust_requests.req_id%type,
                               resultstate     out number,
                               result_comments out varchar2);
- -- Отримання номеру запиту(ReqId)                             
+ -- Отримання номеру запиту(ReqId)
    procedure request_access_req(
                                 p_type         in   cust_requests.req_type%type,
                                 p_trustee      in   cust_requests.trustee_type%type,
@@ -664,7 +659,7 @@ procedure request_frombackoff(p_req_id     in cust_requests.req_id%type,
                                 );
 end;
 /
-CREATE OR REPLACE PACKAGE BODY XRM_INTEGRATION_OE
+CREATE OR REPLACE PACKAGE BODY BARS.XRM_INTEGRATION_OE
 IS
    g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.62 23.05.2018';
    g_null_date      CONSTANT DATE := null;
@@ -812,7 +807,7 @@ IS
       exception when others then bars_audit.error(title||'xrm_ui_oe.xrm_card_trans failed with mess:' || sqlerrm);
       end;
 
-      dbms_session.clear_context('clientcontext','iscrm');    
+      dbms_session.clear_context('clientcontext','iscrm');
       p_nd := to_number(get_old_key(p_nd));
       p_acc := to_number(get_old_key(p_acc));
 
@@ -1482,7 +1477,7 @@ IS
       p_UserLogin        IN     staff.logname%TYPE,
       p_OperationType    IN     INT, -- 1 открытие/ 2 обновление данных клиента, 0 - поиск клиента, 3 установка даты закрытия
                                      -- 4 открытие/ обновление связанного лица, 5 - удаление связанного лица
-									-- 6 - поиск клиента по данным документа (серия, номер, дата рождения)																													  
+									-- 6 - поиск клиента по данным документа (серия, номер, дата рождения)
       p_ClientType       IN     custtype.custtype%TYPE,
       p_FormType         IN     INT, -- 1,2,3 упрощенная форма, 0 полная форма
       p_kf               IN     VARCHAR2,
@@ -1689,7 +1684,7 @@ IS
         INTO p_clientname_gc
         FROM DUAL;
 
-      IF p_OperationType = 6 then 
+      IF p_OperationType = 6 then
         find_customer(p_Ser             => Ser_,
                       p_Numdoc          => Numdoc_,
                       p_Passp           => Passp_,
@@ -1715,7 +1710,7 @@ IS
               p_status_code := 'Не знайдено';
               p_error_code  := 'Не знайдено клієнта з РНК = ' ||
                                TO_CHAR(p_clientid);
-            
+
               IF (p_OperationType = 1) THEN
                 DateOn_ := SYSDATE;
               END IF;
@@ -2589,7 +2584,7 @@ IS
       WHERE upper(TRIM(p.ser)) = upper(TRIM(p_Ser))
         AND TRIM(p.numdoc) = TRIM(p_Numdoc)
         AND (trunc(p.bday) = trunc(p_Bday) OR p_Bday IS NULL)
-        AND (p.passp = p_Passp OR p_Passp IS NULL);     
+        AND (p.passp = p_Passp OR p_Passp IS NULL);
      p_rnk := l_ret_val;
    EXCEPTION
      WHEN no_data_found THEN
@@ -2600,8 +2595,8 @@ IS
        p_status_out      := '-1';
        p_status_code_out := 'Декілька клієнтів';
        p_error_code_out  := 'За введиними данними знайдено більше одного клієнта';
-   END find_customer;		
-   
+   END find_customer;
+
    PROCEDURE AttrCustomer (Rnk_   IN     customerw.rnk%TYPE,
                            Tag_   IN     customerw.tag%TYPE,
                            Val_   IN OUT customerw.VALUE%TYPE,
@@ -3188,8 +3183,8 @@ PROCEDURE CreateDepositAgreement (
   l_ERRORMESSAGE varchar2(4000);
   begin
     bc.go (p_branch);
-    
-    dbms_session.set_context('clientcontext','iscrm','1');    
+
+    dbms_session.set_context('clientcontext','iscrm','1');
     BEGIN
        bars_ow.create_instant_cards (p_cardcode   => p_cardcode,
                                      p_branch     => p_branch,
@@ -3243,7 +3238,7 @@ PROCEDURE CreateDepositAgreement (
     l_instantrow.KV := k.KV;
     pipe row (l_instantrow);
    end loop;
-     dbms_session.clear_context('clientcontext','iscrm');    
+     dbms_session.clear_context('clientcontext','iscrm');
 
   end;
 
@@ -3792,10 +3787,10 @@ PROCEDURE CreateDepositAgreement (
         when no_data_found then
           raise_application_error(-20001, 'Номер договору ('||p_object_id||') не заданий!');
       end;
-                
+
       pkg_dkbo_utl.p_quest_answ_ins(in_object_id       => l_deal_id,
                                     in_attribute_code  => p_attribute_code,
-                                    in_attribute_value => p_attribute_value);                                    
+                                    in_attribute_value => p_attribute_value);
     END p_quest_answ_ins;
 
   -- процедура обработки полученного запроса на партийное создание счетов
@@ -3810,17 +3805,18 @@ PROCEDURE CreateDepositAgreement (
     l_ticketdata := to_blob('0');
     FOR rec_tr_unit IN (SELECT t.id,
                                t.unit_type_id,
-                               ob.id external_file_id,
+                               t.external_file_id external_file_id,
                                t.receiver_url,
                                t.request_data,
                                t.response_data,
                                t.state_id,
                                t.failures_count,
+                               ob.id file_type,
                                t.kf
                           FROM barstrans.transport_unit t
-                          JOIN barstrans.transport_unit_type tt 
+                          JOIN barstrans.transport_unit_type tt
                           on tt.id = t.unit_type_id
-                          join OW_BATCH_FILETYPES ob on tt.transport_type_code = ob.code    
+                          join OW_BATCH_FILETYPES ob on tt.transport_type_code = ob.code
                          WHERE t.state_id IN
                                (barstrans.transport_utl.trans_state_new
                                ,barstrans.transport_utl.trans_state_failed)
@@ -3834,7 +3830,7 @@ PROCEDURE CreateDepositAgreement (
         bars.ow_batch_opening.batch_get_process(p_filename         => '0'
                                                ,p_filebody         => rec_tr_unit.request_data
                                                ,p_external_file_id => rec_tr_unit.external_file_id
-                                               ,p_filetype         => rec_tr_unit.external_file_id
+                                               ,p_filetype         => rec_tr_unit.file_type
                                                ,p_ticketdata       => l_ticketdata);
 
         barstrans.transport_utl.save_response(p_id        => rec_tr_unit.id
@@ -4046,29 +4042,29 @@ PROCEDURE CreateDepositAgreement (
 
   end getdocsbydeal_skrn;
 
-  -- Проверяет дату ПО рабочий или выходной, максимальное дней в периоде между датами. 
+  -- Проверяет дату ПО рабочий или выходной, максимальное дней в периоде между датами.
  -- http://jira.unity-bars.com.ua:11000/browse/COBUXRMIV-36
  -- p_calcDay максимальное количество дней в периоде (по умолчанию 365)
  -- *если макс. указанная дата в периоде выходной день то берем предыдущий рабочий, иначе следующий рабочий.
- 
+
  procedure DatePeriod (p_date1   in  date,
                        p_date2   in  date,
                        p_calcDay in  number default null,
                        p_Odate   out date) is
-         l_holiday boolean;                      
+         l_holiday boolean;
     begin
        l_holiday := nbur_calendar.f_is_holiday((p_date2));  -- проверка выходного дня
-      
+
       if    (p_date2 - p_date1)+1 > nvl(p_calcDay,365)                                 then -- если больше 365 - Ошибка
          raise_application_error(-20000,'Дата "ПО" не може бути більше року');
       elsif l_holiday = false and (p_date2 - p_date1)+1          <= nvl(p_calcDay,365) then -- если <= 365 и дата ПО не вых. - ОК
-         p_Odate := p_date2;  
-      elsif l_holiday = true and (p_date2 - p_date1)+1           <= nvl(p_calcDay,365) then -- Дата ПО вых.(смотреть заголовок*),         
-         p_Odate := case when (f_workday(p_date2,1)+1) - p_date1 <= nvl(p_calcDay,365) 
-                         then f_workday(p_date2,1) 
-                              else f_workday(p_date2,-1) end;   
-      end if; 
-      
+         p_Odate := p_date2;
+      elsif l_holiday = true and (p_date2 - p_date1)+1           <= nvl(p_calcDay,365) then -- Дата ПО вых.(смотреть заголовок*),
+         p_Odate := case when (f_workday(p_date2,1)+1) - p_date1 <= nvl(p_calcDay,365)
+                         then f_workday(p_date2,1)
+                              else f_workday(p_date2,-1) end;
+      end if;
+
      end DatePeriod;
 
 
@@ -4359,7 +4355,7 @@ PROCEDURE CreateDepositAgreement (
                     p_resultcode || ' ' || p_resultmessage || ' ' || p_deal_id);
 
   end open_safe_deposit;
-  
+
  -- Проверяет заполение обязательных параметров для Операций
 procedure check_skrynka_menu(p_dat           in  date   default null,
                              p_dat2          in  date   default null,
@@ -4385,7 +4381,7 @@ procedure check_skrynka_menu(p_dat           in  date   default null,
   when no_data_found then
     p_resultcode    := -1;
     p_resultmessage := 'Не знайдено операції №' || p_mode;
-    RETURN;   
+    RETURN;
  end;
 
     if      l_datename1  = case when l_datename1 = 0 then 0
@@ -4416,26 +4412,26 @@ procedure oper_dep_skrn(p_dat         in date default null, -- обязательный date
 
   l_resultcode    int(3);
   l_resultmessage varchar2(255);
-  l_odate          date; 
-  
+  l_odate          date;
+
 begin
 
   bars_audit.info(title || 'oper_dep_skrn p_mode: ' || p_mode );
-  
+
   p_resultcode    := 0;
   p_resultmessage := null;
-  
- -- Првоерка периода пролонгации Деп. ячеки  (налом и без налом)  
- if p_mode in (17,18)then   
-   
+
+ -- Првоерка периода пролонгации Деп. ячеки  (налом и без налом)
+ if p_mode in (17,18)then
+
    if p_dat2 is null then   raise_application_error(-20000,'Не вказана дата пролонгації');
-   end if; 
+   end if;
      xrm_integration_oe.dateperiod(p_date1   =>(bankdate + 1),
                                    p_date2   => p_dat2,
                                    p_calcday => null,
                                    p_odate   => l_odate);
-  end if;                                   
-                                 
+  end if;
+
  -- Проверяет заполнение обязательных параметров
   xrm_integration_oe.check_skrynka_menu(p_dat           => p_dat,
                                         p_dat2          => p_dat2,
@@ -4553,7 +4549,7 @@ procedure Сlose_ContractLease(p_n_sk        in number default null, -- код ячейк
                                    p_date_from   in varchar2,
                                    p_date_to     in varchar2,
                                    p_cancel_date in varchar2) is
- l_rnk NUMBER(38);                                   
+ l_rnk NUMBER(38);
    begin
       begin
       select c.rnk
@@ -4565,8 +4561,8 @@ procedure Сlose_ContractLease(p_n_sk        in number default null, -- код ячейк
           raise_application_error(-20001,
                                   'Контрагента з таким номером не існує '||'rnk='||p_rnk);
       end;
-  
- 
+
+
   safe_deposit.merge_skrynka_attorney(p_nd          => bars_sqnc.rukey(p_nd),
                                       p_rnk         => bars_Sqnc.rukey(p_rnk),
                                       p_date_from   => p_date_from,
@@ -4595,8 +4591,9 @@ procedure request_forbackoff(p_transactionid in number,
   l_res_cr_doc_scwarrant   ead_docs.id%type;
   l_res_cr_doc_scsignscard ead_docs.id%type;
   l_req_id                 cust_requests.req_id%type := bars_sqnc.rukey(p_req_id);
-  l_cust_id                cust_requests.trustee_rnk%type := bars_sqnc.rukey(p_cust_id);  
+  l_cust_id                cust_requests.trustee_rnk%type := bars_sqnc.rukey(p_cust_id);
   l_deposit                number;
+  l_kf                     varchar2(6) := sys_context('bars_context', 'user_mfo');
 begin
   savepoint sp1;
   resultcode    := 0;
@@ -4641,8 +4638,7 @@ begin
     l_ead_sync_queu_client := ead_pack.msg_create(p_type_id => 'CLIENT',
                                                   p_obj_id  => l_cust_id,
 						  p_rnk     => l_cust_id,
-                                                  p_kf      => sys_context('bars_context',
-                                                                           'user_mfo'));
+                                                  p_kf      => l_kf);
     bars_audit.trace(title ||
                      'Створити повідомлення для синхронізації клієнта в ЕАД' ||
                      to_char(l_ead_sync_queu_client));
@@ -4668,12 +4664,15 @@ begin
       return;
   end;
 
+  -- Проставляємо статус про успішну відпраку в ЕА, відправка в ЕА відбувається на стороні XRM  
+  ead_pack.msg_set_status_done(p_sync_id => l_ead_sync_queu_client, p_kf => l_kf);
+  
   -- Заява на доступ до Картки Клієнта
   --0 - картка клиента
   if (p_req_type = 0) then
 
     -- convert fromBase64 in blob
-    l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scaccess);
+    l_res_scaccess := lob_utl.decode_base64(p_clob_in => p_scaccess);
 
     -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
     l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
@@ -4698,16 +4697,18 @@ begin
       l_ead_sync_queu_agr := ead_pack.msg_create(p_type_id => 'AGR',
                                                  p_obj_id  => to_char('DPT' ||
                                                                       l_deposit),
-												 p_rnk     => l_cust_id, 					  
-                                                 p_kf      => sys_context('bars_context',
-                                                                          'user_mfo'));
+												 p_rnk     => l_cust_id,
+                                                 p_kf      => l_kf);
 
       bars_audit.trace(title ||
                        'Створити повідомлення для синхронізації клієнта в ЕАД' ||
                        to_char(l_ead_sync_queu_agr));
 
+      -- Проставляємо статус про успішну відпраку в ЕА, відправка в ЕА відбувається на стороні XRM
+      ead_pack.msg_set_status_done(p_sync_id => l_ead_sync_queu_agr, p_kf => sys_context('bars_context', 'user_mfo'));
+
       -- convert fromBase64 in blob
-      l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scaccess);
+      l_res_scaccess := lob_utl.decode_base64(p_clob_in => p_scaccess);
 
       -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
       l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
@@ -4728,7 +4729,7 @@ begin
         l_res_scaccess := null;
 
         -- convert fromBase64 in blob
-        l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scwarrant);
+        l_res_scaccess := lob_utl.decode_base64(p_clob_in => p_scwarrant);
 
         -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
         l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
@@ -4749,6 +4750,19 @@ begin
         bars_audit.trace(title || 'Створили надрукований документ в ЕАД' ||
                          to_char(l_res_cr_doc_scwarrant) ||
                          ' для депозиту№: ' || p_depositlist(i));
+      else
+        l_res_cr_doc_scwarrant := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                                      p_template_id  => null,
+                                                      p_scan_data    => null,
+                                                      p_ea_struct_id => case
+                                                                         upper(p_trustee)
+                                                                          when 'T' then
+                                                                           222
+                                                                          else
+                                                                           223
+                                                                        end,
+                                                      p_rnk          => l_cust_id,
+                                                      p_agr_id       => p_depositlist(i));                                 
 
       end if;
 
@@ -4756,7 +4770,7 @@ begin
       if (p_scsignscard is not null) then
         l_res_scaccess := null;
         -- convert fromBase64 in blob
-        l_res_scaccess := barstrans.file_utl.decode_base64(p_clob_in => p_scsignscard);
+        l_res_scaccess := lob_utl.decode_base64(p_clob_in => p_scsignscard);
 
         -- Разархивировать gzip архив в переменную l_uncompressed_blob   from_blob in clob
         l_res_scaccess := utl_compress.lz_uncompress(src => l_res_scaccess);
@@ -4771,7 +4785,13 @@ begin
         bars_audit.trace(title || 'Створили надрукований документ в ЕАД' ||
                          to_char(l_res_cr_doc_scsignscard) ||
                          ' для депозиту№: ' || p_depositlist(i));
-
+      else
+        l_res_cr_doc_scsignscard := ead_pack.doc_create(p_type_id      => 'SCAN',
+                                                        p_template_id  => null,
+                                                        p_scan_data    => null,
+                                                        p_ea_struct_id => 221,
+                                                        p_rnk          => l_cust_id,
+                                                        p_agr_id       => p_depositlist(i));        
       end if;
 
     end loop;
@@ -4840,14 +4860,3 @@ procedure request_access_req(
    end request_access_req;
 end;
 /
-
- show err;
- 
-PROMPT *** Create  grants  XRM_INTEGRATION_OE ***
-grant DEBUG,EXECUTE                                                          on XRM_INTEGRATION_OE to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/xrm_integration_oe.sql =========*** 
- PROMPT ===================================================================================== 

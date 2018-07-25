@@ -98,7 +98,7 @@ public partial class credit_repayment : Bars.BarsPage
             }
             else
             {
-                sDocInputUrl += "&nazn=" + HttpUtility.UrlEncode("Зарахування коштів на поточний рахунок");
+                sDocInputUrl += "&nazn=" + HttpUtility.UrlEncode("Поповнення поточного рахунку готівкою");
             }
 
             ScriptManager.RegisterStartupScript(this, this.GetType(), "show_pay_dialog", "ShowPayDialog('" + sDocInputUrl + "')", true);

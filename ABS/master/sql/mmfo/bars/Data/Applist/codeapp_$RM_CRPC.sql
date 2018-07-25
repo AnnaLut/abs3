@@ -248,15 +248,55 @@ begin
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
+												  
+	  l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+												  p_name      =>     'Перегляд даних в розрізі рахунків(NEW)',          
+                                                  p_funcname  =>     '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_OB_CORP_SALDO[CONDITIONS=>IS_LAST = 1][showDialogWindow=>false]',     
+                                                  p_rolename => '' ,
+                                                  p_frontend  =>      l_application_type_id ); 
+                    
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+												  p_name      =>     'Перегляд даних в розрізі операцій(NEW)',          
+												  p_funcname  =>     '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_OB_CORP_SALDO_DOCS[CONDITIONS=>IS_LAST = 1]',     
+												  p_rolename => '' ,
+                                                  p_frontend  =>      l_application_type_id ); 
+												  
+	  l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+												  p_name      =>     'Передача пакетів даних(NEW)',          
+												  p_funcname  =>     '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_OB_CORP_SESS[NSIFUNCTION][showDialogWindow=>false]',     
+												  p_rolename => '' ,
+                                                  p_frontend  =>      l_application_type_id );
+	
+	l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+												  p_name      =>     'Рахунки корпоративних клієнтів(NEW)',          
+												  p_funcname  =>     '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=V_CORP_ACCOUNTS_WEB[EDIT_MODE=>MULTI_EDIT][NSIFUNCTION][showDialogWindow=>false]',     
+												  p_rolename => '' ,
+                                                  p_frontend  =>      l_application_type_id ); 
+												  
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+													p_name      =>  'Адміністрування корпоративних клієнтів(NEW)',          
+													p_funcname  =>  '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_OB_CORP_L1[CONDITIONS=>PARENT_ID IS NULL][showDialogWindow=>false]',     
+													p_rolename => '' ,
+                                                    p_frontend  =>   l_application_type_id );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Прив'язка клієнтів до корпорацій ********** ');
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Прив''язка клієнтів до корпорацій ********** ');
           --  Створюємо функцію Прив'язка клієнтів до корпорацій
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Прив'язка клієнтів до корпорацій',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0&sPar=V_CUSTOMER_CORPORATIONS',
+                                                  p_name     => 'Прив''язка клієнтів до корпорацій',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0'||chr(38)||'sPar=V_CUSTOMER_CORPORATIONS',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -268,7 +308,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Повторне формування та відправка даних в ЦА',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>kfile_pack.KFILE_SEND(:Param0,:Param1)][PAR=>:Param0(SEM=Дата(ДДММГГГГ),TYPE=C),:Param1(SEM=Код корпоррації(%-всі),TYPE=C)][QST=>Виконати?][MSG=>ОК!]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=[PROC=>kfile_pack.KFILE_SEND(:Param0,:Param1)][PAR=>:Param0(SEM=Дата(ДДММГГГГ),TYPE=C),:Param1(SEM=Код корпоррації(%-всі),TYPE=C)][QST=>Виконати?][MSG=>ОК!]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -280,7 +320,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Оновлення довідника корпорацій',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=>kfile_pack.kfile_get_dict][QST=>Виконати?][MSG=>Довідник оновлено.]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=[PROC=>kfile_pack.kfile_get_dict][QST=>Виконати?][MSG=>Довідник оновлено.]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -292,7 +332,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Б/Р корпоративних клієнтів(включення в звітність)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=5&sPar=OB_CORPORATION_NBS_REPORT',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=5'||chr(38)||'sPar=OB_CORPORATION_NBS_REPORT',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -322,12 +362,12 @@ begin
                                                   );
 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ГРН) ********** ');
-          --  Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ГРН)
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Розбір нез''ясованих відповідних сум 3720 (ГРН) ********** ');
+          --  Створюємо функцію СЕП. Розбір нез''ясованих відповідних сум 3720 (ГРН)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'СЕП. Розбір нез'ясованих відповідних сум 3720 (ГРН)',
+                                                  p_name     => 'СЕП. Розбір нез''ясованих відповідних сум 3720 (ГРН)',
                                                   p_funcname => '/barsroot/sep/sep3720/index?mode=hrivna',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
@@ -388,12 +428,12 @@ begin
 															  );
 					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ВАЛ) ********** ');
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію СЕП. Розбір нез''ясованих відповідних сум 3720 (ВАЛ) ********** ');
           --  Створюємо функцію СЕП. Розбір нез'ясованих відповідних сум 3720 (ВАЛ)
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'СЕП. Розбір нез'ясованих відповідних сум 3720 (ВАЛ)',
+                                                  p_name     => 'СЕП. Розбір нез''ясованих відповідних сум 3720 (ВАЛ)',
                                                   p_funcname => '/barsroot/sep/sep3720/index?mode=valuta',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
@@ -506,9 +546,7 @@ umu.add_report2arm(5045,'$RM_CRPC');
 umu.add_report2arm(5046,'$RM_CRPC');
 umu.add_report2arm(5047,'$RM_CRPC');
 umu.add_report2arm(5048,'$RM_CRPC');
-umu.add_report2arm(5049,'$RM_CRPC');
 umu.add_report2arm(5050,'$RM_CRPC');
-umu.add_report2arm(5051,'$RM_CRPC');
 umu.add_report2arm(5053,'$RM_CRPC');
 umu.add_report2arm(5054,'$RM_CRPC');
 umu.add_report2arm(5702,'$RM_CRPC');

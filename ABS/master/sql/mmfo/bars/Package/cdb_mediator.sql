@@ -1,4 +1,9 @@
-create or replace package cdb_mediator is
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cdb_mediator.sql =========*** Run **
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CDB_MEDIATOR is
 
     DEAL_TYPE_LENDING              constant integer := 1;
     DEAL_TYPE_BORROWING            constant integer := 2;
@@ -291,9 +296,20 @@ create or replace package cdb_mediator is
 
     procedure remove_reckoning(
         p_reckoning_id in integer);
+	
+    --Добавление функции get_income_account так как пакет mbk переписан и исключена эта функция VL 01.24.2018
+    function get_income_account(
+        p_balance_account in varchar2,
+        p_customer_id in integer,
+        p_currency_id in integer,
+        p_branch in varchar2 default sys_context('bars_context', 'user_branch'))
+    return varchar2;
 
-
-
+    function get_income_account(
+        p_proc_dr_row in proc_dr$base%rowtype,
+        p_currency_id in integer)
+    return varchar2;
+	
     -- obsolete
     procedure pay_accrued_interest;
 
@@ -306,7 +322,7 @@ create or replace package cdb_mediator is
         p_reckoning_id in integer);
 end;
 /
-create or replace package body cdb_mediator as
+CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR as
 
     function read_operation_type(
         p_operation_type in varchar2,
@@ -643,6 +659,64 @@ create or replace package body cdb_mediator as
         end if;
     end;
 
+	-- параметри розрахунку процентів для угод кредитных ресурсов 3902 3903  -- VL 01.24.2018
+    ---
+ function get_proc_dr_row(
+        p_balance_account in varchar2,
+        p_customer_id in integer,
+        p_branch in varchar2 default sys_context('bars_context', 'user_branch'))
+    return proc_dr$base%rowtype
+    is
+        l_customer_mfo varchar2(6 char);
+        l_notax integer;
+        l_customerw_value varchar2(32767 byte);
+        l_proc_dr_row proc_dr$base%rowtype;
+    begin
+        l_customer_mfo := customer_utl.get_customer_mfo(p_customer_id);
+        begin
+            select *
+            into   l_proc_dr_row
+            from   proc_dr$base p
+            where  p.rowid = (select min(t.rowid) keep (dense_rank last order by t.rezid)
+                              from   proc_dr$base t
+                              where  t.nbs = p_balance_account and
+                                     t.sour = cck_utl.FUNDS_SOURCE_OWN and
+                                     t.rezid in (l_customer_mfo, 0) and
+                                     t.branch = p_branch);
+
+            return l_proc_dr_row;
+        exception
+            when no_data_found then
+                 return null;
+        end;
+    end;
+	---	
+	-----Добавление функции get_income_account, так как пакет mbk переписан и исключена эта функция -- VL 01.24.2018
+	 function get_income_account(
+        p_proc_dr_row in proc_dr$base%rowtype,
+        p_currency_id in integer)
+    return varchar2
+    is
+    begin
+        return case when p_currency_id = gl.baseval then p_proc_dr_row.g67 else p_proc_dr_row.v67 end;
+    end;
+
+    function get_income_account(
+        p_balance_account in varchar2,
+        p_customer_id in integer,
+        p_currency_id in integer,
+        p_branch in varchar2 default sys_context('bars_context', 'user_branch'))
+    return varchar2
+    is
+        l_proc_dr_row proc_dr$base%rowtype;
+    begin
+        l_proc_dr_row := cdb_mediator.get_proc_dr_row(p_balance_account, p_customer_id, p_branch => p_branch);
+
+        return get_income_account(l_proc_dr_row, p_currency_id);
+    end;	
+	------------	
+	
+	
     procedure open_credit_contract(
         p_contract_number in varchar2,
         p_product_id in integer,
@@ -713,7 +787,7 @@ create or replace package body cdb_mediator as
             raise_application_error(-20000, 'Неочікуваний тип контракту {' || p_contract_type || '}');
         end if;
 
-        l_income_account_number := mbk.get_income_account(l_balance_account, p_party_id, p_currency_code);
+        l_income_account_number := cdb_mediator.get_income_account(l_balance_account, p_party_id, p_currency_code);
         if (l_income_account_number is null) then
             raise_application_error(-20000,
                                     'Не вдалось визначити рахунок доходів/витрат за процентами для філіалу {' || p_party_mfo ||
@@ -846,7 +920,7 @@ create or replace package body cdb_mediator as
 
         l_customer_row := customer_utl.read_customer(p_partner_id);
 
-        l_income_account_number := mbk.get_income_account(l_balance_account, p_partner_id, p_currency_code);
+        l_income_account_number := cdb_mediator.get_income_account(l_balance_account, p_partner_id, p_currency_code);
         if (l_income_account_number is null) then
             raise_application_error(-20000,
                                     'Не вдалось визначити рахунок доходів/витрат за процентами для філіалу {' || l_custbank_row.mfo ||
@@ -980,7 +1054,7 @@ create or replace package body cdb_mediator as
                    s_ => l_amount,
                    kv2_ => p_currency,
                    s2_ => l_amount,
-                   sq_ => l_amount,
+                   sq_ => 0,
                    sk_ => l_tts_row.sk,
                    sub_ => null,
                    data_ => bankdate,
@@ -1953,7 +2027,7 @@ create or replace package body cdb_mediator as
 
         interest_utl.clear_reckonings(l_reckoning_row.account_id, l_reckoning_row.interest_kind_id, l_reckoning_row.date_from);
     end;
-
+	
     -- obsolete
     procedure pay_accrued_interest
     is
@@ -2230,3 +2304,14 @@ create or replace package body cdb_mediator as
     end;
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  CDB_MEDIATOR ***
+grant EXECUTE                                                                on CDB_MEDIATOR    to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/cdb_mediator.sql =========*** End **
+ PROMPT ===================================================================================== 
+ 

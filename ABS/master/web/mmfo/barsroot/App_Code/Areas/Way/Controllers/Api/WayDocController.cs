@@ -66,6 +66,22 @@ namespace BarsWeb.Areas.Way.Controllers.Api
                     new { Data = 0, Message = exception.Message });
             }
         }
+        [HttpPut]
+        public HttpResponseMessage SetRowState(decimal id, decimal idn, decimal state)
+        {
+            try
+            {
+                _repository.SetRowState(id, idn, state);
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK,
+                    new { Data = 1, Message = "Оновлення успішне" });
+                return response;
+            }
+            catch (Exception exception)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    new { Data = 0, Message = exception.Message });
+            }
+        }
         [HttpDelete]
         public HttpResponseMessage Delete(decimal id)
         {

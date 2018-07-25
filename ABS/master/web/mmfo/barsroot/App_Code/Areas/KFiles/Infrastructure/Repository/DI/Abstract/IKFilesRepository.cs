@@ -45,5 +45,7 @@ namespace BarsWeb.Areas.KFiles.Infrastructure.Repository.DI.Abstract
         IList<V_OB_CORPORATION_DATA_DOCS> GetTurnoverbalanceData(DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT);
         Decimal GetTurnoverbalanceDataCount(DataSourceRequest request, String FILE_DATE, Decimal? KV, String NLS, String TT);
         IQueryable<Corporation_SALDO> GetDropDownCorporations();
+		
+		List<OB_CORP_DATA_SAL_DOC> GetSalDoc(Int64? d_sess_id, Int64? d_acc, string d_kf, Int64? d_ref, int? d_dk);
     }
 }

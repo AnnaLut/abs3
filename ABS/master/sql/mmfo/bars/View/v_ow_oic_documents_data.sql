@@ -7,8 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_OW_OIC_DOCUMENTS_DATA ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_OW_OIC_DOCUMENTS_DATA ("ID", "IDN", "NLSA", "KV", "S", "MFOB", "ID_B", "NAM_B", "NLSB", "KV2", "S2", "NAZN", "ERR_TEXT", "URL") AS 
-  select id, idn, org_cbsnumber nlsa, bill_currency kv, bill_amount * 100 s,
+ CREATE OR REPLACE FORCE VIEW BARS.V_OW_OIC_DOCUMENTS_DATA ("ID", "IDN", "NLSA", "KV", "S", "MFOB", "ID_B", "NAM_B", "NLSB", "KV2", "S2", "NAZN", "ERR_TEXT", "URL", "FAILURES_COUNT", "STATE") AS 
+ select id, idn, org_cbsnumber nlsa, bill_currency kv, bill_amount * 100 s,
        dest_institution mfob, cnt_clientregnumber id_b,
        substr(cnt_clientname, 1, 38) nam_b, cnt_contractnumber nlsb,
        bill_currency kv2, bill_amount * 100 s2,
@@ -38,7 +38,7 @@ PROMPT *** Create  view V_OW_OIC_DOCUMENTS_DATA ***
                                'OW3'
                             end
                          end,
-                         '¬веденн€ платежу',
+                         'Введення платежу',
                          'Kv_A',
                          bill_currency,
                          'Mfo_b',
@@ -57,8 +57,11 @@ PROMPT *** Create  view V_OW_OIC_DOCUMENTS_DATA ***
                          'set role bars_access_defrole@begin bars_ow.check_bpdoc('||id||','||idn||');end;',
                          'APROC',
                          'set role bars_access_defrole@begin bars_ow.set_pay_flag('||id||','||idn||',:REF, 1);end;'
-                         ) as url
+                         ) as url,
+                         failures_count,
+                         state
   from ow_oic_documents_data;
+
 
 PROMPT *** Create  grants  V_OW_OIC_DOCUMENTS_DATA ***
 grant SELECT                                                                 on V_OW_OIC_DOCUMENTS_DATA to BARSREADER_ROLE;

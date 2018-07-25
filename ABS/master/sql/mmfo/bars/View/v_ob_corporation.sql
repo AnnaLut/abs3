@@ -14,7 +14,12 @@ PROMPT *** Create  view V_OB_CORPORATION ***
            C.ID,
            C.PARENT_ID,
            C.STATE_ID,
-           LIST_UTL.GET_ITEM_NAME (KFILE_PACK.GET_C_OB_CORPORATION_STATE, C.STATE_ID) CORPORATION_STATE,
+           CASE
+                 WHEN state_id = 1 THEN 'Активний'
+                 WHEN state_id = 2 THEN 'Заблоковано'
+                 WHEN state_id = 3 THEN 'Закритий'
+                 ELSE 'Невідомий тип'
+           END AS CORPORATION_STATE,
            PRIOR C.CORPORATION_NAME AS PARENT_NAME
     FROM OB_CORPORATION C
     START WITH C.PARENT_ID IS NULL

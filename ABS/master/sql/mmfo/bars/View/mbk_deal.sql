@@ -1,12 +1,6 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/MBK_DEAL.sql =========*** Run *** =====
 PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view MBK_DEAL ***
-
   CREATE OR REPLACE FORCE VIEW BARS.MBK_DEAL ("USERID", "CODE_PRODUCT", "NAME_PRODUCT", "NBS", "OB22", "IRR", "ND", "CC_ID", "VIDD", "VIDD_NAME", "S_PR", "TIPD", "DATE_B", "DATE_U", "DATE_V", "DATE_END", "N_NBU", "D_NBU", "S", "A_NLS", "A_OSTC", "A_OSTB", "A_OSTF", "A_MDATE", "A_ACC", "A_ACCC", "A_KV", "A_GRP", "A_TIP", "B_NLS", "B_OSTC", "B_OSTB", "B_OSTF", "B_MDATE", "MFOKRED", "B_ACC", "B_ACCC", "B_KV", "B_GRP", "RNK", "MFOPERC", "NMK", "NMKK", "OKPO", "COUNTRY", "NUM_ND", "KPROLOG", "DAT_ND", "MFO", "KOD_B", "BIC", "ACCKRED", "ACCPERC", "REFP", "SWI_ACC", "SWI_BIC", "SWI_REF", "SWO_ACC", "SWO_BIC", "SWO_REF", "ALT_PARTYB", "INTERM_B", "FIELD_58D", "INT_PARTYA", "INT_PARTYB", "INT_INTERMA", "INT_INTERMB", "INT_AMOUNT", "RAT", "ACRB", "ACR_DAT", "BASEY", "NLS_1819") AS 
   SELECT d.user_id USERID,
           p.code_product,
@@ -91,32 +85,31 @@ PROMPT *** Create  view MBK_DEAL ***
           custbank cb,
           mbdk_product p
     WHERE     d.nd    = ad.nd
-          AND d.vidd  = v.vidd
+          AND d.sos < 15
+          AND d.vidd = v.vidd
+          and d.vidd not like '39%'
           AND v.custtype in (1,2)
           AND LENGTH (v.vidd) = 4
           AND ad.accs = a.acc
           AND c.custtype in (1,2)
           AND ad.adds = 0
           AND a.acc   = i.acc
-          AND i.id    = v.tipd - 1
+          AND i.id    in (0, 1)
           AND a.dazs  IS NULL
           AND b.acc   = i.acra
           AND d.rnk   = c.rnk
           AND c.rnk   = cb.rnk (+)
           AND d.prod  = p.code_product (+)
-          AND (   a.ostc <> 0
-               OR a.dapp = gl.bd
-               OR d.sdate = gl.bd
-               OR d.wdate >= gl.bd)
+          --AND (   a.ostc <> 0  OR a.dapp = gl.bd  OR d.sdate = gl.bd  OR d.wdate >= gl.bd)
           AND d.wdate = NVL (a.mdate, TO_DATE ('31/12/2050', 'dd-mm-yyyy'));
+
+show err;
 
 PROMPT *** Create  grants  MBK_DEAL ***
 grant SELECT                                                                 on MBK_DEAL        to BARSREADER_ROLE;
 grant SELECT                                                                 on MBK_DEAL        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on MBK_DEAL        to FOREX;
 grant SELECT                                                                 on MBK_DEAL        to UPLD;
-
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/View/MBK_DEAL.sql =========*** End *** =====

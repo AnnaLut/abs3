@@ -7,71 +7,83 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_CORP_ACCOUNTS_WEB ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_CORP_ACCOUNTS_WEB ("CORP_KOD", "CORP_NAME", "RNK", "NMK", "OKPO", "ACC", "NLS", "KV", "NMS", "INST_KOD", "TRKK_KOD", "USE_INVP", "ALT_CORP_COD", "BRANCH", "DAOS", "DAZS", "ALT_CORP_NAME") AS 
-  WITH K
-        AS (    SELECT t.*, CONNECT_BY_ROOT external_id AS root_ext_id
-                  FROM OB_CORPORATION t
-            START WITH t.PARENT_ID IS NULL
-            CONNECT BY PRIOR id = parent_id)
-   SELECT obc.EXTERNAL_ID corp_kod,
-          obc.CORPORATION_NAME corp_name,
-          c.RNK,
-          c.NMK,
-          c.okpo,
-          a.ACC,
-          a.NLS,
-          a.KV,
-          a.NMS,
-          --код подразделения для счета, если не найдем - пишем подразделение клиента (? - уточнить)
-          w3.VALUE inst_kod,
-          s.TYPNLS trkk_kod,
-          NVL (w2.VALUE, 'N') use_invp,
-          --мы нашли валидную установу для счета, при этом её корпорация не соответствует корпорации контрагента - пишем её корпорацию в альтернативу
-          --иначе ничего не пишем
-          CASE
-             WHEN                                 /*w3.VALUE is not null and*/
-                 w1.VALUE IS NOT NULL AND cwp.VALUE != w1.VALUE
-             THEN
-                w1.VALUE
-             ELSE
-                NULL
-          END
-             alt_corp_cod,
-          a.BRANCH,
-          a.DAOS,
-          a.DAZS,
-          CASE
-             WHEN                                 /*w3.VALUE is not null and*/
-                 w1.VALUE IS NOT NULL AND cwp.VALUE != w1.VALUE
-             THEN
-                oba.CORPORATION_NAME
-             ELSE
-                NULL
-          END
-             alt_corp_name
-     FROM customer c
-          JOIN customerw cwp ON cwp.RNK = c.RNK AND cwp.TAG = 'OBPCP' --|код корпорации контрагента
-          JOIN OB_CORPORATION obc
-             ON cwp.VALUE = obc.EXTERNAL_ID AND obc.PARENT_ID IS NULL --|заодно удостоверимся, что это корневая корпорация
-          LEFT JOIN
-          customerw cw
-             ON     cw.RNK = c.RNK
-                AND cw.TAG = 'OBCRP'
-          JOIN accounts a ON a.RNK = c.RNK
-          LEFT JOIN accountsw w1 ON a.ACC = w1.ACC AND w1.TAG = 'OBCORP' --|код корпорации для счета
-          LEFT JOIN
-          OB_CORPORATION oba
-             ON     w1.VALUE IS NOT NULL
-                AND w1.VALUE = oba.EXTERNAL_ID
-                AND oba.PARENT_ID IS NULL                                  --|
-          LEFT JOIN accountsw w2 ON a.ACC = w2.ACC AND w2.TAG = 'CORPV' --включение в выписку
-          --ищем код подразделения для счета и удостоверяемся, что он принадлежит указанной для счета родительской корпорации; иначе - не находим
-          LEFT JOIN
-          accountsw w3
-             ON     a.ACC = w3.ACC
-                AND w3.TAG = 'OBCORPCD'
-
-          LEFT JOIN SPECPARAM_INT s ON a.ACC = s.ACC;
+  CREATE OR REPLACE FORCE VIEW BARS.V_CORP_ACCOUNTS_WEB
+(
+   CORP_KOD,
+   CORP_NAME,
+   RNK,
+   NMK,
+   OKPO,
+   ACC,
+   NLS,
+   KV,
+   NMS,
+   INST_KOD,
+   TRKK_KOD,
+   USE_INVP,
+   ALT_CORP_COD,
+   BRANCH,
+   DAOS,
+   DAZS
+)
+AS
+SELECT corp_kod,
+          corp_name,
+          RNK,
+          NMK,
+          okpo,
+          ACC,
+          NLS,
+          KV,
+          NMS,
+          inst_kod,
+          trkk_kod,
+          use_invp,
+          CASE WHEN W1 <> CWPVAL THEN W1 ELSE NULL END AS alt_corp_cod,
+          BRANCH,
+          DAOS,
+          DAZS
+     FROM (
+           SELECT cwp.VALUE AS corp_kod,
+                  (select oba.CORPORATION_NAME FROM OB_CORPORATION oba WHERE oba.EXTERNAL_ID  = cwp.VALUE and oba.PARENT_ID IS NULL) as corp_name,
+                  cwp.RNK,
+                  (select c.NMK from customer c where c.rnk = cwp.RNK) as NMK,
+                  (select c.okpo from customer c where c.rnk = cwp.RNK) as okpo,
+                  a.ACC,
+                  a.NLS,
+                  a.KV,
+                  a.NMS,
+                  (SELECT w3.VALUE
+                     FROM accountsw w3
+                    WHERE a.ACC = w3.ACC AND w3.TAG = 'OBCORPCD')
+                     AS inst_kod,
+                  (SELECT s.TYPNLS
+                     FROM SPECPARAM_INT s
+                    WHERE a.ACC = s.ACC)
+                     AS trkk_kod,
+                  NVL ( (SELECT w2.VALUE
+                           FROM accountsw w2
+                          WHERE a.ACC = w2.ACC AND w2.TAG = 'CORPV'),
+                       'N')
+                     AS use_invp,
+                  (SELECT w1.VALUE
+                     FROM accountsw w1
+                    WHERE a.ACC = w1.ACC AND w1.TAG = 'OBCORP')
+                     AS W1,
+                  cwp.VALUE AS CWPVAL,
+                  a.BRANCH,
+                  a.DAOS,
+                  a.DAZS
+             FROM accounts a
+             JOIN customerw cwp ON cwp.RNK = a.RNK AND cwp.TAG = 'OBPCP')
+             where corp_name is not null;
+/
+GRANT SELECT, UPDATE ON BARS.V_CORP_ACCOUNTS_WEB TO BARS_ACCESS_DEFROLE;
+/
+GRANT SELECT ON BARS.V_CORP_ACCOUNTS_WEB TO CORP_CLIENT;
+/
+GRANT SELECT ON BARS.V_CORP_ACCOUNTS_WEB TO UPLD;
+/
 
 PROMPT *** Create  grants  V_CORP_ACCOUNTS_WEB ***
 grant SELECT                                                                 on V_CORP_ACCOUNTS_WEB to BARSREADER_ROLE;
