@@ -264,7 +264,7 @@ namespace BarsWeb.Areas.Way.Infrastructure.DI.Implementation
 
         public IEnumerable<AFtransfers> NoProccessedAFtransfers(decimal fileId)
         {
-            const string query = @"select * from v_ow_oic_atransfers_data t where t.id = :p_id";
+            const string query = @"select * from v_ow_oic_atransfers_data t where t.id = :p_id and nvl(state,0) <> 99";
             var parameters = new object[]
             {
                 new OracleParameter("p_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
@@ -274,7 +274,7 @@ namespace BarsWeb.Areas.Way.Infrastructure.DI.Implementation
 
         public IEnumerable<BarsWeb.Areas.Way.Models.Documents> NoProccessedDocuments(decimal fileId)
         {
-            const string query = @"select * from v_ow_oic_documents_data t where t.id = :p_id";
+            const string query = @"select * from v_ow_oic_documents_data t where t.id = :p_id and nvl(state,0) <> 99";
             var parameters = new object[]
             {
                 new OracleParameter("p_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
@@ -284,7 +284,7 @@ namespace BarsWeb.Areas.Way.Infrastructure.DI.Implementation
 
         public IEnumerable<Stransfers> NoProccessedStransfers(decimal fileId)
         {
-            const string query = @"select * from v_ow_oic_stransfers_data t where t.id = :p_id";
+            const string query = @"select * from v_ow_oic_stransfers_data t where t.id = :p_id and nvl(state,0) <> 99";
             var parameters = new object[]
             {
                 new OracleParameter("p_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
@@ -305,6 +305,52 @@ namespace BarsWeb.Areas.Way.Infrastructure.DI.Implementation
             }
             return result.ToString();
 
+        }
+        public IEnumerable<BarsWeb.Areas.Way.Models.Documents> DeletedDocuments(decimal fileId)
+        {
+            const string query = @"select * from v_ow_oic_documents_data t where t.id = :p_id and nvl(state,0) = 99";
+            var parameters = new object[]
+            {
+                new OracleParameter("p_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
+            };
+            return _entities.ExecuteStoreQuery<BarsWeb.Areas.Way.Models.Documents>(query, parameters);
+        }
+
+        public IEnumerable<AFtransfers> DeletedAFtransfers(decimal fileId)
+        {
+            const string query = @"select * from v_ow_oic_atransfers_data t where t.id = :p_id and nvl(state,0) = 99";
+            var parameters = new object[]
+            {
+                new OracleParameter("p_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
+            };
+            return _entities.ExecuteStoreQuery<AFtransfers>(query, parameters);
+        }
+        public IEnumerable<Stransfers> DeletedStransfers(decimal fileId)
+        {
+            const string query = @"select * from v_ow_oic_stransfers_data t where t.id = :p_id and nvl(state,0) = 99";
+            var parameters = new object[]
+            {
+                new OracleParameter("p_id", OracleDbType.Decimal, fileId, ParameterDirection.Input)
+            };
+            return _entities.ExecuteStoreQuery<Stransfers>(query, parameters);
+        }
+        public void SetRowState(decimal id, decimal idn, decimal state)
+        {
+            OracleConnection connection = OraConnector.Handler.UserConnection;
+            try
+            {
+                OracleCommand commandImport = new OracleCommand("ow_files_proc.set_tran_state", connection);
+                commandImport.CommandType = CommandType.StoredProcedure;
+
+                commandImport.Parameters.Add("p_fileid", OracleDbType.Decimal, id, ParameterDirection.Input);
+                commandImport.Parameters.Add("p_idn", OracleDbType.Decimal, idn, ParameterDirection.Input);
+                commandImport.Parameters.Add("p_state", OracleDbType.Decimal, state, ParameterDirection.Input);
+                commandImport.ExecuteNonQuery();
+            }
+            finally
+            {
+                connection.Close();
+            }
         }
     }
 

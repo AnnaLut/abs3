@@ -75,9 +75,9 @@
           <TableCell Name="Cell31" Border.Lines="All" Text="Сума операції" HorzAlign="Center"/>
           <TableCell Name="Cell32" Border.Lines="All" Text="Код банку" HorzAlign="Center"/>
           <TableCell Name="Cell33" Border.Lines="All" Text="Рахунок по кредиту" HorzAlign="Center"/>
-          <TableCell Name="Cell34" Border.Lines="All" Text="Найменування отримувача" HorzAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="Найменування відправника" HorzAlign="Center"/>
           <TableCell Name="Cell35" Border.Lines="All" Text="Призначення платежу" HorzAlign="Center"/>
-          <TableCell Name="Cell36" Border.Lines="All" Text="Назва банку отримувача" HorzAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" Text="Назва банку відправника" HorzAlign="Center"/>
         </TableRow>
       </TableObject>
     </PageHeaderBand>

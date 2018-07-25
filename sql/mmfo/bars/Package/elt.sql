@@ -804,10 +804,11 @@ BEGIN
                     a2.ostc OST2C, substr(a2.NMS,1,38) NMS2, d.WDATE,
                     d.SA, a2.acc, d.accp, a2.kv KV2,
                     a2.tip tip2, p.tip tipp,
-                    d.nls_p  NLS_P, p.ostc OST_P, substr(p.nms,1,38) NMS_P,
+                    p.nls  NLS_P, p.ostc OST_P, substr(p.nms,1,38) NMS_P,
                     c.rnk, c.branch BRANCH_K, a2.branch BRANCH_R, a2.lim
-              FROM e_deal d, accounts a3, accounts a2, customer c, accounts p
-             WHERE d.rnk = c.rnk
+              FROM e_deal$base d, accounts a3, accounts a2, customer c, accounts p
+             WHERE d.kf = SYS_CONTEXT ('bars_context', 'user_mfo')
+               and d.rnk = c.rnk
                and d.acc36  = a3.acc and a3.dazs is null
                and d.acc26  = a2.acc and a2.dazs is null
                and d.accp  = p.acc(+) and p.dazs is null
@@ -1820,22 +1821,25 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
                  a2.NLS NLS2, greatest(0,a2.ostc+NVL(a2.lim,0)) OST2,
                  substr(a2.NMS,1,38) NMS2, d.WDATE,
                  d.SA,
-                 d.nls_p  NLS_P, p.ostc OST_P, substr(p.nms,1,38) NMS_P,
+                 p.nls NLS_P, p.ostc OST_P, substr(p.nms,1,38) NMS_P,
                  a8.NLS NLS8, a8.ostc OST8, substr(a8.NMS,1,38) NMS8,
                  a8.ostb OST8P , a3.ostb OST3P,
                  a2.acc, c.rnk, a3.isp, a3.tobo, a3.acc ACC3, a2.kv KV2,
                  a2.tip tip2, p.tip tipp, d.accp, a2.lim
-          FROM   e_deal d, accounts a3, accounts a2, customer c,
+          FROM   e_deal$base d, accounts a3, accounts a2, customer c,
                  accounts a8, accounts p
-          WHERE d.rnk    = c.rnk
-                and d.acc36  = a3.acc and a3.dazs is null
-                and d.acc26  = a2.acc and a2.dazs is null
-                and d.accD = a8.acc(+)
-                --a8.dazs is null
-                and d.accp  = p.acc(+) and p.dazs is null
-                and (PAKET_  = 0 or a3.nls= NLS36_)
-                and d.sos<>15  -- без закритих угод
-          order by d.nd
+          WHERE d.kf = SYS_CONTEXT ('bars_context', 'user_mfo')
+            and d.rnk    = c.rnk
+            and d.acc36  = a3.acc and a3.dazs is null
+            and d.acc26  = a2.acc and a2.dazs is null
+            and d.accD = a8.acc(+)
+            --a8.dazs is null
+            and d.accp  = p.acc(+) and p.dazs is null
+            and (PAKET_  = 0 or a3.nls= NLS36_)
+            and d.sos<>15  -- без закритих угод
+            and ((nvl(a3.ostc,0)<0 and MODE_ = 7)
+                 or (nvl(a8.ostc,0)<0 and MODE_  = 8))
+          order by d.nd 
           )
   loop
     logger.info('ELT.BORG  nd='||k.nd||';  MODE ='|| MODE_ ||' begin');

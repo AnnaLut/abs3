@@ -5,7 +5,7 @@ is
     --
     -- Работа с витринами для псевдо-онлайн выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 0.9.1 23/05/2018';
+    g_header_version  constant varchar2(64)  := 'version 1.0.0 26/06/2018';
     
     G_IMPORT_MODE_FULL  constant varchar2(5) := 'FULL';
     G_IMPORT_MODE_DELTA constant varchar2(5) := 'DELTA';
@@ -25,6 +25,12 @@ is
 
 
     function add38phone (p_phone in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo')) return varchar2;
+
+    --
+    -- Инкрементируент максимальный номер дельты (changenumber) по объекту и проставляет его для выбранного / всех регионов
+    --
+    procedure increment_object_changenumber(p_object_name in varchar2 default null,
+                                            p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'));
 
     --
     -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
@@ -102,7 +108,7 @@ show errors;
 
 create or replace package body xrm_import
 is
-    g_body_version constant varchar2(64) := 'Version 0.9.1 23/05/2018';
+    g_body_version constant varchar2(64) := 'Version 1.0.0 26/06/2018';
     G_TRACE        constant varchar2(20) := 'xrm_import.';
     G_IS_MMFO      number(1);
     G_IS_TEST      number(1)    := 0;
@@ -194,20 +200,22 @@ is
     end get_changed_keys;
 
     --
-    -- Инкрементирует и возвращает номер дельты в разрезе объекта и МФО; для слэша инкрементим все и возвращаем максимальный
+    -- Инкрементируент максимальный номер дельты (changenumber) по объекту и проставляет его для выбранного / всех регионов
     --
-    function increment_object_changenumber(p_object_name in varchar2,
-                                           p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
-    return number
+    procedure increment_object_changenumber(p_object_name in varchar2 default null,
+                                            p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
         is
     l_ret number;
     begin
-        update imp_object_mfo
-        set changenumber = changenumber + 1
-        where object_name = p_object_name
-        and kf = nvl(p_kf, kf)
-        returning max(changenumber) into l_ret;
-        return l_ret;
+        for obj in (select * from imp_object o where o.active = 1 and object_name = nvl(p_object_name, object_name))
+        loop
+            select max(changenumber) + 1 into l_ret from imp_object_mfo where object_name = obj.object_name;
+            
+            update imp_object_mfo
+            set changenumber = l_ret
+            where object_name = obj.object_name
+            and kf = nvl(p_kf, kf);
+        end loop;
     end increment_object_changenumber;
 
     --
@@ -377,8 +385,10 @@ is
         bars.bars_audit.info(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
 
         savepoint imp_start;
-
-        l_changenumber := increment_object_changenumber(c_object_name);
+        increment_object_changenumber(c_object_name);
+        select changenumber into l_changenumber 
+        from imp_object_mfo 
+        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
 
         /* выгрузка */
 
@@ -1052,7 +1062,10 @@ is
 
         savepoint imp_start;
 
-        l_changenumber := increment_object_changenumber(c_object_name);
+        increment_object_changenumber(c_object_name);
+        select changenumber into l_changenumber 
+        from imp_object_mfo 
+        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
 
         /* выгрузка */
         merge into client_address C
@@ -1252,7 +1265,10 @@ is
 
         savepoint imp_start;
 
-        l_changenumber := increment_object_changenumber(c_object_name);
+        increment_object_changenumber(c_object_name);
+        select changenumber into l_changenumber 
+        from imp_object_mfo 
+        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
 
         /* выгрузка */
 
@@ -1366,7 +1382,10 @@ is
 
         savepoint imp_start;
 
-        l_changenumber := increment_object_changenumber(c_object_name);
+        increment_object_changenumber(c_object_name);
+        select changenumber into l_changenumber 
+        from imp_object_mfo 
+        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
 
         /* выгрузка */
 
@@ -1563,7 +1582,10 @@ is
 
         savepoint imp_start;
 
-        l_changenumber := increment_object_changenumber(c_object_name);
+        increment_object_changenumber(c_object_name);
+        select changenumber into l_changenumber 
+        from imp_object_mfo 
+        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
 
         /* выгрузка */
 
@@ -1798,6 +1820,88 @@ is
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_deposits2;
+
+    --
+    -- Выгрузка ACCOUNTS_CASH - счета кассы (все)
+    --
+    procedure import_accounts_cash (p_rows_ok  out number,
+                                    p_rows_err out number,
+                                    p_status   out varchar2)
+        is
+    c_object_name  constant varchar2(32) := 'ACCOUNTS_CASH';
+    l_changenumber number;
+
+    l_changelist bars.number_list;
+
+    begin
+        bars.bars_audit.info(g_trace||c_object_name||': start');
+
+        /* собираем измененные записи */
+        l_changelist := get_changed_keys(c_object_name);
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+
+        savepoint imp_start;
+
+        increment_object_changenumber(c_object_name);
+        select changenumber into l_changenumber 
+        from imp_object_mfo 
+        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
+
+        /* выгрузка */
+
+        merge into accounts_cash a
+        using (
+                with delta as (select /*+ materialize*/ column_value as acc from table(l_changelist))
+                select l_changenumber as changenumber,
+                       a.acc,
+                       a.rnk,
+                       a.kf,
+                       nls,
+                       kv,
+                       a.branch,
+                       nms,
+                       ob22,
+                       nmk,
+                       okpo
+                from bars.accounts a
+                join bars.customer c on a.kf = c.kf and a.rnk = c.rnk
+                join delta on a.acc = delta.acc
+                where a.dazs is null
+            	and substr(nbs, 1, 1) in ('1', '2', '6', '9')
+            	and nbs not in ('2620', '2625', '2630')
+            ) Q on  (a.acc = Q.acc and a.kf = q.kf)
+            when matched then update
+            set changenumber = l_changenumber,
+                rnk = Q.rnk,
+                nls = Q.nls,
+                kv = Q.kv,
+                branch = Q.branch,
+                nms = Q.nms,
+                ob22 = Q.ob22,
+                nmk = Q.nmk,
+                okpo = Q.okpo
+            when not matched then insert
+            (changenumber, kf, acc, rnk, nls, kv, branch, nms, ob22, nmk, okpo)
+            values
+            (l_changenumber, Q.kf, Q.acc, Q.rnk, Q.nls, Q.kv, Q.branch, Q.nms, Q.ob22, Q.nmk, Q.okpo)
+        log errors into ERR$_ACCOUNTS reject limit unlimited;
+
+        p_rows_ok := sql%rowcount;
+        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber;
+
+        reset_object_idupd(c_object_name);
+
+        p_status := G_STATS_SUCCESS;
+
+        bars.bars_audit.info(g_trace||c_object_name||': finished');
+    exception
+        when others then
+            rollback to imp_start;
+            p_status := G_STATS_ERROR;
+            bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
+            raise;
+    end import_accounts_cash;
 
     --
     -- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).

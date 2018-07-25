@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace BarsWeb.Areas.Way.Models
 {
@@ -8,11 +9,35 @@ namespace BarsWeb.Areas.Way.Models
         public string MFOB { get; set; } // МФО получателя
         public string NLSA { get; set; } // Счет отправителя
         public string NLSB { get; set; } // Счет получателя
+        [JsonIgnore]
         public decimal? S { get; set; } // Сумма
+        public decimal? Sgrn
+        {
+            get
+            {
+                return null == S ? 0 : S / 100;
+            }
+            set
+            {
+                S = value * 100;
+            }
+        }
         public decimal? KV { get; set; } // Код валюты
         public string LCV { get; set; } // Симв Код
         public decimal? DIG { get; set; } // Коп
+        [JsonIgnore]
         public decimal? S2 { get; set; } // Сумма документа 2
+        public decimal? Sgrn2
+        {
+            get
+            {
+                return null == S2 ? 0 : S2 / 100;
+            }
+            set
+            {
+                S2 = value * 100;
+            }
+        }
         public decimal? KV2 { get; set; } // Код валюты 2
         public string LCV2 { get; set; } // Симв Код
         public decimal? DIG2 { get; set; } // Коп

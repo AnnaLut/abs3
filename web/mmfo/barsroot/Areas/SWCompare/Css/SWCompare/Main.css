@@ -267,3 +267,7 @@ input.k-input.k-readonly {
 a.k-grid-filter.k-state-active {
     background-color: lightgray !important;
 }
+
+#resolve_comments {
+    height: 34px !important;
+}

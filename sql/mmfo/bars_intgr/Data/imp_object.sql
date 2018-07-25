@@ -29,7 +29,14 @@ end;
 /
 prompt DEPOSITS2
 begin
-    insert into imp_object(object_name, object_proc, imp_order, active, imp_mode) values ('DEPOSITS2', 'xrm_import.import_deposits2', 4, 1, 'DELTA');
+    insert into imp_object(object_name, object_proc, imp_order, active, imp_mode) values ('DEPOSITS2', 'xrm_import.import_deposits2', 5, 1, 'DELTA');
+exception
+    when dup_val_on_index then null;
+end;
+/
+prompt ACCOUNTS_CASH
+begin
+    insert into imp_object(object_name, object_proc, imp_order, active, imp_mode) values ('ACCOUNTS_CASH', 'xrm_import.import_accounts_cash', 6, 1, 'DELTA');
 exception
     when dup_val_on_index then null;
 end;

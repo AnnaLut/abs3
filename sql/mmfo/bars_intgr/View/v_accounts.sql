@@ -25,7 +25,7 @@ CAST (ob22 as VARCHAR2(2)) AS OB22,
 CAST (NMS as VARCHAR2(70)) AS NMS
 FROM
 (
-    select i.changenumber+1 as changenumber,
+    select (select changenumber from imp_object_mfo where object_name = 'ACCOUNTS' and rownum = 1) as changenumber,
             acc,
             branch,
             c.kf,
@@ -48,7 +48,6 @@ FROM
             ob22,
             nms
     from bars_dm.dm_accounts c
-    cross join (select * from bars_intgr.imp_object_mfo where object_name = 'ACCOUNTS' and rownum = 1) i 
     where c.per_id = bars_dm.dm_import.get_period_id('MONTH', trunc(sysdate))
     and bars_intgr.xrm_import.get_import_mode('ACCOUNTS') = 'FULL'
     union all

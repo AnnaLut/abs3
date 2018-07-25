@@ -310,6 +310,7 @@
 
             angular.element(document).ready(function () {
                 $scope.bindModel();
+				$scope.$apply();
             });
 
             $scope.changeLegalIndex = function () {

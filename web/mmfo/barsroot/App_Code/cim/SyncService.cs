@@ -145,7 +145,7 @@ namespace barsroot.cim
             {
                 OracleCommand cmd = con.CreateCommand();
                 cmd.Parameters.Add("p_start_date", OracleDbType.Date, startDate, ParameterDirection.Input);
-                cmd.CommandText = "select c.*, RAWTOHEX (c.line_hash) line_hash_hex from cim_f98 c where least(nvl(delete_date,modify_date), modify_date) > :p_start_date and rownum < 1000";
+                cmd.CommandText = "select c.*, RAWTOHEX (c.line_hash) line_hash_hex from cim_f98 c where greatest(nvl(delete_date,modify_date), modify_date) > :p_start_date and rownum < 1000";
                 var adapter = new OracleDataAdapter(cmd);
                 var dt = new DataTable(table_name);
                 adapter.Fill(dt);

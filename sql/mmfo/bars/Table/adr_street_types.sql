@@ -1,60 +1,110 @@
--- ======================================================================================
--- Module : ADR
--- Author : BAA
--- Date   : 22.01.2016
--- ======================================================================================
--- create table ADR_STREET_TYPES
--- ======================================================================================
 
-SET SERVEROUTPUT ON SIZE UNLIMITED FORMAT WRAPPED
-SET ECHO         OFF
-SET LINES        500
-SET PAGES        500
-SET FEEDBACK     OFF
 
-prompt -- ======================================================
-prompt -- create Table ADR_STREET_TYPES
-prompt -- ======================================================
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/ADR_STREET_TYPES.sql =========*** Run 
+PROMPT ===================================================================================== 
 
-begin
-  BPA.ALTER_POLICY_INFO( 'ADR_STREET_TYPES', 'WHOLE' , NULL, NULL, NULL, NULL );
-  BPA.ALTER_POLICY_INFO( 'ADR_STREET_TYPES', 'FILIAL', null, null, null, null );
-end;
+
+PROMPT *** ALTER_POLICY_INFO to ADR_STREET_TYPES ***
+
+
+BEGIN 
+        execute immediate  
+          'begin  
+               bpa.alter_policy_info(''ADR_STREET_TYPES'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''ADR_STREET_TYPES'', ''WHOLE'' , null, null, null, null);
+               null;
+           end; 
+          '; 
+END; 
 /
 
-begin
-  execute immediate 'CREATE TABLE BARS.ADR_STREET_TYPES
-( STR_TP_ID     number(3)      NOT NULL
-, STR_TP_NM     varchar2(12)   NOT NULL
-, STR_TP_NM_RU  varchar2(12)
-, CONSTRAINT PK_STREETTYPES PRIMARY KEY (STR_TP_ID) USING INDEX  TABLESPACE BRSSMLI
-) TABLESPACE BRSSMLD';
-  
-  dbms_output.put_line('Table BARS.ADR_STREET_TYPES created.');
-  
-exception
-  when OTHERS then 
-    if (sqlcode = -00955)
-    then dbms_output.put_line('Table BARS.ADR_STREET_TYPES already exists.');
-    else raise;
-    end if;  
-end;
+PROMPT *** Create  table ADR_STREET_TYPES ***
+begin 
+  execute immediate '
+  CREATE TABLE BARS.ADR_STREET_TYPES 
+   (	STR_TP_ID NUMBER(3,0), 
+	STR_TP_NM VARCHAR2(12), 
+	STR_TP_NM_RU VARCHAR2(12),
+	STR_TP_NM_ENG varchar2(50),
+	STR_TP_CODE_ENG varchar2(50)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE BRSDYND ';
+exception when others then       
+  if sqlcode=-955 then null; else raise; end if; 
+end; 
 /
 
-SET FEEDBACK ON
 
-prompt -- ======================================================
-prompt -- Table comments
-prompt -- ======================================================
 
-COMMENT ON TABLE  BARS.ADR_STREET_TYPES              IS 'Довідник типів вулиць';
+begin
+    execute immediate 'alter table adr_street_types
+ add STR_TP_NM_ENG varchar2(50)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
 
-COMMENT ON COLUMN BARS.ADR_STREET_TYPES.STR_TP_ID    IS 'Ід.   типу вулиці';
-COMMENT ON COLUMN BARS.ADR_STREET_TYPES.STR_TP_NM    IS 'Назва типу вулиці';
+
+begin
+    execute immediate 'alter table adr_street_types
+ add STR_TP_CODE_ENG varchar2(50)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+
+
+
+PROMPT *** ALTER_POLICIES to ADR_STREET_TYPES ***
+ exec bpa.alter_policies('ADR_STREET_TYPES');
+
+
+COMMENT ON TABLE BARS.ADR_STREET_TYPES IS 'Довідник типів вулиць';
+COMMENT ON COLUMN BARS.ADR_STREET_TYPES.STR_TP_ID IS 'Ід.   типу вулиці';
+COMMENT ON COLUMN BARS.ADR_STREET_TYPES.STR_TP_NM IS 'Назва типу вулиці';
 COMMENT ON COLUMN BARS.ADR_STREET_TYPES.STR_TP_NM_RU IS 'Назва типу вулиці';
 
-prompt -- ======================================================
-prompt -- Table grants
-prompt -- ======================================================
 
-GRANT SELECT ON BARS.ADR_STREET_TYPES TO START1, BARSUPL, UPLD;
+
+
+
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADR_STREET_TYPES MODIFY (STR_TP_ID NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+
+begin   
+ execute immediate '
+  ALTER TABLE BARS.ADR_STREET_TYPES MODIFY (STR_TP_NM NOT NULL ENABLE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+PROMPT *** Create  grants  ADR_STREET_TYPES ***
+grant SELECT                                                                 on ADR_STREET_TYPES to BARSUPL;
+grant SELECT                                                                 on ADR_STREET_TYPES to BARS_ACCESS_DEFROLE;
+grant SELECT                                                                 on ADR_STREET_TYPES to START1;
+grant SELECT                                                                 on ADR_STREET_TYPES to UPLD;
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ADR_STREET_TYPES.sql =========*** End 
+PROMPT ===================================================================================== 

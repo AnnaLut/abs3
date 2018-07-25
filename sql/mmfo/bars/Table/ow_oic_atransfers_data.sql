@@ -236,6 +236,17 @@ end if;
 end; 
 /
 
+begin
+    execute immediate 'alter table OW_OIC_ATRANSFERS_DATA add state number(5)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+
+comment on column OW_OIC_ATRANSFERS_DATA.state
+  is 'Статус(0-в обробку, 99-вилучити з обробки)';
+  
 PROMPT *** Create  grants  OW_OIC_ATRANSFERS_DATA ***
 grant SELECT,UPDATE                                                          on OW_OIC_ATRANSFERS_DATA to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on OW_OIC_ATRANSFERS_DATA to BARS_DM;

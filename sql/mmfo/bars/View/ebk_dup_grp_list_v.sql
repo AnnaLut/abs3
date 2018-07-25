@@ -1,14 +1,12 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/EBK_DUP_GRP_LIST_V.sql =========*** Run
 PROMPT ===================================================================================== 
 
-
 PROMPT *** Create  view EBK_DUP_GRP_LIST_V ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.EBK_DUP_GRP_LIST_V ("KF", "M_RNK", "QTY_D_RNK", "CARD_QUALITY", "OKPO", "NMK", "BIRTH_DAY", "DOCUMENT", "GROUP_ID", "PRODUCT", "LAST_MODIFC_DATE", "BRANCH") AS 
-  select a.KF,
+create or replace force view EBK_DUP_GRP_LIST_V ("KF", "M_RNK", "QTY_D_RNK", "CARD_QUALITY", "OKPO", "NMK", "BIRTH_DAY", "DOCUMENT", "GROUP_ID", "PRODUCT", "LAST_MODIFC_DATE", "BRANCH")
+AS
+select a.KF,
        a.m_rnk,
        a.qty_d_rnk,
        a.card_quality,
@@ -36,13 +34,14 @@ PROMPT *** Create  view EBK_DUP_GRP_LIST_V ***
                ebk_dup_wform_utl.get_group_id(edg.m_rnk,edg.kf) as group_id,
                ebk_dup_wform_utl.get_last_modifc_date(edg.m_rnk) as last_modifc_date,
                c.branch
-          from ( select M_RNK
-                      , KF
-                      , count(d_rnk) as qty_d_rnk /* кол-во открытых дубликатов */
-                   from EBK_DUPLICATE_GROUPS
-                  where not exists (select null from CUSTOMER where rnk = d_rnk and date_off is not null)
-                    and KF = SYS_CONTEXT('BARS_CONTEXT','USER_MFO')
-                  group by M_RNK, KF
+          from ( select g.M_RNK
+                      , g.KF
+                      , count(g.D_RNK) as qty_d_rnk /* кол-во открытых дубликатов */
+                   from EBK_DUPLICATE_GROUPS g -- EBKC_DUPLICATE_GROUPS g
+                  where g.KF = SYS_CONTEXT('BARS_CONTEXT','USER_MFO')
+--                  and g.CUST_TYPE = 'I'
+                    and exists ( select null from CUSTOMER c where c.KF = g.KF and c.RNK = g.D_RNK and c.DATE_OFF is null )
+                  group by g.M_RNK, g.KF
                ) edg
           join CUSTOMER c
             on ( c.KF = edg.KF and c.RNK = edg.M_RNK )
@@ -50,13 +49,10 @@ PROMPT *** Create  view EBK_DUP_GRP_LIST_V ***
       ) a
 ;
 
-PROMPT *** Create  grants  EBK_DUP_GRP_LIST_V ***
-grant SELECT                                                                 on EBK_DUP_GRP_LIST_V to BARSREADER_ROLE;
-grant SELECT                                                                 on EBK_DUP_GRP_LIST_V to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on EBK_DUP_GRP_LIST_V to UPLD;
+show errors;
 
+PROMPT *** Create grants EBK_DUP_GRP_LIST_V ***
 
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/EBK_DUP_GRP_LIST_V.sql =========*** End
-PROMPT ===================================================================================== 
+grant SELECT on EBK_DUP_GRP_LIST_V to BARSREADER_ROLE;
+grant SELECT on EBK_DUP_GRP_LIST_V to BARS_ACCESS_DEFROLE;
+grant SELECT on EBK_DUP_GRP_LIST_V to UPLD;

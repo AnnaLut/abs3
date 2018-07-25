@@ -546,6 +546,7 @@
                 $scope.disabledHouse = !mailModel.SETTLEMET_NAME || !mailModel.REGION_NAME || mailModel.SECTION || mailModel.ROOM ? true : false;
                 $scope.disabledSection = !mailModel.HOUSE_NUM_FULL || !mailModel.SETTLEMET_NAME || !mailModel.REGION_NAME ? true : false;
                 $scope.disabledRoom = !mailModel.HOUSE_NUM_FULL || !mailModel.SETTLEMET_NAME || !mailModel.REGION_NAME ? true : false;
+				$scope.$apply();
             }
 
             $scope.selectedRegion = function (data) {

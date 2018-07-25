@@ -323,16 +323,17 @@ namespace BarsWeb.Areas.KFiles.Controllers
 
         }
 
-        public ViewResult DataKFiles(V_OB_CORPORATION_DATA_DOCS data)
-        {
+        public ViewResult DataKFiles(Int64? d_sess_id, Int64? d_acc, string d_kf, Int64? d_ref, string d_dk)
+        {   int dk;
+            dk = d_dk == "Дт" ? 0 : 1;
             try
             {
-                var serializer = new JavaScriptSerializer();
-                ViewBag.Data = serializer.Serialize(data);
+                List<OB_CORP_DATA_SAL_DOC> data =_kfRepository.GetSalDoc(d_sess_id, d_acc, d_kf, d_ref, dk);
+                ViewBag.Data = new JavaScriptSerializer().Serialize(data.FirstOrDefault());
             }
-            catch
+            catch (Exception ex)
             {
-                ViewBag.Data = null;
+            ViewBag.Data = new JavaScriptSerializer().Serialize(ex.Message);
             }
             return View();
         }

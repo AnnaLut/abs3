@@ -720,7 +720,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR2 as
             raise_application_error(-20000, 'Неочікуваний тип контракту {' || p_contract_type || '}');
         end if;
 
-        l_income_account_number := mbk.get_income_account(l_balance_account, p_party_id, p_currency_code);
+        --l_income_account_number := mbk.get_income_account(l_balance_account, p_party_id, p_currency_code);
+        l_income_account_number := cdb_mediator.get_income_account(l_balance_account, p_party_id, p_currency_code);
         if (l_income_account_number is null) then
             raise_application_error(-20000,
                                     'Не вдалось визначити рахунок доходів/витрат за процентами для філіалу {' || p_party_mfo ||
@@ -853,7 +854,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR2 as
 
         l_customer_row := customer_utl.read_customer(p_partner_id);
 
-        l_income_account_number := mbk.get_income_account(l_balance_account, p_partner_id, p_currency_code);
+        l_income_account_number := cdb_mediator.get_income_account(l_balance_account, p_partner_id, p_currency_code);
         if (l_income_account_number is null) then
             raise_application_error(-20000,
                                     'Не вдалось визначити рахунок доходів/витрат за процентами для філіалу {' || l_custbank_row.mfo ||

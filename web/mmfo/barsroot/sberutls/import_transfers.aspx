@@ -43,7 +43,7 @@
                 <td class="title">
                     <asp:Panel runat="server" GroupingText="Тип файлу">
                         <asp:RadioButton runat="server" Text="Профікс" ID="cbProfix" GroupName="type" Checked="True" />
-                        <asp:RadioButton runat="server" Text="GlobalMoney" ID="cbGlobalMoney" GroupName="type" />
+                        <asp:RadioButton runat="server" Text="Швидка Копійка" ID="cbGlobalMoney" GroupName="type" />
                     </asp:Panel>
                 </td>
             </tr>

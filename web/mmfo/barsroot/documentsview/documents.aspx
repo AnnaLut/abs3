@@ -116,7 +116,8 @@
                     <tr>
                         <td nowrap style="font-weight: bold; font-size: 10pt; padding-bottom: 5px; width: 1%; border-bottom: black 2px solid; font-family: Arial">
                             <div id="lb_DocTitles" style="display: inline">Документы</div>
-                            <div id="lb_DocCount" style="display: inline" />
+                            <div id="lb_DocCount" style="display: inline"></div>
+                            <div id="lb_DocCountSelected" style="display: none"></div>
                         </td>
                     </tr>
                     <tr>

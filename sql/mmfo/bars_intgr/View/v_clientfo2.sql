@@ -200,7 +200,7 @@ CAST (SAB as VARCHAR2(6)) AS SAB,
 CAST (VIP_ACCOUNT_MANAGER as VARCHAR2(500)) AS VIP_ACCOUNT_MANAGER
 FROM
 (
-    select i.changenumber + 1 as changenumber
+    select (select changenumber from imp_object_mfo where object_name = 'CLIENTFO2' and rownum = 1) as changenumber
     ,last_name
     ,first_name
     ,middle_name
@@ -399,7 +399,6 @@ FROM
     ,sab
     ,vip_account_manager
     from bars_dm.customers_plt c
-    cross join (select * from bars_intgr.imp_object_mfo where object_name = 'CLIENTFO2' and rownum = 1) i
     where c.per_id = bars_dm.dm_import.get_period_id('MONTH', trunc(sysdate))
     and bars_intgr.xrm_import.get_import_mode('CLIENTFO2') = 'FULL'
     union all

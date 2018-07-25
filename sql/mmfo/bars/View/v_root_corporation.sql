@@ -7,9 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ROOT_CORPORATION ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ROOT_CORPORATION ("ID", "EXTERNAL_ID", "CORPORATION_NAME") AS 
-  select t.ID, t.EXTERNAL_ID, t.CORPORATION_NAME from OB_CORPORATION t where t.PARENT_ID is null and t.STATE_ID=1
-;
+CREATE OR REPLACE FORCE VIEW BARS.V_ROOT_CORPORATION (ID, EXTERNAL_ID, CORPORATION_NAME) AS 
+  select t.ID, t.EXTERNAL_ID, t.CORPORATION_NAME from OB_CORPORATION t where t.PARENT_ID is null and t.STATE_ID=1;
 
 PROMPT *** Create  grants  V_ROOT_CORPORATION ***
 grant SELECT                                                                 on V_ROOT_CORPORATION to BARSREADER_ROLE;

@@ -1,5 +1,11 @@
-alter table meta_month 
-add  NAME_ENG varchar(10);
+begin
+    execute immediate 'alter table meta_month 
+        add  NAME_ENG varchar(10)';
+    exception when others then 
+     if sqlcode = -1430 then null; else raise; 
+     end if; 
+end;
+/ 
 
 update meta_month
  set name_eng ='january'

@@ -160,7 +160,31 @@ exception when others then
 /
 
 
+prompt ... 
 
+
+-- Add/modify columns 
+begin
+    execute immediate 'alter table OW_OIC_DOCUMENTS_DATA add failures_count number(5)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+-- Add/modify columns 
+begin
+    execute immediate 'alter table OW_OIC_DOCUMENTS_DATA add state number(5)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+-- Add comments to the columns 
+comment on column OW_OIC_DOCUMENTS_DATA.failures_count
+  is 'Кількість невдалих спроб оплати документу.';
+
+comment on column OW_OIC_DOCUMENTS_DATA.state
+  is 'Статус(0-в обробку, 99-вилучити з обробки)';
 PROMPT *** Create  grants  OW_OIC_DOCUMENTS_DATA ***
 grant SELECT                                                                 on OW_OIC_DOCUMENTS_DATA to BARSREADER_ROLE;
 grant SELECT,UPDATE                                                          on OW_OIC_DOCUMENTS_DATA to BARS_ACCESS_DEFROLE;

@@ -1,0 +1,139 @@
+﻿@{    
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
+<script src="@Url.Content("~/Areas/MBDK/Scripts/portfolio.js?v.1.4")"></script>
+<h1 style="padding-bottom: 0px; padding-top: 0px;">Портфель НОСТРО-рахунків</h1>
+<style>
+    .k-grid .k-grid-header .k-header {
+        white-space: normal;
+    }
+
+    .k-grid td {
+        white-space: nowrap;
+        border-bottom: 1px solid black;
+        padding: .19em .6em;
+    }
+
+    div.k-grid .k-selectable a {
+        TEXT-DECORATION: underline;
+        COLOR: rgb(51,153,255);
+    }
+
+    div.k-grid .k-selectable tr.k-state-selected a {
+        TEXT-DECORATION: underline;
+        COLOR: white;
+    }
+
+    .k-grid-filter.k-state-active {
+        background-color: lightslategray;
+    }
+
+    div.k-grid .k-selectable tr.k-state-selected {
+        background-color: #428bca;
+    }
+
+    .k-grid-header th.k-with-icon .k-link {
+        margin-right: 7px;
+    }
+
+    .k-edit-form-container{
+        width: auto;
+    }
+
+    .nostro-table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        margin-left: 10px;
+    }
+    .second_label {
+        margin-left: 5px;
+    }
+
+    .k-popup .k-list .k-item {
+        line-height: 1.5em;
+        min-height: 1.3em;
+    }
+
+    .k-grid-content {
+        min-height: 100px;
+    }
+
+    .fixed-header {
+        top: 0;
+        position: fixed;
+        width: 100%;
+        z-index: 1;
+    }
+
+</style>
+
+<div style="margin-top: 5px">
+    <div id="gridPortfolio" class="fixed_headers"></div>
+</div>
+
+<script id="popup-editor" type="text/x-kendo-template">
+    <table class="nostro-table edit_nostro">
+        <tr>
+            <td>
+                <label for="ND">Реф. угоди:  </label>
+                <input class="k-input edit_field" name="ND" id="ND" data-bind="value:ND" style="width:100px" />
+                <label class="second_label" for="CC_ID">№ Угоди:  </label>
+                <input class="k-input edit_field" name="CC_ID" id="CC_ID" data-bind="value:CC_ID" style="width:150px" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="SDATE">Дата початку:  </label>
+                <input name="SDATE" id="SDATE" class="edit_field" data-bind="value:SDATE" style="width:100px" />
+                <label class="second_label" for="WDATE">Дата закінчення:  </label>
+                <input name="WDATE" id="WDATE" class="edit_field" data-bind="value:WDATE" style="width:100px" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="LIMIT">Поточний ліміт:  </label>
+                <input class="k-input edit_field" name="LIMIT" id="LIMIT" data-bind="value:LIMIT" style="width:120px" />
+                <label class="second_label" for="SOS">Стан:  </label>
+                <input class="k-input edit_field" name="SOS" id="SOS" data-bind="value:SOS" style="width:80px" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="FIN_351">Клас боржн.(пост.351):</label>
+                <input name="FIN_351" id="FIN_351" class="edit_field" data-bind="value:FIN_351" style="width:80px" />
+                <label class="second_label" for="PD">Ймовір. дефолту : </label>
+                <input class="k-input edit_field" name="PD" id="PD" data-bind="value:PD" style="width:80px; padding-left: 5px" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="FIN23">Фін стан:  </label>
+                <input id="FIN23" class="edit_field" style="width:100px" />
+                <label for="OBS23">Обслуг. боргу :  </label>
+                <input id="OBS23" class="edit_field" style="width:130px" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="KAT23">Кат. ризику:  </label>
+                <input id="KAT23" class="edit_field" style="width:130px" />
+            </td>
+        </tr>
+    </table>
+    <table class="nostro-table new_nostro">
+        <tr>
+            <td>
+                <label for="KV">Валюта :   </label>
+                <input id="KV" class="new_field" style="width:250px"  />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="NLS">Рахунок :  </label>
+                <input class="k-input new_field" name="NLS" id="NLS" style="width:150px; padding-left: 5px"  />
+            </td>
+        </tr>
+    </table>
+</script>
+   

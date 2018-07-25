@@ -1,9 +1,11 @@
 ﻿@{
         Layout = "~/Views/Shared/_LayoutPartinal.cshtml";
 }
+<script src="~/Scripts/Angular/angular.min.js"></script>
 <script src="~/Areas/KFiles/Scripts/DataKFilesCtrl.js"></script>
+
 <input type="hidden" value="@ViewBag.Data" id="dataview"  />
-<div ng-controller="KFiles.DataKFilesCtrl">
+<div ng-app="BarsWeb.Areas" ng-controller="KFiles.DataKFilesCtrl">
     <form>
     <div class="panel-group panel-horizontal">
         <div class="panel panel-default grey-color">
@@ -165,7 +167,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12 col-ms-12 col-xs-12 col-lg-12">
-                    <input type="text" class="k-textbox" readonly ng-model="model.sumfull"/>
+                    <input type="text" class="k-textbox" readonly ng-model="model.nazn"/>
                 </div>               
             </div>            
         </div>

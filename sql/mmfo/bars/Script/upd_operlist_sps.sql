@@ -8,5 +8,4 @@ where codeoper = k.codeoper;
 commit; 
 end loop;
 end;
-
 /

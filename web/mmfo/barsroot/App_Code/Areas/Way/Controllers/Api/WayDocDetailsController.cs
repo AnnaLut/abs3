@@ -60,6 +60,16 @@ namespace BarsWeb.Areas.Way.Controllers.Api
                     case "R_DOCUMENTS_REV":
                         // todo: add !!!!!
                         break;
+                    case "DOCUMENTSDEL":
+                        noProccessedFiles = _repository.DeletedDocuments(id).ToList();
+                        break;
+                    case "ATRANSFERSDEL":
+                    case "FTRANSFERSDEL":
+                        noProccessedFiles = _repository.DeletedAFtransfers(id).ToList();
+                        break;
+                    case "STRANSFERSDEL":
+                        noProccessedFiles = _repository.DeletedStransfers(id).ToList();
+                        break;
                 }
                 
                 if(noProccessedFiles == null)

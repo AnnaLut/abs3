@@ -446,5 +446,27 @@ where 1=1
             IQueryable<Corporation_SALDO> data = _entities.ExecuteStoreQuery<Corporation_SALDO>(query).AsQueryable();
             return data;
         }
+		
+		
+		public List<OB_CORP_DATA_SAL_DOC> GetSalDoc(Int64? d_sess_id, Int64? d_acc, string d_kf, Int64? d_ref, int? d_dk)
+        {
+            List<Object> parameters = new List<Object>()
+                {
+                    new OracleParameter("d_sess_id",OracleDbType.Int64){ Value = d_sess_id},
+                    new OracleParameter("d_acc",OracleDbType.Int64){ Value = d_acc},
+                    new OracleParameter("d_kf",OracleDbType.Varchar2,255){ Value = d_kf},
+                    new OracleParameter("d_ref",OracleDbType.Int64){ Value = d_ref},
+                    new OracleParameter("d_dk",OracleDbType.Int32){ Value = d_dk}
+                };
+            String query = "select  d.ND, d.VOB, TO_CHAR(d.postdat, 'hh24miss') AS T_DOC, "+
+                           "(select kv from ob_corp_data_acc a where a.sess_id = d.sess_id and a.acc = d.acc) as KV, "+
+                           "d.TT, d.MFOA, getbankname(d.mfoa) AS NAMBA, d.NLSA, d.KVA, d.OKPOA, d.NAMA, d.MFOB, "+
+                           "getbankname(d.mfob) AS NAMBB, d.NLSB, d.KVB, d.OKPOB, d.NAMB, d.S, d.sq, d.nazn "+
+                           "from ob_corp_data_doc d "+
+                           "where d.sess_id = :d_sess_id and d.acc = :d_acc and d.kf = :d_kf and d.ref = :d_ref and d.dk = :d_dk";
+            List<OB_CORP_DATA_SAL_DOC> data = _entities.ExecuteStoreQuery<OB_CORP_DATA_SAL_DOC>(query, parameters.ToArray()).ToList();
+            return data;
+
+        }
     }
 }

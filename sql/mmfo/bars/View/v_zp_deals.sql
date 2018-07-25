@@ -53,10 +53,10 @@ SELECT z.id,
                       (SELECT MAX (pr)
                          FROM tarif_scale
                         WHERE kod = z.kod_tarif AND kf = z.kf AND t.tip = 1),
-                      '90D99')
+                      'FM90D9999')
                 || ' %'
              ELSE
-                TO_CHAR (t.pr, '90D99') || ' %'
+                TO_CHAR (t.pr, 'FM90D9999') || ' %'
           END
              max_tarif,
           CASE

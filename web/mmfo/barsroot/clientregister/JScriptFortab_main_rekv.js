@@ -45,7 +45,9 @@ $(document).ready(function () {
     $('#ed_NMKK').change(function () { $(this).removeClass('err').attr('title', ''); });
     $('#ed_NMKV').change(function () { $(this).removeClass('err').attr('title', ''); });
     $('#ed_OKPO').change(function () { $(this).removeClass('err').attr('title', ''); });
-    $('#ed_ADR').change(function () { $(this).removeClass('err').attr('title', '');; });
+    $('#ed_ADR').change(function () {
+        $(this).removeClass('err').attr('title', this.val());
+    });
     //якщор клієнт не фізична особа резидент то зменшуємо довжину поля до 9
     /*if ((parent.obj_Parameters['CUSTTYPE'] == 'person' && rezId == 2) || (parent.obj_Parameters['CUSTTYPE']!='person') )
         $('#ed_OKPO').attr('maxlength','9');*/
@@ -669,6 +671,8 @@ function InitObjects() {
         $get('ed_ADR').value = parent.obj_Parameters['fullADR'].type1.locality + ', ' + parent.obj_Parameters['fullADR'].type1.address;
     else
         $get('ed_ADR').value = parent.obj_Parameters['ADR'];
+    var strFullAdr = $('#ed_ADR').val();
+    $('#ed_ADR').attr('title', strFullAdr);
     //значения едитов
     if (parent.obj_Parameters['EditType'] != "Reg" || parent.isRegisterByScb()) {
         $get('ed_DATE_OFF').value = parent.obj_Parameters['DATE_OFF'];

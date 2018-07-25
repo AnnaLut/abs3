@@ -156,23 +156,21 @@ namespace Bars.WebServices.XRM.Services.Card
                     cmdBulkCardTicket.Parameters.Clear();
                     cmdBulkCardTicket.BindByName = true;
                     cmdBulkCardTicket.Parameters.Add("p_bulkid", OracleDbType.Varchar2, XRMBulkCardTicketReq.BulkID, ParameterDirection.Input);
-                    cmdBulkCardTicket.Parameters.Add("p_bulkstatus", OracleDbType.Varchar2, 400, XRMBulkCardTicketRes.ResultMessage, ParameterDirection.Output);
+                    cmdBulkCardTicket.Parameters.Add("p_resultcode", OracleDbType.Decimal, XRMBulkCardTicketRes.ResultCode, ParameterDirection.Output);
+                    cmdBulkCardTicket.Parameters.Add("p_resultmessage", OracleDbType.Varchar2, 400, XRMBulkCardTicketRes.ResultMessage, ParameterDirection.Output);
                     cmdBulkCardTicket.Parameters.Add("p_ticket", OracleDbType.Clob, null, ParameterDirection.Output);
 
-
                     cmdBulkCardTicket.ExecuteNonQuery();
-                    object res = cmdBulkCardTicket.Parameters["p_bulkstatus"].Value;
-                    XRMBulkCardTicketRes.ResultMessage = ((OracleString)res).Value;
-                    object ticket = cmdBulkCardTicket.Parameters["p_ticket"].Value;
-                    string s = ((OracleClob)ticket).IsNull ? ((OracleString)res).Value : ((OracleClob)ticket).Value;
-                    if (s != XRMBulkCardTicketRes.ResultMessage)
-                    {
-                        byte[] bytes = new byte[s.Length * sizeof(char)];
-                        System.Buffer.BlockCopy(s.ToCharArray(), 0, bytes, 0, bytes.Length);
+                    OracleDecimal resCode = (OracleDecimal)cmdBulkCardTicket.Parameters["p_resultcode"].Value;
+                    OracleString resMsg = (OracleString)cmdBulkCardTicket.Parameters["p_resultmessage"].Value;
 
-                        XRMBulkCardTicketRes.Ticket = s;
+                    XRMBulkCardTicketRes.ResultCode = resCode.IsNull ? 0 : (int)resCode.Value;
+                    XRMBulkCardTicketRes.ResultMessage = resMsg.IsNull ? "" : resMsg.Value;
+
+                    using (OracleClob ticket = (OracleClob)cmdBulkCardTicket.Parameters["p_ticket"].Value)
+                    {
+                        XRMBulkCardTicketRes.Ticket = ticket.IsNull ? "" : ticket.Value;
                     }
-                    XRMBulkCardTicketRes.ResultCode = 0;
                 }
                 catch (SystemException e)
                 {

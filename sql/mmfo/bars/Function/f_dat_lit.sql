@@ -18,12 +18,28 @@ BEGIN
      INTO dd_, mm_, yyyy_
      FROM dual;
 
-   SELECT '" '||substr('00'||dd_,-2)||' "'||' '||
-          decode(lang_,'R',m.name_rus_from,m.name_from)||' '||
-          yyyy_||'ð.'
+  IF lang_ = 'U' THEN 
+    
+   SELECT '" '||substr('00'||dd_,-2)||' "'||' '|| m.name_from||' '||yyyy_||'ð.'
      INTO sDAT_
      FROM meta_month m
     WHERE m.n=to_number(mm_);
+    
+  ELSIF lang_ = 'R' THEN 
+   
+   SELECT '" '||substr('00'||dd_,-2)||' "'||' '|| m.name_rus_from||' '||yyyy_||'ã.'
+     INTO sDAT_
+     FROM meta_month m
+    WHERE m.n=to_number(mm_);
+   
+  ELSIF lang_ = 'ENG' THEN 
+   
+   SELECT '" '||substr('00'||dd_,-2)||' "'||' '|| m.NAME_ENG||' '||yyyy_||''
+     INTO sDAT_
+     FROM meta_month m
+    WHERE m.n=to_number(mm_);
+ 
+  END IF;
 
    RETURN sDAT_;
 END F_DAT_LIT;

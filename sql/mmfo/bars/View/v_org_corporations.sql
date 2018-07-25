@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_ORG_CORPORATIONS ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_ORG_CORPORATIONS ("BASE_EXTID", "BASE_CORP_NAME", "ID", "EXTERNAL_ID", "CORPORATION_NAME", "PARENT_ID", "STATE_ID", "CORPORATION_CODE") AS 
+CREATE OR REPLACE FORCE VIEW BARS.V_ORG_CORPORATIONS (BASE_EXTID, BASE_CORP_NAME, ID, EXTERNAL_ID, CORPORATION_NAME, PARENT_ID, STATE_ID, CORPORATION_CODE) AS 
   select --connect_by_root ID as base_id,
        connect_by_root EXTERNAL_ID as base_extid,
        connect_by_root CORPORATION_NAME as base_corp_name,
@@ -19,8 +19,7 @@ PROMPT *** Create  view V_ORG_CORPORATIONS ***
        t.corporation_code
   from OB_CORPORATION t
 start with t.PARENT_ID is null
-connect by prior id = parent_id
-;
+connect by prior id = parent_id;
 
 PROMPT *** Create  grants  V_ORG_CORPORATIONS ***
 grant SELECT                                                                 on V_ORG_CORPORATIONS to BARSREADER_ROLE;

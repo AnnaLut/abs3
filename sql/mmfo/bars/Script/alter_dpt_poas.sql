@@ -25,10 +25,10 @@ begin
 end;
 /
 
-COMMENT ON COLUMN BARS.DPT_POAS.POST_ENG IS 'РџРѕСЃР°РґР° РїС–РґРїРёСЃР°РЅС‚Р° РЅР° Р°РЅРіР».';
+COMMENT ON COLUMN BARS.DPT_POAS.POST_ENG IS 'Посада підписанта на англ.';
 
-COMMENT ON COLUMN BARS.DPT_POAS.TVBV_NUM IS 'N РўР’Р‘Р’';
+COMMENT ON COLUMN BARS.DPT_POAS.TVBV_NUM IS 'N ТВБВ';
 
-COMMENT ON COLUMN BARS.DPT_POAS.doc_basis IS 'Р”РѕРєСѓРјРµРЅС‚ РїС–РґСЃС‚Р°РІР°(РЅР°РєР°Р·/РґРѕРІС–СЂРµРЅС–СЃС‚СЊ)';
+COMMENT ON COLUMN BARS.DPT_POAS.doc_basis IS 'Документ підстава(наказ/довіреність)';
 
-COMMENT ON COLUMN BARS.DPT_POAS.doc_basis IS 'Р”РѕРєСѓРјРµРЅС‚ РїС–РґСЃС‚Р°РІР°(РЅР°РєР°Р·/РґРѕРІС–СЂРµРЅС–СЃС‚СЊ)';
+COMMENT ON COLUMN BARS.DPT_POAS.doc_basis IS 'Документ підстава(наказ/довіреність)';

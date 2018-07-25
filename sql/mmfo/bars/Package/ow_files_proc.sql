@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ow_files_proc.sql =========*** Run *
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.OW_FILES_PROC is
+CREATE OR REPLACE PACKAGE OW_FILES_PROC is
 
   -- Author  : VITALII.KHOMIDA
   -- Created : 09.08.2017 14:10:37
@@ -50,6 +50,10 @@
                          p_int_sign  in varchar2,
                          p_sep_sign  in varchar2);
 
+  procedure set_tran_state(p_fileid in number,
+                           p_idn    number,
+                           p_state  in number);
+
   -- функция формирования дод. реквизита «Way4 Код транзакції» на основании привязки счетов к договору
   function get_w4_msgcode(p_nls accounts.nls%type, p_kv accounts.kv%type)
 		return varchar2;
@@ -63,8 +67,9 @@
    function w4_form_sto return T_ow_iicfiles_form_lst;
    function w4_form return T_ow_iicfiles_form_lst;
 end;
+
 /
-CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
+CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 
   g_modcode       constant varchar2(3) := 'BPK';
   g_filetype_atrn constant varchar2(30) := 'ATRANSFERS';
@@ -108,7 +113,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
   -- счет 9900 для ГОУ
   g_nls9900     varchar2(14);
   -- бранч, который передается в CM
-  g_cm_branch   varchar2(30);
+  --g_cm_branch   varchar2(30);
 
 
 
@@ -744,7 +749,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
       l_recs(l_recs.last).id := p_fileid;
       l_recs(l_recs.last).idn := i + 1;
       l_recs(l_recs.last).work_flag := 0;
-
+      l_recs(l_recs.last).failures_count := 0;
       l_recs(l_recs.last).doc_localdate := to_date(dbms_xslprocessor.valueof(l_doc_item, 'LocalDt/text()'), 'yyyy-mm-dd hh24:mi:ss');
       l_nwdate := to_date(dbms_xslprocessor.valueof(l_doc_item, 'NWDt/text()'), 'yyyy-mm-dd hh24:mi:ss');
       l_recs(l_recs.last).cnt_contractnumber := substr(dbms_xslprocessor.valueof(l_doc_item, 'Destination/ContractNumber/text()'), 1, 100);
@@ -2393,7 +2398,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
   end parse_file;
 
   function get_file_list return t_files is
-    l_files t_files := t_files();
+    l_files t_files;
   begin
     select t.id, t.file_name, t.file_type, t.file_status, nvl(tt.type, 0) type, tt.offset, tt.offsetexpire
       bulk collect
@@ -2412,6 +2417,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
                                        ''));
      return l_files;
   end;
+  
+  function get_err_locpay_list return number_list is
+    l_files number_list;
+  begin
+    select t.id
+      bulk collect
+      into l_files
+      from ow_oic_documents_data t
+     where t.work_flag = 0 and t.failures_count <= 100 and t.err_text is not null
+       for update skip locked
+     order by 1;
+     return l_files;
+  end;  
 
   function lock_file (p_id in number) return boolean
   is
@@ -2660,6 +2678,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
 
   end;
 
+  procedure pay_error_locpay is
+    l_files number_list;
+  begin
+    l_files := get_err_locpay_list;
+    if l_files.count > 0 then
+      for c_fl in l_files.first .. l_files.last loop
+        pay_file(l_files(c_fl));
+      end loop;
+    end if;
+  end;
+   
+  
   procedure files_processing(p_kf     in varchar2,
                              p_userid in number default 1) is
     l_files t_files := t_files();
@@ -2679,7 +2709,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
       pay_files(l_files, false);
 
     end if;
-
+    -- намагаємося платити зависші платежі на вільні реквізити
+    pay_error_locpay;
+    
     bars_login.logout_user;
 
   end;
@@ -2844,6 +2876,50 @@ CREATE OR REPLACE PACKAGE BODY BARS.OW_FILES_PROC is
             rollback to sp_pay;
             l_info := 'Помилка при накладані візи '||substr(sqlerrm || ' - ' || dbms_utility.format_error_backtrace, 1, 1024);
             bars_audit.error('ow_files_proc.put_doc_sign: ref = '||p_ref||', error - '||l_info);
+  end;
+
+  procedure set_tran_state(p_fileid in number,
+                           p_idn    number,
+                           p_state  in number) is
+  
+    l_filetype varchar2(100);
+    h          varchar2(100) := 'ow_files_proc.set_tran_state. ';
+  begin
+  
+    bars_audit.info(h || 'Start: p_fileid=>' || to_char(p_fileid) || ' p_idn=>' || to_char(p_idn)||
+                    'p_state=>'||p_state);
+  
+    -- определяем тип файла
+    begin
+      select file_type into l_filetype from ow_files where id = p_fileid;
+    exception
+      when no_data_found then
+        bars_audit.error(h || 'File not found p_id=>' || to_char(p_fileid));
+        bars_error.raise_nerror(g_modcode, 'FILE_NOT_FOUND');
+    end;
+  
+    bars_audit.info(h || 'l_filetype=>' || l_filetype);
+  
+    if l_filetype in (g_filetype_atrn, g_filetype_ftrn) then
+      update ow_oic_atransfers_data t
+         set t.state = p_state
+       where t.id = p_fileid
+         and t.idn = p_idn;
+    elsif l_filetype = g_filetype_strn then
+      update ow_oic_stransfers_data t
+         set t.state = p_state
+       where t.id = p_fileid
+         and t.idn = p_idn;
+    elsif l_filetype = g_filetype_doc then
+      update ow_oic_documents_data t
+         set t.state = p_state
+       where t.id = p_fileid
+         and t.idn = p_idn;
+    end if;
+  
+    bars_audit.info(h || 'Finish.: p_id=>' || to_char(p_fileid) || ' p_idn=>' || to_char(p_idn)||
+                    'p_state=>'||p_state);
+  
   end;
 
 	-- функция формирования дод. реквизита «Way4 Код транзакції» на основании привязки счетов к договору

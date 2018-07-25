@@ -100,7 +100,13 @@ exception when others then
 end; 
 /
 
-
+-- Add/modify columns 
+begin
+  for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'OW_BATCH_OPEN_DATA' and COLUMN_NAME = 'EXT_ID')) loop
+    execute immediate 'alter table OW_BATCH_OPEN_DATA add ext_id varchar2(300)';
+  end loop;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to OW_BATCH_OPEN_DATA ***

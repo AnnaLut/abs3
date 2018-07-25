@@ -198,9 +198,12 @@
           </xsl:attribute>
 
           <TD style="padding:0">
-            <input id="mainChBox" type="checkbox" style="margin:0px;" onclick="editArrayForPrint(this);" >
+            <input id="mainChBox" type="checkbox" style="margin:0px;" onclick="editArrayForPrint(this); editSelectedSumsArray(this);" >
               <xsl:attribute name="data-ref">
                 <xsl:value-of select="REF" />
+              </xsl:attribute>
+              <xsl:attribute name="data-sum">
+                <xsl:value-of select="S_" />
               </xsl:attribute>
             </input>
           </TD>

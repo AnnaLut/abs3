@@ -1,226 +1,204 @@
-set serveroutput on
-
 declare
+  type t_rec_metaextrnval is record (
+     tabid      meta_extrnval.tabid%type,
+     colid      meta_extrnval.colid%type,
+     srccolname meta_columns.colname%type,
+     tab_alias  meta_extrnval.tab_alias%type,
+     tab_cond   meta_extrnval.tab_cond%type,
+     src_cond   meta_extrnval.src_cond%type);
+  type t_tab_metaextrnval is table of t_rec_metaextrnval;
+  l_arr_metaextrnval t_tab_metaextrnval := t_tab_metaextrnval();
 
-  type t_rec_extrnval is record (
-    tabid            meta_extrnval.tabid%type,
-    colid            meta_extrnval.colid%type,
-    srccolname       meta_columns.colname%type,
-    tab_alias        meta_extrnval.tab_alias%type,
-    tab_cond         meta_extrnval.tab_cond%type,
-    src_cond         meta_extrnval.src_cond%type,
-    col_dyn_tabname  varchar2(30));
-  type t_tab_extrnval is table of t_rec_extrnval;
-  l_extrnval     t_tab_extrnval := t_tab_extrnval();
+  type t_rec_metabrowsetbl is record (
+     hosttabid   meta_browsetbl.hosttabid%type,
+     hostcolid   meta_browsetbl.hostcolkeyid%type,
+     addcolname  meta_columns.colname%type,
+     varcolname  meta_columns.colname%type,
+     addtabalias meta_browsetbl.addtabalias%type,
+     cond_tag    meta_browsetbl.cond_tag%type);
+  type t_tab_metabrowsetbl is table of t_rec_metabrowsetbl;
+  l_arr_metabrowsetbl t_tab_metabrowsetbl := t_tab_metabrowsetbl();
 
-  type t_rec_browsetbl is record (
-    hosttabid   meta_browsetbl.hosttabid%type,
-    hostcolid   meta_browsetbl.hostcolkeyid%type,
-    addcolname  meta_columns.colname%type,
-    varcolname  meta_columns.colname%type,
-    addtabalias meta_browsetbl.addtabalias%type,
-    cond_tag    meta_browsetbl.cond_tag%type);
-  type t_tab_browsetbl is table of t_rec_browsetbl;
-  l_browsetbl    t_tab_browsetbl := t_tab_browsetbl();
+  type t_rec_metafiltertbl is record (
+     tabid    meta_filtertbl.tabid%type,
+     colid    meta_filtertbl.colid%type,
+     fltcode  meta_filtertbl.filter_code%type,
+     flag_ins meta_filtertbl.flag_ins%type,
+     flag_del meta_filtertbl.flag_del%type,
+     flag_upd meta_filtertbl.flag_upd%type);
+  type t_tab_metafiltertbl is table of t_rec_metafiltertbl;
+  l_arr_metafiltertbl t_tab_metafiltertbl := t_tab_metafiltertbl();
 
-  type t_rec_filtertbl is record (
-    tabid       meta_filtertbl.tabid%type,
-    colid       meta_filtertbl.colid%type,
-    fltcode     meta_filtertbl.filter_code%type,
-    flag_ins    meta_filtertbl.flag_ins%type,
-    flag_del    meta_filtertbl.flag_del%type,
-    flag_upd    meta_filtertbl.flag_upd%type);
-  type t_tab_filtertbl is table of t_rec_filtertbl;
-  l_filtertbl    t_tab_filtertbl := t_tab_filtertbl();
-
-  type t_rec_dependency is record (
-    id               meta_dependency_cols.id%type,
-    tabid            meta_dependency_cols.tabid%type,
-    colid            meta_dependency_cols.colid%type,
-    event            meta_dependency_cols.event%type,
-    depcolid         meta_dependency_cols.depcolid%type,
-    action_type      meta_dependency_cols.action_type%type,
-    action_name      meta_dependency_cols.action_name%type,
-    default_value    meta_dependency_cols.default_value%type,
-    condition        meta_dependency_cols.condition%type);
-  type t_tab_dependency is table of t_rec_dependency;
-  l_dependency     t_tab_dependency := t_tab_dependency();
-
-  l_tabid        meta_tables.tabid%type;
-  l_tabname      meta_tables.tabname%type;
-  l_tabsemantic  meta_tables.semantic%type;
-  l_tablinesdef  varchar2(16);
-  l_tabselect_statement meta_tables.select_statement%type;
-  l_newtabid     meta_tables.tabid%type;
-  l_newcolid     meta_columns.colid%type;
-  l_varcolid     meta_columns.colid%type;
-  l_colname      meta_columns.colname%type;
+  l_tabid       meta_tables.tabid%type;
+  l_tablinesdef meta_tables.linesdef%type;
+  l_tabname     meta_tables.tabname%type;
+  l_tabsemantic meta_tables.semantic%type;
+  l_newtabid    meta_tables.tabid%type;
+  l_newcolid    meta_columns.colid%type;
+  l_varcolid    meta_columns.colid%type;
+  l_colname     meta_columns.colname%type;
+  i             number;
 
 begin
 
-  l_tabsemantic := 'Корпоративні клієнти';
-  l_tablinesdef := '';
-  l_tabselect_statement := '';
-  l_tabname     := 'V_CORP_ACCOUNTS_WEB';
+  l_tabsemantic := 'Рахунки корпоративних клієнтів';
+  l_tablinesdef := '30';
+  l_tabname := 'V_CORP_ACCOUNTS_WEB';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
 
   -- если таблица не описана в БМД
   if l_tabid is null then
+  
+     -- получаем код для новой таблицы
+     l_tabid := bars_metabase.get_newtabid();
 
-    -- получаем код для новой таблицы
-    l_tabid := bars_metabase.get_newtabid();
-
-    -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
-
+     -- добавляем описание таблицы в БМД
+     bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, null, l_tablinesdef);
+     bars_metabase.update_table(l_tabid, l_tabname, l_tabsemantic, l_tablinesdef);
   -- если таблица описана в БМД
   else
 
-    -- обновляем семантику таблицы
-    bars_metabase.set_tabsemantic(l_tabid, l_tabsemantic);
+     -- обновляем семантику таблицы
+     bars_metabase.set_tabsemantic(l_tabid, l_tabsemantic);
 
-    -- обновляем linesdef таблицы
-    bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
+     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
+     i := 0;
+     for k in (select e.tabid, e.colid, e.tab_cond, c.colname, e.tab_alias, e.src_cond
+                 from meta_extrnval e, meta_columns c
+                where e.srctabid=l_tabid
+                  and e.srctabid=c.tabid and e.srccolid=c.colid)
+     loop
+        i := i + 1;
+        l_arr_metaextrnval.extend;
+        l_arr_metaextrnval(i).tabid      := k.tabid;
+        l_arr_metaextrnval(i).colid      := k.colid;
+        l_arr_metaextrnval(i).srccolname := k.colname;
+        l_arr_metaextrnval(i).tab_alias  := k.tab_alias;
+        l_arr_metaextrnval(i).tab_cond   := k.tab_cond;
+        l_arr_metaextrnval(i).src_cond   := k.src_cond;
+     end loop;
 
-    -- обновляем select_statement таблицы
-    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
+     -- сохраняем ссылки для условий фильтра полей других таблиц на поля нашей таблицы
+     i := 0;
+     for k in (select b.hosttabid, b.hostcolkeyid, b.addtabalias,
+                      c.colname k_colname, v.colname v_colname, v.semantic v_colsemantic
+                 from meta_browsetbl b, meta_columns c, meta_columns v
+                where b.addtabid=l_tabid
+                  and b.addtabid=c.tabid and b.addcolkeyid=c.colid
+                  and b.addtabid=v.tabid and b.var_colid=v.colid)
+     loop
+        i := i + 1;
+        l_arr_metabrowsetbl.extend;
+        l_arr_metabrowsetbl(i).hosttabid   := k.hosttabid;
+        l_arr_metabrowsetbl(i).hostcolid   := k.hostcolkeyid;
+        l_arr_metabrowsetbl(i).addcolname  := k.k_colname;
+        l_arr_metabrowsetbl(i).varcolname  := k.v_colname;
+        l_arr_metabrowsetbl(i).addtabalias := k.addtabalias;
+        l_arr_metabrowsetbl(i).cond_tag    := k.v_colsemantic;
+     end loop;
 
-    -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
-    select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
-      bulk collect
-      into l_extrnval
-      from meta_extrnval e, meta_columns c
-     where e.srctabid = l_tabid
-       and e.srctabid = c.tabid and e.srccolid = c.colid;
+     -- сохраняем ссылки полей других таблиц на нашу вложенную таблицу
+     i := 0;
+     for k in (select tabid, colid, filter_code, flag_ins, flag_del, flag_upd
+                 from meta_filtertbl
+                where filter_tabid = l_tabid and tabid <> l_tabid)
+     loop
+        i := i + 1;
+        l_arr_metafiltertbl.extend;
+        l_arr_metafiltertbl(i).tabid    := k.tabid;
+        l_arr_metafiltertbl(i).colid    := k.colid;
+        l_arr_metafiltertbl(i).fltcode  := k.filter_code;
+        l_arr_metafiltertbl(i).flag_ins := k.flag_ins;
+        l_arr_metafiltertbl(i).flag_del := k.flag_del;
+        l_arr_metafiltertbl(i).flag_upd := k.flag_upd;
+     end loop;
 
-    -- сохраняем ссылки для условий фильтра полей других таблиц на поля нашей таблицы
-    select b.hosttabid, b.hostcolkeyid, c.colname, v.colname, b.addtabalias, v.semantic
-      bulk collect
-      into l_browsetbl
-      from meta_browsetbl b, meta_columns c, meta_columns v
-     where b.addtabid = l_tabid
-       and b.addtabid = c.tabid and b.addcolkeyid = c.colid
-       and b.addtabid = v.tabid and b.var_colid = v.colid;
-
-    -- сохраняем ссылки полей других таблиц на нашу вложенную таблицу
-    select tabid, colid, filter_code, flag_ins, flag_del, flag_upd
-      bulk collect
-      into l_filtertbl
-      from meta_filtertbl
-     where filter_tabid = l_tabid and tabid <> l_tabid;
-
-    -- сохраняем зависимости между колонками таблицы
-    select id, tabid, colid, event, depcolid, action_type, action_name, default_value, condition
-      bulk collect
-      into l_dependency
-      from meta_dependency_cols
-     where tabid = l_tabid;
-
-    -- удаляем описание полей
-    bars_metabase.delete_metatables(l_tabid);
-
+     -- удаляем описание полей
+     bars_metabase.delete_metatables(l_tabid);
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'Ідентифікатор рахунку', '', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'ALT_CORP_COD', 'N', 'Код альт. корпорація', '', 22, 14, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'ALT_CORP_LIST', 'C', 'Альт. корпорація', '', 24, 12, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'BRANCH', 'C', 'Відділення', '', 30, 11, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'CORP_KOD', 'N', 'Код корпорації', '', 22, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'CORP_NAME', 'C', 'Назва корпорації', '', 24, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'DAOS', 'D', 'Дата вікриття', '', 10, 13, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'INST_KOD', 'N', 'Код установи', '', 254, 8, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'KV', 'N', 'Код валюти', '', 22, 9, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'NLS', 'C', 'Номер рахунку', '', 15, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'NMK', 'C', 'Назва клієнта', '', 70, 10, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'NMS', 'C', 'Назва рахунку', '', 70, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'TRKK_KOD', 'N', 'Код ТРКК', '', 4, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 14, 'USE_INVP', 'B', 'Виписка', '', 254, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1,  'CORP_KOD',      'C', 'Код~корпорації',          1  , '', 1,  0, 0 ,0, 1, '', '', 1, 0, '', 1, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 2,  'CORP_NAME',     'C', 'Назва~корпорації',        3,   '', 2,  0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 3,  'RNK',           'N', 'RNK',                     2,   '', 3,  0, 0 ,0, 0, '', '', 1, 0, '', 1, 1, 0, '');
+  bars_metabase.add_column(l_tabid, 4,  'NMK',           'C', 'Клієнт',                  3,   '', 4,  0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 5,  'OKPO',          'C', 'Код~ЄДРПОУ',              2,   '', 5,  0, 0 ,0, 0, '', '', 1, 0, '', 1, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 6,  'ACC',           'N', 'ACC',                     2,   '', 6,  0, 1 ,0, 0, '', '', 1, 0, '', 1, 1, 0, '');
+  bars_metabase.add_column(l_tabid, 7,  'NLS',           'C', 'Розрахунковий~рахунок',   2,   '', 7,  0, 0 ,0, 0, '', '', 1, 0, '', 1, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 8,  'KV',            'N', 'Код~валюти',              1,   '', 8,  0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 9,  'BRANCH',        'C', 'Відділення',              2,   '', 9,  0, 0 ,0, 0, '', '', 1, 0, '', 1, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 10, 'NMS',           'C', 'Назва~рахунку',           3,   '', 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 11, 'USE_INVP',      'C', 'Виписка',                 1,   '', 11, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 12, 'TRKK_KOD',      'C', 'Код~ТРКК',                1,   '', 12, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 13, 'INST_KOD',      'C', 'Код~устан.',              1,   '', 13, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 14, 'ALT_CORP_COD',  'C', 'Альт.~Корп.',             1,   '', 14, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 15, 'DAOS',          'D', 'Дата~відкриття',          2,   '', 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
 
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('KOD_CLI');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KOD_CLI');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 2, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица KOD_CLI для описания сложного поля таблицы V_CORP_ACCOUNTS_WEB.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('ORG_PFU');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'KOD_UPF');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 8, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица ORG_PFU для описания сложного поля таблицы V_CORP_ACCOUNTS_WEB.');
-  end if;
-
-  -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'bars.update_corp_accounts(:ACC, :INST_KOD, :TRKK_KOD, case when :USE_INVP=''1'' then ''Y'' else ''N'' end, :ALT_CORP_COD) ');
+    -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'kfile_pack.UPDATE_ACC_CORP(:ACC, :USE_INVP, :TRKK_KOD, :INST_KOD, :ALT_CORP_COD, :DAOS)');
+  
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
-
+  
+   -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Встановити ознаку на включення в виписку', 'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :P_USE_INVP, :TRKK_KOD, :INST_KOD, :ALT_CORP_COD, :DAOS)',':P_USE_INVP(SEM=Виписка,TYPE=С)', 'EACH', '', '', '', '', '', '');
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Встановити код ТРКК',                      'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :USE_INVP, :P_TRKK_KOD, :INST_KOD, :ALT_CORP_COD, :DAOS)',':P_TRKK_KOD(SEM=Код ТРКК,TYPE=С)', 'EACH', '', '', '', '', '', '');
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Встановити код установи',                  'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :USE_INVP, :TRKK_KOD, :P_INST_KOD, :ALT_CORP_COD, :DAOS)',':P_INST_KOD(SEM=Код установи,TYPE=С)', 'EACH', '', '', '', '', '', '');
   -- восстанавливаем ссылки сложных полей других таблиц
-  for i in 1..l_extrnval.count loop
-    l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
-    if (l_newcolid is not null) then
-      bars_metabase.add_extrnval(
-        l_extrnval(i).tabid,
-        l_extrnval(i).colid,
-        l_tabid,
-        l_newcolid,
-        l_extrnval(i).tab_alias,
-        l_extrnval(i).tab_cond,
-        l_extrnval(i).src_cond,
-        l_extrnval(i).col_dyn_tabname);
-    end if;
+  for i in 1..l_arr_metaextrnval.count
+  loop
+     l_newcolid := bars_metabase.get_colid(l_tabid, l_arr_metaextrnval(i).srccolname);
+     if (l_newcolid is not null) then
+        bars_metabase.add_extrnval(
+           l_arr_metaextrnval(i).tabid,
+           l_arr_metaextrnval(i).colid,
+           l_tabid,
+           l_newcolid,
+           l_arr_metaextrnval(i).tab_alias,
+           l_arr_metaextrnval(i).tab_cond);
+     end if;
   end loop;
 
   -- восстанавливаем ссылки полей для условий фильтра других таблиц
-  for i in 1..l_browsetbl.count loop
-    l_newcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).addcolname);
-    l_varcolid := bars_metabase.get_colid(l_tabid, l_browsetbl(i).varcolname);
-    if (l_newcolid is not null and l_varcolid is not null) then
-      bars_metabase.add_browsetbl( 
-        l_browsetbl(i).hosttabid,
-        l_tabid,
-        l_browsetbl(i).addtabalias,
-        l_browsetbl(i).hostcolid,
-        l_newcolid,
-        l_varcolid,
-        l_browsetbl(i).cond_tag);
-    end if;
+  for i in 1..l_arr_metabrowsetbl.count
+  loop
+     l_newcolid := bars_metabase.get_colid(l_tabid, l_arr_metabrowsetbl(i).addcolname);
+     l_varcolid := bars_metabase.get_colid(l_tabid, l_arr_metabrowsetbl(i).varcolname);
+     if (l_newcolid is not null and l_varcolid is not null) then
+        bars_metabase.add_browsetbl( 
+           l_arr_metabrowsetbl(i).hosttabid,
+           l_tabid,
+           l_arr_metabrowsetbl(i).addtabalias,
+           l_arr_metabrowsetbl(i).hostcolid,
+           l_newcolid,
+           l_varcolid,
+           l_arr_metabrowsetbl(i).cond_tag);
+     end if;
   end loop;
 
   -- восстанавливаем ссылки полей других таблиц на нашу вложенную таблицу
-  for i in 1..l_filtertbl.count loop
-    bars_metabase.add_filtertbl(
-      l_filtertbl(i).tabid,
-      l_filtertbl(i).colid,
-      l_tabid,
-      l_filtertbl(i).fltcode,
-      l_filtertbl(i).flag_ins,
-      l_filtertbl(i).flag_del,
-      l_filtertbl(i).flag_upd);
+  for i in 1..l_arr_metafiltertbl.count
+  loop
+     bars_metabase.add_filtertbl(
+        l_arr_metafiltertbl(i).tabid,
+        l_arr_metafiltertbl(i).colid,
+        l_tabid,
+        l_arr_metafiltertbl(i).fltcode,
+        l_arr_metafiltertbl(i).flag_ins,
+        l_arr_metafiltertbl(i).flag_del,
+        l_arr_metafiltertbl(i).flag_upd);
   end loop;
 
-  -- восстанавливаем зависимости между колонками таблицы
-  for i in 1..l_dependency.count loop
-    bars_metabase.add_dependency(
-      l_dependency(i).tabid,
-      l_dependency(i).colid,
-      l_dependency(i).event ,
-      l_dependency(i).depcolid  ,
-      l_dependency(i).action_type ,
-      l_dependency(i).action_name ,
-      l_dependency(i).default_value ,
-      l_dependency(i).condition );
-  end loop;
+--опис зв'язкe між таблицями  
+bars_metabase.add_extrnval(l_tabid,12,bars_metabase.get_tabid('TYPNLS_CORP'),2,null,null,'select KOD as id, TXT as name from TYPNLS_CORP v where v.CORP_ID = :CORP_KOD');
+bars_metabase.add_extrnval(l_tabid,13,bars_metabase.get_tabid('V_ORG_CORPORATIONS'),1,'ORG',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :CORP_KOD');
+bars_metabase.add_extrnval(l_tabid,14,bars_metabase.get_tabid('V_ROOT_CORPORATION'),1,'ROOT'); 
 
 end;
 /
-
 commit;
+/
+

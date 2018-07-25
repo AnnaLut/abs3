@@ -82,6 +82,6 @@ namespace BarsWeb.Areas.Way.Controllers
         public ActionResult FileUpload()
         {
             return View();
-        }        
+        }
     }
 }
