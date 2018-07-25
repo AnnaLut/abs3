@@ -167,6 +167,8 @@ CREATE OR REPLACE PACKAGE BODY CCT IS
           l_dat1 := p_fdat - 1;
         ElsIf p_nbs like '2__2' THEN
           l_dat1 := least(p_mdate, p_fdat + 364);
+		elsif p_nbs = '2063' THEN --COBUMMFO-8088
+          l_dat1 := least(p_mdate, p_fdat+364);
         ELSE
           l_dat1 := p_mdate;
         END if;
