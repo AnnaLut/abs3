@@ -15,7 +15,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.012          22.06.2018
+% VERSION     :   v.18.013          25.07.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -28,6 +28,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+25.07.2018  покупка: zayavka.f092 может выбираться по параметрам проводки
 22.06.2018  операции forex: анализ доп.параметра FOREX
 13.06.2018  дополнительная обработка операций 2900-3739 для RNK ="наш банк"
 11.06.2018  исключение операций по маске "прoдаж не [здійснювався]"
@@ -276,23 +277,31 @@ IS
          p_kodp_ := 'Q003';                          --51
          p_value_ := NVL (SUBSTR (TRIM (p_value_), 1, 70), 'N контр.');
 
-         if ko_ = 2 and (trim(p_value_) is null or trim(p_value_)='N контр.')
+         if (trim(p_value_) is null or trim(p_value_)='N контр.')   --and ko_ = 2
          then
             a2_ := ' ';
-            IF pr_s3_ >= 1
-            THEN
-               sql_z := 'SELECT contract, to_char(id) '
-                     || 'FROM ZAYAVKA  '
-                     || 'WHERE REF = :ref_';
 
                BEGIN
-                  EXECUTE IMMEDIATE sql_z
-                     INTO p_value_, a2_
-                  USING ref_ ;
+                 SELECT contract, to_char(id)  INTO p_value_, a2_
+                   FROM ZAYAVKA  
+                  WHERE REF =ref_;
+
                EXCEPTION WHEN NO_DATA_FOUND THEN
-                 a2_ := ' ';
+                    if refd_ is not null  then
+
+                         BEGIN
+                           SELECT contract, to_char(id)  INTO p_value_, a2_
+                             FROM ZAYAVKA  
+                            WHERE refd_ in (ref,ref_sps);
+                     
+                         EXCEPTION WHEN NO_DATA_FOUND THEN
+                            a2_ := ' ';
+                         END;
+
+                    else
+                       a2_ := ' ';
+                    end if;
                END;
-            END IF;
 
             if trim(p_value_) is null or trim(p_value_)='N контр.' then  --and trim(a2_) is not null then
                p_value_ := a2_;
@@ -320,6 +329,41 @@ IS
                   a3_ := ' ';
                END;
             END IF;
+
+            if (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') then --and trim(a3_) is not null then
+               p_value_ := a3_;
+            end if;
+         end if;
+         if ko_ = 1 and (trim(p_value_) is null or trim(p_value_)='DDMMYYYY')
+         then
+            a3_ := ' ';
+
+              BEGIN
+                    SELECT NVL(to_char(dat_vmd,'DDMMYYYY'),'DDMMYYYY'),
+                           NVL(to_char(dat2_vmd,'DDMMYYYY'),'DDMMYYYY') 
+                                                        INTO p_value_, a3_
+                      FROM ZAYAVKA  
+                     WHERE REF = ref_;
+
+               EXCEPTION WHEN NO_DATA_FOUND THEN
+                    if refd_ is not null  then
+
+                         BEGIN
+                           SELECT NVL(to_char(dat_vmd,'DDMMYYYY'),'DDMMYYYY'),
+                                  NVL(to_char(dat2_vmd,'DDMMYYYY'),'DDMMYYYY') 
+                                                            INTO p_value_, a3_
+                             FROM ZAYAVKA  
+                            WHERE refd_ in (ref,ref_sps);
+                     
+                         EXCEPTION WHEN NO_DATA_FOUND THEN
+                            a3_ := ' ';
+                         END;
+
+                    else
+                       a3_ := ' ';
+                    end if;
+
+              end;
 
             if (trim(p_value_) is null or trim(p_value_)='DDMMYYYY') then --and trim(a3_) is not null then
                p_value_ := a3_;
@@ -936,23 +980,26 @@ BEGIN
                END;
                if ko_ =1  and d1#3K_ is null  then
 
-                   if is_f092_ >=1  then
+                    begin
+                       SELECT F092   into d1#3K_
+                       FROM ZAYAVKA  
+                       WHERE REF =ref_ and nvl(dk, 1) =1;
 
-                      sql_z := 'SELECT F092 '
-                            || 'FROM ZAYAVKA  '
-                            || 'WHERE REF = :ref_ and nvl(dk, 1) = 1';
+                    exception
+                        WHEN NO_DATA_FOUND  THEN
+                           begin
+                               select f092, nvl(ref, ref_sps)  into d1#3K_, refd_
+                                 from zayavka
+                                where nvl(dk, 1) =1  and  vdate =dat_
+                                  and s2 =sum0_  and  kv2 =kv_ 
+                                  and rnk =rnk_  and  rownum =1  ;
 
-                      begin
-                          EXECUTE IMMEDIATE sql_z
-                             INTO d1#3K_
-                            USING ref_ ;
-                      exception
-                          WHEN NO_DATA_FOUND  THEN
-                                       d1#3K_ := NULL;
-                      end;
-                   else
-                      d1#3K_ :='000';
-                   end if;
+                           exception     
+                               WHEN NO_DATA_FOUND  THEN
+                                      d1#3K_ := NULL;
+                                      refd_ := null;
+                           end;
+                    end;
 
                end if;
                if ko_ =2  and d1#3K_ is null  then
