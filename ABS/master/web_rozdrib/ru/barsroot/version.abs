@@ -1,1 +1,11 @@
-Bugfix_2.1.44.1.12 (Rev:60644-60646) 
+=========  svn diff --summarize -r 61168:61434 D:\SVN\master\web\ru
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\Areas\CreditUi\Scripts\provide.js
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\Areas\CreditUi\Views\Provide\Index.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\Areas
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\App_Code\Areas\CreditUi\Infrastructure\DI\Implementation\ProvideRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\App_Code\Areas\CreditUi\Models\UpdateProvide.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\App_Code\Areas\CreditUi\Models\ExistProvide.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot\App_Code\Areas
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.18\ru\web
+Bugfix_2.1.44.1.18 (Rev:61168-61434
