@@ -3,47 +3,47 @@ CREATE OR REPLACE PROCEDURE BARS.P_FF8 (Dat_ DATE) IS
 DESCRIPTION : Процедура формирования файла #F8 для КБ
 COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 
-VERSION     :v.18.008  14/06/2018 (04/06/2018)
+VERSION    :v.18.010   18/07/2018 (17/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 
-   Структура показника    DD CC LL ГГ Ч Т AA VVV L
+ Структура показника DD CC LL ГГ Ч Т AA VVV L
 
- 1   DD         {04,05,06,...}            код показника
- 3   CC         {11,51,21,31,32,33,38,35} код виду кредиту
- 5   LL         K111 вид економiчноi дiяльностi
- 7   ГГ         S260 код iндивiдуального споживання за цiлями
- 9   Ч          S032 код виду забезпечення
-10   Т          S080 код категории риска
-11   AA         S270 код срока погашения основного долга
-13   VVV        R030 код валюти
-16   L          S245 узагальнений строк погашення
+ 1 DD {04,05,06,...} код показника
+ 3 CC {11,51,21,31,32,33,38,35} код виду кредиту
+ 5 LL K111 вид економiчноi дiяльностi
+ 7 ГГ S260 код iндивiдуального споживання за цiлями
+ 9 Ч S032 код виду забезпечення
+10 Т S080 код категории риска
+11 AA S270 код срока погашения основного долга
+13 VVV R030 код валюти
+16 L S245 узагальнений строк погашення
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-03.04.2018  для 1502 выбирается поле DOSQ вместо R_DOS
-23.01.2018  -новый сегмент в показателе: L(S245)
-               -расширена рабочая таблица otc_ff8_history_acc
-            -для сегмента CC новая разбивка по балансовым
+03.04.2018 для 1502 выбирается поле DOSQ вместо R_DOS
+23.01.2018 -новый сегмент в показателе: L(S245)
+ -расширена рабочая таблица otc_ff8_history_acc
+ -для сегмента CC новая разбивка по балансовым
 28/09/2017 - в 26 показатель будут включаться договора по которым
-             не было движения но есть курсовая разница
-             в показатель 20 (кол-во догю) не будут включаться
-             договора для ОСББ особый период (ND=NDI в табл. CC_DEAL)
+ не было движения но есть курсовая разница
+ в показатель 20 (кол-во догю) не будут включаться
+ договора для ОСББ особый период (ND=NDI в табл. CC_DEAL)
 13/07/2017 - в 12 показатель не будут включаться договора реструкту-
-             ризиранные в предыдущие отчетные периоды
+ ризиранные в предыдущие отчетные периоды
 11/07/2017 - для определения значения S080
-             исключаем счета дебиторки при отборе из V_TMP_REZ_RISK
-             и выбираем S080 не из SPECPARAM а из OTC_FF7_HISTORY_ACC
-             за предыдущую банковскую дату
+ исключаем счета дебиторки при отборе из V_TMP_REZ_RISK
+ и выбираем S080 не из SPECPARAM а из OTC_FF7_HISTORY_ACC
+ за предыдущую банковскую дату
 10/03/2017 - убрал мусор
 13/02/2017 - для формирования показателей 15,16,18 заменены условие
-             для S080  с S080 in ('4','5') на S080 in ('Q','J')
+ для S080 с S080 in ('4','5') на S080 in ('Q','J')
 10/02/2017 - для договоров реструктуризации (VIEW CC_V) будем изменять
-             параметр S080 (на "A" или "M")
+ параметр S080 (на "A" или "M")
 07/02/2016 - для параметра S080 будем использовать поле S080 вместо KAT
 10/08/2016 - для счетов овердрафтов при заполнении кода "CC" остаток по
-             счету может быть и пассивный
+ счету может быть и пассивный
 08/08/2016 - для показателя 16 изменил условие на f,r013 is not null
-             вместо NVL(f.r013,'0') not in ('0','3') или ('0','1')
+ вместо NVL(f.r013,'0') not in ('0','3') или ('0','1')
 01/08/2016 - для показателя 16 добавлені новые условия
              f.cc like '__1' and f.s270='08' (было f.s270='1')
              f.cc like '__3' and f.s370='J'  (было f.s370='J')
@@ -64,57 +64,57 @@ VERSION     :v.18.008  14/06/2018 (04/06/2018)
              формувався 12 та 13 показник, якщо за звітнsий період було
              введено більше ніж один вид реструктуризації)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  kodf_       varchar2(2):='F8';
-  sheme_      varchar2(1);
-  acc_        Number;
-  dk_         Varchar2(1);
-  nbs_        Varchar2(4);
-  nls_        Varchar2(15);
-  dd_         Varchar2(3);
-  mdate_      Date;
-  data_       Date;
-  kv_         SMALLINT;
-  se_         DECIMAL(24);
-  Ostn_       DECIMAL(24);
-  Ostq_       DECIMAL(24);
-  Dos96_      DECIMAL(24);
-  Kos96_      DECIMAL(24);
-  Dosq96_     DECIMAL(24);
-  Kosq96_     DECIMAL(24);
-  Doszg_      DECIMAL(24);
-  Koszg_      DECIMAL(24);
-  Dos96zg_    DECIMAL(24);
-  Kos96zg_    DECIMAL(24);
-  Dos99zg_    DECIMAL(24);
-  Kos99zg_    DECIMAL(24);
-  kodp_       Varchar2(16);
-  znap_       Varchar2(30);
-  cc_         Varchar(3);
-  userid_     Number;
-  sql_acc_    varchar2(2000):='';
-  ret_        number;
-  rnk_        number;
-  codcagent_  number;
+ kodf_ varchar2(2):='F8';
+ sheme_ varchar2(1);
+ acc_ Number;
+ dk_ Varchar2(1);
+ nbs_ Varchar2(4);
+ nls_ Varchar2(15);
+ dd_ Varchar2(3);
+ mdate_ Date;
+ data_ Date;
+ kv_ SMALLINT;
+ se_ DECIMAL(24);
+ Ostn_ DECIMAL(24);
+ Ostq_ DECIMAL(24);
+ Dos96_ DECIMAL(24);
+ Kos96_ DECIMAL(24);
+ Dosq96_ DECIMAL(24);
+ Kosq96_ DECIMAL(24);
+ Doszg_ DECIMAL(24);
+ Koszg_ DECIMAL(24);
+ Dos96zg_ DECIMAL(24);
+ Kos96zg_ DECIMAL(24);
+ Dos99zg_ DECIMAL(24);
+ Kos99zg_ DECIMAL(24);
+ kodp_ Varchar2(16);
+ znap_ Varchar2(30);
+ cc_ Varchar(3);
+ userid_ Number;
+ sql_acc_ varchar2(2000):='';
+ ret_ number;
+ rnk_ number;
+ codcagent_ number;
 
-  nd_         number;
-  sdate_      date;
-  wdate_      date;
-  sos_        number;
-  comm_       varchar2(200);
-  datp_       date;
-  datb_       date;
-  datr_       date;
+ nd_ number;
+ sdate_ date;
+ wdate_ date;
+ sos_ number;
+ comm_ varchar2(200);
+ datp_ date;
+ datb_ date;
+ datr_ date;
 
-  mfo_        number;
-  mfou_       number;
-  default_    number;
+ mfo_ number;
+ mfou_ number;
+ default_ number;
 
-  typ_        number;
-  nbuc_       varchar2(12);
-  nbuc1_      varchar2(12);
-  flag_       number;
-  dat_spr_    date := last_day(dat_)+1;
-  s080r_      varchar2(1);
+ typ_ number;
+ nbuc_ varchar2(12);
+ nbuc1_ varchar2(12);
+ flag_ number;
+ dat_spr_ date := last_day(dat_)+1;
+ s080r_ varchar2(1);
 
 BEGIN
 logger.info ('P_FF8: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
@@ -124,10 +124,10 @@ EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FF8_MIGR_ND';
 -------------------------------------------------------------------
 sql_acc_ := 'select * from accounts '||
-            'where nbs in (select distinct r020 from kl_f3_29 where kf='''||kodf_||''') and '||
-            ' acc in (select n.acc from nd_acc n, cc_deal d, cck_restr c where n.nd=d.nd and nvl(d.ndg, n.nd) = c.nd and '||
-            ' c.fdat<=to_date('''||to_char(dat_,'ddmmyyyy')||''',''ddmmyyyy'') and '||
-            ' nvl(c.fdat_end, to_date('''|| to_char(dat_,'ddmmyyyy')||''',''ddmmyyyy'')) '||
+ 'where nbs in (select distinct r020 from kl_f3_29 where kf='''||kodf_||''') and '||
+ ' acc in (select n.acc from nd_acc n, cc_deal d, cck_restr c where n.nd=d.nd and nvl(d.ndg, n.nd) = c.nd and '||
+ ' c.fdat<=to_date('''||to_char(dat_,'ddmmyyyy')||''',''ddmmyyyy'') and '||
+ ' nvl(c.fdat_end, to_date('''|| to_char(dat_,'ddmmyyyy')||''',''ddmmyyyy'')) '||
             ' >= to_date('''|| to_char(dat_,'ddmmyyyy')||''',''ddmmyyyy'') and pr_no = 1 '||
             ' union all '||
             'select acc from cck_restr_acc c where c.fdat<=to_date('''||
@@ -1176,6 +1176,13 @@ from (
 p_ff7(dat_,'G',0,1);
 commit;
 
+-- блок для удаления счетов дисконта которые закрыти на отчетную дату
+delete from otc_ff7_history_acc o 
+where o.datf = dat_ 
+  and o.nls like '___6%' 
+  and o.dazs is not null
+  and o.ost = 0;  
+
 update otc_ff7_history_acc o
 set o.s260 = '08'
 where o.s260='00'
@@ -1373,7 +1380,7 @@ from (
                           and f.tpa = 1
                           and (f.ostq_kd <> 0 or (f.ostq_kd=0 and f.dosq+f.kosq<>0))
                           and daos <> to_date('01012011','ddmmyyyy')
-                          and nvl(f.nkd, nvl(to_char(c.ndg), f.nd)) not in
+                          and nvl(f.nkd, f.nd) not in
                           (select nvl(f1.nkd, f1.nd) from OTC_FF7_HISTORY_ACC f1 where f1.datf=datp_
                           -- если в прошлом месяце сумма по договору = 0, а в этом <> 0  - договор новый
                                    and (f1.ostq_kd <> 0
@@ -1469,12 +1476,14 @@ from (
                         decode(typ_, 0, nbuc1_, NVL(F_Codobl_Tobo(f.acc,typ_), nbuc1_) ) nbuc,
                         1 cnt, sum(ostq) ost
                          ,sum(case substr(nd,1,1) when '№' then (kosq)
+                                                  when 'ь' then (kosq) 
                                                   when '-' then (kosq)
                                                   else decode(f.tip,'SS ',(kosq), 'SP ', (-dosq+kosq), 'SL', (-dosq+kosq), 0)
                               end) kos
                          --Для столицы   если несколько счетов SS
                          ,sum(decode(f.tip,'SS ',1,0)) qnt
-                         ,sum(case substr(nd,1,1) when '№' then 0
+                         ,sum(case substr(nd,1,1) when '№' then 0 
+                                                  when 'ь' then 0 
                                                   when '-' then 0
                                                   else decode(f.tip,'SS ',(dosq), 0)
                               end) kos1
@@ -1597,7 +1606,7 @@ logger.info ('P_FF8: etap 12-6 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
                     on (f.nd = to_char(c.nd))
                     where f.datf=dat_
                       and f.tpa in (2, 3)
-                      and nvl(f.nkd, nvl(to_char(c.ndg), f.nd)) not in
+                      and nvl(f.nkd, f.nd) not in
                       (select nvl(f1.nkd, f1.nd) from OTC_FF7_HISTORY_ACC f1 where f1.datf=datp_
                                and ((f1.ostq_kd <> 0 ) -- если в прошлом месяце сумма по договору = 0, а в этом <> 0  - договор новый
                                      OR (f1.nbs in ('2202','2203', '2063','2068', '2600', '2607') and f1.ostq_kd = 0 ) )
@@ -2010,7 +2019,8 @@ select max(r.nls), r.kv, max(r.odate), max(r.kodp), 1 znap, r.nbuc, max(r.isp), 
 from rnbu_trace r, cc_deal c
 where regexp_like (r.kodp, '^(20|04|05|06|10)') and
       r.nd = c.nd and
-      r.nd in (select nd from cc_deal where ndg is not null)
+      r.nd in (select nd from cc_deal where ndg is not null) and
+      not exists (select 1 from rnbu_trace r1 where r1.nd =  c.ndg and substr(r1.kodp, 1, 2) = substr(r.kodp, 1, 2) and r1.kv = r.kv)
 group by r.rnk, c.ndg, r.kv, r.nbuc;
 
 delete
