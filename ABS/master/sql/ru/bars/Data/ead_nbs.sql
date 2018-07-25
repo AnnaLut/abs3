@@ -156,4 +156,3 @@ insert into EAD_NBS (NBS, CUSTTYPE, AGR_TYPE, ACC_TYPE, TIP, OB22, ID)
 values ('3578', 2, 'encashment_uo', 'transit_uo', null, '09', 51);
 */
 commit;
-prompt Done.
