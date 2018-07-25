@@ -3,7 +3,7 @@ is
   --
   -- constants
   --
-  g_header_version      constant varchar2(64) := 'version 1.09  2018.07.18';
+  g_header_version      constant varchar2(64) := 'version 1.10  2018.07.25';
 
   g_correct_quality     constant char(1) := 'C';
   g_non_correct_quality constant char(1) := 'N';
@@ -13,35 +13,7 @@ is
   ( p_rnk  in number
   , p_kf   in varchar2
   ) return number;
-  
-  -- *******************
-  -- * Не используется *
-  -- *******************
-  -- procedure request_updatecard
-  -- ( p_batchId in varchar2,
-  --   p_kf in varchar2,
-  --   p_rnk in number,
-  --   p_anls_quality in number,
-  --   p_defaultGroupQuality in number,
-  --   p_attr_quality in varchar2,
-  --   p_attr_name in varchar2,
-  --   p_attr_value in varchar2,
-  --   p_attr_recommendVal in varchar2,
-  --   p_attr_descr in varchar2
-  -- );
-  
-  -- *******************
-  -- * не используется *
-  -- *******************
-  -- procedure request_updatecard_mass_old
-  -- ( p_batchId in varchar2,
-  --   p_kf in varchar2,
-  --   p_rnk in number,
-  --   p_anls_quality in number,
-  --   p_defaultGroupQuality in number,
-  --   p_tab_attr  t_rec_ebk
-  -- );
-  
+
   procedure REQUEST_UPDATECARD_MASS
   ( p_batchId             in varchar2,
     p_kf                  in varchar2,
@@ -126,7 +98,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.13  2018.07.18';
+  g_body_version  constant varchar2(64) := 'version 1.14  2018.07.25';
   g_cust_tp       constant varchar2(1)  := 'I'; -- ebkc_gcif.cust_type
   g_tms_fmt       constant varchar2(32) := 'DD.MM.YYYY HH24:MI:SSxFF TZH:TZM';
 
@@ -162,128 +134,8 @@ is
       from dual;
     return l_group_id;
   end get_group_id;
-  
-  --************************************************
-  --!!! Не используется
-  --************************************************
-  procedure request_updatecard(p_batchId in varchar2,
-                               p_kf in varchar2,
-                               p_rnk in number,
-                               p_anls_quality in number,
-                               p_defaultGroupQuality in number,
-                               p_attr_quality in varchar2,
-                               p_attr_name in varchar2,
-                               p_attr_value in varchar2,
-                               p_attr_recommendVal in varchar2,
-                               p_attr_descr in varchar2) is
-  begin
 
-    -- не храним предыдущие рекомендации по конкретному kf, rnk, новый пакет стирает старые рекомендации по физ. лицу  
-    delete EBKC_REQ_UPDATECARD -- tmp_ebk_req_updatecard
-     where KF        = p_kf
-       and RNK       = p_rnk
-       and CUST_TYPE = g_cust_tp
-       and batchId  != p_batchId;
 
-    if sql%rowcount > 0 
-    then
-      delete EBKC_REQ_UPDCARD_ATTR -- tmp_ebk_req_updcard_attr 
-       where KF        = p_kf
-         and RNK       = p_rnk
-         and CUST_TYPE = g_cust_tp;
-    end if;
-
-    -- сохраняем только ощибки и предупреждения
-    if p_attr_quality <> g_correct_quality
-    then
-
-      insert 
-        into EBKC_REQ_UPDATECARD -- tmp_ebk_req_updatecard
-           ( BATCHID, KF , RNK, QUALITY, DEFAULTGROUPQUALITY, GROUP_ID, CUST_TYPE )
-      select p_batchId, p_kf, p_rnk,  p_anls_quality, p_defaultGroupQuality
-           , get_group_id(p_rnk,p_kf) as group_id, g_cust_tp
-        from DUAL 
-       where not exists ( select null 
-                            from EBKC_REQ_UPDATECARD -- tmp_ebk_req_updatecard 
-                           where BATCHID   = p_batchId
-                             and KF        = p_kf
-                             and RNK       = p_rnk
-                             and CUST_TYPE = g_cust_tp
-                         );
-
-      insert 
-        into EBKC_REQ_UPDCARD_ATTR -- tmp_ebk_req_updcard_attr
-          ( KF, RNK, QUALITY, NAME, VALUE, RECOMMENDVALUE, DESCR, CUST_TYPE )
-      select p_kf, p_rnk, p_attr_quality, p_attr_name, p_attr_value, p_attr_recommendVal, p_attr_descr, g_cust_tp
-        from DUAL 
-       where not exists ( select null
-                            from EBKC_REQ_UPDCARD_ATTR -- tmp_ebk_req_updcard_attr
-                           where KF        = p_kf
-                             and RNK       = p_rnk
-                             and CUST_TYPE = g_cust_tp
-                             and NAME      = p_attr_name
-                         );
-    end if;
-    commit;
-  exception
-     when others then rollback; raise;
-  end request_updatecard;
-  
-  -- ******************************************************************************
-  -- !!! не используется
-  -- ******************************************************************************
-  procedure request_updatecard_mass_old(p_batchId in varchar2,
-                               p_kf in varchar2,
-                               p_rnk in number,
-                               p_anls_quality in number,
-                               p_defaultGroupQuality in number,
-                               p_tab_attr  t_rec_ebk) is
-  begin
-    -- не храним предыдущие рекомендации по конкретному kf, rnk, новый пакет стирает старые рекомендации по физ. лицу  
-    delete 
-      from EBKC_REQ_UPDATECARD -- tmp_ebk_req_updatecard
-     where kf = p_kf
-       and rnk = p_rnk  
-       and batchId <> p_batchId;
-    
-    if sql%rowcount > 0
-    then
-      delete EBKC_REQ_UPDCARD_ATTR -- tmp_ebk_req_updcard_attr 
-       where kf  = p_kf
-         and rnk = p_rnk;
-    end if;
-    -- сохраняем только ощибки и предупреждения   
-    -- только одна рекомендация может быть у реквизита 
-        insert into EBKC_REQ_UPDCARD_ATTR -- tmp_ebk_req_updcard_attr
-        ( kf, rnk, quality, name, value, recommendValue, descr)
-                                    select p_kf, p_rnk, ms.quality, ms.name, ms.value, ms.recommendvalue, ms.descr
-                                    from table(p_tab_attr) ms
-                                    where ms.quality <> 'C'
-                                      and not exists ( select null 
-                                                         from EBKC_REQ_UPDCARD_ATTR -- tmp_ebk_req_updcard_attr
-                                                        where kf = p_kf
-                                                          and rnk = p_rnk
-                                                          and name = ms.name
-                                                     );
-       -- создаем мастер запись если заполнился выше детаил 
-       if sql%rowcount > 0 then   
-           
-        insert into EBKC_REQ_UPDATECARD -- tmp_ebk_req_updatecard
-        ( batchId, kf , rnk, quality, defaultGroupQuality, group_id )
-                                   select p_batchId, p_kf, p_rnk,  p_anls_quality, p_defaultGroupQuality
-                                          ,get_group_id(p_rnk,p_kf) as group_id
-                                     from dual where not exists (select null 
-                                                                   from EBKC_REQ_UPDATECARD -- tmp_ebk_req_updatecard 
-                                                                  where batchId  = p_batchId 
-                                                                    and kf = p_kf 
-                                                                    and rnk = p_rnk 
-                                                                );
-        end if;
-    commit;
-   exception 
-     when others then rollback; raise;
-  end request_updatecard_mass_old;
-  
   --
   --
   --
@@ -560,7 +412,9 @@ $end
       commit;
 
     else -- отримали застарілу інформацію від ЄБК
-      null;
+      bars_audit.error( title||': отримали застарілу інформацію від ЄБК ( p_kf='||p_kf||', p_rnk='||to_char(l_rnk)
+                             ||', p_ebk_mod_tms='||to_char(p_mod_tms,    'yyyy/mm/dd hh24:mi:ssxff tzh:tzm')
+                             ||', l_ebk_mod_tms='||to_char(l_ebk_mod_tms,'yyyy/mm/dd hh24:mi:ssxff tzh:tzm') );
     end if;
 
 $if EBK_PARAMS.CUT_RNK $then
@@ -692,55 +546,60 @@ $end
        where RNK = l_rnk
           or ( KF = p_kf and GCIF = p_gcif );
 
-      insert 
+      insert
         into EBKC_GCIF
            ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE, EBK_MOD_TMS )
       values
           ( p_kf, l_rnk, p_gcif, p_cust_tp, l_sys_dt, p_mod_tms );
 
---      if ( p_slave_client_ebk.count > 0 )
---      then
+      if ( p_slave_client_ebk.count > 0 )
+      then
 
---        merge
---         into EBKC_GCIF t1
---        using ( select p_gcif as GCIF
---                     , KF as SLAVE_KF
---$if EBK_PARAMS.CUT_RNK $then
---                     , EBKC_WFORMS_UTL.GET_RNK( RNK, KF ) as SLAVE_RNK
---$else
---                     , RNK as SLAVE_RNK
---$end
---                     , p_cust_tp as CUST_TYPE
---                  from table( p_slave_client_ebk )
---              ) t2
---           on ( t1.GCIF      = t2.GCIF      and
---                t1.SLAVE_KF  = t2.SLAVE_KF  and
---                t1.SLAVE_RNK = t2.SLAVE_RNK and
---                t1.CUST_TYPE = t2.CUST_TYPE )
---         when not matched
---         then insert ( GCIF, SLAVE_KF, SLAVE_RNK, CUST_TYPE )
---              values ( t2.GCIF, t2.SLAVE_KF, t2.SLAVE_RNK, t2.CUST_TYPE );
+        begin
 
---      end if;
+          merge
+           into EBKC_GCIF t1
+          using ( select KF
+$if EBK_PARAMS.CUT_RNK $then
+                       , EBKC_WFORMS_UTL.GET_RNK( RNK, KF ) as RNK
+$else
+                       , RNK
+$end
+                    from table( p_slave_client_ebk )
+                ) t2
+             on ( t1.RNK = t2.RNK )
+           when matched
+           then update
+                   set GCIF        = p_gcif
+                     , KF          = t2.KF
+                     , CUST_TYPE   = p_cust_tp
+                     , INSERT_DATE = l_sys_dt
+                     , EBK_MOD_TMS = p_mod_tms
+           when not matched
+           then insert ( KF, RNK, GCIF, CUST_TYPE, INSERT_DATE, EBK_MOD_TMS )
+                values ( t2.KF, t2.RNK, p_gcif, p_cust_tp, l_sys_dt, p_mod_tms );
+
+        exception
+          when OTHERS
+          then bars_audit.error( title||': '||dbms_utility.format_error_stack() );
+        end;
+
+      end if;
 
       commit;
 
     else -- отримали застарілу інформацію від ЄБК
-      bars_audit.error( title || ': отримали застарілу інформацію від ЄБК по РНК='||to_char(l_rnk) );
-    end if;
-/*
-    if ( l_abs_mod_tms Is Null )
-    then
-      l_abs_mod_tms := cast( EBKC_PACK.GET_LAST_CHG_DT( l_rnk, p_cust_tp ) AS TIMESTAMP(3) WITH TIME ZONE );
+      bars_audit.error( title||': отримали застарілу інформацію від ЄБК ( p_kf='||p_kf||', p_rnk='||to_char(l_rnk)
+                             ||', p_ebk_mod_tms='||to_char(p_mod_tms,    'yyyy/mm/dd hh24:mi:ssxff tzh:tzm')
+                             ||', l_ebk_mod_tms='||to_char(l_ebk_mod_tms,'yyyy/mm/dd hh24:mi:ssxff tzh:tzm') );
     end if;
 
-    if ( l_abs_mod_tms > p_abs_mod_tms )
-    then -- Якщо отримане значення атрибуту «Дата модифікації в АБС» менше 
-         -- ніж значення відповідного атрибуту збережене в АБС
-         -- АБС автоматично надсилає в ЄБК таку картку через пакетний інтерфейс
-      EBKC_PACK.ENQUEUE( l_rnk, p_cust_tp );
+    if ( ( l_abs_mod_tms Is Null ) or ( l_abs_mod_tms > p_mod_tms ) )
+    then -- Якщо «Дата модифікації в АБС» більша ніж «Дата модифікації в ЄБК»
+      -- надсилаємо таку картку в ЄБК (через пакетний інтерфейс)
+      EBKC_WFORMS_UTL.ADD_RNK_QUEUE( l_rnk, p_cust_tp );
     end if;
-*/
+
 $if EBK_PARAMS.CUT_RNK $then
     bc.set_context;
 $end
