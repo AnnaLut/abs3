@@ -2,9 +2,9 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /sql/bars/package/zp_corp2_intg.sql =========*** Run *** 
 PROMPT ===================================================================================== 
 
-create or replace package zp_corp2_intg
+create or replace package bars.zp_corp2_intg
 is
-   g_head_version   constant varchar2 (64) := 'version 1.1 11.12.2017';
+   g_head_version   constant varchar2 (64) := 'version 1.2 22.06.2018';
 
    --
    -- пакет интеграции с Corp2
@@ -18,11 +18,12 @@ is
       return varchar2;
 
    function get_db_charset return varchar2;
-     
+
    -- запрос информации о ЗП проекте из корпа2
    procedure get_zp_deal_par (p_rnk       in     customer.rnk%type,
                               p_amount    in     number,
                               p_mfo       in     number,
+                              p_nls_2909  in     accounts.nls%type,
                               p_debt         out number,
                               p_commiss      out number,
                               p_premium      out number);
@@ -42,9 +43,9 @@ is
 end;
 /
 
-create or replace package body zp_corp2_intg
+create or replace package body bars.zp_corp2_intg
 is
-   g_body_version   constant varchar2 (64) := 'version 1.27 26.03.2018';
+   g_body_version   constant varchar2 (64) := 'version 1.28 22.06.2018';
 
    g_p_name         constant varchar2 (13) := 'zp_corp2_intg';
 
@@ -132,7 +133,7 @@ is
    end;
 
    function get_db_charset return varchar2
-   is 
+   is
      l_charset varchar2(256);
    begin
      select value into l_charset from nls_database_parameters where parameter = 'NLS_CHARACTERSET';
@@ -466,16 +467,18 @@ is
       return utl_compress.lz_compress (l_blob);
    end packing;
 
-   -- запрос информации о ЗП проекте из корпа2
+   --------------------------------------------------------------------------------
+   -- Запит комісії із КОРП2 (метод виконується із веб сервісу КОРП2)
+   -- 
    procedure get_zp_deal_par (p_rnk       in     customer.rnk%type,
                               p_amount    in     number,
                               p_mfo       in     number,
+                              p_nls_2909  in     accounts.nls%type,
                               p_debt         out number,
                               p_commiss      out number,
                               p_premium      out number)
    is
       l_rnk        customer.rnk%type;
-      l_nls2909    accounts.nls%type;
       l_kodtarif   number;
       l_act        varchar2 (100) := '.get_zp_deal_par.';
    begin
@@ -491,19 +494,18 @@ is
 
       select deal_premium,
              nvl (ostc_3570, 0) * -1,
-             nls_2909,
              kod_tarif
         into p_premium,
              p_debt,
-             l_nls2909,
              l_kodtarif
         from v_zp_deals
-       where rnk = l_rnk and sos >= 0;
+       where rnk = l_rnk and sos >= 0
+             and nls_2909 = p_nls_2909;
 
       p_commiss :=
          nvl (  f_tarif (l_kodtarif,
                          980,
-                         l_nls2909,
+                         p_nls_2909,
                          p_amount * 100)
               / 100,
               0);
@@ -511,15 +513,18 @@ is
       bars_audit.info (
             g_p_name
          || l_act
-         || ' rnk - '
+         || ' rnk="'
          || p_rnk
-         || ', amount -'
+         || '", amount="'
          || p_amount
-         || ', mfo  - '
-         || p_mfo);
+         || '", mfo="'
+         || p_mfo
+         || '", nls_2909="'
+         || p_nls_2909 ||'"');
    exception
      when others then
-         bars_error.raise_nerror (g_err_mod, g_p_name || l_act || dbms_utility.format_error_backtrace || ' ' || sqlerrm || 'p_rnk='||p_rnk);
+       bars_audit.info (g_p_name || l_act || 'error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+       raise_application_error(-20001, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
    end;
 
    function form_cards_dictionary return clob
@@ -2030,12 +2035,32 @@ is
 
          l_analyticlist_docs := dbms_xslprocessor.selectnodes (l_analytic, 'docs/doc');
 
+         --проверяем счет 2909
+         begin
+           --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.nls_2909='||to_char(l_payroll_row.nls_2909));
+            select acc
+              into l_acc
+              from accounts a
+             where a.nls = l_payroll_row.nls_2909 and kv = 980 and kf = l_payroll_row.mfo;
+
+            if l_acc <> l_zp_deals.acc_2909
+            then
+               l_payroll_row.err := '2909_not_match_with_deal';
+            end if;
+         exception
+            when no_data_found
+            then
+               l_payroll_row.err := '2909_not_found';
+         end;
+
          --проверяем ,есть ли зп договор
          begin
             select z.*
               into l_zp_deals
               from zp_deals z
-             where rnk = l_payroll_row.rnk and sos >= 0;
+                   inner join accounts a on a.acc = z.acc_2909
+             where z.rnk = l_payroll_row.rnk and sos >= 0
+                   and a.nls = l_payroll_row.nls_2909 and a.kv = 980;
          exception
             when no_data_found
             then
@@ -2059,26 +2084,6 @@ is
             when no_data_found
             then
                null;
-         end;
-
-         --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.err='||l_payroll_row.err);
-
-         --проверяем счет 2909
-         begin
-           --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.nls_2909='||to_char(l_payroll_row.nls_2909));
-            select acc
-              into l_acc
-              from accounts a
-             where a.nls = l_payroll_row.nls_2909 and kv = 980 and kf = l_payroll_row.mfo;
-
-            if l_acc <> l_zp_deals.acc_2909
-            then
-               l_payroll_row.err := '2909_not_match_with_deal';
-            end if;
-         exception
-            when no_data_found
-            then
-               l_payroll_row.err := '2909_not_found';
          end;
 
          --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.err='||l_payroll_row.err);
@@ -2347,9 +2352,9 @@ is
        payroll_status   varchar2(1),
        payroll_err      varchar2(4000)
     );
-   
+
     type t_payroll is table of t_payroll_row;
-    
+
     l_payroll_tb t_payroll := t_payroll();
     l_satatus    varchar2(255);
     l_message    clob;
@@ -2371,9 +2376,9 @@ is
        dbms_xslprocessor.valueof (l_analytic, 'message/text()', l_message);
     end loop;
 
-    if upper(l_satatus) = 'OK' and l_message is not null then  
+    if upper(l_satatus) = 'OK' and l_message is not null then
       l_message := decodebase64(l_message);
-      
+
       if upper(l_message) not in ('NULL','ERR') then
         l_parser := dbms_xmlparser.newparser;
         dbms_xmlparser.parseclob (l_parser, l_message);
@@ -2383,12 +2388,12 @@ is
         for i in 1 .. dbms_xmldom.getlength (l_analyticlist)
         loop
           l_analytic := dbms_xmldom.item (l_analyticlist, i - 1);
-          l_payroll_tb.extend; 
+          l_payroll_tb.extend;
           dbms_xslprocessor.valueof (l_analytic, 'id/text()', l_payroll_tb(i).payroll_id);
           dbms_xslprocessor.valueof (l_analytic, 'st/text()', l_payroll_tb(i).payroll_status);
           --dbms_xslprocessor.valueof (l_analytic, 'err/text()', l_payroll_tb(i).payroll_err);
         end loop;
-        
+
         forall i in l_payroll_tb.first..l_payroll_tb.last
           update zp_payroll_log
              set send_status = 1
@@ -2400,7 +2405,7 @@ is
     else
       bars_audit.info (g_p_name || l_act || ' l_satatus='||l_satatus || ', l_message='||substr(l_message,1,2000));
     end if;
-    
+
     dbms_xmlparser.freeparser (l_parser);
     dbms_xmldom.freedocument (l_doc);
   exception
@@ -2409,7 +2414,7 @@ is
       dbms_xmldom.freedocument (l_doc);
       raise;
   end set_payroll_log_result;
-    
+
    procedure send_payrolls_result
    is
       l_method      varchar2 (400) := 'SendPayrollResultToCorp2';
@@ -2433,11 +2438,11 @@ is
    begin
       bars_audit.info (g_p_name || l_act || ' start.');
 
-      if l_corp2_url is null then 
+      if l_corp2_url is null then
         raise_application_error(-20001, 'Не задано параметр ZPCORP2URL');
       end if;
 
-      if l_url is null then 
+      if l_url is null then
         raise_application_error(-20001, 'Не задано параметр ZPCENTRAL');
       end if;
 
@@ -2459,9 +2464,9 @@ is
       l_clob := l_response.doc.getclobval ();
 
       set_payroll_log_result(l_clob);
-      
+
       bars_audit.info (g_p_name || l_act || ' finish.');
-      
+
       commit;
 
    exception
