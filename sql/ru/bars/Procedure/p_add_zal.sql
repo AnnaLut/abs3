@@ -217,10 +217,10 @@ end if;
       accreg.setAccountSParam(az.acc, 'OB22', p_ob22);
 end if;
 
-if (p_strahz  is null or  p_cc_idz is null or  p_sdatz is null) then
+/*if (p_strahz  is null or  p_cc_idz is null or  p_sdatz is null) then
       raise_application_error(g_errn
                              ,g_errs || 'Всі три поля ("№ дог.заб","Дата дог. забез","Страхування застави") мають бути заповнені!');
-end if;    
+end if;*/    
 if p_strahz is not null then
   accreg.setAccountwParam(az.acc, 'Z_POLIS', p_strahz);
 end if;
