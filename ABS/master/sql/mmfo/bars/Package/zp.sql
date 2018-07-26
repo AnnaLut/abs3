@@ -114,7 +114,7 @@ end;
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.19 18.07.2018';
+g_body_version   constant varchar2(64)   := 'version 1.20 23.07.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -716,26 +716,35 @@ is
 l_zp_deals   zp_deals%rowtype;
 l_accounts   accounts%rowtype;
 l_okpo       customer.okpo%type;
-l_nmkv       customer.nmkv%type;
+l_nmkk       customer.nmkv%type;
 l_tmp        number;
 n            number;
+l_nls_2909   accounts.nls%type;
 
 l_sync_id    ead_sync_queue.id%TYPE;
 
 begin
 
-    begin
-    select 1.0 into n from zp_deals where rnk=p_rnk and sos>=0 ;
-    exception when no_data_found then
-             null;
-    end;
+    -- перевірка чи відкрито договір клієнта з таким рахунком 2909
+    -- перевірка тільки якщо рахунок передано в параметрі, інакше рахунок буде відкрито новий
+    if p_acc is not null then
+      begin
+        select 1.0 into n from zp_deals where rnk=p_rnk and sos>=0 and acc_2909 = p_acc;
+        exception 
+          when no_data_found then
+            null;
+          when others then
+            raise;
+      end;
+    end if;
 
     if n=1.0 then
-    raise_application_error(-20000, 'У данного клієнта(РНК-'||p_rnk||') вже є ЗП договір ');
+      select nls into l_nls_2909 from accounts where acc = p_acc;
+      raise_application_error(-20000, 'У данного клієнта(РНК-'||p_rnk||') вже є ЗП договір з таким рахунком '||l_nls_2909);
     end if;
 
     begin
-    select okpo, nmkk into l_okpo,l_nmkv from customer where rnk=p_rnk;
+    select okpo, nmkk into l_okpo,l_nmkk from customer where rnk=p_rnk;
     exception when no_data_found then
              raise_application_error(-20000, 'Вказаного РНК - '||p_rnk||',  не існує.');
     end;
@@ -799,7 +808,7 @@ begin
 
      l_accounts.nls := vkrzn ( substr(gl.amfo,1,5) ,'29090'||l_tmp );
      l_accounts.kv  := gl.baseval;
-     l_accounts.nms :=substr(l_nmkv,1,70);
+     l_accounts.nms :=substr(l_nmkk,1,70);
 
      l_accounts.grp := 39 ;
 
@@ -846,6 +855,7 @@ begin
 
      insert into zp_acc(id,acc,kf) values (l_zp_deals.id,l_zp_deals.acc_2909, l_zp_deals.kf );
 end create_deal;
+
 --==============================
 --Підтвердження договору
 --==============================
@@ -1051,6 +1061,7 @@ begin
 
 
 end del_deal;
+
 --==============================
 --Авторизація договору
 --==============================
@@ -1072,50 +1083,61 @@ begin
   if l_v_zp_deals.sos = 1
   then
 
-       begin
+      begin
 
+       /*
        select * into l_accounts from accounts a
        where nbs_ob22_rnk('3570','29',l_v_zp_deals.nls_2909,980)=a.nls
        and kv=980;
-
+              
        exception when others  then
            if sqlcode = -20203
            then
+       */
+       -- COBUMMFO-7442
+       -- відкриття 3570 на кожен 2909
+       select * into l_accounts from accounts a
+       where acc = l_v_zp_deals.acc_3570;
+       
+      exception
+        when no_data_found then
+          -- відкриття 3570
+          begin
+            while 1<5    loop
+               l_tmp := trunc(dbms_random.value(1, 999999999));
+               begin select 1 into l_tmp from accounts where nls like '3570_'||l_tmp and kv=980;
+               exception when no_data_found then exit ;
+               end;
+            end loop;
 
+            l_accounts.nls := vkrzn ( substr(gl.amfo,1,5) ,'35700'||l_tmp );
+            l_accounts.kv  := gl.baseval;
+            l_accounts.nms :=l_v_zp_deals.nmkv;
 
-                  while 1<5    loop
-                     l_tmp := trunc(dbms_random.value(1, 999999999));
-                     begin select 1 into l_tmp from accounts where nls like '3570_'||l_tmp and kv=980;
-                     exception when no_data_found then exit ;
-                     end;
-                  end loop;
+            l_accounts.grp := 39 ;
 
-                 l_accounts.nls := vkrzn ( substr(gl.amfo,1,5) ,'35700'||l_tmp );
-                 l_accounts.kv  := gl.baseval;
-                 l_accounts.nms :=l_v_zp_deals.nmkv;
+            op_reg_ex(  mod_  => 9,
+                       p1_   => null,
+                       p2_   => 0,
+                       p3_   => l_accounts.grp,
+                       p4_   => l_tmp,
+                       rnk_  => l_v_zp_deals.rnk,
+                       nls_  => l_accounts.nls,
+                       kv_   => l_accounts.kv,
+                       nms_  => l_accounts.nms,
+                       tip_  => 'ODB',
+                       isp_  => user_id,
+                       accr_ => l_accounts.acc,
+                       pap_  => 1     ,
+                       tobo_ => l_v_zp_deals.branch);
 
-                 l_accounts.grp := 39 ;
-
-                 op_reg_ex(  mod_  => 9,
-                             p1_   => null,
-                             p2_   => 0,
-                             p3_   => l_accounts.grp,
-                             p4_   => l_tmp,
-                             rnk_  => l_v_zp_deals.rnk,
-                             nls_  => l_accounts.nls,
-                             kv_   => l_accounts.kv,
-                             nms_  => l_accounts.nms,
-                             tip_  => 'ODB',
-                             isp_  => user_id,
-                             accr_ => l_accounts.acc,
-                             pap_  => 1     ,
-                             tobo_ => l_v_zp_deals.branch);
-
-                accreg.setaccountsparam(l_accounts.acc, 'OB22', '29');
-                accreg.setaccountsparam(l_accounts.acc, 'R013', '3');
-                accreg.setaccountsparam(l_accounts.acc, 'S180', '5');
-                accreg.setaccountsparam(l_accounts.acc, 'S240', '4');
-           end if;
+            accreg.setaccountsparam(l_accounts.acc, 'OB22', '29');
+            accreg.setaccountsparam(l_accounts.acc, 'R013', '3');
+            accreg.setaccountsparam(l_accounts.acc, 'S180', '5');
+            accreg.setaccountsparam(l_accounts.acc, 'S240', '4');
+           end;
+         when others then
+           raise_application_error(-20001, 'Помилка відкриття рахунка 3570 '||substr (dbms_utility.format_error_backtrace || ' ' || sqlerrm, 1, 3000));
        end;
 
        update  zp_deals set acc_3570=l_accounts.acc where id =p_id;
@@ -1155,6 +1177,7 @@ begin
 
 
 end authorize_deal;
+
 --==============================
 --Відмова авторизації
 --==============================
