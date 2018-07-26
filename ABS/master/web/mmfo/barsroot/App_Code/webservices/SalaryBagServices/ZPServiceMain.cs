@@ -52,16 +52,16 @@ namespace Bars.SalaryBagSrv
         }
 
         [WebMethod(EnableSession = true)]
-        public CorpAddIfoResult GetCorp2ClientInfo(string rnk, decimal? sum, string mfo, string sessionId)
+        public CorpAddIfoResult GetCorp2ClientInfo(string rnk, decimal? sum, string mfo, string nls)
         {
             CorpAddIfoResult res = new CorpAddIfoResult();
 
             try
             {
                 String UserName = ConfigurationSettings.AppSettings["ZP.ABS_login"];
-                LoginUser(UserName, sessionId);
+                LoginUser(UserName);
 
-                res = ZPSrvWorker.GetCorp2ClientInfo(rnk, sum, mfo);
+                res = ZPSrvWorker.GetCorp2ClientInfo(rnk, sum, mfo, nls);
             }
             catch (System.Exception ex)
             {
