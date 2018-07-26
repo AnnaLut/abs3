@@ -64,11 +64,6 @@ end if;
                        p_mpawn || ' ,p_PR_12=' || p_pr_12 || ' ,p_nazn=' ||
                        p_nazn);*/
 
-  -- VPogoda 09/05/2018, COBUMMFO-7618
-  if gl.bDATE>=to_date('16.04.2018','dd.mm.yyyy') and (p_ob22 is null or p_R013 is null) then
-    raise_application_error(g_errn,'Параметри OB22 та R013 обов"язкові при додаванні нового забезпечення!');
-  end if;
-
   IF pul.get_mas_ini_val('PAP') = 2 THEN
     l_pawn := 999999;
   ELSE
