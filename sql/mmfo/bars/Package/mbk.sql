@@ -1,3 +1,4 @@
+
  
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mbk.sql =========*** Run *** =======
@@ -281,6 +282,66 @@ function get_pawn_account_number(
         p_nostro_document_id in integer)
     return integer;
 
+Function F_NLS_MB_old (
+     nbs_     in varchar2,
+     rnk_     in integer,
+     ACRB_    in integer,
+     kv_      in integer,
+     maskid_     varchar2 ) return varchar2;
+
+PROCEDURE inp_deal_Ex_old (
+      CC_ID_        varchar2,   -- N тикета/договора
+      nVidd_        integer,        -- Вид договора
+      nTipd_        integer,        -- Тип договора
+      nKV_          integer,        -- Валюта
+      RNKB_         integer,        -- Рег.№ партнера
+      DAT2_         date,       -- дата сделки
+      p_datv        date,       -- дата валютирования
+      DAT4_         date,       -- дата окончания
+      IR_           number,     -- индив ставка
+      OP_           number,     -- арифм.знак
+      BR_           number,     -- базовая ставки
+      SUM_          number,     -- Сумма сделки (в руб.)
+      nBASEY_       integer,        -- % база
+      nIO_          integer,        -- Начисление на входящий остаток 1-Да/0-Нет
+      S1_           varchar2,   -- Осн.Счет для банка Б
+      S2_           varchar2,   -- Код банка Б (mfo/bic) для осн.сч
+      S3_           varchar2,   -- Счет нач.% для банка Б
+      S4_           varchar2,   -- Код банка Б (mfo/bic) для сч нач.%
+      S5_           number,     -- Счет для входа валюты
+      NLSA_         varchar2,   -- Основной счет в нашем банке
+      NMS_          varchar2,   -- Наименование основного счета
+      NLSNA_        varchar2,   -- Счет начисленных % в нашем банке
+      NMSN_         varchar2,   -- Наименование счета начисленных %
+      NLSNB_        varchar2,   -- Счет нач.% для банка Б = S3_
+      NMKB_         varchar2,   -- Наименование клиента
+      Nazn_         varchar2,   -- Назначение платежа (% по дог. CC_ID)
+      NLSZ_         varchar2,   -- Счет обеспечения
+      nKVZ_         integer,        -- Валюта обеспечения
+      p_pawn        number,     -- код вида обеспечения
+      Id_DCP_       integer,        -- Id from dcp_p.id
+      S67_          varchar2,   -- Счет доходов
+      nGrp_         integer,        -- Группа доступа счетов
+      nIsp_         integer,        -- Исполнитель
+      BICA_         varchar2,   -- BIC нашего банка
+      SSLA_         varchar2,   -- Счет VOSTRO у нашего банка-корреспонд
+      BICB_         varchar2,   -- BIC партнера
+      SSLB_         varchar2,   -- Счет VOSTRO партнера у его банка-корресп
+      SUMP_         number,     -- Сумма %%
+      AltB_         varchar2,
+      IntermB_      varchar2,
+      IntPartyA_    varchar2,
+      IntPartyB_    varchar2,
+      IntIntermA_   varchar2,
+      IntIntermB_   varchar2,
+      ND_           out integer,
+      ACC1_         out integer,
+      sErr_         out varchar2,
+      DDAte_        date     default null,  -- Дата заключення
+      IRR_          number   default null,  -- Еф. % ставка
+      code_product_ number   default null,  -- Код продукта
+      n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
+    );
     ----------------------------------------------------------------------
     function header_version return varchar2;
     function body_version return varchar2;
@@ -337,11 +398,26 @@ Function F_NLS_MB (
    MASK_ VARCHAR2(10);
    l_INITIATOR   varchar2(2);
    mm MBDK_ob22%rowtype ;
-   l_NBS_SS char(4) ; l_Ob22_SS char(2) ;    l_NBS_SN char(4) ; l_Ob22_SN char(2) ;  D10 date := gl.Bdate -10 ;  D11 date := gl.Bdate -10 ; 
+   l_NBS_SS char(4) ; 
+   l_Ob22_SS char(2) ;    
+   l_NBS_SN char(4) ; 
+   l_Ob22_SN char(2) ;  
+   D10 date := gl.Bdate -10 ;  
+   D11 date := gl.Bdate -10 ; 
+   v_num number;
 
-BEGIN l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
+BEGIN 
+  l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
+   
+  select count(1) into v_num
+    from mbdk_ob22 m
+    where m.vidd = nbs_;
+  if nbs_ in (3902,3903) then
+    return F_NLS_MB_old(nbs_,rnk_,acrb_,kv_,maskid_);
+  else
 
    mm := MBK.Get_MBDK (p_Vidd => to_number(nbs_) ); 
+  end if;
 
    If maskid_ = 'SP' then
       l_NBS_SS  := Substr(mm.SP,1,4);  
@@ -817,6 +893,61 @@ END RO_deal;
 
       MM mbdk_OB22%ROWTYPE;
     BEGIN
+      if nvidd_ in ('3902','3903') then
+        inp_deal_ex_old(  CC_ID_       ,   -- N тикета/договора
+                        nVidd_       ,   -- Вид договора
+                        nTipd_       ,   -- Тип договора
+                        nKV_         ,   -- Валюта
+                        RNKB_        ,   -- Рег.№ партнера
+                        DAT2_        ,   -- дата сделки
+                        p_datv       ,   -- дата валютирования
+                        DAT4_        ,   -- дата окончания
+                        IR_          ,   -- индив ставка
+                        OP_          ,   -- арифм.знак
+                        BR_          ,   -- базовая ставки
+                        SUM_         ,   -- Сумма сделки (в руб.)
+                        nBASEY_      ,   -- % база
+                        nIO_         ,   -- Начисление на входящий остаток 1-Да/0-Нет
+                        S1_          ,   -- Осн.Счет для банка Б
+                        S2_          ,   -- Код банка Б (mfo/bic) для осн.сч
+                        S3_          ,   -- Счет нач.% для банка Б
+                        S4_          ,   -- Код банка Б (mfo/bic) для сч нач.%
+                        S5_          ,   -- Счет для входа валюты
+                        NLSA_        ,   -- Основной счет в нашем банке
+                        NMS_         ,   -- Наименование основного счета
+                        NLSNA_       ,   -- Счет начисленных % в нашем банке
+                        NMSN_        ,   -- Наименование счета начисленных %
+                        NLSNB_       ,   -- Счет нач.% для банка Б = S3_
+                        NMKB_        ,   -- Наименование клиента
+                        Nazn_        ,   -- Назначение платежа (% по дог. CC_ID)
+                        NLSZ_        ,   -- Счет обеспечения
+                        nKVZ_        ,   -- Валюта обеспечения
+                        p_pawn       ,   -- код вида обеспечения
+                        Id_DCP_      ,   -- Id from dcp_p.id
+                        S67_         ,   -- Счет доходов
+                        nGrp_        ,   -- Группа доступа счетов
+                        nIsp_        ,   -- Исполнитель
+                        BICA_        ,   -- BIC нашего банка
+                        SSLA_        ,   -- Счет VOSTRO у нашего банка-корреспонд
+                        BICB_        ,   -- BIC партнера
+                        SSLB_        ,   -- Счет VOSTRO партнера у его банка-корресп
+                        SUMP_        ,   -- Сумма %%
+                        AltB_        ,
+                        IntermB_     ,
+                        IntPartyA_   ,
+                        IntPartyB_   ,
+                        IntIntermA_  ,
+                        IntIntermB_  ,
+                        ND_          ,
+                        ACC1_        ,
+                        sErr_        ,
+                        null         ,
+                        null         ,
+                        null         ,
+                        null
+                     );
+        return;
+      end if;
       MM := Get_MBDK( p_Vidd => nVidd_) ;
 
       -- счет доходов-расходов c превентивным открытием
@@ -1809,6 +1940,7 @@ end estimate_interest_amount ;
         l_transit_account_number varchar2(15) := '37397005523';
         l_money_format varchar2(30 char) := 'FM999999999999999990.00';
     begin
+    logger.info ('MBDK_L 1 nd =  ' || p_nd );
         l_cc_deal_row := cck_utl.read_cc_deal(p_nd);
         l_cc_add_row := cck_utl.read_cc_add(p_nd, p_application_id => 0);
         l_main_account_row := account_utl.read_account(l_cc_add_row.accs);
@@ -2530,6 +2662,637 @@ end estimate_interest_amount ;
     exception        when no_data_found then             return 1;
     end;
     -------------------------------------------
+Function F_NLS_MB_old (
+     nbs_     in varchar2,
+     rnk_     in integer,
+     ACRB_    in integer,
+     kv_      in integer,
+     maskid_     varchar2 ) return varchar2  IS
+
+   nbsn_ char(4);                         -- БС нач %%
+   SS_   varchar2(14) := to_char(null);   -- осн счет как результат
+   SN_   varchar2(14) := to_char(null);   -- предполож нач % как результат
+   ACRA_ integer;
+   acc_  integer;
+   id_   integer;
+   MASK_ VARCHAR2(10);
+
+     -- 30.08.2010 Sta
+     l_INITIATOR   varchar2(2);
+   BEGIN
+
+       bars_audit.info('mbk.f_nls_mb' || chr(10) ||
+                       'nbs_    : ' || nbs_    || chr(10) ||
+                       'rnk_    : ' || rnk_    || chr(10) ||
+                       'ACRB_   : ' || ACRB_   || chr(10) ||
+                       'kv_     : ' || kv_     || chr(10) ||
+                       'maskid_ : ' || maskid_);
+     BEGIN
+
+        SELECT nbsn INTO nbsn_ FROM proc_dr WHERE nbs=nbs_ and ROWNUM=1; -- если несколько записей - берем первую
+
+        BEGIN
+            if nbs_ like '39%' then  MASK_ := 'MFK';
+            else                     MASK_ := 'MBK';
+            end if;
+
+            -- 30.08.2010 Sta
+            -- только для ГОУ ОБ
+
+            l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
+
+            If gl.aMfo = '300465' and l_INITIATOR is not null then
+
+               EXECUTE IMMEDIATE
+              'SELECT a.acc
+                 FROM accounts a, int_accn i, accounts n,
+                      (select acc from SPECPARAM_CP_OB where INITIATOR ='''|| l_INITIATOR || ''') o
+                WHERE a.acc= o.acc (+)
+                  and a.acc  = i.acc
+                  AND a.kv   = '  || kv_  || '
+                 AND a.nbs  = '''|| nbs_ || '''
+                 AND a.rnk  = '  || rnk_ || '
+                 AND a.ostc = 0 AND a.ostb = 0 AND a.ostf = 0
+                 AND n.ostc = 0 AND n.ostb = 0 AND n.ostf = 0
+                 AND i.acra = n.acc
+                 AND (a.mdate < gl.BD OR a.mdate IS NULL) AND a.dazs is null
+                 AND (n.mdate < gl.BD OR n.mdate IS NULL) AND n.dazs is null
+                 and (a.dapp is null or a.dapp < bankdate-10)
+                 and (n.dapp is null or n.dapp < bankdate-10)
+                 AND ROWNUM=1 ' into ACC_ ;
+
+              SELECT nls,pap-1  INTO SS_, id_ FROM accounts where acc=ACC_;
+
+           else
+
+              -- Для всех других банков
+              -- вот он свободный  SS_
+              SELECT a.nls, a.acc, a.pap-1
+                INTO SS_,   acc_,  id_
+                FROM accounts a, int_accn i, accounts n
+               WHERE a.acc  = i.acc
+                 AND a.kv   = kv_
+                 AND a.nbs  = nbs_
+                 AND a.rnk  = rnk_
+                 AND a.ostc = 0 AND a.ostb = 0 AND a.ostf = 0
+                 AND n.ostc = 0 AND n.ostb = 0 AND n.ostf = 0
+                 AND i.acra = n.acc
+                 AND (a.mdate < gl.BDATE OR a.mdate IS NULL) AND a.dazs is null
+                 AND (n.mdate < gl.BDATE OR n.mdate IS NULL) AND n.dazs is null
+                 and (a.dapp is null or a.dapp < bankdate-10)
+                 and (n.dapp is null or n.dapp < bankdate-10)
+                 AND ROWNUM=1 ;
+
+           end if;
+
+          -- а как его счет  SN ?
+          SELECT a.nls, i.acra  INTO SN_, acra_  FROM int_accn i, accounts a
+          WHERE i.acc=acc_ AND i.id=id_ AND i.acra=a.acc AND a.dazs is null;
+
+       exception when NO_DATA_FOUND THEN
+
+          -- увы, нет --смоделируем следующий (первый) новый
+          SS_ := F_NEWNLS2(null, MASK_, nbs_ , RNK_,null);
+          SN_ := F_NEWNLS2(null, MASK_, nbsn_, RNK_,null);
+
+       END;
+    exception when NO_DATA_FOUND THEN null;
+    end;
+
+    return (substr(SS_||'               ', 1, 15) ||
+            substr(SN_||'               ', 1, 15)
+           );
+
+  END F_NLS_MB_old ;
+--
+    function get_proc_dr_row(
+        p_balance_account in varchar2,
+        p_customer_id in integer,
+        p_branch in varchar2 default sys_context('bars_context', 'user_branch'))
+    return proc_dr$base%rowtype
+    is
+        l_customer_mfo varchar2(6 char);
+        l_notax integer;
+        l_customerw_value varchar2(32767 byte);
+        l_proc_dr_row proc_dr$base%rowtype;
+    begin
+        l_customer_mfo := customer_utl.get_customer_mfo(p_customer_id);
+
+        -- TODO: ніжто вже не пам'ятає для чого існує цей if, але всім страшно сказати, що він не потрібен - розберусь, і приберу його, якщо це можливо
+        if (l_customer_mfo = 0) then
+            l_customerw_value := kl.get_customerw(p_customer_id, 'NOTAX');
+            l_notax := nvl(to_number(case when regexp_like(l_customerw_value, '^\d*$') then l_customerw_value else null end), 0);
+
+            if (l_notax <> 0) then
+                l_customer_mfo := l_notax;
+            end if;
+        end if;
+
+        begin
+            select *
+            into   l_proc_dr_row
+            from   proc_dr$base p
+            where  p.rowid = (select min(t.rowid) keep (dense_rank last order by t.rezid)
+                              from   proc_dr$base t
+                              where  t.nbs = p_balance_account and
+                                     t.sour = cck_utl.FUNDS_SOURCE_OWN and
+                                     t.rezid in (l_customer_mfo, 0) and
+                                     t.branch = p_branch);
+
+            return l_proc_dr_row;
+        exception
+            when no_data_found then
+                 return null;
+        end;
+    end;
+
+PROCEDURE inp_deal_Ex_old (
+      CC_ID_        varchar2,   -- N тикета/договора
+      nVidd_        integer,        -- Вид договора
+      nTipd_        integer,        -- Тип договора
+      nKV_          integer,        -- Валюта
+      RNKB_         integer,        -- Рег.№ партнера
+      DAT2_         date,       -- дата сделки
+      p_datv        date,       -- дата валютирования
+      DAT4_         date,       -- дата окончания
+      IR_           number,     -- индив ставка
+      OP_           number,     -- арифм.знак
+      BR_           number,     -- базовая ставки
+      SUM_          number,     -- Сумма сделки (в руб.)
+      nBASEY_       integer,        -- % база
+      nIO_          integer,        -- Начисление на входящий остаток 1-Да/0-Нет
+      S1_           varchar2,   -- Осн.Счет для банка Б
+      S2_           varchar2,   -- Код банка Б (mfo/bic) для осн.сч
+      S3_           varchar2,   -- Счет нач.% для банка Б
+      S4_           varchar2,   -- Код банка Б (mfo/bic) для сч нач.%
+      S5_           number,     -- Счет для входа валюты
+      NLSA_         varchar2,   -- Основной счет в нашем банке
+      NMS_          varchar2,   -- Наименование основного счета
+      NLSNA_        varchar2,   -- Счет начисленных % в нашем банке
+      NMSN_         varchar2,   -- Наименование счета начисленных %
+      NLSNB_        varchar2,   -- Счет нач.% для банка Б = S3_
+      NMKB_         varchar2,   -- Наименование клиента
+      Nazn_         varchar2,   -- Назначение платежа (% по дог. CC_ID)
+      NLSZ_         varchar2,   -- Счет обеспечения
+      nKVZ_         integer,        -- Валюта обеспечения
+      p_pawn        number,     -- код вида обеспечения
+      Id_DCP_       integer,        -- Id from dcp_p.id
+      S67_          varchar2,   -- Счет доходов
+      nGrp_         integer,        -- Группа доступа счетов
+      nIsp_         integer,        -- Исполнитель
+      BICA_         varchar2,   -- BIC нашего банка
+      SSLA_         varchar2,   -- Счет VOSTRO у нашего банка-корреспонд
+      BICB_         varchar2,   -- BIC партнера
+      SSLB_         varchar2,   -- Счет VOSTRO партнера у его банка-корресп
+      SUMP_         number,     -- Сумма %%
+      AltB_         varchar2,
+      IntermB_      varchar2,
+      IntPartyA_    varchar2,
+      IntPartyB_    varchar2,
+      IntIntermA_   varchar2,
+      IntIntermB_   varchar2,
+      ND_           out integer,
+      ACC1_         out integer,
+      sErr_         out varchar2,
+      DDAte_        date     default null,  -- Дата заключення
+      IRR_          number   default null,  -- Еф. % ставка
+      code_product_ number   default null,  -- Код продукта
+      n_nbu_        varchar2 default null   -- Номер свідоцтва НБУ
+    ) IS
+
+      title         constant  varchar2(60) := 'mbk.inp_deal';
+      sTTA_                   char(3);
+      sTTB_                   char(3);
+      Tip1_                   char(3);
+      Tip2_                   char(3);
+      ACC2_                   accounts.acc%type;
+      ACC3_                   accounts.acc%type;
+      ACC4_                   accounts.acc%type;
+      nID_                    integer;
+      nUser_                  integer;
+      nTmp_                   integer;
+      l_s180                  specparam.s180%type;
+      l_initiator             varchar2(2);
+      l_ob22                  specparam_int.ob22%type;
+      l_proc_dr_row           proc_dr$base%rowtype;
+      l_txt                   customerw.value%type;
+      l_tipd                  cc_vidd.tipd%type;
+      l_io                    int_accn.io%type;
+      l_isp                   accounts.isp%type;
+      l_grp                   accounts.grp%type;
+      l_clt_amnt              oper.s%type; -- сума застава з pul
+      inr_err                 exception;   -- Internal error
+	  l_nmkb                  int_accn.namb%type;
+
+
+    BEGIN
+
+
+      bars_audit.info( SubStr( title || ': Entry with( CC_ID_ => ' || CC_ID_
+           || chr(10) || ', nVidd_ => '      || nVidd_
+           || chr(10) || ', nTipd_ => '      || nTipd_
+           || chr(10) || ', nKV_ => '        || nKV_
+           || chr(10) || ', DAT2_ => '       || to_char(DAT2_ ,'dd/mm/yyyy')
+           || chr(10) || ', p_datv => '      || to_char(p_datv,'dd/mm/yyyy')
+           || chr(10) || ', DAT4_ => '       || to_char(DAT4_ ,'dd/mm/yyyy')
+           || chr(10) || ', RNKB_ => '       || RNKB_      || ', IR_ => '         || IR_
+           || chr(10) || ', OP_   => '       || OP_        || ', BR_ => '         || BR_
+           || chr(10) || ', SUM_  => '       || SUM_       || ', nBASEY_ => '     || nBASEY_
+           || chr(10) || ', nIO_  => '       || nIO_       || ', S1_  => '        || S1_
+           || chr(10) || ', S2_   => '       || S2_        || ', S3_  => '        || S3_
+           || chr(10) || ', S4_   => '       || S4_        || ', S5_  => '        || S5_
+           || chr(10) || ', NLSA_ => '       || NLSA_      || ', NMS_ => '        || NMS_
+           || chr(10) || ', NLSNA_ => '      || NLSNA_     || ', NMSN_ => '       || NMSN_
+           || chr(10) || ', NLSNB_ => '      || NLSNB_     || ', NMKB_ => '       || NMKB_
+           || chr(10) || ', Nazn_  => '      || Nazn_      || ', NLSZ_ => '       || NLSZ_
+           || chr(10) || ', nKVZ_  => '      || nKVZ_      || ', p_pawn => '      || p_pawn
+           || chr(10) || ', Id_DCP_ => '     || Id_DCP_    || ', S67_ => '        || S67_
+           || chr(10) || ', nGrp_   => '     || nGrp_      || ', nIsp_ => '       || nIsp_
+           || chr(10) || ', BICA_   => '     || BICA_      || ', SSLA_ => '       || SSLA_
+           || chr(10) || ', BICB_   => '     || BICB_      || ', SSLB_ => '       || SSLB_
+           || chr(10) || ', SUMP_   => '     || SUMP_      || ', AltB_ => '       || AltB_
+           || chr(10) || ', IntermB_    => ' || IntermB_   || ', IntPartyA_ => '  || IntPartyA_
+           || chr(10) || ', IntPartyB_  => ' || IntPartyB_ || ', IntIntermA_ => ' || IntIntermA_
+           || chr(10) || ', IntIntermB_ => ' || IntIntermB_|| ').', 1, 4000 ) );
+
+      BEGIN
+
+   	    l_nmkb := substr(NMKB_,1,38);
+
+        nUser_ := USER_ID;
+        ND_    := null;
+
+        -- счет доходов-расходов
+        if ( S67_ Is Null )
+        then
+
+          ACC3_ := BARS.F_PROC_DR( RNKB_, 4, 0, 'MKD', nVidd_, nKv_ );
+
+          if ( ACC3_ Is Null )
+          then
+            sERR_ := 'Не знайдено рахунок доходів/витрат';
+            raise inr_err;
+          end if;
+
+        else
+
+          BEGIN
+            SELECT acc
+              INTO ACC3_
+              FROM accounts
+             WHERE kv=gl.baseval
+               and nls=S67_
+               and dazs is null;
+          EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+              sERR_ := 'Не открыт счет '||S67_;
+              raise inr_err;
+          END;
+
+        end if;
+
+        --SELECT s_cc_deal.nextval into ND_  FROM dual;
+        nd_ := bars_sqnc.get_nextval('s_cc_deal');
+
+        INSERT INTO cc_deal (nd , vidd  , rnk  , user_id, cc_id , sos, wdate, sdate                , limit, kprolog,ir  ,prod         )
+                     VALUES (ND_, nVidd_, RNKB_, nUser_ , CC_ID_, 10 , DAT4_, nvl(DDAte_, gl.BDATE), SUM_ , 0      ,IRR_,code_product_);
+
+        INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   ,
+                            mfoperc    , refp       , swi_bic, swi_acc, swo_bic, swo_acc, int_amount, alt_partyb, interm_b, int_partya, int_partyb,
+                            int_interma, int_intermb, n_nbu  )
+                    VALUES (ND_        , 0          , Sum_   , nKv_   , DAT2_  , p_datv , 4         , S1_       , S2_     , 2         , S3_       ,
+                            S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_,
+                            IntIntermA_, IntIntermB_, n_nbu_ );
+
+        if ( nTipd_ Is Null )
+        then
+          select TIPD
+            into l_tipd
+            from CC_VIDD
+           where VIDD = nVidd_;
+        else
+          l_tipd := nTipd_;
+        end if;
+
+        if l_tipd = 1
+        then
+          nID_ :=0;
+          Tip1_:='SS ';
+          Tip2_:='SN ';
+        else
+          nID_ :=1;
+          Tip1_:='DEP';
+          Tip2_:='DEN';
+        end if ;
+
+        if ( nIsp_ Is Null )
+        then
+          l_isp := gl.aUID;
+        else
+          l_isp := nIsp_;
+        end if;
+
+        if ( nGrp_ Is Null )
+        then
+          l_grp := 33;
+        else
+          l_grp := nGrp_;
+        end if;
+
+        bars_audit.info( title || ': tipd = ' || to_char(l_tipd)
+                               || ', grp = '  || to_char(l_grp)
+                               || ', isp = '  || to_char(l_isp) );
+
+        -- открытие основного счета
+        Op_Reg_ex(1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, l_isp, ACC1_, '1', null, null,
+           null);  -- KB  pos=1
+
+        bars_audit.info( title || ': ACC1_ = ' || ACC1_ );
+
+        -- открытие счета нач.%%
+        Op_Reg_ex(1,ND_,nTmp_, l_grp, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, l_isp, ACC2_, '1', null, null,
+           null);  -- KB  pos=1
+
+        UPDATE cc_add
+           SET accs=ACC1_
+         WHERE nd=ND_;
+
+        -- 30.08.2010 Sta
+        l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
+
+        If gl.aMfo = '300465' and l_INITIATOR is not null then
+           -- Доп.реквизиты счета SS
+           EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC1_ ;
+           if SQL%rowcount = 0 then
+              EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
+                                'values ( ' || ACC1_ || ', '''|| l_INITIATOR || ''' )';
+           end if;
+
+           EXECUTE IMMEDIATE 'update SPECPARAM_CP_OB set INITIATOR =''' || l_INITIATOR || ''' where acc= '|| ACC2_ ;
+           if SQL%rowcount = 0 then
+              EXECUTE IMMEDIATE 'insert into SPECPARAM_CP_OB (ACC,INITIATOR) ' ||
+                                'values ( ' || ACC2_ || ', '''|| l_INITIATOR || ''' )';
+           end if;
+        end if;
+        -------------
+
+        IF NLSZ_ is not null
+        then
+          -- открытие счета залога
+          op_reg_ex( 2, ND_, p_pawn -- case when ( l_tipd = 2 ) then 999999 else p_pawn end
+                   , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', l_isp, ACC4_, '1', null, null, null
+                   ); -- KB  pos=1
+
+          bars_audit.info( title || ': ZAL ACC4_ = ' || ACC4_ );
+
+          -- проставляем группу доступа для счета залога как для основного счета
+          p_setAccessByAccmask(ACC4_, ACC1_);
+
+          insert into nd_acc (nd, acc) values (ND_, ACC4_);
+
+           if ( l_tipd = 1 )
+           then
+
+              update cc_accp
+                 set nd=ND_
+                 where acc=ACC4_ and accs=ACC1_;
+
+              IF SQL%rowcount = 0
+              then
+                 INSERT into cc_accp (ACC,ACCS,nd) values (ACC4_,ACC1_,ND_);
+              END IF;
+           END IF;
+
+           cck_utl.set_deal_attribute(ND_, 'PAWN', to_char(p_pawn));
+
+        END IF;
+
+        IF Id_DCP_ is not null then
+           -- обеспечение - ДЦП
+           UPDATE dcp_p Set ref=-ND_, acc=ACC1_ WHERE id=Id_DCP_;
+        END IF;
+
+        UPDATE accounts SET mdate=DAT4_,PAP=l_tipd WHERE acc=ACC1_;
+        UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC2_;
+        UPDATE accounts SET mdate=DAT4_            WHERE acc=ACC4_;
+    /*
+        if substr(nVidd_,1,2) = '39' then
+
+           -- установка ОБ22
+           l_ob22 := case when nKV_ = gl.baseval then '02' else '12' end;
+           update specparam_int set ob22 = l_ob22 where acc = ACC1_ ;
+           if SQL%rowcount = 0 then
+              insert into specparam_int (acc, ob22)
+              values (ACC1_, l_ob22);
+           end if;
+           update specparam_int set ob22 = '02' where acc = ACC2_ ;
+           if SQL%rowcount = 0 then
+              insert into specparam_int (acc, ob22)
+              values (ACC2_, '02');
+           end if;
+
+           -- проставим спецпараметр МФО (нужно для файлов 32, 33)
+           update specparam_int set mfo=S2_ where acc = ACC1_ ;
+           if SQL%rowcount = 0 then
+              insert into specparam_int (acc, mfo)
+              values (ACC1_, S2_);
+           end if;
+           update specparam_int set mfo=S2_ where acc = ACC2_ ;
+           if SQL%rowcount = 0 then
+              insert into specparam_int (acc, mfo)
+              values (ACC2_, S2_);
+           end if;
+
+        end if;
+    */
+        -- Artem Yurchenko, 24.11.2014
+        -- для кредитных ресурсов необходимо использовать другие операции
+        if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
+            -- установка ОБ22
+            l_ob22 := '02';
+            accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);
+            accreg.setAccountSParam(ACC2_, 'OB22', l_ob22);
+
+            -- проставим спецпараметр МФО (нужно для файлов 32, 33)
+            accreg.setAccountSParam(ACC1_, 'MFO', s2_);
+            accreg.setAccountSParam(ACC2_, 'MFO', s2_);
+
+            sTTB_ := 'PS2';
+
+            --операция по начислению проц
+            l_proc_dr_row := get_proc_dr_row(to_char(nVidd_, 'FM9999'), rnkb_);
+            sTTA_ := case when nKv_ = gl.baseval then l_proc_dr_row.tt
+                          else l_proc_dr_row.ttv
+                     end;
+        else
+            sTTB_ := case when nKv_ = gl.baseval then 'WD2' else 'WD3' end;
+
+            --операция по начислению проц
+            BEGIN
+               SELECT val INTO sTTA_ FROM params WHERE par='MBD_%%1';
+            EXCEPTION WHEN NO_DATA_FOUND THEN sTTA_ := '%%1';
+            END;
+            BEGIN
+              -- резидент-нерезидент
+              SELECT decode (codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )
+                INTO sTTA_
+                FROM customer WHERE rnk=RNKB_;
+            EXCEPTION
+              WHEN NO_DATA_FOUND THEN
+                sERR_ := 'Не найден RNKB '||RNKB_;
+                raise inr_err;
+            END;
+        end if;
+
+        if ( nIO_ Is Null )
+        then
+          select IO
+            into l_io
+            from BARS.PROC_DR
+           where NBS = nVidd_
+             and sour = 4
+             and rownum = 1;
+        else
+          l_io := nIO_;
+        end if;
+
+        update BARS.INT_ACCN
+           set BASEY = nBASEY_
+             , TT = sTTA_
+             , STP_DAT = DAT4_-1
+             , ACRA = ACC2_
+             , ACRB = ACC3_
+             , s = 0
+             , IO = l_io
+             , acr_dat = decode(l_io,1,gl.BDATE,acr_dat)
+         where acc = ACC1_
+           and id  = nID_;
+
+        IF SQL%rowcount = 0
+        then
+          INSERT INTO int_accN ( acc, ID, metr, basem, BASEY, freq, ACRA, ACRB, KVB, TT, TTB, STP_DAT, s, IO, acr_dat )
+          VALUES (ACC1_, nID_, 0, 0, nBASEY_, 1, ACC2_, ACC3_, nKv_, sTTA_, sTTB_, DAT4_-1, 0, l_io, decode(l_io,1,gl.BDATE,null));
+        END IF;
+
+        IF ( nID_ = 1 and nKV_=gl.baseval )
+        then
+           UPDATE int_accN
+              Set NLSB=NLSNB_
+                , MFOB=S2_
+                , NAMB= l_nmkb
+                , NAZN=Nazn_
+            WHERE acc=ACC1_ AND id=1;
+        ELSIF nID_ = 1 and nKV_<>gl.baseval then
+            if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then
+                update int_accn
+                set    nlsb = substr(nlsnb_, 1, 14),
+                       mfob = s2_,
+                       namb = l_nmkb,
+                       nazn = nazn_
+                 where acc = acc1_ and
+                       id = 1;
+            else
+                UPDATE int_accN
+                   Set NLSB=substr(NLSNB_,1,14), NAMB=l_nmkb, NAZN=Nazn_
+                 WHERE acc=ACC1_ AND id=1;
+            end if;
+        END IF;
+
+        update INT_ratn
+           SET ir=IR_, op=OP_, br=BR_
+         where acc=ACC1_ and id=nID_ and bdat=DAT2_;
+
+        if SQL%rowcount = 0
+        then
+           INSERT INTO INT_ratn (acc  , ID ,bdat ,ir ,op ,br)
+           VALUES (ACC1_, nID_, DAT2_, IR_, OP_, BR_);
+        end if;
+
+        -- При открытии договора D020 := '01'
+        UPDATE specparam set D020 = '01' where acc=ACC1_;
+        if SQL%rowcount = 0 then
+           INSERT INTO specparam (ACC, D020 ) values ( ACC1_, '01' );
+        end if;
+
+        -- новый код срока только для 1-го класса
+        if nVidd_ like '1%' then
+           l_s180 := FS180(ACC1_, '1', bankdate);
+           update specparam set s180 = l_s180 where acc = acc1_;
+           if SQL%rowcount = 0 then
+              INSERT INTO specparam (ACC, S180) values (ACC1_, l_s180);
+           end if;
+        end if;
+
+        -- установка параметрів Первинний та Поточний ВКР
+        begin
+          select VALUE
+            into l_txt
+            from BARS.CUSTOMERW
+           where RNK = RNKB_
+             and TAG = 'VNCRR';
+        exception
+          when NO_DATA_FOUND then
+            bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );
+            -- raise_application_error(-20666, 'Відсутнє занчення ВКР у клієнта з РНК = '||to_char(RNKB_), true);
+        end;
+
+        -- Поточний ВКР
+        cck_utl.set_deal_attribute( ND_, 'VNCRR', l_txt );
+
+        -- Первинний ВКР
+        begin
+          -- первинний ВКР не оновлюється тому юзаєм INSERT
+          insert
+            into BARS.ND_TXT
+            ( ND, TAG, TXT )
+          values
+            ( ND_, 'VNCRP', l_txt );
+        exception
+          when DUP_VAL_ON_INDEX then
+            -- вже був вставлений тригером
+            null;
+        end;
+
+        begin
+
+          l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
+
+          if ( ( l_clt_amnt > 0 ) and ( NLSZ_ is Not Null ) )
+          then
+
+            collateral_payments( p_mbk_id   => ND_
+                               , p_mbk_num  => CC_ID_
+                               , p_beg_dt   => DAT2_
+                               , p_end_dt   => DAT4_
+                               , p_clt_amnt => l_clt_amnt
+                               , p_acc_num  => NLSZ_
+                               , p_ccy_id   => nKVZ_
+                               , p_rnk      => RNKB_
+                               , p_dk       => case when l_tipd = 1 then 1 else 0 end
+                               );
+
+          end if;
+
+        exception
+          when OTHERS then
+            bars_audit.info( 'mbk.inp_deal: collateral_payments_error => '
+                          || dbms_utility.format_error_stack()
+                          || dbms_utility.format_error_backtrace() );
+        end;
+
+      EXCEPTION
+        when INR_ERR then
+          null;
+        when OTHERS then
+          bars_audit.info( 'mbk.inp_deal: error => '|| dbms_utility.format_error_stack()
+                                                    || dbms_utility.format_error_backtrace() );
+          sErr_ := dbms_utility.format_error_stack();
+      END;
+
+      bars_audit.info( 'mbk.inp_deal: Exit with( ND='|| to_char(ND_) ||', ACC1='|| to_char(ACC1_) || ').' );
+
+    END inp_deal_Ex_old;
+--
     function header_version return varchar2 is    begin        return 'Package header MBK ' || MBK_HEAD_VERS;    end;
     function body_version return varchar2   is    begin        return 'Package body MBK ' || MBK_BODY_VERS;    end;
 end;
