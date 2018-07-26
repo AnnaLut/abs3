@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 3AX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.010  17/07/2018 (08/06/2018)
+% VERSION     :  v.1.002  25/07/2018 (17/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.000  08/06/2018';
+  ver_              char(30)  := 'v.1.002  25/07/2018';
   
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_A3A3F2          constant varchar2(6 char) := 'A3A3F2';
@@ -63,8 +63,7 @@ BEGIN
   --Проверяем есть ли старая версия в очереди на формировании
   --Если нет, то запускаем старую процедуру и ожидаем когда наполнится витрина
   --Если да, то будем ждать, пока она закончится и мы сможем забрать сформированные ею данные
-  if f_nbur_check_file_in_queue(
-                                 p_file_code => c_old_file_code
+  if f_nbur_check_file_in_queue(p_file_code => c_old_file_code
                                  , p_kf => p_kod_filii
                                  , p_report_date => p_report_date
                                )
@@ -89,12 +88,7 @@ BEGIN
       end if ;
     end loop;
   else
-    logger.trace(c_title || ' The file ' || c_old_file_code || ' not in queue. We execute it procedure and waiting data');
-
-    --Запуск старой процедуры, если ее нет в очереди для наполнения данных
-    p_f3A_NN (p_report_date, 'C');
-
-    logger.trace(c_title || ' Execution of procedure for file ' || c_old_file_code || ' finished');
+    logger.trace(c_title || ' The file ' || c_old_file_code || ' not in queue.');
   end if;
 
   --Теперь сохрянем полученные данные в детальном протоколе
@@ -157,31 +151,30 @@ BEGIN
              , BRANCH
       from   (
                 select
-                       datf as report_date
+                       report_date
                        , kf
                        , nbuc
-                       , substr(kodp, 2, 1) as t020
-                       , substr(kodp, 3, 4) as r020
-                       , substr(kodp, 7, 1) as r011
-                       , substr(kodp, 12, 3) as r030
-                       , substr(kodp, 9, 1) as k030
-                       , substr(kodp, 8, 1) as s180
-                       , substr(kodp, 10, 2) as d020
-                       , case when substr(kodp, 1, 1) = '1' then to_number(znap) end as t070
-                       , case when substr(kodp, 1, 1) = '2' then to_number(znap) end as t090
-                       , comm as description
-                       , acc as ACC_ID
-                       , nls as ACC_NUM
-                       , KV
-                       , mdate as MATURITY_DATE
-                       , rnk as CUST_ID
-                       , REF
-                       , ND
-                       , tobo as BRANCH
-                from   otcn_trace_3a
-                where  datf = p_report_date
-                       and kf = p_kod_filii
-                       and user_id = gl.aUID
+                       , seg_02 as t020
+                       , seg_03 as r020
+                       , seg_04 as r011
+                       , seg_08 as r030
+                       , seg_06 as k030
+                       , seg_05 as s180
+                       , seg_07 as d020
+                       , case when seg_01 = '1' then to_number(field_value) end as t070
+                       , case when seg_01 = '2' then to_number(field_value) end as t090
+                       , description
+                       , acc_id
+                       , acc_num
+                       , kv
+                       , maturity_date
+                       , cust_id
+                       , ref
+                       , nd
+                       , branch
+                from   v_nbur_#3a_dtl
+                where  report_date = p_report_date
+                   and kf = p_kod_filii
              )
       group by
                        report_date
