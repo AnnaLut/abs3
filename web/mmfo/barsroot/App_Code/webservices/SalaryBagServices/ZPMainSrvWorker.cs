@@ -47,7 +47,7 @@ namespace Bars.SalaryBagSrv
         }
 
         #region Corp2Intrg
-        public static CorpAddIfoResult GetCorp2ClientInfo(string rnk, decimal? sum, string mfo)
+        public static CorpAddIfoResult GetCorp2ClientInfo(string rnk, decimal? sum, string mfo, string nls)
         {
             CorpAddIfoResult res = new CorpAddIfoResult();
 
@@ -63,6 +63,7 @@ namespace Bars.SalaryBagSrv
                 cmd.Parameters.Add("p_rnk", OracleDbType.Decimal).Value = rnk;
                 cmd.Parameters.Add("p_amount", OracleDbType.Decimal).Value = sum;
                 cmd.Parameters.Add("p_mfo", OracleDbType.Varchar2).Value = mfo;
+                cmd.Parameters.Add("p_nls_2909", OracleDbType.Varchar2).Value = nls;
                 cmd.Parameters.Add(pDebt);
                 cmd.Parameters.Add(pTarifpercent);
                 cmd.Parameters.Add(pPremium);
