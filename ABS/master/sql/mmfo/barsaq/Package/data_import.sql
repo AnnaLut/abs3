@@ -154,7 +154,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   --
   procedure notify_ibank;
-  
+
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -479,6 +479,7 @@ procedure sync_acc_transactions2_TEST(
   procedure job_sync_acctariffs;
 
 end data_import;
+
 /
 
 CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
@@ -3710,7 +3711,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   ----
   -- import_documents_int - выполняет импорт документов
   --
-  procedure import_documents_int is
+  procedure import_documents_int(p_docs_count in out number) is
     l_title     constant varchar2(61) := 'data_import.import_documents';
     l_bankid    varchar2(6);
     l_type_list varchar2(256);
@@ -3723,7 +3724,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- получим список документов для экспорта
     rpc_sync.extract_doc_export(l_bankid, l_type_list, l_docs);
     -- общее к-во документов для импорта
-    g_docs_count := g_docs_count + l_docs.count;
+    p_docs_count := p_docs_count + l_docs.count;
     --
     for i in 1..l_docs.count
     loop
@@ -3745,7 +3746,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     for c in (select kf from v_kf) loop
         bars_sync.subst_mfo(c.kf);
-        import_documents_int;
+        import_documents_int(g_docs_count);
     end loop;
     bars_sync.set_context;
   exception when others then
@@ -3760,6 +3761,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_scn           number;
     l_time          date;
     l_period        number;
+    l_docs_count    number;
+    l_error         varchar2(4000);
   begin
 
     l_time := sysdate;
@@ -3771,22 +3774,37 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     values(l_time, l_scn, p_kf);
     commit;
 
-    g_docs_count := 0;
+    l_docs_count := 0;
 
     bars_sync.subst_mfo(p_kf);
-    import_documents_int;
+    import_documents_int(l_docs_count);
 
     -- вывод результатов
     -- фиксируем завершение работы
     l_period := round((sysdate-l_time)*24*60*60);
     l_scn    := dbms_flashback.get_system_change_number();
 
-    update import_activity set working_period=decode(l_period,0,1,l_period), finish_scn=l_scn, system_error=null, docs_count=g_docs_count
-    where start_time=l_time;
+    update import_activity set working_period=decode(l_period,0,1,l_period), finish_scn=l_scn, system_error=null, docs_count=l_docs_count
+    where start_time=l_time
+      and kf = p_kf;
     commit;
 
     bars_sync.set_context;
   exception when others then
+    -- откат на всякий случай
+    rollback;
+    -- фиксация ошибки
+    l_period := round((sysdate-l_time)*24*60*60);
+    l_scn    := dbms_flashback.get_system_change_number();
+    --
+    l_error := substr(get_error_msg(),1,4000);
+    update import_activity
+       set working_period=decode(l_period,0,1,l_period), finish_scn=l_scn, system_error=l_error
+     where start_time=l_time
+       and kf = p_kf;
+    --
+    logger.trace('ERROR:');
+    logger.trace(get_error_msg());
     bars_sync.set_context;
     raise;
   end import_documents_kf;
@@ -4153,6 +4171,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- внутренний документ
     if     l_typeid = 'P_INT' then
         logger.trace('internal document');
+        --
+        -- вычисляем код операции
+        
 
         -- дата вставки
         l_doc.insertion_date := sysdate;
@@ -5017,7 +5038,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     logger.trace('%s: start '||sysdate, l_title);
     for c in (
-        select * from doc_import where 
+        select * from doc_import where
         case
         when booking_flag is not null and notification_flag is null then 'Y'
         else null
@@ -5073,7 +5094,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     logger.trace('%s: doc_count '||counter, l_title);
     logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
-  
+
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -5641,7 +5662,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
-            
+
             commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
@@ -7006,3 +7027,4 @@ grant EXECUTE                                                                on 
  PROMPT *** End *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** End *
  PROMPT ===================================================================================== 
  
+/
