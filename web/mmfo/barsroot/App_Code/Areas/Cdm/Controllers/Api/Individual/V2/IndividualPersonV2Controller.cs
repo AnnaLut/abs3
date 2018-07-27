@@ -74,7 +74,7 @@ namespace BarsWeb.Areas.Cdm.Controllers.Api.Individual
                         response.Message = response.Message + Environment.NewLine + e.InnerException.StackTrace;
                     }
                     var logger = BarsWeb.Core.Logger.DbLoggerConstruct.NewDbLogger();
-                    logger.Error("ЕБК. Помилка збереження пакету! --" + response.Message);
+                    logger.Error("EBK. Помилка збереження пакету! --" + response.Message);
 
                 }
             }

@@ -14,7 +14,7 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
 {
     public class EbkFindRepository : IEbkFindRepository
     {
-        protected const string _logMessagePrefix = "ЕБК.";
+        protected const string _logMessagePrefix = "EBK.";
         [Inject]
         public IDbLogger Logger { get; set; }
         protected readonly CdmModel _entities;
