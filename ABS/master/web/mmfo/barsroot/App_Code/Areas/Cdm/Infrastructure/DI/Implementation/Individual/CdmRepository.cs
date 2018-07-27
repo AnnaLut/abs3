@@ -38,7 +38,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
         protected virtual string LogMessagePrefix
         {
-            get { return "ЕБК."; }
+            get { return "EBK."; }
         }
 
 
