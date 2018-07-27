@@ -17,9 +17,9 @@ is
 % DESCRIPTION : Процедура формирования #39 в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001  27.03.2018
+% VERSION     :  v.18.002  27/07/2018 (27.03.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.18.001  27.03.2018';
+  ver_          char(30)  := 'v.18.002  27.07.2018';
 /*
    Структура показника  L DDD VVV
 
@@ -43,16 +43,7 @@ BEGIN
     logger.info ('NBUR_P_F39X begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 
     -- определение начальных параметров (код области или МФО или подразделение)
-    nbur_files.P_PROC_SET(
-                           p_kod_filii
-                           , p_file_code
-                           , p_scheme
-                           , l_datez
-                           , 0
-                           , l_file_code
-                           , l_nbuc
-                           , l_type
-                         );
+    nbur_files.P_PROC_SET( p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
 
     logger.trace(
                   'NBUR_P_F39X'
@@ -166,7 +157,7 @@ BEGIN
                                    , F_NBUR_Ret_Dig(s.kv, s.report_date) dig
                                    , F_NBUR_Ret_DiV(s.kv, s.report_date) div
                                    , a.branch
-                                   , a.nbuc
+                                   , (case when l_type = 0 then l_nbuc else a.nbuc end) nbuc
                                    , (
                                        case
                                          when s.kurs is not null
@@ -194,8 +185,7 @@ BEGIN
                                         )
                                       end
                                      ) as comm
-                            from (
-                                    select t.report_date
+                            from (select t.report_date
                                            , t.kf
                                            , t.ref
                                            , t.tt
