@@ -1,6 +1,6 @@
 create or replace package xrm_intg_cashdesk
 is
-   g_head_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
+   g_head_version   constant varchar2 (64) := 'version 1.13 25.07.2018';
 
    --
    -- реализация функционала сервиса функционала сервиса  XRMIntegrationCreateDocuments
@@ -14,7 +14,7 @@ end xrm_intg_cashdesk;
 /
 create or replace package body XRM_INTG_CASHDESK
 is
-   g_body_version   constant varchar2 (64) := 'version 1.12 20.06.2018';
+   g_body_version   constant varchar2 (64) := 'version 1.13 25.07.2018';
 
    g_p_name         constant varchar2 (17) := 'xrm_intg_cashdesk';
 
@@ -4178,7 +4178,10 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
       l_requestdata   clob;
       l_ref           oper.ref%type;
       l_contract      number(38);
+      trx             VARCHAR2(200);
    begin
+      trx := DBMS_TRANSACTION.local_transaction_id(TRUE);
+      logger.info(g_modcode||':'|| g_p_name||', doctype= '||p_doctype||', BEGIN TRANSACTION - '||dbms_transaction.local_transaction_id||', USER =  '||user_id||', BRANCH ='||SYS_CONTEXT ('bars_context', 'user_branch_mask'));
       l_requestdata := xrm_maintenance.unpacking (p_requestdata);
 
       if p_doctype = 1                                                           -- cтворення макету операції
@@ -4211,6 +4214,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
       end if;
 
       p_resultcode := 0;
+      logger.info(g_modcode||':'|| g_p_name||', doctype= '||p_doctype||', END TRANSACTION - '||dbms_transaction.local_transaction_id||', USER =  '||user_id||', BRANCH ='||SYS_CONTEXT ('bars_context', 'user_branch_mask'));
    exception
       when others
       then
@@ -4224,6 +4228,7 @@ procedure dep_tt_valid(p_requestdata in clob, p_result out clob)
                4000);
          p_resultcode := -1;
          rollback;
+         logger.info(g_modcode||':'|| g_p_name||', doctype= '||p_doctype||', END WITH ERROR TRANSACTION - '||trx||', USER =  '||user_id||', BRANCH ='||SYS_CONTEXT ('bars_context', 'user_branch_mask'));
    end doc_service;
 begin
    null;
