@@ -1121,7 +1121,7 @@ create or replace package body sto_all is
                  INTO l_sto_det.branch_card
                  FROM accounts
                 WHERE nls = nlsa
-                  AND nbs = '2625'
+                  AND nbs in ('2625','2620') --8212
                   AND kv = kva;
             EXCEPTION
                WHEN NO_DATA_FOUND
@@ -1168,8 +1168,8 @@ create or replace package body sto_all is
 
                 /* автоп≥дтвердженн€ ф.190 на погашенн€ кредит≥в ƒт2625- т2620
 				поповненн€ депозит≥в ƒт2625- т2630/2635 #COBUMMFO-5328 */
-                if      substr(case when l_sto_det.dk = 1 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2625')
-                    and substr(case when l_sto_det.dk = 1 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620', '2630', '2635')
+                if      substr(case when l_sto_det.dk = 1 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2625','2620') --8212
+                    and substr(case when l_sto_det.dk = 1 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620','2630', '2635')
 					and upper(l_sto_det.POLU) = l_nmk
 					and l_sto_det.okpo = l_okpo
 					and l_sto_det.mfob = l_sto_det.kf
