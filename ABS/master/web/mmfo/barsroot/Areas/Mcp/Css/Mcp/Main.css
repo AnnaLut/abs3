@@ -36,3 +36,10 @@
 {
     width: 200px;
 }
+
+.has-not-payed-file {
+    background-color: rgb(255, 140, 140);
+}
+.k-state-selected.has-not-payed-file {
+    background-color: rgb(225, 90, 90);
+}

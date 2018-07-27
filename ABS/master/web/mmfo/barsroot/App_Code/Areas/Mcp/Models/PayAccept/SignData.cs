@@ -9,4 +9,10 @@ namespace Areas.Mcp.Models
         public string sign { get; set; }
         public short type { get; set; }
     }
+
+    public class SignDataAll
+    {
+        public string paymentType { get; set; }
+        public string paymentPeriod { get; set; }
+    }
 }

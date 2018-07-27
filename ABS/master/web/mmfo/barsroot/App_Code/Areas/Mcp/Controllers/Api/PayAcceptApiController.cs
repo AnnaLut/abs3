@@ -21,6 +21,34 @@ namespace BarsWeb.Areas.Mcp.Controllers.Api
 
         #region Pay Accept
         [HttpGet]
+        public HttpResponseMessage GetPaymentTypes()
+        {
+            try
+            {
+                var data = _repo.GetPaymentTypes().Where(s => !String.IsNullOrEmpty(s));
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpGet]
+        public HttpResponseMessage GetPaymentPeriods()
+        {
+            try
+            {
+                var data = _repo.GetPaymentPeriods().Where(s => !String.IsNullOrEmpty(s));
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpGet]
         public HttpResponseMessage SearchPayAccept([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, short kvitId)
         {
             try
@@ -166,6 +194,30 @@ namespace BarsWeb.Areas.Mcp.Controllers.Api
                         errors.Add(string.Format("{0} : {1}", v.id, e.InnerException != null ? e.InnerException.Message : e.Message));
                     }
                 }
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { Errors = errors });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpPost]
+        public HttpResponseMessage SendALL(SignDataAll data)
+        {
+            try
+            {
+                var errors = new List<string>();
+                try
+                {
+                    var sql = SqlCreator.Send(data.paymentType, data.paymentPeriod);
+                    _repo.ExecuteStoreCommand(sql.SqlText, sql.SqlParams);
+                }
+                catch (Exception e)
+                {
+                    errors.Add(e.InnerException != null ? e.InnerException.Message : e.Message);
+                }
+
 
                 return Request.CreateResponse(HttpStatusCode.OK, new { Errors = errors });
             }

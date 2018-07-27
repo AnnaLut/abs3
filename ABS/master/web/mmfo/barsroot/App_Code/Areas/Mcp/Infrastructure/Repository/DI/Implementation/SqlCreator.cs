@@ -138,6 +138,20 @@ namespace BarsWeb.Areas.Mcp.Infrastructure.DI.Implementation {
                 }
             };
         }
+        public static BarsSql Send(string paymentType, string payPeriod)
+        {
+            return new BarsSql()
+            {
+                SqlText = @"begin
+                                 msp.msp_utl.set_match_processing(:p_payment_type, :p_payment_period);
+                            end;",
+                SqlParams = new object[]
+                {
+                    new OracleParameter("p_payment_type", OracleDbType.Varchar2) { Value = paymentType },
+                    new OracleParameter("p_payment_period", OracleDbType.Varchar2) { Value = payPeriod }
+                }
+            };
+        }
 
         public static BarsSql GetBuffer(decimal id, short kvitId, short type)
         {
