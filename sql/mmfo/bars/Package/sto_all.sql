@@ -1151,7 +1151,7 @@ create or replace package body sto_all is
              THEN
                 p_status := 0;                                           --(новий)
                 p_status_text := '';
-				
+
 
 
               begin
@@ -1160,7 +1160,7 @@ create or replace package body sto_all is
 					 RETURNING idd into l_sto_det.idd;
 				begin
 					select upper(NMK), okpo into l_nmk, l_okpo
-					from customer 
+					from customer
 					where rnk = (select rnk from sto_lst where ids = l_sto_det.ids);
 				exception
 					when no_data_found then null;
@@ -1176,7 +1176,7 @@ create or replace package body sto_all is
                 then
                     sto_all.claim_idd(l_sto_det.idd, 1, 0);
                 end if;
-				
+
               exception when others then
                if (sqlerrm like '%NLSB%') then
                 raise_application_error ( -20001, 'Не корректно введено рахунок отримувача!', false);
@@ -1418,6 +1418,7 @@ create or replace package body sto_all is
         l_doc     oper%rowtype;
         l_ex      int;
         l_sos     integer;
+        l_flag    integer;
     begin
         bars_audit.trace(l_title || 'start with param: ' || p_idd || ',' || to_char(p_dat, 'dd/mm/yyyy'));
 
@@ -1450,6 +1451,7 @@ create or replace package body sto_all is
                v.idb,
                v.dk,
                v.mfoa
+               ,to_number(substr(tts.flags,38,1)) 
         into   l_doc.nlsa,
                l_doc.kv,
                l_doc.mfob,
@@ -1464,7 +1466,8 @@ create or replace package body sto_all is
                l_doc.id_a,
                l_doc.id_b,
                l_doc.dk,
-               l_doc.mfoa
+               l_doc.mfoa,
+               l_flag
         from   v_stoschedules_web v, tts
         where  v.tt = tts.tt and
                recid = p_idd and
@@ -1476,9 +1479,9 @@ create or replace package body sto_all is
         l_doc.pdat := sysdate;
 
         gl.ref(l_doc.ref);
-        
+
         /*COBUMMFO-5087 Если сумма нулевая - не создаем сам документ, только пишем референс*/
-        if l_doc.s != 0 then 
+        if l_doc.s != 0 then
             gl.in_doc3(l_doc.ref,
                        l_doc.tt,
                        l_doc.vob,
@@ -1510,7 +1513,7 @@ create or replace package body sto_all is
                        null);
 
             gl.dyntt2(sos_   => l_sos,
-                      mod1_  => 0,
+                      mod1_  => l_flag,--0, --COBUMMFO-8092
                       mod2_  => 0,
                       ref_   => l_doc.ref,
                       vdat1_ => l_doc.vdat,
