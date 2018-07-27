@@ -12,5 +12,7 @@ namespace BarsWeb.Areas.Mcp.Infrastructure.DI.Abstract
         IEnumerable<T> ExecuteStoreQuery<T>(BarsSql searchQuery);
         int ExecuteStoreCommand(string commandText, params object[] parameters);
         Params GetParam(string id);
+        IEnumerable<string> GetPaymentTypes();
+        IEnumerable<string> GetPaymentPeriods();
     }
 }

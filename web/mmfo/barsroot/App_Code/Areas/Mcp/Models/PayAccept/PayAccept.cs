@@ -18,5 +18,8 @@ namespace Areas.Mcp.Models
         public short? STATE_ID { get; set; }
         public string STATE_NAME { get; set; }
         public string STATE_CODE { get; set; }
+        public string PAYMENT_TYPE { get; set; }
+        public string PAYMENT_PERIOD { get; set; }
+        public int? NOT_CAN_SEND { get; set; }
     }
 }

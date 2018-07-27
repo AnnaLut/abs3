@@ -54,6 +54,23 @@ namespace BarsWeb.Areas.Mcp.Infrastructure.DI.Implementation
         {
             return _globalData.GetParam(id);
         }
+
+        public IEnumerable<string> GetPaymentTypes()
+        {
+            var data = ExecuteStoreQuery<string>(new BarsSql
+            {
+                SqlText = "SELECT payment_type from msp.v_msp_payment_type"
+            });
+            return data;
+        }
+        public IEnumerable<string> GetPaymentPeriods()
+        {
+            var data = ExecuteStoreQuery<string>(new BarsSql
+            {
+                SqlText = "SELECT payment_period from msp.v_msp_payment_period"
+            });
+            return data;
+        }
         #endregion
     }
 }

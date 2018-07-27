@@ -14,11 +14,13 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
     $scope.Title = "Підтвердження відправки даних в УПСЗН";
 
-    $scope.kvitId = KVIT_1;
+    $scope.kvitId = KVIT_2;
 
     var filesGridToolbar = [
-        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'files\', \'excel\')" ng-disabled="disabledToolbarGrid(\'files\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Конверти в Excel</a>' },
-        { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'files\', \'ok\')" ng-disabled="disabledToolbarGrid(\'files\', \'ok\')"><i class="pf-icon pf-16 pf-ok"></i>Виконати відправку</a>' }
+        { template: '<a class="k-button filesGridTb" ng-click="onClickToolbarGrid(\'files\', \'excel\')" ng-disabled="disabledToolbarGrid(\'files\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Конверти в Excel</a>' },
+        { template: '<a class="k-button filesGridTb" ng-click="onClickToolbarGrid(\'files\', \'ok\')" ng-disabled="disabledToolbarGrid(\'files\', \'ok\')"><i class="pf-icon pf-16 pf-ok"></i>Виконати відправку</a>' }
+        ,{ template: '<select class="filesGridDdl" kendo-drop-down-list="ddlPaymentType" k-options="paymentTypeOptions" ></select>' }
+        ,{ template: '<select class="filesGridDdl" kendo-drop-down-list="ddlPaymentPeriod" k-options="paymentPeriodOptions" ></select>' }
     ];
     var filesHistoryGridToolbar = [
         { template: '<a class="k-button" ng-click="onClickToolbarGrid(\'filesHistory\', \'excel\')" ng-disabled="disabledToolbarGrid(\'filesHistory\', \'excel\')"><i class="pf-icon pf-16 pf-exel"></i>Відправлені конверти в Excel</a>' },
@@ -44,7 +46,12 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         }
         return grid;
     };
-
+    //$scope.showToolbarGrid = function (id) {
+    //    if (id == 'files') {
+    //        return $scope.kvitId == KVIT_2;
+    //    }
+    //    return false;
+    //}
     $scope.disabledToolbarGrid = function (id, op){
         var grid = getGrid(id);
 
@@ -53,6 +60,17 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                 return grid._data === undefined ? true : grid._data.length <= 0;
 
             case 'ok':
+                
+                if (id == 'files' && $scope.kvitId == KVIT_2) {
+                    if (grid.dataSource.view().length == 0 ||
+                        $scope.ddlPaymentType.select() == 0 || 
+                        $scope.ddlPaymentPeriod.select() == 0 ||
+                        grid.dataSource.data().some(function (el) { return el.NOT_CAN_SEND == 1; })
+                    ){
+                        return true;
+                    }
+                    return false;
+                }
                 return kendoService.findCheckedGrid(grid).length === 0;
         }
         return false;
@@ -63,28 +81,68 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
         switch (op){
             case 'excel':
-                grid.saveAsExcel();
+                if (grid.dataSource.view() != 0) {
+                    grid.saveAsExcel();
+                }
                 break;
 
             case 'ok':
-                var checkedArr = kendoService.findCheckedGrid(grid);
-                var data = [];
-                for(i = 0; i < checkedArr.length; i++){
-                    data.push({id: checkedArr[i].ID, kvitId: $scope.kvitId});
+                if (id = 'files' && $scope.kvitId == KVIT_2) {
+                    //data = grid.dataSource.data().map(function (el) {
+                    //    return { id: el.ID, kvitId: $scope.kvitId }
+                    //});
+                    var payType = $scope.ddlPaymentType.value();
+                    var payPeriod = $scope.ddlPaymentPeriod.value();
+                    if (payType && payPeriod) {
+                        bars.ui.loader("body", true);
+                        $http.post(bars.config.urlContent('/api/Mcp/PayAcceptApi/SendAll'), { paymentType: payType, paymentPeriod: payPeriod })
+                            .success(function (response) {
+                                bars.ui.loader("body", false);
+                                // $scope.filesGridAll = false;
+                                // angular.element(".chkFormolsAllFiles").prop("checked", $scope.filesGridAll);
+                                //grid.dataSource.read();
+
+                                kendoService.clearGridSelection(getAllGrids());
+                                $scope.filesGrid.dataSource.filter([]);
+                                $scope.ddlPaymentType.select(0);
+                                $scope.ddlPaymentPeriod.select(0);
+                                $scope.filesGrid.dataSource.read();
+                                //$scope.filesHistoryGrid.dataSource.read();
+                                $scope.registryGrid.dataSource.read();
+                                $scope.infoLinesreRistryGrid.dataSource.read();
+
+                                $scope.resultMulty(response, "Відправку виконано успішно");
+
+                            }).error(function (response) {
+                                bars.ui.loader("body", false);
+                            });
+                    }
+                    else {
+                        bars.ui.notify("Відправка не можлива!", "Не обраний Тип виплати чи Період виплати", "error", { autoHideAfter: 15 * 1000 });
+                    }
                 }
-                bars.ui.loader("body", true);
-                $http.post(bars.config.urlContent('/api/Mcp/PayAcceptApi/Send'), data)
-                    .success(function (response) {
-                        bars.ui.loader("body", false);
-                        // $scope.filesGridAll = false;
-                        // angular.element(".chkFormolsAllFiles").prop("checked", $scope.filesGridAll);
-                        grid.dataSource.read();
+                else {
+                    var data = [];
+                    var checkedArr = kendoService.findCheckedGrid(grid);
+                    for(i = 0; i < checkedArr.length; i++){
+                        data.push({id: checkedArr[i].ID, kvitId: $scope.kvitId});
+                    }
+                    if (data.length) {
+                        bars.ui.loader("body", true);
+                        $http.post(bars.config.urlContent('/api/Mcp/PayAcceptApi/Send'), data)
+                            .success(function (response) {
+                                bars.ui.loader("body", false);
+                                // $scope.filesGridAll = false;
+                                // angular.element(".chkFormolsAllFiles").prop("checked", $scope.filesGridAll);
+                                grid.dataSource.read();
 
-                        $scope.resultMulty(response, "Відправку виконано успішно");
+                                $scope.resultMulty(response, "Відправку виконано успішно");
 
-                    }).error(function (response) {
-                    bars.ui.loader("body", false);
-                });
+                            }).error(function (response) {
+                            bars.ui.loader("body", false);
+                        });
+                    }
+                }
 
 
                 // signService.Init(Token_Id, Token_Id, function(){
@@ -146,25 +204,84 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                 break;
         }
     };
-
+    function getAllGrids() {
+        return [
+            $scope.filesGrid,
+            $scope.filesHistoryGrid,
+            $scope.registryGrid,
+            $scope.infoLinesreRistryGrid
+        ];
+    }
     $scope.kvitTypeOptions = {
         dataSource: [
-            {ID: KVIT_1, NAME: "Квит №1"},
-            {ID: KVIT_2, NAME: "Квит №2"}
+            {ID: KVIT_2, NAME: "Квитанція №2"}
+            , { ID: KVIT_1, NAME: "Квитанція №1"}
         ],
         dataTextField: "NAME",
         dataValueField: "ID",
         change: function (e) {
             $scope.kvitId = this.value();
+            var isKvitId_1 = $scope.kvitId == KVIT_1;
+            $scope.filesGrid.dataSource.serverPaging = isKvitId_1;
+            $(".filesGridDdl").each(function (i, el) {
+                el.style.visibility = isKvitId_1 ? "hidden" : "visible";
+            });
+            kendoService.clearGridSelection(getAllGrids());
+            $scope.filesGrid.dataSource.filter([]);
+            $scope.ddlPaymentType.select(0);
+            $scope.ddlPaymentPeriod.select(0);
             $scope.filesGrid.dataSource.read();
             $scope.filesHistoryGrid.dataSource.read();
             $scope.registryGrid.dataSource.read();
             $scope.infoLinesreRistryGrid.dataSource.read();
         }
     };
-
+    var paymentTypeDS = $scope.createDataSource({
+        type: "webapi",
+        transport: {
+            read: {
+                url: bars.config.urlContent("/api/Mcp/PayAcceptApi/GetPaymentTypes")
+            }
+        }
+    });
+    $scope.paymentTypeOptions = {
+        optionLabel: "Тип виплати",
+        dataSource: paymentTypeDS,
+        change: function (e) {
+            var value = this.value();
+            kendoService.updateSearchFilters($scope.filesGrid, "PAYMENT_TYPE", "eq", value);
+            kendoService.clearGridSelection(getAllGrids());
+            kendoService.setCheckedGrid($scope.filesGrid, false);
+            //$scope.filesHistoryGrid.dataSource.read();
+            $scope.registryGrid.dataSource.read();
+            $scope.infoLinesreRistryGrid.dataSource.read();
+        }
+    };
+    var paymentPeriodDS = $scope.createDataSource({
+        type: "webapi",
+        transport: {
+            read: {
+                url: bars.config.urlContent("/api/Mcp/PayAcceptApi/GetPaymentPeriods")
+            }
+        }
+    });
+    $scope.paymentPeriodOptions = {
+        optionLabel: "Період виплати",
+        dataSource: paymentPeriodDS,
+        change: function (e) {
+            var value = this.value();
+            kendoService.updateSearchFilters($scope.filesGrid, "PAYMENT_PERIOD", "eq", value);
+            kendoService.clearGridSelection(getAllGrids());
+            kendoService.setCheckedGrid($scope.filesGrid, false);
+            //$scope.filesHistoryGrid.dataSource.read();
+            $scope.registryGrid.dataSource.read();
+            $scope.infoLinesreRistryGrid.dataSource.read();
+        }
+    };
     var filesDataSource = $scope.createDataSource({
         type: "webapi",
+        pageSize: 50,
+        serverPaging: false,
         transport: { read: { url: bars.config.urlContent("/api/Mcp/PayAcceptApi/SearchPayAccept"),
             data: function () { return {kvitId: $scope.kvitId}; }} },
         schema: {
@@ -183,7 +300,9 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                     TOTAL_SUM_TO_PAY: { type: 'string' },
                     STATE_ID: { type: 'number' },
                     STATE_NAME: { type: 'string' },
-                    STATE_CODE: { type: 'string' }
+                    STATE_CODE: { type: 'string' },
+                    PAYMENT_TYPE: { type: 'string' },
+                    PAYMENT_PERIOD: { type: 'string' }
                 }
             }
         }
@@ -191,16 +310,14 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
     $scope.filesGridOptions = $scope.createGridOptions({
         dataSource: filesDataSource,
-        height: 230,
+        //height: 230,
         excel: $scope.excelGridOptions(),
         excelExport: $scope.excelExport,
         toolbar: filesGridToolbar,
         change: function () {
             $scope.registryGrid.dataSource.read();
+            $scope.infoLinesreRistryGrid.dataSource.data([]);
         },
-        // dataBound: function () {
-        //     $scope.registryGrid.dataSource.read();
-        // },
         columns: [
             {
                 field: "block",
@@ -219,6 +336,16 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
             {
                 field: "ID_MSP_ENV",
                 title: "ID конверту<br>(УПСЗН)",
+                width: "10%"
+            },
+            {
+                field: "PAYMENT_TYPE",
+                title: "Тип виплати",
+                width: "10%"
+            },
+            {
+                field: "PAYMENT_PERIOD",
+                title: "Період виплати",
                 width: "10%"
             },
             {
@@ -252,11 +379,40 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                 title: "Статус",
                 width: "20%"
             }
-        ]
+        ],
+        dataBound: function () {
+            if ($scope.kvitId == KVIT_1) {
+                this.showColumn("block");
+                this.hideColumn("PAYMENT_TYPE");
+                this.hideColumn("PAYMENT_PERIOD");
+            }
+            else {
+                this.hideColumn("block");
+                this.showColumn("PAYMENT_TYPE");
+                this.showColumn("PAYMENT_PERIOD");
+
+                var data = this.dataSource.view();
+                if (!data.length) {
+                    $(".k-button.filesGridTb").each(function (i, el) {
+                        el.setAttribute('disabled', 'disabled');
+                    });
+                }
+
+                for (var i = 0; i < data.length; i++) {
+                    var dataItem = data[i];
+                    if (dataItem.NOT_CAN_SEND == 1) {
+                        var tr = this.table.find("[data-uid='" + dataItem.uid + "']");
+                        tr.addClass('has-not-payed-file');
+                    }
+                }
+            }
+
+        }
     });
 
     var filesHistoryDataSource = $scope.createDataSource({
         type: "webapi",
+        pageSize: 50,
         transport: { read: { url: bars.config.urlContent("/api/Mcp/PayAcceptApi/SearchEnvelopes"),
             data: function () { return {kvitId: $scope.kvitId}; }} },
         schema: {
@@ -283,7 +439,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
     $scope.filesHistoryGridOptions = $scope.createGridOptions({
         dataSource: filesHistoryDataSource,
-        height: 230,
+        //height: 230,
         excel: $scope.excelGridOptions(),
         excelExport: $scope.excelExport,
         toolbar: filesHistoryGridToolbar,
@@ -585,7 +741,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         select: function () {
             var tabstrip = this;
             var curTabIndex = tabstrip.select().index();
-
+            kendoService.clearGridSelection(getAllGrids());
             if(curTabIndex === 0){
                 $scope.filesHistoryGrid.dataSource.read();
             }
@@ -624,5 +780,4 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
     };
 
     $scope.onClick = function(e){ kendoService.setCheckedElemGrid(e); };
-
 });
