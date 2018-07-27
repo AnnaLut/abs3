@@ -3,28 +3,29 @@ CREATE OR REPLACE PROCEDURE BARS.p_f73_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #73 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 15/05/2018 (14/05/2018, 07/09/2017)
+% VERSION     : 26/07/2018 (15/05/2018, 14/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
  sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 15.05.2018 для Дт 1101,1102 Кт 3800  и  Дт 3800 Кт 1101, 1102 и кодов 
+% 26.07.2018 код территории (поле NBUC) будет формироваться по счету кассы
+% 15.05.2018 для Дт 1101,1102 Кт 3800  и  Дт 3800 Кт 1101, 1102 и кодов
 %            операций 'Z16', 'TOU' будет формироваться код "000"
-% 14.05.2018 для Дт 1101,1102 Кт 3800 и назначение пл. 
+% 14.05.2018 для Дт 1101,1102 Кт 3800 и назначение пл.
 %            "підкріплення БМ від ХОУ" будет формироваться код "000"
-% 07.09.2017 вместо кода 349 формировался код 300. Исправлено  
-% 16.06.2017 внесены изменения которые были выполнены для ММФО 
+% 07.09.2017 вместо кода 349 формировался код 300. Исправлено
+% 16.06.2017 внесены изменения которые были выполнены для ММФО
 % 02.08.2016 для Дт 1101,1102 Кт 3800 и назначение пл. "прийнято монети"
 % или "прийнято з ГОУ" будет формироваться код "000"
 % 19.05.2016 для операций конвертации будут коректно формироваться коды
-% 270 и 370 
+% 270 и 370
 % 20.04.2016 добавил NOPARALLEL при наполнении табл. TMP_FILE03
-% 29.03.2016 на 01.04.2016 будут включаться металлы 
-% 23.10.2015 для проводок Дт 3800 Кт 100* анализируем дополнительно 
+% 29.03.2016 на 01.04.2016 будут включаться металлы
+% 23.10.2015 для проводок Дт 3800 Кт 100* анализируем дополнительно
 % назначение платежа
 % 02.10.2014 для проводок Дт 100* Кт 3800 и D#73='342' (переводы ФЛ)
-% формируем код 261 - покупка валюты т.к. переводы в валюте не 
-% выплачивались а выплачивались в грн 
+% формируем код 261 - покупка валюты т.к. переводы в валюте не
+% выплачивались а выплачивались в грн
 % документ вводился как NLSA 2809 NLSB 2909
 % 13.08.2014 вместо VIEW PROVODKI будем использовать PROVODKI_OTC
 % 06.05.2014 для операций сторнирования покупки/продажи валюты (оп. BAK)
@@ -135,7 +136,7 @@ BEGIN
     Dat1_ := calc_pdat(Dat1_);
 
     ---дозаполнение символов "DDD" для банка "Киев"
-    if mfou_ in (300465) --and mfo_ != mfou_ 
+    if mfou_ in (300465) --and mfo_ != mfou_
     then
        p_f73_ch(Dat1_, Dat1_ + 9);
        commit;
@@ -166,9 +167,9 @@ BEGIN
             (nlsk like '110%' and
              nlsk not like '1107%' and
              nlsd not like '1107%')
-          ) 
-      and not (nlsd like '100%' and nlsk like '100%')         
-      and not (nlsd like '110%' and nlsk like '110%')         
+          )
+      and not (nlsd like '100%' and nlsk like '100%')
+      and not (nlsd like '110%' and nlsk like '110%')
       and fdat = any(select fdat from fdat where fdat BETWEEN Dat1_ and Dat_);
     commit;
 
@@ -212,27 +213,27 @@ BEGIN
               d020_:='231';
            END IF;
 
-           IF sn_>0 and 
+           IF sn_>0 and
               substr(nls_,1,4) in ('2620','2630','2635') and
-               (substr(nlsk_,1,4)='1002' and 
-                d020_='342' and mfo_=322498 
+               (substr(nlsk_,1,4)='1002' and
+                d020_='342' and mfo_=322498
                     or
-                nlsk_ like '100%' and 
-                d020_ <> '341'    and 
+                nlsk_ like '100%' and
+                d020_ <> '341'    and
                 lower(comm_) like '%поверн%')
            THEN
               d020_:='341';
            END IF;
 
-           IF mfo_ = 300465 and sn_ > 0 and 
+           IF mfo_ = 300465 and sn_ > 0 and
               substr(nls_,1,4) in ('2620','2630','2635') and
-              nlsk_ like '100%' and 
-              d020_ <> '342'    and 
+              nlsk_ like '100%' and
+              d020_ <> '342'    and
               (lower(comm_) like '%claim%' or lower(comm_) like '%переказ%')
            THEN
               d020_:='342';
            END IF;
-           
+
            IF sn_>0 and (substr(nls_,1,4)='1001' and substr(nlsk_,1,4)='3800') and
                  d020_='250' THEN
               p_ins('261', nls_, nbuc_);
@@ -263,11 +264,11 @@ BEGIN
                  tt1_ := null;
               END if;
 
-              if (tt_ = 'BAK' or tt1_ = 'BAK') OR 
+              if (tt_ = 'BAK' or tt1_ = 'BAK') OR
                  (kv_ in (959,961,962,964) and ( lower(comm_) like '%отримано%'             OR
                                                  lower(comm_) like '%прийнято монети%'      OR
                                                  lower(comm_) like '%прийнято з гоу%'       OR
-                                                 lower(comm_) like '%прийом%оу%'            OR 
+                                                 lower(comm_) like '%прийом%оу%'            OR
                                                  lower(comm_) like '%підкріплення%хоу%'     OR
                                                  lower(comm_) like '%оприбутковані%монети%'
                                                )
@@ -292,13 +293,13 @@ BEGIN
         --- для новых правил формирования
            IF sn_>0 and (substr(nls_,1,4)='3800' and substr(nlsk_,1,4) in ('1001','1002')) and
               d020_='350' THEN
-              p_ins('361', nls_, nbuc_);
+              p_ins('361', nls_, nbuck_);
               prf_:=1;
            END IF;
 
            IF sn_>0 and (substr(nls_,1,4)='3800' and substr(nlsk_,1,4)='1003') and
               d020_='350' THEN
-              p_ins('362', nls_, nbuc_);
+              p_ins('362', nls_, nbuck_);
               prf_:=1;
            END IF;
         -------------------------------------------------------------------------------
@@ -314,72 +315,68 @@ BEGIN
               END if;
 
               if tt_ = 'BAK' or tt1_ = 'BAK' then
-                 p_ins('000', nls_, nbuc_);
+                 p_ins('000', nls_, nbuck_);
                  prf_:=1;
               else
-                 p_ins('361', nls_, nbuc_);
+                 p_ins('361', nls_, nbuck_);
                  prf_:=1;
               end if;
            END IF;
 
-           IF sn_>0 and (substr(nls_,1,4)='3800' and 
+           IF sn_>0 and (substr(nls_,1,4)='3800' and
               substr(nlsk_,1,4) in ('1001','1002','1101','1102')) and
-              ( ( LOWER(comm_) like 'видан%' or 
-                  LOWER(comm_) like 'передан%' or 
+              ( ( LOWER(comm_) like 'видан%' or
+                  LOWER(comm_) like 'передан%' or
                   LOWER(comm_) like 'видача%' or
                   lower(comm_) like '%врегул%' or
-                  lower(comm_) like '%відправ%'               
-                ) OR 
-                tt_ in ('Z16','TOU') 
+                  lower(comm_) like '%відправ%'
+                ) OR
+                tt_ in ('Z16','TOU')
               )
            THEN
-              p_ins('000', nls_, nbuc_);
+              p_ins('000', nls_, nbuck_);
               prf_:=1;
            END IF;
-           
---!!! Поки закоментарила, бо не зрозуміло чи ці суми включати(за 30,11,2016 - включені?)
 
---           IF sn_>0 and (substr(nls_,1,4)='2909' and 
---              substr(nlsk_,1,4) in ('1001','1002')) and
---              LOWER(comm_) like '%виплата%готівки%платіж%банкноти%'  
---           THEN
---              p_ins('000', nls_, nbuc_);
---              prf_:=1;
---           END IF;
---           
-           IF sn_>0 and (substr(nls_,1,4)='3907' and 
+           IF sn_>0 and (substr(nls_,1,4)='3907' and
               substr(nlsk_,1,4) in ('1001','1002')) and
               tt_ = '189' and
-              LOWER(comm_) like '%підкріпл%'  
+              LOWER(comm_) like '%підкріпл%'
            THEN
-              p_ins('000', nls_, nbuc_);
+              p_ins('000', nls_, nbuck_);
               prf_:=1;
            END IF;
-           
-                      IF sn_>0 and (substr(nls_,1,4)='3800' and substr(nlsk_,1,4)='1003') and
-              d020_='000' THEN
-              p_ins('362', nls_, nbuc_);
+
+           IF sn_>0 and (substr(nls_,1,4)='3800' and substr(nlsk_,1,4)='1003') and
+              d020_='000' 
+           THEN
+              p_ins('362', nls_, nbuck_);
               prf_:=1;
            END IF;
 
            IF sn_>0 and d020_='000' and prf_=0 and (substr(nls_,1,3) in ('100','110') and
-              (substr(nlsk_,1,4)<>'3800' and substr(nlsk_,1,4) not in ('1007','1107'))) THEN
-              IF d020_<>'280' and d020_<>'380' THEN
+              (substr(nlsk_,1,4)<>'3800' and substr(nlsk_,1,4) not in ('1007','1107'))) 
+           THEN
+              IF d020_<>'280' and d020_<>'380' 
+              THEN
                  p_ins(d020_, nlsk_, nbuc_);
                  prf_:=1;
               END IF;
            END IF;
 
            IF sn_>0 and d020_='000' and prf_=0 and ((substr(nls_,1,4)<>'3800' and
-              substr(nls_,1,4) not in ('1007','1107')) and substr(nlsk_,1,3) in ('100','110')) THEN
+              substr(nls_,1,4) not in ('1007','1107')) and substr(nlsk_,1,3) in ('100','110')) 
+           THEN
               IF d020_<>'280' and d020_<>'380' THEN
-                 p_ins(d020_, nls_, nbuc_);
+                 p_ins(d020_, nls_, nbuck_);
                  prf_:=1;
               END IF;
            END IF;
 
-           IF SN_>0 and prf_=0 THEN
-              IF substr(nls_,1,3) in ('100','110') and to_number(d020_) < 300 THEN
+           IF SN_>0 and prf_=0 
+           THEN
+              IF substr(nls_,1,3) in ('100','110') and to_number(d020_) < 300 
+              THEN
                  IF d020_<>'280' THEN
                     p_ins(d020_, nlsk_, nbuc_);
                  END IF;
@@ -391,7 +388,8 @@ BEGIN
                  END IF;
               END IF;
 
-              IF substr(nls_,1,3) in ('100','110') and to_number(d020_) > 300  THEN
+              IF substr(nls_,1,3) in ('100','110') and to_number(d020_) > 300  
+              THEN
 
                  if substr(nlsk_,1,4)='3800' and d020_ in ('348','361','362','363','370') then
                     d020_:=to_char(to_number(d020_)-100);
@@ -410,7 +408,7 @@ BEGIN
                  end if;
 
                  IF d020_<>'280' and d020_<>'380' THEN
-                    p_ins(d020_, nlsk_, nbuck_);
+                    p_ins(d020_, nlsk_, nbuc_);
                  END IF;
               END IF ;
 
@@ -440,13 +438,6 @@ BEGIN
     FROM RNBU_TRACE
     where kodp not like '_00%'
     GROUP BY kodp, nbuc;
-
---    INSERT INTO tmp_nbu (nbuc, kodf, datf, kodp, znap)
---    select nbuc1_, kodf_, dat_, ddd || '000', r020
---    from kl_f3_29
---    where kf = kodf_ and
---        to_number(r020)<>0
---    order by ddd;
 
     -----------------------------------------------------------------------------
     p_ch_file73(kodf_,Dat_,userid_);
