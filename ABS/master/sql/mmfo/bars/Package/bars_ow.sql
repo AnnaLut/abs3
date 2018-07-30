@@ -4065,6 +4065,8 @@ begin
            else
               l_nlsb := p_nlsb;
            end if;
+		else 
+		   l_nlsb := p_nlsb;
         end if;
      end if;
      
