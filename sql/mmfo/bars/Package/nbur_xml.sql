@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.6  2018.06.22';
+  g_body_version  constant varchar2(64) := 'version 2.8  2018.06.26';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -1209,6 +1209,28 @@ select  substr(ekp_2,1,1) ekp_2
             having 
                    sum(T070) <> 0;
 
+      when '48X' then
+        open p_recordset
+        for
+          select 
+                ekp
+                , q003
+                , q001
+                , q002
+                , q008
+                , q029
+                , k020
+                , k021
+                , k040
+                , k110
+                , t070
+                , t080
+                , t090_1
+                , t090_2
+                , t090_3
+          from  nbur_log_f48x
+          where report_date = p_rpt_dt
+                and kf = p_kf;
     else
       null;
     end case;
