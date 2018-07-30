@@ -69,6 +69,9 @@ exception when others then
 end;
 /
 
+comment on table msp.msp_env_content_type is 'Типи вмісту сформованих даних по конверту';
+comment on column msp.msp_env_content_type.id is 'id типу сформованих даних';
+comment on column msp.msp_env_content_type.name is 'Назва типу сформованих даних';
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/table/msp_env_content_type.sql =========*** End

@@ -112,6 +112,15 @@ exception when others then
 end;
 /
 
+comment on table msp.msp_env_content is 'Сформовані дані по конверту';
+comment on column msp.msp_env_content.id is 'id вмісту сформованих даних по конверту';
+comment on column msp.msp_env_content.type_id is 'Тип вмісту сформованих даних по конверту (msp_env_content_type)';
+comment on column msp.msp_env_content.bvalue is 'НЕ ВИКОРИСТОВУЄТЬСЯ. Вміст сформованих даних по конверту (blob)';
+comment on column msp.msp_env_content.filename is 'Назва сформованого файлу';
+comment on column msp.msp_env_content.insert_dttm is 'Дата формування';
+comment on column msp.msp_env_content.ecp is 'ECP';
+comment on column msp.msp_env_content.cvalue is 'Вміст сформованих даних по конверту (clob)';
+
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/table/msp_env_content.sql =========*** End
 PROMPT ===================================================================================== 

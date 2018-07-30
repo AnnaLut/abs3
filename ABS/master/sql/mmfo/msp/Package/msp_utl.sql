@@ -4,14 +4,16 @@ PROMPT =========================================================================
  
 create or replace package msp.msp_utl is
 
-  gc_header_version constant varchar2(64)  := 'version 1.3 02.03.2018';
+  gc_header_version constant varchar2(64)  := 'version 1.32 25.07.2018';
 
+  -- тип для роботи з масивом файлів архіву
   type r_file_array is record (
     file_name    varchar2(50),
     file_buff    blob
     );
   type t_file_array is table of r_file_array;
 
+  -- тип для роботи з масивом файлів квитанцій
   type r_match_array is record (
     id     msp_envelopes.id%type,
     bvalue blob
@@ -79,18 +81,28 @@ create or replace package msp.msp_utl is
   --
   function replace_ukrsmb2dos(l_txt clob) return clob;
 
+  -----------------------------------------------------------------------------------------
+  --  set_state
+  --
+  --    Оновлення стану запиту/конверта
+  --
+  --      p_id    - id запиту / конвертв
+  --      p_state - новий стан запиту / конвертв
+  --      p_comm  - коментар
+  --      p_obj   - 0 - request (запит), 1 - envelope (конверт)
+  --
   procedure set_state (p_id in number, p_state in number, p_comm in varchar2, p_obj in number);
 
   -----------------------------------------------------------------------------------------
   --  set_file_state
   --
-  --    Оновлення статуса файла
+  --    Оновлення стану файла
   --
   --      p_file_id       - id файлу
   --      p_state_id      - id стану
   --      p_comment       - коментар
   --      p_send_pay_date - дата відправки файла на оплату
-  -- 
+  --
   procedure set_file_state(p_file_id  in msp_files.id%type,
                            p_state_id in msp_files.state_id%type,
                            p_comment  in msp_files.comm%type default null,
@@ -99,7 +111,10 @@ create or replace package msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  create_parsing_file
   --
-  --    Парсинг і запис табличних даних файлів
+  --    Парсинг і запис табличних даних файлів (точка входу в методі parse_files)
+  --
+  --      p_envelope_file_id - id конверта
+  --      p_id_file          - id реєстра
   --
   procedure create_parsing_file(p_envelope_file_id in msp_envelope_files_info.id%type,
                                 p_id_file          in msp_envelope_files_info.id_file%type);
@@ -121,10 +136,13 @@ create or replace package msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  get_matching2sign
   --
-  --    Функція формує та повертає таблицю ZIP архів квитанції 1/2
+  --    Функція формує та повертає таблицю яка містить в полях ZIP архів квитанції 1/2
+  --    Використовується у view, які підхватує TOSS для підписання і шифрування: 
+  --    v_msp_sign_file        - Список квитанцій конвертів на формування підпису
+  --    v_msp_encrypt_envelope - Список квитанцій конвертів на шифрування
   --
-  --      p_stage          - етап     - 1 - підписання файлу, 2 - накладання ЕЦП
-  --      p_is_convert2dos - ознака 1 - конвертувати в cp866 / 0 - ні
+  --      p_stage          - етап   - 1 - підписання файлу, 2 - шифрування файлу
+  --      p_is_convert2dos - ознака - 1 - конвертувати в cp866 / 0 - ні
   --
   function get_matching2sign(p_stage          in simple_integer,
                              p_is_convert2dos in simple_integer default 1) return t_match_array pipelined;
@@ -132,7 +150,7 @@ create or replace package msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  save_matching
   --
-  --    Процедура зберігає зашифрований архів квитанції 1/2
+  --    Процедура зберігає зашифрований архів квитанції 1/2. Точка входу: TOSS 
   --
   --      p_envelope_id - id конверту
   --      p_file_buff   - clob буфер файлу
@@ -147,23 +165,51 @@ create or replace package msp.msp_utl is
   --
   --    Установка стану "Квитанція 1/2 в процесі формування" для конверту
   --
+  --      p_envelope_id - id конверта
+  --      p_matching_tp - тип квитанції - 1/2
+  --
   procedure set_match_processing(p_envelope_id in msp_envelopes.id%type,
                                  p_matching_tp in simple_integer);
 
   -----------------------------------------------------------------------------------------
+  --  set_match_processing
+  --
+  --    Установка стану "Квитанція 2 в процесі формування" для конверту - перегружений метод - Точка входу із веба
+  --    
+  --      p_payment_type   - тип оплати    (атрибут v_msp_envelopes_match2.payment_type - динамічно оприділяється із назви файлу)
+  --      p_payment_period - період оплати (атрибут v_msp_envelopes_match2.payment_period - динамічно оприділяється із назви файлу)
+  --
+  procedure set_match_processing(p_payment_type   in v_msp_envelopes_match2.payment_type%type,
+                                 p_payment_period in v_msp_envelopes_match2.payment_period%type);
+
+  -----------------------------------------------------------------------------------------
   --  process_file
   --
-  --    Прсинг та валідація нових файлів
+  --    Парсинг та валідація нових файлів. Метод періодично запускається в джобі msp.parse_files
   --
   procedure process_files;
 
   -----------------------------------------------------------------------------------------
-  --  decodeclobfrombase64
+  --  encode_data
   --
-  --    decodeclobfrombase64
+  --    Метод приймає на вхід та повертає шифрований вміст файла запиту конверта
+  --
+  --      p_data - вміст файла запиту конверта
   --
   procedure encode_data(p_data in out nocopy clob);
+
+  -----------------------------------------------------------------------------------------
+  --  decode_data
+  --
+  --    Метод приймає на вхід та повертає розшифрований вміст файла запиту конверта
+  --
+  --      p_data - вміст файла запиту конверта
+  --
   procedure decode_data(p_data in out nocopy clob);
+
+  -----------------------------------------------------------------------------------------
+  -- перекодування clob із utf8 в базове кодування
+  --
   function utf8todeflang(p_clob in clob) return clob;
 
   -----------------------------------------------------------------------------------------
@@ -171,20 +217,36 @@ create or replace package msp.msp_utl is
   --
   --    Включення інформаційного рядка в оплату
   --
+  --      p_file_record_id - id інформаційного рядка, що включається в оплату
+  --
   procedure set_file_record2pay(p_file_record_id in msp_file_records.id%type);
-  
+
   -----------------------------------------------------------------------------------------
   --  set_file_record_payed
   --
   --    Оновлення статуса інформаційного рядка файла на сплачено
   --
+  --      p_file_record_id  - id інформаційного рядка файла
+  --      p_payed_date      - дата оплати
+  --
   procedure set_file_record_payed(p_file_record_id in msp_file_records.id%type,
                                   p_payed_date in date);
+
+  -----------------------------------------------------------------------------------------
+  --  set_file_record_error
+  --
+  --    Оновлення статуса інформаційного рядка файла на повернуто в МСП
+  --
+  --      p_file_record_id - id інформаційного рядка, що повертається в МСП
+  --
+  procedure set_file_record_error(p_file_record_id in msp_file_records.id%type);
 
   -----------------------------------------------------------------------------------------
   --  set_file_for_pay
   --
   --    Передати реєстр на оплату
+  --
+  --      p_file_id - id реєстра, що передається на оплату
   --
   procedure set_file_for_pay(p_file_id in msp_files.id%type);
 
@@ -192,6 +254,10 @@ create or replace package msp.msp_utl is
   --  set_file_record_blocked
   --
   --    Виключити інформаційний рядок з оплати
+  --
+  --      p_file_record_id - id інформаційного рядка, що блокується
+  --      p_comment        - коментар користувача
+  --      p_block_type_id  - тип блокування
   --
   procedure set_file_record_blocked(p_file_record_id in msp_file_records.id%type,
                                     p_comment        in msp_file_records.comm%type,
@@ -201,6 +267,11 @@ create or replace package msp.msp_utl is
   --  create_request
   --
   --    Процедура записує запит в базу даних і формує відповідь
+  --    TOSS розшифровує запит і визиває метод і отримує відповідь p_xml
+  --
+  --      p_req_xml  - xml запит
+  --      p_act_type - тип запиту
+  --      p_xml      - відповідь на запит
   --
   procedure create_request(p_req_xml  in clob,
                            p_act_type in number,
@@ -209,34 +280,94 @@ create or replace package msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  prepare_check_state
   --
-  --    підготовка запиту на перевірку станів оплати референсів по ЕБП
+  --    підготовка запиту для РУ-шок на перевірку станів оплати референсів по ЕБП (точка входу job msp.get_check_state)
   --
   procedure prepare_check_state;
 
   -----------------------------------------------------------------------------------------
   --  prepare_get_rest_request
   --
-  --    підготовка запиту на перевірку станів оплати референсів по ЕБП
+  --    підготовка запиту на перевірку станів оплати референсів по ЕБП (використовується на вебі, навішено на кнопку)
+  --
+  --      p_acc    - рахунок 2909
+  --      p_fileid - id реєстра
+  --      p_kf     - відділення
   --
   procedure prepare_get_rest_request(p_acc    in msp_acc_trans_2909.acc_num%type,
                                      p_fileid in msp_files.id%type,
                                      p_kf     in msp_acc_trans_2909.kf%type);
 
-  procedure create_envelope(p_id in number, p_idenv in number default null, p_code in varchar2 default null, p_sender in varchar2 default null,
-                                              p_recipient in varchar2 default null, p_part_number in number default null, p_part_total in number default null, p_ecp in clob default null,
-                                              p_data in clob default null, p_data_decode in clob default null);
+  -----------------------------------------------------------------------------------------
+  --  create_envelope
+  --
+  --    Процедура записує розібрані дані конверта в базу даних
+  --    TOSS іде по списку нових запитів в бд (стан запиту = -1), розшифровує запит, парсить і зберігає відповідні дані
+  --
+  --      p_id          - id запиту
+  --      p_idenv       - id конверта ІОЦ
+  --      p_code        - Код запиту від ІОЦ
+  --      p_sender      - Відправник пакету
+  --      p_recipient   - Отримувач пакету
+  --      p_part_number - Порядковий номер частини конверту
+  --      p_part_total  - Загальна к-ть частин конверту
+  --      p_ecp         - ЕЦП, який був накладений в ІОЦ
+  --      p_data        - Зашифрований конверт
+  --      p_data_decode - Розшифрований конверт (base64)
+  --
+  procedure create_envelope(
+    p_id          in msp_requests.id%type,
+    p_idenv       in msp_envelopes.id_msp_env%type default null,
+    p_code        in msp_envelopes.code%type       default null,
+    p_sender      in msp_envelopes.sender%type     default null,
+    p_recipient   in msp_envelopes.recipient%type  default null,
+    p_part_number in msp_envelopes.partnumber%type default null,
+    p_part_total  in msp_envelopes.parttotal%type  default null,
+    p_ecp         in clob default null,
+    p_data        in clob default null,
+    p_data_decode in clob default null);
 
-  procedure create_envelope_file(p_id in number, p_id_msp in number, p_filedata in clob, p_filename in varchar2, p_filedate in varchar2, p_filepath in varchar2);
+  -----------------------------------------------------------------------------------------
+  --  create_envelope_file
+  --
+  --    Процедура записує розібрані дані реєстрів конверта в базу даних
+  --    TOSS іде по списку нових конвертів в бд (стан конверта = -1), парсить конверти і записує параметри реєстрів конверта
+  --
+  --      p_id       - id запиту / конверта
+  --      p_id_msp   - id конверта ІОЦ
+  --      p_filedata - текстовий файл реєстра
+  --      p_filename - назва файлу реєстра
+  --      p_filedate - дата файлу реєстра (ІОЦ)
+  --      p_filepath - назва файлу в архіві
+  --
+  procedure create_envelope_file(
+    p_id       in msp_envelopes.id%type,
+    p_id_msp   in msp_envelope_files_info.id_msp%type, 
+    p_filedata in msp_envelope_files.filedata%type, 
+    p_filename in msp_envelope_files_info.filename%type, 
+    p_filedate in msp_envelope_files_info.filedate%type, 
+    p_filepath in msp_envelope_files_info.filepath%type);
 
+  -----------------------------------------------------------------------------------------
+  --  process_receipt
+  --
+  --    Оновлення залишку та оновлення стану оплати референсів по ЕБП (точка входу job msp.process_transport)
+  --
   procedure process_receipt;
 
+  -----------------------------------------------------------------------------------------
+  --  prepare_request_xml
+  --
+  --    Функція готує xml відповідь на запит
+  --
+  --    p_request_id - id запиту
+  --
   function prepare_request_xml(p_request_id in msp_requests.id%type) return clob;
 
 end msp_utl;
 /
 create or replace package body msp.msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.352 12.06.2018';
+  gc_body_version constant varchar2(64) := 'version 1.42 25.07.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -263,6 +394,24 @@ create or replace package body msp.msp_utl is
   begin
      return 'package body msp_utl: ' || gc_body_version || chr(10);
   end body_version;
+
+  -----------------------------------------------------------------------------------------
+  --  get_context_user
+  --
+  --    Функція повертає ФІО та логін поточного користувача системи
+  --
+  function get_context_user return varchar2
+  is
+    l_user varchar2(4000);
+  begin
+    select fio || ' (' || logname || ')' into l_user from bars.staff$base where id = bars.gl.aUID;
+    return l_user;
+  exception
+    when no_data_found then
+      bars.bars_error.raise_nerror (gc_mod_code, 'UNKNOWN_CONTEXT_USER');
+    when others then
+      bars.bars_error.raise_nerror (gc_mod_code, 'ERR_CONTEXT_USER', dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+  end get_context_user;
 
   -----------------------------------------------------------------------------------------
   --  add_text_node_utl
@@ -370,6 +519,11 @@ create or replace package body msp.msp_utl is
         'ґ', chr(ascii('ґ')+6));
   end replace_ukrsmb2dos;
 
+  -----------------------------------------------------------------------------------------
+  --  set_state_request
+  --
+  --    Оновлення стану запиту
+  --  
   procedure set_state_request(p_id in number, p_state in number, p_comment in varchar2 default null)
   is
   begin
@@ -380,6 +534,11 @@ create or replace package body msp.msp_utl is
 
   end set_state_request;
 
+  -----------------------------------------------------------------------------------------
+  --  set_state_envelope
+  --
+  --    Оновлення стану конверта
+  --  
   procedure set_state_envelope(p_id number, p_state in number, p_comm in varchar2 default null)
   is
   begin
@@ -389,6 +548,11 @@ create or replace package body msp.msp_utl is
      where e.id = p_id;
   end set_state_envelope;
 
+  -----------------------------------------------------------------------------------------
+  --  set_state_envelope_async
+  --
+  --    Оновлення стану конверта в автономній транзакції
+  --  
   procedure set_state_envelope_async(p_id number, p_state in number, p_comm in varchar2 default null)
   is
     pragma autonomous_transaction;
@@ -400,8 +564,18 @@ create or replace package body msp.msp_utl is
      commit;
   end set_state_envelope_async;
 
+  -----------------------------------------------------------------------------------------
+  --  set_state
+  --
+  --    Оновлення стану запиту/конверта
+  --
+  --      p_id    - id запиту / конвертв
+  --      p_state - новий стан запиту / конвертв
+  --      p_comm  - коментар
+  --      p_obj   - 0 - request (запит), 1 - envelope (конверт)
+  --
   procedure set_state (p_id in number, p_state in number, p_comm in varchar2, p_obj in number)
-  is -- 0 - request, 1 - envelope
+  is 
   begin
     if p_obj = 0 then
       set_state_request(p_id, p_state, p_comm);
@@ -411,9 +585,9 @@ create or replace package body msp.msp_utl is
   end set_state;
 
   -----------------------------------------------------------------------------------------
-  --  set_envelope_file
+  --  set_envelope_file_state
   --
-  --    Оновлення даних таблиці envelope_files
+  --    Оновлення стану msp_envelope_files_info
   --
   procedure set_envelope_file_state(p_envelope_id in msp_envelope_files_info.id%type,
                                     p_state       in msp_envelope_files_info.state%type,
@@ -434,7 +608,7 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  set_file_state
   --
-  --    Оновлення статуса файла
+  --    Оновлення стану файла
   --
   --      p_file_id       - id файлу
   --      p_state_id      - id стану
@@ -465,14 +639,27 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  set_file_record_state
   --
-  --    Оновлення статуса інформаційного рядка файла
+  --    Оновлення стану інформаційного рядка файла
+  --
+  --      p_file_record_id   - id інформаційного рядка файла
+  --      p_state_id         - id стану
+  --      p_comment          - коментар рядка
+  --      p_validation_state - id стану валідації
+  --      p_state_comment    - коментар зміни стану інформаційного рядка
   --
   procedure set_file_record_state(p_file_record_id in msp_file_records.id%type,
                                   p_state_id       in msp_file_records.state_id%type,
-                                  p_comment        in msp_file_records.comm%type default null)
+                                  p_comment        in msp_file_records.comm%type default null,
+                                  p_validation_state in msp_file_records.validation_state%type default null,
+                                  p_state_comment    in msp_file_records.state_comment%type default null)
   is
   begin
-    update msp_file_records set state_id = p_state_id, comm = coalesce(p_comment, comm) where id = p_file_record_id;
+    update msp_file_records
+       set state_id         = p_state_id,
+           comm             = coalesce(p_comment, comm),
+           validation_state = coalesce(p_validation_state, validation_state),
+           state_comment    = coalesce(p_state_comment, state_comment)
+    where id = p_file_record_id;
 
     if sql%rowcount = 0 then
       raise ex_no_file;
@@ -489,14 +676,21 @@ create or replace package body msp.msp_utl is
   --
   --    Оновлення статуса інформаційного рядка файла на сплачено
   --
+  --      p_file_record_id  - id інформаційного рядка файла
+  --      p_payed_date      - дата оплати
+  --
   procedure set_file_record_payed(p_file_record_id in msp_file_records.id%type,
                                   p_payed_date in date)
     is
       l_file_id   msp_files.id%type;
+      l_comment   msp_file_records.state_comment%type;
   begin
+    l_comment := 'Змінено стан інформаційного рядка на "Сплачений". Користувач: '||get_context_user;
+
     update msp_file_records
        set state_id = 10,
-           fact_pay_date = p_payed_date
+           fact_pay_date = p_payed_date,
+           state_comment = l_comment
      where id = p_file_record_id
     returning file_id into l_file_id;
 
@@ -507,6 +701,43 @@ create or replace package body msp.msp_utl is
                            from msp_file_records mfr
                           where mfr.file_id = mf.id
                             and mfr.state_id in (17,19,20));
+    bars_audit.info('msp.msp_utl.set_file_record_payed, p_file_record_id='||to_char(p_file_record_id)||', p_payed_date='||to_char(p_payed_date,'dd.mm.yyyy'));
+  exception
+    when others then
+      bars.bars_error.raise_nerror (gc_mod_code, 'ERR_SET_RECORD_PAYED', dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+  end;
+
+  -----------------------------------------------------------------------------------------
+  --  set_file_record_error
+  --
+  --    Оновлення статуса інформаційного рядка файла на повернуто в МСП
+  --
+  --      p_file_record_id - id інформаційного рядка, що повертається в МСП
+  --
+  procedure set_file_record_error(p_file_record_id in msp_file_records.id%type)
+    is
+      l_file_id   msp_files.id%type;
+      l_comment   msp_file_records.state_comment%type;
+  begin
+    l_comment := 'Змінено стан інформаційного рядка на "Повернуто в МСП". Користувач: '||get_context_user;
+
+    update msp_file_records
+       set state_id = 3,
+           state_comment = l_comment
+     where id = p_file_record_id
+    returning file_id into l_file_id;
+
+     update msp_files mf
+         set mf.state_id = 9 --'PAYED'
+       where mf.id = l_file_id
+         and not exists (select 1
+                           from msp_file_records mfr
+                          where mfr.file_id = mf.id
+                            and mfr.state_id in (17,19,20));
+    bars_audit.info('msp.msp_utl.set_file_record_error, p_file_record_id='||to_char(p_file_record_id));
+  exception
+    when others then
+      bars.bars_error.raise_nerror (gc_mod_code, 'ERR_SET_RECORD_ERROR', dbms_utility.format_error_backtrace || ' ' || sqlerrm);
   end;
 
   -----------------------------------------------------------------------------------------
@@ -563,7 +794,13 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  checking_file_record
   --
-  --    Процедура перевірки нового файла
+  --    Процедура перевірки нового файла (валідація)
+  --
+  --      p_file_record_id  - id інформаційного рядка файла
+  --      p_numident        - ідент.код отримувача
+  --      p_deposit_acc     - Номер рахунку отримувача
+  --      p_full_name       - ПІБ отримувача
+  --      p_receiver_mfo    - МФО отримувача
   --
   procedure check_file_record(p_file_record_id in msp_file_records.id%type,
                               p_numident       in msp_file_records.numident%type,
@@ -649,11 +886,13 @@ create or replace package body msp.msp_utl is
       --l_err_message := 'Рахунок не відповідає по ПІБ';
       raise ex_err_record;
     end if;
-
-    update msp_file_records set state_id = 0, comm = null where id = p_file_record_id;
+    
+    -- якщо дійшли сюди то валідація ОК (state_id = 0)
+    update msp_file_records set state_id = 0, validation_state = 0, comm = null where id = p_file_record_id;
   exception
     when ex_err_record then
-      update msp_file_records set state_id = l_err_code, comm = null, block_type_id = l_block_type_id where id = p_file_record_id;
+      -- оновлення коду помилки валідації
+      update msp_file_records set state_id = l_err_code, validation_state = l_err_code, comm = null, block_type_id = l_block_type_id where id = p_file_record_id;
     when others then
       raise_application_error(-20000, 'Помилка валідації: ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
   end check_file_record;
@@ -661,21 +900,28 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  create_parsing_file
   --
-  --    Парсинг і запис табличних даних файлів
+  --    Парсинг і запис табличних даних файлів (точка входу в методі parse_files)
+  --
+  --      p_envelope_file_id - id конверта
+  --      p_id_file          - id реєстра
   --
   procedure create_parsing_file(p_envelope_file_id in msp_envelope_files_info.id%type,
                                 p_id_file          in msp_envelope_files_info.id_file%type)
   is
     l_filedata msp_envelope_files.filedata%type;
   begin
-    -- отримаємо вихідний файл для парсингу
+    -- отримаємо вихідний файл (clob) для парсингу
     select filedata into l_filedata from msp_envelope_files t where id = p_envelope_file_id;
+    
+    -- парсинг clob - розбиття на рядки і поміщення вихідних даних в темп таблицю bars.tmp_imp_file (парсить java)
     bars.import_flat_file(l_filedata);
 
+    -- очистка реєстрів
     delete from msp_file_records where file_id = p_id_file;
     delete from msp_files where id = p_id_file;
 
-    -- insert into msp_files
+    -- insert into msp_files - вставка в заголовок реєстру
+    -- bars.tmp_imp_file.id = 0 - перший рядок файлу, містить заголовок
     insert into msp_files (id, state_id, envelope_file_id,
                            file_bank_num, file_filia_num, file_pay_day, file_separator, file_upszn_code, header_lenght, file_date,
                            rec_count, payer_mfo, payer_acc, receiver_mfo, receiver_acc, debit_kredit, pay_sum, pay_type, pay_oper_num,
@@ -707,7 +953,7 @@ create or replace package body msp.msp_utl is
            trim(substr(line, 345, 32)) --checksum
     from bars.tmp_imp_file t where id = 0;
 
-    -- insert into msp_file_records
+    -- insert into msp_file_records - вставка інформаційних рядків
     insert into msp_file_records (id, file_id, state_id, block_type_id, block_comment, rec_no,
                                   deposit_acc, filia_num, deposit_code, pay_sum,
                                   full_name, numident, pay_day, displaced, pers_acc_num)
@@ -730,17 +976,18 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  parse_files
   --
-  --    Парсинг нових файлів
+  --    Парсинг нових файлів (точка входу в методі process_files, який періодично запускає джоб)
   --
   procedure parse_files
   is
     l_err_state msp_envelope_files_info.state%type;
     l_err_msg   varchar2(4000);
   begin
-    -- set status 1 IN_PARSE Виконується парсинг
+    -- Відбір всіх нових файлів 
     for r in (select distinct id from msp_envelope_files_info where state in (-1))
     loop
-      set_envelope_file_state(r.id, 1);-- 1 IN_PARSE Виконується парсинг
+      -- Оновлення стану на: 1 - IN_PARSE - Виконується парсинг
+      set_envelope_file_state(r.id, 1);-- 1 - IN_PARSE - Виконується парсинг
     end loop;
 
     commit;
@@ -756,13 +1003,13 @@ create or replace package body msp.msp_utl is
           create_parsing_file(p_envelope_file_id => r.id, p_id_file => i.id_file);
         exception
           when others then
-            l_err_state := 2; -- 2 PARSE_ERROR Помилка парсингу
+            l_err_state := 2; -- 2 - PARSE_ERROR - Помилка парсингу
             l_err_msg   := sqlerrm;
             exit;
         end;
       end loop;
 
-      set_envelope_file_state(r.id, coalesce(l_err_state, 3), l_err_msg); -- 2 PARSE_ERROR Помилка парсингу / 3 PARSED Файл розібраний 
+      set_envelope_file_state(r.id, coalesce(l_err_state, 3), l_err_msg); -- 2 - PARSE_ERROR - Помилка парсингу / 3 - PARSED - Файл розібраний 
       commit;
     end loop;
   end parse_files;
@@ -770,11 +1017,11 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  validate_file_records
   --
-  --    Валідація нового файла
+  --    Валідація інформаційних рядків нового файла (точка входу в методі process_files, який періодично запускає джоб)
   --
   procedure validate_file_records
   is
-    l_check_state simple_integer := 0; -- статус валідації
+    l_check_state simple_integer := 0; -- статус валідації, за замовчуванням = 0 - Ок
   begin
     -- check file_records
     for ef in (select distinct ef.id
@@ -818,12 +1065,14 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  process_file
   --
-  --    Прсинг та валідація нових файлів
+  --    Парсинг та валідація нових файлів. Метод періодично запускається в джобі msp.parse_files
   --
   procedure process_files
   is
   begin
+    -- парсинг всіх нових файлів
     parse_files;
+    -- валідація інформаційних рядків файлів, які успішно розпарсені, або повторно, що мають системну помилку
     validate_file_records;
   end process_files;
 
@@ -832,6 +1081,9 @@ create or replace package body msp.msp_utl is
   --  do_matching1_header
   --
   --    Побудова заголовку файла квитанції 1
+  --
+  --      p_file_id   - id заголовка файлу
+  --      p_file_buff - буфер зформованого заголовка файла (out parameter)
   --
   procedure do_matching1_header(
     p_file_id   in msp_files.id%type,
@@ -844,7 +1096,6 @@ create or replace package body msp.msp_utl is
     l_file_name   varchar2(17 char);
   begin
     select * into l_file from msp_files where id = p_file_id;
-    --l_file_name := substr(lpad(l_file.file_bank_num,5,'0'),1,5)||'\'||substr(lpad(l_file.file_filia_num,5,'0'),1,5)||substr(lpad(l_file.file_pay_day,2,'0'),1,2)||'.'||substr(lpad(l_file.file_upszn_code,3,'0'),1,3);
     l_file_name   := lpad(coalesce(trim(l_file.file_bank_num),'0'),5,'0')||'\'||lpad(coalesce(trim(l_file.file_filia_num),'0'),5,'0')||lpad(coalesce(trim(l_file.file_pay_day),'0'),2,'0')||coalesce(trim(l_file.file_separator),'.')||lpad(coalesce(trim(l_file.file_upszn_code),'0'),3,'0');
 
     p_file_buff := replace(l_file_name, '\', '')||
@@ -852,10 +1103,8 @@ create or replace package body msp.msp_utl is
       l_create_date||
       to_char(l_file.rec_count,'FM000000')||
       to_char(l_file.payer_mfo,'FM000000000')||
-      --to_char(l_file.payer_acc,'FM000000000')||
       to_char(l_file.payer_acc,'FM00000000000000')||
       to_char(l_file.receiver_mfo,'FM000000000')||
-      --to_char(l_file.receiver_acc,'FM000000000')||
       to_char(l_file.receiver_acc,'FM00000000000000')||
       coalesce(l_file.debit_kredit,' ')||
       to_char(l_file.pay_sum,'FM0000000000000000000')||
@@ -882,6 +1131,9 @@ create or replace package body msp.msp_utl is
   --
   --    Побудова файла квитанції 1
   --
+  --      p_file_id   - id заголовка файлу
+  --      p_file_buff - буфер зформованої квитанції 1 інформаційних рядків файла (out parameter)
+  -- 
   procedure do_matching1_body(
     p_file_id        in msp_files.id%type,
     p_file_buff      in out nocopy clob
@@ -915,6 +1167,9 @@ create or replace package body msp.msp_utl is
   --  do_matching2_header
   --
   --    Побудова заголовку файла квитанції 2
+  --
+  --      p_file_id   - id заголовка файлу
+  --      p_file_buff - буфер зформованого заголовка файла (out parameter)
   --
   procedure do_matching2_header(
     p_file_id   in msp_files.id%type,
@@ -983,6 +1238,9 @@ create or replace package body msp.msp_utl is
   --
   --    Побудова файла квитанції 2
   --
+  --      p_file_id   - id заголовка файлу
+  --      p_file_buff - буфер зформованої квитанції 2 інформаційних рядків файла (out parameter)
+  --
   procedure do_matching2_body(
     p_file_id        in msp_files.id%type,
     p_file_buff      in out nocopy clob
@@ -993,11 +1251,11 @@ create or replace package body msp.msp_utl is
     ex_err_state exception;
   begin
     select count(1) into l_cnt_err from msp_file_records where file_id = p_file_id and state_id not in (1, 2, 3, 4, 5, 14, 10) and rownum = 1;
-    
+
     if l_cnt_err > 0 then
       raise ex_err_state;
     end if;
-    
+
     for c_rec in (select * from msp_file_records where file_id = p_file_id order by id)
       loop
         p_file_buff := p_file_buff||
@@ -1034,9 +1292,14 @@ create or replace package body msp.msp_utl is
   end do_matching2_body;
 
   -----------------------------------------------------------------------------------------
-  --  get_matching
+  --  do_matching
   --
   --    Квитанція 1,2
+  --
+  --      p_file_id        - id заголовка файла
+  --      p_file_buff      - буфер зформованої квитанції 1/2 (out parameter)
+  --      p_matching_tp    - тип квитанції: 1/2
+  --      p_is_convert2dos - ознака чи конвертувати в dos кодування cp866 (1 - так, 0 - ні)
   --
   procedure do_matching(
     p_file_id     in msp_files.id%type,
@@ -1072,53 +1335,13 @@ create or replace package body msp.msp_utl is
   end do_matching;
 
   -----------------------------------------------------------------------------------------
-  --  set_file_content
-  --
-  --    Запис зформованих даних по файлу
-  --
-  --      p_content_id      - id запису
-  --      p_value           - blob файл
-  --      p_content_type_id - тип контенту
-  --      p_file_id         - id файлу
-  --
-  procedure set_file_content(p_content_id       in out msp_file_content.id%type,
-                             p_value            in blob,
-                             p_content_type_id  in msp_file_content.type_id%type default null,
-                             p_file_id          in msp_file_content.file_id%type default null)
-  is
-    ex_no_parameter exception;
-  begin
-    if coalesce(p_content_id, 0) <= 0 then
-      if p_content_type_id is null or p_file_id is null then
-        raise ex_no_parameter;
-      end if;
-
-      insert into msp_file_content (id, type_id, file_id, bvalue)
-      values (msp_file_content_seq.nextval, p_content_type_id, p_file_id, p_value)
-      returning id into p_content_id;
-    else
-      update msp_file_content set bvalue = p_value where id = p_content_id;
-      if sql%rowcount = 0 then
-        raise ex_no_file;
-      end if;
-    end if;
-  exception
-    when ex_no_file then
-      bars.bars_error.raise_nerror (gc_mod_code, 'UNKNOWN_FILE_CONTENT', to_char(p_content_id));
-    when ex_no_parameter then
-      bars.bars_error.raise_nerror (gc_mod_code, 'UNKNOWN_FILECONTENT_PARAMETER', to_char(p_content_type_id), to_char(p_file_id));
-    when others then
-      bars.bars_error.raise_nerror (gc_mod_code, 'ERRWRITE_FILE_CONTENT', dbms_utility.format_error_backtrace || ' ' || sqlerrm);
-  end set_file_content;
-
-  -----------------------------------------------------------------------------------------
   --  set_env_content
   --
-  --    Запис зформованих даних по файлу
+  --    Запис зформованих даних по файлу (квитанція 1/2)
   --
-  --      p_content_id      - id запису
-  --      p_value           - clob файл
-  --      p_content_type_id - тип контенту
+  --      p_id        - id конверта
+  --      p_value     - clob файл
+  --      p_type_id   - тип контенту (msp_env_content_type.id - квитанція 1/2)
   --
   procedure set_env_content(p_id      in msp_env_content.id%type,
                             p_value   in clob,
@@ -1131,9 +1354,11 @@ create or replace package body msp.msp_utl is
     l_start         number(2) := 12;
   begin
     if p_type_id is null then
+      -- не вірно вказано тип
       raise ex_no_parameter;
     end if;
 
+    -- запис даних
     merge into msp_env_content e
     using (select * from msp_envelopes t where t.id = p_id) t on (e.id = t.id and e.type_id = p_type_id)
     when matched then
@@ -1143,7 +1368,6 @@ create or replace package body msp.msp_utl is
                  e.insert_dttm = sysdate
     when not matched then
       insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]', substr(upper(t.filename),l_start,instr(t.filename,'.')-l_start)), sysdate, p_ecp, p_value);
-      --insert values (p_id, p_type_id, null, replace(l_filename, '[FNAME]',substr(upper(t.filename),12,25)), sysdate, p_ecp, p_value); -- replace(replace(upper(t.filename), 'REQPAY', 'CTLPAY'), '.P7S.P7S', '.P7S')
 
     if sql%rowcount = 0 then
       raise ex_no_file;
@@ -1176,17 +1400,24 @@ create or replace package body msp.msp_utl is
   --
   --    Включення інформаційного рядка в оплату
   --
+  --      p_file_record_id - id інформаційного рядка, що включається в оплату
+  --
   procedure set_file_record2pay(p_file_record_id in msp_file_records.id%type)
   is
     l_state_id           msp_file_records.state_id%type;
     ex_include_violation exception;
+    l_state_comment      msp_file_records.state_comment%type;
   begin
+    l_state_comment := 'Включено інформаційний рядок в оплату. Користувач: '||get_context_user;
+
     select state_id into l_state_id from msp_file_records where id = p_file_record_id;
 
     if l_state_id in (0) then
       raise ex_include_violation;
     else
-      set_file_record_state(p_file_record_id => p_file_record_id, p_state_id => 0);
+      set_file_record_state(p_file_record_id   => p_file_record_id,
+                            p_state_id         => 0,
+                            p_state_comment    => l_state_comment);
       bars_audit.info('msp.msp_utl.set_file_record2pay, p_file_record_id='||to_char(p_file_record_id)||', l_state_id='||to_char(l_state_id));
     end if;
   exception
@@ -1202,6 +1433,8 @@ create or replace package body msp.msp_utl is
   --  set_file_for_pay
   --
   --    Передати реєстр на оплату
+  --
+  --      p_file_id - id реєстра, що передається на оплату
   --
   procedure set_file_for_pay(p_file_id in msp_files.id%type)
   is
@@ -1225,14 +1458,19 @@ create or replace package body msp.msp_utl is
   --
   --    Виключити інформаційний рядок з оплати
   --
+  --      p_file_record_id - id інформаційного рядка, що блокується
+  --      p_comment        - коментар користувача
+  --      p_block_type_id  - тип блокування
+  --
   procedure set_file_record_blocked(p_file_record_id in msp_file_records.id%type,
                                     p_comment        in msp_file_records.comm%type,
                                     p_block_type_id  in msp_file_records.block_type_id%type)
   is
     l_new_state msp_file_record_state.id%type;
   begin
+    -- згідно уточнення в банку, поки може бути тільки одна причина блокування 5 - За письмовою вимогою органів УПСЗН
     if p_block_type_id in (5) then
-      l_new_state := 14;
+      l_new_state := 14; -- Заблоковано згідно письмової вимоги органу Пенсійного фонду або органу УПСЗН
     else
       raise_application_error(-20000, 'Хибна причина блокування оплати');
     end if;
@@ -1261,6 +1499,9 @@ create or replace package body msp.msp_utl is
   --
   --    Установка стану "Квитанція 1/2 в процесі формування" для конверту
   --
+  --      p_envelope_id - id конверта
+  --      p_matching_tp - тип квитанції - 1/2
+  --
   procedure set_match_processing(p_envelope_id in msp_envelopes.id%type,
                                  p_matching_tp in simple_integer)
   is
@@ -1276,9 +1517,8 @@ create or replace package body msp.msp_utl is
          inner join msp_envelope_state s on s.id = e.state
     where e.id = p_envelope_id;
 
-    --dbms_output.put_line('l_state='||to_char(l_state));
-    --dbms_output.put_line('l_state_name='||l_state_name);
-
+    -- l_cnt_10 - кількість реєстрів які оплачені в конверті
+    -- l_cnt    - всього реєстрів в конверті
     select sum(case when f.state_id in (9) then 1 else 0 end) cnt_10,
            count(1) cnt
     into l_cnt_10, l_cnt
@@ -1286,16 +1526,14 @@ create or replace package body msp.msp_utl is
          inner join msp_files f on f.id = fi.id_file
     where fi.id = p_envelope_id;
 
-    --dbms_output.put_line('l_cnt_10='||to_char(l_cnt_10));
-    --dbms_output.put_line('l_cnt='||to_char(l_cnt));
-
+    -- не всі стани конвертів дозволяють формувати квитанції 1/2, спочатку перевірка перед формуванням
     case
       when p_matching_tp = 1 and l_state in (0,11,13,14,15) and l_cnt_10 = 0 /*відсутні оплачені реєстри*/ then
         l_new_state := msp_const.st_env_MATCH1_PROCESSING; /*9 - Квитанція 1 в процесі формування*/
-      when p_matching_tp = 2 and l_state in (0,11,14,16,18,19,20) and l_cnt_10 = l_cnt /*всі реєстри оплачені*/ then
+      when p_matching_tp = 2 and l_state in (0,11,13,14,15,16,18,19,20) and l_cnt_10 = l_cnt /*всі реєстри оплачені*/ then
         l_new_state := msp_const.st_env_MATCH2_PROCESSING; /*10 - Квитанція 2 в процесі формування*/
       else
-        raise_application_error(-20000, 'Формування квитанції заборонено в такому статусі конверта ("' || l_state_name || '")');
+        raise_application_error(-20000, 'Формування квитанції заборонено в такому статусі ("' || l_state_name || '") конверта ("'||to_char(p_envelope_id)||'")');
     end case;
 
     set_state_envelope(p_id    => p_envelope_id,
@@ -1303,9 +1541,28 @@ create or replace package body msp.msp_utl is
   end set_match_processing;
 
   -----------------------------------------------------------------------------------------
+  --  set_match_processing
+  --
+  --    Установка стану "Квитанція 2 в процесі формування" для конверту - перегружений метод - Точка входу із веба
+  --    
+  --      p_payment_type   - тип оплати    (атрибут v_msp_envelopes_match2.payment_type - динамічно оприділяється із назви файлу)
+  --      p_payment_period - період оплати (атрибут v_msp_envelopes_match2.payment_period - динамічно оприділяється із назви файлу)
+  --
+  procedure set_match_processing(p_payment_type   in v_msp_envelopes_match2.payment_type%type,
+                                 p_payment_period in v_msp_envelopes_match2.payment_period%type)
+  is
+  begin
+    for i in (select id from v_msp_envelopes_match2 t where payment_type = p_payment_type and payment_period = p_payment_period)
+    loop
+      set_match_processing(p_envelope_id => i.id,
+                           p_matching_tp => 2);
+    end loop;
+  end set_match_processing;
+
+  -----------------------------------------------------------------------------------------
   --  make_zip
   --
-  --    Формування архіву із списку файлів
+  --    Функція формує zip архів із списку файлів та повертає готовий буфер zip файлу (blob)
   --
   --
   function make_zip(p_files in t_file_array) return blob
@@ -1338,11 +1595,11 @@ create or replace package body msp.msp_utl is
                          ) return blob
   is
     l_buff blob;
-    --l_content_id msp_file_content.id%type;
     l_file_array t_file_array := t_file_array();
   begin
     dbms_lob.createtemporary(l_buff, true);
 
+    -- створення масиву l_file_array квитанцій конверта
     for i in (select id_file id, filename, filepath from msp_envelope_files_info t where t.id = p_envelope_id)
     loop
       do_matching(p_file_id        => i.id,
@@ -1356,8 +1613,10 @@ create or replace package body msp.msp_utl is
     end loop;
 
     if l_file_array.count = 0 then
+      -- відсутні дані
       raise no_data_found;
     else
+      -- архівація файлів в zip
       l_buff := make_zip(p_files => l_file_array);
     end if;
 
@@ -1370,9 +1629,20 @@ create or replace package body msp.msp_utl is
   end make_matching;
 
   -----------------------------------------------------------------------------------------
-  --  get_matching2encode
+  --  get_matching_xml
   --
   --    Функція готує xml файл квитанції для шифрування
+  --
+  --      p_matching_tp    - тип квитанції (1/2)
+  --      p_id_msp         - id ІОЦ
+  --      p_filename       - назва файлу
+  --      p_file           - 
+  --      p_filedate       - дата
+  --      p_ecp            - 
+  --      p_count_verified - 
+  --      p_count_total    - 
+  --      p_count_error    - 
+  --      p_count_paid     - 
   --
   function get_matching_xml(p_matching_tp    in simple_integer,
                             p_id_msp         in msp_envelopes.id_msp_env%type,
@@ -1406,12 +1676,12 @@ create or replace package body msp.msp_utl is
   begin
     dbms_lob.createtemporary(l_buff, true, 12);
     l_buff := p_file;
-    --l_buff := bars.lob_utl.blob_to_clob(p_file);
 
     l_domdoc    := dbms_xmldom.newdomdocument;
     l_root_node := dbms_xmldom.makenode(l_domdoc);
     l_head_node := dbms_xmldom.appendchild(l_root_node, dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc, 'upszn_issuess')));
 
+    -- атрибути xml файла квитанції
     add_txt_node_utl(p_document  => l_domdoc,
                      p_host_node => l_head_node,
                      p_node_name => 'id_mcp',
@@ -1475,16 +1745,18 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  get_matching2sign
   --
-  --    Функція формує та повертає таблицю ZIP архів квитанції 1/2
+  --    Функція формує та повертає таблицю яка містить в полях ZIP архів квитанції 1/2
+  --    Використовується у view, які підхватує TOSS для підписання і шифрування: 
+  --    v_msp_sign_file        - Список квитанцій конвертів на формування підпису
+  --    v_msp_encrypt_envelope - Список квитанцій конвертів на шифрування
   --
-  --      p_stage          - етап     - 1 - підписання файлу, 2 - шифрування файлу
-  --      p_is_convert2dos - ознака 1 - конвертувати в cp866 / 0 - ні
+  --      p_stage          - етап   - 1 - підписання файлу, 2 - шифрування файлу
+  --      p_is_convert2dos - ознака - 1 - конвертувати в cp866 / 0 - ні
   --
   function get_matching2sign(p_stage          in simple_integer,
                              p_is_convert2dos in simple_integer default 1) return t_match_array pipelined
   is
     l_buff            blob;
-    --l_content_id msp_file_content.id%type;
     l_file_array      t_file_array;
     l_match_array     t_match_array := t_match_array();
     l_msp_env_content msp_env_content%rowtype;
@@ -1494,6 +1766,8 @@ create or replace package body msp.msp_utl is
     l_count_paid      number(38,0);
   begin
     dbms_lob.createtemporary(l_buff, true);
+    
+    -- курсор конвертів що в стані на формування і підпис квитанції або шифрування квитанції
     for r in (select e.id,
                      case when e.state in (msp_const.st_env_MATCH1_PROCESSING/*9*/, msp_const.st_env_MATCH1_SIGN_WAIT/*12*/) then 1
                           when e.state in (msp_const.st_env_MATCH2_PROCESSING/*10*/, msp_const.st_env_MATCH2_SIGN_WAIT/*17*/) then 2
@@ -1514,20 +1788,6 @@ create or replace package body msp.msp_utl is
                                     case p_stage when 1 then 10
                                                  when 2 then 17
                                     end)
-              /*select e.id,
-                     case when p_stage = 1 and p_matching_tp = 1 then msp_const.st_env_MATCH1_CREATE_ERROR/ *13* /
-                          when p_stage = 2 and p_matching_tp = 1 then msp_const.st_env_MATCH1_ENV_CREATE_ERROR/ *15* /
-                          when p_stage = 1 and p_matching_tp = 2 then msp_const.st_env_MATCH2_CREATE_ERROR/ *18* /
-                          when p_stage = 2 and p_matching_tp = 2 then msp_const.st_env_MATCH2_ENV_CREATE_ERROR/ *20* /
-                     end errst,
-                     e.state,
-                     e.id_msp_env
-              from msp_envelopes e
-                   inner join msp_envelope_state s on s.id = e.state
-              where lower(e.code) in ('payment_data')
-                    and (p_matching_tp = 1 and (p_stage = 1 and e.state in (0,11,13) or p_stage = 2 and e.state in (12,15))
-                      or p_matching_tp = 2 and (p_stage = 1 and e.state in (0,11,14,16,18) or p_stage = 2 and e.state in (17,20))
-                        )*/
              )
     loop
       l_file_array := t_file_array();
@@ -1539,24 +1799,29 @@ create or replace package body msp.msp_utl is
                     from msp_envelope_files_info t
                     where id = r.id)
           loop
+            -- створення буферу l_buff квитанції
             do_matching(p_file_id        => i.id_file,
                         p_file_buff      => l_buff,
                         p_matching_tp    => r.matching_tp,
                         p_is_convert2dos => p_is_convert2dos);
 
+            -- додати буфер l_buff квитанції в масив
             l_file_array.extend;
             l_file_array(l_file_array.last).file_name := i.filepath;
             l_file_array(l_file_array.last).file_buff := l_buff;
           end loop;
         exception
           when others then
+            -- якщо помилка то проставляю відповідний стан конверта в автономній транзакції
             set_state_envelope_async(r.id, r.errst, dbms_utility.format_error_backtrace || ' ' || sqlerrm); -- Помилка формування квитанції 1 -- MATCH1_CREATE_ERROR
+            -- очистка масива
             l_file_array := t_file_array();
         end;
 
         if l_file_array.count = 0 then
           l_buff := null;
         else
+          -- архівування файлів квитанцій в zip
           l_buff := make_zip(p_files => l_file_array);
         end if;
       -- 12 -- Конверт квитанції 1 готовий до шифрування файлу
@@ -1564,6 +1829,7 @@ create or replace package body msp.msp_utl is
       elsif p_stage = 2 and r.state in (12,17) then --(12,15,17,20) then
         l_msp_env_content := read_env_content(p_id      => r.id,
                                               p_type_id => r.matching_tp);
+        -- атрибути xml файла відповіді на запит китанції 1/2
         select count(1) count_total,
                case when r.matching_tp in (1) then
                  sum(case when fr.state_id between 1 and 6 then 1 else 0 end)
@@ -1572,14 +1838,16 @@ create or replace package body msp.msp_utl is
                         when r.matching_tp in (2) and fr.state_id in (10,17,14) then 1 -- (2) Кількість рядків файлу, по яким здійснювалась оплата
                    else 0 end) count_verified,
                case when r.matching_tp in (2) then sum(case when fr.state_id in (10) then 1 else 0 end) else 0 end count_paid
-        into l_count_total,
-             l_count_error,
-             l_count_verified,
-             l_count_paid
+        into l_count_total,    -- кількість позицій в квитанції (1/2)
+             l_count_error,    -- кількість позицій з помилками валідації (для квитанції 1)
+             l_count_verified, -- кількість рядків файлу, що опрацьовано успішно. Оплата здійснюватиметься по даним рядкам (для квитанції 1) 
+                               -- або Кількість рядків файлу, по яким здійснювалась оплата (для квитанції 2) 
+             l_count_paid      -- кількість оплачених рядків в квитанції 2
         from msp_envelope_files_info fi
              inner join msp_file_records fr on fr.file_id = fi.id_file
         where fi.id = r.id;
 
+        -- отримую xml файл відповіді на запит китанції 1/2
         l_buff := get_matching_xml(p_matching_tp    => r.matching_tp,
                                    p_id_msp         => r.id_msp_env,
                                    p_filename       => l_msp_env_content.filename,
@@ -1606,7 +1874,7 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  save_matching
   --
-  --    Процедура зберігає зашифрований архів квитанції 1/2
+  --    Процедура зберігає зашифрований архів квитанції 1/2. Точка входу: TOSS 
   --
   --      p_envelope_id - id конверту
   --      p_file_buff   - clob буфер файлу
@@ -1666,7 +1934,7 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  decodeclobfrombase64
   --
-  --    decodeclobfrombase64
+  --    decode clob from base64
   --
   function decodeclobfrombase64(p_clob clob) return clob is
     l_clob   clob;
@@ -1689,6 +1957,11 @@ create or replace package body msp.msp_utl is
     return l_clob;
   end decodeclobfrombase64;
 
+  -----------------------------------------------------------------------------------------
+  --  encodeclobtobase64
+  --
+  --    encode clob to base64
+  --
   function encodeclobtobase64(p_clob clob) return clob is
     l_clob   clob;
     l_len    number;
@@ -1710,67 +1983,46 @@ create or replace package body msp.msp_utl is
     return l_clob;
   end encodeclobtobase64;
 
-    function base64decode_to_blob(p_clob clob)
-      return blob
-    is
-      l_blob    blob;
-      l_raw     raw(32767);
-      l_amt     number := 7700;
-      l_offset  number := 1;
-      l_temp    varchar2(32767);
-    begin
-      begin
-        dbms_lob.createtemporary (l_blob, false, dbms_lob.call);
-        loop
-          dbms_lob.read(p_clob, l_amt, l_offset, l_temp);
-          l_offset := l_offset + l_amt;
-          l_raw    := utl_encode.base64_decode(utl_raw.cast_to_raw(l_temp));
-          dbms_lob.append (l_blob, to_blob(l_raw));
-        end loop;
-      exception
-        when no_data_found then
-          null;
-      end;
-      return l_blob;
-    end;
-
-    function utf8todeflang(p_clob in    clob) return clob is
-      l_blob blob;
-      l_clob clob;
-      l_dest_offset   integer := 1;
-      l_source_offset integer := 1;
-      l_lang_context  integer := DBMS_LOB.DEFAULT_LANG_CTX;
-      l_warning       integer := DBMS_LOB.WARN_INCONVERTIBLE_CHAR;
-    BEGIN
-      DBMS_LOB.CREATETEMPORARY(l_blob, FALSE);
-      DBMS_LOB.CONVERTTOBLOB
-      (
-       dest_lob    =>l_blob,
-       src_clob    =>p_clob,
-       amount      =>DBMS_LOB.LOBMAXSIZE,
-       dest_offset =>l_dest_offset,
-       src_offset  =>l_source_offset,
-       blob_csid   =>0,
-       lang_context=>l_lang_context,
-       warning     =>l_warning
-      );
-      l_dest_offset   := 1;
-      l_source_offset := 1;
-      l_lang_context  := DBMS_LOB.DEFAULT_LANG_CTX;
-      DBMS_LOB.CREATETEMPORARY(l_clob, FALSE);
-      DBMS_LOB.CONVERTTOCLOB
-      (
-       dest_lob    =>l_clob,
-       src_blob    =>l_blob,
-       amount      =>DBMS_LOB.LOBMAXSIZE,
-       dest_offset =>l_dest_offset,
-       src_offset  =>l_source_offset,
-       blob_csid   =>NLS_CHARSET_ID ('UTF8'),
-       lang_context=>l_lang_context,
-       warning     =>l_warning
-      );
-      return l_clob;
-    end;
+  -----------------------------------------------------------------------------------------
+  -- перекодування clob із utf8 в базове кодування
+  --
+  function utf8todeflang(p_clob in clob) return clob is
+    l_blob blob;
+    l_clob clob;
+    l_dest_offset   integer := 1;
+    l_source_offset integer := 1;
+    l_lang_context  integer := DBMS_LOB.DEFAULT_LANG_CTX;
+    l_warning       integer := DBMS_LOB.WARN_INCONVERTIBLE_CHAR;
+  BEGIN
+    DBMS_LOB.CREATETEMPORARY(l_blob, FALSE);
+    DBMS_LOB.CONVERTTOBLOB
+    (
+     dest_lob    =>l_blob,
+     src_clob    =>p_clob,
+     amount      =>DBMS_LOB.LOBMAXSIZE,
+     dest_offset =>l_dest_offset,
+     src_offset  =>l_source_offset,
+     blob_csid   =>0,
+     lang_context=>l_lang_context,
+     warning     =>l_warning
+    );
+    l_dest_offset   := 1;
+    l_source_offset := 1;
+    l_lang_context  := DBMS_LOB.DEFAULT_LANG_CTX;
+    DBMS_LOB.CREATETEMPORARY(l_clob, FALSE);
+    DBMS_LOB.CONVERTTOCLOB
+    (
+     dest_lob    =>l_clob,
+     src_blob    =>l_blob,
+     amount      =>DBMS_LOB.LOBMAXSIZE,
+     dest_offset =>l_dest_offset,
+     src_offset  =>l_source_offset,
+     blob_csid   =>NLS_CHARSET_ID ('UTF8'),
+     lang_context=>l_lang_context,
+     warning     =>l_warning
+    );
+    return l_clob;
+  end;
 
   -----------------------------------------------------------------------------------------
   --  read_request
@@ -1788,7 +2040,7 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  read_request_xml
   --
-  --    Функція повертає запис таблиці msp_requests
+  --    Функція повертає xml таблиці msp_requests
   --
   function read_request_xml(p_request_id in msp_requests.id%type) return msp_requests.req_xml%type
   is
@@ -1821,6 +2073,8 @@ create or replace package body msp.msp_utl is
   --  get_request_data
   --
   --    Функція повертає вміст тега "data" xml запиту
+  --
+  --      p_request_id - msp_requests.id
   --
   function get_request_data(p_request_id in msp_requests.id%type) return clob
   is
@@ -1859,6 +2113,8 @@ create or replace package body msp.msp_utl is
   --
   --    Функція повертає вміст тега "data" xml запиту
   --
+  --      p_request_xml - msp_requests.req_xml
+  --
   function get_request_data(p_request_xml in clob) return clob
   is
     l_data    clob;
@@ -1889,42 +2145,42 @@ create or replace package body msp.msp_utl is
   end get_request_data;
 
   -----------------------------------------------------------------------------------------
-  --  decode_request_data
+  --  decode_data
   --
-  --    Функція повертає розшифрований вміст файла запиту конверта
+  --    Метод приймає на вхід та повертає розшифрований вміст файла запиту конверта
+  --
+  --      p_data - вміст файла запиту конверта
   --
   procedure decode_data(p_data in out nocopy clob)
   is
   begin
-    -- fix
+    -- fix ІОЦ bug (чомусь ІОЦ шле не правильну base64)
     p_data := replace(p_data, ' ', '+');
-    -- decode
+    -- decode from base64
     p_data := decodeclobfrombase64(p_data);
+    -- utf8 to def lang
     p_data := utf8todeflang(p_data);
   end decode_data;
 
   -----------------------------------------------------------------------------------------
   --  encode_data
   --
-  --    Функція повертає шифрований вміст файла запиту конверта
+  --    Метод приймає на вхід та повертає шифрований вміст файла запиту конверта
+  --
+  --      p_data - вміст файла запиту конверта
   --
   procedure encode_data(p_data in out nocopy clob)
   is
   begin
-    --p_data := replace(replace(replace(p_data, chr(10), ''), chr(13), ''),' ', '');
-    -- decode
+    -- encode to base64
     p_data := encodeclobtobase64(p_data);
-    -- fix
-    --p_data := replace(p_data, '+', ' ');
-    --p_data := replace(replace(replace(p_data, '+', ' '), chr(10), ''), chr(13), '');
-    --p_data := utf8todeflang(p_data);
   end encode_data;
 
 
   -----------------------------------------------------------------------------------------
   --  read_request_data
   --
-  --    Функція читає xml-файл і повертає екземпляр головного тега
+  --    Функція читає xml-файл запиту і повертає екземпляр головного тега
   --
   function read_request_data(p_request_data in clob,
                              p_act_type in msp_requests.act_type%type) return dbms_xmldom.domnode
@@ -1946,15 +2202,21 @@ create or replace package body msp.msp_utl is
   end read_request_data;
 
   -----------------------------------------------------------------------------------------
-  --  read_states
+  --  get_rq_st
   --
-  --    Процедура вичитує стани об'єктів msp_requests, msp_envelopes, msp_files
+  --    Процедура формує атрибути відповіді на запит
+  --
+  --      p_idenv        - id конверта ІОЦ
+  --      p_rq_st        - Код стану запиту (R, S, D)
+  --      p_rq_st_detail - Деталі обробки запиту
+  --      p_rq_ecp_error - Опис помилки
+  --      p_id_msp       - можливо цей параметр вже не потрібний, треба перевірити і замінити на p_idenv
   --
   procedure get_rq_st(p_idenv        in msp_envelopes.id_msp_env%type,
                       p_rq_st        in out nocopy varchar2, -- varchar2(1)
                       p_rq_st_detail in out nocopy number,   -- number(1)
                       p_rq_ecp_error in out nocopy varchar2,
-                      p_id_msp       in out nocopy msp_envelope_files_info.id_msp%type) -- varchar2(1000)
+                      p_id_msp       in out nocopy msp_envelope_files_info.id_msp%type) 
   is
     l_env_state  msp_envelopes.state%type;
     l_req_state  msp_requests.state%type;
@@ -1994,7 +2256,6 @@ create or replace package body msp.msp_utl is
       when no_data_found then
         -- вважаємо що якщо не знайдений запис по idenv то хибний запит, так як Помилка в структурі xml перевіряється і одразу дається відповідь
         raise ex_d;
-        --raise ex_error_xml_envelope;
       when others then
         raise;
     end;
@@ -2012,26 +2273,27 @@ create or replace package body msp.msp_utl is
         raise ex_error_unique_envelope;
     end if;
 
-    -- read msp_files state
-    begin
-      select state, comm, id_msp
-      into l_file_state, l_file_comm, p_id_msp
-      from (
-        select f.state, substrb(f.comm,1000) comm, f.id_msp,
-               -- оприділяю сами поганий статус файлу для формування відповіді
-               row_number() over (order by case when f.state in (2) then 1 when f.state in (-1,1,3,4) then 2 when f.state in (0) then 3 else 4 end) rn
-        from msp_envelope_files_info f
-        where f.id = l_req_id
-        ) t where rn = 1;
-    exception
-      when no_data_found then
-        -- R –- відповідь не готова
-        raise ex_r;
-      when others then
-        raise;
-    end;
-
+    -- check if state parsed
     if l_req_state = msp_const.st_req_PARSED and l_env_state not in (-2,-1,1,2,3,4) then
+      -- read msp_files state
+      begin
+        select state, comm, id_msp
+        into l_file_state, l_file_comm, p_id_msp
+        from (
+          select f.state, substrb(f.comm,1000) comm, f.id_msp,
+                 -- оприділяю сами поганий статус файлу для формування відповіді
+                 row_number() over (order by case when f.state in (2) then 1 when f.state in (-1,1,3,4) then 2 when f.state in (0) then 3 else 4 end) rn
+          from msp_envelope_files_info f
+          where f.id = l_req_id
+          ) t where rn = 1;
+      exception
+        when no_data_found then
+          -- R –- відповідь не готова
+          raise ex_r;
+        when others then
+          raise;
+      end;
+      -- check file state
       if l_file_state = 0 then
         -- 0 –- запит оброблено успішно
         raise ex_s;
@@ -2042,6 +2304,7 @@ create or replace package body msp.msp_utl is
         -- R –- відповідь не готова
         raise ex_r;
       end if;
+    -- check bad state
     elsif l_req_state = msp_const.st_req_ERROR_ECP_REQUEST then -- 1
       -- 6 – помилка ЕЦП для конверту
       raise ex_error_ecp_request;
@@ -2060,8 +2323,6 @@ create or replace package body msp.msp_utl is
     end if;
 
   exception
-    /*when ex_error_xml_envelope then
-      retval(_rq_st => 'S', _rq_st_detail => 3);*/
     when ex_d then
       retval(rq_st_ => 'D');
     when ex_r then
@@ -2087,10 +2348,12 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  payment_data_answer
   --
-  --    Функція готує xml-файл відповіді на запит payment_data
+  --    Функція готує xml-файл відповіді request_transport_answer на запит payment_data
+  --
+  --      p_idenv      - id ІОЦ конверту 
+  --      p_is_bad_xml - ознака xml битий
   --
   function get_payment_data_xml(p_idenv        in msp_envelopes.id_msp_env%type,
-                                --p_id_msp       in msp_envelope_files_info.id_msp%type,
                                 p_is_bad_xml   in simple_integer default 0) return clob
   is
     l_domdoc       dbms_xmldom.domdocument;
@@ -2109,6 +2372,7 @@ create or replace package body msp.msp_utl is
     l_domdoc    := dbms_xmldom.newdomdocument;
     l_root_node := dbms_xmldom.makenode(l_domdoc);
 
+    -- якщо xml битий то вертаю 3
     if p_is_bad_xml in (0) then
       l_rq_st_detail := 0;
     else
@@ -2141,10 +2405,13 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  data_state_answer
   --
-  --    Функція готує xml-файл відповіді на запит
+  --    Функція готує xml-файл відповіді data_state_answer на запит data_state
   --
-  function get_data_state_xml(--p_idenv        in msp_envelopes.id_msp_env%type,
-                              p_id_msp       in msp_envelope_files_info.id_msp%type,
+  --      p_rq_st        - Код стану запиту (R, S, D)
+  --      p_rq_st_detail - Деталі обробки запиту
+  --      p_rq_ecp_error - Опис помилки
+  --
+  function get_data_state_xml(p_id_msp       in msp_envelope_files_info.id_msp%type,
                               p_rq_st        in varchar2,
                               p_rq_st_detail in number,
                               p_rq_ecp_error in varchar2) return clob
@@ -2196,6 +2463,13 @@ create or replace package body msp.msp_utl is
   --
   --    Функція готує файл відповіді на запит
   --
+  --      p_request_data - xml запит
+  --      p_act_type     - тип запиту
+  --      p_id_env       - id конверта ІОЦ (in out)
+  --      p_is_bad_xml   - ознака чи битий xml
+  --      p_env_rq_st    - Код стану запиту (R – відповідь не готова, необхідно здійснити повторний запит через короткий проміжок часу, S – запит оброблено успішно, D – запит не може бути оброблено) (out)
+  --      p_envelope_id  - id конверта (bars) (out)
+  --
   function make_request_data(p_request_data in clob,
                              p_act_type     in msp_requests.act_type%type,
                              p_id_env       in out nocopy msp_envelopes.id_msp_env%type,
@@ -2211,7 +2485,7 @@ create or replace package body msp.msp_utl is
     l_id_msp       msp_envelope_files_info.id_msp%type;
     l_isencode64   boolean := true;
     l_env_state    msp_envelopes.state%type;
-    -- перевірка чи зформована квитанція 2, якщо так то повертаємо статус конверту 'D', інакше 'R'
+    -- перевірка чи зформована квитанція 2, якщо так то повертає статус конверту 'D', інакше 'R'
     function get_match_rq_st(p_id in msp_envelopes.id%type) return varchar2
     is
       l_cnt number;
@@ -2232,6 +2506,7 @@ create or replace package body msp.msp_utl is
     begin
       -- читаю параметри запиту
       l_row := read_request_data(p_request_data, p_act_type);
+      -- читаю id конверта ІОЦ із xml 
       p_id_env := coalesce(to_number(dbms_xslprocessor.valueof(l_row, 'idenv/text()')), p_id_env);
 
       --dbms_output.put_line('p_id_env='||p_id_env);
@@ -2270,19 +2545,23 @@ create or replace package body msp.msp_utl is
           select id, state into p_envelope_id, l_env_state from msp_envelopes e where e.id_msp_env = p_id_env;
           -- підготовка xml відповіді
           begin
+            -- якщо квитанція 1 зформована або відправлена то відправляю квитанцію 1 і код стану запиту S – запит оброблено успішно
             if l_env_state in (msp_const.st_env_MATCH1_CREATED, msp_const.st_env_MATCH1_SEND) then
               select cvalue
               into l_buff
               from msp_env_content c
               where id = p_envelope_id and type_id = 1;
               p_env_rq_st  := 'S';
+            -- якщо квитанція 2 зформована або відправлена то відправляю D – запит не може бути оброблено
             elsif l_env_state in (msp_const.st_env_MATCH2_CREATED, msp_const.st_env_MATCH2_SEND) then
               p_env_rq_st  := 'D';
+            -- інакше R – відповідь не готова, необхідно здійснити повторний запит через короткий проміжок часу
             else
               p_env_rq_st  := 'R';
             end if;
           exception
             when no_data_found then
+              -- перевірка чи зформована квитанція 2, якщо так то повертає статус конверту 'D', інакше 'R'
               p_env_rq_st := get_match_rq_st(p_id => p_envelope_id);
           end;
           l_isencode64 := false;
@@ -2294,19 +2573,22 @@ create or replace package body msp.msp_utl is
         begin
           select id, state into p_envelope_id, l_env_state from msp_envelopes e where e.id_msp_env = p_id_env;
           -- підготовка xml відповіді
+          -- якщо квитанція 2 зформована або відправлена то відправляю квитанцію 2 і код стану запиту S – запит оброблено успішно
           if l_env_state in (msp_const.st_env_MATCH2_CREATED, msp_const.st_env_MATCH2_SEND) then
             select cvalue
             into l_buff
             from msp_env_content c
             where id = p_envelope_id and type_id = 2;
             p_env_rq_st  := 'S';
+          -- інакше R – відповідь не готова, необхідно здійснити повторний запит через короткий проміжок часу
           else
             p_env_rq_st  := 'R';
           end if;
-
+          -- квитанція 2 вже зашифрована в base64
           l_isencode64 := false;
         exception
           when no_data_found then
+            -- якщо не знайдено квитанцію то R – відповідь не готова, необхідно здійснити повторний запит через короткий проміжок часу
             p_env_rq_st := 'R';
         end;
       end if;
@@ -2326,6 +2608,11 @@ create or replace package body msp.msp_utl is
   --  make_envelope
   --
   --    Функція готує xml відповідь на запит
+  --
+  --      p_action_name - назва типу відповіді
+  --      p_idenv       - id конверта ІОЦ
+  --      p_data        - файл відповіді
+  --      p_env_rq_st   - Код стану запиту (R – відповідь не готова, необхідно здійснити повторний запит через короткий проміжок часу, S – запит оброблено успішно, D – запит не може бути оброблено) (out)
   --
   function make_envelope(p_action_name in varchar2,
                          p_idenv       in number,
@@ -2408,9 +2695,11 @@ create or replace package body msp.msp_utl is
   end make_envelope;
 
   -----------------------------------------------------------------------------------------
-  --  check_xml
+  --  check_is_bad_xml
   --
-  --    Перевірка коректності xml запиту
+  --    Перевірка коректності xml, return: 0 - xml коректний / 1 - xml битий
+  --
+  --    p_xml - xml, який потрібно перевірити на коректність
   --
   function check_is_bad_xml(p_xml in clob) return simple_integer
   is
@@ -2432,6 +2721,10 @@ create or replace package body msp.msp_utl is
   --
   --    Підготовка відповіді на запит payment_data
   --
+  --    p_request    - запис запиту msp_requests
+  --    p_id_env     - id конверта ІОЦ
+  --    p_is_bad_xml - ознака чи битий xml
+  --
   function payment_data_ans(p_request    in msp_requests%rowtype,
                             p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                             p_is_bad_xml in simple_integer) return clob
@@ -2452,6 +2745,10 @@ create or replace package body msp.msp_utl is
   --
   --    Підготовка відповіді на запит data_state
   --
+  --    p_request    - запис запиту msp_requests
+  --    p_id_env     - id конверта ІОЦ
+  --    p_is_bad_xml - ознака чи битий xml
+  --
   function data_state_ans(p_request    in msp_requests%rowtype,
                           p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                           p_is_bad_xml in simple_integer) return clob
@@ -2460,6 +2757,7 @@ create or replace package body msp.msp_utl is
     l_env_rq_st   varchar2(1);
     l_envelope_id msp_envelopes.id%type;
   begin
+    -- отримую параметри xml запиту data_state
     l_buff := get_request_data(p_request.req_xml);
     -- перетворення із base64
     decode_data(l_buff);
@@ -2469,7 +2767,7 @@ create or replace package body msp.msp_utl is
     l_buff := make_envelope(p_action_name => 'data_state_ans',
                             p_idenv       => p_id_env,
                             p_data        => l_buff);
-    -- set_state_request = 0
+    -- якщо все ок то міняю стан запиту state = 0 - Ok - PARSED
     msp_utl.set_state_request(p_request.id, 0);
     return l_buff;
   end data_state_ans;
@@ -2479,6 +2777,10 @@ create or replace package body msp.msp_utl is
   --
   --    Підготовка відповіді на запит validation_state
   --
+  --    p_request    - запис запиту msp_requests
+  --    p_id_env     - id конверта ІОЦ
+  --    p_is_bad_xml - ознака чи битий xml
+  --
   function validation_state_ans(p_request    in msp_requests%rowtype,
                                 p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                                 p_is_bad_xml in simple_integer) return clob
@@ -2487,6 +2789,7 @@ create or replace package body msp.msp_utl is
     l_env_rq_st   varchar2(1);
     l_envelope_id msp_envelopes.id%type;
   begin
+    -- отримую параметри xml запиту validation_state
     l_buff := get_request_data(p_request.req_xml);
     -- перетворення із base64
     decode_data(l_buff);
@@ -2502,7 +2805,7 @@ create or replace package body msp.msp_utl is
       set_state_envelope(p_id    => l_envelope_id,
                          p_state => msp_const.st_env_MATCH1_SEND);
     end if;
-    -- set_state_request = 0
+    -- якщо все ок то міняю стан запиту state = 0 - Ok - PARSED
     msp_utl.set_state_request(p_request.id, 0);
     return l_buff;
   end validation_state_ans;
@@ -2512,6 +2815,10 @@ create or replace package body msp.msp_utl is
   --
   --    Підготовка відповіді на запит payment_state
   --
+  --    p_request    - запис запиту msp_requests
+  --    p_id_env     - id конверта ІОЦ
+  --    p_is_bad_xml - ознака чи битий xml
+  --
   function payment_state_ans(p_request    in msp_requests%rowtype,
                              p_id_env     in out nocopy msp_envelopes.id_msp_env%type,
                              p_is_bad_xml in simple_integer) return clob
@@ -2520,6 +2827,7 @@ create or replace package body msp.msp_utl is
     l_env_rq_st   varchar2(1);
     l_envelope_id msp_envelopes.id%type;
   begin
+    -- отримую параметри xml запиту payment_state
     l_buff := get_request_data(p_request.req_xml);
     -- перетворення із base64
     decode_data(l_buff);
@@ -2535,7 +2843,7 @@ create or replace package body msp.msp_utl is
       set_state_envelope(p_id    => l_envelope_id,
                          p_state => msp_const.st_env_MATCH2_SEND);
     end if;
-    -- set_state_request = 0
+    -- якщо все ок то міняю стан запиту state = 0 - Ok - PARSED
     msp_utl.set_state_request(p_request.id, 0);
     return l_buff;
   end payment_state_ans;
@@ -2544,6 +2852,8 @@ create or replace package body msp.msp_utl is
   --  prepare_request_xml
   --
   --    Функція готує xml відповідь на запит
+  --
+  --    p_request_id - id запиту
   --
   function prepare_request_xml(p_request_id in msp_requests.id%type) return clob
   is
@@ -2595,6 +2905,10 @@ create or replace package body msp.msp_utl is
   --
   --    Лог відповіді на запит
   --
+  --      p_request_id  - id запиту
+  --      p_response    - текст запиту
+  --      p_stack_trace - опис помилки
+  --
   procedure track_request(p_request_id  in msp_request_tracking.id%type,
                           p_response    in msp_request_tracking.response%type,
                           p_stack_trace in msp_request_tracking.stack_trace%type default null)
@@ -2611,6 +2925,11 @@ create or replace package body msp.msp_utl is
   --  create_request
   --
   --    Процедура записує запит в базу даних і формує відповідь
+  --    TOSS розшифровує запит і визиває метод і отримує відповідь p_xml
+  --
+  --      p_req_xml  - xml запит
+  --      p_act_type - тип запиту
+  --      p_xml      - відповідь на запит
   --
   procedure create_request(p_req_xml  in clob,
                            p_act_type in number,
@@ -2624,13 +2943,15 @@ create or replace package body msp.msp_utl is
 
       insert into msp_requests(id, req_xml, state, act_type)
       values (l_id, p_req_xml, -1, p_act_type);
-
+      
+      -- підготовка відповіді на запит
       p_xml := prepare_request_xml(l_id);
     exception
       when others then
         l_errmsg := dbms_utility.format_error_backtrace || chr(10) || sqlerrm;
     end;
-
+    
+    -- пишу відповідь в таблицю msp_request_tracking для історії
     track_request(p_request_id  => l_id,
                   p_response    => p_xml,
                   p_stack_trace => l_errmsg);
@@ -2647,7 +2968,7 @@ create or replace package body msp.msp_utl is
   -----------------------------------------------------------------------------------------
   --  prepare_check_state
   --
-  --    підготовка запиту на перевірку станів оплати референсів по ЕБП
+  --    підготовка запиту для РУ-шок на перевірку станів оплати референсів по ЕБП
   --
   procedure prepare_check_state
    is
@@ -2733,6 +3054,10 @@ create or replace package body msp.msp_utl is
   --
   --    підготовка запиту на перевірку станів оплати референсів по ЕБП
   --
+  --      p_acc    - рахунок 2909
+  --      p_fileid - id реєстра
+  --      p_kf     - відділення
+  --
   procedure prepare_get_rest_request(
                                p_acc    in msp_acc_trans_2909.acc_num%type,
                                p_fileid in msp_files.id%type,
@@ -2778,16 +3103,34 @@ create or replace package body msp.msp_utl is
       end;
   end prepare_get_rest_request;
 
-  procedure create_envelope(p_id          in number,
-                            p_idenv       in number default null,
-                            p_code        in varchar2 default null,
-                            p_sender      in varchar2 default null,
-                            p_recipient   in varchar2 default null,
-                            p_part_number in number default null,
-                            p_part_total  in number default null,
-                            p_ecp         in clob default null,
-                            p_data        in clob default null,
-                            p_data_decode in clob default null)
+  -----------------------------------------------------------------------------------------
+  --  create_envelope
+  --
+  --    Процедура записує розібрані дані конверта в базу даних
+  --    TOSS іде по списку нових запитів в бд (стан запиту = -1), розшифровує запит, парсить і зберігає відповідні дані
+  --
+  --      p_id          - id запиту
+  --      p_idenv       - id конверта ІОЦ
+  --      p_code        - Код запиту від ІОЦ
+  --      p_sender      - Відправник пакету
+  --      p_recipient   - Отримувач пакету
+  --      p_part_number - Порядковий номер частини конверту
+  --      p_part_total  - Загальна к-ть частин конверту
+  --      p_ecp         - ЕЦП, який був накладений в ІОЦ
+  --      p_data        - Зашифрований конверт
+  --      p_data_decode - Розшифрований конверт (base64)
+  --
+  procedure create_envelope(
+    p_id          in msp_requests.id%type,
+    p_idenv       in msp_envelopes.id_msp_env%type default null,
+    p_code        in msp_envelopes.code%type       default null,
+    p_sender      in msp_envelopes.sender%type     default null,
+    p_recipient   in msp_envelopes.recipient%type  default null,
+    p_part_number in msp_envelopes.partnumber%type default null,
+    p_part_total  in msp_envelopes.parttotal%type  default null,
+    p_ecp         in clob default null,
+    p_data        in clob default null,
+    p_data_decode in clob default null) 
   is
     l_clob              clob;
     l_domdoc            dbms_xmldom.domdocument;
@@ -2818,15 +3161,13 @@ create or replace package body msp.msp_utl is
     when not matched then
       insert values (p_id, p_idenv, p_code, p_sender, p_recipient, p_part_number, p_part_total, p_ecp, p_data, p_data_decode, -2, null, sysdate, null);
 
-    /*insert into msp_envelopes (id, id_msp_env, code, sender, recipient, partnumber, parttotal, ecp, data, data_decode, state, comm)
-    values(p_id, p_idenv, p_code, p_sender, p_recipient, p_part_number, p_part_total, p_ecp, p_data, p_data_decode, -1, null);*/
-
+    -- запит розібраний успішно
     msp_utl.set_state_request(p_id, 0);
     commit;
     --bars.bars_audit.info('msp_utl.create_envelope_file start finish');
   exception
     when others then
-      if sqlcode in (-1) then -- ORA-00001: unique constraint
+      if sqlcode in (-1) then -- ORA-00001: unique constraint -- Помилка унікальності конверту
         msp_utl.set_state_request(p_id, 5, sqlerrm);
         commit;
       else
@@ -2834,25 +3175,43 @@ create or replace package body msp.msp_utl is
       end if;
   end create_envelope;
 
-  procedure create_envelope_file(p_id in number, p_id_msp in number, p_filedata in clob, p_filename in varchar2, p_filedate in varchar2, p_filepath in varchar2)
-   is
-   l_state        number;
-   l_payment_type msp_envelope_files_info.payment_type%type;
+  -----------------------------------------------------------------------------------------
+  --  create_envelope_file
+  --
+  --    Процедура записує розібрані дані реєстрів конверта в базу даних
+  --    TOSS іде по списку нових конвертів в бд (стан конверта = -1), парсить конверти і записує параметри реєстрів конверта
+  --
+  --      p_id       - id запиту / конверта
+  --      p_id_msp   - id конверта ІОЦ
+  --      p_filedata - текстовий файл реєстра
+  --      p_filename - назва файлу реєстра
+  --      p_filedate - дата файлу реєстра (ІОЦ)
+  --      p_filepath - назва файлу в архіві
+  --
+  procedure create_envelope_file(
+    p_id       in msp_envelopes.id%type,
+    p_id_msp   in msp_envelope_files_info.id_msp%type, 
+    p_filedata in msp_envelope_files.filedata%type, 
+    p_filename in msp_envelope_files_info.filename%type, 
+    p_filedate in msp_envelope_files_info.filedate%type, 
+    p_filepath in msp_envelope_files_info.filepath%type) 
+  is
+    l_state number;
   begin
     --bars.bars_audit.info('msp_utl.create_envelope_file start');
     select state into l_state from msp_envelopes where id = p_id;
 
-    l_payment_type := case when instr(p_filename,'.')>37 then substr(p_filename, 30, 2) else substr(p_filename, 25, 2) end;
-
+    -- якщо стан конверта новий значить ще не оброблявся, добавляю інфу по реєстрам
     if l_state in (-1) then
-      insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file, payment_type)
-      values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval, l_payment_type);
-
+      -- Інформаційний запис до файлів конвертів
+      insert into msp_envelope_files_info(id, id_msp, filename, filedate, state, comm, filepath,id_file)
+      values (p_id, p_id_msp, p_filename, to_date(p_filedate,'ddmmyyyyhh24miss'), -1, null, p_filepath, msp_file_seq.nextval);
+      -- сам текстовий файл
       insert into msp_envelope_files(id, filedata)
       values (p_id, p_filedata);
-
+      -- оновлюю назву файла конверта
       update msp_envelopes set filename = p_filename where id = p_id;
-
+      -- якщо все ок
       msp_utl.set_state_envelope(p_id, 0);
       commit;
     --bars.bars_audit.info('msp_utl.create_envelope_file finish');
@@ -2865,140 +3224,156 @@ create or replace package body msp.msp_utl is
 
 
 
+  -----------------------------------------------------------------------------------------
+  --  set_file_rest
+  --
+  --    оновлення залишку
+  --
   procedure set_file_rest(p_file_data in clob,
                                       p_file_id   in number) is
-      l_parser   dbms_xmlparser.parser;
-      l_doc      dbms_xmldom.domdocument;
-      l_rows     dbms_xmldom.domnodelist;
-      l_row      dbms_xmldom.domnode;
-      l_acc      varchar2(20);
-      l_rest     number;
-      l_fileid   number;
-    begin
+    l_parser   dbms_xmlparser.parser;
+    l_doc      dbms_xmldom.domdocument;
+    l_rows     dbms_xmldom.domnodelist;
+    l_row      dbms_xmldom.domnode;
+    l_acc      varchar2(20);
+    l_rest     number;
+    l_fileid   number;
+  begin
 
-      l_parser := dbms_xmlparser.newparser;
-      dbms_xmlparser.parseclob(l_parser, p_file_data);
-      l_doc := dbms_xmlparser.getdocument(l_parser);
+    l_parser := dbms_xmlparser.newparser;
+    dbms_xmlparser.parseclob(l_parser, p_file_data);
+    l_doc := dbms_xmlparser.getdocument(l_parser);
 
-      l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
+    l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
 
-      l_row := dbms_xmldom.item(l_rows, 0);
+    l_row := dbms_xmldom.item(l_rows, 0);
 
-      l_rest   := to_number(dbms_xslprocessor.valueof(l_row, 'ostc/text()'));
-      l_acc    := to_number(dbms_xslprocessor.valueof(l_row, 'acc/text()'));
-      l_fileid := to_number(dbms_xslprocessor.valueof(l_row, 'fileid/text()'));
+    l_rest   := to_number(dbms_xslprocessor.valueof(l_row, 'ostc/text()'));
+    l_acc    := to_number(dbms_xslprocessor.valueof(l_row, 'acc/text()'));
+    l_fileid := to_number(dbms_xslprocessor.valueof(l_row, 'fileid/text()'));
 
-      merge into msp_acc_rest ar
-      using  dual ON (ar.fileid = l_fileid)
-      when matched then
-        update set ar.rest = l_rest,
-                   ar.restdate = sysdate,
-                   ar.acc = l_acc
-      when not matched then
-        insert values(l_acc,
-                      l_rest,
-                      sysdate,
-                      l_fileid);
+    merge into msp_acc_rest ar
+    using  dual ON (ar.fileid = l_fileid)
+    when matched then
+      update set ar.rest = l_rest,
+                 ar.restdate = sysdate,
+                 ar.acc = l_acc
+    when not matched then
+      insert values(l_acc,
+                    l_rest,
+                    sysdate,
+                    l_fileid);
 
-      pfu.transport_utl.set_transport_state(p_id               => p_file_id,
-                                        p_state_id         => pfu.transport_utl.trans_state_done,
-                                        p_tracking_comment => 'Файл оброблено',
-                                        p_stack_trace      => null);
-      dbms_xmlparser.freeparser(l_parser);
-      dbms_xmldom.freedocument(l_doc);
-      commit;
-      exception
-        when others then
-            pfu.transport_utl.set_transport_state(p_id               => p_file_id,
-                                        p_state_id         => pfu.transport_utl.TRANS_STATE_FAILED,
-                                        p_tracking_comment => 'Ошибка обработки',
-                                        p_stack_trace      => dbms_utility.format_error_backtrace());
+    pfu.transport_utl.set_transport_state(p_id               => p_file_id,
+                                      p_state_id         => pfu.transport_utl.trans_state_done,
+                                      p_tracking_comment => 'Файл оброблено',
+                                      p_stack_trace      => null);
+    dbms_xmlparser.freeparser(l_parser);
+    dbms_xmldom.freedocument(l_doc);
+    commit;
+    exception
+      when others then
+          pfu.transport_utl.set_transport_state(p_id               => p_file_id,
+                                      p_state_id         => pfu.transport_utl.TRANS_STATE_FAILED,
+                                      p_tracking_comment => 'Ошибка обработки',
+                                      p_stack_trace      => dbms_utility.format_error_backtrace());
 
-    end;
+  end;
 
-    procedure check_state          (p_file_data in clob,
-                                   p_file_id   in number) is
-      l_parser   dbms_xmlparser.parser;
-      l_doc      dbms_xmldom.domdocument;
-      l_rows     dbms_xmldom.domnodelist;
-      l_row      dbms_xmldom.domnode;
-      l_ref      number;
-      l_state    number;
-      l_cnt      number;
-      l_cnt2     number;
-      l_fileid   msp_file_records.file_id%type;
-      l_idr      msp_file_records.id%type;
-      l_mfo      pfu.pfu_syncru_params.kf%type;
-      l_arr_fileid   bars.number_list := bars.number_list();
-      l_i            number;
-    begin
+  -----------------------------------------------------------------------------------------
+  --  check_state
+  --
+  --    оновлення стану оплати референсів по ЕБП
+  --
+  procedure check_state          (p_file_data in clob,
+                                 p_file_id   in number) is
+    l_parser   dbms_xmlparser.parser;
+    l_doc      dbms_xmldom.domdocument;
+    l_rows     dbms_xmldom.domnodelist;
+    l_row      dbms_xmldom.domnode;
+    l_ref      number;
+    l_state    number;
+    l_cnt      number;
+    l_cnt2     number;
+    l_fileid   msp_file_records.file_id%type;
+    l_idr      msp_file_records.id%type;
+    l_mfo      pfu.pfu_syncru_params.kf%type;
+    l_arr_fileid   bars.number_list := bars.number_list();
+    l_i            number;
+  begin
 
-      l_parser := dbms_xmlparser.newparser;
-      dbms_xmlparser.parseclob(l_parser, p_file_data);
-      l_doc := dbms_xmlparser.getdocument(l_parser);
+    l_parser := dbms_xmlparser.newparser;
+    dbms_xmlparser.parseclob(l_parser, p_file_data);
+    l_doc := dbms_xmlparser.getdocument(l_parser);
 
-      select t.kf
-        into l_mfo
-        from pfu.transport_unit t
-       where t.id = p_file_id;
+    select t.kf
+      into l_mfo
+      from pfu.transport_unit t
+     where t.id = p_file_id;
 
-      select count(*) into l_cnt2
-        from bars.mv_kf s
-       where s.kf = l_mfo;
+    select count(*) into l_cnt2
+      from bars.mv_kf s
+     where s.kf = l_mfo;
 
-      l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'row');
-      for i in 0 .. dbms_xmldom.getlength(l_rows) - 1
-      loop
+    l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'row');
+    for i in 0 .. dbms_xmldom.getlength(l_rows) - 1
+    loop
 
-        l_row     := dbms_xmldom.item(l_rows, i);
-        l_ref     := to_number(dbms_xslprocessor.valueof(l_row, 'ref/text()'));
-        l_state   := to_number(dbms_xslprocessor.valueof(l_row, 'state_id/text()'));
-        l_idr     := to_number(dbms_xslprocessor.valueof(l_row, 'idr/text()'));
+      l_row     := dbms_xmldom.item(l_rows, i);
+      l_ref     := to_number(dbms_xslprocessor.valueof(l_row, 'ref/text()'));
+      l_state   := to_number(dbms_xslprocessor.valueof(l_row, 'state_id/text()'));
+      l_idr     := to_number(dbms_xslprocessor.valueof(l_row, 'idr/text()'));
 
-        update msp_file_records mfr
-           set mfr.state_id = case when l_state != 0
-                                then 99
-                                when l_state = 0  -- платеж закрыт
-                                then 10
-                                else mfr.state_id
-                                end,
-               mfr.fact_pay_date = sysdate
-         where mfr.id = l_idr
-         returning mfr.file_id into l_fileid;
+      update msp_file_records mfr
+         set mfr.state_id = case when l_state != 0
+                              then 99
+                              when l_state = 0  -- платеж закрыт
+                              then 10
+                              else mfr.state_id
+                              end,
+             mfr.fact_pay_date = sysdate
+       where mfr.id = l_idr
+       returning mfr.file_id into l_fileid;
 
-         if l_fileid not member of l_arr_fileid then
-           l_arr_fileid.extend;
-           l_arr_fileid(l_arr_fileid.last) := l_fileid;
-         end if;
-      end loop;
+       if l_fileid not member of l_arr_fileid then
+         l_arr_fileid.extend;
+         l_arr_fileid(l_arr_fileid.last) := l_fileid;
+       end if;
+    end loop;
 
-         -- если все проставляем для файла статус оплачен
+       -- если все проставляем для файла статус оплачен
 
-      update msp_files mf
-         set mf.state_id = 9 --'PAYED'
-       where mf.id in (select column_value
-                         from table(l_arr_fileid))
-         and not exists (select 1
-                           from msp_file_records mfr
-                          where mfr.file_id = mf.id
-                            and mfr.state_id in (17,19,20));
+    update msp_files mf
+       set mf.state_id = 9 --'PAYED'
+     where mf.id in (select column_value
+                       from table(l_arr_fileid))
+       and not exists (select 1
+                         from msp_file_records mfr
+                        where mfr.file_id = mf.id
+                          and mfr.state_id in (17,19,20));
 
-      pfu.transport_utl.set_transport_state(p_id               => p_file_id,
-                                            p_state_id         => pfu.transport_utl.trans_state_done,
-                                            p_tracking_comment => 'Файл оброблено',
-                                            p_stack_trace      => null);
-      dbms_xmlparser.freeparser(l_parser);
-      dbms_xmldom.freedocument(l_doc);
-      exception
-        when others then
-            pfu.transport_utl.set_transport_state(p_id               => p_file_id,
-                                                  p_state_id         => pfu.transport_utl.TRANS_STATE_FAILED,
-                                                  p_tracking_comment => 'Ошибка обработки',
-                                                  p_stack_trace      => dbms_utility.format_error_backtrace());
+    pfu.transport_utl.set_transport_state(p_id               => p_file_id,
+                                          p_state_id         => pfu.transport_utl.trans_state_done,
+                                          p_tracking_comment => 'Файл оброблено',
+                                          p_stack_trace      => null);
+    dbms_xmlparser.freeparser(l_parser);
+    dbms_xmldom.freedocument(l_doc);
+    exception
+      when others then
+          pfu.transport_utl.set_transport_state(p_id               => p_file_id,
+                                                p_state_id         => pfu.transport_utl.TRANS_STATE_FAILED,
+                                                p_tracking_comment => 'Ошибка обработки',
+                                                p_stack_trace      => dbms_utility.format_error_backtrace());
 
-    end;
+  end;
 
-    procedure process_receipt is
+
+  -----------------------------------------------------------------------------------------
+  --  process_receipt
+  --
+  --    Оновлення залишку та оновлення стану оплати референсів по ЕБП
+  --
+  procedure process_receipt is
 
     l_warning      integer;
     l_dest_offset  integer := 1;
@@ -3041,8 +3416,10 @@ create or replace package body msp.msp_utl is
 
 
         if c0.transport_type_code = pfu.transport_utl.TRANS_TYPE_MSP_GET_ACC_RST then
+          -- оновлення залишку
           set_file_rest(l_clob, c0.id);
         elsif c0.transport_type_code = pfu.transport_utl.TRANS_TYPE_CHECKSTATE_MSP then
+          -- оновлення стану оплати референсів по ЕБП
           check_state(l_clob,c0.id);
         end if;
         dbms_lob.freetemporary(l_clob);

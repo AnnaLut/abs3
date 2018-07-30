@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_acc_trans_2560.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table MSP_ACC_TRANS_2560
 (
@@ -22,10 +26,15 @@ tablespace BRSSMLD
 end;
 / 
 
--- Add comments to the table 
-comment on table MSP_ACC_TRANS_2560
-  is 'Довідник транзитних рахунків 2560';
+comment on table msp.msp_acc_trans_2560 is 'Довідник транзитних рахунків 2560';
+comment on column msp.msp_acc_trans_2560.acc_num is 'Транзитний рахунок (nls)';
+comment on column msp.msp_acc_trans_2560.kf is 'Відділення банка (mfo)';
+comment on column msp.msp_acc_trans_2560.edrpu is 'Код ЄДРПОУ банка';
 -- Grant/Revoke object privileges 
 grant select on MSP_ACC_TRANS_2560 to BARS;
 grant select on MSP_ACC_TRANS_2560 to BARSREADER_ROLE;
 grant select, insert, update, delete on MSP_ACC_TRANS_2560 to BARS_ACCESS_DEFROLE;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_acc_trans_2560.sql =========*** End
+PROMPT ===================================================================================== 

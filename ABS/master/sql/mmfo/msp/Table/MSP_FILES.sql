@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_files.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table MSP_FILES
 (
@@ -105,6 +109,8 @@ comment on column MSP_FILES.state_id
   is 'Стан файлу';
 comment on column MSP_FILES.envelope_file_id
   is 'id розархівованого файлу';
+comment on column msp.msp_files.comm 
+  is 'Коментар';
 
 begin
 -- Create/Rebegin
@@ -180,3 +186,9 @@ exception when others then
   end if;
 end;
 /
+
+comment on column msp.msp_files.send_pay_date is 'Фактична дата відправки реєстру на оплату';
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_files.sql =========*** End
+PROMPT ===================================================================================== 

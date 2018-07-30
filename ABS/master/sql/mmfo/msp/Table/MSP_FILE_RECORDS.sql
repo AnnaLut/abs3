@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_file_records.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table msp_file_records
 (
@@ -73,6 +77,10 @@ comment on column MSP_FILE_RECORDS.fact_pay_date
   is 'Фактична дата зарахування коштів';
 comment on column MSP_FILE_RECORDS.pers_acc_num
   is 'Номер л/с';
+comment on column msp.msp_file_records.rec_no 
+  is 'Номер позиції в отриманому текстовому файлі';
+comment on column msp.msp_file_records.comm 
+  is 'Коментар';
 
 begin
 -- Create/Rebegin
@@ -180,6 +188,35 @@ begin
 end;
 / 
 
+begin 
+  execute immediate 'alter table msp_file_records add state_comment varchar2(4000)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+begin 
+  execute immediate 'alter table msp_file_records add validation_state NUMBER(3)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+comment on column MSP_FILE_RECORDS.state_comment
+  is 'Коментар до зміни стану користувачем';
+comment on column MSP_FILE_RECORDS.validation_state
+  is 'Стан валідації';
+
 -- Grant/Revoke object privileges 
 grant update on MSP_FILE_RECORDS to BARS;
 grant update on MSP_FILE_RECORDS to BARS_ACCESS_DEFROLE;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_file_records.sql =========*** End
+PROMPT ===================================================================================== 

@@ -126,5 +126,29 @@ exception when others then
   end if;
 end;
 /
+
+begin 
+  execute immediate 'alter table msp_envelope_files_info drop column payment_type';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+PROMPT *** Create comment on table msp_envelope_files_info ***
+comment on table msp_envelope_files_info is 'Інформаційні записи до файлів конвертів';
+comment on column msp_envelope_files_info.id is 'id конверту';
+comment on column msp_envelope_files_info.id_msp is 'id_msp';
+comment on column msp_envelope_files_info.filename is 'Назва файлу конверта ІОЦ';
+comment on column msp_envelope_files_info.filedate is 'Дата файлу ІОЦ';
+comment on column msp_envelope_files_info.state is 'Стан файлу';
+comment on column msp_envelope_files_info.comm is 'Коментар';
+comment on column msp_envelope_files_info.filepath is 'Назва файлу в архіві';
+comment on column msp_envelope_files_info.id_file is 'id файлу реєстра';
+
+
 -- Grant/Revoke object privileges 
 grant select on MSP_ENVELOPE_FILES_INFO to BARS_ACCESS_DEFROLE;

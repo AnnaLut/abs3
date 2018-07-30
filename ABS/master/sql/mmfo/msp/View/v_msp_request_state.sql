@@ -10,6 +10,7 @@ select id, state, name from msp_request_state;
 
 PROMPT *** Create comments on v_msp_request_state ***
 
+comment on table v_msp_request_state is 'Стани запитів';
 comment on column v_msp_request_state.id is 'id стану запиту';
 comment on column v_msp_request_state.state is 'Стан запиту';
 comment on column v_msp_request_state.name is 'Назва стану запиту';

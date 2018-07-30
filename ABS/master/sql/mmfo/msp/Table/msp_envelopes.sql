@@ -148,6 +148,50 @@ exception when others then
 end;
 /
 
+PROMPT *** Create  index i_msp_envelopes_type_period ***
+begin
+  execute immediate '
+create index i_msp_envelopes_type_period on msp_envelopes
+  (
+   case when instr(filename,''.'')>37 then substr(filename, 30, 2) end,
+   case when instr(filename,''.'')>37 then substr(filename, 32, 2) end || ''-'' || 
+         case when instr(filename,''.'')>37 then substr(filename, 36, 2) end || ''-'' ||
+         case when instr(filename,''.'')>37 then substr(filename, 38, 4) end
+  )
+  tablespace BRSBIGI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )
+';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+
+comment on table msp.msp_envelopes is 'Таблиця конвертів від ІОЦ';
+comment on column msp.msp_envelopes.id is '№ реєстру = id msp.msp_requests act_type =1';
+comment on column msp.msp_envelopes.id_msp_env is 'Внутрішній код пакета в ІОЦ';
+comment on column msp.msp_envelopes.code is 'Код запиту від ІОЦ';
+comment on column msp.msp_envelopes.sender is 'Відправник пакету';
+comment on column msp.msp_envelopes.recipient is 'Отримувач пакету';
+comment on column msp.msp_envelopes.partnumber is 'Порядковий номер частини конверту';
+comment on column msp.msp_envelopes.parttotal is 'Загальна к-ть частин конверту';
+comment on column msp.msp_envelopes.ecp is 'ЕЦП, який був накладений в ІОЦ';
+comment on column msp.msp_envelopes.data is 'Зашифрований конверт';
+comment on column msp.msp_envelopes.data_decode is 'Розшифрований конверт (base64)';
+comment on column msp.msp_envelopes.state is 'Стан конверту';
+comment on column msp.msp_envelopes.comm is 'Коментар обробки конверту';
+comment on column msp.msp_envelopes.create_date is 'Дата створення конверту';
+comment on column msp.msp_envelopes.filename is 'Назва файлу конверту, який містить реєстри';
+
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /sql/msp/table/msp_envelopes.sql =========*** End
 PROMPT ===================================================================================== 

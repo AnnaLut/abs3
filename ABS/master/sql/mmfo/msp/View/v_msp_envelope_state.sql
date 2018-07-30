@@ -9,7 +9,7 @@ create or replace view v_msp_envelope_state as
 select id, state, name from msp_envelope_state;
 
 PROMPT *** Create comments on v_msp_envelope_state ***
-
+comment on table v_msp_envelope_state is 'Стани конвертів';
 comment on column v_msp_envelope_state.id is 'id стану конверта';
 comment on column v_msp_envelope_state.state is 'Стан конверта';
 comment on column v_msp_envelope_state.name is 'Назва стану';

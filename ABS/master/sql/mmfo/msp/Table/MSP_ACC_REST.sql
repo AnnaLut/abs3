@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_acc_rest.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table MSP_ACC_REST
 (
@@ -23,14 +27,14 @@ tablespace BRSBIGD
 end;
 / 
 
--- Add comments to the columns 
-comment on column MSP_ACC_REST.acc
-  is 'Счет 2909';
-comment on column MSP_ACC_REST.rest
-  is 'Остаток';
-comment on column MSP_ACC_REST.restdate
-  is 'Дата остатка';
-comment on column MSP_ACC_REST.fileid
-  is 'Связь с реестром';
+comment on table msp.msp_acc_rest is 'Залишок на рахунку 2560 в РУ';
+comment on column msp.msp_acc_rest.acc is 'Рахунок 2560';
+comment on column msp.msp_acc_rest.rest is 'Остаток';
+comment on column msp.msp_acc_rest.restdate is 'Дата остатка';
+comment on column msp.msp_acc_rest.fileid is 'Связь с реестром';
 -- Grant/Revoke object privileges 
 grant select on MSP_ACC_REST to BARSREADER_ROLE;
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_acc_rest.sql =========*** End
+PROMPT ===================================================================================== 

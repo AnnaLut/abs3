@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_envelope_state.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table MSP_ENVELOPE_STATE
 (
@@ -58,4 +62,13 @@ begin
     if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
     end if; 
 end;
-/ 
+/
+
+comment on table msp.msp_envelope_state is 'Стани конвертів';
+comment on column msp.msp_envelope_state.id is 'id стану конверта';
+comment on column msp.msp_envelope_state.name is 'Назва стану конверта';
+comment on column msp.msp_envelope_state.state is 'Ідентифікатор стану конверта';
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_envelope_state.sql =========*** End
+PROMPT ===================================================================================== 

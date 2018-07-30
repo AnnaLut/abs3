@@ -28,6 +28,16 @@ where e.code in ('payment_data')
       and 0 = (select sum(case when f.state_id in (0) then 0 else 1 end) from msp_files f where f.envelope_file_id = e.id);
 
 PROMPT *** Create comments on v_msp_envelopes_match1 ***
+comment on table v_msp_envelopes_match1 is 'Список конвертів для формування квитанції 1';
+comment on column v_msp_envelopes_match1.id is 'id конверта';
+comment on column v_msp_envelopes_match1.id_msp_env is 'Внутрішній код пакета в ІОЦ';
+comment on column v_msp_envelopes_match1.code is 'Код запиту від ІОЦ';
+comment on column v_msp_envelopes_match1.sender is 'Відправник пакету';
+comment on column v_msp_envelopes_match1.recipient is 'Отримувач пакету';
+comment on column v_msp_envelopes_match1.partnumber is 'Порядковий номер частини конверту';
+comment on column v_msp_envelopes_match1.parttotal is 'Загальна к-ть частин конверту';
+comment on column v_msp_envelopes_match1.comm is 'Коментар обробки конверту';
+comment on column v_msp_envelopes_match1.create_date is 'Дата створення конверту';
 comment on column v_msp_envelopes_match1.total_sum is 'Загальна сума конверту';
 comment on column v_msp_envelopes_match1.total_sum_to_pay is 'Загальна сума для оплати';
 comment on column v_msp_envelopes_match1.state_id is 'id стану конверта';
