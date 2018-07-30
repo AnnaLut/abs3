@@ -4065,8 +4065,8 @@ begin
            else
               l_nlsb := p_nlsb;
            end if;
-		else 
-		   l_nlsb := p_nlsb;
+        else 
+           l_nlsb := p_nlsb;
         end if;
      end if;
      
@@ -15076,134 +15076,97 @@ begin
 
 end cm_close_acc;
 
--------------------------------------------------------------------------------
--- cm_alter_acc
--- процедура модификации параметров договора по информации из CardMake
---
-procedure cm_alter_acc(p_mode number default 0, p_cm_acc_req cm_acc_request%rowtype, p_msg out varchar2)
+procedure open_2203 (
+   p_pk_acc  in number,
+   p_oldacc  in number,
+   p_oldnls  in varchar2,
+   p_oldnms  in varchar2,
+   p_newnbs  in varchar2,
+   p_newacc out number)
 is
-  l_bdate         date;
-  l_mfo           varchar2(6);
-  l_msg           cm_acc_request.abs_msg%type;
-  l_nd            number;
-  l_acc           number;
-  l_acc_ovr       number;
-  l_card_code     w4_acc.card_code%type;
-  l_old_nbs       w4_product.nbs%type;
-  l_old_kv        w4_product.kv%type;
-  l_old_ob22      w4_product.ob22%type;
-  l_old_tip       w4_product.tip%type;
-  l_new_nbs       w4_product.nbs%type;
-  l_new_kv        w4_product.kv%type;
-  l_new_ob22      w4_product.ob22%type;
-  l_new_tip       w4_product.tip%type;
-  l_ovr_old_nbs   accounts.nbs%type;
-  l_ovr_old_nls   accounts.nls%type;
-  l_ovr_old_nms   accounts.nms%type;
-  l_ovr_old_dazs  date;
-  l_ovr_old_ob22  accounts.ob22%type;
-  l_ovr_new_nbs   accounts.nbs%type;
-  l_ovr_new_acc   number;
-  l_ovr_new_ob22  accounts.ob22%type;
-  l_bpk_proect_id_new    number;
-  l_name_new             bpk_proect.name%type;
-  l_bpk_proect_id_old    number;
-  l_name_old             bpk_proect.name%type;
-  l_trmask               t_trmask;
+ l_bdate         date;
+ l_mfo           varchar2(6);
+   l_acc     number := null;
+   l_ost     number;
+   l_newnls  accounts.nls%type;
+   l_newnms  accounts.nms%type;
+   l_okpo    customer.okpo%type;
+   l_ref     number;
+   l_kv      number;
+   l_tt      varchar2(3) := 'OW1';
+   l_vob     number := 6;
+   l_dk      number := 1;
+   l_s       number;
+   l_nazn    varchar2(160) := 'Перенесення залишків коштів, в зв''язку зі зміною банківського продукту';
+   l_trmask t_trmask;
+begin
+   select * into l_trmask from ow_transnlsmask t where t.nbs = p_newnbs and t.tip = 'KSS' and rownum = 1;
+   -- открываем счет
+   open_acc(p_pk_acc, l_trmask, l_acc);
 
-  h varchar2(100) := 'bars_ow.cm_alter_acc. ';
+   -- остаток на счете
+   l_ost := fost(p_oldacc, l_bdate);
 
-  procedure open_2203 (
-     p_pk_acc  in number,
-     p_oldacc  in number,
-     p_oldnls  in varchar2,
-     p_oldnms  in varchar2,
-     p_newnbs  in varchar2,
-     p_newacc out number)
-  is
-   l_bdate         date;
-   l_mfo           varchar2(6);
-     l_acc     number := null;
-     l_ost     number;
-     l_newnls  accounts.nls%type;
-     l_newnms  accounts.nms%type;
-     l_okpo    customer.okpo%type;
-     l_ref     number;
-     l_kv      number;
-     l_tt      varchar2(3) := 'OW1';
-     l_vob     number := 6;
-     l_dk      number := 1;
-     l_s       number;
-     l_nazn    varchar2(160) := 'Перенесення залишків коштів, в зв''язку зі зміною банківського продукту';
-     l_trmask t_trmask;
-  begin
-     select * into l_trmask from ow_transnlsmask t where t.nbs = p_newnbs and t.tip = 'KSS' and rownum = 1;
-     -- открываем счет
-     open_acc(p_pk_acc, l_trmask, l_acc);
+   -- переносим остаток
+   if l_ost < 0 then
 
-     -- остаток на счете
-     l_ost := fost(p_oldacc, l_bdate);
+      begin
 
-     -- переносим остаток
-     if l_ost < 0 then
+         select a.nls, substr(a.nms,1,38), a.kv, c.okpo
+           into l_newnls, l_newnms, l_kv, l_okpo
+           from accounts a, customer c
+          where a.acc = l_acc
+            and a.rnk = c.rnk;
 
-        begin
+         l_s := abs(l_ost);
 
-           select a.nls, substr(a.nms,1,38), a.kv, c.okpo
-             into l_newnls, l_newnms, l_kv, l_okpo
-             from accounts a, customer c
-            where a.acc = l_acc
-              and a.rnk = c.rnk;
+         gl.ref (l_ref);
 
-           l_s := abs(l_ost);
+         gl.in_doc3 (ref_    => l_ref,
+                     tt_     => l_tt,
+                     vob_    => l_vob,
+                     nd_     => to_char(l_ref),
+                     pdat_   => sysdate,
+                     vdat_   => l_bdate,
+                     dk_     => l_dk,
+                     kv_     => l_kv,
+                     s_      => l_s,
+                     kv2_    => l_kv,
+                     s2_     => l_s,
+                     sk_     => null,
+                     data_   => l_bdate,
+                     datp_   => l_bdate,
+                     nam_a_  => l_newnms,
+                     nlsa_   => l_newnls,
+                     mfoa_   => l_mfo,
+                     nam_b_  => p_oldnms,
+                     nlsb_   => p_oldnls,
+                     mfob_   => l_mfo,
+                     nazn_   => l_nazn,
+                     d_rec_  => null,
+                     id_a_   => l_okpo,
+                     id_b_   => l_okpo,
+                     id_o_   => null,
+                     sign_   => null,
+                     sos_    => null,
+                     prty_   => 0,
+                     uid_    => user_id);
 
-           gl.ref (l_ref);
+         gl.payv(0, l_ref, l_bdate, l_tt, l_dk, l_kv, l_newnls, l_s, l_kv, p_oldnls, l_s);
 
-           gl.in_doc3 (ref_    => l_ref,
-                       tt_     => l_tt,
-                       vob_    => l_vob,
-                       nd_     => to_char(l_ref),
-                       pdat_   => sysdate,
-                       vdat_   => l_bdate,
-                       dk_     => l_dk,
-                       kv_     => l_kv,
-                       s_      => l_s,
-                       kv2_    => l_kv,
-                       s2_     => l_s,
-                       sk_     => null,
-                       data_   => l_bdate,
-                       datp_   => l_bdate,
-                       nam_a_  => l_newnms,
-                       nlsa_   => l_newnls,
-                       mfoa_   => l_mfo,
-                       nam_b_  => p_oldnms,
-                       nlsb_   => p_oldnls,
-                       mfob_   => l_mfo,
-                       nazn_   => l_nazn,
-                       d_rec_  => null,
-                       id_a_   => l_okpo,
-                       id_b_   => l_okpo,
-                       id_o_   => null,
-                       sign_   => null,
-                       sos_    => null,
-                       prty_   => 0,
-                       uid_    => user_id);
+         gl.pay(2, l_ref, l_bdate);
 
-           gl.payv(0, l_ref, l_bdate, l_tt, l_dk, l_kv, l_newnls, l_s, l_kv, p_oldnls, l_s);
+      exception when no_data_found then null;
+      end;
 
-           gl.pay(2, l_ref, l_bdate);
+   end if;
 
-        exception when no_data_found then null;
-        end;
+   -- закрываем старый счет
+   update accounts set dazs = case when dapp < l_bdate then l_bdate else l_bdate+1 end where acc = p_oldacc;
 
-     end if;
+   p_newacc := l_acc;
 
-     -- закрываем старый счет
-     update accounts set dazs = case when dapp < l_bdate then l_bdate else l_bdate+1 end where acc = p_oldacc;
-
-     p_newacc := l_acc;
-
-  end open_2203;
+end open_2203;
 
 -------------------------------------------------------------------------------
 -- cm_alter_acc
