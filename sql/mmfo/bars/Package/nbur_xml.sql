@@ -51,7 +51,13 @@ is
   --
   -- constants
   --
+<<<<<<< .working
   g_body_version  constant varchar2(64) := 'version 2.8  2018.06.26';
+||||||| .merge-left.r59007
+  g_body_version  constant varchar2(64) := 'version 2.6  2018.06.22';
+=======
+  g_body_version  constant varchar2(64) := 'version 2.7  2018.06.26';
+>>>>>>> .merge-right.r59008
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -1209,6 +1215,7 @@ select  substr(ekp_2,1,1) ekp_2
             having 
                    sum(T070) <> 0;
 
+<<<<<<< .working
       when '48X' then
         open p_recordset
         for
@@ -1231,6 +1238,30 @@ select  substr(ekp_2,1,1) ekp_2
           from  nbur_log_f48x
           where report_date = p_rpt_dt
                 and kf = p_kf;
+||||||| .merge-left.r59007
+=======
+       when 'D4X' then
+         open p_recordset  
+         for                
+            select ekp
+                   , r030
+                   , f025
+                   , b010
+                   , q006
+                   , sum(t071) as t071
+            from   nbur_log_fd4x
+            where  report_date = p_rpt_dt
+                   and kf = p_kf
+                   and ekp <> 'XXXXXX' --Берем только замапленные значения
+            group by
+                   ekp
+                   , r030
+                   , f025
+                   , b010
+                   , q006       
+            having sum(t071) <> 0;                                                        
+
+>>>>>>> .merge-right.r59008
     else
       null;
     end case;
