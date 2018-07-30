@@ -1,3 +1,6 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_file_record_state.sql =========*** Run
+PROMPT ===================================================================================== 
 begin
     execute immediate 'create table MSP_FILE_RECORD_STATE
 (
@@ -22,8 +25,9 @@ end;
 / 
 
 -- Add comments to the table 
-comment on table MSP_FILE_RECORD_STATE
-  is 'Статуси інформаційних рядків файла';
+comment on table msp.msp_file_record_state is 'Стани інформаційних рядків файла';
+comment on column msp.msp_file_record_state.id is 'id стану інформаційного рядка файла';
+comment on column msp.msp_file_record_state.name is 'Назва стану';
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin
@@ -58,3 +62,6 @@ begin
     end if; 
 end;
 / 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_file_record_state.sql =========*** End
+PROMPT ===================================================================================== 

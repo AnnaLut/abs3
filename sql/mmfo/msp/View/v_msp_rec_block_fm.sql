@@ -40,6 +40,7 @@ comment on column v_msp_rec_block_fm.sos is 'Стан оплати документу';
 comment on column v_msp_rec_block_fm.groupid is 'Група візування';
 comment on column v_msp_rec_block_fm.username is 'Користувач';
 comment on column v_msp_rec_block_fm.groupname is 'Назва групи візування';
+comment on column v_msp_rec_block_fm.id is 'id інформаційного рядка файлу';
 
 PROMPT *** Create  grants  v_msp_rec_block_fm ***
 

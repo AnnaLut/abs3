@@ -34,10 +34,27 @@ from msp_envelope_files_info fi
 
 PROMPT *** Create comments on v_msp_file_records ***
 
-comment on column v_msp_file_records.envelope_file_id is 'id файлу конверта';
-comment on column v_msp_file_records.state_name is 'Назва статусу інформаційного рядка файлу';
+comment on table v_msp_file_records is 'Інформаційні рядки реєстрів';
+
+comment on column v_msp_file_records.id is 'id інформаційного рядка реєстра';
+comment on column v_msp_file_records.file_id is 'id файлу';
 comment on column v_msp_file_records.check_date is 'Дата зарахування';
 comment on column v_msp_file_records.branch_code is 'Код МФО';
+comment on column v_msp_file_records.deposit_acc is 'Номер рахунку вкладника';
+comment on column v_msp_file_records.filia_num is 'Номер фiлiї';
+comment on column v_msp_file_records.deposit_code is 'Код вкладу';
+comment on column v_msp_file_records.pay_sum is 'Сума (в коп.)';
+comment on column v_msp_file_records.full_name is 'Прiзвище, iм`я, по батьковi';
+comment on column v_msp_file_records.numident is 'Ідентифікаційний номер';
+comment on column v_msp_file_records.pay_day is 'День виплати';
+comment on column v_msp_file_records.displaced is 'Ознака ВПО';
+comment on column v_msp_file_records.state_id is 'id стану інформаційного рядка файлу';
+comment on column v_msp_file_records.state_name is 'Назва статусу інформаційного рядка файлу';
+comment on column v_msp_file_records.block_type_id is 'Тип блокування';
+comment on column v_msp_file_records.block_comment is 'Коментар блокування';
+comment on column v_msp_file_records.envelope_file_id is 'id конверта';
+comment on column v_msp_file_records.mfo is 'МФО банку-одержувача';
+comment on column v_msp_file_records.ref is 'Референс созданного документа';
 comment on column v_msp_file_records.fact_pay_date is 'Дата фактичного зарахування коштів на рахунки';
 
 

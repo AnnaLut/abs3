@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_block_type.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table MSP_BLOCK_TYPE
 (
@@ -58,3 +62,11 @@ begin
     end if; 
 end;
 / 
+
+comment on table msp.msp_block_type is 'Типи блокувань особи';
+comment on column msp.msp_block_type.id is 'id типу блокування';
+comment on column msp.msp_block_type.name is 'Назва типу блокування';
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_block_type.sql =========*** End
+PROMPT ===================================================================================== 

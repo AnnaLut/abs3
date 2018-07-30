@@ -42,8 +42,12 @@ end;
 / 
 
 -- Add comments to the table 
-comment on table msp_request_tracking
-  is 'Історія відповідей на запити';
+comment on table msp_request_tracking is 'Історія відповідей на запити';
+comment on column msp.msp_request_tracking.id is 'id запиту - msp_request.id';
+comment on column msp.msp_request_tracking.response is 'Відповідь';
+comment on column msp.msp_request_tracking.stack_trace is 'Текст помилки';
+comment on column msp.msp_request_tracking.insert_dttm is 'Дата вставки зипису';
+comment on column msp.msp_request_tracking.state is 'Стан відповіді (1 - помилковий, null - ОК!)';
 
 PROMPT *** Create  constraint pk_msp_request_tracking ***
 -- Create/Recreate primary, unique and foreign key constraints 

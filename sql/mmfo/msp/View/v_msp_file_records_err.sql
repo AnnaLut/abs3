@@ -40,9 +40,30 @@ where fr.state_id not in (0,19,20);
 
 PROMPT *** Create comments on v_msp_file_records_err ***
 
-comment on column v_msp_file_records_err.envelope_file_id is 'id файлу конверта';
-comment on column v_msp_file_records_err.state_name is 'Назва статусу інформаційного рядка файлу';
+comment on table v_msp_file_records_err is 'Інформаційні рядки реєстрів з помилками - /barsroot/mcp/mcp/errorsrecords';
+
+comment on column v_msp_file_records_err.id is 'id інформаційного рядка реєстра';
+comment on column v_msp_file_records_err.file_id is 'id файлу';
 comment on column v_msp_file_records_err.check_date is 'Дата зарахування';
+comment on column v_msp_file_records_err.deposit_acc is 'Номер рахунку вкладника';
+comment on column v_msp_file_records_err.filia_num is 'Номер фiлiї';
+comment on column v_msp_file_records_err.deposit_code is 'Код вкладу';
+comment on column v_msp_file_records_err.pay_sum is 'Сума (в коп.)';
+comment on column v_msp_file_records_err.full_name is 'Прiзвище, iм`я, по батьковi';
+comment on column v_msp_file_records_err.numident is 'Ідентифікаційний номер';
+comment on column v_msp_file_records_err.pay_day is 'День виплати';
+comment on column v_msp_file_records_err.displaced is 'Ознака ВПО';
+comment on column v_msp_file_records_err.state_id is 'id стану інформаційного рядка файлу';
+comment on column v_msp_file_records_err.state_name is 'Назва статусу інформаційного рядка файлу';
+comment on column v_msp_file_records_err.block_type_id is 'Тип блокування';
+comment on column v_msp_file_records_err.block_comment is 'Коментар блокування';
+comment on column v_msp_file_records_err.envelope_file_id is 'id конверта';
+comment on column v_msp_file_records_err.receiver_mfo is 'МФО банку-одержувача';
+comment on column v_msp_file_records_err.kf_bank is 'МФО АБС';
+comment on column v_msp_file_records_err.acc_bank is 'Рахунок АБС';
+comment on column v_msp_file_records_err.nmk_bank is 'ПІБ АБС';
+comment on column v_msp_file_records_err.okpo_bank is 'ІПН АБС';
+comment on column v_msp_file_records_err.rnk is 'РНК';
 
 
 PROMPT *** Create  grants  v_msp_file_records_err ***

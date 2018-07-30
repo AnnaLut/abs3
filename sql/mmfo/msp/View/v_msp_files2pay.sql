@@ -8,7 +8,7 @@ PROMPT *** Create view v_msp_files2pay ***
 create or replace view v_msp_files2pay as
 select f.id,
        fi.filepath file_path,
-       fi.payment_type,
+       case when instr(fi.filename,'.')>37 then substr(fi.filename, 30, 2) end payment_type,
        lpad(f.file_filia_num, 5, '0') || lpad(f.file_pay_day, 2, '0') || f.file_separator || lpad(f.file_upszn_code, 3, '0') file_name,
        (select count(1) from msp_file_records fr where fr.file_id = f.id and fr.state_id in (0)) count_to_pay,
        (select sum(fr.pay_sum)*0.01 from msp_file_records fr where fr.file_id = f.id and fr.state_id in (0)) sum_to_pay,
@@ -62,11 +62,46 @@ from msp_envelope_files_info fi
      left join msp_acc_trans_2909 acc2 on acc2.kf = f.receiver_mfo
      left join msp_acc_rest rest on rest.fileid = f.id
 ;
+comment on table V_MSP_FILES2PAY is 'Перегляд та оплата реєстрів';
+comment on column V_MSP_FILES2PAY.ID is 'ID реєстра';
 comment on column V_MSP_FILES2PAY.FILE_PATH is 'Назва папки в конверті';
 comment on column V_MSP_FILES2PAY.PAYMENT_TYPE is 'Тип виплати';
 comment on column V_MSP_FILES2PAY.FILE_NAME is 'Назва файлу в конверті';
 comment on column V_MSP_FILES2PAY.COUNT_TO_PAY is 'Кількість рядків для сплати';
 comment on column V_MSP_FILES2PAY.SUM_TO_PAY is 'Сума для сплати';
+comment on column V_MSP_FILES2PAY.balance_2909 is 'Залишок коштів РУ на 2909';
+comment on column V_MSP_FILES2PAY.balance_2560 is 'Сума залишку 2560 РУ';
+comment on column V_MSP_FILES2PAY.last_balance_req is 'Дата/час останнього запиту залишку';
+comment on column V_MSP_FILES2PAY.fact_payment_sum is 'Сума фактична зарахування на рахунки пенсіонерів';
+comment on column V_MSP_FILES2PAY.return_payment_sum is 'Сума фактична повернення';
+comment on column V_MSP_FILES2PAY.file_bank_num is 'Номер центральної філії банку';
+comment on column V_MSP_FILES2PAY.file_filia_num is 'Номер підзвітної філії банку';
+comment on column V_MSP_FILES2PAY.file_pay_day is 'День виплати';
+comment on column V_MSP_FILES2PAY.file_separator is 'Символ-роздільник назви і розширення файлу- «.»';
+comment on column V_MSP_FILES2PAY.file_upszn_code is 'Код райну УПФУ';
+comment on column V_MSP_FILES2PAY.header_lenght is 'Довжина заголовка';
+comment on column V_MSP_FILES2PAY.file_date is 'Дата створення файлу (формат varchar2)';
+comment on column V_MSP_FILES2PAY.file_datetime is 'Дата створення файлу (формат date)';
+comment on column V_MSP_FILES2PAY.rec_count is 'Кiлькiсть iнформацiйних рядкiв';
+comment on column V_MSP_FILES2PAY.payer_mfo is 'МФО банку-платника';
+comment on column V_MSP_FILES2PAY.payer_acc is 'Рахунок платника';
+comment on column V_MSP_FILES2PAY.receiver_mfo is 'МФО банку-одержувача';
+comment on column V_MSP_FILES2PAY.receiver_acc is 'Рахунок одержувача';
+comment on column V_MSP_FILES2PAY.acc_num_2560 is 'Номер рахунку 2560';
+comment on column V_MSP_FILES2PAY.debit_kredit is 'Ознака "дебет/кредит" платежу';
+comment on column V_MSP_FILES2PAY.pay_sum is 'Сума (в коп.) платежу';
+comment on column V_MSP_FILES2PAY.pay_type is 'Вид платежу';
+comment on column V_MSP_FILES2PAY.pay_oper_num is 'Номер (операцiйний) платежу';
+comment on column V_MSP_FILES2PAY.attach_flag is 'Ознака наявностi додатку до платежу';
+comment on column V_MSP_FILES2PAY.payer_name is 'Найменування платника';
+comment on column V_MSP_FILES2PAY.receiver_name is 'Найменування одержувача';
+comment on column V_MSP_FILES2PAY.payment_purpose is 'Призначення платежу';
+comment on column V_MSP_FILES2PAY.filia_num is 'Номер фiлiї';
+comment on column V_MSP_FILES2PAY.deposit_code is 'Код вкладу';
+comment on column V_MSP_FILES2PAY.process_mode is 'Режими обробки';
+comment on column V_MSP_FILES2PAY.checksum is 'КС або ЕП';
+comment on column V_MSP_FILES2PAY.envelope_state_id is 'id стану конверта';
+comment on column V_MSP_FILES2PAY.envelope_state_name is 'Назва стану конверта';
 comment on column V_MSP_FILES2PAY.STATE_ID is 'id стану файлу';
 comment on column V_MSP_FILES2PAY.STATE_CODE is 'Код стану файлу';
 comment on column V_MSP_FILES2PAY.STATE_NAME is 'Назва стану файлу';

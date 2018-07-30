@@ -48,7 +48,19 @@ from msp_files mf;
 
 PROMPT *** Create comments on v_msp_paym_fields ***
 
---comment on column v_msp_paym_fields. is '';
+comment on table v_msp_paym_fields is 'Параметри дебетування загального платежу';
+comment on column v_msp_paym_fields.ACC_2909 is 'Транзитний рахунок 2909 отримувача в ЦА';
+comment on column v_msp_paym_fields.OKPO_2909 is 'ЄДРПОУ отримувача';
+comment on column v_msp_paym_fields.MFO_2909 is 'МФО отримувача';
+comment on column v_msp_paym_fields.NAME_2909 is 'Назва транзитного рахунка 2909 отримувача в ЦА';
+comment on column v_msp_paym_fields.ACC_2560 is 'Рахунок 2560 для списання в РУ';
+comment on column v_msp_paym_fields.OKPO_2560 is 'ЄДРПОУ РУ';
+comment on column v_msp_paym_fields.MFO_2560 is 'МФО РУ';
+comment on column v_msp_paym_fields.NAME_2560 is 'Назва рахунка 2560 РУ';
+comment on column v_msp_paym_fields.DEBET_TTS is 'Код операції';
+comment on column v_msp_paym_fields.SUM is 'Сума платежу';
+comment on column v_msp_paym_fields.NAZN is 'Призначення платежу';
+comment on column v_msp_paym_fields.ID is 'id реєстра';
 
 
 PROMPT *** Create  grants  v_msp_paym_fields ***

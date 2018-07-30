@@ -1,3 +1,7 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/msp/table/msp_request_state.sql =========*** Run
+PROMPT ===================================================================================== 
+
 begin
     execute immediate 'create table MSP_REQUEST_STATE
 (
@@ -58,4 +62,13 @@ begin
     if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
     end if; 
 end;
-/ 
+/
+
+comment on table msp.msp_request_state is 'Стани запитів';
+comment on column msp.msp_request_state.id is 'id стану запиту';
+comment on column msp.msp_request_state.name is 'Назва стану запиту';
+comment on column msp.msp_request_state.state is 'Ідентифікатор стану запиту';
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/msp/table/msp_request_state.sql =========*** End
+PROMPT ===================================================================================== 

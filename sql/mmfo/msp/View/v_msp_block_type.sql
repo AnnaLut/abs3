@@ -10,6 +10,7 @@ select id, name from msp_block_type;
 
 PROMPT *** Create comments on v_msp_block_type ***
 
+comment on table v_msp_block_type is 'Типи блокувань особи';
 comment on column v_msp_block_type.id is 'id типу блокування';
 comment on column v_msp_block_type.name is 'Тип блокування';
 

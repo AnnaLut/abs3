@@ -28,6 +28,16 @@ where e.code in ('payment_data')
 ;
 
 PROMPT *** Create comments on v_msp_envelopes_match1_hist ***
+comment on table v_msp_envelopes_match1_hist is 'Список відправлених конвертів квитанції 1, або конверти з помилками відправки';
+comment on column v_msp_envelopes_match1_hist.id is 'id конверта';
+comment on column v_msp_envelopes_match1_hist.id_msp_env is 'Внутрішній код пакета в ІОЦ';
+comment on column v_msp_envelopes_match1_hist.code is 'Код запиту від ІОЦ';
+comment on column v_msp_envelopes_match1_hist.sender is 'Відправник пакету';
+comment on column v_msp_envelopes_match1_hist.recipient is 'Отримувач пакету';
+comment on column v_msp_envelopes_match1_hist.partnumber is 'Порядковий номер частини конверту';
+comment on column v_msp_envelopes_match1_hist.parttotal is 'Загальна к-ть частин конверту';
+comment on column v_msp_envelopes_match1_hist.comm is 'Коментар обробки конверту';
+comment on column v_msp_envelopes_match1_hist.create_date is 'Дата створення конверту';
 comment on column v_msp_envelopes_match1_hist.total_sum is 'Загальна сума конверту';
 comment on column v_msp_envelopes_match1_hist.total_sum_to_pay is 'Загальна сума для оплати';
 comment on column v_msp_envelopes_match1_hist.state_id is 'id стану конверта';

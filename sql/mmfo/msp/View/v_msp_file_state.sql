@@ -10,6 +10,7 @@ select id, state, name from msp_file_state s;
 
 PROMPT *** Create comments on v_msp_file_state ***
 
+comment on table v_msp_file_state is 'Стани файла';
 comment on column v_msp_file_state.id is 'id стану реєстра';
 comment on column v_msp_file_state.state is 'Стан реєстра';
 comment on column v_msp_file_state.name is 'Назва стану';

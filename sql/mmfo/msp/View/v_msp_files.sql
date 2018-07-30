@@ -7,7 +7,7 @@ PROMPT *** Create view v_msp_files ***
 
 create or replace view v_msp_files as
 select f.id,
-       fi.payment_type,
+       case when instr(fi.filename,'.')>37 then substr(fi.filename, 30, 2) end payment_type,
        substr(fi.filepath, 1, instr(fi.filepath, '\')-1) file_path,
        substr(filepath, instr(filepath, '\')+1, length(filepath)-instr(filepath, '\')) file_name,
        --lpad(f.file_filia_num, 5, '0') || lpad(f.file_pay_day, 2, '0') || f.file_separator || lpad(f.file_upszn_code, 3, '0') file_name,
@@ -48,7 +48,33 @@ from msp_envelope_files_info fi
 
 PROMPT *** Create comments on v_msp_files ***
 
-comment on column v_msp_files.envelope_file_id is 'id файлу конверта';
+comment on table v_msp_files is 'Реєстри';
+comment on column v_msp_files.id is 'id реєстра';
+comment on column v_msp_files.file_bank_num is 'Номер центральної філії банку';
+comment on column v_msp_files.file_filia_num is 'Номер підзвітної філії банку';
+comment on column v_msp_files.file_pay_day is 'День виплати';
+comment on column v_msp_files.file_separator is 'Символ-роздільник назви і розширення файлу- «.»';
+comment on column v_msp_files.file_upszn_code is 'Код райну УПФУ';
+comment on column v_msp_files.header_lenght is 'Довжина заголовка';
+comment on column v_msp_files.file_date is 'Дата створення файлу';
+comment on column v_msp_files.rec_count is 'Кiлькiсть iнформацiйних рядкiв';
+comment on column v_msp_files.payer_mfo is 'МФО банку-платника';
+comment on column v_msp_files.payer_acc is 'Рахунок платника';
+comment on column v_msp_files.receiver_mfo is 'МФО банку-одержувача';
+comment on column v_msp_files.receiver_acc is 'Рахунок одержувача';
+comment on column v_msp_files.debit_kredit is 'Ознака "дебет/кредит" платежу';
+comment on column v_msp_files.pay_sum is 'Сума (в коп.) платежу';
+comment on column v_msp_files.pay_type is 'Вид платежу';
+comment on column v_msp_files.pay_oper_num is 'Номер (операцiйний) платежу';
+comment on column v_msp_files.attach_flag is 'Ознака наявностi додатку до платежу';
+comment on column v_msp_files.payer_name is 'Найменування платника';
+comment on column v_msp_files.receiver_name is 'Найменування одержувача';
+comment on column v_msp_files.payment_purpose is 'Призначення платежу';
+comment on column v_msp_files.filia_num is 'Номер фiлiї';
+comment on column v_msp_files.deposit_code is 'Код вкладу';
+comment on column v_msp_files.process_mode is 'Режими обробки';
+comment on column v_msp_files.checksum is 'КС або ЕП';
+comment on column v_msp_files.envelope_file_id is 'id конверта';
 comment on column v_msp_files.file_path is 'Назва папки в конверті';
 comment on column v_msp_files.file_name is 'Назва файлу в конверті';
 comment on column v_msp_files.envelope_file_name is 'Назва файлу архіва конверта';
