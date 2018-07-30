@@ -89,6 +89,22 @@ begin
   bars.bars_error.add_message(l_mod, 17, l_exc, l_rus, 'Ошибка записи сформированых данных по файлу. %s', '', 1, 'ERRWRITE_FILE_CONTENT');
   bars.bars_error.add_message(l_mod, 17, l_exc, l_eng, 'Error write file content. %s', '', 1, 'ERRWRITE_FILE_CONTENT');
 
+  bars.bars_error.add_message(l_mod, 18, l_exc, l_ukr, 'Помилка визначення користувача системи. Контекст не задано.', '', 1, 'UNKNOWN_CONTEXT_USER');
+  bars.bars_error.add_message(l_mod, 18, l_exc, l_rus, 'Ошибка определения пользователя системы. Контекст не установлен.', '', 1, 'UNKNOWN_CONTEXT_USER');
+  bars.bars_error.add_message(l_mod, 18, l_exc, l_eng, 'Unknown context user', '', 1, 'UNKNOWN_CONTEXT_USER');
+
+  bars.bars_error.add_message(l_mod, 19, l_exc, l_ukr, 'Помилка визначення користувача системи. %s', '', 1, 'ERR_CONTEXT_USER');
+  bars.bars_error.add_message(l_mod, 19, l_exc, l_rus, 'Ошибка определения пользователя системы %s', '', 1, 'ERR_CONTEXT_USER');
+  bars.bars_error.add_message(l_mod, 19, l_exc, l_eng, 'Error get context user %s', '', 1, 'ERR_CONTEXT_USER');
+
+  bars.bars_error.add_message(l_mod, 20, l_exc, l_ukr, 'Помилка оновлення статуса інформаційного рядка файла на "Сплачено". %s', '', 1, 'ERR_SET_RECORD_PAYED');
+  bars.bars_error.add_message(l_mod, 20, l_exc, l_rus, 'Ошибка обновления статуса информационной строки на "Оплачено" %s', '', 1, 'ERR_SET_RECORD_PAYED');
+  bars.bars_error.add_message(l_mod, 20, l_exc, l_eng, 'Error set record "Payed" %s', '', 1, 'ERR_SET_RECORD_PAYED');
+
+  bars.bars_error.add_message(l_mod, 21, l_exc, l_ukr, 'Помилка оновлення статуса інформаційного рядка файла на "Повернуто в МСП". %s', '', 1, 'ERR_SET_RECORD_ERROR');
+  bars.bars_error.add_message(l_mod, 21, l_exc, l_rus, 'Ошибка обновления статуса информационной строки на "Возвращено в МСП" %s', '', 1, 'ERR_SET_RECORD_ERROR');
+  bars.bars_error.add_message(l_mod, 21, l_exc, l_eng, 'Error set record "Returned to MSP" %s', '', 1, 'ERR_SET_RECORD_ERROR');
+
   commit;
 end;
 /
