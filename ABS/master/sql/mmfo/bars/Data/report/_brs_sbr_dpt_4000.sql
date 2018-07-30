@@ -55,7 +55,7 @@ begin
                            '    sde.mfob,'||nlchr||
                            '    sde.okpo as okpo1,'||nlchr||
                            '    sde.nlsb,'||nlchr||
-                           '    sto_all.fsumFunction(sde.fsum, sde.kva, sde.kvb, sde.nlsa, sde.nlsb, sde.tt) as fsum_c,'||nlchr||
+                           '    sto_all.fsumFunction(sde.fsum, sde.kva, sde.kvb, sde.nlsa, sde.nlsb, sde.tt)/100 as fsum_c,'||nlchr||
                            '    sde.nazn,'||nlchr||
                            '    case when sda.ref is not null then 1 else 0 end as form'||nlchr||
                            '    from sto_det sde'||nlchr||
