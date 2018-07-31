@@ -33,7 +33,7 @@ RETURN NUMERIC IS
   okpo_     Char(12);
 
   vvod_     NUMERIC ;    --  OperW/TAG='VVOD' = 1 - ввод було відкладено на ПісляОпЧас
-                         --  Для операцій 001,002
+                         --  для операцій 001,002,PKR
 
 --------------------------------------------------------------------------- 
 --
@@ -42,35 +42,47 @@ RETURN NUMERIC IS
 --------------------------------------------------------------------------- 
 BEGIN
 
-  vvod_ := 0;
+ vvod_ := 0;
 
-  If kod_<>15 and TT_ in ('001','002','PKR') then
+ If kod_<>15 and TT_ in ('001','002','PKR') then    ---  "Ручные" исходящие 
 
     Begin 
-
       Select 1 into kkk_ 
       from   OperW 
       where  REF=REF_ and TAG='DOG_S' and VALUE='1';
-
-      RETURN  F_TARIF(205, kv_, nls_, s_);
-
+    
+      sk_:=F_TARIF(205,kv_,nls_,s_);  ---  тариф 205 "Договірне списання"    
+      RETURN sk_;      
+    
     EXCEPTION  WHEN NO_DATA_FOUND THEN
       null;
     End;
-
-
-    Begin 
-
+    
+    
+    Begin                     ----  Доп.рекв "Ввод було відкладено на ПісляОпЧас"
       Select 1 into vvod_ 
       from   OperW 
       where  REF=REF_ and TAG='VVOD' and VALUE<>'0';
-
     EXCEPTION  WHEN NO_DATA_FOUND THEN
       vvod_ := 0;
     End;
 
-
  End If;
+
+
+-----  Исходящие PS0,PS1,PS2,PS5,PSG   -------------------- 
+
+ If TT_ like 'PS%' and kod_<>15 then
+
+    if n_tarpak in (14,15)  then        ---  Тепловики (ТП 14,15)
+       sk_:=F_TARIF(283,kv_,nls_,s_);
+       RETURN sk_;
+    end if;
+
+    sk_:=F_TARIF(205,kv_,nls_,s_);  ---  тариф 205 "Договірне списання"    
+    RETURN sk_;
+
+ End if;
 
 
 ----  Определяем kkk_ - Kод Корп.Клиента:
@@ -1250,24 +1262,6 @@ BEGIN
 -------- 2).  Расчет тарифа:  ------------------------------------------------ 
 
 
-
- -----   Исходящие PS1,PS2   -------------------- 
-
- If TT_ in ('PS1','PS2') and kod_<>15 then
-
-    if n_tarpak in (14,15)  then        ---  Тепловики (ТП 14,15)
-       sk_:=F_TARIF(283,kv_,nls_,s_);
-       RETURN sk_;
-    end if;
-
-    if n_tarpak > 0         then        ---  Cчет "с пакетом"
-       sk_:=F_TARIF(205,kv_,nls_,s_);
-       RETURN sk_;
-    end if;
-
- End if;
-
-
  -------    29 особых счетов ГОУ :  -------------
 
  IF n_tarpak = 0  and  gl.amfo = '300465'  then      
@@ -1464,3 +1458,41 @@ BEGIN
 END f_tarif_rko ;
 /
 
+
+
+-----------------------------------------------------------------------------
+--
+--                      Задача "Плата за РО".  
+--                      
+--  Добавление в список операций, за которые начисляется плата, операции PS0,PS5,PSG
+--
+-----------------------------------------------------------------------------
+
+begin
+   bc.go('/');
+   INSERT INTO RKO_TTS ( TT, DK, NTAR ) VALUES ('PS0', 0, 14); 
+exception when others then
+   null;
+end;
+/
+
+
+begin
+   bc.go('/');
+   INSERT INTO RKO_TTS ( TT, DK, NTAR ) VALUES ('PS5', 0, 14); 
+exception when others then
+   null;
+end;
+/
+
+
+begin
+   bc.go('/');
+   INSERT INTO RKO_TTS ( TT, DK, NTAR ) VALUES ('PSG', 0, 14); 
+exception when others then
+   null;
+end;
+/
+
+
+COMMIT;
