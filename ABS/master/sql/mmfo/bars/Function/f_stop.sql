@@ -1469,7 +1469,7 @@ BEGIN
             SELECT ow.tag
               INTO l_txt
               FROM operw ow
-             WHERE ow.REF = l_ref AND ow.tag IN ('ADRES');
+             WHERE ow.REF = l_ref AND ow.tag IN ('ADRES','ADRS');
          EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
