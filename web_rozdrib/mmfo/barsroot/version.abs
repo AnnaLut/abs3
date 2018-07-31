@@ -1,3 +1,3 @@
-=========  svn diff --summarize -r 61782:61885 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 61782:61897 D:\SVN\master\web\mmfo
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.10\mmfo\web\barsroot\version.abs
-Bugfix_2.0.45.0.10 (Rev:61782-61885
+Bugfix_2.0.45.0.10 (Rev:61782-61897
