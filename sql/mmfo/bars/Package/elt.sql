@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/elt.sql =========*** Run *** =======
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.ELT 
+CREATE OR REPLACE PACKAGE ELT
 IS
 
 G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 39.4 від 28/12/2016';
@@ -262,7 +256,7 @@ PROCEDURE shnel
 
 END ELT;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ELT 
+CREATE OR REPLACE PACKAGE BODY ELT
 IS
 
   G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 45.12 від 01.09.2017';
@@ -1339,6 +1333,8 @@ end;
       <<kin_2>> NULL;
    END LOOP;  -- d
    DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор
+exception when others then
+  DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор   
 END;
    end if;  ----  k.nls3 like ...
 ---------
@@ -1672,7 +1668,7 @@ END;
       rollback to DO_O;
     else
       raise_application_error(-20203,'ELT.OPL  nd='||k.nd||';  MODE ='|| MODE_ ||' ERROR= '||SQLERRM);
-    end if;
+    end if;    
   end;
 end loop;   -- k
 --commit;
@@ -2818,16 +2814,3 @@ BEGIN
 
 END ELT;
 /
- show err;
- 
-PROMPT *** Create  grants  ELT ***
-grant EXECUTE                                                                on ELT             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on ELT             to ELT;
-grant EXECUTE                                                                on ELT             to WR_ALL_RIGHTS;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/elt.sql =========*** End *** =======
- PROMPT ===================================================================================== 
- 
