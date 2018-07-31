@@ -554,7 +554,7 @@ END fin_nbu;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_NBU IS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.5.3  13.06.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.5.4  26.07.2018';
  G_coun    int;
  g_pawn    int;
  -------------------------------------------
@@ -1297,6 +1297,7 @@ BEGIN
 
  calculation_class(rnk_, dat_);
 
+    return;
 	if nvl(VED, 0) = 0 or nvl(VED, 0) > 9 then        ved_ :=GET_VED(RNK_ , DAT_);
      else  ved_ := VED;
 	end if;
@@ -1441,7 +1442,7 @@ IS
 	 l_clas number;
 	 l_mod varchar2(254) := 'fin_nbu.calculation_class >>';
   BEGIN
-return;
+
 		ved_ :=GET_GVED(RNK_ , DAT_);
 
 		select okpo
@@ -3645,6 +3646,7 @@ END record_fp_ND_date;
 
   BEGIN
 
+ return;
   aDAT_  := DAT_;
   aOKPO_ := OKPO_;
   aND_   := ND_;
