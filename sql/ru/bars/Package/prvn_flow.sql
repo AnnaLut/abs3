@@ -93,7 +93,7 @@ is
   --
   -- получение номера лиц.счета
   --
-  function GET_NLS
+  function GET_NLS_b
   ( p_nd   number
   , p_tip  accounts.tip%type
   ) return varchar2;
@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 11.3  05.07.2018';
+  g_body_version  constant varchar2(64) := 'version 11.4  12.07.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -564,6 +564,7 @@ procedure D_SNA  ( p_dat01 date ) is -- SDM + SDF + SDI  + SDA  + SNA + SRR от Д
       p4_ int;   
       OO OPER%ROWTYPE ;
       ----------------------------
+/*
 FUNCTION OSTM ( p_acc number, -- ACC счета
                 p_dat date   -- ЛюБАЯ дата отч месяца MM.YYYY  (  от 01.MM.YYYY до    31.MM.YYYY )
                )  return number  is  l_OSTM number ;  z_Dat date := TRUNC ( p_dat, 'MM'); 
@@ -575,6 +576,7 @@ BEGIN
     RETURN l_OSTM ;
 END ;    --- OSTM ;
 ----------------
+*/
 
 
 procedure D_SNA1 ( x_RI varchar2, XX In OUT TEST_PRVN_OSA%ROWtype, OO in out OPER%ROWtype)  iS    
@@ -808,7 +810,13 @@ begin
   dd.prod := substr(dd.prod,1,6) ;
 
   -- Искривленный код продукта 
-  If dd.vidd     in (2701,1624,3660, 150 )  THEN 
+  If dd.vidd =  150 and dd.prod like '1508%'   THEN 
+
+     dd.prod := '150000' ;
+     kk.NBS  := '1500' ;
+     kk.ob22 := '00'   ;
+
+  ElsIf dd.vidd     in (2701,1623,3660, 150 )  THEN 
      begin select a.nbs||a.ob22, a.NBS,  a.ob22 
              into dd.prod,      kk.NBS, kk.ob22  
              from accounts a, nd_acc n 
@@ -824,7 +832,11 @@ begin
            --update cc_deal set prod  = dd.prod where nd = dd.nd ;
            select k.* into kk from cck_ob22 k where  nbs||ob22  = dd.prod;        
         end if ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20000,'НЕ знайдено cck_ob22.PROD='|| dd.prod );       
+  EXCEPTION WHEN NO_DATA_FOUND THEN  -- по группе КРГ* - первый попавший открытый продукт 
+        begin select k.* into kk from cck_ob22 k where  substr(nbs,1,3) = substr(dd.prod,1,3) and rownum = 1 and  kk.d_close is null ;
+              dd.prod := kk.NBS||kk.OB22 ;
+        EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000,'ND='||xx.ND||'*НЕ знайдено cck_ob22.PROD='|| dd.prod );       
+        end ;
   end;
 
   begin  select k.* into kk9 from cck_ob22_9 k where nbs||ob22 = dd.prod ;
@@ -834,9 +846,9 @@ begin
   ----------------------  
 
   If xx.Irr is not null  then
-     begin 
-        If dd.vidd in (2701,1624,3660) then select a.acc into L_ACC from accounts a, nd_acc n  where n.ND = DD.ND and n.acc = a.acc and a.nbs = kk.nbs  ;
-        Else                                select a.acc into L_ACC from accounts a, nd_acc n  where n.ND = DD.ND and n.acc = a.acc and a.tip = decode ( Substr(dd.prod,1,1) , '2', 'LIM', 'SS ') ;
+     begin              --(2701,1624,3660)
+        If dd.vidd not in (1,2,3,11,12,13) then select a.acc into L_ACC from accounts a, nd_acc n  where n.ND = DD.ND and n.acc = a.acc and a.nbs = kk.nbs  ;
+        Else                                    select a.acc into L_ACC from accounts a, nd_acc n  where n.ND = DD.ND and n.acc = a.acc and a.tip = decode ( Substr(dd.prod,1,1) , '2', 'LIM', 'SS ') ;
         end if ; 
      EXCEPTION WHEN NO_DATA_FOUND THEN update TEST_PRVN_OSA  set comm ='Рах.для збереж ЕПС НЕ знайдено' where rowid = x_RI ; RETURN ;
      end ;
@@ -883,15 +895,18 @@ begin
           end if;
 
 -------R5 = SDO = Неамортиз.Д/П~"грошовий"                  ~B5
-       ElsIf aa.tip = 'SDI' then    -- Проверка балансировки SDI 
-          SR_  := NVL(xx.b5, aa.ostc/100 ) + xx.s6 - aa.ostc/100 ;  -- расчетная сумма
-          If SR_ <> 0 or aa.ACC is null then 
+
+       ElsIf aa.tip = 'SDI' then   
+
+          If aa.ACC is null  OR  
+             aa.OSTC < xx.b5*100 and xx.b5 > 0  OR  
+             aa.OSTC > xx.b5*100 and xx.b5 <0  then   -- если нет счета или остаток уже меньше B5 , то ничего не делаем 
              goto EXIT_ ;
-             raise_application_error(-20000,'НЕКОРЕКТНІ дані про виникнення SDI в FV. Дог.'|| xx.ND );
           end if;
-          If xx.S6 <> 0  then   ACC6(6) ;    oo.nazn := 'Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;    oo.dk   := 1 ;        oo.s    := xx.s6 *100 ;   PROVODKA (x_RI, XX, OO) ; 
-          else  update TEST_PRVN_OSA   set   comm = comm||aa.tip||'-' where rowid = x_RI ;    -- Расчетное S5=0  и S6=0 => comm not null
-          end if;
+
+          ACC6(6) ;    oo.nazn := 'Амортизація '||aa.tip ||'. Дог.'|| xx.ND ;    oo.dk   := 1 ;        
+          oo.s := aa.OSTC - xx.b5*100 ;
+          PROVODKA (x_RI, XX, OO) ; 
 
 -------B7= SDA =  -- Неамортиз.Д/П~"технічний"                 ~B7
        ElsIf aa.tip = 'SDA' then  SR_  := NVL( xx.b7, aa.ostc/100 )+ xx.s8 - aa.ostc/100 ;   Del_ := xx.s7 - SR_ ;     xx.s7:= SR_;           -- балансировка SDA 
@@ -1219,26 +1234,26 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
              OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9',    0, BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,    0 )) over (partition by 1))
-                         from nbu23_rez where fdat = z_dat01 and BVuq >= 0  and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
+                         from nbu23_rez where fdat = z_dat01 and BVu >= 0 and tip not in ('SDI','SDA','SDM','SDF','SNA') and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
                           AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9000%' or id like '9122%' or id like 'DEBF%' )
                           and tipa = 3 ;
        ElsIf x.TIP = 3 and x.kv is not null THEN
              OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  , BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,    0)) over (partition by 1))
-                         from nbu23_rez where fdat = z_dat01 and BVuq >= 0  and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
+                         from nbu23_rez where fdat = z_dat01 and BVu >= 0  and tip not in ('SDI','SDA','SDM','SDF','SNA') and nd =  x.ND and ( rez9 = 0 or p_mode = 12)
                           AND ( id like 'CCK%' or id like 'MBDK%' or id like '150%' or id like '9000%' or id like '9122%' or id like 'DEBF%' )
                           and tipa = 3 and kv=x.kv ;
        ElsIf x.TIP = 9   then
              OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu, Div0( BVu , sum(BVu) over (partition by 1)), 0
-                         from nbu23_rez where fdat = z_dat01 and BVuq >= 0  and nd =  x.ND    and ( rez9 = 0 or p_mode = 12)
+                         from nbu23_rez where fdat = z_dat01 and BVu >= 0 and nd =  x.ND    and ( rez9 = 0 or p_mode = 12)
                           AND ( id like 'CACP%' or id like 'DEBF%' )      and tipa = 9 ;
 
        ElsIf x.TIP = 4   then
              OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  ,BVu )) over (partition by 1)),
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,   0)) over (partition by 1))
-                         from nbu23_rez where fdat= z_dat01 and BVuq >= 0 and ( rez9 = 0 or p_mode = 12 )
+                         from nbu23_rez where fdat= z_dat01 and BVu >= 0 and ( rez9 = 0 or p_mode = 12 )
                           and tipa = 4  and nd = x.ND  AND (id like 'W4%'  or id like 'BPK%' or id like 'DEBF%') ;
 
        ElsIf x.TIP = 10  then
@@ -1461,7 +1476,7 @@ begin
   where d.vidd in (1, 2, 3, 11, 12, 13) and d.SDATE <= l_dat31 and d.sos >=10
     and d.nd = n.nd and n.acc = LIM.acc
     and not exists ( select 1 from prvn_flow_deals_const  where nd = d.nd and acc8 = LIM.acc)
-    and nvl( substr( PRVN_FLOW.get_nls ( d.nd, 'SS ') ,5,1),'*')  <> '9'     ;
+    and nvl( substr( PRVN_FLOW.get_nls_b ( d.nd, 'SS ') ,5,1),'*')  <> '9'     ;
 
   l_rowcnt := SQL%ROWCOUNT;
 
@@ -2340,14 +2355,14 @@ begin
 end f_del_pv;
 
 ----------------------------------------
-function Get_nls  (p_nd number, p_tip accounts.tip%type )
+function Get_nls_b  (p_nd number, p_tip accounts.tip%type )
 return varchar2
 is --- получение номера лиц.счета
 begin
   for k in (select a.kv|| '/' || a.nls NLS from accounts a, nd_acc n where n.nd = p_nd and n.acc = a.acc and a.tip = p_tip
             order by decode ( dazs , null, 1,2 ) , a.acc desc   )
    loop  return  k.NLS ;   end loop; return null;
-end Get_nls;
+end Get_nls_b;
 ----------------------------------------------------------------------------
 function G_nd_acc  (p_DAT01 DATE ) return INT IS  --- =1- ND_ACC_arc берем с архива , = 0  нет, БЕРЕМ ПРЯМО ИЗ nd_acc
   l_fl int := 0 ;
@@ -3032,7 +3047,7 @@ end nos_del;
                  , 0         as SNO
                  , 0         as SNP
                  , 0         as SSP
-                 , FDAT-lag(FDAT,1,FDAT) over (order by FDAT) as DAY_QTY
+                 , FDAT-lag(FDAT,1,p_rpt_dt-1) over (order by FDAT) as DAY_QTY
                  , null, 0, 0
               bulk collect
               into agr.gen_shd
@@ -3293,21 +3308,21 @@ end nos_del;
                 then -- платіжна дата для нарахованих %%
 
                   -- override interest amount
-                  r_shd.SN := agr.sar_dtl(a).int;
-                  
-                  if ( r_shd.SN = 0 )
-                  then
-                    r_shd.SN1 := r_shd.LMT_INPT * r_shd.IR / 100 / 365 * l_day_qty;
-                  else
-                    r_shd.SN1 := 0;
-                    agr.sar_dtl(a).int := 0;
-                  end if;
-
+                  r_shd.SN  := agr.sar_dtl(a).int;
+                  r_shd.SN1 := r_shd.LMT_INPT          * r_shd.IR                / 100 / 365 * l_day_qty;
                   r_shd.SN2 := agr.sar_dtl(a).dbt_odue * agr.sar_dtl(a).sar_fine / 100 / 365 * l_day_qty;
+
+                  if ( r_shd.SN > 0 )
+                  then
+                    agr.sar_dtl(a).int := 0;
+                    bars_audit.trace( title||': r_shd.FDAT='||to_char(r_shd.FDAT,'dd/mm/yyyy')||', l_day_qty='||to_char(l_day_qty) );
+                  end if;
 
                 else
 
-                  r_shd.SN := 0;
+                  r_shd.SN  := 0;
+                  r_shd.SN1 := 0;
+                  r_shd.SN2 := 0;
 
                 end if;
 
