@@ -209,8 +209,8 @@ begin
                if l_DEB_BEZ = '1' THEN l_fin := 2; 
                else                    l_fin := 1; 
                end if; 
-               if k.cus = 2 THEN l_tip := 2;
-               else              l_tip := 1;
+               if k.cus = 2 THEN l_tip_30 := 2; l_tip := 2;
+               else              l_tip_30 := 1; l_tip := 1;
                end if; 
             end if; 
             if l_tip = 99 THEN l_tip := 2; end if;

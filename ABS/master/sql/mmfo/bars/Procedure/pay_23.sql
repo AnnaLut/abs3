@@ -54,7 +54,7 @@ oo           oper%rowtype  ;
 
 l_finevare   NUMBER ;  l_row_id14   NUMBER ;  l_row_id13   NUMBER ;  l_row_id18   NUMBER ;  l_user       NUMBER ;  l_user_id    NUMBER ;
 l_user_err   NUMBER ;  l_kat        NUMBER ;  l_rez        NUMBER ;  l_fl         NUMBER ;  l_rez_pay    NUMBER ;  l_pay        NUMBER ;
-l_rnk        NUMBER ;  l_ref        INT    ;
+l_rnk        NUMBER ;  l_ref        INT    ;  l_kf     varchar2(6);
 
 dat31_       date   ;  dat01_       date   ;  l_dat        date   ;
 
@@ -130,7 +130,7 @@ begin
       l_finevare := nvl(F_Get_Params('REZ_FINEVARE', 0) ,0);  -- резерв из FINEVARE
       if l_finevare = 1 THEN
          begin
-            select sum(nvl(rez39,0)) into l_rez from nbu23_rez where fdat=dat01_;
+            select sum(nvl(rez9,0)) into l_rez from nbu23_rez where fdat=dat01_;
          EXCEPTION WHEN NO_DATA_FOUND THEN
             z23.to_log_rez (user_id , 99 , dat01_ ,'Не завантажені данні з FINEVARE на '||dat01_);
             raise_application_error(-20007,'Не завантажені данні з FINEVARE на '||dat01_);
@@ -191,10 +191,13 @@ begin
       END;
    end if;
    dat31_ := Dat_last_work(p_dat01_ - 1);
+   l_kf := sys_context('bars_context','user_mfo');
    if mode_ = 0 THEN
       z23.to_log_rez (user_id , 17 , dat01_ ,'Начало Проводки - Реальные ');
+      dbms_application_info.set_client_info('REZ:'|| l_kf ||': Проводки - Реальные ');
    else
       z23.to_log_rez (user_id , 18 , dat01_ ,'Начало Проводки - МАКЕТ ');
+      dbms_application_info.set_client_info('REZ:'|| l_kf ||': Проводки - МАКЕТ ');
    end if;
    delete from srezerv_errors;
    if mode_ = 0 and (p_user is null or p_user = -1) THEN

@@ -1,8 +1,8 @@
+п»їprompt
+prompt РЎРёРЅС…СЂРѕРЅР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹-СЃРїСЂР°РІРѕС‡РЅРёРєР° "SREZERV_OB22"
+prompt Р”Р°С‚Р°+РІСЂРµРјСЏ СЌРєСЃРїРѕСЂС‚Р°: 12.07.2018 15:20:02
 prompt
-prompt Синхронзация таблицы-справочника "SREZERV_OB22"
-prompt Дата+время экспорта: 06.07.2018 15:01:03
-prompt
-exec bars_audit.info('Синхронзация таблицы-справочника "SREZERV_OB22" Дата+время экспорта: 06.07.2018 15:01:03  ');
+exec bars_audit.info('РЎРёРЅС…СЂРѕРЅР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹-СЃРїСЂР°РІРѕС‡РЅРёРєР° "SREZERV_OB22" Р”Р°С‚Р°+РІСЂРµРјСЏ СЌРєСЃРїРѕСЂС‚Р°: 12.07.2018 15:20:02  ');
 alter session set nls_date_format='DD.MM.YYYY HH24:MI:SS';
 alter session set NLS_NUMERIC_CHARACTERS = '. ';
 declare
@@ -23,6 +23,8 @@ exception when err then
   null;
 end;
 /
+insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
+values('2620', '0', '0', '3', '0', '2629', '01', '7702', '11', '7702', '14', 0, '1', 4.0);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
 values('2620', '0', '0', '3', '0', '2629', '02', '7702', '75', '7702', '77', 8, 'B', 4.0);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
@@ -87,8 +89,6 @@ insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_
 values('3218', '02', '0', '0', '0', '3219', '09', '7704', '05', '7704', '07', 0, '5', 3.0);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
 values('3519', '0', '0', '0', '0', '3590', '01', '7705', '02', '7705', '06', 0, '1', null);
-insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
-values('2620', '0', '0', '3', '0', '2629', '01', '7702', '11', '7702', '14', 0, '1', 4.0);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
 values('3510', '0', '0', '0', '0', '3590', '01', '7705', '02', '7705', '06', 0, '1', null);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
@@ -368,7 +368,7 @@ values('3541', '0', '0', '0', '0', '3599', '38', '7707', '06', '7707', '07', 0, 
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
 values('3710', '0', '0', '0', '0', '3599', '38', '7707', '06', '7707', '07', 0, '1', 9.0);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
-values('9000', '0', '0', '0', '0', '3690', '07', '7706', '01', '7706', '02', 0, '1', null);
+values('9000', '0', '0', '0', '0', '3690', '10', '7706', '01', '7706', '02', 0, '1', null);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)
 values('9129', '0', '0', '3', '0', '3692', '01', '7706', '11', '7706', '12', 0, '1', null);
 insert into REFSYNC_SREZERV_OB22(NBS,OB22,S080,CUSTTYPE,KV,NBS_REZ,OB22_REZ,NBS_7F,OB22_7F,NBS_7R,OB22_7R,PR,NAL,R013)

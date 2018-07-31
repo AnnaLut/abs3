@@ -399,6 +399,15 @@ end;
 /
 COMMENT ON COLUMN REZ_CR.Dat_165_not  IS 'дата останнього припинення визнання дефолту ';
 
+begin
+ execute immediate   'alter table REZ_CR add (POCI number) ';
+exception when others then
+  -- ORA-01430: column being added already exists in table
+  if SQLCODE = - 01430 then null;   else raise; end if; 
+end;
+/
+COMMENT ON COLUMN REZ_CR.POCI  IS 'Признак POCI: 1-Так, 0-Ні ';
+
 
 PROMPT *** Create  grants  REZ_CR ***
 grant SELECT                                                                 on REZ_CR          to BARS_ACCESS_DEFROLE;

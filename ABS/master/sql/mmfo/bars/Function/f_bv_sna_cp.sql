@@ -26,6 +26,11 @@ begin
    into cp_acc_, cp_accp_, cp_accd_, cp_accs_, cp_accr_, cp_accr2_, l_accr3, l_accexpr, l_accunrec, l_accexpn
    from cp_deal where ref = p_nd;
 
+   begin      
+      select  cp_acc into cp_accp_  from cp_accounts c  where  CP_ACCTYPE in ('S2') and cp_ref = p_nd;
+   EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
+   end;  
+
    for k in ( select nls, acc,  ba, ss,  nvl(SD,0), greatest(BA - sd,0) bv
               from (select acc, nls, ba, ss, round( ss * BA/ sum(BA) over (partition by 1),2) sd
                     from ( select acc, nls, -ost_korr (acc,l_dat31,null,nbs) BA,

@@ -32,7 +32,7 @@ begin
     raise_application_error(-20000, l_msg, true);
   end;
 
-  if ( nbs_<>nbsa_ and substr(nbsa_,1,3) <>'207' ) then -- кроме финансового лизинга
+  if ( nbs_<>nbsa_ and substr(nbsa_,1,3) not in ('207','204')) then -- кроме финансового лизинга
      begin
        l_msg := 'Не соответствие вида залога и бал.счета'
        ||chr(10)||dbms_utility.format_call_stack;

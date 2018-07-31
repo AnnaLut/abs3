@@ -1,9 +1,10 @@
 CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 12.4  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   19-05-2017  26-04-2017  05-04-2017  06-03-2017  03-03-2017  
+/* Версия 12.6  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   19-05-2017  
    Розрахунок кредитного ризику по ЦП
 
-21) 26-01-2018(12.5) - PD_0 - для пассивных = l_PD_0, было =0!
+22) 12-07-2018(12.6) - Новые счета ('SDI','SDA','SDM','SDF','SRR')
+21) 26-01-2018(12.5) - PD_0 - для пассивных = l , было =0!
 20) 03-01-2018(12.4) - R013='' - символьный
 19) 27-09-2017 - уточнила таблиці для опредлеления PD
 18) 21-09-2017 - Проверять 'UUDV' по всем (было по custtype=2)
@@ -40,14 +41,16 @@ CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0
  l_dv       NUMBER ;  l_CR_LGD  NUMBER ;  l_RZ        NUMBER ;  l_zal_lgd   NUMBER ;  l_fin_351 NUMBER ;  l_pd_351   NUMBER ;  
  l_fin_okpo NUMBER ;  l_s       NUMBER ;  l_lgd_51    NUMBER := 0.3;
 
- VKR_  varchar2(3);  l_txt  varchar2(1000); l_vkr  varchar2(50); l_nbs  char(4);
+ VKR_  varchar2(3);  l_txt  varchar2(1000); l_vkr  varchar2(50); l_nbs  char(4); l_kf varchar2(6);
 
  l_sdate  date;  l_dat31  date;  
 
 begin                                                                                    
    pul_dat(to_char(p_dat01,'dd-mm-yyyy'),'');
    p_BLOCK_351(p_dat01);
+   l_kf := sys_context('bars_context','user_mfo');
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Начало ЦП 351 ');
+   dbms_application_info.set_client_info('CR_351_JOB:'|| l_kf ||': ЦП 351');
    l_tipa := 15;
    l_dat31 := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    delete from REZ_CR where fdat=p_Dat01 and tipa = l_tipa;
@@ -91,6 +94,11 @@ begin
       select  acc ,    accp ,    accd ,    accs ,    accr ,    accr2 ,   accr3,   accexpr,   accunrec, accexpn
       into cp_acc_, cp_accp_, cp_accd_, cp_accs_, cp_accr_, cp_accr2_, l_accr3, l_accexpr, l_accunrec, l_accexpn
       from cp_deal where ref = d.ref;
+
+      begin      
+         select  cp_acc into cp_accp_  from cp_accounts c  where  CP_ACCTYPE in ('S2') and cp_ref = d.ref;
+      EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
+      end;  
 
       for s in (select kv, acc, rnk, NVL(nbs,SUBSTR(NLS,1,4)) NBS, tip, nls, ob22, BV, f_bv_sna_cp (p_dat01 , d.ref , acc) osta
                 from ( select kv, acc, rnk, nbs, tip, nls, nvl(ob22,'01') ob22, -ost_korr (acc,l_dat31,z23.di_,nbs)  BV from  accounts
@@ -160,7 +168,7 @@ begin
 
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);             
 
-         if s.bv > 0 THEN      
+         if s.bv > 0 and s.tip not in ('SDI','SDA','SDM','SDF')  THEN      
             for z in (select NVL(f_zal_accs (p_dat01, d.ref, a.acc),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02, 
                              f_bv_sna_cp  (p_dat01, d.ref ,a.acc) osta, m.* 
                       from   accounts a,  
@@ -233,7 +241,8 @@ begin
             select    accd, accs, accr, accunrec into l_accd, l_accs, l_accr, l_accunrec from cp_deal where ref = d.ref;
             for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV
                       from  accounts a
-                      where acc in (l_accd, l_accs, l_accr, l_accunrec) and nls not like '8%' and ost_korr(a.acc,l_dat31,null,a.nbs) > 0                   
+                      where acc in (l_accd, l_accs, l_accr, l_accunrec) and nls not like '8%' and 
+                            ost_korr(a.acc,l_dat31,null,a.nbs) <> 0 and a.tip  in ('SNA','SDI','SDA','SDM','SDF')                  
                      )
             loop
                l_nbs  := substr(i.nls,1,4);

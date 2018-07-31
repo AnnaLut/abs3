@@ -39,7 +39,7 @@ CREATE OR REPLACE PROCEDURE BARS.rezerv_23 (dat01_   in date) is
 */
 
 l_oschad   BOOLEAN;  l_commit   number:=  0 ;
-IDR_       number;   ost_nal    number;   s_kos      number;   n_n        number;   ARJK_      number;   r013_      number;   
+IDR_       number;   ost_nal    number;   s_kos      number;   n_n        number;   r013_      number;   
 rez_       number;   pv_        number;   pv_z       number;   pvz_       number;   mfo_       NUMBER;   mfou_      NUMBER;   
 freq_      number;   l_rez      number;   l_rez_30   number;   l_rezq_30  number;   l_rez_0    number;   l_rezq_0   number;   
 l_koef     number;   l_tipa     number;   l_diskont  number;   se1_       DECIMAL (24);  l_xoz_fv   number := 1; 
@@ -59,6 +59,7 @@ l_sed      customer.sed%type;
 l_zq       number;
 ND_CP_     varchar2(40);
 l_mfo      varchar2(6) ;
+l_kf       varchar2(6);
 begin
 
    mfo_ := f_ourmfo ();
@@ -85,6 +86,8 @@ begin
          l_xoz_fv := 0; -- пока не загрузили FINEVARE по хоз.дебиторке, беру REZ23
       end if;
    end if;
+   l_kf := sys_context('bars_context','user_mfo');
+   dbms_application_info.set_client_info('CR_351_JOB:'|| l_kf ||': Розподіл резерву ');
    z23.BV_upd(dat01_); -- BVu = зкориг. бал.варт на суму невизнаних дох.SDI,SNA
    ut2(dat01_); -- Процедура урегулирования дисконта/невизнаних доходів для договора в разных валютах (NBU23_REZ (DISKONT <--> REZ23)
    l_commit := 0 ;
@@ -134,8 +137,8 @@ begin
          ELSif substr(k.id,1,2)<>'RU' and (k.s250<>'8' or k.s250 is null)      THEN k.s250:='7';
          end if;
 
-         ARJK_    := 0    ; s_kos     := 0 ; ND_CP_   := k.nd ; freq_    := NULL; o_r013_1  := null ; o_se_1  := 0    ; o_comm_1 := null  ; 
-         o_r013_2 := null ; o_se_2    := 0 ; o_comm_2 := null ; l_rez_30 := 0   ; l_rezq_30 := 0    ; l_rez_0 := k.rez; l_rezq_0 := k.rezq; 
+         s_kos    := 0    ; ND_CP_   := k.nd ; freq_    := NULL; o_r013_1 := null; o_se_1    := 0 ; o_comm_1 := null ; 
+         o_r013_2 := null ; o_se_2   := 0    ; o_comm_2 := null; l_rez_30 := 0   ; l_rezq_30 := 0 ; l_rez_0  := k.rez; l_rezq_0 := k.rezq; 
 
          If l_oschad then  -- только ОЩАДБАНК
             --Тип актива
@@ -255,8 +258,8 @@ begin
                   else
                      l_koef   := -o_se_2/k.bv/100;   l_rez_30 := round(k.rez * l_koef,2);
                      l_rezq_30:= gl.p_icurval (k.kv, l_rez_30*100, dat31_)/100;
-                     l_rez_0  := greatest(k.rez  - l_rez_30  , 0);
-                     l_rezq_0 := greatest(k.rezq - l_rezq_30 , 0);
+                     l_rez_0  := k.rez  - l_rez_30  ;
+                     l_rezq_0 := k.rezq - l_rezq_30 ;
                   end if;
 /*
                   if k.nbs in ('3570','3578','3118') THEN
@@ -360,11 +363,10 @@ begin
             end;
          end if;
 
-         update nbu23_rez set idr    = idr_ , ARJK  = ARJK_  , rz      = k.rz       , cc_id    = k.cc_id    , rez    = k.rez      , rezq     = k.rezq  ,
-                              kat    = k.kat, s250  = k.s250 , nd      = k.nd       , nd_cp    = nd_cp_     , id     = k.idkod    , branch   = k.branch,
-                              rezn   = 0    , reznq = 0      , bv_30   = -o_se_2/100, custtype = k. custtype,
-                              bvq_30 = -gl.p_icurval (k.kv, o_se_2 , dat31_)/100, rez_30 = l_rez_30,rezq_30 = l_rezq_30  , tipa     = l_tipa  ,
-                              rez_0  = l_rez_0               ,rezq_0  = l_rezq_0
+         update nbu23_rez set idr    = idr_    , rz     = k.rz       , cc_id    = k.cc_id    , rez    = k.rez      , rezq   = k.rezq  , kat    = k.kat, 
+                              s250   = k.s250  , nd     = k.nd       , nd_cp    = nd_cp_     , id     = k.idkod    , branch = k.branch, rezn   = 0    , 
+                              reznq  = 0       , bv_30  = -o_se_2/100, custtype = k. custtype, bvq_30 = -gl.p_icurval (k.kv,  o_se_2  , dat31_)/100   , 
+                              rez_30 = l_rez_30,rezq_30 = l_rezq_30  , tipa     = l_tipa     ,  rez_0 = l_rez_0    , rezq_0 = l_rezq_0
          where rowid = k.RI ;
 
          l_commit :=  l_commit + 1 ;
