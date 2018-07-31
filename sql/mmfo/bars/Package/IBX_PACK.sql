@@ -109,6 +109,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
       end;
         return l_nd;
     end;
+
 ---
 
 ---функция получения НЛС транзита для расчета по картам внутри РУ 
@@ -857,8 +858,8 @@ function get_md5 (input_string varchar2) return varchar2
 --
 --общая процедура проплаты платежа(платежей)    
 --
- procedure pay_common 
-   -- переработанная pay_legal_pers  для общего платежа 
+ procedure pay_common
+   -- переработанная pay_legal_pers  для общего платежа
                          (p_trade_point in varchar2,--код терминала +МФО его
                           p_payer_name in varchar2,--наименование плательщика
                           p_pay_account in varchar2,-- счет получателя MFO.ACCOUNT.980
@@ -866,14 +867,14 @@ function get_md5 (input_string varchar2) return varchar2
                           p_receiver_name in varchar2,--наименование получателя
                           p_cash_symb in varchar2,--касовий символ
                           p_payment_purpose in varchar2,--призначення платежу
-                          p_res_code out number,       --код ответа 
-                          p_res_text out varchar2,     --текст ответа                        
+                          p_res_code out number,       --код ответа
+                          p_res_text out varchar2,     --текст ответа
                           p_receipt_num number,        --номер чека
                           p_pay_id Varchar2,           --пай его ид
-                          p_pay_amount number,         --сумма платежа 
-                          p_fee_amount number,         --сумма комиссии                          
-                          p_ref out number     
-                          ) 
+                          p_pay_amount number,         --сумма платежа
+                          p_fee_amount number,         --сумма комиссии
+                          p_ref out number
+                          )
     is
 
        l_debit_nls  oper.nlsa%type;
@@ -893,7 +894,7 @@ function get_md5 (input_string varchar2) return varchar2
        l_fee_amount   number(32);
        l_pay_id       varchar2(300);
        l_receipt_num  varchar2(220);
-       v_receiver_acc  varchar2(14);     
+       v_receiver_acc  varchar2(14);
        v_receiver_mfo  varchar2(6);
        v_receiver_curr  varchar2(3);
        v_count number;
@@ -952,23 +953,24 @@ function get_md5 (input_string varchar2) return varchar2
       from ibx_legal_pers_paym i
       where i.pay_id = l_pay_id;
           p_res_code := 102;
-          p_res_text := 'Дублюючий платіж для '||l_pay_id;   
-          return;         
+          p_res_text := 'Дублюючий платіж для '||l_pay_id;
+          return;
     exception when no_data_found then
           p_ref := null;
     end;
     --проверка МФО получателя
-    begin 
+    begin
       select 1  into v_count
-      from banks$base 
+      from banks$base
       where mfo =v_receiver_mfo;
-    exception 
-      when no_data_found then   
+    exception
+      when no_data_found then
         p_res_code := 100;
-        p_res_text := 'МФО банка отримувача  відсутне у довіднику: '||v_receiver_mfo; 
+        p_res_text := 'МФО банка отримувача  відсутне у довіднику: '||v_receiver_mfo;
         return;
     end;
-    -- 
+    
+    --
     if (p_ref is null) then
           --Оплата документа
           bc.go(l_mfo);
@@ -977,7 +979,8 @@ function get_md5 (input_string varchar2) return varchar2
           then l_tt:='TO1';
           else l_tt:='328';
         end if;
-
+--logger.info ('ibx_pack.pay_common:l_mfo = '||l_mfo||'-'||v_receiver_mfo||',date=');          
+       begin
           gl.in_doc3 (ref_    => p_ref,
                       tt_     => l_tt,
                       vob_    => 6,
@@ -1007,56 +1010,39 @@ function get_md5 (input_string varchar2) return varchar2
                       sos_    => null,
                       prty_   => 0,
                       uid_    => null);
+         --  exception when others then  
+--             logger.info ('ibx_pack.pay_common:l_mfo = '||l_mfo||'-'||v_receiver_mfo||',date='||sysdate);                     
+         end;             
           --Добавляем в доп. реквезит документа номер чека ТОМАС
         insert into OPERW ( REF, TAG, VALUE ) values ( p_ref, 'NUMCH', l_receipt_num );
-
---
-        begin
+        
+         begin
           select ac.nls, ac.nms
             into l_trans_2902, l_trans_2902_nm
             from accounts ac
-           where ac.nls = get_tp_param(l_trade_point,'TRANS_ACC') 
+           where ac.nls = get_tp_param(l_trade_point,'TRANS_ACC')
              and ac.kv = v_receiver_curr
              and ac.dazs is null
              and ac.kf = l_mfo
              and ac.branch = ibx_pack.get_tp_param(l_trade_point,'TRANS_BR');
-        exception
+         exception
           when no_data_found then
             p_res_code := 101;
             p_res_text := 'Счет TRANS_ACC для устройства Томас не найден';
             return;
-        end;
-
-        if substr(l_acc_tip,1,2) = 'W4' then --если карточный счет
-           --добавляем в доп. реквизит документа сообщение для СМ 
-          insert into OPERW ( REF, TAG, VALUE ) values ( p_ref, 'W4MSG', 'PAYTOMAS' );        
-          l_trans_2902:= get_trans_nls(v_receiver_acc);  
-        end if;
-
-
-
-          paytt ( flg_ => 0,
-                  ref_ => p_ref,
-                 datv_ => l_bdate,
-                   tt_ => l_tt,
-                  dk0_ => l_dk,
-                  kva_ => v_receiver_curr,
-                 nls1_ => l_debit_nls,
-                   sa_ => l_pay_amount + l_fee_amount,
-                  kvb_ => v_receiver_curr,
-                 nls2_ => l_trans_2902,
-                   sb_ => l_pay_amount + l_fee_amount );
-
+         end;        
+         
+------------если есть комисиия
            if (l_fee_amount > 0) then
               begin
                 select ac.nls
                 into l_6110
                 from accounts ac
-               where ac.nls =  ibx_pack.get_tp_param(l_trade_point,'FEE_ACC') 
+               where ac.nls =  ibx_pack.get_tp_param(l_trade_point,'FEE_ACC')
                  and ac.kf = l_mfo
                  and ac.kv =v_receiver_curr
                  and ac.dazs is null
-                 and ac.branch=ibx_pack.get_tp_param(l_trade_point,'FEE_BR');  
+                 and ac.branch=ibx_pack.get_tp_param(l_trade_point,'FEE_BR');
               exception
                when no_data_found then
                 p_res_code := 101;
@@ -1075,11 +1061,23 @@ function get_md5 (input_string varchar2) return varchar2
                      nls2_ => l_6110,
                        sb_ => l_fee_amount);
            end if;
+--------------------------------------
 
-         if (l_mfo != v_receiver_mfo) then
-                select get_proc_nls('T00',980)
-                  into l_nls_t00
-                  from dual;
+        if (l_mfo != v_receiver_mfo) then --разные РУ  
+               select get_proc_nls('T00',980)into l_nls_t00 from dual;
+
+                 paytt ( flg_ => 0,
+                  ref_ => p_ref,
+                 datv_ => l_bdate,
+                   tt_ => l_tt,
+                  dk0_ => l_dk,
+                  kva_ => v_receiver_curr,
+                 nls1_ => l_debit_nls,
+                   sa_ => l_pay_amount + l_fee_amount,
+                  kvb_ => v_receiver_curr,
+                 nls2_ => l_trans_2902,
+                   sb_ => l_pay_amount + l_fee_amount );
+                                  
                 paytt ( flg_ => 0,
                         ref_ => p_ref,
                        datv_ => l_bdate,
@@ -1093,10 +1091,38 @@ function get_md5 (input_string varchar2) return varchar2
                          sb_ => l_pay_amount );
 
                 gl.pay( 2,p_ref,l_bdate);
-    --отправка по СЕП 
-       pay_to_sep (p_ref=>p_ref ,p_trans_nls=>l_trans_2902,p_pay_amount=>l_pay_amount,p_trans_nm=>l_trans_2902_nm );
-
-       else
+                --отправка по СЕП
+                pay_to_sep (p_ref=>p_ref ,p_trans_nls=>l_trans_2902,p_pay_amount=>l_pay_amount,p_mfo_term=>l_mfo );
+               
+       else --- одно РУ
+        --Достаем тип счета получателя  
+logger.info('ibx_pack.pay_common:l_mfo = v_receiver_mfo');        
+          begin 
+           select tip into l_acc_tip from accounts a where a.nls=v_receiver_acc;  
+          exception 
+          when no_data_found then  
+            p_res_code := 102;
+            p_res_text := 'Рахунок отримувача не знайдено';
+            return;
+          end ;
+      
+        if substr(l_acc_tip,1,2) = 'W4' then --если карточный счет
+           --добавляем в доп. реквизит документа сообщение для СМ
+          insert into OPERW ( REF, TAG, VALUE ) values ( p_ref, 'W4MSG', 'PAYTOMAS' );
+          l_trans_2902:= get_trans_nls(v_receiver_acc);                                                                    
+                paytt ( flg_ => null,
+                        ref_ => p_ref,
+                       datv_ => l_bdate,
+                         tt_ => l_tt,
+                        dk0_ => l_dk,
+                        kva_ => v_receiver_curr,
+                       nls1_ => l_debit_nls,
+                         sa_ => l_pay_amount,
+                        kvb_ => v_receiver_curr,
+                       nls2_ =>  l_trans_2902,
+                         sb_ => l_pay_amount);
+                gl.pay( 2, p_ref,l_bdate); 
+         else       
                 paytt ( flg_ => null,
                         ref_ => p_ref,
                        datv_ => l_bdate,
@@ -1108,20 +1134,21 @@ function get_md5 (input_string varchar2) return varchar2
                         kvb_ => v_receiver_curr,
                        nls2_ => v_receiver_acc,
                          sb_ => l_pay_amount);
-                gl.pay( 2, p_ref,l_bdate);
-         end if;
+                gl.pay( 2, p_ref,l_bdate);                 
+           end if;       
+        end if;
 
-         insert into ibx_legal_pers_paym (pay_id, ref)
-         values (l_pay_id, p_ref);
+        insert into ibx_legal_pers_paym (pay_id, ref)
+        values (l_pay_id, p_ref);
        end if;
     commit;
+    
     exception when others then
        p_res_code := 101;
        p_res_text := sqlerrm;
        rollback;
-  
-  end pay_common;
-----------------------------------------------------------------
+
+  end pay_common;----------------------------------------------------------------
 --Пакетная проверка платежа на счет (ACT=30, service_id=TOMAS4)
 -- 
  procedure Pay_30 (  p_params  in clob,  -- XML c входящими параметрами
