@@ -75,7 +75,10 @@
    --1-for-all  - Обмен между веб-сервисом и БД                 
    procedure ExchangeData (p_params  in clob, p_result  out clob );
    --межфилиальній платеж через СЕП
-   procedure pay_to_sep (p_ref in oper.ref%type,p_trans_nls oper.nlsb%type,p_trans_nm accounts.nms%type,p_pay_amount number );
+   procedure pay_to_sep ( p_ref in oper.ref%type
+                       ,p_trans_nls oper.nlsb%type
+                       ,p_pay_amount number
+                       ,p_mfo_term accounts.kf%TYPE);
 end ibx_pack;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
@@ -697,7 +700,8 @@ function get_md5 (input_string varchar2) return varchar2
             return;
         end;
        -- отправка через СЕП
-        pay_to_sep (p_ref =>l_ref ,p_trans_nls=>l_trans,p_pay_amount=>l_pay_amount,p_trans_nm =>l_trans_nm );       
+
+          pay_to_sep (p_ref =>l_ref ,p_trans_nls=>l_trans,p_pay_amount=>l_pay_amount,p_mfo_term=>l_mfo_term);
 
   end if ;   
        --Добавляем в доп. реквезит документа номер чека ТОМАС
