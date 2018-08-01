@@ -7,7 +7,7 @@ namespace BarsWeb.Areas.CreditUi.Models
     public class AfterParams
     {
         public decimal nd { get; set; } 
-        public decimal prod { get; set; }
+        public string prod { get; set; }
         public decimal fin { get; set; }
         public string inic { get; set; }
         public string flags { get; set; }
