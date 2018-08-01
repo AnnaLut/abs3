@@ -1,3 +1,18 @@
-=========  svn diff --summarize -r 61884:61886 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.10\mmfo\web\barsroot\version.abs
-Bugfix_2.0.45.0.10 (Rev:61884-61886
+=========  svn diff --summarize -r 61783:61926 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Infrastructure\Helpers\ImportToFileHelper.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Kernel\Infrastructure\Extentions\ReaderExtentions.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Kernel\Infrastructure\Extentions
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Pfu\Infrastructure\Repository\DI\Implementation\PfuToolsRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Pfu\Models\Grids\PensionerType.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Reporting\Infrastructure\Repository\DI\Abstract\INbuRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Reporting\Infrastructure\Repository\DI\Implementation\NbuRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Reporting\Controllers\Api\NbuController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Reporting\Controllers\NbuController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Areas\Reporting
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Bars.CommonModels\ExternUtilsModels\ColumnDesc.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Bars.CommonModels\ExternUtilsModels
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot\App_Code\Bars.CommonModels
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.11\mmfo\web
+Bugfix_2.0.45.0.11 (Rev:61783-61926
