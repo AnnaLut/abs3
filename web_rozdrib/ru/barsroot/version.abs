@@ -1,7 +1,9 @@
-=========  svn diff --summarize -r 61945:61955 D:\SVN\master\web\ru
+=========  svn diff --summarize -r 61883:61955 D:\SVN\master\web\ru
 ---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web\barsroot\version.abs
 ---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web\barsroot\App_Code\Areas\CreditUi\Models\AfterParams.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web\barsroot\App_Code\Areas\Pfu\Infrastructure\Repository\DI\Implementation\PfuToolsRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web\barsroot\App_Code\Areas\Pfu\Models\Grids\PensionerType.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web\barsroot\App_Code\Areas
 ---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web\barsroot
 ---web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.19.1\ru\web
-Bugfix_2.1.44.1.19.1 (Rev:61945-61955
+Bugfix_2.1.44.1.19.1 (Rev:61883-61955
