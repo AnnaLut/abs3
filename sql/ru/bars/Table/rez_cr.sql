@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/REZ_CR.sql =========*** Run *** ======
 PROMPT ===================================================================================== 
@@ -18,6 +16,13 @@ BEGIN
           '; 
 END; 
 /
+
+begin 
+  execute immediate 'DROP INDEX BARS.I3_REZ_CR_FDAT_RNK';
+exception when others then 
+  if sqlcode in (-06512,-01418) then null; else raise; end if;
+end;
+/      
 
 PROMPT *** Create  table REZ_CR ***
 begin 
@@ -296,7 +301,7 @@ begin
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND ';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+  if  sqlcode in (-955)  then null; else raise; end if;
  end;
 /
 
