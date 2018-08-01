@@ -22,7 +22,7 @@
 ---
 -- Получение сумы %% к оплате
 --
- /*function  Int_for_pay (p_nd number) return number;*/
+ 
 
    type varchar2_list_pck is table of varchar2(4000) index by binary_integer;
 
@@ -83,7 +83,7 @@ end ibx_pack;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
   -- ================================== Константы ===============================================
-  g_body_version constant varchar2(64) := 'version 2.2.1 22.05.2018'; 
+  g_body_version constant varchar2(64) := 'version 2.2.2 30.05.2018'; 
 
   -- ===============================================================================================
   -- header_version - возвращает версию заголовка пакета
@@ -715,11 +715,11 @@ function get_md5 (input_string varchar2) return varchar2
  end;
  
  --процедура отправки платежа через CЕП для межфилиала
- procedure pay_to_sep (
+procedure pay_to_sep (
                         p_ref in oper.ref%type
-                       ,p_trans_nls oper.nlsb%type
-                       ,p_trans_nm accounts.nms%type
-                       ,p_pay_amount number                       
+                       ,p_trans_nls oper.nlsb%type                      
+                       ,p_pay_amount number
+                       ,p_mfo_term accounts.kf%TYPE
                        )
    is
        err_   NUMBER;    -- Return code
@@ -746,6 +746,7 @@ function get_md5 (input_string varchar2) return varchar2
        sos_   NUMBER;
        refA_  VARCHAR2(9);
        prty_  NUMBER;
+       l_trans_nms  accounts.nms%type;
  begin
   SELECT mfoa, nlsa, mfob, nlsb, dk, s, vob, nd, kv,
          datd, datp, nam_a, nam_b, nazn, id_a, id_b,
@@ -762,16 +763,30 @@ function get_md5 (input_string varchar2) return varchar2
            nazns_ := '10';
           END IF;
        end if;
-       
+
+----------------
+       begin
+          select ac.nms
+            into l_trans_nms
+            from accounts ac
+           where ac.nls = p_trans_nls
+             and ac.dazs is null
+             and ac.kf = p_mfo_term;
+        exception
+          when no_data_found then 
+            raise;
+            return;
+        end;
+----------------
+
        logger.info('ibx_pack.pay_to_sep.sep.in_sep DATP='||to_char(datP_,'dd.mm.yyyy')||' DATD='||to_char(datD_,'dd.mm.yyyy')||' p_ref='||to_char(p_ref));
-       
+
        sep.in_sep(err_,rec_,mfoa_,p_trans_nls,mfob_,nlsb_,dk_,p_pay_amount,
-                  vob_,nd_,kv_,datD_,datP_,substr(p_trans_nm,1,38),nam_b_,nazn_,
+                  vob_,nd_,kv_,datD_,datP_,substr(l_trans_nms,1,38),nam_b_,nazn_,
                   NULL,nazns_,id_a_,id_b_,'******',refA_,0,'0123',
                   NULL,NULL,datA_,d_rec_,0,p_ref,0);
-             
- end pay_to_sep;
- 
+
+ end pay_to_sep; 
  
 
  procedure ins_log_xml(p_in_xml clob, p_out_xml clob, p_ref varchar2) is
@@ -1954,6 +1969,7 @@ response
                           ) ;
 
       l_head_node1 := dbms_xmldom.appendchild(l_head_node0, dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc,'transaction')));
+
    if v_status_code in (22,102) then 
      add_txt_node_utl( l_domdoc,l_head_node1,'pay_id',v_pay_id);
      add_txt_node_utl( l_domdoc,l_head_node1,'ref',v_ref);
@@ -1964,6 +1980,7 @@ response
      add_txt_node_utl( l_domdoc,l_head_node1,'status_code',to_char(v_status_code));                      
      add_txt_node_utl( l_domdoc,l_head_node1,'description',v_comment);
    end if;     
+
    End Loop;
      add_txt_node_utl( l_domdoc,l_head_node,'service_id','TOMAS3');
      add_txt_node_utl( l_domdoc,l_head_node,'time_stamp',to_char(sysdate,'dd.mm.yyyy HH24:MI:SS'));     
