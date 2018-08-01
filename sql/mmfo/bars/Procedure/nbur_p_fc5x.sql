@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 5СX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  17/07/2018 (21/06/2018)
+% VERSION     :  v.1.002  01/08/2018 (17/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.000  21/06/2018';
+  ver_              char(30)  := 'v.1.002  01/08/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_old_file_code   constant varchar2(3 char) := '#C5';
   c_sleep_time      constant number := 30; --Время ожидания между тактами проверки
@@ -90,14 +90,14 @@ BEGIN
             , p_kod_filii /*nbuc*/
             , l_version_id /*version_id*/
             , case
-                when t.seg_d in ('1', '2') and (kl.i010 = 'F2') then 'AС5F20'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'F3') then 'AС5F30'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'F4') then 'AС5F40'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'F5') then 'AС5F50'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'F7') then 'AС5F70'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'F8') then 'AС5F80'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'N1') then 'AС5N10'
-                when t.seg_d in ('1', '2') and (kl.i010 = 'N9') then 'AС5N90'                                                                            
+                when t.seg_d in ('1', '2') and (kl.i010 = 'F2') then 'AC5F20'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'F3') then 'AC5F30'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'F4') then 'AC5F40'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'F5') then 'AC5F50'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'F7') then 'AC5F70'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'F8') then 'AC5F80'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'N1') then 'AC5N10'
+                when t.seg_d in ('1', '2') and (kl.i010 = 'N9') then 'AC5N90'  
               end /*ekp*/
             , '1' /*a012*/
             , t.seg_d /*t020*/
