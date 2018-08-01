@@ -8,9 +8,10 @@ using System.Text;
 using System.Net;
 using BarsWeb.Core.Logger;
 using Ninject;
+using System.IO;
 
 namespace BarsWeb.Areas.Reporting.Controllers
-{ 
+{
     /// <summary>
     /// Advertising on tickets
     /// </summary>
@@ -20,7 +21,7 @@ namespace BarsWeb.Areas.Reporting.Controllers
     public class NbuController : ApplicationController
     {
         const string DETAILED_FILE = "nbu.xlsx";
-
+        const string DETAILED_ARCHIVE = "nbu.zip";
         private readonly INbuRepository _repository;
         [Inject]
         public IDbLogger Logger { get; set; }
@@ -28,7 +29,7 @@ namespace BarsWeb.Areas.Reporting.Controllers
         {
             _repository = repository;
         }
-        public ActionResult Index() 
+        public ActionResult Index()
         {
             return View();
         }
@@ -37,7 +38,7 @@ namespace BarsWeb.Areas.Reporting.Controllers
             var bytesFileCodeBase64 = Convert.FromBase64String(fileCodeBase64);
             string fileCode = Encoding.UTF8.GetString(bytesFileCodeBase64);
             var structure = _repository.GetReportStructure(fileCode, schemeCode);
-            
+
             var result = new Utils().ConvertReportStructureToFields(structure);
             return Content(result);
         }
@@ -110,38 +111,38 @@ namespace BarsWeb.Areas.Reporting.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         // return ArchiveGrid 
-        public ActionResult GetArchiveGrid(string fileCodeBase64,string kf,string reportDate)
+        public ActionResult GetArchiveGrid(string fileCodeBase64, string kf, string reportDate)
         {
             if (string.IsNullOrEmpty(fileCodeBase64) || fileCodeBase64 == "undefined")
             {
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                return Content("немає кода файла"); 
+                return Content("немає кода файла");
             }
             Logger.Debug("begin GetArchiveGrid");
-            byte[] bytesFileCodeBase64 ;
+            byte[] bytesFileCodeBase64;
             string fileCode = "";
-           var result = new JsonResult();
+            var result = new JsonResult();
             try
             {
-                if(!string.IsNullOrEmpty(fileCodeBase64))
+                if (!string.IsNullOrEmpty(fileCodeBase64))
                 {
-                     bytesFileCodeBase64 = Convert.FromBase64String(fileCodeBase64);
+                    bytesFileCodeBase64 = Convert.FromBase64String(fileCodeBase64);
                     fileCode = Encoding.UTF8.GetString(bytesFileCodeBase64);
                 }
-                   
-            var data = _repository.ArchiveGrid(fileCode, kf, reportDate); // need to add!!!
-            Logger.Debug("return data:    " + data.ToString());
+
+                var data = _repository.ArchiveGrid(fileCode, kf, reportDate); // need to add!!!
+                Logger.Debug("return data:    " + data.ToString());
                 return Json(data, JsonRequestBehavior.AllowGet);
                 //result.status = JsonResponseStatus.Ok;
             }
             catch (Exception e)
             {
-                
+
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                return Content(e.Message); 
-                
+                return Content(e.Message);
+
             }
-           // return Json(result, JsonRequestBehavior.AllowGet);
+            // return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetVersions(string fileCodeBase64, string reportDate, string kf)
@@ -204,21 +205,29 @@ namespace BarsWeb.Areas.Reporting.Controllers
 
             if (string.IsNullOrEmpty(fName) || !System.IO.File.Exists(fName))
             {
-                throw new Exception(string.Format("Файл не знайдено {0}", fName));
+                return File(Encoding.UTF8.GetBytes(string.Format("Файл не знайдено {0}", fName)), "text/plain", "ExceptionGetFile.txt");
             }
-
-            byte[] fileBytes = System.IO.File.ReadAllBytes(fName);
             try
             {
-                System.IO.File.Delete(fName);
+                string ext = fName.Substring(fName.LastIndexOf('.'));
+                if (ext != ".zip")
+                    return File(System.IO.File.ReadAllBytes(fName), "attachment", DETAILED_FILE);
+                else
+                    return File(System.IO.File.ReadAllBytes(fName), "application/zip", DETAILED_ARCHIVE);
+
             }
             catch (Exception ex)
             {
                 Logger.Exception(ex);
                 Logger.Error("GetExcel (reporting/nbu/getexcel): " + ex.Message);
+                return File(Encoding.UTF8.GetBytes(ex.Message), "text/plain", "ExceptionGetFile.txt");
+            }
+            finally
+            {
+                System.IO.File.Delete(fName);
+
             }
 
-            return File(fileBytes, "attachment", DETAILED_FILE);          
         }
-    }    
+    }
 }

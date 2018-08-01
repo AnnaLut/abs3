@@ -13,7 +13,7 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Abstract
         /// </summary>
         /// <returns></returns>
         IEnumerable<RepStructure> GetReportStructure(string fileCode, string schemeCode);
-
+        Bars.Oracle.Factories.OracleConnectFactory GetOracleConnector { get; }
         NburListFromFinished GetNburListFromFinished(string fileCode, string reportDate, string kf, decimal? versionId = null);
         /// <summary>
         /// Get report data
@@ -100,7 +100,7 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Abstract
         string GetViewName(string fileCode, bool isDtl);
         List<AllColComments> GetTableComments(string tableName);
         List<TableInfo> GetTableInfo(string tableName);
-        List<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn, string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc);
+        IEnumerable<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn, string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc,bool isDtl);
         string GetFileFmt(string fileCode, bool isDtl);
         string GetChkLog(string fileCode, string reportDate, string kf, string schemeCode, decimal? versionId = null);
     }
