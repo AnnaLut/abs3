@@ -9,6 +9,7 @@ using System.IO;
 using Bars.DocPrint;
 using System.Text;
 
+
 namespace Bars.WebServices.XRM.Services.SKRN
 {
     public static class SkrnWorker
