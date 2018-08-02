@@ -4,6 +4,7 @@ declare
   l_file_code   nbur_ref_files.file_code%type;
   l_proc_id     nbur_ref_procs.id%type;
 begin
+bc.home;
 
   l_file_code := 'D4X';
 
@@ -49,7 +50,7 @@ begin
   NBUR_FILES.SET_FILE_PROC
   ( p_proc_id => l_proc_id
    , p_file_id => l_file_id
-   , p_proc_type => 'F'
+   , p_proc_type => 'O'
    , p_proc_active => 'Y'
    , p_scheme => 'BARS'
    , p_proc_name => 'NBUR_P_FD4X_NC'
@@ -64,18 +65,18 @@ begin
   , p_obj_id  => null
   , p_strt_dt => date '2015-01-01'
   );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ACCOUNTS')
-  , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_CUSTOMERS')
-  , p_strt_dt => date '2015-01-01'
-  );
+--
+--  NBUR_FILES.SET_OBJECT_DEPENDENCIES
+--  ( p_file_id => l_file_id
+--  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ACCOUNTS')
+--  , p_strt_dt => date '2015-01-01'
+--  );
+--
+--  NBUR_FILES.SET_OBJECT_DEPENDENCIES
+--  ( p_file_id => l_file_id
+--  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_CUSTOMERS')
+--  , p_strt_dt => date '2015-01-01'
+--  );
 
   NBUR_FILES.SET_FILE_DEPENDENCIES
   ( p_file_id  => l_file_id
