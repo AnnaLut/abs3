@@ -1,4 +1,3 @@
-
 exec bc.home;
 
 declare
@@ -62,14 +61,16 @@ begin
                               , p_date_start => trunc(sysdate,'YYYY')
                           );
 
---  update NBUR_REF_FILES
---     set    FILE_CODE_ALT = l_file_code
---   where ID = r_file.ID;
+  NBUR_FILES.SET_OBJECT_DEPENDENCIES
+  ( p_file_id => l_file_id
+  , p_obj_id  => null
+  , p_strt_dt => date '2015-01-01'
+  );
 
-   NBUR_FILES.SET_FILE_DEPENDENCIES
-       ( p_file_id  => l_file_id
-       , p_file_pid => r_file.ID
-       );
+  NBUR_FILES.SET_FILE_DEPENDENCIES
+  ( p_file_id  => l_file_id
+  , p_file_pid => r_file.ID
+  );
 
 end;
 /

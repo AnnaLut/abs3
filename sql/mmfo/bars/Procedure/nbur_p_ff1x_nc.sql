@@ -13,51 +13,12 @@ create or replace procedure nbur_p_ff1x_nc(
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования #73X для схема "C"
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    30.03.2018
+% VERSION     :   30/07/2018 (30.03.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
-
-   P_FF1_NN ( p_report_date, 'C', 'X');
-
-
-  insert
-    into NBUR_DETAIL_PROTOCOLS
-       ( REPORT_DATE, KF, REPORT_CODE, NBUC,
-         FIELD_CODE,
-         FIELD_VALUE, DESCRIPTION
-       , ACC_ID, ACC_NUM, KV, MATURITY_DATE, CUST_ID, REF, ND, BRANCH )
-  select p_report_date, p_kod_filii, 'F1X', nvl(trim(nbuc), '26'),
-         (case when substr(kodp,2,2) ='11'  then 'AF1001'
-               when substr(kodp,2,2) ='12'  then 'AF1002'
-               when substr(kodp,2,2) ='41'  then 'AF1003'
-               when substr(kodp,2,2) ='42'  then 'AF1004'
-               else 'AF1000'
-           end )
-         ||substr(kodp,4,7),
-         nvl(znap, ' '), COMM
-       , ACC, NLS, KV, MDATE, RNK, REF, ND, TOBO
-    from RNBU_TRACE;
-
-  commit;
-
-      insert
-        into NBUR_AGG_PROTOCOLS
-           ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE )
-      select p_report_date, p_kod_filii, 'F1X', nvl(trim(nbuc), '26'),
-             (case when substr(kodp,2,2) ='11'  then 'AF1001'
-                   when substr(kodp,2,2) ='12'  then 'AF1002'
-                   when substr(kodp,2,2) ='41'  then 'AF1003'
-                   when substr(kodp,2,2) ='42'  then 'AF1004'
-                   else 'AF1000'
-               end)   ||substr(kodp,4,7),
-             SUM(to_number(znap))
-       from RNBU_TRACE
-      group by nvl(trim(nbuc), '26'), kodp;
-
-  commit;
-
+  NBUR_P_FF1X (p_kod_filii, p_report_date, p_form_id, 'C');
 end nbur_p_ff1X_nc;
 /
 
