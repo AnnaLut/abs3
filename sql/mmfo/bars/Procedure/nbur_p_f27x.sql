@@ -9,9 +9,9 @@ is
 % DESCRIPTION : Процедура формирования 27X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.100  25/06/2018
+% VERSION     :  v.1.101  31/07/2018 (25/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.100  25/06/2018';
+  ver_          char(30)  := 'v.1.101  31/07/2018';
   c_title       varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   l_nbuc        varchar2(20);
@@ -209,7 +209,7 @@ BEGIN
                         , t.kv
                         , t.cust_id_cr as cust_id
                         , t.ref as ref
-                        , nvl(round((z.s2 / l_koef), 0), 0) as bal
+                        , t.bal
                  from   nbur_dm_transactions t
                         left join zayavka z on (t.ref = z.refoper)
                                                and (z.dk = 2)
