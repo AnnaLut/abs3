@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования E8X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001  27.03.2018
+% VERSION     :  v.18.002  31/07/2018 (04.04.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.001  04.04.2018';
+  ver_                     char(30)  := 'v.18.002  31.07.2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -254,34 +254,41 @@ BEGIN
             (
               select /*+ MATERIALIZE */ 
                      g.cust_id
-                     , case when g.cust_type in (1, 3) then 'Фізична особа' else coalesce(g.cust_bank_name, g.cust_name) end as Q001 --010 - назва кредитора
+                     , case when g.cust_type in (3, 4) then 'Фізична особа' else coalesce(g.cust_bank_name, g.cust_name) end as Q001 --010 - назва кредитора
                      , case when g.k030 = 2 and length(trim(g.kod_okpo)) > 8 then g.kod_okpo end as Q029 --019 - код кредитора – нерезидента
                      , case when (p_report_date <= date '2013-08-31' or p_report_date > date '2014-09-29') then decode(g.k030, 1, g.k074, '2') end as K074 --021 - код інституційного сектору економіки                 
                      , nvl(decode(g.k030, 1, g.k110), '00000') as K110 --025 - код виду економічної діяльності кредитора                 
                      , g.K040 as K040 --050 - код країни кредитора
-                     , case when g.k030 = '2' or g.cust_type in (1, 3) then '#' else nvl(to_char(g.region_code), '#') end as KU_1 --055 - код регіону кредитора
+                     , case when g.k030 = '2' or g.cust_type = 3 then '#' else nvl(to_char(g.region_code), '#') end as KU_1 --055 - код регіону кредитора
                      , lpad(to_char(g.k060), 2, '0') as Q020 --060 - код або перелік кодів типу пов’язаної з банком особи         
                      , g.kod_okpo as K020 --ZZZZZZZZZZ --код (номер) кредитора за параметром K020 (пункт 9 додатку 2 до Правил організації статистичної звітності, що подається до НБУ)
-                     , to_char(decode(g.cust_type, 1, 3, 2, 1, 3, 2)) as K014 --206 - ознака кредитора 
+                     , to_char((case when g.cust_type = 4 then '2' when g.cust_type = 3 then '3' else '1' end)) as K014 --206 - ознака кредитора 
                      , g.K021 as K021 --A --ознака ідентифікаційного коду/реєстраційного коду/номеру                                       
               from   (
                         select 
                                t.*
                                , case
+                                   -- банки
                                    when t.cust_type = 1 and t.k030 = 1 then lpad(t.cust_bank_id, 10, '0')
                                    when t.cust_type = 1 and t.k030 = 2 then lpad(t.cust_bank_id, 10, '0')
-                                   when t.cust_type = 2 and t.k030 = 1 then decode(t.valid_cust_code_flg, 1, t.cust_code, lpad(t.cust_id, 10, '0'))          
-                                   when t.cust_type = 2 and t.k030 = 2 then decode(t.valid_cust_code_flg, 1, t.cust_code, 'I' || lpad(trim(t.cust_id), 9, '0'))
+                                   -- юридичні особи
+                                   when t.cust_type in (2, 4) and t.k030 = 1 then decode(t.valid_cust_code_flg, 1, t.cust_code, lpad(t.cust_id, 10, '0'))          
+                                   when t.cust_type in (2, 4) and t.k030 = 2 then decode(t.valid_cust_code_flg, 1, t.cust_code, 'I' || lpad(trim(t.cust_id), 9, '0'))
+                                   -- фізичні особи
                                    when t.cust_type = 3 and t.k030 = 1 then decode(t.valid_cust_code_flg, 1, t.cust_code, decode(t.personal_exist_flg, 1, lpad(t.passport, 10, '0'), lpad(t.cust_id, 10, '0')))
                                    when t.cust_type = 3 and t.k030 = 2 then decode(t.valid_cust_code_flg, 1, t.cust_code, decode(t.personal_exist_flg, 1, 'I' || lpad(t.passport, 9, '0'), 'I' || lpad(to_char(t.cust_id), 9, '0')))
                                  end as kod_okpo                 
                                , case
+                                   when t.k021p is not null and t.k021p in ('1','2','3','4','6','7','8','9','A','B','C','D','E','G') then t.k021p
+                                   -- банки
                                    when t.cust_type = 1 and t.k030 = 1 then '3'
                                    when t.cust_type = 1 and t.k030 = 2 then '4'
+                                   -- юридичні особи
                                    when t.cust_type = 2 and t.k030 = 1 then DECODE(t.valid_cust_code_flg, 1, DECODE(t.k070, '13110', 'G', '13120', 'G', '13131', 'G', '13132', 'G', '1' ), 'E') 
                                    when t.cust_type = 2 and t.k030 = 2 then DECODE(t.valid_cust_code_flg, 1, '1', '9') 
-                                   when t.cust_type = 3 and t.k030 = 1 then DECODE(t.valid_cust_code_flg, 1, '2', DECODE(t.personal_exist_flg, 1, '6', '9'))
-                                   when t.cust_type = 3 and t.k030 = 2 then DECODE(t.valid_cust_code_flg, 1, '2', DECODE(t.personal_exist_flg, 1, 'B', '9'))                                                                                                                                                                                
+                                   -- фізичні особи
+                                   when t.cust_type in (3, 4) and t.k030 = 1 then DECODE(t.valid_cust_code_flg, 1, '2', DECODE(t.personal_exist_flg, 1, '6', '9'))
+                                   when t.cust_type in (3, 4) and t.k030 = 2 then DECODE(t.valid_cust_code_flg, 1, '7', DECODE(t.personal_exist_flg, 1, 'B', '9'))                                                                                                                                                                                
                                  end as K021 --A --ознака ідентифікаційного коду/реєстраційного коду/номеру                                           
                         from   (
                                   select 
@@ -294,12 +301,14 @@ BEGIN
                                          , cust.k110
                                          , cust.k040
                                          , cust.k060
+                                         , trim(z.value) k021p
                                          , p.ser as cust_doc_serial
                                          , p.numdoc as cust_doc_number
                                          , to_char(nvl(obl.ko, l_branch_region_code)) as region_code
                                          , coalesce(rc.nb, rcb.name) as cust_bank_name
-                                         , coalesce(cb.alt_bic, to_char(rc.glb), '0') as cust_bank_id         
-                                         , DECODE (cust.cust_type, 1, 2, 2, 2, DECODE (cust.k051, '91', 3, 1)) as cust_type
+                                         , coalesce(cb.alt_bic, to_char(rc.glb), '0') as cust_bank_id 
+                                         -- 1 - банк, 2 - юр.особа, 3 - фіз.особа, 4 - підприємець (що може відноситись в одних випадках до ЮО, а в інших - до ФО)          
+                                         , DECODE (cust.cust_type, 1, 1, 2, 2, DECODE (cust.k051, '91', 4, 3)) as cust_type
                                          , (case when trim(translate(cust.cust_code, '09', '  ')) is null then 0 else 1 end) as valid_cust_code_flg
                                          , (case when p.rnk is null then 0 else 1 end) as personal_exist_flg
                                          , substr(replace(trim(p.ser), ' ', '') || NVL(p.numdoc, '000000'), 1, 10) as passport    
@@ -310,7 +319,8 @@ BEGIN
                                          left join kodobl_reg obl on (cust.tax_reg_id = obl.c_reg)
                                          left join custbank cb on (cb.rnk = cust.cust_id)
                                          left join rcukru rc on (cb.mfo = rc.mfo)
-                                         left join rc_bnk rcb on (trim(cb.alt_bic) = rcb.b010)                                            
+                                         left join rc_bnk rcb on (trim(cb.alt_bic) = rcb.b010)    
+                                         left join customerw z on (cust.cust_id = z.rnk and z.tag = 'K021')                                        
                                   where  cust.report_date = p_report_date
                                          and cust.kf = p_kod_filii
                                ) t
