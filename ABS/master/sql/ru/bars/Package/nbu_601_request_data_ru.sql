@@ -1176,7 +1176,8 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         begin
         execute immediate 'alter table NBU_PLEDGE_DEP truncate partition for (''' || kf_ || ''') reuse storage';
         end;
-     for n in (select distinct ac.rnk,ac.acc,'' as ordernum, p.cc_idz as numberpledge,p.sdatz as pledgeday, (select s031  from cc_pawn cp where cp.pawn=p.pawn) as s031 , ac.kv as r030,
+     for n in (select distinct ac.rnk,ac.acc,'' as ordernum, nvl(case when p.cc_idz like '%\%' then replace (p.cc_idz,'\','\\')else p.cc_idz end,'á\\í') as numberpledge,
+					p.sdatz as pledgeday, (select s031  from cc_pawn cp where cp.pawn=p.pawn) as s031 , ac.kv as r030,
                        fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  as sumppladge,p.sv as  pricepledge, '' as lastpledgeday ,'' as codrealty,'' as ziprealty
                        ,'' as squarerealty,'' as real6income,'' as noreal6income,'' as flaginsurancepledge , dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,
                        case when (select s031  from cc_pawn cp where cp.pawn=p.pawn)=34 then  fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  end sumBail,
