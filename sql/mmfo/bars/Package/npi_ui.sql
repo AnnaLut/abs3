@@ -190,14 +190,18 @@ create or replace package body npi_ui is
         l_accounts number_list;
         l_accounts_cursor sys_refcursor;
         l_date_through date := case when p_date_through is null then trunc(sysdate) - 1 else p_date_through end;
+        l_trace varchar2(2000) := 'npi_ui.reckon_portfolio_interest: ';
+        l_log_message varchar2(2000);
     begin
-        bars_audit.log_info('npi_ui.reckon_interest',
-                            'p_balance_accounts : ' || p_balance_accounts || chr(10) ||
+        l_log_message :=    'p_balance_accounts : ' || p_balance_accounts || chr(10) ||
                             'p_ob22             : ' || p_ob22             || chr(10) ||
                             'p_currencies       : ' || p_currencies       || chr(10) ||
                             'p_managers         : ' || p_managers         || chr(10) ||
                             'p_date_through     : ' || p_date_through     || chr(10) ||
-                            'p_grouping_mode_id : ' || p_grouping_mode_id);
+                            'p_grouping_mode_id : ' || p_grouping_mode_id;
+
+        bars_audit.log_info('npi_ui.reckon_interest',  l_log_message);
+        bars_audit.info(  l_trace|| 'старт процедуры. '|| chr(10) || l_log_message);
 
         l_balance_accounts := tools.string_to_words(p_balance_accounts, p_splitting_symbol => ',', p_trim_words => 'Y', p_ignore_nulls => 'Y');
         l_ob22 := tools.string_to_words(p_ob22, p_splitting_symbol => ',', p_trim_words => 'Y', p_ignore_nulls => 'Y');
@@ -225,14 +229,13 @@ create or replace package body npi_ui is
                not exists (select 1 from dpt_deposit p where p.acc = a.acc) and
                a.branch like sys_context('bars_context', 'user_branch_mask');
 
+        bars_audit.info( l_trace||'отобрано '||l_accounts_cursor%rowcount||' счетов дл€ прогноза');
+
         loop
             fetch l_accounts_cursor
             bulk collect into l_accounts limit 1000;
-
             interest_utl.reckon_interest(l_accounts, l_date_through);
-
             interest_utl.group_reckonings(l_accounts, p_grouping_mode_id, interest_utl.RECKONING_TYPE_ORDINARY_INT);
-
             exit when l_accounts_cursor%notfound;
         end loop;
         close l_accounts_cursor;

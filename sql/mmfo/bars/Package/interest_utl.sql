@@ -1199,29 +1199,20 @@ is
 
     end;
 
-    -----------------------------------
-    -- P_INT 
-    -- расчет суммы начисленных %%, помещенеи информации во временную таблицу 
-    --
-    -- acc     - код счтеа
-    -- id      - вид ставки (int_accn.id)    
-    -- dt1     - дата с 
-    -- dt2     - дата по
-    -- int OUT - расчитанные %%
-    -- ost     - остаток по счету
-    -- mode    = 0  моделирование
-    --         = 1  реальное начисление
-    --         = 2  моделирование без хо-хо
-    -----------------------------------
-
+    -- calculates interest for given amount at given account
     procedure p_int(
-        acc_  integer, 
-        id_   smallint,
-        dt1_  date,    
-        dt2_  date,    
-        int_  out number, 
+        acc_  integer, -- account number
+        id_   smallint,-- calc code
+        dt1_  date,    -- from date
+        dt2_  date,    -- to   date
+        int_  out number, -- interest accrued
         ost_  decimal default null,
-        mode_ smallint default 0) 
+        mode_ smallint default 0) -- mode   play(0)/real(1), play(2)
+                                      /*
+                                      mode_ = 0  моделирование
+                                      mode_ = 1  реальное начисление
+                                      mode_ = 2  моделирование без хо-хо
+                                      */
     is
         dtmp_  date;
         dat0_  date;
@@ -1250,13 +1241,6 @@ is
         arow   urowid      default null;
         kol_   int; -- кол-во цб
         acc_alt_pk_ int := case when mode_ <= 1 then acc_ else mode_ end;
-        l_int_collection_desc varchar2(32000);
-        l_avarage_amount number;
-        l_days_between   number;
-        l_prev_date      date;
-        l_total_amount   number;
-        l_current_amount number;
-        
 
           -- поиск % карточки - зависит от счета
           cursor c_acc
@@ -1508,7 +1492,111 @@ is
 
                     goto end_acc;
 
-                
+                elsif acc.metr = 5 then
+                    -- используется только в петрокомерц
+                    --амортизация по методу эф.% ставки
+                    -- существует 2 проц.карточки по осн.счету номинала
+                    -- id=0 - номинальная стака купона: acc 3114, acra 3118
+                    -- id=2 - эф.стака  для амортизации:диск acc 3114, acra 3116
+                    --                            или премии acc 3114, acra 3117
+                    -- эф.ставка запоминается как дневной коеф.,
+                    -- т.е = год эф.ставка/36500
+                    --проверено и исправлено после проверки в пертокомерц
+
+                    declare
+                        n_    number; -- оттаток номинал
+                        ir_   number; -- ном % ставка годовая
+                        accdp_ int  ; -- acc дисконта/премии
+                        dp_   number; -- остаток дисконт/премия
+                        erat_ number; -- эф.% ставка - дневная
+                        kup1_ number;
+                        dp1_  number; -- дисконт/премия 1-го дня
+                        mdate_ date ; -- дата погашения сч
+                        daos_  date ; -- дата открытия  сч
+
+                        dat_n_ date ; -- дата последненго изменения номинала
+                        dat_i_ date ; -- дата последней установки ном % ставки
+                        dat_e_ date ; -- дата последней установки еф. % ставки
+
+                    begin
+                        --сумма номинала + номинальная % ставка + acc счета дисконта/премии
+                        select sn.fdat, sn.ostf-sn.dos+sn.kos,
+                               a.mdate, a.daos, i.acra, r.ir, r.bdat
+                        into   dat_n_, n_,
+                               mdate_, daos_, accdp_, ir_, dat_i_
+                        from   saldoa sn, accounts a , int_ratn r, int_accn i
+                        where  a.acc = acc_ and
+                               sn.acc = a.acc and
+                               (sn.acc,sn.fdat) = (select acc, max(fdat) from saldoa
+                                                   where acc = sn.acc and fdat<=dat2_
+                                                   group by acc) and
+                               r.acc = a.acc and r.id = i.id - 2 and
+                               (r.acc,r.id,r.bdat) = (select acc,id,max(bdat) from int_ratn
+                                                      where acc = r.acc and id = r.id and bdat <= dat2_
+                                                      group by acc, id) and
+                               i.acc=a.acc and i.id=id_ and
+                               i.acra is not null and i.acrb is not null;
+
+                        -- сумма дисконта/премии
+                        select s.ostf - s.dos + s.kos
+                        into   dp_
+                        from   saldoa s
+                        where  s.acc = accdp_ and
+                               s.ostf - s.dos + s.kos <> 0 and
+                               (s.acc,fdat) = (select acc, max(fdat)
+                                               from   saldoa
+                                               where  acc = s.acc and fdat <= dat2_
+                                               group by acc);
+                        --есть что амортизировать
+                        if n_ = 0 or dat2_>= mdate_ or abs(dp_) <= 100 then
+                            --остаточная аммортизация
+                            dp1_ := dp_;
+                        else
+                            -- эф.% ставка
+                            begin
+                              select r.ir, r.bdat
+                              into erat_, dat_e_
+                              from int_ratn r
+                              where r.acc=acc_ and r.id=id_ and
+                                    (r.acc,r.id,r.bdat) = (select acc,id,max(bdat) from int_ratn
+                                                           where acc=r.acc and id=r.id and bdat<=dat1_ group by acc,id);
+                            exception when no_data_found then dat_e_ := null;
+                            end;
+
+                            if    dat_e_  is null
+                               or dat_e_ < dat_i_
+                               or dat_e_ < dat_n_ then
+                                -- раньше расчитывалась при отсутствии
+                                -- теперь - в случаях:
+                                -- 1) изменения номинала даты
+                                -- 2) изменен. ном % стаавки даты
+
+                                kup1_ := n_* ir_/36500;
+                                dp1_  := dp_ / (mdate_ - dat_n_ );
+                                erat_ := (kup1_-dp1_) / (( n_+dp_ + n_)/2) ;
+                                insert into int_ratn (acc,id,bdat,ir) values (acc_,id_,dat2_,erat_);
+                            end if;
+
+                            if dat2_ >= dat_n_  then
+                                dlta_ := dat2_- greatest(dat_n_,dat1_) + 1 ;
+                                dp1_  := round( ((n_+dp_)*erat_ - n_*ir_/36500 ) * dlta_, 0);
+                            else
+                                dp1_  := 0;
+                            end if;
+                        end if;
+
+                        if dp1_ <> 0 then
+                           if mode_ = 1 then
+                              insert into acr_intn (acc, id, fdat, tdat,ir,br,osts,acrd)
+                                           values (acc_,id_, greatest(dat_n_,dat1_),dat2_,0,0,dp_,dp1_ );
+                           end if;
+                           acr_ := acr_ + dp1_;
+                        end if;
+
+                    exception
+                        when no_data_found then goto end_acc;
+                    end;
+                    goto end_acc;
                 end if;
 
                 -- collect balance history
@@ -1619,6 +1707,10 @@ is
                 open c_ratb;   --история % ставок на счетах
                 loop
                     fetch c_ratb into rat;
+
+                    if (deb.debug) then
+                        dbms_output.put_line('c_rati loop: ' || prev_rat.br || ' ' || acc.kv || ' ' || prev_rat.bdat || ' ' || dat_end);
+                    end if;
                     if prev_rat.br is not null then  --начинаем со второй строки
 
                        if c_ratb%notfound then
@@ -1639,6 +1731,11 @@ is
                        end loop;
 
                        for tie in c_bti(prev_rat.br,acc.kv, prev_rat.bdat, dat_end) loop  --история ступенчатой изменения ставки
+
+                           if (deb.debug) then
+                               dbms_output.put_line('c_bti loop: ' || tie.bdate || ' ' || prev_rat.br);
+                           end if;
+
                            if tie.bdate <  prev_rat.bdat then
                               tie.bdate := prev_rat.bdat;
                            end if;
@@ -1668,65 +1765,29 @@ is
                 osta_ := 0;
                 sdat_ := null;
 
-               bars_audit.info('interest_utl.p_int: start trace info'); 
-               l_int_collection_desc := 'account number = '||acc_||chr(10)||
-                                         '----------------------------------------------------------------------'|| chr(10)||
-                                         'key       dat                   ostf   ir   op   br   brn'|| chr(10)||
-                                         '----------------------------------------------------------------------';
-                                         
-               key := tmp.first;
-               begin
-                   while key is not null  loop
-                        l_int_collection_desc := l_int_collection_desc ||chr(10)||
-                                                 lpad(key, 9) || ' ' ||
-                                                 lpad(nvl(to_char(tmp(key).dat, 'dd.mm.yyyy'), ' '), 10) || ' ' ||
-                                                 lpad(nvl(to_char(tmp(key).ostf), ' '), 15) || ' ' ||
-                                                 lpad(nvl(to_char(tmp(key).ir), ' '), 4) || ' ' ||
-                                                 lpad(nvl(to_char(tmp(key).op), ' '), 4) || ' ' ||
-                                                 lpad(nvl(to_char(tmp(key).br), ' '), 4) || ' ' ||
-                                                 lpad(nvl(to_char(tmp(key).brn), ' '), 15);
-                       key := tmp.next(key);
-                   end loop;
-                   bars_audit.info('interest_utl.p_int: '||l_int_collection_desc);
-               exception when others then 
-                   bars_audit.error('interest_utl.p_int: '||sqlerrm);    
-               end;      
-                
-
-                -- для метода расчетапо-среднему соберем средний остаток за период
-                if (acc.metr = 1) then                
-                    l_days_between   := 0;
-                    l_prev_date      := dat1_ - 1;
-                    l_total_amount   := 0;
-                    l_current_amount := 0;
-                    
+                if (deb.debug) then
                     key := tmp.first;
                     while key is not null loop
-                        -- если остаток пустой - значит аналогичный пердыдущему дню
-                        l_current_amount := nvl( tmp(key).ostf,  l_current_amount);
-                    
-                        -- высчитываем колл-во дней меджу двумя датами
-                        l_days_between   := acrn.dlta(acc.basey, l_prev_date, tmp(key).dat);                    
-                        l_total_amount   := l_total_amount + l_current_amount * l_days_between;   
-                        l_prev_date      := tmp(key).dat;
+                        if (key = tmp.first) then
+                            dbms_output.put_line('Content of TMP collection:');
+                            dbms_output.put_line('----------------------------------------------------------------------');
+                            dbms_output.put_line('key       dat                   ostf   ir   op   br   brn');
+                            dbms_output.put_line('----------------------------------------------------------------------');
+                        end if;
+
+                        dbms_output.put_line(lpad(key, 9) || ' ' ||
+                                             lpad(nvl(to_char(tmp(key).dat, 'dd.mm.yyyy'), ' '), 10) || ' ' ||
+                                             lpad(nvl(to_char(tmp(key).ostf), ' '), 15) || ' ' ||
+                                             lpad(nvl(to_char(tmp(key).ir), ' '), 4) || ' ' ||
+                                             lpad(nvl(to_char(tmp(key).op), ' '), 4) || ' ' ||
+                                             lpad(nvl(to_char(tmp(key).br), ' '), 4) || ' ' ||
+                                             lpad(nvl(to_char(tmp(key).brn), ' '), 15));
                         key := tmp.next(key);
                     end loop;
-                    
-                    l_days_between   := acrn.dlta(acc.basey, dat1_,  l_prev_date); 
-                    l_avarage_amount := l_total_amount / l_days_between;
-                    bars_audit.error('interest_utl.p_int: для метода по-среднему подсчитано: с-по даты: '||to_date(dat1_,'dd/mm/yyyy')||'-'||to_date(l_prev_date,'dd/mm/yyyy')||', кол-во дней='||l_days_between||', средний остаток='||l_avarage_amount);
 
-                    -- установим этот остаток на все дни
-                    key := tmp.first;
-                    while key is not null loop
-                        tmp(key).ostf := l_avarage_amount;
-                        key := tmp.next(key);
-                    end loop;
-                    
-                 end if;    
+                    dbms_output.put_line('');
+                end if;
 
- 
-                -- пройдем по всему массиву и вычислим сумму начисленных %% и внесем в acr_intn
                 key := tmp.first;
                 while key is not null loop
 
@@ -1736,27 +1797,50 @@ is
                     tmp(key).brn  := nvl(tmp(key).brn, nb0_);
 
                     if bdat_ <> tmp(key).dat and ostf_ is not null then
-                        
                         if acc.metr=2 then
+
                            sdat_ := nvl(sdat_, bdat_);
+
                            if tmp(key).ir = ir0_ and tmp(key).brn = nb0_ then
+
                               if (acc.pap = 1 and ostf_ <= tmp(key).ostf or
                                   acc.pap = 2 and ostf_ >= tmp(key).ostf) then
+
                                   ostf_ := tmp(key).ostf;
                               end if;
 
                               if substr(key,-1) <> '4' then
                                   goto int_333;
                               end if;
+
                            end if;
+
                         end if;
 
-
-                       /*
                         if (acc.metr = 1) then    -- по середньому
+                            if (deb.debug and sdat_ is null) then
+                                dbms_output.put_line('key       sdat_         tmp(key).ostf  tmp(key).ir tmp(key).brn ir0_       nb0_ bdat_      tmp(key).dat dlta_          osta_           ostf_' );
+                                dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------------------');
+                            end if;
+
                             sdat_ := nvl(sdat_, bdat_);
                             dlta_ := acrn.dlta(acc.basey, bdat_, tmp(key).dat);
                             osta_ := osta_ + ostf_ * dlta_;
+
+                            if (deb.debug) then
+                                dbms_output.put_line(key || ' ' ||
+                                                     sdat_ || ' ' ||
+                                                     lpad(tmp(key).ostf, 17) || ' ' ||
+                                                     lpad(tmp(key).ir, 12)  || ' ' ||
+                                                     lpad(tmp(key).brn, 12)  || ' ' ||
+                                                     lpad(ir0_, 4) || ' ' ||
+                                                     lpad(nb0_, 10) || ' ' ||
+                                                     to_char(bdat_, 'dd.mm.yyyy') || ' ' ||
+                                                     to_char(tmp(key).dat, 'dd.mm.yyyy') || ' ' ||
+                                                     lpad(dlta_, 8) || ' ' ||
+                                                     lpad(osta_, 15) || ' ' ||
+                                                     lpad(ostf_, 15));
+                            end if;
 
                             if tmp(key).ir <> ir0_ or tmp(key).brn <> nb0_ or substr(key, -1) in ('4', '2', '1') then
                                 -- если ставка изменялась или дошли до последней строки коллекции - расчитываем значение среднего остатка для данного периода
@@ -1772,11 +1856,10 @@ is
                                     goto int_222;
                                 end if;
                             end if;
-                        end if;
-                        */
-                        
 
-                        if (acc.metr = 0) or (acc.metr = 1) then      -- нормальний
+                        end if;
+
+                        if (acc.metr = 0) then      -- нормальний
                             sdat_ := bdat_;
                         end if;
 
@@ -1785,14 +1868,17 @@ is
 
                         if mod(id_, 2) = 0 and ostf_ < 0 or
                            mod(id_, 2) = 1 and ostf_ > 0 then
+
                             ir_ := ir0_;
 
                             if (nb0_ > 0) then
                                 acc_form := acc.acc;
                                 p_bns(br_, ostp_, sdat_, nb0_, acc.kv, abs(ostf_), op_, ir_, acc.kf);
+
                                 if (ostf_ < 0) then
                                     ostp_ := -ostp_;
                                 end if;
+
                                 ir_ := 0;
                             else
                                 br_ := 0;
@@ -2338,11 +2424,15 @@ is
                 gl.pay(p_flag => 2, p_ref => l_document_id, p_vdat => gl.bd());
 
                 -- Вставка записи-истории о начислении процентов, если в будущем будет необходимость СТОРНО или персчета процентов.
+
+/*
                 acrn.acr_dati(p_int_reckoning_row.account_id,
                               p_int_reckoning_row.interest_kind,
                               l_document_id,
                               p_int_reckoning_row.date_to, -- зберігаємо попереднє значення дати, по яку нараховані відсотки
                               p_int_reckoning_row.interest_tail);      -- а також дробну частину залишку відсотків
+*/
+
 
                 if (p_int_reckoning_row.deal_id is not null) then
                     cck_utl.link_document_to_deal(p_int_reckoning_row.deal_id, l_document_id);
@@ -2868,12 +2958,15 @@ is
     procedure reckon_interest(
         p_reckoning_unit in out nocopy t_reckoning_unit)
     is
+       l_trace varchar2(2000) := 'interest_utl.reckon_interest(u): ';
     begin
+        bars_audit.info(l_trace||'старт заполнения int_reckonings по счету acc='||p_reckoning_unit.account_id);
         clear_reckonings(p_reckoning_unit.account_id,
                          p_reckoning_unit.interest_kind,
                          p_reckoning_unit.date_from);
 
         delete acr_intn;
+
 
         interest_utl.p_int(p_reckoning_unit.account_id,
                            p_reckoning_unit.interest_kind,
@@ -2882,6 +2975,7 @@ is
                            p_reckoning_unit.interest_amount,
                            null,
                            1);
+
 
         if (p_reckoning_unit.interest_amount <> 0) then
             for i in (select * from acr_intn) loop
@@ -2988,13 +3082,20 @@ is
         end loop;
     end;
 
+    ------------------------------------------------
+    -- reckon_interest
+    --
+    ------------------------------------------------
     procedure reckon_interest(
         p_accounts in number_list,
         p_date_through in date)
     is
         l_reckoning_units t_reckoning_units;
         l integer;
+        l_trace varchar2(2000) := 'interest_utl.reckon_interest(nl): ';
     begin
+        bars_audit.info(l_trace||'старт прогноза %% по группе счетов из '||p_accounts.count||' по дату '||to_char(p_date_through, 'dd/mm/yyyy'));
+
         if (p_date_through is null) then
             raise_application_error(-20000, 'Дата, по яку нараховуються відсотки не вказана');
         end if;
@@ -3031,6 +3132,7 @@ is
                a.nbs is not null and
                a.dazs is null;
 
+        bars_audit.info(l_trace||'отобрано '||l_reckoning_units.count||' %% карточек для прогноза');
         reckon_interest(l_reckoning_units);
     end;
 
@@ -3521,11 +3623,16 @@ is
                 gl.pay(p_flag => 2, p_ref => l_document_id, p_vdat => gl.bd());
 
                 -- Вставка записи-истории о начислении процентов, если в будущем будет необходимость СТОРНО или персчета процентов.
+-- закомментарено в связи с непонятной ошибкой
+--ORA-20001: \9566 - По цьому рах. вже було виконано нарахування за дату # 30.06.2018,РЕФ = 174591012303 ORA-06512: at "BARS.ACRN", line 1574 ORA-00001: unique constraint (BARS.I1_ACRDOCS) violatedORA-06512: at "BARS.ACRN", line 1574 ORA-06512: at "BARS.INTEREST_UTL", line 3209
+/*
                 acrn.acr_dati(p_reckoning_row.account_id,
                               p_reckoning_row.interest_kind_id,
                               l_document_id,
                               l_int_accn_row.acr_dat,    -- зберігаємо значення дати, по яку нараховані відсотки
                               l_int_accn_row.s);  -- а також дробну частину залишку відсотків
+*/
+
 
                 if (p_reckoning_row.deal_id is not null) then
                     cck_utl.link_document_to_deal(p_reckoning_row.deal_id, l_document_id);
