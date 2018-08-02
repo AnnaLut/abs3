@@ -25,6 +25,8 @@ is
   l_file_code            varchar2(2) := substr(p_file_code, 2, 2);
 
   l_version_id           number; --Номер версии файла
+  l_old_file_code        varchar2(3) := '#1P';
+  l_cnt                  number := 0;
 
   e_ptsn_not_exsts       exception;
 
@@ -54,144 +56,225 @@ BEGIN
 
   logger.trace(c_title || ' Version_id is ' || l_version_id);
 
-  --Проверяем есть ли старая версия в очереди на формировании
-  --Если нет, то запускаем старую процедуру и ожидаем когда наполнится витрина
-  --Если да, то будем ждать, пока она закончится и мы сможем забрать сформированные ею данные
-  if f_nbur_check_file_in_queue(
-                                 p_file_code => c_old_file_code
-                                 , p_kf => p_kod_filii
-                                 , p_report_date => p_report_date
-                               )
-  then
-    logger.trace(c_title || ' The file ' || c_old_file_code || ' in queue. Waiting procedure and use it''s data');
+  -- очікуємо формування старого файлу
+  nbur_waiting_form(p_kod_filii, p_report_date, l_old_file_code, c_title);    
+  
+  -- перевіряємо яи формувався з детальним протоколом чи з відкоригованих даних (без протоколу)
+  select count(*)
+  into l_cnt
+  from v_nbur_#1p_dtl t
+  where report_date = p_report_date and
+        kf = p_kod_filii;
+  
+  if l_cnt > 0 then -- з детального протоколу
+      insert into nbur_log_f1px(report_date, kf, version_id, nbuc, ekp, k040_1, rcbnk_b010, rcbnk_name, 
+            k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q003_1, q004, 
+            t080, t071, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
+        select p_report_date /*report_date*/
+               , p_kod_filii /*kf*/
+               , l_version_id /*version_id*/
+               , nbuc /*nbuc*/
+               , cEKP /*ekp*/
+               , k040_1 /*k040_1*/
+               , rcbnk_b010 /*rcbnk_b010*/
+               , rcbnk_name /*rcbnk_name*/
+               , k040_2 /*k040_2*/
+               , r030 /*r030*/
+               , r020 /*r020*/
+               , r040 /*r040*/
+               , t023 /*t023*/
+               , rcukru_glb_2 /*rcukru_glb_2*/
+               , k018 /*k018*/
+               , k020 /*k020*/
+               , q001 /*q001*/
+               , rcukru_glb_1 /*rcukru_glb_1*/
+               --Генерация номера для связки с агрегированного и детального протокола
+               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 5, '0') as q003_1
+               , q004 /*q004*/
+               , case when t023 = 3 then 0 else 1 end/*t080*/
+               , t071 /*t071*/
+               , description /*description*/
+               , acc_id /*acc_id*/
+               , acc_num /*acc_num*/
+               , kv /*kv*/
+               , maturity_date /*maturity_date*/
+               , cust_id /*cust_id*/
+               , ref /*ref*/
+               , nd /*nd*/
+               , branch /*branch*/
+        from    (
+                  select
+                         nbuc
+                         , max(mmm) as K040_1
+                         , max(hhhhhhhhhh) as RCBNK_B010
+                         , max(case when dd = '10' then znap else null end) as  RCBNK_NAME
+                         , max(www) as K040_2
+                         , max(vvv) as R030
+                         , max(bbbb) as R020
+                         , max(xxxx) as R040
+                         , max(e) as T023
+                         , max(case when dd = '07' then znap else null end) as RCUKRU_GLB_2
+                         , max(case when dd = '04' then znap else null end) as K018
+                         , max(case when dd = '05' then znap else null end) as K020
+                         , max(case when dd = '06' then znap else null end) as Q001
+                         , max(case when dd = '03' then znap else null end) as  RCUKRU_GLB_1
+                         , max(nnn) as Q003_1
+                         , max(case when dd = '99' then znap else null end) as Q004
+                         , max(case when dd = '71' then znap else null end) as T071
 
-    loop
-      --Ждем пока закончится старая процедура наполнения данных
-      dbms_lock.sleep(seconds => c_sleep_time);
+                         , o.comm as description
+                         , o.acc_id as acc_id
+                         , o.nls as acc_num
+                         , o.kv as kv
+                         , o.mdate as maturity_date
+                         , o.rnk as cust_id
+                         , o.ref as ref
+                         , o.nd as nd
+                         , o.branch
+                  from   (
+                            select t.seg_01 as dd
+                                   , t.seg_02 as e
+                                   , t.seg_03 as mmm
+                                   , t.seg_04 as hhhhhhhhhh
+                                   , t.seg_05 as bbbb
+                                   , t.seg_06 as vvv
+                                   , t.seg_07 as xxxx
+                                   , t.seg_08 as www
+                                   , t.seg_09 as nnn
+                                   , t.field_code kodp
+                                   , t.description comm
+                                   , t.acc_num nls
+                                   , t.kv
+                                   , t.maturity_date mdate
+                                   , t.cust_id rnk
+                                   , t.ref
+                                   , t.nd
+                                   , t.branch
+                                   , t.field_value znap
+                                   , t.acc_id
+                                   , t.nbuc
+                            from v_nbur_#1p_dtl t
+                            where report_date = p_report_date and
+                                  kf = p_kod_filii
+                         ) o
+                  group by
+                        substr(o.kodp, 3)
+                         , o.comm
+                         , o.acc_id
+                         , o.nls
+                         , o.kv
+                         , o.mdate
+                         , o.rnk
+                         , o.ref
+                         , o.nd
+                         , o.branch
+                         , o.nbuc
+       );
+  else
+      insert into nbur_log_f1px(report_date, kf, version_id, nbuc, ekp, k040_1, rcbnk_b010, rcbnk_name, 
+            k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q003_1, q004, 
+            t080, t071, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
+        select p_report_date /*report_date*/
+               , p_kod_filii /*kf*/
+               , l_version_id /*version_id*/
+               , nbuc /*nbuc*/
+               , cEKP /*ekp*/
+               , k040_1 /*k040_1*/
+               , rcbnk_b010 /*rcbnk_b010*/
+               , rcbnk_name /*rcbnk_name*/
+               , k040_2 /*k040_2*/
+               , r030 /*r030*/
+               , r020 /*r020*/
+               , r040 /*r040*/
+               , t023 /*t023*/
+               , rcukru_glb_2 /*rcukru_glb_2*/
+               , k018 /*k018*/
+               , k020 /*k020*/
+               , q001 /*q001*/
+               , rcukru_glb_1 /*rcukru_glb_1*/
+               --Генерация номера для связки с агрегированного и детального протокола
+               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 5, '0') as q003_1
+               , q004 /*q004*/
+               , case when t023 = 3 then 0 else 1 end/*t080*/
+               , t071 /*t071*/
+               , description /*description*/
+               , acc_id /*acc_id*/
+               , acc_num /*acc_num*/
+               , kv /*kv*/
+               , maturity_date /*maturity_date*/
+               , cust_id /*cust_id*/
+               , ref /*ref*/
+               , nd /*nd*/
+               , branch /*branch*/
+        from    (
+                  select
+                         nbuc
+                         , max(mmm) as K040_1
+                         , max(hhhhhhhhhh) as RCBNK_B010
+                         , max(case when dd = '10' then znap else null end) as  RCBNK_NAME
+                         , max(www) as K040_2
+                         , max(vvv) as R030
+                         , max(bbbb) as R020
+                         , max(xxxx) as R040
+                         , max(e) as T023
+                         , max(case when dd = '07' then znap else null end) as RCUKRU_GLB_2
+                         , max(case when dd = '04' then znap else null end) as K018
+                         , max(case when dd = '05' then znap else null end) as K020
+                         , max(case when dd = '06' then znap else null end) as Q001
+                         , max(case when dd = '03' then znap else null end) as  RCUKRU_GLB_1
+                         , max(nnn) as Q003_1
+                         , max(case when dd = '99' then znap else null end) as Q004
+                         , max(case when dd = '71' then znap else null end) as T071
 
-      --Выйдем когда файла в очереди уже нет
-      if f_nbur_check_file_in_queue(
-                                      p_file_code => c_old_file_code
-                                      , p_kf => p_kod_filii
-                                      , p_report_date => p_report_date
-                                    )
-      then
-        logger.trace(c_title || ' File ' || c_old_file_code || ' in queue. Waiting more...');
-      else
-        logger.trace(c_title || ' File ' || c_old_file_code || ' not in queue. Stop waiting and process it data');
-        exit;
-      end if ;
-    end loop;
+                         , o.comm as description
+                         , o.acc_id as acc_id
+                         , o.nls as acc_num
+                         , o.kv as kv
+                         , o.mdate as maturity_date
+                         , o.rnk as cust_id
+                         , o.ref as ref
+                         , o.nd as nd
+                         , o.branch
+                  from   (
+                            select t.seg_01 as dd
+                                   , t.seg_02 as e
+                                   , t.seg_03 as mmm
+                                   , t.seg_04 as hhhhhhhhhh
+                                   , t.seg_05 as bbbb
+                                   , t.seg_06 as vvv
+                                   , t.seg_07 as xxxx
+                                   , t.seg_08 as www
+                                   , t.seg_09 as nnn
+                                   , t.field_code kodp
+                                   , null comm
+                                   , null nls
+                                   , null kv
+                                   , null mdate
+                                   , null rnk
+                                   , null ref
+                                   , null nd
+                                   , null branch
+                                   , t.field_value znap
+                                   , null acc_id
+                                   , t.nbuc
+                            from v_nbur_#1p t
+                            where report_date = p_report_date and
+                                  kf = p_kod_filii
+                         ) o
+                  group by
+                        substr(o.kodp, 3)
+                         , o.comm
+                         , o.acc_id
+                         , o.nls
+                         , o.kv
+                         , o.mdate
+                         , o.rnk
+                         , o.ref
+                         , o.nd
+                         , o.branch
+                         , o.nbuc
+       );  
   end if;
-
-  --Запуск старой процедуры для получения данных в rnbu_trace
-  logger.trace(c_title || 'Start execute ' || c_old_file_code || ' file procedure and waiting data');
-  p_f1p_nn(p_report_date, 'C', 'X'); --Вызываем с параметром X, чтобы не перетерался tmp_nbu
-  logger.trace(c_title || ' Execution of procedure for file ' || c_old_file_code || ' finished');
-
-  insert into nbur_log_f1px(report_date, kf, version_id, nbuc, ekp, k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q003_1, q004, t080, t071, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
-    select p_report_date /*report_date*/
-           , p_kod_filii /*kf*/
-           , l_version_id /*version_id*/
-           , nbuc /*nbuc*/
-           , cEKP /*ekp*/
-           , k040_1 /*k040_1*/
-           , rcbnk_b010 /*rcbnk_b010*/
-           , rcbnk_name /*rcbnk_name*/
-           , k040_2 /*k040_2*/
-           , r030 /*r030*/
-           , r020 /*r020*/
-           , r040 /*r040*/
-           , t023 /*t023*/
-           , rcukru_glb_2 /*rcukru_glb_2*/
-           , k018 /*k018*/
-           , k020 /*k020*/
-           , q001 /*q001*/
-           , rcukru_glb_1 /*rcukru_glb_1*/
-           --Генерация номера для связки с агрегированного и детального протокола
-           , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 5, '0') as q003_1
-           , q004 /*q004*/
-           , case when t023 = 3 then 0 else 1 end/*t080*/
-           , t071 /*t071*/
-           , description /*description*/
-           , acc_id /*acc_id*/
-           , acc_num /*acc_num*/
-           , kv /*kv*/
-           , maturity_date /*maturity_date*/
-           , cust_id /*cust_id*/
-           , ref /*ref*/
-           , nd /*nd*/
-           , branch /*branch*/
-    from    (
-              select
-                     nbuc
-                     , max(mmm) as K040_1
-                     , max(hhhhhhhhhh) as RCBNK_B010
-                     , max(case when dd = '10' then znap else null end) as  RCBNK_NAME
-                     , max(www) as K040_2
-                     , max(vvv) as R030
-                     , max(bbbb) as R020
-                     , max(xxxx) as R040
-                     , max(e) as T023
-                     , max(case when dd = '07' then znap else null end) as RCUKRU_GLB_2
-                     , max(case when dd = '04' then znap else null end) as K018
-                     , max(case when dd = '05' then znap else null end) as K020
-                     , max(case when dd = '06' then znap else null end) as Q001
-                     , max(case when dd = '03' then znap else null end) as  RCUKRU_GLB_1
-                     , max(nnn) as Q003_1
-                     , max(case when dd = '99' then znap else null end) as Q004
-                     , max(case when dd = '71' then znap else null end) as T071
-
-                     , o.comm as description
-                     , o.acc_id as acc_id
-                     , o.nls as acc_num
-                     , o.kv as kv
-                     , o.mdate as maturity_date
-                     , o.rnk as cust_id
-                     , o.ref as ref
-                     , o.nd as nd
-                     , o.branch
-              from   (
-                        select substr(kodp, 1, 2) as dd
-                               , substr(kodp, 3, 1) as e
-                               , substr(kodp, 4, 3 ) as mmm
-                               , substr(kodp, 7, 10) as hhhhhhhhhh
-                               , substr(kodp, 17, 4) as bbbb
-                               , substr(kodp, 21, 3) as vvv
-                               , substr(kodp, 24, 4) as xxxx
-                               , substr(kodp, 28, 3) as www
-                               , substr(kodp, 31, 4) as nnn
-                               , t.kodp
-                               , t.comm
-                               , t.nls
-                               , t.kv
-                               , t.mdate
-                               , t.rnk
-                               , t.ref
-                               , t.nd
-                               , ac.branch
-                               , t.znap
-                               , ac.acc as acc_id
-                               , t.nbuc
-                        from   rnbu_trace t
-                               --Так как нет идентификатора счета, то подтянем его из витрины счетов
-                               left join accounts ac on (ac.kf = p_kod_filii)
-                                                        and (ac.nls = t.nls)
-                                                        and (ac.kv = t.kv)
-                     ) o
-              group by
-                    substr(o.kodp, 3)
-                     , o.comm
-                     , o.acc_id
-                     , o.nls
-                     , o.kv
-                     , o.mdate
-                     , o.rnk
-                     , o.ref
-                     , o.nd
-                     , o.branch
-                     , o.nbuc
-   );
 
   logger.info (c_title || ' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END;
