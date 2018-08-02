@@ -1,4 +1,4 @@
-﻿angular.module(globalSettings.modulesAreas)
+angular.module(globalSettings.modulesAreas)
     .controller('Reporting.Nbu', ['$scope', '$http', 'reportingNbuService', 'base64Helper', '$timeout',
         function ($scope, $http, reportingNbuService, base64Helper, $timeout) {
             //ReportingModule.controller('NbuCtrl', function ($scope, $http) {
@@ -28,7 +28,7 @@
                     $scope.report.PERIOD = data[0].PERIOD;
                     $scope.report.KF = data[0].KF;
                     $scope.report.FILE_TYPE = data[0].FILE_TYPE;
-                    $scope.report.FILE_FMT_LIST = data[0].FILE_FMT_LIST.split(",");
+                    $scope.report.FILE_FMT_LIST = data[0].FILE_FMT_LIST ? data[0].FILE_FMT_LIST.split(",") : "";
                     $scope.FileCodeBase64 = base64Helper.encode($scope.report.FILE_CODE);
                     $("#currentBase64page").text($scope.FileCodeBase64);
                     if (isApply) {
