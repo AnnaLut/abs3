@@ -1160,11 +1160,10 @@ CREATE OR REPLACE PACKAGE cck IS
 
 END cck;
 /
-
-CREATE OR REPLACE PACKAGE BODY cck IS
+CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.05  17.05.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.07  01.08.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -1181,6 +1180,7 @@ CREATE OR REPLACE PACKAGE BODY cck IS
   */
 
   /*
+01-08-2018 VPogoda  закрытие гендоговора с субдоговорами
 22.05.2018 Sta PROCEDURE lim_bdate: Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
                FUNCTION cc_stop: Для операции КК1 + дебет счета SS - для проверки нач.комиссии
 17.05.2018 Sta  PROCEDURE cc_day_lim + PROCEDURE lim_bdate  Обновление cc_deal.limit, cc_add.s, accounts.ostx по суб.дог
@@ -1315,13 +1315,14 @@ CREATE OR REPLACE PACKAGE BODY cck IS
                        int_2_date int_ratn.bdat%type default null,
                        int_3_val  int_ratn.ir%type default null,
                        int_3_date int_ratn.bdat%type default null,
-                       p_mode     number default 0 ) is
+                       p_mode     number default 0) is
     l_acc        accounts.acc%type;
     l_ss_acc     accounts.acc%type;
     l_int_2_val  int_ratn.ir%type;
     l_int_2_date int_ratn.bdat%type;
     l_int_3_val  int_ratn.ir%type;
     l_int_3_date int_ratn.bdat%type;
+    v_gpk_type   int_accn.basem%type;
   begin
     l_int_2_val  := int_2_val;
     l_int_3_val  := int_3_val;
@@ -1349,59 +1350,89 @@ CREATE OR REPLACE PACKAGE BODY cck IS
       end;
     end if;*/
     begin
-      select a.acc
-        into l_acc
-        from nd_acc na, accounts a
+      select a.acc,
+             decode(i.basem,1,3,1)
+        into l_acc,
+             v_gpk_type
+        from nd_acc na,
+             accounts a,
+             int_accn i
        where a.tip = 'LIM'
          and na.acc = a.acc
          and a.nbs is null
-         and na.nd = nd_;
+         and na.nd = nd_
+         and a.acc = i.acc
+         and i.id = 0;
     exception
       when too_many_rows then
         null;
+      when no_data_found then
+        bars_audit.info('cck.p_int_save: nd = '||nd_||chr(10)||dbms_utility.format_call_stack());
+        raise;
     end;
 
- --Заповняємо карточку рахунку LIM
- if  p_mode=0 then
-   update int_ratn ir
-       set ir.bdat = l_int_2_date, ir.ir = l_int_2_val
-     where ir.acc = l_acc
-       and ir.op = 0
-       and ir.bdat = (select min(ir1.bdat)
-                        from int_ratn ir1
-                       where ir1.acc = l_acc
-                         and ir1.op = 0);
-    IF SQL%ROWCOUNT = 0 and l_int_2_val is not null and
-       l_int_2_date is not null THEN
-      -- raise_application_error(-20009,nd);
-      insert into int_ratn
-        (acc, id, bdat, ir, br, op, idu)
-        select ir.acc, ir.id, l_int_2_date, l_int_2_val, ir.br, 0, 1
-          from int_ratn ir
-         where ir.acc = l_acc
-           and ir.id = 0
-           and rownum = 1;
-    END IF;
+    --Заповняємо карточку рахунку LIM
+    if p_mode = 0 then
+      declare
+        v_num integer;
+        v_dt date;
+      begin
+        if l_int_2_date is not null and l_int_2_val is not null then
+          select count(1), min(bdat)
+            into v_num, v_dt
+            from (select bdat, rank() over (partition by acc order by bdat) rnk
+                    from int_ratn i
+                    where acc = l_acc
+                      and i.id = 0)
+            where rnk = 2;
+          if v_num = 0 then
+            insert into int_ratn
+              (acc, id, bdat, ir, br, op, idu)
+              select ir.acc, ir.id, l_int_2_date, l_int_2_val, ir.br, 0, 1
+                from int_ratn ir
+               where ir.acc = l_acc
+                 and ir.id = 0
+                 and rownum = 1;
+          else
+            update int_ratn
+              set bdat = l_int_2_date, ir = l_int_2_val
+              where acc = l_acc
+                and id = 0
+                and bdat = v_dt;
+          end if;
+        end if;
 
-    update int_ratn ir
-       set ir.bdat = l_int_3_date, ir.ir = l_int_3_val
-     where ir.acc = l_acc
-       and ir.op = 0
-       and ir.bdat = (select MAX(ir1.bdat)
-                        from int_ratn ir1
-                       where ir1.acc = l_acc
-                         and ir1.op = 0
-                         and ir1.bdat > l_int_2_date);
-    IF SQL%ROWCOUNT = 0 and l_int_3_val is not null and
-       l_int_3_date is not null then
-      insert into int_ratn
-        (acc, id, bdat, ir, br, op, idu)
-        select ir.acc, ir.id, l_int_3_date, l_int_3_val, ir.br, 0, 1
-          from int_ratn ir
-         where ir.acc = l_acc
-           and ir.id = 0
-           and rownum = 1;
-    end if;
+        if l_int_3_date is not null and l_int_3_val is not null then
+          select count(1), min(bdat)
+            into v_num, v_dt
+            from (select bdat, rank() over (partition by acc order by bdat) rnk
+                    from int_ratn i
+                    where acc = l_acc
+                      and i.id = 0)
+            where rnk = 3;
+          if v_num = 0 then
+            insert into int_ratn
+              (acc, id, bdat, ir, br, op, idu)
+              select ir.acc, ir.id, l_int_3_date, l_int_3_val, ir.br, 0, 1
+                from int_ratn ir
+               where ir.acc = l_acc
+                 and ir.id = 0
+                 and rownum = 1;
+          else
+            update int_ratn
+              set bdat = l_int_3_date, ir = l_int_3_val
+              where acc = l_acc
+                and id = 0
+                and bdat = v_dt;
+          end if;
+       end if;
+     end;
+
+
+
+    cck_ui.p_gpk_default(nd         => nd_,
+                         GPK_TYPE   => v_gpk_type,
+                         ROUND_TYPE => 2);
   end if;
   --ЗАповняємо карточку рахунку SS
   if p_mode=1 then
@@ -8748,9 +8779,10 @@ end if;
 
     -- есть ли остатки и тек.обороты на счетах КД?
     FOR k IN (SELECT a.nls, a.kv
-                FROM accounts a, nd_acc n
-               WHERE a.acc = n.acc
-                 AND n.nd = nd_
+                FROM accounts a, nd_acc n, cc_deal c
+               WHERE (c.nd = nd_ or c.ndg = nd_ )
+                 and n.nd = c.nd
+                 AND a.acc = n.acc
                  AND (a.tip IN ('SS ',
                                 'SL ',
                                 'SP ',
@@ -8796,10 +8828,11 @@ end if;
                      i.id,
                      nvl(i.acr_dat + 1, a.daos) dat1,
                      i.stp_dat
-                FROM int_accn i, nd_acc n, accounts a
-               WHERE i.acc = a.acc
+                FROM int_accn i, nd_acc n, accounts a, cc_deal c
+               WHERE (c.nd = nd_ or c.ndg = nd_)
+                 and n.nd = c.nd
                  AND a.acc = n.acc
-                 AND n.nd = nd_
+                 and i.acc = a.acc
                  AND nvl(i.acr_dat + 1, a.daos) < a.dapp
                  AND a.dazs IS NULL
                  AND (a.tip IN ('SS ', 'SL ', 'SP ') AND i.id = 0 OR
@@ -8836,7 +8869,7 @@ end if;
                WHERE a.acc = p.acc
                  AND substr(a.tip, 1, 2) != 'SD'
                  AND a.ostc <> 0
-                 AND p.accs IN (SELECT acc FROM nd_acc WHERE nd = nd_)
+                 AND p.accs IN (SELECT acc FROM nd_acc n, cc_deal c WHERE (c.nd= nd_ or  c.ndg = nd_) and c.nd = n.nd)
                  AND p.acc NOT IN
                      (SELECT acc
                         FROM cc_accp
@@ -8937,9 +8970,10 @@ end if;
     -- Нормальное Закрытие счетов по договору
     l_migr := cck_app.get_nd_txt(nd_, 'MGR_T');
     FOR k IN (SELECT a.acc, a.tip, a.nbs
-                FROM accounts a, nd_acc n
-               WHERE a.acc = n.acc
-                 AND n.nd = nd_
+                FROM accounts a, nd_acc n, cc_deal c
+               WHERE (c.nd = nd_ or c.ndg = nd_)
+                 AND n.nd = c.nd
+                 and a.acc = n.acc
                  AND a.dazs IS NULL
                  AND (a.tip IN ('SS ',
                                 'SL ',
@@ -8977,7 +9011,8 @@ end if;
                      (SELECT acc
                         FROM cc_accp
                        WHERE accs NOT IN
-                             (SELECT acc FROM nd_acc WHERE nd = nd_))
+                             (SELECT acc FROM nd_acc n, cc_deal c WHERE (c.nd= nd_ or c.ndg = nd_) and c.nd = n.nd)
+                     )
                  AND a.ostc = 0
                  AND a.ostb = 0
                  AND a.ostf = 0
@@ -8995,11 +9030,16 @@ end if;
         par_ := '0';
     END;
 
-    IF sos_ <> 15 AND par_ = '1' THEN
-      cck.cc_9819(nd_, 1);
-    END IF;
+    for r in (select nd, sos from cc_deal where nd = nd_ or  ndg = nd_)
+    loop
+--      SELECT sos INTO sos_ FROM cc_deal WHERE nd = nd_;
 
-    UPDATE cc_deal SET sos = 15 WHERE nd = nd_;
+      IF r.sos <> 15 AND par_ = '1' THEN
+        cck.cc_9819(r.nd, 1);
+      END IF;
+
+      UPDATE cc_deal SET sos = 15 WHERE nd = r.nd;
+    end loop;
     --exception when others then NULL;
     --commit;
   END cc_close;
