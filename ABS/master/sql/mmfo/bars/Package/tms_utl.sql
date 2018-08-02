@@ -1363,7 +1363,7 @@ is
     begin
 
       bars_audit.info( $$PLSQL_UNIT||'.CLOSES_ACCESS: ( kf='||p_kf||' ).' );
-
+	  DBMS_APPLICATION_INFO.SET_ACTION( 'TMS_UTL.CLOSES_ACCESS' );
       -- set ban on logging in
       begin
         insert
@@ -1378,7 +1378,7 @@ is
 
       -- close all user sessions that logged in with previous bank date
       CLOSE_USER_SESSIONS( p_kf, l_bnk_dt );
-
+	  DBMS_APPLICATION_INFO.set_action(null);
       -- accumulate a balance snapshot
       -- BARS_CONTEXT.SUBST_MFO( p_kf );
       -- DDRAPS( DAT_NEXT_U( to_date(l_bnk_dt,'MM/DD/YYYY'), -1 ) );
@@ -1430,7 +1430,11 @@ is
       else
         l_kf := p_kf;
       end if;
-
+	  
+	  if ( sys_context('USERENV','ACTION') = 'TMS_UTL.CLOSES_ACCESS' ) then
+        return 1;
+      end if;
+	  
       begin
         select 0
           into l_access
