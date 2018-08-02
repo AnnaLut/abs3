@@ -1,4 +1,4 @@
-create or replace package NBUR_XML
+CREATE OR REPLACE package BARS.NBUR_XML
 is
 
   --
@@ -51,13 +51,7 @@ is
   --
   -- constants
   --
-<<<<<<< .working
-  g_body_version  constant varchar2(64) := 'version 2.8  2018.06.26';
-||||||| .merge-left.r59007
   g_body_version  constant varchar2(64) := 'version 2.6  2018.06.22';
-=======
-  g_body_version  constant varchar2(64) := 'version 2.7  2018.06.26';
->>>>>>> .merge-right.r59008
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -584,6 +578,29 @@ $end
               and KF = p_kf
             group by EKP, KU, R020, T020, R030, K040;
 
+
+    when '25X' then
+
+      open p_recordset
+       for select EKP, KU, R020, T020, R030, K040
+                , sum( T070 ) as T070
+                , sum( T071 ) as T071
+             from NBUR_LOG_F25X
+            where REPORT_DATE = p_rpt_dt
+              and KF = p_kf
+            group by EKP, KU, R020, T020, R030, K040;
+
+    when '81X' then
+
+      open p_recordset
+       for select EKP, KU, R020, T020, R030, K040
+                , sum( T070 ) as T070
+                , sum( T071 ) as T071
+             from NBUR_LOG_F81X
+            where REPORT_DATE = p_rpt_dt
+              and KF = p_kf
+            group by EKP, KU, R020, T020, R030, K040;
+
     when '#F1' then
 
       open p_recordset
@@ -1043,44 +1060,37 @@ $end
                    ekp_6   as k020,
                    ekp_5   as k021,
                    ekp_4   as f001,
-                   decode(ekp_7,'000','#',ekp_7)             as r030,
+                   decode(ekp_7,'000','#',ekp_7)   as r030,
                    decode(ekp_8,'000','#',ekp_8)             as k040_1,
                    decode(ekp_9,'000','#',ltrim(ekp_9,'0'))  as ku_1,
                    decode(ekp_10,'000','#',ekp_10)             as k040_2,
                    decode(ekp_11,'000','#',ltrim(ekp_11,'0'))  as ku_2,
-                   t071                as t071,
-                   t080                as t080,
+                   nvl(t071,0)     as t071,
+                   nvl(t080,0)     as t080,
                    decode(d060_2, null,'#', d060_2)  d060_2,
                    q001
-              from (
-select  substr(ekp_2,1,1) ekp_2
-         , substr(ekp_2,2,2) ekp_3
-         , substr(ekp_2,4,1) ekp_4
-         , substr(ekp_2,5,1) ekp_5
-         , substr(ekp_2,6,10) ekp_6
-         , substr(ekp_2,16,3) ekp_7
-         , substr(ekp_2,19,3) ekp_8
-         , substr(ekp_2,22,3) ekp_9
-         , substr(ekp_2,25,3) ekp_10
-         , substr(ekp_2,28,3) ekp_11
-         , nvl(t071,0)   t071
-         , nvl(t080,0)   t080
-         , d060_2
-         , q001
-          from ( SELECT    substr(field_code,1,1) ekp_1
-                         , substr(field_code,2) ekp_2
-                         , field_value
-                    from  nbur_agg_protocols
-                   where  report_date = p_rpt_dt           --Дата отчета
-                     and  kf = p_kf                        --Филиал
-                     and  report_code = l_rpt_code        --Код отчета
-               )
-                pivot
-               ( max(trim(field_value))
+              from ( select substr(field_code,1,1) ekp_1,
+                            substr(field_code,2,1) ekp_2,
+                            substr(field_code,3,2) ekp_3,
+                            substr(field_code,5,1) ekp_4,
+                            substr(field_code,6,1) ekp_5,
+                            substr(field_code,7,10) ekp_6,
+                            substr(field_code,17,3) ekp_7,
+                            substr(field_code,20,3) ekp_8,
+                            substr(field_code,23,3) ekp_9,
+                            substr(field_code,26,3) ekp_10,
+                            substr(field_code,29,3) ekp_11,
+                            field_value
+                       from   nbur_agg_protocols t
+                      where  report_date = p_rpt_dt           --Дата отчета
+                        and  kf = p_kf                        --Филиал
+                        and  report_code = l_rpt_code        --Код отчета
+                  )
+                   pivot
+                  ( max(trim(field_value))
                     for ekp_1 in ( '1' as T071, '3' as T080,
                                    '8' as D060_2, '9' as Q001 )
-               )
-        ) ;
+                  );                 
 
      when '6EX' then
          open p_recordset
@@ -1130,26 +1140,25 @@ select  substr(ekp_2,1,1) ekp_2
                    , p.Q004
                    , sum(p.T080) as T080
                    , sum(p.T071) as T071
-            from   nbur_log_f1px p
-            where  p.report_date = p_rpt_dt
-                   and p.kf = p_kf
-            group by
-                  p.EKP
-                   , p.K040_1
-                   , p.RCBNK_B010
-                   , p.RCBNK_NAME
-                   , p.K040_2
-                   , p.R030
-                   , p.R020
-                   , p.R040
-                   , p.T023
-                   , p.RCUKRU_GLB_2
-                   , p.K018
-                   , p.K020
-                   , p.Q001
-                   , p.RCUKRU_GLB_1
-                   , p.Q003_1
-                   , p.Q004;
+              from nbur_log_f1px p
+             where p.report_date = p_rpt_dt
+               and p.kf = p_kf
+             group by p.EKP
+                    , p.K040_1
+                    , p.RCBNK_B010
+                    , p.RCBNK_NAME
+                    , p.K040_2
+                    , p.R030
+                    , p.R020
+                    , p.R040
+                    , p.T023
+                    , p.RCUKRU_GLB_2
+                    , p.K018
+                    , p.K020
+                    , p.Q001
+                    , p.RCUKRU_GLB_1
+                    , p.Q003_1
+                    , p.Q004;
 
        when 'C5X' then
          open p_recordset for
@@ -1215,7 +1224,27 @@ select  substr(ekp_2,1,1) ekp_2
             having 
                    sum(T070) <> 0;
 
-<<<<<<< .working
+       when 'D4X' then
+         open p_recordset  
+         for                
+            select ekp
+                   , r030
+                   , f025
+                   , b010
+                   , q006
+                   , sum(t071) as t071
+            from   nbur_log_fd4x
+            where  report_date = p_rpt_dt
+                   and kf = p_kf
+                   and ekp <> 'XXXXXX' --Берем только замапленные значения
+            group by
+                   ekp
+                   , r030
+                   , f025
+                   , b010
+                   , q006       
+            having sum(t071) <> 0;                                                        
+
       when '48X' then
         open p_recordset
         for
@@ -1238,30 +1267,6 @@ select  substr(ekp_2,1,1) ekp_2
           from  nbur_log_f48x
           where report_date = p_rpt_dt
                 and kf = p_kf;
-||||||| .merge-left.r59007
-=======
-       when 'D4X' then
-         open p_recordset  
-         for                
-            select ekp
-                   , r030
-                   , f025
-                   , b010
-                   , q006
-                   , sum(t071) as t071
-            from   nbur_log_fd4x
-            where  report_date = p_rpt_dt
-                   and kf = p_kf
-                   and ekp <> 'XXXXXX' --Берем только замапленные значения
-            group by
-                   ekp
-                   , r030
-                   , f025
-                   , b010
-                   , q006       
-            having sum(t071) <> 0;                                                        
-
->>>>>>> .merge-right.r59008
     else
       null;
     end case;
@@ -1353,7 +1358,7 @@ select  substr(ekp_2,1,1) ekp_2
       l_clob := REGEXP_REPLACE( l_clob, '(<Q007_3)(></)', '\1 xsi:nil = "true" \2' );
     when 'E8'
     then
-      l_clob := REGEXP_REPLACE( l_clob, '(<T090)(></)', '\1 xsi:nil = "true" \2' );      
+      l_clob := REGEXP_REPLACE( l_clob, '(<T090)(></)', '\1 xsi:nil = "true" \2' );
     when 'E9'
     then
       l_clob := REGEXP_REPLACE( l_clob, '(<Q001)(></)', '\1 xsi:nil = "true" \2' );
@@ -1522,7 +1527,6 @@ BEGIN
   v_vrsn_id := 1;
 end NBUR_XML;
 /
-
 show err;
 
 grant EXECUTE on NBUR_XML to BARS_ACCESS_DEFROLE;
