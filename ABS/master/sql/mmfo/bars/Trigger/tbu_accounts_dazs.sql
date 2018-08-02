@@ -82,7 +82,7 @@ BEGIN
  
         if (l_active > 0)
         then
-           raise_application_error ( -20444, 'Заборонено закриття рахунку (наявні залишки на інших рахунках договору БПК)!', TRUE );
+           raise_application_error ( -20444, 'Заборонено закриття рахунку '||:new.nls||'- (наявні залишки на інших рахунках договору БПК)!', TRUE );
         end if;
 
       END IF;
@@ -140,7 +140,7 @@ BEGIN
            and DATE_OFF Is Null;
       exception
         when no_data_found then
-          raise_application_error( -20444, 'Неможливо реанімувати рахунок - клієнт закритий!', TRUE );
+          raise_application_error( -20444, 'Неможливо реанімувати рахунок '||:new.nls||'- клієнт з РНК= '||:new.RNK||' закритий!', TRUE );
       end;
 
       begin
@@ -151,7 +151,7 @@ BEGIN
            and D_CLOSE Is Null;
       exception
         when no_data_found then
-          raise_application_error( -20444, 'Заборонено реанімувати рахунок з R020='||:new.NBS, TRUE );
+          raise_application_error( -20444, 'Заборонено реанімувати рахунок '||:new.nls||' з R020='||:new.NBS, TRUE );
       end;
 
       if (:new.TIP IN ('DEP','DEN','NL8'))
@@ -176,7 +176,7 @@ BEGIN
 
         if (l_active = 0)
         then
-          raise_application_error( -20444, 'Заборонено реанімувати рахунок, що належить закритому депозитному договору!', TRUE );
+          raise_application_error( -20444, 'Заборонено реанімувати рахунок '||:new.nls||', що належить закритому депозитному договору!', TRUE );
         end if;
 
       end if;
