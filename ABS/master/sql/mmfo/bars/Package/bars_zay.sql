@@ -4128,7 +4128,7 @@ begin
   end loop;
   bars_audit.trace('%s zay_comiss -> (%s, %s)', g_title, to_char(l_cmsprc), to_char(l_cmssum));
 
-  if (l_cmsprc is null) then
+/*  if (l_cmsprc is null) then
      -- процент комиссии из "Параметры клиентов"
      begin
        select decode(p_reqtype, 1, kom, 2, kom2, kom3)
