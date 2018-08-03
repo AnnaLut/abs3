@@ -2369,13 +2369,15 @@ begin
                 '/'|| p_coracbb || '$nl$' || p_swiftbb end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             add_dop_req(l_ref, '59',
-                '/'||substr(upper(p_nlsb),1,32)||'$nl$'||substr(p_fnameb,1,32)||'$nl$'||substr(p_fnameb,33,32)||'$nl$'||substr(p_adresb,1,32)||'$nl$'||substr(p_adresb,33,32),
+                '/'||substr(upper(p_nlsb),1,32)||'$nl$'||substr(p_fnameb,1,32)||'$nl$'||case when length(p_fnameb)>32 then substr(p_fnameb,33,32)||'$nl$' else '' end ||substr(p_adresb,1,32)||'$nl$'||substr(p_adresb,33,32),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-            add_dop_req(l_ref, '70', trim(substr(p_nazn,1,34)||'$nl$'||substr(p_nazn,35,34)||'$nl$'||substr(p_nazn,69,34)||'$nl$'||substr(p_nazn,102,34)),
+            add_dop_req(l_ref, '70', trim(substr(p_nazn,1,34)||case when substr(p_nazn,35,34) is not null then '$nl$' else '' end||substr(p_nazn,35,34)||
+            case when substr(p_nazn,69,34) is not null then  '$nl$' else '' end ||substr(p_nazn,69,34)||
+            case when substr(p_nazn,102,34) is not null then '$nl$' else '' end||substr(p_nazn,102,34)),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             add_dop_req(l_ref, '71A', substr(p_sw71a,1,34),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-            add_dop_req(l_ref, '72', substr(p_dopreq,1,34),
+            add_dop_req(l_ref, '72', substr(p_dopreq,1,30),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
 
             if (l_blank_ser is not null and l_blank_num is not null) then

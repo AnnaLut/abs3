@@ -98,7 +98,6 @@ is
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
     p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092	    in  zayavka.f092%type          default null,  -- код параметра F092
-    p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -180,6 +179,7 @@ is
     p_curid   in  zayavka.kv2%type,   -- числ.код валюты
     p_amount  in  zayavka.s2%type,    -- сумма заявленной валюты (в коп.)
     p_reqdate in  zayavka.fdat%type,  -- дата заявки
+ p_obz     in  zayavka.obz%type default 0,   -- признак обязательной продажи
     p_cmsprc  out zayavka.kom%type,   -- процент (%) комиссии
     p_cmssum  out zayavka.skom%type); -- фикс.сумма комиссии
 
