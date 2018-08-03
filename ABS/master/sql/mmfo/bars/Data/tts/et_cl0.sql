@@ -849,3 +849,11 @@ begin
 end;
 /
 commit;
+
+delete BARS.TMP_TTS_REGION where tt = 'CL0' and nls_type = 'NLSK';
+
+Insert into BARS.TMP_TTS_REGION
+   (TT, NLS_TYPE, KF, NLS_STMT)
+ Values
+   ('CL0', 'NLSK', '0', '#(get_proc_nls(''T00'',#(KVA)))');
+COMMIT;
