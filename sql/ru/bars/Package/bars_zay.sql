@@ -167,6 +167,7 @@ is
     p_contacttel    in  zayavka.contact_tel%type   default null,  -- ТЕЛ контактного лица
     p_branch        in  zayavka.branch%type        default null,  -- бранч заявки
     p_operid_nokk   in  zayavka.operid_nokk%type   default null,  -- Унікальний номер операції в системі Клієнт-Банк (Олег, Надра)
+    p_identkb       in  zayavka.identkb%type       default null,  -- Признак системі клиент-банк 1- корп2, 2 - корп лайт
     p_reqid         out zayavka.id%type);                         -- идентификатор заявки
 
   --
@@ -3552,6 +3553,12 @@ begin
      p_request.identkb := substr(to_char(p_request.id), 1, 16);
   end if;
 
+  if p_flag_klb = -1  then
+     p_request.fnamekb := 'C2';
+  elsif p_flag_klb = -2 then
+     p_request.fnamekb := 'CL';
+  end if;
+
   p_request.kf := sys_context('bars_context','user_mfo');
 
   insert into zayavka values p_request;
@@ -3794,6 +3801,7 @@ procedure create_request
     p_contacttel    in  zayavka.contact_tel%type   default null,  -- ТЕЛ контактного лица
     p_branch        in  zayavka.branch%type        default null,  -- бранч заявки
     p_operid_nokk   in  zayavka.operid_nokk%type   default null,  -- Унікальний номер операції в системі Клієнт-Банк (Олег, Надра)
+    p_identkb       in  zayavka.identkb%type       default null,  -- Признак системі клиент-банк 1- корп2, 2 - корп лайт
     p_reqid         out zayavka.id%type)                         -- идентификатор заявки
 is
   l_request zayavka%rowtype;
@@ -3851,7 +3859,7 @@ begin
   l_request.req_type      := null;
   l_request.vdate_plan    := null;
 
-  add_request(l_request, 1);
+  add_request(l_request, p_identkb);
 
   p_reqid := l_request.id;
 
