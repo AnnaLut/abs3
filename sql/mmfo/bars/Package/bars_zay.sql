@@ -179,7 +179,6 @@ is
     p_curid   in  zayavka.kv2%type,   -- числ.код валюты
     p_amount  in  zayavka.s2%type,    -- сумма заявленной валюты (в коп.)
     p_reqdate in  zayavka.fdat%type,  -- дата заявки
- p_obz     in  zayavka.obz%type default 0,   -- признак обязательной продажи
     p_cmsprc  out zayavka.kom%type,   -- процент (%) комиссии
     p_cmssum  out zayavka.skom%type); -- фикс.сумма комиссии
 
