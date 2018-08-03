@@ -11,6 +11,7 @@ PROMPT *** ALTER_POLICY_INFO to ZAYAVKA ***
 BEGIN 
         execute immediate  
           'begin  
+
                bpa.alter_policy_info(''ZAYAVKA'', ''FILIAL'' , ''M'', ''M'', null, ''M'');
                bpa.alter_policy_info(''ZAYAVKA'', ''WHOLE'' , null, ''E'', null, ''E'');
                null;
@@ -98,7 +99,8 @@ begin
 	REFOPER NUMBER, 
 	CODE_2C VARCHAR2(1), 
 	P12_2C VARCHAR2(10), 
-	SUPPORT_DOCUMENT NUMBER(1,0)
+	SUPPORT_DOCUMENT NUMBER(1,0), 
+	ATTACHMENTS_COUNT NUMBER(*,0)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 0 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -107,6 +109,7 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+
 
 PROMPT *** ADD COLUMN F092 to ZAYAVKA ***
 BEGIN 
@@ -117,16 +120,6 @@ exception when others then
 END; 
 /
 
-PROMPT *** ADD COLUMN F092 to ZAYAVKA ***
-BEGIN 
-        execute immediate  
-          ' alter table zayavka add ATTACHMENTS_COUNT integer '; 
-exception when others then
-  if  sqlcode=-01430 then null; else raise; end if;
-END; 
-/
-COMMENT ON COLUMN BARS.ZAYAVKA.ATTACHMENTS_COUNT IS 'Кількість доданих документів';
-/
 
 
 PROMPT *** ALTER_POLICIES to ZAYAVKA ***
@@ -134,6 +127,7 @@ PROMPT *** ALTER_POLICIES to ZAYAVKA ***
 
 
 COMMENT ON TABLE BARS.ZAYAVKA IS 'Заявки клиентов на покупку-продажу валюты';
+COMMENT ON COLUMN BARS.ZAYAVKA.ATTACHMENTS_COUNT IS 'Кількість доданих документів';
 COMMENT ON COLUMN BARS.ZAYAVKA.RNK IS 'РНК клиента';
 COMMENT ON COLUMN BARS.ZAYAVKA.DK IS '1 - покупка,  2 - продажа, 3 - покупка за др.валюту (конверсия)';
 COMMENT ON COLUMN BARS.ZAYAVKA.ACC0 IS 'для 1 - грн счет списания, для 2 - грн счет зачисления(при зачислении выруч.грн на межбанк - поле пустует,зато заполняются поля mfo0, nls0,okpo0), для 3 - вал счет для списания';
@@ -186,122 +180,38 @@ COMMENT ON COLUMN BARS.ZAYAVKA.ISP IS 'код пользователя, который ввел заявку';
 COMMENT ON COLUMN BARS.ZAYAVKA.TOBO IS 'код подразделения, в котором введена заявка';
 COMMENT ON COLUMN BARS.ZAYAVKA.PRODUCT_GROUP IS 'код товарной группы (kod_70_4)';
 COMMENT ON COLUMN BARS.ZAYAVKA.NUM_VMD IS '№ таможенной декларации';
-COMMENT ON COLUMN BARS.ZAYAVKA.f092 is 'Значение параметра f092';
-
-
-PROMPT *** Create  constraint PK_ZAYCLOSETYPES ***
-begin   
- execute immediate 'alter table ZAY_CLOSE_TYPES
-  add constraint PK_ZAYCLOSETYPES primary key (ID)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  PK KOD_70_4 ***
-begin   
- execute immediate ' alter table KOD_70_4   add constraint PK_KOD_70_4 primary key (P70) 
-     using index   tablespace BRSDYNI';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-PROMPT *** Create  constraint FK_ZAYAVKA_PRODUCT_GROUP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_BRANCH FOREIGN KEY (BRANCH)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
+COMMENT ON COLUMN BARS.ZAYAVKA.BRANCH IS '';
+COMMENT ON COLUMN BARS.ZAYAVKA.KF IS '';
+COMMENT ON COLUMN BARS.ZAYAVKA.DETAILS IS '';
+COMMENT ON COLUMN BARS.ZAYAVKA.KURS_KL IS 'Первоначальный клиентский курс';
+COMMENT ON COLUMN BARS.ZAYAVKA.COMM IS 'Коментарий';
+COMMENT ON COLUMN BARS.ZAYAVKA.CONTACT_FIO IS 'ФИО контактного лица';
+COMMENT ON COLUMN BARS.ZAYAVKA.CONTACT_TEL IS 'ТЕЛ контактного лица';
+COMMENT ON COLUMN BARS.ZAYAVKA.CLOSE_TYPE IS 'Тип закрытия заявки (1-на ВП банка; 2-на МВРУ; 3-заявка закрыта на другую заявку клиєнта))';
+COMMENT ON COLUMN BARS.ZAYAVKA.VERIFY_OPT IS 'Унікальний номер операції в системі Клієнт-Банк HOKK';
+COMMENT ON COLUMN BARS.ZAYAVKA.AIMS_CODE IS 'Цифровой код цели продажи валюты';
+COMMENT ON COLUMN BARS.ZAYAVKA.KV_CONV IS 'Код валюти(конвертація)';
+COMMENT ON COLUMN BARS.ZAYAVKA.OPERID_NOKK IS 'Унікальний номер операції в системі Клієнт-Банк HOKK';
+COMMENT ON COLUMN BARS.ZAYAVKA.SOPER IS 'Общая сумма исходного вход.документа на 2603 для ОБЗ';
+COMMENT ON COLUMN BARS.ZAYAVKA.REF_SPS IS 'Референс проводки по списанию средств';
+COMMENT ON COLUMN BARS.ZAYAVKA.S_PF IS 'Сумма отчисления в ПФ';
+COMMENT ON COLUMN BARS.ZAYAVKA.REF_PF IS 'Референс отчисления в ПФ';
+COMMENT ON COLUMN BARS.ZAYAVKA.ID_PREV IS 'Ид заявки-родителя (для той, кот.разбивали)';
+COMMENT ON COLUMN BARS.ZAYAVKA.REQ_TYPE IS '';
+COMMENT ON COLUMN BARS.ZAYAVKA.VDATE_PLAN IS 'Плановая дата валютирования';
+COMMENT ON COLUMN BARS.ZAYAVKA.REASON_COMM IS 'Причина возврата заявки';
+COMMENT ON COLUMN BARS.ZAYAVKA.REFOPER IS 'Референс исходного вход.документа на 2603 для ОБЗ';
+COMMENT ON COLUMN BARS.ZAYAVKA.CODE_2C IS 'Код купівлі за імпортом (#2C)';
+COMMENT ON COLUMN BARS.ZAYAVKA.P12_2C IS 'Ознака операції(#2C)';
+COMMENT ON COLUMN BARS.ZAYAVKA.SUPPORT_DOCUMENT IS 'Наличие подтверждающих документов';
 
 
 
 
-PROMPT *** Create  constraint FK_ZAYAVKA_PRODUCT_GROUP ***
+PROMPT *** Create  constraint CC_ZAYAVKA_CODE2C ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_PRODUCT_GROUP FOREIGN KEY (PRODUCT_GROUP)
-	  REFERENCES BARS.KOD_70_4 (P70) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ZAYAVKA_KF_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA MODIFY (KF CONSTRAINT CC_ZAYAVKA_KF_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_ZAYAVKA_BRANCH_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA MODIFY (BRANCH CONSTRAINT CC_ZAYAVKA_BRANCH_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint NK_ZAYAVKA_ID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA MODIFY (ID CONSTRAINT NK_ZAYAVKA_ID NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_TABVAL_CONV ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_TABVAL_CONV FOREIGN KEY (KV_CONV)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_ZATCLOSETYPES ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_ZATCLOSETYPES FOREIGN KEY (CLOSE_TYPE)
-	  REFERENCES BARS.ZAY_CLOSE_TYPES (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_ZAYBACK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_ZAYBACK FOREIGN KEY (IDBACK)
-	  REFERENCES BARS.ZAY_BACK (ID) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT CC_ZAYAVKA_CODE2C CHECK (code_2c in (''0'', ''1'', ''2'', ''4'', ''9'', ''A'', ''B'')) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -410,10 +320,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_ZAYAVKA_CODE2C ***
+PROMPT *** Create  constraint NK_ZAYAVKA_ID ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT CC_ZAYAVKA_CODE2C CHECK (code_2c in (''0'', ''1'', ''2'', ''4'',''9'',''A'',''B'')) ENABLE';
+  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT CC_ZAYAVKA_CODE2C CHECK (code_2c in (''0'', ''1'', ''2'', ''3'',''4'',''5'',''9'',''A'',''B'')) ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -422,11 +332,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XFK_ZAYAVKA_BENEFCOUNTRY ***
+PROMPT *** Create  constraint CC_ZAYAVKA_BRANCH_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT XFK_ZAYAVKA_BENEFCOUNTRY FOREIGN KEY (BENEFCOUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ZAYAVKA MODIFY (BRANCH CONSTRAINT CC_ZAYAVKA_BRANCH_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -435,141 +344,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint XFK_ZAYAVKA_COUNTRY ***
+PROMPT *** Create  constraint CC_ZAYAVKA_KF_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT XFK_ZAYAVKA_COUNTRY FOREIGN KEY (COUNTRY)
-	  REFERENCES BARS.COUNTRY (COUNTRY) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint XFK_ZAYAVKA_RNK ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT XFK_ZAYAVKA_RNK FOREIGN KEY (RNK)
-	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_ZAYAIMS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_ZAYAIMS FOREIGN KEY (META)
-	  REFERENCES BARS.ZAY_AIMS (AIM) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_STAFF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_STAFF FOREIGN KEY (ISP)
-	  REFERENCES BARS.STAFF$BASE (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_TOBO ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_TOBO FOREIGN KEY (TOBO)
-	  REFERENCES BARS.BRANCH (BRANCH) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_TOPCONTRACTS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_TOPCONTRACTS FOREIGN KEY (PID)
-	  REFERENCES BARS.TOP_CONTRACTS (PID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_BANKS ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_BANKS FOREIGN KEY (MFOP)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_TABVAL ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_TABVAL FOREIGN KEY (KV2)
-	  REFERENCES BARS.TABVAL$GLOBAL (KV) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_BANKS2 ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_BANKS2 FOREIGN KEY (MFO0)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_PRIORITY ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_PRIORITY FOREIGN KEY (PRIORITY)
-	  REFERENCES BARS.ZAY_PRIORITY (ID) ENABLE NOVALIDATE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint FK_ZAYAVKA_KF ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.ZAYAVKA ADD CONSTRAINT FK_ZAYAVKA_KF FOREIGN KEY (KF)
-	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.ZAYAVKA MODIFY (KF CONSTRAINT CC_ZAYAVKA_KF_NN NOT NULL ENABLE)';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -631,15 +409,42 @@ exception when others then
  end;
 /
 
+BEGIN 
+        execute immediate  
+          'alter table ZAYAVKA add cl_person1 VARCHAR2(300)'; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
+
+
+BEGIN 
+        execute immediate  
+          'alter table ZAYAVKA add cl_person2 VARCHAR2(300)'; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
+
+-- Add comments to the columns 
+comment on column ZAYAVKA.cl_person1
+  is 'ФІО пдписанта №1 в корп-лайті';
+comment on column ZAYAVKA.cl_person2
+  is 'ФІО пдписанта №2 в корп-лайті';
+
+
+
 
 
 PROMPT *** Create  grants  ZAYAVKA ***
+grant UPDATE                                                                 on ZAYAVKA         to BARSAQ;
 grant FLASHBACK,REFERENCES,SELECT                                            on ZAYAVKA         to BARSAQ with grant option;
 grant REFERENCES,SELECT                                                      on ZAYAVKA         to BARSAQ_ADM with grant option;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAYAVKA         to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on ZAYAVKA         to BARS_DM;
 grant INSERT,SELECT,UPDATE                                                   on ZAYAVKA         to START1;
 grant INSERT                                                                 on ZAYAVKA         to TECH_MOM1;
+grant SELECT                                                                 on ZAYAVKA         to UPLD;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on ZAYAVKA         to WR_ALL_RIGHTS;
 grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on ZAYAVKA         to ZAY;
 
@@ -648,7 +453,6 @@ grant ALTER,DEBUG,DELETE,INSERT,ON COMMIT REFRESH,QUERY REWRITE,SELECT,UPDATE on
 PROMPT *** Create SYNONYM  to ZAYAVKA ***
 
   CREATE OR REPLACE PUBLIC SYNONYM ZAYAVKA FOR BARS.ZAYAVKA;
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/ZAYAVKA.sql =========*** End *** =====

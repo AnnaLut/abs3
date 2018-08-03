@@ -4362,6 +4362,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         --p_productgrp    => zayavka.product_group%type default null,  -- код товарной группы               (для dk = 1)
         p_details       => l_doc.basis,
 		p_branch        => l_branch,
+		p_identkb       => -1,
 		p_reqid         => l_doc.id);                         -- идентификатор заявки
     --
     -- сохраняем соответствие id заявки и id первичного документа
@@ -6292,8 +6293,8 @@ end data_import;
  show err;
  
 PROMPT *** Create  grants  DATA_IMPORT ***
-grant EXECUTE                                                                on DATA_IMPORT     to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on DATA_IMPORT     to IBANK_ADMIN;
+grant EXECUTE                                                                on barsaq.DATA_IMPORT     to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on barsaq.DATA_IMPORT     to IBANK_ADMIN;
 
  
  
