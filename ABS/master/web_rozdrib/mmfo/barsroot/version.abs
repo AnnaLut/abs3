@@ -1,4 +1,4 @@
-=========  svn diff --summarize -r 62217:62234 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 62217:62236 D:\SVN\master\web\mmfo
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.14\mmfo\web\barsroot\Areas\CDO\Corp2\Controllers\RelatedCustomers.js
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.14\mmfo\web\barsroot\Areas\CDO\Corp2\reports\cl_acsk_requestCorp2.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.14\mmfo\web\barsroot\Areas\CDO\Common\Controllers\CommonCustomers.js
@@ -15,4 +15,4 @@
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.14\mmfo\web\barsroot\App_Data\forms\frm_zay_buy_add_Front.xml
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.14\mmfo\web\barsroot\App_Data\forms\frm_zay_buy_add_edit_Front.xml
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.14\mmfo\web\barsroot\App_Code\Areas\CDO\Corp2\Repository\Corp2RelatedCustomersRepository.cs
-Bugfix_2.0.45.0.14 (Rev:62217-62234
+Bugfix_2.0.45.0.14 (Rev:62217-62236
