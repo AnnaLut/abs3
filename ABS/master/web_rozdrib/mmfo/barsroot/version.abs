@@ -1,8 +1,8 @@
-=========  svn diff --summarize -r 61962:62160 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 61962:62166 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web\barsroot\App_Code\clientregister\defaultWebService.asmx.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web\barsroot\version.abs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web\barsroot\Areas\Reporting\controllers\reportingNbuController.js
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web\barsroot\Areas\Reporting
----web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web\barsroot\App_Code\clientregister\defaultWebService.asmx.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web\barsroot
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.13\mmfo\web
-Bugfix_2.0.45.0.13 (Rev:61962-62160
+Bugfix_2.0.45.0.13 (Rev:61962-62166
