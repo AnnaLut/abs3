@@ -1541,7 +1541,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                        p_prn_file_own  in SW_COMPARE.PRN_FILE_OWN%type,
                        p_prn_file_import in SW_COMPARE.PRN_FILE_IMPORT%type,
                        p_kf            in SW_COMPARE.KF%type,
-                       p_COMMENTS      in SW_COMPARE.COMMENTS%type
+                       p_COMMENTS      in SW_COMPARE.COMMENTS%type,
+                       p_state         out number
                        )
   is
   l_id         SW_COMPARE.ID%type;
@@ -1568,6 +1569,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
        and i.systemcode in (select ss.systemcode from SW_SYSTEM ss where ss.kod_nbu = p_kod_nbu)
        and I.compare_id = 0;
    if ( sql%rowcount = 0 ) and p_type=1   then rollback to DO_O; end if;  --дубляж, его не квитуем
+   p_state:=1;    
 
   end;
 
@@ -1577,13 +1579,49 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     l_cause      SW_COMPARE.CAUSE_ERR%type:=0;
     l_count      number(17):=0;
     l_resolve    SW_COMPARE.IS_RESOLVE%type:=0;
+    l_state      number(1):=0;
   begin
   bars_audit.info(title);
-  for cur in (select o.kf,
+  --будет 2 прохода (пока ничего лучше не придумал)
+  for cur in (select * from (
+              --первый проход по дате
+              select 1 n,
+                     o.kf,
                      o.kod_nbu,
                      o.oper_branch,
                      i.barspointcode,
-                     o.fdat,
+                     o.pdat,
+                     i.operdate,
+                     o.nls,
+                     o.s,
+                     o.sk,
+                     i.amount,
+                     o.ref,
+                     o.tt,
+                     i.transactionid,
+                     i.operation ,
+                     i.totalcomission,
+                     i.bankcomission,
+                     o.prn_file prn_file_own,
+                     i.prn_file prn_file_import
+              from SW_OWN O, SW_IMPORT I, SW_SYSTEM S, SW_TT_OPER TT
+              where I.SYSTEMCODE = S.SYSTEMCODE
+                and o.compare_id = 0
+                and i.compare_id = 0
+                and o.mtsc = i.transactionid
+                and trunc(o.pdat) = i.operdate
+                and S.KOD_NBU = O.KOD_NBU
+                and O.TT      = TT.TT
+                and I.OPERATION = TT.ID
+                and (o.kod_nbu = p_kod_nbu or p_kod_nbu is null)
+              union
+                ---второй проход без даты
+              select 2 n,
+                     o.kf,
+                     o.kod_nbu,
+                     o.oper_branch,
+                     i.barspointcode,
+                     o.pdat,
                      i.operdate,
                      o.nls,
                      o.s,
@@ -1605,7 +1643,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                 and S.KOD_NBU = O.KOD_NBU
                 and O.TT      = TT.TT
                 and I.OPERATION = TT.ID
-                and (o.kod_nbu = p_kod_nbu or p_kod_nbu is null))
+                and (o.kod_nbu = p_kod_nbu or p_kod_nbu is null)
+                ) t order by t.n) 
+            
   loop
     l_cause :=0;
     l_resolve:=0;
@@ -1615,7 +1655,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     if cur.s<> cur.amount then
       l_cause:=l_cause+2; --некорректна сумма ЄВ-АБС
     end if;
-    if cur.operdate<> cur.fdat then
+    if cur.operdate<> cur.pdat then
       l_cause:=l_cause+4;  --розбіжність у даті ЄВ-АБС
     end if;
     if cur.nls is null then
@@ -1641,9 +1681,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
               cur.prn_file_own,
               cur.prn_file_import,
               cur.kf,
-              null);
+              null,
+              l_state);
+   if  l_state = 1 then          
   l_count:=l_count+1;
+      l_state:=0;
+   end if;   
   end loop;
+ 
   p_message:='Успішно зквитовано ' ||l_count||' операцій.';
   end;
 
@@ -1659,6 +1704,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                                 p_comments      in SW_COMPARE.COMMENTS%type)
   is
     title        varchar2(100) := 'pkg_SW_COMPARE.compare_data_hand. ';
+    l_state      number(1):=0;
   begin
   bars_audit.info(title);
     set_match(2,
@@ -1673,7 +1719,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
               case when p_ref is not null then p_prn_file else null end,
               case when p_ref is null then p_prn_file else null end,
               p_kf,
-              p_comments);
+              p_comments,
+              l_state);
   end;
 
  -- удаление квитования
