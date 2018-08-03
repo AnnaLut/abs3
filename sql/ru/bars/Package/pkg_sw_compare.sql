@@ -220,54 +220,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
   l_supplier_element_table := dbms_xmldom.createelement(l_domdoc, 'table');
   l_sup_node_table := dbms_xmldom.appendchild(l_sup_node,dbms_xmldom.makenode(l_supplier_element_table));
 
-          for sup_rec in (/*select
-                                 p.ref,
-                                 o.tt,
-                                 (select name  from tts where tt =p.tt) tt_name,
-                                 p.branch oper_branch ,
-                                 p.pdat,
-                                 o.fdat,
-                                 (select value from operw where ref = p.ref and tag = 'MTSC') MTSC,
-                                 o.dk,
-                                 o.s s,
-                                 null sk,
-                                 x.nls,
-                                 x.kv,
-                                 x.kod_nbu,
-                                 sw.name,
-                                 x.branch acc_branch ,
-                                 x.ob22,
-                                 p.nazn
-                            from oper p,
-                                 opldok o,
-                                 saldoa s,
-                                 (select a.branch,
-                                         a.kv,
-                                         a.nls,
-                                         a.dapp,
-                                         a.acc,
-                                         a.isp,
-                                         a.nms,
-                                         w.kod_nbu,
-                                         a.nbs,
-                                         a.ob22
-                                    from accounts a,  (select  distinct decode(t.kod_nbu ,'94','97','95','97','96','97',t.kod_nbu ) kod_nbu , t.ob22_2909, t.ob22_2809
-                                                        from BARS.SWI_MTI_LIST t,(select distinct kod_nbu from sw_system) s where s.kod_nbu = t.kod_nbu) w
-                                   where (a.nbs = '2909' and a.ob22 = w.OB22_2909 or
-                                         a.nbs = '2809' and a.ob22 = w.OB22_2809)
-                                     and a.dapp >= l_dt)x,
-                                   SWI_MTI_LIST SW
-                           where s.fdat = l_dt
-                             and s.acc = x.acc
-                             and s.acc = o.acc
-                             and s.fdat = o.fdat
-                             and (x.NBS = '2909' and o.dk = 1 OR x.NBS = '2809' and o.dk = 0)
-                             and p.ref = o.ref
-                             and x.kod_nbu = sw.kod_nbu
-                             and p.tt = o.tt
-                             and p.sos= 5*/
-
-                            with x as(select a.branch,
+          for sup_rec in (with x as(select a.branch,
                                                                      a.kv,
                                                                      a.nls,
                                                                      a.dapp,
@@ -927,7 +880,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
            delete from SW_OWN o where o.prn_file =  l_CF.id;
            delete from SW_CA_FILES where ID = l_CF.id;
 
-           update SW_IMPORT i set i.compare_id = 0 where i.prn_file in (select distinct prn_file_import from SW_COMPARE where prn_file_own =l_CF.id);
+           update SW_IMPORT i set i.compare_id = 0 where (i.prn_file, i.compare_id) in (select  prn_file_import, id from SW_COMPARE where prn_file_own =l_CF.id);
 
            delete from SW_COMPARE c where c.prn_file_own = l_CF.id;
 
@@ -1022,7 +975,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
            delete from SW_OWN o where o.prn_file =  l_CF.id;
            delete from SW_CA_FILES where ID = l_CF.id;
 
-           update SW_IMPORT i set i.compare_id = 0 where i.prn_file in (select distinct prn_file_import from SW_COMPARE where prn_file_own =l_CF.id);
+           update SW_IMPORT i set i.compare_id = 0 where (i.prn_file, i.compare_id) in (select  prn_file_import, id from SW_COMPARE where prn_file_own =l_CF.id);
 
            delete from SW_COMPARE c where c.prn_file_own = l_CF.id;
 
@@ -1057,9 +1010,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
            end if;*/
           update  SW_CA_FILES set state = 5, message = l_message where id = l_id;
           if l_message is null then
-            p_message:= 'Файл прийнято та оброблено без помилок!';
+            p_message:= 'Файл '||l_id||' прийнято та оброблено без помилок!';
           else
-            p_message:= 'Файл прийнято, але при обробці виникли помилки! Кількість помилок = '||l_err||'.  Дані о помилках в таблиці - '||l_message;
+            p_message:= 'Файл '||l_id||' прийнято, але при обробці виникли помилки! Кількість помилок = '||l_err||'.  Дані о помилках в таблиці - '||l_message;
           end if;
        else   raise_application_error(-20001,nvl(l_message,'Повертається пустий файл!'));
        end if;
@@ -1185,13 +1138,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                                         p_wallet_dir  => get_param_webconfig('VAL.Wallet_dir'),
                                         p_wallet_pass => get_param_webconfig('VAL.Wallet_pass'));
 
-      -- добавить параметры
-     -- soap_rpc.add_parameter(l_request, 'reportdate', to_char(p_ReportDateFrom, 'DD.MM.YYYY hh24:mi:ss'));
-     -- soap_rpc.add_parameter(l_request, 'SystemId', p_ReportSystemId);
-
-      l_params:='<' || 'REPORTDATE' || '>'||to_char(p_ReportDateFrom, 'DD.MM.YYYY hh24:mi:ss')||'</' || 'REPORTDATE' || '>'
-/*                ||
-                '<' || 'SystemId' || '>'||p_ReportSystemId||'</' || 'SystemId' || '>'*/;
+      l_params:='<' || 'REPORTDATE' || '>'||to_char(p_ReportDateFrom, 'DD.MM.YYYY hh24:mi:ss')||'</' || 'REPORTDATE' || '>';
       soap_rpc.add_parameter(l_request, 'Parameters', l_params);
       soap_rpc.add_parameter(l_request, 'ServiceMethod', '0');
 
@@ -1213,7 +1160,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
       if instr(l_errtxt,'Exception') >0 then
         raise_application_error(-20100,l_errtxt);
       end if;
-     -- l_tmp  := xmltype(l_clob);
 
   end sk_service;
 
@@ -1252,10 +1198,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                                         p_wallet_dir  => get_param_webconfig('VAL.Wallet_dir'),
                                         p_wallet_pass => get_param_webconfig('VAL.Wallet_pass'));
 
-      -- добавить параметры
-      --soap_rpc.add_parameter(l_request, 'ReportDateFrom', to_char(p_ReportDateFrom, 'DD.MM.YYYY hh24:mi:ss'));
-      --soap_rpc.add_parameter(l_request, 'ReportSystemId', p_ReportSystemId);
-
       l_params:='<' || 'ReportDateFrom' || '>'||to_char(p_ReportDateFrom, 'DD.MM.YYYY hh24:mi:ss')||'</' || 'ReportDateFrom' || '>'
                 ||
                 '<' || 'ReportSystemId' || '>'||p_ReportSystemId||'</' || 'ReportSystemId' || '>';
@@ -1267,8 +1209,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
       --Фикс неприятности в работе xpath при указанных xmlns
       p_clob := l_response.doc.getClobVal();
-      --p_clob := replace(l_response.doc.getClobVal(), 'xmlns', 'mlns');
-     -- l_tmp  := xmltype(l_clob);
 
       begin
         l_xml_resp := xmltype(p_clob);
@@ -1321,7 +1261,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           delete from SW_IMPORT o where o.prn_file =  cur.id;
           delete from SW_files where ID = cur.id;
 
-           update SW_OWN i set i.compare_id = 0 where i.prn_file in (select distinct prn_file_own  from SW_COMPARE where prn_file_import =cur.id);
+           update SW_OWN i set i.compare_id = 0 where  (i.prn_file, i.compare_id) in (select prn_file_own, id  from SW_COMPARE where prn_file_import =cur.id);
 
            delete from SW_COMPARE c where c.prn_file_import = cur.id;
 
@@ -1397,10 +1337,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
           INTO l_clob , l_date, l_systemcode
           FROM SW_files t
          WHERE t.id = p_id;
-/*      EXCEPTION
-        WHEN no_data_found THEN
-           bars_audit.error( title || ': ' || dbms_utility.format_error_stack() ||
-                              chr(10) || dbms_utility.format_error_backtrace() );*/
       END;
         l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -1441,33 +1377,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
              l_SW_IMPORT (l_SW_IMPORT .last).bankcomission  := to_number(replace(replace(l_str,'.',l_decimal),',',l_decimal));
 
          END LOOP;
-
-/*        l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
-          for r in (select *
-                      from xmltable(xmlnamespaces(default 'http://ws.unity-bars.com.ua/'),'TransactionDetailReportResponse/TransactionDetailReportResult/Transfer' passing xmltype(l_clob)
-                                    columns
-                                    TRANSACTIONID number        path 'TRANSACTIONID',
-                                    BARSPOINTCODE varchar2(30)  path 'BARSPOINTCODE',
-                                    AMOUNT        varchar2(20)  path 'AMOUNT',
-                                    CURRENCY      varchar2(3)   path 'CURRENCY',
-                                    OPERATION     number        path 'OPERATION'
-
-                                   ) p
-                   )
-           loop
-               l_SW_IMPORT .extend;
-               l_SW_IMPORT (l_SW_IMPORT .last).transactionid   := r.transactionid;
-
-               l_SW_IMPORT (l_SW_IMPORT .last).barspointcode   := r.barspointcode;
-               l_amount  := replace(replace(r.amount,'.',l_decimal),',',l_decimal);
-               l_sw_import(l_sw_import.last).amount := to_number(l_amount);
-
-               l_SW_IMPORT (l_SW_IMPORT .last).currency    := trim(r.currency);
-
-               l_SW_IMPORT (l_SW_IMPORT .last).operation   := to_number(r.operation);
-           end loop;*/
-
-
              BEGIN
                EXECUTE IMMEDIATE ' delete from   ERR$_SW_IMPORT where prn_file = :p_id'
                using p_id;
@@ -1520,7 +1429,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
 
            --очистка,якщо виникли помилки
           l_SW_IMPORT.delete();
-         -- l_SW_IMPORT:= NULL;
 
           dbms_xmlparser.freeparser(l_parser);
           dbms_xmldom.freedocument(l_doc);
