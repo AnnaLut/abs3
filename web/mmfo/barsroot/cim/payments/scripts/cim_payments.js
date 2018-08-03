@@ -209,6 +209,8 @@ CIM.pay_module = function () {
     module.FantomBind = fantomBind;
     // повернутися до стану контракту
     module.GoBack = goBack;
+    // завантажити прикріплені файли
+    module.ShowAttachments = showAttachments;
     //#endregion
 
     // ******** private methods ********
@@ -1143,6 +1145,83 @@ CIM.pay_module = function () {
     }
 
     //#endregion
+
+    //#region Вікно завантаження прикріплених файлів
+    function showAttachments(ref) {
+        //var bidId = obj.REF;
+        var filesList = sessionStorage[ref];
+        if (filesList) {
+            filesList = JSON.parse(filesList);
+            OnGetFileInfos(filesList, ref);
+        }
+        else {
+            $.ajax({
+                //async: false,
+                url: bars.config.urlContent("/api/ExternalServices/ExternalServices/GetCorpLightFilesInfo"),
+                contentType: "application/json",
+                dataType: "json",
+                data: { bidId: ref },
+                success: function (result) {
+                    if (result.error) {
+                        alert(result.error);
+                    }
+                    else if (result.nodata) {
+                        alert("По платежу (реф.док.: " + ref + ") файлів не знайдено.");
+                    }
+                    else {
+                        filesList = result;
+                        sessionStorage[ref] = JSON.stringify(result);
+                        OnGetFileInfos(filesList, ref);
+                    }
+                }
+            });
+        }
+    }
+    function loadFileAnchorClick(e) {
+        e = e || window.event;
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+        window.location.href = this.href;
+        return false;
+    }
+    function OnGetFileInfos(filesList, bidId) {
+        if (filesList.length) {
+            var diagAttachments = $('#dialogAttachments');
+            diagAttachments.empty();
+            //var fileIds = [];
+            for (var i = 0; i < filesList.length; i++) {
+                var link = document.createElement('a');
+                link.href = bars.config.urlContent("/api/ExternalServices/ExternalServices/GetCorpLightFile", { fileId: filesList[i].Id });
+                //because IE8
+                link.onclick = loadFileAnchorClick;
+                link.innerHTML = '<table><tr><td>' + filesList[i].FileName + '</td><td>' + filesList[i].Comment + '</td></tr></table>';
+                link.className = 'load-file';
+                diagAttachments.append(link);
+                //fileIds.push(filesList[i].Id);
+            }
+            if (filesList.length > 1) {
+                var link = document.createElement('a');
+                link.href = bars.config.urlContent("/api/ExternalServices/ExternalServices/GetCorpLightAllFiles", { /*fileIds: fileIds,*/ bidId: bidId });
+                link.onclick = loadFileAnchorClick;
+                link.innerHTML = '<table><tr><td colspan="2">Завантажити всі</td></tr></table>';
+                link.className = 'load-file';
+                diagAttachments.prepend(link);
+            }
+
+            try {
+                diagAttachments.dialog('destroy');
+            }
+            catch (e) { };
+            diagAttachments.dialog({
+                autoOpen: false,
+                modal: false,
+                width: 600,
+                title: "Прикріплені файли по документу\\фантому ref=" + bidId
+            });
+            diagAttachments.dialog('open');
+        }
+    }
+    //#endregion
+
     //#region Панель контекстного меню
     // Ховаємо панель-акселератор
     function hideStatusDialog() {

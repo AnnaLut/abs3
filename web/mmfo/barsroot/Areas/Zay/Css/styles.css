@@ -94,3 +94,63 @@ textarea.ng-valid.ng-dirty {
 .box {
     padding-left: 20%;
 }
+.k-tooltip {
+    background: #b4fab4 !important;
+    /*width: 270px;*/
+    /*margin: 5px;*/
+}
+.load-file {
+    padding: 5px;
+    display: block;
+    color: rgb(70, 130, 70);
+    text-align: justify;
+}
+    .load-file:hover {
+        background: #82b482;
+        color: rgb(70, 130, 70);
+    }
+    .load-file:first-of-type {       
+        border-bottom: 1px dashed rgb(70, 130, 70);
+        font-weight:700;
+    }
+    .load-file td:first-child {
+        width: 120px;
+    }
+
+.legend {
+    /*vertical-align: middle;*/
+    /*display: inline-block;*/
+    width: 70px;
+    height: 25px;
+    line-height: 25px;
+    margin: 3px !important;
+    border: 1px solid;
+    text-align: center;
+}
+
+.corp-light {
+    background-color: rgb(250, 250, 220);
+    border-color: rgb(230, 230, 100);
+    color: rgb(150, 150, 0);
+}
+
+.corp2 {
+    background-color: rgb(200, 250, 250);
+    border-color: rgb(150, 230, 230);
+    color: rgb(0, 150, 150);
+}
+
+.k-state-selected.corp-light {
+    background-color: rgb(230, 230, 100);
+}
+
+.k-state-selected.corp2 {
+    background-color: rgb(150, 230, 230);
+}
+.loadLb {
+    margin-left:10px;
+    text-decoration:underline;
+}
+    .loadLb:hover {
+        font-weight: 700;
+    }

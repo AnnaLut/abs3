@@ -40,13 +40,13 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                        trim(to_char(v.product_group,'09')||' '||v.product_group_name) product_group_name, 
                        v.num_vmd, v.viza, v.priority, v.priorname, v.comm,
                        bars_zay.get_request_cover(v.id) cover_id,
-                       v.verify_opt, v.identkb, v.kv_conv, v.req_type, v.code_2c, v.p12_2c, v.ATTACHMENTS_COUNT, 
+                       v.verify_opt, v.identkb, v.kv_conv, v.req_type, v.code_2c, v.p12_2c, v.ATTACHMENTS_COUNT, v.FNAMEKB,                  
                        v.f092 F092_Code,
                        v.f092||' '||(select z.txt from f092 z where v.f092=z.f092) F092_Text               
                 FROM bars.v_zay_queue v,
                      bars.country c,
                      bars.country bc, bars.v_kod_70_2 k7
-                WHERE v.sos = 0 AND v.dk = :p_dk AND v.viza = 0 AND v.country = c.country(+) AND v.benefcountry = bc.country(+)
+                WHERE v.sos = 0 AND v.dk = :p_dk AND v.viza <= 0 AND v.country = c.country(+) AND v.benefcountry = bc.country(+)
                       AND v.basis = k7.p63(+) and mfo = f_ourmfo
                 ORDER BY v.fdat desc, v.id desc
             ";
@@ -68,7 +68,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                     to_char(v.meta,'09')||' '||v.aim_name meta_aim_name,
                     v.viza, v.priority, v.priorname, v.comm,
                     bars_zay.get_request_cover(v.id) cover_id, 
-                    v.verify_opt, v.obz, v.aims_code, null txt, v.kv_conv, v.req_type, v.ATTACHMENTS_COUNT,
+                    v.verify_opt, v.obz, v.aims_code, null txt, v.kv_conv, v.req_type, v.ATTACHMENTS_COUNT, v.FNAMEKB,
                     v.f092 F092_Code,
                     v.f092||' '||(select z.txt from f092 z where v.f092=z.f092) F092_Text
                 FROM v_zay_queue v
@@ -372,11 +372,11 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                                  end) PRIORVERIFY_VIZA,
                                 close_type, close_type_name, state, start_time, req_type, vdate_plan, sq S2_EQV
                         FROM v_zay
-                        WHERE dk = :p_dk AND s2 > 0 AND nvl(fdat,bankdate) <= bankdate 
+                        WHERE dk = :p_dk AND s2 > 0 AND trunc(nvl(fdat,bankdate)) <= bankdate 
                             AND")
                 .AppendFormat((null == sos && null == visa) 
                             ? " (sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1  AND vdate = bankdate)"
-                            : " (sos = {0} AND viza = {1})", sos, visa)
+                            : " (sos = {0} AND viza = {1})", Convert.ToString(sos, CultureInfo.InvariantCulture), visa)
                 .Append(" ORDER BY fdat desc, id desc");
 
             var parameters = new object[]
@@ -401,11 +401,11 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                                  end) PRIORVERIFY_VIZA,
                                 close_type, close_type_name, nvl(obz,0) obz, state, start_time, req_type, sq S2_EQV
                         FROM v_zay
-                        WHERE dk = :p_dk AND s2 > 0  AND nvl(fdat,bankdate) <= bankdate 
+                        WHERE dk = :p_dk AND s2 > 0  AND trunc(nvl(fdat,bankdate)) <= bankdate 
                             AND")
                 .AppendFormat((null == sos && null == visa)
                             ? @" (sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1  AND vdate = bankdate)"
-                            : " (sos = {0} AND viza = {1})", sos, visa)
+                            : " (sos = {0} AND viza = {1})", Convert.ToString(sos,CultureInfo.InvariantCulture), visa)
                 .Append(" ORDER BY fdat desc, id desc");
 
             var parameters = new object[]
@@ -599,11 +599,11 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                 .AppendFormat("SELECT DISTINCT to_char({0}) ", field)
                 .Append(@"
                         FROM v_zay
-                        WHERE dk = :p_dk AND s2 > 0 AND nvl(fdat,bankdate) <= bankdate 
+                        WHERE dk = :p_dk AND s2 > 0 AND trunc(nvl(fdat,bankdate)) <= bankdate 
                             AND")
                 .AppendFormat((null == sos && null == visa)
                 ? " (sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1  AND vdate = bankdate)"
-                : " (sos = {0} AND viza = {1})", sos, visa);
+                : " (sos = {0} AND viza = {1})", Convert.ToString(sos, CultureInfo.InvariantCulture), visa);
 
             var parameters = new object[]
             {

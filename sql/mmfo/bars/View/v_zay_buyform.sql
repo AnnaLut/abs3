@@ -12,7 +12,7 @@ PROMPT *** Create  view V_ZAY_BUYFORM ***
  "FDAT", "ND", "KOM", "SKOM", "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT",
  "DATC", "NUM_VMD", "VMD1", "VMD5", "COUNTRY", "CBCOUNTRY", "BASIS", "BENEFCOUNTRY", 
 "CBBENEFCOUNTRY", "BANK_CODE", "BANK_NAME", "PRODUCT_GROUP", "PRODUCT_GROUP_NAME", "DATZ",
- "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", "KV_CONV",
+ "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "FNAMEKB", "KB", "KV", "DOC_DESC", "KV_CONV",
  "LCV_CONV", "DATT","F092") AS 
   SELECT v.id,
             DECODE (v.dk, 1, 0, 1) dk, -- для фильтра в вебе, 0 - покупка, 1 - конверсия
@@ -66,6 +66,7 @@ PROMPT *** Create  view V_ZAY_BUYFORM ***
             contact_fio,
             contact_tel,
             bars_zay.get_request_cover (v.id) COVERED,
+            fnamekb,
             DECODE (NVL (identkb, 0), 0, 0, 1) kb,
             kv2 kv,
             NVL (zc.doc_desc, NULL) doc_desc,

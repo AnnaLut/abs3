@@ -263,7 +263,7 @@
                                 },
                                 change: function (e) {
                                     var type = this.value();
-                                    debugger;
+                                   
                                     var row = this.element.closest('tr'),
                                         grid = $scope.gridBuy,
                                         dataItem = grid.dataItem(row);
@@ -299,7 +299,7 @@
                 dataBound: function (data) {
                     $scope.btnBackRequest = false;
                     //$scope.btnSave = false;
-                    debugger;
+                   
                     $scope.gridBuy.tbody.find('>tr').each(function () {
                         var dataItem = $scope.gridBuy.dataItem(this);
                         if (dataItem.KURS_F >= 0 && dataItem.VDATE !== null && dataItem.CLOSE_TYPE === null) {
@@ -384,11 +384,11 @@
 
                     for (var i = $scope.forUpdateData.length; i--;) {
                         if ($scope.forUpdateData[i] === dataItem) {
-                            debugger;
+                           
                             $scope.forUpdateData.splice(i, 1);
                         }
                     }
-                    debugger;
+                   
                     $scope.btnSave = $scope.forUpdateData.length > 0 ? true : false;
                 }
             };
@@ -413,7 +413,7 @@
 
             // update dealer data: 
             $scope.saveUpdatedData = function () {
-                debugger;
+               
                 if ($scope.forUpdateData && $scope.closeTypesValidation($scope.forUpdateData)) {
                     console.log($scope.forUpdateData);
 
@@ -428,7 +428,7 @@
                             Fdat: $scope.forUpdateData[i].FDAT
                         });
                     }
-                    debugger;
+                   
 
                     var update = $http.post(bars.config.urlContent("/api/zay/updatedata/post"), JSON.stringify(arrData));
                     update.success(function(data) {
@@ -475,7 +475,7 @@
                     resizable: false,
                     actions: ['Close'],
                     close: function() {
-                        debugger;
+                       
                     }        
                 };
                 
@@ -498,7 +498,7 @@
                     resizable: false,
                     actions: ['Close'],
                     close: function () {
-                        debugger;
+                       
                     }
                 };*/
                 //$scope.currencyRateArchiveWindow.setOptions($scope.currencyRateArchiveDialog);
@@ -742,7 +742,7 @@
 
             $scope.backRequest = function (reason) {
 
-                debugger;
+               
                 var item = {
                     Mode: reason.viza,
                     Id: reason.id,

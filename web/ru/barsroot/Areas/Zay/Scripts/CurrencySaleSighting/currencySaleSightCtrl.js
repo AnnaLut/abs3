@@ -17,15 +17,18 @@
             {
                 template: "<button id='btnRefresh' type='button' class='k-button' title='Оновити'><i class='pf-icon pf-16 pf-reload_rotate'></i></button>"
             },
-             //{
-             //    template: "<button id='btnFilter' type='button' class='k-button' title='Складний фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
-             //},
+            {
+                template: "<button id='btnFilter' type='button' class='k-button' title='Складний фільтр'><i class='pf-icon pf-16 pf-filter-ok'></i></button>"
+            },
             { type: "separator" },
             {
                 template: "<button id='btnPrintCorp' type='button' class='k-button' title='Завантажити для друку, заявка CORP2'><i class='pf-icon pf-16 pf-print'></i></button>"
             },
             { type: "separator" },
             { type: "button", text: "За валюту", id: "currencyUse", togglable: true, selected: false, toggle: switchCurrencyMode }
+            , { type: "separator" }
+            , { template: "<div class='legend corp-light'>CorpLight</div>" }
+            , { template: "<div class='legend corp2'>Corp2</div>" }
         ]
     });
 
@@ -97,11 +100,11 @@
         dropdownlist.list.width(380);
     }
 
-    var initRequestWindowBtns = function(row) {
+    var initRequestWindowBtns = function (row) {
 
         var window = $("#cenceling-window").data("kendoWindow");
 
-        var backReasonObj = function(row) {
+        var backReasonObj = function (row) {
             return {
                 Mode: 2,
                 Id: row.ID,
@@ -122,7 +125,7 @@
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(request)
-                }).done(function(result) {
+                }).done(function (result) {
                     if (result.Status === "Ok") {
                         bars.ui.alert({ text: result.Message });
                         $("#grid").data("kendoGrid").dataSource.read();
@@ -138,7 +141,7 @@
         });
 
         $("#cencel-reason-btn").kendoButton({
-            click: function(window) {
+            click: function (window) {
                 $("#cenceling-window").data("kendoWindow").close();
             }
         });
@@ -151,7 +154,7 @@
             if (row) {
                 bars.ui.confirm({
                     text: "Ви впевнені, що хочете повернути заявку клієнта " +
-                        row.NMK + " на купівлю " + (row.S2 / 100).toFixed(2) + "/" + row.KV2 + "?"
+                    row.NMK + " на купівлю " + (row.S2 / 100).toFixed(2) + "/" + row.KV2 + "?"
                 }, function () {
                     var window = $("#cenceling-window").data("kendoWindow");
                     createCencelTemplate(row);
@@ -211,7 +214,7 @@
 
     $("#setViza").kendoButton({
         click: function () {
-             
+
             var grid = $("#grid").data("kendoGrid"),
                 row = grid.dataItem(grid.select());
             if (row) {
@@ -225,6 +228,21 @@
 
     // *** grid ***
 
+    function isValidItem(itemId) {
+        $.ajax({
+            url: bars.config.urlContent("/api/zay/kodd31/checkitem"),
+            data: { id: itemId },
+            type: "GET",
+            success: function (data) {
+                if (data === 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+    }
+
     function dataContext() {
         var grid = $("#grid").data("kendoGrid");
         var dk = 2;
@@ -233,7 +251,7 @@
             dk = 4;
             grid.showColumn("KV_CONV");
         }
-        return { requestType: dk,flt: getFilterParam()   }
+        return { requestType: dk, flt: getFilterParam() }
     }
 
     $("#grid").kendoGrid({
@@ -290,7 +308,7 @@
                         KV_CONV: { type: "number", editable: false },
                         REQ_TYPE: { type: "number", editable: false },
                         SUP_DOC: { type: "boolean" },
-                        ATTACHMENTS_COUNT: { type: "number" },
+                        ATTACHMENTS_COUNT: { type: "number", editable: false  },
                         F092_Code: { type: "string", editable: false},
                         F092_Text: { type: "string", editable: true }
                     }
@@ -304,6 +322,8 @@
         sortable: true,
         selectable: "row",
         filterable: true,
+        //reorderable: true,
+        //columnMenu: true,
         pageable: {
             refresh: true,
             pageSizes: true,
@@ -311,11 +331,27 @@
         },
         columns: [
             {
+                field: "ATTACHMENTS_COUNT",
+                title: "Додано<br>сканкопію<br>документів",
+                template: function (data) {
+                    var isAttach = data.ATTACHMENTS_COUNT != null && data.ATTACHMENTS_COUNT > 0;
+                    var text = "<input type='checkbox' disabled data-bid-id='" + data.ID;
+                    if (isAttach) {
+                        text += "' checked/><label class='loadLb'>завантажити</label>";
+                    }
+                    else {
+                        text += "' />";
+                    }
+                    return text;
+                },
+                width: 120,
+                attributes: { style: "text-align:center;" }
+            }, {
                 field: "BLK",
                 title: "Флаг<br/>блок.<br/>грн",
                 template: "<div style='text-align:center'>" +
-                           "<input name='BLK' type='checkbox' checked='checked' />" +
-                           "</div>",
+                "<input name='BLK' type='checkbox' checked='checked' />" +
+                "</div>",
                 width: 50,
                 filterable: false,
                 hidden: glReserve !== 0 ? true : false
@@ -339,23 +375,25 @@
                         showOperators: false
                     }
                 },
-                hidden: true 
+                hidden: true
             }, {
                 field: "OBZ",
                 title: "ОБЗ",
                 width: 50,
                 hidden: false,
                 template: "<div style='text-align:center'>" +
-                            "<input name='OBZ' type='checkbox' disabled='disabled' data-bind='checked: OBZ' #= OBZ !== null ? checked='checked' : '' #/>" +
-                            "</div>",
+                "<input name='OBZ' type='checkbox' disabled='disabled' data-bind='checked: OBZ' #= OBZ !== null ? checked='checked' : '' #/>" +
+                "</div>",
                 filterable: false
             }, {
                 field: "ID",
                 title: "Ідентифікатор<br/>заявки",
+                locked: true,
                 width: 100
             }, {
                 field: "RNK",
                 title: "РНК клієнта",
+                locked: true,
                 width: 100,
                 filterable: {
                     cell: {
@@ -410,7 +448,7 @@
                         showOperators: false
                     }
                 }
-            },{
+            }, {
                 field: "FDAT",
                 title: "Дата<br/>заявки",
                 width: 150,
@@ -524,13 +562,57 @@
                 }
             },
             {
+                field: "TXT",
+                title: "Опис коду<br/>цілі продажу",
+                hidden:true,
+                width: 300,
+                editor: function (container, options) {
+                    var input = $('<input data-text-field="TXT" data-value-field="P40" data-bind="value:' + options.field + '"/>');
+                    input.appendTo(container);
+
+                    // init block of dropdownlist:
+                    input.kendoDropDownList({
+                        autoBind: true,
+                        dataTextField: "TXT",
+                        dataValueField: "P40",
+                        optionLabel: "Змінити на...",
+                        valueTemplate: '<span>#:TXT#</span>',
+                        template: '<span class="k-state-default"></span>' +
+                        '<span class="k-state-default">#:TXT#</span>',
+                        dataSource: {
+                            transport: {
+                                read: {
+                                    type: "GET",
+                                    dataType: "json",
+                                    url: bars.config.urlContent("/api/zay/kodd31/get")
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total"
+                            }
+                        },
+                        change: function (e) {
+                            var aimCode = this.value(),
+                                grid = $("#grid").data("kendoGrid"),
+                                row = grid.dataItem(grid.select()),
+                                model = grid.dataItem(this.element.closest("tr"));
+
+                            model.set("AIMS_CODE", parseInt(aimCode));
+                            //model.set('TXT', this.text());
+                            row.TXT = this.text();
+                            //grid.select(0);
+                        }
+                    }).appendTo(container);
+                }
+            }, {
                 field: "SUP_DOC",
                 title: "Наявність<br/>затвердж.<br/>документів",
                 width: 50,
                 hidden: false,
                 template: "<div style='text-align:center'>" +
-                            '<input name="SUP_DOC" type="checkbox" #= SUP_DOC ? \'checked="checked"\' : "" # class="chkbx" />' +
-                            "</div>",
+                '<input name="SUP_DOC" type="checkbox" #= SUP_DOC ? \'checked="checked"\' : "" # class="chkbx" />' +
+                "</div>",
                 filterable: false
             }, {
                 field: "COMM",
@@ -545,13 +627,7 @@
                         showOperators: false
                     }
                 }
-            },{
-                field: "ATTACHMENTS_COUNT",
-                title: "Додано<br>сканкопію<br>документів",
-                template: "<input type='checkbox' disabled " + "#=(data.ATTACHMENTS_COUNT == 0 || data.ATTACHMENTS_COUNT == null) ? '' : 'checked'#" + "/>",
-                width: 90,
-                attributes: { style: "text-align:center;" }
-            }
+            }           
         ],
         change: function () {
             var grid = $("#grid").data("kendoGrid"),
@@ -564,6 +640,34 @@
             input.keyup(function () {
                 value = input.val();
             });
+            $("[name='AIMS_CODE']", e.container).blur(function () {
+                var input = $(this);
+                //$("#log").html(input.attr('name') + " blurred : " + value);
+                var grid = $("#grid").data("kendoGrid");
+                var row = $(this).closest("tr");
+                var item = grid.dataItem(row);
+                if (isValidItem(input.val())) {
+
+                } else {
+                    bars.ui.alert({ text: 'Увага!!! Такого коду цілі не знайдено!' });
+                }
+                //alert("TXT is : " + item.TXT);
+            });
+
+        }
+        ,dataBound: function (e) {
+            var data = this.dataSource.view();
+
+            for (var i = 0; i < data.length; i++) {
+                var dataItem = data[i];
+                var tr = $("#grid").find("[data-uid='" + dataItem.uid + "']");
+                if (dataItem.FNAMEKB == 'CL')
+                    tr.addClass('corp-light');
+                else if (dataItem.FNAMEKB == 'C2')
+                    tr.addClass('corp2');
+                //var color = dataItem.FNAMEKB == 'CL' ? 'corp-light' : 'corp2';
+                //tr.addClass(color);
+            }
         }
     });
 
@@ -573,4 +677,96 @@
 
         dataItem.set("SUP_DOC", this.checked);
     });
+
+    $("#grid .k-grid-content").kendoTooltip({
+        autoHide: false,
+        showOn: "click",
+        filter: "tr.corp-light td:has(input[checked])",
+        content: {
+            url: bars.config.urlContent("/api/zay/currencystatus/GetFilesTooltipContent")
+        },
+        width: 270,
+        position: "left",
+        animation: {
+            close: {
+                effects: "fadeOut",
+                //effects: "fadeOut zoom:out",
+                duration: 300
+            },
+            open: {
+                effects: "slideIn:left fadeIn",
+                //effects: "fadeIn zoom:in",
+                duration: 300
+            }
+        },
+        requestStart: function (e) {
+            var dataItem = $("#grid").data("kendoGrid").dataItem($(e.target).closest("tr"));
+            e.options.data = {
+                bidId: dataItem.ID
+            }
+        },
+        contentLoad: function () {
+            //because IE8
+            $("a.load-file").each(function () {
+                var href = this.href;
+                $(this).click(function (e) {
+                    e.preventDefault();
+                    window.location.href = href;
+                    return false;
+                });
+            });
+        }
+    });
+    //function getTooltipContent(e) {
+    //    var target = $(e.target);
+    //    var bidId = target.context.children[0].dataset.bidId;
+    //    var filesList = sessionStorage[bidId];
+    //    if (filesList) {
+    //        filesList = JSON.parse(filesList);
+    //    }
+    //    else {
+    //        var grid = $("#grid");
+    //        bars.ui.loader(grid, true);
+    //        var content = false;
+    //        $.ajax({
+    //            async: false,
+    //            url: bars.config.urlContent("/api/ExternalServices/GetCorpLightFilesInfo"),
+    //            contentType: "application/json",
+    //            dataType: "json",
+    //            data: { bidId: bidId},
+    //            success: function (result) {
+    //                bars.ui.loader(grid, false);
+    //                if (result.nodata) {
+    //                    content = "<div class='load-file'>По заявці (ID: " + bidId + ") файлів не знайдено.</div>";
+    //                }
+    //                else if (result.error) {
+    //                    bars.ui.error({ text: result.error });
+    //                }
+    //                else {
+    //                    filesList = result;
+    //                    sessionStorage[bidId] = JSON.stringify(result);
+    //                    content = createTooltipContent(filesList, bidId);
+    //                }
+    //            }
+    //        });
+    //        bars.ui.loader(grid, false);
+    //        return content;
+    //    }
+    //}
+
+    //function createTooltipContent(filesList, bidId) {
+    //    if (!filesList) return;
+    //    var fileLinks = "";
+    //    var fileIds = [];
+    //    for (var i = 0; i < filesList.length; i++) {
+    //        fileLinks += '<a href="' + bars.config.urlContent("/api/ExternalServices/GetCorpLightFile", { fileId: filesList[i].Id }) + '" class="load-file"><table><tr><td>' + filesList[i].FileName + '</td><td>' + filesList[i].Comment + '</td></tr></table></a>';
+    //        fileIds.push(filesList[i].Id);
+    //    }
+    //    var content = '';
+    //    if (filesList.length > 1)
+    //        content += '<a href="' + bars.config.urlContent("/api/ExternalServices/GetCorpLightAllFiles", { fileIds: fileIds, bidId: bidId }) + '" class="load-file"><table><tr><td colspan="2">Завантажити всі</td></tr></table></a>';
+    //    content += fileLinks;
+    //    return content;
+    //}
 });
+

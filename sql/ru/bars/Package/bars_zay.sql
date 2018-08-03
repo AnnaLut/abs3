@@ -6,7 +6,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.BARS_ZAY 
 is
-  head_ver  constant varchar2(64)  := 'version 6.2 20.02.2018';
+  head_ver  constant varchar2(64)  := 'version 6.2 09.07.2018';
   head_awk  constant varchar2(512) := ''
     ||'СБЕРБАНК' ||chr(10)
 ;
@@ -102,7 +102,7 @@ is
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,  -- код цели покупки/продажи
     p_f092	    in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
@@ -149,7 +149,7 @@ is
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,  -- код цели покупки/продажи
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -3776,7 +3776,7 @@ procedure create_request
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -4402,7 +4402,7 @@ BEGIN
            prm := p_id;
            bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
            raise err;
-      end if;  */
+      end if; */
    end if;
 
 

@@ -409,6 +409,31 @@ exception when others then
  end;
 /
 
+BEGIN 
+        execute immediate  
+          'alter table ZAYAVKA add cl_person1 VARCHAR2(300)'; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
+
+
+BEGIN 
+        execute immediate  
+          'alter table ZAYAVKA add cl_person2 VARCHAR2(300)'; 
+exception when others then
+  if  sqlcode=-01430 then null; else raise; end if;
+END; 
+/
+
+-- Add comments to the columns 
+comment on column ZAYAVKA.cl_person1
+  is 'ФІО пдписанта №1 в корп-лайті';
+comment on column ZAYAVKA.cl_person2
+  is 'ФІО пдписанта №2 в корп-лайті';
+
+
+
 
 
 PROMPT *** Create  grants  ZAYAVKA ***

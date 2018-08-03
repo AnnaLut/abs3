@@ -11,7 +11,7 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
 "CUST_BRANCH", "RNK", "NMK", "ACC0", "ACC1", "NLS", "OSTC", "S2", "DIG", "S2S",
 "MFO0", "NLS0", "KV_CONV", "LCV_CONV", "NLS_ACC0", "FDAT", "ND", "KOM", "SKOM",
  "KURS_Z", "KURS_F", "VDATE", "META", "AIM_NAME", "CONTRACT", "DATC", "NUM_VMD", "VMD1",
- "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "KB", "KV", "DOC_DESC", 
+ "BASIS", "DATZ", "COMM", "CONTACT_FIO", "CONTACT_TEL", "COVERED", "FNAMEKB", "KB", "KV", "DOC_DESC", 
 "DATT", "OBZ","F092") AS 
   SELECT v.id,
             DECODE (v.dk, 2, 0, 1) dk, -- для фильтра в вебе, 0 - продажа, 1 - конверсия
@@ -57,6 +57,7 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
             v.contact_fio,
             v.contact_tel,
             bars_zay.get_request_cover (v.id) covered,
+            fnamekb,
             DECODE (NVL (v.identkb, 0), 0, 0, 1) kb,
             v.kv2 kv,
             NVL (zc.doc_desc, NULL) doc_desc,
@@ -71,8 +72,8 @@ PROMPT *** Create  view V_ZAY_SALFORM ***
             AND 2 > v.sos
             AND v.sos >= 0
             AND fdat >   bankdate
-                    - (SELECT TO_NUMBER (val)
-                          FROM birja
+                       - (SELECT TO_NUMBER (val)
+                            FROM birja
                            WHERE par = 'ZAY_DAY')
             AND v.branch LIKE
                    SYS_CONTEXT ('bars_context', 'user_branch') || '%'
