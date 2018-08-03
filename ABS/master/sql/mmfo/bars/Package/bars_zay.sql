@@ -607,7 +607,7 @@ end BARS_ZAY;
 /
 
 
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_ZAY
+CREATE OR REPLACE PACKAGE BODY BARS_ZAY
 is
 
 body_ver   constant varchar2(64)   := 'version 12.02 20.02.2018';
@@ -2988,7 +2988,7 @@ begin
   l_trace varchar2(500):='bars_zay.service_request';
 begin
 
-  bars_audit.info(l_trace||'.1.'||p_reqest_id||'.'||p_flag_klb);         
+  bars_audit.info(l_trace||'.1.'||p_reqest_id||'.'||p_flag_klb);
   -- web-сервис
   select VAL into l_mfo from params where par = 'MFO';
   select v.* into l_vzay from v_zay v where v.id = p_reqest_id;
@@ -3391,7 +3391,7 @@ if l_vzay.MFO<>'300465' then
 
     if l_status = 'error' then
       dbms_xslprocessor.valueof(l_res, 'ErrorMessage/text()', l_str);
-bars_audit.info(l_trace||'.2.'||l_vzay.id||'.'||l_url);         
+bars_audit.info(l_trace||'.2.'||l_vzay.id||'.'||l_url);
       p_data_transfer (p_req_id => l_vzay.id,
                        p_url    => l_url,
                        p_mfo    => l_mfo,
@@ -3663,7 +3663,7 @@ begin
      bars_audit.trace('%s Неуспешное создание заявки № %s ', l_title, to_char(p_reqnum), to_char(msg));
      raise err;
   end if;
- 
+
   if p_reqtype in (1,3) or (p_reqtype = 2 and nvl(p_natbnkmfo,f_ourmfo()) = f_ourmfo() ) then
      begin
         select acc, rnk into l_acc0, l_rnk0
@@ -3766,7 +3766,7 @@ begin
   end if;
 
   p_reqid := l_request.id;
-  
+
 EXCEPTION WHEN err THEN
    bars_error.raise_error('ZAY', ern, prm, prm1);
 end create_request_ex;
@@ -3868,7 +3868,7 @@ begin
   l_request.operid_nokk   := p_operid_nokk;
   l_request.req_type      := null;
   l_request.vdate_plan    := null;
-  
+
   add_request(l_request, p_identkb);
 
   p_reqid := l_request.id;
@@ -4101,13 +4101,6 @@ begin
 
   select nvl(grp, 1), dig into l_curgrp, l_dig from tabval where kv = p_curid;
 
-  if p_curid <> 840 then
-  --вираховуємо відразу еквівалент для всіх валют крім доларів. Будемо шукати комісію по еквіваленту.
-  --індивідуальні комісії в довіднику інд. комісій прописані в доларах І коміс. будемо шукати по еквіваленту.  
-  select to_number(f_convert_val(p_curid, p_amount/100, p_reqdate, 840)) *100 into l_eqv840 from dual;
-  logger.info('ZAY l_eqv840 '||l_eqv840);
-  end if;
-
   for i in 1..4 loop
     -- 1 - инд.тариф клиента для валюты заявки
     -- 2 - инд.тариф клиента для категории валюты
@@ -4116,9 +4109,9 @@ begin
     if (l_cmsprc is null and l_cmssum is null) then
         iget_cms (p_reqtype => p_reqtype,
                   p_custid  => (case when i in (1, 2) then p_custid else null end),
-                  p_curid   => (case when i in (1, 3) then  840/*p_curid*/  else null end), --p_curid заремили працюємо з еквівалентами в доларах, тому передаємо 840 
+                  p_curid   => (case when i in (1, 3) then p_curid  else null end),
                   p_curgrp  => l_curgrp,
-                  p_amount  => (case when p_curid <> 840 then l_eqv840 else p_amount end), --p_amount, заремили вхідну суму валюти, оскільки працюємо з її еквівалентом в доларах. 
+                  p_amount  => p_amount,
                   p_reqdate => p_reqdate,
                   p_cmsprc  => l_cmsprc,
                   p_cmssum  => l_cmssum);
@@ -4127,7 +4120,7 @@ begin
   end loop;
   bars_audit.trace('%s zay_comiss -> (%s, %s)', g_title, to_char(l_cmsprc), to_char(l_cmssum));
 
-/*  if (l_cmsprc is null) then
+  if (l_cmsprc is null) then
      -- процент комиссии из "Параметры клиентов"
      begin
        select decode(p_reqtype, 1, kom, 2, kom2, kom3)
@@ -4139,15 +4132,6 @@ begin
          l_cmsprc := null;
      end;
   end if;
-*/
-  
-  if (l_cmsprc is null and l_cmssum is null) or (p_reqtype = 2 and p_obz = 1) then  -- для обов'язкового продажу беремо лише стандартній тариф, а індивідуальний ігноруємо.
- -- l_eqv840 - еквівалент в доларах США, приведений в долар.
-    if p_curid <> 840 then
-      select to_number(f_convert_val(p_curid, p_amount/100, p_reqdate, 840)) into l_eqv840 from dual;
-    else
-      l_eqv840 := p_amount/100;
-    end if;
 
   if l_cmsprc is null then
 
@@ -5251,7 +5235,7 @@ begin
          service_request(p_id,3);
       else
          -- web-сервис-1 на изменение всего
-          bars_audit.info(l_trace||'.3.'||p_id||'.'||p_viza);         
+          bars_audit.info(l_trace||'.3.'||p_id||'.'||p_viza);
          service_request(p_id, 3);
       end if;
    end if;
