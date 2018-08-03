@@ -2783,39 +2783,47 @@ namespace clientregister
         {
             ClearParameters();
             string sql;
-            if (myClient.EditType == "ReReg")
-            {
-                SetParameters("pRnk", DB_TYPE.Int64, GetParamObj("Dec", myClient.ID), DIRECTION.InputOutput);
-                SetParameters("pSex", DB_TYPE.Char, GetParamObj("Chr", myClient.SEX), DIRECTION.Input);
-                SetParameters("pPassp", DB_TYPE.Decimal, GetParamObj("Dec", myClient.PASSP), DIRECTION.Input);
-                if (myClient.PASSP == "7")
-                    myClient.SER = string.Empty;
-                else
-                {
-                    myClient.ACTUAL_DATE = string.Empty;
-                    myClient.EDDR_ID = string.Empty;
-                }
-                SetParameters("pSer", DB_TYPE.Varchar2, GetParamObj("Str", myClient.SER), DIRECTION.Input);
-                SetParameters("pNumdoc", DB_TYPE.Varchar2, GetParamObj("Str", myClient.NUMDOC), DIRECTION.Input);
-                SetParameters("pPDate", DB_TYPE.Date, GetParamObj("Dat", myClient.PDATE), DIRECTION.Input);
-                SetParameters("pOrgan", DB_TYPE.Varchar2, GetParamObj("Str", myClient.ORGAN), DIRECTION.Input);
-                SetParameters("pFdate", DB_TYPE.Date, GetParamObj("Dat", myClient.DATE_PHOTO), DIRECTION.Input);
-                SetParameters("pBDay", DB_TYPE.Date, GetParamObj("Dat", myClient.BDAY), DIRECTION.Input);
-                SetParameters("pBPlace", DB_TYPE.Varchar2, GetParamObj("Str", myClient.BPLACE), DIRECTION.Input);
-                SetParameters("pTelD", DB_TYPE.Varchar2, GetParamObj("Str", myClient.TELD), DIRECTION.Input);
-                SetParameters("pTelW", DB_TYPE.Varchar2, GetParamObj("Str", myClient.TELW), DIRECTION.Input);
-                SetParameters("pTelM", DB_TYPE.Varchar2, GetParamObj("Str", myClient.CellPhone), DIRECTION.Input);
-                SetParameters("pActualDate", DB_TYPE.Date, GetParamObj("Dat", myClient.ACTUAL_DATE), DIRECTION.Input);
-                SetParameters("pEddrId", DB_TYPE.Varchar2, GetParamObj("Str", myClient.EDDR_ID), DIRECTION.Input);
+            //if (myClient.EditType == "ReReg")
+            //{
+            //    SetParameters("pRnk", DB_TYPE.Int64, GetParamObj("Dec", myClient.ID), DIRECTION.InputOutput);
+            //    SetParameters("pSex", DB_TYPE.Char, GetParamObj("Chr", myClient.SEX), DIRECTION.Input);
+            //    SetParameters("pPassp", DB_TYPE.Decimal, GetParamObj("Dec", myClient.PASSP), DIRECTION.Input);
+            //    if (myClient.PASSP == "7")
+            //        myClient.SER = string.Empty;
+            //    else
+            //    {
+            //        myClient.ACTUAL_DATE = string.Empty;
+            //        myClient.EDDR_ID = string.Empty;
+            //    }
+            //    SetParameters("pSer", DB_TYPE.Varchar2, GetParamObj("Str", myClient.SER), DIRECTION.Input);
+            //    SetParameters("pNumdoc", DB_TYPE.Varchar2, GetParamObj("Str", myClient.NUMDOC), DIRECTION.Input);
+            //    SetParameters("pPDate", DB_TYPE.Date, GetParamObj("Dat", myClient.PDATE), DIRECTION.Input);
+            //    SetParameters("pOrgan", DB_TYPE.Varchar2, GetParamObj("Str", myClient.ORGAN), DIRECTION.Input);
+            //    SetParameters("pFdate", DB_TYPE.Date, GetParamObj("Dat", myClient.DATE_PHOTO), DIRECTION.Input);
+            //    SetParameters("pBDay", DB_TYPE.Date, GetParamObj("Dat", myClient.BDAY), DIRECTION.Input);
+            //    SetParameters("pBPlace", DB_TYPE.Varchar2, GetParamObj("Str", myClient.BPLACE), DIRECTION.Input);
+            //    SetParameters("pTelD", DB_TYPE.Varchar2, GetParamObj("Str", myClient.TELD), DIRECTION.Input);
+            //    SetParameters("pTelW", DB_TYPE.Varchar2, GetParamObj("Str", myClient.TELW), DIRECTION.Input);
+            //    SetParameters("pTelM", DB_TYPE.Varchar2, GetParamObj("Str", myClient.CellPhone), DIRECTION.Input);
+            //    SetParameters("pActualDate", DB_TYPE.Date, GetParamObj("Dat", myClient.ACTUAL_DATE), DIRECTION.Input);
+            //    SetParameters("pEddrId", DB_TYPE.Varchar2, GetParamObj("Str", myClient.EDDR_ID), DIRECTION.Input);
 
-                sql = "begin kl.setPersonAttrEx(:pRnk, :pSex, :pPassp, :pSer, :pNumdoc, :pPDate, :pOrgan, :pFdate, :pBDay, :pBPlace, :pTelD, :pTelW, :pTelM, :pActualDate, :pEddrId); end;";
-                SQL_NONQUERY(sql);
-                return;
-            }
+            //    sql = "begin kl.setPersonAttrEx(:pRnk, :pSex, :pPassp, :pSer, :pNumdoc, :pPDate, :pOrgan, :pFdate, :pBDay, :pBPlace, :pTelD, :pTelW, :pTelM, :pActualDate, :pEddrId); end;";
+            //    //     begin kl.setPersonAttr  (:pRnk, :pSex, :pPassp, :pSer, :pNumdoc, :pPDate, :pOrgan,          :pBDay, :pBPlace, :pTelD, :pTelW, :pTelM, :pActualDate, :pEddrId, :p_flag_visa, :pFdate ); end;"
+            //    SQL_NONQUERY(sql);
+            //    return;
+            //}
 
             SetParameters("pRnk", DB_TYPE.Int64, GetParamObj("Dec", myClient.ID), DIRECTION.InputOutput);
             SetParameters("pSex", DB_TYPE.Char, GetParamObj("Chr", myClient.SEX), DIRECTION.Input);
             SetParameters("pPassp", DB_TYPE.Decimal, GetParamObj("Dec", myClient.PASSP), DIRECTION.Input);
+            if (myClient.PASSP == "7")
+                myClient.SER = string.Empty;
+            else
+            {
+                myClient.ACTUAL_DATE = string.Empty;
+                myClient.EDDR_ID = string.Empty;
+            }
             SetParameters("pSer", DB_TYPE.Varchar2, GetParamObj("Str", myClient.SER), DIRECTION.Input);
             SetParameters("pNumdoc", DB_TYPE.Varchar2, GetParamObj("Str", myClient.NUMDOC), DIRECTION.Input);
             SetParameters("pPDate", DB_TYPE.Date, GetParamObj("Dat", myClient.PDATE), DIRECTION.Input);
@@ -2827,15 +2835,11 @@ namespace clientregister
             SetParameters("pTelM", DB_TYPE.Varchar2, GetParamObj("Str", myClient.CellPhone), DIRECTION.Input);
             SetParameters("pActualDate", DB_TYPE.Date, GetParamObj("Dat", myClient.ACTUAL_DATE), DIRECTION.Input);
             SetParameters("pEddrId", DB_TYPE.Varchar2, GetParamObj("Str", myClient.EDDR_ID), DIRECTION.Input);
-            sql = "begin kl.setPersonAttr(:pRnk, :pSex, :pPassp, :pSer, :pNumdoc, :pPDate, :pOrgan, :pBDay, :pBPlace, :pTelD, :pTelW, :pTelM, :pActualDate, :pEddrId {0}); end;";
-            var addParams = "";
-            if (IsNeedConfirmChanges())
-            {
-                SetParameters("p_flag_visa", DB_TYPE.Decimal, 1, DIRECTION.Input);
-                addParams = ",:p_flag_visa";
-            }
-
-            SQL_NONQUERY(string.Format(sql, addParams));
+            SetParameters("p_flag_visa", DB_TYPE.Decimal, IsNeedConfirmChanges() ? 1 : 0, DIRECTION.Input);
+            SetParameters("pFdate", DB_TYPE.Date, GetParamObj("Dat", myClient.DATE_PHOTO), DIRECTION.Input);
+            sql = "begin kl.setPersonAttr(:pRnk, :pSex, :pPassp, :pSer, :pNumdoc, :pPDate, :pOrgan, :pBDay, :pBPlace, :pTelD, :pTelW, :pTelM, :pActualDate, :pEddrId, :p_flag_visa, :pFdate ); end;";
+            // kl.setPersonAttr все одно викликає kl.setPersonAttrEx
+            SQL_NONQUERY(sql);
         }
 
         /// <summary>
