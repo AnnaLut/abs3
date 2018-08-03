@@ -170,6 +170,7 @@
         <legend>Дії на виділеним рядком</legend>
         <div>
             <input type="button" onclick="curr_module.DocCard();" value="Документ" style="height: 30px" />
+            <input type="button" onclick="curr_module.AccountHistory();" value="Рух по рахунку" style="height: 30px" />
             <span style="display: none">
                 <button id="btVisaDoc" onclick="curr_module.DocSetVisa(); return false;" style="height: 30px">Завізувати</button>
                 <button id="selectVisa" style="height: 30px">Опції візування</button>
@@ -237,11 +238,12 @@
                 <asp:BoundField DataField="CUST_NMK" HeaderText="Назва клієнта" SortExpression="CUST_NMK"></asp:BoundField>
                 <asp:BoundField DataField="CUST_ND" Visible="false" HeaderText="№ договору з клієнтом" SortExpression="CUST_ND"></asp:BoundField>
                 <asp:BoundField DataField="BENEF_NMK" HeaderText="Назва контрагента" SortExpression="BENEF_NMK"></asp:BoundField>
-                <asp:TemplateField HeaderText="Рахунок" SortExpression="NLS">
+                <%--<asp:TemplateField HeaderText="Рахунок" SortExpression="NLS">
                     <ItemTemplate>
                         <asp:LinkButton runat="server" Text='<%# Eval("NLS") %>' OnClientClick='<%# "core$IframeBox({ url: \"/barsroot/customerlist/showhistory.aspx?acc=" + Eval("ACC") + "&type=1\", width: 1100, height: 700, title: \"Рух по рахунку " + Eval("NLS") + "(" + Eval("KV") + ")\" }); return false;" %>'></asp:LinkButton>
                     </ItemTemplate>
-                </asp:TemplateField>
+                </asp:TemplateField>--%>
+                <asp:BoundField DataField="NLS" HeaderText="Рахунок" SortExpression="NLS"></asp:BoundField>
                 <asp:BoundField DataField="NAZN" HeaderText="Призначення платежу" SortExpression="NAZN"></asp:BoundField>
                 <asp:BoundField DataField="CUST_RNK" HeaderText="Реєcтр. номер (RNK)" SortExpression="CUST_RNK"></asp:BoundField>
                 <asp:BoundField DataField="OP_TYPE" HeaderText="Тип операції" SortExpression="OP_TYPE"></asp:BoundField>
@@ -309,6 +311,7 @@
             <tr>
                 <td>
                     <a id="lnShowCard">Перегляд картки документу</a><br />
+                    <a id="lnShowAccountHistory">Рух по рахунку</a><br />
                     <a id="lnSignDoc">Завізувати документ</a><br />
                     <a id="lnKillDoc">Повернути документ</a><br />
                     <a id="lnBindDocMain">Прив'язати документ(основний)</a><br />

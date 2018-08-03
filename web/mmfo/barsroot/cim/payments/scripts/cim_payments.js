@@ -211,6 +211,8 @@ CIM.pay_module = function () {
     module.GoBack = goBack;
     // завантажити прикріплені файли
     module.ShowAttachments = showAttachments;
+    //історія по рахунку
+    module.AccountHistory = accountHistory;
     //#endregion
 
     // ******** private methods ********
@@ -275,6 +277,12 @@ CIM.pay_module = function () {
             core$IframeBox({ url: "/barsroot/documentview/default.aspx?ref=" + selRowData.rf, width: 900, height: 500, title: "Картка докумету ref=" + selRowData.rf });
         else
             alert("Картка фантомного платежу тимчасово недоступна");
+    }
+
+    function accountHistory(obj) {
+        if (!getSelected(obj)) return;
+
+        core$IframeBox({ url: "/barsroot/customerlist/showhistory.aspx?acc=" + selRowData.acc + "&type=1", width: 1100, height: 700, title: "Рух по рахунку=" + selRowData.acc + "(" + selRowData.kv + ")" });
     }
 
     //#endregion
@@ -1314,6 +1322,15 @@ CIM.pay_module = function () {
             });
         else
             disabledLinks.push("#lnBindDocAdd");
+
+        //історія по рахунку
+        if (selRowData.acc)
+            diag.find("#lnShowAccountHistory").click(function () {
+                diag.dialog('close');
+                accountHistory(selRowData);
+            });
+        else
+            disabledLinks.push("#lnShowAccountHistory");
 
 
         diag.find(disabledLinks.join(",")).attr("disabled", "disabled").addClass("ui-state-disabled").css("text-decoration", "none");
