@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.6  2018.06.22';
+  g_body_version  constant varchar2(64) := 'version 2.7  2018.08.03';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -579,27 +579,27 @@ $end
             group by EKP, KU, R020, T020, R030, K040;
 
 
-    when '25X' then
-
-      open p_recordset
-       for select EKP, KU, R020, T020, R030, K040
-                , sum( T070 ) as T070
-                , sum( T071 ) as T071
-             from NBUR_LOG_F25X
-            where REPORT_DATE = p_rpt_dt
-              and KF = p_kf
-            group by EKP, KU, R020, T020, R030, K040;
-
-    when '81X' then
-
-      open p_recordset
-       for select EKP, KU, R020, T020, R030, K040
-                , sum( T070 ) as T070
-                , sum( T071 ) as T071
-             from NBUR_LOG_F81X
-            where REPORT_DATE = p_rpt_dt
-              and KF = p_kf
-            group by EKP, KU, R020, T020, R030, K040;
+--    when '25X' then
+--
+--      open p_recordset
+--       for select EKP, KU, R020, T020, R030, K040
+--                , sum( T070 ) as T070
+--                , sum( T071 ) as T071
+--             from NBUR_LOG_F25X
+--            where REPORT_DATE = p_rpt_dt
+--              and KF = p_kf
+--            group by EKP, KU, R020, T020, R030, K040;
+--
+--    when '81X' then
+--
+--      open p_recordset
+--       for select EKP, KU, R020, T020, R030, K040
+--                , sum( T070 ) as T070
+--                , sum( T071 ) as T071
+--             from NBUR_LOG_F81X
+--            where REPORT_DATE = p_rpt_dt
+--              and KF = p_kf
+--            group by EKP, KU, R020, T020, R030, K040;
 
     when '#F1' then
 
