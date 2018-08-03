@@ -267,6 +267,7 @@ angular.module(globalSettings.modulesAreas)
                                         vm.currentUser.isMappingCustomers = true;
                                         vm.currentUser.SignNumber = null;
 
+                                        vm.currentUser.CustId = custId;
 
                                         vm.currentUser.isReadOnly = true;
                                         vm.currentUser.isMaped = true;
@@ -296,7 +297,7 @@ angular.module(globalSettings.modulesAreas)
             vm.currentUser = new RelatedCustomer();
 
             var dateNow = new Date();
-            vm.minBirthDate = new Date(dateNow.getFullYear() - 16, dateNow.getMonth(), dateNow.getDate());
+            vm.minBirthDate = new Date(dateNow.getFullYear() - 18, dateNow.getMonth(), dateNow.getDate());
 
             var validate = function () {
                 if (vm.currentUser.NoInn == 0 && !vm.currentUser.TaxCode) {
