@@ -45,6 +45,24 @@
                 </td>
             </tr>
             <tr>
+                <td colspan="2">
+                    <asp:Panel runat="server" ID="pnTargetSystem" GroupingText="Система">
+                        <table>
+                            <tr>
+                                <td>Corp2</td>
+                                <td>
+                                    <asp:RadioButton runat="server" ID="rbC2" GroupName="rbTargetSystem" Checked="true"></asp:RadioButton></td>
+                                <td>CorpLight
+                                </td>
+                                <td>
+                                     <asp:RadioButton runat="server" ID="rbCL" GroupName="rbTargetSystem"></asp:RadioButton>
+                                </td>
+                            </tr>
+                        </table>
+                    </asp:Panel>
+                </td>
+            </tr>
+            <tr>
                 <td>Референс:</td>
                 <td>
                     <asp:TextBox id="tbRef" runat="server"></asp:TextBox>

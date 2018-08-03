@@ -4171,10 +4171,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- внутренний документ
     if     l_typeid = 'P_INT' then
         logger.trace('internal document');
-        --
-        -- вычисляем код операции
         
-
         -- дата вставки
         l_doc.insertion_date := sysdate;
         -- контроль идентификационного кода получателя
@@ -4192,7 +4189,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             raise_application_error(-20000, 'Отримувача не знайдено: Банк='
                 ||l_doc.mfo_b||', Рахунок='||l_doc.nls_b||', Валюта='||l_doc.kv, true);
         end;
-
+		
 		select *
           into l_acc_a_rec
           from bars.accounts
@@ -4224,6 +4221,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_doc.tt := 'IB1'; -- Internet-Banking: Внутрішня
             --
         end if;
+		
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
     -- документ в СЭП/ВПС
@@ -4800,6 +4798,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         --p_productgrp    => zayavka.product_group%type default null,  -- код товарной группы               (для dk = 1)
         p_details       => l_doc.basis,
         p_branch        => l_branch,
+        p_identkb       => 1,
         p_reqid         => l_doc.id);                         -- идентификатор заявки
     --
     -- сохраняем соответствие id заявки и id первичного документа

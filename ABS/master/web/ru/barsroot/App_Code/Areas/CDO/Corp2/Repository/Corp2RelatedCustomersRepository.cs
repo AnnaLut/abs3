@@ -132,7 +132,10 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             try
             {
                 if (relatedCustomer.UserId != null)
-                    Corp2Services.UserManager.AddOrUpdateUser(Corp2Services.GetSecretKey(), Mapper.MapRelatedCustomerToUser(relatedCustomer));
+                {
+                    //var isBlock = !(relatedCustomer.IsCanSign.HasValue && relatedCustomer.IsCanSign.Value);
+                    Corp2Services.UserManager.AddOrUpdateUser(Corp2Services.GetSecretKey(), Mapper.MapRelatedCustomerToUser(relatedCustomer), GetOurMfo(), true/*isBlock*/);
+                }
             }
             catch (Exception ex)
             {
@@ -205,6 +208,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             var id = _entities.ExecuteStoreQuery<decimal>(
                 "select CORP2_REL_CUST_SEQ.nextval from dual").FirstOrDefault();
 
+            #region insert into CORP2_REL_CUSTOMERS
             var sql = @"Insert into CORP2_REL_CUSTOMERS
                             (ID, 
                             LOGIN,
@@ -258,7 +262,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             };
 
             _entities.ExecuteStoreCommand(sql, parameters);
-
+            #endregion
             MapRelatedCustomerToUser(relatedCustomer.UserId, relatedCustomer.CustId.Value, id, 0/*relatedCustomer.SignNumber.Value*/);
 
             var address = new RelatedCustomerAddress
@@ -294,7 +298,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         {
             if (rc.ApprovedType != "delete")
             {
-                var corp2UserIdLogin = SaveUserWithConnectionSettingsToCorp2(rc, false);
+                var corp2UserIdLogin = SaveUserWithConnectionSettingsToCorp2(rc, true);
                 if (rc.ApprovedType == "add")
                 {
                     UpdateUserIdAndLoginInRelatedCustomer(rc.Id.Value, rc.CustId.Value, corp2UserIdLogin.Item1.ToString(), corp2UserIdLogin.Item2);

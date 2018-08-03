@@ -10,7 +10,7 @@ bars.visaCtrl = bars.visaCtrl || {
         bars.ui.loader("body", true);
 
         var model = { dk: row.DK, id: row.ID, kv: row.KV2, s: row.S2, kursZ: row.KURS_Z, fDat: row.FDAT };
-        debugger;
+       
         $.ajax({
             type: "POST",
             contentType: "application/json",
@@ -150,7 +150,7 @@ bars.visaCtrl = bars.visaCtrl || {
         // try to use dk?
         var visaType = 1;
 
-        debugger;
+       
         var supDoc = row.SUP_DOC ? 1 : null;
         
         var visaArr = [],

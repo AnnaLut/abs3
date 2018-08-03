@@ -1,5 +1,5 @@
 prompt ===================================== 
-prompt == Друк заяв з обміну ІВ, що надійшли через Corp2
+prompt == Друк заяв з обміну ІВ, що надійшли через СДО
 prompt ===================================== 
 
 set serveroutput on
@@ -16,7 +16,7 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'Друк заяв з обміну ІВ, що надійшли через Corp2';
+   l_zpr.name := 'Друк заяв з обміну ІВ, що надійшли через СДО';
    l_zpr.pkey := '\BRS\SBR\BIR\4016';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
@@ -39,7 +39,7 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'Друк заяв з обміну ІВ, що надійшли через Corp2';
+    l_zpr.name         := 'Друк заяв з обміну ІВ, що надійшли через СДО';
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':sFdat1='''',:sFdat2=''''';
     l_zpr.create_stmt  := '';
@@ -65,8 +65,8 @@ begin
                            '         z.KURS_F kurs_diler,'||nlchr||
                            '         z.comm AS details,'||nlchr||
                            '         z.kom commiss,'||nlchr||
-                           '         cz.fio,'||nlchr||
-                           '         cz.tel,'||nlchr||
+                           '         nvl(z.contact_fio,cz.fio) FIO,'||nlchr||
+                           '         nvl(z.contact_tel,cz.tel) TEL,'||nlchr||
                            '         c.nmk name_customer,'||nlchr||
                            '         c.okpo,'||nlchr||
                            '         (SELECT    ca.ZIP'||nlchr||
@@ -111,8 +111,8 @@ begin
                            '                 AND zt.new_viza = 0'||nlchr||
                            '                 AND zt.id = z.id)'||nlchr||
                            '            POST_KB_fio,'||nlchr||
-                           '         zm.sign01,'||nlchr||
-                           '         zm.sign02'||nlchr||
+                           '         nvl(zm.sign01,(substr(z.CL_PERSON1, 0, instr(z.CL_PERSON1,'','')-1))) sign01,'||nlchr||
+                           '         nvl(zm.sign02,(substr(Z.cl_person2, 0, instr(Z.cl_person2,'','')-1))) sign02'||nlchr||
                            '    FROM zayavka z,'||nlchr||
                            '         customer c,'||nlchr||
                            '         cust_zay cz,'||nlchr||
@@ -133,16 +133,16 @@ begin
                            '   WHERE     z.rnk = c.rnk'||nlchr||
                            '         AND cz.rnk = c.rnk'||nlchr||
                            '         AND z.kv2 = tg.kv'||nlchr||
-                           '         AND z.dk = 3'||nlchr||
+                           '         AND z.dk in (3,4)'||nlchr||
                            '         AND z.acc0 = ac_UAH.acc'||nlchr||
                            '         AND z.acc1 = ac_$.acc'||nlchr||
                            '         AND vk.id(+) = z.id'||nlchr||
                            '         AND vv.id(+) = z.id'||nlchr||
                            '         AND z.identkb IS NOT NULL'||nlchr||
                            '         AND z.fdat BETWEEN :sFdat1 AND :sFdat2'||nlchr||
-                           '         and z.id = zm.idz'||nlchr||
+                           '         and z.id = zm.idz(+)'||nlchr||
                            '         and z.sos >= 0'||nlchr||
-                           'ORDER BY z.dk, z.fdat';
+                           '        ORDER BY z.dk, z.fdat';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -173,7 +173,7 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Друк заяв з обміну ІВ, що надійшли через Corp2';
+    l_rep.description :='Друк заяв з обміну ІВ, що надійшли через СДО';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",FALSE,FALSE';
     l_rep.ndat        :=2;

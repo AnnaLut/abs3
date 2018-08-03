@@ -9,6 +9,24 @@
         .selectedRow {
             background-color: #87CEFA;
         }
+        .load-file {
+            padding: 5px;
+            display: block;
+            color: rgb(70, 130, 70) !important;
+            text-align: justify;
+            text-decoration: none !important;
+        }
+        .load-file:hover {
+            background: rgba(130, 180, 130, 0.5);
+            color: rgb(70, 130, 70);
+        }
+        .load-file:first-of-type {
+            border-bottom: 1px dashed rgb(70, 130, 70) !important;
+            font-weight:700;
+        }
+        .load-file td:first-child {
+            width: 120px;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="ContentMain" ContentPlaceHolderID="MainContent" runat="Server">
@@ -175,6 +193,7 @@
             <input type="button" id="btBindSecondary" onclick="curr_module.DocBind(1);" value="Прив'язати(додатковий)" style="height: 30px" />
             <input id="btBindFantom" type="button" onclick="curr_module.FantomBind();" value="Прив'язати фантом" style="height: 30px; display: none" />
             <input id="btShowRels" type="button" onclick="curr_module.ShowRels();" value="Зв'язки з контрактами" style="height: 30px;" />
+            <%--<input id="btShowAttachments" type="button" onclick="curr_module.ShowAttachments();" value="Завантажити файли" style="height: 30px;" disabled="disabled"/>--%>
         </div>
     </fieldset>
     <asp:ObjectDataSource ID="odsVCimUnboundPayments" runat="server" SelectMethod="SelectPayments"
@@ -274,7 +293,8 @@
             </div>
         </fieldset>
     </div>
-
+     <div id="dialogAttachments" style="display: none;">
+    </div>
     <div id="dialogDocInfo" style="display: none; text-align: left">
         <table cellpadding="3" cellspacing="0">
             <tr>

@@ -26,7 +26,8 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         if (Session[Constants.StateKeys.VisaId] == null)
             Session[Constants.StateKeys.VisaId] = (new CimManager(true)).VisaId;
 
-        Master.AddScript("/barsroot/cim/payments/scripts/cim_payments.js");
+        Master.AddScript("/barsroot/cim/payments/scripts/cim_payments.js?_180706");
+        Master.AddScript("/barsroot/Scripts/Bars/bars.config.js");
         if (!ClientScript.IsStartupScriptRegistered(this.GetType(), "init"))
             ClientScript.RegisterStartupScript(this.GetType(), "init", "CIM.setVariables('" + gvVCimUnboundPayments.ClientID + "', '" + Request["contr_id"] + "','" + Request["direct"] + "','" + Request["payflag"] + "','" + Convert.ToString(Session["CIM.VisaId"]) + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + ((DateTime)Session[Constants.StateKeys.BankDate]).ToString("dd/MM/yyyy") + "'); ", true);
 
@@ -177,6 +178,8 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
                     {"oti",getJsonMapping(e.Row.DataItem, "OP_TYPE_ID")},
                     {"isv",getJsonMapping(e.Row.DataItem, "IS_VISED")}
                 };
+            if (e.Row.DataItem is VCimOutUnboundPaymentsRecord)
+                objJson.Add("attach", getJsonMapping(e.Row.DataItem, "ATTACHMENTS_COUNT"));
 
             e.Row.Attributes.Add("rd", new JavaScriptSerializer().Serialize(objJson));
             string rf = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "REF"));
@@ -236,12 +239,29 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
             }
             else
                 e.Row.Cells[5].ForeColor = Color.Black;
+
+            //bind click event to ATTACHMENTS_COUNT column
+            var corpLight = new[] { "CL0", "CL1", "CL2", "CL5", "CLB", "CLS" };
+            var row = e.Row.DataItem as VCimOutUnboundPaymentsRecord;
+            if (row != null && row.ATTACHMENTS_COUNT > 0 && corpLight.Contains(row.TT))
+            {
+                e.Row.Cells[e.Row.Cells.Count - 1].Attributes.Add("onclick", "curr_module.ShowAttachments("+ row.REF + ")");
+            }
         }
     }
 
     private object getJsonMapping(object dataItem, string sourceField)
     {
-        var obj = DataBinder.Eval(dataItem, sourceField);
+        object obj = null; 
+        try
+        {
+            obj = DataBinder.Eval(dataItem, sourceField);
+
+        }
+        catch (Exception)
+        {
+            obj = null;
+        }
         if (obj is DateTime)
             obj = (obj == DBNull.Value || Convert.ToString(obj) == "" || Convert.ToString(obj) == "null") ? ("") : (Convert.ToDateTime(obj).ToString("dd/MM/yyyy"));
 
@@ -326,7 +346,6 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         return cm.GetDocRels(docRef, docType);
     }
 
-
     #endregion
 
     protected void btSearchByRef_OnClick(object sender, EventArgs e)
@@ -359,7 +378,6 @@ public partial class cim_payments_unbound_payments : System.Web.UI.Page
         }
         gvVCimUnboundPayments.DataBind();
     }
-
 }
 
 class ChebkBooxColumn : ITemplate

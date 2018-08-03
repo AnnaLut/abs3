@@ -20,6 +20,7 @@ namespace BarsWeb.Areas.Zay.Controllers.Api.ZaySale
     {
         private readonly ICurrencySightRepository _repo;
         private readonly ICurrencyDictionary _dictionary;
+
         public CurrencySaleSightingController(ICurrencySightRepository repo, ICurrencyDictionary dictionary)
         {
             _repo = repo;

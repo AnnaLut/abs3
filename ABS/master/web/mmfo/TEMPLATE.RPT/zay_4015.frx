@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" StartReportEvent="_StartReport" ReportInfo.Created="02/25/2016 14:01:45" ReportInfo.Modified="09/12/2017 14:18:48" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" StartReportEvent="_StartReport" ReportInfo.Created="02/25/2016 14:01:45" ReportInfo.Modified="07/26/2018 10:28:15" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHzPfbhMU3HSoU5H4mPft3vzaNak3bFj/bix95osKXFYyQ==">
+    <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHzPfbhMU3HSoU5H4mPft3vzH8cZ0PdaQ6O6jRCJNz4hYw==">
       <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NUM_DOC, NUM00 ID, NUM01 DK, CHAR01 BEGIN_DATE, NUM02 AMOUNT_IN, NUM03 BASE_AMOUNT_IN, NUM04 CURRENCY, NUM05 CURRENCY_CONV, CHAR02 CURRENCY_NAME, CHAR03 CURRENCY_CONV_NAME, NUM06 KURS_DILER, CHAR04 DETAILS, NUM07 COMMISS, CHAR05 FIO, CHAR06 TEL, CHAR07 NAME_CUSTOMER, CHAR08 OKPO, CHAR09 ADR, CHAR10 NLS29, CHAR11 PHONE, CHAR12 BANK_NAME, CHAR13 BANK_MFO, CHAR14 ADR_BRANCH, CHAR15 ACCOUNT_CUSTOMER, CHAR16 BANK_MFO_CUSTOMER, CHAR17 BANK_NAME_CUSTOMER, CHAR18 ACCOUNT_CUSTOMER_UAH, CHAR19 BANK_MFO_CUSTOMER_UAH, CHAR20 BANK_NAME_CUSTOMER_UAH, CHAR21 VK_FIO, CHAR22 VK_DATE, CHAR23 VK_TIME, CHAR24 VV_FIO, CHAR25 VV_DATE, CHAR26 VV_TIME, CHAR27 POST_KB_DATE, CHAR28 POST_KB_TIME, CHAR29 POST_KB_FIO, CHAR30 SIGN01, CHAR31 SIGN02 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="DETAILS" DataType="System.String"/>
         <Column Name="NUM_DOC" DataType="System.String"/>
@@ -147,7 +147,7 @@ namespace FastReport
             <TextObject Name="Text12" Left="264.6" Top="9.45" Width="66.15" Height="18.9" Text="Підписи" VertAlign="Center" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text13" Left="340.2" Top="28.35" Width="103.95" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text14" Left="340.2" Top="75.6" Width="103.95" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
-            <TextObject Name="Text29" Left="444.15" Top="9.45" Width="274.05" Height="18.9" Text="[QMain.SIGN01]" Font="Times New Roman, 10pt"/>
+            <TextObject Name="Text29" Left="444.15" Top="9.45" Width="274.05" Height="18.9" Text="[QMain.SIGN01], Директор" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text32" Left="444.15" Top="56.7" Width="274.05" Height="18.9" Text="[QMain.SIGN02]" Font="Times New Roman, 10pt"/>
             <ChildBand Name="Child4" Top="809.8" Width="718.2" Height="103.95" CanGrow="true">
               <TextObject Name="Text66" Left="359.1" Top="18.9" Width="340.2" Height="85.05" CanGrow="true" Text="Дата [QMain.VV_DATE]р. Час [QMain.VV_TIME]&#13;&#10;[QMain.VV_FIO]&#13;&#10;АТ «Ощадбанк» код [QMain.BANK_MFO]&#13;&#10;[QMain.BANK_NAME]" Font="Times New Roman, 10pt"/>

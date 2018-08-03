@@ -1,12 +1,6 @@
-
-
- PROMPT =====================================================================================
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** Run *** ==
- PROMPT =====================================================================================
-
-  CREATE OR REPLACE PACKAGE BARS.BARS_ZAY
+CREATE OR REPLACE PACKAGE BARS.BARS_ZAY
 is
-  head_ver  constant varchar2(64)  := 'version 6.2 20.02.2018';
+  head_ver  constant varchar2(64)  := 'version 6.2 09.07.2018';
   head_awk  constant varchar2(512) := ''
     ||'СБЕРБАНК' ||chr(10)
 ;
@@ -104,6 +98,7 @@ is
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
     p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_f092	    in  zayavka.f092%type          default null,  -- код параметра F092
+    p_f092          in  zayavka.f092%type          default null,  -- код параметра F092
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -149,7 +144,7 @@ is
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -167,6 +162,7 @@ is
     p_contacttel    in  zayavka.contact_tel%type   default null,  -- ТЕЛ контактного лица
     p_branch        in  zayavka.branch%type        default null,  -- бранч заявки
     p_operid_nokk   in  zayavka.operid_nokk%type   default null,  -- Унікальний номер операції в системі Клієнт-Банк (Олег, Надра)
+    p_identkb       in  zayavka.identkb%type       default null,  -- Признак системі клиент-банк 1- корп2, 2 - корп лайт
     p_reqid         out zayavka.id%type);                         -- идентификатор заявки
 
   --
@@ -391,8 +387,8 @@ is
   -- Разбираем пришедшие xml из ЦА и устанавливаем курсы
   --
   procedure iparse_dilerkurs (p_kurs_clob clob,
-                              p_conv_clob clob,
-                              p_date varchar2);
+    p_conv_clob clob,
+    p_date varchar2);
 
   -------------------------------------------------------------------------------
   -- Передать курсы в конкретное РУ
@@ -605,9 +601,13 @@ is
 
   procedure upd_zay_params(p_ref oper.ref%type ,p_tag operw.tag%type,p_value operw.value%type);
 
-
+  --очищення ZAY42 від застарілих заявок
+  procedure del_zay_old ;
 end BARS_ZAY;
+
 /
+
+
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_ZAY
 is
 
@@ -1023,7 +1023,7 @@ begin
 
   if p_zayrow.dk = 1 then
      i_insdocparam (p_ref, 'D1#70', substr(to_char(p_zayrow.meta),                   1, 254));
-     i_insdocparam (p_ref, 'D1#3K', substr(to_char(p_zayrow.f092),                   1, 220));    
+     i_insdocparam (p_ref, 'D1#3K', substr(to_char(p_zayrow.f092),                   1, 220));
      i_insdocparam (p_ref, 'D2#70', substr(p_zayrow.contract,                        1, 254));
      i_insdocparam (p_ref, 'D3#70', substr(to_char(p_zayrow.dat2_vmd, 'DD.MM.YYYY'), 1, 254));
      i_insdocparam (p_ref, 'D4#70', substr(to_char(p_zayrow.dat_vmd,  'DD.MM.YYYY'), 1, 254));
@@ -3562,6 +3562,12 @@ begin
      p_request.identkb := substr(to_char(p_request.id), 1, 16);
   end if;
 
+  if p_flag_klb = -1  then
+     p_request.fnamekb := 'C2';
+  elsif p_flag_klb = -2 then
+     p_request.fnamekb := 'CL';
+  end if;
+
   p_request.kf := sys_context('bars_context','user_mfo');
 
   insert into zayavka values p_request;
@@ -3658,7 +3664,7 @@ begin
      bars_audit.trace('%s Неуспешное создание заявки № %s ', l_title, to_char(p_reqnum), to_char(msg));
      raise err;
   end if;
-
+ 
   if p_reqtype in (1,3) or (p_reqtype = 2 and nvl(p_natbnkmfo,f_ourmfo()) = f_ourmfo() ) then
      begin
         select acc, rnk into l_acc0, l_rnk0
@@ -3761,7 +3767,7 @@ begin
   end if;
 
   p_reqid := l_request.id;
-
+  
 EXCEPTION WHEN err THEN
    bars_error.raise_error('ZAY', ern, prm, prm1);
 end create_request_ex;
@@ -3788,7 +3794,7 @@ procedure create_request
     p_cmssum        in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
     p_taxflg        in  zayavka.fl_pf%type         default 1,     -- признак отчисления в ПФ          (для dk = 1)
     p_taxacc        in  zayavka.nlsp%type          default null,  -- счет клиента для отчисления в ПФ (для dk = 1)
-    p_aimid         in  zayavka.meta%type,                        -- код цели покупки/продажи
+    p_aimid         in  zayavka.meta%type          default null,  -- код цели покупки/продажи
     p_contractid    in  zayavka.pid%type           default null,  -- идентификатор контракта
     p_contractnum   in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_contractdat   in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -3806,6 +3812,7 @@ procedure create_request
     p_contacttel    in  zayavka.contact_tel%type   default null,  -- ТЕЛ контактного лица
     p_branch        in  zayavka.branch%type        default null,  -- бранч заявки
     p_operid_nokk   in  zayavka.operid_nokk%type   default null,  -- Унікальний номер операції в системі Клієнт-Банк (Олег, Надра)
+    p_identkb       in  zayavka.identkb%type       default null,  -- Признак системі клиент-банк 1- корп2, 2 - корп лайт
     p_reqid         out zayavka.id%type)                         -- идентификатор заявки
 is
   l_request zayavka%rowtype;
@@ -3862,8 +3869,8 @@ begin
   l_request.operid_nokk   := p_operid_nokk;
   l_request.req_type      := null;
   l_request.vdate_plan    := null;
-
-  add_request(l_request, 1);
+  
+  add_request(l_request, p_identkb);
 
   p_reqid := l_request.id;
 
@@ -4095,6 +4102,13 @@ begin
 
   select nvl(grp, 1), dig into l_curgrp, l_dig from tabval where kv = p_curid;
 
+  if p_curid <> 840 then
+  --вираховуємо відразу еквівалент для всіх валют крім доларів. Будемо шукати комісію по еквіваленту.
+  --індивідуальні комісії в довіднику інд. комісій прописані в доларах І коміс. будемо шукати по еквіваленту.  
+  select to_number(f_convert_val(p_curid, p_amount/100, p_reqdate, 840)) *100 into l_eqv840 from dual;
+  logger.info('ZAY l_eqv840 '||l_eqv840);
+  end if;
+
   for i in 1..4 loop
     -- 1 - инд.тариф клиента для валюты заявки
     -- 2 - инд.тариф клиента для категории валюты
@@ -4103,9 +4117,9 @@ begin
     if (l_cmsprc is null and l_cmssum is null) then
         iget_cms (p_reqtype => p_reqtype,
                   p_custid  => (case when i in (1, 2) then p_custid else null end),
-                  p_curid   => (case when i in (1, 3) then p_curid  else null end),
+                  p_curid   => (case when i in (1, 3) then  840/*p_curid*/  else null end), --p_curid заремили працюємо з еквівалентами в доларах, тому передаємо 840 
                   p_curgrp  => l_curgrp,
-                  p_amount  => p_amount,
+                  p_amount  => (case when p_curid <> 840 then l_eqv840 else p_amount end), --p_amount, заремили вхідну суму валюти, оскільки працюємо з її еквівалентом в доларах. 
                   p_reqdate => p_reqdate,
                   p_cmsprc  => l_cmsprc,
                   p_cmssum  => l_cmssum);
@@ -4126,6 +4140,15 @@ begin
          l_cmsprc := null;
      end;
   end if;
+*/
+  
+  if (l_cmsprc is null and l_cmssum is null) or (p_reqtype = 2 and p_obz = 1) then  -- для обов'язкового продажу беремо лише стандартній тариф, а індивідуальний ігноруємо.
+ -- l_eqv840 - еквівалент в доларах США, приведений в долар.
+    if p_curid <> 840 then
+      select to_number(f_convert_val(p_curid, p_amount/100, p_reqdate, 840)) into l_eqv840 from dual;
+    else
+      l_eqv840 := p_amount/100;
+    end if;
 
   if l_cmsprc is null then
 
@@ -4402,7 +4425,7 @@ BEGIN
            raise err;
       end if;
 
-/*   else
+   /*else
      select meta
        into l_aim
        from zayavka
@@ -4668,7 +4691,7 @@ procedure upd_request
     p_mfo0          in  zayavka.mfo0%type          default null,  -- МФО банка счета в нац.валюте     (для dk = 2)
     p_kom           in  zayavka.kom%type           default null,  -- процент (%) комиссии
     p_skom          in  zayavka.skom%type          default null,  -- фикс.сумма комиссии
-    p_meta          in  zayavka.meta%type          default null,                        -- код цели покупки/продажи
+    p_meta          in  zayavka.meta%type          default null,   -- код цели покупки/продажи
     p_f092          in  zayavka.f092%type          default null,  -- код параметра f092
     p_contract      in  zayavka.contract%type      default null,  -- номер контракта/кред.договора
     p_dat2_vmd      in  zayavka.dat2_vmd%type      default null,  -- дата контракта/кред.договора
@@ -4799,7 +4822,7 @@ begin
        dat5_vmd = p_dat5_vmd,
         num_vmd = p_num_vmd,
            meta = p_meta,
-         f092 = p_f092,
+           f092 = p_f092,
         country = p_country,
           basis = decode(p_basis,substr(basis,1,254),basis,p_basis),
    benefcountry = p_benefcountry,
@@ -5204,7 +5227,7 @@ procedure set_visa (
   p_viza      in zayavka.viza%type,
   p_priority  in zayavka.priority%type  default null,
   p_aims_code in zayavka.aims_code%type default null,
-  p_f092      in zayavka.f092%type default null, 
+  p_f092      in zayavka.f092%type default null,
   p_sup_doc   in zayavka.support_document%type default null)
 is
  l_trace varchar2(500):='bars_zay.set_visa';
@@ -5214,7 +5237,7 @@ begin
      set viza      = p_viza,
          priority  = nvl(p_priority, priority),
          aims_code = nvl(p_aims_code, aims_code),
-         f092 = nvl(p_f092, f092)         
+         f092 = nvl(p_f092, f092)
    where id = p_id;
 
    if nvl(p_sup_doc,0)<>0 then
@@ -7381,22 +7404,93 @@ exception when ex_parentnotfound then
   else raise; end if;
 end;
 
+--очищення ZAY від застарілих заявок --COBUMMFO-6744
+procedure del_zay_old
+is
+ l_idback ZAY_BACK.ID%TYPE:=77; -- код причини повернення
+ l_comm_back ZAY_BACK.REASON%TYPE; -- причина повернення
+
+ -- фінальна обробка прострочених заявок -  !!!!
+ procedure del_zay_fin(l_id zayavka.id%TYPE) is
+  l_mfo    VARCHAR2 (10);
+  l_url    VARCHAR2 (256);
+ begin
+     update zayavka  set sos = -1, viza = -1,  idback = 77 where id = del_zay_fin.l_id;
+     SELECT r.url, r.mfo INTO l_url, l_mfo  FROM ZAY_RECIPIENTS r where mfo = '300465';
+     INSERT INTO zay_data_transfer (id,req_id,url,mfo,transfer_type,transfer_date,transfer_result,comm)
+     VALUES (bars_sqnc.get_nextval('s_zay_data_transfer'),
+             del_zay_fin.l_id, l_url, l_mfo, 8, SYSDATE,0,'Повернення прострочених заявок на купівлю-продаж валюти');
+
+ end;
+
+begin
+    select t.reason into l_comm_back  from ZAY_BACK t where t.id= l_idback;--причина повернення
+
+---сторона Дилера ЦА (ZAY42) в ММФО
+    bc.go('300465'); --дилер на ЦА
+    ----вибір старих заявок у стані,віза 0,2 для ЦА ---------------------------
+    for rec_dill in (
+              select * from ( SELECT id,sos,viza,fdat,mfo FROM v_zay WHERE
+                dk = 1 AND s2 > 0 AND nvl(fdat,bankdate) <= bankdate
+                and sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1 AND vdate = bankdate)
+              where (fdat+30)<bankdate and sos=0 and viza=2
+              )
+    loop
+      -- повернення з дилера ЦА в РУ на ZAY3
+      back_request(p_mode => 4,p_id => rec_dill.id,p_idback => l_idback,p_comm => l_comm_back); --збиваємо на 0,1
+      bars_audit.info('BARS_ZAY.'||rec_dill.id||'.'||rec_dill.mfo);
+      commit;
+    end loop;
+------------------------------------------------------------------------------------------
+--- сторона РУ в ММФО
+
+    for rec_kf in ( select * from mv_kf where kf !=300465 ) --всі РУ в ММФО
+    loop
+     bc.go(rec_kf.kf);
+          ----вибір старих заявок (0,1) для РУ ММФО(ZAY3,ZAY12)
+          for rec_ru in (
+             select * from (
+                      select id,sos,viza,fdat,kf
+                      from zayavka
+                      WHERE dk = 1 AND s2 > 0 AND nvl(fdat,bankdate) <= bankdate
+                      and sos < 1 AND sos >= 0 AND viza >= 0 OR sos >=1 AND vdate = bankdate
+
+                      )
+                   where (fdat+30)<bankdate and sos=0 and viza in (0,1) --and mfo=rec_kf.kf
+                   )
+          loop
+            -- Заявка спущена до ZAY3 (0,1)
+            if rec_ru.viza=1 then
+              back_request(p_mode => 1,p_id => rec_ru.id,p_idback => l_idback,p_comm => l_comm_back); --збиваємо на 0,-1
+              del_zay_fin(rec_ru.id);--збиваємо на -1,-1
+            end if;
+            --Заявка спущена на ZAY12 - (0,-1)
+            if rec_ru.viza=0 then
+             del_zay_fin(rec_ru.id);--збиваємо на -1,-1
+            end if;
+          end loop;
+    end loop;
+
+------------------------------------------------------------------------------------------
+
+end;
+-------------------------------------
+
+
 begin
   init;
 end BARS_ZAY;
 /
-
-
-
  show err;
-
+ 
 PROMPT *** Create  grants  BARS_ZAY ***
 grant EXECUTE                                                                on BARS_ZAY        to BARSAQ with grant option;
 grant EXECUTE                                                                on BARS_ZAY        to BARS_ACCESS_DEFROLE;
 grant EXECUTE                                                                on BARS_ZAY        to ZAY;
 
-
-
- PROMPT =====================================================================================
+ 
+ 
+ PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** End *** ==
- PROMPT =====================================================================================
+ PROMPT ===================================================================================== 
+ 

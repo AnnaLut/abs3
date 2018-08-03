@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_ZAY_QUEUE.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
@@ -75,6 +73,7 @@ CREATE OR REPLACE FORCE VIEW BARS.V_ZAY_QUEUE
    USERID,
    BRANCH,
    FL_KURSZ,
+   FNAMEKB,
    IDENTKB,
    COMM,
    CUST_BRANCH,
@@ -165,6 +164,7 @@ AS
           z.isp,                                                 -- исп.заявки
           z.tobo,                                -- BRANCH, где введена заявка
           z.fl_kursz,                                                    -- ??
+          z.fnamekb,
           z.identkb,                 -- идентификатор заявки, принятой по кл-б
           z.comm,                                               -- комментарий
           c.branch,                                          -- BRANCH клиента
@@ -178,7 +178,7 @@ AS
           z.ref_pf,
           z.ref_sps,
           zt.change_time,
-		  DECODE (
+          DECODE (
              z.sos,
              0, DECODE (
                    z.viza,
@@ -297,6 +297,7 @@ AS
           userid,
           branch,
           fl_kursz,
+          null,
           identkb,
           comm,
           cust_branch,
@@ -332,8 +333,11 @@ grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on 
 grant SELECT                                                                 on V_ZAY_QUEUE     to ZAY;
 
 GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.V_ZAY_QUEUE TO BARS_ACCESS_DEFROLE;
+
 GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.V_ZAY_QUEUE TO START1;
+
 GRANT DELETE, INSERT, SELECT, UPDATE, FLASHBACK ON BARS.V_ZAY_QUEUE TO WR_ALL_RIGHTS;
+
 GRANT SELECT ON BARS.V_ZAY_QUEUE TO ZAY;
 
 PROMPT ===================================================================================== 

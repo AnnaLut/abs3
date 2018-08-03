@@ -93,7 +93,7 @@
                 };
             }
             $scope.onClick = function (e) {
-                debugger;
+               
                 var element = $(e.currentTarget);
                 var checked = element.is(':checked'),
                     row = element.closest('tr'),
@@ -146,7 +146,7 @@
             }
 
             $scope.setVisa = function () {
-                debugger;
+               
 
                 transport.activeTabGrid = $scope.buyGrid;
 
@@ -155,7 +155,7 @@
                 var visaArr = $scope.buyGrid._data;
                 if ($scope.chkArr.length > 0) {
                     for (var i in $scope.chkArr) {
-                        debugger;
+                       
                         if ($scope.chkArr[parseInt(i)]) {
                             for (var a = 0; a < visaArr.length; a++) {
                                 // check if ZAY2 past successed:
@@ -170,7 +170,7 @@
                             }
                         }
                     }
-                    debugger;
+                   
                     if (arrErr.length > 0 && checked.length > 0) {
                         bars.ui.confirm({
                             text: "У переліку заявок на візування є ті, що мають стан \"Незавізовано валютним контролем\" (кіл-ть: " + arrErr.length + ")!<br/>Відповідні " +
@@ -385,7 +385,7 @@
                 var visaArr = $scope.saleGrid._data;
                 if ($scope.chkArrSale.length > 0) {
                     for (var i in $scope.chkArrSale) {
-                        debugger;
+                       
                         if ($scope.chkArrSale[parseInt(i)]) {
                             for (var a = 0; a < visaArr.length; a++) {
                                 // check if ZAY2 past successed:
@@ -400,7 +400,7 @@
                             }
                         }
                     }
-                    debugger;
+                   
                     if (arrErr.length > 0 && checked.length > 0) {
                         bars.ui.confirm({
                             text: "У переліку заявок на візування є ті, що мають стан \"Незавізовано валютним контролем\" (кіл-ть: " + arrErr.length + ")!<br/>Відповідні " +

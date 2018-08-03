@@ -226,6 +226,7 @@ namespace clientregister
             string rezId;
 
             string userFio;
+            string clMode;
             try
             {
                 InitOraConnection();
@@ -244,6 +245,7 @@ namespace clientregister
                     if (client == "person" && sed == "91") nSPD = "1";
                     else nSPD = "0";
                 }
+                clMode = string.IsNullOrEmpty(Request.Params.Get("clmode")) ? "base": Request.Params.Get("clmode");
             }
             finally
             {
@@ -264,8 +266,7 @@ namespace clientregister
                             	    array['" + tabs[6] + @"']='tab_linked_custs.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" + nSPD + @"&rezid=" + rezId + @"';
 									" + ((!string.IsNullOrEmpty(rnk)) ? ("array['" + tabs[7] + @"']='tab_custs_segments.aspx?rnk=" + rnk + @"&client=" + client + "';") :(""))  + @";
                                     " + (GetUsageCorpLightParam() && (!string.IsNullOrEmpty(rnk)) ? "array['" + tabs[8] + @"']='/barsroot/cdo/common/relatedCustomers/index?custId=" + rnk + 
-                                            (!string.IsNullOrEmpty(Request.Params.Get("clmode")) 
-                                            ? @"&clmode=" + Request.Params.Get("clmode") : @"") + @"'" : "") + @";
+                                            @"&clmode=" + clMode + @"'" : "") + @";
                             	    fnInitTab('webtab',array,1200,'onChangeTab');
                                 }
                                 function onChangeTab()

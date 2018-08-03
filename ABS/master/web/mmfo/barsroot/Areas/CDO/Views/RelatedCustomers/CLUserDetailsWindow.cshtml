@@ -401,7 +401,7 @@
                         <select id="Roles"
                                 kendo-drop-down-list
                                 class="w-100"
-                                k-ng-disabled="relCustCtrl.currentUser.isReadOnly && (relCustCtrl.currentUser.SignNumber == 1 || relCustCtrl.currentUser.SignNumber == 2)"
+                                k-ng-disabled="relCustCtrl.currentUser.isReadOnly && !relCustCtrl.currentUser.isMaped"
                                 name="Roles"
                                 required="required"
                                 data-placeholder="Виберіть групу..."

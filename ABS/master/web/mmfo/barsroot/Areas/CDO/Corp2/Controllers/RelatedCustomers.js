@@ -177,7 +177,7 @@ angular.module(globalSettings.modulesAreas)
             vm.currentUser = new RelatedCustomer();
 
             var dateNow = new Date();
-            vm.minBirthDate = new Date(dateNow.getFullYear() - 18, dateNow.getMonth(), dateNow.getDate());
+            vm.minBirthDate = new Date(dateNow.getFullYear() - 16, dateNow.getMonth(), dateNow.getDate());
 
             var validate = function () {
                 if (!/^\d{8,10}$/.test(vm.currentUser.TaxCode)) {
@@ -845,8 +845,10 @@ angular.module(globalSettings.modulesAreas)
                         width: '60px',
                         template: function (data) {
                             var html = '';
-                            html += "<button class='btn btn-default' ng-click=\"showEditUserForm("
-                                + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
+                            if (/*data.IsCanSign ||*/ !data.UserId) {
+                                html += "<button class='btn btn-default' ng-click=\"showEditUserForm("
+                                    + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
+                            }
                             return html;
                         },
                         attributes: { "class": "cell-horiz-align-center" }
@@ -892,6 +894,10 @@ angular.module(globalSettings.modulesAreas)
                         width: '150px',
                         template: function (data) {
                             var html = '';
+                            var showBtn = '';
+                            //if (/*data.IsCanSign || */!data.UserId) {
+                            showBtn = 'ng-click="open_userConnectionParamsWindow(' + data.Id + ',' + (data.UserId && data.SignNumber) +')';
+                            //}
                             switch (data.ApprovedType) {
                                 case 'add':
                                     html += '<a href="#" class="label label-primary" style="display: inline-block; font-size: larger;" ng-click="open_userConnectionParamsWindow(' + data.Id + ')">новий</a>';
@@ -1379,6 +1385,7 @@ angular.module(globalSettings.modulesAreas)
                 modal: true,
                 actions: ["Maximize", "Close"],
                 close: function () {
+                    vm.userConParWindowReadonly = false;
                     vm.userConnectionParamsWindow_Model = null;
                     vm.userConnectionParamsWindow_LimitModel = null;
                     vm.currentUserId = null;
@@ -1398,15 +1405,21 @@ angular.module(globalSettings.modulesAreas)
                 }
             }
 
-            $scope.open_userConnectionParamsWindow = vm.open_userConnectionParamsWindow = function (id) {
+            $scope.open_userConnectionParamsWindow = vm.open_userConnectionParamsWindow = function (id, readonly) {
                 vm.currentUserId = id;
-                initUserConnectionParamsWindow(id);
-                vm.userConnectionParamsWindow.center().open();
+                initUserConnectionParamsWindow(id, readonly);
+                //if (readonly) {
+                //    vm.userConnectionParamsWindow_back.center().open();
+                //}
+                //else {
+                    vm.userConnectionParamsWindow.center().open();
+                //}
             }
 
-            function initUserConnectionParamsWindow(userId) {
+            function initUserConnectionParamsWindow(userId, readonly) {
 
                 vm.userConnectionParamsWindow_Model = vm.relCustsGridCorp2.dataSource.get(userId);
+                vm.userConParWindowReadonly = readonly;
                 if (!limitDictionary) {
                     relatedCustomersService.getLimitDictionary().then(
                         function (response) { limitDictionary = response; },
@@ -1693,7 +1706,7 @@ angular.module(globalSettings.modulesAreas)
                     field: 'Name',
                     title: 'Перелік виданих модулів',
                     width: '200px'
-                }],
+                }]
                 change: function (e) {
                     var selectedRows = this.select();
                     if (selectedRows.length != 1) return;
