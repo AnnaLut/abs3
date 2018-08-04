@@ -78,7 +78,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
 
     $scope.onClickToolbarGrid = function (id, op) {
         var grid = getGrid(id);
-
+  
         switch (op){
             case 'excel':
                 if (grid.dataSource.view() != 0) {
@@ -87,7 +87,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
                 break;
 
             case 'ok':
-                if (id = 'files' && $scope.kvitId == KVIT_2) {
+                if (id = 'files' && $scope.kvitId == KVIT_2 && $scope.tabType != "SendTube") {
                     //data = grid.dataSource.data().map(function (el) {
                     //    return { id: el.ID, kvitId: $scope.kvitId }
                     //});
@@ -220,6 +220,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         dataTextField: "NAME",
         dataValueField: "ID",
         change: function (e) {
+            
             $scope.kvitId = this.value();
             var isKvitId_1 = $scope.kvitId == KVIT_1;
             $scope.filesGrid.dataSource.serverPaging = isKvitId_1;
@@ -739,13 +740,16 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
     $scope.tabStripOptions = {
         animation: false,
         select: function () {
+         
             var tabstrip = this;
             var curTabIndex = tabstrip.select().index();
             kendoService.clearGridSelection(getAllGrids());
-            if(curTabIndex === 0){
+            if (curTabIndex === 0) {
+                $scope.tabType = "SendTube";
                 $scope.filesHistoryGrid.dataSource.read();
             }
             else {
+                $scope.tabType = "HistoryTube";
                 $scope.filesGrid.dataSource.read();
             }
         }
@@ -756,7 +760,7 @@ mainApp.controller("McpPayAcceptCtrl", function ($controller, $scope, $http, ken
         select: function () {
             var tabstrip = this;
             var curTabIndex = tabstrip.select().index();
-
+          
             if(curTabIndex === 0 && $scope.registryGridInfo('ID') !== null){
                 $scope.infoLinesreRistryGrid.dataSource.read();
             }
