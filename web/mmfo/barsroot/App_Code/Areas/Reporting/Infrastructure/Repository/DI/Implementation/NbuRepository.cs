@@ -16,13 +16,15 @@ using BarsWeb.Areas.Kernel.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.Kernel.Models;
 using Kendo.Mvc.UI;
 using BarsWeb.Infrastructure.Helpers;
+using BarsWeb.Areas.Kernel.Infrastructure.Extentions;
+using Bars.Oracle.Factories;
 
 namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
 {
     public class NbuRepository : INbuRepository
     {
         readonly IKendoSqlTransformer _sqlTransformer;
-
+        OracleConnectFactory _oracleCommandFactory = null;
         private readonly string CurrentVersionId = "CurrentVersionId";
         readonly ReportingEntities _entities;
         [Inject]
@@ -32,6 +34,17 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             _sqlTransformer = sqlTransformer;
 
             _entities = model.ReportingEntities;
+        }
+
+        public OracleConnectFactory GetOracleConnector
+        {
+            get
+            {
+                if (_oracleCommandFactory == null)
+                    _oracleCommandFactory = new OracleConnectFactory();
+                return _oracleCommandFactory;
+            }
+
         }
 
         public IEnumerable<FileInitialInfo> GetFileInitialInfo(int id, string kf)
@@ -740,9 +753,12 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             return isDtl ? string.Format("{0}_DTL", vn) : vn;
         }
 
-        public List<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn,
-            string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc)
+        public IEnumerable<Dictionary<string, object>> GetDetailedReportDyn(DataSourceRequest request, string vn,
+            string fileCode, string reportDate, string kf, string fieldCode, string schemeCode, string nbuc,bool isDtl = false)
         {
+            try
+            {
+
             var formFinished = GetNburListFromFinished(fileCode, reportDate, kf);
             decimal versionId = formFinished.VERSION_ID;
             HttpContext context = HttpContext.Current;
@@ -802,7 +818,7 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
             var query = _sqlTransformer.TransformSql(bSql, request);
 
             List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
-
+            
             using (OracleConnection connection = Bars.Classes.OraConnector.Handler.UserConnection)
             using (OracleCommand cmd = connection.CreateCommand())
             {
@@ -811,6 +827,7 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
                 cmd.CommandText = query.SqlText;
                 using (OracleDataReader reader = cmd.ExecuteReader())
                 {
+                   
                     while (reader.Read())
                     {
                         Dictionary<string, object> row = new Dictionary<string, object>();
@@ -825,6 +842,13 @@ namespace BarsWeb.Areas.Reporting.Infrastructure.Repository.DI.Implementation
                 }
             }
             return data;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("NbuRepository.GetDetailedReportDyn " + ex.Message);
+                throw;
+            }
         }
 
         public List<TableInfo> GetTableInfo(string tableName)

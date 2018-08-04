@@ -18,6 +18,9 @@ using BarsWeb.Areas.Kernel.Infrastructure;
 using BarsWeb.Areas.Kernel.Models.KendoViewModels;
 using BarsWeb.Infrastructure.Helpers;
 using System.IO;
+using Bars.CommonModels;
+using BarsWeb.Infrastructure.ImportToFileHelper;
+using BarsWeb.Areas.Kernel.Infrastructure.Extentions;
 using BarsWeb.Core.Logger;
 using Ninject;
 
@@ -176,10 +179,10 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                 string vn = _repository.GetViewName(ConvertFileCode(fileCodeBase64), isDtl);
                 List<AllColComments> tc = _repository.GetTableComments(vn);
 
-                List<Dictionary<string, object>> result = _repository.GetDetailedReportDyn(request, vn, ConvertFileCode(fileCodeBase64), reportDate, kf, fieldCode, schemeCode, nbuc);
+                IEnumerable<Dictionary<string, object>> result = _repository.GetDetailedReportDyn(request, vn, ConvertFileCode(fileCodeBase64), reportDate, kf, fieldCode, schemeCode, nbuc,false);
                 return Request.CreateResponse(HttpStatusCode.OK, new
                 {
-                    Data = result,
+                    Data = result.ToList(),
                     Total = (request.Page * request.PageSize) + 1                
                 });
             }
@@ -334,7 +337,7 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                     datasourceModel = new WebDatasourceModel();
                 }
                 var req = dataSourceAdapter.ParsDataSours(datasourceModel);
-
+                string fPath = string.Empty;
                 List<Columns> columns = new List<Columns>();
 
                 string vn = _repository.GetViewName(Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), isDtl);
@@ -354,17 +357,21 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                     title.Add(new string[] { columnDesc.COLUMN_NAME, columnDesc.COMMENTS });  // put comments to the end of list
                 }
 
-                List<Dictionary<string, object>> res = _repository.GetDetailedReportDyn(req, vn, Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode, nbuc);
+                IEnumerable<Dictionary<string, object>> res = _repository.GetDetailedReportDyn(req, vn, Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode, nbuc, isDtl);
 
                 List<TableInfo> ti = _repository.GetTableInfo(vn);
-
-                var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res, title, ti, null);
+                if(isDtl)
+                {
+                    List<ColumnDesc> colDesc = ti.Select(x => new ColumnDesc() { Name = x.ColumnName, Type = x.DataType, Semantic = title.FirstOrDefault(c => c[0] == x.ColumnName)[1] }).ToList<ColumnDesc>();
+                    fPath =  new ImportToFileHelper().ExcelExportToZipCSVFiles('|', "NBU", res, colDesc);
+                    return Request.CreateResponse(HttpStatusCode.OK, new { FileName = fPath });
+                }
+                var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res.ToList(), title, ti, null);
 
                 // todo: add filters and sorts
                 //List<DetailedReport> res = _repository.GetDetailedReportList(Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode);
                 //var exel = new ExcelHelpers<DetailedReport>(res, true);
 
-                string fPath = string.Empty;
                 using(var ms = exel.ExportToMemoryStream())
                 {
                     fPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -378,6 +385,10 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                 Logger.Exception(ex);
                 Logger.Error("GetExcel (api/reporting/nbu/getexcel): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+            finally
+            {
+                _repository.GetOracleConnector.Dispose();
             }
         }
 
