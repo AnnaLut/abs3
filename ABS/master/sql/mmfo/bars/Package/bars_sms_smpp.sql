@@ -325,7 +325,7 @@ begin
         end if;
 
           -- вызов метода Send прокси-сервиса Send_sms.asmx
-
+        soap_rpc.g_transfer_timeout := 15;
           IF (get_param_webconfig ('SMS.Use') = 'Y')
          THEN
            -- подготовить реквест

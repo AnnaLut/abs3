@@ -3730,17 +3730,18 @@ begin
       when NO_DATA_FOUND then
         raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' ще не відкрита!', true );
     end;
-
-    if ( l_bnk_dt_st = 9 )
-    then
-      raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' закрита для входу!', true );
-    else -- 0 or null
-      if ( TMS_UTL.CHECK_ACCESS( gl.aMFO ) = 0 )
+    
+    if ( nvl(sys_context('USERENV','ACTION'), '0') <> 'BARS_LOGIN.CLEAR_EXPIRED_SESSION' ) then
+      if ( l_bnk_dt_st = 9 )
       then
-        raise_application_error( -20666, 'Філіалу '||gl.aMFO||' заборонено вхід в минулу банківську дату!', true );
+        raise_application_error( -20666, 'Банківська дата ' || to_char(dat_,'dd/mm/yyyy') || ' закрита для входу!', true );
+      else -- 0 or null
+        if ( TMS_UTL.CHECK_ACCESS( gl.aMFO ) = 0 )
+        then
+          raise_application_error( -20666, 'Філіалу '||gl.aMFO||' заборонено вхід в минулу банківську дату!', true );
+        end if;
       end if;
     end if;
-
   end if;
 
   SET_BANK_DATE( dat_ );

@@ -1137,6 +1137,7 @@ $end
         l_client_identifier t_sess_clientid;
         l_programs_with_finite_session string_list;
     begin
+        dbms_application_info.set_action( 'BARS_LOGIN.CLEAR_EXPIRED_SESSION');
         ddl_utl.refresh_mview_autonomous('mv_global_context');
 
         l_programs_with_finite_session := tools.string_to_words(branch_attribute_utl.get_value(p_branch_code => '/',
@@ -1147,7 +1148,7 @@ $end
 
         -- Сохраняем свой кл. идентификатор
         l_client_identifier := get_session_clientid();
-
+  
         -- Проходим по всем зарегистрир. сессиям, кроме собственной
         for i in (select s.*, to_date(c.last_activity_at, DATETIME_FORMAT) last_activity_at, u.logname
                   from   staff_user_session s
@@ -1190,14 +1191,17 @@ $end
                 end if;
             end if;
         end loop;
+        dbms_application_info.set_action(null);
+        
     exception
         when others then
+            dbms_application_info.set_action(null);
+
             -- Восстанавливаем свой кл. идентификатор
             set_user_clientid(l_client_identifier);
             -- Выпускаем ошибку
             raise;
     end;
-
 
     procedure clear_session(
         p_client_id varchar2,

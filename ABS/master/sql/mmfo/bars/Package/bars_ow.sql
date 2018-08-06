@@ -12436,6 +12436,7 @@ function send_request(p_body in clob) return wsm_mgr.t_response is
   l_response    wsm_mgr.t_response;
 
 begin
+  wsm_mgr.g_transfer_timeout := 30;
   wsm_mgr.prepare_request(p_url         => l_url,
                           p_action      => null,
                           p_http_method => wsm_mgr.g_http_post,
