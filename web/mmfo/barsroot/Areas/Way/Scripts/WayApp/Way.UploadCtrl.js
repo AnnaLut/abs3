@@ -234,10 +234,12 @@
                     dataType: 'json',
                     data: {
                         dateFrom: function () {
-                            return kendo.toString(kendo.parseDate(dateFrom), 'dd/MM/yyyy') || dateFrom;
+                            /*return kendo.toString(kendo.parseDate(dateFrom), 'dd/MM/yyyy') || dateFrom;*/
+                            return dateFrom;
                         },
                         dateTo: function () {
-                            return kendo.toString(kendo.parseDate(dateTo), 'dd/MM/yyyy') || dateTo;
+                            /*return kendo.toString(kendo.parseDate(dateTo), 'dd/MM/yyyy') || dateTo;*/
+                            return dateTo;
                         },
                         condition: function () {
                             return $scope.base64Condition;
