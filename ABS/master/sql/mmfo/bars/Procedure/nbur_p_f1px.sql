@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 1PX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.004  20/06/2018
+% VERSION     :  v.16.005 06/08/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.004  20/06/2018';
+  ver_          char(30)  := 'v.16.005  06/08/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   cEKP                   constant varchar2(100 char) := 'A1P001';
@@ -89,7 +89,7 @@ BEGIN
                , q001 /*q001*/
                , rcukru_glb_1 /*rcukru_glb_1*/
                --Генерация номера для связки с агрегированного и детального протокола
-               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 5, '0') as q003_1
+               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
                , q004 /*q004*/
                , case when t023 = 3 then 0 else 1 end/*t080*/
                , t071 /*t071*/
@@ -193,7 +193,7 @@ BEGIN
                , q001 /*q001*/
                , rcukru_glb_1 /*rcukru_glb_1*/
                --Генерация номера для связки с агрегированного и детального протокола
-               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 5, '0') as q003_1
+               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
                , q004 /*q004*/
                , case when t023 = 3 then 0 else 1 end/*t080*/
                , t071 /*t071*/
