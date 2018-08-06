@@ -25,15 +25,28 @@ begin
   delete from op_rules where tt='CL0';
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
-    values ('12_2C', 'CL0', 'O', 1, 49, null, null);
+    values ('12_2C', 'CL0', 'O', 0, null, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (op_rules: ''12_2C'', ''CL0'', ''O'', 1, 49, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''12_2C'', ''CL0'', ''O'', 0, null, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;
+  
+    begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('DE#E2', 'CL0', 'O', 0, null, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''DE#E2'', ''CL0'', ''O'', 0, null, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('23B  ', 'CL0', 'O', 1, 4, null, null);
