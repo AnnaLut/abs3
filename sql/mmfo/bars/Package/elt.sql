@@ -1335,6 +1335,7 @@ end;
    DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор
 exception when others then
   DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор   
+  raise_application_error(-20001,SQLERRM);
 END;
    end if;  ----  k.nls3 like ...
 ---------
