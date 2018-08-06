@@ -132,7 +132,7 @@ show errors;
 
 create or replace package body NBUR_QUEUE 
 is
-  g_body_version  constant varchar2(64)  := 'version 7.3  2018.05.15';
+  g_body_version  constant varchar2(64)  := 'version 7.4  2018.08.06';
   g_body_defs     constant varchar2(512) := '';
 
   MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
@@ -1777,7 +1777,7 @@ is
                              else null
                            end as RPT_DT
                      from NBUR_REF_FILES
-                     where file_code not in ('#2C', '#42', '#8B', '#12') and
+                     where file_code not in ('#2C', '#3A', '#42', '#8B', '#12') and
                            PERIOD_TYPE in ('D', 'T')
                  ) f
            cross
