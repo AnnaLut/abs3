@@ -18,9 +18,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.27.005  22/06/2018
+% VERSION     :  v.27.006 06/08/2018 (22/06/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := 'v.27.005  22/06/2018';
+  ver_            char(30)  := 'v.27.006  06/08/2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -78,7 +78,9 @@ BEGIN
                 select tr.cust_id, tr.acc_id, tr.acc_num, tr.ref, tr.Q003_1 as nnnn, tr.K020_1 as segm_z, tr.R030_1 as kv                       
                        , tr.Q001_1, tr.Q002, tr.Q003_2, tr.Q003_3, tr.Q030, tr.K020_1, tr.K021_1, tr.Q006, tr.F086, tr.Q003_4
                        , tr.R030_1, tr.Q007_1, tr.Q007_2, tr.Q031_1, tr.T070_1, tr.T070_2, tr.F088, tr.Q007_3, tr.Q003_5, tr.Q001_2
-                       , tr.K020_2, tr.K021_2, tr.Q001_3, tr.T070_3, tr.R030_2, tr.Q032, tr.Q031_1 as Q031_2, tr.Q003_1
+                       , tr.K020_2, tr.K021_2, tr.Q001_3, tr.T070_3, tr.R030_2, tr.Q032 
+                       , case when tr.ref is null then null else tr.Q031_1 end as Q031_2
+                       , tr.Q003_1
                 from   (               
                           select cust.cust_id
                                  , acc.acc_id
@@ -117,18 +119,18 @@ BEGIN
                                        '2' 
                                      end
                                    ) as F088
-                                 , to_char(tr.operation_date, с_date_fmt) as Q007_3       
-                                 , (case when acc.acc_id = tr.acc_id_db then tr.acc_num_cr else tr.acc_num_cr end) as Q003_5
-                                 , substr(case when acc.acc_id = tr.acc_id_db then tr.cust_name_cr else tr.cust_name_db end, 1, 70) as Q001_2
-                                 , lpad(case when acc.acc_id = tr.acc_id_db then tr.cust_okpo_cr else tr.cust_okpo_db end, 10, '0') as K020_2                
-                                 , substr(case when acc.acc_id = tr.acc_id_db then tr.bank_name_db else tr.bank_name_cr end, 1, 70) as Q001_3
-                                 , nvl(to_char(tr.bal_uah), '0') as T070_3
+                                 , case when tr.ref is null then null else to_char(tr.operation_date, с_date_fmt) end as Q007_3       
+                                 , case when tr.ref is null then null else (case when acc.acc_id = tr.acc_id_db then tr.acc_num_cr else tr.acc_num_cr end) end as Q003_5
+                                 , case when tr.ref is null then null else substr(case when acc.acc_id = tr.acc_id_db then tr.cust_name_cr else tr.cust_name_db end, 1, 70) end as Q001_2
+                                 , case when tr.ref is null then null else lpad(case when acc.acc_id = tr.acc_id_db then tr.cust_okpo_cr else tr.cust_okpo_db end, 10, '0') end as K020_2                
+                                 , case when tr.ref is null then null else substr(case when acc.acc_id = tr.acc_id_db then tr.bank_name_db else tr.bank_name_cr end, 1, 70) end as Q001_3
+                                 , case when tr.ref is null then null else nvl(to_char(tr.bal_uah), '0') end as T070_3
                                  , case
                                      when tr.ref is null then '#' --Если счетов или операции не было
                                    else
                                      lpad(tr.kv, 3, '0')
                                    end as R030_2
-                                 , tr.purpose_of_payment as Q032
+                                 , case when tr.ref is null then null else tr.purpose_of_payment end as Q032
                                  , case    
                                      when tr.ref is null then '#'  --Если счетов или операции не было
                                      when pay_cust.cust_code is not null then   
@@ -157,15 +159,11 @@ BEGIN
                                      end
                                    end  as K021_2  
                                  , lpad(to_char(row_number() over (partition by lpad(cust.cust_code, 10, '0') order by acc.acc_id, tr.ref)), 4, '0') as Q003_1                                   
-                          from   (
-                                    select
-                                           cust.cust_code, max(cust.k070) as k070, max(cust.cust_name) as cust_name, max(cust.cust_adr) as cust_adr
-                                           , max(cust.cust_id) as cust_id, max(cust.cust_type) as cust_type, max(cust.k030) as k030, max(re.rnbor) rnbor
-                                           , max(re.rnbou) rnbou, max(re.rnbos) rnbos, max(re.rnbod) rnbod
-                                    from   (
-                                             select *
-                                             from (
-                                                    select u.rnk
+                          from   (select cust.cust_code, max(cust.k070) as k070, max(trim(custo.nmk)) as cust_name, max(cust.cust_adr) as cust_adr
+                                         , max(cust.cust_id) as cust_id, max(cust.cust_type) as cust_type, max(cust.k030) as k030, max(re.rnbor) rnbor
+                                         , max(re.rnbou) rnbou, max(re.rnbos) rnbos, max(re.rnbod) rnbod
+                                  from   (select *
+                                          from (select u.rnk
                                                            , u.tag
                                                            , case
                                                                when u.tag = 'RNBOD' then
@@ -190,20 +188,20 @@ BEGIN
                                                   )
                                              pivot (max(trim(value)) for tag in ('RNBOR' as RNBOR, 'RNBOU' as RNBOU, 'RNBOS' as RNBOS, 'RNBOD' as RNBOD))
                                            ) re
-                                           join nbur_dm_customers cust on (cust.kf = p_kod_filii)
-                                                                          and (cust.cust_id = re.rnk)
-                                                                                              
+                                           join nbur_dm_customers cust on (cust.report_date = p_report_date and
+                                                                           cust.kf = p_kod_filii and 
+                                                                           cust.cust_id = re.rnk)
+                                           join customer custo on (custo.rnk = re.rnk)
                                     where  1 = 1                            
                                            and trim(re.rnbor) is not null
                                            and trim(re.rnbod) is not null
                                            and (cust.close_date is null)
-                                    group by
-                                           cust.cust_code                                
+                                    group by cust.cust_code                                
                                  ) cust
-                                 left join nbur_dm_accounts acc on (
-                                                                     acc.kf = p_kod_filii
-                                                                     and cust.cust_id = acc.cust_id
-                                                                     and acc.nbs in (
+                                 left join nbur_dm_accounts acc on (acc.report_date = p_report_date and
+                                                                    acc.kf = p_kod_filii and 
+                                                                    cust.cust_id = acc.cust_id and 
+                                                                    acc.nbs in (
                                                                                       '2512', '2513', '2520', '2523', '2525', '2530', '2541', '2542',
                                                                                       '2544', '2545', '2546', '2550', '2551', '2553', '2555', '2556',
                                                                                       '2560', '2561', '2562', '2565', '2600', '2604', '2605', '2610',
@@ -230,7 +228,8 @@ BEGIN
                                                      select cust_code, k070, cust_type, k030
                                                             , row_number() over (partition by cust_code order by cust.open_date desc) rn
                                                      from   nbur_dm_customers cust 
-                                                     where  (cust.kf = p_kod_filii)
+                                                     where  (cust.report_date = p_report_date and
+                                                             cust.kf = p_kod_filii)
                                                    )
                                             where rn = 1
                                           ) pay_cust on (pay_cust.cust_code = decode(acc.acc_id, tr.acc_id_db, tr.cust_okpo_cr, tr.cust_okpo_db))
