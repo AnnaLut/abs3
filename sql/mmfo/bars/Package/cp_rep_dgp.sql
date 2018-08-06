@@ -13,7 +13,7 @@ create or replace package cp_rep_dgp is
 end cp_rep_dgp;
 /
 create or replace package body cp_rep_dgp is
-  G_BODY_VERSION constant varchar2(64) := 'v.1.10  10.05.2018';
+  G_BODY_VERSION constant varchar2(64) := 'v.1.10  06.08.2018';
   G_TRACE        constant varchar2(20) := 'CP_REP_DGP.';
   ---
   cursor G_CUR (p_nlsb_arr string_list, p_date_from date, p_date_to date)
@@ -29,7 +29,7 @@ create or replace package body cp_rep_dgp is
                      ar.sumb / 100 sumb,
                      ar.ref_repo,
                      ar.n / 100 sumn,
-                     ar.nom, 
+                     ar.nom,
                      ar.stiket,
                      ar.op,
                      ar.ref_main, -- rnbu
@@ -98,6 +98,7 @@ create or replace package body cp_rep_dgp is
                      cp_kod   k,
                      cp_spec_cond ks,
                      oper     o,
+                     opldok   od,
                      cp_arch  ar,
                      accounts a,
                      accounts d,
@@ -107,11 +108,14 @@ create or replace package body cp_rep_dgp is
                      accounts r3,
                      accounts s,
                      customer c
-               where (e.acc = a.acc and substr(a.nls, 1, 1) != '8' and
-                     k.dox > 1 or nvl(e.accd, e.accp) = a.acc and k.dox = 1)
+               where ((e.acc = a.acc and substr(a.nls, 1, 1) != '8' and
+                     k.dox > 1) or (nvl(e.accd, e.accp) = a.acc and k.dox = 1))
                  --and (a.dapp > p_date_from - 3 or a.ostc != 0 or a.ostb != 0)
                  and substr(a.nls, 1, 4) in (select column_value from table( p_nlsb_arr ))
-                 and o.vdat between p_date_from and p_date_to --
+                 --and o.vdat between p_date_from and p_date_to --
+                 --and o.ref = od.ref
+                 and od.acc = a.acc
+                 and od.fdat between p_date_from and p_date_to
                  and e.id = k.id
                  and k.rnk = c.rnk(+)
                  and o.ref = e.ref
@@ -1136,7 +1140,7 @@ create or replace package body cp_rep_dgp is
                  p_date_to   cp_dgp_zv.date_to%type) is
     l_title         constant varchar2(25) := 'dgp8: ';
     l_cp_dgp_zv_row cp_dgp_zv%rowtype;
-    l_nlsb_arr      string_list := string_list('1404', '1410', '1412', '1420', '1430', '1435', '1440');
+    l_nlsb_arr      string_list := string_list('1400','1404', '1410', '1412', '1420', '1430', '1435', '1440');
     l_cnt           pls_integer := 0;
 
     --блок змінних для залишків на рахунках по даті або суми оборотів
