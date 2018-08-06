@@ -22,7 +22,7 @@ create or replace package wsm_mgr is
 
   g_status_code pls_integer;
 
-  g_transfer_timeout constant number := 1800;
+  g_transfer_timeout number := 1800;
   -- режим отладочных сообщений (0 - отключено, 1 - dbms_output, 2 - sec_audit (trace), 3 - оба (1 и 2))
   g_trace_mode pls_integer := 0;
 
