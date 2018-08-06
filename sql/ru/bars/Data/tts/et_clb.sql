@@ -34,6 +34,19 @@ begin
       else raise;
       end if;
   end;
+    
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('DE#E2', 'CLB', 'O', 0, null, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''DE#E2'', ''CLB'', ''O'', 0, null, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('33B  ', 'CLB', 'M', 1, 10, null, null);
