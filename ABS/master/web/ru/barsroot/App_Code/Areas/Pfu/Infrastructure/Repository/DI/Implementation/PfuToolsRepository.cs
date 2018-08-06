@@ -20,7 +20,7 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
         public IEnumerable<PensionerType> GetPensionerType()
         {
             PensionerType[] res = {
-                new PensionerType { Id = PensionerTypes.GET_EPP_BATCH_LISTS },
+                //new PensionerType { Id = PensionerTypes.GET_EPP_BATCH_LISTS },
                 new PensionerType { Id = PensionerTypes.GET_CONVERT_LISTS }
                 //new PensionerType { Id = PensionerTypes.DEATH_LIST }
             };
@@ -30,14 +30,14 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
         public void CreateEnvelopeRequest(DateTime startDate, DateTime endDate, int type)
         {
             string command = "";
-            if (type == PensionerTypes.GET_EPP_BATCH_LISTS)
-            {
-                command = @"
-                    begin
-                         PFU.PFU_UI.create_epp_batch_request(:p_date_from, :p_date_to);
-                    end;";
-            }
-            else if (type == PensionerTypes.GET_CONVERT_LISTS)
+            //if (type == PensionerTypes.GET_EPP_BATCH_LISTS)
+            //{
+            //    command = @"
+            //        begin
+            //             PFU.PFU_UI.create_epp_batch_request(:p_date_from, :p_date_to);
+            //        end;";
+            //}
+            //else if (type == PensionerTypes.GET_CONVERT_LISTS)
             {
                 command = @"
                     begin
