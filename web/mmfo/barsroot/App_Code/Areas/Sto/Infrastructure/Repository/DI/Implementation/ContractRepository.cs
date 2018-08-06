@@ -80,7 +80,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
         {
             const string query = @"select * from table(BARS.STO_ALL.get_RNKBYOKPO(:p_okpo))";
             var parameters = new object[] {
-                new OracleParameter("p_okpo", OracleDbType.Decimal) { Value = OKPO}
+                new OracleParameter("p_okpo", OracleDbType.Varchar2) { Value = OKPO}
             };
             return _sto.ExecuteStoreQuery<pipe_customer>(query, parameters).AsQueryable();
         }
