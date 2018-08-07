@@ -6,9 +6,10 @@ Prompt Scheduler Job JOB_SEND_MT199;
 BEGIN
   SYS.DBMS_SCHEDULER.DROP_JOB
     (job_name  => 'BARS.JOB_SEND_MT199');
-END;
+exception when others then
+  if  sqlcode=-27475 then null; else raise; end if;
+ end;
 /
-
 BEGIN
   SYS.DBMS_SCHEDULER.CREATE_JOB
     (

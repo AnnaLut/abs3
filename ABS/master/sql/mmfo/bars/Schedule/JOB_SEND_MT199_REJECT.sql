@@ -2,13 +2,13 @@ Prompt Scheduler Job JOB_SEND_MT199_REJECT;
 --
 -- JOB_SEND_MT199_REJECT  (Scheduler Job) 
 --
-
 BEGIN
   SYS.DBMS_SCHEDULER.DROP_JOB
     (job_name  => 'BARS.JOB_SEND_MT199_REJECT');
-END;
+exception when others then
+  if  sqlcode=-27475 then null; else raise; end if;
+ end;
 /
-
 BEGIN
   SYS.DBMS_SCHEDULER.CREATE_JOB
     (
