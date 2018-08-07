@@ -26,7 +26,7 @@ namespace BarsWeb.Areas.OpenCloseDay.Controllers.Api
             string filename = String.Empty;
             string path = String.Empty;
             byte[] blob = null;
-            
+
             //string data = "";
             try
             {
@@ -37,7 +37,7 @@ namespace BarsWeb.Areas.OpenCloseDay.Controllers.Api
                 cmd.Parameters.Add("p_encode", OracleDbType.Varchar2, param.encode, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("p_reptype", OracleDbType.Decimal, param.reptype, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("p_prior_statement", OracleDbType.Varchar2, param.PriorSqlStatement, System.Data.ParameterDirection.Input);
- 	        cmd.Parameters.Add("p_fname_statement", OracleDbType.Varchar2, param.FnameSqlStatement, System.Data.ParameterDirection.Input);
+                cmd.Parameters.Add("p_fname_statement", OracleDbType.Varchar2, param.FnameSqlStatement, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("p_rep_date", OracleDbType.Date, param.RepDate, System.Data.ParameterDirection.Input);
                 cmd.Parameters.Add("p_filename", OracleDbType.Varchar2, 4000, filename, System.Data.ParameterDirection.Output);
                 cmd.Parameters.Add("p_path", OracleDbType.Varchar2, 4000, path, System.Data.ParameterDirection.Output);
@@ -47,25 +47,25 @@ namespace BarsWeb.Areas.OpenCloseDay.Controllers.Api
                 filename = ((OracleString)cmd.Parameters["p_filename"].Value).Value;
                 path = ((OracleString)cmd.Parameters["p_path"].Value).Value;
 
-                OracleBlob Body = (OracleBlob)cmd.Parameters["p_blob"].Value;
-                if (!Body.IsNull)
+                using (OracleBlob Body = (OracleBlob)cmd.Parameters["p_blob"].Value)
                 {
-                    //OracleBlob Body = (OracleBlob)cmd.Parameters["p_blob"].Value;
-                    blob = Body.Value;//Encoding.UTF8.GetBytes(Encoding.GetEncoding(1251).GetString(Body.Value));
-                    if (!Directory.Exists(path))
+                    if (!Body.IsNull)
                     {
-                        DirectoryInfo di = Directory.CreateDirectory(path);
+                        //OracleBlob Body = (OracleBlob)cmd.Parameters["p_blob"].Value;
+                        blob = Body.Value;//Encoding.UTF8.GetBytes(Encoding.GetEncoding(1251).GetString(Body.Value));
+                        if (!Directory.Exists(path))
+                        {
+                            DirectoryInfo di = Directory.CreateDirectory(path);
+                        }
+                        File.WriteAllBytes(path + "\\" + filename, blob);
                     }
-                    File.WriteAllBytes(path + "\\" + filename, blob);
-                    
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, "Процедура повернула пусте значення");
+                    }
                 }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK, "Процедура повернула пусте значення");
-                }
-
                 //blob = ((Oracle.DataAccess.Types.OracleBlob)cmd.Parameters["p_blob"].Value).Value;
-                
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

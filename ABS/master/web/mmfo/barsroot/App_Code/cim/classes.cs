@@ -416,27 +416,27 @@ namespace barsroot.cim
                 oraRdr = oraCmd.ExecuteReader();
                 if (oraRdr.Read())
                 {
-                    OracleBlob blob = oraRdr.GetOracleBlob(0);
-                    if (blob.IsNull)
+                    using (OracleBlob blob = oraRdr.GetOracleBlob(0))
                     {
-                        res.Code = -1;
-                        res.Message = "Не знайденно друкованої форми по документу ref=" + docRef + " в таблиці імпортованих з corp2!";
-                    }
-                    else
-                    {
-
-                        string fileName = Path.GetTempFileName();
-                        Byte[] byteArr = new Byte[blob.Length];
-                        blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
-                        using (FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write))
+                        if (blob.IsNull)
                         {
-                            fs.Write(byteArr, 0, byteArr.Length);
+                            res.Code = -1;
+                            res.Message = "Не знайденно друкованої форми по документу ref=" + docRef + " в таблиці імпортованих з corp2!";
                         }
-                        res.Message = string.Format("card_{0}({1}).rtf", tt, docRef);
-                        res.DataStr = fileName;
-                        res.Code = 0;
+                        else
+                        {
+                            string fileName = Path.GetTempFileName();
+                            Byte[] byteArr = new Byte[blob.Length];
+                            blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
+                            using (FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write))
+                            {
+                                fs.Write(byteArr, 0, byteArr.Length);
+                            }
+                            res.Message = string.Format("card_{0}({1}).rtf", tt, docRef);
+                            res.DataStr = fileName;
+                            res.Code = 0;
+                        }
                     }
-                    blob.Dispose();
                 }
                 else
                 {
@@ -1277,7 +1277,7 @@ namespace barsroot.cim
 
                 if (Bank_change.Length > 300)
                     throw new System.Exception("Контракт НЕ збережено!\nПоле \"Інформація про перехід з іншого банку\" не може містити більше 300 символів!");
-                   
+
 
                 // Update 
                 if (ContrId.HasValue)
@@ -1294,7 +1294,7 @@ namespace barsroot.cim
                     oraCmd.Parameters.Add("p_bic", OracleDbType.Varchar2, BeneficiarBankInfo.BicCodeId, ParameterDirection.Input);
                     oraCmd.Parameters.Add("p_b010", OracleDbType.Varchar2, BeneficiarBankInfo.BankB010, ParameterDirection.Input);
                     oraCmd.Parameters.Add("p_service_branch", OracleDbType.Varchar2, ServiceBranch, ParameterDirection.Input);
-                    
+
                     if (ContrType == 0 || ContrType == 1)
                     {
                         addParams = ",:p_spec_id, :p_subject_id, :p_without_acts, :p_deadline, :p_txt_subject";
@@ -1335,14 +1335,14 @@ namespace barsroot.cim
                         oraCmd.Parameters.Add("p_f504_reason", OracleDbType.Decimal, CreditContractInfo.F504_Reason, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f504_note", OracleDbType.Varchar2, CreditContractInfo.F504_Note, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_type", OracleDbType.Decimal, CreditContractInfo.F503_PercentType, ParameterDirection.Input);
-                        oraCmd.Parameters.Add("p_f503_percent_base", OracleDbType.Varchar2, CreditContractInfo.F503_Base, ParameterDirection.Input); 
-                        oraCmd.Parameters.Add("p_f503_percent_margin", OracleDbType.Decimal, CreditContractInfo.F503_Margin, ParameterDirection.Input); 
-                        oraCmd.Parameters.Add("p_f503_percent", OracleDbType.Decimal, CreditContractInfo.F503_Percent, ParameterDirection.Input); 
+                        oraCmd.Parameters.Add("p_f503_percent_base", OracleDbType.Varchar2, CreditContractInfo.F503_Base, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_f503_percent_margin", OracleDbType.Decimal, CreditContractInfo.F503_Margin, ParameterDirection.Input);
+                        oraCmd.Parameters.Add("p_f503_percent", OracleDbType.Decimal, CreditContractInfo.F503_Percent, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_purpose", OracleDbType.Decimal, CreditContractInfo.F503_Purpose, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_percent_base_t", OracleDbType.Varchar2, CreditContractInfo.F503_Base_Term, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_change_info", OracleDbType.Varchar2, CreditContractInfo.F503_Change_Info, ParameterDirection.Input);
                     }
-                    
+
                     oraCmd.CommandText = @"begin cim_mgr.update_contract(:p_contr_id,
                                                                 :p_num,
                                                                 :p_subnum,
@@ -1425,7 +1425,7 @@ namespace barsroot.cim
                         oraCmd.Parameters.Add("p_f503_percent_base_t", OracleDbType.Varchar2, CreditContractInfo.F503_Base_Term, ParameterDirection.Input);
                         oraCmd.Parameters.Add("p_f503_change_info", OracleDbType.Varchar2, CreditContractInfo.F503_Change_Info, ParameterDirection.Input);
                     }
-                    
+
                     oraCmd.CommandText = @"begin cim_mgr.create_contract (:p_contr_id,:p_contr_type,:p_rnk,:p_num,:p_subnum,:p_s,:p_kv,:p_benef_id,:p_open_date,:p_close_date,:p_comments,:p_bank_change,:p_bic,:p_b010,:p_service_branch " + addParams + "); end;";
                     oraCmd.ExecuteNonQuery();
                     ContrId = Convert.ToDecimal(oraCmd.Parameters["p_contr_id"].Value.ToString());

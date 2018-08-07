@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BarsWeb.Areas.FastReport.Helpers;
 using BarsWeb.Areas.FastReport.Models;
+using Oracle.DataAccess.Types;
 
 public partial class corp2_export_docs : System.Web.UI.Page
 {
@@ -115,7 +116,11 @@ public partial class corp2_export_docs : System.Web.UI.Page
                         //Corp2
                         if (rbC2.Checked)
                         {
-                            data = rdr.GetOracleBlob(2).Value;
+                            using (OracleBlob _dataBlob = rdr.GetOracleBlob(2))
+                            {
+                                data = _dataBlob.Value;
+                            }
+
                             var content = enc.GetString(data);
                             try
                             {
@@ -311,7 +316,7 @@ public partial class corp2_export_docs : System.Web.UI.Page
                         zip.AddEntry(fileName, data);
                     }
                 }
-                
+
                 if (zip.Entries.Count > 0)
                 {
                     var stream = new MemoryStream();

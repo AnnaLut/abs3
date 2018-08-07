@@ -71,10 +71,10 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                     State = Convert.ToInt32(cmd.Parameters["p_state"].Value.ToString())
                 };
 
-                if (!((OracleString) cmd.Parameters["p_message"].Value).IsNull)
+                if (!((OracleString)cmd.Parameters["p_message"].Value).IsNull)
                     result.Result.Message = Convert.ToString(cmd.Parameters["p_message"].Value);
                 result.Status = 0;
-                if(!((OracleString)cmd.Parameters["p_stack"].Value).IsNull)
+                if (!((OracleString)cmd.Parameters["p_stack"].Value).IsNull)
                     result.ErrorStackTrace = Convert.ToString(cmd.Parameters["p_stack"].Value);
 
                 return result;
@@ -158,19 +158,22 @@ namespace BarsWeb.Areas.Pfu.Infrastructure.Repository.DI.Implementation
                 var rdr = cmd.ExecuteReader();
                 if (rdr.Read())
                 {
-                    var blob = rdr.GetOracleBlob(0).Value;
-                    if (blob.Length == 0)
+                    using (OracleBlob _blob = rdr.GetOracleBlob(0))
                     {
-                        result.Status = 1;
-                        result.ErrorMessage = "Квитанція по файлу [" + packageId + "] не знайдена.";
-                        return result;
+                        byte[] blob = _blob.Value;
+                        if (blob.Length == 0)
+                        {
+                            result.Status = 1;
+                            result.ErrorMessage = "Квитанція по файлу [" + packageId + "] не знайдена.";
+                            return result;
+                        }
+                        result.Status = 0;
+                        result.Result = new ResponseDataResult
+                        {
+                            State = 0,
+                            Data = Convert.ToBase64String(blob)
+                        };
                     }
-                    result.Status = 0;
-                    result.Result = new ResponseDataResult
-                    {
-                        State = 0,
-                        Data = Convert.ToBase64String(blob)
-                    };
                 }
                 else
                 {

@@ -251,7 +251,12 @@ namespace Bars.Oracle
             OracleParameter oracleParameter = GetParameter(_command, _parameterName);
 
             if (oracleParameter.Value is OracleBlob)
-                return GetBytes((OracleBlob)oracleParameter.Value);
+            {
+                using (OracleBlob val = (OracleBlob)oracleParameter.Value)
+                {
+                    return GetBytes(val);
+                }
+            }
 
             throw new InvalidCastException(String.Format("Unable to convert parameter {0} from type {1} to {2}", _parameterName, oracleParameter.Value.GetType(), typeof(Byte[])));
         }
