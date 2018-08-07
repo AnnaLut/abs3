@@ -7,7 +7,7 @@ IS
    --**************************************************************--
 
 
-   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.17 02.07.2018';
+   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.18 07.08.2018';
    VERSION_HEADER_DEFS   CONSTANT VARCHAR2 (512) := '';
 
    -- Устаревшие типы
@@ -356,6 +356,8 @@ IS
    PROCEDURE job_mt199_ru_tr2tr2client2;
    
    PROCEDURE job_mt199_ru_tr2tr2client3;
+   
+   PROCEDURE job_mt199_claims;
 
 
    -----------------------------------------------------------------
@@ -380,10 +382,9 @@ IS
       RETURN VARCHAR2;
 END bars_swift_msg;
 /
-
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.47 04.07.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.52 07.08.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -424,6 +425,8 @@ IS
 
    MODVAL_MSGTRANSLATE_YES   CONSTANT params.val%TYPE := '1';
    MODVAL_MSGTRANSLATE_NO    CONSTANT params.val%TYPE := '0';
+   
+   BIC_GPI                   CONSTANT VARCHAR2(15):='TRCKCHZ0XXX';
 
 
    g_vldList                          t_reflist;
@@ -3682,6 +3685,7 @@ IS
    --
 
 
+
    PROCEDURE process_document
    IS
    BEGIN
@@ -6512,13 +6516,13 @@ IS
       --
       l_doc        t_doc;
    --
-   /*
+   
        ERR     constant number := -20782;
        l_mt    sw_mt.mt%type;
        l_opt   varchar2(1);
        l_value sw_operw.value%type;
        l_list  t_strlist;
-   */
+   
    BEGIN
       bars_audit.trace ('%s: entry point par[0]=>%s', p, TO_CHAR (p_ref));
 
@@ -6537,8 +6541,8 @@ IS
 
       -- Вызываем процедуру проверки
       docmsg_document_validate (l_doc);
-
-      /*
+-------
+     
 
               -- Получаем доп. реквизит - признак формирования сообщения
               if (not docmsg_checkmsgflag(p_ref)) then
@@ -6748,7 +6752,7 @@ IS
 
               bars_audit.trace('document validation step 3 complete.');
 
-      */
+     ----------------
 
       bars_audit.trace ('%s: succ end', p);
    END docmsg_document_validate;
@@ -6937,6 +6941,7 @@ IS
 
             bars_audit.trace ('tag=%s opt=%s successfully validated.',
                               i.tag,
+
                               i.opt);
          END IF;
       END LOOP;
@@ -7024,6 +7029,8 @@ IS
          THEN
             IF (c.VALUE != bars_swift.strverify2 (c.VALUE, 'TRANS'))
             THEN
+             bars_audit.info('SWT: docref-'||p_docref||', tag-'||c.tag||', value-'||c.value);
+             bars_audit.info('SWT: docref-'||p_docref||', tag-'||c.tag||', value-'||bars_swift.strverify2 (c.VALUE, 'TRANS'));
                raise_application_error (
                   -20782,
                      '\932 Найдены недопустимые символы в поле '
@@ -7382,6 +7389,9 @@ IS
       l_pos          NUMBER;        /*                              позиция */
       l_currCode     tabval.kv%TYPE; /*                 Код валюты документа */
       l_status       sw_statuses.VALUE%TYPE;
+      l_32a          sw_operw.VALUE%TYPE;
+      l_33b          sw_operw.VALUE%TYPE;
+      l_52fld        sw_operw.VALUE%TYPE;
    BEGIN
       --
       -- Проверяем есть ли метаописание
@@ -7438,6 +7448,21 @@ IS
                || '.Не могу опеределить тип комиссии!');
             
       END;
+      
+        --      BEGIN
+        --         SELECT t.VALUE
+        --           INTO l_52fld
+        --           FROM sw_operw t
+        --          WHERE t.swref = p_swref AND t.tag = '52' AND ROWNUM = 1;
+        --      EXCEPTION
+        --         WHEN NO_DATA_FOUND
+        --         THEN
+        --            bars_audit.info (
+        --                  'MT199:Нет поля 52 для SwRef=> '
+        --               || TO_CHAR (p_swref));
+        --            l_52fld:=null;   
+        --            
+        --      END;
 
       BEGIN
          SELECT VALUE
@@ -7475,6 +7500,33 @@ IS
                   'MT199: Нет поля 71F для SwRef=> '
                || TO_CHAR (p_swref));
       END;
+      
+      BEGIN
+         SELECT t.VALUE
+           INTO l_32a
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '32' and t.opt='A' AND ROWNUM = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (
+                  'MT199: Нет поля 32A для SwRef=> '
+               || TO_CHAR (p_swref));
+      END;
+      
+      BEGIN
+         SELECT t.VALUE
+           INTO l_33b
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '33' and t.opt='B' AND ROWNUM = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (
+                  'MT199: Нет поля 33B для SwRef=> '
+               || TO_CHAR (p_swref));
+      END;
+
 
         --      BEGIN
         --         SELECT w.VALUE
@@ -7507,7 +7559,7 @@ IS
          page_       => NULL,
          io_         => 'I',
          sender_     => l_sw_journal.receiver,
-         receiver_   => 'TRCKCHZZXXX',
+         receiver_   => BIC_GPI,
          transit_    => l_sw_journal.transit,
          payer_      => NULL,
          payee_      => l_sw_journal.payee,
@@ -7591,9 +7643,7 @@ IS
                || '//'
                || l_status
                || CRLF
-               || '//'
-               || l_sw_journal.sender
-               || '/'
+               || '//'-- || case when l_52fld is not null then  l_sw_journal.sender|| '/' else '' end 
                || l_sw_journal.receiver
                || CRLF
                || '//'
@@ -7634,6 +7684,24 @@ IS
                                                l_currCode,
                                                TRUE,
                                                TRUE);                            
+            END IF;
+            
+            IF (l_71fld='OUR') THEN
+                IF (p_statusid=1 and l_33b is not null) then
+                  l_value :=l_value
+                  || CRLF
+                  || '//'
+                  || l_33b; 
+                END IF;
+                
+                IF (p_statusid!=1 and l_32a is not null) then
+                  l_value :=l_value
+                  || CRLF
+                  || '//'
+                  || substr(l_32a,7); 
+                END IF;
+                
+                
             END IF;
 
 
@@ -7684,9 +7752,9 @@ IS
       BEGIN
          SELECT j.swref
            INTO l_swref
-           FROM sw_journal j, sw_oper o
+           FROM sw_journal j--, sw_oper o
           WHERE     j.uetr = p_uetr
-                AND o.swref = j.swref
+--              AND o.swref = j.swref
                 AND j.mt = 103
                 AND ROWNUM = 1;
       EXCEPTION
@@ -8111,6 +8179,7 @@ IS
                      || c.swref
                      || ' вже було надіслано статус "ACSC"');
                ELSE
+
                   bars_audit.error (
                         'job_send_mt199_tr2tr2client:'
                      || DBMS_UTILITY.format_error_stack ()
@@ -8393,7 +8462,7 @@ IS
                     AND d3.acc = c3.acc
                     -- не беремо зарахування на транзит
                     AND c3.tip NOT IN ('NLL', 'NL9')
-                     AND s.swref not in (select swref from sw_oper_queue where status !=0) )
+                     AND s.swref not in (select swref from sw_oper_queue where status in(1,2)) )
       LOOP
          BEGIN
             bc.go (300465);
@@ -8776,6 +8845,41 @@ IS
         end loop;
         
    end job_send_reject;
+   
+   PROCEDURE job_mt199_claims
+   IS
+   BEGIN
+      FOR c
+         IN (SELECT DISTINCT s.swref
+               FROM bars.sw_oper_queue s,
+                    bars.arc_rrp a,
+                    bars.oper o
+              WHERE     s.REF = a.REF
+                    AND a.ref=o.ref
+                    AND o.tt='CLI'
+                    AND NVL (s.send_mt199, 0) != 1
+                    AND a.nazns in(10, 11)
+                    AND a.sos in(7,9)
+                    AND o.mfob in (select kf from bars.kf_ru
+                        where kf not in (select kf from bars.mv_kf)))
+      LOOP
+         BEGIN
+            bc.go (300465);
+               bars_swift_msg.genmsg_mt199 (c.swref, 1);
+         
+            bc.home ();
+         EXCEPTION
+            WHEN OTHERS
+            THEN
+               bars_audit.error (
+                     'job_mt199_claims:'
+                  || DBMS_UTILITY.format_error_stack ()
+                  || CHR (10)
+                  || DBMS_UTILITY.format_error_backtrace ());
+               bc.home ();
+         END;
+      END LOOP;
+   END job_mt199_claims;
 
    -----------------------------------------------------------------
    -- HEADER_VERSION()

@@ -1564,6 +1564,7 @@ procedure stmt_unlink_doc(
 
 
 end bars_swift;
+
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_SWIFT
 is
@@ -1583,7 +1584,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.88 02.07.2018';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.91 07.08.2018';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -9961,7 +9962,8 @@ begin
         if (p_value not in ('AGNT', 'BILA', 'BROK')) then
             raise_application_error(-20782, 'T36: Неверный код в поле ' || p_tag || p_opt);
         end if;
-
+    elsif (p_tag  in('KOD_G')) then
+        null;
     else
         raise_application_error(-20999, 'implementation restriction - cannot validate ' || p_tag || p_opt);
     end if;
@@ -10012,6 +10014,8 @@ begin
             l_row   := l_value;
             l_value := null;
         end if;
+
+        dbms_output.put_line(length(l_row));
 
         l_rowcnt:= l_rowcnt + 1;
 
@@ -16031,28 +16035,28 @@ end process_auth_message;
         bars_audit.trace('Linking document Ref=%s with main message SwRef=%s ...', to_char(p_docRef), to_char(p_swRef));
         impmsgi_document_link(p_docRef, p_swRef);
         bars_audit.trace('Document Ref=%s successfully linked with main message SwRef=%s.', to_char(p_docRef), to_char(p_swRef));
-        
+
          begin
             insert into sw_oper_queue (ref, swref,status) values (p_docRef, p_swRef,0);
          exception when dup_val_on_index then null;
          end;
-         
+
          --читаемо uetr для передачі по ВПС
           begin
            select uetr
               into l_uetr
            from sw_journal
            where swref = p_swref;
-          exception when no_data_found then l_uetr:=null; 
+          exception when no_data_found then l_uetr:=null;
           end;
-          
-          if (l_uetr is not null) then 
+
+          if (l_uetr is not null) then
             begin
                 insert into operw(ref, tag, value)
                 values(p_docRef, 'UETR', l_uetr);
-            exception when dup_val_on_index then null;    
+            exception when dup_val_on_index then null;
             end;
-          end if;   
+          end if;
 
         -- Смотрим есть ли строка выписки
         begin
@@ -16717,6 +16721,10 @@ is
 begin
 select s.* into l_sw_journal from sw_journal s where s.swref=p_swref;
 select o.* into l_oper from oper o where o.ref=p_ref;
+
+ if ((l_oper.dk=1 and substr(l_oper.nlsa,1,4)='1500' and substr(l_oper.nlsb,1,4)='1600' and l_oper.mfob=gl.aMFO)
+ or (l_oper.dk=0 and substr(l_oper.nlsa,1,4)='1600' and l_oper.mfoa=gl.aMFO and substr(l_oper.nlsb,1,4)='1500')) then
+
         begin
             select trim(value) into l_transit from sw_operw
             where swref= p_swref
@@ -16753,15 +16761,24 @@ select o.* into l_oper from oper o where o.ref=p_ref;
                     end;
 
                 else
-                    raise_application_error(-20000, 'Не вдалося знайти БАНК ОТРИМУВАЧ');
+
+                    if l_oper.nlsb  like '1600%' then
+                        select b.bic into l_transit from accounts a, bic_acc b
+                        where a.acc=b.acc and nls=l_oper.nlsb and kv=l_oper.kv2;
+                    elsif  l_oper.nlsa  like '1600%' then
+                        select b.bic into l_transit from accounts a, bic_acc b
+                        where a.acc=b.acc and nls=l_oper.nlsa and kv=l_oper.kv;
+                    else
+                        raise_application_error(-20000, 'Не вдалося знайти БАНК ОТРИМУВАЧ');
+                    end if;
+
                 end if;
             end;
         end;
 
- if ((l_oper.dk=1 and substr(l_oper.nlsa,1,4)='1500' and substr(l_oper.nlsb,1,4)='1600' and l_oper.mfob=gl.aMFO)
- or (l_oper.dk=0 and substr(l_oper.nlsa,1,4)='1600' and l_oper.mfoa=gl.aMFO and substr(l_oper.nlsb,1,4)='1500')) then
 
-            l_guid :=bars_swift.generate_uetr;
+
+     --l_guid :=bars_swift.generate_uetr;
 
     BARS_SWIFT.In_SwJournalInt(ret_      => l_ret,
                         swref_    => l_swref_new,
@@ -16782,7 +16799,8 @@ select o.* into l_oper from oper o where o.ref=p_ref;
                         idat_     => to_char(sysdate,  'YYYY-MM-DD HH24:MI'),
                         flag_     => 'L',
                         sti_      => '001',
-                        uetr_     => lower(l_guid)
+						uetr_     => l_sw_journal.uetr
+                    --uetr_     => lower(l_guid)
                         );
  update sw_journal set date_pay = sysdate, date_out = null where swref=l_swref_new;
 
