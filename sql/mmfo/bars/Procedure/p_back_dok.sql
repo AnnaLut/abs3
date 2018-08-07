@@ -1,8 +1,10 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BACK_DOK.sql =========*** Run **
-PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PROCEDURE P_BACK_DOK (
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_back_dok.sql =========*** Run **
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PROCEDURE BARS.P_BACK_DOK (
     Ref_        IN  Number,
     Lev_        IN  Number default 3,
     ReasonId_   IN  Number,
@@ -432,14 +434,18 @@ BEGIN
   -- на accounts на вставку в pkk_que
   delete from pkk_que where ref = Ref_;
   delete from ow_pkk_que where ref = Ref_;
+  update nlk_ref n
+    set n.ref2 = null,
+        n.ref2_state= null
+    where n.ref2 = ref_;
 
 --EXCEPTION
  -- WHEN err THEN
    -- bars_error.raise_nerror('DOC', erm, par1);
 END p_back_dok;
 /
-show err;
-
+ show err;
+ 
 PROMPT *** Create  grants  P_BACK_DOK ***
 grant EXECUTE                                                                on P_BACK_DOK      to ABS_ADMIN;
 grant EXECUTE                                                                on P_BACK_DOK      to BARS_ACCESS_DEFROLE;
@@ -449,8 +455,9 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on P_BACK_DOK      to START1;
 grant EXECUTE                                                                on P_BACK_DOK      to WR_ALL_RIGHTS;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_BACK_DOK.sql =========*** End **
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_back_dok.sql =========*** End **
+ PROMPT ===================================================================================== 
+ 
