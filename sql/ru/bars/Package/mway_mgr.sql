@@ -3866,7 +3866,6 @@ l_xml xmltype;
     elsif l_key_err = 1 then
       if l_transcode in ('01000P','01000F','01000F_AUTH','04200P','04200F') and l_request_type is null then
       get_payord(l_xml, l_rnk, l_transcode, l_mfo, l_error_code, l_error_message);
-      dbms_lock.sleep(45);  -- COBUSUPABS-6410  Встановити таймаут обробки UFX запитів з процесінгової системи на стороні АБС «БАРС» на рівні 45 секунд
     else
         if l_request_type is not null and l_request_type in ('OPEN_DEPOSIT','EDIT_DEPOSIT') then
           case l_request_type
