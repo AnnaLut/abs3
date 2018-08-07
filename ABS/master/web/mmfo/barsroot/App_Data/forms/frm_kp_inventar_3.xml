@@ -17,9 +17,7 @@
         <buttons defaulttype="button">
           <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
             <command type="Edit">
-              <sql>update VV_9819 set  
-              CC_ID= :CC_ID, SDATE= :SDATE, RNK= :RNK, NMK= :NMK, 
-              ISP= :ISP, K_02= :K_02, K_03= :K_03, K_79= :K_79, 
+              <sql>update VV_9819 set   K_02= :K_02, K_03= :K_03, K_79= :K_79, 
               K_83= :K_83 , K_I3= :K_I3 , K_B8= :K_B8 
 			  where ISP=:ISP and BRANCH= :BRANCH and ND= :ND</sql>
               <parameters>
