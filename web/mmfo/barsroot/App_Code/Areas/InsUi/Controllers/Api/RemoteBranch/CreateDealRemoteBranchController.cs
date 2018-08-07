@@ -35,7 +35,7 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
             ser.Serialize(stream, param);
             stream.Position = 0;
             string pParams = new StreamReader(stream).ReadToEnd();
-            
+
             OracleConnection con = OraConnector.Handler.UserConnection;
             OracleCommand cmd = con.CreateCommand();
 
@@ -47,13 +47,16 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
 
             try
             {
-                cmd.CommandText = "bars.ins_ewa_mgr.create_deal";
-                cmd.Parameters.Add("p_params", OracleDbType.XmlType, pParams, ParameterDirection.Input);
-                cmd.Parameters.Add("p_deal_number", OracleDbType.Decimal, ParameterDirection.Output);
-                cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, ParameterDirection.Output);
-                cmd.Parameters.Add("p_errmessage", OracleDbType.Varchar2, 4000, errMessage, ParameterDirection.Output);
+                using (OracleXmlType _pParams = new OracleXmlType(con, pParams))
+                {
+                    cmd.CommandText = "bars.ins_ewa_mgr.create_deal";
+                    cmd.Parameters.Add("p_params", OracleDbType.XmlType, _pParams, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_deal_number", OracleDbType.Decimal, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, ParameterDirection.Output);
+                    cmd.Parameters.Add("p_errmessage", OracleDbType.Varchar2, 4000, errMessage, ParameterDirection.Output);
 
-                cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
+                }
 
                 dealNumber = cmd.Parameters["p_deal_number"].Value.ToString() == "null" ? -1 : Convert.ToInt32(cmd.Parameters["p_deal_number"].Value.ToString());
                 errCode = String.IsNullOrEmpty(cmd.Parameters["p_errcode"].Value.ToString()) ? 0 : Convert.ToInt32(cmd.Parameters["p_errcode"].Value.ToString());
@@ -79,7 +82,7 @@ namespace Areas.InsUi.Controllers.Api.RemoteBranch
                 con.Close();
                 con.Dispose();
             }
-            
+
             response.success = true;
             response.message = "Ok";
             response.externalId = dealNumber;
