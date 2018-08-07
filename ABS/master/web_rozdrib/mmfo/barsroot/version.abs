@@ -1,1 +1,25 @@
-Bugfix_2.0.45.0.19 (Rev:62418-62437) 
+=========  svn diff --summarize -r 62312:62509 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\corp2\export_docs.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\Areas\Way\Scripts\WayApp\Way.UploadCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\Areas\Way\Views\WayApp\Index.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\tools\load_tikets_cp.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\tools\Load_corp2_docs.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Data\forms\frm_kp_inventar_3.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\ibank.objlayer\sync\DataImport.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\InsUi\Controllers\Api\RemoteBranch\CreateDealRemoteBranchController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\Transp\Infrastructure\DI\Implementation\TranspRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\Admin\Infrastructure\Repository\DI\Implementation\OperRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\OpenCloseDay\Controllers\Api\FormReportController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\OpenCloseDay\Controllers\Api\KFileFormPepController.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\Pfu\Infrastructure\Repository\DI\Implementation\PfuRequestRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Areas\Sto\Infrastructure\Repository\DI\Implementation\ContractRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\deposit\Deposit.Request.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\cim\classes.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\ins\InsPack.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\Bars.Oracle\OracleValueHelper.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\credit\WcsUtl.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot\App_Code\webservices\PFUService.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.45.0.20\mmfo\web
+Bugfix_2.0.45.0.20 (Rev:62312-62509
