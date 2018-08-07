@@ -739,11 +739,11 @@ namespace Bars.Ins
             parameters.Add(new OracleParameter("$$RETVAL$$", OracleDbType.Blob, ParameterDirection.ReturnValue));
             object ReturnValue = null;
             ExecuteNonQuery("INS_PACK.GET_DEAL_SCAN", parameters.ToArray(), CommandType.StoredProcedure, out ReturnValue);
-            OracleBlob res = (OracleBlob)ReturnValue;
-            Byte[] resByte = res.IsNull ? (Byte[])null : res.Value;
-            res.Close();
-            res.Dispose();
-            return resByte;
+            using (OracleBlob res = (OracleBlob)ReturnValue)
+            {
+                Byte[] resByte = res.IsNull ? null : res.Value;
+                return resByte;
+            }
         }
         public Decimal? CREATE_ACCIDENT ( Decimal? P_ID,  Decimal? P_DEAL_ID,  DateTime? P_ACDT_DATE,  String P_COMM,  Decimal? P_REFUND_SUM,  DateTime? P_REFUND_DATE)
         {

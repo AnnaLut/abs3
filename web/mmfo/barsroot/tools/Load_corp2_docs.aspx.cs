@@ -28,68 +28,53 @@ public partial class tools_Load_corp2_docs : System.Web.UI.Page
 
     protected void saveToFolders(object sender, EventArgs e)
     {
-        OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
-
-        try
+        using (OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection())
+        using (OracleCommand cmd = con.CreateCommand())
         {
-            OracleCommand cmd = con.CreateCommand();
-
             cmd.CommandText = "  select 'card_tt' arx_name, f_zay_rtf_rar (:dat1, :dat2) from dual";
             cmd.Parameters.Add("dat1", OracleDbType.Date, DAT1.Value, ParameterDirection.Input);
             cmd.Parameters.Add("dat2", OracleDbType.Date, DAT2.Value, ParameterDirection.Input);
 
-            OracleDataReader oraRdr = cmd.ExecuteReader();
-            if (oraRdr.Read())
+            using (OracleDataReader oraRdr = cmd.ExecuteReader())
             {
-                OracleBlob blob = oraRdr.GetOracleBlob(1);
-                string fileName = oraRdr.GetString(0);
-                fileName += ".rar";
-                if (blob.IsNull)
+                if (oraRdr.Read())
                 {
-                    ShowError( "Не знайденно документів на задану дату в Corp2!");
+                    using (OracleBlob blob = oraRdr.GetOracleBlob(1))
+                    {
+                        string fileName = oraRdr.GetString(0);
+                        fileName += ".rar";
+                        if (blob.IsNull)
+                        {
+                            ShowError("Не знайденно документів на задану дату в Corp2!");
+                        }
+                        else
+                        {
+                            string tempFileName = Path.GetTempFileName();
+                            Byte[] byteArr = new Byte[blob.Length];
+                            blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
+                            using (FileStream fs = new FileStream(tempFileName, FileMode.Append, FileAccess.Write))
+                            {
+                                fs.Write(byteArr, 0, byteArr.Length);
+                            }
+                            try
+                            {
+                                Response.ClearContent();
+                                Response.ClearHeaders();
+                                Response.AppendHeader("content-disposition", "attachment;filename=" + fileName);
+                                Response.ContentType = "application/octet-stream";
+                                Response.WriteFile(tempFileName, true);
+                                Response.Flush();
+                                Response.End();
+                            }
+                            finally
+                            {
+                                if (File.Exists(tempFileName))
+                                    File.Delete(tempFileName);
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    string tempFileName = Path.GetTempFileName();
-                    Byte[] byteArr = new Byte[blob.Length];
-                    blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
-                    using (FileStream fs = new FileStream(tempFileName, FileMode.Append, FileAccess.Write))
-                    {
-                        fs.Write(byteArr, 0, byteArr.Length);
-                    }
-                    try
-                    {
-                         
-                        Response.ClearContent();
-                        Response.ClearHeaders();
-                        Response.AppendHeader("content-disposition", "attachment;filename=" + fileName);
-                        Response.ContentType = "application/octet-stream";
-                        Response.WriteFile(tempFileName, true);
-                        Response.Flush();
-                        Response.End();
-                         
-                    }
-                    finally
-                    {
-                        if (File.Exists(tempFileName))
-                            File.Delete(tempFileName);
-                        
-                    }
-                }
-                blob.Dispose();
-                 
             }
-            cmd.Dispose();
-            oraRdr.Close();
-            
-
         }
-        finally
-        {
-            con.Close();
-            con.Dispose();
-        }
-        
     }
- 
 }

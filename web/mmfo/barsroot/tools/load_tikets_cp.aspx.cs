@@ -36,10 +36,11 @@ public partial class tools_Load_tikets_cp : Bars.BarsPage
                     Bt_save.Enabled = true;
                 }
                 else
-                { TB_ticets.Enabled = true;
-                  TB_ticets.ReadOnly = true;
-                  TB_ticets.Text = "Не вдалось знайти тікет в архіві.";
-                  Bt_save.Enabled = false;
+                {
+                    TB_ticets.Enabled = true;
+                    TB_ticets.ReadOnly = true;
+                    TB_ticets.Text = "Не вдалось знайти тікет в архіві.";
+                    Bt_save.Enabled = false;
                 }
             }
             finally
@@ -63,39 +64,40 @@ public partial class tools_Load_tikets_cp : Bars.BarsPage
             OracleDataReader oraRdr = cmd.ExecuteReader();
             if (oraRdr.Read())
             {
-                OracleBlob blob = oraRdr.GetOracleBlob(1);
-                string fileName = oraRdr.GetString(0) ;
-                fileName += ".txt";
-                if (blob.IsNull)
+                using (OracleBlob blob = oraRdr.GetOracleBlob(1))
                 {
-                    //res.Message = "Не знайденно друкованої форми по документу ref=" + docRef + " в таблиці імпортованих з corp2!";
+                    string fileName = oraRdr.GetString(0);
+                    fileName += ".txt";
+                    if (blob.IsNull)
+                    {
+                        //res.Message = "Не знайденно друкованої форми по документу ref=" + docRef + " в таблиці імпортованих з corp2!";
+                    }
+                    else
+                    {
+                        string tempFileName = Path.GetTempFileName();
+                        Byte[] byteArr = new Byte[blob.Length];
+                        blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
+                        using (FileStream fs = new FileStream(tempFileName, FileMode.Append, FileAccess.Write))
+                        {
+                            fs.Write(byteArr, 0, byteArr.Length);
+                        }
+                        try
+                        {
+                            Response.ClearContent();
+                            Response.ClearHeaders();
+                            Response.AppendHeader("content-disposition", "attachment;filename=" + fileName);
+                            Response.ContentType = "application/octet-stream";
+                            Response.WriteFile(tempFileName, true);
+                            Response.Flush();
+                            Response.End();
+                        }
+                        finally
+                        {
+                            if (File.Exists(tempFileName))
+                                File.Delete(tempFileName);
+                        }
+                    }
                 }
-                else
-                {
-                    string tempFileName = Path.GetTempFileName();
-                    Byte[] byteArr = new Byte[blob.Length];
-                    blob.Read(byteArr, 0, Convert.ToInt32(blob.Length));
-                    using (FileStream fs = new FileStream(tempFileName, FileMode.Append, FileAccess.Write))
-                    {
-                        fs.Write(byteArr, 0, byteArr.Length);
-                    }
-                    try
-                    {
-                        Response.ClearContent();
-                        Response.ClearHeaders();
-                        Response.AppendHeader("content-disposition", "attachment;filename=" + fileName);
-                        Response.ContentType = "application/octet-stream";
-                        Response.WriteFile(tempFileName, true);
-                        Response.Flush();
-                        Response.End();
-                    }
-                    finally
-                    {
-                        if (File.Exists(tempFileName))
-                            File.Delete(tempFileName);
-                    }
-                }
-                blob.Dispose();
             }
             cmd.Dispose();
             oraRdr.Close();

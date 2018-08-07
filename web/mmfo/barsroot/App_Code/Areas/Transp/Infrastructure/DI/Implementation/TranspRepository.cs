@@ -26,57 +26,55 @@ namespace BarsWeb.Areas.Transp.Infrastructure.DI.Implementation
         {
         }
 
-       /* public transp_reqtype GetReqType(string req_type)
-        {
-            using (OracleConnection con = OraConnector.Handler.UserConnection)
-            {
-                using (OracleCommand cmd = con.CreateCommand())
-                {
-                    try
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "bars.ins_ewa_mgr.get_purpose";
-                        cmd.Parameters.Add("p_clob", OracleDbType.XmlType, p_xml, ParameterDirection.Input);
-                        cmd.Parameters.Add("p_purpose", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
-                        cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, ParameterDirection.Output);
-                        cmd.Parameters.Add("p_errmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+        /* public transp_reqtype GetReqType(string req_type)
+         {
+             using (OracleConnection con = OraConnector.Handler.UserConnection)
+             {
+                 using (OracleCommand cmd = con.CreateCommand())
+                 {
+                     try
+                     {
+                         cmd.CommandType = CommandType.StoredProcedure;
+                         cmd.CommandText = "bars.ins_ewa_mgr.get_purpose";
+                         cmd.Parameters.Add("p_clob", OracleDbType.XmlType, p_xml, ParameterDirection.Input);
+                         cmd.Parameters.Add("p_purpose", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
+                         cmd.Parameters.Add("p_errcode", OracleDbType.Decimal, ParameterDirection.Output);
+                         cmd.Parameters.Add("p_errmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output);
 
-                        cmd.ExecuteNonQuery();
-
-
-                        if (cmd.Parameters["p_errcode"].Status == OracleParameterStatus.NullFetched || Convert.ToInt32(cmd.Parameters["p_errcode"].Value.ToString()) == 0)
-                        {
-                            response.message = cmd.Parameters["p_purpose"].Status == OracleParameterStatus.NullFetched ? String.Empty : cmd.Parameters["p_purpose"].Value.ToString();
-                        }
-                        else
-                        {
-                            response.message = cmd.Parameters["p_errmessage"].Value.ToString();
-                            response.success = false;
-                        }
+                         cmd.ExecuteNonQuery();
 
 
-                    }
-                    catch (Exception e)
-                    {
+                         if (cmd.Parameters["p_errcode"].Status == OracleParameterStatus.NullFetched || Convert.ToInt32(cmd.Parameters["p_errcode"].Value.ToString()) == 0)
+                         {
+                             response.message = cmd.Parameters["p_purpose"].Status == OracleParameterStatus.NullFetched ? String.Empty : cmd.Parameters["p_purpose"].Value.ToString();
+                         }
+                         else
+                         {
+                             response.message = cmd.Parameters["p_errmessage"].Value.ToString();
+                             response.success = false;
+                         }
 
 
-                        response.success = false;
-                        response.message = e.Message;
-                        return Request.CreateResponse(HttpStatusCode.InternalServerError, response);
+                     }
+                     catch (Exception e)
+                     {
 
 
-                    }
-
-                    return Request.CreateResponse(HttpStatusCode.OK, response);
-
-                }
-            }
-        }
+                         response.success = false;
+                         response.message = e.Message;
+                         return Request.CreateResponse(HttpStatusCode.InternalServerError, response);
 
 
-    */
+                     }
+
+                     return Request.CreateResponse(HttpStatusCode.OK, response);
+
+                 }
+             }
+         }
 
 
+     */
 
 
 
@@ -112,7 +110,9 @@ namespace BarsWeb.Areas.Transp.Infrastructure.DI.Implementation
 
 
 
-      
+
+
+
 
         /// <summary>
         /// Package import
@@ -248,19 +248,22 @@ namespace BarsWeb.Areas.Transp.Infrastructure.DI.Implementation
                 var rdr = cmd.ExecuteReader();
                 if (rdr.Read())
                 {
-                    var blob = rdr.GetOracleBlob(0).Value;
-                    if (blob.Length == 0)
+                    using (OracleBlob _blob = rdr.GetOracleBlob(0))
                     {
-                        result.Status = 1;
-                        result.ErrorMessage = "Квитанція по файлу [" + packageId + "] не знайдена.";
-                        return result;
+                        byte[] blob = _blob.Value;
+                        if (blob.Length == 0)
+                        {
+                            result.Status = 1;
+                            result.ErrorMessage = "Квитанція по файлу [" + packageId + "] не знайдена.";
+                            return result;
+                        }
+                        result.Status = 0;
+                        result.Result = new ResponseDataResult
+                        {
+                            State = 0,
+                            Data = Convert.ToBase64String(blob)
+                        };
                     }
-                    result.Status = 0;
-                    result.Result = new ResponseDataResult
-                    {
-                        State = 0,
-                        Data = Convert.ToBase64String(blob)
-                    };
                 }
                 else
                 {

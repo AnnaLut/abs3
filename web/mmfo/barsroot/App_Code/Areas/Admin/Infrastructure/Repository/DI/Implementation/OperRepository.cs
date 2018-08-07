@@ -13,6 +13,7 @@ using Kendo.Mvc.UI;
 using Microsoft.Ajax.Utilities;
 using Oracle.DataAccess.Client;
 using Dapper;
+using Oracle.DataAccess.Types;
 
 namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
 {
@@ -887,19 +888,22 @@ namespace BarsWeb.Areas.Admin.Infrastructure.Repository.DI.Implementation
             par.Add("cod", Convert.ToString(cod), OracleDbType.Varchar2, ParameterDirection.Input);
             par.Add("l_blob", null, OracleDbType.Blob, ParameterDirection.Output);
             //p.Add("l_blob", dbType: DbType.String, size: 5000, direction: ParameterDirection.Output);
+
             using (var connection = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = connection.CreateCommand())
+            using (OracleParameter lBlob = new OracleParameter("l_blob", OracleDbType.Blob, null, ParameterDirection.Output))
             {
+                cmd.CommandText = sql;
+                cmd.Parameters.Add("cod", OracleDbType.Varchar2, Convert.ToString(cod), ParameterDirection.Input);
+                cmd.Parameters.Add(lBlob);
+                cmd.ExecuteNonQuery();
 
-                connection.Execute(sql,par);
-                data = par.Get<dynamic>("l_blob");
-                byte[] file = data.Value;
-                return file;
+                using (OracleBlob _lBlobRes = (OracleBlob)lBlob.Value)
+                {
+                    if (_lBlobRes.IsNull) return null;
+                    return _lBlobRes.Value;
+                }
             }
-           
-
-           // data = p.Get<String>("l_blob");
-
-            //return data;
         }
     }
 }
