@@ -1,10 +1,4 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FF1X.sql =======*** Run ***
-PROMPT ===================================================================================== 
-
-PROMPT *** Create  procedure NBUR_P_FF1X ***
-
-create or replace procedure NBUR_P_FF1X(p_kod_filii        varchar2
+CREATE OR REPLACE procedure BARS.NBUR_P_FF1X(p_kod_filii        varchar2
                                           , p_report_date    date
                                           , p_form_id        number
                                           , p_scheme         varchar2 default 'C'
@@ -14,7 +8,7 @@ create or replace procedure NBUR_P_FF1X(p_kod_filii        varchar2
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования #73X для схема "C"
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    v.16.001     30/07/2018
+% VERSION     :    v.16.002 07/08/2018 (30/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -74,7 +68,7 @@ BEGIN
                when seg_02 ='42'  then 'AF1004'
                else 'XXXXXX'
            end)
-         ||seg_04 || seg_05 || seg_06
+         ||seg_03 || seg_04 || seg_05
        , nvl(field_value, ' ')
        , DESCRIPTION
        , ACC_ID
@@ -102,7 +96,7 @@ BEGIN
                when seg_02 ='42'  then 'AF1004'
                else 'XXXXXX'
            end)
-         ||seg_04 || seg_05 || seg_06
+         ||seg_03 || seg_04 || seg_05
        , nvl(field_value, ' ')
    from v_nbur_#f1 t
    where report_date = p_report_date and
@@ -113,8 +107,3 @@ BEGIN
 
 end NBUR_P_FF1X;
 /
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_FF1X.sql =======*** End ***
-PROMPT ===================================================================================== 
