@@ -2,24 +2,24 @@ CREATE OR REPLACE PROCEDURE BARS.P_FC5 (dat_ DATE, pnd_ NUMBER DEFAULT NULL)
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
-% COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
+% COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION     : v.17.033  17/07/2018 (12/07/2018)
+% VERSION : v.17.035  08/08/2018 (03/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    параметры: Dat_ - отчетная дата
+ параметры: Dat_ - отчетная дата
 
-   Структура показателя     D BBBB Z P VVV Й Q WWW E K
+ Структура показателя D BBBB Z P VVV Й Q WWW E K
 
-  1    D          1/2  (остаток ДТ/КТ)
-  2    BBBB       R020 балансовый счет
-  6    Z          распределение в разрезе R011
-  7    P          распределение в разрезе R013
-  8    VVV        R030 код валюты
- 11    Й          S580 распределение по группе риска
- 12    Q          R017 код индексации финансовых инструментов
- 13    WWW        R030 код валюты индексации
- 16    E          S245 код строку погашення
- 17    K          K077 код сектору економiки
+ 1 D 1/2 (остаток ДТ/КТ)
+ 2 BBBB R020 балансовый счет
+ 6 Z распределение в разрезе R011
+ 7 P распределение в разрезе R013
+ 8 VVV R030 код валюты
+ 11 Й S580 распределение по группе риска
+ 12 Q R017 код индексации финансовых инструментов
+ 13 WWW R030 код валюты индексации
+ 16 E S245 код строку погашення
+ 17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  03/07/2018 вирівнювання з А7 файлом рахунків резервів
@@ -28,34 +28,34 @@ IS
  28.07.2017 отдельное определение r012 для счетов 1592
  28.03.2017 ограничение на количество параллельных процессов
  17.03.2017 снята отдельная разбивка в разрезе S580 для счетов резервов
-               (было s580=9 для первой категории качества)
+ (было s580=9 для первой категории качества)
  21.02.2017 расширен список счетов, для которых определяется S580 в P_Set_S580_Def
-            исключение задвоения для 3541 (есть основные и дочерние счета)
+ исключение задвоения для 3541 (есть основные и дочерние счета)
  31.01.2017 второй блок резервов -оптимизация для счетов просроченных процентов
  21.09.2016 -в ограничения по счетам добавлены 2657
  19.09.2016 -резервы по счетам просроченных процентов обрабатываются
-             во втором блоке резервов (как в #A7)
+ во втором блоке резервов (как в #A7)
  12.09.2016 -для счетов просрочки по телу r012=B при обработке данных из tmp_rez_risk
  02.09.2016 -для бал.счетов с отсутсвующим либо закрытым r013 в kl_r013
-             параметр r013 устанавливается в '0'
+ параметр r013 устанавливается в '0'
  31.08.2016 - изменение структуры показателей с отчета за 01.09.2016
  29.07.2016 - перераспределение R013 при превышении резерва над текущим
-              остатком для проц.счетов ЦБ
+ остатком для проц.счетов ЦБ
  21/07/2016 - для счетов резерва параметр R013 будет определяться по
-              R013 активов (счета начисленных процентов до 30, больше 30)
+ R013 активов (счета начисленных процентов до 30, больше 30)
  02/07/2016 - для таблиц OPLDOK добавил условие o.fdat = z.fdat
-              для уменьшения времени формирования
-              для валюты 974 (белоруские рубли) из V_TMP_REZ_RISK_C5
-              изменяем на значение 933
+ для уменьшения времени формирования
+ для валюты 974 (белоруские рубли) из V_TMP_REZ_RISK_C5
+ изменяем на значение 933
  14/06/2016 - для счетов резервов под непросроченные проценты будет
-              разбивка по параметру  R012 на 'A' и "B'
+ разбивка по параметру R012 на 'A' и "B'
  10/06/2016 - для счетов резервов под непросроченные проценты формируем
-              параметр R012 = 'A'
+ параметр R012 = 'A'
  17/05/2016 - ГРЦ Ощадбанка. Макаренко И.В.
-              в самом конце процедуры проверка на академическое время вызова процедуры,
-              если вызывается после 19:00 (технологи закрывают/открывают день) -
-              ничего не писать в архив, если в операционное время - технологи выполняют
-              формирование файла - в архив фиксируем запись
+ в самом конце процедуры проверка на академическое время вызова процедуры,
+ если вызывается после 19:00 (технологи закрывают/открывают день) -
+ ничего не писать в архив, если в операционное время - технологи выполняют
+ формирование файла - в архив фиксируем запись
  15/10/2014 - для блока "списання за рахунок резерву" добавлено умову
               and x.nls not like '3800%' тому що при перенесенні суми
               з одного рахунку 2400 на інший і потім погашення з іншого
@@ -71,365 +71,360 @@ IS
  22/07/2013 - для курсора SALDO_CP добавив параметр S580 iз SPECPARAM
               (зауваження ГОУ)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-   kodf_      Varchar2(2) := 'C5';
-   sheme_     Varchar2(1) := 'G';
-   acc_       NUMBER;
-   nbs_       VARCHAR2 (4);
-   nbs1_      VARCHAR2 (4);
-   nls_       VARCHAR2 (15);
-   daos_      DATE;
-   datp_      DATE;
-   data_      DATE;
-   mdate_     DATE;
-   kv_        SMALLINT;
-   sn_        DECIMAL (24);
-   se_        DECIMAL (24);
-   se1_       DECIMAL (24);
-   dk_        CHAR (1);
-   kodp_      VARCHAR2 (20);
-   znap_      VARCHAR2 (30);
+ kodf_ Varchar2(2) := 'C5';
+ sheme_ Varchar2(1) := 'G';
+ acc_ NUMBER;
+ nbs_ VARCHAR2 (4);
+ nbs1_ VARCHAR2 (4);
+ nls_ VARCHAR2 (15);
+ daos_ DATE;
+ datp_ DATE;
+ data_ DATE;
+ mdate_ DATE;
+ kv_ SMALLINT;
+ sn_ DECIMAL (24);
+ se_ DECIMAL (24);
+ se1_ DECIMAL (24);
+ dk_ CHAR (1);
+ kodp_ VARCHAR2 (20);
+ znap_ VARCHAR2 (30);
 
-   r011_      VARCHAR2 (1);
-   r013_      VARCHAR2 (1);
-   r013_30    NUMBER;
-   fa7d_      NUMBER;
-   id_        NUMBER;
-   s080_      NUMBER;
-   s080_r_    NUMBER;
-   sum_rez_   NUMBER;
-   sum_24_    NUMBER;
-   acc_24_    NUMBER;
-   nls_24_    VARCHAR2 (15);
-   userid_    NUMBER;
-   rnk_       NUMBER;
-   isp_       NUMBER;
-   fa7p_      NUMBER;
-   comm_      rnbu_trace.comm%TYPE;
-   comm1_     rnbu_trace.comm%TYPE;
-   tobo_      accounts.tobo%TYPE;
-   nms_       accounts.nms%TYPE;
-   mfo_       NUMBER;
-   mfou_      NUMBER;
-   dos_       NUMBER;
-   dose_      NUMBER;
-   nd_        NUMBER;
-   nd1_       NUMBER;
-   nd2_       NUMBER;
-   nd3_       NUMBER;
-   nd4_       NUMBER;
-   -- Макаренко И.В.
-   CurrDate   DATE;
-   Checkdate  DATE;
+ r011_ VARCHAR2 (1);
+ r013_ VARCHAR2 (1);
+ r013_30 NUMBER;
+ fa7d_ NUMBER;
+ id_ NUMBER;
+ s080_ NUMBER;
+ s080_r_ NUMBER;
+ sum_rez_ NUMBER;
+ sum_24_ NUMBER;
+ acc_24_ NUMBER;
+ nls_24_ VARCHAR2 (15);
+ userid_ NUMBER;
+ rnk_ NUMBER;
+ isp_ NUMBER;
+ fa7p_ NUMBER;
+ comm_ rnbu_trace.comm%TYPE;
+ comm1_ rnbu_trace.comm%TYPE;
+ tobo_ accounts.tobo%TYPE;
+ nms_ accounts.nms%TYPE;
+ mfo_ NUMBER;
+ mfou_ NUMBER;
+ dos_ NUMBER;
+ dose_ NUMBER;
+ nd_ NUMBER;
+ nd1_ NUMBER;
+ nd2_ NUMBER;
+ nd3_ NUMBER;
+ nd4_ NUMBER;
+ -- Макаренко И.В.
+ CurrDate DATE;
+ Checkdate DATE;
 
-   -- ДО 30 ДНЕЙ
-   o_r013_1   VARCHAR2 (1);
-   o_se_1     DECIMAL (24);
-   o_comm_1   rnbu_trace.comm%TYPE;
-   -- ПОСЛЕ 30 ДНЕЙ
-   o_r013_2   VARCHAR2 (1);
-   o_se_2     DECIMAL (24);
-   o_comm_2   rnbu_trace.comm%TYPE;
-   tips_      VARCHAR2 (3);
-   f7ad_      NUMBER;
+ -- ДО 30 ДНЕЙ
+ o_r013_1 VARCHAR2 (1);
+ o_se_1 DECIMAL (24);
+ o_comm_1 rnbu_trace.comm%TYPE;
+ -- ПОСЛЕ 30 ДНЕЙ
+ o_r013_2 VARCHAR2 (1);
+ o_se_2 DECIMAL (24);
+ o_comm_2 rnbu_trace.comm%TYPE;
+ tips_ VARCHAR2 (3);
+ f7ad_ NUMBER;
 
-   caldt_ID_  NUMBER;
+ caldt_ID_ NUMBER;
 
-   typ_       NUMBER;
-   nbuc1_     VARCHAR2 (20);
-   nbuc_      VARCHAR2 (20);
-   t020_      VARCHAR2 (1);
+ typ_ NUMBER;
+ nbuc1_ VARCHAR2 (20);
+ nbuc_ VARCHAR2 (20);
+ t020_ VARCHAR2 (1);
 
-   dathb_   date;
-   dathe_   date;
-   s240_    varchar2(1);
+ dathb_ date;
+ dathe_ date;
+ s240_ varchar2(1);
 
-   TYPE ref_type_curs IS REF CURSOR;
+ TYPE ref_type_curs IS REF CURSOR;
 
-   saldo        ref_type_curs;
-   cursor_sql   varchar2(20000);
+ saldo ref_type_curs;
+ cursor_sql varchar2(20000);
 
-   type rec_type is record
-        (acc_   number,
-         nls_   varchar2(15),
-         kv_    integer,
-         daos_  date,
-         data_  date,
-         nbs_   char(4),
-         r011_  varchar2(1),
-         r013_  varchar2(1),
-         s080_  varchar2(1),
-         se_    number,
-         sn_    number,
-         rnk_   number,
-         isp_   accounts.isp%TYPE,
-         mdate_ date,
-         tips_  accounts.tip%TYPE,
-         tobo_  accounts.tobo%TYPE,
-         nms_   accounts.nms%TYPE,
-         r012_  varchar2(1),
-         s580_  varchar2(1),
-         t020_  varchar2(1),
-         s240_  varchar2(1),
-         nd1_   number,
-         nd2_   number,
-         nd3_   number,
-         nd4_   number,
-         nd_    number,
-         fa7p_  number,
-         freq_  number,
-         k077_  varchar2(1) );
+ type rec_type is record
+ (acc_ number,
+ nls_ varchar2(15),
+ kv_ integer,
+ daos_ date,
+ data_ date,
+ nbs_ char(4),
+ r011_ varchar2(1),
+ r013_ varchar2(1),
+ s080_ varchar2(1),
+ se_ number,
+ sn_ number,
+ rnk_ number,
+ isp_ accounts.isp%TYPE,
+ mdate_ date,
+ tips_ accounts.tip%TYPE,
+ tobo_ accounts.tobo%TYPE,
+ nms_ accounts.nms%TYPE,
+ r012_ varchar2(1),
+ s580_ varchar2(1),
+ t020_ varchar2(1),
+ s240_ varchar2(1),
+ nd1_ number,
+ nd2_ number,
+ nd3_ number,
+ nd4_ number,
+ nd_ number,
+ fa7p_ number,
+ freq_ number,
+ k077_ varchar2(1) );
 
-   TYPE rec_t IS TABLE OF rec_type;
-   l_rec_t      rec_t := rec_t();
+ TYPE rec_t IS TABLE OF rec_type;
+ l_rec_t rec_t := rec_t();
 
-   TYPE rnbu_trace_t IS TABLE OF rnbu_trace%rowtype;
-   l_rnbu_trace rnbu_trace_t := rnbu_trace_t();
+ TYPE rnbu_trace_t IS TABLE OF rnbu_trace%rowtype;
+ l_rnbu_trace rnbu_trace_t := rnbu_trace_t();
 
-   TYPE     t_otcn IS TABLE OF NUMBER(1) INDEX BY VARCHAR2(4);
-   table_R011    t_otcn;
-   table_R013    t_otcn;
+ TYPE t_otcn IS TABLE OF NUMBER(1) INDEX BY VARCHAR2(4);
+ table_R011 t_otcn;
+ table_R013 t_otcn;
 
-   datz_        date := Dat_Next_U(dat_, 1);
+ datz_ date := Dat_Next_U(dat_, 1);
 
-   sql_acc_     clob;
+ sql_acc_ clob;
 
-   ret_         number;
-   in_acc_      varchar2(255);
+ ret_ number;
+ in_acc_ varchar2(255);
 
-   r012_        specparam.r012%type;
-   s580_        specparam.s580%type;
-   s580a_       specparam.s580%type;
-   s580r_       specparam.s580%type;
-   s245_        varchar2(1);
-   k077_        varchar2(1);
-   r017_        varchar2(1);          --segment   Q
-   segm_WWW     varchar2(3);
+ r012_ specparam.r012%type;
+ s580_ specparam.s580%type;
+ s580a_ specparam.s580%type;
+ s580r_ specparam.s580%type;
+ s245_ varchar2(1);
+ k077_ varchar2(1);
+ r017_ varchar2(1); --segment Q
+ segm_WWW varchar2(3);
 
-   dat_zmin1    date         := to_date('20022008', 'ddmmyyyy');
-   dat_zmin2    date         := to_date('03012013', 'ddmmyyyy');
-   dat_zmin3    date         := to_date('01092016', 'ddmmyyyy');
-   dat_zmin4    date         := to_date('26122017', 'ddmmyyyy');
+ dat_zmin1 date := to_date('20022008', 'ddmmyyyy');
+ dat_zmin2 date := to_date('03012013', 'ddmmyyyy');
+ dat_zmin3 date := to_date('01092016', 'ddmmyyyy');
+ dat_zmin4 date := to_date('26122017', 'ddmmyyyy');
 
-   -- балансовые счета премии
-   nbspremiy_      VARCHAR2 (2000)
-      := '2065,2075,2085,2105,2115,2125,2135,2205,2215,2235,';
+ -- балансовые счета премии
+ nbspremiy_ VARCHAR2 (2000)
+ := '2065,2075,2085,2105,2115,2125,2135,2205,2215,2235,';
 
-   discont_ number := 0;
-   premiy_  number := 0;
+ discont_ number := 0;
+ premiy_ number := 0;
 
-   datr_    date;
-   datb_    date;
-   sum_     number;
-   sumc_    number := 0;
-   srez_    number := 0;
-   srezp_   number := 0;
-   sakt_    number := 0;
-   r030_    varchar2(3);
-   nbs_r013_    varchar2(5);
+ datr_ date;
+ datb_ date;
+ sum_ number;
+ sumc_ number := 0;
+ srez_ number := 0;
+ srezp_ number := 0;
+ sakt_ number := 0;
+ r030_ varchar2(3);
+ nbs_r013_ varchar2(5);
 
-   cnt_     number;
-   TP_SND   BOOLEAN := false;
-   pr_accc  number;
-   dati_    integer := null;
-   freq_    number;
-   fl_cp_   number:=0;
+ cnt_ number;
+ TP_SND BOOLEAN := false;
+ pr_accc number;
+ dati_ integer := null;
+ freq_ number;
+ fl_cp_ number:=0;
 
-   sum_zal  number:=0;
+ sum_zal number:=0;
 
-   sum_z0   number:=0;
-   sum_z1   number:=0;
-   sum_z2   number:=0;
+ sum_z0 number:=0;
+ sum_z1 number:=0;
+ sum_z2 number:=0;
 
-   koef_z0   number:=1;
-   koef_z1   number:=1;
-   koef_z2   number:=1;
+ koef_z0 number:=1;
+ koef_z1 number:=1;
+ koef_z2 number:=1;
 
-   sum_se0   number:=0;
-   sum_sel   number:=0;
-   sum_se2   number:=0;
+ sum_se0 number:=0;
+ sum_sel number:=0;
+ sum_se2 number:=0;
 
-   dc_   number;
+ dc_ number;
 
-   dat_beg_ date;
-   dat_end_ date;
+ dat_beg_ date;
+ dat_end_ date;
 
-   datd_    date;
+ datd_ date;
 
-    procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
-       invk_ varchar2(1);
-    begin
-       if s580_ = '0' or r020_ in ('2233', '2238', '2625', '3114', '3570') then
-           select nvl(max(s580), '9')
-           into s580r_
-           from nbur_ref_risk_s580
-           where r020 = r020_ and
-                (t020 = t020_ or t020 = '*') and
-                (r011 = r011_ or r011 = '*') and
-                (r013 = r013_ or r013 = '*') and
-                (S245 = s245_ or S245 = '*');
+ procedure P_Set_S580_Def(r020_ in varchar2, t020_ in varchar2, r011_ in varchar2, s245_ in varchar2) is
+    invk_ varchar2(1);
+ begin
+     if s580_ = '0' or r020_ in ('2233', '2238', '2625', '3114', '3570') then
+         select nvl(max(s580), '9')
+         into s580r_
+         from nbur_ref_risk_s580
+         where r020 = r020_ and
+             (t020 = t020_ or t020 = '*') and
+             (r011 = r011_ or r011 = '*') and
+             (r013 = r013_ or r013 = '*') and
+             (S245 = s245_ or S245 = '*');
 
-           s580_ := s580r_;
-       end if;
+         s580_ := s580r_;
+     end if;
 
-       if r020_ in ('2066', '2920', '3400', '3408', '3500', '3508', '4410', '9129') and s580_ = '9' then
-          s580_ := '5';
-       end if;
+     if r020_ in ('2066', '2920', '3400', '3408', '3500', '3508', '4410', '9129') and s580_ = '9' then
+        s580_ := '5';
+     end if;
 
-       if r020_ in ('1602','2602','2622','9030','9031','9036','9500') and
-          r020_ || r013_ not in ('16024','26021','26221','90301','90311','90361','95001','95003')
-       then
-          s580_ := '9';
-       end if;
-    end;
+     if r020_ in ('1602','2602','2622','9030','9031','9036','9500') and
+        r020_ || r013_ not in ('16024','26021','26221','90301','90311','90361','95001','95003')
+     then
+        s580_ := '9';
+     end if;
+ end;
 
-    procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
-                        p_kv rnbu_trace.kv%type, p_odate rnbu_trace.odate%type, p_kodp rnbu_trace.kodp%type,
-                        p_znap rnbu_trace.znap%type, p_rnk rnbu_trace.rnk%type, p_isp rnbu_trace.isp%type,
-                        p_comm rnbu_trace.comm%type, p_nd rnbu_trace.nd%type, p_acc rnbu_trace.acc%type,
-                        p_mdate rnbu_trace.mdate%type, p_nbuc rnbu_trace.nbuc%type, p_tobo rnbu_trace.tobo%type)
-    is
-        lr_rnbu_trace rnbu_trace%rowtype;
-    begin
-       lr_rnbu_trace.RECID := p_recid;
-       lr_rnbu_trace.USERID := p_userid;
-       lr_rnbu_trace.NLS := p_nls;
-       lr_rnbu_trace.KV := p_kv;
-       lr_rnbu_trace.ODATE := p_odate;
-       lr_rnbu_trace.KODP := p_kodp;
-       lr_rnbu_trace.ZNAP := p_znap;
-       lr_rnbu_trace.NBUC := p_nbuc;
-       lr_rnbu_trace.ISP := p_isp;
-       lr_rnbu_trace.RNK := p_rnk;
-       lr_rnbu_trace.ACC := p_acc;
-       lr_rnbu_trace.REF := null;
-       lr_rnbu_trace.COMM := p_comm;
-       lr_rnbu_trace.ND := p_nd;
-       lr_rnbu_trace.MDATE := p_mdate;
-       lr_rnbu_trace.TOBO := p_tobo;
+ procedure p_add_rec(p_recid rnbu_trace.recid%type, p_userid rnbu_trace.userid%type, p_nls rnbu_trace.nls%type,
+     p_kv rnbu_trace.kv%type, p_odate rnbu_trace.odate%type, p_kodp rnbu_trace.kodp%type,
+     p_znap rnbu_trace.znap%type, p_rnk rnbu_trace.rnk%type, p_isp rnbu_trace.isp%type,
+     p_comm rnbu_trace.comm%type, p_nd rnbu_trace.nd%type, p_acc rnbu_trace.acc%type,
+     p_mdate rnbu_trace.mdate%type, p_nbuc rnbu_trace.nbuc%type, p_tobo rnbu_trace.tobo%type)
+ is
+     lr_rnbu_trace rnbu_trace%rowtype;
+ begin
+     lr_rnbu_trace.RECID := p_recid;
+     lr_rnbu_trace.USERID := p_userid;
+     lr_rnbu_trace.NLS := p_nls;
+     lr_rnbu_trace.KV := p_kv;
+     lr_rnbu_trace.ODATE := p_odate;
+     lr_rnbu_trace.KODP := p_kodp;
+     lr_rnbu_trace.ZNAP := p_znap;
+     lr_rnbu_trace.NBUC := p_nbuc;
+     lr_rnbu_trace.ISP := p_isp;
+     lr_rnbu_trace.RNK := p_rnk;
+     lr_rnbu_trace.ACC := p_acc;
+     lr_rnbu_trace.REF := null;
+     lr_rnbu_trace.COMM := p_comm;
+     lr_rnbu_trace.ND := p_nd;
+     lr_rnbu_trace.MDATE := p_mdate;
+     lr_rnbu_trace.TOBO := p_tobo;
 
-       l_rnbu_trace.Extend;
-       l_rnbu_trace(l_rnbu_trace.last) := lr_rnbu_trace;
+     l_rnbu_trace.Extend;
+     l_rnbu_trace(l_rnbu_trace.last) := lr_rnbu_trace;
 
-       if l_rnbu_trace.COUNT >= 10000 then
-          FORALL i IN 1 .. l_rnbu_trace.COUNT
-               insert /*+ append */ into rnbu_trace values l_rnbu_trace(i);
+     if l_rnbu_trace.COUNT >= 10000 then
+         FORALL i IN 1 .. l_rnbu_trace.COUNT
+         insert /*+ append */ into rnbu_trace values l_rnbu_trace(i);
 
-          l_rnbu_trace.delete;
-       end if;
-    end;
+         l_rnbu_trace.delete;
+     end if;
+ end;
 BEGIN
-   commit;
+ commit;
 
-  -- фактическая дата конца декады
-   dc_ := TO_NUMBER (LTRIM (TO_CHAR (dat_, 'DD'), '0'));
+ -- фактическая дата конца декады
+ dc_ := TO_NUMBER (LTRIM (TO_CHAR (dat_, 'DD'), '0'));
 
-   FOR i IN 1 .. 3
-   LOOP
+ FOR i IN 1 .. 3
+ LOOP
      IF dc_ BETWEEN 10 * (i - 1) + 1 AND 10 * i + iif (i, 3, 0, 1, 0)
      THEN
-       IF i < 3
-       THEN
-          dat_beg_ := TO_DATE (LPAD (10 * (i - 1) + 1, 2, '0')
-                      || TO_CHAR (dat_, 'mmyyyy'),
-                      'ddmmyyyy'
-                     );
-          dat_end_ :=
-             TO_DATE (LPAD (10 * i, 2, '0')
-                      || TO_CHAR (dat_, 'mmyyyy'),
-                      'ddmmyyyy'
-                     );
-       ELSE
-          dat_beg_ := to_date('21'|| TO_CHAR (dat_, 'mmyyyy'), 'ddmmyyyy');
-          dat_end_ := LAST_DAY (dat_);
-       END IF;
+         IF i < 3
+         THEN
+             dat_beg_ := TO_DATE (LPAD (10 * (i - 1) + 1, 2, '0')
+             || TO_CHAR (dat_, 'mmyyyy'),
+             'ddmmyyyy'
+             );
+             
+             dat_end_ := TO_DATE (LPAD (10 * i, 2, '0')
+             || TO_CHAR (dat_, 'mmyyyy'),
+             'ddmmyyyy'
+             );
+         ELSE
+             dat_beg_ := to_date('21'|| TO_CHAR (dat_, 'mmyyyy'), 'ddmmyyyy');
+             dat_end_ := LAST_DAY (dat_);
+         END IF;
 
-       EXIT;
+         EXIT;
      END IF;
-   END LOOP;
+ END LOOP;
 
-   select max(fdat)
-   into dat_end_
-   from fdat
-   where fdat<=dat_end_;
+ select max(fdat)
+ into dat_end_
+ from fdat
+ where fdat<=dat_end_;
 
-   if dat_ = dat_end_ then
-      datd_ := dat_;
-   else
-       select nvl(max(report_date), dat_)
-       into datd_
-       from NBUR_TMP_A7_S245
-       where report_date < dat_end_;
-   end if;
+ if dat_ = dat_end_ then
+     datd_ := dat_;
+ else
+     select nvl(max(report_date), dat_)
+     into datd_
+     from NBUR_TMP_A7_S245
+     where report_date < dat_end_;
+ end if;
 
-   select count(*)
-   into cnt_
-   from NBUR_TMP_A7_S245
-   where report_date = datd_;
+ select count(*)
+ into cnt_
+ from NBUR_TMP_A7_S245
+ where report_date = datd_;
 
-   if cnt_ = 0 then
-      p_fa7_nn(datd_);
-      commit;
-   end if;
-
-   EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
+ EXECUTE IMMEDIATE 'ALTER SESSION ENABLE PARALLEL DML';
 -------------------------------------------------------------------
    logger.info ('P_FC5: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 
-   userid_ := user_id;
+ userid_ := user_id;
 
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
+ EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_fa7_temp';
+ EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_fa7_temp';
 
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FA7_REZ1';
+ EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FA7_REZ1';
 
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FA7_REZ2';
+ EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_FA7_REZ2';
 
-   EXECUTE IMMEDIATE 'truncate table otcn_f42_zalog';
+ EXECUTE IMMEDIATE 'truncate table otcn_f42_zalog';
 
-   EXECUTE IMMEDIATE 'truncate table otcn_f42_temp';
+ EXECUTE IMMEDIATE 'truncate table otcn_f42_temp';
 
-   EXECUTE IMMEDIATE 'truncate table OTC_REF_AKT';
+ EXECUTE IMMEDIATE 'truncate table OTC_REF_AKT';
 
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE TMP_KOD_R020';
+ EXECUTE IMMEDIATE 'TRUNCATE TABLE TMP_KOD_R020';
 
 -------------------------------------------------------------------
-    -- свой МФО
-   mfo_ := f_ourmfo ();
+ -- свой МФО
+ mfo_ := f_ourmfo ();
 
-   -- МФО "родителя"
-   BEGIN
-      SELECT mfou
-        INTO mfou_
-        FROM banks
-       WHERE mfo = mfo_;
-   EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
+ -- МФО "родителя"
+ BEGIN
+     SELECT mfou
+     INTO mfou_
+     FROM banks
+     WHERE mfo = mfo_;
+ EXCEPTION
+     WHEN NO_DATA_FOUND
+     THEN
          mfou_ := mfo_;
-   END;
+ END;
 
-   if 300465 in (mfo_, mfou_) then
-      sheme_ := 'C';
-   end if;
+ if 300465 in (mfo_, mfou_) then
+    sheme_ := 'C';
+ end if;
 
-   -------------------------------------------------------------------
+ -------------------------------------------------------------------
 
-   INSERT /*+ append */
-   INTO otcn_fa7_temp
-      SELECT r020
-        FROM kl_r020
-       WHERE trim(prem) = 'КБ'
-         AND (   LOWER (txt) LIKE '%нарах%доход%'
-              OR LOWER (txt) LIKE '%нарах%витр%' )
-         and not lower(txt) like '%прострочен%'
-         and trim(pr) is null
-         AND d_open between TO_DATE ('01011997', 'ddmmyyyy') and datz_
-         and (d_close is null or
-              d_close >= datz_);
+ INSERT /*+ append */
+ INTO otcn_fa7_temp
+ SELECT r020
+ FROM kl_r020
+ WHERE trim(prem) = 'КБ'
+     AND ( LOWER (txt) LIKE '%нарах%доход%'
+     OR LOWER (txt) LIKE '%нарах%витр%' )
+     and not lower(txt) like '%прострочен%'
+     and trim(pr) is null
+     AND d_open between TO_DATE ('01011997', 'ddmmyyyy') and datz_
+     and (d_close is null or
+          d_close >= datz_);
 
-   -- определение кода области для выбранного файла и схемы
-   P_Proc_Set (kodf_, sheme_, nbuc1_, typ_);
+ -- определение кода области для выбранного файла и схемы
+ P_Proc_Set (kodf_, sheme_, nbuc1_, typ_);
 
 -------------------------------------------------------------------
    declare
@@ -1216,7 +1211,7 @@ BEGIN
                        from rnbu_trace
                        where substr(kodp,1,5) not in ('21600','22600','22605','22620','22625','22650','22655',
                                                       '11419','11429','11519','11529',
-                                                      '12039','12069','12089',
+                                                      '12039','12049','12069','12089',
                                                       '12109','12119','12129','12139',
                                                       '12209','12239' )
                        group by acc, kodp, substr(kodp,7,1)) s,
@@ -1455,7 +1450,7 @@ BEGIN
                                          from rnbu_trace x
                                         where x.acc = t.acc
                                           and substr(x.kodp,1,5) not in ('21600','22600','22605','22620','22625','22650','22655',
-                                                                         '11419','11429','11519','11529','12039',
+                                                                         '11419','11429','11519','11529','12039','12049',
                                                                          '12069','12089','12109','12119','12129',
                                                                          '12139','12209','12239') )
                              )
@@ -1486,7 +1481,7 @@ BEGIN
                                         from rnbu_trace x
                                        where x.acc = t.acc
                                          and substr(x.kodp,1,5) not in ('21600','22600','22605','22620','22625','22650','22655',
-                                                                        '11419','11429','11519','11529','12039',
+                                                                        '11419','11429','11519','11529','12039','12049',
                                                                         '12069','12089','12109','12119','12129',
                                                                         '12139','12209','12239') )
                              )
@@ -1574,7 +1569,7 @@ BEGIN
          if      nbs_ in ('2239','2249','3599')
          then
                r011_ :='1';
-         elsif   nbs_ in ('2019','2089','2119','2139')
+         elsif   nbs_ in ('2019','2049','2089','2119','2139')
          then
                r011_ :='2';
          elsif   nbs_ in ('2069','2109','2129')
@@ -1852,7 +1847,7 @@ BEGIN
    end;
 ------------------------------------------------
    -- вирівнювання з А7 по рахунках резерву на декадну дату
-   if dat_ = datd_ then
+   if dat_ = dat_end_ then
        merge into rnbu_trace a
        using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
               from (
@@ -1911,7 +1906,7 @@ BEGIN
                                           '1419','1429','1509','1519','1529','2039','2046','2049',
                                           '2069','2089','2109','2119','2129',
                                           '2609','2629','2659',
-                                          '2139','2206','2209','2239','3119','3219')
+                                          '2139','2206','2209','2236','2239','3119','3219')
                               and a.acc = s.acc
                               and a.rnk = c.rnk
                             group by (case when typ_ > 0
@@ -1934,7 +1929,7 @@ BEGIN
                                       '1419','1429','1509','1519','1529','2039','2046','2049',
                                       '2069','2089','2109','2119','2129',
                                       '2609','2629','2659',
-                                      '2139','2206','2209','2239','3119','3219')
+                                      '2139','2206','2209','2236','2239','3119','3219')
                           and r.rnk = c.rnk
                         group by r.nbuc, substr(r.kodp, 1, 1), 2-MOD(c.codcagent,2),substr(r.kodp, 2, 4), r.kv) b
                     on (a.nbuc = b.nbuc and a.t020 = b.t020 and a.rez = b.rez and a.nbs = b.nbs and a.kv = b.kv)
@@ -2012,7 +2007,8 @@ BEGIN
                         '2149','2209','2219','2229','2239','2249','2309',
                         '2319','2329','2339','2349','2359','2369','2379',
                         '2409','2419','2429','2439','2609','2629','2659',
-                        '2890','3119','3219','3569','3590','3599','3690','3692') and
+                        '2890','3119','3219','3569','3590','3599','3690',
+                        '3692','2236') and
               k.t020 = '2' and
               k.rizn > 0
              then
@@ -2048,10 +2044,12 @@ BEGIN
 
 ---------------------------------------------------
    INSERT INTO tmp_nbu(kodf, datf, kodp, znap, nbuc)
-   SELECT 'C5', dat_, kodp, abs(SUM (znap)), nbuc
+   SELECT 'C5', dat_, kodp, 
+      (case when kodp like '12049%' then -1 else 1 end) * SUM (znap), 
+      nbuc
    FROM rnbu_trace
-   GROUP BY kodp, nbuc
-   having SUM (znap)<> 0;
+   GROUP BY kodp, (case when kodp like '12049%' then -1 else 1 end), nbuc
+   having SUM (znap)<>0;
 
 ----------------------------------------
     -- Макаренко И.В.(налаштований job о 19:00 по формуванню файлу для розшифровки показників
@@ -2329,3 +2327,4 @@ BEGIN
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
+
