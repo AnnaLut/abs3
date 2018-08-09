@@ -1,11 +1,11 @@
-CREATE OR REPLACE PACKAGE BARS.BARS_ZAY
+CREATE OR REPLACE PACKAGE BARS_ZAY
 is
-  head_ver  constant varchar2(64)  := 'version 6.2 09.07.2018';
-  head_awk  constant varchar2(512) := ''
-    ||'СБЕРБАНК' ||chr(10)
+ head_ver constant varchar2(64) := 'version 6.2 09.07.2018';
+ head_awk constant varchar2(512) := ''
+ ||'СБЕРБАНК' ||chr(10)
 ;
 
--- Надра  aw bars_zay_head.sql bars_zay_head.ndr SBER+SEGM+NOKK
+-- Надра aw bars_zay_head.sql BARS.bars_zay_head.ndr SBER+SEGM+NOKK
 -- Сбер   aw bars_zay_head.sql bars_zay_head.sb SBER
 -- УПБ    aw bars_zay_head.sql bars_zay_head.upb
 
@@ -603,11 +603,10 @@ is
   --очищення ZAY42 від застарілих заявок
   procedure del_zay_old ;
 end BARS_ZAY;
-
 /
 
 
-CREATE OR REPLACE PACKAGE BODY BARS_ZAY
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_ZAY
 is
 
 body_ver   constant varchar2(64)   := 'version 12.02 20.02.2018';
@@ -4312,20 +4311,13 @@ BEGIN
       end if;
     end if;
 
-  -- Продажа
+  -- Покупка
    if p_dk = 1 then
      select meta, contract, dat2_vmd, country, basis, benefcountry, bank_code, bank_name, product_group, code_2c, p12_2c
        into l_aim, l_contract, l_dat2_vmd, l_country, l_basis, l_benefcountry, l_bank_code, l_bank_name, l_product_group, l_code_2c, l_p12_2c
        from zayavka
       where id = p_id;
-      -- пустая цель
-      if l_aim is null then
-           msg  := 'Не указана цель заявки ' || p_id;
-           ern  := 32;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
+
       -- пустой № контракта
       if l_contract is null then
            msg  := 'Не указан № контракта заявки ' || p_id;
@@ -4342,85 +4334,10 @@ BEGIN
            bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
            raise err;
       end if;
-      -- пустая страна перечисления валюты
-      if l_country is null then
-           msg  := 'Не указана страна перечисления валюты заявки ' || p_id;
-           ern  := 48;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
-      -- пустая основание для покупки
-      if l_basis is null then
-           msg  := 'Не указано основание для покупки валюты заявки ' || p_id;
-           ern  := 33;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
-      -- пустая страна бенефециара
-      if l_benefcountry is null then
-           msg  := 'Не указана страна бенефециара заявки ' || p_id;
-           ern  := 49;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
-      -- пустой код иностранного банка
-      if l_bank_code is null then
-           msg  := 'Не указан код иностранного банка заявки ' || p_id;
-           ern  := 50;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
-      -- пустое наименование иностранного банка
-      if l_bank_name is null then
-           msg  := 'Не указано наименование иностранного банка заявки ' || p_id;
-           ern  := 51;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
-      -- пустой код товарной группы
-/*     if l_product_group is null then
-           msg  := 'Не указан код товарной группы заявки ' || p_id;
-           ern  := 34;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;*/
-      -- пустой код покупки за импортом #2C
-      if l_code_2c is null then
-           msg  := 'Не указан код покупки за импортом #2C заявки ' || p_id;
-           ern  := 52;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
-      -- пустая ознака операции #2C
-      if l_p12_2c is null then
-           msg  := 'Не указана ознака операции #2C заявки ' || p_id;
 
-           ern  := 53;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;
 
-   /*else
-     select meta
-       into l_aim
-       from zayavka
-      where id = p_id;
-      -- пустая цель
-      if l_aim is null then
-           msg  := 'Не указана цель заявки ' || p_id;
-           ern  := 32;
-           prm := p_id;
-           bars_audit.trace('%s Неуспешное визирование заявки № %s - %s', l_title, to_char(p_id), to_char(msg));
-           raise err;
-      end if;*/
+
+
    end if;
 
 
@@ -7464,16 +7381,4 @@ begin
   init;
 end BARS_ZAY;
 /
- show err;
- 
-PROMPT *** Create  grants  BARS_ZAY ***
-grant EXECUTE                                                                on BARS_ZAY        to BARSAQ with grant option;
-grant EXECUTE                                                                on BARS_ZAY        to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on BARS_ZAY        to ZAY;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_zay.sql =========*** End *** ==
- PROMPT ===================================================================================== 
- 
