@@ -9,6 +9,7 @@ namespace BarsWeb.Areas.GL.Infrastructure.Repository.DI.Abstract
         IEnumerable<SubFile> SubFileData(decimal acc);
         void RemoveDocument(decimal id);
         IEnumerable<Operation> OperDictionary(string type);
+        SwiftInfo GetSwiftInfo(decimal refid);
     }
 
 }

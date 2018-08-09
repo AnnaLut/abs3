@@ -8,7 +8,19 @@
 
 		var vm = this;
 
-		vm.subFileDisplay = false;		
+		vm.subFileDisplay = false;
+		vm.subFileSwift = false;
+
+		vm.ShowSWIFTs = ShowSWIFTs();
+
+		function ShowSWIFTs() {
+		    var array_of_types = ['nlf', 'nl9', 'nli', 'nlj', 'nll'];
+		    var type = getUrlParameter('tip');
+		    if (type)
+		        return array_of_types.indexOf(type.toLowerCase()) > -1;
+		    else
+		        return false;
+		}
 
 		function getUrlParameter(param) {             
             var PageURL = window.location.search.substring(1);
@@ -25,7 +37,6 @@
         	var tt = getUrlParameter('tt'),
         		ttList = getUrlParameter('ttList'),
         		createMode = 'single';
-        		debugger;
     		if (tt) {
     			createMode = 'single';
     		} else if (ttList) {
@@ -84,9 +95,11 @@
             change: function () {
                 vm.subFileGrid.dataSource.read();
                 vm.subFileDisplay = true;
+                vm.subFileSwift = false;
             },
             dataBinding: function (e) {
-            	vm.subFileDisplay = false;
+                vm.subFileDisplay = false;
+                vm.subFileSwift = false;
             	$scope.$apply();
             },
             dataSource: {
@@ -236,7 +249,13 @@
         				click: function() {
         					var subFileRow = selectedSubFileGridRow();
         					if (subFileRow) {
-        						window.location = '/barsroot/documentview/default.aspx?ref=' + subFileRow.REF;
+        					    //window.location = '/barsroot/documentview/default.aspx?ref=' + subFileRow.REF;
+        					    bars.ui.dialog({
+        					        content: bars.config.urlContent('/documentview/default.aspx?ref=' + subFileRow.REF),
+        					        iframe: true,
+        					        height: 600,
+        					        width: 800
+        					    });
         					} else {
                             	bars.ui.notify('Увага!', 'Не обрано документу для перегляду', 'error');
                             }
@@ -290,7 +309,16 @@
 		                            APROC: subFileRow.APROC
 		                        };
 
-                            	window.location = '/barsroot/docinput/docinput.aspx?' + serializeData(params);
+                                //window.location = '/barsroot/docinput/docinput.aspx?' + serializeData(params);
+                            	bars.ui.dialog({
+                            	    content: bars.config.urlContent('/docinput/docinput.aspx?' + serializeData(params)),
+                            	    iframe: true,
+                            	    height: document.documentElement.offsetHeight * 0.9,
+                            	    width: 625,
+                            	    close: function () {
+                            	        vm.subFileGrid.dataSource.read();
+                            	    } 
+                            	});
                             } else {
                             	bars.ui.notify('Увага!', 'Не обрано значення для створення документу', 'error');
                             }
@@ -330,7 +358,17 @@
 	                BPROC: subFileRow.BPROC,
 	                APROC: subFileRow.APROC
 	            };
-	            window.location = '/barsroot/docinput/docinput.aspx?' + serializeData(params);
+        	    //window.location = '/barsroot/docinput/docinput.aspx?' + serializeData(params);
+	        	bars.ui.dialog({
+	        	    content: bars.config.urlContent('/docinput/docinput.aspx?' + serializeData(params)),
+	        	    iframe: true,
+	        	    height: document.documentElement.offsetHeight * 0.9,
+	        	    width: 625,
+	        	    close: function () {
+	        	        $scope.selectOperWindow.close();
+	        	        vm.subFileGrid.dataSource.read();
+	        	    }
+	        	});
         	} else {
         		bars.ui.notify('Увага!', 'Для створення документу необхідно обрати значення операції.', 'error');
         	}
@@ -410,7 +448,41 @@
                    template: "<div style='text-align:center;'>#=kendo.toString(DATD,'dd/MM/yyyy')#</div>",
                    title: 'Дата документа'
                }
-            ]
+            ],
+            change: function () {
+                vm.subFileSwift = false;
+                if (vm.ShowSWIFTs)
+                    TryToLoadSwift();
+            }
         };
+
+
+        function TryToLoadSwift() {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                contentType: 'application/json',
+                data: { REFID: selectedSubFileGridRow().REF },
+                url: bars.config.urlContent(config.baseApiUrl + 'GetSwiftInfo'),
+                success: function (data) {
+
+                    if (data.RESULT === null)
+                        return false;
+
+                    var line = "";
+                    line += "Sender  :\t" + data.RESULT.SENDER + "\n";
+                    line += "Receiver:\t" + data.RESULT.RECEIVER + "\n";
+
+                    if (data.RESULT.SWIFTDATA && data.RESULT.SWIFTDATA.length > 0) {
+                        line += data.RESULT.SWIFTDATA;
+                    }
+
+                    vm.subFileSwift = true;
+                    $("#SwiftInfo").val(line);
+                    $scope.$apply();
+
+                }
+            });
+        }
 
 	}]);
