@@ -21,7 +21,8 @@ PROMPT *** Create  procedure PAY_CCK_UPB ***
               sum2_  DECIMAL   -- Amount 2
 ) IS
 /*
-  Ver 3.34
+  Ver 3.35
+  24.07.2018  COBUMMFO-7620 )
   01-02-2017  http://jira.unity-bars.com.ua:11000/browse/COBUSUPABS-5268
               Погоджено з бек-офісом!
               Символ каси дійсно має проставлятися не номеру рахунку , а по призначенню коштів!
@@ -397,7 +398,7 @@ bars_audit.trace('PAY_CCK_UPB: CC_ID_='||CC_ID_||', DAT1_='||DAT1_||
   --2. Иден. код клиента
   INSERT INTO operw (ref,tag,value) VALUES (REF_,'POKPO', OKPO_ );
 
-      update oper set vob=vob_, sk = 14 where ref=REF_; --sk = decode(substr(nls2_,1,4),'2620',16,14)
+      update oper set vob=vob_, sk = decode(substr(nls2_,1,4),'2620',16,14) where ref=REF_; --sk = decode(substr(nls2_,1,4),'2620',16,14)
 
   -- Узнаем код валюты КОМИССИИ
     begin
