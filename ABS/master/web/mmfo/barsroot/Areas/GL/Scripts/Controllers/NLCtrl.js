@@ -295,12 +295,12 @@
                             	bars.ui.notify('Увага!', 'Не обрано значення для створення документу', 'error');
                             }
                         },
-        				hidden: vm.cteateDocDisplayMode === 'single' ? false : true
+                        hidden: !(vm.cteateDocDisplayMode === 'single' || getUrlParameter('ttList') === 'NL9')
                     },
                     {
                         type: 'button',
                         id: 'selectOperForDoc',
-                        text: '<i class="pf-icon pf-16 pf-document_header_footer-ok2"></i> Створити документ',
+                        text: '<i class="pf-icon pf-16 pf-document_header_footer-ok2"></i> Створити документ (вибір операції)',
                         click: function () {
                         	var subFileRow = selectedSubFileGridRow();
                             if (subFileRow) {
