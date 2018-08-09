@@ -15294,7 +15294,7 @@ begin
 
      if z.okpo is not null and z.okpo_n is not null and l_msg is null then
         begin
-          select t.id, t.name
+          select distinct t.id, t.name --COBUMMFO-8964 ("distinct")
             into l_bpk_proect_id_new, l_name_new
            from bpk_proect t, w4_card  w
            where t.product_code = w.product_code and t.okpo = z.okpo and w.code = z.card_type and
@@ -15940,11 +15940,13 @@ begin
      -- полный доступ
      bc.set_policy_group('WHOLE');
      for i in 1..l_sender_tab.count loop
+      if ( l_sender_tab(i).mfo is not null and l_sender_tab(i).nls is not null) then --COBUMMFO-8964
         begin
            insert into ow_iic_msgcode (tt, mfoa, nlsa, msgcode)
            values ('R01', l_sender_tab(i).mfo, l_sender_tab(i).nls, 'PAYSAL');
         exception when dup_val_on_index then null;
         end;
+       end if; 
      end loop;
      -- вернуться в свою область видимости
      bc.set_context();
