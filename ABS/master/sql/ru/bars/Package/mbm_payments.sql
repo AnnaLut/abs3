@@ -143,7 +143,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
    g_awk_body_defs constant varchar2(512) := ''
           ||'    - Сбербанк'    || chr(10);
 
-   G_BODY_VERSION    constant varchar2(64) := 'version 13.12 09.08.2018';
+   G_BODY_VERSION    constant varchar2(64) := 'version 13.16 09.08.2018';
 
    G_MODULE          constant char(3)      := 'KLB';    -- код модуля
    G_TRACE           constant varchar2(50) := 'MBM_PAYMENTS.';
@@ -1154,7 +1154,14 @@ end add_dop_req;
                                   p_id_b oper.id_b%type) return smallint is
     begin
 
-       return 0;
+       return 0;--sdo_autopay_check_cl(p_nlsa,
+                          --         p_mfoa,
+                              --     p_nlsb,
+                               --    p_mfob,
+                               --    p_s,
+                               --    p_nazn,
+                               --    p_id_a,
+                               --    p_id_b);
     end;
 
     procedure set_payment_payed(p_ref oper.ref%type) is
@@ -1429,11 +1436,14 @@ end add_dop_req;
               end if;*/
 
   --            if l_branch_usr like l_branch_acc||'%' then
-                 bc.subst_branch(l_branch_acc);
+                 --bc.subst_branch(l_branch_acc);
+				 
     /*          else
                  bc.subst_branch(l_branch_usr);
               end if;*/
 
+			  
+			    bc.subst_branch(l_branch_usr);
 
          -- вычисление операции для оплаты документа
          /*l_tt := bars_xmlklb_imp.get_import_operation(
@@ -1740,12 +1750,13 @@ begin
 
         --if l_branch_usr like l_branch_acc||'%' then
         
-           bc.subst_branch(l_branch_acc);
+           --bc.subst_branch(l_branch_acc);
       /*  else
            bc.subst_branch(l_branch_usr);
         end if;*/
 
-
+            bc.subst_branch(l_branch_usr);
+			
         l_doc.nd := p_nd;
         l_doc.fdat := p_clcdate;
         l_doc.kurs_z := p_rate;
@@ -2187,8 +2198,12 @@ begin
             end;
 
             -- после определения исполнителя, залогинится бранчом
-            select branch into l_branch from bars.accounts
-            where nls = p_nlsa and kv = p_kv and kf = p_mfoa;
+            select a.branch, s.branch into l_branch, l_branch_isp from bars.accounts a, staff$base s
+            where 
+            a.nls = p_nlsa 
+            and a.kv = p_kv 
+            and a.kf = p_mfoa
+            and a.isp=s.id;
 
             -- Ищем бранч пользователя-операциониста
             -- Для пользователя на '/' будет подставляться МФО плательщика
@@ -2197,7 +2212,7 @@ begin
             -- Если только бранч пользователя не выше чем счета
          --   if l_branch_isp like l_branch||'%' then
                 -- представимся текущим отделением плательщика
-                bars.bars_context.subst_branch(l_branch);
+                bars.bars_context.subst_branch(l_branch_isp);
           /*  else
                 -- представимся текущим отделением исполнителя
                 bars.bars_context.subst_branch(l_branch_isp);
@@ -2335,7 +2350,7 @@ begin
             );
 
 
-            add_dop_req(l_ref, 'EXREF', to_char(p_doc_id),
+             add_dop_req(l_ref, 'EXREF', to_char(p_doc_id),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             add_dop_req(l_ref, 'f', 'MT 103',
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
