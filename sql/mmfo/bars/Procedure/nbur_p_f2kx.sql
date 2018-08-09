@@ -1,10 +1,3 @@
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F2KX.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-PROMPT *** Create  procedure NBUR_P_F2KX ***
-
-
 CREATE OR REPLACE PROCEDURE NBUR_P_F2KX (
                                            p_kod_filii        varchar2
                                            , p_report_date      date
@@ -18,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.27.006 06/08/2018 (22/06/2018)
+% VERSION     :  v.27.007 07/08/2018 (06/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := 'v.27.006  06/08/2018';
+  ver_            char(30)  := 'v.27.007  07/08/2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -160,7 +153,7 @@ BEGIN
                                    end  as K021_2  
                                  , lpad(to_char(row_number() over (partition by lpad(cust.cust_code, 10, '0') order by acc.acc_id, tr.ref)), 4, '0') as Q003_1                                   
                           from   (select cust.cust_code, max(cust.k070) as k070, max(trim(custo.nmk)) as cust_name, max(cust.cust_adr) as cust_adr
-                                         , max(cust.cust_id) as cust_id, max(cust.cust_type) as cust_type, max(cust.k030) as k030, max(re.rnbor) rnbor
+                                         , cust.cust_id as cust_id, max(cust.cust_type) as cust_type, max(cust.k030) as k030, max(re.rnbor) rnbor
                                          , max(re.rnbou) rnbou, max(re.rnbos) rnbos, max(re.rnbod) rnbod
                                   from   (select *
                                           from (select u.rnk
@@ -196,7 +189,7 @@ BEGIN
                                            and trim(re.rnbor) is not null
                                            and trim(re.rnbod) is not null
                                            and (cust.close_date is null)
-                                    group by cust.cust_code                                
+                                    group by cust.cust_code, cust.cust_id                                
                                  ) cust
                                  left join nbur_dm_accounts acc on (acc.report_date = p_report_date and
                                                                     acc.kf = p_kod_filii and 
@@ -249,6 +242,3 @@ BEGIN
   logger.info (c_prefix || ' end for date = ' || to_char(p_report_date, 'dd.mm.yyyy'));
 END;
 /
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F2KX.sql =========*** End *** =
-PROMPT ===================================================================================== 
