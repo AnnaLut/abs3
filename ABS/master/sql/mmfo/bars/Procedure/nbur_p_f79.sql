@@ -1,13 +1,4 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F79.sql =========*** Run **
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure NBUR_P_F79 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F79 (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -18,9 +9,9 @@ is
 % DESCRIPTION : Процедура формирования #79 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.006  27.12.2017
+% VERSION     :  v.16.008 08.08.2018 (31/01/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.006  27.12.2017';
+  ver_          char(30)  := 'v.16.008  08/08/2018';
 /*
    Структура показника   DD ZZZZZZZZZZ VVV NNNN
 
@@ -112,7 +103,9 @@ BEGIN
                                  b.cust_id,
                                  a.branch,
                                  a.nbuc,
-                                 lpad (trim (c.cust_code), 10, '0') kod1,
+                                 decode(c.k040, '804', lpad (trim (c.cust_code), 10, '0'), 
+                                                       'I' || lpad (to_char(c.cust_id), '9', '0') 
+                                       ) kod1,
                                  lpad (trim (a.kv), 3, '0') kod2,
                                  lpad (dense_rank () over (order by b.ostq), 4, '0') kod3,
                                  nvl(trim(w.D#79_01), '') p01, --замінить на c.nmk
@@ -131,38 +124,40 @@ BEGIN
                                  NVL(trim(w.D#79_15),'дата реєстрації договору') p15,
                                  '0' p16,
                                  NVL(trim(z.value),'ознака ідентифікаційного коду') p17
-                            FROM NBUR_DM_ACCOUNTS a,
-                                 NBUR_DM_CUSTOMERS c,
-                                 NBUR_DM_BALANCES_DAILY b,
-                                 (select *
-                                  from (
-                                    select *
-                                    from ACCOUNTSW
-                                    where tag like 'D#79%' and
-                                        substr(trim(tag), 6, 2) in ('01', '02', '03', '04', '05',
-                                            '08', '09', '14', '15'))
-                                    PIVOT (max(value) for tag in
-                                    ('D#79_01' as D#79_01,  'D#79_02' as D#79_02, 'D#79_03' as D#79_03,
-                                    'D#79_04' as D#79_04,  'D#79_05' as D#79_05, 'D#79_08' as D#79_08,
-                                    'D#79_09' as D#79_09,  'D#79_14' as D#79_14, 'D#79_15' as D#79_15))) w,
-                                 NBUR_DM_ACNT_RATES r,
-                                 CUSTOMERW z
-                           WHERE     a.report_date = p_report_date
+                            FROM NBUR_DM_ACCOUNTS a
+                            join NBUR_DM_CUSTOMERS c
+                            on (a.cust_id = c.cust_id and 
+                                c.report_date = p_report_date and 
+                                c.kf = p_kod_filii)
+                            join NBUR_DM_BALANCES_DAILY b
+                            on (b.acc_id = a.acc_id and 
+                                b.report_date = p_report_date and 
+                                b.kf = p_kod_filii and 
+                                b.ost <> 0)
+                            left outer join 
+                                      (select *
+                                       from (
+                                        select *
+                                        from ACCOUNTSW
+                                        where tag like 'D#79%' and
+                                            substr(trim(tag), 6, 2) in ('01', '02', '03', '04', '05',
+                                                '08', '09', '14', '15'))
+                                        PIVOT (max(value) for tag in
+                                        ('D#79_01' as D#79_01,  'D#79_02' as D#79_02, 'D#79_03' as D#79_03,
+                                        'D#79_04' as D#79_04,  'D#79_05' as D#79_05, 'D#79_08' as D#79_08,
+                                        'D#79_09' as D#79_09,  'D#79_14' as D#79_14, 'D#79_15' as D#79_15))) w
+                            on (a.acc_id = w.acc)
+                            left outer join NBUR_DM_ACNT_RATES r
+                            on (a.acc_id = r.acc_id and
+                                r.report_date = p_report_date and 
+                                r.kf = p_kod_filii and
+                                r.rate_tp = 1)
+                            left outer join CUSTOMERW z
+                            on (c.cust_id = z.rnk and 
+                                z.tag = 'K021 ')
+                           WHERE a.report_date = p_report_date
                                  AND a.kf = p_kod_filii
                                  AND a.nbs in ('3660','3661')
-                                 AND b.acc_id = a.acc_id
-                                 AND b.report_date = p_report_date
-                                 AND b.kf = p_kod_filii
-                                 AND a.cust_id = c.cust_id
-                                 AND c.report_date = p_report_date
-                                 and c.kf = p_kod_filii
-                                 AND b.ost <> 0
-                                 and a.acc_id = w.acc(+)
-                                 and r.report_date(+) = p_report_date
-                                 AND r.kf(+) = p_kod_filii
-                                 and a.acc_id = r.acc_id(+)
-                                 and c.cust_id = z.rnk(+)
-                                 and nvl(z.tag(+), 'K021 ') = 'K021 '
                                  )
                                  UNPIVOT (VALUE FOR colname IN
                                  (P01, P02, P03, P04, P05, P07, P08, P09, P10,
@@ -200,10 +195,4 @@ BEGIN
 
 END;
 /
-show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F79.sql =========*** End **
-PROMPT ===================================================================================== 
+SHOW ERRORS;
