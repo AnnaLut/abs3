@@ -76,63 +76,20 @@ PROMPT *** Create  procedure PAY_23_OB22 ***
   rasform_nazn_korr_year varchar2(100);
 
   par        NBS_OB22_PAR_REZ%rowtype;
-  b_date     date;
-  dat31_     date;
-  vv_        int;
-  p4_        int;
-  l_MMFO     int;
-  l_day_year NUMBER;
-  r7702_acc  number;
-  mon_       NUMBER;
-  year_      NUMBER;
-  vob_       number;
-  otvisp_    number;
-  fl         number(1);
-  s_old_     number;
-  s_old_q    number;
-  s_new_     number;
-  s_val_     number;
-  userid_    number;
-  l_user     number;
-  diff_      number;
-  ref_       number;
-  REZPROV_   NUMBER         DEFAULT 0;
-  nn_        number;
-  l_rez_pay  number;
-  l_pay      number;
-  r7702_     varchar2(20);
-  nazn_      varchar2(500);
-  tt_        varchar2(3);
-  nam_a_     varchar2(50);
-  nam_b_     varchar2(50);
-  r7702_bal  varchar2(50);
-  kurs_      varchar2(500);
-  okpoa_     varchar2(14);
-  error_str  varchar2(1000);
-  ru_        varchar2(50);
-  sdat01_    char(10);
-  l_absadm   staff$base.logname%type;
-  GRP_       accounts.grp%type:= 21;
-  rnk_b      accounts.rnk%type;
-  acc_       accounts.acc%type;
-  nls_       accounts.nls%type;
-  maska_     accounts.nls%type;
-  isp_       accounts.isp%type;
-  nms_       accounts.nms%type;
-  l_acc      accounts.acc%type;
-  rnk_       accounts.rnk%type;
-  nmk_       customer.nmk%type;
-  nmkl_      customer.nmk%type;
-  nmklk_     customer.nmk%type;
-  k050_      customer.k050%type;
-  s080_      specparam.s080%type;
-  s090_      specparam.s090%type;
-  r013_      specparam.r013%type;
-  l_code     regions.code%type;
-  name_mon_  META_MONTH.name_plain%type;
-  rz_        nbu23_rez.rz%type;
-  l_nd       oper.nd%type;
-  e_nofound_7form    exception;
+  b_date     date;  dat31_     date;
+  vv_        int ;  p4_        int;
+  l_MMFO     int ;
+  l_day_year NUMBER;  r7702_acc  number;  mon_       NUMBER;  year_      NUMBER;  vob_       number;  otvisp_    number;  fl         number(1);
+  s_old_     number;  s_old_q    number;  s_new_     number;  s_val_     number;  userid_    number;  l_user     number;  diff_      number;
+  ref_       number;  nn_        number;  l_rez_pay  number;  l_pay      number;  REZPROV_   NUMBER   DEFAULT 0;
+  r7702_     varchar2(20);  nazn_      varchar2(500);  tt_        varchar2(3)   ; nam_a_     varchar2(50);  nam_b_     varchar2(50);  r7702_bal  varchar2(50);
+  kurs_      varchar2(500); okpoa_     varchar2(14) ;  error_str  varchar2(1000); ru_        varchar2(50);  sdat01_    char(10);
+  l_absadm   staff$base.logname%type;   GRP_   accounts.grp%type:= 21;  rnk_b      accounts.rnk%type;  acc_       accounts.acc%type ;  nls_       accounts.nls%type;
+  maska_     accounts.nls%type      ;  isp_    accounts.isp%type     ;  nms_       accounts.nms%type;  l_acc      accounts.acc%type ;  rnk_       accounts.rnk%type;
+  nmk_       customer.nmk%type      ;  nmkl_   customer.nmk%type     ;  nmklk_     customer.nmk%type;  k050_      customer.k050%type;  s080_      specparam.s080%type;
+  s090_      specparam.s090%type    ;  r013_   specparam.r013%type   ;  l_code     regions.code%type;  oo         oper%rowtype      ;  name_mon_  META_MONTH.name_plain%type;
+  rz_        nbu23_rez.rz%type      ;  l_nd    oper.nd%type;  
+  e_nofound_7form    exception;  
   e_nofound_7rasform exception;
 
   TYPE CurTyp IS REF CURSOR;
@@ -190,7 +147,9 @@ BEGIN
    else
       z23.to_log_rez (user_id , nn_ , dat01_ ,'Начало Проводки - МАКЕТ '||'nal='||nal_);
    end if;
-   dat31_ := Dat_last_work(dat01_-1); -- Последний рабочий день месяца
+   dat31_  := Dat_last_work(dat01_-1); -- Последний рабочий день месяца
+   oo.vdat := dat31_;
+   oo.datd := gl.bdate;
    if p_user  = -1 THEN -- Трансформационные проводки
       l_user := -1;
    else
@@ -211,7 +170,7 @@ BEGIN
    userid_ := user_id;
 
    s_new_ := 0;
-   if nal_='1' and l_user is null THEN
+   if nal_='0' and l_user is null THEN
       --выбираем не оплаченные документы
       --проверка, есть ли за текущую дату расчета непроведенные проводки по резервам
       SELECT count(*) INTO s_new_ FROM oper
@@ -222,7 +181,7 @@ BEGIN
       end if;
    end if;
 
-   if nal_='1' THEN
+   if nal_='0' THEN
 --      DELETE FROM srezerv_errors;
       DELETE FROM rez_doc_maket;
    end if;
@@ -288,7 +247,7 @@ BEGIN
       k r0Typ;
    begin
 
-      if nal_ in ('1','5','7','B','C') THEN
+      if nal_ in ('0','1','2','5','7','B','C') THEN
 
          OPEN c0 FOR
          select t.country, t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz    , t.branch, t.sz,
@@ -309,12 +268,13 @@ BEGIN
                                         r.kv = decode(o.kv,'0',r.kv,o.kv) )
                 where fdat = dat01_  and substr(r.id,1,4) <> 'CACP' 
                       and r.nd = decode(l_user,null,r.nd,-1,r.nd,l_user)
-                      and nvl(decode(nal_,'5',rez_30,'C',rez_30,'D',rez_30,'8',r.rez,rez_0),0) <> 0
+                      and nvl(decode(nal_,'2',rez_30,'5',rez_30,'6',rez_30,'C',rez_30,'D',rez_30,'8',r.rez,rez_0),0) <> 0
+                      and decode(nal_,'0',-sign(r.rez),'2',-sign(r.rez),sign(r.rez)) = 1 
                 group by c.country,o.NBS_REZ, o.OB22_REZ, o.NBS_7f, o.OB22_7f, o.NBS_7r, o.OB22_7r, o.pr, o.r013, r.KV, r.rz,
                          rtrim(substr(r.branch||'/',1,instr(r.branch||'/','/',1,3)-1),'/')||'/',decode(r.kat,1,1,9,9,2),r.kat
               ) t
          --счет резерва
-         left join v_gls080 ar on ( t.NBS_REZ = ar.nbs    and t.OB22_REZ = ar.ob22  and ar.rz    = t.rz    and t.KV = ar.kv  and
+         left join v_gls080 ar on ( t.NBS_REZ = ar.nbs    and t.OB22_REZ = ar.ob22  and ar.rz    = t.rz    and t.KV = ar.kv  and ar.pap = decode(nal_,'0',1,'2',1,2) and
                                     t.branch  = ar.BRANCH and ar.dazs is null       and t.r_s080 = ar.s080 and t.country = ar.country)
          --счет 7 класса формирования
          left join v_gl a7_f   on (t.NBS_7f = a7_f.nbs    and t.OB22_7f = a7_f.ob22 and '980' = a7_f.kv and
@@ -408,6 +368,7 @@ BEGIN
          -- logger.info('PAY2 : acc_= ' || acc_) ;
          -- logger.info('PAY3 : R013= ' || k.r013) ;
          --проверка корректности данных
+         logger.info('PAY11-5 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' nal_= ' || nal_|| ' k.r_nls= ' || k.r_nls || ' k.f7_nls= ' || k.f7_nls || ' k.r7_nls= ' || k.r7_nls) ;   
          if k.cnt > 1 then
             -- для одного счета резерва найдено несколько лицевых счетов
             if instr(k.r_nls,',') > 0 then
@@ -446,9 +407,9 @@ BEGIN
             par.sed       := '12';
             par.nazn      := '(?)';
          END;
-         nazn_ := par.nazn;
+         oo.nazn := par.nazn;
          if l_user is not null and l_user <> -1 THEN
-            nazn_ := nazn_ ||' (перенос)';
+            oo.nazn := oo.nazn ||' (перенос)';
          end if;
 
          --проверка открыты ли необходимые счета в базе
@@ -556,9 +517,9 @@ BEGIN
                op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,k.kv,nms_,'REZ',isp_,acc_);
                --logger.info('PAY55 : nls_= ' || nls_||' '||acc_) ;
                k.r_acc:=acc_;
-               update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
-               update accounts set tobo = k.branch             where acc= acc_ and tobo <> k.branch ;
-
+               update accounts set                 daos=dat31_       where acc= acc_ and daos > dat31_ ;
+               update accounts set tobo = k.branch                   where acc= acc_ and tobo <> k.branch ;
+               update accounts set pap  = decode(nal_,'0',1,'2',1,2) where acc= acc_ and pap  <> decode(nal_,'0',1,'2',1,2) ;
                update specparam_int set ob22=k.OB22_REZ where acc=acc_;
                if sql%rowcount=0 then
                   insert into specparam_int(acc,ob22) values(acc_, k.OB22_REZ);
@@ -705,35 +666,40 @@ BEGIN
             savepoint sp;
             error_str :=null;
             --формирование проводок
+         logger.info('PAY11-6 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' fl= ' || fl) ;   
             if fl = 0 then
-               tt_ := 'ARE';
+               oo.tt   := 'ARE';
+               oo.nlsa := k.r_nls;
+               oo.kv  := k.kv;
+               oo.kv2 := 980;
+
                if l_user is not null THEN
-                  vob_    := 6;
+                  oo.vob  := 6;
                   s_old_  := 0;  -- Предыдущий резерв
                else
                   -- Определяем необходимый вид VOB
                   if b_date - dat31_ > l_day_year and dat01_=to_date('01-01-2016','dd-mm-yyyy')  THEN
-                     vob_ := 99; -- корректирующие годовые
+                     oo.vob := 99; -- корректирующие годовые
                      begin
                         select ostc into s_old_ from accounts where acc=k.r_acc; -- при годовых текущий остаток
                      EXCEPTION WHEN NO_DATA_FOUND THEN s_old_ := 0;
                      end;
                   ElsIf TO_CHAR (b_date, 'YYYYMM') > TO_CHAR (dat31_, 'YYYYMM') THEN
-                     vob_ := 96; -- корректирующие
+                     oo.vob := 96; -- корректирующие
                      select ost_korr(k.r_acc,dat31_,null,k.nbs_rez) INTO s_old_ from dual; -- Предыдущий резерв -  остаток с корректир.
                   ELSE
-                     vob_ := 6;  -- обычные
+                     oo.vob := 6;  -- обычные
                      select ost_korr(k.r_acc,dat31_,null,k.nbs_rez) INTO s_old_ from dual; -- Предыдущий резерв -  остаток с корректир.
                   END IF;
                end if;
                --новая сумма резерва
                if    nal_  in ('3','4','8')      THEN  s_new_ := k.sz;
-               elsif nal_  in ('5','C')          THEN  s_new_ := k.sz_30;
+               elsif nal_  in ('2','5','C')      THEN  s_new_ := k.sz_30;
                elsif nal_  in ('6','D')          THEN  s_new_ := k.sz_30;
-               elsif nal_ ='7'                  THEN  s_new_ := k.sz_30;
+               elsif nal_ ='7'                   THEN  s_new_ := k.sz_30;
                else
-                  if    k.sz_30<>0              THEN  s_new_ := k.sz-k.sz_30;
-                  else                                s_new_ := k.sz;
+                  if    k.sz_30<>0               THEN  s_new_ := k.sz-k.sz_30;
+                  else                                 s_new_ := k.sz;
                   end if;
                end if;
 
@@ -742,116 +708,79 @@ BEGIN
                --logger.info('PAY11 : s_new_= ' || s_new_) ;
                --logger.info('PAY11 : s_old_= ' || s_old_) ;
                --logger.info('KORR99-11: vob_= ' || vob_||'s_old_='||s_old_||':s_new-'||s_new_||'-'||k.r_nls) ;
+              logger.info('PAY11-7 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' s_old_= ' || s_old_|| ' s_new_= ' || s_new_) ;   
                if s_new_ - s_old_ <> 0 then
-
                   if s_new_ > s_old_ then-- увеличение резерва
-
+                     oo.dk     := 0;
+                     oo.s      := (-s_old_ + s_new_);
+               logger.info('PAY11-1 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' s_old_= ' || s_old_|| ' s_new_= ' || s_new_ || ' oo.s= ' || oo.s) ;
+                     oo.nlsb   := k.f7_nls;
                      r7702_acc := k.f7_acc;
-                     r7702_    := k.f7_nls;
+                     --r7702_    := k.f7_nls;
                      r7702_bal := k.NBS_7f||'/'||k.OB22_7f;
                      pap_77 (k.f7_acc,1); -- Корректировка признака актива-пассива по 7 кл.
+                     IF    oo.vob = 99 THEN oo.nazn := doform_nazn_korr_year || oo.nazn;
+                     ElsIf oo.vob = 96 THEN oo.nazn := doform_nazn_korr      || oo.nazn;
+                     Else                   oo.nazn := doform_nazn           || oo.nazn;
+                     END IF;
+
 
                   else--уменьшение резерва
 
+                     oo.dk     := 1;
+                     oo.s      := (s_old_ - s_new_);
+               logger.info('PAY11-2 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' s_old_= ' || s_old_|| ' s_new_= ' || s_new_ || ' oo.s= ' || oo.s) ;
+                     oo.nlsb   := k.r7_nls;
                      r7702_acc := k.r7_acc;
-                     r7702_    := k.r7_nls;
+                     --r7702_    := k.r7_nls;
                      r7702_bal := k.NBS_7r||'/'||k.OB22_7r;
                      pap_77 (k.r7_acc,2);
-                  end if;
-                  error_str := error_str||'2';
-                  IF mode_ = 0 THEN
-                     gl.REF (ref_);
-                     l_nd := substr(to_char(ref_),-10);
-                  end if;
+                     IF    oo.vob = 99 THEN oo.nazn := rasform_nazn_korr_year || oo.nazn;
+                     ElsIf oo.vob = 96 THEN oo.nazn := rasform_nazn_korr      || oo.nazn;
+                     Else                   oo.nazn := rasform_nazn           || oo.nazn;
+                     END IF;
 
---
+                  end if;
+                  oo.s2     := gl.p_icurval ( oo.kv, oo.s, oo.vdat );
+                  error_str := error_str||'2';
+
                   -- узнать название нужных счетов для вставки в OPER
-                  SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38) INTO nam_a_, nam_b_
+                  SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38) INTO oo.nam_a, oo.nam_b
                   FROM v_gl a, v_gl b WHERE a.acc = k.r_acc and b.acc = r7702_acc;
 
-                  if s_new_ > s_old_ then
-                     diff_ := (-s_old_ + s_new_);
-                     error_str := error_str||'6';
-                     -- увеличение резерва
-                     IF    vob_ = 99 THEN nazn_ := doform_nazn_korr_year || nazn_;
-                     ElsIf vob_ = 96 THEN nazn_ := doform_nazn_korr      || nazn_;
-                     Else                 nazn_ := doform_nazn           || nazn_;
-                     END IF;
+logger.info('PAY11-3 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' oo.nlsa= ' || oo.nlsa|| ' oo.nlsb= ' || oo.nlsb ) ;
+                  IF mode_ = 0 THEN
 
-                     error_str := error_str||'7';
+                     gl.ref (oo.REF);
+                     oo.nd := substr(to_char(oo.ref),-10);
+                     gl.in_doc3 (ref_ => oo.REF  , tt_  => oo.tt  , vob_ => oo.vob ,   nd_ =>oo.nd   , pdat_=>SYSDATE, vdat_ =>oo.vdat, dk_ =>oo.dk,
+                                  kv_ => oo.kv   , s_   => oo.S   , kv2_ => oo.kv2 ,   s2_ =>oo.S2   , sk_  => null  , data_ =>oo.DATD, datp_=>gl.bdate,
+                               nam_a_ => oo.nam_a,nlsa_ => oo.nlsa,mfoa_ => gl.aMfo, nam_b_=>oo.nam_b,nlsb_ =>oo.nlsb, mfob_ =>gl.aMfo ,
+                                nazn_ => oo.nazn ,d_rec_=> null   ,id_a_ => null   , id_b_ =>null    ,id_o_ =>null   , sign_ =>null,sos_=>1,prty_=>null,uid_=>null);
+                     gl.payv(0, oo.ref, oo.vdat, oo.tt, oo.dk, oo.kv, oo.nlsa , oo.s, oo.kv2    ,oo.nlsb, oo.s2);
+                     gl.pay (2, oo.ref, gl.bdate);  -- по факту
 
-                     IF mode_ = 0 THEN
-                        --gl.REF (ref_);
---                        if length(ref_) < 10 THEN l_x := 1                ; l_y := length(ref_);
---                        else                      l_x := length(ref_)+1-10; l_y := 10;
---                        end if;
---                        l_nd := substr(ref_,l_x,l_y);
-                        INSERT INTO oper (REF   , tt    , vob   , nd     , dk    , pdat   , vdat  , datd  , datp  , nam_a , nlsa   ,   mfoa,
-                                          id_a  , nam_b , nlsb  , mfob   , id_b  , kv     , s     , kv2   , s2    , nazn  , userid)
-                                  VALUES (ref_  , tt_   , vob_  , l_nd   , 0     , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls,gl.amfo,
-                                          okpoa_, nam_b_, r7702_, gl.amfo, okpoa_, k.kv   , diff_ , 980   , gl.p_icurval (k.kv, diff_, dat31_),
-                                          nazn_ , otvisp_) ;
-
-                        error_str := error_str||'8';
-
-                        gl.payv (l_pay, ref_, dat31_, tt_, 0, k.kv, k.r_nls, diff_, 980, r7702_, gl.p_icurval (k.kv, diff_, dat31_) );
-
-                        error_str := error_str||'9';
-                     end if;
-                     -- logger.info('KORR99-12+: vob_= ' || vob_||'diff_='||diff_||':s_new-'||s_new_||'-'||k.r_nls) ;
-                     INSERT INTO rez_doc_maket (tt    , vob    , pdat   , vdat     , datd  , datp  , nam_a , nlsa   , mfoa  , id_a   , nam_b, nlsb      ,
-                                                mfob  , id_b   , kv     , s        , kv2   , s2    , nazn  , userid , dk   , branch_a, ref  )
-                                        VALUES (tt_   , k.s080 , SYSDATE, dat31_   , b_date, b_date, nam_a_, k.r_nls, k.nbs_rez||'/'||k.ob22_rez        ,
-                                                okpoa_, nam_b_ , r7702_ , r7702_bal, okpoa_, k.kv  , diff_ , 980    , gl.p_icurval (k.kv, diff_, dat31_),
-                                                nazn_ , userid_, 1      , k.branch , ref_ );
-
-                     error_str := error_str||' 10';
-
-                  else
-                     --уменьшение резерва
-                     diff_ := (s_old_ - s_new_);
-                     error_str := error_str||' 11';
-                     IF    vob_ = 99 THEN nazn_ := rasform_nazn_korr_year || nazn_;
-                     ElsIf vob_ = 96 THEN nazn_ := rasform_nazn_korr      || nazn_;
-                     Else                 nazn_ := rasform_nazn           || nazn_;
-                     END IF;
-
-                     error_str := error_str||' 12';
-                     IF mode_ = 0 THEN
-                        INSERT INTO oper (REF   , tt    , vob   , nd     , dk    , pdat   , vdat  , datd  , datp  , nam_a , nlsa   , mfoa   ,
-                                          id_a  , nam_b , nlsb  , mfob   , id_b  , kv     , s     , kv2   , s2    , nazn  , userid )
-                                  VALUES (ref_  , tt_   , vob_  , l_nd   , 1     , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls, gl.amfo,
-                                          okpoa_, nam_b_, r7702_, gl.amfo, okpoa_, k.kv   , diff_ , 980   , gl.p_icurval (k.kv, diff_, dat31_),
-                                          nazn_ , otvisp_ );
-
-                        error_str := error_str||' 13';
-                        gl.payv (l_pay, ref_, dat31_, tt_, 1, k.kv, k.r_nls, diff_, 980, r7702_, gl.p_icurval (k.kv, diff_, dat31_));
-                        error_str := error_str||' 14';
-                     end if;
-                     -- logger.info('KORR99-13-: vob_= ' || vob_||'diff_='||diff_||':s_new-'||s_new_||'-'||k.r_nls) ;
-                     INSERT INTO rez_doc_maket (tt    , vob    , pdat   , vdat     , datd  , datp  , nam_a , nlsa   , mfoa, id_a    , nam_b , nlsb       ,
-                                                mfob  , id_b   , kv     , s        , kv2   , s2    , nazn  , userid , dk  , branch_a, ref   )
-                                       VALUES  (tt_   , k.s080 , SYSDATE, dat31_   , b_date, b_date, nam_a_, k.r_nls, k.nbs_rez||'/'||k.ob22_rez         ,
-                                                okpoa_, nam_b_ , r7702_ , r7702_bal, okpoa_, k.kv  , diff_ , 980    , gl.p_icurval (k.kv, diff_, dat31_) ,
-                                                nazn_ , userid_, 0      , k.branch , ref_  );
-
-                     error_str := error_str||' 15';
-
-                  END IF;
+                  end if;
                   -- резерв не поменялся - все равно запишем в rez_doc_maket с признаком dk = -1
                   -- чтобы впоследствии при полном расформировании не учитывать этот счет
                else
-                  -- logger.info('KORR99-14-0: vob_= ' || vob_||'diff_='||diff_||':s_new-'||s_new_||'-'||k.r_nls) ;
-                  INSERT INTO rez_doc_maket (tt     , vob   , pdat     , vdat  , datd  , datp  , nam_a , nlsa   , mfoa    , id_a    , nam_b , nlsb  ,
-                                             mfob   , id_b  , kv       , s     ,kv2    , s2    , nazn  , userid , dk      , branch_a, ref   )
-                                     VALUES (tt_    , k.s080, SYSDATE  , dat31_, b_date, b_date, null  , k.r_nls, k.nbs_rez||'/'||k.ob22_rez, okpoa_,
-                                             null   , null  , r7702_bal, okpoa_, k.kv  , diff_ , 980   , gl.p_icurval (k.kv, diff_, dat31_) , null  ,
-                                             userid_, -1    , k.branch ,ref_   );
-
+                  oo.dk     := -1;
+                  oo.nam_a  := null;
+                  oo.nam_b  := null;
+                  oo.nlsb   := null;
+                  oo.nazn   := null;
+                  oo.s      := s_new_;
+ logger.info('PAY11-7 : NBS/OB22 = ' || k.NBS_REZ||'/'||k.OB22_REZ || ' s_old_= ' || s_old_|| ' s_new_= ' || s_new_) ;   
+                  oo.s2     := gl.p_icurval ( oo.kv, oo.s, oo.vdat );
                   error_str := error_str||' 16';
                end if;
-            end if;
+               INSERT INTO rez_doc_maket (tt    , vob     , pdat   , vdat     , datd   , datp    , nam_a   , nlsa   , mfoa  , 
+                                          id_a  , nam_b   , nlsb   , mfob     , id_b   , kv      , s       , kv2    , s2    , nazn    , userid , dk   , branch_a, ref    )
+                                  VALUES (oo.tt , k.s080  , SYSDATE, oo.vdat  , oo.datd, gl.bdate, oo.nam_a, oo.nlsa, k.nbs_rez||'/'||k.ob22_rez      ,
+                                          okpoa_, oo.nam_b, oo.nlsb, r7702_bal, okpoa_ , oo.kv   , oo.s    , oo.kv2 , oo.s2 , oo.nazn , userid_, oo.dk, k.branch, oo.ref );
+               error_str := error_str||' 10';
 
+            end if;
          exception when others then
             rollback to sp;
             p_error( 5, null,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ, k.kv, null, k.sz,
@@ -879,215 +808,270 @@ BEGIN
                 OB22_7r  srezerv_ob22.OB22_7r%TYPE,
                 r7_acc   VARCHAR2(1000),
                 r7_nls   VARCHAR2(1000),
+                NBS_7f   srezerv_ob22.NBS_7r%TYPE,
+                OB22_7f  srezerv_ob22.OB22_7r%TYPE,
+                f7_acc   VARCHAR2(1000),
+                f7_nls   VARCHAR2(1000),
                 pr       srezerv_ob22.pr%TYPE);
       k r0Typ;
    begin
-   if l_user is null THEN
-      if nal_ in ('1','5','B','C') THEN
+      if l_user is null  THEN
+         if nal_ in ('0','1','2','5','B','C') THEN
+          
+            OPEN c0 FOR
+            select a.acc r_acc, a.ob22 OB22_REZ, a.nbs NBS_REZ, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' branch,
+                   a.nls r_nls, a.kv, ost_korr(a.acc,dat31_,null,a.nbs) sz, 
+                   o.NBS_7R, o.OB22_7R, ConcatStr(a7r.acc) r7_acc, ConcatStr(a7r.nls) r7_nls,  
+                   o.NBS_7F, o.OB22_7F, ConcatStr(a7f.acc) f7_acc, ConcatStr(a7f.nls) f7_nls,o.pr
+            from v_gl a
+            left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
+            left join v_gl a7r on (o.NBS_7R = a7r.nbs and a7r.nbs like '77%'  and o.OB22_7R = a7r.ob22 and '980' = a7r.kv and
+                                  rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7r.BRANCH and a7r.dazs is null )
+            left join v_gl a7f on (o.NBS_7f = a7f.nbs and a7f.nbs like '77%'  and o.OB22_7f = a7f.ob22 and '980' = a7f.kv and
+                                  rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7f.BRANCH and a7f.dazs is null )
+            where a.nbs||a.ob22 in (select distinct nbs_rez||ob22_rez from srezerv_ob22 where substr(nbs_rez,1,2) not in ('14','31','32')) and
+                  o.nal = decode(nal_, '3', '1', '4', '1', nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0 and a.pap = decode(nal_,'0',1,'2',1,2)
+                  --не формировались проводки
+                  and not exists (select 1 from rez_doc_maket r  where r.userid = userid_ and r.nlsa = a.nls and  r.kv = a.kv)
+                  --нет ошибок
+                  and not exists (select 1 from srezerv_errors r
+                                  where r.error_type <> 1 and  r.nbs_rez = a.nbs||'/'||a.ob22 and r.nbs_7f = a.kv and r.userid = userid_
+                                        and r.branch = rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' )
+            group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
+                     a.nls, a.kv, o.NBS_7R, o.OB22_7R, o.NBS_7f, o.OB22_7f,o.pr ;
+         else
+            OPEN c0 FOR
+            select a.acc r_acc, a.ob22 OB22_REZ, a.nbs NBS_REZ, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' branch,
+                   a.nls r_nls, a.kv, ost_korr(a.acc,dat31_,null,a.nbs) sz, 
+                   o.NBS_7R, o.OB22_7R, ConcatStr(a7r.acc) r7_acc, ConcatStr(a7r.nls) r7_nls,
+                   o.NBS_7f, o.OB22_7f, ConcatStr(a7f.acc) f7_acc, ConcatStr(a7f.nls) f7_nls,o.pr
+            from v_gl a
+            left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
+            left join v_gl a7r on (o.NBS_7R = a7r.nbs and a7r.nbs like '77%'  and o.OB22_7R = a7r.ob22 and '980' = a7r.kv and
+                                  rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7r.BRANCH and a7r.dazs is null )
+            left join v_gl a7f on (o.NBS_7f = a7f.nbs and a7f.nbs like '77%'  and o.OB22_7f = a7f.ob22 and '980' = a7f.kv and
+                                  rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7f.BRANCH and a7f.dazs is null )
+            where a.nbs||a.ob22 in (select distinct nbs_rez||ob22_rez from srezerv_ob22 where substr(nbs_rez,1,2) in ('14','31','32')) 
+              and o.nal=decode(nal_,'3','3','4','1',nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
+            --не формировались проводки
+            and not exists (select 1 from rez_doc_maket r  where r.userid = userid_ and r.nlsa = a.nls and  r.kv = a.kv)
+            --нет ошибок
+            and not exists (select 1 from srezerv_errors r
+                            where r.error_type <> 1 and  r.nbs_rez = a.nbs||'/'||a.ob22 and r.nbs_7f = a.kv and r.userid = userid_ and
+                                  r.branch = rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' )
+            group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
+                     a.nls, a.kv, o.NBS_7R, o.OB22_7R, o.NBS_7f, o.OB22_7f,o.pr;
+         end if;
 
-         OPEN c0 FOR
-         select a.acc r_acc, a.ob22 OB22_REZ, a.nbs NBS_REZ, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' branch,
-                a.nls r_nls, a.kv, ost_korr(a.acc,dat31_,null,a.nbs) sz, o.NBS_7R, o.OB22_7R, ConcatStr(a7.acc) r7_acc, ConcatStr(a7.nls) r7_nls,o.pr
-         from v_gl a
-         left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
-         left join v_gl a7 on (o.NBS_7R = a7.nbs and a7.nbs like '77%'  and o.OB22_7R = a7.ob22 and '980' = a7.kv and
-                               rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7.BRANCH and a7.dazs is null )
-         where a.nbs in (select distinct nbs_rez from srezerv_ob22 where substr(nbs_rez,1,2) not in ('14','31','32')) and
-               o.nal = decode(nal_, '3', '1', '4', '1', nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
-               --не формировались проводки
-               and not exists (select 1 from rez_doc_maket r  where r.userid = userid_ and r.nlsa = a.nls and  r.kv = a.kv)
-               --нет ошибок
-               and not exists (select 1 from srezerv_errors r
-                               where r.error_type <> 1 and  r.nbs_rez = a.nbs||'/'||a.ob22 and r.nbs_7f = a.kv and r.userid = userid_
-                                     and r.branch = rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' )
-         group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
-                  a.nls, a.kv, o.NBS_7R, o.OB22_7R,o.pr ;
-      else
-         OPEN c0 FOR
-         select a.acc r_acc, a.ob22 OB22_REZ, a.nbs NBS_REZ, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' branch,
-                a.nls r_nls, a.kv, ost_korr(a.acc,dat31_,null,a.nbs) sz, o.NBS_7R, o.OB22_7R, ConcatStr(a7.acc) r7_acc, ConcatStr(a7.nls) r7_nls,o.pr
-         from v_gl a
-         left join srezerv_ob22 o on a.nbs = o.nbs_rez and a.ob22 = o.ob22_rez
-         left join v_gl a7 on (o.NBS_7R = a7.nbs and a7.nbs like '77%'  and o.OB22_7R = a7.ob22 and '980' = a7.kv and
-                               rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' = a7.BRANCH and a7.dazs is null )
-         where a.nbs in (select distinct nbs_rez from srezerv_ob22 where substr(nbs_rez,1,2) in ('14','31','32')) 
-           and o.nal=decode(nal_,'3','1','4','1',nal_) and a.dazs is null and ost_korr(a.acc,dat31_,null,a.nbs) <> 0
-         --не формировались проводки
-         and not exists (select 1 from rez_doc_maket r  where r.userid = userid_ and r.nlsa = a.nls and  r.kv = a.kv)
-         --нет ошибок
-         and not exists (select 1 from srezerv_errors r
-                         where r.error_type <> 1 and  r.nbs_rez = a.nbs||'/'||a.ob22 and r.nbs_7f = a.kv and r.userid = userid_ and
-                               r.branch = rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' )
-         group by a.acc, a.ob22, a.nbs, rtrim(substr(a.branch||'/',1,instr(a.branch||'/','/',1,3)-1),'/')||'/' ,
-                  a.nls, a.kv, o.NBS_7R, o.OB22_7R,o.pr;
-      end if;
+         loop
+            FETCH c0 INTO k;
+            EXIT WHEN c0%NOTFOUND;
 
-      loop
-         FETCH c0 INTO k;
-         EXIT WHEN c0%NOTFOUND;
+            fl := 0;
 
-         fl := 0;
+            if k.NBS_7R is null then
+               p_error( 8, k.NBS_rez||'/'|| k.OB22_rez,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
+                        k.kv, null, k.sz,k.r7_nls,  'Рахунок резерву - '||k.r_nls);
+               fl := 5;
 
-         if k.NBS_7R is null then
-            p_error( 8, k.NBS_rez||'/'|| k.OB22_rez,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
-                     k.kv, null, k.sz,k.r7_nls,  'Рахунок резерву - '||k.r_nls);
-            fl := 5;
+            -- для одного счета 7 класса (для уменьшения) найдено несколько лицевых счетов
+            elsif instr(k.r7_nls,',') > 0 then
+               p_error( 7, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch,  k.NBS_REZ||'/'||k.OB22_REZ,
+                        k.kv, null, k.sz,k.r7_nls,  'Рахунок резерву - '||k.r_nls);
+               fl := 5;
+            --счета не найдены
+            elsif k.r7_acc is null then
+               acc_:=null;
+               nls_ := k.NBS_7R || '0' || substr(k.branch,9,6) || k.OB22_7R ||'0';
+               nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
+               nms_ := 'Формир.рез. ' || ',об22=' || k.OB22_7R || ',бранч=' || k.branch;
+               k.r7_nls := nls_;
+               begin
+                  select isp, rnk into isp_,rnk_b  from v_gl
+                  where kv=980 and branch = k.branch and nbs =k.NBS_7R and ostc<>0 and dazs is null and isp<>l_absadm and rownum=1;
+               EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := l_absadm; rnk_b :=to_number('1' || l_code);
+               end;
+               bars_audit.error('222 счет='|| nls_);
 
-         -- для одного счета 7 класса (для уменьшения) найдено несколько лицевых счетов
-         elsif instr(k.r7_nls,',') > 0 then
-            p_error( 7, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch,  k.NBS_REZ||'/'||k.OB22_REZ,
-                      k.kv, null, k.sz,k.r7_nls,  'Рахунок резерву - '||k.r_nls);
-            fl := 5;
+               begin
+                  select acc into l_acc from accounts where nls=nls_ and kv=980 and dazs is not null;
+                  -- или закрыт или поменяли БРАНЧ
+                  update accounts set dazs=null, tobo=k.branch where acc=l_acc;
+                  update specparam_int set ob22=k.OB22_7R where acc=l_acc;
+                  if sql%rowcount=0 then
+                     insert into specparam_int(acc,ob22) values(l_acc, k.OB22_7R);
+                  end if;
+                  update accounts set ob22 = k.OB22_7R where acc=l_acc and (ob22 <> k.OB22_7R or ob22 is null);
+                  k.r7_acc:=l_acc;
+               EXCEPTION WHEN NO_DATA_FOUND THEN
+                  op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,980,nms_,'ODB',isp_,acc_);
+                  k.r7_acc:=acc_;
+                  --update accounts set tobo = k.branch,daos=dat31_ where acc= acc_;
+                  update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
+                  update accounts set tobo = k.branch             where acc= acc_ and tobo <> k.branch ;
+                  update specparam_int set ob22=k.OB22_7R where acc=acc_;
+                  if sql%rowcount=0 then
+                     insert into specparam_int(acc,ob22) values(acc_, k.OB22_7R);
+                  end if;
+                  update accounts set ob22 = k.OB22_7R where acc=acc_ and (ob22 <> k.OB22_7R or ob22 is null);
+               end;
+            end if;
+            if k.NBS_7f is null then
+               p_error( 8, k.NBS_rez||'/'|| k.OB22_rez,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ,
+                        k.kv, null, k.sz,k.f7_nls,  'Рахунок резерву - '||k.r_nls);
+               fl := 5;
+               -- для одного счета 7 класса (для уменьшения) найдено несколько лицевых счетов
+            elsif instr(k.f7_nls,',') > 0 then
+               p_error( 7, k.NBS_7f||'/'|| k.OB22_7f,null, null, 980, k.branch,  k.NBS_REZ||'/'||k.OB22_REZ,
+                        k.kv, null, k.sz,k.f7_nls,  'Рахунок резерву - '||k.r_nls);
+               fl  := 5;
 
-         --счета не найдены
-         elsif k.r7_acc is null then
-            acc_:=null;
-            nls_ := k.NBS_7R || '0' || substr(k.branch,9,6) || k.OB22_7R ||'0';
-            nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
-            nms_ := 'Формир.рез. ' || ',об22=' || k.OB22_7R || ',бранч=' || k.branch;
-            k.r7_nls := nls_;
+            --счета не найдены
+            elsif k.f7_acc is null then
+               acc_:=null;
+               nls_ := k.NBS_7f || '0' || substr(k.branch,9,6) || k.OB22_7f ||'0';
+               nls_ := vkrzn( substr(gl.aMfo,1,5), NLS_);
+               nms_ := 'Формир.рез. ' || ',об22=' || k.OB22_7f || ',бранч=' || k.branch;
+               k.r7_nls := nls_;
 
-            begin
-               select isp, rnk into isp_,rnk_b  from v_gl
-               where kv=980 and branch = k.branch and nbs =k.NBS_7R and ostc<>0 and dazs is null and isp<>l_absadm and rownum=1;
-            EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := l_absadm; rnk_b :=to_number('1' || l_code);
-            end;
-            bars_audit.error('222 счет='|| nls_);
-
-            begin
-               select acc into l_acc from accounts where nls=nls_ and kv=980 and dazs is not null;
-               -- или закрыт или поменяли БРАНЧ
-               update accounts set dazs=null, tobo=k.branch where acc=l_acc;
-               update specparam_int set ob22=k.OB22_7R where acc=l_acc;
-               if sql%rowcount=0 then
-                  insert into specparam_int(acc,ob22) values(l_acc, k.OB22_7R);
-               end if;
-               update accounts set ob22 = k.OB22_7R where acc=l_acc and (ob22 <> k.OB22_7R or ob22 is null);
-               k.r7_acc:=l_acc;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,980,nms_,'ODB',isp_,acc_);
-               k.r7_acc:=acc_;
-               --update accounts set tobo = k.branch,daos=dat31_ where acc= acc_;
-               update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
-               update accounts set tobo = k.branch             where acc= acc_ and tobo <> k.branch ;
-               update specparam_int set ob22=k.OB22_7R where acc=acc_;
-               if sql%rowcount=0 then
-                  insert into specparam_int(acc,ob22) values(acc_, k.OB22_7R);
-               end if;
-               update accounts set ob22 = k.OB22_7R where acc=acc_ and (ob22 <> k.OB22_7R or ob22 is null);
-            end;
+               begin
+                  select isp, rnk into isp_,rnk_b  from v_gl
+                  where kv=980 and branch = k.branch and nbs =k.NBS_7f and ostc<>0 and dazs is null and isp<>l_absadm and rownum=1;
+               EXCEPTION WHEN NO_DATA_FOUND THEN isp_ := l_absadm; rnk_b :=to_number('1' || l_code);
+               end;
+               bars_audit.error('222 счет='|| nls_);
+    
+               begin
+                  select acc into l_acc from accounts where nls=nls_ and kv=980 and dazs is not null;
+                  -- или закрыт или поменяли БРАНЧ
+                  update accounts set dazs=null, tobo=k.branch where acc=l_acc;
+                  update specparam_int set ob22=k.OB22_7f where acc=l_acc;
+                  if sql%rowcount=0 then
+                     insert into specparam_int(acc,ob22) values(l_acc, k.OB22_7f);
+                  end if;
+                  update accounts set ob22 = k.OB22_7f where acc=l_acc and (ob22 <> k.OB22_7f or ob22 is null);
+                  k.f7_acc := l_acc;
+               EXCEPTION WHEN NO_DATA_FOUND THEN
+                  op_reg(99,0,0,GRP_,p4_,rnk_b,nls_,980,nms_,'ODB',isp_,acc_);
+                  k.f7_acc:=acc_;
+                  --update accounts set tobo = k.branch,daos=dat31_ where acc= acc_;
+                  update accounts set                 daos=dat31_ where acc= acc_ and daos > dat31_ ;
+                  update accounts set tobo = k.branch             where acc= acc_ and tobo <> k.branch ;
+                  update specparam_int set ob22=k.OB22_7f where acc=acc_;
+                  if sql%rowcount=0 then
+                     insert into specparam_int(acc,ob22) values(acc_, k.OB22_7f);
+                  end if;
+                  update accounts set ob22 = k.OB22_7f where acc=acc_ and (ob22 <> k.OB22_7f or ob22 is null);
+               end;
 
 /*
-            begin
-               select acc into l_acc from accounts
-               where nbs=k.nbs_7r and ob22 = k.ob22_7r and kv=980 and branch=k.branch and dazs is not null;
-               -- или закрыт или поменяли БРАНЧ
-               update accounts set dazs=null where acc=l_acc;
-            EXCEPTION WHEN NO_DATA_FOUND THEN
-               p_error( 8, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch, k.NBS_REZ||'/'||k.OB22_REZ,
-                        k.kv, null,  k.sz, k.NBS_7r||'/'|| k.OB22_7r, 'Рахунок резерву - '||k.r_nls);
-               fl := 5;
-            end;
-*/
-         end if;
-         --logger.info('PAY1 : nbs_rez/ob22= ' || k.nbs_rez||'/'||k.ob22_rez|| ' NLS='||k.r_nls) ;
-         begin
-            savepoint sp;
-            -- Определение параметров клиента и счета
-
-            error_str :=null;
-            --формирование проводок
-            if fl = 0 then
                begin
-                  select * into par from NBS_OB22_PAR_REZ  where nbs_rez = k.nbs_rez and ob22_rez in (k.ob22_rez,'0') and rz=1;
-               EXCEPTION  WHEN NO_DATA_FOUND THEN
-                  par.nazn      := '(?)';
-               END;
-               nazn_ := par.nazn;
-
-               --тип операции
-               tt_ := 'ARE';
-                -- Определяем необходимый вид VOB
-
-               if b_date - dat31_ > l_day_year and dat01_=to_date('01-01-2016','dd-mm-yyyy')  THEN
-                  vob_ := 99; -- корректирующие годовые
-                  begin
-                     select ostc into s_old_ from accounts where acc=k.r_acc; -- при годовых текущий остаток
-                  EXCEPTION WHEN NO_DATA_FOUND THEN s_old_ := 0;
-                  end;
-                  --logger.info('KORR99-1: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
-               ElsIf TO_CHAR (b_date, 'YYYYMM') > TO_CHAR (dat31_, 'YYYYMM') THEN
-                  vob_ := 96; -- корректирующие
-                  -- узнать предыдущие остатки
-                  s_old_ := k.sz;
-                  -- logger.info('KORR99-2: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
-               ELSE
-                  vob_ := 6;  -- обычные
-                  -- узнать предыдущие остатки
-                  s_old_ := k.sz;
-                  -- logger.info('KORR99-3: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
-               END IF;
-
-               --новая сумма резерва
-               s_new_ := 0;
-
-               error_str := error_str||'1';
-               r7702_acc := k.r7_acc;
-               r7702_ := k.r7_nls;
-
-               -- узнать название нужных счетов для вставки в OPER
-               SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38) INTO nam_a_, nam_b_ FROM v_gl a, v_gl b
-               WHERE a.acc = k.r_acc and b.acc = r7702_acc;
-
-               error_str := error_str||'2';
-               -- проводка по расформированию резерва
-               IF mode_ = 0  THEN
-                  gl.REF (ref_);
-                  l_nd := substr(to_char(ref_),-10);
-               END IF;
-
-               error_str := error_str||'4';
-
-               --уменьшение резерва
-               diff_ := (s_old_ - s_new_);
-               -- logger.info('KORR99-5: vob_= ' || vob_||'old ='||s_old_||':new-'||s_new_||'-'||k.r_nls) ;
-               error_str := error_str||'5';
-
-               IF    vob_ = 99 THEN nazn_ := rasform_nazn_korr_year || nazn_;
-               ElsIf vob_ = 96 THEN nazn_ := rasform_nazn_korr      || nazn_;
-               Else                 nazn_ := rasform_nazn           || nazn_;
-               END IF;
-
-               error_str := error_str||'6';
-               if diff_ <> 0 THEN
-                  IF mode_ = 0 then
-
-                  INSERT INTO oper (REF   , tt    , vob    , nd    , dk  , pdat   , vdat  , datd  , datp  , nam_a , nlsa      , mfoa   , id_a   ,
-                                    nam_b , nlsb  , mfob   , id_b  , kv  , s      , kv2   , s2    , nazn  , userid)
-                            VALUES (ref_  , tt_   , vob_   , l_nd  , 1   , SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls   , gl.amfo, okpoa_ ,
-                                    nam_b_, r7702_, gl.amfo, okpoa_, k.kv, diff_  , 980   , gl.p_icurval (k.kv, diff_, dat31_), nazn_  , otvisp_);
-                  error_str := error_str||'7';
-                  gl.payv (l_pay, ref_, dat31_, tt_, 1, k.kv, k.r_nls, diff_, 980, r7702_, gl.p_icurval (k.kv, diff_, dat31_));
-                  error_str := error_str||'8';
-
-               end if;
-
-               INSERT INTO rez_doc_maket (tt   , vob , pdat , vdat   , datd  , datp      , nam_a , nlsa   , mfoa, id_a      , nam_b , nlsb,
-                                          mfob , id_b, kv   , s      , kv2   , s2        , nazn  , userid , dk  , branch_a  , ref   )
-                                  VALUES (tt_  , nvl(k.pr,0), SYSDATE, dat31_, b_date    , b_date, nam_a_ , k.r_nls,
-                                          k.nbs_rez||'/'||k.ob22_rez , okpoa_, nam_b_    , r7702_, k.NBS_7R||'/'||k.OB22_7R , okpoa_, k.kv,
-                                          diff_, 980 , gl.p_icurval (k.kv, diff_, dat31_), nazn_ , userid_, 2   , k.branch  , ref_  );
-               error_str := error_str||'9';
-               end if;
+                  select acc into l_acc from accounts
+                  where nbs=k.nbs_7r and ob22 = k.ob22_7r and kv=980 and branch=k.branch and dazs is not null;
+                  -- или закрыт или поменяли БРАНЧ
+                  update accounts set dazs=null where acc=l_acc;
+               EXCEPTION WHEN NO_DATA_FOUND THEN
+                  p_error( 8, k.NBS_7r||'/'|| k.OB22_7r,null, null, 980, k.branch, k.NBS_REZ||'/'||k.OB22_REZ,
+                           k.kv, null,  k.sz, k.NBS_7r||'/'|| k.OB22_7r, 'Рахунок резерву - '||k.r_nls);
+                  fl := 5;
+               end;
+*/
             end if;
+            --logger.info('PAY1 : nbs_rez/ob22= ' || k.nbs_rez||'/'||k.ob22_rez|| ' NLS='||k.r_nls) ;
+            begin
+               savepoint sp;
+               -- Определение параметров клиента и счета
+               error_str :=null;
+               --формирование проводок
+               if fl = 0 then
+                  begin
+                     select * into par from NBS_OB22_PAR_REZ  where nbs_rez = k.nbs_rez and ob22_rez in (k.ob22_rez,'0') and rz=1;
+                  EXCEPTION  WHEN NO_DATA_FOUND THEN
+                     par.nazn      := '(?)';
+                  END;
+                  oo.nazn := par.nazn;
+                  --тип операции
+                  tt_ := 'ARE';
+                  -- Определяем необходимый вид VOB
 
-         exception when others then rollback to sp;
-            p_error( 9, null,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ, k.kv, null, k.sz,
-                     k.NBS_REZ||'/'||k.OB22_REZ||','||k.NBS_7r||'/'|| k.OB22_7r|| substr(sqlerrm,instr(sqlerrm,':')+1),error_str );
-         end;
-      end loop;
-      CLOSE c0;
-   end if;
+                  if b_date - dat31_ > l_day_year and dat01_=to_date('01-01-2016','dd-mm-yyyy')  THEN
+                     vob_ := 99; -- корректирующие годовые
+                     begin
+                        select ostc into s_old_ from accounts where acc=k.r_acc; -- при годовых текущий остаток
+                     EXCEPTION WHEN NO_DATA_FOUND THEN s_old_ := 0; 
+                     end;
+                     --logger.info('KORR99-1: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
+                  ElsIf TO_CHAR (b_date, 'YYYYMM') > TO_CHAR (dat31_, 'YYYYMM') THEN
+                     vob_ := 96; -- корректирующие
+                     -- узнать предыдущие остатки
+                     s_old_ := k.sz;
+                     -- logger.info('KORR99-2: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
+                  ELSE
+                     vob_ := 6;  -- обычные
+                     -- узнать предыдущие остатки
+                     s_old_ := k.sz;
+                     -- logger.info('KORR99-3: vob_= ' || vob_||'ostc='||s_old_||'-'||k.r_acc||'-'||k.r_nls) ;
+                  END IF;
+
+                  --новая сумма резерва
+                  s_new_ := 0;
+                  if s_old_ < 0 then-- увеличение резерва
+                     r7702_acc := k.f7_acc;
+                     r7702_    := k.f7_nls;
+                     r7702_bal := k.NBS_7f||'/'||k.OB22_7f;
+                     pap_77 (k.f7_acc,1); -- Корректировка признака актива-пассива по 7 кл.
+                     diff_     := -(s_old_ - s_new_);
+                     oo.dk := 0;
+                  else--уменьшение резерва
+                     r7702_acc := k.r7_acc;
+                     r7702_    := k.r7_nls;
+                     r7702_bal := k.NBS_7r||'/'||k.OB22_7r;
+                     pap_77 (k.r7_acc,2);
+                     diff_ := (s_old_ - s_new_);
+                     oo.dk := 1;
+                  end if;
+                  -- узнать название нужных счетов для вставки в OPER
+                  SELECT SUBSTR (a.nms, 1, 38), SUBSTR (b.nms, 1, 38) INTO nam_a_, nam_b_ FROM v_gl a, v_gl b
+                  WHERE a.acc = k.r_acc and b.acc = r7702_acc;
+                  error_str := error_str||'2';
+                  -- проводка по расформированию резерва
+                  IF mode_ = 0  THEN
+                     gl.REF (ref_);
+                     l_nd := substr(to_char(ref_),-10);
+                  END IF;
+                  error_str := error_str||'5';
+                  IF    vob_ = 99 THEN oo.nazn := rasform_nazn_korr_year || oo.nazn;
+                  ElsIf vob_ = 96 THEN oo.nazn := rasform_nazn_korr      || oo.nazn;
+                  Else                 oo.nazn := rasform_nazn           || oo.nazn;
+                  END IF;
+                  error_str := error_str||'6';
+                  if diff_ <> 0 THEN
+                     IF mode_ = 0 then
+                        INSERT INTO oper (REF   , tt    , vob    , nd    , dk  , pdat   , vdat  , datd  , datp  , nam_a , nlsa      , mfoa   , id_a   ,
+                                          nam_b , nlsb  , mfob   , id_b  , kv  , s      , kv2   , s2    , nazn  , userid)
+                                  VALUES (ref_  , tt_   , vob_   , l_nd  , oo.dk, SYSDATE, dat31_, b_date, b_date, nam_a_, k.r_nls   , gl.amfo, okpoa_ ,
+                                          nam_b_, r7702_, gl.amfo, okpoa_, k.kv, diff_  , 980   , gl.p_icurval (k.kv, diff_, dat31_), oo.nazn  , otvisp_);
+                        error_str := error_str||'7';
+                        gl.payv (l_pay, ref_, dat31_, tt_, oo.dk, k.kv, k.r_nls, diff_, 980, r7702_, gl.p_icurval (k.kv, diff_, dat31_));
+                        error_str := error_str||'8';
+
+                     end if;
+
+                     INSERT INTO rez_doc_maket (tt   , vob , pdat , vdat   , datd  , datp      , nam_a , nlsa   , mfoa, id_a      , nam_b , nlsb,
+                                                mfob , id_b, kv   , s      , kv2   , s2        , nazn  , userid , dk  , branch_a  , ref   )
+                                        VALUES (tt_  , nvl(k.pr,0), SYSDATE, dat31_, b_date    , b_date, nam_a_ , k.r_nls,
+                                                k.nbs_rez||'/'||k.ob22_rez , okpoa_, nam_b_    , r7702_, r7702_bal , okpoa_, k.kv,
+                                                diff_, 980 , gl.p_icurval (k.kv, diff_, dat31_), oo.nazn , userid_, 2   , k.branch  , ref_  );
+                     error_str := error_str||'9';
+                  end if;
+               end if;
+            exception when others then rollback to sp;
+               p_error( 9, null,null, null, k.kv, k.branch,k.NBS_REZ||'/'||k.OB22_REZ, k.kv, null, k.sz,
+                        k.NBS_REZ||'/'||k.OB22_REZ||','||k.NBS_7r||'/'|| k.OB22_7r|| substr(sqlerrm,instr(sqlerrm,':')+1),error_str );
+            end;
+         end loop;
+         CLOSE c0;
+      end if;
    END;
 
    if mode_ = 0 THEN

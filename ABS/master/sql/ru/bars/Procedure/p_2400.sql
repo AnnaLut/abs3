@@ -53,7 +53,7 @@ DECLARE
 
 begin
 
-      if nal_ in ('1','5','7','B','C','D') THEN
+      if nal_ in ('0','1','2','5','7','B','C','D') THEN
 
       OPEN c0 FOR
          select t.ri, t.country, t.id   , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz   , t.branch,
@@ -70,12 +70,12 @@ begin
                                         decode(r.kat,1,1,2) = decode(o.s080,'0',decode(r.kat,1,1,2),o.s080) and
                                         r.custtype = decode(o.custtype,'0',r.custtype,o.custtype) and r.kv = decode(o.kv,'0',r.kv,o.kv) )
          where fdat = dat01_ and substr(r.id,1,4) <> 'CACP' and
+               decode(nal_,'0',-sign(r.rez),'2',-sign(r.rez),sign(r.rez)) = 1 and
                r.s250=decode(nal_,'8','8','A','8','B','8','C','8','D','8',decode(r.s250,'8','Z',r.s250)) and
-               nvl(decode(nal_,'0', rezn  , 'A', rezn  , '2',rezn  ,
-                               '5', rez_30, 'C', rez_30, '6',rez_30,
+               nvl(decode(nal_,'A', rezn  , '2',rez_30  , '5', rez_30, 'C', rez_30, '6',rez_30,
                                'D', REz_30, '8', r.rez , decode(rez_30,0,r.rez-rezn,r.rez-rez_30)),0) <> 0 ) t
          --счет резерва
-         left join v_gls080 ar on (t.NBS_REZ = ar.nbs    and ar.rz   = t.rz  and t.OB22_REZ = ar.ob22 and t.KV      = ar.kv and
+         left join v_gls080 ar on (t.NBS_REZ = ar.nbs    and ar.rz   = t.rz  and t.OB22_REZ = ar.ob22 and t.KV      = ar.kv and ar.pap = decode(nal_,'0',1,'2',1,2) and
                                    t.branch  = ar.BRANCH and ar.dazs is null and t.r_s080   = ar.s080 and t.country = ar.country
                                    )
          group by t.ri    , t.country, t.id , t.NBS_REZ, t.OB22_REZ, t.NBS_7f, t.OB22_7f, t.NBS_7r, t.OB22_7r, t.kv   , t.rz,
@@ -137,9 +137,9 @@ begin
       EXIT WHEN c0%NOTFOUND;
 
       if instr(k.r_nls,',')=0 THEN
-         If    nal_ IN ('1','4','B')         and k.sz   <> k.szn THEN
+         If    nal_ IN ('0','1','4','B')         and k.sz   <> k.szn THEN
             update nbu23_rez set nls_rez   = substr(k.r_nls,1,15), acc_rez   = k.r_acc,  ob22_rez  = k.ob22_rez  where ROWID = K.RI;
-         elsif nal_ IN ('5','6','7','C','D') and k.sz_30<> 0     THEN
+         elsif nal_ IN ('2','5','6','7','C','D') and k.sz_30<> 0     THEN
             update nbu23_rez set nls_rez_30= substr(k.r_nls,1,15), acc_rez_30= k.r_acc, ob22_rez_30= k.ob22_rez  where ROWID = K.RI;
          else
             update nbu23_rez set nls_rez   = substr(k.r_nls,1,15), acc_rez   = k.r_acc, ob22_rez   = k.ob22_rez  where ROWID = K.RI;

@@ -207,9 +207,25 @@ begin
    END IF;
    -- определение параметров
    rezerv_23(dat01_);
+   -- 
+   begin
+      for k in ( select * from accounts where tip = 'REZ' and ostc < 0 and pap <> 1 ) 
+      LOOP
+         PAP_ACC (k.acc, 1);   
+      end LOOP;
+   end;
+   begin
+      for k in ( select * from accounts where tip = 'REZ' and ostc > 0 and pap <> 2 ) 
+      LOOP
+         PAP_ACC (k.acc, 2);   
+      end LOOP;
+   end;
+
    -- налоговый/не налоговый
    --PAY_23_ob22(dat01_, mode_, p_user,'0');
+   PAY_23_ob22(dat01_, mode_, p_user,'0');
    PAY_23_ob22(dat01_, mode_, p_user,'1');
+   PAY_23_ob22(dat01_, mode_, p_user,'2');
    PAY_23_ob22(dat01_, mode_, p_user,'5');
    --PAY_23_ob22(dat01_, mode_, p_user,'6');
    -- портфельный метод
