@@ -419,6 +419,8 @@ DECLARE
    and sq.msg_status <> 'ERROR';
    COMMIT;
 
+exception when no_data_found then
+null;
 END send_nd;
 
 --відправляє повідомлення (заглушка)
