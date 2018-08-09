@@ -2,9 +2,9 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
     ViewBag.Title = "Розбір картотек ";
 }
-<link rel="stylesheet" href="~/Areas/GL/CSS/nlStyle.css" />
+<link rel="stylesheet" href="~/Areas/GL/CSS/nlStyle.css?v1.1" />
 <script src="~/Areas/GL/Scripts/Services/NLService.js?v1.1"></script>
-<script src="~/Areas/GL/Scripts/Controllers/NLCtrl.js?v1.2"></script>
+<script src="~/Areas/GL/Scripts/Controllers/NLCtrl.js?v1.8"></script>
 
 <div ng-controller="NLController as nl">
 	<h1>@ViewBag.Title{{nl.tipTitle}}</h1>
@@ -48,4 +48,9 @@
         	</div>
 		</div>
 	</div>	
+    <div ng-show="nl.subFileSwift === true">
+        <div>
+            <textarea readonly id="SwiftInfo" cols="150"></textarea>
+        </div>
+    </div>	
 </div>

@@ -70,5 +70,19 @@ namespace BarsWeb.Areas.GL.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.OK, new { Msg = ex.Message });
             }
         }
+
+        [HttpGet]
+        [GET("api/gl/nl/GetSwiftInfo")]
+        public HttpResponseMessage GetSwiftInfo(decimal refid)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, new { RESULT = _repository.GetSwiftInfo(refid) } );
+            }
+            catch(Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { Msg = e.Message });
+            }
+        }
     }
 }
