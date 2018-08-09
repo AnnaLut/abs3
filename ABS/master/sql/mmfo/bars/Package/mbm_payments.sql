@@ -143,7 +143,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
    g_awk_body_defs constant varchar2(512) := ''
           ||'    - Сбербанк'    || chr(10);
 
-   G_BODY_VERSION    constant varchar2(64) := 'version 13.11 18.05.2016';
+   G_BODY_VERSION    constant varchar2(64) := 'version 13.12 09.08.2018';
 
    G_MODULE          constant char(3)      := 'KLB';    -- код модуля
    G_TRACE           constant varchar2(50) := 'MBM_PAYMENTS.';
@@ -2350,7 +2350,10 @@ begin
             add_dop_req(l_ref, case when p_kv = 840 then '50F'
                                     when p_kv = 978 then '50F'
                                     else '50K' end,
-                '/'||p_nlsa||'$nl$1/'||substr(p_fnamea,1,32)||'$nl$2/'||substr(p_adresa,1,32)||'$nl$3/'||substr(upper(p_ccodea),1,32),
+                '/'||p_nlsa||'$nl$1/'
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end,1,32)||'$nl$2/'
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresa,'TRANS') else p_adresa end,1,32)||'$nl$3/'
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(upper(p_ccodea),'TRANS') else upper(p_ccodea) end ,1,32),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             add_dop_req(l_ref, '52A', l_biccode,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
@@ -2358,19 +2361,35 @@ begin
                 add_dop_req(l_ref, '56A', p_swiftib,
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             end if;
-            add_dop_req(l_ref, '57A', case when p_coracbb is null then p_swiftbb else 
+            add_dop_req(l_ref, '57A', case when p_coracbb is null then p_swiftbb else
                 '/'|| p_coracbb || '$nl$' || p_swiftbb end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
+         
             add_dop_req(l_ref, '59',
-                '/'||substr(upper(p_nlsb),1,32)||'$nl$'||substr(p_fnameb,1,32)||'$nl$'||case when length(p_fnameb)>32 then substr(p_fnameb,33,32)||'$nl$' else '' end ||substr(p_adresb,1,32)||'$nl$'||substr(p_adresb,33,32),
+                '/'||substr(upper(p_nlsb),1,32)||'$nl$'
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,1,32)||'$nl$'
+                   ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end)>32 then substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,33,32)||'$nl$' else '' end 
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end,1,32)||'$nl$'
+                   ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end)>32 then substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end,33,32) else '' end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-            add_dop_req(l_ref, '70', trim(substr(p_nazn,1,34)||case when substr(p_nazn,35,34) is not null then '$nl$' else '' end||substr(p_nazn,35,34)||
+                
+            add_dop_req(l_ref, '70', 
+            
+            case when p_kv=643 then 
+            trim(substr(p_nazn,1,34)||case when substr(p_nazn,35,34) is not null then '$nl$' else '' end  ||substr(p_nazn,35,34)||
             case when substr(p_nazn,69,34) is not null then  '$nl$' else '' end ||substr(p_nazn,69,34)||
-            case when substr(p_nazn,102,34) is not null then '$nl$' else '' end||substr(p_nazn,102,34)),
+            case when substr(p_nazn,102,34) is not null then '$nl$' else '' end||substr(p_nazn,102,34))
+            else 
+            trim(substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),1,34)||case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),35,34) is not null then '$nl$' else '' end  ||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),35,34)||
+            case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),69,34) is not null then  '$nl$' else '' end ||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),69,34)||
+            case when substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34) is not null then '$nl$' else '' end||substr(bars.bars_swift.StrToSwift(p_nazn,'TRANS'),102,34)) 
+            end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
+                
             add_dop_req(l_ref, '71A', substr(p_sw71a,1,34),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-            add_dop_req(l_ref, '72', substr(p_dopreq,1,30),
+                
+            add_dop_req(l_ref, '72', substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_dopreq,'TRANS') else p_dopreq end,1,32),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
 
             if (l_blank_ser is not null and l_blank_num is not null) then
