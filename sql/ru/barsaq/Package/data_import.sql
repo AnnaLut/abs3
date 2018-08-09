@@ -1,5 +1,3 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** Run *
  PROMPT ===================================================================================== 
@@ -3574,6 +3572,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_creatingdate  date;
     l_date          date;
     l_acc           bars.accounts.acc%type;
+    l_acc_a_rec     bars.accounts%rowtype;
+    l_acc_b_rec     bars.accounts%rowtype;
     l_narrative_rows    integer;
     l_narrative_rownum  varchar2(2);
     l_narrative_attr    varchar2(30);
@@ -3738,7 +3738,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         
         -- перевірка рахунка отримувача
         begin
-          select 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
+          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
 
           if l_is_nls_closed = 1 then
             raise_application_error(-20000, 'Рахунок отримувача закритий');
@@ -3774,17 +3774,31 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     -- внутренний документ
     if     l_typeid = 'P_INT' then
         logger.trace('internal document');
+ 
+       select * 
+          into l_acc_a_rec
+          from bars.accounts
+         where nls = l_doc.nls_a
+           and kv = l_doc.kv; 
+        select * 
+          into l_acc_b_rec
+          from bars.accounts
+         where nls = l_doc.nls_b
+           and kv = nvl(l_doc.kv2, l_doc.kv);
         --
         -- вычисляем код операции
-        if    l_nbsa in ('2605','2625') and l_nbsb in ('2605','2625')
+       -- if    l_nbsa in ('2605','2625') and l_nbsb in ('2605','2625')
+        if l_acc_a_rec.tip like 'W4%' and l_acc_b_rec.tip like 'W4%'
         then
             l_doc.tt := 'IB6'; -- Internet-Banking: Переказ між карт.рахунками
             --
-        elsif l_nbsa in ('2605','2625') and l_nbsb not in ('2605','2625')
+      --  elsif l_nbsa in ('2605','2625') and l_nbsb not in ('2605','2625')
+        elsif l_acc_a_rec.tip like 'W4%' and l_acc_b_rec.tip not like 'W4%'
         then
             l_doc.tt := 'IB3'; -- Internet-Banking: Списання з карт.рахунку внутрішнє
             --
-        elsif l_nbsa not in ('2605','2625') and l_nbsb in ('2605','2625','2655')
+       -- elsif l_nbsa not in ('2605','2625') and l_nbsb in ('2605','2625','2655')
+        elsif l_acc_a_rec.tip not like 'W4%' and l_acc_b_rec.tip like 'W4%'
         then
             l_doc.tt := 'IB5'; -- Internet-Banking: Поповнення карт.рахунку внутрішнє
             --
@@ -3799,7 +3813,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
             l_idb      bars.customer.okpo%type;
 	    	l_idb_bank bars.customer.okpo%type;
         begin
-	    select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and rownum<2) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
+        select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
             where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nls=l_doc.nls_b and a.kv=l_doc.kv;
             if l_idb<>l_doc.id_b and l_idb_bank<>l_doc.id_b then
                 raise_application_error(-20000,
@@ -3816,9 +3830,17 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         logger.trace('interbank document');
         -- проверка наличия обязательных только для данной операции атрибутов
         check_mandatory_attr(l_body, 'PAYEE_BANK_CODE');
+
+        select * 
+          into l_acc_a_rec
+          from bars.accounts a
+         where a.nls = l_doc.nls_a
+           and a.kv = l_doc.kv
+           and a.dazs is null;
         --
         -- вычисляем код операции
-        if l_nbsa in ('2605','2625')
+       -- if l_nbsa in ('2605','2625')
+        if l_acc_a_rec.tip like 'W4%'
         then
             l_doc.tt := 'IB4'; -- Internet-Banking: Списання з карт.рахунку міжбанк
             --
