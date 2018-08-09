@@ -15,7 +15,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.013          25.07.2018
+% VERSION     :   v.18.014          07.08.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -28,6 +28,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+07.08.2018  новая корреспонденция дт2600-кт3800, операция OW1,OW2
 25.07.2018  покупка: zayavka.f092 может выбираться по параметрам проводки
 22.06.2018  операции forex: анализ доп.параметра FOREX
 13.06.2018  дополнительная обработка операций 2900-3739 для RNK ="наш банк"
@@ -250,7 +251,8 @@ IS
             if nls_ like '2900205%' and nlsk_ like '29003%' or
                --nls_ like '2909%' and nlsk_ like '2900%' or
                nls_ like '2625%' and nlsk_ like '2900%' or
-               nls_ like '2625%' and nlsk_ like '3800%'
+               nls_ like '2625%' and nlsk_ like '3800%' or
+               nls_ like '2620%' and nlsk_ like '3800%'
             then
                p_value_ := '216';
                d1#D3_ := '16';
@@ -613,7 +615,12 @@ BEGIN
                             AND LOWER (TRIM (o.nazn)) like '%перерах%кошт_в%продаж%'
                             AND instr(LOWER (o.nazn),'продаж не ') =0
                            )
-                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2620','2625','2630','2525','2546')
+                        OR (    SUBSTR (o.nlsd, 1,4) ='2620'
+                            AND substr (o.nlsk, 1,4) ='3800'
+                            AND o.tt in ('OW1','OW2')
+                            AND mfou_ = 300465
+                           )
+                        OR (    SUBSTR (o.nlsd, 1, 4) in ('2610','2625','2630','2525','2546')
                             AND substr (o.nlsk, 1,4) ='3800'
                             AND o.tt !='DPT'
                             AND mfou_ = 300465
@@ -676,6 +683,16 @@ BEGIN
 
       delete from otcn_prov_temp a
       where a.nlsk like '2625%'
+        and a.nlsd like '3800%'
+        and not exists ( select 1
+                         from operw b
+                         where b.ref = a.ref
+                           and b.tag like 'OW_AM%'
+                           and b.value like '%/980%'
+                       );
+
+      delete from otcn_prov_temp a
+      where a.nlsk like '2620%'
         and a.nlsd like '3800%'
         and not exists ( select 1
                          from operw b
