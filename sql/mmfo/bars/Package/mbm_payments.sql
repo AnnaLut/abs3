@@ -143,7 +143,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
    g_awk_body_defs constant varchar2(512) := ''
           ||'    - Сбербанк'    || chr(10);
 
-   G_BODY_VERSION    constant varchar2(64) := 'version 13.12 09.08.2018';
+   G_BODY_VERSION    constant varchar2(64) := 'version 13.15 09.08.2018';
 
    G_MODULE          constant char(3)      := 'KLB';    -- код модуля
    G_TRACE           constant varchar2(50) := 'MBM_PAYMENTS.';
