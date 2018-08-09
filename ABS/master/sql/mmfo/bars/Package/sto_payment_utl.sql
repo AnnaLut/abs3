@@ -492,7 +492,7 @@ create or replace package body sto_payment_utl as
 
     procedure inform_customer(
         p_customer_id in integer,
-        p_message in varchar2)
+        p_message     in varchar2)
     is
         l_msgid integer;
         l_customer_phone varchar2(30 char);
@@ -1062,7 +1062,7 @@ create or replace package body sto_payment_utl as
         l_s varchar2(250);
         l_dk oper.dk%type;
     begin
-     bc.go('/'||f_ourmfo_g||'/');
+    
      for k in (
         SELECT o.ref, sp.order_id, sp.id, o.dk
           FROM sto_payment sp, STO_PAYMENT_DOCUMENT_LINK spdl, oper o
@@ -1102,7 +1102,7 @@ create or replace package body sto_payment_utl as
     procedure auto_try
     is
     begin
-     bc.go('/'||f_ourmfo_g||'/');
+     
      for k in (
        SELECT o.ref, sp.order_id, sp.id, spdl.payment_id, p.f_n, p.dk
           FROM sto_payment sp, STO_PAYMENT_DOCUMENT_LINK spdl, oper o, ow_pkk_que p
