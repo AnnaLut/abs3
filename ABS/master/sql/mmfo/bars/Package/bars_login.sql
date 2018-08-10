@@ -1136,9 +1136,11 @@ $end
     is
         l_client_identifier t_sess_clientid;
         l_programs_with_finite_session string_list;
+        last_activity_at date;
+        l_cleared boolean;
     begin
         dbms_application_info.set_action( 'BARS_LOGIN.CLEAR_EXPIRED_SESSION');
-        ddl_utl.refresh_mview_autonomous('mv_global_context');
+        --ddl_utl.refresh_mview_autonomous('mv_global_context');
 
         l_programs_with_finite_session := tools.string_to_words(branch_attribute_utl.get_value(p_branch_code => '/',
                                                                                                p_attribute_code => 'PROGRAMS_WITH_FINITE_SESSION'),
@@ -1150,10 +1152,10 @@ $end
         l_client_identifier := get_session_clientid();
   
         -- Проходим по всем зарегистрир. сессиям, кроме собственной
-        for i in (select s.*, to_date(c.last_activity_at, DATETIME_FORMAT) last_activity_at, u.logname
+        for i in (select s.*, u.logname
                   from   staff_user_session s
                   left join staff$base u on u.id = s.user_id
-                  left join mv_global_context c on c.client_identifier = s.client_identifier
+                  --left join mv_global_context c on c.client_identifier = s.client_identifier
                   where  s.client_identifier <> l_client_identifier and
                          s.logout_time is null) loop
 
@@ -1162,32 +1164,50 @@ $end
             if (nvl(tools.contains_at_least_one(i.program_name, l_programs_with_finite_session), 'N') = 'Y') then
                 -- время последней активности более часа назад (MAX_SESSION_TIMEOUT = 60 минут) или
                 -- если время последней активности отсутсвует, то не более суток с момента входа в систему
-                if (i.last_activity_at < sysdate - MAX_SESSION_TIMEOUT / 60 / 24 or (i.last_activity_at is null and i.login_time < sysdate - 1 / 24)) then
+                --if (i.last_activity_at < sysdate - MAX_SESSION_TIMEOUT / 60 / 24 or (i.last_activity_at is null and i.login_time < sysdate - 1 / 24)) then
                     -- на всякий случай проверяем наличие активной оракловой сессии для данного клиентского идентификатора,
                     -- если активная сессия Oracle существует, значит запустили что-то очень длинное - оставляем сессию дорабатывать то что начато,
                     -- иначе устанавливаем кл. идентификатор чужой сессии для доступа к ее контекстам и очищаем их
-                    if (check_if_ora_session_is_active(i.client_identifier) = 'N') then
-                        drop_user_session(i.client_identifier);
-                        bars_audit.info('Сесію користувача ' || i.logname || ' (' || i.client_identifier || ') завершено через неактивність' || chr(10) ||
-                                        'Остання активність  : ' || to_char(i.last_activity_at, DATETIME_FORMAT) || chr(10) ||
-                                        'Час входу в систему : ' || to_char(i.login_time, DATETIME_FORMAT));
+                if (check_if_ora_session_is_active(i.client_identifier) = 'N') then
 
-                        set_user_clientid(i.client_identifier);
-                        clear_session_context();
-                        set_user_clientid(l_client_identifier);
+                    set_user_clientid(i.client_identifier);
+                    begin
+                      last_activity_at := to_date(GREATEST(sys_context('BARS_GLOBAL', 'LAST_CALL'), sys_context('BARS_CONTEXT', 'LAST_CALL')), DATETIME_FORMAT);
+                    exception
+                      when others then
+                        last_activity_at := null;
+                    end;
+                    l_cleared := false;
+                    if (last_activity_at < sysdate - MAX_SESSION_TIMEOUT / 60 / 24 or (last_activity_at is null and i.login_time < sysdate - 1 / 24)) then
+                       drop_user_session(i.client_identifier);
+                       clear_session_context();
+                       l_cleared := true;
+                    end if;
+                        
+                    set_user_clientid(l_client_identifier);
+                    if l_cleared then
+                       bars_audit.info('Сесію користувача ' || i.logname || ' (' || i.client_identifier || ') завершено через неактивність' || chr(10) ||
+                                       'Остання активність  : ' || last_activity_at || chr(10) ||
+                                       'Час входу в систему : ' || to_char(i.login_time, DATETIME_FORMAT));                      
                     end if;
                 end if;
+                --end if;
             else
                 -- пробуем найти сессию Oracle - если сессии нет, очищаем контекст
                 if (check_if_ora_session_is_alive(i.client_identifier) = 'N') then
-                    drop_user_session(i.client_identifier);
-                    bars_audit.info('Сесію користувача ' || i.logname || ' (' || i.client_identifier || ') завершено через неактивність' || chr(10) ||
-                                    'Остання активність  : ' || to_char(i.last_activity_at, DATETIME_FORMAT) || chr(10) ||
-                                    'Час входу в систему : ' || to_char(i.login_time, DATETIME_FORMAT));
-
                     set_user_clientid(i.client_identifier);
+                    begin
+                      last_activity_at := to_date(GREATEST(sys_context('BARS_GLOBAL', 'LAST_CALL'), sys_context('BARS_CONTEXT', 'LAST_CALL')), DATETIME_FORMAT);
+                    exception
+                      when others then
+                        last_activity_at := null;
+                    end;
+                    drop_user_session(i.client_identifier);
                     clear_session_context();
                     set_user_clientid(l_client_identifier);
+                    bars_audit.info('Сесію користувача ' || i.logname || ' (' || i.client_identifier || ') завершено через неактивність' || chr(10) ||
+                                    'Остання активність  : ' || last_activity_at|| chr(10) ||
+                                    'Час входу в систему : ' || to_char(i.login_time, DATETIME_FORMAT));                    
                 end if;
             end if;
         end loop;
@@ -1202,7 +1222,7 @@ $end
             -- Выпускаем ошибку
             raise;
     end;
-
+	
     procedure clear_session(
         p_client_id varchar2,
         p_kill_session in integer default 1)
