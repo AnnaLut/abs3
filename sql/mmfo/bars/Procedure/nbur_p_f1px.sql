@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 1PX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.005 06/08/2018
+% VERSION     :  v.16.006 09/08/2018 (06/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.005  06/08/2018';
+  ver_          char(30)  := 'v.16.006  09/08/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   cEKP                   constant varchar2(100 char) := 'A1P001';
@@ -150,7 +150,7 @@ BEGIN
                                    , t.ref
                                    , t.nd
                                    , t.branch
-                                   , t.field_value znap
+                                   , trim(t.field_value) znap
                                    , t.acc_id
                                    , t.nbuc
                             from v_nbur_#1p_dtl t
@@ -254,7 +254,7 @@ BEGIN
                                    , null ref
                                    , null nd
                                    , null branch
-                                   , t.field_value znap
+                                   , trim(t.field_value) znap
                                    , null acc_id
                                    , t.nbuc
                             from v_nbur_#1p t
