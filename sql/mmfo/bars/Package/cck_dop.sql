@@ -6,7 +6,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.CCK_DOP IS
 
-  G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'version 6.2 17.06.2018';
+  G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'version 6.3 22.06.2018';
 
   -- ===============================================================================================
   -- Public types declarations
@@ -185,6 +185,19 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
                      p_urov in varchar2 default null);
 
 function get_prod_old(p_prod varchar2) return varchar2;
+
+function get_kk1_crd (p_nls  in accounts.nls%type
+                     ,p_kv   in accounts.kv%type
+                     ,p_nlsa in oper.nlsa%type
+                     )
+  return accounts.nls%type;
+
+function get_amount_kkw (p_ref in oper.ref%type)
+  return number;
+
+function get_kkw_crd (p_ref in oper.ref%type)
+  return oper.nlsb%type;
+
 -------------------------------------------------------
   /**
   * header_version - возвращает версию заголовка пакета CCK
@@ -201,13 +214,10 @@ END CCK_DOP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.05 17/06/2018';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.1 22/06/2018';
 
-  /*
- 27.11.2017 Sta+Вика Семенова : При авторизации кред.линий (Ген.договора - VIDD=2,3) при типе авторизации 1 (полная авторизация)
-              автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами Ген.договора (валюта, % ставка, база начисления)
-
-  28/03/2017 Приведение дисконта в формат NNNNNN.NN
+   /*
+   22/06/2018 COBUMMFO-8206 - добавлена логика для расщепления операции КК1 при перечислении средств на карточный счет
   02/03/2017 вызов стандартной процедуры авторизации перенесен после открытия счетов
   15/02/2017 COBUSUPABS-5326
               3.1    При повній авторизації кредитних договорів з типами:
@@ -260,12 +270,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
 
   -- Для Сбербанка
 --------------------------------------------------------------
---открітие КД из простого ВЕБ
+--открытие КД из простого ВЕБ
 PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK        in int,        nKV         in int,
                   SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
                   SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
                   METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
-                  dfDen       in int,        PROD_       in varchar2,
+                  dfDen       in int,        PROD_       in VARCHAR2,  --COBUSUPABS-7065
                   nBANK       number default null,        NLS         varchar2 default null,
                   PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
                   PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
@@ -282,9 +292,15 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
     SDATE_ date; -- день закл. договора кор-ный на праздник
     WDATE_ date; -- день оконч. договора кор-ный на праздник
     K_     int ; -- коэф для перевода коп в грн
-    ACC8_  int ;    NLS8_  accounts.nls%type;    INIC_  varchar2(30);
-    STOP_PRC EXCEPTION;    ret_    int;
-    acc_    int;    CC_KOM_ int;    NMS_    varchar2(38);    gpk2    int;    nTmp_ number;  nInt_ number := 0; S260_ varchar2(2);
+    ACC8_  int ;
+    NLS8_  accounts.nls%type;
+    INIC_  varchar2(30);
+    gpk2   int;
+    S260_  varchar2(2);
+    STOP_PRC EXCEPTION;
+    /* not used
+      ret_ int; acc_ int; CC_KOM_ int;
+      NMS_    varchar2(38); nTmp_ number;  nInt_ number := 0; */
 BEGIN
     ERR_Code    := null;    ERR_Message := NULL;
     logger.trace('CCK_DOP.CC_OPEN  Старт!');
@@ -294,6 +310,9 @@ BEGIN
     WDATE_ :=  WDATE;
     SDATE_ :=  SDATE;
 
+
+    -- проверки по гендоговорам
+    
     if prod_ is null then
        ERR_Message := 'Не знайдений код продукту. Вийдіть з функцiї й увiйдiть у неї ще раз';    ERR_Code    := 1;
        raise STOP_PRC;
@@ -480,7 +499,7 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
                   SDOG        in number,     SumSDI      in number,        fPROC       in number,     BASEY       in int,
                   SDATE       in DATE,       WDATE       in DATE,          GPK         in number,     METR        in int,
                   METR_R      in number,     METR_9      in number,        nFIN        in int,        nFREQ       in int,
-                  dfDen       in int,        PROD_       in INT, 
+                  dfDen       in int,        PROD_       in INT,
                   nBANK       number default null,        NLS         varchar2 default null,
                   PAWN        number , PAWN_S  number,  PAWN_RNK  int,  PAWNP  number,   PAWNP_S  number, PAWNP_RNK   int,
                   PAWN2       number , PAWN2_S number,  PAWN2_RNK int,  PAWNP2 number,   PAWNP2_S number, PAWNP2_RNK  int,
@@ -491,18 +510,18 @@ PROCEDURE CC_OPEN(ND_         in OUT int,    CC_ID_      in varchar2,      nRNK 
 ) is
 
 BEGIN
-      cck_dop.cc_open(    ND_ ,     CC_ID_,    nRNK,   nKV, 
+      cck_dop.cc_open(    ND_ ,     CC_ID_,    nRNK,   nKV,
                   SDOG,     SumSDI,    fPROC,  BASEY,
                   SDATE,    WDATE,     GPK,    METR,
                   METR_R,   METR_9,    nFIN,   nFREQ,
-                  dfDen,    PROD_,  --was int 
+                  dfDen,    to_char(PROD_),  --was int
                   nBANK,    NLS,
                   PAWN,     PAWN_S  ,  PAWN_RNK  ,  PAWNP  ,   PAWNP_S  , PAWNP_RNK   ,
                   PAWN2,    PAWN2_S ,  PAWN2_RNK ,  PAWNP2 ,   PAWNP2_S , PAWNP2_RNK  ,
                   PAWN3,    PAWN3_S ,  PAWN3_RNK ,  PAWNP3 ,   PAWNP3_S , PAWNP3_RNK  ,
                   PAWN4,    PAWN4_S ,  PAWN4_RNK ,  PAWNP4 ,   PAWNP4_S , PAWNP4_RNK  ,
-                  PAWN5,    PAWN5_S ,  PAWN5_RNK ,  PAWNP5 ,   PAWNP5_S , PAWNP5_RNK, Err_Code, Err_Message); 
-									
+                  PAWN5,    PAWN5_S ,  PAWN5_RNK ,  PAWNP5 ,   PAWNP5_S , PAWNP5_RNK, Err_Code, Err_Message);
+
 EXCEPTION WHEN OTHERS THEN
     ROLLBACK;
     if ERR_Message is null then
@@ -684,10 +703,10 @@ end builder_gpk;
   end;
 
   procedure CALC_SDI(nd_ in int, SUM_SDI in int) is
-    n_          int;
+    --n_          int;
     dat1        date; --дата выдачи
     l_SUM_KOM   int;
-    Err_        varchar2(2000);
+    --Err_        varchar2(2000);
     IrrE_       number; -- Эфф.ставка
     SUM_ALL_    int;
     ACRB_       int;
@@ -1389,8 +1408,9 @@ return; -- cobuprvnix-161
 
       return get_isp_by_branch(l_sb_row.branch);
   end get_isp_by_user;
-  
-   -- получение генерального договора для субдоговора
+
+
+	 -- получение генерального договора для субдоговора
   function get_gen_nd(p_ndg in cc_deal.nd%type)
     return cc_deal.nd%type is
     l_nd cc_deal.nd%type;
@@ -1399,7 +1419,7 @@ return; -- cobuprvnix-161
     select nd into l_nd
       from cc_deal t
 			 where t.nd = p_ndg
-			 and rownum = 1;		
+			 and rownum = 1;
 
     return l_nd;
   exception
@@ -1610,9 +1630,8 @@ begin
 --COBUPRVNIX-151 При авторизації Ген.договора по суб.договору надо убрать расчет эффект.ставки
 	elsif get_gen_nd(l_cd_row.nd) is not null then
 	  logger.info('CCK_DOP.cc_autor vidd ='||l_cd_row.vidd||', для субдоговору  nd='||to_char(l_cd_row.nd)||' ЕФ.ставки не розраховуються');
-  --COBUPRVNIX-151	
-  
-  else
+
+	else
       select count(*) into l_tmp_cnt from cc_many where nd = p_nd ;
       if (l_tmp_cnt = 0) then      calc_sdi( p_nd, null);  end if ;
   end if;
@@ -1746,10 +1765,9 @@ begin
                 sys_context('bars_context','user_branch');
 
   begin
-    
      -- параметры кредита
      select * into l_ccv from cc_v where nd = p_nd;
- 
+
      -- установить доступ уровня договора для возможности постановки виз
      -- прользователей уровня договора       -- bc.set_context;
      bc.subst_branch(l_ccv.branch);
@@ -1763,9 +1781,7 @@ begin
      if substr(l_nls9, 1, 2) = '#(' then      -- dynamic account number present
         execute immediate 'select '||substr(l_nls9,3,length(l_nls9)-3)||' from dual' into l_nls9;
      end if;
-     
-    l_nls9:= BRANCH_USR.GET_BRANCH_PARAM2('NLS_9900',0);
-   
+
      -- его наименование
     begin
      select substr(nms,1,38) into l_nms9 from accounts where nls=l_nls9 and kv=gl.baseval;
@@ -1876,9 +1892,12 @@ begin
             substr(l_nms9,   1,38),l_nls9    , gl.amfo, substr(nazn_,1,160),
             null , l_okpo,  l_okpo, null,null, 0,null , l_ccv.id);
 
-       exception when others then         -- вернуться в свою область видимости
-         bc.subst_branch(l_branch);      -- исключение бросаем дальше
-         raise_application_error(-20000,sqlerrm || chr(10) ||  dbms_utility.format_error_backtrace(), true);
+       exception when others then
+         -- вернуться в свою область видимости
+         bc.subst_branch(l_branch);
+         -- исключение бросаем дальше
+         raise_application_error(-20000,sqlerrm || chr(10) ||
+                                 dbms_utility.format_error_backtrace(), true);
        end;
        gl.payv(l_fl_opl, ref_, gl.bdate, 'ZAL', l_dk,  gl.baseval,l_new_nls,   k.sum,  gl.baseval,   l_nls9,   k.sum);
      end loop;
@@ -1942,6 +1961,70 @@ begin
 return l_prod_old;
 end get_prod_old;
 
+
+function get_kk1_crd (p_nls  in accounts.nls%type
+                     ,p_kv   in accounts.kv%type
+                     ,p_nlsa in oper.nlsa%type
+                     )
+  return accounts.nls%type
+  is
+  v_tip accounts.tip%type;
+  v_ret accounts.nls%type;
+begin
+  logger.info('p_nls = '||p_nls||', p_kv = '||p_kv||', p_nlsa = '||p_nlsa);
+  select tip 
+    into v_tip
+    from accounts a
+    where a.nls = p_nls
+      and a.kv = p_kv;
+
+  if v_tip like 'W4%' then
+    v_ret := bpk_get_transit(p_tran_type   => '20',
+                             p_nls_transit => p_nlsa,
+                             p_nls_pk      => p_nls,
+                             p_kv          => p_kv);
+  else
+    v_ret := p_nls;
+  end if;
+  return v_ret;
+exception 
+  when others then 
+    logger.info('CCK_DOP.GET_KK1_CRD: Помилка при визначенні дебетового рахунку: '||sqlerrm);
+    return p_nls;
+end get_kk1_crd;
+
+function get_amount_kkw (p_ref in oper.ref%type)
+  return number
+  is
+begin
+  logger.info('P_REF = '||p_ref);
+  for r in (select o.tt, o.nlsb, o.s, a.tip
+              from oper o, accounts a
+              where ref = p_ref
+                and o.nlsb = a.nls)
+  loop
+    if r.tt = 'KK1' and r.tip like 'W4%' then
+      logger.info('s = '||r.s);
+      return r.s;
+    else 
+      logger.info('s = 0');
+      return 0;
+    end if;
+  end loop;
+      logger.info('s = 0');
+  return 0;
+end get_amount_kkw;
+
+function get_kkw_crd (p_ref in oper.ref%type)
+  return oper.nlsb%type
+  is
+begin
+  for r in (select nlsb from oper where ref = p_ref)
+  loop
+    return r.nlsb;
+  end loop;
+  return null;
+end get_kkw_crd;
 -----------------------------------
 
   function header_version return varchar2 is
