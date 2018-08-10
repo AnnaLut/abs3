@@ -64,7 +64,7 @@ begin
 	TOBO VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''), 
 	ISP NUMBER(38,0), 
 	TAXF VARCHAR2(12), 
-	NOMPDV VARCHAR2(9), 
+	NOMPDV VARCHAR2(12), 
 	K050 CHAR(3), 
 	NREZID_CODE VARCHAR2(20), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
@@ -157,7 +157,10 @@ exception when others then
 /
 
 
-
+begin
+  execute immediate 'alter table CUSTOMER modify nompdv VARCHAR2(12)';
+end;
+/
 
 PROMPT *** Create  constraint PK_CUSTOMER ***
 begin   
@@ -362,7 +365,7 @@ grant ALTER,DEBUG,DELETE,FLASHBACK,INDEX,INSERT,ON COMMIT REFRESH,QUERY REWRITE,
 grant SELECT                                                                 on CUSTOMER        to FOREX;
 grant SELECT                                                                 on CUSTOMER        to IBSADM_ROLE;
 grant SELECT                                                                 on CUSTOMER        to KLB;
-grant SELECT,SELECT                                                          on CUSTOMER        to KLBX;
+grant SELECT                                                                 on CUSTOMER        to KLBX;
 grant SELECT                                                                 on CUSTOMER        to OBPC;
 grant SELECT                                                                 on CUSTOMER        to OPERKKK;
 grant SELECT                                                                 on CUSTOMER        to PFU with grant option;

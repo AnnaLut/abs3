@@ -68,7 +68,7 @@ begin
 	TOBO VARCHAR2(30) DEFAULT NULL, 
 	ISP NUMBER(38,0), 
 	TAXF VARCHAR2(12), 
-	NOMPDV VARCHAR2(9), 
+	NOMPDV VARCHAR2(12), 
 	K050 CHAR(3), 
 	EFFECTDATE DATE, 
 	GLOBAL_BDATE DATE, 
@@ -83,6 +83,10 @@ exception when others then
 end; 
 /
 
+begin
+  execute immediate 'alter table CUSTOMER_UPDATE modify nompdv VARCHAR2(12)';
+end;
+/
 
 
 
