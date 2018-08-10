@@ -234,7 +234,8 @@ namespace Bars.Application
                             return;
                         }
                     }
-                    else if (pageFileName != "synchead.asmx" && req.Path != "/barsroot/messagesctrl/count/")
+                    //else if (pageFileName != "synchead.asmx" && req.Path != "/barsroot/messagesctrl/count/")
+                    else if (pageFileName != "synchead.asmx" && !req.Path.Contains("/barsroot/messagesctrl/count/"))
                         app.Context.Session["LastAccess"] = DateTime.Now;
                 }
                 // ƒостаем из сесии идентификацию пользовател€, сохраненную на логине

@@ -29,11 +29,11 @@ function reloadMessage() {
     butt.addClass('active');
     var messBlock = $('#userMessage');
 
-    messBlock.load('/barsroot/messagesctrl/index/', function() {
+    messBlock.load('/barsroot/messagesctrl/index/', { userId: $('#curentUserIdentifier').val() }, function () {
         messBlock.parent().loader('remove');
     });
 
-    messBlock.popupBox({ selector: butt, rightMargin: 65, onClose: function() { butt.removeClass('active'); } });
+    messBlock.popupBox({ selector: butt, rightMargin: 65, onClose: function () { butt.removeClass('active'); } });
     messBlock.parent().loader();
 }
 
@@ -111,7 +111,7 @@ function reloadAudit() {
     auditBlock.load('/barsroot/security/account/audit/', function () {
         auditBlock.parent().loader('remove');
     });
-    auditBlock.popupBox({ selector: buttAudit, rightMargin: 125, onClose: function() { buttAudit.removeClass('active'); } });
+    auditBlock.popupBox({ selector: buttAudit, rightMargin: 125, onClose: function () { buttAudit.removeClass('active'); } });
     auditBlock.parent().loader();
 }
 
@@ -253,32 +253,32 @@ function logout(prepareLogoutUrl, logoutUrl) {
     });
 }
 
-/* ******** */ 
+/* ******** */
 
-$(document).ready(function () {    
+$(document).ready(function () {
 
     var branches = new kendo.data.HierarchicalDataSource({
         transport: {
             read: function (options) {
-                var id = options.data.BRANCH || 'null'; 
+                var id = options.data.BRANCH || 'null';
                 $.ajax({
                     url: '/barsroot/api/kernel/headerbranches/get',
-                    dataType: "json",   
+                    dataType: "json",
                     data: { id: id.replace(/\s+/g, '') },
-                    success: function (result) {    
+                    success: function (result) {
                         options.success(result);
                     },
                     error: function (result) {
                         options.error(result);
                     }
                 });
-            }            
+            }
         },
         schema: {
             model: {
                 id: "BRANCH",
                 hasChildren: "HAS_CHILD"
-            }          
+            }
         }
     });
 
@@ -287,9 +287,9 @@ $(document).ready(function () {
             e.preventDefault();
         } else {
             var branch = e.sender._current.context.children[0].innerText,
-            requestData = {
-                branch: branch.replace(/\s+/g, '')
-            }
+                requestData = {
+                    branch: branch.replace(/\s+/g, '')
+                }
             $.ajax({
                 type: 'POST',
                 url: '/barsroot/api/kernel/headerbranches/post',
@@ -310,6 +310,6 @@ $(document).ready(function () {
             // expand all
             //this.expand(".k-item");                        
         }
-    });   
-  
+    });
+
 });

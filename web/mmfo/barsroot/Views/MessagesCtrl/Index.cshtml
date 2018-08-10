@@ -63,10 +63,10 @@
       }, 'json');
     return false;
   }
-  function loadMassages(page,elem) {
-    elem.load('/barsroot/messagesctrl/index/',{pageNum:page}, function () {
-      elem.parent().loader('remove');
-    });
+  function loadMassages(page, elem) {
+      elem.load('/barsroot/messagesctrl/index/', { userId: $('#curentUserIdentifier').val(), pageNum: page }, function () {
+          elem.parent().loader('remove');
+      });
   }
 </script>
 

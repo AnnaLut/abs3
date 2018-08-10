@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using barsroot;
 using BarsWeb.Models;
@@ -15,13 +16,16 @@ namespace BarsWeb.Controllers
     {
         EntitiesBars _entities;
 
-        public ActionResult Index(decimal pageNum = 1, decimal pageSize = 20)
+        public ActionResult Index(decimal? userId = null, decimal pageNum = 1, decimal pageSize = 20)
         {
-            using (var conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            //using (var conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+            using (OracleConnection conn = GetIndependentConnection())
             using (var cmd = conn.CreateCommand())
             {
                 var userMessages = new List<V_USER_MESSAGES>();
-                cmd.CommandText = "select MSG_ID,USER_ID,MSG_SENDER_ID,MSG_SUBJECT,MSG_TEXT,MSG_DATE,MSG_DONE,USER_COMMENT,DATE_TEXT,TODAY,MSG_DONE_TEXT from V_USER_MESSAGES order by msg_id desc";
+                //cmd.CommandText = "select MSG_ID,USER_ID,MSG_SENDER_ID,MSG_SUBJECT,MSG_TEXT,MSG_DATE,MSG_DONE,USER_COMMENT,DATE_TEXT,TODAY,MSG_DONE_TEXT from V_USER_MESSAGES order by msg_id desc";
+                cmd.CommandText = "select MSG_ID,USER_ID,MSG_SENDER_ID,MSG_TEXT,MSG_DATE,MSG_DONE,USER_COMMENT,DATE_TEXT,TODAY,MSG_DONE_TEXT from BARS.V_USER_MESSAGES_GENERAL where USER_ID = :p_user_id order by msg_id desc";
+                cmd.Parameters.Add("p_user_id", OracleDbType.Decimal, userId, System.Data.ParameterDirection.Input);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -30,7 +34,7 @@ namespace BarsWeb.Controllers
                         userMessage.MSG_ID = Convert.ToDecimal(reader["MSG_ID"]);
                         userMessage.USER_ID = Convert.ToDecimal(reader["USER_ID"]);
                         userMessage.MSG_SENDER_ID = Convert.ToDecimal(reader["MSG_SENDER_ID"]);
-                        userMessage.MSG_SUBJECT = Convert.ToString(reader["MSG_SUBJECT"]);
+                        //userMessage.MSG_SUBJECT = Convert.ToString(reader["MSG_SUBJECT"]);
                         userMessage.MSG_TEXT = Convert.ToString(reader["MSG_TEXT"]);
                         userMessage.MSG_DATE = Convert.ToDateTime(reader["MSG_DATE"]);
                         userMessage.MSG_DONE = Convert.ToDecimal(reader["MSG_DONE"]);
@@ -48,13 +52,22 @@ namespace BarsWeb.Controllers
             }
         }
 
-        public ActionResult Count()
+        public ActionResult Count(decimal? userId)
         {
-            using (var conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
-            using (var cmd = conn.CreateCommand())
+            try
             {
-                cmd.CommandText = "select count(*) from V_USER_MESSAGES";
-                return Content(Convert.ToString(cmd.ExecuteScalar()));
+                //using (var conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                using (OracleConnection conn = GetIndependentConnection())
+                using (OracleCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "select count(*) from BARS.V_USER_MESSAGES_GENERAL V where V.USER_ID = :p_user_id";
+                    cmd.Parameters.Add("p_user_id", OracleDbType.Decimal, userId, System.Data.ParameterDirection.Input);
+                    return Content(Convert.ToString(cmd.ExecuteScalar()));
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
             }
         }
 
@@ -62,13 +75,15 @@ namespace BarsWeb.Controllers
         {
             return View();
         }
-        public ActionResult Get()
+        public ActionResult Get(decimal? userId)
         {
             using (var conn = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
             using (var cmd = conn.CreateCommand())
             {
                 var userMessages = new List<V_USER_MESSAGES>();
-                cmd.CommandText = "select MSG_ID,USER_ID,MSG_SENDER_ID,MSG_SUBJECT,MSG_TEXT,MSG_DATE,MSG_DONE,USER_COMMENT,DATE_TEXT,TODAY,MSG_DONE_TEXT from V_USER_MESSAGES order by msg_id desc";
+                //cmd.CommandText = "select MSG_SUBJECT,MSG_ID,USER_ID,MSG_SENDER_ID,MSG_TEXT,MSG_DATE,MSG_DONE,USER_COMMENT,DATE_TEXT,TODAY,MSG_DONE_TEXT from V_USER_MESSAGES order by msg_id desc";
+                cmd.CommandText = "select MSG_ID,USER_ID,MSG_SENDER_ID,MSG_TEXT,MSG_DATE,MSG_DONE,USER_COMMENT,DATE_TEXT,TODAY,MSG_DONE_TEXT from BARS.V_USER_MESSAGES_GENERAL where USER_ID = :p_user_id order by msg_id desc";
+                cmd.Parameters.Add("p_user_id", OracleDbType.Decimal, userId, System.Data.ParameterDirection.Input);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -77,7 +92,7 @@ namespace BarsWeb.Controllers
                         userMessage.MSG_ID = Convert.ToDecimal(reader["MSG_ID"]);
                         userMessage.USER_ID = Convert.ToDecimal(reader["USER_ID"]);
                         userMessage.MSG_SENDER_ID = Convert.ToDecimal(reader["MSG_SENDER_ID"]);
-                        userMessage.MSG_SUBJECT = Convert.ToString(reader["MSG_SUBJECT"]);
+                        //userMessage.MSG_SUBJECT = Convert.ToString(reader["MSG_SUBJECT"]);
                         userMessage.MSG_TEXT = Convert.ToString(reader["MSG_TEXT"]);
                         userMessage.MSG_DATE = Convert.ToDateTime(reader["MSG_DATE"]);
                         userMessage.MSG_DONE = Convert.ToDecimal(reader["MSG_DONE"]);
@@ -149,6 +164,32 @@ namespace BarsWeb.Controllers
             public string UserLogin { get; set; }
             public string Message { get; set; }
             public string TypeId { get; set; }
+        }
+
+        private OracleConnection GetIndependentConnection()
+        {
+            string conStr = WebConfigurationManager.ConnectionStrings[Infrastructure.Constants.AppConnectionStringName].ConnectionString;
+            OracleConnection conn = new OracleConnection(conStr);
+
+            try { conn.Open(); }
+            catch (OracleException ex)
+            {
+                if (ex.Message.StartsWith("Connection request timed out"))
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    conn.Open();
+                }
+                else if (ex.Message.StartsWith("ORA-604"))
+                {
+                    conn.Dispose();
+                    throw ex;
+                }
+                else
+                    throw ex;
+            }
+            return conn;
         }
     }
 }
