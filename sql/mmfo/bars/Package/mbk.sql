@@ -1396,10 +1396,10 @@ END RO_deal;
            then p_sos:=15;
            else p_sos:=k.sos;
            end if;
-        else 
+        elsif p_fl <> 0 THEN 
            if k.nd >= p_nd THEN
               if k.ostcs<>0 or k.ostbs<>0 or k.ostfs<>0 or k.ostcp<>0 or k.ostbp<>0 or k.ostfp<>0 THEN
-                 l_txt := 'Неможливо перенести в архів! Існує залишок!';   raise_application_error( -20555, l_txt ); 
+                 l_txt := 'Неможливо перенести в архів! Існує залишок! ND =' || k.nd;   raise_application_error( -20555, l_txt ); 
                  --l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
                  --cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' є залишок /' );
               elsif  k.acr_dat+1 < k.wdate THEN
