@@ -26,6 +26,8 @@
     }
 }
 
+<input id="curentUserIdentifier" value="@Model.USER_ID" style="display:none;" />
+
 @if (barsroot.ServicesClass.GetGlobalParam("ENABLE_COMET_JS") == "1")
 {
     <script src="@Url.Content("~/comet/js/comet.js")"></script>
@@ -35,7 +37,10 @@ else
     <script type="text/javascript" src="/barsroot/Scripts/crypto/barsCrypto.js?v1.0.4"></script>
     <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
     <script>
+
       var initCheckTimeout = 10 * 1000; // wait for first check
+      //var initCheckTimeout = 100; // wait for first check
+
       var checkTimeout = 120 * 1000; // check messages timeout
       function startNewSession() {
           var data = { "url": location.href };
@@ -49,11 +54,14 @@ else
           window.setTimeout(function () { getMessCount(); }, initCheckTimeout);
       });
 
-      function getMessCount() {
+        function getMessCount() {
           var url = '/barsroot/messagesctrl/count/';
           $.ajax({
               type: 'POST',
               url: url,
+              data: {
+                  userId: $('#curentUserIdentifier').val()
+              },
               success: function (data) {
                   var count = parseInt(data, 10);
                   if (count != NaN) {
@@ -781,7 +789,7 @@ else
                 $elem.parent().addClass('active');
                 splitter.toggle("#right-pane", true);
                 kendo.ui.progress(pane, true);
-                pane.load('/barsroot/messagesctrl/index/', function() {
+                pane.load('/barsroot/messagesctrl/index/', { userId: $('#curentUserIdentifier').val()}, function() {
                     kendo.ui.progress(pane, false);
                 });
             }
