@@ -11,6 +11,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using Bars.Classes;
 using Bars.Configuration;
+using BarsWeb.Core.Logger;
 
 namespace Bars.Application
 {
@@ -19,6 +20,7 @@ namespace Bars.Application
     /// </summary>
     public sealed class BarsModule : IHttpModule, IRequiresSessionState
     {
+        private  IDbLogger _dbLogger;
         HttpApplication app = null;
         const string AUTHENTICATION = "CustomAuthentication";
         const string AUTHENTICATION_USESESSION = "CustomAuthentication.UseSession";
@@ -41,7 +43,7 @@ namespace Bars.Application
         public void Init(HttpApplication httpapp)
         {
             this.app = httpapp;
-
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
             // работа через формсовую аутентификацию (логин),
             //  перехватываем загрузку каждой страницы
             if (ConfigurationSettings.AppSettings[AUTHENTICATION] == "On")
@@ -141,6 +143,7 @@ namespace Bars.Application
             // ѕопытка почистить пам€ть при OutOfMemory исключении
             if (ex.Message.Contains("OutOfMemoryException"))
             {
+                _dbLogger.Error(string.Format("Messaage: {0}, Trace: {1} ", ex.Message, ex.StackTrace), "OutOfMemoryException");
                 GC.Collect(); 
                 GC.WaitForPendingFinalizers();
                 GC.Collect();
