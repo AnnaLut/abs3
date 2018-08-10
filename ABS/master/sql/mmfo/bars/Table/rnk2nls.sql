@@ -24,7 +24,7 @@ PROMPT *** Create  table RNK2NLS ***
 begin 
   execute immediate '
   CREATE TABLE BARS.RNK2NLS 
-   (	RNKFROM NUMBER, 
+   (RNKFROM NUMBER, 
 	RNKTO NUMBER, 
 	SDATE DATE, 
 	NLS VARCHAR2(15), 
@@ -96,7 +96,14 @@ exception when others then
  end;
 /
 
-
+prompt create index I_KF_RNK2RNK
+begin
+    execute immediate 'create index BARS.I_KF_RNK2RNK on bars.rnk2nls(kf, rnkfrom, rnkto) tablespace brsdyni compute statistics'; 
+exception
+    when others then
+        if sqlcode = -955 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  grants  RNK2NLS ***
 grant SELECT                                                                 on RNK2NLS         to BARSREADER_ROLE;
