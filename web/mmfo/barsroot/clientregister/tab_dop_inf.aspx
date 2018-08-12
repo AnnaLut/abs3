@@ -149,7 +149,7 @@
                         <td>
                         </td>
                         <td>
-                            <input class="tab_main_rekv_ed_style" id="ed_NOMPDV" tabindex="9" type="text" maxlength="10"
+                            <input class="tab_main_rekv_ed_style" id="ed_NOMPDV" tabindex="9" type="text" maxlength="12"
                                 onchange="ToDoOnChange();">
                         </td>
                     </tr>
