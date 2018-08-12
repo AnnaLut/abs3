@@ -8,6 +8,7 @@ var custRiskList = new Array();
 var custReptList = new Array();
 var custCatsList = new Array();
 var isOkpoExclusion = '0';
+var valOKPO = '';
 var g_PhotoType = "";
 
 // photo directions
@@ -945,10 +946,28 @@ function Check_DopInf() {
     obj_Parameters['NOM_DOG'] = gE(curTab, 'ed_NOM_DOG').value;
     obj_Parameters['LIM_KASS'] = gE(curTab, 'ed_LIM_KASS').value;
     obj_Parameters['LIM'] = gE(curTab, 'ed_LIM').value;
-    obj_Parameters['NOMPDV'] = gE(curTab, 'ed_NOMPDV').value;
     obj_Parameters['RNKP'] = gE(curTab, 'ed_RNKP').value;
     obj_Parameters['NOTESEC'] = gE(curTab, 'ed_NOTESEC').value;
-
+    obj_Parameters['NOMPDV'] = gE(curTab, 'ed_NOMPDV').value;
+    // перевірки для ІПН (COBUMMFO-7835)
+    if (obj_Parameters['NOMPDV'].trim() != '') {
+        if (obj_Parameters['CUSTTYPE'] === 'person') {
+            if (obj_Parameters['NOMPDV'] !== parent.valOKPO) {
+                alert('Ідн. податковий номер має співпадати з ідентифікаційним кодом. Введіть ІПН повторно.');
+                return false;
+            }
+        }
+        else {
+            if (obj_Parameters['NOMPDV'].slice(0, 7) !== parent.valOKPO.slice(0, 7)) {
+                alert('Ідн. податковий номер має відповідати ідентифікаційному коду. Введіть ІПН повторно.');
+                return false;
+            }
+            if (obj_Parameters['NOMPDV'].length != 12) {
+                alert('Довжина Ідн. податкового номера для ЮО має бути 12 символів. Введіть ІПН повторно.');
+                return false;
+            }
+        }
+    }
     return true;
 }
 function Check_DopReqv() {

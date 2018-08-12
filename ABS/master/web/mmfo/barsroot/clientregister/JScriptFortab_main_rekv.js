@@ -361,6 +361,7 @@ function checkOKPO(edit, validFromBase) {
         if (validFromBase == true)
             validOkpoFromBase(strOKPO);
     }
+    parent.valOKPO = strOKPO;
     return true;
     //alert(custType);
 }
@@ -682,7 +683,7 @@ function InitObjects() {
         $get('ed_NMKV').value = parent.obj_Parameters['NMKV'];
         $get('ed_NMKK').value = parent.obj_Parameters['NMKK'];
 
-        $get('ed_OKPO').value = parent.obj_Parameters['OKPO'];
+        $get('ed_OKPO').value = parent.valOKPO = parent.obj_Parameters['OKPO'];
         $get('ed_SAB').value = parent.obj_Parameters['SAB'];
         $get('ed_TOBOCd').value = parent.obj_Parameters['TOBO'];
         OnTOBOCdChange();

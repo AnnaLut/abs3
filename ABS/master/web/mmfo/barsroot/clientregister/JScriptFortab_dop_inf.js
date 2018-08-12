@@ -43,7 +43,58 @@ function InitObjects()
 			SetMB();
 		}
 		DisableAll(document, parent.obj_Parameters['ReadOnly']);		
-	}				
+    }	
+
+    $(function () {
+        // init для ІПН (COBUMMFO-7835)
+        var ctrl_NOMPDV = $('#ed_NOMPDV');
+
+        if (parent.obj_Parameters['CUSTTYPE'] === 'person') {
+            ctrl_NOMPDV.numberMask({ beforePoint: 10, pattern: /^[0-9]*$/ });
+            ctrl_NOMPDV.attr('maxlength', '10');
+        }
+        else
+            ctrl_NOMPDV.numberMask({ beforePoint: 12, pattern: /^[0-9]*$/ });
+
+        ctrl_NOMPDV.focus(function () {
+            var val_OKPO = parent.valOKPO;
+            if (parent.obj_Parameters['CUSTTYPE'] === 'person') {
+                if (this.value.length === 0) {
+                    this.value = val_OKPO;
+                    ToDoOnChange();
+                }
+            }
+            else {
+                if (this.value.length === 0 && val_OKPO.length > 0) {
+                    this.value = val_OKPO.slice(0, 7);
+                    ToDoOnChange();
+                }
+            }
+        });
+        // перевірки для ІПН (COBUMMFO-7835)
+        ctrl_NOMPDV.blur(function () {
+            if (this.value.length > 0) {
+                var reg = /^[0-9]*$/;//маска для вылідації цифр
+                if (!reg.test(this.value)) {
+                    alert('Ідн. податковий номер містить недопустимі символи. Введіть ІПН повторно.');
+                    return false;
+                }
+
+                if (parent.obj_Parameters['CUSTTYPE'] === 'person') {
+                    if (this.value !== parent.valOKPO) {
+                        alert('Ідн. податковий номер має співпадати з ідентифікаційним кодом. Введіть ІПН повторно.');
+                        return false;
+                    }
+                }
+                else {
+                    if (this.value.slice(0, 7) !== parent.valOKPO.slice(0, 7)) {
+                        alert('Ідн. податковий номер має відповідати ідентифікаційному коду. Введіть ІПН повторно.');
+                        return false;
+                    }
+                }
+            }
+        });
+    });
 	
     HideProgress();
 }
