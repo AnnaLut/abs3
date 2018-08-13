@@ -34,7 +34,7 @@ begin
    то курси не імпортуються, обов’язково  видається  повідомлення про некоректний час початку дії курсів.
 */
 
-  select max(fdat) into  fdat_ from bank_metals$local where kod = p_KOD;
+  select max(fdat) into  fdat_ from bank_metals$local where kod = p_KOD and kf =  sys_context('bars_context','user_mfo');
   pDAT_ := Trunc(fdat_)   ; -- дата предыдущих курсов
 
   If pDAT_ =  nDAT_ then
