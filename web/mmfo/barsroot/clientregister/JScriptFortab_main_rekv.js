@@ -243,6 +243,7 @@ function checkOKPO(edit, validFromBase) {
     if (custType == 'person' && rezId == 1) {
         //перевірка на релігійну віру
         if (strOKPO == '0000000000') {//десять нулів
+            parent.valOKPO = strOKPO;
             return true;
         }
         //перевірка довжини
@@ -307,6 +308,7 @@ function checkOKPO(edit, validFromBase) {
         var countryCode = getCountryCode();
         lenghtOKPO = 10;
         if (strOKPO == '0000000000') {//девять нулів
+            parent.valOKPO = strOKPO;
             return true;
         }
         if (strOKPO.length != lenghtOKPO && countryCode !== FREE_ECONOMIC_ZONE_KRYM_CODE) {
@@ -323,6 +325,7 @@ function checkOKPO(edit, validFromBase) {
     //для Юридичних осіб резидентів
     if (custType == 'corp' && rezId == 1) {
         if (strOKPO == '000000000') {//девять нулів
+            parent.valOKPO = strOKPO;
             return true;
         }
         //перевіка ключового розряду
@@ -338,6 +341,7 @@ function checkOKPO(edit, validFromBase) {
     //для Юридичних осіб нерезидентів
     if (custType == 'corp' && rezId == 2) {
         if (strOKPO == '000000000') {//девять нулів
+            parent.valOKPO = strOKPO;
             return true;
         }
 

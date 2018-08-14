@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../Scripts/jquery/jquery.bars.ui.js"></script>
     <script type="text/javascript" src="../Content/Themes/ModernUI/scripts/jquery.tiptip.js"></script>
 
-    <script type="text/javascript" src="JScriptFortab_dop_inf.js?v1.0.0"></script>
+    <script type="text/javascript" src="JScriptFortab_dop_inf.js?v1.0.1"></script>
     <script language="javascript" src="additionalFuncs.js"></script>
 
 </head>

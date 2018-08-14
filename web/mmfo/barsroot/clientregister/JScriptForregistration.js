@@ -952,13 +952,13 @@ function Check_DopInf() {
     // перевірки для ІПН (COBUMMFO-7835)
     if (obj_Parameters['NOMPDV'].trim() != '') {
         if (obj_Parameters['CUSTTYPE'] === 'person') {
-            if (obj_Parameters['NOMPDV'] !== parent.valOKPO) {
+            if (obj_Parameters['NOMPDV'] !== valOKPO) {
                 alert('Ідн. податковий номер має співпадати з ідентифікаційним кодом. Введіть ІПН повторно.');
                 return false;
             }
         }
         else {
-            if (obj_Parameters['NOMPDV'].slice(0, 7) !== parent.valOKPO.slice(0, 7)) {
+            if (obj_Parameters['NOMPDV'].slice(0, 7) !== valOKPO.slice(0, 7)) {
                 alert('Ідн. податковий номер має відповідати ідентифікаційному коду. Введіть ІПН повторно.');
                 return false;
             }
