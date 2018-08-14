@@ -6,6 +6,8 @@ using System.Web;
 using Bars.CommonModels;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
+using Ninject;
+using BarsWeb.Core.Logger;
 /// <summary>
 /// Summary description for ImportToFileHelper
 /// </summary>
@@ -15,11 +17,13 @@ namespace BarsWeb.Infrastructure.ImportToFileHelper
 
     public class ImportToFileHelper
     {
+
+
+        private IDbLogger _dbLogger;
         public ImportToFileHelper()
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
+
         }
         public string ExcelExportToZipCSVFiles(char columnSeparator, string fileName, IEnumerable<Dictionary<string, object>> dataRecords, List<ColumnDesc> ColumnsInfo)
         {
@@ -42,57 +46,56 @@ namespace BarsWeb.Infrastructure.ImportToFileHelper
             StreamWriter sw = GetStreamWriterToFile(path, windows);
             try
             {
-
-
                 // remove last 'columnSeparator' symbol
                 //sbHeaders.AppendLine();
                 sw.WriteLine("sep=" + columnSeparator);
                 sw.WriteLine(sbHeaders);
                 int rowCount = 0;
-
-                foreach (Dictionary<string, object> rowData in dataRecords)
-                {
-                    rowCount++;
-                    if (rowCount % 1000000 == 0)
+                
+                    foreach (Dictionary<string, object> rowData in dataRecords)
                     {
-                        sw.Close();
-                        sw.Dispose();
-                        string newFilePath = dirPath + "\\" + fileName + "_more_" + rowCount.ToString() + ".csv";
-                        filePathes.Add(newFilePath);
-                        sw = GetStreamWriterToFile(newFilePath, windows);
-                        sw.WriteLine("sep=" + columnSeparator);
-                        sw.WriteLine(sbHeaders);
-                    }
-
-                    //System.Text.StringBuilder sbRow = new System.Text.StringBuilder();
-                    string v = string.Empty;
-                    string sbRow = "";
-                    foreach (var colInfo in ColumnsInfo)
-                    {
-                        object o = rowData[colInfo.Name];
-                        if (o != null)
+                        rowCount++;
+                        if (rowCount % 1000000 == 0)
                         {
-                            v = o.ToString();
-                            if (colInfo == null)
-                                continue;
-                            //hack for A7 report
-                            if (colInfo.Type == "D")
-                            {
-                                if (!string.IsNullOrEmpty(v))
-                                    v = ((DateTime)o).ToString(string.IsNullOrEmpty(colInfo.Type) ? "ddMMyyyy" : colInfo.Type);
-                            }
-
-                            sbRow += v;
+                            sw.Close();
+                            sw.Dispose();
+                            string newFilePath = dirPath + "\\" + fileName + "_more_" + rowCount.ToString() + ".csv";
+                            filePathes.Add(newFilePath);
+                            sw = GetStreamWriterToFile(newFilePath, windows);
+                            sw.WriteLine("sep=" + columnSeparator);
+                            sw.WriteLine(sbHeaders);
                         }
-                        else
-                            sbRow += "";
 
-                        sbRow += columnSeparator;
+                        //System.Text.StringBuilder sbRow = new System.Text.StringBuilder();
+                        string v = string.Empty;
+                        string sbRow = "";
+                        foreach (var colInfo in ColumnsInfo)
+                        {
+                            object o = rowData[colInfo.Name];
+                            if (o != null)
+                            {
+                                v = o.ToString();
+                                if (colInfo == null)
+                                    continue;
+                                //hack for A7 report
+                                if (colInfo.Type == "D")
+                                {
+                                    if (!string.IsNullOrEmpty(v))
+                                        v = ((DateTime)o).ToString(string.IsNullOrEmpty(colInfo.Type) ? "ddMMyyyy" : colInfo.Type);
+                                }
+
+                                sbRow += v;
+                            }
+                            else
+                                sbRow += "";
+
+                            sbRow += columnSeparator;
+                        }
+                        sbRow = sbRow.Remove(sbRow.Length - 1, 1);
+                        sw.WriteLine(sbRow);
+
                     }
-                    sbRow = sbRow.Remove(sbRow.Length - 1, 1);
-                    sw.WriteLine(sbRow);
-
-                }
+                
                 sw.Close();
                 sw.Dispose();
                 sw = null;
@@ -118,6 +121,7 @@ namespace BarsWeb.Infrastructure.ImportToFileHelper
                 {
                     dir.Delete(true);
                 }
+                _dbLogger.Error(string.Format("ExcelExportToZipCSVFiles api/reporting/nbu/getexcel exception: {0}", e.Message), "ExcelExportToZipCSVFiles");
                 throw e;
             }
             finally
