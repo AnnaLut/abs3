@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 73X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001  27.03.2018
+% VERSION     :  v.18.003    26/07/018 (20/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_               char(30)  := 'v.18.001  20.06.2018';
+  ver_               char(30)  := 'v.18.003  26.07.2018';
 
   c_title            constant varchar2(200 char) := $$PLSQL_UNIT;
 
@@ -86,37 +86,45 @@ BEGIN
                             when z.r020_db = '1001' and z.r020_cr in ('3800') and z.d020 = '250' then '261'
                             when z.r020_db in ('1002') and z.r020_cr in ('3800') and z.d020 in ('250', '262') then '261'
                             when z.r020_db in ('1003') and z.r020_cr in ('3800') and z.d020 in ('250') then '262'
-                            when z.r020_db in ('1001', '1002', '1101', '1102') and z.r020_cr in ('3800') and z.d020 in ('000') then
-                                                                                                                                      case
-                                                                                                                                        when z.tt in ('BAK', 'TIK')
-                                                                                                                                             or z.cnt_bak > 0
-                                                                                                                                             or (
-                                                                                                                                                  z.kv in (959, 961, 962, 964)
-                                                                                                                                                  and (
-                                                                                                                                                        lower(z.comm) like '%отримано%' or
-                                                                                                                                                        lower(z.comm) like '%прийнято монети%' or
-                                                                                                                                                        lower(z.comm) like '%прийнято з гоу%' or
-                                                                                                                                                        lower(z.comm) like '%прийом%оу%'
-                                                                                                                                                      )
-                                                                                                                                                )
-                                                                                                                                      then
-                                                                                                                                        '000'
-                                                                                                                                      else
-                                                                                                                                        '261'
-                                                                                                                                      end
+                            when z.r020_db in ('1001', '1002', '1101', '1102') and z.r020_cr in ('3800') --and z.d020 in ('000') 
+                                then
+                                  case
+                                    when z.tt in ('BAK', 'TIK', 'Z16', 'TOU')
+                                         or z.cnt_bak > 0
+                                         or (
+                                              z.kv in (959, 961, 962, 964)
+                                              and (
+                                                    lower(z.comm) like '%отримано%' or
+                                                    lower(z.comm) like '%прийнято монети%' or
+                                                    lower(z.comm) like '%прийнято з гоу%' or
+                                                    lower(z.comm) like '%прийом%оу%'  OR
+                                                    lower(z.comm) like '%підкріплення%хоу%'     OR
+                                                    lower(z.comm) like '%оприбутковані%монети%'
+                                                  )
+                                            )
+                                  then
+                                    '000'
+                                  else
+                                    '261'
+                                  end
                             when z.r020_db in ('1003') and z.r020_cr in ('3800') and z.d020 in ('000') then '262'
                             when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002') and z.d020 in ('350') then '361'
                             when z.r020_db in ('3800') and z.r020_cr in ('1003') and z.d020 in ('350') then '362'
-                            when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002', '1101', '1102') and z.d020 in ('000') and lower(z.comm) not like 'вида%' and lower(z.comm) not like 'переда%' then
-                                                                                                                                                                                                            case
-                                                                                                                                                                                                              when z.tt = 'BAK'
-                                                                                                                                                                                                                   or z.cnt_bak > 0
-                                                                                                                                                                                                            then
-                                                                                                                                                                                                              '000'
-                                                                                                                                                                                                            else
-                                                                                                                                                                                                              '361'
-                                                                                                                                                                                                            end
-
+                            when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002', '1101', '1102')  --z.d020 in ('000') and 
+                                then
+                                    case
+                                      when z.tt in ('BAK', 'Z16','TOU')
+                                           or z.cnt_bak > 0
+                                           or LOWER(z.comm) like 'видан%' 
+                                           or LOWER(z.comm) like 'передан%' 
+                                           or LOWER(z.comm) like 'видача%' 
+                                           or lower(z.comm) like '%врегул%' 
+                                           or lower(z.comm) like '%відправ%'
+                                    then
+                                      '000'
+                                    else
+                                      '361'
+                                    end
                             when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002', '1101', '1102') and (lower(z.comm) like 'видан%' or lower(z.comm) like 'передан%' or lower(z.comm) like 'видача%' or lower(z.comm) like '%врегул%' or lower(z.comm) like '%відправ%') then '000'
                             when z.r020_db in ('3907') and z.r020_cr in ('1001', '1002') and z.tt = '189' and lower(z.comm) like '%підкріпл%' then '000'
                             when z.r020_db in ('3800') and z.r020_cr in ('1003') and z.d020 in ('000') then '362'
@@ -124,29 +132,32 @@ BEGIN
                             when z.r020_db not in ('1007', '1107', '3800') and substr(z.r020_cr, 1, 3) in ('100', '110') and z.d020 in ('000') then '000'
                             when substr(z.r020_db, 1, 3) in ('100', '110') and z.d020 not in ('280') and to_number(z.d020) < 300 then z.d020
                             when substr(z.r020_cr, 1, 3) in ('100', '110') and z.d020 not in ('380') and to_number(z.d020) > 300 then z.d020
-                            when substr(z.r020_db, 1, 3) in ('100', '110') then
-                                                                                case
-                                                                                  when z.kf = '300465' and z.d020 in ('310') then '270'
-
-                                                                                  when z.r020_cr in ('3800') and z.d020 = '348' then '248'
-                                                                                  when z.r020_cr in ('3800') and z.d020 = '342' then '242'
-                                                                                  when z.r020_cr in ('3800') and z.d020 = '361' then '361'
-                                                                                  when z.r020_cr in ('3800') and z.d020 = '362' then '362'
-                                                                                  when z.r020_cr in ('3800') and z.d020 = '363' then '363'
-                                                                                  when z.r020_cr in ('3800') and z.d020 = '370' then '370'
-                                                                                  when to_number(z.d020) > 300 then '200'
-                                                                                end
-                            when substr(z.r020_cr, 1, 3) in ('100', '110') then
-                                                                                case
-                                                                                  when z.r020_db in ('3800') and z.d020 = '248' then '342'
-                                                                                  when z.r020_db in ('3800') and z.d020 = '261' then '361'
-                                                                                  when z.r020_db in ('3800') and z.d020 = '262' then '361'
-                                                                                  when z.r020_db in ('3800') and z.d020 = '263' then '363'
-                                                                                  when z.r020_db in ('3800') and z.d020 = '270' then '370'
-                                                                                  when z.d020 not in ('280') and to_number(z.d020) < 300 then '300'
-                                                                                end
+                            when substr(z.r020_db, 1, 3) in ('100', '110') 
+                                then
+                                    case
+                                      when z.kf = '300465' and z.d020 in ('310') then '270'
+                                      when z.r020_cr in ('3800') and z.d020 = '348' then '248'
+                                      when z.r020_cr in ('3800') and z.d020 = '342' then '242'
+                                      when z.r020_cr in ('3800') and z.d020 = '361' then '361'
+                                      when z.r020_cr in ('3800') and z.d020 = '362' then '362'
+                                      when z.r020_cr in ('3800') and z.d020 = '363' then '363'
+                                      when z.r020_cr in ('3800') and z.d020 = '370' then '370'
+                                      when to_number(z.d020) > 300 then '200'
+                                      else z.d020
+                                    end
+                            when substr(z.r020_cr, 1, 3) in ('100', '110') 
+                                then
+                                    case
+                                      when z.r020_db in ('3800') and z.d020 = '248' then '348'
+                                      when z.r020_db in ('3800') and z.d020 = '261' then '361'
+                                      when z.r020_db in ('3800') and z.d020 = '262' then '362'
+                                      when z.r020_db in ('3800') and z.d020 = '263' then '363'
+                                      when z.r020_db in ('3800') and z.d020 = '270' then '370'
+                                      when z.d020 not in ('280') and to_number(z.d020) < 300 then '300'
+                                      else z.d020
+                                    end
                           end
-                         )
+                    )
                when '210' then 'A73001'
                when '221' then 'A73002'
                when '222' then 'A73003'
@@ -222,10 +233,22 @@ BEGIN
               from    (
                         select
                                t.*
-                               , (case when t.r020_db like '100%' then to_number(t.Nbuc_Cr) else to_number(t.Nbuc_Db) end) as nbuc
-                               , (case when t.r020_db like '100%' then t.Acc_Id_Cr else t.Acc_Id_Db end) as acc_id
-                               , (case when t.r020_db like '100%' then t.Acc_Num_Cr else t.Acc_Num_Db end) as acc_num
-                               , (case when t.r020_db like '100%' then t.Cust_Id_Cr else t.Cust_Id_Db end) as cust_id
+                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
+                                       then t.Nbuc_db 
+                                       else t.Nbuc_Cr 
+                                 end) as nbuc -- визначаємо код областіпо рахунку каси
+                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
+                                       then t.Acc_Id_Cr 
+                                       else t.Acc_Id_Db 
+                                 end) as acc_id
+                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
+                                       then t.Acc_Num_Cr 
+                                       else t.Acc_Num_Db 
+                                  end) as acc_num
+                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
+                                       then t.Cust_Id_Cr 
+                                       else t.Cust_Id_Db 
+                                  end) as cust_id
                                , sum(case when t.tt = 'BAK' then 1 else 0 end) over (partition by t.ref) CNT_BAK
                         from   v_nbur_dm_transactions t
                         where  (1 = 1)
