@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.006     30.05.2018
+% VERSION     : v.18.007     14.08.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 14.08.2018  обработка "второго" набора доп.параметров клиента с санкциями
  30.05.2018  DDD=270 -залишок коштiв на дату введення санкцiй (дата-1)
  16.03.2018  адрес клиента заполняется отдельным скриптом
  06.02.2018  обязательное заполнение кода DDD=310 при  отсутствии операций
@@ -292,7 +293,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
    dats_ := trunc(dat_, 'mm');
    
    for k in ( select c.okpo, c.codcagent, c.ise,
-                             c.nmk, c.adr, c.rnk,
+                             c.nmk, c.adr, c.rnk, c.country,
                              re.rnbor, re.rnbou,
                              re.rnbos, re.rnbod
                 from customer c,
@@ -301,9 +302,9 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
                                   from customerw u
                                  where exists (select 1 from customerw p
                                                 where p.tag like 'RNBOS'
-       and instr(p.value,'01')+instr(p.value,'02')+instr(p.value,'03')+
-           instr(p.value,'04')+instr(p.value,'05')+instr(p.value,'99') >0
+                                                  and regexp_instr(p.value,'01|02|03|04|05|99') >0
                                                   and p.rnk=u.rnk) 
+                                   and tag in ('RNBOR', 'RNBOU', 'RNBOS', 'RNBOD')
                               ) pivot
                               ( max(trim(value))
                                 for tag in ('RNBOR' as RNBOR, 'RNBOU' as RNBOU,
@@ -319,6 +320,8 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
        if     k.ise like '13%'             then    segm_a :='G';
        elsif  k.ise in ('ZZZZZ','YYYYY')   then    segm_a :='D';
        elsif  k.codcagent =5               then    segm_a :='2';
+       elsif  k.codcagent =6 and k.country ='900'
+                                           then    segm_a :='2';
        else
              segm_a := '1';
        end if;
@@ -380,8 +383,12 @@ select
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         to_char( round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_) ) ) p_270,
-                         to_char( round(fostq(a.acc,dat_)) ) p_280,
+                         to_char( (case when round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_) ) <0 then 0
+                                        else round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_) )
+                                    end) )  p_270,
+                         to_char( (case when round(fostq(a.acc,dat_)) <0 then 0
+                                        else round(fostq(a.acc,dat_))
+                                    end) )  p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
                    where a.rnk = k.rnk 
@@ -613,6 +620,72 @@ select
 
    end loop;                       --цикл по клиентам
 
+--    обработка "второго" набора доп.параметров клиента с санкциями
+   for k in ( select c.okpo, c.codcagent, c.ise,
+                             c.nmk, c.adr, c.rnk, c.country,
+                             re.rnbor, re.rnbou,
+                             re.rnbos, re.rnbod
+                from customer c,
+                     ( select *
+                         from ( select u.rnk, u.tag, substr(trim(u.value),1,20) value
+                                  from customerw u
+                                 where exists (select 1 from customerw p
+                                                where p.tag like 'RNB1S'
+                                                  and regexp_instr(p.value,'01|02|03|04|05|99') >0
+                                                  and p.rnk=u.rnk) 
+                                   and tag in ('RNB1R', 'RNB1U', 'RNB1S', 'RNB1D')
+                              ) pivot
+                              ( max(trim(value))
+                                for tag in ('RNB1R' as RNBOR, 'RNB1U' as RNBOU,
+                                            'RNB1S' as RNBOS, 'RNB1D' as RNBOD)
+                              )
+                     ) re
+               where c.rnk = re.rnk
+                 and c.date_off is null
+                 and trim(re.rnbor) is not null
+               order by c.okpo
+            )
+   loop
+         nnnn_ := nnnn_+1;
+         segm_n := lpad(to_char(nnnn_),4,'0');
+
+         for u in (select * from rnbu_trace
+                    where rnk =k.rnk
+         ) loop
+
+             if    substr(u.kodp,1,3) ='110'  then
+--    110  номер позицii
+                 insert into rnbu_trace
+                           ( rnk, kodp, znap )
+                    values ( k.rnk, substr(u.kodp,1,14)||segm_n,
+                            (case when k.rnbor is null  then 'немае даних'
+                                  else k.rnbor end) );
+
+             elsif substr(u.kodp,1,3) ='120'  then
+--    120  номер указу
+                insert into rnbu_trace
+                          ( rnk, kodp, znap )
+                   values ( k.rnk, substr(u.kodp,1,14)||segm_n, 
+                           (case when k.rnbou is null  then 'немае даних'
+                                 else k.rnbou end) );
+
+             elsif substr(u.kodp,1,3) ='130'  then
+--    130  санкцiя
+                insert into rnbu_trace
+                          ( rnk, kodp, znap )
+                   values ( k.rnk, substr(u.kodp,1,14)||segm_n,
+                           (case when k.rnbos is null  then 'немае даних'
+                                 else k.rnbos end) );
+
+             else
+                 insert into rnbu_trace
+                           ( rnk, kodp, znap )
+                    values ( k.rnk, substr(u.kodp,1,14)||segm_n, u.znap );
+             end if;
+
+         end loop;
+
+   end loop;
 ------------------------------------------------------
    DELETE FROM tmp_nbu
     where kodf=kodf_ and datf=dat_;
