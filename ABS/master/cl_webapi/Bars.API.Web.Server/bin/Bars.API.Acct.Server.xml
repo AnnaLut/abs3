@@ -137,6 +137,17 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Bars.API.Acct.Server.Controllers.StatementsBaseController.GetFile(ExportTypes,System.Decimal,System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Get statement by accID
+            </summary>
+            <param name="type"></param>
+            <param name="accId">Account id</param>
+            <param name="currencyCode"></param>
+            <param name="dateStart"></param>
+            <param name="dateEnd"></param>
+            <returns></returns>
+        </member>
         <member name="T:Bars.API.Acct.Server.Controllers.TurnoversBaseController">
             <summary>
             Payments Api
@@ -352,6 +363,15 @@
             <summary>
             AccountsRepository
             </summary>
+        </member>
+        <member name="M:Bars.API.Acct.Server.Infrastructure.Repository.StatementsRepository.GetFile(ExportTypes,Bars.API.Acct.Models.StatementParams,System.String)">
+            <summary>
+            Get statement by account id
+            </summary>
+            <param name="type"></param>
+            <param name="param"></param>
+            <param name="path"></param>
+            <returns></returns>
         </member>
         <member name="T:Bars.API.Acct.Server.Infrastructure.Repository.IStatementsRepository">
             <summary>

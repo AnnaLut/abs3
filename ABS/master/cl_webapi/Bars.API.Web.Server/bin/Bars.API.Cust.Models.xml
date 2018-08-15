@@ -4,6 +4,11 @@
         <name>Bars.API.Cust.Models</name>
     </assembly>
     <members>
+        <member name="T:Bars.API.Cust.Models.BankId.ErrorMessage">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Bars.API.Cust.Models.BankId.RequestFilter.SetCustomerFields(Bars.API.Cust.Models.BankId.Customer)">
             <summary>
             
@@ -186,6 +191,16 @@
             Contract number
             </summary>
         </member>
+        <member name="P:Bars.API.Cust.Models.Customer.Address">
+            <summary>
+            Customer address
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Customer.Phone">
+            <summary>
+            Phone of customer
+            </summary>
+        </member>
         <member name="P:Bars.API.Cust.Models.Customer.CustType">
             <summary>
             Customer type
@@ -224,6 +239,11 @@
         <member name="P:Bars.API.Cust.Models.Customer.EDRPO">
             <summary>
             CorpLight customer identifier (First letter - customer type, Second letter - OKPO, the rest depending on the user type)
+            </summary>
+        </member>
+        <member name="P:Bars.API.Cust.Models.Customer.MenuSettings">
+            <summary>
+            Menu setting of side nav (display or  hide)
             </summary>
         </member>
     </members>
