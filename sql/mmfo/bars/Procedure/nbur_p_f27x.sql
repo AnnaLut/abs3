@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE NBUR_P_F27X (p_kod_filii        varchar2,
+CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F27X (p_kod_filii        varchar2,
                                              p_report_date      date,
                                              p_form_id          number,
                                              p_scheme           varchar2 default 'C',
@@ -9,9 +9,9 @@ is
 % DESCRIPTION : Процедура формирования 27X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.101  31/07/2018 (25/06/2018)
+% VERSION     :  v.1.103  14/08/2018 (09/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.101  31/07/2018';
+  ver_          char(30)  := 'v.1.103  14/08/2018';
   c_title       varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   l_nbuc        varchar2(20);
@@ -209,7 +209,11 @@ BEGIN
                         , t.kv
                         , t.cust_id_cr as cust_id
                         , t.ref as ref
-                        , t.bal
+                        , (case 
+                                when abs(nvl(round((z.s2 / l_koef), 0), 0) - t.bal)<10 then t.bal
+                                when z.s2 is not null then nvl(round((z.s2 / l_koef), 0), 0)
+                                else 0 
+                          end) bal
                  from   nbur_dm_transactions t
                         left join zayavka z on (t.ref = z.refoper)
                                                and (z.dk = 2)
@@ -264,3 +268,4 @@ BEGIN
     logger.info (c_title || 'end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END;
 /
+
