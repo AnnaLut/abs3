@@ -13,11 +13,13 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла 1P (ПБ-1)
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    03/05/2018 (01/03/2018, 02/02/2018)
+% VERSION     :    10/07/2018 (03/05/2018, 01/03/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+10/07/2018 - для проводок Дт 100 Кт 1911 будем изменять код банка (KOD_B)
+             заполняем по проводке Дт 1911 Кт 3739
 03/05/2018 - для проводок Дт 1811 Кт 3739 добавлено новое условие для отбора
 01/03/2018 - для проводок Дт 100* Кт 3800 будет формироваться код 2343001
 02/02/2018 - для проводок Дт 100 Кт 1811 будем изменять код банка (KOD_B)
@@ -1220,7 +1222,47 @@ BEGIN
                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
                    AND a.REF = k.REF;
             exception when no_data_found then
+               begin
+                  select trim(w.value)
+                     into bank_
+                  from provodki_otc o, operw w
+                  where o.fdat = k.fdat
+                    and o.nlsd like k.nlsk || '%'
+                    and o.nlsk like '3739%'
+                    and o.kv = k.kv 
+                    and o.s*100 = k.s
+                    and o.ref = w.ref(+)
+                    and w.tag(+) like 'KOD_B%'
+                    and instr(k.nazn, substr(o.nazn, instr(o.nazn, '№')+6,3)) > 0;
+
+               UPDATE operw a
+                  SET a.VALUE = bank_
+                WHERE  a.tag = 'KOD_B'
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND a.REF = k.REF;
+               exception when no_data_found then
+                  begin
+                     select trim(w.value)
+                        into bank_
+                    from provodki_otc o, operw w
+                    where o.fdat = k.fdat
+                      and o.nlsd like k.nlsk || '%'
+                      and o.nlsk like '3739%'
+                      and o.kv = k.kv 
+                      and o.s*100 = k.s
+                      and o.ref = w.ref(+)
+                      and w.tag(+) like 'KOD_B%'
+                      and rownum = 1;
+
+                    UPDATE operw a
+                       SET a.VALUE = bank_
+                    WHERE  a.tag = 'KOD_B'
+                       AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                       AND a.REF = k.REF;
+                  exception when no_data_found then
                null;
+            end;
+               end; 
             end;
 
          END IF;
@@ -1271,6 +1313,28 @@ BEGIN
              WHERE     a.tag = 'KOD_G'
                    AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> '804')
                    AND a.REF = k.REF;
+
+            -- заміна коду банка із проводки Дт 1911 Кт 3739
+            begin
+               select trim(w.value)
+                  into bank_
+               from provodki_otc o, operw w
+               where o.fdat = k.fdat
+                 and o.nlsd like k.nlsk || '%'
+                 and o.nlsk like '3739%'
+                 and o.s*100 = k.s
+                 and o.ref = w.ref(+)
+                 and w.tag(+) like 'KOD_B%'
+                 and rownum = 1;
+
+               UPDATE operw a
+                  SET a.VALUE = bank_
+                WHERE  a.tag = 'KOD_B'
+                   AND (TRIM (a.VALUE) IS NULL OR TRIM (a.VALUE) <> bank_)
+                   AND a.REF = k.REF;
+            exception when no_data_found then
+               null;
+            end;
          END IF;
 
          -- зарахування на вклад
@@ -1522,7 +1586,8 @@ BEGIN
                  and o.nlsk like k.nlsd || '%'
                  and o.s*100 = k.s
                  and o.ref = w.ref(+)
-                 and w.tag(+) like 'KOD_B%';
+                 and w.tag(+) like 'KOD_B%'
+                 and rownum = 1;
 
                UPDATE operw a
                   SET a.VALUE = bank_
