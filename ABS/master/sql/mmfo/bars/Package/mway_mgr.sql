@@ -2,7 +2,7 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/mway_mgr.sql =========*** Run *** ==
 PROMPT ===================================================================================== 
 
-create or replace package MWAY_MGR
+CREATE OR REPLACE PACKAGE BARS.MWAY_MGR
 is
   --
   -- Автор  : OLEG
@@ -156,10 +156,7 @@ is
 
 end MWAY_MGR;
 /
-
-show errors;
-
-create or replace package body MWAY_MGR
+CREATE OR REPLACE PACKAGE BODY BARS.MWAY_MGR
 is
   --
   -- Автор  : OLEG
@@ -169,7 +166,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 5.8 24/05/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.82  05/07/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -894,22 +891,13 @@ is
                                                         WHEN d.freq_k = 360 THEN upper('yearly')
                                                         WHEN d.freq_k = 400 THEN upper('at_maturity')
                                                      END)                                                           ||';'||
-              decode(nvl(d.disable_add, 0), 0,'DEPOSIT_TOPUP_AMOUNT=' || /*nvl(d.dpt_amount,100000000)||*/'100000000;','') ||
+              decode(nvl(d.disable_add, 0), 0,'DEPOSIT_TOPUP_AMOUNT=' || /*nvl(d.dpt_amount, 100000000) ||*/'100000000;','')     ||
               'DEPOSIT_WITHDRAWAL='             || decode(dpt_irrevocable(d.dpt_id),0,'Y','N')                      ||';'||
               'DEPOSIT_EARLY_CLOSE='            || decode(dpt_irrevocable(d.dpt_id),0,'Y','N')                      ||';'||
 --              'DEPOSIT_AUTOPROLONGATION='       || decode(d.fl_dubl,0,'N','Y')                                      ||';'||
               'DEPOSIT_AUTOPROLONGATION='       || decode(dpt_web.check_for_extension(d.dpt_id),0,'N','Y')                                      ||';'||
               'DEPOSIT_REINVEST_INTEREST='      || decode(d.comproc,0,'N','Y')                                      ||';'||
-              'DEPOSIT_REPLENISHABLE='            || case
-                                                     when exists( select 1
-                                                                    from DPT_TTS_VIDD v1
-                                                                    join OP_RULES o1
-                                                                      on ( o1.tt = v1.tt )
-                                                                   where v1.VIDD = d.VIDD_CODE
-                                                                     and o1.tag = 'DPTOP'
-                                                                     and o1.val = '1'
-                                                                     and o1.tt like 'DP%' )
-                                                     then 'З поповненням' else 'Без поповнення' end                   ||';'||
+              'DEPOSIT_REPLENISHABLE='          || decode(r.cnt, 0, 'Без поповнення', 'З поповненням')      ||';'||
               'DEPOSIT_AGREEMENT='              || d.dpt_num                                                        ||';'||
               'DEPOSIT_AUTOPROLONGATION_ALLOWED='              || decode(dpt_web.check_for_extension(d.dpt_id),0,'N','Y')  ||';'||
               'DEPOSIT_DATE_OPEN='              || get_mway_date(d.dpt_dat)                                         ||';'||
@@ -953,16 +941,25 @@ is
         ) -- ContractRs
       ) -- XmlAgg
      into l_res
-     from V_MWAY_DPT_PORTFOLIO_ALL d
-    where d.CUST_ID = p_rnk
-      and d.DPT_ACCNUM like '2630%'
-      and d.DAT_END > trunc(sysdate)
-      and d.DPT_SALDO > 0;
+     from v_mway_dpt_portfolio_all d,
+          accounts a,
+          (select t1.deposit_id, (select count(v1.tt)
+                                    from dpt_tts_vidd v1,
+                                         op_rules o1
+                                   where v1.vidd = t1.vidd
+                                     and v1.tt = o1.tt
+                                     and o1.tag = 'DPTOP'
+                                     and o1.val = '1'
+                                     and o1.tt like 'DP%') as cnt
+             from dpt_deposit t1) r
+    where d.cust_id = p_rnk
+      and a.acc=d.dpt_accid
+      and a.nbs!='2620'
+      and d.dpt_id = r.deposit_id
+      and p_is_replanish is null;
 
-    bars_audit.trace( '%s: done', l_th );
-
+    bars_audit.trace('%s: done', l_th);
     return l_res;
-
   end get_dptlist;
 
   --------------------------------------------------------------------------------
@@ -1368,7 +1365,7 @@ is
     return l_value;
   end get_docrefset_parm;
   --------------------------------------------------------------------------------
-  -- get_error - 
+  -- get_error - создание проводки
   --
   --
   procedure get_error(p_code mway_errors.err_code%type,
@@ -1697,7 +1694,7 @@ is
                           get_error(701,l_obj_operation,p_error_code,p_error_message);
                           return;
                     end;
-                    
+
                      if l_acca.tip  like 'W4%' then
                       begin
                        select a.*
@@ -1727,7 +1724,7 @@ is
                              rollback to savepoint sp_paystart;
                              get_error(711,l_obj_operation,p_error_code,p_error_message);
                              return;
-                        end;            
+                        end;
                      end if;
 
                  else
@@ -1753,7 +1750,7 @@ is
                   end if;
 
                   bc.subst_branch(l_accb.branch);
-                  
+
                    -- COBUSUPABS-6352 щодо обмеження поповнення нових строкових вкладів
                   if substr(l_accb.nls, 1, 3) = '263' then
 
@@ -1819,12 +1816,12 @@ is
                       end if;
 
                       l_summ := l_sum_month + l_sum;
-                      
+
                       if l_count_mm = 0 then -- первый месяц
-                       
+
                         if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
                           null;
-                        else 
+                        else
                          if l_summ > l_deposit.dpt_amount * 2 then
                             --731 Превышен лимит пополнения за период
                             rollback to savepoint sp_paystart;
@@ -1835,8 +1832,8 @@ is
                              return;
                          else
                             null;
-                         end if;    
-                        end if; 
+                         end if;
+                        end if;
                       else  -- не первый месяц
                         if l_summ > l_deposit.dpt_amount then
                             --731 Превышен лимит пополнения за период
@@ -1848,15 +1845,15 @@ is
                              return;
                          else
                             null;
-                         end if;    
-                      end if;  
-                    
+                         end if;
+                      end if;
+
                     else
                       null;
                     end if;
 
                   end if;
-                  
+
                 else
                   --705 Мінімальна сума поповнення %s
                   rollback to savepoint sp_paystart;
@@ -1949,7 +1946,7 @@ is
 
 
                   bc.subst_branch(l_accb.branch);
-                  
+
                   -- COBUSUPABS-6352 щодо обмеження поповнення нових строкових вкладів
                   if substr(l_accb.nls, 1, 3) = '263' then
 
@@ -2016,10 +2013,11 @@ is
 
                       l_summ := l_sum_month + l_sum;
 
+
                       if l_count_mm = 0 then -- первый месяц
                         if kost(l_deposit.dpt_accid,trunc(sysdate - 1)) = 0 then -- первичный взнос
                           null;
-                        else 
+                        else
                          if l_summ > l_deposit.dpt_amount * 2 then
                             --731 Превышен лимит пополнения за период
                             rollback to savepoint sp_paystart;
@@ -2030,8 +2028,8 @@ is
                              return;
                          else
                             null;
-                         end if;    
-                        end if; 
+                         end if;
+                        end if;
                       else  -- не первый месяц
                         if l_summ > l_deposit.dpt_amount then
                             --731 Превышен лимит пополнения за период
@@ -2043,14 +2041,14 @@ is
                              return;
                          else
                             null;
-                         end if;    
+                         end if;
                       end if;
                     else
                       null;
                     end if;
 
                   end if;
-                  
+
                 else
                   --705 Мінімальна сума поповнення %s
                   rollback to savepoint sp_paystart;
@@ -2477,7 +2475,7 @@ is
 
     BARS_AUDIT.TRACE( '%s: Entry.', title );
 
-    for cur in ( select /*+ ORDERED FULL(r) */ 
+    for cur in ( select /*+ ORDERED FULL(r) */
                         r.ROWID as REC_ID
                       , m.REF_TR
                    from MWAY_RVRS  r
