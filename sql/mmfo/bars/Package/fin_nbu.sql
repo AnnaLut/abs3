@@ -770,7 +770,7 @@ end ZN_P;
 
 BEGIN
     BEGIN
-      if kod_ in ('KKDP','CLS','PD') then
+      if kod_ in ('KKDP'/*,'CLS','PD'*/) then
         stmp_ := load_data(p_rnk => rnk_,
                            p_nd  => nd_,
                            p_kod => kod_,
