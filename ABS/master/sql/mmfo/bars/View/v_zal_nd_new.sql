@@ -34,7 +34,7 @@ SELECT distinct pap
                ,(select w.value from accountsW w where w.acc  = t.acc and w.tag  = 'Z_POLIS') Z_POLIS
                ,(select r013 from specparam sp where sp.acc = t.acc) R013
   FROM (SELECT 1 pap
-              ,p.nd nd
+              ,0 as nd--p.nd nd
               ,p.pr_12
               ,az.acc
               ,az.nls
