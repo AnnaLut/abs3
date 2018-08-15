@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 5.0.2 08/08/2018 '; -- CUSTOMERS_PLT optimiz.
+    g_header_version  constant varchar2(64)  := 'version 5.0.3 15/08/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -240,7 +240,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
     
-    g_body_version constant varchar2(64) := 'Version 5.0.2 08/08/2018';
+    g_body_version constant varchar2(64) := 'Version 5.0.3 15/08/2018';--+2620БПК.
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
 	-- BARS_INTGR - integration
@@ -817,7 +817,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 and a.rnk      = c.rnk
                 and c.custtype in (2, 3)
             --  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
-                and ba.acc_pk = aa.acc and aa.nbs = '2625'
+                and ba.acc_pk = aa.acc and aa.nbs in ('2625', '2620') 
                 and ba.acc_9129 = a9129.acc(+)
 
             union all
@@ -826,7 +826,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                            (select sp.nkd from bars.specparam sp where sp.acc=ba.acc_9129) nkd
             from bars.bpk_all_accounts ba, bars.accounts a, bars.customer c, bars.accounts a9129
             where ba.acc_ovr is null
-                and ba.acc_pk = a.acc and a.nbs = '2625'
+                and ba.acc_pk = a.acc and a.nbs in ('2625', '2620')
                 and a.rnk = c.rnk
                 and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
             --  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
@@ -1581,7 +1581,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                             and a.rnk      = c.rnk
                             and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
     --                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
-                            and ba.acc_pk = aa.acc and aa.nbs = '2625'
+                            and ba.acc_pk = aa.acc and aa.nbs in ('2625','2620')
                             and ba.acc_9129 = a9129.acc(+)
                             union
                         select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a9129.branch, a9129.kf, a9129.nbs, a9129.ob22, a9129.daos, a9129.dazs, a9129.kv, c.okpo,
@@ -1589,7 +1589,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                (select sp.nkd from bars.specparam sp where sp.acc=ba.acc_9129) nkd
                         from bars.bpk_all_accounts ba, bars.accounts a, bars.customer c, bars.accounts a9129
                         where ba.acc_ovr is null
-                            and ba.acc_pk = a.acc and a.nbs = '2625'
+                            and ba.acc_pk = a.acc and a.nbs in ('2625','2620')
                             and a.rnk = c.rnk
                             and c.custtype in (2, 3) -- and nvl(trim(c.sed),'00')<>'91'
     --                        and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
