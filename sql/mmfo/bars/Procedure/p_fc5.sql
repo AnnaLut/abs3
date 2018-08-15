@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.035  08/08/2018 (03/08/2018)
+% VERSION : v.17.036  13/08/2018 (08/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -1406,7 +1406,7 @@ BEGIN
           end if;
       else
          if k.discont_SDF <> 0 then
-            kodp_ := '2'||'2046'||'6'||(case when TP_SND then k.r013 else '4' end)||substr(kodp_,8);
+            kodp_ := '2'||'2046'||'6'||(case when TP_SND then k.r013 else '4' end)||substr(k.kodp,8);
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
              
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
