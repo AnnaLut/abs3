@@ -7,8 +7,36 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_SW_IMPMSG ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG ("SWREF", "MT", "TRN", "SENDER", "SENDER_NAME", "RECEIVER", "RECEIVER_NAME", "PAYER", "PAYEE", "CURRENCY", "KV", "DIG", "AMOUNT", "ACCD", "ACCK", "IO_IND", "DATE_IN", "DATE_OUT", "DATE_REC", "DATE_PAY", "VDATE", "ID", "FIO", "TRANSIT", "TAG20") AS 
-  SELECT /*+ FIRST_ROWS(100)*/
+CREATE OR REPLACE FORCE VIEW BARS.V_SW_IMPMSG
+(
+   SWREF,
+   MT,
+   TRN,
+   SENDER,
+   SENDER_NAME,
+   RECEIVER,
+   RECEIVER_NAME,
+   PAYER,
+   PAYEE,
+   CURRENCY,
+   KV,
+   DIG,
+   AMOUNT,
+   ACCD,
+   ACCK,
+   IO_IND,
+   DATE_IN,
+   DATE_OUT,
+   DATE_REC,
+   DATE_PAY,
+   VDATE,
+   ID,
+   FIO,
+   TRANSIT,
+   TAG20
+)
+AS
+   SELECT /*+ FIRST_ROWS(100)*/
          j.swref,
           j.mt,
           j.trn,
@@ -47,6 +75,7 @@ PROMPT *** Create  view V_SW_IMPMSG ***
           AND j.sender = sb1.bic
           AND j.receiver = sb2.bic
           AND j.mt NOT IN (SELECT mt FROM sw_stmt)
+          AND J.MT !=199
           AND t.lcv(+) = j.currency
    WITH READ ONLY;
 

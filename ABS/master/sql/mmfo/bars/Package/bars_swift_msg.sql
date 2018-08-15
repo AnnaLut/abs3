@@ -385,7 +385,7 @@ END bars_swift_msg;
 
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.53 13.08.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.55 14.08.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -7924,7 +7924,7 @@ IS
                     opldok d,
                     accounts c
               WHERE     s.REF = o.REF
-                    AND o.pdat >= SYSDATE - 5
+                    AND o.pdat >= SYSDATE - 3
                     AND o.sos IN (5, -1, -2)
                     AND NVL (s.send_mt199, 0) != 1
                     AND o.mfob = '300465'
@@ -7982,7 +7982,7 @@ IS
                     accounts c,
                     nlk_ref n
               WHERE     s.REF = o.REF
-                    AND o.pdat >= SYSDATE - 5
+                    AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
                     AND o.mfob = '300465'
@@ -8058,7 +8058,7 @@ IS
                     opldok d2,
                     accounts c2
               WHERE     s.REF = o.REF
-                    AND o.pdat >= SYSDATE - 5
+                    AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
                     AND NVL (s.status, 0) != -1
@@ -8139,7 +8139,7 @@ IS
                     nlk_ref n3,
                     oper o4
               WHERE     s.REF = o.REF
-                    AND o.pdat >= SYSDATE - 5
+                    AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
                     AND o.mfob = '300465'
@@ -8213,7 +8213,7 @@ IS
                     bars.nlk_ref n2,
                     bars.oper o3
               WHERE     s.REF = o.REF
-                    AND o.pdat >= SYSDATE - 5
+                    AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
                     AND o.mfob = '300465'
@@ -8361,7 +8361,7 @@ IS
                     AND o.REF = a.REF
                     AND o.mfob != '300465'
                     AND a2.ref_a = TO_NUMBER (SUBSTR (a.REF, -9))
-                    AND TRUNC (a2.dat_a) >= TRUNC (SYSDATE) - 30
+                    AND TRUNC (a2.dat_a) >= TRUNC (SYSDATE) - 3
                     AND a2.kf = o.mfob
                     AND a2.nazns = 11
                     AND o2.REF = a2.REF
@@ -8700,8 +8700,8 @@ IS
                AND o.sos=5
                AND o.ref=a.ref
                AND a.nazns=11
-               AND TRUNC (a.dat_a) BETWEEN TRUNC (SYSDATE) - 5  AND TRUNC (SYSDATE) + 5
-               AND TRUNC (a2.dat_a) BETWEEN TRUNC (SYSDATE) - 5  AND TRUNC (SYSDATE) + 5
+               AND TRUNC (a.dat_a) BETWEEN TRUNC (SYSDATE) - 3  AND TRUNC (SYSDATE) + 1
+               AND TRUNC (a2.dat_a) BETWEEN TRUNC (SYSDATE) - 3  AND TRUNC (SYSDATE) + 1
                AND a2.ref_a = TO_NUMBER (SUBSTR (a.REF, -9))
                AND a2.nazns = 11
                AND a2.kf = o.mfob
@@ -8857,12 +8857,26 @@ IS
                     bars.oper o
               WHERE     s.REF = a.REF
                     AND a.ref=o.ref
-                    AND o.tt='CLI'
+                    AND o.tt ='C14'
                     AND NVL (s.send_mt199, 0) != 1
                     AND a.nazns in(10, 11)
                     AND a.sos in(7,9)
                     AND o.mfob in (select kf from bars.kf_ru
-                        where kf not in (select kf from bars.mv_kf)))
+                        where kf not in (select kf from bars.mv_kf))
+               union all 
+               SELECT DISTINCT s.swref
+               FROM bars.sw_oper_queue s,
+                    bars.arc_rrp a,
+                    bars.oper o
+              WHERE     s.REF = a.REF
+                    AND a.ref=o.ref
+                    AND o.tt ='CLI'
+                    AND NVL (s.send_mt199, 0) != 1
+                    AND a.nazns in(10, 11)
+                    AND a.sos in(7,9)
+                    AND o.mfob in (select kf from bars.kf_ru))
+                  --where kf not in (select kf from bars.mv_kf)))
+                        
       LOOP
          BEGIN
             bc.go (300465);
