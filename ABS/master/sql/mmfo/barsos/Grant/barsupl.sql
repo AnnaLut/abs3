@@ -1,0 +1,1 @@
+grant execute on j_mergefiles to barsupl;

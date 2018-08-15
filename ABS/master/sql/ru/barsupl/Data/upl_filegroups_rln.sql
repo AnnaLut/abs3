@@ -126,3 +126,47 @@ prompt fix bpk_plt
 delete from upl_filegroups_rln t where t.group_id in (10, 11) and t.file_id = 10051;
 insert into upl_filegroups_rln (group_id, file_id, sql_id) values (10, 10051, 10052);
 commit;
+/
+prompt Credits_oper into 10 group
+begin
+  insert into upl_filegroups_rln(group_id, file_id, sql_id)
+  values (10, 100101, 100101);
+exception
+  when dup_val_on_index then null;
+end;
+/
+commit;
+/
+prompt Credits_oper into 11 group
+begin
+  insert into upl_filegroups_rln(group_id, file_id, sql_id)
+  values (11, 100101, 100102);
+exception
+  when dup_val_on_index then null;
+end;
+/
+commit;
+/
+prompt Deposits_oper into 10 group
+begin
+  insert into upl_filegroups_rln(group_id, file_id, sql_id)
+  values (10, 100103, 100103);
+exception
+  when dup_val_on_index then null;
+end;
+/
+commit;
+/
+
+prompt Deposits_oper into 11 group
+begin
+  insert into upl_filegroups_rln(group_id, file_id, sql_id)
+  values (11, 100103, 100104);
+exception
+  when dup_val_on_index then null;
+end;
+/
+
+commit;
+/
+

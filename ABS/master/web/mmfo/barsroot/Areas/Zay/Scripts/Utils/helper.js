@@ -70,7 +70,7 @@ bars.helper = bars.helper || {
         var dropdownlist1 = $("#meta_aim_name").data("kendoDropDownList");
         dropdownlist1.list.width(380);
 
-        // #2 Країна перечислення валюти:
+       // #2 Країна перерахування валюти:
         $("#country_name").kendoDropDownList({
             filter: "startswith",
             dataTextField: "COUNTRY_CODE",
@@ -199,8 +199,6 @@ bars.helper = bars.helper || {
 
         var f092Dropdownlist = $("#f092_text").data("kendoDropDownList");
         f092Dropdownlist.list.width(380);
-
-
         // #4 Країна бенефециара:
         $("#benef_country").kendoDropDownList({
             filter: "startswith",
@@ -379,14 +377,14 @@ bars.helper = bars.helper || {
         var dropdownlist8 = $("#p12").data("kendoDropDownList");
         dropdownlist8.list.width(380);
 
-
         // save edited obj:
         function getObjData(data) {
             var id = data.ID,                                                               // Идентификатор заявки
                 verifyOpt = $('#checkRequiredField').is(":checked") ? 1 : 0,                // Унікальний номер операції в системі Клієнт-Банк HOKK
                 meta = $("#meta_aim_name").data("kendoDropDownList").value(),               // Цель покупки (спр-к zay_aims)
                 f092 = $("#f092_text").data("kendoDropDownList").value(),                   // Значение параметра F092
-                contract = $("#contract").val(),                                            // № контракта
+                //contract = $("#contract").data("kendoDropDownList").value(),              // № контракта
+                contract = $("#contract").val(),
                 dat2Vmd = $("#dat2_vmd").val(),                                             // дата контракта
                 datVmd = $("#dat_vmd").val(),                                               // дата последней вмд
                 dat5Vmd = $("#dat5_vmd").val(),                                             // дата остальных вмд
@@ -506,6 +504,90 @@ bars.helper = bars.helper || {
             format: "dd/MM/yyyy"
         });
     },
+
+    chooseContract: function (rnk) {
+        var window = $("#contractRefWindow").data("kendoWindow");
+        var contractBox = $("#contractReferenceBox"),
+            contractRefTemplate = kendo.template($("#ContractRefPattern").html());
+        contractBox.html(contractRefTemplate);
+
+        $("#contractRefGrid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        type: "GET",
+                        dataType: "json",
+                        data: { rnk: rnk },
+                        url: bars.config.urlContent("/api/zay/contract/get")
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    model: {
+                        fields: {
+                            CONTRACT_ID: { type: "number" },
+                            CONTRACT_NUMBER: { type: "string" },
+                            CONTRACT_DATE: { type: "date" }
+                        }
+                    }
+                },
+                pageSize: 10,
+                serverPaging: true,
+                //serverFiltering: true
+            },
+            filterable: {
+                mode: "row"
+            },
+            sortable: true,
+            selectable: "row",
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 3
+            },
+            columns: [
+                {
+                    field: "CONTRACT_NUMBER",
+                    title: "Номер контракту",
+                    template: '<span class="k-state-default"></span>' +
+                    '<span class="k-state-default" style="font-size: 13px;">#=CONTRACT_NUMBER === null ? "" : CONTRACT_NUMBER#</span>',
+                    filterable: {
+                        cell: {
+                            operator: "contains",
+                            suggestionOperator: "contains"
+                        }
+                    } 
+                },
+                {
+                    field: "CONTRACT_DATE",
+                    title: "Дата контракту",
+                    template: '<span class="k-state-default" style="font-size: 13px;">#=kendo.toString(kendo.parseDate(CONTRACT_DATE),"dd/MM/yyyy")# </span>',
+                    filterable: false
+                }
+            ],
+            noRecords: {
+                template: '<div class="k-label" style="color:grey; margin:20px 20px;"> Немає контрактів для відображення для даного Rnk </div>'
+            },
+        });
+
+        $("#contractRefGrid").on("dblclick", "tr.k-state-selected", function () {
+            var contractGrid = $("#contractRefGrid").data("kendoGrid"),
+                currentRow = contractGrid.dataItem(contractGrid.select());
+
+            $("#contract").val(currentRow.CONTRACT_NUMBER);
+            var contractDatePicker = $("#dat2_vmd").data("kendoDatePicker");
+            contractDatePicker.value(currentRow.CONTRACT_DATE);
+            window.close();
+        });
+
+        window.open().element.closest(".k-window").css({
+            top: 200,
+            left: 350
+        });
+
+    },
+
     validateForm: function () {
         var contract = $.trim($('#contract').val());
         var dat2_vmd = $.trim($('#dat2_vmd').val());

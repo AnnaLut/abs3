@@ -7,7 +7,7 @@ is
     -- for import from BARS scheme
     --
 
-    g_header_version  constant varchar2(64)  := 'version 3.0.0 13/09/2017';
+    g_header_version  constant varchar2(64)  := 'version 3.3.9 30/07/2018';
 
     g_header_defs     constant varchar2(512) := '';
 
@@ -236,6 +236,25 @@ is
     --
     procedure imp_run(p_dat        in date default sysdate,
                       p_periodtype in varchar2 default C_FULLIMP);
+    
+    --
+    -- выгрузка для кредитов по финансовых операциях
+    --
+    procedure credits_oper_imp (p_dat        in date default trunc(sysdate),
+                                p_periodtype in varchar2 default C_FULLIMP,
+                                p_rows       out number,
+                                p_rows_err   out number,
+                                p_state      out varchar2);
+    
+    --
+    -- выгрузка для депозитов по финансовых операциях
+    --
+    
+    procedure deposits_oper_imp  (p_dat        in date default trunc(sysdate)
+                                 ,p_periodtype in varchar2 default C_FULLIMP
+                                 ,p_rows       out number
+                                 ,p_rows_err   out number
+                                 ,p_state      out varchar2);
 
 end;
 /
@@ -245,7 +264,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 
-  g_body_version constant varchar2(64) := 'Version 3.3.8 19/03/2018';
+  g_body_version constant varchar2(64) := 'Version 3.3.9 30/07/2018';
   g_body_defs    constant varchar2(512) := null;
   G_TRACE        constant varchar2(20) := 'dm_import.';
 
@@ -5904,14 +5923,15 @@ end deposits_plt_imp;
             p_periodtype = 'MONTH'
             or
             p_periodtype = 'DAY'
-            and
+            -- Згідно заявки COBUMMFO-8186 вибірка за день повинна прцювати,як повне вивантаження
+            /*and
             (
                 cd.nd in (select nd from changes_ccd)
                 or
                 (ca.nd, ca.acc) in (select nd, acc from changes_cc_accp)
                 or
                 a.acc in (select acc from changes_acc)
-            )
+            )*/
             ;
 
             l_rows := sql%rowcount;
@@ -6189,12 +6209,297 @@ end deposits_plt_imp;
         l_id_event := null;
         end loop;
     end imp_run;
+    
+    --
+    -- выгрузка для кредитов по финансовых операциях
+    --
+    
+    procedure credits_oper_imp (p_dat        in date default trunc(sysdate), 
+                                p_periodtype in varchar2 default C_FULLIMP, 
+                                p_rows       out number, 
+                                p_rows_err   out number, 
+                                p_state      out varchar2)
+    is
+    l_trace  varchar2(500) := G_TRACE||'credits_oper_imp: ';
+    l_per_id periods.id%type;
+    l_row    credits_oper%rowtype;
+    l_errmsg varchar2(512);
 
+    l_rows     pls_integer := 0;
+    l_rows_err pls_integer := 0;
+
+    c        sys_refcursor;
+
+    q_str          varchar2(32000);
+    q_str_inc_pre  varchar2(4000) :=' ';
+
+    q_str_main  varchar2(32000) :=
+    'select
+                nd_ac.nd nd_cre
+                ,cd.cc_id
+                ,cd.vidd  
+                ,o.ref
+                ,o.nd
+                ,o.mfoa
+                ,o.nlsa
+                ,o.s
+                ,o.kv
+                ,o.vdat
+                ,o.s2
+                ,o.kv2
+                ,o.mfob
+                ,o.nlsb
+                ,o.sk
+                ,o.datd
+                ,o.nazn
+                ,o.tt
+                ,o.tobo
+                ,o.id_a
+                ,o.nam_a
+                ,o.id_b
+                ,o.nam_b
+                ,o.vob
+                ,o.pdat
+                ,o.odat
+            from bars.nd_acc nd_ac, bars.accounts ac, bars.cc_deal cd,bars.oper o
+           where nd_ac.acc = ac.acc
+             and nd_ac.nd = cd.nd
+             and cd.vidd in (1,2,3,11,12,13) 
+           and ( (o.nlsa = ac.nls and o.kv= ac.kv and o.mfoa = ac.kf)  or (o.nlsb = ac.nls and nvl(o.kv2,o.kv)=ac.kv and o.mfob = ac.kf)) 
+    ';
+
+    q_str_inc_suf  varchar2(4000) :=
+          ' and o.pdat  between trunc(:p_dat) and trunc(:p_dat)+0.99999';
+
+    q_str_full_suf  varchar2(4000) :=
+          ' and o.pdat  between trunc(:p_dat)-7 and trunc(:p_dat)+0.99999 ';
+
+  begin
+    bars.bars_audit.info(l_trace||' start');
+    -- get period id
+    l_per_id := get_period_id (p_periodtype, p_dat);
+
+    if l_per_id is null then
+        return;
+    end if;
+
+    delete from credits_oper where per_id=l_per_id;
+
+    l_row.per_id := l_per_id;
+    l_row.kf := bars.f_ourmfo_g;
+
+    if (p_periodtype = C_INCRIMP) then
+        q_str := q_str_inc_pre || q_str_main || q_str_inc_suf;
+        open c for q_str using p_dat, p_dat;
+    else
+        q_str := q_str_main || q_str_full_suf;
+        open c for q_str using p_dat, p_dat;
+    end if;
+    loop
+      begin
+        fetch c into 
+                       l_row.ND_CRE
+                      ,l_row.CC_ID
+                      ,l_row.VIDD
+                      ,l_row.REF
+                      ,l_row.ND
+                      ,l_row.MFOA
+                      ,l_row.NLSA
+                      ,l_row.S
+                      ,l_row.KV
+                      ,l_row.VDAT
+                      ,l_row.S2
+                      ,l_row.KV2
+                      ,l_row.MFOB
+                      ,l_row.NLSB
+                      ,l_row.SK
+                      ,l_row.DATD
+                      ,l_row.NAZN
+                      ,l_row.TT
+                      ,l_row.TOBO
+                      ,l_row.IDA
+                      ,l_row.NAMA
+                      ,l_row.IDB
+                      ,l_row.NAMB
+                      ,l_row.VOB
+                      ,l_row.PDAT
+                      ,l_row.ODAT;
+        exit when c%notfound;
+
+        insert into credits_oper values l_row;
+
+        l_rows:=l_rows + 1;
+        dbms_application_info.set_client_info(l_trace||to_char(l_rows)|| ' processed');
+
+      exception
+        when others then
+          l_errmsg :=substr(l_trace||' Error: '
+                                   ||dbms_utility.format_error_stack()||chr(10)
+                                   ||dbms_utility.format_error_backtrace()
+                                   , 1, 512);
+          bars.bars_audit.error(l_errmsg);
+          l_rows_err:=l_rows_err + 1;
+      end;
+    end loop;
+
+    close c;
+
+    p_rows := l_rows;
+    p_rows_err := l_rows_err;
+    p_state := 'SUCCESS';
+
+    bars.bars_audit.info(l_trace||' finish');
+
+  end credits_oper_imp;
+  
+  --
+  -- выгрузка для депозитов по финансовых операциях
+  -- 
+  procedure deposits_oper_imp  (p_dat        in date default trunc(sysdate), 
+                                p_periodtype in varchar2 default C_FULLIMP, 
+                                p_rows       out number, 
+                                p_rows_err   out number, 
+                                p_state      out varchar2)
+    is
+    l_trace  varchar2(500) := G_TRACE||'deposits_oper_imp: ';
+    l_per_id periods.id%type;
+    l_row    deposits_oper%rowtype;
+    l_errmsg varchar2(512);
+
+    l_rows     pls_integer := 0;
+    l_rows_err pls_integer := 0;
+
+    c        sys_refcursor;
+
+    q_str          varchar2(32000);
+    q_str_inc_pre  varchar2(4000) :=' ';
+
+    q_str_main  varchar2(32000) :=
+    'select
+                 dpt_dep.deposit_id
+                ,dpt_dep.nd
+                ,dpt_dep.cnt_dubl  
+                ,o.ref
+                ,o.nd
+                ,o.mfoa
+                ,o.nlsa
+                ,o.s
+                ,o.kv
+                ,o.vdat
+                ,o.s2
+                ,o.kv2
+                ,o.mfob
+                ,o.nlsb
+                ,o.sk
+                ,o.datd
+                ,o.nazn
+                ,o.tt
+                ,o.tobo
+                ,o.id_a
+                ,o.nam_a
+                ,o.id_b
+                ,o.nam_b
+                ,o.vob
+                ,o.pdat
+                ,o.odat
+            from bars.dpt_payments dpt, bars.oper o ,
+    ';
+
+    q_str_inc_suf  varchar2(4000) :=
+          ' bars.dpt_deposit dpt_dep
+               where dpt.ref = o.ref
+                 and dpt.dpt_id = dpt_dep.deposit_id 
+                 and o.pdat  between trunc(:p_dat) and trunc(:p_dat)+0.99999';
+
+    q_str_full_suf  varchar2(4000) :=
+          ' (select dp_d.kf, dp_d.deposit_id, dp_d.cnt_dubl, dp_d.nd
+                  from bars.dpt_deposit dp_d
+                union
+                select distinct dp_c.kf, dp_c.deposit_id, dp_c.cnt_dubl, dp_c.nd
+                  from bars.dpt_deposit_clos dp_c
+                 where dp_c.dat_end between trunc(:p_dat)-7 and trunc(:p_dat)
+                ) dpt_dep 
+                 where dpt.ref = o.ref
+                   and dpt.dpt_id = dpt_dep.deposit_id
+                   and o.pdat  between trunc(:p_dat)-7 and trunc(:p_dat)+0.99999';
+
+  begin
+    bars.bars_audit.info(l_trace||' start');
+    -- get period id
+    l_per_id := get_period_id (p_periodtype, p_dat);
+
+    if l_per_id is null then
+        return;
+    end if;
+
+    delete from deposits_oper where per_id=l_per_id;
+
+    l_row.per_id := l_per_id;
+    l_row.kf := bars.f_ourmfo_g;
+
+    if (p_periodtype = C_INCRIMP) then
+        q_str := q_str_inc_pre || q_str_main || q_str_inc_suf;
+        open c for q_str using p_dat, p_dat;
+    else
+        q_str := q_str_main || q_str_full_suf;
+        open c for q_str using p_dat, p_dat, p_dat, p_dat;
+    end if;
+    loop
+      begin
+        fetch c into 
+                       l_row. deposit_id
+                      ,l_row.nd_dep
+                      ,l_row.cnt_dubl 
+                      ,l_row.REF
+                      ,l_row.ND
+                      ,l_row.MFOA
+                      ,l_row.NLSA
+                      ,l_row.S
+                      ,l_row.KV
+                      ,l_row.VDAT
+                      ,l_row.S2
+                      ,l_row.KV2
+                      ,l_row.MFOB
+                      ,l_row.NLSB
+                      ,l_row.SK
+                      ,l_row.DATD
+                      ,l_row.NAZN
+                      ,l_row.TT
+                      ,l_row.TOBO
+                      ,l_row.IDA
+                      ,l_row.NAMA
+                      ,l_row.IDB
+                      ,l_row.NAMB
+                      ,l_row.VOB
+                      ,l_row.PDAT
+                      ,l_row.ODAT;
+        exit when c%notfound;
+
+        insert into deposits_oper values l_row;
+
+        l_rows:=l_rows + 1;
+        dbms_application_info.set_client_info(l_trace||to_char(l_rows)|| ' processed');
+
+      exception
+        when others then
+          l_errmsg :=substr(l_trace||' Error: '
+                                   ||dbms_utility.format_error_stack()||chr(10)
+                                   ||dbms_utility.format_error_backtrace()
+                                   , 1, 512);
+          bars.bars_audit.error(l_errmsg);
+          l_rows_err:=l_rows_err + 1;
+      end;
+    end loop;
+
+    close c;
+
+    p_rows := l_rows;
+    p_rows_err := l_rows_err;
+    p_state := 'SUCCESS';
+
+    bars.bars_audit.info(l_trace||' finish');
+
+  end deposits_oper_imp;
+  
 end;
 /
-show errors
-
-PROMPT *** Create  grants  DM_IMPORT ***
-
-grant EXECUTE                                                                on DM_IMPORT       to BARSUPL;
-grant EXECUTE                                                                on DM_IMPORT       to BARS_SUP; 

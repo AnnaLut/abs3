@@ -1,4 +1,5 @@
 set serveroutput on
+
 declare
 
   type t_rec_extrnval is record (
@@ -49,6 +50,7 @@ declare
   l_tabname      meta_tables.tabname%type;
   l_tabsemantic  meta_tables.semantic%type;
   l_tablinesdef  varchar2(16);
+  l_tabselect_statement meta_tables.select_statement%type;
   l_newtabid     meta_tables.tabid%type;
   l_newcolid     meta_columns.colid%type;
   l_varcolid     meta_columns.colid%type;
@@ -58,6 +60,7 @@ begin
 
   l_tabsemantic := 'Довідник Бал.рах+Ob22 для модуля МБДК';
   l_tablinesdef := '10';
+  l_tabselect_statement := '';
   l_tabname     := 'MBDK_OB22';
 
   -- получаем код таблицы
@@ -70,7 +73,7 @@ begin
     l_tabid := bars_metabase.get_newtabid();
 
     -- добавляем описание таблицы в БМД
-    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
+    bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, l_tabselect_statement);
 
   -- если таблица описана в БМД
   else
@@ -81,6 +84,8 @@ begin
     -- обновляем linesdef таблицы
     bars_metabase.set_tablinesdef(l_tabid, l_tablinesdef);
 
+    -- обновляем select_statement таблицы
+    bars_metabase.set_tabselect_statement(l_tabid, l_tabselect_statement);
 
     -- сохраняем ссылки сложных полей других таблиц на поля нашей таблицы
     select e.tabid, e.colid, c.colname, e.tab_alias, e.tab_cond, e.src_cond, e.col_dyn_tabname
@@ -119,22 +124,23 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 0, 'VIDD',    'N', 'Код~Виду дог',                 '1', null,  1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 1, 'NAME',    'C', 'Назва~Виду дог',               '3', null,  2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'IO',      'N', 'Депозит=1~Кредит=0',           '1', null,  3, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'SS',      'C', 'Бал.рах+Ob22~Нормальн.тіла',   '1', null,  7, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'SP',      'C', 'Бал.рах+Ob22~Простроч.тіла',   '1', null,  9, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'SN',      'C', 'Бал.рах+Ob22~Нормальн.проц',   '1', null, 11, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'SPN',     'C', 'Бал.рах+Ob22~Простроч.проц',   '1', null, 13, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'SD_N',    'C', 'Бал.рах+Ob22~% Дох/Витр(грн)', '1', null, 15, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'SD_I',    'C', 'Бал.рах+Ob22~% Дох/Витр(вал)', '1', null, 20, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'D_CLOSE', 'D', 'Дата~ДЕ-яктивації',            '1', null, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 0, 'VIDD', 'N', 'Код~Виду дог', '1', null, 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'NAME', 'C', 'Назва~Виду дог', '3', null, 2, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'SS', 'C', 'Бал.рах+Ob22~Нормальн.тіла', '1', null, 7, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'SP', 'C', 'Бал.рах+Ob22~Простроч.тіла', '1', null, 9, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'SN', 'C', 'Бал.рах+Ob22~Нормальн.проц', '1', null, 11, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'SPN', 'C', 'Бал.рах+Ob22~Простроч.проц', '1', null, 13, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SD_N', 'C', 'Бал.рах+Ob22~% Дох/Витр(грн)', '1', null, 15, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SD_I', 'C', 'Бал.рах+Ob22~% Дох/Витр(вал)', '1', null, 20, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'D_CLOSE', 'D', 'Дата~ДЕ-яктивації', '1', null, 24, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'IO', 'N', 'Депозит=1~Кредит=0', '1', null, 3, 0, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'K9', 'N', 'Числ.код Корзини', '1', null, 3, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_NBSOB22');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'KOD');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 2, l_newtabid, l_newcolid, 'SS', '', '', '');
+    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, 'SP', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица V_NBSOB22 для описания сложного поля таблицы MBDK_OB22.');
   end if;
@@ -143,7 +149,7 @@ begin
   l_newtabid := bars_metabase.get_tabid('V_NBSOB22');
   l_newcolid := bars_metabase.get_colid(l_newtabid, 'KOD');
   if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 3, l_newtabid, l_newcolid, 'SP', '', '', '');
+    bars_metabase.add_extrnval(l_tabid, 2, l_newtabid, l_newcolid, 'SS', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица V_NBSOB22 для описания сложного поля таблицы MBDK_OB22.');
   end if;

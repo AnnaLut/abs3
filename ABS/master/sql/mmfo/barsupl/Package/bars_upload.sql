@@ -1860,8 +1860,22 @@ is
          bars.bars_error.raise_nerror(G_MODULE, 'NO_REGION_PRFX_PARAMETER');
       end;
 
-      -- получить последовательный номер выгрузки
-      l_nextnmbr := get_nextFileNumber(p_fileid, p_param1);
+      -- формируем имя исходящего файла
+      begin
+         -- получить последовательный номер выгрузки
+         l_nextnmbr := get_nextFileNumber(p_fileid, p_param1);
+
+         l_bankdate := to_date(p_param1,'dd/mm/yyyy');
+         l_filename := l_region_prfx||'_'||l_file.filename_prfx||'_'||to_char(l_bankdate,'yyyymmdd')||'.'||bars.lpadchr(to_char(l_nextnmbr),'0',3);
+         p_filename := l_filename;
+
+         set_param('STAT_FILE_NAME',to_char(l_filename));
+
+         bars.bars_audit.trace(l_trace||'Имя файла: '||l_filename);
+      exception when others then
+         bars.bars_error.raise_nerror(G_MODULE, 'NOT_CORRECT_DATE', p_param1);
+      end;
+
       -- выполнить действие 'ДО'
       if l_sql_before is not null then
         begin
@@ -1894,15 +1908,15 @@ is
       end if;
       if l_sqltext is not null then
 
-          -- формируем имя исходящего файла
-          begin
-             l_bankdate := to_date(p_param1,'dd/mm/yyyy');
-             l_filename := l_region_prfx||'_'||l_file.filename_prfx||'_'||to_char(l_bankdate,'yyyymmdd')||'.'||bars.lpadchr(to_char(l_nextnmbr),'0',3);
-             p_filename := l_filename;
-             bars.bars_audit.trace(l_trace||'Имя файла: '||l_filename);
-          exception when others then
-             bars.bars_error.raise_nerror(G_MODULE, 'NOT_CORRECT_DATE', p_param1);
-          end;
+--          -- формируем имя исходящего файла
+--          begin
+--             l_bankdate := to_date(p_param1,'dd/mm/yyyy');
+--             l_filename := l_region_prfx||'_'||l_file.filename_prfx||'_'||to_char(l_bankdate,'yyyymmdd')||'.'||bars.lpadchr(to_char(l_nextnmbr),'0',3);
+--             p_filename := l_filename;
+--             bars.bars_audit.trace(l_trace||'Имя файла: '||l_filename);
+--          exception when others then
+--             bars.bars_error.raise_nerror(G_MODULE, 'NOT_CORRECT_DATE', p_param1);
+--          end;
 
           l_cur := dbms_sql.open_cursor;
 

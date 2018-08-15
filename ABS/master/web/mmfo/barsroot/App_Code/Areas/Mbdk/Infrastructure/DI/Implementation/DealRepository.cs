@@ -120,6 +120,19 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
                 var acc = p.Get<long?>("ACC1_");
                 var error = p.Get<string>("sErr_");
                 var resultObj = new { nd, acc, error };
+
+                #region SAVE EXTRA PARAMETERS
+                if (megamodel.agreementType == 1)
+                {
+                    string commandBM = GetCommandStrForSavingExtraParams(nd.Value, "BUS_MOD", megamodel.BUS_MOD);
+                    string commandSPPI = GetCommandStrForSavingExtraParams(nd.Value, "SPPI", megamodel.SPPI);
+                    string commandIFRS = GetCommandStrForSavingExtraParams(nd.Value, "IFRS", megamodel.IFRS);
+
+                    connection.Execute(commandBM);
+                    connection.Execute(commandSPPI);
+                    connection.Execute(commandIFRS);
+                }
+                #endregion
                 return resultObj;
             }
         }
@@ -203,22 +216,33 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
                 throw new Exception("Не коректний формат договору!");
             using (var connection = OraConnector.Handler.UserConnection)
             {
-                var sql = @"SELECT d.cc_id, d.vidd, d.vidd_name, d.tipd, d.date_u, d.date_end,
+                var sql = @"SELECT d.cc_id, d.vidd, d.vidd_name, d.tipd, d.date_u, d.date_end, tip.name,
                                        d.s SUMM, d.int_amount, d.s_pr, d.basey, 
                                        d.a_nls, d.a_kv, t.lcv, d.b_nls, d.refp,
                                        d.acckred, d.accperc, d.mfokred, d.mfoperc, 
                                        d.rnk, d.nmk, d.okpo, d.mfo, d.bic, d.kod_b, d.num_nd,
                                        d.swi_bic, d.swi_acc, d.swo_bic, d.swo_acc, d.alt_partyb, t.dig,
                                        d.irr, d.date_b, d.code_product, d.name_product, d.n_nbu, d.nd, d.d_nbu
-                                FROM mbk_deal d, tabval t
-                                WHERE d.nd   = :ND
-                                AND d.a_kv = t.kv ";
+                                FROM mbk_deal d, tabval t, CC_TIPD tip
+                                WHERE d.nd = :ND
+                                AND d.a_kv = t.kv and d.tipd=tip.tipd";
 
                 var model = connection.Query<Deal>(sql, new { ND }).SingleOrDefault();
                 if (model == null)
                 {
                     var error = string.Format("За данним номером {0} договору інформації не існує", id);
                     throw new Exception(error);
+                }
+
+                if(model.TIPD == 1)
+                {
+                    var sqlBM = @"select TXT from nd_txt where TAG = 'BUS_MOD' and ND = :ND";
+                    var sqlSPPI = @"select TXT from nd_txt where TAG = 'SPPI' and ND = :ND";
+                    var sqlIFRS = @"select TXT from nd_txt where TAG = 'IFRS' and ND = :ND";
+
+                    model.BUS_MOD = connection.Query(sqlBM, new { ND }).FirstOrDefault().TXT.ToString();
+                    model.SPPI = connection.Query(sqlSPPI, new { ND }).FirstOrDefault().TXT.ToString();
+                    model.IFRS = connection.Query(sqlIFRS, new { ND }).FirstOrDefault().TXT.ToString();
                 }
                 return model;
             }
@@ -280,5 +304,15 @@ namespace BarsWeb.Areas.Mbdk.Infrastructure.DI.Implementation
             return new { nls1, nls2 };
         }
 
+        private string GetCommandStrForSavingExtraParams(long deal_id, string attribute_code, string attribute_value)
+        {
+            return String.Format(@"
+                            begin         
+                            BARS.cck_utl.set_deal_attribute(p_deal_id => {0},
+                                    p_attribute_code => '{1}',
+                                    p_value => '{2}');                           
+                            end;",
+                                    deal_id, attribute_code, attribute_value);
+        }
     }
 }

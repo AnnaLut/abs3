@@ -141,8 +141,12 @@
 
 end safe_deposit;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.SAFE_DEPOSIT is
-  g_body_version  constant varchar2(64) := 'version 3.11 02/10/2017';
+
+show err
+
+create or replace package body SAFE_DEPOSIT
+is
+  g_body_version  constant varchar2(64) := 'version 3.11  12/07/2018';
   g_awk_body_defs constant varchar2(512) := '' || 'OBU' || chr(10);
   /*-------------------------------------------------------------------------------------------------------------------------------------*/
   /*  Назва : safe_deposit
@@ -947,7 +951,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.SAFE_DEPOSIT is
     bars_audit.trace('%s started', l_title);
 
     -- пошук номеру договору та мобільного телефону
-    for skrn in (select n.nd, f_get_cust_tel(n.rnk) tel, n.dat_end, n.kf
+    for skrn in (select n.nd, f_get_cust_tel(n.rnk) tel, n.dat_end, n.kf, n.RNK
                    from skrynka_nd n, customer c
                   where n.sos <> 15
                     and c.rnk = n.rnk
@@ -1049,10 +1053,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.SAFE_DEPOSIT is
                                   p_expiration_time => l_crtime + 1,
                                   p_phone           => l_phone,
                                   p_encode          => l_encode,
-                                  p_msg_text        => substr(l_msg ||
-                                                              l_datend,
-                                                              1,
-                                                              160),
+                                  p_msg_text        => substr( l_msg||l_datend, 1, 160 ),
+                                  p_rnk             => skrn.RNK,
                                   p_kf              => l_kf);
 
               o_errmsg := null;

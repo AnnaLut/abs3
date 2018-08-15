@@ -7,7 +7,7 @@ IS
   --
   -- пакет процедур для обробки інформації по сегментації клієнтів від DWH. Ощадбанк
   --
-  g_header_version  CONSTANT  VARCHAR2(64)  := 'version 1.4  01.10.2017';
+  g_header_version  CONSTANT  VARCHAR2(64)  := 'version 1.6  03.08.2018';
 
   FUNCTION header_version RETURN varchar2;
 
@@ -26,7 +26,7 @@ IS
 END SEGMENTATION_PACK;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.SEGMENTATION_PACK IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.4  01.10.2017';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.6  03.08.2018';
 
   TYPE parse_result IS RECORD(
      status      VARCHAR2(20)
@@ -355,55 +355,69 @@ CREATE OR REPLACE PACKAGE BODY BARS.SEGMENTATION_PACK IS
                              ' s6 - ' || to_char(l_s6) || ' l_rnk - ' ||
                              to_char(l_rnk));*/
         -- сегмент активності
+     if l_ACTIVITY is not null then 
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_ACTIVITY'
                                     ,udf_to_number(l_ACTIVITY)
 --                                    ,l_bank_date
                                     ,to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY')
                                     ,cast(null as date));
+     end if;                                        
         -- BARS.BARS_AUDIT.INFO('SEGMENTATION_PACK: parse_segments - in LOOP. s1 ' || to_char(l_rnk) || ' '  || to_char(l_s1));
         -- сегмент фінансовий
+     if l_FINANCIAL is not null then    
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_FINANCIAL'
                                     ,udf_to_number(l_FINANCIAL)
                                     ,to_date(l_FINANCIAL_VALID_FROM, 'DD.MM.YYYY')
                                     ,to_date(l_FINANCIAL_VALID_UNTIL, 'DD.MM.YYYY'));
+     end if;                                 
         -- сегмент поведінковий
+     if l_BEHAVIOR is not null then           
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_BEHAVIOR'
                                     ,udf_to_number(l_BEHAVIOR)
 --                                    ,l_bank_date
                                     ,to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY')
                                     ,cast(null as date));
+     end if;  
         -- BARS.BARS_AUDIT.INFO('SEGMENTATION_PACK: parse_segments - in LOOP. s3 ' || to_char(l_rnk) || ' '  || to_char(l_s3));
         -- сегмент транзактори  (кол-во операций в ТСП)
+     if l_TRANSACTIONS is not null then     
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_TRANSACTIONS'
                                     ,udf_to_number(l_TRANSACTIONS)
 --                                    ,l_bank_date
                                     ,to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY')
                                     ,cast(null as date));
+     end if; 
         -- BARS.BARS_AUDIT.INFO('SEGMENTATION_PACK: parse_segments - in LOOP. s4 ' || to_char(l_rnk) || ' '  || to_char(l_s4));
         -- Кількість операцій зняття готівки в АТМ
+    if l_ATM is not null then         
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_ATM'
                                     ,udf_to_number(l_ATM)
 --                                    ,l_bank_date
                                     ,to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY')
                                     ,cast(null as date));
+    end if; 
         -- Сума встановленої кредитної лінії на БПК
+    if l_BPK_CREDITLINE is not null then      
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_BPK_CREDITLINE'
                                     ,udf_to_number(l_BPK_CREDITLINE)
 --                                    ,l_bank_date
                                     ,to_date(l_dwhlog_row.bank_date, 'DD.MM.YYYY')
                                     ,cast(null as date));
+    end if; 
         -- Сума наданого кеш-кредиту
+    if l_CASHCREDIT_GIVEN is not null then             
         bars.attribute_utl.set_value(l_rnk
                                     ,'CUSTOMER_SEGMENT_CASHCREDIT_GIVEN'
                                     ,udf_to_number(l_CASHCREDIT_GIVEN)
                                     ,to_date(l_CASHCREDIT_GIVEN_VALID_FROM, 'DD.MM.YYYY')
                                     ,to_date(l_CASHCREDIT_GIVEN_VALID_UNTIL, 'DD.MM.YYYY'));
+    end if;                                  
 
       EXCEPTION
 

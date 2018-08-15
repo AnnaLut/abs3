@@ -60,8 +60,12 @@
 
 end ESCR;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.8 26/01/2018';
+
+show err
+
+create or replace package body ESCR
+IS
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.1.8  12/07/2018';
   --nlchr CHAR(2) := chr(13) || chr(10);
 
   /*
@@ -178,6 +182,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     when no_data_found then
       l_comp_sum := 0;
   end p_deal_comp_sum;
+
   procedure p_cc_lim_repair(id_log  escr_pay_log_body.id_log%type default null,
                             deal_id in cc_deal.nd%type default null) is
 
@@ -275,21 +280,22 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
          and acc in (select acc from nd_acc where nd = i.ND)
          and rownum = 1;
       escr.p_deal_sumg(deal_id => i.nd, l_lim_sumg => l_lim_sumg);
-      CCK_dpk.DPK(p_mode    => 2, -- IN  int   , -- 0 - справка, 1 - досрочное пог.+модификация ГПК (121) , 2 - только модификация ГПК (122)
-                  p_ND      => i.nd, -- IN  number, -- реф КД
-                  p_acc2620 => aa.acc, -- IN  number, -- счет гашения (2620) ----/2625/SG)
-                  p_K0      => p_k0, -- IN OUT number, -- 1-Ануитет. 0 - Класс
-                  p_K1      => 0, -- IN     number, -- <Сумма для досрочного пог>, по умолч = R2,
-                  p_K2      => p_k2, -- IN     number, -- <Платежный день>, по умол = DD от текущего банк.дня
-                  p_K3      => 1, -- IN     number, -- 1=ДА ,<с сохранением суммы одного платежа?>, 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
-                  p_Z1      => p_Z1, --OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
-                  p_Z2      => p_Z2, --OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
-                  p_Z3      => p_Z3, --OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
-                  p_Z4      => p_Z4, --OUT number, --ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
-                  p_Z5      => p_Z5, --OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
-                  p_R1      => p_R1, --OUT number, -- Общий ресурс (ост на SG(262*)
-                  p_R2      => p_R2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
-                  p_P1      => p_P1  --OUT number  --  Реф.платежа
+
+      CCK_dpk.DPK(p_mode    => 2,      -- IN     int   , -- 0 - справка, 1 - досрочное пог.+модификация ГПК (121) , 2 - только модификация ГПК (122)
+                  p_ND      => i.nd,   -- IN     number, -- реф КД
+                  p_acc2620 => aa.acc, -- IN     number, -- счет гашения (2620) ----/2625/SG)
+                  p_K0      => p_k0,   -- IN OUT number, -- 1-Ануитет. 0 - Класс
+                  p_K1      => 0,      -- IN     number, -- <Сумма для досрочного пог>, по умолч = R2,
+                  p_K2      => p_k2,   -- IN     number, -- <Платежный день>, по умол = DD от текущего банк.дня
+                  p_K3      => 1,      -- IN     number, -- 1=ДА ,<с сохранением суммы одного платежа?>, 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
+                  p_Z1      => p_Z1,   --    OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
+                  p_Z2      => p_Z2,   --    OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
+                  p_Z3      => p_Z3,   --    OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
+                  p_Z4      => p_Z4,   --    OUT number, -- ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
+                  p_Z5      => p_Z5,   --    OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
+                  p_R1      => p_R1,   --    OUT number, -- Общий ресурс (ост на SG(262*)
+                  p_R2      => p_R2,   --    OUT number, -- Свободный ресурс R2 =  R1 - z4
+                  p_P1      => p_P1   --    OUT number  -- Реф.платежа
                   );
       escr.p_cc_lim_count(deal_id      => i.nd,
                           cc_lim_count => l_lim_count_after);
@@ -442,7 +448,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
     p_p3    NUMBER;
     p_k2    NUMBER;
     phone_  acc_sms_phones.phone%TYPE;
-    l_msgid INTEGER;
     l_count NUMBER;
     l_nazn  NUMBER;
     ---------------------------------------
@@ -836,21 +841,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
                   ,t.not_sn
               FROM cc_lim t
              WHERE t.nd = dd.nd;*/
-          cck_dpk.dpk(p_mode    => 2, -- IN  int   , -- 0 - справка, 1 - досрочное пог.+модификация ГПК (121) , 2 - только модификация ГПК (122)
-                      p_nd      => dd.nd, -- IN  number, -- реф КД
-                      p_acc2620 => aa.acc, -- IN  number, -- счет гашения (2620) ----/2625/SG)
-                      p_k0      => p_k0, -- IN OUT number, -- 1-Ануитет. 0 - Класс
-                      p_k1      => 0, -- IN     number, -- <Сумма для досрочного пог>, по умолч = R2,
-                      p_k2      => p_k2, -- IN     number, -- <Платежный день>, по умол = DD от текущего банк.дня
-                      p_k3      => 1, -- IN     number, -- 1=ДА ,<с сохранением суммы одного платежа?>, 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
-                      p_z1      => p_z1, --OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
-                      p_z2      => p_z2, --OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
-                      p_z3      => p_z3, --OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
-                      p_z4      => p_z4, --OUT number, --ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
-                      p_z5      => p_z5, --OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
-                      p_r1      => p_r1, --OUT number, -- Общий ресурс (ост на SG(262*)
-                      p_r2      => p_r2, --OUT number, --  Свободный ресурс R2 =  R1 - z4
-                      p_p1      => p_p1 --OUT number  --  Реф.платежа
+          cck_dpk.dpk(p_mode    => 2,      -- IN     int   , -- 0 - справка, 1 - досрочное пог.+модификация ГПК (121) , 2 - только модификация ГПК (122)
+                      p_nd      => dd.nd,  -- IN     number, -- реф КД
+                      p_acc2620 => aa.acc, -- IN     number, -- счет гашения (2620) ----/2625/SG)
+                      p_k0      => p_k0,   -- IN OUT number, -- 1-Ануитет. 0 - Класс
+                      p_k1      => 0,      -- IN     number, -- <Сумма для досрочного пог>, по умолч = R2,
+                      p_k2      => p_k2,   -- IN     number, -- <Платежный день>, по умол = DD от текущего банк.дня
+                      p_k3      => 1,      -- IN     number, -- 1=ДА ,<с сохранением суммы одного платежа?>, 2=НЕТ (с перерасчетом суммы до последней ненулевой даты)
+                      p_z1      => p_z1,   --    OUT number, -- Просрочки z1 =SLN+SLK+SL+SPN+SK9+SP+SN8
+                      p_z2      => p_z2,   --    OUT number, -- Норм.проценты и комис z2 =SN+SN`+SK0
+                      p_z3      => p_z3,   --    OUT number, -- <Сегодняшний> или БЛИЖАЙШИЙ (будущий, следующий) платеж по телу
+                      p_z4      => p_z4,   --    OUT number, -- ИТОГО  обязательного платежа = z4 =  z1 + z2 + z3
+                      p_z5      => p_z5,   --    OUT number, -- Плановый остаток по телу  z5 = (SS - z3)
+                      p_r1      => p_r1,   --    OUT number, -- Общий ресурс (ост на SG(262*)
+                      p_r2      => p_r2,   --    OUT number, -- Свободный ресурс R2 =  R1 - z4
+                      p_p1      => p_p1   --    OUT number  -- Реф.платежа
                       );
           escr.p_cc_lim_count(deal_id      => dd.nd,
                               cc_lim_count => l_lim_count_after);
@@ -904,23 +909,16 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
       BEGIN
         SELECT phone INTO phone_ FROM acc_sms_phones WHERE acc = aa.acc; --ищем телефон по счету 2620
         bars_audit.info('ESCR-inf* SM ' || aa.acc || ';' || phone_ || ';');
-        bars_sms.create_msg(p_msgid           => l_msgid,
-                            p_creation_time   => SYSDATE,
-                            p_expiration_time => SYSDATE + 1,
-                            p_phone           => phone_,
-                            p_encode          => 'lat',
-                            p_msg_text        => 'Vam zarahovano vidshkoduvannja za teplim creditom.<\n>Data ' ||
-                                                 to_char(SYSDATE,
-                                                         'DD.MM.YYYY') ||
-                                                 '. Dovidka 0800210800',
-																								  p_kf              =>sys_context('bars_context','user_mfo'));
-        --l_msgid := NULL;
-        --phone_  := NULL; -- освобождаем переменную
+        BARS_SMS.CREATE_MSG
+        ( p_phone    => phone_
+        , p_msg_text => 'Vam zarahovano vidshkoduvannja za teplim creditom.<\n>Data '||to_char(SYSDATE,'DD.MM.YYYY')||'. Dovidka 0800210800'
+        , p_rnk      => aa.RNK
+        );
       EXCEPTION
         WHEN no_data_found THEN
           NULL;
       END;
-     -- По КД проставляємо статус "Оплачено"
+      -- По КД проставляємо статус "Оплачено"
       cck_app.set_nd_txt(dd.nd, 'ES000', 11);
       cck_app.set_nd_txt(dd.nd, 'ES005', 'Кошти зараховано');
       cck_app.set_nd_txt(dd.nd, 'ES006', sysdate);
@@ -935,24 +933,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.ESCR IS
   BEGIN
     DELETE FROM nlk_ref WHERE ref1 = p_ref;
   END del1;
-  -----------------------------------------------------------------------------------
+
   FUNCTION header_version RETURN VARCHAR2 IS
   BEGIN
     RETURN 'Package header ESCR ' || g_header_version;
   END header_version;
+
   FUNCTION body_version RETURN VARCHAR2 IS
   BEGIN
     RETURN 'Package body ESCR ' || g_body_version;
   END body_version;
-  ---Аномимный блок --------------
+
 BEGIN
   NULL;
-END escr;
+END ESCR;
 /
- show err;
- 
-PROMPT *** Create  grants  ESCR ***
-grant EXECUTE                                                                on ESCR            to BARS_ACCESS_DEFROLE;
+
+show err;
+
+grant EXECUTE on ESCR to BARS_ACCESS_DEFROLE;
 
  
  

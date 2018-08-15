@@ -9,6 +9,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Abstract
     public interface ICurrencyDictionary
     {
         IEnumerable<ZAY_AIMS> ZayAimsDictionary(bool isBuying);
+        IEnumerable<ZAY_BuyContract> ContractDictionary(decimal rnk);
         IEnumerable<F092Model> F092SellingDictionary();
         IEnumerable<F092Model> F092BuyingDictionary();
         IEnumerable<Country> CountryDictionary();

@@ -13,14 +13,99 @@ is
 
 -- g_header_version    constant varchar2 (64) := 'version 1.00.01 17/07/2015';
 --   g_header_version    constant varchar2 (64) := 'version 1.00.02 16/11/2015';
-   g_header_version    constant varchar2 (64) := 'version 1.00.05 02/12/2016';
+   g_header_version    constant varchar2 (64) := 'version 1.01.00 25/06/2018';
 
    g_awk_header_defs   constant varchar2 (512) := '';
+
 
    --------------------------------------------------------------------------------
    -- Типи
    --
+   type t_val is record (
+     rrrrw                varchar2(5),
+     val                  number
+   );
+   type t_arr_val is table of t_val;
 
+   type t_indicators_f503 is record (
+     contr_id             number,
+     p2010                number,
+     p2011                number,
+     p2012                number,
+     p2013                number,
+     p2014                number,
+     p2016                number,
+     p2017                number,
+     p2018                number,
+     p2020                number,
+     p2021                number,
+     p2022                number,
+     p2023                number,
+     p2024                number,
+     p2025                number,
+     p2026                number,
+     p2027                number,
+     p2028                number,
+     p2029                number,
+     p2030                number,
+     p2031                number,
+     p2032                number,
+     p2033                number,
+     p2034                number,
+     p2035                number,
+     p2036                number,
+     p2037                number,
+     p2038                number,
+     p2042                number
+   );
+   
+    type t_indicators_f504 is record (
+     contr_id             number,
+     p090                 number,
+     p212                 t_arr_val,
+
+     p213                 t_arr_val,
+     p201                 t_arr_val,
+     p222                 t_arr_val,
+     p223                 t_arr_val,
+     p292                 t_arr_val,
+     p293                 t_arr_val
+   );
+
+
+    type t_contracts is record ( 
+      contr_id                cim_contracts.contr_id%type, 
+      contr_type              cim_contracts.contr_type%type, 
+      contr_type_name         cim_contract_types.contr_type_name%type, 
+      num                     cim_contracts.num%type,  
+      subnum                  cim_contracts.subnum%type, 
+      rnk                     cim_contracts.rnk%type, 
+      okpo                    customer.okpo%type, 
+      nmk                     customer.nmk%type, 
+      nmkk                    customer.nmkk%type, 
+      custtype                customer.custtype%type, 
+      nd                      customer.nd%type,
+      status_id               cim_contracts.status_id%type, 
+      status_name             cim_contract_statuses.status_name%type,
+      comments                cim_contracts.comments%type,       
+      branch_own              cim_contracts.branch%type,           
+      branch_own_name         branch.name%type,
+      kv                      cim_contracts.kv%type,           
+      s                       cim_contracts.s%type,           
+      open_date               cim_contracts.open_date%type,           
+      close_date              cim_contracts.close_date%type,           
+      owner_uid               cim_contracts.owner_uid%type,           
+      owner_fio               staff$base.fio%type,
+      benef_id                cim_contracts.benef_id%type,           
+      benef_name              cim_beneficiaries.benef_name%type,
+      benef_adr               cim_beneficiaries.benef_adr%type,
+      country_id              cim_beneficiaries.country_id%type,
+      country_name            country.name%type,
+      deadline                cim_contracts_trade.deadline%type,
+      branch_service          cim_contracts.service_branch%type,           
+      branch_service_name     branch.name%type
+                               );
+    type t_arr_contracts is table of t_contracts;                           
    --------------------------------------------------------------------------------
    -- Константи
    --
@@ -95,6 +180,18 @@ function p_f531(p_date in date :=bankdate, p_error out varchar2) return clob;
    procedure sync_f503;
    procedure sync_f504;
 
+   procedure get_indicators_f503(p_contract_n number, p_date_z_begin date, p_date_z_end date, p_indicators_f503 out t_indicators_f503);
+   procedure get_indicators_f504(p_contract_n number, p_date_to date, p_date_z_begin date, p_indicators_f504 in out t_indicators_f504);
+   
+  function get_contracts_list(p_mfo         varchar2,--cim_contracts.kf%type, 
+                              p_date_from   cim_contracts.open_date%type, 
+                              p_date_to     cim_contracts.open_date%type,
+                              p_contr_type  varchar2,--cim_contracts.contr_type%type,
+                              p_kv          varchar2,--cim_contracts.kv%type,
+                              p_status      varchar2--cim_contracts.status_id%type
+                              )  
+   return t_arr_contracts pipelined PARALLEL_ENABLE;
+
 END cim_reports;
 /
 CREATE OR REPLACE PACKAGE BODY CIM_REPORTS
@@ -108,58 +205,9 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.10 19/02/2018';
+   g_body_version      constant varchar2 (64) := 'version 1.01.13 20/07/2018';
    g_awk_body_defs     constant varchar2 (512) := '';
 
-   type t_indicators_f503 is record (
-     contr_id             number,
-     p2010                number,
-     p2011                number,
-     p2012                number,
-     p2013                number,
-     p2014                number,
-     p2016                number,
-     p2017                number,
-     p2018                number,
-     p2020                number,
-     p2021                number,
-     p2022                number,
-     p2023                number,
-     p2024                number,
-     p2025                number,
-     p2026                number,
-     p2027                number,
-     p2028                number,
-     p2029                number,
-     p2030                number,
-     p2031                number,
-     p2032                number,
-     p2033                number,
-     p2034                number,
-     p2035                number,
-     p2036                number,
-     p2037                number,
-     p2038                number,
-     p2042                number
-   );
-
-   type t_val is record (
-     rrrrw                varchar2(5),
-     val                  number
-   );
-   type t_arr_val is table of t_val;
-
-   type t_indicators_f504 is record (
-     contr_id             number,
-     p090                 number,
-     p212                 t_arr_val,
-     p213                 t_arr_val,
-     p201                 t_arr_val,
-     p222                 t_arr_val,
-     p223                 t_arr_val,
-     p292                 t_arr_val,
-     p293                 t_arr_val
-   );
 
    --------------------------------------------------------------------------------
    -- header_version - повертає версію заголовка пакету
@@ -702,7 +750,7 @@ begin
                nvl2(a.p15, a.p14, a.f_p14) as p14, decode(a.p22, 3, 0, a.p15) as p15, case when a.p15 is null or a.m_p22=3 then a.f_p16 else a.p16 end as p16,
                case when a.p15 is null or a.m_p22=3 then a.f_p17 else a.p17 end as p17,
                decode(a.p22, 1, a.p18, a.f_p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
-               case when a.p15 is null or a.m_p22=3 then a.f_p21 else a.p21 end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
+               case when a.p15 is null or a.m_p22=3 then a.f_p21 else nvl(a.f_p21,a.p21) end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
                decode(a.p22, 3, case when a.p15=0 then a.max_pdat else null end, null) as p24, case when a.p27=0 then null else to_char(a.p27, 'fm999') end as p27, a.doc_date,
                case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new
                /*row_number() over ( partition by a.k020, decode(a.p22, 3, nvl(a.f_p08_old, a.f_p08), a.p08),
@@ -1117,8 +1165,8 @@ end  p_f531;
            ||cur.m||'080'||l_zn0yvt||cur.p080||chr(13)||chr(10)
            ||cur.m||'070'||l_zn0yvt||cur.p070||chr(13)||chr(10)
            ||cur.m||'950'||l_zn0yvt||cur.p950||chr(13)||chr(10)
-           
-           ||cur.m||'030'||l_zn0yvt||cur.p030||chr(13)||chr(10)           
+
+           ||cur.m||'030'||l_zn0yvt||cur.p030||chr(13)||chr(10)
            ;
        l_n:=l_n+8+1+6+1+1+4+1;
 
@@ -2440,6 +2488,76 @@ end  p_f531;
       end loop;
 
   end;
+
+  function get_contracts_list(p_mfo         varchar2,--cim_contracts.kf%type, 
+                              p_date_from   cim_contracts.open_date%type, 
+                              p_date_to     cim_contracts.open_date%type,
+                              p_contr_type  varchar2,--cim_contracts.contr_type%type,
+                              p_kv          varchar2,--cim_contracts.kv%type,
+                              p_status      varchar2--cim_contracts.status_id%type
+                              ) 
+  return t_arr_contracts pipelined PARALLEL_ENABLE
+  is
+    l_title   CONSTANT VARCHAR2 (50) := 'CIM_REPORTS.get_contracts_list: ';  
+    l_branch  CONSTANT VARCHAR2 (30) := sys_context('bars_context','user_branch'); 
+  
+    l_t_contracts t_contracts;
+    l_cur         sys_refcursor;
+    
+    l_sql         varchar2(4000) := 'select cc.contr_id, cc.contr_type, ct.contr_type_name, cc.num, cc.subnum, cc.rnk, c.okpo, '||chr(13)||chr(10)||
+                                    '       nvl((select nmku from corps where rnk=cc.rnk), c.nmk) nmk, c.nmkk, c.custtype, c.nd, '||chr(13)||chr(10)||
+                                    '       cc.status_id, cs.status_name, cc.comments,cc.branch branch_own, br.name branch_own_name, '||chr(13)||chr(10)||
+                                    '       cc.kv, round(cc.s/100,2) s, cc.open_date, cc.close_date, cc.owner_uid, (select fio from staff$base where id=cc.owner_uid) owner_fio, '||chr(13)||chr(10)||
+                                    '       cc.benef_id, b.benef_name, b.benef_adr, b.country_id, co.name country_name, cd.deadline, '||chr(13)||chr(10)||
+                                    '       cc.service_branch, brs.name service_branch_name '||chr(13)||chr(10)||
+                                    '  from cim_contracts cc '||chr(13)||chr(10)||
+                                    '  join cim_contract_statuses cs on cs.status_id=cc.status_id '||chr(13)||chr(10)||
+                                    '  join cim_contract_types ct on ct.contr_type_id=cc.contr_type '||chr(13)||chr(10)||
+                                    '  left outer join customer c on c.rnk=cc.rnk '||chr(13)||chr(10)|| --left join бо політизована
+                                    '  join cim_beneficiaries b on b.benef_id=cc.benef_id '||chr(13)||chr(10)||
+                                    '  left outer join country co on co.country=b.country_id '||chr(13)||chr(10)||
+                                    '  left outer join branch br on br.branch=cc.branch '||chr(13)||chr(10)||
+                                    '  left outer join branch brs on brs.branch=cc.service_branch '||chr(13)||chr(10)||
+                                    '  left outer join cim_contracts_trade cd on cd.contr_id=cc.contr_id '||chr(13)||chr(10);
+    l_sql_where   varchar2(1000) := ' where 1=1 ';
+    l_sql_order   varchar2(255)  := ' order by cc.branch, cc.contr_id';
+  begin
+    bars_audit.info(l_title||' Пуск l_branch='||l_branch);
+    if (l_branch is not null and l_branch not in ('/', '/300465/')) or (p_mfo = 'Поточне' and sys_context('bars_context','user_mfo') is not null) then 
+      --тільки ЦА або "/" може бачити все (таблиці на час розробки звіту неполітизовані тому є можливість для ЦА бачити всіх)
+      --таблиця customer політизована, тому якщо в табл. corps немає записів то для 300465 найменування організаціїї буде пустим
+      l_sql_where := l_sql_where||' and cc.kf = '''||sys_context('bars_context','user_mfo')||''' '||chr(13)||chr(10);
+    end if;  
+    
+    if p_mfo is not null and p_mfo != '%' and p_mfo != 'Поточне' then
+      l_sql_where := l_sql_where||' and cc.kf = '''||replace(p_mfo,'/','')||''' '||chr(13)||chr(10);
+    end if;  
+    if p_date_from is not null then
+      l_sql_where := l_sql_where||' and cc.open_date >= to_date('''||to_char(p_date_from,'DDMMYYYY')||''',''DDMMYYYY'') '||chr(13)||chr(10);
+    end if;   
+    if p_date_to is not null then
+      l_sql_where := l_sql_where||' and cc.open_date <= to_date('''||to_char(p_date_to,'DDMMYYYY')||''',''DDMMYYYY'') '||chr(13)||chr(10);
+    end if;   
+    if p_contr_type is not null and  p_contr_type != '%' then
+      l_sql_where := l_sql_where||' and cc.contr_type = '||p_contr_type||' '||chr(13)||chr(10);
+    end if;    
+    if p_kv is not null and p_kv != '%' then
+      l_sql_where := l_sql_where||' and cc.kv = '||p_kv||' '||chr(13)||chr(10);
+    end if;    
+    if p_status is not null and p_status != '%' then
+      l_sql_where := l_sql_where||' and cc.status_id = '||p_status||' '||chr(13)||chr(10);
+    end if;     
+    
+    bars_audit.info(l_title||' SQL = '||chr(13)||chr(10)||l_sql||l_sql_where||l_sql_order);
+    open l_cur for l_sql||l_sql_where||l_sql_order;
+    loop
+      fetch l_cur into l_t_contracts;
+      exit when l_cur%notfound;
+
+      pipe row (l_t_contracts);     
+    end loop;
+    close l_cur;
+  end;    
 
 
 end cim_reports;

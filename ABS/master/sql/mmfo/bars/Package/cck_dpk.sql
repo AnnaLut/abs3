@@ -1002,12 +1002,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
       Return;
     end if;
 
-    cck_dpk.PLAN_FAKT(p_nd); -- проверка на совпадение флановых и фактич остатков
+    cck_dpk.PLAN_FAKT(p_nd); -- проверка на совпадение плановых и фактич остатков
 
     If p_mode = 1 then
       -- досрочное погашение + изменение ГПК.
 
-      If nvl(p_k1, 0) <= 1 then
+      If nvl(p_k1, 0) <= 1 and nvl(Z5_,0) > 0 --COBUMMFO-6236 (test_result_20180418(п.1))
+				then
         bars_error.raise_nerror(p_errmod  => 'CCK',
                                 p_errname => 'SUM_POG',
                                 p_param1  => to_char(p_nd),
@@ -1018,7 +1019,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
 
       CCK_DPK.MODI_pay(p_ND, p_acc2620);
 
-      If Z5_ > 0 then
+      If Z5_ >= 0 then
         CCK_DPK.MODI_gpk(p_ND);
         p_P1 := RR1.ref;
       end if;

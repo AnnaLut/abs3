@@ -187,17 +187,26 @@ public partial class ins_new : System.Web.UI.Page
         if (PartnerType.OBJECT_TYPE == "CL")
         {
             rbgObject_CheckedChanged(true);
-            rbgObject_ShowHide(true, false);
+            rbgObject_ShowHide(true, false, false, true);
         }
         else if (PartnerType.OBJECT_TYPE == "GRT")
         {
             rbgObject_CheckedChanged(false);
-            rbgObject_ShowHide(false, true);
+            rbgObject_ShowHide(false, true, false, true);
+        }
+        else if (PartnerType.OBJECT_TYPE == "ANY")
+        {
+            // rbgObject_CheckedChanged(false);
+            rbgObject_ShowHide(false, false, true, false);
+        }
+        else if (PartnerType.OBJECT_TYPE == "RNK")
+        {
+            rbgObject_ShowHide(true, false, false, false);
         }
         else
         {
             rbgObject_CheckedChanged(true);
-            rbgObject_ShowHide(true, true);
+            rbgObject_ShowHide(true, true, false, true);
         }
 
         TextBoxRefer GRT_ID = (wzd.FindControl("GRT_ID") as TextBoxRefer);
@@ -479,19 +488,24 @@ public partial class ins_new : System.Web.UI.Page
                         P_INSU_SUM = INSU_SUM.Value;
                     }
 
-                    String P_OBJECT_TYPE = (rbCL.Checked ? "CL" : "GRT");
+                    VInsUserPartnerTypesRecord PartnerType = (new VInsUserPartnerTypes()).SelectPartnerType(PARTNER_ID.Value, TYPE_ID.Value);
+                    String P_OBJECT_TYPE = PartnerType.OBJECT_TYPE;
+                    //String P_OBJECT_TYPE = "ANY";
+                    //if (rbCL.Checked) P_OBJECT_TYPE = "CL";
+                    //else if (rbGRT.Checked) P_OBJECT_TYPE = "GRT";
+
                     Decimal? P_RNK = (Decimal?)null;
                     Decimal? P_GRT_ID = (Decimal?)null;
                     if (rbCL.Checked)
                     {
                         P_RNK = Convert.ToDecimal(CL_RNK.Value);
                     }
-                    else
+                    else if (rbGRT.Checked)
                     {
                         P_GRT_ID = Convert.ToDecimal(GRT_ID.Value);
                     }
-
-                    Decimal? P_ND = Convert.ToDecimal(ND.Value);
+                    decimal nd;
+                    Decimal? P_ND = Decimal.TryParse(ND.Value, out nd) ? (Decimal?)nd : null;
                     Decimal? P_PAY_FREQ = PAY_FREQ.Value;
                     Decimal? P_RENEW_NEED = RENEW_NEED.Value;
 
@@ -513,6 +527,11 @@ public partial class ins_new : System.Web.UI.Page
                                             P_PAY_FREQ,
                                             P_RENEW_NEED);
 
+                    if(P_OBJECT_TYPE == "ANY")
+                    {
+                        TextBoxString ANY = (wzd.FindControl("ANY") as TextBoxString);
+                        ip.SET_DEAL_ATTR_S(DEAL_ID, "ANY_DATA", ANY.Value);
+                    }
                     // закрываем старый договор
                     if (OLD_ID.HasValue)
                         ip.CLOSE_DEAL(OLD_ID, DEAL_ID, Comment);
@@ -732,7 +751,7 @@ public partial class ins_new : System.Web.UI.Page
             CL_RNK_ValueChanged(CL_RNK, null);
         }
     }
-    private void rbgObject_ShowHide(Boolean isCl_Visible, Boolean isGRT_Visible)
+    private void rbgObject_ShowHide(Boolean isCl_Visible, Boolean isGRT_Visible, Boolean isAnyVisible, Boolean isCredVisible)
     {
         HtmlTableRow ObjectRowCL = (wzd.FindControl("ObjectRowCL") as HtmlTableRow);
         RadioButton rbCL = (wzd.FindControl("rbCL") as RadioButton);
@@ -745,6 +764,12 @@ public partial class ins_new : System.Web.UI.Page
         ObjectRowsSeparator.Visible = isCl_Visible && isGRT_Visible;
         rbGRT.Visible = isCl_Visible && isGRT_Visible;
         ObjectRowGRT.Visible = isGRT_Visible;
+
+        HtmlTableRow ObjectRowCredContract = (wzd.FindControl("ObjectRowCredContract") as HtmlTableRow);
+        HtmlTableRow ObjectRowAnyContract = (wzd.FindControl("ObjectRowAnyContract") as HtmlTableRow);
+
+        ObjectRowCredContract.Visible = isCredVisible;
+        ObjectRowAnyContract.Visible = isAnyVisible;
     }
     private void rbgFinance_ClearData(Boolean isTARIFF_Checked)
     {

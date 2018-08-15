@@ -78,7 +78,6 @@
             }
         }
 
-
         $("#save-reason-btn").kendoButton({
             click: function (row, window) {
                 var grid=$("#grid").data("kendoGrid");
@@ -680,6 +679,15 @@
             rowEditTemplate = kendo.template($("#RowEditPattern").html());
         box.html(rowEditTemplate(data));
     }
+
+    $("#contractRefWindow").kendoWindow({
+        title: "Довідник номерів контрактів за РНК",
+        visible: false,
+        width: "400px",
+        //height: "300px",
+        resizable: false,
+        actions: ["Close"]
+    });
 
     $("#grid").on("dblclick", "tr.k-state-selected", function () {
         var grid = $("#grid").data("kendoGrid"),

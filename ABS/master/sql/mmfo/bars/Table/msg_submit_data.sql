@@ -50,33 +50,50 @@ exception when others then
 end; 
 /
 
+prompt -- ======================================================
+prompt -- Alters
+prompt -- ======================================================
 
-
+declare
+  e_col_exists           exception;
+  pragma exception_init( e_col_exists, -01430 );
+begin
+  execute immediate 'alter table MSG_SUBMIT_DATA add RNK number(38)';
+  dbms_output.put_line( 'Table altered.' );
+exception
+  when e_col_exists 
+  then null;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to MSG_SUBMIT_DATA ***
- exec bpa.alter_policies('MSG_SUBMIT_DATA');
 
+exec bpa.alter_policies('MSG_SUBMIT_DATA');
 
-COMMENT ON TABLE BARS.MSG_SUBMIT_DATA IS 'Повідомлення для посилки SMS';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.KF IS '';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.MSG_ID IS 'ID повідомлення';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.CREATION_TIME IS 'Час створення повідомлення';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.EXPIRATION_TIME IS 'Граничний час актуальності повідомлення';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.PHONE IS '№ моб. телефону';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.ENCODE IS 'Кодування повідомлення cyr/lat';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.MSG_TEXT IS 'Текст повідомлення';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.STATUS IS 'Статус повідомлення';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.STATUS_TIME IS 'Час зміни статусу';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.SUBMIT_CODE IS 'Результат відправки повідомлення';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.LAST_ERROR IS 'Описа останньої помилки';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.SMPP_ERROR_MSG IS '';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.PAYEDREF IS '';
-COMMENT ON COLUMN BARS.MSG_SUBMIT_DATA.REF IS 'Референс повідомлення в центрі відправки повідомлень для пошуку повідомлення при проставленні статусу після відправки';
+prompt -- ======================================================
+prompt -- Comments
+prompt -- ======================================================
 
+COMMENT ON TABLE  MSG_SUBMIT_DATA                 IS 'Повідомлення для посилки SMS';
 
-
+COMMENT ON COLUMN MSG_SUBMIT_DATA.KF              IS 'Код фiлiалу (МФО)';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.MSG_ID          IS 'ID повідомлення';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.CREATION_TIME   IS 'Час створення повідомлення';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.EXPIRATION_TIME IS 'Граничний час актуальності повідомлення';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.PHONE           IS '№ моб. телефону';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.ENCODE          IS 'Кодування повідомлення cyr/lat';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.MSG_TEXT        IS 'Текст повідомлення';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.STATUS          IS 'Статус повідомлення';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.STATUS_TIME     IS 'Час зміни статусу';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.SUBMIT_CODE     IS 'Результат відправки повідомлення';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.LAST_ERROR      IS 'Описа останньої помилки';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.SMPP_ERROR_MSG  IS '';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.PAYEDREF        IS '';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.REF             IS 'Референс повідомлення в центрі відправки повідомлень для пошуку повідомлення при проставленні статусу після відправки';
+COMMENT ON COLUMN MSG_SUBMIT_DATA.RNK             IS 'РНК по продукту якого було надіслано SMS';
 
 PROMPT *** Create  constraint PK_MSGSUBMIT1 ***
+
 begin   
  execute immediate '
   ALTER TABLE BARS.MSG_SUBMIT_DATA ADD CONSTRAINT PK_MSGSUBMIT1 PRIMARY KEY (MSG_ID, KF)
@@ -268,13 +285,7 @@ exception when others then
 
 
 PROMPT *** Create  grants  MSG_SUBMIT_DATA ***
-grant SELECT                                                                 on MSG_SUBMIT_DATA to BARSREADER_ROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on MSG_SUBMIT_DATA to BARS_ACCESS_DEFROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on MSG_SUBMIT_DATA to START1;
-grant SELECT                                                                 on MSG_SUBMIT_DATA to UPLD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/MSG_SUBMIT_DATA.sql =========*** End *
-PROMPT ===================================================================================== 
+grant SELECT                      on MSG_SUBMIT_DATA to BARSREADER_ROLE;
+grant DELETE,INSERT,SELECT,UPDATE on MSG_SUBMIT_DATA to BARS_ACCESS_DEFROLE;
+grant SELECT                      on MSG_SUBMIT_DATA to START1;
+grant SELECT                      on MSG_SUBMIT_DATA to UPLD;

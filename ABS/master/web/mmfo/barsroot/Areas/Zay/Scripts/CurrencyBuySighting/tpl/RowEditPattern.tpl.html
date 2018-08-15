@@ -6,7 +6,8 @@
         </div>
         <div>
             <label for="contract" class="simple">2. № контракту:</label>
-            <input id="contract" type="text" class="form-control" value="#= CONTRACT === null ? '' : CONTRACT #"><span style="color: red; font-size: 19px">*</span>
+            <input id="contract" type="text" style="width:320px;margin-bottom: 5px;font-size: 13px;" class="form-control" maxlength="240" value="#= CONTRACT === null ? '' : CONTRACT #"><span style="color: red; font-size: 19px">*</span>
+            <button class="k-button" style="margin-bottom: 5px;" onclick="bars.helper.chooseContract('#=RNK#')">...</button>
         </div>
         <div class="date-picker" style="margin-top: 10px;">
             <label for="dat2_vmd" class="simple">3. Дата контракту:</label>

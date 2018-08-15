@@ -27,6 +27,18 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             return _entities.ExecuteStoreQuery<ZAY_AIMS>(query);
         }
 
+        public IEnumerable<ZAY_BuyContract> ContractDictionary(decimal rnk)
+        {
+            string query = @"select distinct contr_id as CONTRACT_ID, num as CONTRACT_NUMBER, open_date as CONTRACT_DATE from V_CIM_ALL_CONTRACTS where rnk= :RNK";
+            var param = new object[]
+            {
+                new OracleParameter("RNK", OracleDbType.Decimal, rnk, ParameterDirection.Input),
+            };
+
+            return _entities.ExecuteStoreQuery<ZAY_BuyContract>(query, param);
+        }
+
+
         public IEnumerable<F092Model> F092SellingDictionary()
         {
             var query = @"select f092 as F092_Code, txt as F092_Name from f092 where to_number(f092,'999') >199";

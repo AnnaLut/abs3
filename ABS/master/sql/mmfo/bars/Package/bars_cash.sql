@@ -278,7 +278,7 @@ is
     -- Константы                                                   --
     -----------------------------------------------------------------
 
-    VERSION_BODY      constant varchar2(64)  := 'version 6.4 15.05.2018';
+    VERSION_BODY      constant varchar2(64)  := 'version 7.0 39.07.2018';
     G_MODULE          constant varchar2(4)   := 'CSH';
     G_CASH_JOURNAL    constant varchar2(4)   := 'CJ';
     G_SVOD_DAY        constant varchar2(4)   := 'SD';
@@ -1317,7 +1317,7 @@ is
                        opldok l,
                        opldok l2,
                        accounts a2,
-                       v_cashaccounts_hist v,
+                       v_cashaccounts v,
                        (select unique ref                      -- Найдем все платеди завизирвоанные в эту смену
                           from cash_lastvisa ov                -- Берем ф-цию max, берем ф-цию MAX, поскольку на одном док-те может быть несколько виз касс (Например сховище и кассир)
                          where ov.dat >= l_start_date  and ov.dat < l_next_shift_date
@@ -1333,14 +1333,13 @@ is
                    and o.sos     = 5
                    and o.ref     = l.ref
                    and v.acc     = l.acc
-		   --and o.pdat    between l_shift_date - 10 and  l_shift_date + 10
-		   --and l.fdat    between l_shift_date - 10 and  l_shift_date + 10
-		   --and l2.fdat   between l_shift_date - 10 and  l_shift_date + 10
+		           and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
+		           and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
+		           and l2.fdat   between l_shift_date - 5 and  l_shift_date + 5
                    and l.ref     = l2.ref
                    and l.stmt    = l2.stmt
                    and l.dk      = 1 - l2.dk
-                   and l2.acc    = a2.acc
-                   and v.opdate  = l_shift_date;
+                   and l2.acc    = a2.acc;
 
 
 
@@ -1381,7 +1380,7 @@ is
                  from
                       oper           o,
                       opldok         l,
-                      v_cashaccounts_hist v,
+                      v_cashaccounts v,
                       (select unique ref                 -- Найдем все платеди завизирвоанные в эту смену
                          from cash_lastvisa ov           -- Берем ф-цию max, берем ф-цию MAX, поскольку на одном док-те может быть несколько виз касс (Например сховище и кассир)
                         where ov.dat >= l_start_date
@@ -1390,10 +1389,9 @@ is
                 where ov.ref = o.ref
                   and o.sos  = 5
                   and o.ref  = l.ref
- 		  and o.pdat    between l_shift_date - 10 and  l_shift_date + 10
-		  and l.fdat    between l_shift_date - 10 and  l_shift_date + 10
-                  and l.acc= v.acc
-                  and v.opdate  = l_shift_date;
+ 		          and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
+		          and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
+                  and l.acc= v.acc;
 
 
 
@@ -1507,8 +1505,8 @@ is
                 ) ov
           where ov.ref = o.ref
             and o.sos  = 5
-   	        and o.pdat    between l_shift_date - 10 and  l_shift_date + 10
-			and l.fdat    between l_shift_date - 10 and  l_shift_date + 10
+   	        and o.pdat    between l_shift_date - 5 and  l_shift_date + 5
+		    and l.fdat    between l_shift_date - 5 and  l_shift_date + 5
             and o.ref  = l.ref
             and l.acc= v.acc;
 

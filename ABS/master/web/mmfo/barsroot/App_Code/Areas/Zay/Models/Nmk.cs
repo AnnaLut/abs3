@@ -14,7 +14,7 @@ public class Nmk
     public decimal SOS { get; set; }
     public decimal DK { get; set; }
     public DateTime FDAT { get; set; }
-    public decimal REF { get; set; }
+    public decimal? REF { get; set; }
     public decimal DIG { get; set; }
     public decimal NREFSOS { get; set; }
 }

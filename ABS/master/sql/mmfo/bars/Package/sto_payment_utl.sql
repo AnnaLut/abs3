@@ -494,18 +494,14 @@ create or replace package body sto_payment_utl as
         p_customer_id in integer,
         p_message     in varchar2)
     is
-        l_msgid integer;
         l_customer_phone varchar2(30 char);
     begin
         l_customer_phone := customer_utl.get_customer_mobile_phone(p_customer_id);
-        if (l_customer_phone is not null) then
-            bars_sms.create_msg(p_msgid           => l_msgid,
-                                p_creation_time   => sysdate,
-                                p_expiration_time => sysdate + 1,
-                                p_phone           => l_customer_phone,
-                                p_encode          => 'lat',
-                                p_msg_text        => substr(p_message, 1, 160),
-                                p_kf              => sys_context('bars_context','user_mfo'));
+        if (l_customer_phone is not null)
+        then
+            BARS_SMS.CREATE_MSG( p_phone    => l_customer_phone,
+                                 p_msg_text => substr(p_message,1,160),
+                                 p_rnk      => p_customer_id );
         end if;
     end;
 

@@ -113,6 +113,14 @@ exception when others then
  end;
 /
 
+PROMPT *** ALTER TABLE BARS.INS_DEAL_ATTRS VAL ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.INS_DEAL_ATTRS MODIFY (VAL VARCHAR2(4000))';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  INS_DEAL_ATTRS ***

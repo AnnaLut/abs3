@@ -42,5 +42,10 @@
         public string n_nbu { get; set; }
         public string irr { get; set; }
         public string nd { get; set; }
+
+        public decimal agreementType { get; set; }
+        public string BUS_MOD { get; set; }
+        public string SPPI { get; set; }
+        public string IFRS { get; set; }
     }
 }
