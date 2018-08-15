@@ -224,6 +224,22 @@
             </summary>
             <param name="message"></param>
         </member>
+        <member name="M:Bars.API.Core.Extensions.BarsLog.Error``1(System.String,``0,System.Exception)">
+            <summary>
+            In-code errors with 1 argument and exceptions
+            </summary>
+            <param name="message"></param>
+            <param name="argument1"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Bars.API.Core.Extensions.BarsLog.Error``1(System.String,System.Exception,``0[])">
+            <summary>
+            
+            </summary>
+            <param name="message"></param>
+            <param name="e"></param>
+            <param name="arguments"></param>
+        </member>
         <member name="M:Bars.API.Core.Extensions.BarsLog.Error(System.String,System.Exception)">
             <summary>
             In-code errors with exceptions
@@ -239,6 +255,14 @@
             <param name="custId"></param>
             <param name="bankId"></param>
             <param name="e"></param>
+        </member>
+        <member name="M:Bars.API.Core.Extensions.BarsLog.Info``1(System.String,``0[])">
+            <summary>
+            
+            </summary>
+            <typeparam name="TArgument"></typeparam>
+            <param name="message"></param>
+            <param name="arguments"></param>
         </member>
         <member name="M:Bars.API.Core.Extensions.BarsLog.Info(System.String)">
             <summary>
@@ -338,6 +362,18 @@
             <param name="key">key name</param>
             <returns></returns>
         </member>
+        <member name="T:Bars.API.Core.Extensions.ExceptionExtensions">
+            <summary>
+            Extends Exception class
+            </summary>
+        </member>
+        <member name="M:Bars.API.Core.Extensions.ExceptionExtensions.GetAllMessages(System.Exception)">
+            <summary>
+            Get all exception messages in this exception hierarchy
+            </summary>
+            <param name="e">thrown exception</param>
+            <returns>string that contains all exception messages in hierarchy</returns>
+        </member>
         <member name="T:Bars.API.Core.Extensions.OwinFirewall">
             <summary>
             Simple Firewall 
@@ -378,6 +414,12 @@
                 Creates the kernel that will manage your application.
             </summary>
             <returns>The created kernel.</returns>
+        </member>
+        <member name="M:Bars.API.Core.Infrastructure.DI.NinjectWebCommon.RegisterServices(Ninject.IKernel)">
+            <summary>
+                Load your modules or register your services here!
+            </summary>
+            <param name="kernel">The kernel.</param>
         </member>
         <member name="M:Bars.API.Core.Infrastructure.PagingExtensions.GetPage``1(System.Linq.IQueryable{``0},Bars.API.Core.Infrastructure.Page)">
             <summary>

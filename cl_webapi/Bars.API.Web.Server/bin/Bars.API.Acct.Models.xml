@@ -56,7 +56,7 @@
         </member>
         <member name="T:Bars.API.Acct.Models.IncomingDocument">
             <summary>
-            Модель платежу
+            Модель платежу 
             </summary>
         </member>
         <member name="P:Bars.API.Acct.Models.IncomingDocument.RecipientCustomerId">
@@ -224,14 +224,14 @@
             Фінансова дата документу
             </summary>
         </member>
+        <member name="P:Bars.API.Acct.Models.Transaction.CreatedDate">
+            <summary>
+            Дата створення документу
+            </summary>
+        </member>
         <member name="P:Bars.API.Acct.Models.Transaction.PayedDate">
             <summary>
             Фактична дата оплати документу
-            </summary>
-        </member>
-        <member name="P:Bars.API.Acct.Models.Transaction.CreateDate">
-            <summary>
-            Дата створення документу
             </summary>
         </member>
         <member name="P:Bars.API.Acct.Models.Transaction.Sender">

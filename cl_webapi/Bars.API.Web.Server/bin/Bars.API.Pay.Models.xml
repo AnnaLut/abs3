@@ -24,11 +24,6 @@
             Create payment status object
             </summary>
         </member>
-        <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.Id">
-            <summary>
-            Document Id
-            </summary>
-        </member>
         <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus.BankReceivedDate">
             <summary>
             Date when bank had received payment
@@ -67,6 +62,21 @@
         <member name="P:Bars.API.Pay.Models.Responses.UpdateResourceStatus`1.Message">
             <summary>
             Status message
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.SwiftModel.Purpose">
+            <summary>
+            Призначення платежу
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.SwiftModel.PaymentFee">
+            <summary>
+            Комісійні за рахунок
+            </summary>
+        </member>
+        <member name="P:Bars.API.Pay.Models.SwiftModel.Amount">
+            <summary>
+            Сума платежу
             </summary>
         </member>
     </members>
