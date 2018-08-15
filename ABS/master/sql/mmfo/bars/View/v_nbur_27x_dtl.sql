@@ -10,9 +10,9 @@ select p.REPORT_DATE
        , p.VERSION_ID
        , p.NBUC
        , p.FIELD_CODE
-       , SUBSTR(p.FIELD_CODE, 7, 1) as F091
-       , SUBSTR(p.FIELD_CODE, 8, 4) as R020
-       , SUBSTR(p.FIELD_CODE, 12, 3) as R030
+       , SUBSTR(p.FIELD_CODE, 1, 1) as F091
+       , SUBSTR(p.FIELD_CODE, 2, 4) as R020
+       , SUBSTR(p.FIELD_CODE, 6, 3) as R030
        , p.FIELD_VALUE
        , p.DESCRIPTION
        , p.ACC_ID
@@ -47,6 +47,7 @@ select p.REPORT_DATE
                                              )
    where p.REPORT_CODE = '27X'
      and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED' );
+     
 comment on table V_NBUR_27X_DTL is 'Детальний протокол файлу 27X';
 comment on column V_NBUR_27X_DTL.REPORT_DATE is 'Звітна дата';
 comment on column V_NBUR_27X_DTL.KF is 'Код фiлiалу (МФО)';
