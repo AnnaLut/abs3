@@ -6,9 +6,7 @@ PROMPT =========================================================================
 
 
 PROMPT *** Create  procedure P_FF1_NN ***
---
--- P_FF1_NN  (Procedure) 
---
+
 CREATE OR REPLACE PROCEDURE BARS.P_FF1_NN (dat_     DATE,
                                            sheme_   VARCHAR2 DEFAULT 'G') IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -584,7 +582,8 @@ BEGIN
                        and p.s*100 = k.s_nom
                        and w.ref = k.ref
                        and w.tag like '59%'
-                       and p.nlsk = substr(w.value,2,14);
+                       and p.nlsk = substr(w.value,2,14)
+                       and rownum =1; 
 
                     update otcn_prov_temp t set t.rnk = rnk_
                     where t.ref = k.ref
