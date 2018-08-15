@@ -1055,7 +1055,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.11  07.06.2018';
+  g_body_version  constant varchar2(32)  := 'version 48.11  12.07.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -18720,6 +18720,7 @@ is
                                                         ' Dovidka 0800210800.',
                                                         1,
                                                         160),
+                            p_rnk             => p_rnk,
                             p_kf              => l_kf);
         --  зберігаємо інфу по відпрвці
         insert into acc_msg

@@ -96,17 +96,18 @@ angular.module("BarsWeb.Controllers")
             }
             $http.get(currencyOperationData.GetApplicationMethod, { params: { dfKV: $scope.dfKV, dfRNK: $scope.rnk, dfID: $scope.dfID, nDk: $scope.nDk } })
                 .then(function (response) {
-                    if (response.data == "") {
+                    var result = response.data;
+                    if (result.Status == "error") {
                         //       clearAllFields();
                         $scope.FDAT = "";
                         $scope.DK = "";
-                        bars.ui.error({ text: "Заявка із заданими параметрами не знайдена!" });
+                        bars.ui.error({ text: result.Message });
                         return;
                     }
-                    $scope.FDAT = kendo.toString(kendo.parseDate(response.data.FDAT), 'dd/MM/yyyy');
-                    $scope.DK = response.data.DK;
-                    $scope.sos = +response.data.SOS;
-                    $scope.ref = +response.data.REF;
+                    $scope.FDAT = kendo.toString(kendo.parseDate(response.data.Data.FDAT), 'dd/MM/yyyy');
+                    $scope.DK = result.Data.DK;
+                    $scope.sos = +result.Data.SOS;
+                    $scope.ref = +result.Data.REF;
 
                     if ($scope.ref != undefined)
                         $http.get(currencyOperationData.getNrefSosMethod, { params: { nRef: $scope.ref } })

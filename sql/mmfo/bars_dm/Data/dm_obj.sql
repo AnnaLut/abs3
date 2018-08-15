@@ -53,6 +53,14 @@ into dm_obj (OBJ_NAME, IMP_TYPE, OBJ_PROC, IMP_ORDER, ACTIVE, PARALLEL_FLAG)
 values ('CREDITS_ZAL', 'MONTH', 'dm_import.credits_zal_imp', 11, 1, 'Y')
 into dm_obj (OBJ_NAME, IMP_TYPE, OBJ_PROC, IMP_ORDER, ACTIVE, PARALLEL_FLAG)
 values ('CREDITS_ZAL', 'DAY', 'dm_import.credits_zal_imp', 15, 1, 'Y')
+into dm_obj (OBJ_NAME, IMP_TYPE, OBJ_PROC, IMP_ORDER, ACTIVE, PARALLEL_FLAG)
+values ('CREDITS_OPER', 'MONTH', 'dm_import.credits_oper_imp', 12, 1, 'Y')
+into dm_obj (OBJ_NAME, IMP_TYPE, OBJ_PROC, IMP_ORDER, ACTIVE, PARALLEL_FLAG)
+values ('CREDITS_OPER', 'DAY', 'dm_import.credits_oper_imp', 16, 1, 'Y')
+into dm_obj (OBJ_NAME, IMP_TYPE, OBJ_PROC, IMP_ORDER, ACTIVE, PARALLEL_FLAG)
+values ('DEPOSITS_OPER', 'MONTH', 'dm_import.deposits_oper_imp', 13, 1, 'Y')
+into dm_obj (OBJ_NAME, IMP_TYPE, OBJ_PROC, IMP_ORDER, ACTIVE, PARALLEL_FLAG)
+values ('DEPOSITS_OPER', 'DAY', 'dm_import.deposits_oper_imp', 17, 1, 'Y')
 select 1 from dual;
 
 commit;

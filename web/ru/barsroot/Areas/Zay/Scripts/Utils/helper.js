@@ -550,7 +550,7 @@ bars.helper = bars.helper || {
             bars.ui.error({ text: "Не вказано дату контракту " });
             return false;
         }
-		 else if (f092_text === "" || f092_text === null) {
+        else if (f092_text === "" || f092_text === null) {
             bars.ui.error({ text: 'Не вказано "Підставу для купівлі (510) "' });
             return false;
         }

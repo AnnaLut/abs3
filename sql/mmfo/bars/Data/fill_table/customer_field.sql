@@ -7,3 +7,9 @@ exception
 when dup_val_on_index then null;
 end;
 /
+
+begin
+ update customer_field set F=2,F_SPD=2 where tag = 'FMPOS';
+commit;
+ end;
+/

@@ -3,8 +3,7 @@ using BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Controllers;
 using System;
 using BarsWeb.Core.Logger;
-
-
+using BarsWeb.Core.Models.Json;
 
 namespace BarsWeb.Areas.Zay.Controllers
 {
@@ -61,19 +60,26 @@ namespace BarsWeb.Areas.Zay.Controllers
 
         public ActionResult GetApplication(decimal dfID, decimal dfKV, decimal dfRNK, decimal nDk)
         {
+            JsonResponse JsonResult = new JsonResponse("ok"); 
             try
             {
                 var nmkArr = _repo.GetApplication(dfID, dfKV, dfRNK, nDk);
                 if (nmkArr.Count == 0)
-                    throw new Exception();
-
-                return Json(nmkArr[0], JsonRequestBehavior.AllowGet);
+                {
+                    JsonResult.Status = "error";
+                    JsonResult.Message = "Заявка із заданими параметрами не знайдена!";
+                }
+                else
+                {
+                    JsonResult.Data = nmkArr[0];
+                }
             }
             catch (Exception ex)
             {
-                string errText = null;
-                return Json(errText, JsonRequestBehavior.AllowGet);
+                JsonResult.Status = "error";
+                JsonResult.Message = ex.Message;
             }
+            return Json(JsonResult, JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetNrefSos(decimal nRef)
         {

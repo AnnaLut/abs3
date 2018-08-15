@@ -1,8 +1,14 @@
-﻿$(document).ready(function() {
+﻿$(document).ready(function () {
 
     var validator = $("#deal").kendoValidator().data("kendoValidator"), status = $(".status");
 
     var ND;
+
+    var dealData = {
+        typeBModel: null,
+        k9: null
+    }
+
     $("#deal").kendoValidator({
         //errorTemplate: "<span>#=message#</span>"
         errorTemplate: "<span style=\"color:red; font-style:italic;\">#=message#</span>"
@@ -25,11 +31,11 @@
     }, 100);
 
     //Реквізити Банка (зліва)
-    $(function() {
+    $(function () {
         $.ajax({
             type: "GET",
             url: bars.config.urlContent("/api/mbdk/bankrequisites/getleftbankrequire"),
-            success: function(data) {
+            success: function (data) {
                 $("#bankName").text(data[0]);
                 $(".mfo").val(data[1]);
                 $("#bicode").val(data[2]);
@@ -44,15 +50,9 @@
         optionLabel: " ",
         dataTextField: "NAME",
         dataValueField: "VIDD",
-        dataSource: {
-            transport: {
-                read: {
-                    dataType: "json",
-                    url: bars.config.urlContent("/api/mbdk/getdata/getagreements")
-                }
-            }
-        },
-        change: function(e) {
+        dataSource: [],
+        enable: false,
+        change: function (e) {
             $("#nmk").text("");
             $("#mfo").val("");
             $("#bic").val("");
@@ -88,13 +88,112 @@
         }
     });
 
+    $("#agreementType").kendoDropDownList({
+        optionLabel: " ",
+        dataTextField: "NAME",
+        dataValueField: "TIPD",
+        dataSource: {
+            transport: {
+                read: {
+                    dataType: "json",
+                    url: bars.config.urlContent("/api/mbdk/getdata/GetAgreementTypes")
+                }
+            }
+        },
+        change: loadingDealType
+    });
+
+    var typeBModelData = [
+        { text: "1", value: "1" }
+    ];
+
+    $("#typeBModel").kendoDropDownList({
+        optionLabel: " ",
+        dataTextField: "text",
+        dataValueField: "value",
+        dataSource: typeBModelData,
+        change: IFRScalculate
+    });
+
+    $("#critSPPI").kendoDropDownList({
+        optionLabel: " ",
+        dataTextField: "SPPI_ID",
+        dataValueField: "SPPI_VALUE",
+        dataSource: {
+            transport: {
+                read: {
+                    dataType: "json",
+                    url: bars.config.urlContent("/api/mbdk/getdata/GetSPPIValues")
+                }
+            }
+        },
+        change: IFRScalculate,
+    });
+
+    function IFRScalculate() {
+        if (!$("#typeBModel").val() || !$("#critSPPI").val()) {
+            $("#clasMsfz").val("");
+            $("#dealType").data("kendoDropDownList").dataSource.data([]);
+            $("#dealType").data("kendoDropDownList").enable(false);
+            return;
+        }
+
+        $.ajax({
+            type: "GET",
+            url: bars.config.urlContent("/api/mbdk/getdata/GetIFRS?businessModel=" + $("#typeBModel").val() + "&sppiVal=" + $("#critSPPI").val()),
+            success: function (data) {
+                $("#clasMsfz").val(data.IFRS);
+                dealData.k9 = data.K9;
+                dealData.typeBModel = data.BUS_MOD;
+                loadingDeals();
+            }
+        });
+    };
+
+    function loadingDeals() {
+        $.ajax({
+            type: "GET",
+            url: bars.config.urlContent("/api/mbdk/getdata/GetAgreements?tipdVal=" + dealData.typeBModel + "&k9Val=" + dealData.k9),
+            success: function (deals) {
+                $("#dealType").data("kendoDropDownList").dataSource.data(deals);
+                $("#dealType").data("kendoDropDownList").enable(true);
+            }
+        });
+    }
+
+    function loadingDealType() {
+        $("#dealType").data("kendoDropDownList").dataSource.data([]);
+
+        if (!$("#agreementType").val() || ($("#agreementType").val() == 1 && !$("#clasMsfz").val())) {
+            $("#dealType").data("kendoDropDownList").enable(false);
+            return;
+        }
+
+        if ($("#agreementType").val() == 1) {
+            loadingDeals();
+            return;
+        }
+
+        if ($("#agreementType").val() == 2) {
+            $.ajax({
+                type: "GET",
+                url: bars.config.urlContent("/api/mbdk/getdata/GetAgreements?tipdVal=2"),
+                success: function (data) {
+                    dealData.dealTypesData = data;
+                    $("#dealType").data("kendoDropDownList").dataSource.data(dealData.dealTypesData);
+                    $("#dealType").data("kendoDropDownList").enable(true);
+                }
+            });
+        }
+    }
+
     $("#s58DfieldWindow").kendoWindow({
         width: "300px",
         title: "Підтвердження",
         visible: false
     });
     $("#confirm58DBtn").kendoButton({
-        click: function() {
+        click: function () {
             $("#s58DfieldWindow").data("kendoWindow").close();
             saveDeal();
         }
@@ -118,10 +217,10 @@
         minLength: 0,
         placeholder: "Валюта",
         autoWidth: false,
-        change: function() {
+        change: function () {
             var val = this.value().trim();
             var data = this.dataSource.data();
-            if (!data.some(function(x) { return x.KV == val; })) {
+            if (!data.some(function (x) { return x.KV == val; })) {
                 this.value('');
                 $('#currency').data('kendoAutoComplete').search();
             };
@@ -131,11 +230,11 @@
     var autoComplete = $("#currency").data("kendoAutoComplete");
     autoComplete.list.width(400);
 
-    $('#currency').focus(function() {
+    $('#currency').focus(function () {
         $('#currency').data('kendoAutoComplete').search();
     });
 
-    $("#eq3").change(function() {
+    $("#eq3").change(function () {
         if ($('#eq3').is(':checked')) {
             $("#s3").attr("readonly", true);
             $("#s3").val("");
@@ -145,7 +244,7 @@
             $("#s3").removeClass("non-active");
         }
     });
-    $("#eq2").change(function() {
+    $("#eq2").change(function () {
         if ($('#eq2').is(':checked')) {
             $("#s1").attr("readonly", true);
             $("#s1").val("");
@@ -156,22 +255,22 @@
             $("#s1").removeClass("non-active");
         }
     });
-    $("#s1").change(function() {
+    $("#s1").change(function () {
         if (!bars.utils.checkNlsCtrlDigit($("#mfo").val(), $("#s1").val())) {
             bars.ui.alert({ text: "Не проходить перевірку контрольного розряду" })
         }
     });
-    $("#s3").change(function() {
+    $("#s3").change(function () {
         if (!bars.utils.checkNlsCtrlDigit($("#mfo").val(), $("#s3").val())) {
             bars.ui.alert({ text: "Не проходить перевірку контрольного розряду" })
         }
     });
 
-    var getRoadInfo = function() {
+    var getRoadInfo = function () {
         $.ajax({
             type: "GET",
             url: bars.config.urlContent("/api/mbdk/getdata/getroadinfo?nls=" + $("#nls").val() + "&kv=" + $("#currency").val()),
-            success: function(data) {
+            success: function (data) {
                 $("#acc").val(data.ACC);
                 $("#bicUser").val(data.BIC);
                 if ($("#acc").val() == 0) {
@@ -189,7 +288,7 @@
         return value;
     }
 
-    var getContractorParams = function() {
+    var getContractorParams = function () {
 
         var currVal = NullUndefToEmptyString($("#currency").val());
         var dTypeVal = NullUndefToEmptyString($("#dealType").val());
@@ -207,7 +306,7 @@
         $.ajax({
             type: "GET",
             url: bars.config.urlContent("/api/mbdk/getdata/getContractorParams?nVidd=" + $("#dealType").val() + "&rnkB=" + $("#rnk").val() + "&kv=" + $("#currency").val()),
-            success: function(data) {
+            success: function (data) {
                 try {
                     $("#s1").val(data.nls);
                     $("#s3").val(data.nlsn);
@@ -231,11 +330,11 @@
         });
     }
 
-    var checkTicketNumber = function(ticketID) {
+    var checkTicketNumber = function (ticketID) {
         $.ajax({
             type: "GET",
             url: bars.config.urlContent("/api/mbdk/getdata/checkTicketNumber?ticketNumber=" + ticketID),
-            success: function(data) {
+            success: function (data) {
                 if (data > 0) {
                     bars.ui.alert({ title: "Попередження", text: "Тікет з таким номером вже існує!" });
                 }
@@ -244,13 +343,13 @@
         });
     }
 
-    var disableUnnecessaryFields = function() {
+    var disableUnnecessaryFields = function () {
         if ($("#dealType").val() == "") return;
         var deal = $("#dealType").val();
         $.ajax({
             type: "GET",
             url: bars.config.urlContent("/api/mbdk/getdata/GetDealType?nVidd=" + deal),
-            success: function(type) {
+            success: function (type) {
                 if (type["TIPD"] == 1) {
                     $("#eq3").attr("disabled", "disabled");
                     $("#s3").attr("readonly", true);
@@ -267,7 +366,7 @@
     }
 
 
-    var getPawnAccountNumber = function() {
+    var getPawnAccountNumber = function () {
         var mainDealAccount = $("#baseScore").val();
         var rnk = $("#rnk").val();
         var nTip = $("#dealType").val();
@@ -282,7 +381,7 @@
                 type: "POST",
                 url: bars.config.urlContent("/api/mbdk/getdata/getprovidingscore"),
                 data: item,
-                success: function(data) {
+                success: function (data) {
                     if (data != null) {
                         $("#provScore").val(data.score);
                     } else {
@@ -293,7 +392,7 @@
         }
     };
 
-    var getNmsScore = function() {
+    var getNmsScore = function () {
         var deal = $("#dealType").val();
         var rnk = $("#rnk").val();
         var kv = $("#currency").val();
@@ -304,7 +403,7 @@
                 type: "POST",
                 url: bars.config.urlContent("/api/mbdk/getdata/getscorenms"),
                 data: model,
-                success: function(data) {
+                success: function (data) {
 
                     $("#scoreNLS").empty();
                     if (data[0].length == 0) {
@@ -331,7 +430,7 @@
         }
     };
 
-    var calcSumma = function() {
+    var calcSumma = function () {
         var inSum = $("#inSumField").val();
         var procStav = $("#procStav").val();
         var basey = $("#listOfBase").val();
@@ -376,20 +475,20 @@
                 type: "POST",
                 url: bars.config.urlContent("/api/mbdk/getdata/calcsumm"),
                 data: model,
-                success: function(data) {
+                success: function (data) {
                     $("#outSum").data("kendoNumericTextBox").value(data);
                 }
             });
         }
     };
 
-    $("#dealType, #initTrans").change(function() {
+    $("#dealType, #initTrans").change(function () {
         disableUnnecessaryFields();
         getNmsScore();
         calcSumma();
     });
 
-    $("#ccid").change(function() {
+    $("#ccid").change(function () {
         checkTicketNumber($("#ccid").val());
     })
 
@@ -399,7 +498,7 @@
         spinners: false
     });
 
-    $("#inSumField").change(function() {
+    $("#inSumField").change(function () {
         if (validator.validateInput($("#inSumField"))) {
             calcSumma();
         }
@@ -417,14 +516,14 @@
     });
 
 
-    $("#procStav").change(function() {
+    $("#procStav").change(function () {
         $("#procStav").val($("#procStav").val().replace(",", "."));
         if (validator.validateInput($("#procStav"))) {
             calcSumma();
         }
     });
 
-    $("#listOfBase").change(function() {
+    $("#listOfBase").change(function () {
         calcSumma();
     });
 
@@ -442,7 +541,7 @@
                                 url: bars.config.urlContent("/api/mbdk/getdata/getscorelist/")
                             }
                         },
-                        change: function(e) {
+                        change: function (e) {
                             if (e.items.length > 0) {
                                 $("#nls").val(e.items[0].NLS);
                                 getRoadInfo();
@@ -465,13 +564,13 @@
                 $("#disableGroup :input").removeClass("non-active");
             }
 
-            $(function() {
+            $(function () {
                 $.ajax({
                     type: "GET",
                     dataType: "json",
                     url: bars.config.urlContent("/api/mbdk/gettransitinfo/getmultiscore"),
                     data: { KV: $("#currency").val() },
-                    success: function(data) {
+                    success: function (data) {
                         if (data == null) {
                             bars.ui.alert({ text: "Транзитний рахунок 3739 для валюти " + $("#currency").val() + " не відкритий" })
                             $("#currency").val("");
@@ -491,7 +590,7 @@
     }
 
 
-    $("#mfo, #rnk").change(function() {
+    $("#mfo, #rnk").change(function () {
 
         if ($("#rnk").val() !== $("#backupRnk").text() &&
             $("#rnk").val() !== "") {
@@ -504,7 +603,7 @@
                 type: "POST",
                 url: bars.config.urlContent("/api/mbdk/clientdata/getclient"),
                 data: item,
-                success: function(data) {
+                success: function (data) {
                     if (data.length > 0) {
                         $("#nmk").text(data[0].NMK);
                         $("#mfo").val(data[0].MFO);
@@ -525,7 +624,7 @@
     });
 
 
-    $("#scoreList").change(function() {
+    $("#scoreList").change(function () {
         var score = $("#scoreList").val();
         if (score != "") {
             $("#nls").val($("#scoreList").val());
@@ -539,26 +638,26 @@
         }
     });
 
-    $("#acc").change(function() {
+    $("#acc").change(function () {
         if ($("#acc").val() == 0) {
             $("#acc").val("");
         }
     });
-    $("#callCurrencyHandBook").click(function() {
+    $("#callCurrencyHandBook").click(function () {
         var options = {
             tableName: "TABVAL",
             jsonSqlParams: "",
             filterCode: "",
             hasCallbackFunction: true
         }
-        bars.ui.getMetaDataNdiTable("TABVAL", function(selectedItem) {
+        bars.ui.getMetaDataNdiTable("TABVAL", function (selectedItem) {
             $("#currency").val(selectedItem.KV);
             onCurrencyChange();
         }, options)
     });
     //--------------------викливає грід з контрагентами----------------
 
-    $("#callGridClient").click(function() {
+    $("#callGridClient").click(function () {
 
         var dropDown = $("#dealType").data("kendoDropDownList");
         var selectedIndex = dropDown.select();
@@ -577,7 +676,7 @@
             filterCode: "",
             hasCallbackFunction: true
         }
-        bars.ui.getMetaDataNdiTable(contrAgentsTableName, function(selectedItem) {
+        bars.ui.getMetaDataNdiTable(contrAgentsTableName, function (selectedItem) {
 
             $("#nmk").text(selectedItem.NMK);
             $("#mfo").val(selectedItem.MFO);
@@ -592,45 +691,45 @@
     //----------------------------------------------------------------
 
     //--------------------викливає грід з трасою платежу-----------------
-    $("#roadPay").click(function() {
+    $("#roadPay").click(function () {
         var options = {
             tableName: "SW_BANKS",
             jsonSqlParams: "",
             filterCode: "",
             hasCallbackFunction: true
         }
-        bars.ui.getMetaDataNdiTable("SW_BANKS", function(selectedItem) {
+        bars.ui.getMetaDataNdiTable("SW_BANKS", function (selectedItem) {
             $("#bicRoad").val(selectedItem.BIC);
             $("#nameRoad").val(selectedItem.NAME);
         }, options)
     });
 
     //--------------------викливає грід з коментарієм-----------------
-    $("#comments").click(function() {
+    $("#comments").click(function () {
         var options = {
             tableName: "SW_BANKS",
             jsonSqlParams: "",
             filterCode: "",
             hasCallbackFunction: true
         }
-        bars.ui.getMetaDataNdiTable("SW_BANKS", function(selectedItem) {
+        bars.ui.getMetaDataNdiTable("SW_BANKS", function (selectedItem) {
             $("#area").val(selectedItem.BIC);
         }, options)
     });
     //----------------------------------------------------------------
     //Все свободные счета с остатком в портфеле
-    $('#accountsInBriefcase').click(function() {
+    $('#accountsInBriefcase').click(function () {
         if (!$("#dealType").val() || !$("#currency").val() || !$("#outRnk").val() || !$("#inSumField").val()) return;
         var requestUrl = "GetFreeAccountsInBriefcase?nVidd=" + $("#dealType").val() + "&nKv=" + $("#currency").val() + "&RNKB=" + $("#outRnk").val()
             + "&nSUM=" + $("#inSumField").val();
         openAccountsWindow("Рахунки контрагента у портфелі", requestUrl);
     });
-    $('#accountsOutsideBriefcase').click(function() {
+    $('#accountsOutsideBriefcase').click(function () {
         if (!$("#dealType").val() || !$("#currency").val() || !$("#outRnk").val()) return;
         var requestUrl = "GetFreeAccountsOutsideBriefcase?nVidd=" + $("#dealType").val() + "&nKv=" + $("#currency").val() + "&RNKB=" + $("#outRnk").val();
         openAccountsWindow("Рахунки контрагента поза портфелем", requestUrl);
     });
-    $('#accountsWithoutBalance').click(function() {
+    $('#accountsWithoutBalance').click(function () {
         if (!$("#dealType").val() || !$("#currency").val() || !$("#outRnk").val()) return;
         var requestUrl = "GetFreeAccountsWithoutBalance?nVidd=" + $("#dealType").val() + "&nKv=" + $("#currency").val() + "&RNKB=" + $("#outRnk").val();
         openAccountsWindow("Вільні рахунки контрагента", requestUrl);
@@ -640,7 +739,7 @@
 
         var accountWindow = $('#windowAccounts'),
             undo = $('#undo');
-        undo.click(function() {
+        undo.click(function () {
             accountWindow.data("kendoWindow").open();
             undo.fadeOut();
         });
@@ -759,14 +858,14 @@
 
     //----------------------------------------------------------------
     //--------------------забезпечення-------------------------------
-    $("#providing").click(function() {
+    $("#providing").click(function () {
         var options = {
             tableName: "V_MBDK_CC_PAWN",
             jsonSqlParams: "",
             filterCode: "",
             hasCallbackFunction: true
         }
-        bars.ui.getMetaDataNdiTable("V_MBDK_CC_PAWN", function(selectedItem) {
+        bars.ui.getMetaDataNdiTable("V_MBDK_CC_PAWN", function (selectedItem) {
             $("#providName").text(selectedItem.NAME);
             $("#provScore").removeClass('non-active');
             $("#provSum").data("kendoNumericTextBox").enable(true);
@@ -790,7 +889,7 @@
             type: "GET",
             async: false,
             url: bars.config.urlContent("/api/mbdk/getdata/getbankdate"),
-            success: function(data) {
+            success: function (data) {
                 dateOn = data;
             }
         });
@@ -805,7 +904,7 @@
                     duration: 300
                 }
             },
-            change: function() {
+            change: function () {
                 calcSumma(); //value is the selected date in the datepicker
             }
         });
@@ -821,7 +920,7 @@
                     duration: 300
                 }
             },
-            change: function() {
+            change: function () {
                 calcSumma(); //value is the selected date in the datepicker
             }
 
@@ -836,7 +935,7 @@
                     duration: 300
                 }
             },
-            change: function() {
+            change: function () {
                 calcSumma(); //value is the selected date in the datepicker
             }
 
@@ -851,7 +950,7 @@
                     duration: 300
                 }
             },
-            change: function() {
+            change: function () {
                 calcSumma(); //value is the selected date in the datepicker
             }
         });
@@ -891,12 +990,12 @@
 
 
 
-    $("#provKv").change(function() {
+    $("#provKv").change(function () {
         getPawnAccountNumber();
     });
 
     //--------------Збереження угоди---------------------
-    saveDeal = function() {
+    saveDeal = function () {
 
         var CC_ID = $("#ccid").val(); //номер договору
         var nVidd = $("#dealType").val(); //вид договору
@@ -963,6 +1062,11 @@
 
         var nbuIdValue = $("#nbuId").val();
 
+        var agreementType = $("#agreementType").val();
+        var bus_mod = agreementType == "1" ? $("#typeBModel").data("kendoDropDownList").text() : null;
+        var sppi = agreementType == "1" ? $("#critSPPI").data("kendoDropDownList").text() : null;
+        var ifrs = agreementType == "1" ? $("#clasMsfz").val() : null;
+
         var megamodel = {
             CC_ID: CC_ID,
             nVidd: nVidd,
@@ -1000,7 +1104,11 @@
             colNbuRegDate: nbuRegDate,
             productCode: product,
             irr: EffectiveProc,
-            n_nbu: nbuIdValue
+            n_nbu: nbuIdValue,
+            agreementType: agreementType,
+            BUS_MOD: bus_mod,
+            SPPI: sppi,
+            IFRS: ifrs
         }
 
         if (nVidd != "" && nKv != "" && RNKB != "" && procStav != "" && nBASEY != "" && colSumma != "") {
@@ -1009,7 +1117,7 @@
                 type: "POST",
                 url: bars.config.urlContent("/api/mbdk/savedeal/createdeal"),
                 data: megamodel,
-                success: function(data) {
+                success: function (data) {
 
                     bars.ui.loader('body', false);
                     if (data.error == null) {
@@ -1030,7 +1138,7 @@
             bars.ui.alert({ title: "Помилка!", text: "Недостатньо даних для збереження угоди!" });
         }
     }
-    $("#saveDeal").click(function(event) {
+    $("#saveDeal").click(function (event) {
         event.preventDefault();
         if (validator.validate()) {
 
@@ -1047,7 +1155,7 @@
     });
 
     $("#printDeal").kendoButton({
-        click: function() {
+        click: function () {
             if (ND) {
                 window.open(bars.config.urlContent("/mbdk/deal/ExportDoc/") + "?ND=" + ND, ND);
             } else {
@@ -1056,8 +1164,8 @@
         }
     });
     $("#saveRoad").kendoButton({
-        click: function() {
-            bars.ui.confirm({ text: 'Зберегти параметри траси?' }, function() {
+        click: function () {
+            bars.ui.confirm({ text: 'Зберегти параметри траси?' }, function () {
                 var rnk = $("#rnk").val();
                 var currency = $("#currency").val();
                 var partnerBic = $("#bicRoad").val();
@@ -1080,7 +1188,7 @@
                         s58D: s58D,
                         partherAccNumber: partherAccNumber
                     },
-                    success: function(data) {
+                    success: function (data) {
                         bars.ui.alert({ text: "Трасу збережено" });
                     }
                 });
@@ -1090,22 +1198,22 @@
     });
 
     $("#partnersResidentsBtn").kendoButton({
-        click: function() {
-            bars.ui.getMetaDataNdiTable("V_RESID_PARTNERS", function() { }, { tableName: "V_RESID_PARTNERS", jsonSqlParams: "", filterCode: "" })
+        click: function () {
+            bars.ui.getMetaDataNdiTable("V_RESID_PARTNERS", function () { }, { tableName: "V_RESID_PARTNERS", jsonSqlParams: "", filterCode: "" })
         }
     });
     $("#partnersNonResidentsBtn").kendoButton({
-        click: function() {
-            bars.ui.getMetaDataNdiTable("V_NONRESID_PARTNERS", function() { }, { tableName: "V_NONRESID_PARTNERS", jsonSqlParams: "", filterCode: "" })
+        click: function () {
+            bars.ui.getMetaDataNdiTable("V_NONRESID_PARTNERS", function () { }, { tableName: "V_NONRESID_PARTNERS", jsonSqlParams: "", filterCode: "" })
         }
     });
     $("#dealsArchive").kendoButton({
-        click: function() {
-            bars.ui.getMetaDataNdiTable("V_MBDK_ARCHIVE", function() { }, { tableName: "V_MBDK_ARCHIVE", jsonSqlParams: "", filterCode: "" })
+        click: function () {
+            bars.ui.getMetaDataNdiTable("V_MBDK_ARCHIVE", function () { }, { tableName: "V_MBDK_ARCHIVE", jsonSqlParams: "", filterCode: "" })
         }
     });
     $("#clientPasportBtn").kendoButton({
-        click: function() {
+        click: function () {
             var rnk = $("#rnk").val();
             if (rnk === "") {
                 bars.ui.alert({ title: "Помилка!", text: "Оберіть клієнта-контрагента" });
@@ -1114,7 +1222,7 @@
 
             var myWindow = $("#clientPasportWindow"),
                 undo = $("#undo");
-            undo.click(function() {
+            undo.click(function () {
                 myWindow.data("kendoWindow").open();
                 undo.fadeOut();
             });
@@ -1134,7 +1242,7 @@
     });
 
     $("#clientOpenAccountsBtn").kendoButton({
-        click: function() {
+        click: function () {
             var rnk = $("#rnk").val();
             if (rnk === "") {
                 bars.ui.alert({ title: "Помилка!", text: "Оберіть клієнта-контрагента" });
@@ -1143,7 +1251,7 @@
 
             var myWindow = $("#clientOpenAccountsWindow"),
                 undo = $("#undo");
-            undo.click(function() {
+            undo.click(function () {
                 myWindow.data("kendoWindow").open();
                 undo.fadeOut();
             });
@@ -1163,12 +1271,12 @@
     });
 
     $("#reloadBtn").kendoButton({
-        click: function() {
+        click: function () {
             window.location = window.location
         }
     });
     $("#createDocuments").kendoButton({
-        click: function() {
+        click: function () {
             if (ND) {
                 url = '/barsroot/ndi/referencebook/GetRefBookData/?NsiFuncId=40&TableName=V_MBDK_PORTFOLIO&RowParamsNames=:ND|&jsonSqlParams=[{%22Name%22:%22ND%22,%22Type%22:%22N%22,%22Value%22:' + ND + '}]';
                 bars.ui.dialog({
@@ -1186,14 +1294,14 @@
 
     $("#createSwift").kendoButton({
 
-        click: function() {
+        click: function () {
             if (ND) {
                 $.ajax({
                     dataType: "json",
                     type: "POST",
                     url: bars.config.urlContent("/api/mbdk/AdditionalFunctions/CreateSwiftMessage"),
                     data: { '': ND },
-                    success: function(data) {
+                    success: function (data) {
                         $("#showSwift").data('kendoButton').enable(true);
                         $("#showSwift").find('span').removeClass("pf-disabled");
                         bars.ui.alert({ text: "SWIFT повідомлення сформовано" });
@@ -1206,12 +1314,12 @@
 
     $("#showSwift").kendoButton({
 
-        click: function() {
+        click: function () {
             if (ND) {
                 $.ajax({
                     type: "GET",
                     url: bars.config.urlContent("/api/mbdk/AdditionalFunctions/GetSwifMessageRef?ND=" + ND),
-                    success: function(swiftRef) {
+                    success: function (swiftRef) {
                         if (swiftRef) {
                             window.open('/barsroot/documentview/view_swift.aspx?swref=' + swiftRef, '_blank')
                         }
@@ -1238,12 +1346,12 @@
 
 
     jQuery.extend(jQuery.expr[':'], {
-        focusable: function(el, index, selector) {
+        focusable: function (el, index, selector) {
             return $(el).is('a, button, :input, [tabindex]');
         }
     });
 
-    $(document).on('keydown', 'input[id], .k-dropdown, .k-button', function(e) {
+    $(document).on('keydown', 'input[id], .k-dropdown, .k-button', function (e) {
 
         if (e.which == 13) {
             e.preventDefault();
@@ -1251,6 +1359,14 @@
             var index = $(document.activeElement).prop("tabindex") + 1;
             $('[tabindex=' + index + ']').focus();
             return;
+        }
+    });
+
+    $('#agreementType').change(function () {
+        if ($(this).val() == '1') {
+            $('#additionalOptions').css("display", "block");
+        } else {
+            $('#additionalOptions').css("display", "none");
         }
     });
 });

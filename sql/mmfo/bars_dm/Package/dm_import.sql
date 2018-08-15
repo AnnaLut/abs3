@@ -215,7 +215,23 @@ is
     --
     procedure imp_run(p_dat        in date default sysdate,
                       p_periodtype in varchar2 default C_FULLIMP);
-
+                  
+    --
+    -- выгрузка для кредитов по финансовых операциях
+    --
+    procedure credits_oper_imp (p_dat    in date default trunc(sysdate),
+                                p_periodtype in varchar2 default C_FULLIMP,
+                                p_rows       out number,
+                                p_rows_err   out number,
+                                p_state      out varchar2);
+    --
+    -- выгрузка для депозитов по финансовых операциях
+    --
+    procedure deposits_oper_imp (p_dat    in date default trunc(sysdate),
+                                 p_periodtype in varchar2 default C_FULLIMP,
+                                 p_rows       out number,
+                                 p_rows_err   out number,
+                                 p_state      out varchar2);
 end;
 /
 Show errors;
@@ -5418,14 +5434,15 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             p_periodtype = 'MONTH'
             or
             p_periodtype = 'DAY'
-            and
+            -- Згідно заявки COBUMMFO-8186 вибірка за день повинна прцювати,як повне вивантаження
+            /*and
             (
                 cd.nd in (select nd from changes_ccd)
                 or
                 (ca.nd, ca.acc) in (select nd, acc from changes_cc_accp)
                 or
                 a.acc in (select acc from changes_acc)
-            )
+            )*/
             ;
 
             l_rows := sql%rowcount;
@@ -5766,7 +5783,328 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
 		commit;
 
     end imp_run;
+    
+    --
+    -- выгрузка для кредитов по финансовых операциях
+    --
+    
+    procedure credits_oper_imp  (p_dat in date default trunc(sysdate)
+                               , p_periodtype in varchar2 default C_FULLIMP
+                               , p_rows out number
+                               , p_rows_err out number
+                               , p_state out varchar2)                       
+    is
+        l_trace  varchar2(500) := G_TRACE||'credits_oper: ';
+        l_per_id periods.id%type;
 
+        l_rows     pls_integer := 0;
+        l_rows_err pls_integer := 0;
+
+        l_insert_target varchar2(64);
+        l_ourmfo       varchar2(6) := sys_context('bars_context', 'user_mfo');
+        -- общий запрос
+        q_str          varchar2(32000);
+        -- цель для вставки
+        q_insert       varchar2(4000);
+        -- измененные записи (дельта)
+        q_str_inc_pre  varchar2(4000) := ' ';
+        -- основной запрос
+        q_str_main  varchar2(32000) :=
+        'select
+                :per_id
+                ,nd_ac.nd nd_cre
+                ,cd.cc_id
+                ,cd.vidd
+                ,o.kf    
+                ,o.ref
+                ,o.nd
+                ,o.mfoa
+                ,o.nlsa
+                ,o.s
+                ,o.kv
+                ,o.vdat
+                ,o.s2
+                ,o.kv2
+                ,o.mfob
+                ,o.nlsb
+                ,o.sk
+                ,o.datd
+                ,o.nazn
+                ,o.tt
+                ,o.tobo
+                ,o.id_a
+                ,o.nam_a
+                ,o.id_b
+                ,o.nam_b
+                ,o.vob
+                ,o.pdat
+                ,o.odat
+            from bars.nd_acc nd_ac, bars.accounts ac, bars.cc_deal cd,bars.oper o
+           where nd_ac.acc = ac.acc
+             and nd_ac.nd = cd.nd
+             and cd.vidd in (1,2,3,11,12,13) 
+           and ( (o.nlsa = ac.nls and o.kv= ac.kv and o.mfoa = ac.kf)  or (o.nlsb = ac.nls and nvl(o.kv2,o.kv)=ac.kv and o.mfob = ac.kf))
+        ';
+        -- дельта
+        q_str_inc_suf  varchar2(4000) :=
+              ' and o.pdat  between trunc(:p_dat) and trunc(:p_dat)+0.99999';
+        -- полная выгрузка
+        q_str_full_suf  varchar2(4000) :=
+              ' and o.pdat  between trunc(:p_dat)-7 and trunc(:p_dat)+0.99999';
+
+        q_log_errors varchar2(4000) := q'[ LOG ERRORS into ERR$_CREDITS_OPER ('INS') reject limit unlimited ]';
+
+    begin
+        bars.bars_audit.info(l_trace||' start');
+        -- get period id
+        l_per_id := get_period_id (p_periodtype, p_dat);
+
+        if l_per_id is null then
+            return;
+        end if;
+
+        truncate_kf_subpartition('CREDITS_OPER', l_per_id, l_ourmfo);
+
+        -- удаляем данные о предыдущих ошибках периода
+        clear_err_log(p_table_name => 'CREDITS_OPER', p_per_id => l_per_id);
+
+        -- e.g. partition (P1164) or subpartition (P1164_KF_300465)
+        l_insert_target := case when l_ourmfo is null then 'partition (P'||l_per_id||')' else 'subpartition (P'||l_per_id||'_KF_'||l_ourmfo||')' end;
+        bars.bars_audit.info(l_trace||' insert target: '||l_insert_target);
+
+        dbms_application_info.set_client_info('BARS_DM: IMPORT_'||p_periodtype||': CREDITS_OPER '||l_ourmfo);
+
+        begin
+            q_insert :=
+            q'[
+            insert /*+ APPEND */ into CREDITS_OPER ]'||l_insert_target||q'[
+            (
+                 per_id
+                ,nd_cre
+                ,cc_id
+                ,vidd
+                ,kf 
+                ,ref
+                ,nd
+                ,mfoa
+                ,nlsa
+                ,s
+                ,kv
+                ,vdat
+                ,s2
+                ,kv2
+                ,mfob
+                ,nlsb
+                ,sk
+                ,datd
+                ,nazn
+                ,tt
+                ,tobo
+                ,ida
+                ,nama
+                ,idb
+                ,namb
+                ,vob
+                ,pdat
+                ,odat)
+            ]';
+
+        if (p_periodtype = C_INCRIMP) then
+            /* дельта */
+            q_str := q_insert || q_str_inc_pre || q_str_main || q_str_inc_suf || q_log_errors;
+            dbms_output.put_line(q_str );
+            execute immediate q_str using l_per_id,p_dat, p_dat;
+        else
+            /* полная выгрузка */
+            q_str := q_insert || q_str_main || q_str_full_suf || q_log_errors;
+            dbms_output.put_line(q_str );
+            execute immediate q_str using l_per_id,p_dat, p_dat;
+        end if;
+
+        l_rows := l_rows + sql%rowcount;
+        commit;
+
+        exception
+            when others then
+                rollback;
+                raise;
+        end;
+
+        -- считаем кол-во ошибочных строк
+        select count(*) into l_rows_err from ERR$_CREDITS_OPER where PER_ID = l_per_id;
+
+        p_rows := l_rows;
+        p_rows_err := l_rows_err;
+        p_state := 'SUCCESS';
+
+        dbms_application_info.set_client_info('');
+        bars.bars_audit.info(l_trace||' finish');
+
+    end credits_oper_imp;
+    
+    --
+    -- выгрузка для депозитов по финансовых операциях
+    --
+    
+    procedure deposits_oper_imp  (p_dat in date default trunc(sysdate)
+                                 ,p_periodtype in varchar2 default C_FULLIMP
+                                 ,p_rows out number
+                                 ,p_rows_err out number
+                                 ,p_state out varchar2)                       
+    is
+        l_trace  varchar2(500) := G_TRACE||'deposits_oper_imp: ';
+        l_per_id periods.id%type;
+
+        l_rows     pls_integer := 0;
+        l_rows_err pls_integer := 0;
+
+        l_insert_target varchar2(64);
+        l_ourmfo       varchar2(6) := sys_context('bars_context', 'user_mfo');
+        -- общий запрос
+        q_str          varchar2(32000);
+        -- цель для вставки
+        q_insert       varchar2(4000);
+        -- измененные записи (дельта)
+        q_str_inc_pre  varchar2(4000) := ' ';
+        -- основной запрос
+        q_str_main  varchar2(32000) :=
+        'select
+                :per_id
+                ,o.kf  
+                ,dpt_dep.deposit_id
+                ,dpt_dep.nd
+                ,dpt_dep.cnt_dubl  
+                ,o.ref
+                ,o.nd
+                ,o.mfoa
+                ,o.nlsa
+                ,o.s
+                ,o.kv
+                ,o.vdat
+                ,o.s2
+                ,o.kv2
+                ,o.mfob
+                ,o.nlsb
+                ,o.sk
+                ,o.datd
+                ,o.nazn
+                ,o.tt
+                ,o.tobo
+                ,o.id_a
+                ,o.nam_a
+                ,o.id_b
+                ,o.nam_b
+                ,o.vob
+                ,o.pdat
+                ,o.odat
+            from bars.dpt_payments dpt, bars.oper o ,
+        ';
+        -- дельта
+        q_str_inc_suf  varchar2(4000) :=
+              'bars.dpt_deposit dpt_dep
+               where dpt.ref = o.ref
+                 and dpt.dpt_id = dpt_dep.deposit_id 
+                 and o.pdat  between trunc(:p_dat) and trunc(:p_dat)+0.99999';
+        -- полная выгрузка
+        q_str_full_suf  varchar2(4000) :=
+              '(select dp_d.kf, dp_d.deposit_id, dp_d.cnt_dubl, dp_d.nd
+                  from bars.dpt_deposit dp_d
+                union
+                select distinct dp_c.kf, dp_c.deposit_id, dp_c.cnt_dubl, dp_c.nd
+                  from bars.dpt_deposit_clos dp_c
+                 where dp_c.dat_end between trunc(:p_dat)-7 and trunc(:p_dat)
+                ) dpt_dep 
+                 where dpt.ref = o.ref
+                   and dpt.dpt_id = dpt_dep.deposit_id
+                   and o.pdat  between trunc(:p_dat)-7 and trunc(:p_dat)+0.99999';
+        q_log_errors varchar2(4000) := q'[ LOG ERRORS into ERR$_DEPOSITS_OPER ('INS') reject limit unlimited ]';
+    begin
+        bars.bars_audit.info(l_trace||' start');
+        -- get period id
+        l_per_id := get_period_id (p_periodtype, p_dat);
+
+        if l_per_id is null then
+            return;
+        end if;
+
+        truncate_kf_subpartition('DEPOSITS_OPER', l_per_id, l_ourmfo);
+
+        -- удаляем данные о предыдущих ошибках периода
+        clear_err_log(p_table_name => 'DEPOSITS_OPER', p_per_id => l_per_id);
+
+        -- e.g. partition (P1164) or subpartition (P1164_KF_300465)
+        l_insert_target := case when l_ourmfo is null then 'partition (P'||l_per_id||')' else 'subpartition (P'||l_per_id||'_KF_'||l_ourmfo||')' end;
+        bars.bars_audit.info(l_trace||' insert target: '||l_insert_target);
+
+        dbms_application_info.set_client_info('BARS_DM: IMPORT_'||p_periodtype||': DEPOSITS_OPER '||l_ourmfo);
+
+        begin
+            q_insert :=
+            q'[
+            insert /*+ APPEND */ into DEPOSITS_OPER ]'||l_insert_target||q'[
+            (
+                 per_id
+                ,kf 
+                ,deposit_id
+                ,nd_dep
+                ,cnt_dubl              
+                ,ref
+                ,nd
+                ,mfoa
+                ,nlsa
+                ,s
+                ,kv
+                ,vdat
+                ,s2
+                ,kv2
+                ,mfob
+                ,nlsb
+                ,sk
+                ,datd
+                ,nazn
+                ,tt
+                ,tobo
+                ,ida
+                ,nama
+                ,idb
+                ,namb
+                ,vob
+                ,pdat
+                ,odat)
+            ]';
+
+        if (p_periodtype = C_INCRIMP) then
+            /* дельта */
+            q_str := q_insert || q_str_inc_pre || q_str_main || q_str_inc_suf || q_log_errors;
+            dbms_output.put_line(q_str );
+            execute immediate q_str using l_per_id,p_dat, p_dat;
+        else
+            /* полная выгрузка */
+            q_str := q_insert || q_str_main || q_str_full_suf || q_log_errors;
+            dbms_output.put_line(q_str );
+            execute immediate q_str using l_per_id,p_dat, p_dat,p_dat, p_dat;
+        end if;
+
+        l_rows := l_rows + sql%rowcount;
+        commit;
+
+        exception
+            when others then
+                rollback;
+                raise;
+        end;
+
+        -- считаем кол-во ошибочных строк
+        select count(*) into l_rows_err from ERR$_DEPOSITS_OPER where PER_ID = l_per_id;
+
+        p_rows := l_rows;
+        p_rows_err := l_rows_err;
+        p_state := 'SUCCESS';
+
+        dbms_application_info.set_client_info('');
+        bars.bars_audit.info(l_trace||' finish');
+
+    end deposits_oper_imp;
 end;
 /
 show err;

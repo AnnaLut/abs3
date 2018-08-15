@@ -12,7 +12,8 @@ begin    execute immediate ' create table MBDK_ob22 (
   SD_N VARCHAR2(6),
   SD_I VARCHAR2(6),
   IO   int , 
-  d_close date ) ';
+  d_close date,
+  k9 INTEGER ) ';
 
 exception when others then   if SQLCODE = - 00955 then null;   else raise; end if; 
 --ORA-00955: name is already used by an existing object
@@ -28,13 +29,20 @@ COMMENT ON COLUMN BARS.MBDK_ob22.SPN     IS 'Бал.рах+Ob22 Простроч.проц';
 COMMENT ON COLUMN BARS.MBDK_ob22.SD_N    IS 'Бал.рах+Ob22 % Дох/Витр від грн'; 
 COMMENT ON COLUMN BARS.MBDK_ob22.SD_I    IS 'Бал.рах+Ob22 % Дох.Витр від вал'; 
 COMMENT ON COLUMN BARS.MBDK_ob22.d_close IS 'Дата ДЕ-яктивації ';
-COMMENT ON COLUMN BARS.MBDK_ob22.Io      IS 'Признак "Депозита" =1 , "Кдедита"=0 ';
+COMMENT ON COLUMN BARS.MBDK_ob22.Io      IS 'Признак "Депозита" =1 , "Кредита"=0 ';
                                  
 GRANT DELETE, INSERT, SELECT, UPDATE ON BARS.MBDK_ob22 TO BARS_ACCESS_DEFROLE;
 
 begin    execute immediate '  ALTER TABLE BARS.MBDK_ob22 ADD (  CONSTRAINT PK_MBDKob22  PRIMARY KEY  (Vidd )) ';
 exception when others then   if SQLCODE = - 02260 then null;   else raise; end if; --ORA-02260: table can have only one primary key
 end;
+/
+
+begin
+  execute immediate'alter table mbdk_ob22 add k9 INTEGER';
+ exception when others then 
+	if sqlcode=-955 then null;end if;
+end; 
 /
 
 

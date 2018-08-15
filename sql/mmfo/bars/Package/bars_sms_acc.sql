@@ -1,17 +1,14 @@
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms_acc.sql =========*** Run **
 PROMPT ===================================================================================== 
 
-CREATE OR REPLACE PACKAGE BARS.BARS_SMS_ACC
+create or replace package BARS_SMS_ACC
 is
 ----
 --  Package BARS_SMS_ACC - пакет процедур для подготовки SMS-сообщений по факту изменения остатков по счетам
 --
 
 g_header_version  constant varchar2(64)  := 'version 2.4 03/09/2015';
-
-g_awk_header_defs constant varchar2(512) := '';
 
 ----
 -- header_version - возвращает версию заголовка пакета
@@ -22,11 +19,6 @@ function header_version return varchar2;
 -- body_version - возвращает версию тела пакета
 --
 function body_version return varchar2;
-
-----
--- init - инициализация пакета
---
-procedure init;
 
 --
 -- ф-ция получения типа счета
@@ -74,19 +66,18 @@ procedure set_acc_phones(p_acc in accounts.acc%type,
                                 p_new_phone   ACC_SMS_PHONES.PHONE%TYPE,
                                 p_rnk         ACCOUNTS.RNK%TYPE);
 
-end bars_sms_acc;
+end BARS_SMS_ACC;
 /
 
 show errors;
 
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS_ACC 
-IS
+create or replace package body BARS_SMS_ACC
+is
    ----
    --  Package BARS_SMS_ACC - пакет процедур для подготовки SMS-сообщений по факту изменения остатков по счетам
    --
 
-   g_body_version      CONSTANT VARCHAR2 (64)  := 'version 2.11 23/03/2018';
-   g_awk_body_defs     CONSTANT VARCHAR2 (512) := '';
+   g_body_version      CONSTANT VARCHAR2 (64)  := 'version 2.12 17/07/2018';
    title               constant varchar2 (14)  := 'BARS_SMS_ACC:';
 
    -- маска формата для преобразования char <--> number
@@ -134,32 +125,20 @@ IS
    -- header_version - возвращает версию заголовка пакета
    --
    FUNCTION header_version
-      RETURN VARCHAR2
+     RETURN VARCHAR2
    IS
    BEGIN
-      RETURN    'Package header BARS_SMS_ACC '
-             || g_header_version
-             || '.'
-             || CHR (10)
-             || 'AWK definition: '
-             || CHR (10)
-             || g_awk_header_defs;
+     RETURN 'Package ' || $$PLSQL_UNIT || ' header '||g_header_version||'.';
    END header_version;
 
    ----
    -- body_version - возвращает версию тела пакета
    --
    FUNCTION body_version
-      RETURN VARCHAR2
+     RETURN VARCHAR2
    IS
    BEGIN
-      RETURN    'Package body BARS_SMS_ACC '
-             || g_body_version
-             || '.'
-             || CHR (10)
-             || 'AWK definition: '
-             || CHR (10)
-             || g_awk_body_defs;
+     RETURN 'Package ' || $$PLSQL_UNIT || ' body '||g_body_version||'.';
    END body_version;
 
    ----
@@ -168,17 +147,16 @@ IS
    PROCEDURE init
    IS
    BEGIN
-      --
-      SELECT TO_NUMBER (val)
-        INTO G_SMS_ACT
-        FROM params$base
-       WHERE par = 'SMS_ACT' and rownum = 1;
 
-      SELECT val
-        INTO G_SMS_CHAR
-        FROM params$base
-       WHERE par = 'SMS_CHAR' and rownum = 1;
-   --
+     SELECT TO_NUMBER (val)
+       INTO G_SMS_ACT
+       FROM params$base
+      WHERE par = 'SMS_ACT' and rownum = 1;
+
+     SELECT val
+       INTO G_SMS_CHAR
+       FROM params$base
+      WHERE par = 'SMS_CHAR' and rownum = 1;
 
    END init;
 
@@ -481,13 +459,15 @@ IS
       END IF;
 
     -- создаем само сообщение
-    BARS_SMS.CREATE_MSG( l_msgid,
-                         l_crtime,
-                         l_crtime + G_SMS_ACT / 24,
-                         p_phone,
-                         l_encode,
-                         l_msg,
-                         l_kf );
+    BARS_SMS.CREATE_MSG
+    ( p_msgid           => l_msgid
+    , p_creation_time   => l_crtime
+    , p_expiration_time => l_crtime + G_SMS_ACT / 24
+    , p_phone           => p_phone
+    , p_encode          => l_encode
+    , p_msg_text        => l_msg
+    , p_rnk             => p_rnk
+    , p_kf              => l_kf );
 
     -- добавляем доп. информацию по сообщению
     insert
@@ -496,7 +476,7 @@ IS
     values
          ( l_msgid, p_change_time, l_rnk, p_acc, p_dos, p_kos, p_ostc );
 
-  END prepare_acc_msg;
+  end PREPARE_ACC_MSG;
 
    ----
    -- prepare_submit_data - подготавливает данные для посылки SMS
@@ -727,29 +707,31 @@ IS
                                 p_rnk         ACCOUNTS.RNK%TYPE)
    IS
    BEGIN
-      if (p_old_phone<>p_new_phone) THEN
-      UPDATE ACC_SMS_PHONES t1
-         SET t1.phone = p_new_phone
-       WHERE t1.phone = p_old_phone
-              and exists (select 1 from accounts t2 where t2.acc = t1.acc and t2.rnk = p_rnk );
+     IF (p_old_phone<>p_new_phone)
+     THEN
 
-      UPDATE ACC_SMS_PHONES t1
-         SET t1.phone1 = p_new_phone
-       WHERE t1.phone1 = p_old_phone AND t1.phone1 IS NOT NULL
-         and exists (select 1 from accounts t2 where t2.acc = t1.acc and t2.rnk = p_rnk );
+       UPDATE ACC_SMS_PHONES t1
+          SET t1.phone = p_new_phone
+        WHERE t1.phone = p_old_phone
+          and exists (select 1 from accounts t2 where t2.acc = t1.acc and t2.rnk = p_rnk );
 
-      UPDATE ACC_SMS_PHONES t1
-         SET t1.phone2 = p_new_phone
-       WHERE t1.phone2 = p_old_phone AND t1.phone2 IS NOT NULL
-         and exists (select 1 from accounts t2 where t2.acc = t1.acc and t2.rnk = p_rnk );
+       UPDATE ACC_SMS_PHONES t1
+          SET t1.phone1 = p_new_phone
+        WHERE t1.phone1 = p_old_phone AND t1.phone1 IS NOT NULL
+          and exists (select 1 from accounts t2 where t2.acc = t1.acc and t2.rnk = p_rnk );
 
-      end if;
+       UPDATE ACC_SMS_PHONES t1
+          SET t1.phone2 = p_new_phone
+        WHERE t1.phone2 = p_old_phone AND t1.phone2 IS NOT NULL
+          and exists (select 1 from accounts t2 where t2.acc = t1.acc and t2.rnk = p_rnk );
+
+     end if;
    END change_acc_phones;
 
 
 
 BEGIN
-  init;
+  INIT;
 END BARS_SMS_ACC;
 /
 

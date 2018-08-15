@@ -2,7 +2,6 @@
 <link rel="stylesheet" href="~/Areas/Mbdk/Content/index.css" />
 <script>
     var globalND = '@Model.ND';
-
     $(document).ready(function() {
 
         $(function() {
@@ -178,6 +177,35 @@
                         <input type="text" name="productType" class="k-textbox disable-solid" id="productType" title="Продукт" />
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="agreementType" class="col-md-12 col-sm-12 control-label">Тип угоди</label>
+                    <div class="col-md-12 col-sm-12">
+                        <input type="text" name="agreementType" class="k-textbox k-textbox-dark non-active" id="agreementType" value="@Model.NAME" readonly />
+                    </div>
+                </div>
+
+                @if(@Model.TIPD == 1 && @Model.BUS_MOD != null && @Model.IFRS != null && @Model.SPPI != null)
+                {
+                    <div class="form-group">
+                        <label for="typeBModel" class="col-md-5 col-sm-6 control-label">Тип бізнес моделі для договору</label>
+                        <div class="col-md-7 col-sm-6">
+                            <input type="text" name="typeBModel" class="k-textbox k-textbox-dark non-active" id="typeBModel" value="@Model.BUS_MOD" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="critSPPI" class="col-md-5 col-sm-6 control-label">Відповідність критерію SPPI</label>
+                        <div class="col-md-7 col-sm-6">
+                            <input type="text" name="critSPPI" class="k-textbox k-textbox-dark non-active" id="critSPPI" value="@Model.SPPI" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="clasMsfz" class="col-md-5 col-sm-6 control-label">Класифікація за МСФЗ</label>
+                        <div class="col-md-7 col-sm-6">
+                            <input type="text" name="clasMsfz" class="k-textbox k-textbox-dark non-active" id="clasMsfz" value="@Model.IFRS" readonly />
+                        </div>
+                    </div>
+                }
 
                 <div class="form-group">
                     <label for="" class="col-xs-12 control-label">Вид договору</label>

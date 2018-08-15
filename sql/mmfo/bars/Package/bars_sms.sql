@@ -1,10 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** Run *** ==
- PROMPT ===================================================================================== 
- 
-create or replace package bars_sms is
+create or replace package bars_sms
+is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
 --
@@ -26,7 +21,7 @@ create or replace package bars_sms is
 
 */
 
-g_header_version  constant varchar2(64)  := 'version 2.11  25/04/2018';
+g_header_version  constant varchar2(64)  := 'version 2.12  12/07/2018';
 
 g_awk_header_defs constant varchar2(512) := '';
 
@@ -40,22 +35,29 @@ function header_version return varchar2;
 --
 function body_version return varchar2;
 
-----
--- init - инициализация пакета
 --
-procedure init;
+-- Создает сообщение для посылки SMS
+--
+procedure CREATE_MSG
+( p_msgid             in out  msg_submit_data.msg_id%type
+, p_creation_time     in      msg_submit_data.creation_time%type
+, p_expiration_time   in      msg_submit_data.expiration_time%type
+, p_phone             in      msg_submit_data.phone%type
+, p_encode            in      msg_submit_data.encode%type
+, p_msg_text          in      msg_submit_data.msg_text%type
+, p_rnk               in      msg_submit_data.rnk%type
+, p_kf                in      msg_submit_data.kf%type  default bars_context.current_mfo()
+);
 
-----
--- create_msg - Создает сообщение для посылки SMS
 --
-procedure create_msg(
-    p_msgid             in out  msg_submit_data.msg_id%type,
-    p_creation_time     in      msg_submit_data.creation_time%type,
-    p_expiration_time   in      msg_submit_data.expiration_time%type,
-    p_phone             in      msg_submit_data.phone%type,
-    p_encode            in      msg_submit_data.encode%type,
-    p_msg_text          in      msg_submit_data.msg_text%type,
-    p_kf                in      msg_submit_data.kf%type default bars_context.current_mfo());
+--
+--
+procedure CREATE_MSG
+( p_phone             in      msg_submit_data.phone%type
+, p_msg_text          in      msg_submit_data.msg_text%type
+, p_rnk               in      msg_submit_data.rnk%type
+, p_encode            in      msg_submit_data.encode%type default 'lat'
+);
 
 ----
 -- submit_msg - выполняет посылку сообщения
@@ -104,7 +106,7 @@ is
 
 */
 
-g_body_version  constant varchar2(64)  := 'version 2.21 25/04/2018';
+g_body_version  constant varchar2(64)  := 'version 2.22  12/07/2018';
 
 g_awk_body_defs constant varchar2(512) := '';
 
@@ -151,35 +153,68 @@ begin
     -- инстанцируем объект
     --
     execute immediate 'begin :g_sms_provider := new '||G_SMS_PROV||'(); end;'
-            using out g_sms_provider;
+      using out g_sms_provider;
     --
 end init;
 
-----
--- create_msg - Создает сообщение для посылки SMS
 --
-procedure create_msg(
-    p_msgid             in out  msg_submit_data.msg_id%type,
-    p_creation_time     in      msg_submit_data.creation_time%type,
-    p_expiration_time   in      msg_submit_data.expiration_time%type,
-    p_phone             in      msg_submit_data.phone%type,
-    p_encode            in      msg_submit_data.encode%type,
-    p_msg_text          in      msg_submit_data.msg_text%type,
-    p_kf                in      msg_submit_data.kf%type default bars_context.current_mfo())
-is
+-- Создает сообщение для посылки SMS
+--
+procedure CREATE_MSG
+( p_msgid             in out  msg_submit_data.msg_id%type
+, p_creation_time     in      msg_submit_data.creation_time%type
+, p_expiration_time   in      msg_submit_data.expiration_time%type
+, p_phone             in      msg_submit_data.phone%type
+, p_encode            in      msg_submit_data.encode%type
+, p_msg_text          in      msg_submit_data.msg_text%type
+, p_rnk               in      msg_submit_data.rnk%type
+, p_kf                in      msg_submit_data.kf%type default bars_context.current_mfo()
+) is
 begin
     if p_msgid is null
     then
-        select s_msgid.nextval
-          into p_msgid
-          from dual;
+      select s_msgid.nextval
+        into p_msgid
+        from dual;
     end if;
     --
     insert
-      into msg_submit_data(msg_id, creation_time, expiration_time, phone, encode, msg_text, kf)
-    values (p_msgid, p_creation_time, p_expiration_time, p_phone, p_encode, p_msg_text,p_kf);
+      into MSG_SUBMIT_DATA ( MSG_ID, CREATION_TIME, EXPIRATION_TIME, PHONE, ENCODE, MSG_TEXT, KF, RNK )
+    values ( p_msgid, p_creation_time, p_expiration_time, p_phone, p_encode, p_msg_text, p_kf, p_rnk );
     --
-end create_msg;
+end CREATE_MSG;
+
+--
+--
+--
+procedure CREATE_MSG
+( p_phone             in      msg_submit_data.phone%type
+, p_msg_text          in      msg_submit_data.msg_text%type
+, p_rnk               in      msg_submit_data.rnk%type
+, p_encode            in      msg_submit_data.encode%type default 'lat'
+) is
+  l_msgid                     msg_submit_data.msg_id%type;
+  l_crt_tm                    msg_submit_data.creation_time%type;
+  l_exp_tm                    msg_submit_data.expiration_time%type;
+begin
+
+  l_crt_tm := sysdate;
+  l_exp_tm := l_crt_tm + 1;
+
+  CREATE_MSG
+  ( p_msgid           => l_msgid
+  , p_creation_time   => l_crt_tm
+  , p_expiration_time => l_exp_tm
+  , p_phone           => p_phone
+  , p_encode          => p_encode
+  , p_msg_text        => p_msg_text
+  , p_rnk             => p_rnk
+  , p_kf              => sys_context('bars_context','user_mfo')
+  );
+
+  bars_audit.trace( 'BARS_SMS.CREATE_MSG: created message #'||to_char(l_msgid) );
+
+end CREATE_MSG;
 
 ----
 -- submit_msg - выполняет посылку сообщения
@@ -279,8 +314,10 @@ begin
   --
 end submit_messages;
 
+--
+--
+--
 procedure submit_messages(p_start_id in number, p_end_id in number)
-
 is
 begin
     logger.trace('bars_sms.submit_messages: start. #p_start_id ='||p_start_id||' p_end_id ='||p_end_id);
@@ -300,6 +337,7 @@ begin
     end loop;
     logger.trace('bars_sms.submit_messages: finish. #p_start_id ='||p_start_id||' p_end_id ='||p_end_id);   
 end;
+
 ----
 -- query_status - выполняет проверку статуса
 --

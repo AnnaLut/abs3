@@ -76,6 +76,18 @@ begin
     when no_data_found then
       null;
   end;
+  
+  begin
+  --добавление доп. параметров по за€вке COBUPRVNIX-124 VL 22.03.2018
+   if (l_nbs in (1811, 1819, 2800, 2801, 2805, 2809, 3540, 3541, 3542, 3548, 3570, 3578, 3710)) 
+    then 
+	bars.accreg.setAccountwParam (p_acc,'BUS_MOD',15);
+	bars.accreg.setAccountwParam (p_acc,'SPPI','“ак');
+	bars.accreg.setAccountwParam (p_acc,'IFRS','AC');
+   end if;
+   exception when others then 
+    raise_application_error(-20000,p_acc || ' ERROR: ' || sqlerrm ||' '||dbms_utility.format_error_backtrace());
+  end;
 
   -- выдача сообщени€ (реестр инсайдеров)
   if getglobaloption('BMS')='1' and getglobaloption('RI')='1'

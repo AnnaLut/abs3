@@ -314,7 +314,7 @@
                                         </asp:Panel>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr id="ObjectRowCredContract" runat="server">
                                     <td>
                                         <asp:Panel ID="pnlNd" runat="server" GroupingText="Кредитний договір">
                                             <table border="0" cellpadding="3" cellspacing="0" class="data_table">
@@ -349,6 +349,14 @@
                                                     </tr>
                                                 </colgroup>
                                             </table>
+                                        </asp:Panel>
+                                    </td>
+                                </tr>
+                                <tr id="ObjectRowAnyContract" runat="server">
+                                    <td>
+                                        <asp:Panel ID="pnlAny" runat="server" GroupingText="Довільний об'єкт страхування">
+                                            <%-- Якщо ввести більше MaxLength символів не виводить MinMaxLengthErrorText, а виводить 'Заповніть поле', проте йти далі не дозволяє. --%>
+                                            <bars:TextBoxString ID="ANY" runat="server" MaxLength="4000" Rows="20" Width="500" ValidationGroup="Main" MinMaxLengthErrorText="Дозволено не більше 4000 символів."/>
                                         </asp:Panel>
                                     </td>
                                 </tr>

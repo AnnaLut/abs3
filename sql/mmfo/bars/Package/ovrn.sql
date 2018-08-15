@@ -1452,7 +1452,7 @@ procedure ADD_master (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date,
   l_wdate date ;
   l_Isp number := nvl (p_ISP,gl.aUid) ;
   x_ACCC number;
-  l_BUSSS varchar2(10);
+  l_BUSSL varchar2(10);
 begin
   l_sdate := nvl(p_sdate, gl.bdate) ; -------------------------\
   l_wdate := nvl(p_wdate, add_months(gl.bdate,12) -1 ) ; ------/ по умолчанию 1 год
@@ -1522,9 +1522,13 @@ begin
   end if;
 
   If p_ND = 0 then
-     l_BUSSS := Substr ( OVRN.GetCW( dd.rnk, 'BUSSS'),1,1) ;
+     l_BUSSL := Substr ( OVRN.GetCW( dd.rnk, 'BUSSL'),1,1) ;
      -- По рахунку 8998 та 2600 в параметрах рахунку автоматично проставляється базовий рік нарахування по %% Факт/360(3), по ММСБ має бути Факт/Факт(0). 
-     If l_BUSSS  = '2' then  insert into int_accn (ACC,ID,METR,BASEM,BASEY,FREQ, stp_DAT, acr_dat ) values (a8.acc,0,0,0,0,1, dd.wdate, dd.sdate-1 );
+     If l_BUSSL  = '2' then  insert into int_accn (ACC,ID,METR,BASEM,BASEY,FREQ, stp_DAT, acr_dat ) values (a8.acc,0,0,0,0,1, dd.wdate, dd.sdate-1 );
+                             OVRN.SetW ( a8.acc, 'TERM_LIM', to_char(20) );  --дата встановлення нового ліміту з 21 числа
+                             OVRN.SetW ( a8.acc, 'EXIT_ZN', null );  --Вихід з сірої зони автоматично (відключити)
+                             OVRN.SetW ( aa.acc, 'NOT_DS', null ); --Договірне списання з 2600 наявне (відключити)
+                             
      else                    insert into int_accn (ACC,ID,METR,BASEM,BASEY,FREQ, stp_DAT, acr_dat ) values (a8.acc,0,0,0,3,1, dd.wdate, dd.sdate-1 );
      end if;
 
@@ -1556,7 +1560,7 @@ procedure ADD_slave
   aa accounts%rowtype ;  sn accounts%rowtype ;  a8 accounts%rowtype ;  a9 accounts%rowtype ;  a0 accounts%rowtype ;
   dd cc_deal%rowtype  ;  U_ND number ;
   p4_ int             ;  l_nd number ;  dTmp_ date          ;  L_LIM NUMBER        ;
-  l_BUSSS varchar2(10);  l_basey int ;
+  l_BUSSL varchar2(10);  l_basey int ;
   l_acc6 number ;
 begin
 
@@ -1631,8 +1635,8 @@ begin
   EXCEPTION WHEN NO_DATA_FOUND THEN l_acc6 := null;
   end ;
 
-  l_BUSSS := Substr ( OVRN.GetCW( aa.rnk, 'BUSSS'),1,1) ;
-  If l_BUSSS = '2' then l_basey := 0;  else l_basey := 3;  end if; 
+  l_BUSSL := Substr ( OVRN.GetCW( aa.rnk, 'BUSSL'),1,1) ;
+  If l_BUSSL = '2' then l_basey := 0;  else l_basey := 3;  end if; 
 
   begin insert into int_accn ( ACC, ID, METR, BASEM, BASEY, FREQ, acr_dat, acra, acrb) values (aa.acc, 0, 0, 0, l_basey, 1, dd.sdate-1, sn.acc, l_acc6);
   exception when dup_val_on_index then  
@@ -2071,7 +2075,8 @@ procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2
 
 begin
   if p_User is not null then
-    bars.bars_login.login_user(sys_guid,p_User,null,null);
+      bars.bars_login.login_user(sys_guid,p_User,null,null);
+      bars.bc.go(p_branch);
       bars.bc.go(p_branch);
   end if;
   If p_mode not in (0,1) then RETURN; end if;

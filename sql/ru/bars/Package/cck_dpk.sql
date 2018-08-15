@@ -631,17 +631,18 @@ end;
         Return;
   end if;
 
-  cck_dpk.PLAN_FAKT (p_nd) ; -- проверка на совпадение флановых и фактич остатков
+  cck_dpk.PLAN_FAKT (p_nd) ; -- проверка на совпадение плановых и фактич остатков
 
   If p_mode = 1 then  -- досрочное погашение + изменение ГПК.
 
-     If nvl(p_k1, 0 ) <= 1 then        bars_error.raise_nerror(p_errmod =>'CCK', p_errname => 'SUM_POG', p_param1 => to_char(p_nd), p_param2 => to_char(p_K1/100) );     end if;
+     If nvl(p_k1, 0 ) <= 1 and nvl(Z5_,0) > 0 --COBUMMFO-6236 (test_result_20180418(п.1))
+				then        bars_error.raise_nerror(p_errmod =>'CCK', p_errname => 'SUM_POG', p_param1 => to_char(p_nd), p_param2 => to_char(p_K1/100) );     end if;
      CCK_DPK.K1_ := p_k1 + Z3_ ;
      lim2_       := Z5_-  p_K1 ;
 
      CCK_DPK.MODI_pay ( p_ND, p_acc2620 ) ;
 
-     If Z5_ > 0 then     CCK_DPK.MODI_gpk (p_ND)  ;      p_P1 := RR1.ref ;   end if;
+     If Z5_ >= 0 then     CCK_DPK.MODI_gpk (p_ND)  ;      p_P1 := RR1.ref ;   end if;
 
   ElsIf p_mode = 2 then  -- только изменение ГПК, без досрочного погашения.
      CCK_DPK.k1_:= 0  ;  -- Сумма для досрочного пог

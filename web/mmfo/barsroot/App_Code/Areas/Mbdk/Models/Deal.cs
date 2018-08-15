@@ -44,6 +44,11 @@ namespace BarsWeb.Areas.Mbdk.Models
         public string ND { get; set; }
         public DateTime D_NBU { get; set; }
 
+        public string NAME { get; set; } //тип угоди
+        public string BUS_MOD { get; set; }
+        public string SPPI { get; set; }
+        public string IFRS { get; set; }
+
         /*public decimal KV { get; set; }
         public string NLS { get; set; }
         public decimal ACC { get; set; }

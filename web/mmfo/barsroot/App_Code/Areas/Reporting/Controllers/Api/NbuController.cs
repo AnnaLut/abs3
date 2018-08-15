@@ -23,7 +23,7 @@ using BarsWeb.Infrastructure.ImportToFileHelper;
 using BarsWeb.Areas.Kernel.Infrastructure.Extentions;
 using BarsWeb.Core.Logger;
 using Ninject;
-using System.Diagnostics;
+
 
 namespace BarsWeb.Areas.Reporting.Controllers.Api
 {
@@ -362,11 +362,8 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                 List<TableInfo> ti = _repository.GetTableInfo(vn);
                 if(isDtl)
                 {
-                    long memorySize = Process.GetCurrentProcess().PrivateMemorySize64;
-                    Logger.Info("begin Dtl lazy load GetExcel (api/reporting/nbu/getexcel) PrivateMemorySize64: " + memorySize.ToString(), "api/reporting/nbu/getexcel");
                     List<ColumnDesc> colDesc = ti.Select(x => new ColumnDesc() { Name = x.ColumnName, Type = x.DataType, Semantic = title.FirstOrDefault(c => c[0] == x.ColumnName)[1] }).ToList<ColumnDesc>();
                     fPath =  new ImportToFileHelper().ExcelExportToZipCSVFiles('|', "NBU", res, colDesc);
-                    Logger.Info(string.Format("GetExcel (api/reporting/nbu/getexcel) file path: {0} was created", fPath), "api/reporting/nbu/getexcel");
                     return Request.CreateResponse(HttpStatusCode.OK, new { FileName = fPath });
                 }
                 var exel = new ExcelHelpers<List<Dictionary<string, object>>>(res.ToList(), title, ti, null);
@@ -386,15 +383,7 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
             catch (Exception ex)
             {
                 Logger.Exception(ex);
-
-                if (ex.Message.Contains("OutOfMemoryException"))
-                {
-                    long memorySize = Process.GetCurrentProcess().PrivateMemorySize64;
-                    Logger.Error(string.Format("GetExcel api/reporting/nbu/getexcel  OutOfMemoryException Messaage: {0}, privateMemory: {1} ", ex.Message, memorySize), "api/reporting/nbu/getexcel");
-                }
-                else
-                    Logger.Error("GetExcel (api/reporting/nbu/getexcel): " + ex.Message);
-                throw ex;
+                Logger.Error("GetExcel (api/reporting/nbu/getexcel): " + ex.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
             finally

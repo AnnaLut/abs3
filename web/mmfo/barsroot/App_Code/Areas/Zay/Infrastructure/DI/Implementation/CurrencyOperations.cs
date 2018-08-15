@@ -57,6 +57,7 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
                                 AND z.rnk = :dfRNK
                                 AND z.dk = :nDk
                                 AND z.kv2 = :dfKV
+                                AND z.kv2 = t.kv
                                 ";
 
             var parameters = new object[]

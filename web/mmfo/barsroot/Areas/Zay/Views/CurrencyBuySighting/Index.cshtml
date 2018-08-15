@@ -10,6 +10,7 @@
 <script>
     bars.helper.loadTemplate('@Url.Content("~/Areas/Zay/Scripts/CurrencyBuySighting/tpl/CencelReasonPattern.tpl.html")');
     bars.helper.loadTemplate('@Url.Content("~/Areas/Zay/Scripts/CurrencyBuySighting/tpl/RowEditPattern.tpl.html")');
+    bars.helper.loadTemplate('@Url.Content("~/Areas/Zay/Scripts/CurrencyBuySighting/tpl/ContractRefPattern.tpl.html")');
 
     var glReserve = '@ViewBag.nReserve';
     var glCovered = '@ViewBag.nCovered';
@@ -28,10 +29,13 @@
     <div id="box"></div>
 </div>
 
+<div id="contractRefWindow">
+    <div id="contractReferenceBox"></div>
+</div>
+
 <div id="cenceling-window">
     <div id="cencel-box"></div>
 </div>
-
 
 <style>
     .btns-group {
@@ -119,11 +123,12 @@
         text-align: center;
         font-size: 11px;
     }
-    .k-list-optionlabel{
+
+    .k-list-optionlabel {
         font-size: 13px;
     }
 
-  #currencyUse.k-state-active{
+    #currencyUse.k-state-active {
         background-color: #32408f !important;
         color: white !important;
     }

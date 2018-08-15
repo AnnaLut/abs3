@@ -62,11 +62,56 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
         }
 
         [HttpGet]
-        public HttpResponseMessage GetAgreements()
+        public HttpResponseMessage GetAgreementTypes()
         {
             try
             {
-                var sql = @"select name, vidd , tipp from v_mbdk_product order by vidd";
+                var sql = @"SELECT * FROM CC_TIPD WHERE TIPD < 3";
+                using (var connection = OraConnector.Handler.UserConnection)
+                {
+                    object list = connection.Query(sql).ToList();
+                    return Request.CreateResponse(HttpStatusCode.OK, list);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetAgreements(decimal tipdVal, decimal? k9val=null)
+        {
+            try
+            {
+                string sql = "";
+                if(tipdVal == 1)
+                {
+                    sql = @"select name, vidd , tipp from v_mbdk_product where tipd=:tipdVal and k9=:k9val order by vidd";
+                }
+                else if(tipdVal == 2)
+                {
+                    sql = @"select name, vidd , tipp from v_mbdk_product where tipd=:tipdVal order by vidd";
+                }
+
+                using (var connection = OraConnector.Handler.UserConnection)
+                {
+                    var list = connection.Query(sql, new { tipdVal, k9val }).ToList();
+                    return Request.CreateResponse(HttpStatusCode.OK, list);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetSPPIValues()
+        {
+            try
+            {
+                var sql = @"SELECT * FROM SPPI";
 
                 using (var connection = OraConnector.Handler.UserConnection)
                 {
@@ -482,6 +527,26 @@ namespace BarsWeb.Areas.Mbdk.Controllers.Api
                 using (var connection = OraConnector.Handler.UserConnection)
                 {
                     object type = connection.Query(sql, new { nVidd }).FirstOrDefault();
+                    return Request.CreateResponse(HttpStatusCode.OK, type);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetIFRS(decimal businessModel, decimal sppiVal)
+        {
+            try
+            {
+                var sql = @"SELECT b.ifrs, k9.k9, b.* FROM busmod_sppi_ifrs b, k9 
+                                WHERE b.ifrs = k9.ifrs AND k9.poci = 0 AND BUS_MOD=:businessModel AND SPPI=:sppiVal ";
+
+                using (var connection = OraConnector.Handler.UserConnection)
+                {
+                    object type = connection.Query(sql, new { businessModel, sppiVal }).FirstOrDefault();
                     return Request.CreateResponse(HttpStatusCode.OK, type);
                 }
             }
