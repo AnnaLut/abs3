@@ -3,11 +3,14 @@ CREATE OR REPLACE PROCEDURE BARS.P_FE9_SB ( dat_     DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #E9 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 10/05/2018 (22/04/2018)
+% VERSION     : 03/08/2018 (21/05/2018, 10/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19/07/2018 - выбираем параметр OB22 из табл.ACCOUNTS вместо SPECPARAM_INT
+             т.к. для некоторых лицевых счетов балансового 2909 не 
+             заполнено поле OB22 в табл. SPECPARAM_INT 
 05/04/2018 - для операций M37, MMV, CN3, CN4
              (операции анулирования переводов)
              удаляем референс проводки анулирования и
@@ -334,7 +337,7 @@ BEGIN
                      o.acck, o.nlsk,
                      o.s * 100 s_nom,
                      gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                FROM provodki_otc o, cust_acc ca, kl_fe9 k, oper p, specparam_int s
+                FROM provodki_otc o, cust_acc ca, kl_fe9 k, oper p, accounts s
                 WHERE o.fdat = one_day_
                   AND o.kv != 980
                   AND mfou_ = 300465
@@ -353,7 +356,7 @@ BEGIN
                     k.d060, ca.rnk, o.fdat, o.ref, o.tt, o.accd, o.nlsd, o.kv,
                     o.acck, o.nlsk, o.s * 100 s_nom,
                     gl.p_icurval (o.kv, o.s * 100, o.fdat) s_eqv, o.nazn, o.branch
-                FROM provodki_otc o, cust_acc ca, kl_fe9 k, oper p, specparam_int s
+                FROM provodki_otc o, cust_acc ca, kl_fe9 k, oper p,accounts s
                 WHERE o.fdat = one_day_
                   AND o.kv != 980
                   AND mfou_ = 300465
@@ -385,7 +388,7 @@ BEGIN
    -- 31.03.2016 поменял для OB22 со значения 24 на 60
    for k in (select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
                     NVL(trim(s.ob22),'00') OB22
-             from otcn_prov_temp o, specparam_int s
+             from otcn_prov_temp o, accounts s
              where o.nlsd LIKE '2909%'
                and o.nlsk LIKE '2909%'
                and o.acck = s.acc(+) )
@@ -401,7 +404,7 @@ BEGIN
    -- удаление проводок для проводок Дт 2809 Кт 2909 и OB22 = '75'
    for k in ( select o.ref REF, trim(o.nlsd) NLSD, trim(o.nlsk) NLSK,
                      o.s_nom S_NOM, NVL(trim(s.ob22),'00') OB22
-              from otcn_prov_temp o, specparam_int s
+              from otcn_prov_temp o, accounts s
               where o.nlsd LIKE '2809%'
                 and o.nlsk LIKE '2909%'
                 and o.acck = s.acc(+)
@@ -481,6 +484,11 @@ BEGIN
       where tt in ('I00', 'I05');
    end if;
 
+   -- убираем операции для банковских металлов BM*
+   delete from otcn_prov_temp
+   where tt like 'BM%';
+
+
    -- переказ коштiв нерезидентам (отримання коштiв вiд нерезидентiв)
    OPEN opl_dok;
 
@@ -517,7 +525,7 @@ BEGIN
             BEGIN
                select ob22
                   into ob22_
-               from specparam_int
+               from accounts
                where acc = acc_;
              EXCEPTION WHEN NO_DATA_FOUND THEN
                 ob22_ := null;
