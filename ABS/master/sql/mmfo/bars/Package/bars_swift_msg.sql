@@ -7,7 +7,7 @@ IS
    --**************************************************************--
 
 
-   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.18 07.08.2018';
+   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.19 15.08.2018';
    VERSION_HEADER_DEFS   CONSTANT VARCHAR2 (512) := '';
 
    -- Устаревшие типы
@@ -358,6 +358,8 @@ IS
    PROCEDURE job_mt199_ru_tr2tr2client3;
    
    PROCEDURE job_mt199_claims;
+   
+   PROCEDURE job_mt199_send_sms;
 
 
    -----------------------------------------------------------------
@@ -382,10 +384,9 @@ IS
       RETURN VARCHAR2;
 END bars_swift_msg;
 /
-
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.55 14.08.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.56 15.08.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -7490,10 +7491,10 @@ IS
       END;
 
       BEGIN
-         SELECT t.VALUE
+         SELECT count(*)
            INTO l_71fld199
            FROM sw_operw t
-          WHERE t.swref = p_swref AND t.tag = '71' and t.opt='F' AND ROWNUM = 1;
+          WHERE t.swref = p_swref AND t.tag = '71' and t.opt='F' ;
       EXCEPTION
          WHEN NO_DATA_FOUND
          THEN
@@ -7656,23 +7657,26 @@ IS
 
             --Якщо вхідна МТ199 має 71 поле, а в 71 полі МТ103 SHA або BEN -
             --то для статусу ACSC в 79 поле дописуємо комісію яка прийшла до нас в МТ199 + нашу в розмірі 0,
-            IF (    l_71fld199 IS NOT NULL
+            IF (    l_71fld199 >0
                 AND l_71fld IN ('SHA', 'BEN')
                 AND p_statusid = 1                                    /*ACSC*/
                                   )
             THEN
+            begin
+             for c in( SELECT value
+                         FROM sw_operw t
+                     WHERE t.swref = p_swref AND t.tag = '71' and t.opt='F' )
+             loop
                l_value :=
-                     l_value
-                  || CRLF
-                  || '//:71F:'
-                  || REPLACE (l_71fld199, CRLF, CRLF || '//:71F:')
-                  || CRLF
-                  || '//:71F:'
-                  || bars_swift.AmountToSwift (0,
+                     l_value|| CRLF || '//:71F:' || REPLACE (c.value, CRLF, CRLF || '//:71F:');
+               end loop;      
+                   l_value :=
+                     l_value|| CRLF || '//:71F:'     || bars_swift.AmountToSwift (0,
                                                l_currCode,
                                                TRUE,
                                                TRUE);
-            ELSIF(    l_71fld199 IS NULL
+             end;                                  
+            ELSIF(    l_71fld199 =0
                 AND l_71fld IN ('SHA', 'BEN')
                 AND p_statusid = 1                                    /*ACSC*/
                                   )
@@ -8777,7 +8781,8 @@ IS
                                                AND sj.sender = 'RZBAATWWXXX'
                                                AND so.VALUE LIKE
                                                       '%00155073621%')
-                    AND j.vdate = TRUNC (SYSDATE))
+                    AND j.vdate = TRUNC (SYSDATE)
+                    AND j.swref not in (select swref from sw_oper_queue where status in(1,2)))
       LOOP
          BEGIN
             bc.go (300465);
@@ -8870,7 +8875,7 @@ IS
                     bars.oper o
               WHERE     s.REF = a.REF
                     AND a.ref=o.ref
-                    AND o.tt ='CLI'
+                    AND o.tt  in ('CLI','CLG')
                     AND NVL (s.send_mt199, 0) != 1
                     AND a.nazns in(10, 11)
                     AND a.sos in(7,9)
@@ -8895,6 +8900,70 @@ IS
          END;
       END LOOP;
    END job_mt199_claims;
+   
+
+    PROCEDURE job_mt199_send_sms
+    IS
+       l_msgid   NUMBER;
+    BEGIN
+       BEGIN
+          FOR c
+             IN (SELECT s2.swref,
+                        s2.vdate,
+                        o.nlsa,
+                        o.kv,
+                        o.mfoa,
+                        a.send_sms,
+                        p.phone,
+                        a.rnk,
+                        s2.currency,
+                        s2.amount
+                   FROM bars.sw_journal s
+                        INNER JOIN bars.sw_operw w
+                           ON     s.swref = w.swref
+                              AND w.tag = '79'
+                              AND INSTR (w.VALUE, 'ACSC') > 0
+                        INNER JOIN bars.sw_journal s2
+                           ON     s.uetr = s2.uetr
+                              AND s2.mt = 103
+                              AND s2.imported = 'N'
+                              AND NVL (s2.count_send_sms, 0) = 0
+                        INNER JOIN bars.sw_oper so ON so.swref = s2.swref
+                        INNER JOIN bars.oper o ON o.REF = so.REF
+                        INNER JOIN bars.accounts a
+                           ON a.nls = o.nlsa AND a.kv = o.kv AND a.kf = o.mfoa
+                        INNER JOIN bars.acc_sms_phones p ON p.acc = a.acc
+                  WHERE     s.vdate = TRUNC (SYSDATE)
+                        AND s.mt = 199
+                        AND s.imported = 'Y'
+                        AND a.send_sms = 'Y')
+          LOOP
+             BEGIN
+                BARS_SMS.CREATE_MSG (
+                   p_msgid             => l_msgid,
+                   p_creation_time     => SYSDATE,
+                   p_expiration_time   => SYSDATE + 1,
+                   p_phone             => c.phone,
+                   p_encode            => 'lat',
+                   p_msg_text          =>    'Vash platizh vid '
+                                          || TO_CHAR (c.vdate, 'dd-mm-yyyy')
+                                          || ' v sumi '
+                                          || TRIM (
+                                                TO_CHAR (c.amount / 100,
+                                                         '999999999D99'))
+                                          || '('
+                                          || c.currency
+                                          || ') uspishno zarahovano beneficiaru(swift gpi).',
+                   p_rnk               => c.rnk,
+                   p_kf                => c.mfoa);
+
+                UPDATE sw_journal
+                   SET count_send_sms = NVL (count_send_sms, 0) + 1
+                 WHERE swref = c.swref;
+             END;
+          END LOOP;
+       END;
+    END job_mt199_send_sms;
 
    -----------------------------------------------------------------
    -- HEADER_VERSION()
