@@ -768,19 +768,14 @@ function val_convert(p_dat in date , -- Дата конмертації
 
 END cim_mgr;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.CIM_MGR 
+CREATE OR REPLACE PACKAGE BODY cim_mgr
 is
    --
    --  CIM_MGR
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
--- g_body_version      constant varchar2 (64) := 'version 1.00.01 17/07/2015';
--- g_body_version      constant varchar2 (64) := 'version 1.00.02 14/08/2015';
--- g_body_version      constant varchar2 (64) := 'version 1.00.03 16/11/2015';
--- g_body_version      constant varchar2 (64) := 'version 1.00.04 04/04/2016';
--- g_body_version      constant varchar2 (64) := 'version 1.00.05 08/08/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.05 04/12/2017';
+   g_body_version      constant varchar2 (64) := 'version 1.01.07 17/07/2018';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -1330,11 +1325,12 @@ end get_license_link_sum;
                                                      p_f503_percent_base_val varchar2 :=null --База процентної ставки (валюта),
                                                     )
 is
-  l_n number;
-  l_branch varchar2(30);
-  l_p27_f531 number;
-  l_benef_id number;
-  l_max_p27_f531 number;
+  l_n                 number;
+  l_branch            varchar2(30);
+  l_p27_f531          number;
+  l_benef_id          number;
+  l_max_p27_f531      number;
+  l_s_limit           number;
 begin
   if (p_s=0 or p_s is null) and p_contr_type=2 then bars_error.raise_error(g_module_name, 8); end if;
   select count(*) into l_n from cim_contracts
@@ -1359,19 +1355,31 @@ begin
     end if;
     insert into cim_contracts_trade (contr_id, spec_id, without_acts, subject_id, deadline, trade_desc, p27_f531)
       values (p_contr_id, p_spec_id, p_without_acts, p_subject_id, p_deadline, p_txt_subject, l_p27_f531);
-  else if p_contr_type=2 then
-    insert into cim_contracts_credit (contr_id, percent_nbu, s_limit, creditor_type, borrower, credit_type, credit_term, credit_prepay, name,
-      add_agree, percent_nbu_type, percent_nbu_info, r_agree_date, r_agree_no, prev_doc_key, prev_reestr_attr, ending_date_indiv,
-      parent_ch_data, ending_date, f503_reason, f503_state, f503_note, f504_reason, f504_note, f503_percent_type, f503_percent_base,
-      f503_percent_margin, f503_percent, f503_purpose, f503_percent_base_t, f503_change_info, f503_percent_base_val)
-      values (p_contr_id, p_percent_nbu, round(p_s_limit*100,0), p_creditor_type, p_credit_borrower, p_credit_type, p_credit_term,
-      p_credit_prepay, p_name,
-      p_add_agree, p_percent_nbu_type, p_percent_nbu_info, p_r_agree_date, p_r_agree_no, p_prev_doc_key, p_prev_reestr_attr,
-      p_ending_date_indiv, p_parent_ch_data, p_ending_date, p_f503_reason, p_f503_state, p_f503_note, p_f504_reason, p_f504_note,
-      p_f503_percent_type, case when p_f503_percent_type=2 then p_f503_percent_base else null end,
-      case when p_f503_percent_type=2 then p_f503_percent_margin else null end, p_f503_percent, p_f503_purpose,
-      case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, p_f503_change_info,
-      case when p_f503_percent_type=2 then p_f503_percent_base_val else null end);
+  else
+    if p_contr_type=2 then
+      insert into cim_contracts_credit (contr_id, percent_nbu, s_limit, creditor_type, borrower, credit_type, credit_term, credit_prepay, name,
+        add_agree, percent_nbu_type, percent_nbu_info, r_agree_date, r_agree_no, prev_doc_key, prev_reestr_attr, ending_date_indiv,
+        parent_ch_data, ending_date, f503_reason, f503_state, f503_note, f504_reason, f504_note, f503_percent_type, f503_percent_base,
+        f503_percent_margin, f503_percent, f503_purpose, f503_percent_base_t, f503_change_info, f503_percent_base_val)
+        values (p_contr_id, p_percent_nbu, round(p_s_limit*100,0), p_creditor_type, p_credit_borrower, p_credit_type, p_credit_term,
+        p_credit_prepay, p_name,
+        p_add_agree, p_percent_nbu_type, p_percent_nbu_info, p_r_agree_date, p_r_agree_no, p_prev_doc_key, p_prev_reestr_attr,
+        p_ending_date_indiv, p_parent_ch_data, p_ending_date, p_f503_reason, p_f503_state, p_f503_note, p_f504_reason, p_f504_note,
+        p_f503_percent_type, case when p_f503_percent_type=2 then p_f503_percent_base else null end,
+        case when p_f503_percent_type=2 then p_f503_percent_margin else null end, p_f503_percent, p_f503_purpose,
+        case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, p_f503_change_info,
+        case when p_f503_percent_type=2 then p_f503_percent_base_val else null end);
+    end if;
+    if p_contr_type=4 then
+      begin
+        select to_number(par_value)*100 into l_s_limit from cim_params where par_name='LIMIT_CONTR_EL_LIC';
+        if val_convert(p_open_date, p_s*100, p_kv, 840) > l_s_limit then
+          bars_error.raise_error(g_module_name, 104);
+        end if;
+        exception
+          when NO_DATA_FOUND then
+            bars_error.raise_error(g_module_name, 103);
+      end;
     end if;
   end if;
   l_branch:=sys_context('bars_context','user_branch');
@@ -1441,20 +1449,22 @@ procedure update_contract                           (p_contr_id in number, -- id
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
                                                      p_f503_percent_base_val varchar2 :=null --База процентної ставки (валюта)
                                                     )
-is l_contr_type number;
-   l_status_id number;
-   l_okpo varchar2(10);
-   l_branch varchar2(30); -- Код установи
-   l_date_term_change date;
-   l_rnk number;
-   l_subject_id number;
-   l_n number;
-   l_p27_f531 number;
-   l_benef_id number;
-   l_max_p27_f531 number;
+is l_contr_type         number;
+   l_status_id          number;
+   l_okpo               varchar2(10);
+   l_branch             varchar2(30); -- Код установи
+   l_date_term_change   date;
+   l_rnk                number;
+   l_subject_id         number;
+   l_n                  number;
+   l_p27_f531           number;
+   l_benef_id           number;
+   l_max_p27_f531       number;
+   l_kv                 number;
+   l_s_limit            number;
 begin
-  select status_id, c.contr_type, (select max(okpo) from customer where rnk=c.rnk), branch, rnk
-    into l_status_id, l_contr_type, l_okpo, l_branch, l_rnk from cim_contracts c where contr_id=p_contr_id;
+  select status_id, c.contr_type, (select max(okpo) from customer where rnk=c.rnk), branch, rnk, kv
+    into l_status_id, l_contr_type, l_okpo, l_branch, l_rnk, l_kv from cim_contracts c where contr_id=p_contr_id;
   if (p_s=0 or p_s is null) and l_contr_type=2 then bars_error.raise_error(g_module_name, 8); end if;
   if l_branch!=sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
   if l_contr_type=2 and nvl(p_f503_percent_type,-1)=2 and ( p_f503_percent_base is null or p_f503_percent_base_t is null or p_f503_percent_margin is null )
@@ -1498,6 +1508,16 @@ begin
         f503_percent_base_t=case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, f503_change_info=p_f503_change_info,
         f503_percent_base_val=case when p_f503_percent_type=2 then p_f503_percent_base_val else null end
     where contr_id=p_contr_id;
+   elsif l_contr_type=4 then
+      begin
+        select to_number(par_value)*100 into l_s_limit from cim_params where par_name='LIMIT_CONTR_EL_LIC';
+        if val_convert(p_open_date, p_s*100, l_kv, 840) > l_s_limit then
+          bars_error.raise_error(g_module_name, 104);
+        end if;
+        exception
+          when NO_DATA_FOUND then
+            bars_error.raise_error(g_module_name, 103);
+      end;
   end if;
   update cim_contracts
   set num=p_num, subnum=p_subnum, open_date=p_open_date, close_date=p_close_date,
@@ -1507,7 +1527,7 @@ begin
   where contr_id=p_contr_id;
   if l_contr_type<2 then check_contract_status(p_contr_id); end if;
   bars_audit.info(g_module_name||' Редагування контракту. contr_id:'||p_contr_id||' rnk:'||l_rnk||
-                  ' benef_id:'||p_benef_id||' s:'||p_s||' open_date: '||p_open_date||' close_date: '||p_close_date);
+                  ' benef_id:'||p_benef_id||' s:'||p_s||' open_date: '||p_open_date||' close_date: '||p_close_date||' l_contr_type: '||l_contr_type||' l_s_limit: '||l_s_limit/100);
 end update_contract;
 
 -- close_contract - Закриття (видалення) / відновлення контракту
@@ -2435,41 +2455,45 @@ function bound_payment(p_payment_type in number, -- Тип платежу
                         p_c_num varchar2 :=null, --Номер контракту
                         p_c_date date :=null --Дата контракту
                        ) return number
-is l_vc number; -- Валюта контракту
-   l_contr_type number; -- Тип контракту
-   l_rnk number; -- rnk клієнта
-   l_benef_id number; -- id бенефіціара
-   l_branch varchar2(30); -- Код установи
-   l_contr_s number; --сума контракту
-   l_status number; --статус контрату
+is l_vc                      number; -- Валюта контракту
+   l_contr_type              number; -- Тип контракту
+   l_rnk                     number; -- rnk клієнта
+   l_benef_id                number; -- id бенефіціара
+   l_branch                  varchar2(30); -- Код установи
+   l_contr_s                 number; --сума контракту
+   l_status                  number; --статус контрату
 
 
-   l_s number; -- Cума платежу
-   l_vp number; -- Валюта платежу
-   l_sos number; -- Стан документа
+   l_s                       number; -- Cума платежу
+   l_vp                      number; -- Валюта платежу
+   l_sos                     number; -- Стан документа
 
-   l_n number;
-   l_bound_id number; -- id зв'язку
-   l_direct number; -- Тип платежу (0 - вхідні, 1 - вихідні)
-   l_s_unbound number; -- Неприв'язана частина суми (реальна)
-   l_s_unbound_x number; -- Неприв'язана частина суми (з висячого зв'язку)
-   l_subject_id number; -- Предмет оплати (0 - товари, 1 - послуги)
-   l_comments varchar2(250); -- Коментар
-   l_contr_arrears number; -- Заборгованысть по кредиту
-   l_val_date date; -- Дата валютування
+   l_sum_bound               number; -- Сума привязаних
+   l_s_limit                 number; -- Ліміт для типу контракту 4
+   l_open_date               date;   -- Дата видачі е-ліцензії (дата відкриття)
 
-   l_fantom_id number; -- id фантома
-   l_okpo varchar2(14 byte);
+   l_n                       number;
+   l_bound_id                number; -- id зв'язку
+   l_direct                  number; -- Тип платежу (0 - вхідні, 1 - вихідні)
+   l_s_unbound               number; -- Неприв'язана частина суми (реальна)
+   l_s_unbound_x             number; -- Неприв'язана частина суми (з висячого зв'язку)
+   l_subject_id              number; -- Предмет оплати (0 - товари, 1 - послуги)
+   l_comments                varchar2(250); -- Коментар
+   l_contr_arrears           number; -- Заборгованысть по кредиту
+   l_val_date                date; -- Дата валютування
 
-   l_ape_id number;
-   l_txt varchar2(4000);
+   l_fantom_id               number; -- id фантома
+   l_okpo                    varchar2(14 byte);
+
+   l_ape_id                  number;
+   l_txt                     varchar2(4000);
 begin
   if p_contr_id=0 then
     if p_payment_type>0 or p_ref is null then bars_error.raise_error(g_module_name, 44); end if;
     l_branch:=sys_context('bars_context', 'user_branch'); l_contr_type:=3;
   else
-    select max(rnk), max(benef_id), max(kv), max(contr_type), max(branch), max(okpo), max(s), max(status_id)
-      into l_rnk, l_benef_id, l_vc, l_contr_type, l_branch, l_okpo, l_contr_s, l_status
+    select max(rnk), max(benef_id), max(kv), max(contr_type), max(branch), max(okpo), max(s), max(status_id), max(open_date)
+      into l_rnk, l_benef_id, l_vc, l_contr_type, l_branch, l_okpo, l_contr_s, l_status, l_open_date
       from cim_contracts where contr_id=p_contr_id;
     if l_branch != sys_context('bars_context', 'user_branch') then bars_error.raise_error(g_module_name, 40); end if;
     if l_status=1 or l_status>8 then bars_error.raise_error(g_module_name, 6); end if;
@@ -2527,6 +2551,24 @@ begin
       l_comments:=p_comments;
       if p_s_vp*100>l_s_unbound or p_s_vp=0 then bars_error.raise_error(g_module_name, 43);
       else
+        if l_contr_type = 4 then
+          select nvl(sum(b.s_cv),0)
+          into   l_sum_bound
+          from cim_payments_bound b
+          where b.contr_id = p_contr_id;
+
+          begin
+            select to_number(par_value)*100 into l_s_limit from cim_params where par_name='LIMIT_CONTR_EL_LIC';
+            bars_audit.debug(g_module_name||' Прив`язка платежу. bound_id:'||l_bound_id||' l_sum_bound+p_s_vc: '||(l_sum_bound+p_s_vc*100)||' l_s_limit: '||l_s_limit);
+            if val_convert(l_open_date, l_sum_bound+p_s_vc*100, l_vc, 840) > l_s_limit then
+              bars_error.raise_error(g_module_name, 104);
+            end if;
+            exception
+              when NO_DATA_FOUND then
+                   bars_error.raise_error(g_module_name, 103);
+          end;
+          --if l_sum_bound+
+        end if;
         if p_s_vp*100<l_s_unbound and (l_sos=5 or f_check_visa_status(p_ref)=0) then
             insert into cim_payments_bound (direct, ref, s, branch, pay_flag)
               values (p_direct, p_ref, round((l_s_unbound-p_s_vp*100),0), l_branch, 0);
@@ -3900,6 +3942,7 @@ is
   l_kurs_a number;
   l_kurs_b number;
 begin
+  --bars_audit.debug(g_module_name||' val_convert() - p_dat:'||p_dat||' p_s:'||p_s||' p_kv_a:'||p_kv_a||' p_kv_b:'||p_kv_b||' g_root_branch:'||g_root_branch);
   if p_dat<to_date('26/12/2008', 'dd/mm/yyyy') then return null; end if;
   if p_kv_a=980 then l_kurs_a:=1;
   else
@@ -3908,6 +3951,7 @@ begin
      where b.branch=g_root_branch and b.kv=p_kv_a and
            b.vdate=(select /*+ index(a pk_currate$base) */ max(vdate) from cur_rates$base a where a.branch=g_root_branch and a.kv=p_kv_a and a.vdate<=p_dat);
   end if;
+  --bars_audit.debug(g_module_name||' val_convert() - l_kurs_a:'||l_kurs_a);
   if p_kv_b=980 then l_kurs_b:=1;
   else
     select /*+ index(b pk_currate$base) */ rate_o/bsum into l_kurs_b
@@ -3915,6 +3959,7 @@ begin
      where b.branch=g_root_branch and b.kv=p_kv_b and
            b.vdate=(select /*+ index(a pk_currate$base) */ max(vdate) from cur_rates$base a where a.branch=g_root_branch and a.kv=p_kv_b and a.vdate<=p_dat);
   end if;
+  --bars_audit.debug(g_module_name||' val_convert() - l_kurs_a:'||l_kurs_b||' round(p_s*l_kurs_a/l_kurs_b ,0):'||round(p_s*l_kurs_a/l_kurs_b ,0));
   return round(p_s*l_kurs_a/l_kurs_b ,0);
 end val_convert;
 
@@ -4024,7 +4069,7 @@ select max(k030) as k030, max(k020) as k020, max(r4) as r4, case when max(sanksi
   from cim_f98
  where sanksia1!='ПІ' and sanksia1!='П' and
        (k030=2 and r4=(select upper(benef_name) from cim_beneficiaries where benef_id=(select benef_id from cim_contracts where contr_id=p_contr_id))
-          or k030=1 and k020=(select okpo from cim_contracts where contr_id=p_contr_id))
+          or k030=1 and ltrim(k020,'0')=(select ltrim(okpo, '0') from cim_contracts where contr_id=p_contr_id))
  group by nomnak, datanak, nomnaksk, datnaksk
  order by decode(status, 0, 2, 1), nvl(datnaksk, datanak);
 
@@ -4037,6 +4082,7 @@ select max(k030) as k030, max(k020) as k020, max(r4) as r4, case when max(sanksi
   l_n_z number;
   l_benef_id number;
 begin
+--  bars_audit.info(g_module_name||'.check_contract_sanction. p_contr_id:'||p_contr_id||' p_date:'||p_date||' p_okpo:'||p_okpo||' p_benef_name:'||p_benef_name);  
   date_i:=null; date_z:=null; date_i_end:=null; date_z_end:=null; l_n_i:=0; l_n_z:=0; l_n:=0;
   for c in c_sanction loop
     if c.k030=2 then
@@ -4067,6 +4113,7 @@ begin
 
   select okpo, benef_id into p_okpo, l_benef_id  from cim_contracts where contr_id=p_contr_id;
   select benef_name into p_benef_name from cim_beneficiaries where benef_id=l_benef_id;
+  bars_audit.info(g_module_name||'.check_contract_sanction. p_contr_id:'||p_contr_id||' p_date:'||p_date||' p_okpo:'||p_okpo||' p_benef_name:'||p_benef_name||' Санкції? => l_n='||l_n);      
   if l_n=0 then return 0; -- Немає жодних санкцій
     elsif date_i is not null and l_n_i>0 then return 2; --Є діючі санкції на резидента
     elsif date_z is not null and l_n_z>0 then return 3; --Є діючі санкції на нерезидента

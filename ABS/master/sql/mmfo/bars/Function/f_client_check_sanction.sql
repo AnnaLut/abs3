@@ -48,7 +48,7 @@ IS
                                    FROM customer
                                   WHERE rnk = p_rnk))
                OR     k030 = 1
-                  AND k020 = (SELECT okpo
+                  AND ltrim(k020,'0') = (SELECT ltrim(okpo,'0')
                                 FROM customer
                                WHERE rnk = p_rnk)
       GROUP BY nomnak,

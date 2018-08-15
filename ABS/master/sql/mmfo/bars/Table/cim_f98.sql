@@ -174,6 +174,16 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index I_CIM98_K020_LTRIM0 ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I_CIM98_K020_LTRIM0 ON BARS.CIM_F98 (LTRIM(K020,''0'')) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_F98 ***
