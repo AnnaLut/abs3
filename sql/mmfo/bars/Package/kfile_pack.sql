@@ -1,81 +1,74 @@
-CREATE OR REPLACE PACKAGE "KFILE_PACK"
-IS
+CREATE OR REPLACE PACKAGE BARS."KFILE_PACK" IS
     -- Author  : Alex.Iurchenko
     -- Created : 31.12.1899 23:59:59
     -- Purpose : package for work with k-files data(CA LEVEL)
     -- Версія пакету
-    G_HEADER_VERSION   CONSTANT VARCHAR2 (64) := 'VERSION 1.00 04/12/2015';
+    G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'VERSION 1.01 09/08/2018';
 
-    C_OB_CORPORATION_STATE CONSTANT VARCHAR2 (25 CHAR) := 'OB_CORPORATION_STATE';
+    C_OB_CORPORATION_STATE CONSTANT VARCHAR2(25 CHAR) := 'OB_CORPORATION_STATE';
     C_OB_STATE_ACTIVE      CONSTANT INT := 1;
     C_OB_STATE_LOCKED      CONSTANT INT := 2;
     C_OB_STATE_CLOSED      CONSTANT INT := 3;
 
-    TYPE R_UNIT IS RECORD (ID OB_CORPORATION.EXTERNAL_ID%TYPE, NAME OB_CORPORATION.CORPORATION_NAME%TYPE);
+    TYPE R_UNIT IS RECORD(
+        ID   OB_CORPORATION.EXTERNAL_ID%TYPE,
+        NAME OB_CORPORATION.CORPORATION_NAME%TYPE);
     TYPE T_UNITS IS TABLE OF R_UNIT;
 
-
-    TYPE MEASURE_RECORD IS RECORD
-    (
-        kf   VARCHAR2 (6),
-        OST_SUM  NUMBER
-    );
+    TYPE MEASURE_RECORD IS RECORD(
+        kf      VARCHAR2(6),
+        OST_SUM NUMBER);
 
     TYPE MEASURE_TABLE IS TABLE OF MEASURE_RECORD;
 
-    TYPE MEASURE_RECORD_2 IS RECORD
-    (
-        KOD_USTAN  NUMBER,
-        OST_SUM    NUMBER
-    );
+    TYPE MEASURE_RECORD_2 IS RECORD(
+        KOD_USTAN NUMBER,
+        OST_SUM   NUMBER);
 
     TYPE MEASURE_TABLE_2 IS TABLE OF MEASURE_RECORD_2;
-
 
     -- header_version - возвращает версию заголовка пакета
     FUNCTION HEADER_VERSION RETURN VARCHAR2;
 
     -- body_version - возвращает версию тела пакета
-    FUNCTION BODY_VERSION RETURN VARCHAR2;  
-  
+    FUNCTION BODY_VERSION RETURN VARCHAR2;
+
     FUNCTION GET_C_OB_CORP_STATE RETURN VARCHAR2;
------------------------------------------------------------kfile_sync
--- get next id in recieved data table
-function get_last_id(p_last_id in decimal)  return decimal;
 
--- get next id in recieved data table (delete old data for corporation)
-function get_sync_id(p_MFO in varchar2, p_CORP_ID in varchar2, p_SYNC_DATE in varchar2, p_d_type number default 1)  return number;
-procedure set_last_corp (p_s date, p_corpc varchar2, p_kf varchar2, p_sess_id number);
--- fill data on date(p_date format DDMMYYYY)
-procedure fill_data(p_date date, p_corp_code varchar2);
+    -- get next id in recieved data table
+    function get_last_id(p_last_id in decimal) return decimal;
 
-procedure SYNC_OB_CORP(
-   p_ID                IN OB_CORPORATION.ID%TYPE,
-   p_CORPORATION_CODE  IN OB_CORPORATION.CORPORATION_CODE%TYPE,
-   p_CORPORATION_NAME  IN OB_CORPORATION.CORPORATION_NAME%TYPE,
-   p_PARENT_ID         IN OB_CORPORATION.PARENT_ID%TYPE,
-   p_STATE_ID          IN OB_CORPORATION.state_id%TYPE,
-   p_EXTERNAL_ID       IN OB_CORPORATION.EXTERNAL_ID%TYPE);
------------------------------------------------------------end kfile_sync
------------------------------------------------------------p_lic26_kfile_mmfo
-procedure lic26_kfile (p_s      date,           -- дата по
-                         p_corpc  varchar2);
+    -- get next id in recieved data table (delete old data for corporation)
+    function get_sync_id(p_MFO       in varchar2,
+                         p_CORP_ID   in varchar2,
+                         p_SYNC_DATE in varchar2,
+                         p_d_type    number default 1) return number;
 
-FUNCTION GET_ALL_UNITS(P_ACC ACCOUNTS.ACC%TYPE) RETURN T_UNITS PIPELINED;
------------------------------------------------------------p_lic26_kfile_mmfo
+    procedure set_last_corp(p_s       date,
+                            p_corpc   varchar2,
+                            p_kf      varchar2,
+                            p_sess_id number);
+    
+    procedure kfile_vzd;                        
+                            
+    -- fill data on date(p_date format DDMMYYYY)
+    procedure fill_data(p_date date, p_corp_code varchar2);
+    -----------------------------------------------------------p_lic26_kfile_mmfo
+    procedure lic26_kfile(p_s date, p_corpc varchar2, p_sess_id out number);
 
+    FUNCTION GET_ALL_UNITS(P_ACC ACCOUNTS.ACC%TYPE) RETURN T_UNITS
+        PIPELINED;
 
+    PROCEDURE ADD_CORP(P_CORPORATION_CODE OB_CORPORATION.CORPORATION_CODE%TYPE,
+                       P_CORPORATION_NAME OB_CORPORATION.CORPORATION_NAME%TYPE,
+                       P_PARENT_ID        OB_CORPORATION.PARENT_ID%TYPE DEFAULT NULL,
+                       P_EXTERNAL_ID      OB_CORPORATION.EXTERNAL_ID%TYPE);
 
-    PROCEDURE ADD_CORP (P_CORPORATION_CODE  OB_CORPORATION.CORPORATION_CODE%TYPE,
-                        P_CORPORATION_NAME  OB_CORPORATION.CORPORATION_NAME%TYPE,
-                        P_PARENT_ID         OB_CORPORATION.PARENT_ID%TYPE DEFAULT NULL,
-                        P_EXTERNAL_ID       OB_CORPORATION.EXTERNAL_ID%TYPE);
-
-       PROCEDURE EDIT_CORP (P_ID               OB_CORPORATION.ID%TYPE,
-                            P_CORPORATION_CODE OB_CORPORATION.CORPORATION_CODE%TYPE,
-                            P_CORPORATION_NAME OB_CORPORATION.CORPORATION_NAME%TYPE,
-                            P_EXTERNAL_ID      OB_CORPORATION.EXTERNAL_ID%TYPE,
-                            P_PARENT_ID        OB_CORPORATION.EXTERNAL_ID%TYPE);
+    PROCEDURE EDIT_CORP(P_ID               OB_CORPORATION.ID%TYPE,
+                        P_CORPORATION_CODE OB_CORPORATION.CORPORATION_CODE%TYPE,
+                        P_CORPORATION_NAME OB_CORPORATION.CORPORATION_NAME%TYPE,
+                        P_EXTERNAL_ID      OB_CORPORATION.EXTERNAL_ID%TYPE,
+                        P_PARENT_ID        OB_CORPORATION.EXTERNAL_ID%TYPE);
 
     PROCEDURE LOCK_CORP_ITEM(P_UNIT_ID OB_CORPORATION.ID%TYPE);
 
@@ -83,63 +76,51 @@ FUNCTION GET_ALL_UNITS(P_ACC ACCOUNTS.ACC%TYPE) RETURN T_UNITS PIPELINED;
 
     PROCEDURE CLOSE_CORP_ITEM(P_UNIT_ID OB_CORPORATION.ID%TYPE);
 
-  /*  FUNCTION KF_OST_SUM (P_CORP_ID      OB_CORPORATION_DATA.CORPORATION_ID%TYPE,
-                         P_NBS          OB_CORPORATION_DATA.NLS%TYPE,
-                         P_KV_FLAG      INTEGER,
-                         P_KOD_ANALYT   OB_CORPORATION_DATA.KOD_ANALYT%TYPE,
-                         P_DATE_START   OB_CORPORATION_DATA.POSTDAT%TYPE,
-                         P_DATE_END     OB_CORPORATION_DATA.POSTDAT%TYPE)
-    RETURN MEASURE_TABLE PIPELINED;
+    function kf_ost_sum(p_corp_id    in number,
+                        p_nbs        in varchar2,
+                        p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
+                        p_kod_analyt in varchar2,
+                        p_date_start in date,
+                        p_date_end   in date,
+                        p_rep_id     in number) return measure_table
+        pipelined;
 
-    FUNCTION KF_OST_SUM_USTAN (P_CORP_ID      OB_CORPORATION_DATA.CORPORATION_ID%TYPE,
-                               P_NBS          OB_CORPORATION_DATA.NLS%TYPE,
-                               P_KV_FLAG      INTEGER,
-                               P_KOD_ANALYT   OB_CORPORATION_DATA.KOD_ANALYT%TYPE,
-                               P_DATE_START        OB_CORPORATION_DATA.POSTDAT%TYPE,
-                               P_DATE_end       OB_CORPORATION_DATA.POSTDAT%TYPE)
-    RETURN MEASURE_TABLE_2 PIPELINED;*/
+    function kf_ost_sum_ustan(p_corp_id    in number,
+                              p_nbs        in varchar2,
+                              p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
+                              p_kod_analyt in varchar2,
+                              p_date_start in date,
+                              p_date_end   in date,
+                              p_rep_id     in number) return measure_table_2
+        pipelined;
 
-    FUNCTION GET_POSSIBLE_UNITS(P_ID_UNIT OB_CORPORATION.ID%TYPE) RETURN T_UNITS PIPELINED;
+    FUNCTION GET_POSSIBLE_UNITS(P_ID_UNIT OB_CORPORATION.ID%TYPE)
+        RETURN T_UNITS
+        PIPELINED;
     --процедура обновления счетов корпоративных клиентов(обновляет включение в выписку, код ТРКК, код подразделения, дату открытия и альтернат. корпорацию)
-    procedure UPDATE_ACC_CORP(p_acc      number, 
-                              p_invp     varchar2, 
-                              p_trkk     varchar2, 
-                              p_sub_corp varchar2, 
-                              p_alt_corp varchar2, 
+    procedure UPDATE_ACC_CORP(p_acc      number,
+                              p_invp     varchar2,
+                              p_trkk     varchar2,
+                              p_sub_corp varchar2,
+                              p_alt_corp varchar2,
                               p_daos     date);
-    function get_mmfo_type return number;
-    procedure ins_customerw (p_rnk customerw.rnk%type,p_external_id varchar2, p_org_id varchar2);
-    function crt_dict_xml return clob;
-    function pars_dict_xml(p_clob in clob) return clob;
-    function crt_xml(p_sess_id in number, p_kf in varchar2) return clob;
-    function pars_xml(p_clob in clob) return clob;
-    procedure send_kfiles(p_id number, p_mmfo varchar2);
-    
-    procedure send_corp_dict;
-    
-    procedure send_dict_result(p_transp_id varchar2);
-    
-    procedure send_kfile_result(p_transp_id varchar2);
-	
-	procedure crt_txt_k_file(p_sess_id in number,
-                          p_corp_id in number,
-                          p_kf      in varchar2,
-                          p_fname   in out varchar2,
-                          p_k_file  out clob);
-                        
+    procedure ins_customerw(p_rnk         customerw.rnk%type,
+                            p_external_id varchar2,
+                            p_org_id      varchar2);
+
+    procedure crt_txt_k_file(p_sess_id in number,
+                             p_corp_id in number,
+                             p_kf      in varchar2,
+                             p_fname   in out varchar2,
+                             p_k_file  out clob);
+
     procedure crt_kfile(p_sess_id in number,
-                     p_kf      in varchar2,
-                     p_corp_id in number default null);
-                          
-    /*procedure ins_nbs_rep(p_corp_id number, p_nbs varchar2, p_rep_id number);
-  
-    procedure del_nbs_rep(p_id char);
- 
-    procedure upd_nbs_rep(p_id char, p_user_id number, p_corp_id number, p_nbs varchar2, p_rep_id number);*/
-	
+                        p_kf      in varchar2,
+                        p_corp_id in number default null);
+
 END KFILE_PACK;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.KFILE_PACK
+CREATE OR REPLACE PACKAGE BODY BARS."KFILE_PACK"
 IS
     -- Версія пакету
     G_BODY_VERSION   CONSTANT VARCHAR2 (64) := 'VERSION 1.11 04/12/2017';
@@ -147,46 +128,89 @@ IS
     ------------------------------------------------------------------------------------
 
 -- header_version - возвращает версию заголовка пакета
-    FUNCTION HEADER_VERSION RETURN VARCHAR2 IS
-    BEGIN
-        RETURN 'Package header ' || G_DBGCODE || ' ' || G_HEADER_VERSION || '.';
-    END HEADER_VERSION;
+ function header_version return varchar2 is
+ begin
+     return 'Package header ' || g_dbgcode || ' ' || g_header_version || '.';
+ end header_version;
 
 -- body_version - возвращает версию тела пакета
-    FUNCTION BODY_VERSION RETURN VARCHAR2 IS
-    BEGIN
-        RETURN 'Package body ' || G_DBGCODE || ' ' || G_BODY_VERSION || '.';
-    END BODY_VERSION;
+ function body_version return varchar2 is
+ begin
+     return 'Package body ' || g_dbgcode || ' ' || g_body_version || '.';
+ end body_version;
 
---GET_C_OB_CORPORATION_STATE
-    FUNCTION GET_C_OB_CORP_STATE RETURN VARCHAR2 IS
-    BEGIN
-        RETURN C_OB_CORPORATION_STATE;
-    END;
+--get_c_ob_corporation_state
+ function get_c_ob_corp_state return varchar2 is
+ begin
+     return c_ob_corporation_state;
+ end;
+ 
+ function encode_base64(p_blob in blob) return clob is
+            l_clob           clob;
+            l_result         clob;
+            l_offset         integer;
+            l_chunk_size     binary_integer := 23808;
+            l_buffer_varchar varchar2(32736);
+            l_buffer_raw     raw(32736);
+          begin
+            if (p_blob is null) then
+              return null;
+            end if;
 
-    FUNCTION GET_CORP_STATE (P_ID OB_CORPORATION.ID%TYPE) return number IS
-        l_STATE_ID number;
-        begin
-    SELECT STATE_ID into l_STATE_ID
-    FROM OB_CORPORATION C
-    WHERE C.ID = P_ID;
-    return l_STATE_ID;
-    exception when no_data_found then
-        return null;
-    END GET_CORP_STATE;
+            dbms_lob.createtemporary(l_clob, false);
 
---get_web_params
-    function get_param_webconfig(par varchar2) return web_barsconfig.val%type is
-        l_res web_barsconfig.val%type;
-      begin
-        select val into l_res from web_barsconfig where key = par;
-        return trim(l_res);
-      exception
-        when no_data_found then
-          raise_application_error(-20000,
-                                  'Не знайдено KEY=' || par ||
-                                  ' в таблице web_barsconfig!');
-      end;
+            l_offset := 1;
+            for i in 1 .. ceil(dbms_lob.getlength(p_blob) / l_chunk_size) loop
+              dbms_lob.read(p_blob, l_chunk_size, l_offset, l_buffer_raw);
+              l_buffer_raw     := utl_encode.base64_encode(l_buffer_raw);
+              l_buffer_varchar := utl_raw.cast_to_varchar2(l_buffer_raw);
+              l_buffer_varchar :=regexp_replace(l_buffer_varchar, '\s', '');
+              dbms_lob.writeappend(l_clob, length(l_buffer_varchar), l_buffer_varchar);
+              l_offset := l_offset + l_chunk_size;
+            end loop;
+
+            l_result := l_clob;
+            dbms_lob.freetemporary(l_clob);
+
+            return l_result;
+        end;
+        
+ function clob_to_blob(p_clob in clob) return blob is
+     l_blob         blob;
+     l_warning      integer;
+     l_dest_offset  integer := 1;
+     l_src_offset   integer := 1;
+     l_blob_csid    number := dbms_lob.default_csid;
+     l_lang_context number := dbms_lob.default_lang_ctx;
+ begin
+            if (p_clob is null) then
+              return null;
+            end if;
+            
+     dbms_lob.createtemporary(l_blob, false);
+
+     dbms_lob.converttoblob(dest_lob     => l_blob,
+                            src_clob     => p_clob,
+                            amount       => dbms_lob.lobmaxsize,
+                            dest_offset  => l_dest_offset,
+                            src_offset   => l_src_offset,
+                            blob_csid    => l_blob_csid,
+                            lang_context => l_lang_context,
+                            warning      => l_warning);
+     return l_blob;
+ end;
+
+ function get_corp_state(p_id ob_corporation.id%type) return number is l_state_id number;
+ begin
+     select state_id
+       into l_state_id
+       from ob_corporation c
+      where c.id = p_id;
+     return l_state_id;
+ exception
+     when no_data_found then
+         return null;
+ end get_corp_state;
 
  procedure crt_txt_k_file(p_sess_id in number,
                           p_corp_id in number,
@@ -196,7 +220,7 @@ IS
      l_clob clob;
      l_filename varchar2(50);
  begin
-     DBMS_LOB.CREATETEMPORARY(l_clob, true);
+     DBMS_LOB.CREATETEMPORARY(l_clob, true, DBMS_LOB.SESSION);
      for j in (select ROWTYPE || '|' || lpadchr(kf, ' ', 9) || '|' ||
                       lpadchr(nls, ' ', 14) || '|' ||
                       lpadchr(nvl(kv, 0), ' ', 3) || '|' ||
@@ -253,18 +277,22 @@ IS
 
      p_fname:= l_filename;
      p_k_file:= l_clob;
+     dbms_lob.freetemporary(l_clob);
  end;
 
  procedure crt_kfile(p_sess_id in number,
                      p_kf      in varchar2,
                      p_corp_id in number default null) is
 
-  l_url         params$global.val%type :=  getglobaloption('ABSBARS_WEBSERVER_PROTOCOL')||'://'||getglobaloption('ABSBARS_WEBSERVER_IP_ADRESS')||'/barsroot/api/kfile/CrtKfile';
-  l_f_path      varchar2(255) :=branch_attribute_utl.get_value('TMS_REPORTS_DIR');
-  l_wallet_path varchar2(256) := getglobaloption('PATH_FOR_ABSBARS_WALLET');
-  l_wallet_pwd  varchar2(256) := getglobaloption('PASS_FOR_ABSBARS_WALLET');
-  l_response    wsm_mgr.t_response;
-  l_id varchar2(36);
+  l_url           varchar2(1024) :=  branch_attribute_utl.get_value('LINK_FOR_ABSBARS_WEBAPISERVICES')||'kfiles/CrtKfile';
+  l_f_path        varchar2(255) :=branch_attribute_utl.get_value('TMS_REPORTS_DIR');
+  l_wallet_path   varchar2(256) := getglobaloption('PATH_FOR_ABSBARS_WALLET');
+  l_wallet_pwd    varchar2(256) := getglobaloption('PASS_FOR_ABSBARS_WALLET');
+  l_login         varchar2(400):= branch_attribute_utl.get_value('TMS_LOGIN');
+  l_password      varchar2(400):= branch_attribute_utl.get_value('TMS_PASS');
+  l_response      wsm_mgr.t_response;
+  fname           varchar2(50);
+  l_clob          clob;
   begin
 
   for i in (select corp_id
@@ -274,124 +302,71 @@ IS
                and c.is_last = 1
                and case when p_corp_id is null then -1 else c.corp_id end = case when p_corp_id is null then -1 else p_corp_id end)
            loop
-
-             wsm_mgr.prepare_request(p_url         => l_url,
+           
+           crt_txt_k_file(p_sess_id, i.corp_id, p_kf, fname, l_clob);
+           
+           if l_clob is not null then          
+           l_clob:=encode_base64(utl_compress.lz_compress(clob_to_blob(l_clob)));
+           
+             wsm_mgr.prepare_request(p_url=> l_url,
                           p_action      => null,
-                          p_http_method => wsm_mgr.g_http_get,
+                          p_http_method => wsm_mgr.g_http_post,
                           p_wallet_path => l_wallet_path,
                           p_wallet_pwd  => l_wallet_pwd,
-                          p_body        => null);
-             WSM_MGR.ADD_HEADER('sess_id', to_char(p_sess_id));
-             WSM_MGR.ADD_HEADER('corp_id', to_char(i.corp_id));
-             WSM_MGR.ADD_HEADER('kf', p_kf);
-             WSM_MGR.ADD_HEADER('path', l_f_path);
+                          p_body        => l_clob);
+             WSM_MGR.add_parameter('path', l_f_path);
+             WSM_MGR.add_parameter('filename', fname);
+             WSM_MGR.add_header('Authorization', 'Basic ' ||
+             utl_raw.cast_to_varchar2(utl_encode.base64_encode(utl_raw.cast_to_raw(l_login || ':' || l_password))));
              -- позвать метод веб-сервиса
              wsm_mgr.execute_api(l_response);
+           end if;
            end loop;
   end;
-
- /*procedure ins_nbs_rep(p_corp_id number, p_nbs varchar2, p_rep_id number) is
-
- begin
- insert into ob_corp_nbs_rep(id, corp_id, nbs, rep_id) values (sys_guid(), p_corp_id, p_nbs, p_rep_id);
- end;
-
- procedure del_nbs_rep(p_id char) is
-
- begin
- delete ob_corp_nbs_rep where id = p_id;
- end;
-
- procedure upd_nbs_rep(p_id char, p_user_id number, p_corp_id number, p_nbs varchar2, p_rep_id number) is
-
- begin
- update ob_corp_nbs_rep r
-    set corp_id = p_corp_id,
-        nbs     = p_nbs,
-        rep_id  = p_rep_id
- where id = p_id;
- end;*/
-
-
-    procedure loger(p_module varchar2,
-                    p_sess_id number,
-                    p_err clob,
-                    p_state number default 1,
-                    p_clob clob default null,
-                    p_blob blob default null) is
-        pragma autonomous_transaction;
-        log_id number;
-    begin
-            update bars.ob_corp_sess q
-                set q.state_id = p_state
-            where q.id = p_sess_id;
-
-        log_id:=S_OB_CORP_SESS_TRACK.NEXTVAL;
-        insert into bars.ob_corp_sess_track(ID, SESS_ID, ERR_SOURCE, STATE_ID, ERR_REP, ERR_ZIP, ERR_XML, SYS_TIME)
-        values (log_id, p_sess_id, p_module, p_state, p_err, p_blob, p_clob, sysdate);
-     commit;
-    end;
---xpath_extract
-    function extract(p_xml       in xmltype,
-                     p_xpath     in varchar2,
-                     p_mandatory in number) return clob is
-      g_is_error     boolean := false;
-      g_cur_rep_id   number := -1;
-      g_cur_block_id number := -1;
-      begin
-        begin
-          return p_xml.extract(p_xpath).getStringVal();
-        exception
-          when others then
-            if p_mandatory is null or g_is_error then
-              return null;
-            else
-              if sqlcode = -30625 then
-                bars_error.raise_nerror('BCK',
-                                        'XMLTAG_NOT_FOUND',
-                                        p_xpath,
-                                        g_cur_block_id,
-                                        g_cur_rep_id);
-              else
-                raise;
-              end if;
-            end if;
-        end;
-      end;
-
+  
+  procedure kfile_vzd is 
+  l_date date:= gl.bd();
+  l_corpc varchar2(255):=null;
+  l_kf varchar2(6):=f_ourmfo();
+  l_session number;
+  begin
+  lic26_kfile(l_date, l_corpc, l_session);
+  commit;
+  crt_kfile(l_session, l_kf);
+  end;
 
 -----------------------------------------------------------------------------------
-    function get_last_id(p_last_id in decimal) return decimal is
-      l_last_id decimal;
-    begin
-      select max(t1.id)
-        into l_last_id
-        from bars.attribute_history t1,
-             bars.object_type       t2,
-             bars.attribute_kind    t3,
-             bars.ob_corporation    t4
-       where t1.attribute_id = t3.id
-         and t3.object_type_id = t2.id
-         and t2.type_code = 'CORPORATIONS'
-         and t4.id = t1.object_id
-         and t1.id > p_last_id;
-      if (l_last_id is null) then
-        select max(t1.id)
-          into l_last_id
-          from bars.attribute_history t1,
-               bars.object_type       t2,
-               bars.attribute_kind    t3,
-               bars.ob_corporation    t4
-         where t1.attribute_id = t3.id
-           and t3.object_type_id = t2.id
-           and t2.type_code = 'CORPORATIONS'
-           and t4.id = t1.object_id;
-      end if;
-      return l_last_id;
-    end;
+ function get_last_id(p_last_id in decimal) return decimal is
+     l_last_id decimal;
+ begin
+     select max(t1.id)
+       into l_last_id
+       from bars.attribute_history t1,
+            bars.object_type       t2,
+            bars.attribute_kind    t3,
+            bars.ob_corporation    t4
+      where t1.attribute_id = t3.id
+        and t3.object_type_id = t2.id
+        and t2.type_code = 'CORPORATIONS'
+        and t4.id = t1.object_id
+        and t1.id > p_last_id;
+     if (l_last_id is null) then
+         select max(t1.id)
+           into l_last_id
+           from bars.attribute_history t1,
+                bars.object_type       t2,
+                bars.attribute_kind    t3,
+                bars.ob_corporation    t4
+          where t1.attribute_id = t3.id
+            and t3.object_type_id = t2.id
+            and t2.type_code = 'CORPORATIONS'
+            and t4.id = t1.object_id;
+     end if;
+     return l_last_id;
+ end;
 
 ---------------------------------------------------------------------------------------
-    function get_sync_id(P_MFO in varchar2, P_CORP_ID in varchar2, P_SYNC_DATE in varchar2, p_d_type number default 1)
+ function get_sync_id(P_MFO in varchar2, P_CORP_ID in varchar2, P_SYNC_DATE in varchar2, p_d_type number default 1)
       return number
       is
       pragma autonomous_transaction;
@@ -409,7 +384,7 @@ IS
         END IF;
       commit;
       return l_sync_id;
-    end ;
+ end;
 ------------------------------------------------------------------------------------------------
     procedure set_last_corp (p_s date, p_corpc varchar2, p_kf varchar2, p_sess_id number) is
     begin
@@ -420,7 +395,7 @@ IS
                 and q.sess_id<>p_sess_id
                 and q.sess_id in (select id from OB_CORP_SESS A WHERE a.FILE_DATE = p_s);
 
-				update OB_CORP_DATA_ACC q
+                update OB_CORP_DATA_ACC q
                 set q.is_last = 0
                 where q.kf = p_kf
                 and q.sess_id<>p_sess_id
@@ -434,23 +409,25 @@ IS
                                     and a.id<>p_sess_id
                                     AND a.FILE_DATE = p_s and B.CORP_ID = to_nume(p_corpc));
 
-			    update OB_CORP_DATA_ACC q
+                update OB_CORP_DATA_ACC q
                 set q.is_last = 0
-				where q.kf = p_kf
+                where q.kf = p_kf
                 and q.sess_id<>p_sess_id
                 and q.FDAT = p_s
-				and q.CORP_ID = to_nume(p_corpc);
+                and q.CORP_ID = to_nume(p_corpc);
         END IF;
     end;
 -----------------------------------------------------------------------------------------
     procedure fill_data(p_date date, p_corp_code varchar2) is
       l_jobname varchar2(64) := 'K_FILES_CREATE_FOR'||f_ourmfo;
       l_action varchar2(2000) :=
-    'begin
+    'declare
+     l_sess_id number;
+     begin
         bars_login.login_user(sys_guid, 1, null, null);
         bc.go('''||f_ourmfo||''');
         kfile_pack.LIC26_KFILE(to_date('''||to_char(p_date, 'dd.mm.yyyy')||''',''dd.mm.yyyy'')'||
-                               case when p_corp_code is null then ', null' else ', '||p_corp_code end||');
+                               case when p_corp_code is null then ', null' else ', '||p_corp_code end||', l_sess_id);
         commit;
         bms.send_message(p_receiver_id     => '||user_id||',
          p_message_type_id => 1,
@@ -489,8 +466,9 @@ exception
 ---------------------------------------------------------p_lic26_kfile_mmfo
 
 PROCEDURE lic26_kfile
-             (p_s        date,           -- дата по
-              p_corpc    varchar2 )      -- код корпорации
+             (p_s           date,           -- дата по
+              p_corpc       varchar2,
+              p_sess_id out number)      -- код корпорации
 is
 type lt_data_acc is table of OB_CORP_DATA_ACC%rowtype;
 l_data_acc lt_data_acc:=lt_data_acc();
@@ -540,7 +518,7 @@ begin
 
 
         l_sync := get_sync_id(f_ourmfo, p_corpc, to_char(p_s,'DDMMYYYY'));
-
+        p_sess_id:=l_sync;
    -----------------------------
    -- по счетам
    -----------------------------
@@ -872,7 +850,7 @@ begin
                 l_data_acc(l_data_acc.last).postdat   :=c0.fdat;
                 l_data_acc(l_data_acc.last).namk      :=replace(c0.nmk,'|',' ');
                 l_data_acc(l_data_acc.last).nms       :=replace(c0.nms,'|',' ');
-				l_data_acc(l_data_acc.last).is_last   :=1;
+                l_data_acc(l_data_acc.last).is_last   :=1;
 
 
     if l_data_doc.last >= 1000 then
@@ -900,503 +878,501 @@ exception when others then
 END lic26_kfile;
 
 
-FUNCTION GET_ALL_UNITS(P_ACC ACCOUNTS.ACC%TYPE) RETURN T_UNITS PIPELINED IS
-        ------------------------------------------------------------------------------------
-       CURSOR POSIBLE_UNITS (P_ROOT OB_CORPORATION.ID%TYPE) IS
-            SELECT T.ID, T.CORPORATION_NAME
-            FROM OB_CORPORATION T
-            WHERE T.STATE_ID <> C_OB_STATE_CLOSED
-            START WITH ID = P_ROOT
-            CONNECT BY PRIOR ID = PARENT_ID;
-        L_UNIT R_UNIT;
-        L_ROOT OB_CORPORATION.ID%TYPE;
-        L_UNITS T_UNITS;
-        L_CORP_EXT_ID VARCHAR(2);
-        ------------------------------------------------------------------------------------
-    BEGIN
-        SELECT C.VALUE INTO L_CORP_EXT_ID
-        FROM CUSTOMERW C
-        JOIN ACCOUNTS A ON A.RNK = C.RNK
-        WHERE c.tag = 'OBPCP'
-        and A.ACC = P_ACC;
-
-        SELECT MAX(ID) KEEP (DENSE_RANK LAST ORDER BY LEVEL) INTO L_ROOT
-        FROM OB_CORPORATION T
-        START WITH ID = L_CORP_EXT_ID
-        CONNECT BY ID = PRIOR PARENT_ID;
-
-        OPEN POSIBLE_UNITS(L_ROOT);
-        FETCH POSIBLE_UNITS BULK COLLECT INTO L_UNITS;
-        CLOSE POSIBLE_UNITS;
-
-        IF NVL(L_UNITS.COUNT,0) <> 0 THEN
-            FOR I IN L_UNITS.FIRST .. L_UNITS.LAST LOOP
-                L_UNIT.ID := L_UNITS(I).ID;
-                L_UNIT.NAME := L_UNITS(I).NAME;
-                PIPE ROW(L_UNIT);
-            END LOOP;
-        END IF;
-    END;
-
----------------------------------------------------------end p_lic26_kfile_mmfo
-
----------------------------------------------------------kfile_pack
----------------------------------------------------------kfile_sync
---Синхронизація довідника OB_CORPORATION
-    procedure SYNC_OB_CORP(
-       P_ID                 IN OB_CORPORATION.ID%TYPE,
-       P_CORPORATION_CODE   IN OB_CORPORATION.CORPORATION_CODE%TYPE,
-       P_CORPORATION_NAME   IN OB_CORPORATION.CORPORATION_NAME%TYPE,
-       P_PARENT_ID          IN OB_CORPORATION.PARENT_ID%TYPE,
-       P_STATE_ID           IN OB_CORPORATION.STATE_ID%TYPE,
-       P_EXTERNAL_ID        IN OB_CORPORATION.EXTERNAL_ID%TYPE)
-    IS
-       l_corp_row    OB_CORPORATION%ROWTYPE;
-    BEGIN
-       BEGIN
-          SELECT t1.*
-            INTO l_corp_row
-            FROM OB_CORPORATION t1
-           WHERE T1.ID = p_ID;
-       EXCEPTION
-          WHEN NO_DATA_FOUND
-          THEN
-             --select S_OB_CORPORATION.nextval into l_corp_id from dual;
-             INSERT INTO BARS.OB_CORPORATION t1 (T1.ID)
-                  VALUES (p_ID)
-               RETURNING id
-                    INTO l_corp_row.id;
-       END;
-
-       --DBMS_OUTPUT.PUT_LINE (l_corp_row.CORP_NAME);
-
-       IF (   p_CORPORATION_NAME <> l_corp_row.CORPORATION_NAME
-           OR (    p_CORPORATION_NAME IS NULL
-               AND l_corp_row.CORPORATION_NAME IS NOT NULL)
-           OR (    p_CORPORATION_NAME IS NOT NULL
-               AND l_corp_row.CORPORATION_NAME IS NULL))
-       THEN
-          BARS.ATTRIBUTE_UTL.SET_VALUE (l_corp_row.id,
-                                        'CORPORATION_NAME',
-                                        p_CORPORATION_NAME);
-       END IF;
-
-       IF (   p_CORPORATION_CODE <> l_corp_row.CORPORATION_CODE
-           OR (    p_CORPORATION_CODE IS NULL
-               AND l_corp_row.CORPORATION_CODE IS NOT NULL)
-           OR (    p_CORPORATION_CODE IS NOT NULL
-               AND l_corp_row.CORPORATION_CODE IS NULL))
-       THEN
-          BARS.ATTRIBUTE_UTL.SET_VALUE (l_corp_row.id,
-                                        'CORPORATION_CODE',
-                                        p_CORPORATION_CODE);
-       END IF;
-
-       IF (   p_PARENT_ID <> l_corp_row.PARENT_ID
-           OR (p_PARENT_ID IS NULL AND l_corp_row.PARENT_ID IS NOT NULL)
-           OR (p_PARENT_ID IS NOT NULL AND l_corp_row.PARENT_ID IS NULL))
-       THEN
-          BARS.ATTRIBUTE_UTL.SET_VALUE (l_corp_row.id,
-                                        'CORPORATION_PARENT_ID',
-                                        p_PARENT_ID);
-       END IF;
-
-       IF (   p_STATE_ID <> l_corp_row.STATE_ID
-           OR (p_STATE_ID IS NULL AND l_corp_row.STATE_ID IS NOT NULL)
-           OR (p_STATE_ID IS NOT NULL AND l_corp_row.STATE_ID IS NULL))
-       THEN
-          BARS.ATTRIBUTE_UTL.SET_VALUE (l_corp_row.id,
-                                        'CORPORATION_STATE_ID',
-                                        p_STATE_ID);
-       END IF;
-
-       IF (   p_EXTERNAL_ID <> l_corp_row.EXTERNAL_ID
-           OR (p_EXTERNAL_ID IS NULL AND l_corp_row.EXTERNAL_ID IS NOT NULL)
-           OR (p_EXTERNAL_ID IS NOT NULL AND l_corp_row.EXTERNAL_ID IS NULL))
-       THEN
-          BARS.ATTRIBUTE_UTL.SET_VALUE (l_corp_row.id,
-                                        'CORPORATION_EXTERNAL_ID',
-                                        p_EXTERNAL_ID);
-       END IF;
-
-    END SYNC_OB_CORP;
-
+ function get_all_units(p_acc accounts.acc%type) return t_units pipelined is
+     cursor posible_units(p_root ob_corporation.id%type) is
+         select t.id, t.corporation_name
+           from ob_corporation t
+          where t.state_id <> c_ob_state_closed
+          start with id = p_root
+         connect by prior id = parent_id;
+     l_unit        r_unit;
+     l_root        ob_corporation.id%type;
+     l_units       t_units;
+     l_corp_ext_id varchar(2);
+ begin
+     select c.value
+       into l_corp_ext_id
+       from customerw c
+       join accounts a
+         on a.rnk = c.rnk
+      where c.tag = 'OBPCP'
+        and a.acc = p_acc;
+ 
+     select max(id) keep(dense_rank last order by level)
+       into l_root
+       from ob_corporation t
+      start with id = l_corp_ext_id
+     connect by id = prior parent_id;
+ 
+     open posible_units(l_root);
+     fetch posible_units bulk collect
+         into l_units;
+     close posible_units;
+ 
+     if nvl(l_units.count, 0) <> 0 then
+         for i in l_units.first .. l_units.last loop
+             l_unit.id   := l_units(i).id;
+             l_unit.name := l_units(i).name;
+             pipe row(l_unit);
+         end loop;
+     end if;
+ end;
 -------------------------------------------------------------------------------------
 
-    PROCEDURE ADD_CORP (P_CORPORATION_CODE   OB_CORPORATION.CORPORATION_CODE%TYPE,
-                        P_CORPORATION_NAME   OB_CORPORATION.CORPORATION_NAME%TYPE,
-                        P_PARENT_ID          OB_CORPORATION.PARENT_ID%TYPE DEFAULT NULL,
-                        P_EXTERNAL_ID        OB_CORPORATION.EXTERNAL_ID%TYPE) IS
-        L_CORPORATION_ID  OB_CORPORATION.ID%TYPE;
-        L_CORPORATION_ROW OB_CORPORATION%ROWTYPE;
-        RES        NUMBER;
-    BEGIN
-
-        if P_PARENT_ID is null then --корневая корпорация
-          begin
-            select 1 into res from V_ROOT_CORPORATION t where P_EXTERNAL_ID = t.EXTERNAL_ID;
-            --нашли - ругаемся
-            raise_application_error (-20300,'Підрозділ з таким ідентифікатором вже існує');
-          exception
-            when no_data_found then null; --не нашли - все нормально
-          end;
-        else     --подразделение
-          begin
-            select 1 into res from V_ORG_CORPORATIONS t
-            where t.EXTERNAL_ID = P_EXTERNAL_ID
-            and   t.base_extid = (select t.base_extid from V_ORG_CORPORATIONS t where t.ID = P_PARENT_ID); --находим ид корневой корпорации
-            raise_application_error (-20300,'Підрозділ з таким ідентифікатором вже існує');
-          exception
-            when no_data_found then null;
-          end;
-        end if;
-
-        SELECT S_OB_CORPORATION.NEXTVAL INTO L_CORPORATION_ID FROM DUAL;
-
-        INSERT INTO BARS.OB_CORPORATION T1 (T1.ID)
-        VALUES (L_CORPORATION_ID)
-        RETURNING ID INTO L_CORPORATION_ROW.ID;
-
-        IF (P_CORPORATION_NAME IS NOT NULL) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_NAME',
-                                          P_CORPORATION_NAME);
-        END IF;
-
-        IF (P_CORPORATION_CODE IS NOT NULL) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_CODE',
-                                          P_CORPORATION_CODE);
-        END IF;
-
-        IF (P_PARENT_ID IS NOT NULL ) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_PARENT_ID',
-                                          P_PARENT_ID);
-        END IF;
-
-        IF (P_EXTERNAL_ID IS NOT NULL) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_EXTERNAL_ID',
-                                          P_EXTERNAL_ID);
-        END IF;
-
-        BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                      'CORPORATION_STATE_ID',
-                                      C_OB_STATE_ACTIVE);
-    END ADD_CORP;
+ procedure add_corp(p_corporation_code ob_corporation.corporation_code%type,
+                    p_corporation_name ob_corporation.corporation_name%type,
+                    p_parent_id        ob_corporation.parent_id%type default null,
+                    p_external_id      ob_corporation.external_id%type) is
+     l_corporation_id  ob_corporation.id%type;
+     l_corporation_row ob_corporation%rowtype;
+     res               number;
+ begin
+ 
+     if p_parent_id is null then
+         --корневая корпорация
+         begin
+             select 1
+               into res
+               from v_root_corporation t
+              where p_external_id = t.external_id;
+             --нашли - ругаемся
+             raise_application_error(-20300,
+                                     'Підрозділ з таким ідентифікатором вже існує');
+         exception
+             when no_data_found then
+                 null; --не нашли - все нормально
+         end;
+     else
+         --подразделение
+         begin
+             select 1
+               into res
+               from v_org_corporations t
+              where t.external_id = p_external_id
+                and t.base_extid =
+                    (select t.base_extid
+                       from v_org_corporations t
+                      where t.id = p_parent_id); --находим ид корневой корпорации
+             raise_application_error(-20300,
+                                     'Підрозділ з таким ідентифікатором вже існує');
+         exception
+             when no_data_found then
+                 null;
+         end;
+     end if;
+ 
+     select s_ob_corporation.nextval into l_corporation_id from dual;
+ 
+     insert into bars.ob_corporation t1
+         (t1.id)
+     values
+         (l_corporation_id)
+     returning id into l_corporation_row.id;
+ 
+     if (p_corporation_name is not null) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_NAME',
+                                      p_corporation_name);
+     end if;
+ 
+     if (p_corporation_code is not null) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_CODE',
+                                      p_corporation_code);
+     end if;
+ 
+     if (p_parent_id is not null) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_PARENT_ID',
+                                      p_parent_id);
+     end if;
+ 
+     if (p_external_id is not null) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_EXTERNAL_ID',
+                                      p_external_id);
+     end if;
+ 
+     bars.attribute_utl.set_value(l_corporation_row.id,
+                                  'CORPORATION_STATE_ID',
+                                  c_ob_state_active);
+ end add_corp;
 ----------------------------------------------------------------------------------------------------------------------
-    PROCEDURE EDIT_CORP (P_ID               OB_CORPORATION.ID%TYPE,
-                         P_CORPORATION_CODE OB_CORPORATION.CORPORATION_CODE%TYPE,
-                         P_CORPORATION_NAME OB_CORPORATION.CORPORATION_NAME%TYPE,
-                         P_EXTERNAL_ID      OB_CORPORATION.EXTERNAL_ID%TYPE,
-                         P_PARENT_ID        OB_CORPORATION.EXTERNAL_ID%TYPE) IS
-            CURSOR POSIBLE_UNITS (P_ID OB_CORPORATION.EXTERNAL_ID%TYPE, P_ROOT OB_CORPORATION.ID%TYPE) IS
-            SELECT T.ID, T.CORPORATION_NAME
-            FROM OB_CORPORATION T
-            WHERE T.STATE_ID <> C_OB_STATE_CLOSED
-            START WITH ID = P_ROOT
-            CONNECT BY PRIOR ID = PARENT_ID
-            MINUS
-            SELECT T.ID, T.CORPORATION_NAME
-            FROM OB_CORPORATION T
-            WHERE T.STATE_ID <> C_OB_STATE_CLOSED
-            START WITH ID = P_ID
-            CONNECT BY PRIOR ID = PARENT_ID;
-        L_ROOT OB_CORPORATION.ID%TYPE;
-        L_UNITS T_UNITS;
-        L_EXISTS BOOLEAN:=false;
-        L_CORPORATION_ROW OB_CORPORATION%ROWTYPE;
-        l_parent_id number;
-        res        number;
-    BEGIN
-        BEGIN
-            SELECT T1.* INTO L_CORPORATION_ROW
-            FROM OB_CORPORATION T1
-            WHERE T1.ID = P_ID;
-        EXCEPTION
-            WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20101, 'Не знайдено підрозділ корпорації з кодом '|| TO_CHAR(P_ID));
-        END;
-
-        if L_CORPORATION_ROW.PARENT_ID is null then --корневая корпорация
-          begin
-            select 1 into res from V_ROOT_CORPORATION t where P_EXTERNAL_ID = t.EXTERNAL_ID and P_ID != t.ID;
-            --нашли - ругаемся
-            raise_application_error (-20300,'Підрозділ з таким ідентифікатором вже існує');
-          exception
-            when no_data_found then null; --не нашли - все нормально
-          end;
-        else     --подразделение
-          begin
-            select 1 into res from V_ORG_CORPORATIONS t
-            where t.EXTERNAL_ID = P_EXTERNAL_ID
-            and   P_ID != t.ID
-            and   t.base_extid = (select t.base_extid from V_ORG_CORPORATIONS t where L_CORPORATION_ROW.PARENT_ID = t.ID); --находим ид корневой корпорации
-            raise_application_error (-20300,'Підрозділ з таким ідентифікатором вже існує');
-          exception
-            when no_data_found then null;
-          end;
-        end if;
-
-        IF (P_CORPORATION_NAME <> L_CORPORATION_ROW.CORPORATION_NAME
-        OR (P_CORPORATION_NAME IS NULL AND L_CORPORATION_ROW.CORPORATION_NAME IS NOT NULL)
-        OR (P_CORPORATION_NAME IS NOT NULL AND L_CORPORATION_ROW.CORPORATION_NAME IS NULL)) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_NAME',
-                                          P_CORPORATION_NAME);
-        END IF;
-
-        IF (P_CORPORATION_CODE <> L_CORPORATION_ROW.CORPORATION_CODE
-        OR (P_CORPORATION_CODE IS NULL AND L_CORPORATION_ROW.CORPORATION_CODE IS NOT NULL)
-        OR (P_CORPORATION_CODE IS NOT NULL AND L_CORPORATION_ROW.CORPORATION_CODE IS NULL)) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_CODE',
-                                          P_CORPORATION_CODE);
-        END IF;
-
-        IF (P_EXTERNAL_ID <> L_CORPORATION_ROW.EXTERNAL_ID
-        OR (P_EXTERNAL_ID IS NULL AND L_CORPORATION_ROW.EXTERNAL_ID IS NOT NULL)
-        OR (P_EXTERNAL_ID IS NOT NULL AND L_CORPORATION_ROW.EXTERNAL_ID IS NULL)) THEN
-            BARS.ATTRIBUTE_UTL.SET_VALUE (L_CORPORATION_ROW.ID,
-                                          'CORPORATION_EXTERNAL_ID',
-                                          P_EXTERNAL_ID);
-        END IF;
-
-
-
-        SELECT MAX(ID) KEEP (DENSE_RANK LAST ORDER BY LEVEL) INTO L_ROOT
-        FROM OB_CORPORATION T
-        START WITH ID = P_ID
-        CONNECT BY ID = PRIOR PARENT_ID;
-
-       begin
-       select ID into l_parent_id from v_ob_corp_l1 c where c.base_extid = L_ROOT and c.ext_id = P_PARENT_ID;
-       exception when no_data_found then null;
-       end;
-       select count(*) into res from v_ob_corp_l1 c where c.parent_id = l_parent_id and c.id = P_ID;
-       if res = 0 and P_PARENT_ID is not null then
-            OPEN POSIBLE_UNITS(P_ID, L_ROOT);
-            FETCH POSIBLE_UNITS BULK COLLECT INTO L_UNITS;
-            CLOSE POSIBLE_UNITS;
-
-                IF NVL(L_UNITS.COUNT,0) <> 0 THEN
-                    FOR I IN L_UNITS.FIRST .. L_UNITS.LAST LOOP
-                        IF l_parent_id = L_UNITS(I).ID THEN
-                            L_EXISTS := TRUE;
-                            EXIT;
-                        END IF;
-                    END LOOP;
-                END IF;
-
-
-                IF L_EXISTS THEN
-                    UPDATE OB_CORPORATION SET PARENT_ID = l_parent_id WHERE ID = P_ID;
-                ELSE
-                    RAISE_APPLICATION_ERROR(-20000, 'Невірний батьківський підрозділ!');
-                END IF;
-       end if;
-    END EDIT_CORP;
+ procedure edit_corp(p_id               ob_corporation.id%type,
+                     p_corporation_code ob_corporation.corporation_code%type,
+                     p_corporation_name ob_corporation.corporation_name%type,
+                     p_external_id      ob_corporation.external_id%type,
+                     p_parent_id        ob_corporation.external_id%type) is
+     cursor posible_units(p_id   ob_corporation.external_id%type,
+                          p_root ob_corporation.id%type) is
+         select t.id, t.corporation_name
+           from ob_corporation t
+          where t.state_id <> c_ob_state_closed
+          start with id = p_root
+         connect by prior id = parent_id
+         minus
+         select t.id, t.corporation_name
+           from ob_corporation t
+          where t.state_id <> c_ob_state_closed
+          start with id = p_id
+         connect by prior id = parent_id;
+     l_root            ob_corporation.id%type;
+     l_units           t_units;
+     l_exists          boolean := false;
+     l_corporation_row ob_corporation%rowtype;
+     l_parent_id       number;
+     res               number;
+ begin
+     begin
+         select t1.*
+           into l_corporation_row
+           from ob_corporation t1
+          where t1.id = p_id;
+     exception
+         when no_data_found then
+             raise_application_error(-20101,
+                                     'Не знайдено підрозділ корпорації з кодом ' ||
+                                     to_char(p_id));
+     end;
+ 
+     if l_corporation_row.parent_id is null then
+         --корневая корпорация
+         begin
+             select 1
+               into res
+               from v_root_corporation t
+              where p_external_id = t.external_id
+                and p_id != t.id;
+             --нашли - ругаемся
+             raise_application_error(-20300,
+                                     'Підрозділ з таким ідентифікатором вже існує');
+         exception
+             when no_data_found then
+                 null; --не нашли - все нормально
+         end;
+     else
+         --подразделение
+         begin
+             select 1
+               into res
+               from v_org_corporations t
+              where t.external_id = p_external_id
+                and p_id != t.id
+                and t.base_extid =
+                    (select t.base_extid
+                       from v_org_corporations t
+                      where l_corporation_row.parent_id = t.id); --находим ид корневой корпорации
+             raise_application_error(-20300,
+                                     'Підрозділ з таким ідентифікатором вже існує');
+         exception
+             when no_data_found then
+                 null;
+         end;
+     end if;
+ 
+     if (p_corporation_name <> l_corporation_row.corporation_name or
+        (p_corporation_name is null and
+        l_corporation_row.corporation_name is not null) or
+        (p_corporation_name is not null and
+        l_corporation_row.corporation_name is null)) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_NAME',
+                                      p_corporation_name);
+     end if;
+ 
+     if (p_corporation_code <> l_corporation_row.corporation_code or
+        (p_corporation_code is null and
+        l_corporation_row.corporation_code is not null) or
+        (p_corporation_code is not null and
+        l_corporation_row.corporation_code is null)) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_CODE',
+                                      p_corporation_code);
+     end if;
+ 
+     if (p_external_id <> l_corporation_row.external_id or
+        (p_external_id is null and
+        l_corporation_row.external_id is not null) or
+        (p_external_id is not null and
+        l_corporation_row.external_id is null)) then
+         bars.attribute_utl.set_value(l_corporation_row.id,
+                                      'CORPORATION_EXTERNAL_ID',
+                                      p_external_id);
+     end if;
+ 
+     select max(id) keep(dense_rank last order by level)
+       into l_root
+       from ob_corporation t
+      start with id = p_id
+     connect by id = prior parent_id;
+ 
+     begin
+         select id
+           into l_parent_id
+           from v_ob_corp_l1 c
+          where c.base_extid = l_root
+            and c.ext_id = p_parent_id;
+     exception
+         when no_data_found then
+             null;
+     end;
+     select count(*)
+       into res
+       from v_ob_corp_l1 c
+      where c.parent_id = l_parent_id
+        and c.id = p_id;
+     if res = 0 and p_parent_id is not null then
+         open posible_units(p_id, l_root);
+         fetch posible_units bulk collect
+             into l_units;
+         close posible_units;
+     
+         if nvl(l_units.count, 0) <> 0 then
+             for i in l_units.first .. l_units.last loop
+                 if l_parent_id = l_units(i).id then
+                     l_exists := true;
+                     exit;
+                 end if;
+             end loop;
+         end if;
+     
+         if l_exists then
+             update ob_corporation
+                set parent_id = l_parent_id
+              where id = p_id;
+         else
+             raise_application_error(-20000,
+                                     'Невірний батьківський підрозділ!');
+         end if;
+     end if;
+ end edit_corp;
 --------------------------------------------------------------------------------------
-    PROCEDURE LOCK_CORP_ITEM(P_UNIT_ID OB_CORPORATION.ID%TYPE) IS
-        CURSOR CUR_CORP IS
-        SELECT S.ID
-        FROM OB_CORPORATION S
-        WHERE S.STATE_ID = C_OB_STATE_ACTIVE
-        START WITH ID = P_UNIT_ID
-        CONNECT BY PRIOR ID = PARENT_ID;
-    BEGIN
-        IF GET_CORP_STATE(P_UNIT_ID) = C_OB_STATE_ACTIVE THEN
-            FOR CORP IN CUR_CORP LOOP
-                BARS.ATTRIBUTE_UTL.SET_VALUE (CORP.ID,
-                                              'CORPORATION_STATE_ID',
-                                              C_OB_STATE_LOCKED);
-            END LOOP;
-        ELSE
-            RAISE_APPLICATION_ERROR(-20000, 'Невідповідність статусів!');
-        END IF;
-    END;
+ procedure lock_corp_item(p_unit_id ob_corporation.id%type) is
+     cursor cur_corp is
+         select s.id
+           from ob_corporation s
+          where s.state_id = c_ob_state_active
+          start with id = p_unit_id
+         connect by prior id = parent_id;
+ begin
+     if get_corp_state(p_unit_id) = c_ob_state_active then
+         for corp in cur_corp loop
+             bars.attribute_utl.set_value(corp.id,
+                                          'CORPORATION_STATE_ID',
+                                          c_ob_state_locked);
+         end loop;
+     else
+         raise_application_error(-20000,
+                                 'Невідповідність статусів!');
+     end if;
+ end;
 ------------------------------------------------------------------------------------
-    PROCEDURE UNLOCK_CORP_ITEM(P_UNIT_ID OB_CORPORATION.ID%TYPE) IS
-    CURSOR CUR_CORP IS
-        SELECT S.ID
-        FROM OB_CORPORATION S
-        WHERE S.STATE_ID = C_OB_STATE_LOCKED
-        START WITH ID = P_UNIT_ID
-        CONNECT BY PRIOR PARENT_ID = ID;
-    BEGIN
-        IF GET_CORP_STATE(P_UNIT_ID) = C_OB_STATE_LOCKED THEN
-           FOR CORP IN CUR_CORP LOOP
-                    BARS.ATTRIBUTE_UTL.SET_VALUE (CORP.ID,
-                                                  'CORPORATION_STATE_ID',
-                                                  C_OB_STATE_ACTIVE);
-           END LOOP;
-        ELSE
-            RAISE_APPLICATION_ERROR(-20000, 'Невідповідність статусів!');
-        END IF;
-    END;
+ procedure unlock_corp_item(p_unit_id ob_corporation.id%type) is
+     cursor cur_corp is
+         select s.id
+           from ob_corporation s
+          where s.state_id = c_ob_state_locked
+          start with id = p_unit_id
+         connect by prior parent_id = id;
+ begin
+     if get_corp_state(p_unit_id) = c_ob_state_locked then
+         for corp in cur_corp loop
+             bars.attribute_utl.set_value(corp.id,
+                                          'CORPORATION_STATE_ID',
+                                          c_ob_state_active);
+         end loop;
+     else
+         raise_application_error(-20000,
+                                 'Невідповідність статусів!');
+     end if;
+ end;
+ 
 ---------------------------------------------------------------------------------------
-    PROCEDURE CLOSE_CORP_ITEM(P_UNIT_ID OB_CORPORATION.ID%TYPE) IS
-        CURSOR CUR_CORP IS
-        SELECT S.ID
-        FROM OB_CORPORATION S
-        WHERE S.STATE_ID <> C_OB_STATE_CLOSED
-        START WITH ID = P_UNIT_ID
-        CONNECT BY PRIOR ID = PARENT_ID;
-    BEGIN
-        IF GET_CORP_STATE(P_UNIT_ID) <> C_OB_STATE_CLOSED THEN
-           FOR CORP IN CUR_CORP LOOP
-                    BARS.ATTRIBUTE_UTL.SET_VALUE (CORP.ID,
-                                                  'CORPORATION_STATE_ID',
-                                                  C_OB_STATE_CLOSED);
-            END LOOP;
-        ELSE
-            RAISE_APPLICATION_ERROR(-20000, 'Невідповідність статусів!');
-        END IF;
-    END;
+ procedure close_corp_item(p_unit_id ob_corporation.id%type) is
+     cursor cur_corp is
+         select s.id
+           from ob_corporation s
+          where s.state_id <> c_ob_state_closed
+          start with id = p_unit_id
+         connect by prior id = parent_id;
+ begin
+     if get_corp_state(p_unit_id) <> c_ob_state_closed then
+         for corp in cur_corp loop
+             bars.attribute_utl.set_value(corp.id,
+                                          'CORPORATION_STATE_ID',
+                                          c_ob_state_closed);
+         end loop;
+     else
+         raise_application_error(-20000,
+                                 'Невідповідність статусів!');
+     end if;
+ end;
+ 
 --------------------------------------------------виборка корпорації(PIPELINED)
-    FUNCTION GET_POSSIBLE_UNITS(P_ID_UNIT OB_CORPORATION.ID%TYPE) RETURN T_UNITS PIPELINED IS
-        ------------------------------------------------------------------------------------
-       CURSOR POSIBLE_UNITS (P_ID OB_CORPORATION.EXTERNAL_ID%TYPE, P_ROOT OB_CORPORATION.ID%TYPE) IS
-            SELECT EXTERNAL_ID, CORPORATION_NAME FROM (
-            SELECT T.ID, T.EXTERNAL_ID, T.CORPORATION_NAME
-            FROM OB_CORPORATION T
-            WHERE T.STATE_ID <> C_OB_STATE_CLOSED
-            START WITH ID = P_ROOT
-            CONNECT BY PRIOR ID = PARENT_ID
-            MINUS
-            SELECT T.ID, T.EXTERNAL_ID, T.CORPORATION_NAME
-            FROM OB_CORPORATION T
-            WHERE T.STATE_ID <> C_OB_STATE_CLOSED
-            START WITH ID = P_ID
-            CONNECT BY PRIOR ID = PARENT_ID)
-            ORDER BY TO_NUMBER(ID);
-        L_UNIT R_UNIT;
-        L_ROOT OB_CORPORATION.ID%TYPE;
-        L_UNITS T_UNITS;
-        ------------------------------------------------------------------------------------
-    BEGIN
-        SELECT MAX(ID) KEEP (DENSE_RANK LAST ORDER BY LEVEL) INTO L_ROOT
-        FROM OB_CORPORATION T
-        START WITH ID = P_ID_UNIT
-        CONNECT BY ID = PRIOR PARENT_ID;
-
-        OPEN POSIBLE_UNITS(P_ID_UNIT, L_ROOT);
-        FETCH POSIBLE_UNITS BULK COLLECT INTO L_UNITS;
-        CLOSE POSIBLE_UNITS;
-
-        IF NVL(L_UNITS.COUNT,0) <> 0 THEN
-            FOR I IN L_UNITS.FIRST .. L_UNITS.LAST LOOP
-                L_UNIT.ID := L_UNITS(I).ID;
-                L_UNIT.NAME := L_UNITS(I).NAME;
-                PIPE ROW(L_UNIT);
-            END LOOP;
-        END IF;
-    END;
+ function get_possible_units(p_id_unit ob_corporation.id%type)
+     return t_units
+     pipelined is
+     cursor posible_units(p_id   ob_corporation.external_id%type,
+                          p_root ob_corporation.id%type) is
+         select external_id, corporation_name
+           from (select t.id, t.external_id, t.corporation_name
+                   from ob_corporation t
+                  where t.state_id <> c_ob_state_closed
+                  start with id = p_root
+                 connect by prior id = parent_id
+                 minus
+                 select t.id, t.external_id, t.corporation_name
+                   from ob_corporation t
+                  where t.state_id <> c_ob_state_closed
+                  start with id = p_id
+                 connect by prior id = parent_id)
+          order by to_number(id);
+     l_unit  r_unit;
+     l_root  ob_corporation.id%type;
+     l_units t_units;
+ begin
+     select max(id) keep(dense_rank last order by level)
+       into l_root
+       from ob_corporation t
+      start with id = p_id_unit
+     connect by id = prior parent_id;
+ 
+     open posible_units(p_id_unit, l_root);
+     fetch posible_units bulk collect
+         into l_units;
+     close posible_units;
+ 
+     if nvl(l_units.count, 0) <> 0 then
+         for i in l_units.first .. l_units.last loop
+             l_unit.id   := l_units(i).id;
+             l_unit.name := l_units(i).name;
+             pipe row(l_unit);
+         end loop;
+     end if;
+ end;
 ----------------------------------------------------------------------оновлення PARENT_ID корпорації
 
 
 --процедура обновлениџ счетов корпоративных клиентов(обновлџет включение в выписку, код Х¬јј, код подразделениџ, дату открытиџ и альтернат. корпорацию)
-    procedure UPDATE_ACC_CORP(p_acc      number,
-                              p_invp     varchar2,
-                              p_trkk     varchar2,
-                              p_sub_corp varchar2,
-                              p_alt_corp varchar2,
-                              p_daos     date) as
-      l_daos date;
-      l_obpcp varchar2(500);
-      res number;
-      --l_obcrp varchar2(500);
-    begin
-
-        --дата відкриття
-        /*select daos into l_daos from accounts t where t.ACC = p_acc;
-        if (l_daos <> p_daos and p_daos is not null) then
-            update accounts t
-               set t.daos = p_daos
-             where t.ACC = p_acc;
-        elsif p_daos is null then
-            raise_application_error(-20000, 'Поле дата відкриття порожнє!!');
-        end if;*/
-
-
-
-        --выписка
-        if p_invp in ('Y', 'N') then
-            update ACCOUNTSW t
-               set t.VALUE = p_invp
-             where t.ACC = p_acc
-               and t.TAG = 'CORPV';
-            if SQL%rowcount = 0 then
-              insert into accountsw t (acc, tag, value)
-              values (p_acc, 'CORPV', p_invp);
-            end if;
-         else
-          raise_application_error(-20000, 'Значення поля включення до виписки можуть приймати значення Y або N');
+ procedure update_acc_corp(p_acc      number,
+                           p_invp     varchar2,
+                           p_trkk     varchar2,
+                           p_sub_corp varchar2,
+                           p_alt_corp varchar2,
+                           p_daos     date) as
+     l_daos  date;
+     l_obpcp varchar2(500);
+     res     number;
+     --l_obcrp varchar2(500);
+ begin
+ 
+     --дата відкриття
+     /*select daos into l_daos from accounts t where t.acc = p_acc;
+     if (l_daos <> p_daos and p_daos is not null) then
+         update accounts t set t.daos = p_daos where t.acc = p_acc;
+     elsif p_daos is null then
+         raise_application_error(-20000,
+                                 'Поле дата відкриття порожнє!!');
+     end if;*/
+ 
+     --выписка
+     if p_invp in ('Y', 'N') then
+         update accountsw t
+            set t.value = p_invp
+          where t.acc = p_acc
+            and t.tag = 'CORPV';
+         if sql%rowcount = 0 then
+             insert into accountsw t
+                 (acc, tag, value)
+             values
+                 (p_acc, 'CORPV', p_invp);
          end if;
-
-
-        --TRKK код
-        begin
-        select count(*) into res from typnls_corp t where t.kod = p_trkk;
-        exception when no_data_found then
-           null;
-        end;
-        if (res<>0 or p_trkk is null) then
-        update SPECPARAM_INT t
-           set t.TYPNLS = p_trkk
-         where t.ACC = p_acc;
-        if SQL%rowcount = 0 then
-          insert into SPECPARAM_INT t (acc, typnls)
-          values (p_acc, p_trkk);
-        end if;
-        elsif (res=0) then
-        raise_application_error(-20000, 'Код ТРКК відсутній в довіднику!!');
-        end if;
-        --get customer corp_code and inst_code
-        select cw1.VALUE into l_obpcp
-        from accounts a
-        join customerw cw1 on a.rnk = cw1.RNK and cw1.TAG = 'OBPCP'
-        where a.ACC = p_acc;
-
-        --проверим, есть ли такое подразделение у корпорации клиента или альтернативной корпорации
-        begin
-              select 1 into res from V_ORG_CORPORATIONS t
-              where (t.base_extid = l_obpcp or t.base_extid = p_alt_corp)
-              and rownum = 1
-              and t.EXTERNAL_ID = p_sub_corp;
-              --јод установи
-              update ACCOUNTSW t
-                 set t.VALUE = p_sub_corp
-               where t.ACC = p_acc
-                 and t.TAG = 'OBCORPCD';
-              if SQL%rowcount = 0 then
-                insert into accountsw t (acc, tag, value)
-                values (p_acc, 'OBCORPCD', p_sub_corp);
-              end if;
-        exception when no_data_found then
-            raise_application_error(-20500, 'В довіднику віднсутній підрозділ '||p_sub_corp||' з основною корпорацією '||l_obpcp||' або альтернитивною корпорацією '||p_alt_corp);
-        end;
-
-
-        --альтернатива
-        select count(*) into res from V_ROOT_CORPORATION t where t.EXTERNAL_ID = p_alt_corp;
-
-        --check, if alt_corp != customer's corp
-        if (l_obpcp != p_alt_corp and res<>0) or p_alt_corp is null then
-            update ACCOUNTSW t
-             set t.VALUE = p_alt_corp
-           where t.ACC = p_acc
-             and t.TAG = 'OBCORP';
-          if SQL%rowcount = 0 then
-            insert into accountsw t (acc, tag, value)
-            values (p_acc, 'OBCORP', p_alt_corp);
-          end if;
-          else
-              raise_application_error(-20500, 'Код альтернативної '||p_alt_corp||' корпорації не знайдено в довіднику корпорацій!!');
-        end if;
-    end UPDATE_ACC_CORP;
------------------------------------------------отримання признаку РУ/ММФО
+     else
+         raise_application_error(-20000,
+                                 'Значення поля включення до виписки можуть приймати значення Y або N');
+     end if;
+ 
+     --trkk код
+     begin
+         select count(*) into res from typnls_corp t where t.kod = p_trkk;
+     exception
+         when no_data_found then
+             null;
+     end;
+     if (res <> 0 or p_trkk is null) then
+         update specparam_int t set t.typnls = p_trkk where t.acc = p_acc;
+         if sql%rowcount = 0 then
+             insert into specparam_int t
+                 (acc, typnls)
+             values
+                 (p_acc, p_trkk);
+         end if;
+     elsif (res = 0) then
+         raise_application_error(-20000,
+                                 'Код ТРКК відсутній в довіднику!!');
+     end if;
+     --get customer corp_code and inst_code
+     select cw1.value
+       into l_obpcp
+       from accounts a
+       join customerw cw1
+         on a.rnk = cw1.rnk
+        and cw1.tag = 'OBPCP'
+      where a.acc = p_acc;
+ 
+     --проверим, есть ли такое подразделение у корпорации клиента или альтернативной корпорации
+     begin
+         select 1
+           into res
+           from v_org_corporations t
+          where (t.base_extid = l_obpcp or t.base_extid = p_alt_corp)
+            and rownum = 1
+            and t.external_id = p_sub_corp;
+         --јод установи
+         update accountsw t
+            set t.value = p_sub_corp
+          where t.acc = p_acc
+            and t.tag = 'OBCORPCD';
+         if sql%rowcount = 0 then
+             insert into accountsw t
+                 (acc, tag, value)
+             values
+                 (p_acc, 'OBCORPCD', p_sub_corp);
+         end if;
+     exception
+         when no_data_found then
+             raise_application_error(-20500,
+                                     'В довіднику віднсутній підрозділ ' ||
+                                     p_sub_corp ||
+                                     ' з основною корпорацією ' || l_obpcp ||
+                                     ' або альтернитивною корпорацією ' ||
+                                     p_alt_corp);
+     end;
+ 
+     --альтернатива
+     select count(*)
+       into res
+       from v_root_corporation t
+      where t.external_id = p_alt_corp;
+ 
+     --check, if alt_corp != customer's corp
+     if (l_obpcp != p_alt_corp and res <> 0) or p_alt_corp is null then
+         update ACCOUNTSW t
+            set t.VALUE = p_alt_corp
+          where t.ACC = p_acc
+            and t.TAG = 'obcorp';
+         if SQL%rowcount = 0 then
+             insert into accountsw t
+                 (acc, tag, value)
+             values
+                 (p_acc, 'obcorp', p_alt_corp);
+         end if;
+     else
+         raise_application_error(-20500,
+                                 'код альтернативної ' || p_alt_corp ||
+                                 ' корпорації не знайдено в довіднику корпорацій!!');
+     end if;
+ end UPDATE_ACC_CORP;
 
 
 
@@ -1405,196 +1381,216 @@ FUNCTION GET_ALL_UNITS(P_ACC ACCOUNTS.ACC%TYPE) RETURN T_UNITS PIPELINED IS
 
 -----------------------------------------------------------------------------
 
- /*     -- возвращает общую сумму остатков за период по календарным днџм (учитываџ первую и последнюю даты)
-   -- (используетсџ в дальнейшем к примеру длџ расчета средневзвешенного остатка период)
-   FUNCTION KF_OST_SUM(P_CORP_ID    IN OB_CORPORATION_DATA.CORPORATION_ID%TYPE,
-                       P_NBS        IN OB_CORPORATION_DATA.NLS%TYPE,
-                       -- p_kv_flag - ознака, џка вказуЬ по џким валютам формувати залишки
-                       -- 0 - вс? валюти
-                       -- 1 - гривнџ
-                       -- 2 - ?ноземн? валюти (вс? кр?м гривн?)
-                       P_KV_FLAG    INTEGER,
-                       P_KOD_ANALYT IN OB_CORPORATION_DATA.KOD_ANALYT%TYPE,
-                       P_DATE_START IN OB_CORPORATION_DATA.POSTDAT%TYPE,
-                       P_DATE_END   IN OB_CORPORATION_DATA.POSTDAT%TYPE)
-     RETURN MEASURE_TABLE
-     PIPELINED IS
-     REC       MEASURE_RECORD;
-     l_sum     OB_CORPORATION_DATA.OSTQ%TYPE := 0;
-     l_kf      OB_CORPORATION_DATA.KF%TYPE;
-     l_dat     OB_CORPORATION_DATA.file_date%TYPE;
-     l_last_zn OB_CORPORATION_DATA.OSTQ%TYPE := 0;
-     l_dat_loop OB_CORPORATION_DATA.file_date%TYPE;
-     l_d_sql clob;
-     l_ref_cur sys_refcursor;
-     type l_my_tab is table of number index by varchar2(255);
-     l_rec l_my_tab;
-     DATE_DIFF DECIMAL;
-     CURSOR kf_cur IS
-       SELECT DISTINCT CD.kf
-         FROM v_ob_corporation_data_last CD
-        WHERE     CD.ROWTYPE = 0
-              AND CD.CORPORATION_ID = P_CORP_ID
-              and cd.file_date >= P_DATE_START and cd.file_date <= P_DATE_START+10 ;
-   BEGIN
-         --  менџем первую дату периода (если перваџ дата в ob_corporation_data больше, чем перваџ дата периода)
-         -- устанавливаем предельную дату длџ суммированиџ = второй дате периода
-         -- не имеет значениџ есть ли такаџ дата в ob_corporation_data, если еще не наступила,
-         -- то будет прогнозный расчет cо значением остатка=текущему
-         -- суммируем в выбранном периоде остатки
-          l_d_sql:= ' SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.kf, cd.file_date
-                  FROM v_ob_corporation_data_last cd
-                  join v_ob_corporation_nbs_report spr on cd.corporation_id = spr.external_id and substr(cd.nls,1,4) = spr.nbs
-                  WHERE CD.ROWTYPE = 0
-                  AND CD.CORPORATION_ID = '||P_CORP_ID||'
-                  AND substr(CD.NLS,1,4) = '||P_NBS||''||
-                  case when P_KV_FLAG = 1 then 'AND CD.KV = 980'
-                  when P_KV_FLAG = 2 then 'AND CD.KV <> 980' else '' end
-                  || case when P_KOD_ANALYT <> '%' then 'AND ('||P_KOD_ANALYT||' = nvl(CD.KOD_ANALYT,0) or  ''0''||'||P_KOD_ANALYT||' = nvl(CD.KOD_ANALYT,0))' else '' end
-                  ||' AND cd.file_date >= date'''||to_char(P_DATE_START,'yyyy-mm-dd')||'''
-                  AND cd.file_date <= date'''||to_char(P_DATE_END,'yyyy-mm-dd')||''' +10
-                  group by cd.kf, cd.file_date
-                  order by CD.kf asc, cd.file_date desc';
-
-              open l_ref_cur for l_d_sql;
-                loop
-                  fetch l_ref_cur into l_sum, l_kf, l_dat;
-                    if l_kf is not null and l_dat is not null then
-                    l_rec(l_kf||to_char(l_dat,'ddmmyyyy')):=l_sum;
-                    end if;
-                  exit when l_ref_cur%notfound;
-                end loop;
-              close l_ref_cur;
-
-              for l_kf_k in kf_cur loop
-              l_dat_loop:=P_DATE_END+10;
-              l_last_zn:=0;
-              l_sum:=0;
-              DATE_DIFF:=0;
-                     WHILE l_dat_loop >= P_DATE_START LOOP
-                        if l_rec.exists(l_kf_k.KF||to_char(l_dat_loop,'ddmmyyyy')) then
-                            l_last_zn:=l_rec(l_kf_k.KF||to_char(l_dat_loop,'ddmmyyyy'));
-                        end if;
-                        if l_dat_loop<=P_DATE_END then
-                            l_sum:=l_sum+l_last_zn;
-                            DATE_DIFF:=DATE_DIFF+1;
-                        end if;
-                            l_dat_loop:=l_dat_loop-1;
-                     end loop;
-                begin
-                REC.kf:= l_kf_k.KF;
-                REC.OST_SUM:= TRUNC(l_sum / 100 / DATE_DIFF, 2); -- /100 - в гривны; /date_diff - среднее за период;
-                PIPE ROW(REC);
-                exception when  ZERO_DIVIDE THEN raise_application_error (-20001, 'Відсутні данні за вказаний період');
-                end;
-              end loop;
-     RETURN;
-    EXCEPTION WHEN OTHERS THEN
-    close l_ref_cur;
-    raise;
-   END KF_OST_SUM;
-
-
    -- возвращает общую сумму остатков за период по календарным днџм (учитываџ первую и последнюю даты)
    -- (используетсџ в дальнейшем к примеру длџ расчета средневзвешенного остатка период)
-   FUNCTION KF_OST_SUM_USTAN(P_CORP_ID    IN OB_CORPORATION_DATA.CORPORATION_ID%TYPE,
-                             P_NBS        IN OB_CORPORATION_DATA.NLS%TYPE,
-                             -- p_kv_flag - ознака, џка вказуЬ по џким валютам формувати залишки
-                             -- 0 - вс? валюти
-                             -- 1 - гривнџ
-                             -- 2 - ?ноземн? валюти (вс? кр?м гривн?)
-                             P_KV_FLAG    INTEGER,
-                             P_KOD_ANALYT IN OB_CORPORATION_DATA.KOD_ANALYT%TYPE,
-                             P_DATE_START      IN OB_CORPORATION_DATA.POSTDAT%TYPE,
-                             P_DATE_END      IN OB_CORPORATION_DATA.POSTDAT%TYPE)
-     RETURN MEASURE_TABLE_2
-     PIPELINED IS
-     REC       MEASURE_RECORD_2;
-     l_sum     OB_CORPORATION_DATA.OSTQ%TYPE := 0;
-     l_K_UST   OB_CORPORATION_DATA.KOD_USTAN%TYPE;
-     l_dat     OB_CORPORATION_DATA.file_date%TYPE;
-     l_last_zn OB_CORPORATION_DATA.OSTQ%TYPE := 0;
-     l_dat_loop OB_CORPORATION_DATA.file_date%TYPE;
-     l_d_sql clob;
-     l_ref_cur sys_refcursor;
+ function kf_ost_sum(p_corp_id    in number,
+                     p_nbs        in varchar2,
+                     p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
+                     p_kod_analyt in varchar2,
+                     p_date_start in date,
+                     p_date_end   in date,
+                     p_rep_id     in number) return measure_table
+     pipelined is
+     rec        measure_record;
+     l_sum      ob_corp_data_acc.ostq%type := 0;
+     l_kf       ob_corp_data_acc.kf%type;
+     l_dat      ob_corp_data_acc.fdat%type;
+     l_last_zn  ob_corp_data_acc.ostq%type := 0;
+     l_dat_loop ob_corp_data_acc.fdat%type;
+     l_d_sql    clob;
+     l_ref_cur  sys_refcursor;
      type l_my_tab is table of number index by varchar2(255);
-     l_rec l_my_tab;
-     DATE_DIFF DECIMAL;
-     CURSOR KOD_USTAN_cur IS
-       SELECT DISTINCT CD.KOD_USTAN
-         FROM OB_CORPORATION_DATA CD
-        WHERE     CD.ROWTYPE = 0
-              AND CD.CORPORATION_ID = P_CORP_ID;
-   BEGIN
---  менџем первую дату периода (если перваџ дата в ob_corporation_data больше, чем перваџ дата периода)
--- устанавливаем предельную дату длџ суммированиџ = второй дате периода
--- не имеет значениџ есть ли такаџ дата в ob_corporation_data, если еще не наступила,
--- то будет прогнозный расчет cо значением остатка=текущему
--- суммируем в выбранном периоде остатки
-        l_d_sql:= ' SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.KOD_USTAN, cd.file_date
-                  FROM v_ob_corporation_data_last cd
-                  join v_ob_corporation_nbs_report spr on cd.corporation_id = spr.external_id and substr(cd.nls,1,4) = spr.nbs
-                  WHERE CD.ROWTYPE = 0
-                  AND CD.CORPORATION_ID = '||P_CORP_ID||'
-                  AND substr(CD.NLS,1,4) = '||P_NBS||''||
-                  case when P_KV_FLAG = 1 then 'AND CD.KV = 980'
-                  when P_KV_FLAG = 2 then 'AND CD.KV <> 980' else '' end
-                  || case when P_KOD_ANALYT <> '%' then 'AND ('||P_KOD_ANALYT||' = nvl(CD.KOD_ANALYT,0) or  ''0''||'||P_KOD_ANALYT||' = nvl(CD.KOD_ANALYT,0))' else '' end
-                  ||' AND cd.file_date >= date'''||to_char(P_DATE_START,'yyyy-mm-dd')||'''
-                  AND cd.file_date <= date'''||to_char(P_DATE_END,'yyyy-mm-dd')||''' +10
-                  group by cd.KOD_USTAN, cd.file_date
-                  order by CD.KOD_USTAN asc, cd.file_date desc';
+     l_rec     l_my_tab;
+     date_diff decimal;
+ begin
+     --  менџем первую дату периода (если перваџ дата в ob_corporation_data больше, чем перваџ дата периода)
+     -- устанавливаем предельную дату длџ суммированиџ = второй дате периода
+     -- не имеет значениџ есть ли такаџ дата в ob_corporation_data, если еще не наступила,
+     -- то будет прогнозный расчет cо значением остатка=текущему
+     -- суммируем в выбранном периоде остатки
+     l_d_sql := 'SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.kf, cd.fdat
+                       FROM ob_corp_data_acc cd
+                       join v_ob_corp_rep_nbs q on q.nbs = substr(cd.nls,1,4) 
+                      WHERE cd.is_last = 1 
+                        AND q.rep_id = :P_REP_ID 
+                        AND CD.CORP_ID = :P_CORP_ID
+                        AND substr(CD.NLS,1,4) = :P_NBS' || case
+                    when p_kv_flag = 1 then
+                     ' AND CD.KV = 980 '
+                    when p_kv_flag = 2 then
+                     ' AND CD.KV <> 980 '
+                    else
+                     ' '
+                end || case
+                    when p_kod_analyt <> '%' then
+                     ' AND :P_KOD_ANALYT = CD.KOD_ANALYT '
+                    else
+                     ' '
+                end ||
+                'AND cd.fdat >= :P_DATE_START
+                        AND cd.fdat <= :P_DATE_END +10
+                        group by cd.kf, cd.fdat
+                        order by CD.kf asc, cd.fdat desc';
+     if p_kod_analyt <> '%' then
+         open l_ref_cur for l_d_sql
+             using p_rep_id, p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
+     else
+         open l_ref_cur for l_d_sql
+             using p_rep_id, p_corp_id, p_nbs, p_date_start, p_date_end;
+     end if;
+     loop
+         fetch l_ref_cur
+             into l_sum, l_kf, l_dat;
+         if l_kf is not null and l_dat is not null then
+             l_rec(l_kf || to_char(l_dat, 'ddmmyyyy')) := l_sum;
+         end if;
+         exit when l_ref_cur%notfound;
+     end loop;
+     close l_ref_cur;
+ 
+     for l_kf_k in (select kf from clim_mfo) loop
+         l_dat_loop := p_date_end + 10;
+         l_last_zn  := 0;
+         l_sum      := 0;
+         date_diff  := 0;
+         while l_dat_loop >= p_date_start loop
+             if l_rec.exists(l_kf_k.kf || to_char(l_dat_loop, 'ddmmyyyy')) then
+                 l_last_zn := l_rec(l_kf_k.kf ||
+                                    to_char(l_dat_loop, 'ddmmyyyy'));
+             end if;
+             if l_dat_loop <= p_date_end then
+                 l_sum     := l_sum + l_last_zn;
+                 date_diff := date_diff + 1;
+             end if;
+             l_dat_loop := l_dat_loop - 1;
+         end loop;
+         begin
+             rec.kf      := l_kf_k.kf;
+             rec.ost_sum := trunc(l_sum / 100 / date_diff, 2); -- /100 - в гривны; /date_diff - среднее за период;
+             pipe row(rec);
+         exception
+             when zero_divide then
+                 raise_application_error(-20001,
+                                         'Відсутні данні за вказаний період');
+         end;
+     end loop;
+     return;
+ exception
+     when others then
+         close l_ref_cur;
+         raise_application_error(-20000,
+                                 dbms_utility.format_error_backtrace || ' ' ||
+                                 sqlerrm);
+ end kf_ost_sum;
 
-              open l_ref_cur for l_d_sql;
-                loop
-                  fetch l_ref_cur into l_sum, l_K_UST, l_dat;
-                    if l_K_UST is not null and l_dat is not null then
-                    l_rec(l_K_UST||to_char(l_dat,'ddmmyyyy')):=l_sum;
-                    end if;
-                  exit when l_ref_cur%notfound;
-                end loop;
-              close l_ref_cur;
-
-              for k_ust_c in KOD_USTAN_cur loop
-              l_dat_loop:=P_DATE_END+10;
-              l_last_zn:=0;
-              l_sum:=0;
-              DATE_DIFF:=0;
-                     WHILE l_dat_loop >= P_DATE_START LOOP
-                        if l_rec.exists(k_ust_c.KOD_USTAN||to_char(l_dat_loop,'ddmmyyyy')) then
-                            l_last_zn:=l_rec(k_ust_c.KOD_USTAN||to_char(l_dat_loop,'ddmmyyyy'));
-                        end if;
-                        if l_dat_loop<=P_DATE_END then
-                            l_sum:=l_sum+l_last_zn;
-                            DATE_DIFF:=DATE_DIFF+1;
-                        end if;
-                            l_dat_loop:=l_dat_loop-1;
-                     end loop;
-                begin
-                REC.KOD_USTAN:= k_ust_c.KOD_USTAN;
-                REC.OST_SUM:= TRUNC(l_sum / 100 / DATE_DIFF, 2); -- /100 - в гривны; /date_diff - среднее за период;
-                PIPE ROW(REC);
-                exception when  ZERO_DIVIDE THEN raise_application_error (-20001, 'Відсутні данні за вказаний період');
-                end;
-              end loop;
-
-     RETURN;
-    EXCEPTION WHEN OTHERS THEN
-    close l_ref_cur;
-    raise;
-   END KF_OST_SUM_USTAN;*/
---------------------------------------------------------------------------
-function get_mmfo_type return number
-is
-l_type mv_kf.kf%type;
+------------------------------------------------------------------------------------------------------------
+   -- возвращает общую сумму остатков за период по календарным днџм (учитываџ первую и последнюю даты)
+   -- (используетсџ в дальнейшем к примеру длџ расчета средневзвешенного остатка период)
+function kf_ost_sum_ustan(p_corp_id    in number,
+                          p_nbs        in varchar2,
+                          p_kv_flag    in number, --0 - всі валюти, 1 - гривні, 2 - всі крім гривні)
+                          p_kod_analyt in varchar2,
+                          p_date_start in date,
+                          p_date_end   in date,
+                          p_rep_id     in number) return measure_table_2
+    pipelined is
+    rec        measure_record_2;
+    l_sum      ob_corp_data_acc.ostq%type := 0;
+    l_k_ust    ob_corp_data_acc.kod_ustan%type;
+    l_dat      ob_corp_data_acc.fdat%type;
+    l_last_zn  ob_corp_data_acc.ostq%type := 0;
+    l_dat_loop ob_corp_data_acc.fdat%type;
+    l_d_sql    clob;
+    l_ref_cur  sys_refcursor;
+    type l_my_tab is table of number index by varchar2(255);
+    l_rec     l_my_tab;
+    date_diff decimal;
 begin
-select kf into l_type from mv_kf;
-if l_type='300465'
-then return 0;
-else return 1;
-end if;
-   exception when too_many_rows then return 0;
-end;
+    --  менџем первую дату периода (если перваџ дата в ob_corporation_data больше, чем перваџ дата периода)
+    -- устанавливаем предельную дату длџ суммированиџ = второй дате периода
+    -- не имеет значениџ есть ли такаџ дата в ob_corporation_data, если еще не наступила,
+    -- то будет прогнозный расчет cо значением остатка=текущему
+    -- суммируем в выбранном периоде остатки
+    l_d_sql := 'SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.KOD_USTAN, cd.fdat
+                     FROM ob_corp_data_acc cd  
+                     join v_ob_corp_rep_nbs q on q.nbs = substr(cd.nls,1,4)                    
+                    WHERE cd.is_last = 1 
+                      AND q.rep_id = :p_rep_id 
+                      AND CD.CORP_ID = :P_CORP_ID
+                      AND substr(CD.NLS,1,4) = :P_NBS ' || case
+                   when p_kv_flag = 1 then
+                    'AND CD.KV = 980 '
+                   when p_kv_flag = 2 then
+                    'AND CD.KV <> 980 '
+                   else
+                    ' '
+               end || case
+                   when p_kod_analyt <> '%' then
+                    'AND :P_KOD_ANALYT = CD.KOD_ANALYT '
+                   else
+                    ' '
+               end || ' 
+                      AND cd.fdat >= :P_DATE_START
+                      AND cd.fdat <= :P_DATE_END +10
+                    group by cd.KOD_USTAN, cd.fdat
+                    order by CD.KOD_USTAN asc, cd.fdat desc';
+
+    if p_kod_analyt <> '%' then
+        open l_ref_cur for l_d_sql
+            using p_rep_id, p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
+    else
+        open l_ref_cur for l_d_sql
+            using p_rep_id, p_corp_id, p_nbs, p_date_start, p_date_end;
+    end if;
+    loop
+        fetch l_ref_cur
+            into l_sum, l_k_ust, l_dat;
+        if l_k_ust is not null and l_dat is not null then
+            l_rec(l_k_ust || to_char(l_dat, 'ddmmyyyy')) := l_sum;
+        end if;
+        exit when l_ref_cur%notfound;
+    end loop;
+    close l_ref_cur;
+
+    for k_ust_c in (select c.external_id
+                      from ob_corporation c
+                     where c.parent_id = p_corp_id) loop
+        l_dat_loop := p_date_end + 10;
+        l_last_zn  := 0;
+        l_sum      := 0;
+        date_diff  := 0;
+        while l_dat_loop >= p_date_start loop
+            if l_rec.exists(k_ust_c.external_id ||
+                            to_char(l_dat_loop, 'ddmmyyyy')) then
+                l_last_zn := l_rec(k_ust_c.external_id ||
+                                   to_char(l_dat_loop, 'ddmmyyyy'));
+            end if;
+            if l_dat_loop <= p_date_end then
+                l_sum     := l_sum + l_last_zn;
+                date_diff := date_diff + 1;
+            end if;
+            l_dat_loop := l_dat_loop - 1;
+        end loop;
+        begin
+            rec.kod_ustan := k_ust_c.external_id;
+            rec.ost_sum   := trunc(l_sum / 100 / date_diff, 2); -- /100 - в гривны; /date_diff - среднее за период;
+            pipe row(rec);
+        exception
+            when zero_divide then
+                raise_application_error(-20001,
+                                        'Відсутні данні за вказаний період');
+        end;
+    end loop;
+
+    return;
+exception
+    when others then
+        close l_ref_cur;
+        raise_application_error(-20000,
+                                dbms_utility.format_error_backtrace || ' ' ||
+                                sqlerrm);
+end kf_ost_sum_ustan;
+
 -------------------------------------------------вставка в customerw
 procedure ins_customerw (p_rnk customerw.rnk%type,p_external_id varchar2, p_org_id varchar2)
 is
@@ -1604,732 +1600,6 @@ is
       insert into customerw(rnk, tag, value, isp) values (p_rnk, 'OBCRP', p_org_id, 0);
  end;
 
--------------------------------------------------------------------------crt_dict_xml
-function crt_dict_xml return clob
-is
-  l_clob           clob;
-  l_id             number;
-  l_kf             varchar2(6);
-  l_file_date      date;
-  l_sync           number;
-  l_doc            dbms_xmldom.domdocument;
-  l_root_node      dbms_xmldom.domnode;
-  l_main_node      dbms_xmldom.domnode;--root
-  l_head_node      dbms_xmldom.domnode;--head
-  l_corps_node     dbms_xmldom.domnode;--corps
-  l_corp_node      dbms_xmldom.domnode;--corp
-  l_chs_node       dbms_xmldom.domnode;--chs
-  l_ch_node        dbms_xmldom.domnode;--ch
-  l_ch_chs_node    dbms_xmldom.domnode;--ch_chs
-  l_ch_ch_node     dbms_xmldom.domnode;--ch_ch
-  l_acc_sub_node   dbms_xmldom.domnode;
-  l_acc_subt_node  dbms_xmldom.domnode;
-
-procedure lg_add_text_elem(m_node dbms_xmldom.domnode,
-                           node_name varchar2,
-                           node_val varchar2,
-                           lp_doc dbms_xmldom.domdocument) is
-begin
-l_acc_sub_node := dbms_xmldom.appendchild(m_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(lp_doc, node_name)));
-
-l_acc_subt_node:= dbms_xmldom.appendchild(l_acc_sub_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createtextnode(lp_doc, node_val)));
-end;
-
-begin
-l_sync := get_sync_id(f_ourmfo, '%', to_char(sysdate,'DDMMYYYY'),0);
-    dbms_lob.createtemporary(l_clob, true, 2);
-    -- Create an empty XML document
-    l_doc := dbms_xmldom.newdomdocument;
-        dbms_xmldom.setVersion(l_doc,'1.0" encoding="windows-1251');
-        -- Create a root node
-        l_root_node := dbms_xmldom.makenode(l_doc);
-            -- Create a new Supplier Node and add it to the root node
-            l_main_node := dbms_xmldom.appendchild(l_root_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc,'root')));
-        --data for header
-        select id,kf,file_date into l_id, l_kf, l_file_date from ob_corp_sess where id = l_sync;
-        l_head_node  := dbms_xmldom.appendchild(l_main_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'head')));
-
-        lg_add_text_elem(l_head_node, 'sess_id',to_char(l_id), l_doc);
-        lg_add_text_elem(l_head_node, 'kf',     l_kf, l_doc);
-        lg_add_text_elem(l_head_node, 'f_date', to_char(l_file_date,'dd.mm.yyyy'), l_doc);
-
-
-        l_corps_node  := dbms_xmldom.appendchild(l_main_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'corps')));
-
-for corps in (select   id, corporation_code,
-                       corporation_name, parent_id,
-                       state_id, external_id
-              from ob_corporation where parent_id is null
-              order by to_number(external_id)) loop
-
-            l_corp_node  := dbms_xmldom.appendchild(l_corps_node,
-                                dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'corp')));
-
-                lg_add_text_elem(l_corp_node, 'corp_id',to_char(corps.id),l_doc);
-                lg_add_text_elem(l_corp_node, 'corp_code',to_char(corps.corporation_code),l_doc);
-                lg_add_text_elem(l_corp_node, 'corp_name',to_char(corps.corporation_name),l_doc);
-                lg_add_text_elem(l_corp_node, 'perent_id',to_char(corps.parent_id),l_doc);
-                lg_add_text_elem(l_corp_node, 'state_id',to_char(corps.state_id),l_doc);
-                lg_add_text_elem(l_corp_node, 'ext_id',to_char(corps.external_id),l_doc);
-
-
-
-
-            l_chs_node := dbms_xmldom.appendchild(l_corp_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'ch_corps')));
-
-
-        for ch_corp in (select   id, corporation_code,
-                       corporation_name, parent_id,
-                       state_id, external_id
-              from ob_corporation where parent_id = corps.id
-              order by to_number(external_id)) loop
-
-
-                 l_ch_node := dbms_xmldom.appendchild(l_chs_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'ch_corp')));
-
-                lg_add_text_elem(l_ch_node, 'corp_id',to_char(ch_corp.id),l_doc);
-                lg_add_text_elem(l_ch_node, 'corp_code',to_char(ch_corp.corporation_code),l_doc);
-                lg_add_text_elem(l_ch_node, 'corp_name',to_char(ch_corp.corporation_name),l_doc);
-                lg_add_text_elem(l_ch_node, 'state_id',to_char(ch_corp.state_id),l_doc);
-                lg_add_text_elem(l_ch_node, 'ext_id',to_char(ch_corp.external_id),l_doc);
-
-                             l_ch_chs_node := dbms_xmldom.appendchild(l_ch_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'ch_ch_corps')));
-
-
-                                    for ch_ch_corp in (select   id, corporation_code,
-                                                   corporation_name, parent_id,
-                                                   state_id, external_id
-                                          from ob_corporation where parent_id = ch_corp.id
-                                          order by to_number(external_id)) loop
-
-
-                                             l_ch_ch_node := dbms_xmldom.appendchild(l_ch_chs_node,
-                                                          dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'ch_ch_corp')));
-
-                                            lg_add_text_elem(l_ch_ch_node, 'corp_id',to_char(ch_ch_corp.id),l_doc);
-                                            lg_add_text_elem(l_ch_ch_node, 'corp_code',to_char(ch_ch_corp.corporation_code),l_doc);
-                                            lg_add_text_elem(l_ch_ch_node, 'corp_name',to_char(ch_ch_corp.corporation_name),l_doc);
-                                            lg_add_text_elem(l_ch_ch_node, 'state_id',to_char(ch_ch_corp.state_id),l_doc);
-                                            lg_add_text_elem(l_ch_ch_node, 'ext_id',to_char(ch_ch_corp.external_id),l_doc);
-
-
-
-
-end loop;
-    end loop;
-          end loop;
-dbms_xmldom.writetoclob(l_doc, l_clob);
-  dbms_xmldom.freedocument(l_doc);
-return l_clob;
-exception when others then
-loger('CRT_DICT_XML', l_sync, to_char(-sqlcode)||' '||sqlerrm(-sqlcode), 3, l_clob);
-raise;
-end crt_dict_xml;
-------------------------------------------------------------------------------pars_dict_xml
-function pars_dict_xml(p_clob in clob) return clob
-IS
-        l_parser        dbms_xmlparser.parser;
-        l_sess          dbms_xmldom.domdocument;
-        l_fileheader    dbms_xmldom.DOMNodeList;
-        l_header        dbms_xmldom.DOMNode;
-        l_corp_l        dbms_xmldom.DOMNodeList;
-        l_corp          dbms_xmldom.DOMNode;
-        l_corp_el       dbms_xmldom.DOMElement;
-        l_chs_l         dbms_xmldom.DOMNodeList;
-        l_chs           dbms_xmldom.DOMNode;
-        l_chs_el        dbms_xmldom.DOMElement;
-        l_ch_l          dbms_xmldom.DOMNodeList;
-        l_ch            dbms_xmldom.DOMNode;
-        l_ch_el         dbms_xmldom.DOMElement;
-        l_ch_chs_l      dbms_xmldom.DOMNodeList;
-        l_ch_chs        dbms_xmldom.DOMNode;
-        l_ch_chs_el     dbms_xmldom.DOMElement;
-        l_ch_ch_l       dbms_xmldom.DOMNodeList;
-        l_ch_ch         dbms_xmldom.DOMNode;
-        l_str           varchar(255);
-l_clob clob;
-l_ob_corp_ses ob_corp_sess%rowtype;
-type lt_ob_corp is table of ob_corporation%rowtype;
-l_ob_corp_m lt_ob_corp:=lt_ob_corp();
-l_ob_corp_ch lt_ob_corp:=lt_ob_corp();
-l_ob_corp_ch_ch lt_ob_corp:=lt_ob_corp();
-
-l_errors number;
-l_errs clob;
-dml_errors EXCEPTION;
-    PRAGMA exception_init(dml_errors, -24381);
-
-procedure bi_ob_corp(lp_ob_corp lt_ob_corp) is
-begin
-    begin
-    forall j in lp_ob_corp.first .. lp_ob_corp.last SAVE EXCEPTIONS
-      insert into ob_corporation values lp_ob_corp(j);
-    exception when dml_errors then
-         l_errors := sql%bulk_exceptions.count;
-                for i in 1 .. l_errors
-                loop
-                    l_errs:=l_errs||to_clob('ob_corporation:');
-                    l_errs:=l_errs||to_clob('-'||sql%bulk_exceptions(i).error_code||' ');
-                    l_errs:=l_errs||to_clob(sqlerrm(-sql%bulk_exceptions(i).error_code)||' ');
-                    l_errs:=l_errs||to_clob(sql%bulk_exceptions(i).error_index||chr(10));
-                end loop;
-    end;
-end;
-
-BEGIN
-  l_clob:= p_clob;
-  l_parser := dbms_xmlparser.newparser;
-  dbms_xmlparser.parseclob(l_parser, l_clob);
-  l_sess := dbms_xmlparser.getdocument(l_parser);
-  l_fileheader := dbms_xmldom.getelementsbytagname(l_sess, 'head');
-  l_header := dbms_xmldom.item(l_fileheader, 0);
-
-  dbms_xslprocessor.valueof(l_header, 'sess_id/text()', l_str);
-  l_ob_corp_ses.id:=to_number(l_str);
-
-  dbms_xslprocessor.valueof(l_header, 'kf/text()', l_str);
-  l_ob_corp_ses.kf:=l_str;
-
-  dbms_xslprocessor.valueof(l_header, 'f_date/text()', l_str);
-  l_ob_corp_ses.file_date:=to_date(l_str,'dd.mm.yyyy');
-  l_ob_corp_ses.state_id:=0;
-  l_ob_corp_ses.sys_time:=sysdate;
-    begin
-  insert into ob_corp_sess values l_ob_corp_ses;
-    exception when dup_val_on_index then
-        l_errs:=l_errs||to_clob('ob_corp_session:');
-        l_errs:=l_errs||to_clob(to_char(sqlcode)||chr(10));
-    end;
-
-  l_corp_l:= dbms_xmldom.getelementsbytagname(l_sess, 'corp');--corp nodelist
-    for c in 0 .. dbms_xmldom.getlength(l_corp_l)-1
-    loop
-    l_corp := dbms_xmldom.item(l_corp_l, c);--corp node
-
-    l_ob_corp_m.extend;
-    l_ob_corp_m(l_ob_corp_m.last).id:=to_number(dbms_xslprocessor.valueof(l_corp, 'corp_id/text()'));
-    l_ob_corp_m(l_ob_corp_m.last).corporation_code:=dbms_xslprocessor.valueof(l_corp, 'corp_code/text()');
-    l_ob_corp_m(l_ob_corp_m.last).corporation_name:=dbms_xslprocessor.valueof(l_corp, 'corp_name/text()');
-    l_ob_corp_m(l_ob_corp_m.last).parent_id:=to_number(dbms_xslprocessor.valueof(l_corp, 'perent_id/text()'));
-    l_ob_corp_m(l_ob_corp_m.last).state_id:=to_number(dbms_xslprocessor.valueof(l_corp, 'state_id/text()'));
-    l_ob_corp_m(l_ob_corp_m.last).external_id:=dbms_xslprocessor.valueof(l_corp, 'ext_id/text()');
-
-    l_corp_el  := dbms_xmldom.makeElement(l_corp);--corp element
-    l_chs_l := dbms_xmldom.getelementsbytagname(l_corp_el, 'ch_corps');
-    l_chs   := dbms_xmldom.item(l_chs_l, 0); --беремо перший node chs
-    l_chs_el := dbms_xmldom.makeElement(l_chs); --створюємо елемент chs
-    l_ch_l:=dbms_xmldom.getelementsbytagname(l_chs_el,'ch_corp'); --створюємо nodelist ch
-
-
-      for ch in 0 .. dbms_xmldom.getlength(l_ch_l)-1
-        loop
-        l_ch := dbms_xmldom.item(l_ch_l, ch);
-        l_ob_corp_ch.extend;
-        l_ob_corp_ch(l_ob_corp_ch.last).parent_id :=l_ob_corp_m(l_ob_corp_m.last).id;
-
-            l_ob_corp_ch(l_ob_corp_ch.last).id:=to_number(dbms_xslprocessor.valueof(l_ch, 'corp_id/text()'));
-            l_ob_corp_ch(l_ob_corp_ch.last).corporation_code :=dbms_xslprocessor.valueof(l_ch, 'corp_code/text()');
-            l_ob_corp_ch(l_ob_corp_ch.last).corporation_name :=dbms_xslprocessor.valueof(l_ch, 'corp_name/text()');
-            l_ob_corp_ch(l_ob_corp_ch.last).state_id :=to_number(dbms_xslprocessor.valueof(l_ch, 'state_id/text()'));
-            l_ob_corp_ch(l_ob_corp_ch.last).external_id :=dbms_xslprocessor.valueof(l_ch, 'ext_id/text()');
-
-                    l_ch_el  := dbms_xmldom.makeElement(l_ch);--corp element
-                    l_ch_chs_l := dbms_xmldom.getelementsbytagname(l_ch_el, 'ch_ch_corps');
-                    l_ch_chs   := dbms_xmldom.item(l_ch_chs_l, 0); --беремо перший node chs
-                    l_ch_chs_el := dbms_xmldom.makeElement(l_ch_chs); --створюємо елемент chs
-                    l_ch_ch_l:=dbms_xmldom.getelementsbytagname(l_ch_chs_el,'ch_ch_corp'); --створюємо nodelist ch
-
-
-                      for i in 0 .. dbms_xmldom.getlength(l_ch_ch_l)-1
-                        loop
-                        l_ch_ch := dbms_xmldom.item(l_ch_ch_l, i);
-                        l_ob_corp_ch_ch.extend;
-                        l_ob_corp_ch_ch(l_ob_corp_ch_ch.last).parent_id :=l_ob_corp_ch(l_ob_corp_ch.last).id;
-
-                            l_ob_corp_ch_ch(l_ob_corp_ch_ch.last).id:=to_number(dbms_xslprocessor.valueof(l_ch_ch, 'corp_id/text()'));
-                            l_ob_corp_ch_ch(l_ob_corp_ch_ch.last).corporation_code :=dbms_xslprocessor.valueof(l_ch_ch, 'corp_code/text()');
-                            l_ob_corp_ch_ch(l_ob_corp_ch_ch.last).corporation_name :=dbms_xslprocessor.valueof(l_ch_ch, 'corp_name/text()');
-                            l_ob_corp_ch_ch(l_ob_corp_ch_ch.last).state_id :=to_number(dbms_xslprocessor.valueof(l_ch_ch, 'state_id/text()'));
-                            l_ob_corp_ch_ch(l_ob_corp_ch_ch.last).external_id :=dbms_xslprocessor.valueof(l_ch_ch, 'ext_id/text()');
-
-
-    if l_ob_corp_ch_ch.last>=1000 then
-        bi_ob_corp(l_ob_corp_ch_ch);
-        l_ob_corp_ch_ch.delete;
-    end if;
-end loop;
-    if l_ob_corp_m.last >= 1000 or l_ob_corp_ch_ch.last>=1000 then
-            bi_ob_corp(l_ob_corp_ch);
-            bi_ob_corp(l_ob_corp_ch_ch);
-        l_ob_corp_ch.delete;
-        l_ob_corp_ch_ch.delete;
-        end if;
-end loop;
-    if l_ob_corp_ch.last >= 1000 or l_ob_corp_m.last >= 1000 or l_ob_corp_ch_ch.last>=1000 then
-            bi_ob_corp(l_ob_corp_m);
-            bi_ob_corp(l_ob_corp_ch);
-            bi_ob_corp(l_ob_corp_ch_ch);
-        l_ob_corp_m.delete;
-        l_ob_corp_ch.delete;
-        l_ob_corp_ch_ch.delete;
-        end if;
-end loop;
-        bi_ob_corp(l_ob_corp_m);
-        bi_ob_corp(l_ob_corp_ch);
-        bi_ob_corp(l_ob_corp_ch_ch);
-    l_ob_corp_m.delete;
-    l_ob_corp_ch.delete;
-    l_ob_corp_ch_ch.delete;
-if l_errs is null then
-loger('PARS_XML', l_ob_corp_ses.id, l_errs, 1, '');
-else
-loger('PARS_XML', l_ob_corp_ses.id, l_errs, 2, l_clob);
-end if;
-dbms_xmldom.freedocument(l_sess);
-return l_errs;
-exception when others then
-loger('PARS_XML', l_ob_corp_ses.id, l_errs, 3, l_clob);
-raise;
-end;
-
--------------------------------------------------------------------------create_xml
-function crt_xml(p_sess_id in number, p_kf in varchar2) return clob
-is
-  l_clob           clob;
-  l_id             number;
-  l_kf             varchar2(6);
-  l_file_date      date;
-  l_doc            dbms_xmldom.domdocument;
-  l_root_node      dbms_xmldom.domnode;
-  l_main_node      dbms_xmldom.domnode;--root
-  l_head_node      dbms_xmldom.domnode;--head
-  l_corps_node     dbms_xmldom.domnode;--corps
-  l_corp_node      dbms_xmldom.domnode;--corp
-  l_acc_node       dbms_xmldom.domnode;--acc
-  l_docs_node      dbms_xmldom.domnode;--docs
-  l_doc_node       dbms_xmldom.domnode;--doc
-  l_acc_sub_node   dbms_xmldom.domnode;
-  l_acc_subt_node  dbms_xmldom.domnode;
-
-procedure lg_add_text_elem(m_node dbms_xmldom.domnode,
-                           node_name varchar2,
-                           node_val varchar2,
-                           lp_doc dbms_xmldom.domdocument) is
-begin
-l_acc_sub_node := dbms_xmldom.appendchild(m_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(lp_doc, node_name)));
-
-l_acc_subt_node:= dbms_xmldom.appendchild(l_acc_sub_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createtextnode(lp_doc, node_val)));
-end;
-
-begin
-    dbms_lob.createtemporary(l_clob, true, 2);
-    -- Create an empty XML document
-    l_doc := dbms_xmldom.newdomdocument;
-        dbms_xmldom.setVersion(l_doc,'1.0" encoding="windows-1251');
-        -- Create a root node
-        l_root_node := dbms_xmldom.makenode(l_doc);
-            -- Create a new Supplier Node and add it to the root node
-            l_main_node := dbms_xmldom.appendchild(l_root_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc,'root')));
-        select id,kf,file_date into l_id, l_kf, l_file_date from ob_corp_sess where id = p_sess_id;
-        l_head_node  := dbms_xmldom.appendchild(l_main_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'head')));
-
-        lg_add_text_elem(l_head_node, 'sess_id',to_char(l_id),                     l_doc);
-        lg_add_text_elem(l_head_node, 'kf',     l_kf,                              l_doc);
-        lg_add_text_elem(l_head_node, 'f_date', to_char(l_file_date,'dd.mm.yyyy'), l_doc);
-
-
-        l_corps_node  := dbms_xmldom.appendchild(l_main_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'corps')));
-
-for corps in (select distinct corp_id
-                    from ob_corp_data_acc
-                    where sess_id = p_sess_id and kf = p_kf
-                    order by corp_id) loop
-
-            l_corp_node  := dbms_xmldom.appendchild(l_corps_node,
-                                dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'corp')));
-
-                lg_add_text_elem(l_corp_node, 'corp_id',to_char(corps.corp_id),l_doc);
-
-    for corp_acc in (select acc, corp_id, kf, nls, kv, okpo, obdb, obdbq, obkr, obkrq,
-                            ost, ostq, kod_ustan, kod_analyt, dapp, postdat, namk, nms
-                    from ob_corp_data_acc
-                    where sess_id = p_sess_id and kf = p_kf and corp_id = corps.corp_id) loop
-
-            l_acc_node  := dbms_xmldom.appendchild(l_corp_node,
-                           dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'acc')));
-
-            lg_add_text_elem(l_acc_node, 'acc_id',    to_char(corp_acc.acc),                  l_doc);
-            lg_add_text_elem(l_acc_node, 'nls',       corp_acc.nls,                           l_doc);
-            lg_add_text_elem(l_acc_node, 'kv',        to_char(corp_acc.kv),                   l_doc);
-            lg_add_text_elem(l_acc_node, 'okpo',      corp_acc.okpo,                          l_doc);
-            lg_add_text_elem(l_acc_node, 'obdb',      to_char(corp_acc.obdb),                 l_doc);
-            lg_add_text_elem(l_acc_node, 'obdbq',     to_char(corp_acc.obdbq),                l_doc);
-            lg_add_text_elem(l_acc_node, 'obkr',      to_char(corp_acc.obkr),                 l_doc);
-            lg_add_text_elem(l_acc_node, 'obkrq',     to_char(corp_acc.obkrq),                l_doc);
-            lg_add_text_elem(l_acc_node, 'ost',       to_char(corp_acc.ost),                  l_doc);
-            lg_add_text_elem(l_acc_node, 'ostq',      to_char(corp_acc.ostq),                 l_doc);
-            lg_add_text_elem(l_acc_node, 'kod_ustan', to_char(corp_acc.kod_ustan),            l_doc);
-            lg_add_text_elem(l_acc_node, 'kod_analyt',corp_acc.kod_analyt,                    l_doc);
-            lg_add_text_elem(l_acc_node, 'dapp',      to_char(corp_acc.dapp,'dd.mm.yyyy'),    l_doc);
-            lg_add_text_elem(l_acc_node, 'postdat',   to_char(corp_acc.postdat,'dd.mm.yyyy'), l_doc);
-            lg_add_text_elem(l_acc_node, 'namk',      corp_acc.namk,                          l_doc);
-            lg_add_text_elem(l_acc_node, 'nms',       corp_acc.nms,                           l_doc);
-
-
-            l_docs_node := dbms_xmldom.appendchild(l_acc_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'docs')));
-
-
-        for corp_doc in (select ref, postdat, docdat, valdat, nd, vob, dk, mfoa, nlsa, kva, nama,
-                                okpoa, mfob, nlsb, kvb, namb, okpob, s, dockv, sq, nazn, tt
-                         from ob_corp_data_doc
-                         where sess_id = p_sess_id and acc = corp_acc.acc) loop
-
-
-                 l_doc_node := dbms_xmldom.appendchild(l_docs_node,
-                              dbms_xmldom.makenode(dbms_xmldom.createelement(l_doc, 'doc')));
-
-                 lg_add_text_elem(l_doc_node, 'ref',       to_char(corp_doc.ref),                             l_doc);
-                 lg_add_text_elem(l_doc_node, 'dk',        to_char(corp_doc.dk),                              l_doc);
-                 lg_add_text_elem(l_doc_node, 'postdat',   to_char(corp_doc.postdat,'dd.mm.yyyy hh24:mi:ss'), l_doc);
-                 lg_add_text_elem(l_doc_node, 'docdat',    to_char(corp_doc.docdat,'dd.mm.yyyy'),             l_doc);
-                 lg_add_text_elem(l_doc_node, 'valdat',    to_char(corp_doc.valdat,'dd.mm.yyyy'),             l_doc);
-                 lg_add_text_elem(l_doc_node, 'nd',        corp_doc.nd,                                       l_doc);
-                 lg_add_text_elem(l_doc_node, 'vob',       to_char(corp_doc.vob),                             l_doc);
-                 lg_add_text_elem(l_doc_node, 'mfoa',      corp_doc.mfoa,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'nlsa',      corp_doc.nlsa,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'kva',       to_char(corp_doc.kva),                             l_doc);
-                 lg_add_text_elem(l_doc_node, 'nama',      corp_doc.nama,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'okpoa',     corp_doc.okpoa,                                    l_doc);
-                 lg_add_text_elem(l_doc_node, 'mfob',      corp_doc.mfob,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'nlsb',      corp_doc.nlsb,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'kvb',       to_char(corp_doc.kvb),                             l_doc);
-                 lg_add_text_elem(l_doc_node, 'namb',      corp_doc.namb,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'okpob',     corp_doc.okpob,                                    l_doc);
-                 lg_add_text_elem(l_doc_node, 's',         to_char(corp_doc.s),                               l_doc);
-                 lg_add_text_elem(l_doc_node, 'dockv',     to_char(corp_doc.dockv),                           l_doc);
-                 lg_add_text_elem(l_doc_node, 'sq',        to_char(corp_doc.sq),                              l_doc);
-                 lg_add_text_elem(l_doc_node, 'nazn',      corp_doc.nazn,                                     l_doc);
-                 lg_add_text_elem(l_doc_node, 'tt',        corp_doc.tt,                                       l_doc);
-
-end loop;
-    end loop;
-        end loop;
-dbms_xmldom.writetoclob(l_doc, l_clob);
-  dbms_xmldom.freedocument(l_doc);
-return l_clob;
-exception when others then
-loger('CRT_XML', l_id, to_char(-sqlcode)||' '||sqlerrm(-sqlcode), 3, l_clob);
-end crt_xml;
-------------------------------------------------------------------------------------------pars_xml
-function pars_xml(p_clob in clob) return clob
-IS
-        l_parser        dbms_xmlparser.parser;
-        l_sess          dbms_xmldom.domdocument;
-        l_fileheader    dbms_xmldom.DOMNodeList;
-        l_header        dbms_xmldom.DOMNode;
-        l_corp_l        dbms_xmldom.DOMNodeList;
-        l_corp          dbms_xmldom.DOMNode;
-        l_corp_el       dbms_xmldom.DOMElement;
-        l_accs_l        dbms_xmldom.DOMNodeList;
-        l_acc           dbms_xmldom.DOMNode;
-        l_acc_el        dbms_xmldom.DOMElement;
-        l_docs_nl       dbms_xmldom.DOMNodeList;
-        l_docs          dbms_xmldom.DOMNode;
-        l_doc_el        dbms_xmldom.DOMElement;
-        l_docs_l        dbms_xmldom.DOMNodeList;
-        l_doc           dbms_xmldom.DOMNode;
-        l_corp_id       number;
-        l_str           varchar(255);
-l_clob clob;
-l_ob_corp_ses ob_corp_sess%rowtype;
-type lt_ob_corp_acc is table of  ob_corp_data_acc%rowtype;
-l_ob_corp_acc lt_ob_corp_acc:=lt_ob_corp_acc();
-type lt_ob_corp_doc is table of  ob_corp_data_doc%rowtype;
-l_ob_corp_doc lt_ob_corp_doc:=lt_ob_corp_doc();
-
-l_errors number;
-l_errs clob;
-dml_errors EXCEPTION;
-    PRAGMA exception_init(dml_errors, -24381);
-
-procedure bi_ob_corp_acc(lp_ob_corp_acc lt_ob_corp_acc) is
-begin
-    begin
-    forall j in lp_ob_corp_acc.first .. lp_ob_corp_acc.last SAVE EXCEPTIONS
-      insert into ob_corp_data_acc values lp_ob_corp_acc(j);
-    exception when dml_errors then
-         l_errors := sql%bulk_exceptions.count;
-                for i in 1 .. l_errors
-                loop
-                    l_errs:=l_errs||to_clob('ob_corp_data_acc:');
-                    l_errs:=l_errs||to_clob('-'||sql%bulk_exceptions(i).error_code||' ');
-                    l_errs:=l_errs||to_clob(sqlerrm(-sql%bulk_exceptions(i).error_code)||' ');
-                    l_errs:=l_errs||to_clob(sql%bulk_exceptions(i).error_index||chr(10));
-                end loop;
-    end;
-end;
-
-procedure bi_ob_corp_doc(lp_ob_corp_doc lt_ob_corp_doc) is
-begin
-    begin
-    forall j in lp_ob_corp_doc.first .. lp_ob_corp_doc.last SAVE EXCEPTIONS
-      insert into ob_corp_data_doc values lp_ob_corp_doc(j);
-    exception when dml_errors then
-         l_errors := sql%bulk_exceptions.count;
-                for i in 1 .. l_errors
-                loop
-                    l_errs:=l_errs||to_clob('ob_corp_data_doc:');
-                    l_errs:=l_errs||to_clob('-'||sql%bulk_exceptions(i).error_code||' ');
-                    l_errs:=l_errs||to_clob(sqlerrm(-sql%bulk_exceptions(i).error_code)||' ');
-                    l_errs:=l_errs||to_clob(sql%bulk_exceptions(i).error_index||chr(10));
-                end loop;
-    end;
-end;
-
-
-BEGIN
-  l_clob:= p_clob;
-  l_parser := dbms_xmlparser.newparser;
-  dbms_xmlparser.parseclob(l_parser, l_clob);
-  l_sess := dbms_xmlparser.getdocument(l_parser);
-  l_fileheader := dbms_xmldom.getelementsbytagname(l_sess, 'head');
-  l_header := dbms_xmldom.item(l_fileheader, 0);
-
-  dbms_xslprocessor.valueof(l_header, 'sess_id/text()', l_str);
-  l_ob_corp_ses.id:=to_number(l_str);
-
-  dbms_xslprocessor.valueof(l_header, 'kf/text()', l_str);
-  l_ob_corp_ses.kf:=l_str;
-
-  dbms_xslprocessor.valueof(l_header, 'f_date/text()', l_str);
-  l_ob_corp_ses.file_date:=to_date(l_str,'dd.mm.yyyy');
-  l_ob_corp_ses.state_id:=0;----------------------------------------
-  l_ob_corp_ses.sys_time:=sysdate;
-    begin
-  insert into ob_corp_sess values l_ob_corp_ses;
-    exception when dup_val_on_index then
-        l_errs:=l_errs||to_clob('ob_corp_session:');
-        l_errs:=l_errs||to_clob(to_char(sqlcode)||chr(10));
-    end;
-
-  l_corp_l:= dbms_xmldom.getelementsbytagname(l_sess, 'corp');--corp nodelist
-    for c in 0 .. dbms_xmldom.getlength(l_corp_l)-1
-    loop
-    l_corp := dbms_xmldom.item(l_corp_l, c);--corp node
-    l_corp_el  := dbms_xmldom.makeElement(l_corp);--corp element
-    l_corp_id:=to_number(dbms_xslprocessor.valueof(l_corp, 'corp_id/text()'));
-    l_accs_l := dbms_xmldom.getelementsbytagname(l_corp_el, 'acc');
-        insert into ob_corp_sess_corp(SESS_ID, CORP_ID) VALUES (l_ob_corp_ses.id, l_corp_id);-----------------
-
-      for i in 0 .. dbms_xmldom.getlength(l_accs_l)-1
-        loop
-        l_ob_corp_acc.extend;
-        l_acc := dbms_xmldom.item(l_accs_l, i);
-        l_acc_el  := dbms_xmldom.makeElement(l_acc);
-		l_ob_corp_acc(l_ob_corp_acc.last).is_last:=1;
-        l_ob_corp_acc(l_ob_corp_acc.last).sess_id:= l_ob_corp_ses.id;
-
-        l_ob_corp_acc(l_ob_corp_acc.last).acc:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'acc_id/text()'),0));
-
-        l_ob_corp_acc(l_ob_corp_acc.last).kf:=l_ob_corp_ses.kf;
-        l_ob_corp_acc(l_ob_corp_acc.last).corp_id:=l_corp_id;
-        l_ob_corp_acc(l_ob_corp_acc.last).fdat:=l_ob_corp_ses.file_date;
-        l_ob_corp_acc(l_ob_corp_acc.last).nls:=dbms_xslprocessor.valueof(l_acc, 'nls/text()');
-        l_ob_corp_acc(l_ob_corp_acc.last).kv:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'kv/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).okpo:=dbms_xslprocessor.valueof(l_acc, 'okpo/text()');
-        l_ob_corp_acc(l_ob_corp_acc.last).obdb:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'obdb/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).obdbq:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'obdbq/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).obkr:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'obkr/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).obkrq:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'obkrq/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).ost:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'ost/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).ostq:=to_number(nvl(dbms_xslprocessor.valueof(l_acc, 'ostq/text()'),0));
-        l_ob_corp_acc(l_ob_corp_acc.last).kod_ustan:=dbms_xslprocessor.valueof(l_acc, 'kod_ustan/text()');
-        l_ob_corp_acc(l_ob_corp_acc.last).kod_analyt:=dbms_xslprocessor.valueof(l_acc, 'kod_analyt/text()');
-        l_ob_corp_acc(l_ob_corp_acc.last).dapp:=to_date(dbms_xslprocessor.valueof(l_acc, 'dapp/text()'),'dd.mm.yyyy');
-        l_ob_corp_acc(l_ob_corp_acc.last).postdat:=to_date(dbms_xslprocessor.valueof(l_acc, 'postdat/text()'),'dd.mm.yyyy');
-        l_ob_corp_acc(l_ob_corp_acc.last).namk:=dbms_xslprocessor.valueof(l_acc, 'namk/text()');
-        l_ob_corp_acc(l_ob_corp_acc.last).nms:=dbms_xslprocessor.valueof(l_acc, 'nms/text()');
-------------------------------docs
-            l_docs_nl:= dbms_xmldom.getelementsbytagname(l_acc_el,'docs'); --беремо nodelist docs
-            l_docs   := dbms_xmldom.item(l_docs_nl, 0); --беремо перший node docs
-
-            l_doc_el := dbms_xmldom.makeElement(l_docs); --створюємо елемент docs
-            l_docs_l:=dbms_xmldom.getelementsbytagname(l_doc_el,'doc'); --створюємо nodelist doc
-
-            for j in 0 .. dbms_xmldom.getlength(l_docs_l)-1
-             loop
-
-            l_doc := dbms_xmldom.item(l_docs_l, j); --беремо J node doc
-                l_ob_corp_doc.extend;
-                l_ob_corp_doc(l_ob_corp_doc.last).sess_id:=l_ob_corp_acc(l_ob_corp_acc.last).sess_id;
-                l_ob_corp_doc(l_ob_corp_doc.last).acc:=l_ob_corp_acc(l_ob_corp_acc.last).acc;
-                l_ob_corp_doc(l_ob_corp_doc.last).kf:=l_ob_corp_acc(l_ob_corp_acc.last).kf;
-                l_ob_corp_doc(l_ob_corp_doc.last).ref:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'ref/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).dk:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'dk/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).postdat:=to_date(dbms_xslprocessor.valueof(l_doc, 'postdat/text()'),'dd.mm.yyyy hh24:mi:ss');
-                l_ob_corp_doc(l_ob_corp_doc.last).docdat:=to_date(dbms_xslprocessor.valueof(l_doc, 'docdat/text()'),'dd.mm.yyyy');
-                l_ob_corp_doc(l_ob_corp_doc.last).valdat:=to_date(dbms_xslprocessor.valueof(l_doc, 'valdat/text()'),'dd.mm.yyyy');
-                l_ob_corp_doc(l_ob_corp_doc.last).nd:=dbms_xslprocessor.valueof(l_doc, 'nd/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).vob:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'vob/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).mfoa:=dbms_xslprocessor.valueof(l_doc, 'mfoa/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).nlsa:=dbms_xslprocessor.valueof(l_doc, 'nlsa/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).kva:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'kva/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).nama:=dbms_xslprocessor.valueof(l_doc, 'nama/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).okpoa:=dbms_xslprocessor.valueof(l_doc, 'okpoa/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).mfob:=dbms_xslprocessor.valueof(l_doc, 'mfob/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).nlsb:=dbms_xslprocessor.valueof(l_doc, 'nlsb/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).kvb:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'kvb/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).namb:=dbms_xslprocessor.valueof(l_doc, 'namb/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).okpob:=dbms_xslprocessor.valueof(l_doc, 'okpob/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).s:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 's/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).dockv:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'dockv/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).sq:=to_number(nvl(dbms_xslprocessor.valueof(l_doc, 'sq/text()'),0));
-                l_ob_corp_doc(l_ob_corp_doc.last).nazn:=dbms_xslprocessor.valueof(l_doc, 'nazn/text()');
-                l_ob_corp_doc(l_ob_corp_doc.last).tt:=dbms_xslprocessor.valueof(l_doc, 'tt/text()');
-
-        end loop;
-
-    if l_ob_corp_acc.last >= 1000 or l_ob_corp_doc.last >= 1000 then
-        bi_ob_corp_acc(l_ob_corp_acc);
-        bi_ob_corp_doc(l_ob_corp_doc);
-    l_ob_corp_acc.delete;
-    l_ob_corp_doc.delete;
-    end if;
-end loop;
-if l_errs is null then
-set_last_corp (l_ob_corp_ses.file_date, l_corp_id, l_ob_corp_ses.kf, l_ob_corp_ses.id);
-end if;
-end loop;
-        bi_ob_corp_acc(l_ob_corp_acc);
-        bi_ob_corp_doc(l_ob_corp_doc);
-    l_ob_corp_acc.delete;
-    l_ob_corp_doc.delete;
-if l_errs is null then
-loger('PARS_XML', l_ob_corp_ses.id, l_errs, 1, '');
-    update BARS.OB_CORP_SESS s
-       set s.state_id = 2
-    where s.id = l_ob_corp_ses.id;
-else
-loger('PARS_XML', l_ob_corp_ses.id, l_errs, 2, l_clob);
-    update BARS.OB_CORP_SESS s
-       set s.state_id = 2
-    where s.id = l_ob_corp_ses.id;
-end if;
-dbms_xmldom.freedocument(l_sess);
-return l_errs;
-exception when others then
-loger('PARS_XML', l_ob_corp_ses.id, l_errs, 3, l_clob);
-    update BARS.OB_CORP_SESS s
-       set s.state_id = 3
-    where s.id = l_ob_corp_ses.id;
-end;
-
-procedure send_kfiles(p_id number, p_mmfo varchar2) is
-    /*params BARSTRANS.TRANSP_UTL.t_add_params;
-l_sess_id   varchar2(36);
-l_xml_body  clob;
-l_ret       varchar2(4000);
-l_corp_code varchar2(10);
-l_sync      number;
-l_crt_err   number:=0;*/
-begin
-null;
-/*if SYS_CONTEXT ('bars_context', 'user_mfo') is null then
-raise_application_error(-20000, 'Передача К-файлів з рівні "/" заборонено!!');
-elsif SYS_CONTEXT ('bars_context', 'user_mfo') != p_mmfo then
-raise_application_error(-20000, 'Передача К-файлів іншого МФО заборонено!!');
-end if;
-
-
-
-  if kfile_pack.get_mmfo_type = 0 then
-       l_xml_body:= crt_xml(p_id, p_mmfo);
-       BARSTRANS.TRANSP_UTL.send(l_xml_body, params, 'K_FILE_DATE', '300465', l_sess_id);
-       loger('KFILE_SEND', l_sync, to_clob(l_ret), 3, l_xml_body);
-            if l_ret is not null then
-                raise_application_error (-20000, 'Помилка при передачі: '||l_ret);
-            end if;
-  else
-   raise_application_error (-20000, 'З серверу ММФО К-файли передаються автоматично!!');
-  end if;*/
-end send_kfiles;
-
-procedure proc_corp_dict(p_transp_id varchar2) is
-l_clob clob;
-begin
-null;
-/*select d_clob into l_clob from BARSTRANS.INPUT_REQS where id = p_transp_id;
-l_clob:=pars_dict_xml(l_clob);*/
-end;
-
-
-procedure send_corp_dict is
-/*l_params BARSTRANS.TRANSP_UTL.t_add_params;
-l_send_list BARSTRANS.TRANSP_UTL.NUMBER_LIST;
-l_sess_id   varchar2(36);
-l_xml_body  clob;
-l_ret       varchar2(4000);
-l_corp_code varchar2(10);
-l_sync      number;
-l_crt_err   number:=0;*/
-begin
-null;
-/*if SYS_CONTEXT ('bars_context', 'user_mfo') is null or SYS_CONTEXT ('bars_context', 'user_mfo') = '300465' then
-       l_xml_body:= crt_dict_xml;
-
-        select to_number(kf) as kf bulk collect into l_send_list
-        from clim_mfo m
-        where not exists(select 1 from mv_kf k where k.kf = m.kf);
-
-       BARSTRANS.TRANSP_UTL.send(l_xml_body, l_params, 'K_FILE_CORP_DICT', l_send_list, l_sess_id);
-       --loger('KFILE_SEND', l_sync, to_clob(l_ret), 3, l_xml_body);
-            if l_ret is not null then
-                raise_application_error (-20000, 'Помилка при передачі: '||l_ret);
-            end if;
-else
-raise_application_error(-20000, 'Передача довідника заборонено!!');
-end if;*/
-end send_corp_dict;
-
-procedure send_dict_result(p_transp_id varchar2) is
-    l_status number;
-    begin
-                 null;
-                 /*select q.status into l_status from barstrans.out_main_req q where q.id = p_transp_id;
-
-                 bms.send_message(p_receiver_id     => user_id,
-                 p_message_type_id => 1,
-                 p_message_text    => 'Довідник корпорацій доставлено успішно.',
-                 p_delay           => 0,
-                 p_expiration      => 0);*/
-    end;
-
-procedure send_kfile_result(p_transp_id varchar2) is
-    l_status number;
-    begin
-                 null;
-                 /*select q.status into l_status from barstrans.out_main_req q where q.id = p_transp_id;
-
-                 bms.send_message(p_receiver_id     => user_id,
-                 p_message_type_id => 1,
-                 p_message_text    => 'К-файли доставлено успішно.',
-                 p_delay           => 0,
-                 p_expiration      => 0);*/
-    end;
 
 BEGIN
    -- Initialization

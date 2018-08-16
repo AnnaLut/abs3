@@ -1,0 +1,30 @@
+delete CLIM_MFO;
+/
+insert into CLIM_MFO values(302076,'Вінницьке',1,1,302076,'UALA');
+insert into CLIM_MFO values(303398,'Волинське',2,2,303398,'BBLA');
+insert into CLIM_MFO values(305482,'Дніпропетровське',3,3,305482,'UCLA');
+insert into CLIM_MFO values(335106,'Донецьке',4,4,335106,'DDLA');
+insert into CLIM_MFO values(311647,'Житомирське',5,5,311647,'EELA');
+insert into CLIM_MFO values(312356,'Закарпатське',6,6,312356,'UFL0');
+insert into CLIM_MFO values(313957,'Запорізьке',7,7,313957,'UGLA');
+insert into CLIM_MFO values(336503,'Івано-франківське',8,8,336503,'UHL0');
+insert into CLIM_MFO values(323475,'Кіровоградське',9,9,323475,'UKLA');
+insert into CLIM_MFO values(324805,'Автономна республіка Крим',10,10,324805,'LLLA');
+insert into CLIM_MFO values(304665,'Луганське',11,11,304665,'UMLA');
+insert into CLIM_MFO values(325796,'Львівське',12,12,325796,'NNLA');
+insert into CLIM_MFO values(326461,'Миколаївське',13,13,326461,'OOLA');
+insert into CLIM_MFO values(328845,'Одеське',14,14,328845,'UPLB');
+insert into CLIM_MFO values(331467,'Полтавське',15,15,331467,'UQLA');
+insert into CLIM_MFO values(333368,'Рівненське',16,16,333368,'URLA');
+insert into CLIM_MFO values(337568,'Сумське',17,17,337568,'SSLB');
+insert into CLIM_MFO values(338545,'Тернопільське',18,18,338545,'TTLA');
+insert into CLIM_MFO values(351823,'Харківське',19,19,351823,'UULA');
+insert into CLIM_MFO values(352457,'Херсонське',20,20,352457,'VVLA');
+insert into CLIM_MFO values(315784,'Хмельницьке',21,21,315784,'UWLA');
+insert into CLIM_MFO values(354507,'Черкаське',22,22,354507,'XXL0');
+insert into CLIM_MFO values(353553,'Чернігівське',23,23,353553,'UYLA');
+insert into CLIM_MFO values(356334,'Чернівецьке',24,24,356334,'UZLA');
+insert into CLIM_MFO values(322669,'Київське',25,25,322669,'UILA');
+insert into CLIM_MFO values(300465,'ГОУ',26,26,300465,'5ILP');
+COMMIT;
+/
