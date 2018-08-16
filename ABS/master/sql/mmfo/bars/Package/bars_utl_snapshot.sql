@@ -2,14 +2,14 @@ PROMPT =========================================================================
 PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_utl_snapshot.sql =========*** R
 PROMPT ===================================================================================== 
 
-create or replace package BARS_UTL_SNAPSHOT 
+create or replace package BARS_UTL_SNAPSHOT
 is
   -- Author  : OLEG.MUZYKA
   -- Created : 07.07.2015 13:05:13
   -- Purpose : Службовий пакет роботи зі знімками балансу
 
   -- Public constant declarations
-  VERSION_HEAD         constant varchar2(64) := 'version 1.4  06.03.2018';
+  VERSION_HEAD         constant varchar2(64) := 'version 1.5  16.08.2018';
 
   -- алгоритмы наполнения accm_snap_balances
   ALGORITHM_OLD        constant varchar2(30) := 'OLD';
@@ -63,7 +63,7 @@ is
   --
   function CHECK_SNP_RUNNING
   ( p_action  in   v$session.action%type
-  , p_kf      in   v$globalcontext.value%type
+  , p_kf      in   varchar2
   ) return varchar2;
 
   --
@@ -162,7 +162,7 @@ is
   --
   -- constants
   --
-  VERSION_BODY    constant varchar2(64)  := 'version 1.3.4  10.06.2018';
+  VERSION_BODY    constant varchar2(64)  := 'version 1.3.5  16.08.2018';
 
   -- Префикс для трассировки
   PKG_CODE        constant varchar2(100) := 'UTL_SNAPSHOT';
@@ -262,10 +262,15 @@ is
   --
   function CHECK_SNP_RUNNING
   ( p_action  in   v$session.action%type
-  , p_kf      in   v$globalcontext.value%type
+  , p_kf      in   varchar2
   ) return varchar2
   is
     l_errmsg  varchar2(500);
+    l_client_identifier_my  varchar2(64);
+    l_client_identifier_job varchar2(64);
+    l_uname                 varchar2(64);
+    l_machine               varchar2(64);
+    l_osuser                varchar2(30);    
   begin
 
     case
@@ -277,33 +282,26 @@ is
     end case;
 
     begin
-/*    select case s.USERNAME
-             when 'BARS_ACCESS_USER'
-             then ( select VALUE
-                      from V$GLOBALCONTEXT
-                     where NAMESPACE = 'BARS_GLOBAL'
-                       and ATTRIBUTE = 'USER_NAME'
-                       and CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER
-                  )
-             else s.USERNAME
-             end || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
-*/
-      select s.USERNAME || ' (' || s.MACHINE || '/' || s.OSUSER || ')'
-        into l_errmsg
+      select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
+        into l_client_identifier_job, l_uname, l_machine, l_osuser
         from V$SESSION s
        where s.TYPE   = 'USER'
          and s.STATUS = 'ACTIVE'
-         and s.ACTION = p_action
-         and exists( select 1 
-                       from V$GLOBALCONTEXT c
-                      where c.CLIENT_IDENTIFIER = s.CLIENT_IDENTIFIER
-                        and c.NAMESPACE = 'BARS_CONTEXT'
-                        and c.ATTRIBUTE = 'USER_MFO'
-                        and c.VALUE     = p_kf );
+         and s.ACTION = p_action;
+
+    sys.dbms_session.set_identifier(l_client_identifier_job);
+
+    if sys_context('BARS_CONTEXT', 'USER_MFO') = p_kf then
+      l_errmsg := l_uname || ' (' || l_machine || '/' || l_osuser || ')';
+    else
+      l_errmsg := null;
+    end if;
+    sys.dbms_session.set_identifier(l_client_identifier_my);
+
     exception
       when NO_DATA_FOUND then
         l_errmsg := null;
-    end;
+    end;        
 
     return l_errmsg;
 
