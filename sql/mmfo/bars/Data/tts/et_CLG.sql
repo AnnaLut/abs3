@@ -12,11 +12,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CLK', 'SWT->ЦА Комісія Фонд Claims Conference(ЦА)', 1, null, null, '19197202737', null, null, null, null, null, 0, 0, 0, 0, '225', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', null);
+    values ('CLK', 'SWT->ЦА Комісія Фонд Claims Conference(ЦА)', 1, '#(get_proc_nls(''T00'',#(KVA)))', null, '19197202737', null, null, null, null, null, 0, 0, 0, 0, '225', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CLK', name='SWT->ЦА Комісія Фонд Claims Conference(ЦА)', dk=1, nlsm=null, kv=null, nlsk='19197202737', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='225', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn=null
+         set tt='CLK', name='SWT->ЦА Комісія Фонд Claims Conference(ЦА)', dk=1, nlsm='#(get_proc_nls(''T00'',#(KVA)))', kv=null, nlsk='19197202737', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='225', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
        where tt='CLK';
   end;
   --------------------------------
@@ -55,11 +55,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CLL', 'SWT->ЦА. Зарахування з Claims Conference', 1, null, null, '29090900056557', null, null, null, null, null, 0, 0, 0, 0, '#(S)-225', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
+    values ('CLL', 'SWT->ЦА. Зарахування з Claims Conference', 1, '#(get_proc_nls(''T00'',#(KVA)))', null, '29090900056557', null, null, null, null, null, 0, 0, 0, 0, '#(S)-225', null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CLL', name='SWT->ЦА. Зарахування з Claims Conference', dk=1, nlsm=null, kv=null, nlsk='29090900056557', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)-225', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
+         set tt='CLL', name='SWT->ЦА. Зарахування з Claims Conference', dk=1, nlsm='#(get_proc_nls(''T00'',#(KVA)))', kv=null, nlsk='29090900056557', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s='#(S)-225', s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
        where tt='CLL';
   end;
   --------------------------------
@@ -99,6 +99,49 @@ begin
   end;
 end;
 /
+prompt Создание / Обновление операции CLM
+prompt Наименование операции: SWT->ЦА. Claims Conference(ЦА)-Внутрішня
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('CLM', 'SWT->ЦА. Claims Conference(ЦА)-Внутрішня', 1, null, null, '#(get_proc_nls(''T00'',#(KVA)))', null, null, null, null, null, 0, 0, 0, 0, null, null, null, null, null, null, '0100000000000000000000000000000000000000000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='CLM', name='SWT->ЦА. Claims Conference(ЦА)-Внутрішня', dk=1, nlsm=null, kv=null, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=null, nlss=null, nlsa=null, nlsb=null, mfob=null, flc=0, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800=null, rang=null, flags='0100000000000000000000000000000000000000000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
+       where tt='CLM';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='CLM';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='CLM';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='CLM';
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='CLM';
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='CLM';
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='CLM';
+end;
+/
 prompt Создание / Обновление операции CLG
 prompt Наименование операции: CLG-SWIFT->ЦА. Транзит c Claims Conference
 declare
@@ -109,11 +152,11 @@ begin
   --------------------------------
   begin
     insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
-    values ('CLG', 'CLG-SWIFT->ЦА. Транзит c Claims Conference', 1, null, 978, '29090900056557', 978, null, null, '29090900056557', null, 1, 0, 0, 0, null, null, null, null, '0', null, '1000000000000000000000000000000000010300000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
+    values ('CLG', 'CLG-SWIFT->ЦА. Транзит c Claims Conference', 1, null, 978, '#(get_proc_nls(''T00'',#(KVA)))', 978, null, null, '29090900056557', null, 1, 0, 0, 0, null, null, null, null, '0', null, '1000000000000000000000000000000000010300000000000000000000000000', 'Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро');
   exception
     when dup_val_on_index then 
       update tts
-         set tt='CLG', name='CLG-SWIFT->ЦА. Транзит c Claims Conference', dk=1, nlsm=null, kv=978, nlsk='29090900056557', kvk=978, nlss=null, nlsa=null, nlsb='29090900056557', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='0', rang=null, flags='1000000000000000000000000000000000010300000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
+         set tt='CLG', name='CLG-SWIFT->ЦА. Транзит c Claims Conference', dk=1, nlsm=null, kv=978, nlsk='#(get_proc_nls(''T00'',#(KVA)))', kvk=978, nlss=null, nlsa=null, nlsb='29090900056557', mfob=null, flc=1, fli=0, flv=0, flr=0, s=null, s2=null, sk=null, proc=null, s3800='0', rang=null, flags='1000000000000000000000000000000000010300000000000000000000000000', nazn='Грошовий переказ з відрахуванням комісії банку-кор. CITI/London в сумі 2,25 Євро'
        where tt='CLG';
   end;
   --------------------------------
@@ -187,6 +230,17 @@ begin
     when others then
       if ( sqlcode = -02291 ) then
         dbms_output.put_line('Не удалось добавить запись (ttsap: ''CLL'', ''CLG'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('CLM', 'CLG', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''CLM'', ''CLG'', 0) - первичный ключ не найден!');
       else raise;
       end if;
   end;
