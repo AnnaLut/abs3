@@ -9,7 +9,7 @@ is
 % DESCRIPTION : Процедура формирования #C9 для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     : v.16.024 21/05/2018 (20/04/2018)
+% VERSION     : v.16.025 16/08/2018 (21/05/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показника DD NNN
@@ -613,7 +613,7 @@ BEGIN
                                 to_char(p20) p20, p31, p35, p40, p42, p62, p99
                            from ( select o.report_date, o.kf, o.kv, 
                                          LPAD(o.kv, 3, '0') as p10,
-                                         sum( nvl(round((z.s2 / l_koef) / 100, 0), 0) ) p20,
+                                         nvl(round((sum(z.s2) / l_koef) / 100, 0), 0) p20,
                                          '0'         p31,
                                          '1'         p35,
                                          '36'        p40,
