@@ -1423,7 +1423,7 @@ END RO_deal;
            end if;
            p_sos:=15;
         end if;
-        update cc_deal set SOS=p_sos where nd=k.ND;
+        update cc_deal set SOS=nvl(p_sos,sos) where nd=k.ND and k.sos != nvl(p_sos,k.sos);
         -- отвязываем счета залога
         if p_sos = 15 then
            for z in ( select acc, accs from cc_accp where nd = k.nd )
