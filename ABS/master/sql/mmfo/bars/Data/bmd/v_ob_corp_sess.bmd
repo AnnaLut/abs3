@@ -135,7 +135,6 @@ begin
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 1, 'Формування К-файлу' , 'KFILE_PACK.FILL_DATA(:P_DATE, :P_CORP)', ':P_DATE(SEM=ДАТА,TYPE=D), :P_CORP(SEM=НОМЕР КОРПОРАЦІЇ,TYPE=С)', 'ONCE', '', '', '', '', '', 4);
   bars_metabase.add_nsifunction(l_tabid, 2, 'Вивантажити К-файли', 'KFILE_PACK.CRT_KFILE(:ID, :MFO)',   '', 'SELECTED_ONE', '', '', '', '', '', 7);
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Відправити К-файл'  , 'KFILE_PACK.SEND_KFILES(:ID, :MFO)', '', 'SELECTED_ONE', '', '', '', '', '', 59);
  -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'DESC');
  

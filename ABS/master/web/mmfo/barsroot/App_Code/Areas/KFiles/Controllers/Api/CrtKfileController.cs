@@ -3,64 +3,55 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.IO;
-using Bars.Classes;
-using Oracle.DataAccess.Client;
-using Oracle.DataAccess.Types;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO.Compression;
 
 namespace BarsWeb.Areas.KFiles.Controllers
 {
     [AuthorizeApi]
     public class CrtKfileController : ApiController
     {
-        [HttpGet]
-        public HttpResponseMessage CrtKfile(Int64 sess_id, Int32 corp_id, string kf, string path)
+        [HttpPost]
+        public HttpResponseMessage CrtKfile()
         {
-            string filename = String.Empty;
-            string kfile = String.Empty;
-            byte[] blob = null;
 
-            Encoding windows1251 = Encoding.GetEncoding("windows-1251");
+            byte[] kfile = Request.Content.ReadAsByteArrayAsync().Result;
 
-            using (OracleConnection connection = OraConnector.Handler.UserConnection)
-            using (OracleCommand cmd = connection.CreateCommand())
+            KeyValuePair<string, string>[] get_params = Request.GetQueryNameValuePairs().ToArray();
+
+            using (MemoryStream compressedStream = new MemoryStream(Convert.FromBase64String(Encoding.UTF8.GetString(kfile))))
+            using (GZipStream zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+            using (MemoryStream resultStream = new MemoryStream())
             {
 
-                try
-                {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.CommandText = @"bars.kfile_pack.crt_txt_k_file";
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.Add("p_sess_id", OracleDbType.Int64, sess_id, System.Data.ParameterDirection.Input);
-                    cmd.Parameters.Add("p_corp_id", OracleDbType.Int32, corp_id, System.Data.ParameterDirection.Input);
-                    cmd.Parameters.Add("p_kf",      OracleDbType.Varchar2, kf, System.Data.ParameterDirection.Input);
-                    cmd.Parameters.Add("p_fname",   OracleDbType.Varchar2, 255, filename, System.Data.ParameterDirection.InputOutput);
-                    cmd.Parameters.Add("p_k_file",  OracleDbType.Clob, System.Data.ParameterDirection.Output);
-                    cmd.ExecuteNonQuery();
+                zipStream.CopyTo(resultStream);
+                kfile = resultStream.ToArray();
 
-                    filename = cmd.Parameters["p_fname"].Status == OracleParameterStatus.NullFetched ? String.Empty : cmd.Parameters["p_fname"].Value.ToString();
-
-                    if (cmd.Parameters["p_k_file"].Status != OracleParameterStatus.NullFetched)
-                        using (OracleClob RespClob = (OracleClob)cmd.Parameters["p_k_file"].Value)
-                        {
-                            kfile = RespClob.Value;
-                        }
-                }
-                catch (Exception ex)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
-                }
             }
 
-            if (!String.IsNullOrEmpty(kfile))
+            string filename = String.Empty;
+            string path = String.Empty;
+
+            foreach (KeyValuePair<string, string> get_param in get_params)
             {
-                blob = Encoding.Convert(Encoding.UTF8, windows1251, Encoding.UTF8.GetBytes(kfile));
+
+                if (get_param.Key == "filename")
+                    filename = get_param.Value;
+
+                if (get_param.Key == "path")
+                    path = get_param.Value;
+            }
+
+            if (kfile != null && kfile.Length > 0)
+            {
 
                 if (!Directory.Exists(path))
                 {
                     DirectoryInfo di = Directory.CreateDirectory(path);
                 }
-                File.WriteAllBytes(path + "\\" + filename, blob);
+                File.WriteAllBytes(path + "\\" + filename, kfile);
 
             }
             else
