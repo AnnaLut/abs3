@@ -4,7 +4,7 @@ PROMPT =========================================================================
  
 create or replace package msp.msp_utl is
 
-  gc_header_version constant varchar2(64)  := 'version 1.32 25.07.2018';
+  gc_header_version constant varchar2(64)  := 'version 1.33 16.08.2018';
 
   -- тип дл€ роботи з масивом файл≥в арх≥ву
   type r_file_array is record (
@@ -344,7 +344,7 @@ create or replace package msp.msp_utl is
     p_id_msp   in msp_envelope_files_info.id_msp%type, 
     p_filedata in msp_envelope_files.filedata%type, 
     p_filename in msp_envelope_files_info.filename%type, 
-    p_filedate in msp_envelope_files_info.filedate%type, 
+    p_filedate in varchar2, -- в TOSS прописано string
     p_filepath in msp_envelope_files_info.filepath%type);
 
   -----------------------------------------------------------------------------------------
@@ -367,7 +367,7 @@ end msp_utl;
 /
 create or replace package body msp.msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.43 02.08.2018';
+  gc_body_version constant varchar2(64) := 'version 1.44 16.08.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -3193,12 +3193,20 @@ create or replace package body msp.msp_utl is
     p_id_msp   in msp_envelope_files_info.id_msp%type,
     p_filedata in msp_envelope_files.filedata%type,
     p_filename in msp_envelope_files_info.filename%type,
-    p_filedate in msp_envelope_files_info.filedate%type,
+    p_filedate in varchar2, -- в TOSS прописано string
     p_filepath in msp_envelope_files_info.filepath%type)
   is
     l_state number;
   begin
-    --bars.bars_audit.info('msp_utl.create_envelope_file start');
+    /*
+    bars.bars_audit.info('msp_utl.create_envelope_file start p_id='||to_char(p_id)||', '||
+                                                             'p_id_msp='||to_char(p_id_msp)||', '||
+                                                             'p_filename='||p_filename||', '||
+                                                             'p_filedate='||p_filedate||', '||
+                                                             'p_filepath='||p_filepath
+                                                             );
+    */
+    
     select state into l_state from msp_envelopes where id = p_id;
 
     -- €кщо стан конверта новий значить ще не обробл€вс€, добавл€ю ≥нфу по реЇстрам
@@ -3218,7 +3226,7 @@ create or replace package body msp.msp_utl is
     end if;
   exception
     when others then
-      --bars.bars_audit.info('msp_utl.create_envelope_file error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      bars.bars_audit.info('msp_utl.create_envelope_file error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
       raise_application_error(-20000, 'msp_utl.create_envelope_file error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
   end create_envelope_file;
 
