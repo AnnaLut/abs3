@@ -6,7 +6,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.NERUHOMI 
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.1  13/02/2013';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.2.5  17/08/2018';
    g_transfer_timeout constant number := 15;
 
 -- Ф-ція отримання залишку %%
@@ -95,7 +95,7 @@ PROCEDURE PAY_JOB;
 END NERUHOMI;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.25mmfo  23/05/2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.2.5 17/08/2018';
   g_is_error     boolean := false;
   g_cur_rep_id   number := -1;
   g_cur_block_id number := -1;
@@ -1239,7 +1239,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.NERUHOMI IS
                  xmlelement("nd", encode_row_to_base(nvl(a.nd,'Empty'))),
                  xmlelement("dptid", a.dptid),
                  xmlelement("LANDCOD", a.landcod),
-                 xmlelement("FL", 5),
+				 case  
+                     when (a.attr like '%h%' or a.attr like '%Q%') and a.source = 'АСВО'
+                          then xmlelement("FL",12)
+                     else xmlelement("FL",5)
+                     end case
+				 ,
                  xmlelement("DZAGR", to_char(sysdate,'dd/mm/yyyy')),
                  xmlelement("ref", l_ref),
                  xmlelement("acc_card", a.acc_card),

@@ -58,10 +58,10 @@ declare
 
 begin
 
-  l_tabsemantic := 'Миграция неподвижных вкладов. Проверка №1._';
-  l_tablinesdef := '';
+  l_tabsemantic := 'Імпорт вкладів ASVO';
+  l_tablinesdef := '10';
   l_tabselect_statement := '';
-  l_tabname     := 'PROV31';
+  l_tabname     := 'V_P_MIGRAASIMM';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
@@ -124,33 +124,36 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч', '', 35, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NBS', 'C', 'БР', '', 4, 2, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'OB22', 'C', 'ОБ22', '', 3, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'OР', '', 15, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Вал', '', 22, 5, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NMS', 'C', 'Найменування ОР', '', 38, 10, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OSTC', 'N', 'Залишок', '', 22, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SOST', 'N', 'Сума~нерухомих', '', 22, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DIFF', 'N', 'Різниця', '', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CNT', 'N', 'К-ть~нерухомих', '', 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 2, 2, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 3, 3, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 5, 4, 'ASC ');
+  bars_metabase.add_column(l_tabid, 1, 'ACTION', 'C', 'ACTION', '5', 64, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'PROCNAME', 'C', 'PROCNAME', '2', 64, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'ERRMASK', 'C', 'ERRMASK', '2', 64, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ORDNUNG', 'N', 'ORDNUNG', '2', 22, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'PROV_SQL', 'C', 'PROV_SQL', '2', 20, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=PROV31', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'DATE_BEGIN', 'C', 'DATE_BEGIN', '2', 19, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'DATE_END', 'C', 'DATE_END', '2', 19, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'DONE', 'N', 'DONE', '1', 22, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'MISTAKE_SHOW', 'C', 'MISTAKE_SHOW', '2', 100, 10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=VV_P_SEC_AUDIT[CONDITIONS=>VV_P_SEC_AUDIT.DATTE between to_date(:DATE_BEGIN,''dd.mm.yyyy hh24:mi:ss'') and to_date(:DATE_END,''dd.mm.yyyy hh24:mi:ss'') and MES like :ERRMASK] ', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ERR', 'N', 'ERR', '1', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
-  -- восстанавливаем ссылки сложных полей других таблиц
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 10, 'Iмпорт DBF', '', '', '', '', '', '', '', 'sPar=[EXEC=>ONCE][PROC=>sk_test.new_load_file (:p_filename, :p_filebody)][UPLOAD_PARAMS=>:p_filebody(SEM=Виберіть файл,TYPE=BLOB),:p_filename(KIND=UPLOAD_FILE_NAME,WITHOUT_EXT=TRUE))]', 2);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 11, 'Імпорт вкладів', '', '', '', '', '', '', '', 'sPar=[EXEC=>ONCE][PROC=>sk_test.new_sk_create_dptASIM][QST=>Виконати ?][MSG=>ОК !]', 4);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 12, 'Згортання_котл', '', '', '', '', '', '', '', 'sPar=[EXEC=>ONCE][PROC=>sk_test.new_sk_load_IM4KOTL2S][QST=>Виконати ?][MSG=>ОК !]', 5);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 13, 'Відкат_котл', '', '', '', '', '', '', '', 'sPar=[EXEC=>ONCE][PROC=>sk_test.new_sk_drop_IM4KOTL2S][QST=>Виконати ?][MSG=>ОК !]', 61);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 14, 'Відкат_вкладів', '', '', '', '', '', '', '', 'sPar=[EXEC=>ONCE][PROC=>sk_test.new_sk_drop_deposASIM][QST=>Виконати ?][MSG=>ОК !]', 61);
+
+   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
     if (l_newcolid is not null) then
