@@ -1304,6 +1304,26 @@ $end
           where report_date = p_rpt_dt
                 and kf = p_kf;
                 
+       when 'D4X' then
+         open p_recordset  
+         for                
+            select ekp
+                   , r030
+                   , f025
+                   , b010
+                   , q006
+                   , sum(t071) as t071
+            from   nbur_log_fd4x
+            where  report_date = p_rpt_dt
+                   and kf = p_kf
+                   and ekp <> 'XXXXXX' --Берем только замапленные значения
+            group by
+                   ekp
+                   , r030
+                   , f025
+                   , b010
+                   , q006       
+            having sum(t071) <> 0;                                                        
     else
       null;
     end case;
