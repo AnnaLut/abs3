@@ -38,7 +38,21 @@ exception when others then
 end; 
 /
 
+begin
+  execute immediate ' ALTER TABLE BARS.EAD_TYPES ADD ( ORD NUMBER(1) ) ';
+exception
+  when others then
+    if SQLCODE = -01430 then null; else raise; end if; 
+end;
+/ 
 
+begin
+  execute immediate ' ALTER TABLE BARS.EAD_TYPES ADD ( ISUO NUMBER(1) ) ';
+exception
+  when others then
+    if SQLCODE = -01430 then null; else raise; end if;
+end;
+/ 
 
 
 PROMPT *** ALTER_POLICIES to EAD_TYPES ***
@@ -51,8 +65,8 @@ COMMENT ON COLUMN BARS.EAD_TYPES.NAME IS 'Найменування';
 COMMENT ON COLUMN BARS.EAD_TYPES.METHOD IS 'JSON RPC метод';
 COMMENT ON COLUMN BARS.EAD_TYPES.MSG_LIFETIME IS 'Термін актуальності повідомлення (хв.)';
 COMMENT ON COLUMN BARS.EAD_TYPES.MSG_RETRY_INTERVAL IS 'Інтервал повторної відправки повідомлення (хв.), множиться на кіл-ть невдалих спроб';
-
-
+COMMENT ON COLUMN BARS.EAD_TYPES.ORD IS 'Порядок запуска процедур (0-5)';
+COMMENT ON COLUMN BARS.EAD_TYPES.ISUO IS 'Признак (0-Физлицо, 1-Юрлицо)';
 
 
 PROMPT *** Create  constraint PK_EADTYPES ***
@@ -126,6 +140,23 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  constraint CC_EADTYPES_ORD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.EAD_TYPES ADD CONSTRAINT CC_EADTYPES_ORD CHECK (ORD IN (0,1,2,3,4,5)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+end;
+/
+
+PROMPT *** Create  constraint CC_EADTYPES_ISUO ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.EAD_TYPES ADD CONSTRAINT CC_EADTYPES_ISUO CHECK (ISUO IN (0,1)) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+end;
+/
 
 
 

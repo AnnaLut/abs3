@@ -11,7 +11,7 @@
 
   -- Public type declarations
   -- type <TypeName> is <Datatype>;
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.2  20.06.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.3  10.08.2018 MMFO';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -36,6 +36,13 @@
   function print_number (p_kf  IN ead_sync_queue.kf%TYPE,
                          p_num in number --10	АБС «БАРС», 20	Card Management, 99	Електронний архів (ІМС)
                          ) return  varchar2;
+
+  -- Проверка изменений по счету, которые необходимо отправлять в ЕА.
+  function Check_Acc_update (p_acc        number,
+          --                   p_kf         VARCHAR2,
+                             p_idupd_from number,
+                             p_idupd_to   number ) return number;
+                           
   -- Public variable declarations
   -- <VariableName> <Datatype>;
 
@@ -86,6 +93,26 @@
                                  p_err_text in ead_sync_queue.err_text%type,
                                  p_kf       in ead_sync_queue.KF%TYPE);
 
+  --Установить статус сообщению
+  PROCEDURE msg_set_status(p_sync_id   IN ead_sync_queue.id%TYPE,
+                           p_status_id IN EAD_SYNC_QUEUE.STATUS_ID%TYPE);
+  --Установить параметры сообщению
+  PROCEDURE msg_set_message(p_sync_id       IN ead_sync_queue.id%TYPE,
+                            p_status_id     IN ead_sync_queue.status_id%TYPE,
+                            p_message_id    IN ead_sync_queue.message_id%TYPE,
+                            p_message_date  IN ead_sync_queue.message_date%TYPE,
+                            p_message       IN ead_sync_queue.MESSAGE%TYPE,
+                            p_responce      IN ead_sync_queue.responce%TYPE,
+                            p_responce_id   IN ead_sync_queue.responce_id%TYPE,
+                            p_responce_date IN ead_sync_queue.responce_date%TYPE,
+                            p_err_text      IN ead_sync_queue.err_text %TYPE,
+                            p_err_count     IN ead_sync_queue.err_count %TYPE);
+
+  -- апдейт таблиці ead_sync_sessions по конкретному типу
+  procedure update_sync_sessions(p_type_id    in bars.ead_types.id%type,
+                                 p_sync_start in bars.ead_sync_sessions.sync_start%type,
+                                 p_sync_end   in bars.ead_sync_sessions.sync_end %type);
+
   -- Створити повідомлення
   function msg_create(p_type_id in ead_sync_queue.type_id%type,
                       p_obj_id  in ead_sync_queue.obj_id%type,
@@ -133,10 +160,16 @@
   -- Захват изменений - счета физлиц (2625,2630)
   PROCEDURE cdc_acc;
 
+  procedure get_sync_queue_proc(p_type           in varchar2,
+                                p_kf             in varchar2,
+                                p_count          in number,
+                                p_retry_interval in number,
+                                res              out t_ead_sync_que_list);
+
   -- !!! Пока в ручном режиме DICT  Довідник  SetDictionaryData
 
   -- Передача в ЭА сообщение типа
-  procedure type_process(p_type_id in bars.ead_types.id%type, p_kf in bars.ead_sync_queue.kf%type);
+  procedure type_process;
   -- функция возвращает 0 если счет не в рамках ДБО, 1 если счет в рамках ДБО
   function get_acc_info(p_acc in accounts.acc%type) return int;
   -- функция возвращает 1 если это первый акцептированный счет в рамках ДБО, 0 - если не первый
@@ -145,6 +178,8 @@
   -- функция возвращает nbs для открытого и псевдо - nbs для зарезервированного счета
   function get_acc_nbs(p_acc in accounts.acc%type) return char;
   -- функция возвращает "2" для юрлиц и спд, "3" для фо
+
+  function LOCK_ROW(rid in rowid) return number;
   function get_custtype(p_rnk in customer.rnk%type) return number;
 
 end ead_pack;
@@ -154,7 +189,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
-   g_body_version constant varchar2(64) := 'version 3.2  20.06.2018 MMFO';
+   g_body_version constant varchar2(64) := 'version 3.3  10.08.2018 MMFO';
    kflist bars.string_list; -- Список рабочих kf
    gn_dummy   number;  -- Для возвратов функций
 
@@ -340,6 +375,47 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
      end;
    end;
 
+   -- Проверка изменений по счету, которые необходимо отправлять в ЕА.
+  function Check_Acc_update (p_acc        number,
+                        --     p_kf         VARCHAR2,
+                             p_idupd_from number,
+                             p_idupd_to   number ) return number is 
+    l_idupd number(38);
+    l_acc number(38);
+  begin
+ ----- 
+    begin    
+      select xx.acc, xx.idupd
+        into l_acc , l_idupd
+         from (
+          select max(x.idupd) idupd
+                    ,x.acc
+                    ,x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby
+                    ,x.blkd, x.blkk, 
+                     row_number() over(partition by x.acc order by x.acc) rn                
+        from (select au.idupd
+                    ,au.acc
+                    ,au.nls,  au.kv  , au.kf, au.daos, au.dazs, au.doneby
+                    ,au.blkd, au.blkk -- состояние счета вычисляется в EAD_integration
+              from accounts_update au
+             where au.acc = p_acc -- in (32979301 /*, 1448383401*/)
+            --   and au.kf  = p_kf
+               and au.idupd between  p_idupd_from and p_idupd_to
+              order by au.idupd desc )x
+         where rownum < 3
+           group by x.acc, x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby, x.blkd, x.blkk
+            ) xx
+         where xx.rn > 1;
+         
+ EXCEPTION  
+    WHEN NO_DATA_FOUND  THEN
+          l_idupd := null;
+      END;  
+       
+  return l_idupd;   
+     
+   end Check_Acc_update ; 
+
    -- ==== Надруковані документи ====
    -- Створити надрукований документ
   function doc_create(p_type_id      in ead_docs.type_id%type,
@@ -458,10 +534,53 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
              sq.message_date = p_message_date,
              sq.MESSAGE = p_message,
              sq.err_text = NULL
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf;
 
       COMMIT;
    END msg_set_status_send;
+
+  -- Установить статус сообщению "Повідомлення відправлено"
+  PROCEDURE msg_set_message(p_sync_id       IN ead_sync_queue.id%TYPE,
+                            p_status_id     IN ead_sync_queue.status_id%TYPE,
+                            p_message_id    IN ead_sync_queue.message_id%TYPE,
+                            p_message_date  IN ead_sync_queue.message_date%TYPE,
+                            p_message       IN ead_sync_queue.MESSAGE%TYPE,
+                            p_responce      IN ead_sync_queue.responce%TYPE,
+                            p_responce_id   IN ead_sync_queue.responce_id%TYPE,
+                            p_responce_date IN ead_sync_queue.responce_date%TYPE,
+                            p_err_text      IN ead_sync_queue.err_text %TYPE,
+                            p_err_count     IN ead_sync_queue.err_count %TYPE) IS
+  BEGIN
+    -- ставим параметры сообщению
+    UPDATE ead_sync_queue sq
+       SET sq.message_id    = p_message_id,
+           sq.message_date  = p_message_date,
+           sq.MESSAGE       = p_message,
+           sq.RESPONCE      = p_responce,
+           sq.RESPONCE_ID   = p_responce_id,
+           sq.RESPONCE_DATE = p_responce_date,
+           sq.err_text      = p_err_text,
+           sq.err_count     = p_err_count,
+           sq.status_id     = p_status_id
+     WHERE sq.id = p_sync_id;
+
+    --    COMMIT;
+  END msg_set_message;
+
+  function LOCK_ROW(rid in rowid) return number is
+    ret_id number := 0;
+  begin
+    select 1
+      into ret_id
+      from bars.ead_sync_queue
+     where rowid = rid
+       for update nowait;
+    return 1;
+  exception
+    when others then
+      return 0;
+  end;
 
    -- Установить статус сообщению "Відповідь отримано"
    PROCEDURE msg_set_status_received (
@@ -478,7 +597,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
          SET sq.status_id = 'RSP_RECEIVED',
              sq.responce = p_responce,
              sq.err_text = NULL
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf;
 
       COMMIT;
    END msg_set_status_received;
@@ -500,7 +620,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
              sq.responce_id = p_responce_id,
              sq.responce_date = p_responce_date,
              sq.err_text = NULL
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf;
 
       COMMIT;
    END msg_set_status_parsed;
@@ -514,7 +635,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       -- ставим статус "Виконано"
       UPDATE ead_sync_queue sq
          SET sq.status_id = 'DONE', sq.err_text = NULL
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf;
 
       COMMIT;
    END msg_set_status_done;
@@ -531,7 +653,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       -- ставим статус "Помилка"
       UPDATE ead_sync_queue sq
          SET sq.status_id = 'ERROR', sq.err_text = p_err_text
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf;
 
       COMMIT;
    END msg_set_status_error;
@@ -545,11 +668,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       -- ставим статус "Помилка"
       UPDATE ead_sync_queue sq
          SET sq.status_id = 'OUTDATED'
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf;
 
       COMMIT;
    END msg_set_status_outdated;
 
+  -- Установить статус сообщению
+  PROCEDURE msg_set_status(p_sync_id   IN ead_sync_queue.id%TYPE,
+                           p_status_id IN EAD_SYNC_QUEUE.STATUS_ID%TYPE) IS
+  BEGIN
+    -- ставим статус
+    UPDATE ead_sync_queue sq
+       SET sq.status_id = p_status_id
+     WHERE sq.id = p_sync_id;
+
+    COMMIT;
+  END msg_set_status;
    -- Створити повідомлення
    FUNCTION msg_create (p_type_id   IN ead_sync_queue.type_id%TYPE,
                         p_obj_id    IN ead_sync_queue.obj_id%TYPE,
@@ -605,7 +740,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       UPDATE ead_sync_queue sq
          SET sq.status_id = 'PROC',
              sq.err_count = DECODE (sq.status_id, 'ERROR', err_count + 1, 0)
-       WHERE sq.id = p_sync_id AND sq.kf = p_kf and (status_id in ('NEW', 'ERROR') or p_force = 'F');
+       WHERE sq.id = p_sync_id
+         AND sq.kf = p_kf
+         and (status_id in ('NEW', 'ERROR') or p_force = 'F');
 
       -- выход, если сообщение уже обработано (status_id in (DONE, OUTDATED))
        if sql%rowcount = 0 then
@@ -649,7 +786,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
             -- ставим статус "Помилка"
             UPDATE ead_sync_queue sq
                SET sq.status_id = 'ERROR', sq.err_text = l_err_text
-             WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+             WHERE sq.id = p_sync_id
+               AND sq.kf = p_kf;
 
             COMMIT;
       END;
@@ -662,7 +800,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
    BEGIN
       -- удаляем записи
       DELETE FROM ead_sync_queue sq
-            WHERE sq.id = p_sync_id AND sq.kf = p_kf;
+            WHERE sq.id = p_sync_id
+              AND sq.kf = p_kf;
 
       COMMIT;
    END msg_delete;
@@ -676,7 +815,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       --bars_audit.info('EAD: msg_delete_older:p_date=' || to_char(p_date));
       -- удаляем записи
       DELETE FROM ead_sync_queue sq
-            WHERE sq.crt_date < p_date AND sq.kf = p_kf;
+            WHERE sq.crt_date < p_date
+              AND sq.kf = p_kf;
 
       l_cnt := SQL%ROWCOUNT;
       COMMIT;
@@ -1103,6 +1243,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     for cur in (select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id
                   from ead_docs d left outer join dpt_deposit_all da on d.agr_id = da.deposit_id
                  where 1=1
+				   and d.EA_STRUCT_ID <> '333'
 --                   and id > l_cdc_lastkey
 --                   and (sign_date IS NOT NULL OR type_id = 'SCAN') --отбираем только подписанные документы или сканкопии.
                    and (type_id = 'SCAN' and id > l_cdc_lastkey
@@ -1674,7 +1815,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       LOOP
 */
  for cur in (
-                select distinct 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
+   
+       select /*distinct*/ 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
+                  from accounts_update au, EAD_NBS e 
+                 where  e.id = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22,2) -- проверка балансовых которые отправляем в ЕА по справочнику
+                   and au.kf member of kflist
+                   and au.idupd   >  l_cdc_lastkey_acc 
+                   and au.idupd   <= l_cdc_newkey_acc 
+                   and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) -- не знаю. 
+                   and ead_pack.get_custtype(au.rnk) = 2
+                   and not exists (select 1 from dpu_accounts da where da.accid = au.acc)
+                   and au.idupd = ead_pack.check_acc_update(au.acc, l_cdc_lastkey_acc, l_cdc_newkey_acc) -- выгребаем последнюю запись с accounts_update, если она отличается от предпоследней
+                   and au.tip not in ('DEP', 'DEN', 'NL8') 
+ 
+ 
+               /* select distinct 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
                   from accounts_update au
                  where au.idupd > l_cdc_lastkey_acc and au.idupd <= l_cdc_newkey_acc and au.kf member of kflist
                        and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) and ead_pack.get_custtype(au.rnk) = 2
@@ -1684,8 +1839,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                                      where a.acc = au.acc and a.kf = au.kf
                                            and ( ead_pack.get_acc_nbs(a.acc) in ( select nbs from EAD_NBS e where custtype = 2 and e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22) ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
                                                 or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10') )
-                       and au.tip not in ('DEP', 'DEN', 'NL8') )
-          union
+                       and au.tip not in ('DEP', 'DEN', 'NL8') )*/
+         -- походу лишняк :) --09.08.2018
+      /*    union
                 select distinct 'ACC' as agr_type, su.acc as acc, a.rnk as rnk, su.kf
                   from specparam_update su
                        join accounts a on a.acc = su.acc and a.kf = su.kf and ead_pack.get_custtype(a.rnk) = 2 and a.tip not in ('DEP', 'DEN', 'NL8')
@@ -1694,7 +1850,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                  where su.idupd > l_cdc_lastkey_specparam
                    and su.idupd <= l_cdc_newkey_specparam
                    and su.kf member of kflist
-                   and not exists (select 1 from dpu_accounts da where da.accid = su.acc)
+                   and not exists (select 1 from dpu_accounts da where da.accid = su.acc)*/
                  )
       LOOP
          -- на всякий передаем клиента
@@ -1774,7 +1930,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
         FROM accounts_update au;
 
     for cur in (
-      select agr_type, acc, rnk, kf from
+    /*  select agr_type, acc, rnk, kf from
         (select
         case when (ead_pack.get_acc_nbs(acc) = '2600' and ob22 = '05') OR (TIP IN ('DEP', 'NL8') AND EXISTS (SELECT 1 FROM dpu_accounts da WHERE da.accid = acc))
              then 'DPT'
@@ -1790,7 +1946,34 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                        AND kf member of kflist
                        AND idupd <= l_cdc_newkey_acc
                        AND ead_pack.get_acc_nbs(acc) IN (SELECT nbs FROM EAD_NBS WHERE custtype = 2)))   -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3"
-           where agr_type is not null)
+           where agr_type is not null*/
+  select  agr_type,
+          acc,
+          rnk,
+          kf   
+from(
+   SELECT             
+        case when (ead_pack.get_acc_nbs(au.acc) = '2600' and au.ob22 = '05') OR (au.TIP IN ('DEP', 'NL8') AND EXISTS (SELECT 1 FROM dpu_accounts da WHERE da.accid = acc))
+             then 'DPT'
+             when (ead_pack.get_acc_nbs(au.acc) = '2600' and au.ob22 IN ('01', '02', '10')) OR (au.tip NOT IN ('DEP', 'DEN', 'NL8') AND NOT EXISTS (SELECT 1 FROM dpu_accounts da WHERE da.accid = acc))
+             then 'ACC'
+             when (au.ob22 = '05' AND au.TIP NOT IN ('DEP', 'NL8'))
+             then 'DPT_OLD'
+                           end agr_type,
+            au.acc,
+            au.rnk,
+            au.kf
+                  FROM accounts_update au, ead_nbs e
+                 WHERE au.kf member of kflist
+                       and au.idupd > l_cdc_lastkey_acc
+                       AND au.idupd <= l_cdc_newkey_acc
+                       and au.idupd = ead_pack.check_acc_update(au.acc, l_cdc_lastkey_acc, l_cdc_newkey_acc)  -- отсекаем изменения, которые не передаем в ЕА
+                       AND ead_pack.get_acc_nbs(au.acc) = e.nbs 
+                       and e.id = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22,2)  -- првоеряем справочник счетов EAD.
+      ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3"
+  where agr_type is not null   
+           
+           )
     LOOP
       ead_pack.msg_create('UACC', cur.agr_type || ';' || TO_CHAR(cur.acc), cur.rnk, cur.kf);
     END LOOP;
@@ -1848,14 +2031,30 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       SELECT MAX(idupd) INTO l_cdc_newkey_acc FROM accounts_update;
 
       -- берем все изменения по счетам клиентов
-      FOR cur IN (
+      FOR cur IN (/*
              select 'ACC' as agr_type, -- условный код, который расшифровывается внутри ead_integration.get_accagr_param() при отправке сообщения по счету
                     acc, nbs, rnk, kf
                from accounts
-              where (acc, kf) in (select acc, kf from accounts_update au join ead_nbs e on ead_pack.get_acc_nbs(au.acc) = e.nbs and e.custtype = 3
-                             where kf member of kflist and rnk > 199
-                               and idupd > l_cdc_lastkey_acc
-                               and idupd <= l_cdc_newkey_acc)
+              where (acc, kf) in (select acc, kf 
+                                       from accounts_update au 
+                                                               join ead_nbs e on ead_pack.get_acc_nbs(au.acc) = e.nbs and e.custtype = 3
+                                     where kf member of kflist and rnk > 199
+                                       and idupd > l_cdc_lastkey_acc
+                                       and idupd <= l_cdc_newkey_acc)*/
+ select 'ACC' as agr_type -- условный код, который расшифровывается внутри ead_integration.get_accagr_param() при отправке сообщения по счету
+      , au.acc
+      , au.kf
+      , au.nbs
+      , au.rnk
+   from accounts_update au, ead_nbs e
+       where au.kf member of kflist
+          and au.rnk > 199
+          and ead_pack.get_acc_nbs(au.acc) = e.nbs
+          and au.idupd = ead_pack.check_acc_update(au.acc, l_cdc_lastkey_acc, l_cdc_newkey_acc) -- отсекаем изменения, которые не передаем в ЕА
+          and au.idupd > l_cdc_lastkey_acc
+          and au.idupd <= l_cdc_newkey_acc
+          and e.id = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22,3)
+                                       
          )
       LOOP
 
@@ -1895,10 +2094,21 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       COMMIT;
    END cdc_acc;
 
-   -- !!! Пока в ручном режиме DICT  Довідник  SetDictionaryData
+  procedure update_sync_sessions(p_type_id    in bars.ead_types.id%type,
+                                 p_sync_start in bars.ead_sync_sessions.sync_start%type,
+                                 p_sync_end   in bars.ead_sync_sessions.sync_end %type) is
+  begin
+    update ead_sync_sessions s
+       set s.sync_start = p_sync_start, s.sync_end = p_sync_end
+     where s.type_id = p_type_id;
+    commit;
+  end update_sync_sessions;
 
-   -- Передача в ЭА сообщение типа
-  procedure type_process(p_type_id in bars.ead_types.id%type, p_kf in bars.ead_sync_queue.kf%type) is
+  -- !!! Пока в ручном режиме DICT  Довідник  SetDictionaryData
+
+  -- Передача в ЭА сообщение типа
+  procedure type_process_old(p_type_id in bars.ead_types.id%type,
+                             p_kf      in bars.ead_sync_queue.kf%type) is
     l_t_row ead_types%rowtype;
     l_s_row ead_sync_sessions%rowtype;
     l_rows  pls_integer; --ограничение кол-ва строк обработки за один запуск
@@ -1973,6 +2183,44 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
        set s.sync_start = l_s_row.sync_start, s.sync_end = l_s_row.sync_end
      where s.type_id = p_type_id;
     commit;
+  end type_process_old;
+
+  /* Formatted on 09/07/2018 15:40:58 (QP5 v5.326) */
+  PROCEDURE type_process IS
+    l_response wsm_mgr.t_response;
+    --    l_response_msg varchar2(2000);
+  BEGIN
+
+    --подготовить вызов
+    wsm_mgr.prepare_request(p_url             => g_wsproxy_url,
+                            p_action          => null,
+                            p_http_method     => bars.wsm_mgr.g_http_post,
+                            p_wallet_path     => g_wsproxy_walletdir,
+                            p_wallet_pwd      => g_wsproxy_walletpass,
+                            p_content_type    => wsm_mgr.g_ct_xml,
+                            p_content_charset => wsm_mgr.g_cc_win1251,
+                            p_namespace       => g_wsproxy_ns,
+                            p_soap_method     => 'ProcessQueue');
+
+--    wsm_mgr.ADD_PARAMETER(p_name  => 'userName',
+--                          p_value => g_wsproxy_username);
+--    wsm_mgr.ADD_PARAMETER(p_name  => 'password',
+--                          p_value => g_wsproxy_password);
+--    wsm_mgr.ADD_PARAMETER(p_name => 'kf', p_value => p_kf);
+--    wsm_mgr.ADD_PARAMETER(p_name => 'type', p_value => p_type_id);
+
+    -- позвать метод веб-сервиса
+    bars.wsm_mgr.execute_soap(l_response);
+
+    --    l_response_msg := dbms_lob.substr(l_response.cdoc, 2000, 1);
+    --    if length (l_response_msg)>0 then
+    --        raise;
+    --    end if;
+
+  exception
+    when OTHERS then
+      bars_audit.info('EAD type_process: Something goes wrong');
+
   end type_process;
 
    FUNCTION get_acc_info (p_acc IN accounts.acc%TYPE)
@@ -2082,10 +2330,64 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     return l_custtype;
   end get_custtype;
 
+  procedure get_sync_queue_proc(p_type           in varchar2,
+                                p_kf             in varchar2,
+                                p_count          in number,
+                                p_retry_interval in number,
+                                res              out t_ead_sync_que_list) is
+    k                   number := 0;
+    l_ead_sync_que_line t_ead_sync_que_line := t_ead_sync_que_line(null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null);
+    l_ead_sync_que_list t_ead_sync_que_list := t_ead_sync_que_list();
+begin
+    for i in (SELECT id,
+                     obj_id,
+                     crt_date,
+                     status_id,
+                     kf,
+                     err_count,
+                     rowid,
+                     type_id
+                FROM bars.ead_sync_queue
+               WHERE type_id = p_type
+                 AND status_id IN ('NEW', 'ERROR')
+                 AND err_count < 15
+                 AND kf = p_kf
+                 AND crt_date > sysdate - 15
+                    -- арифметична прогресія по формулі n(n+1)/2, додатково ділиться на '60*24' для переведення хвилин у дні
+                 AND (crt_date + (p_retry_interval * err_count *
+                     (err_count + 1)) / (2 * 60 * 24)) <= SYSDATE
+               ORDER BY status_id DESC, id ASC) loop
+      if k = p_count then
+        exit;
+      end if;
+      if ead_pack.LOCK_ROW(i.rowid) = 1 then
+        k                             := k + 1;
+        l_ead_sync_que_line.id        := i.id;
+        l_ead_sync_que_line.crt_date  := i.crt_date;
+        l_ead_sync_que_line.obj_id    := i.obj_id;
+        l_ead_sync_que_line.status_id := i.status_id;
+        l_ead_sync_que_line.err_count := i.err_count;
+        l_ead_sync_que_line.type_id   := i.type_id;
+        l_ead_sync_que_list.extend;
+        l_ead_sync_que_list(l_ead_sync_que_list.last) := l_ead_sync_que_line;
+
+      end if;
+    end loop;
+    res := l_ead_sync_que_list;
+  end get_sync_queue_proc;
 
 begin
-  select replace(key, 'ead.ServiceUrl', '') bulk collect into kflist from bars.web_barsconfig
-   where key like 'ead.ServiceUrl%' and val not like '-%';
+  select replace(key, 'ead.ServiceUrl', '')
+    bulk collect
+    into kflist
+    from bars.web_barsconfig
+   where key like 'ead.ServiceUrl%'
+     and val not like '-%';
 /*
 Predicted subpartition templates for upcoming mfo to migrate
 
