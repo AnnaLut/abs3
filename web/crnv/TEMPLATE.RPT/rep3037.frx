@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="09/24/2015 13:49:32" ReportInfo.Modified="01/27/2016 13:22:54" ReportInfo.CreatorVersion="2014.2.4.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/24/2015 13:49:32" ReportInfo.Modified="07/27/2018 11:50:38" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq8+HCsj5mnfc2oQWOJAI1rOWOGv68sBpiXMxVx5dIqE7fZmMxoAeKqIz2gmiyZm0S1uLzMXygA4R9FLUDTsYemg==">
-      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ROWN, CHAR00 NLS, NUM01 KV, CHAR01 SOURCE, CHAR02 FIO, NUM02 OST, CHAR03 BRANCH, CHAR04 COMMENTS, NUM03 FL, NUM04 KOL from rs_tmp_report_data where session_id=:SESSION_ID order by ROWN">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWrXAA7A21xsmM7RTPHtKkTjPdKv9dxb7T7Ggxr+qxrmw==">
+      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ROWN, CHAR00 NLS, NUM01 KV, CHAR01 SOURCE, CHAR02 FIO, NUM02 OST, CHAR03 BRANCH, CHAR04 COMMENTS, NUM03 FL, NUM04 KOL, CHAR05 DAT1, CHAR06 DAT2 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="KV" DataType="System.Decimal"/>
         <Column Name="SOURCE" DataType="System.String"/>
@@ -13,6 +13,8 @@
         <Column Name="FL" DataType="System.Decimal"/>
         <Column Name="KOL" DataType="System.Decimal"/>
         <Column Name="ROWN" DataType="System.Decimal"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
         <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
@@ -21,10 +23,16 @@
     <Total Name="Total_KOL" Expression="[Table1.KOL]" Evaluator="Data1" PrintOn="ReportSummary1"/>
   </Dictionary>
   <ReportPage Name="Page1" PaperWidth="220" FirstPageSource="15" OtherPagesSource="15">
-    <ReportTitleBand Name="ReportTitle1" Width="756" Height="21.49">
+    <ReportTitleBand Name="ReportTitle1" Width="756" Height="106.54">
       <TextObject Name="Text1" Left="212.34" Top="0.88" Width="316.13" Height="18.9" Text="Звіт про вилучення коштів із ЦРНВ" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text2" Top="37.8" Width="387.45" Height="56.7" Text="Дата з: [Table1.DAT1]&#13;&#10;&#13;&#10;Дата по: [Table1.DAT2]" VertAlign="Center">
+        <Formats>
+          <DateFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="24.69" Width="756" Height="27.69">
+    <PageHeaderBand Name="PageHeader1" Top="110.54" Width="756" Height="27.69">
       <TableObject Name="Table1" Left="0.32" Width="737" Height="27.69">
         <TableColumn Name="Column1" Width="37.61"/>
         <TableColumn Name="Column2" Width="113.9"/>
@@ -46,10 +54,10 @@
         </TableRow>
       </TableObject>
     </PageHeaderBand>
-    <GroupHeaderBand Name="GroupHeader1" Top="55.58" Width="756" Condition="[Table1.KV]" SortOrder="None">
-      <GroupHeaderBand Name="GroupHeader2" Top="58.78" Width="756" Guides="2.611427" Condition="[Table1.OST]" SortOrder="None">
-        <GroupHeaderBand Name="GroupHeader3" Top="61.98" Width="756" Condition="[Table1.KOL]">
-          <DataBand Name="Data1" Top="65.18" Width="756" Height="27.69" DataSource="Table">
+    <GroupHeaderBand Name="GroupHeader1" Top="142.23" Width="756" Condition="[Table1.KV]" SortOrder="None">
+      <GroupHeaderBand Name="GroupHeader2" Top="146.23" Width="756" Guides="2.611427" Condition="[Table1.OST]" SortOrder="None">
+        <GroupHeaderBand Name="GroupHeader3" Top="150.23" Width="756" Condition="[Table1.KOL]">
+          <DataBand Name="Data1" Top="154.23" Width="756" Height="27.69" DataSource="Table">
             <TableObject Name="Table1" Width="737" Height="27.69" Fill.Color="White">
               <TableColumn Name="Column20" Width="37.61"/>
               <TableColumn Name="Column21" Width="113.9"/>
@@ -74,7 +82,7 @@
         </GroupHeaderBand>
       </GroupHeaderBand>
     </GroupHeaderBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="96.07" Width="756" Height="87.2">
+    <ReportSummaryBand Name="ReportSummary1" Top="185.92" Width="756" Height="87.2">
       <TableObject Name="Table1" Left="-0.12" Top="-0.14" Width="229.17" Height="86.34" Border.Lines="All">
         <TableColumn Name="Column17" Width="141.38"/>
         <TableColumn Name="Column18" Width="87.79"/>
