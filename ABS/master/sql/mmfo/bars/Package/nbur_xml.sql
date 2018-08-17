@@ -51,7 +51,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.7  2018.08.03';
+  g_body_version  constant varchar2(64) := 'version 2.8  2018.08.17';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -1233,26 +1233,53 @@ $end
             having 
                    sum(T070) <> 0;
 
-       when 'D4X' then
-         open p_recordset  
-         for                
-            select ekp
-                   , r030
-                   , f025
-                   , b010
-                   , q006
-                   , sum(t071) as t071
-            from   nbur_log_fd4x
-            where  report_date = p_rpt_dt
-                   and kf = p_kf
-                   and ekp <> 'XXXXXX' --Берем только замапленные значения
-            group by
-                   ekp
-                   , r030
-                   , f025
-                   , b010
-                   , q006       
-            having sum(t071) <> 0;                                                        
+       when '#4P' then
+         open p_recordset
+         for
+           select
+                  EKP
+                  , B040
+                  , R020
+                  , R030_1
+                  , R030_2
+                  , K040
+                  , S050
+                  , S184
+                  , F028
+                  , F045
+                  , F046
+                  , F047
+                  , F048
+                  , F049
+                  , F050
+                  , F052
+                  , F053
+                  , F054
+                  , F055
+                  , F056
+                  , F057
+                  , F070
+                  , K020
+                  , Q001_1
+                  , Q001_2
+                  , Q003_1
+                  , Q003_2
+                  , Q003_3
+                  , Q006
+                  , Q007_1
+                  , Q007_2
+                  , Q007_3
+                  , Q010_1
+                  , Q010_2
+                  , Q012
+                  , Q013
+                  , Q021
+                  , Q022
+                  , T071
+           from   nbur_log_f4px
+           where  report_date = p_rpt_dt
+                  and kf = p_kf;
+
 
       when '48X' then
         open p_recordset
@@ -1276,6 +1303,7 @@ $end
           from  nbur_log_f48x
           where report_date = p_rpt_dt
                 and kf = p_kf;
+                
     else
       null;
     end case;
