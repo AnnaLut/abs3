@@ -44,8 +44,7 @@ from   (select nbs||'*'||substr('00'||ob22,-2)||'*'||branch||'*'||to_char(kv) kl
         where  tip='ODB'    and
                dazs is null and
                ((nbs='2620' and ob22 IN ('08','09','11','12','05','16')) or
-                (nbs='2630' and ob22 IN ('11','12','13','14','16'))      or
-                (nbs='2635' and ob22 IN ('13','14','15','16'))           or
+                (nbs='2630' and ob22 IN ('11','12','13','14','16','B6','B7','B8','B9'))      or
                 (nbs='2628' AND ob22 IN ('05'))                          or
                 (nbs='2638' AND ob22 IN ('17','16','02'))                or
                 (nbs='2909' AND ob22 IN ('18')))) a
