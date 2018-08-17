@@ -1,0 +1,36 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+@using BarsWeb.Areas.Ndi.Models
+@model CallFunctionMetaInfo
+<div class="container">
+    <h2>Завантаження файла</h2>
+    <form id="uploadForm" action="@Url.Action("PostUploadFile", "ReferenceBook")">
+        <div class="form-group">
+            <label class="control-label col-sm-2 col-sm-offset-2" for="email">оберіть Excel файл:</label>
+            <div class="col-sm-6 col-sm-offset-2 ">
+                <input name="file" id="uploadInput" type="file" accept=".xlsx" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2 col-sm-offset-2" for="start">оберіть дату:</label>
+            <div class="col-sm-6 col-sm-offset-2 ">
+                <input type="date" id="choceDate" name="trip" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button id="uploadBtn" onclick="fileUpload();">Завантажити файл</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    window.funcId = '@Model.FUNCID';
+    window.tabId = '@Model.TABID';
+
+</script>
+<script src="@Url.Content("~/Areas/Ndi/Scripts/JS/UploadFile.js")"></script>
+<link rel="stylesheet" href="~/Areas/Ndi/CSS/MVC_CSS/FileUploadForm.css">

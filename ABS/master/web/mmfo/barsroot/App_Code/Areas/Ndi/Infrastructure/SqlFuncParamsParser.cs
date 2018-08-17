@@ -8,6 +8,7 @@ using System;
 using System.Data;
 using BarsWeb.Areas.Ndi.Models.DbModels;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers.BarsWeb.Areas.Ndi.Infrastructure.Helpers;
+using System.Text;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -204,6 +205,10 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     paramsInfo.AddRange(func.UploadParamsInfo);
                 }
 
+                if (!string.IsNullOrEmpty(func.ConvertParams))
+                {
+                    func.ConvertParamsInfo = GetSqlFuncCallParamsDescription<ConvertParams>(func.PROC_NAME, func.ConvertParams);
+                }
                 if (!string.IsNullOrEmpty(func.OutParams))
                 {
                     func.OutParamsInfo = GetSqlFuncCallParamsDescription<OutParamsInfo>(func.PROC_NAME, func.OutParams);
@@ -228,23 +233,28 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     {
                         List<ColMultiRowParam> colRowParams = new List<ColMultiRowParam>();
                         paramsInfo.RemoveAll(x => func.MultiRowsParams.Find(y => y.ColName == x.ColName) != null);
-                        func.MultiRowsParams.ForEach(x => colRowParams.AddRange(x.ListColumnNames.
+                        if(func.MultiRowsParams.Find(x => x.ListColumnNames != null && x.ListColumnNames.Count() > 0) != null)
+                        {
+                            func.MultiRowsParams.ForEach(x => colRowParams.AddRange(x.ListColumnNames.
                             Select(y => new ColMultiRowParam() { ColName = y })));
-                        if (colRowParams.Count() > 0)
-                            paramsInfo.AddRange(colRowParams.Distinct());
+                            if (colRowParams.Count() > 0)
+                                paramsInfo.AddRange(colRowParams.Distinct());
+                        }
+                        
                     }
 
 
                 }
                 if (func.PROC_EXEC == "BEFORE" && tableInfo != null && tableInfo.SemanticParamNames.Count > 0)
-                    paramsInfo.ForEach(item => {
+                    paramsInfo.ForEach(item =>
+                    {
                         if (tableInfo.SemanticParamNames.Contains(item.ColName))
                         {
                             item.AdditionalUse.Add("ReplaseTableSemantic");
                         }
-                           
+
                     });
-                
+
 
                 // преобразуем список информации о параметрах к формату, который ожидает клиент
                 func.ParamsInfo = paramsInfo.Select(x => new
@@ -269,7 +279,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             }
 
         }
-        
+
         public static void AddUploadParameters(CallFunctionMetaInfo callFunction, OracleCommand command, List<FieldProperties> funcParams, List<FieldProperties> additionalParams)
         {
             List<UploadParamsInfo> uploadParams = GetSqlFuncCallParamsDescription<UploadParamsInfo>(callFunction.PROC_NAME, callFunction.UploadParams);
@@ -282,7 +292,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     FieldProperties clobProp = funcParams.FirstOrDefault(x => x.Name == item.ColName);
                     command.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Clob, clobProp.Value, ParameterDirection.Input));
                 }
-                if(item.ColType == "BLOB")
+                if (item.ColType == "BLOB")
                 {
                     FieldProperties blobProp = funcParams.FirstOrDefault(x => x.Name == item.ColName);
                     command.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Blob, blobProp.ByteBody, ParameterDirection.Input));
@@ -299,7 +309,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                             fileNameProp.Value = fileNameProp.Value.Substring(0, fileNameProp.Value.LastIndexOf('.'));
                         command.Parameters.Add(new OracleParameter(item.ColName, OracleDbType.Varchar2, 4000, fileNameProp.Value, ParameterDirection.Input));
                     }
-                        
+
                 }
 
 
@@ -353,6 +363,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 AddOptionsFromDictionary(paramMetaInfo as UploadParamsInfo, options);
             else if (paramMetaInfo is OutParamsInfo)
                 AddOptionsFromDictionary(paramMetaInfo as OutParamsInfo, options);
+            else if (paramMetaInfo is ConvertParams)
+                AddOptionsFromDictionary(paramMetaInfo as ConvertParams, options);
             else if (paramMetaInfo is MultiRowsParams)
                 AddOptionsFromDictionary(paramMetaInfo as MultiRowsParams, options);
             else if (paramMetaInfo is ComplexParams)
@@ -543,6 +555,28 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
         }
 
+        private static void AddOptionsFromDictionary(ConvertParams paramMetaInfo, Dictionary<string, string> options)
+        {
+            if (options == null || options.Count < 1)
+                return;
+
+            foreach (var option in options)
+            {
+                switch (option.Key)
+                {
+                    case "GET_FROM":
+                        paramMetaInfo.GetFrom = option.Value;
+                        break;
+                    case "DEF":
+                        paramMetaInfo.DefaultValue = option.Value;
+                        break;
+                }
+            }
+
+
+        }
+        
+
         private static void AddOptionsFromDictionary(GetFileParInfo paramMetaInfo, Dictionary<string, string> options)
         {
             foreach (var option in options)
@@ -605,7 +639,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
 
             foreach (var item in paramValues)
             {
-               string resValue = FormatConverter.ConvertFieldValueFromJsToSharpFormat(item);
+                string resValue = FormatConverter.ConvertFieldValueFromJsToSharpFormat(item);
                 sqlString = sqlString.Replace("|:" + item.Name + "|", resValue);
                 sqlString = sqlString.Replace(":" + item.Name, resValue);
             }
@@ -680,5 +714,46 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
         }
 
 
+        public static List<FieldProperties> ParsConvertParams(CallFunctionMetaInfo func,List<string> semantics)
+        {
+            char[] denied = new[] { ' ', '\n', '\t', '\r' };
+            List<string> semWithoutChs = new List<string>();
+            foreach (string item in semantics)
+            {
+                StringBuilder newString = new StringBuilder();
+                foreach (var ch in item)
+                {
+                    if (!denied.Contains(ch))
+                        newString.Append(ch);
+                }
+                semWithoutChs.Add( newString.ToString());
+                
+            }
+
+            List<FieldProperties> convertProp = FormatConverter.JsonToObject<List<FieldProperties>>(func.CUSTOM_OPTIONS);
+            List<FieldProperties> res = new List<FieldProperties>();
+            foreach (FieldProperties item in convertProp)
+            {
+                StringBuilder newString = new StringBuilder();
+                foreach (var ch in item.Name)
+                {
+                    if (!denied.Contains(ch))
+                        newString.Append(ch);
+                }
+                item.Name = newString.ToString();
+
+            }
+            for (int i = 0; i < semWithoutChs.Count(); i++)
+            {
+                FieldProperties field = convertProp.Find(x => x.Name == semWithoutChs[i]);
+                if (field != null)
+                {
+                    field.ColNum = i +1;
+                    res.Add(field);
+                }
+            }
+
+            return res;
+        }
     }
 }

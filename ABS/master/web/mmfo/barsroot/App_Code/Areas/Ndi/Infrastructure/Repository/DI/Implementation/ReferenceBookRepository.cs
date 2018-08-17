@@ -224,6 +224,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         updateCmdText.AppendFormat("{0}=:p_{0},", data.Name);
                         if (data.Type != "C" && string.IsNullOrEmpty(data.Value))
                             data.Value = null;
+                        if (data.Type == "N" && !string.IsNullOrEmpty(data.Value) && data.Value.Contains("E"))
+                            data.Value = Decimal.Parse(data.Value, System.Globalization.NumberStyles.Float).ToString();
                         sqlUpdateCommand.Parameters.Add("p_" + data.Name, data.Value == null ? null : Convert.ChangeType(data.Value, SqlStatementParamsParser.GetCsTypeCode(data.Type)));
                     }
                     if (updateCmdText.Length > 0)
@@ -532,7 +534,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                             ? null
                             : Convert.ChangeType(par.Value, SqlStatementParamsParser.GetCsTypeCode(par.Type));
                         logAddParamsMessage += "parameter name:  " + paramName + "Value:  " + paramValue;
-                       
+
                         var param = new OracleParameter(paramName, paramValue);
                         callFunctionCmd.Parameters.Add(param);
                         callFunctionCmd.BindByName = true;
@@ -587,6 +589,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             }
             catch (Exception e)
             {
+                Logger.Error(string.Format("message: {0},  trace: {1}", e.Message, e.StackTrace), LoggerPrefix +"ERROR");
                 throw e;
             }
             finally
@@ -598,13 +601,14 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         public string CallEachFuncWithMultypleRows(int? tableId, int? funcId, int? codeOper, int? columnId, MultiRowParamsDataModel dataModel,
             string funcText = "", string msg = "", string web_form_name = "", string ListjsonSqlProcParams = "")
         {
-            List<FieldProperties> inputParams = dataModel.InputParams ?? new List<FieldProperties>();
+
             string errorMessages = string.Empty;
             try
             {
                 CallFunctionMetaInfo callFunction = CreateCallFunctionCommand(tableId, funcId, codeOper, columnId, funcText);
-                if (callFunction.PROC_EXEC == "BATCH")
-                    return CallBatchFuncWithMultypleRowsParams(callFunction, inputParams, dataModel, msg, ListjsonSqlProcParams);
+                if (callFunction.PROC_EXEC == "BATCH" || (callFunction.MultiParams != null && callFunction.MultiParams.Count() > 0))
+                    return CallBatchFuncWithMultypleRowsParams(callFunction, dataModel, msg);
+                List<FieldProperties> inputParams = dataModel.InputParams ?? new List<FieldProperties>();
                 OracleCommand callFunctionCmd = GetOracleConnector.GetCommandOrCreate;
                 int successCount = 0;
                 int failCount = 0;
@@ -649,32 +653,33 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 return resMessages;
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
                 GetOracleConnector.Dispose();
             }
         }
 
-        public string CallBatchFuncWithMultypleRowsParams(CallFunctionMetaInfo callFunction, List<FieldProperties> inputParams,
-            MultiRowParamsDataModel dataModel, string msg = "", string ListjsonSqlProcParams = "")
+        public string CallBatchFuncWithMultypleRowsParams(CallFunctionMetaInfo callFunction, MultiRowParamsDataModel dataModel, string msg = "")
         {
-            if (callFunction.MultiRowsParams == null || callFunction.MultiRowsParams.Count() < 1)
+            if ((callFunction.MultiRowsParams == null || callFunction.MultiRowsParams.Count() < 1) &&
+                (callFunction.ConvertParamsInfo == null || callFunction.ConvertParamsInfo.Count() < 1))
                 throw new Exception("немає багаторядкових параметрів");
             try
             {
+
                 List<OutMessageParInfo> outParameters = null;
                 string successMessage = "Процедура виконана";
                 OutMessageParInfo outMessageParam = null;
                 string funcOutMessage = string.Empty;
 
                 OracleCommand callFunctionCmd = GetOracleConnector.GetCommandOrCreate;
-                OraTypesHelper.AddListDictionaryParam(callFunction, dataModel, callFunctionCmd);
-                if (inputParams != null && inputParams.Count() > 0)
-                    OraTypesHelper.AddParamsToCommand(inputParams, callFunctionCmd);
+                callFunctionCmd.BindByName = true;
+
+                OraTypesHelper.AddMoltiParamsToProc(callFunction, dataModel, GetOracleConnector);
+
+
+                if (dataModel.InputParams != null && dataModel.InputParams.Count() > 0)
+                    OraTypesHelper.AddParamsToCommand(dataModel.InputParams, callFunctionCmd);
                 if (callFunction != null && !string.IsNullOrEmpty(callFunction.OutParams))
                 {
                     outParameters = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<OutMessageParInfo>(callFunction.PROC_NAME, callFunction.OutParams);
@@ -691,10 +696,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 }
                 return successMessage;
             }
-            catch (Exception e)
+            finally
             {
-
-                throw e;
+                GetOracleConnector.Dispose();
             }
         }
 
@@ -806,8 +810,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     string clobRes = clob.IsNull ? string.Empty : clob.Value;
                     unicodeBytes = unicode.GetBytes(clobRes.ToString());
                     asciiBytes = Encoding.Convert(unicode, windows, unicodeBytes);
-                   
-                   
+
+
                     result = new GetFileResult() { FileBytesBody = asciiBytes, FileName = !string.IsNullOrEmpty(name) ? name : "file.txt", Result = "ok" };
 
                 }
@@ -829,6 +833,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             {
                 if (clob != null)
                 {
+                    clob.Close();
                     clob.Dispose();
                     clob = null;
                 }
@@ -943,7 +948,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 }
 
-                string condition = string.IsNullOrEmpty(srcCond) ? "" :  "(" +  srcCond + ") and" ;
+                string condition = string.IsNullOrEmpty(srcCond) ? "" : "(" + srcCond + ") and";
 
                 OracleCommand getDataCommand = connection.CreateCommand();
 
@@ -952,7 +957,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 @"select * from (select rownum rn, {0} as id, {1} as name , {2} as name2
                                                 from {3} where {7}  (UPPER({0}) like UPPER('{6}') or UPPER({1}) like UPPER('{6}') 
                                                 or UPPER({2}) like UPPER('{6}')) and rownum <= {5}) where rn > {4}",
-                fieldForId, fieldForName, colName2, tableName,  start, start + limit + 1, queryValue, condition);
+                fieldForId, fieldForName, colName2, tableName, start, start + limit + 1, queryValue, condition);
                 else
                     getDataCommand.CommandText = string.Format(
                         @"select * from (select rownum rn, {0} as id, {1} as name 
@@ -973,7 +978,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             }
         }
 
-        public  ParamMetaInfo GetDefaultRelatedData(MetaTable srcTable)
+        public ParamMetaInfo GetDefaultRelatedData(MetaTable srcTable)
         {
             // string sourcTabName = srcTabName;
             ParamMetaInfo refParam = new ParamMetaInfo();
@@ -1123,7 +1128,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             string SelectConditions = null;
             FunNSIEditFParams nsiEditParams = null;
             MetaTable nativTableForFilter = null;
-            string funNsiEditFParamsString = GetFunNSIEditFParamsString(null, dataModel.CodeOper, dataModel.SParColumn, dataModel.NativeTabelId, dataModel.NsiTableId, dataModel.NsiFuncId,dataModel.Code);
+            string funNsiEditFParamsString = GetFunNSIEditFParamsString(null, dataModel.CodeOper, dataModel.SParColumn, dataModel.NativeTabelId, dataModel.NsiTableId, dataModel.NsiFuncId, dataModel.Code);
             List<FieldProperties> sqlParamerties = FormatConverter.JsonToObject<List<FieldProperties>>(dataModel.JsonSqlProcParams);//  string.IsNullOrEmpty(dataModel.JsonSqlProcParams)  ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(dataModel.JsonSqlProcParams) as List<FieldProperties>;
             List<FieldProperties> sqlSelectRowParams = FormatConverter.JsonToObject<List<FieldProperties>>(stringJsonSqlProcParams); // string.IsNullOrEmpty(stringJsonSqlProcParams) ? new List<FieldProperties>() : JsonConvert.DeserializeObject<List<FieldProperties>>(stringJsonSqlProcParams) as List<FieldProperties>;
             List<FieldProperties> allParams = new List<FieldProperties>();
@@ -1200,8 +1205,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 startInfo.FallDownFilter.FilterParams = sqlSelectRowParams.Where(x => startInfo.FallDownFilter.Condition.Contains(x.Name)).ToList();
 
             }
-            bool lazyLoad = dataModel is ExcelDataModel && dataModel.Limit > 80000 && nsiEditParams !=null &&   nsiEditParams.ExcelParam == "ALL_CSV";
-           connection = this.GetOracleConnector.GetConnOrCreate;
+            bool lazyLoad = dataModel is ExcelDataModel && dataModel.Limit > 80000 && nsiEditParams != null && nsiEditParams.ExcelParam == "ALL_CSV";
             try
             {
                 var selectBuilder = new SelectBuilder
@@ -1234,7 +1238,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 context.Session[sesstionLastActionKey] = "GetData";
                 if (!string.IsNullOrEmpty(startInfo.ProcedureText) && lactAction != "GetData")
                 {
-                    CallFunctionBeforeSelectTable( startInfo.AllFieldProperties, startInfo.ProcedureText);
+                    CallFunctionBeforeSelectTable(startInfo.AllFieldProperties, startInfo.ProcedureText);
                 }
 
                 // получим основной набор данных
@@ -1255,7 +1259,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 //if (selectBuilder.TotalColumns.Any())
                 // {
                 // для подсчета итоговых значений берем запрошенное количество строк
-                if(lazyLoad && !string.IsNullOrEmpty(nsiEditParams.ExcelParam) && nsiEditParams.ExcelParam == "ALL_CSV")
+                if (lazyLoad && !string.IsNullOrEmpty(nsiEditParams.ExcelParam) && nsiEditParams.ExcelParam == "ALL_CSV")
                 {
                     result = AllRecordReader.GetDataForExcelCsv(getDataReader, nsiEditParams.ExcelParam);
                     return result;
@@ -1317,7 +1321,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             }
         }
 
-        public  List<ColumnMetaInfo> DbColumnsToMetaColumnsForMetaData(List<MetaColumnsDbModel> columnList)
+        public List<ColumnMetaInfo> DbColumnsToMetaColumnsForMetaData(List<MetaColumnsDbModel> columnList)
         {
             List<ColumnMetaInfo> columnsInfo = new List<ColumnMetaInfo>();
             foreach (var item in columnList)
@@ -1338,11 +1342,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 if (!string.IsNullOrEmpty(col.WEB_FORM_NAME))
                 {
                     FunNSIEditFParams par = new FunNSIEditFParams(col.WEB_FORM_NAME);
-                    
+
                     if (col.FunctionMetaInfo != null && !string.IsNullOrEmpty(col.FunctionMetaInfo.TableName) && !col.FunctionMetaInfo.TableName.Contains("|:"))
                     {
-                        
+
                         MetaTable tableInfo = GetMetaTableByName(col.FunctionMetaInfo.TableName);
+                        if (tableInfo == null)
+                            throw new Exception(string.Format("Не знайдена таблиця {0}, посилання на неї в колонці  {1}", col.FunctionMetaInfo.TableName, col.COLNAME));
                         if (!string.IsNullOrEmpty(tableInfo.SEMANTIC) && tableInfo.SEMANTIC.Contains("|:"))
                         {
                             col.FunctionMetaInfo.TableSemantic = tableInfo.SEMANTIC;
@@ -1624,12 +1630,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
                 bool showRecordsCount = nsiPar != null && nsiPar.ShowRecordsCount;
 
-                
-                if(defInsertParams != null && defInsertParams.Count > 0)
+
+                if (defInsertParams != null && defInsertParams.Count > 0)
                 {
                     saveInPageParams.DefaultModels.InsertDefParams = defInsertParams;
                 }
-               
+
 
                 IEnumerable<MetaTblColor> colorsForGrid = GetTblColors(tableInfo.TABID);
                 //добавляем дополнительные свойства на клиент для упрощения жизни
@@ -1680,7 +1686,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                         TABID = (int)mt.TABID,
                         TABNAME = mt.TABNAME,
                         SEMANTIC = mt.SEMANTIC,
-                        LINESDEF =  mt.LINESDEF,
+                        LINESDEF = mt.LINESDEF,
                     }).Single();
 
             if (tableInfo != null && tableInfo.SEMANTIC.Contains("|:"))
@@ -1775,7 +1781,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 nsiEditParams.ReplaceParams(rowParams.Distinct().ToList());
                 tableInfo.SEMANTIC = nsiEditParams.TableSemantic;
             }
-                
+
 
             return nsiEditParams;
         }
@@ -1829,11 +1835,11 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         private IEnumerable<MetaTblColor> GetTblColors(int tabid)
         {
             var pTabId = new OracleParameter("tabid", OracleDbType.Decimal).Value = tabid;
-            IEnumerable<MetaTblColor> colors = _entities.ExecuteStoreQuery<MetaTblColor>("SELECT * FROM META_TBLCOLOR WHERE TABID = :tabid",pTabId).ToList();
+            IEnumerable<MetaTblColor> colors = _entities.ExecuteStoreQuery<MetaTblColor>("SELECT * FROM META_TBLCOLOR WHERE TABID = :tabid", pTabId).ToList();
             return colors.Where<MetaTblColor>(x => !string.IsNullOrEmpty(x.COLOR_SEMANTIC)).GroupBy(col => col.COLOR_NAME).Select(g => g.First(x => !string.IsNullOrEmpty(x.COLOR_SEMANTIC)));
         }
 
-     
+
         //public ColumnMetaInfo GetMetaInfoByTabId(int tabid)
         //{
         //    var pTabId = new OracleParameter("tabid", OracleDbType.Decimal).Value = tabid;
@@ -2028,12 +2034,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             return _entities.ExecuteStoreQuery<ExtFilterMeta>(sql, pTabId);
         }
 
-        public string GetFunNSIEditFParamsString(int? tabid, int? codeOper, int? metacolumnId, int? nativeTabelId, int? nsiTableId, int? nsiFuncId = null,string code = null)
+        public string GetFunNSIEditFParamsString(int? tabid, int? codeOper, int? metacolumnId, int? nativeTabelId, int? nsiTableId, int? nsiFuncId = null, string code = null)
         {
             string funNsiEditFParamsString = null;
             try
             {
-                if(!string.IsNullOrEmpty(code))
+                if (!string.IsNullOrEmpty(code))
                 {
                     MetaCallSettings colSettings = GetMetaCallSettingsByCode(code);
                     if (!string.IsNullOrEmpty(colSettings.WEB_FORM_NAME))
@@ -2121,12 +2127,12 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     procTextRes);
             return callFunction;
         }
-        private void CallFunctionBeforeSelectTable( List<FieldProperties> fields, string procedureText)
+        private void CallFunctionBeforeSelectTable(List<FieldProperties> fields, string procedureText)
         {
             try
             {
                 if (string.IsNullOrEmpty(procedureText))
-                    return ;
+                    return;
                 procedureText = SqlStatementParamsParser.ReplaceCenturaNullConstants(procedureText);
                 OracleCommand sqlCommand = GetOracleConnector.CreateCommand;
                 sqlCommand.BindByName = true;
@@ -2215,7 +2221,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         {
             try
             {
-                const string sql = @"select tabid, funcid, descr, proc_name, proc_par, proc_exec, qst, msg, check_func, web_form_name 
+                const string sql = @"select tabid, funcid, descr, proc_name, proc_par, proc_exec, qst, msg, check_func, web_form_name,CUSTOM_OPTIONS
                                  from META_NSIFUNCTION 
                                  where tabid = :tabid and funcid = :funcid";
                 var pTabId = new OracleParameter("tabid", OracleDbType.Decimal).Value = tableId;
@@ -2547,6 +2553,34 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         public string InsertFilters(List<CreateFilterModel> filterModels)
         {
             return null;
+        }
+
+        public string CallParsExcelFunction(HttpPostedFileBase excelFile, string fileName, string date, int? tabid, int? funcid)
+        {
+            var callFunction = GetCallFunction(tabid.Value, funcid.Value);
+            if (callFunction == null)
+                throw new Exception(string.Format("процедура з tabid: {0}, та funcid: {1} не знайдена", tabid, funcid));
+            SqlStatementParamsParser.BuildFunction(callFunction);
+            List<CallFunctionMetaInfo> callFuncs = new List<CallFunctionMetaInfo>();
+            callFuncs.Add(callFunction);
+            SqlStatementParamsParser.BuilFunctionParams(callFuncs);
+            List<FieldProperties> inputParams = new List<FieldProperties>();
+            inputParams.Add(new FieldProperties() { Name = "p_file_name", Type = "C", Value = fileName });
+            inputParams.Add(new FieldProperties() { Name = "p_ddate", Type = "C", Value = date });
+            string convertParams = callFunction.CUSTOM_OPTIONS;
+            ExcelHelper excelHelper = new ExcelHelper();
+            List<CallFuncRowParam> RowsData = new List<CallFuncRowParam>();// excelHelper.ParseExcelFile(excelFile, callFunction);
+
+
+            MultiRowParamsDataModel dataModel = new MultiRowParamsDataModel()
+            {
+                RowsData = RowsData,
+                InputParams = inputParams,
+                UploadedFile = excelFile
+            };
+
+            return CallEachFuncWithMultypleRows(tabid, funcid, null, null, dataModel);
+
         }
 
         //public string GetFilterStructure(int dynFilterId)
