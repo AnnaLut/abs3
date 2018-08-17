@@ -1,7 +1,7 @@
 -- ======================================================================================
 -- Module : CDM
 -- Author : BAA
--- Date   : 18.10.2017
+-- Date   : 17.08.2018
 -- ======================================================================================
 -- create table EBKC_GCIF
 -- ======================================================================================
@@ -135,6 +135,27 @@ exception
 end;
 /
 
+PROMPT *** Create index BARS.IDX_EBKCGCIF_INSERTDATE ***
+
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+  e_dup_keys_found       exception;
+  pragma exception_init( e_dup_keys_found,  -01452 );
+begin
+  execute immediate 'create index IDX_EBKCGCIF_INSERTDATE on EBKC_GCIF ( INSERT_DATE ) tablespace BRSMDLI';
+  dbms_output.put_line( 'Index "IDX_EBKCGCIF_INSERTDATE" created.' );
+exception
+  when e_idx_exists 
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+  when e_dup_keys_found
+  then dbms_output.put_line( 'Cannot create unique index: duplicate keys found' );
+end;
+/
 
 SET FEEDBACK ON
 
