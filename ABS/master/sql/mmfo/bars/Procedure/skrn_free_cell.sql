@@ -12,7 +12,7 @@ as
 begin
 
   delete from tmp_sal;
-
+  
 
 for x in (
             SELECT * FROM BRANCH WHERE BRANCH LIKE SYS_CONTEXT ('bars_context', 'user_branch_mask') and length(branch) = 22
@@ -20,8 +20,8 @@ for x in (
     LOOP
 
                -- представимось бранчом
-               bc.subst_branch(x.branch);
-
+               bc.go(x.branch);
+               
                 insert into  tmp_sal (branch, nms, ostqk, kosq, ostiqk, kv)
                 select t.branch, e.name, t.cell_count, nvl(a.col,0) less_cell, t.cell_count-nvl(a.col,0) Free_cell  , t.ETALON_ID
                 from (
@@ -37,12 +37,14 @@ for x in (
                        BARS.SKRYNKA_TIP_ETALON e
                where  e.ID = t.ETALON_ID
                order by t.branch, t.ETALON_ID;
+               
 
-
-    suda;
+         
+    --suda; --COBUMMFO-8771
 
     END LOOP;
-
+    
+    bc.home;
 
 end;
 /
