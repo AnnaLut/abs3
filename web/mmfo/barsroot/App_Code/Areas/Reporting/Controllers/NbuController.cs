@@ -210,10 +210,17 @@ namespace BarsWeb.Areas.Reporting.Controllers
             try
             {
                 string ext = fName.Substring(fName.LastIndexOf('.'));
-                if (ext != ".zip")
-                    return File(System.IO.File.ReadAllBytes(fName), "attachment", DETAILED_FILE);
-                else
-                    return File(System.IO.File.ReadAllBytes(fName), "application/zip", DETAILED_ARCHIVE);
+                switch (ext)
+                {
+                    case ".zip":
+                        return File(System.IO.File.ReadAllBytes(fName), "application/zip", DETAILED_ARCHIVE);
+                    case ".csv":
+                        return File(System.IO.File.ReadAllBytes(fName), "attachment", Path.GetFileName(fName));
+                    default:
+                        return File(System.IO.File.ReadAllBytes(fName), "attachment", DETAILED_FILE);
+                }
+                
+                    
 
             }
             catch (Exception ex)

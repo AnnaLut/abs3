@@ -99,6 +99,8 @@ namespace BarsWeb.Infrastructure.ImportToFileHelper
                 sw.Close();
                 sw.Dispose();
                 sw = null;
+                if (filePathes.Count() == 1)
+                    return filePathes.First();
                 string zipFilePath = _tempDir + fileName + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + ".zip";
                 ToZip(filePathes, zipFilePath);
                 return zipFilePath;
