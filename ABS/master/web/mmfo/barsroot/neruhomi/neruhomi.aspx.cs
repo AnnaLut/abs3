@@ -125,12 +125,39 @@ public partial class neruhomi_neruhomi : Bars.BarsPage
 
         if (rbSum1.Checked)
         {
-            SelectCommand += " and ost <get_scale_immobile(nvl(kv,980)) ";
+            SelectCommand += @" and (
+                                         (
+                                             (upper(source)  like '%АСВО%' and  attr not like '%h%' and  attr not like '%Q%' and ost <get_scale_immobile(nvl(kv,980))
+)
+                                          or (upper(source)  like '%АСВО%' and  attr not like '%Q%' and  attr not like '%h%' and ost <get_scale_immobile(nvl(kv,980))
+)
+                                         )
+                                       or
+                                         (
+                                          upper(source) not like '%АСВО%' and ost <get_scale_immobile(nvl(kv,980))
+                                         )
+                                    )
+                 ";
         }
 
         if (rbSum2.Checked)
-        {
-            SelectCommand += " and ost >=get_scale_immobile(nvl(kv,980)) ";
+        {           			
+                SelectCommand += @"and (
+                                         (
+                                          (upper(source) like '%АСВО%' and  attr like '%h%') or (upper(source) like '%АСВО%' and attr like '%Q%')
+                                         )
+                                       or
+                                         (
+                                             (upper(source)  like '%АСВО%' and  attr not like '%h%' and attr not like '%Q%'  and ost >= get_scale_immobile(nvl(kv, 980)))
+                                          or (upper(source)  like '%АСВО%' and attr not like '%Q%'  and  attr not like '%h%' and ost >= get_scale_immobile(nvl(kv, 980)))
+                                         )
+                                       or
+                                         (
+                                          upper(source) not like '%АСВО%' and ost >= get_scale_immobile(nvl(kv, 980))
+                                         )
+                                      ) ";
+
+            
         }
 
         if (rbNSender.Checked)
