@@ -7,7 +7,7 @@ is
     -- for import from BARS scheme
     --
 
-    g_header_version  constant varchar2(64)  := 'version 3.4.0 15/08/2018';--¡œ 2620
+    g_header_version  constant varchar2(64)  := 'version 3.4.1 17/08/2018';--¡œ 2620+gcif
 
     g_header_defs     constant varchar2(512) := '';
 
@@ -264,7 +264,7 @@ show errors
 
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT is
 
-  g_body_version constant varchar2(64) := 'Version 3.4.0 30/07/2018';--¡œ 2620
+  g_body_version constant varchar2(64) := 'Version 3.4.1 17/08/2018';--¡œ 2620+gcif
   g_body_defs    constant varchar2(512) := null;
   G_TRACE        constant varchar2(20) := 'dm_import.';
 
@@ -2768,6 +2768,8 @@ is
      (select distinct rnk from bars.corps_update pu where pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
       union
      (select distinct rnk from bars.custbank_update pu where pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
+	  union
+     (select distinct rnk from bars.ebkc_gcif ebkg where  ebkg.insert_date between trunc(:p_dat) and trunc(:p_dat)+0.99999)
      )
      ';
 
@@ -2933,7 +2935,7 @@ begin
         -- test q_str
         -- insert into t_clob values(sysdate,q_str);
 
-        open c for q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat;
+        open c for q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat;
     else
         q_str := q_str_main || q_str_full_suf;
         -- test q_str
@@ -4552,7 +4554,10 @@ end deposits_plt_imp;
                    union
          (select distinct rnk from bars.customer_address_update cau where cau.chgdate between trunc(p_dat) and trunc(p_dat)+0.99999)
                    union
-                 (select distinct rnk from bars.person_update pu where  pu.chgdate between trunc(p_dat) and trunc(p_dat)+0.99999))
+                 (select distinct rnk from bars.person_update pu where  pu.chgdate between trunc(p_dat) and trunc(p_dat)+0.99999)
+				   union
+                  (select distinct rnk from bars.ebkc_gcif ebkg where  ebkg.insert_date between trunc(p_dat) and trunc(p_dat)+0.99999)
+				 )
 
                   select
                        null as ID,

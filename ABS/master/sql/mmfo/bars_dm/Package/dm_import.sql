@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 5.0.3 15/08/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.
+    g_header_version  constant varchar2(64)  := 'version 5.0.4 17/08/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -240,7 +240,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
     
-    g_body_version constant varchar2(64) := 'Version 5.0.3 15/08/2018';--+2620БПК.
+    g_body_version constant varchar2(64) := 'Version 5.0.4 17/08/2018';--+2620БПК.+gcif
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
 	-- BARS_INTGR - integration
@@ -2657,6 +2657,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
          (select distinct rnk from bars.corps_update pu where pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
           union
          (select distinct rnk from bars.custbank_update pu where pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
+		  union
+         (select distinct rnk from bars.ebkc_gcif ebkg where  ebkg.insert_date between trunc(:p_dat) and trunc(:p_dat)+0.99999)
          ) ';
         -- основной запрос
         q_str_main  varchar2(32000) :=
@@ -2903,7 +2905,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         if (p_periodtype = C_INCRIMP) then
             /* дельта */
             q_str := q_insert || q_str_inc_pre || q_str_main || q_str_inc_suf || q_log_errors;
-            execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, l_per_id;
+            execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat,p_dat, p_dat, l_per_id;
         else
             /* полная выгрузка */
             q_str := q_insert || q_str_main || q_str_full_suf || q_log_errors;
@@ -4518,6 +4520,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       (select distinct rnk from bars.customer_address_update cau where cau.effectdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                    union
                       (select distinct rnk from bars.person_update pu where  pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
+				   union
+                      (select distinct rnk from bars.ebkc_gcif ebkg where  ebkg.insert_date between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                      )';
         -- основной запрос
         q_str_main  varchar2(32000) :=
@@ -5347,7 +5351,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
     if (p_periodtype = C_INCRIMP) then
         /* дельта */
        q_str := q_insert || q_str_inc_pre || q_str_main || q_str_inc_suf || q_log_errors;
-       execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, l_per_id; 
+       execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, l_per_id;
     else
         /* полная выгрузка */
        q_str := q_insert || q_str_main || q_str_full_suf || q_log_errors;
