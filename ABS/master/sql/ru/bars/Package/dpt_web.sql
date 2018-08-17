@@ -1051,7 +1051,7 @@ create or replace package dpt_web is
 end dpt_web;
 /
 create or replace package body dpt_web is
-  g_body_version  constant varchar2(64) := 'version 48.056 02.05.2018 - not mmfo';
+  g_body_version  constant varchar2(64) := 'version 48.057 17.08.2018 - not mmfo';
   g_awk_body_defs constant varchar2(512) := '' || 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' ||
                                             chr(10) ||
@@ -9702,7 +9702,7 @@ create or replace package body dpt_web is
               end if;
             
               -- пошук котлового рахунка (нерухомі вклади для РНВ із залишками більше 10 одиниць)
-              l_nls := get_nls_immobile(r_immobile.nbs_term,  --r_immobile.nbs_dep,
+              l_nls := get_nls_immobile(r_immobile.nbs_dep, 
                                         r_immobile.kv,
                                         r_immobile.branch,
                                         null);
