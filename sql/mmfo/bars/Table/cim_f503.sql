@@ -225,6 +225,16 @@ end;
 / 
 COMMENT ON COLUMN bars.cim_f503.p3300 IS 'Код валюти розрахунків';
 
+begin
+    execute immediate 'alter table bars.cim_f503 add (F057 CHAR(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F503.F057 IS 'Вид запозичення';
+
+        
 
 
 PROMPT *** Create  grants  CIM_F503 ***
