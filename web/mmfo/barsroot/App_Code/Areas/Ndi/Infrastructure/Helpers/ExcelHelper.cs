@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-
 /// <summary>
 /// Summary description for ExcelHelper
 /// </summary>
@@ -208,7 +207,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
         {
             IEnumerable<Dictionary<string, object>> dataRecords = resultInfo.DataRecords;
             Dictionary<string, int> headerLen = new Dictionary<string, int>();
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            StringBuilder sb = new StringBuilder();
             Encoding windows = Encoding.GetEncoding("windows-1251");
             Encoding unicode = Encoding.Unicode;
             byte[] unicodeBytes;
@@ -273,7 +272,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                
 
                 // add file header
-                System.Text.StringBuilder sbHeaders = new System.Text.StringBuilder();
+                StringBuilder sbHeaders = new StringBuilder();
                 foreach (var colInfo in ColumnsInfo)
                 {
                     sbHeaders.Append(colInfo.SEMANTIC != null ? colInfo.SEMANTIC.Replace("~", " ") : "");
@@ -310,6 +309,343 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                 unicodeBytes = null;
 
             }
+        }
+
+        public List<CallFuncRowParam>  ParseExcelFile(HttpPostedFileBase parsedFile, CallFunctionMetaInfo func)
+        {
+            List<CallFuncRowParam> resParams = new List<CallFuncRowParam>();
+            List<ColumnMetaInfo> refList = new List<ColumnMetaInfo>();
+            List<string> excelColSemanticList = new List<string>();
+            int dataStartsFromRow = 4;
+            int dataStartFromCol = 1;
+            int curCol;
+            using (ExcelPackage package = new ExcelPackage(parsedFile.InputStream))
+            {
+                ExcelWorksheet worksheet;
+                try
+                {
+                    worksheet = package.Workbook.Worksheets[1];
+                    bool emptyData = true;
+                    var startFrom = worksheet.Dimension.Start;
+                    var finishTo = worksheet.Dimension.End;
+                    bool semanticEmpty = IsRowEmpty(worksheet, dataStartsFromRow);
+                    List<string> colExcelSemantics = new List<string>();
+
+                    if (semanticEmpty)
+                        throw new Exception("рядок {0} з семантикою колонок - порожній");
+                    for (int col = dataStartFromCol; col <= finishTo.Column; col++)
+                    {
+                        object colSemantic = worksheet.Cells[dataStartsFromRow, col].Value ?? "";
+                        if (string.IsNullOrEmpty(colSemantic.ToString()))
+                            break;
+                        colExcelSemantics.Add(colSemantic.ToString());
+                    }
+                    dataStartsFromRow++;
+                    if (colExcelSemantics.Count() == 0)
+                        throw new Exception("семантика в першому стовбці не заповнена");
+                    List<FieldProperties> SemanticFields = SqlStatementParamsParser.ParsConvertParams(func, colExcelSemantics);
+                    for (int irow = dataStartsFromRow; irow <= finishTo.Row; irow++)
+                    {
+                        List<FieldProperties> rowFields = new List<FieldProperties>();
+                        curCol = dataStartFromCol;
+                        foreach (var item in SemanticFields)
+                        {
+                            //decimal? resPersent;
+                            //if (item.ColNum == 9)
+                            //    worksheet.Cells[irow, item.ColNum.Value].Style.Numberformat.Format = "###,##%";
+                            string res = worksheet.Cells[irow, item.ColNum.Value].Text ?? "";
+                            //string resString = res.ToString();
+                            //string format = worksheet.Cells[irow, item.ColNum.Value].Style.Numberformat.Format;
+                            //if (!string.IsNullOrEmpty(format) && format.Contains('%') && !string.IsNullOrEmpty(resString))
+                            //{
+                            //    resPersent = (decimal)res ;
+                            //    if (resPersent != null)
+                            //        resPersent = resPersent * 100;
+                            //    resString = resPersent.ToString() + '%';
+                            //}
+                            //else
+                            //    resString = res.ToString();
+
+                              
+                            rowFields.Add(new FieldProperties() { Name = item.Value, Value = res });
+                        }
+                        resParams.Add(new CallFuncRowParam() { RowIndex = irow, RowParams = rowFields });
+
+
+
+
+                    }
+                   
+                    return resParams;
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
+
+
+
+            }
+        }
+
+        public void ParsExcelAndWriteToClob(HttpPostedFileBase parsedFile, CallFunctionMetaInfo func, Oracle.DataAccess.Types.OracleClob clob)
+        {
+            Encoding unicode = Encoding.Unicode;
+            byte[] unicodeBytes;
+            byte[] asciiBytes;
+            List<ColumnMetaInfo> refList = new List<ColumnMetaInfo>();
+            List<string> excelColSemanticList = new List<string>();
+            int dataStartsFromRow = 4;
+            int dataStartFromCol = 1;
+            int curCol;
+
+            
+            
+            using (ExcelPackage package = new ExcelPackage(parsedFile.InputStream))
+            {
+                ExcelWorksheet worksheet;
+                try
+                {
+                    StringBuilder xmlRes = new StringBuilder();
+                    worksheet = package.Workbook.Worksheets[1];
+                    bool emptyData = true;
+                    var startFrom = worksheet.Dimension.Start;
+                    var finishTo = worksheet.Dimension.End;
+                    bool semanticEmpty = IsRowEmpty(worksheet, dataStartsFromRow);
+                    List<string> colExcelSemantics = new List<string>();
+                    if (semanticEmpty)
+                        throw new Exception("рядок {0} з семантикою колонок - порожній");
+                    for (int col = dataStartFromCol; col <= finishTo.Column; col++)
+                    {
+                        object colSemantic = worksheet.Cells[dataStartsFromRow, col].Value ?? "";
+                        if (string.IsNullOrEmpty(colSemantic.ToString()))
+                            break;
+                        colExcelSemantics.Add(colSemantic.ToString());
+                    }
+                    dataStartsFromRow++;
+                    if (colExcelSemantics.Count() == 0)
+                        throw new Exception("семантика в першому стовбці не заповнена");
+                    List<FieldProperties> SemanticFields = SqlStatementParamsParser.ParsConvertParams(func, colExcelSemantics);
+                    string beginRow = "<Row>";
+                    string endRow = "</Row>";
+                    List<byte> resBytes = new List<byte>();
+                    Models.Column columnPars = new Models.Column();
+                    StringBuilder xmlStart = new StringBuilder();
+                    List<byte> startxmlBytes = new List<byte>( unicode.GetBytes("<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><body>"));
+                    List<byte> startRowBytges = new List<byte>(unicode.GetBytes(beginRow));
+                    List<byte> endRowBytges = new List<byte>(unicode.GetBytes(endRow));
+                    List<byte> startTagBytes = new List<byte>(unicode.GetBytes("<Column><Tag>"));
+                    List<byte> startValueBytes = new List<byte>(unicode.GetBytes("</Tag><Value>"));
+                    List<byte> endValueBytes = new List<byte>(unicode.GetBytes("</Value></Column>"));
+                    List<byte> endXmlBytes = new List<byte>(unicode.GetBytes("</body></root>"));
+                    resBytes.AddRange(startxmlBytes);
+                    for (int irow = dataStartsFromRow; irow <= finishTo.Row; irow++)
+                    {
+                        resBytes.AddRange(startRowBytges);
+                        //  xmlRes.Append(beginRow);
+                        // Row rowFields = new Row();
+                        curCol = dataStartFromCol;
+                        foreach (var item in SemanticFields)
+                        {
+                            //decimal? resPersent;
+                            //if (item.ColNum == 9)
+                            //    worksheet.Cells[irow, item.ColNum.Value].Style.Numberformat.Format = "###,##%";
+                            string res = worksheet.Cells[irow, item.ColNum.Value].Text ?? "";
+                            //string resString = res.ToString();
+                            //string format = worksheet.Cells[irow, item.ColNum.Value].Style.Numberformat.Format;
+                            //if (!string.IsNullOrEmpty(format) && format.Contains('%') && !string.IsNullOrEmpty(resString))
+                            //{
+                            //    resPersent = (decimal)res ;
+                            //    if (resPersent != null)
+                            //        resPersent = resPersent * 100;
+                            //    resString = resPersent.ToString() + '%';
+                            //}
+                            //else
+                            //    resString = res.ToString();
+                            resBytes.AddRange(startTagBytes);
+                            resBytes.AddRange(unicode.GetBytes(item.Value));
+                            resBytes.AddRange(startValueBytes);
+                            resBytes.AddRange(unicode.GetBytes(res));
+                            resBytes.AddRange(endValueBytes);
+                           
+                        }
+                       resBytes.AddRange(endRowBytges);
+                        //xmlRes.Append(endRow);
+                        //if(irow % 10000 == 0)
+                        //{
+                        //     rowBytes.AddRange(unicode.GetBytes(xmlRes.);
+
+                        //    xmlRes.Clear();
+                        //}
+
+
+
+
+                    }
+                    //xmlRes.Append("</body></root>");
+                    resBytes.AddRange(endXmlBytes);
+                    //resBytes = unicode.GetBytes(xmlRes.ToString());
+                    //int countBytes = resBytes.Length;
+                    clob.Write(resBytes.ToArray(), 0, resBytes.Count);
+                    resBytes = null;
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
+
+        public void GetExcelResByBytes(HttpPostedFileBase parsedFile, CallFunctionMetaInfo func, OracleDbModel connector)
+        {
+            Encoding windows = Encoding.GetEncoding("windows-1251");
+            string fileName = "FileForExcel";
+            string _tempDir = Path.GetTempPath();
+            string fileNameWithExt = "FileForExcell.txt";
+            string dirPath = _tempDir + "__" + HttpContext.Current.Session.SessionID + "__" + fileName;
+            CreateNewDirectoryAndFile(dirPath);
+            string path = dirPath + "\\" + fileNameWithExt;
+            StreamWriter sw = GetStreamWriterToFile(path, Encoding.Unicode);
+            Encoding unicode = Encoding.Unicode;
+            byte[] unicodeBytes;
+            byte[] asciiBytes;
+            List<ColumnMetaInfo> refList = new List<ColumnMetaInfo>();
+            List<string> excelColSemanticList = new List<string>();
+            int dataStartsFromRow = 4;
+            int dataStartFromCol = 1;
+            int curCol;
+
+
+
+            using (ExcelPackage package = new ExcelPackage(parsedFile.InputStream))
+            {
+                ExcelWorksheet worksheet;
+                try
+                {
+                    StringBuilder xmlRes = new StringBuilder();
+                    worksheet = package.Workbook.Worksheets[1];
+                    bool emptyData = true;
+                    var startFrom = worksheet.Dimension.Start;
+                    var finishTo = worksheet.Dimension.End;
+                    bool semanticEmpty = IsRowEmpty(worksheet, dataStartsFromRow);
+                    List<string> colExcelSemantics = new List<string>();
+                    if (semanticEmpty)
+                        throw new Exception("рядок {0} з семантикою колонок - порожній");
+                    for (int col = dataStartFromCol; col <= finishTo.Column; col++)
+                    {
+                        object colSemantic = worksheet.Cells[dataStartsFromRow, col].Value ?? "";
+                        if (string.IsNullOrEmpty(colSemantic.ToString()))
+                            break;
+                        colExcelSemantics.Add(colSemantic.ToString());
+                    }
+                    dataStartsFromRow++;
+                    if (colExcelSemantics.Count() == 0)
+                        throw new Exception("семантика в першому стовбці не заповнена");
+                    List<FieldProperties> SemanticFields = SqlStatementParamsParser.ParsConvertParams(func, colExcelSemantics);
+                    string beginRow = "<Row>";
+                    string endRow = "</Row>";
+                    byte[] resBytes;
+                    Models.Column columnPars = new Models.Column();
+                    StringBuilder xmlStart = new StringBuilder();
+                    string xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><body>";
+                    string startTag = "<Column><Tag>";
+                    string startValue = "</Tag><Value>";
+                    string endValue = "</Value></Column>";
+                    string endXml = "</body></root>";
+                    sw.Write(xmlHeader);
+                    
+                    for (int irow = dataStartsFromRow; irow <= finishTo.Row; irow++)
+                    {
+                        sw.Write(beginRow);
+                        //  xmlRes.Append(beginRow);
+                        // Row rowFields = new Row();
+                        curCol = dataStartFromCol;
+                        foreach (var item in SemanticFields)
+                        {
+                            //decimal? resPersent;
+                            //if (item.ColNum == 9)
+                            //    worksheet.Cells[irow, item.ColNum.Value].Style.Numberformat.Format = "###,##%";
+                            string res = worksheet.Cells[irow, item.ColNum.Value].Text ?? "";
+                            var objRes = worksheet.Cells[irow, item.ColNum.Value];
+                            //string resString = res.ToString();
+                            //string format = worksheet.Cells[irow, item.ColNum.Value].Style.Numberformat.Format;
+                            //if (!string.IsNullOrEmpty(format) && format.Contains('%') && !string.IsNullOrEmpty(resString))
+                            //{
+                            //    resPersent = (decimal)res ;
+                            //    if (resPersent != null)
+                            //        resPersent = resPersent * 100;
+                            //    resString = resPersent.ToString() + '%';
+                            //}
+                            //else
+                            //    resString = res.ToString();
+                            sw.Write(startTag);
+                            sw.Write(item.Value);
+                            sw.Write(startValue);
+                            sw.Write(res);
+                            sw.Write(endValue);
+
+                        }
+                        sw.Write(endRow);
+                        //xmlRes.Append(endRow);
+                        //if(irow % 10000 == 0)
+                        //{
+                        //     rowBytes.AddRange(unicode.GetBytes(xmlRes.);
+
+                        //    xmlRes.Clear();
+                        //}
+
+
+
+
+                    }
+                    //xmlRes.Append("</body></root>");
+                    sw.Write(endXml);
+                    sw.Close();
+                    sw.Dispose();
+                    sw = null;
+                    connector.ParmeterBytes = File.ReadAllBytes(path);
+                    //resBytes = unicode.GetBytes(xmlRes.ToString());
+                    //int countBytes = resBytes.Length;
+                    connector.CommandClob.Write(connector.ParmeterBytes, 0, connector.ParmeterBytes.Length);
+                   
+
+                }
+                finally
+                {
+                    if (sw != null)
+                    {
+                        sw.Close();
+                        sw.Dispose();
+                        sw = null;
+                    }
+                    File.Delete(path);
+                }
+                
+
+            }
+        }
+        public static StreamWriter GetStreamWriterToFile(string path, Encoding encoding)
+        {
+            return new StreamWriter(File.Open(path, FileMode.Create), encoding);
+        }
+        public static void CreateNewDirectoryAndFile(string path)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+
+        }
+        private bool IsRowEmpty(ExcelWorksheet worksheet, int irow)
+        {
+            var start = worksheet.Dimension.Start;
+            var end = worksheet.Dimension.End;
+            for (int icol = start.Column; icol <= end.Column; icol++)
+                if (!String.IsNullOrEmpty(worksheet.Cells[irow, icol].Text))
+                {
+                    return false;
+                }
+            return true;
         }
     }
 }

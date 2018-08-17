@@ -2,6 +2,7 @@
 using System.Data;
 using Bars.Classes;
 using Oracle.DataAccess.Client;
+using Oracle.DataAccess.Types;
 
 namespace BarsWeb.Areas.Ndi.Models
 {
@@ -10,6 +11,8 @@ namespace BarsWeb.Areas.Ndi.Models
     /// </summary>
     public class OracleDbModel : IDisposable
     {
+        public OracleClob CommandClob { get; set; }
+        public byte[] ParmeterBytes;
         public OracleDbModel()
         {
             //
@@ -133,6 +136,16 @@ namespace BarsWeb.Areas.Ndi.Models
                     _command.Dispose();
                 _command = null;
             }
+
+            if (CommandClob != null)
+            {
+                CommandClob.Close();
+                CommandClob.Dispose();
+                CommandClob = null;
+                ParmeterBytes = null;
+            }
+              
+        
             if (_conn != null && _conn.State == ConnectionState.Open)
             {
                 _conn.Close();
