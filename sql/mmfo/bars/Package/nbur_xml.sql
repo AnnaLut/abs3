@@ -1,6 +1,7 @@
 CREATE OR REPLACE package BARS.NBUR_XML
 is
 
+
   --
   -- constants
   --
