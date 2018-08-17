@@ -224,6 +224,16 @@ end;
 / 
 COMMENT ON COLUMN BARS.CIM_F504.P030 IS 'Код країни кредитора';
 
+begin
+    execute immediate 'alter table bars.cim_f504 add (F057 CHAR(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_F504.F057 IS 'Вид запозичення';
+
+
 PROMPT *** Create  grants  CIM_F504 ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CIM_F503        to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CIM_F503        to UPLD;
