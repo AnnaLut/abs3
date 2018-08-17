@@ -76,6 +76,17 @@ begin
 															  );
 					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
+      --  Створюємо функцію Імпорт нерухомих вкладів АСВО
+	  l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Імпорт нерухомих вкладів з АСВО',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||'&'||'sPar=V_P_MIGRAASIMM[NSIFUNCTION][PROC=>sk_test.init][EXEC=>BEFORE][showDialogWindow=>false]',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+												  
+					 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WNER) - АРМ Нерухомі (WEB)  ');
     l := l_function_ids.first;
     while (l is not null and l_function_ids(l)  is not null) loop

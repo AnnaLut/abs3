@@ -58,10 +58,10 @@ declare
 
 begin
 
-  l_tabsemantic := 'Миграция неподвижных вкладов. Проверка №1._';
-  l_tablinesdef := '';
+  l_tabsemantic := 'АУДИТ';
+  l_tablinesdef := '10';
   l_tabselect_statement := '';
-  l_tabname     := 'PROV31';
+  l_tabname     := 'VV_P_SEC_AUDIT';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
@@ -124,28 +124,9 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'BRANCH', 'C', 'Бранч', '', 35, 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'NBS', 'C', 'БР', '', 4, 2, 1, 1, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'OB22', 'C', 'ОБ22', '', 3, 3, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NLS', 'C', 'OР', '', 15, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'KV', 'N', 'Вал', '', 22, 5, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NMS', 'C', 'Найменування ОР', '', 38, 10, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'OSTC', 'N', 'Залишок', '', 22, 6, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'SOST', 'N', 'Сума~нерухомих', '', 22, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'DIFF', 'N', 'Різниця', '', 22, 8, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 10, 'CNT', 'N', 'К-ть~нерухомих', '', 22, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 1, 1, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 2, 2, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 3, 3, 'ASC ');
-
-  -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 5, 4, 'ASC ');
+  bars_metabase.add_column(l_tabid, 1, 'DATTE', 'D','Дата', '2', 7, 1, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'USERID','N', 'Користувач',  '2', 22, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'MES', 'C','Повідомлення',  '20', 300, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
