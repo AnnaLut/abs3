@@ -1102,7 +1102,7 @@ $end
                                )
                         ) ;                           
 
-     when '6EX' then
+     when '#6E' then
          open p_recordset
          for
            select substr(t.FIELD_CODE, 1, 6) as EKP
