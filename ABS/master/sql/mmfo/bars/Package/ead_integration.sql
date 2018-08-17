@@ -3,7 +3,7 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql ====
 PROMPT ===================================================================================== 
 
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-43 3.1 04.06.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-43 3.2 10.08.2018 MMFO';
    g_type_id  object_type.id%type;
    g_state_id number;
 
@@ -20,11 +20,12 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
                      p_id          out deal.id%type,
                      p_deal_number out deal.deal_number%type,
                      p_start_date  out deal.start_date%type,
-                     p_state_id    out deal.state_id%type);
- 
-function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
-                               p_tip  varchar2,
-                               p_ob22 varchar2 ) return number;                     
+                     p_state_id    out number);
+
+function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs так и nls
+                               p_tip      varchar2,
+                               p_ob22     varchar2,
+                               p_CUSTTYPE INTEGER default null ) return number;
    -----------------------------------------------------------------------
    -- EADService.cs         Structs.Params.Dict.GetData
    -----------------------------------------------------------------------
@@ -452,7 +453,7 @@ show errors
 
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
-   g_body_version constant varchar2(64) := 'version 3.0 01.02.2018 MMFO';
+   g_body_version constant varchar2(64) := 'version 3.1 10.08.2018 MMFO';
 
    type TAccAgrParam is record
    (
@@ -530,7 +531,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
      if (l_agr_type is null or l_agr_type in ('dkbo_fo'))
      then
       begin
-       select case when nbs = '2625' then 'bpk_fo' end
+       select case when nbs = '2625' or nbs = '2620' then 'bpk_fo' end
          into l_res
          from accounts
         where acc= p_acc;
@@ -614,7 +615,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                      p_id          out deal.id%type,
                      p_deal_number out deal.deal_number%type,
                      p_start_date  out deal.start_date%type,
-                     p_state_id    out deal.state_id%type) is
+                     p_state_id    out number) is
    begin
         begin
       /*SELECT d.id, d.deal_number, d.start_date, d.state_id
@@ -666,10 +667,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                 null;
         end;
    end get_dkbo;
- 
- function ead_nbs_check_param  (p_nbs  varchar2, -- можно передавать как nbs так и nls
-                                p_tip  varchar2,
-                                p_ob22 varchar2 ) return number is 
+
+ function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs так и nls
+                                p_tip      varchar2,
+                                p_ob22     varchar2,
+                                p_CUSTTYPE INTEGER default null ) return number is
  l_nbs varchar2(14);  
  l_id  number(10);   
                       
@@ -685,11 +687,12 @@ begin
                 count(e.nbs) over(partition by e.nbs ) coun
            from ead_nbs e
           where e.nbs = l_nbs
+          and e.custtype = nvl(p_CUSTTYPE, e.custtype)
                
            )
  loop
 
-     dbms_output.put_line(' 1 ->'||rec.id ); 
+   --  dbms_output.put_line(' 1 ->'||rec.id ); 
     if     nvl(rec.tip,'0')  = p_tip and nvl(rec.ob22,'0')  = p_ob22  then l_id:= rec.id ; 
     elsif nvl(rec.tip,'0')  = p_tip  and nvl(rec.ob22,'0') <> p_ob22 then l_id:= rec.id ; 
     elsif nvl(rec.tip,'0')  <> p_tip  and    nvl(rec.ob22,'0') = p_ob22 then l_id:= rec.id ;
@@ -703,7 +706,8 @@ begin
            from ead_nbs e
           where e.nbs = l_nbs 
            and e.tip is null
-           and e.ob22 is null;         
+           and e.ob22 is null
+		   and e.custtype = nvl(p_CUSTTYPE, e.custtype);         
   end if; 
  
     return l_id;
