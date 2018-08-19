@@ -25,8 +25,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels
 
         public List<CallFuncRowParam> RowsData { get; set; }
 
-        public HttpPostedFileBase UploadedFile { get; set; }
-
 
     }
 }

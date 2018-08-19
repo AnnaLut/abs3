@@ -16,10 +16,6 @@ using BarsWeb.Areas.Ndi.Models.ViewModels;
 using BarsWeb.Areas.Ndi.Models.FilterModels;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
-using System.Reflection;
-using BarsWeb.Core.Models.Json;
-using Oracle.DataAccess.Client;
-using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 
 namespace BarsWeb.Areas.Ndi.Controllers
 {
@@ -27,12 +23,10 @@ namespace BarsWeb.Areas.Ndi.Controllers
     public class ReferenceBookController : Controller
     {
         private readonly IReferenceBookRepository _repository;
-        private const string ResultContentType = "text/html";
-        private JsonResponse JsonResult;
+
         public ReferenceBookController(IReferenceBookRepository repository)
         {
             _repository = repository;
-            JsonResult = new JsonResponse();
         }
         [Inject]
         public IDbLogger Logger { get; set; }
@@ -53,7 +47,6 @@ namespace BarsWeb.Areas.Ndi.Controllers
         public ActionResult UploadTemplateFile(string fieldFileName, int? tableId, int? funcId, int? codeOper, string jsonFuncParams = "", string procName = "", string msg = "",
                   string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
         {
-            
             //string[] supportedTypes = new string[]{
             //    "png", "gif", "tiff", "bmp", "jpg", "jpeg", "htm" ,"rtf", "xml", "txt", "doc"
             //};
@@ -62,6 +55,11 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
                 List<FieldProperties> additionalParams = new List<FieldProperties>();
                 List<FieldProperties> funcParams = FormatConverter.JsonToObject<List<FieldProperties>>(jsonFuncParams) ?? new List<FieldProperties>();
+                //if (!string.IsNullOrEmpty(jsonSqlProcParams))
+                //{
+                //    jsonSqlProcParameter = JsonConvert.DeserializeObject<List<FieldProperties>>(jsonSqlProcParams);
+                //    funcParams.AddRange(jsonSqlProcParameter.Where(x => !funcParams.Select(c => c.Name).Contains(x.Name)));
+                //}
 
                 HttpPostedFileBase postedFile = Request.Files[fieldFileName];
                 if (postedFile != null)
@@ -75,10 +73,10 @@ namespace BarsWeb.Areas.Ndi.Controllers
                     string fileName = postedFile.FileName;
                     if (fileName.Contains('\\'))
                         fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-
+                  
 
                     //string result = Encoding.UTF8.GetString(binData);
-
+                    
                     if (funcParams.Count() > 0 && funcParams.FirstOrDefault(c => c.Type == "CLOB") != null)
                         funcParams.FirstOrDefault(c => c.Type == "CLOB").Value = Encoding.UTF8.GetString(binData);
                     else
@@ -92,60 +90,29 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
                     string res = _repository.CallRefFunction(tableId, funcId, codeOper, null, funcParams, procName, msg, web_form_name, null, additionalParams);
                     //_repository.ExecProcWithClobParam(result, fileName, null, 0);
-                    return Content("{success: 'true', resultMessage: '"+ res + "'}");
+                    //to do sth with the file
+                    return Json(new { success = "true", resultMessage = res });
+                    //}
+                    //else
+                    //{
+                    //    return new JsonResult()
+                    //    {
+                    //        ContentType = "text/html",
+                    //        Data = new { success = false, error = "Unsupported file type" }
+                    //    };
+                    //   // return Content("{success:false, error:\"Unsupported file type\"}");
+                    //}
                 }
-                string result = "{success: 'false', resultMessage: 'файл не було завантажено'}";
-                return Content(result);
+                return Json(new { success = "false", resultMessage =  "файл не було завантажено"});
 
             }
             catch (Exception e)
             {
-                return Content("{success: 'false', errorMessage: '"+ e.Message  +"'}");
+                return Json(new { success = "false", errorMessage = e.Message });
             }
         }
 
 
-        [HttpGet]
-        public ViewResult GetUploadFile(int? funcId, int? tabid,string code = null)
-        {
-            CallFunctionMetaInfo func = null;
-            if (funcId != null && tabid != null)
-             func  = _repository.GetCallFunction(tabid.Value, funcId.Value);
-            if (func != null)
-                SqlStatementParamsParser.BuildFunction(func);
-            return View(func);
-        }
-
-        [HttpPost]
-        public ActionResult PostUploadFile(string fileName, string date,int? tabid, int? funcid)
-        {
-            var file = Request.Files[0];
-
-            try
-            {
-               
-                string dirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                JsonResult.Message =  _repository.CallParsExcelFunction(file, fileName, date, tabid, funcid);
-                JsonResult.Status = JsonResponseStatus.Ok;
-                return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
-                    
-                }
-
-            
-            catch (OracleException orex)
-            {
-                JsonResult.Status = JsonResponseStatus.Error;
-                JsonResult.Message = orex.Message;
-                JsonResult.Data = orex.Data;
-            }
-            catch (Exception ex)
-            {
-                JsonResult.Status = JsonResponseStatus.Error;
-                JsonResult.Message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
-            }
-
-            return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
-        }
 
         /// <summary>
         /// Вывод грида с данными справочника

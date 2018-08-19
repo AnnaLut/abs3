@@ -9,9 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-using BarsWeb.Areas.Ndi.Infrastructure.Helpers;
-using Oracle.DataAccess.Types;
-using System.Text;
+
 /// <summary>
 /// Summary description for OraTypesHelper
 /// </summary>
@@ -53,70 +51,19 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
             return dictionaryList;
         }
 
-        static public List<OraDictionary> BuildRowsDataDict(List<CallFuncRowParam> RowsData, ConvertParams multiParam)
-        {
-
-            List<OraDictionary> dictionaryList = new List<OraDictionary>();
-            foreach (var row in RowsData)
-            {
-                List<OraDictionaryItem> dictionary = new List<OraDictionaryItem>();
-                foreach (var item in row.RowParams)
-                {
-                    
-                        if (item.Type == "D")
-                        {
-                            DateTime date = new DateTime();
-                            bool isDate = DateTime.TryParse(item.Value, out date);
-                            if (isDate)
-                                item.Value = date.ToString("ddMMyyyy");
-                        }
-                        dictionary.Add(new OraDictionaryItem() { Key = item.Name, Value = item.Value });
-                    
-                }
-                dictionaryList.Add((OraDictionary)dictionary);
-
-            }
-            return dictionaryList;
-        }
-
-        static public void AddMoltiParamsToProc(CallFunctionMetaInfo callFunction,
-            MultiRowParamsDataModel dataModel, OracleDbModel oraConnector)
-        {
-            if (callFunction.MultiRowsParams.FirstOrDefault(x =>  x.GetFrom == "EXCEL_FILE") != null)
-                WriteXmlToClobFromFile(callFunction, dataModel, oraConnector);
-            else
-                AddListDictionaryParam(callFunction, dataModel, oraConnector);
-        }
         static public void AddListDictionaryParam(CallFunctionMetaInfo callFunction,
-            MultiRowParamsDataModel dataModel, OracleDbModel oraConnector )
+            MultiRowParamsDataModel dataModel, OracleCommand command)
         {
-            OracleCommand command = oraConnector.GetCommand;
             foreach (var item in callFunction.MultiRowsParams)
             {
-                List<OraDictionary> oraDictionary;
                 OracleParameter dictionaryParameter = new OracleParameter(item.ColName, OracleDbType.Array, ParameterDirection.Input);
-                if(item is ConvertParams)
-                    oraDictionary = OraTypesHelper.BuildRowsDataDict(dataModel.RowsData, item as ConvertParams);
-                else
-                    oraDictionary =  OraTypesHelper.BuildRowsDataDict(dataModel.RowsData, item);
+                List<OraDictionary> oraDictionary = OraTypesHelper.BuildRowsDataDict(dataModel.RowsData, item);
                 dictionaryParameter.Value = (OraDictionaryList)oraDictionary;
                 dictionaryParameter.UdtTypeName = "BARS.T_DICTIONARY_LIST";
                 command.Parameters.Add(dictionaryParameter);
             }
         }
 
-        static public void WriteXmlToClobFromFile(CallFunctionMetaInfo callFunction,
-            MultiRowParamsDataModel dataModel, OracleDbModel oraConnector)
-        {
-            OracleCommand command = oraConnector.GetCommand;
-            oraConnector.CommandClob = new OracleClob(oraConnector.GetConnOrCreate);
-            ExcelHelper excelHelper = new ExcelHelper();
-             excelHelper.GetExcelResByBytes(dataModel.UploadedFile, callFunction, oraConnector);
-                 
-            
-            oraConnector.GetCommand.Parameters.Add(new OracleParameter("p_clob", OracleDbType.Clob, oraConnector.CommandClob, ParameterDirection.Input));
-
-        }
         static public void AddMessageToComand(OracleCommand callFunctionCmd, CallFunctionMetaInfo callFunction)
         {
 
