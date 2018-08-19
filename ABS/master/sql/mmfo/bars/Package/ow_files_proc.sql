@@ -2417,7 +2417,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
                                        ''));
      return l_files;
   end;
-  
+
   function get_err_locpay_list return number_list is
     l_files number_list;
   begin
@@ -2429,7 +2429,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
        for update skip locked
      order by 1;
      return l_files;
-  end;  
+  end;
 
   function lock_file (p_id in number) return boolean
   is
@@ -2635,47 +2635,48 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
         l_pay_files(l_pay_files.last) :=p_files(c_pf);
       end if;
     end loop;
+    
+    if l_pay_files.first is not null then
+      if l_useparallelexec = '1' and p_parallel_enable then
 
-    if l_useparallelexec = '1' and p_parallel_enable then
+       for c_ch in 1 .. l_pay_files.count loop
+         l_sql_chunk := l_sql_chunk||' select '||l_pay_files(c_ch).id||' start_id, '||l_pay_files(c_ch).id||' end_id from dual ';
+         if c_ch <> l_pay_files.last then l_sql_chunk:= l_sql_chunk||'union'; end if;
+       end loop;
 
-     for c_ch in 1 .. l_pay_files.count loop
-       l_sql_chunk := l_sql_chunk||' select '||l_pay_files(c_ch).id||' start_id, '||l_pay_files(c_ch).id||' end_id from dual ';
-       if c_ch <> l_pay_files.last then l_sql_chunk:= l_sql_chunk||'union'; end if;
-     end loop;
-
-      --Запуск
-      l_sql_stmt := 'begin
-                      bars_login.login_user(p_sessionid => substr(sys_guid(), 1, 32),
-                                            p_userid    => '|| USER_ID||',
-                                            p_hostname  => null,
-                                            p_appname   => '' w4_parjob '');
-                      bc.go('''||gl.amfo||''');
-                      if ow_files_proc.lock_file(:start_id) then
-                        ow_files_proc.pay_file(:end_id);
-                      else
-                         bars_audit.info(''ow_files_proc. parallel pars. '' || ''File ''|| :start_id ||'' is processed by another application'');
-                      end if;
-                      bars_login.logout_user;
-                    exception
-                      when others then
+        --Запуск
+        l_sql_stmt := 'begin
+                        bars_login.login_user(p_sessionid => substr(sys_guid(), 1, 32),
+                                              p_userid    => '|| USER_ID||',
+                                              p_hostname  => null,
+                                              p_appname   => '' w4_parjob '');
+                        bc.go('''||gl.amfo||''');
+                        if ow_files_proc.lock_file(:start_id) then
+                          ow_files_proc.pay_file(:end_id);
+                        else
+                           bars_audit.info(''ow_files_proc. parallel pars. '' || ''File ''|| :start_id ||'' is processed by another application'');
+                        end if;
                         bars_login.logout_user;
-                    end;';
-        bars_ow.run_parallel(p_task           => DBMS_PARALLEL_EXECUTE.GENERATE_TASK_NAME('PAY_FILES_'),
-                             p_chunk          => l_sql_chunk,
-                             p_stmt           => l_sql_stmt,
-                             p_parallel_level => l_parallel_level);
+                      exception
+                        when others then
+                          bars_login.logout_user;
+                      end;';
+          bars_ow.run_parallel(p_task           => DBMS_PARALLEL_EXECUTE.GENERATE_TASK_NAME('PAY_FILES_'),
+                               p_chunk          => l_sql_chunk,
+                               p_stmt           => l_sql_stmt,
+                               p_parallel_level => l_parallel_level);
 
-    else
-      for c_f in 1 .. l_pay_files.count loop
-        if lock_file(l_pay_files(c_f).id) then
-           pay_file(l_pay_files(c_f).id);
-           commit;
-        else
-           bars_audit.info(h || 'File ' || l_pay_files(c_f).file_name || ' is processed by another application');
-        end if;
-      end loop;
+      else
+        for c_f in 1 .. l_pay_files.count loop
+          if lock_file(l_pay_files(c_f).id) then
+             pay_file(l_pay_files(c_f).id);
+             commit;
+          else
+             bars_audit.info(h || 'File ' || l_pay_files(c_f).file_name || ' is processed by another application');
+          end if;
+        end loop;
+      end if;
     end if;
-
   end;
 
   procedure pay_error_locpay is
@@ -2688,8 +2689,8 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
       end loop;
     end if;
   end;
-   
-  
+
+
   procedure files_processing(p_kf     in varchar2,
                              p_userid in number default 1) is
     l_files t_files := t_files();
@@ -2711,9 +2712,13 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
     end if;
     -- намагаємося платити зависші платежі на вільні реквізити
     pay_error_locpay;
-    
-    bars_login.logout_user;
 
+    bars_login.logout_user;
+  exception
+    when others then
+      bars_audit.error('OW_FILES_PROC.FILES_PROCESSING. ERROR: '||dbms_utility.format_error_stack() || chr(10) ||
+            dbms_utility.format_error_backtrace());
+    bars_login.logout_user;
   end;
 
   function get_docs_buffers (p_key in varchar2)
@@ -2744,7 +2749,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
                        join oper o on mm.ref_tr = o.ref
                                   and o.sos between 0 and 4
                                   and o.pdat >= trunc (sysdate) - 10
-------------------------                           
+------------------------
                  where rownum <= 1000
                    )
           loop
@@ -2805,7 +2810,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 
 	  l_p1      number;
       l_p2      number;
-	  
+
       h          varchar2(100) := 'ow_files_proc.put_doc_sign. ';
   begin
 
@@ -2881,14 +2886,14 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
   procedure set_tran_state(p_fileid in number,
                            p_idn    number,
                            p_state  in number) is
-  
+
     l_filetype varchar2(100);
     h          varchar2(100) := 'ow_files_proc.set_tran_state. ';
   begin
-  
+
     bars_audit.info(h || 'Start: p_fileid=>' || to_char(p_fileid) || ' p_idn=>' || to_char(p_idn)||
                     'p_state=>'||p_state);
-  
+
     -- определяем тип файла
     begin
       select file_type into l_filetype from ow_files where id = p_fileid;
@@ -2897,9 +2902,9 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
         bars_audit.error(h || 'File not found p_id=>' || to_char(p_fileid));
         bars_error.raise_nerror(g_modcode, 'FILE_NOT_FOUND');
     end;
-  
+
     bars_audit.info(h || 'l_filetype=>' || l_filetype);
-  
+
     if l_filetype in (g_filetype_atrn, g_filetype_ftrn) then
       update ow_oic_atransfers_data t
          set t.state = p_state
@@ -2916,10 +2921,10 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
        where t.id = p_fileid
          and t.idn = p_idn;
     end if;
-  
+
     bars_audit.info(h || 'Finish.: p_id=>' || to_char(p_fileid) || ' p_idn=>' || to_char(p_idn)||
                     'p_state=>'||p_state);
-  
+
   end;
 
 	-- функция формирования дод. реквизита «Way4 Код транзакції» на основании привязки счетов к договору
@@ -2940,7 +2945,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 			and r.tip = a.tip
 		 where a.nls = p_nls
 			and a.kv = p_kv;
-	
+
 		return l_w4_msgcode;
 	exception
 		when others then
@@ -2949,7 +2954,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 
 	-- функция уточнения счета кредита для счето 6___, не привязанных к договору
 	function get_w4_nlsb(p_nls accounts.nls%type, p_ref oper.ref%type)
-	return varchar2 
+	return varchar2
         as
 		l_nls accounts.nls%type;
 	begin
@@ -2958,7 +2963,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
               -- и подставляем его номер вместо счета 6___
               select a.nls
               into l_nls
-              from opldok d 
+              from opldok d
               join accounts a on a.acc = d.acc
               where d.ref = p_ref and d.dk = 1 and a.tip = 'SN8' ;
 	   else
@@ -3003,7 +3008,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 							  WHERE nlsa = o1.nlsa
 								 AND pdat >= bankdate - 30
 								 AND tt != l_tt
-								 and ref in (select ref from ow_pkk_que)								 
+								 and ref in (select ref from ow_pkk_que)
 								 AND sos BETWEEN 2 AND 4)
 					  AND sos > 0
 					  AND pdat >= bankdate - 30
@@ -3016,7 +3021,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 								 and sos = 1
 								 and drn is not null)
 					GROUP BY nlsa);
-	
+
 		return l_oper;
 	exception
 		when others then
@@ -3029,7 +3034,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 		l_tt   oper.tt%type;
 	begin
 		l_tt := NVL(getglobaloption('ASG_FOR_BPK'), 'W4Y');
-	
+
 		-- документы на пополнение/списание
 		SELECT T_ow_iicfiles_oper(ref,
 										  dk,
@@ -3106,7 +3111,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 								 2,
 								 '0');
 		l_mfo      := getglobaloption('MFO');
-	
+
 		SELECT T_ow_iicfiles_form(p.acc,
 										  p.REF,
 										  p.dk,
@@ -3119,8 +3124,8 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 										  p.nazn,
 										  p.w4_msgcode,
 										  p.tt_asg,
-										  p.kv) BULK COLLECT 
-		  INTO l_oper 
+										  p.kv) BULK COLLECT
+		  INTO l_oper
 		  FROM (SELECT q.acc,
 							q.REF,
 							q.dk,
@@ -3220,7 +3225,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 								 2,
 								 '0');
 		l_mfo      := getglobaloption('MFO');
-	
+
 		SELECT T_ow_iicfiles_form(p.acc,
 										  p.REF,
 										  p.dk,
@@ -3234,7 +3239,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 										  p.w4_msgcode,
 										  p.tt_asg,
 										  p.kv) BULK COLLECT
-		  INTO l_oper 
+		  INTO l_oper
 		  FROM (SELECT q.acc,
 							q.REF,
 							q.dk,
