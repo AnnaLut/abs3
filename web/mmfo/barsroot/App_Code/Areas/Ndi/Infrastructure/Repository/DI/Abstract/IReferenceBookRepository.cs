@@ -11,11 +11,10 @@ using barsroot.core;
 using BarsWeb.Areas.Ndi.Models.DbModels;
 using BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers.ViewModels;
-using System.Web;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
 {
-    public interface IReferenceBookRepository 
+    public interface IReferenceBookRepository
     {
         /// <summary>
         /// Выполнить экспорт данных в Excel
@@ -96,7 +95,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
        string CallRefFunction(int? tableId, int? funcId,int? codeOper,int? columnId, List<FieldProperties> jsonFuncParams, 
             string procName = "", string msg = "", string web_form_name = "", string jsonSqlProcParams = "", List<FieldProperties> addParams = null);
 
-        string CallParsExcelFunction(HttpPostedFileBase excelFile, string fileName, string date,int? tabid,int? funcid);
         string CallEachFuncWithMultypleRows(int? tableId, int? funcId, int? codeOper, int? columnId, MultiRowParamsDataModel dataModel, string funcText = "", string msg = "", string web_form_name = "", string ListjsonSqlProcParams = "");
         /// <summary>
         /// Получить дерево справочников в формате необходимом для клиентского extjs дерева
@@ -162,7 +160,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         MetaCallSettings GetMetaCallSettingsByAppCodeAndTabid(string appCode,int tabId);
         FunNSIEditFParams GetNsiParams(string nsiParamString, int? baseCodeOper = null, List<FieldProperties> rowParams = null);
         CallFunctionMetaInfo GetFunctionsMetaInfo(int? codeOper, string code = "");
-        CallFunctionMetaInfo GetCallFunction(int tableId, int funcid);
         MetaTable GetMetaTableByName(string name);
 
         MetaTable GetMetaTableById(int id);

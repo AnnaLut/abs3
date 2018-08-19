@@ -276,14 +276,13 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             string res = string.Empty;
             if (!string.IsNullOrEmpty(base64String))
             {
-                base64String = base64String.Replace(" ", "+");
+         base64String = base64String.Replace(" ", "+");
                 int mod4 = base64String.Length % 4;
                 if (mod4 > 0)
                 {
                     base64String += new string('=', 4 - mod4);
                 }
                 var bytes = Convert.FromBase64String(base64String);
-                if(bytes != null)
                 res = Encoding.UTF8.GetString(bytes);
             }
             return res;
@@ -296,7 +295,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
             if (!string.IsNullOrEmpty(param))
             {
                 var bytes = Encoding.UTF8.GetBytes(param);
-                if(bytes != null && bytes.Length > 0)
                 res = HttpServerUtility.UrlTokenEncode(bytes);
             }
             return res;
@@ -315,8 +313,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                 //}
 
                 var bytes = HttpServerUtility.UrlTokenDecode(param);
-                if (bytes != null && bytes.Length > 0)
-                    res = Encoding.UTF8.GetString(bytes);
+                res = Encoding.UTF8.GetString(bytes);
             }
             return res;
         }

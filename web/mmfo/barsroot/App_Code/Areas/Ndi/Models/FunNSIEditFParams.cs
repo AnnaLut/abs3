@@ -16,21 +16,16 @@ namespace BarsWeb.Areas.Ndi.Models
 {
     public class FunNSIEditFParams
     {
- private string WebFormName;
-        public FunNSIEditFParams()
-        {
-        }
-        public FunNSIEditFParams(string webFormName)
-        {
-            if(string.IsNullOrEmpty(webFormName))
-            throw new Exception("строка параметрів порожня");
-            this.WebFormName = webFormName;
-            BuildParams();
-        }
 
+        public FunNSIEditFParams(string stringFunNSIEditFParams)
+        {
+            this.FunNSIEditFParamsArray = GetParamArrayByString(stringFunNSIEditFParams);
+            this.ParsParams(this.FunNSIEditFParamsArray);
+            BuildParams();
+
+        }
         public FunNSIEditFParams(MetaCallSettings settings)
         {
-            this.WebFormName = settings.WEB_FORM_NAME;
             this.ACCESS_CODE = settings.ACCESSCODE ?? 1;
             this.TableName = settings.TABNAME ?? "";
             this.SaveColumns = settings.SAVE_COLUMN ?? "";
@@ -87,7 +82,6 @@ namespace BarsWeb.Areas.Ndi.Models
         public string OutParams { get; set; }
         public string SystemParams { get; set; }
         public string UploadParams { get; set; }
-        public string ConvertParams { get; set; }
         public string Conditions { get; set; }
         public string RenderFunctionsIn { get; set; }
 
@@ -111,13 +105,6 @@ namespace BarsWeb.Areas.Ndi.Models
             return arrayStr;
         }
 
-        private void ParsWebFormName()
-        {
-            if (string.IsNullOrEmpty(this.WebFormName))
-                return;
-            this.FunNSIEditFParamsArray = GetParamArrayByString(this.WebFormName);
-            this.ParsParams(this.FunNSIEditFParamsArray);
-        }
         public void ReplaceParams(List<FieldProperties> rowParams)
         {
             if (!string.IsNullOrEmpty(this.QST))
@@ -173,10 +160,6 @@ namespace BarsWeb.Areas.Ndi.Models
             string uploadPrams = paramsArray.FirstOrDefault(u => u.Contains("UPLOAD_PARAMS"));
             if (!string.IsNullOrEmpty(uploadPrams))
                 this.UploadParams = uploadPrams.Substring(uploadPrams.IndexOf("UPLOAD_PARAMS=>") + "UPLOAD_PARAMS=>".Length).Trim();
-
-            string convertParams = paramsArray.FirstOrDefault(u => u.Contains("CONVERT_PARAMS"));
-            if (!string.IsNullOrEmpty(convertParams))
-                this.ConvertParams = convertParams.Substring(convertParams.IndexOf("CONVERT_PARAMS=>") + "CONVERT_PARAMS=>".Length).Trim();
 
             string multiParam = paramsArray.FirstOrDefault(u => u.Contains("MULTI_ROW_PARAMS=>"));
             if (!string.IsNullOrEmpty(multiParam))
@@ -256,7 +239,6 @@ namespace BarsWeb.Areas.Ndi.Models
 
         private void BuildParams()
         {
-            ParsWebFormName();
             this.FunNSIEditFParamsInfo = new List<ParamMetaInfo>();
             this.ParamsNames = new List<string>();
             this.RowParamNames = new List<string>();
@@ -325,7 +307,6 @@ namespace BarsWeb.Areas.Ndi.Models
             func.SysPar = this.SystemParams;
             func.UploadParams = UploadParams;
             func.ThrowNsiParams = this.ThrowNsiParams;
-            func.ConvertParams = this.ConvertParams;
             List<ParamMetaInfo> paramsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<ParamMetaInfo>(func.PROC_NAME, func.PROC_PAR);
             List<UploadParamsInfo> uploadParamsInfo = SqlStatementParamsParser.GetSqlFuncCallParamsDescription<UploadParamsInfo>(func.PROC_NAME, func.PROC_PAR);
 
@@ -375,7 +356,6 @@ namespace BarsWeb.Areas.Ndi.Models
             func.UploadParams = this.UploadParams;
             func.PROC_EXEC = GetProcExec(func, this);
             func.ThrowNsiParams = this.ThrowNsiParams;
-            func.ConvertParams = this.ConvertParams;
             return func;
         }
 
@@ -390,11 +370,6 @@ namespace BarsWeb.Areas.Ndi.Models
                         func.PROC_EXEC = FuncProcNames.INTERNER_LINK_WITH_PARAMS.ToString();
                     else
                         func.PROC_EXEC = FuncProcNames.LINK_FUNC_BEFORE.ToString();
-                }
-                else
-                    if(func.MultiRowsParams != null && func.MultiRowsParams.Count() > 0 && func.MultiRowsParams.FirstOrDefault(x => x.Kind == "FROM_UPLOAD_EXCEL") != null)
-                {
-                    func.PROC_EXEC ="FROM_UPLOAD_EXCEL";
                 }
                 else
                     func.PROC_EXEC = this.EXEC;

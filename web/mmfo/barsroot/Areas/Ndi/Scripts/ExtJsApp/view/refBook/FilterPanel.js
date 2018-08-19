@@ -6,7 +6,7 @@ Ext.define('ExtApp.view.refBook.FilterPanel', {
     collapsed: true,
     collapsible: true,
     cls: 'extfilter-panel',
-    title: 'фільтри та панель керування',
+    title: 'фільтри',
     header: {
         listeners: {
             dblclick: function (header) {

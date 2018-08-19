@@ -17,7 +17,6 @@ namespace BarsWeb.Areas.Ndi.Models
         /// Значение в строковом виде, так как передается json-ом с клиента на сервер, конвертится к нужному типу на основе Type 
         /// </summary>
         public string Value { get; set; }
-        public int? ColNum { get; set; }
 
         public byte[] ByteBody { get; set; }
         /// <summary>
