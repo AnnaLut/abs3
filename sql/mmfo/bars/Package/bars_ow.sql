@@ -8692,22 +8692,22 @@ begin
 
   if l_filetype = g_filetype_atrn then
 
-     update ow_oic_atransfers_data set err_text = null where id = p_id;
+     update ow_oic_atransfers_data set err_text = null where id = p_id and nvl(state, 0) <> 99;
      ipay_oic_atransfers_file(p_id, l_filename, l_filedate);
 
   elsif l_filetype = g_filetype_ftrn then
 
-     update ow_oic_atransfers_data set err_text = null where id = p_id;
+     update ow_oic_atransfers_data set err_text = null where id = p_id and nvl(state, 0) <> 99;
      ipay_oic_ftransfers_file(p_id, l_filename);
 
   elsif l_filetype = g_filetype_strn then
 
-     update ow_oic_stransfers_data set err_text = null where id = p_id;
+     update ow_oic_stransfers_data set err_text = null where id = p_id  and nvl(state, 0) <> 99;
      ipay_oic_stransfers_file(p_id, l_filename);
 
   elsif l_filetype = g_filetype_doc then
 
-     update ow_oic_documents_data set err_text = null where id = p_id;
+     update ow_oic_documents_data set err_text = null where id = p_id  and nvl(state, 0) <> 99;
      ipay_oic_documents_file(p_id, l_filename);
 
   else
