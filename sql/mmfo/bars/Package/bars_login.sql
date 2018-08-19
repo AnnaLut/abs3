@@ -1152,12 +1152,13 @@ $end
         l_client_identifier := get_session_clientid();
   
         -- Проходим по всем зарегистрир. сессиям, кроме собственной
-        for i in (select s.*, u.logname
+        for i in (select s.client_identifier, s.program_name, u.logname, max(s.login_time) login_time
                   from   staff_user_session s
                   left join staff$base u on u.id = s.user_id
                   --left join mv_global_context c on c.client_identifier = s.client_identifier
                   where  s.client_identifier <> l_client_identifier and
-                         s.logout_time is null) loop
+                         s.logout_time is null
+                  group by s.client_identifier, s.program_name, u.logname) loop
 
             -- для сессий, запущенных от имени программ, которые не держат подключение постоянно, проверяем время последней активности
             -- для остальных программ (sqlplus, toad, сессии порожденные job-ами и т.д.) проверяется наличие живой сессии Oracle
