@@ -280,6 +280,7 @@ is
     then raise_application_error( -20666, 'Parameter [p_kf] must be specified!' );
     else null;
     end case;
+    l_client_identifier_my := bars_login.get_session_clientid;
 
     begin
       select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER

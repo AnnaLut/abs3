@@ -35,7 +35,7 @@ begin
   values (l_file_id, 9, 'PDATE', 'Дата видачі', 'DATE', 7, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
-  values (l_file_id, 10, 'ORGAN', 'Орган видачі', 'VARCHAR2', 70, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
+  values (l_file_id, 10, 'ORGAN', 'Орган видачі', 'VARCHAR2', 150, null, null, null, 'Y', null, '35,09,13,10|32,32,32,32', null, null, null);
 
   insert into upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
   values (l_file_id, 11, 'PASSP_EXPIRE_TO', 'Документ дійсний до', 'DATE', 7, null, 'dd/mm/yyyy', null, 'Y', null, null, null, null, null);
