@@ -19,7 +19,7 @@ begin
 	SER VARCHAR2(10), 
 	NUMDOC VARCHAR2(20), 
 	PDATE DATE, 
-	ORGAN VARCHAR2(70), 
+	ORGAN VARCHAR2(150), 
 	PASSP_EXPIRE_TO DATE, 
 	PASSP_TO_BANK DATE, 
 	OKPO VARCHAR2(14), 
@@ -311,6 +311,18 @@ alter table bars_dm.customers_plt modify merried varchar2(500);
 
 prompt alter column adr_work_adr modify varchar2(100)
 alter table bars_dm.customers_plt modify ADR_WORK_ADR VARCHAR2(100);
+
+prompt alter column organ modify varchar2(150)
+alter table bars_dm.customers_plt modify ORGAN VARCHAR2(150);
+
+prompt modify id null -- unused column
+begin
+    execute immediate 'alter table bars_dm.customers_plt modify id null';
+exception
+    when others then
+        if sqlcode = -1451 then null; else raise; end if;
+end;
+/
 
 PROMPT *** Create  grants  CUSTOMERS_PLT ***
 grant SELECT                                                                 on CUSTOMERS_PLT   to BARSREADER_ROLE;

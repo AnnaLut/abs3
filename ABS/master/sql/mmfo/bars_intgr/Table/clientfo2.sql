@@ -14,7 +14,7 @@ PASSP NUMBER(22, 0),
 SER VARCHAR2(10),
 NUMDOC VARCHAR2(20),
 PDATE DATE,
-ORGAN VARCHAR2(70),
+ORGAN VARCHAR2(150),
 PASSP_EXPIRE_TO DATE,
 PASSP_TO_BANK DATE,
 KF  VARCHAR2(6),
@@ -439,6 +439,9 @@ comment on column bars_intgr.clientfo2.VIP_ACCOUNT_MANAGER is q'[Аккаунт vip-мен
 
 prompt modify adr_work_adr varchar2(100)
 alter table bars_intgr.clientfo2 modify adr_work_adr varchar2(100);
+
+prompt alter column organ modify varchar2(150)
+alter table bars_intgr.clientfo2 modify ORGAN VARCHAR2(150);
 
 prompt create unique index XPK_CLIENFO2
 

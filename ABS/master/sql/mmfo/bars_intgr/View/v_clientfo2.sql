@@ -10,7 +10,7 @@ CAST (PASSP as NUMBER(22)) AS PASSP,
 CAST (SER as VARCHAR2(10)) AS SER,
 CAST (NUMDOC as VARCHAR2(20)) AS NUMDOC,
 CAST (PDATE as DATE) AS PDATE,
-CAST (ORGAN as VARCHAR2(70)) AS ORGAN,
+CAST (ORGAN as VARCHAR2(150)) AS ORGAN,
 CAST (PASSP_EXPIRE_TO as DATE) AS PASSP_EXPIRE_TO,
 CAST (PASSP_TO_BANK as DATE) AS PASSP_TO_BANK,
 CAST (KF as VARCHAR2(6)) AS KF,
@@ -200,7 +200,7 @@ CAST (SAB as VARCHAR2(6)) AS SAB,
 CAST (VIP_ACCOUNT_MANAGER as VARCHAR2(500)) AS VIP_ACCOUNT_MANAGER
 FROM
 (
-    select (select changenumber from imp_object_mfo where object_name = 'CLIENTFO2' and rownum = 1) as changenumber
+    select (select changenumber from imp_object_mfo where object_name = 'CLIENTFO2' and kf = c.kf) as changenumber
     ,last_name
     ,first_name
     ,middle_name
