@@ -72,8 +72,10 @@ exception when others then
 end; 
 /
 
+PROMPT *** Add comments to the table PFU.PFU_EPP_LINE ***
+COMMENT ON TABLE PFU.PFU_EPP_LINE IS 'Рядки файлу ПЕНСІОНЕРІВ для відкриття рахунку в Банку та атрибутів файлу з інформацією по ЕПП, які потребують перевипуску';
 
-COMMENT ON TABLE PFU.PFU_EPP_LINE IS '';
+PROMPT *** Add comments to the columns of table PFU.PFU_EPP_LINE *** 
 COMMENT ON COLUMN PFU.PFU_EPP_LINE.COMM IS '';
 COMMENT ON COLUMN PFU.PFU_EPP_LINE.ID IS '';
 COMMENT ON COLUMN PFU.PFU_EPP_LINE.BATCH_REQUEST_ID IS '';
@@ -195,6 +197,72 @@ exception when others then
  end;
 /
 
+
+PROMPT *** Create column PFU.PFU_EPP_LINE.GUARDIANSHIP ***
+begin 
+  execute immediate 'ALTER TABLE PFU.PFU_EPP_LINE ADD GUARDIANSHIP VARCHAR2(4000)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+
+PROMPT *** Add comments to the column PFU.PFU_EPP_LINE.GUARDIANSHIP *** 
+comment on column PFU.PFU_EPP_LINE.GUARDIANSHIP is 'Наявність опікуна';
+
+
+PROMPT *** Create column PFU.PFU_EPP_LINE.GUARDIAN_ID ***
+begin 
+  execute immediate 'ALTER TABLE PFU.PFU_EPP_LINE ADD GUARDIAN_ID NUMBER(10,0)';
+exception when others then 
+  if sqlcode in (-904, -6512, -1430) then 
+    null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+PROMPT *** Add comments to the column PFU.PFU_EPP_LINE.GUARDIAN_ID *** 
+COMMENT ON COLUMN PFU.PFU_EPP_LINE.GUARDIAN_ID IS 'ID опікуна пенсіонера (PFU.PFU_EPP_LINE_GUARDIAN.ID)';
+
+
+begin
+    execute immediate 'create index I_EPP_LINE_GUARDIAN_ID on PFU.PFU_EPP_LINE (GUARDIAN_ID)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+
+
+begin
+    execute immediate 'alter table PFU.PFU_EPP_LINE add constraint FK_EPP_LINE_GUARDIAN_ID foreign key (GUARDIAN_ID) references PFU.PFU_EPP_LINE_GUARDIAN (ID)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table PFU.PFU_EPP_LINE add constraint FK_EPP_LINE_REF_BATCH foreign key (BATCH_REQUEST_ID) references PFU.PFU_EPP_BATCH_REQUEST (ID)';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'create index I_EPP_LINE_REF_BATCH on PFU.PFU_EPP_LINE (BATCH_REQUEST_ID)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
 
 
 PROMPT *** Create  grants  PFU_EPP_LINE ***

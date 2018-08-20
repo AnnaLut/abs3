@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_utl.sql =========*** Run *** ====
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE PFU.PFU_UTL is
+CREATE OR REPLACE PACKAGE PFU.PFU_UTL is
 
     REQ_STATE_NEW                  constant varchar2(30) := 'NEW';
     REQ_STATE_READY_FOR_SENDING    constant varchar2(30) := 'READY_FOR_SENDING';
@@ -29,6 +29,7 @@
     REQ_TYPE_DEATH_MATCHING        constant varchar2(30) := 'POST_WORKING_NOTICE_DEATH_BANK';
     REQ_TYPE_NO_TURNOVER           constant varchar2(30) := 'POST_NOTICE_DRAWING_BANK_ANSW';
     REQ_TYPE_EPP_MATCHING          constant varchar2(30) := 'PUT_EPP_PACKET_BNK_STATE';
+    REQ_TYPE_EPP_MATCHING2         constant varchar2(30) := 'PUT_EPP_PACKET_BNK_STATE2';
     REQ_TYPE_EPP_ACTIVATION        constant varchar2(30) := 'PUT_EPP_BNK_INFO_ASK';
     REQ_TYPE_DEATH_LIST            constant varchar2(30) := 'GET_DEATH_LIST';
     REQ_TYPE_DEATH                 constant varchar2(30) := 'GET_DEATH';
@@ -169,6 +170,8 @@
     procedure create_epp_matching(p_xml in clob,
                                   p_parent_request_id in integer);
 
+    procedure create_epp_matching2(p_xml in clob);
+    
     procedure create_epp_activation(
         p_xml in clob);
 
@@ -735,6 +738,23 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_UTL as
         track_request(l_request_id,
                       pfu_utl.REQ_STATE_NEW,
                       'Запит на формування квитанції зареєстрований');
+
+    end;
+    
+    procedure create_epp_matching2(p_xml in clob)
+
+    is
+        l_request_id integer;
+    begin
+        l_request_id := create_request(pfu_utl.REQ_TYPE_EPP_MATCHING2, null);
+
+        insert into pfu_matching_request
+        values (l_request_id,
+                p_xml);
+
+        track_request(l_request_id,
+                      pfu_utl.REQ_STATE_NEW,
+                      'Запит на формування квитанції 2 зареєстрований');
 
     end;
 

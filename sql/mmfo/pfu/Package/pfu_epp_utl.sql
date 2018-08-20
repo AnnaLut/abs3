@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_epp_utl.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE PFU.PFU_EPP_UTL is
+CREATE OR REPLACE PACKAGE PFU.PFU_EPP_UTL is
 
     LINE_STATE_NEW                 constant integer := 1;
     LINE_STATE_ACCEPTED            constant integer := 2;
@@ -33,7 +33,10 @@
     LINE_STATE_CARD_BLOCKED_DBLK   constant integer := 24;
     LINE_STATE_CARD_UNBLOCKED_DBLK constant integer := 25;
 
+    -- тип для валідації рядків файлу для відкриття рахунку в Банку та атрибутів файлу з інформацією по ЕПП, які потребують перевипуску
     type t_epp_lines is table of pfu_epp_line%rowtype index by pls_integer;
+    -- тип для валідації ОПІКУНІВ рядків файлу для відкриття рахунку в Банку та атрибутів файлу з інформацією по ЕПП, які потребують перевипуску
+    type t_epp_line_guardian is table of pfu_epp_line_guardian%rowtype index by pls_integer;
 
     function read_epp_batch_list_request(
         p_request_id in integer,
@@ -345,10 +348,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
         )
     is
     l_doc               dbms_xmldom.DOMDocument;
-		l_root_node         dbms_xmldom.DOMNode;
-		l_header_node       dbms_xmldom.DOMNode;
-		l_body_node         dbms_xmldom.DOMNode;
-		l_transport_unit_id integer;
+    l_root_node         dbms_xmldom.DOMNode;
+    l_header_node       dbms_xmldom.DOMNode;
+    l_body_node         dbms_xmldom.DOMNode;
+    l_transport_unit_id integer;
     l_mfo               pfu_epp_line.bank_mfo%type;
     begin
 
@@ -359,28 +362,29 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
 
         l_doc       := dbms_xmldom.newDomDocument;
-				l_root_node := dbms_xmldom.makeNode(l_doc);
-				l_root_node := dbms_xmldom.appendChild(l_root_node,
-																							 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																															'root')));
+        l_root_node := dbms_xmldom.makeNode(l_doc);
+        l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                               dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                              'root')));
 
-				l_header_node := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'header')));
-				l_body_node   := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'body')));
+        l_header_node := dbms_xmldom.appendChild(l_root_node,
 
-				pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'epp', 1);
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'header')));
+        l_body_node   := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'body')));
+
+        pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'epp', 1);
         pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'id', p_line_id);
 
-				begin
-					--TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
-					l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+        begin
+          --TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
+          l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
                                                                      l_mfo,
-																																		 transport_utl.get_receiver_url(l_mfo),
-																																		 dbms_xmldom.getXmlType(l_doc)
-																																		 .getClobVal());
+                                                                     transport_utl.get_receiver_url(l_mfo),
+                                                                     dbms_xmldom.getXmlType(l_doc)
+                                                                     .getClobVal());
 
           track_line(p_line_id, pfu_epp_utl.LINE_STATE_CARD_BLOCKED_DBLK, p_tracking_comment, null);
         end;
@@ -393,10 +397,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
         )
     is
     l_doc               dbms_xmldom.DOMDocument;
-		l_root_node         dbms_xmldom.DOMNode;
-		l_header_node       dbms_xmldom.DOMNode;
-		l_body_node         dbms_xmldom.DOMNode;
-		l_transport_unit_id integer;
+    l_root_node         dbms_xmldom.DOMNode;
+    l_header_node       dbms_xmldom.DOMNode;
+    l_body_node         dbms_xmldom.DOMNode;
+    l_transport_unit_id integer;
     l_mfo               pfu_epp_line.bank_mfo%type;
     begin
 
@@ -407,28 +411,28 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
 
         l_doc       := dbms_xmldom.newDomDocument;
-				l_root_node := dbms_xmldom.makeNode(l_doc);
-				l_root_node := dbms_xmldom.appendChild(l_root_node,
-																							 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																															'root')));
+        l_root_node := dbms_xmldom.makeNode(l_doc);
+        l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                               dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                              'root')));
 
-				l_header_node := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'header')));
-				l_body_node   := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'body')));
+        l_header_node := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'header')));
+        l_body_node   := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'body')));
 
-				pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'epp', 1);
+        pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'epp', 1);
         pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'id', p_line_id);
 
-				begin
-					--TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
-					l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK,
+        begin
+          --TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
+          l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK,
                                                                      l_mfo,
-																																		 transport_utl.get_receiver_url(l_mfo),
-																																		 dbms_xmldom.getXmlType(l_doc)
-																																		 .getClobVal());
+                                                                     transport_utl.get_receiver_url(l_mfo),
+                                                                     dbms_xmldom.getXmlType(l_doc)
+                                                                     .getClobVal());
 
           track_line(p_line_id, pfu_epp_utl.LINE_STATE_CARD_UNBLOCKED_DBLK, p_tracking_comment, null);
         end;
@@ -442,10 +446,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
         )
     is
     l_doc               dbms_xmldom.DOMDocument;
-		l_root_node         dbms_xmldom.DOMNode;
-		l_header_node       dbms_xmldom.DOMNode;
-		l_body_node         dbms_xmldom.DOMNode;
-		l_transport_unit_id integer;
+    l_root_node         dbms_xmldom.DOMNode;
+    l_header_node       dbms_xmldom.DOMNode;
+    l_body_node         dbms_xmldom.DOMNode;
+    l_transport_unit_id integer;
 --    l_mfo               pfu_epp_line.bank_mfo%type;
     begin
 
@@ -455,27 +459,27 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
            and t.kf = p_kf;
 
         l_doc       := dbms_xmldom.newDomDocument;
-				l_root_node := dbms_xmldom.makeNode(l_doc);
-				l_root_node := dbms_xmldom.appendChild(l_root_node,
-																							 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																															'root')));
+        l_root_node := dbms_xmldom.makeNode(l_doc);
+        l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                               dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                              'root')));
 
-				l_header_node := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'header')));
-				l_body_node   := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'body')));
+        l_header_node := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'header')));
+        l_body_node   := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'body')));
         pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'epp', 0);
-				pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'nls', p_nls);
+        pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'nls', p_nls);
 
-				begin
-					--TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
-					l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+        begin
+          --TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
+          l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
                                                                      p_kf,
-																																		 transport_utl.get_receiver_url(p_kf),
-																																		 dbms_xmldom.getXmlType(l_doc)
-																																		 .getClobVal());
+                                                                     transport_utl.get_receiver_url(p_kf),
+                                                                     dbms_xmldom.getXmlType(l_doc)
+                                                                     .getClobVal());
 
           --track_line(p_line_id, pfu_epp_utl.LINE_STATE_CARD_BLOCKED_DBLK, p_tracking_comment, null);
         end;
@@ -489,10 +493,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
         )
     is
     l_doc               dbms_xmldom.DOMDocument;
-		l_root_node         dbms_xmldom.DOMNode;
-		l_header_node       dbms_xmldom.DOMNode;
-		l_body_node         dbms_xmldom.DOMNode;
-		l_transport_unit_id integer;
+    l_root_node         dbms_xmldom.DOMNode;
+    l_header_node       dbms_xmldom.DOMNode;
+    l_body_node         dbms_xmldom.DOMNode;
+    l_transport_unit_id integer;
 --    l_mfo               pfu_epp_line.bank_mfo%type;
     begin
 
@@ -502,27 +506,27 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
            and t.kf = p_kf;
 
         l_doc       := dbms_xmldom.newDomDocument;
-				l_root_node := dbms_xmldom.makeNode(l_doc);
-				l_root_node := dbms_xmldom.appendChild(l_root_node,
-																							 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																															'root')));
+        l_root_node := dbms_xmldom.makeNode(l_doc);
+        l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                               dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                              'root')));
 
-				l_header_node := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'header')));
-				l_body_node   := dbms_xmldom.appendChild(l_root_node,
-																								 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
-																																																'body')));
+        l_header_node := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'header')));
+        l_body_node   := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'body')));
         pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'epp', 0);
-				pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'nls', p_nls);
+        pfu_service_utl.add_text_node_utl(l_doc, l_body_node, 'nls', p_nls);
 
-				begin
-					--TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
-					l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK,
+        begin
+          --TRANS_TYPE_ACTIVATEACC ставимо тип - '3'    ACTIVATEACC     Активація рахунку
+          l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK,
                                                                      p_kf,
-																																		 transport_utl.get_receiver_url(p_kf),
-																																		 dbms_xmldom.getXmlType(l_doc)
-																																		 .getClobVal());
+                                                                     transport_utl.get_receiver_url(p_kf),
+                                                                     dbms_xmldom.getXmlType(l_doc)
+                                                                     .getClobVal());
 
           --track_line(p_line_id, pfu_epp_utl.LINE_STATE_CARD_BLOCKED_DBLK, p_tracking_comment, null);
         end;
@@ -632,6 +636,61 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
         where  t.id = p_epp_line.id;
     end;
 
+    -----------------------------------------------------------------------------------------
+    --  insert_epp_line_bnk_state2
+    --
+    --    Наповнення таблиці для квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2)
+    --
+    --      p_request_id - id запиту
+    --
+    procedure insert_epp_line_bnk_state2(p_epp_line_id in pfu_epp_line.id%type,
+                                         p_state_id    in pfu_epp_line.state_id%type,
+                                         p_type_card   in pfu_epp_line_bnk_state2.type_card%type,
+                                         p_comm        in varchar2,
+                                         p_create_date in date default trunc(sysdate))
+    is
+      l_error_stack varchar2(4000);
+    begin
+      begin
+        select substr(tr.error_stack,1,2000)
+          into l_error_stack
+          from pfu_epp_line_tracking tr
+         where tr.line_id = p_epp_line_id
+           and tr.rowid in (select min(track.rowid) keep(dense_rank last order by tr.id desc)
+                             from pfu_epp_line_tracking track
+                            where track.line_id = p_epp_line_id
+                              and track.state_id = 3);
+      exception
+        when no_data_found then
+          l_error_stack := null;
+        when others then
+          raise;
+      end;
+      insert into pfu_epp_line_bnk_state2 (epp_line_id, batch_request_id, type_card, epp_expiry_date, state_id, create_date, comm,
+                                           stage_ticket, error_stack, epp_number, ps_type, rn)
+      select p_epp_line_id,
+             batch_request_id,
+             p_type_card,
+             null,
+             p_state_id,
+             p_create_date,
+             p_comm,
+             case when p_state_id not in (20) then 1 else null end,
+             l_error_stack,
+             e.epp_number,
+             /*case when p_type_card like '%NSMEP%' and e.displaced_person_flag = '1' and e.pens_type in ('1','2') then '1'
+                  when p_type_card like '%MWORLDEBPP_EPP%' and e.displaced_person_flag = '0' and e.pens_type in ('1','2') then '0'
+                  else '' end,*/
+             case when p_type_card like '%NSMEP%' then '0' else '1' end as ps_type,
+             line_id
+        from pfu_epp_line e
+       where id = p_epp_line_id;
+
+    exception
+      when others then
+        raise_application_error(-20001, 'pfu_epp_utl.insert_epp_line_bnk_state2 err - Помилка наповнення таблиці для квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2) ' || sqlerrm || chr(10) ||dbms_utility.format_error_backtrace());
+    end insert_epp_line_bnk_state2;
+
     procedure r_regepp_procesing(p_file_data in clob,
                                  p_file_id   in number) is
       l_parser   dbms_xmlparser.parser;
@@ -671,6 +730,11 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
                          p_tracking_comment => l_message,
                          p_stack_trace      => null);
         end if;
+          -- Наповнення таблиці для квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2)
+          insert_epp_line_bnk_state2(p_epp_line_id => l_id,
+                                     p_state_id    => case l_state_id when 20 then l_state_id else line_state_account_claim_fail end,
+                                     p_type_card   => l_card_type,
+                                     p_comm        => l_message);
       end loop;
       transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.trans_state_done,
@@ -866,6 +930,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
       l_id       number;
       l_state_id number;
       l_message  varchar2(4000);
+      l_expdate  date;
     begin
 
       l_parser := dbms_xmlparser.newparser;
@@ -881,9 +946,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
                                                           'id/text()'));
         l_state_id := to_number(dbms_xslprocessor.valueof(l_row,
                                                           'state_id/text()'));
-        l_message  := to_number(dbms_xslprocessor.valueof(l_row,
-                                                          'message/text()'));
-        set_line_state(p_line_id          => l_id,
+        l_message  := dbms_xslprocessor.valueof(l_row,
+                                                          'message/text()');
+        l_expdate  := to_date(dbms_xslprocessor.valueof(l_row, 'epp_expired/text()'), 'dd.mm.yyyy');
+        /*set_line_state(p_line_id          => l_id,
                        p_state_id         => case l_state_id
                                                when 30 then
                                                 LINE_STATE_PERSONALIZED
@@ -893,7 +959,18 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
                                                 LINE_STATE_DECLINED_BY_CBS
                                              end,
                        p_tracking_comment => l_message,
-                       p_stack_trace      => null);
+                       p_stack_trace      => null);*/
+        update pfu_epp_line_bnk_state2 s
+           set s.state_id = case l_state_id
+                              when 101 then 20 -- відправляєм повторно запит якщо ще не оброблено
+                              when 30 then LINE_STATE_PERSONALIZED     -- 11
+                              when 21 then LINE_STATE_PROCESSED_BY_CBS -- 10
+                              when 22 then LINE_STATE_DECLINED_BY_CBS  -- 9
+                            end,
+               s.comm = l_message,
+               s.epp_expiry_date  = l_expdate,
+               s.stage_ticket = 1 -- очікує формування pfu_result для квитанції 2
+        where s.epp_line_id = l_id;
       end loop;
       transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.TRANS_STATE_DONE,
@@ -935,7 +1012,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
         l_state_id := to_number(dbms_xslprocessor.valueof(l_row,
                                                           'state_id/text()'));
         l_message  := dbms_xslprocessor.valueof(l_row, 'message/text()');
-        
+
         if l_state_id = 30 then
           set_epp_activate(l_id, l_message, sysdate, 1);
         else
