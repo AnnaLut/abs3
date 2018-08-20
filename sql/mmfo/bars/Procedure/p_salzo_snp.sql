@@ -53,7 +53,7 @@ BEGIN
       l_DAT01t_ := last_day  ( p_DAT) +  1 ; --01 число отчетного мес€ца   - “ќЋя
       l_DAT01d_ := add_months(l_DAT01t_,-1); --01 число след.за отч мес€ца - ƒ»ћј
 
-      select caldt_ID into Di_ from accm_calendar where caldt_DATE=l_DAT01d_;
+      --select caldt_ID into Di_ from accm_calendar where caldt_DATE=l_DAT01d_;
 
       LOGGER.INFO('SALZO ' || l_DAT01d_ ||' '|| Di_ || ' '||
       P_KV || ' '|| NBS1_ || ' '|| NBS2_ ||' '||  P_BR );
@@ -73,8 +73,8 @@ BEGIN
                b.Kosq  - b.CUKosq+ b.CRKosq                  PRS_KOSq ,
                b.ost   + (b.CRkos -b.CRdos )                 ZAL_OST  ,
                b.ostq  + (b.CRkosq-b.CRdosq)                 ZALQ_OSTq
-        from ACCM_AGG_MONBALS b, accounts a
-        where b.caldt_ID=Di_
+        from AGG_MONBALS b, accounts a
+        where b.fdat=l_DAT01d_
           and b.ACC=a.acc and a.nbs not like '8%'
           and (b.ostq   <> 0 or
                b.kosq   <> 0 or
@@ -93,9 +93,9 @@ BEGIN
      -- ≥накше - по щоденних
      ------------------------
   elsif l_DATBank_ > p_DAT then
-      select caldt_ID into Di1_ from accm_calendar where caldt_DATE=trunc(p_DAT, 'mm')-1;
+      --select caldt_ID into Di1_ from accm_calendar where caldt_DATE=trunc(p_DAT, 'mm')-1;
 
-      select caldt_ID into Di2_ from accm_calendar where caldt_DATE=p_DAT;
+      --select caldt_ID into Di2_ from accm_calendar where caldt_DATE=p_DAT;
 
       --2) страховочна€ синхронизаци€
      -- bars_accm_sync.sync_snap_period('BALANCE', trunc(p_DAT, 'mm')-1, p_DAT);
@@ -103,7 +103,7 @@ BEGIN
       l_DAT01t_ := trunc ( p_DAT, 'mm'); --01 число отчетного мес€ца   - “ќЋя
       l_DAT01d_ := add_months(l_DAT01t_,-1); --01 число пред.перед. отч мес€ца
 
-      select caldt_ID into Di_ from accm_calendar where caldt_DATE=l_DAT01d_;
+      --select caldt_ID into Di_ from accm_calendar where caldt_DATE=l_DAT01d_;
 
       LOGGER.INFO('SALZO from ACCM_SNAP_BALANCES ' || p_DAT ||' '|| Di_ || ' '||
       P_KV || ' '|| NBS1_ || ' '|| NBS2_ ||' '||  P_BR );
@@ -130,8 +130,8 @@ BEGIN
                    0                                     PRS_KOSq ,
                    0                                     ZAL_OST  ,
                    0                                     ZALQ_OSTq
-            from ACCM_SNAP_BALANCES b, accounts a
-            where b.caldt_ID = Di1_
+            from SNAP_BALANCES b, accounts a
+            where b.fdat = trunc(p_DAT, 'mm')-1
               and b.ACC=a.acc and a.nbs not like '8%'
               and (b.ostq   <> 0
                   )
@@ -151,8 +151,8 @@ BEGIN
                    0                                    PRS_KOSq ,
                    sum(b.ost)                           ZAL_OST  ,
                    sum(b.ostq)                          ZALQ_OSTq
-            from ACCM_SNAP_BALANCES b, accounts a
-            where b.caldt_ID = Di2_
+            from SNAP_BALANCES b, accounts a
+            where b.fdat = p_DAT
               and b.ACC=a.acc and a.nbs not like '8%'
               and (b.ostq   <> 0
                   )
@@ -172,8 +172,8 @@ BEGIN
                    sum(b.kosq)                          PRS_KOSq ,
                    0                                    ZAL_OST  ,
                    0                                    ZALQ_OSTq
-            from ACCM_SNAP_BALANCES b, accounts a
-            where b.caldt_ID between Di1_+1 and Di2_
+            from SNAP_BALANCES b, accounts a
+            where b.fdat between trunc(p_DAT, 'mm') and p_DAT
               and b.ACC=a.acc and a.nbs not like '8%'
               and (b.kosq   <> 0 or
                    b.dosq   <> 0
@@ -194,8 +194,8 @@ BEGIN
                    - b.CRKosq                           PRS_KOSq ,
                    + b.CRdos-b.CRKos                    ZAL_OST  ,
                    + b.CRdosq-b.CRKosq                  ZALQ_OSTq
-            from ACCM_AGG_MONBALS b, accounts a
-            where b.caldt_ID=Di_
+            from AGG_MONBALS b, accounts a
+            where b.fdat=l_DAT01d_
               and b.ACC=a.acc and a.nbs not like '8%'
               and (b.CRdosq <> 0 or
                    b.CRkosq <> 0
@@ -217,7 +217,7 @@ BEGIN
       l_DAT01t_ := trunc ( p_DAT, 'mm'); --01 число отчетного мес€ца   - “ќЋя
       l_DAT01d_ := add_months(l_DAT01t_,-1); --01 число пред.перед. отч мес€ца
 
-      select caldt_ID into Di_ from accm_calendar where caldt_DATE=l_DAT01d_;
+      --select caldt_ID into Di_ from accm_calendar where caldt_DATE=l_DAT01d_;
 
       --2) страховочна€ синхронизаци€
       bars_accm_sync.sync_AGG('MONBAL', l_DAT01d_);
@@ -319,8 +319,8 @@ BEGIN
                    - b.CRKosq                           PRS_KOSq ,
                    + b.CRdos-b.CRKos                    ZAL_OST  ,
                    + b.CRdosq-b.CRKosq                  ZALQ_OSTq
-            from ACCM_AGG_MONBALS b, accounts a
-            where b.caldt_ID=Di_
+            from AGG_MONBALS b, accounts a
+            where b.fdat=l_DAT01d_
               and b.ACC=a.acc and a.nbs not like '8%'
               and (b.CRdosq <> 0 or
                    b.CRkosq <> 0
