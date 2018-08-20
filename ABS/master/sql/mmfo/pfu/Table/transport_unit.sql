@@ -146,6 +146,14 @@ exception when others then
 /
 
 
+begin
+    execute immediate 'create index I_TRANSPORT_UNIT_STATE_ID on PFU.TRANSPORT_UNIT (STATE_ID)';
+ exception when others then 
+    if sqlcode = -955 or sqlcode = -1408 then null; else raise; 
+    end if; 
+end;
+/
+
 
 PROMPT *** Create  grants  TRANSPORT_UNIT ***
 grant SELECT                                                                 on TRANSPORT_UNIT  to BARSREADER_ROLE;
