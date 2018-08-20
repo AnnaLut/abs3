@@ -12,7 +12,7 @@ BEGIN
         execute immediate  
           'begin  
                bpa.alter_policy_info(''PERSON'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''PERSON'', ''FILIAL'' , null, null, null, null);
+               bpa.alter_policy_info(''PERSON'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
                bpa.alter_policy_info(''PERSON'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
@@ -24,7 +24,8 @@ PROMPT *** Create  table PERSON ***
 begin 
   execute immediate '
   CREATE TABLE BARS.PERSON 
-   (	RNK NUMBER(38,0), 
+   (KF varchar2(6) default sys_context(''bars_context'',''user_mfo'') not null,
+    RNK NUMBER(38,0), 
 	SEX CHAR(1), 
 	PASSP NUMBER(*,0), 
 	SER VARCHAR2(10), 
@@ -46,7 +47,35 @@ begin
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
-  TABLESPACE BRSBIGD ';
+  TABLESPACE BRSBIGD
+PARTITION BY LIST (KF)
+( PARTITION P_300465 VALUES (''300465'')
+, PARTITION P_302076 VALUES (''302076'')
+, PARTITION P_303398 VALUES (''303398'')
+, PARTITION P_304665 VALUES (''304665'')
+, PARTITION P_305482 VALUES (''305482'')
+, PARTITION P_311647 VALUES (''311647'')
+, PARTITION P_312356 VALUES (''312356'')
+, PARTITION P_313957 VALUES (''313957'')
+, PARTITION P_315784 VALUES (''315784'')
+, PARTITION P_322669 VALUES (''322669'')
+, PARTITION P_323475 VALUES (''323475'')
+, PARTITION P_324805 VALUES (''324805'')
+, PARTITION P_325796 VALUES (''325796'')
+, PARTITION P_326461 VALUES (''326461'')
+, PARTITION P_328845 VALUES (''328845'')
+, PARTITION P_331467 VALUES (''331467'')
+, PARTITION P_333368 VALUES (''333368'')
+, PARTITION P_335106 VALUES (''335106'')
+, PARTITION P_336503 VALUES (''336503'')
+, PARTITION P_337568 VALUES (''337568'')
+, PARTITION P_338545 VALUES (''338545'')
+, PARTITION P_351823 VALUES (''351823'')
+, PARTITION P_352457 VALUES (''352457'')
+, PARTITION P_353553 VALUES (''353553'')
+, PARTITION P_354507 VALUES (''354507'')
+, PARTITION P_356334 VALUES (''356334'')
+)  ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
@@ -132,21 +161,6 @@ exception when others then
 
 
 
-
-PROMPT *** Create  index I1_PERSON ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I1_PERSON ON BARS.PERSON (SER, NUMDOC) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
 PROMPT *** Create  index PK_PERSON ***
 begin   
  execute immediate '
@@ -158,18 +172,79 @@ exception when others then
  end;
 /
 
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+  e_dup_keys_found       exception;
+  pragma exception_init( e_dup_keys_found,  -01452 );
+begin
+  execute immediate 'create unique index UK_PERSON_RNK on PERSON (KF,RNK) tablespace BRSBIGI local compress 1';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx
+  then dbms_output.put_line( 'Such column list already indexed.' );
+  when e_dup_keys_found
+  then dbms_output.put_line( 'Cannot create unique index: duplicate keys found' );
+end;
+/
 
 
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate q'[create index I_PERSON_PSN on PERSON (KF, PASSP, TRANSLATE(UPPER(SER),'ABCEHIKMOPTXY','юбяем╡йлнпрус'), UPPER(NUMDOC))
+  tablespace BRSBIGI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 128K
+    minextents 1
+    maxextents unlimited
+  ) local compress 1]';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+end;
+/
 
-PROMPT *** Create  index I_PERSON_PSN ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I_PERSON_PSN ON BARS.PERSON (PASSP, TRANSLATE(UPPER(SER),''ABCEHIKMOPTXY'',''юбяем╡йлнпрус''), UPPER(NUMDOC)) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
+declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate q'[create index I1_PERSON on PERSON (KF, SER, NUMDOC)
+  tablespace BRSBIGI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 128K
+    minextents 1
+    maxextents unlimited
+  ) local compress 1]';
+  dbms_output.put_line( 'Index created.' );
+exception
+  when e_idx_exists
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+end;
 /
 
 
