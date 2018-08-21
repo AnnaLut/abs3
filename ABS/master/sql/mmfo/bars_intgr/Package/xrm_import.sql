@@ -5,8 +5,8 @@ is
     --
     -- Работа с витринами для псевдо-онлайн выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 1.0.0 26/06/2018';
-    
+    g_header_version  constant varchar2(64)  := 'Version 1.1.0 16/08/2018';
+
     G_IMPORT_MODE_FULL  constant varchar2(5) := 'FULL';
     G_IMPORT_MODE_DELTA constant varchar2(5) := 'DELTA';
     G_STATS_ERROR constant varchar2(10) := 'ERROR';
@@ -22,18 +22,36 @@ is
     -- body_version - возвращает версию тела пакета
     --
     function body_version return varchar2;
+    
+    --
+    -- Логирование детализированной статистики в разрезе филиала
+    --
+    procedure log_stat_details (p_changenumber number   default null,
+                                p_start_time   date     default null,
+                                p_stop_time    date     default null,
+                                p_object_name  varchar2 default null,
+                                p_rows_ok      number   default null,
+                                p_rows_err     number   default null,
+                                p_status       varchar2 default null);
 
 
     function add38phone (p_phone in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo')) return varchar2;
 
     --
-    -- Инкрементируент максимальный номер дельты (changenumber) по объекту и проставляет его для выбранного / всех регионов
+    -- Инкрементирует номер дельты (changenumber) по объекту(-ам) и проставляет его для выбранного региона
     --
     procedure increment_object_changenumber(p_object_name in varchar2 default null,
                                             p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'));
+                                            
+    --
+    -- Получает changenumber по объекту и региону
+    --
+    function get_object_changenumber (p_object_name in varchar2,
+                                      p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
+    return number;
 
     --
-    -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
+    -- Устанавливает максимальный idupd по таблицам-зависимостям объекта
     --
     procedure reset_object_idupd (p_object_name in varchar2, p_kf in varchar2 default sys_context('bars_context', 'user_mfo'));
 
@@ -53,9 +71,9 @@ is
     -- Установить режим выдачи данных (полная выгрузка / дельта) шине для объекта / для всех
     -- При полной выгрузке используется витрина bars_dm, при дельте - bars_intgr
     --
-    procedure set_import_mode (p_mode        in varchar2, 
+    procedure set_import_mode (p_mode        in varchar2,
                                p_object_name in varchar2 default null);
-                               
+
     --
     -- Получение режима выдачи данных по объекту
     --
@@ -91,6 +109,13 @@ is
     procedure import_deposits2 (p_rows_ok  out number,
                                 p_rows_err out number,
                                 p_status   out varchar2);
+                                
+    --
+    -- Выгрузка ACCOUNTS_CASH - счета кассы (все)
+    --
+    procedure import_accounts_cash (p_rows_ok  out number,
+                                    p_rows_err out number,
+                                    p_status   out varchar2);
     --
     -- Запуск выгрузки по объекту в контексте указанного МФО (для параллели).
     --
@@ -108,7 +133,7 @@ show errors;
 
 create or replace package body xrm_import
 is
-    g_body_version constant varchar2(64) := 'Version 1.0.0 26/06/2018';
+    g_body_version constant varchar2(64) := 'Version 1.1.0 16/08/2018';
     G_TRACE        constant varchar2(20) := 'xrm_import.';
     G_IS_MMFO      number(1);
     G_IS_TEST      number(1)    := 0;
@@ -136,7 +161,7 @@ is
                              p_rows_ok      number   default null,
                              p_rows_err     number   default null,
                              p_status       varchar2 default null,
-                             p_id    in out number) 
+                             p_id    in out number)
         is
     begin
         if (p_id is null) then
@@ -170,6 +195,41 @@ is
 
         commit;
     end log_stat_event;
+    
+    --
+    -- Логирование детализированной статистики в разрезе филиала
+    --
+    procedure log_stat_details (p_changenumber number   default null,
+                                p_start_time   date     default null,
+                                p_stop_time    date     default null,
+                                p_object_name  varchar2 default null,
+                                p_rows_ok      number   default null,
+                                p_rows_err     number   default null,
+                                p_status       varchar2 default null)
+        is
+    pragma autonomous_transaction;
+    begin
+        insert into bars_intgr.intgr_stats_detail
+        (id,
+         changenumber,
+         object_name,
+         start_time,
+         stop_time,
+         rows_ok,
+         rows_err,
+         status)
+        values
+        (s_stats_detail.nextval,
+         p_changenumber,
+         p_object_name,
+         p_start_time,
+         p_stop_time,
+         p_rows_ok,
+         p_rows_err,
+         p_status
+        );
+        commit;
+    end log_stat_details;
 
     --
     -- Возвращает список ключей (измененных записей) для дельты; не поддерживает составные ключи
@@ -183,7 +243,7 @@ is
     l_sql clob;
     l_is_test_clause varchar2(50) := case when g_is_test = 1 then ' and rownum <= 1000 ' else '' end;
     begin
-        bars.bars_audit.info(l_trace||'start.');
+        bars.bars_audit.trace(l_trace||'start.');
         -- конструируем запрос
         select listagg ('select distinct '||key_column||' from bars.'||table_name||' where idupd>='||idupd||case when sql_predicate is not null then ' and '||sql_predicate end || l_is_test_clause,
                ' union ' )
@@ -192,34 +252,50 @@ is
         from imp_object_dependency
         where kf = p_kf
         and object_name = p_object_name;
-        bars.bars_audit.info(l_trace||'prepared sql = ['||l_sql||']');
+        bars.bars_audit.trace(l_trace||'prepared sql = ['||l_sql||']');
 
         execute immediate l_sql bulk collect into l_keys;
-        bars.bars_audit.info(l_trace||'finish');
+        bars.bars_audit.trace(l_trace||'finish');
         return l_keys;
     end get_changed_keys;
 
     --
-    -- Инкрементируент максимальный номер дельты (changenumber) по объекту и проставляет его для выбранного / всех регионов
+    -- Инкрементирует номер дельты (changenumber) по объекту(-ам) и проставляет его для выбранного региона (или всех, если явно передан /)
     --
     procedure increment_object_changenumber(p_object_name in varchar2 default null,
                                             p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
         is
-    l_ret number;
     begin
         for obj in (select * from imp_object o where o.active = 1 and object_name = nvl(p_object_name, object_name))
         loop
-            select max(changenumber) + 1 into l_ret from imp_object_mfo where object_name = obj.object_name;
-            
             update imp_object_mfo
-            set changenumber = l_ret
+            set changenumber = changenumber + 1
             where object_name = obj.object_name
-            and kf = nvl(p_kf, kf);
+            and kf = case when p_kf = '/' then kf else p_kf end;
         end loop;
     end increment_object_changenumber;
+    
+    --
+    -- Получает changenumber по объекту и региону
+    --
+    function get_object_changenumber (p_object_name in varchar2,
+                                      p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
+    return number
+    is
+    l_ret_changenumber imp_object_mfo.changenumber%type;
+    begin
+        select changenumber 
+        into l_ret_changenumber 
+        from imp_object_mfo 
+        where object_name = p_object_name and kf = p_kf;
+        return l_ret_changenumber;
+    exception
+        when no_data_found then
+            return null;
+    end get_object_changenumber;
 
     --
-    -- Устанавливает максимальный idupd по таблицам-зависимостям объекта (в случае успешной выгрузки)
+    -- Устанавливает максимальный idupd по таблицам-зависимостям объекта
     --
     procedure reset_object_idupd(p_object_name in varchar2,
                                  p_kf          in varchar2 default sys_context('bars_context', 'user_mfo'))
@@ -229,7 +305,7 @@ is
         for rec in (select table_name from imp_object_dependency where kf = p_kf)
         loop
             -- e.g. "select max(idupd) from bars.customer_update where kf = 300465"
-            execute immediate 'select max(idupd) from bars.'||rec.table_name||case when G_IS_MMFO = 1 then ' where kf = '||p_kf else '' end into l_max_idupd;
+            execute immediate 'select max(idupd) from bars.'||rec.table_name||case when G_IS_MMFO = 1 then ' where kf = '''||p_kf||'''' else '' end into l_max_idupd;
 
             update imp_object_dependency
             set idupd = l_max_idupd
@@ -281,7 +357,7 @@ is
     -- Установить режим выдачи данных (полная выгрузка / дельта) шине для объекта / для всех
     -- При полной выгрузке используется витрина bars_dm, при дельте - bars_intgr
     --
-    procedure set_import_mode (p_mode        in varchar2, 
+    procedure set_import_mode (p_mode        in varchar2,
                                p_object_name in varchar2 default null)
         is
     l_trace varchar2(150) := g_trace || 'set_import_mode: ';
@@ -290,7 +366,7 @@ is
         if p_mode in (G_IMPORT_MODE_FULL, G_IMPORT_MODE_DELTA) then
             begin
                 select distinct imp_mode into l_curr_mode from imp_object where object_name = nvl(p_object_name, object_name);
-                
+
                 if l_curr_mode != p_mode then
                     -- при переключении режима пишем в лог
                     bars.bars_audit.info(l_trace || p_mode || ' for ' || nvl(p_object_name, 'all objects'));
@@ -303,7 +379,7 @@ is
                     -- запрашиваемый объект не найден
                     bars.bars_audit.warning(l_trace || p_mode || ' for ' || nvl(p_object_name, 'all objects') || ' - NDF');
             end;
-            
+
             update imp_object
             set imp_mode = p_mode
             where object_name = nvl(p_object_name, object_name);
@@ -311,7 +387,7 @@ is
             bars.bars_audit.error(l_trace||'некорректное использование процедуры, mode='||p_mode);
         end if;
     end set_import_mode;
-    
+
     --
     -- Получение режима выдачи данных по объекту
     --
@@ -323,7 +399,7 @@ is
         select imp_mode into l_result from imp_object where object_name = p_object_name;
         return l_result;
     end get_import_mode;
-    
+
     --
     -- add prefix '38' to phone number
     --
@@ -374,22 +450,24 @@ is
     c_object_name  constant varchar2(32) := 'CLIENTFO2';
     l_changenumber number;
 
-    l_changelist bars.number_list;
-
+    l_changelist   bars.number_list;
+    l_ourMFO       varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_start_time   date := sysdate;
     begin
-        bars.bars_audit.info(g_trace||c_object_name||': start');
-
+        bars.bars_audit.trace(g_trace||c_object_name||': start');
+        
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
 
-        bars.bars_audit.info(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
 
         savepoint imp_start;
         increment_object_changenumber(c_object_name);
-        select changenumber into l_changenumber 
-        from imp_object_mfo 
-        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
-
+        
+        l_changenumber := get_object_changenumber(c_object_name, l_ourMFO);
+        
+        delete from ERR$_CLIENTFO2 where changenumber = l_changenumber and kf = l_ourMFO;
+        
         /* выгрузка */
 
         merge into clientfo2 C
@@ -410,9 +488,9 @@ is
                        p.pdate  as pdate,--дата видачі
                        p.organ,--орган видачі
                        c.okpo  as okpo,--ІНН
-                       xrm_import.add38phone(substr(mpno,1,20), c.kf) as telm,--мобільний
-                       xrm_import.add38phone(p.teld, c.kf) teld,--домашній телефон
-                       xrm_import.add38phone(p.telw, c.kf) telw,--робочий телефон
+                       substr(mpno,1,20) as telm,--мобільний
+                       p.teld teld,--домашній телефон
+                       p.telw telw,--робочий телефон
                        tel_d as teladd,--додатковий телефон
                        substr(email,1,30) as email,--електронна пошта
                        au_country,
@@ -439,9 +517,8 @@ is
                        decode(to_number(nvl(c.sed, 0)),91,2,34,2,1) as subject_class,--класифікація суб'єкта
                        case
                             when length(trim(w.cigpo))=1
-                                and regexp_replace(trim(w.cigpo), '\D') = trim(w.cigpo)
-                                and trim(w.cigpo) != '0'
-                             then trim(w.cigpo)
+                                and w.cigpo != '0'
+                             then w.cigpo
                             when trim(w.cigpo) is null
                              then ''
                             else '9'
@@ -449,12 +526,12 @@ is
                        decode(to_number(p.sex),1,1,2,2,0) as sex,--стать
                        (select prinsiderlv1 from bars.prinsider where prinsider = nvl(c.prinsider,2)) as insider,--признак інсайдера
                        decode(vipk,'1',1,0) vipk,--значення параметру
-                       (select max(fio_manager) from bars.vip_flags where rnk=c.rnk) vip_fio_manager,--піб працівника по віп
-                       (select max(phone_manager) from bars.vip_flags where rnk=c.rnk) vip_phone_manager,--телефон працівника по віп
+                       (select max(fio_manager) from bars.vip_flags where rnk=c.rnk and mfo = c.kf) vip_fio_manager,--піб працівника по віп
+                       (select max(phone_manager) from bars.vip_flags where rnk=c.rnk and mfo = c.kf) vip_phone_manager,--телефон працівника по віп
                        (select s.active_directory_name
                         from bars.vip_flags v
                         join bars.staff_ad_user s on v.account_manager = s.user_id
-                        where rnk=c.rnk) vip_account_manager,--аккаунт працівника по віп в форматі АД
+                        where rnk=c.rnk and mfo = c.kf) vip_account_manager,--аккаунт працівника по віп в форматі АД
                        date_on,--дата відкриття клієнта
                        date_off,--дата закриття
                        p.eddr_id,
@@ -1027,17 +1104,30 @@ is
         log errors into ERR$_CLIENTFO2 reject limit unlimited;
 
         p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_CLIENTFO2 where changenumber = l_changenumber;
+        select count(*) into p_rows_err from ERR$_CLIENTFO2 where changenumber = l_changenumber and kf = l_ourMFO;
 
         reset_object_idupd(c_object_name);
 
         p_status := G_STATS_SUCCESS;
-
-        bars.bars_audit.info(g_trace||c_object_name||': finished');
+        log_stat_details(p_changenumber => l_changenumber,
+                         p_start_time   => l_start_time,
+                         p_stop_time    => sysdate,
+                         p_object_name  => c_object_name,
+                         p_rows_ok      => p_rows_ok,
+                         p_rows_err     => p_rows_err,
+                         p_status       => p_status);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := G_STATS_ERROR;
+            log_stat_details(p_changenumber => l_changenumber,
+                             p_start_time   => l_start_time,
+                             p_stop_time    => sysdate,
+                             p_object_name  => c_object_name,
+                             p_rows_ok      => p_rows_ok,
+                             p_rows_err     => p_rows_err,
+                             p_status       => p_status);
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_clientfo2;
@@ -1051,28 +1141,30 @@ is
 
     l_changelist bars.number_list;
 
-    l_ourmfo varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_ourMFO varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_start_time   date := sysdate;
     begin
-        bars.bars_audit.info(g_trace||c_object_name||': start');
+        bars.bars_audit.trace(g_trace||c_object_name||': start');
 
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
 
-        bars.bars_audit.info(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished collecting rnk: '||l_changelist.count);
 
         savepoint imp_start;
 
         increment_object_changenumber(c_object_name);
-        select changenumber into l_changenumber 
-        from imp_object_mfo 
-        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
+        
+        l_changenumber := get_object_changenumber(c_object_name, l_ourMFO);
+        
+        delete from ERR$_CLIENT_ADDRESS where changenumber = l_changenumber and kf = l_ourMFO;
 
         /* выгрузка */
         merge into client_address C
         using (
                 with delta as (select /*+ materialize*/ column_value as rnk from table(l_changelist))
                          select l_changenumber as changenumber,
-                                l_ourmfo as kf,
+                                l_ourMFO as kf,
                                 rnk,
                                 "'1'_C1" au_country,
                                 "'1'_C2" au_zip,
@@ -1228,17 +1320,30 @@ is
         log errors into ERR$_CLIENT_ADDRESS reject limit unlimited;
 
         p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_CLIENT_ADDRESS where changenumber = l_changenumber;
+        select count(*) into p_rows_err from ERR$_CLIENT_ADDRESS where changenumber = l_changenumber and kf = l_ourMFO;
 
         reset_object_idupd(c_object_name);
 
         p_status := G_STATS_SUCCESS;
-
-        bars.bars_audit.info(g_trace||c_object_name||': finished');
+        log_stat_details(p_changenumber => l_changenumber,
+                         p_start_time   => l_start_time,
+                         p_stop_time    => sysdate,
+                         p_object_name  => c_object_name,
+                         p_rows_ok      => p_rows_ok,
+                         p_rows_err     => p_rows_err,
+                         p_status       => p_status);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := G_STATS_ERROR;
+            log_stat_details(p_changenumber => l_changenumber,
+                             p_start_time   => l_start_time,
+                             p_stop_time    => sysdate,
+                             p_object_name  => c_object_name,
+                             p_rows_ok      => p_rows_ok,
+                             p_rows_err     => p_rows_err,
+                             p_status       => p_status);
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_client_address;
@@ -1253,22 +1358,24 @@ is
     c_object_name  constant varchar2(32) := 'ACCOUNTS';
     l_changenumber number;
 
-    l_changelist bars.number_list;
-
+    l_changelist   bars.number_list;
+    l_ourMFO       varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_start_time   date := sysdate;
     begin
-        bars.bars_audit.info(g_trace||c_object_name||': start');
+        bars.bars_audit.trace(g_trace||c_object_name||': start');
 
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
 
-        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
 
         savepoint imp_start;
 
         increment_object_changenumber(c_object_name);
-        select changenumber into l_changenumber 
-        from imp_object_mfo 
-        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
+        
+        l_changenumber := get_object_changenumber(c_object_name, l_ourMFO);
+        
+        delete from ERR$_ACCOUNTS where changenumber = l_changenumber and kf = l_ourMFO;
 
         /* выгрузка */
 
@@ -1344,22 +1451,35 @@ is
         log errors into ERR$_ACCOUNTS reject limit unlimited;
 
         p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber;
+        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber and kf = l_ourMFO;
 
         reset_object_idupd(c_object_name);
 
         p_status := G_STATS_SUCCESS;
-
-        bars.bars_audit.info(g_trace||c_object_name||': finished');
+        log_stat_details(p_changenumber => l_changenumber,
+                         p_start_time   => l_start_time,
+                         p_stop_time    => sysdate,
+                         p_object_name  => c_object_name,
+                         p_rows_ok      => p_rows_ok,
+                         p_rows_err     => p_rows_err,
+                         p_status       => p_status);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := G_STATS_ERROR;
+            log_stat_details(p_changenumber => l_changenumber,
+                             p_start_time   => l_start_time,
+                             p_stop_time    => sysdate,
+                             p_object_name  => c_object_name,
+                             p_rows_ok      => p_rows_ok,
+                             p_rows_err     => p_rows_err,
+                             p_status       => p_status);
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_accounts;
-    
-    
+
+
     --
     -- Выгрузка BPK2 - договора БПК
     --
@@ -1370,23 +1490,25 @@ is
     c_object_name  constant varchar2(32) := 'BPK2';
     l_changenumber number;
 
-    l_changelist bars.number_list;
-
+    l_changelist   bars.number_list;
+    l_ourMFO       varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_start_time   date := sysdate;
     begin
-        bars.bars_audit.info(g_trace||c_object_name||': start');
+        bars.bars_audit.trace(g_trace||c_object_name||': start');
 
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
 
-        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
 
         savepoint imp_start;
 
         increment_object_changenumber(c_object_name);
-        select changenumber into l_changenumber 
-        from imp_object_mfo 
-        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
-
+        
+        l_changenumber := get_object_changenumber(c_object_name, l_ourMFO);
+        
+        delete from ERR$_BPK2 where changenumber = l_changenumber and kf = l_ourMFO;
+        
         /* выгрузка */
 
         merge into bpk2 a
@@ -1545,17 +1667,30 @@ is
         log errors into ERR$_BPK2 reject limit unlimited;
 
         p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber;
+        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber and kf = l_ourMFO;
 
         reset_object_idupd(c_object_name);
 
         p_status := G_STATS_SUCCESS;
-
-        bars.bars_audit.info(g_trace||c_object_name||': finished');
+        log_stat_details(p_changenumber => l_changenumber,
+                         p_start_time   => l_start_time,
+                         p_stop_time    => sysdate,
+                         p_object_name  => c_object_name,
+                         p_rows_ok      => p_rows_ok,
+                         p_rows_err     => p_rows_err,
+                         p_status       => p_status);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := G_STATS_ERROR;
+            log_stat_details(p_changenumber => l_changenumber,
+                             p_start_time   => l_start_time,
+                             p_stop_time    => sysdate,
+                             p_object_name  => c_object_name,
+                             p_rows_ok      => p_rows_ok,
+                             p_rows_err     => p_rows_err,
+                             p_status       => p_status);
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_bpk2;
@@ -1570,23 +1705,25 @@ is
     c_object_name  constant varchar2(32) := 'DEPOSITS2';
     l_changenumber number;
 
-    l_changelist bars.number_list;
-
+    l_changelist   bars.number_list;
+    l_ourMFO       varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_start_time   date := sysdate;
     begin
-        bars.bars_audit.info(g_trace||c_object_name||': start');
+        bars.bars_audit.trace(g_trace||c_object_name||': start');
 
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
 
-        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
 
         savepoint imp_start;
 
         increment_object_changenumber(c_object_name);
-        select changenumber into l_changenumber 
-        from imp_object_mfo 
-        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
-
+        
+        l_changenumber := get_object_changenumber(c_object_name, l_ourMFO);
+        
+        delete from ERR$_DEPOSITS2 where changenumber = l_changenumber and kf = l_ourMFO;
+        
         /* выгрузка */
 
         merge into deposits2 a
@@ -1806,17 +1943,30 @@ is
         log errors into ERR$_DEPOSITS2 reject limit unlimited;
 
         p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_DEPOSITS2 where changenumber = l_changenumber;
+        select count(*) into p_rows_err from ERR$_DEPOSITS2 where changenumber = l_changenumber and kf = l_ourMFO;
 
         reset_object_idupd(c_object_name);
 
         p_status := G_STATS_SUCCESS;
-
-        bars.bars_audit.info(g_trace||c_object_name||': finished');
+        log_stat_details(p_changenumber => l_changenumber,
+                         p_start_time   => l_start_time,
+                         p_stop_time    => sysdate,
+                         p_object_name  => c_object_name,
+                         p_rows_ok      => p_rows_ok,
+                         p_rows_err     => p_rows_err,
+                         p_status       => p_status);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := G_STATS_ERROR;
+            log_stat_details(p_changenumber => l_changenumber,
+                             p_start_time   => l_start_time,
+                             p_stop_time    => sysdate,
+                             p_object_name  => c_object_name,
+                             p_rows_ok      => p_rows_ok,
+                             p_rows_err     => p_rows_err,
+                             p_status       => p_status);
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_deposits2;
@@ -1831,22 +1981,24 @@ is
     c_object_name  constant varchar2(32) := 'ACCOUNTS_CASH';
     l_changenumber number;
 
-    l_changelist bars.number_list;
-
+    l_changelist   bars.number_list;
+    l_ourMFO       varchar2(6) := sys_context('bars_context', 'user_mfo');
+    l_start_time   date := sysdate;
     begin
-        bars.bars_audit.info(g_trace||c_object_name||': start');
+        bars.bars_audit.trace(g_trace||c_object_name||': start');
 
         /* собираем измененные записи */
         l_changelist := get_changed_keys(c_object_name);
 
-        bars.bars_audit.info(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished collecting keys: '||l_changelist.count);
 
         savepoint imp_start;
 
         increment_object_changenumber(c_object_name);
-        select changenumber into l_changenumber 
-        from imp_object_mfo 
-        where object_name = c_object_name and kf = sys_context('bars_context', 'user_mfo');
+        
+        l_changenumber := get_object_changenumber(c_object_name, l_ourMFO);
+        
+        delete from ERR$_ACCOUNTS_CASH where changenumber = l_changenumber and kf = l_ourMFO;
 
         /* выгрузка */
 
@@ -1888,17 +2040,30 @@ is
         log errors into ERR$_ACCOUNTS reject limit unlimited;
 
         p_rows_ok := sql%rowcount;
-        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber;
+        select count(*) into p_rows_err from ERR$_ACCOUNTS where changenumber = l_changenumber and kf = l_ourMFO;
 
         reset_object_idupd(c_object_name);
 
         p_status := G_STATS_SUCCESS;
-
-        bars.bars_audit.info(g_trace||c_object_name||': finished');
+        log_stat_details(p_changenumber => l_changenumber,
+                         p_start_time   => l_start_time,
+                         p_stop_time    => sysdate,
+                         p_object_name  => c_object_name,
+                         p_rows_ok      => p_rows_ok,
+                         p_rows_err     => p_rows_err,
+                         p_status       => p_status);
+        bars.bars_audit.trace(g_trace||c_object_name||': finished');
     exception
         when others then
             rollback to imp_start;
             p_status := G_STATS_ERROR;
+            log_stat_details(p_changenumber => l_changenumber,
+                             p_start_time   => l_start_time,
+                             p_stop_time    => sysdate,
+                             p_object_name  => c_object_name,
+                             p_rows_ok      => p_rows_ok,
+                             p_rows_err     => p_rows_err,
+                             p_status       => p_status);
             bars.bars_audit.error(g_trace||c_object_name||': '|| dbms_utility.format_error_stack || chr(10) ||dbms_utility.format_error_backtrace);
             raise;
     end import_accounts_cash;
@@ -1924,15 +2089,15 @@ is
 
         -- переключаем режим выдачи на дельту
         set_import_mode(G_IMPORT_MODE_DELTA);
-       
+
         commit;
 
         -- лочим строку статистики и обновляем статус (кроме ERROR) и инкрементно выгруженные строки
         select * into l_stats_current_row from intgr_stats where id = p_id_event for update;
         log_stat_event(p_rows_ok    => nvl(l_stats_current_row.rows_ok, 0) + l_rows_ok,
                        p_rows_err   => nvl(l_stats_current_row.rows_err, 0) + l_rows_err,
-                       p_status     => case when l_stats_current_row.status in (G_STATS_ERROR, G_STATS_INPROCESS) and l_status != G_STATS_ERROR then l_stats_current_row.status 
-                                            else l_status 
+                       p_status     => case when l_stats_current_row.status in (G_STATS_ERROR, G_STATS_INPROCESS) and l_status != G_STATS_ERROR then l_stats_current_row.status
+                                            else l_status
                                        end,
                        p_id         => l_stats_current_row.id);
     exception

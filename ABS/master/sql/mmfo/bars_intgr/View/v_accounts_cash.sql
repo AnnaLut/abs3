@@ -14,7 +14,7 @@ select
     okpo
 FROM
 (
-    select (select changenumber from imp_object_mfo where object_name = 'ACCOUNTS_CASH' and rownum = 1) as changenumber,
+    select (select changenumber from imp_object_mfo where object_name = 'ACCOUNTS_CASH' and kf = c.kf) as changenumber,
             c.acc,
             c.rnk,
             c.kf,

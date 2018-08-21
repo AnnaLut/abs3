@@ -15,3 +15,5 @@ from bars.V_ACCOUNTS_XRM v
 join bars.customer c on v.rnk = c.rnk;
 
 comment on table vw_ref_accounts_xrm is 'Відкриті рахунки (accounts_xrm)';
+
+grant select on bars_intgr.vw_ref_accounts_xrm to bars_dm;

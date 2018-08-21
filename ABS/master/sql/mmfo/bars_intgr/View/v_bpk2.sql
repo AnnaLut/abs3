@@ -55,7 +55,7 @@ CAST (ob22 as VARCHAR2(2)) AS OB22,
 CAST (NMS as VARCHAR2(70)) AS NMS
 FROM
 (
-    select (select changenumber from imp_object_mfo where object_name = 'BPK2' and rownum = 1) as changenumber,
+    select (select changenumber from imp_object_mfo where object_name = 'BPK2' and kf = c.kf) as changenumber,
     c.kf,
     branch,
     rnk,
