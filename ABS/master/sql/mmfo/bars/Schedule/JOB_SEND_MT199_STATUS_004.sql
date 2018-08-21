@@ -3,25 +3,28 @@ Prompt Scheduler Job JOB_SEND_MT199_STATUS_004;
 -- JOB_SEND_MT199_STATUS_004  (Scheduler Job) 
 --
 BEGIN
-  SYS.DBMS_SCHEDULER.DROP_JOB
-    (job_name  => 'BARS.JOB_SEND_MT199_STATUS_004');
-exception when others then
-  if  sqlcode=-27475 then null; else raise; end if;
- end;
-/
-BEGIN
+  SYS.DBMS_SCHEDULER.DROP_JOB (job_name =>  'BARS.JOB_SEND_MT199_STATUS_004');
+
   SYS.DBMS_SCHEDULER.CREATE_JOB
     (
        job_name        => 'BARS.JOB_SEND_MT199_STATUS_004'
       ,start_date      => TO_TIMESTAMP_TZ('2016/08/09 02:00:00.000000 +03:00','yyyy/mm/dd hh24:mi:ss.ff tzr')
-      ,repeat_interval => 'FREQ=DAILY; INTERVAL=1; BYHOUR=18; BYMINUTE=0;BYSECOND=0'
+      ,repeat_interval => 'FREQ=DAILY; INTERVAL=1; BYHOUR=20; BYMINUTE=0;BYSECOND=0'
       ,end_date        => NULL
       ,job_class       => 'DEFAULT_JOB_CLASS'
       ,job_type        => 'PLSQL_BLOCK'
-      ,job_action      => 'begin
-                                bars_swift_msg.job_send_status_004;  
-                                bars_swift_msg.job_send_mt199_tr;
-                                bars_swift_msg.job_send_mt199_ru_tr;
+      ,job_action      => 'declare 
+l_date date;
+begin
+    select holiday into l_date 
+    from holiday
+    where kv=980
+    and holiday=trunc(sysdate);
+exception when no_data_found then
+    bars_swift_msg.job_send_status_004;
+    bars_swift_msg.job_send_mt199_tr;
+    bars_swift_msg.job_send_mt199_ru_tr;          
+                               
 
 end;'
       ,comments        => 'Выдправка МТ199 для тих МТ103 по яких не було покриття'
@@ -60,5 +63,5 @@ end;'
     (name                  => 'BARS.JOB_SEND_MT199_STATUS_004');
 END;
 /
-
-
+COMMIT
+/
