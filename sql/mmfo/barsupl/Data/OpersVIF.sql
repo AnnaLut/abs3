@@ -48,18 +48,25 @@ begin
            -- collect data
            fetch cur bulk collect into l_bulk_data limit 100000;
            l_index := l_bulk_data.first;
-           dbms_lob.open(l_clob_data, dbms_lob.lob_readwrite);
+           if DBMS_LOB.isopen(l_clob_data) = 0
+           then
+                dbms_lob.open(l_clob_data, dbms_lob.lob_readwrite);
+           end if;
            while l_index is not null
            loop
                dbms_lob.writeappend( l_clob_data, length(l_bulk_data(l_index))+1, l_bulk_data(l_index) || chr(10) );
                l_index := l_bulk_data.next(l_index);
                
-               if dbms_lob.getlength(l_clob_data) > 4294965296 then
-                   -- make file on CLOB maxsize (4GB)
+               if dbms_lob.getlength(l_clob_data) > 1073741824 then
+                   -- make file on CLOB maxsize (1GB)
                    dbms_xslprocessor.clob2file(cl        => l_clob_data,
                                                flocation => 'UPLD',
                                                fname     => l_filename || '_p' || l_file_part_index);
                    l_file_part_index := l_file_part_index + 1;
+                   if DBMS_LOB.isopen(l_clob_data) = 1
+                   then
+                       DBMS_LOB.Close(l_clob_data);
+                   end if;
                    dbms_lob.freetemporary(l_clob_data);
                    dbms_lob.createtemporary(l_clob_data, true);
                end if;
@@ -87,38 +94,15 @@ begin
        -- java call
        barsos.j_mergeFiles(l_dir_path, l_filename, l_dir_path || case when l_os = 'UNIX' then '/' else '\' end || l_filename);
    end;
+exception
+    when others then
+        bars.bars_audit.error('VIF_UPLOAD OpersVIF: '||l_filename||':'||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
+        raise;
 end;
 $');
-/* 1=0 - ‘Œ–Ã»–”≈Ã œ”—“Œ… ‘¿…À */
-l_sql_text clob := to_clob(
-q'[
-select bars.gl.kf,
-       o.mfoa,
-       o.nlsa,
-       o.mfob,
-       o.nlsb,
-       o.dk,
-       o.s,
-       o.vob,
-       od.ref,
-       o.kv,
-       o.datd,
-       o.nam_a,
-       o.nam_b,
-       o.nazn,
-       o.id_a,
-       o.id_b,
-       od.fdat
-  from bars.oper o, bars.opldok od
- where 1=0 and od.ref = o.ref
-   and od.sos = 5
-   and od.fdat between trunc(TO_DATE (:param1, 'dd/mm/yyyy'), 'YEAR') and TRUNC(ADD_MONTHS(TO_DATE(:param1, 'dd/mm/yyyy'), 12), 'YEAR')-1
-]'
-);
 begin
     update upl_sql
-    set after_proc = l_sql,
-        sql_text = l_sql_text
+    set after_proc = l_sql
     where sql_id = 98;
     commit;
 end;
