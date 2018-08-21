@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   --
-  g_body_version  constant varchar2(64)          := 'version 44.21  16.08.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.20  16.04.2018';
 
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -7685,10 +7685,6 @@ is
   l_errmsg                varchar2(500);
   l_usr_mfo               varchar2(6);
   l_client_identifier_my  varchar2(64);
-  l_client_identifier_job varchar2(64);
-  l_uname                 varchar2(64);
-  l_machine               varchar2(64);
-  l_osuser                varchar2(30);
 begin
 
   -- task is already running
@@ -7700,56 +7696,47 @@ begin
   if ( l_usr_mfo Is Null )
   then -- for all KF
 
-    begin
-      select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
-        into l_client_identifier_job, l_uname, l_machine, l_osuser
-        from V$SESSION s
-       where s.TYPE   = 'USER'
-         and s.STATUS = 'ACTIVE'
-         and s.MODULE = 'DPU'
-         and s.ACTION = p_action;
-    sys.dbms_session.set_identifier(l_client_identifier_job);
-    
-    l_errmsg := case l_uname
-                  when 'BARS_ACCESS_USER'
-                  then sys_context('BARS_GLOBAL', 'USER_NAME')
-                  else l_uname
-                end || ' (' || l_machine || '/' || l_osuser || ')';
-    sys.dbms_session.set_identifier(l_client_identifier_my);
-    
-    exception
-      when NO_DATA_FOUND then
-        l_errmsg := null;
-    end;
+     for i in(select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
+                --into l_client_identifier_job, l_uname, l_machine, l_osuser
+                from V$SESSION s
+               where s.TYPE   = 'USER'
+                 and s.STATUS = 'ACTIVE'
+                 and s.MODULE = 'DPU'
+                 and s.ACTION = p_action) loop
+      sys.dbms_session.set_identifier(i.client_identifier);
 
-  else -- for one KF
-    begin
-      select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
-        into l_client_identifier_job, l_uname, l_machine, l_osuser
-        from V$SESSION s
-       where s.TYPE   = 'USER'
-         and s.STATUS = 'ACTIVE'
-         and s.MODULE = 'DPU'
-         and s.ACTION = p_action;
-    
-    sys.dbms_session.set_identifier(l_client_identifier_job);
-    
-    if sys_context('BARS_CONTEXT', 'USER_MFO') = l_usr_mfo then
-      l_errmsg := case l_uname
+      l_errmsg := case i.username
                     when 'BARS_ACCESS_USER'
                     then sys_context('BARS_GLOBAL', 'USER_NAME')
-                    else l_uname
-                  end || ' (' || l_machine || '/' || l_osuser || ')';
-    else
-      l_errmsg := null;
-    end if;
-    sys.dbms_session.set_identifier(l_client_identifier_my);
-   
-    exception
-      when NO_DATA_FOUND then
-        l_errmsg := null;
-    end;
+                    else i.username
+                  end || ' (' || i.machine || '/' || i.osuser || ')';
+      sys.dbms_session.set_identifier(l_client_identifier_my);
+    end loop;
 
+  else -- for one KF
+    for k in(select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
+                --into l_client_identifier_job, l_uname, l_machine, l_osuser
+               from V$SESSION s
+               where s.TYPE   = 'USER'
+                and s.STATUS = 'ACTIVE'
+                and s.MODULE = 'DPU'
+                and s.ACTION = p_action) loop
+
+      sys.dbms_session.set_identifier(k.client_identifier);
+
+      if sys_context('BARS_CONTEXT', 'USER_MFO') = l_usr_mfo then
+        l_errmsg := case k.USERNAME
+                      when 'BARS_ACCESS_USER'
+                      then sys_context('BARS_GLOBAL', 'USER_NAME')
+                      else k.USERNAME
+                    end || ' (' || k.machine || '/' || k.osuser || ')';
+        sys.dbms_session.set_identifier(l_client_identifier_my);
+        exit;
+      else
+        l_errmsg := null;
+      end if;
+      sys.dbms_session.set_identifier(l_client_identifier_my);
+    end loop;
   end if;
 
   bars_audit.trace( '%s: Exit with ( l_errmsg=>%s ).', title, l_errmsg );
