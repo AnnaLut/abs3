@@ -1428,11 +1428,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
        end if;
      end;
 
-
-
-    cck_ui.p_gpk_default(nd         => nd_,
-                         GPK_TYPE   => v_gpk_type,
-                         ROUND_TYPE => 2);
   end if;
   --ЗАповняємо карточку рахунку SS
   if p_mode=1 then
@@ -9717,7 +9712,7 @@ end if;
                 FROM cc_deal d,
                      cc_add ad,
                      customer c,
-                     (SELECT nd, acc FROM cc_lim GROUP BY nd, acc) l
+                     (select n.nd, a.acc from nd_acc n, accounts a where n.acc = a.acc and a.tip = 'LIM') l
                WHERE d.nd = ad.nd
                  AND ad.adds = 0
                  and d.nd = l.nd
