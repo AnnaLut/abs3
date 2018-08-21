@@ -266,11 +266,7 @@ is
   ) return varchar2
   is
     l_errmsg  varchar2(500);
-    l_client_identifier_my  varchar2(64);
-    l_client_identifier_job varchar2(64);
-    l_uname                 varchar2(64);
-    l_machine               varchar2(64);
-    l_osuser                varchar2(30);    
+    l_client_identifier_my  varchar2(64); 
   begin
 
     case
@@ -281,28 +277,24 @@ is
     else null;
     end case;
     l_client_identifier_my := bars_login.get_session_clientid;
+    for i in(select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
+               --into l_client_identifier_job, l_uname, l_machine, l_osuser
+               from V$SESSION s
+              where s.TYPE   = 'USER'
+                and s.STATUS = 'ACTIVE'
+                and s.ACTION = p_action) loop
 
-    begin
-      select s.CLIENT_IDENTIFIER, s.USERNAME, s.MACHINE, s.OSUSER
-        into l_client_identifier_job, l_uname, l_machine, l_osuser
-        from V$SESSION s
-       where s.TYPE   = 'USER'
-         and s.STATUS = 'ACTIVE'
-         and s.ACTION = p_action;
+      sys.dbms_session.set_identifier(i.client_identifier);
 
-    sys.dbms_session.set_identifier(l_client_identifier_job);
-
-    if sys_context('BARS_CONTEXT', 'USER_MFO') = p_kf then
-      l_errmsg := l_uname || ' (' || l_machine || '/' || l_osuser || ')';
-    else
-      l_errmsg := null;
-    end if;
-    sys.dbms_session.set_identifier(l_client_identifier_my);
-
-    exception
-      when NO_DATA_FOUND then
+      if sys_context('BARS_CONTEXT', 'USER_MFO') = p_kf then
+        l_errmsg := i.USERNAME || ' (' || i.machine || '/' || i.osuser || ')';
+        sys.dbms_session.set_identifier(l_client_identifier_my);    
+        exit;
+      else
         l_errmsg := null;
-    end;        
+      end if;
+      sys.dbms_session.set_identifier(l_client_identifier_my);
+    end loop;
 
     return l_errmsg;
 
