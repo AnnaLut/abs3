@@ -10,7 +10,7 @@
 ----------------
  15.12.2017 ВВод сделки - снова Proc-dr
  08.12.2017 Sta ОТСутствие в Proc-dr
- 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22 
+ 17.11.2017 Трансфер-2017 ПОДМЕНА ПРОЦЕДУРЫ ОТКР.СЧЕТА  На уровне бал.счетов - без учета об22
 
 */
     MBK_HEAD_VERS  constant varchar2(64)  := 'version 57.0 26.03.2018';
@@ -240,7 +240,7 @@ function get_pawn_account_number(
     return number;
 
     procedure edit_selected_reckoning   ( p_id in integer,        p_interest_amount in number,        p_purpose in varchar2);
-    procedure prepare_deal_interest     ( p_deal_id in integer,        p_date_to in date); 
+    procedure prepare_deal_interest     ( p_deal_id in integer,        p_date_to in date);
     procedure prepare_portfolio_interest( p_product_id in varchar2,      p_partner_id in varchar2,    p_currency_id in varchar2,    p_date_to in date);
     procedure pay_accrued_interest;
     procedure pay_selected_interest     ( p_id in integer);
@@ -347,6 +347,7 @@ PROCEDURE inp_deal_Ex_old (
     function body_version return varchar2;
 
 end MBK;
+
 /
 CREATE OR REPLACE PACKAGE BODY BARS.MBK is    MBK_BODY_VERS   CONSTANT VARCHAR2(64)  := 'version 2.1 27.03.2018';
 
@@ -358,25 +359,25 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBK is    MBK_BODY_VERS   CONSTANT VARCHAR2(
 
 ---------------------------------------------------------
 Function Get_MBDK (p_Vidd  int) Return MBDK_ob22%rowtype is   mm MBDK_ob22%rowtype ;
-begin 
-    BEGIN select * into mm from mbdk_ob22  where VIDD = p_Vidd  
-             and SS   is not null and SN   is not null 
-             and Sp   is not null and SpN  is not null 
-             and SD_N is not null and SD_i is not null 
+begin
+    BEGIN select * into mm from mbdk_ob22  where VIDD = p_Vidd
+             and SS   is not null and SN   is not null
+             and Sp   is not null and SpN  is not null
+             and SD_N is not null and SD_i is not null
              and d_close is  null and io   is not null ;
-    exception when NO_DATA_FOUND THEN  raise_application_error( -20666, p_Vidd ||'.Не заповнено вид угоди в довіднику MBDK_ob22' );  
+    exception when NO_DATA_FOUND THEN  raise_application_error( -20666, p_Vidd ||'.Не заповнено вид угоди в довіднику MBDK_ob22' );
     end;
     Return MM ;
 end Get_MBDK  ;
 -------------------------------------------
 function ACC_DOX_RASX(p_vidd int, p_kv int ) Return number is  l_acc6 number ; mm MBDK_ob22%rowtype ;
-begin 
+begin
    mm := MBK.Get_MBDK (p_Vidd  => p_vidd ) ;
 
    If p_kv <> gl.baseval then MM.SD_N := MM.SD_I ; end if ;
 
    begin   select acc into l_acc6 from accounts where kv = gl.baseval and  nls = nbs_ob22( substr(mm.SD_N,1,4) , substr(mm.SD_N,5,2 ) ) ;
-   exception when NO_DATA_FOUND THEN  raise_application_error( -20666, p_Vidd||'/'|| p_kv ||'.Не знайдено рах.дох.витрат по довіднику MBDK_ob22' );  
+   exception when NO_DATA_FOUND THEN  raise_application_error( -20666, p_Vidd||'/'|| p_kv ||'.Не знайдено рах.дох.витрат по довіднику MBDK_ob22' );
    end;
     Return l_acc6 ;
 end  ACC_DOX_RASX ;
@@ -398,15 +399,15 @@ Function F_NLS_MB (
    MASK_ VARCHAR2(10);
    l_INITIATOR   varchar2(2);
    mm MBDK_ob22%rowtype ;
-   l_NBS_SS char(4) ; 
-   l_Ob22_SS char(2) ;    
-   l_NBS_SN char(4) ; 
-   l_Ob22_SN char(2) ;  
-   D10 date := gl.Bdate -10 ;  
-   D11 date := gl.Bdate -10 ; 
+   l_NBS_SS char(4) ;
+   l_Ob22_SS char(2) ;
+   l_NBS_SN char(4) ;
+   l_Ob22_SN char(2) ;
+   D10 date := gl.Bdate -10 ;
+   D11 date := gl.Bdate -10 ;
    v_num number;
 
-BEGIN 
+BEGIN
 
   l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
   select count(1) into v_num
@@ -416,27 +417,27 @@ BEGIN
     return F_NLS_MB_old(nbs_,rnk_,acrb_,kv_,maskid_);
   else
 
-   mm := MBK.Get_MBDK (p_Vidd => to_number(nbs_) ); 
+   mm := MBK.Get_MBDK (p_Vidd => to_number(nbs_) );
   end if;
 
    If maskid_ = 'SP' then
-      l_NBS_SS  := Substr(mm.SP,1,4);  
-      l_Ob22_SS := Substr(mm.SP,5,2);  
-      l_NBS_SN  := Substr(mm.SPN,1,4); 
+      l_NBS_SS  := Substr(mm.SP,1,4);
+      l_Ob22_SS := Substr(mm.SP,5,2);
+      l_NBS_SN  := Substr(mm.SPN,1,4);
       l_Ob22_SN := Substr(mm.SPN,5,2);
-   else 
-      l_NBS_SS  := Substr(mm.SS,1,4);  
-      l_Ob22_SS := Substr(mm.SS,5,2);  
-      l_NBS_SN  := Substr(mm.SN,1,4); 
+   else
+      l_NBS_SS  := Substr(mm.SS,1,4);
+      l_Ob22_SS := Substr(mm.SS,5,2);
+      l_NBS_SN  := Substr(mm.SN,1,4);
       l_Ob22_SN := Substr(mm.SN,5,2);
    end if;
 
 
-   begin 
-      SELECT a.Nls,  a.acc,  i.id, n.nls, n.acc 
+   begin
+      SELECT a.Nls,  a.acc,  i.id, n.nls, n.acc
       INTO     SS_,   acc_,  id_ , SN_  , acra_
-      FROM (select * from accounts where kv=kv_ AND nbs=l_NBS_SS and ob22=l_OB22_SS AND rnk=rnk_ and NVL(mdate,D11)<gl.bDate and NVL(dapp,D11)<D10 and dazs is null AND ostc=0 AND ostb=0 AND ostf=0) a, 
-           (select * from accounts where kv=kv_ AND nbs=l_NBS_SN and ob22=l_OB22_SN AND rnk=rnk_ and NVL(mdate,D11)<gl.bDate and NVL(dapp,D11)<D10 and dazs is null AND ostc=0 AND ostb=0 AND ostf=0) n, 
+      FROM (select * from accounts where kv=kv_ AND nbs=l_NBS_SS and ob22=l_OB22_SS AND rnk=rnk_ and NVL(mdate,D11)<gl.bDate and NVL(dapp,D11)<D10 and dazs is null AND ostc=0 AND ostb=0 AND ostf=0) a,
+           (select * from accounts where kv=kv_ AND nbs=l_NBS_SN and ob22=l_OB22_SN AND rnk=rnk_ and NVL(mdate,D11)<gl.bDate and NVL(dapp,D11)<D10 and dazs is null AND ostc=0 AND ostb=0 AND ostf=0) n,
            int_accn i,
            (select acc from SPECPARAM_CP_OB where INITIATOR = l_INITIATOR ) o
       WHERE a.acc = i.acc AND i.acra = n.acc and i.id = a.pap-1  and rownum = 1 ;
@@ -496,7 +497,7 @@ procedure ro_deal (
         nid_        in integer,
         nkv_        in integer,
         nls_old     in varchar2,
-        nls_new     in varchar2,  -- Новый вид дог 
+        nls_new     in varchar2,  -- Новый вид дог
         nls8_new    in varchar2,  -- резерв
         ns_old      in number,
         ns_new      in number,
@@ -556,7 +557,7 @@ procedure ro_deal (
 
 BEGIN
 logger.info ('RRR'  ||'*'
-      ||cc_id_new   ||'*' 
+      ||cc_id_new   ||'*'
       || nd_        ||'*'
       || nid_       ||'*'
       || nkv_       ||'*'
@@ -588,8 +589,8 @@ logger.info ('RRR'  ||'*'
 
       SELECT acra  INTO ACRA_OLD FROM    int_accn    WHERE acc=ACC_OLD AND id=nID_ AND acra is not null ;
 
-      select * into AA from accounts where acc = ACC_OLD  ; 
-      select * into A8 from accounts where acc = ACRA_OLD ; 
+      select * into AA from accounts where acc = ACC_OLD  ;
+      select * into A8 from accounts where acc = ACRA_OLD ;
 
       begin  select INITIATOR  into l_INITIATOR  from SPECPARAM_CP_OB where  acc = ACC_OLD;
       EXCEPTION WHEN NO_DATA_FOUND THEN l_INITIATOR := null;
@@ -603,7 +604,7 @@ logger.info ('RRR'  ||'*'
    IF vidd_old = vidd_new then ---- nvl(CC_ID_NEW, cc_id_) = cc_id_ and DATN_NEW = DAT2_ THEN         --старая сделка (не ролловер, а пролонгация), просто меняем  реквизиты сделки
       UPDATE cc_deal   SET KPROLOG = KPROLOG +1, limit= nS_NEW, wdate=DatK_NEW     WHERE nd= ND_;
       ND_NEW   := ND_;
-      ACC_NEW  := ACC_OLD;     
+      ACC_NEW  := ACC_OLD;
       ACRA_NEW := ACRA_OLD;
 
    ElsIf trunc(vidd_old/100) <> trunc(vidd_new/100) then raise_application_error( -20666, 'НЕвідповідність видів угод: старої='|| Vidd_old ||' та нової='|| Vidd_new ) ;
@@ -642,7 +643,7 @@ logger.info ('RRR'  ||'*'
       end;
    end if;
 
-   --------------------------------------------------------------	   
+   --------------------------------------------------------------
    -- для остального
    select substr(
        decode ( nvl(CC_ID_NEW, cc_id_),cc_id_,  decode (DATN_NEW,DAT2_,'Змiни:','Змiни-Ролл:'),'Змiни-Ролл:')||
@@ -662,7 +663,7 @@ logger.info ('RRR'  ||'*'
       IF SQL%rowcount = 0 THEN     -- определим контрсчет для проц карточки
          nG67_ := MBK.ACC_DOX_RASX( VIDD_new, nKv_);
          INSERT INTO int_accn (ACC, ID, METR, BASEM, BASEY, FREQ, STP_DAT   , ACR_DAT, APL_DAT, TT, ACRA    , ACRB , S, TTB, KVB, NLSB, MFOB, NAMB, NAZN)
-                    SELECT ACC_NEW,nID_,METR, BASEM, BASEY, FREQ, DatK_NEW-1, ACR_DAT, APL_DAT, TT, ACRA_NEW, nG67_, S, TTB, KVB, NLSB, MFOB, NAMB, NAZN  
+                    SELECT ACC_NEW,nID_,METR, BASEM, BASEY, FREQ, DatK_NEW-1, ACR_DAT, APL_DAT, TT, ACRA_NEW, nG67_, S, TTB, KVB, NLSB, MFOB, NAMB, NAZN
                     FROM int_accn WHERE acc = ACC_OLD and id = nID_;
       END IF;
    END IF;
@@ -746,7 +747,7 @@ END RO_deal;
 
         bars_audit.trace( '%s: Entry with ( p_clt_amnt ).', title, to_char(p_clt_amnt) );
 
-        begin select a.NLS, a.NMS    into l_9910_num, l_9910_nm     
+        begin select a.NLS, a.NMS    into l_9910_num, l_9910_nm
               from BARS.ACCOUNTS a  where a.NLS  = Substr(BARS.BRANCH_USR.GET_BRANCH_PARAM('NLS_9900'),1,14)   and a.KV   = p_ccy_id    and a.DAZS is Null;
         exception  when NO_DATA_FOUND then   raise_application_error( -20666, 'Не знайдено або закритий рахунок 9910', true );
         end;
@@ -953,15 +954,15 @@ END RO_deal;
       -- счет доходов-расходов c превентивным открытием
       OP_BS_OB1 ( PP_BRANCH => Substr( sys_context('bars_context','user_branch'),1,15) , P_BBBOO  => MM.SD_N ) ;
       OP_BS_OB1 ( PP_BRANCH => Substr( sys_context('bars_context','user_branch'),1,15) , P_BBBOO  => MM.SD_I ) ;
-      --------------------------------------------------------------	   
-      If nKv_ <> gl.baseval then 
-        MM.SD_N := MM.SD_I; 
+      --------------------------------------------------------------
+      If nKv_ <> gl.baseval then
+        MM.SD_N := MM.SD_I;
       end if;
 
       Acc3_ := MBK.ACC_DOX_RASX(p_vidd => nVidd_, p_kv=>nKv_ ) ;
-  
+
       nd_ := bars_sqnc.get_nextval('s_cc_deal');
-      INSERT INTO cc_deal(nd, vidd, rnk, user_id, cc_id, sos, wdate, sdate, limit, kprolog,ir,prod) 
+      INSERT INTO cc_deal(nd, vidd, rnk, user_id, cc_id, sos, wdate, sdate, limit, kprolog,ir,prod)
         VALUES (ND_,nVidd_,RNKB_,gl.aUid,CC_ID_,10,DAT4_,nvl(DDAte_, gl.BDATE), SUM_, 0, IRR_,code_product_);
 
       INSERT INTO cc_add (nd         , adds       , s      , kv     , bdate  , wdate  , sour      , acckred   , mfokred , freq      , accperc   ,
@@ -971,47 +972,47 @@ END RO_deal;
                           S4_        , S5_        , bica_  , ssla_  , bicb_  , sslb_  , sump_     , altb_     , intermb_, IntPartyA_, IntPartyB_,
                           IntIntermA_, IntIntermB_, n_nbu_ , d_nbu_ );
 
-      if  nTipd_ Is Null then 
-        select TIPD 
-          into l_tipd  
-          from CC_VIDD 
-            where VIDD = nVidd_;   
-      else  
-        l_tipd := nTipd_; 
+      if  nTipd_ Is Null then
+        select TIPD
+          into l_tipd
+          from CC_VIDD
+            where VIDD = nVidd_;
+      else
+        l_tipd := nTipd_;
       end if ;
-      
-      if l_tipd = 1      then  
---        nID_:=0; 
-        Tip1_:='SS '; 
-        Tip2_:='SN '; 
-      else  
---        nID_:=1; 
-        Tip1_:='DEP'; 
-        Tip2_  :='DEN'  ; 
+
+      if l_tipd = 1      then
+--        nID_:=0;
+        Tip1_:='SS ';
+        Tip2_:='SN ';
+      else
+--        nID_:=1;
+        Tip1_:='DEP';
+        Tip2_  :='DEN'  ;
       end if ;
 
       --
-      
+
 
       -- открытие основного счета +  открытие счета нач.%%
-      op_reg_ex (1,ND_,nTmp_, 33, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, gl.aUid, ACC1_, '1', null, null,  null);  
+      op_reg_ex (1,ND_,nTmp_, 33, nTmp_,RNKB_,NLSA_, nKv_,NMS_, Tip1_, gl.aUid, ACC1_, '1', null, null,  null);
       accreg.setAccountSParam(ACC1_, 'OB22', Substr(MM.ss,5,2)  );
       begin
-        select case pap 
+        select case pap
                  when 1 then 0
                  when 2 then 1
                  else nid_
                end
           into nid_
-          from accounts 
+          from accounts
           where nls = nlsa_
             and kv = nkv_;
-      exception 
+      exception
         when others then
           nid_ := nid_;
       end;
 
-      op_reg_ex (1,ND_,nTmp_, 33, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, gl.aUid, ACC2_, '1', null, null,  null);  
+      op_reg_ex (1,ND_,nTmp_, 33, nTmp_,RNKB_,NLSNA_,nKv_,NMSN_,Tip2_, gl.aUid, ACC2_, '1', null, null,  null);
       accreg.setAccountSParam(ACC2_, 'OB22', Substr(MM.sn,5,2)  );
 
       update accounts set mdate = DAT4_ where acc = ACC1_;
@@ -1019,65 +1020,65 @@ END RO_deal;
       update accounts set mdate = DAT4_ where acc = ACC2_;
 
       -------------------------------------------------------------------------------------------------------------------------
-      UPDATE cc_add          
-        SET accs=ACC1_ 
-        WHERE nd=ND_; 
+      UPDATE cc_add
+        SET accs=ACC1_
+        WHERE nd=ND_;
       l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
 
-      update SPECPARAM_CP_OB 
-        set INITIATOR= l_INITIATOR 
-        where acc=ACC1_; 
+      update SPECPARAM_CP_OB
+        set INITIATOR= l_INITIATOR
+        where acc=ACC1_;
 
-      if SQL%rowcount= 0 then 
-        insert into SPECPARAM_CP_OB (ACC,INITIATOR) 
-          values ( ACC1_,l_INITIATOR );  
+      if SQL%rowcount= 0 then
+        insert into SPECPARAM_CP_OB (ACC,INITIATOR)
+          values ( ACC1_,l_INITIATOR );
       end if;
 
-      update SPECPARAM_CP_OB 
-        set INITIATOR= l_INITIATOR 
-        where acc=ACC2_; 
-      if SQL%rowcount= 0 then 
-        insert into SPECPARAM_CP_OB (ACC,INITIATOR) 
-          values ( ACC2_,l_INITIATOR );  
+      update SPECPARAM_CP_OB
+        set INITIATOR= l_INITIATOR
+        where acc=ACC2_;
+      if SQL%rowcount= 0 then
+        insert into SPECPARAM_CP_OB (ACC,INITIATOR)
+          values ( ACC2_,l_INITIATOR );
       end if;
 
 
       IF NLSZ_ is not null  then         -- открытие счета залога
          op_reg_ex ( 2, ND_, p_pawn  , 2, nTmp_, RNKB_, NLSZ_, nKVZ_, NMS_, 'ZAL', gl.aUid, ACC4_, '1', null, null, null                   ); -- KB  pos=1
          p_setAccessByAccmask(ACC4_, ACC1_);           -- проставляем группу доступа для счета залога как для основного счета
-         insert into nd_acc (nd, acc) 
+         insert into nd_acc (nd, acc)
            values (ND_, ACC4_);
-         if l_tipd = 1 then 
-           update cc_accp 
-             set nd=ND_ 
-             where acc=ACC4_ 
-               and accs=ACC1_; 
-           IF SQL%rowcount = 0 then 
-             INSERT into cc_accp (ACC,ACCS,nd) 
-               values (ACC4_,ACC1_,ND_); 
-           END IF;   
+         if l_tipd = 1 then
+           update cc_accp
+             set nd=ND_
+             where acc=ACC4_
+               and accs=ACC1_;
+           IF SQL%rowcount = 0 then
+             INSERT into cc_accp (ACC,ACCS,nd)
+               values (ACC4_,ACC1_,ND_);
+           END IF;
          END IF;
          cck_utl.set_deal_attribute(ND_, 'PAWN', to_char(p_pawn));
 
-         IF Id_DCP_ is not null then   
-           UPDATE dcp_p 
-             Set ref=-ND_, 
-                 acc=ACC1_ 
-             WHERE id=Id_DCP_; 
+         IF Id_DCP_ is not null then
+           UPDATE dcp_p
+             Set ref=-ND_,
+                 acc=ACC1_
+             WHERE id=Id_DCP_;
          END IF;          -- обеспечение - ДЦП
-         UPDATE accounts 
+         UPDATE accounts
            SET mdate=DAT4_,
-               PAP=l_tipd 
+               PAP=l_tipd
            WHERE acc=ACC1_;
-         UPDATE accounts 
-           SET mdate=DAT4_            
+         UPDATE accounts
+           SET mdate=DAT4_
            WHERE acc=ACC2_;
-         UPDATE accounts 
-           SET mdate=DAT4_            
+         UPDATE accounts
+           SET mdate=DAT4_
            WHERE acc=ACC4_;
       end if;
       -- Внесение РНК в CUSTBANK для сделок (2700,2701,3660)
-      if mbdk_tip(nVidd_) = 1 THEN 
+      if mbdk_tip(nVidd_) = 1 THEN
          update custbank set bki = 1 where rnk = RNKB_ ;
          if SQL%rowcount = 0 then
             insert into custbank (rnk, bki) values (RNKB_, 1);
@@ -1086,129 +1087,129 @@ END RO_deal;
       -- Artem Yurchenko, 24.11.2014
       -- для кредитных ресурсов необходимо использовать другие операции
       if (check_if_deal_belong_to_crsour(nVidd_) = 'Y') then           -- установка ОБ22 +     -- проставим спецпараметр МФО (нужно для файлов 32, 33)
-           l_ob22 := '02';  
-           accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);    
+           l_ob22 := '02';
+           accreg.setAccountSParam(ACC1_, 'OB22', l_ob22);
            accreg.setAccountSParam(ACC2_, 'OB22', l_ob22);
-           sTTB_ := 'PS2';  
-           accreg.setAccountSParam(ACC1_, 'MFO' , s2_   );    
+           sTTB_ := 'PS2';
+           accreg.setAccountSParam(ACC1_, 'MFO' , s2_   );
            accreg.setAccountSParam(ACC2_, 'MFO' , s2_   );
            sTTA_ := '%%1';
-      else 
-        sTTB_ := case 
-                   when nKv_ = gl.baseval then 
-                       'WD2' 
-                   else 'WD3' 
+      else
+        sTTB_ := case
+                   when nKv_ = gl.baseval then
+                       'WD2'
+                   else 'WD3'
                  end;
            --операция по начислению проц
-           BEGIN 
-             SELECT val 
-               INTO sTTA_ 
-               FROM params 
-               WHERE par='MBD_%%1';      
-           EXCEPTION 
-             WHEN NO_DATA_FOUND THEN 
-               sTTA_ := '%%1';       
+           BEGIN
+             SELECT val
+               INTO sTTA_
+               FROM params
+               WHERE par='MBD_%%1';
+           EXCEPTION
+             WHEN NO_DATA_FOUND THEN
+               sTTA_ := '%%1';
            END;
-           BEGIN 
-             SELECT decode(codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') ) 
-               INTO sTTA_ 
-               FROM customer 
-               WHERE rnk=RNKB_; 
-           EXCEPTION 
-             WHEN NO_DATA_FOUND THEN 
-               sERR_ := 'Не найден RNKB '||RNKB_;   
-               raise_application_error( -20666, sERR_ );  --raise inr_err; 
+           BEGIN
+             SELECT decode(codcagent,1, sTTA_, decode(l_tipd,1,'%00','%02') )
+               INTO sTTA_
+               FROM customer
+               WHERE rnk=RNKB_;
+           EXCEPTION
+             WHEN NO_DATA_FOUND THEN
+               sERR_ := 'Не найден RNKB '||RNKB_;
+               raise_application_error( -20666, sERR_ );  --raise inr_err;
            END;
       end if;
 
-      update INT_ACCN 
-        set BASEY = nBASEY_, 
-            TT = sTTA_, 
-            STP_DAT = DAT4_-1, 
-            ACRA = ACC2_, 
-            ACRB = ACC3_, 
-            s = 0, 
-            IO = mm.io , 
-            acr_dat = decode(mm.io,1,gl.BDATE,acr_dat)   
-        where acc = ACC1_  
+      update INT_ACCN
+        set BASEY = nBASEY_,
+            TT = sTTA_,
+            STP_DAT = DAT4_-1,
+            ACRA = ACC2_,
+            ACRB = ACC3_,
+            s = 0,
+            IO = mm.io ,
+            acr_dat = decode(mm.io,1,gl.BDATE,acr_dat)
+        where acc = ACC1_
           and id  = nID_;
-      IF SQL%rowcount = 0  then  
+      IF SQL%rowcount = 0  then
         INSERT INTO int_accN (acc, ID, metr, basem, BASEY, freq, ACRA, ACRB, KVB, TT, TTB, STP_DAT, s, IO, acr_dat )
           VALUES (ACC1_, nID_, 0, 0, nBASEY_, 1, ACC2_, ACC3_, nKv_, sTTA_, sTTB_, DAT4_-1, 0, mm.io, decode(mm.io,1,gl.BDATE,null));
       END IF;
 
-      IF    nID_ = 1 and nKV_ =gl.baseval OR check_if_deal_belong_to_crsour(nVidd_) = 'Y'  then 
-            UPDATE int_accN 
-              Set NLSB=substr(nlsnb_, 1,14), 
-                  NAMB= l_nmkb, 
-                  NAZN=Nazn_, 
-                  MFOB=S2_    
-              WHERE acc=ACC1_ 
+      IF    nID_ = 1 and nKV_ =gl.baseval OR check_if_deal_belong_to_crsour(nVidd_) = 'Y'  then
+            UPDATE int_accN
+              Set NLSB=substr(nlsnb_, 1,14),
+                  NAMB= l_nmkb,
+                  NAZN=Nazn_,
+                  MFOB=S2_
+              WHERE acc=ACC1_
                 AND id=1;
-      ELSe  
-        UPDATE int_accN 
-          Set NLSB=substr(NLSNB_, 1,14), 
-              NAMB= l_nmkb, 
-              NAZN=Nazn_              
+      ELSe
+        UPDATE int_accN
+          Set NLSB=substr(NLSNB_, 1,14),
+              NAMB= l_nmkb,
+              NAZN=Nazn_
           WHERE acc=ACC1_ AND id=1;
       end if;
 
-      update INT_ratn 
-        SET ir=IR_, 
-            op=OP_, 
-            br=BR_ 
-        where acc=ACC1_ 
-          and id=nID_ 
-          and bdat=DAT2_; 
-      if SQL%rowcount=0 then 
-        INSERT INTO INT_ratn(acc,ID,bdat,ir,op,br) 
-           VALUES (ACC1_,nID_,DAT2_,IR_,OP_,BR_);  
+      update INT_ratn
+        SET ir=IR_,
+            op=OP_,
+            br=BR_
+        where acc=ACC1_
+          and id=nID_
+          and bdat=DAT2_;
+      if SQL%rowcount=0 then
+        INSERT INTO INT_ratn(acc,ID,bdat,ir,op,br)
+           VALUES (ACC1_,nID_,DAT2_,IR_,OP_,BR_);
       end if;
 
       -- При открытии договора D020 := '01'
-      UPDATE specparam 
-        set D020 = '01' 
-        where acc=ACC1_;         
-      if SQL%rowcount = 0 then   
-        INSERT INTO specparam (ACC, D020 ) 
-          values ( ACC1_, '01' );     
+      UPDATE specparam
+        set D020 = '01'
+        where acc=ACC1_;
+      if SQL%rowcount = 0 then
+        INSERT INTO specparam (ACC, D020 )
+          values ( ACC1_, '01' );
       end if;
-      
-      if nVidd_ like '1%' then   
+
+      if nVidd_ like '1%' then
         l_s180 := FS180(ACC1_, '1', bankdate);          -- новый код срока только для 1-го класса
-        update specparam 
-          set s180 = l_s180 
-          where acc = acc1_;  
-        if SQL%rowcount = 0 then  
-          INSERT INTO specparam (ACC, S180) 
-            values (ACC1_, l_s180);       
+        update specparam
+          set s180 = l_s180
+          where acc = acc1_;
+        if SQL%rowcount = 0 then
+          INSERT INTO specparam (ACC, S180)
+            values (ACC1_, l_s180);
         end if;
       end if;
 
       -- установка параметрів Первинний та Поточний ВКР
-      begin  
-        select VALUE    
-          into l_txt    
-          from BARS.CUSTOMERW   
-            where RNK = RNKB_     
-              and TAG = 'VNCRR';          
-      exception  
-        when NO_DATA_FOUND then    
-          bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );    
-      end;  
+      begin
+        select VALUE
+          into l_txt
+          from BARS.CUSTOMERW
+            where RNK = RNKB_
+              and TAG = 'VNCRR';
+      exception
+        when NO_DATA_FOUND then
+          bars_audit.info( title || ': not found "VNCRR" for RNK = ' || to_char(RNKB_) );
+      end;
       cck_utl.set_deal_attribute( ND_, 'VNCRR', l_txt );         -- Поточний ВКР
 
       -- Первинний ВКР
-      begin  
-        insert into BARS.ND_TXT (ND, TAG, TXT )    
+      begin
+        insert into BARS.ND_TXT (ND, TAG, TXT )
           values    ( ND_, 'VNCRP', l_txt );
-      exception  
+      exception
         when DUP_VAL_ON_INDEX then   null;      -- вже був вставлений тригером
       end;
 
       l_clt_amnt := to_number( bars.pul.get_mas_ini_val('COLLATERAL_AMOUNT') );
       if l_clt_amnt > 0  and  NLSZ_ is Not Null    then
-         collateral_payments( p_mbk_id   => ND_  , p_mbk_num=> CC_ID_, p_beg_dt=> DAT2_, p_end_dt=> DAT4_, p_clt_amnt => l_clt_amnt, 
+         collateral_payments( p_mbk_id   => ND_  , p_mbk_num=> CC_ID_, p_beg_dt=> DAT2_, p_end_dt=> DAT4_, p_clt_amnt => l_clt_amnt,
                               p_acc_num  => NLSZ_, p_ccy_id => nKVZ_ , p_rnk   => RNKB_, p_dk    => case when l_tipd = 1 then 1 else 0 end   );
       end if;
 
@@ -1342,7 +1343,7 @@ END RO_deal;
         select d.SDATE, v.TIPD   into DAT1_,TIPD_    from cc_deal d , cc_vidd v  where d.nd=ND_ and d.vidd=v.vidd ;
         for k in (select acc from nd_acc where nd=ND_)
         loop delete from int_ratn where acc=k.ACC and bdat >=DAT1_;
-             update accounts SET mdate = null where acc=k.Acc  and acc not in (select acc from mbd_k where nd<>ND_) and ostc+ostb=0;   
+             update accounts SET mdate = null where acc=k.Acc  and acc not in (select acc from mbd_k where nd<>ND_) and ostc+ostb=0;
         end loop;
 
         delete from mbd_k_r where nd=ND_     and ref in ( select ref from oper where sos<0 );
@@ -1373,6 +1374,7 @@ END RO_deal;
          from cc_deal D, cc_vidd V,cc_add p,accounts a,accounts n,int_accn i
         where (ND_=0 or d.nd=ND_) and d.nd=p.nd
           and d.vidd=v.vidd and ( v.custtype=1 or v.vidd in (2700,2701,3660) )
+          and not d.vidd in (3902,3903)
           and p.adds=0 and  p.accs=a.acc
           AND i.acc=a.acc AND i.acra=n.acc
          and d.sos<15 --and d.WDATE <= gl.BDATE
@@ -1382,7 +1384,7 @@ END RO_deal;
         begin  -- определим максимальный номер договора, который обслуживают счета
           select max(nd) into p_nd from nd_acc  where acc in (k.accs,k.accp);
         EXCEPTION WHEN NO_DATA_FOUND THEN p_nd:=0;
-        end; 
+        end;
         if p_fl = 0 and k.WDATE <= gl.BDATE THEN
            if ( k.ostcs=0 and k.ostbs=0 and k.ostfs=0
             and k.ostcp=0 and k.ostbp=0 and k.ostfp=0
@@ -1396,28 +1398,28 @@ END RO_deal;
            then p_sos:=15;
            else p_sos:=k.sos;
            end if;
-        elsif p_fl <> 0 THEN 
+        elsif p_fl <> 0 THEN
            if k.nd >= p_nd THEN
               if k.ostcs<>0 or k.ostbs<>0 or k.ostfs<>0 or k.ostcp<>0 or k.ostbp<>0 or k.ostfp<>0 THEN
-                 l_txt := 'Неможливо перенести в архів! Існує залишок! ND =' || k.nd;   raise_application_error( -20555, l_txt ); 
-                 --l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
+                 l_txt := 'Неможливо перенести в архів! Існує залишок! ND =' || k.nd;   raise_application_error( -20555, l_txt );
+                 --l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR');
                  --cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' є залишок /' );
               elsif  k.acr_dat+1 < k.wdate THEN
-                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
+                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR');
                  cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' дата нарахов.% < дати закін.дог./' );
               elsif k.mdate_a <> k.wdate THEN
-                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
+                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR');
                  cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' дата закін.дії рах.тіла<>даті закін.дог./' );
               elsif k.mdate_a <> k.mdate_n  THEN
-                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
+                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR');
                  cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' дата закін.дії рах.%<>дата закін.дії рах.тіла/' );
               end if;
            else
               if k.mdate_a <= k.wdate THEN
-                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
+                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR');
                  cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' дата закін.дії рах.тіла<=даті закін.дог./' );
               elsif k.mdate_a<>k.mdate_n  THEN
-                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR'); 
+                 l_TXT := cck_app.Get_ND_TXT (k.ND,'CL_ERR');
                  cck_app.Set_ND_TXT (k.nd, 'CL_ERR', l_txt || ' дата закін.дії рах.%<>даті закін.дог./' );
               end if;
            end if;
@@ -1447,7 +1449,7 @@ END RO_deal;
 --
 PROCEDURE del_Ro_deal (ND_ integer ) IS  ---    откат сегодняшней сделки Ролловер
       Ref_      number ;
-      Ref1_     number := 0; 
+      Ref1_     number := 0;
       Ref2_     number := 0;
       Tipd_     number ;
       ND_Old_   number ;
@@ -1465,16 +1467,16 @@ BEGIN
    IF SDate_ <> gl.bdate  THEN   erm := 'Невозможно откатить HEсегодняшнюю сделку RollOver!';   raise_application_error( -20666, erm );     END IF;
 
    begin   select t.tipd into tipd_      from cc_vidd t, cc_deal c      where c.nd=ND_   and c.vidd=t.vidd;
-   EXCEPTION  WHEN NO_DATA_FOUND THEN    erm := 'Не определен вид договора или договора нет в системе';    raise_application_error( -20666, erm ); 
+   EXCEPTION  WHEN NO_DATA_FOUND THEN    erm := 'Не определен вид договора или договора нет в системе';    raise_application_error( -20666, erm );
    end;
 
    -- ND сделки, исходной для Ролловер (предыдущей)   -- Откат переброски по Ролл
    -- 1. референс документа Ролл текущей сделки
    SELECT nvl(min(m.ref),0)    INTO Ref2_    FROM mbd_k_r m, oper p    WHERE m.nd=ND_ AND m.ref=p.ref AND p.tt='KV1'       AND upper(p.nazn) like '%ROLLOVER%' ;
-   IF  Ref2_=0  THEN   erm := 'Не нашли Реф. документа Ролловер текущей сделки';     raise_application_error( -20666, erm ); end if ;  
+   IF  Ref2_=0  THEN   erm := 'Не нашли Реф. документа Ролловер текущей сделки';     raise_application_error( -20666, erm ); end if ;
 
    begin   select to_number(value) into ND_Old_    from operw where ref=Ref2_ and tag='MBKND';
-   EXCEPTION WHEN NO_DATA_FOUND THEN   erm := 'Отсутствует  допреквизит MBKND для реф.'||Ref2_; raise_application_error( -20666, erm ); 
+   EXCEPTION WHEN NO_DATA_FOUND THEN   erm := 'Отсутствует  допреквизит MBKND для реф.'||Ref2_; raise_application_error( -20666, erm );
    end;
 
    -- 2. Максимальный Ref документа Ролл предыдущ. сделки (если несколько Ролл по старым версиям)
@@ -1507,7 +1509,7 @@ BEGIN
    end if;
    -- SDate, WDate предыдущ. сделки
    BEGIN      SELECT sdate, wdate INTO SDate_, WDate_ FROM cc_deal WHERE nd=ND_Old_ ;
-   EXCEPTION WHEN NO_DATA_FOUND THEN        erm := 'Не нашли даты предыдущ. сделки' ;        raise_application_error( -20666, erm ); 
+   EXCEPTION WHEN NO_DATA_FOUND THEN        erm := 'Не нашли даты предыдущ. сделки' ;        raise_application_error( -20666, erm );
    END;
 
    FOR k IN (SELECT acc FROM nd_acc WHERE nd=ND_)
@@ -1599,14 +1601,14 @@ begin
 
   for k in ( select b.par, b.txt
              from ( select a.par, nvl(b.rep_prefix,'DEFAULT') rep_prefix
-                    from ( select par from tickets_par  where upper(rep_prefix) = upper(p_tic_name)    and mod_code = 'MBK'      union 
-                           select par from tickets_par  where upper(rep_prefix) = upper('DEFAULT')     and mod_code = 'MBK' 
-                         ) a, 
+                    from ( select par from tickets_par  where upper(rep_prefix) = upper(p_tic_name)    and mod_code = 'MBK'      union
+                           select par from tickets_par  where upper(rep_prefix) = upper('DEFAULT')     and mod_code = 'MBK'
+                         ) a,
                          tickets_par b
-                    where a.par = b.par(+)    and upper(b.rep_prefix(+)) = upper(p_tic_name) 
-                  ) a, 
+                    where a.par = b.par(+)    and upper(b.rep_prefix(+)) = upper(p_tic_name)
+                  ) a,
                  tickets_par b
-             where upper(a.rep_prefix) = upper(b.rep_prefix)    and a.par = b.par and b.txt is not null 
+             where upper(a.rep_prefix) = upper(b.rep_prefix)    and a.par = b.par and b.txt is not null
             )
   loop
      l_sql := replace( k.txt, ':ND', to_char(p_nd) ) ;
@@ -1682,12 +1684,12 @@ function estimate_interest_amount(
         p_currency_id in integer,
         p_interest_base in number,
         p_interest_rate in number)
-    return number    is  
+    return number    is
         MM MBDK_ob22%rowtype;
         l_date_from   date := p_deal_start_date;
         l_date_through date := p_deal_expiry_date - 1; -- в останній день угоди відсотки не нараховуються, в цей день угода вже не працює (може відрізнятися для інших банків)
-begin 
-   MM := MBK.Get_MBDK (p_Vidd => p_product_id ); 
+begin
+   MM := MBK.Get_MBDK (p_Vidd => p_product_id );
    if MM.IO = interest_utl.BALANCE_KIND_BANK_DATE_IN   then   l_date_from := l_date_from + 1;    end if;
 
    return currency_utl.from_fractional_units(
@@ -3296,6 +3298,7 @@ PROCEDURE inp_deal_Ex_old (
     function header_version return varchar2 is    begin        return 'Package header MBK ' || MBK_HEAD_VERS;    end;
     function body_version return varchar2   is    begin        return 'Package body MBK ' || MBK_BODY_VERS;    end;
 end;
+
 /
  show err;
  
