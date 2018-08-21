@@ -348,6 +348,7 @@ function checkDocType(type) {
         $('#trDocSerial,#trDocNumber,#trDocOrgan,#trDocDate').show();
         $('#trIDNumber,#trIDRecordNum,#trIDOrgan,#trIDDate').hide();
     }
+    if (type == "1") $('#datePfotoRow').show(); else $('#datePfotoRow').hide();
 }
 /// Перевірка Номера запису в ЄДДР для Паспорта ID-картки
 /// Аналогічна перевірка продубльована в JScriptForregistration.js -> Check_ClientRekvPerson()
