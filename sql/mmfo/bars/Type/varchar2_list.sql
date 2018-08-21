@@ -12,3 +12,4 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on VARCHAR2_LIST   to UPLD;
 grant EXECUTE                                                                on VARCHAR2_LIST   to WR_ALL_RIGHTS;
 grant EXECUTE                                                                on VARCHAR2_LIST   to BARS_INTGR;
+grant EXECUTE                                                                on VARCHAR2_LIST   to BARS_DM;

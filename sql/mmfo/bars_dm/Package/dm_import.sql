@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 5.0.4 17/08/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
+    g_header_version  constant varchar2(64)  := 'version 5.0.5 21/08/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -17,7 +17,7 @@ is
 
     --
     -- body_version - возвращает версию тела пакета
-    -- 
+    --
     function body_version return varchar2;
 
     --
@@ -79,13 +79,13 @@ is
                            p_state      out varchar2);
 
     --
-    -- import accounts
+    -- Выгрузка клиентских счетов
     --
-    procedure accounts_imp(p_dat        in date default trunc(sysdate),
-                           p_periodtype in varchar2 default C_FULLIMP,
-                           p_rows       out number,
-                           p_rows_err   out number,
-                           p_state      out varchar2);
+    procedure accounts_imp (p_dat        in  date     default trunc(sysdate), 
+                            p_periodtype in  varchar2 default C_FULLIMP, 
+                            p_rows       out number, 
+                            p_rows_err   out number, 
+                            p_state      out varchar2);
 
     --
     -- import bpk
@@ -215,7 +215,7 @@ is
     --
     procedure imp_run(p_dat        in date default sysdate,
                       p_periodtype in varchar2 default C_FULLIMP);
-                  
+
     --
     -- выгрузка для кредитов по финансовых операциях
     --
@@ -239,11 +239,11 @@ Show errors;
 CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
-    
-    g_body_version constant varchar2(64) := 'Version 5.0.4 17/08/2018';--+2620БПК.+gcif
+
+    g_body_version constant varchar2(64) := 'Version 5.0.5 21/08/2018';--+2620БПК.+gcif
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
-	-- BARS_INTGR - integration
+    -- BARS_INTGR - integration (changenumber by object / KF)
     -- DIY - parallel
     -- partitioned: segments, credits_stat, custur, customers_plt
     c_cntdays constant number := 40; -- кількість днів, за які зберігаємо дані у вітринах
@@ -272,7 +272,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
     begin
           execute immediate 'alter table '||p_table_name||' add partition P'||p_period_id||' values ('||p_period_id||')';
     exception
-    when partition_exist then       
+    when partition_exist then
         bars_audit.info('Вивантаження даних для CRM - така секція в вітрині вже існує '|| p_table_name ||' за період   з ідентифікатором {' || p_period_id || '}');
     end add_partition;
 
@@ -351,6 +351,38 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
 
       commit;
     end log_stat_event;
+    
+    --
+    -- Уведомление интеграционной схемы (BARS_INTGR) о завершении полной выгрузки по объекту
+    -- запись в лог, при успешной выгрузке - увеличение changenumber, переключение витрины на bars_dm
+    --
+    procedure notify_intgr (p_periodtype   in period_type.id%type,
+                            p_objects_list in bars.varchar2_list,
+                            p_start_time   in date,
+                            p_rows_ok      in number,
+                            p_rows_err     in number,
+                            p_status       in bars_dm.dm_stats.status%type)
+    is
+    begin
+        if p_periodtype = C_FULLIMP then
+            for obj in (select column_value as obj_name from table(p_objects_list))
+            loop
+                if p_status = 'SUCCESS' then
+                    bars_intgr.xrm_import.increment_object_changenumber(obj.obj_name);
+                    bars_intgr.xrm_import.set_import_mode(p_mode        => bars_intgr.xrm_import.G_IMPORT_MODE_FULL, 
+                                                          p_object_name => obj.obj_name);
+                end if;
+                bars_intgr.xrm_import.log_stat_details(p_changenumber => case when p_status = 'SUCCESS' then bars_intgr.xrm_import.get_object_changenumber(obj.obj_name) end,
+                                                       p_start_time   => p_start_time,
+                                                       p_stop_time    => sysdate,
+                                                       p_object_name  => obj.obj_name,
+                                                       p_rows_ok      => p_rows_ok,
+                                                       p_rows_err     => p_rows_err,
+                                                       p_status       => p_status);
+            end loop;
+        else return;
+        end if;
+    end notify_intgr;
 
     --
     -- import month (full)
@@ -817,7 +849,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 and a.rnk      = c.rnk
                 and c.custtype in (2, 3)
             --  and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
-                and ba.acc_pk = aa.acc and aa.nbs in ('2625', '2620') 
+                and ba.acc_pk = aa.acc and aa.nbs in ('2625', '2620')
                 and ba.acc_9129 = a9129.acc(+)
 
             union all
@@ -2360,18 +2392,22 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
     --
     -- Выгрузка клиентских счетов
     --
-    procedure accounts_imp (p_dat in date default trunc(sysdate), p_periodtype in varchar2 default C_FULLIMP, p_rows out number, p_rows_err out number, p_state out varchar2)
+    procedure accounts_imp (p_dat        in  date     default trunc(sysdate), 
+                            p_periodtype in  varchar2 default C_FULLIMP, 
+                            p_rows       out number, 
+                            p_rows_err   out number, 
+                            p_state      out varchar2)
     is
-        l_trace  varchar2(500) := G_TRACE||'accounts_imp: ';
-        l_per_id periods.id%type;
-        l_row    dm_accounts%rowtype;
-        l_errmsg varchar2(512);
+        l_trace      varchar2(500)          := G_TRACE||'accounts_imp: ';
+        l_errmsg     varchar2(512);
+        -- intgr logs
+        l_start_time  date                  := sysdate;
+        l_rows        pls_integer           := 0;
+        l_rows_err    pls_integer           := 0;
 
-        l_rows     pls_integer := 0;
-        l_rows_err pls_integer := 0;
-
-        c        sys_refcursor;
-
+        l_row         dm_accounts%rowtype;
+        l_per_id      periods.id%type;
+        c             sys_refcursor;
         q_str_pre  varchar2(4000) := 'with dapp as
                                          (select a.acc
                                             from bars.accounts a
@@ -2492,6 +2528,13 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         p_state := 'SUCCESS';
         bars.bars_audit.info(l_trace||' accounts count='||l_rows);
         bars.bars_audit.info(l_trace||' finish');
+
+        notify_intgr(p_periodtype   => p_periodtype,
+                     p_objects_list => bars.varchar2_list('ACCOUNTS'),
+                     p_start_time   => l_start_time,
+                     p_rows_ok      => l_rows,
+                     p_rows_err     => l_rows_err,
+                     p_status       => p_state);
 
     end accounts_imp;
 
@@ -2657,7 +2700,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
          (select distinct rnk from bars.corps_update pu where pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
           union
          (select distinct rnk from bars.custbank_update pu where pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
-		  union
+          union
          (select distinct rnk from bars.ebkc_gcif ebkg where  ebkg.insert_date between trunc(:p_dat) and trunc(:p_dat)+0.99999)
          ) ';
         -- основной запрос
@@ -3665,6 +3708,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         l_per_id periods.id%type;
         l_row    deposit_PLT%rowtype;
         l_errmsg varchar2(512);
+        l_start_time date := sysdate;
 
         l_rows     pls_integer := 0;
         l_rows_err pls_integer := 0;
@@ -3984,8 +4028,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.wb          := c.wb;
             l_row.ob22            := c.ob22;
             l_row.nms             := c.nms;
-			l_row.ob22 := c.ob22;
-			l_row.nms := c.nms;
+            l_row.ob22 := c.ob22;
+            l_row.nms := c.nms;
 
             insert into deposit_PLT values l_row;
             l_rows:=l_rows+1;
@@ -4148,8 +4192,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_row.wb          := c_clos.wb;
             l_row.ob22            := c_clos.ob22;
             l_row.nms             := c_clos.nms;
-			l_row.ob22 := c_clos.ob22;
-			l_row.nms := c_clos.nms;
+            l_row.ob22 := c_clos.ob22;
+            l_row.nms := c_clos.nms;
             insert into deposit_PLT values l_row;
             l_rows:=l_rows+1;
 
@@ -4169,6 +4213,13 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
+        
+        notify_intgr(p_periodtype   => p_periodtype,
+                     p_objects_list => bars.varchar2_list('DEPOSITS2'),
+                     p_start_time   => l_start_time,
+                     p_rows_ok      => l_rows,
+                     p_rows_err     => l_rows_err,
+                     p_status       => p_state);
 
         bars.bars_audit.info(l_trace||' deposits count='||l_rows);
         bars.bars_audit.info(l_trace||' finish');
@@ -4185,6 +4236,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         l_per_id periods.id%type;
         l_row    bpk_plt%rowtype;
         l_errmsg varchar2(512);
+        l_start_time date := sysdate;
 
         l_rows     pls_integer := 0;
         l_rows_err pls_integer := 0;
@@ -4481,6 +4533,14 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
+        
+        notify_intgr(p_periodtype   => p_periodtype,
+                     p_objects_list => bars.varchar2_list('BPK2'),
+                     p_start_time   => l_start_time,
+                     p_rows_ok      => l_rows,
+                     p_rows_err     => l_rows_err,
+                     p_status       => p_state);
+                     
         bars.bars_audit.info(l_trace||' bpk_plt count='||l_rows);
         bars.bars_audit.info(l_trace||' finish');
 
@@ -4496,16 +4556,17 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                             p_rows       out number,
                             p_rows_err   out number,
                             p_state      out varchar2)
-    is    
+    is
         l_trace  varchar2(500) := G_TRACE || 'customers_plt_imp: ';
         l_per_id periods.id%type;
+        l_start_time date := sysdate;
 
         l_rows     pls_integer := 0;
         l_rows_err pls_integer := 0;
 
         l_insert_target varchar2(4000);
         l_ourmfo       varchar2(6) := sys_context('bars_context', 'user_mfo');
-        
+
         -- общий запрос
         q_str      clob:='';    --varchar2(32000);
         -- цель для вставки
@@ -4520,7 +4581,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                       (select distinct rnk from bars.customer_address_update cau where cau.effectdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                    union
                       (select distinct rnk from bars.person_update pu where  pu.chgdate between trunc(:p_dat) and trunc(:p_dat)+0.99999)
-				   union
+                   union
                       (select distinct rnk from bars.ebkc_gcif ebkg where  ebkg.insert_date between trunc(:p_dat) and trunc(:p_dat)+0.99999)
                      )';
         -- основной запрос
@@ -4579,7 +4640,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
               null month_income,
               null subject_role,
               decode(c.codcagent,5,1,2) rezident,--резидент
-              ww.PC_SS as merried, 
+              ww.PC_SS as merried,
                        case
                             when length(w.cigpo)=1
                              and w.cigpo != ''0''
@@ -4618,7 +4679,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
               ww.PC_Z1,
               ww.AGENT,
               ww.PC_SS,
-              --  ww.STMT, 06.12.2016 [COBUSUPABS-5030]  замена на c.STMT 
+              --  ww.STMT, 06.12.2016 [COBUSUPABS-5030]  замена на c.STMT
               c.STMT,  --Формат выписки c.STMT,  --Формат выписки"
               ww.VIDKL,
               c.VED,--Вид экономической деятельности
@@ -4801,10 +4862,10 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
               a.p_settlement_id,
               a.p_street_id,
               a.p_house_id,
-              (select s.active_directory_name  
-                 from bars.vip_flags v  
-                 join bars.staff_ad_user s on v.account_manager = s.user_id  
-                where rnk=c.rnk and mfo = c.kf) vip_account_manager --аккаунт працівника по віп в форматі АД 
+              (select s.active_directory_name
+                 from bars.vip_flags v
+                 join bars.staff_ad_user s on v.account_manager = s.user_id
+                where rnk=c.rnk and mfo = c.kf) vip_account_manager --аккаунт працівника по віп в форматі АД
                   from bars.customer c, bars.person p,
                          ( select rnk,
                                 "''1''_C1" au_contry,
@@ -5028,7 +5089,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                                               ''DOV_P'', ''DOV_A'', ''DOV_F''))
                              ) ww
                              ';
-                             
+
     -- дельта
     q_str_inc_suf  varchar2(4000) :=
              ' ,c1
@@ -5040,7 +5101,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 and c.rnk = a.rnk(+)
                 and c.rnk = w.rnk(+)
                 and c.rnk = ww.rnk(+)
-                and C.RNK = c1.rnk --Только для ежедневных выгрузок 
+                and C.RNK = c1.rnk --Только для ежедневных выгрузок
                  ';
     -- полная выгрузка
     q_str_full_suf  varchar2(4000) :=
@@ -5053,9 +5114,9 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 and c.rnk = w.rnk(+)
                 and c.rnk = ww.rnk(+)
                  ';
-                
+
     q_log_errors varchar2(4000) := q'[ LOG ERRORS into ERR$_CUSTOMERS_PLT ('INS') reject limit unlimited ]';
-    
+
           begin
           bars.bars_audit.info(l_trace||' start');
           -- get period id
@@ -5074,8 +5135,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
           l_insert_target := case when l_ourmfo is null then 'partition (P'||l_per_id||')' else 'subpartition (P'||l_per_id||'_KF_'||l_ourmfo||')' end;
           bars.bars_audit.info(l_trace||' insert target: '||l_insert_target);
 
-          dbms_application_info.set_client_info('BARS_DM: IMPORT_'||p_periodtype||': CUSTOMERS_PLT '||l_ourmfo); 
-     begin     
+          dbms_application_info.set_client_info('BARS_DM: IMPORT_'||p_periodtype||': CUSTOMERS_PLT '||l_ourmfo);
+     begin
           q_insert :=
             q'[
             insert /*+ APPEND */ into CUSTOMERS_PLT ]'||l_insert_target||q'[
@@ -5362,18 +5423,34 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
           exception
             when others then
             rollback;
-            raise; 
+            raise;
           end;
             -- считаем кол-во ошибочных строк
-        select count(*) into l_rows_err from ERR$_CUSTOMERS_PLT where PER_ID = l_per_id;
+        select count(*) into l_rows_err from ERR$_CUSTOMERS_PLT where PER_ID = l_per_id and kf = l_ourmfo;
 
         p_rows := l_rows;
         p_rows_err := l_rows_err;
         p_state := 'SUCCESS';
 
+        notify_intgr(p_periodtype   => p_periodtype,
+                     p_objects_list => bars.varchar2_list('CLIENTFO2', 'CLIENT_ADDRESS'),
+                     p_start_time   => l_start_time,
+                     p_rows_ok      => l_rows,
+                     p_rows_err     => l_rows_err,
+                     p_status       => p_state);
+                     
         dbms_application_info.set_client_info('');
         bars.bars_audit.info(l_trace||' finish');
-             
+    exception
+        when others then
+            p_state := 'ERROR';
+            notify_intgr(p_periodtype   => p_periodtype,
+                         p_objects_list => bars.varchar2_list('CLIENTFO2', 'CLIENT_ADDRESS'),
+                         p_start_time   => l_start_time,
+                         p_rows_ok      => l_rows,
+                         p_rows_err     => l_rows_err,
+                         p_status       => p_state);
+            raise;
     end customers_plt_imp;
 
     --
@@ -5394,6 +5471,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         l_trace  varchar2(500) := G_TRACE||'credits_zal_imp: ';
         l_per_id periods.id%type;
         l_errmsg varchar2(512);
+        l_ourmfo       varchar2(6) := sys_context('bars_context', 'user_mfo');
 
         l_rows     pls_integer := 0;
         --l_rows_err pls_integer := 0;
@@ -5408,7 +5486,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         end if;
         begin
 
-            delete from credits_zal where per_id=l_per_id;
+            delete from credits_zal where per_id=l_per_id and kf = l_ourmfo;
             --
             -- денні зміни
 
@@ -5500,7 +5578,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         end;
 
     begin
-    
+
         select p.id
         bulk collect into l_periods
         from   periods p
@@ -5509,12 +5587,12 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         clear_partition('bars_dm.customers_segment', l_periods);
         clear_partition('bars_dm.customers_plt', l_periods);
         clear_partition('bars_dm.credits_stat', l_periods);
-        
+
         delete from bars_dm.customers c
          where C.PER_ID in (select id from periods p where P.SDATE < p_dat - c_cntdays);
         commit;
         --
-        
+
         delete from bars_dm.credits_dyn  c
          where C.PER_ID in (select id from periods p where P.SDATE < p_dat - c_cntdays);
         commit;
@@ -5715,13 +5793,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         -- кем логинимся
         select id into l_usr_id from bars.staff$base t where t.logname = 'BARS_DM';
         l_task_statement := replace(l_task_statement, ':usr_id', l_usr_id);
-		
-		-- Если полная выгрузка - переключаем вьюшки BARS_INTGR на витрины BARS_DM
-		if p_periodtype = C_FULLIMP then
-			bars_intgr.xrm_import.set_import_mode(p_mode => bars_intgr.xrm_import.G_IMPORT_MODE_FULL);
-            bars_intgr.xrm_import.increment_object_changenumber;
-		end if;
-		
+
         for cur in (select obj_name, obj_proc, parallel_flag from dm_obj where imp_type = p_periodtype and active = 1 order by imp_order)
         loop
             begin
@@ -5735,7 +5807,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                 p_rows_err => null,
                                 p_status => 'INPROCESS',
                                 p_id => l_id_event );
-								
+
                 if cur.parallel_flag='Y' then
                     -- удаляем предыдущую задачу
                     drop_import_task;
@@ -5783,20 +5855,34 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_id_event := null;
             l_final_status := null;
         end loop;
-		
-		commit;
+        
+        /* вручную переключаем в интегр. схеме витрину accounts_cash */
+        declare
+        l_rows_ok number;
+        l_start_time date := sysdate;
+        begin
+            select count(*) into l_rows_ok from bars_intgr.vw_ref_accounts_xrm;
+            notify_intgr(p_periodtype   => p_periodtype,
+                         p_objects_list => bars.varchar2_list('ACCOUNTS_CASH'),
+                         p_start_time   => l_start_time,
+                         p_rows_ok      => l_rows_ok,
+                         p_rows_err     => 0,
+                         p_status       => 'SUCCESS');
+        end;
+
+        commit;
 
     end imp_run;
-    
+
     --
     -- выгрузка для кредитов по финансовых операциях
     --
-    
+
     procedure credits_oper_imp  (p_dat in date default trunc(sysdate)
                                , p_periodtype in varchar2 default C_FULLIMP
                                , p_rows out number
                                , p_rows_err out number
-                               , p_state out varchar2)                       
+                               , p_state out varchar2)
     is
         l_trace  varchar2(500) := G_TRACE||'credits_oper: ';
         l_per_id periods.id%type;
@@ -5819,7 +5905,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 ,nd_ac.nd nd_cre
                 ,cd.cc_id
                 ,cd.vidd
-                ,o.kf    
+                ,o.kf
                 ,o.ref
                 ,o.nd
                 ,o.mfoa
@@ -5846,7 +5932,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             from bars.nd_acc nd_ac, bars.accounts ac, bars.cc_deal cd,bars.oper o
            where nd_ac.acc = ac.acc
              and nd_ac.nd = cd.nd
-             and cd.vidd in (1,2,3,11,12,13) 
+             and cd.vidd in (1,2,3,11,12,13)
            and ( (o.nlsa = ac.nls and o.kv= ac.kv and o.mfoa = ac.kf)  or (o.nlsb = ac.nls and nvl(o.kv2,o.kv)=ac.kv and o.mfob = ac.kf))
         ';
         -- дельта
@@ -5887,7 +5973,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 ,nd_cre
                 ,cc_id
                 ,vidd
-                ,kf 
+                ,kf
                 ,ref
                 ,nd
                 ,mfoa
@@ -5945,16 +6031,16 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         bars.bars_audit.info(l_trace||' finish');
 
     end credits_oper_imp;
-    
+
     --
     -- выгрузка для депозитов по финансовых операциях
     --
-    
+
     procedure deposits_oper_imp  (p_dat in date default trunc(sysdate)
                                  ,p_periodtype in varchar2 default C_FULLIMP
                                  ,p_rows out number
                                  ,p_rows_err out number
-                                 ,p_state out varchar2)                       
+                                 ,p_state out varchar2)
     is
         l_trace  varchar2(500) := G_TRACE||'deposits_oper_imp: ';
         l_per_id periods.id%type;
@@ -5974,10 +6060,10 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         q_str_main  varchar2(32000) :=
         'select
                 :per_id
-                ,o.kf  
+                ,o.kf
                 ,dpt_dep.deposit_id
                 ,dpt_dep.nd
-                ,dpt_dep.cnt_dubl  
+                ,dpt_dep.cnt_dubl
                 ,o.ref
                 ,o.nd
                 ,o.mfoa
@@ -6007,7 +6093,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
         q_str_inc_suf  varchar2(4000) :=
               'bars.dpt_deposit dpt_dep
                where dpt.ref = o.ref
-                 and dpt.dpt_id = dpt_dep.deposit_id 
+                 and dpt.dpt_id = dpt_dep.deposit_id
                  and o.pdat  between trunc(:p_dat) and trunc(:p_dat)+0.99999';
         -- полная выгрузка
         q_str_full_suf  varchar2(4000) :=
@@ -6017,7 +6103,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                 select distinct dp_c.kf, dp_c.deposit_id, dp_c.cnt_dubl, dp_c.nd
                   from bars.dpt_deposit_clos dp_c
                  where dp_c.dat_end between trunc(:p_dat)-7 and trunc(:p_dat)
-                ) dpt_dep 
+                ) dpt_dep
                  where dpt.ref = o.ref
                    and dpt.dpt_id = dpt_dep.deposit_id
                    and o.pdat  between trunc(:p_dat)-7 and trunc(:p_dat)+0.99999';
@@ -6048,10 +6134,10 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             insert /*+ APPEND */ into DEPOSITS_OPER ]'||l_insert_target||q'[
             (
                  per_id
-                ,kf 
+                ,kf
                 ,deposit_id
                 ,nd_dep
-                ,cnt_dubl              
+                ,cnt_dubl
                 ,ref
                 ,nd
                 ,mfoa
