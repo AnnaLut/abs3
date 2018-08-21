@@ -3768,7 +3768,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_time := sysdate;
     l_scn  := dbms_flashback.get_system_change_number();
 
-    delete from import_activity where start_time<sysdate-1;
+    delete from import_activity where start_time<sysdate-1 and kf = p_kf;
     -- пишем время начала работы
     insert into import_activity(start_time, start_scn, kf)
     values(l_time, l_scn, p_kf);
