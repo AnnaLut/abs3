@@ -65,6 +65,13 @@ begin
       when e_tab_not_exists
       then null;
     end;
+    
+    begin
+        execute immediate 'alter table CUSTOMERW read write';
+    exception
+        when others then
+            if sqlcode = -14140 then null; else raise; end if;
+    end;
 
     execute immediate 'ALTER SESSION ENABLE PARALLEL DDL';
     execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
@@ -82,12 +89,12 @@ begin
       when e_clmn_exsts then
         dbms_output.put_line( 'Column "KF" already exists in table.' );
     end;
-    /*
+    
     execute immediate '
     update CUSTOMERW
        set KF = (select bars_sqnc.get_kf(substr(to_char(rnk), -2, 2)) from dual)
      where kf is null';
-    */
+    
     commit;
     
     execute immediate 'alter table CUSTOMERW enable all triggers';

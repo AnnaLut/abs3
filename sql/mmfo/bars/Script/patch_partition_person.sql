@@ -111,6 +111,14 @@ begin
     lock table PERSON in exclusive mode;
     execute immediate 'alter table PERSON disable all triggers';
     lock table PERSON in exclusive mode;
+    
+    begin
+        execute immediate 'alter table person read write';
+    exception
+        when others then
+            if sqlcode = -14140 then null; else raise; end if;
+    end;
+    
     declare
       e_clmn_exsts  exception;
       pragma exception_init( e_clmn_exsts, -01430 );
@@ -122,9 +130,10 @@ begin
         dbms_output.put_line( 'Column "KF" already exists in table.' );
     end;
 
-    update PERSON
+    execute immediate 
+    'update PERSON
        set KF = (select bars_sqnc.get_kf(substr(to_char(rnk), -2, 2)) from dual)
-     where kf is null;
+     where kf is null';
 
     commit;
     
