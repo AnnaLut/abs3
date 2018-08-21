@@ -440,7 +440,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.022 06/05/2018';
+g_body_version    constant varchar2(64)  := 'version 6.022 21/08/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -15300,6 +15300,8 @@ begin
         exception
           when no_data_found then
            l_msg := 'Не знайдено зп проект по параметрам OKPO=' || z.okpo || ' OKPO_N=' || z.okpo_n||' CARD_TYPE ='||z.card_type;
+          when too_many_rows then
+           l_msg := 'Більше одного проекта за такими даними :OKPO=' || z.okpo || ' OKPO_N=' || z.okpo_n||' CARD_TYPE ='||z.card_type;
         end;
 
      end if;
