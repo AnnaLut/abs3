@@ -10,7 +10,7 @@ is
 begin
  --select substr(d_rec, 9, 15) into l_branch from oper where ref=p_ref;
  --return nbs_ob22_bra('6110', '28', l_branch);
- return vkrzn(substr(sys_context('bars_context','user_mfo'),1,5), '6110_002800000');
+ return vkrzn(substr(sys_context('bars_context','user_mfo'),1,5), '6510_002800000');
 end;
 /
  show err;
