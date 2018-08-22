@@ -262,6 +262,13 @@
         }
     },
 
+    openWindowForUploadOnly: function (tabid,funcId) {
+        var url = '/barsroot/ndi/ReferenceBook/GetUploadFile?tabid=' + tabid + '&funcid=' + funcId;
+        var width = 1000;
+        var height = 600;
+        var params = 'width=' + width + ',' + 'height=' + height + ',' + 'scrollbars=1' + ',' + 'left=205,top=125';
+        window.open(url, '_blank', params);
+    },
     onbeforeitemdblclick: function (record, item, index, e, eOpts) {
         if (window.hasCallbackFunction && window.hasCallbackFunction.toUpperCase() == 'TRUE')
             window.parent.CallFunctionFromMetaTable(item.data, true);
@@ -1277,6 +1284,11 @@
         //    window.open(funcMetaInfo.WEB_FORM_NAME, '_blank');
         //    return;
         //}
+         if(funcMetaInfo.MultiRowsParams != null &&funcMetaInfo.MultiRowsParams.length > 0 && funcMetaInfo.MultiRowsParams[0].Kind =='FROM_UPLOAD_EXCEL')
+         {
+             thisController.openWindowForUploadOnly(funcMetaInfo.TABID,funcMetaInfo.FUNCID);
+              return;
+         }
 
         var titleMsg = 'Виконання процедури' + funcMetaInfo.DESCR;
         //если заполнен вопрос который нужно задать перед выполнением процедуры
@@ -2907,6 +2919,7 @@
                 }
             case "GET_FILE_ONCE":
                 {
+                    
                     func.infoDialogTitle = 'Виконання процедури: ' + funcMetaInfo.DESCR;
                     //для ONCE заполняем единожды параметры в диалоге и вызываем функцию (из строк грида никакие данные не берутся)
                     func.params.push({ rowIndex: null, rowParams: new Array() });
@@ -3296,7 +3309,6 @@
 
     //вызвать sql-функцию, по данным объекта thisController.currentCalledSqlFunction
     executeCurrentSqlFunction: function (callbackFunc) {
-        
         var thisController = this;
         var func = thisController.currentCalledSqlFunction;
         if (func.systemParams && func.systemParams.length > 0)
@@ -3395,17 +3407,38 @@
                 url: '/barsroot/ndi/ReferenceBook/UploadTemplateFile?fieldFileName=' + fileParam.Name + '&tableId=' + func.tableId + '&funcId=' + func.funcId + '&codeOper=' + func.CodeOper +
             '&jsonFuncParams=' + Ext.JSON.encode(params) + '&procName=' + func.funcName,
                 waitMsg: 'завантаження...',
-   success: function (conn, response) {
-                    
-                    var result = response.result;
-                    if (result.success == 'true')
-                        Ext.Msg.alert('Загрузка прошла успешно', result.resultMessage);
+                success: function (form,result) {
+                    var msg;
+                    var descr;
+                    if(result || result.response || result.response.responseText)
+                    {
+                        var resObj = Ext.JSON.decode(result.response.responseText);
+                        if(resObj.success === 'true')
+                        {
+                            msg = resObj.resultMessage;
+                            descr = 'Файл завантажен';
+                            formWindow.close();
+                        }
+                        else
+                        {
+                            msg = resObj.resultMessage;
+                            descr = 'Файл не завантажено';
+                        }
+                    }
+                    else {
+                        msg = 'повідомлення не в потрібному форматі';
+                        descr = 'помилка відповіді від сервера';
+                    }
+                    Ext.Msg.alert(descr, msg);
+                },
+                failure:function(form,result) {
+                    var msg;
+                    var descr = 'помилка відповіді від сервера';
+                    if(result && result.response && result.response.responseText)
+                       msg = result.response.responseText
                     else
-                         Ext.Msg.show({
-                            title: "Не вдалося завантажити файл",
-                            msg: result.errorMessage + '</br> </br>', icon: Ext.Msg.ERROR, buttons: Ext.Msg.OK
-                        });
-                        formWindow.close();
+                        msg = 'повідомлення не в потрібному форматі';
+                    Ext.Msg.alert(descr, msg)
                 }
             });
         }

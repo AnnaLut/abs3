@@ -19,7 +19,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
             //var functionInfoList = new FilterInfoList();
             //functionInfoList.FilterInfoArray = filterRowList.ToArray();
 
-            using (var context = new DbAccess())
+            using (var context = new OracleDbModel())
             {
                 try
                 {
@@ -37,7 +37,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
                     parameters[3] = new OracleParameter("p_save_filter", OracleDbType.Int32, saveFilter, ParameterDirection.Input);
                     parameters[4] = new OracleParameter("p_where_clause", OracleDbType.Varchar2, 4000, whereClause, ParameterDirection.InputOutput);
                     parameters[5] = new OracleParameter("p_condition_list", OracleDbType.Clob, filterStructure, ParameterDirection.Input);
-                    var result = context.CreateCommand("BARS.BARS_METABASE.CREATE_DYN_FILTER", CommandType.StoredProcedure, parameters);
+                    var result = context.CreateCommandWithParams("BARS.BARS_METABASE.CREATE_DYN_FILTER", CommandType.StoredProcedure, parameters);
                     result.ExecuteNonQuery();
 
                     string clause = Convert.ToString(result.Parameters["p_where_clause"].Value);
@@ -53,7 +53,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
         public static string UpdateFilter(EditFilterModel editFilterModel)
         {
 
-            using (var context = new DbAccess())
+            using (var context = new OracleDbModel())
             {
                 try
                 {
@@ -70,7 +70,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.Helpers
                     };
                     parameters[4] = new OracleParameter("p_where_clause", OracleDbType.Varchar2, 4000, "", ParameterDirection.InputOutput);
                     parameters[5] = new OracleParameter("p_condition_list", OracleDbType.Clob, editFilterModel.JosnStructure, ParameterDirection.Input);
-                    var result = context.CreateCommand("BARS.BARS_METABASE.update_dyn_filter", CommandType.StoredProcedure, parameters);
+                    var result = context.CreateCommandWithParams("BARS.BARS_METABASE.update_dyn_filter", CommandType.StoredProcedure, parameters);
                     result.ExecuteNonQuery();
 
                     string clause = Convert.ToString(result.Parameters["p_where_clause"].Value);
