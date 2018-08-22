@@ -5846,6 +5846,7 @@ procedure PAY_DOC_EXT
 is
   l_nd              varchar2(16);
   l_tt              oper.tt%type;         --
+  l_vob             oper.vob%type;        --   
   l_acc             accounts.acc%type;    --
   l_nls8            accounts.nls%type;    --
   l_rec_A           dpt_web.acc_rec;      -- параметри платежду строни А
@@ -5977,9 +5978,11 @@ $else
 $end
       end if;
 
+      l_vob := GET_VOB( l_tt, l_rec_A.acc_cur, l_rec_A.acc_cur );
+
       GL.in_doc3( ref_    => p_ref  , mfoa_   => gl.amfo
                 , tt_     => l_tt   , nlsa_   => l_rec_A.acc_num
-                , vob_    => 6      , kv_     => l_rec_A.acc_cur
+                , vob_    => l_vob  , kv_     => l_rec_A.acc_cur
                 , dk_     => 1      , nam_a_  => l_rec_A.acc_name
                 , nd_     => l_nd   , id_a_   => l_rec_A.cust_idcode
                 , pdat_   => sysdate, s_      => p_sum
@@ -7615,7 +7618,7 @@ begin
 
     gl.in_doc3( ref_   => l_ref,
                 tt_    => l_tt,         dk_    => doc_r.dk,
-                vob_   => 6,            nd_    => SubStr(to_char(l_ref),1,10),
+                vob_   => doc_r.vob,    nd_    => SubStr(to_char(l_ref),1,10),
                 pdat_  => sysdate,      data_  => l_bdate,
                 vdat_  => l_bdate,      datp_  => l_bdate,
                 kv_    => doc_r.kv2,    kv2_   => doc_r.kv,
@@ -8384,7 +8387,7 @@ begin
                           p_nazn       => null,
                           p_nmk        => d.custname,
                           p_tt         => null,
-                          p_vob        => null,
+                          p_vob        => GET_VOB( null, d.intcurid, d.intcurid ),
                           p_dk         => 1,
                           p_sk         => null,
                           p_userid     => null,
@@ -8443,7 +8446,7 @@ begin
                           p_nazn       => null,
                           p_nmk        => d.custname,
                           p_tt         => null,
-                          p_vob        => null,
+                          p_vob        => GET_VOB( null, d.intcurid, d.intcurid ),
                           p_dk         => 1,
                           p_sk         => null,
                           p_userid     => null,
