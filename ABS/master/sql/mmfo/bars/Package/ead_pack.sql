@@ -392,7 +392,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                     ,x.acc
                     ,x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby
                     ,x.blkd, x.blkk,
-                      row_number() over(partition by x.acc order by x.acc) rn
+                      row_number() over(partition by x.acc order by max(x.idupd)) rn
                    --  ,count(x.acc)over(partition by x.acc order by x.acc) c_n
                     ,x.c_n                
         from (select au.idupd
