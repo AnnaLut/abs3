@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.036  13/08/2018 (08/08/2018)
+% VERSION : v.17.036  21/08/2018 (13/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -22,7 +22,9 @@ IS
  17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 03/07/2018 вирівнювання з А7 файлом рахунків резервів
+ 21.08.2018 для наполнения таблиц? OTC_C5_PROC по счетам ЦБ добавлено новое
+            значение параметра R011='P' 
+ 03.07.2018 вирівнювання з А7 файлом рахунків резервів
  26.12.2017 изменение структуры показателей с отчета за 26.12.2017
  19.12.2017 исключение из основнго скрипта новых счетов резервов
  28.07.2017 отдельное определение r012 для счетов 1592
@@ -887,7 +889,7 @@ BEGIN
 
                            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_,
                                         substr(comm_ || o_comm_1,1,200), nd_, acc_, mdate_, nbuc_, tobo_);
-                       else 
+                       else
                            kodp_ := dk_ || nbs_ || r011_|| o_r013_1 || LPAD (kv_,3,'0') || s580_|| r017_|| segm_WWW|| s245_|| k077_;
 
                            znap_ := TO_CHAR (ABS (o_se_1));
@@ -896,7 +898,7 @@ BEGIN
                                         substr(comm_ || o_comm_1,1,200), nd_, acc_, mdate_, nbuc_, tobo_);
                        end if;
                     end if;
-                    
+
                     -- свыше 30 дней
                     IF o_se_2 <> 0
                     THEN
@@ -920,7 +922,7 @@ BEGIN
                          r017_ := '1';
                          segm_WWW := '840';
                     end if;
-                    
+
                     -- обтяження по ЦП
                     if nls_ like '14%'
                     then
@@ -1191,7 +1193,7 @@ BEGIN
                     round(discont * decode(suma, 0, 1, sump / suma)) discont_row,
                     round(prem * decode(suma, 0, 1, sump / suma)) prem_row,
                     nd, id, ob22, custtype, accr, accr_30, tip, discont_SDF,
-                    (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez 
+                    (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez
              from (
                  select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                         nvl(gl.p_icurval(t.kv, t.sz, dat_), 0) szq,
@@ -1271,7 +1273,7 @@ BEGIN
       TP_SND := (case when substr(k.nls, 1,1) in ('1','2','3') and
                            ( (substr(k.nls,1,4) in ('2607','2627','2657') and k.tip = 'SNA') or
                              substr(k.nls,4,1) = '8' or
-                             (substr(k.nls,4,1) = '9' and k.tip = 'SNA') 
+                             (substr(k.nls,4,1) = '9' and k.tip = 'SNA')
                            )  and
                            substr(k.nls,1,4) not in ('1818','1819','2809','3519','3559')
                       then true else false end);
@@ -1300,9 +1302,9 @@ BEGIN
              if k.cnt = k.rnum and sumc_ <> srez_ then
                 sum_ := sum_ + (srez_ - sumc_);
              end if;
-             
+
              znap_ := to_char(sign(k.szq) * sum_);
-             
+
              comm_ := SUBSTR (' резерв під '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'відсотки відносимо до R012='||r012_||' sumc='||to_char(sumc_) , 1, 200);
           else
              r012_ := 'A';
@@ -1387,13 +1389,13 @@ BEGIN
                            comm_, k.nd, nbuc_, k.tobo );
              end if;
           end if;
-          
+
           if k.discont_SDF <> 0 then
              kodp_ := '2'||'2046'||'6'||r013_||substr(kodp_,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
-             
+
              comm_ := SUBSTR(' дисконт SDF c1', 1,100);
-             
+
              insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1408,9 +1410,9 @@ BEGIN
          if k.discont_SDF <> 0 then
             kodp_ := '2'||'2046'||'6'||(case when TP_SND then k.r013 else '4' end)||substr(k.kodp,8);
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
-             
+
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
-             
+
             insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1420,7 +1422,7 @@ BEGIN
                        k.nls, k.kv, data_, kodp_,
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
-         end if; 
+         end if;
 
          if k.rnum = 1 then
               discont_ := k.discont;
@@ -1432,7 +1434,7 @@ BEGIN
    for k in (select acc, nbs, nls, kv, rnk, s080, szq, isp, mdate, tobo, r031, r030,
                     r011, r013, s580, rez, discont, prem, nd, id, ob22, custtype, accr, tip, s240,
                     (case sign(fost(accr, dat_)) when -1 then '1' else '2' end) sign_rez,
-                    discont_SDF 
+                    discont_SDF
                from ( select t.acc, t.nls, decode(t.kv, 974, 933, t.kv) kv, t.rnk, t.s080,
                              gl.p_icurval(t.kv, t.sz - t.rez_30, dat_) szq,
                              a.isp, a.mdate, a.tobo, nvl(a.nbs, substr(a.nls, 1,4)) nbs,
@@ -1441,7 +1443,7 @@ BEGIN
                              nvl(gl.p_icurval(t.kv, t.discont, dat_),0) discont,
                              nvl(gl.p_icurval(t.kv, t.prem, dat_),0) prem,
                              t.nd, t.id, nvl(s.s580, '0') s580, a.ob22, c.custtype, t.accr,
-                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF 
+                             a.tip, nvl(s.s240, '0') s240, t.zpr discont_SDF
                         from v_tmp_rez_risk_c5 t,
                              accounts a, specparam s, customer c, kl_r030 l
                        where t.dat = datr_
@@ -1627,7 +1629,7 @@ BEGIN
       TP_SND := (case when substr(k.nls, 1,1) in ('1','2','3') and
                            ( (substr(k.nls,1,4) in ('2607','2627','2657') and k.tip = 'SNA') or
                              substr(k.nls,4,1) = '8' or
-                             (substr(k.nls,4,1) = '9' and k.tip = 'SNA') 
+                             (substr(k.nls,4,1) = '9' and k.tip = 'SNA')
                            )  and
                            substr(k.nls,1,4) not in ('1818','1819','2809','3519','3559')
                       then true else false end);
@@ -1639,13 +1641,13 @@ BEGIN
 
              kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
              znap_ := to_char(k.szq);
-             
+
              comm_ := SUBSTR (' резерв під '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'відсотки ' , 1, 200);
           else
 --?? как здесь определить просрочку
              if substr(k.nls, 4, 1)  = '7' and
                 substr(k.nls, 1, 4) not in ('2607','2627','2657') or
-                trim(k.tip) in ('SP') 
+                trim(k.tip) in ('SP')
              then
                 kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
                 znap_ := to_char(k.szq);
@@ -1701,13 +1703,13 @@ BEGIN
                      znap_, k.acc, k.rnk, k.isp, k.mdate,
                      comm_, k.nd, nbuc_, k.tobo);
           end if;
-          
+
           if k.discont_SDF <> 0 then
              kodp_ := '2'||'2046'||'6'||r013_||substr(kodp_,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
-             
+
              comm_ := SUBSTR(' дисконт SDF c2', 1,100);
-             
+
              insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1717,14 +1719,14 @@ BEGIN
                        k.nls, k.kv, data_, kodp_,
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
-          end if;          
+          end if;
       else
          if k.discont_SDF <> 0 then
             kodp_ := '2'||'2046'||'6'||(case when TP_SND then k.r013 else '4' end)||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
-             
+
             comm_ := SUBSTR(' дисконт SDF for rez=0 c2', 1,100);
-             
+
             insert into rnbu_trace
                      ( recid, userid,
                        nls, kv, odate, kodp,
@@ -1734,13 +1736,13 @@ BEGIN
                        k.nls, k.kv, data_, kodp_,
                        znap_, k.acc, k.rnk, k.isp, k.mdate,
                        comm_, k.nd, nbuc_, k.tobo );
-         end if;          
+         end if;
 
          discont_ := k.discont;
          premiy_ := k.prem;
       end if;
    end loop;
- 
+
 --------------------------------------------------
 -- списання за рахунок резерву
    declare
@@ -1791,7 +1793,7 @@ BEGIN
 
                if recid_ is not null then
                   diff_ :=0;
-                  
+
                   if abs(k.sq) > znap_ then
                      diff_ := -1 *(abs(k.sq) - znap_);
                      znap_ := to_char(-1 *znap_);
@@ -1862,14 +1864,14 @@ BEGIN
                 group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
                 on (a.acc = b.acc and
                     a.s245 = b.s245 and
-                    a.nbs=b.nbs) 
+                    a.nbs=b.nbs)
                 where nvl(a.ost,0)<>nvl(b.ost,0)
                 order by nvl(a.nbs, b.nbs)) b
        on (a.acc = b.acc and
            a.kodp like '_'||b.nbs||'__________'||b.s245||'%')
-       WHEN MATCHED THEN 
+       WHEN MATCHED THEN
             update set a.znap = a.znap + b.rizn,
-                   comm = comm || ' *=' || to_char(b.rizn) 
+                   comm = comm || ' *=' || to_char(b.rizn)
        WHERE b.acc is not null;
    end if;
 
@@ -2031,7 +2033,7 @@ BEGIN
        end loop;
    end;
    commit;
-   
+
 --------------------------------------------------
    if dat_ <to_date('20171226','yyyymmdd')  then
        delete from rnbu_trace
@@ -2044,8 +2046,8 @@ BEGIN
 
 ---------------------------------------------------
    INSERT INTO tmp_nbu(kodf, datf, kodp, znap, nbuc)
-   SELECT 'C5', dat_, kodp, 
-      (case when kodp like '12049%' then -1 else 1 end) * SUM (znap), 
+   SELECT 'C5', dat_, kodp,
+      (case when kodp like '12049%' then -1 else 1 end) * SUM (znap),
       nbuc
    FROM rnbu_trace
    GROUP BY kodp, (case when kodp like '12049%' then -1 else 1 end), nbuc
@@ -2145,7 +2147,7 @@ BEGIN
         or
         v.seg_02 = '3008' and v.seg_03 in ('6', 'B') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3010' and v.seg_03 in ('2') and v.seg_04 in ('9')
+        v.seg_02 = '3010' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
         or
         v.seg_02 = '3011' and v.seg_03 in ('5') and v.seg_04 in ('9')
         or
@@ -2155,13 +2157,13 @@ BEGIN
         or
         v.seg_02 = '3014' and v.seg_03 in ('N','O') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('4')
+        v.seg_02 = '3015' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('4')
         or
         v.seg_02 = '3015' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2','4')
         or
-        v.seg_02 = '3018' and v.seg_03 in ('2','8','A','J','K','N') and v.seg_04 in ('9') and v.seg_09 in ('1')
+        v.seg_02 = '3018' and v.seg_03 in ('2','8','A','J','K','N','P') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3018' and v.seg_03 in ('5','9','B','E','F','O') and v.seg_04 in ('2')
         or
@@ -2188,7 +2190,7 @@ BEGIN
         or
         v.seg_02 = '3108' and v.seg_03 in ('2','5','6','9') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3110' and v.seg_03 in ('2') and v.seg_04 in ('9')
+        v.seg_02 = '3110' and v.seg_03 in ('2','P') and v.seg_04 in ('9')
         or
         v.seg_02 = '3111' and v.seg_03 in ('5') and v.seg_04 in ('9')
         or
@@ -2198,21 +2200,21 @@ BEGIN
         or
         v.seg_02 = '3114' and v.seg_03 in ('K','L') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3115' and v.seg_03 in ('2','5','6','7','A','B','C','D','E','F','K','L') and v.seg_04 in ('9')
+        v.seg_02 = '3115' and v.seg_03 in ('2','5','6','7','A','B','C','D','E','F','K','L','P') and v.seg_04 in ('9')
         or
-        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('4')
+        v.seg_02 = '3116' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('4')
         or
         v.seg_02 = '3116' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
         or
-        v.seg_02 = '3118' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('9') and v.seg_09 in ('1')
+        v.seg_02 = '3118' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3118' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K') and v.seg_04 in ('4')
+        v.seg_02 = '3119' and v.seg_03 in ('2','6','A','C','D','K','P') and v.seg_04 in ('4')
         or
         v.seg_02 = '3119' and v.seg_03 in ('5','7','B','E','F','L') and v.seg_04 in ('2','4')
         )
@@ -2229,7 +2231,7 @@ BEGIN
         v.seg_02 = k.r020 and
         (v.seg_01 = k.r012 or k.r012 = '3') and
         (
-        v.seg_02 = '3210' and v.seg_03 in ('1')
+        v.seg_02 = '3210' and v.seg_03 in ('1','P')
         or
         v.seg_02 = '3211' and v.seg_03 in ('2')
         or
@@ -2241,17 +2243,17 @@ BEGIN
         or
         v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('4')
+        v.seg_02 = '3216' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('4')
         or
         v.seg_02 = '3216' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         or
-        v.seg_02 = '3218' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('9') and v.seg_09 in ('1')
+        v.seg_02 = '3218' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('9') and v.seg_09 in ('1')
         or
         v.seg_02 = '3218' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2')
         or
-        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('1') and v.seg_09 in ('1')
+        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('1') and v.seg_09 in ('1')
         or
-        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B') and v.seg_04 in ('4')
+        v.seg_02 = '3219' and v.seg_03 in ('1','4','5','7','8','B','P') and v.seg_04 in ('4')
         or
         v.seg_02 = '3219' and v.seg_03 in ('2','3','6','9','A','C') and v.seg_04 in ('2','4')
         )
@@ -2327,4 +2329,3 @@ BEGIN
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 END;
 /
-

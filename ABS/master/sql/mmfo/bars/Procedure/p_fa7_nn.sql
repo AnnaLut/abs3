@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.016 13/08/2018 (03/07/2018)
+% VERSION     :  v.18.016 21/08/2018 (13/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,6 +32,7 @@ IS
 12     VVV        R030 код валюты
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 21.08.2018 добавлен? бал.счета 2206, 2236 для в?равнивания с балансом 
  22.03.2018 для 3648 устанавливается R011 =0 по умолчанию
  02.03.2018 для pmode_=2 переменная  Datn_ определяется как и для pmode_=0
             (включались балансовые счета у которых D_CLOSE='31/12/2017')
@@ -518,6 +519,11 @@ end;
       if s242_ in ('9', 'C', 'D', 'E', 'F', 'G', 'H','K','L','M') then
          x_ := '2';
       end if;
+
+      if s242_ is null
+      then
+         s242_ := '0';
+      end if;
    END pp_doda;
 
 -------------------------------------------------------------------
@@ -875,10 +881,10 @@ BEGIN
    end if;
 
    if pnd_ is null then
-      sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ a.ACC, a.KF, a.NLS, a.KV, a.BRANCH, a.NLSALT, a.NBS, a.NBS2, 
-                        a.DAOS, a.DAPP, a.ISP, a.NMS, a.LIM, a.OSTB, a.OSTC, a.OSTF, a.OSTQ, a.DOS, a.KOS, a.DOSQ, 
-                        a.KOSQ, a.PAP, a.TIP, a.VID, a.TRCN, a.MDATE, a.DAZS, a.SEC, a.ACCC, a.BLKD, a.BLKK, a.POS, 
-                        a.SECI, a.SECO, a.GRP, a.OSTX, a.RNK, a.NOTIFIER_REF, a.TOBO, a.BDATE, a.OPT, a.OB22, a.DAPPQ, 
+      sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ a.ACC, a.KF, a.NLS, a.KV, a.BRANCH, a.NLSALT, a.NBS, a.NBS2,
+                        a.DAOS, a.DAPP, a.ISP, a.NMS, a.LIM, a.OSTB, a.OSTC, a.OSTF, a.OSTQ, a.DOS, a.KOS, a.DOSQ,
+                        a.KOSQ, a.PAP, a.TIP, a.VID, a.TRCN, a.MDATE, a.DAZS, a.SEC, a.ACCC, a.BLKD, a.BLKK, a.POS,
+                        a.SECI, a.SECO, a.GRP, a.OSTX, a.RNK, a.NOTIFIER_REF, a.TOBO, a.BDATE, a.OPT, a.OB22, a.DAPPQ,
                         a.SEND_SMS, a.DAT_ALT
                     FROM ACCOUNTS a
                     WHERE ( '||to_char(mfou_)||' = 324805
@@ -922,10 +928,10 @@ BEGIN
                                    v.DEP_ACC = s.acc  '
                        else '' end);
    else
-      sql_acc_ := 'SELECT a.ACC, a.KF, a.NLS, a.KV, a.BRANCH, a.NLSALT, a.NBS, a.NBS2, 
-                        a.DAOS, a.DAPP, a.ISP, a.NMS, a.LIM, a.OSTB, a.OSTC, a.OSTF, a.OSTQ, a.DOS, a.KOS, a.DOSQ, 
-                        a.KOSQ, a.PAP, a.TIP, a.VID, a.TRCN, a.MDATE, a.DAZS, a.SEC, a.ACCC, a.BLKD, a.BLKK, a.POS, 
-                        a.SECI, a.SECO, a.GRP, a.OSTX, a.RNK, a.NOTIFIER_REF, a.TOBO, a.BDATE, a.OPT, a.OB22, a.DAPPQ, 
+      sql_acc_ := 'SELECT a.ACC, a.KF, a.NLS, a.KV, a.BRANCH, a.NLSALT, a.NBS, a.NBS2,
+                        a.DAOS, a.DAPP, a.ISP, a.NMS, a.LIM, a.OSTB, a.OSTC, a.OSTF, a.OSTQ, a.DOS, a.KOS, a.DOSQ,
+                        a.KOSQ, a.PAP, a.TIP, a.VID, a.TRCN, a.MDATE, a.DAZS, a.SEC, a.ACCC, a.BLKD, a.BLKK, a.POS,
+                        a.SECI, a.SECO, a.GRP, a.OSTX, a.RNK, a.NOTIFIER_REF, a.TOBO, a.BDATE, a.OPT, a.OB22, a.DAPPQ,
                         a.SEND_SMS, a.DAT_ALT
                     FROM ACCOUNTS a
                     WHERE acc in (select acc from nd_acc where nd = '||to_char(pnd_)|| ' ) and
@@ -3417,7 +3423,7 @@ BEGIN
          r011_ :='0';
       end if;
 
-      if nbs_ in ('2029','2039','2079','2209','2219','2229')
+      if nbs_ in ('2029','2039','2079','2209','2219','2229','2239')
       then
           r011_ :='1';
       elsif nbs_ = '3599' then
@@ -4207,7 +4213,7 @@ BEGIN
                                            '2400','2401','2600','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500','1419','1429','1509','1519',
                                            '1529','2039','2046','2049','2069','2089','2109','2119','2129',
-                                          '2139','2209','2239','2609','2629','2659','3119','3219')
+                                           '2139','2209','2239','2609','2629','2659','3119','3219','2206','2236')
                                 and tip <> 'NL8'
                                 and a.acc = s.acc
                                 and a.rnk = c.rnk
@@ -4233,8 +4239,8 @@ BEGIN
                                            '2400','2401','2600','2890','3190','3290','3590','3599','3690','3692',
                                            '9010','9015','9030','9031','9036','9500','1419','1429','1509','1519',
                                            '1529','2039','2046','2049','2069','2089','2109','2119','2129',
-                                          '2139','2209','2239','2609','2629',
-                                          '2659','3119','3219')
+                                           '2139','2209','2239','2609','2629',
+                                           '2659','3119','3219','2206','2236')
                          group by nbuc, substr(kodp, 1, 1), substr(kodp,10,1), substr(kodp, 2, 4), kv) b
                      on (a.nbuc = b.nbuc and a.rez = b.rez and a.t020 = b.t020 and a.nbs = b.nbs and a.kv = b.kv)
                  where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
@@ -4294,7 +4300,8 @@ BEGIN
                             '2149','2209','2219','2229','2239','2249','2309',
                             '2319','2329','2339','2349','2359','2369','2379',
                             '2409','2419','2429','2439','2609','2629','2659',
-                            '2890','3119','3219','3569','3590','3599','3690','3692') and
+                            '2890','3119','3219','3569','3590','3599','3690',
+                            '3692','2206') and
                   k.t020 = '2' and
                   k.rizn > 0
                then
@@ -4521,4 +4528,3 @@ BEGIN
    logger.info ('P_FA7_NN: END ');
 END;
 /
-
