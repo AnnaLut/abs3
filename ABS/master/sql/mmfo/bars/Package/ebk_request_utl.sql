@@ -98,7 +98,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.14  2018.07.25';
+  g_body_version  constant varchar2(64) := 'version 1.15  2018.08.22';
   g_cust_tp       constant varchar2(1)  := 'I'; -- ebkc_gcif.cust_type
   g_tms_fmt       constant varchar2(32) := 'DD.MM.YYYY HH24:MI:SSxFF TZH:TZM';
 
@@ -597,7 +597,7 @@ $end
     if ( ( l_abs_mod_tms Is Null ) or ( l_abs_mod_tms > p_mod_tms ) )
     then -- Якщо «Дата модифікації в АБС» більша ніж «Дата модифікації в ЄБК»
       -- надсилаємо таку картку в ЄБК (через пакетний інтерфейс)
-      EBKC_WFORMS_UTL.ADD_RNK_QUEUE( l_rnk, p_cust_tp );
+      EBKC_WFORMS_UTL.ADD_RNK_QUEUE( l_rnk, p_cust_tp, p_kf );
     end if;
 
 $if EBK_PARAMS.CUT_RNK $then

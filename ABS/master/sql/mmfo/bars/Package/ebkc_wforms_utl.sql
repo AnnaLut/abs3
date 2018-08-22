@@ -1,10 +1,10 @@
-create or replace package EBKC_WFORMS_UTL 
+create or replace package EBKC_WFORMS_UTL
 is
 
   --
   -- constants
   --
-  g_header_version constant varchar2(64) := 'version 1.03  2018.06.19';
+  g_header_version constant varchar2(64) := 'version 1.04  2018.08.22';
 
   --
   function show_card_accord_quality( p_kf in varchar2,
@@ -41,8 +41,9 @@ is
 
   --
   procedure ADD_RNK_QUEUE
-  ( p_rnk       in  number
-  , p_cust_tp   in  varchar2 default null
+  ( p_rnk       in  number,
+    p_cust_tp   in  varchar2 default null,
+    p_kf        in  varchar2 default sys_context('bars_context','user_mfo')
   );
 
   --
@@ -149,13 +150,13 @@ end EBKC_WFORMS_UTL;
 
 show errors;
 
-create or replace package body EBKC_WFORMS_UTL 
+create or replace package body EBKC_WFORMS_UTL
 is
 
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 1.10  2018.07.20';
+  g_body_version  constant varchar2(64) := 'version 1.11  2018.08.22';
 
   --
   -- variables
@@ -480,8 +481,9 @@ is
   -- ENQUEUE
   --
   procedure ADD_RNK_QUEUE
-  ( p_rnk       in  number
-  , p_cust_tp   in  varchar2 default null
+  ( p_rnk       in  number,
+    p_cust_tp   in  varchar2 default null,
+    p_kf        in  varchar2 default sys_context('bars_context','user_mfo')
   ) is
     l_cust_tp       varchar2(1);
   begin
@@ -493,7 +495,7 @@ is
       l_cust_tp := p_cust_tp;
     end if;
 
-    EBKC_PACK.ENQUEUE( p_rnk, l_cust_tp );
+    EBKC_PACK.ENQUEUE( p_rnk, l_cust_tp, p_kf );
 
     update EBKC_GCIF
        set ABS_MOD_TMS = cast( EBKC_PACK.GET_LAST_CHG_DT( p_rnk, l_cust_tp ) AS TIMESTAMP(3) WITH TIME ZONE ) -- systimestamp

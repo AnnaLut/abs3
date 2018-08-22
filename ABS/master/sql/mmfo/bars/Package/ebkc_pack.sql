@@ -3,7 +3,7 @@ is
   --
   -- Customer Data Management (CDM)
   --
-  g_header_version constant varchar2(64) := 'version 1.04 19/07/2018';
+  g_header_version constant varchar2(64) := 'version 1.05 22/08/2018';
 
   -- типи клієнтів, що використовуються в ЕБК Корп
   LEGAL_ENTITY      constant varchar2(1) := 'L';   -- ЮО
@@ -35,8 +35,10 @@ is
   -- ENQUEUE
   --
   procedure ENQUEUE
-  ( p_rnk                 in  ebkc_queue_updatecard.rnk%type
-  , p_cust_tp             in  ebkc_queue_updatecard.cust_type%type );
+  ( p_rnk                 in  ebkc_queue_updatecard.rnk%type,
+    p_cust_tp             in  ebkc_queue_updatecard.cust_type%type,
+    p_kf                  in  ebkc_queue_updatecard.kf%type default sys_context('bars_context','user_mfo') 
+  );
 
   --
   -- DEQUEUE
@@ -135,7 +137,7 @@ create or replace package body EBKC_PACK
 is
 
   -- Версія пакету
-  g_body_version constant varchar2(64) := 'version 1.07 19/07/2018';
+  g_body_version constant varchar2(64) := 'version 1.08 22/08/2018';
 
   -- header_version - возвращает версию заголовка пакета
   function header_version return varchar2 is
@@ -277,16 +279,17 @@ is
   -- ENQUEUE
   --
   procedure ENQUEUE
-  ( p_rnk       in  ebkc_queue_updatecard.rnk%type
-  , p_cust_tp   in  ebkc_queue_updatecard.cust_type%type
+  ( p_rnk       in  ebkc_queue_updatecard.rnk%type,
+    p_cust_tp   in  ebkc_queue_updatecard.cust_type%type,
+    p_kf        in  ebkc_queue_updatecard.kf%type default sys_context('bars_context','user_mfo')
   ) is
   begin
     begin
       insert
         into EBKC_QUEUE_UPDATECARD
-           ( RNK, CUST_TYPE )
+           ( RNK, CUST_TYPE, KF )
       values
-           ( p_rnk, p_cust_tp );
+           ( p_rnk, p_cust_tp, p_kf );
     exception
       when DUP_VAL_ON_INDEX then
         update EBKC_QUEUE_UPDATECARD
