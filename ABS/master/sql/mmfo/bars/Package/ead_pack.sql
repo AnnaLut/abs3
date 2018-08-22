@@ -384,28 +384,34 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     l_acc number(38);
   begin
  ----- 
-    begin    
+     begin    
       select xx.acc, xx.idupd
         into l_acc , l_idupd
          from (
           select max(x.idupd) idupd
                     ,x.acc
                     ,x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby
-                    ,x.blkd, x.blkk, 
-                     row_number() over(partition by x.acc order by x.acc) rn                
+                    ,x.blkd, x.blkk,
+                      row_number() over(partition by x.acc order by x.acc) rn
+                   --  ,count(x.acc)over(partition by x.acc order by x.acc) c_n
+                    ,x.c_n                
         from (select au.idupd
                     ,au.acc
                     ,au.nls,  au.kv  , au.kf, au.daos, au.dazs, au.doneby
                     ,au.blkd, au.blkk -- состо€ние счета вычисл€етс€ в EAD_integration
+                    ,au.CHGACTION
+                    ,count(au.acc)over(partition by au.acc order by au.acc) c_n
               from accounts_update au
              where au.acc = p_acc -- in (32979301 /*, 1448383401*/)
             --   and au.kf  = p_kf
                and au.idupd between  p_idupd_from and p_idupd_to
               order by au.idupd desc )x
-         where rownum < 3
-           group by x.acc, x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby, x.blkd, x.blkk
+         where 1=1 -- rownum < 3
+          or (gl.bd = x.daos and  x.CHGACTION = 1)
+           group by x.acc, x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby, x.blkd, x.blkk, x.c_n 
             ) xx
-         where xx.rn > 1;
+         where xx.rn  > 1
+            or xx.c_n = 1;
          
  EXCEPTION  
     WHEN NO_DATA_FOUND  THEN
@@ -864,6 +870,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                   from customer_update cu
                  where cu.idupd > l_cdc_lastkey
                    and get_custtype(cu.rnk) = 3
+				   and  cu.kf member of kflist
 /* COBUSUPABS-5837
                       AND (   (   EXISTS
                                      (SELECT 1
@@ -2059,13 +2066,13 @@ from(
       LOOP
 
         -- ƒоговор по 2625
-        if cur.nbs = '2625' then
+        if cur.nbs in ('2625','2620') then
           <<Way4>>
           declare
             l_deal_id         deal.id%type;
             l_deal_number     deal.deal_number%type;
             l_deal_start_date deal.start_date%type;
-            l_deal_state_id   deal.state_id%type;
+            l_deal_state_id   number;
           begin
 
             bars.ead_integration.get_dkbo(p_acc         => cur.acc,
