@@ -255,7 +255,7 @@ IS
                       lpadchr(nvl(sq, 0), ' ', 16) || '|' ||
                       rpadchr(substr(nazn, 1, 160), ' ', 160) || '|' ||
                       lpadchr(nvl(doctype, 0), ' ', 1) || '|' ||
-                      lpadchr(to_char(posttime, 'HHMM'), ' ', 4) || '|' ||
+                      lpadchr(to_char(posttime, 'HH24MI'), ' ', 4) || '|' ||
                       rpadchr(substr(namk, 1, 60), ' ', 60) || '|' ||
                       rpadchr(substr(nms, 1, 60), ' ', 60) || '|' ||
                       rpadchr(tt, ' ', 3) || '|' as k_file_str
@@ -476,6 +476,8 @@ l_data_acc lt_data_acc:=lt_data_acc();
 type lt_data_doc is table of OB_CORP_DATA_DOC%rowtype;
 l_data_doc lt_data_doc:=lt_data_doc();
 
+   dml_errors EXCEPTION;
+   PRAGMA exception_init(dml_errors, -24381);
 
    l_nb       varchar2(38);
    l_ostqp    number;
@@ -501,14 +503,50 @@ l_data_doc lt_data_doc:=lt_data_doc();
 
    l_whoiam  number;   -- 0-плательщик, 1- получатель
 procedure l_ins_data_acc(p_data_acc lt_data_acc) is
+   l_errors   number; 
+   l_errs     clob;
+   l_str      varchar2(32000); 
 begin
-forall j in p_data_acc.first .. p_data_acc.last
+dbms_lob.createtemporary(l_errs, true);
+forall j in p_data_acc.first .. p_data_acc.last SAVE EXCEPTIONS
       insert into ob_corp_data_acc values p_data_acc(j);
+exception when dml_errors then
+         l_errors := sql%bulk_exceptions.count;
+                for i in 1 .. l_errors
+                loop
+                    l_str:='acc | ';
+                    l_str:= l_str||'-'||sql%bulk_exceptions(i).error_code||' | ';
+                    l_str:= l_str||to_char(p_data_acc(sql%bulk_exceptions(i).error_index).SESS_ID)||' | ';
+                    l_str:= l_str||to_char(p_data_acc(sql%bulk_exceptions(i).error_index).ACC)||' | ';
+                    l_str:= l_str||p_data_acc(sql%bulk_exceptions(i).error_index).KF||chr(10);
+                    DBMS_LOB.WRITEAPPEND(l_errs, length(l_str), l_str);
+                end loop;      
+         logger.error(substr(G_DBGCODE || to_char(p_s, 'ddmmyyyy') || l_errs, 1, 4000));
+         raise;
 end;
 procedure l_ins_data_doc(p_data_doc lt_data_doc) is
+   l_errors   number; 
+   l_errs     clob;
+   l_str      varchar2(32000);  
 begin
-    forall j in p_data_doc.first .. p_data_doc.last
+    dbms_lob.createtemporary(l_errs, true);
+    forall j in p_data_doc.first .. p_data_doc.last SAVE EXCEPTIONS
       insert into ob_corp_data_doc values p_data_doc(j);
+exception when dml_errors then
+         l_errors := sql%bulk_exceptions.count;
+                for i in 1 .. l_errors
+                loop
+                    l_str:='doc | ';
+                    l_str:=l_str||'-'||sql%bulk_exceptions(i).error_code||' | ';
+                    l_str:=l_str||to_char(p_data_doc(sql%bulk_exceptions(i).error_index).SESS_ID)||' | ';
+                    l_str:=l_str||to_char(p_data_doc(sql%bulk_exceptions(i).error_index).ACC||' | ');
+                    l_str:=l_str||p_data_doc(sql%bulk_exceptions(i).error_index).KF||' | ';
+                    l_str:=l_str||to_char(p_data_doc(sql%bulk_exceptions(i).error_index).REF)||' | ';
+                    l_str:=l_str||to_char(p_data_doc(sql%bulk_exceptions(i).error_index).DK)||chr(10);
+                    DBMS_LOB.WRITEAPPEND(l_errs, length(l_str), l_str);
+                end loop;      
+         logger.error(substr(G_DBGCODE || to_char(p_s, 'ddmmyyyy') || l_errs, 1, 4000));
+         raise;
 end;
 
 begin
@@ -581,7 +619,7 @@ begin
       ----------------
       -- по проводкам
       ----------------
-      for c1 in (select ref,tt, s * decode(dk,0,-1,1) s,txt, dk, stmt, f_ourmfo kf
+      for c1 in (select ref,tt, s * decode(dk,0,-1,1) s,txt, dk, stmt, kf
                   from opldok where acc=c0.acc and fdat=c0.fdat and sos=5)
          loop
 
@@ -872,9 +910,12 @@ begin
     where s.id = l_sync;
 
 exception when others then
+    logger.error(substr(G_DBGCODE || to_char(p_s, 'ddmmyyyy') || p_corpc || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
+    rollback;
     update BARS.OB_CORP_SESS s
        set s.state_id = 3
     where s.id = l_sync;
+    raise;
 END lic26_kfile;
 
 
