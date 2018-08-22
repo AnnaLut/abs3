@@ -28,8 +28,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                         parMetaInfo = GetByKindParam(kind);
                     else if (!string.IsNullOrEmpty(type))
                         parMetaInfo = GetParamByTypeParam(type);
-                    else
-                        parMetaInfo = new T();
+                   
                 }
                 if (typeof(T).Equals(typeof(OutParamsInfo)))
                 {
@@ -37,8 +36,14 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                         parMetaInfo = GetByKindParam(kind);
                     else if (!string.IsNullOrEmpty(type))
                         parMetaInfo = GetParamByTypeParam(type);
-                    else
-                        parMetaInfo = new T();
+                   
+                }
+
+                if (typeof(T).Equals(typeof(MultiRowsParams)))
+                {
+                    if (!string.IsNullOrEmpty(kind))
+                        parMetaInfo = GetByKindParam(kind);
+                    
                 }
 
                 if (typeof(T).Equals(typeof(ComplexParams)))
@@ -62,6 +67,9 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
                         break;
                     case "GET_FILE":
                         parMetaInfo = new GetFileParInfo() as T;
+                        break;
+                    case "FROM_UPLOAD_EXCEL":
+                        parMetaInfo = new ConvertParams() as T;
                         break;
                     case "DEF_VAL_BY_INSERT":
                         DefParam e = new DefParam();
