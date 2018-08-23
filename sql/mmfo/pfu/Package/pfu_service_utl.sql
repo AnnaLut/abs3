@@ -137,7 +137,7 @@ CREATE OR REPLACE PACKAGE PFU.PFU_SERVICE_UTL is
   procedure gen_matching2(p_file_id in integer, p_ecp in varchar2);
 
   procedure gen_epp_kvt2;
-  
+
   procedure gen_no_turnover(p_nt_id in integer,
                             p_mfo   in varchar2,
                             p_ecp   in varchar2);
@@ -273,7 +273,7 @@ CREATE OR REPLACE PACKAGE PFU.PFU_SERVICE_UTL is
   --    Оновлення результатів опрацювання кожного запису файлу для квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2) - update pfu_epp_line_bnk_state2 pfu_result, res_teg
   --
   procedure prepare_epp_kvt2_result;
-  
+
 
   function prepare_no_turnover(p_nt_id    in integer,
                                p_mfo      in varchar2,
@@ -309,6 +309,7 @@ CREATE OR REPLACE PACKAGE PFU.PFU_SERVICE_UTL is
 	procedure process_claim_stage;
 	procedure process_transport_stage;
 	procedure process_transport_ebp_stage;
+  procedure process_transport_lock_stage;
 
 	procedure process_all_stages;
   procedure prepare_checkissuecard;
@@ -6005,7 +6006,9 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
                   on t.unit_type_id = tt.id
                where t.state_id = transport_utl.TRANS_STATE_NEW
                  and tt.transport_type_code not in
-                     (transport_utl.TRANS_TYPE_GET_EBP) --відбираються всі пакети з статусом 1
+                     (transport_utl.TRANS_TYPE_GET_EBP,
+                      transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK) --відбираються всі пакети з статусом 1
                  for update skip locked) loop
       transport_utl.send_data(i);
     end loop;
@@ -6018,7 +6021,9 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
                      (transport_utl.TRANS_STATE_SENT,
                       transport_utl.TRANS_STATE_DATA_NOT_READY)
                  and tt.transport_type_code not in
-                     (transport_utl.TRANS_TYPE_GET_EBP)
+                     (transport_utl.TRANS_TYPE_GET_EBP,
+                      transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
                  for update skip locked) loop
       transport_utl.check_unit_state(i);
     end loop;
@@ -6052,6 +6057,37 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
       transport_utl.check_unit_state(i);
     end loop;
   end;
+  
+  procedure send_data_to_bank_units_lock --відправка пакетів на РУ
+   is
+  begin
+    for i in (select t.*
+                from transport_unit t
+                join transport_unit_type tt
+                  on t.unit_type_id = tt.id
+               where t.state_id = transport_utl.TRANS_STATE_NEW
+                 and tt.transport_type_code in
+                     (transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK) --відбираються всі пакети з статусом 1
+                 for update skip locked) loop
+      transport_utl.send_data(i);
+    end loop;
+    commit;
+
+    for i in (select t.*
+                from transport_unit t
+                join transport_unit_type tt
+                  on t.unit_type_id = tt.id
+               where t.state_id in
+                     (transport_utl.TRANS_STATE_SENT,
+                      transport_utl.TRANS_STATE_DATA_NOT_READY)
+                 and tt.transport_type_code in
+                     (transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
+                 for update skip locked) loop
+      transport_utl.check_unit_state(i);
+    end loop;
+  end;
 
   procedure process_receipt is
 
@@ -6078,9 +6114,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
                        transport_utl.TRANS_TYPE_CHECK_EPP_STATE,
                        transport_utl.TRANS_TYPE_GET_REPORT,
                        transport_utl.TRANS_TYPE_RESTART_EPP,
-                       transport_utl.TRANS_TYPE_GET_BRANCH,
-                       transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
-                       transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
+                       transport_utl.TRANS_TYPE_GET_BRANCH)
                   and t.state_id = transport_utl.TRANS_STATE_RESPONDED) loop
       declare
         l_clob         clob;
@@ -6139,10 +6173,6 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
           pfu_epp_utl.r_check_epp_state_procesing(l_clob, c0.id);
         elsif c0.transport_type_code = transport_utl.TRANS_TYPE_GET_BRANCH then
           pfu_files_utl.r_branch_procesing(l_clob, c0.id);
-        elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_BLOCK then
-          pfu_epp_utl.r_card_block_procesing(l_clob, c0.id);
-        elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK then
-          pfu_epp_utl.r_card_unblock_procesing(l_clob, c0.id);
         end if;
         dbms_lob.freetemporary(l_clob);
       exception
@@ -6195,6 +6225,60 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
 
         if c0.transport_type_code = transport_utl.TRANS_TYPE_GET_EBP then
           pfu_files_utl.r_getebp_procesing(l_clob, c0.id);
+        end if;
+        dbms_lob.freetemporary(l_clob);
+      exception
+        when others then
+          dbms_lob.freetemporary(l_clob);
+          rollback to before_transaction;
+      end;
+
+    end loop;
+  end;
+  
+  procedure process_receipt_lock is
+
+    l_warning      integer;
+    l_dest_offset  integer := 1;
+    l_src_offset   integer := 1;
+    l_blob_csid    number := dbms_lob.default_csid;
+    l_lang_context number := dbms_lob.default_lang_ctx;
+
+  begin
+    for c0 in (select t.*, tt.transport_type_code
+                 from transport_unit t
+                 join transport_unit_type tt
+                   on t.unit_type_id = tt.id
+                  and tt.transport_type_code in (transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                                                 transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
+                  and t.state_id = transport_utl.TRANS_STATE_RESPONDED) loop
+      declare
+        l_clob         clob;
+        l_tmpb         blob;
+        l_warning      integer;
+        l_dest_offset  integer := 1;
+        l_src_offset   integer := 1;
+        l_blob_csid    number := dbms_lob.default_csid;
+        l_lang_context number := dbms_lob.default_lang_ctx;
+      begin
+        dbms_lob.createtemporary(l_clob, false);
+        savepoint before_transaction;
+
+        l_tmpb := utl_compress.lz_uncompress(c0.response_data);
+
+        dbms_lob.converttoclob(dest_lob     => l_clob,
+                               src_blob     => l_tmpb,
+                               amount       => dbms_lob.lobmaxsize,
+                               dest_offset  => l_dest_offset,
+                               src_offset   => l_src_offset,
+                               blob_csid    => l_blob_csid,
+                               lang_context => l_lang_context,
+                               warning      => l_warning);
+
+        if c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_BLOCK then
+          pfu_epp_utl.r_card_block_procesing(l_clob, c0.id);
+        elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK then
+          pfu_epp_utl.r_card_unblock_procesing(l_clob, c0.id);
         end if;
         dbms_lob.freetemporary(l_clob);
       exception
@@ -6286,6 +6370,12 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
     send_data_to_bank_units_ebp;
     process_receipt_ebp;
     prepare_cardkill_claim();
+  end;
+  
+  procedure process_transport_lock_stage is
+  begin
+    send_data_to_bank_units_lock;
+    process_receipt_lock;
   end;
 
   procedure process_all_stages is
