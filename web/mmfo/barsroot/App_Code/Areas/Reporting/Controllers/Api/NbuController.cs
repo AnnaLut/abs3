@@ -360,6 +360,7 @@ namespace BarsWeb.Areas.Reporting.Controllers.Api
                 IEnumerable<Dictionary<string, object>> res = _repository.GetDetailedReportDyn(req, vn, Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode, nbuc, isDtl);
 
                 List<TableInfo> ti = _repository.GetTableInfo(vn);
+
                 if(isDtl)
                 {
                     List<ColumnDesc> colDesc = ti.Select(x => new ColumnDesc() { Name = x.ColumnName, Type = x.DataType, Semantic = title.FirstOrDefault(c => c[0] == x.ColumnName)[1] }).ToList<ColumnDesc>();

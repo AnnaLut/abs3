@@ -203,6 +203,8 @@ namespace BarsWeb.Areas.Reporting.Controllers
             //List<DetailedReport> res = _repository.GetDetailedReportList(Encoding.UTF8.GetString(Convert.FromBase64String(fileCodeBase64)), reportDate, kf, fieldCode, schemeCode);
             //var exel = new ExcelHelpers<DetailedReport>(res, true);
 
+
+            
             if (string.IsNullOrEmpty(fName) || !System.IO.File.Exists(fName))
             {
                 return File(Encoding.UTF8.GetBytes(string.Format("Файл не знайдено {0}", fName)), "text/plain", "ExceptionGetFile.txt");
