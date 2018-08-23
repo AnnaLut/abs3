@@ -475,6 +475,13 @@ end;
 /
 
 begin
+    BPA.ALTER_POLICY_INFO('PERSON', 'WHOLE', null, 'E', 'E', 'E');
+    BPA.ALTER_POLICY_INFO('PERSON', 'FILIAL', 'M', 'M', 'M', 'M');
+    BPA.ALTER_POLICIES('PERSON');
+end;
+/
+
+begin
   DBMS_STATS.GATHER_TABLE_STATS
   ( OwnName          => 'BARS'
   , TabName          => 'PERSON'

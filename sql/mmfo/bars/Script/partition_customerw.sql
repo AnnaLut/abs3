@@ -76,28 +76,8 @@ begin
     execute immediate 'ALTER SESSION ENABLE PARALLEL DDL';
     execute immediate 'ALTER SESSION ENABLE PARALLEL DML';
 
-    lock table PERSON in exclusive mode;
-    execute immediate 'alter table CUSTOMERW disable all triggers';
-    lock table PERSON in exclusive mode;
-    declare
-      e_clmn_exsts  exception;
-      pragma exception_init( e_clmn_exsts, -01430 );
-    begin
-      execute immediate q'[alter table CUSTOMERW add kf varchar2(6)]';
-      dbms_output.put_line( 'Table altered.' );
-    exception
-      when e_clmn_exsts then
-        dbms_output.put_line( 'Column "KF" already exists in table.' );
-    end;
+    lock table CUSTOMERW in exclusive mode;
     
-    execute immediate '
-    update CUSTOMERW
-       set KF = (select bars_sqnc.get_kf(substr(to_char(rnk), -2, 2)) from dual)
-     where kf is null';
-    
-    commit;
-    
-    execute immediate 'alter table CUSTOMERW enable all triggers';
 
     -- KF + all other columns
     select LISTAGG(t.COLUMN_NAME,', ') WITHIN GROUP ( order by case t.COLUMN_NAME when 'KF' then -1 else t.COLUMN_ID end )
@@ -170,7 +150,7 @@ SUBPARTITION TEMPLATE
 , PARTITION P_356334 VALUES ('356334')
 )
 as
-select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
+select /*+ parallel( 24 ) */ ]' || ' (select bars_sqnc.get_kf(substr(to_char(rnk), -2, 2)) from dual) as KF, RNK, TAG, VALUE, ISP ' || q'[
   from ]'|| l_tab_nm;
 
     execute immediate l_tab_stmt;
@@ -372,6 +352,7 @@ select /*+ parallel( 24 ) */ ]' || l_col_lst || q'[
     -- ======================================================
     -- Policies
     -- ======================================================
+    --BPA.ALTER_POLICY_INFO(l_tab_nm, 'WHOLE', null, 'E', 'E', 'E');
     BPA.ALTER_POLICIES( l_tab_nm );
     commit;
 
@@ -419,6 +400,13 @@ exception
   then dbms_output.put_line( 'Such column list already indexed.' );
   when e_dup_keys_found
   then dbms_output.put_line( 'Cannot create unique index: duplicate keys found' );
+end;
+/
+
+begin
+    BPA.ALTER_POLICY_INFO('CUSTOMERW', 'WHOLE', null, 'E', 'E', 'E');
+    BPA.ALTER_POLICY_INFO('CUSTOMERW', 'FILIAL', 'M', 'M', 'M', 'M');
+    BPA.ALTER_POLICIES('CUSTOMERW');
 end;
 /
 
