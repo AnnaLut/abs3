@@ -35,7 +35,8 @@ begin
 	FORM_NAME VARCHAR2(254), 
 	CHECK_FUNC VARCHAR2(254), 
 	WEB_FORM_NAME VARCHAR2(508), 
-	ICON_ID NUMBER
+	ICON_ID NUMBER,
+        CUSTOM_OPTIONS CLOB
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -51,6 +52,13 @@ end;
 PROMPT *** ALTER_POLICIES to META_NSIFUNCTION ***
  exec bpa.alter_policies('META_NSIFUNCTION');
 
+PROMPT *** ADD COLUMN  custom_options***
+begin 
+   execute immediate('alter table META_NSIFUNCTION add custom_options clob ');
+exception when others then 
+   null; 
+end;
+/
 
 COMMENT ON TABLE BARS.META_NSIFUNCTION IS 'Описание функций, выполняемых на справочниках';
 COMMENT ON COLUMN BARS.META_NSIFUNCTION.WEB_FORM_NAME IS 'Функция WEB';
@@ -65,7 +73,7 @@ COMMENT ON COLUMN BARS.META_NSIFUNCTION.QST IS 'Вопрос перед выполнением';
 COMMENT ON COLUMN BARS.META_NSIFUNCTION.MSG IS 'Сообщение после удачного выполнения процедуры';
 COMMENT ON COLUMN BARS.META_NSIFUNCTION.FORM_NAME IS 'Функция центуры';
 COMMENT ON COLUMN BARS.META_NSIFUNCTION.CHECK_FUNC IS 'Функция проверки';
-
+COMMENT ON COLUMN BARS.META_NSIFUNCTION.CUSTOM_OPTIONS IS 'Дополнительные парамeтры функции';
 
 
 
