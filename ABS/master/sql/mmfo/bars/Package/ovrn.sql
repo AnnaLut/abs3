@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.05.2018';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.5 13.08.2018';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -11,6 +11,7 @@ CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='v
  g_TAGN char(8)   := 'DONOR'   ; -- Признак донора
  g_TAGS char(8)   := 'STOP_O'  ; -- <<СТОП>> для ОВРН
  g_2017 int       := 1 ; -- Флаг выполненной (=1) или НЕ выполненной трансформации-2017 по переходу на новый план счетов
+ g_inscc NUMBER;    -- Флаг для включения проверки при авторизации параметра  INSCC(сделано на всякий случай что бы быстро отключить не меняя пакет) 1- включена проверка
 
 
 /*
@@ -59,6 +60,7 @@ procedure Chk_nls  ( p_mode int  , p_acc number, p_kv IN int , p_nls IN varchar2
 procedure ADD_master  (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date, p_wdate date, p_lim number, p_ir0 number, p_ir1 number,
                       p_nls varchar2, p_kv int,  p_day int, p_PD number, p_isp number,
                       p_METR int, -- =1 = ¦Ёшчэръ  яырт.ёЄртъш
+                      p_MMETR int default null, -- =1 = Признак максимальной ставки при плав.ставки
                       p_SK   int,  -- = ¦ °ърыv фы  яырт.ёЄртъш
                       p_NZ   int  -- яЁшчэръ "схч юсхёяхўхэш "
                      );
@@ -76,7 +78,7 @@ procedure OP_3600    ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a36 IN O
 procedure OP_SP      ( dd IN cc_deal%rowtype, a26 IN accounts%rowtype , a67 IN OUT accounts%rowtype, a69 IN OUT accounts%rowtype) ;   -- откр просрочки 2067 + 2069
 procedure BG1        ( p_ini  int, p_mode int, p_dat date, dd cc_deal%rowtype, a26 accounts%rowtype, x26 accounts%rowtype ) ;   -- БЭК-сопровождение одного 2600
 function  SP         ( p_mode int, p_nd number, p_rnk number) return number ;
-procedure FLOW_IR    ( p_accc number, p_dat1 date, p_dat2 date);  -- Виконано розрахунок плаваючих % ставок (METR=7)
+procedure FLOW_IR    ( p_accc number, p_dat1 date, p_dat2 date, p_mode number, l_baza int, l_bazp int);  -- Виконано розрахунок плаваючих % ставок (METR=7)
 
 -------------------------------
 procedure DEL_ALL (p_nd number);  -- удаление всех/тестовый режим Или одного неавторизованного
@@ -107,8 +109,9 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.3 10.05.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.5 13.08.2018';
 /*
+10.07.2018 LitvinSO COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
 06.04.2018  Нач %% через JOB
 06.04.2018 Sta Удаление ЧКО одного реф по 2- (и более) счетам
 
@@ -377,7 +380,7 @@ OVR_TERM_TRZ.TRZ = Код события:
   end;
 
   delete from OVR_TERM_TRZ t
-   where TRZ < 4 and ( DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  OR ovrn.fost_sal(t.acc, gl_bdate) >= 0  )  ;
+   where TRZ < 4 and ( DATSP < gl_bdate and exists (select 1 from nd_acc where nd = dd.nd and acc = t.acc )  OR OVRN.fost_sal(t.acc, gl_bdate) >= 0  )  ;
 
   begin -- Просроченные проценты несвоевременная оплата %/комиссии,
      select 11 into n_sos from accounts a, nd_acc n where n.nd = dd.ND and a.acc= n.acc and a.nbs = SB_2069.R020 and tip ='SPN' and a.ob22 = SB_2069.ob22 and OSTC < 0  and rownum = 1 ;   
@@ -631,7 +634,7 @@ begin
 
      EXCEPTION WHEN NO_DATA_FOUND THEN   ----- raise_application_error(g_errn,'Не знайдено % картку(id='||p_id||') для рах=' ||aa.nls);
 
-        If aa.tip = ovrn.tip then
+        If aa.tip = OVRN.tip then
            insert into int_accn (ACC,ID,METR,BASEM,BASEY,FREQ, acr_dat ) values (aa.acc, p_id, 0,0,0,1, (aa.daos-1) );
         else
            -- код корпоративного кл
@@ -689,7 +692,7 @@ begin
      If aa.tip = 'SP ' then
 
         -- может быть дог имеет плав.ставку
-        begin select * into ii from int_accn where id = 0 and acc = aa.ACCC and metr = 7;
+        begin select * into ii from int_accn where id = 0 and acc = aa.ACCC and metr in( 7,9);
               select max(ir) into n_IR from INT_OVR where id = ii.idr;
         EXCEPTION WHEN NO_DATA_FOUND THEN  null;
         end ;
@@ -887,6 +890,7 @@ PROCEDURE AUTOR ( p_nd number , p_x varchar2) is ---- авторизация
   l_CPROD int    ;
   l_ob22_9129 accounts.ob22%type;
   l_acc_9129  accounts.acc%type;
+  l_inscc_val  varchar2(250);
 BEGIN
 
   if  length(trim(p_x )) < 6 then raise_application_error(g_errn, g_errS||'Не задано підставу для авторизації' )  ;  end if;
@@ -906,6 +910,24 @@ BEGIN
   end if;
   --- Проверки по ДОГ.
   if gl.aUid = dd.user_id then raise_application_error(g_errn,'Користувач '||  gl.aUid || ' Не може авторизувати <свою> угоду ' ||dd.nd); end if;
+
+      --COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
+    if g_inscc = 1 then
+        begin
+            select txt
+            into   l_inscc_val
+            from   nd_txt
+            where  tag = 'INSCC' and
+                   nd = dd.nd;
+        exception
+            when no_data_found then
+                 null;
+        end;
+        
+        if (l_inscc_val is null) then
+            raise_application_error(-20203, 'НЕ заповнено обов’язковий параметр «Страхування кредиту»');
+        end if;
+    end if;
 
   select count(*), min(acc), min (lim) into u_Kol, x_acc26, x_lim26 from accounts where accc = a89.acc and nbs in ('2600','2650','2602','2603','2604') ;  -- эти БС-2017 не меняются 
   If u_Kol = 0 then raise_application_error(g_errn, g_errS||'Відсутні дані про учасників договору' ) ;   end if;
@@ -962,7 +984,7 @@ BEGIN
   end if;
 
 
-  If ii.metr = 7  then
+  If ii.metr in (7,9)   then
      BEGIN  SELEct 1 into nTmp_ from int_ovr where id = ii.idr and kv = gl.baseval and rownum = 1 ;
      EXCEPTION WHEN NO_DATA_FOUND  THEN raise_application_error(g_errn, g_errS||'Відсутній опис шкали для плаваючої ставки. Дог='||l_nd )  ;
      end;
@@ -1055,7 +1077,7 @@ BEGIN
                       update accounts set lim = l_lim  where acc = a26.acc  ;
 
     -- обновить проц.карточки
-    If ii.metr = 7  then  update int_accn set metr = ii.metr, idr = ii.idr where acc = a26.acc and id = 0  ; end if ;
+    If ii.metr in (7,9)  then  update int_accn set metr = ii.metr, idr = ii.idr where acc = a26.acc and id = 0  ; end if ;
     update int_accn set   basey = 3 where acc = a26.acc and id = 0 ; -- 3 Г% Факт/360  ACT/360
     update int_accn set   basey = 0 where acc = a26.acc and id = 1 ; -- 0 Г% Факт/Факт  ACT/ACT
 
@@ -1438,6 +1460,7 @@ end chk_nls;
 procedure ADD_master (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date, p_wdate date, p_lim number, p_ir0 number, p_ir1 number,
                       p_nls varchar2, p_kv int,  p_day int, p_PD number, p_isp number,
                       p_METR int, -- =1 = Признак  плав.ставки
+                      p_MMETR int default null, -- =1 = Признак максимальной ставки при плав.ставки
                       p_SK   int,  -- = № шкалы для плав.ставки
                       p_NZ   int  -- признак "без обеспечения"
                      ) is
@@ -1457,7 +1480,7 @@ begin
   l_sdate := nvl(p_sdate, gl.bdate) ; -------------------------\
   l_wdate := nvl(p_wdate, add_months(gl.bdate,12) -1 ) ; ------/ по умолчанию 1 год
 
-  ovrn.Chk_dat ( l_SDate, l_sdate, l_wDate, l_wdate  ) ;
+  OVRN.Chk_dat ( l_SDate, l_sdate, l_wDate, l_wdate  ) ;
 
   If p_ND = 0 then
 
@@ -1465,7 +1488,7 @@ begin
      EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(g_errn,'Не знайдено рах.' ||l_kv||'/'|| p_nls);
      end;
 
-     ovrn.Chk_nls ( p_mode => 0, p_acc =>null, p_kv=>l_kv , p_nls=>p_nls , aa => aa ) ;
+     OVRN.Chk_nls ( p_mode => 0, p_acc =>null, p_kv=>l_kv , p_nls=>p_nls , aa => aa ) ;
 
      -- открытие дог с видом 10
      dd.nd      := bars_sqnc.get_nextval('s_cc_deal') ;  ---- s_cc_deal.NEXTVAL ;
@@ -1540,14 +1563,18 @@ begin
   If p_metr = 1 then
      OVRN.SetIR( dd.nd, a8,  0, dd.sdate, 0 ) ; --\ Установить плав. проц ставку на 8998*
      OVRN.SetIR( dd.nd, a8,  1, dd.sdate, 0 ) ; --/
-     update int_accn set metr = 7, idr = p_sk where acc = a8.acc and id = 0;
+     update int_accn
+        set metr = case when p_mmetr = 1 then 9 else 7 end,
+            idr = p_sk
+     where acc = a8.acc
+       and id = 0;
   else
      OVRN.SetIR( dd.nd, a8,  0, dd.sdate, p_ir0 ) ; --\ Установить льготную проц ставку на 8998*
      OVRN.SetIR( dd.nd, a8,  1, dd.sdate, p_ir1 ) ; --/
   end if;
 
   If p_ND = 0 then OVRN.ADD_slave  (0, dd.ND , aa.acc , dd.limit, null, null, aa.nls, null, null, null, null );
-                   If p_metr = 1 then  update int_accn set metr = 7, idr = p_sk where acc = aa.acc and id = 0 ; end if ;
+                   If p_metr = 1 then  update int_accn set metr = case when p_mmetr = 1 then 9 else 7 end, idr = p_sk where acc = aa.acc and id = 0 ; end if ;
                    OVRN.isob  (p_nd => dd.ND, p_sob => 'INS:master-Договір/'|| p_nls||'/'||l_kv );
   else             OVRN.isob  (p_nd => dd.ND, p_sob => 'UPD:master-Договір/'|| p_nls||'/'||l_kv );
   end if;
@@ -1575,7 +1602,7 @@ begin
   EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(g_errn,'!! Не знайдено master-угоду !! ' ||l_nd);
   end;
 
-  ovrn.Chk_nls ( p_mode, p_acc, a8.kv , p_nls , aa ) ;
+  OVRN.Chk_nls ( p_mode, p_acc, a8.kv , p_nls , aa ) ;
   ----------------------------------------------------
   OP_BS_OB1 ( PP_BRANCH => substr(aa.branch,1,15) , P_BBBOO => SB_6020.R020||SB_6020.OB22 );
   OP_BS_OB1 ( PP_BRANCH => substr(aa.branch,1,15) , P_BBBOO => SB_6111.R020||SB_6111.OB22 );
@@ -1737,7 +1764,7 @@ begin
   update accounts set ostc=0  where acc= p_acc8;    delete from saldoa where acc = p_acc8;
 
   -- суммарный вход ост
-  select Nvl( sum( ovrn.FOST_SAL (acc, l_daos-1)) ,0) into  l_s from accounts where accc= p_acc8;
+  select Nvl( sum( OVRN.FOST_SAL (acc, l_daos-1)) ,0) into  l_s from accounts where accc= p_acc8;
   gl.bdate := l_daos -1;
   update accounts set ostc = l_s where acc= p_acc8;
 
@@ -1994,7 +2021,7 @@ begin
          end loop  ; -- aaa
 
          --- освежить данные по 89998         -- общий лимит  a89.LIM
-         select a.* into a89 from accounts a, nd_acc n where n.nd = dd.ND and n.acc= a.acc and a.tip = ovrn.tip;
+         select a.* into a89 from accounts a, nd_acc n where n.nd = dd.ND and n.acc= a.acc and a.tip = OVRN.tip;
 
          -- сумма частных использ. ОВР (толлько отриц суммы ! )
          select NVL ( sum ( LEAST ( 0, x.OSTC ) ) , 0) into a89.ostc  from accounts x where x.accc = a89.acc ;
@@ -2072,7 +2099,7 @@ procedure INTXJ  ( p_User int,p_branch varchar2, p_mode int ,p_dat1 date, p_dat2
 --21.06.2015 Базовый год для акт = факт/360, для пас = факт.факт
   l_BAZA  int  := 36000;
   l_BAZP  int  := 36500;
-
+ltemp number;
 begin
   if p_User is not null then
       bars.bars_login.login_user(sys_guid,p_User,null,null);
@@ -2093,11 +2120,12 @@ begin
 
   k31_ :=  to_number( to_char( last_day(p_dat2) , 'dd') ) ;
   If  mod( to_number (to_char(p_dat2, 'YYY')) ,4) = 0 then   l_BAZP  := 36600; end if; --высокосный год
-  delete from OVR_INTX where ISP = gl.aUid;
+-- delete from OVR_INTX where ISP = gl.aUid;
+  delete from OVR_INTX where state = 0;   --таблица политизирована, поэтому удаляем все расчеты по своей РУ
   ----------------------
   for a8 in (SELECT a.acc , NVL(i.acr_dat+1, d.sdate)  DAT1, i.metr, i.basey
              FROM accounts a, nd_acc n, cc_deal d , int_accn i
-             WHERE a.tip  = ovrn.tip and (p_acc8 = 0 or p_acc8 = a.acc)
+             WHERE a.tip  = OVRN.tip and (p_acc8 = 0 or p_acc8 = a.acc)
                and d.vidd = OVRN.VIDD and d.sos  >= 10 and d.sos < 15
                and a.acc  = n.acc     and n.nd   = d.nd  and i.acc  = a.acc  and i.id = 0    )
   loop
@@ -2121,7 +2149,7 @@ begin
      If a8.DAT1 > p_Dat2 then goto Rec_Next; end if;
 
 
-     If a8.metr = 7 then ovrn.FLOW_IR ( a8.acc, a8.DAT1, p_DAT2);  end if; -- плав.% ставка
+     If a8.metr in(7, 9) then OVRN.FLOW_IR ( a8.acc, a8.DAT1, p_DAT2, p_mode, l_baza , l_bazp );  end if; -- плав.% ставка
 
      select count(*) into l_kol from accounts where accc = a8.acc and nbs in ('2600','2650','2602','2603','2604'); -- эти БС в 2017 не меняются
 
@@ -2129,6 +2157,13 @@ begin
      for  d in (select (a8.dat1 - 1 + c.num) CDAT, mod(c.num,3) npp from conductor c where (a8.dat1 - 1 + c.num) <= p_dat2 )
      loop
         d8:= to_char(d.cdat,'yyyymmdd');
+
+        tmpD(d8).id         := S_OVR_INTX_COUNT.NEXTVAL;
+        tmpD(d8).pid        := null;
+        tmpD(d8).count_date := p_dat2;
+        tmpD(d8).state      := 0;
+        tmpD(d8).kf         := sys_context('bars_context','user_mfo');
+
         tmpD(d8).mod1 := p_mode ;
         tmpD(d8).cdat := d.cdat ;
         tmpD(d8).npp  := d.npp ;
@@ -2137,7 +2172,7 @@ begin
         tmpD(d8).acc8 := a8.acc ;
 
         select  NVL( sum ( decode ( sign(ost),  1, ost, 0) ), 0),    NVL( sum ( decode ( sign(ost), -1, ost, 0) ), 0)
-        into tmpD(d8).Pas8 ,   tmpD(d8).Akt8     from  (select ovrn.FOST_SAL (acc, d.cdat) ost  from accounts where accc = a8.acc );
+        into tmpD(d8).Pas8 ,   tmpD(d8).Akt8     from  (select OVRN.FOST_SAL (acc, d.cdat) ost  from accounts where accc = a8.acc );
 
         tmpD(d8).Sal8 := tmpD(d8).Pas8 + tmpD(d8).Akt8  ;
 
@@ -2149,11 +2184,12 @@ begin
            end if;
         end if;
 
-        for  x in (select rnk, acc, kv, nls, ovrn.FOST_SAL ( acc, d.cdat) ost from accounts where accc= a8.acc and (p_acc2 = 0 or p_acc2 = acc) )
+        for  x in (select rnk, acc, kv, nls, OVRN.FOST_SAL ( acc, d.cdat) ost from accounts where accc= a8.acc and (p_acc2 = 0 or p_acc2 = acc) )
         loop
            tmpD(d8).Ost2 := x.ost;
            tmpD(d8).IP2  := acrn.fprocn( x.acc, 1, d.cdat);
            tmpD(d8).IA2  := acrn.fprocn( x.acc, 0, d.cdat);
+           ltemp:= tmpD(d8).IA2;
            tmpD(d8).acc  := x.acc ;
            tmpD(d8).rnk  := x.rnk ;
 
@@ -2185,6 +2221,7 @@ begin
            tmpD(d8).PR  := ROUND( tmpD(d8).PR , 8 ) ;
            tmpD(d8).ISP := gl.aUid ;
            insert into OVR_INTX values tmpD(d8);
+
            ---------------------------------------
            l_donor := nvl(to_number (OVRN.GetW(x.acc, 'DONOR' ) ),0) ;
 
@@ -2200,7 +2237,11 @@ begin
            If l_donor <> 1 and l_kol > 1 then
               tmpD(d8).VN  := 62   ;
               begin select - round (tar/k31_,8) into tmpD(d8).PR  from ACC_TARIF where acc = x.acc and kod = 145 and tar > 0 ;
-                    If tmpD(d8).PR  < 0 then         tmpD(d8).ISP := gl.aUid ;  insert into OVR_INTX values tmpD(d8); end if;
+                    If tmpD(d8).PR  < 0 then
+                      tmpD(d8).ISP := gl.aUid ;
+                      tmpD(d8).id  := S_OVR_INTX_COUNT.NEXTVAL;
+                      insert into OVR_INTX values tmpD(d8);
+                    end if;
               EXCEPTION WHEN NO_DATA_FOUND THEN null;
               end ;
            end if ;
@@ -2210,7 +2251,11 @@ begin
            If l_kol > 1 and tmpD(d8).IA8  > 0 then
               tmpD(d8).VN  := 63   ;
               begin select - round( tar/k31_, 8)  into tmpD(d8).PR from ACC_TARIF where acc = x.acc and kod = 146 and tar > 0  ;
-                    If tmpD(d8).PR < 0 then            tmpD(d8).ISP := gl.aUid ; insert into OVR_INTX values tmpD(d8); end if;
+                    If tmpD(d8).PR < 0 then
+                      tmpD(d8).ISP := gl.aUid ;
+                      tmpD(d8).id  := S_OVR_INTX_COUNT.NEXTVAL;
+                      insert into OVR_INTX values tmpD(d8);
+                   end if;
               EXCEPTION WHEN NO_DATA_FOUND THEN null;
               end ;
            end if ;
@@ -2221,7 +2266,11 @@ begin
                  select NVL(a.pr,t.PR) into tmpD(d8).IA2 from (select kod,pr from acc_tarif where acc=x.acc and kod=144) a, tarif t where T.kod= 144 and t.kod= a.kod (+);
                  tmpD(d8).PR  :=  ROUND( tmpD(d8).S2  * tmpD(d8).IA2/100,8)  ;
                  tmpD(d8).VN  := 61   ;
-                 if tmpD(d8).PR < 0 then tmpD(d8).ISP := gl.aUid ; insert into OVR_INTX values tmpD(d8); end if ;
+                 if tmpD(d8).PR < 0 then
+                   tmpD(d8).ISP := gl.aUid ;
+                   tmpD(d8).id  := S_OVR_INTX_COUNT.NEXTVAL;
+                   insert into OVR_INTX values tmpD(d8);
+                 end if ;
               EXCEPTION WHEN NO_DATA_FOUND THEN null;
               end ;
            end if ;
@@ -2295,7 +2344,8 @@ loop
 
 end loop ; --x
 
-  delete  from OVR_INTX where  ISP = gl.aUid ;
+  --delete  from OVR_INTX where  ISP = gl.aUid ;
+  update  OVR_INTX set state = 1 where state = 0 ;
 
 end INTB;
 -------------------------------
@@ -2783,8 +2833,16 @@ begin
   RETURN l_ost;
 end SP;
 -------------------------------
-procedure FLOW_IR    ( p_accc number, p_dat1 date, p_dat2 date) is  -- Виконано розрахунок плаваючих % ставок (METR=7)
-  kol_ int;  ir1_  NUMBER := -1 ;   ir2_ number ; dat1_ date ;
+procedure FLOW_IR    ( p_accc number, p_dat1 date, p_dat2 date, p_mode number, l_baza int, l_bazp int) is  -- Виконано розрахунок плаваючих % ставок (METR=7)
+  kol_ int;
+  ir1_  NUMBER := -1 ;
+  ir2_  number ;
+  dat1_ date ;
+  ldate date;
+  lkol_ int:=0;
+  ldo   int;
+  TYPE INTT  IS TABLE OF OVR_INTX%rowtype INDEX BY varchar2 (8) ;
+  tmpD INTT    ;  d8 varchar2 (8) ;
 begin
 
 for ii in (select i.* from int_accn i, accounts a where a.accc = p_accc and a.acc = i.acc and i.id = 0)
@@ -2792,25 +2850,116 @@ loop
    --очистим ставки для периода начисления
    DELETE FROM int_ratn WHERE acc = ii.acc AND ID = 0 AND bdat > ii.acr_dat;
    ir1_  := -1 ;
-
+   ldo   := 0;
+   ldate:=ii.acr_dat+1;
    -- сканируем все дни от пред до тек начисления
-   for f in (select FDAT
-             from ( select (ii.acr_dat+c.num) FDAT from conductor c where  (ii.acr_dat+c.num) <= p_dat2  )
-             where ovrn.FOST_SAL (ii.acc, FDAT ) < 0
-             order by FDAT
+   for f in (select c.fdat, ostf - dos + kos SALDO
+             from saldoa SA,
+                  ( select (ii.acr_dat+c.num) FDAT, num from conductor c where  (ii.acr_dat+c.num) <= p_dat2 ) c
+             where SA.acc  = ii.acc
+               and SA.fdat = ( select max(x.fdat) from saldoa x where x.acc = SA.acc and x.fdat <= c.fdat)
+               and ostf - dos + kos <0
+             order by c.FDAT
              )
    LOOP
      -- последняя дата входа в овр
      select max(fdat) into dat1_ from saldoa  where fdat <= f.FDAT and acc = ii.acc and  ostf >= 0 ;
      kol_ := f.FDAT - dat1_ + 1;
+     if  ii.metr = 9   then -- Ставка берется максимальная
+       if f.FDAT = dat1_ or f.FDAT = p_dat2  then  --пришли в начало нового отрезка, либо мы в конце расчета
+         if f.FDAT = p_dat2 then
+           lkol_:=kol_; --для конца расчета колличество берем текущее
+         end if;
+         SELECT NVL(ir,IR1_) INTO IR2_
+            FROM (SELECT ir,dni FROM int_ovr WHERE kv = gl.baseval AND ID = ii.idr ORDER BY dni)  WHERE ROWNUM = 1 AND dni >= lkol_ ;
+         INSERT INTO int_ratn (acc,ID,bdat,ir) VALUES (ii.acc,0,ldate,IR2_);
+         ldate:=f.FDAT; --фиксируем дату начала отрезка
+         ldo:= ldo+1;
+       end if;
+       lkol_:=kol_; --фиксируем колличество
 
+       if ldo = 1 and  kol_>1 then  --в случае начала периода расчета, но на этот день находимся в овердрафте уже больше одного дня, то будем пересчитывать предыдущий расчет
+        for cur in (select * from OVR_INTX t
+                            where t.acc8 = p_accc
+                              and t.acc = ii.acc
+                              and t.state = 1
+                              and t.cdat>f.FDAT-kol_
+                              and t.count_date = (select max(tt.count_date) from OVR_INTX tt where tt.acc8 = p_accc and tt.acc = ii.acc and tt.state = 1)
+                   )
+        loop
+           d8:= to_char(cur.cdat,'yyyymmdd');
+
+          tmpD(d8).id         := S_OVR_INTX_COUNT.NEXTVAL;
+          tmpD(d8).pid        := cur.id;
+          tmpD(d8).count_date := p_dat2;
+          tmpD(d8).state      := 0;
+          tmpD(d8).kf         := sys_context('bars_context','user_mfo');
+
+          tmpD(d8).mod1 := p_mode;
+          tmpD(d8).cdat := cur.cdat;
+          tmpD(d8).npp  := cur.npp;
+          tmpD(d8).IP8  := cur.IP8;--ставки по 8 не меняю
+          tmpD(d8).IA8  := cur.IA8;--ставки по 8 не меняю
+          tmpD(d8).acc8 := cur.acc8;
+          tmpD(d8).Pas8 := cur.Pas8;
+          tmpD(d8).Akt8 := cur.Akt8;
+          tmpD(d8).Sal8 := cur.Sal8;
+          tmpD(d8).KP   := cur.KP;
+          tmpD(d8).KA   := cur.KA;
+
+          tmpD(d8).Ost2 := cur.ost2 ;
+          tmpD(d8).IP2  := 0; --не предусматриваю пассивы
+          tmpD(d8).IA2  := IR2_;
+          tmpD(d8).acc  := cur.acc ;
+          tmpD(d8).rnk  := cur.rnk ;
+
+          tmpD(d8).S2  := round(tmpD(d8).KA  * tmpD(d8).Ost2,8) ;
+          tmpD(d8).S8  := round(tmpD(d8).Ost2 - tmpD(d8).S2,8) ;
+          tmpD(d8).PR2 := round(tmpD(d8).S2  * IR2_/l_baza,8) ;
+          tmpD(d8).PR8 := round(tmpD(d8).S8 * tmpD(d8).IA8/l_baza,8)  ;
+          tmpD(d8).VN  := 65 ;   -- проценты, актив,  доходы
+
+          tmpD(d8).PR  := round( tmpD(d8).PR2 + tmpD(d8).PR8,8) ;
+
+          tmpD(d8).DPR2 := tmpD(d8).PR2 -cur.PR2 ;
+          tmpD(d8).DPR8 := tmpD(d8).PR8 -cur.PR8 ;
+          tmpD(d8).DPR  := round( tmpD(d8).DPR2 + tmpD(d8).DPR8,8) ;
+
+           -- округления конечного результата для капризного ВЕБ
+          tmpD(d8).IP8 := ROUND( tmpD(d8).IP8, 4 ) ;
+          tmpD(d8).IA8 := ROUND( tmpD(d8).IA8, 4 ) ;
+          tmpD(d8).KP  := Round( tmpD(d8).KP , 4 ) ;
+          tmpD(d8).KA  := ROUND( tmpD(d8).KA , 4 ) ;
+          tmpD(d8).IP2 := Round( tmpD(d8).IP2, 4 ) ;
+          tmpD(d8).IA2 := ROUND( tmpD(d8).IA2, 4 ) ;
+          tmpD(d8).S2  := Round( tmpD(d8).S2 , 0 ) ;
+          tmpD(d8).S8  := ROUND( tmpD(d8).S8 , 0 ) ;
+          tmpD(d8).PR2 := Round( tmpD(d8).PR2, 8 ) ;
+          tmpD(d8).PR8 := ROUND( tmpD(d8).PR8, 8 ) ;
+          tmpD(d8).PR  := ROUND( tmpD(d8).PR , 8 ) ;
+          tmpD(d8).DPR2 := Round( tmpD(d8).DPR2, 8 ) ;
+          tmpD(d8).DPR8 := ROUND( tmpD(d8).DPR8, 8 ) ;
+          tmpD(d8).DPR  := ROUND( tmpD(d8).DPR , 8 ) ;
+          tmpD(d8).ISP := gl.aUid ;
+          insert into OVR_INTX values tmpD(d8);
+
+
+        end loop;
+      end if;
+
+     else --все по-старому
      begin   -- ставка нового дня
         SELECT NVL(ir,IR1_) INTO IR2_
         FROM (SELECT ir,dni FROM int_ovr WHERE kv = gl.baseval AND ID = ii.idr ORDER BY dni)  WHERE ROWNUM = 1 AND dni >= KOL_ ;
         -- если поменялась, то запомнить
-        If IR1_ <> IR2_ then   INSERT INTO int_ratn (acc,ID,bdat,ir) VALUES (ii.acc,0,f.FDAT,IR2_);     IR1_:= IR2_;   end if;
+            If IR1_ <> IR2_   then
+                INSERT INTO int_ratn (acc,ID,bdat,ir) VALUES (ii.acc,0,f.FDAT,IR2_);
+                IR1_:= IR2_;
+            end if;
      EXCEPTION  WHEN NO_DATA_FOUND THEN null;
      end;
+     end if;
+
    end loop; --- f
 end loop ; -- k
 
@@ -2826,7 +2975,7 @@ begin
  ------------------------------------------------------------------------
  for dd in (select d.nd, d.sdate, a.acc ACC8 , d.sos
             from cc_deal d, nd_acc n, accounts a
-            where d.vidd = ovrn.vidd and d.nd = n.nd and n.acc = a.acc and a.tip = OVRN.tip
+            where d.vidd = OVRN.vidd and d.nd = n.nd and n.acc = a.acc and a.tip = OVRN.tip
               and ( p_ND = 0 or
                     p_ND = d.nd and sysdate < x_dat OR
                     p_ND = d.nd and d.sos < 10
@@ -2855,7 +3004,7 @@ begin
 
  end loop; -- dd
 
- If p_nd = 0 then delete from OVR_INTX ; end if;
+ If p_nd = 0 then delete from OVR_INTX where state=0; end if;
 
 end DEL_ALL;
 
@@ -2904,7 +3053,7 @@ BEGIN
   end;
 
   -- 1) доначислить проценты по дату завершения включительно
-  ovrn.INTXj (p_User => null, p_branch => null, p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
+  OVRN.INTXj (p_User => null, p_branch => null, p_mode => 1, p_dat1 => null, p_dat2 => (GL.BDATE-1), p_acc8 =>A8.ACC, p_acc2 =>0) ;
 
 
   -- 0) ДОПЛАТА ФОРВАРДНОЙ КОМИССИИ ПРИ ДОСРОЧНОМ ЗАКРЫТИИ
@@ -2982,7 +3131,6 @@ BEGIN
      end if ;
   end loop;
 
---update cc_deal set sos = 15 where nd = dd.nd;
   OVRN.NEW_SOS (p_ND=> dd.nd, p_sos => 15);
   l_txt := ' Закрито !';
   -------------------
@@ -3180,7 +3328,7 @@ begin
  G_TAGN := 'DONOR'    ; PUL.Set_Mas_Ini('G_TAGN', 'DONOR'   , 'Сол.ОВР.Признак донора'    ); -- Признак донора
  G_TAGS := 'STOP_O'   ; PUL.Set_Mas_Ini('G_TAGS', 'STOP_O'  , 'Сол.ОВР.<<СТОП>> для ОВРН' ); -- <<СТОП>> для ОВРН
 
-
+ g_inscc  := to_number(nvl(getglobaloption('INSCC'), '0')); -- Флаг для включения проверки при авторизации параметра  INSCC(сделано на всякий случай что бы быстро отключить не меняя пакет) 1- включена проверка
 
  begin select 0 into OVRN.G_2017 from SB_OB22  where         r020  = '2067'      and ob22  = '01'   and d_close is null ;
        SB_2067.R020 := '2067';   SB_2067.OB22 := '01' ; -- короткостроковў кредити в поточну дўяльнўсть
@@ -3195,5 +3343,5 @@ begin
 
  end ;
 
-END ovrn;
+END OVRN;
 /
