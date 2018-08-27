@@ -105,7 +105,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.26 05/03/2018';
+g_body_version constant varchar2(64)  := 'Version 1.27 27/08/2018';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -1958,11 +1958,17 @@ end;
        IF l_custtype = 3
       AND SUBSTR(okpo_, 1, 5) IN ('99999', '00000') THEN
           BEGIN
-             SELECT SUBSTR(TRIM(ser) || TRIM(numdoc), 1, 14)
+             SELECT case 
+                      when passp in (1) 
+                        then 
+                          SUBSTR(TRIM(ser) || TRIM(numdoc), 1, 14) 
+                        else 
+                          SUBSTR(TRIM(numdoc), 1, 14) 
+                      end
                INTO l_passp
                FROM person
               WHERE rnk = p_rnk
-                AND passp = 1;
+                AND passp in (1,7);
           EXCEPTION
              WHEN NO_DATA_FOUND THEN
                 l_passp  := NULL;
