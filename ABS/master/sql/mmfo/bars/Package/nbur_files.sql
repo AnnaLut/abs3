@@ -317,7 +317,7 @@ show errors
 create or replace package body NBUR_FILES
 is
 
-  g_body_version  constant varchar2(64) := 'version 6.7  2018.06.18';
+  g_body_version  constant varchar2(64) := 'version 6.8  2018.08.23';
 
   MODULE_PREFIX   constant varchar2(8) := 'NBUR';
 
@@ -871,6 +871,9 @@ begin
        and r.scheme_code = p_scheme_code;
     
     return l_file_name;
+exception 
+    when no_data_found then 
+        return '';    
 end f_get_file_name;                            
 
 -- отримання сформуваного файлу (clob)
@@ -893,6 +896,9 @@ begin
        and r.scheme_code = p_scheme_code;
     
     return l_file_clob;
+exception 
+    when no_data_found then 
+        return '';
 end f_get_file_clob;           
 
 -- отримання дати

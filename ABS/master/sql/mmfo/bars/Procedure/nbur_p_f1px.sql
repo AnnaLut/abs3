@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 1PX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.006 09/08/2018 (06/08/2018)
+% VERSION     :  v.16.076 26/08/2018 (09/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.006  09/08/2018';
+  ver_          char(30)  := 'v.16.007  26/08/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   cEKP                   constant varchar2(100 char) := 'A1P001';
@@ -89,7 +89,9 @@ BEGIN
                , q001 /*q001*/
                , rcukru_glb_1 /*rcukru_glb_1*/
                --Генерация номера для связки с агрегированного и детального протокола
-               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
+               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, 
+                                                  r030, r020, r040, t023, rcukru_glb_2, k018, 
+                                                  k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
                , q004 /*q004*/
                , case when t023 = 3 then 0 else 1 end/*t080*/
                , t071 /*t071*/
@@ -102,78 +104,44 @@ BEGIN
                , ref /*ref*/
                , nd /*nd*/
                , branch /*branch*/
-        from    (
-                  select
-                         nbuc
-                         , max(mmm) as K040_1
-                         , max(hhhhhhhhhh) as RCBNK_B010
-                         , max(case when dd = '10' then znap else null end) as  RCBNK_NAME
-                         , max(www) as K040_2
-                         , max(vvv) as R030
-                         , max(bbbb) as R020
-                         , max(xxxx) as R040
-                         , max(e) as T023
-                         , max(case when dd = '07' then znap else null end) as RCUKRU_GLB_2
-                         , max(case when dd = '04' then znap else null end) as K018
-                         , max(case when dd = '05' then znap else null end) as K020
-                         , max(case when dd = '06' then znap else null end) as Q001
-                         , max(case when dd = '03' then znap else null end) as  RCUKRU_GLB_1
-                         , max(nnn) as Q003_1
-                         , max(case when dd = '99' then znap else null end) as Q004
-                         , max(case when dd = '71' then znap else null end) as T071
-
-                         , o.comm as description
-                         , o.acc_id as acc_id
-                         , o.nls as acc_num
-                         , o.kv as kv
-                         , o.mdate as maturity_date
-                         , o.rnk as cust_id
-                         , o.ref as ref
-                         , o.nd as nd
-                         , o.branch
-                  from   (
-                            select t.seg_01 as dd
-                                   , t.seg_02 as e
-                                   , t.seg_03 as mmm
-                                   , t.seg_04 as hhhhhhhhhh
-                                   , t.seg_05 as bbbb
-                                   , t.seg_06 as vvv
-                                   , t.seg_07 as xxxx
-                                   , t.seg_08 as www
-                                   , t.seg_09 as nnn
-                                   , t.field_code kodp
-                                   , t.description comm
-                                   , t.acc_num nls
-                                   , t.kv
-                                   , t.maturity_date mdate
-                                   , t.cust_id rnk
-                                   , t.ref
-                                   , t.nd
-                                   , t.branch
-                                   , trim(t.field_value) znap
-                                   , t.acc_id
-                                   , t.nbuc
-                            from v_nbur_#1p_dtl t
-                            where report_date = p_report_date and
-                                  kf = p_kod_filii
-                         ) o
-                  group by
-                        substr(o.kodp, 3)
-                         , o.comm
-                         , o.acc_id
-                         , o.nls
-                         , o.kv
-                         , o.mdate
-                         , o.rnk
-                         , o.ref
-                         , o.nd
-                         , o.branch
-                         , o.nbuc
+        from    (select *
+                    from   (select t.seg_01 as dd
+                               , t.seg_02 as T023
+                               , t.seg_03 as K040_1
+                               , t.seg_04 as RCBNK_B010
+                               , t.seg_05 as R020
+                               , t.seg_06 as R030
+                               , t.seg_07 as R040
+                               , t.seg_08 as K040_2
+                               , t.seg_09 as Q003_1
+                               , trim(t.field_value) znap
+                               , t.description
+                               , t.acc_num
+                               , t.kv
+                               , t.maturity_date
+                               , t.cust_id
+                               , t.ref
+                               , t.nd
+                               , t.branch
+                               , t.acc_id
+                               , t.nbuc
+                        from v_nbur_#1p_dtl t
+                        where report_date = p_report_date and
+                              kf = p_kod_filii) o
+                    pivot (max(znap) for dd in ('03' as RCUKRU_GLB_1, 
+                                                '04' as K018, 
+                                                '05' as K020, 
+                                                '06' as Q001, 
+                                                '07' as RCUKRU_GLB_2, 
+                                                '10' as RCBNK_NAME, 
+                                                '71' as T071, 
+                                                '99' as Q004)
+                    )                      
        );
   else
       insert into nbur_log_f1px(report_date, kf, version_id, nbuc, ekp, k040_1, rcbnk_b010, rcbnk_name, 
             k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q003_1, q004, 
-            t080, t071, description, acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
+            t080, t071)
         select p_report_date /*report_date*/
                , p_kod_filii /*kf*/
                , l_version_id /*version_id*/
@@ -193,86 +161,36 @@ BEGIN
                , q001 /*q001*/
                , rcukru_glb_1 /*rcukru_glb_1*/
                --Генерация номера для связки с агрегированного и детального протокола
-               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, r030, r020, r040, t023, rcukru_glb_2, k018, k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
+               , lpad(dense_rank() over (order by k040_1, rcbnk_b010, rcbnk_name, k040_2, 
+                                                  r030, r020, r040, t023, rcukru_glb_2, k018, 
+                                                  k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
                , q004 /*q004*/
                , case when t023 = 3 then 0 else 1 end/*t080*/
                , t071 /*t071*/
-               , description /*description*/
-               , acc_id /*acc_id*/
-               , acc_num /*acc_num*/
-               , kv /*kv*/
-               , maturity_date /*maturity_date*/
-               , cust_id /*cust_id*/
-               , ref /*ref*/
-               , nd /*nd*/
-               , branch /*branch*/
-        from    (
-                  select
-                         nbuc
-                         , max(mmm) as K040_1
-                         , max(hhhhhhhhhh) as RCBNK_B010
-                         , max(case when dd = '10' then znap else null end) as  RCBNK_NAME
-                         , max(www) as K040_2
-                         , max(vvv) as R030
-                         , max(bbbb) as R020
-                         , max(xxxx) as R040
-                         , max(e) as T023
-                         , max(case when dd = '07' then znap else null end) as RCUKRU_GLB_2
-                         , max(case when dd = '04' then znap else null end) as K018
-                         , max(case when dd = '05' then znap else null end) as K020
-                         , max(case when dd = '06' then znap else null end) as Q001
-                         , max(case when dd = '03' then znap else null end) as  RCUKRU_GLB_1
-                         , max(nnn) as Q003_1
-                         , max(case when dd = '99' then znap else null end) as Q004
-                         , max(case when dd = '71' then znap else null end) as T071
-
-                         , o.comm as description
-                         , o.acc_id as acc_id
-                         , o.nls as acc_num
-                         , o.kv as kv
-                         , o.mdate as maturity_date
-                         , o.rnk as cust_id
-                         , o.ref as ref
-                         , o.nd as nd
-                         , o.branch
-                  from   (
-                            select t.seg_01 as dd
-                                   , t.seg_02 as e
-                                   , t.seg_03 as mmm
-                                   , t.seg_04 as hhhhhhhhhh
-                                   , t.seg_05 as bbbb
-                                   , t.seg_06 as vvv
-                                   , t.seg_07 as xxxx
-                                   , t.seg_08 as www
-                                   , t.seg_09 as nnn
-                                   , t.field_code kodp
-                                   , null comm
-                                   , null nls
-                                   , null kv
-                                   , null mdate
-                                   , null rnk
-                                   , null ref
-                                   , null nd
-                                   , null branch
-                                   , trim(t.field_value) znap
-                                   , null acc_id
-                                   , t.nbuc
-                            from v_nbur_#1p t
-                            where report_date = p_report_date and
-                                  kf = p_kod_filii
-                         ) o
-                  group by
-                        substr(o.kodp, 3)
-                         , o.comm
-                         , o.acc_id
-                         , o.nls
-                         , o.kv
-                         , o.mdate
-                         , o.rnk
-                         , o.ref
-                         , o.nd
-                         , o.branch
-                         , o.nbuc
+        from    (select *
+                 from   (select t.seg_01 as dd
+                           , t.seg_02 as T023
+                           , t.seg_03 as K040_1
+                           , t.seg_04 as RCBNK_B010
+                           , t.seg_05 as R020
+                           , t.seg_06 as R030
+                           , t.seg_07 as R040
+                           , t.seg_08 as K040_2
+                           , t.seg_09 as Q003_1
+                           , trim(t.field_value) znap
+                           , t.nbuc
+                    from v_nbur_#1p t
+                    where report_date = p_report_date and
+                          kf = p_kod_filii) o
+                pivot (max(znap) for dd in ('03' as RCUKRU_GLB_1, 
+                                            '04' as K018, 
+                                            '05' as K020, 
+                                            '06' as Q001, 
+                                            '07' as RCUKRU_GLB_2, 
+                                            '10' as RCBNK_NAME, 
+                                            '71' as T071, 
+                                            '99' as Q004)
+                        )
        );  
   end if;
 
