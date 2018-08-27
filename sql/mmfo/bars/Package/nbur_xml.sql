@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.8  2018.08.17';
+  g_body_version  constant varchar2(64) := 'version 2.9  2018.08.26';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -1132,7 +1132,7 @@ $end
        when '1PX' then
          open p_recordset 
          for
-            select p.EKP
+            select 'A1P001' EKP
                    , p.K040_1
                    , p.RCBNK_B010
                    , p.RCBNK_NAME
@@ -1148,27 +1148,33 @@ $end
                    , p.RCUKRU_GLB_1
                    , p.Q003_1
                    , p.Q004
-                   , sum(p.T080) as T080
-                   , sum(p.T071) as T071
-              from nbur_log_f1px p
-             where p.report_date = p_rpt_dt
-               and p.kf = p_kf
-             group by p.EKP
-                    , p.K040_1
-                    , p.RCBNK_B010
-                    , p.RCBNK_NAME
-                    , p.K040_2
-                    , p.R030
-                    , p.R020
-                    , p.R040
-                    , p.T023
-                    , p.RCUKRU_GLB_2
-                    , p.K018
-                    , p.K020
-                    , p.Q001
-                    , p.RCUKRU_GLB_1
-                    , p.Q003_1
-                    , p.Q004;
+                   , case when t023 = 3 then 0 else 1 end T080
+                   , p.T071
+              from (select *
+                     from   (select t.seg_01 as dd
+                               , t.seg_02 as T023
+                               , t.seg_03 as K040_1
+                               , t.seg_04 as RCBNK_B010
+                               , t.seg_05 as R020
+                               , t.seg_06 as R030
+                               , t.seg_07 as R040
+                               , t.seg_08 as K040_2
+                               , t.seg_09 as Q003_1
+                               , trim(t.field_value) znap
+                               , t.nbuc
+                        from v_nbur_#1p t
+                        where report_date = p_rpt_dt and
+                              kf = p_kf) o
+                    pivot (max(znap) for dd in ('03' as RCUKRU_GLB_1, 
+                                                '04' as K018, 
+                                                '05' as K020, 
+                                                '06' as Q001, 
+                                                '07' as RCUKRU_GLB_2, 
+                                                '10' as RCBNK_NAME, 
+                                                '71' as T071, 
+                                                '99' as Q004)
+                        )
+                   ) p;
 
        when 'C5X' then
          open p_recordset for
@@ -1216,7 +1222,7 @@ $end
                    , S181
                    , S190
                    , S240   
-                   , sum(T070) as T070
+                   , abs(sum(T070)) as T070
             from   nbur_log_fa7x
             where  report_date = p_rpt_dt
                    and kf = p_kf
@@ -1231,8 +1237,7 @@ $end
                    , S181
                    , S190
                    , S240     
-            having 
-                   sum(T070) <> 0;
+            having sum(T070) <> 0;
 
        when '#4P' then
          open p_recordset
