@@ -4,7 +4,6 @@ PROMPT =========================================================================
 
 -- ins_ree_tmp_COBUMMFO-9231
 begin
-  if trunc(sysdate) = to_date('27.08.2018','dd.mm.yyyy') then
     bars.bars_login.login_user(p_sessionid => sys_guid(),
                                p_userid    => 1,
                                p_hostname  => null,
@@ -30,7 +29,6 @@ begin
                                   );
       end if;
     end loop;
-  end if;
 end;
 /
 
