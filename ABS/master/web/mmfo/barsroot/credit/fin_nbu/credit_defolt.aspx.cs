@@ -2658,7 +2658,11 @@ public partial class credit_defolt : Bars.BarsPage
 
 
             }
-            else { Pn_Wizar5_2.Visible = false; }
+            else { Pn_Wizar5_2.Visible = false;
+            Dl_ZD3.SelectedValue = "0";
+            Tb_ZDN1.Text = null;
+            Tb_ZDD1.Value = null;
+            }
 
         }
         else
