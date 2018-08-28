@@ -2392,7 +2392,7 @@
         var start = ((grid.store.currentPage - 1) * grid.store.pageSize);
         if (item.allPages) {
             start = 0;
-            pageSize = 999999;
+            pageSize = 999;
         }
         var metaData = {
             tableInfo: grid.metadata.tableInfo

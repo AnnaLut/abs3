@@ -9,20 +9,24 @@ using System.Web;
 using Bars.Oracle;
 using ICSharpCode.SharpZipLib.Zip;
 using Oracle.DataAccess.Client;
+using BarsWeb.Core.Logger;
 
 namespace Bars.Web.Report
 {
     public class MultiPrintRtfReporter
     {
+        private IDbLogger _dbLogger;
         private readonly HttpContext _httpContext;
+        string userName;
         private readonly string _tempDir;
         private long _adds;               //параметр ADDS для договоров
         private long _nEvent = -1;	             //код события для трасировки сессии Oracle
         private long _nLevel = -1;	             //уровень детализации события трасировки сессии Oracle
         public MultiPrintRtfReporter(HttpContext context)
         {
+            userName = context.User != null ? context.User.Identity.Name.ToLower() : "";
             _httpContext = context;
-
+            _dbLogger = DbLoggerConstruct.NewDbLogger();
             //-- если в пути будет пробел, то ни один процесс который получает этот 
             //-- путь как параметр работать не будет (проверил tvSukhov)
             string strFilePrefix = Path.GetTempPath().Replace("Documents and Settings", "DOCUME~1").Replace("Local Settings", "LOCALS~1");
@@ -67,11 +71,13 @@ namespace Bars.Web.Report
         }
         public string GetReportFile()
         {
+            int charsCounter = 0;
             var mainReport = new MainReport(_tempDir);
             OracleCommand cmd = new OracleCommand();
             IOraConnection icon = (IOraConnection)_httpContext.Application["OracleConnectClass"];
             OracleConnection con = icon.GetUserConnection();
             cmd.Connection = con;
+            var strTemplatesId = new StringBuilder();
             //создаем пустой файл шаблона, в который будем закидывать несколько отдельных шаблонов
             try
             {
@@ -92,7 +98,7 @@ namespace Bars.Web.Report
                 }
                 // вычитываем шаблоны
 
-                var strTemplatesId = new StringBuilder();
+              
                 foreach (var templateId in TemplateIds)
                 {
                     strTemplatesId.AppendFormat("'{0}',", templateId.ToUpper());
@@ -124,6 +130,7 @@ namespace Bars.Web.Report
                         }
                         string reportId = reader["ID"].ToString();
                         string reportTemplate = reader["TEMPLATE"].ToString();
+                        charsCounter += reportTemplate.Length;
                         //создать список договоров для каждого клиента
                         foreach (var contractNumber in ContractNumbers)
                         {
@@ -151,6 +158,7 @@ namespace Bars.Web.Report
             }
             finally
             {
+                _dbLogger.Warning(string.Format("GetReportFile executed.user name: {0}  strTemplatesId: {1} charsCounter: {2} ", userName, strTemplatesId, charsCounter), "GetReportFile");
                 cmd.Dispose();
                 con.Close();
                 con.Dispose();
