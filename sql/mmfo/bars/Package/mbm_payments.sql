@@ -25,7 +25,7 @@
   procedure set_payment_payed(p_ref oper.ref%type);
 
 
-	procedure create_payment(
+    procedure create_payment(
                             p_date oper.vdat%type default trunc(sysdate),
                             p_vdate oper.vdat%type default trunc(sysdate),
                             p_mfoa oper.mfoa%type,
@@ -1125,7 +1125,7 @@ end add_dop_req;
        return l_ref;
     end;
 
-    procedure ins_cl_paym_id(p_cl_id number, 
+    procedure ins_cl_paym_id(p_cl_id number,
                              p_type  number) is
       pragma autonomous_transaction;
     begin
@@ -1227,7 +1227,7 @@ end add_dop_req;
        bars.gl.pay( p_flag => 2,
                     p_ref  => p_ref,
                     p_vdat => l_doc.datp);
-                    
+
        select o.* into l_doc from oper o where o.ref = p_ref;
 
        -- если удалось оплатить
@@ -1303,7 +1303,7 @@ end add_dop_req;
        bc.set_context();
 
     end if;
-    
+
     set_payment_payed(p_ref);
 
     exception when others
@@ -1363,6 +1363,7 @@ end add_dop_req;
     l_numdoc person.numdoc%type;
     l_is_auto_pay tmp_cl_payment.is_auto_pay%type;
     l_okpo customer.okpo%type;
+    l_cnt  number;
 
   begin
     bars_audit.trace('%s: entry point', l_th);
@@ -1421,6 +1422,16 @@ end add_dop_req;
                   exception when no_data_found then
                       raise_application_error(-20000, 'Рахунок відправника не знайдено!');
               end;
+              
+              select count(*)
+                into l_cnt
+                from bars.accounts a
+               where a.nls = p_nlsa
+                 and ((a.nbs = 2600 and a.ob22 = 14) 
+                   or (a.nbs = 2650 and a.ob22 = 12));
+               if l_cnt > 0 then
+                 raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
+               end if;
               -- представляемся отделением
 
               --COBUMMFO-4647 согласно заявки докмент создается в бранче привязки счета. Бранч исполнителя не проверяется(код заккоментирован)
@@ -1455,28 +1466,28 @@ end add_dop_req;
           if (p_mfoa = p_mfob) then
             /*COBUBB-1480 start*/
             begin
-                
+
                 select *
                   into l_acc
                   from accounts a
                  where a.nls = p_nlsb
                    and a.kv = l_kv;
-                
+
                 select cust.okpo
-                  into l_okpo 
+                  into l_okpo
                   from customer cust
-                 where cust.rnk = l_acc.rnk;  
-                
+                 where cust.rnk = l_acc.rnk;
+
                 if (l_okpo != p_okpob) then
                       raise_application_error(-20000,
                           'Вказиний ОКПО отримувача не вірний!');
-                end if; 
+                end if;
              exception when no_data_found  then
                 raise_application_error(-20000,
                           'Вказиний рахунок отримувача не вірний!');
-             end;   
-            /*COBUBB-1480 finish*/   
-            
+             end;
+            /*COBUBB-1480 finish*/
+
             if l_acc.tip like 'W4%' then
                l_tt := 'CL5';
             end if;
@@ -1675,14 +1686,14 @@ is
     l_branch varchar2(30) := null;
     l_branch_acc varchar2(30);
     l_branch_usr varchar2(30);
-    
+
     l_str           varchar2(32767);
     l_length        number;
     l_name          operw.tag%type;
     l_val           operw.value%type;
     l_tmp           varchar2(32767);
 begin
-  
+
       -- точка отката
   bars_audit.trace('%s: entry point', l_title);
   bars_audit.info('corplight_pay_fc-application_api(input parameters):'||
@@ -1709,7 +1720,7 @@ begin
       ', p_signes=>'||to_char(p_signes)||chr(13)||chr(10)||
 
       ', p_nd=>'||p_nd||chr(13)||chr(10));
-  
+
     if (check_cl_id(cl_doc_id) = 0) then
         ins_cl_paym_id(cl_doc_id, 3);
         l_doc.dk   := p_reqtype;
@@ -1739,7 +1750,7 @@ begin
         end;
 
         --if l_branch_usr like l_branch_acc||'%' then
-        
+
            bc.subst_branch(l_branch_acc);
       /*  else
            bc.subst_branch(l_branch_usr);
@@ -1928,7 +1939,7 @@ begin
                  set z.attachments_count = p_attachment
                where z.id = l_doc.id;
             end if;
-            
+
             begin
                 if p_signes is not null then
                     l_length := length(p_signes) - length(replace(p_signes,';'));
@@ -1951,7 +1962,7 @@ begin
             exception when others then
                 raise_application_error(-20000, 'Не коректно сформовано параметр P_SIGNES!');
             end;
-            
+
 
             logger.trace('%s: finish', l_title);
             upd_cl_paym(cl_doc_id, l_doc.id, 0);
@@ -1976,7 +1987,7 @@ begin
     else
       bars_audit.info('Дублирующий документ: '|| cl_doc_id);
       p_zay_id := get_ref(cl_doc_id);
-    end if;        
+    end if;
 
     bars_audit.info('corplight_create_fc_application_api(output parameters):
             p_ref=>'||to_char(l_doc.id)||chr(13)||chr(10)||
@@ -2087,7 +2098,7 @@ is
     l_branch_isp    varchar2(30);
 
     l_cnt           number;
-    
+
     l_tt_row        bars.tts%rowtype;
     l_d_rec         bars.oper.d_rec%type;
     l_needless      number;
@@ -2142,9 +2153,9 @@ begin
         ', p_dopreq=>'||to_char(p_dopreq)||chr(13)||chr(10)||
         ', p_signes=>'||to_char(p_signes)||chr(13)||chr(10)||
         ', p_attachment=>'||to_char(p_attachment)||chr(13)||chr(10));
-  
+
   if (check_cl_id(p_doc_id) = 0) then
-        ins_cl_paym_id(p_doc_id, 2); 
+        ins_cl_paym_id(p_doc_id, 2);
     savepoint sp_paystart;
 
         begin
@@ -2298,7 +2309,7 @@ begin
                 when p_kv=bars.gl.baseval then null
                 else bars.gl.p_icurval(p_kv, p_s, GL.BD)
                 end;
-                
+
             p_creating_date := sysdate;
 
             bars.gl.in_doc2(
@@ -2424,13 +2435,13 @@ begin
           exception when no_data_found then
              l_paymode   := 0;
           end;
-          
+
         if get_bis_count(l_ref) > 0 then
            update bars.oper set bis = 1
            where ref=l_ref;
            bars.bars_audit.trace('bars_docsync.post_document: найдены бис строки');
         end if;
-        
+
         -- проверка: операция d.tt существует ?
         begin
             select * into l_tt_row from bars.tts where tt=l_tt;

@@ -28,6 +28,9 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   STATUS_PAID_BANK    constant number :=  50; -- Проведений Банком
   STATUS_PROC_BANK    constant number :=  60; -- Оброблений Банком
 
+    --
+  -- Типи
+  --
   type acc_t   is table of integer index by binary_integer;
 
   ----
@@ -154,7 +157,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   --
   procedure notify_ibank;
-
+  
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -479,7 +482,6 @@ procedure sync_acc_transactions2_TEST(
   procedure job_sync_acctariffs;
 
 end data_import;
-
 /
 
 CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
@@ -3990,6 +3992,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_blank_num     varchar2(100);
     l_bank_id       varchar2(100);
     l_is_nls_closed number(1);
+    l_cnt           number;
     --
     numeric_value_error exception;
     pragma exception_init(numeric_value_error, -6502);
@@ -4159,6 +4162,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             when numeric_value_error then
                 raise_application_error(-20000, 'Код отримувача занадто довгий');
         end;
+        
         -- дата валютирования
         if is_attr_exists(l_body, 'VALUE_DATE') then
             l_doc.vdat  := get_attr_date(l_body, 'VALUE_DATE');
@@ -4166,12 +4170,23 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- вычленяем балансовые счета
         l_nbsa := substr(l_doc.nls_a, 1, 4);
         l_nbsb := substr(l_doc.nls_b, 1, 4);
+        
+        select count(*)
+          into l_cnt
+          from bars.accounts a
+         where a.nls = l_doc.nls_a
+           and ((a.nbs = 2600 and a.ob22 = 14) 
+             or (a.nbs = 2650 and a.ob22 = 12));
+         if l_cnt > 0 then
+           raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
+         end if;
+            
     end if;
     --
     -- внутренний документ
     if     l_typeid = 'P_INT' then
         logger.trace('internal document');
-        
+
         -- дата вставки
         l_doc.insertion_date := sysdate;
         -- контроль идентификационного кода получателя
@@ -5037,7 +5052,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     logger.trace('%s: start '||sysdate, l_title);
     for c in (
-        select * from doc_import where
+        select * from doc_import where 
         case
         when booking_flag is not null and notification_flag is null then 'Y'
         else null
@@ -5093,7 +5108,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     logger.trace('%s: doc_count '||counter, l_title);
     logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
-
+  
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -5661,7 +5676,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
-
+            
             commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
@@ -5699,22 +5714,23 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                          ) as of scn l_scn
                 )
         loop
-            -- блокируем строку в doc_export
-            select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
-            -- если нету истории изменений по oper.sos, то ставим время создания документа
-            l_change_time := nvl(c.status_change_time, c.creating_time);
-            --
-            l_back_reason := nvl(c.bank_back_reason, 'Причину відхилення не вказано');
-            --
-            set_status_info(
-                p_docid                   => c.doc_id,
-                p_statusid                => c.status,
-                p_status_change_time      => l_change_time,
-                p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
-                p_bank_ref                => c.bank_ref,
-                p_bank_back_date          => case when c.status<0 then l_change_time else null end,
-                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
-            );
+                -- блокируем строку в doc_export
+                select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
+                -- если нету истории изменений по oper.sos, то ставим время создания документа
+                l_change_time := nvl(c.status_change_time, c.creating_time);
+                --
+                l_back_reason := nvl(c.bank_back_reason, 'Причину відхилення не вказано');
+                --
+                set_status_info(
+                    p_docid                   => c.doc_id,
+                    p_statusid                => c.status,
+                    p_status_change_time      => l_change_time,
+                    p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
+                    p_bank_ref                => c.bank_ref,
+                    p_bank_back_date          => case when c.status<0 then l_change_time else null end,
+                    p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
+                );
+           
         end loop;
         -- фиксируем изменения
         commit;
@@ -7026,4 +7042,3 @@ grant EXECUTE                                                                on 
  PROMPT *** End *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** End *
  PROMPT ===================================================================================== 
  
-/
