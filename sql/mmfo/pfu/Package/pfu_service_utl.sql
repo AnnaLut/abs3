@@ -3732,8 +3732,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
         add_text_node_utl(l_doc, l_row_node, 'id_epp',   rec.id_epp);
         add_text_node_utl(l_doc, l_row_node, 'result',   rec.pfu_result);
         add_text_node_utl(l_doc, l_row_node, 'res_teg',  rec.res_tag);
-        add_text_node_utl(l_doc, l_row_node, 'ps_type',  rec.ps_type);
-        add_text_node_utl(l_doc, l_row_node, 'date_end', rec.date_end);
+        add_text_node_utl(l_doc, l_row_node, 'Ps_type',  rec.ps_type);
+        add_text_node_utl(l_doc, l_row_node, 'Date_end', rec.date_end);
       end loop;
 
       l_clob := dbms_xmldom.getXmlType(l_doc).getClobVal();
@@ -4439,7 +4439,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
     l_lang_context number := dbms_lob.default_lang_ctx;
     l_warning      integer;
   begin
-    for i in (select batch_request_id, xml_data from pfu_matching_request2 where state = 'NEW')
+    for i in (select m.batch_request_id, r.pfu_batch_id, m.xml_data 
+              from pfu_matching_request2 m
+                   inner join pfu_epp_batch_request r on r.id = m.batch_request_id
+              where state = 'NEW')
     loop
       l_blob_xml := pfu_utl.clob_to_blob(i.xml_data);
       l_blob_zip := utl_compress.lz_compress(l_blob_xml);
@@ -4455,7 +4458,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
                                              dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
                                                                                             'epp_packet_bnk_state_2')));
 
-      add_text_node_utl(l_doc, l_root_node, 'id', i.batch_request_id);
+      add_text_node_utl(l_doc, l_root_node, 'id', i.pfu_batch_id);
       add_text_node_utl(l_doc, l_root_node, 'data', l_clob_base64);
 
       pfu_utl.create_epp_matching2(dbms_xmldom.getXmlType(l_doc).getClobVal());
