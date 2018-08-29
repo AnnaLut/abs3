@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.27.007 07/08/2018 (06/08/2018)
+% VERSION     :  v.27.008 28/08/2018 (07/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := 'v.27.007  07/08/2018';
+  ver_            char(30)  := 'v.27.008  28/08/2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -88,7 +88,7 @@ BEGIN
                                  , case
                                      when cust.k070 like '13%'  then 'G'
                                      when cust.k070 in ('ZZZZZ', 'YYYYY') then 'D'
-                                     when cust.cust_type = 3 and cust.k030 ='1' then '2' --Физлицо резидент
+                                     when cust.cust_type = 3 and (cust.k030 ='1' or cust.k040 ='900') then '2' --Физлицо резидент
                                    else
                                      '1'
                                    end as K021_1
@@ -151,10 +151,10 @@ BEGIN
                                        '1'
                                      end
                                    end  as K021_2  
-                                 , lpad(to_char(row_number() over (partition by lpad(cust.cust_code, 10, '0') order by acc.acc_id, tr.ref)), 4, '0') as Q003_1                                   
+                                 , lpad(to_char(row_number() over (order by lpad(cust.cust_code, 10, '0'), acc.acc_id, tr.ref)), 4, '0') as Q003_1                                   
                           from   (select cust.cust_code, max(cust.k070) as k070, max(trim(custo.nmk)) as cust_name, max(cust.cust_adr) as cust_adr
                                          , cust.cust_id as cust_id, max(cust.cust_type) as cust_type, max(cust.k030) as k030, max(re.rnbor) rnbor
-                                         , max(re.rnbou) rnbou, max(re.rnbos) rnbos, max(re.rnbod) rnbod
+                                         , max(re.rnbou) rnbou, max(re.rnbos) rnbos, max(re.rnbod) rnbod, max(cust.k040) as k040
                                   from   (select *
                                           from (select u.rnk
                                                            , u.tag
