@@ -23,7 +23,14 @@ begin
                and e.EA_STRUCT_ID in ('542','543'))
   loop
      if k.FLAGS <> 0 then  
+       begin 
      intg_wb.frx2ea(k.deposit_id, k.rnk, k.FLAGS);
+     
+     exception
+        when others then
+          bars_audit.info('JOB_DPT_MAKEFRX:\ function:dpt_push_frx:' ||k.deposit_id||'\RNK:'||k.rnk||':->'||sqlerrm);
+      end;
+      
      else 
        BARS_AUDIT.INFO('DPT_PUSH_FRX: Для вида договора '||k.vidd || ' не знайден флаг 38,39,40 у таблиці dpt_vidd_scheme. DEPOSIT_ID='||k.deposit_id);
      end if;
