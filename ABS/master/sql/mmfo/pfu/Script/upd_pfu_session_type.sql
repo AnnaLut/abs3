@@ -7,3 +7,11 @@ Insert into PFU.PFU_SESSION_TYPE
 COMMIT;
 end;
 /
+
+BEGIN
+  update pfu_session_type 
+  set pfu_method_code = 'put_epp_packet_bnk_state_2'
+  where id = 28;
+  commit;
+END;
+/

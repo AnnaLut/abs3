@@ -29,7 +29,7 @@ CREATE OR REPLACE PACKAGE PFU.PFU_UTL is
     REQ_TYPE_DEATH_MATCHING        constant varchar2(30) := 'POST_WORKING_NOTICE_DEATH_BANK';
     REQ_TYPE_NO_TURNOVER           constant varchar2(30) := 'POST_NOTICE_DRAWING_BANK_ANSW';
     REQ_TYPE_EPP_MATCHING          constant varchar2(30) := 'PUT_EPP_PACKET_BNK_STATE';
-    REQ_TYPE_EPP_MATCHING2         constant varchar2(30) := 'PUT_EPP_PACKET_BNK_STATE2';
+    REQ_TYPE_EPP_MATCHING2         constant varchar2(30) := 'PUT_EPP_PACKET_BNK_STATE_2';
     REQ_TYPE_EPP_ACTIVATION        constant varchar2(30) := 'PUT_EPP_BNK_INFO_ASK';
     REQ_TYPE_DEATH_LIST            constant varchar2(30) := 'GET_DEATH_LIST';
     REQ_TYPE_DEATH                 constant varchar2(30) := 'GET_DEATH';
