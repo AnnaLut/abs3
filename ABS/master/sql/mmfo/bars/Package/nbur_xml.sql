@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.9  2018.08.26';
+  g_body_version  constant varchar2(64) := 'version 2.9  2018.08.27';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -1047,8 +1047,8 @@ $end
        when 'E9X' then
          open p_recordset
          for
-            select (case when ekp_2='1' and ekp_8 ='804' and ekp_10 ='804'   then 'AE9001'
-                         when ekp_2='1' and ekp_8!='804' and ekp_10 ='804'   then 'AE9002'
+            select (case when ekp_2='1' and ekp_8 ='804' and ekp_10 in ('804', '#') then 'AE9001'
+                         when ekp_2='1' and ekp_8!='804' and ekp_10 in ('804', '#') then 'AE9002'
                          when ekp_2='1' and ekp_8 ='804' and ekp_10!='804'   then 'AE9003'
                          when ekp_2='2' and ekp_8!='804' and ekp_10 ='804'
                                         and d060_2 is not null               then 'AE9004'
