@@ -4,12 +4,12 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_interest_cck1.sql =========*** R
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PROCEDURE   BARS.P_INTEREST_CCK1 
+  CREATE OR REPLACE PROCEDURE BARS.P_INTEREST_CCK1 
  (
    p_type    IN NUMBER DEFAULT 0
   ,p_date_to IN DATE
  ) IS
- 
+
    /*
      26/02/2018  Pogoda   додано розрахунок комісії по методу "відсоток від залишку"
      05/11/2017  Pivanova додано умову для нарахування basey=2 i basem=0
@@ -18,9 +18,9 @@
      20/03/2017  Pivanova розділила нарахування по ануїтету і по рівним частинам на дві
      19/03/2017  Pivanova змінено визначення платіжної дати для ануїтету фізіків
      16/03/2017  Pivanova змінено призначення платежу при нарахуванні амортизації
- 
+
     25.01.2017 Sta Разные начисления в КП ФЛ и ЮЛ
- 
+
            ЮЛ   ФЛ
      p_type = 1 , 11 НА ВИМОГУ - по ВСІМ - Щомiсячне Нар. %%  та комісії
      p_type = 2 , 12 НА ВИМОГУ - з залишками на SG
@@ -28,7 +28,7 @@
      p_type = 3 , 13 ЩОДЕННЕ   - по пл. датах
      p_type = 4 , 14 ЩОДЕННЕ   - по прострочених дог.
      p_type = 17   для Києва тимчасово
- 
+
      p_type < 0 НА ВИМОГУ - по 1 КД
    */
    nint_  NUMBER;
@@ -39,13 +39,13 @@
    dd     cc_deal%ROWTYPE;
    k1     SYS_REFCURSOR;
    l_mode INT := 1;
- 
+
    l_bdat_real DATE;
    l_bdat_next DATE;
    l_num  integer;
- 
+
  BEGIN
- 
+
    IF p_type >= 0
       AND p_type NOT IN (1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 17) THEN
      RETURN;
@@ -54,7 +54,7 @@
    IF p_date_to IS NULL and p_type not in(5,15) THEN
      l_bdat_real := nvl(p_date_to, gl.bdate);
      l_bdat_next := dat_next_u(l_bdat_real, 1);
- 
+
      IF to_number(to_char(l_bdat_next, 'YYMM')) >
         to_number(to_char(l_bdat_real, 'YYMM')) THEN
        ddat2_ := trunc(l_bdat_next, 'MM') - 1;
@@ -65,7 +65,7 @@
     --ddat2_ := nvl(p_date_to, gl.bd);
    d_prev := dat_next_u(ddat2_, -1);
    d_next := ddat2_ + 1;
- 
+
    IF p_type < 0 AND p_type <> -999 THEN
      -- НА ВИМОГУ- по 1 КД
      OPEN k1 FOR
@@ -102,9 +102,9 @@
           AND sos >= 10
           AND sos < 14
           AND vidd IN (1, 2, 3, 11, 12, 13);
- 
+
    ELSIF p_type IN (1, 11) THEN
- 
+
      -- НА ВИМОГУ- по ВСІМ
      OPEN k1 FOR
        SELECT nd, cc_id, sdate, wdate,ndg
@@ -113,7 +113,7 @@
           AND sos < 14
           AND (p_type = 1 AND vidd IN (1, 2, 3) OR
               p_type = 11 AND vidd IN (11, 12, 13));
- 
+
    ELSIF p_type IN (2, 12) THEN
      -- НА ВИМОГУ- з залишками на SG
      OPEN k1 FOR
@@ -129,7 +129,7 @@
                   AND a.tip = 'SG '
                   AND a.acc = n.acc
                   AND n.nd = d.nd);
- 
+
    ELSIF p_type IN (3, 13) THEN
      -- ЩОДЕННЕ   - по пл. датах
      OPEN k1 FOR
@@ -166,7 +166,7 @@
                 WHERE nd = d.nd
                   AND fdat > d_prev
                   AND fdat < d_next);
- 
+
    ELSIF p_type IN (3, 13) THEN
      -- ЩОДЕННЕ   - по пл. датах
      OPEN k1 FOR
@@ -181,7 +181,7 @@
                 WHERE nd = d.nd
                   AND fdat > d_prev
                   AND fdat < d_next);
- 
+
    ELSIF p_type IN (4, 14) THEN
      -- ЩОДЕННЕ  - по прострочених дог.
      OPEN k1 FOR
@@ -191,21 +191,21 @@
           AND d.wdate < ddat2_
           AND (p_type = 4 AND vidd IN (1, 2, 3) OR
               p_type = 14 AND vidd IN (11, 12, 13));
- 
+
    END IF;
- 
+
    IF NOT k1%ISOPEN THEN
      RETURN;
    END IF;
- 
- 
- 
+
+
+
    LOOP
      FETCH k1
        INTO dd.nd, dd.cc_id, dd.sdate, dd.wdate,dd.ndg;
      EXIT WHEN k1%NOTFOUND;
      --------------------------------------------
- 
+
      IF p_type IN (3, 13, 5, 15) THEN
        SELECT MAX(fdat) - 1
          INTO ddat2_
@@ -214,7 +214,7 @@
           AND fdat > d_prev
           AND fdat < d_next;
      END IF;
- 
+
      FOR p IN (SELECT a.nls
                      ,a.accc
                      ,a.acc
@@ -225,7 +225,7 @@
                      ,i.metr
                      ,i.id
                      ,n.nd
- 
+
                  FROM accounts a, int_accn i, nd_acc n
                    WHERE n.nd = dd.nd
                      AND n.acc = a.acc
@@ -257,32 +257,36 @@
                          i.id IN (0, 2) OR i.metr = 4 AND i.id = 1)
                      AND i.acra IS NOT NULL
                      AND i.acrb IS NOT NULL
-                     AND i.acr_dat < ddat2_) 
+                     AND i.acr_dat < ddat2_)
      LOOP
+       if p.ddat1 >= ddat2_ then
+         logger.info('P_INTEREST_CCK1: ND = '||p.nd||', acc = '||p.acc||', ddat1 = '||p.ddat1||', відсотки вже нараховані');
+         continue;
+       end if;
        DELETE FROM acr_intn;
- 
+
        l_nazn := NULL;
-       
-       if p.tip in('SS ', 'SP ') and 
-          p.nd =dd.nd and 
-          p.id =0 and 
-          p.basey<>2 
+
+       if p.tip in('SS ', 'SP ') and
+          p.nd =dd.nd and
+          p.id =0 and
+          p.basey<>2
           and p.basem<>1 then
- 
+
          acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode);
-       elsif p.tip in('SS ', 'SP ') and 
-             p.nd =dd.nd and 
-             p.id =0 and 
-             p.basey<>2 and 
+       elsif p.tip in('SS ', 'SP ') and
+             p.nd =dd.nd and
+             p.id =0 and
+             p.basey<>2 and
              p.basem is null then
- 
+
           acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode);
        elsif p.tip IN ('SS ')
          AND p.accc IS NOT NULL
          AND p.basey = 2
          AND p.basem = 1
          AND p.id = 0 THEN
- 
+
            cck.int_metr_a(p.accc
                          ,p.acc
                          ,p.id
@@ -296,7 +300,7 @@
          AND p.basey = 2
          AND p.basem = 0
          AND p.id = 0 THEN
- 
+
            cck.int_metr_a(p.accc
                          ,p.acc
                          ,p.id
@@ -310,12 +314,12 @@
          AND p.id = 0
          AND p.basey <> 2
          AND p.basem <> 1 THEN
- 
+
            acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское
        ELSIF p.id = 1
          AND p.metr = 4
          AND p.tip IN ('S36') THEN
- 
+
      -- add by VPogoda 2018-01-16, COBUMMFO-6039
      -- амортизация дисконта выполняется только по тем договорам, по которым была выдача.
      -- add by VPogoda 2018-01-16, COBUMMFO-6039
@@ -333,23 +337,33 @@
                                  and cd.vidd in (1,2,3,4))
              union select 1 from cc_deal cd where cd.nd = dd.nd and cd.vidd not in (1,2,3,4));
              if l_num != 0 then
-               acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
- 
-               l_nazn := substr('Амортизація рах.(пропорц.) ' || p.nls /*||
-                                '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
-                                ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
-                               ,1
-                               ,160);
+               begin
+                 acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
+  
+                 l_nazn := substr('Амортизація рах.(пропорц.) ' || p.nls /*||
+                                  '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
+                                  ' по ' || to_char(ddat2_, 'dd.mm.yyyy') || ' вкл.'*/
+                                 ,1
+                                 ,160);
+  
+               exception when others  then
+                IF SQLCODE = -01476 THEN
+                  logger.info('P_INTEREST_CCK1: договор '||p.nd||', acc = '||p.acc||', ошибка: '||sqlerrm);
+                  continue;
+                else RAISE;    
+                end if;
+               end;
+
              else
                bars_audit.info('Договор [ref = '||dd.nd||'] не має залишків на рахунках основної заборгованості, амортизація дисконту не виконується!');
              end if;
        ELSIF p.id = 1
          AND p.metr = 4
-         AND p.tip IN ('SDI') 
+         AND p.tip IN ('SDI')
          and 1=0    -- cobuprvnix-161 отключение амортизации дисконта
          THEN
- 
- 
+
+
              acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление банковское */
              l_nazn := substr('Аморт. дисконту по рах.' || p.nls /*||
                               '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
@@ -358,7 +372,7 @@
                              ,160);
        ELSIF p.tip IN ('SP ', 'SPN', 'SK9')
          AND p.id = 2  THEN
- 
+
              acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени
              l_nazn := substr('Нарахування пені. КД № ' || dd.cc_id || ' від  ' ||
                               to_char(dd.sdate, 'dd.mm.yyyy') || ', рах.' ||
@@ -367,14 +381,14 @@
                               to_char(ddat2_, 'dd.mm.yyyy')*/
                              ,1
                              ,160);
- 
+
      -- add by VPogoda 2018-02-26
          ELSIF p.tip IN ('LIM')
            AND p.id = 2
            and p.metr = 0 THEN
- 
+
              acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление комиссии по методу "% от остатка"
- 
+
              l_nazn := substr('Нарахування комісії. КД № ' || dd.cc_id || ' від  ' ||
                               to_char(dd.sdate, 'dd.mm.yyyy') || ', рах.' ||
                               p.nls /*|| '. Період: з ' ||
@@ -382,11 +396,11 @@
                               to_char(ddat2_, 'dd.mm.yyyy')*/
                              ,1
                              ,160);
- 
+
            ELSIF p.tip IN ('CR9')
                  AND p.id = 0 THEN
              acrn.p_int(p.acc, p.id, p.ddat1, ddat2_, nint_, NULL, l_mode); ------ начисление пени
- 
+
              l_nazn := substr('Ком.за невикор.ліміт по рах. ' ||
                               p.nls /*|| '. Період: з ' ||
                               to_char(p.ddat1, 'dd.mm.yyyy') || ' по ' ||
@@ -404,7 +418,7 @@
                         ,nint_
                         ,NULL
                         ,l_mode); -------- Начисление комиссий
- 
+
              l_nazn := substr('Нарахування комісії. КД № ' || dd.cc_id ||
                               ' від  ' || to_char(dd.sdate, 'dd.mm.yyyy') /*||
                               '. Період: з ' || to_char(p.ddat1, 'dd.mm.yyyy') ||
@@ -412,25 +426,24 @@
                              ,1
                              ,160);
            END IF;
- 
+
            ------------------
            interest_utl.take_reckoning_data(p_base_year => p.basey
                                            ,p_purpose   => l_nazn
                                            ,p_deal_id   => dd.nd);
- 
- 
+
+
          END LOOP; -- p\
               update INT_RECKONING t set t.purpose =
             t.purpose || ' Період: з ' || to_char(t.date_from, 'dd.mm.yyyy') ||
             ' по ' || to_char(t.DATE_TO, 'dd.mm.yyyy') || ' вкл.'
               where t.deal_id =dd.nd;
    END LOOP; --k1
- 
- 
-   CLOSE k1;
- 
- END p_interest_cck1;
 
+
+   CLOSE k1;
+
+ END p_interest_cck1;
 /
  show err;
  

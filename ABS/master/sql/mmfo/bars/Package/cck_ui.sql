@@ -2081,8 +2081,13 @@ END p_cck_interest;
 
   BEGIN
 null;
-    IF p_type = 1 THEN
 
+    if gl.bdate != dat_last_work(gl.bdate) then
+      logger.info('Поточний банківський день не останній робочий день місяця. Нарахування відсотків виконуємо лише в останній робочий день!');
+      return;
+    end if;
+
+    IF p_type = 1 THEN
       p_interest_cck1(11, NULL);
       cdb_mediator.pay_accrued_interest;
     ELSIF p_type = 2 THEN
