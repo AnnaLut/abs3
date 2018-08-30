@@ -1,7 +1,8 @@
 ﻿SET DEFINE OFF;
 delete from BARS.NBUR_REF_PREPARE_XML 
 where FILE_CODE in ('#3K', '#4P', '#6E', '02X', '12X', '13X', '1PX', '25X', '27X', '2KX', 
-	'39X', '3AX', '48X', '73X', '81X', 'A7X', 'C5X', 'D4X', 'E8X', 'E9X', 'F1X')
+	'39X', '3AX', '48X', '73X', '81X', 'A7X', 'C5X', 'D4X', 'E8X', 'E9X', 'F1X');
+	
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
