@@ -15,12 +15,35 @@ DECLARE
   -- ver. 06/12/2016
   ern          NUMBER := 4;
   err          EXCEPTION;
+  l_value      integer;
 BEGIN
 
   IF kl.cus_rec.rnk IS NOT NULL
   THEN
     RAISE err;
   END IF;
+
+  -- COBUMMFO-8905 Begin
+  -- При попытке закрыть клиента 
+  IF updating  
+	 and :new.date_off is not null 
+     and :old.date_off is null then
+     begin
+		-- проверяем, является ли клиент незакрытым бранчом
+        select count(*)
+        into   l_value
+        from   branch_attribute_value t
+        join   branch b on b.branch = t.branch_code
+        where  t.attribute_code = 'RNK'
+               and b.date_closed is null;
+        
+        if l_value > 0 then
+		   -- если да - ошибочка
+           raise_application_error(-20000, 'Неможливо закрити клієнта. Клієнт являється незакритим відділенням');
+		end if;
+     end;
+  end if;
+  -- COBUMMFO-8905 End
 
   IF inserting or updating and
      ( :new.tgr <> :old.tgr or
