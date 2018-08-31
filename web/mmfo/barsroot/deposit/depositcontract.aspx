@@ -1,5 +1,8 @@
-﻿<%@ Page Language="c#" CodeFile="DepositContract.aspx.cs" AutoEventWireup="true"
-    Inherits="DepositContract" EnableViewState="True" %>
+﻿<%@ Page Language="c#" 
+    CodeFile="DepositContract.aspx.cs" 
+    Inherits="DepositContract" 
+    AutoEventWireup="true"
+    EnableViewState="True" %>
 
 <%@ Register TagPrefix="igtxt" Namespace="Infragistics.WebUI.WebDataInput" Assembly="Infragistics.WebUI.WebDataInput.v1, Version=1.0.20041.14, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc2" %>
@@ -384,7 +387,7 @@
                                                                 Text='<%# Bind("BAR_NOMINAL") %>' Presiction="1" />
                                                         </td>
                                                         <td>
-                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="NOMINAL_I"
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="NOMINAL_U"
                                                                 ErrorMessage="Необхідно заповнити" Font-Names="Arial" Font-Size="8pt"></asp:RequiredFieldValidator>
                                                         </td>
                                                     </tr>
@@ -398,7 +401,7 @@
                                                             </cc1:NumericEdit>
                                                         </td>
                                                         <td>
-                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="NaznTextBox"
+                                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="PROBA_U"
                                                                 ErrorMessage="Необхідно заповнити" Font-Names="Arial" Font-Size="8pt"></asp:RequiredFieldValidator>
                                                         </td>
                                                     </tr>

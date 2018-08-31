@@ -89,9 +89,10 @@ public partial class Transfer : Bars.BarsPage
  else
         {
             // Метали
-            Bars.Metals.DepositMetals.ClearData();
+            //Bars.Metals.DepositMetals.ClearData();
             //fvBankMetals.DataSource = null;
-           // fvBankMetals.DataBind();
+            // fvBankMetals.DataBind();
+
             FillControls(false);
         }
     }
@@ -175,8 +176,8 @@ public partial class Transfer : Bars.BarsPage
                    dpt_cur_denom       
                    from v_dpt_portfolio_active 
                    where dpt_id = :contract_id";
-          // Метали
-                Bars.Metals.DepositMetals.ClearData();
+                // Метали
+                //////     Bars.Metals.DepositMetals.ClearData(); //прибрав. Не зрозуміло навіщо це викликати...
 
             }
             else if (rbPercent.Checked)
@@ -190,8 +191,8 @@ public partial class Transfer : Bars.BarsPage
                    dpt_cur_denom 
                    from " + ((Convert.ToString(Request["other"]) == "Y") ? "v_dpt_portfolio_other " : "v_dpt_portfolio_active ") +
                  " where dpt_id = :contract_id";
-             // Метали
-                Bars.Metals.DepositMetals.ClearData();
+                // Метали
+                //   Bars.Metals.DepositMetals.ClearData(); //прибрав. Не зрозуміло навіщо це викликати...
 
             }
             cmdGetInfo.Parameters.Add("contract_id", OracleDbType.Decimal, 
