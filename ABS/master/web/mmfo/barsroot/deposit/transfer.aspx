@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Transfer.aspx.cs" Inherits="Transfer" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Transfer.aspx.cs" Inherits="Transfer" EnableViewState="True" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -84,6 +84,7 @@
                         </td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>
                             <asp:RadioButton ID="rbMain" runat="server" CssClass="RadioText" TabIndex="1" AutoPostBack="True"
                                 Checked="True" GroupName="ACC" Text="Основний рахунок" />
@@ -102,12 +103,12 @@
             <td colspan="3">
                 <table style='text-align: right' class="InnerTable" id="metalParameters" runat="server" visible="false">
                     <tr>
-                        <td align="left">
+                        <td align="right">
                             <asp:Label ID="lbMetalsInfo" Text="Інформація про злитки" runat="server" CssClass="InfoLabel" />
                         </td>
                     </tr>
                     <tr>
-                        <td style="width: 100%">
+                        <td style="width: 100%" align="right">
                             <asp:GridView ID="gvBankMetals" CssClass="barsGridView" Width="600px" runat="server"
                                 AutoGenerateColumns="False" DataSourceID="dsBankMetals" DataKeyNames="BAR_ID"
                                 OnDataBound="gvBankMetals_DataBound">
@@ -135,7 +136,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
+                        <td align="right">
                             <asp:FormView ID="fvBankMetals" runat="server" DataSourceID="dsBankMetals_Edit"
                                 BorderStyle="Solid" BorderWidth="1px" Width="600px" 
                                 OnItemInserted="fvBankMetals_ItemInserted"
@@ -304,7 +305,7 @@
                                                     CommandName="Edit" Text="Редагувати" />
                                                 &nbsp;
                                                 <asp:LinkButton ID="DeleteButton" runat="server" CausesValidation="False"
-                                                    CommandName="Delete" Text="Видалити" />
+                                                    CommandName="Delete" Text="Видалити" CommandArgument='<%# Bind("BAR_ID") %>' />
                                                 &nbsp;
                                                 <asp:LinkButton ID="NewButton" runat="server" CausesValidation="False"
                                                     CommandName="New" Text="Додати" />
@@ -338,6 +339,17 @@
                             </asp:FormView>
                         </td>
                     </tr>
+
+                    <tr>
+                        <td>
+
+
+
+                        </td>
+
+                        <td></td>
+                    </tr>
+
                     <tr>
                         <td>
                             <asp:ObjectDataSource ID="dsBankMetals" runat="server" SelectMethod="SelectBars"
@@ -361,7 +373,12 @@
                                 InsertMethod="InsertBar" SelectMethod="SelectBar"
                                 UpdateMethod="UpdateBar" DeleteMethod="DeleteBar" >
                                 <DeleteParameters>
-                                    <asp:Parameter Name="BAR_ID" Type="Int32" />
+                                    <%--<asp:Parameter Name="BAR_ID" Type="Int32" />--%>
+                                    <asp:ControlParameter 
+                                        ControlID="gvBankMetals" 
+                                        Name="BAR_ID" 
+                                        PropertyName="SelectedValue"
+                                        Type="Int32" />
                                 </DeleteParameters>
                                 <UpdateParameters>
                                     <asp:Parameter Name="BAR_ID" Type="Int32" />
@@ -376,7 +393,9 @@
                                     <asp:Parameter Name="BAR_PROBA" Type="Decimal" />
                                 </InsertParameters>
                                 <SelectParameters>
-                                    <asp:ControlParameter ControlID="gvBankMetals" Name="BAR_ID" PropertyName="SelectedValue"
+                                    <asp:ControlParameter 
+                                        ControlID="gvBankMetals" 
+                                        Name="BAR_ID" PropertyName="SelectedValue"
                                         Type="Int32" />
                                 </SelectParameters>
                             </asp:ObjectDataSource>
