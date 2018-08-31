@@ -3,7 +3,7 @@ is
   --
   -- constants
   --
-  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 3.4  19.06.2018';
+  G_HEADER_VERSION  CONSTANT VARCHAR2(64) := 'version 3.5  30.08.2018';
   G_SHOW_LOG                 BOOLEAN      := false;
 
   --
@@ -30,7 +30,7 @@ is
                             , SNO       number(24)  -- відкладенні відсотки
                             , SSP       number(24)  --
                             , SNP       number(24)  --
-                            , DAY_QTY   number(4)   --
+                            , DAY_QTY   number(24)  -- кількість днів у періоді для розрахунку відсотків
                             , IR        number(6,3) --
                             , SN1       number(24)  -- Розрах.Відсотки на SS
                             , SN2       number(24)  -- Розрах.Відсотки на SP
@@ -196,7 +196,7 @@ show errors;
 
 create or replace package body PRVN_FLOW
 is
-  g_body_version  constant varchar2(64) := 'version 11.4  12.07.2018';
+  g_body_version  constant varchar2(64) := 'version 11.5  30.08.2018';
 
   individuals_shd signtype := 1; -- 1/0 - формувати графіки для ФО
 
@@ -3262,6 +3262,8 @@ end nos_del;
           if ( agr.gen_shd.count > 0 )
           then
 
+            l_day_qty := 0;
+
             << PCS_SHD >>
             for r in agr.gen_shd.first .. agr.gen_shd.last
             loop
@@ -3269,6 +3271,7 @@ end nos_del;
               -- make copy of record
               r_shd := agr.gen_shd(r);
 
+              --для розрахунку відсотків накопичуємо кількість днів у періодах до моменту необхідності (наявність відсотків по графіку) розрахунку
               l_day_qty := l_day_qty + r_shd.DAY_QTY;
 
               a := agr.sar_dtl.first;
@@ -3454,7 +3457,7 @@ end nos_del;
                 then
                   if ( r_shd.LMT_OTPT != 0 )
                   then -- bad schedule
-                    bars_audit.error( title || ': bad schedule (exit with LMT_OTPT != 0 ).' );
+                    bars_audit.error( title || ': bad schedule (exit with LMT_OTPT != 0 ). ND=' || r_shd.ND );
                     r_shd.SS       := r_shd.SS + agr.sar_dtl(a).dbt;
                     r_shd.SN       := r_shd.SN + agr.sar_dtl(a).int;
                     r_shd.SSP      := agr.sar_dtl(a).dbt_odue;
