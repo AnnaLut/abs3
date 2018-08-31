@@ -106,6 +106,16 @@ exception when others then
 /
 
 
+PROMPT *** Create  index I_W4_EPP_STATUSES_OPER_TYPE ***
+begin   
+ execute immediate '
+  CREATE INDEX PFU.I_W4_EPP_STATUSES_OPER_TYPE ON PFU.W4_EPP_STATUSES (TO_NUMBER(OPER_TYPE)) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 PROMPT *** Create  grants  W4_EPP_STATUSES ***
 grant SELECT                                                                 on W4_EPP_STATUSES to BARSREADER_ROLE;
