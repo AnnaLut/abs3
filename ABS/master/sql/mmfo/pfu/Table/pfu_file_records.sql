@@ -180,7 +180,19 @@ exception when others then
 /
 
 
+PROMPT *** Create  index PFU_FILE_RECORDS_PK ***
+begin   
+ execute immediate 'create index I_PFU_FILE_RECORD_2 on PFU.PFU_FILE_RECORDS (PFU_ENVELOPE_ID)
+                    tablespace BRSBIGI
+                    pctfree 10 initrans 2 maxtrans 255
+                    compress';                 
+ exception when others then
+  if  sqlcode=-1408  then null; else raise; end if;
+ end;
+/
 
+  
+  
 PROMPT *** Create  grants  PFU_FILE_RECORDS ***
 grant SELECT,UPDATE                                                          on PFU_FILE_RECORDS to BARS;
 grant SELECT                                                                 on PFU_FILE_RECORDS to BARSREADER_ROLE;
