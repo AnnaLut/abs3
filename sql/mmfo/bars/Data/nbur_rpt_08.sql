@@ -74,10 +74,10 @@ delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = '08X';
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
-   ('08X', 'select T020, R020, R011, R030, K040, K072, S130, S183, ekp, sum(T070) as T070 
+   ('08X', 'select KU, T020, R020, R011, R030, K040, K072, S130, S183, ekp, sum(T070) as T070 
 from nbur_log_f08x t 
 where  report_date = :p_rpt_dt  and kf = :p_kf
-group by T020, R020, R011, R030, K040, K072, S130, S183, ekp
+group by KU, T020, R020, R011, R030, K040, K072, S130, S183, ekp
  having sum(T070) <> 0', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
 COMMIT;
 

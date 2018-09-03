@@ -106,7 +106,7 @@ BEGIN
              , seg_y as K072
              , seg_p as S130
              , seg_c as S183
-             , to_number(znap) as T070          
+             , abs(to_number(znap)) as T070          
              , comm as description
              , acc as ACC_ID
              , nls as ACC_NUM
