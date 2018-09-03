@@ -1050,10 +1050,6 @@ function SendProvidesToND(_nd) {
 }
 
 function showDeposits() {
-    var grid = $("#gridExistProvide").data("kendoGrid");
-    if (grid.select().length > 0)
-        return;
-
     bars.ui.handBook("V_DPT_DPU", function (data) {
         $("#depid").val(data[0].ID);
     },
@@ -1066,7 +1062,7 @@ function showDeposits() {
             { title: "Валюта", field: "KV", width: 50 },
             { field: "Сума", width: 100, template: '#= kendo.toString(SUM, "n2") #' }],
         multiSelect: false,
-        clause: "where dat_end is null and rnk = " + $("#RNK").val(),
+        clause: "where rnk = " + $("#RNK").val(),
         ResizedColumns: true
     });
 }
