@@ -1374,7 +1374,7 @@ END RO_deal;
          from cc_deal D, cc_vidd V,cc_add p,accounts a,accounts n,int_accn i
         where (ND_=0 or d.nd=ND_) and d.nd=p.nd
           and d.vidd=v.vidd and ( v.custtype=1 or v.vidd in (2700,2701,3660) )
-          and not d.vidd in (3902,3903)
+          --and not d.vidd in (3902,3903)
           and p.adds=0 and  p.accs=a.acc
           AND i.acc=a.acc AND i.acra=n.acc
          and d.sos<15 --and d.WDATE <= gl.BDATE
@@ -1385,6 +1385,7 @@ END RO_deal;
           select max(nd) into p_nd from nd_acc  where acc in (k.accs,k.accp);
         EXCEPTION WHEN NO_DATA_FOUND THEN p_nd:=0;
         end;
+        p_sos := k.sos;
         if p_fl = 0 and k.WDATE <= gl.BDATE THEN
            if ( k.ostcs=0 and k.ostbs=0 and k.ostfs=0
             and k.ostcp=0 and k.ostbp=0 and k.ostfp=0
