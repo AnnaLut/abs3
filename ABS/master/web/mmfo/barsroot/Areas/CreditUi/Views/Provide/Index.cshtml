@@ -2,7 +2,7 @@
     ViewBag.Title = "Договора забезпечення";
 }
 <script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
-<script src="@Url.Content("~/Areas/CreditUi/Scripts/provide.js?v.1.0.7")"></script>
+<script src="@Url.Content("~/Areas/CreditUi/Scripts/provide.js?v.1.0.8")"></script>
 <script src="@Url.Content("~/Areas/CreditUi/Scripts/creditUI.js")"></script>
 <h1 style="padding-bottom: 0px;">@ViewBag.title</h1>
 <br />
@@ -154,7 +154,7 @@
     </div>
     <div class="k-edit-field">
         <input name="DEPID" id="depid" data-bind="value:DEPID" disabled />
-        <a class='k-button created' onclick="showDeposits()"><i class='pf-icon pf-16 pf-book created'></i></a>
+        <a class='k-button' onclick="showDeposits()"><i class='pf-icon pf-16 pf-book'></i></a>
     </div>
     <div class="k-edit-label">
         <label for="MPAWN">Місцезнаходження застави</label>
