@@ -70,21 +70,6 @@ BEGIN
  End If;
 
 
------  Исходящие PS0,PS1,PS2,PS5,PSG   -------------------- 
-
- If TT_ like 'PS%' and kod_<>15 then
-
-    if n_tarpak in (14,15)  then        ---  Тепловики (ТП 14,15)
-       sk_:=F_TARIF(283,kv_,nls_,s_);
-       RETURN sk_;
-    end if;
-
-    sk_:=F_TARIF(205,kv_,nls_,s_);  ---  тариф 205 "Договірне списання"    
-    RETURN sk_;
-
- End if;
-
-
 ----  Определяем kkk_ - Kод Корп.Клиента:
 
  kkk_:=0;            
@@ -112,6 +97,22 @@ BEGIN
  EXCEPTION WHEN others THEN
     n_tarpak := 0; 
  END;
+
+
+-----  Исходящие PS0,PS1,PS2,PS5,PSG   -------------------- 
+
+ If TT_ like 'PS%' and kod_<>15 then
+
+    if n_tarpak in (14,15)  then        ---  Тепловики (ТП 14,15)
+       sk_:=F_TARIF(283,kv_,nls_,s_);
+       RETURN sk_;
+    end if;
+
+    sk_:=F_TARIF(205,kv_,nls_,s_);  ---  тариф 205 "Договірне списання"    
+    RETURN sk_;
+
+ End if;
+
 
 
 
@@ -1459,40 +1460,3 @@ END f_tarif_rko ;
 /
 
 
-
------------------------------------------------------------------------------
---
---                      Задача "Плата за РО".  
---                      
---  Добавление в список операций, за которые начисляется плата, операции PS0,PS5,PSG
---
------------------------------------------------------------------------------
-
-begin
-   bc.go('/');
-   INSERT INTO RKO_TTS ( TT, DK, NTAR ) VALUES ('PS0', 0, 14); 
-exception when others then
-   null;
-end;
-/
-
-
-begin
-   bc.go('/');
-   INSERT INTO RKO_TTS ( TT, DK, NTAR ) VALUES ('PS5', 0, 14); 
-exception when others then
-   null;
-end;
-/
-
-
-begin
-   bc.go('/');
-   INSERT INTO RKO_TTS ( TT, DK, NTAR ) VALUES ('PSG', 0, 14); 
-exception when others then
-   null;
-end;
-/
-
-
-COMMIT;
