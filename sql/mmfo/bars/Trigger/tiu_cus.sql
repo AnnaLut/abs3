@@ -35,6 +35,7 @@ BEGIN
         from   branch_attribute_value t
         join   branch b on b.branch = t.branch_code
         where  t.attribute_code = 'RNK'
+               and t.attribute_value = :new.rnk
                and b.date_closed is null;
         
         if l_value > 0 then
