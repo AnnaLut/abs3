@@ -1,8 +1,8 @@
-п»їSET DEFINE OFF;
+SET DEFINE OFF;
 delete from BARS.NBUR_REF_PREPARE_XML 
 where FILE_CODE in ('#3K', '#4P', '#6E', '02X', '12X', '13X', '1PX', '25X', '27X', '2KX', 
-	'39X', '3AX', '48X', '73X', '81X', 'A7X', 'C5X', 'D4X', 'E8X', 'E9X', 'F1X');
-	
+    '39X', '3AX', '48X', '73X', '81X', 'A7X', 'C5X', 'D4X', 'E8X', 'E9X', 'F1X');
+    
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
@@ -85,7 +85,7 @@ Insert into BARS.NBUR_REF_PREPARE_XML
 from   nbur_log_f4px
 where  report_date = :p_rpt_dt
       and kf = :p_kf', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-	  
+      
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
@@ -112,10 +112,10 @@ group by EKP, KU, R020, T020, R030, K040', TO_DATE('01/01/2018 00:00:00', 'MM/DD
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
-   ('12X', 'select substr(field_code, 1, 6) as EKP --Р РµС”СЃС‚СЂ РїРѕРєР°Р·РЅРёРєС–РІ
-      , substr(field_code, 9, 2) as KU --РЎРёРјРІРѕР»Рё РєР°СЃРѕРІРёС… РѕР±РѕСЂРѕС‚С–РІ                  
-      , substr(field_code, 7, 2) as D010 --РўРµСЂРёС‚РѕСЂС–СЏ
-      , field_value as T070 --РЎСѓРјР° Сѓ РЅР°С†.РІР°Р»СЋС‚С–
+   ('12X', 'select substr(field_code, 1, 6) as EKP --Реєстр показників
+      , substr(field_code, 9, 2) as KU --Символи касових оборотів                  
+      , substr(field_code, 7, 2) as D010 --Територія
+      , field_value as T070 --Сума у нац.валюті
 from   nbur_agg_protocols
 where report_date = :p_rpt_dt
   and kf = :p_kf
@@ -125,10 +125,10 @@ Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
    ('13X', 'select 
-      substr(field_code, 1, 6) as EKP --Р РµС”СЃС‚СЂ РїРѕРєР°Р·РЅРёРєС–РІ
-      , substr(field_code, 9, 2) as KU --РЎРёРјРІРѕР»Рё РєР°СЃРѕРІРёС… РѕР±РѕСЂРѕС‚С–РІ                  
-      , substr(field_code, 7, 2) as D010 --РўРµСЂРёС‚РѕСЂС–СЏ
-      , field_value as T070 --РЎСѓРјР° Сѓ РЅР°С†.РІР°Р»СЋС‚С–
+      substr(field_code, 1, 6) as EKP --Реєстр показників
+      , substr(field_code, 9, 2) as KU --Символи касових оборотів                  
+      , substr(field_code, 7, 2) as D010 --Територія
+      , field_value as T070 --Сума у нац.валюті
 from   nbur_agg_protocols
 where report_date = :p_rpt_dt
   and kf = :p_kf
@@ -195,17 +195,17 @@ from (select *
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
-   ('27X', 'select ''A27001'' as EKP                     --РљРѕРґ РїРѕРєР°Р·Р°С‚РµР»СЏ
-       , t.nbuc as KU                      --РљРѕРґ РѕР±Р»Р°СЃС‚Рё
-       , substr(field_code, 2, 4) as R020  --Р‘Р°Р»Р°РЅСЃРѕРІС‹Р№ СЃС‡РµС‚Р°
-       , substr(field_code, 6, 3) as R030  --Р’Р°Р»СЋС‚Р°
-       , substr(field_code, 1, 1) as F091  --РљРѕРґ РѕРїРµСЂР°С†С–С—
-       , field_value as T071               --Р—РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°
+   ('27X', 'select ''A27001'' as EKP                     --Код показателя
+       , t.nbuc as KU                      --Код области
+       , substr(field_code, 2, 4) as R020  --Балансовый счета
+       , substr(field_code, 6, 3) as R030  --Валюта
+       , substr(field_code, 1, 1) as F091  --Код операції
+       , field_value as T071               --Значение параметра
 from   nbur_agg_protocols t
 where  report_date = :p_rpt_dt              
        and kf = :p_kf                       
        and report_code = ''27X''              ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-	   
+       
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
@@ -294,7 +294,7 @@ where report_date = :p_rpt_dt
 group by t.nbuc
      , substr(t.FIELD_CODE, 2, 6)
      , substr(t.field_code, 8, 3)', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-	 
+     
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
@@ -323,7 +323,7 @@ group by
       , K030
       , S180
       , D020', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-	  
+      
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
@@ -346,17 +346,17 @@ Insert into BARS.NBUR_REF_PREPARE_XML
 from  nbur_log_f48x
 where report_date = :p_rpt_dt
     and kf = :p_kf', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-	
+    
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
-   ('73X', 'select substr(field_code, 1, 6) as EKP  -- РљРѕРґ РїРѕРєР°Р·Р°С‚РµР»СЏ
-    , t.nbuc as KU                     -- РљРѕРґ РѕР±Р»Р°СЃС‚Рё
-    , substr(field_code, 7, 3) as R030 -- Р’Р°Р»СЋС‚Р°
-    , field_value as T100              -- Р—РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°
+   ('73X', 'select substr(field_code, 1, 6) as EKP  -- Код показателя
+    , t.nbuc as KU                     -- Код области
+    , substr(field_code, 7, 3) as R030 -- Валюта
+    , field_value as T100              -- Значение параметра
 from NBUR_AGG_PROTOCOLS t
-where report_date = :p_rpt_dt           -- Р”Р°С‚Р° РѕС‚С‡РµС‚Р°
-  and kf = :p_kf                        -- Р¤РёР»РёР°Р»
+where report_date = :p_rpt_dt           -- Дата отчета
+  and kf = :p_kf                        -- Филиал
   and report_code = ''73X''', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
   
 -- Insert into BARS.NBUR_REF_PREPARE_XML
@@ -447,7 +447,7 @@ Insert into BARS.NBUR_REF_PREPARE_XML
 from   nbur_log_fd4x
 where  report_date = :p_rpt_dt
        and kf = :p_kf
-       and ekp <> ''XXXXXX'' --Р‘РµСЂРµРј С‚РѕР»СЊРєРѕ Р·Р°РјР°РїР»РµРЅРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
+       and ekp <> ''XXXXXX'' --Берем только замапленные значения
 group by
        ekp
        , r030
@@ -566,9 +566,9 @@ Insert into BARS.NBUR_REF_PREPARE_XML
                              , substr(field_code,2) ekp_2
                              , field_value
                         from  nbur_agg_protocols
-                       where  report_date = :p_rpt_dt         --Р”Р°С‚Р° РѕС‚С‡РµС‚Р°
-                         and  kf = :p_kf                      --Р¤РёР»РёР°Р»
-                         and  report_code = ''E9X''             --РљРѕРґ РѕС‚С‡РµС‚Р°
+                       where  report_date = :p_rpt_dt         --Дата отчета
+                         and  kf = :p_kf                      --Филиал
+                         and  report_code = ''E9X''             --Код отчета
                    )
                     pivot
                    ( max(trim(field_value))
@@ -576,18 +576,18 @@ Insert into BARS.NBUR_REF_PREPARE_XML
                                        ''8'' as D060_2, ''9'' as Q001 )
                    )
             )', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-			
+            
 Insert into BARS.NBUR_REF_PREPARE_XML
    (FILE_CODE, DESC_XML, DATE_START)
  Values
-   ('F1X', 'select substr(field_code, 1, 6) as EKP    --РљРѕРґ РїРѕРєР°Р·Р°С‚РµР»СЏ
-       , f_get_ku_by_nbuc(t.nbuc) as KU   --РљРѕРґ РѕР±Р»Р°СЃС‚Рё
-       , substr(field_code, 7, 1) as K030 --Р РµР·РёРґРµРЅС‚РЅРѕСЃС‚СЊ
-       , substr(field_code, 8, 3) as R030 --Р’Р°Р»СЋС‚Р°
-       , substr(field_code, 11, 3) as K040 --РљРѕРґ СЃС‚СЂР°РЅС‹
-       , field_value as T071         --Р—РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°
+   ('F1X', 'select substr(field_code, 1, 6) as EKP    --Код показателя
+       , f_get_ku_by_nbuc(t.nbuc) as KU   --Код области
+       , substr(field_code, 7, 1) as K030 --Резидентность
+       , substr(field_code, 8, 3) as R030 --Валюта
+       , substr(field_code, 11, 3) as K040 --Код страны
+       , field_value as T071         --Значение параметра
 from   nbur_agg_protocols t
-where  report_date = :p_rpt_dt           --Р”Р°С‚Р° РѕС‚С‡РµС‚Р°
-       and kf = :p_kf                    --Р¤РёР»РёР°Р»
+where  report_date = :p_rpt_dt           --Дата отчета
+       and kf = :p_kf                    --Филиал
        and report_code = ''F1X''', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
 COMMIT;
