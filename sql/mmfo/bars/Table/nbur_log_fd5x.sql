@@ -121,7 +121,7 @@ prompt -- ======================================================
 prompt -- Comments
 prompt -- ======================================================
 
-comment on table NBUR_LOG_FD5X is 'D5X Додаткові дані для розрахунку економічних нормативів';
+comment on table NBUR_LOG_FD5X is 'D5X Дані про кредити (за класифікаціями видів кредитів та контрагентів)';
 
 comment on column NBUR_LOG_FD5X.REPORT_DATE is 'Звiтна дата';
 comment on column NBUR_LOG_FD5X.KF is 'Код фiлiалу (МФО)';
