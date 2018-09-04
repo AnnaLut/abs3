@@ -11,7 +11,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD6_NN (Dat_ DATE,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :	#D6 for KB
 % COPYRIGHT   :	Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 08/02/2018 (06/02/2018, 05/02/2018)
+% VERSION     : 01.09.2018 (08/02/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 08/02/2018 - для 2608 и R011 in ('5','7') и S180 in ('0','1' ) 
                изменяем S180 на "B"
@@ -1134,7 +1134,12 @@ BEGIN
     dat_kl_ := add_months(trunc(dat_, 'mm'), 1);
 
     if prnk_ is null then
-        sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ * FROM ACCOUNTS a where nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in (';
+        sql_acc_ := ' SELECT  /*+ parallel(a, 8) */ a.ACC, a.KF, a.NLS, a.KV, a.BRANCH, a.NLSALT, a.NBS, a.NBS2, a.DAOS, a.DAPP, 
+                        a.ISP, a.NMS, a.LIM, a.OSTB, a.OSTC, a.OSTF, a.OSTQ, a.DOS, a.KOS, a.DOSQ, a.KOSQ, a.PAP, a.TIP, a.VID, 
+                        a.TRCN, a.MDATE, a.DAZS, a.SEC, a.ACCC, a.BLKD, a.BLKK, a.POS, a.SECI, a.SECO, a.GRP, a.OSTX, a.RNK, 
+                        a.NOTIFIER_REF, a.TOBO, a.BDATE, a.OPT, a.OB22, a.DAPPQ, a.SEND_SMS, a.DAT_ALT 
+                      FROM ACCOUNTS a 
+                      where nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in (';
         sql_acc_ := sql_acc_ || 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''D6'' and r020 not like ''7%'' ';
         sql_acc_ := sql_acc_ || 'and d_open<=to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy'') ';
         sql_acc_ := sql_acc_ || 'and (d_close is null or d_close>to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy''))) ';
@@ -1163,7 +1168,11 @@ BEGIN
 
         ret_ := F_Pop_Otcn(Dat_, 2, sql_acc_, null, 0, 1);
     else
-        sql_acc_ := 'select * from accounts where rnk = '||to_char(prnk_)||' and nbs in ';
+        sql_acc_ := 'select ACC, KF, NLS, KV, BRANCH, NLSALT, NBS, NBS2, DAOS, DAPP, ISP, NMS, 
+                LIM, OSTB, OSTC, OSTF, OSTQ, DOS, KOS, DOSQ, KOSQ, PAP, TIP, VID, TRCN, MDATE, DAZS, 
+                SEC, ACCC, BLKD, BLKK, POS, SECI, SECO, GRP, OSTX, RNK, NOTIFIER_REF, TOBO, BDATE, OPT, 
+                OB22, DAPPQ, SEND_SMS, DAT_ALT 
+            from accounts where rnk = '||to_char(prnk_)||' and nbs in ';
         sql_acc_ := sql_acc_ || '(select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''D6'' and r020 not like ''7%'' ';
         sql_acc_ := sql_acc_ || 'and d_open<=to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy'') ';
         sql_acc_ := sql_acc_ || 'and (d_close is null or d_close>to_date('''||to_char(dat_kl_, 'ddmmyyyy')||''',''ddmmyyyy''))) ';
