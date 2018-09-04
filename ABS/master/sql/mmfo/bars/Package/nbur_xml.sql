@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 2.9  2018.08.28';
+  g_body_version  constant varchar2(64) := 'version 3.0  2018.09.03';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -555,7 +555,7 @@ $end
                 , abs( sum(OST ) ) as T071
              from ( select /*+ ORDERED FULL( a ) FULL( c ) FULL( b ) USE_HASH( b ) */
                            'A01'||t.I010||'0' as EKP
-                         , a.NBUC as KU
+                         , ltrim(a.NBUC, '0') as KU
                          , t.R020
                          , case when b.OST < 0 then 1 else 2 end as T020
                          , a.R030
