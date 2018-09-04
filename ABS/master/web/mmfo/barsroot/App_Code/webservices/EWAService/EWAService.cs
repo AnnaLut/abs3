@@ -93,6 +93,9 @@ public class EWAService : BarsWebService
     [WebMethod(EnableSession = true)]
     public Result SendAccStatus(Int32 id, String state)
     {
+        //ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+        ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
+
         Result result = new Result();
         try
         {
