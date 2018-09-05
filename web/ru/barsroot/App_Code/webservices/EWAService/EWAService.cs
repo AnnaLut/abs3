@@ -130,6 +130,8 @@ public class EWAService : BarsWebService
     [WebMethod(EnableSession = true)]
     public Result SendAccStatus(Int32 id, String state)
     {
+		ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
+		
         Result result = new Result();
         //get user`s login for logging in ABS
         string UserLogin = Bars.Configuration.ConfigurationSettings.AppSettings["EWA.ABS_login"];

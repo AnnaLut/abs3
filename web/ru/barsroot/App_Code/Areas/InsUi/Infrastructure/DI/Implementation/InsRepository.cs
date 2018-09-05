@@ -350,12 +350,13 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
 
         public string CreateDealEWA(ParamsEwa parameters, OracleConnection connection)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
             Login login = new Login();
             login.email = GetParameter("EWAEMAIL"); //"43@ewa.ua";
             login.password = GetParameter("EWAHASH");
 
             var param = parameters.param;
-			string errorMessage = String.Empty;
+            string errorMessage = String.Empty;
             try
             {
                 var response = RemoteLogin(login, "POST", "user/login");
@@ -397,6 +398,7 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
                 SetState(parameters.nd, "DONE", null, connection);
 
                 var doc = JsonConvert.DeserializeXmlNode(result, "root");
+
                 string code = resultres.SelectToken(@"code").Value<string>();
                 DateTime dateFrom = resultres.SelectToken(@"dateFrom").Value<DateTime>();
                 DateTime dateTo = resultres.SelectToken(@"dateTo").Value<DateTime>();
