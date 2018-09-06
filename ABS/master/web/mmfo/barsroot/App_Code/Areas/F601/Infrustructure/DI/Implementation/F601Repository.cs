@@ -29,10 +29,11 @@ namespace BarsWeb.Areas.F601.Infrastructure.DI.Abstract
                     cmd.Parameters.Add("p_session_id", OracleDbType.Int32, id, ParameterDirection.Input);
                     cmd.ExecuteNonQuery();
 
-                    OracleClob resClob = (OracleClob)cmd.Parameters["p_res"].Value;
-                    if (resClob.Length != 0)
-                    {
-                        objectData = resClob.Value;
+                    using (OracleClob resClob = (OracleClob)cmd.Parameters["p_res"].Value) {
+                        if (resClob.Length != 0)
+                        {
+                            objectData = resClob.Value;
+                        }
                     }
                 }
             }

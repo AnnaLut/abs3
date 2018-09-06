@@ -1,0 +1,61 @@
+﻿<script id="PledgeCurrent" type="text/x-kendo-template">
+    <strong>схема «Забезпечення за Кредитною операцією» Поточні дані</strong>
+    <table class="DtlBlk">
+        <tr><td class="fldLb" id="orderNum">Порядковий номер  запису у повідомлені</td>                                             <td class="fldTxt">#=formatFldV(orderNum)#</td>             </tr>
+        <tr><td class="fldLb" id="codZastava">Унікальний код забезпечення за кредитною операцією Боржника</td>                      <td class="fldTxt">#=formatFldV(codZastava)#</td>           </tr>
+        <tr><td class="fldLb" id="codMan">Унікальний код Боржника</td>                                                              <td class="fldTxt">#=formatFldV(codMan)#</td>               </tr>
+        <tr><td class="fldLb" id="numberPledge">Номер договору застави/іпотеки, гарантії, поруки, грошового покриття</td>           <td class="fldTxt">#=formatFldV(numberPledge)#</td>         </tr>
+        <tr><td class="fldLb" id="pledgeDay">Дата укладання договору застави/іпотеки, гарантії, поруки, грошового покриття</td>     <td class="fldTxt">#=formatFldV(pledgeDay)#</td>            </tr>
+        <tr><td class="fldLb" id="s031">Код виду забезпечення за договором</td>                                                     <td class="fldTxt">#=formatFldV(s031)#</td>                 </tr>
+        <tr><td class="fldLb" id="orderZastava">Порядковий номер  застави/іпотеки, ... грошового покриття у Боржника</td>           <td class="fldTxt">#=formatFldV(orderZastava)#</td>         </tr>
+        <tr><td class="fldLb" id="r030">Код валюти</td>                                                                             <td class="fldTxt">#=formatFldV(r030)#</td>                 </tr>
+        <tr><td class="fldLb" id="sumPledge">Сума забезпечення згідно з договором</td>                                              <td class="fldTxt">#=formatFldV(sumPledge)#</td>            </tr>
+        <tr><td class="fldLb" id="pricePledge">Вартість забезпечення згідно з висновком суб’єкта оціночної діяльності</td>          <td class="fldTxt">#=formatFldV(pricePledge)#</td>          </tr>
+        <tr><td class="fldLb" id="lastPledgeDay">Дата останньої оцінки забезпечення</td>                                            <td class="fldTxt">#=formatFldV(lastPledgeDay)#</td>        </tr>
+        <tr><td class="fldLb" id="codRealty">Вид нерухомого майна</td>                                                              <td class="fldTxt">#=formatFldV(codRealty)#</td>            </tr>
+        <tr><td class="fldLb" id="zipRealty">Поштовий індекс</td>                                                                   <td class="fldTxt">#=formatFldV(zipRealty)#</td>            </tr>
+        <tr><td class="fldLb" id="squareRealty">Загальна площа нерухомого майна</td>                                                <td class="fldTxt">#=formatFldV(squareRealty)#</td>         </tr>
+        <tr><td class="fldLb" id="sumBail">Сума поруки</td>                                                                         <td class="fldTxt">#=formatFldV(sumBail)#</td>              </tr>
+        <tr><td class="fldLb" id="sumGuarantee">Сума фінансової поруки (гарантії)</td>                                              <td class="fldTxt">#=formatFldV(sumGuarantee)#</td>         </tr>
+        <tr><td class="fldLb" id="real6month">Середній підтверджений дохід особи, що надала фінансову поруку (гарантію)</td>        <td class="fldTxt">#=formatFldV(real6month)#</td>           </tr>
+        <tr><td class="fldLb" id="noreal6month">Регулярний непідтверджений дохід особи, що надала фінансову поруку (гарантію)</td>  <td class="fldTxt">#=formatFldV(noreal6month)#</td>         </tr>
+        <tr><td class="fldLb" id="flagInsurancePledge">Факт страхування  забезпечення</td>                                          <td class="fldTxt">#=formatFldV(flagInsurancePledge)#</td>  </tr>
+        <tr><td class="fldLb" id="deposit">Депозити, що є предметом забезпечення</td>                                               <td class="fldTxt" id="DepositCRef"></td>                   </tr>
+    </table>
+</script>
+<script id="PledgeCurrentGrids" type="text/x-kendo-template">
+    <strong>Поточні дані</strong>
+    <div>Перелік депозитів, що є предметом забезпечення</div>
+    <div id='DepositC' data-kendo-grid="DepositC" data-options="PledgeDepositOptions"> </div>
+</script>
+
+<script id="PledgeLast" type="text/x-kendo-template">
+    <strong>Попередні дані</strong>
+    <table class="DtlBlk">
+        <tr><td class="fldTxt2">#=formatFldV(orderNum)#</td>             <td class="fldLb2">Порядковий номер  запису у повідомлені</td>                                         </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codZastava)#</td>           <td class="fldLb2">Унікальний код забезпечення за кредитною операцією Боржника</td>                    </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codMan)#</td>               <td class="fldLb2">Унікальний код Боржника</td>                                                        </tr>
+        <tr><td class="fldTxt2">#=formatFldV(numberPledge)#</td>         <td class="fldLb2">Номер договору застави/іпотеки, гарантії, поруки, грошового покриття</td>           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(pledgeDay)#</td>            <td class="fldLb2">Дата укладання договору застави/іпотеки, гарантії, поруки, грошового покриття</td>  </tr>
+        <tr><td class="fldTxt2">#=formatFldV(s031)#</td>                 <td class="fldLb2">Код виду забезпечення за договором</td>                                             </tr>
+        <tr><td class="fldTxt2">#=formatFldV(orderZastava)#</td>         <td class="fldLb2">Порядковий номер  застави/іпотеки, ... грошового покриття у Боржника</td>           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(r030)#</td>                 <td class="fldLb2">Код валюти</td>                                                                     </tr>
+        <tr><td class="fldTxt2">#=formatFldV(sumPledge)#</td>            <td class="fldLb2">Сума забезпечення згідно з договором</td>                                           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(pricePledge)#</td>          <td class="fldLb2">Вартість забезпечення згідно з висновком суб’єкта оціночної діяльності</td>         </tr>
+        <tr><td class="fldTxt2">#=formatFldV(lastPledgeDay)#</td>        <td class="fldLb2">Дата останньої оцінки забезпечення</td>                                             </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codRealty)#</td>            <td class="fldLb2">Вид нерухомого майна</td>                                                           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(zipRealty)#</td>            <td class="fldLb2">Поштовий індекс</td>                                                                </tr>
+        <tr><td class="fldTxt2">#=formatFldV(squareRealty)#</td>         <td class="fldLb2">Загальна площа нерухомого майна</td>                                                </tr>
+        <tr><td class="fldTxt2">#=formatFldV(sumBail)#</td>              <td class="fldLb2">Сума поруки</td>                                                                    </tr>
+        <tr><td class="fldTxt2">#=formatFldV(sumGuarantee)#</td>         <td class="fldLb2">Сума фінансової поруки (гарантії)</td>                                              </tr>
+        <tr><td class="fldTxt2">#=formatFldV(real6month)#</td>           <td class="fldLb2">Середній підтверджений дохід особи, що надала фінансову поруку (гарантію)</td>      </tr>
+        <tr><td class="fldTxt2">#=formatFldV(noreal6month)#</td>         <td class="fldLb2">Регулярний непідтверджений дохід особи, що надала фінансову поруку (гарантію)</td>  </tr>
+        <tr><td class="fldTxt2">#=formatFldV(flagInsurancePledge)#</td>  <td class="fldLb2">Факт страхування  забезпечення</td>                                                 </tr>
+        <tr><td class="fldTxt2" id="DepositCRef"></td>                   <td class="fldLb2">Депозити, що є предметом забезпечення</td>                                          </tr>
+    </table>
+</script>
+<script id="PledgeLastGrids" type="text/x-kendo-template">
+    <strong>Попередні дані</strong>
+    <div>Перелік депозитів, що є предметом забезпечення</div>
+    <div id='DepositL' data-kendo-grid="DepositL" data-options="PledgeDepositOptions"> </div>
+</script>

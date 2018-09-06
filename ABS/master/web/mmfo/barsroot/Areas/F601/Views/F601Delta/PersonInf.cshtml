@@ -1,0 +1,79 @@
+﻿<script id="PersonCurrent" type="text/x-kendo-template">
+    <strong>схема «Позичальник - фізична особа» Поточні дані</strong>
+    <table class="DtlBlk">
+        <tr><td class="fldLb" id="codMan">Унікальний код Боржника</td>                                                   <td class="fldTxt">#=formatFldV(codMan)#</td>                  </tr>
+        <tr><td class="fldLb" id="lastName">Прізвище</td>                                                                <td class="fldTxt">#=formatFldV(lastName)#</td>                </tr>
+        <tr><td class="fldLb" id="firstName">Ім’я</td>                                                                   <td class="fldTxt">#=formatFldV(firstName)#</td>               </tr>
+        <tr><td class="fldLb" id="middleName">По батькові</td>                                                           <td class="fldTxt">#=formatFldV(middleName)#</td>              </tr>
+        <tr><td class="fldLb" id="isRez">Ознака особи</td>                                                               <td class="fldTxt">#=formatFldV(isRez)#</td>                   </tr>
+        <tr><td class="fldLb" id="inn">Ідентифікатор Боржника</td>                                                       <td class="fldTxt">#=formatFldV(inn)#</td>                     </tr>
+        <tr><td class="fldLb" id="codDocum">Код типу документа</td>                                                      <td class="fldTxt">#=formatFldV(codDocum)#</td>                </tr>
+        <tr><td class="fldLb" id="codK020">Код Боржника за параметром К020</td>                                          <td class="fldTxt">#=formatFldV(codK020)#</td>                 </tr>
+        <tr><td class="fldLb" id="birthDay">Дата народження</td>                                                         <td class="fldTxt">#=formatFldV(birthDay)#</td>                </tr>
+        <tr><td class="fldLb" id="document">Документ що посвідчує особу</td>                                             <td class="fldTxt" id="documentCRef"></td>                  </tr>
+        <tr><td class="fldLb" id="codRegion">Код регіону</td>                                                            <td class="fldTxt">#=formatFldV(codRegion)#</td>       </tr>
+        <tr><td class="fldLb" id="area">Район</td>                                                                       <td class="fldTxt">#=formatFldV(area)#</td>            </tr>
+        <tr><td class="fldLb" id="zip">Поштовий індекс</td>                                                              <td class="fldTxt">#=formatFldV(zip)#</td>             </tr>
+        <tr><td class="fldLb" id="city">Назва населеного пункту</td>                                                     <td class="fldTxt">#=formatFldV(city )#</td>           </tr>
+        <tr><td class="fldLb" id="streetAddress">Вулиця</td>                                                             <td class="fldTxt">#=formatFldV(streetAddress)#</td>   </tr>
+        <tr><td class="fldLb" id="houseNo">Будинок</td>                                                                  <td class="fldTxt">#=formatFldV(houseNo)#</td>         </tr>
+        <tr><td class="fldLb" id="adrKorp">Корпус (споруда)</td>                                                         <td class="fldTxt">#=formatFldV(adrKorp)#</td>         </tr>
+        <tr><td class="fldLb" id="flatNo">Квартира</td>                                                                  <td class="fldTxt">#=formatFldV(flatNo)#</td>          </tr>
+        <tr><td class="fldLb" id="countryCodNerez">Код країни реєстрації</td>                                            <td class="fldTxt">#=formatFldV(countryCodNerez)#</td>         </tr>
+        <tr><td class="fldLb" id="education">Освіта</td>                                                                 <td class="fldTxt">#=formatFldV(education)#</td>               </tr>
+        <tr><td class="fldLb" id="organization">Місце роботи Боржника</td>                                               <td class="fldTxt" id="organizationCRef"></td>              </tr>
+        <tr><td class="fldLb" id="real6month">Підтверджений дохід Боржника</td>                                          <td class="fldTxt">#=formatFldV(real6month)#</td>       </tr>
+        <tr><td class="fldLb" id="noreal6month">Непідтверджений дохід Боржника</td>                                      <td class="fldTxt">#=formatFldV(noreal6month)#</td>     </tr>
+        <tr><td class="fldLb" id="status">Сімейний стан Боржника</td>                                                    <td class="fldTxt">#=formatFldV(status)#</td>           </tr>
+        <tr><td class="fldLb" id="members">Кількість осіб, що перебувають на  утриманні Боржника</td>                    <td class="fldTxt">#=formatFldV(members)#</td>          </tr>
+        <tr><td class="fldLb" id="k060">Тип пов’язаної з банком особи</td>                                               <td class="fldTxt">#=formatFldV(k060)#</td>                    </tr>
+        <tr><td class="fldLb" id="isKr">Ознака використання даних для Кредитного реєстру Національного банку України</td><td class="fldTxt">#=formatFldV(isKr)#</td>                    </tr>
+    </table>
+</script>
+<script id="PersonCurrentGrids" type="text/x-kendo-template">
+    <strong>Поточні дані</strong>
+    <div>Перелік документів що посвідчує особу Боржника</div>
+    <div id='documentC' data-kendo-grid="documentC" data-options="PersonDocOptions"> </div>
+    <div>Перелік місць роботи Боржника</div>
+    <div id='organizationC' data-kendo-grid="organizationC" data-options="PersonOrgOptions"> </div>
+</script>
+
+<script id="PersonLast" type="text/x-kendo-template">
+    <strong>Попередні дані</strong>
+    <table class="DtlBlk">
+        <tr><td class="fldTxt2">#=formatFldV(codMan)#</td>          <td class="fldLb2">Унікальний код Боржника</td>                                                           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(lastName)#</td>        <td class="fldLb2">Прізвище</td>                                                                        </tr>
+        <tr><td class="fldTxt2">#=formatFldV(firstName)#</td>       <td class="fldLb2">Ім’я</td>                                                                           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(middleName)#</td>      <td class="fldLb2">По батькові</td>                                                                   </tr>
+        <tr><td class="fldTxt2">#=formatFldV(isRez)#</td>           <td class="fldLb2">Ознака особи</td>                                                                       </tr>
+        <tr><td class="fldTxt2">#=formatFldV(inn)#</td>             <td class="fldLb2">Ідентифікатор Боржника</td>                                                               </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codDocum)#</td>        <td class="fldLb2">Код типу документа</td>                                                              </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codK020)#</td>         <td class="fldLb2">Код Боржника за параметром К020</td>                                                  </tr>
+        <tr><td class="fldTxt2">#=formatFldV(birthDay)#</td>        <td class="fldLb2">Дата народження</td>                                                                 </tr>
+        <tr><td class="fldTxt2" id="documentLRef"></td>          <td class="fldLb2">Документ що посвідчує особу</td>                                                     </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codRegion)#</td>       <td class="fldLb2">Код регіону</td>                                                            </tr>
+        <tr><td class="fldTxt2">#=formatFldV(area)#</td>            <td class="fldLb2">Район</td>                                                                       </tr>
+        <tr><td class="fldTxt2">#=formatFldV(zip)#</td>             <td class="fldLb2">Поштовий індекс</td>                                                              </tr>
+        <tr><td class="fldTxt2">#=formatFldV(city )#</td>           <td class="fldLb2">Назва населеного пункту</td>                                                     </tr>
+        <tr><td class="fldTxt2">#=formatFldV(streetAddress)#</td>   <td class="fldLb2">Вулиця</td>                                                             </tr>
+        <tr><td class="fldTxt2">#=formatFldV(houseNo)#</td>         <td class="fldLb2">Будинок</td>                                                                  </tr>
+        <tr><td class="fldTxt2">#=formatFldV(adrKorp)#</td>         <td class="fldLb2">Корпус (споруда)</td>                                                         </tr>
+        <tr><td class="fldTxt2">#=formatFldV(flatNo)#</td>          <td class="fldLb2">Квартира</td>                                                                  </tr>
+        <tr><td class="fldTxt2">#=formatFldV(countryCodNerez)#</td> <td class="fldLb2">Код країни реєстрації</td>                                                    </tr>
+        <tr><td class="fldTxt2">#=formatFldV(education)#</td>       <td class="fldLb2">Освіта</td>                                                                         </tr>
+        <tr><td class="fldTxt2" id="organizationLRef"></td>      <td class="fldLb2">Місце роботи Боржника</td>                                                       </tr>
+        <tr><td class="fldTxt2">#=formatFldV(real6month)#</td>      <td class="fldLb2">Підтверджений дохід Боржника</td>                                           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(noreal6month)#</td>    <td class="fldLb2">Непідтверджений дохід Боржника</td>                                       </tr>
+        <tr><td class="fldTxt2">#=formatFldV(status)#</td>          <td class="fldLb2">Сімейний стан Боржника</td>                                                     </tr>
+        <tr><td class="fldTxt2">#=formatFldV(members)#</td>         <td class="fldLb2">Кількість осіб, що перебувають на  утриманні Боржника</td>                     </tr>
+        <tr><td class="fldTxt2">#=formatFldV(k060)#</td>            <td class="fldLb2">Тип пов’язаної з банком особи</td>                                                       </tr>
+        <tr><td class="fldTxt2">#=formatFldV(isKr)#</td>            <td class="fldLb2">Ознака використання даних для Кредитного реєстру Національного банку України</td>        </tr>
+    </table>
+</script>
+<script id="PersonLastGrids" type="text/x-kendo-template">
+    <strong>Попередні дані</strong>
+    <div>Перелік документів що посвідчує особу Боржника</div>
+    <div id='documentL' data-kendo-grid="documentL" data-options="PersonDocOptions"> </div>
+    <div>Перелік місць роботи Боржника</div>
+    <div id='organizationL' data-kendo-grid="organizationL" data-options="PersonOrgOptions"> </div>
+</script>

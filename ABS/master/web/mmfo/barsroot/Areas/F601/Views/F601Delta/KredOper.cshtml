@@ -1,0 +1,77 @@
+﻿<script id="KredOperCurrent" type="text/x-kendo-template">
+    <strong>схема "Кредитні операції" Поточні дані</strong>
+    <table class="DtlBlk">
+        <tr><td class="fldLb" id="orderNum">Порядковий номер кредитної операції у повідомлені</td>                                  <td class="fldTxt">#=formatFldV(orderNum)#</td>     </tr>
+        <tr><td class="fldLb" id="flagOsoba">Ознака особи</td>                                                                      <td class="fldTxt">#=formatFldV(flagOsoba)#</td>    </tr>
+        <tr><td class="fldLb" id="codCredit">Унікальний код кредитної операції Боржника</td>                                        <td class="fldTxt">#=formatFldV(codCredit)#</td>    </tr>
+        <tr><td class="fldLb" id="codMan">Унікальний код Боржника</td>                                                              <td class="fldTxt">#=formatFldV(codMan)#</td>       </tr>
+        <tr><td class="fldLb" id="typeCredit">Вид кредиту/наданого фінансового зобов’язання</td>                                    <td class="fldTxt">#=formatFldV(typeCredit)#</td>   </tr>
+        <tr><td class="fldLb" id="numberDog">Номер договору</td>                                                                    <td class="fldTxt">#=formatFldV(numberDog)#</td>    </tr>
+        <tr><td class="fldLb" id="dogDay">Дата укладання договору</td>                                                              <td class="fldTxt">#=formatFldV(dogDay)#</td>       </tr>
+        <tr><td class="fldLb" id="endDay">Кінцева дата погашення кредиту/наданого фінансового зобов’язання</td>                     <td class="fldTxt">#=formatFldV(endDay)#</td>       </tr>
+        <tr><td class="fldLb" id="sumZagal">Загальна сума (ліміт кредитної лінії/овердрафту) наданого фінансового зобов’язання</td> <td class="fldTxt">#=formatFldV(sumZagal)#</td>     </tr>
+        <tr><td class="fldLb" id="r030">Код валюти</td>                                                                             <td class="fldTxt">#=formatFldV(r030)#</td>     </tr>
+        <tr><td class="fldLb" id="procCredit">Номінальна процентна ставка</td>                                                      <td class="fldTxt">#=formatFldV(procCredit)#</td>     </tr>
+        <tr><td class="fldLb" id="sumPay">Сума платежів за кредитною операцією</td>                                                 <td class="fldTxt">#=formatFldV(sumPay)#</td>     </tr>
+        <tr><td class="fldLb" id="periodBase">Періодичність сплати основного боргу</td>                                             <td class="fldTxt">#=formatFldV(periodBase)#</td>     </tr>
+        <tr><td class="fldLb" id="periodProc">Періодичність сплати відсотків</td>                                                   <td class="fldTxt">#=formatFldV(periodProc)#</td>     </tr>
+        <tr><td class="fldLb" id="sumArrears">Залишок заборгованості за кредитною операцією</td>                                    <td class="fldTxt">#=formatFldV(sumArrears)#</td>     </tr>
+        <tr><td class="fldLb" id="arrearBase">Прострочена заборгованість за основним боргом</td>                                    <td class="fldTxt">#=formatFldV(arrearBase)#</td>     </tr>
+        <tr><td class="fldLb" id="arrearProc">Прострочена заборгованість  за процентами</td>                                        <td class="fldTxt">#=formatFldV(arrearProc)#</td>     </tr>
+        <tr><td class="fldLb" id="dayBase">Кількість днів прострочення за основним боргом</td>                                      <td class="fldTxt">#=formatFldV(dayBase)#</td>     </tr>
+        <tr><td class="fldLb" id="dayProc">Кількість днів прострочення  за процентами</td>                                          <td class="fldTxt">#=formatFldV(dayProc)#</td>     </tr>
+        <tr><td class="fldLb" id="factEndDay">Дата фактичного погашення кредиту/припинення зобов’язань по кредиту </td>             <td class="fldTxt">#=formatFldV(factEndDay)#</td>     </tr>
+        <tr><td class="fldLb" id="flagZ">Наявність здійснених заходів із примусового стягнення боргу</td>                           <td class="fldTxt">#=formatFldV(flagZ)#</td>     </tr>
+        <tr><td class="fldLb" id="klass">Клас боржника</td>                                                                         <td class="fldTxt">#=formatFldV(klass)#</td>     </tr>
+        <tr><td class="fldLb" id="risk">Величина кредитного ризику</td>                                                             <td class="fldTxt">#=formatFldV(risk)#</td>     </tr>
+        <tr><td class="fldLb" id="flagInsurance">Факт страхування  кредиту</td>                                                     <td class="fldTxt">#=formatFldV(flagInsurance)#</td>     </tr>
+        <tr><td class="fldLb" id="pledge">Забезпечення за кредитним договором</td>                                                  <td class="fldTxt" id="KredPledgeCRef"></td>     </tr>
+        <tr><td class="fldLb" id="tranche">Транші за кредитним договором</td>                                                       <td class="fldTxt" id="KredTrancheCRef"></td>     </tr>
+    </table>
+</script>
+<script id="KredOperCurrentGrids" type="text/x-kendo-template">
+    <strong>Поточні дані</strong>
+    <div>Забезпечення за кредитним договором</div>
+    <div id='KredPledgeC' data-kendo-grid="KredPledgeC" data-options="KredPledgeOptions"> </div>
+    <div>Транші за кредитним договором</div>
+    <div id='KredTrancheC' data-kendo-grid="KredTrancheC" data-options="KredTrancheOptions"> </div>
+</script>
+
+<script id="KredOperLast" type="text/x-kendo-template">
+    <strong>Попередні дані</strong>
+    <table class="DtlBlk">
+        <tr><td class="fldTxt2">#=formatFldV(orderNum)#</td>         <td class="fldLb2">Порядковий номер кредитної операції у повідомлені</td>                                      </tr>
+        <tr><td class="fldTxt2">#=formatFldV(flagOsoba)#</td>        <td class="fldLb2">Ознака особи</td>                                                                           </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codCredit)#</td>        <td class="fldLb2">Унікальний код кредитної операції Боржника</td>                                             </tr>
+        <tr><td class="fldTxt2">#=formatFldV(codMan)#</td>           <td class="fldLb2">Унікальний код Боржника</td>                                                                </tr>
+        <tr><td class="fldTxt2">#=formatFldV(typeCredit)#</td>       <td class="fldLb2">Вид кредиту/наданого фінансового зобов’язання</td>                                          </tr>
+        <tr><td class="fldTxt2">#=formatFldV(numberDog)#</td>        <td class="fldLb2">Номер договору</td>                                                                         </tr>
+        <tr><td class="fldTxt2">#=formatFldV(dogDay)#</td>           <td class="fldLb2">Дата укладання договору</td>                                                                </tr>
+        <tr><td class="fldTxt2">#=formatFldV(endDay)#</td>           <td class="fldLb2">Кінцева дата погашення кредиту/наданого фінансового зобов’язання</td>                       </tr>
+        <tr><td class="fldTxt2">#=formatFldV(sumZagal)#</td>         <td class="fldLb2">Загальна сума (ліміт кредитної лінії/овердрафту) наданого фінансового зобов’язання</td>     </tr>
+        <tr><td class="fldTxt2">#=formatFldV(r030)#</td>             <td class="fldLb2">Код валюти</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(procCredit)#</td>       <td class="fldLb2">Номінальна процентна ставка</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(sumPay)#</td>           <td class="fldLb2">Сума платежів за кредитною операцією</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(periodBase)#</td>       <td class="fldLb2">Періодичність сплати основного боргу</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(periodProc)#</td>       <td class="fldLb2">Періодичність сплати відсотків</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(sumArrears)#</td>       <td class="fldLb2">Залишок заборгованості за кредитною операцією</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(arrearBase)#</td>       <td class="fldLb2">Прострочена заборгованість за основним боргом</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(arrearProc)#</td>       <td class="fldLb2">Прострочена заборгованість  за процентами</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(dayBase)#</td>          <td class="fldLb2">Кількість днів прострочення за основним боргом</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(dayProc)#</td>          <td class="fldLb2">Кількість днів прострочення  за процентами</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(factEndDay)#</td>       <td class="fldLb2">Дата фактичного погашення кредиту/припинення зобов’язань по кредиту </td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(flagZ)#</td>            <td class="fldLb2">Наявність здійснених заходів із примусового стягнення боргу</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(klass)#</td>            <td class="fldLb2">Клас боржника</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(risk)#</td>             <td class="fldLb2">Величина кредитного ризику</td> </tr>
+        <tr><td class="fldTxt2">#=formatFldV(flagInsurance)#</td>    <td class="fldLb2">Факт страхування  кредиту</td> </tr>
+        <tr><td class="fldTxt2" id="KredPledgeLRef"></td>             <td class="fldLb2">Забезпечення за кредитним договором</td> </tr>
+        <tr><td class="fldTxt2" id="KredTrancheLRef"></td>            <td class="fldLb2">Транші за кредитним договором</td>        </tr>
+    </table>
+</script>
+<script id="KredOperLastGrids" type="text/x-kendo-template">
+    <strong>Попередні дані</strong>
+    <div>Забезпечення за кредитним договором</div>
+    <div id='KredPledgeL' data-kendo-grid="KredPledgeL" data-options="KredPledgeOptions"> </div>
+    <div>Транші за кредитним договором</div>
+    <div id='KredTrancheL' data-kendo-grid="KredTrancheL" data-options="KredTrancheOptions"> </div>
+</script>

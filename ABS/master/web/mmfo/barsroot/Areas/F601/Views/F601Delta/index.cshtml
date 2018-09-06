@@ -1,0 +1,128 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script src="~/lib/jsZip/jszip.js"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Scripts/Angular/kendoservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/utilsservice.js?v1.0"></script>
+<script src="~/Scripts/Angular/baseController.js?v1.0"></script>
+<script language="javascript" src="~/Areas/F601/Scripts/Delta/index.js?v1.1.0" type="text/javascript"></script>
+<style>
+    .k-window-content .k-content {
+        overflow-x: hidden;
+    }
+
+    .k-grid .k-grid-header .k-header {
+        white-space: normal;
+    }
+
+    .k-header .k-link {
+        text-align: center;
+    }
+
+    .k-grid td {
+        white-space: nowrap;
+        border-bottom: 1px solid black;
+        padding: .2em .6em;
+    }
+
+    .k-grid {
+        margin-right: 15px;
+    }
+
+    div.k-grid .k-selectable tr.k-state-selected {
+        background-color: #428bca;
+    }
+
+    .k-grid-filter.k-state-active {
+        background-color: lightslategray;
+    }
+
+    .k-grid-header th.k-with-icon .k-link {
+        margin-right: 7px;
+    }
+
+    .k-grid-content {
+        min-height: 100px;
+        max-height: 700px;
+    }
+
+    .ColorRow {
+        background: darkseagreen;
+    }
+
+    body {
+        font-size: 11.5px;
+    }
+
+    .k-window div.k-window-content {
+        overflow-x: hidden;
+    }
+
+    .Diff {
+        color: red; /*font-style:italic;*/
+    }
+
+    .fldLb {
+        text-align: right; /*font-style:italic;*/
+    }
+
+    .fldLbT {
+        text-decoration: dotted;
+        text-align: right;
+        font-style: italic;
+    }
+
+    .fldLb2 {
+        text-align: left; /*font-style:italic;*/
+    }
+
+    .fldTxt {
+        text-align: left;
+        font-weight: bolder;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .fldTxt2 {
+        text-align: right;
+        font-weight: bolder;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+</style>
+
+<div ng-controller="F601DeltaCtrl">
+    <div><h2><strong>{{Title}}</strong></h2></div>
+
+    <div id="ReportsGrid"
+         data-kendo-grid="ReportsGrid"
+         data-options="ReportsGridOptions">
+    </div>
+
+    <div id="SessionsGrid"
+         data-kendo-grid="SessionsGrid"
+         data-options="SessionsGridOptions">
+    </div>
+
+    <div id="DeltaViewWindow">
+        <h4>Дельта даних</h4>
+        <div id="splitter1" kendo-splitter="splitter1" k-orientation="splitter1.orientation" k-panes="splitter1.panes" style="height: 800px; border: 0;">
+            <div id="DeltaViewCurrent"></div>
+            <div id="DeltaViewLast"></div>
+        </div>
+        <div id="splitter2" kendo-splitter="splitter2" k-orientation="splitter2.orientation" k-panes="splitter2.panes" style="height: 1200px; border: 0;">
+            <div id="DeltaGridsCurrent"></div>
+            <div id="DeltaGridsLast"></div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("KredOper")
+@Html.Partial("PersonInf")
+@Html.Partial("Pledge")
+@Html.Partial("LegalInf")
+
+<script id="NoDataTemplate" type="text/x-kendo-template">
+    <h2>Немає даних</h2>
+</script>
