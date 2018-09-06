@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования D5X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  28/08/2018 (27/06/2018)
+% VERSION     :  v.1.001 05/09/2018 (28/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                   char(30)  := 'v.1.001  28/08/2018';
+  ver_                   char(30)  := 'v.1.001  05/09/2018';
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
   c_date_fmt             constant varchar2(10 char) := 'dd.mm.yyyy';
   c_old_file_code        constant varchar2(3 char) := '#D5';
@@ -99,6 +99,7 @@ BEGIN
                  when ac.mdate - p_report_date < 365 and ac.mdate > p_report_date then '1'
                  when ac.mdate - p_report_date > 365 and ac.mdate > p_report_date then '2'
                  when ac.mdate < p_report_date then 'Z'                      
+                 else '1'                     
                end  /*s241*/
              , t.seg_15 /*s260*/
              , case
