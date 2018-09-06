@@ -52,7 +52,8 @@ begin
 	LAU_ACT NUMBER(1,0), 
 	IMPORTED CHAR(1) DEFAULT ''N'', 
 	APP_FLAG VARCHAR2(5), 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+        COUNT_SEND_SMS NUMBER 
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -62,6 +63,13 @@ exception when others then
 end; 
 /
 
+
+
+begin
+execute immediate 'alter table bars.sw_journal add count_send_sms number';
+exception when others then if (sqlcode=-1430) then null; else raise; end if;
+end;
+/
 
 
 
@@ -99,6 +107,7 @@ COMMENT ON COLUMN BARS.SW_JOURNAL.LAU_ACT IS 'Признак обработки сообщения';
 COMMENT ON COLUMN BARS.SW_JOURNAL.IMPORTED IS 'Признак импортированного сообщения';
 COMMENT ON COLUMN BARS.SW_JOURNAL.APP_FLAG IS 'Флаги сообщения SWIFT';
 COMMENT ON COLUMN BARS.SW_JOURNAL.KF IS '';
+comment on column sw_journal.count_send_sms is 'Відправка смс';
 
 
 
@@ -515,3 +524,7 @@ PROMPT *** Create SYNONYM  to SW_JOURNAL ***
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/SW_JOURNAL.sql =========*** End *** ==
 PROMPT ===================================================================================== 
+
+
+
+
