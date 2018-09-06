@@ -1,5 +1,6 @@
 create or replace view v_nbu_session_history as
 select s.id,
+       s.report_id,
        o.id object_id,
        o.object_type_id,
        case when o.object_type_id = 1 then 'Фізична особа'
@@ -43,4 +44,4 @@ left join nbu_reported_pledge pl on pl.id = s.object_id
 left join nbu_reported_loan cr on cr.id = s.object_id
 order by s.last_activity_at desc, s.id desc;
 
-grant all on v_nbu_session to bars_access_defrole;
+grant select on v_nbu_session_history to BARS_ACCESS_DEFROLE;
