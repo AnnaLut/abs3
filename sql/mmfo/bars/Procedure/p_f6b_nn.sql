@@ -7,19 +7,19 @@ PROMPT =========================================================================
 
 PROMPT *** Create  procedure P_F6B_NN ***
 
- CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
+CREATE OR REPLACE PROCEDURE BARS.P_F6B_NN (Dat_ DATE, sheme_ Varchar2 DEFAULT 'G' )
 IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.008      09.07.2018
+ % VERSION     :   v.18.010      05.09.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
 
   1   GGG           вид задолженности       [kl_f3_29.DDD]
   4   CC            [список]
-  6   N             код контрагента         [1/2/3/4/5]
+  6   N             код контрагента         [1/2/3/4/5/6/7]
   7   H             S083 тип оценки крединого риска
   8   I             S080 код класса должника
   9   OO            S031 код вида обеспечения кредита
@@ -28,6 +28,8 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+05.09.2018  новое значение сегмента N =7 для ФОПов
+11.07.2018  для счетов SRR с отриц.остатком BV устанавливается CC=40
 09.07.2018  -обработка дисконтов 2046/SDF без учета r013
             -значения СС=40 резервы могут быть отрицательными
 11.06.2018  формирование показателей по счетам SNA не присутствующим в nbu23_rez
@@ -196,7 +198,7 @@ BEGIN
 
        if k.codcagent in (1, 2)               -- банки
        then
-          N_ := '3';                          
+          N_ := '3';
        elsif k.codcagent in (3, 4)            -- юр.лица
        then
 
@@ -219,7 +221,7 @@ BEGIN
              if k.nls like '21%'    or
                 k.nls like '236%'   or
                 k.nls like '237%'   or
-                k.nls like '238%'   
+                k.nls like '238%'
              then
                      is_budg_ := 1;
              else    is_budg_ := 0;
@@ -243,7 +245,7 @@ BEGIN
           N_ := '1';                          --физ.лицо
        elsif k.codcagent in (5,6) and k.sed = '91'
        then
-          N_ := '1';                    --физ.лицо предприниматель (ранее =2)
+          N_ := '7';                    --физ.лицо предприниматель
        else
 
           if    k.custtype ='1'  then   N_ := '3';
@@ -317,9 +319,9 @@ BEGIN
        end if;
 
        if    k.pd_0 =1  and
-             k.nbs in ('1500','1502','1508','1600','1607') 
-       then  
-           ddd_ :='120';   
+             k.nbs in ('1500','1502','1508','1600','1607')
+       then
+           ddd_ :='120';
            H_ := '0';
 
        end if;
@@ -328,16 +330,16 @@ BEGIN
              k.nbs in ('1402','1403','1405','1408', '3012','3015','3018',
                        '1412','1413','1415','1418', '3112','3115','3118',
                        '1422','1423','1428', '3212','3218')
-       then  
-           ddd_ :='130';   
+       then
+           ddd_ :='130';
            H_ := '0';
 
        end if;
 
 -- отдельная обработка  счетов 3-го класса -могут быть в ggg=130
- 
+
        if  ddd_ in('133','135','138') and k.nbs like '3%'   then
-                 
+
           select count(*)  into pr_
             from nbu23_rez
            where fdat = z.fdat1
@@ -346,7 +348,7 @@ BEGIN
 
           if pr_ !=0  then
 
-              ddd_ :='130';   
+              ddd_ :='130';
               H_ := '0';
           else
 
@@ -355,9 +357,9 @@ BEGIN
        end if;
 
 -- отдельная обработка  счетов 3-го класса -могут быть в ggg=130
- 
+
        if  ddd_ in('133','135','138') and k.nbs like '3%'   then
-                 
+
           select count(*)  into pr_
             from nbu23_rez
            where fdat = z.fdat1
@@ -366,18 +368,18 @@ BEGIN
 
           if pr_ !=0  then
 
-              ddd_ :='130';   
+              ddd_ :='130';
               H_ := '0';
           else
 
               H_ := '1';
           end if;
        end if;
-                                     --  отдельная обработка клиента  90593701
+--                                     --  отдельная обработка клиента  90593701
        if    mfo_ = 300465 and k.rnk in (90593701) and
-             k.nbs like '311%'
-       then  
-           ddd_ :='138';   
+             k.nbs like '301%'
+       then
+           ddd_ :='133';
            H_ := '1';
 
        end if;
@@ -439,13 +441,24 @@ BEGIN
 
           else
 
-             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
-             VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+             if k.tip ='SRR' and k.BV <0  then     ---зміна знаку та СС для рахунків типу SRR
 
-             if ddd_ = '121' and k.pd_0 =1 then
-     
+                kodp_:= '40'|| N_|| H_|| I_||'00'|| to_char(k.rez) || kv_;
+                znap_:= TO_CHAR(abs(k.BV));
+
                 INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
-                VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+                VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+
+             else
+                INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
+                VALUES (k.nls, k.kv, dat_, ddd_||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+
+                if ddd_ = '121' and k.pd_0 =1 then
+
+                   INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, nd, comm, acc)
+                   VALUES (k.nls, k.kv, dat_, '120'||kodp_, znap_, nbuc_, k.rnk, k.nd, comm_, k.acc);
+                end if;
+
              end if;
           end if;
        end if;
@@ -624,7 +637,7 @@ BEGIN
 
        if k.codcagent in (1, 2)               -- банки
        then
-          N_ := '3';                          
+          N_ := '3';
        elsif k.codcagent in (3, 4)            -- юр.лица
        then
 
@@ -647,7 +660,7 @@ BEGIN
              if k.nls like '21%'    or
                 k.nls like '236%'   or
                 k.nls like '237%'   or
-                k.nls like '238%'   
+                k.nls like '238%'
              then
                      is_budg_ := 1;
              else    is_budg_ := 0;
@@ -672,7 +685,7 @@ BEGIN
           N_ := '1';                          --физ.лицо
        elsif k.codcagent in (5,6) and k.sed = '91'
        then
-          N_ := '1';                    --физ.лицо предприниматель (ранее =2)
+          N_ := '7';                    --физ.лицо предприниматель
        else
 
           if    k.custtype ='1'  then   N_ := '3';
@@ -705,9 +718,9 @@ BEGIN
        end if;
 
        if    k.pd_0 =1  and
-             k.nbs in ('1500','1502','1508','1600','1607') 
-       then  
-           ddd_ :='120';   
+             k.nbs in ('1500','1502','1508','1600','1607')
+       then
+           ddd_ :='120';
            H_ := '0';
 
        end if;
@@ -770,7 +783,7 @@ BEGIN
 
        if k.codcagent in (1, 2)               -- банки
        then
-           N_ := '3';                          
+           N_ := '3';
        elsif k.codcagent in (3, 4)            -- юр.лица
        then
 
@@ -793,7 +806,7 @@ BEGIN
              if k.nls like '21%'    or
                 k.nls like '236%'   or
                 k.nls like '237%'   or
-                k.nls like '238%'   
+                k.nls like '238%'
              then
                      is_budg_ := 1;
              else    is_budg_ := 0;
@@ -817,7 +830,7 @@ BEGIN
           N_ := '1';                          --физ.лицо
        elsif k.codcagent in (5,6) and k.sed = '91'
        then
-          N_ := '1';                    --физ.лицо предприниматель (ранее =2)
+          N_ := '7';                    --физ.лицо предприниматель
        else
 
           if    k.custtype ='1'  then   N_ := '3';
@@ -850,9 +863,9 @@ BEGIN
        end if;
 
        if    k.pd_0 =1  and
-             k.nbs in ('1500','1502','1508','1600','1607') 
-       then  
-           ddd_ :='120';   
+             k.nbs in ('1500','1502','1508','1600','1607')
+       then
+           ddd_ :='120';
            H_ := '0';
 
        end if;
@@ -899,7 +912,11 @@ BEGIN
          comm_ := ' RNK='||k.rnk||' DDD='||ddd_||' TIP='||k.tip;
          kv_ := lpad(to_char(k.kv),3,'0');
 
-         N_ := '1';                          --физ.лицо
+         if k.sed = '91'  then
+             N_ := '7';                          --физ.лицо предприниматель
+         else
+             N_ := '1';                          --физ.лицо
+         end if;
          I_ := 'M';
          H_ := '2';
 
@@ -941,14 +958,6 @@ BEGIN
 
    end loop;
 
-       if dat_ =to_date('20180330','yyyymmdd')   then
-           update rnbu_trace
-              set kodp = substr(kodp, 1,3) || '40' || substr(kodp, 6),
-                  znap = (-1)* to_number(znap)
-            where acc = 1433732901 
-              and kodp like '13011%';
-
-       end if;
 -----------------------------------------------------------------------------
    DELETE FROM tmp_nbu
          WHERE kodf = kodf_ AND datf = dat_;
@@ -972,7 +981,6 @@ BEGIN
 END p_f6b_nn;
 /
 show err;
-
 
 
 PROMPT ===================================================================================== 
