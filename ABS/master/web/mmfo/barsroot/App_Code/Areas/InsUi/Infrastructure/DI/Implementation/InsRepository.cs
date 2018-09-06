@@ -28,6 +28,7 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
         public InsRepository(IInsModel model)
         {
             _entities = model.InsuranceEntities;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
         }
 
         public IQueryable<INS_PARAMS_INTG> GetParams()
@@ -350,7 +351,6 @@ namespace BarsWeb.Areas.InsUi.Infrastructure.DI.Implementation
 
         public string CreateDealEWA(ParamsEwa parameters, OracleConnection connection)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
             Login login = new Login();
             login.email = GetParameter("EWAEMAIL"); //"43@ewa.ua";
             login.password = GetParameter("EWAHASH");

@@ -15,6 +15,11 @@ using Bars;
 [System.Web.Script.Services.ScriptService]
 public class EWAService : BarsWebService
 {
+    public EWAService()
+    {
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
+    }
+
     public WsHeader WsHeaderValue;
 
     #region Приватные методы
@@ -93,9 +98,6 @@ public class EWAService : BarsWebService
     [WebMethod(EnableSession = true)]
     public Result SendAccStatus(Int32 id, String state)
     {
-        ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | (SecurityProtocolType)768 | (SecurityProtocolType)3072;
-        //ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
-
         Result result = new Result();
         try
         {
