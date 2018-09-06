@@ -2,7 +2,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_pack.sql =========*** Run *** ==
  PROMPT ===================================================================================== 
 
- CREATE OR REPLACE PACKAGE BARS.EAD_PACK is
+ CREATE OR REPLACE PACKAGE EAD_PACK is
 
   -- Author  : TVSUKHOV
   -- Created : 12.06.2013 16:56:08
@@ -11,7 +11,7 @@
 
   -- Public type declarations
   -- type <TypeName> is <Datatype>;
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.3  10.08.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 3.3  03.09.2018 MMFO';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -42,7 +42,7 @@
           --                   p_kf         VARCHAR2,
                              p_idupd_from number,
                              p_idupd_to   number ) return number;
-                           
+
   -- Public variable declarations
   -- <VariableName> <Datatype>;
 
@@ -109,9 +109,10 @@
                             p_err_count     IN ead_sync_queue.err_count %TYPE);
 
   -- апдейт таблиці ead_sync_sessions по конкретному типу
-  procedure update_sync_sessions(p_type_id    in bars.ead_types.id%type,
-                                 p_sync_start in bars.ead_sync_sessions.sync_start%type,
-                                 p_sync_end   in bars.ead_sync_sessions.sync_end %type);
+  procedure update_sync_sessions(p_type_id     in bars.ead_types.id%type,
+                                 p_sync_start  in bars.ead_sync_sessions.sync_start%type  default null,
+                                 p_sync_end    in bars.ead_sync_sessions.sync_end %type   default null,
+                                 p_CDC_LASTKEY in bars.ead_sync_sessions.cdc_lastkey%type default null);
 
   -- Створити повідомлення
   function msg_create(p_type_id in ead_sync_queue.type_id%type,
@@ -184,10 +185,7 @@
 
 end ead_pack;
 /
-show errors
-
-
-CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
+CREATE OR REPLACE PACKAGE BODY EAD_PACK IS
 
    g_body_version constant varchar2(64) := 'version 3.3  10.08.2018 MMFO';
    kflist bars.string_list; -- Список рабочих kf
@@ -379,13 +377,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
   function Check_Acc_update (p_acc        number,
                         --     p_kf         VARCHAR2,
                              p_idupd_from number,
-                             p_idupd_to   number ) return number is 
+                             p_idupd_to   number ) return number is
     l_idupd number(38);
     l_acc number(38);
   begin
- ----- 
-     begin    
-      select xx.acc, xx.idupd
+ -----
+    begin
+     select xx.acc, xx.idupd
         into l_acc , l_idupd
          from (
           select max(x.idupd) idupd
@@ -394,7 +392,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                     ,x.blkd, x.blkk,
                       row_number() over(partition by x.acc order by max(x.idupd)) rn
                    --  ,count(x.acc)over(partition by x.acc order by x.acc) c_n
-                    ,x.c_n                
+                    ,x.c_n
         from (select au.idupd
                     ,au.acc
                     ,au.nls,  au.kv  , au.kf, au.daos, au.dazs, au.doneby
@@ -408,19 +406,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
               order by au.idupd desc )x
          where 1=1 -- rownum < 3
           or (gl.bd = x.daos and  x.CHGACTION = 1)
-           group by x.acc, x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby, x.blkd, x.blkk, x.c_n 
+           group by x.acc, x.nls,  x.kv  , x.kf, x.daos, x.dazs, x.doneby, x.blkd, x.blkk, x.c_n
             ) xx
          where xx.rn  > 1
             or xx.c_n = 1;
-         
- EXCEPTION  
+
+ EXCEPTION
     WHEN NO_DATA_FOUND  THEN
           l_idupd := null;
-      END;  
-       
-  return l_idupd;   
-     
-   end Check_Acc_update ; 
+      END;
+
+  return l_idupd;
+
+   end Check_Acc_update ;
 
    -- ==== Надруковані документи ====
    -- Створити надрукований документ
@@ -470,7 +468,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
        rnk,
        agr_id,
        kf,
-       acc)
+       acc,
+       ticket_id,
+       doc_print_number)
     values
       (l_id,
        sysdate,
@@ -483,7 +483,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
        p_rnk,
        p_agr_id,
        l_kf,
-       l_acc);
+       l_acc,
+       sys_guid(),
+       ead_pack.print_number(l_kf,10)  );
 
     return l_id;
   end doc_create;
@@ -573,6 +575,28 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
 
     --    COMMIT;
   END msg_set_message;
+
+ procedure update_sync_sessions (p_type_id     in bars.ead_types.id%type,
+                                 p_sync_start  in bars.ead_sync_sessions.sync_start%type  default null,
+                                 p_sync_end    in bars.ead_sync_sessions.sync_end %type   default null,
+                                 p_CDC_LASTKEY in bars.ead_sync_sessions.cdc_lastkey%type default null
+                                 ) is
+			  begin
+				update ead_sync_sessions s
+				   set s.sync_start  = nvl(p_sync_start ,s.sync_start ),
+               s.sync_end    = nvl(p_sync_end   ,s.sync_end   ),
+               s.cdc_lastkey = nvl(p_CDC_LASTKEY,s.cdc_lastkey)
+				 where s.type_id = p_type_id;
+
+   IF (SQL%ROWCOUNT = 0)
+      THEN
+         INSERT INTO ead_sync_sessions es (es.type_id, es.cdc_lastkey, es.sync_start, es.sync_end   )
+                                   VALUES (p_type_id , p_CDC_LASTKEY , p_sync_start , p_sync_end    );
+      END IF;
+
+				commit;
+  end update_sync_sessions;
+
 
   function LOCK_ROW(rid in rowid) return number is
     ret_id number := 0;
@@ -869,6 +893,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     for cur in (select cu.idupd, cu.rnk, cu.kf
                   from customer_update cu
                  where cu.idupd > l_cdc_lastkey
+                   and cu.kf member of kflist
                    and get_custtype(cu.rnk) = 3
 				   and  cu.kf member of kflist
 /* COBUSUPABS-5837
@@ -1226,9 +1251,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       l_cdc_newkey    ead_sync_sessions.cdc_lastkey%TYPE;
 
       l_sync_id       ead_sync_queue.id%TYPE;
-      l_cdc_lastkey   ead_docs.id%TYPE;
+	    l_cdc_lastkey   ead_docs.id%TYPE;
       l_cdc_last_time ead_sync_sessions.sync_start%TYPE;
+      l_sync_start    ead_sync_sessions.sync_start%TYPE;
+      l_sync_end      ead_sync_sessions.sync_end%TYPE;
    BEGIN
+     l_sync_start := sysdate;
       --bc.go('/');
       --sec_aud_temp_write ('EAD: cdc_doc');
 
@@ -1250,7 +1278,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
     for cur in (select id, rnk, ea_struct_id, agr_id, d.kf, da.deposit_id
                   from ead_docs d left outer join dpt_deposit_all da on d.agr_id = da.deposit_id
                  where 1=1
-				   and d.EA_STRUCT_ID <> '333'
+           and d.EA_STRUCT_ID <> '333'
 --                   and id > l_cdc_lastkey
 --                   and (sign_date IS NOT NULL OR type_id = 'SCAN') --отбираем только подписанные документы или сканкопии.
                    and (type_id = 'SCAN' and id > l_cdc_lastkey
@@ -1283,7 +1311,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       -- сохраняем ключ захвата
       l_cdc_newkey := TO_CHAR (l_cdc_lastkey);
 
-      UPDATE ead_sync_sessions ss
+   /*     UPDATE ead_sync_sessions ss
          SET ss.cdc_lastkey = l_cdc_newkey
        WHERE ss.type_id = l_type_id;
 
@@ -1291,7 +1319,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       THEN
          INSERT INTO ead_sync_sessions (type_id, cdc_lastkey)
               VALUES (l_type_id, l_cdc_newkey);
-      END IF;
+      END IF;*/
+
+    l_sync_end := sysdate;
+    ead_pack.update_sync_sessions(l_type_id, l_sync_start, l_sync_end, l_cdc_newkey);
 
       COMMIT;
    END cdc_doc;
@@ -1822,21 +1853,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
       LOOP
 */
  for cur in (
-   
-       select /*distinct*/ 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
-                  from accounts_update au, EAD_NBS e 
+
+   /*    select --distinct
+   'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
+                  from accounts_update au, EAD_NBS e
                  where  e.id = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22,2) -- проверка балансовых которые отправляем в ЕА по справочнику
                    and au.kf member of kflist
-                   and au.idupd   >  l_cdc_lastkey_acc 
-                   and au.idupd   <= l_cdc_newkey_acc 
-                   and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) -- не знаю. 
+                   and au.idupd   >  l_cdc_lastkey_acc
+                   and au.idupd   <= l_cdc_newkey_acc
+                   and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) -- не знаю.
                    and ead_pack.get_custtype(au.rnk) = 2
                    and not exists (select 1 from dpu_accounts da where da.accid = au.acc)
                    and au.idupd = ead_pack.check_acc_update(au.acc, l_cdc_lastkey_acc, l_cdc_newkey_acc) -- выгребаем последнюю запись с accounts_update, если она отличается от предпоследней
-                   and au.tip not in ('DEP', 'DEN', 'NL8') 
- 
- 
-               /* select distinct 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
+                   and au.tip not in ('DEP', 'DEN', 'NL8')
+*/
+
+
+                select distinct 'ACC' as agr_type, au.acc as acc, au.rnk as rnk, au.kf
                   from accounts_update au
                  where au.idupd > l_cdc_lastkey_acc and au.idupd <= l_cdc_newkey_acc and au.kf member of kflist
                        and au.CHGDATE >= LAST_DAY (ADD_MONTHS (SYSDATE, -3)) and ead_pack.get_custtype(au.rnk) = 2
@@ -1846,7 +1879,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                                      where a.acc = au.acc and a.kf = au.kf
                                            and ( ead_pack.get_acc_nbs(a.acc) in ( select nbs from EAD_NBS e where custtype = 2 and e.id = ead_integration.ead_nbs_check_param(a.nls,substr(a.tip,1,2),a.ob22) ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3" (до 11 мая 2017)
                                                 or ead_pack.get_acc_nbs(a.acc) = '2600' and a.ob22 in ('01', '02', '10') )
-                       and au.tip not in ('DEP', 'DEN', 'NL8') )*/
+                       and au.tip not in ('DEP', 'DEN', 'NL8') )
          -- походу лишняк :) --09.08.2018
       /*    union
                 select distinct 'ACC' as agr_type, su.acc as acc, a.rnk as rnk, su.kf
@@ -1937,7 +1970,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
         FROM accounts_update au;
 
     for cur in (
-    /*  select agr_type, acc, rnk, kf from
+      select agr_type, acc, rnk, kf from
         (select
         case when (ead_pack.get_acc_nbs(acc) = '2600' and ob22 = '05') OR (TIP IN ('DEP', 'NL8') AND EXISTS (SELECT 1 FROM dpu_accounts da WHERE da.accid = acc))
              then 'DPT'
@@ -1953,13 +1986,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_PACK IS
                        AND kf member of kflist
                        AND idupd <= l_cdc_newkey_acc
                        AND ead_pack.get_acc_nbs(acc) IN (SELECT nbs FROM EAD_NBS WHERE custtype = 2)))   -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3"
-           where agr_type is not null*/
-  select  agr_type,
+           where agr_type is not null
+/*  select  agr_type,
           acc,
           rnk,
-          kf   
+          kf
 from(
-   SELECT             
+   SELECT
         case when (ead_pack.get_acc_nbs(au.acc) = '2600' and au.ob22 = '05') OR (au.TIP IN ('DEP', 'NL8') AND EXISTS (SELECT 1 FROM dpu_accounts da WHERE da.accid = acc))
              then 'DPT'
              when (ead_pack.get_acc_nbs(au.acc) = '2600' and au.ob22 IN ('01', '02', '10')) OR (au.tip NOT IN ('DEP', 'DEN', 'NL8') AND NOT EXISTS (SELECT 1 FROM dpu_accounts da WHERE da.accid = acc))
@@ -1975,11 +2008,11 @@ from(
                        and au.idupd > l_cdc_lastkey_acc
                        AND au.idupd <= l_cdc_newkey_acc
                        and au.idupd = ead_pack.check_acc_update(au.acc, l_cdc_lastkey_acc, l_cdc_newkey_acc)  -- отсекаем изменения, которые не передаем в ЕА
-                       AND ead_pack.get_acc_nbs(au.acc) = e.nbs 
+                       AND ead_pack.get_acc_nbs(au.acc) = e.nbs
                        and e.id = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22,2)  -- првоеряем справочник счетов EAD.
       ) -- "2" это и СПД и Юрлица, раньше СПД в справочнике числились как "3"
-  where agr_type is not null   
-           
+  where agr_type is not null
+*/
            )
     LOOP
       ead_pack.msg_create('UACC', cur.agr_type || ';' || TO_CHAR(cur.acc), cur.rnk, cur.kf);
@@ -2038,17 +2071,17 @@ from(
       SELECT MAX(idupd) INTO l_cdc_newkey_acc FROM accounts_update;
 
       -- берем все изменения по счетам клиентов
-      FOR cur IN (/*
+      FOR cur IN (
              select 'ACC' as agr_type, -- условный код, который расшифровывается внутри ead_integration.get_accagr_param() при отправке сообщения по счету
                     acc, nbs, rnk, kf
                from accounts
-              where (acc, kf) in (select acc, kf 
-                                       from accounts_update au 
+              where (acc, kf) in (select acc, kf
+                                       from accounts_update au
                                                                join ead_nbs e on ead_pack.get_acc_nbs(au.acc) = e.nbs and e.custtype = 3
                                      where kf member of kflist and rnk > 199
                                        and idupd > l_cdc_lastkey_acc
-                                       and idupd <= l_cdc_newkey_acc)*/
- select 'ACC' as agr_type -- условный код, который расшифровывается внутри ead_integration.get_accagr_param() при отправке сообщения по счету
+                                       and idupd <= l_cdc_newkey_acc)
+ /*select 'ACC' as agr_type -- условный код, который расшифровывается внутри ead_integration.get_accagr_param() при отправке сообщения по счету
       , au.acc
       , au.kf
       , au.nbs
@@ -2061,7 +2094,7 @@ from(
           and au.idupd > l_cdc_lastkey_acc
           and au.idupd <= l_cdc_newkey_acc
           and e.id = ead_integration.ead_nbs_check_param(au.nls,substr(au.tip,1,2),au.ob22,3)
-                                       
+*/
          )
       LOOP
 
@@ -2100,16 +2133,6 @@ from(
 
       COMMIT;
    END cdc_acc;
-
-  procedure update_sync_sessions(p_type_id    in bars.ead_types.id%type,
-                                 p_sync_start in bars.ead_sync_sessions.sync_start%type,
-                                 p_sync_end   in bars.ead_sync_sessions.sync_end %type) is
-  begin
-    update ead_sync_sessions s
-       set s.sync_start = p_sync_start, s.sync_end = p_sync_end
-     where s.type_id = p_type_id;
-    commit;
-  end update_sync_sessions;
 
   -- !!! Пока в ручном режиме DICT  Довідник  SetDictionaryData
 
@@ -2364,7 +2387,7 @@ begin
                  AND status_id IN ('NEW', 'ERROR')
                  AND err_count < 15
                  AND kf = p_kf
-                 AND crt_date > sysdate - 15
+                 AND crt_date > sysdate - 3
                     -- арифметична прогресія по формулі n(n+1)/2, додатково ділиться на '60*24' для переведення хвилин у дні
                  AND (crt_date + (p_retry_interval * err_count *
                      (err_count + 1)) / (2 * 60 * 24)) <= SYSDATE
