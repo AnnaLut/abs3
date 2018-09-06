@@ -384,9 +384,10 @@ IS
       RETURN VARCHAR2;
 END bars_swift_msg;
 /
+
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.56 15.08.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.57 21.08.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -7926,8 +7927,11 @@ IS
                FROM sw_oper_queue s,
                     oper o,
                     opldok d,
-                    accounts c
+                    accounts c,
+                    sw_journal j
               WHERE     s.REF = o.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103
                     AND o.pdat >= SYSDATE - 3
                     AND o.sos IN (5, -1, -2)
                     AND NVL (s.send_mt199, 0) != 1
@@ -7984,8 +7988,11 @@ IS
                     oper o,
                     opldok d,
                     accounts c,
-                    nlk_ref n
+                    nlk_ref n,
+                    sw_journal j
               WHERE     s.REF = o.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
@@ -8060,8 +8067,11 @@ IS
                     nlk_ref n,
                     oper o2,
                     opldok d2,
-                    accounts c2
+                    accounts c2,
+                    sw_journal j
               WHERE     s.REF = o.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
@@ -8141,8 +8151,11 @@ IS
                     nlk_ref n2,
                     oper o3,
                     nlk_ref n3,
-                    oper o4
+                    oper o4,
+                    sw_journal j
               WHERE     s.REF = o.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
@@ -8215,8 +8228,11 @@ IS
                     bars.opldok d2,
                     bars.accounts c2,
                     bars.nlk_ref n2,
-                    bars.oper o3
+                    bars.oper o3,
+                    bars.sw_journal j
               WHERE     s.REF = o.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND o.pdat >= SYSDATE - 3
                     AND o.sos = 5
                     AND NVL (s.send_mt199, 0) != 1
@@ -8292,8 +8308,11 @@ IS
                     arc_rrp a2,
                     oper o2,
                     opldok d,
-                    accounts c
+                    accounts c,
+                    sw_journal j
               WHERE     s.REF = a.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND NVL (s.send_mt199, 0) != 1
                     AND a.nazns = 11
                     AND o.REF = a.REF
@@ -8358,8 +8377,11 @@ IS
                     oper o2,
                     opldok d,
                     accounts c,
-                    nlk_ref n
+                    nlk_ref n,
+                    sw_journal j
               WHERE     s.REF = a.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND NVL (s.send_mt199, 0) != 1
                     AND a.nazns = 11
                     AND o.REF = a.REF
@@ -8439,8 +8461,11 @@ IS
                     nlk_ref n,
                     oper o3,
                     opldok d3,
-                    accounts c3
+                    accounts c3,
+                    sw_journal j
               WHERE     s.REF = a.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND NVL (s.send_mt199, 0) != 1
                     AND NVL (s.status, 0) != -1
                     AND a.nazns = 11
@@ -8533,8 +8558,11 @@ IS
                     nlk_ref n2,
                     oper o4,
                     nlk_ref n3,
-                    oper o5
+                    oper o5,
+                    sw_journal j
               WHERE     s.REF = a.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND NVL (s.send_mt199, 0) != 1
                     AND a.nazns = 11
                     AND o.REF = a.REF
@@ -8621,8 +8649,11 @@ IS
                     bars.opldok d3,
                     bars.accounts c3,
                     bars.nlk_ref n2,
-                    bars.oper o4
+                    bars.oper o4,
+                    bars.sw_journal j
               WHERE     s.REF = a.REF
+                    AND s.swref=j.swref
+                    AND j.mt=103 
                     AND NVL (s.send_mt199, 0) != 1
                     AND a.nazns = 11
                     AND o.REF = a.REF
@@ -8697,9 +8728,12 @@ IS
                bars.arc_rrp a2,
                bars.oper o2,
                bars.nlk_ref n2,
-               bars.oper o3
+               bars.oper o3,
+               bars.sw_journal j
                where NVL (s.send_mt199, 0) != 1
                AND s.ref=n.ref1
+               AND s.swref=j.swref
+               AND j.mt=103 
                AND n.ref2 = o.ref
                AND o.sos=5
                AND o.ref=a.ref

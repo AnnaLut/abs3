@@ -269,12 +269,23 @@ begin
   delete from chklist_tts where tt='CLG';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (5, 'CLG', 1, null, null, 0);
+    values (2, 'CLG', 2, null, null, 0);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''CLG'', 1, null, null, 0) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''CLG'', 2, null, null, 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (5, 'CLG', 1, null, null, 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''CLG'', 1, null, null, 1) - первичный ключ не найден!');
       else raise;
       end if;
   end;
