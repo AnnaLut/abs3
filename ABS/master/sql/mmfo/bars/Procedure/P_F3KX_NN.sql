@@ -15,7 +15,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.014          07.08.2018
+% VERSION     :   v.18.016          06.09.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -28,6 +28,9 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+06.09.2018  из общего списка операций удаляются проводки конвертации,
+              zayavka.DT =3, kv_conv !=null (ранее удалялись только для 300465)
+30.08.2018  для продажи валюты добавлен отбор проводок Дт 2542 Кт 3739
 07.08.2018  новая корреспонденция дт2600-кт3800, операция OW1,OW2
 25.07.2018  покупка: zayavka.f092 может выбираться по параметрам проводки
 22.06.2018  операции forex: анализ доп.параметра FOREX
@@ -530,7 +533,7 @@ BEGIN
      FROM all_tab_columns
     WHERE owner = 'BARS' AND table_name = 'FX_DEAL' AND column_name = 'SWAP_TAG';
 
--- определение наличия поля F092 табл.FX_DEAL
+-- определение наличия поля F092 табл.ZAYAVKA
    SELECT COUNT ( * )
      INTO is_f092_
      FROM all_tab_columns
@@ -585,7 +588,7 @@ BEGIN
                             AND
                                 SUBSTR (o.nlsd, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
-                                      '2541', '2544', '2545', '2555',
+                                      '2541', '2542', '2544', '2545', '2555',
                                       '2600', '2603', '2620', '2650', '3640')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
@@ -672,8 +675,7 @@ BEGIN
                        and b.s_nom = a.s_nom
                    )
         and a.ref in ( select ref_sps
-                       from zayavka
-                     );
+                       from zayavka );
    end if;
 
    -- 08.06.2017 для продажи
@@ -713,17 +715,15 @@ BEGIN
       EXECUTE IMMEDIATE sql_z;
    END IF;
 
-   -- 28.05.2014 для 300465 исключаем проводки по конверсии
-   -- c 26.05.2014 установлен модуль по конверсии
-   IF mfou_ = 300465  THEN
+   -- для ММФО исключаем проводки по конверсии (ранее только 300465)
+--   IF mfou_ = 300465  THEN
 
-      sql_z :=
-            'UPDATE OTCN_PROV_TEMP t '
-         || 'SET t.s_nom = 0, t.s_eqv = 0 '
-         || 'WHERE t.REF IN (SELECT REF FROM ZAYAVKA WHERE dk = 3)';
-
-      EXECUTE IMMEDIATE sql_z;
-   END IF;
+     UPDATE OTCN_PROV_TEMP t 
+        SET t.s_nom = 0, t.s_eqv = 0 
+      WHERE t.REF IN ( SELECT REF     FROM ZAYAVKA WHERE dk =3
+                       union
+                       SELECT REF_SPS FROM ZAYAVKA WHERE dk =3 );
+--   END IF;
 
    OPEN c_main;
 
