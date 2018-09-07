@@ -232,6 +232,22 @@ is
                                  p_rows       out number,
                                  p_rows_err   out number,
                                  p_state      out varchar2);
+    --
+    -- выгрузка дл€ кредитов по финансовых операци€х
+    --
+    procedure credits_oper_imp (p_dat    in date default trunc(sysdate),
+                                p_periodtype in varchar2 default C_FULLIMP,
+                                p_rows       out number,
+                                p_rows_err   out number,
+                                p_state      out varchar2);
+    --
+    -- выгрузка дл€ депозитов по финансовых операци€х
+    --
+    procedure deposits_oper_imp (p_dat    in date default trunc(sysdate),
+                                 p_periodtype in varchar2 default C_FULLIMP,
+                                 p_rows       out number,
+                                 p_rows_err   out number,
+                                 p_state      out varchar2);
 end;
 /
 Show errors;

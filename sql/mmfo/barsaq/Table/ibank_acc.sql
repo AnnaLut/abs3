@@ -51,13 +51,26 @@ exception when others then
 
 
 
-
+/*
 PROMPT *** Create  constraint PK_IBANKACC ***
 begin   
  execute immediate '
   ALTER TABLE BARSAQ.IBANK_ACC ADD CONSTRAINT PK_IBANKACC PRIMARY KEY (KF, ACC)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYND  ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+*/
+
+
+
+PROMPT *** Create  constraint FK_IBANKACC_BANKS ***
+begin   
+ execute immediate '
+  ALTER TABLE BARSAQ.IBANK_ACC ADD CONSTRAINT FK_IBANKACC_BANKS FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -77,13 +90,26 @@ exception when others then
  end;
 /
 
+begin   
+ execute immediate 'alter table BARSAQ.IBANK_ACC add acc_corp2 INTEGER';
+exception when others then
+  if  sqlcode=-1430  then null; else raise; end if;
+ end;
+/
 
+begin   
+ execute immediate 'alter table BARSAQ.IBANK_ACC add visa_count NUMBER';
+exception when others then
+  if  sqlcode=-1430  then null; else raise; end if;
+ end;
+/
+
+-- Add comments to the columns 
+comment on column BARSAQ.IBANK_ACC.acc_corp2
+  is 'ACC счета Corp2';
 
 PROMPT *** Create  grants  IBANK_ACC ***
 grant SELECT                                                                 on IBANK_ACC       to BARSREADER_ROLE;
-
-
-
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARSAQ/Table/IBANK_ACC.sql =========*** End *** =
 PROMPT ===================================================================================== 
