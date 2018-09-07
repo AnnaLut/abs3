@@ -946,8 +946,20 @@ BEGIN
 
          nlsb_tobo := NBS_OB22_NULL( '6510','06',tobo_a );
 
-         IF nlsb_tobo is NULL  then  
-            raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);   
+         If nlsb_tobo is NULL  then    --    Не найден счет 6510/06.  Открываем !
+----------- raise_application_error(-20000,'Не найден счет 6510/06 на '||substr(tobo_a,1,15), true);   
+            nlsb_tobo := RKO.Get_NLS_random ('6510') ;  -- получение № лиц.сч 6510 по случ.числам
+            Select ISP, RNK, ACC into isp_6510, rnk_6510, acc_6510_1  --- для нахождения ISP,RNK и доступа берем любой счет 6% этого бранча
+            from   Accounts 
+            where  NBS like '6%' and DAZS is NULL and BRANCH = substr(tobo_a,1,15) and rownum = 1 ;
+
+            OP_REG(99, 0, 0, grp_, tmp_, rnk_6510, nlsb_tobo, 980, 'За обробку документів субєктів господарювання','ODB', isp_6510, acc_6510);
+            p_setAccessByAccmask(acc_6510, acc_6510_1);      ---  копируем доступ из acc_6510_1
+            Accreg.setAccountSParam( acc_6510, 'OB22', '06' ) ;
+            UPDATE accounts set  TOBO = substr(tobo_a,1,15)  WHERE acc = acc_6510;
+
+         End If;
+
          END IF;
       END IF;
 

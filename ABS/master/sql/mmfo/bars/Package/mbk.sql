@@ -409,6 +409,7 @@ Function F_NLS_MB (
 
 BEGIN
 
+
   l_INITIATOR := substr( pul.Get_Mas_Ini_Val('INITIATOR'), 1, 2 );
   select count(1) into v_num
     from mbdk_ob22 m

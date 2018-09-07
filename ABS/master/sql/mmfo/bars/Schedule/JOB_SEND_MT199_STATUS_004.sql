@@ -63,5 +63,14 @@ end;'
     (name                  => 'BARS.JOB_SEND_MT199_STATUS_004');
 END;
 /
-COMMIT
+
+
+begin
+  for i in (select job_name
+              from dba_scheduler_jobs
+             where job_name like '%199%') loop
+    dbms_scheduler.disable(name => i.job_name, force => true);
+  end loop;
+end;
 /
+commit; 

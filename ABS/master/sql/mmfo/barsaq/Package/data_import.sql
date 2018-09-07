@@ -65,6 +65,15 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- перечень импортируемых полей
   --
   procedure add_company(p_kf in varchar2, p_rnk in integer);
+  
+  ----
+  -- add_client - добавляет клиента юрлицо
+  --
+  -- @p_rnk [in] - регистрационный номер клиента в АБС
+  -- работа по RNK позволит скрыть реализацию и расширять, при необходимости,
+  -- перечень импортируемых полей
+  --
+  procedure add_client(p_kf in varchar2, p_rnk in integer);
 
   ----
   -- reload_customers - загрузка клиентов
@@ -89,6 +98,15 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- перечень импортируемых полей
   --
   procedure add_account(p_acc in integer);
+
+  ----
+  -- add_account - добавляет счет в систему
+  --
+  -- @p_acc [in] - id счета в АБС
+  -- работа по ACC позволит скрыть реализацию и расширять, при необходимости,
+  -- перечень импортируемых полей
+  
+  procedure add_account_new(p_acc in integer);
 
   ----
   -- add_account_and_sync - добавляет счет в систему и синхронизирует обороты и счета
@@ -268,8 +286,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_doc_export(p_startdate in date default trunc(sysdate-1));
 
    ----
-  -- sync_doc_export - синхронизирует зависшие документы
-  --
+  -- sync_doc_export - синхронизирует зависшие документы 
+  --  
   procedure sync_doc_export_open;
 
   ----
@@ -1315,6 +1333,34 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
     commit;
     --
   end add_company;
+  
+  ----
+  -- add_client - добавляет клиента юрлицо
+  --
+  -- @p_rnk [in] - регистрационный номер клиента в АБС
+  -- работа по RNK позволит скрыть реализацию и расширять, при необходимости,
+  -- перечень импортируемых полей
+  --
+  procedure add_client(p_kf in varchar2, p_rnk in integer)
+  is
+    l_custtype bars.customer.custtype%type;
+  begin
+    if (barsaq.ibank_accounts.is_cust_subscribed(p_rnk) = 0) then
+      select c.custtype
+        into l_custtype
+        from bars.customer c
+       where c.rnk = p_rnk
+         and c.kf = p_kf;
+      if (l_custtype = 2) then
+        add_company( p_kf, p_rnk);
+      elsif (l_custtype = 3) then
+        add_individual( p_kf, p_rnk);
+      end if;
+    end if;
+    --
+    commit;
+    --
+  end add_client;
 
   ----
   -- sync_customers - синхронизация клиентов
@@ -1614,6 +1660,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
   procedure add_account_int(p_acc in integer, p_rnk in integer default null) is
       l_account         accounts%rowtype;
     p               constant varchar2(30) := G_PACKAGE_NAME||'.ADD_ACCOUNT_AUX';
+    l_acc_corp2 ibank_acc.acc_corp2%type;
   begin
     logger.trace('%s: p_acc=>%s', p, to_char(p_acc));
     --
@@ -1638,14 +1685,22 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
     insert
        into accounts
      values l_account;
+    
     -- сохраняем счет в corp2
     l_account.rnk := get_origin_rnk(l_account.rnk);
     rpc_sync.add_account(l_account);
     -- синхронизируем схемы BANK и CORE в IBANK
     rpc_sync.sync_account(l_account.bank_id, l_account.acc_num, l_account.cur_id);
+    rpc_sync.get_corp2_acc(l_account.bank_id, l_account.acc_num, l_account.cur_id, l_acc_corp2);
+    
     --
     -- подписываемся на получение изменений по счету в АБС
     subscribe_for_account_changes(p_acc);
+    update barsaq.ibank_acc ia 
+       set ia.acc_corp2 = l_acc_corp2
+     where ia.acc = p_acc
+       and ia.kf = l_account.bank_id;
+    
     --
     bars.bars_audit.info('Рахунок acc='||p_acc||' експортовано в IBANK');
     --
@@ -1673,6 +1728,42 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
     commit;
     --
   end add_account;
+  
+    ----
+  -- add_account - добавляет счет в систему
+  --
+  -- @p_acc [in] - id счета в АБС
+  -- работа по ACC позволит скрыть реализацию и расширять, при необходимости,
+  -- перечень импортируемых полей
+  --
+  procedure add_account_new(p_acc in integer)
+  is
+    l_rnk  bars.customer.rnk%type;
+    l_kf   bars.customer.kf%type;
+    l_custtype bars.customer.custtype%type;
+  begin
+    select a.rnk
+      into l_rnk
+      from bars.accounts a
+     where a.acc = p_acc;
+    if (barsaq.ibank_accounts.is_cust_subscribed(l_rnk) = 0) then
+      select c.custtype,
+             c.kf
+        into l_custtype,
+             l_kf
+        from bars.customer c
+       where c.rnk = l_rnk;
+      if (l_custtype = 2) then
+        add_company(l_kf, l_rnk);
+      elsif (l_custtype = 3) then
+        add_individual(l_kf, l_rnk);
+      end if;
+    end if;  
+    add_account_int(p_acc);
+    --
+    commit;
+    --
+  end add_account_new;
 
   ----
   -- add_account2909 - добавляет счет в систему
@@ -1898,7 +1989,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                         );
                 l_cnt := sql%rowcount;
             else
-                if l_bankid = f.kf then
+                if l_bankid = f.kf then 
                 -- по одному счету
                 insert
                   into acc_turnovers (
@@ -2070,7 +2161,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                 l_cnt := sql%rowcount;
             else
                 -- по одному счету
-                if l_bankid = f.kf then
+                if l_bankid = f.kf then 
                 insert
                   into acc_turnovers (
                           bank_id, acc_num, cur_id, turns_date, prev_turns_date,
@@ -2196,7 +2287,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                and bank_id = f.kf;
             l_cnt := sql%rowcount;
         else
-            if l_bankid = f.kf then
+            if l_bankid = f.kf then 
             delete
               from acc_transactions
              where bank_id = l_bankid
@@ -2548,7 +2639,7 @@ procedure sync_acc_transactions2_TEST(
            and v.groupid (+) not in (77, 80, 81, 30, 130)
            and v.status (+) = 2)
            loop
-dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
+dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent'); 
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2627,7 +2718,7 @@ dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
           )
           loop
 
-dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
+dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld'); 
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2670,8 +2761,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_transactions2_TEST;
-
-
+  
+  
     ----
   -- sync_acc_period_transactions2 - синхронизиреут проводки в АБС для передачи в систему
   --
@@ -3766,10 +3857,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_docs_count    number;
     l_error         varchar2(4000);
   begin
-
+    
     l_time := sysdate;
     l_scn  := dbms_flashback.get_system_change_number();
-
+    
     delete from import_activity where start_time<sysdate-1 and kf = p_kf;
     -- пишем время начала работы
     insert into import_activity(start_time, start_scn, kf)
@@ -3916,7 +4007,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- модифицируем удаленную таблицу
     if p_is_open = 1 then
       rpc_sync.update_doc_export_status_open(p_docid);
-    else
+    else 
       rpc_sync.update_doc_export_status(p_docid);
     end if;
     --
@@ -4618,9 +4709,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- чтение общих атрибутов
     l_doc.dk       := get_attr_number(l_body, 'BUY_SELL_FLAG');
     -- кількість доданих документів до заявки
-    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then
+    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then 
         l_attachments_count := 1;
-    end if;
+    end if;    
 
     -- получим валюту которая покупается
     l_doc.kv2      := get_attr_number(l_body, 'DOC_CURRENCY');
@@ -5759,18 +5850,18 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export;
-
+  
   ---
   -- get_doc_export_old_state
   --
   procedure get_doc_export_old_state
     is
   begin
-    execute immediate 'insert into tmp_old_state
-    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45';
+    insert into tmp_old_state
+    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45;
     logger.info('doc_export_old_state'||sql%rowcount);
   end;
-
+  
   ----
   -- sync_doc_export_open - синхронизирует документы
   --
@@ -5791,7 +5882,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- точка отката
         savepoint sp;
         -- точка отсчета
-
+        
         --
         replace_tags(l_local_tag, l_remote_tag);
         --
@@ -5803,12 +5894,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             -- устанавливаем точку синхронизации для удаленной таблицы на текущий момент
             rpc_sync.manual_instantiate_now(TAB_DOC_EXPORT, c.kf);
         end loop;
-
+        
         -- загружаем зависшие статусы в временную таблицу
-        get_doc_export_old_state;
-
+        get_doc_export_old_state; 
+        
      --   l_scn := dbms_flashback.get_system_change_number();
-
+        
         -- идем по платежным документам
         for c in (select i.ref, e.doc_id, tos.status_id, e.bank_ref,
                        e.status_change_time, e.bank_accept_date, e.bank_back_date,
@@ -5849,7 +5940,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
                 p_bank_ref                => c.ref,
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
-                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end,
+                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end, 
                 p_is_open                 => 1
                 );
             commit;
@@ -6561,7 +6652,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
           select ca.rnk, ca.type_id, ca.country, ca.zip, ca.domain, ca.region, ca.locality, ca.address, c.kf
             from bars.customer_address as of scn l_scn ca where rnk in (select rnk from ibank_rnk where kf = c.kf);
         end loop;
-
+  
         write_sync_status(TAB_CUST_ADDRESSES, JOB_STATUS_INPROGRESS, 'вставка даних в БД corp2');
         --
         rpc_sync.fill_cust_addresses;

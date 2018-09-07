@@ -353,6 +353,16 @@
     p_accnum  in varchar2,
     p_curid   in integer
   );
+  
+  ----
+  -- get_corp2_acc
+  --
+  procedure get_corp2_acc(
+    p_bankid  in varchar2,
+    p_accnum  in varchar2,
+    p_curid   in integer,
+    p_acc_corp2 out ibank_acc.acc_corp2%type    
+  );
 
   ----
   -- erase_doc_curex_params - выполняет очистку удаленной таблицы
@@ -844,7 +854,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
    using p_docid;
   end extract_doc_export_single;
 
- ----
+  ----
   -- update_doc_export_status
   --
   procedure update_doc_export_status(p_docid in number)
@@ -1546,6 +1556,21 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
     execute immediate 'call ibank.sync.sync_account(:p_bankid, :p_accnum, :p_curid)'
       using p_bankid, p_accnum, p_curid;
   end sync_account;
+  
+  ----
+  -- get_corp2_acc
+  --
+  procedure get_corp2_acc(
+    p_bankid  in varchar2,
+    p_accnum  in varchar2,
+    p_curid   in integer,
+    p_acc_corp2 out ibank_acc.acc_corp2%type    
+  )
+  is
+  begin
+    execute immediate 'begin :p_acc_corp2 := ibank.sync.get_corp2_account(:p_bankid, :p_accnum, :p_curid); end;'
+      using OUT p_acc_corp2, IN p_bankid, IN p_accnum, IN p_curid;
+  end get_corp2_acc;
 
   -- erase_doc_curex_params - выполняет очистку удаленной таблицы
   --
@@ -1860,10 +1885,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
           from acc_transactions
          where trans_date >= :p_startdate'
         using p_startdate;
-        
     elsif p_bankid is not null and p_accnum is null and p_curid is null
     then
-
         execute immediate
         'insert
           into ibank.tmp_acc_transactions (
@@ -1894,7 +1917,6 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
            and cur_id  = :p_curid
            and trans_date >= :p_startdate'
         using p_bankid, p_accnum, p_curid, p_startdate;
-        
     end if;
   end fill_tmp_acc_transactions;
 
@@ -2053,7 +2075,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
                    closed = :p_closed,
                    notes = :p_notes,
                    cust_limit = :p_cust_limit
-             where rnk = :p_rnk
+             where rnk = round(:p_rnk/100, 0)
                and bank_id = :p_bank_id'
     using p_row.type_id,
           p_row.name,
