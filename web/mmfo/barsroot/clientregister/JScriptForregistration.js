@@ -705,7 +705,7 @@ function Check_ClientRekvPerson() {
             }
 		}
 
-		if (!isIDPassport && !isTempDoc && isEmpty(gE(curTab, 'ed_DATE_PHOTO'))) {
+        if (isDocPassport && isEmpty(gE(curTab, 'ed_DATE_PHOTO'))) {
 			alert('"Дата вклеювання фото" не заповнена');
 			//isEmptyCheck(gE(curTab, 'ed_DATE_PHOTO'));
 			gE(curTab, 'ed_DATE_PHOTO').focus();
