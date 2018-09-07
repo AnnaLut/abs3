@@ -65,7 +65,7 @@ namespace BarsWeb.Areas.CDO.Common.Models
 
 
         public string UserId { get; set; }
-
+        public string Corp2BlockStatus { get; set; }
         public bool? LockoutEnabled { get; set; }
         [JsonIgnore]
         public decimal? IsApprovedDecimal { get; set; }
@@ -93,5 +93,6 @@ namespace BarsWeb.Areas.CDO.Common.Models
         {
             get { return HasAllSignesDecimal == 1; }
         }
+        public bool? IsCanSign { get; set; }
     }
 }

@@ -31,22 +31,28 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
     [AuthorizeApi]
     public class C2RelatedCustomersController : ApiController
     {
+        private IRelatedCustomersRepository _relaredCustRepository;
         private ICLRelatedCustomersRepository _clrelaredCustRepository;
         private ICorp2RelatedCustomerValidator _corp2RelatedCustomerValidator;
         private ICorp2RelatedCustomersRepository _corp2RelatedCustomers;
+        private readonly IC2AcskRepository _acskRepository;
         private readonly string corp2ExMessage = "Виникла помилка під час запросу до сервісу Corp2. Зверніться до адміністратора.";
         private readonly string corpLightExMessage = "Виникла помилка під час запросу до сервісу CorpLight. Зверніться до адміністратора.";
         private readonly IDbLogger _logger;
 
         public C2RelatedCustomersController(
-            ICLRelatedCustomersRepository relaredCustRepository,
+            IRelatedCustomersRepository relaredCustRepository,
+            ICLRelatedCustomersRepository clrelaredCustRepository,
             ICorp2RelatedCustomerValidator corp2RelatedCustomerValidator,
             ICorp2RelatedCustomersRepository corp2RelatedCustomers
-            ,IDbLogger logger)
+            , IC2AcskRepository acskRepository
+            , IDbLogger logger)
         {
-            _clrelaredCustRepository = relaredCustRepository;
+            _relaredCustRepository = relaredCustRepository;
+            _clrelaredCustRepository = clrelaredCustRepository;
             _corp2RelatedCustomerValidator = corp2RelatedCustomerValidator;
             _corp2RelatedCustomers = corp2RelatedCustomers;
+            _acskRepository = acskRepository;
             _logger = logger;
         }
 
@@ -61,17 +67,25 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
 
                 foreach (var item in data)
                 {
+                    item.IsCanSign = _relaredCustRepository.IsCanSign(custId, item.TaxCode);
                     decimal userId;
                     if (item.UserId != null && decimal.TryParse(item.UserId, out userId))
                     {
-                        try
+                        var isBlocked = _corp2RelatedCustomers.IsBlocked(userId, custId);
+                        var corp2BlockStatus = String.Empty;
+                        switch (isBlocked)
                         {
-                            item.LockoutEnabled = _corp2RelatedCustomers.Corp2Services.UserManager.IsBlocked(userId);
+                            case 0:
+                                corp2BlockStatus = "розблокований";
+                                break;
+                            case 1:
+                                corp2BlockStatus = "заблокований";
+                                break;
+                            case -1:
+                                corp2BlockStatus = "відв'язаний";
+                                break;
                         }
-                        catch (Exception ex)
-                        {
-                            throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
-                        }
+                        item.Corp2BlockStatus = corp2BlockStatus;
                     }
                 }
                 //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
@@ -154,8 +168,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             try
             {
                 //Шукаємо користувача в базі ABS Corp2
-                BarsSql sql = SqlCreator.GetByTaxCodeFrom_REL_CUSTOMERS(taxCode);
-                var users = _corp2RelatedCustomers.ExecuteStoreQuery<RelatedCustomer>(sql).ToList();
+                var users = _corp2RelatedCustomers.GetByTaxCodeFrom_REL_CUSTOMERS(taxCode).ToList();
                 //Шукаємо користувача прикріпленного до даного клієнта
                 RelatedCustomer data = users.FirstOrDefault(i => i.CustId == custId);
                 if (data != null)
@@ -163,31 +176,35 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                     return Request.CreateResponse(HttpStatusCode.BadRequest,
                         string.Format("Користувач з ІПН: {0} вже існує у клієнта id: {1}", taxCode, custId));
                 }
+                //var isCanSign = _relaredCustRepository.IsCanSign(custId, taxCode);
 
                 data = users.FirstOrDefault(i => i.CustId != custId);
                 if (data != null)
                 {
                     //data.Sdo = "Corp2";
+                    //data.IsCanSign = _relaredCustRepository.IsCanSign(custId, taxCode);
                     return Request.CreateResponse(HttpStatusCode.OK, data);
                 }
 
                 //Якщо не знаходимо, то шукаємо в ABS CorpLight
-                data = _clrelaredCustRepository.GetByTaxCode(taxCode);
+                data = _clrelaredCustRepository.GetByTaxCode(taxCode).FirstOrDefault(); ;
                 if (data != null)
                 {
                     data.Id = null;
                     data.UserId = null;
+                    //data.IsCanSign = _relaredCustRepository.IsCanSign(custId, taxCode);
                     //data.Sdo = "CorpLight";
                     return Request.CreateResponse(HttpStatusCode.OK, data);
                 }
 
                 //Якщо не знаходемо в ABS, то шукаємо в базі Корп2
                 User userCorp2 = _corp2RelatedCustomers.GetExistUser(new RelatedCustomer { TaxCode = taxCode, DocSeries = docSeries, DocNumber = docNumber });
-                
+
                 if (userCorp2 != null)
                 {
                     data = Mapper.MapUserToRelatedCustomer(userCorp2);
                     data.UserId = null;
+                    //data.IsCanSign = isCanSign;
                     //data.Sdo = "Corp2";
                     return Request.CreateResponse(HttpStatusCode.OK, data);
                 }
@@ -202,8 +219,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 catch (Exception ex)
                 {
                     var erNumber = _logger.Exception(ex);
-                    return Request.CreateResponse(HttpStatusCode.OK, 
-                        new { error = string.Format("{0}<br> Запис в sec_audit №{1} від {2}", corpLightExMessage, erNumber, DateTime.Now ) });
+                    return Request.CreateResponse(HttpStatusCode.OK,
+                        new { error = string.Format("{0}<br> Запис в sec_audit №{1} від {2}", corpLightExMessage, erNumber, DateTime.Now) });
                     //throw new Exception(corpLightExMessage + Environment.NewLine + ex.Message);
                 }
                 if (userCorpLight != null)
@@ -221,11 +238,27 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                         LockoutEnabled = userCorpLight.LockoutEnabled,
                         AcskRegistrationId = decimal.TryParse(userCorpLight.AcskRegistrationId, out acskRegId) ? new Nullable<decimal>(acskRegId) : null,
                         //AcskAuthorityKey = userCorpLight.AcskAuthorityKey,
-                        TaxCode = userCorpLight.TaxCode
+                        TaxCode = userCorpLight.TaxCode,
+                        //IsCanSign = isCanSign
                         //Sdo = "CorpLight"
                     };
                 }
+                
                 return data == null ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.OK, data);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+        }
+        [HttpGet]
+        [GET("api/cdo/corp2/isCanSign/{custId}/{taxCode}")]
+        public HttpResponseMessage IsCanSign(decimal custId, string taxCode)
+        {
+            try
+            {
+                var isCanSign = _relaredCustRepository.IsCanSign(custId, taxCode);
+                return Request.CreateResponse(HttpStatusCode.OK, isCanSign);
             }
             catch (Exception ex)
             {
@@ -245,10 +278,19 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                         HttpStatusCode.BadRequest,
                         "Користувач з вказаними параметрами вже існує");
                 }
-                _corp2RelatedCustomers.Add(relatedCustomer);
-                //_logger.Info(string.Format(
-                //    "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, Email:{3}",
-                //    relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
+                var id = _corp2RelatedCustomers.Add(relatedCustomer);
+                if (relatedCustomer.AcskRegistrationId.HasValue && relatedCustomer.AcskRegistrationId != 0)
+                {   //insert into CORP2_ACSK_REGISTRATION
+                    _acskRepository.MapCorp2RelatedCustomerToAcskUser(id, new Common.Models.Acsk.AcskSendProfileInfo
+                    {
+                        RegistrationId = (int?)relatedCustomer.AcskRegistrationId,
+                        RegistrationDate = relatedCustomer.AcskRegistrationDate,
+                        UserId = relatedCustomer.AcskUserId
+                    });
+                }
+                _logger.Info(string.Format(
+                    "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, Email:{3} та прикріплено до клієнта Id:{4}",
+                    relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email, relatedCustomer.CustId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -263,10 +305,19 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             try
             {
                 _corp2RelatedCustomers.UpdateAndMap(relatedCustomer);
+                if (relatedCustomer.AcskRegistrationId.HasValue && relatedCustomer.AcskRegistrationId != 0)
+                {   //insert into CORP2_ACSK_REGISTRATION
+                    _acskRepository.MapCorp2RelatedCustomerToAcskUser(relatedCustomer.Id.Value, new Common.Models.Acsk.AcskSendProfileInfo
+                    {
+                        RegistrationId = (int?)relatedCustomer.AcskRegistrationId,
+                        RegistrationDate = relatedCustomer.AcskRegistrationDate,
+                        UserId = relatedCustomer.AcskUserId
+                    });
+                }
 
-                //_logger.Info(string.Format(
-                //"Користувач Id:{0} TaxCode:{1}, PhoneNumber:{2}, Email:{3} оновлений та прикріплений до нового клієнта Id:{4}",
-                //relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email, relatedCustomer.CustId));
+                _logger.Info(string.Format(
+                "Користувач Id:{0} TaxCode:{1}, PhoneNumber:{2}, Email:{3} оновлений та прикріплений до нового клієнта Id:{4}",
+                relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email, relatedCustomer.CustId));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -282,9 +333,9 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             try
             {
                 _corp2RelatedCustomers.UpdateRelatedCustomer(relatedCustomer);
-                //_logger.Info(string.Format(
-                //"Відредаговано дані користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, Email:{3}",
-                //relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
+                _logger.Info(string.Format(
+                "Відредаговано дані користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, Email:{3}",
+                relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -296,107 +347,107 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
         #endregion
 
         #region Customer Account Visa Setting
-        [HttpPost]
-        [POST("api/cdo/corp2/savecustomeraccount/")]
-        public HttpResponseMessage UpdateCustomerAccount(Corp2CustomerAccount acc)
-        {
-            try
-            {
-                _corp2RelatedCustomers.UpdateCustomerAccount(acc);
-                //_logger.Info(string.Format(
-                //    "Рахунок оновлено - BANK_ACC: {0}, KF: {1}",
-                //    acc.BANK_ACC, acc.KF));
+        //[HttpPost]
+        //[POST("api/cdo/corp2/savecustomeraccount/")]
+        //public HttpResponseMessage UpdateCustomerAccount(Corp2CustomerAccount acc)
+        //{
+        //    try
+        //    {
+        //        _corp2RelatedCustomers.UpdateCustomerAccount(acc);
+        //        //_logger.Info(string.Format(
+        //        //    "Рахунок оновлено - BANK_ACC: {0}, KF: {1}",
+        //        //    acc.BANK_ACC, acc.KF));
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+        //        return Request.CreateResponse(HttpStatusCode.OK);
 
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
-        [HttpGet]
-        [GET("api/cdo/corp2/getaccvisacounts")]
-        public HttpResponseMessage GetCustomerAccountVisaCounts(/*[ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, */decimal? accId)
-        {
-            try
-            {
-                BarsSql sql = SqlCreator.SelectCustomerAccountVisaCounts((int)accId.Value);
-                var data = _corp2RelatedCustomers.ExecuteStoreQuery<CustAccVisaCount>(sql).ToList();
-                //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
-                if (null == data)
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                }
-                return Request.CreateResponse(HttpStatusCode.OK, new { Data = data });
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
-        [HttpPost]
-        [POST("api/cdo/corp2/addvisa/")]
-        public HttpResponseMessage AddAccountVisa(CustAccVisaCount visa)
-        {
-            try
-            {
-                if (_corp2RelatedCustomerValidator.IsExistAccountVisa(visa))
-                {
-                    return Request.CreateResponse(
-                        HttpStatusCode.BadRequest,
-                        "Рахунок з вказаними рівнем візи вже існує");
-                }
-                _corp2RelatedCustomers.AddAccountVisa(visa);
-                //_logger.Info(string.Format(
-                //    "Створено новий рівень візи для рахунка: {0}, рівень візи - {1}, кількість віз рівня - {2}",
-                //    visa.ACC_ID, visa.VISA_ID, visa.COUNT));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
+        //[HttpGet]
+        //[GET("api/cdo/corp2/getaccvisacounts")]
+        //public HttpResponseMessage GetCustomerAccountVisaCounts(/*[ModelBinder(typeof(WebApiDataSourceRequestModelBinder))] DataSourceRequest request, */decimal? accId)
+        //{
+        //    try
+        //    {
+        //        BarsSql sql = SqlCreator.SelectCustomerAccountVisaCounts((int)accId.Value);
+        //        var data = _corp2RelatedCustomers.ExecuteStoreQuery<CustAccVisaCount>(sql).ToList();
+        //        //decimal dataCount = _corp2RelatedCustomers.CountGlobal(request, sql);
+        //        if (null == data)
+        //        {
+        //            return Request.CreateResponse(HttpStatusCode.OK);
+        //        }
+        //        return Request.CreateResponse(HttpStatusCode.OK, new { Data = data });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
+        //[HttpPost]
+        //[POST("api/cdo/corp2/addvisa/")]
+        //public HttpResponseMessage AddAccountVisa(CustAccVisaCount visa)
+        //{
+        //    try
+        //    {
+        //        if (_corp2RelatedCustomerValidator.IsExistAccountVisa(visa))
+        //        {
+        //            return Request.CreateResponse(
+        //                HttpStatusCode.BadRequest,
+        //                "Рахунок з вказаними рівнем візи вже існує");
+        //        }
+        //        _corp2RelatedCustomers.AddAccountVisa(visa);
+        //        //_logger.Info(string.Format(
+        //        //    "Створено новий рівень візи для рахунка: {0}, рівень візи - {1}, кількість віз рівня - {2}",
+        //        //    visa.ACC_ID, visa.VISA_ID, visa.COUNT));
 
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
-        [HttpPost]
-        [POST("api/cdo/corp2/editvisa/")]
-        public HttpResponseMessage EditAccountVisa(CustAccVisaCount visa)
-        {
-            try
-            {
-                _corp2RelatedCustomers.EditAccountVisa(visa);
-                //_logger.Info(string.Format(
-                //    "Відредаговано рівень візи для рахунка: {0}, рівень візи - {1}, кількість віз рівня - {2}",
-                //    visa.ACC_ID, visa.VISA_ID, visa.COUNT));
+        //        return Request.CreateResponse(HttpStatusCode.OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
+        //[HttpPost]
+        //[POST("api/cdo/corp2/editvisa/")]
+        //public HttpResponseMessage EditAccountVisa(CustAccVisaCount visa)
+        //{
+        //    try
+        //    {
+        //        _corp2RelatedCustomers.EditAccountVisa(visa);
+        //        //_logger.Info(string.Format(
+        //        //    "Відредаговано рівень візи для рахунка: {0}, рівень візи - {1}, кількість віз рівня - {2}",
+        //        //    visa.ACC_ID, visa.VISA_ID, visa.COUNT));
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+        //        return Request.CreateResponse(HttpStatusCode.OK);
 
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
 
-        [HttpPost]
-        [POST("api/cdo/corp2/deletevisa/")]
-        public HttpResponseMessage DeleteAccountVisa(CustAccVisaCount visa)
-        {
-            try
-            {
-                _corp2RelatedCustomers.DeleteAccountVisa(visa);
-                //_logger.Info(string.Format(
-                //    "Видалено рівень візи для рахунка: {0}, рівень візи - {1}, кількість віз рівня - {2}",
-                //    visa.ACC_ID, visa.VISA_ID, visa.COUNT));
+        //[HttpPost]
+        //[POST("api/cdo/corp2/deletevisa/")]
+        //public HttpResponseMessage DeleteAccountVisa(CustAccVisaCount visa)
+        //{
+        //    try
+        //    {
+        //        _corp2RelatedCustomers.DeleteAccountVisa(visa);
+        //        //_logger.Info(string.Format(
+        //        //    "Видалено рівень візи для рахунка: {0}, рівень візи - {1}, кількість віз рівня - {2}",
+        //        //    visa.ACC_ID, visa.VISA_ID, visa.COUNT));
 
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
+        //        return Request.CreateResponse(HttpStatusCode.OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
         #endregion
 
         #region Corp2 User Connection Params Setting
@@ -446,36 +497,36 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
-        [HttpGet]
-        [GET("api/cdo/corp2/getuserfuncs/{userId}")]
-        public HttpResponseMessage GetUserFuncs(decimal? userId)
-        {
-            BarsSql sql = SqlCreator.SelectUserFuncs(userId);
-            try
-            {
-                var data = _corp2RelatedCustomers.ExecuteStoreQuery<FunctionViewModel>(sql).ToList();
-                return Request.CreateResponse(HttpStatusCode.OK, data);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
-        [HttpGet]
-        [GET("api/cdo/corp2/getavailablefuncs/{userId}")]
-        public HttpResponseMessage GetAvailableFuncs(decimal? userId)
-        {
-            BarsSql sql = SqlCreator.SelectAvailableFuncs(userId);
-            try
-            {
-                var data = _corp2RelatedCustomers.ExecuteStoreQuery<FunctionViewModel>(sql).ToList();
-                return Request.CreateResponse(HttpStatusCode.OK, data);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
+        //[HttpGet]
+        //[GET("api/cdo/corp2/getuserfuncs/{userId}")]
+        //public HttpResponseMessage GetUserFuncs(decimal? userId)
+        //{
+        //    BarsSql sql = SqlCreator.SelectUserFuncs(userId);
+        //    try
+        //    {
+        //        var data = _corp2RelatedCustomers.ExecuteStoreQuery<FunctionViewModel>(sql).ToList();
+        //        return Request.CreateResponse(HttpStatusCode.OK, data);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
+        //[HttpGet]
+        //[GET("api/cdo/corp2/getavailablefuncs/{userId}")]
+        //public HttpResponseMessage GetAvailableFuncs(decimal? userId)
+        //{
+        //    BarsSql sql = SqlCreator.SelectAvailableFuncs(userId);
+        //    try
+        //    {
+        //        var data = _corp2RelatedCustomers.ExecuteStoreQuery<FunctionViewModel>(sql).ToList();
+        //        return Request.CreateResponse(HttpStatusCode.OK, data);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
         [HttpGet]
         [GET("api/cdo/corp2/getuserlimit/{userId}")]
         public HttpResponseMessage GetUserLimit(int userId)
@@ -484,7 +535,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             try
             {
                 var data = _corp2RelatedCustomers.ExecuteStoreQuery<LimitViewModel>(sql).ToList().FirstOrDefault();
-                if(data == null)
+                if (data == null)
                 {
                     data = new LimitViewModel() { USER_ID = userId, LIMIT_ID = "UNLIMITED" };
                 }
@@ -496,14 +547,15 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                 {
                     var limitDictionary = ReadLimitDictionary();
                     var limit = limitDictionary["UNLIMITED"];
-                    if(limit != null)
-                    {
-                        data.DOC_SUM = data.DOC_SUM ?? limit.DOC_SUM;
-                        data.DOC_SENT_COUNT = data.DOC_SENT_COUNT ?? limit.DOC_SENT_COUNT;
-                        data.DOC_CREATED_COUNT = data.DOC_CREATED_COUNT ?? limit.DOC_CREATED_COUNT;
-                    }
+                    data.DOC_SUM = data.DOC_SUM ?? limit.DOC_SUM;
+                    data.DOC_SENT_COUNT = data.DOC_SENT_COUNT ?? limit.DOC_SENT_COUNT;
+                    data.DOC_CREATED_COUNT = data.DOC_CREATED_COUNT ?? limit.DOC_CREATED_COUNT;
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, data);
+            }
+            catch (KeyNotFoundException)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "В таблиці CORP2_LIMITS відсутній запис із LIMIT_ID = 'UNLIMITED'");
             }
             catch (Exception ex)
             {
@@ -518,6 +570,10 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             foreach (var item in data)
             {
                 limitDictionary.Add(item.LIMIT_ID, item);
+            }
+            if (limitDictionary.Count == 0)
+            {
+                throw new Exception("Таблиця CORP2_LIMITS не заповнена даними.");
             }
             return limitDictionary;
         }
@@ -600,8 +656,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                         });
                 }
 
-                //_logger.Info(string.Format(
-                //    "Бек офісом підтверджено картку клієнта Id:{0}, RNK:{1}", id, custId));
+                _logger.Info(string.Format(
+                    "Бек офісом підтверджено картку нового користувача Id:{0}, RNK:{1}", id, custId));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -619,8 +675,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             {
                 _corp2RelatedCustomers.SetRelatedCustomerApproved(relCustId, customerId, false, "rejected");
 
-                //_logger.Info(string.Format(
-                //    "Відхилено запит на підтвердження змін по користувачу Id:{0}", relCustId));
+                _logger.Info(string.Format(
+                    "Відхилено запит на підтвердження змін по користувачу Id:{0}", relCustId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

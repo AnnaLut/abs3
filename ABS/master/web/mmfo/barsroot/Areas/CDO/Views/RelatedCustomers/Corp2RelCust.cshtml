@@ -4,12 +4,12 @@
     <div class="panel panel-default" style="border: none;">
         <div class="panel-body">
             <div class="row">
-                <div class="col col-md-2 col-sm-2 col-xs-3"><span style="font-weight:bolder; line-height:36px; vertical-align:middle;">АЦСК Клієнта:</span></div>
-                <div class="col col-md-6 col-sm-5 col-xs-5">
-                    <button class="btn btn-default"><i class="fa fa-paper-plane fa-lg"></i></button>
-                    <button class="btn btn-default"><i class="fa fa-paw fa-lg"></i></button>
-                    <button class="btn btn-default"><i class="fa fa-refresh fa-lg"></i></button>
-                </div>
+                @*<div class="col col-md-2 col-sm-2 col-xs-3"><span style="font-weight:bolder; line-height:36px; vertical-align:middle;">АЦСК Клієнта:</span></div>
+                    <div class="col col-md-6 col-sm-5 col-xs-5">
+                        <button class="btn btn-default"><i class="fa fa-paper-plane fa-lg"></i></button>
+                        <button class="btn btn-default"><i class="fa fa-paw fa-lg"></i></button>
+                        <button class="btn btn-default"><i class="fa fa-refresh fa-lg"></i></button>
+                    </div>*@
                 <div class="col col-md-1 col-sm-1">
                     <button type="button" class="btn btn-default" ng-click="relCustCtrl.showUserForm()" title="Створити"><span class='fa fa-plus fa-lg text-success' style="margin-right:10px;"></span>Новий користувач</button>
                 </div>
@@ -48,6 +48,7 @@
     @Html.Partial("PrintCertificateTemplate")
 
     @Html.Partial("Corp2ConnectionParamsWindow")
+    @*@Html.Partial("Corp2ConnectionParamsWindow_back")*@
 
     @Html.Partial("Corp2CustomerAccountVisaSettingWindow")
 

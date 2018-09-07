@@ -5,7 +5,7 @@
 <script src="@Url.Content("~/Areas/CDO/Common/directives/ngModelOnblur.js")?_0.2.20"></script>
 <script src="@Url.Content("~/Areas/CDO/Common/directives/numericOnly.js")?_0.2.21"></script>
 
-<script src="@Url.Content("~/Areas/CDO/Common/services/commonCustomresService.js")?_0.2.20"></script>
+<script src="@Url.Content("~/Areas/CDO/Common/services/commonCustomresService.js")?_0.2.23"></script>
 
 <script src="@Url.Content("~/Areas/CDO/CorpLight/services/relatedCustomersSercvice.js")?_0.2.20"></script>
 <script src="@Url.Content("~/Areas/CDO/CorpLight/services/ProfileSignService.js")?_0.2.20"></script>
@@ -13,27 +13,27 @@
 
 <script src="@Url.Content("~/Areas/CDO/Corp2/services/AcskService.js")?_0.2.20"></script>
 <script src="@Url.Content("~/Areas/CDO/Corp2/services/ProfileSignService.js")?_0.2.20"></script>
-<script src="@Url.Content("~/Areas/CDO/Corp2/services/relatedCustomersService.js")?_0.2.20"></script>
+<script src="@Url.Content("~/Areas/CDO/Corp2/services/relatedCustomersService.js")?_0.2.22"></script>
 
 
-<script src="@Url.Content("~/Areas/CDO/Common/Controllers/CommonCustomers.js")?_0.2.20"></script>
-<script src="@Url.Content("~/Areas/CDO/Common/Controllers/CommonRelCustController.js")?_0.2.21"></script>
+<script src="@Url.Content("~/Areas/CDO/Common/Controllers/CommonCustomers.js")?_180709"></script>
+<script src="@Url.Content("~/Areas/CDO/Common/Controllers/CommonRelCustController.js")?_180709"></script>
 
-<script src="@Url.Content("~/Areas/CDO/CorpLight/Controllers/RelatedCustomers.js")?_0.2.21"></script>
-<script src="@Url.Content("~/Areas/CDO/Corp2/Controllers/RelatedCustomers.js")?_0.2.20"></script>
+<script src="@Url.Content("~/Areas/CDO/CorpLight/Controllers/RelatedCustomers.js")?_180709"></script>
+<script src="@Url.Content("~/Areas/CDO/Corp2/Controllers/RelatedCustomers.js")?_180717"></script>
 
 @*TODO related customers services *@
 
 
 @*<script src="@Url.Content("~/Areas/CorpLight/services/relatedCustomersService.js")?_0.2.20"></script>
-<script src="@Url.Content("~/Areas/CorpLight/services/AcskService.js")?_0.2.20"></script>
-<script src="@Url.Content("~/Areas/CorpLight/services/ProfileSignService.js")?_0.2.20"></script>
-<script src="@Url.Content("~/Areas/CorpLight/controllers/RelatedCustomers.js")?_0.2.20"></script>*@
+    <script src="@Url.Content("~/Areas/CorpLight/services/AcskService.js")?_0.2.20"></script>
+    <script src="@Url.Content("~/Areas/CorpLight/services/ProfileSignService.js")?_0.2.20"></script>
+    <script src="@Url.Content("~/Areas/CorpLight/controllers/RelatedCustomers.js")?_0.2.20"></script>*@
 
 
 @{
     var isConfirmMode = ViewBag.Clmode != "base";
-
+    var addCorp2Tube = ViewBag.AddCorp2Tube;
 }
 
 
@@ -57,14 +57,21 @@
                 <div id="myTabStrip" kendo-tab-strip k-options="commonCustCtrl.tabstripOptions">
                     <ul>
                         <li class="k-state-active">Corplight</li>
-                        @*<li>Corp2</li>*@
+                        @if (ViewBag.AddCorp2Tube)
+                        {
+                            <li id="li_corp2" style="display:none">Corp2</li>
+                        }
+
                     </ul>
                     <div class="tabLayout">
                         @Html.Partial("CLRelCust")
                     </div>
-                    @*<div class="tabLayout">
-                        @Html.Partial("Corp2RelCust")
-                    </div>*@
+                    @if (ViewBag.AddCorp2Tube)
+                    {
+                        <div id="div_corp2" style="display:none" class="tabLayout">
+                            @Html.Partial("Corp2RelCust")
+                        </div>
+                    }
                 </div>
             </div>
         </div>

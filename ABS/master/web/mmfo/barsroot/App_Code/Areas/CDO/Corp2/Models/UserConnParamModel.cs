@@ -15,7 +15,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Models
         public RelatedCustomer User { get; set; }
         public LimitViewModel UserLimit { get; set; }
         public List<ModuleViewModel> UserModules { get; set; }
-        public List<FunctionViewModel> UserFuncs { get; set; }
+        //public List<FunctionViewModel> UserFuncs { get; set; }
         public List<UserAccountPermissionViewModel> UserAccs { get; set; }
     }
 }

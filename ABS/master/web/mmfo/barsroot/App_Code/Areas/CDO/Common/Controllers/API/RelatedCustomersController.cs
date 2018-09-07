@@ -180,5 +180,19 @@ namespace BarsWeb.Areas.CDO.Common.Controllers.Api
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
             }
         }
+        [HttpGet]
+        [GET("api/cdo/common/customers/getTypeOfCustomer/{customerId}")]
+        public HttpResponseMessage GetTypeOfCustomer(decimal customerId)
+        {
+            try
+            {
+                var res = _relaredCustRepository.GetTypeOfCustomer(customerId);
+                return Request.CreateResponse(HttpStatusCode.OK, res);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+        }
     }
 }

@@ -132,6 +132,7 @@ angular.module(globalSettings.modulesAreas)
             }
 
             vm.validateTaxCode = function () {
+                initIsCanSign(false);
                 var taxCode = vm.currentUser.TaxCode;
 
                 if (!/^\d{8,10}$/.test(taxCode)) return;
@@ -139,6 +140,7 @@ angular.module(globalSettings.modulesAreas)
                 var userForm = $('#userCartNew');
                 bars.ui.loader(userForm, true);
                 var custId = document.getElementById('custId').value;
+
                 relatedCustomersService.getByTaxCode(custId, taxCode, vm.currentUser.DocSeries, vm.currentUser.DocNumber).then(
                     function (response) {
                         bars.ui.loader(userForm, false);
@@ -154,7 +156,9 @@ angular.module(globalSettings.modulesAreas)
                                 bars.ui.confirm({
                                     text: 'Користувач з ІПН ' + taxCode + ' вже існує. Бажаєте відкрити його дані?',
                                     func: function () {
+                                        var isCS = vm.currentUser.IsCanSign; //!ISCANSIGN! Бо перетирається наступною строкою, а код ...vm.currentUser.IsCanSign = res == 'true' ? true : false;... вже відпрацював
                                         vm.currentUser = response;
+                                        vm.currentUser.IsCanSign = isCS;
                                         vm.currentUser.SignNumber = 0;
                                         //Якщо знайшли не в АБС Корп2, то Id буде дорівнювати null -> vm.saveUser -> relatedCustomersService.create,
                                         //де корисувач також буде прив'язаний до клієнта.
@@ -167,17 +171,30 @@ angular.module(globalSettings.modulesAreas)
                             }
                         }
                     },
-                    function (response) {
+                    function (err) {
                         bars.ui.loader(userForm, false);
                         vm.currentUser.TaxCode = null;
+                        taxCode = null;
                     }
-                );
+                ).then(function () {
+                    if (taxCode) {
+                        bars.ui.loader(userForm, true);
+                        return relatedCustomersService.isCanSign(custId, taxCode); //!ISCANSIGN! Запит призначений лише для відображення на формі (initIsCanSign), буде повторний при збереженні
+                    }
+                    }).then(function (res) {
+                        bars.ui.loader(userForm, false);
+                        vm.currentUser.IsCanSign = res == 'true' ? true : false; //!ISCANSIGN! Перетирається в ...func: function () { vm.currentUser = response;... - зробимо повторний запит при збереженні.
+                        initIsCanSign(vm.currentUser.IsCanSign);
+                    }, function (err) {
+                        bars.ui.loader(userForm, false);
+                        }
+                    );
             }
 
             vm.currentUser = new RelatedCustomer();
 
             var dateNow = new Date();
-            vm.minBirthDate = new Date(dateNow.getFullYear() - 18, dateNow.getMonth(), dateNow.getDate());
+            vm.minBirthDate = new Date(dateNow.getFullYear() - 16, dateNow.getMonth(), dateNow.getDate());
 
             var validate = function () {
                 if (!/^\d{8,10}$/.test(vm.currentUser.TaxCode)) {
@@ -258,45 +275,58 @@ angular.module(globalSettings.modulesAreas)
 
                     var userForm = $('#userCartNew');
                     bars.ui.loader(userForm, true);
-                    if (!vm.currentUser.Id) {
-                        relatedCustomersService.create(vm.currentUser).then(
-                            function (response) {
-                                bars.ui.loader(userForm, false);
-                                bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                                vm.relCustsGridCorp2.dataSource.read();
-                                vm.userDetailWindow.close();
-                            },
-                            function (response) {
-                                bars.ui.loader(userForm, false);
+                    var custId = document.getElementById('custId').value;
+                    //!ISCANSIGN!
+                    //Знову запит на isCanSign, бо попередній (при validateTaxCode) перетирається або може не встигнути виконатися.
+                    //Планується видалити з форми відображення isCanSign(видалення з validateTaxCode) та виконувати запит тільки тут з відображенням відповідного повідомлення по результату.
+                    relatedCustomersService.isCanSign(custId, vm.currentUser.TaxCode).then(
+                        function (res) {
+                            vm.currentUser.IsCanSign = res == 'true' ? true : false;
+                            //initIsCanSign(vm.currentUser.IsCanSign);
+                            if (!vm.currentUser.Id) {
+                                relatedCustomersService.create(vm.currentUser).then(
+                                    function (response) {
+                                        bars.ui.loader(userForm, false);
+                                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                                        vm.relCustsGridCorp2.dataSource.read();
+                                        vm.userDetailWindow.close();
+                                    },
+                                    function (response) {
+                                        bars.ui.loader(userForm, false);
+                                    }
+                                );
                             }
-                        );
-                    }
-                    else if (vm.currentUser.isNotMaped) {
-                        relatedCustomersService.updateAndMap(vm.currentUser).then(
-                            function (response) {
-                                bars.ui.loader(userForm, false);
-                                bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                                vm.relCustsGridCorp2.dataSource.read();
-                                vm.userDetailWindow.close();
-                            },
-                            function (response) {
-                                bars.ui.loader(userForm, false);
+                            else if (vm.currentUser.isNotMaped) {
+                                relatedCustomersService.updateAndMap(vm.currentUser).then(
+                                    function (response) {
+                                        bars.ui.loader(userForm, false);
+                                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                                        vm.relCustsGridCorp2.dataSource.read();
+                                        vm.userDetailWindow.close();
+                                    },
+                                    function (response) {
+                                        bars.ui.loader(userForm, false);
+                                    }
+                                );
                             }
-                        );
-                    }
-                    else {
-                        relatedCustomersService.update(vm.currentUser).then(
-                            function (response) {
-                                bars.ui.loader(userForm, false);
-                                bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                                vm.relCustsGridCorp2.dataSource.read();
-                                vm.userDetailWindow.close();
-                            },
-                            function (response) {
-                                bars.ui.loader(userForm, false);
+                            else {
+                                relatedCustomersService.update(vm.currentUser).then(
+                                    function (response) {
+                                        bars.ui.loader(userForm, false);
+                                        bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                                        vm.relCustsGridCorp2.dataSource.read();
+                                        vm.userDetailWindow.close();
+                                    },
+                                    function (response) {
+                                        bars.ui.loader(userForm, false);
+                                    }
+                                );
                             }
-                        );
-                    }
+                        },
+                        function (err) {
+                            bars.ui.loader(userForm, false);
+                        });
+                    
                 }
             }
 
@@ -386,7 +416,7 @@ angular.module(globalSettings.modulesAreas)
 
             vm.sendProfileToAcsk = $scope.sendProfileToAcsk = function (relCustId, custId) {
                 bars.ui.loader('body', true);
-
+                debugger;
                 acskService.sendProfileToAcsk(relCustId, custId).then(
                     function (response) {
                         bars.ui.loader('body', false);
@@ -845,8 +875,10 @@ angular.module(globalSettings.modulesAreas)
                         width: '60px',
                         template: function (data) {
                             var html = '';
-                            html += "<button class='btn btn-default' ng-click=\"showEditUserForm("
-                                + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
+                            if (/*data.IsCanSign ||*/ !data.UserId) {
+                                html += "<button class='btn btn-default' ng-click=\"showEditUserForm("
+                                    + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
+                            }
                             return html;
                         },
                         attributes: { "class": "cell-horiz-align-center" }
@@ -856,8 +888,8 @@ angular.module(globalSettings.modulesAreas)
                         template: function (data) {
                             var html = '';
                             if (data.UserId && data.IsApproved) {
-                                html += '<label style="width:15px; " class="text-' + (data.LockoutEnabled ? 'danger' : 'success') + '">\
-                                                <i >' + (data.LockoutEnabled ? 'за' : 'роз') + 'блокований' + '</i>\
+                                html += '<label style="width:15px; " class="text-' + (data.Corp2BlockStatus == 'розблокований' ? 'success' : 'danger') + '">\
+                                                <i >' + data.Corp2BlockStatus + '</i>\
                                             </label>';
                             }
                             return html;
@@ -892,22 +924,26 @@ angular.module(globalSettings.modulesAreas)
                         width: '150px',
                         template: function (data) {
                             var html = '';
+                            var showBtn = '';
+                            //if (/*data.IsCanSign || */!data.UserId) {
+                            showBtn = 'ng-click="open_userConnectionParamsWindow(' + data.Id + ',' + (data.UserId && data.SignNumber) +')';
+                            //}
                             switch (data.ApprovedType) {
                                 case 'add':
-                                    html += '<a href="#" class="label label-primary" style="display: inline-block; font-size: larger;" ng-click="open_userConnectionParamsWindow(' + data.Id + ')">новий</a>';
+                                    html += '<a href="#" class="label label-primary" style="display: inline-block; font-size: larger;" ' + showBtn + '">новий</a>';
                                     break;
                                 case 'update':
-                                    html += '<a href="#" class="label label-warning" style="display: inline-block; font-size: larger;" ng-click="open_userConnectionParamsWindow(' + data.Id + ')">оновлено</a>';
+                                    html += '<a href="#" class="label label-warning" style="display: inline-block; font-size: larger;" ' + showBtn + '">оновлено</a>';
                                     break;
                                 case 'delete':
                                     html += '<h3><span class="label label-danger">видалено</span></h3>';
                                     break;
                                 case 'rejected':
-                                    html += '<a href="#" class="label label-default" style="display: inline-block; font-size: larger;" ng-click="open_userConnectionParamsWindow(' + data.Id + ')">відхилено</a>';
+                                    html += '<a href="#" class="label label-default" style="display: inline-block; font-size: larger;" ' + showBtn + '">відхилено</a>';
                                     break;
                                 default:
                                     if (data.IsApproved) {
-                                        html += '<a href="#" class="label label-success" style="display: inline-block; font-size: larger;" ng-click="open_userConnectionParamsWindow(' + data.Id + ')">підтверджено</a>';
+                                        html += '<a href="#" class="label label-success" style="display: inline-block; font-size: larger;" ' + showBtn + '">підтверджено</a>';
                                     }
                             }
                             return html;
@@ -966,20 +1002,27 @@ angular.module(globalSettings.modulesAreas)
 
             $scope.showUserForm = vm.showUserForm = function () {
                 vm.currentUser = new RelatedCustomer();
-                if (!vm.reatedCustomers) {
+                //if (!vm.reatedCustomers) {
                     vm.reatedCustomers = [];
                     getCustomerRelatedCustomers(vm.currentUser.CustId);
-                }
+                //}
+                initIsCanSign(vm.currentUser.IsCanSign);
                 vm.userDetailWindow.center().open();
+            }
+            function initIsCanSign(isCanSign) {
+                var classNames = isCanSign ? "fa fa-check text-success" : "fa fa-times text-danger";
+                $("#IsCanSign").removeClass().addClass(classNames);
             }
             $scope.showEditUserForm = vm.showEditUserForm = function (userId) {
                 vm.currentUser = vm.relCustsGridCorp2.dataSource.get(userId);
+                initIsCanSign(vm.currentUser.IsCanSign);
                 vm.currentUser.isReadOnly = false;
                 vm.userDetailWindow.center().open();
             };
             $scope.viewUser = vm.viewUser = function (userId) {
                 vm.SignNumber = null;
                 vm.currentUser = vm.relCustsGridCorp2.dataSource.get(userId);
+                initIsCanSign(vm.currentUser.IsCanSign);
                 vm.custBirthDate.enable(false);
                 vm.custDocDate.enable(false);
                 vm.currentUser.isReadOnly = true;
@@ -1118,7 +1161,7 @@ angular.module(globalSettings.modulesAreas)
                     }, {
                         field: 'EXECUTOR_NAME',
                         title: 'ПІБ<br>виконавця'
-                        //width: '3px'
+                        ,width: '200px'
                     }, {
                         field: 'BRANCH',
                         title: 'Код<br>відділення',
@@ -1127,20 +1170,21 @@ angular.module(globalSettings.modulesAreas)
                         field: 'BRANCH_NAME',
                         title: 'Назва<br>відділення',
                         width: '170px'
-                    }, {
-                        title: 'Налаштування<br>віз по<br>рахунку',
-                        width: '70px',
-                        filterable: false,
-                        sortable: false,
-                        template: function (data) {
-                            var html = '';
-                            if (data.IS_CORP2_ACC) {
-                                html += "<button class='btn btn-default' ng-click='openCustAccVisaSettingWindow(" + data.NUM_ACC + ", " + data.BANK_ACC + ", " + data.CORP2_ACC + ", " + data.KF + ", " + data.VISA_COUNT + ")' title='Перегляд/редагування'><i class='fa fa-pencil fa-lg' style='color:green;'></i></button>";
-                            }
-                            return html;
-                        },
-                        attributes: { "class": "cell-horiz-align-center" }
                     }
+                    //, {
+                    //    title: 'Налаштування<br>віз по<br>рахунку',
+                    //    width: '70px',
+                    //    filterable: false,
+                    //    sortable: false,
+                    //    template: function (data) {
+                    //        var html = '';
+                    //        if (data.IS_CORP2_ACC) {
+                    //            html += "<button class='btn btn-default' ng-click='openCustAccVisaSettingWindow(" + data.NUM_ACC + ", " + data.BANK_ACC + ", " + data.CORP2_ACC + ", " + data.KF + ", " + data.VISA_COUNT + ")' title='Перегляд/редагування'><i class='fa fa-pencil fa-lg' style='color:green;'></i></button>";
+                    //        }
+                    //        return html;
+                    //    },
+                    //    attributes: { "class": "cell-horiz-align-center" }
+                    //}
                 ]
             });
 
@@ -1172,203 +1216,203 @@ angular.module(globalSettings.modulesAreas)
             };
 
             ////////////Corp2 Customer Account Visa Setting///////////////
-            vm.custAccVisaSettingWindowOptions = {
-                width: '600px',
-                height: '500px',
-                title: 'Налаштування віз по рахунку',
-                modal: true,
-                actions: ["Maximize", "Close"],
-                close: function () {
-                    vm.currentCustomerAccount = null;
-                }
-            }
-            $scope.openCustAccVisaSettingWindow = function openCustAccVisaSettingWindow(numAcc, bankAccId, corp2AccId, kf, visaQty) {
-                vm.currentCustomerAccount = {};
-                vm.currentCustomerAccount.NUM_ACC = numAcc;
-                vm.currentCustomerAccount.BANK_ACC = bankAccId;
-                vm.currentCustomerAccount.CORP2_ACC = corp2AccId;
-                vm.currentCustomerAccount.KF = kf;
-                vm.currentCustomerAccount.VISA_COUNT = visaQty || 1;
-                vm.custAccVisaSettingGrid.dataSource.read();
-                vm.custAccVisaSettingWindow.center().open();
-            }
-            var custAccVisaSettingWindowDataSource = createDataSource({
-                type: "webapi",
-                transport: {
-                    read: {
-                        url: bars.config.urlContent('api/cdo/corp2/getaccvisacounts'),
-                        cache: false,
-                        data: function () { return { accId: vm.currentCustomerAccount.BANK_ACC }; }
-                    }
-                },
-                schema: {
-                    model: {
-                        id: 'Id',
-                        fields: {
-                            //ACC_ID: { type: "number" },
-                            VISA_ID: { type: "number" },
-                            COUNT: { type: "number" }
-                        }
-                    }
-                }
-            });
+            //vm.custAccVisaSettingWindowOptions = {
+            //    width: '600px',
+            //    height: '500px',
+            //    title: 'Налаштування віз по рахунку',
+            //    modal: true,
+            //    actions: ["Maximize", "Close"],
+            //    close: function () {
+            //        vm.currentCustomerAccount = null;
+            //    }
+            //}
+            //$scope.openCustAccVisaSettingWindow = function openCustAccVisaSettingWindow(numAcc, bankAccId, corp2AccId, kf, visaQty) {
+            //    vm.currentCustomerAccount = {};
+            //    vm.currentCustomerAccount.NUM_ACC = numAcc;
+            //    vm.currentCustomerAccount.BANK_ACC = bankAccId;
+            //    vm.currentCustomerAccount.CORP2_ACC = corp2AccId;
+            //    vm.currentCustomerAccount.KF = kf;
+            //    vm.currentCustomerAccount.VISA_COUNT = visaQty || 1;
+            //    vm.custAccVisaSettingGrid.dataSource.read();
+            //    vm.custAccVisaSettingWindow.center().open();
+            //}
+            //var custAccVisaSettingWindowDataSource = createDataSource({
+            //    type: "webapi",
+            //    transport: {
+            //        read: {
+            //            url: bars.config.urlContent('api/cdo/corp2/getaccvisacounts'),
+            //            cache: false,
+            //            data: function () { return { accId: vm.currentCustomerAccount.BANK_ACC }; }
+            //        }
+            //    },
+            //    schema: {
+            //        model: {
+            //            id: 'Id',
+            //            fields: {
+            //                //ACC_ID: { type: "number" },
+            //                VISA_ID: { type: "number" },
+            //                COUNT: { type: "number" }
+            //            }
+            //        }
+            //    }
+            //});
 
-            vm.custAccVisaSettingGridOptions = createGridOptions({
-                dataSource: custAccVisaSettingWindowDataSource,
-                toolbar: [
-                    {
-                        name: "btAddVisa",
-                        text: "Додати",
-                        template: "<button class='btn btn-default' ng-click=\"openAddEditVisaWindow();\" title='Додати'><i class='fa fa-plus fa-lg text-success' style='margin-right:10px;'></i>Додати</button>"
-                    }
-                ],
-                autoBind: false,
-                filterable: false,
-                sortable: false,
-                dataBound: function (e) {
-                    $.each(e.sender._data, function (i, el) { el.CORP2_ACC_ID = vm.currentCustomerAccount.CORP2_ACC; });
-                    bars.ext.kendo.grid.noDataRow(e);
-                },
-                columns: [
-                    {
-                        field: 'Edit',
-                        title: 'Налаштування',
-                        width: '65px',
-                        template: function (data) {
-                            var html = '';
-                            html += "<button class='btn btn-default' ng-click=\"openAddEditVisaWindow("
-                                + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
-                            html += "<button class='btn btn-default' style='margin-left: 5px;' ng-click=\"deleteVisa("
-                                + data.Id + ");\" title='Видалити'><i class='fa fa-trash-o fa-lg text-danger'></i></button>";
-                            return html;
-                        },
-                        attributes: { "class": "cell-horiz-align-center" }
-                    //}, {
-                    //    field: 'ACC_ID',
-                    //    title: 'Номер рахунку',
-                    //    width: '80px'
-                    }, {
-                        field: 'VISA_ID',
-                        title: 'Рівень візи',
-                        width: '70px',
-                        attributes: { "class": "cell-horiz-align-center" }
-                    }, {
-                        field: 'COUNT',
-                        title: 'Кількість віз рівня',
-                        width: '90px',
-                        attributes: { "class": "cell-horiz-align-center" }
-                    }
-                ]
-            });
-            $scope.saveVisaQuantity = vm.saveVisaQuantity = function () {
-                if (!vm.currentCustomerAccount.VISA_COUNT) { //від 1 до 99
-                    bars.ui.error({ text: 'Вкажіть кількість віз' });
-                    return;
-                }
-                var form = $('#custAccVisaSettingForm');
-                bars.ui.loader(form, true);
-                relatedCustomersService.saveAccountVisaQuantity(vm.currentCustomerAccount)
-                    .then(function (response) {
-                        bars.ui.loader(form, false);
-                        bars.ui.notify('Успішно',
-                            'Налаштування віз по рахунку збережено успішно',
-                            'success');
-                        vm.custAccGrid.dataSource.read();
-                        vm.custAccVisaSettingWindow.close();
-                    },
-                    function (response) {
-                        bars.ui.loader(form, false);
-                        bars.ui.notify('Помилка',
-                            'Виникла при збереженні налаштувань віз по рахунку. <small>' +
-                            (response.Message || response.ErrorMessage || '') + '</small>',
-                            'error');
-                    }
-                    );
-            }
+            //vm.custAccVisaSettingGridOptions = createGridOptions({
+            //    dataSource: custAccVisaSettingWindowDataSource,
+            //    toolbar: [
+            //        {
+            //            name: "btAddVisa",
+            //            text: "Додати",
+            //            template: "<button class='btn btn-default' ng-click=\"openAddEditVisaWindow();\" title='Додати'><i class='fa fa-plus fa-lg text-success' style='margin-right:10px;'></i>Додати</button>"
+            //        }
+            //    ],
+            //    autoBind: false,
+            //    filterable: false,
+            //    sortable: false,
+            //    dataBound: function (e) {
+            //        $.each(e.sender._data, function (i, el) { el.CORP2_ACC_ID = vm.currentCustomerAccount.CORP2_ACC; });
+            //        bars.ext.kendo.grid.noDataRow(e);
+            //    },
+            //    columns: [
+            //        {
+            //            field: 'Edit',
+            //            title: 'Налаштування',
+            //            width: '65px',
+            //            template: function (data) {
+            //                var html = '';
+            //                html += "<button class='btn btn-default' ng-click=\"openAddEditVisaWindow("
+            //                    + data.Id + ");\" title='Редагувати'><i class='fa fa-pencil fa-lg text-success'></i></button>";
+            //                html += "<button class='btn btn-default' style='margin-left: 5px;' ng-click=\"deleteVisa("
+            //                    + data.Id + ");\" title='Видалити'><i class='fa fa-trash-o fa-lg text-danger'></i></button>";
+            //                return html;
+            //            },
+            //            attributes: { "class": "cell-horiz-align-center" }
+            //        //}, {
+            //        //    field: 'ACC_ID',
+            //        //    title: 'Номер рахунку',
+            //        //    width: '80px'
+            //        }, {
+            //            field: 'VISA_ID',
+            //            title: 'Рівень візи',
+            //            width: '70px',
+            //            attributes: { "class": "cell-horiz-align-center" }
+            //        }, {
+            //            field: 'COUNT',
+            //            title: 'Кількість віз рівня',
+            //            width: '90px',
+            //            attributes: { "class": "cell-horiz-align-center" }
+            //        }
+            //    ]
+            //});
+            //$scope.saveVisaQuantity = vm.saveVisaQuantity = function () {
+            //    if (!vm.currentCustomerAccount.VISA_COUNT) { //від 1 до 99
+            //        bars.ui.error({ text: 'Вкажіть кількість віз' });
+            //        return;
+            //    }
+            //    var form = $('#custAccVisaSettingForm');
+            //    bars.ui.loader(form, true);
+            //    relatedCustomersService.saveAccountVisaQuantity(vm.currentCustomerAccount)
+            //        .then(function (response) {
+            //            bars.ui.loader(form, false);
+            //            bars.ui.notify('Успішно',
+            //                'Налаштування віз по рахунку збережено успішно',
+            //                'success');
+            //            vm.custAccGrid.dataSource.read();
+            //            vm.custAccVisaSettingWindow.close();
+            //        },
+            //        function (response) {
+            //            bars.ui.loader(form, false);
+            //            bars.ui.notify('Помилка',
+            //                'Виникла при збереженні налаштувань віз по рахунку. <small>' +
+            //                (response.Message || response.ErrorMessage || '') + '</small>',
+            //                'error');
+            //        }
+            //        );
+            //}
 
-            $scope.openAddEditVisaWindow = function openAddEditVisaWindow(rowId) {
-                //Edit
-                if (rowId) {
-                    vm.currentAccountVisa = vm.custAccVisaSettingGrid.dataSource.get(rowId);
-                    vm.currentAccountVisa.ACC_ID = vm.currentCustomerAccount.BANK_ACC;
-                    vm.currentAccountVisa.NUM_ACC = vm.currentCustomerAccount.NUM_ACC;
-                    vm.currentAccountVisa.Old_VISA_ID = vm.currentAccountVisa.VISA_ID;
-                    vm.currentAccountVisa.EditMode = true;
-                }
-                //Add
-                else {
-                    vm.currentAccountVisa = {
-                        Id: 0,
-                        NUM_ACC: vm.currentCustomerAccount.NUM_ACC,
-                        ACC_ID: vm.currentCustomerAccount.BANK_ACC,
-                        CORP2_ACC_ID: vm.currentCustomerAccount.CORP2_ACC,
-                        VISA_ID: 1,
-                        Old_VISA_ID: 1,
-                        COUNT: 1
-                    };
-                    vm.currentAccountVisa.EditMode = false;
-                }
+            //$scope.openAddEditVisaWindow = function openAddEditVisaWindow(rowId) {
+            //    //Edit
+            //    if (rowId) {
+            //        vm.currentAccountVisa = vm.custAccVisaSettingGrid.dataSource.get(rowId);
+            //        vm.currentAccountVisa.ACC_ID = vm.currentCustomerAccount.BANK_ACC;
+            //        vm.currentAccountVisa.NUM_ACC = vm.currentCustomerAccount.NUM_ACC;
+            //        vm.currentAccountVisa.Old_VISA_ID = vm.currentAccountVisa.VISA_ID;
+            //        vm.currentAccountVisa.EditMode = true;
+            //    }
+            //    //Add
+            //    else {
+            //        vm.currentAccountVisa = {
+            //            Id: 0,
+            //            NUM_ACC: vm.currentCustomerAccount.NUM_ACC,
+            //            ACC_ID: vm.currentCustomerAccount.BANK_ACC,
+            //            CORP2_ACC_ID: vm.currentCustomerAccount.CORP2_ACC,
+            //            VISA_ID: 1,
+            //            Old_VISA_ID: 1,
+            //            COUNT: 1
+            //        };
+            //        vm.currentAccountVisa.EditMode = false;
+            //    }
 
-                vm.addEditVisaWindow.center().open();
-            }
+            //    vm.addEditVisaWindow.center().open();
+            //}
 
-            $scope.deleteVisa = function deleteVisa(rowId) {
-                var form = $('#custAccVisaSettingForm');
-                bars.ui.loader(form, true);
-                var item = vm.custAccVisaSettingGrid.dataSource.get(rowId);
-                relatedCustomersService.deleteVisa(item).then(
-                    function (response) {
-                        bars.ui.loader(form, false);
-                        bars.ui.notify('Успішно',
-                            'Видалено',
-                            'success');
-                        vm.custAccVisaSettingGrid.dataSource.read();
-                    },
-                    function (response) {
-                        bars.ui.loader(form, false);
-                        bars.ui.notify('Помилка',
-                            'Виникла при видаленні. <small>' +
-                            (response.Message || response.ErrorMessage || '') + '</small>',
-                            'error');
-                    });
-            }
+            //$scope.deleteVisa = function deleteVisa(rowId) {
+            //    var form = $('#custAccVisaSettingForm');
+            //    bars.ui.loader(form, true);
+            //    var item = vm.custAccVisaSettingGrid.dataSource.get(rowId);
+            //    relatedCustomersService.deleteVisa(item).then(
+            //        function (response) {
+            //            bars.ui.loader(form, false);
+            //            bars.ui.notify('Успішно',
+            //                'Видалено',
+            //                'success');
+            //            vm.custAccVisaSettingGrid.dataSource.read();
+            //        },
+            //        function (response) {
+            //            bars.ui.loader(form, false);
+            //            bars.ui.notify('Помилка',
+            //                'Виникла при видаленні. <small>' +
+            //                (response.Message || response.ErrorMessage || '') + '</small>',
+            //                'error');
+            //        });
+            //}
 
-            $scope.addEditVisa = vm.addEditVisa = function addEditVisa() {
-                //if (!$scope.addEditVisaForm.$valid) {
-                //    bars.ui.notify('Помилка',
-                //        'Заповніть поля. Поля приймають тільки числові значення.',
-                //        'error');
-                //    return;
-                //}
-                if (!vm.currentAccountVisa.VISA_ID) { //від 1 до 9
-                    bars.ui.error({ text: 'Вкажіть рівень візи' });
-                    return;
-                }
-                if (!vm.currentAccountVisa.COUNT) { //від 1 до 99
-                    bars.ui.error({ text: 'Вкажіть кількість віз рівня' });
-                    return;
-                }
-                var form = $('#addEditVisaForm');
-                bars.ui.loader(form, true);
+            //$scope.addEditVisa = vm.addEditVisa = function addEditVisa() {
+            //    //if (!$scope.addEditVisaForm.$valid) {
+            //    //    bars.ui.notify('Помилка',
+            //    //        'Заповніть поля. Поля приймають тільки числові значення.',
+            //    //        'error');
+            //    //    return;
+            //    //}
+            //    if (!vm.currentAccountVisa.VISA_ID) { //від 1 до 9
+            //        bars.ui.error({ text: 'Вкажіть рівень візи' });
+            //        return;
+            //    }
+            //    if (!vm.currentAccountVisa.COUNT) { //від 1 до 99
+            //        bars.ui.error({ text: 'Вкажіть кількість віз рівня' });
+            //        return;
+            //    }
+            //    var form = $('#addEditVisaForm');
+            //    bars.ui.loader(form, true);
 
-                relatedCustomersService.addEditVisa(vm.currentAccountVisa).then(
-                    function (response) {
+            //    relatedCustomersService.addEditVisa(vm.currentAccountVisa).then(
+            //        function (response) {
 
-                        bars.ui.loader(form, false);
-                        bars.ui.notify('Успішно',
-                            'Додано / Відредаговано',
-                            'success');
-                        vm.custAccVisaSettingGrid.dataSource.read();
-                        vm.addEditVisaWindow.close();
-                    },
-                    function (response) {
-                        bars.ui.loader(form, false);
-                        //bars.ui.notify('Помилка',
-                        //    'Виникла при додаванні / редагуванні. <small>' +
-                        //    (response.Message || response.ErrorMessage || '') + '</small>',
-                        //    'error');
-                    });
-            }
+            //            bars.ui.loader(form, false);
+            //            bars.ui.notify('Успішно',
+            //                'Додано / Відредаговано',
+            //                'success');
+            //            vm.custAccVisaSettingGrid.dataSource.read();
+            //            vm.addEditVisaWindow.close();
+            //        },
+            //        function (response) {
+            //            bars.ui.loader(form, false);
+            //            //bars.ui.notify('Помилка',
+            //            //    'Виникла при додаванні / редагуванні. <small>' +
+            //            //    (response.Message || response.ErrorMessage || '') + '</small>',
+            //            //    'error');
+            //        });
+            //}
 
             ////////////Corp2 User Connection Params Setting////////////
 
@@ -1379,6 +1423,7 @@ angular.module(globalSettings.modulesAreas)
                 modal: true,
                 actions: ["Maximize", "Close"],
                 close: function () {
+                    vm.userConParWindowReadonly = false;
                     vm.userConnectionParamsWindow_Model = null;
                     vm.userConnectionParamsWindow_LimitModel = null;
                     vm.currentUserId = null;
@@ -1386,27 +1431,30 @@ angular.module(globalSettings.modulesAreas)
                     vm.corp2_UserConnParamsWindow_AccsGrid.dataSource.data([]);
                     vm.corp2_UserConnParamsWindow_availableModulesGrid.dataSource.data([]);
                     vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.data([]);
-                    vm.corp2_UserConnParamsWindow_userFuncsGrid.dataSource.data([]);
-                    vm.corp2_UserConnParamsWindow_availableFuncsGrid.dataSource.data([]);
-                    vm.ModuleName = null;
-                    allUserFuncs.length = 0;
-                    allAvailableFuncs.length = 0;
+                    //vm.corp2_UserConnParamsWindow_userFuncsGrid.dataSource.data([]);
+                    //vm.corp2_UserConnParamsWindow_availableFuncsGrid.dataSource.data([]);
+                    //vm.ModuleName = null;
+                    //allUserFuncs.length = 0;
+                    //allAvailableFuncs.length = 0;
                     //$scope.$apply();
-                    //vm.custCreatedDate.enable(true);
-                    //vm.custBirthDate.enable(true);
-                    //vm.custDocDate.enable(true);
                 }
             }
 
-            $scope.open_userConnectionParamsWindow = vm.open_userConnectionParamsWindow = function (id) {
+            $scope.open_userConnectionParamsWindow = vm.open_userConnectionParamsWindow = function (id, readonly) {
                 vm.currentUserId = id;
-                initUserConnectionParamsWindow(id);
-                vm.userConnectionParamsWindow.center().open();
+                initUserConnectionParamsWindow(id, readonly);
+                //if (readonly) {
+                //    vm.userConnectionParamsWindow_back.center().open();
+                //}
+                //else {
+                    vm.userConnectionParamsWindow.center().open();
+                //}
             }
 
-            function initUserConnectionParamsWindow(userId) {
+            function initUserConnectionParamsWindow(userId, readonly) {
 
                 vm.userConnectionParamsWindow_Model = vm.relCustsGridCorp2.dataSource.get(userId);
+                vm.userConParWindowReadonly = readonly;
                 if (!limitDictionary) {
                     relatedCustomersService.getLimitDictionary().then(
                         function (response) { limitDictionary = response; },
@@ -1422,14 +1470,14 @@ angular.module(globalSettings.modulesAreas)
                 vm.corp2_UserConnParamsWindow_availableModulesGrid.dataSource.read();
                 vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.read();
 
-                relatedCustomersService.getAvailableFuncs(userId).then(
-                    function (response2) { allAvailableFuncs = response2; },
-                    function (response2) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних до видачі функцій', 'error'); }
-                );
-                relatedCustomersService.getUserFuncs(userId).then(
-                    function (response3) { allUserFuncs = response3; },
-                    function (response3) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних функцій по користувачу', 'error'); }
-                );
+                //relatedCustomersService.getAvailableFuncs(userId).then(
+                //    function (response2) { allAvailableFuncs = response2; },
+                //    function (response2) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних до видачі функцій', 'error'); }
+                //);
+                //relatedCustomersService.getUserFuncs(userId).then(
+                //    function (response3) { allUserFuncs = response3; },
+                //    function (response3) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних функцій по користувачу', 'error'); }
+                //);
             }
 
             $scope.saveUserConnectionParamsWindow = vm.saveUserConnectionParamsWindow = function () {
@@ -1444,7 +1492,7 @@ angular.module(globalSettings.modulesAreas)
                     vm.userConnectionParamsWindow_Model,
                     vm.userConnectionParamsWindow_LimitModel,
                     vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.view(),
-                    allUserFuncs,
+                    //allUserFuncs,
                     getAccsSettinsForSave()
                 ).then(function (response) {
                     bars.ui.loader(form, false);
@@ -1513,7 +1561,7 @@ angular.module(globalSettings.modulesAreas)
                     {
                         field: 'CAN_WORK',
                         title: ' ',
-                        width: '50px',
+                        width: '55px',
                         filterable: false,
                         sortable: false,
                         headerTemplate: "<label class='btn' ng-click='switchUserAccCheckBoxes()' title='Вибрати всі'><input type='checkbox' id='accHeaderChbx'/></label>",
@@ -1528,7 +1576,7 @@ angular.module(globalSettings.modulesAreas)
                     {
                         field: 'CAN_VIEW',
                         title: 'Виписка',
-                        width: '55px',
+                        width: '65px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1541,7 +1589,7 @@ angular.module(globalSettings.modulesAreas)
                     }, {
                         field: 'CAN_DEBIT',
                         title: 'Дебет',
-                        width: '50px',
+                        width: '55px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1554,7 +1602,7 @@ angular.module(globalSettings.modulesAreas)
                     }, {
                         field: 'CAN_VISA',
                         title: 'Віза',
-                        width: '50px',
+                        width: '55px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1567,7 +1615,7 @@ angular.module(globalSettings.modulesAreas)
                     }, {
                         field: 'VISA_ID',
                         title: '№ візи',
-                        width: '50px',
+                        width: '60px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1578,7 +1626,7 @@ angular.module(globalSettings.modulesAreas)
                     }, {
                         field: 'SEQUENTIAL_VISA',
                         title: 'Послідовна',
-                        width: '70px',
+                        width: '80px',
                         filterable: false,
                         sortable: false,
                         template: function (data) {
@@ -1662,8 +1710,8 @@ angular.module(globalSettings.modulesAreas)
             }
 
             //----------Modules & Functions
-            var allUserFuncs;
-            var allAvailableFuncs;
+            //var allUserFuncs;
+            //var allAvailableFuncs;
 
             vm.corp2_UserConnParamsWindow_userModulesGridOptions = createGridOptions({
                 dataSource: createDataSource({
@@ -1693,14 +1741,14 @@ angular.module(globalSettings.modulesAreas)
                     field: 'Name',
                     title: 'Перелік виданих модулів',
                     width: '200px'
-                }],
-                change: function (e) {
-                    var selectedRows = this.select();
-                    if (selectedRows.length != 1) return;
-                    var dataItem = this.dataItem(selectedRows[0]);
-                    vm.ModuleName = dataItem.Name;
-                    initFuncsGrids(dataItem.id);
-                }
+                }]
+                //change: function (e) {
+                //    var selectedRows = this.select();
+                //    if (selectedRows.length != 1) return;
+                //    var dataItem = this.dataItem(selectedRows[0]);
+                //    vm.ModuleName = dataItem.Name;
+                //    initFuncsGrids(dataItem.id);
+                //}
             });
             vm.corp2_UserConnParamsWindow_availableModulesGridOptions = createGridOptions({
                 dataSource: createDataSource({
@@ -1737,104 +1785,104 @@ angular.module(globalSettings.modulesAreas)
             });
 
             $scope.copySelectedToAvailableModulesGrid = vm.copySelectedToAvailableModulesGrid = function () {
-                var selected = vm.corp2_UserConnParamsWindow_userModulesGrid.select();
+                //var selected = vm.corp2_UserConnParamsWindow_userModulesGrid.select();
                 //Видаляємо функції користувача по видаленому модулю та заносимо їх до переліку всіх доступних функцій
-                $.each(selected, function (idx, elem) {
-                    elem = vm.corp2_UserConnParamsWindow_userModulesGrid.dataItem(elem);
-                    allAvailableFuncs = allAvailableFuncs.concat(allUserFuncs.filter(function (el) { return el.ModuleId == elem.id; }));
-                    allUserFuncs = allUserFuncs.filter(function (el) { return el.ModuleId != elem.id; });
-                });
+                //$.each(selected, function (idx, elem) {
+                //    elem = vm.corp2_UserConnParamsWindow_userModulesGrid.dataItem(elem);
+                //    allAvailableFuncs = allAvailableFuncs.concat(allUserFuncs.filter(function (el) { return el.ModuleId == elem.id; }));
+                //    allUserFuncs = allUserFuncs.filter(function (el) { return el.ModuleId != elem.id; });
+                //});
 
                 moveBetweenGrids(vm.corp2_UserConnParamsWindow_userModulesGrid, vm.corp2_UserConnParamsWindow_availableModulesGrid);
-                vm.ModuleName = null;
-                initFuncsGrids();
+                //vm.ModuleName = null;
+                //initFuncsGrids();
             };
             $scope.copySelectedToUserModulesGrid = vm.copySelectedToUserModulesGrid = function () {
                 moveBetweenGrids(vm.corp2_UserConnParamsWindow_availableModulesGrid, vm.corp2_UserConnParamsWindow_userModulesGrid);
-                vm.ModuleName = null;
-                initFuncsGrids();
+                //vm.ModuleName = null;
+                //initFuncsGrids();
             };
 
-            vm.corp2_UserConnParamsWindow_userFuncsGridOptions = createGridOptions({
-                editable: "popup",
-                selectable: "multiple, row",
-                filterable: false,
-                sortable: false,
-                pageable: false,
-                //autoBind: false,
-                columns: [{
-                    field: 'Name',
-                    title: 'Перелік виданих функцій',
-                    width: '200px'
-                }]
-            });
-            vm.corp2_UserConnParamsWindow_availableFuncsGridOptions = createGridOptions({
-                editable: "popup",
-                selectable: "multiple, row",
-                filterable: false,
-                sortable: false,
-                pageable: false,
-                //autoBind: false,
-                columns: [{
-                    field: 'Name',
-                    title: 'Перелік доступних до видачі функцій',
-                    width: '200px'
-                }]
-            });
+            //vm.corp2_UserConnParamsWindow_userFuncsGridOptions = createGridOptions({
+            //    editable: "popup",
+            //    selectable: "multiple, row",
+            //    filterable: false,
+            //    sortable: false,
+            //    pageable: false,
+            //    //autoBind: false,
+            //    columns: [{
+            //        field: 'Name',
+            //        title: 'Перелік виданих функцій',
+            //        width: '200px'
+            //    }]
+            //});
+            //vm.corp2_UserConnParamsWindow_availableFuncsGridOptions = createGridOptions({
+            //    editable: "popup",
+            //    selectable: "multiple, row",
+            //    filterable: false,
+            //    sortable: false,
+            //    pageable: false,
+            //    //autoBind: false,
+            //    columns: [{
+            //        field: 'Name',
+            //        title: 'Перелік доступних до видачі функцій',
+            //        width: '200px'
+            //    }]
+            //});
 
-            $scope.copySelectedToAvailableFuncsGrid = vm.copySelectedToAvailableFuncsGrid = function () {
-                var selected = vm.corp2_UserConnParamsWindow_userFuncsGrid.select();
-                if (selected.length > 0) {
-                    $.each(selected, function (idx, elem) {
-                        elem = vm.corp2_UserConnParamsWindow_userFuncsGrid.dataItem(elem);
-                        allAvailableFuncs = allAvailableFuncs.concat(allUserFuncs.filter(function (el) { return el.Id == elem.Id }));
-                        allUserFuncs = allUserFuncs.filter(function (el) { return el.Id != elem.Id });
-                    });
-                }
-                moveBetweenGrids(vm.corp2_UserConnParamsWindow_userFuncsGrid, vm.corp2_UserConnParamsWindow_availableFuncsGrid);
-            };
-            $scope.copySelectedToUserFuncsGrid = vm.copySelectedToUserFuncsGrid = function () {
-                var selected = vm.corp2_UserConnParamsWindow_availableFuncsGrid.select();
-                if (selected.length > 0) {
-                    $.each(selected, function (idx, elem) {
-                        elem = vm.corp2_UserConnParamsWindow_availableFuncsGrid.dataItem(elem);
-                        allUserFuncs = allUserFuncs.concat(allAvailableFuncs.filter(function (el) { return el.Id == elem.Id }));
-                        allAvailableFuncs = allAvailableFuncs.filter(function (el) { return el.Id != elem.Id });
-                    });
-                }
-                moveBetweenGrids(vm.corp2_UserConnParamsWindow_availableFuncsGrid, vm.corp2_UserConnParamsWindow_userFuncsGrid);
-            };
+            //$scope.copySelectedToAvailableFuncsGrid = vm.copySelectedToAvailableFuncsGrid = function () {
+            //    var selected = vm.corp2_UserConnParamsWindow_userFuncsGrid.select();
+            //    if (selected.length > 0) {
+            //        $.each(selected, function (idx, elem) {
+            //            elem = vm.corp2_UserConnParamsWindow_userFuncsGrid.dataItem(elem);
+            //            allAvailableFuncs = allAvailableFuncs.concat(allUserFuncs.filter(function (el) { return el.Id == elem.Id }));
+            //            allUserFuncs = allUserFuncs.filter(function (el) { return el.Id != elem.Id });
+            //        });
+            //    }
+            //    moveBetweenGrids(vm.corp2_UserConnParamsWindow_userFuncsGrid, vm.corp2_UserConnParamsWindow_availableFuncsGrid);
+            //};
+            //$scope.copySelectedToUserFuncsGrid = vm.copySelectedToUserFuncsGrid = function () {
+            //    var selected = vm.corp2_UserConnParamsWindow_availableFuncsGrid.select();
+            //    if (selected.length > 0) {
+            //        $.each(selected, function (idx, elem) {
+            //            elem = vm.corp2_UserConnParamsWindow_availableFuncsGrid.dataItem(elem);
+            //            allUserFuncs = allUserFuncs.concat(allAvailableFuncs.filter(function (el) { return el.Id == elem.Id }));
+            //            allAvailableFuncs = allAvailableFuncs.filter(function (el) { return el.Id != elem.Id });
+            //        });
+            //    }
+            //    moveBetweenGrids(vm.corp2_UserConnParamsWindow_availableFuncsGrid, vm.corp2_UserConnParamsWindow_userFuncsGrid);
+            //};
 
-            function initFuncsGrids(moduleId) {
-                var availableFuncs = allAvailableFuncs.filter(function (el) { return el.ModuleId == moduleId; });
-                var userFuncs = allUserFuncs.filter(function (el) { return el.ModuleId == moduleId; });
-                var availableFuncsDS = new kendo.data.DataSource({
-                    data: availableFuncs,
-                    schema: {
-                        model: {
-                            id: 'Id',
-                            fields: {
-                                Name: { type: "string" },
-                                ModuleId: { type: "string" }
-                            }
-                        }
-                    }
-                });
-                var userFuncsDS = new kendo.data.DataSource({
-                    data: userFuncs,
-                    schema: {
-                        model: {
-                            id: 'Id',
-                            fields: {
-                                Name: { type: "string" },
-                                ModuleId: { type: "string" }
-                            }
-                        }
-                    }
-                });
-                vm.corp2_UserConnParamsWindow_availableFuncsGrid.setDataSource(availableFuncsDS);
-                vm.corp2_UserConnParamsWindow_userFuncsGrid.setDataSource(userFuncsDS);
-            };
+            //function initFuncsGrids(moduleId) {
+            //    var availableFuncs = allAvailableFuncs.filter(function (el) { return el.ModuleId == moduleId; });
+            //    var userFuncs = allUserFuncs.filter(function (el) { return el.ModuleId == moduleId; });
+            //    var availableFuncsDS = new kendo.data.DataSource({
+            //        data: availableFuncs,
+            //        schema: {
+            //            model: {
+            //                id: 'Id',
+            //                fields: {
+            //                    Name: { type: "string" },
+            //                    ModuleId: { type: "string" }
+            //                }
+            //            }
+            //        }
+            //    });
+            //    var userFuncsDS = new kendo.data.DataSource({
+            //        data: userFuncs,
+            //        schema: {
+            //            model: {
+            //                id: 'Id',
+            //                fields: {
+            //                    Name: { type: "string" },
+            //                    ModuleId: { type: "string" }
+            //                }
+            //            }
+            //        }
+            //    });
+            //    vm.corp2_UserConnParamsWindow_availableFuncsGrid.setDataSource(availableFuncsDS);
+            //    vm.corp2_UserConnParamsWindow_userFuncsGrid.setDataSource(userFuncsDS);
+            //};
 
             function moveBetweenGrids(from, to) {
                 var selected = from.select();

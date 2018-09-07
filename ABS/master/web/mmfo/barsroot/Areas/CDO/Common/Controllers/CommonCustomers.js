@@ -8,6 +8,16 @@ angular.module(globalSettings.modulesAreas)
         '$rootScope',
         function ($scope, customersService, corpLightRelCustService, corp2RelCustService, $rootScope) {
             'use strict';
+            $('body').on('keydown', handleBodyKeyDown);
+            function handleBodyKeyDown(event) {
+                var e = event || window.event,
+                    target = e.target || e.srcElement;
+
+                if (e.keyCode != 8 || target.tagName.toUpperCase() == 'INPUT' || target.tagName.toUpperCase() == 'TEXTAREA') return true;
+
+                e.preventDefault();
+                return false;
+            }
 
             var vm = this;
 
@@ -44,6 +54,25 @@ angular.module(globalSettings.modulesAreas)
                     vm.isCorp2 = e.item.innerText.trim() === "Corp2"; */
                 }
             };
+            //var tabStrip = $("#myTabStrip").kendoTabStrip().data("kendoTabStrip");
+            var custId = bars.ext.getParamFromUrl('custId');
+            var clmode = bars.ext.getParamFromUrl('clmode');
+            var addCorp2Tube = bars.ext.getParamFromUrl('addCorp2Tube');
+            if (clmode == 'base') {
+                customersService.getTypeOfCustomer(custId).then(
+                    function (response) {
+                        response = JSON.parse(response);
+                        if (response && response != 'person') {
+                            $('#li_corp2').show();
+                            if (addCorp2Tube && addCorp2Tube.toUpperCase() == 'TRUE')
+                            $('#div_corp2').show();
+                            //$(tabStrip.items()[1]).hide();
+                            //tabStrip.remove("li:last");
+                        }
+                    },
+                    function () { }
+                );
+            }
             //#endregion
         }
     ]);

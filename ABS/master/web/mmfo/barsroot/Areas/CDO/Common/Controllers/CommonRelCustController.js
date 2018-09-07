@@ -160,16 +160,16 @@ angular.module(globalSettings.modulesAreas)
                 }, {
                     field: 'Sdo',
                     title: 'СДО',
-                    width: '60px',
-                    template: function (data) {
-                        var content = '';
-                        if (data.Sdo && data.Sdo.toUpperCase() == 'CORP2') {
-                            content = '<a href="#" ng-click="open_userConnectionParamsWindow_back(' + data.Id + ')" style="text-decoration: underline; color: steelblue;">'
-                                + data.Sdo + '</a>';
-                        }
-                        else content = data.Sdo;
-                        return content;
-                    }
+                    width: '60px'
+                    //,template: function (data) {
+                    //    var content = '';
+                    //    if (data.Sdo && data.Sdo.toUpperCase() == 'CORP2') {
+                    //        content = '<a href="#" ng-click="open_userConnectionParamsWindow_back(' + data.Id + ')" style="text-decoration: underline; color: steelblue;">'
+                    //            + data.Sdo + '</a>';
+                    //    }
+                    //    else content = data.Sdo;
+                    //    return content;
+                    //}
                 }, {
                     title: 'ПІБ',
                     width: '200px',
@@ -240,309 +240,309 @@ angular.module(globalSettings.modulesAreas)
                 vm.currentUser = null;
             }
         }
-        vm.userConnectionParamsWindow_Options_back = {
-            //width: '600px',
-            //height: '400px',
-            title: 'Налаштування користувача Корп2',
-            modal: true,
-            actions: ["Maximize", "Close"],
-            close: function () {
-                vm.userConnectionParamsWindow_Model = null;
-                vm.userConnectionParamsWindow_LimitModel = null;
-                vm.currentUserId = null;
-                //clear grids
-                vm.corp2_UserConnParamsWindow_AccsGrid.dataSource.data([]);
-                vm.corp2_UserConnParamsWindow_availableModulesGrid.dataSource.data([]);
-                vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.data([]);
-                vm.corp2_UserConnParamsWindow_userFuncsGrid.dataSource.data([]);
-                vm.corp2_UserConnParamsWindow_availableFuncsGrid.dataSource.data([]);
-                vm.ModuleName = null;
-                allUserFuncs.length = 0;
-                allAvailableFuncs.length = 0;
-            }
-        }
+        //vm.userConnectionParamsWindow_Options_back = {
+        //    //width: '600px',
+        //    //height: '400px',
+        //    title: 'Налаштування користувача Корп2',
+        //    modal: true,
+        //    actions: ["Maximize", "Close"],
+        //    close: function () {
+        //        vm.userConnectionParamsWindow_Model = null;
+        //        vm.userConnectionParamsWindow_LimitModel = null;
+        //        vm.currentUserId = null;
+        //        //clear grids
+        //        vm.corp2_UserConnParamsWindow_AccsGrid.dataSource.data([]);
+        //        vm.corp2_UserConnParamsWindow_availableModulesGrid.dataSource.data([]);
+        //        vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.data([]);
+        //        //vm.corp2_UserConnParamsWindow_userFuncsGrid.dataSource.data([]);
+        //        //vm.corp2_UserConnParamsWindow_availableFuncsGrid.dataSource.data([]);
+        //        //vm.ModuleName = null;
+        //        //allUserFuncs.length = 0;
+        //        //allAvailableFuncs.length = 0;
+        //    }
+        //}
 
-        $scope.open_userConnectionParamsWindow_back = vm.open_userConnectionParamsWindow_back = function (id) {
-            vm.currentUserId = id;
-            initUserConnectionParamsWindow(id);
-            vm.userConnectionParamsWindow_back.center().open();
-        }
+        //$scope.open_userConnectionParamsWindow_back = vm.open_userConnectionParamsWindow_back = function (id) {
+        //    vm.currentUserId = id;
+        //    initUserConnectionParamsWindow(id);
+        //    vm.userConnectionParamsWindow_back.center().open();
+        //}
 
-        function initUserConnectionParamsWindow(userId) {
+        //function initUserConnectionParamsWindow(userId) {
 
-            vm.userConnectionParamsWindow_Model = vm.back_confirmConnectUsersGrid.dataSource.get(userId);
-            if (!limitDictionary) {
-                corp2RelCustService.getLimitDictionary().then(
-                    function (response) { limitDictionary = response; },
-                    function (response1) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні словника лімітів', 'error'); }
-                );
-            }
+        //    vm.userConnectionParamsWindow_Model = vm.back_confirmConnectUsersGrid.dataSource.get(userId);
+        //    if (!limitDictionary) {
+        //        corp2RelCustService.getLimitDictionary().then(
+        //            function (response) { limitDictionary = response; },
+        //            function (response1) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні словника лімітів', 'error'); }
+        //        );
+        //    }
 
-            corp2RelCustService.getUserLimit(userId).then(
-                function (response1) { vm.userConnectionParamsWindow_LimitModel = response1; },
-                function (response1) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні лімітів по користувачу', 'error'); }
-            );
-            vm.corp2_UserConnParamsWindow_AccsGrid.dataSource.read();
-            vm.corp2_UserConnParamsWindow_availableModulesGrid.dataSource.read();
-            vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.read();
+        //    corp2RelCustService.getUserLimit(userId).then(
+        //        function (response1) { vm.userConnectionParamsWindow_LimitModel = response1; },
+        //        function (response1) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні лімітів по користувачу', 'error'); }
+        //    );
+        //    vm.corp2_UserConnParamsWindow_AccsGrid.dataSource.read();
+        //    vm.corp2_UserConnParamsWindow_availableModulesGrid.dataSource.read();
+        //    vm.corp2_UserConnParamsWindow_userModulesGrid.dataSource.read();
 
-            corp2RelCustService.getAvailableFuncs(userId).then(
-                function (response2) { allAvailableFuncs = response2; },
-                function (response2) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних до видачі функцій', 'error'); }
-            );
-            corp2RelCustService.getUserFuncs(userId).then(
-                function (response3) { allUserFuncs = response3; },
-                function (response3) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних функцій по користувачу', 'error'); }
-            );
-        }
+        //    //corp2RelCustService.getAvailableFuncs(userId).then(
+        //    //    function (response2) { allAvailableFuncs = response2; },
+        //    //    function (response2) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних до видачі функцій', 'error'); }
+        //    //);
+        //    //corp2RelCustService.getUserFuncs(userId).then(
+        //    //    function (response3) { allUserFuncs = response3; },
+        //    //    function (response3) { bars.ui.notify('Помилка', 'Сталася помилка при отриманні доступних функцій по користувачу', 'error'); }
+        //    //);
+        //}
         //----------Modules & Functions
-        var allUserFuncs;
-        var allAvailableFuncs;
-        vm.corp2_UserConnParamsWindow_userModulesGridOptions = createGridOptions({
-            dataSource: createDataSource({
-                type: "webapi",
-                transport: {
-                    read: {
-                        //async: false,
-                        url: bars.config.urlContent('api/cdo/corp2/getusermodules'),
-                        cache: false,
-                        data: function () { return { userId: vm.currentUserId }; }
-                    }
-                },
-                schema: {
-                    model: {
-                        id: 'Id',
-                        fields: { Name: { type: "string" } }
-                    }
-                }
-            }),
-            editable: "popup",
-            selectable: "multiple, row",
-            pageable: false,
-            autoBind: false,
-            columns: [{
-                field: 'Name',
-                title: 'Перелік виданих модулів',
-                width: '200px'
-            }],
-            change: function (e) {
-                var selectedRows = this.select();
-                if (selectedRows.length != 1) return;
-                var dataItem = this.dataItem(selectedRows[0]);
-                vm.ModuleName = dataItem.Name;
-                initFuncsGrids(dataItem.id);
-            }
-        });
-        vm.corp2_UserConnParamsWindow_availableModulesGridOptions = createGridOptions({
-            dataSource: createDataSource({
-                type: "webapi",
-                transport: {
-                    read: {
-                        url: bars.config.urlContent('api/cdo/corp2/getavailablemodules'),
-                        cache: false,
-                        data: function () { return { userId: vm.currentUserId }; }
-                    }
-                },
-                schema: {
-                    model: {
-                        id: 'Id',
-                        fields: { Name: { type: "string" } }
-                    }
-                }
-                //pageSize: 10,
-                //page: 1,
-                //total: 0
-            }),
-            //height: 50,
-            pageable: false,
-            editable: "popup",
-            selectable: "multiple, row",
-            autoBind: false,
-            columns: [{
-                field: 'Name',
-                title: 'Перелік доступних до видачі модулів',
-                width: '200px'
-            }]
-        });
+        //var allUserFuncs;
+        //var allAvailableFuncs;
+        //vm.corp2_UserConnParamsWindow_userModulesGridOptions = createGridOptions({
+        //    dataSource: createDataSource({
+        //        type: "webapi",
+        //        transport: {
+        //            read: {
+        //                //async: false,
+        //                url: bars.config.urlContent('api/cdo/corp2/getusermodules'),
+        //                cache: false,
+        //                data: function () { return { userId: vm.currentUserId }; }
+        //            }
+        //        },
+        //        schema: {
+        //            model: {
+        //                id: 'Id',
+        //                fields: { Name: { type: "string" } }
+        //            }
+        //        }
+        //    }),
+        //    editable: "popup",
+        //    selectable: "multiple, row",
+        //    pageable: false,
+        //    autoBind: false,
+        //    columns: [{
+        //        field: 'Name',
+        //        title: 'Перелік виданих модулів',
+        //        width: '200px'
+        //    }],
+        //    change: function (e) {
+        //        var selectedRows = this.select();
+        //        if (selectedRows.length != 1) return;
+        //        var dataItem = this.dataItem(selectedRows[0]);
+        //        vm.ModuleName = dataItem.Name;
+        //        initFuncsGrids(dataItem.id);
+        //    }
+        //});
+        //vm.corp2_UserConnParamsWindow_availableModulesGridOptions = createGridOptions({
+        //    dataSource: createDataSource({
+        //        type: "webapi",
+        //        transport: {
+        //            read: {
+        //                url: bars.config.urlContent('api/cdo/corp2/getavailablemodules'),
+        //                cache: false,
+        //                data: function () { return { userId: vm.currentUserId }; }
+        //            }
+        //        },
+        //        schema: {
+        //            model: {
+        //                id: 'Id',
+        //                fields: { Name: { type: "string" } }
+        //            }
+        //        }
+        //        //pageSize: 10,
+        //        //page: 1,
+        //        //total: 0
+        //    }),
+        //    //height: 50,
+        //    pageable: false,
+        //    editable: "popup",
+        //    selectable: "multiple, row",
+        //    autoBind: false,
+        //    columns: [{
+        //        field: 'Name',
+        //        title: 'Перелік доступних до видачі модулів',
+        //        width: '200px'
+        //    }]
+        //});
 
-        vm.corp2_UserConnParamsWindow_userFuncsGridOptions = createGridOptions({
-            editable: "popup",
-            selectable: "multiple, row",
-            pageable: false,
-            //autoBind: false,
-            columns: [{
-                field: 'Name',
-                title: 'Перелік виданих функцій',
-                width: '200px'
-            }]
-        });
-        vm.corp2_UserConnParamsWindow_availableFuncsGridOptions = createGridOptions({
-            editable: "popup",
-            selectable: "multiple, row",
-            pageable: false,
-            //autoBind: false,
-            columns: [{
-                field: 'Name',
-                title: 'Перелік доступних до видачі функцій',
-                width: '200px'
-            }]
-        });
+        //vm.corp2_UserConnParamsWindow_userFuncsGridOptions = createGridOptions({
+        //    editable: "popup",
+        //    selectable: "multiple, row",
+        //    pageable: false,
+        //    //autoBind: false,
+        //    columns: [{
+        //        field: 'Name',
+        //        title: 'Перелік виданих функцій',
+        //        width: '200px'
+        //    }]
+        //});
+        //vm.corp2_UserConnParamsWindow_availableFuncsGridOptions = createGridOptions({
+        //    editable: "popup",
+        //    selectable: "multiple, row",
+        //    pageable: false,
+        //    //autoBind: false,
+        //    columns: [{
+        //        field: 'Name',
+        //        title: 'Перелік доступних до видачі функцій',
+        //        width: '200px'
+        //    }]
+        //});
 
-        function initFuncsGrids(moduleId) {
-            var availableFuncs = allAvailableFuncs.filter(function (el) { return el.ModuleId == moduleId; });
-            var userFuncs = allUserFuncs.filter(function (el) { return el.ModuleId == moduleId; });
-            var availableFuncsDS = new kendo.data.DataSource({
-                data: availableFuncs,
-                schema: {
-                    model: {
-                        id: 'Id',
-                        fields: {
-                            Name: { type: "string" },
-                            ModuleId: { type: "string" }
-                        }
-                    }
-                }
-            });
-            var userFuncsDS = new kendo.data.DataSource({
-                data: userFuncs,
-                schema: {
-                    model: {
-                        id: 'Id',
-                        fields: {
-                            Name: { type: "string" },
-                            ModuleId: { type: "string" }
-                        }
-                    }
-                }
-            });
-            vm.corp2_UserConnParamsWindow_availableFuncsGrid.setDataSource(availableFuncsDS);
-            vm.corp2_UserConnParamsWindow_userFuncsGrid.setDataSource(userFuncsDS);
-        };
+        //function initFuncsGrids(moduleId) {
+        //    var availableFuncs = allAvailableFuncs.filter(function (el) { return el.ModuleId == moduleId; });
+        //    var userFuncs = allUserFuncs.filter(function (el) { return el.ModuleId == moduleId; });
+        //    var availableFuncsDS = new kendo.data.DataSource({
+        //        data: availableFuncs,
+        //        schema: {
+        //            model: {
+        //                id: 'Id',
+        //                fields: {
+        //                    Name: { type: "string" },
+        //                    ModuleId: { type: "string" }
+        //                }
+        //            }
+        //        }
+        //    });
+        //    var userFuncsDS = new kendo.data.DataSource({
+        //        data: userFuncs,
+        //        schema: {
+        //            model: {
+        //                id: 'Id',
+        //                fields: {
+        //                    Name: { type: "string" },
+        //                    ModuleId: { type: "string" }
+        //                }
+        //            }
+        //        }
+        //    });
+        //    vm.corp2_UserConnParamsWindow_availableFuncsGrid.setDataSource(availableFuncsDS);
+        //    vm.corp2_UserConnParamsWindow_userFuncsGrid.setDataSource(userFuncsDS);
+        //};
 
         //----------Accounts
-        var corp2_UserConnParamsWindow_AccsGrid_DataSource = createDataSource({
-            type: "webapi",
-            transport: {
-                read: {
-                    url: bars.config.urlContent('api/cdo/corp2/getcorp2useraccspermissions'),
-                    cache: false,
-                    data: function () { return { custId: $('#custId').val(), userId: vm.currentUserId }; }
-                }
-            },
-            schema: {
-                model: {
-                    id: 'Id',
-                    fields: {
-                        CAN_WORK: { type: "boolean" },
-                        CAN_VIEW: { type: "boolean" },
-                        CAN_DEBIT: { type: "boolean" },
-                        CAN_VISA: { type: "boolean" },
-                        CORP2_ACC: { type: "number" },
+        //var corp2_UserConnParamsWindow_AccsGrid_DataSource = createDataSource({
+        //    type: "webapi",
+        //    transport: {
+        //        read: {
+        //            url: bars.config.urlContent('api/cdo/corp2/getcorp2useraccspermissions'),
+        //            cache: false,
+        //            data: function () { return { custId: $('#custId').val(), userId: vm.currentUserId }; }
+        //        }
+        //    },
+        //    schema: {
+        //        model: {
+        //            id: 'Id',
+        //            fields: {
+        //                CAN_WORK: { type: "boolean" },
+        //                CAN_VIEW: { type: "boolean" },
+        //                CAN_DEBIT: { type: "boolean" },
+        //                CAN_VISA: { type: "boolean" },
+        //                CORP2_ACC: { type: "number" },
 
-                        //кількість
-                        VISA_ID: { type: "number" },
-                        SEQUENTIAL_VISA: { type: "boolean" },
-                        KF: { type: "string" },
-                        KV: { type: "string" },
-                        NUM_ACC: { type: "string" },
-                        NAME: { type: "string" }
-                    }
-                }
-            }
-        });
-        vm.corp2_UserConnParamsWindow_AccsGridOptions = createGridOptions({
-            dataSource: corp2_UserConnParamsWindow_AccsGrid_DataSource,
-            autoBind: false,
-            columns: [
-                {
-                    field: 'CAN_WORK',
-                    title: ' ',
-                    width: '50px',
-                    filterable: false,
-                    sortable: false,
-                    //headerTemplate: "<label class='btn' ng-click='switchUserAccCheckBoxes()' title='Вибрати всі'><input type='checkbox' id='accHeaderChbx'/></label>",
-                    template: function (data) {
-                        var html = "<label class='btn'><input type='checkbox' fieldName='CAN_WORK' disabled";
-                        if (data.CAN_WORK) html += ' checked';
-                        html += " /></label>";
-                        return html;
-                    },
-                    attributes: { "class": "cell-horiz-align-center" }
-                },
-                {
-                    field: 'CAN_VIEW',
-                    title: 'Виписка',
-                    width: '55px',
-                    filterable: false,
-                    sortable: false,
-                    template: function (data) {
-                        var html = "<label class='btn'><input type='checkbox' fieldName='CAN_VIEW' disabled";
-                        if (data.CAN_VIEW) html += ' checked';
-                        html += " /></label>";
-                        return html;
-                    },
-                    attributes: { "class": "cell-horiz-align-center" }
-                }, {
-                    field: 'CAN_DEBIT',
-                    title: 'Дебет',
-                    width: '50px',
-                    filterable: false,
-                    sortable: false,
-                    template: function (data) {
-                        var html = "<label class='btn'><input type='checkbox' fieldName='CAN_DEBIT' disabled";
-                        if (data.CAN_DEBIT) html += ' checked';
-                        html += " /></label>";
-                        return html;
-                    },
-                    attributes: { "class": "cell-horiz-align-center" }
-                }, {
-                    field: 'CAN_VISA',
-                    title: 'Віза',
-                    width: '50px',
-                    filterable: false,
-                    sortable: false,
-                    template: function (data) {
-                        var html = "<label class='btn'><input type='checkbox' fieldName='CAN_VISA' disabled";
-                        if (data.CAN_VISA) html += ' checked';
-                        html += " /></label>";
-                        return html;
-                    },
-                    attributes: { "class": "cell-horiz-align-center" }
-                }, {
-                    field: 'VISA_ID',
-                    title: '№ візи',
-                    width: '50px',
-                    filterable: false,
-                    sortable: false,
-                    template: function (data) {
-                        var html = "<input fieldName='VISA_ID' kendo-numeric-text-box k-min='1' k-max='9' data-k-format=\"'n0'\" class='k-input w-100' value='" + (data.VISA_ID || vm.userConnectionParamsWindow_Model.SignNumber) + "' disabled/>";
-                        return html;
-                    },
-                    attributes: { "class": "cell-horiz-align-center" }
-                }, {
-                    field: 'SEQUENTIAL_VISA',
-                    title: 'Послідовна',
-                    width: '70px',
-                    filterable: false,
-                    sortable: false,
-                    template: function (data) {
-                        var html = "<label class='btn'><input type='checkbox' fieldName='SEQUENTIAL_VISA' disabled";
-                        if (data.SEQUENTIAL_VISA) html += ' checked';
-                        html += " /></label>";
-                        return html;
-                    },
-                    attributes: { "class": "cell-horiz-align-center" }
-                }, {
-                    field: 'NUM_ACC',
-                    title: 'Рахунок',
-                    width: '120px'
-                }, {
-                    field: 'NAME',
-                    title: 'Найменування',
-                    width: '180px'
-                }
-            ]
-        });
+        //                //кількість
+        //                VISA_ID: { type: "number" },
+        //                SEQUENTIAL_VISA: { type: "boolean" },
+        //                KF: { type: "string" },
+        //                KV: { type: "string" },
+        //                NUM_ACC: { type: "string" },
+        //                NAME: { type: "string" }
+        //            }
+        //        }
+        //    }
+        //});
+        //vm.corp2_UserConnParamsWindow_AccsGridOptions = createGridOptions({
+        //    dataSource: corp2_UserConnParamsWindow_AccsGrid_DataSource,
+        //    autoBind: false,
+        //    columns: [
+        //        {
+        //            field: 'CAN_WORK',
+        //            title: ' ',
+        //            width: '50px',
+        //            filterable: false,
+        //            sortable: false,
+        //            //headerTemplate: "<label class='btn' ng-click='switchUserAccCheckBoxes()' title='Вибрати всі'><input type='checkbox' id='accHeaderChbx'/></label>",
+        //            template: function (data) {
+        //                var html = "<label class='btn'><input type='checkbox' fieldName='CAN_WORK' disabled";
+        //                if (data.CAN_WORK) html += ' checked';
+        //                html += " /></label>";
+        //                return html;
+        //            },
+        //            attributes: { "class": "cell-horiz-align-center" }
+        //        },
+        //        {
+        //            field: 'CAN_VIEW',
+        //            title: 'Виписка',
+        //            width: '55px',
+        //            filterable: false,
+        //            sortable: false,
+        //            template: function (data) {
+        //                var html = "<label class='btn'><input type='checkbox' fieldName='CAN_VIEW' disabled";
+        //                if (data.CAN_VIEW) html += ' checked';
+        //                html += " /></label>";
+        //                return html;
+        //            },
+        //            attributes: { "class": "cell-horiz-align-center" }
+        //        }, {
+        //            field: 'CAN_DEBIT',
+        //            title: 'Дебет',
+        //            width: '50px',
+        //            filterable: false,
+        //            sortable: false,
+        //            template: function (data) {
+        //                var html = "<label class='btn'><input type='checkbox' fieldName='CAN_DEBIT' disabled";
+        //                if (data.CAN_DEBIT) html += ' checked';
+        //                html += " /></label>";
+        //                return html;
+        //            },
+        //            attributes: { "class": "cell-horiz-align-center" }
+        //        }, {
+        //            field: 'CAN_VISA',
+        //            title: 'Віза',
+        //            width: '50px',
+        //            filterable: false,
+        //            sortable: false,
+        //            template: function (data) {
+        //                var html = "<label class='btn'><input type='checkbox' fieldName='CAN_VISA' disabled";
+        //                if (data.CAN_VISA) html += ' checked';
+        //                html += " /></label>";
+        //                return html;
+        //            },
+        //            attributes: { "class": "cell-horiz-align-center" }
+        //        }, {
+        //            field: 'VISA_ID',
+        //            title: '№ візи',
+        //            width: '50px',
+        //            filterable: false,
+        //            sortable: false,
+        //            template: function (data) {
+        //                var html = "<input fieldName='VISA_ID' kendo-numeric-text-box k-min='1' k-max='9' data-k-format=\"'n0'\" class='k-input w-100' value='" + (data.VISA_ID || vm.userConnectionParamsWindow_Model.SignNumber) + "' disabled/>";
+        //                return html;
+        //            },
+        //            attributes: { "class": "cell-horiz-align-center" }
+        //        }, {
+        //            field: 'SEQUENTIAL_VISA',
+        //            title: 'Послідовна',
+        //            width: '70px',
+        //            filterable: false,
+        //            sortable: false,
+        //            template: function (data) {
+        //                var html = "<label class='btn'><input type='checkbox' fieldName='SEQUENTIAL_VISA' disabled";
+        //                if (data.SEQUENTIAL_VISA) html += ' checked';
+        //                html += " /></label>";
+        //                return html;
+        //            },
+        //            attributes: { "class": "cell-horiz-align-center" }
+        //        }, {
+        //            field: 'NUM_ACC',
+        //            title: 'Рахунок',
+        //            width: '120px'
+        //        }, {
+        //            field: 'NAME',
+        //            title: 'Найменування',
+        //            width: '180px'
+        //        }
+        //    ]
+        //});
 
 
         $scope.visaMapedCustomers = vm.visaMapedCustomers = function (relCustId, custId, sdo) {

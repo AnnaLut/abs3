@@ -59,10 +59,26 @@ angular.module(globalSettings.modulesAreas)
                 return deferred.promise;
             };
 
+            var _getTypeOfCustomer = function (custId) {
+                state.isLoading = true;
+                var deferred = $q.defer();
+                $http.get(bars.config.urlContent('/api/cdo/common/customers/getTypeOfCustomer/' + custId)).success(function (response) {
+                    state.isLoading = false;
+                    deferred.resolve(response);
+                }).error(function (response) {
+                    state.isLoading = false;
+                    deferred.reject(response);
+                });
+
+                return deferred.promise;
+            };
+
             factory.getModuleVersion = _getModuleVersion;
             factory.getCustomerRelatedCustomers = _getCustomerRelatedCustomers;
             factory.getFOPData = _getFOPData;
             factory.getDocsType = _getDocsType;
+
+            factory.getTypeOfCustomer = _getTypeOfCustomer;
 
             return factory;
         }

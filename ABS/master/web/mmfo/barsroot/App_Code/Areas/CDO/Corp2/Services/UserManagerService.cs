@@ -44,7 +44,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         
         /// <remarks/>
         public UserManagerService() {
-            this.Url = "http://localhost:7777/ibank/service/UserManagerService.asmx";
+            this.Url = "http://localhost:5656/ibank/service/UserManagerService.asmx";
         }
         
         /// <remarks/>
@@ -117,13 +117,12 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/AddOrUpdateUserWithConnectionSettings", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public object[] AddOrUpdateUserWithConnectionSettings(string secretKey, User user, string bankId, string[] moduleIds, decimal[] funcIds, Limit limit, Account[] accs, bool isBlock) {
+        public object[] AddOrUpdateUserWithConnectionSettings(string secretKey, User user, string bankId, string[] moduleIds, Limit limit, Account[] accs, bool isBlock) {
             object[] results = this.Invoke("AddOrUpdateUserWithConnectionSettings", new object[] {
                         secretKey,
                         user,
                         bankId,
                         moduleIds,
-                        funcIds,
                         limit,
                         accs,
                         isBlock});
@@ -131,13 +130,12 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         }
         
         /// <remarks/>
-        public System.IAsyncResult BeginAddOrUpdateUserWithConnectionSettings(string secretKey, User user, string bankId, string[] moduleIds, decimal[] funcIds, Limit limit, Account[] accs, bool isBlock, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult BeginAddOrUpdateUserWithConnectionSettings(string secretKey, User user, string bankId, string[] moduleIds, Limit limit, Account[] accs, bool isBlock, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("AddOrUpdateUserWithConnectionSettings", new object[] {
                         secretKey,
                         user,
                         bankId,
                         moduleIds,
-                        funcIds,
                         limit,
                         accs,
                         isBlock}, callback, asyncState);
@@ -150,12 +148,12 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         }
         
         /// <remarks/>
-        public void AddOrUpdateUserWithConnectionSettingsAsync(string secretKey, User user, string bankId, string[] moduleIds, decimal[] funcIds, Limit limit, Account[] accs, bool isBlock) {
-            this.AddOrUpdateUserWithConnectionSettingsAsync(secretKey, user, bankId, moduleIds, funcIds, limit, accs, isBlock, null);
+        public void AddOrUpdateUserWithConnectionSettingsAsync(string secretKey, User user, string bankId, string[] moduleIds, Limit limit, Account[] accs, bool isBlock) {
+            this.AddOrUpdateUserWithConnectionSettingsAsync(secretKey, user, bankId, moduleIds, limit, accs, isBlock, null);
         }
         
         /// <remarks/>
-        public void AddOrUpdateUserWithConnectionSettingsAsync(string secretKey, User user, string bankId, string[] moduleIds, decimal[] funcIds, Limit limit, Account[] accs, bool isBlock, object userState) {
+        public void AddOrUpdateUserWithConnectionSettingsAsync(string secretKey, User user, string bankId, string[] moduleIds, Limit limit, Account[] accs, bool isBlock, object userState) {
             if ((this.AddOrUpdateUserWithConnectionSettingsOperationCompleted == null)) {
                 this.AddOrUpdateUserWithConnectionSettingsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnAddOrUpdateUserWithConnectionSettingsOperationCompleted);
             }
@@ -164,7 +162,6 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
                         user,
                         bankId,
                         moduleIds,
-                        funcIds,
                         limit,
                         accs,
                         isBlock}, this.AddOrUpdateUserWithConnectionSettingsOperationCompleted, userState);
@@ -179,18 +176,22 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/AddOrUpdateUser", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public object[] AddOrUpdateUser(string secretKey, User user) {
+        public object[] AddOrUpdateUser(string secretKey, User user, string bankId, bool isBlock) {
             object[] results = this.Invoke("AddOrUpdateUser", new object[] {
                         secretKey,
-                        user});
+                        user,
+                        bankId,
+                        isBlock});
             return ((object[])(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult BeginAddOrUpdateUser(string secretKey, User user, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult BeginAddOrUpdateUser(string secretKey, User user, string bankId, bool isBlock, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("AddOrUpdateUser", new object[] {
                         secretKey,
-                        user}, callback, asyncState);
+                        user,
+                        bankId,
+                        isBlock}, callback, asyncState);
         }
         
         /// <remarks/>
@@ -200,18 +201,20 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         }
         
         /// <remarks/>
-        public void AddOrUpdateUserAsync(string secretKey, User user) {
-            this.AddOrUpdateUserAsync(secretKey, user, null);
+        public void AddOrUpdateUserAsync(string secretKey, User user, string bankId, bool isBlock) {
+            this.AddOrUpdateUserAsync(secretKey, user, bankId, isBlock, null);
         }
         
         /// <remarks/>
-        public void AddOrUpdateUserAsync(string secretKey, User user, object userState) {
+        public void AddOrUpdateUserAsync(string secretKey, User user, string bankId, bool isBlock, object userState) {
             if ((this.AddOrUpdateUserOperationCompleted == null)) {
                 this.AddOrUpdateUserOperationCompleted = new System.Threading.SendOrPostCallback(this.OnAddOrUpdateUserOperationCompleted);
             }
             this.InvokeAsync("AddOrUpdateUser", new object[] {
                         secretKey,
-                        user}, this.AddOrUpdateUserOperationCompleted, userState);
+                        user,
+                        bankId,
+                        isBlock}, this.AddOrUpdateUserOperationCompleted, userState);
         }
         
         private void OnAddOrUpdateUserOperationCompleted(object arg) {
@@ -307,36 +310,42 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://unity-bars.com.ua/ws/IsBlocked", RequestNamespace="http://unity-bars.com.ua/ws", ResponseNamespace="http://unity-bars.com.ua/ws", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public bool IsBlocked(decimal userId) {
+        public int IsBlocked(decimal userId, int rnk, string bankId) {
             object[] results = this.Invoke("IsBlocked", new object[] {
-                        userId});
-            return ((bool)(results[0]));
+                        userId,
+                        rnk,
+                        bankId});
+            return ((int)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult BeginIsBlocked(decimal userId, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult BeginIsBlocked(decimal userId, int rnk, string bankId, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("IsBlocked", new object[] {
-                        userId}, callback, asyncState);
+                        userId,
+                        rnk,
+                        bankId}, callback, asyncState);
         }
         
         /// <remarks/>
-        public bool EndIsBlocked(System.IAsyncResult asyncResult) {
+        public int EndIsBlocked(System.IAsyncResult asyncResult) {
             object[] results = this.EndInvoke(asyncResult);
-            return ((bool)(results[0]));
+            return ((int)(results[0]));
         }
         
         /// <remarks/>
-        public void IsBlockedAsync(decimal userId) {
-            this.IsBlockedAsync(userId, null);
+        public void IsBlockedAsync(decimal userId, int rnk, string bankId) {
+            this.IsBlockedAsync(userId, rnk, bankId, null);
         }
         
         /// <remarks/>
-        public void IsBlockedAsync(decimal userId, object userState) {
+        public void IsBlockedAsync(decimal userId, int rnk, string bankId, object userState) {
             if ((this.IsBlockedOperationCompleted == null)) {
                 this.IsBlockedOperationCompleted = new System.Threading.SendOrPostCallback(this.OnIsBlockedOperationCompleted);
             }
             this.InvokeAsync("IsBlocked", new object[] {
-                        userId}, this.IsBlockedOperationCompleted, userState);
+                        userId,
+                        rnk,
+                        bankId}, this.IsBlockedOperationCompleted, userState);
         }
         
         private void OnIsBlockedOperationCompleted(object arg) {
@@ -983,10 +992,10 @@ namespace BarsWeb.Areas.CDO.Corp2.Services {
         }
         
         /// <remarks/>
-        public bool Result {
+        public int Result {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((bool)(this.results[0]));
+                return ((int)(this.results[0]));
             }
         }
     }
