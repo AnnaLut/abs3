@@ -7,10 +7,11 @@ namespace BarsWeb.Areas.CDO.Common.Controllers
     //[CheckAccessPage]
     public class RelatedCustomersController : ApplicationController
     {
-        public ActionResult Index(decimal custId, string clmode="base")
+        public ActionResult Index(decimal custId,bool addCorp2Tube = false, string clmode="base")
         {
             ViewBag.CustId = custId;
             ViewBag.Clmode = clmode;
+            ViewBag.AddCorp2Tube = addCorp2Tube;
             return View();
         }
     }

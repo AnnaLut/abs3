@@ -21,6 +21,8 @@ using BarsWeb.Areas.CDO.Common.Services;
 using BarsWeb.Areas.CDO.Common.Models;
 using BarsWeb.Areas.CDO.CorpLight.Repository;
 using BarsWeb.Areas.CDO.CorpLight.Services;
+using BarsWeb.Areas.CDO.Corp2.Repository;
+using BarsWeb.Areas.CDO.Corp2.Services;
 
 // ReSharper disable once CheckNamespace
 namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
@@ -34,6 +36,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         private ICustomersRepository _custRepository;
         private IRelatedCustomersRepository _commonrelaredCustRepository;
         private ICLRelatedCustomersRepository _relaredCustRepository;
+        private readonly ICorp2RelatedCustomersRepository _corp2RelatedCustomers;
+        private readonly ICLAcskRepository _acskRepository;
         private ICLRelatedCustomerValidator _relCustValidator;
         private IUserCertificateService _userCertificateService;
         private readonly IDbLogger _logger;
@@ -44,10 +48,14 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
             ICLRelatedCustomersRepository relaredCustRepository,
             ICLRelatedCustomerValidator relCustValidator,
             IUserCertificateService userCertificateService
+            , ICorp2RelatedCustomersRepository corp2RelatedCustomers
+            , ICLAcskRepository acskRepository
             , IDbLogger logger)
         {
             _commonrelaredCustRepository = commonRelatedCustomerRepository;
             _relaredCustRepository = relaredCustRepository;
+            _corp2RelatedCustomers = corp2RelatedCustomers;
+            _acskRepository = acskRepository;
             _relCustValidator = relCustValidator;
             _custRepository = custRepository;
             _userCertificateService = userCertificateService;
@@ -177,17 +185,47 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         /// <param name="taxCode"></param>
         /// <returns></returns>
         [HttpGet]
-        [GET("api/cdo/corplight/RelatedCustomers/getbytaxcode/{taxCode}/{somevalue}")]
-        public HttpResponseMessage GetByTaxCode(string taxCode, string somevalue)
+        [GET("api/cdo/corplight/RelatedCustomers/getbytaxcode/{custId}/{taxCode}/{docSeries}/{docNumber}")]
+        public HttpResponseMessage GetByTaxCode(decimal custId, string taxCode, string docSeries, string docNumber)
         {
             try
             {
-                var result = _relaredCustRepository.GetByTaxCode(taxCode);
-                if (result == null)
+                //Шукаємо користувача в базі ABS CorpLight
+                var users = _relaredCustRepository.GetByTaxCode(taxCode).ToList();
+                RelatedCustomer data = users.FirstOrDefault(i => i.CustId == custId);
+                if (data != null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK);
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                        string.Format("Користувач з ІПН: {0} вже існує у клієнта id: {1}", taxCode, custId));
                 }
-                return Request.CreateResponse(HttpStatusCode.OK, result);
+                data = users.FirstOrDefault(i => i.CustId != custId);
+                if (data != null)
+                {
+                    data.Sdo = "CorpLight";
+                    return Request.CreateResponse(HttpStatusCode.OK, data);
+                }
+                //Якщо не знаходимо, то шукаємо в ABS Corp2
+                data = _corp2RelatedCustomers.GetByTaxCodeFrom_REL_CUSTOMERS(taxCode).FirstOrDefault();
+                if (data != null)
+                {
+                    data.Id = null;
+                    data.UserId = null;
+					data.NoInn = 0;
+                    return Request.CreateResponse(HttpStatusCode.OK, data);
+                }
+                //В базі КорпЛайт не шукаємо, бо такий пошук проводиться при підтвердженні беком. Терещенко Ю. сказала не чіпати, зробити поки костилями.
+                //Якщо не знаходемо в ABS, то шукаємо в базі Корп2
+                User userCorp2 = _corp2RelatedCustomers.GetExistUser(new RelatedCustomer { TaxCode = taxCode, DocSeries = docSeries, DocNumber = docNumber });
+
+                if (userCorp2 != null)
+                {
+                    data = Mapper.MapUserToRelatedCustomer(userCorp2);
+                    data.UserId = null;
+					data.NoInn = 0;
+                    return Request.CreateResponse(HttpStatusCode.OK, data);
+                }
+
+                return data == null ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.OK, data);
             }
             catch (Exception ex)
             {
@@ -214,7 +252,17 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                         "Користувач з вказаними параметрами вже існує");
                 }
 
-                _relaredCustRepository.Add(relatedCustomer);
+                var id = _relaredCustRepository.Add(relatedCustomer);
+                if (relatedCustomer.AcskRegistrationId.HasValue && relatedCustomer.AcskRegistrationId != 0)
+                {   //insert into MBM_ACSK_REGISTRATION
+                    _acskRepository.MapRelatedCustomerToAcskUser(id, new Common.Models.Acsk.AcskSendProfileInfo
+                    {
+                        RegistrationId = (int?)relatedCustomer.AcskRegistrationId,
+                        RegistrationDate = relatedCustomer.AcskRegistrationDate,
+                        UserId = relatedCustomer.AcskUserId
+                    }); 
+                }
+
                 _logger.Info(string.Format(
                     "Створено нового користувача Id:{0} TaxCode:{1}, PhoneNumber:{2}, email:{3}",
                     relatedCustomer.Id, relatedCustomer.TaxCode, relatedCustomer.CellPhone, relatedCustomer.Email));
@@ -284,22 +332,49 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         /// <param name="custId"></param>
         /// <param name="signNumber"></param>
         /// <returns></returns>
+        //[HttpPut]
+        //[PUT("api/cdo/corplight/RelatedCustomers/mapCustomer/{id}/{custId}/{signNumber}")]
+        //public HttpResponseMessage MapCustomer(decimal id, decimal custId, decimal signNumber)
+        //{
+        //    try
+        //    {
+        //        if (_relCustValidator.CustomerIsMapped(id, custId))
+        //        {
+        //            return Request.CreateResponse(
+        //                HttpStatusCode.BadRequest,
+        //                "Користувач вже прикріплений до клієнта");
+        //        }
+        //        _relaredCustRepository.MapRelatedCustomerToUser(null, custId, id, signNumber);
+        //        _logger.Info(string.Format(
+        //            "Користувачу Id:{0} надано доступ до клієнта RNK:{1}, номер підпису:{2}",
+        //            id, custId, signNumber));
+
+        //        return Request.CreateResponse(HttpStatusCode.OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
+        //    }
+        //}
         [HttpPut]
-        [PUT("api/cdo/corplight/RelatedCustomers/mapCustomer/{id}/{custId}/{signNumber}")]
-        public HttpResponseMessage MapCustomer(decimal id, decimal custId, decimal signNumber)
+        [PUT("api/cdo/corplight/RelatedCustomers/updateAndMap/")]
+        public HttpResponseMessage UpdateAndMap(RelatedCustomer relatedCustomer)
         {
             try
             {
-                if (_relCustValidator.CustomerIsMapped(id, custId))
-                {
-                    return Request.CreateResponse(
-                        HttpStatusCode.BadRequest,
-                        "Користувач вже прикріплений до клієнта");
+                _relaredCustRepository.UpdateAndMap(relatedCustomer);
+                if (relatedCustomer.AcskRegistrationId.HasValue && relatedCustomer.AcskRegistrationId != 0)
+                {   //insert into MBM_ACSK_REGISTRATION
+                    _acskRepository.MapRelatedCustomerToAcskUser(relatedCustomer.Id.Value, new Common.Models.Acsk.AcskSendProfileInfo
+                    {
+                        RegistrationId = (int?)relatedCustomer.AcskRegistrationId,
+                        RegistrationDate = relatedCustomer.AcskRegistrationDate,
+                        UserId = relatedCustomer.AcskUserId
+                    });
                 }
-                _relaredCustRepository.MapRelatedCustomerToUser(null, custId, id, signNumber);
                 _logger.Info(string.Format(
                     "Користувачу Id:{0} надано доступ до клієнта RNK:{1}, номер підпису:{2}",
-                    id, custId, signNumber));
+                    relatedCustomer.Id, relatedCustomer.CustId, relatedCustomer.SignNumber));
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -308,7 +383,6 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
-
         /// <summary>
         /// Unmap related customer to the user
         /// </summary>

@@ -12,6 +12,7 @@ using BarsWeb.Areas.CDO.Common.Repository;
 using BarsWeb.Areas.CDO.Common.Models;
 using BarsWeb.Areas.CDO.Corp2.Models;
 using BarsWeb.Areas.CDO.Corp2.Services;
+using System.Data;
 
 namespace BarsWeb.Areas.CDO.Corp2.Repository
 {
@@ -78,6 +79,11 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         {
             return _globalData.GetParam(id);
         }
+        public IEnumerable<RelatedCustomer> GetByTaxCodeFrom_REL_CUSTOMERS(string taxCode)
+        {
+            BarsSql sql = SqlCreator.GetByTaxCodeFrom_REL_CUSTOMERS(taxCode);
+            return ExecuteStoreQuery<RelatedCustomer>(sql);
+        }
         private void Update(RelatedCustomer relatedCustomer)
         {
             BarsSql sql = SqlCreator.UpdateRelatedCustomer(relatedCustomer);
@@ -98,14 +104,16 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         }
         public void UpdateRelatedCustomer(RelatedCustomer relatedCustomer)
         {
+            UnloadCustomerToCorp2(relatedCustomer.CustId.Value);
             Update(relatedCustomer);
 
-            if (relatedCustomer.SignNumber.HasValue &&
-                System.Text.RegularExpressions.Regex.IsMatch(relatedCustomer.SignNumber.ToString(), "^[^0-2]$"))
+            //if (relatedCustomer.SignNumber.HasValue &&
+            //    System.Text.RegularExpressions.Regex.IsMatch(relatedCustomer.SignNumber.ToString(), "^[^0-2]$"))
+            if(!string.IsNullOrEmpty(relatedCustomer.UserId) && !(relatedCustomer.IsCanSign.HasValue && relatedCustomer.IsCanSign.Value))
             {
                 try
                 {
-                    Corp2Services.UserManager.AddOrUpdateUser(Corp2Services.GetSecretKey(), Mapper.MapRelatedCustomerToUser(relatedCustomer));
+                    Corp2Services.UserManager.AddOrUpdateUser(Corp2Services.GetSecretKey(), Mapper.MapRelatedCustomerToUser(relatedCustomer), GetOurMfo(), true);
                 }
                 catch (Exception ex)
                 {
@@ -126,13 +134,17 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         /// <param name="relatedCustomer"></param>
         public void UpdateAndMap(RelatedCustomer relatedCustomer)
         {
+            UnloadCustomerToCorp2(relatedCustomer.CustId.Value);
             Update(relatedCustomer);
 
             MapRelatedCustomerToUser(relatedCustomer.UserId, relatedCustomer.CustId.Value, relatedCustomer.Id.Value, 0);
             try
             {
                 if (relatedCustomer.UserId != null)
-                    Corp2Services.UserManager.AddOrUpdateUser(Corp2Services.GetSecretKey(), Mapper.MapRelatedCustomerToUser(relatedCustomer));
+                {
+                    //var isBlock = !(relatedCustomer.IsCanSign.HasValue && relatedCustomer.IsCanSign.Value);
+                    Corp2Services.UserManager.AddOrUpdateUser(Corp2Services.GetSecretKey(), Mapper.MapRelatedCustomerToUser(relatedCustomer), GetOurMfo(), true/*isBlock*/);
+                }
             }
             catch (Exception ex)
             {
@@ -196,15 +208,27 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         }
         private void UnloadCustomerToCorp2(decimal custId)
         {
-            _entities.ExecuteStoreCommand("begin barsaq.data_import.add_client(p_kf => :p_kf, p_rnk => :p_rnk); end;", _bankRepository.GetOurMfo(), custId); //HACK: GetOurMfo
+            _entities.ExecuteStoreCommand("begin barsaq.data_import.add_client(p_kf => :p_kf, p_rnk => :p_rnk); end;", GetOurMfo(), custId); //HACK: GetOurMfo
         }
-        public void Add(RelatedCustomer relatedCustomer/*, decimal? custId, string custMFO*/)
+        public decimal Add(RelatedCustomer relatedCustomer/*, decimal? custId, string custMFO*/)
         {
             UnloadCustomerToCorp2(relatedCustomer.CustId.Value);
 
             var id = _entities.ExecuteStoreQuery<decimal>(
                 "select CORP2_REL_CUST_SEQ.nextval from dual").FirstOrDefault();
 
+            string acskKeySn = relatedCustomer.AcskSertificateSn;
+            if (string.IsNullOrEmpty(acskKeySn) && relatedCustomer.AcskRegistrationId.HasValue && relatedCustomer.AcskRegistrationId != 0)
+            {
+                try
+                {
+                    acskKeySn = ((int)relatedCustomer.AcskRegistrationId.Value).ToString("X8");
+                }
+                finally
+                {
+                }
+            }
+            #region insert into CORP2_REL_CUSTOMERS
             var sql = @"Insert into CORP2_REL_CUSTOMERS
                             (ID, 
                             LOGIN,
@@ -220,7 +244,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                             BIRTH_DATE,
                             CELL_PHONE,
                             EMAIL,
-                            FIO_CARD)
+                            FIO_CARD,
+                            key_id)
                         Values
                             (:p_id,
                             :p_login,
@@ -236,7 +261,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                             :p_BIRTH_DATE,
                             :p_CELL_PHONE, 
                             :p_EMAIL,
-                            :p_FIO_CARD)";
+                            :p_FIO_CARD,
+                            :p_key_id)";
 
             var parameters = new object[]
             {
@@ -254,11 +280,12 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                 relatedCustomer.BirthDate,
                 relatedCustomer.CellPhone,
                 relatedCustomer.Email,
-                relatedCustomer.FullNameGenitiveCase
+                relatedCustomer.FullNameGenitiveCase,
+                acskKeySn
             };
 
             _entities.ExecuteStoreCommand(sql, parameters);
-
+            #endregion
             MapRelatedCustomerToUser(relatedCustomer.UserId, relatedCustomer.CustId.Value, id, 0/*relatedCustomer.SignNumber.Value*/);
 
             var address = new RelatedCustomerAddress
@@ -271,7 +298,23 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             };
 
             AddRelatedCustomerAddress(id, address);
+            AddRelatedCustomerDefaultModulesAndFuncs(id);
+            return id;
         }
+
+        private void AddRelatedCustomerDefaultModulesAndFuncs(decimal id)
+        {
+            var defaultModulesIds = new string[] { "ACC", "CST", "DOC" };
+
+            SaveModules(id, defaultModulesIds);
+
+            //BarsSql sqlAllFuncs = SqlCreator.SelectFuncs();
+            //var defaultFuncs = ExecuteStoreQuery<FunctionViewModel>(sqlAllFuncs)
+            //    .Where(f => defaultModulesIds.Contains(f.ModuleId))
+            //    .Select(f=>f.Id).Distinct().ToArray();
+            //SaveFuncs(id, defaultFuncs);
+        }
+
         public void MapRelatedCustomerToUser(
             string userId, decimal custId, decimal relatedCustId, decimal signNumber)
         {
@@ -294,11 +337,11 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         {
             if (rc.ApprovedType != "delete")
             {
-                var corp2UserIdLogin = SaveUserWithConnectionSettingsToCorp2(rc, false);
+                var corp2UserIdLogin = SaveUserWithConnectionSettingsToCorp2(rc, true);
                 if (rc.ApprovedType == "add")
                 {
                     UpdateUserIdAndLoginInRelatedCustomer(rc.Id.Value, rc.CustId.Value, corp2UserIdLogin.Item1.ToString(), corp2UserIdLogin.Item2);
-                    //var bankId = _bankRepository.GetOurMfo();
+                    //var bankId =  GetOurMfo();
                     //_entities.ExecuteStoreCommand("begin barsaq.data_import.add_client(p_kf => :p_kf, p_rnk => :p_rnk); end;", bankId, rc.CustId.Value); //HACK: GetOurMfo
                 }
                 SetRelatedCustomerApproved(rc.Id.Value, rc.CustId.Value, true, null);
@@ -363,75 +406,75 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                             id = :p_id";
             _entities.ExecuteStoreCommand(sql, newKeyId, relCustId);
         }
-        public void UpdateCustomerAccount(Corp2CustomerAccount acc)
-        {
-            try
-            {
-                Corp2Services.CustomerManager.UpdateVisaQty(Corp2Services.GetSecretKey(), acc.CORP2_ACC.Value, acc.VISA_COUNT.Value);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
-            }
+        //public void UpdateCustomerAccount(Corp2CustomerAccount acc)
+        //{
+        //    try
+        //    {
+        //        Corp2Services.CustomerManager.UpdateVisaQty(Corp2Services.GetSecretKey(), acc.CORP2_ACC.Value, acc.VISA_COUNT.Value);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
+        //    }
 
-            var sql = @"update BARSAQ.IBANK_ACC set
-                            VISA_COUNT = :p_visa_count
-                        where 
-                            ACC = :p_BANK_ACC and KF = :p_kf";
-            _entities.ExecuteStoreCommand(sql, acc.VISA_COUNT, acc.BANK_ACC, acc.KF);
-        }
-        public void EditAccountVisa(CustAccVisaCount visa)
-        {
-            try
-            {
-                Corp2Services.CustomerManager.UpdateVisaQtyCount(Corp2Services.GetSecretKey(), visa.CORP2_ACC_ID, visa.VISA_ID, visa.Old_VISA_ID, visa.COUNT.Value);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
-            }
+        //    var sql = @"update BARSAQ.IBANK_ACC set
+        //                    VISA_COUNT = :p_visa_count
+        //                where 
+        //                    ACC = :p_BANK_ACC and KF = :p_kf";
+        //    _entities.ExecuteStoreCommand(sql, acc.VISA_COUNT, acc.BANK_ACC, acc.KF);
+        //}
+        //public void EditAccountVisa(CustAccVisaCount visa)
+        //{
+        //    try
+        //    {
+        //        Corp2Services.CustomerManager.UpdateVisaQtyCount(Corp2Services.GetSecretKey(), visa.CORP2_ACC_ID, visa.VISA_ID, visa.Old_VISA_ID, visa.COUNT.Value);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
+        //    }
 
-            var sql = @"update CORP2_ACC_VISA_COUNT set
-                        VISA_ID = :p_visa_id,
-                        COUNT = :p_count
-                    where 
-                        ACC_ID = :p_acc_id
-                        and VISA_ID = :p_old_visa_id";
-            _entities.ExecuteStoreCommand(sql, visa.VISA_ID, visa.COUNT, visa.ACC_ID, visa.Old_VISA_ID);
-        }
-        public void AddAccountVisa(CustAccVisaCount visa)
-        {
-            try
-            {
-                Corp2Services.CustomerManager.AddVisaQtyCount(Corp2Services.GetSecretKey(), visa.CORP2_ACC_ID, visa.VISA_ID, visa.COUNT.Value);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
-            }
+        //    var sql = @"update CORP2_ACC_VISA_COUNT set
+        //                VISA_ID = :p_visa_id,
+        //                COUNT = :p_count
+        //            where 
+        //                ACC_ID = :p_acc_id
+        //                and VISA_ID = :p_old_visa_id";
+        //    _entities.ExecuteStoreCommand(sql, visa.VISA_ID, visa.COUNT, visa.ACC_ID, visa.Old_VISA_ID);
+        //}
+        //public void AddAccountVisa(CustAccVisaCount visa)
+        //{
+        //    try
+        //    {
+        //        Corp2Services.CustomerManager.AddVisaQtyCount(Corp2Services.GetSecretKey(), visa.CORP2_ACC_ID, visa.VISA_ID, visa.COUNT.Value);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
+        //    }
 
-            var sql = @"insert into CORP2_ACC_VISA_COUNT 
-                            (ACC_ID, VISA_ID, COUNT) values
-                            (:p_acc_id, :p_visa_id, :p_count)";
-            _entities.ExecuteStoreCommand(sql, visa.ACC_ID, visa.VISA_ID, visa.COUNT);
-        }
-        public void DeleteAccountVisa(CustAccVisaCount visa)
-        {
-            try
-            {
-                Corp2Services.CustomerManager.DeleteVisaQtyCount(Corp2Services.GetSecretKey(), visa.CORP2_ACC_ID, visa.VISA_ID);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
-            }
+        //    var sql = @"insert into CORP2_ACC_VISA_COUNT 
+        //                    (ACC_ID, VISA_ID, COUNT) values
+        //                    (:p_acc_id, :p_visa_id, :p_count)";
+        //    _entities.ExecuteStoreCommand(sql, visa.ACC_ID, visa.VISA_ID, visa.COUNT);
+        //}
+        //public void DeleteAccountVisa(CustAccVisaCount visa)
+        //{
+        //    try
+        //    {
+        //        Corp2Services.CustomerManager.DeleteVisaQtyCount(Corp2Services.GetSecretKey(), visa.CORP2_ACC_ID, visa.VISA_ID);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
+        //    }
 
-            var sql = @"delete CORP2_ACC_VISA_COUNT
-                    where 
-                        ACC_ID = :p_acc_id
-                        and VISA_ID = :p_visa_id";
-            _entities.ExecuteStoreCommand(sql, visa.ACC_ID, visa.VISA_ID);
-        }
+        //    var sql = @"delete CORP2_ACC_VISA_COUNT
+        //            where 
+        //                ACC_ID = :p_acc_id
+        //                and VISA_ID = :p_visa_id";
+        //    _entities.ExecuteStoreCommand(sql, visa.ACC_ID, visa.VISA_ID);
+        //}
         public void SaveUserWithConnectionSettings(UserConnParamModel model)
         {
             var user = model.User;
@@ -447,7 +490,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             }
 
 
-            if (user.SignNumber == 1 || user.SignNumber == 2)
+            //if (user.SignNumber == 1 || user.SignNumber == 2)
+            if(user.IsCanSign.HasValue && user.IsCanSign.Value)
             {
                 SetRelatedCustomerApproved(userId.Value, user.CustId.Value, false, user.UserId == null ? "add" : "update");
             }
@@ -469,10 +513,42 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                 SetRelatedCustomerApproved(userId.Value, user.CustId.Value, true, null);
             }
         }
+        private void SaveModules (decimal userId, string[] modulesIds)
+        {
+            if(modulesIds.Length > 0)
+            {
+                var sqlModules = new StringBuilder("BEGIN ");
+                var parameters = new Queue<object>();
+                parameters.Enqueue(userId);
+                for (int i = 0; i < modulesIds.Length; i++)
+                {
+                    sqlModules.AppendFormat("INSERT INTO CORP2_USER_MODULES (USER_ID, MODULE_ID) VALUES (:p_userId, :p_moduleId{0});", i);
+                    parameters.Enqueue(modulesIds[i]);
+                }
+                sqlModules.Append("END;");
+                _entities.ExecuteStoreCommand(sqlModules.ToString(), parameters.ToArray());
+            }
+        }
+        //private void SaveFuncs(decimal userId, decimal[] funcsIds)
+        //{
+        //    if (funcsIds.Length > 0)
+        //    {
+        //        var sqlFuncs = new StringBuilder("BEGIN ");
+        //        var parameters = new Queue<object>();
+        //        parameters.Enqueue(userId);
+        //        for (int i = 0; i < funcsIds.Length; i++)
+        //        {
+        //            sqlFuncs.AppendFormat("INSERT INTO CORP2_USER_FUNCTIONS (USER_ID, FUNC_ID) VALUES (:p_userId, :p_funcId{0});", i);
+        //            parameters.Enqueue(funcsIds[i]);
+        //        }
+        //        sqlFuncs.Append("END;");
+        //        _entities.ExecuteStoreCommand(sqlFuncs.ToString(), parameters.ToArray());
+        //    }
+        //}
         private void SaveUserWithConnectionSettingsToABS(UserConnParamModel model)
         {
             var user = model.User;
-            var userId = user.Id;
+            var userId = user.Id.Value;
 
             var sqlDel = @"begin 
                            DELETE CORP2_USER_MODULES
@@ -482,37 +558,42 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                           end;";
             _entities.ExecuteStoreCommand(sqlDel, userId);
             //Save User Modules
-            if (model.UserModules.Count > 0)
-            {
-                var sqlModules = new StringBuilder("BEGIN ");
-                var parameters = new Queue<object>();
-                parameters.Enqueue(userId);
-                int index = 0;
-                foreach (var item in model.UserModules)
-                {
-                    sqlModules.AppendFormat("INSERT INTO CORP2_USER_MODULES (USER_ID, MODULE_ID) VALUES (:p_userId, :p_moduleId{0});", index);
-                    parameters.Enqueue(item.Id);
-                    index++;
-                }
-                sqlModules.Append("END;");
-                _entities.ExecuteStoreCommand(sqlModules.ToString(), parameters.ToArray());
-            }
+            SaveModules(userId, model.UserModules.Select(m => m.Id).ToArray());
+            //if (model.UserModules.Count > 0)
+            //{
+            //    var sqlModules = new StringBuilder("BEGIN ");
+            //    var parameters = new Queue<object>();
+            //    parameters.Enqueue(userId);
+            //    int index = 0;
+            //    foreach (var item in model.UserModules)
+            //    {
+            //        sqlModules.AppendFormat("INSERT INTO CORP2_USER_MODULES (USER_ID, MODULE_ID) VALUES (:p_userId, :p_moduleId{0});", index);
+            //        parameters.Enqueue(item.Id);
+            //        index++;
+            //    }
+            //    sqlModules.Append("END;");
+            //    _entities.ExecuteStoreCommand(sqlModules.ToString(), parameters.ToArray());
+            //}
             //Save User Funcs
-            if (model.UserFuncs.Count > 0)
-            {
-                var sqlFuncs = new StringBuilder("BEGIN ");
-                var parameters = new Queue<object>();
-                parameters.Enqueue(userId);
-                int index = 0;
-                foreach (var id in model.UserFuncs.Select(f => f.Id).Distinct())
-                {
-                    sqlFuncs.AppendFormat("INSERT INTO CORP2_USER_FUNCTIONS (USER_ID, FUNC_ID) VALUES (:p_userId, :p_funcId{0});", index);
-                    parameters.Enqueue(id);
-                    index++;
-                }
-                sqlFuncs.Append("END;");
-                _entities.ExecuteStoreCommand(sqlFuncs.ToString(), parameters.ToArray());
-            }
+            //BarsSql sqlAllFuncs = SqlCreator.SelectFuncs();
+            //var modulesIds = model.UserModules.Select(m => m.Id);
+            //model.UserFuncs = ExecuteStoreQuery<FunctionViewModel>(sqlAllFuncs).Where(f => modulesIds.Contains(f.ModuleId)).ToList();
+            //SaveFuncs(userId, model.UserFuncs.Select(f => f.Id).Distinct().ToArray());
+            //if (model.UserFuncs.Count > 0)
+            //{
+            //    var sqlFuncs = new StringBuilder("BEGIN ");
+            //    var parameters = new Queue<object>();
+            //    parameters.Enqueue(userId);
+            //    int index = 0;
+            //    foreach (var id in model.UserFuncs.Select(f => f.Id).Distinct())
+            //    {
+            //        sqlFuncs.AppendFormat("INSERT INTO CORP2_USER_FUNCTIONS (USER_ID, FUNC_ID) VALUES (:p_userId, :p_funcId{0});", index);
+            //        parameters.Enqueue(id);
+            //        index++;
+            //    }
+            //    sqlFuncs.Append("END;");
+            //    _entities.ExecuteStoreCommand(sqlFuncs.ToString(), parameters.ToArray());
+            //}
             //Save User
             var sqlUser = @"merge into corp2_cust_rel_users_map c
                             using (select * from dual) p on ( :custid = c.cust_id and :relcustid = c.rel_cust_id)                                
@@ -583,9 +664,9 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
 
             try
             {
-                var userIdLogin = Corp2Services.UserManager.AddOrUpdateUserWithConnectionSettings(Corp2Services.GetSecretKey(), user, _bankRepository.GetOurMfo(),
+                var userIdLogin = Corp2Services.UserManager.AddOrUpdateUserWithConnectionSettings(Corp2Services.GetSecretKey(), user, GetOurMfo(),
                     model.UserModules.Select(m => m.Id).ToArray(),
-                    model.UserFuncs.Select(f => f.Id).Distinct().ToArray(),
+                    /*model.UserFuncs.Select(f => f.Id).Distinct().ToArray(),*/
                     Mapper.MapLimitVMToLimit(model.UserLimit),
                     model.UserAccs.Select(a => Mapper.MapUserAccountPermissionViewModelToAccount(a)).ToArray(), true);
 
@@ -613,15 +694,15 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             BarsSql sqlModules = SqlCreator.SelectUserModules(userId);
             var modules = ExecuteStoreQuery<ModuleViewModel>(sqlModules).Select(m => m.Id).ToArray();
 
-            BarsSql sqlFuncs = SqlCreator.SelectUserFuncs(userId);
-            var funcs = ExecuteStoreQuery<FunctionViewModel>(sqlFuncs).Select(f => f.Id).Distinct().ToArray();
+            //BarsSql sqlFuncs = SqlCreator.SelectUserFuncs(userId);
+            //var funcs = ExecuteStoreQuery<FunctionViewModel>(sqlFuncs).Select(f => f.Id).Distinct().ToArray();
 
             var accs = SelectCorp2UserAccsPermissionsForSave(rc.CustId, userId);
 
             try
             {
-                var userIdLogin = Corp2Services.UserManager.AddOrUpdateUserWithConnectionSettings(Corp2Services.GetSecretKey(), user, _bankRepository.GetOurMfo(),
-                    modules, funcs, limit, accs, isBlock);
+                var userIdLogin = Corp2Services.UserManager.AddOrUpdateUserWithConnectionSettings(Corp2Services.GetSecretKey(), user, GetOurMfo(),
+                    modules, /*funcs,*/ limit, accs, isBlock);
                 return Tuple.Create((decimal)userIdLogin[0], userIdLogin[1].ToString());
             }
             catch (Exception ex)
@@ -664,6 +745,23 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
             var data = ExecuteStoreQuery<Account>(sql).ToArray();
             return data;
         }
+        public int IsBlocked(decimal userId, decimal custId)
+        {
+            try
+            {
+                return Corp2Services.UserManager.IsBlocked(userId, (int)custId, GetOurMfo());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(corp2ExMessage + Environment.NewLine + ex.Message);
+            }
+        }
+        private string GetOurMfo()
+        {
+            var mfo  = _bankRepository.GetOurMfo();
+            if (String.IsNullOrEmpty(mfo)) throw new Exception("Не знайдений МФО. Можливо, необхідно обрати відділення.");
+            return mfo;
+        }
     }
 
     public interface ICorp2RelatedCustomersRepository
@@ -682,7 +780,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         /// <param name="relatedCustomer"></param>
         /// <param name="custId">is RNK</param>
         /// <param name="custMFO">is KF</param>
-        void Add(RelatedCustomer relatedCustomer/*, decimal? custId, string custMFO*/);
+        decimal Add(RelatedCustomer relatedCustomer/*, decimal? custId, string custMFO*/);
         void MapRelatedCustomerToUser(string userId, decimal custId, decimal relatedCustId, decimal signNumber);
         void UnloadCustomerAccountsToCorp2(decimal[] accIdList);
         //void VisaMapedRelatedCustomerToUser(decimal id, decimal custId);
@@ -692,13 +790,15 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         User GetExistUser(RelatedCustomer relCust);
         void UpdateRelatedCustomerKey(decimal relCustId, string newKeyId);
         //void SubscribeCustomer(decimal custId);
-        void UpdateCustomerAccount(Corp2CustomerAccount acc);
-        void AddAccountVisa(CustAccVisaCount visa);
-        void EditAccountVisa(CustAccVisaCount visa);
-        void DeleteAccountVisa(CustAccVisaCount visa);
+        //void UpdateCustomerAccount(Corp2CustomerAccount acc);
+        //void AddAccountVisa(CustAccVisaCount visa);
+        //void EditAccountVisa(CustAccVisaCount visa);
+        //void DeleteAccountVisa(CustAccVisaCount visa);
         void SetRelatedCustomerApproved(decimal relCustId, decimal custId, bool approved, string approvedType);
         void SaveUserWithConnectionSettings(UserConnParamModel model);
         List<UserAccountPermissionViewModel> SelectCorp2UserAccsPermissions(decimal? custId, decimal? userId);
+        int IsBlocked(decimal userId, decimal custId);
+        IEnumerable<RelatedCustomer> GetByTaxCodeFrom_REL_CUSTOMERS(string taxCode);
     }
 
     public class SqlCreator
@@ -812,6 +912,17 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
         }
         internal static BarsSql UpdateRelatedCustomer(RelatedCustomer relatedCustomer)
         {
+            string acskKeySn = relatedCustomer.AcskSertificateSn;
+            if (string.IsNullOrEmpty(acskKeySn) && relatedCustomer.AcskRegistrationId.HasValue && relatedCustomer.AcskRegistrationId != 0)
+            {
+                try
+                {
+                    acskKeySn = ((int)relatedCustomer.AcskRegistrationId.Value).ToString("X8");
+                }
+                finally
+                {
+                }
+            }
             return new BarsSql
             {
                 SqlText = @"update CORP2_REL_CUSTOMERS set
@@ -828,7 +939,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                             CELL_PHONE = :p_CELL_PHONE, 
                             EMAIL = :p_EMAIL,                            
                             ACSK_ACTUAL = 0,
-                            FIO_CARD = :p_FIO_CARD
+                            FIO_CARD = :p_FIO_CARD,
+                            key_id = :p_key_id
                         where 
                             id = :p_id",//NO_INN = :p_NO_INN,
                 SqlParams = new object[]
@@ -846,6 +958,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                     relatedCustomer.CellPhone,
                     relatedCustomer.Email,
                     relatedCustomer.FullNameGenitiveCase,
+                    acskKeySn,
                     relatedCustomer.Id
                 }
             };
@@ -913,53 +1026,68 @@ namespace BarsWeb.Areas.CDO.Corp2.Repository
                 }
             };
         }
-        internal static BarsSql SelectAvailableFuncs(decimal? userId)
-        {
-            var sql = @"SELECT t.FUNC_ID as Id, f.FUNC_NAME as Name, t.MODULE_ID as ModuleId FROM 
-                         (SELECT mf.* FROM CORP2_MODULE_FUNCTIONS mf
-                          MINUS
-                          SELECT m.* FROM CORP2_MODULE_FUNCTIONS m
-                                            JOIN CORP2_USER_FUNCTIONS uf ON (
-                                            uf.FUNC_ID = m.FUNC_ID AND uf.USER_ID = NVL(:userId, 0))) t
-                      JOIN CORP2_FUNCTIONS f ON(f.FUNC_ID = t.FUNC_ID)";
+        //internal static BarsSql SelectAvailableFuncs(decimal? userId)
+        //{
+        //    var sql = @"SELECT t.FUNC_ID as Id, f.FUNC_NAME as Name, t.MODULE_ID as ModuleId FROM 
+        //                 (SELECT mf.* FROM CORP2_MODULE_FUNCTIONS mf
+        //                  MINUS
+        //                  SELECT m.* FROM CORP2_MODULE_FUNCTIONS m
+        //                                    JOIN CORP2_USER_FUNCTIONS uf ON (
+        //                                    uf.FUNC_ID = m.FUNC_ID AND uf.USER_ID = NVL(:userId, 0))) t
+        //              JOIN CORP2_FUNCTIONS f ON(f.FUNC_ID = t.FUNC_ID)";
 
-            return new BarsSql
-            {
-                SqlText = sql,
-                SqlParams = new object[]
-                {
-                    new OracleParameter("userId", OracleDbType.Int64) { Value = userId }
-                }
-            };
-        }
-        internal static BarsSql SelectUserFuncs(decimal? userId)
-        {
-            var sql = @"SELECT mf.FUNC_ID as Id, f.FUNC_NAME as Name, mf.MODULE_ID as ModuleId FROM CORP2_MODULE_FUNCTIONS mf
-                            JOIN CORP2_USER_FUNCTIONS uf ON (uf.FUNC_ID = mf.FUNC_ID 
-                                                            AND uf.USER_ID = NVL(:userId, 0))
-                            JOIN CORP2_FUNCTIONS f ON(f.FUNC_ID = mf.FUNC_ID)";
-            return new BarsSql
-            {
-                SqlText = sql,
-                SqlParams = new object[]
-                {
-                    new OracleParameter("userId", OracleDbType.Int64) { Value = userId }
-                }
-            };
-        }
+        //    return new BarsSql
+        //    {
+        //        SqlText = sql,
+        //        SqlParams = new object[]
+        //        {
+        //            new OracleParameter("userId", OracleDbType.Int64) { Value = userId }
+        //        }
+        //    };
+        //}
+        //internal static BarsSql SelectUserFuncs(decimal? userId)
+        //{
+        //    //var sql = @"SELECT mf.FUNC_ID as Id, f.FUNC_NAME as Name, mf.MODULE_ID as ModuleId FROM CORP2_MODULE_FUNCTIONS mf
+        //    //                JOIN CORP2_USER_FUNCTIONS uf ON (uf.FUNC_ID = mf.FUNC_ID 
+        //    //                                                AND uf.USER_ID = NVL(:userId, 0))
+        //    //                JOIN CORP2_FUNCTIONS f ON(f.FUNC_ID = mf.FUNC_ID)";
+        //    var sql = @"SELECT mf.FUNC_ID as Id, mf.MODULE_ID as ModuleId FROM CORP2_MODULE_FUNCTIONS mf
+        //                    JOIN CORP2_USER_FUNCTIONS uf ON (uf.FUNC_ID = mf.FUNC_ID 
+        //                                                    AND uf.USER_ID = NVL(:userId, 0))";
+        //    return new BarsSql
+        //    {
+        //        SqlText = sql,
+        //        SqlParams = new object[]
+        //        {
+        //            new OracleParameter("userId", OracleDbType.Int64) { Value = userId }
+        //        }
+        //    };
+        //}
+        //internal static BarsSql SelectFuncs()
+        //{
+        //    //var sql = @"SELECT mf.FUNC_ID as Id, f.FUNC_NAME as Name, mf.MODULE_ID as ModuleId FROM CORP2_MODULE_FUNCTIONS mf
+        //    //                JOIN CORP2_USER_FUNCTIONS uf ON (uf.FUNC_ID = mf.FUNC_ID 
+        //    //                                                AND uf.USER_ID = NVL(:userId, 0))
+        //    //                JOIN CORP2_FUNCTIONS f ON(f.FUNC_ID = mf.FUNC_ID)";
+        //    var sql = @"SELECT mf.FUNC_ID as Id, mf.MODULE_ID as ModuleId FROM CORP2_MODULE_FUNCTIONS mf";
+        //    return new BarsSql
+        //    {
+        //        SqlText = sql,
+        //    };
+        //}
 
-        internal static BarsSql SelectCustomerAccountVisaCounts(int accId)
-        {
-            return new BarsSql
-            {
-                SqlText = @"SELECT * FROM CORP2_ACC_VISA_COUNT 
-                                WHERE ACC_ID = :accId",
-                SqlParams = new object[]
-                {
-                    new OracleParameter("accId", OracleDbType.Int32){ Value = accId}
-                }
-            };
-        }
+        //internal static BarsSql SelectCustomerAccountVisaCounts(int accId)
+        //{
+        //    return new BarsSql
+        //    {
+        //        SqlText = @"SELECT * FROM CORP2_ACC_VISA_COUNT 
+        //                        WHERE ACC_ID = :accId",
+        //        SqlParams = new object[]
+        //        {
+        //            new OracleParameter("accId", OracleDbType.Int32){ Value = accId}
+        //        }
+        //    };
+        //}
         internal static BarsSql SelectUserLimits(decimal userId)
         {
             return new BarsSql

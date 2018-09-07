@@ -188,11 +188,11 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
             return result;
         }
 
-        public RelatedCustomer GetByTaxCode(string taxCode)
+        public IEnumerable<RelatedCustomer> GetByTaxCode(string taxCode)
         {
-            var sql = string.Format(baseSql, " and um.cust_id = :p_cust_id") + @" where rc.tax_code = :p_tax_code";
+            var sql = string.Format(baseSql, "") + @" where rc.tax_code = :p_tax_code";
 
-            var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, null, taxCode).FirstOrDefault();
+            var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, taxCode);
             return result;
         }
 
@@ -231,7 +231,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
                     relCustId);
         }
 
-        public void Add(RelatedCustomer relatedCustomer)
+        public decimal Add(RelatedCustomer relatedCustomer)
         {
             var id = _entities.ExecuteStoreQuery<decimal>(
                 "select MBM_REL_CUST_SEQ.nextval from dual").FirstOrDefault();
@@ -304,6 +304,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
             };
 
             AddRelatedCustomerAddress(id, address);
+            return id;
         }
 
         public void Delete(decimal id)
@@ -387,7 +388,12 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
                 false,
                 relCustInBase.UserId == null ? "add" : "update");
         }
+        public void UpdateAndMap(RelatedCustomer relatedCustomer)
+        {
+            Update(relatedCustomer);
 
+            MapRelatedCustomerToUser(null, relatedCustomer.CustId.Value, relatedCustomer.Id.Value, relatedCustomer.SignNumber.Value);
+        }
         public void SetAcskActual(decimal relCustId, decimal value)
         {
             var sql = @"update MBM_REL_CUSTOMERS set
@@ -933,7 +939,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
         /// <param name="custId"></param>
         /// <returns></returns>
         RelatedCustomer GetById(decimal id, decimal? custId);
-        RelatedCustomer GetByTaxCode(string taxCode);
+        IEnumerable<RelatedCustomer> GetByTaxCode(string taxCode);
         //HACK: Moved to Common
         /// <summary>
         /// Get main data from main customer requisites for creating new related user (available only for FOP)
@@ -945,7 +951,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
         /// Add related customer
         /// </summary>
         /// <param name="relatedCustomer"></param>
-        void Add(RelatedCustomer relatedCustomer);
+        decimal Add(RelatedCustomer relatedCustomer);
         /// <summary>
         /// Delete related custoomer
         /// </summary>
@@ -956,7 +962,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
         /// </summary>
         /// <param name="type"></param>
         void Update(RelatedCustomer type);
-
+        void UpdateAndMap(RelatedCustomer user);
         /// <summary>
         /// Map related customer to user
         /// </summary>

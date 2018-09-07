@@ -25,17 +25,17 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
         private IUserCertificateService _certeficateService;
         private ICorp2RelatedCustomersRepository _corp2RelatedCustomersRepository;
         private ICorp2ProfileSignRepository _corp2ProfileSignRepository;
-        //private readonly IDbLogger _logger;
+        private readonly IDbLogger _logger;
         public C2ProfileSignController(
             IUserCertificateService certeficateService,
             ICorp2RelatedCustomersRepository corp2RelatedCustomers,
             ICorp2ProfileSignRepository corp2ProfileSignRepository
-            /*,IDbLogger logger*/)
+            ,IDbLogger logger)
         {
             _certeficateService = certeficateService;
             _corp2RelatedCustomersRepository = corp2RelatedCustomers;
             _corp2ProfileSignRepository = corp2ProfileSignRepository;
-            //_logger = logger;
+            _logger = logger;
         }
         
 
@@ -75,9 +75,9 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
             try
             {
                 _corp2ProfileSignRepository.Add(profileSignature);
-                //_logger.Info(String.Format(
-                //    "Накладено підпис на профіль користувача Corp2 UserId:{0}, VisaId:{1}",
-                //    profileSignature.UserId, profileSignature.VisaId));
+                _logger.Info(String.Format(
+                    "Накладено підпис на профіль користувача Corp2 UserId:{0}, VisaId:{1}",
+                    profileSignature.UserId, profileSignature.VisaId));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

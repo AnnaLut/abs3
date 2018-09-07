@@ -47,6 +47,22 @@ angular.module(globalSettings.modulesAreas)
                 return deferred.promise;
             };
 
+            var _isCanSign = function (custId, taxCode) {
+                state.isLoading = true;
+                var deferred = $q.defer();
+
+                var url = 'api/cdo/corp2/isCanSign/' + custId + '/' + taxCode;
+                $http.get(bars.config.urlContent(url)).success(function (response) {
+                    state.isLoading = false;
+                    var result = mapResponse(response);
+                    deferred.resolve(result);
+                }).error(function (response) {
+                    state.isLoading = false;
+                    deferred.reject(response);
+                });
+                return deferred.promise;
+            }
+
             var _create = function (relCustomer) {
                 state.isLoading = true;
                 var deferred = $q.defer();
@@ -163,50 +179,50 @@ angular.module(globalSettings.modulesAreas)
                 return deferred.promise;
             }
             ////////////Corp2 Customer Account Visa Setting///////////////
-            var _saveAccountVisaQuantity = function (acc) {
-                state.isLoading = true;
-                var deferred = $q.defer();
+            //var _saveAccountVisaQuantity = function (acc) {
+            //    state.isLoading = true;
+            //    var deferred = $q.defer();
 
-                $http.post(bars.config.urlContent('/api/cdo/corp2/savecustomeraccount/'), acc)
-                    .success(function (response) {
-                        state.isLoading = false;
-                        deferred.resolve(response);
-                    }).error(function (response) {
-                        state.isLoading = false;
-                        deferred.reject(response);
-                    });
-                return deferred.promise;
-            }
-            var _deleteVisa = function (item) {
-                state.isLoading = true;
-                var deferred = $q.defer();
+            //    $http.post(bars.config.urlContent('/api/cdo/corp2/savecustomeraccount/'), acc)
+            //        .success(function (response) {
+            //            state.isLoading = false;
+            //            deferred.resolve(response);
+            //        }).error(function (response) {
+            //            state.isLoading = false;
+            //            deferred.reject(response);
+            //        });
+            //    return deferred.promise;
+            //}
+            //var _deleteVisa = function (item) {
+            //    state.isLoading = true;
+            //    var deferred = $q.defer();
 
-                $http.post(bars.config.urlContent('/api/cdo/corp2/deletevisa/'), item)
-                    .success(function (response) {
-                        state.isLoading = false;
-                        deferred.resolve(response);
-                    }).error(function (response) {
-                        state.isLoading = false;
-                        deferred.reject(response);
-                    });
-                return deferred.promise;
-            }
-            var _addEditVisa = function (item) {
-                state.isLoading = true;
-                var deferred = $q.defer();
-                var url;
-                if (item.Id) url = bars.config.urlContent('/api/cdo/corp2/editvisa/');
-                else url = bars.config.urlContent('/api/cdo/corp2/addvisa/');
-                $http.post(url, item)
-                    .success(function (response) {
-                        state.isLoading = false;
-                        deferred.resolve(response);
-                    }).error(function (response) {
-                        state.isLoading = false;
-                        deferred.reject(response);
-                    });
-                return deferred.promise;
-            }
+            //    $http.post(bars.config.urlContent('/api/cdo/corp2/deletevisa/'), item)
+            //        .success(function (response) {
+            //            state.isLoading = false;
+            //            deferred.resolve(response);
+            //        }).error(function (response) {
+            //            state.isLoading = false;
+            //            deferred.reject(response);
+            //        });
+            //    return deferred.promise;
+            //}
+            //var _addEditVisa = function (item) {
+            //    state.isLoading = true;
+            //    var deferred = $q.defer();
+            //    var url;
+            //    if (item.Id) url = bars.config.urlContent('/api/cdo/corp2/editvisa/');
+            //    else url = bars.config.urlContent('/api/cdo/corp2/addvisa/');
+            //    $http.post(url, item)
+            //        .success(function (response) {
+            //            state.isLoading = false;
+            //            deferred.resolve(response);
+            //        }).error(function (response) {
+            //            state.isLoading = false;
+            //            deferred.reject(response);
+            //        });
+            //    return deferred.promise;
+            //}
 
             ////////////Corp2 User Coonection Parameters Setting////////////////
             var _getUserLimit = function (userId) {
@@ -237,35 +253,35 @@ angular.module(globalSettings.modulesAreas)
                     });
                 return deferred.promise;
             }
-            var _getAvailableFuncs = function (userId) {
-                state.isLoading = true;
-                var deferred = $q.defer();
+            //var _getAvailableFuncs = function (userId) {
+            //    state.isLoading = true;
+            //    var deferred = $q.defer();
 
-                $http.get(bars.config.urlContent('/api/cdo/corp2/getavailablefuncs/' + userId))
-                    .success(function (response) {
-                        state.isLoading = false;
-                        deferred.resolve(response);
-                    }).error(function (response) {
-                        state.isLoading = false;
-                        deferred.reject(response);
-                    });
-                return deferred.promise;
-            }
-            var _getUserFuncs = function (userId) {
-                state.isLoading = true;
-                var deferred = $q.defer();
+            //    $http.get(bars.config.urlContent('/api/cdo/corp2/getavailablefuncs/' + userId))
+            //        .success(function (response) {
+            //            state.isLoading = false;
+            //            deferred.resolve(response);
+            //        }).error(function (response) {
+            //            state.isLoading = false;
+            //            deferred.reject(response);
+            //        });
+            //    return deferred.promise;
+            //}
+            //var _getUserFuncs = function (userId) {
+            //    state.isLoading = true;
+            //    var deferred = $q.defer();
 
-                $http.get(bars.config.urlContent('/api/cdo/corp2/getuserfuncs/' + userId))
-                    .success(function (response) {
-                        state.isLoading = false;
-                        deferred.resolve(response);
-                    }).error(function (response) {
-                        state.isLoading = false;
-                        deferred.reject(response);
-                    });
-                return deferred.promise;
-            }
-            var _saveUserConnectionParamsWindow = function (userModel, limitModel, modules, funcs, accs) {
+            //    $http.get(bars.config.urlContent('/api/cdo/corp2/getuserfuncs/' + userId))
+            //        .success(function (response) {
+            //            state.isLoading = false;
+            //            deferred.resolve(response);
+            //        }).error(function (response) {
+            //            state.isLoading = false;
+            //            deferred.reject(response);
+            //        });
+            //    return deferred.promise;
+            //}
+            var _saveUserConnectionParamsWindow = function (userModel, limitModel, modules, /*funcs,*/ accs) {
                 state.isLoading = true;
                 var deferred = $q.defer();
                 var url = bars.config.urlContent('/api/cdo/corp2/saveuserconnparams/');
@@ -273,7 +289,7 @@ angular.module(globalSettings.modulesAreas)
                     User: userModel,
                     UserLimit: limitModel,
                     UserModules: modules,
-                    UserFuncs: funcs,
+                    //UserFuncs: funcs,
                     UserAccs: accs
                 })
                     .success(function (response) {
@@ -291,6 +307,7 @@ angular.module(globalSettings.modulesAreas)
             factory.state = state;
 
             factory.getByTaxCode = _getByTaxCode;
+            factory.isCanSign = _isCanSign;
             factory.create = _create;
 
             factory.update = _update;
@@ -301,14 +318,14 @@ angular.module(globalSettings.modulesAreas)
             //factory.blockUser = _blockUser;
             //factory.unblockUser = _unblockUser;
             factory.unloadCustomerAccountsToCorp2 = _unloadCustomerAccountsToCorp2;
-            factory.saveAccountVisaQuantity = _saveAccountVisaQuantity;
-            factory.deleteVisa = _deleteVisa;
-            factory.addEditVisa = _addEditVisa;
+            //factory.saveAccountVisaQuantity = _saveAccountVisaQuantity;
+            //factory.deleteVisa = _deleteVisa;
+            //factory.addEditVisa = _addEditVisa;
 
             factory.getUserLimit = _getUserLimit;
             factory.getLimitDictionary = _getLimitDictionary;
-            factory.getAvailableFuncs = _getAvailableFuncs;
-            factory.getUserFuncs = _getUserFuncs;
+            //factory.getAvailableFuncs = _getAvailableFuncs;
+            //factory.getUserFuncs = _getUserFuncs;
             factory.saveUserConnectionParamsWindow = _saveUserConnectionParamsWindow;
             return factory;
         }

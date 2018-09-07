@@ -47,11 +47,11 @@ angular.module(globalSettings.modulesAreas)
                 });
                 return deferred.promise;
             };
-            var _getByTaxCode = function(taxCode, custId) {
+            var _getByTaxCode = function (custId, taxCode, docSeries, docNumber) {
                 state.isLoading = true;
                 var deferred = $q.defer();
 
-                $http.get(_url + 'getByTaxCode/' + taxCode + '/' + custId).success(function (response) {
+                $http.get(_url + 'getByTaxCode/' + custId + '/' + (taxCode || null) + '/' + (docSeries || null) + '/' + (docNumber || null)).success(function (response) {
                     state.isLoading = false;
                     var result = mapResponse(response);
                     deferred.resolve(result);
@@ -145,19 +145,33 @@ angular.module(globalSettings.modulesAreas)
                 return deferred.promise;
             }
 
-            var _mapCustomer = function(id, custId, signNumber) {
+            //var _mapCustomer = function(id, custId, signNumber) {
+            //    state.isLoading = true;
+            //    var deferred = $q.defer();
+
+            //    $http.put(_url + 'mapCustomer/' + id + '/' + custId + '/' + signNumber)
+            //    .success(function (response) {
+            //        state.isLoading = false;
+            //        deferred.resolve(response);
+            //    }).error(function (response) {
+            //        state.isLoading = false;
+            //        deferred.reject(response);
+            //    });
+            //    return deferred.promise;                  
+            //}
+            var _updateAndMap = function (relCustomer) {
                 state.isLoading = true;
                 var deferred = $q.defer();
 
-                $http.put(_url + 'mapCustomer/' + id + '/' + custId + '/' + signNumber)
-                .success(function (response) {
-                    state.isLoading = false;
-                    deferred.resolve(response);
-                }).error(function (response) {
-                    state.isLoading = false;
-                    deferred.reject(response);
-                });
-                return deferred.promise;                  
+                $http.put(_url + 'updateAndMap/', relCustomer)
+                    .success(function (response) {
+                        state.isLoading = false;
+                        deferred.resolve(response);
+                    }).error(function (response) {
+                        state.isLoading = false;
+                        deferred.reject(response);
+                    });
+                return deferred.promise;
             }
 
             var _visaMapedCustomer = function(id, custId) {
@@ -244,8 +258,9 @@ angular.module(globalSettings.modulesAreas)
             factory.getList = _getList;
             factory.create = _create;
             factory.update = _update;
+            factory.updateAndMap = _updateAndMap;
             factory.remove = _remove;
-            factory.mapCustomer = _mapCustomer;
+            //factory.mapCustomer = _mapCustomer;
             factory.visaMapedCustomer = _visaMapedCustomer;
             factory.visaExistingUser = _visaExistingUser;
             factory.validateMobilePhone = _validateMobilePhone;

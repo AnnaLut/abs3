@@ -227,6 +227,7 @@ namespace clientregister
 
             string userFio;
             string clMode;
+            bool addCorp2Tube;
             try
             {
                 InitOraConnection();
@@ -245,12 +246,14 @@ namespace clientregister
                     if (client == "person" && sed == "91") nSPD = "1";
                     else nSPD = "0";
                 }
+                addCorp2Tube = GetUsageCorp2Param();
                 clMode = string.IsNullOrEmpty(Request.Params.Get("clmode")) ? "base": Request.Params.Get("clmode");
             }
             finally
             {
                 DisposeOraConnection();
             }
+            bool isKred = (Request.Params.Get("kred") != null); // для умолчабельного перехода на вкладку "Для Кредитного реєстру" в доп.реквизитах COBUMMFO-8558
             string sScript = @"<script language=javascript>
                                 var userFio = '" + userFio.Replace("'","`") +@"';
                                 var dopCustomerParam = {rezid:'" + rezId + @"',spd:'" + nSPD + @"',client:'" + client + @"'}
@@ -262,12 +265,14 @@ namespace clientregister
                             	    array['" + tabs[2] + @"']='about:blank';
                             	    array['" + tabs[3] + @"']='" + client_rekv_link + @"';
                             	    array['" + tabs[4] + @"']='tab_dop_inf.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" +nSPD+ @"&rezid=" + rezId + @"';
-                            	    array['" + tabs[5] + @"']='tab_dop_rekv.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" +nSPD+ @"&rezid=" + rezId + @"';
+                            	    array['" + tabs[5] + @"']='tab_dop_rekv.asPX?rnk=" + rnk + @"&client=" + client + (isKred ? "&kred=1" : "") + @"&spd=" +nSPD+ @"&rezid=" + rezId + @"';
                             	    array['" + tabs[6] + @"']='tab_linked_custs.asPX?rnk=" + rnk + @"&client=" + client + @"&spd=" + nSPD + @"&rezid=" + rezId + @"';
 									" + ((!string.IsNullOrEmpty(rnk)) ? ("array['" + tabs[7] + @"']='tab_custs_segments.aspx?rnk=" + rnk + @"&client=" + client + "';") :(""))  + @";
                                     " + (GetUsageCorpLightParam() && (!string.IsNullOrEmpty(rnk)) ? "array['" + tabs[8] + @"']='/barsroot/cdo/common/relatedCustomers/index?custId=" + rnk + 
-                                            @"&clmode=" + clMode + @"'" : "") + @";
+                                            @"&clmode=" + clMode + @"&addCorp2Tube=" + addCorp2Tube + @"'" : "") + @";
                             	    fnInitTab('webtab',array,1200,'onChangeTab');
+									
+									" + (isKred ? " goPage({id:'bTab5'}); ":"") + @"
                                 }
                                 function onChangeTab()
                                 {
@@ -284,6 +289,39 @@ namespace clientregister
             ClearParameters();
             SetParameters("p_par", DB_TYPE.Varchar2, "USAGE_CORPLIGHT", DIRECTION.Input);
             return Convert.ToString(SQL_SELECT_scalar(sql)) == "1";
+        }
+
+        private bool GetUsageCorp2Param()
+        {
+            InitOraConnection();
+            ClearParameters();
+            string sqlGetBranch = "select SYS_CONTEXT('bars_context', 'user_branch') current_branch from dual";
+            string currentBrancch = Convert.ToString(SQL_SELECT_scalar(sqlGetBranch));
+            if (currentBrancch == @"\")
+                throw new Exception("оберіть відділення");
+            string branchWithoutFirstSlash = currentBrancch.Substring(currentBrancch.IndexOf('/') + 1);
+            string hierBranch = "/" + branchWithoutFirstSlash.Substring(0, branchWithoutFirstSlash.IndexOf('/') +1);
+            string sql = "select branch_attribute_utl.get_attribute_value(p_branch_code    => :p_branch,p_attribute_code => :p_attribute) from dual";
+
+
+            SetParameters("p_branch", DB_TYPE.Varchar2, hierBranch, DIRECTION.Input);
+            SetParameters("p_attribute", DB_TYPE.Varchar2, "CORP2_PILOT", DIRECTION.Input);
+            string resІtring = string.Empty;
+            try
+            {
+                 resІtring = SQL_SELECT_scalar(sql) as string;
+            }
+            catch (Exception ex)
+            {
+                if(!ex.Message.Contains("20000"))
+                throw ex;
+            }
+           
+            int res;
+            if (!string.IsNullOrEmpty(resІtring) && Int32.TryParse(resІtring, out res))
+                return res == 1;
+            else
+                return false;
         }
 
         private Client SetEbkClientParamToClient(BufClientData ebkClient, Client client)

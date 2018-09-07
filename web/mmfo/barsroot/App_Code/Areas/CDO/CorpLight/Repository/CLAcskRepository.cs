@@ -24,18 +24,30 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
 
         public void MapRelatedCustomerToAcskUser(decimal relCustId, AcskSendProfileInfo profileInfo)
         {
-            var user = _relCustRepository.GetById(relCustId);
-            if (user.AcskRegistrationId != null)
-            {
-                throw new Exception("Користувач (id=" + relCustId + ") "
-                    + "вже зареєстрований в АЦСК (registrationId=" + user.AcskRegistrationId + ")");
-            }
-            var sql = @"insert into MBM_ACSK_REGISTRATION 
-                            (rel_cust_id, registration_id, registration_date, acsk_user_id)
-                        values
-                            (:rel_cust_id, :registration_id, :registration_date, :acsk_user_id)";
+            //var user = _relCustRepository.GetById(relCustId);
+            //if (user.AcskRegistrationId != null)
+            //{
+            //    throw new Exception("Користувач (id=" + relCustId + ") "
+            //        + "вже зареєстрований в АЦСК (registrationId=" + user.AcskRegistrationId + ")");
+            //}
+            //var sql = @"insert into MBM_ACSK_REGISTRATION 
+            //                (rel_cust_id, registration_id, registration_date, acsk_user_id)
+            //            values
+            //                (:rel_cust_id, :registration_id, :registration_date, :acsk_user_id)";
+            //_entities.ExecuteStoreCommand(
+            //    sql, relCustId, profileInfo.RegistrationId, DateTime.Now, profileInfo.UserId);
+            var sql = @"merge into MBM_ACSK_REGISTRATION  car
+                            using (select * from dual) p on ( :registration_id = car.registration_id)                                
+                            when matched then update
+                                set REL_CUST_ID = :rel_cust_id,
+                                    REGISTRATION_DATE = :registration_date,
+                                    ACSK_USER_ID = :acsk_user_id
+                            when not matched then
+                            insert (registration_id, rel_cust_id, registration_date, acsk_user_id)
+                            values (:registration_id, :rel_cust_id, :registration_date, :acsk_user_id)";
             _entities.ExecuteStoreCommand(
-                sql, relCustId, profileInfo.RegistrationId, DateTime.Now, profileInfo.UserId);
+                sql, profileInfo.RegistrationId, relCustId, profileInfo.RegistrationDate ?? DateTime.Now, profileInfo.UserId);
+
         }
         public AcskCertificate GetAcskCertificate(decimal id)
         {

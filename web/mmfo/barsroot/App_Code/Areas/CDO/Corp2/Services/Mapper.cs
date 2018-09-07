@@ -10,11 +10,22 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
         public static User MapRelatedCustomerToUser(RelatedCustomer rc)
         {
             decimal userId;
+            string acskKeySn = rc.AcskSertificateSn;
+            if (string.IsNullOrEmpty(acskKeySn) && rc.AcskRegistrationId.HasValue && rc.AcskRegistrationId != 0)
+            {
+                try
+                {
+                    acskKeySn = ((int)rc.AcskRegistrationId.Value).ToString("X8");
+                }
+                finally
+                {
+                }
+            }
             return new User
             {
                 Id = decimal.TryParse(rc.UserId, out userId) ? new Nullable<decimal>(userId) : null,
                 CustomerId = rc.CustId,
-                VisaId = (int)rc.SignNumber,
+                VisaId = (int)(rc.SignNumber ?? 0),
                 SequentialVisa = rc.SequentialVisa,
                 TaxCode = rc.TaxCode,
                 Login = rc.Login,
@@ -24,7 +35,7 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
                 FullNameGenitiveCase = rc.FullNameGenitiveCase,
                 Email = rc.Email,
                 PhoneNumber = rc.CellPhone,
-                AcskSertificateKeySn = rc.AcskSertificateSn,
+                AcskSertificateKeySn = acskKeySn,
                 BirthDate = rc.BirthDate,
                 DocSeries = rc.DocSeries,
                 DocNumber = rc.DocNumber,
@@ -40,6 +51,14 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
         public static RelatedCustomer MapUserToRelatedCustomer(User user)
         {
             decimal addrRegId;
+            decimal? acskRegId = null;
+            try
+            {
+                acskRegId = Convert.ToInt32(user.AcskSertificateKeySn, 16);
+            }
+            finally
+            {
+            }
             return new RelatedCustomer
             {
                 UserId = user.Id == null ? null : user.Id.ToString(),
@@ -64,7 +83,8 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
                 AddressStreet = user.AddressStreet,
                 AddressHouseNumber = user.AddressHouseNumber,
                 AddressAddition = user.AddressAddition,
-                AcskSertificateSn = user.AcskSertificateKeySn
+                AcskSertificateSn = user.AcskSertificateKeySn,
+                AcskRegistrationId = acskRegId
             };
         }
 

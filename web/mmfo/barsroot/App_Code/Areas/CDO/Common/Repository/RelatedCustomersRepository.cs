@@ -5,13 +5,11 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using BarsWeb.Areas.Kernel.Infrastructure.DI.Abstract;
-using CorpLight.Users;
-using CorpLight.Users.Models;
-using CorpLight.Users.Models.Enums;
 using Models;
 using System.Text.RegularExpressions;
-
 using BarsWeb.Areas.CDO.Common.Models;
+using Oracle.DataAccess.Client;
+using System.Data;
 
 // ReSharper disable once CheckNamespace
 namespace BarsWeb.Areas.CDO.Common.Repository
@@ -79,50 +77,50 @@ namespace BarsWeb.Areas.CDO.Common.Repository
                                   MBM_REL_CUSTOMERS rc
                             left join mbm_cust_rel_users_map um on (
                                   rc.id = um.rel_cust_id )
-                            where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add') AND um.sign_number <> 0";
-            //UNION
-            //            select 
-            //                rc.id as Id,       
-            //                rc.tax_code as TaxCode,       
-            //                rc.first_name as FirstName,   
-            //                rc.last_name as LastName,
-            //                rc.second_name as SecondName, 
-            //                rc.doc_type as DocType,
-            //                rc.doc_series as DocSeries,
-            //                rc.doc_number as DocNumber,
-            //                rc.doc_organization as DocOrganization,
-            //                rc.doc_date as DocDate,
-            //                'Corp2' as Sdo,
-            //                rc.cell_phone as CellPhone,
-            //                rc.email as Email,                           
-            //                um.sign_number as SignNumber,                           
-            //                um.cust_id as CustId,
-            //                um.user_id as UserId,
-            //                um.approved_type as ApprovedType,
-            //                um.is_approved as IsApprovedDecimal,
-            //                rc.login as Login,
-            //                rc.key_id as AcskSertificateSn,
-            //                rc.CREATED_DATE as CreateDate,
-            //                um.sequential_visa as SequentialVisa,
-            //                rc.birth_date as BirthDate,
-            //                rc.FIO_CARD as FullNameGenitiveCase,
-            //                ca.region_id as addressRegionId,
-            //                ca.city as addressCity,
-            //                ca.street as addressStreet,
-            //                ca.house_number as addressHouseNumber,
-            //                ca.addition as addressAddition
-            //                  from
-            //                      CORP2_REL_CUSTOMERS rc
-            //                left join corp2_rel_customers_address ca on(
-            //                    rc.id = ca.rel_cust_id
-            //                )
-            //                left join corp2_acsk_registration ar on(
-            //                    rc.id = ar.rel_cust_id
-            //                )
-            //                left join corp2_cust_rel_users_map um on (
-            //                      rc.id = um.rel_cust_id )
-            //                where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add')  AND um.sign_number <> 0";
-            #endregion
+                            where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add') AND um.sign_number <> 0
+                        UNION
+                        select 
+                            rc.id as Id,       
+                            rc.tax_code as TaxCode,       
+                            rc.first_name as FirstName,   
+                            rc.last_name as LastName,
+                            rc.second_name as SecondName, 
+                            rc.doc_type as DocType,
+                            rc.doc_series as DocSeries,
+                            rc.doc_number as DocNumber,
+                            rc.doc_organization as DocOrganization,
+                            rc.doc_date as DocDate,
+                            'Corp2' as Sdo,
+                            rc.cell_phone as CellPhone,
+                            rc.email as Email,                           
+                            um.sign_number as SignNumber,                           
+                            um.cust_id as CustId,
+                            um.user_id as UserId,
+                            um.approved_type as ApprovedType,
+                            um.is_approved as IsApprovedDecimal,
+                            rc.login as Login,
+                            rc.key_id as AcskSertificateSn,
+                            rc.CREATED_DATE as CreateDate,
+                            um.sequential_visa as SequentialVisa,
+                            rc.birth_date as BirthDate,
+                            rc.FIO_CARD as FullNameGenitiveCase,
+                            ca.region_id as addressRegionId,
+                            ca.city as addressCity,
+                            ca.street as addressStreet,
+                            ca.house_number as addressHouseNumber,
+                            ca.addition as addressAddition
+                              from
+                                  CORP2_REL_CUSTOMERS rc
+                            left join corp2_rel_customers_address ca on(
+                                rc.id = ca.rel_cust_id
+                            )
+                            left join corp2_acsk_registration ar on(
+                                rc.id = ar.rel_cust_id
+                            )
+                            left join corp2_cust_rel_users_map um on (
+                                  rc.id = um.rel_cust_id )
+                            where um.cust_id = :p_cust_id AND um.approved_type IN ('update', 'delete', 'add')  AND um.sign_number <> 0";
+#endregion
             var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, custId).ToList();
             
             return result;
@@ -133,11 +131,11 @@ namespace BarsWeb.Areas.CDO.Common.Repository
                             from 
                                 mbm_cust_rel_users_map
                             where 
-                                (is_approved = 0 or is_approved is null) AND sign_number <> 0";
-                        //UNION
-                        //select distinct cust_id 
-                        //    from CORP2_CUST_REL_USERS_MAP
-                        //    where (is_approved = 0 or is_approved is null) AND sign_number <> 0";
+                                (is_approved = 0 or is_approved is null) AND sign_number <> 0
+                        UNION
+                        select distinct cust_id 
+                            from CORP2_CUST_REL_USERS_MAP
+                            where (is_approved = 0 or is_approved is null) AND sign_number <> 0";
             var result = _entities.ExecuteStoreQuery<decimal>(sql).ToList();
             return result;
         }
@@ -223,6 +221,37 @@ namespace BarsWeb.Areas.CDO.Common.Repository
             //var result = query.Where(x => x.PASSP == 1 || x.PASSP == 7 || x.PASSP == 15 || x.PASSP == 13 || x.PASSP == 5).Select(x => new DocsType { PASSP = x.PASSP, NAME = x.NAME }).ToList();
             return query;
         }
+        public bool IsCanSign(decimal custId, string taxCode)
+        {
+            var p_rnk = new OracleParameter("p_rnk", OracleDbType.Decimal, custId, ParameterDirection.Input);
+            var p_okpo = new OracleParameter("p_okpo", OracleDbType.NVarchar2, taxCode, ParameterDirection.Input);
+            var commandText = "begin :result := bars.is_can_sign(p_rnk => :p_rnk, p_okpo => :p_okpo); end; ";
+            var result = new OracleParameter("result", OracleDbType.Int32, ParameterDirection.ReturnValue);
+            _entities.ExecuteStoreCommand(commandText, result, p_rnk, p_okpo);
+            int res;
+            if (result.Value != null && int.TryParse(result.Value.ToString(), out res)) return res == 1;
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="custId"></param>
+        /// <returns>bank - банк, corp - юр.лица, fop - фіз.особа-підприємець, person - фізична особа</returns>
+        public string GetTypeOfCustomer(decimal custId)
+        {
+            var sql = @"select 
+                    CASE when t.CUSTTYPE = 1 then 'bank'
+                         when t.CUSTTYPE = 2 then 'corp'
+                         when t.CUSTTYPE = 3 and t.SED = 91 then 'fop'
+                         when t.CUSTTYPE = 3 and t.SED != 91 then 'person' 
+                         else null end
+                    from CUSTOMER t
+                            where t.rnk = :p_rnk";
+            var result = _entities.ExecuteStoreQuery<string>(sql, custId).FirstOrDefault();
+            if (result == null) throw new Exception(string.Format("Контрагент (RNK: {0}) не знайдений", custId));
+            return result;
+        }
     }
 
     /// <summary>
@@ -230,7 +259,6 @@ namespace BarsWeb.Areas.CDO.Common.Repository
     /// </summary>
     public interface IRelatedCustomersRepository
     {
-
         IEnumerable<RelatedCustomer> GetAllForConfirm(decimal custId);
         /// <summary>
         /// Get all not visa customers id`s
@@ -250,5 +278,7 @@ namespace BarsWeb.Areas.CDO.Common.Repository
         /// <returns></returns>
         RelatedCustomer GetFOPData(decimal id);
         IEnumerable<DocsType> GetDocsData();
+        bool IsCanSign(decimal custId, string taxCode);
+        string GetTypeOfCustomer(decimal custId);
     }
 }

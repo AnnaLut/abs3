@@ -143,18 +143,24 @@ namespace BarsWeb.Areas.CDO.Corp2.Controllers.Api
                         BarsSql sql = SqlCreator.SearchUserById(relCustId);
                         var user = _corp2RelatedCustomersRepository.ExecuteStoreQuery<RelatedCustomer>(sql).FirstOrDefault();
                         decimal userId;
-                        if (user.AcskRegistrationId == null && decimal.TryParse(user.UserId, out userId))
+                        if (decimal.TryParse(user.UserId, out userId))
                         {
-                            _acskRepository.MapCorp2RelatedCustomerToAcskUser(relCustId, userInfo); //insert into CORP2_ACSK_REGISTRATION
+                            if(user.AcskRegistrationId == null)
+                            {
+                                _acskRepository.MapCorp2RelatedCustomerToAcskUser(relCustId, userInfo); //insert into CORP2_ACSK_REGISTRATION
+                            }
+                            var serialNumber = Convert.ToInt32(userInfo.RegistrationId).ToString("X8");
                             try
                             {
-                                var serialNumber = Convert.ToInt32(userInfo.RegistrationId).ToString("X8");
                                 _corp2RelatedCustomersRepository.Corp2Services.UserManager.SetUserACSKKeySn(_corp2RelatedCustomersRepository.Corp2Services.GetSecretKey(), userId, serialNumber);
-                                _corp2RelatedCustomersRepository.UpdateRelatedCustomerKey(relCustId, serialNumber);
                             }
                             catch (Exception ex)
                             {
                                 throw new Exception("Виникла помилка під час запросу до сервісу Corp2. Зверніться до адміністратора." + Environment.NewLine + ex.Message);
+                            }
+                            if (string.IsNullOrEmpty(user.AcskSertificateSn))
+                            {
+                                _corp2RelatedCustomersRepository.UpdateRelatedCustomerKey(relCustId, serialNumber);
                             }
                         }
                         //else throw new Exception("");

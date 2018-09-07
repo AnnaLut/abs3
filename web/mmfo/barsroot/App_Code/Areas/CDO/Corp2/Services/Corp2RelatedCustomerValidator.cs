@@ -71,28 +71,28 @@ namespace BarsWeb.Areas.CDO.Corp2.Services
             return false;
         }
 
-        public bool IsExistAccountVisa(CustAccVisaCount visa)
-        {
-            var sql = @"select 
-                            count(1) 
-                        from 
-                            CORP2_ACC_VISA_COUNT
-                        where 
-                            ACC_ID = :p_acc_id 
-                            and VISA_ID = :p_visa_id";
-            var result = _entities.ExecuteStoreQuery<decimal>(sql, visa.ACC_ID, visa.VISA_ID).FirstOrDefault();
-            if (result > 0)
-            {
-                return true;
-            }
-            return false;
-        }
+        //public bool IsExistAccountVisa(CustAccVisaCount visa)
+        //{
+        //    var sql = @"select 
+        //                    count(1) 
+        //                from 
+        //                    CORP2_ACC_VISA_COUNT
+        //                where 
+        //                    ACC_ID = :p_acc_id 
+        //                    and VISA_ID = :p_visa_id";
+        //    var result = _entities.ExecuteStoreQuery<decimal>(sql, visa.ACC_ID, visa.VISA_ID).FirstOrDefault();
+        //    if (result > 0)
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 
     public interface ICorp2RelatedCustomerValidator
     {
         bool CustomerIsMapped(decimal id, decimal custId);
         bool IsExistByParameters(string taxCode, /*string phoneNumber, */string email);
-        bool IsExistAccountVisa(CustAccVisaCount visa);
+        //bool IsExistAccountVisa(CustAccVisaCount visa);
     }
 }

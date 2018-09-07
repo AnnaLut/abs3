@@ -256,7 +256,7 @@ angular.module(globalSettings.modulesAreas)
                 var taxCode = vm.currentUser.TaxCode;
                 var custId = document.getElementById('custId').value;
                 if (taxCode) {
-                    relatedCustomersService.getByTaxCode(taxCode, custId).then(
+                    relatedCustomersService.getByTaxCode(custId, taxCode, vm.currentUser.DocSeries, vm.currentUser.DocNumber).then(
                         function (response) {
                             if (response) {
                                 vm.currentUser = new RelatedCustomer();
@@ -264,20 +264,24 @@ angular.module(globalSettings.modulesAreas)
                                     text: 'Користувач з ІПН ' + taxCode + ' вже існує. Бажаєте відкрити його дані?',
                                     func: function () {
                                         vm.currentUser = response;
-                                        vm.currentUser.isMappingCustomers = true;
+                                        //vm.currentUser.isMappingCustomers = true;
+                                        vm.currentUser.isConfirmedPhone = vm.currentUser.Sdo == 'CorpLight';
                                         vm.currentUser.SignNumber = null;
-
-                                        vm.currentUser.CustId = custId;
-
-                                        vm.currentUser.isReadOnly = true;
+                                        vm.currentUser.isReadOnly = vm.currentUser.Sdo == 'CorpLight';
                                         vm.currentUser.isMaped = true;
+                                        //Якщо знайшли не в АБС КорпЛайт, то Id буде дорівнювати null -> vm.saveUser -> relatedCustomersService.create,
+                                        //де корисувач також буде прив'язаний до клієнта.
+                                        //Якщо знайшли в АБС КорпЛайт, то -> relatedCustomersService.updateAndMap
+                                        vm.currentUser.isNotMaped = (response.Id && response.CustId != custId);
+                                        vm.currentUser.CustId = custId;
                                         $scope.$apply();
                                     }
                                 });
                             }
                         },
                         function (response) {
-                            bars.ui.notify('Помилка', 'Сталася помилка при перавірці ІПН', 'error');
+                            //bars.ui.notify('Помилка', 'Сталася помилка при перавірці ІПН', 'error');
+                            vm.currentUser.TaxCode = null;
                         }
                     );
                 }
@@ -297,7 +301,7 @@ angular.module(globalSettings.modulesAreas)
             vm.currentUser = new RelatedCustomer();
 
             var dateNow = new Date();
-            vm.minBirthDate = new Date(dateNow.getFullYear() - 18, dateNow.getMonth(), dateNow.getDate());
+            vm.minBirthDate = new Date(dateNow.getFullYear() - 16, dateNow.getMonth(), dateNow.getDate());
 
             var validate = function () {
                 if (vm.currentUser.NoInn == 0 && !vm.currentUser.TaxCode) {
@@ -373,7 +377,7 @@ angular.module(globalSettings.modulesAreas)
                 }
 
                 
-                if (!vm.currentUser.isConfirmedPhone && !vm.currentUser.isMappingCustomers) {
+                if (!vm.currentUser.isConfirmedPhone /*&& !vm.currentUser.isMappingCustomers*/) {
                     bars.ui.error({ text: 'Не підтверджено мобільний телефон.' });
                     return false;
                 } 
@@ -390,27 +394,13 @@ angular.module(globalSettings.modulesAreas)
 
                     var userForm = $('#userCart');
                     bars.ui.loader(userForm, true);
-                    if (vm.currentUser.isMappingCustomers) {
-                        relatedCustomersService.mapCustomer(
-                            vm.currentUser.Id, vm.currentUser.CustId, vm.currentUser.SignNumber
-                        ).then(
-                            function (response) {
-                                bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
-                                vm.relatedCustomersGrid.dataSource.read();
-                                vm.userDeailWindow.close();
-                                vm.hideClUserForm();
-                            },
-                            function (response) {
-                                bars.ui.notify('Помилка', response.Message, 'error');
-                            }
-                            );
-                    } else if (!vm.currentUser.Id) {
+                    if (!vm.currentUser.Id) {
                         relatedCustomersService.create(vm.currentUser).then(
                             function (response) {
                                 bars.ui.loader(userForm, false);
                                 bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
                                 vm.relatedCustomersGrid.dataSource.read();
-                                vm.userDeailWindow.close();
+                                //vm.userDeailWindow.close();
                                 vm.hideClUserForm();
                             },
                             function (response) {
@@ -418,7 +408,26 @@ angular.module(globalSettings.modulesAreas)
                                 bars.ui.notify('Помилка', response.ExceptionMessage || response.Message || response, 'error');
                             }
                         );
-                    } else {
+                    }
+                    else if (vm.currentUser.isNotMaped) {
+                        relatedCustomersService.updateAndMap(vm.currentUser).then(
+                    //else if (vm.currentUser.isMappingCustomers) {
+                    //    relatedCustomersService.mapCustomer(
+                    //        vm.currentUser.Id, vm.currentUser.CustId, vm.currentUser.SignNumber).then(
+                            function (response) {
+                                bars.ui.loader(userForm, false);
+                                bars.ui.notify('Успішно', 'Зміни успішно збережено', 'success');
+                                vm.relatedCustomersGrid.dataSource.read();
+                                vm.userDeailWindow.close();
+                                vm.hideClUserForm();
+                            },
+                            function (response) {
+                                bars.ui.loader(userForm, false);
+                                bars.ui.notify('Помилка', response.Message, 'error');
+                            }
+                            );
+                    }
+                    else {
                         relatedCustomersService.update(vm.currentUser).then(
                             function (response) {
                                 bars.ui.loader(userForm, false);
@@ -504,10 +513,10 @@ angular.module(globalSettings.modulesAreas)
                     vm.currentUser = new RelatedCustomer(custId, userId, firstName, lastName, patronymic, email, relCustId, isExistUser);
                     vm.currentUser.DocType = 1;
                     SetDropDocListValue();
-                    if (!vm.reatedCustomers) {
+                    //if (!vm.reatedCustomers) {
                         vm.reatedCustomers = [];
                         getCustomerRelatedCustomers(vm.currentUser.CustId);
-                    }
+                    //}
                 }
             }
 
