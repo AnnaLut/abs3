@@ -204,6 +204,3 @@ C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\obj\Debug\
 C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\obj\Debug\Bars.API.Web.Server.csproj.CoreCompileInputs.cache
 C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\obj\Debug\Bars.API.Web.Server.dll
 C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\obj\Debug\Bars.API.Web.Server.pdb
-C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\bin\Bars.DbProvider.Oracle.Server.dll
-C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\bin\Bars.DbProvider.Oracle.Server.pdb
-C:\VisualStudioProjects\Git\dev\Source\src\WebApi\Bars.API.Web.Server\bin\Bars.DbProvider.Oracle.Server.dll.config
