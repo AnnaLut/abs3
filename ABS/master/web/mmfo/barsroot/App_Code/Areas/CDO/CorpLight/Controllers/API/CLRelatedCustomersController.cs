@@ -215,15 +215,15 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                 }
                 //В базі КорпЛайт не шукаємо, бо такий пошук проводиться при підтвердженні беком. Терещенко Ю. сказала не чіпати, зробити поки костилями.
                 //Якщо не знаходемо в ABS, то шукаємо в базі Корп2
-                User userCorp2 = _corp2RelatedCustomers.GetExistUser(new RelatedCustomer { TaxCode = taxCode, DocSeries = docSeries, DocNumber = docNumber });
+     //           User userCorp2 = _corp2RelatedCustomers.GetExistUser(new RelatedCustomer { TaxCode = taxCode, DocSeries = docSeries, DocNumber = docNumber });
 
-                if (userCorp2 != null)
-                {
-                    data = Mapper.MapUserToRelatedCustomer(userCorp2);
-                    data.UserId = null;
-					data.NoInn = 0;
-                    return Request.CreateResponse(HttpStatusCode.OK, data);
-                }
+     //           if (userCorp2 != null)
+     //           {
+     //               data = Mapper.MapUserToRelatedCustomer(userCorp2);
+     //               data.UserId = null;
+					//data.NoInn = 0;
+     //               return Request.CreateResponse(HttpStatusCode.OK, data);
+     //           }
 
                 return data == null ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.OK, data);
             }
