@@ -57,12 +57,12 @@ procedure PUL_OVRD ( p_ND number , p_ACC number, p_dat1 varchar2, p_dat2 varchar
 procedure Chk_dat  ( m_SDate date, s_sdate date, m_wDate date, s_wdate date) ;
 procedure Chk_nls  ( p_mode int  , p_acc number, p_kv IN int , p_nls IN varchar2, aa OUT accounts%rowtype) ;
 
-procedure ADD_master  (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date, p_wdate date, p_lim number, p_ir0 number, p_ir1 number,
+procedure ADD_master (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date, p_wdate date, p_lim number, p_ir0 number, p_ir1 number,
                       p_nls varchar2, p_kv int,  p_day int, p_PD number, p_isp number,
-                      p_METR int, -- =1 = ¦Ёшчэръ  яырт.ёЄртъш
-                      p_MMETR int default null, -- =1 = Признак максимальной ставки при плав.ставки
-                      p_SK   int,  -- = ¦ °ърыv фы  яырт.ёЄртъш
-                      p_NZ   int  -- яЁшчэръ "схч юсхёяхўхэш "
+                      p_METR int, -- =1 = Признак  плав.ставки
+                      p_SK   int,  -- = № шкалы для плав.ставки
+                      p_NZ   int,  -- признак "без обеспечения"
+                      p_MMETR int default null -- =1 = Признак максимальной ставки при плав.ставки
                      );
 procedure DEL_master  (p_ND number);
 procedure ADD_slave
@@ -1460,10 +1460,11 @@ end chk_nls;
 procedure ADD_master (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date, p_wdate date, p_lim number, p_ir0 number, p_ir1 number,
                       p_nls varchar2, p_kv int,  p_day int, p_PD number, p_isp number,
                       p_METR int, -- =1 = Признак  плав.ставки
-                      p_MMETR int default null, -- =1 = Признак максимальной ставки при плав.ставки
                       p_SK   int,  -- = № шкалы для плав.ставки
-                      p_NZ   int  -- признак "без обеспечения"
-                     ) is
+                      p_NZ   int,  -- признак "без обеспечения"
+                      p_MMETR int default null -- =1 = Признак максимальной ставки при плав.ставки
+                     )
+ is
   aa accounts%rowtype ;
   a8 accounts%rowtype ;
   dd cc_deal%rowtype  ;
