@@ -190,9 +190,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Providers\Bars.DbProvider.Oracle.Server\Bars.DbProvider.Oracle.Server.csproj">
-      <Project>{234a237b-b491-480b-be45-6b6499ec1fe0}</Project>
-      <Name>Bars.DbProvider.Oracle.Server</Name>
+    <ProjectReference Include="..\..\Providers\Bars.DbProvider.Oracle\Bars.DbProvider.Oracle.csproj">
+      <Project>{e7baef75-5877-4f87-aaf3-9a56433c7958}</Project>
+      <Name>Bars.DbProvider.Oracle</Name>
     </ProjectReference>
     <ProjectReference Include="..\Acct\Bars.API.Acct.Models\Bars.API.Acct.Models.csproj">
       <Project>{06409048-ba3a-4217-8d3c-a6a449ab2232}</Project>
