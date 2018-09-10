@@ -44,31 +44,21 @@ begin
     );
   end loop;
 
+  delete from NBUR_REF_PROCS where file_id = l_file_id;
+
   NBUR_FILES.SET_FILE_PROC
   ( p_proc_id     => l_proc_id
   , p_file_id     => l_file_id
-  , p_proc_name   => 'NBUR_F'||l_file_code
+  , p_proc_name   => 'NBUR_P_F02X_NC'
   , p_description => '(xml) '||r_file.FILE_NAME
   , p_version     => '1.0'
   , p_date_start  => trunc(sysdate,'YYYY')
   );
 
   NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ACCOUNTS')
-  , p_strt_dt => trunc(sysdate,'YYYY')
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_CUSTOMERS')
-  , p_strt_dt => trunc(sysdate,'YYYY')
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => BARS.NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_BALANCES_MONTHLY')
-  , p_strt_dt => trunc(sysdate,'YYYY')
+  ( p_file_id  => l_file_id
+  , p_obj_id => null
+  , p_strt_dt => date '2018-01-01'
   );
 
   NBUR_FILES.SET_FILE_DEPENDENCIES
@@ -80,3 +70,21 @@ end;
 /
 
 commit;
+
+-- опис для підготовки XML
+begin
+    delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = '02X'; 
+    Insert into NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START)
+     Values
+       ('02X', 'select EKP, KU, R020, T020, R030, K040
+    , sum( T070 ) as T070
+    , sum( T071 ) as T071
+from NBUR_LOG_F02X
+where REPORT_DATE = :p_rpt_dt
+  and KF = :p_kf
+group by EKP, KU, R020, T020, R030, K040', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+    COMMIT;
+end;
+/
+

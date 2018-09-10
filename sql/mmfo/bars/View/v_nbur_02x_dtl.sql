@@ -23,18 +23,16 @@ create or replace force view V_NBUR_02X_DTL
 , T070
 , T071
 , ACC_ID
---, ACC_NUM
---, ACC_KV
---, MATURITY_DATE
---, CUST_ID
---, BRANCH
---, CUST_ID
---, CUST_CODE
---, CUST_NAME
+, ACC_NUM
+, KV
+, BRANCH
+, CUST_ID
+, CUST_CODE
+, CUST_NAME
 ) as
-select v.REPORT_DATE
-     , v.KF
-     , v.VERSION_ID
+select l.REPORT_DATE
+     , l.KF
+     , l.VERSION_ID
      , l.EKP
      , l.KU
      , l.R020
@@ -44,30 +42,23 @@ select v.REPORT_DATE
      , l.T070
      , l.T071
      , l.ACC_ID
---   , a.ACC_NUM
---   , a.KV
---   , a.MATURITY_DATE
---   , a.CUST_ID
---   , a.BRANCH
---   , c.CUST_ID
---   , c.CUST_CODE
---   , c.CUST_NAME
+     , l.ACC_NUM
+     , l.KV
+     , l.BRANCH
+     , l.CUST_ID
+     , c.CUST_CODE
+     , c.CUST_NAME
   from NBUR_LOG_F02X  l
   join NBUR_LST_FILES v
     on ( v.REPORT_DATE = l.REPORT_DATE and
          v.KF          = l.KF )
   join NBUR_REF_FILES f
     on ( f.ID = v.FILE_ID )
---left outer
---join V_NBUR_DM_ACCOUNTS a
---  on ( a.REPORT_DATE = l.REPORT_DATE and
---       a.KF          = l.KF          and
---       a.ACC_ID      = l.ACC_ID )
---left outer
---join V_NBUR_DM_CUSTOMERS c
---  on ( c.REPORT_DATE = a.REPORT_DATE and
---       c.KF          = a.KF          and
---       c.CUST_ID     = a.CUST_ID )
+left outer
+join V_NBUR_DM_CUSTOMERS c
+  on ( c.REPORT_DATE = l.REPORT_DATE and
+       c.KF          = l.KF          and
+       c.CUST_ID     = l.CUST_ID )
  where f.FILE_CODE = '02X'
    and f.FILE_FMT = 'XML'
    and v.FILE_STATUS in ( 'FINISHED', 'BLOCKED' );
@@ -82,6 +73,7 @@ comment on table  V_NBUR_02X_DTL         is 'Файл 02X - Щомісячні знімки балансу
 
 comment on column V_NBUR_02X_DTL.REPORT_DATE is 'Звітна дата';
 comment on column V_NBUR_02X_DTL.KF          is 'Код фiлiалу (МФО)';
+comment on column V_NBUR_02X_DTL.VERSION_ID  is 'Ід. версії файлу';
 comment on column V_NBUR_02X_DTL.EKP         is 'Код показника';
 comment on column V_NBUR_02X_DTL.KU          is 'Код областi розрiзу юридичної особи';
 comment on column V_NBUR_02X_DTL.R020        is 'Номер рахунку';
@@ -91,6 +83,13 @@ comment on column V_NBUR_02X_DTL.K040        is 'Код країни';
 comment on column V_NBUR_02X_DTL.T070        is 'Сума в гривневому еквіваленті';
 comment on column V_NBUR_02X_DTL.T071        is 'Сума в іноземній валюті';
 comment on column V_NBUR_02X_DTL.ACC_ID      is 'Iдентифiкатор рахунку';
+comment on column V_NBUR_02X_DTL.ACC_ID is 'Ід. рахунка';
+comment on column V_NBUR_02X_DTL.ACC_NUM is 'Номер рахунка';
+comment on column V_NBUR_02X_DTL.KV is 'Ід. валюти';
+comment on column V_NBUR_02X_DTL.CUST_ID is 'Ід. клієнта';
+comment on column V_NBUR_02X_DTL.CUST_CODE is 'Код клієнта';
+comment on column V_NBUR_02X_DTL.CUST_NAME is 'Назва клієнта';
+comment on column V_NBUR_02X_DTL.BRANCH is 'Код підрозділу';
 
 prompt -- ======================================================
 prompt -- Grants

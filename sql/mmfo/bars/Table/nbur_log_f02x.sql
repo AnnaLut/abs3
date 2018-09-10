@@ -19,7 +19,16 @@ prompt -- ======================================================
 begin
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F02X', 'WHOLE' , NULL, NULL, NULL, NULL );
   BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F02X', 'FILIAL',  'M', NULL,  'E',  'E' );
-  BARS.BPA.ALTER_POLICY_INFO( 'NBUR_LOG_F02X', 'CENTER', NULL,  'E',  'E',  'E' );
+end;
+/
+
+declare
+  e_tab_not_exists exception;
+  pragma exception_init( e_tab_not_exists, -00942 );
+begin
+  execute immediate 'drop table NBUR_LOG_F02X';
+exception
+  when e_tab_not_exists then null;  
 end;
 /
 
@@ -30,6 +39,8 @@ begin
   execute immediate q'[create table NBUR_LOG_F02X
 ( REPORT_DATE     date       constraint CC_NBURLOGF02X_REPORTDT_NN NOT NULL
 , KF              char(6)    constraint CC_NBURLOGF02X_KF_NN       NOT NULL
+, VERSION_ID      NUMBER
+, NBUC            VARCHAR2(20 CHAR)     
 , EKP             char(6)
 , KU              number(3)
 , R020            char(4)
@@ -39,6 +50,10 @@ begin
 , T070            number(24)
 , T071            number(24)
 , ACC_ID          number(38)
+, ACC_NUM         VARCHAR2(20)
+, KV              NUMBER(3)
+, CUST_ID         number(38)
+, BRANCH          VARCHAR2(30)     
 ) tablespace BRSBIGD
 COMPRESS BASIC
 STORAGE( INITIAL 128K NEXT 128K )
@@ -99,26 +114,6 @@ exception
 end;
 /
 
--- prompt -- ======================================================
--- prompt -- Indexes
--- prompt -- ======================================================
--- 
--- begin
---   execute immediate q'[CREATE UNIQUE INDEX BARS.UK_DMBALSMONTHARCH ON NBUR_LOG_F02X ( REPORT_DATE, KF, VERSION_ID, ACC_ID )
---   TABLESPACE BRSBIGI
---   PCTFREE 0 
---   LOCAL
---   COMPRESS 3 ]';
---   dbms_output.put_line( 'Index "BARS.UK_DMBALSMONTHARCH" created.' );
--- exception
---   when OTHERS then 
---     if (sqlcode = -00955)
---     then dbms_output.put_line( 'Index "BARS.UK_DMBALSMONTHARCH" already exists.' );
---     else raise;
---     end if;
--- end;
--- /
-
 SET FEEDBACK ON
 
 prompt -- ======================================================
@@ -140,6 +135,7 @@ comment on table  NBUR_LOG_F02X             is 'Щомісячні знімки балансу РУ на з
 
 comment on column NBUR_LOG_F02X.REPORT_DATE is 'Звітна дата';
 comment on column NBUR_LOG_F02X.KF          is 'Код фiлiалу (МФО)';
+comment on column NBUR_LOG_F02X.VERSION_ID  is 'Ідентифікатор версії';
 comment on column NBUR_LOG_F02X.EKP         is 'Код показника';
 comment on column NBUR_LOG_F02X.KU          is 'Код областi розрiзу юридичної особи';
 comment on column NBUR_LOG_F02X.R020        is 'Номер рахунку';
@@ -149,6 +145,7 @@ comment on column NBUR_LOG_F02X.K040        is 'Код країни';
 comment on column NBUR_LOG_F02X.T070        is 'Сума в гривневому еквіваленті';
 comment on column NBUR_LOG_F02X.T071        is 'Сума в іноземній валюті';
 comment on column NBUR_LOG_F02X.ACC_ID      is 'Iдентифiкатор рахунку';
+comment on column NBUR_LOG_F02X.CUST_ID     is 'Iдентифiкатор контрагента';
 
 prompt -- ======================================================
 prompt -- Grants
