@@ -360,7 +360,12 @@
        ELSIF p.id = 1
          AND p.metr = 4
          AND p.tip IN ('SDI')
-         and 1=0    -- cobuprvnix-161 отключение амортизации дисконта
+/*Получен ответ от Банка (Фастованова А, Рыбалко Е) :
+прямолинейную амортизацию по гарантиям (Продукты = 90%) необходимо оставить в АБС (тип счета SDI, БС=3648)
+*/
+         and p.nls like '3648%' 
+         and dd.prod like '90%'
+--            1=0    -- cobuprvnix-161 отключение амортизации дисконта
          THEN
 
 
@@ -437,7 +442,7 @@
               update INT_RECKONING t set t.purpose =
             t.purpose || ' Період: з ' || to_char(t.date_from, 'dd.mm.yyyy') ||
             ' по ' || to_char(t.DATE_TO, 'dd.mm.yyyy') || ' вкл.'
-              where t.deal_id =dd.nd;
+              where t.deal_id =dd.nd and not purpose like '%Період:%';
    END LOOP; --k1
 
 
