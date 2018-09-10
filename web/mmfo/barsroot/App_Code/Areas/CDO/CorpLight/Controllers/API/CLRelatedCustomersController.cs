@@ -184,30 +184,36 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
         /// </summary>
         /// <param name="taxCode"></param>
         /// <returns></returns>
-        [HttpGet]
-        [GET("api/cdo/corplight/RelatedCustomers/getbytaxcode/{custId}/{taxCode}/{docSeries}/{docNumber}")]
-        public HttpResponseMessage GetByTaxCode(decimal custId, string taxCode, string docSeries, string docNumber)
+       // [HttpGet]
+        [HttpPost]
+        [POST("api/cdo/corplight/RelatedCustomers/getbytaxcode/")]
+        public HttpResponseMessage GetByTaxCode(GetByTaxCoeModel getByTaxCodeModel)
         {
             try
             {
+                _logger.Info(string.Format("begin GetByTaxCode custId: {0}, taxCode: {1} docSeries: {2} docNumber: {3}",
+                    getByTaxCodeModel.CustId, getByTaxCodeModel.TaxCode, getByTaxCodeModel.DocSeries, getByTaxCodeModel.DocNumber), "GetByTaxCode");
                 //Шукаємо користувача в базі ABS CorpLight
-                var users = _relaredCustRepository.GetByTaxCode(taxCode).ToList();
-                RelatedCustomer data = users.FirstOrDefault(i => i.CustId == custId);
+                var users = _relaredCustRepository.GetByTaxCode(getByTaxCodeModel.TaxCode).ToList();
+                RelatedCustomer data = users.FirstOrDefault(i => i.CustId == getByTaxCodeModel.CustId);
                 if (data != null)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest,
-                        string.Format("Користувач з ІПН: {0} вже існує у клієнта id: {1}", taxCode, custId));
+                        string.Format("Користувач з ІПН: {0} вже існує у клієнта id: {1}", getByTaxCodeModel.TaxCode, getByTaxCodeModel.CustId));
                 }
-                data = users.FirstOrDefault(i => i.CustId != custId);
+                data = users.FirstOrDefault(i => i.CustId != getByTaxCodeModel.CustId);
                 if (data != null)
                 {
                     data.Sdo = "CorpLight";
                     return Request.CreateResponse(HttpStatusCode.OK, data);
                 }
+                _logger.Info("begin GetByTaxCodeFrom_REL_CUSTOMERS", "GetByTaxCode");
                 //Якщо не знаходимо, то шукаємо в ABS Corp2
-                data = _corp2RelatedCustomers.GetByTaxCodeFrom_REL_CUSTOMERS(taxCode).FirstOrDefault();
+                data = _corp2RelatedCustomers.GetByTaxCodeFrom_REL_CUSTOMERS(getByTaxCodeModel.TaxCode).FirstOrDefault();
                 if (data != null)
                 {
+                    _logger.Info("data is not null after GetByTaxCodeFrom_REL_CUSTOMERS", "GetByTaxCode");
+
                     data.Id = null;
                     data.UserId = null;
 					data.NoInn = 0;
@@ -215,16 +221,21 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                 }
                 //В базі КорпЛайт не шукаємо, бо такий пошук проводиться при підтвердженні беком. Терещенко Ю. сказала не чіпати, зробити поки костилями.
                 //Якщо не знаходемо в ABS, то шукаємо в базі Корп2
-                User userCorp2 = _corp2RelatedCustomers.GetExistUser(new RelatedCustomer { TaxCode = taxCode, DocSeries = docSeries, DocNumber = docNumber });
+                _logger.Info("begin _corp2RelatedCustomers.GetExistUser", "GetByTaxCode");
+
+                User userCorp2 = _corp2RelatedCustomers.GetExistUser(new RelatedCustomer { TaxCode = getByTaxCodeModel.TaxCode, DocSeries = getByTaxCodeModel.DocSeries,
+                    DocNumber = getByTaxCodeModel.DocNumber
+                });
 
                 if (userCorp2 != null)
                 {
+                    _logger.Info("userCorp2 is not null after _corp2RelatedCustomers.GetExistUser", "GetByTaxCode");
                     data = Mapper.MapUserToRelatedCustomer(userCorp2);
                     data.UserId = null;
 					data.NoInn = 0;
                     return Request.CreateResponse(HttpStatusCode.OK, data);
                 }
-
+                _logger.Info(string.Format("data is not null {0}",data == null), "GetByTaxCode");
                 return data == null ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.OK, data);
             }
             catch (Exception ex)

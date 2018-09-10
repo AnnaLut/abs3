@@ -51,11 +51,17 @@ angular.module(globalSettings.modulesAreas)
                 state.isLoading = true;
                 var deferred = $q.defer();
 
-                $http.get(_url + 'getByTaxCode/' + custId + '/' + (taxCode || null) + '/' + (docSeries || null) + '/' + (docNumber || null)).success(function (response) {
-                    state.isLoading = false;
-                    var result = mapResponse(response);
-                    deferred.resolve(result);
-                }).error(function (response) {
+                var getByTaxCodeModel = {
+                    CustId: custId,
+                    TaxCode: taxCode || null,
+                    DocSeries: docSeries ? docSeries.trim() : null,
+                    DocNumber: docNumber || null
+                }
+                $http.post(_url   + 'getByTaxCode/', getByTaxCodeModel)
+                    .success(function (response) {
+                        state.isLoading = false;
+                        deferred.resolve(response);
+                    }).error(function (response) {
                     state.isLoading = false;
                     deferred.reject(response);
                 });
