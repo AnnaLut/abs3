@@ -83,3 +83,21 @@ begin
 end;
 /
 commit;
+
+-- опис для підготовки XML
+begin
+    delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = '73X'; 
+    Insert into NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START)
+     Values
+       ('73X', 'select substr(field_code, 1, 6) as EKP  -- Код показателя
+        , ltrim(t.nbuc, ''0'') as KU          -- Код области
+        , substr(field_code, 7, 3) as R030 -- Валюта
+        , field_value as T100              -- Значение параметра
+    from NBUR_AGG_PROTOCOLS t
+    where report_date = :p_rpt_dt           -- Дата отчета
+      and kf = :p_kf                        -- Филиал
+      and report_code = ''73X''', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+    COMMIT;
+end;
+/
