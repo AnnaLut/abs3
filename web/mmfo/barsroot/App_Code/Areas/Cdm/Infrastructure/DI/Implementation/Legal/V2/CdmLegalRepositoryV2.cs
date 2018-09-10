@@ -172,7 +172,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                     HomeRepo.GetUserParam().USER_FULLNAME, card);
 
                 string xml = simpleCard.XmlSerialize(Encoding.UTF8);
-                Logger.Trace(String.Format("{0} Xml до надсилання: -={1}=-", _logMessagePrefix, xml));
+                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", _logMessagePrefix, xml));
 
                 //отправляем данные в ЕБК
                 var bytes = Encoding.UTF8.GetBytes(xml);
@@ -182,7 +182,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                 using (Stream responseStream = httpResponse.GetResponseStream())
                 {
                     responseStr = new StreamReader(responseStream, Encoding.UTF8).ReadToEnd();
-                    Logger.Trace(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", _logMessagePrefix,
                         responseStr));
                 }
 
