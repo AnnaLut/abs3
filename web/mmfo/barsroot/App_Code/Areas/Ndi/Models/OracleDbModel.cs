@@ -135,8 +135,8 @@ namespace BarsWeb.Areas.Ndi.Models
         {
             if (_command != null)
             {
-                if (_command.Connection.State == ConnectionState.Open)
-                    _command.Connection.Close();
+                //if (_command.Connection.State == ConnectionState.Open)
+                //    _command.Connection.Close();
                 _command.Dispose();
                 _command = null;
             }
@@ -216,7 +216,7 @@ namespace BarsWeb.Areas.Ndi.Models
 
         public void DisposeWithTransaction(bool result)
         {
-            if (_myTransaction != null)
+            if (_conn !=null && _conn.State == ConnectionState.Open &&  _myTransaction != null)
             {
                 if (result)
                     _myTransaction.Commit();
