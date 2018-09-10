@@ -52,6 +52,7 @@ comment on table  V_NBUR_02X             is 'Файл 02X - Щомісячні знімки балансу
 
 comment on column V_NBUR_02X.REPORT_DATE is 'Звітна дата';
 comment on column V_NBUR_02X.KF          is 'Код фiлiалу (МФО)';
+comment on column V_NBUR_02X.VERSION_ID  is 'Ід. версії файлу';
 comment on column V_NBUR_02X.EKP         is 'Код показника';
 comment on column V_NBUR_02X.KU          is 'Код областi розрiзу юридичної особи';
 comment on column V_NBUR_02X.R020        is 'Номер рахунку';
