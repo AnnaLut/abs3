@@ -329,10 +329,10 @@ create or replace package body nbu_601_request_data_ru is
                                when (c.codcagent=4
                                  or (c.codcagent=6 and c.sed=91 and c.ise in ('14200', '14100', '14201', '14101')))
                                  and (c.okpo  is null or c.okpo like '%0000000%')  then ('I'||c.OKPO)
-								                  when c.codcagent=4 
-                                 and (c.okpo  is not null)  then ('I'||c.OKPO) 
+								                  when c.codcagent=4
+                                 and (c.okpo  is not null)  then ('I'||c.OKPO)
                                  when c.codcagent=6 and c.sed=91 and c.ise='20008'
-                                  then ('I'||c.OKPO)  
+                                  then ('I'||c.OKPO)
                           end k020,
                           case when c.okpo is not null and
                           (c.codcagent in (3,4) or (c.codcagent in (5,6) and c.sed=91 and c.ise in ('14200', '14100', '14201', '14101')))
@@ -847,7 +847,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         for person in (select rnk_client.rnk,bpk.nd,'' as ordernum,(select decode( c.custtype,3,'true',2,'false')  from customer c where c.rnk=rnk_client.rnk) as flagosoba,
                               case when bpk.nbs=2202  then '01'
                                    when bpk.nbs=2203  then '02'
-                                   when bpk.nbs not in ('2202', '2203') and bpk.nbs  in ('2625', '2605')  then '08'
+                                   when bpk.nbs  in ('2625', '2605',9129) then '08'      
                                end typecredit,
                                'cc_deal' as table_name,
                                (select nkd from specparam where acc=bpk.acc_pk) as numberdog,
@@ -893,10 +893,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                         on sumzagal.acc=bpk.acc_pk and
                                         sumzagal.kv=bpk.kv*/
                        left join
-                          (select a.acc, min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal  
-                                  from saldoa a, accounts a1 
-                                  where a.acc=a1.acc and a1.nbs=9129 
-                                  group by  a.acc ) sumzagal1 on sumzagal1.acc=bpk.acc                  
+                          (select a.acc, min(a.dos) keep (dense_rank first order by a.fdat) as sum_zagal
+                                  from saldoa a, accounts a1
+                                  where a.acc=a1.acc and a1.nbs=9129
+                                  group by  a.acc ) sumzagal1 on sumzagal1.acc=bpk.acc
 					             -- sp
                        left join (select nd, kv, sum(sp) sp_sum
                                   from   (select distinct bpk.nd, bpk.kv, bpk.acc,
@@ -918,7 +918,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   from   (select bpk.nd, bpk.kv, (ag.ost + ag.crkos - ag.crdos) sum_ost
                                           from   agg_monbals ag,
                                                  nbu_w4_bpk bpk
-                                          where  
+                                          where
                                           ag.fdat = add_months(trunc(sysdate, 'mm'), -1) and
                                           --ag.fdat = trunc(sysdate, 'mm') and
                                                  bpk.tip in ('SS ', 'SP ', 'SN ', 'SPN', 'SNO', 'SNA','CR9') and
@@ -986,7 +986,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      case when (d.prod like '2062%' or  d.prod like '2202%') and ad.aim=62 and d.vidd in(1,11)  then '01'
                                           when  (d.prod like '2063%' or  d.prod like '2203%') and ad.aim in (62,40) and d.vidd in(1,11)  then '02'
                                           when   d.prod like '204%' and ad.aim=62  then '02'
-                                          when   d.prod like '204%' and ad.aim=77  then '03'    
+                                          when   d.prod like '204%' and ad.aim=77  then '03'
                                           when  (d.prod like '207%' or  d.prod like '221%') then '03'
                                           when   d.prod like '203%' then '04'
                                           when  (d.prod like '202%' or  d.prod like '222%') then '05'
@@ -995,11 +995,11 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                           when  d.vidd in(10,110)  then '08'
                                           when  d.prod like '220%' and ad.aim=0  then '07'
                                           when  d.prod like '239%' and ad.aim=62  then '09'
-                                          when  d.prod like '204%' and ad.aim=0  then '09'  
-                                          when  d.prod like '211%' and ad.aim=100  then '09' 
-                                          when  d.prod like '210%' and ad.aim=210 and d.vidd in (1,2)  then '09'  
+                                          when  d.prod like '204%' and ad.aim=0  then '09'
+                                          when  d.prod like '211%' and ad.aim=100  then '09'
+                                          when  d.prod like '210%' and ad.aim=210 and d.vidd in (1,2)  then '09'
                                           when  d.prod like '210%' and ad.aim=210 and d.vidd=2  then '09'
-                                          when  d.prod like '206%'  and d.vidd=1 and d.ndg is not null then '09'   
+                                          when  d.prod like '206%'  and d.vidd=1 and d.ndg is not null then '09'
                                           when  (d.prod like '206%' or  d.prod like '220%')  and d.vidd in(2,3,12,13)  then '09'
                                           when  (d.prod like '9020%' or d.prod like '9000%') and ad.aim=98 then '10'
                                           when  (d.prod like '9023%' or d.prod like '9003%') and ad.aim=97 then '12'
@@ -1026,7 +1026,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      nvl((select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP')
                                         ,(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ')) as periodproc,
                                      --sumarrears.sum_ost as sumarrears,
-                                     (abs(sumarrears.sum_ost)+nvl(abs(sumacommission.sum_ostcom),0)) as sumarrears,
+                                     (abs(sumarrears.sum_ost)+abs(nvl(sumacommission.sum_ostcom,0))) as sumarrears,
                                      ltrim(nbu23_rez.daybase) as daybase,
                                      ltrim(nbu23_rez.daybase) as dayproc,
                                      a.dazs as factendday,
@@ -1053,14 +1053,15 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                           /*(select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
                             from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv*/
 
-                            (select distinct cd.nd ,ca.kv, ((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
+                            (select distinct cd.nd ,ca.kv, --((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
+                                              (cd.sdog*100) as  sum_zagal     
                                              from cc_add ca,cc_deal cd
-                                             left join (select a.nd,sum(a.amount_com) as amount_com from(
+                                             /*left join (select a.nd,sum(a.amount_com) as amount_com from(
                                                             select distinct ad.nd,na.acc,ad.kv,a.kv,
                                                                case  when ad.kv<>a.kv then (select (abs(s.ostc)*(c.rate_o)) as amount_com from accounts s where s.acc=a.acc and s.kv=a.kv and s.kv=c.kv and c.vdate=trunc(sysdate,'dd'))
                                                                else abs(a.ostc) end amount_com
                                                             from accounts a, cur_rates c,nd_acc na,cc_add ad where ad.nd=na.nd and na.acc=a.acc and a.kv=c.kv and  nbs in (3578,3579))a
-                                                            group by a.nd) b on b.nd=cd.nd
+                                                            group by a.nd) b on b.nd=cd.nd*/
                                                        where ca.nd=cd.nd)sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv
 
 
@@ -1075,8 +1076,8 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                         n.acc = a2.acc and
                                         n.acc = ag.acc)
                             group by nd, kv) sumarrears on ad.nd = sumarrears.nd and ad.kv = sumarrears.kv
-                    left join--комисия 
-                           (select nd ,kv, sum (sum_ost) as sum_ostcom
+                    left join--комисия
+                           (select nd, sum (sum_ost) as sum_ostcom
                             from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
                                   from   agg_monbals ag,
                                          nd_acc n,
@@ -1085,7 +1086,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                         a2.nbs ='3578' and
                                         n.acc = a2.acc and
                                         n.acc = ag.acc)
-                            group by nd, kv) sumacommission on ad.nd = sumacommission.nd  
+                            group by nd) sumacommission on ad.nd = sumacommission.nd
                     left join
                           (select nd,
                                   decode(max(kol_351), null, 0, max(kol_351)) daybase,
@@ -1096,10 +1097,16 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            group by nd) nbu23_rez on nbu23_rez.nd = ad.nd
 
                     --sumpay
-                    left join(select nd ,sum(sumo+sumk) as sumpay
+                    /*left join(select nd ,sum(sumo+sumk) as sumpay
                                        from cc_lim
                                        where fdat between  add_months(trunc(sysdate,'mm'),-1) and add_months(trunc(sysdate,'mm'),11) and sumo>0
-                                       group by nd) sum_lim on sum_lim.nd=ad.nd 
+                                       group by nd) sum_lim on sum_lim.nd=ad.nd*/
+                    left join(select a.nd ,sum(sumo+sumk) as sumpay
+                                       from cc_lim_arc a, cc_deal c
+                                       where fdat between  add_months(trunc(sysdate,'mm'),-1) and add_months(trunc(sysdate,'mm'),11) and sumo>0
+                                       and a.nd=c.nd 
+                                       and mdat = (select max(mdat) from cc_lim_arc aa where aa.nd=c.nd) 
+                                       group by a.nd) sum_lim on sum_lim.nd=ad.nd                          
                     --номінальна процентна ставка
                     left join (select t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
                            from int_ratn t,
@@ -1113,10 +1120,10 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                 accounts t2,
                                 nd_acc t4,
                                 cc_deal d
-                           where  t.id = 0 and t4.acc = t2.acc and t2.tip in('LIM')and t.acc=t4.acc  and bdat< trunc(sysdate,'mm') 
+                           where  t.id = 0 and t4.acc = t2.acc and t2.tip in('LIM')and t.acc=t4.acc  and bdat< trunc(sysdate,'mm')
                                   and d.nd=t4.nd
                                   and d.ndg is not null
-                           group by d.nd,t.acc) proc1 on proc1.nd = ad.nd,        
+                           group by d.nd,t.acc) proc1 on proc1.nd = ad.nd,
                           nd_acc n,
                           nd_txt nt,
                           accounts a
@@ -1128,7 +1135,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            n.kf = a.kf and
                            a.tip = 'LIM' and
                            a.nls like '8999%' and
-                           (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1)) 
+                           (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1))
                            --and
                            --proc.acc = ad.accs
                            and d.nd=nt.nd
@@ -1144,12 +1151,12 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                               (person.rnk,person.nd,person.ordernum,person.flagosoba,person.typecredit,person.numberdog,person.dogday,person.endday,person.sumzagal,person.r030,
                                person.proccredit,person.sumpay,'',person.periodbase,person.periodproc,person.sumarrears,person.daybase,person.dayproc,person.factendday,person.flagz
                                ,person.klass,person.risk,person.flagInsurance,'',kf_);
-                               exception when others then       
-                               if sqlcode=-1438 then 
-                                 dbms_output.put_line(person.rnk||':'||person.nd); 
-                                  end if; 
-                                --end;  
-                                 
+                               exception when others then
+                               if sqlcode=-1438 then
+                                 dbms_output.put_line(person.rnk||':'||person.nd);
+                                  end if;
+                                --end;
+
                                 -- dup_val_on_index then null;
              end;
 
@@ -1233,7 +1240,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         end;
      for n in (select distinct ac.rnk,ac.acc,'' as ordernum,nvl(case when p.cc_idz like '%\%' then replace (p.cc_idz,'\','\\')else p.cc_idz end,'б\\н') as numberpledge,
                  case when p.sdatz  is not null then p.sdatz
-                      when p.sdatz is null then c1.creditdate end as pledgeday, 
+                      when p.sdatz is null then c1.creditdate end as pledgeday,
                 (select s031  from cc_pawn cp where cp.pawn=p.pawn) as s031 , ac.kv as r030,
                 fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  as sumppladge,p.sv as  pricepledge, '' as lastpledgeday ,'' as codrealty,'' as ziprealty
                        ,'' as squarerealty,'' as real6income,'' as noreal6income,'' as flaginsurancepledge , dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,
@@ -1241,9 +1248,9 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                        case when (select s031  from cc_pawn cp where cp.pawn=p.pawn) in (11 , 12,  13, 14, 16, 20, 23, 31, 60, 61, 62, 63, 64, 65) then
                              fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))end sumGuarantee
                    from accounts ac
-                                   left join (select rnk,max(c.dogday) creditdate from nbu_credit c 
+                                   left join (select rnk,max(c.dogday) creditdate from nbu_credit c
                                          group by rnk) c1 on c1.rnk=ac.rnk ,
-                                 pawn_acc p 
+                                 pawn_acc p
                                     left join( select nd,d.acc,a.kv as kv ,dat_begin as date_begin , sum as limit , dpu_id as  deposit_id from dpu_deal d ,  accounts a
                                           where a.acc=d.acc
                                           union
@@ -1271,14 +1278,14 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         execute immediate 'alter table NBU_CREDIT_TRANCHE truncate partition for (''' || kf_ || ''') reuse storage';
         end;
         for tranche in (select distinct person.rnk,d.nd, --to_char(tr.npp)||'--'||d.nd as numDogTr,
-                 case when to_char(tr.npp) like '%\%' then to_char(replace(tr.npp,'\','\\')||'--'||d.nd) else to_char(tr.npp||'--'||d.nd) end
-                                     as numDogTr,      
+                               case when to_char(tr.npp) like '%\%' then to_char(replace(tr.npp,'\','\\')||'--'||d.nd) else to_char(tr.npp||'--'||d.nd) end
+                                     as numDogTr,
                                 tr.fdat as dogDayTr, tr.sv as sumZagalTr ,tr.dapp as endDayTr, a.kv as r030Tr,proc.proccredit,
                                (select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ' ) as periodbasetr,
                                nvl((select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP')
-                                        ,(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ')) as periodproctr,
+                                ,(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ')) as periodproctr,
                                --(select decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6)  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP' and regexp_like(dt.txt, '^\d{1,}$')) as periodproctr,
-                                sumarrears.sum_ost as  sumArrearsTr,
+                                 sumarrears.sum_ost as  sumArrearsTr,
                                  nbu23_rez.daybase as  dayBaseTr,
                                  nbu23_rez.daybase as dayProcTr,
                                  tr.d_fakt as factEndDayTr,
@@ -1373,14 +1380,15 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                          /* (select cd.nd ,ca.kv, (cd.limit*100) as  sum_zagal
                             from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv  */
 
-                            (select distinct cd.nd ,ca.kv, ((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
+                            (select distinct cd.nd ,ca.kv, --((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
+                                             (cd.sdog*100) as sum_zagal
                                              from cc_add ca,cc_deal cd
-                                             left join (select a.nd,sum(a.amount_com) as amount_com from(
+                                             /*left join (select a.nd,sum(a.amount_com) as amount_com from(
                                                             select distinct ad.nd,na.acc,ad.kv,a.kv,
                                                                case  when ad.kv<>a.kv then (select (abs(s.ostc)*(c.rate_o)) as amount_com from accounts s where s.acc=a.acc and s.kv=a.kv and s.kv=c.kv and c.vdate=trunc(sysdate,'dd'))
                                                                else abs(a.ostc) end amount_com
                                                             from accounts a, cur_rates c,nd_acc na,cc_add ad where ad.nd=na.nd and na.acc=a.acc and a.kv=c.kv and  nbs in (3578,3579))a
-                                                            group by a.nd) b on b.nd=cd.nd
+                                                            group by a.nd) b on b.nd=cd.nd*/
                                                        where ca.nd=cd.nd) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv
 
 
