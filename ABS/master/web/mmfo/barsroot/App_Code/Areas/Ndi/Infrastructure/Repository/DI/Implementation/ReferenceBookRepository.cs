@@ -294,7 +294,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                     res = EditData(tableId, tableName, item, true);
                     if (!res)
                     {
-                        this.GetOracleConnector.MyTransaction.Rollback();
+                        this.GetOracleConnector.DisposeWithTransaction(false);
                         return false;
                     }
 
@@ -305,7 +305,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             }
             catch (Exception e)
             {
-                this.GetOracleConnector.MyTransaction.Rollback();
+                this.GetOracleConnector.DisposeWithTransaction(false);
                 throw;
             }
             finally
