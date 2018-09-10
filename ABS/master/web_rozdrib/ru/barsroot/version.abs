@@ -1,5 +1,1 @@
-=========  svn diff --summarize -r 65264:64285 D:\SVN\master\web\ru
----web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.40\ru\web\barsroot\App_Code\Areas\InsUi\Infrastructure\DI\Implementation\InsRepository.cs
----web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.40\ru\web\barsroot\App_Code\webservices\EWAService\EWAService.cs
----web_release----: D:\SVN\Releases\Bugfix_2.1.44.1.40\ru\web\barsroot\version.abs
-Bugfix_2.1.44.1.40 (Rev:65264-64285
+Bugfix_2.1.44.1.40 (Rev:65264-64285) 
