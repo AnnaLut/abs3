@@ -169,7 +169,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                     new SimpleCard(card.Kf, packNum.ToString(Culture), HomeRepo.GetUserParam().USER_FULLNAME, card);
 
                 string xml = simpleCard.XmlSerialize(Encoding.UTF8);
-                Logger.Trace(String.Format("{0} Xml до надсилання: -={1}=-", LogMessagePrefix, xml));
+                Logger.Info(String.Format("{0} Xml до надсилання: -={1}=-", LogMessagePrefix, xml));
 
 
                 // отправляем данные в ЕБК
@@ -180,7 +180,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                 using (Stream responseStream = httpResponse.GetResponseStream())
                 {
                     responseStr = new StreamReader(responseStream, Encoding.UTF8).ReadToEnd();
-                    Logger.Trace(string.Format("{0} Отримано відповідь від сервісу:: {1}", LogMessagePrefix,
+                    Logger.Info(string.Format("{0} Отримано відповідь від сервісу:: {1}", LogMessagePrefix,
                         responseStr));
                 }
 
