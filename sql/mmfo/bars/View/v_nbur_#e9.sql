@@ -7,7 +7,11 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_NBUR_#E9 ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#E9 ("REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", "SEG_01", "SEG_02", "SEG_03", "SEG_04", "SEG_05", "SEG_06", "SEG_07", "SEG_08", "SEG_09", "SEG_10", "SEG_11", "SEG_12", "FIELD_VALUE") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_NBUR_#E9 (
+  "REPORT_DATE", "KF", "VERSION_ID", "NBUC", "FIELD_CODE", 
+  "SEG_01", "SEG_02", "SEG_03", "SEG_04", "SEG_05", 
+  "SEG_06", "SEG_07", "SEG_08", "SEG_09", "SEG_10", 
+  "SEG_11", "SEG_12", "FIELD_VALUE") AS 
   select p.REPORT_DATE
      , p.KF
      , p.VERSION_ID
