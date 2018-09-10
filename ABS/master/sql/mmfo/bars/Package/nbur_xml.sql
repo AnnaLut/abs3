@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.0  2018.09.03';
+  g_body_version  constant varchar2(64) := 'version 3.1  2018.09.06';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -547,47 +547,6 @@ $end
            where d1.SDATE <= l_last_dt
              and d1.WDATE  > l_last_dt;
 
-    when '01X' then
-
-      open p_recordset
-       for select EKP, KU, R020, T020, R030, K040
-                , abs( sum(OSTQ) ) as T070
-                , abs( sum(OST ) ) as T071
-             from ( select /*+ ORDERED FULL( a ) FULL( c ) FULL( b ) USE_HASH( b ) */
-                           'A01'||t.I010||'0' as EKP
-                         , ltrim(a.NBUC, '0') as KU
-                         , t.R020
-                         , case when b.OST < 0 then 1 else 2 end as T020
-                         , a.R030
-                         , c.K040
-                         , b.OST
-                         , b.OSTQ
-                      from ( select /*+ MATERIALIZE */ t2.R020, t2.I010
-                               from ( select R020
-                                        from KOD_R020
-                                       where A010 = '01'
-                                         and PREM = 'สม'
-                                         and D_OPEN <= p_rpt_dt
-                                         and lnnvl( D_CLOSE <= p_rpt_dt )
-                                    ) t1
-                               join ( select R020, I010
-                                        from KL_R020
-                                       where PREM = 'สม'
-                                         and D_OPEN <= p_rpt_dt
-                                         and lnnvl( D_CLOSE <= p_rpt_dt )
-                                    ) t2
-                                 on ( t2.R020 = t1.R020 )
-                           ) t
-                      join NBUR_DM_ACCOUNTS a
-                        on ( a.KF = p_kf and a.NBS = t.R020 )
-                      join NBUR_DM_CUSTOMERS c
-                        on ( c.KF = a.KF and c.CUST_ID = a.CUST_ID )
-                      join NBUR_DM_BALANCES_DAILY b
-                        on ( b.KF = a.KF and b.ACC_ID = a.ACC_ID )
-                     where b.OSTQ != 0
-                  )
-            group by EKP, KU, R020, T020, R030, K040;
-
     when '#F1' then
 
       open p_recordset
@@ -921,7 +880,7 @@ $end
       
       if ( l_rpt_code Is Null ) 
       then raise_application_error( -20666, 'Not found report with ID='||to_char(p_file_id), true );
-      else l_rpt_code := SubStr( l_rpt_code, 2, 2 );
+      else l_rpt_code := SubStr( l_rpt_code, 1, 2 );
       end if;
       
     end case;
