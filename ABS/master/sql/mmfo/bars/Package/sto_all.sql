@@ -16,7 +16,7 @@ create or replace package sto_all is
     19.07.2017 lypskykh: generate_stoschedules_reg исправлена для работы в ММФО
 */
 
-    G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.6  10.07.2016';
+    G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.7  05.09.2018';
 
     -- header_version - возвращает версию заголовка пакета STO_ALL
     function header_version return varchar2;
@@ -1374,7 +1374,7 @@ create or replace package body sto_all is
      l_tts_REC r_tts_REC;
      begin
      bars_audit.trace ('get_TTS start');
-     FOR i IN ( select tt, tt||'('||name||')' as name_ from tts where tt in ('PKD', '310', '101','D66', 'PKR', '440', '420', '445', 'K20', 'M19', '190', 'PKQ', 'W4W', 'PK!', 'W4T') )
+     FOR i IN ( select tt, tt||'('||name||')' as name_ from tts where tt in ('PKD', '310', '101','D66', 'PKR', '440', '420', '445', 'K20', 'M19', '190', 'PKQ', 'W4W', 'PK!', 'W4T', 'DOR') )
          LOOP
             l_tts_REC.tt := i.tt;
             l_tts_REC.name_ := i.name_;
