@@ -63,10 +63,10 @@ declare
     end if;
     l_rec.IDUPD         := bars_sqnc.get_nextval('s_vip_flags_arc'); 
     l_rec.EFFECTDATE    := COALESCE(gl.bd, glb_bankdate);
-    l_rec.GLOBAL_BDATE  := glb_bankdate;    -- sysdate
-    l_rec.IDU           := gl.auid; --gl.aUID(NUMBER);    user_name(VARCHAR2);
+    l_rec.GLOBAL_BDATE  := glb_bankdate;
+    l_rec.IDU           := gl.auid;
     l_rec.fdat          := sysdate;
-    l_rec.kf            := sys_context('bars_context','user_mfo');
+    l_rec.kf            := l_rec.MFO;
     insert into BARS.vip_flags_arc values l_rec;
 
   end SAVE_CHANGES;
