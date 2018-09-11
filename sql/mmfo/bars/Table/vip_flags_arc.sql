@@ -11,7 +11,7 @@ PROMPT *** ALTER_POLICY_INFO to VIP_FLAGS_ARC ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''VIP_FLAGS_ARC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
+               bpa.alter_policy_info(''VIP_FLAGS_ARC'', ''FILIAL'', null, null, null, null);
                bpa.alter_policy_info(''VIP_FLAGS_ARC'', ''WHOLE'' , null, null, null, null);
                null;
            end; 
