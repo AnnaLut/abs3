@@ -142,6 +142,37 @@ exception when others then
 /
 
 
+PROMPT *** Create  constraint PK_VIPFLAGSARC_IDUPD ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.VIP_FLAGS_ARC ADD CONSTRAINT PK_VIPFLAGSARC_IDUPD PRIMARY KEY (IDUPD)
+  USING INDEX COMPUTE STATISTICS TABLESPACE BRSMDLI  ENABLE VALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_VIPFLAGSARC_MFO_GL_EF ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_VIPFLAGSARC_MFO_GL_EF ON BARS.VIP_FLAGS_ARC (MFO, GLOBAL_BDATE, EFFECTDATE)
+  COMPUTE STATISTICS TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_VIPFLAGSARC_MFO_RNK  ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_VIPFLAGSARC_MFO_RNK ON BARS.VIP_FLAGS_ARC (MFO, RNK)
+  COMPUTE STATISTICS TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
 
 PROMPT *** Create  grants  VIP_FLAGS_ARC ***
 grant SELECT                                                                 on VIP_FLAGS_ARC   to BARSREADER_ROLE;
