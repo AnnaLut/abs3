@@ -1218,7 +1218,7 @@ IS
                    DECODE(custw.rnk, NULL, cwu.ISP, custw.ISP),
                    DECODE(custw.rnk, NULL, cwu.VALUE, custw.VALUE),
                    coalesce (custw.kf, cwu.kf) as KF
-              FROM (SELECT cw.*, c.kf
+              FROM (SELECT cw.RNK, cw.TAG, cw.VALUE, cw.ISP, c.kf
                       FROM BARS.CUSTOMER c, BARS.CUSTOMERW cw
                      WHERE cw.rnk = c.rnk) custw
                    FULL OUTER JOIN (SELECT  u1.rnk, cast(u1.tag as char(5)) as tag_char, u1.value, u1.isp, u1.kf, u1.tag as tag
@@ -1289,7 +1289,7 @@ IS
                DECODE(custw.rnk, NULL, cwu.ISP, custw.ISP),
                DECODE(custw.rnk, NULL, cwu.VALUE, custw.VALUE),
                coalesce (custw.kf, cwu.kf) as KF
-          FROM (SELECT cw.*, c.kf
+          FROM (SELECT cw.RNK, cw.TAG, cw.VALUE, cw.ISP, c.kf
                   FROM BARS.CUSTOMER c, BARS.CUSTOMERW cw, tg
                  WHERE cw.rnk = c.rnk
                    and cw.tag = tg.tag_char) custw
