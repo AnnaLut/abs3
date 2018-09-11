@@ -30,18 +30,18 @@ IS
               tt.tip:='KXN'; tt.name := 'W4.Нар.% Х-оверд~2627';
 %16/08/2018 - изменено формирование показателей 162, 163, 170 и др.
               для бал.счетов 3 класса
-%13/08/2018 - для нахождения даты первого движения по счету исключаем 
-              счета типа 'SNA' (используется для показателя 111........) 
+%13/08/2018 - для нахождения даты первого движения по счету исключаем
+              счета типа 'SNA' (используется для показателя 111........)
 %30/07/2018 - для формирования показателя 131 и гр. бал.сч. 204 добалено
               отбор документов с кодами операций 'IF1','IF2','IF3'
 %19/07/2018 - в формирование показателя 131 добавлены бал.счета 2044,2045
-%13/07/2018 - для 300465 и переклассифицированн?х кредитов в пределах 
-              одного договора показатель 111 будем формировать по счетам 
-              типа "XS" вместо типа "SS" 
+%13/07/2018 - для 300465 и переклассифицированн?х кредитов в пределах
+              одного договора показатель 111 будем формировать по счетам
+              типа "XS" вместо типа "SS"
 %20/06/2018 - в перечень бал.счетов для отбора добавлены 2038,2039,2398
-%14/06/2018 - изменено формирования показателя 041 для Крыма 
+%14/06/2018 - изменено формирования показателя 041 для Крыма
 %13/06/2018 - показник 164 формируем по ND вместо NDG
-%12/0602018 - изменено условие для формирования показателя 134 
+%12/0602018 - изменено условие для формирования показателя 134
 %11/06/2018 - на 01.06.2018 добавлено формирование показателя 134.......
 %11/05/2018 - для счетов дисконта 14_6,15_6,20_6,21_6,22_6,23_6,24_6,
               31_6,32_6,35_6
@@ -664,7 +664,7 @@ IS
                       UNION
                         SELECT RECID, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO FROM rnbu_trace r4
                         WHERE SUBSTR (r4.kodp, 1, 3) IN ('162', '163')
-                           and r4.nls like '3%' 
+                           and r4.nls like '3%'
                            and r4.nls not like '3__6%'
                            and not exists ( select 1
                                             from rnbu_trace r5
@@ -1387,7 +1387,7 @@ IS
          then
             p111p_ := dat_nkd_;
          end if;
- 
+
          begin
             INSERT INTO otcn_f71_temp
                         (rnk, acc, tp, nd, p090, p080, p081, p110,
@@ -2139,13 +2139,13 @@ IS
             THEN                              -- если это не гарантии клиентам
                -- реальная дата возникновения задолженности
                BEGIN
-                  SELECT NVL (MIN (s.fdat), p111_)  
+                  SELECT NVL (MIN (s.fdat), p111_)
                      INTO p111p_
                   FROM saldoa s, accounts a
                   WHERE s.acc = acc1_
                     AND s.fdat <= dat_
                     AND s.dos <> 0
-                    AND s.acc = a.acc 
+                    AND s.acc = a.acc
                     AND a.tip <> 'SNA';
                EXCEPTION
                   WHEN NO_DATA_FOUND
@@ -2309,11 +2309,11 @@ IS
 
              kol_ := kol_ + 1;
 
-             begin 
-                select a2.acc 
+             begin
+                select a2.acc
                    into acc1_
-                from accounts a2, nd_acc n2 
-                where a2.acc = n2.acc 
+                from accounts a2, nd_acc n2
+                where a2.acc = n2.acc
                   and trim(a2.tip) in ('XS','XP','XN','XPN','XNA')
                   and n2.nd = nd_
                   and rownum = 1;
@@ -2329,7 +2329,7 @@ IS
                 WHERE s.acc = acc1_
                   AND s.fdat <= dat_
                   AND s.dos <> 0
-                  AND s.acc = a.acc 
+                  AND s.acc = a.acc
                   AND a.tip <> 'SNA';
              EXCEPTION
                 WHEN NO_DATA_FOUND
@@ -2360,7 +2360,7 @@ IS
          null;
       END;
 
-      if acc_ = 1561563801 
+      if acc_ = 1561563801
       then
          p111p_ := to_date('16102014','ddmmyyyy');
       end if;
@@ -2476,14 +2476,6 @@ BEGIN
                           || ''''
                          );
    END;
-
-   select max(v.version_id)
-   into vers_
-   from NBUR_LST_FILES v, NBUR_REF_FILES f
-   where f.file_CODE = '#A7' AND
-         f.ID = v.FILE_ID and
-         v.REPORT_DATE = dat_ and
-         v.FILE_STATUS IN ('FINISHED', 'BLOCKED');
 
 -- код области, где расположен банк
    BEGIN
@@ -2741,7 +2733,7 @@ BEGIN
    where (c.codcagent < 7 and c.codcagent not in (2, 4, 6) and
           ((our_okpo_ = '0' or NVL(ltrim(c.okpo, '0'),'X') <> our_okpo_) and mfo_ <> 300465 or
           NVL(ltrim(c.okpo, '0'),'X') <> 'XXXXX' and mfo_ = 300465) or
-          (c.codcagent < 7 and mfo_ = 324805) or 
+          (c.codcagent < 7 and mfo_ = 324805) or
           g.link_group in (27, 58, 655, 306, 1358, 32, 34, 35, 39, 56, 290, 324, 304, 1169))
    group by c.rnk, c.nmk;
    commit;
@@ -3794,7 +3786,7 @@ BEGIN
           BEGIN
              select n.nd
                 into nd_acc_
-             from nd_acc n, cc_deal cc 
+             from nd_acc n, cc_deal cc
              where n.acc = acc_
                and NVL(cc.ndg, cc.nd) = nd_
                and n.nd = cc.nd;
@@ -4339,7 +4331,7 @@ BEGIN
                       from nbu23_rez n, cc_deal cc
                       where n.fdat = dat23_
                         and n.rnk = rnk_
-                        and NVL(cc.ndg, cc.nd) = nd_ 
+                        and NVL(cc.ndg, cc.nd) = nd_
                         and n.nd = cc.nd
                         and n.kv = kv_
                         and n.id not like 'DEB%'
@@ -5007,7 +4999,7 @@ BEGIN
                                   p070_ in ('1510','1513','1520','1521','1524',
                                             '2020','2030','2063','2071','2083',
                                             '2103','2113','2123','2133','2203',
-                                            '2211','2220','2233','3578', 
+                                            '2211','2220','2233','3578',
                                             '2390','2043','2044','2045') and
                                   tip_ in ('SP','SK9','OFR')
                                then
@@ -5022,15 +5014,15 @@ BEGIN
                                   if Dat_ >= dat_izm5
                                   then
                                      if p070_ like '204%'
-                                     then  
+                                     then
 
                                         select NVL(sum(o.s), 0)
                                            into s_v
-                                        from provodki_otc p, oper o 
+                                        from provodki_otc p, oper o
                                         where p.fdat between dat_ - 90 and dat_
                                           and p.tt like 'IF%'
                                           and p.accd = acc_
-                                          and p.ref = o.ref 
+                                          and p.ref = o.ref
                                           and o.vdat < dat_ - 90;
 
                                         select NVL(sum(dos), 0)
@@ -5053,13 +5045,13 @@ BEGIN
                                           and acc = acc_;
                                      end if;
 
-                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_ - s_v, dat_) 
+                                     if ABS(p120_) > gl.p_icurval(kv_, dos_spn_ - s_v, dat_)
                                         OR acc_ = 1780963901
                                      then
                                         if acc_ = 1780963901
                                         then
                                            p131_ := ABS(p120_);
-                                        else  
+                                        else
                                            p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_- s_v, dat_);
                                         end if;
 
@@ -5146,15 +5138,15 @@ BEGIN
                                   if Dat_ >= dat_izm5
                                   then
                                      if p070_ like '204%'
-                                     then  
+                                     then
 
                                         select NVL(sum(o.s), 0)
                                            into s_v
-                                        from provodki_otc p, oper o 
+                                        from provodki_otc p, oper o
                                         where p.fdat between dat_ - 90 and dat_
                                           and p.tt like 'IF%'
                                           and p.accd = acc_
-                                          and p.ref = o.ref 
+                                          and p.ref = o.ref
                                           and o.vdat < dat_ - 90;
 
                                         select NVL(sum(dos), 0)
@@ -5240,15 +5232,15 @@ BEGIN
                                   if Dat_ >= dat_izm5
                                   then
                                      if p070_ like '204%'
-                                     then  
+                                     then
 
                                         select NVL(sum(o.s), 0)
                                            into s_v
-                                        from provodki_otc p, oper o 
+                                        from provodki_otc p, oper o
                                         where p.fdat between dat_ - 90 and dat_
                                           and p.tt like 'IF%'
                                           and p.accd = acc_
-                                          and p.ref = o.ref 
+                                          and p.ref = o.ref
                                           and o.vdat < dat_ - 90;
 
                                         select NVL(sum(dos), 0)
@@ -5277,7 +5269,7 @@ BEGIN
                                         if acc_ = 1780963901
                                         then
                                            p131_ := ABS(p120_);
-                                        else  
+                                        else
                                            p131_ := ABS(p120_) - gl.p_icurval(kv_, dos_spn_- s_v, dat_);
                                         end if;
 
@@ -5552,12 +5544,12 @@ BEGIN
                                '2368', '2378', '2388', '2398',
                                '2408', '2418', '2428', '2438',
                                '2458', '2607', '2627', '2657',
-                               '3008', '3018', '3108', 
+                               '3008', '3018', '3108',
                                '3218', '3418', '3428', '3568'
                              ) and p120_ < 0 and tip_ <> 'SPN'
                              ) OR
                      (p070_ = '3118' and p120_ < 0 and tip_ = 'ODB' and Dat_ - mdate_ < 90)
-                   )  
+                   )
              then
 
                 BEGIN
@@ -6174,9 +6166,9 @@ then
 
       loop
 
-         update rnbu_trace r1 set r1.kodp = '125' || substr(k.kodp,4), 
+         update rnbu_trace r1 set r1.kodp = '125' || substr(k.kodp,4),
                                   r1.znap = 0 - k.znap
-         where r1.kodp like '122%' 
+         where r1.kodp like '122%'
            and r1.acc = k.acc;
 
    end loop;
@@ -6188,7 +6180,7 @@ end if;
 if Dat_ >= dat_izm8
 then
 
-   for k in ( select r.kodp, r.znap, r.nls, r.acc 
+   for k in ( select r.kodp, r.znap, r.nls, r.acc
               from rnbu_trace r, accounts a
               where substr(r.kodp, 1, 3) = '122'
                 and substr(r.kodp,18,4) in ('2046')
@@ -6198,9 +6190,9 @@ then
 
       loop
 
-         update rnbu_trace r1 set r1.kodp = '125' || substr(k.kodp,4), 
+         update rnbu_trace r1 set r1.kodp = '125' || substr(k.kodp,4),
                                   r1.znap = 0 - k.znap
-         where r1.kodp like '122%' 
+         where r1.kodp like '122%'
            and r1.acc = k.acc;
 
    end loop;
