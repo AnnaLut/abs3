@@ -2388,7 +2388,7 @@ begin
   OVRN.ins_110 (d_nd => dd.ND, p_acc26 => a26.acc, p_ACC => sn8.acc, u_nd => U_ND ) ; -- добавить 8008 в дог 110
 
   -- счет 2069 SPN
-  begin select a.* into a69 from accounts a, nd_acc n where a.rnk = a26.rnk and a.nbs = SB_2069.R020 and a.tip ='SPN'  and a.ob22 = SB_2069.ob22 and a.acc =n.acc and n.nd = dd.nd;
+  begin select a.* into a69 from accounts a, nd_acc n where a.rnk = a26.rnk and a.nbs = SB_2069.R020 and a.tip ='SPN'  and a.ob22 = SB_2069.ob22 and a.acc =n.acc and n.nd = dd.nd and a.dazs is null;
   EXCEPTION WHEN NO_DATA_FOUND THEN
      -- открыть 2069
      a69.nls := OVRN.Get_Nls (p_R4 => SB_2069.R020 ) ;  ---a69.nls := VKrzn ( substr( gl.aMfo,1,5),  f_newnls (a26.acc, 'OV2069', '') ) ;
