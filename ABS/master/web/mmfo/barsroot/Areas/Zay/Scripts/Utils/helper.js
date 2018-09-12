@@ -15,7 +15,7 @@ bars.helper = bars.helper || {
             dataValueField: "AIM_CODE",
             valueTemplate: '<span><b>#: AIM_CODE #</b>  -  #:AIM_NAME#</span>',
             template: '<span class="k-state-default"></span>' +
-                                      '<span class="k-state-default" style="font-size: 13px;"><b>#: AIM_CODE #</b> - #:AIM_NAME#</span>',
+            '<span class="k-state-default" style="font-size: 13px;"><b>#: AIM_CODE #</b> - #:AIM_NAME#</span>',
             dataSource: {
                 filter: {
                     field: "AIM_NAME",
@@ -30,7 +30,7 @@ bars.helper = bars.helper || {
                     read: {
                         type: "GET",
                         dataType: "json",
-                        data: { isBuying : true },
+                        data: { isBuying: true },
                         url: bars.config.urlContent("/api/zay/aims/get")
                     }
                 },
@@ -70,7 +70,7 @@ bars.helper = bars.helper || {
         var dropdownlist1 = $("#meta_aim_name").data("kendoDropDownList");
         dropdownlist1.list.width(380);
 
-       // #2 Країна перерахування валюти:
+        // #2 Країна перерахування валюти:
         $("#country_name").kendoDropDownList({
             filter: "startswith",
             dataTextField: "COUNTRY_CODE",
@@ -116,7 +116,7 @@ bars.helper = bars.helper || {
 
                 }
 
-               
+
 
             },
             dataBound: function () {
@@ -140,7 +140,7 @@ bars.helper = bars.helper || {
             optionLabel: "Оберіть причину...",
             valueTemplate: '<span><b>#: P63 #</b> - #:TXT#</span>',
             template: '<span class="k-state-default"></span>' +
-                                      '<span class="k-state-default" style="font-size: 13px;"><b>#: P63 #</b> - #:TXT#</span>',
+            '<span class="k-state-default" style="font-size: 13px;"><b>#: P63 #</b> - #:TXT#</span>',
             dataSource: {
                 transport: {
                     read: {
@@ -239,7 +239,7 @@ bars.helper = bars.helper || {
             optionLabel: "Оберіть код банку...",
             valueTemplate: '<span>#:BANK_CODE#</span>',
             template: '<span class="k-state-default"></span>' +
-                                      '<span class="k-state-default" style="font-size: 12px;"><b>#: BANK_CODE#</b>  #:BANK_NAME==null?" " : "- " + BANK_NAME#</span>',
+            '<span class="k-state-default" style="font-size: 12px;"><b>#: BANK_CODE#</b>  #:BANK_NAME==null?" " : "- " + BANK_NAME#</span>',
             dataSource: {
                 type: 'aspnetmvc-ajax',
                 serverSorting: true,
@@ -305,7 +305,7 @@ bars.helper = bars.helper || {
             optionLabel: "Оберіть групу...",
             valueTemplate: '<span><b>#: PRODUCT_GROUP #</b> - #:PRODUCT_GROUP_NAME#</span>',
             template: '<span class="k-state-default"></span>' +
-                                      '<span class="k-state-default" style="font-size: 13px;"><b>#: PRODUCT_GROUP #</b> - #:PRODUCT_GROUP_NAME#</span>',
+            '<span class="k-state-default" style="font-size: 13px;"><b>#: PRODUCT_GROUP #</b> - #:PRODUCT_GROUP_NAME#</span>',
             dataSource: {
                 transport: {
                     read: {
@@ -332,7 +332,7 @@ bars.helper = bars.helper || {
             optionLabel: "Оберіть код...",
             valueTemplate: '<span><b>#: ID #</b> - #:NAME#</span>',
             template: '<span class="k-state-default"></span>' +
-                                      '<span class="k-state-default" style="font-size: 13px;"><b>#: ID #</b> - #:NAME#</span>',
+            '<span class="k-state-default" style="font-size: 13px;"><b>#: ID #</b> - #:NAME#</span>',
             dataSource: {
                 transport: {
                     read: {
@@ -358,7 +358,7 @@ bars.helper = bars.helper || {
             optionLabel: "Оберіть ознаку...",
             valueTemplate: '<span><b>#:CODE #</b> #:TXT#</span>',
             template: '<span class="k-state-default"></span>' +
-                                      '<span class="k-state-default" style="font-size: 13px;"><b>#:CODE #</b> #:TXT#</span>',
+            '<span class="k-state-default" style="font-size: 13px;"><b>#:CODE #</b> #:TXT#</span>',
             dataSource: {
                 transport: {
                     read: {
@@ -394,9 +394,9 @@ bars.helper = bars.helper || {
                 bankName = $("#bank_name").val(),                                           // наименование иностранного банка
                 bankCode = $("#bank_code").data("kendoDropDownList").text().trim() === 'Оберіть код банку...' ? '' : $("#bank_code").data("kendoDropDownList").text().trim();
             productGroup = $("#product_group_name").data("kendoDropDownList").value(),      // код товарной группы (kod_70_4)
-            numVmd = $("#num_vmd").val(),                                                   // № таможенной декларации
-            code2C = $("#code2c").data("kendoDropDownList").value(),                        // Код купівлі за імпортом (#2C)
-            p122C = $("#p12").data("kendoDropDownList").value();                            // Ознака операції(#2C)
+                numVmd = $("#num_vmd").val(),                                                   // № таможенной декларации
+                code2C = $("#code2c").data("kendoDropDownList").value(),                        // Код купівлі за імпортом (#2C)
+                p122C = $("#p12").data("kendoDropDownList").value();                            // Ознака операції(#2C)
 
             return {
                 Id: id,
@@ -422,9 +422,9 @@ bars.helper = bars.helper || {
         // buttons:
         $("#save-btn").kendoButton({
             click: function () {
-                
+
                 var detailsModel = getObjData(data);
-                
+
                 var codeValid = function (detailsModel) {
 
                     var cCode = detailsModel.Country;
@@ -485,8 +485,8 @@ bars.helper = bars.helper || {
                         }
                     });
                 }
-                
-                
+
+
             }
         });
         $("#cencel-btn").kendoButton({
@@ -513,6 +513,7 @@ bars.helper = bars.helper || {
 
         $("#contractRefGrid").kendoGrid({
             dataSource: {
+                type: "aspnetmvc-ajax",
                 transport: {
                     read: {
                         type: "GET",
@@ -520,6 +521,12 @@ bars.helper = bars.helper || {
                         data: { rnk: rnk },
                         url: bars.config.urlContent("/api/zay/contract/get")
                     }
+                },
+                requestStart: function (e) {
+                    bars.ui.loader("body", true);
+                },
+                requestEnd: function (e) {
+                    bars.ui.loader("body", false);
                 },
                 schema: {
                     data: "Data",
@@ -534,11 +541,12 @@ bars.helper = bars.helper || {
                 },
                 pageSize: 10,
                 serverPaging: true,
-                //serverFiltering: true
+                serverFiltering: true
             },
-            filterable: {
-                mode: "row"
-            },
+            //filterable: {
+            //    mode: "row"
+            //},
+            filterable: true,  // 
             sortable: true,
             selectable: "row",
             pageable: {
@@ -552,12 +560,12 @@ bars.helper = bars.helper || {
                     title: "Номер контракту",
                     template: '<span class="k-state-default"></span>' +
                     '<span class="k-state-default" style="font-size: 13px;">#=CONTRACT_NUMBER === null ? "" : CONTRACT_NUMBER#</span>',
-                    filterable: {
-                        cell: {
-                            operator: "contains",
-                            suggestionOperator: "contains"
-                        }
-                    } 
+                    //filterable: {
+                    //    cell: {
+                    //        operator: "contains",
+                    //        suggestionOperator: "contains"
+                    //    }
+                    //} 
                 },
                 {
                     field: "CONTRACT_DATE",
@@ -608,16 +616,16 @@ bars.helper = bars.helper || {
                     bankCode: '8040000000'
                 };
 
-                if (dlCountryName!="" && parseInt(dlCountryName) !== aimValidCobdition.countryCode) {
+                if (dlCountryName != "" && parseInt(dlCountryName) !== aimValidCobdition.countryCode) {
                     bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням країни перерахування валюти!(п.6)" });
                     return false;
-                } else if (dlBenefCountry!="" && parseInt(dlBenefCountry) !== aimValidCobdition.countryCode) {
+                } else if (dlBenefCountry != "" && parseInt(dlBenefCountry) !== aimValidCobdition.countryCode) {
                     bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням країни бенефеціара!(п.8)" });
                     return false;
-                } else if (dlBasisText!="" && dlBasisText !== aimValidCobdition.basisText) {
+                } else if (dlBasisText != "" && dlBasisText !== aimValidCobdition.basisText) {
                     bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням причини покупки!(п.7)" });
                     return false;
-                } else if (dlBankCode!="" && dlBankCode !== aimValidCobdition.bankCode) {
+                } else if (dlBankCode != "" && dlBankCode !== aimValidCobdition.bankCode) {
                     bars.ui.error({ text: "Ціль покупки не сумісна із обраним значенням коду та назви банку!(п.9/10)" });
                     return false;
                 }
