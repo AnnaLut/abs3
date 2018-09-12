@@ -195,7 +195,7 @@ type gt_response is record(
 
   -- Private constant declarations
   g_package_name constant varchar2(160) := 'ins_ewa_mgr';
-  g_body_version  constant varchar2(64)  := 'version 3.23 26/03/2018';
+  g_body_version  constant varchar2(64)  := 'version 3.31 12/09/2018';
 
   --3.0
 --исправлены мелкие ошибки при создании договоров страхования (формат полей таблиц модуля страхования, проверкуи на корректность данных и и.п.)
@@ -1691,7 +1691,17 @@ end get_purpose;
     p_deal_number := l_deal_id;
     p_errcode := 0;
     p_errmessage := null;
-  end;
+  exception
+    when others then
+      logger.error(g_package_name||'.create_deal error <params>' 
+                                 || '<partner_id>' || to_char(l_partner.id) || '</partner_id>'
+                                 || '<type_id>' || to_char(l_type_id) || '</type_id>'
+                                 || '<ins_rnk>' || to_char(l_rnk) || '</ins_rnk>'
+                                 || '<num>' || l_paydat.d_number || '</num>'
+                                 || '<branch>' || sys_context('bars_context','user_branch') || '</branch>' || '</params>'
+                                 || ' backtrace: '||dbms_utility.format_error_backtrace||'; sqlerrm: '||sqlerrm);
+      raise;
+  end create_deal;
 
 
 
