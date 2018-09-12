@@ -2357,7 +2357,7 @@ begin
             add_dop_req(l_ref, 'NOS_A', '0',
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             if (p_sw71a = 'BEN') then
-                add_dop_req(l_ref, '33B', l_lcv || to_char(p_s,'9999'),
+                add_dop_req(l_ref, '33B', l_lcv || to_char(p_s,'99999999999,99'),
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
                 add_dop_req(l_ref, '71F', l_lcv || '0,',
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
@@ -2381,7 +2381,8 @@ begin
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
          
             add_dop_req(l_ref, '59',
-                '/'||substr(upper(p_nlsb),1,32)||'$nl$'
+                   case when substr(p_nlsb,1,1) = '/' then substr(upper(p_nlsb),1,32)||'$nl$'
+                                                      else '/'||substr(upper(p_nlsb),1,32)||'$nl$' end  
                    ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,1,32)||'$nl$'
                    ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end)>32 then substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,33,32)||'$nl$' else '' end 
                    ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end,1,32)||'$nl$'
