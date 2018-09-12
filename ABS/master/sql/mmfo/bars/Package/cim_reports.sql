@@ -841,9 +841,41 @@ begin
       order by b041, k020, p17, p08, p16, p21, p01
     )
     loop
-      insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, create_date)
-                   values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
-                           l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l_date_z_end);
+      begin
+        insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, create_date)
+                     values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
+                             l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l_date_z_end);
+      --COBUMMFO-9323
+      exception
+        when dup_val_on_index then
+          update cim_f36 f36
+             set f36.p02 = l.p02,
+                 f36.p06 = l.p06,
+                 f36.p07 = l.p07,
+                 f36.p08 = l.p08,
+                 f36.p09 = l.p09,
+                 f36.p13 = l.p13,
+                 f36.p15 = l.p15,
+                 f36.p18 = l.p18,
+                 f36.p19 = l.p19,
+                 f36.p20 = l.p20,
+                 f36.p21_new = l.p21_new,
+                 f36.p22 = l.p22,
+                 f36.p23 = l.p23,
+                 f36.p24 = l.p24,
+                 f36.p27 = l.p27
+           where f36.BRANCH = sys_context('bars_context', 'user_branch')
+             and f36.B041 = l.b041
+             and f36.K020 = l.k020
+             and f36.P17 = l.p17
+             and f36.P16 = l.p16
+             and f36.DOC_DATE = l.doc_date
+             and f36.P21 = l.p21
+             and f36.P14 = l.p14
+             and f36.P01 = l.p01
+             and f36.CREATE_DATE = l_date_z_end;
+      ----
+      end;
     end loop;
     commit;
   elsif l_date_z_end>l_last_date then
