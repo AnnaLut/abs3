@@ -18,7 +18,7 @@ new.tag in ('N','n')
 begin
   begin
      -- SWIFT - платеж, пришедший через corp2
-     select d_rec into l_drec_old from bars.oper where ref=:new.ref and tt in ('IBO', 'IBS', 'IBB');
+     select d_rec into l_drec_old from bars.oper where ref=:new.ref and tt in ('IBO', 'IBS', 'IBB', 'CL0', 'CLS', 'CLB');
      if (instr(l_drec_old, '#f')>0 ) then
         begin
             if (instr(l_drec_old, '#'||trim(:new.tag)) <= 0) then
