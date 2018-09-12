@@ -1163,7 +1163,7 @@ END cck;
 CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.07  01.08.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.08  06.08.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -1180,6 +1180,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   */
 
   /*
+22.02.2018 LSO Убрал проверку зарегестрирован ли счет по договору в процедуре cc_op_nls, так как там неверно отрабатывает.
 01-08-2018 VPogoda  закрытие гендоговора с субдоговорами
 22.05.2018 Sta PROCEDURE lim_bdate: Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
                FUNCTION cc_stop: Для операции КК1 + дебет счета SS - для проверки нач.комиссии
@@ -7570,7 +7571,7 @@ end if;
         FROM accounts
        WHERE kv = kv_
          AND nls = nls_;
-      IF aa.nbs LIKE '22%' OR aa.nbs LIKE '20%' THEN
+      /*IF aa.nbs LIKE '22%' OR aa.nbs LIKE '20%' THEN -- Логика непонятная
         BEGIN
           SELECT acc INTO aa.acc FROM nd_acc WHERE nd = nd_;
         EXCEPTION
@@ -7579,7 +7580,7 @@ end if;
                                     '\ Рах' || aa.nls || '*' || aa.tip ||
                                     ' уже існує !');
         END;
-      END IF;
+      END IF;*/
 
       acc_   := aa.acc;
       l_accc := aa.accc;
