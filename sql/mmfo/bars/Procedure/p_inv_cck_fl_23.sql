@@ -10,9 +10,10 @@ PROMPT *** Create  procedure P_INV_CCK_FL_23 ***
   CREATE OR REPLACE PROCEDURE BARS.P_INV_CCK_FL_23 (p_dat date, p_frm int, p_mode int default 0) is
 -- ============================================================================
 --                    Инвентаризационная ведомость - 23 постанова
---                          VERSION 7.1 (04/12/2017)
+--                          VERSION 7.2 (12/09/2018)
 -- ============================================================================
 /*
+ 12-09-2018(7.2) - G05 = Null - COBUMMFO-9420
  Даные про классификацию кредитных операций и расчет сумы резерва по физ.лицам - 23 постанова
  p_dat   -- на дату  (ПОСЛЕДНЯЯ ДАТА МЕСЯЦА!!!!!!)
  p_frm   -- с(1)/без(0) переформирования
@@ -208,8 +209,8 @@ loop
    --04 Наименование заемщика
    GG.G04 := k.NMK;
 
-   --05 Номер плательщика налогов
-   GG.G05 := k.nompdv;
+   --05 Номер плательщика налогов --INV_CCK_FL_23  
+   --GG.G05 := k.nompdv;     --G05=Null - COBUMMFO-9420
 
    --05I OKPO
    GG.G05I := k.OKPO;
@@ -824,7 +825,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
    G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129)
   (
 -- БПК 2202, 2203, у которых остаток в принципе существует (может 0)
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0 G06,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, null G05, c.okpo G05I, 0 G06,   --G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08, to_char(get_dat_first_turn(ba.acc_ovr),fd_) G09,
        null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null G18, a.nbs G19, a.ob22 G20,
        -f_get_ost(a.acc,DI_,1,7)/100 G21,
@@ -875,7 +876,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
   (
   --UNION ALL
   -- БПК, по которым 2202, 2203 еще не открыт, но есть 9129
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, null G05, c.okpo G05I, 0,  --G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08,  null G09,
        null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
@@ -927,7 +928,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
   (
   --UNION ALL
   -- БПК, по которым есть 9129, а 2202, 2203 открыт позже даты формирования
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, null G05, c.okpo G05I, 0,  --G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08,  null G09,
        null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
@@ -983,7 +984,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
   (
   --UNION ALL
   -- БПК, по которым нет ни 2202, 2203, ни 9129, но есть 2208
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, null G05, c.okpo G05I, 0,  ----G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08,  null G09,
        null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
@@ -1030,7 +1031,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
    G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129) 
   (
 -- БПК, по которым нет ни 2202, 2203, ни 9129, ни 2207, 2208, 2209, но есть 2625
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, NULL G05, c.okpo G05I, 0,  --G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08,  null G09,
        null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
@@ -1082,7 +1083,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
   (
 
 -- БПК 2207, у которых остаток в принципе существует (может 0)
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0 G06,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03, substr('БПК '||c.nmk,1,70) G04, NULL G05, c.okpo G05I, 0 G06,   --G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08, to_char(get_dat_first_turn(ba.acc_2207),fd_) G09,
        null G10, null G11, null G12, 0 G13, null G14, null G15, null G16, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null G18, a.nbs G19, a.ob22 G20,
        -f_get_ost(a.acc,DI_,1,7)/100 G21,
@@ -1138,7 +1139,7 @@ bars_audit.trace('%s 17-1.Вставляем данные по БПК ФЛ расширенные.',l_title);
    G00 , GT, GR, ACC, RNK, ACC2208, ACC2209, ACC9129) 
   (
 -- БПК, по которым нет ни 2202, 2203, 2207, 2208, ни 9129, но есть 2209
-  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, c.nompdv G05, c.okpo G05I, 0,
+  select (select name from branch where branch = nvl(a.branch,'/')) G01, a.kf G02, a.branch G03,  substr('БПК '||c.nmk,1,70) G04, null G05, c.okpo G05I, 0,  --G05=Null - COBUMMFO-9420
        a.kv G07, ba.nd G08,  null G09,
        null, null, null, 0, null, 0, null, (select prinsiderlv1  from prinsider where prinsider = c.prinsider) G17, null, a.nbs G19, null G20,
        0 G21,
