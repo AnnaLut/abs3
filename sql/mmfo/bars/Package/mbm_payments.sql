@@ -2353,7 +2353,7 @@ begin
             add_dop_req(l_ref, 'NOS_A', '0',
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             if (p_sw71a = 'BEN') then
-                add_dop_req(l_ref, '33B', l_lcv || to_char(p_s,'99999999999,99'),
+                add_dop_req(l_ref, '33B', l_lcv || trim(to_char(p_s,'99999999999,99')),
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
                 add_dop_req(l_ref, '71F', l_lcv || '0,',
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
