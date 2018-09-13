@@ -11,19 +11,26 @@ is
 % DESCRIPTION : Процедура формирования 73X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.003    26/07/018 (20/07/2018)
+% VERSION     :  v.18.004    13/09/2018 (26/07/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_               char(30)  := 'v.18.003  26.07.2018';
+  ver_               char(30)  := 'v.18.004  13/09/2018';
 
   c_title            constant varchar2(200 char) := $$PLSQL_UNIT;
 
+  l_nbuc             varchar2(20 char);
+  l_type             number;
+  l_datez            date := p_report_date + 1;
+  l_file_code        varchar2(2 char) := substr(p_file_code, 2, 2);
+  
+  c_old_file_code    constant varchar2(3 char) := '#73';
 
-  l_nbuc                varchar2(20 char);
-  l_type                number;
-  l_datez               date := p_report_date + 1;
-  l_file_code           varchar2(2 char) := substr(p_file_code, 2, 2);
+  l_file_id       nbur_ref_files.id%type := nbur_files.GET_FILE_ID(p_file_code => p_file_code);
+  l_version_id    nbur_lst_files.version_id%type;  
+  
+  --Exception
+  e_ptsn_not_exsts exception;
 
-  l_start_date          date;
+  pragma exception_init( e_ptsn_not_exsts, -02149 );  
 BEGIN
   logger.info (
                 c_title
@@ -34,130 +41,38 @@ BEGIN
                 || ' p_scheme= ' || p_scheme
               );
 
-  --Опредеялем дату начала охвата как последний рабочий день предыдущего месяца
-  l_start_date := calc_pdat(dat_ => trunc(p_report_date, 'MM'));
-
-  logger.info(
-               c_title
-               || ' selecting from date='
-               || to_char(l_start_date, 'dd.mm.yyyy')
-             );
-
   -- определение начальных параметров (код области или МФО или подразделение)
-  nbur_files.P_PROC_SET(
-                         p_kod_filii
-                         , p_file_code
-                         , p_scheme
-                         , l_datez
-                         , 0
-                         , l_file_code
-                         , l_nbuc
-                         , l_type
-                       );
+  nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
+  
+  --Очистка партиции для хранения детального протокола
+  begin
+    execute immediate 'alter table NBUR_LOG_F73X truncate subpartition for ( to_date('''
+                      || to_char(p_report_date,'YYYYMMDD')||''',''YYYYMMDD''), ''' || p_kod_filii || ''' )';
+  exception
+    when e_ptsn_not_exsts then
+      null;
+  end;
 
-  insert into nbur_detail_protocols (
-                                          report_date
-                                          , kf
-                                          , report_code
-                                          , nbuc
-                                          , field_code
-                                          , field_value
-                                          , description
-                                          , acc_id
-                                          , acc_num
-                                          , kv
-                                          , maturity_date
-                                          , cust_id
-                                          , REF
-                                          , nd
-                                          , branch
-                                    )
-    select p_report_date
-           , z.kf
-           , p_file_code
-           , z.nbuc
-           , case
-                 (
-                          case
-                            when z.r020_db = '1002' and z.r020_cr in ('2620', '2630', '2635') and z.kf = '322498' and z.d020 = '232' then '231'
-                            when z.r020_db in ('2620', '2630', '2635') and z.r020_cr in ('1002') and z.kf = '322498' and z.d020 = '342' then '341'
-                            when z.r020_db in ('2620', '2630', '2635') and substr(z.r020_cr, 1, 3) in ('100') and lower(z.comm) like 'поверн%' then '341'
-                            when z.r020_db in ('2620', '2630', '2635') and substr(z.r020_cr, 1, 3) in ('100') and z.kf = '300465' and (lower(z.comm) like '%claim%' or lower(z.comm) like '%переказ%') then '342'
-                            when z.r020_db = '1001' and z.r020_cr in ('3800') and z.d020 = '250' then '261'
-                            when z.r020_db in ('1002') and z.r020_cr in ('3800') and z.d020 in ('250', '262') then '261'
-                            when z.r020_db in ('1003') and z.r020_cr in ('3800') and z.d020 in ('250') then '262'
-                            when z.r020_db in ('1001', '1002', '1101', '1102') and z.r020_cr in ('3800') --and z.d020 in ('000') 
-                                then
-                                  case
-                                    when z.tt in ('BAK', 'TIK', 'Z16', 'TOU')
-                                         or z.cnt_bak > 0
-                                         or (
-                                              z.kv in (959, 961, 962, 964)
-                                              and (
-                                                    lower(z.comm) like '%отримано%' or
-                                                    lower(z.comm) like '%прийнято монети%' or
-                                                    lower(z.comm) like '%прийнято з гоу%' or
-                                                    lower(z.comm) like '%прийом%оу%'  OR
-                                                    lower(z.comm) like '%підкріплення%хоу%'     OR
-                                                    lower(z.comm) like '%оприбутковані%монети%'
-                                                  )
-                                            )
-                                  then
-                                    '000'
-                                  else
-                                    '261'
-                                  end
-                            when z.r020_db in ('1003') and z.r020_cr in ('3800') and z.d020 in ('000') then '262'
-                            when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002') and z.d020 in ('350') then '361'
-                            when z.r020_db in ('3800') and z.r020_cr in ('1003') and z.d020 in ('350') then '362'
-                            when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002', '1101', '1102')  --z.d020 in ('000') and 
-                                then
-                                    case
-                                      when z.tt in ('BAK', 'Z16','TOU')
-                                           or z.cnt_bak > 0
-                                           or LOWER(z.comm) like 'видан%' 
-                                           or LOWER(z.comm) like 'передан%' 
-                                           or LOWER(z.comm) like 'видача%' 
-                                           or lower(z.comm) like '%врегул%' 
-                                           or lower(z.comm) like '%відправ%'
-                                    then
-                                      '000'
-                                    else
-                                      '361'
-                                    end
-                            when z.r020_db in ('3800') and z.r020_cr in ('1001', '1002', '1101', '1102') and (lower(z.comm) like 'видан%' or lower(z.comm) like 'передан%' or lower(z.comm) like 'видача%' or lower(z.comm) like '%врегул%' or lower(z.comm) like '%відправ%') then '000'
-                            when z.r020_db in ('3907') and z.r020_cr in ('1001', '1002') and z.tt = '189' and lower(z.comm) like '%підкріпл%' then '000'
-                            when z.r020_db in ('3800') and z.r020_cr in ('1003') and z.d020 in ('000') then '362'
-                            when substr(z.r020_db, 1, 3) in ('100', '110') and z.r020_cr not in ('1007', '1107', '3800') and z.d020 in ('000') then '000'
-                            when z.r020_db not in ('1007', '1107', '3800') and substr(z.r020_cr, 1, 3) in ('100', '110') and z.d020 in ('000') then '000'
-                            when substr(z.r020_db, 1, 3) in ('100', '110') and z.d020 not in ('280') and to_number(z.d020) < 300 then z.d020
-                            when substr(z.r020_cr, 1, 3) in ('100', '110') and z.d020 not in ('380') and to_number(z.d020) > 300 then z.d020
-                            when substr(z.r020_db, 1, 3) in ('100', '110') 
-                                then
-                                    case
-                                      when z.kf = '300465' and z.d020 in ('310') then '270'
-                                      when z.r020_cr in ('3800') and z.d020 = '348' then '248'
-                                      when z.r020_cr in ('3800') and z.d020 = '342' then '242'
-                                      when z.r020_cr in ('3800') and z.d020 = '361' then '361'
-                                      when z.r020_cr in ('3800') and z.d020 = '362' then '362'
-                                      when z.r020_cr in ('3800') and z.d020 = '363' then '363'
-                                      when z.r020_cr in ('3800') and z.d020 = '370' then '370'
-                                      when to_number(z.d020) > 300 then '200'
-                                      else z.d020
-                                    end
-                            when substr(z.r020_cr, 1, 3) in ('100', '110') 
-                                then
-                                    case
-                                      when z.r020_db in ('3800') and z.d020 = '248' then '348'
-                                      when z.r020_db in ('3800') and z.d020 = '261' then '361'
-                                      when z.r020_db in ('3800') and z.d020 = '262' then '362'
-                                      when z.r020_db in ('3800') and z.d020 = '263' then '363'
-                                      when z.r020_db in ('3800') and z.d020 = '270' then '370'
-                                      when z.d020 not in ('280') and to_number(z.d020) < 300 then '300'
-                                      else z.d020
-                                    end
-                          end
-                    )
+  --Определяем версию файла для хранения детальеного протокола
+  l_version_id := f_nbur_get_run_version(p_file_code => p_file_code
+                                          , p_kf => p_kod_filii
+                                          , p_report_date => p_report_date
+                                        );
+
+  logger.trace(c_title || ' Version_id is ' || l_version_id);
+
+  -- очікуємо формування старого файлу
+  nbur_waiting_form(p_kod_filii, p_report_date, c_old_file_code, c_title);
+  
+  --Теперь сохрянем полученные данные в детальном протоколе
+  
+  -- детальний протокол
+  insert into nbur_log_f73X
+        (REPORT_DATE, KF, VERSION_ID, NBUC, KU, EKP, R030, T100, 
+         ACC_ID, ACC_NUM, KV, CUST_ID, REF, BRANCH)
+    select p.report_date, p.kf, l_version_id, p.kf, 
+        f_get_ku_by_nbuc(nbuc) as KU, 
+        (CASE p.seg_01 
                when '210' then 'A73001'
                when '221' then 'A73002'
                when '222' then 'A73003'
@@ -196,147 +111,21 @@ BEGIN
                when '620' then 'A73036'
                when '248' then 'A73037'
                when '348' then 'A73038'
+               when '000' then 'A73000'
              else
                'XXXXXX'
-             end
-             || lpad(z.kv, '3', '0')
-           , z.bal * F_NBUR_Ret_Dig(z.kv, p_report_date)
-           , z.comm
-           , z.acc_id
-           , z.acc_num
-           , z.kv
-           , null as maturity_date
-           , z.cust_id
-           , z.REF
-           , null as nd
-           , z.branch
-    from   (
-              select
-                      t.report_date
-                      , t.kf
-                      , t.ref
-                      , t.tt
-                      , t.kv
-                      , t.bal
-                      , t.r020_db
-                      , t.r020_cr
-                     -- , NVL(substr(coalesce(rpt.D1#73, rpt.D2#73), 1, 3), '000') as d020
-                      , NVL(substr(coalesce(w2.value, w1.value), 1, 3), '000') as d020                     
-                      , DECODE (t.tt, p.tt, p.nazn, DECODE (t.tt, 'PO3', p.nazn, t1.NAME)) as comm
-                      , p.sos
-                      , t.cnt_bak
-                      , ac.branch
-                      , t.cust_id
-                      , t.acc_num
-                      , t.acc_id
-                      , t.nbuc
-              from    (
-                        select
-                               t.*
-                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
-                                       then t.Nbuc_db 
-                                       else t.Nbuc_Cr 
-                                 end) as nbuc -- визначаємо код областіпо рахунку каси
-                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
-                                       then t.Acc_Id_Cr 
-                                       else t.Acc_Id_Db 
-                                 end) as acc_id
-                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
-                                       then t.Acc_Num_Cr 
-                                       else t.Acc_Num_Db 
-                                  end) as acc_num
-                               , (case when t.r020_db like '100%' or t.r020_db like '110%'
-                                       then t.Cust_Id_Cr 
-                                       else t.Cust_Id_Db 
-                                  end) as cust_id
-                               , sum(case when t.tt = 'BAK' then 1 else 0 end) over (partition by t.ref) CNT_BAK
-                        from   v_nbur_dm_transactions t
-                        where  (1 = 1)
-                               and t.report_date between l_start_date and p_report_date  --Дата отчета
-                               and t.kf = p_kod_filii        --Код филиала
-                               --Условия отбора
-                               and t.kv != 980 --Только валютные проводки
-                               and (
-                                     (
-                                       t.r020_db in ('1000', '1001', '1002', '1003', '1004', '1005', '1006', '1008', '1009')
-                                       and t.r020_cr not in ('1007')
-                                     )
-                                     or
-                                     (
-                                       t.r020_cr in ('1000', '1001', '1002', '1003', '1004', '1005', '1006', '1008', '1009')
-                                       and t.r020_db not in ('1007')
-                                     )
-                                     or
-                                     (
-                                       t.r020_db in ('1100', '1101', '1102', '1103', '1104', '1105', '1106', '1108', '1109')
-                                       and t.r020_cr not in ('1107')
-                                     )
-                                     or
-                                     (
-                                       t.r020_cr in ('1100', '1101', '1102', '1103', '1104', '1105', '1106', '1108', '1109')
-                                       and t.r020_cr not in ('1107')
-                                     )
-                                   )
-                               and not (t.r020_db like '100%' and t.r020_cr like '100%')
-                               and not (t.r020_db like '110%' and t.r020_cr like '110%')
-                       ) t
-                       join oper p on (t.kf = p.kf)
-                                      and (t.ref = p.ref)
-                       /*
-                       --Витрину не используем, так как есть несовпадение данных operw и витрины
-                       --Есть процедуры, которые в конце месяца апдейтят значения полей                                                     
-                       left join V_NBUR_DM_ADL_DOC_RPT_DTL rpt on (rpt.REPORT_DATE = t.REPORT_DATE)
-                                                                  and (rpt.KF = t.KF)
-                                                                  and (rpt.REF = t.REF)
-                       */                                           
-                       left join operw w1 on (w1.ref = t.ref and w1.tag = 'D#73')
-                       left join operw w2 on (w2.ref = t.ref and w2.tag = '73' || t.tt)
-                                                                                         
-                       left join tts t1 on (t.tt = t1.tt)
-                       left join nbur_dm_accounts ac on (t.kf = ac.kf)
-                                                        and (t.acc_id = ac.acc_id)
-              where (p.sos = 5)
-                    and (t.bal > 0)
-      ) z;
-
-    logger.info(c_title || ' data inserted into nbur_detail_protocols');
-
-    -- формирование показателей файла  в  nbur_agg_protocols
-    INSERT INTO nbur_agg_protocols (
-                                     report_date
-                                     , kf
-                                     , report_code
-                                     , nbuc
-                                     , field_code
-                                     , field_value
-                                   )
-       SELECT report_date
-              , kf
-              , report_code
-              , nbuc
-              , field_code
-              , to_char(field_value)
-         FROM (
-                SELECT report_date
-                       , kf
-                       , report_code
-                       , nbuc
-                       , field_code
-                       , SUM (field_value) field_value
-                FROM   nbur_detail_protocols
-                WHERE  report_date = p_report_date
-                       AND report_code = p_file_code
-                       AND kf = p_kod_filii
-                       and field_code not like 'XXXXXX%' --Из отчета выбросим неопознаные коды операций
-                GROUP BY
-                       report_date
-                       , kf
-                       , report_code
-                       , nbuc
-                       , field_code
-             );
-
-  logger.info(c_title || ' into nbur_aggregate_protocol inserted ' || to_char(sql%rowcount) || ' rows');
+             end) as EKP, 
+        p.seg_02 as R030, 
+        p.field_value, 
+        a.acc as acc_id, p.acc_num, p.kv, 
+        a.rnk as cust_id, p.ref, a.branch
+    from v_nbur_#73_dtl p
+    join accounts a
+    on (a.kf = p_kod_filii and
+        p.acc_num = a.nls and
+        p.kv = a.kv)
+    where p.report_date = p_report_date and
+        p.kf = p_kod_filii;
 
   logger.info ('NBUR_P_F73X end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 END NBUR_P_F73X;

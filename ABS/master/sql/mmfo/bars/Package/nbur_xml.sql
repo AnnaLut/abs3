@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.1  2018.09.06';
+  g_body_version  constant varchar2(64) := 'version 3.2  2018.09.13';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -863,6 +863,7 @@ $end
     title   constant     varchar2(64) := $$PLSQL_UNIT||'.SET_XSD';
     l_rpt_code           nbur_ref_files.file_code%type;
     l_scm_url            nbur_ref_xsd.scm_url%type;
+    l_scm_url_old        nbur_ref_xsd.scm_url%type;
   begin
     
     bars_audit.trace( '%s: Entry with ( p_file_id=%s, p_scm_dt=%s ).', title );
@@ -897,13 +898,19 @@ $end
       
     exception
       when DUP_VAL_ON_INDEX then
+        select SCM_URL
+        into l_scm_url_old
+        from NBUR_REF_XSD
+        where FILE_ID = p_file_id
+           and SCM_DT <= p_scm_dt;
         
-        DBMS_XMLSCHEMA.DELETESCHEMA( SCHEMAURL     => l_scm_url
+        DBMS_XMLSCHEMA.DELETESCHEMA( SCHEMAURL     => l_scm_url_old
                                    , DELETE_OPTION => DBMS_XMLSCHEMA.DELETE_CASCADE_FORCE );
         
         update NBUR_REF_XSD
            set CHG_USR = USER_ID()
              , CHG_DT  = SYSDATE
+             , SCM_URL = l_scm_url
          where FILE_ID = p_file_id
            and SCM_DT  = p_scm_dt;
         
