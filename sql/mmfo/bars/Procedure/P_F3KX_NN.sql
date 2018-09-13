@@ -15,7 +15,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.016          06.09.2018
+% VERSION     :   v.18.017          13.09.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -28,6 +28,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+13.09.2018  исключаются операции дт2620-кт2900 ob22=05
 06.09.2018  из общего списка операций удаляются проводки конвертации,
               zayavka.DT =3, kv_conv !=null (ранее удалялись только для 300465)
 30.08.2018  для продажи валюты добавлен отбор проводок Дт 2542 Кт 3739
@@ -583,7 +584,7 @@ BEGIN
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
                    AND o.kv not in (959, 961, 962, 964, 980)
-                   AND (   (     ( substr (o.nlsk, 1,4) ='2900'  or
+                   AND (   (     ( substr (o.nlsk, 1,4) ='2900'  and  o.ob22k !='05'  or
                                    substr (o.nlsk, 1,4) ='3739'  and  substr (o.nlsb, 1,4) ='2900' )
                             AND
                                 SUBSTR (o.nlsd, 1,4) IN
@@ -679,22 +680,12 @@ BEGIN
    end if;
 
    -- 08.06.2017 для продажи
-   -- для корреспонденции Дт 2625 Кт 3800 включаем проводки
+   -- для корреспонденции Дт 2620/2625 Кт 3800 включаем проводки
    -- только с доп.реквизитом OW_AM и в значении есть текст "/980"
    if mfou_ = 300465  then 
 
       delete from otcn_prov_temp a
-      where a.nlsk like '2625%'
-        and a.nlsd like '3800%'
-        and not exists ( select 1
-                         from operw b
-                         where b.ref = a.ref
-                           and b.tag like 'OW_AM%'
-                           and b.value like '%/980%'
-                       );
-
-      delete from otcn_prov_temp a
-      where a.nlsk like '2620%'
+      where a.nlsk like '262%'
         and a.nlsd like '3800%'
         and not exists ( select 1
                          from operw b
