@@ -1563,7 +1563,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     if cur.s<> cur.amount then
       l_cause:=l_cause+2; --некорректна сумма ЄВ-АБС
     end if;
-    if cur.operdate<> cur.pdat then
+    if cur.operdate<> trunc(cur.pdat) then
       l_cause:=l_cause+4;  --розбіжність у даті ЄВ-АБС
     end if;
     if cur.nls is null then
