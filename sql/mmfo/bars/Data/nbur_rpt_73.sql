@@ -51,7 +51,7 @@ begin
   (
    p_proc_id => l_proc_id
    , p_file_id => l_file_id
-   , p_proc_type => 'F'
+   , p_proc_type => 'O'
    , p_proc_active => 'Y'
    , p_scheme => 'BARS'
    , p_proc_name => 'NBUR_P_F73X_NC'
@@ -65,14 +65,6 @@ begin
   ( 
     p_file_id => l_file_id
     , p_obj_id  => null
-    , p_strt_dt => date '2015-01-01'
-  );
-
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ACCOUNTS')
     , p_strt_dt => date '2015-01-01'
   );
 
@@ -90,14 +82,15 @@ begin
     Insert into NBUR_REF_PREPARE_XML
        (FILE_CODE, DESC_XML, DATE_START)
      Values
-       ('73X', 'select substr(field_code, 1, 6) as EKP  -- Код показателя
-        , ltrim(t.nbuc, ''0'') as KU          -- Код области
-        , substr(field_code, 7, 3) as R030 -- Валюта
-        , field_value as T100              -- Значение параметра
-    from NBUR_AGG_PROTOCOLS t
+       ('73X', 'select EKP  -- Код показателя
+        , KU                -- Код области
+        , R030              -- Валюта
+        , sum(T100) as T100 -- Значение параметра
+    from NBUR_LOG_F73X t
     where report_date = :p_rpt_dt           -- Дата отчета
-      and kf = :p_kf                        -- Филиал
-      and report_code = ''73X''', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+      and kf = :p_kf
+      and ekp not in (''A73000'', ''XXXXXX'') 
+    group by ekp, ku, r030  ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
     COMMIT;
 end;
 /
