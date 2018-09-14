@@ -151,6 +151,15 @@ exec  bars.bpa.alter_policies('ZP_PAYROLL_DOC');
 comment on table  bars.ZP_PAYROLL_DOC is 'Документи  ЗП відомості';
 comment on column bars.ZP_PAYROLL_DOC.id_pr is 'id ЗП відомості';
 
+begin
+    execute immediate 'alter table zp_payroll_doc add idcard_num varchar2(9 char)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/
+comment on column bars.zp_payroll_doc.idcard_num is 'Номер паспорта нового зразка';
+
 grant select,delete,update,insert on bars.ZP_PAYROLL_DOC to bars_access_defrole;
 
 PROMPT ===================================================================================== 

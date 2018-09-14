@@ -3,7 +3,7 @@ PROMPT *** Run *** ========== Scripts /sql/bars/package/zp.sql =========*** Run 
 PROMPT ===================================================================================== 
 
 create or replace package bars.zp is
-  g_head_version  constant varchar2(64)  := 'version 1.2 18.06.2018';
+  g_head_version  constant varchar2(64)  := 'version 1.21 01.08.2018';
 
   --
   -- определение версии заголовка пакета
@@ -49,16 +49,19 @@ create or replace package bars.zp is
   procedure create_payroll_draft ( p_zp_id zp_deals.id%type, p_id out zp_payroll.id%type);
   procedure del_zp_payroll(p_id zp_payroll.id%type);
 procedure approve_payroll(p_sign_doc_set t_sign_doc_set,p_id zp_payroll.id%type);
-procedure add_payroll_doc(p_id_pr     zp_payroll.id%type,
-                          p_okpob     zp_payroll_doc.okpob%type,
-                          p_namb      zp_payroll_doc.namb%type,
-                          p_mfob      zp_payroll_doc.mfob%type,
-                          p_nlsb      zp_payroll_doc.nlsb%type,
-                          p_source    zp_payroll_doc.source%type,
-                          p_nazn      zp_payroll_doc.nazn%type,
-                          p_s         zp_payroll_doc.s%type,
-                          p_id        zp_payroll_doc.id%type       default null,
-                          p_id_file     zp_payroll_doc.id_file%type default null
+procedure add_payroll_doc(p_id_pr        zp_payroll.id%type,
+                          p_okpob        zp_payroll_doc.okpob%type,
+                          p_namb         zp_payroll_doc.namb%type,
+                          p_mfob         zp_payroll_doc.mfob%type,
+                          p_nlsb         zp_payroll_doc.nlsb%type,
+                          p_source       zp_payroll_doc.source%type,
+                          p_nazn         zp_payroll_doc.nazn%type,
+                          p_s            zp_payroll_doc.s%type,
+                          p_id           zp_payroll_doc.id%type           default null,
+                          p_id_file      zp_payroll_doc.id_file%type      default null,
+                          p_passp_serial zp_payroll_doc.passp_serial%type default null,
+                          p_passp_num    zp_payroll_doc.passp_num%type    default null,
+                          p_id_card_num  varchar2                         default null -- Паспорт гр.України у вигляді картки (поки не використовується)
                           );
  procedure del_payroll_doc(p_id  zp_payroll_doc.id%type);
  procedure create_payroll (p_id          zp_payroll.id%type,
@@ -108,13 +111,34 @@ function get_payroll_buffer (p_id zp_payroll.id%type)
 function get_user_key_id
    return varchar2;
 procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number);
+
+  -----------------------------------------------------------------------------------------
+  --  get_doc_person
+  --
+  --    Метод повертає паспортні дані клієнта по рахунку
+  --
+  --      p_nls - Вхідний параметр рахунок клієнта (2625)
+  --      p_okpo        - ІПН клієнта (out)
+  --      p_nmk         - ПІБ клієнта (out)
+  --      p_pass_serial - Серія паспорта (out)
+  --      p_pass_num    - Номер паспорта (out)
+  --      p_pass_card   - Номер паспорта у вигляді картки (out)
+  --      p_actual_date - Дата актуальності паспорта у вигляді картки (out)
+  --
+  procedure get_doc_person(p_nls in accounts.nls%type,
+                           p_okpo        out customer.okpo%type,
+                           p_nmk         out customer.nmk%type,
+                           p_pass_serial out person.ser%type,
+                           p_pass_num    out person.numdoc%type,
+                           p_pass_card   out person.numdoc%type,
+                           p_actual_date out person.actual_date%type);
 end;
 /
 
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.20 23.07.2018';
+g_body_version   constant varchar2(64)   := 'version 1.23 21.08.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -730,7 +754,7 @@ begin
     if p_acc is not null then
       begin
         select 1.0 into n from zp_deals where rnk=p_rnk and sos>=0 and acc_2909 = p_acc;
-        exception 
+        exception
           when no_data_found then
             null;
           when others then
@@ -944,9 +968,13 @@ begin
    end;
 
    if p_branch is not null then
-     update zp_deals
-        set branch = p_branch
-      where id= p_id;
+     if l_zp_deals.sos not in (0,5) then -- COBUMMFO-7001 -- можливо редагувати відділення тільки в статусі (0,5)
+       raise_application_error(-20000, 'Можливо редагувати відділення тільки в статусі "Новий" або "Діючий"');
+     else
+       update zp_deals
+          set branch = p_branch
+        where id= p_id;
+     end if;
    end if;
 
    if l_zp_deals.sos in (0,2,7)  then
@@ -1061,7 +1089,6 @@ begin
 
 
 end del_deal;
-
 --==============================
 --Авторизація договору
 --==============================
@@ -1177,7 +1204,6 @@ begin
 
 
 end authorize_deal;
-
 --==============================
 --Відмова авторизації
 --==============================
@@ -1441,16 +1467,19 @@ end ;
 --==============================
 --Додавання/апдейт документу у відомість
 --==============================
-procedure add_payroll_doc(p_id_pr     zp_payroll.id%type,
-                          p_okpob     zp_payroll_doc.okpob%type,
-                          p_namb      zp_payroll_doc.namb%type,
-                          p_mfob      zp_payroll_doc.mfob%type,
-                          p_nlsb      zp_payroll_doc.nlsb%type,
-                          p_source    zp_payroll_doc.source%type,
-                          p_nazn      zp_payroll_doc.nazn%type,
-                          p_s         zp_payroll_doc.s%type,
-                          p_id        zp_payroll_doc.id%type       default null,
-                          p_id_file     zp_payroll_doc.id_file%type default null
+procedure add_payroll_doc(p_id_pr        zp_payroll.id%type,
+                          p_okpob        zp_payroll_doc.okpob%type,
+                          p_namb         zp_payroll_doc.namb%type,
+                          p_mfob         zp_payroll_doc.mfob%type,
+                          p_nlsb         zp_payroll_doc.nlsb%type,
+                          p_source       zp_payroll_doc.source%type,
+                          p_nazn         zp_payroll_doc.nazn%type,
+                          p_s            zp_payroll_doc.s%type,
+                          p_id           zp_payroll_doc.id%type           default null,
+                          p_id_file      zp_payroll_doc.id_file%type      default null,
+                          p_passp_serial zp_payroll_doc.passp_serial%type default null,
+                          p_passp_num    zp_payroll_doc.passp_num%type    default null,
+                          p_id_card_num  varchar2                         default null -- Паспорт гр.України у вигляді картки (поки не використовується)
                           )
 is
 
@@ -1471,7 +1500,7 @@ begin
         raise_application_error(-20000, 'МФО отримувача має бути в Ощадбанку');
     end;
 
-    if p_nlsb <> vkrzn( substr(p_mfob,1,5),p_nlsb ) then
+    if length(p_nlsb) > 15 or p_nlsb <> vkrzn( substr(p_mfob,1,5),p_nlsb ) then
           raise_application_error(-20000, 'Невірний контрольний розряд рахунку');
     end if;
 
@@ -1519,10 +1548,21 @@ begin
         where rnk=l_rnk
         and   okpo=p_okpob;
       exception when no_data_found then
-        raise_application_error(-20000, 'ОКПО клієнта - '||p_okpob||' не відповідає рахунку - '||p_nlsb);
+        if coalesce(p_okpob,'0000000000') <> '0000000000' then
+          raise_application_error(-20000, 'ОКПО клієнта - '||p_okpob||' не відповідає рахунку - '||p_nlsb);
+        end if;
       end ;
     end if;
 
+  begin
+    if coalesce(p_okpob,'0000000000') = '0000000000' and ((p_passp_serial is null or p_passp_num is null) and p_id_card_num is null) then
+      raise_application_error(-20000, 'Не вказані ІПН або серія та (або) номер паспорту');
+    end if;
+
+    if coalesce(p_id_card_num,'000000000') <> '000000000' and not regexp_like(p_id_card_num,'^\d{9}$') then
+      raise_application_error(-20000, 'Номер паспорта нового зразка має містити 9 цифр');
+    end if;
+  end;
 
   if p_id is null then
 
@@ -1538,6 +1578,9 @@ begin
          l_zp_payroll_doc.source   := p_source;
          l_zp_payroll_doc.crt_date := sysdate;
          l_zp_payroll_doc.id_file  := p_id_file;
+         l_zp_payroll_doc.passp_serial := p_passp_serial;
+         l_zp_payroll_doc.passp_num    := p_passp_num;
+         l_zp_payroll_doc.idcard_num   := p_id_card_num;
 
          insert into zp_payroll_doc values l_zp_payroll_doc;
 
@@ -1548,8 +1591,11 @@ begin
           okpob   = nvl(p_okpob,l_zp_payroll_doc.okpob),
            namb   = nvl(p_namb,l_zp_payroll_doc.namb ),
            mfob   = p_mfob,
-           nazn   = p_nazn ,
-           signed = null
+           nazn   = p_nazn,
+           signed = null,
+           passp_serial = p_passp_serial,
+           passp_num    = p_passp_num,
+           idcard_num   = p_id_card_num
        where id = p_id;
 
   end if;
@@ -1645,7 +1691,9 @@ begin
                               c.nlsb,
                               3,
                               c.nazn,
-                              c.s/100);
+                              c.s/100,
+                              c.passp_serial,
+                              c.passp_num);
           exception
            when others then  if sqlcode =-20000 then null; else raise; end if;
           end;
@@ -2000,8 +2048,8 @@ begin
                     from bars.accounts
                    where nls = l_oper_zp.nlsb
                      and kv = l_accounts_2909.kv;
-              
-              if l_acc_b_rec.tip like 'W4%' and  l_zp_payroll.corp2_id is null 
+
+              if l_acc_b_rec.tip like 'W4%' and  l_zp_payroll.corp2_id is null
                 then
                   l_oper_zp.tt    := 'PKS';
               elsif l_acc_b_rec.tip not like 'W4%' and l_zp_payroll.corp2_id is null
@@ -2020,7 +2068,7 @@ begin
                  raise_application_error(-20000, 'Номер рахунку отримувача не 2625/20') ;
               end if;
             else
-              if substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is null 
+              if substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is null
                 then
                  l_oper_zp.tt    := '310';
               elsif substr(c.nlsb,1,4) in ('2620','2625') and l_zp_payroll.corp2_id is  not null
@@ -2029,7 +2077,7 @@ begin
               else
                  rollback to sp_payroll;
                  raise_application_error(-20000, 'Номер рахунку отримувача не 2625/20') ;
-              end if;              
+              end if;
             end if;
 
 
@@ -2391,7 +2439,8 @@ p_blob:=p_clob;
                 elsif c.col_nr=2 then l_tab(c.row_nr-1).namb  :=c.string_val;
                 elsif c.col_nr=3 then l_tab(c.row_nr-1).nlsb  :=c.number_val;
                 elsif c.col_nr=4 then l_tab(c.row_nr-1).s     :=c.number_val;
-                elsif c.col_nr=5 then l_tab(c.row_nr-1).mfob  :=c.number_val;
+                elsif c.col_nr=5 then l_tab(c.row_nr-1).mfob  :=coalesce(c.number_val,c.string_val);
+                                      --bars_audit.info('zp.imp_test c.number_val='||to_char(c.number_val)||', c.string_val'||c.string_val);
                 elsif c.col_nr=6 then l_tab(c.row_nr-1).nazn  :=c.string_val;
                 end if;
 
@@ -2638,7 +2687,59 @@ begin
         where nlsa=p_nls and mfoa=p_mfo and msgcode='PAYSAL' and tt='R01';
     end if;
 
-    end;
+end;
+
+  -----------------------------------------------------------------------------------------
+  --  get_doc_person
+  --
+  --    Метод повертає паспортні дані клієнта по рахунку
+  --
+  --      p_nls - Вхідний параметр рахунок клієнта (2625)
+  --      p_okpo        - ІПН клієнта (out)
+  --      p_nmk         - ПІБ клієнта (out)
+  --      p_pass_serial - Серія паспорта (out)
+  --      p_pass_num    - Номер паспорта (out)
+  --      p_pass_card   - Номер паспорта у вигляді картки (out)
+  --      p_actual_date - Дата актуальності паспорта у вигляді картки (out)
+  --
+  procedure get_doc_person(p_nls in accounts.nls%type,
+                           p_okpo        out customer.okpo%type,
+                           p_nmk         out customer.nmk%type,
+                           p_pass_serial out person.ser%type,
+                           p_pass_num    out person.numdoc%type,
+                           p_pass_card   out person.numdoc%type,
+                           p_actual_date out person.actual_date%type)
+  is 
+  begin
+    for i in (select c.okpo, 
+                     c.nmk,
+                     p.ser,
+                     p.numdoc,
+                     p.actual_date,
+                     p.passp
+              from accounts a, customer c, person p
+              where 
+                  a.rnk = c.rnk 
+                  and a.kv = 980 
+                  and p.rnk = c.rnk
+                  and p.passp in (1,7)
+                  and nls = p_nls)
+    loop
+      if i.passp in (1) then
+        p_okpo        := i.okpo;
+        p_nmk         := i.nmk;
+        p_pass_serial := i.ser;
+        p_pass_num    := i.numdoc;
+      elsif i.passp in (7) then
+        p_okpo        := i.okpo;
+        p_nmk         := i.nmk;
+        p_pass_card   := i.numdoc;
+        p_actual_date := i.actual_date;
+      else
+        null;
+      end if;
+    end loop;
+  end get_doc_person;
 
 begin
   init;
