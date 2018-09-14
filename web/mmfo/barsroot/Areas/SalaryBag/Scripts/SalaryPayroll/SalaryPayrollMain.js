@@ -230,7 +230,10 @@ function initKendoWidgets() {
                     sos: { type: "number" },
                     signed: { type: "string" },
                     signed_fio: { type: "string" },
-                    doc_comment: { type: "string" }
+                    doc_comment: { type: "string" },
+                    passp_serial: { type: "string" },
+                    passp_num: { type: "string" },
+                    idcard_num: { type: "string" }
                 }
             }
         }
@@ -262,6 +265,10 @@ function initKendoWidgets() {
             { field: "doc_ref", title: "Референс", width: "110px", hidden: formCfg.curSos != 0 && formCfg.curSos != 5, template: '<a href="\\#" onclick="openDoc(#= doc_ref #);">#= doc_ref == null ? "" : doc_ref #</a>' },
             { field: "namb", title: "ПІБ клієнта", width: "250px" },
             { field: "okpob", title: "ІПН", width: "120px" },
+            {
+                field: "passp_num", title: "Паспорт/ID-картка", width: "180px",
+                template: "#= getPasportTemplate(passp_num , passp_serial, idcard_num) #"
+            },
             { field: "mfob", title: "МФО", width: "90px" },
             { field: "nlsb", title: "Рахунок", width: "150px" },
             { field: "s", title: "Сума, &#8372;", width: "120px", template: '<div style="text-align:right;">#= convertToMoneyStr(s) #</div>' },
@@ -328,6 +335,11 @@ function initKendoWidgets() {
     $(formCfg.gridSelector).kendoGrid(gridOptions);
 };
 
+function getPasportTemplate(num, series, idcard) {
+    if (idcard) return idcard;
+    return series + ' ' + num;
+};
+
 function calcCommission() {
     var grid = $(formCfg.gridSelector).data("kendoGrid");
     var count = grid.dataSource.data().length;
@@ -380,6 +392,7 @@ function getNumericOptions(options) {
     options = $.extend(
         {
             min: 0,
+            max: 99999999999999,
             spinners: false,
             decimals: 2,
             restrictDecimals: true,
@@ -681,26 +694,6 @@ function getDateFromString(strVal) {
     day = day > 9 ? day : '0' + day;
 
     return day + "." + month + "." + year;
-};
-
-function getNumericOptions(options) {
-    if (options === undefined || options == null) options = {};
-    options = $.extend(
-        {
-            min: 0,
-            spinners: false,
-            decimals: 2,
-            restrictDecimals: true,
-            format: "n2",
-            change: function () {
-                var value = this.value();
-                if (value == null || $.trim(value) == "")
-                    this.value(0);
-            }
-        },
-        options
-    );
-    return options;
 };
 
 function changeGridMaxHeight() {

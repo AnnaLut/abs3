@@ -249,7 +249,7 @@
                     <label class="k-label fullWidth" for="nls_editor">Рахунок одержувача</label>
                 </td>
                 <td>
-                    <input id="nls_editor" tabindex="1" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.nlsb, '') #">
+                    <input id="nls_editor" maxlength="15" tabindex="1" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.nlsb, '') #">
                 </td>
                 <td>
                     <label class="k-label fullWidth" for="mfo_editor">МФО</label>
@@ -265,7 +265,7 @@
                     <label class="k-label fullWidth" for="client_pib_editor">ПІБ клієнта</label>
                 </td>
                 <td colspan="3">
-                    <input id="client_pib_editor" tabindex="3" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.namb, '') #">
+                    <input id="client_pib_editor" maxlength="38" tabindex="3" class="k-textbox k-input fullWidth" value="#= checkValForEdit(data.namb, '') #">
                 </td>
                 <td></td>
                 <td>
@@ -286,6 +286,37 @@
                     <input id="sum_editor" tabindex="5" class="fullWidth" value="#= checkValForEdit(data.s, 0) #">
                 </td>
             </tr>
+
+            <tr class="cb_td">
+                <td></td>
+                <td>
+                    <input type="checkbox" id="no_ipn_cb" />
+                    <label class="k-label" for="no_ipn_cb"> ІПН відсутній</label>
+                </td>
+            </tr>
+
+            @*----------------------------------------------------------------*@
+
+            <tr id="passportData" class="invisible">
+                <td>
+                    <input id="passportType" class="invisible" style="text-align:left;width:90px;"/>
+                    <label class="k-label" style="margin-right:25px;text-align:left;display: inline-block;">Паспорт</label>
+                </td>
+                <td colspan="3">
+                    <div id="passpSeriesDiv" style="display:inline-block;">
+                        <label class="k-label" for="passportSeries">Серія</label>
+                        <input class="k-textbox k-input" style="width:40px;" id="passportSeries" maxlength="2" value="#= checkValForEdit(data.passp_serial, '') #" />
+                    </div>
+                    <div style="display:inline-block;">
+                        <label class="k-label" for="passportNumber">Номер</label>
+                        <input class="k-textbox k-input" id="passportNumber" maxlength="6" value="#= checkValForEdit(data.passp_num, '') #" />
+                    </div>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            @*----------------------------------------------------------------*@
 
             <tr>
                 <td>

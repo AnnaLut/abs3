@@ -241,14 +241,6 @@ function clearSelection() {
     }
 };
 
-//var lastMouseX,
-//    lastMouseY;
-
-//$(document).on("mousemove", function(e) {
-//    lastMouseX = e.pageX;
-//    lastMouseY = e.pageY;
-//});
-
 function DownloadFileFromBase64(base64, fileName) {
     var form = $('<form method="POST" action="' + bars.config.urlContent("/SalaryBag/SalaryBag/ConvertBase64ToFileUrlDecoded") + '" id="download_form"></form>');
     form.append($('<input type="hidden" name="base64" value="' + base64 + '" />'));

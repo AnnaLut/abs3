@@ -198,3 +198,12 @@
 .custom-btn-change-encoding {
     width: auto;
 }
+
+.cb_td, .cb_td td {
+    height: 20px !important;
+    padding: 0px !important;
+}
+
+.k-textbox.k-input[disabled], .k-textbox.k-input[disabled]:hover {
+    background-color: lightgray !important;
+}

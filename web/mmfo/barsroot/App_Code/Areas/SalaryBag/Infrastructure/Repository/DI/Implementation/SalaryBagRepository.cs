@@ -285,6 +285,10 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                 p.Add("p_s", model.Summ, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_id", model.DocumentId, DbType.Decimal, ParameterDirection.Input);
 
+                p.Add("p_passp_serial", model.PasspSeries, DbType.String, ParameterDirection.Input);
+                p.Add("p_passp_num", model.PasspNumber, DbType.String, ParameterDirection.Input);
+                p.Add("p_id_card_num", model.IdCardNumber, DbType.String, ParameterDirection.Input);
+
                 connection.Execute("zp.add_payroll_doc", p, commandType: CommandType.StoredProcedure);
             }
         }
@@ -397,6 +401,48 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        public ClientModel SearchExistingClient(string nls)
+        {
+            ClientModel client = new ClientModel();
+
+            using (OracleConnection con = OraConnector.Handler.UserConnection)
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleParameter pOkpo = new OracleParameter("p_okpo", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output),
+                                    pNmk = new OracleParameter("p_nmk", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output),
+                            pPasspSerial = new OracleParameter("p_pass_serial", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output),
+                               pPasspNum = new OracleParameter("p_pass_num", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output),
+                              pPasspCard = new OracleParameter("p_pass_card", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output),
+                             pActualDate = new OracleParameter("p_actual_date", OracleDbType.Date, null, ParameterDirection.Output))
+            {
+                cmd.CommandText = "zp.get_doc_person";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.BindByName = true;
+                cmd.Parameters.Add(new OracleParameter("p_nls", OracleDbType.Varchar2, nls, ParameterDirection.Input));
+                cmd.Parameters.AddRange(new OracleParameter[] { pOkpo, pNmk, pPasspSerial, pPasspNum, pPasspCard, pActualDate });
+                cmd.ExecuteNonQuery();
+
+                client.okpo = GetStrFromOraParam(pOkpo);
+                if (string.IsNullOrWhiteSpace(client.okpo)) return client;
+
+                client.nmk = GetStrFromOraParam(pNmk);
+                client.nls = nls;
+                client.PassportIdCardNum = GetStrFromOraParam(pPasspCard);
+                client.PassportNumber = GetStrFromOraParam(pPasspNum);
+                client.PassportSerial = GetStrFromOraParam(pPasspSerial);
+
+                OracleDate actualDate = (OracleDate)pActualDate.Value;
+                client.ActualDate = actualDate.IsNull ? (DateTime?)null : actualDate.Value;
+            }
+            return client;
+        }
+        private string GetStrFromOraParam(OracleParameter par)
+        {
+            OracleString oraStr = (OracleString)par.Value;
+            if (oraStr.IsNull) return string.Empty;
+
+            return oraStr.Value;
         }
         #endregion
 
