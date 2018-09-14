@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования F4X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  02/09/2018 
+% VERSION     :  v.1.002 14/09/2018 (02/09/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.001  02/09/2018';
+  ver_              char(30)  := 'v.1.002  14/09/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   c_old_file_code   constant varchar2(3 char) := '#F4';
@@ -145,7 +145,7 @@ BEGIN
                 left join accounts a
                 on (t.acc_id = a.acc)  
                 left join (select  t.acc
-                                   , max(coalesce(trim(replace(replace(kol24, '[', ''), ']', '')), '#')) as kol24
+                                   , max(coalesce(trim(replace(replace(kol24, '[', ''), ']', '')), '000')) as kol24
                            from    rez_cr t
                            where   t.fdat = l_next_mnth_frst_dt
                            group by t.acc) r 
