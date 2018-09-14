@@ -65,6 +65,10 @@ namespace Areas.SalaryBag.Models
         public decimal? Source { get; set; }
         public string PaymentPurpose { get; set; }
         public decimal? Summ { get; set; }
+
+        public string PasspSeries { get; set; }
+        public string PasspNumber { get; set; }
+        public string IdCardNumber { get; set; }
     }
 
     public class SosArray

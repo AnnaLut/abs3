@@ -523,9 +523,10 @@ namespace BarsWeb.Areas.SalaryBag.Controllers.Api
         {
             try
             {
-                BarsSql sql = SqlCreator.GetClientInfo(nls);
+                //BarsSql sql = SqlCreator.GetClientInfo(nls);
 
-                ClientModel data = _repo.SearchGlobal<ClientModel>(null, sql).ToList().FirstOrDefault();
+                //ClientModel data = _repo.SearchGlobal<ClientModel>(null, sql).ToList().FirstOrDefault();
+                ClientModel data = _repo.SearchExistingClient(nls);
 
                 return Request.CreateResponse(HttpStatusCode.OK, new ResponseSB() { ResultObj = data });
             }

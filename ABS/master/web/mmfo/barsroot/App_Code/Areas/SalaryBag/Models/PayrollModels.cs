@@ -39,5 +39,6 @@ namespace Areas.SalaryBag.Models
         public decimal? ostc_2909 { get; set; }
 
         public decimal? src { get; set; }
+        public DateTime? imp_date { get; set; }
     }
 }

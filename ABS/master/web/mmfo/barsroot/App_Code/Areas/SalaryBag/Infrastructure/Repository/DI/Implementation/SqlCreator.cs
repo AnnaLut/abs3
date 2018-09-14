@@ -374,7 +374,8 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                                 signed,
                                 signed_fio,
                                 ostc_2909,
-                                src
+                                src,
+                                imp_date
                             from v_zp_payroll ",
                 SqlParams = new object[] { }
             };
@@ -410,7 +411,10 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                                 o.sos,
                                 z.signed,
                                 case when s.fio is null and z.corp2_id is not null then 'Корпоративний клієнт' else s.fio end signed_fio,
-                                z.doc_comment
+                                z.doc_comment,
+                                z.passp_serial,
+                                z.passp_num,
+                                z.idcard_num
                             from zp_payroll_doc z, oper o, staff$base s
                             where 
                                 o.ref(+) = z.ref 
@@ -431,7 +435,11 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                                 okpo,
                                 nmk,
                                 nls,
-                                mfo
+                                mfo,
+                                pass_serial as PassportSerial,
+                                pass_num as PassportNumber,
+                                pass_card as PassportIdCardNum,
+                                actual_date as ActualDate
                             from v_zp_acc_pk
                             where 
                                 id = :p_id",

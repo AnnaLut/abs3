@@ -1,5 +1,7 @@
 ﻿function AddOrEditForm(selectedItem) {
     selectedItem = selectedItem || {};
+    var ipnDefault = '0000000000';
+
     var kendoWindow = $("<div />").kendoWindow({
         actions: ["Close"],
         title: selectedItem.id === undefined ? 'Створення документу' : 'Редагування документу',
@@ -36,10 +38,15 @@
 
     kendoWindow.find("#client_pib_editor_btn").on('click', function () {
         selectClientForm(formCfg.salaryDealId, function (data) {
+            noIpnCbChange(data.okpo == ipnDefault);
+
             kendoWindow.find("#client_pib_editor").val(data.nmk);
             kendoWindow.find("#okpo_editor").val(data.okpo);
             kendoWindow.find("#mfo_editor").val(data.mfo);
             kendoWindow.find("#nls_editor").val(data.nls);
+
+            kendoWindow.find('#passportSeries').val(data.PassportSerial);
+            kendoWindow.find('#passportNumber').val(data.PassportNumber);
         });
     });
 
@@ -82,34 +89,83 @@
         }
     });
 
+    kendoWindow.find('#okpo_editor').on('change', function () {
+        noIpnCbChange($(this).val() == ipnDefault)
+    });
+
+    function noIpnCbChange(val) {
+        if (val) {
+            kendoWindow.find('#no_ipn_cb').attr('checked', 'checked');
+        } else {
+            kendoWindow.find('#no_ipn_cb').removeAttr('checked');
+        }
+
+        var editor = $('#okpo_editor');
+
+        if (val) kendoWindow.oldOkpo = editor.val();
+        if (kendoWindow.oldOkpo == ipnDefault) kendoWindow.oldOkpo = '';
+
+        enableElem('#okpo_editor', !val);
+        editor.val(val ? ipnDefault : kendoWindow.oldOkpo);
+
+        if (!val) $('#passportData').addClass('invisible');
+        else $('#passportData').removeClass('invisible');
+    };
+    kendoWindow.find('#no_ipn_cb').on('change', function () {
+        noIpnCbChange(this.checked);
+    });
+
+    var passpType = 0;
+    if (!selectedItem.passp_serial && selectedItem.idcard_num) {
+        $('#passpSeriesDiv').css('display', 'none');
+        $('#passportSeries').val('');
+        passpType = 1;
+    }
+
+    kendoWindow.find('#passportType').kendoDropDownList({
+        dataTextField: "txt",
+        dataValueField: "val",
+        template: '<span style="font-size:12px;">#:data.txt#</span>',
+        valueTemplate: '<span style="font-size:12px;">#:data.txt#</span>',
+        dataSource: [
+            { val: 0, txt: 'Паспорт' },
+            { val: 1, txt: 'ID-картка' }
+        ],
+        value: passpType,
+        change: function (e) {
+            var docType = +e.sender.value();
+
+            $('#passportNumber').attr('maxlength', docType === 1 ? 9 : 6);
+
+            if (docType === 1) {
+                $('#passpSeriesDiv').css('display', 'none');
+                $('#passportSeries').val('');
+            } else {
+                $('#passpSeriesDiv').css('display', 'inline-block');
+            }
+        }
+    });
+    kendoWindow.find('#passportSeries').on('change', function () {
+        this.value = this.value.toUpperCase();
+    });
+
     if (selectedItem.id === undefined) {
-        //kendoWindow.find('#mfo_editor').on('change', function() {
-        //    var _mfo = $(this).val();
-        //    if (selectedItem.id === undefined) {
-
-        //        if (_mfo != formCfg.ourMfo) {
-        //            kendoWindow.find('#client_pib_editor').val('');
-        //            kendoWindow.find('#okpo_editor').val('');
-        //        } else {
-        //            if (kendoWindow.find('#nls_editor').val() != '') {
-        //                getClientByNls();
-        //            }
-        //        }
-        //    }
-        //});
-
         var fireBlur = true;
         kendoWindow.find('#nls_editor').on('blur', function () {
             if (!fireBlur) return;
             fireBlur = false;
-            console.log('blur');
             checkNls();
         });
     }
     kendoWindow.find("#sum_editor").kendoNumericTextBox(getNumericOptions());
 
+    if (selectedItem.okpob == ipnDefault) {
+        noIpnCbChange(true);
+    }
+
     kendoWindow.data("kendoWindow").center().open();
     bindSelectOnFocus();
+
 
     function checkNls() {
         var _nls = kendoWindow.find('#nls_editor').val();
@@ -180,8 +236,12 @@
                     //showBarsErrorAlert(data.ErrorMsg);
                 } else {
                     if (data.ResultObj !== undefined && data.ResultObj != null) {
+                        noIpnCbChange(data.ResultObj.okpo == ipnDefault);
+
                         kendoWindow.find('#client_pib_editor').val(data.ResultObj.nmk);
                         kendoWindow.find('#okpo_editor').val(data.ResultObj.okpo);
+                        kendoWindow.find('#passportSeries').val(data.ResultObj.PassportSerial);
+                        kendoWindow.find('#passportNumber').val(data.ResultObj.PassportNumber);
                     }
                 }
             },
@@ -192,6 +252,9 @@
     };
 
     function validateAddEditForm() {
+        var noIpn = no_ipn_cb.checked;
+        var isIdCard = $('#passportType').data('kendoDropDownList').value() == 1;
+
         var result = {
             res: true,
             enteredData: {
@@ -203,20 +266,32 @@
                 NlsB: kendoWindow.find("#nls_editor").val(),
                 Source: 1,
                 PaymentPurpose: kendoWindow.find("#payment_purpose_editor").val(),
-                Summ: kendoWindow.find("#sum_editor").data("kendoNumericTextBox").value()
+                Summ: kendoWindow.find("#sum_editor").data("kendoNumericTextBox").value(),
+                PasspSeries: noIpn ? (isIdCard ? '' : kendoWindow.find('#passportSeries').val()) : '',
+                PasspNumber: noIpn ? (isIdCard ? '' : kendoWindow.find('#passportNumber').val()) : '',
+                IdCardNumber: noIpn ? (isIdCard ? kendoWindow.find('#passportNumber').val() : '') : '',
             },
             errors: ''
         };
 
         if (formCfg.ourMfo != result.enteredData.MfoB) {
-            if (isEmpty(result.enteredData.OkpoB)) result.errors += '<b>ІПН</b></br>'
-            if (isEmpty(result.enteredData.NameB)) result.errors += '<b>ПІБ</b></br>'
-            if (isEmpty(result.enteredData.MfoB)) result.errors += '<b>МФО</b></br>'
+            if (isEmpty(result.enteredData.OkpoB)) result.errors += '<b>ІПН</b></br>';
+            if (isEmpty(result.enteredData.NameB)) result.errors += '<b>ПІБ</b></br>';
+            if (isEmpty(result.enteredData.MfoB)) result.errors += '<b>МФО</b></br>';
         }
 
-        if (isEmpty(result.enteredData.NlsB)) result.errors += '<b>Рахунок одержувача</b></br>'
-        if (isEmpty(result.enteredData.PaymentPurpose) || result.enteredData.PaymentPurpose.length < 3) result.errors += '<b>Призначення платежу</b> (мінімальна довжина 3 символи)</br>'
-        if (+result.enteredData.Summ <= 0) result.errors += '<b>Сума</b></br>'
+        if (isEmpty(result.enteredData.NlsB)) result.errors += '<b>Рахунок одержувача</b></br>';
+        if (isEmpty(result.enteredData.PaymentPurpose) || result.enteredData.PaymentPurpose.length < 3) result.errors += '<b>Призначення платежу</b> (мінімальна довжина 3 символи)</br>';
+        if (+result.enteredData.Summ <= 0) result.errors += '<b>Сума</b></br>';
+
+        if (noIpn) {
+            if (isIdCard) {
+                if (isEmpty(result.enteredData.IdCardNumber)) result.errors += '<b>Номер ID-картки</b></br>';
+            } else {
+                if (isEmpty(result.enteredData.PasspSeries)) result.errors += '<b>Серія паспорту</b></br>';
+                if (isEmpty(result.enteredData.PasspNumber)) result.errors += '<b>Номер паспорту</b></br>';
+            }
+        }
 
         if (result.errors != '') {
             result.res = false;

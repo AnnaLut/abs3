@@ -218,7 +218,10 @@ function getGridOptions(options, dataSourse, showSign, sosFilterDs) {
                     }
                 },
                 { field: "comm_reject", title: "Коментар", width: "300px" },
-                { field: "fio", title: "Менеджер", width: "250px" }
+                {
+                    field: "fio", title: "Менеджер", width: "250px",
+                    template: "#= fio #</br>#= imp_date ? kendo.toString(imp_date, 'dd.MM.yyyy HH:mm:ss') : '' #"
+                }
             ],
             selectable: "row",
             editable: false,
@@ -277,7 +280,8 @@ function getGridOptions(options, dataSourse, showSign, sosFilterDs) {
                         fio: { type: "string" },
                         signed: { type: "string" },
                         sined_fio: { type: "string" },
-                        ostc_2909: { type: "number" }
+                        ostc_2909: { type: "number" },
+                        imp_date: { type: "date" }
                     }
                 }
             },
@@ -295,6 +299,7 @@ function getGridOptions(options, dataSourse, showSign, sosFilterDs) {
 
     return options;
 };
+
 
 function mainGridChangeEventHandler() {
     clearSelection();

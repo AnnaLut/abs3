@@ -147,6 +147,9 @@ namespace Areas.SalaryBag.Models
         public decimal? doc_ref { get; set; }
         public int? sos { get; set; }
         public string doc_comment { get; set; }
+        public string passp_serial { get; set; }
+        public string passp_num { get; set; }
+        public string idcard_num { get; set; }
     }
 
     public class ClientModel
@@ -155,6 +158,11 @@ namespace Areas.SalaryBag.Models
         public string nmk { get; set; }
         public string nls { get; set; }
         public string mfo { get; set; }
+
+        public string PassportSerial { get; set; }
+        public string PassportNumber { get; set; }
+        public string PassportIdCardNum { get; set; }
+        public DateTime? ActualDate { get; set; }
     }
 
     public class PayrollHistory
