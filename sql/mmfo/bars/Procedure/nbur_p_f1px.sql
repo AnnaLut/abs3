@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 1PX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.076 26/08/2018 (09/08/2018)
+% VERSION     :  v.16.008 14/09/2018 (26/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.007  26/08/2018';
+  ver_          char(30)  := 'v.16.008  14/09/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   cEKP                   constant varchar2(100 char) := 'A1P001';
@@ -93,7 +93,7 @@ BEGIN
                                                   r030, r020, r040, t023, rcukru_glb_2, k018, 
                                                   k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
                , q004 /*q004*/
-               , case when t023 = 3 then 0 else 1 end/*t080*/
+               , case when t023 = 3 then 0 else to_number(t080) end/*t080*/
                , t071 /*t071*/
                , description /*description*/
                , acc_id /*acc_id*/
@@ -135,6 +135,7 @@ BEGIN
                                                 '07' as RCUKRU_GLB_2, 
                                                 '10' as RCBNK_NAME, 
                                                 '71' as T071, 
+                                                '80' as T080, 
                                                 '99' as Q004)
                     )                      
        );
@@ -165,7 +166,7 @@ BEGIN
                                                   r030, r020, r040, t023, rcukru_glb_2, k018, 
                                                   k020, q001, rcukru_glb_1, q004), 3, '0') as q003_1
                , q004 /*q004*/
-               , case when t023 = 3 then 0 else 1 end/*t080*/
+               , case when t023 = 3 then 0 else to_number(t080) end/*t080*/
                , t071 /*t071*/
         from    (select *
                  from   (select t.seg_01 as dd
@@ -189,6 +190,7 @@ BEGIN
                                             '07' as RCUKRU_GLB_2, 
                                             '10' as RCBNK_NAME, 
                                             '71' as T071, 
+                                            '80' as T080, 
                                             '99' as Q004)
                         )
        );  
