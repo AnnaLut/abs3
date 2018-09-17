@@ -4,24 +4,24 @@
 }
 <meta charset="utf-8" />
 
-<script src="~/Scripts/respond.min.js?13_04_2018__17_03_48"></script>
+<script src="~/Scripts/respond.min.js?22_08_2018__09_45_16"></script>
 
-<script src="~/Areas/SalaryBag/Scripts/SlaryBagCommon.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/BeforeScanForm.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/ViewDocumentsFromEA.js?13_04_2018__17_03_48"></script>
+<script src="~/Areas/SalaryBag/Scripts/SlaryBagCommon.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/BeforeScanForm.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/ViewDocumentsFromEA.js?22_08_2018__09_45_16"></script>
 
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/AddViewEditForm.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/ExplaineAndConfirm.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/TarifSelectForm.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/RnkSelectForm.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/CreateDocument.js?13_04_2018__17_03_48"></script>
-<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/HistoryForm.js?13_04_2018__17_03_48"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/AddViewEditForm.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/ExplaineAndConfirm.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/TarifSelectForm.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/RnkSelectForm.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/CreateDocument.js?22_08_2018__09_45_16"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/HistoryForm.js?22_08_2018__09_45_16"></script>
 
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/DealChangesHistory.js?13_04_2018__17_03_48"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/DealChangesHistory.js?22_08_2018__09_45_16"></script>
 
-<script src="~/Areas/SalaryBag/Scripts/SalaryBag/SBmain.js?13_04_2018__17_03_48"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/SBmain.js?22_08_2018__09_45_16"></script>
 
-<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SBstyle.css?13_04_2018__17_03_48" />
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SBstyle.css?22_08_2018__09_45_16" />
 
 
 <div class="page-header">
@@ -165,7 +165,8 @@
                         <label class="k-label bold-lbl lbl-padding" id="customer_okpo_lbl">#=_okpo#</label>
                     </div>
                 </div>
-                <div class="row">
+
+                <div class="row" id="branch_editor_lbl">
                     <div class="col-md-2">
                         <label class="k-label lbl-padding">Відділення:</label>
                     </div>
@@ -176,6 +177,22 @@
             </div>
         </div>
     </div>
+
+    <table class="SB_edit_form_table invisible" id="branch_editor_input">
+        <tbody>
+            <tr>
+                <td><label class="k-label lbl-padding" for="branch_editor_lbl">Відділення : </label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3"><input style="width:100% !important" id="branch_editor_ddl"></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
     <hr class="modal-hr" />
     <table class="SB_edit_form_table">
         <tbody>
@@ -234,11 +251,6 @@
                 </td>
                 <td></td>
             </tr>
-            @*<tr>
-                    <td colspan="3"><label style="padding-left:5px;" id="tarif_not_found_lbl" class="k-label"></label></td>
-                    <td></td>
-                    <td></td>
-                </tr>*@
         </tbody>
     </table>
 
