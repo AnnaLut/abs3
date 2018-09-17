@@ -333,10 +333,15 @@ function initKendoWidgets() {
         }
     };
     $(formCfg.gridSelector).kendoGrid(gridOptions);
+
+    $(formCfg.gridSelector).on("dblclick", "tr:not(:first)", function (event) {
+        $('.custom-btn-edit').click();
+    });
 };
 
 function getPasportTemplate(num, series, idcard) {
     if (idcard) return idcard;
+    if (!series && !num) return '';
     return series + ' ' + num;
 };
 
