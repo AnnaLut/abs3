@@ -1,0 +1,614 @@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "Портфель ЗП";
+}
+<meta charset="utf-8" />
+
+<script src="~/Scripts/respond.min.js?22_08_2018__09_37_41"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SlaryBagCommon.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/BeforeScanForm.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/ViewDocumentsFromEA.js?22_08_2018__09_37_41"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/AddViewEditForm.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/ExplaineAndConfirm.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/TarifSelectForm.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/RnkSelectForm.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/CreateDocument.js?22_08_2018__09_37_41"></script>
+<script src="~/Areas/SalaryBag/Scripts/SalaryPayroll/HistoryForm.js?22_08_2018__09_37_41"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/DealChangesHistory.js?22_08_2018__09_37_41"></script>
+
+<script src="~/Areas/SalaryBag/Scripts/SalaryBag/SBmain.js?22_08_2018__09_37_41"></script>
+
+<link rel="stylesheet" href="~/Areas/SalaryBag/Content/SBstyle.css?22_08_2018__09_37_41" />
+
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+@*<input id="fileUploader" type="file" />*@
+
+<div id="toolbox" style="width:100%;"></div>
+
+<br />
+<div id="SalaryBagMainGrid"></div>
+<div class="search-main"></div>
+<div id="aditionalDiv"></div>
+
+<script id="AddEditTemplate" type="text/x-kendo-template">
+    # var _rnk = checkValForEdit(data.selectedItem.rnk, ''); #
+    # var _deal_name = checkValForEdit(data.selectedItem.deal_name, ''); #
+    # var _kod_tarif = checkValForEdit(data.selectedItem.kod_tarif, ''); #
+    # var _tarif_name = checkValForEdit(data.selectedItem.tarif_name, ''); #
+
+    # var _deal_id = checkValForEdit(data.selectedItem.deal_id, 0); #
+
+    # if(_deal_id != 0) { #
+    <div class="row">
+        <div class="col-md-12" style="margin-left:3px;">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label">Номер договору: </label>
+                </div>
+                <div class="col-md-8">
+                    <label class="k-label bold-lbl">#=_deal_id#</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    # } #
+    <div class="row invisible" id="deal_name_editor_lbl">
+        <div class="col-md-12" style="margin-left:3px;">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label lbl-padding">Назва договору:</label>
+                </div>
+                <div class="col-md-8">
+                    <label class="k-label bold-lbl lbl-padding">#=_deal_name#</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    # var _open_date = checkValForEdit(data.selectedItem.start_date, ''); #
+    # _open_date = kendo.toString(new Date(_open_date), "dd.MM.yyyy");#
+    <div class="row invisible" id="start_date_editor_lbl">
+        <div class="col-md-12" style="margin-left:3px;">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label lbl-padding">Дата відкриття:</label>
+                </div>
+                <div class="col-md-8">
+                    <label class="k-label bold-lbl lbl-padding">#=_open_date#</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row start_date_editor_input_for_edit" id="start_date_editor_input">
+        <div class="col-md-12" style="margin-left:3px;">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label lbl-padding" for="start_date_editor">Дата відкриття</label>
+                </div>
+                <div class="col-md-8">
+                    <input id="start_date_editor" tabindex="1">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="SB_edit_form_table start_date_editor_input_for_add" id="start_date_editor_input">
+        <tbody>
+            <tr>
+                <td><label class="k-label lbl-padding" for="start_date_editor">Дата відкриття</label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input style="width:100% !important;" id="start_date_editor" tabindex="1"></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="SB_edit_form_table" id="rnk_editor_input">
+        <tbody>
+            <tr>
+                <td><label class="k-label lbl-padding" for="rnk_editor">РНК</label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input style="width:100% !important" value="#=_rnk#" id="rnk_editor" tabindex="2" autocomplete="off"></td>
+                <td colspan="2">
+                    <a class="btn btn-primary custom-btn search-btn" title="Пошук клієнта" id="rnk_editor_btn" tabindex="-1"></a>
+                    <label style="padding-left:5px;" class="k-label" id="rnk_not_found_lbl"></label>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- customer details -->
+    # var _nmk = checkValForEdit(data.selectedItem.nmk, ''); #
+    # var _branch = checkValForEdit(data.selectedItem.branch, ''); #
+    # var _okpo = checkValForEdit(data.selectedItem.okpo, ''); #
+    # var _rnk = checkValForEdit(data.selectedItem.rnk, ''); #
+    <div class="row">
+        <div id="customerDetails" class="#=_rnk===''?'invisible':''#">
+            <div class="col-md-12" style="margin-left:3px;">
+                <div class="row invisible" id="rnk_editor_lbl">
+                    <div class="col-md-2">
+                        <label class="k-label lbl-padding">РНК: </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl lbl-padding">#=_rnk#</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="k-label lbl-padding">Назва ЮО: </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl lbl-padding" id="customer_name_lbl">#=_nmk#</label>
+                    </div>
+                </div>
+                <div id="cust_okpo" class="row">
+                    <div class="col-md-2">
+                        <label class="k-label lbl-padding">ЄДРПОУ:</label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl lbl-padding" id="customer_okpo_lbl">#=_okpo#</label>
+                    </div>
+                </div>
+
+                <div class="row" id="branch_editor_lbl">
+                    <div class="col-md-2">
+                        <label class="k-label lbl-padding">Відділення:</label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl lbl-padding" id="customer_branch_lbl">#=_branch#</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="SB_edit_form_table invisible" id="branch_editor_input">
+        <tbody>
+            <tr>
+                <td><label class="k-label lbl-padding" for="branch_editor_lbl">Відділення : </label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3"><input style="width:100% !important" id="branch_editor_ddl"></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr class="modal-hr" />
+    <table class="SB_edit_form_table">
+        <tbody>
+            <tr class="deal_name_editor_input">
+                <td colspan="3"><label class="k-label" for="deal_name_editor">Назва договору</label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr class="deal_name_editor_input">
+                <td colspan="3"><input type="text" class="k-textbox k-input" value="#=_deal_name#" id="deal_name_editor" style="width:100%;" tabindex="3" autocomplete="off"></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td><label class="k-label lbl-padding" for="deal_premium_editor">Тип договору</label></td>
+                <td><label class="k-label lbl-padding" for="central_editor">Централізований договір</label></td>
+                <td><label class="k-label lbl-padding" for="fs_editor">Тип організації</label></td>
+            </tr>
+            <tr>
+                <td><input style="width:100% !important;" id="deal_premium_editor" tabindex="4"></td>
+                <td><input style="width:100% !important;" id="central_editor" tabindex="5"></td>
+                <td><input style="width:100% !important;" id="fs_editor" tabindex="6"></td>
+            </tr>
+
+            <tr class="acc3570_editor invisible">
+                <td><label class="k-label lbl-padding" for="selectAcc3570Ddl">Рахунок 3570 : </label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr class="acc3570_editor invisible">
+                <td colspan="3"><input style="width:100% !important" id="selectAcc3570Ddl"></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+
+        </tbody>
+    </table>
+
+    <hr class="modal-hr" />
+
+    <table class="SB_edit_form_table">
+        <tbody>
+            <tr>
+                <td><label class="k-label" for="tarif_editor">Тариф(код)</label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input style="width:100% !important;" id="tarif_editor" value="#=_kod_tarif#" tabindex="7" autocomplete="off"></td>
+                <td colspan="2">
+                    <a id="tarif_editor_btn" class="btn btn-primary custom-btn search-btn" title="Пошук тарифів" tabindex="-1"></a>
+                    <a id="show_tarif_details" class="btn btn-primary custom-btn search-btn details-btn" title="Деталі шкального тарифу" tabindex="-1"></a>
+                    <label style="padding-left:5px;" id="tarif_not_found_lbl" class="k-label"></label>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- tarif details -->
+    # var _tar = checkValForEdit(data.selectedItem.tar, 0); #
+    # var _max_tarif = checkValForEdit(data.selectedItem.max_tarif, ''); #
+    <div class="row">
+        <div id="tarifDetails" class="#=_kod_tarif===''?'invisible':''#">
+            <div class="col-md-12" style="margin-left:3px;">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="k-label lbl-padding">Назва тарифу: </label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl lbl-padding" id="tarif_name_lbl">#=_tarif_name#</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="k-label">Сума:</label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl" id="tarif_summ_lbl">#=_tar#</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="k-label">% від суми:</label>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="k-label bold-lbl" id="tarif_percent_lbl">#=_max_tarif#</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- additional information -->
+    # var _comm_reject = checkValForEdit(data.selectedItem.comm_reject, '-'); #
+    # var _fio = checkValForEdit(data.selectedItem.fio, ''); #
+    # var _sos_name = checkValForEdit(data.selectedItem.sos_name, ''); #
+    <div class="row invisible" id="additional_info">
+        <hr class="modal-hr" />
+        <div class="col-md-12" style="margin-left:3px;">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label">Стан договору: </label>
+                </div>
+                <div class="col-md-8">
+                    <label class="k-label bold-lbl">#=_sos_name#</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label">Менеджер:</label>
+                </div>
+                <div class="col-md-8">
+                    <label class="k-label bold-lbl">#=_fio#</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="k-label">Коментар: </label>
+                </div>
+                <div class="col-md-8">
+                    <label class="k-label bold-lbl">#=_comm_reject#</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="modal-hr" />
+    <table class="SB_edit_form_table invisible" id="accSelection">
+        <tbody>
+            <tr>
+                <td colspan="100"><label class="k-label bold-lbl lbl-padding">Рахунок для зарахування 2909</label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <input id="createNewCb" type="checkbox" class="checkbox-circle" checked />
+                    <label for="createNewCb" class="checkbox-info">  Відкрити новий</label>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="SB_edit_form_table invisible" id="accComboBoxDiv">
+        <tbody>
+            <tr>
+                <td><label class="k-label lbl-padding" for="selectAccDdl">Оберіть рахунок : </label></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3"><input style="width:100% !important" id="selectAccDdl"></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    @*<hr class="modal-hr" />*@
+
+    <div class="row" style="margin:5px 5px 5px 5px;">
+        <div class="k-edit-buttons k-state-default">
+            <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="9"><span class="k-icon k-cancel"></span> #=data.formOptions.cancelBtnText#</a>
+            <a id="btnSave" class="k-button k-button-icontext k-primary k-grid-update modal-buttons" tabindex="8"><span class="k-icon k-update"></span> #=data.formOptions.confirmBtnText#</a>
+        </div>
+    </div>
+</script>
+
+<script id="filterSelectedTag" type="text/x-kendo-template">
+    # var _names = ['Новий', 'Очікує підтвердження БО', 'Відхилений БО', 'Очікує підтвердження внесених змін БО', 'Внесені зміни відхилені БО', 'Діючий', 'Очікує підтвердження закриття БО', 'Закриття відхилене БО']; #
+    # var titleStr = ''; #
+    # for (var i = 0; i < values.length; i++) { #
+    #   if (i == values.length - 1) { #
+    #       titleStr += _names[values[i]];#
+    #   } else {#
+    #       titleStr += _names[values[i]] + '\n';#
+    #   } #
+    # } #
+    <span id="selectedFilters" title="#:titleStr#"> Вибрано  #:values.length#  з  #:maxTotal# </span>
+</script>
+
+<script id="ViewFormTemplate" type="text/x-kendo-template">
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3 class="h3-modal"><label class="k-label">Договір, № <b>#=data.deal_id#</b></label></h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Назва</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=data.deal_name#</label>
+        </div>
+    </div>
+
+    # var _open_date = checkValForEdit(data.start_date, ''); #
+    # _open_date = kendo.toString(new Date(_open_date), "dd.MM.yyyy");#
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Відкрито</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=_open_date#</label>
+        </div>
+    </div>
+
+    # var _close_date = checkValForEdit(data.close_date, ''); #
+    # if( _close_date !== '' ) { #
+    # _close_date = kendo.toString(new Date(_close_date), "dd.MM.yyyy"); #
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Закрито</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=_close_date#</label>
+        </div>
+    </div>
+    # } #
+
+    # var _prem = data.deal_premium == 1 ? "Преміальний" : "Базовий" #
+    # var _central = data.central == 1 ? "Так" : "Ні" #
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Тип договору</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label l-lbl"><b>#=_prem#</b></label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Централізований</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label l-lbl"><b>#=_central#</b></label>
+        </div>
+    </div>
+
+    <hr class="modal-hr" />
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3 class="h3-modal"><label class="k-label">Клієнт, РНК <b>#=data.rnk#</b></label></h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Назва ЮО</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=data.nmk#</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">ЄДРПОУ</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=data.okpo#</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Відділення</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=data.branch#</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Рахунок 2909</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label l-lbl"><b>#=data.nls_2909#</b>  (залишок: <u>#= convertToMoneyStr(data.ostc_2909) #</u> &\\#8372;)</label>
+        </div>
+    </div>
+
+    # var _nls_3570 = checkValForEdit(nls_3570, ''); #
+    # if(_nls_3570 != '') { #
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Рахунок 3570</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label l-lbl"><b>#=_nls_3570#</b>  (залишок: <u>#= convertToMoneyStr(data.ostc_3570) #</u> &\\#8372;)</label>
+        </div>
+    </div>
+    # } #
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Тип організації</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#= data.fs == null ? '-' : data.fs_name #</label>
+        </div>
+    </div>
+
+    <hr class="modal-hr" />
+
+    <!-- tarif details -->
+    # var _tar = convertToMoneyStr(data.tar); #
+    # _tar = _tar > 0 ? (_tar + ' &\\#8372;') : '-'; #
+
+    # var _max_tarif = checkValForEdit(data.max_tarif, ''); #
+    # var _ind_acc_tarif = checkValForEdit(data.ind_acc_tarif, 0); #
+    # var tarifExists = data.kod_tarif == null ? false : true; #
+
+    # if(+_ind_acc_tarif <= 0) {#
+    # _ind_acc_tarif = _ind_acc_tarif <= 0 ? '-' : (_ind_acc_tarif + '%') ; #
+    # if(tarifExists) { #
+    <div class="row">
+        <div class="col-md-8">
+            <h3 class="h3-modal">
+                <label class="k-label">
+                    Тариф, код <b>#=data.kod_tarif#</b>
+                    <a id="view_tarifs_details" class="btn custom-btn search-btn details-small-btn view-tarif-20x20#=data.tip == 1 ? '' : ' invisible'#" title="Деталі шкального тарифу" tabindex="-1"></a>
+                </label>
+            </h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Назва</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#= data.tarif_name #</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Сума</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#= _tar #</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">% від суми</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#= _max_tarif #</label>
+        </div>
+    </div>
+    <hr class="modal-hr" />
+    # } #
+    # } else { #
+    <div class="row">
+        <div class="col-md-8">
+            <h3 class="h3-modal"><label class="k-label">Індивідуальний тариф для рахунку <b>#=data.nls_2909#</b></label></h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Відсоток</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#= _ind_acc_tarif #</label>
+        </div>
+    </div>
+    <hr class="modal-hr" />
+    # } #
+
+
+
+    <!-- additional information -->
+    # var _comm_reject = checkValForEdit(data.comm_reject, '-'); #
+    # var _fio = checkValForEdit(data.fio, ''); #
+    # var _sos_name = checkValForEdit(data.sos_name, ''); #
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Стан договору</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=_sos_name#</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Менеджер</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=_fio#</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <label class="k-label lbl-tab">Коментар</label>
+        </div>
+        <div class="col-md-8">
+            <label class="k-label bold-lbl l-lbl">#=_comm_reject#</label>
+        </div>
+    </div>
+
+    <hr class="modal-hr" />
+    <div class="row" style="margin:5px 5px 5px 5px;">
+        <div class="k-edit-buttons k-state-default">
+            <a id="btnCancel" class="k-button k-button-icontext k-grid-cancel modal-buttons" tabindex="8"><span class="k-icon k-cancel"></span> Закрити</a>
+        </div>
+    </div>
+</script>
