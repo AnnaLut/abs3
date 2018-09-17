@@ -335,6 +335,8 @@ function mainGridChangeEventHandler() {
                     $(item).removeClass('k-state-selected');
                 }
             }
+            if (this.select().length <= 0)
+                enableElem('.custom-btn:not(.custom-btn-payroll-filter):not(.custom-btn-clear-filter)', true);
         }
         selectedItems = this.select();
     } else if (selectedItems.length > 0) {
@@ -351,6 +353,9 @@ function mainGridChangeEventHandler() {
             if (formCfg.currentGridName == 'accepted') {
                 enableElem('.custom-btn-payroll-enrollment', money == 1);
                 enableElem('.custom-btn-payroll-reject', true);
+            }
+            if (formCfg.currentGridName == 'processed') {
+                enableElem('.custom-btn-payroll-enrollment, .custom-btn-payroll-reject', false);
             }
         }
     } else {
@@ -884,10 +889,10 @@ function initTabStrip() {
 
             var a = $(e.contentElement).attr('data-type');
 
-            if (formCfg.formType != 0 && a != 'accepted')
-                enableElem('.custom-btn-payroll-enrollment, .custom-btn-payroll-reject', false);
-            else
-                enableElem('.custom-btn-payroll-enrollment, .custom-btn-payroll-reject', true);
+            //if (formCfg.formType != 0 && a != 'accepted')
+            //    enableElem('.custom-btn-payroll-enrollment, .custom-btn-payroll-reject', false);
+            //else
+            //    enableElem('.custom-btn-payroll-enrollment, .custom-btn-payroll-reject', true);
 
             if (a != 'draft')
                 $('.custom-btn-print').removeAttr('disabled');
