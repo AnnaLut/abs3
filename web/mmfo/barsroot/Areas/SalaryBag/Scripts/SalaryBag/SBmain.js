@@ -308,7 +308,7 @@ function initMainGrid() {
                     }
                 }
             },
-            { field: "branch", title: "Відділення", width: "165px" },
+            { field: "branch", title: "Відділення", width: "120px" },
             { field: "fio", title: "Менеджер", width: "120px" },
             { field: "corp2", title: "Клієнт-банк(Корп2)", width: "110px", filterable: false },
             { field: "kod_tarif", title: "Код тарифу", width: "110px" },

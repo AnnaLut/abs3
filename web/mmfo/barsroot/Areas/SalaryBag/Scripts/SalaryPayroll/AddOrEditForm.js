@@ -94,44 +94,31 @@
     });
 
     function noIpnCbChange(val) {
-        var editor = $('#okpo_editor');
-        kendoWindow.find('#no_ipn_cb').prop('checked', val);
-        enableElem('#okpo_editor', !val);
-
-        if (!val) {
-            $('#passportData').addClass('invisible');
-            if (editor.val() == ipnDefault) editor.val('');
+        if (val) {
+            kendoWindow.find('#no_ipn_cb').attr('checked', 'checked');
         } else {
-            $('#passportData').removeClass('invisible');
-            editor.val(ipnDefault);
+            kendoWindow.find('#no_ipn_cb').removeAttr('checked');
         }
+
+        var editor = $('#okpo_editor');
+
+        if (val) kendoWindow.oldOkpo = editor.val();
+        if (kendoWindow.oldOkpo == ipnDefault) kendoWindow.oldOkpo = '';
+
+        enableElem('#okpo_editor', !val);
+        editor.val(val ? ipnDefault : kendoWindow.oldOkpo);
+
+        if (!val) $('#passportData').addClass('invisible');
+        else $('#passportData').removeClass('invisible');
     };
-
-    kendoWindow.find('#passportSeries').on('keypress', function (event) {
-        var alphabetAnd = /[A-Za-z]|[А-Яа-я]|[Іі]/g;
-        var key = String.fromCharCode(event.which);
-        if (event.keyCode == 8 || event.keyCode == 37 || event.keyCode == 39 || alphabetAnd.test(key)) {
-            return true;
-        }
-        return false;
-    });
-    kendoWindow.find('#passportNumber, #idCardNumber').on('keypress', function (event) {
-        var alphabetAnd = /[A-Za-z]|[А-Яа-я]|[Іі]/g;
-        var key = String.fromCharCode(event.which);
-        if (event.keyCode == 8 || event.keyCode == 37 || event.keyCode == 39 || !alphabetAnd.test(key)) {
-            return true;
-        }
-        return false;
-    });
-
     kendoWindow.find('#no_ipn_cb').on('change', function () {
         noIpnCbChange(this.checked);
     });
 
     var passpType = 0;
     if (!selectedItem.passp_serial && selectedItem.idcard_num) {
-        $('#passpSeriesDiv, #passportNumber').css('display', 'none');
-        $('#idCardNumber').css('display', 'inline-block');
+        $('#passpSeriesDiv').css('display', 'none');
+        $('#passportSeries').val('');
         passpType = 1;
     }
 
@@ -148,12 +135,13 @@
         change: function (e) {
             var docType = +e.sender.value();
 
+            $('#passportNumber').attr('maxlength', docType === 1 ? 9 : 6);
+
             if (docType === 1) {
-                $('#passpSeriesDiv, #passportNumber').css('display', 'none');
-                $('#idCardNumber').css('display', 'inline-block');
+                $('#passpSeriesDiv').css('display', 'none');
+                $('#passportSeries').val('');
             } else {
-                $('#passpSeriesDiv, #passportNumber').css('display', 'inline-block');
-                $('#idCardNumber').css('display', 'none');
+                $('#passpSeriesDiv').css('display', 'inline-block');
             }
         }
     });
@@ -281,8 +269,7 @@
                 Summ: kendoWindow.find("#sum_editor").data("kendoNumericTextBox").value(),
                 PasspSeries: noIpn ? (isIdCard ? '' : kendoWindow.find('#passportSeries').val()) : '',
                 PasspNumber: noIpn ? (isIdCard ? '' : kendoWindow.find('#passportNumber').val()) : '',
-                //IdCardNumber: noIpn ? (isIdCard ? kendoWindow.find('#passportNumber').val() : '') : ''
-                IdCardNumber: noIpn ? (isIdCard ? kendoWindow.find('#idCardNumber').val() : '') : ''
+                IdCardNumber: noIpn ? (isIdCard ? kendoWindow.find('#passportNumber').val() : '') : '',
             },
             errors: ''
         };

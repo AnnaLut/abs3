@@ -14,7 +14,6 @@ namespace Areas.SalaryBag.Models
         public decimal? Account { get; set; }
         public int? Fs { get; set; }
         public decimal? acc3570 { get; set; }
-        public string Branch { get; set; }
     }
 
     public class PostFileModel

@@ -213,21 +213,6 @@ function addEditForm(mode, dataItem) {
         });
     };
 
-    kendoWindow.find('#branch_editor_ddl').kendoDropDownList({
-        dataTextField: "Branch",
-        dataValueField: "Branch",
-        template: '<span style="font-size:12px;">#:data.Branch#</span>',
-        valueTemplate: '<span style="font-size:12px;">#:data.Branch#</span>',
-        filter: 'contains',
-        dataSource: {
-            type: "json",
-            transport: {
-                read: bars.config.urlContent("/api/SalaryBag/SalaryBag/GetBranches")
-            }
-        },
-        value: dataForTemplate.selectedItem.branch
-    });
-
     kendoWindow.find("#rnk_editor_btn").click(function () {
         rnkForm(function (data) {
             kendoWindow.find("#rnk_editor").data("kendoNumericTextBox").value(data.rnk);
@@ -238,7 +223,6 @@ function addEditForm(mode, dataItem) {
             kendoWindow.find("#customer_name_lbl").text(data.nmk);
             kendoWindow.find("#customer_okpo_lbl").text(data.okpo);
             kendoWindow.find("#customer_branch_lbl").text(data.branch);
-            kendoWindow.find("#branch_editor_ddl").data("kendoDropDownList").value(data.branch);
             checkAccounts(data.rnk);
             kendoWindow.data("kendoWindow").refresh();
         })
@@ -271,12 +255,6 @@ function addEditForm(mode, dataItem) {
                 break;
         }
         $("#additional_info").removeClass('invisible');
-
-        if (~[0, 5].indexOf(type)) {
-            $('#branch_editor_input').removeClass('invisible');
-            $('#branch_editor_lbl').addClass('invisible');
-        }
-
     } else {
         kendoWindow.find('.start_date_editor_input_for_edit').remove();
     }
@@ -378,7 +356,6 @@ function addEditForm(mode, dataItem) {
                             kendoWindow.find("#customer_name_lbl").text(data.nmk);
                             kendoWindow.find("#customer_okpo_lbl").text(data.okpo);
                             kendoWindow.find("#customer_branch_lbl").text(data.branch);
-                            kendoWindow.find("#branch_editor_ddl").data("kendoDropDownList").value(data.branch);
 
                             checkAccounts(data.rnk);
                         }
@@ -495,7 +472,6 @@ function getDataFromEditForm(id) {
     var acc = isNewAcc ? null : $("#selectAccDdl").data("kendoDropDownList").value();
 
     var _acc3570 = $('.acc3570_editor').hasClass('invisible') ? '' : $("#selectAcc3570Ddl").data("kendoDropDownList").value();
-    var branch = $('#branch_editor_ddl').data('kendoDropDownList').value();
 
     return {
         Id: id || '',
@@ -507,8 +483,7 @@ function getDataFromEditForm(id) {
         KodTarif: tarif,
         Account: acc,
         Fs: fs,
-        acc3570: _acc3570,
-        Branch: branch
+        acc3570: _acc3570
     }
 };
 
