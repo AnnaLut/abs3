@@ -89,7 +89,13 @@
                 var parseOraErrorMessage = function(message) {
                     var messageArray = message.split('ORA-');
                     if (messageArray.length > 1) {
-                        message = messageArray[1];
+                        message = '';
+                        for (var i = 1; i < messageArray.length; i++) {
+                            message += messageArray[i];
+                            if (/[\u0400-\u04FF]/.test(messageArray[i])) {
+                                break;
+                            }
+                        }
                     }
                     return message;
                 }
