@@ -23,6 +23,15 @@ exception
 end;
 /
 
+begin
+    execute immediate
+    'alter table NBU_REPORTED_PLEDGE add PLEDGE_TYPE VARCHAR2(2)';
+exception
+    when others then
+         null;
+end;
+/
+
 declare
     name_already_used exception;
     table_can_have_only_one_pk exception;

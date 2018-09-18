@@ -58,10 +58,10 @@ declare
 
 begin
 
-  l_tabsemantic := 'Стан завантаження даних';
-  l_tablinesdef := '40';
+  l_tabsemantic := 'V_NBU_CONS_CREDIT';
+  l_tablinesdef := '10';
   l_tabselect_statement := '';
-  l_tabname     := 'V_NBU_CORE_DATA_REQUEST';
+  l_tabname     := 'V_NBU_CONS_CREDIT';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
@@ -124,41 +124,48 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Ідентифікатор запиту', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'KF', 'N', 'МФО', '1', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'BRANCH_NAME', 'C', 'Назва філії', '3', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'DATA_TYPE_NAME', 'C', 'Тип даних', '5', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'REQUEST_STATE', 'C', 'Стан передачі даних', '3', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'TRACKING_MESSAGE', 'C', 'Додаткові відомості', '5', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'REPORTING_TIME', 'D', 'Дата та час запиту', '2', null, 7, 0, 0, 0, 0, '', 'dd/MM/yyyy hhhh:mm:ss', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'REPORTING_PERSON', 'C', 'Користувач ', '2', null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'DOGDAY', 'D', 'Дата укладання ~договору', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 2, 'ENDDAY', 'D', 'Кінцева дата ~погашення ', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'SUMZAGAL', 'N', 'Загальна сума ~наданого ~фінансового ~зобов’язання', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'R030', 'C', 'Код валюти', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'PROCCREDIT', 'N', 'Номінальна ~процентна ставка', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'SUMPAY', 'N', 'Сума платежів за ~кредитною ~операцією', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'PERIODBASE', 'N', 'Періодичність ~сплати основного ~боргу', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'PERIODPROC', 'N', 'Періодичність ~сплати відсотків', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SUMARREARS', 'N', 'Залишок ~заборгованості за ~кредитною ~операцією', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 10, 'ARREARBASE', 'N', 'Прострочена ~заборгованість за ~основним боргом', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'ARREARPROC', 'N', 'Прострочена ~заборгованість  за ~процентами', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'DAYBASE', 'N', 'Кількість днів ~прострочення за ~основним боргом', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'DAYPROC', 'N', 'Кількість днів ~прострочення  за ~процентами', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 14, 'FACTENDDAY', 'D', 'Дата фактичного ~погашення кредиту/припинення ~зобов’язань по ~кредиту ', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 15, 'FLAGZ', 'C', 'Наявність ~здійснених заходів із ~примусового ~стягнення боргу', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'KLASS', 'C', 'Клас боржника', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'RISK', 'N', 'Величина ~кредитного ~ризику', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'FLAGINSURANCE', 'C', 'Факт страхування  ~кредиту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'DEFAULT_LOAN_KF', 'C', 'МФО', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 20, 'DEFAULT_LOAN_ID', 'N', 'id кредиту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'LOAN_OBJECT_ID', 'N', 'id об''єкту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'STATUS', 'C', 'Статус', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 23, 'STATUS_MESSAGE', 'C', 'Повідомлення ', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 24, 'KF', 'C', 'МФО', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'LOAN_CODE', 'C', 'Код кредиту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 26, 'CORE_CUSTOMER_KF', 'C', 'МФО боржника', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 27, 'CORE_CUSTOMER_ID', 'N', 'id боржника', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 28, 'ID', 'N', 'ID', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 29, 'REPORT_ID', 'N', 'id звіту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 30, 'SESSION_CREATION_TIME', 'D', 'Створення сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 31, 'SESSION_ACTIVITY_TIME', 'D', 'Остання дія по сесії', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 32, 'NMK', 'C', 'Назва боржника', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 33, 'REQUEST_ID', 'N', 'id запиту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 34, 'RNK', 'N', 'РНК', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 35, 'ND', 'N', 'Номер договору', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 36, 'ORDERNUM', 'N', 'Номер застави', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 37, 'FLAGOSOBA', 'C', 'Ознака особи', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 38, 'TYPECREDIT', 'N', 'Вид кредиту', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 39, 'NUMDOG', 'C', 'Номер договору ', '', 2, 3, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Формування', '', '', 'ONCE', '', '', '', '', '', null);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Консолідація', '', '', 'ONCE', 'Виконати консолідацію даних ?', 'Запит на виконання відправлено !', '', '', 'sPar=[DESCR=>Консолідація даних][EXEC=>ONCE][PROC=>nbu_gateway.nbu_data_service.start_report]', 86);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Фізичні особи', '', '', 'ONCE', '', '', '', '', 'sPar=V_CORE_FO_SHOW[NSIFUNCTION]', 26);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 4, 'Юридичні особи', '', '', 'ONCE', '', '', '', '', 'sPar=V_CORE_UO_SHOW[NSIFUNCTION]', 161);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 5, 'Консолідовані дані_ФО', '', '', 'ONCE', '', '', '', '', 'sPar=V_NBU_CONS_PERSON_FO[NSIFUNCTION]', null);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 6, 'Консолідовані дані_ЮО', '', '', 'ONCE', '', '', '', '', 'sPar=V_NBU_CONS_PERSON_UO[NSIFUNCTION]', null);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 7, 'Консолідовані дані_Кредити', '', '', 'ONCE', '', '', '', '', 'sPar=V_NBU_CONS_CREDIT[NSIFUNCTION]', null);
-
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 8, 'Консолідовані дані_Застави', '', '', 'ONCE', '', '', '', '', 'sPar=V_NBU_CONS_PLEDGE[NSIFUNCTION]', null);
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

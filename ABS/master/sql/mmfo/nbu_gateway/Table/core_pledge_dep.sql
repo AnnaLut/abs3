@@ -31,7 +31,9 @@ begin
             pledge_object_id    number(38),
             status              varchar2(30 char),
             status_message      varchar2(4000 byte),
-            kf                  varchar2(6 char)
+            kf                  varchar2(6 char),
+			SUMBAIL		        NUMBER(22),
+			SUMGUARANTEE	    NUMBER(22)
      )
      tablespace brsmdld
      partition by range (request_id) interval (1)
@@ -41,6 +43,23 @@ exception
          null;
 end;
 /
+begin
+    execute immediate
+    'alter table core_pledge_dep add SUMBAIL NUMBER(22)';
+exception
+    when others then
+         null;
+end;
+/
+begin
+    execute immediate
+    'alter table core_pledge_dep add SUMGUARANTEE NUMBER(22)';
+exception
+    when others then
+         null;
+end;
+/
+
 
 comment on table core_pledge_dep is 'Залоги';
 comment on column core_pledge_dep.rnk is 'Регистрационный номер.';
