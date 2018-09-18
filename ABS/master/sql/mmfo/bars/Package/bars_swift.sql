@@ -1566,6 +1566,7 @@ procedure stmt_unlink_doc(
 end bars_swift;
 
 /
+
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_SWIFT
 is
 
@@ -1584,7 +1585,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.91 07.08.2018';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.92 12.09.2018';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -16028,7 +16029,7 @@ end process_auth_message;
     --
     l_stmtref   t_stmtref;
     l_stmtrow   t_stmtrnum;
-    l_uetr      sw_journal.uetr%type;
+    l_sw_journal      sw_journal%rowtype;
     --
     begin
 
@@ -16043,19 +16044,23 @@ end process_auth_message;
 
          --читаемо uetr для передачі по ВПС
           begin
-           select uetr
-              into l_uetr
+           select *
+              into l_sw_journal
            from sw_journal
            where swref = p_swref;
-          exception when no_data_found then l_uetr:=null;
+          exception when no_data_found then l_sw_journal.uetr:=null;
           end;
 
-          if (l_uetr is not null) then
+          if (l_sw_journal.uetr is not null) then
             begin
                 insert into operw(ref, tag, value)
-                values(p_docRef, 'UETR', l_uetr);
+                values(p_docRef, 'UETR', l_sw_journal.uetr);
             exception when dup_val_on_index then null;
             end;
+          end if;
+          
+          if (l_sw_journal.mt='202' and l_sw_journal.cov='COV' and l_sw_journal.imported='Y') then 
+            bars_swift_msg.genmsg_mt299(p_swref);
           end if;
 
         -- Смотрим есть ли строка выписки

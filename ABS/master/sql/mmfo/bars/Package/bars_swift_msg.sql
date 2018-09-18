@@ -7,7 +7,7 @@ IS
    --**************************************************************--
 
 
-   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.19 15.08.2018';
+   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.21 18.09.2018';
    VERSION_HEADER_DEFS   CONSTANT VARCHAR2 (512) := '';
 
    -- Устаревшие типы
@@ -324,8 +324,23 @@ IS
 
    PROCEDURE genmsg_mt199 (p_swref      IN sw_journal.swref%TYPE,
                            p_statusid   IN NUMBER);
+    -----------------------------------------------------------------
+   -- GENMSG_MT299()
+   --
+   --     Генерация MT299 - статус свифт сообщения в GPI
+   --
+   --     Параметры:
+   --
+   --         p_swref        Референс родительской свифтовки
+   --
+
+   PROCEDURE genmsg_mt299 (p_swref      IN sw_journal.swref%TYPE);
 
    PROCEDURE generate_reject (p_uetr IN sw_journal.uetr%TYPE);
+   
+   PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number);
+   
+   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2);
    
    PROCEDURE generate_acsc (p_uetr IN sw_journal.uetr%TYPE);
    
@@ -387,7 +402,7 @@ END bars_swift_msg;
 
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.57 21.08.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.59 18.09.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -7747,6 +7762,762 @@ IS
    --------------------------------------------------------------
 
    END genmsg_mt199;
+
+   
+     -----------------------------------------------------------------
+   -- GENMSG_MT299()
+   --
+   --     Генерация MT299 - статус свифт сообщения в GPI
+   --
+   --     Параметры:
+   --
+   --         p_swref        Референс родительской свифтовки
+   --
+
+   PROCEDURE genmsg_mt299 (p_swref      IN sw_journal.swref%TYPE)
+   IS
+      CURSOR cursModel (p_mt IN NUMBER)
+      IS
+         SELECT *
+           FROM sw_model
+          WHERE mt = p_mt;
+
+      l_sw_journal   sw_journal%ROWTYPE;
+      l_swref_new    sw_journal.swref%TYPE;
+      l_ret          NUMBER;
+      l_mt           sw_mt.mt%TYPE := 299;       /*           Тип сообщения */
+      l_recModel     sw_model%ROWTYPE; /*               Строка модели сообщния */
+      l_cnt          NUMBER;        /*                       просто счетчик */
+      l_useTrans     BOOLEAN;       /*     Флаг использования перекодировки */
+      l_transTable   sw_chrsets.setid%TYPE; /*            Код таблицы перекодировки */
+      l_20fld        sw_operw.VALUE%TYPE;
+      l_71fld        sw_operw.VALUE%TYPE;
+      l_71fld199     sw_operw.VALUE%TYPE;
+      l_value        sw_operw.VALUE%TYPE; /*                        Значение тега */
+      l_recno        sw_operw.n%TYPE; /*              Порядковый номер записи */
+      l_opt          sw_operw.opt%TYPE; /*                    Опция тега записи */
+      l_pos          NUMBER;        /*                              позиция */
+      l_currCode     tabval.kv%TYPE; /*                 Код валюты документа */
+      l_status       sw_statuses.VALUE%TYPE;
+      l_32a          sw_operw.VALUE%TYPE;
+      l_33b          sw_operw.VALUE%TYPE;
+      l_52fld        sw_operw.VALUE%TYPE;
+   BEGIN
+      --
+      -- Проверяем есть ли метаописание
+      --
+      SELECT COUNT (*)
+        INTO l_cnt
+        FROM sw_model
+       WHERE mt = l_mt;
+
+      IF (l_cnt = 0)
+      THEN
+         bars_audit.error ('Error! message description MT299 not found...');
+         RETURN;
+      END IF;
+
+      bars_audit.info ('message MT299 description found...');
+
+      BEGIN
+         SELECT s.*
+           INTO l_sw_journal
+           FROM sw_journal s
+          WHERE s.swref = p_swref and cov='COV';
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info ('MT299: Skip swref=> ' || TO_CHAR (p_swref));
+            RETURN;
+      END;
+
+      BEGIN
+         SELECT t.VALUE
+           INTO l_20fld
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '20';
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.error (
+               'MT299: Нет поля 20 для SwRef=>' || TO_CHAR (p_swref));
+            RETURN;
+      END;
+
+      BEGIN
+         SELECT t.VALUE
+           INTO l_71fld
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '71' and t.opt='A' AND ROWNUM = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (
+                  'MT299:Нет поля 71A для SwRef=> '
+               || TO_CHAR (p_swref)
+               || '.Не могу опеределить тип комиссии!');
+
+      END;
+
+
+      BEGIN
+         SELECT VALUE
+           INTO l_status
+           FROM sw_statuses
+          WHERE id = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.error (
+               'MT299: Не найден статус' || TO_CHAR (1));
+      END;
+
+      BEGIN
+         SELECT kv
+           INTO l_currCode
+           FROM tabval
+          WHERE lcv = l_sw_journal.currency;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.error (
+               'MT299:Не найдена валюта ' || l_sw_journal.currency);
+      END;
+
+      BEGIN
+         SELECT count(*)
+           INTO l_71fld199
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '71' and t.opt='F' ;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (
+                  'MT299: Нет поля 71F для SwRef=> '
+               || TO_CHAR (p_swref));
+      END;
+
+      BEGIN
+         SELECT t.VALUE
+           INTO l_32a
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '32' and t.opt='A' AND ROWNUM = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (
+                  'MT299: Нет поля 32A для SwRef=> '
+               || TO_CHAR (p_swref));
+      END;
+
+      BEGIN
+         SELECT t.VALUE
+           INTO l_33b
+           FROM sw_operw t
+          WHERE t.swref = p_swref AND t.tag = '33' and t.opt='B' AND ROWNUM = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (
+                  'MT299: Нет поля 33B для SwRef=> '
+               || TO_CHAR (p_swref));
+      END;
+
+
+
+      --
+      -- Нормальный метод определения перекодировки - по банку
+      -- получателю сообщения определяем таблицу перекодировки
+      --
+      l_transTable := 'TRANS';
+      l_useTrans := TRUE;
+
+
+      BARS_SWIFT.In_SwJournalInt (
+         ret_        => l_ret,
+         swref_      => l_swref_new,
+         mt_         => '299',
+         mid_        => NULL,
+         page_       => NULL,
+         io_         => 'I',
+         sender_     => l_sw_journal.receiver,
+         receiver_   => BIC_GPI,
+         transit_    => l_sw_journal.transit,
+         payer_      => NULL,
+         payee_      => l_sw_journal.payee,
+         ccy_        => l_sw_journal.currency,
+         amount_     => l_sw_journal.amount,
+         accd_       => l_sw_journal.accd,
+         acck_       => NULL,
+         vdat_       => NULL,
+         idat_       => TO_CHAR (SYSDATE, 'YYYY-MM-DD HH24:MI'),
+         flag_       => 'L',
+         sti_        => '001',
+         uetr_       => l_sw_journal.uetr);
+
+      UPDATE sw_journal
+         SET date_pay = SYSDATE, date_out = NULL
+       WHERE swref = l_swref_new;
+
+      bars_audit.info (
+         'message MT299 header created SwRef=> ' || TO_CHAR (l_swref_new));
+
+      --------------------------------------------------------------
+      bars_audit.info ('write message MT299 details ...');
+
+      -- Открываем модель сообщения
+      OPEN cursModel (l_mt);
+
+      l_recno := 1;
+
+      LOOP
+         FETCH cursModel INTO l_recModel;
+
+         EXIT WHEN cursModel%NOTFOUND;
+
+
+         --
+         -- Отдельно формируем поля
+         --
+         IF (l_recModel.tag = '20')
+         THEN
+            l_opt := '';
+
+            IF LENGTH (l_20fld) < 16
+            THEN
+               l_value := l_20fld || 'A';
+            ELSE
+               l_value := SUBSTR (l_20fld, 2, 15) || 'A';
+            END IF;
+
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         --
+         ELSIF (l_recModel.tag = '21')
+         THEN
+            l_opt := '';
+            l_value := l_20fld;
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         ELSIF (l_recModel.tag = '79')
+         THEN
+            l_opt := '';
+
+            l_value :=
+                  '//'
+               || TO_CHAR (SYSDATE, 'YYMMDDHH24MI')
+               || REPLACE (SESSIONTIMEZONE, ':', '')
+               || CRLF
+               || '//'
+               || l_status
+               || CRLF
+               || '//'-- || case when l_52fld is not null then  l_sw_journal.sender|| '/' else '' end
+               || l_sw_journal.receiver
+               || CRLF
+               || '//'
+               || bars_swift.AmountToSwift (l_sw_journal.amount,
+                                            l_currCode,
+                                            TRUE,
+                                            TRUE);
+
+
+            --Якщо вхідна МТ199 має 71 поле, а в 71 полі МТ103 SHA або BEN -
+            --то для статусу ACSC в 79 поле дописуємо комісію яка прийшла до нас в МТ199 + нашу в розмірі 0,
+            IF (    l_71fld199 >0
+                AND l_71fld IN ('SHA', 'BEN')
+                                                 /*ACSC*/
+                                  )
+            THEN
+            begin
+             for c in( SELECT value
+                         FROM sw_operw t
+                     WHERE t.swref = p_swref AND t.tag = '71' and t.opt='F' )
+             loop
+               l_value :=
+                     l_value|| CRLF || '//:71F:' || REPLACE (c.value, CRLF, CRLF || '//:71F:');
+               end loop;      
+                   l_value :=
+                     l_value|| CRLF || '//:71F:'     || bars_swift.AmountToSwift (0,
+                                               l_currCode,
+                                               TRUE,
+                                               TRUE);
+             end;                                  
+            ELSIF(    l_71fld199 =0
+                AND l_71fld IN ('SHA', 'BEN')
+                                                /*ACSC*/
+                                  )
+               THEN
+                   l_value :=
+                     l_value
+                  || CRLF
+                  || '//:71F:'
+                  || bars_swift.AmountToSwift (0,
+                                               l_currCode,
+                                               TRUE,
+                                               TRUE);
+            END IF;
+
+--            IF (l_71fld='OUR') THEN
+--                IF (p_statusid=1 and l_33b is not null) then
+--                  l_value :=l_value
+--                  || CRLF
+--                  || '//'
+--                  || l_33b;
+--                END IF;
+--
+--                IF (p_statusid!=1 and l_32a is not null) then
+--                  l_value :=l_value
+--                  || CRLF
+--                  || '//'
+--                  || substr(l_32a,7);
+--                END IF;
+--
+--
+--            END IF;
+
+
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         END IF;
+      END LOOP;
+
+      CLOSE cursModel;
+
+
+      bars_audit.info (
+         'message MT299 generated swref=' || TO_CHAR (l_swref_new));
+      bars_audit.info (
+            'Сформировано сообщение SwRef='
+         || TO_CHAR (l_swref_new));
+   --------------------------------------------------------------
+
+   END genmsg_mt299;
+   
+   
+   PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number)
+   is 
+     CURSOR cursModel (p_mt IN NUMBER)
+      IS
+         SELECT *
+           FROM sw_model
+          WHERE mt = p_mt;
+
+      l_sw_journal   sw_journal%ROWTYPE;
+      l_swref_new    sw_journal.swref%TYPE;
+      l_ret          NUMBER;
+      l_mt           sw_mt.mt%TYPE := 192;       /*           Тип сообщения */
+      l_recModel     sw_model%ROWTYPE; /*               Строка модели сообщния */
+      l_cnt          NUMBER;        /*                       просто счетчик */
+      l_cnt_dict     NUMBER;
+      l_useTrans     BOOLEAN;       /*     Флаг использования перекодировки */
+      l_transTable   sw_chrsets.setid%TYPE; /*            Код таблицы перекодировки */
+      l_value        sw_operw.VALUE%TYPE; /*                        Значение тега */
+      l_recno        sw_operw.n%TYPE; /*              Порядковый номер записи */
+      l_opt          sw_operw.opt%TYPE; /*                    Опция тега записи */
+      l_pos          NUMBER;        /*                              позиция */
+      l_20fld        sw_operw.VALUE%TYPE;
+
+     
+  BEGIN
+          --
+      -- Проверяем есть ли метаописание
+      --
+      SELECT COUNT (*)
+        INTO l_cnt
+        FROM sw_model
+       WHERE mt = l_mt;
+
+      IF (l_cnt = 0)
+      THEN
+         bars_audit.error ('Error! message description '|| l_mt ||' not found...');
+         RETURN;
+      END IF;
+
+      bars_audit.info ('message '|| l_mt ||' description found...');
+
+      BEGIN
+         SELECT s.*
+           INTO l_sw_journal
+           FROM sw_journal s
+          WHERE s.uetr = p_uetr and s.mt=103;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (l_mt ||': Skip uetr=> ' || p_uetr);
+            RETURN;
+      END;
+      
+     
+        select count(*)
+        into l_cnt_dict
+         from sw_dictionary_status_mt192
+        where id = p_status_code;
+     
+      
+      IF (l_cnt_dict = 0)
+      THEN
+        raise_application_error(-20000, 'Невірний статус для МТ'||l_mt);
+      END IF;
+      
+      BEGIN
+         SELECT t.VALUE
+           INTO l_20fld
+           FROM sw_operw t
+          WHERE t.swref = l_sw_journal.swref AND t.tag = '20';
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.error (
+               'MT192: Нет поля 20 для SwRef=>' || TO_CHAR (l_sw_journal.swref));
+            RETURN;
+      END;
+        --
+      -- Нормальный метод определения перекодировки - по банку
+      -- получателю сообщения определяем таблицу перекодировки
+      --
+      l_transTable := 'TRANS';
+      l_useTrans := TRUE;
+
+
+      BARS_SWIFT.In_SwJournalInt (
+         ret_        => l_ret,
+         swref_      => l_swref_new,
+         mt_         => l_mt,
+         mid_        => NULL,
+         page_       => NULL,
+         io_         => 'I',
+         sender_     => l_sw_journal.receiver,
+         receiver_   => BIC_GPI,
+         transit_    => l_sw_journal.transit,
+         payer_      => NULL,
+         payee_      => l_sw_journal.payee,
+         ccy_        => l_sw_journal.currency,
+         amount_     => l_sw_journal.amount,
+         accd_       => l_sw_journal.accd,
+         acck_       => NULL,
+         vdat_       => NULL,
+         idat_       => TO_CHAR (SYSDATE, 'YYYY-MM-DD HH24:MI'),
+         flag_       => 'L',
+         sti_        => '002',
+         uetr_       => l_sw_journal.uetr);
+
+      UPDATE sw_journal
+         SET date_pay = SYSDATE, date_out = NULL
+       WHERE swref = l_swref_new;
+
+      bars_audit.info (
+         'message '|| l_mt ||' header created SwRef=> ' || TO_CHAR (l_swref_new));
+
+      --------------------------------------------------------------
+      bars_audit.info ('write message '|| l_mt ||' details ...');
+
+      -- Открываем модель сообщения
+      OPEN cursModel (l_mt);
+
+      l_recno := 1;
+
+      LOOP
+         FETCH cursModel INTO l_recModel;
+
+         EXIT WHEN cursModel%NOTFOUND;
+
+
+         --
+         -- Отдельно формируем поля
+         --
+         IF (l_recModel.tag = '20')
+         THEN
+            l_opt := '';
+
+            IF LENGTH (l_20fld) < 16
+            THEN
+               l_value := l_20fld || 'A';
+            ELSE
+               l_value := SUBSTR (l_20fld, 2, 15) || 'A';
+            END IF;
+
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         --
+         ELSIF (l_recModel.tag = '21')
+         THEN
+            l_opt := '';
+            l_value := l_20fld;
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         ELSIF (l_recModel.tag = '11')
+         THEN
+            l_opt := 'S';
+            l_value := l_sw_journal.mt||CRLF||to_char(l_sw_journal.vdate,'YYMMDD');
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         ELSIF (l_recModel.tag = '79')
+         THEN
+            l_opt := '';
+            l_value := '/'||p_status_code||'/'||case when p_indm =1 then 'INDM' else '' end;
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);                                                        
+         
+         END IF;
+      END LOOP;
+
+      CLOSE cursModel;
+
+
+      bars_audit.info (
+         'message MT192 generated swref=' || TO_CHAR (l_swref_new));
+      bars_audit.info (
+            'Сформировано сообщение SwRef='
+         || TO_CHAR (l_swref_new));
+      
+      
+  end generate_mt192;
+   
+   
+   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2)
+    is 
+     CURSOR cursModel (p_mt IN NUMBER)
+      IS
+         SELECT *
+           FROM sw_model
+          WHERE mt = p_mt;
+
+      l_sw_journal   sw_journal%ROWTYPE;
+      l_swref_new    sw_journal.swref%TYPE;
+      l_ret          NUMBER;
+      l_mt           sw_mt.mt%TYPE := 196;       /*           Тип сообщения */
+      l_recModel     sw_model%ROWTYPE; /*               Строка модели сообщния */
+      l_cnt          NUMBER;        /*                       просто счетчик */
+      l_cnt_dict     NUMBER;
+      l_useTrans     BOOLEAN;       /*     Флаг использования перекодировки */
+      l_transTable   sw_chrsets.setid%TYPE; /*            Код таблицы перекодировки */
+      l_value        sw_operw.VALUE%TYPE; /*                        Значение тега */
+      l_recno        sw_operw.n%TYPE; /*              Порядковый номер записи */
+      l_opt          sw_operw.opt%TYPE; /*                    Опция тега записи */
+      l_pos          NUMBER;        /*                              позиция */
+      l_20fld        sw_operw.VALUE%TYPE;
+
+     
+  BEGIN
+          --
+      -- Проверяем есть ли метаописание
+      --
+      SELECT COUNT (*)
+        INTO l_cnt
+        FROM sw_model
+       WHERE mt = l_mt;
+
+      IF (l_cnt = 0)
+      THEN
+         bars_audit.error ('Error! message description '|| l_mt ||' not found...');
+         RETURN;
+      END IF;
+
+      bars_audit.info ('message '|| l_mt ||' description found...');
+
+      BEGIN
+         SELECT s.*
+           INTO l_sw_journal
+           FROM sw_journal s
+          WHERE s.uetr = p_uetr and s.mt=192 and rownum=1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.info (l_mt ||': Skip uetr=> ' || p_uetr);
+            RETURN;
+      END;
+      
+     
+        select count(*)
+        into l_cnt_dict
+         from sw_dictionary_status_mt196
+        where id = p_status_code;
+     
+      
+      IF (l_cnt_dict = 0)
+      THEN
+        raise_application_error(-20000, 'Невірний статус для МТ'||l_mt);
+      END IF;
+      
+      BEGIN
+         SELECT t.VALUE
+           INTO l_20fld
+           FROM sw_operw t
+          WHERE t.swref = l_sw_journal.swref AND t.tag = '20';
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            bars_audit.error (
+               'MT196: Нет поля 20 для SwRef=>' || TO_CHAR (l_sw_journal.swref));
+            RETURN;
+      END;
+        --
+      -- Нормальный метод определения перекодировки - по банку
+      -- получателю сообщения определяем таблицу перекодировки
+      --
+      l_transTable := 'TRANS';
+      l_useTrans := TRUE;
+
+
+      BARS_SWIFT.In_SwJournalInt (
+         ret_        => l_ret,
+         swref_      => l_swref_new,
+         mt_         => l_mt,
+         mid_        => NULL,
+         page_       => NULL,
+         io_         => 'I',
+         sender_     => l_sw_journal.sender,
+         receiver_   => l_sw_journal.receiver,
+         transit_    => l_sw_journal.transit,
+         payer_      => NULL,
+         payee_      => l_sw_journal.payee,
+         ccy_        => l_sw_journal.currency,
+         amount_     => l_sw_journal.amount,
+         accd_       => l_sw_journal.accd,
+         acck_       => NULL,
+         vdat_       => NULL,
+         idat_       => TO_CHAR (SYSDATE, 'YYYY-MM-DD HH24:MI'),
+         flag_       => 'L',
+         sti_        => '002',
+         uetr_       => l_sw_journal.uetr);
+
+      UPDATE sw_journal
+         SET date_pay = SYSDATE, date_out = NULL
+       WHERE swref = l_swref_new;
+
+      bars_audit.info (
+         'message '|| l_mt ||' header created SwRef=> ' || TO_CHAR (l_swref_new));
+
+      --------------------------------------------------------------
+      bars_audit.info ('write message '|| l_mt ||' details ...');
+
+      -- Открываем модель сообщения
+      OPEN cursModel (l_mt);
+
+      l_recno := 1;
+
+      LOOP
+         FETCH cursModel INTO l_recModel;
+
+         EXIT WHEN cursModel%NOTFOUND;
+
+
+         --
+         -- Отдельно формируем поля
+         --
+         IF (l_recModel.tag = '20')
+         THEN
+            l_opt := '';
+
+            IF LENGTH (l_20fld) < 16
+            THEN
+               l_value := l_20fld || 'A';
+            ELSE
+               l_value := SUBSTR (l_20fld, 2, 15) || 'A';
+            END IF;
+
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         --
+         ELSIF (l_recModel.tag = '21')
+         THEN
+            l_opt := '';
+            l_value := l_20fld;
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);
+         
+         ELSIF (l_recModel.tag = '76')
+         THEN
+            l_opt := '';
+            l_value := '/'||p_status_code||'/'||CRLF||bars_swift.get_ourbank_bic;
+            genmsg_document_instag (l_recModel,
+                                    l_swref_new,
+                                    NULL,
+                                    l_recno,
+                                    l_opt,
+                                    l_value,
+                                    TRUE,
+                                    l_useTrans,
+                                    l_transTable);                                                        
+         
+         END IF;
+      END LOOP;
+
+      CLOSE cursModel;
+
+
+      bars_audit.info (
+         'message MT192 generated swref=' || TO_CHAR (l_swref_new));
+      bars_audit.info (
+            'Сформировано сообщение SwRef='
+         || TO_CHAR (l_swref_new));
+      
+      
+   end generate_mt196; 
+
 
    -----------------------------------------------------
    -- Процедура отправки статуса REJECT для WEB-формы
