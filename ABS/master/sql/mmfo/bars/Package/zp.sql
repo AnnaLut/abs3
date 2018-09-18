@@ -138,7 +138,7 @@ end;
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.23 21.08.2018';
+g_body_version   constant varchar2(64)   := 'version 1.26 18.09.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -1840,7 +1840,7 @@ begin
 end format_errmsg;
 
 --==============================
---Підтвердження відомості(формування доків)
+-- Підтвердження відомості(формування доків та оплата)
 --==============================
 procedure pay_payroll(p_id       zp_payroll.id%type,
                       p_sign     zp_payroll.sign%type,
@@ -1873,9 +1873,11 @@ is
 
   l_docref t_doc_ref:=t_doc_ref();
 
-  n              number;
-  l_doc_is_error boolean := false;
-  l_acc_b_rec    accounts%rowtype;
+  n                 number;
+  l_doc_is_error    boolean := false;
+  l_acc_b_rec       accounts%rowtype;
+  ex_payroll_locked exception;
+  pragma exception_init(ex_payroll_locked, -54);
 begin
 
 
@@ -1886,9 +1888,13 @@ begin
 
     begin
         select * into l_zp_payroll from zp_payroll
-        where id=p_id and sos=2;
-    exception when no_data_found
-        then raise_application_error(-20000, 'Статус відомості повинен бути - Очікує підтвердження БО ');
+        where id=p_id and sos=2
+        for update nowait;
+    exception 
+      when no_data_found then 
+        raise_application_error(-20000, 'Статус відомості повинен бути - Очікує підтвердження БО ');
+      when ex_payroll_locked then
+        raise_application_error(-20000, 'Відомість зараховується іншим користувачем. Оновіть сторінку для актуалізації її статусу.');
     end;
 
     begin
@@ -2173,8 +2179,8 @@ begin
 
    -- DBMS_PROFILER.STOP_PROFILER;
 
+end pay_payroll;
 
-end;
 --==============================
 --імпорт файлу відомості
 --==============================
