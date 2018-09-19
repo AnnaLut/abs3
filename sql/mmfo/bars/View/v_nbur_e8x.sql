@@ -9,12 +9,12 @@ select
           v.REPORT_DATE
           , v.KF
           , v.VERSION_ID
-          , extractValue(COLUMN_VALUE, 'DATA/KU_1') as NBUC
           , lpad(extractValue(COLUMN_VALUE, 'DATA/Q003_12'), 10 , '0') as FIELD_CODE
           , extractValue(COLUMN_VALUE, 'DATA/EKP') as EKP
           , extractValue(COLUMN_VALUE, 'DATA/T070_1') as T070_1
           , extractValue(COLUMN_VALUE, 'DATA/T070_2') as T070_2
           , extractValue(COLUMN_VALUE, 'DATA/T070_3') as T070_3
+          , extractValue(COLUMN_VALUE, 'DATA/T070_4') as T070_4
           , extractValue(COLUMN_VALUE, 'DATA/T090') as T090
           , extractValue(COLUMN_VALUE, 'DATA/K040') as K040
           , extractValue(COLUMN_VALUE, 'DATA/KU_1') as KU_1
@@ -40,6 +40,7 @@ select
           and f.FILE_CODE = 'E8X'
           and f.FILE_FMT  = 'XML'
           and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED');
+           
 comment on table V_NBUR_E8X is 'Файл E8X - Дані про концетрацію ризиків за пасивними операціями банку';
 comment on column V_NBUR_E8X.REPORT_DATE is 'Звiтна дата';
 comment on column V_NBUR_E8X.KF is 'Фiлiя';
@@ -48,6 +49,7 @@ comment on column V_NBUR_E8X.EKP is 'Код показника';
 comment on column V_NBUR_E8X.T070_1 is 'Основна сума боргу';
 comment on column V_NBUR_E8X.T070_2 is 'Неамортизовані дисконт/премія';
 comment on column V_NBUR_E8X.T070_3 is 'Нараховані витрати';
+comment on column V_NBUR_E8X.T070_4 is 'Переоцінка (дооцінка/уцінка)';
 comment on column V_NBUR_E8X.T090 is 'Розмір процентної ставки';
 comment on column V_NBUR_E8X.K040 is 'Код країни кредитора';
 comment on column V_NBUR_E8X.KU_1 is 'Код регіону, у якому зареєстрований кредитор';

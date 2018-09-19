@@ -49,7 +49,7 @@ begin
   NBUR_FILES.SET_FILE_PROC
   ( p_proc_id => l_proc_id
    , p_file_id => l_file_id
-   , p_proc_type => 'F'
+   , p_proc_type => 'O'
    , p_proc_active => 'Y'
    , p_scheme => 'BARS'
    , p_proc_name => 'NBUR_P_FE8X_NC'
@@ -60,37 +60,7 @@ begin
 
   NBUR_FILES.SET_OBJECT_DEPENDENCIES
   ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_ACCOUNTS')
-  , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_BALANCES_MONTHLY')
-  , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => NBUR_OBJECTS.F_GET_OBJECT_ID_BY_NAME('NBUR_DM_AGRM_ACCOUNTS')
-  , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => nbur_objects.f_get_object_id_by_name('NBUR_DM_CUSTOMERS')
-  , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => nbur_objects.f_get_object_id_by_name('NBUR_DM_ACNT_RATES')
-  , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( p_file_id => l_file_id
-  , p_obj_id  => nbur_objects.f_get_object_id_by_name('NBUR_DM_AGREEMENTS')
+  , p_obj_id  => null
   , p_strt_dt => date '2015-01-01'
   );
 
@@ -102,3 +72,42 @@ begin
 end;
 /
 commit;
+
+-- опис для підготовки XML
+begin
+    delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = 'E8X'; 
+    Insert into NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START)
+     Values
+       ('E8X', 'select EKP
+        , K020
+        , Q003_1
+        , Q001
+        , Q029
+        , K074
+        , K110
+        , K040
+        , KU_1
+        , Q020
+        , K014
+        , Q003_2
+        , Q007_1
+        , Q007_2
+        , T070_1
+        , T070_2
+        , T070_3
+        , T070_4
+        , T090
+        , R030
+        , R020
+        , K021
+        , Q003_12
+    from   nbur_log_fE8X
+    where  report_date = :p_rpt_dt
+           and kf = :p_kf
+    order by Q003_12       
+
+        ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+    COMMIT;
+end;
+/
