@@ -367,7 +367,7 @@ end msp_utl;
 /
 create or replace package body msp.msp_utl is
 
-  gc_body_version constant varchar2(64) := 'version 1.44 16.08.2018';
+  gc_body_version constant varchar2(64) := 'version 1.45 19.09.2018';
   gc_mod_code     constant varchar2(3)  := 'MSP';
   -----------------------------------------------------------------------------------------
 
@@ -3358,7 +3358,7 @@ create or replace package body msp.msp_utl is
        and not exists (select 1
                          from msp_file_records mfr
                         where mfr.file_id = mf.id
-                          and mfr.state_id in (17,19,20));
+                          and mfr.state_id in (17,19,20,99));
 
     pfu.transport_utl.set_transport_state(p_id               => p_file_id,
                                           p_state_id         => pfu.transport_utl.trans_state_done,
