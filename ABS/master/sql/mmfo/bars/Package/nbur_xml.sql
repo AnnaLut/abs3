@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.2  2018.09.13';
+  g_body_version  constant varchar2(64) := 'version 3.3  2018.09.18';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -816,7 +816,8 @@ $end
       l_clob := REGEXP_REPLACE( l_clob, '(<Q007_3)(></)', '\1 xsi:nil = "true" \2' );
     when 'E8'
     then
-      l_clob := REGEXP_REPLACE( l_clob, '(<T090)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q001|<Q029)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2|<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
     else
       null;
     end case;
@@ -898,22 +899,26 @@ $end
       
     exception
       when DUP_VAL_ON_INDEX then
-        select SCM_URL
-        into l_scm_url_old
-        from NBUR_REF_XSD
-        where FILE_ID = p_file_id
-           and SCM_DT <= p_scm_dt;
+        begin
+            select SCM_URL
+            into l_scm_url_old
+            from NBUR_REF_XSD
+            where FILE_ID = p_file_id
+               and SCM_DT <= p_scm_dt;
+            
+            DBMS_XMLSCHEMA.DELETESCHEMA( SCHEMAURL     => l_scm_url_old
+                                       , DELETE_OPTION => DBMS_XMLSCHEMA.DELETE_CASCADE_FORCE );
         
-        DBMS_XMLSCHEMA.DELETESCHEMA( SCHEMAURL     => l_scm_url_old
-                                   , DELETE_OPTION => DBMS_XMLSCHEMA.DELETE_CASCADE_FORCE );
-        
+        exception
+          when NO_DATA_FOUND then null;
+        end;
+
         update NBUR_REF_XSD
            set CHG_USR = USER_ID()
              , CHG_DT  = SYSDATE
              , SCM_URL = l_scm_url
          where FILE_ID = p_file_id
            and SCM_DT  = p_scm_dt;
-        
     end;
 
     DBMS_XMLSCHEMA.REGISTERSCHEMA( schemaurl       => l_scm_url
@@ -989,7 +994,3 @@ BEGIN
   v_vrsn_id := 1;
 end NBUR_XML;
 /
-show err;
-
-grant EXECUTE on NBUR_XML to BARS_ACCESS_DEFROLE;
-
