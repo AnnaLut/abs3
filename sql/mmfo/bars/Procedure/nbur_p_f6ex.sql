@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6EX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  17/08/2018 (25/06/2018)
+% VERSION     :  v.1.001  19/09/2018 (17/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.001  17/08/2018';
+  ver_          char(30)  := 'v.1.002  19/09/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -149,7 +149,9 @@ BEGIN
                               , t.k030
                               , case
                                   when t.MATURITY_DATE is null
-                                       or t.MATURITY_DATE <= p_report_date + 30 then '1'
+                                       or t.MATURITY_DATE <= p_report_date + 30 
+                                       or t.s240 in ('0', '1', '2', 'I')
+                                  then '1'
                                 else
                                   '0'
                                 end as m030
@@ -172,6 +174,7 @@ BEGIN
                                   when t.k070 in ('12602', '12603', '12702','12703','12799') then 'T3'
                                 end as cust_type
                               , case
+                                -- неінвестиційний клас
                                  when b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
                                       or substr(b.rating, 1, 1) in ('A', 'T', 'F')
                                 then
@@ -450,10 +453,10 @@ BEGIN
                   , t.field_value /*field_value*/
           from      (
                       select r030
-                             , A6E004
-                             , (case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) else 0 end) as A6E005
-                             , A6E009
-                             , (case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) else 0 end) as A6E010
+                             , to_char(A6E004) as A6E004
+                             , to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) / 100 else 0 end), '0.0000') as A6E005
+                             , to_char(A6E009) as A6E009
+                             , to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) / 100 else 0 end), '0.0000') as A6E010
                       from   (
                                 select r030
                                        , A6E001
