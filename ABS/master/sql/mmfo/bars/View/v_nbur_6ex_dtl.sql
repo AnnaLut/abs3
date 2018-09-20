@@ -44,7 +44,8 @@ create or replace view v_nbur_6ex_dtl as
                                                p.REPORT_DATE = a.REPORT_DATE
                                                and p.KF          = a.KF
                                                and p.nd          = a.AGRM_ID
-                                             );
+                                             )
+    where ekp not in (select ekp from bars.nbur_dct_f6ex_ekp where constant_value =0);
 
 comment on table V_NBUR_6EX_DTL is 'Детальний протокол файлу 6EX';
 comment on column V_NBUR_6EX_DTL.REPORT_DATE is 'Звітна дата';
