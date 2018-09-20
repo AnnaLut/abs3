@@ -132,7 +132,7 @@ show errors;
 
 create or replace package body NBUR_QUEUE 
 is
-  g_body_version  constant varchar2(64)  := 'version 7.4  2018.08.06';
+  g_body_version  constant varchar2(64)  := 'version 7.5  2018.09.20';
   g_body_defs     constant varchar2(512) := '';
 
   MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
@@ -280,11 +280,11 @@ is
              using p_report_date;
 
              p_send_message('Файл #'||p_kodf||'('||p_a017||') за дату '||
-                  to_char(p_report_date, 'dd.mm.yyyy')||' успішно сформовано!', user_id);
+                  to_char(p_report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||' успішно сформовано!', user_id);
          exception
               when others then
                       p_send_message('При формування файлу #'||p_kodf||'('||p_a017||') за дату '||
-                          to_char(p_report_date, 'dd.mm.yyyy')||' виникла помилка!', user_id);
+                          to_char(p_report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||' виникла помилка!', user_id);
 
                       p_errors_log('ERROR LOAD #'||p_kodf||'('||p_a017||')'||
                          ' dat='||to_char(p_report_date, 'dd.mm.yyyy')||' KF='||p_kf);
@@ -1556,7 +1556,7 @@ is
                 p_info_log(k.PROC_NAME||' end for date = '||to_char(p_report_date, 'dd.mm.yyyy')||CHR(10));
               end if;
 
-              l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
+              l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||
                            ' (версія '||to_char(p_version_id)||') успішно сформовано!';
 
             exception
@@ -1564,7 +1564,8 @@ is
 
                 l_flagOK := 0;
 
-                l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' виникла помилка!';
+                l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
+                            ' по МФО='||p_kf||' виникла помилка!';
 
                 l_error_mes := 'ERROR LOAD '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf;
 
@@ -1600,7 +1601,7 @@ is
                     and datf = k.report_date
                     and kf   = k.kf;
 
-                  l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
+                  l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||
                                ' (версія '||to_char(p_version_id)||') успішно сформовано!';
 
               exception
@@ -1608,7 +1609,8 @@ is
 
                   l_flagOK := 0;
 
-                  l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' виникла помилка!';
+                  l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
+                                ' по МФО='||p_kf||' виникла помилка!';
 
                   l_error_mes := 'ERROR LOAD '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf;
 
@@ -1638,7 +1640,7 @@ is
                             datf = k.report_date and
                             kf = k.kf;
 
-                l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
+                l_message := 'Файл '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' по МФО='||p_kf||
                              ' (версія '||to_char(p_version_id)||') успішно сформовано!';
 
               exception
@@ -1646,7 +1648,8 @@ is
 
                   l_flagOK := 0;
 
-                  l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||' виникла помилка!';
+                  l_message := 'При формування файлу '||k.object_name||' за дату '||to_char(k.report_date, 'dd.mm.yyyy')||
+                                ' по МФО='||p_kf||' виникла помилка!';
 
                   p_errors_log( 'ERROR LOAD '||k.OBJECT_NAME||' dat='||to_char(k.report_date, 'dd.mm.yyyy')||' KF='||k.kf );
 
