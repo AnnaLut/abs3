@@ -24,8 +24,8 @@ create or replace package nbu_601_parse_xml  as
  procedure p_parse_credit_tranche (p_id in  NUMBER);
 
 end nbu_601_parse_xml;
-
-/create or replace package body nbu_601_parse_xml  as
+/
+create or replace package body nbu_601_parse_xml  as
 
 TYPE t_nbu_personal_fo         IS TABLE OF core_person_fo%ROWTYPE;
 TYPE t_nbu_document_fo         IS TABLE OF core_document_fo%ROWTYPE;
@@ -537,7 +537,7 @@ procedure p_parse_person_uo (p_id in  NUMBER)
              l_PERSON_UO (l_PERSON_UO.last).EC_YEAR:=to_date(dbms_xslprocessor.valueof(l_row, 'EC_YEAR/text()'), l_date);
 
              --raise_application_error (-20001,dbms_xslprocessor.valueof(l_row,'COUNTRYCODNEREZ/text()'));
-             l_PERSON_UO (l_PERSON_UO.last).COUNTRYCODNEREZ  := to_number(dbms_xslprocessor.valueof(l_row, 'COUNTRYCODNEREZ/text()'),0);
+             l_PERSON_UO (l_PERSON_UO.last).COUNTRYCODNEREZ  := to_char(dbms_xslprocessor.valueof(l_row, 'COUNTERYCODNEREZ/text()'));
 
              dbms_xslprocessor.valueof(l_row, 'ISMEMBER/text()', l_str);
              l_PERSON_UO (l_PERSON_UO.last).ISMEMBER   :=trim(l_str);

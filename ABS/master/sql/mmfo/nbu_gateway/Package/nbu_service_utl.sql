@@ -492,7 +492,7 @@ create or replace package body nbu_service_utl as
          end if;
      end;
 
-     procedure process_post_response(
+procedure process_post_response(
          p_session_row in nbu_session%rowtype,
          p_xml in xmltype)
      is
@@ -681,7 +681,7 @@ create or replace package body nbu_service_utl as
          for i in (select s.*
                    from   nbu_session s
                    where  s.state_id in (nbu_service_utl.SESSION_STATE_RESPONDED)
-           and rownum<=1000
+           and rownum<=5000
                    /*for update*/) loop
              process_response(i);
          end loop;
@@ -713,7 +713,6 @@ create or replace package body nbu_service_utl as
     g_nbu_url(nbu_object_utl.OBJ_TYPE_LOAN)    := 'https://172.22.2.168/cr_reestr/api/v2/credit';
      -- *app_test
  end;
-
 /
 
 

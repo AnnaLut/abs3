@@ -53,12 +53,10 @@ create or replace type body t_core_pledge is
     is
         l_customer_object_row nbu_reported_object%rowtype;
         l_core_pledge_row core_pledge_dep%rowtype;
-        --l_core_company_row core_person_uo%rowtype;
-        --l_core_person_row core_person_fo%rowtype;
+        l_core_company_row core_person_uo%rowtype;
+        l_core_person_row core_person_fo%rowtype;
         l_pledge_row nbu_reported_pledge%rowtype;
         l_pledge_object_row nbu_reported_object%rowtype;
-        l_customer_row nbu_reported_customer%rowtype;
-        --l_pledge_object_row nbu_reported_pledge%rowtype; --nbu_reported_object%rowtype;
     begin
         l_core_pledge_row := nbu_core_service.get_core_pledge_row(p_report_id, p_pledge_id, p_pledge_kf);
 
@@ -77,7 +75,6 @@ create or replace type body t_core_pledge is
         flaginsurancepledge := l_core_pledge_row.flaginsurancepledge;
         sumBail             := l_core_pledge_row.sumbail;
         sumGuarantee        := l_core_pledge_row.sumGuarantee;
-        
 
         if (l_core_pledge_row.numdogdp is not null or
             l_core_pledge_row.dogdaydp is not null or
@@ -87,28 +84,10 @@ create or replace type body t_core_pledge is
             deposit := t_core_pledge_deposits(t_core_pledge_deposit(l_core_pledge_row.numdogdp, l_core_pledge_row.dogdaydp, l_core_pledge_row.r030dp, l_core_pledge_row.sumdp));
         end if;
 
-        l_pledge_row:=nbu_object_utl.get_pledge_by_core_id(p_pledge_id,p_pledge_kf);
-         if (l_pledge_row.id is not null) then
-           l_customer_row := nbu_object_utl.get_customer_by_core_id(l_core_pledge_row.rnk, l_core_pledge_row.kf);
-            if (l_pledge_row.pledge_number = numberpledge and 
-                        l_pledge_row.pledge_date = pledgeday and
-                        l_pledge_row.pledge_type = s031 and
-                        l_customer_row.id=l_pledge_row.customer_object_id
-                        ) then
-                        
-            l_pledge_object_row:=nbu_object_utl.read_object(l_pledge_row.id);
-            l_customer_object_row:=nbu_object_utl.read_object(l_pledge_row.customer_object_id);
-           end if;
-         end if;
-        
-       /* l_core_company_row := nbu_core_service.get_core_company_row(p_report_id, l_core_pledge_row.rnk, l_core_pledge_row.kf);
-        if (l_core_company_row.rnk is not null) then 
-        
-        l_pledge_row:=nbu_core_service.get
-        
-        
-         l_pledge_object_row := nbu_object_utl.read_object(l_pledge_row.id);
-       /* if (l_core_company_row.rnk is null) then
+
+        l_core_company_row := nbu_core_service.get_core_company_row(p_report_id, l_core_pledge_row.rnk, l_core_pledge_row.kf);
+
+        if (l_core_company_row.rnk is null) then
             l_core_person_row := nbu_core_service.get_core_person_row(p_report_id, l_core_pledge_row.rnk, l_core_pledge_row.kf);
 
             customer_code := l_core_person_row.person_code;
@@ -124,25 +103,18 @@ create or replace type body t_core_pledge is
                 l_pledge_row := nbu_object_utl.read_pledge(customer_id, numberPledge, pledgeday, p_raise_ndf => false);
 
                 if (l_pledge_row.id is not null) then
-                   l_pledge_object_row :=nbu_object_utl.read_object(l_pledge_row.id);
-                -- l_pledge_object_row :=nbu_object_utl.get_pledge_by_core_id(l_pledge_row.id,l_pledge_row.core_pledge_kf);
-             if (l_pledge_row.pledge_number = numberpledge and 
-                        l_pledge_row.pledge_date = pledgeday and
-                        l_pledge_row.pledge_type = s031
-                        ) then
-                     
-                      l_pledge_object_row := nbu_object_utl.read_object(l_pledge_row.id);
-                    end if;
-                
+                    l_pledge_object_row := nbu_object_utl.read_object(l_pledge_row.id);
                 end if;
             end if;
-        end if;*/
+        end if;
 
         codman              := l_customer_object_row.external_id;
 
         ordernum            := l_pledge_row.order_number;
         codzastava          := l_pledge_object_row.external_id;
-        
+
+        --pledge_code         := l_core_pledge_row.pledge_code;
+
         core_object_kf      := p_pledge_kf;
         core_object_id      := p_pledge_id;
         core_customer_id    := l_core_pledge_row.rnk;
@@ -244,7 +216,7 @@ create or replace type body t_core_pledge is
         l_deposit_attributes bars.string_list;
         l integer;
     begin
-        l_attributes.extend(17);
+        l_attributes.extend(30);
         -- l_attributes(1) := json_utl.make_json_value('orderNum', nvl(ordernum, '1'));
         l_attributes(1) := json_utl.make_json_value('orderNum', '1', p_mandatory => true);
         l_attributes(2) := json_utl.make_json_value('codZastava', nvl(codzastava, '0'), p_mandatory => true);
@@ -252,19 +224,20 @@ create or replace type body t_core_pledge is
         l_attributes(4) := json_utl.make_json_string('numberPledge', numberPledge, p_mandatory => true);
         l_attributes(5) := json_utl.make_json_date('pledgeDay', pledgeday, p_mandatory => true);
         l_attributes(6) := json_utl.make_json_string('s031', s031, p_mandatory => true);
-        l_attributes(7) := json_utl.make_json_string('r030', r030, p_mandatory => false);
-        l_attributes(8) := json_utl.make_json_value('sumPledge', sumpledge, p_mandatory => true);
-        l_attributes(9) := json_utl.make_json_value('pricePledge', pricePledge, p_mandatory => false);
-        l_attributes(10) := json_utl.make_json_date('lastPledgeDay', lastPledgeDay, p_mandatory => false);
-        l_attributes(11) := json_utl.make_json_value('codRealty', codRealty, p_mandatory => false);
-        l_attributes(12) := json_utl.make_json_string('zipRealty', zipRealty, p_mandatory => false);
-        l_attributes(13) := json_utl.make_json_value('squareRealty', squareRealty, p_mandatory => false);
-        l_attributes(14) := json_utl.make_json_value('sumBail', sumBail, p_mandatory => false);
-        l_attributes(15) := json_utl.make_json_value('sumGuarantee', sumGuarantee, p_mandatory => false); 
-        l_attributes(16) := json_utl.make_json_value('real6income', real6income, p_mandatory => false);
-        l_attributes(17) := json_utl.make_json_value('noreal6income', noreal6income, p_mandatory => false);
-
-        l_attributes(18) := json_utl.make_json_value('flagInsurancePledge', nvl(flaginsurancepledge, 'false'), p_mandatory => true);
+        l_attributes(7) := json_utl.make_json_value('orderZastava', '1', p_mandatory => true);
+        l_attributes(8) := json_utl.make_json_string('r030', r030, p_mandatory => false);
+        l_attributes(9) := json_utl.make_json_value('sumPledge', sumpledge, p_mandatory => true);
+        l_attributes(10) := json_utl.make_json_value('pricePledge', pricePledge, p_mandatory => false);
+        l_attributes(11) := json_utl.make_json_date('lastPledgeDay', lastPledgeDay, p_mandatory => false);
+        l_attributes(12) := json_utl.make_json_value('codRealty', codRealty, p_mandatory => false);
+        l_attributes(13) := json_utl.make_json_string('zipRealty', zipRealty, p_mandatory => false);
+        l_attributes(14) := json_utl.make_json_value('squareRealty', squareRealty, p_mandatory => false);
+        l_attributes(15) := json_utl.make_json_value('sumBail', sumBail, p_mandatory => true);
+        l_attributes(16) := json_utl.make_json_value('sumGuarantee', sumGuarantee, p_mandatory => true); 
+        l_attributes(17) := json_utl.make_json_value('real6income', real6income, p_mandatory => false);
+        l_attributes(18) := json_utl.make_json_value('noreal6income', noreal6income, p_mandatory => false);
+        
+        l_attributes(19) := json_utl.make_json_value('flagInsurancePledge', nvl(flaginsurancepledge, 'false'), p_mandatory => true);
 
         if (deposit is not null and deposit is not empty) then
             l_deposit_attributes := bars.string_list();
@@ -281,7 +254,7 @@ create or replace type body t_core_pledge is
                 l := deposit.next(l);
             end loop;
 
-            l_attributes(19) := json_utl.make_json_value('deposit', '[' || bars.tools.words_to_string(l_deposit_attributes, p_splitting_symbol => ', ', p_ignore_nulls => 'Y') || ']');
+            l_attributes(20) := json_utl.make_json_value('deposit', '[' || bars.tools.words_to_string(l_deposit_attributes, p_splitting_symbol => ', ', p_ignore_nulls => 'Y') || ']');
         end if;
 
         dbms_lob.createtemporary(l_clob, false);

@@ -489,7 +489,7 @@ create or replace package body nbu_data_service as
                                  group by r.kf);
 
        --при добавлении типа и порядкового номера мердж нам не нужен
-       /*  merge into tmp_pledge a
+         merge into tmp_pledge a
          using (select t.core_pledge_kf, t.core_pledge_id,
                        coalesce(min(case when t.core_pledge_kf = l.core_pledge_kf and t.core_pledge_id = l.core_pledge_id then
                                               t.core_pledge_kf
@@ -512,7 +512,7 @@ create or replace package body nbu_data_service as
              a.core_pledge_id = s.core_pledge_id)
          when matched then update
               set a.default_core_pledge_kf = s.default_core_pledge_kf,
-                  a.default_core_pledge_id = s.default_core_pledge_id;*/
+                  a.default_core_pledge_id = s.default_core_pledge_id;
      end;
 
      procedure gather_loan_data(
@@ -657,12 +657,12 @@ create or replace package body nbu_data_service as
              begin
                --- добавляем проверку на мин зарплату!
               select attribute_value into l_min_salary from  bars.branch_attribute_value where attribute_code='$BASE';
-               if  (i.total_loans_amount >=(l_min_salary*100)) then 
-                   update core_person_uo p set isKr=1 where p.rnk=i.core_company_id;
-                   else 
-                   update core_person_uo p set isKr=0 where p.rnk=i.core_company_id;
-               end if;     
-             
+               if  (i.total_loans_amount >=(l_min_salary*10000)) then
+                   update core_person_uo p set isKr=1 where p.rnk=i.core_company_id and p.request_id=i.request_id;
+                   else
+                   update core_person_uo p set isKr=0 where p.rnk=i.core_company_id and p.request_id=i.request_id;
+               end if;
+
                  if (i.total_loans_amount >= l_bottom_line or i.customer_object_id is not null) then
                      -- якщо сума заборгованості перевищує граничне значення (-i.total_loans_amount >= l_bottom_line)
                      -- або ми хоча б раз відправляли відомості по даному клієнту до НБУ (i.company_object_id is not null)
@@ -780,12 +780,12 @@ create or replace package body nbu_data_service as
              begin
               --- добавляем проверку на мин зарплату!
               select attribute_value into l_min_salary from  bars.branch_attribute_value where attribute_code='$BASE';
-               if  (i.total_loans_amount >=(l_min_salary*100) ) then 
-                   update core_person_fo f set isKr=1 where f.rnk=i.core_person_id;
-                   else 
-                   update core_person_fo f set isKr=0 where f.rnk=i.core_person_id;
-               end if;      
-                   
+               if  (i.total_loans_amount >=(l_min_salary*10000)) then
+                   update core_person_fo f set isKr=1 where f.rnk=i.core_person_id and f.request_id=i.request_id;
+                   else
+                   update core_person_fo f set isKr=0 where f.rnk=i.core_person_id and f.request_id=i.request_id;
+               end if;
+
                  if (i.total_loans_amount >= l_bottom_line or i.customer_object_id is not null) then
                      -- якщо сума заборгованості перевищує граничне значення (-i.total_loans_amount >= l_bottom_line)
                      -- або ми хоча б раз відправляли відомості по даному клієнту до НБУ (i.person_object_id is not null)
@@ -887,7 +887,8 @@ create or replace package body nbu_data_service as
                                                  '} деактивується у зв''язку з його відсутністю в поточній версії даних АБС');
          end loop;
 
-         for i in (select c.id
+         for i in (select /*+Ordered*/
+                          c.id
                    from   tmp_pledge t
                    join   nbu_reported_pledge p on p.core_pledge_kf = t.core_pledge_kf and p.core_pledge_id = t.core_pledge_id
                    join   nbu_reported_customer c on c.id = p.customer_object_id
@@ -900,7 +901,7 @@ create or replace package body nbu_data_service as
 
          for i in (select * from tmp_pledge t where t.pledge_number is not null and t.pledge_date is not null) loop
              begin
-               -- if (i.core_pledge_kf = i.default_core_pledge_kf and i.core_pledge_id = i.default_core_pledge_id) then
+               if (i.core_pledge_kf = i.default_core_pledge_kf and i.core_pledge_id = i.default_core_pledge_id) then
                      l_pledge := t_core_pledge(p_report_id, i.core_pledge_id, i.core_pledge_kf);
 
                      if (l_pledge.customer_id is not null) then
@@ -956,7 +957,7 @@ create or replace package body nbu_data_service as
                                                                 i.default_core_pledge_kf,
                                                                 null);
                      end if;
-                 /*else
+                 else
                      nbu_core_service.set_core_pledge_state(i.request_id,
                                                             i.core_pledge_id,
                                                             'DUPLICATE',
@@ -967,7 +968,7 @@ create or replace package body nbu_data_service as
                                                             i.default_core_pledge_id,
                                                             i.default_core_pledge_kf,
                                                             null);
-                 end if;*/
+                 end if;
              exception
                  when others then
                       nbu_core_service.set_core_pledge_state(i.request_id,
@@ -1005,7 +1006,8 @@ create or replace package body nbu_data_service as
                                                  '} деактивується у зв''язку з його відсутністю в поточній версії даних АБС');
          end loop;
 
-         for i in (select c.id
+         for i in (select /*+Ordered*/
+                          c.id
                    from   tmp_loan t
                    join   nbu_reported_loan p on p.core_loan_kf = t.core_loan_kf and p.core_loan_id = t.core_loan_id
                    join   nbu_reported_customer c on c.id = p.customer_object_id

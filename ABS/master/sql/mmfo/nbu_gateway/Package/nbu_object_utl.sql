@@ -519,19 +519,6 @@ create or replace package body nbu_object_utl as
 
         p_person.reported_object_id := l_object_id;
     end;
-    
-    
-        procedure check_pledge_core_uniqueness(
-        p_core_pledge_id in integer,
-        p_core_pledge_kf in varchar2)
-    is
-        l_pledge_row nbu_reported_pledge%rowtype;
-    begin
-        l_pledge_row := get_pledge_by_core_id(p_core_pledge_id, p_core_pledge_kf);
-        if (l_pledge_row.id is not null) then
-            dismiss_object(l_pledge_row.id, 'обьект "перестав існувати" в поточній версії');
-        end if;
-    end;
 
     procedure create_company(
         p_company in out nocopy t_core_company)
@@ -567,9 +554,7 @@ create or replace package body nbu_object_utl as
                                             '} на дату {' || to_char(p_pledge.pledgeday, 'dd.mm.yyyy') ||
                                             '} та ідентифікатором {' || p_pledge.reported_object_id || '} вже створена');
         end if;
-        
-       check_pledge_core_uniqueness(p_pledge.core_object_id, p_pledge.core_object_kf);
-        
+
         check_pledge_uniqueness(p_pledge.customer_id, p_pledge.numberpledge, p_pledge.pledgeday);
 
         if (p_pledge.ordernum is null) then
@@ -578,8 +563,7 @@ create or replace package body nbu_object_utl as
              from   nbu_reported_pledge t
              where  t.customer_object_id = p_pledge.customer_id and
                     t.pledge_number = p_pledge.numberpledge and
-                    t.pledge_date = p_pledge.pledgeday and
-                    t.pledge_type = p_pledge.s031; --добавляем проверку на тип залога!
+                    t.pledge_date = p_pledge.pledgeday;
         end if;
 
         l_object_id := create_object(nbu_object_utl.OBJ_TYPE_PLEDGE);
