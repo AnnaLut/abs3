@@ -38,6 +38,7 @@ begin
         DEFAULT_FLG     VARCHAR2(1 CHAR),
         LIQUID_TYPE     VARCHAR2(1 CHAR),
         CREDIT_WORK_FLG VARCHAR2(1 CHAR),
+		CREDIT_IRR_COMM_FLG  VARCHAR2(1 CHAR),
         CUST_TYPE       VARCHAR2(2 CHAR),
         CUST_RATING     VARCHAR2(2 CHAR),
         FACTOR          NUMBER,
@@ -52,6 +53,15 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+
+begin 
+  execute immediate '
+  ALTER TABLE BARS.NBUR_DCT_F6EX_NBS 
+  ADD (CREDIT_IRR_COMM_FLG  VARCHAR2(1 CHAR))';
+exception when others then       
+  if sqlcode=-01430 then null; else raise; end if; 
+end; 
+/  
 
 PROMPT *** ALTER_POLICIES to NBUR_DCT_F6EX_NBS ***
  exec bpa.alter_policies('NBUR_DCT_F6EX_NBS');
@@ -77,6 +87,7 @@ COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.LIQUID_TYPE IS 'Тип ліквідних активів';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.CUST_TYPE IS 'Тип клієнта';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.CUST_RATING IS 'Рейтінг клієнта';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.CREDIT_WORK_FLG IS 'Флаг повністю працюючого кредиту';
+COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.CREDIT_IRR_COMM_FLG IS 'Флаг безвідкличних зобов''язань банку з кредитування';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.EKP IS 'Код показника';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.LCY_PCT IS 'Коефіцієнт показника у національній валюті';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.FCY_PCT IS 'Коефіцієнт показника у іноземній валюті';
