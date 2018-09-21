@@ -221,7 +221,7 @@ create or replace package body nbu_601_request_data_ru is
         for doc in (select pf.rnk,
                            case when p.passp = 11 then 2
                                 when p.passp = 7 then 3
-                                when p.passp in (-1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 99) then 4
+                                when p.passp in (-1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18,98,99) then 4
                            else p.passp
                            end passp,
                            p.ser, p.numdoc, p.pdate
@@ -847,7 +847,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
         for person in (select rnk_client.rnk,bpk.nd,'' as ordernum,(select decode( c.custtype,3,'true',2,'false')  from customer c where c.rnk=rnk_client.rnk) as flagosoba,
                               case when bpk.nbs=2202  then '01'
                                    when bpk.nbs=2203  then '02'
-                                   when bpk.nbs  in ('2625', '2605',9129) then '08'      
+                                   when bpk.nbs  in ('2625', '2605',9129) then '08'
                                end typecredit,
                                'cc_deal' as table_name,
                                (select nkd from specparam where acc=bpk.acc_pk) as numberdog,
@@ -1006,7 +1006,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                           when  d.prod like '9122%' and ad.aim=99 then '13'
                                      end typecredit,
                                      'cc_deal' as table_name,
-                    case when d.cc_id like '%\%' then replace (d.cc_id,'\','\\')||'--'||d.nd else d.cc_id||'--'||d.nd end
+                                     case when d.cc_id like '%\%' then replace (d.cc_id,'\','\\')||'--'||d.nd else d.cc_id||'--'||d.nd end
                                      as numberdog,
                                      --d.cc_id||'--'||d.nd as numberdog,
                                       case
@@ -1040,9 +1040,14 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                        end flagz,
                                      ltrim(nbu23_rez.fin) as klass,
                                      nbu23_rez.cr as risk,
-                                    case when  (d.prod like '2082%' or  d.prod like '2232%') then 'true'
+                                     case 
+                                      when nt.tag='INSCC' and txt='Taк' then 'true'
+                                      when nt.tag='INSCC' and txt='Ні' then 'false'
+                                       --else null
+                                      end flagInsurance                                    
+                     /*case when  (d.prod like '2082%' or  d.prod like '2232%') then 'true'
                                          when  (d.prod like '2083%' or  d.prod like '2233%') then 'true'
-                                           end flagInsurance
+                                           end flagInsurance*/
                      from (select rnk,kf from nbu_person_fo
                            union
                            select rnk,kf from nbu_person_uo) rnk_client ,
@@ -1054,7 +1059,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                             from cc_deal cd, cc_add ca where ca.nd=cd.nd  ) sumzagal on ad.nd = sumzagal.nd and ad.kv = sumzagal.kv*/
 
                             (select distinct cd.nd ,ca.kv, --((cd.sdog*100)+nvl(b.amount_com,0)) as  sum_zagal
-                                              (cd.sdog*100) as  sum_zagal     
+                                              (cd.sdog*100) as  sum_zagal
                                              from cc_add ca,cc_deal cd
                                              /*left join (select a.nd,sum(a.amount_com) as amount_com from(
                                                             select distinct ad.nd,na.acc,ad.kv,a.kv,
@@ -1104,9 +1109,9 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                     left join(select a.nd ,sum(sumo+sumk) as sumpay
                                        from cc_lim_arc a, cc_deal c
                                        where fdat between  add_months(trunc(sysdate,'mm'),-1) and add_months(trunc(sysdate,'mm'),11) and sumo>0
-                                       and a.nd=c.nd 
-                                       and mdat = (select max(mdat) from cc_lim_arc aa where aa.nd=c.nd) 
-                                       group by a.nd) sum_lim on sum_lim.nd=ad.nd                          
+                                       and a.nd=c.nd
+                                       and mdat = (select max(mdat) from cc_lim_arc aa where aa.nd=c.nd)
+                                       group by a.nd) sum_lim on sum_lim.nd=ad.nd
                     --номінальна процентна ставка
                     left join (select t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
                            from int_ratn t,

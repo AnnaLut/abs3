@@ -374,9 +374,9 @@ create or replace type body t_core_loan is
                 l := tranche.next(l);
             end loop;
 
-            l_attributes(26) := json_utl.make_json_value('tranche',
+            /*l_attributes(26) := json_utl.make_json_value('tranche',
                                                          '[' || bars.tools.words_to_string(l_tranche_items, p_splitting_symbol => ', ', p_ignore_nulls => 'Y') || ']',
-                                                         p_mandatory => true);
+                                                         p_mandatory => true);*/
         end if;
 
         dbms_lob.createtemporary(l_clob, false);

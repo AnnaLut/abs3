@@ -396,5 +396,4 @@ create or replace type body t_core_person is
          end if;
      end;
  end;
-
 /

@@ -27,3 +27,17 @@ exception
          null;
 end;
 /
+create index IDX_NBU_SESSION_TRACK_SESSION on NBU_SESSION_TRACKING (SESSION_ID)
+  tablespace BRSMDLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  )
+  compress;
+/
