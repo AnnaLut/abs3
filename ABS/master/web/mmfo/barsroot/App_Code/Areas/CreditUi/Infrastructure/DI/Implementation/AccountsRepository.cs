@@ -101,7 +101,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                           ,a.ostc / 100 AS ostc
                           ,d.wdate
                           ,c.custtype
-                          ,t.ndg  
+                          ,t.ndg
+                          ,t.sos
                       FROM cc_deal t, customer c, cc_vidd v, accounts a, cc_add d,nd_acc na
                     WHERE c.rnk = t.rnk
                        AND t.vidd = v.vidd
@@ -135,6 +136,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                         data.Date_issuance = String.IsNullOrEmpty(reader.GetValue(10).ToString()) ? String.Empty : Convert.ToDateTime(reader.GetValue(10).ToString()).ToString("dd/MM/yyyy");
                         data.CUSTYPE = String.IsNullOrEmpty(reader.GetValue(11).ToString()) ? 0 : reader.GetInt32(11);
                         data.NDR = String.IsNullOrEmpty(reader.GetValue(12).ToString()) ? (decimal?)null : reader.GetDecimal(12);
+                        data.SOS = String.IsNullOrEmpty(reader.GetValue(13).ToString()) ? (byte?)null : reader.GetByte(13); 
                         data.Avalible_provide = !data.NDR.HasValue || nd == data.NDR;
                     }
                 }
