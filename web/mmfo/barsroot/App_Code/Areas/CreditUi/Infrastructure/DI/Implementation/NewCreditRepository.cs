@@ -1060,7 +1060,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                            (select name from cc_rang_name where rang = cck_app.Get_ND_TXT(cc.nd, 'CCRNG')) as rang_name,--42
                                            (select metr from int_accn where acc = cc.acc8 and id = 2) as metr,--43
                                            (select name from  int_metr where metr in (select metr from int_accn where acc = cc.acc8 and id = 2)) as metr_name, --44
-                                           (select ir from int_ratn where acc = cc.acc8 and id = 2) as metr_r,--45
+                                           (select max(ir) keep (dense_rank first order by bdat desc)  from int_ratn where acc = cc.acc8 and id = 2 ) as metr_r,--45
                                            cck_app.Get_ND_TXT(cc.nd, 'SN8_R') as sn8,--46
                                            (SELECT r.ir FROM int_ratn r, int_accn i
                                              WHERE r.acc=i.acc and r.id=i.id and r.acc=cc.acc8 and r.id=4 
