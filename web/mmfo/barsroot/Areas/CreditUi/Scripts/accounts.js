@@ -381,7 +381,7 @@ $(document).ready(function () {
     });
 
     $(".k-grid-btToCreditCard").click(function () {
-        window.open(bars.config.urlContent('/CreditUi/NewCredit/?custtype=' + staticData.CUSTYPE + '&nd=' + globalID), '_blank');
+        window.open(bars.config.urlContent('/CreditUi/NewCredit/?custtype=' + staticData.CUSTYPE + '&nd=' + globalID + '&sos=' + staticData.SOS), '_blank');
     });
 
     $(".k-grid-btProvide").click(function () {

@@ -26,6 +26,7 @@ namespace BarsWeb.Areas.CreditUi.Models
         public int CUSTYPE { get; set; }
         public bool Avalible_provide { get; set; }
         public decimal? NDR { get; set; }
+        public byte? SOS { get; set; }
 
     }
 }
