@@ -204,6 +204,9 @@
      FETCH k1
        INTO dd.nd, dd.cc_id, dd.sdate, dd.wdate,dd.ndg;
      EXIT WHEN k1%NOTFOUND;
+
+     select prod into dd.prod from cc_deal where nd = dd.nd;
+
      --------------------------------------------
 
      IF p_type IN (3, 13, 5, 15) THEN
