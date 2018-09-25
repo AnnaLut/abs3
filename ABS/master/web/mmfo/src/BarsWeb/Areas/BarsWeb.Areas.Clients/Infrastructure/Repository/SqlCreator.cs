@@ -57,7 +57,7 @@ namespace BarsWeb.Areas.Clients.Infrastructure.Repository
             {
                 return new BarsSql
                 {
-                    SqlText = string.Format(@"{0} where A.SED = 91 and A.ISE in (14200, 14100, 14201, 14101) and nvl(a.ved , 00000) != '00000' {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null")
+                    SqlText = string.Format(@"{0} where A.SED = '91' and A.ISE in ('14200', '14100', '14201', '14101') and nvl(a.ved , '00000') != '00000' {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null")
                 };
             }
 
