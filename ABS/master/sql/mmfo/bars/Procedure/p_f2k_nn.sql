@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.007     14.08.2018
+% VERSION     : v.18.008     25.09.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 25.09.2018  корректировка алгоритма обработки "второго" набора доп.параметров
  14.08.2018  обработка "второго" набора доп.параметров клиента с санкциями
  30.05.2018  DDD=270 -залишок коштiв на дату введення санкцiй (дата-1)
  16.03.2018  адрес клиента заполняется отдельным скриптом
@@ -646,44 +647,53 @@ select
                order by c.okpo
             )
    loop
-         nnnn_ := nnnn_+1;
-         segm_n := lpad(to_char(nnnn_),4,'0');
 
-         for u in (select * from rnbu_trace
-                    where rnk =k.rnk
-         ) loop
+       for u1 in ( select rnk, substr(kodp,15,4) nnnn
+                     from rnbu_trace
+                    group by rnk, substr(kodp,15,4)
+       ) loop
 
-             if    substr(u.kodp,1,3) ='110'  then
+           nnnn_ := nnnn_+1;
+           segm_n := lpad(to_char(nnnn_),4,'0');
+
+           for u in (select * from rnbu_trace
+                      where rnk =k.rnk
+                        and substr(kodp,15,4) =u1.nnnn
+           ) loop
+
+               if    substr(u.kodp,1,3) ='110'  then
 --    110  номер позицii
-                 insert into rnbu_trace
-                           ( rnk, kodp, znap )
-                    values ( k.rnk, substr(u.kodp,1,14)||segm_n,
-                            (case when k.rnbor is null  then 'немае даних'
-                                  else k.rnbor end) );
+                   insert into rnbu_trace
+                             ( rnk, kodp, znap )
+                      values ( k.rnk, substr(u.kodp,1,14)||segm_n,
+                               (case when k.rnbor is null  then 'немае даних'
+                                       else k.rnbor end) );
 
-             elsif substr(u.kodp,1,3) ='120'  then
+               elsif substr(u.kodp,1,3) ='120'  then
 --    120  номер указу
-                insert into rnbu_trace
-                          ( rnk, kodp, znap )
-                   values ( k.rnk, substr(u.kodp,1,14)||segm_n, 
-                           (case when k.rnbou is null  then 'немае даних'
-                                 else k.rnbou end) );
+                  insert into rnbu_trace
+                            ( rnk, kodp, znap )
+                     values ( k.rnk, substr(u.kodp,1,14)||segm_n, 
+                             (case when k.rnbou is null  then 'немае даних'
+                                     else k.rnbou end) );
 
-             elsif substr(u.kodp,1,3) ='130'  then
+               elsif substr(u.kodp,1,3) ='130'  then
 --    130  санкцiя
-                insert into rnbu_trace
-                          ( rnk, kodp, znap )
-                   values ( k.rnk, substr(u.kodp,1,14)||segm_n,
-                           (case when k.rnbos is null  then 'немае даних'
-                                 else k.rnbos end) );
+                  insert into rnbu_trace
+                            ( rnk, kodp, znap )
+                     values ( k.rnk, substr(u.kodp,1,14)||segm_n,
+                             (case when k.rnbos is null  then 'немае даних'
+                                     else k.rnbos end) );
 
-             else
-                 insert into rnbu_trace
-                           ( rnk, kodp, znap )
-                    values ( k.rnk, substr(u.kodp,1,14)||segm_n, u.znap );
-             end if;
+               else
+                   insert into rnbu_trace
+                             ( rnk, kodp, znap )
+                      values ( k.rnk, substr(u.kodp,1,14)||segm_n, u.znap );
+               end if;
 
-         end loop;
+           end loop;
+
+       end loop;
 
    end loop;
 ------------------------------------------------------

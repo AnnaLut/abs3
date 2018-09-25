@@ -1,3 +1,9 @@
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_F2KX.sql ======== *** Run *** 
+PROMPT ===================================================================================== 
+
+
 CREATE OR REPLACE PROCEDURE NBUR_P_F2KX (
                                            p_kod_filii        varchar2
                                            , p_report_date      date
@@ -11,9 +17,9 @@ is
 % DESCRIPTION : ѕроцедура формировани€ 2KX дл€ ќщадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.009    19/09/2018
+% VERSION     :  v.18.010    24/09/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := 'v.18.009  19/09/2018';
+  ver_            char(30)  := 'v.18.010  24/09/2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -67,9 +73,10 @@ BEGIN
                , ref
                , null as nd
                , null as branch
-        from   (
+        from (
+             with cust_data as (
                 select tr.cust_id, tr.acc_id, tr.acc_num, tr.ref, tr.Q003_1 as nnnn, tr.K020_1 as segm_z, tr.R030_1 as kv                       
-                       , tr.Q001_1, tr.Q002, tr.Q003_2, tr.Q003_3, tr.Q030, tr.K020_1, tr.K021_1, tr.Q006, tr.F086, tr.Q003_4
+                       , tr.Q001_1, tr.Q002, tr.Q003_2, tr.Q003_2a, tr.Q003_3, tr.Q030, tr.Q030a, tr.K020_1, tr.K021_1, tr.Q006, tr.F086, tr.Q003_4
                        , tr.R030_1, tr.Q007_1, tr.Q007_2, tr.Q031_1, tr.T070_1, tr.T070_2, tr.F088, tr.Q007_3, tr.Q003_5, tr.Q001_2
                        , tr.K020_2, tr.K021_2, tr.Q001_3, tr.T070_3, tr.R030_2, tr.Q032 
                        , case when tr.ref is null then null else tr.Q031_1 end as Q031_2
@@ -83,8 +90,10 @@ BEGIN
                                  , cust.cust_name as Q001_1
                                  , cust.cust_adr as Q002
                                  , cust.rnbor as Q003_2
+                                 , cust.rnb1r as Q003_2a
                                  , coalesce(cust.rnbou, 'немае даних') as Q003_3
                                  , coalesce(Replace(cust.rnbos, ' ', ''), 'немае даних') as Q030 --22.06.2018 добавил убираение пробелов
+                                 , coalesce(Replace(cust.rnb1s, ' ', ''), 'немае даних') as Q030a
                                  , case
                                      when cust.k070 like '13%'  then 'G'
                                      when cust.k070 in ('ZZZZZ', 'YYYYY') then 'D'
@@ -155,6 +164,7 @@ BEGIN
                           from   (select cust.cust_code, max(cust.k070) as k070, max(trim(custo.nmk)) as cust_name, max(cust.cust_adr) as cust_adr
                                          , cust.cust_id as cust_id, max(cust.cust_type) as cust_type, max(cust.k030) as k030, max(re.rnbor) rnbor
                                          , max(re.rnbou) rnbou, max(re.rnbos) rnbos, max(re.rnbod) rnbod, max(cust.k040) as k040
+                                         , max(re.rnb1r) rnb1r, max(re.rnb1s) rnb1s
                                   from   (select *
                                           from (select u.rnk
                                                            , u.tag
@@ -177,9 +187,10 @@ BEGIN
                                                                            and instr(p.value, '01') + instr(p.value, '02') + instr(p.value, '03') + instr(p.value, '04') + instr(p.value,'05') + instr(p.value,'99') > 0
                                                                            and p.rnk = u.rnk
                                                                   )
-                                                            and u.tag in ('RNBOR', 'RNBOU', 'RNBOS', 'RNBOD')
+                                                            and u.tag in ('RNBOR', 'RNBOU', 'RNBOS', 'RNBOD','RNB1R','RNB1S')
                                                   )
-                                             pivot (max(trim(value)) for tag in ('RNBOR' as RNBOR, 'RNBOU' as RNBOU, 'RNBOS' as RNBOS, 'RNBOD' as RNBOD))
+                                             pivot (max(trim(value)) for tag in ('RNBOR' as RNBOR, 'RNBOU' as RNBOU, 'RNBOS' as RNBOS, 'RNBOD' as RNBOD,
+                                                                                 'RNB1R' as RNB1R, 'RNB1S' as RNB1S       ))
                                            ) re
                                            join nbur_dm_customers cust on (cust.report_date = p_report_date and
                                                                            cust.kf = p_kod_filii and 
@@ -226,13 +237,33 @@ BEGIN
                                             where rn = 1
                                           ) pay_cust on (pay_cust.cust_code = decode(acc.acc, tr.acc_id_db, tr.cust_okpo_cr, tr.cust_okpo_db))
                        ) tr
-        )
+                               )      ---  end of cust_data
+              select segm_z, lpad(to_char(rownum),4,'0') nnnn, acc_id, acc_num, kv, cust_id, ref, 
+                     T070_1, T070_2, T070_3, lpad(to_char(rownum),4,'0') Q003_1, Q001_1, Q002, K020_1, K021_1, Q003_2
+                     , Q003_3, Q030, Q006, F086, Q003_4, R030_1, Q007_1, Q007_2, Q031_1, F088
+                     , Q007_3, Q003_5, Q001_2, K020_2, K021_2, Q001_3, R030_2, Q032, Q031_2                                                   
+               from (                       -- (1) данные по основным четырем доп.параметрам санкций
+                      select segm_z, acc_id, acc_num, kv, cust_id, ref, 
+                             T070_1, T070_2, T070_3, Q001_1, Q002, K020_1, K021_1, Q003_2
+                             , Q003_3, Q030, Q006, F086, Q003_4, R030_1, Q007_1, Q007_2, Q031_1, F088
+                             , Q007_3, Q003_5, Q001_2, K020_2, K021_2, Q001_3, R030_2, Q032, Q031_2                                                   
+                        from cust_data
+                      union                 -- (2) дублирование с учетом наличи€ 2-го набора доп.параметров санкций
+                      select segm_z, acc_id, acc_num, kv, cust_id, ref, 
+                             T070_1, T070_2, T070_3, Q001_1, Q002, K020_1, K021_1, Q003_2a as Q003_2
+                             , Q003_3, Q030a as Q030, Q006, F086, Q003_4, R030_1, Q007_1, Q007_2, Q031_1, F088
+                             , Q007_3, Q003_5, Q001_2, K020_2, K021_2, Q001_3, R030_2, Q032, Q031_2                                                   
+                        from cust_data   
+                       where  Q003_2a is not null
+                    )
+             )
         unpivot (field_value for field_code in (
-                                                   T070_1, T070_2, T070_3, Q003_1, Q001_1, Q002, K020_1, K021_1, Q003_2
-                                                   , Q003_3, Q030, Q006, F086, Q003_4, R030_1, Q007_1, Q007_2, Q031_1, F088
-                                                   , Q007_3, Q003_5, Q001_2, K020_2, K021_2, Q001_3, R030_2, Q032, Q031_2                                                   
+                                               T070_1, T070_2, T070_3, Q003_1, Q001_1, Q002, K020_1, K021_1, Q003_2
+                                               , Q003_3, Q030, Q006, F086, Q003_4, R030_1, Q007_1, Q007_2, Q031_1, F088
+                                               , Q007_3, Q003_5, Q001_2, K020_2, K021_2, Q001_3, R030_2, Q032, Q031_2                                                   
                                               )
-                );
+                ); 
+
   exception
     when others then
       logger.trace(c_prefix || ' error insert data ' || sqlerrm);
@@ -241,3 +272,9 @@ BEGIN
   logger.info (c_prefix || ' end for date = ' || to_char(p_report_date, 'dd.mm.yyyy'));
 END;
 /
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_F2KX.sql ======== *** End *** 
+PROMPT ===================================================================================== 
+
