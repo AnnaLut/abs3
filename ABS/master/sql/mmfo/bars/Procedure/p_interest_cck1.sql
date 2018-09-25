@@ -262,7 +262,7 @@
                      AND i.acrb IS NOT NULL
                      AND i.acr_dat < ddat2_)
      LOOP
-       if p.ddat1 >= ddat2_ then
+       if p.ddat1 > ddat2_ then
          logger.info('P_INTEREST_CCK1: ND = '||p.nd||', acc = '||p.acc||', ddat1 = '||p.ddat1||', відсотки вже нараховані');
          continue;
        end if;
