@@ -1,5 +1,5 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F42X.sql =========*** Run *** =
+PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/NBUR_P_F26X.sql =========*** Run *** =
 PROMPT ===================================================================================== 
 
 PROMPT *** Create  procedure NBUR_P_F26X ***
@@ -32,7 +32,7 @@ is
   l_file_code              varchar2(2 char) := substr(p_file_code, 2, 2);
   l_type                   number;
   
-  c_old_file_code          constant varchar2(3 char) := '#42';
+  c_old_file_code          constant varchar2(3 char) := '#26';
 
   l_file_id       nbur_ref_files.id%type := nbur_files.GET_FILE_ID(p_file_code => p_file_code);
   l_version_id    nbur_lst_files.version_id%type;  
