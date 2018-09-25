@@ -61,7 +61,7 @@ namespace BarsWeb.Areas.Crkr.Controllers.Api
                                 where a.rnk=c.rnk and 
                                       c.rnk=p.rnk and
                                       a.KV = 980 and 
-                                      a.nls like '2625%' and
+                                      (a.nls like '2625%' or (a.nls like '2620%' and a.tip like 'W4%')) and
                                       a.tip like 'W%' and
                                       a.dazs is null and";
 
