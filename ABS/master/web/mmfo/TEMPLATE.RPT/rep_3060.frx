@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="06/26/2018 17:11:51" ReportInfo.Modified="07/20/2018 12:58:57" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/26/2018 17:11:51" ReportInfo.Modified="09/14/2018 10:46:53" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
     <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 CONTR_ID, NUM01 CONTR_TYPE, CHAR00 CONTR_TYPE_NAME, CHAR01 NUM, CHAR02 SUBNUM, NUM02 RNK, CHAR03 OKPO, CHAR04 NMK, CHAR05 NMKK, NUM03 CUSTTYPE, CHAR06 ND, NUM04 STATUS_ID, CHAR07 STATUS_NAME, CHAR08 COMMENTS, CHAR09 BRANCH_OWN, CHAR10 BRANCH_OWN_NAME, NUM05 KV, NUM06 S, DAT00 OPEN_DATE, DAT01 CLOSE_DATE, NUM07 OWNER_UID, CHAR11 OWNER_FIO, NUM08 BENEF_ID, CHAR12 BENEF_NAME, CHAR13 BENEF_ADR, NUM09 COUNTRY_ID, CHAR14 COUNTRY_NAME, NUM10 DEADLINE, CHAR15 BRANCH_SERVICE, CHAR16 BRANCH_SERVICE_NAME, CHAR17 PARAM1, CHAR18 SFDAT1, CHAR19 SFDAT2, CHAR20 PARAM2, CHAR21 PARAM3, CHAR22 PARAM4, CHAR23 CONTR_TYPE_NAME, CHAR24 STATUS_NAME, CHAR25 PARAM3, CHAR26 PARAM1 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
@@ -124,7 +124,7 @@
           <TableCell Name="Cell28" Border.Lines="All" Text="[Table.CLOSE_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell29" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell30" Border.Lines="All" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell31" Border.Lines="All" Text="[Table.NMKK]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="[Table.BENEF_NAME]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell32" Border.Lines="All" Text="[Table.COUNTRY_NAME]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell33" Border.Lines="All" Text="[Table.COMMENTS]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell34" Border.Lines="All" Text="[Table.RNK]" HorzAlign="Center" VertAlign="Center"/>
