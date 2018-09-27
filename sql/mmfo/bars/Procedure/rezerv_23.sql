@@ -421,6 +421,7 @@ begin
       end LOOP;
    commit;
    end;
+/*
    begin
       z23.to_log_rez (user_id , 37 , dat01_ ,'Распределение SDF');
       for k in (select nd, sum(-bv) over  (partition by nd) bv_sna from nbu23_rez where fdat = dat01_
@@ -435,6 +436,7 @@ begin
       end LOOP;
    commit;
    end;
+*/
 /*
    begin
       z23.to_log_rez (user_id , 37 , dat01_ ,'Распределение SNA');

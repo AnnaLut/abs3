@@ -102,14 +102,14 @@ begin
 
       for s in (select kv, acc, rnk, NVL(nbs,SUBSTR(NLS,1,4)) NBS, tip, nls, ob22, BV, f_bv_sna_cp (p_dat01 , d.ref , acc) osta
                 from ( select kv, acc, rnk, nbs, tip, nls, nvl(ob22,'01') ob22, -ost_korr (acc,l_dat31,z23.di_,nbs)  BV from  accounts
-                       where acc in (cp_acc_ , cp_accp_ , cp_accd_  , cp_accs_, cp_accr_, cp_accr2_,
-                                     l_accr3 , l_accexpr, l_accunrec,l_accexpn) and nls not like '8%' and substr(nls,1,4) not in ('4103','4203')
+                       where acc in (select cp_acc from cp_accounts c where c.cp_ref = d.ref and c.cp_acctype in ('N','D','RD','EXPN','EXPR','P','R','R2','R3','S','S2','UNREC'))  
+                         and nls not like '8%' and substr(nls,1,4) not in ('4103','4203')
                              --and ost_korr (acc,l_dat31,null,nbs) < 0
                       )
                  )
    
       loop
-
+--logger.info('REZ_351_cp 1   : nd = ' || d.ref || ' s.acc = '|| s.acc || ' bv = '|| s.bv) ;   
          if D.vncrr is null or f_vkr_correct (D.vncrr) = 0 THEN
             p_error_351( P_dat01, d.ref, user_id, 16, null, s.acc, s.kv, null, l_vkr, s.rnk, s.nls); 
          end if;
@@ -167,7 +167,7 @@ begin
             if l_pawn = 11 THEN l_pd := 0; l_pd_0 := 1; l_fin := 1; end if;
 
             l_s080 := f_get_s080 (p_dat01,l_tip_fin, l_fin);             
-
+--logger.info('REZ_351_cp 2   : nd = ' || d.ref || ' s.acc = '|| s.acc || ' bv = '|| s.bv || ' s.tip = '|| s.tip) ;   
          if s.bv > 0 and s.tip not in ('SDI','SDA','SDM','SDF')  THEN      
             for z in (select NVL(f_zal_accs (p_dat01, d.ref, a.acc),0) zal_lgd, a.acc, a.kv, -ost_korr(a.acc,l_dat31,null,a.nbs) BV02, 
                              f_bv_sna_cp  (p_dat01, d.ref ,a.acc) osta, m.* 
@@ -237,30 +237,34 @@ begin
                                    l_RC   , L_RCQ , d.cp_id , l_s080, l_ddd   , l_tip_fin, s.ob22  , l_pd_0   , d.rz  , z.kl_351  , 
                                    d.datp );  
             end loop;
-         else
-            select    accd, accs, accr, accunrec into l_accd, l_accs, l_accr, l_accunrec from cp_deal where ref = d.ref;
-            for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV
-                      from  accounts a
-                      where acc in (l_accd, l_accs, l_accr, l_accunrec) and nls not like '8%' and 
-                            ost_korr(a.acc,l_dat31,null,a.nbs) <> 0 and a.tip  in ('SNA','SDI','SDA','SDM','SDF')                  
-                     )
-            loop
-               l_nbs  := substr(i.nls,1,4);
-               l_ddd  := f_ddd_6B(l_nbs);
-               l_BV   := i.bv / 100;             
-               l_BVQ  := p_icurval(i.kv,i.bv,l_dat31)/100; 
-               update rez_cr set tip = i.tip where fdat = p_dat01 and acc = i.acc;
+         elsif s.bv<>0 THEN
+--logger.info('REZ_351_cp 4   : nd = ' || d.ref ) ;   
+            --select    accd, accs, accr, accunrec into l_accd, l_accs, l_accr, l_accunrec from cp_deal where ref = d.ref;
+            --for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV
+            --          from  accounts a
+            --          where a.acc in (select cp_acc from cp_accounts c where c.cp_ref = d.ref and c.cp_acctype in ('P','D','UNREC','R','S','S2') )   and nls not like '8%' and 
+            --                ost_korr(a.acc,l_dat31,null,a.nbs) <> 0 and  not exists (select 1 from rez_cr r  where r.fdat=p_dat01 and r.acc = a.acc)--and a.tip  in ('SNA','SDI','SDA','SDM','SDF')                                        
+                                     
+            --         )
+            --loop
+
+--logger.info('REZ_351_cp 3   : nd = ' || d.ref || ' acc = '|| s.acc || ' bv = '|| s.bv) ;  
+               --l_nbs  := substr(i.nls,1,4);
+               l_ddd  := f_ddd_6B(s.nbs);
+               l_BV   := s.bv / 100;             
+               l_BVQ  := p_icurval(s.kv,s.bv,l_dat31)/100; 
+               update rez_cr set tip = s.tip where fdat = p_dat01 and acc = s.acc;
                IF SQL%ROWCOUNT=0 then                                                                             
                   INSERT INTO REZ_CR (fdat    , RNK   , NMK  , ND    , KV     , NLS      , ACC  , EAD    , EADQ   , FIN  , PD        , 
                                       CR      , CRQ   , bv   , bvq   , VKR    , IDF      , KOL  , FIN23  , tipa   , vidd , CUSTTYPE  , 
                                       nbs     , dv    , BV02 , s080  , ddd_6B , tip_fin  , tip  , bv02q  , sdate  , RZ   , cc_id     , 
                                       istval  , wdate , pd_0 , ob22  )                                        
-                              VALUES (p_dat01 , d.RNK , d.NMK, d.ref , i.kv   , i.nls    , i.acc, 0      , 0      , l_fin, l_pd      ,
+                              VALUES (p_dat01 , d.RNK , d.NMK, d.ref , s.kv   , s.nls    , s.acc, 0      , 0      , l_fin, l_pd      ,
                                       0       , 0     , l_bv , l_bvq , D.vncrr, l_idf    , l_kol, d.fin23, l_tipa , null , d.CUSTTYPE, 
-                                      l_nbs   , l_dv  , l_bv , l_s080, l_ddd  , l_tip_fin, i.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
-                                      l_istval, d.datp, l_pd_0, nvl(i.ob22,'01') ) ;  
+                                      s.nbs   , l_dv  , l_bv , l_s080, l_ddd  , l_tip_fin, s.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
+                                      l_istval, d.datp, l_pd_0, nvl(s.ob22,'01') ) ;  
                END IF;
-            END LOOP;
+            --END LOOP;
          end if;
       end loop;    
    End LOOP;

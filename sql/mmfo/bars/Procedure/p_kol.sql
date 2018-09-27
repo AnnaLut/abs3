@@ -30,7 +30,7 @@ begin
 
       If l_ostc >= 0 THEN l_KOL := 0;
          -- узнаем сумму всех кредитовых оборотов
-         select nvl(sum(s.kos),0) into l_KOS  from  saldoa s,accounts a where  p_acc = a.acc and a.acc=s.acc and s.FDAT <= p_dat;
+         select nvl(sum(s.kos),0) into l_KOS  from  saldoa s,accounts a where  p_acc = a.acc and a.acc=s.acc and s.FDAT < p_dat;
          begin
             select l_kos-s into l_KOS from opldok where acc = p_acc and tt ='024' and dk=1 order by fdat;
          EXCEPTION WHEN NO_DATA_FOUND THEN null;
@@ -45,7 +45,7 @@ begin
                    from (select s.fdat fdat,case when fdat=(select min(fdat) from saldoa where acc=a.acc) then greatest(-s.ostf,s.dos)
                                             else s.dos end DOS
                          from   saldoa s,accounts a
-                         where  a.acc = p_acc and a.acc=s.acc and s.FDAT <= p_DAT
+                         where  a.acc = p_acc and a.acc=s.acc and s.FDAT < p_DAT
                          union  all 
                          select fdat, -s dos from opldok where acc = p_acc and tt ='024' and dk=0 order by fdat    
                         )

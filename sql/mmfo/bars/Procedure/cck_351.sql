@@ -1,18 +1,10 @@
+CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_351.sql =========*** Run *** =
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CCK_351 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
-
-/* Версия 14.9   12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 16-11-2017  17-10-2017 
+/* Версия 15.0   10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 16-11-2017  
    Розрахунок кредитного ризику по кредитах + БПК
 
    ----------------------------------------------
+31) 10-09-2018(15.0) - ОВЕР - 2600 добавлен 
 30) 12-07-2018(14.9) - Новые счета - ('SDI','SDA','SDM','SDF','SRR') по ОВЕРАМ выборка , как по кредитам
 29) 20-04-2018(14.8) - По Крыму FIN = max, PD = 1 (COBUSUPABS-5846 (Крым), лист 18-04-2018 20:36, будет в COBUMMFO-7561)
 28) 10-04-2018(14.7) - по оверам исключить залоги - a.tip <> 'ZAL' + по БПК исключить 3570,3578 -  b.tip not in ('SK9','ODB','OFR')
@@ -115,9 +107,9 @@ begin
                                 l_real := substr(trim(cck_app.get_nd_txt(d.nd, 'REAL')),1,3);
       end if;
 
-      If trim(cck_app.get_nd_txt(d.nd, 'POCI')) = 'Так' then l_poci := 1; 
+      If trim(cck_app.get_nd_txt(d.nd, 'POCI')) = 'Так' then l_poci := 1;
       else                                                   l_poci := 0;
-      end if; 
+      end if;
 
       DECLARE
          TYPE r0Typ IS RECORD
@@ -144,8 +136,9 @@ begin
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed
                from   nd_acc n, accounts a, customer c
                where  n.nd = d.nd and n.acc = a.acc and nls not like '3%' and a.nbs not in ('2620','9611','9601')
-                 and  a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI','SDA','SDM','SDF','SRR')
-                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 and a.rnk = c.rnk order by a.tip desc;
+                 and  (a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI','SDA','SDM','SDF','SRR')
+                 and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 or a.nbs='2600' and ost_korr(a.acc,l_dat31,null,a.nbs) <0)  
+                 and a.rnk = c.rnk order by a.tip desc;
          else
             OPEN c0 FOR
                select b.tip, a.ob22, a.nls, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, a.rnk,
@@ -202,7 +195,7 @@ begin
 
             end if;
 
-            if s.nbs in ('9129','9122','9023','9003','9000') THEN 
+            if s.nbs in ('9129','9122','9023','9003','9000') THEN
                begin
                   SELECT R013 INTO l_r013 FROM specparam p  WHERE  s.acc = p.acc (+);
                EXCEPTION WHEN NO_DATA_FOUND THEN l_r013:= NULL;
@@ -274,7 +267,7 @@ begin
                   if d.tipa = 10 THEN l_tipa := 90;
                   else                l_tipa :=  9;
                   end if;
-                  if s.nbs in ('9000','9001','9122') and f_zal_ccf(p_dat01, d.nd) = 1 THEN l_CCF := 0;   -- COBUMMFO-7561 
+                  if s.nbs in ('9000','9001','9122') and f_zal_ccf(p_dat01, d.nd) = 1 THEN l_CCF := 0;   -- COBUMMFO-7561
                   else
                      if d.wdate is not null and d.sdate is not null THEN
                         l_srok := d.wdate-d.sdate;
@@ -284,7 +277,7 @@ begin
                         end if;
                      else                        srok := 3;
                      end if;
-                     l_CCF := F_GET_CCF (s.nbs, s.ob22, srok); 
+                     l_CCF := F_GET_CCF (s.nbs, s.ob22, srok);
                   end if;
                else l_tipa := d.tipa;
                end if;

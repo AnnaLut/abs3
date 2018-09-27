@@ -233,9 +233,10 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.8 02-07-2018'; 
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.9 24-09-2018'; 
 
 /*
+117) 24-09-2018(23.9) - Перестраивать архив пока не выгрузят T0
 116) 02-07-2018(23.8) - BVU по  tip  in ('SDI','SDA','SDM','SDF')     
 115) 26-02-2018(23.7) - /COBUMMFO-6811/ - В START_REZ - создание архива PRVN_FIN_DEB --> FIN_DEB_ARC 
 114) 27-11-2017(23.6) - Убрала перепривязку задогов по ЦБ
@@ -453,7 +454,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 -------------------------------------------------------------------
 procedure BV_upd (p_dat01 date) is z_dat01 date; s_dat01 varchar2(10) ;
 
-l_commit number; l_sna number;
+l_commit number; l_sna number;  l_sdf number;
 dat31_   date;
 begin
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> BV_UPD');
@@ -466,7 +467,7 @@ begin
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> BVU = BV');
    for k in (select rowid RI from nbu23_rez where fdat=p_dat01)
    LOOP
-      update nbu23_rez set bvu = bv, bvuq = bvq where rowid = k.ri;
+      update nbu23_rez set bvu = bv, bvuq = bvq, pv = null, zpr = null where rowid = k.ri;
    end LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'End --> BVU = BV');
    commit;
@@ -481,19 +482,20 @@ begin
 */
    --------------------------
    l_commit := 0;
-   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDF (POCI)');
-   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDF') and bv <>0 and nls < '4' and arjk = 1)
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDI, SDA, SDM, SDF <> (POCI)');
+   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID, tip from nbu23_rez where fdat = z_dat01 and tip in ('SDI','SDA','SDM','SDF') and bv <>0 and nls < '4' and arjk <> 1)
    loop
       for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu  from nbu23_rez
-                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4' and tip in ('SPN','SN ','SNO')
-                 and tip not in ('SDI','SDA','SDM','SDF') and arjk = 1    
-                 order by  decode (tip, 'SPN',1, 'SN ',2, 10 )
+                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4'
+                 and tip not in ('SDI','SDA','SDM','SDF','SNA','SPN','SN ','SNO') and arjk <> 1    
+                 order by  decode (tip, 'SP ',1, 'SS ',2, 10 )
                  )
       loop y.BVu := x.BV + y.BV;
-         If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0;
+      --logger.info ('SNA 5 nd =  ' || x.nd || ' x.tip = '|| x.tip || ' y.tip = '|| y.tip || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv || ' y.bvu = '|| y.bvu); 
+         If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0; l_sdf := y.bv;
          else               x.BV := 0     ;
          end if;
-
+      --logger.info ('SNA 6 nd =  ' || x.nd ||  ' x.bv = '|| x.bv ||  ' y.bvu = '|| y.bvu);
          If x.kv = gl.baseval then  update nbu23_rez set BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
          else                       update nbu23_rez set BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
          end if;
@@ -505,13 +507,13 @@ begin
       else                       update nbu23_rez set BVu = x.BV, BVuq = gl.p_icurval( x.kv, x.BV*100, dat31_)/100  where rowid = x.RI;
       end if;
    end loop;    -- x
-   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDI, SDA, SDM, SDF (POCI)');
-   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDF','SDI','SDA','SDM') and bv <>0 and nls < '4' and arjk = 1)
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDI, SDA, SDM, (POCI)');
+   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDI','SDA','SDM') and bv <>0 and nls < '4' and arjk = 1)
    loop
       for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu  from nbu23_rez
                  where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4' 
-                 and tip not in ('SDI','SDA','SDM','SDF','SPN','SN ','SNO') and arjk = 1    
-                 order by  decode (tip, 'SPN', 1, 'SN ', 2, 'SNO', 3, 'SP ', 4, 'SS ', 5, 10 )
+                 and tip not in ('SDI','SDA','SDM','SDF','SNA','SPN','SN ','SNO') and arjk = 1    
+                 order by  decode (tip, 'SP ', 1, 'SS ', 2,  10 )
                  )
       loop y.BVu := x.BV + y.BV;
          If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0;
@@ -529,54 +531,23 @@ begin
       else                       update nbu23_rez set BVu = x.BV, BVuq = gl.p_icurval( x.kv, x.BV*100, dat31_)/100  where rowid = x.RI;
       end if;
    end loop;    -- x
-   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDI, SDA, SDM, SDF <> (POCI)');
-   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDI','SDA','SDM','SDF') and bv <>0 and nls < '4' and arjk <> 1)
-   loop
-      for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu  from nbu23_rez
-                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4'
-                 and tip not in ('SDI','SDA','SDM','SDF','SPN','SN ','SNO') and arjk <> 1    
-                 order by  decode (tip, 'SP ',1, 'SS ',2, 'SPN',4, 'SNO',5, 'SN ',6, 10 )
-                 )
-      loop y.BVu := x.BV + y.BV;
-         If y.BVu < 0 then  x.BV := y.BVu ; y.BVu := 0;
-         else               x.BV := 0     ;
-         end if;
-
-         If x.kv = gl.baseval then  update nbu23_rez set BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
-         else                       update nbu23_rez set BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
-         end if;
-         l_commit :=  l_commit + 1 ;
-         If l_commit >= 500 then  commit;  l_commit:= 0 ;  end if;
-
-      end loop; -- y
-      If x.kv = gl.baseval then  update nbu23_rez set BVu = x.BV, BVuq =                     x.BV                   where rowid = x.RI;
-      else                       update nbu23_rez set BVu = x.BV, BVuq = gl.p_icurval( x.kv, x.BV*100, dat31_)/100  where rowid = x.RI;
-      end if;
-   end loop;    -- x
-   l_commit := 0;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SNA');
    for x in (select rowid RI, nd, BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip ='SNA' and bv <0 and nls < '4')
    loop
       for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu    from nbu23_rez
-                 where fdat = z_dat01 and kv = x.kv  and bv > 0 and nd= x.nd and id like x.ID||'%' and nls<'4'
-                       and tip not in ('SDI','SDA','SDM','SDF')     
-                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ),bv
+                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) > 0 and nd= x.nd and id like x.ID||'%' and nls<'4'
+                       and tip not in ('SDI','SDA','SDM','SDF','SNA')     
+                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ), bv
                  )
       loop y.BVu := x.BV + y.BV;
            --logger.info ('SNA 1 nd =  ' || x.nd|| ' BV_SNA = '|| x.BV );
            If y.BVu < 0 then  x.BV  := y.BVu ; y.BVu := 0; l_sna := y.bv;
            --logger.info ('SNA 2 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
-           else               --l_sna := 5 ;
-                              l_sna := - x.bv ; 
-                              x.BV  := 0;
+           else                          l_sna := - x.bv ; x.BV  := 0;
            --logger.info ('SNA 3 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
            end if;
-           If x.kv = gl.baseval then  
-           --logger.info ('SNA 4 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
-              update nbu23_rez set pv = l_sna, BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
-           else
-           --logger.info ('SNA 5 nd =  ' || x.nd || ' l_sna = '|| l_sna || ' x.bv = '|| x.bv || ' y.bv = '|| y.bv); 
-              update nbu23_rez set pv = l_sna, BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
+           If x.kv = gl.baseval then  update nbu23_rez set pv = l_sna, BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
+           else                       update nbu23_rez set pv = l_sna, BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
            end if;
          l_commit :=  l_commit + 1 ;
          If l_commit >= 500 then  commit;  l_commit:= 0 ;  end if;
@@ -586,6 +557,55 @@ begin
       else                       update nbu23_rez set BVu = x.BV, BVuq = gl.p_icurval( x.kv, x.BV*100, dat31_)/100  where rowid = x.RI;
       end if;
    end loop; -- x
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDF (POCI)');
+   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDF') and bv <>0 and nls < '4' and arjk = 1)
+   loop
+      for  y in (select rowid RI, nvl(BVu,BV) BV, tip, BVu  from nbu23_rez
+                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4' --and tip in ('SPN','SN ','SNO')
+                 and tip not in ('SDI','SDA','SDM','SDF','SNA') and arjk = 1    
+                 order by  decode (tip, 'SPN',1, 'SNO',2, 'SN ',3, 'SP ',5, 'SS ',6, 10 ), bv
+                 )
+      loop y.BVu := x.BV + y.BV;
+ --logger.info ('SNA 1 nd =  ' || x.nd|| ' x.BV = '|| x.BV || ' y.BV = '|| y.BV  || ' y.BVu = '|| y.BVu  );
+         If y.BVu < 0 then  x.BV  := y.BVu  ; y.BVu := 0; l_sdf := y.bv;
+         else               l_sdf := - x.bv ; x.BV  := 0;
+         end if;
+    --logger.info ('SNA 2 nd =  ' || x.nd|| ' x.BV = '|| x.BV || ' y.BV = '|| y.BV  || ' y.BVu = '|| y.BVu || ' l_sdf = '|| l_sdf );
+         If x.kv = gl.baseval then  update nbu23_rez set zpr = l_sdf, BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
+         else                       update nbu23_rez set zpr = l_sdf, BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
+         end if;
+         l_commit :=  l_commit + 1 ;
+         If l_commit >= 500 then  commit;  l_commit:= 0 ;  end if;
+
+      end loop; -- y
+      If x.kv = gl.baseval then  update nbu23_rez set BVu = x.BV, BVuq =                     x.BV                   where rowid = x.RI;
+      else                       update nbu23_rez set BVu = x.BV, BVuq = gl.p_icurval( x.kv, x.BV*100, dat31_)/100  where rowid = x.RI;
+      end if;
+   end loop;    -- x
+   z23.to_log_rez (user_id , 351 , p_dat01 ,'--> SDF (POCI)-кусок');
+   for x in (select rowid RI, nd,  BVu BV, kv, substr(id,1,3) ID from nbu23_rez where fdat = z_dat01 and tip in ('SDF') and bvu <>0 and nls < '4' and arjk = 1)
+   loop
+      for  y in (select rowid RI, acc, nvl(BVu,BV) BV, tip, BVu, 
+                        FIRST_VALUE(acc)  OVER (ORDER BY decode (tip, 'SP ',1, 'SS ',2, 'SN ', 3, 'SNO', 4, 'SPN', 5, 10 )) first, zpr from nbu23_rez
+                 where fdat = z_dat01 and kv = x.kv  and nvl(BVu,BV) >= 0 and nd= x.nd and id like x.ID||'%' and nls < '4' --and tip in ('SP ','SS ')
+                 and tip not in ('SDI','SDA','SDM','SDF','SNA') and arjk = 1    
+                 order by  decode (tip, 'SP ',1, 'SS ',2, 'SN ', 3, 'SNO', 4, 'SPN', 5, 10  ), bv
+                 )
+      loop
+ --logger.info ('SNA 20 nd =  ' || x.nd|| ' x.BV = '|| x.BV || ' y.BV = '|| y.BV  || ' y.BVu = '|| y.BVu || ' y.zpr = '|| y.zpr );
+         if y.first = y.acc THEN  l_sdf := y.zpr - x.bv; y.BVu :=x.BV + y.BV;  x.bv := 0;
+            If x.kv = gl.baseval then  update nbu23_rez set zpr = l_sdf, BVu = y.BVu, BVuq =                     y.BVu                   where rowid = y.RI;
+            else                       update nbu23_rez set zpr = l_sdf, BVu = y.BVu, BVuq = gl.p_icurval( x.kv, y.BVu*100, dat31_)/100  where rowid = y.RI;
+            end if;
+            l_commit :=  l_commit + 1 ;
+            If l_commit >= 500 then  commit;  l_commit:= 0 ;  end if;
+         end if;
+      end loop; -- y
+      If x.kv = gl.baseval then  update nbu23_rez set BVu = x.BV, BVuq =                     x.BV                   where rowid = x.RI;
+      else                       update nbu23_rez set BVu = x.BV, BVuq = gl.p_icurval( x.kv, x.BV*100, dat31_)/100  where rowid = x.RI;
+      end if;
+   end loop;    -- x
+
    z23.to_log_rez (user_id , 351 , p_dat01 ,'End --> SNA');
 
    -- Первоначально заполняется BV и BVQ
@@ -1896,7 +1916,7 @@ begin
            PVZ_N   , PVZQ_N, REZ_N  , REZQ_N  ,
            REZ23   , REZq23, REZ23_N, REZQ23_N, DELTA_351, DELTAQ_351, NMK, OB22, DELTA , DELTAQ,
            id      , dd    , ddd    )
-   select  FDAT    , RNK   , NBS    , KV      , ND       , CC_ID     , ACC, NLS , BRANCH, FIN, 0 , 0  , 0  , 0   , 0  , 0   , BV  , BVQ  ,
+   select  dat01_  , RNK   , NBS    , KV      , ND     , CC_ID     , ACC, NLS , BRANCH, FIN, 0 , 0  , 0  , 0   , 0  , 0   , BV  , BVQ  ,
            PVZ     , PVZQ  , REZ    , gl.p_icurval( kv , rez*100, dat31_)/100 ,
            0       , 0     , REZ23  , REZQ23  , -REZ23   , -gl.p_icurval( kv, REZ23*100, dat31_)/100, NMK, OB22, -rez  ,
            -gl.p_icurval( kv, rez*100, dat31_)/100,  id||' i', dd    , ddd
@@ -2069,6 +2089,12 @@ begin
 
      z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
      cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
+
+     if BARSUPL.IS_T0_OK(p_dat01) <> 1 THEN
+        delete from fin_deb_arc where mdat=p_dat01;
+        delete from xoz_ref_arc where mdat=p_dat01;
+     end if;
+
      -- архив по хоз.дебиторке
      z23.to_log_rez (user_id , 351 , p_dat01 ,' xoz_ref_arc');
      insert into xoz_ref_arc (REF1, STMT1, REF2, ACC, MDATE, S, FDAT, S0, NOTP, PRG, BU, DATZ, REFD, ID, KF, mdat)
