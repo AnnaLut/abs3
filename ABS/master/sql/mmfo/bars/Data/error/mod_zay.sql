@@ -182,6 +182,14 @@ begin
 
     bars_error.add_message(l_mod, 62, l_exc, l_rus, 'Значение тэга - DB#70 должно соотвтетсвовать коду из Справочника кодов товарных групп', '', 1, 'FK_ZAYAVKA_PRODUCT_GROUP');
     bars_error.add_message(l_mod, 62, l_exc, l_ukr, 'Значення тега - DB#70 повинно відповідати коду із Довідника кодів товарних груп', '', 1, 'FK_ZAYAVKA_PRODUCT_GROUP');
+
+    bars_error.add_message(l_mod, 63, l_exc, l_rus, 'Заявка № %s не завизирована дилером. Списание средств невозможно!');
+    bars_error.add_message(l_mod, 63, l_exc, l_ukr, 'Заявка № %s не завізована ділером. Списання коштів неможливе!');
+
+    bars_error.add_message(l_mod, 64, l_exc, l_rus, 'По заявке № %s списание средств произведено (документ REF=%s). Повторное списание средств запрещено!');
+    bars_error.add_message(l_mod, 64, l_exc, l_ukr, 'По заявці № %s списання коштів виконано (документ REF=%s). Повторне списання коштів заборонено!');
+
+
   commit;
 end;
 /
