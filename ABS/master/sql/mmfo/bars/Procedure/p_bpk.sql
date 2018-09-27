@@ -72,7 +72,7 @@ BEGIN
    FOR K IN ( SELECT r.rowid RI , r.* FROM rez_w4_bpk r )
    LOOP
       l_grp := NULL;
-      l_vkr := F_Get_Bpk_Params(k.nd,'VNCRR');
+      l_vkr := substr(F_Get_Bpk_Params(k.nd,'VNCRR'),1,3);
       l_grp := f_2401_grp(k.nbs,k.ob22);
       if l_grp is not null THEN l_s250 := 8;
       else                      l_s250 := NULL;

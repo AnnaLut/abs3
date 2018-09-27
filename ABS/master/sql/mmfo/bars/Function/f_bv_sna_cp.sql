@@ -35,12 +35,10 @@ begin
               from (select acc, nls, ba, ss, round( ss * BA/ sum(BA) over (partition by 1),2) sd
                     from ( select acc, nls, -ost_korr (acc,l_dat31,null,nbs) BA,
                                  (select  nvl(sum(ost_korr (acc,l_dat31,null,nbs)),0) from  accounts
-                                  where acc in (cp_acc_,  cp_accp_, cp_accs_, cp_accr_, cp_accr2_, l_accr3 , l_accexpr,
-                                        l_accexpn) and f_get_tip (substr(nls,1,4), tip) <> 'SPI' and nls not like '8%' and
-                                        ost_korr (acc,l_dat31,null,nbs)>0) ss
-                           from  accounts where acc in (cp_acc_ , cp_accp_, cp_accs_, cp_accr_, cp_accr2_,l_accr3 ,
-                                                l_accexpr, l_accunrec, l_accexpn) and f_get_tip (substr(nls,1,4), tip) <> 'SPI'  and
-                                                nls not like '8%' and ost_korr (acc,l_dat31,null,nbs)<0
+                                  where acc in (select cp_acc from cp_accounts c where c.cp_ref = p_nd and c.cp_acctype in ('N','EXPN','EXPR','P','R','RD','R2','R3','S','S2') )
+                                    and f_get_tip (substr(nls,1,4), tip) <> 'SPI' and nls not like '8%' and  ost_korr (acc,l_dat31,null,nbs)>0) ss
+                           from  accounts where acc in (select cp_acc from cp_accounts c where c.cp_ref = p_nd and c.cp_acctype in ('N','EXPN','EXPR','P','R','RD','R2','R3','S','S2','UNREC')) 
+                                            and f_get_tip (substr(nls,1,4), tip) <> 'SPI'  and  nls not like '8%' and ost_korr (acc,l_dat31,null,nbs)<0
                          )
                    )
              )
