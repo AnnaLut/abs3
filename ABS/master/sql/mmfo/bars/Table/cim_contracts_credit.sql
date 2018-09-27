@@ -192,6 +192,24 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table bars.CIM_CONTRACTS_CREDIT add (F057 CHAR(3))';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CIM_CONTRACTS_CREDIT.F057 IS 'Вид запозичення';
+
+PROMPT *** Create  constraint FK_CIM_CRED_F057 ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CIM_CONTRACTS_CREDIT ADD CONSTRAINT FK_CIM_CRED_F057 FOREIGN KEY (F057)
+	  REFERENCES BARS.F057 (F057) ENABLE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  CIM_CONTRACTS_CREDIT ***

@@ -13,7 +13,7 @@ is
 
 -- g_header_version    constant varchar2 (64) := 'version 1.00.01 17/07/2015';
 --   g_header_version    constant varchar2 (64) := 'version 1.00.02 16/11/2015';
-   g_header_version    constant varchar2 (64) := 'version 1.01.00 25/06/2018';
+   g_header_version    constant varchar2 (64) := 'version 1.01.01 27/09/2018';
 
    g_awk_header_defs   constant varchar2 (512) := '';
 
@@ -81,7 +81,7 @@ is
       subnum                  cim_contracts.subnum%type, 
       rnk                     cim_contracts.rnk%type, 
       okpo                    customer.okpo%type, 
-      nmk                     customer.nmk%type, 
+      nmk                     corps.nmku%type,--customer.nmk%type,
       nmkk                    customer.nmkk%type, 
       custtype                customer.custtype%type, 
       nd                      customer.nd%type,
@@ -205,7 +205,7 @@ is
 -- g_body_version      constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.04 08/08/2016';
 -- g_body_version      constant varchar2 (64) := 'version 1.00.05 20/09/2016';
-   g_body_version      constant varchar2 (64) := 'version 1.01.13 20/07/2018';
+   g_body_version      constant varchar2 (64) := 'version 1.01.14 23/08/2018';
    g_awk_body_defs     constant varchar2 (512) := '';
 
 
@@ -1827,7 +1827,7 @@ end  p_f531;
                              p2024, p2025, p2026, p2027, p2028, p2029,
                              p2030, p2031, p2032, p2033, p2034, p2035,
                              p2036, p2037, p2038, p2042,
-                             p3000)
+                             p3000, f057)
         values (cur.contr_id, l_date_to, substr(cur.nmkk,1,27) /*as p1000*/, lpad(substr(cur.okpo,1,10),10,'0') /*as z*/, cur.borrower_id /*as p0100*/,
                substr(cur.benef_name,1,54) /*as p1300*/, lpad(cur.country_id,3,'0') /*as p0300*/, decode(cur.creditor_type,11,1,cur.creditor_type) /*as p1400*/,
                decode(cur.credit_term, 3 , 1, cur.credit_term) /*as p1900*/, lpad(cur.kv,3,'0') /*as pval*/, cur.credit_type /*as p1500*/,
@@ -1847,7 +1847,7 @@ end  p_f531;
                l_indicators_f503.p2024, l_indicators_f503.p2025, l_indicators_f503.p2026, l_indicators_f503.p2027, l_indicators_f503.p2028, l_indicators_f503.p2029,
                l_indicators_f503.p2030, l_indicators_f503.p2031, l_indicators_f503.p2032, l_indicators_f503.p2033, l_indicators_f503.p2034, l_indicators_f503.p2035,
                l_indicators_f503.p2036, l_indicators_f503.p2037, l_indicators_f503.p2038, l_indicators_f503.p2042,
-               cur.f503_state /*as p3000*/);
+               cur.f503_state /*as p3000*/, cur.f057);
 
       end loop;
       pul.set_mas_ini('cim_work_prepare_f503_change','NO',null);
@@ -1904,7 +1904,8 @@ end  p_f531;
                              P999,
                              p010,
                              p040,
-                             p070, p950, p030
+                             p070, p950, p030,
+                             f057 --показник в файл поки не вигружається, потрібен для іншого звіту
                               )
               values (c.contr_id, l_date_to, substr(c.nmkk,1,27) /*as p101*/, lpad(substr(c.okpo,1,10),10,'0'), lpad(substr(c.r_agree_no,1,5),5,'0') /*r_agree_no*/,
                c.r_agree_date /*as p103*/, lpad(c.kv,3,'0') /*as pval*/, '0' /*as t*/, case when c.credit_type=0 then 1 when c.creditor_type=11 then 3 else 2 end /*as m*/,
@@ -1920,7 +1921,8 @@ end  p_f531;
                c.f504_note /*as p999*/,
                c.borrower_id /*as p010*/,
                decode(c.f503_percent_type, 1, 3, c.f503_percent_type) /*as p040*/,
-               c.f503_percent_margin /*as p070*/, c.f503_percent /*as p950*/, lpad(c.country_id,3,'0') /*as p030*/)
+               c.f503_percent_margin /*as p070*/, c.f503_percent /*as p950*/, lpad(c.country_id,3,'0') /*as p030*/,
+               c.f057)
                returning f504_id into l_f504_id;
 
         --розрахунок незаповнених показників
@@ -2261,7 +2263,8 @@ end  p_f531;
                          c.f503_percent_base as p0800_1_vk,                                                  f.p0800_1 as p0800_1_r,
                          c.f503_percent_base_t as p0800_2_vk,                                                f.p0800_2 as p0800_2_r,
                          c.f503_percent_base_val as p0800_3_vk,                                              f.p0800_3 as p0800_3_r,
-                         c.s as p0900_vk,                                                                    f.p0900 as p0900_r
+                         c.s as p0900_vk,                                                                    f.p0900 as p0900_r,
+                         c.f057         as pf057_vk,                                                         f.f057 as pf057_r --показник в файл поки не вигружається, потрібен для іншого звіту
                   from v_cim_credit_contracts c, cim_f503 f where c.contr_id = f.contr_id
                     and f.kf = sys_context('bars_context','user_mfo'))
       loop
@@ -2293,7 +2296,8 @@ end  p_f531;
             p0800_1  = cur.p0800_1_vk,
             p0800_2  = cur.p0800_2_vk,
             p0800_3  = cur.p0800_3_vk,
-            p0900    = cur.p0900_vk
+            p0900    = cur.p0900_vk,
+            f057     = cur.pf057_vk
         where f503_id = cur.f503_id;
 
         if nvl(cur.m_r,-1)        != nvl(cur.m_vk,-1)  then
@@ -2380,7 +2384,9 @@ end  p_f531;
         if nvl(cur.p0900_r,'-1')    != nvl(cur.p0900_vk,'-1')  then
           add_auto_change_hist(cur.f503_id, '0900', 'загальна сума кредиту', cur.p0900_r, cur.p0900_vk);
         end if;
-
+        if nvl(cur.pf057_r,'-1')    != nvl(cur.pf057_vk,'-1') then
+          add_auto_change_hist(cur.f503_id, '010', 'вид запозичення', cur.pf057_r, cur.pf057_vk);
+        end if;
       end loop;
 
   end;
@@ -2428,7 +2434,8 @@ end  p_f531;
                          c.s as p090_vk,                                                                     f.p090 as p090_r,
                          c.borrower_id as p010_vk,                                                           f.p010 as p010_r,
                          c.f503_percent_margin as p070_vk,                                                   f.p070 as p070_r,
-                         c.f503_percent as p950_vk,                                                          f.p950 as p950_r
+                         c.f503_percent as p950_vk,                                                          f.p950 as p950_r,
+                         c.f057         as pf057_vk,                                                         f.f057 as pf057_r --показник в файл поки не вигружається, потрібен для іншого звіту
                   from v_cim_credit_contracts c, cim_f504 f where c.contr_id = f.contr_id
                    and f.kf = sys_context('bars_context','user_mfo'))
       loop
@@ -2452,7 +2459,8 @@ end  p_f531;
             p090 = cur.p090_vk,
             p010 = cur.p010_vk,
             p070 = cur.p070_vk,
-            p950 = cur.p950_vk
+            p950 = cur.p950_vk,
+            f057 = cur.pf057_vk
         where f504_id = cur.f504_id;
 
         if nvl(cur.m_r,-1)        != nvl(cur.m_vk,-1)  then
@@ -2516,7 +2524,9 @@ end  p_f531;
         if nvl(cur.p950_r,-1)     != nvl(cur.p950_vk,-1) then
           add_auto_change_hist(cur.f504_id, '950', 'величина процентної ставки', cur.p950_r, cur.p950_vk);
         end if;
-
+        if nvl(cur.pf057_r,'-1')    != nvl(cur.pf057_vk,'-1') then
+          add_auto_change_hist(cur.f504_id, '010', 'вид запозичення', cur.pf057_r, cur.pf057_vk);
+        end if;
       end loop;
 
   end;
