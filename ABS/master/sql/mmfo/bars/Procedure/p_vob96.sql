@@ -34,7 +34,7 @@ for k in (  select distinct
                   and pa.fdat>=dat1_ and pa.fdat<=dat2_
                   and pa.stmt=pb.stmt and pa.fdat=pb.fdat
                   and pa.dk=0 and pb.dk=1
-                  and o.userid in (select distinct decode(isp_,0,id,isp_) from staff where branch like (select sys_context('bars_context', 'user_branch')||'%' from dual)))
+                  and (isp_ = 0 and o.branch like sys_context('bars_context', 'user_branch_mask')) or o.userid = isp_)
 loop
      insert into tmp_vob96 (ID,REF,VDAT,FDAT,ND,NLSA,KVA,NAMA,NLSB,KVB,NAMB,
                             SUMM,SQ,NAZN,ISP,JEAR,TT,CC,D6,K6,D7,K7)
