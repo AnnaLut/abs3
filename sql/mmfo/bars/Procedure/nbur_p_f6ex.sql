@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6EX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  19/09/2018 (17/08/2018)
+% VERSION     :  v.1.001  26/09/2018 (19/09/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.002  19/09/2018';
+  ver_          char(30)  := 'v.1.003  26/09/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -107,7 +107,7 @@ BEGIN
                    , t.cust_type /*cust_type*/
                    , t.cust_rating /*cust_rating*/
                    , case
-                      when t.S080 not in ('J', 'Q')
+                      when t.S080 not in ('J', 'Q', 'L')
                            and (coalesce(t.kol, 0) = 0)
                            and (t.kol26 is null or t.kol26 = '000000000')
                            and (t.restruct_date is null or t.restruct_date < (p_report_date - 180))
@@ -150,7 +150,7 @@ BEGIN
                               , case
                                   when t.MATURITY_DATE is null
                                        or t.MATURITY_DATE <= p_report_date + 30 
-                                       or t.s240 in ('0', '1', '2', 'I')
+                                       -- or t.s240 in ('0', '1', '2', 'I')
                                   then '1'
                                 else
                                   '0'
@@ -175,8 +175,8 @@ BEGIN
                                 end as cust_type
                               , case
                                 -- неінвестиційний клас
-                                 when b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
-                                      or substr(b.rating, 1, 1) in ('A', 'T', 'F')
+                                 when not (b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
+                                           or substr(b.rating, 1, 1) in ('A', 'T', 'F'))
                                 then
                                   'R1'
                                 else
@@ -306,7 +306,7 @@ BEGIN
                                , p_kod_filii /*nbuc*/
                                , n.ekp /*ekp*/
                                , n.rule_id /*rule_id*/
-                               , lpad(to_char(t.KV), 3, '0') /*r030*/
+                               , (case when nvl(e.R030_980, '0') = '1' then c_base_currency_id else lpad(to_char(t.KV), 3, '0') end)/*r030*/
                                , t.amount * nvl(n.factor, 1) /*t100*/
                                , case
                                    when t.kv = 980 then coalesce(n.lcy_pct, e.lcy_pct)
