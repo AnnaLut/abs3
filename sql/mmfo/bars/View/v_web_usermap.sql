@@ -8,7 +8,14 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_WEB_USERMAP ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_WEB_USERMAP ("WEBUSER", "DBUSER", "ERRMODE", "WEBPASS", "ADMINPASS", "COMM", "CHGDATE", "BLOCKED", "ATTEMPTS", "USER_ID", "SHARED_USER", "LOG_LEVEL", "CHANGE_DATE", "BANK_DATE") AS 
-  SELECT m.webuser,
+with conf_val as(
+  select max(case when t.attribute_code = 'MARKDATE' then to_number(t.attribute_value) end) conf_number
+        ,max(case when t.attribute_code = 'BANKDATE' then to_date(t.attribute_value, 'mm/dd/yyyy') end) conf_date
+    from   branch_attribute_value t
+    where  t.attribute_code in ('MARKDATE', 'BANKDATE') and
+           t.branch_code = '/'
+)
+SELECT m.webuser,
           m.dbuser,
           m.errmode,
           m.webpass,
@@ -22,26 +29,14 @@ PROMPT *** Create  view V_WEB_USERMAP ***
           ts.scheme_user shared_user,
           NVL (ua.log_level, 'INFO') log_level,
           CASE
-             WHEN c.mark >= TO_NUMBER (branch_attribute_utl.get_attribute_value (
-                                          '/',
-                                          'MARKDATE',
-                                          0,
-                                          0,
-                                          0,                 /*default value*/
-                                          50))
+             WHEN c.mark >= v.conf_number 
              THEN
                 'Y'
              ELSE
                 'N'
           END
-             change_date,
-          TO_DATE (branch_attribute_utl.get_attribute_value ('/',
-                                                             'BANKDATE',
-                                                             0,
-                                                             0,
-                                                             0),
-                   'mm/dd/yyyy')
-             bank_date
+             change_date, 
+          v.conf_date bank_date
      FROM (
          select webuser,dbuser, errmode,webpass, adminpass, comm, chgdate, blocked, attempts from web_usermap
           union
@@ -51,7 +46,8 @@ PROMPT *** Create  view V_WEB_USERMAP ***
           staff_templates t,
           staff_templ_schemes ts,
           sec_useraudit ua,
-          staff_class c
+          staff_class c,
+          conf_val v
     WHERE     m.dbuser = s.logname
           AND s.templ_id = t.templ_id
           AND t.scheme_id = ts.scheme_id
