@@ -21,16 +21,17 @@ begin
   execute immediate '
   CREATE TABLE BARS.NBUR_DCT_F6EX_EKP 
    (	EKP            VARCHAR2(6 CHAR)   constraint CC_NBURDCT6EXEKP_EKP_NN NOT NULL, 
-	EKP_NAME       VARCHAR2(255 CHAR) constraint CC_NBURDCT6EXEKP_EKPNAME_NN NOT NULL,
+	    EKP_NAME       VARCHAR2(255 CHAR) constraint CC_NBURDCT6EXEKP_EKPNAME_NN NOT NULL,
         GRP_R030       VARCHAR2(1 CHAR) constraint CC_NBURDCT6EXEKP_GRPR030_NN NOT NULL,
         AGGR_EKP       VARCHAR2(6 CHAR),
         CONSTANT_VALUE NUMBER(38),
         FORMULA	       VARCHAR(255 CHAR),
-	LCY_PCT        NUMBER(12, 2), 
-	FCY_PCT        NUMBER(12, 2)
+	    LCY_PCT        NUMBER(12, 2), 
+	    FCY_PCT        NUMBER(12, 2),
+        R030_980       VARCHAR2(1 CHAR)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
+  NOCOMPRESS LOGGING
   TABLESPACE BRSMDLD ';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
@@ -48,6 +49,14 @@ exception
         if sqlcode = -1430 then null; else raise; end if;
 end;
 /
+prompt add column R030_980
+begin
+    execute immediate 'alter table NBUR_DCT_F6EX_EKP add R030_980 VARCHAR2(1 CHAR)';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 
 COMMENT ON TABLE BARS.NBUR_DCT_F6EX_EKP IS 'Показники для формування файлу 6EX';
@@ -59,6 +68,7 @@ COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_EKP.CONSTANT_VALUE IS 'Значення показника (
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_EKP.FORMULA IS 'Формула для розрахунку показника';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_EKP.LCY_PCT IS 'Коефіцієнт показника у національній валюті';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_EKP.FCY_PCT IS 'Коефіцієнт показника у іноземній валюті';
+COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_EKP.R030_980 IS 'Ознака того, що показник формувати з кодом 980 по всіх валютах';
 
 
 PROMPT *** Create  constraint PK_NBUR_DCT_F6EX_EKP ***

@@ -1,227 +1,1301 @@
-begin
-  delete from NBUR_DCT_F6EX_EKP;
+п»їSET DEFINE OFF;
 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E001','Загальний обсяг високоякісних ліквідних активів (ВЛА)', 1, 'A6E006', null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E002','Сукупні очікувані відтоки грошових коштів', 1, 'A6E007', null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E003','Сукупні очікувані надходження грошових коштів', 1, 'A6E008', null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, FORMULA, LCY_PCT, FCY_PCT) values ('A6E004','Чистий очікуваний відтік грошових коштів', 1, 'A6E002 - LEAST(A6E003, 0.75 * A6E002)', null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, FORMULA, LCY_PCT, FCY_PCT) values ('A6E005','Коефіцієнт покриття ліквідністю', 1, 'AE6001/AE6004', null, null); exception when dup_val_on_index then null; end; 
+delete from NBUR_DCT_F6EX_EKP;
 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, LCY_PCT, FCY_PCT) values ('A6E006','Загальний обсяг високоякісних ліквідних активів (ВЛА) ', 0, null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, LCY_PCT, FCY_PCT) values ('A6E007','Сукупні очікувані відтоки грошових коштів', 0, null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, LCY_PCT, FCY_PCT) values ('A6E008','Сукупні очікувані надходження грошових коштів', 0, null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, FORMULA, LCY_PCT, FCY_PCT) values ('A6E009','Чистий очікуваний відтік грошових коштів', 0, 'A6E007 - LEAST(A6E008, 0.75 * A6E007)', null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, FORMULA, LCY_PCT, FCY_PCT) values ('A6E010','Коефіцієнт покриття ліквідністю (LCR)', 0, 'AE6006/AE6009', null, null); exception when dup_val_on_index then null; end; 
-
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E011','Сума за облігаціями внутрішньої державної позики (ОВДП) зі строком погашення більше 30 днів', 1, 'A6E001', 100,100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E012','Сума за облігаціями внутрішньої державної позики (ОВДП) зі строком погашення до 30 днів', 1, 'A6E001', 100,100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E013','Сума за облігаціями зовнішньої державної позики (ОЗДП) зі строком погашення до 30 днів', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E014','Сума за облігаціями зовнішньої державної позики (ОЗДП) зі строком погашення більше 30 днів ', 1, 'A6E001', 85,85); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, CONSTANT_VALUE, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E015','Сума за борговими цінними паперами міжнародних фінансових організацій/державних органів країн G-7 з рейтингами провідних світових рейтингових агенств не нижче "АА-"/"Аа3"', 0, 1, 'A6E001', 100,100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E016','Кошти на кореспондентських рахунках в банках з рейтингом не нижче інвестиційного класу', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, CONSTANT_VALUE, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E017','Сума незнижувального залишку на рахунках ностро в банках з рейтингом не нижче інвестиційного класу', 0, 1, 'A6E001', -100,-100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E001','Банкноти та монети', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E002','Резерви за готівковими коштами, наявність яких є непідтвердженою ', 1, 'A6E001', -100, -100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E003','Кошти на кореспондентському рахунку в Національному банку України', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
---  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, CONSTANT_VALUE, GRP_R030, AGGR_EKP,LCY_PCT, FCY_PCT) values ('B6E004','Сума обов''язкових резервів, що має зберігатись на кореспондентському рахунку банку в Національному банку України', 0, 1, 'A6E001', -100,-100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E024','Сума за борговими цінними паперами, емітованими міжнародними банками розвитку', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E025','Сума за депозитними сертифікатами Національного банку України', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E026','Сума за депозитами в Національному банку України до 1 дня ', 1, 'A6E001', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP,LCY_PCT, FCY_PCT) values ('A6E018','Сума строкових вкладів фізичних осіб, які згідно з умовами договорів, не можуть бути повернені протягом 30 днів', 1, 'A6E002', 0, 0); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP,LCY_PCT, FCY_PCT) values ('A6E019','Сума строкових вкладів фізичних осіб, на які було накладено обмеження на розпорядження протягом 30 днів', 1, 'A6E002', 0, 0); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, CONSTANT_VALUE, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E020','Сума строкових вкладів фізичних осіб, за якими отримано повідомленням про їх повернення', 0, 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E021','Сума інших строкових вкладів фізичних осіб, які згідно з умовами договорів, можуть бути повернені протягом 30 днів', 1, 'A6E002', 10, 10); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E022','Сума строкових вкладів суб''єктів господарської діяльності (СГД), які згідно з умовами договорів, не можуть бути повернені протягом 30 днів', 1, 'A6E002', 0, 0); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E023','Сума строкових вкладів суб''єктів господарської діяльності (СГД) на які було накладено обмеження на розпорядження протягом 30 днів', 1, 'A6E002', 0, 0); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, CONSTANT_VALUE, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E024','Сума строкових вкладів суб''єктів господарської діяльності (СГД) за якими отримано повідомленням про їх повернення ', 0, 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E025','Сума очікуваних контрактних відтоків протягом 30 днів за строковими вкладами суб''єктів господарської діяльності (СГД)', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E026','Сума за лоро рахунками, які не включені до розрахунку високоякісних ліквідних активів (ВЛА)', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E027','Сума очікуваних контрактних відтоків протягом 30 днів за строковими депозитами інших банків та за строковими кредитами, що отримані від інших банків', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E028','Сума очікуваних контрактних відтоків протягом 30 днів за строковими коштами бюджетних установ', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E029','Сума очікуваних контрактних відтоків протягом 30 днів за строковими коштами небанківських фінансових установ', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, CONSTANT_VALUE, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E030','Вклади небанківських фінансових установ за якими було отримано повідомленням про їх повернення', 0, 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E031','Сума очікуваних контрактних відтоків протягом 30 днів за строковими кошти Національного банку України ', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E032','Сума очікуваних контрактних відтоків протягом 30 днів за кредитами від міжнародних банків розвитку', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E033','Сума очікуваних контрактних відтоків протягом 30 днів кредитами від інших організацій ', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E034','Сума очікуваних контрактних відтоків протягом 30 днів за строковими ощадними (депозитними) сертифікатами зі строком до 30 днів', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E035','Сума очікуваних контрактних відтоків протягом 30 днів за іншими цінними паперами власного боргу', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E036','Сума очікуваних контрактних відтоків протягом 30 днів за субординованим боргом ', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E037','Сума за безвідкличними зобов''язаннями з кредитування, що надані  фізичним особам', 1, 'A6E002', 5, 5); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E038','Сума за безвідкличними зобов''язаннями з кредитування, що надані суб''єктам господарської діяльності, органам державної влади, органам місцевого самоврядування та міжнародним фінансовим організаціям ', 1, 'A6E002', 10, 10); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E039','Сума за безвідкличними зобов''язаннями з кредитування, що надані іншим фінансовим установам', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E040','Сума очікуваних контрактних відтоків протягом 30 днів за операціями, пов''язаними з торговим фінансуванням (акредитиви, гарантії)', 1, 'A6E002', 30, 30); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E041','Сума очікуваних контрактних відтоків протягом 30 днів за іншими балансовими та позабалансовими зобов''язаннями', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E042','Сума очікуваних контрактних відтоків протягом 30 днів за операціями з деривативами', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E043','Сума очікуваних контрактних відтоків протягом 30 днів за кредиторською заборгованістю з придбання та продажу іноземної валюти за рахунок банку', 1, 'A6E007', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E044','Сума очікуваних контрактних відтоків протягом 30 днів за кредиторською заборгованістю', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E045','Сума очікуваних контрактних відтоків протягом 30 днів за кредитами, що отримані від Національного банку України', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E046','Сума очікуваних контрактних відтоків протягом 30 днів за коштами, що отримані за операціями репо та забезпечені вискоякісними ліквідними активами (ВЛА)', 1, 'A6E002', 0, 0); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E047','Сума очікуваних контрактних відтоків протягом 30 днів за коштами, що отримані за операціями репо та забезпечені не вискоякісними ліквідними активами (ВЛА)', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E048','Сума простроченої заборгованості за відтоками', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E066','Кошти банків у розрахунках', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E005','Кошти фізичних осіб на вимогу', 1, 'A6E002', 20, 20); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E006','Нараховані витрати за вкладами фізичних осіб', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E007','Кошти суб''єктів господарської діяльності на вимогу', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E008','Кошти в розрахунках інших банків', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E009','Нараховані витрати за коштами банків', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E010','Поточні рахунки бюджетних  установ', 1, 'A6E002', 100, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E011','Нараховані витрати за рахунками бюджетних  установ ', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E012','Кошти виборчих фондів та фонду референдуму', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E013','Кошти на вимогу небанківських фінансових установ', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E014','Нараховані витрати за коштами небанківських фінансових установ', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E015','Кошти Національного банку України на вимогу ', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E016','Нараховані витрати за коштами Національного банку України', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E017','Нараховані витрати за кредитами від міжнародних банків розвитку та інших фінанансових організацій', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E018','Нараховані витрати за цінними паперами власного боргу', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E019','Нараховані витрати за субординованим боргом', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E020','Безвідкличні зобов''язання з кредитування, що надані банкам', 1, 'A6E002', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E021','Відтоки за транзитними та кліринговими рахунками', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E023','Сума за нарахованими витратами за вкладами суб''єктів господарської діяльності (СГД)', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E027','Сума нарахованих витрат за кредитами Національного банку та коштами отриманими за операціями репо', 1, 'A6E002', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E049','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами фізичних осіб на поточні потреби', 1, 'A6E003', 50, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E050','Сума очікуваних контрактних надходжень протягом 30 днів за іпотечними кредитами фізичних осіб', 1, 'A6E003', 50, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E051','Сума очікуваних контрактних надходжень протягом 30 днів за фінансовим лізингом (оренда) фізичних осіб', 1, 'A6E003', 50, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E052','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами фізичних осіб, що надані за врахованими векселями', 1, 'A6E003', 50, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E053','Сума очікуваних контрактних надходжень протягом 30 днів за нарахованими доходами за кредитами фізичних осіб', 1, 'A6E003', 50, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E054','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами суб''єктам господарської діяльності в поточну діяльність', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E055','Сума очікуваних контрактних надходжень протягом 30 днів за іпотечними кредитами суб''єктам господарської діяльності', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E056','Сума очікуваних контрактних надходжень протягом 30 днів за фінансовим лізингом (оренда) суб''єктам господарської діяльності', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E057','Сума очікуваних контрактних надходжень протягом 30 днів за факторинговими операціями із суб''єктами господарської діяльності', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E058','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами суб''єктам господарської діяльності, що надані за врахованими векселями', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E059','Сума очікуваних контрактних надходжень протягом 30 днів за нарахованими доходами за кредитами суб''єктам господарської діяльності', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E060','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами органам державної влади та місцевого самоврядування', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E061','Сума очікуваних контрактних надходжень протягом 30 днів за іпотечними кредитами органам державної влади та місцевого самоврядування', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E062','Сума очікуваних контрактних надходжень протягом 30 днів за нарахованими доходами за кредитами органам державної влади та місцевого самоврядування', 1, 'A6E003', 50, 50); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E063','Сума за депозитами в Національному банку України, які не включені до високоякісних ліквідних активів (ВЛА), та нараховані доходи за ними', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E064','Сума за ностро рахунками, яка не включена до високоякісних ліквідних активів (ВЛА)', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, LCY_PCT, FCY_PCT) values ('A6E065','Сума незнижувального залишку на рахунках ностро, яка не включена до високоякісних ліквідних активів (ВЛА)', 1, 'A6E003', 0, -100, -100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E067','Сума очікуваних контрактних надходжень протягом 30 днів за вкладами (депозитами) в інших банках', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E068','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами та фінансовим лізингом наданим іншим банкам', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E069','Сума очікуваних контрактних надходжень протягом 30 днів за кредитами та депозитами, що надані (розміщені) на умовах субординованого боргу ', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E070','Сума невикористаної частини безвідкличних кредитних ліній для підтримання ліквідності, відкритих материнським банком', 1, 'A6E003', 40, 40); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E071','Сума очікуваних контрактних надходжень протягом 30 днів за нарахованими доходами за коштами в інших банках', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E072','Сума очікуваних контрактних надходжень протягом 30 днів за борговими цінними паперами, які не включені до високоякісних ліквідних активів (ВЛА), та нарахованими доходами за ними', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E073','Сума очікуваних контрактних надходжень протягом 30 днів за операціями зворотнього репо без переходу права власності/розпорядження та нарахованими доходами за ними ', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E074','Сума очікуваних контрактних надходжень протягом 30 днів за операціями зворотнього репо з переходом права власності/розпорядження, забезпеченими не високоякісними ліквідними активами, та нарахованими доходами за ними ', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E075','Сума очікуваних контрактних надходжень протягом 30 днів за операціями зворотнього репо з переходом права власності/розпорядження, забезпеченими високоякісними ліквідними активами, та нарахованими доходами за ними', 1, 'A6E003', null, null); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E076','Сума очікуваних контрактних надходжень протягом 30 днів за операціями з деривативами', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E077','Сума очікуваних контрактних надходжень протягом 30 днів за дебіторською заборгованістю з придбання та продажу іноземної валюти за рахунок банку', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E078','Сума очікуваних контрактних надходжень протягом 30 днів за дебіторською заборгованістю за операціями з банками та клієнтами', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('B6E022','Надходження за транзитними і кліринговими рахунками', 1, 'A6E003', 100, 100); exception when dup_val_on_index then null; end; 
-
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E080','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за кредитами фізичних осіб на поточні потреби ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E081','Фактична сума роловеру за повністю працюючими кредитами фізичних осіб на поточні потреби, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E082','Фактична сума лонгацій за повністю працюючими  кредитами фізичних осіб на поточні потреби, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E083','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за кредитами фізичних осіб на поточні потреби ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E084','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за іпотечними кредитами фізичних осіб ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E085','Фактична сума роловеру за повністю працюючими іпотечними кредитами фізичних осіб, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E086','Фактична сума лонгацій за повністю працюючими іпотечними кредитами фізичних осіб, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E087','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за іпотечними кредитами фізичних осіб ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E088','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за фінансовим лізингом (оренда) фізичних осіб ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E089','Фактична сума роловеру за повністю працюючим фінансовим лізингом (оренда) фізичних осіб, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E090','Фактична сума лонгацій за повністю працюючим фінансовим лізингом (оренда) фізичних осіб, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E091','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за фінансовим лізингом (оренда) фізичних осіб ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E092','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за кредитами фізичних осіб, що надані за врахованими векселями', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E093','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за нарахованими доходами за кредитами фізичних осіб', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E094','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за кредитами суб''єктам господарської діяльності в поточну діяльність', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E095','Фактична сума роловеру за повністю працюючими кредитами суб''єктам господарської діяльності в поточну діяльність, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E096','Фактична сума лонгацій за повністю працюючими кредитами суб''єктам господарської діяльності в поточну діяльність, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E097','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за кредитами суб''єктам господарської діяльності в поточну діяльність', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E098','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за іпотечними кредитами суб''єктам господарської діяльності ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E099','Фактична сума роловеру за повністю працюючими  іпотечними кредитами  суб''єктам господарської діяльності, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E100','Фактична сума лонгацій за повністю працюючими  іпотечними кредитами суб''єктам господарської діяльності, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E101','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за іпотечними кредитами суб''єктам господарської діяльності ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E102','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за фінансовим лізингом (оренда) суб''єктам господарської діяльності ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E103','Фактична сума роловеру за повністю працюючим фінансовим лізингом (оренда) суб''єктам господарської діяльності, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E104','Фактична сума лонгацій за повністю працюючим фінансовим лізингом (оренда) суб''єктам господарської діяльності, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E105','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за фінансовим лізингом(оренда) суб''єктам господарської діяльності ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E106','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за кредитами суб''єктам господарської діяльності, що надані за врахованими векселями', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E107','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за нарахованими доходами за кредитами суб''єктам господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E108','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за факторинговими операціями із суб''єктам господарської діяльності ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E109','Фактична сума роловеру грошових надходжень за факторинговими операціями із суб''єктам господарської діяльності, що очікувалися протягом 30 днів ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E110','Фактична сума лонгацій грошових надходжень за факторинговими операціями із суб''єктам господарської діяльності, що очікувалися протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E111','Сума фактичних понад контрактних надходжень грошових коштів протягом 30 днів за факторинговими операціями  із суб''єктам господарської діяльності ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E112','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за нарахованими доходами за кредитами органів державної влади та самоврядування', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E113','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за кредитами органів державної влади та органів місцевого самоврядування', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E114','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за іпотечними кредитами органів державної влади та органів місцевого самоврядування', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E115','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за кредитами та фінансовими лізингом, наданим іншим банкам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E116','Сума фактичних контрактних надходжень грошових коштів протягом 30 дні за кредитами та депозитами, що надані (розміщені) на умовах субординованого боргу ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E117','Сума фактичних контрактних надходжень грошових коштів протягом 30 днів за нарахованими доходами з інших банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E118','Сума фактичних контрактних надходжень, що очікувалися, протягом 30 днів за борговими цінними паперами, які не включені до високоякісних ліквідних активів (ВЛА), та нарахованими доходами за ними', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E119','Сума фактичних контрактних надходжень, що очікувалися протягом 30 днів за операціями з деривативами', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E120','Сума фактичних контрактних надходжень, що очікувалися протягом 30 днів, за дебіторською заборгованістю з придбання та продажу іноземної валюти за рахунок банку', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E121','Сума фактичних контрактних надходжень, що очікувалися протягом 30 днів, за дебіторською заборгованістю за операціями з банками та клієнтами', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E122','Сума фактичних контрактних надходжень, що очікувалися протягом 30 днів, за операціями зворотнього репо без переходу права власності/розпорядження та нарахованими доходами за ними ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E123','Сума фактичних контрактних надходжень, що очікувалися протягом 30 днів, за операціями зворотнього репо з переходом права власності/розпорядження, забезпеченими не високоякісними ліквідними активами, та нарахованими доходами за ними ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E124','Сума фактичних контрактних надходжень, що очікувалися протягом 30 днів, за операціями зворотнього репо з переходом права власності/розпорядження, забезпеченими високоякісними ліквідними активами, та нарахованими доходами за ними ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E125','Сума фактичних відтоків за кредитами овердрафт фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E126','Сума безвідкличних зобов''язань банку за кредитами овердрафт фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E127','Сума відкличних зобов''язань банку за кредитами овердрафт фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E128','Сума фактичних відтоків за кредитами овердрафт суб''єктам господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E129','Сума безвідкличних зобов''язань банку за кредитами овердрафт суб''єктам господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E130','Сума відкличних зобов''язань банку за кредитами овердрафт суб''єктам господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E131','Сума фактичних відтоків за кредитами овердрафт банкам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E132','Сума безвідкличних  зобов''язань банку за кредитами овердрафт банкам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E133','Сума відкличних  зобов''язань банку за кредитами овердрафт банкам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E134','Сума фактичних відтоків за кредитними лініями фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E135','Сума безвідкличних зобов''язань банку за кредитними лініями фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E136','Сума відкличних зобов''язань банку за кредитними лініями фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E137','Сума фактичних відтоків за кредитними лініями суб''єктам господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E138','Сума безвідкличних зобов''язань банку за кредитними лініями суб''єктам господарської діяльност', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E139','Сума відкличних зобов''язань банку за кредитними лініями суб''єктам господарської діяльност', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E140','Сума фактичних відтоків за кредитними лініями банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E141','Сума відкличних зобов''язань банку за кредитними лініями банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E142','Сума безвідкличних зобов''язань банку за кредитними лініями банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E143','Сума фактичних відтоків за рахунками-ескроу фізичних осіб', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E144','Сума залишку за рахунками-ескроу фізичних осіб', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E145','Сума фактичних відтоків за рахунками-ескроу суб''єктів господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E146','Сума залишку за рахунками-ескроу суб''єктів господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E147','Сума фактичних відтоків за рахунками - ескроу банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E148','Сума залишку за рахунками-ескроу банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E149','Сума фактичних надходжень за кредитами овердрафт фізичним особам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E150','Сума фактичних надходжень за кредитами овердрафт суб''єктам господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E151','Сума фактичних надходжень за кредитами овердрафт банкам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E152','Сума фактичних грошових відтоків протягом 30 днів за строковими вкладами фізичних осіб, які були повернуті згідно з отриманим повідомленням про їх повернення', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E153','Сума фактичних грошових відтоків протягом 30 днів за строковими вкладами фізичних осіб', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E154','Сума пролонгованих та повторно заключених договорів/контрактів за  строковими вкладами фізичних осіб, які згідно з умовами договорів мали бути  повернені протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E155','Сума за новими договорами/контрактами за строковими вкладами фізичних осіб', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E156','Сума фактичних грошових відтоків протягом 30 днів за за строковими вкладами суб''єктів господарської діяльності, які були повернуті згідно з отриманим повідомленням про їх повернення', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E157','Сума фактичних грошових відтоків протягом 30 днів за строковими вкладами суб''єктів господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E158','Сума пролонгованих та повторно заключених договорів/контрактів за  строковими вкладами суб''єктів господарської діяльності, які згідно з умовами договорів, мали бути  повернені протягом 30 днів', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E159','Сума за новими договорами/контрактами за строковими вкладами суб''єктів господарської діяльності', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E160','Сума фактичних грошових відтоків протягом 30 днів за строковими депозитами інших банків та за строковими кредитами, що отримані від інших банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E161','Сума фактичних грошових відтоків протягом 30 днів за вкладами бюджетних установ, які були повернуті згідно з отриманим повідомленням про їх повернення', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E162','Сума фактичних грошових відтоків протягом 30 днів за строковими коштами бюджетних установ ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E163','Сума фактичних грошових відтоків протягом 30 днів за строковими коштами небанківських фінансових установ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E164','Сума фактичних грошових відтоків протягом 30 днів за вкладами небанківських фінансових установ, які були повернені відповідно до отриманого повідомлення про їх повернення ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E165','Сума фактичних грошових відтоків протягом 30 днів за кредитами від міжнародних банків розвитку ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E166','Сума фактичних грошових відтоків протягом 30 днів за кредитами від інших організацій', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E167','Сума фактичних грошових відтоків протягом 30 днів за строковими ощадними (депозитними) сертифікатами зі строком до 30 днів ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E168','Сума фактичних грошових відтоків протягом 30 днів за іншими цінними паперами власного боргу ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E169','Сума фактичних грошових відтоків протягом 30 днів за субординованим боргом ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E170','Сума фактичних грошових відтоків за безвідкличними зобов''язаннями з кредитування, що надані іншим фінансовим установам', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E171','Сума фактичних грошових відтоків протягом 30 днів за операціями, пов''язаними з торговим фінансуванням (акредитиви, гарантії)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E172','Сума фактичних грошових відтоків протягом 30 днів за іншими балансовими та позабалансовими зобов''язаннями', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E173','Сума фактичних грошових відтоків протягом 30 днів за операціями з деривативами', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E174','Сума фактичних грошових відтоків протягом 30 днів за кредиторською заборгованістю з придбання та продажу іноземної валюти за рахунок банку', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E175','Сума фактичних грошових відтоків протягом 30 днів за кредиторською заборгованістю', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E176','Сума фактичних грошових відтоків протягом 30 днів за коштами, що отримані за операціями репо та забезпечені вискоякісними ліквідними активами (ВЛА)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E177','Сума пролонгованих та повторно заключених договорів/контрактів протягом 30 днів за коштами, що отримані за операціями репо та забезпечені вискоякісними ліквідними активами (ВЛА)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E178','Сума за новими договорами/контрактами протягом 30 днів за коштами, що отримані за операціями репо та забезпечені вискоякісними ліквідними активами (ВЛА)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E179','Сума фактичних грошових відтоків протягом 30 днів за коштами, що отримані за операціями репо та забезпечені не вискоякісними ліквідними активами (ВЛА)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E180','Сума пролонгованих договорів/контрактів протягом 30 днів за коштами, що отримані за операціями репо та забезпечені не вискоякісними ліквідними активами (ВЛА)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E181','Сума нових договорів/контрактів протягом 30 днів за коштами, що отримані за операціями репо та забезпечені не вискоякісними ліквідними активами (ВЛА)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E182','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів   за вкладами фізичних осіб', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E183','Сума фактичних грошових відтоків протягом 30 днів за грошовим покриттям інших банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E184','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів  за коштами банків', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E185','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів   за рахунками бюджетних  установ ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E186','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів за коштами небанківських фінансових установ', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E187','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів за кредитами від міжнародних банків розвитку та інших фінанансових організацій', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E188','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів   за цінними паперами власного боргу', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E189','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів за субординованим боргом', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E190','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів за вкладами суб''єктів господарської діяльності (СГД)', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-  begin insert into NBUR_DCT_F6EX_EKP (EKP, EKP_NAME, GRP_R030, AGGR_EKP, LCY_PCT, FCY_PCT) values ('A6E191','Сума фактичних грошових відтоків за нарахованими витратами протягом 30 днів за кредитами Національного банку та коштами отриманими за операціями репо', 1, '', 100, 100); exception when dup_val_on_index then null; end; 
-
-  commit;
-end;
-/
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E001', 'Р—Р°РіР°Р»СЊРЅРёР№ РѕР±СЃСЏРі РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ)', '1', 'A6E006', NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E002', 'РЎСѓРєСѓРїРЅС– РѕС‡С–РєСѓРІР°РЅС– РІС–РґС‚РѕРєРё РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ', '1', 'A6E007', NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E003', 'РЎСѓРєСѓРїРЅС– РѕС‡С–РєСѓРІР°РЅС– РЅР°РґС…РѕРґР¶РµРЅРЅСЏ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ', '1', 'A6E008', NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E004', 'Р§РёСЃС‚РёР№ РѕС‡С–РєСѓРІР°РЅРёР№ РІС–РґС‚С–Рє РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ', '1', NULL, NULL, 
+    'A6E002 - LEAST(A6E003, 0.75 * A6E002)', NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E005', 'РљРѕРµС„С–С†С–С”РЅС‚ РїРѕРєСЂРёС‚С‚СЏ Р»С–РєРІС–РґРЅС–СЃС‚СЋ', '1', NULL, NULL, 
+    'AE6001/AE6004', NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E006', 'Р—Р°РіР°Р»СЊРЅРёР№ РѕР±СЃСЏРі РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ) ', '0', NULL, NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E007', 'РЎСѓРєСѓРїРЅС– РѕС‡С–РєСѓРІР°РЅС– РІС–РґС‚РѕРєРё РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ', '0', NULL, NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E008', 'РЎСѓРєСѓРїРЅС– РѕС‡С–РєСѓРІР°РЅС– РЅР°РґС…РѕРґР¶РµРЅРЅСЏ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ', '0', NULL, NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E009', 'Р§РёСЃС‚РёР№ РѕС‡С–РєСѓРІР°РЅРёР№ РІС–РґС‚С–Рє РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ', '0', NULL, NULL, 
+    'A6E007 - LEAST(A6E008, 0.75 * A6E007)', NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E010', 'РљРѕРµС„С–С†С–С”РЅС‚ РїРѕРєСЂРёС‚С‚СЏ Р»С–РєРІС–РґРЅС–СЃС‚СЋ (LCR)', '0', NULL, NULL, 
+    'AE6006/AE6009', NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E011', 'РЎСѓРјР° Р·Р° РѕР±Р»С–РіР°С†С–СЏРјРё РІРЅСѓС‚СЂС–С€РЅСЊРѕС— РґРµСЂР¶Р°РІРЅРѕС— РїРѕР·РёРєРё (РћР’Р”Рџ) Р·С– СЃС‚СЂРѕРєРѕРј РїРѕРіР°С€РµРЅРЅСЏ Р±С–Р»СЊС€Рµ 30 РґРЅС–РІ', '1', 'A6E001', NULL, 
+    NULL, 100, 100, '1');
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E012', 'РЎСѓРјР° Р·Р° РѕР±Р»С–РіР°С†С–СЏРјРё РІРЅСѓС‚СЂС–С€РЅСЊРѕС— РґРµСЂР¶Р°РІРЅРѕС— РїРѕР·РёРєРё (РћР’Р”Рџ) Р·С– СЃС‚СЂРѕРєРѕРј РїРѕРіР°С€РµРЅРЅСЏ РґРѕ 30 РґРЅС–РІ', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E013', 'РЎСѓРјР° Р·Р° РѕР±Р»С–РіР°С†С–СЏРјРё Р·РѕРІРЅС–С€РЅСЊРѕС— РґРµСЂР¶Р°РІРЅРѕС— РїРѕР·РёРєРё (РћР—Р”Рџ) Р·С– СЃС‚СЂРѕРєРѕРј РїРѕРіР°С€РµРЅРЅСЏ РґРѕ 30 РґРЅС–РІ', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E014', 'РЎСѓРјР° Р·Р° РѕР±Р»С–РіР°С†С–СЏРјРё Р·РѕРІРЅС–С€РЅСЊРѕС— РґРµСЂР¶Р°РІРЅРѕС— РїРѕР·РёРєРё (РћР—Р”Рџ) Р·С– СЃС‚СЂРѕРєРѕРј РїРѕРіР°С€РµРЅРЅСЏ Р±С–Р»СЊС€Рµ 30 РґРЅС–РІ ', '1', 'A6E001', NULL, 
+    NULL, 85, 85, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E015', 'РЎСѓРјР° Р·Р° Р±РѕСЂРіРѕРІРёРјРё С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё РјС–Р¶РЅР°СЂРѕРґРЅРёС… С„С–РЅР°РЅСЃРѕРІРёС… РѕСЂРіР°РЅС–Р·Р°С†С–Р№/РґРµСЂР¶Р°РІРЅРёС… РѕСЂРіР°РЅС–РІ РєСЂР°С—РЅ G-7 Р· СЂРµР№С‚РёРЅРіР°РјРё РїСЂРѕРІС–РґРЅРёС… СЃРІС–С‚РѕРІРёС… СЂРµР№С‚РёРЅРіРѕРІРёС… Р°РіРµРЅСЃС‚РІ РЅРµ РЅРёР¶С‡Рµ "РђРђ-"/"РђР°3"', '1', 'A6E001', 0, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E016', 'РљРѕС€С‚Рё РЅР° РєРѕСЂРµСЃРїРѕРЅРґРµРЅС‚СЃСЊРєРёС… СЂР°С…СѓРЅРєР°С… РІ Р±Р°РЅРєР°С… Р· СЂРµР№С‚РёРЅРіРѕРј РЅРµ РЅРёР¶С‡Рµ С–РЅРІРµСЃС‚РёС†С–Р№РЅРѕРіРѕ РєР»Р°СЃСѓ', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E017', 'РЎСѓРјР° РЅРµР·РЅРёР¶СѓРІР°Р»СЊРЅРѕРіРѕ Р·Р°Р»РёС€РєСѓ РЅР° СЂР°С…СѓРЅРєР°С… РЅРѕСЃС‚СЂРѕ РІ Р±Р°РЅРєР°С… Р· СЂРµР№С‚РёРЅРіРѕРј РЅРµ РЅРёР¶С‡Рµ С–РЅРІРµСЃС‚РёС†С–Р№РЅРѕРіРѕ РєР»Р°СЃСѓ', '1', 'A6E001', 0, 
+    NULL, -100, -100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E001', 'Р‘Р°РЅРєРЅРѕС‚Рё С‚Р° РјРѕРЅРµС‚Рё', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E002', 'Р РµР·РµСЂРІРё Р·Р° РіРѕС‚С–РІРєРѕРІРёРјРё РєРѕС€С‚Р°РјРё, РЅР°СЏРІРЅС–СЃС‚СЊ СЏРєРёС… С” РЅРµРїС–РґС‚РІРµСЂРґР¶РµРЅРѕСЋ ', '1', 'A6E001', NULL, 
+    NULL, -100, -100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E003', 'РљРѕС€С‚Рё РЅР° РєРѕСЂРµСЃРїРѕРЅРґРµРЅС‚СЃСЊРєРѕРјСѓ СЂР°С…СѓРЅРєСѓ РІ РќР°С†С–РѕРЅР°Р»СЊРЅРѕРјСѓ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E024', 'РЎСѓРјР° Р·Р° Р±РѕСЂРіРѕРІРёРјРё С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё, РµРјС–С‚РѕРІР°РЅРёРјРё РјС–Р¶РЅР°СЂРѕРґРЅРёРјРё Р±Р°РЅРєР°РјРё СЂРѕР·РІРёС‚РєСѓ', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E025', 'РЎСѓРјР° Р·Р° РґРµРїРѕР·РёС‚РЅРёРјРё СЃРµСЂС‚РёС„С–РєР°С‚Р°РјРё РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E026', 'РЎСѓРјР° Р·Р° РґРµРїРѕР·РёС‚Р°РјРё РІ РќР°С†С–РѕРЅР°Р»СЊРЅРѕРјСѓ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё РґРѕ 1 РґРЅСЏ ', '1', 'A6E001', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E018', 'РЎСѓРјР° СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, СЏРєС– Р·РіС–РґРЅРѕ Р· СѓРјРѕРІР°РјРё РґРѕРіРѕРІРѕСЂС–РІ, РЅРµ РјРѕР¶СѓС‚СЊ Р±СѓС‚Рё РїРѕРІРµСЂРЅРµРЅС– РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', 'A6E002', NULL, 
+    NULL, 0, 0, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E019', 'РЎСѓРјР° СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, РЅР° СЏРєС– Р±СѓР»Рѕ РЅР°РєР»Р°РґРµРЅРѕ РѕР±РјРµР¶РµРЅРЅСЏ РЅР° СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', 'A6E002', NULL, 
+    NULL, 0, 0, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E020', 'РЎСѓРјР° СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, Р·Р° СЏРєРёРјРё РѕС‚СЂРёРјР°РЅРѕ РїРѕРІС–РґРѕРјР»РµРЅРЅСЏРј РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ', '1', 'A6E002', 0, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E021', 'РЎСѓРјР° С–РЅС€РёС… СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, СЏРєС– Р·РіС–РґРЅРѕ Р· СѓРјРѕРІР°РјРё РґРѕРіРѕРІРѕСЂС–РІ, РјРѕР¶СѓС‚СЊ Р±СѓС‚Рё РїРѕРІРµСЂРЅРµРЅС– РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', 'A6E002', NULL, 
+    NULL, 10, 10, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E022', 'РЎСѓРјР° СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– (РЎР“Р”), СЏРєС– Р·РіС–РґРЅРѕ Р· СѓРјРѕРІР°РјРё РґРѕРіРѕРІРѕСЂС–РІ, РЅРµ РјРѕР¶СѓС‚СЊ Р±СѓС‚Рё РїРѕРІРµСЂРЅРµРЅС– РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', 'A6E002', NULL, 
+    NULL, 0, 0, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E023', 'РЎСѓРјР° СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– (РЎР“Р”) РЅР° СЏРєС– Р±СѓР»Рѕ РЅР°РєР»Р°РґРµРЅРѕ РѕР±РјРµР¶РµРЅРЅСЏ РЅР° СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', 'A6E002', NULL, 
+    NULL, 0, 0, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E024', 'РЎСѓРјР° СЃС‚СЂРѕРєРѕРІРёС… РІРєР»Р°РґС–РІ СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– (РЎР“Р”) Р·Р° СЏРєРёРјРё РѕС‚СЂРёРјР°РЅРѕ РїРѕРІС–РґРѕРјР»РµРЅРЅСЏРј РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ ', '1', 'A6E002', 0, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E025', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– (РЎР“Р”)', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E026', 'РЎСѓРјР° Р·Р° Р»РѕСЂРѕ СЂР°С…СѓРЅРєР°РјРё, СЏРєС– РЅРµ РІРєР»СЋС‡РµРЅС– РґРѕ СЂРѕР·СЂР°С…СѓРЅРєСѓ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ)', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E027', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РґРµРїРѕР·РёС‚Р°РјРё С–РЅС€РёС… Р±Р°РЅРєС–РІ С‚Р° Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєСЂРµРґРёС‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– РІС–Рґ С–РЅС€РёС… Р±Р°РЅРєС–РІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E028', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєРѕС€С‚Р°РјРё Р±СЋРґР¶РµС‚РЅРёС… СѓСЃС‚Р°РЅРѕРІ', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E029', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєРѕС€С‚Р°РјРё РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E030', 'Р’РєР»Р°РґРё РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ Р·Р° СЏРєРёРјРё Р±СѓР»Рѕ РѕС‚СЂРёРјР°РЅРѕ РїРѕРІС–РґРѕРјР»РµРЅРЅСЏРј РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ', '1', 'A6E002', 0, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E031', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєРѕС€С‚Рё РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё ', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E032', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РІС–Рґ РјС–Р¶РЅР°СЂРѕРґРЅРёС… Р±Р°РЅРєС–РІ СЂРѕР·РІРёС‚РєСѓ', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E033', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ РєСЂРµРґРёС‚Р°РјРё РІС–Рґ С–РЅС€РёС… РѕСЂРіР°РЅС–Р·Р°С†С–Р№ ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E034', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РѕС‰Р°РґРЅРёРјРё (РґРµРїРѕР·РёС‚РЅРёРјРё) СЃРµСЂС‚РёС„С–РєР°С‚Р°РјРё Р·С– СЃС‚СЂРѕРєРѕРј РґРѕ 30 РґРЅС–РІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E035', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РЅС€РёРјРё С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё РІР»Р°СЃРЅРѕРіРѕ Р±РѕСЂРіСѓ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E036', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃСѓР±РѕСЂРґРёРЅРѕРІР°РЅРёРј Р±РѕСЂРіРѕРј ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E037', 'РЎСѓРјР° Р·Р° Р±РµР·РІС–РґРєР»РёС‡РЅРёРјРё Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏРјРё Р· РєСЂРµРґРёС‚СѓРІР°РЅРЅСЏ, С‰Рѕ РЅР°РґР°РЅС–  С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', 'A6E002', NULL, 
+    NULL, 5, 5, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E038', 'РЎСѓРјР° Р·Р° Р±РµР·РІС–РґРєР»РёС‡РЅРёРјРё Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏРјРё Р· РєСЂРµРґРёС‚СѓРІР°РЅРЅСЏ, С‰Рѕ РЅР°РґР°РЅС– СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, РѕСЂРіР°РЅР°Рј РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё, РѕСЂРіР°РЅР°Рј РјС–СЃС†РµРІРѕРіРѕ СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ С‚Р° РјС–Р¶РЅР°СЂРѕРґРЅРёРј С„С–РЅР°РЅСЃРѕРІРёРј РѕСЂРіР°РЅС–Р·Р°С†С–СЏРј ', '1', 'A6E002', NULL, 
+    NULL, 10, 10, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E039', 'РЎСѓРјР° Р·Р° Р±РµР·РІС–РґРєР»РёС‡РЅРёРјРё Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏРјРё Р· РєСЂРµРґРёС‚СѓРІР°РЅРЅСЏ, С‰Рѕ РЅР°РґР°РЅС– С–РЅС€РёРј С„С–РЅР°РЅСЃРѕРІРёРј СѓСЃС‚Р°РЅРѕРІР°Рј', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E040', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё, РїРѕРІ''СЏР·Р°РЅРёРјРё Р· С‚РѕСЂРіРѕРІРёРј С„С–РЅР°РЅСЃСѓРІР°РЅРЅСЏРј (Р°РєСЂРµРґРёС‚РёРІРё, РіР°СЂР°РЅС‚С–С—)', '1', 'A6E002', NULL, 
+    NULL, 30, 30, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E041', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РЅС€РёРјРё Р±Р°Р»Р°РЅСЃРѕРІРёРјРё С‚Р° РїРѕР·Р°Р±Р°Р»Р°РЅСЃРѕРІРёРјРё Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏРјРё', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E042', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р· РґРµСЂРёРІР°С‚РёРІР°РјРё', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E043', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ Р· РїСЂРёРґР±Р°РЅРЅСЏ С‚Р° РїСЂРѕРґР°Р¶Сѓ С–РЅРѕР·РµРјРЅРѕС— РІР°Р»СЋС‚Рё Р·Р° СЂР°С…СѓРЅРѕРє Р±Р°РЅРєСѓ', '1', 'A6E007', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E044', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E045', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– РІС–Рґ РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E046', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', 'A6E002', NULL, 
+    NULL, 0, 0, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E047', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РЅРµ РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E048', 'РЎСѓРјР° РїСЂРѕСЃС‚СЂРѕС‡РµРЅРѕС— Р·Р°Р±РѕСЂРіРѕРІР°РЅРѕСЃС‚С– Р·Р° РІС–РґС‚РѕРєР°РјРё', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E066', 'РљРѕС€С‚Рё Р±Р°РЅРєС–РІ Сѓ СЂРѕР·СЂР°С…СѓРЅРєР°С…', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E005', 'РљРѕС€С‚Рё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± РЅР° РІРёРјРѕРіСѓ', '1', 'A6E002', NULL, 
+    NULL, 20, 20, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E006', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° РІРєР»Р°РґР°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E007', 'РљРѕС€С‚Рё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– РЅР° РІРёРјРѕРіСѓ', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E008', 'РљРѕС€С‚Рё РІ СЂРѕР·СЂР°С…СѓРЅРєР°С… С–РЅС€РёС… Р±Р°РЅРєС–РІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E009', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° РєРѕС€С‚Р°РјРё Р±Р°РЅРєС–РІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E010', 'РџРѕС‚РѕС‡РЅС– СЂР°С…СѓРЅРєРё Р±СЋРґР¶РµС‚РЅРёС…  СѓСЃС‚Р°РЅРѕРІ', '1', 'A6E002', NULL, 
+    NULL, 100, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E011', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° СЂР°С…СѓРЅРєР°РјРё Р±СЋРґР¶РµС‚РЅРёС…  СѓСЃС‚Р°РЅРѕРІ ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E012', 'РљРѕС€С‚Рё РІРёР±РѕСЂС‡РёС… С„РѕРЅРґС–РІ С‚Р° С„РѕРЅРґСѓ СЂРµС„РµСЂРµРЅРґСѓРјСѓ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E013', 'РљРѕС€С‚Рё РЅР° РІРёРјРѕРіСѓ РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E014', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° РєРѕС€С‚Р°РјРё РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E015', 'РљРѕС€С‚Рё РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё РЅР° РІРёРјРѕРіСѓ ', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E016', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° РєРѕС€С‚Р°РјРё РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E017', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° РєСЂРµРґРёС‚Р°РјРё РІС–Рґ РјС–Р¶РЅР°СЂРѕРґРЅРёС… Р±Р°РЅРєС–РІ СЂРѕР·РІРёС‚РєСѓ С‚Р° С–РЅС€РёС… С„С–РЅР°РЅР°РЅСЃРѕРІРёС… РѕСЂРіР°РЅС–Р·Р°С†С–Р№', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E018', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё РІР»Р°СЃРЅРѕРіРѕ Р±РѕСЂРіСѓ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E019', 'РќР°СЂР°С…РѕРІР°РЅС– РІРёС‚СЂР°С‚Рё Р·Р° СЃСѓР±РѕСЂРґРёРЅРѕРІР°РЅРёРј Р±РѕСЂРіРѕРј', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E020', 'Р‘РµР·РІС–РґРєР»РёС‡РЅС– Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏ Р· РєСЂРµРґРёС‚СѓРІР°РЅРЅСЏ, С‰Рѕ РЅР°РґР°РЅС– Р±Р°РЅРєР°Рј', '1', 'A6E002', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E021', 'Р’С–РґС‚РѕРєРё Р·Р° С‚СЂР°РЅР·РёС‚РЅРёРјРё С‚Р° РєР»С–СЂРёРЅРіРѕРІРёРјРё СЂР°С…СѓРЅРєР°РјРё', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E023', 'РЎСѓРјР° Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё Р·Р° РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– (РЎР“Р”)', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E027', 'РЎСѓРјР° РЅР°СЂР°С…РѕРІР°РЅРёС… РІРёС‚СЂР°С‚ Р·Р° РєСЂРµРґРёС‚Р°РјРё РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ С‚Р° РєРѕС€С‚Р°РјРё РѕС‚СЂРёРјР°РЅРёРјРё Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ', '1', 'A6E002', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E049', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± РЅР° РїРѕС‚РѕС‡РЅС– РїРѕС‚СЂРµР±Рё', '1', 'A6E003', NULL, 
+    NULL, 50, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E050', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', 'A6E003', NULL, 
+    NULL, 50, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E051', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', 'A6E003', NULL, 
+    NULL, 50, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E052', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, С‰Рѕ РЅР°РґР°РЅС– Р·Р° РІСЂР°С…РѕРІР°РЅРёРјРё РІРµРєСЃРµР»СЏРјРё', '1', 'A6E003', NULL, 
+    NULL, 50, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E053', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', 'A6E003', NULL, 
+    NULL, 50, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E054', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– РІ РїРѕС‚РѕС‡РЅСѓ РґС–СЏР»СЊРЅС–СЃС‚СЊ', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E055', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E056', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E057', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„Р°РєС‚РѕСЂРёРЅРіРѕРІРёРјРё РѕРїРµСЂР°С†С–СЏРјРё С–Р· СЃСѓР±''С”РєС‚Р°РјРё РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E058', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РЅР°РґР°РЅС– Р·Р° РІСЂР°С…РѕРІР°РЅРёРјРё РІРµРєСЃРµР»СЏРјРё', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E059', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E060', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕСЂРіР°РЅР°Рј РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё С‚Р° РјС–СЃС†РµРІРѕРіРѕ СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E061', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё РѕСЂРіР°РЅР°Рј РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё С‚Р° РјС–СЃС†РµРІРѕРіРѕ СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E062', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕСЂРіР°РЅР°Рј РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё С‚Р° РјС–СЃС†РµРІРѕРіРѕ СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ', '1', 'A6E003', NULL, 
+    NULL, 50, 50, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E063', 'РЎСѓРјР° Р·Р° РґРµРїРѕР·РёС‚Р°РјРё РІ РќР°С†С–РѕРЅР°Р»СЊРЅРѕРјСѓ Р±Р°РЅРєСѓ РЈРєСЂР°С—РЅРё, СЏРєС– РЅРµ РІРєР»СЋС‡РµРЅС– РґРѕ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ), С‚Р° РЅР°СЂР°С…РѕРІР°РЅС– РґРѕС…РѕРґРё Р·Р° РЅРёРјРё', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E064', 'РЎСѓРјР° Р·Р° РЅРѕСЃС‚СЂРѕ СЂР°С…СѓРЅРєР°РјРё, СЏРєР° РЅРµ РІРєР»СЋС‡РµРЅР° РґРѕ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ)', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E065', 'РЎСѓРјР° РЅРµР·РЅРёР¶СѓРІР°Р»СЊРЅРѕРіРѕ Р·Р°Р»РёС€РєСѓ РЅР° СЂР°С…СѓРЅРєР°С… РЅРѕСЃС‚СЂРѕ, СЏРєР° РЅРµ РІРєР»СЋС‡РµРЅР° РґРѕ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ)', '1', 'A6E003', 0, 
+    NULL, -100, -100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E067', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РІРєР»Р°РґР°РјРё (РґРµРїРѕР·РёС‚Р°РјРё) РІ С–РЅС€РёС… Р±Р°РЅРєР°С…', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E068', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С‚Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј РЅР°РґР°РЅРёРј С–РЅС€РёРј Р±Р°РЅРєР°Рј', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E069', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С‚Р° РґРµРїРѕР·РёС‚Р°РјРё, С‰Рѕ РЅР°РґР°РЅС– (СЂРѕР·РјС–С‰РµРЅС–) РЅР° СѓРјРѕРІР°С… СЃСѓР±РѕСЂРґРёРЅРѕРІР°РЅРѕРіРѕ Р±РѕСЂРіСѓ ', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E070', 'РЎСѓРјР° РЅРµРІРёРєРѕСЂРёСЃС‚Р°РЅРѕС— С‡Р°СЃС‚РёРЅРё Р±РµР·РІС–РґРєР»РёС‡РЅРёС… РєСЂРµРґРёС‚РЅРёС… Р»С–РЅС–Р№ РґР»СЏ РїС–РґС‚СЂРёРјР°РЅРЅСЏ Р»С–РєРІС–РґРЅРѕСЃС‚С–, РІС–РґРєСЂРёС‚РёС… РјР°С‚РµСЂРёРЅСЃСЊРєРёРј Р±Р°РЅРєРѕРј', '1', 'A6E003', NULL, 
+    NULL, 40, 40, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E071', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєРѕС€С‚Р°РјРё РІ С–РЅС€РёС… Р±Р°РЅРєР°С…', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E072', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° Р±РѕСЂРіРѕРІРёРјРё С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё, СЏРєС– РЅРµ РІРєР»СЋС‡РµРЅС– РґРѕ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ), С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E073', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р·РІРѕСЂРѕС‚РЅСЊРѕРіРѕ СЂРµРїРѕ Р±РµР· РїРµСЂРµС…РѕРґСѓ РїСЂР°РІР° РІР»Р°СЃРЅРѕСЃС‚С–/СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё ', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E074', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р·РІРѕСЂРѕС‚РЅСЊРѕРіРѕ СЂРµРїРѕ Р· РїРµСЂРµС…РѕРґРѕРј РїСЂР°РІР° РІР»Р°СЃРЅРѕСЃС‚С–/СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ, Р·Р°Р±РµР·РїРµС‡РµРЅРёРјРё РЅРµ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё, С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё ', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E075', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р·РІРѕСЂРѕС‚РЅСЊРѕРіРѕ СЂРµРїРѕ Р· РїРµСЂРµС…РѕРґРѕРј РїСЂР°РІР° РІР»Р°СЃРЅРѕСЃС‚С–/СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ, Р·Р°Р±РµР·РїРµС‡РµРЅРёРјРё РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё, С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё', '1', 'A6E003', NULL, 
+    NULL, NULL, NULL, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E076', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р· РґРµСЂРёРІР°С‚РёРІР°РјРё', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E077', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РґРµР±С–С‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ Р· РїСЂРёРґР±Р°РЅРЅСЏ С‚Р° РїСЂРѕРґР°Р¶Сѓ С–РЅРѕР·РµРјРЅРѕС— РІР°Р»СЋС‚Рё Р·Р° СЂР°С…СѓРЅРѕРє Р±Р°РЅРєСѓ', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E078', 'РЎСѓРјР° РѕС‡С–РєСѓРІР°РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РґРµР±С–С‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р· Р±Р°РЅРєР°РјРё С‚Р° РєР»С–С”РЅС‚Р°РјРё', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('B6E022', 'РќР°РґС…РѕРґР¶РµРЅРЅСЏ Р·Р° С‚СЂР°РЅР·РёС‚РЅРёРјРё С– РєР»С–СЂРёРЅРіРѕРІРёРјРё СЂР°С…СѓРЅРєР°РјРё', '1', 'A6E003', NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E080', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± РЅР° РїРѕС‚РѕС‡РЅС– РїРѕС‚СЂРµР±Рё ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E081', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± РЅР° РїРѕС‚РѕС‡РЅС– РїРѕС‚СЂРµР±Рё, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E082', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё  РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± РЅР° РїРѕС‚РѕС‡РЅС– РїРѕС‚СЂРµР±Рё, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E083', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± РЅР° РїРѕС‚РѕС‡РЅС– РїРѕС‚СЂРµР±Рё ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E084', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E085', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E086', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E087', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E088', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E089', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРј С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E090', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРј С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E091', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) С„С–Р·РёС‡РЅРёС… РѕСЃС–Р± ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E092', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, С‰Рѕ РЅР°РґР°РЅС– Р·Р° РІСЂР°С…РѕРІР°РЅРёРјРё РІРµРєСЃРµР»СЏРјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E093', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєСЂРµРґРёС‚Р°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E094', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– РІ РїРѕС‚РѕС‡РЅСѓ РґС–СЏР»СЊРЅС–СЃС‚СЊ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E095', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– РІ РїРѕС‚РѕС‡РЅСѓ РґС–СЏР»СЊРЅС–СЃС‚СЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E096', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– РІ РїРѕС‚РѕС‡РЅСѓ РґС–СЏР»СЊРЅС–СЃС‚СЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E097', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– РІ РїРѕС‚РѕС‡РЅСѓ РґС–СЏР»СЊРЅС–СЃС‚СЊ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E098', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E099', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё  С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё  СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E100', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРјРё  С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E101', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E102', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E103', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРј С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E104', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ Р·Р° РїРѕРІРЅС–СЃС‚СЋ РїСЂР°С†СЋСЋС‡РёРј С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј (РѕСЂРµРЅРґР°) СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E105', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„С–РЅР°РЅСЃРѕРІРёРј Р»С–Р·РёРЅРіРѕРј(РѕСЂРµРЅРґР°) СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E106', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РЅР°РґР°РЅС– Р·Р° РІСЂР°С…РѕРІР°РЅРёРјРё РІРµРєСЃРµР»СЏРјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E107', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєСЂРµРґРёС‚Р°РјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E108', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„Р°РєС‚РѕСЂРёРЅРіРѕРІРёРјРё РѕРїРµСЂР°С†С–СЏРјРё С–Р· СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E109', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° СЂРѕР»РѕРІРµСЂСѓ РіСЂРѕС€РѕРІРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ Р·Р° С„Р°РєС‚РѕСЂРёРЅРіРѕРІРёРјРё РѕРїРµСЂР°С†С–СЏРјРё С–Р· СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E110', 'Р¤Р°РєС‚РёС‡РЅР° СЃСѓРјР° Р»РѕРЅРіР°С†С–Р№ РіСЂРѕС€РѕРІРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ Р·Р° С„Р°РєС‚РѕСЂРёРЅРіРѕРІРёРјРё РѕРїРµСЂР°С†С–СЏРјРё С–Р· СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E111', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РїРѕРЅР°Рґ РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С„Р°РєС‚РѕСЂРёРЅРіРѕРІРёРјРё РѕРїРµСЂР°С†С–СЏРјРё  С–Р· СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E112', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕСЂРіР°РЅС–РІ РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё С‚Р° СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E113', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕСЂРіР°РЅС–РІ РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё С‚Р° РѕСЂРіР°РЅС–РІ РјС–СЃС†РµРІРѕРіРѕ СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E114', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РїРѕС‚РµС‡РЅРёРјРё РєСЂРµРґРёС‚Р°РјРё РѕСЂРіР°РЅС–РІ РґРµСЂР¶Р°РІРЅРѕС— РІР»Р°РґРё С‚Р° РѕСЂРіР°РЅС–РІ РјС–СЃС†РµРІРѕРіРѕ СЃР°РјРѕРІСЂСЏРґСѓРІР°РЅРЅСЏ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E115', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё С‚Р° С„С–РЅР°РЅСЃРѕРІРёРјРё Р»С–Р·РёРЅРіРѕРј, РЅР°РґР°РЅРёРј С–РЅС€РёРј Р±Р°РЅРєР°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E116', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС– Р·Р° РєСЂРµРґРёС‚Р°РјРё С‚Р° РґРµРїРѕР·РёС‚Р°РјРё, С‰Рѕ РЅР°РґР°РЅС– (СЂРѕР·РјС–С‰РµРЅС–) РЅР° СѓРјРѕРІР°С… СЃСѓР±РѕСЂРґРёРЅРѕРІР°РЅРѕРіРѕ Р±РѕСЂРіСѓ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E117', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ РіСЂРѕС€РѕРІРёС… РєРѕС€С‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р· С–РЅС€РёС… Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E118', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ, РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° Р±РѕСЂРіРѕРІРёРјРё С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё, СЏРєС– РЅРµ РІРєР»СЋС‡РµРЅС– РґРѕ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёС… Р»С–РєРІС–РґРЅРёС… Р°РєС‚РёРІС–РІ (Р’Р›Рђ), С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E119', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р· РґРµСЂРёРІР°С‚РёРІР°РјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E120', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ, Р·Р° РґРµР±С–С‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ Р· РїСЂРёРґР±Р°РЅРЅСЏ С‚Р° РїСЂРѕРґР°Р¶Сѓ С–РЅРѕР·РµРјРЅРѕС— РІР°Р»СЋС‚Рё Р·Р° СЂР°С…СѓРЅРѕРє Р±Р°РЅРєСѓ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E121', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ, Р·Р° РґРµР±С–С‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р· Р±Р°РЅРєР°РјРё С‚Р° РєР»С–С”РЅС‚Р°РјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E122', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ, Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р·РІРѕСЂРѕС‚РЅСЊРѕРіРѕ СЂРµРїРѕ Р±РµР· РїРµСЂРµС…РѕРґСѓ РїСЂР°РІР° РІР»Р°СЃРЅРѕСЃС‚С–/СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E123', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ, Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р·РІРѕСЂРѕС‚РЅСЊРѕРіРѕ СЂРµРїРѕ Р· РїРµСЂРµС…РѕРґРѕРј РїСЂР°РІР° РІР»Р°СЃРЅРѕСЃС‚С–/СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ, Р·Р°Р±РµР·РїРµС‡РµРЅРёРјРё РЅРµ РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё, С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E124', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РєРѕРЅС‚СЂР°РєС‚РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ, С‰Рѕ РѕС‡С–РєСѓРІР°Р»РёСЃСЏ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ, Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р·РІРѕСЂРѕС‚РЅСЊРѕРіРѕ СЂРµРїРѕ Р· РїРµСЂРµС…РѕРґРѕРј РїСЂР°РІР° РІР»Р°СЃРЅРѕСЃС‚С–/СЂРѕР·РїРѕСЂСЏРґР¶РµРЅРЅСЏ, Р·Р°Р±РµР·РїРµС‡РµРЅРёРјРё РІРёСЃРѕРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё, С‚Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РґРѕС…РѕРґР°РјРё Р·Р° РЅРёРјРё ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E125', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E126', 'РЎСѓРјР° Р±РµР·РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E127', 'РЎСѓРјР° РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E128', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E129', 'РЎСѓРјР° Р±РµР·РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E130', 'РЎСѓРјР° РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E131', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ Р±Р°РЅРєР°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E132', 'РЎСѓРјР° Р±РµР·РІС–РґРєР»РёС‡РЅРёС…  Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ Р±Р°РЅРєР°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E133', 'РЎСѓРјР° РІС–РґРєР»РёС‡РЅРёС…  Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ Р±Р°РЅРєР°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E134', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E135', 'РЎСѓРјР° Р±РµР·РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E136', 'РЎСѓРјР° РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E137', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E138', 'РЎСѓРјР° Р±РµР·РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E139', 'РЎСѓРјР° РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E140', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E141', 'РЎСѓРјР° РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E142', 'РЎСѓРјР° Р±РµР·РІС–РґРєР»РёС‡РЅРёС… Р·РѕР±РѕРІ''СЏР·Р°РЅСЊ Р±Р°РЅРєСѓ Р·Р° РєСЂРµРґРёС‚РЅРёРјРё Р»С–РЅС–СЏРјРё Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E143', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° СЂР°С…СѓРЅРєР°РјРё-РµСЃРєСЂРѕСѓ С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E144', 'РЎСѓРјР° Р·Р°Р»РёС€РєСѓ Р·Р° СЂР°С…СѓРЅРєР°РјРё-РµСЃРєСЂРѕСѓ С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E145', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° СЂР°С…СѓРЅРєР°РјРё-РµСЃРєСЂРѕСѓ СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E146', 'РЎСѓРјР° Р·Р°Р»РёС€РєСѓ Р·Р° СЂР°С…СѓРЅРєР°РјРё-РµСЃРєСЂРѕСѓ СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E147', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РІС–РґС‚РѕРєС–РІ Р·Р° СЂР°С…СѓРЅРєР°РјРё - РµСЃРєСЂРѕСѓ Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E148', 'РЎСѓРјР° Р·Р°Р»РёС€РєСѓ Р·Р° СЂР°С…СѓРЅРєР°РјРё-РµСЃРєСЂРѕСѓ Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E149', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ С„С–Р·РёС‡РЅРёРј РѕСЃРѕР±Р°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E150', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ СЃСѓР±''С”РєС‚Р°Рј РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E151', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РЅР°РґС…РѕРґР¶РµРЅСЊ Р·Р° РєСЂРµРґРёС‚Р°РјРё РѕРІРµСЂРґСЂР°С„С‚ Р±Р°РЅРєР°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E152', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, СЏРєС– Р±СѓР»Рё РїРѕРІРµСЂРЅСѓС‚С– Р·РіС–РґРЅРѕ Р· РѕС‚СЂРёРјР°РЅРёРј РїРѕРІС–РґРѕРјР»РµРЅРЅСЏРј РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E153', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E154', 'РЎСѓРјР° РїСЂРѕР»РѕРЅРіРѕРІР°РЅРёС… С‚Р° РїРѕРІС‚РѕСЂРЅРѕ Р·Р°РєР»СЋС‡РµРЅРёС… РґРѕРіРѕРІРѕСЂС–РІ/РєРѕРЅС‚СЂР°РєС‚С–РІ Р·Р°  СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±, СЏРєС– Р·РіС–РґРЅРѕ Р· СѓРјРѕРІР°РјРё РґРѕРіРѕРІРѕСЂС–РІ РјР°Р»Рё Р±СѓС‚Рё  РїРѕРІРµСЂРЅРµРЅС– РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E155', 'РЎСѓРјР° Р·Р° РЅРѕРІРёРјРё РґРѕРіРѕРІРѕСЂР°РјРё/РєРѕРЅС‚СЂР°РєС‚Р°РјРё Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E156', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, СЏРєС– Р±СѓР»Рё РїРѕРІРµСЂРЅСѓС‚С– Р·РіС–РґРЅРѕ Р· РѕС‚СЂРёРјР°РЅРёРј РїРѕРІС–РґРѕРјР»РµРЅРЅСЏРј РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E157', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E158', 'РЎСѓРјР° РїСЂРѕР»РѕРЅРіРѕРІР°РЅРёС… С‚Р° РїРѕРІС‚РѕСЂРЅРѕ Р·Р°РєР»СЋС‡РµРЅРёС… РґРѕРіРѕРІРѕСЂС–РІ/РєРѕРЅС‚СЂР°РєС‚С–РІ Р·Р°  СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–, СЏРєС– Р·РіС–РґРЅРѕ Р· СѓРјРѕРІР°РјРё РґРѕРіРѕРІРѕСЂС–РІ, РјР°Р»Рё Р±СѓС‚Рё  РїРѕРІРµСЂРЅРµРЅС– РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E159', 'РЎСѓРјР° Р·Р° РЅРѕРІРёРјРё РґРѕРіРѕРІРѕСЂР°РјРё/РєРѕРЅС‚СЂР°РєС‚Р°РјРё Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С–', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E160', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РґРµРїРѕР·РёС‚Р°РјРё С–РЅС€РёС… Р±Р°РЅРєС–РІ С‚Р° Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєСЂРµРґРёС‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– РІС–Рґ С–РЅС€РёС… Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E161', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РІРєР»Р°РґР°РјРё Р±СЋРґР¶РµС‚РЅРёС… СѓСЃС‚Р°РЅРѕРІ, СЏРєС– Р±СѓР»Рё РїРѕРІРµСЂРЅСѓС‚С– Р·РіС–РґРЅРѕ Р· РѕС‚СЂРёРјР°РЅРёРј РїРѕРІС–РґРѕРјР»РµРЅРЅСЏРј РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E162', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєРѕС€С‚Р°РјРё Р±СЋРґР¶РµС‚РЅРёС… СѓСЃС‚Р°РЅРѕРІ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E163', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РєРѕС€С‚Р°РјРё РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E164', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РІРєР»Р°РґР°РјРё РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ, СЏРєС– Р±СѓР»Рё РїРѕРІРµСЂРЅРµРЅС– РІС–РґРїРѕРІС–РґРЅРѕ РґРѕ РѕС‚СЂРёРјР°РЅРѕРіРѕ РїРѕРІС–РґРѕРјР»РµРЅРЅСЏ РїСЂРѕ С—С… РїРѕРІРµСЂРЅРµРЅРЅСЏ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E165', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РІС–Рґ РјС–Р¶РЅР°СЂРѕРґРЅРёС… Р±Р°РЅРєС–РІ СЂРѕР·РІРёС‚РєСѓ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E166', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РІС–Рґ С–РЅС€РёС… РѕСЂРіР°РЅС–Р·Р°С†С–Р№', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E167', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃС‚СЂРѕРєРѕРІРёРјРё РѕС‰Р°РґРЅРёРјРё (РґРµРїРѕР·РёС‚РЅРёРјРё) СЃРµСЂС‚РёС„С–РєР°С‚Р°РјРё Р·С– СЃС‚СЂРѕРєРѕРј РґРѕ 30 РґРЅС–РІ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E168', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РЅС€РёРјРё С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё РІР»Р°СЃРЅРѕРіРѕ Р±РѕСЂРіСѓ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E169', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃСѓР±РѕСЂРґРёРЅРѕРІР°РЅРёРј Р±РѕСЂРіРѕРј ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E170', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° Р±РµР·РІС–РґРєР»РёС‡РЅРёРјРё Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏРјРё Р· РєСЂРµРґРёС‚СѓРІР°РЅРЅСЏ, С‰Рѕ РЅР°РґР°РЅС– С–РЅС€РёРј С„С–РЅР°РЅСЃРѕРІРёРј СѓСЃС‚Р°РЅРѕРІР°Рј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E171', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё, РїРѕРІ''СЏР·Р°РЅРёРјРё Р· С‚РѕСЂРіРѕРІРёРј С„С–РЅР°РЅСЃСѓРІР°РЅРЅСЏРј (Р°РєСЂРµРґРёС‚РёРІРё, РіР°СЂР°РЅС‚С–С—)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E172', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° С–РЅС€РёРјРё Р±Р°Р»Р°РЅСЃРѕРІРёРјРё С‚Р° РїРѕР·Р°Р±Р°Р»Р°РЅСЃРѕРІРёРјРё Р·РѕР±РѕРІ''СЏР·Р°РЅРЅСЏРјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E173', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РѕРїРµСЂР°С†С–СЏРјРё Р· РґРµСЂРёРІР°С‚РёРІР°РјРё', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E174', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ Р· РїСЂРёРґР±Р°РЅРЅСЏ С‚Р° РїСЂРѕРґР°Р¶Сѓ С–РЅРѕР·РµРјРЅРѕС— РІР°Р»СЋС‚Рё Р·Р° СЂР°С…СѓРЅРѕРє Р±Р°РЅРєСѓ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E175', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚РѕСЂСЃСЊРєРѕСЋ Р·Р°Р±РѕСЂРіРѕРІР°РЅС–СЃС‚СЋ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E176', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E177', 'РЎСѓРјР° РїСЂРѕР»РѕРЅРіРѕРІР°РЅРёС… С‚Р° РїРѕРІС‚РѕСЂРЅРѕ Р·Р°РєР»СЋС‡РµРЅРёС… РґРѕРіРѕРІРѕСЂС–РІ/РєРѕРЅС‚СЂР°РєС‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E178', 'РЎСѓРјР° Р·Р° РЅРѕРІРёРјРё РґРѕРіРѕРІРѕСЂР°РјРё/РєРѕРЅС‚СЂР°РєС‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E179', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РЅРµ РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E180', 'РЎСѓРјР° РїСЂРѕР»РѕРЅРіРѕРІР°РЅРёС… РґРѕРіРѕРІРѕСЂС–РІ/РєРѕРЅС‚СЂР°РєС‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РЅРµ РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E181', 'РЎСѓРјР° РЅРѕРІРёС… РґРѕРіРѕРІРѕСЂС–РІ/РєРѕРЅС‚СЂР°РєС‚С–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё, С‰Рѕ РѕС‚СЂРёРјР°РЅС– Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ С‚Р° Р·Р°Р±РµР·РїРµС‡РµРЅС– РЅРµ РІРёСЃРєРѕСЏРєС–СЃРЅРёРјРё Р»С–РєРІС–РґРЅРёРјРё Р°РєС‚РёРІР°РјРё (Р’Р›Рђ)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E182', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ   Р·Р° РІРєР»Р°РґР°РјРё С„С–Р·РёС‡РЅРёС… РѕСЃС–Р±', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E183', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РіСЂРѕС€РѕРІРёРј РїРѕРєСЂРёС‚С‚СЏРј С–РЅС€РёС… Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E184', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ  Р·Р° РєРѕС€С‚Р°РјРё Р±Р°РЅРєС–РІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E185', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ   Р·Р° СЂР°С…СѓРЅРєР°РјРё Р±СЋРґР¶РµС‚РЅРёС…  СѓСЃС‚Р°РЅРѕРІ ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E186', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєРѕС€С‚Р°РјРё РЅРµР±Р°РЅРєС–РІСЃСЊРєРёС… С„С–РЅР°РЅСЃРѕРІРёС… СѓСЃС‚Р°РЅРѕРІ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E187', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РІС–Рґ РјС–Р¶РЅР°СЂРѕРґРЅРёС… Р±Р°РЅРєС–РІ СЂРѕР·РІРёС‚РєСѓ С‚Р° С–РЅС€РёС… С„С–РЅР°РЅР°РЅСЃРѕРІРёС… РѕСЂРіР°РЅС–Р·Р°С†С–Р№', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E188', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ   Р·Р° С†С–РЅРЅРёРјРё РїР°РїРµСЂР°РјРё РІР»Р°СЃРЅРѕРіРѕ Р±РѕСЂРіСѓ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E189', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° СЃСѓР±РѕСЂРґРёРЅРѕРІР°РЅРёРј Р±РѕСЂРіРѕРј', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E190', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РІРєР»Р°РґР°РјРё СЃСѓР±''С”РєС‚С–РІ РіРѕСЃРїРѕРґР°СЂСЃСЊРєРѕС— РґС–СЏР»СЊРЅРѕСЃС‚С– (РЎР“Р”)', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+Insert into BARS.NBUR_DCT_F6EX_EKP
+   (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
+    FORMULA, LCY_PCT, FCY_PCT, R030_980)
+ Values
+   ('A6E191', 'РЎСѓРјР° С„Р°РєС‚РёС‡РЅРёС… РіСЂРѕС€РѕРІРёС… РІС–РґС‚РѕРєС–РІ Р·Р° РЅР°СЂР°С…РѕРІР°РЅРёРјРё РІРёС‚СЂР°С‚Р°РјРё РїСЂРѕС‚СЏРіРѕРј 30 РґРЅС–РІ Р·Р° РєСЂРµРґРёС‚Р°РјРё РќР°С†С–РѕРЅР°Р»СЊРЅРѕРіРѕ Р±Р°РЅРєСѓ С‚Р° РєРѕС€С‚Р°РјРё РѕС‚СЂРёРјР°РЅРёРјРё Р·Р° РѕРїРµСЂР°С†С–СЏРјРё СЂРµРїРѕ', '1', NULL, NULL, 
+    NULL, 100, 100, NULL);
+COMMIT;
