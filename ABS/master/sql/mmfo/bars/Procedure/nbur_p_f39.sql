@@ -247,6 +247,7 @@ BEGIN
                       a.nbuc = b.nbuc and
                       a.field_code = b.field_code);
 
+    -- для використання при формуванні #2F
     DELETE FROM OTCN_TRACE_39
     WHERE datf = p_report_date;
 
@@ -257,9 +258,21 @@ BEGIN
     where report_date = p_report_date and
           kf = p_kod_filii and
           report_code = p_file_code;
+    
+    -- вставка для забезпечення контролю файлу #73
+    DELETE FROM tmp_nbu
+    WHERE datf = p_report_date and
+          kf = p_kod_filii and
+          kodf = '39';
+              
+    insert into tmp_nbu(DATF, KODF, KODP, ZNAP, NBUC, KF)
+    select report_date, '39', field_code, field_value, nbuc, kf
+    from nbur_agg_protocols 
+    where report_date = p_report_date and
+          kf = p_kod_filii and
+          report_code = p_file_code;    
 
     logger.info ('NBUR_P_F39 end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
-
 END;
 /
 show err;
