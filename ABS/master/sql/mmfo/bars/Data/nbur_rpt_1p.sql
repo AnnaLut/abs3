@@ -77,47 +77,31 @@ commit;
 -- опис для підготовки XML
 begin
     delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = '1PX'; 
-Insert into BARS.NBUR_REF_PREPARE_XML
-   (FILE_CODE, DESC_XML, DATE_START)
- Values
-   ('1PX', 'select p.EKP
-   , p.K040_1
-   , p.RCBNK_B010
-   , p.RCBNK_NAME
-   , p.K040_2
-   , p.R030
-   , p.R020
-   , p.R040
-   , p.T023
-   , p.RCUKRU_GLB_2
-   , coalesce(p.K018, ''#'') as K018
-   , p.K020
-   , p.Q001
-   , p.RCUKRU_GLB_1
-   , p.Q003_1
-   , p.Q004
-   , sum(p.T071) as T071
-   , sum(p.T080) as T080
-from NBUR_LOG_F1PX p
-where report_date = :p_rpt_dt and
-      kf = :p_kf
-group by p.EKP
-   , p.K040_1
-   , p.RCBNK_B010
-   , p.RCBNK_NAME
-   , p.K040_2
-   , p.R030
-   , p.R020
-   , p.R040
-   , p.T023
-   , p.RCUKRU_GLB_2
-   , coalesce(p.K018, ''#'')
-   , p.K020
-   , p.Q001
-   , p.RCUKRU_GLB_1
-   , p.Q003_1
-   , p.Q004', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
-    COMMIT;
+    Insert into BARS.NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START)
+     Values
+       ('1PX', 'select p.EKP
+       , p.K040_1
+       , p.RCBNK_B010
+       , p.RCBNK_NAME
+       , p.K040_2
+       , p.R030
+       , p.R020
+       , p.R040
+       , p.T023
+       , p.RCUKRU_GLB_2
+       , coalesce(p.K018, ''#'') as K018
+       , p.K020
+       , p.Q001
+       , p.RCUKRU_GLB_1
+       , p.Q003_1
+       , p.Q004
+       , p.T071
+       , p.T080
+    from NBUR_LOG_F1PX p
+    where report_date = :p_rpt_dt and
+          kf = :p_kf', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+        COMMIT;
 end;
 /
 
