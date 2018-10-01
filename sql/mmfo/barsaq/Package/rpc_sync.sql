@@ -2075,7 +2075,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
                    closed = :p_closed,
                    notes = :p_notes,
                    cust_limit = :p_cust_limit
-             where rnk = round(:p_rnk/100, 0)
+             where rnk = :p_rnk
                and bank_id = :p_bank_id'
     using p_row.type_id,
           p_row.name,
@@ -2115,7 +2115,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
                    phone_mobile = :p_phone_mobile,
                    email = :p_email,
                    id_date_valid = :id_date_valid
-             where rnk = round(:p_rnk/100, 0)
+             where rnk = :p_rnk
                and bank_id = :p_bank_id'
     using  p_row.id_id,
            p_row.id_serial,
@@ -2148,7 +2148,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.RPC_SYNC is
            accountant_phone = :p_accountant_phone,
            fax = :p_fax,
            email = :p_email
-     where rnk = round(:p_rnk/100, 0)
+     where rnk = :p_rnk
        and bank_id = :p_bank_id'
     using  p_row.article_name,
            p_row.head_name,
