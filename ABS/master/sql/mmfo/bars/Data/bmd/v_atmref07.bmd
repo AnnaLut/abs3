@@ -142,13 +142,13 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку (кучку) по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF17[NSIFUNCTION][ACCESSCODE=>2][PROC=>pul.PUT(''ATM_NLS'',:NLS );pul.PUT(''ATM_ACC'',:ACC);pul.PUT(''ATM_DK'',:DK);delete from atm_ref3 where acc = :ACC][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', 55);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку (кучку) по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF17[NSIFUNCTION][ACCESSCODE=>5][PROC=>pul.PUT(''ATM_NLS'',:NLS );pul.PUT(''ATM_ACC'',:ACC);pul.PUT(''ATM_DK'',:DK);delete from atm_ref3 where acc = :ACC][EXEC=>BEFORE][showDialogWindow=>false][EDIT_MODE=>MULTI_EDIT]', 55);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 4, '=> на 6399/L9 на дату -1 міс по ВИБРАНОМУ рах ', 'KWT_2924.CLS_ATM ( :D , :ACC , 2 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'EACH', 'ЗАКРИТИ на доходи(6399/L9) НЕврегульвані залишки на дату :D-180 днів по рахунку :NLS  ?', 'ОК', '', '', '', 21);
+  bars_metabase.add_nsifunction(l_tabid, 4, '=> на 6399/L9 на дату -180днів по ВИБРАНОМУ рах ', 'KWT_2924.CLS_ATM ( :D , :ACC , 2 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'EACH', 'ЗАКРИТИ на доходи(6399/L9) НЕврегульвані залишки на дату :D-180 днів по рахунку :NLS  ?', 'ОК', '', '', '', 21);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 5, '=> на 6399/L9 на дату -1 міс по ВСІХ АТ7', 'KWT_2924.CLS_ATM ( :D , 0, 2 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'ONCE', 'ЗАКРИТИ на доходи(6399/L9) НЕврегульвані залишки на дату :D-180 днів по  В С І Х  рахунках АТ7 ? ', 'ОК', '', '', '', 19);
+  bars_metabase.add_nsifunction(l_tabid, 5, '=> на 6399/L9 на дату -180днів по ВСІХ АТ7', 'KWT_2924.CLS_ATM ( :D , 0, 2 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'ONCE', 'ЗАКРИТИ на доходи(6399/L9) НЕврегульвані залишки на дату :D-180 днів по  В С І Х  рахунках АТ7 ? ', 'ОК', '', '', '', 19);
 
   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'OSTC');
