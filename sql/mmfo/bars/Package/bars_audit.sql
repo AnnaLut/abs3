@@ -2260,7 +2260,7 @@ is
                 --union all
                 --select t.namespace || ' - ' || t.attribute, t.value
                 --from   gv$globalcontext t
-                where  t.client_identifier = sys_context('userenv', 'client_identifier')
+                --where  t.client_identifier = sys_context('userenv', 'client_identifier')
                 order by 1);
 
         return tools.words_to_string(l_values, p_splitting_symbol => chr(10), p_ceiling_length => 4000, p_ignore_nulls => 'Y');
