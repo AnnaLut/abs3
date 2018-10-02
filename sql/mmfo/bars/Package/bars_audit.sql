@@ -2286,7 +2286,8 @@ is
         -- делаем снимок контекстных переменных автоматически (в независимости от значения параметра p_make_context_snapshot)
         l_context_snapshot := case when p_make_context_snapshot or
                                         p_log_level in (bars_audit.LOG_LEVEL_SECURITY, bars_audit.LOG_LEVEL_ERROR, bars_audit.LOG_LEVEL_FATAL) then
-                                        substrb(get_context_snapshot(), 1, 4000)
+                                        ''
+										-- substrb(get_context_snapshot(), 1, 4000)
                                    else null
                               end;
 
