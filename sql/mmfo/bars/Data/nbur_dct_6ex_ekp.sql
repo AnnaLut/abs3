@@ -1,5 +1,7 @@
 SET DEFINE OFF;
 
+exec bc.home;
+
 delete from NBUR_DCT_F6EX_EKP;
 
 Insert into BARS.NBUR_DCT_F6EX_EKP

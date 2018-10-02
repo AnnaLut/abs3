@@ -1,4 +1,7 @@
 ﻿SET DEFINE OFF;
+
+exec bc.home;
+
 delete from BARS.NBUR_DCT_F6EX_NBS;
 Insert into BARS.NBUR_DCT_F6EX_NBS
    (RULE_ID, R020, T020, R011, R013, 
