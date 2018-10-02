@@ -124,7 +124,7 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС~рах', '1', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС~рах', '1', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч~рахунку', '1.5', null, 16, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'DEL', 'N', 'Залишок~суми', '1.5', null, 7, 0, 0, 0, 0, '', '# ##9.99', 0, 0, 'Sum(Del) ', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'KOL', 'N', 'Кіл оп.~ЗАКРИТТЯ', '.5', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
@@ -134,7 +134,7 @@ begin
   bars_metabase.add_column(l_tabid, 8, 'NMS', 'C', 'Назва~рах', '1', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 9, 'OB22', 'C', 'Об22~рах', '.3', null, 18, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'OSTC', 'N', 'Зал.рах~ІСТОРІЯ', '1.5', null, 0, 0, 0, 0, 0, '', '# ##9.99', 0, 0, 'Min(OSTC) ', 1, 0, 0, '/barsroot/customerlist/showhistory.aspx?acc=:ACC'||chr(38)||'type=0', '', 0);
-  bars_metabase.add_column(l_tabid, 11, 'REF1', 'N', 'Реф.,док~ВИНИКНЕННЯ', '1.5', null, 1, 0, 1, 1, 0, '', '', 0, 0, '', 1, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', '', 0);
+  bars_metabase.add_column(l_tabid, 11, 'REF1', 'N', 'Реф.,док~ВИНИКНЕННЯ', '1.5', null, 1, 0, 1, 1, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', '', 0);
   bars_metabase.add_column(l_tabid, 12, 'S1', 'N', 'Сума~виникнення', '1.5', null, 2, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 13, 'S2', 'N', 'Використана~сума', '1.5', null, 6, 0, 0, 0, 0, '', '# ##9.99', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'TIP', 'C', 'Тип~рах', '.3', null, 20, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
@@ -161,7 +161,7 @@ begin
   bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'KWT_2924.DEL_ATM1 ( null, :REF1 )');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'KWT_2924.INS_ATM1 ( null , :REF1 ) ');
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'KWT_2924.INS_ATM1 ( :ACC , :REF1 ) ');
 
   -- добавляем описание процедур
   bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'KWT_2924.UPD3 ( :ACC, :REF1,  :DEL, :S3  ) ');

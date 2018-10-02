@@ -124,7 +124,7 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС~рах', '1', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'ACC', 'N', 'АСС~рах', '1', null, 99, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'BRANCH', 'C', 'Бранч~рахунку', '1.5', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'DEL', 'N', 'Залишок~суми', '1.5', null, 7, 0, 0, 0, 0, '', '# ##9.99', 0, 0, 'Sum(Del) ', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'KOL', 'N', 'Кіл оп.~ЗАКРИТТЯ', '.5', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 1, 0, '', '', 0);
@@ -150,7 +150,7 @@ begin
   bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'KWT_2924.DEL_ATM1 ( null, :REF1 )');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'KWT_2924.INS_ATM1 ( null , :REF1 ) ');
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'KWT_2924.INS_ATM1 ( :ACC , :REF1 ) ');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);

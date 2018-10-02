@@ -142,13 +142,13 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку (ямку) по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF18[NSIFUNCTION][ACCESSCODE=>4][PROC=>pul.PUT( ''ATM_NLS'', :NLS );pul.PUT( ''ATM_ACC'', :ACC);pul.PUT( ''ATM_DK'', :DK)][EXEC=>BEFORE][showDialogWindow=>false]', 55);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Розкрити картотеку (ямку) по вибраному рахунку ', '', '', 'EACH', '', '', '', '', 'sPar=V_ATMREF18[NSIFUNCTION][ACCESSCODE=>5[PROC=>pul.PUT( ''ATM_NLS'', :NLS );pul.PUT( ''ATM_ACC'', :ACC);pul.PUT( ''ATM_DK'', :DK)][EXEC=>BEFORE][showDialogWindow=>false]', 55);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 4, '=> на 7399/53 на дату -1 міс по ВИБРАНОМУ рах ', 'KWT_2924.CLS_ATM ( :D , :ACC , 1)  ', ':D(SEM=Звiтна дата,TYPE=D)', 'EACH', 'ЗАКРИТИ на витрати(7399/53) НЕврегульвані залишки на дату :D-180 днів по рахунку :NLS  ?', 'ОК', '', '', '', 21);
+  bars_metabase.add_nsifunction(l_tabid, 4, '=> на 7399/53 на дату -180днів по ВИБРАНОМУ рах ', 'KWT_2924.CLS_ATM ( :D , :ACC , 1)  ', ':D(SEM=Звiтна дата,TYPE=D)', 'EACH', 'ЗАКРИТИ на витрати(7399/53) НЕврегульвані залишки на дату :D-180 днів по рахунку :NLS  ?', 'ОК', '', '', '', 21);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 5, '=> на 7399/53 на дату -1 міс по ВСІХ АТ8', 'KWT_2924.CLS_ATM ( :D , 0, 1 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'ONCE', 'ЗАКРИТИ на витрати(7399/53) НЕврегульвані залишки на дату :D-180 днів по  В С І Х  рахунках АТ8 ?', 'ОК', '', '', '', 19);
+  bars_metabase.add_nsifunction(l_tabid, 5, '=> на 7399/53 на дату -180днів по ВСІХ АТ8', 'KWT_2924.CLS_ATM ( :D , 0, 1 )  ', ':D(SEM=Звiтна дата,TYPE=D)', 'ONCE', 'ЗАКРИТИ на витрати(7399/53) НЕврегульвані залишки на дату :D-180 днів по  В С І Х  рахунках АТ8 ?', 'ОК', '', '', '', 19);
 
   -- добавляем описание раскраски
   l_newcolid := bars_metabase.get_colid(l_tabid, 'OSTC');
