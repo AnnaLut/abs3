@@ -513,7 +513,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_AUDIT
 is
 
 
-     g_bodyVersion   constant varchar2(64)  := 'version 1.24 16.10.2012';
+     g_bodyVersion   constant varchar2(64)  := 'version 1.25 02.10.2018';
      g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'       || chr(10)
 
@@ -2257,9 +2257,9 @@ is
                 select ' userenv - host', sys_context('userenv', 'host') from dual
                 union all
                 select ' userenv - module', sys_context('userenv', 'module') from dual
-                union all
-                select t.namespace || ' - ' || t.attribute, t.value
-                from   gv$globalcontext t
+                --union all
+                --select t.namespace || ' - ' || t.attribute, t.value
+                --from   gv$globalcontext t
                 where  t.client_identifier = sys_context('userenv', 'client_identifier')
                 order by 1);
 
@@ -2286,8 +2286,7 @@ is
         -- делаем снимок контекстных переменных автоматически (в независимости от значения параметра p_make_context_snapshot)
         l_context_snapshot := case when p_make_context_snapshot or
                                         p_log_level in (bars_audit.LOG_LEVEL_SECURITY, bars_audit.LOG_LEVEL_ERROR, bars_audit.LOG_LEVEL_FATAL) then
-                                        ''
-										-- substrb(get_context_snapshot(), 1, 4000)
+					substrb(get_context_snapshot(), 1, 4000)
                                    else null
                               end;
 
