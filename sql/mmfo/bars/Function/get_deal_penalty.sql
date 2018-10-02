@@ -7,8 +7,6 @@
   CREATE OR REPLACE FUNCTION BARS.GET_DEAL_PENALTY 
 ( p_dptid  in   dpt_deposit.deposit_id%type
 ) return number
-  result_cache
-  relies_on ( DPT_DEPOSIT_CLOS )
 is
   l_acc_dep     accounts.acc%type;
   l_acc_int     accounts.acc%type;

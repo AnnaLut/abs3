@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/function/zvt_p.sql =========*** Run *** ====
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE FUNCTION BARS.ZVT_P (DAT_ date)    return number result_cache is
+  CREATE OR REPLACE FUNCTION BARS.ZVT_P (DAT_ date)    return number is
  -- определение суммы оборотов техн.переоценки в целом по МФО по фин.учету
  n_  number;
 begin

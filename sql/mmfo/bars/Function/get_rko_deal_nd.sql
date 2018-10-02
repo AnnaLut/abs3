@@ -7,8 +7,6 @@
   CREATE OR REPLACE FUNCTION BARS.GET_RKO_DEAL_ND 
 ( p_acc1 RKO_LST.ACC1%type
 ) return number
-result_cache
-relies_on ( RKO_LST )
 is
   PRAGMA AUTONOMOUS_TRANSACTION;
   l_nd   RKO_LST.ND%type;

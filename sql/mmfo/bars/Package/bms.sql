@@ -182,7 +182,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.BMS is
         p_web_user_login in varchar2,
         p_raise_ndf in boolean default true)
     return web_usermap%rowtype
-    result_cache relies_on (web_usermap)
     is
         l_web_user_row web_usermap%rowtype;
     begin
