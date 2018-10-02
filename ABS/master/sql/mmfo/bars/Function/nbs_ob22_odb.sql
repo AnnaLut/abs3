@@ -10,7 +10,6 @@
   p_branch branch.branch%type default sys_context('bars_context','user_branch')
   )
   return accounts.nls%type
-  result_cache
    is
  NLS_    accounts.NLS%type := null ;
  Branch_ Branch.Branch%type := p_branch;

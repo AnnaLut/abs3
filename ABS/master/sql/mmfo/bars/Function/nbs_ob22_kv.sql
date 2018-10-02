@@ -9,7 +9,7 @@
   ob22_ accounts.ob22%type,
   kv_ accounts.KV%type
   )
-  return accounts.nls%type  result_cache  is
+  return accounts.nls%type   is
 
   l_ob22  accounts.ob22%type := ob22_ ;
   l_nls   accounts.nls%type  ;

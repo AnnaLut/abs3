@@ -9,9 +9,8 @@
   ob22_ accounts.ob22%type,
   p_branch branch.branch%type default sys_context('bars_context','user_branch')
   )
-
   return accounts.nls%type
-  result_cache
+
 
 is
 

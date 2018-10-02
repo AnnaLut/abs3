@@ -668,7 +668,6 @@ $if KL_PARAMS.SBER $then
   ( p_rnk           in     customer.rnk%type
   ) return varchar2
   deterministic
-  result_cache
   is
     PRAGMA AUTONOMOUS_TRANSACTION;
     l_custtype             customer.custtype%type;

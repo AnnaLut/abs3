@@ -63,7 +63,6 @@ g_penaltymsgdim           constant number       := 3000;
   ---
   function check_nls4pay(p_nls  dpt_deposit.nls_p%type,
                          p_acc  dpt_deposit.acc%type) return boolean
-  RESULT_CACHE
   is
     l_nls  accounts.nls%type;
   begin
@@ -80,7 +79,6 @@ g_penaltymsgdim           constant number       := 3000;
   ---
   function check_joinpay(p_deposit_id  dpt_deposit.deposit_id%type,
                          p_nlsb        dpt_deposit.nls_p%type) return boolean
-  RESULT_CACHE
   is
    l_adds int;
   begin
