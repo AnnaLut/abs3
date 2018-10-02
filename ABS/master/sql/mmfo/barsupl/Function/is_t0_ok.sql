@@ -4,8 +4,9 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARSUPL/function/is_t0_ok.sql =========*** Run **
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE FUNCTION BARSUPL.IS_T0_OK (p_date in date default null) return number RESULT_CACHE
+  CREATE OR REPLACE FUNCTION BARSUPL.IS_T0_OK (p_date in date default null) return number
     -- функци€ возвращает 1 если выгрузка T0 в мес€це p_date была выполнена и 0 в противном случае
+    -- 01/10/2018 - disable RESULT_CACHE clause (COBUMMFO-9544) V.Kharin
     is
         l_T0    number(1) := 0;
         l_date  date;
@@ -55,7 +56,8 @@
  show err;
  
 PROMPT *** Create  grants  IS_T0_OK ***
-grant EXECUTE                                                                on IS_T0_OK        to BARS;
+grant EXECUTE                                                                on BARSUPL.IS_T0_OK        to BARS;
+grant EXECUTE                                                                on BARSUPL.IS_T0_OK        to UPLD;
 
  
  
