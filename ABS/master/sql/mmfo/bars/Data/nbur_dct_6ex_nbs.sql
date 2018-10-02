@@ -1,4 +1,4 @@
-﻿SET DEFINE OFF;
+SET DEFINE OFF;
 
 exec bc.home;
 
