@@ -1585,7 +1585,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.92 12.09.2018';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.93 02.10.2018';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -16037,10 +16037,7 @@ end process_auth_message;
         impmsgi_document_link(p_docRef, p_swRef);
         bars_audit.trace('Document Ref=%s successfully linked with main message SwRef=%s.', to_char(p_docRef), to_char(p_swRef));
 
-         begin
-            insert into sw_oper_queue (ref, swref,status) values (p_docRef, p_swRef,0);
-         exception when dup_val_on_index then null;
-         end;
+
 
          --читаемо uetr для передачі по ВПС
           begin
@@ -16050,6 +16047,13 @@ end process_auth_message;
            where swref = p_swref;
           exception when no_data_found then l_sw_journal.uetr:=null;
           end;
+         
+         if substr(l_sw_journal.mt,1,1) in ('1','2') then  
+             begin
+                insert into sw_oper_queue (ref, swref,status) values (p_docRef, p_swRef,0);
+             exception when dup_val_on_index then null;
+             end;
+         end if;
 
           if (l_sw_journal.uetr is not null) then
             begin
