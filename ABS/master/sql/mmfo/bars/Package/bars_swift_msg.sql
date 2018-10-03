@@ -399,10 +399,9 @@ IS
       RETURN VARCHAR2;
 END bars_swift_msg;
 /
-
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.59 18.09.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.60 03.10.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -8207,7 +8206,7 @@ IS
          mid_        => NULL,
          page_       => NULL,
          io_         => 'I',
-         sender_     => l_sw_journal.receiver,
+         sender_     => 'COSBUAUKXXX',
          receiver_   => BIC_GPI,
          transit_    => l_sw_journal.transit,
          payer_      => NULL,
