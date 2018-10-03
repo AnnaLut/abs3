@@ -147,7 +147,7 @@ IS
                                                                                                                      from dpt_deposit_clos a
                                                                                                                      where a.deposit_id = b.deposit_id)) VIDD_CODE,
                                                                                                                
-                           (SELECT type_name FROM dpt_vidd WHERE vidd in (select b.vidd from dpt_deposit_clos b where b.deposit_id =  D.DEPOSIT_ID and b.idupd in (select max( a.idupd ) 
+                           (SELECT type_name FROM dpt_vidd WHERE vidd = (select b.vidd from dpt_deposit_clos b where b.deposit_id =  D.DEPOSIT_ID and b.idupd in (select max( a.idupd ) 
                                                                                                                                                                    from dpt_deposit_clos a
                                                                                                                                                                    where a.deposit_id = b.deposit_id)) ) VIDD_NAME,
                            
@@ -248,9 +248,9 @@ IS
           when p_mode = -2 then l_stmt_str  || ' where DPT_STATUS = -1 and ARCHDOC_ID < 0 '
      end;
 
-      bars_audit.info(substr(l_stmt_str,1,4000));
+/*      bars_audit.info(substr(l_stmt_str,1,4000));
       bars_audit.info(substr(l_stmt_str,4001,8000));
-      bars_audit.info(substr(l_stmt_str,8001,16000));
+      bars_audit.info(substr(l_stmt_str,8001,16000));*/
       OPEN l_cursor FOR l_stmt_str;
 
       LOOP
