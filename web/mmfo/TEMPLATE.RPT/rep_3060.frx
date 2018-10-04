@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="06/26/2018 17:11:51" ReportInfo.Modified="09/14/2018 10:46:53" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/26/2018 17:11:51" ReportInfo.Modified="10/03/2018 15:17:05" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
     <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 CONTR_ID, NUM01 CONTR_TYPE, CHAR00 CONTR_TYPE_NAME, CHAR01 NUM, CHAR02 SUBNUM, NUM02 RNK, CHAR03 OKPO, CHAR04 NMK, CHAR05 NMKK, NUM03 CUSTTYPE, CHAR06 ND, NUM04 STATUS_ID, CHAR07 STATUS_NAME, CHAR08 COMMENTS, CHAR09 BRANCH_OWN, CHAR10 BRANCH_OWN_NAME, NUM05 KV, NUM06 S, DAT00 OPEN_DATE, DAT01 CLOSE_DATE, NUM07 OWNER_UID, CHAR11 OWNER_FIO, NUM08 BENEF_ID, CHAR12 BENEF_NAME, CHAR13 BENEF_ADR, NUM09 COUNTRY_ID, CHAR14 COUNTRY_NAME, NUM10 DEADLINE, CHAR15 BRANCH_SERVICE, CHAR16 BRANCH_SERVICE_NAME, CHAR17 PARAM1, CHAR18 SFDAT1, CHAR19 SFDAT2, CHAR20 PARAM2, CHAR21 PARAM3, CHAR22 PARAM4, CHAR23 CONTR_TYPE_NAME, CHAR24 STATUS_NAME, CHAR25 PARAM3, CHAR26 PARAM1 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT NUM00 CONTR_ID,&#13;&#10;         NUM01 CONTR_TYPE,&#13;&#10;         CHAR00 CONTR_TYPE_NAME,&#13;&#10;         CHAR01 NUM,&#13;&#10;         CHAR02 SUBNUM,&#13;&#10;         NUM02 RNK,&#13;&#10;         CHAR03 OKPO,&#13;&#10;         CHAR04 NMK,&#13;&#10;         CHAR05 NMKK,&#13;&#10;         NUM03 CUSTTYPE,&#13;&#10;         CHAR06 ND,&#13;&#10;         NUM04 STATUS_ID,&#13;&#10;         CHAR07 STATUS_NAME,&#13;&#10;         CHAR08 COMMENTS,&#13;&#10;         CHAR09 BRANCH_OWN,&#13;&#10;         CHAR10 BRANCH_OWN_NAME,&#13;&#10;         NUM05 KV,&#13;&#10;         NUM06 S,&#13;&#10;         DAT00 OPEN_DATE,&#13;&#10;         decode (DAT01,null,'',to_char(DAT01,'dd/mm/yyyy')) CLOSE_DATE,&#13;&#10;         NUM07 OWNER_UID,&#13;&#10;         CHAR11 OWNER_FIO,&#13;&#10;         NUM08 BENEF_ID,&#13;&#10;         CHAR12 BENEF_NAME,&#13;&#10;         CHAR13 BENEF_ADR,&#13;&#10;         NUM09 COUNTRY_ID,&#13;&#10;         CHAR14 COUNTRY_NAME,&#13;&#10;         NUM10 DEADLINE,&#13;&#10;         CHAR15 BRANCH_SERVICE,&#13;&#10;         CHAR16 BRANCH_SERVICE_NAME,&#13;&#10;         CHAR17 PARAM1,&#13;&#10;         CHAR18 SFDAT1,&#13;&#10;         CHAR19 SFDAT2,&#13;&#10;         CHAR20 PARAM2,&#13;&#10;         CHAR21 PARAM3,&#13;&#10;         CHAR22 PARAM4,&#13;&#10;         CHAR23 CONTR_TYPE_NAME,&#13;&#10;         CHAR24 STATUS_NAME,&#13;&#10;         CHAR25 PARAM3,&#13;&#10;         CHAR26 PARAM1&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :SESSION_ID&#13;&#10;ORDER BY id">
         <Column Name="CONTR_ID" DataType="System.Decimal"/>
         <Column Name="CONTR_TYPE" DataType="System.Decimal"/>
         <Column Name="CONTR_TYPE_NAME" DataType="System.String"/>
@@ -22,7 +22,7 @@
         <Column Name="KV" DataType="System.Decimal"/>
         <Column Name="S" DataType="System.Decimal"/>
         <Column Name="OPEN_DATE" DataType="System.DateTime"/>
-        <Column Name="CLOSE_DATE" DataType="System.DateTime"/>
+        <Column Name="CLOSE_DATE" DataType="System.Char" Format="General"/>
         <Column Name="OWNER_UID" DataType="System.Decimal"/>
         <Column Name="OWNER_FIO" DataType="System.String"/>
         <Column Name="BENEF_ID" DataType="System.Decimal"/>
@@ -43,7 +43,7 @@
         <Column Name="STATUS_NAME1" DataType="System.String"/>
         <Column Name="PARAM31" DataType="System.String"/>
         <Column Name="PARAM11" DataType="System.String"/>
-        <CommandParameter Name=":session_id" DataType="112" Expression="[session_id]" DefaultValue="808669"/>
+        <CommandParameter Name=":session_id" DataType="112" Expression="[session_id]" DefaultValue="810673"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="session_id" DataType="System.Int32"/>
@@ -121,7 +121,7 @@
           <TableCell Name="Cell5" Border.Lines="All" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell26" Border.Lines="All" Text="[Table.S]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell27" Border.Lines="All" Text="[Table.OPEN_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell28" Border.Lines="All" Text="[Table.CLOSE_DATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="[Table.CLOSE_DATE]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell29" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell30" Border.Lines="All" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell31" Border.Lines="All" Text="[Table.BENEF_NAME]" HorzAlign="Center" VertAlign="Center"/>
