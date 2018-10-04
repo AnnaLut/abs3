@@ -348,8 +348,17 @@ namespace BarsWeb.Controllers
         
         public ActionResult LogOut()
         {
-            _repository.LogOutUser();
-            return Redirect(Constants.LoginPageUrl);
+            if (System.Configuration.ConfigurationManager.AppSettings["CustomAuthentication.AD"] == "On")
+            {
+                _repository.LogOutUser();
+                return Redirect( Url.Content("~/"));
+            }
+            else
+            {
+                _repository.LogOutUser();
+                 return Redirect(Constants.LoginPageUrl);
+            }
+           
         }
 
         #region RC4 шифрование
