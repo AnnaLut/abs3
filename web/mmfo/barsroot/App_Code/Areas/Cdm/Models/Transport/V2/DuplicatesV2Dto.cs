@@ -18,16 +18,16 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
             MasterGcif = string.Empty;
         }
 
-        [OracleObjectMapping("KF")]
+        [OracleObjectMappingAttribute("KF")]
         public string Kf { get; set; }
 
-        [OracleObjectMapping("RNK")]
-        public long Rnk { get; set; }
+        [OracleObjectMappingAttribute("RNK")]
+        public decimal Rnk { get; set; }
 
-        [OracleObjectMapping("GCIF")]
+        [OracleObjectMappingAttribute("GCIF")]
         public string Gcif { get; set; }
 
-        [OracleObjectMapping("MASTERGCIF")]
+        [OracleObjectMappingAttribute("MASTERGCIF")]
         public string MasterGcif { get; set; }
 
         public bool IsNull
@@ -40,6 +40,13 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
 
         public void FromCustomObject(OracleConnection con, IntPtr pUdt)
         {
+            if (Kf != null)
+            {
+                OracleUdt.SetValue(con, pUdt, "KF", Kf);
+            }
+
+            OracleUdt.SetValue(con, pUdt, "RNK", Rnk);
+
             if (Gcif != null)
             {
                 OracleUdt.SetValue(con, pUdt, "GCIF", Gcif);
@@ -49,13 +56,6 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
             {
                 OracleUdt.SetValue(con, pUdt, "MASTERGCIF", MasterGcif);
             }
-
-            if (Kf != null)
-            {
-                OracleUdt.SetValue(con, pUdt, "KF", Kf);
-            }
-
-            OracleUdt.SetValue(con, pUdt, "RNK", Rnk);
         }
 
         public void ToCustomObject(OracleConnection con, IntPtr pUdt)
@@ -67,13 +67,13 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
         }
     }
 
-    [OracleCustomTypeMapping("BARS.R_SLAVE_CLIENT_EBK")]
+    [OracleCustomTypeMappingAttribute("BARS.R_SLAVE_CLIENT_EBK")]
     public class DuplicatesV2DtoFactory : IOracleCustomTypeFactory
     {
         public IOracleCustomType CreateObject() { return new DuplicatesV2Dto();}
     }
 
-    [OracleCustomTypeMapping("BARS.T_SLAVE_CLIENT_EBK")]
+    [OracleCustomTypeMappingAttribute("BARS.T_SLAVE_CLIENT_EBK")]
     public class DuplicatesV2DtoArrayFactory : IOracleArrayTypeFactory
     {
         public Array CreateArray(int numElems)
