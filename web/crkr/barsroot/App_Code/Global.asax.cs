@@ -7,12 +7,14 @@ using BarsWeb.Infrastructure.Repository.DI.Implementation;
 using Oracle.DataAccess.Client;
 using System.Data;
 using barsroot.core;
+using BarsWeb.Models;
 
 //***********************
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.Http;
+using System.Web.Security;
 using Bars.Application;
 using BarsWeb.Core.Logger;
 using BarsWeb.Infrastructure;
@@ -77,7 +79,10 @@ namespace BarsWeb
 
         protected void Session_Start(Object sender, EventArgs e)
         {
+            if(Request.Url.AbsolutePath == "/barsroot/errors/index/") return;
+
             bool formsAuthEnabled = (ConfigurationSettings.AppSettings.Get("CustomAuthentication") == "On") ? (true) : (false);
+            bool adEnabled = System.Configuration.ConfigurationManager.AppSettings["CustomAuthentication.AD"] == "On";
             bool useSSL = (ConfigurationSettings.AppSettings["CustomAuthentication.AuthSSL"] == "On") ? (true) : (false);
             if (useSSL && !Request.IsSecureConnection)
             {
@@ -86,30 +91,37 @@ namespace BarsWeb
             }
             if (useSSL)
                 ConfigurationSettings.RefreshUserInfo(ConfigurationSettings.getUserNameFromCertificate(Request.ClientCertificate));
-            if (!formsAuthEnabled)
+            if (!formsAuthEnabled || adEnabled)
             {
+                if (!Context.User.Identity.IsAuthenticated)
+                {
+                    return;
+                }
+                //throw new Exception("Неавторизований запит, ймовірно некоректно налаштований веб-сервер. Зверніться до адміністратора.");
                 OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
-
                 // информация о текущем пользователе
                 string userName = Context.User.Identity.Name.ToLower();
-                UserMap userMap = Bars.Configuration.ConfigurationSettings.RefreshUserInfo(userName);
+                UserMap userMap;
                 try
                 {
                     if (System.Configuration.ConfigurationManager.AppSettings["CustomAuthentication.AD"] == "On")
                     {
+                        userMap = ConfigurationSettings.RefreshUserInfo(userName);
+                        if (string.IsNullOrEmpty(userMap.webuser))
+                            throw new System.Exception(string.Format("Користувача {0} не знайдено у базі даних.", userName));
                         // установка первичных параметров
                         OracleCommand command = connect.CreateCommand();
                         command.Parameters.Add("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input);
-                        command.Parameters.Add("p_login_name", OracleDbType.Varchar2, userName, ParameterDirection.Input);
-                        command.Parameters.Add("p_authentication_mode", OracleDbType.Varchar2, "ACTIVE DIRECTORY", ParameterDirection.Input);
+                        command.Parameters.Add("p_user_id", OracleDbType.Varchar2, userMap.user_id, ParameterDirection.Input);
                         command.Parameters.Add("p_hostname", OracleDbType.Varchar2, HttpContext.Current.Request.UserHostAddress, ParameterDirection.Input);
                         command.Parameters.Add("p_application_name", OracleDbType.Varchar2, "barsroot", ParameterDirection.Input);
                         command.CommandText = "bars.bars_login.login_user";
                         command.CommandType = CommandType.StoredProcedure;
                         command.ExecuteNonQuery();
+                        HttpContext.Current.Session["AD_Auth"] = true;
                     }
                     else {
-                        
+                        userMap = ConfigurationSettings.RefreshUserInfo(userName);
                         if (string.IsNullOrEmpty(userMap.webuser))
                             throw new System.Exception(string.Format("Користувача {0} не знайдено у базі даних.", userName));
                         // установка первичных параметров
@@ -122,9 +134,8 @@ namespace BarsWeb
                         command.CommandType = CommandType.StoredProcedure;
                         command.ExecuteNonQuery();
                     }
-
                 }
-                catch (Oracle.DataAccess.Client.OracleException ex)
+                catch (OracleException ex)
                 {
                     if (ex.Message.StartsWith("ORA-20984") /*Банковский день закрыт*/ ||
                         ex.Message.StartsWith("ORA-20980") /*Повторная регистрация с одним и тем же SESSION_ID*/ ||
@@ -138,7 +149,14 @@ namespace BarsWeb
                             throw new Bars.Exception.BarsException("Банківський день закрито.<br>Спробуйте перезайти в систему через деякий час.");
                         }
                     }
-                    else
+                    else if (ex.Message.StartsWith("ORA-20000"))
+                    {
+                        string message = ex.Message.Substring(10, ex.Message.IndexOf("ORA-", 10) - 10);
+                        HttpContext.Current.Session["AppError"] = new Exception(message, ex);
+                        HttpContext.Current.Response.Redirect("~/errors/index/?type=AppError&_=" + DateTime.Now.Ticks);
+                        return;
+                    }
+                    else 
                         throw ex;
                 }
                 finally
@@ -146,6 +164,8 @@ namespace BarsWeb
                     connect.Close();
                     connect.Dispose();
                 }
+                userMap = ConfigurationSettings.RefreshUserInfo(userName);
+
                 // Если выполнили установку параметров
                 Session["UserLoggedIn"] = true;
                 Session[Constants.UserId] = userMap.user_id;
@@ -153,8 +173,7 @@ namespace BarsWeb
                 HttpContext.Current.Session["userIdentity"] = userIdentity;
                 HttpContext.Current.Session["dbuser"] = userMap.dbuser;
 
-
-                _dbLogger.Info("Веб-користувач [" + userName + "] розпочав роботу в глобальній банківській даті - " + userMap.bank_date.ToString("dd.MM.yyyy"));
+                //_dbLogger.Info("Веб-користувач [" + userName + "] розпочав роботу в глобальній банківській даті - " + userMap.bank_date.ToString("dd.MM.yyyy"));
 
                 //Response.Redirect("/barsroot");
                 // Проверка на возможность работы с несколькоми банковскими днями
@@ -200,12 +219,18 @@ namespace BarsWeb
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)
-        {
+        {  /*if (System.Configuration.ConfigurationManager.AppSettings["CustomAuthentication.AD"] == "On")
+           {
+			   Context.Response.Redirect("~");
+		   }
+		   else 
+		   {*/
             if (Request.Url.ToString().ToLower().Contains("barsweb/loginpage.aspx"))
             {
                 Context.Response.StatusCode = 301;
                 Context.Response.Redirect("~/Account/Login");
             }
+		   //}
         }
 
         #region Web Form Designer generated code
