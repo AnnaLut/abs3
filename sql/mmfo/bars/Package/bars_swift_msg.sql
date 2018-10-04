@@ -7,7 +7,7 @@ IS
    --**************************************************************--
 
 
-   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.21 18.09.2018';
+   VERSION_HEADER        CONSTANT VARCHAR2 (64) := 'version 1.22 04.10.2018';
    VERSION_HEADER_DEFS   CONSTANT VARCHAR2 (512) := '';
 
    -- Устаревшие типы
@@ -338,9 +338,9 @@ IS
 
    PROCEDURE generate_reject (p_uetr IN sw_journal.uetr%TYPE);
    
-   PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number);
+   PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number, p_20 varchar2);
    
-   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2);
+   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_20 varchar2);
    
    PROCEDURE generate_acsc (p_uetr IN sw_journal.uetr%TYPE);
    
@@ -401,7 +401,7 @@ END bars_swift_msg;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.60 03.10.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.61 04.10.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -8114,7 +8114,7 @@ IS
    END genmsg_mt299;
    
    
-   PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number)
+   PROCEDURE generate_mt192 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_indm number, p_20 varchar2)
    is 
      CURSOR cursModel (p_mt IN NUMBER)
       IS
@@ -8249,12 +8249,7 @@ IS
          THEN
             l_opt := '';
 
-            IF LENGTH (l_20fld) < 16
-            THEN
-               l_value := l_20fld || 'A';
-            ELSE
-               l_value := SUBSTR (l_20fld, 2, 15) || 'A';
-            END IF;
+          l_value:=p_20;
 
             genmsg_document_instag (l_recModel,
                                     l_swref_new,
@@ -8322,7 +8317,7 @@ IS
   end generate_mt192;
    
    
-   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2)
+   PROCEDURE generate_mt196 (p_uetr IN sw_journal.uetr%TYPE, p_status_code varchar2, p_20 varchar2)
     is 
      CURSOR cursModel (p_mt IN NUMBER)
       IS
@@ -8457,12 +8452,7 @@ IS
          THEN
             l_opt := '';
 
-            IF LENGTH (l_20fld) < 16
-            THEN
-               l_value := l_20fld || 'A';
-            ELSE
-               l_value := SUBSTR (l_20fld, 2, 15) || 'A';
-            END IF;
+            l_value:=p_20;
 
             genmsg_document_instag (l_recModel,
                                     l_swref_new,

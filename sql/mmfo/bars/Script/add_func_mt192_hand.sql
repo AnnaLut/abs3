@@ -17,7 +17,7 @@ bc.home();
       l_function_ids.extend(l);      
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'Ручне формування МТ192',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=[NSIFUNCTION][PAR=>:UETR(SEM=UETR,TYPE=S),:STATUS_CODE(SEM=Статус,TYPE=S,REF=SW_DICTIONARY_STATUS_MT192),:INDM(SEM=Компенсація,TYPE=B)][PROC=> bars_swift_msg.generate_mt192(:UETR,:STATUS_CODE,:INDM)][QST=>Відіслати МТ192?][EXEC=>BEFORE][MSG=>Виконано!]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=[NSIFUNCTION][PAR=>:UETR(SEM=UETR,TYPE=S),:STATUS_CODE(SEM=Статус,TYPE=S,REF=SW_DICTIONARY_STATUS_MT192),:INDM(SEM=Компенсація,TYPE=B),:P_20(SEM=20,TYPE=S)][PROC=> bars_swift_msg.generate_mt192(:UETR,:STATUS_CODE,:INDM,:P_20)][QST=>Відіслати МТ192?][EXEC=>BEFORE][MSG=>Виконано!]',
                                                   p_rolename => 'bars_access_defrole' ,    
                                                   p_frontend => l_application_type_id
                                                   );
