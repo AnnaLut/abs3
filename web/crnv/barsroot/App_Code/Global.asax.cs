@@ -1,22 +1,17 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
 using System.Web;
-using System.Web.SessionState;
 using Bars.Configuration;
 using Oracle.DataAccess.Client;
-using System.Collections.Specialized;
-using System.Xml;
 using System.Data;
 using barsroot.core;
+using Bars.Application;
 
 //***********************
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-
 using barsroot.Controllers;
+using BarsWeb.Infrastructure;
 //***********************
 
 namespace barsroot
@@ -94,6 +89,7 @@ namespace barsroot
         {
 
             bool formsAuthEnabled = (ConfigurationSettings.AppSettings.Get("CustomAuthentication") == "On") ? (true) : (false);
+            bool adEnabled = true;
             bool useSSL = (ConfigurationSettings.AppSettings["CustomAuthentication.AuthSSL"] == "On") ? (true) : (false);
             if (useSSL && !Request.IsSecureConnection)
             {
@@ -102,16 +98,29 @@ namespace barsroot
             }
             if(useSSL)
                 ConfigurationSettings.RefreshUserInfo(ConfigurationSettings.getUserNameFromCertificate(Request.ClientCertificate));
-            if (!formsAuthEnabled)
+            if (!formsAuthEnabled|| adEnabled)
             {
+                if (!Context.User.Identity.IsAuthenticated)
+                {
+                    return;
+                }
+                //throw new Exception("Неавторизований запит, ймовірно некоректно налаштований веб-сервер. Зверніться до адміністратора.");
+
                 OracleConnection connect = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
 
                 // информация о текущем пользователе
                 string userName = Context.User.Identity.Name.ToLower();
-                UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
+                UserMap userMap;                
+//UserMap userMap = Bars.Configuration.ConfigurationSettings.GetUserInfo(userName);
 
                 try
                 {
+                      
+
+                   userMap = ConfigurationSettings.RefreshUserInfo(userName);
+                        if (string.IsNullOrEmpty(userMap.webuser))
+                            throw new System.Exception(string.Format("Користувача {0} не знайдено у базі даних.", userName));
+                    
                     // установка первичных параметров
                     OracleCommand command = connect.CreateCommand();
                     command.Parameters.Add("p_session_id", OracleDbType.Varchar2, Session.SessionID, ParameterDirection.Input);
@@ -121,7 +130,9 @@ namespace barsroot
                     command.CommandText = "bars.bars_login.login_user";
                     command.CommandType = CommandType.StoredProcedure;
                     command.ExecuteNonQuery();
-                 
+                    HttpContext.Current.Session["AD_Auth"] = true;
+					//Bars.Logger.DBLogger.Info("Веб-користувач [" + userMap.user_id + "] розпочав");
+
                 }
                 catch (Oracle.DataAccess.Client.OracleException ex)
                 {
@@ -145,8 +156,13 @@ namespace barsroot
                     connect.Close();
                     connect.Dispose();
                 }
+               userMap = ConfigurationSettings.RefreshUserInfo(userName);
                 // Если выполнили установку параметров
                 Session["UserLoggedIn"] = true;
+                Session[Constants.UserId] = userMap.user_id;
+                CustomIdentity userIdentity = new CustomIdentity(userName, 1, true, false, userName, "", "");
+                HttpContext.Current.Session["userIdentity"] = userIdentity;
+                HttpContext.Current.Session["dbuser"] = userMap.dbuser;
 
                 Bars.Logger.DBLogger.Info("Веб-користувач [" + userName + "] розпочав роботу в глобальній банківській даті - " + userMap.bank_date.ToString("dd.MM.yyyy"));
 
