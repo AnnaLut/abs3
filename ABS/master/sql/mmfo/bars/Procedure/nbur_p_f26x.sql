@@ -18,7 +18,7 @@ is
 %
 % VERSION     :  v.18.001 20/09/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.001    20.09.2018';
+  ver_                     char(30)  := 'v.18.002    03.10.2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -113,14 +113,15 @@ BEGIN
                else 'XXXXXX'  
           end) as EKP, 
          f_get_ku_by_nbuc(nbuc) as KU,
-         b.T020, b.R020, b.R011, b.R013, b.R030, a.K040, a.Q001, a.K020, a.K021, a.K180, a.K190, 
+         b.T020, b.R020, b.R011, b.R013, b.R030, a.K040, a.Q001, a.K020, a.K021, a.K180, 
+         nvl(trim(c.k190), '#') as K190,  
          b.S181, replace(b.S245, '0', '#') as S245, b.S580, a.F033, b.T070, 
          (case when b.r030 = '980' then b.T070 else b.T071 end) as T071, 
          b.ACC_ID, b.ACC_NUM, b.KV, a.CUST_ID, b.BRANCH
     from (     
     -- інформація про банки             
     select REPORT_DATE, KF, NBUC, K020, (case when K040 = '804' then '3' else '4' end) as K021, 
-           K040, Q001, K180, '#' as K190, F033, CUST_ID, BRANCH 
+           K040, Q001, K180, F033, CUST_ID, BRANCH 
     from (
     select REPORT_DATE, KF, NBUC, SEG_04 as R020, SEG_05 as R011, SEG_06 as R013, SEG_07 as R030, 
        SEG_02 as K040, SEG_03 as K020, SEG_09 as S181, SEG_10 as S245, 
@@ -129,7 +130,7 @@ BEGIN
     where p.report_date = p_report_date and
           p.kf = p_kod_filii and 
           p.seg_04 = '0000')   
-    pivot (max(field_value) for seg_01 in ('97' as K180, '98' as Q001, '99' as K190))) a
+    pivot (max(field_value) for seg_01 in ('97' as K180, '98' as Q001))) a
     left outer join
     -- інформація про рахунки та залишки
     (select R020, R030, R011, R013, S181, S245, S580,  
@@ -146,7 +147,9 @@ BEGIN
           p.kf = p_kod_filii and 
           p.seg_04 <> '0000')   
     pivot (max(field_value) for seg_01 in ('10' as DEBG, '11' as DEBV, '20' as KREG, '21' as KREV))) b
-    on (a.cust_id = b.cust_id); 
+    on (a.cust_id = b.cust_id)
+    left outer join custbank c
+    on (b.cust_id = c.rnk); 
 
   --Агрегированный нам не нужен, так как агрегированные данные будут поступать из XML-формата
 
