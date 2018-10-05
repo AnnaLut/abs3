@@ -29,8 +29,8 @@ select p.REPORT_DATE
          , p.ACC_NUM
          , p.KV
          , p.CUST_ID
-         , c.CUST_CODE
-         , c.CUST_NAME
+         , c.OKPO as CUST_CODE
+         , c.NMK as CUST_NAME
          , p.REF
          , p.BRANCH
     from NBUR_LOG_FE9X p
@@ -39,9 +39,7 @@ select p.REPORT_DATE
                                   and (v.KF = p.KF)
                                   and (v.VERSION_ID = p.VERSION_ID)
                                   and (v.FILE_ID = f.ID)
-         left join V_NBUR_DM_CUSTOMERS c on (p.REPORT_DATE = c.REPORT_DATE)
-                                            and (p.KF = c.KF)
-                                            and (p.CUST_ID    = c.CUST_ID)
+         left join CUSTOMER c on (p.CUST_ID    = c.RNK)
    where v.FILE_STATUS IN ('FINISHED', 'BLOCKED');
 
 comment on table v_nbur_e9x_DTL is 'Детальний протокол файлу E9X';
