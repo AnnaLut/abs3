@@ -29,19 +29,17 @@ PROMPT *** Create  view V_OPER_FM ***
           o.s / 100 s,
           o.s2 / 100 s2,
           'ƒÛÍ' PRINT
-     FROM oper o,
-          (SELECT DISTINCT REF
-             FROM operw
-            WHERE tag IN ('BPLAC',
-                          'WORK',
-                          'PHONW',
-                          'O_REP',
-                          'RIZIK',
-                          'PUBLP',
-                          'FSVSN',
-                          'DJER')) ow
-    WHERE     o.REF = ow.REF
-                  and (case
+     FROM oper o
+    WHERE o.tt in (
+                   'AA0', 'AA3', 'AA4', 'AA5', 'AA6', 'AA7', 'AA8', 'AA9', '107', 
+                   '112', '113', '115', '116', '130', '132', '136', '140', '142', 
+                   '146', '19C', '19K', '401', '402', '403', '404', '406', '416', 
+                   '417', 'C05', 'HO1', 'HO3', 'HO6', 'HO9', 'PKK', '—N1', 'MUK', 
+                   'MUM', 'MUV', '27', '02¿', '02B', '02C', '03B', '77', '07A', 
+                   '“Ã ', '“Ã–', '“Ã1', '“Ã2', '“Ã7', '“Ã8', '“≤ ', '“≤–', '“11', 
+                   '“12', '“17', '“18', '“  ', '““≤', '¬ÃY', 'BNY'
+                   )
+              and (case
                    when kv2=980  then s2
                    when kv2!=980 then gl.p_icurval(kv2,s2,gl.bd)
                    else 0
