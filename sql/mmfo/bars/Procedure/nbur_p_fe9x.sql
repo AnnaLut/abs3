@@ -20,7 +20,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FE9X (p_kod_filii  varchar2
   l_datez         date := p_report_date + 1;
   l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
   l_old_file_code varchar2(3) := '#E9';
-  l_version       number;
+  l_version_id    number;
 
   --Exception
   e_ptsn_not_exsts exception;
@@ -41,14 +41,14 @@ begin
       null;
   end;
   
+  l_version_id := f_nbur_get_run_version(
+                                          p_file_code => p_file_code
+                                          , p_kf => p_kod_filii
+                                          , p_report_date => p_report_date
+                                        );
+
   -- очікуємо формування старого файлу
   nbur_waiting_form(p_kod_filii, p_report_date, l_old_file_code, c_title);
-  
-  select max(version_id)
-  into l_version
-  from v_nbur_#e9
-  where report_date = p_report_date and
-        kf = p_kod_filii;
 
   -- вставляємо з протоколу старого файлу
   insert
@@ -115,7 +115,7 @@ begin
                  , ref
                  , branch
            from (select nbuc
-                       , version_id
+                       , l_version_id as version_id
                        , substr(substr(field_code,1,16)||substr(field_code,19),1,1) ekp_1
                        , substr(substr(field_code,1,16)||substr(field_code,19),2) ekp_2
                        , field_value
@@ -131,7 +131,7 @@ begin
                         kf = p_kod_filii
                   union all
                   select nbuc
-                       , l_version
+                       , l_version_id
                        , substr(field_code,1,1) ekp_1
                        , substr(field_code,2) ekp_2
                        , field_value
