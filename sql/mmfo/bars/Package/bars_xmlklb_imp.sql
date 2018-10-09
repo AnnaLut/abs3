@@ -353,7 +353,7 @@ is
   ----------------------------------------------
   --  константы
   ----------------------------------------------
-  G_BODY_VERSION    constant varchar2(64) := 'version 13.4  28.11.2017';
+  G_BODY_VERSION    constant varchar2(64) := 'version 13.5  20.07.2018';
   G_MODULE          constant char(3)      := 'KLB';    -- код модуля
   G_TRACE           constant varchar2(50) := 'xmlklb_imp.';
 
@@ -1302,9 +1302,17 @@ is
       l_trace     varchar2(1000) := G_TRACE||'insert_doc_to_oper: ';
    begin
 
+     if ( p_impdoc.id_b in ('0000000000','9999999999') )
+     then
+       if ( p_impdoc.d_rec is null )
+       then
+         p_impdoc.d_rec := '#ф'||'Клієнтом не надано'||'#';
+       else
+          p_impdoc.d_rec := p_impdoc.d_rec||'ф'||'Клієнтом не надано'||'#';
+       end if;
+     end if;
 
-
-      gl.in_doc2(
+     gl.in_doc2(
              ref_   =>  p_ref,
              tt_    =>  p_impdoc.tt,
              vob_   =>  p_impdoc.vob,
@@ -1336,7 +1344,6 @@ is
              prty_  =>  0,
              uid_   =>  p_impdoc.userid);
 
-
       for i in  0..p_dreclist.count-1 loop
           -- вставка доп. реквизитов
           if ( p_dreclist(i).tag is not null and
@@ -1367,11 +1374,9 @@ is
 
        end loop;
 
-
       if p_impdoc.bis = 1 then
          update oper set bis = p_impdoc.bis where ref = p_ref;
       end if;
-
 
       if p_impdoc.fn is not null then
          insert into operw(ref, tag, value)

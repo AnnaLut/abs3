@@ -1,12 +1,5 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_xmlklb_imp.sql =========*** Run
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.BARS_XMLKLB_IMP is
-
-
+create or replace package BARS_XMLKLB_IMP
+is
 
   -----------------------------------------------------------------
   --
@@ -344,8 +337,13 @@
 
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
 
+show errors
+
+----------------------------------------------------------------------------------------------------
+
+create or replace package body BARS_XMLKLB_IMP
+is
 
    ---------------------------------------------------------
    --
@@ -359,12 +357,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
    ----------------------------------------------
    --  константы
    ----------------------------------------------
-
-   g_awk_body_defs constant varchar2(512) := ''
-          ||'    - —бербанк'    || chr(10)
-;
-
-   G_BODY_VERSION    constant varchar2(64) := 'version 13.13 28.11.2017';
+   G_BODY_VERSION    constant varchar2(64) := 'version 13.14 20.07.2018';
 
    G_MODULE          constant char(3)      := 'KLB';    -- код модул€
    G_TRACE           constant varchar2(50) := 'xmlklb_imp.';
@@ -1315,9 +1308,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
       l_trace     varchar2(1000) := G_TRACE||'insert_doc_to_oper: ';
    begin
 
+     if ( p_impdoc.id_b in ('0000000000','9999999999') )
+     then
+       if ( p_impdoc.d_rec is null )
+       then
+         p_impdoc.d_rec := '#ф'||' л≥Їнтом не надано'||'#';
+       else
+          p_impdoc.d_rec := p_impdoc.d_rec||'ф'||' л≥Їнтом не надано'||'#';
+       end if;
+     end if;
 
-
-      gl.in_doc2(
+     gl.in_doc2(
              ref_   =>  p_ref,
              tt_    =>  p_impdoc.tt,
              vob_   =>  p_impdoc.vob,
@@ -1349,7 +1350,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
              prty_  =>  0,
              uid_   =>  p_impdoc.userid);
 
-
       for i in  0..p_dreclist.count-1 loop
           -- вставка доп. реквизитов
           if ( p_dreclist(i).tag is not null and
@@ -1380,11 +1380,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
 
        end loop;
 
-
       if p_impdoc.bis = 1 then
          update oper set bis = p_impdoc.bis where ref = p_ref;
       end if;
-
 
       if p_impdoc.fn is not null then
          insert into operw(ref, tag, value)
@@ -1426,8 +1424,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
          l_paymode   := 0;
       end;
 
-
       bars_audit.trace(l_trace||'перед gl.dyntt2');
+
       gl.dyntt2 (
          sos_   => l_sos,
          mod1_  => l_paymode,
@@ -1451,11 +1449,12 @@ CREATE OR REPLACE PACKAGE BODY BARS.BARS_XMLKLB_IMP is
    -- установка записи  в oper_list
    chk.put_visa (p_ref, p_impdoc.tt, null, 0, null, null, null);
 
-   exception when others then
-      bars_audit.error(l_trace||'ошибка  оплаты док-та:');
-      bars_audit.error(l_trace||sqlerrm);
-      raise;
-   end;
+   exception
+     when others then
+       bars_audit.error(l_trace||'ошибка  оплаты док-та:');
+       bars_audit.error(l_trace||sqlerrm);
+       raise;
+   end glpay_doc;
 
 
    -----------------------------------------------------------------
