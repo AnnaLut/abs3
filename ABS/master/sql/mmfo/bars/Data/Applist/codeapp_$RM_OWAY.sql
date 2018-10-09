@@ -802,6 +802,38 @@ begin
                                                   );
 
 
+	 DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Перелік зарезервованих номерів рахунків 2600, 2650 ********** ');
+    l := l +1;
+    l_function_ids.extend(l);
+    l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Перелік зарезервованих номерів рахунків 2600, 2650',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_TRANSFORM_LE_REPORT',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                               );
+
+	 --  Створюємо функцію АРМ
+	 DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Табл. прогнозу заміни рахунків фіз. осіб по МФО для сателітних систем ********** ');
+    l := l +1;
+    l_function_ids.extend(l);
+    l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Табл. прогнозу заміни рахунків фіз. осіб по МФО для сателітних систем',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_TRANSFORM_FORECAST[CONDITIONS=>NBS=''2625''][NSIFUNCTION][EXCEL=>DISABLE]',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                               );
+
+	 --  Створюємо функцію АРМ
+	 DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Табл. прогнозу заміни рахунків юр. осіб по МФО для сателітних систем ********** ');
+    l := l +1;
+    l_function_ids.extend(l);
+    l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'Табл. прогнозу заміни рахунків юр. осіб по МФО для сателітних систем',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_TRANSFORM_FORECAST_LE[NSIFUNCTION][EXCEL=>DISABLE]',
+                                                  p_rolename => '' ,
+                                                  p_frontend => l_application_type_id
+                                               );
+
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_OWAY) - АРМ Інтерфейс з OpenWay  ');
     l := l_function_ids.first;
     while (l is not null and l_function_ids(l)  is not null) loop

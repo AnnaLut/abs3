@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_epp_utl.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE PFU.PFU_EPP_UTL is
+CREATE OR REPLACE PACKAGE PFU_EPP_UTL is
 
     LINE_STATE_NEW                 constant integer := 1;
     LINE_STATE_ACCEPTED            constant integer := 2;
@@ -33,10 +33,7 @@ CREATE OR REPLACE PACKAGE PFU.PFU_EPP_UTL is
     LINE_STATE_CARD_BLOCKED_DBLK   constant integer := 24;
     LINE_STATE_CARD_UNBLOCKED_DBLK constant integer := 25;
 
-    -- тип для валідації рядків файлу для відкриття рахунку в Банку та атрибутів файлу з інформацією по ЕПП, які потребують перевипуску
     type t_epp_lines is table of pfu_epp_line%rowtype index by pls_integer;
-    -- тип для валідації ОПІКУНІВ рядків файлу для відкриття рахунку в Банку та атрибутів файлу з інформацією по ЕПП, які потребують перевипуску
-    type t_epp_line_guardian is table of pfu_epp_line_guardian%rowtype index by pls_integer;
 
     function read_epp_batch_list_request(
         p_request_id in integer,
@@ -151,7 +148,7 @@ CREATE OR REPLACE PACKAGE PFU.PFU_EPP_UTL is
         p_epp_line in pfu_epp_line%rowtype);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
+CREATE OR REPLACE PACKAGE BODY PFU_EPP_UTL as
 
     function read_epp_batch_list_request(
         p_request_id in integer,
@@ -368,7 +365,6 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
                                                                                               'root')));
 
         l_header_node := dbms_xmldom.appendChild(l_root_node,
-
                                                  dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
                                                                                                 'header')));
         l_body_node   := dbms_xmldom.appendChild(l_root_node,
@@ -455,7 +451,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
         update pfu_pensacc t
            set t.state = 'BLOCKED'
-         where t.nls = p_nls
+         where (t.nls = p_nls or t.nlsalt = p_nls) -- COBUMMFO-7501
            and t.kf = p_kf;
 
         l_doc       := dbms_xmldom.newDomDocument;
@@ -502,13 +498,13 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
         update pfu_pensacc t
            set t.state = 'UNBLOCKED'
-         where t.nls = p_nls
+         where (t.nls = p_nls or t.nlsalt = p_nls) -- COBUMMFO-7501
            and t.kf = p_kf;
 
         l_doc       := dbms_xmldom.newDomDocument;
         l_root_node := dbms_xmldom.makeNode(l_doc);
         l_root_node := dbms_xmldom.appendChild(l_root_node,
-                                               dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+																						 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
                                                                                               'root')));
 
         l_header_node := dbms_xmldom.appendChild(l_root_node,
@@ -831,7 +827,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
           update pfu.pfu_pensacc c
              set c.comm =l_comm,
                  c.date_blk = l_date
-           where c.nls = l_nls
+           where (c.nls = l_nls or c.nlsalt = l_nls) -- COBUMMFO-7501
              and c.kf = l_kf;
         elsif l_isepp = 1 then
           l_id   := to_number(dbms_xslprocessor.valueof(l_row, 'id/text()'));
@@ -893,7 +889,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
           update pfu.pfu_pensacc c
              set c.comm =l_comm,
                  c.date_blk = l_date
-           where c.nls = l_nls
+           where (c.nls = l_nls or c.nlsalt = l_nls) -- COBUMMFO-7501
              and c.kf = l_kf;
         elsif l_isepp = 1 then
           l_id   := to_number(dbms_xslprocessor.valueof(l_row, 'id/text()'));
@@ -1054,6 +1050,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 */
 end;
 /
+
  show err;
  
 PROMPT *** Create  grants  PFU_EPP_UTL ***

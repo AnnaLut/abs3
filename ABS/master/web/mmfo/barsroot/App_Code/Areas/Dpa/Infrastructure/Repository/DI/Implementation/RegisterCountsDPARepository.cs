@@ -23,12 +23,47 @@ public class RegisterCountsDPARepository : IRegisterCountsDPARepository
 
     }
 
+    public string GetParameter(string par)
+    {
+        OracleConnection connection = OraConnector.Handler.UserConnection;
+        OracleCommand cmd = connection.CreateCommand();
+        string res = String.Empty;
+        try
+        {
+            cmd.CommandType = System.Data.CommandType.Text;
+            cmd.CommandText = "select GetGlobalOption(:Par_) from dual";
+            cmd.Parameters.Add(new OracleParameter("Par_", OracleDbType.Varchar2, par, System.Data.ParameterDirection.Input));
+
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                res = reader.GetString(0);
+            }
+        }
+        catch
+        {
+            res = "100";
+        }
+        finally
+        {
+            cmd.Dispose();
+            connection.Dispose();
+            connection.Close();
+        }
+
+        return res;
+    }
+
     public List<T> GetFileReport<T>(string entereddate, string fileType)
     {
         List<T> list = new List<T>();
+
         if (fileType == "F")
         {
-            var sql = @"SELECT t.rowid AS idrow
+            string countRow = GetParameter("DPA_FFILE_ROW_CNT");
+
+            var sql = @"SELECT * FROM (SELECT t.rowid AS idrow
       ,t.mfo
       ,t.id_a
       ,t.rt
@@ -121,10 +156,10 @@ SELECT t.rowid AS idrow
                   ,nvl(dazs
                       ,a.daos))
        END >= to_date(:entereddate
-                     ,'dd/mm/yyyy') - 30";
+                     ,'dd/mm/yyyy') - 30) where rownum <= :countRow";
             using (var connection = OraConnector.Handler.UserConnection)
             {
-                return connection.Query<T>(sql, new { entereddate }).ToList();
+                return connection.Query<T>(sql, new { entereddate, countRow }).ToList();
             }
         }
         else if (fileType == "CV")

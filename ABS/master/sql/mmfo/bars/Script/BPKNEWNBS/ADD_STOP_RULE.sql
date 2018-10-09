@@ -18,5 +18,77 @@ begin
         null;
     end;
   end loop;
+  
+  begin
+     insert into ttsap
+        (ttap, tt, dk)
+     values
+        ('!!U', 'PKR', 0);
+  exception
+     when others then
+        null;
+end;
+
+  begin
+     insert into ttsap
+        (ttap, tt, dk)
+     values
+        ('!!Z', 'PKR', 1);
+  exception
+     when others then
+        null;
+  end;
+
+  begin
+     insert into ttsap
+       (ttap, tt, dk)
+     values
+       ('!!U', 'PKD', 1 );
+  exception
+     when others then
+        null;
+  end;
+
+  begin
+     insert into ttsap
+        (ttap, tt, dk)
+     values
+        ('!!U', 'OW4', 1);
+  exception
+     when others then
+        null;
+  end;
+
+  begin
+     insert into ttsap
+       (ttap, tt, dk)
+     values
+       ('!!U', 'CL1', 0 );
+  exception
+     when others then
+        null;
+  end;
+
+  begin
+     insert into ttsap
+        (ttap, tt, dk)
+     values
+        ('!!U', 'CL5', 0);
+  exception
+     when others then
+        null;
+  end;
+
+  begin
+     insert into ttsap
+       (ttap, tt, dk)
+     values
+       ('!!V', 'DP2', 0);
+  exception
+     when others then
+         null;
+  end;
+
+  commit;
 end;
 /

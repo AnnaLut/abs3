@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_sync_ru.sql =========*** Run *** 
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE PFU.PFU_SYNC_RU is
+CREATE OR REPLACE PACKAGE PFU_SYNC_RU is
 
   -- Author  : IVAN.GALISEVYCH
   -- Created : 25.05.2016 12:06:45
@@ -92,7 +92,7 @@
 
 end pfu_sync_ru;
 /
-CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
+CREATE OR REPLACE PACKAGE BODY PFU_SYNC_RU is
 
   -- Версія пакету
   g_body_version constant varchar2(64) := 'version 1.00 25/05/2016';
@@ -260,6 +260,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
                          1,
                          512);
       --bars_audit.error(l_errmsg);
+      --logger.info(l_errmsg);
+      logger (sysdate,l_errmsg);
       rollback to sp;
       --raise;
 
@@ -292,7 +294,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
       into l_dummy
       from pfu_pensacc pa
      where pa.kf = p_kf
-       and pa.nls = p_nls
+           and (pa.nls = p_nls or pa.nlsalt = p_nls) -- COBUMMFO-7501
        for update nowait;
 
     update pfu_pensacc pa
@@ -308,7 +310,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
            last_ru_idupd   = p_last_idupd,
            last_ru_chgdate = p_last_chgdate
      where pa.kf = p_kf
-       and pa.nls = p_nls;
+           and (pa.nls = p_nls or pa.nlsalt = p_nls); -- COBUMMFO-7501
 
     p_res := 2;
 
@@ -610,6 +612,7 @@ begin
   null;
 end pfu_sync_ru;
 /
+
  show err;
  
 PROMPT *** Create  grants  PFU_SYNC_RU ***
