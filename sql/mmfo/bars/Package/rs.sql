@@ -1,10 +1,4 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/rs.sql =========*** Run *** ========
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.RS is
+CREATE OR REPLACE PACKAGE BARS.rs is
 
   /******************************************************************************
      Ќазвание:   RS
@@ -69,7 +63,8 @@
                             p_file_type in CBIREP_QUERIES_DATA.FILE_TYPE%type);
 end;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.RS as
+
+CREATE OR REPLACE PACKAGE BODY BARS.rs as
 
   g_body_version constant varchar2(64) := 'version 2.5 22/03/2013';
   modcode        constant varchar2(3) := 'OTC';
@@ -613,12 +608,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.RS as
       -- вызов метода прокси-сервиса
       begin
         select val into l_request_url from params$global where par = G_WSPROXY_URL_TAG and rownum = 1;
+
+        --балансировка на 3 сервера
+        --l_request_url := replace(l_request_url, '10.7.98.30', decode(mod(p_query_id, 3), 0, '10.7.98.11', 1, '10.7.98.15', 2, '10.7.98.21'));
+        if mod(p_query_id, 3) = 0 then
+            l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.11');
+        end if;
+        if mod(p_query_id, 3) = 1 then
+            l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.15');
+        end if;
+        if mod(p_query_id, 3) = 2 then
+            l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.21');
+        end if;
         -- ручна€ балансировка на 2 сервера
-        if mod(p_query_id, 2) = 0 then
+        /*if mod(p_query_id, 2) = 0 then
             l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.11');
         else
             l_request_url := replace(l_request_url, '10.7.98.30', '10.7.98.21');
-        end if;
+        end if;*/
         logger.info('RS:: p_query_id=' || p_query_id || ', l_request_url=' || l_request_url);
 
         select max(val) into l_wallet_dir from web_barsconfig where key = G_WALLET_DIR_TAG;
@@ -837,19 +844,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.RS as
     set_status(p_queries_id,'CREATEDFILE','');
   end set_report_file;
 end;
-/
- show err;
- 
-PROMPT *** Create  grants  RS ***
-grant EXECUTE                                                                on RS              to ABS_ADMIN;
-grant EXECUTE                                                                on RS              to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on RS              to RS;
-grant EXECUTE                                                                on RS              to WR_ALL_RIGHTS;
-grant EXECUTE                                                                on RS              to WR_CBIREP;
 
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/rs.sql =========*** End *** ========
- PROMPT ===================================================================================== 
- 
+/
+
+GRANT EXECUTE ON BARS.RS TO ABS_ADMIN;
+
+GRANT EXECUTE ON BARS.RS TO BARS_ACCESS_DEFROLE;
+
+GRANT EXECUTE ON BARS.RS TO RS;
+
+GRANT EXECUTE ON BARS.RS TO WR_ALL_RIGHTS;
+
+GRANT EXECUTE ON BARS.RS TO WR_CBIREP;
