@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cim_mgr.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.CIM_MGR 
+CREATE OR REPLACE PACKAGE CIM_MGR
 is
    --
    --  CIM_MGR
@@ -15,7 +15,7 @@ is
 -- g_header_version    constant varchar2 (64) := 'version 1.00.02 16/11/2015';
 -- g_header_version    constant varchar2 (64) := 'version 1.00.03 04/04/2016';
 -- g_header_version    constant varchar2 (64) := 'version 1.00.04 08/08/2016';
-   g_header_version    constant varchar2 (64) := 'version 1.01.02 04/12/2017';
+   g_header_version    constant varchar2 (64) := 'version 1.01.03 23/08/2018';
    g_awk_header_defs   constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -308,7 +308,8 @@ function get_license_link_sum (p_license_id in number, --id ліцензії
                                                      p_f503_purpose in number := null, --Ціль використання кредиту
                                                      p_f503_percent_base_t varchar2 :=null, --База процентної ставки (термін)
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
-                                                     p_f503_percent_base_val varchar2 :=null --База процентної ставки (валюта)
+                                                     p_f503_percent_base_val varchar2 :=null, --База процентної ставки (валюта)
+                                                     p_f057 char :=null --Вид запозичення,
                                                     );
 
   -- update_contract - Редагування контракту
@@ -365,7 +366,8 @@ procedure update_contract                           (p_contr_id in number, -- id
                                                      p_f503_purpose in number := null, --Ціль використання кредиту
                                                      p_f503_percent_base_t varchar2 :=null, --База процентної ставки (термін)
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
-                                                     p_f503_percent_base_val varchar2 :=null --База процентної ставки (валюта)
+                                                     p_f503_percent_base_val varchar2 :=null, --База процентної ставки (валюта)
+                                                     p_f057 char :=null --Вид запозичення,
                                                     );
   -- close_contract - Закриття (видалення) / відновлення контракту
   --
@@ -775,7 +777,7 @@ is
    --  Currency Inspection Module - Модуль валютного контролю
    --
 
-   g_body_version      constant varchar2 (64) := 'version 1.01.07 17/07/2018';
+   g_body_version      constant varchar2 (64) := 'version 1.01.09 26/09/2018';
    g_awk_body_defs     constant varchar2 (512) := '';
 
    --------------------------------------------------------------------------------
@@ -1322,7 +1324,8 @@ end get_license_link_sum;
                                                      p_f503_purpose in number := null, --Ціль використання кредиту
                                                      p_f503_percent_base_t varchar2 :=null, --База процентної ставки (термін)
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
-                                                     p_f503_percent_base_val varchar2 :=null --База процентної ставки (валюта),
+                                                     p_f503_percent_base_val varchar2 :=null, --База процентної ставки (валюта),
+                                                     p_f057 char :=null --Вид запозичення,
                                                     )
 is
   l_n                 number;
@@ -1360,7 +1363,7 @@ begin
       insert into cim_contracts_credit (contr_id, percent_nbu, s_limit, creditor_type, borrower, credit_type, credit_term, credit_prepay, name,
         add_agree, percent_nbu_type, percent_nbu_info, r_agree_date, r_agree_no, prev_doc_key, prev_reestr_attr, ending_date_indiv,
         parent_ch_data, ending_date, f503_reason, f503_state, f503_note, f504_reason, f504_note, f503_percent_type, f503_percent_base,
-        f503_percent_margin, f503_percent, f503_purpose, f503_percent_base_t, f503_change_info, f503_percent_base_val)
+        f503_percent_margin, f503_percent, f503_purpose, f503_percent_base_t, f503_change_info, f503_percent_base_val, f057)
         values (p_contr_id, p_percent_nbu, round(p_s_limit*100,0), p_creditor_type, p_credit_borrower, p_credit_type, p_credit_term,
         p_credit_prepay, p_name,
         p_add_agree, p_percent_nbu_type, p_percent_nbu_info, p_r_agree_date, p_r_agree_no, p_prev_doc_key, p_prev_reestr_attr,
@@ -1368,7 +1371,8 @@ begin
         p_f503_percent_type, case when p_f503_percent_type=2 then p_f503_percent_base else null end,
         case when p_f503_percent_type=2 then p_f503_percent_margin else null end, p_f503_percent, p_f503_purpose,
         case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, p_f503_change_info,
-        case when p_f503_percent_type=2 then p_f503_percent_base_val else null end);
+        case when p_f503_percent_type=2 then p_f503_percent_base_val else null end,
+        p_f057);
     end if;
     if p_contr_type=4 then
       begin
@@ -1447,7 +1451,8 @@ procedure update_contract                           (p_contr_id in number, -- id
                                                      p_f503_purpose in number := null, --Ціль використання кредиту
                                                      p_f503_percent_base_t varchar2 :=null, --База процентної ставки (термін)
                                                      p_f503_change_info varchar2 :=null, --Інформація щодо внесення змін до договору
-                                                     p_f503_percent_base_val varchar2 :=null --База процентної ставки (валюта)
+                                                     p_f503_percent_base_val varchar2 :=null, --База процентної ставки (валюта)
+                                                     p_f057 char :=null --Вид запозичення,
                                                     )
 is l_contr_type         number;
    l_status_id          number;
@@ -1506,7 +1511,8 @@ begin
         f503_percent_type=p_f503_percent_type, f503_percent_base=case when p_f503_percent_type=2 then p_f503_percent_base else null end,
         f503_percent_margin=case when p_f503_percent_type=2 then p_f503_percent_margin else null end, f503_percent=p_f503_percent, f503_purpose=p_f503_purpose,
         f503_percent_base_t=case when p_f503_percent_type=2 then p_f503_percent_base_t else null end, f503_change_info=p_f503_change_info,
-        f503_percent_base_val=case when p_f503_percent_type=2 then p_f503_percent_base_val else null end
+        f503_percent_base_val=case when p_f503_percent_type=2 then p_f503_percent_base_val else null end,
+        f057 = p_f057
     where contr_id=p_contr_id;
    elsif l_contr_type=4 then
       begin
@@ -4023,7 +4029,7 @@ begin
   for l in
     (select q.ref, q.contr_id, max(q.vdat) as vdat, nvl(max(o.fdat), max(q.vdat)) as fdat, nvl(max(o.sos), -1) as sos, max(c.branch) as branch
        from cim_unheld_que q, opldok o, cim_contracts c
-       where q.contr_id=c.contr_id and q.ref=o.ref(+) group by q.ref, q.contr_id order by contr_id)
+       where c.kf=sys_context('bars_context','user_mfo') and q.contr_id=c.contr_id and q.ref=o.ref(+) group by q.ref, q.contr_id order by contr_id)
   loop
     if l.sos = 5 then
       if l_contr_id != l.contr_id and l.vdat != l.fdat then
