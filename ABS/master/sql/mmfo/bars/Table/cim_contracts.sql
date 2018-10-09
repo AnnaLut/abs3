@@ -247,6 +247,18 @@ exception when others then
 /
 
 
+PROMPT *** Create  index I3_CIM_CONTRACTS ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I3_CIM_CONTRACTS ON BARS.CIM_CONTRACTS (KF) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSMDLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+
 
 PROMPT *** Create  grants  CIM_CONTRACTS ***
 grant SELECT                                                                 on CIM_CONTRACTS   to BARSREADER_ROLE;
