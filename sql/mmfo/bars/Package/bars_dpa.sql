@@ -878,6 +878,8 @@ is
 
   p varchar2(100) := 'bars_dpa.iparse_ticket. ';
 
+  l_tip    accounts.tip%type; -- COBUMMFO-7501
+  l_nlsalt accounts.nlsalt%type; -- COBUMMFO-7501
 begin
 
   bars_audit.info(p || 'Start. p_filename - ' || p_filename);
@@ -1048,12 +1050,22 @@ begin
               and kv = l_currency
               and dazs is null
               and blkd = l_dpablk
-           returning acc into l_acc;
+           returning acc, tip, nlsalt into l_acc, l_tip, l_nlsalt; -- COBUMMFO-7501
 
          -- если біла изменена строка - сохраняем информаци
           if sql%rowcount != 0 then
             bars_audit.info('DPI rowcount' || sql%rowcount || ' l_account - ' ||l_account || 'acc - '  );
           end if;
+
+          -- COBUMMFO-7501 Begin
+          -- Блокируем трансформированный счет по дебиту и кредиту
+          if l_acc is not null and l_tip like 'OW%' and regexp_like(l_nlsalt, '^26[0,5]5') then
+             update accounts a
+             set a.blkd = 99
+                 , a.blkk = 99
+             where acc = l_acc;
+          end if;
+          -- COBUMMFO-7501 End
 
            select count(*)
              into l_tmpn

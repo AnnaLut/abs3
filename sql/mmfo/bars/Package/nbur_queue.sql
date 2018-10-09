@@ -135,6 +135,9 @@ is
   g_body_version  constant varchar2(64)  := 'version 7.5  2018.09.20';
   g_body_defs     constant varchar2(512) := '';
 
+  -- COBUMMFO-7501
+  gc_block_date   constant date := to_date('01012019', 'ddmmyyyy');
+  
   MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
 
   --
@@ -568,9 +571,10 @@ is
            return l_ret_mes;
         end if;
         
-        if p_report_date <= to_date('15122017', 'ddmmyyyy') and p_file_code <> '@87' then
+        -- COBUMMFO-7501
+        if (p_report_date <= gc_block_date and sysdate >= gc_block_date) and p_file_code <> '@87' then
            l_ret_mes := 'Дата '||to_char(p_report_date, 'dd.mm.yyyy')||' не доступна для формування, бо вже перейшли на новий план рахунків!'||
-                        ' Виберіть іншу дату, що більша за 15.12.2017!';
+                        ' Виберіть іншу дату, що більша за '||to_char(gc_block_date, 'dd.mm.yyyy')||'!';
 
            return l_ret_mes;
         end if;        
