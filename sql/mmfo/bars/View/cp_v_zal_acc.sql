@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view CP_V_ZAL_ACC ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.CP_V_ZAL_ACC ("FDAT", "REF", "ID", "ISIN", "NLS", "KV", "ACC", "OST", "SUM_ZAL", "DAT_ZAL") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.CP_V_ZAL_ACC ("FDAT", "REF", "ID", "ISIN", "NLS", "KV", "ACC", "OST", "SUM_ZAL", "DAT_ZAL", "CP_ACCTYPE") AS 
   SELECT x.B FDAT,
             e.REF,
             k.id,
@@ -23,7 +23,8 @@ PROMPT *** Create  view CP_V_ZAL_ACC ***
                0)
                ost_zal,
             NVL (cp.get_from_cp_zal_dat(e.ref, x.b), a.mdate)
-               datz
+               datz,
+            ca.cp_acctype
        FROM cp_deal e,
             cp_kod k,
             accounts a,
@@ -31,14 +32,17 @@ PROMPT *** Create  view CP_V_ZAL_ACC ***
                        TO_DATE (pul.get_mas_ini_val ('sFdat1'), 'dd.mm.yyyy'),
                        gl.bd)
                        B
-               FROM DUAL) x
+               FROM DUAL) x,
+            cp_accounts ca 
       WHERE e.id = k.id
-            AND a.acc IN (e.acc,
+            AND ca.cp_acc = a.acc and e.ref = ca.cp_ref
+            AND ca.cp_acctype in ('N','D','P','R','R2','S','S2')
+            /*AND a.acc IN (e.acc,
                           e.accd,
                           e.accp,
                           e.accr,
                           e.accr2,
-                          e.accs)
+                          e.accs)*/
             AND (a.nls LIKE '14%' or a.nls LIKE '31%')
             AND fost (e.acc, x.B) < 0
    ORDER BY e.id, e.REF;
