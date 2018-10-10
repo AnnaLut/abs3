@@ -4,8 +4,6 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_F3KX_NN.sql ========
 PROMPT ===================================================================================== 
 
 
-PROMPT *** Create  procedure P_F3KX_NN ***
-
 CREATE OR REPLACE PROCEDURE BARS.p_f3kx_nn (
                     dat_     DATE,
                     sheme_   VARCHAR2 DEFAULT 'G'
@@ -15,7 +13,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.017          13.09.2018
+% VERSION     :   v.18.019          10.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -28,6 +26,9 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+10.10.2018  -добавлены операции дт2622-кт2900(3739)               [9700]
+25.09.2018  -добавлены операции дт2900/ob22=01-кт2625, tt=PRK     [9499]
+            -удаление проводок занесенных в NBUR_TMP_DEL_70       [9512]
 13.09.2018  исключаются операции дт2620-кт2900 ob22=05
 06.09.2018  из общего списка операций удаляются проводки конвертации,
               zayavka.DT =3, kv_conv !=null (ранее удалялись только для 300465)
@@ -552,18 +553,20 @@ BEGIN
                   FROM provodki_otc o
                  WHERE o.fdat = dat_
                    AND o.kv not in (959, 961, 962, 964, 980)
-                   AND (        substr (o.nlsd, 1,4) = '2900'
+                   AND (   (    substr (o.nlsd, 1,4) = '2900'
                             AND SUBSTR (o.nlsk, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
                                       '2541', '2542', '2544', '2545',
                                       '2600', '2602', '2620', '2650')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
-                            AND LOWER (TRIM (o.nazn)) not like '%за рахунок _ншо_%'
+                            AND LOWER (TRIM (o.nazn)) not like '%за рахунок _ншо_%' )
+                        OR (    substr (o.nlsd, 1,4) = '2900'  and  o.ob22d ='01'
+                            and substr (o.nlsk, 1,4) = '2625'  and  o.tt = 'PRK' )
                        )
               GROUP BY '1', o.rnkk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
               UNION ALL --купівля валюти  (2)
-               SELECT  '1' ko, o.rnkk, o.REF, o.acck, o.nlsk,
+              SELECT  '1' ko, o.rnkk, o.REF, o.acck, o.nlsk,
                        o.kv, o.accd, o.nlsd, o.nazn,
                        SUM (o.s * 100) s_nom,
                        SUM (gl.p_icurval (o.kv, o.s * 100, dat_)) s_eqv
@@ -590,7 +593,7 @@ BEGIN
                                 SUBSTR (o.nlsd, 1,4) IN
                                      ('1600', '1602', '2520', '2530', '2531',
                                       '2541', '2542', '2544', '2545', '2555',
-                                      '2600', '2603', '2620', '2650', '3640')
+                                      '2600', '2603', '2620', '2622','2650', '3640')
                             AND LOWER (TRIM (o.nazn)) not like '%конверс%'
                             AND LOWER (TRIM (o.nazn)) not like '%конверт%'
                             AND LOWER (TRIM (o.nazn)) not like '%куп_вля%'
@@ -633,6 +636,11 @@ BEGIN
               GROUP BY '2', o.rnkd, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn );
 
    commit;
+
+   delete
+   from OTCN_PROV_TEMP
+   where ref in (select ref from NBUR_TMP_DEL_70 where kodf = '3K' and datf = dat_); 
+
    -- для РУ Ощадбанку видаляємо проводки виду Дт 2600/2620/2650 Кт 2900
    -- якщо наявна заявка на продаж валюти на цю суму по цьому клієнту в найближчі +/- 3 дні
    if mfou_ = 300465 and mfo_ = 351823  then
