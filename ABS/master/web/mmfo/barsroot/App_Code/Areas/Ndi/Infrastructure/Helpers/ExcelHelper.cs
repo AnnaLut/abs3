@@ -6,6 +6,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
             {
                 ResultForExcel excelResult = dataResult as ResultForExcel;
                 if (excelResult.ExcelParam == "ALL_CSV")
-                    return ExcelExportToCSV('|', tableSemantic, dataResult, allShowColumns, excelDataModel.TableName);
+                    return ExcelExportToCSV('|', tableSemantic, dataResult, allShowColumns, excelDataModel.TableName,excelDataModel.Limit);
             }
 
 
@@ -195,113 +196,16 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Helpers
             }
         }
 
-        public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, GetDataResultInfo resultInfo, List<ColumnMetaInfo> ColumnsInfo,
-            string fileName)
+     public static ExcelResulModel ExcelExportToCSV(char columnSeparator, string tableSemantic, GetDataResultInfo resultInfo, List<ColumnMetaInfo> columnsInfo,
+            string fileName,int limit)
         {
-            IEnumerable<Dictionary<string, object>> dataRecords = resultInfo.DataRecords;
-            Dictionary<string, int> headerLen = new Dictionary<string, int>();
-            StringBuilder sb = new StringBuilder();
-            Encoding windows = Encoding.GetEncoding("windows-1251");
-            Encoding unicode = Encoding.Unicode;
-            byte[] unicodeBytes;
-            byte[] asciiBytes;
-            try
+            return new ExcelResulModel()
             {
-                //sb.Append("sep=|");
-                //foreach (Dictionary<string, object> rowData in dataRecords)
-                //{
-                //    foreach (KeyValuePair<string, object> r in rowData)
-                //    {
-                //        if (!headerLen.ContainsKey(r.Key)) { headerLen.Add(r.Key, r.Key.Length); }
-                //        headerLen[r.Key] = Math.Max(headerLen[r.Key], r.Value.ToString().Length);
-                //    }
-                //}
-                foreach (Dictionary<string, object> rowData in dataRecords)
-                {
-                    System.Text.StringBuilder sbRow = new System.Text.StringBuilder();
-                    string v = string.Empty;
-                    foreach (var colInfo in ColumnsInfo)
-                    {
-                        object o = rowData[colInfo.COLNAME];
-                        if (o != null)
-                        {
-                             v = o.ToString();
-                            if (colInfo == null)
-                                continue;
-                            //hack for A7 report
-                            if (colInfo.COLTYPE == "D")
-                            {
-                                if (!string.IsNullOrEmpty(v))
-                                    v = ((DateTime)o).ToString(string.IsNullOrEmpty(colInfo.SHOWFORMAT) ? "ddMMyyyy" : colInfo.SHOWFORMAT);
-                            }
-                            sbRow.Append(v);
-                        }
-                        else
-                            sbRow.Append("");
-                        sbRow.Append(columnSeparator);
-                    }
-                    //foreach (KeyValuePair<string, object> r in rowData)
-                    //{
-
-                    //    string v = r.Value.ToString();
-                    //    var colInfo = ColumnsInfo.FirstOrDefault(x => x.COLNAME == r.Key);
-                    //    if (colInfo == null)
-                    //        continue;
-                    //    //hack for A7 report
-                    //    if (colInfo.COLTYPE == "D")
-                    //    {
-                    //        if (!string.IsNullOrEmpty(v))
-                    //            v = ((DateTime)r.Value).ToString(string.IsNullOrEmpty(colInfo.SHOWFORMAT) ? "ddMMyyyy" : colInfo.SHOWFORMAT);
-                    //    }
-                    //    sbRow.Append(v);
-                    //    sbRow.Append(columnSeparator);
-                    //}
-                    sbRow.Remove(sbRow.Length - 1, 1);  // remove last 'columnSeparator' symbol
-                    sbRow.AppendLine();
-
-                    sb.Append(sbRow);
-                }
-                string lineBreak = "" + (char)13 + (char)10;
-               
-
-                // add file header
-                StringBuilder sbHeaders = new StringBuilder();
-                foreach (var colInfo in ColumnsInfo)
-                {
-                    sbHeaders.Append(colInfo.SEMANTIC != null ? colInfo.SEMANTIC.Replace("~", " ") : "");
-                    sbHeaders.Append(columnSeparator);
-                }
-                sbHeaders.Remove(sbHeaders.Length - 1, 1);  // remove last 'columnSeparator' symbol
-                sbHeaders.AppendLine();
-                sb.Insert(0, sbHeaders);
-                sb.Insert(0, "sep=" + columnSeparator + "\n");
-                ExcelResulModel excelResult = new ExcelResulModel();
-                excelResult.FileName = fileName + ".csv";
-                excelResult.ContentType = "application/ms-excel";// "text/csv";
-
-                unicodeBytes = unicode.GetBytes(sb.ToString());
-                asciiBytes = Encoding.Convert(unicode, windows, unicodeBytes);
-                //char[] asciiChars = new char[ascii.GetCharCount(asciiBytes, 0, asciiBytes.Length)];
-                //ascii.GetChars(asciiBytes, 0, asciiBytes.Length, asciiChars, 0);
-                //string resStr = new string(asciiChars);
-                excelResult.ContentResult = asciiBytes;
-
-
-                return excelResult;
-
-
-            }
-            catch (Exception e)
-            {
-
-                throw e;
-            }
-            finally
-            {
-                asciiBytes = null;
-                unicodeBytes = null;
-
-            }
+                FileName = fileName,
+                Path = new ImportToFile().ExcelExportToZipCSVFiles(columnSeparator, fileName, resultInfo.DataRecords, columnsInfo,limit)
+            };
+        
+          
         }
 
         public List<CallFuncRowParam>  ParseExcelFile(HttpPostedFileBase parsedFile, CallFunctionMetaInfo func)

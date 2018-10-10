@@ -2390,7 +2390,9 @@
         //В зависимости от выбранного пункта меню загружаем всю таблицу либо только текущую страницу
         var pageSize = grid.store.pageSize;
         var start = ((grid.store.currentPage - 1) * grid.store.pageSize);
+        var getAll = item.allPages;
         if (item.allPages) {
+         
             start = 0;
             pageSize = 999;
         }
@@ -2416,6 +2418,7 @@
             "&sort=" + Ext.encode(sort) +
             "&start=" + start +
             "&limit=" + pageSize +
+            "&GetAll=" + getAll +
             "&CodeOper=" + window.CodeOper +
             "&nativeTabelId=" + window.nativeTabelId +
             "&sParColumn=" + window.sParColumn +

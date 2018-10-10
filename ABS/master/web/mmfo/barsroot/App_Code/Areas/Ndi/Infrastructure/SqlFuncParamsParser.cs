@@ -10,6 +10,8 @@ using BarsWeb.Areas.Ndi.Models.DbModels;
 using BarsWeb.Areas.Ndi.Infrastructure.Helpers.BarsWeb.Areas.Ndi.Infrastructure.Helpers;
 using System.Text;
 using Oracle.DataAccess.Types;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation;
 
 namespace BarsWeb.Areas.Ndi.Infrastructure
 {
@@ -395,43 +397,25 @@ namespace BarsWeb.Areas.Ndi.Infrastructure
                     case "REF":
                         // вытянем информацию для построения выпадающего списка
                         string tabName = option.Value;
-                        OracleConnection connection = OraConnector.Handler.UserConnection;
-                        try
-                        {
+                        IReferenceBookRepository repository = new ReferenceBookRepository();
                             // получить tabId
                             //
-                            OracleCommand selectTabId = connection.CreateCommand();
-                            selectTabId.BindByName = true;
-                            selectTabId.CommandText = "select tabid from meta_tables where tabname=:tabName";
-                            selectTabId.Parameters.Add(new OracleParameter("tabName", tabName));
-                            var tabId = (decimal)selectTabId.ExecuteScalar();
-
+                        MetaTable table = repository.GetMetaTableByName(tabName);
+                            if (table == null)
+                                throw new Exception(string.Format("таблиця за іменем {0} не описана в метаопису", tabName));
+                            var tabId = table.TABID;
                             // получить имя первой колонки-первичного ключа
                             //
-                            OracleCommand selectPkColumn = connection.CreateCommand();
-                            selectPkColumn.BindByName = true;
-                            selectPkColumn.CommandText = "select colname from meta_columns where tabid=:tabid and showretval=:showretval";
-                            selectPkColumn.Parameters.Add(new OracleParameter("tabid", tabId));
-                            selectPkColumn.Parameters.Add(new OracleParameter("showretval", 1));
-                            var pkColumn = (string)selectPkColumn.ExecuteScalar();
+                            var pkColumn = repository.GetFirstKeyName(tabId);
 
                             // получить имя колонки-наименования
                             //
-                            OracleCommand selectNameColumn = connection.CreateCommand();
-                            selectNameColumn.BindByName = true;
-                            selectNameColumn.CommandText = "select colname from meta_columns where tabid=:tabid and instnssemantic=:instnssemantic";
-                            selectNameColumn.Parameters.Add(new OracleParameter("tabid", tabId));
-                            selectNameColumn.Parameters.Add(new OracleParameter("instnssemantic", 1));
-                            var nameColumn = (string)selectNameColumn.ExecuteScalar();
+                            var nameColumn = repository.GetSelectName(tabId);
 
                             paramMetaInfo.SrcTableName = tabName;
                             paramMetaInfo.SrcColName = pkColumn;
                             paramMetaInfo.SrcTextColName = nameColumn;
-                        }
-                        finally
-                        {
-                            connection.Close();
-                        }
+                        
                         break;
                     case "DEF":
                         paramMetaInfo.DefaultValue = option.Value;

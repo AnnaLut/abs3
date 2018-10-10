@@ -21,5 +21,6 @@ namespace BarsWeb.Areas.Ndi.Models
         public string StringContentResult { get; set; }
         public string FileName { get; set; }
         public string ContentType { get; set; }
+        public string Path { get; set; }
     }
 }
