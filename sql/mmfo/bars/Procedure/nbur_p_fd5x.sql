@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования D5X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001 05/09/2018 (28/08/2018)
+% VERSION     :  v.1.002 09/10/2018 (05/09/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                   char(30)  := 'v.1.001  05/09/2018';
+  ver_                   char(30)  := 'v.1.002  09/10/2018';
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
   c_date_fmt             constant varchar2(10 char) := 'dd.mm.yyyy';
   c_old_file_code        constant varchar2(3 char) := '#D5';
@@ -89,7 +89,11 @@ BEGIN
              , coalesce(t.seg_6, '#') /*k072*/
              , t.seg_5 /*k111*/
              , t.seg_7 /*k140*/
-             , decode(r.kol24, '101', '100', '010', '000', nvl(r.kol24, '000')) /*f074*/
+             , (case when g.link_group is not null then '001' 
+                    when r.kol24 = '101' then '100'
+                    when r.kol24 = '010' then '000'
+                    else nvl(r.kol24, '000')
+                end) /*f074*/
              , t.seg_11 /*s032*/
              , t.seg_14 /*s080*/
              , t.seg_8 /*s183*/
@@ -126,6 +130,7 @@ BEGIN
                       , field_value as znap
                       , nbuc
                       , cust_id as rnk
+                      , cust_code as okpo
                       , acc_id as acc
                       , ref
                       , description as comm
@@ -183,6 +188,8 @@ BEGIN
                            group by
                                    t.acc
                        ) r on (t.acc = r.acc)
+             left outer join d8_cust_link_groups g
+             on (t.okpo = g.okpo or t.seg_9 = '2' and t.okpo = g.rnk)
              left join nbur_tmp_desc_ekp p
              on (p.I010 = kl.I010 and
                  p.t020 = t.seg_2 and
