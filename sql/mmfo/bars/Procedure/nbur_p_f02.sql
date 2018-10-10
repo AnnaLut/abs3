@@ -36,31 +36,11 @@ PROMPT *** Create  procedure NBUR_P_F02 ***
    l_type          number;
    l_datez         date := p_report_date + 1;
    l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
-   
-   -- COBUMMFO-7501 Begin
-   l_date_first     date := trunc(p_report_date, 'MM');
-   l_date_last      date := last_day(p_report_date);
-   l_date_transform date;
-   -- COBUMMFO-7501 End
 BEGIN
    logger.info ('NBUR_P_F02 begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 
    -- определение начальных параметров (код области или МФО или подразделение)
    nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type, p_report_date);
-
-   -- COBUMMFO-7501 Begin
-   -- определяем дату замены счетов по МФО
-   begin
-	  select max(bal.report_date)
-      into l_date_transform 
-      from nbur_kor_balances bal 
-      where bal.kf = p_kod_filii 
-            and bal.report_date between l_date_first and l_date_last;
-   exception 
-	  when others then
- 	       l_date_transform := to_date('01011900', 'ddmmyyyy');
-   end;
-   -- COBUMMFO-7501 End
 
     BEGIN
        INSERT /*+ APPEND */
@@ -165,15 +145,7 @@ BEGIN
                                  AND b.kf = p_kod_filii
                                  AND a.cust_id = c.cust_id
                                  AND c.report_date = p_report_date
-                                 and (
-                                       a.acc_alt_dt is null 
-                                       or (
-                                             p_report_date <> to_date('29122017','ddmmyyyy')
-                                             -- COBUMMFO-7501 Begin
-                                             and l_date_last <> last_day(l_date_transform)
-                                             -- COBUMMFO-7501 End
-                                          )
-                                     )
+                                 and trunc(nvl(a.acc_alt_dt, add_months(p_report_date, -1)), 'mm') <> trunc(p_report_date, 'mm')
                                  AND c.kf = p_kod_filii) UNPIVOT (VALUE
                                                                     FOR colname
                                                                     IN  (P10,
@@ -257,7 +229,6 @@ BEGIN
                                  (case when sign(b.adj_bal_uah) <> 1 or d.acc_type = 'OLD' then 0 else adj_bal_uah end) P20,
                                  (case when sign(b.adj_bal) = 1 or d.acc_type = 'OLD' then 0 else -adj_bal end) P11,
                                  (case when sign(b.adj_bal) <> 1 or d.acc_type = 'OLD' then 0 else adj_bal end) P21,
-                                 ----
                                  (case when d.acc_type = 'OLD'
                                        then
                                           d.dosq_repm - b.cudosq
@@ -297,25 +268,18 @@ BEGIN
                                  nbur_dm_accounts a,
                                  nbur_dm_customers c,
                                  nbur_dm_balances_monthly b                                 
-                           WHERE (
-                                    p_report_date = to_date('29122017','ddmmyyyy')
-                                    -- COBUMMFO-7501 Begin
-                                    or l_date_last = last_day(l_date_transform)
-                                    -- COBUMMFO-7501 End
-                                 )
-                                 and substr(d.acc_num,1,4) in (select r020 from nbur_tmp_kod_r020)
-                                 AND d.report_date = l_date_transform  -- COBUMMFO-7501 to_date('18122017','ddmmyyyy')
+                           WHERE      substr(d.acc_num,1,4) in (select r020 from nbur_tmp_kod_r020)
+                                 AND d.report_date = to_date('18122017','ddmmyyyy')
                                  and d.kf = p_kod_filii
-                                 AND b.acc_id = d.acc_id
                                  and a.acc_id = d.acc_id
                                  AND a.report_date = p_report_date
                                  AND a.kf = p_kod_filii
+                                 AND b.acc_id = d.acc_id
                                  AND b.report_date = p_report_date
                                  AND b.kf = p_kod_filii
                                  AND d.cust_id = c.cust_id
                                  AND c.report_date = p_report_date
-                                 and a.acc_alt_dt is not null 
-                                 and a.acc_alt_dt  = l_date_transform  -- COBUMMFO-7501 to_date('18122017','ddmmyyyy')
+                                 and trunc(a.acc_alt_dt, 'mm') = trunc(p_report_date, 'mm')
                                  AND c.kf = p_kod_filii
                                  ) UNPIVOT (VALUE
                                                                     FOR colname

@@ -1923,11 +1923,7 @@ is
               if /*(l_dpt_vidd.disable_add is null or l_dpt_vidd.disable_add = 1) and*/ l_is_replenished > 0 then
                 if l_sum >= nvl(l_dpt_vidd.limit*100,0) then
                    begin
-                       select a.* into l_acca 
-                       from accounts a, tabval$global t 
-                       where a.kv = t.kv 
-                            and (a.nls = l_acc26 or a.nlsalt = l_acc26) --COBUMMFO-7501
-                            and t.lcv = l_lcv;
+                       select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.nls = l_acc26 and t.lcv = l_lcv;
                        select * into l_cusa from customer where rnk = l_acca.rnk;
                    exception
                          when no_data_found then
@@ -2101,23 +2097,11 @@ is
               exception
                 when no_data_found then
                   begin
-                    select a.* 
-                    into l_accb 
-                    from accounts a, nd_acc na 
-                    where a.acc = na.acc 
-                          and na.nd = l_cc_deal.nd 
-                          and a.nbs = '2620' 
-                          and a.tip not like 'W4%'; -- COBUMMFO-7501 ищем только текущие счета, отсекая карточные 2620
+                    select a.* into l_accb from accounts a, nd_acc na where a.acc = na.acc and na.nd = l_cc_deal.nd and a.nbs = '2620';
                   exception
                     when no_data_found then
                       begin
-                        select a.* 
-                        into l_accb 
-                        from accounts a, nd_acc na 
-                        where a.acc = na.acc 
-                              and na.nd = l_cc_deal.nd 
-                              and a.tip like 'W4%'; -- COBUMMFO-7501 карточные счета (2620 или 2625)
-                              --a.nbs = '2625';
+                        select a.* into l_accb from accounts a, nd_acc na where a.acc = na.acc and na.nd = l_cc_deal.nd and a.nbs = '2625';
                       exception
                         when no_data_found then
                           -- 722 Рахунок погашення для договору №%s не знайдено
@@ -3548,13 +3532,7 @@ l_xml xmltype;
         end;
       end loop;
     begin
-      select * 
-      into l_acc 
-      from accounts 
-      where rnk = l_rnk 
-            and (nls = l_nls or nlsalt = l_nls) -- COBUMMFO-7501
-            and dazs is null 
-            and rownum = 1;
+      select * into l_acc from accounts where rnk = l_rnk and nls = l_nls and dazs is null and rownum = 1;
     exception
       when no_data_found then
         --701 Рахунок не належить клієнту
@@ -3686,12 +3664,7 @@ l_xml xmltype;
         return;
     end;
     begin
-      select * 
-      into l_acc 
-      from accounts 
-      where rnk = l_rnk 
-            and (nls = l_nls or nlsalt = l_nls) -- COBUMMFO-7501
-            and dazs is null;
+      select * into l_acc from accounts where rnk = l_rnk and nls = l_nls and dazs is null;
     exception
       when no_data_found then
         --701 Рахунок не належить клієнту

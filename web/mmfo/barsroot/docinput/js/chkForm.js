@@ -90,20 +90,8 @@ function Validate(form) {
 
     //    Перевірка на блокування рахунків 2625, 2605     (COBUMMFO-3907)
     var nls = form.__DK.value != 0 ? form.Nls_A.value : form.Nls_B.value;
-
-    ////
-    if (null == webService.Doc) webService.useService("DocService.asmx?wsdl", "Doc");
-    var callNlsTipObj = webService.createCallOptions();
-    callNlsTipObj.async = false;
-    callNlsTipObj.funcName = "IsNlsW4";
-    callNlsTipObj.params = new Array();
-    callNlsTipObj.params.nls = nls;
-    var isW4 = webService.Doc.callService(callObj);
-    ////
-
-    //var maskAcc = nls.slice(0, 4);
-    //if (maskAcc == "2625" || maskAcc == "2605") {
-    if (+isW4 !== 0) {
+    var maskAcc = nls.slice(0, 4);
+    if (maskAcc == "2625" || maskAcc == "2605") {
         if (null == webService.Doc) webService.useService("DocService.asmx?wsdl", "Doc");
         var callObj = webService.createCallOptions();
         callObj.async = false;

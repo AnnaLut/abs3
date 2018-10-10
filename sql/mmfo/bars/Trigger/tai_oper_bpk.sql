@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TAI_OPER_BPK ***
 
-CREATE OR REPLACE TRIGGER BARS.TAI_OPER_BPK 
+  CREATE OR REPLACE TRIGGER BARS.TAI_OPER_BPK 
 after insert or update of nlsa, nlsb on oper
 for each row
 declare
@@ -24,19 +24,9 @@ begin
 
      -- 1. Запрет выполнения операций по счетам моб.сбережений
      if :new.tt not in ('OW1', 'OW2', 'OW3') and
-        ( 
-           (  
-              :new.mfoa = f_ourmfo
-              and (:new.nlsa like '2625%' or :new.nlsa like '2620%') /* COBUMMFO-7501 add :new.nlsa like '2620%'*/
-           )
-         
-        or ( 
-              :new.mfob = f_ourmfo 
-              and (:new.nlsb like '2625%' or :new.nlsb like '2620%') /* COBUMMFO-7501 add :new.nlsb like '2620%'*/ 
-           ) 
-              
-        ) then
-        if :new.mfoa = f_ourmfo and (:new.nlsa like '2625%' or :new.nlsa like '2620%') /* COBUMMFO-7501 add :new.nlsa like '2620%'*/ then
+        (  :new.mfoa = f_ourmfo and :new.nlsa like '2625%'
+        or :new.mfob = f_ourmfo and :new.nlsb like '2625%' ) then
+        if :new.mfoa = f_ourmfo and :new.nlsa like '2625%' then
            begin
               select a.acc into l_acc
                 from w4_acc o, accounts a
@@ -48,7 +38,7 @@ begin
            exception when no_data_found then null;
            end;
         end if;
-        if :new.mfob = f_ourmfo and (:new.nlsb like '2625%' or :new.nlsb like '2620%') /* COBUMMFO-7501 add :new.nlsb like '2620%'*/ then
+        if :new.mfob = f_ourmfo and :new.nlsb like '2625%' then
            begin
               select a.acc into l_acc
                 from w4_acc o, accounts a
@@ -75,13 +65,7 @@ begin
            select a.acc, a.ob22, a.tip, a.ostc, a.rnk
             into l_acc, l_ob22, l_tip, l_ost, l_rnk
              from accounts a
-            where (
-                     a.nls = decode(z.dk,:new.dk,:new.nlsb,:new.nlsa)
-                     or (
-                           a.nlsalt = decode(z.dk,:new.dk,:new.nlsb,:new.nlsa)
-                           and a.nlsalt like '2625%'
-                        ) /* COBUMMFO-7501 проверяем по альтернативному счету для физиков*/
-                  )
+            where a.nls = decode(z.dk,:new.dk,:new.nlsb,:new.nlsa)
               and a.kv  = decode(z.dk,:new.dk,nvl(:new.kv2,:new.kv),:new.kv)
               and a.tip like 'W4%';
 
@@ -115,8 +99,9 @@ begin
   end if;
 
 end tau_oper_sos_bpk;
-/
 
+
+/
 ALTER TRIGGER BARS.TAI_OPER_BPK ENABLE;
 
 

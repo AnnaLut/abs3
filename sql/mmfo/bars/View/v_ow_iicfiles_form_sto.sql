@@ -18,7 +18,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_STO ***
           END
              w4_msgcode,
           a.acc,
-          bars_ow.get_nls(a.nls, a.nlsalt, a.kf) nls,
+          a.nls,
           a.kv,
           c.okpo,
           p.s / 100 s,

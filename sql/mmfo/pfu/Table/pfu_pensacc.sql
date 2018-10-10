@@ -38,13 +38,6 @@ exception when others then
 end; 
 /
 
-begin 
-  execute immediate 'alter table PFU.PFU_PENSACC add nlsalt VARCHAR2(15)';
-exception when others then       
-  if sqlcode=-1430 then null; else raise; end if; 
-end; 
-/
-
 
 COMMENT ON TABLE PFU.PFU_PENSACC IS 'Рахунки пенсіонерів ЄБП';
 COMMENT ON COLUMN PFU.PFU_PENSACC.DATE_BLK IS '';
@@ -67,7 +60,6 @@ COMMENT ON COLUMN PFU.PFU_PENSACC.LAST_RU_IDUPD IS '';
 COMMENT ON COLUMN PFU.PFU_PENSACC.LAST_RU_CHGDATE IS '';
 COMMENT ON COLUMN PFU.PFU_PENSACC.TRANSACC IS '';
 COMMENT ON COLUMN PFU.PFU_PENSACC.TRANSKV IS '';
-comment on column PFU.PFU_PENSACC.nlsalt is 'Альтернативний номер рахунку';
 
 
 
@@ -110,16 +102,6 @@ exception when others then
 /
 
 
-PROMPT *** Create  index I1_PFUPENSACCALT ***
-begin   
- execute immediate '
-  CREATE INDEX PFU.I1_PFUPENSACCALT on PFU.PFU_PENSACC (kf, nlsalt) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSBIGI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
 
 
 PROMPT *** Create  index I2_PFUPENSACC_KF ***
