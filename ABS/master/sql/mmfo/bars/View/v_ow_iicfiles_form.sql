@@ -26,7 +26,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM ***
           END
              w4_msgcode,
           a.acc,
-          bars_ow.get_nls(a.nls, a.nlsalt, a.kf) nls,
+          a.nls,
           a.kv,
           c.okpo,
           p.s / 100 s,
@@ -44,7 +44,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM ***
           NULL,
           'PAYFAAS',
           a.acc,
-          bars_ow.get_nls(a.nls, a.nlsalt, a.kf) nls,
+          a.nls,
           a.kv,
           c.okpo,
           q.s / 100 s,

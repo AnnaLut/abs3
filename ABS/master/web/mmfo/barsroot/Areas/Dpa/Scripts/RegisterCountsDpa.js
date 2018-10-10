@@ -2533,7 +2533,6 @@
             if (data.path) {
                 if ($scope.fileType === "F") {
                     bars.ui.success({ text: data.filename + " файл завантажено до " + data.path });
-                    $scope.GetDataForGrid();
                 }
                 else if ($scope.fileType === "CV") {
                     bars.ui.success({ text: $scope.fileType + " файл(и) завантажено до " + data.path });

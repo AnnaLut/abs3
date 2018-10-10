@@ -1683,24 +1683,8 @@ LOOP
           FROM accounts a,cust_acc cu
          WHERE a.acc=cu.acc AND a.nls=nlsb_ AND a.kv=kv_;
        EXCEPTION
-          WHEN NO_DATA_FOUND THEN 
-               -- COBUMMFO-7501 Begin
-               if regexp_like(nlsb_, '^26[0,2,5]5') then
-                  BEGIN
-                     SELECT a.acc,a.nlsalt,a.tip,a.isp, a.grp, a.nms,cu.rnk,a.sec
-                       INTO   acck_,nlsalt_,tipk_, isp_,  grp_,  nms_,  rnk_, sec_
-                       FROM accounts a,cust_acc cu
-                      WHERE a.acc = cu.acc AND a.nlsalt = nlsb_ AND a.kv = kv_;
-                  EXCEPTION
-                     WHEN NO_DATA_FOUND THEN 
-                         acck_ := ch_acc( gl.aMFO, kv_, ts_ );
-                         susp_ := 1;
-                  END;
-               else
-               -- COBUMMFO-7501 End
-                  acck_ := ch_acc( gl.aMFO, kv_, ts_ );
-                  susp_ := 1;
-               end if;
+          WHEN NO_DATA_FOUND THEN acck_ := ch_acc( gl.aMFO, kv_, ts_ );
+          susp_ := 1;
        END;
     ELSE
        IF wk_='A' THEN    -- account RRP

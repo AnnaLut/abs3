@@ -200,10 +200,6 @@ BEGIN
                    select 1
                      from ACCOUNTS_RSRV
                     where NLS = nlsfin_
-                    union  -- COBUMMFO-7501
-                   select 1
-                     from transform_2017_forecast
-                    where new_nls = nlsfin_
                  ) t;
         exception
           when no_data_found then
@@ -224,11 +220,6 @@ BEGIN
                    select 1
                      from ACCOUNTS_RSRV
                     where NLS = nlsfin_
-                      and KV  = kv_
-                    union  -- COBUMMFO-7501
-                   select 1
-                     from transform_2017_forecast
-                    where new_nls = nlsfin_
                       and KV  = kv_
                  ) t;
         exception when no_data_found then
@@ -258,10 +249,6 @@ BEGIN
                      select 1
                        from ACCOUNTS_RSRV
                       where nls = nlsfin_
-                      union  -- COBUMMFO-7501
-                     select 1
-                       from transform_2017_forecast
-                      where new_nls = nlsfin_
                    ) t;
           exception
             when no_data_found then
@@ -280,11 +267,6 @@ BEGIN
                      select 1
                        from ACCOUNTS_RSRV
                       where NLS = nlsfin_
-                        and KV  = kv_
-                      union  -- COBUMMFO-7501
-                     select 1
-                       from transform_2017_forecast
-                      where new_nls = nlsfin_
                         and KV  = kv_
                    ) t;
           exception

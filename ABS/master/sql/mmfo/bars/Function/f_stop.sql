@@ -3304,52 +3304,7 @@ end ;
          erm := 'Заборонено проведення операції по рахункам БПК';
          RAISE err;
       END IF;
-   -- COBUMMFO - 7501 Begin
-   ELSIF KOD_ = 9997 THEN
-      select t.nlsb
-        into l_nlsb
-        from oper t
-       where t.ref = p_ref;
-
-      select count(*)
-        into l_cnt
-        from accounts t
-       where t.tip = 'KW4'
-         and t.nls = l_nlsb;
       
-      IF l_cnt > 0
-      THEN
-         bars_audit.info ('!f_stop#9997 Заборонено проведення операції по рахункам Мобільних заощаджень');
-         erm := 'Заборонено проведення операції по рахункам Мобільних заощаджень';
-         RAISE err;
-      END IF;
-   ELSIF KOD_ = 9996 THEN
-	  begin
-         select case ap.dk
-                     when 1 then t.nlsb
-					 else t.nlsa
-                end
-         into l_nlsb
-         from oper t
-         join ttsap ap on ap.tt = t.tt and ap.ttap = '!!U'
-         where t.ref = p_ref;
-
-         select count(*)
-         into l_cnt
-         from accounts t
-         where t.tip like 'W4%'
-              and t.nls = l_nlsb;
-
-      exception
-		 when others then
-			  l_cnt := 0;
-      end;
-      IF l_cnt > 0 THEN
-         bars_audit.info ('!f_stop#9999 Заборонено проведення операції по рахункам БПК');
-         erm := 'Заборонено проведення операції по рахункам БПК';
-         RAISE err;
-      END IF;
-   -- COBUMMFO - 7501 End
    ELSIF KOD_ = 9998 THEN
         begin
           select trim(t.value)

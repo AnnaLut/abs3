@@ -833,8 +833,7 @@ create or replace package body msp.msp_utl is
     -- наявність рахунку
     begin
       select * into l_pensacc_row from pfu.pfu_pensacc pa
-      where (pa.nls = to_char(p_deposit_acc) or pa.nlsalt = to_char(p_deposit_acc)) -- COBUMMFO-7501
-            and pa.kf = to_char(p_receiver_mfo);
+      where pa.nls = to_char(p_deposit_acc) and pa.kf = to_char(p_receiver_mfo);
     exception
       when no_data_found then
         l_err_code    := 4;
