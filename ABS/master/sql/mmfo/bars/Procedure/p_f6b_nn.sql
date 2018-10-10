@@ -12,7 +12,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  % DESCRIPTION : процедура #6B
  %
- % VERSION     :   v.18.010      05.09.2018
+ % VERSION     :   v.18.011      09.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
    Структура показателя    GGG CC N H I OO R VVV
@@ -28,6 +28,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+09.10.2018  SNA отсутсвующие в nbu23_rez: изменен скрипт отбора остатков
 05.09.2018  новое значение сегмента N =7 для ФОПов
 11.07.2018  для счетов SRR с отриц.остатком BV устанавливается CC=40
 09.07.2018  -обработка дисконтов 2046/SDF без учета r013
@@ -887,18 +888,19 @@ BEGIN
                       2-MOD(c.codcagent,2) REZ, NVL(trim(c.sed),'00') sed,
                       c.codcagent, c.custtype
                 from agg_monbals m, accounts a, customer c
-               where m.kf=mfo_ and m.fdat=dato_
+               where m.kf =mfo_ and m.fdat =dato_
                  and m.acc = a.acc
                  and a.rnk = c.rnk
                  and m.ost-m.crdos+m.crkos !=0
                  and m.acc in ( select acc  from accounts  where tip='SNA' )
                  and not exists ( select 1  from nbu23_rez n
-                                   where n.kf=mfo_ and n.fdat=dat1_
+                                   where n.kf=mfo_ and n.fdat =dat1_
                                      and n.acc =m.acc and (-100)*n.bv = m.ost-m.crdos+m.crkos )
-                 and exists ( select 1  from nd_acc n, cc_deal d
-                               where n.acc =m.acc
-                                 and n.nd =d.nd
-                                 and d.wdate is not null and d.wdate <dat1_ )
+                 and exists ( select 1  from accounts a, nd_acc n, nd_acc ns
+                               where ns.acc = m.acc  and ns.kf =mfo_
+                                 and ns.nd = n.nd    and n.kf =mfo_
+                                 and a.acc = n.acc   and a.kf =mfo_
+                                 and a.nls like '8999%' ) 
    ) loop
          select max(ddd) into ddd_
            from kl_f3_29
