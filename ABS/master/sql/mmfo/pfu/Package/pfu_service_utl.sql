@@ -4,7 +4,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/PFU/package/pfu_service_utl.sql =========*** Run 
  PROMPT ===================================================================================== 
  
-CREATE OR REPLACE PACKAGE PFU_SERVICE_UTL is
+CREATE OR REPLACE PACKAGE PFU.PFU_SERVICE_UTL is
 
     SESS_STATE_NEW                 constant integer := 1;
     SESS_STATE_SIGNED              constant integer := 7;
@@ -30,6 +30,7 @@ CREATE OR REPLACE PACKAGE PFU_SERVICE_UTL is
   SESS_TYPE_GET_EPP_BATCH      constant integer := 10;
   SESS_TYPE_REQ_MATCHING1      constant integer := 11;
   SESS_TYPE_REQ_EPP_MATCHING   constant integer := 12;
+  SESS_TYPE_REQ_EPP_MATCHING2  constant integer := 28;
   SESS_TYPE_REQ_EPP_ACTIVATION constant integer := 13;
   SESS_TYPE_GET_EPP_MATCHING   constant integer := 14;
   SESS_TYPE_REQ_MATCHING2      constant integer := 15;
@@ -134,6 +135,8 @@ CREATE OR REPLACE PACKAGE PFU_SERVICE_UTL is
   procedure regen_matching1(p_env_id in integer);
 
   procedure gen_matching2(p_file_id in integer, p_ecp in varchar2);
+
+  procedure gen_epp_kvt2;
 
   procedure gen_no_turnover(p_nt_id in integer,
                             p_mfo   in varchar2,
@@ -258,6 +261,20 @@ CREATE OR REPLACE PACKAGE PFU_SERVICE_UTL is
   function prepare_matching2(p_file_id  in integer,
                              p_enc_type in number default 0) return clob;
 
+  -----------------------------------------------------------------------------------------
+  --  prepare_epp_kvt2
+  --
+  --    Створення файлу квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2) - insert pfu_matching_request2, state = 'NEW'
+  --
+  procedure prepare_epp_kvt2;
+  -----------------------------------------------------------------------------------------
+  --  prepare_epp_kvt2_result
+  --
+  --    Оновлення результатів опрацювання кожного запису файлу для квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2) - update pfu_epp_line_bnk_state2 pfu_result, res_teg
+  --
+  procedure prepare_epp_kvt2_result;
+
+
   function prepare_no_turnover(p_nt_id    in integer,
                                p_mfo      in varchar2,
                                p_enc_type in number default 0) return clob;
@@ -292,11 +309,13 @@ CREATE OR REPLACE PACKAGE PFU_SERVICE_UTL is
 	procedure process_claim_stage;
 	procedure process_transport_stage;
 	procedure process_transport_ebp_stage;
+  procedure process_transport_lock_stage;
 
 	procedure process_all_stages;
+  procedure prepare_checkissuecard;
 end;
 /
-create or replace package body pfu_service_utl as
+CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
 
   function extract_clob(p_xml     in xmltype,
                         p_xpath   in varchar2,
@@ -1041,6 +1060,19 @@ create or replace package body pfu_service_utl as
       from pfu_matching_request pmr
      where pmr.id = p_request_id;
     return create_session(pfu_service_utl.SESS_TYPE_REQ_EPP_MATCHING,
+                          p_request_id,
+                          l_xml_clob);
+  end;
+
+  function gen_session_req_epp_matching2(p_request_id in integer)
+    return integer is
+    l_xml_clob clob;
+  begin
+    select pmr.pfu_matching_xml
+      into l_xml_clob
+      from pfu_matching_request pmr
+     where pmr.id = p_request_id;
+    return create_session(pfu_service_utl.SESS_TYPE_REQ_EPP_MATCHING2,
                           p_request_id,
                           l_xml_clob);
   end;
@@ -2465,7 +2497,7 @@ create or replace package body pfu_service_utl as
           select *
             into l_pensacc_row
             from pfu_pensacc pa
-					 where (pa.nls = l_frow2.num_acc or pa.nlsalt = l_frow2.num_acc) -- COBUMMFO-7501
+           where pa.nls = l_frow2.num_acc
              and pa.kf = l_frow2.bank_mfo;
         exception
           when no_data_found then
@@ -2636,6 +2668,13 @@ create or replace package body pfu_service_utl as
     end if;
   end;
 
+  -----------------------------------------------------------------------------------------
+  --  validate_epp_lines
+  --
+  --    Валідація даних пенсіонерів на отримання ЕПП
+  --
+  --      p_request_id - id запиту
+  --
   procedure validate_epp_lines(p_request_id in integer) is
     l_wrong_tag_list string_list;
   begin
@@ -2688,12 +2727,29 @@ create or replace package body pfu_service_utl as
       validate_epp_line(l_wrong_tag_list,
                         'type_doc',
                         i.document_type,
-												'^(1|2|3)$');
+                        '^(1|2)$');
+      -- COBUMMFO-8918
+      -- якщо паспорт старого зразка
+      if i.document_type in ('1') then
         validate_epp_line(l_wrong_tag_list,
                           'ser_num',
                           i.document_id,
                           '^([АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯ]{2}\s{1}\d{6}|\d{9})$');
+      -- якщо паспорт нового зразка
+      elsif i.document_type in ('2') then
         validate_epp_line(l_wrong_tag_list,
+                          'ser_num',
+                          i.document_id,
+                          '^\d{9}$');
+      -- залишаємо валідацію старого зразка на випадок якщо передають хз що
+      else
+        validate_epp_line(l_wrong_tag_list,
+                          'ser_num',
+                          i.document_id,
+                          '^([АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯ]{2}\s{1}\d{6}|\d{9})$');
+      end if;
+      --
+      validate_epp_line(l_wrong_tag_list,
                         'date_doc',
                         i.document_issue_date,
                         '^[0-3][0-9][0-1][0-9][0-2][0-9][0-9][0-9]$');
@@ -2801,6 +2857,14 @@ create or replace package body pfu_service_utl as
                         'bank_name',
                         i.bank_name,
                         '.{1,100}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'pens_type',
+                        i.pens_type,
+                        '^(1|2)$');
+      validate_epp_line(l_wrong_tag_list,
+                        'guardianship',
+                        i.guardianship,
+                        '^(0|1)$');
 
       if (l_wrong_tag_list is empty) then
         pfu_epp_utl.set_line_state(i.id,
@@ -2820,7 +2884,196 @@ create or replace package body pfu_service_utl as
     pfu_utl.set_request_state(p_request_id,
                               'MATCH_SEND',
                               'Квітанція сформована');
-	end;
+  end validate_epp_lines;
+
+  -----------------------------------------------------------------------------------------
+  --  validate_epp_guardians
+  --
+  --    Валідація даних опікунів пенсіонерів на отримання ЕПП
+  --
+  --      p_request_id - id запиту
+  --
+  procedure validate_epp_guardians(p_request_id in integer) is
+    l_wrong_tag_list string_list;
+  begin
+    for i in (select l.*
+                from pfu_epp_line_guardian l
+               where l.batch_request_id = p_request_id
+                 and l.state_id <> pfu_epp_utl.LINE_STATE_ACCEPTED) loop
+
+      l_wrong_tag_list := string_list();
+
+      validate_epp_line(l_wrong_tag_list,
+                        'num_zo_g',
+                        i.person_record_number,
+                        '^(\w|\d|-){1,10}$');
+      validate_epp_line(l_wrong_tag_list, 'ln', i.last_name, '^.{2,70}$');
+      validate_epp_line(l_wrong_tag_list, 'nm', i.first_name, '^.{2,50}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'ftn_g',
+                        i.middle_name,
+                        '^.{1,50}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list, 'st', i.gender, '^(0|1)$');
+      validate_epp_line(l_wrong_tag_list,
+                        'date_birth_g',
+                        i.date_of_birth,
+                        '^[0-3][0-9][0-1][0-9][0-2][0-9][0-9][0-9]$');
+      validate_epp_line(l_wrong_tag_list,
+                        'num_tel_g',
+                        i.phone_numbers,
+                        '^(\d|-|\(|\)|\+|\s|,){1,30}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'lnf_lat_g',
+                        i.embossing_name,
+                        '^([A-Z]|\s){1,172}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'numident_g',
+                        i.tax_registration_number,
+                        '^\d{8,10}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'type_doc_g',
+                        i.document_type,
+                        '^(1|2)$');
+      -- COBUMMFO-8918
+      -- якщо паспорт старого зразка
+      if i.document_type in ('1') then
+        validate_epp_line(l_wrong_tag_list,
+                          'ser_num_g',
+                          i.document_id,
+                          '^([АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯ]{2}\s{1}\d{6}|\d{9})$');
+      -- якщо паспорт нового зразка
+      elsif i.document_type in ('2') then
+        validate_epp_line(l_wrong_tag_list,
+                          'ser_num_g',
+                          i.document_id,
+                          '^\d{9}$');
+      -- залишаємо валідацію старого зразка на випадок якщо передають хз що
+      else
+        validate_epp_line(l_wrong_tag_list,
+                          'ser_num_g',
+                          i.document_id,
+                          '^([АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯ]{2}\s{1}\d{6}|\d{9})$');
+      end if;
+      --
+      validate_epp_line(l_wrong_tag_list,
+                        'date_doc_g',
+                        i.document_issue_date,
+                        '^[0-3][0-9][0-1][0-9][0-2][0-9][0-9][0-9]$');
+      validate_epp_line(l_wrong_tag_list,
+                        'issued_doc_g',
+                        i.document_issuer,
+                        '^.{1,100}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'type_osob_g',
+                        i.displaced_person_flag,
+                        '^(0|1)$');
+      validate_epp_line(l_wrong_tag_list,
+                        'country_reg_g',
+                        i.legal_country,
+                        '^.{1,50}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'post_reg_g',
+                        i.legal_zip_code,
+                        '^\d{5,6}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'region_reg_g',
+                        i.legal_region,
+                        '^.{1,50}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'area_reg_g',
+                        i.legal_district,
+                        '^.{1,100}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'settl_reg_g',
+                        i.legal_settlement,
+                        '^.{1,100}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'street_reg_g',
+                        i.legal_street,
+                        '^.{1,100}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'house_reg_g',
+                        i.legal_house,
+                        '^.{1,7}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'corps_reg_g',
+                        i.legal_house_part,
+                        '^.{1,2}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'apart_reg_g',
+                        i.legal_apartment,
+                        '^.{1,7}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'country_act_g',
+                        i.actual_country,
+                        '^.{1,50}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'post_act_g',
+                        i.actual_zip_code,
+                        '^\d{5,6}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'region_act_g',
+                        i.actual_region,
+                        '^.{1,50}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'area_act_g',
+                        i.actual_district,
+                        '^.{1,100}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'settl_act_g',
+                        i.actual_settlement,
+                        '^.{1,100}$');
+      validate_epp_line(l_wrong_tag_list,
+                        'street_act_g',
+                        i.actual_street,
+                        '^.{1,100}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'house_act_g',
+                        i.actual_house,
+                        '^.{1,7}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'corps_act_g',
+                        i.actual_house_part,
+                        '^.{1,2}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'apart_act_g',
+                        i.actual_apartment,
+                        '^.{1,5}$',
+                        false);
+      validate_epp_line(l_wrong_tag_list,
+                        'pens_type_g',
+                        i.pens_type,
+                        '^(1|2)$');
+
+      if (l_wrong_tag_list is empty) then
+        pfu_epp_utl.set_line_state(i.id,
+                                   pfu_epp_utl.LINE_STATE_ACCEPTED,
+                                   '',
+                                   null);
+      else
+        pfu_epp_utl.set_line_state(i.id,
+                                   pfu_epp_utl.LINE_STATE_INCORRECT_DATA,
+                                   'Невідповідність формату даних, отриманих від ПФУ, або не заповнено обов’язкові поля',
+                                   pfu_utl.string_list_to_clob(l_wrong_tag_list,
+                                                               ', '));
+      end if;
+
+    end loop;
+  end validate_epp_guardians;
 
   procedure validate_epp_lines is --валідація даних після прийому (запису) в PFU_EPP_LINE
   begin
@@ -2845,6 +3098,13 @@ create or replace package body pfu_service_utl as
     end loop;
   end;
 
+  -----------------------------------------------------------------------------------------
+  --  gather_epp_batch_parts
+  --
+  --    Парсинг файлу ЕПП
+  --
+  --      p_request_id - id запиту
+  --
   procedure gather_epp_batch_parts(p_request_id in integer) is
     l_response_data clob;
 
@@ -2853,7 +3113,8 @@ create or replace package body pfu_service_utl as
 
     l_sessions number_list := number_list();
 
-		l_epp_lines pfu_epp_utl.t_epp_lines;
+    l_epp_lines         pfu_epp_utl.t_epp_lines;         -- колекція для пенсіонерів
+    l_epp_line_guardian pfu_epp_utl.t_epp_line_guardian; -- колекція для опікунів
 
     l_parser dbms_xmlparser.parser;
     l_doc    dbms_xmldom.DOMDocument;
@@ -2864,6 +3125,7 @@ create or replace package body pfu_service_utl as
 
     l_fd_zip   blob;
     l_fd_unzip blob;
+    l_g        simple_integer := 0;
   begin
     dbms_lob.createtemporary(l_response_data, false);
 
@@ -2909,7 +3171,7 @@ create or replace package body pfu_service_utl as
     for i in 0 .. dbms_xmldom.getlength(l_rows) - 1 loop
 
       l_row := dbms_xmldom.item(l_rows, i);
-
+      -- дані пенсіонера
       l_epp_lines(i).id := s_pfu_epp_line.nextval;
       l_epp_lines(i).batch_request_id := p_request_id;
       l_epp_lines(i).line_id := dbms_xslprocessor.valueof(l_row,
@@ -2991,9 +3253,57 @@ create or replace package body pfu_service_utl as
                                                          'branch/text()');
       l_epp_lines(i).pens_type := dbms_xslprocessor.valueof(l_row,
                                                             'pens_type/text()');
+      l_epp_lines(i).guardianship := dbms_xslprocessor.valueof(l_row,
+                                                            'guardianship/text()');
 
       l_epp_lines(i).line_sign := pfu_epp_utl.calc_line_sign(l_epp_lines(i));
       l_epp_lines(i).state_id := pfu_epp_utl.LINE_STATE_NEW;
+
+      -- дані опікуна, якщо є
+      if l_epp_lines(i).guardianship = '1' then
+        l_g := l_epp_line_guardian.count;
+        -- отримую новий id опікуна
+        l_epp_line_guardian(l_g).id := s_pfu_epp_line_guardian.nextval;
+        l_epp_line_guardian(l_g).batch_request_id := p_request_id;
+        -- прописую ссилку на опікуна в pfu_epp_lines
+        l_epp_lines(i).guardian_id := l_epp_line_guardian(l_g).id;
+        -- інші дані опікуна
+        l_epp_line_guardian(l_g).person_record_number := dbms_xslprocessor.valueof(l_row,    'num_zo_g/text()');
+        l_epp_line_guardian(l_g).last_name := dbms_xslprocessor.valueof(l_row,               'ln_g/text()');
+        l_epp_line_guardian(l_g).first_name := dbms_xslprocessor.valueof(l_row,              'nm_g/text()');
+        l_epp_line_guardian(l_g).middle_name := dbms_xslprocessor.valueof(l_row,             'ftn_g/text()');
+        l_epp_line_guardian(l_g).gender := dbms_xslprocessor.valueof(l_row,                  'st_g/text()');
+        l_epp_line_guardian(l_g).date_of_birth := dbms_xslprocessor.valueof(l_row,           'date_birth_g/text()');
+        l_epp_line_guardian(l_g).phone_numbers := dbms_xslprocessor.valueof(l_row,           'num_tel_g/text()');
+        l_epp_line_guardian(l_g).embossing_name := dbms_xslprocessor.valueof(l_row,          'lnf_lat_g/text()');
+        l_epp_line_guardian(l_g).tax_registration_number := dbms_xslprocessor.valueof(l_row, 'numident_g/text()');
+        l_epp_line_guardian(l_g).document_type := dbms_xslprocessor.valueof(l_row,           'type_doc_g/text()');
+        l_epp_line_guardian(l_g).document_id := dbms_xslprocessor.valueof(l_row,             'ser_num_g/text()');
+        l_epp_line_guardian(l_g).document_issue_date := dbms_xslprocessor.valueof(l_row,     'date_doc_g/text()');
+        l_epp_line_guardian(l_g).document_issuer := dbms_xslprocessor.valueof(l_row,         'issued_doc_g/text()');
+        l_epp_line_guardian(l_g).displaced_person_flag := dbms_xslprocessor.valueof(l_row,   'type_osob_g/text()');
+        l_epp_line_guardian(l_g).pens_type := dbms_xslprocessor.valueof(l_row,               'pens_type_g/text()');
+        l_epp_line_guardian(l_g).legal_country := dbms_xslprocessor.valueof(l_row,           'country_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_zip_code := dbms_xslprocessor.valueof(l_row,          'post_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_region := dbms_xslprocessor.valueof(l_row,            'region_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_district := dbms_xslprocessor.valueof(l_row,          'area_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_settlement := dbms_xslprocessor.valueof(l_row,        'settl_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_street := dbms_xslprocessor.valueof(l_row,            'street_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_house := dbms_xslprocessor.valueof(l_row,             'house_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_house_part := dbms_xslprocessor.valueof(l_row,        'corps_reg_g/text()');
+        l_epp_line_guardian(l_g).legal_apartment := dbms_xslprocessor.valueof(l_row,         'apart_reg_g/text()');
+        l_epp_line_guardian(l_g).actual_country := dbms_xslprocessor.valueof(l_row,          'country_act_g/text()');
+        l_epp_line_guardian(l_g).actual_zip_code := dbms_xslprocessor.valueof(l_row,         'post_act_g/text()');
+        l_epp_line_guardian(l_g).actual_region := dbms_xslprocessor.valueof(l_row,           'region_act_g/text()');
+        l_epp_line_guardian(l_g).actual_district := dbms_xslprocessor.valueof(l_row,         'area_act_g/text()');
+        l_epp_line_guardian(l_g).actual_settlement := dbms_xslprocessor.valueof(l_row,       'settl_act_g/text()');
+        l_epp_line_guardian(l_g).actual_street := dbms_xslprocessor.valueof(l_row,           'street_act_g/text()');
+        l_epp_line_guardian(l_g).actual_house := dbms_xslprocessor.valueof(l_row,            'house_act_g/text()');
+        l_epp_line_guardian(l_g).actual_house_part := dbms_xslprocessor.valueof(l_row,       'corps_act_g/text()');
+        l_epp_line_guardian(l_g).actual_apartment := dbms_xslprocessor.valueof(l_row,        'apart_act_g/text()');
+        --l_epp_line_guardian(i).line_sign := pfu_epp_utl.calc_line_sign(l_epp_line_guardian(i));
+        l_epp_line_guardian(l_g).state_id := pfu_epp_utl.LINE_STATE_NEW;
+      end if;
     end loop;
 
     dbms_xmlparser.freeParser(l_parser);
@@ -3017,6 +3327,17 @@ create or replace package body pfu_service_utl as
          sysdate,
          null,
          null);
+
+    -- якщо є опікуни, то парсимо спочатку опікунів (бо в validate_epp_lines вкінці формується квитанція1)
+    -- в поточній реалізації помилки валідації пенса і опікуна об'єднані (тобто якщо пао одному з них помилка то вважаємо що помилка валідації по пенсу)
+    -- TODO: in process
+    if not (l_epp_line_guardian is null or l_epp_line_guardian.count() = 0) then
+      forall i in indices of l_epp_line_guardian
+        insert into pfu_epp_line_guardian values l_epp_line_guardian (i);
+
+      validate_epp_guardians(p_request_id);
+    end if;
+    --
 
     validate_epp_lines(p_request_id);
 
@@ -3345,6 +3666,166 @@ create or replace package body pfu_service_utl as
     l_clob_base64 := pfu_utl.pfu_encode_base64(l_blob_zip);
   return l_clob_base64;
   end;
+
+  -----------------------------------------------------------------------------------------
+  --  prepare_kvt2
+  --
+  --    Створення файлу квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2) - insert pfu_matching_request2, state = 'NEW'
+  --
+  procedure prepare_epp_kvt2
+  is
+    l_doc         dbms_xmldom.DOMDocument;
+    l_root_node   dbms_xmldom.DOMNode;
+    l_header_node dbms_xmldom.DOMNode;
+    l_body_node   dbms_xmldom.DOMNode;
+    l_row_node    dbms_xmldom.DOMNode;
+    l_res_file    varchar2(1 char);
+    l_firstname   varchar2(3000);
+    l_lastname    varchar2(3000);
+    l_surname     varchar2(3000);
+    l_clob        clob;
+    l_create_date date := sysdate;
+    l_match_req2_rec pfu_matching_request2%rowtype;
+    l_errm        varchar2(4000);
+    --l_blob_xml    blob;
+    --l_blob_zip    blob;
+    --l_clob_base64 clob;
+  begin
+    for file in (select distinct batch_request_id from pfu_epp_line_bnk_state2 where stage_ticket = 2)
+    loop
+      l_doc := dbms_xmldom.newDomDocument;
+
+      l_root_node := dbms_xmldom.makeNode(l_doc);
+      l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                             dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc, 'declar')));
+
+      select to_char(max(case when s.pfu_result in (0) then 0 else 1 end)) res_file
+        into l_res_file
+        from pfu_epp_line_bnk_state2 s
+       where batch_request_id = file.batch_request_id;
+
+      -- заголовок файлу
+      l_header_node := dbms_xmldom.appendChild(l_root_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc, 'declarhead')));
+      -- рядки файлу
+      add_text_node_utl(l_doc,
+                        l_header_node,
+                        'date_time',
+                        to_char(l_create_date, 'dd.mm.yyyy hh24.mi.ss'));
+      add_text_node_utl(l_doc,
+                        l_header_node,
+                        'res_file',
+                        l_res_file);
+
+      l_body_node := dbms_xmldom.appendChild(l_root_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc, 'declarbody')));
+
+      for rec in (select to_char(s.rn)         as rn, -- pfu_epp_line.line_id
+                         s.epp_number          as id_epp,
+                         to_char(s.pfu_result) as pfu_result,
+                         s.res_tag             as res_tag,
+                         s.ps_type             as ps_type,
+                         case s.pfu_result when 0 then coalesce(to_char(s.epp_expiry_date, 'dd.mm.yyyy'),'') else '' end as date_end
+                  from pfu_epp_line_bnk_state2 s
+                  where s.batch_request_id = file.batch_request_id)
+      loop
+        l_row_node := dbms_xmldom.appendChild(l_body_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc, 'row')));
+        add_text_node_utl(l_doc, l_row_node, 'rownum',   rec.rn);
+        add_text_node_utl(l_doc, l_row_node, 'id_epp',   rec.id_epp);
+        add_text_node_utl(l_doc, l_row_node, 'result',   rec.pfu_result);
+        add_text_node_utl(l_doc, l_row_node, 'res_teg',  rec.res_tag);
+        add_text_node_utl(l_doc, l_row_node, 'Ps_type',  rec.ps_type);
+        add_text_node_utl(l_doc, l_row_node, 'Date_end', rec.date_end);
+      end loop;
+
+      l_clob := dbms_xmldom.getXmlType(l_doc).getClobVal();
+
+      begin
+        select * into l_match_req2_rec from pfu_matching_request2 m where m.batch_request_id = file.batch_request_id;
+        -- if l_match_req2_rec.state in ('NEW') then
+        -- згідно уточнення по ТЗ: квитанцію можна переформувати в любому стані
+        update pfu_matching_request2
+           set create_date = l_create_date,
+               xml_data = l_clob,
+               state = 'NEW'
+         where batch_request_id = file.batch_request_id;
+        --else
+        --  raise_application_error(-20001, 'Квитанція вже була відправлена. Переформувати не можливо');
+        --end if;
+      exception
+        when no_data_found then
+          insert into pfu_matching_request2 (batch_request_id, state, create_date, xml_data)
+          values (file.batch_request_id, 'NEW', l_create_date, l_clob);
+        when others then
+          l_errm := sqlerrm || ' ' ||dbms_utility.format_error_backtrace();
+          update pfu_matching_request2 s
+             set create_date = l_create_date,
+                 s.state = 'ERROR',
+                 s.comm  = l_errm
+           where batch_request_id = file.batch_request_id;
+      end;
+      update pfu_epp_line_bnk_state2 s set s.stage_ticket = null where batch_request_id = file.batch_request_id;
+      commit;
+    end loop;
+  exception
+    when others then
+      --bars.bars_audit.info('pfu_service_utl.prepare_epp_kvt2 error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      raise_application_error(-20000, 'pfu_service_utl.prepare_epp_kvt2 error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+  end prepare_epp_kvt2;
+
+  -----------------------------------------------------------------------------------------
+  --  prepare_kvt2result
+  --
+  --    Оновлення результатів опрацювання кожного запису файлу для квитанції 2 (PUT_EPP_PACKET_BNK_STATE_2) - update pfu_epp_line_bnk_state2 pfu_result, res_teg
+  --
+  procedure prepare_epp_kvt2_result
+  is
+  begin
+    -- оновлення результатів опрацювання кожного запису файлу
+    merge into (select * from pfu_epp_line_bnk_state2 where stage_ticket = 1) e
+    using (select s.epp_line_id,
+                  case s.state_id
+                    when 11 then 0 -- ok
+                    when 20 then 4 -- нова заявка
+                    when 10 then 4 -- операція в обробці
+                    else coalesce(m.pfu_result,2) end pfu_result, -- не визначений рахуємо помилкою (2)
+                  case when m.id in (3) then to_char(s.error_stack) else m.pfu_tag end pfu_tag -- згідно ТЗ по коду 3 мапінга треба брати тег із поля error_stack
+           from pfu_epp_line_bnk_state2 s
+                left join pfu_bnk_state2_mapping m on  lower(s.comm) like '%'||lower(m.msg)||'%'
+           where s.stage_ticket in (1) -- 1 - очікує формування pfu_result для квитанції 2
+           ) t on (e.epp_line_id = t.epp_line_id)
+    when matched then
+      update set e.pfu_result   = t.pfu_result,
+                 e.res_tag      = t.pfu_tag;
+
+    -- проставляю статус для формування кв 2
+    update pfu_epp_line_bnk_state2 e
+       set stage_ticket = 2
+     where e.batch_request_id in
+           (select distinct batch_request_id from pfu_epp_line_bnk_state2 where stage_ticket = 1);
+
+    /*
+    -- оновлення результатів опрацювання кожного запису файлу
+    update pfu_epp_line_bnk_state2 s
+       set stage_ticket = 2, -- проставляю зразу статус для формування файла кв2
+           pfu_result   = case state_id
+                            when 11 then 0 -- ok
+                            when 20 then 4 --
+                            when 10 then 4 --
+                            when  9 then 2 --
+                            when  7 then 2 --
+                          else 2 end / * не визначений рахуємо помилкою * /,
+           res_tag      = null
+     where stage_ticket = 1;
+     */
+
+    commit;
+
+    -- статус для формування файла кв2
+    -- update pfu_epp_line_bnk_state2 set stage_ticket = 2 where stage_ticket = 1;
+  exception
+    when others then
+      --bars.bars_audit.info('pfu_service_utl.prepare_epp_kvt2_result error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      raise_application_error(-20000, 'pfu_service_utl.prepare_epp_kvt2_result error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+  end prepare_epp_kvt2_result;
 
   function prepare_death_matching(p_death_id in integer,
                                   p_enc_type in number default 0) return clob is
@@ -3937,6 +4418,57 @@ create or replace package body pfu_service_utl as
            pf.match_date = l_date_cr
      where pf.id = p_file_id;
   end;
+
+  procedure gen_epp_kvt2
+  is
+    l_doc          dbms_xmldom.DOMDocument;
+    l_root_node    dbms_xmldom.DOMNode;
+    l_header_node  dbms_xmldom.DOMNode;
+    l_body_node    dbms_xmldom.DOMNode;
+    l_row_node     dbms_xmldom.DOMNode;
+    l_file_rec     pfu_file%rowtype;
+    l_env_rec      pfu_envelope_request%rowtype;
+    l_date_cr      date;
+    l_blob_xml     blob;
+    l_blob_zip     blob;
+    l_clob_res     clob;
+    l_clob_base64  clob;
+    l_dest_offset  integer := 1;
+    l_src_offset   integer := 1;
+    l_blob_csid    number := dbms_lob.default_csid;
+    l_lang_context number := dbms_lob.default_lang_ctx;
+    l_warning      integer;
+  begin
+    for i in (select m.batch_request_id, r.pfu_batch_id, m.xml_data 
+              from pfu_matching_request2 m
+                   inner join pfu_epp_batch_request r on r.id = m.batch_request_id
+              where state = 'NEW')
+    loop
+      l_blob_xml := pfu_utl.clob_to_blob(i.xml_data);
+      l_blob_zip := utl_compress.lz_compress(l_blob_xml);
+      --if p_enc_type = 1 then
+      --  return pfu_utl.blob_to_hex(l_blob_zip);
+      --end if;
+      l_clob_base64 := pfu_utl.pfu_encode_base64(l_blob_zip);
+
+      l_doc := dbms_xmldom.newDomDocument;
+
+      l_root_node := dbms_xmldom.makeNode(l_doc);
+      l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                             dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                            'epp_packet_bnk_state_2')));
+
+      add_text_node_utl(l_doc, l_root_node, 'id', i.pfu_batch_id);
+      add_text_node_utl(l_doc, l_root_node, 'data', l_clob_base64);
+
+      pfu_utl.create_epp_matching2(dbms_xmldom.getXmlType(l_doc).getClobVal());
+
+      update pfu_matching_request2 m
+         set m.state       = 'SEND'
+       where m.batch_request_id = i.batch_request_id;
+      commit;
+    end loop;
+  end gen_epp_kvt2;
 
   procedure gen_death_matching(p_death_id in integer, p_ecp in varchar2) is
     l_doc          dbms_xmldom.DOMDocument;
@@ -4601,6 +5133,69 @@ create or replace package body pfu_service_utl as
     end;
   end;
 
+  procedure prepare_checkissuecard
+  -- підготовка запиту на перевірку станів випуску/перевипуску ЕПП
+   is
+    l_file_lines        number_list;
+    l_doc               dbms_xmldom.DOMDocument;
+    l_root_node         dbms_xmldom.DOMNode;
+    l_header_node       dbms_xmldom.DOMNode;
+    l_body_node         dbms_xmldom.DOMNode;
+    l_row_node          dbms_xmldom.DOMNode;
+    l_transport_unit_id integer;
+    l_count             integer;
+  begin
+    -- Блокуємо рядки перед обробкою
+
+    --bars.bc.go('300465');
+    for rec_mfo in (select p.kf mfo from pfu_syncru_params p) loop
+
+        select s.epp_line_id
+          bulk collect
+          into l_file_lines
+        from pfu_epp_line_bnk_state2 s
+             inner join pfu_epp_line e on e.id = s.epp_line_id
+        where s.state_id = 20
+              and e.bank_mfo = rec_mfo.mfo
+              and trunc(sysdate) - 5 >= s.create_date;
+
+      if (l_file_lines.count > 0) then
+
+        l_doc       := dbms_xmldom.newDomDocument;
+        l_root_node := dbms_xmldom.makeNode(l_doc);
+        l_root_node := dbms_xmldom.appendChild(l_root_node,
+                                               dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                              'root')));
+
+        l_header_node := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'header')));
+        l_body_node   := dbms_xmldom.appendChild(l_root_node,
+                                                 dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                'body')));
+        if (l_file_lines is not empty) then
+          for i in (select column_value id from table(l_file_lines)) loop
+
+              l_row_node := dbms_xmldom.appendChild(l_body_node,
+                                                    dbms_xmldom.makeNode(dbms_xmldom.createElement(l_doc,
+                                                                                                   'row')));
+              add_text_node_utl(l_doc,
+                                l_row_node,
+                                'id',
+                                i.id);
+          end loop;
+          --TRANS_TYPE_CHECKSTATE проставляємо тип  4    CHECKPAYMSTATE  Опитування статусу платежу
+          l_transport_unit_id := transport_utl.create_transport_unit(transport_utl.TRANS_TYPE_CHECKISSUECARD,
+                                                                     rec_mfo.mfo,
+                                                                     transport_utl.get_receiver_url(rec_mfo.mfo),
+                                                                     dbms_xmldom.getXmlType(l_doc)
+                                                                     .getClobVal());
+        end if;
+      end if;
+    end loop;
+    commit;
+  end prepare_checkissuecard;
+
   procedure prepare_check_state
   -- підготовка запиту на перевірку станів оплати референсів по ЕБП
    is
@@ -5075,6 +5670,7 @@ create or replace package body pfu_service_utl as
            pfu_service_utl.SESS_TYPE_REQ_CHANGE_ATTR,
            pfu_service_utl.SESS_TYPE_REQ_NO_TURNOVER,
            pfu_service_utl.SESS_TYPE_REQ_EPP_MATCHING,
+           pfu_service_utl.SESS_TYPE_REQ_EPP_MATCHING2,
            pfu_service_utl.SESS_TYPE_REQ_EPP_ACTIVATION)) then
 
         l_pfu_request_id    := to_number(get_node_value(l_doc,
@@ -5353,6 +5949,8 @@ create or replace package body pfu_service_utl as
         l_session_id := gen_session_req_no_turnover(c0.id);
       elsif (c0.request_type = pfu_utl.REQ_TYPE_EPP_MATCHING) then
         l_session_id := gen_session_req_epp_matching(c0.id);
+      elsif (c0.request_type = pfu_utl.REQ_TYPE_EPP_MATCHING2) then
+        l_session_id := gen_session_req_epp_matching2(c0.id);
       elsif (c0.request_type = pfu_utl.REQ_TYPE_EPP_ACTIVATION) then
         l_session_id := gen_session_req_epp_activation(c0.id);
       elsif (c0.request_type = pfu_utl.REQ_TYPE_DEATH_LIST) then
@@ -5411,7 +6009,9 @@ create or replace package body pfu_service_utl as
                   on t.unit_type_id = tt.id
                where t.state_id = transport_utl.TRANS_STATE_NEW
                  and tt.transport_type_code not in
-										 (transport_utl.TRANS_TYPE_GET_EBP) --відбираються всі пакети з статусом 1
+                     (transport_utl.TRANS_TYPE_GET_EBP,
+                      transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK) --відбираються всі пакети з статусом 1
                  for update skip locked) loop
       transport_utl.send_data(i);
     end loop;
@@ -5424,7 +6024,9 @@ create or replace package body pfu_service_utl as
                      (transport_utl.TRANS_STATE_SENT,
                       transport_utl.TRANS_STATE_DATA_NOT_READY)
                  and tt.transport_type_code not in
-										 (transport_utl.TRANS_TYPE_GET_EBP)
+                     (transport_utl.TRANS_TYPE_GET_EBP,
+                      transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
                  for update skip locked) loop
       transport_utl.check_unit_state(i);
     end loop;
@@ -5459,6 +6061,37 @@ create or replace package body pfu_service_utl as
     end loop;
   end;
   
+  procedure send_data_to_bank_units_lock --відправка пакетів на РУ
+   is
+  begin
+    for i in (select t.*
+                from transport_unit t
+                join transport_unit_type tt
+                  on t.unit_type_id = tt.id
+               where t.state_id = transport_utl.TRANS_STATE_NEW
+                 and tt.transport_type_code in
+                     (transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK) --відбираються всі пакети з статусом 1
+                 for update skip locked) loop
+      transport_utl.send_data(i);
+    end loop;
+    commit;
+
+    for i in (select t.*
+                from transport_unit t
+                join transport_unit_type tt
+                  on t.unit_type_id = tt.id
+               where t.state_id in
+                     (transport_utl.TRANS_STATE_SENT,
+                      transport_utl.TRANS_STATE_DATA_NOT_READY)
+                 and tt.transport_type_code in
+                     (transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                      transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
+                 for update skip locked) loop
+      transport_utl.check_unit_state(i);
+    end loop;
+  end;
+
   procedure process_receipt is
 
     l_warning      integer;
@@ -5484,9 +6117,7 @@ create or replace package body pfu_service_utl as
                        transport_utl.TRANS_TYPE_CHECK_EPP_STATE,
                        transport_utl.TRANS_TYPE_GET_REPORT,
                        transport_utl.TRANS_TYPE_RESTART_EPP,
-											 transport_utl.TRANS_TYPE_GET_BRANCH,
-											 transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
-											 transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
+                       transport_utl.TRANS_TYPE_GET_BRANCH)
                   and t.state_id = transport_utl.TRANS_STATE_RESPONDED) loop
       declare
         l_clob         clob;
@@ -5512,11 +6143,12 @@ create or replace package body pfu_service_utl as
                                lang_context => l_lang_context,
                                warning      => l_warning);
 
-
+        -- запит в РУ на реєстрацію/перевипуск карт
         if c0.transport_type_code in
            (transport_utl.TRANS_TYPE_REGEPP,
             transport_utl.TRANS_TYPE_RESTART_EPP) then
           pfu_epp_utl.r_regepp_procesing(l_clob, c0.id);
+        -- запит на статуси реєстрації/перевипуск карт
         elsif c0.transport_type_code =
               transport_utl.TRANS_TYPE_CHECKISSUECARD then
           pfu_epp_utl.r_checkissuecard_procesing(l_clob, c0.id);
@@ -5544,10 +6176,6 @@ create or replace package body pfu_service_utl as
           pfu_epp_utl.r_check_epp_state_procesing(l_clob, c0.id);
         elsif c0.transport_type_code = transport_utl.TRANS_TYPE_GET_BRANCH then
           pfu_files_utl.r_branch_procesing(l_clob, c0.id);
-				elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_BLOCK then
-					pfu_epp_utl.r_card_block_procesing(l_clob, c0.id);
-        elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK then
-					pfu_epp_utl.r_card_unblock_procesing(l_clob, c0.id);
         end if;
         dbms_lob.freetemporary(l_clob);
       exception
@@ -5611,6 +6239,60 @@ create or replace package body pfu_service_utl as
     end loop;
   end;
   
+  procedure process_receipt_lock is
+
+    l_warning      integer;
+    l_dest_offset  integer := 1;
+    l_src_offset   integer := 1;
+    l_blob_csid    number := dbms_lob.default_csid;
+    l_lang_context number := dbms_lob.default_lang_ctx;
+
+  begin
+    for c0 in (select t.*, tt.transport_type_code
+                 from transport_unit t
+                 join transport_unit_type tt
+                   on t.unit_type_id = tt.id
+                  and tt.transport_type_code in (transport_utl.TRANS_TYPE_SET_CARD_BLOCK,
+                                                 transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK)
+                  and t.state_id = transport_utl.TRANS_STATE_RESPONDED) loop
+      declare
+        l_clob         clob;
+        l_tmpb         blob;
+        l_warning      integer;
+        l_dest_offset  integer := 1;
+        l_src_offset   integer := 1;
+        l_blob_csid    number := dbms_lob.default_csid;
+        l_lang_context number := dbms_lob.default_lang_ctx;
+      begin
+        dbms_lob.createtemporary(l_clob, false);
+        savepoint before_transaction;
+
+        l_tmpb := utl_compress.lz_uncompress(c0.response_data);
+
+        dbms_lob.converttoclob(dest_lob     => l_clob,
+                               src_blob     => l_tmpb,
+                               amount       => dbms_lob.lobmaxsize,
+                               dest_offset  => l_dest_offset,
+                               src_offset   => l_src_offset,
+                               blob_csid    => l_blob_csid,
+                               lang_context => l_lang_context,
+                               warning      => l_warning);
+
+        if c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_BLOCK then
+          pfu_epp_utl.r_card_block_procesing(l_clob, c0.id);
+        elsif c0.transport_type_code = transport_utl.TRANS_TYPE_SET_CARD_UNBLOCK then
+          pfu_epp_utl.r_card_unblock_procesing(l_clob, c0.id);
+        end if;
+        dbms_lob.freetemporary(l_clob);
+      exception
+        when others then
+          dbms_lob.freetemporary(l_clob);
+          rollback to before_transaction;
+      end;
+
+    end loop;
+  end;
+
   function get_job_info return t_job_info
     pipelined is
   begin
@@ -5693,6 +6375,12 @@ create or replace package body pfu_service_utl as
     prepare_cardkill_claim();
   end;
   
+  procedure process_transport_lock_stage is
+  begin
+    send_data_to_bank_units_lock;
+    process_receipt_lock;
+  end;
+
   procedure process_all_stages is
   begin
     /*-- запити в ПФУ
@@ -5711,10 +6399,10 @@ create or replace package body pfu_service_utl as
     send_data_to_bank_units();
     process_receipt;
     gen_epp_matching2();
+    gen_epp_kvt2;
   end;
 end;
 /
-
  show err;
  
 PROMPT *** Create  grants  PFU_SERVICE_UTL ***
