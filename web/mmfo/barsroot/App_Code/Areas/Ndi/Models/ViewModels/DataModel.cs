@@ -36,6 +36,7 @@ namespace BarsWeb.Areas.Ndi.Models.ViewModels
         public int Start { get; set; }
 
         public string Code { get; set; }
+        public bool GetAll { get; set; }
 
     }
 

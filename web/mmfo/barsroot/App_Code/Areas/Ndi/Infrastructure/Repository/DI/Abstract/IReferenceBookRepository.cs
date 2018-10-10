@@ -164,7 +164,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract
         CallFunctionMetaInfo GetFunctionsMetaInfo(int? codeOper, string code = "");
         CallFunctionMetaInfo GetCallFunction(int tableId, int funcid);
         MetaTable GetMetaTableByName(string name);
-
+        string GetFirstKeyName(int tabId);
+        string GetSelectName(int tabid);
         MetaTable GetMetaTableById(int id);
     }
 }

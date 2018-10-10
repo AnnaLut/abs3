@@ -53,7 +53,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         public ActionResult UploadTemplateFile(string fieldFileName, int? tableId, int? funcId, int? codeOper, string jsonFuncParams = "", string procName = "", string msg = "",
                   string web_form_name = "", string sPar = "", string jsonSqlProcParams = "")
         {
-            
+
             //string[] supportedTypes = new string[]{
             //    "png", "gif", "tiff", "bmp", "jpg", "jpeg", "htm" ,"rtf", "xml", "txt", "doc"
             //};
@@ -92,7 +92,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
 
                     string res = _repository.CallRefFunction(tableId, funcId, codeOper, null, funcParams, procName, msg, web_form_name, null, additionalParams);
                     //_repository.ExecProcWithClobParam(result, fileName, null, 0);
-                    return Content("{success: 'true', resultMessage: '"+ res + "'}");
+                    return Content("{success: 'true', resultMessage: '" + res + "'}");
                 }
                 string result = "{success: 'false', resultMessage: 'файл не було завантажено'}";
                 return Content(result);
@@ -100,38 +100,38 @@ namespace BarsWeb.Areas.Ndi.Controllers
             }
             catch (Exception e)
             {
-                return Content("{success: 'false', errorMessage: '"+ e.Message  +"'}");
+                return Content("{success: 'false', errorMessage: '" + e.Message + "'}");
             }
         }
 
 
         [HttpGet]
-        public ViewResult GetUploadFile(int? funcId, int? tabid,string code = null)
+        public ViewResult GetUploadFile(int? funcId, int? tabid, string code = null)
         {
             CallFunctionMetaInfo func = null;
             if (funcId != null && tabid != null)
-             func  = _repository.GetCallFunction(tabid.Value, funcId.Value);
+                func = _repository.GetCallFunction(tabid.Value, funcId.Value);
             if (func != null)
                 SqlStatementParamsParser.BuildFunction(func);
             return View(func);
         }
 
         [HttpPost]
-        public ActionResult PostUploadFile(string fileName, string date,int? tabid, int? funcid)
+        public ActionResult PostUploadFile(string fileName, string date, int? tabid, int? funcid)
         {
             var file = Request.Files[0];
 
             try
             {
-               
+
                 string dirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                JsonResult.Message =  _repository.CallParsExcelFunction(file, fileName, date, tabid, funcid);
+                JsonResult.Message = _repository.CallParsExcelFunction(file, fileName, date, tabid, funcid);
                 JsonResult.Status = JsonResponseStatus.Ok;
                 return Json(JsonResult, ResultContentType, JsonRequestBehavior.AllowGet);
-                    
-                }
 
-            
+            }
+
+
             catch (OracleException orex)
             {
                 JsonResult.Status = JsonResponseStatus.Error;
@@ -278,6 +278,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// Получить данные для выбора из связанного справочника
         /// </summary>
         /// <param name="tableName">Таблица из которой нужно выбрать данные</param>
+        /// /// <param name="tableName">Таблица из которой нужно выбрать данные</param>
         /// <param name="fieldForId">Поле таблицы с кодом</param>
         /// <param name="fieldForName">Поле таблицы с наименованием</param>
         /// <param name="query">Строка для поиска по код+наименование</param>
@@ -364,8 +365,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// </summary>
         /// <param name="tableId">Код справочника</param>
         /// <param name="tableName">Название таблицы таблицы</param>
-        /// <param name="jsonUpdatableRowKeys">json cо значениями ключевых полей по которым выполнять update (используется оптимистическая блокировка)</param>
-        /// <param name="jsonUpdatableRowData">json c новыми значениями полей, которые были изменены</param>
+        /// <param name="editData">Модель. Параметр из тела пост запроса</param>
         /// <returns></returns>
 
         [HttpPost, ValidateInput(false)]
@@ -649,7 +649,7 @@ namespace BarsWeb.Areas.Ndi.Controllers
         }
 
         public JsonResult CallFuncWithMultypleRows(int? tableId, int? funcId, string listJsonSqlProcParams, int? codeOper, int? columnId, string procName = "", string msg = "",
-    string web_form_name = "", string sPar = "", string inputProcParams = "",string base64JExternProcParams = "")
+    string web_form_name = "", string sPar = "", string inputProcParams = "", string base64JExternProcParams = "")
         {
             try
             {
@@ -723,24 +723,55 @@ namespace BarsWeb.Areas.Ndi.Controllers
         /// <returns></returns>
         public FileContentResult ExportToExcel(ExcelDataModel excelDataModel)
         {
+            //string ftileName = string.IsNullOrEmpty(excelDataModel.TableName) ? "data.xlsx" : excelDataModel.TableName + "-data.xlsx";
+            //string ftileName = string.IsNullOrEmpty(excelDataModel.TableName) ? "data.xlsx" : excelDataModel.TableName + "-data.xlsx";
+            ExcelResulModel resultModel = null;
             try
             {
-                //string ftileName = string.IsNullOrEmpty(excelDataModel.TableName) ? "data.xlsx" : excelDataModel.TableName + "-data.xlsx";
-                //string ftileName = string.IsNullOrEmpty(excelDataModel.TableName) ? "data.xlsx" : excelDataModel.TableName + "-data.xlsx";
-                ExcelResulModel resultModel = _repository.ExportToExcel(
-              excelDataModel);
+                resultModel = _repository.ExportToExcel(
+             excelDataModel);
+                if (!string.IsNullOrEmpty(resultModel.Path))
+                {
+                    if (!System.IO.File.Exists(resultModel.Path))
+                    {
+                        return File(Encoding.UTF8.GetBytes(string.Format("Файл не знайдено {0}", resultModel.Path)), "text/plain", "ExceptionGetFile.txt");
+                    }
+
+                    string ext = resultModel.Path.Substring(resultModel.Path.LastIndexOf('.'));
+                    switch (ext)
+                    {
+                        case ".zip":
+                            return File(System.IO.File.ReadAllBytes(resultModel.Path), "application/zip", resultModel.FileName + ".zip");
+                        case ".csv":
+                            return File(System.IO.File.ReadAllBytes(resultModel.Path), "attachment", Path.GetFileName(resultModel.Path));
+                        default:
+                            return File(System.IO.File.ReadAllBytes(resultModel.Path), "attachment", resultModel.FileName + ".xlsx");
+                    }
+
+                }
+                else
+                    return File(resultModel.ContentResult, resultModel.ContentType, resultModel.FileName);
+
                 //  return File(_repository.ExportToExcel(
                 //excelDataModel), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ftileName);
-                return File(resultModel.ContentResult, resultModel.ContentType, resultModel.FileName);
+
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw e;
+                Logger.Exception(ex);
+                Logger.Error("GetExcel " + ex.Message, LoggerPrefix);
+                return File(Encoding.UTF8.GetBytes(ex.Message), "text/plain", "ExceptionGetFile.txt");
             }
+            finally
+            {
+                if (resultModel != null && !string.IsNullOrEmpty(resultModel.Path))
+                    System.IO.File.Delete(resultModel.Path);
+
+            }
+
+
 
         }
-
-
 
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BarsWeb.Areas.Ndi.Models;
 using BarsWeb.Areas.Ndi.Infrastructure;
+using BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Abstract;
 
 /// <summary>
 /// Summary description for CallFuncParamsFactory

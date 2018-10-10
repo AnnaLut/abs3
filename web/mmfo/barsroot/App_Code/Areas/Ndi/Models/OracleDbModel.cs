@@ -55,7 +55,6 @@ namespace BarsWeb.Areas.Ndi.Models
                     if (_conn == null)
                         _conn = OraConnector.Handler.UserConnection;
                     _command = _conn.CreateCommand();
-                    //_command.CommandType = CommandType.StoredProcedure;
                 }
                 return _command;
             }
@@ -96,9 +95,6 @@ namespace BarsWeb.Areas.Ndi.Models
                     _myTransaction = _conn.BeginTransaction();
                 _command.Transaction = _myTransaction;
                 }
-                //if (command.Transaction == null)
-                //    command.Transaction = myTransaction;
-                //command.Transaction = myTransaction;
                 return _command;
             }
 
@@ -113,7 +109,6 @@ namespace BarsWeb.Areas.Ndi.Models
                     _myTransaction = _conn.BeginTransaction();
                 }
 
-                //command.Transaction = myTransaction;
                 return _conn;
             }
         }
@@ -135,8 +130,6 @@ namespace BarsWeb.Areas.Ndi.Models
         {
             if (_command != null)
             {
-                //if (_command.Connection.State == ConnectionState.Open)
-                //    _command.Connection.Close();
                 _command.Dispose();
                 _command = null;
             }
@@ -179,7 +172,7 @@ namespace BarsWeb.Areas.Ndi.Models
         * oracleUDTName - Name of the Oracle User Defined Type with Schema Name. (Make sure this is all caps. For ex: DESTINY.COMPANYINFOLIST)
         * 
         * */
-        public static OracleParameter CreateCustomTypeArrayInputParameter(string name, string oracleUDTName, FilterRowInfo[] value)
+        public static OracleParameter CreateCustomTypeArrayInputParameter(string name, string oracleUDTName, object value)
         {
             OracleParameter parameter = new OracleParameter();
             parameter.ParameterName = name;

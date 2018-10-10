@@ -121,7 +121,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             {
                 // вычитка метаданных колонок, метаданные по таблице приходят с клиента   
                 var columnsInfo = GetNativeColumnsMetaInfo(excelDataModel.TableId);
-
+                    
                 //вычитаем инфу о внешних колонках
                 List<ColumnMetaInfo> extColumnsList = GetExternalColumnsMeta(excelDataModel.TableId).ToList();
                 extColumnsList = SelectBuilder.BuildExternalColumnsToColumns(extColumnsList);
@@ -186,8 +186,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
         /// </summary>
         /// <param name="tableId">Код справочника</param>
         /// <param name="tableName">Название таблицы таблицы</param>
-        /// <param name="updatableRowKeys">Значениями ключевых полей по которым выполнять update (используется оптимистическая блокировка)</param>
-        /// <param name="updatableRowData">Новые значения полей, которые были изменены</param>
+        /// <param name="OldRow">Значениями ключевых полей по которым выполнять update (используется оптимистическая блокировка)</param>
+        /// <param name="Modified">Новые значения полей, которые были изменены</param>
         /// <exception cref="Exception"></exception>
         /// <returns>Признак успешной операции</returns>
         public bool EditData(int tableId, string tableName, EditRowModel editDataModel, bool multipleUse = false)
@@ -1161,7 +1161,14 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
 
             var dbMetaColumns = GetDbNativeColumnsMetaInfo(TableId);
             var nativeMetaColumns = DbColumnsToMetaColumnsForGetData(dbMetaColumns);
+            bool lazyLoad = false;
 
+            if (dataModel is ExcelDataModel && dataModel.GetAll && nsiEditParams != null && nsiEditParams.ExcelParam == "ALL_CSV")
+            {
+                lazyLoad = true;// nsiEditParams != null && nsiEditParams.ExcelParam == "ALL_CSV";
+                dataModel.Limit = 9999999;
+            }
+          
             var startInfo = new GetDataStartInfo
             {
                 TableId = TableId,
@@ -1176,7 +1183,7 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 // добавим условие фильтра проваливания
                 FallDownFilter = !string.IsNullOrEmpty(dataModel.FilterCode) ? GetFilterByCode(dataModel.FilterCode) : null,// AddFilterCondition(FormatConverter.JsonToObject<FallDownFilterInfo>(fallDownFilter), tableName),
                 StartRecord = dataModel.IsResetPages == true ? 0 : dataModel.Start,
-                RecordsCount = dataModel.Limit,
+                RecordsCount =  dataModel.Limit,
                 GetAllRecords = false,
                 DbMetaColumns = dbMetaColumns,
                 NativeMetaColumns = nativeMetaColumns,// NeedToGetAllRecords(dataModel.Start, dataModel.Limit),
@@ -1200,7 +1207,8 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 startInfo.FallDownFilter.FilterParams = sqlSelectRowParams.Where(x => startInfo.FallDownFilter.Condition.Contains(x.Name)).ToList();
 
             }
-            bool lazyLoad = dataModel is ExcelDataModel && dataModel.Limit > 80000 && nsiEditParams != null && nsiEditParams.ExcelParam == "ALL_CSV";
+
+           
             try
             {
                 var selectBuilder = new SelectBuilder
@@ -2308,10 +2316,6 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
                 sqlCommand.ExecuteNonQuery();
                 return true;
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
             finally
             {
                 if (!isMultipleProcedure)
@@ -2404,6 +2408,27 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             return _entities.ExecuteStoreQuery<MetaTable>(sql, oraParam).FirstOrDefault();
         }
 
+        // получаем имя первой колонки-первичного ключа
+        //
+        public string GetFirstKeyName(int tabId)
+        {
+            string sqlStr = "select colname from meta_columns where tabid=:tabid and showretval=:showretval";
+            OracleParameter[] oraParams = new OracleParameter[2];
+            oraParams[0] = new OracleParameter("tabid", OracleDbType.Int32, tabId, ParameterDirection.Input);
+            oraParams[1] = new OracleParameter("showretval", OracleDbType.Int32, 1, ParameterDirection.Input);
+            OracleCommand command =  GetOracleConnector.CreateCommandWithParams(sqlStr, CommandType.Text, oraParams);
+            return command.ExecuteScalar() as string;
+        }
+
+        public string GetSelectName(int tabid)
+        {
+            string sqlStr = "select colname from meta_columns where tabid=:tabid and instnssemantic=:instnssemantic";
+            OracleParameter[] oraParams = new OracleParameter[2];
+            oraParams[0] = new OracleParameter("tabid", OracleDbType.Int32, tabid, ParameterDirection.Input);
+            oraParams[1] = new OracleParameter("instnssemantic", OracleDbType.Int32, 1, ParameterDirection.Input);
+            OracleCommand command = GetOracleConnector.CreateCommandWithParams(sqlStr, CommandType.Text, oraParams);
+            return command.ExecuteScalar() as string;
+        }
         public MetaTable GetMetaTableById(int id)
         {
             string sql = "SELECT TABID,TABNAME,SEMANTIC,TABRELATION,TABLDEL,BRANCH,LINESDEF,SELECT_STATEMENT FROM META_TABLES WHERE TABID = :tableId";
