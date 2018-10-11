@@ -375,7 +375,7 @@ namespace Bars.DocPrint
                                 }
                                 else
                                 {
-                                    if (tag == "59") tag += "F"; // Печать биса в документе, не имеющего OPT
+                                    //if (tag == "59") tag += "F";  Печать биса в документе, не имеющего OPT
                                     tagW = tag + opt;
                                     cmd.Parameters.Clear();
                                     cmd.Parameters.Add("ref", OracleDbType.Decimal, InRef, ParameterDirection.Input);
