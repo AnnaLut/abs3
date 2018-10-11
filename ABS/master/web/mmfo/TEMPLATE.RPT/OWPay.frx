@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="08/08/2018 10:56:44" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQF+t9ApqVdjfhb/SevkWDKc=" CommandTimeout="4000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select num00 ref, char00 tt,  char01 nam_a, char02 nam_b, num01 debit ,num02 credit , char03 nazn, dat00 pdat, dat01 vdat, char04 value, dat02 datd, char05 nd  from rs_tmp_report_data where&#13;&#10;session_id=:SESSION_ID order by id">
+        <Column Name="REF" DataType="System.String"/>
+        <Column Name="DEBIT" DataType="System.Decimal"/>
+        <Column Name="CREDIT" DataType="System.Decimal"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="PDAT" DataType="System.DateTime"/>
+        <Column Name="VDAT" DataType="System.DateTime"/>
+        <Column Name="VALUE" DataType="System.String"/>
+        <Column Name="DATD" DataType="System.DateTime"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="NAM_A" DataType="System.String"/>
+        <Column Name="NAM_B" DataType="System.String"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="809463"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+  </Dictionary>
+  <ReportPage Name="Page2" PaperWidth="450" TopMargin="0" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle2" Width="1625.4" Height="37.8">
+      <TableObject Name="Table1" Left="18.9" Width="1341.87" Height="37.8">
+        <TableColumn Name="Column75" Width="108.83"/>
+        <TableColumn Name="Column76" Width="52.13"/>
+        <TableColumn Name="Column77" Width="137.18"/>
+        <TableColumn Name="Column78" Width="118.28"/>
+        <TableColumn Name="Column79" Width="71.03"/>
+        <TableColumn Name="Column80" Width="65.36"/>
+        <TableColumn Name="Column81" Width="131.51"/>
+        <TableColumn Name="Column82" Width="84.26"/>
+        <TableColumn Name="Column83" Width="93.71"/>
+        <TableColumn Name="Column84" Width="188.21"/>
+        <TableColumn Name="Column85" Width="188.21"/>
+        <TableColumn Name="Column86" Width="103.16"/>
+        <TableRow Name="Row22" Height="37.8">
+          <TableCell Name="Cell243" Border.Lines="All" Text="Номер док." HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell244" Border.Lines="All" Text="Код оп." HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell245" Border.Lines="All" Text="Відправник" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell246" Border.Lines="All" Text="Одержувач" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell247" Border.Lines="All" Text="Дебет" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell248" Border.Lines="All" Text="Кредит" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell249" Border.Lines="All" Text="Призначення" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell250" Border.Lines="All" Text="Дата надходження" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell251" Border.Lines="All" Text="Фактична дата &#13;&#10;валютування" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell252" Border.Lines="All" Text="Дані доп. реквізитів з проведень (OW. Опис документа Way4)&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell253" Border.Lines="All" Text="Дані доп. реквізитів з проведень&#10;(OW. Дата створення документа Way4)&#10;&#13;&#10;" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell254" Border.Lines="All" Text="Реф. Документа WAY4" HorzAlign="Center" Font="Arial, 8pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data2" Top="43.13" Width="1625.4" Height="66.15" DataSource="Table">
+      <TableObject Name="Table1" Left="18.9" Width="1341.87" Height="66.15">
+        <TableColumn Name="Column87" Width="108.83"/>
+        <TableColumn Name="Column88" Width="52.13"/>
+        <TableColumn Name="Column89" Width="137.18"/>
+        <TableColumn Name="Column90" Width="118.28"/>
+        <TableColumn Name="Column91" Width="71.03"/>
+        <TableColumn Name="Column92" Width="65.36"/>
+        <TableColumn Name="Column93" Width="131.51"/>
+        <TableColumn Name="Column94" Width="84.26"/>
+        <TableColumn Name="Column95" Width="93.71"/>
+        <TableColumn Name="Column96" Width="188.21"/>
+        <TableColumn Name="Column97" Width="188.21"/>
+        <TableColumn Name="Column98" Width="103.16"/>
+        <TableRow Name="Row23" Height="66.15">
+          <TableCell Name="Cell255" Border.Lines="All" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell256" Border.Lines="All" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell257" Border.Lines="All" Text="[Table.NAM_A]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell258" Border.Lines="All" Text="[Table.NAM_B]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell259" Border.Lines="All" Text="[Table.DEBIT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell260" Border.Lines="All" Text="[Table.CREDIT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell261" Border.Lines="All" Text="[Table.NAZN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell262" Border.Lines="All" Text="[Table.PDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell263" Border.Lines="All" Text="[Table.VDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell264" Border.Lines="All" Text="[Table.VALUE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell265" Border.Lines="All" Text="[Table.DATD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell266" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>

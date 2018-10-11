@@ -34,9 +34,6 @@ namespace Bars.WebServices.XRM.Services.Customer
         [WebMethod(EnableSession = true)]
         public List<SetClient> SetClientMethod(SetClient[] Clients)
         {
-            decimal TransSuccess = 0;
-            Byte[] responseBytes;
-
             var SetClientResponse = new SetClient();
             var SetClientResponseSet = new List<SetClient>();
             try
@@ -47,7 +44,8 @@ namespace Bars.WebServices.XRM.Services.Customer
 
                     foreach (var ClientsReq in Clients)
                     {
-                        TransSuccess = TransactionCheck(con, ClientsReq.TransactionId, out responseBytes);
+                        Byte[] responseBytes;
+                        decimal TransSuccess = TransactionCheck(con, ClientsReq.TransactionId, out responseBytes);
                         if (TransSuccess == 0)
                         {
                             TransactionCreate(con, ClientsReq.TransactionId, ClientsReq.UserLogin, ClientsReq.OperationType);
@@ -57,9 +55,17 @@ namespace Bars.WebServices.XRM.Services.Customer
                         }
                         else
                         {
-                            String errorMsg = TransSuccess == -1 ? String.Format(TransactionExistsMessage, ClientsReq.TransactionId) : String.Format(TransactionErrorMessage, ClientsReq.TransactionId);
-                            SetClientResponse = ToResponse<SetClient>(responseBytes);
-                            SetClientResponse.ErrorCode = errorMsg + "\r" + SetClientResponse.ErrorCode;
+                            if (TransSuccess == -1 && null == responseBytes)
+                            {
+                                String errorMsg = string.Format(TransactionInProgress, ClientsReq.TransactionId);
+                                SetClientResponse = new SetClient { ErrorCode = errorMsg };
+                            }
+                            else
+                            {
+                                String errorMsg = TransSuccess == -1 ? String.Format(TransactionExistsMessage, ClientsReq.TransactionId) : String.Format(TransactionErrorMessage, ClientsReq.TransactionId);
+                                SetClientResponse = ToResponse<SetClient>(responseBytes);
+                                SetClientResponse.ErrorCode = errorMsg + "\r" + SetClientResponse.ErrorCode;
+                            }
                         }
                         SetClientResponseSet.Add(SetClientResponse);
                     }

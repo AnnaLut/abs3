@@ -693,7 +693,7 @@ is
   --
   -- глобальные переменные и константы
   --
-  g_body_version  constant varchar2(64)          := 'version 44.20  16.04.2018';
+  g_body_version  constant varchar2(64)          := 'version 44.21  15.07.2018';
 
   modcode         constant varchar2(3)           := 'DPU';
   accispparam     constant varchar2(16)          := 'DPU_ISP';
@@ -786,7 +786,7 @@ procedure GET_ACCPARAMS
   p_branch    in     varchar2,
   p_mfo       in     varchar2,
   p_dpuline   in     number,
-  p_termtype  in     dpu_vidd.irvk%type,
+--  p_termtype  in     dpu_vidd.irvk%type,
   p_depacc       out r_accrec,
   p_intacc       out r_accrec
 ) is
@@ -1511,7 +1511,6 @@ $end
                  p_branch    =>  l_branch,
                  p_mfo       =>  l_mfo,
                  p_dpuline   =>  nvl(l_typerow.fl_extend, 0),
-                 p_termtype  =>  l_typerow.IRVK,
                  p_depacc    =>  l_depacc,
                  p_intacc    =>  l_intacc);
 
@@ -1559,7 +1558,12 @@ $end
   -- параметри OB22 для рахунків
   begin
 
+    if ( l_typerow.IRVK = 0 )
+    then -- Revocable (on demand)
+      l_s181 := '1';
+    else -- Irrevocable
     l_s181 := GET_S181( p_datn, p_dato );
+    end if;
 
     select OB22_DEP, OB22_INT, NBS_EXP, OB22_EXP
       into l_depob22, l_intob22, l_exp_r020, l_exp_ob22

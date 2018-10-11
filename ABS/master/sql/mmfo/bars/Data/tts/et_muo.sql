@@ -2,6 +2,115 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
+prompt Создание / Обновление операции LUO
+prompt Наименование операции: LUO Оприбуткування нестачі за вкладними операціями
+declare
+  cnt_  number;
+begin
+  --------------------------------
+  -- Основные свойства операции --
+  --------------------------------
+  begin
+    insert into tts(tt, name, dk, nlsm, kv, nlsk, kvk, nlss, nlsa, nlsb, mfob, flc, fli, flv, flr, s, s2, sk, proc, s3800, rang, flags, nazn)
+    values ('LUO', 'LUO Оприбуткування нестачі за вкладними операціями', 1, '#(nbs_ob22 (''9618'',''06''))', 980, '#(nbs_ob22 (''9910'',''01''))', 980, null, '#(nbs_ob22 (''9618'',''06''))', '#(nbs_ob22 (''9910'',''01''))', null, 0, 0, 1, 1, '#(S2)', null, null, null, '0', null, '1001110000010000000000000001000000010000000000000000000000000000', 'Оприбуткування нестачі за вкладними операціямих осіб');
+  exception
+    when dup_val_on_index then 
+      update tts
+         set tt='LUO', name='LUO Оприбуткування нестачі за вкладними операціями', dk=1, nlsm='#(nbs_ob22 (''9618'',''06''))', kv=980, nlsk='#(nbs_ob22 (''9910'',''01''))', kvk=980, nlss=null, nlsa='#(nbs_ob22 (''9618'',''06''))', nlsb='#(nbs_ob22 (''9910'',''01''))', mfob=null, flc=0, fli=0, flv=1, flr=1, s='#(S2)', s2=null, sk=null, proc=null, s3800='0', rang=null, flags='1001110000010000000000000001000000010000000000000000000000000000', nazn='Оприбуткування нестачі за вкладними операціямих осіб'
+       where tt='LUO';
+  end;
+  --------------------------------
+  ----------- Реквизиты ----------
+  --------------------------------
+  delete from op_rules where tt='LUO';
+  --------------------------------
+  ------ Связанные операции ------
+  --------------------------------
+  delete from ttsap where tt='LUO';
+  --------------------------------
+  ------- Балансовые счета -------
+  --------------------------------
+  delete from ps_tts where tt='LUO';
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('9618', 'LUO', 0);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9618'', ''LUO'', 0) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into ps_tts(nbs, tt, dk)
+    values ('9910', 'LUO', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ps_tts: ''9910'', ''LUO'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  --------------------------------
+  -------- Виды документов -------
+  --------------------------------
+  delete from tts_vob where tt='LUO';
+  begin
+    insert into tts_vob(vob, tt, ord)
+    values (206, 'LUO', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (tts_vob: 206, ''LUO'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  --------------------------------
+  -------- Группы контроля -------
+  --------------------------------
+  delete from chklist_tts where tt='LUO';
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (2, 'LUO', 1, null, null, 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''LUO'', 1, null, null, 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
+    values (5, 'LUO', 2, null, null, 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 5, ''LUO'', 2, null, null, 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  --------------------------------
+  ------------- Папки ------------
+  --------------------------------
+  delete from folders_tts where tt='LUO';
+  begin
+    insert into folders_tts(idfo, tt)
+    values (26, 'LUO');
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 26, ''LUO'') - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+end;
+/
 prompt Создание / Обновление операции MVN
 prompt Наименование операции: MVN Вичвлення нестачі за вкладними операціями (дочірня)
 declare
@@ -70,6 +179,17 @@ begin
   ------ Связанные операции ------
   --------------------------------
   delete from ttsap where tt='MUO';
+  begin
+    insert into ttsap(ttap, tt, dk)
+    values ('LUO', 'MUO', 1);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (ttsap: ''LUO'', ''MUO'', 1) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
   begin
     insert into ttsap(ttap, tt, dk)
     values ('MVN', 'MUO', 1);
@@ -198,12 +318,12 @@ begin
   delete from folders_tts where tt='MUO';
   begin
     insert into folders_tts(idfo, tt)
-    values (26, 'MUO');
+    values (50, 'MUO');
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (folders_tts: 26, ''MUO'') - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (folders_tts: 50, ''MUO'') - первичный ключ не найден!');
       else raise;
       end if;
   end;

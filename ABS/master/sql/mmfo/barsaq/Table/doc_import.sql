@@ -58,7 +58,8 @@ begin
 	NOTIFICATION_DATE DATE, 
 	SYSTEM_ERR_CODE NUMBER(*,0), 
 	SYSTEM_ERR_MSG VARCHAR2(4000), 
-	SYSTEM_ERR_DATE DATE
+	SYSTEM_ERR_DATE DATE,
+        FLG_AUTO_PAY  smallint
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -100,7 +101,7 @@ COMMENT ON COLUMN BARSAQ.DOC_IMPORT.ID_B IS 'Идент. код получателя';
 COMMENT ON COLUMN BARSAQ.DOC_IMPORT.NAZN IS 'Назначение платежа';
 COMMENT ON COLUMN BARSAQ.DOC_IMPORT.USERID IS 'ID пользователя - исполнителя';
 COMMENT ON COLUMN BARSAQ.DOC_IMPORT.ID_O IS 'Идентификатор ключа операциониста';
-COMMENT ON COLUMN BARSAQ.DOC_IMPORT.SIGN IS 'ЭЦП документа';
+COMMENT ON COLUMN BARSAQ.DOC_IMPORT.SIGN IS 'ЭЦП документа на внутреннем буффере';
 COMMENT ON COLUMN BARSAQ.DOC_IMPORT.INSERTION_DATE IS 'Дата вставки документа';
 COMMENT ON COLUMN BARSAQ.DOC_IMPORT.VERIFICATION_FLAG IS 'Флаг верификации';
 COMMENT ON COLUMN BARSAQ.DOC_IMPORT.VERIFICATION_ERR_CODE IS 'Код ошибки при верификации';
@@ -127,6 +128,15 @@ COMMENT ON COLUMN BARSAQ.DOC_IMPORT.SYSTEM_ERR_DATE IS 'Дата возникновения систе
 
 
 
+begin   
+   execute immediate 'alter table barsaq.doc_import add flg_auto_pay smallint';
+exception when others then
+  if  sqlcode=-1430 or  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
 
 PROMPT *** Create  constraint CC_DOCIMPORT_VRFL ***
 begin   
@@ -136,6 +146,7 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
+
 
 
 
@@ -475,6 +486,9 @@ exception when others then
  end;
 /
 
+
+
+COMMENT ON COLUMN BARSAQ.DOC_IMPORT.FLG_AUTO_PAY IS '=1 - оплачивать автоматом вертушкой без проходжения ручных виз, =0 - ручная оплата';
 
 
 PROMPT *** Create  grants  DOC_IMPORT ***

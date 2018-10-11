@@ -7,7 +7,7 @@
 CREATE OR REPLACE PACKAGE VALUE_PAPER
 IS
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.24 08.06.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.25 09.08.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -538,8 +538,13 @@ TYPE r_many_grid
   procedure make_int_dividends_prepare(p_ref cp_deal.ref%type default null);
 
   --виплата дивідентів -населення таблиці
+  procedure change_pay_dividends_prepare(p_ref cp_pay_dividents.ref%type, p_certificate cp_pay_dividents.certificate%type, p_sum cp_pay_dividents.sum%type, p_sum_tax cp_pay_dividents.sum_tax%type, p_sum_comis_transf cp_pay_dividents.sum_comis_transf%type, p_sum_comis_custody cp_pay_dividents.sum_comis_custody%type, p_nazn cp_pay_dividents.nazn%type);
+  --виплата дивідентів -населення таблиці
   procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null);
+  --виплата дивідентів -створення операцій
+  procedure make_oper_cp_pay_dividends (p_ref cp_pay_dividents.ref%type, p_nazn cp_pay_dividents.nazn%type, p_sum cp_pay_dividents.sum%type, p_sum_tax cp_pay_dividents.sum_tax%type, p_sum_comis_transf cp_pay_dividents.sum_comis_transf%type, p_sum_comis_custody cp_pay_dividents.sum_comis_custody%type, p_certificate cp_pay_dividents.certificate%type);
 
+  --нарахування дивідентів
   procedure change_int_dividends_prepare(p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type);
   procedure make_oper_cp_int_dividends (p_ref cp_int_dividents.ref%type, p_sum cp_int_dividents.sum%type, p_nazn cp_int_dividents.nazn%type, p_nlsrd_6 cp_int_dividents.nlsrd_6%type);
 
@@ -565,7 +570,7 @@ END value_paper;
 /
 CREATE OR REPLACE PACKAGE BODY VALUE_PAPER
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.39 08.06.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.41 20.08.2018';
 
    g_newline constant varchar2(5) := CHR(10)||CHR(13);
    FUNCTION body_version
@@ -3197,7 +3202,7 @@ END;
       -- Вставка записи-истории о начислении процентов, если, в будущем будет необходимость СТОРНО или персчета процентов.
     ACRN.acr_dati ( l_acc, 0, oo.REF, gl.bdate, 0);
 
-    delete from cp_int_dividents where user_id = user_id();
+    delete from cp_int_dividents where user_id = user_id() and ref = p_ref;
 
     bars_audit.info('value_paper.make_oper_cp_int_dividends END');
 end;
@@ -3205,6 +3210,9 @@ end;
   --виплата дивідентів -населення таблиці
   procedure make_pay_dividends_prepare(p_ref cp_deal.ref%type default null) as
    l_ref           cp_deal.ref%type;
+   l_cp_id         cp_kod.cp_id%type;
+   l_acc           accounts.acc%type;    
+   l_sum           cp_pay_dividents.sum%type;
   begin
      if p_ref is null then
        l_ref := to_number(bars.pul.get('cp_ref_dividents'));
@@ -3216,11 +3224,167 @@ end;
        raise_application_error(-20001,  'Вкажіть REF угоди по якій необхідно виплатити дивіденти');
      end if;
 
-
+     select k.cp_id into l_cp_id from cp_kod k, cp_deal d where k.id = d.id and d.ref = l_ref; 
+     
+     begin 
+       select ac.cp_acc
+       into  l_acc
+       from cp_accounts ac
+       where ac.cp_ref = p_ref and ac.cp_acctype = 'RD';     
+       exception
+         when NO_DATA_FOUND then
+           raise_application_error(-20001,  'Не знайшов рахунок для нарахованих дивідентів(Раніше повина бути використанна функція Нарахування дивідентів). ');
+     end;
+     
+     l_sum := abs(FOSTZn(l_acc, gl.bd)) /100;
+     
      delete from cp_pay_dividents where user_id = user_id();
-     insert into cp_pay_dividents(ref) values(l_ref);
+     insert into cp_pay_dividents(ref, nazn, sum) values(l_ref, 'Утриманий податок __% від суми____ з доходів по акціях '||l_cp_id||', дохід на 1шт.- ________, кіл-ть ________, зг. служб. записки №______ від _______р.', l_sum);
      bars_audit.info('value_paper.make_pay_dividends_prepare END');
   end;
+    
+  procedure change_pay_dividends_prepare(p_ref cp_pay_dividents.ref%type, p_certificate cp_pay_dividents.certificate%type, p_sum cp_pay_dividents.sum%type, p_sum_tax cp_pay_dividents.sum_tax%type, p_sum_comis_transf cp_pay_dividents.sum_comis_transf%type, p_sum_comis_custody cp_pay_dividents.sum_comis_custody%type, p_nazn cp_pay_dividents.nazn%type)
+  is
+    l_sum_divid number;
+    l_acc       accounts.acc%type;
+  begin
+     if p_ref is null then
+       raise_application_error(-20001,  'Вкажіть REF угоди');
+     end if;
+     
+     begin 
+       select ac.cp_acc
+       into  l_acc
+       from cp_accounts ac
+       where ac.cp_ref = p_ref and ac.cp_acctype = 'RD';     
+       exception
+         when NO_DATA_FOUND then
+           raise_application_error(-20001,  'Не знайшов рахунок для нарахованих дивідентів(Раніше повина бути використанна функція Нарахування дивідентів). ');
+     end;
+     
+     l_sum_divid := abs(FOSTZn(l_acc, gl.bd)) /100;
+     
+     update cp_pay_dividents
+        set nazn = p_nazn, 
+            sum = case when p_sum = sum then l_sum_divid - nvl(p_sum_tax, 0) - nvl(p_sum_comis_custody, 0) - nvl(p_sum_comis_transf, 0) else p_sum end,
+            sum_tax = p_sum_tax,
+            certificate = p_certificate,
+            sum_comis_custody = p_sum_comis_custody,
+            sum_comis_transf = p_sum_comis_transf
+      where ref = p_ref and user_id = user_id();
+
+     if sql%rowcount = 0 then
+       raise_application_error(-20001,  'Оновив 0 записів!');
+     end if;
+
+  end;  
+  
+  procedure make_oper_cp_pay_dividends (p_ref cp_pay_dividents.ref%type, p_nazn cp_pay_dividents.nazn%type, p_sum cp_pay_dividents.sum%type, p_sum_tax cp_pay_dividents.sum_tax%type, p_sum_comis_transf cp_pay_dividents.sum_comis_transf%type, p_sum_comis_custody cp_pay_dividents.sum_comis_custody%type, p_certificate cp_pay_dividents.certificate%type)
+  is
+    oo                oper%rowtype;
+    l_B_4621          accounts.nls%type := '37392555';
+    l_nls_3620        accounts.nls%type;
+    l_nls_7419        accounts.nls%type;
+    l_nls_7500        accounts.nls%type;
+    l_nls_7503        accounts.nls%type;        
+  begin
+    bars_audit.info('value_paper.make_oper_cp_pay_dividends START: REF=' || p_ref);
+
+    if p_ref is null then
+      raise_application_error(-20001,  'Вкажіть REF угоди');
+    end if;
+    if nvl(p_sum, 0) = 0 then
+      raise_application_error(-20001,  'Вкажіть суму на виплату дивідентів');
+    end if;    
+    if p_sum_tax is null and p_sum_comis_transf is null and p_sum_comis_custody is null then
+      raise_application_error(-20001,  'Вкажіть хоча б одну суму по виплаті дивідентів');
+    end if;
+    if p_nazn is null then
+      raise_application_error(-20001,  'Вкажіть призначення платежу');
+    end if;
+    if p_certificate is null then
+      raise_application_error(-20001,  'Вкажіть чи наявна довідка');
+    end if;
+    if instr(p_nazn, '__') > 0 then
+      raise_application_error(-20001,  'Відредагуйте призначення платежу (видаліть символи _ )');
+    end if;  
+    
+    select a.nls_3620, a.nls_7419, a.nls_7500, a.nls_7503
+     into l_nls_3620, l_nls_7419, l_nls_7500, l_nls_7503
+    from cp_kod k
+    join cp_deal d on (k.id = d.id)
+    join accounts ac on (d.acc = ac.acc)
+    left join accounts acp on (d.accp = acp.acc)
+    left join cp_accc a on (d.ryn = a.ryn and nvl(d.pf, a.pf) = a.pf and k.emi = a.emi and (substr(ac.nls,1,4)=a.vidd or substr(acp.nls,1,4)=a.vidd))
+    where d.ref = p_ref;
+       
+    
+    select a.nls, a.kv, substr(a.nms, 1, 38), c.okpo
+    into   oo.nlsb, oo.kv, oo.nam_b, oo.id_b
+    from cp_accounts ac, accounts a, customer c
+    where ac.cp_ref = p_ref and ac.cp_acctype = 'RD'
+      and ac.cp_acc = a.acc
+      and a.rnk = c.rnk;
+
+    select substr(a.nms, 1, 38), c.okpo
+    into   oo.nam_a, oo.id_a
+    from accounts a, customer c
+    where a.nls = l_B_4621 and a.kv = oo.kv
+      and a.rnk = c.rnk;
+
+    gl.ref (oo.REF);
+
+    oo.nd    := trim (Substr( '          '||to_char(oo.ref) , -10));
+    oo.s     := p_sum*100;
+    oo.s2    := p_sum*100;
+    oo.dk    := 1;
+    oo.tt    := 'FX%';
+    oo.nlsa  := l_B_4621;
+    oo.kv2   := oo.kv;
+    oo.nazn  := substr(p_nazn,1,160);
+
+    gl.in_doc3 (oo.REF, oo.tt, 6, oo.nd, SYSDATE, gl.bdate, oo.dk,  oo.kv, oo.S , oo.kv2 ,oo.S2, null, gl.BDATE, gl.bdate,
+                  oo.nam_a, oo.nlsa,  gl.aMfo,
+                  oo.nam_b, oo.nlsb,  gl.amfo,
+                  oo.nazn ,null,oo.id_a, gl.Aokpo, null, null, 1, null, null);
+    gl.payv(0, oo.ref, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.s2);    
+    
+    --3.1.	На суму утриманого податку з дивідендів
+    if p_sum_tax > 0 then
+      if p_certificate = 1 then -- 3.1.1.	При наявності довідки 
+        if l_nls_3620 is null then 
+          raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 3620');
+        end if;  
+        gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_3620, gl.p_icurval(oo.kv2, p_sum_tax*100, gl.bd), oo.kv2, oo.nlsb, p_sum_tax*100);
+        else --3.1.2.	За відсутності довідки  
+          if l_nls_7419 is null then 
+            raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 7419');
+          end if;  
+          gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_7419, gl.p_icurval(oo.kv2, p_sum_tax*100, gl.bd), oo.kv2, oo.nlsb, p_sum_tax*100);
+      end if;  
+    end if;   
+    
+    --3.2.	На суму утриманої банком-кореспондентом комісії за перерахування коштів 
+    if p_sum_comis_transf > 0 then
+        if l_nls_7500 is null then 
+          raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 7500');
+        end if;  
+        gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_7500, gl.p_icurval(oo.kv2, p_sum_comis_transf*100, gl.bd), oo.kv2, oo.nlsb, p_sum_comis_transf*100);
+    end if;  
+
+    --3.3.	 На суму утриманої зберігачем комісії 
+    if p_sum_comis_custody > 0 then
+        if l_nls_7503 is null then 
+          raise_application_error(-20001,  'В cp_accc не вказано аналітичний рахунок 7503');
+        end if;  
+        gl.payv(0, oo.ref, gl.bdate, oo.tt, 1, 980, l_nls_7503, gl.p_icurval(oo.kv2, p_sum_comis_custody*100, gl.bd), oo.kv2, oo.nlsb, p_sum_comis_custody*100);
+    end if;  
+
+    
+    delete from cp_pay_dividents where user_id = user_id() and ref = p_ref;
+    bars_audit.info('value_paper.make_oper_cp_pay_dividends END: REF=' || p_ref);
+  end;  
+  
 
   --за основу функції взяті з нового пакету cp_rep_dgp
   --після устаканювання звітів, та потоків потрібно зробити єдину точку визову цих функцій, наприклад з цього пакету.

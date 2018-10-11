@@ -328,7 +328,13 @@ CIM.contract_state_module = function () {
         else if (ContractClass.ContrType == 3) {
             actTabs.push(1, 5);
             $(".imgApeLink").hide();
-        } else
+        }
+        else if (ContractClass.ContrType == 4) {
+            actTabs.push(1); 
+            $(".imgApeLink").hide();
+            $("#btLicenses").hide();
+        }
+        else
             actTabs.push(1, 2, 3);
         //tabsDiv.tabs("option", "disabled", [1, 2, 4]);
         tabsDiv.show();

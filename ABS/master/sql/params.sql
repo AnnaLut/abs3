@@ -1,7 +1,7 @@
 set define on
 --
 -- Синонім бази даних
-define dbname=COBUSUPABS_RC_RU_DB
+define dbname=COBUSUPABS_DEV_MMFO_DB
 --
 -- Пароль користувача sys
 define sys_pass=manager2

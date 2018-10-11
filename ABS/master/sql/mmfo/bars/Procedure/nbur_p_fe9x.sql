@@ -50,6 +50,12 @@ begin
   -- очікуємо формування старого файлу
   nbur_waiting_form(p_kod_filii, p_report_date, l_old_file_code, c_title);
 
+  select max(version_id)
+  into l_version
+  from v_nbur_#e9
+  where report_date = p_report_date and
+        kf = p_kod_filii;
+
   -- вставляємо з протоколу старого файлу
   insert
     into NBUR_LOG_FE9X

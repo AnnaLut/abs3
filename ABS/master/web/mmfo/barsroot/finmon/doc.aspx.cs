@@ -179,7 +179,7 @@ public partial class finmon_doc : Bars.BarsPage
         {
             allreadyClick = false;
         }
-        
+
         switch (Request.Form["__EVENTTARGET"])
         {
             case "ibtClearFilterParams":
@@ -250,19 +250,20 @@ public partial class finmon_doc : Bars.BarsPage
             updateRowRendering();
         }
 
-        if(FinmonFilterApplyed == "1")
+        if (FinmonFilterApplyed == "1")
         {
             gvFmDocs.Sort(string.Empty, SortDirection.Ascending);
             gvFmDocs.DataSourceID = string.Empty;
             gvFmDocs.DataBind();
-        } else
+        }
+        else
         {
             gvFmDocs.DataSourceID = "odsFmDocs";
         }
 
         if (FinminReload == "1")
         {
-            FillData();            
+            FillData();
             FinminReload = "0";
         }
     }
@@ -272,7 +273,7 @@ public partial class finmon_doc : Bars.BarsPage
     {
         return SELECTEDROWS.ToArray();
     }
-    
+
 
     private void SetSelectedRows()
     {
@@ -388,10 +389,12 @@ public partial class finmon_doc : Bars.BarsPage
                                    v_finmon_que_oper.nmka,
                                    v_finmon_que_oper.nmkb,
                                    v_finmon_que_oper.sos,
-                                   v_finmon_que_oper.fv2_agg
+                                   v_finmon_que_oper.fv2_agg,
+                                   case when tt.ref is not null then 1 else 0 end on3720
                                  from v_finmon_que_oper  
                                  join tmp_fm_checkrules t on v_finmon_que_oper.ref = t.ref
                                  left join finmon_que_status s on v_finmon_que_oper.status = s.status
+                                 left join t902 tt on tt.ref = v_finmon_que_oper.ref
                                  where t.id = bars.user_id()
                                  and ROWNUM <= 100000              
                                  ";
@@ -438,9 +441,11 @@ public partial class finmon_doc : Bars.BarsPage
                                    v_finmon_que_oper.nmka,
                                    v_finmon_que_oper.nmkb,
                                    v_finmon_que_oper.sos,
-                                   v_finmon_que_oper.fv2_agg
+                                   v_finmon_que_oper.fv2_agg,
+                                   case when tt.ref is not null then 1 else 0 end on3720
                           from v_finmon_que_oper 
                           left join finmon_que_status s on v_finmon_que_oper.status = s.status
+                          left join t902 tt on tt.ref = v_finmon_que_oper.ref
                            where v_finmon_que_oper.vdat between to_date(decode('" + dat1 + "','01.01.1500',to_char(bars.DAT_NEXT_U(bars.web_utl.get_bankdate,-1),'dd.mm.yyyy'),'" + dat1 + "'),'dd.mm.yy') and to_date(decode('" + dat2 + "','01.01.1500',to_char(bars.DAT_NEXT_U(bars.web_utl.get_bankdate,-1),'dd.mm.yyyy'),'" + dat2 + "'),'dd.mm.yy') and ROWNUM <= 100000";
         }
 
@@ -487,10 +492,10 @@ public partial class finmon_doc : Bars.BarsPage
         {
             Title.Text = "Відбір документів [ВСІ ДОКУМЕНТИ]";
         }
-        
+
         if (!string.IsNullOrEmpty(FilterParams))
         {
-            selectCommand += " and (" + FilterParams + ")";           
+            selectCommand += " and (" + FilterParams + ")";
         }
 
         HttpContext.Current.Session["SelectCommand"] = selectCommand;
@@ -511,36 +516,45 @@ public partial class finmon_doc : Bars.BarsPage
             string nlsa = DataBinder.Eval(e.Row.DataItem, "NLSA").ToString();
             string nlsb = DataBinder.Eval(e.Row.DataItem, "NLSB").ToString();
 
+            bool isOn3720 = Convert.ToInt16(DataBinder.Eval(e.Row.DataItem, "on3720")) == 1;
+
             foreach (TableCell cell_ in e.Row.Cells)
             {
-                if (sos == -2)
-                {
-                    cell_.ForeColor = Color.Brown;
-                }
-                if (sos == -1)  //сторнировано
-                {
-                    cell_.ForeColor = Color.Red;
-                }
-                if (sos == 0)
-                {
-                    cell_.ForeColor = Color.Blue;
-                }             
-                if (sos == 1)
+                if (isOn3720)
                 {
                     cell_.ForeColor = Color.Green;
                 }
-                if (sos == 3)
+                else
                 {
-                    cell_.ForeColor = Color.DarkBlue;
-                }
-                if (sos == 5)  //оплачено
-                {
-                    cell_.ForeColor = Color.Black;
-                }
+                    if (sos == -2)
+                    {
+                        cell_.ForeColor = Color.Brown;
+                    }
+                    if (sos == -1)  //сторнировано
+                    {
+                        cell_.ForeColor = Color.Red;
+                    }
+                    if (sos == 0)
+                    {
+                        cell_.ForeColor = Color.Blue;
+                    }
+                    if (sos == 1)
+                    {
+                        cell_.ForeColor = Color.Green;
+                    }
+                    if (sos == 3)
+                    {
+                        cell_.ForeColor = Color.DarkBlue;
+                    }
+                    if (sos == 5)  //оплачено
+                    {
+                        cell_.ForeColor = Color.Black;
+                    }
 
-                if((nlsa.StartsWith("3720") || nlsb.StartsWith("3720")) && sos != 5)
-                {
-                    cell_.ForeColor = Color.Green;
+                    if ((nlsa.StartsWith("3720") || nlsb.StartsWith("3720")) && sos != 5)
+                    {
+                        cell_.ForeColor = Color.Green;
+                    }
                 }
             }
 
@@ -598,9 +612,9 @@ public partial class finmon_doc : Bars.BarsPage
             var d = gvFmDocs.DataKeys[row]["OTM"].ToString();
 
             if (String.IsNullOrEmpty(gvFmDocs.DataKeys[row]["STATUS"].ToString())
-                && gvFmDocs.DataKeys[row]["OTM"].ToString().Length == 0) 
-                /*|| (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "S" 
-                || gvFmDocs.DataKeys[row]["STATUS"].ToString() == "B"))*/
+                && gvFmDocs.DataKeys[row]["OTM"].ToString().Length == 0)
+            /*|| (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "S" 
+            || gvFmDocs.DataKeys[row]["STATUS"].ToString() == "B"))*/
             {
                 p_count = p_count + 1;
                 p_ref += gvFmDocs.DataKeys[row]["REF"].ToString() + "-";
@@ -644,7 +658,7 @@ public partial class finmon_doc : Bars.BarsPage
         {
             FillGrid();
             FillData();
-        }        
+        }
     }
 
     protected void Unblock(int row, ref int counter)
@@ -731,20 +745,20 @@ public partial class finmon_doc : Bars.BarsPage
             reference = (string[])Session[PARAMS_REF_KEY];
         if (reference != null && reference.Length != 0)
         {
-                foreach (GridViewRow row in gvFmDocs.Rows)
+            foreach (GridViewRow row in gvFmDocs.Rows)
+            {
+                if (row.Cells[refFieldidx].Text == reference[0])
                 {
-                    if (row.Cells[refFieldidx].Text == reference[0])
+                    if (row.Cells[statusFieldidx].Text == "" || row.Cells[statusFieldidx].Text == "&nbsp;")
                     {
-                        if (row.Cells[statusFieldidx].Text == "" || row.Cells[statusFieldidx].Text == "&nbsp;")
-                        {
-                            row.Cells[statusFieldidx].Text = "Повідомлено"; //меняем отображение статуса до следующего обновления датасорса
-                        }
-                        row.Cells[OMFieldidx].Text = reference[1];
-                        row.Cells[VMFieldidx].Text = reference[2];
-                        Session[PARAMS_REF_KEY] = null;
-                        break;
+                        row.Cells[statusFieldidx].Text = "Повідомлено"; //меняем отображение статуса до следующего обновления датасорса
                     }
+                    row.Cells[OMFieldidx].Text = reference[1];
+                    row.Cells[VMFieldidx].Text = reference[2];
+                    Session[PARAMS_REF_KEY] = null;
+                    break;
                 }
+            }
         }
     }
 
@@ -798,14 +812,14 @@ public partial class finmon_doc : Bars.BarsPage
                 if ((String.IsNullOrEmpty(st) && otm.Length > 0)
                     || (!String.IsNullOrEmpty(st) && st == "I")
                     || (!String.IsNullOrEmpty(st) && st == "S"))
-                    {
-                        ClearParameters();
-                        SetParameters("p_ref", DB_TYPE.Decimal, Convert.ToDecimal(gvFmDocs.DataKeys[row]["REF"]), DIRECTION.Input);
-                        var status = gvFmDocs.DataKeys[row]["OTM"].ToString().Length > 0 ? "T" : "N";
-                        SetParameters("p_status", DB_TYPE.Varchar2, status, DIRECTION.Input);
-                        SetParameters("p_comm", DB_TYPE.Varchar2, "", DIRECTION.Input);
-                        SQL_NONQUERY("begin p_fm_set_status(:p_ref,null,:p_status,:p_comm,null); end;");
-                    }
+                {
+                    ClearParameters();
+                    SetParameters("p_ref", DB_TYPE.Decimal, Convert.ToDecimal(gvFmDocs.DataKeys[row]["REF"]), DIRECTION.Input);
+                    var status = gvFmDocs.DataKeys[row]["OTM"].ToString().Length > 0 ? "T" : "N";
+                    SetParameters("p_status", DB_TYPE.Varchar2, status, DIRECTION.Input);
+                    SetParameters("p_comm", DB_TYPE.Varchar2, "", DIRECTION.Input);
+                    SQL_NONQUERY("begin p_fm_set_status(:p_ref,null,:p_status,:p_comm,null); end;");
+                }
             }
         }
         finally
@@ -827,8 +841,8 @@ public partial class finmon_doc : Bars.BarsPage
         {
             foreach (int row in GetChecked())
             {
-                if (String.IsNullOrEmpty(gvFmDocs.DataKeys[row]["STATUS"].ToString()) 
-                    || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "I") 
+                if (String.IsNullOrEmpty(gvFmDocs.DataKeys[row]["STATUS"].ToString())
+                    || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "I")
                     || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "S")
                     || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "N"))
                 {
@@ -860,7 +874,7 @@ public partial class finmon_doc : Bars.BarsPage
         {
             foreach (int row in GetChecked())
             {
-                if (String.IsNullOrEmpty(gvFmDocs.DataKeys[row]["STATUS"].ToString()) 
+                if (String.IsNullOrEmpty(gvFmDocs.DataKeys[row]["STATUS"].ToString())
                     || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "I")
                     || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "B")
                     || (gvFmDocs.DataKeys[row]["STATUS"].ToString() == "N"))
@@ -937,7 +951,7 @@ public partial class finmon_doc : Bars.BarsPage
                     _connect.Dispose();
                     _connect = null;
                 }
-            }            
+            }
         }
 
         return opcnt;
@@ -1036,7 +1050,7 @@ public partial class finmon_doc : Bars.BarsPage
         }
     }
 
-  
+
     public void ExportToExcel()
     {
         string fileXls = string.Empty;
@@ -1159,7 +1173,7 @@ public partial class finmon_doc : Bars.BarsPage
         {
             try
             {
-                File.Delete(fileXls);   
+                File.Delete(fileXls);
             }
             catch (Exception)
             {
@@ -1187,11 +1201,11 @@ public partial class finmon_doc : Bars.BarsPage
         odsFmDocs.WhereStatement = null;
         gvFmDocs.ShowFilter = false;
         gvFmDocs.FilterState.Clear();
-        gvFmDocs.ApplyFilters();    
+        gvFmDocs.ApplyFilters();
 
-        if (!string.IsNullOrEmpty(FilterParams) )
+        if (!string.IsNullOrEmpty(FilterParams))
         {
-            FilterParams = string.Empty;         
+            FilterParams = string.Empty;
         }
 
         //if (FinminReload == "0")

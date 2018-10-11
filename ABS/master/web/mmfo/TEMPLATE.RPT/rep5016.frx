@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/11/2016 15:43:43" ReportInfo.Modified="04/25/2017 14:21:38" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/11/2016 15:43:43" ReportInfo.Modified="09/10/2018 17:14:32" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,15 +29,15 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfhjnw0iMVk0YjYK1Ztlx8Ig==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name, t1.ord, t2.kf ourmfo, nvl(t2.sum_post,0)sum_post, nvl(t3.sum_gu_pf,0)sum_gu_pf,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT cd.kf, SUM (nvl(cd.sq,0)) / 100 sum_post&#13;&#10;              FROM ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND cd.rowtype = 1&#13;&#10;                   AND cd.nlsa LIKE '2560%'&#13;&#10;                   AND cd.nlsb LIKE '2604%'&#13;&#10;                   AND trunc(cd.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(cd.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')&#13;&#10;          GROUP BY cd.kf) t2&#13;&#10;            ON t1.mfo = t2.kf&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT cd.kf, SUM (nvl(cd.sq,0)) / 100 sum_gu_pf&#13;&#10;              FROM  ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND cd.rowtype = 1&#13;&#10;                   and okpob in (select corporation_code from ob_corporation where parent_id=1 )&#13;&#10;                   and nlsb in (select nls from ob_corporation_data a where rowtype = 0 and a.kf=cd.kf and trunc(a.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(a.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')  and kod_analyt=40 )&#13;&#10;                   --AND cd.kod_analyt = '40'&#13;&#10;                   AND trunc(cd.file_date) &gt;= TRUNC(:rpt_date, 'DDD') AND trunc(cd.file_date) &lt; TRUNC(:rpt_date + 1, 'DDD')&#13;&#10;          GROUP BY cd.kf) t3&#13;&#10;            ON t1.mfo = t3.kf&#13;&#10;ORDER BY t1.ord">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJtSNjsFLttWqTKtQ+UQJJg=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name, t1.ord, t2.kf ourmfo, nvl(t2.sum_post,0)sum_post, nvl(t2.sum_gu_pf,0)sum_gu_pf,t1.kod_s&#13;&#10;    FROM clim_mfo t1&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT a.kf, SUM (case when substr(d.nlsa,1,4) = '2560' AND substr(d.nlsb,1,4) = '2604' then d.sq else 0 end) / 100 sum_post,&#13;&#10;                          SUM (case when okpob in (select corporation_code from ob_corporation where parent_id=1)&#13;&#10;                                      and nlsb in (select nls from ob_corp_data_acc q where a.kf=q.kf and q.fdat = a.fdat and kod_analyt=40 and corp_id = 1)            &#13;&#10;                                                   then d.sq else 0 end) / 100 sum_gu_pf&#13;&#10;              FROM ob_corp_data_acc a&#13;&#10;              join ob_corp_data_doc d on A.ACC = d.acc and A.SESS_ID = d.sess_id and a.kf = d.kf&#13;&#10;              WHERE a.corp_id = 1&#13;&#10;              and a.is_last = 1&#13;&#10;              AND a.fdat = :sFdat1&#13;&#10;          GROUP BY a.kf) t2&#13;&#10;            ON t1.mfo = t2.kf&#13;&#10;ORDER BY t1.ord  ">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="ORD" DataType="System.Int16"/>
         <Column Name="OURMFO" DataType="System.String"/>
         <Column Name="SUM_POST" DataType="System.Decimal"/>
         <Column Name="SUM_GU_PF" DataType="System.Decimal"/>
         <Column Name="KOD_S" DataType="System.String"/>
-        <CommandParameter Name="rpt_date" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
@@ -72,16 +72,16 @@ namespace FastReport
           <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Silver" Text="рахунки &quot;40&quot; головних управлінь ПФ" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row3">
-          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="Silver" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="Silver" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="Silver" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="Silver" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="Silver" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
-          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Silver" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell11" Border.Lines="All" Fill.Color="Silver" Text="1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell12" Border.Lines="All" Fill.Color="Silver" Text="2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell13" Border.Lines="All" Fill.Color="Silver" Text="3" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell14" Border.Lines="All" Fill.Color="Silver" Text="4" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell15" Border.Lines="All" Fill.Color="Silver" Text="5" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Silver" Text="6" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="163.85" Width="703.08" Height="18.9" DataSource="Table">
+    <DataBand Name="Data1" Top="164.65" Width="703.08" Height="18.9" DataSource="Table">
       <TableObject Name="Table2" Width="699.3" Height="18.9">
         <TableColumn Name="Column7" Width="56.7"/>
         <TableColumn Name="Column8" Width="170.1"/>
@@ -90,7 +90,7 @@ namespace FastReport
         <TableColumn Name="Column11" Width="151.2"/>
         <TableColumn Name="Column12" Width="141.75"/>
         <TableRow Name="Row4">
-          <TableCell Name="Cell29" Border.Lines="All" Text="[Table.ORD]" HorzAlign="Right"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="[Table.ORD]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
           <TableCell Name="Cell30" Border.Lines="All" Text="[Table.NAME]"/>
           <TableCell Name="Cell31" Border.Lines="All" Text="[Table.KOD_S]"/>
           <TableCell Name="Cell32" Border.Lines="All" Text="[Data_Exists]"/>
@@ -99,7 +99,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="185.95" Width="703.08" Height="18.9">
+    <ReportSummaryBand Name="ReportSummary1" Top="187.55" Width="703.08" Height="18.9">
       <TableObject Name="Table3" Width="699.3" Height="18.9" Border.Lines="All">
         <TableColumn Name="Column13" Width="56.7"/>
         <TableColumn Name="Column14" Width="170.1"/>
@@ -108,8 +108,8 @@ namespace FastReport
         <TableColumn Name="Column17" Width="151.2"/>
         <TableColumn Name="Column18" Width="141.75"/>
         <TableRow Name="Row5">
-          <TableCell Name="Cell55" Border.Lines="All"/>
-          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Aquamarine" Text="Разом"/>
+          <TableCell Name="Cell55" Border.Lines="All" Fill.Color="Aquamarine" Text="Разом:" ColSpan="4"/>
+          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Aquamarine"/>
           <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Aquamarine"/>
           <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Aquamarine"/>
           <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Aquamarine" Text="[Total_Post]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>

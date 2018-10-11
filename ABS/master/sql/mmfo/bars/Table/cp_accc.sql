@@ -262,6 +262,34 @@ end;
 /
 COMMENT ON COLUMN BARS.CP_ACCC.NLSS2_6 IS 'Рах 6 класу для переоцінки по опціону';
 
+begin 
+  EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add (NLS_3620 VARCHAR2(15)) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CP_ACCC.NLS_3620 IS 'Рах 3620 (при виплаті дивідентів)';
+
+begin 
+  EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add (NLS_7419 VARCHAR2(15)) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CP_ACCC.NLS_7419 IS 'Рах 7419 (при виплаті дивідентів)';
+
+begin 
+  EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add (NLS_7500 VARCHAR2(15)) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CP_ACCC.NLS_7419 IS 'Рах 7500 (при виплаті дивідентів)';
+
+begin 
+  EXECUTE IMMEDIATE 'alter table bars.CP_ACCC add (NLS_7503 VARCHAR2(15)) ';
+  exception when others then   if SQLCODE = -01430 then null;   else raise; end if;   -- ORA-01430: column being added already exists in table
+end;
+/
+COMMENT ON COLUMN BARS.CP_ACCC.NLS_7419 IS 'Рах 7503 (при виплаті дивідентів)';
+
 
 PROMPT *** Create  grants  CP_ACCC ***
 grant SELECT                                                                 on CP_ACCC         to BARSUPL;

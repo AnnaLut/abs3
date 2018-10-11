@@ -174,7 +174,6 @@ BEGIN
                            , t.seg_07 as R040
                            , t.seg_08 as K040_2
                            , t.seg_09 as Q003_1
-                           , trim(t.field_value) znap
                            , t.nbuc
                     from v_nbur_#1p t
                     where report_date = p_report_date and

@@ -118,102 +118,129 @@ exception when others then
 end; 
 /
 
+PROMPT *** Add columns for CM *************
+begin   
+ execute immediate '
+	alter table cm_client_que add (
+		addr1_city_type varchar2(30)   ,
+		addr1_street_type  varchar2(25)  ,
+		addr1_address varchar2(70)  ,
+		addr1_house  varchar2(5) ,
+		addr1_flat varchar2(5) ,
+		addr2_city_type varchar2(30)  ,
+		addr2_street_type  varchar2(25)  ,
+		addr2_address varchar2(70)  ,
+		addr2_house  varchar2(5) ,
+		addr2_flat varchar2(5)     ) ';
+exception when others then
+  if  sqlcode=-955 or sqlcode=-01430  then null; else raise; end if;
+ end;
+/
 
+alter table cm_client_que modify  addr1_house varchar2(100 char);
+alter table cm_client_que modify  addr2_house varchar2(100 char);
+alter table cm_client_que modify  addr1_flat  varchar2(100 char);
+alter table cm_client_que modify  addr2_flat  varchar2(100 char);
 
 
 PROMPT *** ALTER_POLICIES to CM_CLIENT_QUE ***
  exec bpa.alter_policies('CM_CLIENT_QUE');
+/
 
+-- Add comments to the columns 
+comment on column CM_CLIENT_QUE.id  		is 'Унікальний ідентифікатор заявки';
+comment on column CM_CLIENT_QUE.datein  	is 'Дата додавання заявки';
+comment on column CM_CLIENT_QUE.datemod  	is 'Дата модификації заявки';
+comment on column CM_CLIENT_QUE.oper_type  	is 'Тип операції';
+comment on column CM_CLIENT_QUE.oper_status  	is 'Статус операції';
+comment on column CM_CLIENT_QUE.resp_txt     	is 'Опис помилки';
+comment on column CM_CLIENT_QUE.branch       	is 'Код установи банку';
+comment on column CM_CLIENT_QUE.opendate     	is 'Дата відкриття клієнта';
+comment on column CM_CLIENT_QUE.clienttype   	is 'Тип клієнта';
+comment on column CM_CLIENT_QUE.taxpayeridentifier  is 'Ідентифікаційний код клиента';
+comment on column CM_CLIENT_QUE.shortname           is 'Найменування клієнта українською';
+comment on column CM_CLIENT_QUE.firstname           is 'Ім’я';
+comment on column CM_CLIENT_QUE.lastname            is 'Прізвище';
+comment on column CM_CLIENT_QUE.middlename          is 'По-батькові';
+comment on column CM_CLIENT_QUE.engfirstname        is 'Ім’я що ембосується (на англійський )';
+comment on column CM_CLIENT_QUE.englastname         is 'Прізвище що ембосується (на англійський)';
+comment on column CM_CLIENT_QUE.country             is 'Громадянство';
+comment on column CM_CLIENT_QUE.resident            is 'Ознака резидента';
+comment on column CM_CLIENT_QUE.work                is 'Місце роботи';
+comment on column CM_CLIENT_QUE.office              is 'Посада';
+comment on column CM_CLIENT_QUE.date_w              is 'Дата принятия на работу';
+comment on column CM_CLIENT_QUE.isvip               is 'Признак VIP клиента';
+comment on column CM_CLIENT_QUE.k060                is 'Признак инсайдера';
+comment on column CM_CLIENT_QUE.companyname         is 'Назва організації';
+comment on column CM_CLIENT_QUE.shortcompanyname    is 'Краткое наименование организации';
+comment on column CM_CLIENT_QUE.personalisationname   is 'Назва компанії що ембосується (на англ.)';
+comment on column CM_CLIENT_QUE.klas_client_id        is 'Юр. статус';
+comment on column CM_CLIENT_QUE.contactperson         is 'Прізвище контактної особи';
+comment on column CM_CLIENT_QUE.birthdate             is 'Дата народження';
+comment on column CM_CLIENT_QUE.birthplace            is 'Місце народження';
+comment on column CM_CLIENT_QUE.gender                is 'Стать';
+comment on column CM_CLIENT_QUE.addr1_cityname        is 'Місто (прописки/реєстрації)';
+comment on column CM_CLIENT_QUE.addr1_pcode           is 'Індекс (прописки/реєстрації)';
+comment on column CM_CLIENT_QUE.addr1_domain          is 'Область (прописки/реєстрації)';
+comment on column CM_CLIENT_QUE.addr1_region          is 'Район (прописки/реєстрації)';
+comment on column CM_CLIENT_QUE.addr1_street          is 'Вулиця, будинок, квартира (прописки/реєстрації)';
+comment on column CM_CLIENT_QUE.addr2_cityname        is 'Місто (проживання)';
+comment on column CM_CLIENT_QUE.addr2_pcode           is 'Індекс (проживання)';
+comment on column CM_CLIENT_QUE.addr2_domain          is 'Область (проживання)';
+comment on column CM_CLIENT_QUE.addr2_region          is 'Район (проживання)';
+comment on column CM_CLIENT_QUE.addr2_street          is 'Вулиця, будинок, квартира (проживання)';
+comment on column CM_CLIENT_QUE.email                 is 'e-mail';
+comment on column CM_CLIENT_QUE.phonenumber           is 'Телефон';
+comment on column CM_CLIENT_QUE.phonenumber_mob       is 'Телефон мобільний';
+comment on column CM_CLIENT_QUE.phonenumber_dod       is 'Телефон додатковий';
+comment on column CM_CLIENT_QUE.fax                   is 'Факс';
+comment on column CM_CLIENT_QUE.typedoc               is 'Тип документа';
+comment on column CM_CLIENT_QUE.paspnum               is 'Номер документу що засвідчує особу';
+comment on column CM_CLIENT_QUE.paspseries            is 'Серія документу що засвідчує особу';
+comment on column CM_CLIENT_QUE.paspdate              is 'Дата видачі документу що засвідчує особу';
+comment on column CM_CLIENT_QUE.paspissuer            is 'Ким виданий документ що засвідчує особу';
+comment on column CM_CLIENT_QUE.foreignpaspnum        is 'Номер закордонного паспорту';
+comment on column CM_CLIENT_QUE.foreignpaspseries     is 'Серія закордонного паспорту';
+comment on column CM_CLIENT_QUE.foreignpaspdate       is 'Дата видачі закордонного паспорту';
+comment on column CM_CLIENT_QUE.foreignpaspenddate    is 'Закордонний паспорт дійсний до';
+comment on column CM_CLIENT_QUE.foreignpaspissuer     is 'Ким виданий закордонний паспорт';
+comment on column CM_CLIENT_QUE.contractnumber        is 'Номер аналітичного рахунку 2625';
+comment on column CM_CLIENT_QUE.productcode           is 'Код продукту';
+comment on column CM_CLIENT_QUE.card_type             is 'Код Картковий субпродукт';
+comment on column CM_CLIENT_QUE.cntm                  is 'Количество месяцев действия карты';
+comment on column CM_CLIENT_QUE.pind                  is 'Таємне слово';
+comment on column CM_CLIENT_QUE.okpo_sysorg           is 'ОКПО системної організаціі';
+comment on column CM_CLIENT_QUE.kod_sysorg            is 'Код підрозділу системної організаціі';
+comment on column CM_CLIENT_QUE.regnumberclient       is 'Унікальний код клієнта, власника рахунку в АБС';
+comment on column CM_CLIENT_QUE.regnumberowner        is 'Унікальний код клієнта, держателя карти в АБС';
+comment on column CM_CLIENT_QUE.cl_rnk                is 'РНК кліента в ЦРВ';
+comment on column CM_CLIENT_QUE.cl_dt_iss             is 'Дата видачи карти кліенту';
+comment on column CM_CLIENT_QUE.card_br_iss           is 'Номер відділення, де буде видаватися картка';
+comment on column CM_CLIENT_QUE.card_addr_iss         is 'Адрес відділення, де буде видаватися картка';
+comment on column CM_CLIENT_QUE.delivery_br           is 'Код відділення, куди треба доставити картку';
+comment on column CM_CLIENT_QUE.rnk                   is 'Реєстраційний номер клієнта';
+comment on column CM_CLIENT_QUE.kk_secret_word        is 'Таємне слово для КК';
+comment on column CM_CLIENT_QUE.kk_flag               is 'Признак необходимости передачи данных по КК';
+comment on column CM_CLIENT_QUE.kk_regtype            is 'Тип реєстрації громадянина';
+comment on column CM_CLIENT_QUE.kk_cityareaid         is 'Код району міста';
+comment on column CM_CLIENT_QUE.kk_streettypeid       is 'Код типу вулиці';
+comment on column CM_CLIENT_QUE.kk_streetname         is 'Вулиця';
+comment on column CM_CLIENT_QUE.kk_apartment          is 'Номер будинку (та квартири)';
+comment on column CM_CLIENT_QUE.kk_postcode           is 'Поштовий індекс';
+comment on column CM_CLIENT_QUE.add_info              is 'Додаткова інформація';
+comment on column CM_CLIENT_QUE.shortnameowner        is 'Найменування клієнта-держателя українською';
+comment on column CM_CLIENT_QUE.addr2_city_type           is 'Тип населеного пункту (фактична адреса)';
+comment on column CM_CLIENT_QUE.addr2_street_type          is 'Тип вулиці (фактична адреса)';
+comment on column CM_CLIENT_QUE.addr2_address               is 'Вулиця (фактична адреса)';
+comment on column CM_CLIENT_QUE.addr2_house                is 'Номер будинку (фактична адреса)';
+comment on column CM_CLIENT_QUE.addr2_flat                 is 'Номер квартири (фактична адреса)';
+comment on column CM_CLIENT_QUE.addr1_city_type           is 'Тип населеного пункту (юридична адреса)';
+comment on column CM_CLIENT_QUE.addr1_street_type          is 'Тип вулиці (юридична адреса)';
+comment on column CM_CLIENT_QUE.addr1_address              is 'Вулиця (юридична адреса)';
+comment on column CM_CLIENT_QUE.addr1_house                is 'Номер будинку (юридична адреса)';
+comment on column CM_CLIENT_QUE.addr1_flat                 is 'Номер квартири (юридична адреса)';
 
-COMMENT ON TABLE BARS.CM_CLIENT_QUE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.RNK IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_SECRET_WORD IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_FLAG IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_REGTYPE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_CITYAREAID IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_STREETTYPEID IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_STREETNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_APARTMENT IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KK_POSTCODE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADD_INFO IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.IDCARDENDDATE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.EDDR_ID IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KF IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.SHORTNAMEOWNER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ID IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.DATEIN IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.DATEMOD IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.OPER_TYPE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.OPER_STATUS IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.RESP_TXT IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.BRANCH IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.OPENDATE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CLIENTTYPE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.TAXPAYERIDENTIFIER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.SHORTNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FIRSTNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.LASTNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.MIDDLENAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ENGFIRSTNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ENGLASTNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.COUNTRY IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.RESIDENT IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.WORK IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.OFFICE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.DATE_W IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ISVIP IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.K060 IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.COMPANYNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.SHORTCOMPANYNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PERSONALISATIONNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KLAS_CLIENT_ID IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CONTACTPERSON IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.BIRTHDATE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.BIRTHPLACE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.GENDER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR1_CITYNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR1_PCODE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR1_DOMAIN IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR1_REGION IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR1_STREET IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR2_CITYNAME IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR2_PCODE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR2_DOMAIN IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR2_REGION IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ADDR2_STREET IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.EMAIL IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PHONENUMBER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PHONENUMBER_MOB IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PHONENUMBER_DOD IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FAX IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.TYPEDOC IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PASPNUM IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PASPSERIES IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PASPDATE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PASPISSUER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FOREIGNPASPNUM IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FOREIGNPASPSERIES IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FOREIGNPASPDATE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FOREIGNPASPENDDATE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.FOREIGNPASPISSUER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CONTRACTNUMBER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PRODUCTCODE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CARD_TYPE IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CNTM IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.PIND IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.OKPO_SYSORG IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.KOD_SYSORG IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.REGNUMBERCLIENT IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.REGNUMBEROWNER IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.ACC IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CL_RNK IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CL_DT_ISS IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CARD_BR_ISS IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.CARD_ADDR_ISS IS '';
-COMMENT ON COLUMN BARS.CM_CLIENT_QUE.DELIVERY_BR IS '';
-
-
-
+/
 
 PROMPT *** Create  constraint PK_CMCLIENTQUE ***
 begin   
@@ -241,6 +268,19 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint FK_CMCLIENTQUE_CUSTOMER ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CM_CLIENT_QUE ADD CONSTRAINT FK_CMCLIENTQUE_CUSTOMER FOREIGN KEY (RNK)
+	  REFERENCES BARS.CUSTOMER (RNK) ENABLE NOVALIDATE';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
 PROMPT *** Create  constraint CC_CMCLIENTQUE_KF_NN ***
 begin   
  execute immediate '
@@ -257,6 +297,19 @@ PROMPT *** Create  constraint CC_CMCLIENTQUE_ID_NN ***
 begin   
  execute immediate '
   ALTER TABLE BARS.CM_CLIENT_QUE MODIFY (ID CONSTRAINT CC_CMCLIENTQUE_ID_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+ end;
+/
+
+
+
+
+PROMPT *** Create  constraint FK_CMCLIENTQUE_KF ***
+begin   
+ execute immediate '
+  ALTER TABLE BARS.CM_CLIENT_QUE ADD CONSTRAINT FK_CMCLIENTQUE_KF FOREIGN KEY (KF)
+	  REFERENCES BARS.BANKS$BASE (MFO) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -318,16 +371,13 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  CM_CLIENT_QUE ***
-grant SELECT                                                                 on CM_CLIENT_QUE   to BARSREADER_ROLE;
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CM_CLIENT_QUE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_CLIENT_QUE   to BARS_DM;
 grant DELETE,INSERT,SELECT,UPDATE                                            on CM_CLIENT_QUE   to OW;
-grant UPDATE                                                                 on CM_CLIENT_QUE   to SEROVVV;
-grant SELECT                                                                 on CM_CLIENT_QUE   to UPLD;
 grant FLASHBACK,SELECT                                                       on CM_CLIENT_QUE   to WR_REFREAD;
+
+
 
 
 

@@ -33,6 +33,14 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   --
   type acc_t   is table of integer index by binary_integer;
 
+
+  -- массив мфо для Ощадного банка
+  type t_osch_mfo_list is table of smallint  index by varchar2(6); 
+  g_osch_mfo_list      t_osch_mfo_list;
+
+  
+  
+
   ----
   -- header_version - возвращает версию заголовка пакета
   --
@@ -4040,6 +4048,23 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     return l_value;
   end;
 
+  
+---------------------------------------------------------------------------
+  --  CHECK_AUTOPAY_RULE
+  --
+  --  Проверка проходит ли платеж правила на автооплату документа
+  --  1 -  прошла проверка, значит платеж должен пройти автооплату
+  --  0 -  не прошла проверка, платеж пойдет по стандартной цепочке визирования 
+  ---------------------------------------------------------------------------
+  function check_autopay_rule (l_doc doc_import%rowtype) return smallint
+  is
+  begin
+     return bars.sdo_autopay_check_corp2(l_doc);
+  end;
+ 
+  
+
+----
   ----
   -- import_payment - выполняет импорт платежного документа
   --
@@ -4327,6 +4352,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_doc.tt := 'IB1'; -- Internet-Banking: Внутрішня
             --
         end if;
+
+		 -- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+        l_doc.flg_auto_pay := check_autopay_rule(l_doc);	
 		
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
@@ -4360,6 +4388,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         end if;
         -- дата вставки
         l_doc.insertion_date := sysdate;
+
+-- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+        l_doc.flg_auto_pay := check_autopay_rule(l_doc);
+
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
         -- дата валютирования в СЭП
@@ -4391,6 +4423,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
         -- дата вставки
         l_doc.insertion_date := sysdate;
+
+-- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+        l_doc.flg_auto_pay := check_autopay_rule(l_doc);
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
     -- SWIFT документ
@@ -4433,6 +4468,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         end if;
         -- дата вставки
         l_doc.insertion_date := sysdate;
+
+ 	    -- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+        l_doc.flg_auto_pay := check_autopay_rule(l_doc);
+
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
 
@@ -7138,6 +7177,16 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             raise_application_error(-20000, 'Не задано параметр SYNCADM');
     end;
     --
+	
+	begin
+       -- инициализация массиба мфо ощадного банка
+       if g_osch_mfo_list.count  = 0 then
+          for c in (select kf from regions) loop
+              g_osch_mfo_list(c.kf) := 0;
+          end loop;
+       end if;
+    end;
+	
   end init;
 
 begin

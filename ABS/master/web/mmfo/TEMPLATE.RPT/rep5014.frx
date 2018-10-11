@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="11/03/2015 15:09:51" ReportInfo.Modified="04/25/2017 13:05:54" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ConvertNulls="false" ReportInfo.Created="11/03/2015 15:09:51" ReportInfo.Modified="09/10/2018 17:13:50" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71MdNeMLYJtZKlJLnCb+PyjIrw==" CommandTimeout="300">
-      <TableDataSource Name="Table5" Alias="Data" DataType="System.Int32" Enabled="true" SelectCommand="SELECT t1.name, t1.ord, t2.KF ourmfo, nvl(t2.ost_sum,0) ost_sum, nvl(t2.ost_10,0) ost_10, nvl(t2.ost_30,0) ost_30, nvl(t2.ost_40,0) ost_40, nvl(t2.ost_other,0) ost_other&#13;&#10;    FROM clim_mfo t1&#13;&#10;         LEFT JOIN&#13;&#10;         (  SELECT cd.KF,&#13;&#10;                   SUM (cd.ostq) / 100 ost_sum,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '10', cd.ostq, 0)) / 100 ost_10,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '30', cd.ostq, 0)) / 100 ost_30,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '40', cd.ostq, 0)) / 100 ost_40,&#13;&#10;                   SUM (DECODE (cd.kod_analyt, '10', 0, '30', 0, '40', 0, cd.ostq)) / 100 ost_other&#13;&#10;              FROM ob_corporation_data cd&#13;&#10;             WHERE     cd.corporation_id = 1&#13;&#10;                   AND cd.rowtype = 0&#13;&#10;                   and kfile_pack.get_correct_session_id(cd.corporation_id,cd.kf,cd.session_id)=1&#13;&#10;                   and kfile_pack.get_correct_nbs(cd.corporation_id,substr(cd.nls,1,4))=1&#13;&#10;                   AND cd.file_date &gt;= TRUNC(:rpt_date, 'DDD')-1 AND cd.file_date &lt; TRUNC(:rpt_date + 1, 'DDD')-1&#13;&#10;          GROUP BY cd.KF) t2&#13;&#10;            ON t1.mfo = t2.KF&#13;&#10;ORDER BY t1.ord&#13;&#10;">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQJ4wg3eFA+xQcI8NHPYoQkw=" CommandTimeout="300">
+      <TableDataSource Name="Table5" Alias="Data" DataType="System.Int32" Enabled="true" SelectCommand="&#13;&#10;SELECT t1.name,&#13;&#10;       t1.ord,&#13;&#10;       t2.KF ourmfo,&#13;&#10;       nvl(t2.ost_sum, 0) ost_sum,&#13;&#10;       nvl(t2.ost_10, 0) ost_10,&#13;&#10;       nvl(t2.ost_30, 0) ost_30,&#13;&#10;       nvl(t2.ost_40, 0) ost_40,&#13;&#10;       nvl(t2.ost_other, 0) ost_other&#13;&#10;  FROM clim_mfo t1&#13;&#10;  LEFT JOIN (SELECT a.KF,&#13;&#10;                    SUM(a.ostq) / 100 ost_sum,&#13;&#10;                    SUM(case when a.kod_analyt = '10' then a.ostq else 0 end) / 100 ost_10,&#13;&#10;                    SUM(case when a.kod_analyt = '30' then a.ostq else 0 end) / 100 ost_30,&#13;&#10;                    SUM(case when a.kod_analyt = '40' then a.ostq else 0 end) / 100 ost_40,&#13;&#10;                    SUM(case when (a.kod_analyt not in ('10', '30', '40') or a.kod_analyt is null) then a.ostq else 0 end) / 100 ost_other&#13;&#10;               FROM ob_corp_data_acc a     &#13;&#10;                where a.corp_id = 1&#13;&#10;                and a.is_last = 1&#13;&#10;                AND a.fdat = trunc(:sFdat1) - 1&#13;&#10;              GROUP BY a.KF) t2&#13;&#10;    ON t1.mfo = t2.KF&#13;&#10; ORDER BY t1.ord">
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="ORD" DataType="System.Int16"/>
         <Column Name="OURMFO" DataType="System.String"/>
@@ -11,13 +11,13 @@
         <Column Name="OST_30" DataType="System.Decimal"/>
         <Column Name="OST_40" DataType="System.Decimal"/>
         <Column Name="OST_OTHER" DataType="System.Decimal"/>
-        <CommandParameter Name="rpt_date" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
       </TableDataSource>
     </OracleDataConnection>
     <Relation Name="Table_Table4" ParentDataSource="null" ChildDataSource="null" ParentColumns="PARENT_ID" ChildColumns="ID" Enabled="true"/>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
     <Total Name="Total_10" Expression="[Data.OST_10]" Evaluator="Data1" PrintOn="ReportSummary1"/>
-    <Total Name="Total_30" Expression="[Data.OST_10]" Evaluator="Data1" PrintOn="ReportSummary1"/>
+    <Total Name="Total_30" Expression="[Data.OST_30]" Evaluator="Data1" PrintOn="ReportSummary1"/>
     <Total Name="Total_40" Expression="[Data.OST_40]" Evaluator="Data1" PrintOn="ReportSummary1"/>
     <Total Name="Total_Other" Expression="[Data.OST_OTHER]" Evaluator="Data1" PrintOn="ReportSummary1"/>
     <Total Name="Total" Expression="[Data.OST_SUM]" Evaluator="Data1" PrintOn="ReportSummary1"/>
@@ -60,20 +60,20 @@
           <TableCell Name="Cell58" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="на інших рахунках" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row5">
-          <TableCell Name="Cell43" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="1" Padding="1, 1, 1, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell44" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell45" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell46" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell47" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell59" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="6" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell60" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="7" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="1" Padding="1, 1, 1, 1" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell44" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="2" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell45" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="3" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell46" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="4" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell47" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="5" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="6" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell60" Border.Lines="All" Border.Width="1.5" Fill.Color="Silver" Text="7" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
       <TextObject Name="Text1" Top="9.45" Width="1030.05" Height="18.9" Text="Інформація" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold, Underline"/>
       <TextObject Name="Text2" Top="37.8" Width="1030.05" Height="28.35" Text="щодо залишків коштів по рахунках органів Пенсійного фонду України&#13;&#10;станом на [sFdat1] р." Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
       <TextObject Name="Text3" Left="935.55" Top="66.15" Width="94.5" Height="18.9" Text="грн." HorzAlign="Right" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="286.7" Width="1031.94" Height="18.9" DataSource="Table5">
+    <DataBand Name="Data1" Top="287.5" Width="1031.94" Height="18.9" DataSource="Table5">
       <TableObject Name="Table1" Width="1030.05" Height="18.9">
         <TableColumn Name="Column1" Width="37.8"/>
         <TableColumn Name="Column2" Width="236.25"/>
@@ -83,20 +83,20 @@
         <TableColumn Name="Column6" Width="151.2"/>
         <TableColumn Name="Column7" Width="151.2"/>
         <TableRow Name="Row1">
-          <TableCell Name="Cell1" Border.Lines="All" Border.Width="1.5" Text="[Data.ORD]" HorzAlign="Right"/>
+          <TableCell Name="Cell1" Border.Lines="All" Border.Width="1.5" Text="[Data.ORD]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
           <TableCell Name="Cell2" Border.Lines="All" Border.Width="1.5" Text="[Data.NAME]"/>
-          <TableCell Name="Cell3" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_SUM]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell4" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_10]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell5" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_30]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell26" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_40]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell27" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_OTHER]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell3" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_SUM]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell4" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_10]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell5" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_30]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell26" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_40]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell27" Border.Lines="All" Border.Width="1.5" Text="[Data.OST_OTHER]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
         </TableRow>
       </TableObject>
       <Sort>
         <Sort Expression="[Data.ORD]"/>
       </Sort>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="308.8" Width="1031.94" Height="18.9">
+    <ReportSummaryBand Name="ReportSummary1" Top="310.4" Width="1031.94" Height="18.9">
       <TableObject Name="Table3" Width="1030.05" Height="18.9">
         <TableColumn Name="Column15" Width="37.8"/>
         <TableColumn Name="Column16" Width="236.25"/>
@@ -108,11 +108,11 @@
         <TableRow Name="Row6">
           <TableCell Name="Cell61" Border.Lines="Left, Top, Bottom" Border.Width="1.5" Fill.Color="Aquamarine"/>
           <TableCell Name="Cell62" Border.Lines="Right, Top, Bottom" Border.Width="1.5" Fill.Color="Aquamarine" Text="Разом" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
-          <TableCell Name="Cell63" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell64" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_10]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell65" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_30]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell86" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_40]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
-          <TableCell Name="Cell87" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_Other]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell63" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell64" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_10]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell65" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_30]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell86" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_40]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
+          <TableCell Name="Cell87" Border.Lines="All" Border.Width="1.5" Fill.Color="Aquamarine" Text="[Total_Other]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right"/>
         </TableRow>
       </TableObject>
     </ReportSummaryBand>

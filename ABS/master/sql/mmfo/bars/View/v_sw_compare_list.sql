@@ -7,7 +7,7 @@ select /*case when c.cause_err <> 0 and c.is_resolve = 0 then 1 else 0 end*/ c.i
        i.transactionid transactionid_EW,
        op.id operation,
        op.name operation_name,
-       o.fdat date_bars,
+       trunc(o.pdat) date_bars,
        i.operdate date_EW,
        o.ref,
        o.tt,
@@ -36,12 +36,12 @@ union all
 select 2 type,
        t.name system,
        t.kod_nbu,
-       o.fdat  ddate,
+       trunc(o.pdat)  ddate,
        o.mtsc transactionid_bars,
        null transactionid_EW,
        op.id operation,
        op.name operation_name,
-       o.fdat date_bars,
+       trunc(o.pdat) date_bars,
        null date_EW,
        o.ref,
        o.tt,
@@ -98,6 +98,3 @@ where i.compare_id = 0
   and I.SYSTEMCODE = S.SYSTEMCODE
   and S.KOD_NBU = T.KOD_NBU
   and op.id = i.operation;
-
-
-grant SELECT                                                on v_sw_compare_list    to BARS_ACCESS_DEFROLE;

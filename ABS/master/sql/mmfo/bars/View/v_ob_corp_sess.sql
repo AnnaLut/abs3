@@ -6,7 +6,8 @@ CREATE OR REPLACE VIEW BARS.V_OB_CORP_SESS
    FILE_DATE,
    CORP,
    STATE,
-   SYNCTIME
+   SYNCTIME,
+   ERR_LOG
 )
 AS
      SELECT T1.ID,
@@ -23,7 +24,8 @@ AS
                     2, 'Оброблено з помилками',
                     3, 'Помилка даних')
                AS state,
-            SYS_TIME AS synctime
+            SYS_TIME AS synctime,
+            to_char(substr(t1.err_log, 1, 100)) as err_log
        FROM BARS.ob_corp_sess t1
    ORDER BY SYS_TIME DESC;
 /

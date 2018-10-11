@@ -20,7 +20,27 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
             var connectionStr = EntitiesConnection.ConnectionString("ZayModel", "Zay");
             _entities = new ZayModel(connectionStr);
         }
+        
+        public GetFileFromClModel GetModelFileForCl(long id)
+        {
+           var parameters = new object[]
+           {
+                new OracleParameter("p_id", OracleDbType.Decimal, id, ParameterDirection.Input)
+           };
+            string query = "select z.id,v.adr,v.NMK,v.bank_name,v.address_bank,v.phone,z.kom,z.fnamekb from zayavka  z " +
+                "inner join  V_MBM_CUSTOMERS  v on z.rnk = v.RNK where z.id = :p_id";
+           return  _entities.ExecuteStoreQuery<GetFileFromClModel>(query, parameters).ToList().FirstOrDefault();
+        }
 
+        public string GetFNameKb(long id)
+        {
+            var parameters = new object[]
+           {
+                new OracleParameter("p_id", OracleDbType.Decimal, id, ParameterDirection.Input)
+           };
+            string query = " select FNAMEKB from v_zay_salform where id = :p_id";
+            return _entities.ExecuteStoreQuery<string>(query, parameters).ToList().FirstOrDefault();
+        }
 
         public IList<Nmk> GetCustomerNmk(decimal rnk)
         {
@@ -72,6 +92,8 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Implementation
 
             return _entities.ExecuteStoreQuery<Nmk>(query, parameters).ToList();
         }
+
+
         public void DeleteApplication(decimal dfID)
         {
             const string query = @"update zayavka set sos = -1

@@ -180,14 +180,14 @@ public partial class cim_contracts_contract_state : System.Web.UI.Page
                 gvCredGraph.Rows[gvCredGraph.Rows.Count - 1].Cells[0].Text = "Всього";
             }
         }
-        else if (contract.ContrType == 3)
+        else if (contract.ContrType == 3 || contract.ContrType == 4)
         {
             OtherContractClass occ = new OtherContractClass(Convert.ToDecimal(Request["contr_id"]));
             lbOtherSumIn.Text = CimManager.NumberFormat(occ.SumIn);
             lbOtherSumOut.Text = CimManager.NumberFormat(occ.SumOut);
             lbOtherSumAddIn.Text = CimManager.NumberFormat(occ.SumAddIn);
             lbOtherSumAddOut.Text = CimManager.NumberFormat(occ.SumAddOut);
-
+			  
             showControls(false, false, true);
         }
     }
