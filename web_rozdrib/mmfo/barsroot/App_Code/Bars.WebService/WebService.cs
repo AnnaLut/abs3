@@ -197,8 +197,9 @@ namespace Bars
         #endregion
 
         #region Transaction processing  
-        protected String TransactionErrorMessage = "Помилка отримання транзакції {0} з БД";
-        protected String TransactionExistsMessage = "TransactionID {0} вже була проведена";
+        protected readonly String TransactionErrorMessage = "Помилка отримання транзакції {0} з БД";
+        protected readonly String TransactionExistsMessage = "TransactionID {0} вже була проведена";
+        protected readonly String TransactionInProgress = "TransactionID {0} вже була проведена, але обробка ще не завершилась";
 
         protected void TransactionCreate(OracleConnection con, decimal transactionId, string userLogin, short? operationType = null, string description = null)
         {
@@ -266,19 +267,32 @@ namespace Bars
         /// <param name="operationType">Operation type (passed from XRM)</param>
         /// <param name="moduleName">log message identifier (default is "XRMIntegration")</param>
         /// <param name="description">Transaction decription (empty by default)</param>
-        protected void ProcessTransactions(OracleConnection con, decimal transactionId, string userLogin, short? operationType, out byte[] response, string description = "")
-        {
-            decimal TransStatus = TransactionCheck(con, transactionId, out response);
+        //protected void ProcessTransactions(OracleConnection con, decimal transactionId, string userLogin, short? operationType, out byte[] response, string description = "")
+        //{
+        //    decimal TransStatus = TransactionCheck(con, transactionId, out response);
 
-            if (0 == TransStatus)
-                TransactionCreate(con, transactionId, userLogin, operationType, description);
+        //    if (0 == TransStatus)
+        //        TransactionCreate(con, transactionId, userLogin, operationType, description);
+        //    else if (-1 == TransStatus)
+        //    {
+        //        if (null == response)
+        //            throw new System.Exception(String.Format("TransactionID {0} already exists and there is no saved answer", transactionId));
+        //    }
+        //    else
+        //        throw new System.Exception(String.Format("Помилка отримання транзакції {0} з БД", transactionId));
+        //}
+        protected int ProcessTransactions(OracleConnection con, decimal transactionId, string userLogin, short? operationType, out byte[] response, string description = "")
+        {
+            int TransStatus = (int)TransactionCheck(con, transactionId, out response);
+
+            if (0 == TransStatus) TransactionCreate(con, transactionId, userLogin, operationType, description);
             else if (-1 == TransStatus)
             {
-                if (null == response)
-                    throw new System.Exception(String.Format("TransactionID {0} already exists and there is no saved answer", transactionId));
+                if (null == response) TransStatus = -2;
             }
             else
                 throw new System.Exception(String.Format("Помилка отримання транзакції {0} з БД", transactionId));
+            return TransStatus;
         }
         #endregion Transaction
 

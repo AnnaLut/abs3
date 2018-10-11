@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <xmlform caption="">
   <grids>
-    <grid id="gv2" pagesize="2" showpagesizebox="true" title="Параметри клієнтів" >
+    <grid id="gv2" pagesize="2" showpagesizebox="true" title="Параметри клієнтів">
       <filters caption="Фільтри" buttontext="Знайти" columnscount="3" width="50%">
         <filter field="rnk" caption ="РНК" columnindex="1" condition="Equal" id="fltrrnk">
           <uicontrol></uicontrol>
@@ -15,49 +15,42 @@
       </filters>
       <datasource>
         <sql>
-          select  z.rnk, c.nmk, c.okpo, c.branch, z.nls29, z.nlsv, z.mfov, z.nls26, z.mfo26, z.tel, z.fio, z.kom, z.kom2, z.kom3, z.nls_kom, z.nls_kom2, z.custacc4cms
-          from cust_zay z, customer c
-          where z.rnk = c.rnk
-            and (c.custtype = 2 or (c.custtype = 3 and trim(c.sed) = '91'))
-          order by nls29, nmk
+          select z.rnk, c.nmk, c.okpo, c.branch, z.nls29, z.nlsv, z.mfov, z.nls26, z.mfo26, z.tel, z.fio, z.nls_kom, z.nls_kom2, z.custacc4cms
+            from cust_zay z, customer c
+           where z.rnk = c.rnk
+             and (c.custtype = 2 or (c.custtype = 3 and trim(c.sed) = '91'))
+           order by nls29, nmk
         </sql>
       </datasource>
       <rowselection method="SingleRow"/>
-
       <editform style="Dialog" title="Параметри клієнта {0} (РНК {1}) для біржевих заявок " height="750" width="1000" columnscount="3">
         <buttons defaulttype="Button">
           <button id="btnEdit" caption="Редагувати|Зберегти|Вiдмiнити" hint="Редагувати рядок|Зберегти рядок|Вiдмiнити редагування" confirmmessage="">
             <command type="Edit" successmessage="Збережені зміни в параметрах клієнта!">
               <sql>
                 begin
-                bars_zay.upd_custzay
-                ( p_mode    => 1,        
-                  p_rnk     => :rnk,     
-                  p_nls29   => :nls29,   
-                  p_nls26   => :nls26,   
-                  p_mfo26   => :mfo26,
-                  p_okpo26  => :okpo,
-                  p_kom     => :kom,
-                  p_kom2    => :kom2,
-                  p_kom3    => :kom3,
-                  p_tel     => :tel,
-                  p_fio     => :fio,
-                  p_mfov    => :mfov,
-                  p_nlsv    => :nlsv, 
-                  p_nls_kom     => :nls_kom,
-                  p_nls_kom2    => :nls_kom2,
-                  p_custacc4cms => :custacc4cms );
+                  bars_zay.upd_custzay (
+                    p_mode    => 1,
+                    p_rnk     => :rnk,
+                    p_nls29   => :nls29,
+                    p_nls26   => :nls26,
+                    p_mfo26   => :mfo26,
+                    p_okpo26  => :okpo,
+                    p_tel     => :tel,
+                    p_fio     => :fio,
+                    p_mfov    => :mfov,
+                    p_nlsv    => :nlsv,
+                    p_nls_kom     => :nls_kom,
+                    p_nls_kom2    => :nls_kom2,
+                    p_custacc4cms => :custacc4cms );
                 end;
               </sql>
               <parameters>
                 <parameter type="DataField" name="rnk" />
                 <parameter type="DataField" name="nls29" />
                 <parameter type="DataField" name="nls26" />
-                <parameter type="DataField" name="mfo26" />				
+                <parameter type="DataField" name="mfo26" />
                 <parameter type="DataField" name="okpo" />
-                <parameter type="DataField" name="kom" />
-                <parameter type="DataField" name="kom2" />
-                <parameter type="DataField" name="kom3" />
                 <parameter type="DataField" name="tel" />
                 <parameter type="DataField" name="fio" />
                 <parameter type="DataField" name="mfov" />
@@ -72,34 +65,28 @@
             <command type="Insert" successmessage="Збережені параметри клієнта!">
               <sql>
                 begin
-                bars_zay.upd_custzay
-                ( p_mode    => 0,
-                p_rnk     => :rnk,
-                p_nls29   => :nls29,
-                p_nls26   => :nls26,
-                p_mfo26   => :mfo26,
-                p_okpo26  => :okpo,
-                p_kom     => :kom,
-                p_kom2    => :kom2,
-                p_kom3    => :kom3,
-                p_tel     => :tel,
-                p_fio     => :fio,
-                p_mfov    => :mfov,
-                p_nlsv    => :nlsv,
-                p_nls_kom     => :nls_kom,
-                p_nls_kom2    => :nls_kom2,
-                p_custacc4cms => :custacc4cms );
+                  bars_zay.upd_custzay (
+                    p_mode    => 0,
+                    p_rnk     => :rnk,
+                    p_nls29   => :nls29,
+                    p_nls26   => :nls26,
+                    p_mfo26   => :mfo26,
+                    p_okpo26  => :okpo,
+                    p_tel     => :tel,
+                    p_fio     => :fio,
+                    p_mfov    => :mfov,
+                    p_nlsv    => :nlsv,
+                    p_nls_kom     => :nls_kom,
+                    p_nls_kom2    => :nls_kom2,
+                    p_custacc4cms => :custacc4cms );
                 end;
               </sql>
               <parameters>
                 <parameter type="DataField" name="rnk" />
                 <parameter type="DataField" name="nls29" />
                 <parameter type="DataField" name="nls26" />
-                <parameter type="DataField" name="mfo26" />				
+                <parameter type="DataField" name="mfo26" />
                 <parameter type="DataField" name="okpo" />
-                <parameter type="DataField" name="kom" />
-                <parameter type="DataField" name="kom2" />
-                <parameter type="DataField" name="kom3" />
                 <parameter type="DataField" name="tel" />
                 <parameter type="DataField" name="fio" />
                 <parameter type="DataField" name="mfov" />
@@ -114,9 +101,9 @@
             <command type="Delete" successmessage="Видалено!">
               <sql>
                 begin
-                bars_zay.upd_custzay
-                ( p_mode    => 2,
-                p_rnk     => :rnk );
+                  bars_zay.upd_custzay(
+                    p_mode => 2,
+                    p_rnk  => :rnk );
                 end;
               </sql>
               <parameters>
@@ -200,18 +187,6 @@
         <field name="fio" datatype="String">
           <column caption="ПІБ уповнов.працівника" align="Right" show="true"></column>
           <form show="true" rwmode="RW" columnindex="1" index="6" ></form>
-        </field>
-        <field name="kom" datatype="Decimal" >
-          <column caption="Комісія за купівлю(%)" show="true" formatstring="{0:F}"  align="Right"></column>
-          <form show="true" rwmode="RW" columnindex="3" index="1" ></form>
-        </field>
-        <field name="kom2" datatype="Decimal" >
-          <column caption="Комісія за продаж(%)" show="true" formatstring="{0:F}"  align="Right"></column>
-          <form show="true" rwmode="RW" columnindex="3" index="2" ></form>
-        </field>
-        <field name="kom3" datatype="Decimal" >
-          <column caption="Комісія за конверсію(%)" show="true" formatstring="{0:F}"  align="Right"></column>
-          <form show="true" rwmode="RW" columnindex="3" index="3" ></form>
         </field>
         <field name="nls_kom" datatype="Int64">
           <column caption="Рахунок комісії банка (купівля)" align="Right" show="true"></column>

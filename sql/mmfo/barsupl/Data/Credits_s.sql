@@ -34,6 +34,7 @@ select
                           ,VIDD_CUSTTYPE
 						  ,ob22
 						  ,nms
+						  ,nls
                    from bars_dm.credits_stat c
                    where c.per_id=bars_dm.dm_import.GET_PERIOD_ID('DAY',nvl(to_date(:param1, 'dd/mm/yyyy'), trunc(sysdate)))
 				   and kf = sys_context('bars_context', 'user_mfo')
@@ -155,6 +156,9 @@ begin
     
     insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
     values (52, 30, 'nms', 'Название счета', 'VARCHAR2', 70, null, null, null, 'Y', null, null, null, null, null);
+	
+	insert into barsupl.upl_columns (FILE_ID, COL_ID, COL_NAME, COL_DESC, COL_TYPE, COL_LENGTH, COL_SCALE, COL_FORMAT, PK_CONSTR, NULLABLE, NULL_VALUES, REPL_CHARS_WITH, SKELETON_VALUES, PK_CONSTR_ID, PREFUN)
+    values (52, 31, 'NLS', 'Номер рахунку', 'VARCHAR2', 15, null, null, null, 'Y', null, null, null, null, null);
 
 end;
 /

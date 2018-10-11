@@ -73,6 +73,61 @@ exception when others then
 /
 
 
+begin
+    execute immediate 'alter table CP_PAY_DIVIDENTS add NAZN	VARCHAR2(160)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CP_PAY_DIVIDENTS.NAZN IS 'Вкажіть призначення платежу';
+
+begin
+    execute immediate 'alter table CP_PAY_DIVIDENTS add sum_tax	number';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CP_PAY_DIVIDENTS.sum_tax IS 'Вкажіть суму податку з дивідентів';
+
+begin
+    execute immediate 'alter table CP_PAY_DIVIDENTS add sum_comis_transf	number';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CP_PAY_DIVIDENTS.sum_comis_transf IS 'Вкажіть суму за перерахування';
+
+begin
+    execute immediate 'alter table CP_PAY_DIVIDENTS add sum_comis_custody	number';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CP_PAY_DIVIDENTS.sum_comis_custody IS 'Вкажіть суму комісії зберігача';
+
+begin
+    execute immediate 'alter table CP_PAY_DIVIDENTS add certificate	number(1)';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CP_PAY_DIVIDENTS.certificate IS 'Довідка, наявність';
+
+begin
+    execute immediate 'alter table CP_PAY_DIVIDENTS add sum	number';
+ exception when others then 
+    if sqlcode = -1430 then null; else raise; 
+    end if; 
+end;
+/ 
+COMMENT ON COLUMN BARS.CP_PAY_DIVIDENTS.sum IS 'Нараховано дивідентів';
+
+
 PROMPT *** Create  grants  CP_PAY_DIVIDENTS ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on CP_PAY_DIVIDENTS     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CP_PAY_DIVIDENTS     to BARS_DM;

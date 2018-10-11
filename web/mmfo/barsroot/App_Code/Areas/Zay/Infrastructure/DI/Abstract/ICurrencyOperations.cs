@@ -15,6 +15,8 @@ namespace BarsWeb.Areas.Zay.Infrastructure.Repository.DI.Abstract
         IList<V_ZAY_SPLIT_AMOUNT> GetSplitSum(_Spliter _data);
         void SaveSplitSettings(V_ZAY_SPLIT_AMOUNT _datam, decimal nREF);
         void DeleteSetting(decimal ID);
+        string GetFNameKb(long id);
+        GetFileFromClModel GetModelFileForCl(long id);
 
     }
 }

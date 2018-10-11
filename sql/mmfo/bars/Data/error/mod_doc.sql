@@ -197,6 +197,30 @@ begin
 
     bars_error.add_message(l_mod, 54, l_exc, l_rus, 'Запрещено проведение касовых документов на уровне МФО', '', 1, 'CASH_MFO');
     bars_error.add_message(l_mod, 54, l_exc, l_ukr, 'Заборонено проведення касових документів на рівні МФО', '', 1, 'CASH_MFO');
+
+    bars_error.add_message(l_mod, 55, l_exc, l_rus, 'Ошибка вставки и оплаты докмента корп2 %s. Ошибка: %s', '', 1, 'ERROR_AUTO_PAY');
+    bars_error.add_message(l_mod, 55, l_exc, l_ukr, 'Помилка сплати документу корп2  корп2 %s. Помилка: %s ', '', 1, 'ERROR_AUTO_PAY');
+
+    bars_error.add_message(l_mod, 56, l_exc, l_rus, 'Ошибка вставки документа корп2 в arc_rrp: %s. Для EXT_REF=%s, REF=%s', '', 1, 'SDO_AUTO_PAY_INSEP_ERROR');
+    bars_error.add_message(l_mod, 56, l_exc, l_ukr, 'Помилка внесення документу корп2 в arc_rrp: %s. Для EXT_REF=%s, REF=%s', '', 1, 'SDO_AUTO_PAY_INSEP_ERROR');
+
+    bars_error.add_message(l_mod, 57, l_exc, l_rus, 'Ошибка сборки функции %s для автопроверки платежа СДО на автопроплату: %s', '', 1, 'ERROR_COMPILE');
+    bars_error.add_message(l_mod, 57, l_exc, l_ukr, 'Помилка копіляції функції %s для автоперевірки платежу СДО на автопроплату: %s', '', 1, 'ERROR_COMPILE');
+
+    bars_error.add_message(l_mod, 58, l_exc, l_rus, 'Ошибка вставки строки бис №%s для докумнента ref=%s', '', 1, 'ERROR_IN_PUT_BIS');
+    bars_error.add_message(l_mod, 58, l_exc, l_ukr, 'Помилка вставки строки біс №%s для докумненту ref=%s', '', 1, 'ERROR_IN_PUT_BIS');
+
+    bars_error.add_message(l_mod, 59, l_exc, l_rus, 'Помилка видачі гранту на функцію %s: %s', '', 1, 'ERROR_GRANT');
+    bars_error.add_message(l_mod, 59, l_exc, l_ukr, 'Помилка видачі гранту на функцію %s: %s', '', 1, 'ERROR_GRANT');
+
+    bars_error.add_message(l_mod, 60, l_exc, l_rus, 'Документ EXT_REF=%s, REF=%s с будущей датой валютирования %s, будет обработан в дату валютирования', '', 1, 'FUTURE_VALUE_DATE');
+    bars_error.add_message(l_mod, 60, l_exc, l_ukr, 'Документ EXT_REF=%s, REF=%s з майбутньою датою валютування %s, буде оброблено в дату валютування', '', 1, 'FUTURE_VALUE_DATE');
+
+    bars_error.add_message(l_mod, 61, l_exc, l_rus, 'Документ EXT_REF=%s, REF=%s не сплачено по факту', '', 1, 'FAILED_TO_PAY_BY_FACT');
+    bars_error.add_message(l_mod, 61, l_exc, l_ukr, 'Документ EXT_REF=%s, REF=%s не оплатено по факту', '', 1, 'FAILED_TO_PAY_BY_FACT');
+
+
+
   commit;
 end;
 /

@@ -1,54 +1,5 @@
-CREATE OR REPLACE FORCE VIEW BARS.V_W4_BALANCE_TXT
-(
-   BRANCH,
-   NMK,
-   ACC,
-   NLS,
-   DAT,
-   KV,
-   A_PK_OST,
-   W_PK_OST,
-   DELTA_PK_OST,
-   A_OVR_OST,
-   W_OVR_OST,
-   DELTA_OVR_OST,
-   A2207_OST,
-   W2207_OST,
-   DELTA_2207_OST,
-   A2208_OST,
-   W2208_OST,
-   DELTA_2208_OST,
-   A2209_OST,
-   W2209_OST,
-   DELTA_2209_OST,
-   A2625D_OST,
-   W2625D_OST,
-   DELTA_2625D_OST,
-   A2627_OST,
-   W2627_OST,
-   DELTA_2627_OST,
-   A2627X_OST,
-   W2627X_OST,
-   DELTA_2627X_OST,
-   A2628_OST,
-   W2628_OST,
-   DELTA_2628_OST,
-   A3570_OST,
-   W3570_OST,
-   DELTA_3570_OST,
-   A3579_OST,
-   W3579_OST,
-   DELTA_3579_OST,
-   A9129_OST,
-   W9129_OST,
-   DELTA_9129_OST,
-   AAR_OST,
-   WAR_OST,
-   DELTA_AR_OST,
-   WPEN
-)
-AS
-           SELECT BRANCH,
+CREATE OR REPLACE VIEW V_W4_BALANCE_TXT AS
+SELECT BRANCH,
            NMK,
            ACC,
            NLS,
@@ -93,7 +44,8 @@ AS
            AAR_OST,
            WAR_OST,
            DELTA_AR_OST,
-           WPEN
+           WPEN,
+           acc_close
      FROM (SELECT t.branch,
                   t.nmk,
                   t.acc,
@@ -138,7 +90,8 @@ AS
                   a9129_ost - NVL (w9129_ost, 0) delta_9129_ost,
                   aar_ost,
                   NVL (war_ost, 0) war_ost,
-                  aar_ost - NVL (war_ost, 0) delta_ar_ost, nvl(WPEN,0) wpen
+                  aar_ost - NVL (war_ost, 0) delta_ar_ost, nvl(WPEN,0) wpen,
+                  case when dazs is null then 0 else 1 end acc_close
              FROM (SELECT a.branch,
                           c.nmk,
                           a.acc,
@@ -201,7 +154,8 @@ AS
                                     fost (o.acc_9129, d.dat))
                           / 100
                              a9129_ost,
-                          TO_NUMBER (NVL (w.VALUE, 0))*-1 aar_ost
+                          TO_NUMBER (NVL (w.VALUE, 0))*-1 aar_ost,
+                          a.dazs
                      FROM w4_acc o,
                           accounts a,
                           customer c,
@@ -334,8 +288,3 @@ AS
           OR delta_3579_ost <> 0
           OR delta_9129_ost <> 0
           OR delta_ar_ost <> 0;
-/
-GRANT SELECT ON BARS.V_W4_BALANCE_TXT TO BARS_ACCESS_DEFROLE;
-/
-GRANT SELECT ON BARS.V_W4_BALANCE_TXT TO OW;
-/

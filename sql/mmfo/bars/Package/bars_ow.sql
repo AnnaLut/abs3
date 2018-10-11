@@ -5,7 +5,7 @@
   CREATE OR REPLACE PACKAGE BARS.BARS_OW 
 is
 
-g_header_version  constant varchar2(64)  := 'version 4.288 05/06/2018';
+g_header_version  constant varchar2(64)  := 'version 4.289 22/08/2018';
 g_header_defs     constant varchar2(512) := '';
 
 subtype t_trmask is OW_TRANSNLSMASK%rowtype;                      
@@ -228,6 +228,10 @@ procedure form_salary_ticket (
   p_fileid     in out number,
   p_ticketname    out varchar2 );
 
+procedure form_salary_ticket_ex (
+  p_fileid     in out number,
+  p_ticketname    out varchar2 );
+
 -- функция поиска клиента по ОКПО и паспортным данным
 function found_client (
   p_okpo    varchar2,
@@ -432,7 +436,32 @@ procedure open_2203 (
    p_newnbs  in varchar2,
    p_newacc out number);
 
+
+
+  function check_cust_dk(p_rnk customer.rnk%TYPE, p_card_code w4_card.code%TYPE) return integer;
+
+  --процедура получения данных по адресам клиента
+procedure get_address_client(
+  p_rnk in  number,
+  p_type in number,
+  p_city_type out varchar2,
+  p_house out varchar2,
+  p_flat out varchar2,
+  p_street_type out varchar2,
+  p_street out varchar2
+  );
+  ---процедура зміни статуса запиту до СМ з 99 на  1 після відповіді СМ W4_CARD_ADD (6327)
+  procedure add_deal_to_cmque_dk(
+            p_datemod     in cm_client_que.datemod%TYPE,
+            p_resp_txt    in cm_client_que.resp_txt%TYPE,
+            p_reqid       in cm_client_que.id%TYPE
+          ) ;
+
+
+
+
 end;
+
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_OW 
 is
@@ -440,7 +469,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.022 21/08/2018';
+g_body_version    constant varchar2(64)  := 'version 6.023 22/08/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -612,6 +641,178 @@ begin
          end;
 end;*/
 -------------------------------------------------------------------------------
+---процедура зміни статуса запиту до СМ з 99 на  1 після відповіді СМ
+--W4_CARD_ADD (6327)
+---
+procedure add_deal_to_cmque_dk(
+            p_datemod     in cm_client_que.datemod%TYPE,
+            p_resp_txt    in cm_client_que.resp_txt%TYPE,
+            p_reqid       in cm_client_que.id%TYPE
+          )
+  is
+ l_card_code_add w4_card_add.card_code_add%TYPE;
+ l_rnk customer.rnk%TYPE;
+ l_reqid_add cm_client_que.id%TYPE;
+begin
+   select  a.rnk ,   ad.card_code_add
+   into    l_rnk,   l_card_code_add
+   from cm_client_que q
+     INNER JOIN accounts a on a.acc=q.acc
+     inner join w4_card_ADD ad on ad.card_code=q.card_type
+   where q.id=p_reqid;
+ -------
+for rec in (
+    select q.id
+    from cm_client_que q
+         inner join accounts a on a.acc=q.acc and a.rnk=l_rnk and q.card_type=l_card_code_add    )
+ loop
+  update cm_client_que
+      set datemod     = p_datemod,
+          oper_status = 1,
+          resp_txt    = p_resp_txt
+    where id = rec.id ;
+ end loop;
+end add_deal_to_cmque_dk ;
+--------------------------------------------------------------------
+--перевірка клієнта на відповідність вимог для відкриття додаткової картки до ЗП картки
+-- w4_card_add
+function check_cust_dk(p_rnk customer.rnk%TYPE, p_card_code w4_card.code%TYPE) return integer
+is
+  l_err integer:=0;
+begin
+  --відсутня заборгованність ?
+    begin
+     select l_err+1 into l_err from accounts acc
+     where tip in ( 'SK9', 'SP', 'SPN') and ostc != 0 and acc.rnk=p_rnk;
+     if l_err>0 then
+       logger.info('BARS_OW.check_cust_kk:присутня прострочена заборгованість');
+       return l_err;
+     end if;
+    exception
+     when no_data_found then null;
+    end;
+  --валідний вік
+    begin
+      select l_err+0 into l_err  from person p where p.rnk =p_rnk and
+      (select trunc(months_between(sysdate,p.bday)/12) from dual )<74 and
+      (select trunc(months_between(sysdate,p.bday)/12) from dual )>18 ;
+    exception
+      when no_data_found then l_err:=l_err+1 ;
+      logger.info('BARS_OW.check_cust_kk:вік клієнта не відповідає вимогам');
+      return l_err;
+    end;
+ /* --вже існує картка , що відкривається
+    begin
+      select l_err+1 into l_err from  w4_deal where cust_rnk = p_rnk and card_code = p_card_code;
+     if l_err>0 then
+       logger.info('BARS_OW.check_cust_kkв:вже відкрита додаткова картка');
+       return l_err;
+     end if;
+    exception
+      when no_data_found then null;
+    end;*/
+  --валідний тип документа
+    begin
+     select l_err+0 into l_err  from person p where rnk =p_rnk and  passp in (1,7);
+    exception
+     when no_data_found then
+      l_err:=l_err+1 ;
+      logger.info('BARS_OW.check_cust_kk:документ клієнта не відповідає вимогам');
+      return l_err;
+    end;
+  --валідність кода ОКПО - відключити для тесту
+    begin
+--    select  f_validokpo(okpo)*(-1)+l_err into l_err from customer where rnk=p_rnk ;
+     select l_err+1 into l_err from customer where rnk=p_rnk and (f_validokpo(okpo)*(-1))!=0;
+     if l_err>0 then
+       logger.info('BARS_OW.check_cust_kk: код ОКПО  не коректний');
+       return l_err;
+     end if;
+    exception
+       when no_data_found then null;
+    end;
+ --
+    --без помилок
+    return l_err;
+end;
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- дані адреси клієнта (COBUMMFO-7587)
+procedure get_address_client(
+  p_rnk in  number,
+  p_type in number,
+  p_city_type out varchar2,
+  p_house out varchar2,
+  p_flat out varchar2,
+  p_street_type out varchar2,
+  p_street out varchar2
+  )
+  as
+begin
+ select
+     case
+       when to_char(ca.locality_type_n) is not null then --NEW
+                                                (select ln.settlement_tp_nm
+                                                 from adr_settlement_types ln
+                                                 where ln.settlement_tp_id=ca.locality_type_n )
+         else --OLD
+           (select lo.name from address_locality_type lo where lo.id=ca.locality_type )
+     end  city_type
+     ,ca.home as  house
+     ,ca.room as  flat
+     ,case
+       when to_char(ca.street_type_n) is not null then --NEW
+                                              (select sn.str_tp_nm
+                                               from adr_street_types sn
+                                               where sn.str_tp_id=ca.street_type_n )
+         else --OLD
+            (select so.name from address_street_type so where so.id=ca.street_type )
+     end street_type
+     ,ca.street
+     into p_city_type,p_house,p_flat,p_street_type,p_street
+     from customer_address ca
+        left join address_street_type adst on adst.id=ca.street_type
+     where ca.rnk = p_rnk and ca.type_id = p_type;
+ exception
+   when no_data_found then --null;
+       p_city_type:=null;
+       p_house:=null;
+       p_flat:=null;
+       p_street_type:=null;
+       p_street:=null;
+end;
+
+-------------------------------------------------------------------------------
+procedure check_address_client ( p_rnk in customer.rnk%TYPE,p_cm_err_msg out varchar2)
+as
+  l_city_type    varchar2(250);
+  l_house        varchar2(250);--customer_address.home%TYPE;
+  l_flat         varchar2(50); --customer_address.room%TYPE;
+  l_street_type  varchar2(250);--address_street_type.name%TYPE;
+  l_street       varchar2(250);--customer_address.street%TYPE;
+  l_cm_err_msg   varchar2(1000);
+begin
+
+    get_address_client(p_rnk => p_rnk,p_type => 1, --
+    p_city_type =>l_city_type,    p_house =>l_house,    p_flat => l_flat,    p_street_type =>l_street_type,    p_street => l_street    );
+    if l_city_type   is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Тип населеного пункту'''' (прописки) не заповнено'||'</br>'; end if;
+    if l_street_type is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Тип вулиці'''' (прописки) не заповнено'||'</br>';end if;
+    if l_street      is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Вулиця'''' (прописки) не заповнено'||'</br>';end if;
+    if l_house       is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Будинок'''' (прописки) не заповнено'||'</br>';end if;
+
+    get_address_client(p_rnk => p_rnk,p_type => 2, --
+    p_city_type =>l_city_type,    p_house =>l_house,    p_flat => l_flat,    p_street_type =>l_street_type,    p_street => l_street    );
+    if l_city_type    is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Тип населеного пункту'''' (проживання) не заповнено'||'</br>'; end if;
+    if l_street_type  is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Тип вулиці'''' (проживання) не заповнено'||'</br>';end if;
+    if l_street       is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Вулиця'''' (проживання) не заповнено'||'</br>';end if;
+    if l_house        is null then l_cm_err_msg:=l_cm_err_msg||'Поле ''''Будинок'''' (проживання) не заповнено'||'</br>';end if;
+
+    p_cm_err_msg:=l_cm_err_msg;
+end;
+
+
 --процедура для проставления счетам 2924 признака пакетной оплаты
 procedure setoptfor2924w4 is
   pragma autonomous_transaction;
@@ -9214,27 +9415,47 @@ begin
                teld  = nvl(teld,  p_clientdata.phone_home)
          where rnk = p_rnk;
      end if;
-
+------------------address
      if ( l_custadr1.zip      is null
        or l_custadr1.domain   is null
        or l_custadr1.region   is null
        or l_custadr1.locality is null
-       or l_custadr1.address  is null ) and
+       or l_custadr1.address  is null
+       or l_custadr1.locality_type_n is null
+       or l_custadr1.home            is null
+       or l_custadr1.room            is null
+       or l_custadr1.street_type_n   is null
+       or l_custadr1.street          is null
+        ) and
         ( p_clientdata.addr1_cityname is not null
        or p_clientdata.addr1_pcode    is not null
        or p_clientdata.addr1_domain   is not null
        or p_clientdata.addr1_region   is not null
-       or p_clientdata.addr1_street   is not null ) then
+       or p_clientdata.addr1_street   is not null
+       or p_clientdata.addr1_city_type is not null
+       or p_clientdata.addr1_bud       is not null
+       or p_clientdata.addr1_flat      is not null
+       or p_clientdata.addr1_streettype is not null
+       or p_clientdata.addr1_streetname is not null
+       ) then
         update customer_address
            set zip      = nvl(zip,      p_clientdata.addr1_pcode),
                domain   = nvl(domain,   p_clientdata.addr1_domain),
                region   = nvl(region,   p_clientdata.addr1_region),
                locality = nvl(locality, p_clientdata.addr1_cityname),
-               address  = nvl(address,  p_clientdata.addr1_street)
+               address  = nvl(address,  p_clientdata.addr1_street),
+               locality_type_n=nvl(locality_type_n,  p_clientdata.addr1_city_type),
+               home=nvl(home,  p_clientdata.addr1_bud),
+               room=nvl(room,  p_clientdata.addr1_flat),
+               street_type_n=nvl(street_type_n,  p_clientdata.addr1_streettype),
+               street=nvl(street,  p_clientdata.addr1_streetname)
+
          where rnk = p_rnk and type_id = 1;
         if sql%rowcount = 0 then
-           insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address)
-           values (p_rnk, 1, 804, p_clientdata.addr1_pcode, p_clientdata.addr1_domain, p_clientdata.addr1_region, p_clientdata.addr1_cityname ,p_clientdata.addr1_street);
+           insert into customer_address (rnk, type_id, country, zip, domain, region, locality, address,locality_type_n,home,room,street_type_n,street)
+           values (p_rnk, 1, 804, p_clientdata.addr1_pcode, p_clientdata.addr1_domain, p_clientdata.addr1_region,p_clientdata.addr1_cityname ,p_clientdata.addr1_street,
+                   p_clientdata.addr1_city_type,p_clientdata.addr1_bud,p_clientdata.addr1_flat,p_clientdata.addr1_streettype,p_clientdata.addr1_streetname
+                   );
         end if;
      end if;
 
@@ -10648,6 +10869,7 @@ is
   l_sed           varchar2(4);
   l_ismmfo        varchar2(1) := nvl(getglobaloption('IS_MMFO'), '0');
   l_iscrm         varchar2(1) := nvl(sys_context('CLIENTCONTEXT', 'ISCRM'), '0');
+  l_cm_err_msg    varchar2(1000);
 begin
 
   bars_audit.info(h || 'Start: p_nd=>' || to_char(p_nd) || ', p_opertype=>' || to_char(p_opertype));
@@ -11350,6 +11572,32 @@ if    not regexp_like(upper(l_cmclient.paspissuer),q'{^[АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУ
   l_cmclient.resp_txt    := null;
   l_cmclient.kf := sys_context('bars_context','user_mfo');
   select bars_sqnc.get_nextval('S_CMCLIENT') into l_cmclient.id from dual;
+
+-----#######add in new fields on COBUMMFO-5620 (COBUMMFO-7587)
+    get_address_client(p_rnk => l_cmclient.rnk,p_type => 1,
+    p_city_type   =>l_cmclient.addr1_city_type,
+    p_house       =>l_cmclient.addr1_house,
+    p_flat        =>l_cmclient.addr1_flat,
+    p_street_type =>l_cmclient.addr1_street_type,
+    p_street      =>l_cmclient.addr1_street );
+
+    get_address_client(p_rnk => l_cmclient.rnk,p_type => 2,
+    p_city_type   =>l_cmclient.addr2_city_type,
+    p_house       =>l_cmclient.addr2_house,
+    p_flat        =>l_cmclient.addr2_flat,
+    p_street_type =>l_cmclient.addr2_street_type,
+    p_street      =>l_cmclient.addr2_street );
+
+---##############-----------------------------------------------------
+     --перевірка заповнення обов"язкових полів (COBUMMFO-7587)
+    if l_cmclient.clienttype=3 then
+     check_address_client(p_rnk => l_cmclient.rnk,p_cm_err_msg=>l_cm_err_msg);
+     if length(l_cm_err_msg)>0
+       then raise_application_error(-20000, 'Помилка формування запиту :'||'</br>'||l_cm_err_msg);
+     end if;
+     l_cm_err_msg:='';
+    end if;
+   -----------
 
   insert into cm_client_que values l_cmclient;
   if l_iscrm = '1' then
@@ -12569,6 +12817,15 @@ is
   l_sendsms    varchar2(3);
   l_iscrm      varchar2(1) := nvl(sys_context('CLIENTCONTEXT','ISCRM'), '0');
   l_salaryproect bpk_proect.id%type;
+  l_cm_err_msg varchar2(1000);
+  l_add_card integer;
+  l_city_type    customer_address.locality_type%TYPE;
+  l_house        customer_address.home%TYPE;
+  l_flat         customer_address.room%TYPE;
+  l_street_type  address_street_type.name%TYPE;
+  l_street       customer_address.street%TYPE;
+
+  --l_salaryproect bpk_proect.id%type;
   l_trmask t_trmask;
 begin
 
@@ -12762,10 +13019,25 @@ begin
 
 
   -- внесение данных в очередь для обработки в CardMake
+    ---for subcard from w4_card_add (6327)
+  begin
+   select count('x') into l_add_card
+   from w4_card_add a where a.card_code_add=p_cardcode;
+  exception
+   when no_data_found then
+     null;
+  end;
+ ---
+
   add_deal_to_cmque(
      p_nd         => l_nd,
      p_opertype   => l_opertype,
-     p_wait_confirm => case when l_ctype = 2 then 1 else null end,
+     p_wait_confirm => case
+                         when l_ctype = 2 then 1
+                         when l_add_card >0 then 1  --якщо карта, що створюється є додатковою з w4_card_add (6327)
+                        else null
+                       end,
+
      p_cmclient   => l_cmclient);
   if l_ctype = 2 then
     update w4_acc_instant t
@@ -12787,8 +13059,8 @@ begin
       null;
   end;
 
-  -- отправляем запрос на W4 по персонализации карты
-  if l_opertype = 6 and l_iscrm = '0' then
+  -- отправляем запрос на W4 по персонализации карты (без нерезидентов COBUMMFO-7787_2)
+  if l_opertype = 6 and l_iscrm = '0' and l_cmclient.resident=1 then
 
      l_pers_err := pers_instant_card(l_nd, l_cmclient);
      if l_pers_err = 'OK' then
@@ -13319,6 +13591,10 @@ begin
      l_project.eng_last_name  := extract(p_xml, '/ROWSET/ROW['||i||']/ENG_LAST_NAME/text()', null);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/MNAME/text()', null);
      l_project.mname          := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,20);
+  --address
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_CITY_TYPE/text()', null);
+     l_project.addr1_city_type:= substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
+
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_CITYNAME/text()', null);
      l_project.addr1_cityname := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_PCODE/text()', null);
@@ -13329,17 +13605,27 @@ begin
      l_project.addr1_region   := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,48);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_STREET/text()', null);
      l_project.addr1_street   := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
-                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_STREETTYPE/text()', null);
+
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_STREET_TYPE/text()', null);
      l_project.addr1_streettype := convert_to_number(trim(dbms_xmlgen.convert(l_tmp,1)));
-                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_STREETNAME/text()', null);
+
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_STREET/text()', null);
      l_project.addr1_streetname  := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
-                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_BUD/text()', null);
+
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_HOUSE/text()', null);
      l_project.addr1_bud      := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,50);
+
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR1_FLAT/text()', null);
+     l_project.addr1_flat     := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,50);
+
      if l_project.addr1_bud is not null then
-        l_project.addr1_street := l_project.addr1_street || ' ' || l_project.addr1_bud;
+        l_project.addr1_street := l_project.addr1_street || ', ' || l_project.addr1_bud ||', '||l_project.addr1_flat;
      end if;
+  -----------
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_CITYNAME/text()', null);
      l_project.addr2_cityname := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_CITY_TYPE/text()', null);
+     l_project.addr2_city_type:= substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_PCODE/text()', null);
      l_project.addr2_pcode    := check_pcode(l_tmp);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_DOMAIN/text()', null);
@@ -13348,15 +13634,19 @@ begin
      l_project.addr2_region   := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,48);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_STREET/text()', null);
      l_project.addr2_street   := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
-                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_STREETTYPE/text()', null);
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_STREET/text()', null);
+     l_project.addr2_streetname  := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_STREET_TYPE/text()', null);
      l_project.addr2_streettype := convert_to_number(trim(dbms_xmlgen.convert(l_tmp,1)));
-                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_STREETNAME/text()', null);
-     l_project.addr2_streetname := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,100);
-                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_BUD/text()', null);
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_HOUSE/text()', null);
      l_project.addr2_bud      := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,50);
+                        l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/ADDR2_FLAT/text()', null);
+     l_project.addr2_flat     := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,50);
+
      if l_project.addr2_bud is not null then
-        l_project.addr2_street := l_project.addr2_street || ' ' || l_project.addr2_bud;
+        l_project.addr2_street := l_project.addr2_street || ', ' || l_project.addr2_bud ||', '||l_project.addr2_flat;
      end if;
+  ---------------
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/WORK/text()', null);
      l_project.work           := substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,254);
                         l_tmp := extract(p_xml, '/ROWSET/ROW['||i||']/OFFICE/text()', null);
@@ -13522,6 +13812,120 @@ exception when no_data_found then
         dbms_utility.format_error_stack() || chr(10) ||
         dbms_utility.format_error_backtrace());
 end import_salary_file;
+
+-------------------------------------------------------------------------------
+-- form_salary_ticket
+--
+procedure form_salary_ticket_ex(
+  p_fileid     in out number,
+  p_ticketname    out varchar2 )
+is
+  l_count     number  := 0;
+  l_data      xmltype := null;
+  l_xml_tmp   xmltype := null;
+  l_clob_data clob;
+    p_result clob;
+    l_domdoc        dbms_xmldom.domdocument;
+    l_root_node     dbms_xmldom.domnode;
+    l_rows_node     dbms_xmldom.domnode;
+    l_row_node      dbms_xmldom.domnode;
+    l_customer_node dbms_xmldom.domnode;
+    l_deals_node    dbms_xmldom.domnode;
+    l_deal_node     dbms_xmldom.domnode;
+    l_node          dbms_xmldom.DOMNode;
+  h varchar2(100) := 'bars_ow.form_salary_ticket_ex.';
+begin
+   bars_audit.info(h || 'Start.');
+
+  begin
+     select 'R_' || file_name into p_ticketname from ow_salary_files where id = p_fileid;
+  exception when no_data_found then
+     bars_audit.info(h || 'File not found p_fileid=>' || to_char(p_fileid));
+     bars_error.raise_nerror(g_modcode, 'FILE_NOT_FOUND');
+  end;
+    l_domDoc    := dbms_xmldom.newdomdocument;
+    l_root_node := dbms_xmldom.makenode(l_domDoc);
+    l_rows_node := dbms_xmldom.appendchild(l_root_node, dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc, 'ROWS')));
+
+ for v in ( select  p.okpo, p.first_name, p.last_name, p.middle_name, p.paspseries,
+                    p.paspnum, to_char(p.bday,'dd/mm/yyyy') bday, p.tabn,  p.str_err,p.rnk
+               from ow_salary_data p  where p.id = p_fileid
+          )
+  loop
+    l_count := l_count + 1;
+    l_row_node  := dbms_xmldom.appendchild(l_rows_node, dbms_xmldom.makenode(dbms_xmldom.createelement(l_domdoc, 'ROW')));
+
+      l_customer_node := dbms_xmldom.appendChild(l_row_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'CUSTOMER')));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'OKPO')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.okpo )));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'FIRST_NAME')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.first_name )));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'LAST_NAME')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.last_name )));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'MIDDLE_NAME')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.middle_name )));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'PASPSERIES')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.paspseries )));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement( l_domdoc, 'PASPNUM')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.paspnum )));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'BDAY')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,  v.bday)));
+
+        l_node := dbms_xmldom.appendChild(l_customer_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'TABN')));
+        l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.tabn  )));
+
+        l_deals_node := dbms_xmldom.appendChild(l_row_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'DEALS')));
+
+        if v.str_err is null then
+          for d in ( select q.*  from cm_client_que q
+                       where q.rnk =v.rnk
+                   )
+          loop
+            l_deal_node := dbms_xmldom.appendChild(l_deals_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'DEAL')));
+                l_node := dbms_xmldom.appendChild(l_deal_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc,'ND')));
+                l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,d.id)));
+
+                l_node := dbms_xmldom.appendChild(l_deal_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'DD')));
+                l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,to_char(d.datein,'dd.mm.yyyy'))));
+
+                l_node := dbms_xmldom.appendChild(l_deal_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'ACC')));
+                l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,d.contractnumber )));
+
+                l_node := dbms_xmldom.appendChild(l_deal_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'CARD_TYPE')));
+                l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,d.card_type )));
+          end loop;
+          l_node := dbms_xmldom.appendChild(l_row_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'ERR')));
+          l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,'No errors' )));
+        else
+          l_node := dbms_xmldom.appendChild(l_row_node, dbms_xmldom.makeNode(dbms_xmldom.createElement(l_domdoc, 'ERR')));
+          l_node := dbms_xmldom.appendChild(l_node, dbms_xmldom.makeNode(dbms_xmldom.createTextNode(l_domdoc,v.str_err )));
+        end if;
+  end loop;
+---
+    dbms_lob.createtemporary(p_result, true, 12);
+    dbms_xmldom.writetoclob(l_domdoc, p_result);
+   --отпускаем объекты ...
+    dbms_xmldom.freeDocument(l_domdoc);
+
+
+     if l_count > 0 then
+      p_fileid := get_impid;
+      insert into ow_impfile (id, file_data) values (p_fileid, p_result);
+     else
+      p_fileid := null;
+      p_ticketname := null;
+     end if;
+  bars_audit.info(h || 'p_ticketname=>' || p_ticketname);
+  bars_audit.info(h || 'Finish.');
+
+end form_salary_ticket_ex;
 
 -------------------------------------------------------------------------------
 -- form_salary_ticket
@@ -13988,6 +14392,32 @@ begin
           p_branchissue   => p_branch,
           p_nd            => l_nd,
           p_reqid         => l_reqid );
+
+       --open subcard from W4_CARD_ADD (6327)
+       for card_add in (select cad.card_code_add
+                          from W4_CARD_ADD cad where cad.card_code=p_card_code and cad.en=1)
+       loop
+        if check_cust_dk(l_rnk, null )=0 then     --перевірка умов по клієнту
+         open_card (
+          p_rnk           => l_rnk,
+          p_nls           => l_instant_nls,
+          p_cardcode      => card_add.card_code_add,
+          p_branch        => p_branch,
+          p_embfirstname  => l_client_array(i).eng_first_name,
+          p_emblastname   => l_client_array(i).eng_last_name,
+          p_secname       => l_client_array(i).mname,
+          p_work          => l_client_array(i).work,
+          p_office        => l_client_array(i).office,
+          p_wdate         => l_client_array(i).date_w,
+          p_salaryproect  => p_proect_id,
+          p_term          => l_client_array(i).max_term,
+          p_branchissue   => p_branch,
+          p_nd            => l_nd,
+          p_reqid         => l_reqid );
+        else logger.info (h||'Помилка перевірки клієнта (РНК '||l_rnk||') для відкриття додаткової картки');
+        end if;
+       end loop;
+---------------
         update accounts set isp = p_isp where acc = (select acc_pk from w4_acc where nd = l_nd);
 
         -- сохранение данных по новому клиенту
@@ -14040,7 +14470,7 @@ begin
      p_isp       => p_isp );
 
   l_fileid := p_fileid;
-  form_salary_ticket (
+  form_salary_ticket_ex  (
      p_fileid     => l_fileid,
      p_ticketname => l_ticketname );
 

@@ -257,7 +257,7 @@
                     <!-- /others -->
 
                     <td style="text-align: right">
-                        <button type="button" class="btn-pin-ico" style="width: 100px; height: 22px; padding-top: 0" title="Перегляд ліцензій по контракту"
+                        <button type="button" id="btLicenses" class="btn-pin-ico" style="width: 100px; height: 22px; padding-top: 0" title="Перегляд ліцензій по контракту"  
                             onclick="curr_module.ShowLicenses()">
                             Ліцензії</button>
                     </td>

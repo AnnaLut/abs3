@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/24/2015 13:49:32" ReportInfo.Modified="08/21/2018 17:54:04" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="crnv" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWrXAA7A21xsmM7RTPHtKkTahP5GT91QlqS7RfITny80Q==" CommandTimeout="4000">
+      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 ROWN, CHAR00 ND, NUM01 KV, CHAR01 SOURCE, CHAR02 FIO, NUM02 OST, CHAR03 BRANCH, CHAR04 NLS, CHAR05 DEPCODE, DAT00 DZAGR, CHAR06 IDCODE, CHAR07 DAT1, CHAR08 DAT2 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="SOURCE" DataType="System.String"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="ROWN" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="DEPCODE" DataType="System.String"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="DZAGR" DataType="System.DateTime"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table2" DataType="System.Int32" Enabled="true" SelectCommand="select  CHAR07 DAT1,  CHAR08 DAT2 from rs_tmp_report_data where session_id=:SESSION_ID and rownum = 1">
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Total Name="Total" Expression="[Table1.OST]" Evaluator="Data1"/>
+    <Total Name="Total1" TotalType="Count" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="280" PaperHeight="400" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="982.8" Height="48.13">
+      <TextObject Name="Text1" Left="4.44" Top="10.33" Width="968.18" Height="37.8" Text="Список вкладів, переданих до ЦРНВ  за період з [Table2.DAT1] по [Table2.DAT2]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold">
+        <Formats>
+          <DateFormat/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="52.13" Width="982.8" Height="27.69">
+      <TableObject Name="Table1" Left="0.32" Width="973.96" Height="27.69">
+        <TableColumn Name="Column1" Width="37.61"/>
+        <TableColumn Name="Column28" Width="85.05"/>
+        <TableColumn Name="Column29" Width="96.01"/>
+        <TableColumn Name="Column30" Width="65.02"/>
+        <TableColumn Name="Column2" Width="113.9"/>
+        <TableColumn Name="Column3" Width="47.63"/>
+        <TableColumn Name="Column4" Width="84.02"/>
+        <TableColumn Name="Column32" Width="122.85"/>
+        <TableColumn Name="Column5" Width="217.63"/>
+        <TableColumn Name="Column6" Width="104.24"/>
+        <TableRow Name="Row1" Height="27.69">
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="LightGray" Text="№ п/п" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="LightGray" Text="Номер договору" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="LightGray" Text="Відділення" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="LightGray" Text="Вид вкладу" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="LightGray" Text="Номер рахунку" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="LightGray" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell4" Border.Lines="All" Fill.Color="LightGray" Text="Джерело завантаження" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="LightGray" Text="ІНН" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell5" Border.Lines="All" Fill.Color="LightGray" Text="ПІБ вкладника" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell6" Border.Lines="Right, Top, Bottom" Fill.Color="LightGray" Text="Залишок" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="83.82" Width="982.8" Height="27.69" DataSource="Table">
+      <TableObject Name="Table1" Width="974.26" Height="27.69" Fill.Color="White">
+        <TableColumn Name="Column20" Width="37.61"/>
+        <TableColumn Name="Column21" Width="85.55"/>
+        <TableColumn Name="Column22" Width="95.93"/>
+        <TableColumn Name="Column23" Width="65.12"/>
+        <TableColumn Name="Column24" Width="113.68"/>
+        <TableColumn Name="Column25" Width="47.54"/>
+        <TableColumn Name="Column26" Width="83.92"/>
+        <TableColumn Name="Column33" Width="122.85"/>
+        <TableColumn Name="Column27" Width="217.73"/>
+        <TableColumn Name="Column31" Width="104.33"/>
+        <TableRow Name="Row9" Height="27.69">
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="White" Text="[AbsRow#]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="White" Text="[Table1.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="White" Text="[Table1.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="White" Text="[Table1.DEPCODE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="White" Text="[Table1.NLS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="White" Text="[Table1.KV]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="White" Text="[Table1.SOURCE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell71" Border.Lines="All" Text="[Table1.IDCODE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="White" Text="[Table1.FIO]" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt"/>
+          <TableCell Name="Cell69" Border.Lines="Right, Top, Bottom" Text="[Table1.OST]" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="115.51" Width="982.8" Height="37.8">
+      <TextObject Name="Text2" Top="9.45" Width="973.35" Height="18.9" Border.Lines="All" Fill.Color="LightGray" Text="Всього:   Кількість [Total1]    Сума: [Total]" VertAlign="Center"/>
+    </ReportSummaryBand>
+  </ReportPage>
+</Report>

@@ -215,6 +215,16 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IND_OB_CORP_DATA_ACC_CORP_G ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IND_OB_CORP_DATA_ACC_CORP_G ON BARS.OB_CORP_DATA_ACC (FDAT, IS_LAST, CORP_ID)
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSBIGI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/  
 
 
 

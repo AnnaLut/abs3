@@ -82,15 +82,14 @@ begin
     Insert into NBUR_REF_PREPARE_XML
        (FILE_CODE, DESC_XML, DATE_START)
      Values
-       ('73X', 'select EKP  -- Код показателя
-        , KU                -- Код области
-        , R030              -- Валюта
-        , sum(T100) as T100 -- Значение параметра
-    from NBUR_LOG_F73X t
+       ('73X', 'select substr(field_code, 1, 6) as EKP  -- Код показателя
+        , ltrim(t.nbuc, ''0'') as KU          -- Код области
+        , substr(field_code, 7, 3) as R030 -- Валюта
+        , field_value as T100              -- Значение параметра
+    from NBUR_AGG_PROTOCOLS t
     where report_date = :p_rpt_dt           -- Дата отчета
-      and kf = :p_kf
-      and ekp not in (''A73000'', ''XXXXXX'') 
-    group by ekp, ku, r030  ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+      and kf = :p_kf                        -- Филиал
+      and report_code = ''73X''', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
     COMMIT;
 end;
 /

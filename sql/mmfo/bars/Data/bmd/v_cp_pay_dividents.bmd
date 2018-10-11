@@ -122,19 +122,71 @@ begin
   bars_metabase.add_column(l_tabid, 1, 'REF', 'N', 'REF~угоди', 2, null, 1, 0, 1, 0, 0, '', '', 0, 1, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 2, 'ND', 'C', '№ ~угоди', 2, null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 3, 'DATD', 'D', 'Дата~угоди', 2, null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Вн.№ ~ЦП', 2.5, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'CP_ID', 'C', 'Зовн.№ ~ЦП', 2.5, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'NLSRD', 'C', 'Рахунок ~дивідентів', 2.5, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'ID', 'N', 'Вн.№ ~ЦП', 2, null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'CP_ID', 'C', 'Зовн.№ ~ЦП', 2, null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'NAZN', 'C', 'Призначення ~платежу', 5, null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'SUM', 'N', 'Сума нарахованих ~дивідентів', 2, null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'SUM_TAX', 'N', 'Вкажіть ~суму утриманого ~податку', 2, null, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'SUM_COMIS_TRANSF', 'N', 'Вкажіть ~суму комісії ~переводу', 2, null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,10, 'SUM_COMIS_CUSTODY', 'N', 'Вкажіть ~суму комісії ~зберігача', 2, null,10, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid,11, 'CERTIFICATE', 'N', 'Надана довідка', 1, null,7, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+
+  -- добавляем описание сложного поля
+  l_newtabid := bars_metabase.get_tabid('V_CP_PAY_DIVIDENTS_CERTIF');
+  l_newcolid := bars_metabase.get_colid(l_newtabid, 'ID');
+  if (l_newtabid is not null and l_newcolid is not null) then
+    bars_metabase.add_extrnval(l_tabid, 11, l_newtabid, l_newcolid, '', '', '', '');
+  else
+    dbms_output.put_line('В БМД не описана таблица V_CP_PAY_DIVIDENTS_CERTIF для описания сложного поля таблицы V_CP_PAY_DIVIDENTS.');
+  end if;
+
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Виконати проводки по нарахуванню', 'value_paper.make_oper_cp_pay_dividends(:REF, :SUM, :NAZN, :NLSRD_6)', '', 'EACH', 'Виконати проводки по виплаті?', 'Виконано', '', '', '', null);
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Виконати проводки по нарахуванню', 'value_paper.make_oper_cp_pay_dividends(:REF, :NAZN, :SUM, :SUM_TAX, :SUM_COMIS_TRANSF, :SUM_COMIS_CUSTODY, :CERTIFICATE)', '', 'EACH', 'Виконати проводки по виплаті?', 'Виконано', '', '', '', null);
 
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'value_paper.change_pay_dividends_prepare(:REF,:SUM,:NAZN)');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'value_paper.change_pay_dividends_prepare(:REF, :CERTIFICATE, :SUM, :SUM_TAX, :SUM_COMIS_TRANSF, :SUM_COMIS_CUSTODY,:NAZN)');
+
+   -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'CERTIFICATE');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 1, l_newcolid, ':CERTIFICATE is null', 2, 'COLOR_Red', 'Невказано про надання довідки');
+  end if;
+
+   -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'SUM');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 2, l_newcolid, '(:SUM is null or SUM<=0)', 1, 'COLOR_Red', 'Невказана сума нарахованих дивідентів');
+  end if;
+
+   -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'SUM');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 3, l_newcolid, '(:SUM is null or SUM<=0)', 2, 'COLOR_Yellow');
+  end if;
+
+
+   -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'SUM_TAX');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 4, l_newcolid, ':SUM_TAX is null', 2, 'COLOR_Yellow', 'Невказана сума');
+  end if;
+
+   -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'SUM_COMIS_CUSTODY');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 5, l_newcolid, ':SUM_COMIS_CUSTODY is null', 2, 'COLOR_Yellow', 'Невказана сума');
+  end if;
+
+   -- добавляем описание раскраски
+  l_newcolid := bars_metabase.get_colid(l_tabid, 'SUM_COMIS_TRANSF');
+  if (l_newcolid is not null) then
+    bars_metabase.add_tblcolor(l_tabid, 6, l_newcolid, ':SUM_COMIS_TRANSF is null', 2, 'COLOR_Yellow', 'Невказана сума');
+  end if;
 
 
   -- восстанавливаем ссылки сложных полей других таблиц

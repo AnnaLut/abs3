@@ -69,9 +69,16 @@ namespace Bars.Web.Print
                             return;
                         }
                         //Response.AddHeader("Content-Disposition", "inline;filename=Contract"+fileExtention);
-                        Response.AddHeader("Content-Disposition", "attachment;filename=Contract" + fileExtention);
-                        //Response.ContentType = "application/octet-stream";
-                        Response.ContentType = mimeType;
+                        if (!isRtf)
+                        {
+                            Response.AddHeader("Content-Disposition", "attachment;filename=Contract" + fileExtention);
+                            Response.ContentType = mimeType;
+                        }
+                        else
+                        {
+                            Response.AddHeader("Content-Disposition", "inline;filename=Contract.rtf");
+                            Response.ContentType = "application/octet-stream";
+                        }
                     }
                     else
                     {

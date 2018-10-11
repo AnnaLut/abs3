@@ -96,6 +96,42 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+begin
+  execute immediate '
+alter table OW_SALARY_DATA add (
+  addr1_city_type     NUMBER(22),  
+  addr2_city_type     NUMBER(22)
+  )
+';
+exception when others then       
+  if sqlcode=-01430 then null; else raise; end if; 
+
+end ;
+/
+begin
+  execute immediate ' alter table ow_salary_data drop column addr1_flat'; 
+exception when others then       
+  if sqlcode=-00904 then null; else raise; end if;   
+end;
+/
+begin
+  execute immediate ' alter table ow_salary_data drop column addr2_flat'; 
+exception when others then       
+  if sqlcode=-00904 then null; else raise; end if; 
+end;
+/
+
+begin
+  execute immediate '
+alter table OW_SALARY_DATA add (
+  addr1_flat          VARCHAR2(100 CHAR),
+  addr2_flat          VARCHAR2(100 CHAR)
+  )
+';
+exception when others then       
+  if sqlcode=-01430 then null; else raise; end if; 
+end ;
+/
 
 
 
@@ -129,16 +165,16 @@ COMMENT ON COLUMN BARS.OW_SALARY_DATA.EMAIL IS '';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.ENG_FIRST_NAME IS '';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.ENG_LAST_NAME IS '';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.MNAME IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_CITYNAME IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_PCODE IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_DOMAIN IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_REGION IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_STREET IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_CITYNAME IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_PCODE IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_DOMAIN IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_REGION IS '';
-COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_STREET IS '';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_CITYNAME IS 'Місто (прописки/реєстрації)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_PCODE IS 'Індекс (прописки/реєстрації)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_DOMAIN IS 'Область (прописки/реєстрації)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_REGION IS 'Район (прописки/реєстрації)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR1_STREET IS 'Вулиця, будинок, квартира (прописки/реєстрації)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_CITYNAME IS 'Місто (проживання)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_PCODE IS 'Індекс (проживання)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_DOMAIN IS 'Область (проживання)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_REGION IS 'Район (проживання)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.ADDR2_STREET IS 'Вулиця, будинок, квартира (проживання)';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.WORK IS '';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.OFFICE IS '';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.DATE_W IS '';
@@ -166,8 +202,11 @@ COMMENT ON COLUMN BARS.OW_SALARY_DATA.KK_APARTMENT IS 'Номер будинку (та квартир
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.KK_POSTCODE IS 'Поштовий індекс';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.KK_PHOTO_DATA IS 'Фото клієнта для КК';
 COMMENT ON COLUMN BARS.OW_SALARY_DATA.MAX_TERM IS 'Срок действия карты в месяцах';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.addr1_flat IS 'Квартира (прописки)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.addr2_flat IS 'Квартира (проживання)';
+COMMENT ON COLUMN BARS.OW_SALARY_DATA.addr1_city_type IS 'Тип населенного пункту (прописки)';
 
-
+                        
 
 
 PROMPT *** Create  constraint CC_OWSALARYDATA_FLAGOPEN ***

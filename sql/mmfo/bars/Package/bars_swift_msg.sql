@@ -399,6 +399,7 @@ IS
       RETURN VARCHAR2;
 END bars_swift_msg;
 /
+
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
    VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.61 04.10.2018';

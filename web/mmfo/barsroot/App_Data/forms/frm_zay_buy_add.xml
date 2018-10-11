@@ -51,7 +51,8 @@
         <button caption="Файли заявки" hint="Завантаження файлів заявки з CorpLight" id="btnDownloadFiles" type="Image" imagename="disk_blue">
           <command type="Redirect" url="/barsroot/cim/payments/zay_files_download.aspx" target="Blank" >
             <parameters>
-              <parameter type="DataField" name="ID" altname="ID" ></parameter>
+              <parameter type="DataField" name="ID" altname="ID" />
+              <parmeter type="DataField" name="FNAMEKB" altname="FNAMEKB"/>
             </parameters>
           </command>
         </button>

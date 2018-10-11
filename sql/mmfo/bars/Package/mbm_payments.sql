@@ -1154,7 +1154,14 @@ end add_dop_req;
                                   p_id_b oper.id_b%type) return smallint is
     begin
 
-       return 0;
+       return sdo_autopay_check_cl(p_nlsa,
+                                   p_mfoa,
+                                   p_nlsb,
+                                   p_mfob,
+                                   p_s,
+                                   p_nazn,
+                                   p_id_a,
+                                   p_id_b);
     end;
 
     procedure set_payment_payed(p_ref oper.ref%type) is

@@ -1,0 +1,1796 @@
+...
+...
+... loading params
+...
+...
+... connecting as bars
+...
+Connected.
+...
+... invalid objects before install
+...
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           NBS_OB22_NLS_RNK               FUNCTION
+BARS                           IB_STOP_2603                   FUNCTION
+BARS                           GET_INT_BUF_HEX                FUNCTION
+BARS                           GETNEXTVISAGROUP               FUNCTION
+BARS                           F_TARIF_RKO                    FUNCTION
+BARS                           F_REP_5009                     FUNCTION
+BARS                           CHECK_TIME_VISA                FUNCTION
+BARS                           F_CP_HIERARCHY_INT_REF         FUNCTION
+BARS                           F_CP_HIERARCHY_INT             FUNCTION
+BARS                           F_CP_HIERARCHY_ALL_INT_REF     FUNCTION
+BARS                           F_CP_HIERARCHY_ALL_INT         FUNCTION
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           F_BLK_VAL_CORP                 FUNCTION
+BARS                           F_GET_REZ_KAT                  FUNCTION
+BARS                           EDS_UTL                        PACKAGE BODY
+BARS                           OW_FILES_PROC                  PACKAGE BODY
+BARS                           SMB_DEPOSIT_UTL                PACKAGE BODY
+BARS                           ELT                            PACKAGE BODY
+BARS                           BARS_DBO                       PACKAGE BODY
+BARS                           SGN_MGR                        PACKAGE BODY
+BARS                           EK                             PACKAGE BODY
+BARS                           RS                             PACKAGE BODY
+BARS                           RKO                            PACKAGE BODY
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           MBK                            PACKAGE BODY
+BARS                           XRM_INTG_CASHDESK              PACKAGE BODY
+BARS                           XRM_INTEGRATION_OE             PACKAGE BODY
+BARS                           REZ1                           PACKAGE BODY
+BARS                           XOZ                            PACKAGE BODY
+BARS                           EAD_INTEGRATION                PACKAGE BODY
+BARS                           REZ                            PACKAGE BODY
+BARS                           BARS_SMS_CLEARANCE             PACKAGE BODY
+BARS                           OVRN                           PACKAGE BODY
+BARS                           WEB_IMPEXP                     PACKAGE BODY
+BARS                           CP_REP_DGP                     PACKAGE BODY
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           KFILE_SYNC                     PACKAGE BODY
+BARS                           CP_REP                         PACKAGE BODY
+BARS                           KFILE_PACK                     PACKAGE BODY
+BARS                           CP_KB                          PACKAGE BODY
+BARS                           KASZ_W                         PACKAGE BODY
+BARS                           CCK                            PACKAGE BODY
+BARS                           WCS_REGISTER                   PACKAGE BODY
+BARS                           DPU                            PACKAGE BODY
+BARS                           CA_COMPEN                      PACKAGE BODY
+BARS                           PRVN_FLOW                      PACKAGE BODY
+BARS                           PRIOCOM_USER                   PACKAGE BODY
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           NBU_601_REQUEST_DATA_RU        PACKAGE BODY
+BARS                           VAL_SERVICE                    PACKAGE BODY
+BARS                           GERC_PAYMENTS                  PACKAGE BODY
+BARS                           NBU_601_FORMED_XML             PACKAGE BODY
+BARS                           NBUR_XML                       PACKAGE BODY
+BARS                           PKG_SW_COMPARE                 PACKAGE BODY
+BARS                           CIM_MGR                        PACKAGE BODY
+BARS                           FM_UTL                         PACKAGE BODY
+BARS                           NBUR_OBJECTS                   PACKAGE BODY
+BARS                           BARS_OWCRV                     PACKAGE BODY
+BARS                           MGR_OSCHAD                     PACKAGE BODY
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           PFU_RU_FILE_UTL                PACKAGE BODY
+BARS                           DPT_WEB                        PACKAGE BODY
+BARS                           PFU_PAYS                       PACKAGE BODY
+BARS                           NAEK                           PACKAGE BODY
+BARS                           MGR_COMMERC3                   PACKAGE BODY
+BARS                           BARS_XMLKLB_IMP                PACKAGE BODY
+BARS                           PACK_NU                        PACKAGE BODY
+BARS                           MGR_COMMERC2                   PACKAGE BODY
+BARS                           Z23                            PACKAGE BODY
+BARS                           BARS_XMLKLB                    PACKAGE BODY
+BARS                           DPT_SOCIAL                     PACKAGE BODY
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           MGR_COMMERC                    PACKAGE BODY
+BARS                           STO_PAYMENT_UTL                PACKAGE BODY
+BARS                           CCK_DPK                        PACKAGE BODY
+BARS                           MSP_PAYS                       PACKAGE BODY
+BARS                           Z2014                          PACKAGE BODY
+BARS                           MBM_PAYMENTS                   PACKAGE BODY
+BARS                           ESCR                           PACKAGE BODY
+BARS                           EDS_INTG                       PACKAGE BODY
+BARS                           NBUR_P_F3AX_NC                 PROCEDURE
+BARS                           W4_FORMFILE_IIC                PROCEDURE
+BARS                           VISA_SSR                       PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           VISA_BATCH_OW6                 PROCEDURE
+BARS                           UT2                            PROCEDURE
+BARS                           TIPA                           PROCEDURE
+BARS                           SBB_SPEC                       PROCEDURE
+BARS                           RKO335                         PROCEDURE
+BARS                           REZ_CR_MANUALLY                PROCEDURE
+BARS                           REZ_351_BLOCK                  PROCEDURE
+BARS                           REZERV_23_F                    PROCEDURE
+BARS                           REZERV_23                      PROCEDURE
+BARS                           RET_PAY                        PROCEDURE
+BARS                           P_REZ_KPZ                      PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_REP_PROVOD_OPL               PROCEDURE
+BARS                           P_REE_CHECKS_SALBUY            PROCEDURE
+BARS                           P_RECONSILATION_KWT            PROCEDURE
+BARS                           P_PVZ                          PROCEDURE
+BARS                           P_POSITIONER                   PROCEDURE
+BARS                           P_PAR_23                       PROCEDURE
+BARS                           P_OB22NU_AUTO                  PROCEDURE
+BARS                           P_OB22NU_A                     PROCEDURE
+BARS                           P_NBU23_CR_DP                  PROCEDURE
+BARS                           P_NBU23_CR                     PROCEDURE
+BARS                           P_NBU23_ARC                    PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_LICSBB                       PROCEDURE
+BARS                           P_LIC26_KFILE_MMFO             PROCEDURE
+BARS                           P_LIC26_KFILE                  PROCEDURE
+BARS                           P_LIC26                        PROCEDURE
+BARS                           P_ISTVAL                       PROCEDURE
+BARS                           P_INV_CCK_FL_23                PROCEDURE
+BARS                           P_INS_NLO_351_1414             PROCEDURE
+BARS                           P_INS_NLO_351                  PROCEDURE
+BARS                           P_FXK_U                        PROCEDURE
+BARS                           P_FXK_SPOT                     PROCEDURE
+BARS                           P_FXK                          PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_FOREX_NETTING                PROCEDURE
+BARS                           P_FM_UNBLOCK                   PROCEDURE
+BARS                           P_FF8                          PROCEDURE
+BARS                           P_FD8_NN                       PROCEDURE
+BARS                           P_FD8_NG                       PROCEDURE
+BARS                           P_FD8_NC                       PROCEDURE
+BARS                           P_FD5_NN                       PROCEDURE
+BARS                           P_FD5_NG                       PROCEDURE
+BARS                           P_FD5_NC                       PROCEDURE
+BARS                           P_FC5                          PROCEDURE
+BARS                           P_FA7_NN                       PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_F84                          PROCEDURE
+BARS                           P_F78_NN                       PROCEDURE
+BARS                           P_F78_NG                       PROCEDURE
+BARS                           P_F78_NC                       PROCEDURE
+BARS                           P_F77SB                        PROCEDURE
+BARS                           P_F6B_NN                       PROCEDURE
+BARS                           P_F6B_ND                       PROCEDURE
+BARS                           P_F6B_NC                       PROCEDURE
+BARS                           P_F4A                          PROCEDURE
+BARS                           P_F3V_NN                       PROCEDURE
+BARS                           P_F3V_NG                       PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_F3V_NC                       PROCEDURE
+BARS                           P_F3D_NN                       PROCEDURE
+BARS                           P_F3B_NN                       PROCEDURE
+BARS                           P_F3B_NG                       PROCEDURE
+BARS                           P_F3B_NC                       PROCEDURE
+BARS                           P_F30                          PROCEDURE
+BARS                           P_F26                          PROCEDURE
+BARS                           P_F1B                          PROCEDURE
+BARS                           P_F11_NN                       PROCEDURE
+BARS                           P_EAD_PD_LGD                   PROCEDURE
+BARS                           P_DOC_MAKET                    PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_DEB_HOZ                      PROCEDURE
+BARS                           P_DEB_FIN                      PROCEDURE
+BARS                           P_CP_TAKEOUT                   PROCEDURE
+BARS                           P_CP_LEVELS_IDS                PROCEDURE
+BARS                           P_CP_EXPIRY                    PROCEDURE
+BARS                           P_CONTRACT_REF                 PROCEDURE
+BARS                           P_CONTRACT_JRNL_UNI            PROCEDURE
+BARS                           P_BACK_WEB                     PROCEDURE
+BARS                           P_AUTO_PAYOUT_INT_PLAN         PROCEDURE
+BARS                           P_ACC_D30                      PROCEDURE
+BARS                           P_2400_NBS                     PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           P_2400_23_NBS                  PROCEDURE
+BARS                           P_2400_23                      PROCEDURE
+BARS                           P_2400                         PROCEDURE
+BARS                           PVZ                            PROCEDURE
+BARS                           PK_2600                        PROCEDURE
+BARS                           PAY_DATE                       PROCEDURE
+BARS                           PAY_23_OB22_NBS                PROCEDURE
+BARS                           PAY_23_OB22                    PROCEDURE
+BARS                           PAY_23_NBS                     PROCEDURE
+BARS                           PAY_23                         PROCEDURE
+BARS                           OVER_351                       PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           NBU_2017_01_ARC                PROCEDURE
+BARS                           NBU_2017_01                    PROCEDURE
+BARS                           NBUR_P_I77_NC                  PROCEDURE
+BARS                           NBUR_P_FF8_NC                  PROCEDURE
+BARS                           NBUR_P_FD8_NC                  PROCEDURE
+BARS                           NBUR_P_FD5_NC                  PROCEDURE
+BARS                           NBUR_P_FC5_NC                  PROCEDURE
+BARS                           NBUR_P_FA7_NC                  PROCEDURE
+BARS                           NBUR_P_F84_NC                  PROCEDURE
+BARS                           NBUR_P_F78_NC                  PROCEDURE
+BARS                           NBUR_P_F6B_NC                  PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           NBUR_P_F3V_NC                  PROCEDURE
+BARS                           NBUR_P_F3D_NC                  PROCEDURE
+BARS                           NBUR_P_F3B_NC                  PROCEDURE
+BARS                           NBUR_P_F30_NC                  PROCEDURE
+BARS                           NBUR_P_F26_NC                  PROCEDURE
+BARS                           NBUR_P_F12                     PROCEDURE
+BARS                           NBUR_P_F11_NC                  PROCEDURE
+BARS                           MGR_BRATES                     PROCEDURE
+BARS                           KONTROL2                       PROCEDURE
+BARS                           IRR0                           PROCEDURE
+BARS                           GETVISASIGNATTRIBUTE           PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           GAP_JOB                        PROCEDURE
+BARS                           FINREZ_SB                      PROCEDURE
+BARS                           EQV_DDD                        PROCEDURE
+BARS                           DPT_EXECUTE_JOB                PROCEDURE
+BARS                           DPT_159                        PROCEDURE
+BARS                           CR                             PROCEDURE
+BARS                           CP_ZV_D                        PROCEDURE
+BARS                           CP_ZV8N                        PROCEDURE
+BARS                           CP_ZV8K                        PROCEDURE
+BARS                           CP_ZV8                         PROCEDURE
+BARS                           CP_UCENKA                      PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           CP_REZERV                      PROCEDURE
+BARS                           CP_PEREOC_P                    PROCEDURE
+BARS                           CP_OBU8                        PROCEDURE
+BARS                           CP_OBU7                        PROCEDURE
+BARS                           CP_OBU                         PROCEDURE
+BARS                           CP_KALENDAR                    PROCEDURE
+BARS                           CP_IRR                         PROCEDURE
+BARS                           CP_EXP_ALL                     PROCEDURE
+BARS                           CCK_351                        PROCEDURE
+BARS                           BL_RRP_26                      PROCEDURE
+BARS                           BL_RRP_22                      PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           BL_RRP_21                      PROCEDURE
+BARS                           BL_RRP_13                      PROCEDURE
+BARS                           BL_RRP_11                      PROCEDURE
+BARS                           BL_RRP_07                      PROCEDURE
+BARS                           BL_RRP_06                      PROCEDURE
+BARS                           BL_RRP_03                      PROCEDURE
+BARS                           BL_RRP_02                      PROCEDURE
+BARS                           BL_RRP_01                      PROCEDURE
+BARS                           AUTO_MAKE_INT_MONTHLY_OPT      PROCEDURE
+BARS                           ANI_AUTO                       PROCEDURE
+BARS                           ANI4_BU_EX                     PROCEDURE
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           ANI4_BU                        PROCEDURE
+BARS                           ANI                            PROCEDURE
+BARS                           AFTER_PAY_NOS                  PROCEDURE
+BARS                           ADD_CL_CLIENT                  PROCEDURE
+BARS                           ACCD_2604                      PROCEDURE
+BARS                           TIUD_VSTOGROUPS                TRIGGER
+BARS                           TU_PROVNU_PO3                  TRIGGER
+BARS                           TU_PROVNU_PO1                  TRIGGER
+BARS                           TI_CHKLIST_HEX                 TRIGGER
+BARS                           V_DPRM_CONTRACT_HISTORY        VIEW
+BARS                           V_OZNAKA_351                   VIEW
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           V_OB_CORPORATION_NBS_REPORT    VIEW
+BARS                           V_OB_CORP_SALDO_DOCS           VIEW
+BARS                           V_OPER_USERKL                  VIEW
+BARS                           V_USER_SELFVISA_DOCS           VIEW
+BARS                           V_VISALIST                     VIEW
+BARS                           V_USER_VISA                    VIEW
+BARS                           V_USER_VISA_DOCS               VIEW
+BARS                           V_SW_USER_VISA                 VIEW
+BARS                           V_SW_USER_VISA_MSG             VIEW
+BARS                           V_USER_TOBO_DOCS               VIEW
+BARS                           V_STOGROUPS                    VIEW
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           CORP_CLIENT                    VIEW
+BARS                           V_OB22NU_REF_FO                VIEW
+BARS                           V_OB22NU_REF_81                VIEW
+BARS                           V_USER_SUBTOBO_DOCS            VIEW
+BARS                           V_OBPC_PFILES_FORM             VIEW
+BARS                           V_PF_ACCOUNTS                  VIEW
+BARS                           V_CORP_ACCOUNTS                VIEW
+BARS                           V_DOKTIME                      VIEW
+BARS                           V_RPTLIC2                      VIEW
+BARS                           V_VISALIST_XRM                 VIEW
+BARS                           V_CURRENT_ACCOUNTS_INTEREST    VIEW
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           V_INTEREST_TO_PAYMENT          VIEW
+BARS                           V_INTEREST_TO_ACCRUAL          VIEW
+BARS                           V_MBM_INCOMING_DOC             VIEW
+BARS                           V_MBM_DOCUMENTS                VIEW
+BARS                           V_KASM                         VIEW
+BARS                           V_CP_PREPARE                   VIEW
+BARS                           V_STO_PAYMENT_REPORT           VIEW
+BARS                           V_OPER_TIMEOPL_KT              VIEW
+BARS                           V_FM_FINMON_QUE                VIEW
+BARS                           V_FM_FUNC_OPER                 VIEW
+BARS                           V_OPER_TIMEOPL                 VIEW
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+BARS                           V_RPTLIC3                      VIEW
+BARS_DM                        DM_IMPORT                      PACKAGE BODY
+MSP                            V_MSP_ENCRYPT_ENVELOPE         VIEW
+MSP                            V_MSP_SIGN_FILE                VIEW
+MSP                            V_MSP_REC_BLOCK_FM             VIEW
+NBU_GATEWAY                    NBU_CORE_SERVICE               PACKAGE BODY
+NBU_GATEWAY                    NBU_OBJECT_UTL                 PACKAGE BODY
+NBU_GATEWAY                    T_CORE_LOAN                    TYPE BODY
+NBU_GATEWAY                    T_NBU_RESPONSE_PAYLOAD         TYPE BODY
+NBU_GATEWAY                    T_NBU_RESPONSE                 TYPE BODY
+NBU_GATEWAY                    V_NBU_SESSION_TO_SIGN          VIEW
+
+OWNER                          OBJECT_NAME                    OBJECT_TYPE
+------------------------------ ------------------------------ -------------------
+PFU                            PFU_SYNC_RU                    PACKAGE BODY
+PFU                            PFU_FILES_UTL                  PACKAGE BODY
+PFU                            PFU_SERVICE_UTL                PACKAGE BODY
+PFU                            PFU_EPP_UTL                    PACKAGE BODY
+PFU                            DOWNLOAD                       PROCEDURE
+PFU                            V_PFU_PENSACC                  VIEW
+PFU                            V_PFU_ERR_RECORD               VIEW
+PFU                            V_PFU_REC_BLOCK_FM             VIEW
+PFU                            V_PFU_PENSIONER                VIEW
+
+284 rows selected.
+
+Elapsed: 00:00:00.56
+...
+... loading params
+...
+...
+... connecting as bars
+Connected.
+...
+... loading params
+...
+...
+... connecting as bars
+Connected.
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/Table/IBANK_ACC.sql =========*** Run *** =
+=====================================================================================
+*** Create  table IBANK_ACC ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+*** Create  constraint CC_IBANKACC_KF_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  constraint CC_IBANKACC_ACC_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+*** Create  constraint FK_IBANKACC_BANKS ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  index PK_IBANKACC ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.00
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/Table/IBANK_ACC.sql =========*** End *** =
+=====================================================================================
+SP2-0310: unable to open file "mmfo\barsaq\Script\ibank_acc_grant.sql"
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/package/rpc_sync.sql =========*** Run ***
+=====================================================================================
+
+Package created.
+
+Elapsed: 00:00:00.00
+
+Package body created.
+
+Elapsed: 00:00:00.01
+No errors.
+*** Create  grants  RPC_SYNC ***
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/package/rpc_sync.sql =========*** End ***
+=====================================================================================
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** Run *
+=====================================================================================
+
+Package created.
+
+Elapsed: 00:00:00.00
+
+Package body created.
+
+Elapsed: 00:00:02.49
+No errors.
+*** Create  grants  DATA_IMPORT ***
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** End *
+=====================================================================================
+...
+... loading params
+...
+...
+... connecting as bars
+Connected.
+
+0 rows updated.
+
+Elapsed: 00:00:00.02
+
+0 rows updated.
+
+Elapsed: 00:00:00.02
+
+0 rows updated.
+
+Elapsed: 00:00:00.02
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.04
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+Grant succeeded.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.02
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.02
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+View created.
+
+Elapsed: 00:00:00.10
+
+View created.
+
+Elapsed: 00:00:00.03
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+@mmfo\bars\Data\error\mod_doc.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/Bars/Data/Err/mod_DOC.sql =========*** Run *** ==
+=====================================================================================
+*** Create/replace ERR модуль DOC ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.21
+=====================================================================================
+*** End *** ========== Scripts /Sql/Bars/Data/Err/mod_DOC.sql =========*** Run *** ==
+=====================================================================================
+@mmfo\bars\Table\sdo_autopay_rules.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/Table/sdo_autopay_rules.sql =========*** Run *** =====
+=====================================================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  table sdo_autopay_rules ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.02
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/Table/TR_QT.sql =========*** End *** =====
+=====================================================================================
+@mmfo\bars\Table\sdo_autopay_rules_fields.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/Table/sdo_autopay_rules_fields.sql =========*** Run *** =====
+=====================================================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  table sdo_autopay_rules_fields ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+Comment created.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+@mmfo\bars\Table\sdo_autopay_rules_desc.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/Table/sdo_autopay_rules_desc.sql =========*** Run *** =====
+=====================================================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+*** Create  table sdo_autopay_rules_desc ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.06
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/Table/TR_QT.sql =========*** End *** =====
+=====================================================================================
+@mmfo\bars\Function\sdo_autopay_check_corp2.sql
+
+Function created.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+@mmfo\bars\Script\insert_sdo_auto_rules.sql
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Commit complete.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+@mmfo\bars\Grant\grant_barsaq.sql
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+
+Package created.
+
+Elapsed: 00:00:00.01
+
+Package body created.
+
+Elapsed: 00:00:00.01
+No errors.
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARS/package/bars_xmlklb.sql =========*** End ***
+=====================================================================================
+@mmfo\bars\Data\bmd\sdo_autopay_rules.sql
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+@mmfo\bars\Data\bmd\sdo_autopay_rules_desc.sql
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.06
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+@mmfo\bars\Data\bmd\sdo_autopay_rules_fields.sql
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.04
+
+Commit complete.
+
+Elapsed: 00:00:00.01
+@mmfo\bars\Script\add_sdo_function.sql
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.15
+...
+... loading params
+...
+...
+... connecting as bars
+Connected.
+@mmfo\barsaq\Table\doc_import.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/Table/DOC_IMPORT.sql =========*** Run ***
+=====================================================================================
+*** Create  table DOC_IMPORT ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.02
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.02
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.02
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.08
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+Comment created.
+
+Elapsed: 00:00:00.04
+
+Comment created.
+
+Elapsed: 00:00:00.03
+
+Comment created.
+
+Elapsed: 00:00:00.04
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+*** Create  constraint CC_DOCIMPORT_VRFL ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+*** Create  constraint CC_DOCIMPORT_CFFL ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+*** Create  constraint CC_DOCIMPORT_BKFL ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+*** Create  constraint CC_DOCIMPORT_RMFL ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint PK_DOCIMPORT ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_NOTIFFLAG_CC ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_EXTREF_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_TT_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_DK_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.04
+*** Create  constraint CC_DOCIMPORT_KV_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_S_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+*** Create  constraint CC_DOCIMPORT_MFOA_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_NAMA_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+*** Create  constraint CC_DOCIMPORT_NLSA_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+*** Create  constraint CC_DOCIMPORT_IDA_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.04
+*** Create  constraint CC_DOCIMPORT_MFOB_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_NAMB_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+*** Create  constraint CC_DOCIMPORT_NLSB_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_IDB_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_NAZN_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_USERID_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  constraint CC_DOCIMPORT_INSDATE_NN ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.02
+*** Create  index I_DOCIMPORT_PAY ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+*** Create  index I_DOCIMPORT_NOTIFREQ ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  index PK_DOCIMPORT ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  index I_DOCIMPORT_RM ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  index I_DOCIMPORT_INSDATE ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+*** Create  index I_DOCIMPORT_REF ***
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+Comment created.
+
+Elapsed: 00:00:00.01
+*** Create  grants  DOC_IMPORT ***
+
+Grant succeeded.
+
+Elapsed: 00:00:00.04
+
+Grant succeeded.
+
+Elapsed: 00:00:00.06
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+*** Create SYNONYM  to DOC_IMPORT ***
+
+Synonym created.
+
+Elapsed: 00:00:00.01
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/Table/DOC_IMPORT.sql =========*** End ***
+=====================================================================================
+@mmfo\barsaq\Package\bars_docsync.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/package/bars_docsync.sql =========*** Run
+=====================================================================================
+
+Package created.
+
+Elapsed: 00:00:00.01
+
+Package body created.
+
+Elapsed: 00:00:00.01
+No errors.
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/package/bars_docsync.sql =========*** End
+=====================================================================================
+@mmfo\barsaq\Package\data_import.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** Run *
+=====================================================================================
+
+Package created.
+
+Elapsed: 00:00:00.00
+
+Package body created.
+
+Elapsed: 00:00:00.03
+No errors.
+*** Create  grants  DATA_IMPORT ***
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/package/data_import.sql =========*** End *
+=====================================================================================
+@mmfo\barsaq\View\v_doc_import_auto.sql
+=====================================================================================
+*** Run *** ========== Scripts /Sql/BARSAQ/View/V_DOC_IMPORT_AUTO.sql =========*** Run ***
+=====================================================================================
+
+View created.
+
+Elapsed: 00:00:00.03
+=====================================================================================
+*** End *** ========== Scripts /Sql/BARSAQ/View/V_DOC_IMPORT.sql =========*** End ***
+=====================================================================================
+
+Comment created.
+
+Elapsed: 00:00:00.01
+
+Grant succeeded.
+
+Elapsed: 00:00:00.01

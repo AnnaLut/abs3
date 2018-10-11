@@ -4,7 +4,7 @@ is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 5.0.5 21/08/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
+    g_header_version  constant varchar2(64)  := 'version 5.0.6 04/09/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -256,7 +256,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
  is
 
 
-    g_body_version constant varchar2(64) := 'Version 5.0.5 21/08/2018';--+2620БПК.+gcif
+    g_body_version constant varchar2(64) := 'Version 5.0.6 04/09/2018';--+2620БПК.+gcif
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
     -- BARS_INTGR - integration (changenumber by object / KF)
@@ -691,7 +691,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                      es003,
                                      vidd_custtype,
                                      ob22,
-                                     nms)
+                                     nms,
+									 nls)
             select  s_credits.nextval,
                     :l_per_id,
                     ccd.nd,
@@ -755,7 +756,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                          and kf = ccd.kf) as ES003,
                       case when (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') then 2 else ccv.custtype end as vidd_custtype, -- #COBUSUPABS-6567
                       main_acc.ob22,
-                      main_acc.nms
+                      main_acc.nms,
+					  a_acc.nls
             from bars.cc_deal ccd
             join bars.customer c on ccd.rnk = c.rnk
             join bars.cc_vidd ccv on ccd.vidd = ccv.vidd
@@ -800,7 +802,10 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
              where a.tip = 'SS'
              group by na.kf, na.nd
             ) MAIN_ACC on ccd.kf = main_acc.kf and ccd.nd = main_acc.nd
+			left join bars.nd_acc nd_acc on ccd.nd = nd_acc.nd and nd_acc.kf = ccd.kf
+            left join bars.accounts a_acc on a_acc.acc = nd_acc.acc  and a_acc.kf = nd_acc.kf
             where c.CUSTTYPE in (2, 3) and ccd.vidd in (1, 2, 3, 11, 12, 13)
+			  and (a_acc.tip = 'SG ' or a_acc.nbs in ('2620','2625','2600'))
             -- and not (C.ise in ('14100', '14200', '14101','14201') and C.sed ='91') --фильтруем ФОПов -- 20.03.2017  COBUSUPABS-5659
             LOG ERRORS into ERR$_CREDITS_STAT ('STANDARD') reject limit unlimited
             ]' using l_per_id, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat;
@@ -853,7 +858,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
                                      es003,
                                      vidd_custtype,
                                      ob22,
-                                     nms)
+                                     nms,
+									 nls)
             with cur as
             (select ba.nd, ba.acc_pk, ba.acc_ovr, ba.acc_2208, c.rnk, a.branch, a.kf, a.nbs, a.ob22, a.daos, a.dazs, a.kv, c.okpo,
                                            aa.lim, aa.nls nls2625, aa.daos daos2625, AA.DAZS dazs2625, a.ostc ost_ovr, A9129.OSTC ost_9129, a9129.daos daos9129,
@@ -933,7 +939,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
              and kf = cur.kf) as ES003,
             3 as vidd_custtype, -- хардкод по #COBUSUPABS-6567
             main_acc.ob22,
-            main_acc.nms
+            main_acc.nms,
+			main_nls.nls
             from cur
             left join
             (select acc, nvl(to_number(aw.value), 0) as bpk_term
@@ -949,6 +956,14 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
              where a.tip = 'SS'
              group by na.kf, na.nd
             ) MAIN_ACC on cur.kf = main_acc.kf and cur.nd = main_acc.nd
+			 left join 
+            (select na.kf,
+                    na.nd,
+                    a.nls
+             from bars.nd_acc na
+             join bars.accounts a on na.kf = a.kf and na.acc = a.acc
+             where (a.tip = 'SG ' or a.nbs in ('2620','2625','2600'))
+            ) MAIN_NLS on cur.kf = main_nls.kf and cur.nd = main_nls.nd 
             LOG ERRORS into ERR$_CREDITS_STAT ('BPK') reject limit unlimited
             ]' using l_per_id, p_dat, p_dat, p_dat, p_dat, p_dat;
 

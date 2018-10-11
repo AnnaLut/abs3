@@ -330,7 +330,7 @@ CIM.contract_module = function () {
 
         diag.find(disabledLinks.join(",")).attr("disabled", "disabled").addClass("ui-state-disabled").css("text-decoration", "none");
         // если в режиме выбора - то прячем все
-        if (isSelectMode)
+        if (isSelectMode) 
             diag.find('a[id*="ln"]').hide();
         diag.dialog('open');
     }

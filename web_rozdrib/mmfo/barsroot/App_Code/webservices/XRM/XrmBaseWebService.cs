@@ -1,6 +1,7 @@
 ﻿using System;
 using Oracle.DataAccess.Client;
 using Bars.WebServices.XRM.Models;
+using System.Collections.Generic;
 
 namespace Bars.WebServices.XRM.Services
 {
@@ -22,7 +23,9 @@ namespace Bars.WebServices.XRM.Services
         }
         #endregion
 
-        protected Resp ExecuteMethod<Resp, Req>(Req Request, Func<OracleConnection, Req, Resp> method, bool checkTransaction = true) where Resp : IResponse, new() where Req : IRequest
+        protected Resp ExecuteMethod<Resp, Req>(Req Request, Func<OracleConnection, Req, Resp> method, bool checkTransaction = true)
+            where Resp : IResponse, new()
+            where Req : IRequest
         {
             Resp response = new Resp();
             using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
@@ -34,13 +37,15 @@ namespace Bars.WebServices.XRM.Services
 
                     if (checkTransaction)
                     {
-                        ProcessTransactions(con, Request.TransactionId, Request.UserLogin, Request.OperationType, out transResp, moduleName);
+                        int transactionCheckResp = ProcessTransactions(con, Request.TransactionId, Request.UserLogin, Request.OperationType, out transResp, moduleName);
 
-                        if (null != transResp)
+                        if (new List<int> { -1, -2 }.Contains(transactionCheckResp))
                         {
-                            Resp r = ToResponse<Resp>(transResp);
-                            r.ResultMessage = string.Format("Транзакція номер {0} вже була проведена \r{1}", Request.TransactionId, r.ResultMessage);
-
+                            Resp r = -1 == transactionCheckResp ? ToResponse<Resp>(transResp) : new Resp();
+                            r.ResultCode = -1 == transactionCheckResp ? 0 : 1;
+                            r.ResultMessage = -1 == transactionCheckResp ?
+                                  string.Format("Транзакція номер {0} вже була проведена \r{1}", Request.TransactionId, r.ResultMessage)
+                                : string.Format("Транзакція номер {0} вже була проведена, але обробка ще не завершилась", Request.TransactionId);
                             return r;
                         }
                     }

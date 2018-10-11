@@ -9,7 +9,8 @@ select cast(bars.F_OURMFO_G as varchar2(6)) MFO,
 "KVB", 
 "DEF",
 CONTRACTA_ABS_SEL,
-CONTRACTB_ABS_SEL
+CONTRACTB_ABS_SEL,
+flag
 from bars.v_tts_xrm;
 
 comment on table VW_REF_TTS_XRM is 'Операції(KOP)';

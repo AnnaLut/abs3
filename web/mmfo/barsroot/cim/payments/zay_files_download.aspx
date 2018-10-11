@@ -42,10 +42,11 @@
         </div>
     </form>
     <script>
+ 
         var ref = getParamFromUrl('ID');
         //var hasAttachments = true/* = getParamFromUrl('ATTACHMENTS_COUNT') > 0*/;
-        //var fnamekb = getParamFromUrl('FNAMEKB').toUpperCase() == 'CL';
-
+        var fnamekb = getParamFromUrl('FNAMEKB') == 'CL';
+  
         if (ref) {
             showAttachments(ref);
         }
@@ -54,6 +55,7 @@
         }
         //#region Вікно завантаження прикріплених файлів
         function showAttachments(ref) {
+        
             //var bidId = obj.REF;
             var filesList = sessionStorage[ref];
             if (filesList) {
@@ -61,13 +63,15 @@
                 OnGetFileInfos(filesList, ref);
             }
             else {
+             
                 $.ajax({
                     //async: false,
-                    url: bars.config.urlContent("/api/ExternalServices/ExternalServices/GetCorpLightFilesInfo"),
+                    url: bars.config.urlContent("/api/ExternalServices/ExternalServices/GetCorpLightFileInfo"),
                     contentType: "application/json",
                     dataType: "json",
-                    data: { bidId: ref },
+                    data: { fileId: ref },
                     success: function (result) {
+                        
                         if (result.error) {
                             alert(result.error);
                             window.close();
@@ -77,21 +81,26 @@
                             window.close();
                         }
                         else {
-                            filesList = result;
-                            sessionStorage[ref] = JSON.stringify(result);
-                            OnGetFileInfos(filesList, ref);
+                            window.close();
+                            window.open(bars.config.urlContent("/api/ExternalServices/ExternalServices/DownLoadCorpLightFile", { fileId: ref }));
+                        
+                            //filesList = result;
+                            //sessionStorage[ref] = JSON.stringify(result);
+                            //OnGetFileInfos(filesList, ref);
                         }
                     }
                 });
             }
         }
         function loadFileAnchorClick(e) {
+            
             e = e || window.event;
             e.preventDefault ? e.preventDefault() : (e.returnValue = false);
             window.location.href = this.href;
             return false;
         }
         function OnGetFileInfos(filesList, bidId) {
+           
             if (filesList.length) {
                 var diagAttachments = $('#dialogAttachments');
                 diagAttachments.empty();

@@ -353,8 +353,7 @@ function homeController($scope, paramsService, $window, LS) {
         });
     }
 
-    $scope.openMetaTableWithRef = function () {
-        debugger;
+    $scope.openMetaTableWithRef = function () {        
         var options = {
             jsonSqlParams: "[{\"Name\":\"P_REF\",\"Type\":\"S\",\"Value\":" + $scope.firstSelRow.REF+ "}]",
             code: "V_CP_INT_DIVIDENTS",
@@ -362,6 +361,19 @@ function homeController($scope, paramsService, $window, LS) {
             // externelFuncOnly: true,
         };
 
+        bars.ui.getMetaDataNdiTable("", function () {
+
+        }, options);
+
+    }
+          
+    $scope.openMetaTable4PayDiv = function () {        
+        var options = {
+            jsonSqlParams: "[{\"Name\":\"P_REF\",\"Type\":\"S\",\"Value\":" + $scope.firstSelRow.REF+ "}]",
+            code: "V_CP_PAY_DIVIDENTS",
+            hasCallbackFunction: false//,
+            // externelFuncOnly: true,
+        };
 
         bars.ui.getMetaDataNdiTable("", function () {
 
