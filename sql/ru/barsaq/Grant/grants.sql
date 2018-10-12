@@ -1,1 +1,0 @@
-grant execute on barsAQ.Ibank_Accounts to bars;

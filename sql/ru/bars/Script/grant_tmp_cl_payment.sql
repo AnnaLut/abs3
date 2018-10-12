@@ -1,1 +1,0 @@
-grant select on tmp_cl_payment to bars_access_defrole;

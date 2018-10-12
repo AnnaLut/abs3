@@ -1,4 +1,0 @@
-CREATE OR REPLACE FORCE VIEW "BARS"."V_ISE" ("ISE", "NAME", "D_CLOSE") AS 
-  select "ISE","NAME","D_CLOSE" from ise where ise <> '00000'
-;
-  GRANT SELECT ON "BARS"."V_ISE" TO "BARS_ACCESS_DEFROLE";
