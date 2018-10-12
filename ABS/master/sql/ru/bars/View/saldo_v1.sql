@@ -1,1 +1,0 @@
-CREATE OR REPLACE VIEW SALDO_V1 AS SELECT KF, acc,dat_alt FDAT,kv,nls,nlsalt,NBS,ob22,fost(acc,dat_alt-1) ost FROM accounts WHERE  dat_alt IS NOT NULL AND nlsalt IS NOT NULL AND fost(acc,dat_alt-1)<>0;
