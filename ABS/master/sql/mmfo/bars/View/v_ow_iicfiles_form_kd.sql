@@ -14,7 +14,7 @@ PROMPT *** Create  view V_OW_IICFILES_FORM_KD ***
           p.tt,
           OW_FILES_PROC.get_w4_msgcode(p.nlsb, p.kv) w4_msgcode,
           a.acc,
-          a.nls,
+          bars_ow.get_nls(a.nls, a.nlsalt, a.kf) nls,
           a.kv,
           c.okpo,
           p.s / 100 s,

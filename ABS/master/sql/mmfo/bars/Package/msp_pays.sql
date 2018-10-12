@@ -115,7 +115,7 @@ CREATE OR REPLACE package body BARS.msp_pays is
      where (p.rnk,p.kf) in (select pa.rnk,pa.kf
                               from pfu.pfu_pensacc pa
                              where pa.kf = l_mfo
-                               and pa.nls = to_char(l_rec_row.deposit_acc)
+                               and (pa.nls = to_char(l_rec_row.deposit_acc) or pa.nlsalt = to_char(l_rec_row.deposit_acc)) -- COBUMMFO-7501
                                and pa.dazs is null);
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
@@ -127,7 +127,7 @@ CREATE OR REPLACE package body BARS.msp_pays is
             from pfu.pfu_pensioner p
            where p.rnk = (select pa.rnk
                             from pfu.pfu_pensacc pa
-                           where pa.nls = to_char(l_rec_row.deposit_acc)
+                           where (pa.nls = to_char(l_rec_row.deposit_acc) or pa.nlsalt = to_char(l_rec_row.deposit_acc)) -- COBUMMFO-7501
                              and pa.kf = l_mfo)
              and p.kf = l_mfo;
           if (l_date_off is not null) then

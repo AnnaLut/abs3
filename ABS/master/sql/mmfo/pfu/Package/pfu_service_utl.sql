@@ -2497,7 +2497,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
           select *
             into l_pensacc_row
             from pfu_pensacc pa
-           where pa.nls = l_frow2.num_acc
+					 where (pa.nls = l_frow2.num_acc or pa.nlsalt = l_frow2.num_acc) -- COBUMMFO-7501
              and pa.kf = l_frow2.bank_mfo;
         exception
           when no_data_found then
@@ -6375,6 +6375,12 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
     prepare_cardkill_claim();
   end;
   
+  procedure process_transport_lock_stage is
+  begin
+    send_data_to_bank_units_lock;
+    process_receipt_lock;
+  end;
+
   procedure process_transport_lock_stage is
   begin
     send_data_to_bank_units_lock;

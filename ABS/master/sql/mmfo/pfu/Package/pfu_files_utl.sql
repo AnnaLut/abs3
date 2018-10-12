@@ -39,13 +39,13 @@
   procedure set_file_state_for_pay(p_file_id in integer);
 
   procedure set_rec_unerror(p_rec_id in integer);
-  
+
   procedure set_death_state_send_match(p_death_id in integer);
   procedure check_set_file_state_payed(p_file_id in integer);
-  
+
 /*  procedure set_death_debet_ref(p_recid in pfu_death_record.id%type,
                                   p_ref_debet in pfu_death_record.ref_debet%type);*/
-  
+
   procedure set_file_record_state(p_file_rec_id in integer,
                                     p_state       in varchar2);
 
@@ -201,7 +201,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       -- наявність рахунку
       begin
         select * into l_pensacc_row from pfu_pensacc pa
-         where pa.nls = p_rec.num_acc and pa.kf = p_rec.mfo /*and pa.kv = 980*/;
+         where (pa.nls = p_rec.num_acc or pa.nlsalt = p_rec.num_acc) -- COBUMMFO-7501
+               and pa.kf = p_rec.mfo /*and pa.kv = 980*/;
       exception
         when no_data_found then
           l_err_code    := 9;
@@ -253,13 +254,13 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       p_err_code    := 0;
       p_err_message := '';
       p_rec.ebp_nmk := l_pensioner_row.nmk;
-      
-      update pfu_pensacc pa 
-         set pa.ispayed = 1 
+
+      update pfu_pensacc pa
+         set pa.ispayed = 1
        where pa.kf = p_rec.mfo
-         and pa.nls = p_rec.num_acc
-         and pa.ispayed is null;
-      
+             and (pa.nls = p_rec.num_acc or pa.nlsalt = p_rec.num_acc) -- COBUMMFO-7501
+             and pa.ispayed is null;
+
     exception
       when err_record then
         p_err_code    := l_err_code;
@@ -281,9 +282,10 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                           and pfr.state = 0) loop
          begin
             select pp.dazs into l_dazs
-              from pfu_pensacc pp
-             where pp.nls = ltrim(rec_frec.num_acc, 0)
-               and pp.kf = rec_frec.mfo;
+            from pfu_pensacc pp
+             where (pp.nls = ltrim(rec_frec.num_acc, 0) or pp.nlsalt = ltrim(rec_frec.num_acc, 0)) -- COBUMMFO-7501
+                   and pp.kf = rec_frec.mfo;
+      
             if l_dazs is not null then
                update pfu_file_records pfr
                   set pfr.state = 3
@@ -299,7 +301,12 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
               from pfu_pensioner pp
              where pp.okpo = rec_frec.numident
                and pp.kf = rec_frec.mfo
-               and pp.rnk = (select pa.rnk from pfu_pensacc pa where pa.nls = rec_frec.num_acc and pa.kf = rec_frec.mfo)
+               and pp.rnk = (
+                               select pa.rnk 
+                               from pfu_pensacc pa 
+                               where (pa.nls = rec_frec.num_acc or pa.nlsalt = rec_frec.num_acc) -- COBUMMFO-7501
+                                     and pa.kf = rec_frec.mfo
+                            )
                and pp.date_off is null;
             if l_ebp_state is not null then
                update pfu_file_records pfr
@@ -565,7 +572,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
        update pfu_file set state='IN_PAY' where id=p_file_id;
        commit;
     end;
-    
+
     procedure check_set_file_state_payed(p_file_id in integer)
       is
       l_cnt number;
@@ -574,8 +581,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
          into l_cnt
          from pfu_file_records pfr
         where pfr.file_id = p_file_id
-          and pfr.state in (19,0,20); 
-       
+          and pfr.state in (19,0,20);
+
        if (l_cnt = 0) then
            update pfu_file pf
               set pf.state = 'PAYED'
@@ -583,12 +590,12 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
        end if;
        commit;
     end;
-    
+
     procedure set_file_record_state(p_file_rec_id in integer,
                                     p_state       in varchar2)
       is
     begin
-       update pfu_file_records fr 
+       update pfu_file_records fr
           set fr.state = Case when p_state = 'Зараховано' then 10
                               when p_state = 'Повернуто ПФУ' then 99 end
         where fr.id = p_file_rec_id;
@@ -608,7 +615,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
        update pfu_file_records set state = 0 where id=p_rec_id;
        commit;
     end;
-    
+
     procedure set_death_state_send_match(p_death_id in integer)
       is
     begin
@@ -783,7 +790,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       l_ref      number;
       l_state    number;
       l_cnt      number;
-      l_fileid   pfu_file_records.file_id%type; 
+      l_fileid   pfu_file_records.file_id%type;
     begin
 
       l_parser := dbms_xmlparser.newparser;
@@ -839,7 +846,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       l_parser := dbms_xmlparser.newparser;
       dbms_xmlparser.parseclob(l_parser, p_file_data);
       l_doc := dbms_xmlparser.getdocument(l_parser);
-      
+
       l_rows := dbms_xmldom.getelementsbytagname(l_doc, 'body');
 
       l_row := dbms_xmldom.item(l_rows, 0);
@@ -928,7 +935,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
          l_ser            := dbms_xslprocessor.valueof(l_row, 'ser/text()');
          l_numdoc         := dbms_xslprocessor.valueof(l_row, 'numdoc/text()');
          l_pdate          := to_date(dbms_xslprocessor.valueof(l_row, 'pdate/text()'),'dd.mm.yyyy');
-         l_organ 		  := substr(trim(utl_raw.cast_to_varchar2(hextoraw(dbms_xslprocessor.valueof(l_row, 'organ/text()')))),1,70);
+         l_organ          := substr(trim(utl_raw.cast_to_varchar2(hextoraw(dbms_xslprocessor.valueof(l_row, 'organ/text()')))),1,70); 
          l_bday           := to_date(dbms_xslprocessor.valueof(l_row, 'bday/text()'),'dd.mm.yyyy');
          l_bplace         := utl_raw.cast_to_varchar2(hextoraw(dbms_xslprocessor.valueof(l_row, 'bplace/text()')));
          l_cellphone      := dbms_xslprocessor.valueof(l_row, 'cellphone/text()');
@@ -1085,31 +1092,31 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
       l_parser := dbms_xmlparser.newparser;
       dbms_xmlparser.parseclob(l_parser, p_file_data);
       l_doc := dbms_xmlparser.getdocument(l_parser);
-      
-      begin 
-           select tl.id 
+
+      begin
+           select tl.id
              into l_fileid
              from pfu_no_turnover_list tl
             where substr(to_char(tl.date_create, 'dd.mm.yyyy'), 4, 2) = substr(to_char(sysdate, 'dd.mm.yyyy'), 4, 2)
               and tl.kf = p_mfo;
-         exception 
-           when NO_DATA_FOUND 
-              then 
+         exception
+           when NO_DATA_FOUND
+              then
                 l_fileid := pfu_no_turnover_list_seq.nextval;
-                insert into pfu_no_turnover_list(id, 
-                                                 id_request, 
-                                                 date_create, 
-                                                 date_sent, 
-                                                 full_lines, 
-                                                 user_id, 
+                insert into pfu_no_turnover_list(id,
+                                                 id_request,
+                                                 date_create,
+                                                 date_sent,
+                                                 full_lines,
+                                                 user_id,
                                                  state,
                                                  kf)
-                values (l_fileid, 
-                        null, 
-                        sysdate, 
-                        null, 
-                        null, 
-                        null, 
+                values (l_fileid,
+                        null,
+                        sysdate,
+                        null,
+                        null,
+                        null,
                         'NEW',
                         p_mfo);
       end;
@@ -1123,21 +1130,21 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
          l_rnk          := to_number(dbms_xslprocessor.valueof(l_row, 'rkn/text()'));
          l_mfo          := dbms_xslprocessor.valueof(l_row, 'mfo/text()');
          l_datet        := to_date(dbms_xslprocessor.valueof(l_row, 'date_turn/text()'),'dd.mm.yyyy');
-         
+
          select p.nmk, p.okpo, p.ser||' '||p.numdoc
-           into l_fullname, l_okpo, l_sernum 
+           into l_fullname, l_okpo, l_sernum
            from pfu_pensioner p
           where p.rnk = l_rnk
             and p.kf = l_mfo;
-            
-         select p.ispayed 
+
+         select p.ispayed
            into l_ispayed
            from pfu_pensacc p
-          where p.nls = l_num_acc
-            and p.kf = l_mfo;
-          
+          where (p.nls = l_num_acc or p.nlsalt = l_num_acc) -- COBUMMFO-7501
+                and p.kf = l_mfo;
+
          pfu_service_utl.parse_fio(l_fullname, l_last_name, l_name, l_father_name);
-         
+
          if (l_ispayed = 1) then
              insert into pfu_no_turnover(id,
                                          id_file,
@@ -1151,8 +1158,8 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                                          date_last)
              values(pfu_no_turnover_seq.nextval,
                     l_fileid,
-                    l_last_name, 
-                    l_name, 
+                    l_last_name,
+                    l_name,
                     l_father_name,
                     l_okpo,
                     l_sernum,
@@ -1160,7 +1167,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_FILES_UTL as
                     l_mfo,
                     l_datet);
          end if;
-         
+
       end loop;
       transport_utl.set_transport_state(p_id               => p_file_id,
                                         p_state_id         => transport_utl.trans_state_done,

@@ -292,7 +292,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
       into l_dummy
       from pfu_pensacc pa
      where pa.kf = p_kf
-       and pa.nls = p_nls
+           and (pa.nls = p_nls or pa.nlsalt = p_nls) -- COBUMMFO-7501
        for update nowait;
 
     update pfu_pensacc pa
@@ -308,7 +308,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SYNC_RU is
            last_ru_idupd   = p_last_idupd,
            last_ru_chgdate = p_last_chgdate
      where pa.kf = p_kf
-       and pa.nls = p_nls;
+           and (pa.nls = p_nls or pa.nlsalt = p_nls); -- COBUMMFO-7501
 
     p_res := 2;
 
