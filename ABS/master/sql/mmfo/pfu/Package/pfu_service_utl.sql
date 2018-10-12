@@ -6381,13 +6381,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_SERVICE_UTL as
     process_receipt_lock;
   end;
 
-  procedure process_transport_lock_stage is
-  begin
-    send_data_to_bank_units_lock;
-    process_receipt_lock;
-  end;
-
-  procedure process_all_stages is
+ procedure process_all_stages is
   begin
     /*-- запити в ПФУ
     send_requests;
