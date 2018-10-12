@@ -1,1 +1,0 @@
-﻿<%@ WebService Language="C#" CodeBehind="~/App_Code/webservices/PirService.cs" Class="Bars.PirWebServices.PirService" %>

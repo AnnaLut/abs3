@@ -1,7 +1,0 @@
-﻿<button caption="Графік платежів" hint="Перегляд графіку платежів по договору" id="bched" >
-  <command type="Redirect" checkselectedrow="true" url="dynform.aspx?form=frm_ins_pay_sched">
-    <parameters>
-      <parameter datatype="Int64" name="P_ID" altname="deal_id" type="FormField"></parameter>
-    </parameters>
-  </command>
-</button>

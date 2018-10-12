@@ -1,1 +1,0 @@
-<%@ WebService Language="C#" CodeBehind="~/App_Code/get_eq.cs" Class="get_eq" %>

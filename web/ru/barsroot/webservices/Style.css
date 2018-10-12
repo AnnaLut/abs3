@@ -1,7 +1,0 @@
-.outset { BORDER-TOP-STYLE: outset; BORDER-RIGHT-STYLE: outset; BORDER-LEFT-STYLE: outset; BORDER-BOTTOM-STYLE: outset }
-.btoutset { FONT-SIZE: 8pt; WIDTH: 140px; COLOR: navy; FONT-FAMILY: Verdana }
-.btinset { FONT-SIZE: 8pt; WIDTH: 140px; COLOR: maroon; BORDER-TOP-STYLE: inset; FONT-FAMILY: Verdana; BORDER-RIGHT-STYLE: inset; BORDER-LEFT-STYLE: inset; BORDER-BOTTOM-STYLE: inset }
-.bt { FONT-SIZE: 10pt; WIDTH: 100px; FONT-FAMILY: Verdana }
-.frame { BORDER-RIGHT: gray 2px outset; BORDER-TOP: gray 2px outset; BORDER-LEFT: gray 2px outset; WIDTH: 600px; BORDER-BOTTOM: gray 2px outset; POSITION: absolute; HEIGHT: 350px; BACKGROUND-COLOR: gainsboro }
-
-.webservice { behavior: url(/Common/WebService/js/WebService.htc); }
