@@ -3292,12 +3292,6 @@ end ;
         from oper t
        where t.ref = p_ref;
 
-   ELSIF KOD_ = 9999 THEN
-      select t.nlsa, t.nlsb
-        into l_nlsa, l_nlsb
-        from oper t
-       where t.ref = p_ref;
-
 
       select count(*)
         into l_cnt
