@@ -43,7 +43,13 @@ exception when others then
 end; 
 /
 
-
+-- Add/modify columns 
+begin 
+  execute immediate 'alter table TRANSFORM_2017_FORECAST add rnk number(38)';
+exception when others then       
+  if sqlcode=-1430 then null; else raise; end if; 
+end; 
+/
 
 
 PROMPT *** ALTER_POLICIES to TRANSFORM_2017_FORECAST ***
@@ -61,7 +67,7 @@ COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NEW_NBS IS '';
 COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NEW_OB22 IS '';
 COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.NEW_NLS IS '';
 COMMENT ON COLUMN BARS.TRANSFORM_2017_FORECAST.INSERT_DATE IS '';
-
+comment on column BARS.TRANSFORM_2017_FORECAST.rnk  is '–еЇстрац≥йний номер кл≥Їнта';
 
 
 

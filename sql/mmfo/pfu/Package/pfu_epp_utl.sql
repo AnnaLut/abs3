@@ -455,7 +455,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
         update pfu_pensacc t
            set t.state = 'BLOCKED'
-         where t.nls = p_nls
+         where (t.nls = p_nls or t.nlsalt = p_nls) -- COBUMMFO-7501
            and t.kf = p_kf;
 
         l_doc       := dbms_xmldom.newDomDocument;
@@ -502,7 +502,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
 
         update pfu_pensacc t
            set t.state = 'UNBLOCKED'
-         where t.nls = p_nls
+         where (t.nls = p_nls or t.nlsalt = p_nls) -- COBUMMFO-7501
            and t.kf = p_kf;
 
         l_doc       := dbms_xmldom.newDomDocument;
@@ -831,7 +831,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
           update pfu.pfu_pensacc c
              set c.comm =l_comm,
                  c.date_blk = l_date
-           where c.nls = l_nls
+           where (c.nls = l_nls or c.nlsalt = l_nls) -- COBUMMFO-7501
              and c.kf = l_kf;
         elsif l_isepp = 1 then
           l_id   := to_number(dbms_xslprocessor.valueof(l_row, 'id/text()'));
@@ -893,7 +893,7 @@ CREATE OR REPLACE PACKAGE BODY PFU.PFU_EPP_UTL as
           update pfu.pfu_pensacc c
              set c.comm =l_comm,
                  c.date_blk = l_date
-           where c.nls = l_nls
+           where (c.nls = l_nls or c.nlsalt = l_nls) -- COBUMMFO-7501
              and c.kf = l_kf;
         elsif l_isepp = 1 then
           l_id   := to_number(dbms_xslprocessor.valueof(l_row, 'id/text()'));

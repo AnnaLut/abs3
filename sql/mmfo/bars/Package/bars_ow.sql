@@ -427,6 +427,14 @@ procedure set_cck_sob (
   p_transfer_flag number,
   p_sucs_flag     boolean );
 
+-------------------------------------------------------------------------------
+-- COBUMMFO-7501
+function get_nls (  
+                    p_nls      in accounts.nls%type
+                    , p_nlsalt in accounts.nls%type
+                    , p_kf     in accounts.kf%type
+                 ) return accounts.nls%type;
+                 
 --function get_new_nbs(p_nbs in varchar2) return varchar2;
 procedure open_2203 (
    p_pk_acc  in number,
@@ -1053,6 +1061,42 @@ begin
 end get_impid;
 
 -------------------------------------------------------------------------------
+-- COBUMMFO-7501
+-- get_nls
+-- функция номер счета
+--
+function get_nls (  
+                    p_nls      in accounts.nls%type
+                    , p_nlsalt in accounts.nls%type
+                    , p_kf     in accounts.kf%type
+                 ) return accounts.nls%type
+is
+   l_nls       accounts.nls%type := null;
+   l_type_flag ow_params.par%type;
+begin
+   if p_nlsalt is null or not regexp_like(p_nlsalt, '^26[0,2,5]5') then
+      l_nls := p_nls;
+   else 
+      if regexp_like(p_nlsalt, '^2625') then
+		 l_type_flag := 'W4_IICNLSP';
+      else
+		 l_type_flag := 'W4_IICNLSU';
+	  end if;
+      begin
+		 select decode(p.val, '1', p_nls, p_nlsalt)
+         into l_nls
+         from ow_params p
+         where p.par = l_type_flag and p.kf = p_kf;
+	  exception
+		 when others then
+			l_nls := p_nlsalt;
+	  end;
+   end if;
+   return l_nls;
+
+end get_nls;
+
+-------------------------------------------------------------------------------
 -- get_nls_trans
 -- функция возвращает транзитный счет отделения p_branch
 --
@@ -1175,12 +1219,16 @@ is
 
 begin
   begin
-     select substr(nvl(c.nmk, a.nms),1,38), c.okpo, a.tobo, nvl(a.opt,0)
+     select nms, okpo, tobo, opt
        into p_nms, p_okpo, p_branch, l_opt
-       from accounts a, customer c
-      where a.nls = p_nls
-        and a.kv  = p_kv
-        and a.rnk = c.rnk;
+       from (  -- COBUMMFO-7501
+               select substr(nvl(c.nmk, a.nms),1,38) nms, c.okpo, a.tobo, nvl(a.opt,0) opt
+               from accounts a
+               join customer c on c.rnk = a.rnk
+               where (a.nls = p_nls or a.nlsalt = p_nls) and a.kv = p_kv and a.dazs is null
+               order by a.daos 
+            )
+      where rownum = 1;
       f := true;
       if l_opt = 0 and substr(p_nls,1,4) in ('2920',2924) then
          setoptfornlsw4(p_nls);
@@ -1212,12 +1260,16 @@ is
 
 begin
   begin
-     select substr(nvl(c.nmk, a.nms),1,38), c.okpo, a.tobo, nvl(a.opt,0), a.acc
+     select nms, okpo, tobo, opt, acc
        into p_nms, p_okpo, p_branch, l_opt, p_acc
-       from accounts a, customer c
-      where a.nls = p_nls
-        and a.kv  = p_kv
-        and a.rnk = c.rnk;
+       from (  -- COBUMMFO-7501
+               select substr(nvl(c.nmk, a.nms),1,38) nms, c.okpo, a.tobo, nvl(a.opt,0) opt, a.acc
+               from accounts a
+               join customer c on c.rnk = a.rnk
+               where (a.nls = p_nls or a.nlsalt = p_nls) and a.kv = p_kv  and a.dazs is null
+               order by a.daos 
+            )
+      where rownum = 1;
       f := true;
       if l_opt = 0 and substr(p_nls,1,4) in ('2920',2924) then
          setoptfornlsw4(p_nls);
@@ -5648,7 +5700,16 @@ begin
       -- ищем счет 2625
       if l_pk_nls is not null then
          begin
-            select acc into l_pk_acc from accounts where nls = l_pk_nls and kv = p_kv;
+			-- COBUMMFO-7501
+            select acc
+            into l_pk_acc
+            from (
+                    select a.acc
+                    from accounts a
+                    where (a.nls = l_pk_nls or a.nlsalt = l_pk_nls ) and a.kv = p_kv  and a.dazs is null
+                    order by a.daos
+                 )
+             where rownum = 1;
          exception when no_data_found then
             l_pk_acc := null;
          end;
@@ -5854,7 +5915,16 @@ begin
       -- ищем счет 2625
       if l_pk_nls is not null then
          begin
-            select acc into l_pk_acc from accounts where nls = l_pk_nls and kv = p_kv;
+			-- COBUMMFO-7501
+            select acc
+            into l_pk_acc
+            from (
+                    select a.acc
+                    from accounts a
+                    where (a.nls = l_pk_nls or a.nlsalt = l_pk_nls ) and a.kv = p_kv and a.dazs is null
+                    order by a.daos
+                 )
+             where rownum = 1;
          exception when no_data_found then
             l_pk_acc := null;
          end;

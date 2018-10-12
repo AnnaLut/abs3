@@ -106,7 +106,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
      where (p.rnk,p.kf) in (select pa.rnk,pa.kf
                               from pfu.pfu_pensacc pa
                              where pa.kf = l_rec_row.mfo
-                               and pa.nls = l_rec_row.num_acc
+                                   and (pa.nls = l_rec_row.num_acc or pa.nlsalt = l_rec_row.num_acc) -- COBUMMFO-7501
                                and pa.dazs is null);
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
@@ -118,7 +118,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
             from pfu.pfu_pensioner p
            where p.rnk = (select pa.rnk
                             from pfu.pfu_pensacc pa
-                           where pa.nls = l_rec_row.num_acc
+                           where (pa.nls = l_rec_row.num_acc or pa.nlsalt = l_rec_row.num_acc) -- COBUMMFO-7501
                              and pa.kf = l_rec_row.mfo)
              and p.kf = l_rec_row.mfo;
           if (l_date_off is not null) then

@@ -510,7 +510,7 @@ namespace DocInput
                             string buffer = "DOC_BUFFER::REF={0}\nINT=|{1}|=\nEXT=|{2}|=";
                             _dbLogger.Info(string.Format(buffer, oper.Ref.ToString(), HttpUtility.UrlDecode(data[39], System.Text.Encoding.UTF8), HttpUtility.UrlDecode(data[40], System.Text.Encoding.UTF8)));
                         }
-                       
+
 
                         _dbLogger.Financial("Ввод док Ref" + oper.Ref + ": " + oper.NlsA + "(" + oper.KvA + ") " + oper.SA.ToString("F0") + " -> " + oper.BankB + " " + oper.NlsB + "(" + oper.KvB + ") " + oper.SB.ToString("F0") + "[" + oper.NamB + "],[" + oper.Nazn + "] " + oper.OperId);
                         return oper.Ref.ToString();
@@ -530,7 +530,7 @@ namespace DocInput
         {
             return GetArrayFileForPrint(new[] { refernce }, printTrnModel);
         }
-      
+
         /// <summary>
         /// Генерируем текстовый файл тикета 
         /// </summary>
@@ -594,7 +594,7 @@ namespace DocInput
         }
 
         [WebMethod(EnableSession = true)]
-        public string ExportExcel(string[] data, bool? forceExecute=null)
+        public string ExportExcel(string[] data, bool? forceExecute = null)
         {
             //Form SQL QUERY FOR EXEL IMPORT
             InitOraConnection(Context);
@@ -658,7 +658,7 @@ namespace DocInput
                 "a.NAZN  \"Призначення платежу\", " +
                 "a.TOBO  \"Код безбалансового відділення\", " +
                 "a.ID_A  \"ОКПО відправника\", " +
-                "a.NAM_A  \"Назва відправника\", "+
+                "a.NAM_A  \"Назва відправника\", " +
                 "a.ID_B  \"ОКПО отримувача\", " +
                 "a.NAM_B  \"Назва отримувача\" ";
             }
@@ -685,7 +685,7 @@ namespace DocInput
                     "to_char(a.DATD,'dd.mm.yyyy')  \"Дата документа\", " +
                     "a.NAZN  \"Призначення платежу\", " +
                     "a.TOBO  \"Код безбалансового відділення\" ";
-                    //", a.SOS  \"Референс документа\" ";
+            //", a.SOS  \"Референс документа\" ";
             string localBD = Convert.ToString(Session["LocalBDate"]);
 
 
@@ -1212,7 +1212,7 @@ namespace DocInput
                 con.Dispose();
             }
         }
-       
+
         /// <summary>
         /// Метод получения данных для грида из функции доввода доп. реквизитов документа
         /// </summary>
@@ -1237,7 +1237,7 @@ namespace DocInput
                 DisposeOraConnection();
             }
         }
-       
+
         /// <summary>
         /// Проверка кода валюты
         /// </summary>
@@ -1799,7 +1799,7 @@ namespace DocInput
                 res.StatusCode = 0;
                 return res;
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 res.StatusCode = -1;
                 res.ErrorMessage = ex.Message;
@@ -1812,7 +1812,7 @@ namespace DocInput
                 con = null;
             }
         }
-      
+
         /// <summary>
         /// признак чи має користувач можливість друку в PDF
         /// </summary>
@@ -1859,7 +1859,7 @@ namespace DocInput
             }
             return res;
         }
-      
+
         /// <summary>
         /// признак документа для печати без подтверждения
         /// </summary>
@@ -1913,5 +1913,25 @@ namespace DocInput
             return result;
         }
 
+        /// <summary>
+        /// 0 = nls is not w4
+        /// </summary>
+        /// <param name="nls"></param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public string IsNlsW4(string nls)
+        {
+            using (var con = ((IOraConnection)Application["OracleConnectClass"]).GetUserConnection())
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "select count(*) from accounts where nls = :p_nls and tip like '%W4%'";
+                cmd.Parameters.Add("p_nls", OracleDbType.Varchar2, nls, ParameterDirection.Input);
+
+                object res = cmd.ExecuteScalar();
+                if (null == res) return "0";
+
+                return Convert.ToString(res);
+            }
+        }
     }
 }
