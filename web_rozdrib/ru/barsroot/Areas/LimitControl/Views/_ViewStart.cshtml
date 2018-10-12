@@ -1,9 +1,0 @@
-﻿@{
-    bool isPartial = false;
-    var getPartial = HttpContext.Current.Request.Params.GetValues("partial");
-    if (getPartial != null)
-    {
-        isPartial = Convert.ToBoolean(getPartial[0]);
-    }
-    Layout = isPartial ? null : "~/Views/Shared/_LayoutKendo.cshtml";
-}
