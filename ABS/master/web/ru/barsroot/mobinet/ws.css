@@ -1,8 +1,0 @@
-﻿.webservice 
-{
-	behavior: url(/Common/WebService/js/WebService.htc);
-}
-.centerme
-{
-	text-align: center;
-}

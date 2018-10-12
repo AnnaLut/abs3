@@ -1,1 +1,0 @@
-var require={baseUrl:"http://static.finance.ua/asset/1.35.0",shim:{underscore:{exports:"_"},backbone:{deps:["underscore","jquery"],exports:"Backbone"}}};

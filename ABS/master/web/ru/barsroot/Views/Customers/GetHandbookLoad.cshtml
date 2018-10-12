@@ -1,8 +1,0 @@
-﻿@{
-    Layout = null;
-}
-@inherits System.Web.Mvc.WebViewPage<IEnumerable<BarsWeb.Models.Handbook>>
-@foreach (var item in Model.OrderBy(i=>i.ID))
-{
-   <option value="@item.ID">@item.NAME</option>  
-}

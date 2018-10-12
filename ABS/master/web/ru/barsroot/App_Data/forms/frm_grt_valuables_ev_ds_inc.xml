@@ -1,7 +1,0 @@
-﻿<datasource>
-  <sql>select d.*, e.id as ev_id, e.type_id as ev_type_id, e.planned_date, e.actual_date, e.comment_text from V_GRT_VALUABLES   d,grt_events e where d.deal_id = :deal_id and e.deal_id = d.deal_id and e.id = :ev_id</sql>
-  <parameters>
-    <parameter type="QueryString" name="deal_id"></parameter>
-    <parameter type="QueryString" name="ev_id"></parameter>
-  </parameters>
-</datasource>

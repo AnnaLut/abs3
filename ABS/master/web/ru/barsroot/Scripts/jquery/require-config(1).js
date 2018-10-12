@@ -1,1 +1,0 @@
-if(!require){var require={};}if(!require.packages){require.packages=[];}require.packages.push({name:"local",location:"http://static.finance.ua/assetx/1.57.0"});
