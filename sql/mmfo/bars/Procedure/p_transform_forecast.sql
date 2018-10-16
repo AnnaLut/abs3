@@ -55,7 +55,7 @@ begin
              --bars_audit.info(l_trace||'нашли счет ='||l_new_nls||' попытка ='||l_tries);
 
              if l_tries < 100 then
-                insert into TRANSFORM_2017_FORECAST  values (c.kf, c.kv, c.acc, c.nbs, c.nls, c.ob22, c.new_nbs, c.new_ob22, l_new_nls, sysdate );
+		 insert into TRANSFORM_2017_FORECAST  values (c.kf, c.kv, c.acc, c.nbs, c.nls, c.ob22, c.new_nbs, c.new_ob22, l_new_nls, sysdate, null );
                 l_acc_cnt := l_acc_cnt + 1;
              else
                 bars_audit.info(l_trace||'cчет не подобран. kf='||c.kf||', acc='||c.acc||', nls='||c.nls);
