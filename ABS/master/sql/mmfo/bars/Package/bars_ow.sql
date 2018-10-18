@@ -1716,7 +1716,7 @@ begin
            and q.ref_tr = o.ref
            and o.tt     = t.tt and t.dk = p_dk
            and a.kf     = sys_context('bars_context','mfo')
-           and q.nls_tr = a.nls
+           and q.nls_tr in(a.nls, a.nlsalt) -- COBUMMFO-7501
            and q.lcv_tr = v.lcv and v.kv = a.kv
            and o.sos > 0
            and o.tt = wt.tt(+);
@@ -5387,13 +5387,16 @@ is
         -- ищем документ в списке несквитованных документов
         begin
            select q.id, q.ref_tr into l_id, l_ref
-             from mway_match q, oper o, ow_match_tt t, tabval$global v
+             from mway_match q, oper o, ow_match_tt t, tabval$global v,
+                  accounts a -- COBUMMFO-7501
             where q.state  = 0
               and q.ref_tr = o.ref
               and o.sos    = 5
               and o.tt     = t.tt
               and t.code   = l_atrn(i).doc_descr
-              and q.nls_tr = decode(t.dk, 0, l_atrn(i).debit_anlaccount, l_atrn(i).credit_anlaccount)
+              -- and q.nls_tr = decode(t.dk, 0, l_atrn(i).debit_anlaccount, l_atrn(i).credit_anlaccount) -- Comment COBUMMFO-7501
+              and q.nls_tr in (a.nls, a.nlsalt) -- Comment COBUMMFO-7501
+              and decode(t.dk, 0, l_atrn(i).debit_anlaccount, l_atrn(i).credit_anlaccount) in (a.nls, a.nlsalt) -- Comment COBUMMFO-7501
               and q.lcv_tr = v.lcv and v.kv = decode(t.dk, 0, l_atrn(i).debit_currency, l_atrn(i).credit_currency)
               and q.sum_tr = decode(t.dk, 0, l_atrn(i).debit_amount, l_atrn(i).credit_amount) * 100
               and trunc(q.date_tr) = l_atrn(i).doc_localdate
