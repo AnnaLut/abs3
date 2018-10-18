@@ -48,7 +48,7 @@ namespace BarsWeb.Areas.DPU.Infrastructure.DI.Implementation
         public List<T> GetDataForGrid<T>(dynamic id)
         {
             var p = new DynamicParameters();
-            p.Add("NLK_8", dbType: DbType.Int32, size: 50, value: id, direction: ParameterDirection.Input);
+            p.Add("NLK_8", dbType: DbType.Decimal, size: 50, value: id, direction: ParameterDirection.Input);
 
             var sql = @"SELECT a.acc, a.nls, a.kv, a.ostc/100 as OSTC, a.ostb/100 as OSTB, a.nms, d.nd, d.sum/100 as SUM
                             FROM accounts a
