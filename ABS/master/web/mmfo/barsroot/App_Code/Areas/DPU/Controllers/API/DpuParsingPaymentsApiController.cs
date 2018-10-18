@@ -22,7 +22,7 @@ namespace BarsWeb.Areas.DPU.Controllers.Api
 
 
         [HttpGet]
-        public HttpResponseMessage GetDataForGrid([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request, int id)
+        public HttpResponseMessage GetDataForGrid([ModelBinder(typeof(WebApiDataSourceRequestModelBinder))]DataSourceRequest request, decimal id)
         {
             var fileList = _repository.GetDataForGrid<BalanceCounts>(id);
             return Request.CreateResponse(HttpStatusCode.OK,fileList.ToDataSourceResult(request));
