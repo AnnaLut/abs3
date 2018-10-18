@@ -1,7 +1,0 @@
-LangResourceV2RUS
-{cTAt} {Внимание!} {Внимание!}
-{dlg_InputPassword.cTWndTitle} {Ввод технологического пароля} {Ввод технологического пароля}
-{dlg_InputPassword.pbOk} {Ввести} {Ввести}
-{dlg_InputPassword.pbExit} {Отменить} {Отменить}
-{dlg_InputPassword.bgPassword} {Пароль:} {Пароль:}
-{dlg_InputPassword.cTErrPassword} {Ошибка ввода технологического пароля АБС} {Ошибка ввода технологического пароля АБС}

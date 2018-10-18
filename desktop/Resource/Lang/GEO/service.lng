@@ -1,7 +1,0 @@
-LangResourceV2GEO
-{cTAt} {Внимание!} {ЪЦТАГЩДБА!}
-{dlg_InputPassword.cTWndTitle} {Ввод технологического пароля} {Input technological password}
-{dlg_InputPassword.pbOk} {Ввести} {Input}
-{dlg_InputPassword.pbExit} {Отменить} {Close}
-{dlg_InputPassword.bgPassword} {Пароль:} {Password}
-{dlg_InputPassword.cTErrPassword} {Ошибка ввода технологического пароля АБС} {Technological password input error}
