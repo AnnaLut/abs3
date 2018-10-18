@@ -88,7 +88,7 @@ PROMPT *** ALTER_POLICIES to TMP_OPER_PS1 ***
  exec bpa.alter_policies('TMP_OPER_PS1');
 
 
-COMMENT ON TABLE BARS.TMP_OPER_PS1 IS '';
+COMMENT ON TABLE BARS.TMP_OPER_PS1 IS 'Временная таблица струткуры OPER для выгрузки тестовых данных для дальнейшего анализа';
 COMMENT ON COLUMN BARS.TMP_OPER_PS1.REF IS '';
 COMMENT ON COLUMN BARS.TMP_OPER_PS1.DEAL_TAG IS '';
 COMMENT ON COLUMN BARS.TMP_OPER_PS1.TT IS '';
