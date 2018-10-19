@@ -1418,11 +1418,9 @@ end add_dop_req;
               l_kv:=get_kv(p_kv);
               begin
 
-                select a.isp,
-                       a.branch,
+                select a.branch,
                        s.branch
-                  into l_userid,
-                       l_branch_acc,
+                  into l_branch_acc,
                        l_branch_usr
                   from
                       accounts a,
@@ -1434,6 +1432,11 @@ end add_dop_req;
                   exception when no_data_found then
                       raise_application_error(-20000, 'Рахунок відправника не знайдено!');
               end;
+
+              select sb.id
+                into l_userid
+                from staff$base sb
+               where sb.logname = 'CORP_LIGHT_SYSTEM_USER';
               
               select count(*)
                 into l_cnt
