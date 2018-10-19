@@ -90,7 +90,8 @@ begin
                     Ruk_    => null,
                     Telr_   => null,
                     Buh_    => null,
-                    Telb_   => null);
+                    Telb_   => null,
+                    k190_   => null);
 --       dbms_output.put_line('3. зарегистрирован клиент № '||to_char(RNK_));
       end;
       branch_edit.setBranchParams( branch_, 'RNK', to_char(RNK_) );

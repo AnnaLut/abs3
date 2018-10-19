@@ -4210,7 +4210,8 @@ as
                            null,  -- Ruk_    VARCHAR2,
                            TEL_,  -- TelR_   VARCHAR2,
                            null,  -- Buh_    VARCHAR2,
-                           null   -- TelB_   VARCHAR2
+                           null,  -- TelB_   VARCHAR2
+                           null   -- kl190
                           );
             fl_ := 0;
           exception when others then
@@ -5262,6 +5263,7 @@ as
                            TELR_,  -- TelR_   VARCHAR2,
                            BUH_ ,  -- Buh_    VARCHAR2,
                            TELB_   -- TelB_   VARCHAR2
+                          ,null
                           );
             if NMKU_ is not null then
               begin
@@ -10360,6 +10362,7 @@ as
                            TEL_,  -- TelR_   VARCHAR2,
                            null,  -- Buh_    VARCHAR2,
                            null   -- TelB_   VARCHAR2
+                          ,null
                           );
             fl_ := 0;
           exception when others then
@@ -11120,6 +11123,7 @@ as
                            TEL_,  -- TelR_   VARCHAR2,
                            null,  -- Buh_    VARCHAR2,
                            null   -- TelB_   VARCHAR2
+                          ,null   -- TelB_   VARCHAR2
                           );
             fl_ := 0;
           exception when others then
@@ -18433,6 +18437,7 @@ as
                            TEL_,  -- TelR_   VARCHAR2,
                            null,  -- Buh_    VARCHAR2,
                            null   -- TelB_   VARCHAR2
+                           ,null   -- kl190   VARCHAR2
                           );
             fl_ := 0;
           exception when others then
@@ -22247,6 +22252,7 @@ as
                            TEL_,  -- TelR_   VARCHAR2,
                            BUH_,  -- Buh_    VARCHAR2,
                            TELB_  -- TelB_   VARCHAR2
+                           ,null   -- k190   VARCHAR2
                           );
             if NMKU_ is not null then
               begin
@@ -26959,6 +26965,7 @@ as
                            TELR_,  -- TelR_   VARCHAR2,
                            BUH_ ,  -- Buh_    VARCHAR2,
                            TELB_   -- TelB_   VARCHAR2
+                          ,null   -- k190_   VARCHAR2
                           );
             if NMKU_ is not null then
               begin
@@ -30167,6 +30174,7 @@ as
                            TEL_,  -- TelR_   VARCHAR2,
                            BUH_,  -- Buh_    VARCHAR2,
                            TELB_  -- TelB_   VARCHAR2
+                          ,null   -- k190   VARCHAR2
                           );
             if NMKU_ is not null then
               begin
