@@ -1832,8 +1832,8 @@ namespace ViewAccounts
                 decimal Lim = (data[18] == "") ? (0) : Convert.ToDecimal(data[18]);
                 string Tobo = data[19];
                 decimal mode = (ProcMfo.HasValue || ProcMfoOld.HasValue) ? (4) : (77);
-                string ostx = (Ostx == 0) ? ("") : (Ostx.ToString());
-
+//                string ostx = (Ostx == 0) ? ("") : (Ostx.ToString());
+	        string ostx = ((Ostx != null) &&  (Ostx != 0))?  (Ostx.ToString()) :  ("NULL"); 
                 string ob22 = data[26];
                 decimal P4 = 0;
 
