@@ -32,7 +32,6 @@ begin
 
   dbms_output.put_line( 'Created new file #' || to_char(l_file_id) );
 
-
   for l in ( 
              select *
              from   NBUR_REF_FILES_LOCAL
@@ -55,7 +54,7 @@ begin
   nbur_files.SET_FILE_PROC(
                               p_proc_id => l_proc_id
                               , p_file_id => l_file_id
-                              , p_proc_type => 'F'
+                              , p_proc_type => 'O'
                               , p_proc_active => 'Y'
                               , p_scheme => 'BARS'
                               , p_proc_name => 'NBUR_P_F4PX_NC'
@@ -72,48 +71,63 @@ begin
     , p_strt_dt => date '2015-01-01'
   );
 
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id => nbur_objects.f_get_object_id_by_name(p_object_name => 'NBUR_DM_ACCOUNTS')
-    , p_strt_dt => date '2015-01-01'
+  NBUR_FILES.SET_FILE_DEPENDENCIES
+  ( p_file_id  => l_file_id
+  , p_file_pid => r_file.ID
   );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id => nbur_objects.f_get_object_id_by_name(p_object_name => 'NBUR_DM_CUSTOMERS')
-    , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id  => nbur_objects.f_get_object_id_by_name(p_object_name => 'NBUR_DM_ACNT_RATES')
-    , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id  => nbur_objects.f_get_object_id_by_name(p_object_name => 'NBUR_DM_AGRM_ACCOUNTS')
-    , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id  => nbur_objects.f_get_object_id_by_name(p_object_name => 'NBUR_DM_AGREEMENTS')
-    , p_strt_dt => date '2015-01-01'
-  );
-
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id  => nbur_objects.f_get_object_id_by_name(p_object_name => 'NBUR_DM_BALANCES_MONTHLY')
-    , p_strt_dt => date '2015-01-01'
-  );                              
+                              
 end;
 /
 commit;
 
+begin
+    delete from NBUR_REF_PREPARE_XML where FILE_CODE = '#4P';
+    Insert into NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START)
+     Values
+       ('#4P', 'select
+          EKP
+          , B040
+          , R020
+          , R030_1
+          , nvl(R030_2, ''#'') as R030_2 
+          , K040
+          , S050
+          , S184
+          , F028
+          , nvl(F045, ''#'') as F045
+          , nvl(F046, ''#'') as F046
+          , nvl(F047, ''#'') as F047
+          , nvl(F048, ''#'') as F048
+          , nvl(F049, ''#'') as F049
+          , nvl(F050, ''#'') as F050
+          , nvl(F052, ''#'') as F052
+          , nvl(F053, ''#'') as F053
+          , nvl(F054, ''#'') as F054
+          , nvl(F055, ''#'') as F055
+          , nvl(F056, ''#'') as F056
+          , F057
+          , nvl(F070, ''#'') as F070
+          , K020
+          , Q001_1
+          , Q001_2
+          , Q003_1
+          , Q003_2
+          , Q003_3
+          , Q006
+          , Q007_1
+          , Q007_2
+          , Q007_3
+          , Q010_1
+          , Q010_2
+          , Q012
+          , Q013
+          , Q021
+          , Q022
+          , T071
+    from   nbur_log_f4px
+    where  report_date = :p_rpt_dt
+          and kf = :p_kf', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+    COMMIT;
+end;
+/

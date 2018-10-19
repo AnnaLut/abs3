@@ -52,7 +52,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.4  2018.10.12';
+  g_body_version  constant varchar2(64) := 'version 3.5  2018.10.16';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -825,6 +825,10 @@ $end
     then
       l_clob := REGEXP_REPLACE( l_clob, '(<Q001|<Q029)(></)', '\1 xsi:nil = "true" \2' );
       l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2|<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
+    when '4P'
+    then
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q001_1|<Q001_2|Q003_1|Q006|Q007_1|Q007_2|Q007_3)(></)', '\1 xsi:nil = "true" \2' );
+      l_clob := REGEXP_REPLACE( l_clob, '(<Q012|<Q013|Q021|Q022)(></)', '\1 xsi:nil = "true" \2' );
     else
       null;
     end case;
