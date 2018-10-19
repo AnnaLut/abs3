@@ -17,7 +17,18 @@ begin
   from   nbur_queue_forms f
   where  f.id = l_file_id
          and f.report_date = p_report_date
-         and f.kf = p_kf;
+         and f.kf = p_kf
+         and (f.status = 1 or
+              exists (select 1
+                      from nbur_lnk_files_files a, 
+                           nbur_ref_procs b, 
+                           nbur_ref_procs c
+                      where a.file_id = l_file_id and
+                            a.file_id = b.file_id and
+                            a.file_dep_id = c.file_id and 
+                            b.proc_type <> c.proc_type
+                     )
+             );
 
   return (l_count > 0);
 exception

@@ -5,7 +5,7 @@ create or replace procedure BARS.P_F1A_NN
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования файла #1A для КБ
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :    26.01.2018 (07/03/2017)
+% VERSION     :   08/10/2018 (26.01.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -483,9 +483,9 @@ BEGIN
                   comm1_ := comm_ ||' begin = ' || to_char(datn_, 'dd.mm.yyyy')
                                   || ' end = ' || to_char(date_, 'dd.mm.yyyy');
 
-                  INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
+                  INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
                   VALUES
-                                         (nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm1_, mdate_);
+                                         (acc_, nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm1_, mdate_);
 
                   if codcagent_ = 6 then
                      datn_ := datk_;
@@ -506,8 +506,8 @@ BEGIN
              kodp_:= dk_ || LPAD(to_char(kv_),3,'0') || ddd_ || z_ || '0000' || '0';
              znap_:= TO_CHAR(ABS(se_));
 
-             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
-             VALUES (nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
+             INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
+             VALUES (acc_, nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
 
              if mdate_ <= dat_ then    --03.06.2010
                 dk_ := '21';
@@ -519,8 +519,8 @@ BEGIN
 
              znap_:= TO_CHAR(ABS(se_));
 
-             INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
-             VALUES (nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
+             INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
+             VALUES (acc_, nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
           end if;
        END IF;
 
@@ -575,8 +575,8 @@ BEGIN
                 kodp_:= dk_ || LPAD(to_char(kv_),3,'0') || ddd_ || z_ || '0000' || '0';
                 znap_:= TO_CHAR(ROUND(ABS(s41_),0));
 
-                INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
-                VALUES (nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
+                INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
+                VALUES (acc_, nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
              end if;
           end if;
 
@@ -589,8 +589,8 @@ BEGIN
                 kodp_:= dk_ || LPAD(to_char(kv_),3,'0') || ddd_ || z_ || '0000' || '0';
                 znap_:= TO_CHAR(ROUND(ABS(s51_),0));
 
-                INSERT INTO rnbu_trace (nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
-                VALUES (nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
+                INSERT INTO rnbu_trace (acc, nls, kv, odate, kodp, znap, nbuc, rnk, comm, mdate)
+                VALUES (acc_, nls_, kv_, data_, kodp_, znap_, nbuc_, rnk_, comm_, mdate_);
              end if;
           end if;
 
