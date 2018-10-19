@@ -273,7 +273,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = @"bars.CCK.cc_START";
-                cmd.Parameters.Add("ND_", OracleDbType.Int32, nd, ParameterDirection.Input);
+                cmd.Parameters.Add("ND_", OracleDbType.Decimal, nd, ParameterDirection.Input);
                 cmd.ExecuteNonQuery();
             }
             finally
@@ -391,7 +391,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = @"bars.CCK_UI.OP_OFR";
-                cmd.Parameters.Add("p_acc", OracleDbType.Int32, acc, ParameterDirection.Input);
+                cmd.Parameters.Add("p_acc", OracleDbType.Decimal, acc, ParameterDirection.Input);
                 cmd.ExecuteNonQuery();
             }
             finally

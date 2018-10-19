@@ -73,7 +73,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     while (reader.Read())
                     {
                         AccKredit acc = new AccKredit();
-                        acc.ACC = reader.GetInt32(0);
+                        acc.ACC = reader.GetDecimal(0);
                         acc.TIP = reader.GetString(1);
                         acc.KV = reader.GetInt16(2);
                         acc.NLS = reader.GetString(3);
@@ -116,7 +116,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                         acc.DPLAN = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? (DateTime?)null : reader.GetDateTime(0);
                         acc.FDAT = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? (DateTime?)null : reader.GetDateTime(1);
                         acc.NPP = String.IsNullOrEmpty(reader.GetValue(2).ToString()) ? (decimal?)null : reader.GetDecimal(2);
-                        acc.ACC = reader.GetInt32(3);
+                        acc.ACC = reader.GetDecimal(3);
                         acc.TIP = reader.GetString(4);
                         acc.KV = reader.GetInt16(5);
                         acc.NLS = reader.GetString(6);
