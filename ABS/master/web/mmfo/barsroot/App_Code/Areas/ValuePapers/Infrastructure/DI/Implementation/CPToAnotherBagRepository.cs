@@ -181,7 +181,7 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
         {
             string sql = @"update oper set nd=:ticket_number where ref = :REF_MAIN";
             var p = new DynamicParameters();
-            p.Add("REF_MAIN", dbType: DbType.Int16, value: REF_MAIN, direction: ParameterDirection.Input);
+            p.Add("REF_MAIN", dbType: DbType.Int32, value: REF_MAIN, direction: ParameterDirection.Input);
             p.Add("ticket_number", dbType: DbType.String, size: 200, value: ticket_number, direction: ParameterDirection.Input);
             using (var connection = OraConnector.Handler.UserConnection)
             {
