@@ -277,6 +277,7 @@ FUNCTION ostc96_3 (acc_ INT, dat_ IN DATE)
 
 
 END rez;
+
 /
 CREATE OR REPLACE PACKAGE BODY BARS.REZ 
 /*
@@ -360,7 +361,7 @@ IS
    );
 
    TYPE type_korprov1 IS TABLE OF type_korprov
-      INDEX BY BINARY_INTEGER;
+      INDEX BY varchar2(30);
 
    korprov_        type_korprov1;
 
@@ -370,12 +371,12 @@ IS
    );
 
    TYPE type_saldo1 IS TABLE OF type_saldo
-      INDEX BY BINARY_INTEGER;
+      INDEX BY varchar2(30);
 
    salost_         type_saldo1;
 
    TYPE type_nd_acc IS TABLE OF NUMBER
-      INDEX BY BINARY_INTEGER;
+      INDEX BY varchar2(30);
 
    ndacc_          type_nd_acc;
 
@@ -755,13 +756,13 @@ IS
       END IF;
 
       -- to_log (acc_, 'function ostc96', '');
-      IF salost_.EXISTS (acc_)
+      IF salost_.EXISTS (to_char(acc_))
       THEN
-         IF salost_ (acc_).fdat = dat_
+         IF salost_ (to_char(acc_)).fdat = dat_
          THEN
             --     to_log (acc_, '..остаток1=', TO_CHAR (salost_ (acc_).ost));
-            dbms_output.put_line('..остаток1= '|| TO_CHAR (salost_ (acc_).ost));
-            RETURN salost_ (acc_).ost;
+            dbms_output.put_line('..остаток1= '|| TO_CHAR (salost_ (to_char(acc_)).ost));
+            RETURN salost_ (to_char(acc_)).ost;
          END IF;
       END IF;
 
@@ -802,16 +803,16 @@ IS
          to_log (acc_, '..корректирующие1=', TO_CHAR (ob_));
          dbms_output.put_line('..корректирующие1='|| TO_CHAR (ob_));
       ELSE
-         IF korprov_.EXISTS (acc_)
+         IF korprov_.EXISTS (to_char(acc_))
          THEN
-            IF korprov_ (acc_).fdat = dat_
+            IF korprov_ (to_char(acc_)).fdat = dat_
             THEN
                to_log (acc_,
                        '..корректирующие2=',
-                       TO_CHAR (NVL (korprov_ (acc_).ob, 0))
+                       TO_CHAR (NVL (korprov_ (to_char(acc_)).ob, 0))
                       );
-              dbms_output.put_line('..корректирующие2='|| TO_CHAR (NVL (korprov_ (acc_).ob, 0)));
-               ost_ := ost_ + NVL (korprov_ (acc_).ob, 0);
+              dbms_output.put_line('..корректирующие2='|| TO_CHAR (NVL (korprov_ (to_char(acc_)).ob, 0)));
+               ost_ := ost_ + NVL (korprov_ (to_char(acc_)).ob, 0);
             ELSE
                SELECT NVL (SUM (DECODE (o.dk, 1, o.s, -o.s)), 0)
                  INTO ob_
@@ -825,15 +826,15 @@ IS
 
                to_log (acc_, '..корректирующие3=', TO_CHAR (ob_));
                 dbms_output.put_line('..корректирующие3='|| TO_CHAR (ob_));
-               korprov_ (acc_).ob := ob_;
-               korprov_ (acc_).fdat := dat_;
+               korprov_ (to_char(acc_)).ob := ob_;
+               korprov_ (to_char(acc_)).fdat := dat_;
                ost_ := ost_ + ob_;
             END IF;
          END IF;
       END IF;
 
-      salost_ (acc_).ost := ost_;
-      salost_ (acc_).fdat := dat_;
+      salost_ (to_char(acc_)).ost := ost_;
+      salost_ (to_char(acc_)).fdat := dat_;
       RETURN ost_;
    END ostc96;
 
@@ -1121,9 +1122,9 @@ IS
          END IF;
 
          BEGIN
-            IF ndacc_.EXISTS (acc_)
+            IF ndacc_.EXISTS (to_char(acc_))
             THEN
-               nd_ := ndacc_ (acc_);
+               nd_ := ndacc_ (to_char(acc_));
             ELSE
                SELECT MAX (nd)
                  INTO nd_
@@ -1623,9 +1624,9 @@ IS
       END;
 
       BEGIN
-         IF ndacc_.EXISTS (acc_)
+         IF ndacc_.EXISTS (to_char(acc_))
          THEN
-            nd_ := ndacc_ (acc_);
+            nd_ := ndacc_ (to_char(acc_));
          ELSE
             SELECT MAX (nd)
               INTO nd_
@@ -1802,9 +1803,9 @@ IS
       END;
 
       BEGIN
-         IF ndacc_.EXISTS (acc_)
+         IF ndacc_.EXISTS (to_char(acc_))
          THEN
-            nd_ := ndacc_ (acc_);
+            nd_ := ndacc_ (to_char(acc_));
          ELSE
             SELECT DISTINCT nd
                        INTO nd_
@@ -6217,6 +6218,7 @@ BEGIN
          rezpay2_ := 0;
    END;
 END rez;
+
 /
  show err;
  
