@@ -1074,7 +1074,8 @@ is
    l_nls       accounts.nls%type := null;
    l_type_flag ow_params.par%type;
 begin
-   if p_nlsalt is null or not regexp_like(p_nlsalt, '^26[0,2,5]5') then
+   if p_nlsalt is null or not regexp_like(p_nlsalt, '^26[0,2,5]5') 
+   or (regexp_like(p_nlsalt, '^26[0,2,5]5') and regexp_like(p_nls, '^26[0,2,5]5')) then
       l_nls := p_nls;
    else 
       if regexp_like(p_nlsalt, '^2625') then
