@@ -10082,7 +10082,8 @@ end if;
                          cc_add ad,
                          accounts a,
                          customer c,
-                         (SELECT nd, acc FROM cc_lim GROUP BY nd, acc) l
+                         (select n.nd, a.acc from nd_acc n, accounts a where n.acc = a.acc and a.tip = 'LIM') l
+--                         (SELECT nd, acc FROM cc_lim GROUP BY nd, acc) l
                    WHERE d.nd = ad.nd
                      AND ad.adds = 0
                      AND ad.accs = a.acc
@@ -13592,6 +13593,12 @@ end if;
                             AND tag = 'DAYSN'),
                          to_char(lpad(i8.s, 2, '0'))) pl_day_sn
                     ,a.dazs
+                    ,a.blkd
+                    ,case
+                       when a.nbs = 2625 then 1
+                       when a.nbs = 2620 and a.tip like 'W4%' then 1
+                       else 0
+                     end as ow_flag
                 FROM accounts a,
                      nd_acc n,
                      nd_acc n8,
@@ -13614,14 +13621,19 @@ end if;
                  AND i8.id = 0
                  AND ((a.tip = 'SG' AND a.ostc > 0) OR
                      (a.nbs IN ('2620', '2600') AND a.ostc > 0) OR
-                     a.nbs = '2625')
+                     a.nbs = '2625'
+                     or (a.nbs = 2620 and a.tip like 'W4%'))
                  AND a8.rnk = c.rnk
                  AND d.nd = n.nd
                  AND a.acc = n.acc
               ----------- AND a.ostC=a.ostB  -------------------------------------------------
                ORDER BY d.sdate, d.wdate, d.sos DESC,
-                        decode(a.nbs, '3739', 1, '2620', 2, 3)) LOOP
+                        decode(a.nbs, '3739', 1, '2620', decode(substr(a.tip,1,2),'W4',3,2), 3)) LOOP
       --цикл по счетам гашения
+      if k.blkd>0 then
+        logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' блокований, списання неможливе. Пропускаємо');
+        continue;
+      end if;
 
       if k.dazs is not null and k.dazs>gl.bDATE then
         logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' закритий '||to_char(k.dazs,'dd.mm.yyyy')||'. Списання неможливе. Пропускаємо');
@@ -13629,7 +13641,7 @@ end if;
       end if;
 
       --перевірка mode_ на необхідність врахування рахунків 2625 як рах. погашення
-      IF (mode_ = 2) AND (k.nlsd LIKE '2625%') THEN
+      IF (mode_ = 2) AND (k.ow_flag = 1) THEN
         continue;
       ELSE
         /*
@@ -13705,7 +13717,7 @@ end if;
           FROM accounts
          WHERE acc = k.accd;
 
-        IF k.nlsd LIKE '2625%' AND k.sos = 10 THEN
+        IF k.ow_flag = 1  AND k.sos = 10 THEN
           s29_ := 10000000000000; -- Неорганиченный. т.к. неизвестный. М.б будет сервис - узнать остаток
         ELSE
           s29_ := s29_ + k.s29_lim; -- Вычитаем неснижаемый остаток с учетом блокировок и оверд
@@ -14092,7 +14104,7 @@ end if;
               vob_ := vob_val;
             END IF;
 
-            IF substr(k.nlsd, 1, 4) IN ('2625') THEN
+            IF k.ow_flag = 1 THEN
               tt_ := tt_bpk;
             ELSE
               tt_ := tt_odb;
