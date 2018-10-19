@@ -138,7 +138,7 @@ end;
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.26 18.09.2018';
+g_body_version   constant varchar2(64)   := 'version 1.26 19.10.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -1548,19 +1548,28 @@ begin
         where rnk=l_rnk
         and   okpo=p_okpob;
       exception when no_data_found then
-        if coalesce(p_okpob,'0000000000') <> '0000000000' then
+        if p_source = 1 then
+          if coalesce(p_okpob,'0000000000') <> '0000000000' then
+            raise_application_error(-20000, 'ОКПО клієнта - '||p_okpob||' не відповідає рахунку - '||p_nlsb);
+          else
+            null;
+          end if;
+        else
           raise_application_error(-20000, 'ОКПО клієнта - '||p_okpob||' не відповідає рахунку - '||p_nlsb);
         end if;
-      end ;
+      end;
     end if;
 
+  -- перевірка паспортних даних тільки для ручного введення
   begin
-    if coalesce(p_okpob,'0000000000') = '0000000000' and ((p_passp_serial is null or p_passp_num is null) and p_id_card_num is null) then
-      raise_application_error(-20000, 'Не вказані ІПН або серія та (або) номер паспорту');
-    end if;
+    if p_source = 1 then
+      if coalesce(p_okpob,'0000000000') = '0000000000' and ((p_passp_serial is null or p_passp_num is null) and p_id_card_num is null) then
+        raise_application_error(-20000, 'Не вказані ІПН або серія та (або) номер паспорту');
+      end if;
 
-    if coalesce(p_id_card_num,'000000000') <> '000000000' and not regexp_like(p_id_card_num,'^\d{9}$') then
-      raise_application_error(-20000, 'Номер паспорта нового зразка має містити 9 цифр');
+      if coalesce(p_id_card_num,'000000000') <> '000000000' and not regexp_like(p_id_card_num,'^\d{9}$') then
+        raise_application_error(-20000, 'Номер паспорта нового зразка має містити 9 цифр');
+      end if;
     end if;
   end;
 
@@ -2723,27 +2732,28 @@ end;
                      p.numdoc,
                      p.actual_date,
                      p.passp
-              from accounts a, customer c, person p
-              where 
-                  a.rnk = c.rnk 
-                  and a.kv = 980 
-                  and p.rnk = c.rnk
-                  and p.passp in (1,7)
-                  and nls = p_nls)
+              from accounts a
+                   inner join customer c on c.rnk = a.rnk 
+                   left join person p on p.rnk = c.rnk
+              where a.nls = p_nls
+                    and a.kv = 980)
     loop
+      -- якщо паспорт старого зразка
       if i.passp in (1) then
-        p_okpo        := i.okpo;
-        p_nmk         := i.nmk;
         p_pass_serial := i.ser;
         p_pass_num    := i.numdoc;
+      -- якщо паспорт нового зразка
       elsif i.passp in (7) then
-        p_okpo        := i.okpo;
-        p_nmk         := i.nmk;
         p_pass_card   := i.numdoc;
         p_actual_date := i.actual_date;
       else
         null;
       end if;
+      -- ОКПО і назву заповнюю в любому випадку, якщо є
+      p_okpo := i.okpo;
+      p_nmk  := i.nmk;
+
+      exit;
     end loop;
   end get_doc_person;
 
