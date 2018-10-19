@@ -776,7 +776,11 @@ BEGIN
       t_ := 8;                                               -- Dt Forex paper
    ELSIF NBSd_ LIKE '7%' AND tt_ NOT IN ('PS0')
    THEN
-      t_ := 39;                                                         --Вирт
+      IF tt_ = 'C4A' THEN --COBUMMFO-9457
+        t_ := 27;
+      ELSE
+        t_ := 39;
+      END IF;
    ELSIF NBSk_ LIKE '7%' AND tt_ NOT IN ('PS0')
    THEN
       IF tt_ = 'MVN' THEN
