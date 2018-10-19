@@ -34,7 +34,7 @@ namespace BarsWeb.Areas.ReserveAccs.Infrastructure.Repository.DI.Implementation
 					{
 						if (!String.IsNullOrEmpty(account.mainCurr))
 						{
-							var sql = String.Format("select aw.value from ACCOUNTSW aw join accounts a on a.acc = aw.acc and a.nls = '{0}' and a.kv = {1}", account.Number, account.mainCurr);
+							var sql = String.Format("select aw.value from ACCOUNTSW aw join accounts a on a.acc = aw.acc and a.nls = '{0}' and a.kv = {1} and aw.tag = 'SHTAR'", account.Number, account.mainCurr);
 							account.Tarriff = connect.Query<decimal?>(sql).SingleOrDefault();
 						}
 					}
