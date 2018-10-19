@@ -1,4 +1,10 @@
-CREATE OR REPLACE PACKAGE cck IS
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck.sql =========*** Run *** =======
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.CCK IS
 
   g_header_version CONSTANT VARCHAR2(64) := 'ver.3.25  16/05/2018 ';
 
@@ -97,7 +103,7 @@ CREATE OR REPLACE PACKAGE cck IS
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
   PROCEDURE lim_bdate
   (
-   p_nd NUMBER, 
+   p_nd NUMBER,
    p_dat DATE default gl.bdate
   );
 
@@ -170,7 +176,7 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE update_obs
   (
     dat_ DATE
-   ,nd_  INT
+   ,nd_  number
   );
   --автоматичне визначення параметру "обслуговування боргу".
 
@@ -242,7 +248,7 @@ CREATE OR REPLACE PACKAGE cck IS
   ---------------------------------------------
   FUNCTION fbs
   (
-    nd_  INT
+    nd_  number
    ,acc_ INT
    ,dat_ DATE
   ) RETURN NUMBER;
@@ -250,7 +256,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   FUNCTION pbs
   (
-    nd_  INT
+    nd_  number
    ,acc_ INT
    ,dat_ DATE
   ) RETURN NUMBER;
@@ -281,7 +287,7 @@ CREATE OR REPLACE PACKAGE cck IS
   -----------------
   PROCEDURE cc_asg_sn8
   (
-    nd_      INT
+    nd_      number
    ,nls_6397 VARCHAR2
    ,nls_8006 VARCHAR2
   );
@@ -289,7 +295,7 @@ CREATE OR REPLACE PACKAGE cck IS
   ----------------
   PROCEDURE cc_update
   (
-    nd_      INT
+    nd_      number
    ,dat1_    DATE
    ,dat2_    DATE
    ,dat3_    DATE
@@ -343,7 +349,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE an_gpk
   (
-    nd_  INT
+    nd_  number
    ,s1_  NUMBER
    ,den_ INT
   );
@@ -352,24 +358,24 @@ CREATE OR REPLACE PACKAGE cck IS
   FUNCTION r011_s181
   (
     acc_ INT
-   ,nd_  INT
+   ,nd_  number
   ) RETURN CHAR;
   --Спецпарам R011 + S181
 
   FUNCTION sum_int
   (
     kv8_ INT
-   ,nd_  INT
+   ,nd_  number
    ,dat_ DATE
   ) RETURN NUMBER;
   --Сумма проц по договору в базовой валюте договора на дату
   ----------------------------------------
-  FUNCTION sum_spn(nd_ INT) RETURN NUMBER;
+  FUNCTION sum_spn(nd_ number) RETURN NUMBER;
   --Сумма просроч проц по договору на тек банк дату
   ---------------------------------------------
   FUNCTION sum_asg
   (
-    nd_ INT
+    nd_ number
    ,kv_ INT
   ) RETURN NUMBER;
   --Сумма ожидаемого платежа по КД в заданной валюте на тек банк дату
@@ -399,7 +405,7 @@ CREATE OR REPLACE PACKAGE cck IS
   --------------------------
   FUNCTION nls0
   (
-    nd_  INT
+    nd_  number
    ,tip_ CHAR
   ) RETURN VARCHAR2;
   --PRAGMA RESTRICT_REFERENCES ( NLS0, WNDS );
@@ -440,13 +446,13 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE cc_lim_null(p_nd NUMBER);
   --наполнение CC_LIM хотя бы одной записью
 
-  PROCEDURE cc_lim_del(nd_ INT);
+  PROCEDURE cc_lim_del(nd_ number);
   --удаление "модельных" КД
 
   -----------------
   PROCEDURE cc_kv
   (
-    nd_  INT
+    nd_  number
    ,kv1_ INT
    ,kv2_ INT
   );
@@ -473,7 +479,7 @@ CREATE OR REPLACE PACKAGE cck IS
   -----------------
   PROCEDURE cc_open
   (
-    nd_    IN OUT INT
+    nd_    IN OUT number
    ,nrnk   INT
    ,cc_id_ VARCHAR2
    ,dat1   DATE
@@ -506,7 +512,7 @@ CREATE OR REPLACE PACKAGE cck IS
   (
     acc_    INT
    , -- ACC сч 8999
-    nd_     INT
+    nd_     number
    , -- реф КД
     nrnk_   INT
    , -- Рег № заемщика
@@ -564,7 +570,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE cc_open_ext
   (
-    p_nd         IN OUT INT
+    p_nd         IN OUT number
    , -- Реф кредитного договора (системный)
     p_rnk        INT
    , -- РНК залогозаемщика
@@ -656,7 +662,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE cc_open_com
   (
-    p_nd       INT
+    p_nd       number
    , -- Реф кредитного договора (системный)
     p_sdi      NUMBER
    , -- Сумма дисконта,
@@ -706,7 +712,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE cc_sob
   (
-    p_nd   INT
+    p_nd   number
    ,p_fdat DATE
    ,p_id   INT
    ,p_isp  INT
@@ -720,7 +726,7 @@ CREATE OR REPLACE PACKAGE cck IS
   -- процедура открытия и присоединения счетов к КД
   PROCEDURE cc_op_nls
   (
-    nd_     INT
+    nd_     number
    ,kv_     INT
    ,nls_    VARCHAR2
    ,tip_prt VARCHAR2
@@ -734,24 +740,24 @@ CREATE OR REPLACE PACKAGE cck IS
   -- Вывод счета из под договора без закрытия.
   PROCEDURE cc_exit_nls
   (
-    p_nd  INT
+    p_nd  number
    ,p_acc INT
   );
 
   ---------------------------
-  PROCEDURE cc_delete(nd_ INT);
+  PROCEDURE cc_delete(nd_ number);
   -- процедура удаления ош. КД
   ---------------------
   PROCEDURE cc_close
   (
-    nd_   INT
+    nd_   number
    ,serr_ OUT VARCHAR2
   );
   -- процедура закрытия КД
   ----------------------
   PROCEDURE cc_autor
   (
-    nd_   INT
+    nd_   number
    ,saim_ VARCHAR2
    ,urov_ VARCHAR2
   );
@@ -806,7 +812,7 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE cc_9129
   (
     fdat_ DATE
-   ,nd_   INT
+   ,nd_   number
    ,tip_  INT
   );
   -- поддержка бс 9129
@@ -814,7 +820,7 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE cc_9031
   (
     fdat_ DATE
-   ,nd_   INT
+   ,nd_   number
    ,tip_  INT
   );
   -- проводка по 9031 на сумму начального лимита по договору
@@ -822,7 +828,7 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE cc_close9031
   (
     fdat_ DATE
-   ,nd_   INT
+   ,nd_   number
    ,tip_  INT
   );
   -- снятие с 9031
@@ -919,7 +925,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   -- старая проц построения ГПК
   PROCEDURE cc_gpk(mode_  INT,
-                   nd_    INT,
+                   nd_    number,
                    acc_   INT,
                    bdat_1 DATE, -- начало
                    datn_  DATE, -- первая дата погашенпя
@@ -957,10 +963,10 @@ CREATE OR REPLACE PACKAGE cck IS
   );
   -- Расчет Прогноз суммы погашения за период работает НА ВРЕМЕННой  ТАБЛИЦе
   ---------------------
-  PROCEDURE cc_intn(nd_ INT);
+  PROCEDURE cc_intn(nd_ number);
   -- Общий ГЛК +ГПК + ГП%
   ---------------------------------
-  PROCEDURE cc_start(nd_ INT);
+  PROCEDURE cc_start(nd_ number);
   --Установить остатки на счете консолидации
   -----------------------
   PROCEDURE cc_sv12
@@ -973,14 +979,14 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE cc_m_accp
   (
     mod_  INT
-   ,nd_   INT
+   ,nd_   number
    ,accz_ INT
   );
   --присoединить, oтсоединить залoговый счет
   -------------------
   PROCEDURE cc_9819
   (
-    nd_ INT
+    nd_ number
    ,pr_ INT
   );
   -- ND_ - номер договора
@@ -990,7 +996,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE cc_crd
   (
-    nd_    INT
+    nd_    number
    ,pr_    INT
    ,refd_  INT
    ,nls_   VARCHAR2
@@ -1053,7 +1059,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE cc_asp
   (
-    p_nd INT
+    p_nd number
    ,day_ INT
   );
   --авто перенос на просрочку основного долга
@@ -1093,14 +1099,14 @@ CREATE OR REPLACE PACKAGE cck IS
   PROCEDURE cc_aspn
   (
     custtype_ INT
-   ,nd_       INT
+   ,nd_       number
    ,day_      INT
   );
   --авто перенос на просрочку долга по процентам
 
   PROCEDURE cc_aspn_dog
   (
-    p_nd    INT
+    p_nd    number
    ,p_cc_id IN VARCHAR2
    ,p_okpo  IN VARCHAR2
    ,p_nmk   IN VARCHAR2
@@ -1116,7 +1122,7 @@ CREATE OR REPLACE PACKAGE cck IS
 
   PROCEDURE cc_prolong
   (
-    p_nd  INT
+    p_nd  number
    , -- выбор по всем КД =0, или по одному
     p_dat DATE -- тек.дата
   );
@@ -1159,6 +1165,7 @@ CREATE OR REPLACE PACKAGE cck IS
   -------------------
 
 END cck;
+
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
@@ -1773,7 +1780,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
       IF (aa.nbs LIKE '20_%' OR aa.nbs LIKE '22_%' OR aa.tip = 'LIM') THEN
        if aa.tip = 'SPN' or aa.tip = 'SNO' or aa.tip = 'SS ' or aa.tip = 'SP ' or aa.tip = 'SN ' then -- Временно для разделения линий
          null;
-       else	   
+       else
         raise_application_error(-20203,
                                 '\ Виведення рах ' || aa.nls || '*' ||
                                 aa.tip || ' недопустимо !');
@@ -2051,15 +2058,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   ------------------------------------------------------
 
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
-  PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS    ll cc_lim%ROWTYPE; l_Kv8 int; 
-    l_NDG number ;   
+  PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS    ll cc_lim%ROWTYPE; l_Kv8 int;
+    l_NDG number ;
   BEGIN
 
     BEGIN --  22.05.2018 Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
        select NDG  into  l_NDG from cc_deal   where nd  = p_ND and ( NDG is null OR NDG = ND ) ;
 
        -- ШАГ-1. на заглавном КД
-       SELECT l.* INTO ll    FROM cc_lim l WHERE l.nd = p_nd AND l.fdat = (SELECT MAX(fdat) FROM cc_lim WHERE nd = p_nd  AND fdat <= nvl(p_dat, gl.bdate));  ---       есть изменение лимита 
+       SELECT l.* INTO ll    FROM cc_lim l WHERE l.nd = p_nd AND l.fdat = (SELECT MAX(fdat) FROM cc_lim WHERE nd = p_nd  AND fdat <= nvl(p_dat, gl.bdate));  ---       есть изменение лимита
           UPDATE accounts SET   ostx  = -ll.lim2, pap = 1 WHERE acc = ll.acc;
           UPDATE cc_deal  SET   LIMIT =  ll.lim2 / 100    WHERE nd = p_nd;
           UPDATE cc_add   SET   s     =  ll.lim2 / 100    WHERE nd = p_nd  AND adds = 0;
@@ -2072,10 +2079,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                 update accounts set ostx  = d.ostx , pap = 3  where acc = d.acc ;
                 d.ostx := - d.ostx /100;
                 update cc_deal  set limit = d.ostx where nd = d.nd;
-                update cc_add   set s     = d.ostx where nd = d.nd;          
+                update cc_add   set s     = d.ostx where nd = d.nd;
           end loop  ;  -- d
        end if ; -- l_NDG = p_ND
-    EXCEPTION  WHEN no_data_found THEN     NULL;  
+    EXCEPTION  WHEN no_data_found THEN     NULL;
     END;
 
   END lim_bdate;
@@ -2436,7 +2443,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   END set_pmt_instructions;
   ----------------------------
 
-  PROCEDURE update_obs(dat_ DATE, nd_ INT) IS
+  PROCEDURE update_obs(dat_ DATE, nd_ number) IS
     --автоматичне визначення параметру "обслуговування боргу".
     -- ND_ =  0 для всех КД
     -- ND_ = -2 для всех КД  ЮЛ
@@ -3070,7 +3077,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   ---------------------------------------------
 
-  FUNCTION fbs(nd_ INT, acc_ INT, dat_ DATE) RETURN NUMBER IS
+  FUNCTION fbs(nd_ number, acc_ INT, dat_ DATE) RETURN NUMBER IS
     kv8_ INT := NULL;
     tst_ NUMBER := 0; -- искомая факт.бал.вартiсть на заданную дату DAT_ в коп в вал КД
   BEGIN
@@ -3105,7 +3112,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     RETURN tst_;
   END fbs;
 
-  FUNCTION pbs(nd_ INT, acc_ INT, dat_ DATE) RETURN NUMBER IS
+  FUNCTION pbs(nd_ number, acc_ INT, dat_ DATE) RETURN NUMBER IS
     /*
     Якщо в майбутньому реальнi значення та строки потокiв грошових коштiв
     будуть вiдрiзнятися вiд запланованих,
@@ -3336,7 +3343,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   END cc_wdate;
   -----------
 
-  PROCEDURE cc_asg_sn8(nd_ INT, nls_6397 VARCHAR2, nls_8006 VARCHAR2) IS
+  PROCEDURE cc_asg_sn8(nd_ number, nls_6397 VARCHAR2, nls_8006 VARCHAR2) IS
     --Авто-погашение пени.
     nms_6397 VARCHAR2(38);
     tip_6397 CHAR(3);
@@ -3514,7 +3521,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   END cc_asg_sn8;
   ----------------
 
-  PROCEDURE cc_update(nd_      INT,
+  PROCEDURE cc_update(nd_      number,
                       dat1_    DATE,
                       dat2_    DATE,
                       dat3_    DATE,
@@ -4938,7 +4945,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     END LOOP; --- k
   END int_irr;
   --------------------------------
-  PROCEDURE an_gpk(nd_ INT, s1_ NUMBER, den_ INT) IS
+  PROCEDURE an_gpk(nd_ number, s1_ NUMBER, den_ INT) IS
 
     --построение ГПК с суммой гашения 1 платежа (S1_) в указанный день(Den_)
     datn_  DATE; -- дата начала (выдачи)
@@ -5037,7 +5044,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   ---------------------
 
-  FUNCTION r011_s181(acc_ int, nd_ int) RETURN CHAR IS
+  FUNCTION r011_s181(acc_ int, nd_ number) RETURN CHAR IS
     --Спецпарам R011 + S181
     nbs_      CHAR(4);
     tip_      CHAR(3);
@@ -5112,7 +5119,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   ---------------------------------------
 
-  FUNCTION sum_int(kv8_ INT, nd_ INT, dat_ DATE) RETURN NUMBER IS
+  FUNCTION sum_int(kv8_ INT, nd_ number, dat_ DATE) RETURN NUMBER IS
     --Сумма проц по договору в базовой валюте договора на дату
     s_ NUMBER := 0;
   BEGIN
@@ -5138,7 +5145,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     RETURN s_;
   END sum_int;
   ----------------------------------------
-  FUNCTION sum_spn(nd_ INT) RETURN NUMBER IS
+  FUNCTION sum_spn(nd_ number) RETURN NUMBER IS
     --Сумма просроч проц по договору на дату
     dat31_ DATE := gl.bdate - to_number(to_char(gl.bdate, 'dd'));
     sn_    NUMBER := 0;
@@ -5204,7 +5211,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   END sum_spn;
   --------------------
-  FUNCTION sum_asg(nd_ INT, kv_ INT) RETURN NUMBER IS
+  FUNCTION sum_asg(nd_ number, kv_ INT) RETURN NUMBER IS
     --Сумма ожидаемого платежа по КД в заданной валюте на тек банк дату
     --Внимание ! Норм проц долг = остатку на SN
     n_   NUMBER;
@@ -5277,7 +5284,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   --------------------------
 
-  FUNCTION nls0(nd_ INT, tip_ CHAR) RETURN VARCHAR2 IS
+  FUNCTION nls0(nd_ number, tip_ CHAR) RETURN VARCHAR2 IS
     -- Прогноз номера счета по КД заданного вида
     nls0_ VARCHAR2(15);
     acc8_ INT;
@@ -5351,8 +5358,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
      --  Проверка на выдачу дисконта    14.02.2018 Sta Анализ НЕ-нул.остатка комиссии перед выдачей кредита (при наличии доп.реквизита по комиссии)
     BEGIN   -- к какому дог привязан ссудный счет, с которого происходит выдача ? И есть ли на нем доп.реквизит про комиссию
-        SELECT cck_app.to_number2(t.txt), d.nd, d.ndG, d.vidd    
-       INTO l_sdi, l_nd, l_ndG, l_vidd  
+        SELECT cck_app.to_number2(t.txt), d.nd, d.ndG, d.vidd
+       INTO l_sdi, l_nd, l_ndG, l_vidd
        FROM nd_txt t, accounts a, oper o, nd_acc n, cc_deal d
        WHERE t.tag = 'S_SDI'  AND t.nd = n.nd  AND n.acc = a.acc
          AND n.nd  = d.nd     AND d.sos < 14   AND decode(o.dk, 1, o.nlsa, o.nlsb) = a.nls    AND decode(o.dk, 1, o.kv, o.kv2) = a.kv   AND o.ref = ref_
@@ -5583,14 +5590,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   END cc_lim_null;
   ----------------
 
-  PROCEDURE cc_lim_del(nd_ INT) IS
+  PROCEDURE cc_lim_del(nd_ number) IS
     --удаление "модельных" КД
   BEGIN
     --резерв
     RETURN;
   END cc_lim_del;
   ----
-  PROCEDURE cc_kv(nd_ INT, kv1_ INT, kv2_ INT) IS --переустановка другой баз.валюты
+  PROCEDURE cc_kv(nd_ number, kv1_ INT, kv2_ INT) IS --переустановка другой баз.валюты
   BEGIN
     raise_application_error(- (20203),
                             '\8999 - Дану опцію відключено 03.02.2016');
@@ -6265,7 +6272,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     -- bars.bars_audit.info('CCK.p_after_open_deal.ND= '||L_ND||' ,int_accn count = '||l_count);
   END p_after_open_deal;
   -----------------------------------
-  PROCEDURE cc_open(nd_    IN OUT INT,
+  PROCEDURE cc_open(nd_    in OUT number,
                     nrnk   INT,
                     cc_id_ VARCHAR2,
                     dat1   DATE,
@@ -6488,7 +6495,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   (
     acc_    INT
    , -- ACC сч 8999
-    nd_     INT
+    nd_     number
    , -- реф КД
     nrnk_   INT
    , -- Рег № заемщика
@@ -6547,7 +6554,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     nsos cc_Deal.sos%type;
     l_nd    cc_Deal.nd%TYPE;
   BEGIN
-   
+
     BEGIN
       --COBUPRVNIX-113
       SELECT d.nd
@@ -6563,7 +6570,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
         raise_application_error(g_errn,
                                 g_errs || 'cc_kor -' || 'КД =' || nd_ ||
                                 ', має декілька записів');
-      
+
         CASE
           WHEN l_nd IS NOT NULL AND nvid_ = 1 THEN
             raise_application_error(g_errn,
@@ -6574,7 +6581,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
             NULL;
         END CASE;
     END;
-  
+
     begin
       select t.sos into nsos from cc_deal t where t.nd = nd_;
     exception
@@ -6762,7 +6769,7 @@ end if;
 
   END cc_kor;
 
-  PROCEDURE cc_open_ext(p_nd         IN OUT INT, -- Реф кредитного договора (системный)
+  PROCEDURE cc_open_ext(p_nd         in OUT number, -- Реф кредитного договора (системный)
                         p_rnk        INT, -- РНК залогозаемщика
                         p_user_id    INT, -- Реф пользователя
                         p_branch     VARCHAR2, -- BRANCH (инициатор)  nd_txt.INIC
@@ -7211,7 +7218,7 @@ end if;
 
   END cc_open_ext;
 
-  PROCEDURE cc_open_com(p_nd       INT, -- Реф кредитного договора (системный)
+  PROCEDURE cc_open_com(p_nd       number, -- Реф кредитного договора (системный)
                         p_sdi      NUMBER, -- Сумма дисконта,
                         p_f        NUMBER, -- Сумма первоначальной комиссии,
                         p_f_freq   INT, -- периодичность уплаты перв комиссии
@@ -7382,7 +7389,7 @@ end if;
              положительные   - события пользователей
   */
 
-  PROCEDURE cc_sob(p_nd   INT,
+  PROCEDURE cc_sob(p_nd   number,
                    p_fdat DATE,
                    p_id   INT,
                    p_isp  INT,
@@ -7437,7 +7444,7 @@ end if;
 
   --------------------------------------
   -- процедура открытия счетов по КД
-  PROCEDURE cc_op_nls(nd_     INT,
+  PROCEDURE cc_op_nls(nd_     number,
                       kv_     INT,
                       nls_    VARCHAR2,
                       tip_prt VARCHAR2,
@@ -7741,9 +7748,9 @@ end if;
     IF tip_ = 'SG ' THEN
       /* счет ГАШЕНИЯ и зачем это ? */
        UPDATE cc_add SET accp = acc_   WHERE nd = nd_   AND adds = 0;
-      begin  Insert into nd_acc ( nd, acc)   
+      begin  Insert into nd_acc ( nd, acc)
              select d.nd, acc_  from cc_deal d, nd_acc n, accounts a   where d.ndg = nd_ and d.nd <> d.ndg and d.nd = n.nd and n.acc = a.acc and a.kv = kv_ and a.tip ='LIM' ;
-      exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint 
+      exception when others then   if SQLCODE = - 00001 then null;   else raise; end if; --ORA-00001: unique constraint
       end;
     END IF;
 
@@ -8417,7 +8424,7 @@ end if;
 
   END cc_op_nls;
   -----------------------------------
-  PROCEDURE cc_exit_nls(p_nd INT, p_acc INT) IS
+  PROCEDURE cc_exit_nls(p_nd number, p_acc INT) IS
     r_aa  accounts%ROWTYPE;
     ern   NUMBER := 315;
     l_col INT;
@@ -8472,7 +8479,7 @@ end if;
   END cc_exit_nls;
 
   -------------------------------------
-  PROCEDURE cc_delete(nd_ INT) IS
+  PROCEDURE cc_delete(nd_ number) IS
     -- процедура удаления ош. КД
 
     sos_ INT;
@@ -8594,7 +8601,7 @@ end if;
   END cc_delete;
   -- ВИконується пролонгація КД з додаванням запису в CC_LIM
   --COBUSUPMMFO-732 внесено зміни в вибірку
-  PROCEDURE cc_prolong(p_nd  INT, -- выбор по всем КД =0, или по одному
+  PROCEDURE cc_prolong(p_nd  number, -- выбор по всем КД =0, или по одному
                        p_dat DATE -- тек.дата
 
                        ) IS
@@ -8631,8 +8638,8 @@ end if;
             union -- Добавление субдоговоров для пролонгации
              select d.nd,c.mdate, d.vidd, d.sdate
               from cc_deal d, cc_prol c
-             where p_nd = d.ndg 
-               and d.nd<>d.ndg 
+             where p_nd = d.ndg
+               and d.nd<>d.ndg
                and d.ndg = c.nd
                and d.vidd in (1,2,3) and d.sos<15
                and c.dmdat = p_dat and c.dmdat is not null
@@ -8744,7 +8751,7 @@ end if;
 
   END cc_prolong;
   ----------------------------------------
-  PROCEDURE cc_close(nd_ INT, serr_ OUT VARCHAR2) IS
+  PROCEDURE cc_close(nd_ number, serr_ OUT VARCHAR2) IS
 
     sd_    NUMBER;
     nls9_  VARCHAR2(15);
@@ -9092,7 +9099,7 @@ end if;
   END cc_escr_check;
   -- Авторизация кредитного договора
 
-  PROCEDURE cc_autor(nd_ INT, saim_ VARCHAR2, urov_ VARCHAR2) IS
+  PROCEDURE cc_autor(nd_ number, saim_ VARCHAR2, urov_ VARCHAR2) IS
     dd       cc_deal%ROWTYPE;
     l_pstart VARCHAR2(50);
     par_     VARCHAR2(14);
@@ -9158,12 +9165,12 @@ end if;
       END IF;
     END IF;
     UPDATE cc_deal SET sos = 10 WHERE nd = nd_;
-	
+
 	--COBUPRVNIX-148 При авторизации Кред.линии ЮО - необходимо авторизировать все его суб.договора
-	if dd.vidd in (1, 2, 3) then 
+	if dd.vidd in (1, 2, 3) then
 		UPDATE cc_deal SET sos = 10 WHERE ndg = nd_;
 	end if;
-    --COBUPRVNIX-148 
+    --COBUPRVNIX-148
 
     FOR k IN (SELECT a.acc
                 FROM accounts a, nd_acc n
@@ -9424,21 +9431,21 @@ end if;
   begin
 
     -- простые КД
-    FOR d1 in ( SELECT d.nd, a.acc, a.ostc FROM cc_deal d, nd_acc n, accounts a  
-                WHERE  d.vidd in (1,11) and n.nd = d.nd  AND n.acc = a.acc  AND a.tip ='LIM' and d.sos >=10 and d.sos <14 
+    FOR d1 in ( SELECT d.nd, a.acc, a.ostc FROM cc_deal d, nd_acc n, accounts a
+                WHERE  d.vidd in (1,11) and n.nd = d.nd  AND n.acc = a.acc  AND a.tip ='LIM' and d.sos >=10 and d.sos <14
                   and  p_nd in ( 0, d.nd )  and d.nd <> nvl( d.ndg,0)
               )
     loop l_ostc := 0;
        for s1 in (select a.acc, nvl(a.accc,0) ACCC, a.OSTC FROM nd_acc n, accounts a WHERE n.nd = d1.nd  AND n.acc = a.acc  AND a.tip IN ('SS ', 'SP' ) )
-       loop l_ostc := l_ostC + s1.ostc ; 
+       loop l_ostc := l_ostC + s1.ostc ;
             If s1.ACCC <> d1.ACC then  update accounts a set a.accc = d1.acc where a.acc = s1.acc ; end if ;
        end loop; -- s1
        If l_ostc <> d1.ostc      then  update accounts a set a.ostc = l_ostc where a.acc = d1.acc ; end if ;
     end loop ; -- d1
 
     -- Сложные простые КД
-    FOR d2 in ( SELECT d.nd, a.kv, a.acc, a.ostc FROM cc_deal d, nd_acc n, accounts a  
-                WHERE  d.vidd not in (1,11) and n.nd = d.nd  AND n.acc = a.acc  AND a.tip ='LIM' and d.sos >=10 and d.sos <14 
+    FOR d2 in ( SELECT d.nd, a.kv, a.acc, a.ostc FROM cc_deal d, nd_acc n, accounts a
+                WHERE  d.vidd not in (1,11) and n.nd = d.nd  AND n.acc = a.acc  AND a.tip ='LIM' and d.sos >=10 and d.sos <14
                   and  p_nd in ( 0, d.nd )  and d.nd = d.ndg
               )
     loop select nvl( sum(  gl.p_Ncurval ( d2.kv, gl.p_icurval ( s2.kv, s2.ostc, gl.bdate),  gl.bdate ) ), 0 )  into l_ostc from accounts s2 where  accc = d2.acc;
@@ -9473,7 +9480,7 @@ end if;
 
     -- IF nn_ = 0 THEN  RE_ost8 (0) ;  END IF; -- 0. Аварийное Исправление остатка на счете 8999
     -----------------------------------------------------
-    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_)) 
+    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_))
     LOOP
        cck.set_floating_rate(p_nd => k.nd);                -- пересмотр плавающей % ставки
        cck.lim_bdate(p_nd => k.nd, p_dat => fdat_);        -- установка cc_deal.limit,  cc_add.s, accounts.ostx
@@ -9483,9 +9490,9 @@ end if;
        IF l_accs IS NOT NULL THEN   UPDATE cc_add  SET accs = l_accs   WHERE nd = k.nd   AND adds = 0    AND nvl(accs, 0) <> l_accs ;  END IF;
 
        -- пересмотр поля SOS
-       IF k.sos >= 10 THEN   
+       IF k.sos >= 10 THEN
           SELECT nvl(SUM(a.ostc), 0), nvl(SUM(a.ostb), 0)  INTO s_, ss_ FROM accounts a, nd_acc n WHERE n.nd = k.nd   AND n.acc = a.acc AND a.tip IN ('SP ', 'SPN', 'SK9', 'SL ', 'SLN', 'SLK');
-          IF s_ = ss_ THEN   
+          IF s_ = ss_ THEN
              IF s_ = 0 AND k.wdate - fdat_ >= 0 AND k.sos > 10  THEN    UPDATE cc_deal SET sos = 10 WHERE nd = k.nd;  END IF;
              IF k.sos = 10 AND (s_ != 0 OR k.wdate - fdat_ < 0) THEN    UPDATE cc_deal SET sos = 13 WHERE nd = k.nd;  END IF;
           END IF;
@@ -9504,21 +9511,21 @@ end if;
                 IF SQL%ROWCOUNT = 0    THEN  INSERT INTO cc_sparam  (acc,datg,sumg) VALUES (a8.acc,datg_,sumg_); END IF ;
           EXCEPTION WHEN no_data_found THEN  UPDATE      cc_sparam   SET datg = NULL, sumg = NULL  WHERE acc = a8.acc   ;
           END;
-       END IF; -- ibank_ = '1' 
+       END IF; -- ibank_ = '1'
 
        --   3.Переоц родит.сч при доч. в другой вал   Делаем  для VIDD 3,13 либо 2,12, если счетов SS несколько
        IF k.vidd IN (2, 3, 12, 13) THEN
           SELECT COUNT(*) INTO l_cnt  FROM accounts  WHERE accc = a8.acc AND kv <> a8.kv;
           IF   l_cnt > 0  THEN cck.rate_lim(a8.acc); END IF;
        END IF;
- 
+
        --   4. Отметки в ГПК о вып.платежей
        SELECT nvl(SUM(kos - dos), 0)  INTO s1_  FROM saldoa  WHERE acc = a8.acc  AND kos > dos   AND kos > 0; -- всего погашено по сумме
-       SELECT nvl(SUM(sumg), 0)       INTO s2_  FROM cc_pog  WHERE nd = k.nd     AND otm = 1;                 -- всего погашено по ГПК 
+       SELECT nvl(SUM(sumg), 0)       INTO s2_  FROM cc_pog  WHERE nd = k.nd     AND otm = 1;                 -- всего погашено по ГПК
        s1_ := s1_ - s2_ ; IF s1_ <= 0 THEN      GOTO kin_k ; END IF;
 
        ------- отметим погашенные ПЛАНОВЫЕ платежи до тек дня
-       FOR p IN (SELECT sumg, fdat  FROM cc_pog WHERE nd = k.nd   AND fdat > k.sdate   AND fdat < gl.bdate   AND nvl(otm, 0) <> 1 ORDER BY fdat) 
+       FOR p IN (SELECT sumg, fdat  FROM cc_pog WHERE nd = k.nd   AND fdat > k.sdate   AND fdat < gl.bdate   AND nvl(otm, 0) <> 1 ORDER BY fdat)
        LOOP
           IF s1_ <= 0 OR s1_ < p.sumg THEN  s1_ := 0;  EXIT ;     END IF ;
           UPDATE cc_pog  SET otm = 1  WHERE nd = k.nd  AND fdat = p.fdat ;
@@ -9531,8 +9538,8 @@ end if;
        EXCEPTION  WHEN no_data_found THEN  par1_:= NULL;
        END;
        IF par1_ IS NULL THEN  par1_ := par_; END IF;
-                                                   
-       FOR p IN (SELECT sumg, fdat   FROM cc_pog   WHERE nd = k.nd AND fdat >= gl.bdate  AND nvl(otm, 0) <> 1 ORDER BY decode(par1_, '0', -1, +1) * (k.wdate - fdat)) 
+
+       FOR p IN (SELECT sumg, fdat   FROM cc_pog   WHERE nd = k.nd AND fdat >= gl.bdate  AND nvl(otm, 0) <> 1 ORDER BY decode(par1_, '0', -1, +1) * (k.wdate - fdat))
        LOOP
           IF s1_ <= 0 OR s1_< p.sumg THEN s1_:= 0; EXIT;   END IF;
           UPDATE cc_pog  SET otm = 1 WHERE nd = k.nd  AND fdat = p.fdat;
@@ -9591,10 +9598,10 @@ end if;
   END rate_lim;
 
   ---------------------
-  PROCEDURE cc_9129(fdat_ DATE, nd_ INT, tip_ INT) IS
-  
+  PROCEDURE cc_9129(fdat_ DATE, nd_ number, tip_ INT) IS
+
     -- TIP_ = 0 - все КП  -- TIP_ = 2 - все КП ЮЛ  -- TIP_ = 3 - все КП ФЛ
-  
+
     fl_opl_ INT;
     sd_     NUMBER;
     x8_     NUMBER;
@@ -9610,12 +9617,12 @@ end if;
     nms99_  VARCHAR2(38);
     okpo_b  oper.id_b%TYPE;
     d9129_  NUMBER;
-  
+
     vob_   INT := 6;
     vob_pr INT := 6;
     vob_rs INT := 6;
     r013_  INT;
-  
+
     l_limt      NUMBER; -- текущий лимит из ГЛК
     l_dos       NUMBER; -- сумма всех выдач (ДТ оборотов) с начала жизни
     l_ost_fakt  NUMBER; -- текущий остаток 9129
@@ -9628,7 +9635,7 @@ end if;
     v_block_flag integer;
   BEGIN
     -- Проводки по 9129
-  
+
     BEGIN
       -- есть ли карточка операции и контрсчет ?
       SELECT nlsa, nlsm, substr(flags, 38, 1)
@@ -9648,21 +9655,21 @@ end if;
       IF nls99_ IS NULL THEN
         nls99_ := substr(tobopack.gettoboparam('NLS_9900'), 1, 15);
       END IF; -- Шаг 3 если формула не введена то поисчем самостоятельно
-    
+
       SELECT substr(a.nms, 1, 38), c.okpo
         INTO nms99_, okpo_b
         FROM accounts a, customer c
        WHERE a.kv = 980
          AND a.nls = nls99_
          AND c.rnk = a.rnk;
-    
+
     EXCEPTION
       WHEN no_data_found THEN
         raise_application_error(- (20203),
                                 '\9351 - CCK.CC_9129 : ош в карточке оп.CR9',
                                 TRUE);
     END;
-  
+
     BEGIN
       SELECT vob
         INTO vob_
@@ -9694,7 +9701,7 @@ end if;
       WHEN no_data_found THEN
         NULL;
     END;
-  
+
     --курсор по всем лимитам КП
     FOR k IN (SELECT d.nd,
                      d.vidd,
@@ -9727,7 +9734,7 @@ end if;
       If k.NDG is not null and k.NDG <> k.ND then
         goto kin_;
       end if; -- это подчитенные суб.дог. Они не имеют своего 9129
-    
+
       -- невiдновлювана КЛ   I_CR9 = '1'
       BEGIN
         SELECT a9.acc,
@@ -9765,7 +9772,7 @@ end if;
       ---------------------------------------------------------------------
       l_dos  := 0;
       l_limb := k.lim_beg + d9129_; -- лимит начальный с учетом дельты
-    
+
       -- лимит на дату FDAT_ с учетом дельты
       BEGIN
         SELECT lim2 + d9129_
@@ -9782,7 +9789,7 @@ end if;
         WHEN no_data_found THEN
           l_limt := l_limb; -- берем просто первый с учетом дельты
       END;
-    
+
       IF I_CR9 = '1' THEN
         --------------------------- HEвiдновлювана кредитна лiнiя
         If k.NDG is null then
@@ -9816,7 +9823,7 @@ end if;
       ELSE
         l_ost_plan := l_limt - (-fost(k.acc8, fdat_)); ---- вiдновлювана кредитна лiнiя
       END IF;
-    
+
       l_ost_plan := greatest(l_ost_plan, 0);
       IF k.wdate <= fdat_ THEN
         l_ost_plan := 0;
@@ -9844,16 +9851,16 @@ end if;
         from accounts
         where nls = nls9_
           and kv = k.kv;
-          
-      if v_block_flag >0 then 
+
+      if v_block_flag >0 then
         bars_audit.info('CCK.CC_9129: Вирівнювання неможливе, рахунок '||nls9_||' блокований на '||case dk_ when 1 then 'дебетування' when 0 then 'кредитування' end||'!');
         continue;
-      end if;        
+      end if;
 
-    
+
       nazn_ := 'Невикористаний лiмiт кредитної угоди № ' || k.cc_id ||
                ' вiд ' || to_char(k.sdate, 'DD.MM.YYYY');
-    
+
       --savepoint DO_PROVODKI;
       --begin
       gl.ref(ref_);
@@ -9973,23 +9980,23 @@ end if;
            k.sdate,
            k.nmk);
       END IF;
-    
+
       IF i_commit >= n_commit AND nvl(g_reports, 0) = 0 THEN
         COMMIT;
         l_kol    := l_kol + i_commit;
         i_commit := 0;
       END IF;
-    
+
       <<kin_>>
       NULL;
     END LOOP; --- k
-  
+
     COMMIT;
-  
+
   END cc_9129;
 
   -------------------
-  PROCEDURE cc_9031(fdat_ DATE, nd_ INT, tip_ INT) IS
+  PROCEDURE cc_9031(fdat_ DATE, nd_ number, tip_ INT) IS
 
     -- Проводки по 9031 на сумму начального лимита по договору
 
@@ -10191,7 +10198,7 @@ end if;
     END;
   END cc_9031;
   -------------------
-  PROCEDURE cc_close9031(fdat_ DATE, nd_ INT, tip_ INT) IS
+  PROCEDURE cc_close9031(fdat_ DATE, nd_ number, tip_ INT) IS
 
     -- Снятие с 9031
 
@@ -10928,7 +10935,7 @@ end if;
 
   -- старая проц построения ГПК
   PROCEDURE cc_gpk(mode_  INT,
-                   nd_    INT,
+                   nd_    number,
                    acc_   INT,
                    bdat_1 DATE, -- начало
                    datn_  DATE, -- первая дата погашенпя
@@ -11024,7 +11031,7 @@ end if;
       l_freq_  := freq_;
       l_rate_  := rate_;
     END IF;
-  
+
     l_datn_ := datn_;
     IF l_datn_ IS NULL THEN
       BEGIN
@@ -11164,7 +11171,7 @@ end if;
            WHERE fdat > k.bdat;
 
     -- расчет комиссии для ГПК
---    cck_ui.calc_comission_4_gpk(p_nd => nd_); 
+--    cck_ui.calc_comission_4_gpk(p_nd => nd_);
      EXECUTE IMMEDIATE  'begin cck_ui.calc_comission_4_gpk (:ND ); end;'    USING nd_;
 
 
@@ -11574,9 +11581,9 @@ end if;
     END IF;
 
     -- расчет комиссии для ГПК
---   cck_ui.calc_comission_4_gpk(p_nd => nd_); 
+--   cck_ui.calc_comission_4_gpk(p_nd => nd_);
      EXECUTE IMMEDIATE  'begin cck_ui.calc_comission_4_gpk (:ND ); end;'    USING nd_;
-    
+
     --переливка в лимиты
     cck.cc_gpk_lim(nd_, l_acc, l_bdat_1, l_datn_, l_sum1_);
 
@@ -11683,7 +11690,7 @@ end if;
       and na.nd=ND_;
     else
       l_acc:=acc_;
-    end if;  
+    end if;
     --raise_application_error (-20008,l_acc);
 
     -- 08.10.2013
@@ -11824,7 +11831,7 @@ end if;
     END LOOP;
   END cc_sum_pog;
   ---------------------------------------
-  PROCEDURE cc_intn(nd_ INT) IS
+  PROCEDURE cc_intn(nd_ number) IS
     -- Общий ГЛК +ГПК + ГП%
 
     dat4_ DATE; -- последняя дата КД
@@ -12037,7 +12044,7 @@ end if;
   END cc_intn;
 
   ----------------
-  PROCEDURE cc_start(nd_ INT) IS
+  PROCEDURE cc_start(nd_ number) IS
     --восстанавливает обороты и остатки по родительскому счету на
     --основании оборотов дочерних счетов
     --по реальным датам
@@ -12199,7 +12206,7 @@ end if;
 
   END cc_sv12;
   ----------
-  PROCEDURE cc_m_accp(mod_ INT, nd_ INT, accz_ INT) IS
+  PROCEDURE cc_m_accp(mod_ INT, nd_ number, accz_ INT) IS
     mpawn_ INT;
     pawn_  INT;
     rnk_   INT;
@@ -12231,7 +12238,7 @@ end if;
   END cc_m_accp;
   -----------
 
-  PROCEDURE cc_9819(nd_ INT, pr_ INT) IS
+  PROCEDURE cc_9819(nd_ number, pr_ INT) IS
 
     -- ND_ - номер договора
     -- PR_ - 0 - приход (при открытии договора)
@@ -12484,7 +12491,7 @@ end if;
   END cc_9819;
   ----------------------
 
-  PROCEDURE cc_crd(nd_    INT,
+  PROCEDURE cc_crd(nd_    number,
                    pr_    INT,
                    refd_  INT,
                    nls_   VARCHAR2,
@@ -14485,7 +14492,7 @@ end if;
   END cc_asg1;
   -----------------------
 
-  PROCEDURE cc_asp(p_nd INT, day_ INT) IS
+  PROCEDURE cc_asp(p_nd number, day_ INT) IS
     --авто перенос на просрочку основного долга
 
     -- p_ND = -1  = только ЮЛ
@@ -14547,12 +14554,12 @@ end if;
 
     --цикл по договорам, которые имели факт просрочки в DAT7_  и имеют ее сейчас
     -- По ГПК !!!!
-    FOR k IN (SELECT a.acc8, a.ost, a.kv8, a.rnk, d.nd, d.cc_id, d.sdate, a.tobo, d.vidd, d.NDG 
+    FOR k IN (SELECT a.acc8, a.ost, a.kv8, a.rnk, d.nd, d.cc_id, d.sdate, a.tobo, d.vidd, d.NDG
               FROM cc_deal d,  nd_acc n,   (SELECT tobo, acc acc8, -ostc ost, kv kv8, rnk FROM accounts WHERE tip = 'LIM'  AND ostc = ostb  AND ostc < 0 AND ostx <= 0) a
               WHERE nd_ IN (0, d.nd)       AND d.nd = n.nd    AND n.acc = a.acc8
                 AND nvl(d.branch, 0) LIKE  nvl(l_branch || '%', nvl(d.branch, 0))
                 AND (l_vidd IS NULL OR l_vidd = 1 AND d.vidd IN (1, 2, 3) OR   l_vidd = 11 AND d.vidd IN (11, 12, 13))
-             ) 
+             )
     LOOP
       /*
       --   условия обхода выноса на просрочку
@@ -14607,7 +14614,7 @@ end if;
          -- столько реально погашено за платежный период  (ТОЛЬКО НОРМАЛЬНОЕ ТЕЛО !!!)
 
 --Sta 16.05.2018
-         SELECT nvl ( SUM ( gl.p_icurval(a.kv,  decode(a.tip, 'SS ', s.kos, 0),  gl.bdate)),    0) 
+         SELECT nvl ( SUM ( gl.p_icurval(a.kv,  decode(a.tip, 'SS ', s.kos, 0),  gl.bdate)),    0)
               - nvl ( SUM ( gl.p_icurval(a.kv,  decode(a.tip, 'SP ', s.dos, 0),  gl.bdate)),    0)
          INTO l_s_pay
          FROM accounts a, nd_acc n, saldoa s
@@ -14623,7 +14630,7 @@ end if;
          IF ll.sumg > l_s_pay THEN
 -- Sta 16.05.2018
             SELECT nvl(SUM(gl.p_icurval(a.kv, s.kos, gl.bdate)), 0)        INTO s8_       FROM accounts a, nd_acc n, saldoa s
-            WHERE n.nd in ( select x.nd from cc_deal x where k.nd = NVL( x.NDG, x.ND) )   -- AND a.accc = k.acc8 k.nd 
+            WHERE n.nd in ( select x.nd from cc_deal x where k.nd = NVL( x.NDG, x.ND) )   -- AND a.accc = k.acc8 k.nd
               AND n.acc = a.acc   AND a.tip = 'SS '   AND s.acc = a.acc   AND s.fdat > ll.fdat;
             IF s8_ <> 0 AND k.kv8 <> gl.baseval THEN    s8_ := gl.p_ncurval(k.kv8, s8_, gl.bdate);    END IF;
          END IF;
@@ -14638,12 +14645,12 @@ end if;
 --Sta 16.05.2018
       FOR p IN (SELECT a.kv, a.nls nlsk, substr(a.nms,1,38) nmsk, least(- (s.ostf-s.dos+s.kos), -a.ostc) ss, a.isp, a.grp, p.s080, a.mdate, a.acc, n.ND , a.ACCC
                 FROM accounts a, saldoa s, specparam p, nd_acc n
-                WHERE a.acc = p.acc(+)  AND a.tip  = 'SS '   AND a.acc   = s.acc   AND a.acc = n.acc    AND a.ostc < 0   AND s.ostf-s.dos+s.kos < 0  
+                WHERE a.acc = p.acc(+)  AND a.tip  = 'SS '   AND a.acc   = s.acc   AND a.acc = n.acc    AND a.ostc < 0   AND s.ostf-s.dos+s.kos < 0
                   AND n.nd in (select nd from cc_deal where NVL( ndg,nd ) = k.nd )
---                AND a.accc = k.acc8  
+--                AND a.accc = k.acc8
                   AND a.ostc = a.ostb  AND s.fdat = (SELECT MAX(fdat)  FROM saldoa  WHERE acc = s.acc  AND fdat <= dat7_  )
                 ORDER BY  a.mdate, s.fdat
-                ) 
+                )
       LOOP  -- S7_ уменьшаемая сумма несделенной просрочки в вал LIM
          IF s7_ <= 0 THEN    EXIT;     END IF; --больше не надо.
          ----------------------------------------------------
@@ -14955,7 +14962,7 @@ end if;
     END IF;
 
   END cc_isg_nazn;
-  PROCEDURE cc_aspn(custtype_ INT, nd_ INT, day_ INT) IS
+  PROCEDURE cc_aspn(custtype_ INT, nd_ number, day_ INT) IS
     --авто перенос на просрочку долга по процентам и комиссии
   BEGIN
     FOR k IN (SELECT d.nd,
@@ -14977,7 +14984,7 @@ end if;
 
   END cc_aspn;
   -----------------------
-  PROCEDURE cc_aspn_dog(p_nd    INT,
+  PROCEDURE cc_aspn_dog(p_nd    number,
                         p_cc_id IN VARCHAR2,
                         p_okpo  IN VARCHAR2,
                         p_nmk   IN VARCHAR2,
@@ -15900,5 +15907,20 @@ BEGIN
   END IF;
 
 END cck;
+
 /
-show err;
+ show err;
+ 
+PROMPT *** Create  grants  CCK ***
+grant EXECUTE                                                                on CCK             to BARS009;
+grant EXECUTE                                                                on CCK             to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on CCK             to RCC_DEAL;
+grant EXECUTE                                                                on CCK             to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on CCK             to WR_CREDIT;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/cck.sql =========*** End *** =======
+ PROMPT ===================================================================================== 
+ 
