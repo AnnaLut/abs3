@@ -459,7 +459,15 @@ public partial class DepositClient : Bars.BarsPage
         textBirthPlace.Text = client.BirthPlace;        
         listSex.SelectedIndex = listSex.Items.IndexOf(listSex.Items.FindByValue(client.Sex.ToString()));
 
-        textCellPhone.Text = client.CellPhone.Substring(Math.Max(0, client.CellPhone.Length - 10));
+        String croppedMobPhone = client.CellPhone.Substring(Math.Max(0, client.CellPhone.Length - 10));
+
+        textCellPhoneWithoutMask.Value = croppedMobPhone;
+
+        if (croppedMobPhone != "000-00-00" && !croppedMobPhone.Contains("x") && croppedMobPhone.Length == 10)
+            textCellPhone.Text = croppedMobPhone.Substring(0, 3) + "*****" + croppedMobPhone.Substring(8, 2);
+        else
+            textCellPhone.Text = croppedMobPhone;
+
         textHomePhone.Text = client.HomePhone;
         textWorkPhone.Text = client.WorkPhone;
 
@@ -548,8 +556,8 @@ public partial class DepositClient : Bars.BarsPage
         
         client.HomePhone = textHomePhone.Text;
         client.WorkPhone = textWorkPhone.Text;
-        if (!String.IsNullOrEmpty(textCellPhone.Text))
-            client.CellPhone = "+38" + textCellPhone.Text; //Доопрацювання в зв'язку з заявкою по єдиному формату номера мобільного у клієнта в різних АРМ
+        if (!String.IsNullOrEmpty(textCellPhoneWithoutMask.Value))
+            client.CellPhone = "+38" + textCellPhoneWithoutMask.Value; //Доопрацювання в зв'язку з заявкою по єдиному формату номера мобільного у клієнта в різних АРМ
        
         client.CodeType = Convert.ToDecimal(listClientCodeType.SelectedValue);
         client.textCodeType = listClientCodeType.Items[listClientCodeType.SelectedIndex].Text;
