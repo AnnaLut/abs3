@@ -1,4 +1,4 @@
-=========  svn diff --summarize -r 68241:68282 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 68241:68302 D:\SVN\master\web\mmfo
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.3\mmfo\web\barsroot\version.abs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.3\mmfo\web\barsroot\App_Code\Areas\Zay\Models\ZayDebt.cs
-Bugfix_2.0.48.a.3 (Rev:68241-68282
+Bugfix_2.0.48.a.3 (Rev:68241-68302
