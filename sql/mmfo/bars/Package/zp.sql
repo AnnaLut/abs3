@@ -2117,6 +2117,10 @@ begin
             l_oper_zp.id_a  := l_okpoa;
             l_oper_zp.id_b  := c.okpob;
 
+            -- Оплата по паспорту, якщо відсутній код ОКПО
+            -- спочатку очистка змінної
+            l_oper_zp.d_rec := null;
+            -- перевірка чи відсутній код ОКПО            
             if l_oper_zp.id_b = '0000000000' then
               l_oper_zp.d_rec := '#ф'||c.passp_serial||c.passp_num||'#';
             end if;
