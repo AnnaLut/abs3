@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования 26X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001 20/09/2018
+% VERSION     :  v.18.003  19/10/2018 (03/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.002    03.10.2018';
+  ver_                     char(30)  := 'v.18.003    19.10.2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -115,17 +115,17 @@ BEGIN
          f_get_ku_by_nbuc(nbuc) as KU,
          b.T020, b.R020, b.R011, b.R013, b.R030, a.K040, a.Q001, a.K020, a.K021, a.K180, 
          nvl(trim(c.k190), '#') as K190,  
-         b.S181, replace(b.S245, '0', '#') as S245, b.S580, a.F033, b.T070, 
+         b.S181, replace(b.S245, '0', '#') as S245, b.S580, b.F033, b.T070, 
          (case when b.r030 = '980' then b.T070 else b.T071 end) as T071, 
          b.ACC_ID, b.ACC_NUM, b.KV, a.CUST_ID, b.BRANCH
     from (     
     -- інформація про банки             
     select REPORT_DATE, KF, NBUC, K020, (case when K040 = '804' then '3' else '4' end) as K021, 
-           K040, Q001, K180, F033, CUST_ID, BRANCH 
+           K040, Q001, K180, CUST_ID, BRANCH 
     from (
     select REPORT_DATE, KF, NBUC, SEG_04 as R020, SEG_05 as R011, SEG_06 as R013, SEG_07 as R030, 
        SEG_02 as K040, SEG_03 as K020, SEG_09 as S181, SEG_10 as S245, 
-       SEG_11 as S580, SEG_08 as F033, SEG_01, FIELD_VALUE, CUST_ID, BRANCH
+       SEG_11 as S580, SEG_01, FIELD_VALUE, CUST_ID, BRANCH
     from v_nbur_#26_dtl p
     where p.report_date = p_report_date and
           p.kf = p_kod_filii and 
@@ -133,7 +133,7 @@ BEGIN
     pivot (max(field_value) for seg_01 in ('97' as K180, '98' as Q001))) a
     left outer join
     -- інформація про рахунки та залишки
-    (select R020, R030, R011, R013, S181, S245, S580,  
+    (select F033, R020, R030, R011, R013, S181, S245, S580,  
            (case when DEBG is not null then '1' else '2' end) T020, 
            nvl(DEBG, 0) + nvl(KREG, 0) T070, nvl(DEBV, 0) + nvl(KREV, 0) T071,
            CUST_ID, ACC_ID, ACC_NUM, KV, BRANCH
