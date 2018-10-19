@@ -33,6 +33,7 @@ is
         r_rt.comm := 'Разбиение заявки № '||r_rt.id||' клиента '||r_rt.rnk||' суммы '||r_rt.s2;
         r_rt.id := l_id;
         r_rt.s2 := p_s*100;
+        r_rt.identkb:=l_id;--COBUMMFO-9206
         r_rt.datedokkb := null;  -- чтобы триггер tbi_zayavka вставил текущее время
         insert into zayavka  values r_rt;
         -- потому как триггер tbi_zayavka затирает другими значениями, а нам необходимы первоначальные
