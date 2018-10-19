@@ -296,54 +296,52 @@
     }
 
 
-    $(document).on("click", function () {  additemToPopup(); });
-    function additemToPopup() {
+    //$(document).on("click", function () {  additemToPopup(); });
+    //function additemToPopup() {
         
-        for (var i = 1; i < 1000; i++) {
-            var elements = $("#r_" + i).children();
-            if (elements.length <= 0) {
-                deselect($('#contact'));
-                $("#popupsum").hide();
-                $('.pop').css({ top: 100, left: 10000000 }).hide();
-                break;
-            }
+        //for (var i = 1; i < 1000; i++) {
+        //    var elements = $("#r_" + i).children();
+        //    if (elements.length <= 0) {
+        //        deselect($('#contact'));
+        //        $("#popupsum").hide();
+        //        $('.pop').css({ top: 100, left: 100 }).hide();
+        //        break;
+        //    }
            
-            for (var j = 1; j < elements.length; j++) {
+        //    for (var j = 1; j < elements.length; j++) {
                
-                //    "elements[j].attachEvent('onmouseover', function (event) {" +              
-                //elements[j].attachEvent('onmouseout', function () {                
-                eval(
-                    //"elements[j].unbind('onmouseover');" +
-                    //"elements[j].unbind('onmouseout');" +
-                    "elements[j].onmouseover =  function () {" +
-                    "var res = ManualKalkulateGrid(" + j + ");" +
-                    "if (res === 'none') {" +
-                    "    deselect($('#contact')); " +
-                     //"    $('#cust_colm_Name')[0].innerHTML = 'Обрано менше 2х записів';" +
-                     // "    $('#cust_colm_Sum')[0].innerHTML = '';" +
-                    "    return;" +
-                    "} else {" +
-                     "    $('#cust_colm_Name')[0].innerHTML = res.comn;" +
-                     "    $('#cust_colm_Sum')[0].innerHTML = res.sum;}" +
-                    "    if ($(this).hasClass('selected')) { deselect($(this)); } else { $(this).addClass('selected'); $('.pop').slideFadeToggle(); }" +
-                    "    $('#popupsum').show();" +
-                    "    $('.pop').css({ top: window.event.clientY+15, left: window.event.clientX }).show(); " +
-                    "    return false;" +
-                    "};");
-                elements[j].onmouseout = function () {
+        //        //    "elements[j].attachEvent('onmouseover', function (event) {" +              
+        //        //elements[j].attachEvent('onmouseout', function () {                
+        //        eval(
+        //            //"elements[j].unbind('onmouseover');" +
+        //            //"elements[j].unbind('onmouseout');" +
+        //            "elements[j].onmouseover =  function () {" +
+        //            "var res = ManualKalkulateGrid(" + j + ");" +
+        //            "if (res === 'none') {" +
+        //            "    deselect($('#contact')); " +
+        //             //"    $('#cust_colm_Name')[0].innerHTML = 'Обрано менше 2х записів';" +
+        //             // "    $('#cust_colm_Sum')[0].innerHTML = '';" +
+        //            "    return;" +
+        //            "} else {" +
+        //             "    $('#cust_colm_Name')[0].innerHTML = res.comn;" +
+        //             "    $('#cust_colm_Sum')[0].innerHTML = res.sum;}" +
+        //            "    if ($(this).hasClass('selected')) { deselect($(this)); } else { $(this).addClass('selected'); $('.pop').slideFadeToggle(); }" +
+        //            "    $('#popupsum').show();" +
+        //            "    $('.pop').css({ top: window.event.clientY+15, left: window.event.clientX }).show(); " +
+        //            "    return false;" +
+        //            "};");
+        //        elements[j].onmouseout = function () {
                     
-                    deselect($('#contact'));
-                    //$("#popupsum").hide();
-                    //hide window in right part out of screen
-                    //Ie8 solution
-                   $('.pop').css({ top: 100, left: 10000000 }).hide();
-                    return false;
-                };
-            }
-        }
-    }
-
-
+        //            deselect($('#contact'));
+        //            //$("#popupsum").hide();
+        //            //hide window in right part out of screen
+        //            //Ie8 solution
+        //           $('.pop').css({ top: 100, left: 100 }).hide();
+        //            return false;
+        //        };
+        //    }
+        //}
+    //}
 
 
     function deselect(e) {
