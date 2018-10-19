@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6EX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  26/09/2018 (19/09/2018)
+% VERSION     :  v.1.004  17/10/2018 (26/09/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.003  26/09/2018';
+  ver_          char(30)  := 'v.1.004  17/10/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -174,9 +174,9 @@ BEGIN
                                   when t.k070 in ('12602', '12603', '12702','12703','12799') then 'T3'
                                 end as cust_type
                               , case
-                                -- неінвестиційний клас
-                                 when not (b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
-                                           or substr(b.rating, 1, 1) in ('A', 'T', 'F'))
+                                -- інвестиційний клас
+                                 when b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
+                                      or substr(b.rating, 1, 1) in ('A', 'T', 'F')
                                 then
                                   'R1'
                                 else
@@ -414,7 +414,7 @@ BEGIN
                           --Добавляем агрегирующие показатели
                           select a.aggr_ekp as ekp
                                  , case when e.grp_r030 = 1 then d.r030 else '#' end as r030
-                                 , sum(d.t100_pct) as t100
+                                 , sum(d.t100_pct) as t100                         
                           from   (
                                    --Построение иерархии параметров
                                    SELECT aggr_ekp
