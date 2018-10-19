@@ -1,11 +1,17 @@
-create or replace package KL
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/kl.sql =========*** Run *** ========
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.KL 
 IS
 
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.5 29/05/2018';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'Version 1.6 28/09/2018';
 G_AWK_HEADER_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ  - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -168,7 +174,8 @@ procedure setBankAttr (
   Ruk_      custbank.ruk%type,
   Telr_     custbank.telr%type,
   Buh_      custbank.buh%type,
-  Telb_     custbank.telb%type ) ;
+  Telb_     custbank.telb%type,
+  k190_     custbank.k190%type ) ;
 
 --***************************************************************************--
 -- procedure 	: setCorpAttr
@@ -569,17 +576,14 @@ procedure check_attr_foropenacc (p_rnk in number, p_msg out varchar2);
 
 END KL;
 /
-
-show errors;
-
-create or replace package body KL
+CREATE OR REPLACE PACKAGE BODY BARS.KL 
 is
 
 --***************************************************************************--
 -- (C) BARS. Contragents
 --***************************************************************************--
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.1  29/05/2018';
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.3  03/10/2018';
   G_AWK_BODY_DEFS CONSTANT VARCHAR2(512) := ''
 $if KL_PARAMS.TREASURY $then
   || 'KAZ   - Для казначейства (без связ.клиентов, счетов юр.лиц в др.банках)' || chr(10)
@@ -935,6 +939,16 @@ begin
      -- неизв. тип контрагента
      bars_error.raise_nerror(g_modcode, 'INCORRECT_CUSTTYPE', to_char(p_custtype));
   end if;
+  
+  --2018.09.25 для запобігання багу, коли після оновлення сектору економіки або ВЕД клієнт(ФОП) зникав із інтерфейсів
+  if p_custtype = 3 and p_sed = 91 then
+    if p_ise not in ('14200', '14100', '14201', '14101') then
+      bars_error.raise_nerror(g_modcode, 'INCORRECT_ISE', to_char(p_ise));
+    elsif coalesce(p_ved, '00000') = '00000' then
+      bars_error.raise_nerror(g_modcode, 'INCORRECT_VED', to_char(p_ved));
+    end if;
+  end if;
+  ----
 
   begin
     insert
@@ -1123,6 +1137,16 @@ $if KL_PARAMS.NADRA $then
 
 $end
 BEGIN
+  --2018.09.25 для запобігання багу, коли після оновлення сектору економіки або ВЕД клієнт(ФОП) зникав із інтерфейсів
+  if Custtype_ = 3 and Sed_ = 91 then
+    if Ise_ not in ('14200', '14100', '14201', '14101') then
+      bars_error.raise_nerror(g_modcode, 'INCORRECT_ISE', to_char(Ise_));
+    elsif coalesce(Ved_, '00000') = '00000' then
+      bars_error.raise_nerror(g_modcode, 'INCORRECT_VED', to_char(Ved_));
+    end if;
+  end if;
+  ----
+
   bars_audit.trace('%s 1.params:'
        || ' Rnk_=>%s,'
        || ' Custtype_=>%s,'
@@ -1427,7 +1451,8 @@ PROCEDURE setBankAttr (
   Ruk_      custbank.ruk%type,
   Telr_     custbank.telr%type,
   Buh_      custbank.buh%type,
-  Telb_     custbank.telb%type
+  Telb_     custbank.telb%type,
+  k190_     custbank.k190%type
 ) IS
   l_title varchar2(20) := 'kl.setBankAttr: ';
 BEGIN
@@ -1455,12 +1480,13 @@ BEGIN
          ruk     = Ruk_,
          telr    = TelR_,
          buh     = Buh_,
-         telb    = TelB_
+         telb    = TelB_,
+         k190    = k190_
    WHERE rnk = Rnk_;
   IF SQL%rowcount = 0 THEN
      bars_audit.trace('%s 3. регистрация параметров банка РНК=%s', l_title, Rnk_);
-     INSERT INTO Custbank(rnk, mfo, bic, alt_bic, rating, kod_b, ruk, telr, buh, telb)
-     VALUES (Rnk_, Mfo_, Bic_, BicAlt_, Rating_, Kod_b_, Ruk_, TelR_, Buh_, TelB_ );
+     INSERT INTO Custbank(rnk, mfo, bic, alt_bic, rating, kod_b, ruk, telr, buh, telb, K190)
+     VALUES (Rnk_, Mfo_, Bic_, BicAlt_, Rating_, Kod_b_, Ruk_, TelR_, Buh_, TelB_, k190_ );
      bars_audit.trace('%s 4. завершена регистрация параметров банка РНК=%s', l_title, Rnk_);
   ELSE
      bars_audit.trace('%s 5. завершено обновление параметров банка РНК=%s', l_title, Rnk_);
@@ -1638,7 +1664,11 @@ BEGIN
   if p_flag_visa = 0
   or p_flag_visa = 1 and not is_customer_visa(Rnk_) 
   then
-     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_,Pdate_,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
+     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_,case passp_ 
+                                                     when 1 then 
+                                                       Pdate_ 
+                                                     else null 
+                                                   end,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
 $if KL_PARAMS.CLV $then
   else
      declare
@@ -3646,13 +3676,20 @@ BEGIN
 
 END KL;
 /
+ show err;
+ 
+PROMPT *** Create  grants  KL ***
+grant EXECUTE                                                                on KL              to ABS_ADMIN;
+grant EXECUTE                                                                on KL              to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on KL              to CUST001;
+grant EXECUTE                                                                on KL              to WR_ALL_RIGHTS;
+grant EXECUTE                                                                on KL              to WR_CUSTREG;
+grant EXECUTE                                                                on KL              to WR_TOBO_ACCOUNTS_LIST;
+grant EXECUTE                                                                on KL              to WR_USER_ACCOUNTS_LIST;
 
-show errors;
-
-grant EXECUTE on KL to ABS_ADMIN;
-grant EXECUTE on KL to BARS_ACCESS_DEFROLE;
-grant EXECUTE on KL to CUST001;
-grant EXECUTE on KL to WR_ALL_RIGHTS;
-grant EXECUTE on KL to WR_CUSTREG;
-grant EXECUTE on KL to WR_TOBO_ACCOUNTS_LIST;
-grant EXECUTE on KL to WR_USER_ACCOUNTS_LIST;
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/kl.sql =========*** End *** ========
+ PROMPT ===================================================================================== 
+ 

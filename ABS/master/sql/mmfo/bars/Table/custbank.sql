@@ -36,7 +36,8 @@ begin
 	BUH VARCHAR2(70), 
 	TELB VARCHAR2(20), 
 	NUM_ND VARCHAR2(20), 
-	BKI NUMBER(1,0) DEFAULT 1
+	BKI NUMBER(1,0) DEFAULT 1, 
+	K190 VARCHAR2(4)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -47,6 +48,19 @@ end;
 /
 
 
+declare
+  v_num integer;
+begin
+  select count(1) into v_num
+    from user_tab_columns
+    where table_name = 'CUSTBANK'
+      and column_name = 'K190';
+  if v_num = 0 then
+    execute immediate 'alter table custbank add k190 varchar2(4)';
+  end if;
+end;
+/
+
 
 
 PROMPT *** ALTER_POLICIES to CUSTBANK ***
@@ -54,12 +68,7 @@ PROMPT *** ALTER_POLICIES to CUSTBANK ***
 
 
 COMMENT ON TABLE BARS.CUSTBANK IS 'Клиенты-банки';
-COMMENT ON COLUMN BARS.CUSTBANK.RNK IS 'Идентификатор клиента';
-COMMENT ON COLUMN BARS.CUSTBANK.MFO IS 'Код МФО банка';
-COMMENT ON COLUMN BARS.CUSTBANK.ALT_BIC IS 'Альтернативный BIC-код';
-COMMENT ON COLUMN BARS.CUSTBANK.BIC IS 'BIC-код банка';
-COMMENT ON COLUMN BARS.CUSTBANK.RATING IS 'Рейтинг';
-COMMENT ON COLUMN BARS.CUSTBANK.KOD_B IS 'Код банка';
+COMMENT ON COLUMN BARS.CUSTBANK.K190 IS 'Рейтинг надійності K190';
 COMMENT ON COLUMN BARS.CUSTBANK.DAT_ND IS 'Дата регистрации';
 COMMENT ON COLUMN BARS.CUSTBANK.RUK IS 'ФИО руководителя';
 COMMENT ON COLUMN BARS.CUSTBANK.TELR IS 'Тел. руководителя';
@@ -67,6 +76,12 @@ COMMENT ON COLUMN BARS.CUSTBANK.BUH IS 'ФИО гл. бухгалтера';
 COMMENT ON COLUMN BARS.CUSTBANK.TELB IS 'Тел .гл. бухгалтера';
 COMMENT ON COLUMN BARS.CUSTBANK.NUM_ND IS 'Номер ген. соглашения';
 COMMENT ON COLUMN BARS.CUSTBANK.BKI IS 'Ознака передачі ПВБКІ';
+COMMENT ON COLUMN BARS.CUSTBANK.RNK IS 'Идентификатор клиента';
+COMMENT ON COLUMN BARS.CUSTBANK.MFO IS 'Код МФО банка';
+COMMENT ON COLUMN BARS.CUSTBANK.ALT_BIC IS 'Альтернативный BIC-код';
+COMMENT ON COLUMN BARS.CUSTBANK.BIC IS 'BIC-код банка';
+COMMENT ON COLUMN BARS.CUSTBANK.RATING IS 'Рейтинг';
+COMMENT ON COLUMN BARS.CUSTBANK.KOD_B IS 'Код банка';
 
 
 
@@ -83,10 +98,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTBANK_BKI ***
+PROMPT *** Create  constraint CC_CUSTBANK_BKI_NN ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT CC_CUSTBANK_BKI CHECK (bki in (0,1)) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT CC_CUSTBANK_BKI_NN CHECK (bki is not null) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -109,10 +124,10 @@ exception when others then
 
 
 
-PROMPT *** Create  constraint CC_CUSTBANK_BKI_NN ***
+PROMPT *** Create  constraint CC_CUSTBANK_BKI ***
 begin   
  execute immediate '
-  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT CC_CUSTBANK_BKI_NN CHECK (bki is not null) ENABLE NOVALIDATE';
+  ALTER TABLE BARS.CUSTBANK ADD CONSTRAINT CC_CUSTBANK_BKI CHECK (bki in (0,1)) ENABLE NOVALIDATE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
