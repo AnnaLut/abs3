@@ -14,7 +14,7 @@ namespace BarsWeb.Areas.SWCompare.Models
     public class HandModel
     {
         public string p_kod_nbu { get; set; }
-        public decimal p_ref { get; set; }
+        public decimal? p_ref { get; set; }
         public string p_tt { get; set; }
         public string p_transactionid { get; set; }
         public decimal p_operation { get; set; }
