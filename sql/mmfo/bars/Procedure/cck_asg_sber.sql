@@ -1,12 +1,9 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/CCK_ASG_SBER.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure CCK_ASG_SBER ***
-
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/cck_asg_sber.sql =========*** Run 
+ PROMPT ===================================================================================== 
+ 
   CREATE OR REPLACE PROCEDURE BARS.CCK_ASG_SBER (tip_ in number, mode_ int default 1) is
 begin
 /*
@@ -28,7 +25,9 @@ for k in (select d.nd
             where d.nd   = n.nd  AND  a.acc  = n.acc
               and d.sos  < 15    and  d.sos >= 10
               AND (a.tip ='SG '  OR   a.nbs  = '2620' OR a.nbs = '2625' )
-              AND (a.OSTC >= 0    AND  a.ostC = a.ostB OR a.nbs = '2625' )
+              AND ((a.OSTC >= 0    AND  a.ostC = a.ostB)
+                  OR a.nbs = '2625' 
+                  or (a.nbs = '2620' and a.tip like 'W4%'))
               AND (d.vidd in ( 1, 2, 3) and tip_ = 2
                    OR
                    d.vidd in (11,12,13) and tip_ = 3
