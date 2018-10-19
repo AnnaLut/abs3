@@ -199,7 +199,7 @@ END pkg_escr_reg_utl;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
 
-  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.4 19/12/2017';
+  g_body_version   CONSTANT VARCHAR2(64) := 'VERSION 8.7.5 21/09/2018';
   g_header_version CONSTANT VARCHAR2(64) := 'VERSION 8.7.3 05/05/2018';
 
   c_err_txt VARCHAR2(4000);
@@ -495,6 +495,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                                 in_status_comment IN escr_reg_obj_state.status_comment%TYPE DEFAULT NULL,
                                 in_set_date       IN DATE) IS
     l_flag NUMBER;
+    v_curr_branch branch.branch%type := bc.current_branch_code();
   BEGIN
     p_get_status_id(in_status_code => in_status_code,
                     out_status_id  => l_status_id);
@@ -504,6 +505,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
       SELECT COUNT(1) INTO l_flag FROM cc_tag t WHERE t.tag LIKE 'ES%';
     END;
     IF l_flag >= 1 THEN
+      for r in (select kf from cc_deal where nd = in_obj_id)
+      loop
+        bc.go(r.kf);
+      end loop;
       cck_app.set_nd_txt(in_obj_id, 'ES000', l_status_id);
       cck_app.set_nd_txt(in_obj_id, 'ES005', l_status_name);
       cck_app.set_nd_txt(in_obj_id, 'ES006', in_set_date);
@@ -512,6 +517,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
         cck_app.set_nd_txt(in_obj_id, 'ES003', trunc(SYSDATE));
       END IF;
     END IF;
+    bc.go(v_curr_branch);
     UPDATE escr_reg_header t
        SET t.credit_status_id = l_status_id
      WHERE t.deal_id = in_obj_id;
@@ -2036,13 +2042,18 @@ CREATE OR REPLACE PACKAGE BODY BARS.PKG_ESCR_REG_UTL IS
                           in_new_good_cost NUMBER,
                           in_new_deal_sum  NUMBER,
                           in_new_comp_sum  NUMBER) IS
-
+    v_curr_branch branch.branch%type := bc.current_branch_code();
   BEGIN
     logger.info('ESCR.p_set_new_sum in_deal_id=' || in_deal_id ||
                 ' ,in_new_good_cost=' || in_new_good_cost);
+    for r in (select kf from cc_deal where nd = in_deal_id)
+    loop
+      bc.go(r.kf);
+    end loop;
     cck_app.set_nd_txt(in_deal_id, 'ES010', in_new_good_cost);
     cck_app.set_nd_txt(in_deal_id, 'ES011', in_new_deal_sum);
     cck_app.set_nd_txt(in_deal_id, 'ES012', in_new_comp_sum);
+    bc.go(v_curr_branch);
 
   END p_set_new_sum;
   /***************************************************************
