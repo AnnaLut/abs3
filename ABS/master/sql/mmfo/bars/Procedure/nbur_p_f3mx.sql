@@ -8,11 +8,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 3MX для схема "C"
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001      29.09.2018
+ VERSION     :    v.18.003      17.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.001  29.09.2018';
+  ver_              char(30)  := ' v.18.003  17.10.2018';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -30,7 +30,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
 
   pragma exception_init( e_ptsn_not_exsts, -02149 );
 begin
-  logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
+  logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy')||ver_);
 
   -- визначення початкових параметрів для формування файлу
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type);
@@ -45,9 +45,8 @@ begin
   end;
 
   -- очікуємо формування старих файлiв
---  nbur_waiting_form(p_kod_filii, p_report_date, l_old_file_code, c_title);
-----  nbur_waiting_form(p_kod_filii, p_report_date, '#C9', c_title);
-----  nbur_waiting_form(p_kod_filii, p_report_date, '#E2', c_title);
+    nbur_waiting_form(p_kod_filii, p_report_date, '#C9', c_title);
+    nbur_waiting_form(p_kod_filii, p_report_date, '#E2', c_title);
 --   ?? включати чи ні ->   nbur_waiting_form(p_kod_filii, p_report_date, '#2D', c_title);
   
    select max(version_id)                 -- остання версія файлу #C9
@@ -107,12 +106,13 @@ begin
                              )
             select   'A3M001'                   EKP
                    ,  KU
-                   ,  to_char(round(to_number(T071) * (F_Ret_Dig(r030, p_report_date) * 100),0))  T071
+                   ,  T071
+--                   ,  to_char(round(to_number(T071) * (F_Ret_Dig(r030, p_report_date) * 100),0))  T071
                    ,  nnn_new.q003_1            Q003_1
                    ,  F091
                    ,  R030
                    ,  F090
-                   ,  K040
+                   ,  substr(trim(k040),1,3)    K040
                    , (case when substr(k020,1,1)='0'  then '1'
                              else '2'
                        end)                     F089
@@ -144,10 +144,10 @@ begin
                             , '6'                        F091
                             , t.seg_02                   seg_02
                             , t.r030                     R030
-                            , f_nbur_get_f090('C9', t.ref, t.f090a)    F090
+                            , f_nbur_get_f090('C9', e.ref, t.f090a)    F090
                             , t.k040                     K040
-                            , f_nbur_get_k020_by_rnk(t.cust_id)            K020
-                            , t.q001_1                   Q001_1
+                            , f_nbur_get_k020_by_rnk(e.cust_id)            K020
+                            , e.cust_name                Q001_1
                             , null                       B010
                             , null                       Q033
                             , null                       Q001_2
@@ -156,28 +156,23 @@ begin
                             , '#'                        F027
                             , '#'                        F02D
                             , t.q006                     Q006
-                            , t.description
-                            , t.acc_id
-                            , t.acc_num
-                            , decode(t.kv, 0, to_number(t.r030), t.kv)  kv     
-                            , t.cust_id
-                            , t.ref   
-                            , t.branch, t.nbuc
+                            , e.description
+                            , e.acc_id
+                            , e.acc_num
+                            , decode(e.kv, 0, to_number(t.r030), e.kv)  kv     
+                            , e.cust_id
+                            , e.ref   
+                            , e.branch, t.nbuc
                      from   (
-                                 select nbuc, seg_02, r030, t071, k040, q006, f090a,
-                                        description, acc_id, acc_num, kv, cust_id, ref, q001_1, branch
+                                 select nbuc, seg_02, r030, t071, k040, q006, f090a
                                    from (
-                                          select nbuc, seg_01, seg_02, field_value,
-                                                description, acc_id, acc_num, kv,
-                                                cust_id, ref, cust_name q001_1, branch 
+                                          select nbuc, seg_01, seg_02, field_value
                                             from v_nbur_#c9_dtl d
                                            where d.report_date = p_report_date
                                              and d.kf = p_kod_filii 
                                              and d.seg_01 in ('10','20','40','62','99')
                                            union all
-                                          select nbuc, seg_01, seg_02, field_value,
-                                                null description, 0 acc_id, null acc_num, 0 kv,
-                                                0 cust_id, 0 ref, ' ' q001_1, null branch 
+                                          select nbuc, seg_01, seg_02, field_value
                                             from v_nbur_#c9 d
                                            where d.report_date = p_report_date 
                                              and d.kf = p_kod_filii 
@@ -196,16 +191,22 @@ begin
                                                             '62' as k040, '99' as q006 )
                                         ) 
                             ) t
+                     left outer join  v_nbur_#c9_dtl e
+                                    on (   e.report_date = p_report_date 
+                                       and e.kf = p_kod_filii 
+                                       and e.seg_01 ='20'
+                                       and e.kv = t.r030
+                                       and e.seg_02 =t.seg_02 )
                     union all
                      select   f_get_ku_by_nbuc(t.nbuc)   KU
                             , t.t071                     T071
                             , '5'                        F091
                             , t.seg_02                   seg_02
                             , t.r030                     R030
-                            , f_nbur_get_f090('E2', t.ref, t.f090a)    F090
+                            , f_nbur_get_f090('E2', e.ref, t.f090a)    F090
                             , t.k040                     K040
-                            , f_nbur_get_k020_by_rnk(t.cust_id)            K020
-                            , t.q001_1                   Q001_1
+                            , f_nbur_get_k020_by_rnk(e.cust_id)            K020
+                            , e.cust_name                Q001_1
                             , t.b010                     B010
                             , t.q033                     Q033
                             , t.q001_2                   Q001_2
@@ -216,25 +217,26 @@ begin
                             , decode( d.field_value, null, '#', d.field_value )
                                                          F02D
                             , t.q006                     Q006
-                            , t.description
-                            , t.acc_id
-                            , t.acc_num
-                            , t.kv     
-                            , t.cust_id
-                            , t.ref   
-                            , t.branch, t.nbuc
+                            , e.description
+                            , (case
+                                  when e.acc_id is null and e.acc_num is not null
+                                     then nvl((select acc from accounts where nls=e.acc_num),null)
+                                     else e.acc_id
+                                end)                     acc_id
+                            , e.acc_num
+                            , e.kv     
+                            , e.cust_id
+                            , e.ref   
+                            , e.branch, t.nbuc
                      from   (
                            select nbuc, seg_02, r030, t071, k040, q006, f090a, k020a,
-                                                b010, q033, q003_2, q007_1, q001_2, f027,
-                                  description, acc_id, acc_num, kv, cust_id, ref, q001_1, branch
+                                                b010, q033, q003_2, q007_1, q001_2, f027
                              from (
-                                    select nbuc, seg_01, seg_02, field_value,
-                                          description, acc_id, acc_num, kv,
-                                          cust_id, ref, cust_name q001_1, branch
+                                    select nbuc, seg_01, seg_02, field_value
                                       from v_nbur_#e2_dtl d
-                                     where d.report_date = p_report_date and
-                                           d.kf = p_kod_filii and
-                                           d.seg_01 in ('10','20','40','64','61','31',
+                                     where d.report_date = p_report_date
+                                       and d.kf = p_kod_filii
+                                       and d.seg_01 in ('10','20','40','64','61','31',
                                                         '65','66','51','52','53','54')
                                   )
                                    pivot
@@ -245,11 +247,17 @@ begin
                                                       '52' as q007_1, '53' as q001_2, '54' as f027 )
                                   ) 
                             ) t
+                     left join  v_nbur_#e2_dtl e
+                                    on (   e.report_date = p_report_date 
+                                       and e.kf = p_kod_filii
+                                       and e.seg_01 ='20'
+                                       and e.seg_02 =t.seg_02 )
                      left outer join v_nbur_#2d_dtl d
                             on (    d.report_date = p_report_date
                                 and d.kf = p_kod_filii
-                                and d.ref = t.ref
+                                and d.ref = e.ref
                                and d.seg_01 ='40' )
+                     where t.Q006 not like '%комісія банку%'
                    ) u, nnn_new 
               where nnn_new.kodf='C9' and nnn_new.seg_02 =u.seg_02 and u.f091 ='6'
                  or nnn_new.kodf='E2' and nnn_new.seg_02 =u.seg_02 and u.f091 ='5'
