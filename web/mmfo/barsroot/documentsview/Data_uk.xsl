@@ -184,11 +184,11 @@
             <xsl:text>); </xsl:text>
           </xsl:attribute>
           <xsl:attribute name="oncontextmenu">
-            <xsl:text>ShowPopupMenu();SelectRow('</xsl:text>
+            <xsl:text>SelectRow('</xsl:text>
             <xsl:value-of select="$id"/>
             <xsl:text>',</xsl:text>
             <xsl:value-of select="position()"/>
-            <xsl:text>);return false</xsl:text>
+            <xsl:text>);ShowPopupMenu4Docs();return false</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="id">
             <xsl:value-of select="concat('r_',position())" />

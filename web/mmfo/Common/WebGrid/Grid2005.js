@@ -1014,12 +1014,31 @@ function drawFilterElementStatic() {
 Контекстное меню
 ********************************************************************************/
 function ShowPopupMenu() {
-    if (document.getElementById('popupmenu') == null) {
+	if (document.getElementById('popupmenu') == null) {
         document.body.insertBefore(document.createElement("<div id='popupmenu' style='visibility:hidden;POSITION: absolute'>"));
         document.getElementById('popupmenu').innerHTML = MakePopupMenu();
     }
     popupmenu.style.left = (event.x < popupmenu.style.width ? popupmenu.style.width : event.x) + document.body.scrollLeft;
     popupmenu.style.top = event.y;
+    popupmenu.style.visibility = 'visible';
+}
+function ShowPopupMenu4Docs(){
+	if (document.getElementById('popupmenu') == null) {
+        document.body.insertBefore(document.createElement("<div id='popupmenu' style='visibility:hidden;POSITION: absolute'>"));
+        document.getElementById('popupmenu').innerHTML = MakePopupMenu();
+    }
+	if(selectedRowId){
+		popupmenu.style.top = selectedRow.offsetTop+85;
+	}
+	else
+	{
+		popupmenu.style.top = event.y;
+	}
+	//('.menu_body').width = 200 in webgrid/grid.css
+	//document.getElementById('applist').width = 195
+
+	popupmenu.style.left = (event.x + 200 > document.body.clientWidth - 200) ? document.body.clientWidth - 200 : event.x + 195 ;
+
     popupmenu.style.visibility = 'visible';
 }
 //-------------------------------------------------------------------------------
