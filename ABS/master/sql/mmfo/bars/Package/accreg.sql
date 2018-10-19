@@ -2685,12 +2685,12 @@ begin
     end loop;
 
     -- наслідуємо додаткові реквізити рахунка
-    insert
-      into ACCOUNTSW
-         ( KF, ACC, TAG, VALUE )
-    select KF, l_acc_id, TAG, VALUE
-      from ACCOUNTSW
-     where ACC = p_acc;
+    merge into accountsw aw
+    using (select * from accountsw where acc = p_acc) acw
+    on (aw.acc = l_acc_id and aw.tag = acw.tag and aw.kf = acw.kf)
+    when matched then update set aw.value = acw.value
+    when not matched then insert ( KF, ACC, TAG, VALUE )
+    values (acw.kf, l_acc_id, acw.TAG, acw.VALUE);
 
     -- наслідуємо спецпараметри рахунка
     begin
