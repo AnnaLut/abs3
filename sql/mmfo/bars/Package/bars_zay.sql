@@ -4400,7 +4400,8 @@ is
         r_rt.id := l_id;
         r_rt.s2 := p_s*100;
         r_rt.datedokkb := null;  -- чтобы триггер tbi_zayavka вставил текущее время
-        r_rt.identkb :=null;--Степан: добавив щоб уникнути спрацювання констрейнтирейнти унікальності UK_ZAYAVKA_FNAMEKB_IDENTKB
+        r_rt.identkb :=l_id;--COBUMMFO-9206
+        --null;--Степан: добавив щоб уникнути спрацювання констрейнтирейнти унікальності UK_ZAYAVKA_FNAMEKB_IDENTKB
         -- пересчитываем комиссию, поскольку поменялись суммы
         get_commission(r_rt.dk,
                        r_rt.rnk,
