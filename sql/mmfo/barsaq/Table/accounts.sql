@@ -347,6 +347,17 @@ exception when others then
  end;
 /
 
+PROMPT *** Modify lock_debit ***
+begin   
+ execute immediate 'alter table BARSAQ.ACCOUNTS modify lock_debit NUMBER(3)';
+end;
+/
+
+PROMPT *** Modify lock_credit ***
+begin   
+ execute immediate 'alter table BARSAQ.ACCOUNTS modify lock_credit NUMBER(3)';
+end;
+/
 
 
 PROMPT *** Create  grants  ACCOUNTS ***
