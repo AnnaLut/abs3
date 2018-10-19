@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования 79X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001 24/09/2018
+% VERSION     :  v.18.002 18/10/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.001    24.09.2018';
+  ver_                     char(30)  := 'v.18.002    18.10.2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -121,7 +121,7 @@ BEGIN
                  '07' as T070_1,
                  '08' as T070_2, 
                  '10' as T070_3, 
-                 '11' as T090_1,
+                 '09' as T090_1,
                  '12' as T090_2, 
                  '13' as K030,
                  '14' as Q003_2, 
