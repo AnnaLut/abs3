@@ -83,17 +83,17 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
             string sql = @"select value_paper.get_sumi_all(:strPar01, :kv, :pf, :emi, :vidd, :dox, :ryn) from dual";
             var p = new DynamicParameters();
             p.Add("strPar01", dbType: DbType.String, value: strPar01, direction: ParameterDirection.Input);
-            p.Add("kv", dbType: DbType.Int16, value: kv, direction: ParameterDirection.Input);
-            p.Add("pf", dbType: DbType.Int16, value: pf, direction: ParameterDirection.Input);
-            p.Add("emi", dbType: DbType.Int16, value: emi, direction: ParameterDirection.Input);
+            p.Add("kv", dbType: DbType.Int32, value: kv, direction: ParameterDirection.Input);
+            p.Add("pf", dbType: DbType.Int32, value: pf, direction: ParameterDirection.Input);
+            p.Add("emi", dbType: DbType.Int32, value: emi, direction: ParameterDirection.Input);
             p.Add("vidd", dbType: DbType.String, value: vidd, direction: ParameterDirection.Input);
-            p.Add("dox", dbType: DbType.Int16, value: dox, direction: ParameterDirection.Input);
-            p.Add("ryn", dbType: DbType.Int16, value: ryn, direction: ParameterDirection.Input);
+            p.Add("dox", dbType: DbType.Int32, value: dox, direction: ParameterDirection.Input);
+            p.Add("ryn", dbType: DbType.Int32, value: ryn, direction: ParameterDirection.Input);
 
             using (var connection = OraConnector.Handler.UserConnection)
             {
                 var sumi_all = connection.Query<double>(sql, p).SingleOrDefault();
-                return sumi_all;
+                return sumi_all; 
             }
         }
 
@@ -101,9 +101,9 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
         {
             string sql = @"select * from table(value_paper.populate_cpv_wnd(:p_ID, :nRYN ,:nGRP))";
             var p = new DynamicParameters();
-            p.Add("p_ID", dbType: DbType.Int16, value: p_ID, direction: ParameterDirection.Input);
-            p.Add("nGRP", dbType: DbType.Int16, value: nGRP, direction: ParameterDirection.Input);
-            p.Add("nRYN", dbType: DbType.Int16, value: nRYN, direction: ParameterDirection.Input);
+            p.Add("p_ID", dbType: DbType.Int32, value: p_ID, direction: ParameterDirection.Input);
+            p.Add("nGRP", dbType: DbType.Int32, value: nGRP, direction: ParameterDirection.Input);
+            p.Add("nRYN", dbType: DbType.Int32, value: nRYN, direction: ParameterDirection.Input);
             using (var connection = OraConnector.Handler.UserConnection)
             {
                 var data = connection.Query<PayTicketGrid>(sql, p).ToList();
@@ -131,7 +131,7 @@ namespace BarsWeb.Areas.ValuePapers.Infrastructure.DI.Implementation
             string sqlText = @"select RYN as VAL, NAME as TEXT from CP_RYN
                                 WHERE TIPD=2 and ( KV is null OR kv= :kv ) ORDER BY RYN";
             var p = new DynamicParameters();
-            p.Add("kv", dbType: DbType.Int16, value: kv, direction: ParameterDirection.Input);
+            p.Add("kv", dbType: DbType.Int32, value: kv, direction: ParameterDirection.Input);
 
             using (var connection = OraConnector.Handler.UserConnection)
             {
