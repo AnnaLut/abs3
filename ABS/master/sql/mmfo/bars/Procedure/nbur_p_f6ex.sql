@@ -149,8 +149,7 @@ BEGIN
                               , t.k030
                               , case
                                   when t.MATURITY_DATE is null
-                                       or t.MATURITY_DATE <= p_report_date + 30 
-                                       -- or t.s240 in ('0', '1', '2', 'I')
+                                       or t.MATURITY_DATE <= last_day(p_report_date) + 31 
                                   then '1'
                                 else
                                   '0'
@@ -454,9 +453,9 @@ BEGIN
           from      (
                       select r030
                              , to_char(A6E004) as A6E004
-                             , to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) / 100 else 0 end), '0.0000') as A6E005
+                             , to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) * 100 else 0 end), '0.0000') as A6E005
                              , to_char(A6E009) as A6E009
-                             , to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) / 100 else 0 end), '0.0000') as A6E010
+                             , to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) * 100 else 0 end), '0.0000') as A6E010
                       from   (
                                 select r030
                                        , A6E001
