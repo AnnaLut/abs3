@@ -12249,14 +12249,15 @@ is
   l_acc_nbs     w4_product.nbs%type;
   l_acc_kv      w4_product.kv%type;
   l_vid         number;
+  l_nls         accounts.nls%type;
 begin
 
   -- проверка типов карт
   begin
-     select a.acc, c.sub_code, p.nbs, p.kv
-       into l_acc, l_acc_subcode, l_acc_nbs, l_acc_kv
+     select a.acc, c.sub_code, p.nbs, p.kv, a.nls
+       into l_acc, l_acc_subcode, l_acc_nbs, l_acc_kv, l_nls
        from accounts a, w4_acc_instant w, w4_card c, w4_product p
-      where a.nls = p_nls
+      where (a.nls = p_nls or a.nlsalt = p_nls)
         and a.acc = w.acc
         and w.card_code = c.code
         and c.product_code = p.code
@@ -12267,10 +12268,11 @@ begin
         bars_error.raise_nerror(g_modcode, 'ACC_NOT_FOUND', p_nls);
      when too_many_rows then
         begin
-           select a.acc, c.sub_code, p.nbs, p.kv
-             into l_acc, l_acc_subcode, l_acc_nbs, l_acc_kv
+           select a.acc, c.sub_code, p.nbs, p.kv, a.nls
+             into l_acc, l_acc_subcode, l_acc_nbs, l_acc_kv, l_nls
              from accounts a, w4_acc_instant w, w4_card c, w4_product p
-            where a.nls = p_nls and a.kv = p_product.kv
+            where (a.nls = p_nls or a.nlsalt = p_nls)
+              and a.kv = p_product.kv
               and a.acc = w.acc
               and w.card_code = c.code
               and c.product_code = p.code
@@ -12323,7 +12325,7 @@ begin
         set rnk = p_customer.rnk,
             nms = substr('БПК ' || p_customer.nmk || ' ' || p_product.card_code,1,70),
             -- Костиль для карток інтстант випущенних до заміни плану рахунків
-            nbs = case when p_product.nbs = substr(p_nls, 1, 4) then p_product.nbs else substr(p_nls, 1, 4) end,
+            nbs = case when p_product.nbs = substr(l_nls, 1, 4) then p_product.nbs else substr(p_nls, 1, 4) end,
             tip = p_product.tip,
             vid = l_vid,
             tobo = p_branch,
