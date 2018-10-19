@@ -3,7 +3,7 @@
     public class ZayDebt
     {
         public int nMod { get; set; }
-        public int nAcc { get; set; }
+        public decimal nAcc { get; set; }
         public decimal nRef { get; set; }
         public decimal nSum1 { get; set; }
         public decimal nSum2 { get; set; }
