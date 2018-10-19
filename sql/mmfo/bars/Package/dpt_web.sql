@@ -9044,12 +9044,10 @@ is
                                     (select v.br_id
                                        from dpt_vidd_update v
                                       where v.vidd = p_dptdata.dptype
-                                        and dateu =
-                                            (select max(dateu)
-                                               from dpt_vidd_update v
-                                              where v.vidd = p_dptdata.dptype
-                                                and dateu <=
-                                                    p_dptdata.dptdat + 0.99999))
+                                        and idu = (select max(idu)
+                                                   from dpt_vidd_update v
+                                                   where v.vidd = p_dptdata.dptype
+                                                     and dateu <= p_dptdata.dptdat + 0.99999))
                                  end base_rate,
                                  method_id,
                                  ext_num,
@@ -9270,13 +9268,9 @@ is
         
         if nvl(l_arest11,0) = 0 then -- если счет арестован, бонусная ставка не устанавливается  -- COBUMMFO-7402
           
-        bars_audit.info('get_bonusval (p_dptdata.dptid)=' ||
-                        to_char(get_bonusval(p_dptdata.dptid)));
-        bars_audit.info('dpt_bonus.set_bonus starts');
+        bars_audit.info('start dpt_bonus.set_bonus for deposit_id = '||to_char(p_dptdata.dptid));
         dpt_bonus.set_bonus(p_dptdata.dptid);
-        bars_audit.info('dpt_bonus.set_bonus ends');
-        bars_audit.info('get_bonusval (p_dptdata.dptid)=' ||
-                        to_char(get_bonusval(p_dptdata.dptid)));
+        bars_audit.info('end dpt_bonus.set_bonus l_bonusval = '||to_char(l_bonusval));
 
         /*Если метод переоформления для вклада не (8,9,10) - убираем Эксклюзивный  (bonus_id = 4) 2017 года для вкладов с пролонгацией до 8,9,10 метода, так как его действие начинается в будущем (или не начинается)*/
         if (ext.method_id not in (8, 9, 10)) then
