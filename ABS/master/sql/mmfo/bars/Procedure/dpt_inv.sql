@@ -73,36 +73,31 @@ mode_ = 101 -  консолiдовано на зв.м?с, з корр
 */
 
    DAT_  date := p_DAT;
-   caldt_ID_ accm_calendar.caldt_ID%type;
 
 begin
 
   EXECUTE IMMEDIATE 'TRUNCATE TABLE TMP_DPT_INV';
 --  bars_audit.info ('dpt_inv === '||' mode_ = '||mode_||' p_dat = '||p_dat||' BRANCH_ = '||BRANCH_);
   l_cont:=sys_context('bars_context','user_branch');
---  bars_audit.info ('dpt_inv === CALDT_ID_ = '||CALDT_ID_||'sys_context = '||l_cont);
   begin
 
   if mode_ >= 100 then
      DAT_  := to_date  ('01.'||to_char(p_DAT,'mm.yyyy'),'dd.mm.yyyy');
   end if;
-  if length(BRANCH_)=8 and mode_ >= 100 then
+  /*if length(BRANCH_)=8 and mode_ >= 100 then
      -- страховочная синхронизация месячная
        bars_accm_sync.sync_AGG('MONBAL', Dat_);
   elsif length(BRANCH_)=8 and mode_ < 100 then
        -- страховочная синхронизация дневная
        bars_accm_sync.sync_snap('BALANCE', Dat_);
-  end if;
+  end if;*/
   commit;
 
-  select caldt_ID into caldt_ID_ from accm_calendar  where caldt_DATE=Dat_ ;
 
   EXCEPTION WHEN NO_DATA_FOUND THEN return;
   end;
 
 If mode_ = 0 then  /* детально на дату, без корр*/
--- bars_audit.info ('dpt_inv === 0'||' mode_ = '||mode_||' p_dat = '||p_dat||' BRANCH_ = '||BRANCH_);
--- bars_audit.info ('dpt_inv ===0 CALDT_ID_ = '||CALDT_ID_||'sys_context = '||l_cont);
  insert into TMP_DPT_INV
         (branch,    nbs,   kv,  ob22,
          vidd,      nmk,
@@ -116,7 +111,7 @@ If mode_ = 0 then  /* детально на дату, без корр*/
          nvl(a.nlsalt,to_char(d.deposit_id)),                  --
          decode(a.nlsalt,null,2,1)                               -- разделение на АСВО=1, АБС=2
   from accounts a,
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m,
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) m,
        (select a.acc,a.vidd,a.deposit_id,a.idupd
                from dpt_deposit_clos a,
                    (select distinct acc,  deposit_id,
@@ -124,7 +119,7 @@ If mode_ = 0 then  /* детально на дату, без корр*/
                     from dpt_deposit_clos   ) b
               where a.acc=b.acc and a.deposit_id=a.deposit_id and a.idupd=b.idupd
         ) d,
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) n,
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) n,
        customer c, int_accn i, accounts b, specparam_int s
   where d.acc=a.acc
     and a.acc=m.acc and   a.nbs not like '8%'  and a.nls not like '8%'
@@ -145,9 +140,9 @@ union all
          b.nls, decode(a.nls,b.nls,0,n.ost), decode(a.nls,b.nls,0,n.ostq),
          a.nlsalt, 1
   from accounts a,
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m,
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) m,
        customer c, int_accn i,   accounts b, specparam_int s,
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) n
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) n
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and a.acc=m.acc and   a.nbs not like '8%'   and a.nls not like '8%'
@@ -167,7 +162,7 @@ union all
          a.nls, m.ost,m.ostq,
          '', 0, 0, a.nlsalt, 1
   from accounts a,
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m,
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) m,
         customer c,   specparam_int s
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
@@ -182,7 +177,7 @@ union all
 
 ElsIf mode_ = 1 then  /* консолiдовано на дату, без корр */
 --bars_audit.info ('dpt_inv === 1'||' mode_ = '||mode_||' p_dat = '||p_dat||' BRANCH_ = '||BRANCH_);
---bars_audit.info ('dpt_inv === 1 CALDT_ID_ = '||CALDT_ID_||'sys_context = '||l_cont);
+--bars_audit.info ('dpt_inv === 1 Dat_ = '||Dat_||'sys_context = '||l_cont);
   insert into TMP_DPT_INV
   (branch,
       nbs,
@@ -199,7 +194,7 @@ ElsIf mode_ = 1 then  /* консолiдовано на дату, без корр */
          sum(decode(a.nls,b.nls,0,nvl(n.ost,0))), sum(decode(a.nls,b.nls,0,nvl(n.ostq,0))), count(*)
   from accounts a
        left outer join
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) m on (a.acc = m.acc),
        (select a.acc,a.vidd,a.deposit_id,a.idupd
                from dpt_deposit_clos a,
                    (select distinct acc,  deposit_id,
@@ -210,7 +205,7 @@ ElsIf mode_ = 1 then  /* консолiдовано на дату, без корр */
        int_accn i,
           accounts b
               left outer join
-          (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) n  on (b.acc = n.acc)
+          (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) n  on (b.acc = n.acc)
   where d.acc=a.acc
     and a.nbs not like '8%'     and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
@@ -227,11 +222,11 @@ union all
            sum(decode(a.nls,b.nls,0,n.ost)), sum(decode(a.nls,b.nls,0,n.ostq)), count(*)
   from accounts a
        left outer join
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) m on (a.acc = m.acc),
        int_accn i,
         accounts b
          left outer join
-       (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) n on (b.acc = n.acc)
+       (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) n on (b.acc = n.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and a.acc=m.acc
@@ -249,7 +244,7 @@ union all
            sum(m.ost), sum(m.ostq),   0, 0, count(*)
   from accounts a
        left outer join
-        (select acc,rnk,ost,ostq,caldt_id from ACCM_SNAP_BALANCES where caldt_id=caldt_ID_) m on (a.acc = m.acc)
+        (select acc,rnk,ost,ostq from SNAP_BALANCES where fdat=Dat_) m on (a.acc = m.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and  a.nbs not like '8%'   and a.nls not like '8%'
@@ -262,7 +257,7 @@ union all
 ElsIf mode_ = 100 then  /* на зв.мес, з корр*/
 
 --bars_audit.info ('dpt_inv === 100'||' mode_ = '||mode_||' p_dat = '||p_dat||' BRANCH_ = '||BRANCH_);
---bars_audit.info ('dpt_inv === 100 CALDT_ID_ = '||CALDT_ID_||'sys_context = '||l_cont);
+--bars_audit.info ('dpt_inv === 100 Dat_ = '||Dat_||'sys_context = '||l_cont);
 
   insert into TMP_DPT_INV (branch,  nbs,  kv,  ob22, vidd,  nmk,  nls,  ost,  ostq, nlsn, nost, nostq,  nlsalt, prizn )
   select a.branch,   a.nbs,   a.kv,   a.ob22,   d.vidd vidd,    substr(c.nmk,1,35),
@@ -272,8 +267,8 @@ ElsIf mode_ = 100 then  /* на зв.мес, з корр*/
          nvl(a.nlsalt,to_char(d.deposit_id)),                  --
          decode(a.nlsalt,null,2,1)                               -- разделение на АСВО=1, АБС=2
   from accounts a left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) m on (a.acc = m.acc),
        (select a.acc,a.vidd,a.deposit_id,a.idupd
                from dpt_deposit_clos a,
                    (select distinct acc,  deposit_id,
@@ -282,8 +277,8 @@ ElsIf mode_ = 100 then  /* на зв.мес, з корр*/
               where a.acc=b.acc and a.deposit_id=a.deposit_id and a.idupd=b.idupd
        ) d,
        customer c, int_accn i, accounts b left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) n on (b.acc = n.acc)
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) n on (b.acc = n.acc)
   where d.acc=a.acc
     and   a.nbs not like '8%'     and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
@@ -303,11 +298,11 @@ union all
                 decode(a.nls,b.nls,0,n.ostq-n.crdosQ+n.crkosQ) OSTQn,
          a.nlsalt, 1
   from accounts a left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) m on (a.acc = m.acc),
        customer c, int_accn i, accounts b left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) n on (b.acc = n.acc)
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) n on (b.acc = n.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and   a.nbs not like '8%'   and a.nls not like '8%'
@@ -327,8 +322,8 @@ union all
          '', 0, 0,
          a.nlsalt, 1
   from accounts a left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) m on (a.acc = m.acc),
        customer c
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
@@ -343,7 +338,7 @@ union all
 
 ElsIf mode_ = 101 then  /* консолiдовано на зв.мес, з корр */
 --bars_audit.info ('dpt_inv === 101'||' mode_ = '||mode_||' p_dat = '||p_dat||' BRANCH_ = '||BRANCH_);
---bars_audit.info ('dpt_inv === 101 CALDT_ID_ = '||CALDT_ID_||'sys_context = '||l_cont);
+--bars_audit.info ('dpt_inv === 101 Dat_ = '||Dat_||'sys_context = '||l_cont);
   insert into TMP_DPT_INV (branch, nbs,  kv, ob22, vidd, ost, ostq, nost, nostq, kol)
   select a.branch, a.nbs,a.kv,a.ob22,d.vidd vidd,
           sum(m.ost-m.crdos+m.crkos), sum(m.ostq-m.crdosQ+m.crkosQ),
@@ -351,8 +346,8 @@ ElsIf mode_ = 101 then  /* консолiдовано на зв.мес, з корр */
           sum(decode(a.nls,b.nls,0,n.ostq-n.crdosQ+n.crkosQ)),
           count(*)
   from accounts a left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) m on (a.acc = m.acc),
        (select a.acc,a.vidd,a.deposit_id,a.idupd
                from dpt_deposit_clos a,
                    (select distinct acc,  deposit_id,
@@ -362,8 +357,8 @@ ElsIf mode_ = 101 then  /* консолiдовано на зв.мес, з корр */
        ) d,
        customer c, int_accn i,
        accounts b left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) n on (b.acc = n.acc)
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) n on (b.acc = n.acc)
   where d.acc=a.acc
     and   a.nbs not like '8%'     and a.nls not like '8%'
     and ( a.dazs is null or a.dazs > p_dat)
@@ -384,11 +379,11 @@ union all
           sum(decode(a.nls,b.nls,0,n.ostq-n.crdosQ+n.crkosQ)),
           count(*)
   from accounts a left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) m on (a.acc = m.acc),
        customer c, int_accn i, accounts b left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) n on (b.acc = n.acc)
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) n on (b.acc = n.acc)
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
     and   a.nbs not like '8%'     and a.nls not like '8%'
@@ -408,8 +403,8 @@ union all
           sum(m.ostq-m.crdosQ+m.crkosQ),
           0, 0, count(*)
   from accounts a left outer join
-       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ,caldt_id
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m on (a.acc = m.acc),
+       (select acc,rnk,ost,ostq,crdos,crkos,crdosQ,crkosQ
+          from AGG_MONBALS where fdat=Dat_) m on (a.acc = m.acc),
        customer c
   where a.acc not in (select acc from dpt_deposit_clos)
     and ((newnbs.g_state = 1 and a.nbs in ('2620','2630')) or (newnbs.g_state = 0 and a.nbs in ('2620','2630','2635')))
@@ -441,12 +436,12 @@ ElsIf mode_ = 102 then  /* сальдовка  на отч.мес, с корр 096*/
          m.ost -  m.crdos +m.crkos  osti,
          m.ostq-  m.crdosQ+m.crkosQ ostiq
   from accounts a,
-       (select acc,rnk, caldt_id,
+       (select acc,rnk,
                dos,    kos,   dosQ,   kosQ,
                ost,    ostq,
                crdos,  crkos, crdosQ, crkosQ,
                cudos,  cukos, cudosQ, cukosQ
-          from ACCM_AGG_MONBALS where caldt_id=caldt_ID_) m,
+          from AGG_MONBALS where fdat=Dat_) m,
        customer c, specparam_int s
   where a.acc=m.acc
     and ( a.dazs is null or a.dazs > p_dat)
