@@ -538,7 +538,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
             from accounts where nls = p_impdoc.nlsb and kv = p_impdoc.kv2;
 
             if l_dazs is not null then
-               bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYEE_ACCOUNT', p_impdoc.nlsa, to_char(p_impdoc.kv));
+               bars_error.raise_nerror(G_MODULE, 'CLOSE_PAYEE_ACCOUNT', p_impdoc.nlsb, to_char(p_impdoc.kv));
             end if;
 
 
@@ -874,6 +874,11 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
                 bars_audit.trace(l_trace||'вставка реквизита <'||p_dreclist(i).tag||'>');
                 insert into operw(ref, tag, value)
                 values(p_ref, p_dreclist(i).tag, p_dreclist(i).val);
+                if p_dreclist(i).tag = 'ф' then
+                   update oper op
+                      set op.d_rec = op.d_rec || '#'||p_dreclist(i).tag||p_dreclist(i).val||'#'
+                    where op.ref = p_ref;
+                end if;
              exception when others then
                 case sqlcode
                    when  -02291  then bars_error.raise_error(G_MODULE, 31, p_dreclist(i).tag); -- integrity constraint (BARS.FK_OPERW_OPFIELD) violated - parent key not found
