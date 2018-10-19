@@ -1,4 +1,17 @@
-=========  svn diff --summarize -r 68241:68302 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.3\mmfo\web\barsroot\version.abs
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.3\mmfo\web\barsroot\App_Code\Areas\Zay\Models\ZayDebt.cs
-Bugfix_2.0.48.a.3 (Rev:68241-68302
+=========  svn diff --summarize -r 68303:68347 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\TEMPLATE.RPT\PROVZVED.QRP
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\TEMPLATE.RPT
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\Common\WebGrid\Grid2005.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\documentsview\documents.aspx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\documentsview\Data_uk.xsl
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\deposit\depositclient.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\deposit\depositclient.aspx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\deposit
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\App_Code\Areas\SWCompare\Models\ResolveModel.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\App_Code\Areas\CreditUi\Infrastructure\DI\Implementation\AccountsRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\App_Code\Areas\CreditUi\Infrastructure\DI\Implementation\AnalysisBalanceRepository.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot\App_Code\viewaccounts\AccService.asmx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.4\mmfo\web
+Bugfix_2.0.48.a.4 (Rev:68303-68347
