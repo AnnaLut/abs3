@@ -928,6 +928,7 @@ function Check_ClientRekvBank() {
         obj_Parameters['BUH'] = gE(curTab, 'ed_BUH').value;
         obj_Parameters['TELR'] = gE(curTab, 'ed_TELR').value;
         obj_Parameters['TELB'] = gE(curTab, 'ed_TELB').value;
+        obj_Parameters['K190'] = gE(curTab, 'ed_K190').value;
 
         return true;
     }
@@ -1224,6 +1225,7 @@ function saveCustomerToBase() {
         TELR: obj_Parameters['TELR'],
         TELB: obj_Parameters['TELB'],
         NMKU: obj_Parameters['NMKU'],
+        K190: obj_Parameters['K190'],
         fullACCS: obj_Parameters['fullACCS'],
         E_MAIL: obj_Parameters['E_MAIL'],
         TEL_FAX: obj_Parameters['TEL_FAX'],

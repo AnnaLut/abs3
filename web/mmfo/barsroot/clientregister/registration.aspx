@@ -49,7 +49,7 @@
     <script type="text/javascript" src="additionalFuncs.js?v1.3"></script>
     <script type="text/javascript" src="Parameters.js?v.1.3"></script>
     <script type="text/javascript" src="../Scripts/WebTab.js"></script>
-    <script type="text/javascript" src="JScriptForregistration.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t032"></script>
+    <script type="text/javascript" src="JScriptForregistration.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>.t043"></script>
     <script type="text/javascript" src="InitService.js"></script>
 </head>
 <body onload="FullInit(); InitObjects(); InitTabs();">

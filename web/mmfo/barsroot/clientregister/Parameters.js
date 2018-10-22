@@ -62,6 +62,7 @@ obj_Parameters['RATING'] = ''; 		// Рейтинг банка
 obj_Parameters['KOD_B'] = ''; 		// Для 1ПБ
 obj_Parameters['DAT_ND'] = ''; 		// Неизвесная дата
 obj_Parameters['NUM_ND'] = ''; 		// Номер ген. соглашения (неисп.)  
+obj_Parameters['K190'] = '';        // Рейтинг надійності K190 (для 26Х)
 // --(банк/юр.лицо)--
 obj_Parameters['RUK'] = ''; 		// Руководитель
 obj_Parameters['BUH'] = ''; 		// Гл. бухгалтер банка
@@ -173,7 +174,8 @@ function SetParameters(p_EditType,
 						p_RATING,
 						p_KOD_B,
 						p_DAT_ND,
-						p_NUM_ND,
+                        p_NUM_ND,
+                        p_K190,
 						p_RUK,
 						p_BUH,
 						p_TELR,
@@ -311,4 +313,5 @@ function SetParameters(p_EditType,
     obj_Parameters['DopRekv_NDBO'] = p_DopRekv_NDBO;
     obj_Parameters['DopRekv_SDBO'] = p_DopRekv_SDBO;
     obj_Parameters['DopRekv_MPNO'] = p_DopRekv_MPNO;  
+    obj_Parameters['K190'] = p_K190;  
 }
