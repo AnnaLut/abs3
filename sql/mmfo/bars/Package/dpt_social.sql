@@ -996,7 +996,7 @@ begin
          , customer c
      where a.rnk  = c.rnk
        and a.kf   = p_bankmfo
-       and a.nls  = p_accnum
+       and (a.nls = p_accnum or a.nlsalt = p_accnum) -- COBUMMFO-7501
        and a.kv   = p_acccur
        and a.dazs is null;
        bars_audit.trace('%s balaccount found, accid = %s', title, to_char(l_acc.id));
@@ -1014,7 +1014,7 @@ begin
           from accounts a,
                bpk_acc  b
          where a.kf  = p_bankmfo
-           and a.nls = p_accnum
+           and (a.nls = p_accnum or a.nlsalt = p_accnum) -- COBUMMFO-7501
            and a.kv  = p_acccur
            and a.acc = b.acc_pk;
 
@@ -2178,7 +2178,7 @@ begin
 
   if l_cnt = 0 then
     select count(*) into l_cnt from accounts
-     where nls = p_cardaccount
+     where (nls = p_cardaccount or nlsalt = p_cardaccount) --COBUMMFO - 7501
        and (tip like l_cardacc_type or tip like l_cardacc_type2);
   end if;
 
