@@ -2041,8 +2041,16 @@ begin
                 select substr(nms,1,38), rnk into l_oper_zp.nam_b, l_rnk from accounts where nls=l_oper_zp.nlsb and kv=980 and dazs is null;
               exception
                 when no_data_found then
+                  begin
+                    select substr(nms,1,38), rnk into l_oper_zp.nam_b, l_rnk from accounts where nlsalt=l_oper_zp.nlsb and kv=980 and dazs is null;
+                  exception
+                    when no_data_found then
+                      rollback to sp_payroll;
+                      raise_application_error(-20000, 'Не знайдено альтернативний рахунок - '|| c.nlsb||', або рахунок закрито.') ;            
+                  end;
+                when others then
                   rollback to sp_payroll;
-                  raise_application_error(-20000, 'Не знайдено рахунок  - '|| c.nlsb||', або рахунок закрито.') ;
+                  raise_application_error(-20000, 'Помилка пошуку рахунка '|| c.nlsb||'. '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);                              
               end;
 
               begin
@@ -2740,6 +2748,18 @@ end;
                    inner join customer c on c.rnk = a.rnk 
                    left join person p on p.rnk = c.rnk
               where a.nls = p_nls
+                    and a.kv = 980
+              union all
+              select c.okpo, 
+                     c.nmk,
+                     p.ser,
+                     p.numdoc,
+                     p.actual_date,
+                     p.passp
+              from accounts a
+                   inner join customer c on c.rnk = a.rnk 
+                   left join person p on p.rnk = c.rnk
+              where a.nlsalt = p_nls
                     and a.kv = 980)
     loop
       -- якщо паспорт старого зразка
