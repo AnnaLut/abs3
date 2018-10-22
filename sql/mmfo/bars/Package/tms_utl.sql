@@ -169,8 +169,8 @@ is
 
     function CHECK_ACCESS(
         p_kf    in     fdat_kf.kf%type)
-    return integer
-    result_cache;
+    return integer;
+    --result_cache;
 
     procedure SET_BANK_DATE_STATE(
         p_fdat   in date,
@@ -1418,7 +1418,7 @@ is
     function CHECK_ACCESS
     ( p_kf    in     fdat_kf.kf%type
     ) return integer
-    result_cache relies_on ( FDAT_KF )
+    --result_cache relies_on ( FDAT_KF )
     is
       l_access       number(1);
       l_kf           fdat_kf.kf%type;
