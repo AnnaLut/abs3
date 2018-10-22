@@ -3137,6 +3137,7 @@ is
   l_dealcreated    dpt_file_row.deal_created%type             := 0;
 
   l_acc            accounts.acc%type;
+  l_tip            accounts.tip%type; -- COBUMMFO-7501
   l_rnk            customer.rnk%type;
   l_agencyid       social_agency.agency_id%type;
   l_soctypeid      social_dpt_types.type_id%type;
@@ -3164,7 +3165,6 @@ begin
   l_excluded  := 0;
   l_id_code   := trim(p_id_code);
 
-
   if (p_nls = l_newaccount /*or regexp_like(p_nls,l_newaccount2)*/) 
   then
     -- I. открытие клиента и счета
@@ -3176,14 +3176,14 @@ begin
   else
     -- II. поиск счета и определение его статуса
     begin
-      select 0, decode(dazs, null, 0, 1), branch, rnk, acc
-        into l_incorrect, l_closed, l_branch, l_rnk, l_acc
+      select 0, decode(dazs, null, 0, 1), branch, rnk, acc, tip
+        into l_incorrect, l_closed, l_branch, l_rnk, l_acc, l_tip
         from accounts
-       where nls = p_nls
+       where (nls = p_nls or nlsalt = p_nls) --COBUMMFO-7501
          and kv  = l_kv
          and kf  = l_curkf;
 
-      if ((l_closed = 1) AND (SubStr(p_nls,1,4)='2625'))
+      if ((l_closed = 1) AND l_tip like 'W4%'/* COBUMMFO-7501 (SubStr(p_nls,1,4)='2625')*/)
       then
         begin
           select a.nls, a.branch, a.rnk, 0, 0
