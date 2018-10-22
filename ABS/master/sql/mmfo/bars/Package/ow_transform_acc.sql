@@ -777,7 +777,7 @@ create or replace package body ow_transform_acc is
                      )
                      values
                      (
-                        c.kv
+                        c.kf
                         , c.kv
                         , c.acc
                         , c.rnk
@@ -1037,7 +1037,7 @@ create or replace package body ow_transform_acc is
                         )
                         values
                         (
-                           c.kv
+                           c.kf
                            , c.kv
                            , c.acc
                            , c.rnk
@@ -1368,7 +1368,7 @@ create or replace package body ow_transform_acc is
                      )
                      values
                      (
-                        c.kv
+                        c.kf
                         , c.kv
                         , c.acc
                         , c.rnk
