@@ -4206,7 +4206,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- и другие общие параметры
     begin
         select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
-        where kf=l_doc.mfo_a and nls=l_doc.nls_a and kv=l_doc.kv;
+        where kf=l_doc.mfo_a and (nls=l_doc.nls_a or nlsalt = l_doc.nls_a)  and kv=l_doc.kv;
         if l_doc.userid is null then
             raise_application_error(-20000, 'Караул! Рахунок без виконавця: kf='||l_doc.mfo_a||', nls='||l_doc.nls_a||', kv='||l_doc.kv, true);
         end if;
@@ -4254,7 +4254,11 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
         -- перевірка рахунка отримувача
         begin
-          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
+          select isclosed into l_is_nls_closed from(
+          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 isclosed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null
+          union 
+          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and kv=l_doc.kv and dazs is not null
+          );
 
           if l_is_nls_closed = 1 then
             raise_application_error(-20000, 'Рахунок отримувача закритий');
@@ -4311,7 +4315,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_idb_bank bars.customer.okpo%type;
         begin
         select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
-            where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nls=l_doc.nls_b and a.kv=l_doc.kv;
+            where c.rnk=a.rnk and a.kf=l_doc.mfo_b and (a.nls=l_doc.nls_b or a.nlsalt = l_doc.nls_b)  and a.kv=l_doc.kv;
             if l_idb<>l_doc.id_b and l_idb_bank<>l_doc.id_b then
                 raise_application_error(-20000,
                     'Ідентифікаційний код отримувача задано невірно, правильний код = '''||l_idb||''' або '''||l_idb_bank||'''', true);
@@ -4324,12 +4328,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 		select *
           into l_acc_a_rec
           from bars.accounts
-         where nls = l_doc.nls_a
+         where (nls = l_doc.nls_a or nlsalt = l_doc.nls_a)
            and kv = l_doc.kv;
         select *
           into l_acc_b_rec
           from bars.accounts
-         where nls = l_doc.nls_b
+         where (nls = l_doc.nls_b or nlsalt = l_doc.nls_b)
            and kv = nvl(l_doc.kv2, l_doc.kv);
         --
         -- вычисляем код операции
