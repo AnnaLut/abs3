@@ -115,24 +115,6 @@ namespace Bars.UserControls
                 }
             }
         }
-        [Category("Format")]
-        [DefaultValue(2)]
-        [Bindable(true, BindingDirection.OneWay)]
-        public Decimal? Precision
-        {
-            get
-            {
-                Decimal Precision = (ViewState["PRECISION"] == null ? 2 : (Decimal)ViewState["PRECISION"]);
-                return Precision;
-            }
-            set
-            {
-                if (value.HasValue)
-                {
-                    ViewState["PRECISION"] = value;
-                }
-            }
-        }
         /// <summary>
         /// Текст ошибки валидации (MinMax значение)
         /// </summary>
@@ -370,7 +352,7 @@ namespace Bars.UserControls
             rv.DataBind();
 
             // допускает нажатие только цифровых клавиш (скрипт берет из файла JScript.js)
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "init_numeric_edit_" + tb.ClientID, "init_numedit('" + tb.ClientID + "', '" + (Value.HasValue ? Value.Value.ToString() : string.Empty) + "', " + Precision + ", '" + ""/*this.GroupSeparator*/ + "'); ", true);
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "init_numeric_edit_" + tb.ClientID, "init_numedit('" + tb.ClientID + "', '" + (Value.HasValue ? Value.Value.ToString() : string.Empty) + "', " + 2 + ", '" + ""/*this.GroupSeparator*/ + "'); ", true);
 
             base.OnPreRender(e);
         }

@@ -441,7 +441,7 @@
                                                         TabIndex="303" />
                                                 </td>
                                                 <td>
-                                                    <bars:TextBoxDecimal ID="INSU_TARIFF" runat="server" IsRequired="true" ValidationGroup="Main" Precision="5"
+                                                    <bars:TextBoxDecimal ID="INSU_TARIFF" runat="server" IsRequired="true" ValidationGroup="Main"
                                                         TabIndex="308" />
                                                 </td>
                                             </tr>
