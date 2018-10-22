@@ -20,7 +20,8 @@ function InitObjects()
 		getEl('ed_RUK').value = parent.obj_Parameters['RUK'];
 		getEl('ed_BUH').value = parent.obj_Parameters['BUH'];
 		getEl('ed_TELR').value = parent.obj_Parameters['TELR'];
-		getEl('ed_TELB').value = parent.obj_Parameters['TELB'];
+        getEl('ed_TELB').value = parent.obj_Parameters['TELB'];
+        getEl('ed_K190').value = parent.obj_Parameters['K190'];
 	}
 	//нерезиденты банки не заполняют следущие поля
 	var MainRekvTab = parent.document.frames['Tab0'];

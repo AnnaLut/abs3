@@ -6,7 +6,7 @@
 		<LINK href="DefaultStyleSheet.css" type="text/css" rel="stylesheet">
 		<script language="javascript" src="/Common/Script/Localization.js"></script>
 		<script language="javascript" src="additionalFuncs.js?v1.0.1"></script>
-		<script language="javascript" src="JScriptFortab_client_rekv_bank.js?v1.0.2"></script>
+		<script language="javascript" src="JScriptFortab_client_rekv_bank.js?v1.0.3"></script>
 	</HEAD>
 	<body onload="InitObjects()">
 			<div id="main">
@@ -74,6 +74,18 @@
 					<TR>
 						<TD runat="server" meta:resourcekey="tdGLBuhPhone">Телефон гл. бухгалтера</TD>
 						<TD><INPUT class="tab_main_rekv_ed2_style" id="ed_TELB" tabIndex="9" type="text" maxLength="20" onchange="ToDoOnChange();"></TD>
+					</TR>
+					<TR>
+						<TD>Рейтинг надійності K190 (для 26Х)</TD>
+						<TD><table cellpadding="0" cellspacing="0">
+								<tr>
+									<td><INPUT class="tab_main_rekv_ed_style" id="ed_K190" tabIndex="10" type="text" maxLength="4" onchange="ToDoOnChange();"></td>
+									<td>
+                                        <img id="Img2" runat="server" meta:resourcekey="btHelp" src="/Common/Images/HELP.gif" height="16" width="16" alt="Справка" onclick="var result = window.showModalDialog('dialog.aspx?type=metatab&tabname=kl_k190&tail=\'\'&role=WR_CUSTREG', 'dialogHeight:600px; dialogWidth:600px'); if(result != null) PutIntoEdit(getEl('ed_K190'), result[0]);ToDoOnChange();" />
+                                    </td>
+								</tr>
+							</table>
+						</TD>
 					</TR>
 				</TABLE>
 			</div>

@@ -78,6 +78,7 @@ namespace clientregister
         public string KOD_B = "";			// Для 1ПБ
         public string DAT_ND = "";			// Неизвесная дата
         public string NUM_ND = "";			// Номер геню. соглашения (неисп.)  
+        public string K190 = "";			// Рейтинг надійності K190 (для 26Х)  
         // --(банк/юр.лицо)--
         public string RUK = "";				// Руководитель
         public string BUH = "";				// Гл. бухгалтер банка
@@ -843,7 +844,7 @@ namespace clientregister
         public Client()
         {
         }
-        public Client(string p_EditType, string p_ReadOnly, string p_BANKDATE, string p_Par_EN, string p_CUSTTYPE, string p_DATE_ON, string p_DATE_OFF, string p_ID, string p_ND, string p_NMK, string p_NMKV, string p_NMKK, string p_ADR, string p_fullADR, string p_fullADRMORE, string p_CODCAGENT, string p_COUNTRY, string p_PRINSIDER, string p_TGR, string p_STMT, string p_OKPO, string p_SAB, string p_BC, string p_TOBO, string p_PINCODE, string p_RNlPres, string p_C_REG, string p_C_DST, string p_ADM, string p_TAXF, string p_RGADM, string p_RGTAX, string p_DATET, string p_DATEA, string p_NEkPres, string p_ISE, string p_FS, string p_VED, string p_OE, string p_K050, string p_SED, string p_MFO, string p_ALT_BIC, string p_BIC, string p_RATING, string p_KOD_B, string p_DAT_ND, string p_NUM_ND, string p_RUK, string p_BUH, string p_TELR, string p_TELB, string p_NMKU, string p_fullACCS, string p_E_MAIL, string p_TEL_FAX, string p_SEAL_ID, string p_RCFlPres, string p_PASSP, string p_SER, string p_NUMDOC, string p_ORGAN, string p_PDATE, string p_BDAY, string p_DATE_PHOTO, string p_BPLACE, string p_SEX, string p_TELD, string p_TELW, string p_ACTUAL_DATE, string p_EDDR_ID, /*string p_DOV, string p_BDOV, string p_EDOV,*/ string p_ISP, string p_NOTES, string p_CRISK, string p_MB, string p_ADR_ALT, string p_NOM_DOG, string p_LIM_KASS, string p_LIM, string p_NOMPDV, string p_RNKP, string p_NOTESEC, string p_TrustEE, string nRezidCode, string p_DopRekv, string p_kf, string cellPhone)
+        public Client(string p_EditType, string p_ReadOnly, string p_BANKDATE, string p_Par_EN, string p_CUSTTYPE, string p_DATE_ON, string p_DATE_OFF, string p_ID, string p_ND, string p_NMK, string p_NMKV, string p_NMKK, string p_ADR, string p_fullADR, string p_fullADRMORE, string p_CODCAGENT, string p_COUNTRY, string p_PRINSIDER, string p_TGR, string p_STMT, string p_OKPO, string p_SAB, string p_BC, string p_TOBO, string p_PINCODE, string p_RNlPres, string p_C_REG, string p_C_DST, string p_ADM, string p_TAXF, string p_RGADM, string p_RGTAX, string p_DATET, string p_DATEA, string p_NEkPres, string p_ISE, string p_FS, string p_VED, string p_OE, string p_K050, string p_SED, string p_MFO, string p_ALT_BIC, string p_BIC, string p_RATING, string p_KOD_B, string p_DAT_ND, string p_NUM_ND, string p_K190, string p_RUK, string p_BUH, string p_TELR, string p_TELB, string p_NMKU, string p_fullACCS, string p_E_MAIL, string p_TEL_FAX, string p_SEAL_ID, string p_RCFlPres, string p_PASSP, string p_SER, string p_NUMDOC, string p_ORGAN, string p_PDATE, string p_BDAY, string p_DATE_PHOTO, string p_BPLACE, string p_SEX, string p_TELD, string p_TELW, string p_ACTUAL_DATE, string p_EDDR_ID, /*string p_DOV, string p_BDOV, string p_EDOV,*/ string p_ISP, string p_NOTES, string p_CRISK, string p_MB, string p_ADR_ALT, string p_NOM_DOG, string p_LIM_KASS, string p_LIM, string p_NOMPDV, string p_RNKP, string p_NOTESEC, string p_TrustEE, string nRezidCode, string p_DopRekv, string p_kf, string cellPhone)
         {
             EditType = p_EditType;		// Reg, ReReg, View - для чего открыто приложение
             ReadOnly = p_ReadOnly;	// Правка разрешена\запрещена
@@ -904,6 +905,7 @@ namespace clientregister
             KOD_B = p_KOD_B;			// Для 1ПБ
             DAT_ND = p_DAT_ND;			// Неизвесная дата
             NUM_ND = p_NUM_ND;			// Номер геню. соглашения (неисп.)  
+            K190  = p_K190;             // Рейтинг надійності K190 (для 26Х)  
             // --(банк/юр.лицо)--
             RUK = p_RUK;			    // Руководитель
             BUH = p_BUH;			    // Гл. бухгалтер банка
@@ -1387,7 +1389,7 @@ namespace clientregister
 															BIC, 
 															RATING, 
 															KOD_B, 
-															DAT_ND, 
+															DAT_ND, K190,
 															RUK, 
 															BUH, 
 															TELR, 
@@ -1415,6 +1417,7 @@ namespace clientregister
                     KOD_B = DataRow.GetValue(DataCols.IndexOf("KOD_B")).ToString();
                     DAT_ND = DataRow.GetValue(DataCols.IndexOf("DAT_ND")).ToString();
                     //				NUM_ND = DataRow.GetValue(DataCols.IndexOf("NUM_ND")).ToString();
+                    K190 = DataRow.GetValue(DataCols.IndexOf("K190")).ToString();
                     RUK = DataRow.GetValue(DataCols.IndexOf("RUK")).ToString();
                     BUH = DataRow.GetValue(DataCols.IndexOf("BUH")).ToString();
                     TELR = DataRow.GetValue(DataCols.IndexOf("TELR")).ToString();

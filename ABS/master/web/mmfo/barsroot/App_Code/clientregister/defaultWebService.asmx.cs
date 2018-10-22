@@ -1824,6 +1824,7 @@ namespace clientregister
             string KOD_B,
             string DAT_ND,
             string NUM_ND,
+            string K190,
             string RUK,
             string BUH,
             string TELR,
@@ -1886,7 +1887,7 @@ namespace clientregister
 
             string cellPhone = custAttrList.SingleOrDefault(i => i.Tag == "MPNO") != null ? custAttrList.SingleOrDefault(i => i.Tag == "MPNO").Value : null;
 
-            Client myClient = new Client(EditType, ReadOnly, BANKDATE, Par_EN, CUSTTYPE, DATE_ON, DATE_OFF, ID, ND, NMK, NMKV, NMKK, ADR, fullADR, fullADRMORE, CODCAGENT, COUNTRY, PRINSIDER, TGR, STMT, OKPO, SAB, BC, TOBO, PINCODE, RNlPres, C_REG, C_DST, ADM, TAXF, RGADM, RGTAX, DATET, DATEA, NEkPres, ISE, FS, VED, OE, K050, SED, MFO, ALT_BIC, BIC, RATING, KOD_B, DAT_ND, NUM_ND, RUK, BUH, TELR, TELB, NMKU, fullACCS, E_MAIL, TEL_FAX, SEAL_ID, RCFlPres, PASSP, SER, NUMDOC, ORGAN, PDATE, BDAY, DATE_PHOTO, BPLACE, SEX, TELD, TELW, ACTUAL_DATE, EDDR_ID, /*DOV, BDOV, EDOV,*/ ISP, NOTES, CRISK, MB, ADR_ALT, NOM_DOG, LIM_KASS, LIM, NOMPDV, RNKP, NOTESEC, TrustEE, nRezidCode, DopRekv, Kf, cellPhone);
+            Client myClient = new Client(EditType, ReadOnly, BANKDATE, Par_EN, CUSTTYPE, DATE_ON, DATE_OFF, ID, ND, NMK, NMKV, NMKK, ADR, fullADR, fullADRMORE, CODCAGENT, COUNTRY, PRINSIDER, TGR, STMT, OKPO, SAB, BC, TOBO, PINCODE, RNlPres, C_REG, C_DST, ADM, TAXF, RGADM, RGTAX, DATET, DATEA, NEkPres, ISE, FS, VED, OE, K050, SED, MFO, ALT_BIC, BIC, RATING, KOD_B, DAT_ND, NUM_ND, K190, RUK, BUH, TELR, TELB, NMKU, fullACCS, E_MAIL, TEL_FAX, SEAL_ID, RCFlPres, PASSP, SER, NUMDOC, ORGAN, PDATE, BDAY, DATE_PHOTO, BPLACE, SEX, TELD, TELW, ACTUAL_DATE, EDDR_ID, /*DOV, BDOV, EDOV,*/ ISP, NOTES, CRISK, MB, ADR_ALT, NOM_DOG, LIM_KASS, LIM, NOMPDV, RNKP, NOTESEC, TrustEE, nRezidCode, DopRekv, Kf, cellPhone);
 
             RegistrationResult res = new RegistrationResult(myClient.EditType);
             bool txCommited = false;
@@ -2967,8 +2968,9 @@ namespace clientregister
             SetParameters("pTelR", DB_TYPE.Varchar2, GetParamObj("Str", myClient.TELR), DIRECTION.Input);
             SetParameters("pBuh", DB_TYPE.Varchar2, GetParamObj("Str", myClient.BUH), DIRECTION.Input);
             SetParameters("pTelB", DB_TYPE.Varchar2, GetParamObj("Str", myClient.TELB), DIRECTION.Input);
+            SetParameters("pK190", DB_TYPE.Varchar2, GetParamObj("Str", myClient.K190), DIRECTION.Input);
 
-            SQL_NONQUERY("begin kl.setBankAttr(:pRnk, :pMfo, :pBic, :pBicAlt, :pRating, :pKod_b, :pRuk, :pTelR, :pBuh, :pTelB); end;");
+            SQL_NONQUERY("begin kl.setBankAttr(:pRnk, :pMfo, :pBic, :pBicAlt, :pRating, :pKod_b, :pRuk, :pTelR, :pBuh, :pTelB, :pK190); end;");
         }
         /// <summary>
         /// Записываем полный адрес клиента в базу
