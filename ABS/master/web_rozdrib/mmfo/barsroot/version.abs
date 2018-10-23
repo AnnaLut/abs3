@@ -1,13 +1,1 @@
-=========  svn diff --summarize -r 68416:68514 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\clientregister\Parameters.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\clientregister\tab_client_rekv_bank.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\clientregister\JScriptFortab_client_rekv_bank.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\clientregister\registration.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\clientregister\JScriptForregistration.js
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\credit\usercontrols\TextBoxDecimal.ascx.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\ins\new.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\App_Code\clientregister\defaultWebService.asmx.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot\App_Code\clientregister\clientRegModels\Client.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.5\mmfo\web
-Bugfix_2.0.48.a.5 (Rev:68416-68514
+Bugfix_2.0.48.a.6 (Rev:68348-68540) 
