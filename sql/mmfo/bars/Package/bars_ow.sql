@@ -6242,9 +6242,20 @@ begin
    -- ищем счет 2625
    if l_pk_nls is not null then
       begin
-         select acc, tobo into l_pk_acc, l_pk_branch
-           from accounts
-          where nls = l_pk_nls and kv = l_pk_kv;
+         /* Comment COBUMMFO-7501
+          select acc, tobo into l_pk_acc, l_pk_branch
+          from accounts
+          where nls = l_pk_nls and kv = l_pk_kv;*/
+         -- COBUMMFO-7501
+         select acc, tobo
+         into l_pk_acc, l_pk_branch
+         from (
+                 select a.acc, a.tobo
+                 from accounts a
+                 where (a.nls = l_pk_nls or a.nlsalt = l_pk_nls ) and a.kv = l_pk_kv and a.dazs is null
+                 order by a.daos
+              )
+         where rownum = 1;
       exception when no_data_found then
          l_pk_acc := null;
          l_pk_branch := null;
