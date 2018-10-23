@@ -996,7 +996,7 @@ begin
          , customer c
      where a.rnk  = c.rnk
        and a.kf   = p_bankmfo
-       and (a.nls = p_accnum or a.nlsalt = p_accnum) -- COBUMMFO-7501
+       and (a.nls = p_accnum or (a.nlsalt = p_accnum and regexp_like(a.nls, '^26[0,2,5]0') and a.tip like 'W4%')) -- COBUMMFO-7501
        and a.kv   = p_acccur
        and a.dazs is null;
        bars_audit.trace('%s balaccount found, accid = %s', title, to_char(l_acc.id));
@@ -1014,7 +1014,7 @@ begin
           from accounts a,
                bpk_acc  b
          where a.kf  = p_bankmfo
-           and (a.nls = p_accnum or a.nlsalt = p_accnum) -- COBUMMFO-7501
+           and (a.nls = p_accnum or (a.nlsalt = p_accnum and regexp_like(a.nls, '^26[0,2,5]0') and a.tip like 'W4%')) -- COBUMMFO-7501
            and a.kv  = p_acccur
            and a.acc = b.acc_pk;
 
@@ -2178,7 +2178,7 @@ begin
 
   if l_cnt = 0 then
     select count(*) into l_cnt from accounts
-     where (nls = p_cardaccount or nlsalt = p_cardaccount) --COBUMMFO - 7501
+     where (nls = p_cardaccount or (nlsalt = p_cardaccount and regexp_like(nls, '^26[0,2,5]0') and tip like 'W4%')) --COBUMMFO - 7501
        and (tip like l_cardacc_type or tip like l_cardacc_type2);
   end if;
 
@@ -3179,7 +3179,7 @@ begin
       select 0, decode(dazs, null, 0, 1), branch, rnk, acc, tip
         into l_incorrect, l_closed, l_branch, l_rnk, l_acc, l_tip
         from accounts
-       where (nls = p_nls or nlsalt = p_nls) --COBUMMFO-7501
+       where (nls = p_nls or (nlsalt = p_nls and regexp_like(nls, '^26[0,2,5]0') and regexp_like(nls, '^26[0,2,5]0') and tip like 'W4%')) --COBUMMFO-7501
          and kv  = l_kv
          and kf  = l_curkf;
 
