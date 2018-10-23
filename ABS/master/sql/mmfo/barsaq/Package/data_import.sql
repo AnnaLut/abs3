@@ -35,11 +35,11 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
 
 
   -- массив мфо для Ощадного банка
-  type t_osch_mfo_list is table of smallint  index by varchar2(6); 
+  type t_osch_mfo_list is table of smallint  index by varchar2(6);
   g_osch_mfo_list      t_osch_mfo_list;
 
-  
-  
+
+
 
   ----
   -- header_version - возвращает версию заголовка пакета
@@ -73,7 +73,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- перечень импортируемых полей
   --
   procedure add_company(p_kf in varchar2, p_rnk in integer);
-  
+
   ----
   -- add_client - добавляет клиента юрлицо
   --
@@ -113,7 +113,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- @p_acc [in] - id счета в АБС
   -- работа по ACC позволит скрыть реализацию и расширять, при необходимости,
   -- перечень импортируемых полей
-  
+
   procedure add_account_new(p_acc in integer);
 
   ----
@@ -183,7 +183,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   --
   procedure notify_ibank;
-  
+
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -294,8 +294,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_doc_export(p_startdate in date default trunc(sysdate-1));
 
    ----
-  -- sync_doc_export - синхронизирует зависшие документы 
-  --  
+  -- sync_doc_export - синхронизирует зависшие документы
+  --
   procedure sync_doc_export_open;
 
   ----
@@ -1341,7 +1341,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
     commit;
     --
   end add_company;
-  
+
   ----
   -- add_client - добавляет клиента юрлицо
   --
@@ -1693,22 +1693,22 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
     insert
        into accounts
      values l_account;
-    
+
     -- сохраняем счет в corp2
     l_account.rnk := get_origin_rnk(l_account.rnk);
     rpc_sync.add_account(l_account);
     -- синхронизируем схемы BANK и CORE в IBANK
     rpc_sync.sync_account(l_account.bank_id, l_account.acc_num, l_account.cur_id);
     rpc_sync.get_corp2_acc(l_account.bank_id, l_account.acc_num, l_account.cur_id, l_acc_corp2);
-    
+
     --
     -- подписываемся на получение изменений по счету в АБС
     subscribe_for_account_changes(p_acc);
-    update barsaq.ibank_acc ia 
+    update barsaq.ibank_acc ia
        set ia.acc_corp2 = l_acc_corp2
      where ia.acc = p_acc
        and ia.kf = l_account.bank_id;
-    
+
     --
     bars.bars_audit.info('Рахунок acc='||p_acc||' експортовано в IBANK');
     --
@@ -1736,7 +1736,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
     commit;
     --
   end add_account;
-  
+
     ----
   -- add_account - добавляет счет в систему
   --
@@ -1766,7 +1766,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
       elsif (l_custtype = 3) then
         add_individual(l_kf, l_rnk);
       end if;
-    end if;  
+    end if;
     add_account_int(p_acc);
     --
     commit;
@@ -1997,7 +1997,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                         );
                 l_cnt := sql%rowcount;
             else
-                if l_bankid = f.kf then 
+                if l_bankid = f.kf then
                 -- по одному счету
                 insert
                   into acc_turnovers (
@@ -2169,7 +2169,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                 l_cnt := sql%rowcount;
             else
                 -- по одному счету
-                if l_bankid = f.kf then 
+                if l_bankid = f.kf then
                 insert
                   into acc_turnovers (
                           bank_id, acc_num, cur_id, turns_date, prev_turns_date,
@@ -2295,7 +2295,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
                and bank_id = f.kf;
             l_cnt := sql%rowcount;
         else
-            if l_bankid = f.kf then 
+            if l_bankid = f.kf then
             delete
               from acc_transactions
              where bank_id = l_bankid
@@ -2647,7 +2647,7 @@ procedure sync_acc_transactions2_TEST(
            and v.groupid (+) not in (77, 80, 81, 30, 130)
            and v.status (+) = 2)
            loop
-dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent'); 
+dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2726,7 +2726,7 @@ dbms_application_info.set_action(cur_r.rn||'/'||cur_r.cnt||' Parent');
           )
           loop
 
-dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld'); 
+dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         l_ref92_bank_id := null;
         l_ref92_cust_code := null;
         l_ref92_acc_num := null;
@@ -2769,8 +2769,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_transactions2_TEST;
-  
-  
+
+
     ----
   -- sync_acc_period_transactions2 - синхронизиреут проводки в АБС для передачи в систему
   --
@@ -3865,10 +3865,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_docs_count    number;
     l_error         varchar2(4000);
   begin
-    
+
     l_time := sysdate;
     l_scn  := dbms_flashback.get_system_change_number();
-    
+
     delete from import_activity where start_time<sysdate-1 and kf = p_kf;
     -- пишем время начала работы
     insert into import_activity(start_time, start_scn, kf)
@@ -4015,7 +4015,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- модифицируем удаленную таблицу
     if p_is_open = 1 then
       rpc_sync.update_doc_export_status_open(p_docid);
-    else 
+    else
       rpc_sync.update_doc_export_status(p_docid);
     end if;
     --
@@ -4048,21 +4048,21 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     return l_value;
   end;
 
-  
+
 ---------------------------------------------------------------------------
   --  CHECK_AUTOPAY_RULE
   --
   --  Проверка проходит ли платеж правила на автооплату документа
   --  1 -  прошла проверка, значит платеж должен пройти автооплату
-  --  0 -  не прошла проверка, платеж пойдет по стандартной цепочке визирования 
+  --  0 -  не прошла проверка, платеж пойдет по стандартной цепочке визирования
   ---------------------------------------------------------------------------
   function check_autopay_rule (l_doc doc_import%rowtype) return smallint
   is
   begin
      return bars.sdo_autopay_check_corp2(l_doc);
   end;
- 
-  
+
+
 
 ----
   ----
@@ -4205,8 +4205,13 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.ext_ref   := to_char(l_docid);
     -- и другие общие параметры
     begin
-        select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
-        where kf=l_doc.mfo_a and (nls=l_doc.nls_a or nlsalt = l_doc.nls_a)  and kv=l_doc.kv;
+        begin  
+           select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
+            where kf=l_doc.mfo_a and nls=l_doc.nls_a and kv=l_doc.kv;
+         exception when no_data_found then
+           select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
+            where kf=l_doc.mfo_a and nlsalt =l_doc.nls_a and kv=l_doc.kv;
+        end;
         if l_doc.userid is null then
             raise_application_error(-20000, 'Караул! Рахунок без виконавця: kf='||l_doc.mfo_a||', nls='||l_doc.nls_a||', kv='||l_doc.kv, true);
         end if;
@@ -4255,9 +4260,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- перевірка рахунка отримувача
         begin
           select isclosed into l_is_nls_closed from(
-          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 isclosed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null
+          select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 isclosed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null
           union 
-          select /*INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and kv=l_doc.kv and dazs is not null
+          select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ 1 from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and kv=l_doc.kv and dazs is not null
           );
 
           if l_is_nls_closed = 1 then
@@ -4282,7 +4287,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             when numeric_value_error then
                 raise_application_error(-20000, 'Код отримувача занадто довгий');
         end;
-        
+
         -- дата валютирования
         if is_attr_exists(l_body, 'VALUE_DATE') then
             l_doc.vdat  := get_attr_date(l_body, 'VALUE_DATE');
@@ -4290,17 +4295,18 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- вычленяем балансовые счета
         l_nbsa := substr(l_doc.nls_a, 1, 4);
         l_nbsb := substr(l_doc.nls_b, 1, 4);
-        
+
         select count(*)
           into l_cnt
           from bars.accounts a
-         where a.nls = l_doc.nls_a
-           and ((a.nbs = 2600 and a.ob22 = 14) 
+         where (a.nls = l_doc.nls_a or 
+                a.nlsalt = l_doc.nls_a)
+           and ((a.nbs = 2600 and a.ob22 = 14)
              or (a.nbs = 2650 and a.ob22 = 12));
          if l_cnt > 0 then
            raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
          end if;
-            
+
     end if;
     --
     -- внутренний документ
@@ -4324,17 +4330,33 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             raise_application_error(-20000, 'Отримувача не знайдено: Банк='
                 ||l_doc.mfo_b||', Рахунок='||l_doc.nls_b||', Валюта='||l_doc.kv, true);
         end;
-		
-		select *
-          into l_acc_a_rec
-          from bars.accounts
-         where (nls = l_doc.nls_a or nlsalt = l_doc.nls_a)
-           and kv = l_doc.kv;
-        select *
-          into l_acc_b_rec
-          from bars.accounts
-         where (nls = l_doc.nls_b or nlsalt = l_doc.nls_b)
-           and kv = nvl(l_doc.kv2, l_doc.kv);
+
+		    begin 
+            select *
+              into l_acc_a_rec
+              from bars.accounts
+             where nls = l_doc.nls_a
+               and kv = l_doc.kv;
+         exception when no_data_found then
+           select *
+              into l_acc_a_rec
+              from bars.accounts
+             where nlsalt = l_doc.nls_a
+               and kv = l_doc.kv;
+        end;
+        begin 
+            select *
+              into l_acc_b_rec
+              from bars.accounts
+             where nls = l_doc.nls_b
+               and kv = nvl(l_doc.kv2, l_doc.kv);
+         exception when no_data_found then
+            select *
+              into l_acc_b_rec
+              from bars.accounts
+             where nlsalt = l_doc.nls_b
+               and kv = nvl(l_doc.kv2, l_doc.kv);
+        end;
         --
         -- вычисляем код операции
        -- if    l_nbsa in ('2605','2625') and l_nbsb in ('2605','2625')
@@ -4357,9 +4379,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             --
         end if;
 
-		 -- Перед вставкой  нужно пройти правило для проверки автооплаты.  
-        l_doc.flg_auto_pay := check_autopay_rule(l_doc);	
-		
+		 -- Перед вставкой  нужно пройти правило для проверки автооплаты.
+        l_doc.flg_auto_pay := check_autopay_rule(l_doc);
+
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
     -- документ в СЭП/ВПС
@@ -4368,12 +4390,21 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- проверка наличия обязательных только для данной операции атрибутов
         check_mandatory_attr(l_body, 'PAYEE_BANK_CODE');
 
-        select *
-          into l_acc_a_rec
-          from bars.accounts a
-         where a.nls = l_doc.nls_a
-           and a.kv = l_doc.kv
-           and a.dazs is null;
+        begin 
+            select *
+              into l_acc_a_rec
+              from bars.accounts a
+             where a.nls = l_doc.nls_a
+               and a.kv = l_doc.kv
+               and a.dazs is null;
+          exception when no_data_found then
+            select *
+              into l_acc_a_rec
+              from bars.accounts a
+             where a.nlsalt = l_doc.nls_a
+               and a.kv = l_doc.kv
+               and a.dazs is null;
+        end;
         --
         -- вычисляем код операции
        -- if l_nbsa in ('2605','2625')
@@ -4393,7 +4424,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- дата вставки
         l_doc.insertion_date := sysdate;
 
--- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+-- Перед вставкой  нужно пройти правило для проверки автооплаты.
         l_doc.flg_auto_pay := check_autopay_rule(l_doc);
 
         -- вставляем док-т в таблицу doc_import
@@ -4428,7 +4459,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- дата вставки
         l_doc.insertion_date := sysdate;
 
--- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+-- Перед вставкой  нужно пройти правило для проверки автооплаты.
         l_doc.flg_auto_pay := check_autopay_rule(l_doc);
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
@@ -4473,7 +4504,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- дата вставки
         l_doc.insertion_date := sysdate;
 
- 	    -- Перед вставкой  нужно пройти правило для проверки автооплаты.  
+ 	    -- Перед вставкой  нужно пройти правило для проверки автооплаты.
         l_doc.flg_auto_pay := check_autopay_rule(l_doc);
 
         -- вставляем док-т в таблицу doc_import
@@ -4674,10 +4705,17 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
     -- обрабатываем ид.код получателя 10 нулей - строна A
     if l_doc.id_a = l_blank_id_code /* or l_doc.id_a = l_blank_id_code9*/ then
-        begin
-            select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
-            where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nls=l_doc.nls_a and a.kv=l_doc.kv;
-        exception when no_data_found then
+        begin     
+            begin
+                select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
+                 where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nls=l_doc.nls_a and a.kv=l_doc.kv;
+         
+             exception when no_data_found then
+                select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
+                 where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nlsalt=l_doc.nls_a and a.kv=l_doc.kv;
+            end;
+               
+         exception when no_data_found then
             raise_application_error(-20000, 'Для власника рахунку '||l_doc.nls_a||'('||l_doc.kv||') не знайдено паспортних данних', true);
         end;
         if (l_blank_ser is null or l_blank_num is null) then
@@ -4752,9 +4790,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     -- чтение общих атрибутов
     l_doc.dk       := get_attr_number(l_body, 'BUY_SELL_FLAG');
     -- кількість доданих документів до заявки
-    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then 
+    if is_attr_exists(l_body, 'ATTACHMENT_MAILID') then
         l_attachments_count := 1;
-    end if;    
+    end if;
 
     -- получим валюту которая покупается
     l_doc.kv2      := get_attr_number(l_body, 'DOC_CURRENCY');
@@ -5186,7 +5224,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     logger.trace('%s: start '||sysdate, l_title);
     for c in (
-        select * from doc_import where 
+        select * from doc_import where
         case
         when booking_flag is not null and notification_flag is null then 'Y'
         else null
@@ -5242,7 +5280,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     logger.trace('%s: doc_count '||counter, l_title);
     logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
-  
+
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -5810,7 +5848,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
-            
+
             commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
@@ -5864,7 +5902,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                     p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                     p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
                 );
-           
+
         end loop;
         -- фиксируем изменения
         commit;
@@ -5893,7 +5931,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export;
-  
+
   ---
   -- get_doc_export_old_state
   --
@@ -5904,7 +5942,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45;
     logger.info('doc_export_old_state'||sql%rowcount);
   end;
-  
+
   ----
   -- sync_doc_export_open - синхронизирует документы
   --
@@ -5925,7 +5963,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- точка отката
         savepoint sp;
         -- точка отсчета
-        
+
         --
         replace_tags(l_local_tag, l_remote_tag);
         --
@@ -5937,12 +5975,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             -- устанавливаем точку синхронизации для удаленной таблицы на текущий момент
             rpc_sync.manual_instantiate_now(TAB_DOC_EXPORT, c.kf);
         end loop;
-        
+
         -- загружаем зависшие статусы в временную таблицу
-        get_doc_export_old_state; 
-        
+        get_doc_export_old_state;
+
      --   l_scn := dbms_flashback.get_system_change_number();
-        
+
         -- идем по платежным документам
         for c in (select i.ref,
         		 e.doc_id,
@@ -5989,7 +6027,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                  and i.ref is not null -- только документы АБС
                  and to_char(tos.doc_id) = i.ext_ref
                  and i.ref = o.ref
-                 and e.doc_id = tos.doc_id) 
+                 and e.doc_id = tos.doc_id)
            loop
 
             -- блокируем строку в doc_export
@@ -6006,7 +6044,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
                 p_bank_ref                => c.ref,
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
-                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end, 
+                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end,
                 p_is_open                 => 1
                 );
             commit;
@@ -6028,8 +6066,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export_open;
-  
-        
+
+
   ----
   -- extract_doc_export_sync - получить список проблемных документов для выполнения синхронизации
   --
@@ -6718,7 +6756,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
           select ca.rnk, ca.type_id, ca.country, ca.zip, ca.domain, ca.region, ca.locality, ca.address, c.kf
             from bars.customer_address as of scn l_scn ca where rnk in (select rnk from ibank_rnk where kf = c.kf);
         end loop;
-  
+
         write_sync_status(TAB_CUST_ADDRESSES, JOB_STATUS_INPROGRESS, 'вставка даних в БД corp2');
         --
         rpc_sync.fill_cust_addresses;
@@ -7181,7 +7219,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             raise_application_error(-20000, 'Не задано параметр SYNCADM');
     end;
     --
-	
+
 	begin
        -- инициализация массиба мфо ощадного банка
        if g_osch_mfo_list.count  = 0 then
@@ -7190,7 +7228,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
           end loop;
        end if;
     end;
-	
+
   end init;
 
 begin
