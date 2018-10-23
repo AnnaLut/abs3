@@ -4204,7 +4204,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.ext_ref   := to_char(l_docid);
     -- и другие общие параметры
     begin
-        begin
+        begin  
            select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
             where kf=l_doc.mfo_a and nls=l_doc.nls_a and kv=l_doc.kv;
          exception when no_data_found then
@@ -4258,11 +4258,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
         -- перевірка рахунка отримувача
         begin
-          begin
-            select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
-           exception when no_data_found then 
-            select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ 1 into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and kv=l_doc.kv and dazs is not null;
+          begin 
+            select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ case when a.dazs is not null then 1 else 0 end into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv;
+           exception when no_data_found then
+            select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ case when a.dazs is not null then 1 else 0 end into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and kv=l_doc.kv;
           end;
+
           if l_is_nls_closed = 1 then
             raise_application_error(-20000, 'Рахунок отримувача закритий');
           end if;
@@ -4297,7 +4298,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         select count(*)
           into l_cnt
           from bars.accounts a
-         where (a.nls = l_doc.nls_a or
+         where (a.nls = l_doc.nls_a or 
                 a.nlsalt = l_doc.nls_a)
            and ((a.nbs = 2600 and a.ob22 = 14)
              or (a.nbs = 2650 and a.ob22 = 12));
@@ -4318,13 +4319,13 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_idb      bars.customer.okpo%type;
             l_idb_bank bars.customer.okpo%type;
         begin
-          begin
+          begin 
               select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
                   where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nls=l_doc.nls_b  and a.kv=l_doc.kv;
-           exception when no_data_found then
+           exception when no_data_found then    
              select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
                   where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b  and a.kv=l_doc.kv;
-          end;
+          end;    
             if l_idb<>l_doc.id_b and l_idb_bank<>l_doc.id_b then
                 raise_application_error(-20000,
                     'Ідентифікаційний код отримувача задано невірно, правильний код = '''||l_idb||''' або '''||l_idb_bank||'''', true);
@@ -4334,7 +4335,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 ||l_doc.mfo_b||', Рахунок='||l_doc.nls_b||', Валюта='||l_doc.kv, true);
         end;
 
-		    begin
+		    begin 
             select *
               into l_acc_a_rec
               from bars.accounts
@@ -4347,7 +4348,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
              where nlsalt = l_doc.nls_a
                and kv = l_doc.kv;
         end;
-        begin
+        begin 
             select *
               into l_acc_b_rec
               from bars.accounts
@@ -4393,7 +4394,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- проверка наличия обязательных только для данной операции атрибутов
         check_mandatory_attr(l_body, 'PAYEE_BANK_CODE');
 
-        begin
+        begin 
             select *
               into l_acc_a_rec
               from bars.accounts a
@@ -4708,16 +4709,16 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
     -- обрабатываем ид.код получателя 10 нулей - строна A
     if l_doc.id_a = l_blank_id_code /* or l_doc.id_a = l_blank_id_code9*/ then
-        begin
+        begin     
             begin
                 select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
                  where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nls=l_doc.nls_a and a.kv=l_doc.kv;
-
+         
              exception when no_data_found then
                 select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
                  where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nlsalt=l_doc.nls_a and a.kv=l_doc.kv;
             end;
-
+               
          exception when no_data_found then
             raise_application_error(-20000, 'Для власника рахунку '||l_doc.nls_a||'('||l_doc.kv||') не знайдено паспортних данних', true);
         end;
