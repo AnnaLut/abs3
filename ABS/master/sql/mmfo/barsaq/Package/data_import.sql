@@ -509,8 +509,7 @@ procedure sync_acc_transactions2_TEST(
 
 end data_import;
 /
-
-CREATE OR REPLACE PACKAGE BODY BARSAQ.data_import is
+CREATE OR REPLACE PACKAGE BODY barsaq.data_import is
 
   -- global consts
   G_BODY_VERSION constant varchar2(64)  := 'version 1.98 07/06/2018';
@@ -4320,8 +4319,13 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_idb      bars.customer.okpo%type;
             l_idb_bank bars.customer.okpo%type;
         begin
-        select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
-            where c.rnk=a.rnk and a.kf=l_doc.mfo_b and (a.nls=l_doc.nls_b or a.nlsalt = l_doc.nls_b)  and a.kv=l_doc.kv;
+          begin 
+              select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
+                  where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nls=l_doc.nls_b  and a.kv=l_doc.kv;
+           exception when no_data_found then    
+             select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
+                  where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b  and a.kv=l_doc.kv;
+          end;    
             if l_idb<>l_doc.id_b and l_idb_bank<>l_doc.id_b then
                 raise_application_error(-20000,
                     'Ідентифікаційний код отримувача задано невірно, правильний код = '''||l_idb||''' або '''||l_idb_bank||'''', true);
