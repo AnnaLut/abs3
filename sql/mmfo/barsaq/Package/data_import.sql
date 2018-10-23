@@ -509,7 +509,7 @@ procedure sync_acc_transactions2_TEST(
 
 end data_import;
 /
-CREATE OR REPLACE PACKAGE BODY barsaq.data_import is
+CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
 
   -- global consts
   G_BODY_VERSION constant varchar2(64)  := 'version 1.98 07/06/2018';
@@ -4386,6 +4386,16 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 		 -- Перед вставкой  нужно пройти правило для проверки автооплаты.
         l_doc.flg_auto_pay := check_autopay_rule(l_doc);
 
+        if l_acc_a_rec.nbs = '2602' and l_acc_a_rec.ob22 = '09' then
+          if substr(l_doc.nazn, 1, 8) = '#REFUND#' then
+            l_doc.tt := 'IBL';
+          else
+            l_doc.tt := 'IBP';
+          end if;
+        end if;
+
+		 -- Перед вставкой  нужно пройти правило для проверки автооплаты.
+        l_doc.flg_auto_pay := check_autopay_rule(l_doc);
         -- вставляем док-т в таблицу doc_import
         insert into doc_import values l_doc;
     -- документ в СЭП/ВПС
@@ -4419,6 +4429,14 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         else
             l_doc.tt := 'IB2'; -- Internet-Banking: СЕП
             --
+        end if;
+        
+        if l_acc_a_rec.nbs = '2602' and l_acc_a_rec.ob22 = '09' then
+          if substr(l_doc.nazn, 1, 8) = '#REFUND#' then
+            l_doc.tt := 'IBE';
+          else
+            raise_application_error(-20000, 'Рахунок 2602 ОБ22 09 не правильно використовується');
+          end if;
         end if;
 
         -- признак срочности документа: СЕП/ССП
