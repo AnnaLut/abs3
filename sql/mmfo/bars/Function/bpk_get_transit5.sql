@@ -27,13 +27,22 @@ begin
      end if;
   end if;
   begin
-    select acc
-    into   l_acc
-    from   accounts
-    where  nls=p_nls and
-           kv=p_kv   and
-           tip like 'W4%';
-    l_nls := bars_ow.get_transit(l_acc);
+     begin
+        select acc
+        into   l_acc
+        from   accounts
+        where  nls=p_nls and
+               kv=p_kv   and
+               tip like 'W4%';
+     exception when no_data_found then
+        select acc
+        into   l_acc
+        from   accounts
+        where  nlsalt=p_nls and
+               kv=p_kv   and
+               tip like 'W4%';
+     end;
+     l_nls := bars_ow.get_transit(l_acc);
   exception when no_data_found then
     l_nls := null;
   end;
