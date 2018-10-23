@@ -15,9 +15,15 @@ is
 begin
 
   begin
-     select acc into l_acc
-       from accounts
-      where nls = p_nls_pk and kv = p_kv and tip like 'W4%';
+     begin 
+        select acc into l_acc
+        from accounts
+        where nls = p_nls_pk and kv = p_kv and tip like 'W4%';
+     exception when no_data_found then
+        select acc into l_acc
+        from accounts
+        where nlsalt = p_nls_pk and kv = p_kv and tip like 'W4%';
+     end ;
      l_nls := bars_ow.get_transit(l_acc);
      if l_nls is not null and l_nls = p_nls_transit then
         l_nls := p_nls_pk;
