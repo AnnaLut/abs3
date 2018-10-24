@@ -1,3 +1,8 @@
+
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_F3MX.sql ======== *** Run ***
+PROMPT ===================================================================================== 
+
 CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
                                             , p_report_date      date
                                             , p_form_id          number
@@ -8,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F3MX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 3MX для схема "C"
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.003      17.10.2018
+ VERSION     :    v.18.003      22.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.18.003  17.10.2018';
+  ver_              char(30)  := ' v.18.003  22.10.2018';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -211,7 +216,14 @@ begin
                             , t.q033                     Q033
                             , t.q001_2                   Q001_2
                             , t.q003_2                   Q003_2
-                            , t.q007_1                   Q007_1
+                            , (case
+                                  when    length(trim(t.q007_1))=8 
+                                      and regexp_instr(trim(t.q007_1),'^[0-9]+$')>0
+                                     then
+                                        substr(t.q007_1,1,2)||'.'||substr(t.q007_1,3,2)||'.'||substr(t.q007_1,5,4)
+                                  else
+                                     substr(trim(t.q007_1),1,10)
+                                end)                     Q007_1
                             , decode( t.f027, null, '#', t.f027 )
                                                          F027
                             , decode( d.field_value, null, '#', d.field_value )
@@ -220,7 +232,8 @@ begin
                             , e.description
                             , (case
                                   when e.acc_id is null and e.acc_num is not null
-                                     then nvl((select acc from accounts where nls=e.acc_num),null)
+                                     then nvl((select acc from accounts
+                                                where nls=e.acc_num and kv=e.kv),null)
                                      else e.acc_id
                                 end)                     acc_id
                             , e.acc_num
@@ -268,4 +281,9 @@ begin
    logger.info(c_title || ' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
 end;
 /
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ======== Scripts /Sql/BARS/Procedure/NBUR_P_F3MX.sql ======== *** End ***
+PROMPT ===================================================================================== 
 
