@@ -173,11 +173,11 @@ end;
   Insert
     into DOC_ATTR ( ID, NAME, SSQL )
   Values ( 'RSRV_DATEA_LIT', 'Анкета ФМ: Дата державної реєстрацiї прописом'
-         , 'select nvl(f_dat_lit(to_date(substr(f_get_cust_h((select a.rnk from accounts_rsrv a where a.rsrv_id = :ND), ''to_char(datea)'', f_get_cust_fmdat ((select TO_NUMBER(TO_CHAR(c.DATEA,''ddMMyyyy'')) from v_customer c, accounts_rsrv a where c.rnk = a.rnk and a.rsrv_id = :ND))), 1, 10)), ''DD.MM.YYYY''), ''__ ______ ____ГѓЖ’Гўв‚¬ЛњГѓВўГўв‚¬ЕЎГ‚В¬.'') INTO :sValue from dual' );
+         , q'[select nvl(f_dat_lit(to_date(substr(f_get_cust_h((select a.rnk from accounts_rsrv a where a.rsrv_id = :ND), 'to_char(datea)', f_get_cust_fmdat ((select TO_NUMBER(TO_CHAR(c.DATEA,'ddMMyyyy')) from v_customer c, accounts_rsrv a where c.rnk = a.rnk and a.rsrv_id = :ND))), 1, 10), 'DD.MM.YYYY')), '__ ______ ____ р.') INTO :sValue from dual]' );
 exception
   when DUP_VAL_ON_INDEX then
     update DOC_ATTR
-       set SSQL = 'select nvl(f_dat_lit(to_date(substr(f_get_cust_h((select a.rnk from accounts_rsrv a where a.rsrv_id = :ND), ''to_char(datea)'', f_get_cust_fmdat ((select TO_NUMBER(TO_CHAR(c.DATEA,''ddMMyyyy'')) from v_customer c, accounts_rsrv a where c.rnk = a.rnk and a.rsrv_id = :ND))), 1, 10)), ''DD.MM.YYYY''), ''__ ______ ____ГѓЖ’Гўв‚¬ЛњГѓВўГўв‚¬ЕЎГ‚В¬.'') INTO :sValue from dual'
+       set SSQL = q'[select nvl(f_dat_lit(to_date(substr(f_get_cust_h((select a.rnk from accounts_rsrv a where a.rsrv_id = :ND), 'to_char(datea)', f_get_cust_fmdat ((select TO_NUMBER(TO_CHAR(c.DATEA,'ddMMyyyy')) from v_customer c, accounts_rsrv a where c.rnk = a.rnk and a.rsrv_id = :ND))), 1, 10), 'DD.MM.YYYY')), '__ ______ ____ р.') INTO :sValue from dual]'
          , NAME = 'Анкета ФМ: Дата державної реєстрацiї прописом'
      where ID   = 'RSRV_DATEA_LIT';
 end;
@@ -318,4 +318,18 @@ exception
 end;
 /
 
+--CUST_DATEA_LIT
+begin
+  Insert
+    into DOC_ATTR ( ID, NAME, SSQL )
+  Values ( 'CUST_DATEA_LIT', 'Анкета ФМ: Дата державної реєстрацiї прописом'
+         , q'[select nvl(f_dat_lit(to_date(substr(f_get_cust_h(:ND, 'to_char(datea)', f_get_cust_fmdat(:ADDS)), 1, 10), 'DD.MM.YYYY')), '__ ______ ____ р.') INTO :sValue from dual]' );
+exception
+  when DUP_VAL_ON_INDEX then
+    update DOC_ATTR
+       set SSQL = q'[select nvl(f_dat_lit(to_date(substr(f_get_cust_h(:ND, 'to_char(datea)', f_get_cust_fmdat(:ADDS)), 1, 10), 'DD.MM.YYYY')), '__ ______ ____ р.') INTO :sValue from dual]'
+         , NAME = 'Анкета ФМ: Дата державної реєстрацiї прописом'
+     where ID   = 'CUST_DATEA_LIT';
+end;
+/
 COMMIT;
