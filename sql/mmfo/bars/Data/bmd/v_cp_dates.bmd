@@ -58,7 +58,7 @@ declare
 
 begin
 
-  l_tabsemantic := 'Платіжний календар по ЦП / V_CP_DATES';
+  l_tabsemantic := 'Платіжний календар по ЦП / V_CP_DATES |:CP_ID|';
   l_tablinesdef := '50';
   l_tabselect_statement := '';
   l_tabname     := 'V_CP_DATES';
@@ -157,13 +157,13 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 3, 'Виконати  погашення НОМIНАЛУ', 'CP.CP_POG_NOM2 (:Z, :ID, :NOM * 100 ) ', ':Z(SEM=Корр=1,TYPE=N)', 'EACH', 'Виконати погашення НОМIНАЛУ на суму :NOM за 1 шт. ЦП по всім угодам ?', '', '', '', '', 58);
 
   -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 1, null, 'DOK < gl.BD ', 2, 'COLOR_LightGray');
+  bars_metabase.add_tblcolor(l_tabid, 1, null, 'DOK < gl.BD ', 2, 'COLOR_LightGray', 'Записи до банківської дати');
 
   -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 2, null, 'DOK = gl.BD ', 2, 'COLOR_Sky');
+  bars_metabase.add_tblcolor(l_tabid, 2, null, 'DOK = gl.BD ', 2, 'COLOR_Sky', 'Запис рівняється банківській даті');
 
   -- добавляем описание раскраски
-  bars_metabase.add_tblcolor(l_tabid, 3, null, 'DOK > gl.BD ', 2, 'COLOR_LightGreen');
+  bars_metabase.add_tblcolor(l_tabid, 3, null, 'DOK > gl.BD ', 2, 'COLOR_LightGreen', 'Записи майбутньою датою');
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
