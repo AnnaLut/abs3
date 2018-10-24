@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.036  21/08/2018 (13/08/2018)
+% VERSION : v.17.039 22/10/2018 (09/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -22,6 +22,8 @@ IS
  17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок 
+ активу 3541
  21.08.2018 для наполнения таблиц? OTC_C5_PROC по счетам ЦБ добавлено новое
             значение параметра R011='P' 
  03.07.2018 вирівнювання з А7 файлом рахунків резервів
@@ -567,7 +569,16 @@ BEGIN
                          decode(t.r020, null, 0, 1) fa7p, i.freq,
                          decode(k.k077,null,decode(substr(a.nbs,1,1),''1'',''1'',''3''),k.k077) k077
                     from (SELECT   /*+ ordered full(s) */
-                                   a.acc, a.nls, a.kv, a.daos, :dat_, a.nbs,
+                                   a.acc, 
+                                   (case when :dat_ < a.dat_alt 
+                                         then a.nls_alt 
+                                         else a.nls 
+                                    end) as nls, 
+                                   a.kv, a.daos, :dat_, 
+                                   (case when :dat_ < a.dat_alt 
+                                         then substr(a.nls_alt, 1, 4) 
+                                         else a.nbs 
+                                    end) as nbs,
                                    NVL(trim(cc.r011), ''0'') r011,
                                    NVL(trim(cc.r013), ''0'') r013, NVL (cc.s080, ''1'') s080,
                                    decode(a.kv, 980, s.ost, s.ostq) ostq, s.ost, a.rnk,
@@ -608,7 +619,7 @@ BEGIN
                          on (a.nls like t.r020||''%'' )
                   ORDER BY 6, 3, 2 ';
 
-   OPEN saldo FOR cursor_sql USING dat_, dat_, dat_, dat_;
+ OPEN saldo FOR cursor_sql USING dat_, dat_, dat_, dat_, dat_, dat_;
    LOOP
        FETCH saldo BULK COLLECT INTO l_rec_t LIMIT 10000;
        EXIT WHEN l_rec_t.count = 0;
@@ -1369,7 +1380,7 @@ BEGIN
 
                 if nbs_ in ('2609','2629','2659') then
                     kodp_ := k.sign_rez||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
-                elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
+ 			    elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
                     kodp_ := k.sign_rez||nbs_||'2'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
                 else
                     kodp_ := k.sign_rez||nbs_||substr(k.kodp,6,1)||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||'2'||substr(k.kodp,17);
@@ -1391,7 +1402,10 @@ BEGIN
           end if;
 
           if k.discont_SDF <> 0 then
-             kodp_ := '2'||'2046'||'6'||r013_||substr(kodp_,8);
+	      	 r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
+		  	 r011_ := substr(k.kodp,6,1);
+ 
+ 			 kodp_ := '2'||'2046'||r011_||r013_||substr(k.kodp,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
              comm_ := SUBSTR(' дисконт SDF c1', 1,100);
@@ -1408,7 +1422,10 @@ BEGIN
           end if;
       else
          if k.discont_SDF <> 0 then
-            kodp_ := '2'||'2046'||'6'||(case when TP_SND then k.r013 else '4' end)||substr(k.kodp,8);
+			r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
+			r011_ := substr(k.kodp,6,1);
+ 
+			kodp_ := '2'||'2046'||r011_||r013_||substr(k.kodp,8);
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
             comm_ := SUBSTR(' дисконт SDF for rez=0 c1', 1,100);
@@ -1540,7 +1557,7 @@ BEGIN
       nbs_ := substr(nbs_r013_, 1, 4);
       r013_ := substr(nbs_r013_, 5, 1);
 
-      select nvl(max(s245), '1')
+ select nvl(min(s245), '1')
       into s245_
       from NBUR_TMP_A7_S245
       where report_date = datd_ and
@@ -1562,7 +1579,7 @@ BEGIN
       if      nbs_ in ('2029','2039','2079','2209','2219','2229')
       then
             r011_ :='1';
-      elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3548') then
+ elsif nbs_ = '3599' and substr(k.nls, 1, 4) in ('3710', '3541', '3548') then
             r011_ :='2';
       end if;
 
@@ -1850,6 +1867,7 @@ BEGIN
 ------------------------------------------------
    -- вирівнювання з А7 по рахунках резерву на декадну дату
    if dat_ = dat_end_ then
+ 	   -- по резервах
        merge into rnbu_trace a
        using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
               from (
@@ -1873,6 +1891,31 @@ BEGIN
             update set a.znap = a.znap + b.rizn,
                    comm = comm || ' *=' || to_char(b.rizn)
        WHERE b.acc is not null;
+ 
+ -- по дсиконтах
+ merge into rnbu_trace a
+ using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
+ from (
+ select acc_id acc, s245, nbs, ost
+ from NBUR_TMP_A7_S245
+ where report_date = dat_ and
+ nbs = '2046') a
+ join
+ (select acc, substr(kodp, 16, 1) s245, substr(kodp, 2, 4) nbs, sum(znap) ost
+ from rnbu_trace
+ where kodp like '_2046%'
+ group by acc, substr(kodp, 16, 1), substr(kodp, 2, 4)) b
+ on (a.acc = b.acc and
+ a.s245 = b.s245 and
+ a.nbs=b.nbs)
+ where nvl(a.ost,0)<>nvl(b.ost,0)
+ order by nvl(a.nbs, b.nbs)) b
+ on (a.acc = b.acc and
+ a.kodp like '_'||b.nbs||'__________'||b.s245||'%')
+ WHEN MATCHED THEN
+ update set a.znap = a.znap + b.rizn,
+ comm = comm || ' *=' || to_char(b.rizn)
+ WHERE b.acc is not null;
    end if;
 
 ------------------------------------------------
