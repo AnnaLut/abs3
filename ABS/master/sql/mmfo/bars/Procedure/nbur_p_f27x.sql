@@ -9,9 +9,9 @@ is
 % DESCRIPTION : Процедура формирования 27X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.103  14/08/2018 (09/08/2018)
+% VERSION     :  v.1.104  23/10/2018 (14/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.103  14/08/2018';
+  ver_          char(30)  := 'v.1.104  23/10/2018';
   c_title       varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   l_nbuc        varchar2(20);
@@ -54,7 +54,7 @@ BEGIN
         SELECT d.report_date
                , d.kf
                , p_file_code
-               , to_char(to_number(d.nbuc)) as nbuc
+               , to_char(f_get_ku_by_nbuc(d.kf)) as nbuc
                , substr(d.colname, 2, 1)
                  || d.nbs
                  || lpad(d.kv, 3, '0')
@@ -104,7 +104,7 @@ BEGIN
         SELECT d.report_date
                , d.kf
                , p_file_code
-               , to_char(to_number(a.nbuc)) as nbuc
+               , to_char(f_get_ku_by_nbuc(a.kf)) as nbuc
                , '7' || d.nbs || lpad(d.kv, 3, '0') field_code
                , d.sump field_value
                , NULL description
@@ -188,7 +188,7 @@ BEGIN
         SELECT d.report_date
                , d.kf
                , p_file_code
-               , to_char(to_number(a.nbuc)) as nbuc
+               , to_char(f_get_ku_by_nbuc(a.kf)) as nbuc
                , '8' || d.nbs || lpad(d.kv, 3, '0') field_code
                , d.bal field_value
                , NULL description
