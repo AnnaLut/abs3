@@ -9,9 +9,10 @@ PROMPT *** Create  procedure P_1200 ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_1200 (p_dat01 date) IS
 
-/* Версия 3.5   05-10-2017  21-09-2017  11-09-2017  04-09-2017  18-07-2017  07-02-2017  01-02-2017
+/* Версия 3.6   23-10-2018  05-10-2017  21-09-2017  11-09-2017  04-09-2017  18-07-2017  07-02-2017 
    Заполнение PVZ в TMP_REZ_OBESP
    -------------------------------------
+ 8) 23-10-2018(3.6) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
  7) 05-10-2017(3.5) -  параметры из таблицы rez_par_9200 (временно, до уточнения алгоритма)
  6) 21-09-2017 - Параметр VNCRR из accountsw
  5) 11-09-2017 - Убрала группу 30* из не ризикових (должен быть pd_0 = 0)
@@ -82,18 +83,18 @@ begin
       l_cr     := round(l_ead * l_lgd * l_pd,2);
       l_crq    := p_icurval(k.kv,l_cr*100,l_dat31)/100;
       if k.tipa in (30,12) THEN  l_CCF := 100;  end if;
-      INSERT INTO NBU23_REZ ( ob22   , tip  , acc   , FDAT   , branch    , nls       , nmk      , RNK   , NBS      , KV    , ND    , ID    ,
-                              BV     , BVQ  , FIN   , KAT    , sdate     , custtype  , rez      , rezq  , REZ23    , REZQ23, cr    , crq   ,
-                              vkr    , ead  , eadq  , fin_351, s080      , DDD_6B    , OKPO     , pd_0  , tipa     )
-                     values ( k.ob22 , k.tip, k.acc , p_dat01, k.branch  , k.nls     , k.nmk    , k.rnk , k.nbs    , k.kv  , k.acc , k.id  ,
-                              l_BV   , l_BVQ, l_fin , k.kat  , k.daos    , k.custtype, l_cr     , l_crq , l_cr     , l_crq ,l_cr   , l_crq ,
-                              par.vkr, l_ead, l_eadq, l_fin  , l_s080    , l_DDD_6B  , k.OKPO   , k.pd_0, k.tipa_fv);
-      INSERT INTO REZ_CR    ( fdat   , RNK  , NMK   , ND     , KV        , NLS       , ACC      , EAD   , EADQ     , FIN   , PD    , CR    ,
-                              CRQ    , bv   , bvq   , LGD    , CUSTTYPE  , nbs       , tip      , sdate , RZ       , s080  , ob22  , pd_0  ,
-                              vkr    , idf  , ccf   , istval , wdate     , ddd_6B    , tip_fin  , tipa  )
-                  VALUES    ( p_dat01, k.RNK, k.NMK , k.acc  , k.kv      , k.nls     , k.acc    , l_ead , l_eadq   , l_fin , l_pd  , l_cr  ,
-                              l_crq  , l_bv , l_bvq , l_lgd  , k.CUSTTYPE, k.nbs     , k.tip    , k.daos, k.RZ     , l_s080, k.ob22, k.pd_0,
-                              par.vkr, l_idf, l_ccf , 0      , k.mdate   , l_ddd_6B  , l_tip_fin, k.tipa) ;
+      INSERT INTO NBU23_REZ ( ob22   , tip  , acc   , FDAT   , branch    , nls       , nmk   , RNK      , NBS      , KV    , ND    , ID    ,
+                              BV     , BVQ  , FIN   , KAT    , sdate     , custtype  , rez   , rezq     , REZ23    , REZQ23, cr    , crq   ,
+                              vkr    , ead  , eadq  , fin_351, s080      , DDD_6B    , OKPO  , pd_0     , tipa     )
+                     values ( k.ob22 , k.tip, k.acc , p_dat01, k.branch  , k.nls     , k.nmk , k.rnk    , k.nbs    , k.kv  , k.acc , k.id  ,
+                              l_BV   , l_BVQ, l_fin , k.kat  , k.daos    , k.custtype, l_cr  , l_crq    , l_cr     , l_crq ,l_cr   , l_crq ,
+                              par.vkr, l_ead, l_eadq, l_fin  , l_s080    , l_DDD_6B  , k.OKPO, k.pd_0   , k.tipa_fv);
+      INSERT INTO REZ_CR    ( fdat   , RNK  , NMK   , ND     , KV        , NLS       , ACC   , EAD      , EADQ     , FIN   , PD    , CR    ,
+                              CRQ    , bv   , bvq   , LGD    , CUSTTYPE  , nbs       , tip   , sdate    , RZ       , s080  , ob22  , pd_0  ,
+                              vkr    , idf  , ccf   , istval , wdate     , ddd_6B    , OKPO  ,tip_fin   , tipa     )
+                  VALUES    ( p_dat01, k.RNK, k.NMK , k.acc  , k.kv      , k.nls     , k.acc , l_ead    , l_eadq   , l_fin , l_pd  , l_cr  ,
+                              l_crq  , l_bv , l_bvq , l_lgd  , k.CUSTTYPE, k.nbs     , k.tip , k.daos   , k.RZ     , l_s080, k.ob22, k.pd_0,
+                              par.vkr, l_idf, l_ccf , 0      , k.mdate   , l_ddd_6B  , k.OKPO, l_tip_fin, k.tipa   );
 
    end LOOP;
    commit;

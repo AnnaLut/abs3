@@ -5,13 +5,16 @@
   CREATE OR REPLACE PACKAGE BARS.Z23 IS
 
 --***************************************************************--
--- 22-06-2018  20:05      Резерв по НБУ-23                       --
+-- 23-10-2018  20:05      Резерв по НБУ-23                       --
 --***************************************************************--
 
-G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.02 21.07.2016';
+G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.03 23.10.2016';
 
 /*
 
+23-10-2018(2.03) - (COBUMMFO-7488) - Добавлены процедура и функция 
+                   procedure Set_OK_18   ( p_Dat01 date, p_KF varchar2, p_NPP int ); 
+                   function  Get_REZ_LOG ( p_KF char, p_dat date, p_txt varchar2) return varchar2 ;  
 21-07-2016 LUDA procedure p_delta ( dat00_ date, dat01_ date);
 26-03-2014 Sta  Проверка на НЕ-формирование мес снимков - NOZ
 
@@ -38,6 +41,8 @@ G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 2.02 21.07.2016';
  XOZ_    int    ;
 
  -------------------------------
+ procedure Set_OK_18   ( p_Dat01 date, p_KF varchar2, p_NPP int ); 
+ function  Get_REZ_LOG ( p_KF char, p_dat date, p_txt varchar2) return varchar2 ; 
  procedure BV_upd (p_dat01 date) ; -- Кориг бал.варт на суму SNA+SDI
  -------------------------------
  --Функция получения  PV на дату по КД
@@ -233,9 +238,12 @@ END Z23;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
 
-  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 23.9 24-09-2018'; 
+  G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 24.0 23-10-2018'; 
 
 /*
+118) 23-10-2018(24.0) - (COBUMMFO-7488) - Добавлены процедура и функция 
+                         procedure Set_OK_18   ( p_Dat01 date, p_KF varchar2, p_NPP int ); 
+                         function  Get_REZ_LOG ( p_KF char, p_dat date, p_txt varchar2) return varchar2 ;  
 117) 24-09-2018(23.9) - Перестраивать архив пока не выгрузят T0
 116) 02-07-2018(23.8) - BVU по  tip  in ('SDI','SDA','SDM','SDF')     
 115) 26-02-2018(23.7) - /COBUMMFO-6811/ - В START_REZ - создание архива PRVN_FIN_DEB --> FIN_DEB_ARC 
@@ -451,6 +459,34 @@ CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
   D_REZ  number ; D_REZq number ;
   D_ZAL  number ; D_ZALq number ;
 
+-------------------------------------------------------------------
+ --------- предназначена для простановки положительной отметки на одну из процедур с № p_NPP из списка JOB
+ procedure Set_OK_18      ( p_Dat01 date, p_KF varchar2, p_NPP int ) Is
+ l_name regions.name%type;  l_cn integer; 
+ begin  
+    begin 
+       SELECT name into l_name from regions where kf = p_kf;
+    EXCEPTION WHEN NO_DATA_FOUND THEN  l_Name := NULL; 
+    end;
+    begin 
+       SELECT 1 into l_cn from REZ_LOG_18 where kf = p_kf and dat01 = p_dat01;
+    EXCEPTION WHEN NO_DATA_FOUND THEN  
+       insert into REZ_LOG_18 (dat01, kf, name_kf) values (p_Dat01, p_KF, l_name) ;
+    end;
+    EXECUTE IMMEDIATE ' update REZ_LOG_18 set C'  || p_NPP || ' = 1 where Dat01 = :Dat01 and KF =:KF ' using p_Dat01, p_KF ;
+ end Set_OK_18; 
+-------------------------------------------------------------------
+ function Get_REZ_LOG   ( p_KF char, p_dat date, p_txt varchar2) return varchar2 is 
+   l_Ret varchar2 (2000);
+   begin 
+      begin
+         select to_char(chgdate,'DD/MM/YYYY HH24:MI:SS')|| ' ' || txt into l_RET from rez_log  
+         where kf = p_kf and txt = p_txt and fdat = p_dat;
+      EXCEPTION WHEN NO_DATA_FOUND THEN  l_Ret := 'No'; 
+      end;
+   
+      RETURN l_Ret ;
+  End Get_REZ_LOG ;
 -------------------------------------------------------------------
 procedure BV_upd (p_dat01 date) is z_dat01 date; s_dat01 varchar2(10) ;
 
@@ -2087,8 +2123,14 @@ begin
      --     insert into cc_lim_arc (ND,MDAT,   FDAT, LIM2, ACC,SUMG,SUMO,SUMK)
      --                     select  ND,dat01_, FDAT, LIM2, ACC,SUMG,SUMO,SUMK from cc_lim ;
 
-     z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
-     cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
+     --z23.to_log_rez (user_id , 351 , p_dat01 ,' cck_arc_cc_lim');
+     --cck_arc_cc_lim (P_DAT =>gl.bd,P_ND =>0 );
+
+     if BARSUPL.IS_T0_OK(p_dat01) <> 1 THEN
+        delete from fin_deb_arc where mdat=p_dat01;
+        delete from xoz_ref_arc where mdat=p_dat01;
+     end if;
+
 
      if BARSUPL.IS_T0_OK(p_dat01) <> 1 THEN
         delete from fin_deb_arc where mdat=p_dat01;

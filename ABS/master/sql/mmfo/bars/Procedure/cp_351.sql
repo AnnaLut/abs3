@@ -1,8 +1,9 @@
 CREATE OR REPLACE PROCEDURE BARS.CP_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 12.6  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   19-05-2017  
+/* Версия 12.7  23-10-2018  12-07-2018  03-01-2018 27-09-2017  21-09-2017  18-09-2017 31-07-2017   
    Розрахунок кредитного ризику по ЦП
 
+23) 23-10-2018(12.7) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 22) 12-07-2018(12.6) - Новые счета ('SDI','SDA','SDM','SDF','SRR')
 21) 26-01-2018(12.5) - PD_0 - для пассивных = l , было =0!
 20) 03-01-2018(12.4) - R013='' - символьный
@@ -56,7 +57,7 @@ begin
    delete from REZ_CR where fdat=p_Dat01 and tipa = l_tipa;
    for d in ( SELECT a.rnk, a.acc, a.kv, d.id,  d.REF,  d.erat, a.nls, a.tobo, d.accs,kk.vncrr,kk.emi,kk.fin23,kk.cp_id,kk.datp,kk.dox,
                      c.custtype, substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, 
-                     DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ  
+                     DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, c.okpo  
               FROM cp_deal d,  accounts a, CP_KOD KK, customer c
               WHERE D.ID = KK.ID AND (d.acc = a.acc AND KK.DOX > 1    OR     d.accp = a.acc  AND KK.DOX = 1 ) and 
                    (d.active=1 or d.active = -1 and d.dazs >= p_dat01) and a.rnk = c.rnk and substr(a.nls,1,4) not in ('3541')
@@ -229,13 +230,13 @@ begin
                                    tipa   , pawn  , zal     , zalq  , kpz     , vidd     , tip_zal , LGD      , OVKR  , P_DEF     , 
                                    OVD    , OPD   , istval  , dv    , CR_LGD  , nbs      , zal_bv  , zal_bvq  , tip   , custtype  , 
                                    RC     , RCQ   , cc_id   , s080  , ddd_6B  , tip_fin  , ob22    , pd_0     , RZ    , KL_351    , 
-                                   wdate  )     
+                                   okpo   , wdate )     
                            VALUES (p_dat01, d.RNK , d.NMK   , d.ref , l_sdate , d.kv     , s.nls   , s.acc    , l_ead , l_eadq    , 
                                    l_fin  , l_pd  , l_CR    , l_CRQ , l_bv    , l_bvq    , D.vncrr , l_idf    , l_kol , d.fin23   , 
                                    l_tipa , z.pawn, l_zal   , l_zalq, z.kpz   , null     , z.tip   , l_LGD    , l_OVKR, l_PDEF    , 
                                    l_OVD  , l_OPD , l_istval, l_dv  , l_CR_LGD, l_nbs    , l_zal_bv, l_zal_bvq, s.tip , d.custtype, 
                                    l_RC   , L_RCQ , d.cp_id , l_s080, l_ddd   , l_tip_fin, s.ob22  , l_pd_0   , d.rz  , z.kl_351  , 
-                                   d.datp );  
+                                   d.okpo , d.datp);  
             end loop;
          elsif s.bv<>0 THEN
 --logger.info('REZ_351_cp 4   : nd = ' || d.ref ) ;   
@@ -258,11 +259,11 @@ begin
                   INSERT INTO REZ_CR (fdat    , RNK   , NMK  , ND    , KV     , NLS      , ACC  , EAD    , EADQ   , FIN  , PD        , 
                                       CR      , CRQ   , bv   , bvq   , VKR    , IDF      , KOL  , FIN23  , tipa   , vidd , CUSTTYPE  , 
                                       nbs     , dv    , BV02 , s080  , ddd_6B , tip_fin  , tip  , bv02q  , sdate  , RZ   , cc_id     , 
-                                      istval  , wdate , pd_0 , ob22  )                                        
-                              VALUES (p_dat01 , d.RNK , d.NMK, d.ref , s.kv   , s.nls    , s.acc, 0      , 0      , l_fin, l_pd      ,
+                                      okpo   , istval  , wdate , pd_0  , ob22   )                                        
+                              VALUES (p_dat01, d.RNK   , d.NMK , d.ref , s.kv   , s.nls    , s.acc, 0      , 0      , l_fin, l_pd      ,
                                       0       , 0     , l_bv , l_bvq , D.vncrr, l_idf    , l_kol, d.fin23, l_tipa , null , d.CUSTTYPE, 
-                                      s.nbs   , l_dv  , l_bv , l_s080, l_ddd  , l_tip_fin, s.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
-                                      l_istval, d.datp, l_pd_0, nvl(s.ob22,'01') ) ;  
+                                      s.nbs  , l_dv    , l_bv  , l_s080, l_ddd  , l_tip_fin, s.tip, l_bvq  , l_sdate, d.RZ , d.cp_id   , 
+                                      d.okpo , l_istval, d.datp, l_pd_0, nvl(s.ob22,'01') ) ;  
                END IF;
             --END LOOP;
          end if;
