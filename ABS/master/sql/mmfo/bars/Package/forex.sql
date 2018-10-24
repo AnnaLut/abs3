@@ -215,30 +215,40 @@ CREATE OR REPLACE PACKAGE BODY BARS.FOREX is
   g_body_version    constant varchar2(64)  := 'version 2 26.02.2018';
 
 /*
- 26.02.2018 Sta Доп.рекв о сделкам Форекс (с новым доп.параметром F092) для корректного формирования ф.510 (файл 3К XML).
-                COBUMMFO-6808, COBUMMFO-6704 - Дзедзюсь Костя
- 18.07.2017 Sta - передано напрямую. Все 92** проверены.
- 05.07.2017 Sta Форекс-продукты в разрезе ДЛ/КОР + 1/2 (вал/депо) в всязи с переходом на новые бал счета 
+01.10.2018 MDom В процедурі pay_forward_vn додано внутрішню функцію перевірки дати для коректного розкриття бухгалтерської моделі SPLIT-угод
+                (коли одна з дат валютування в межах SPOT), щоб закриття внебалансу (9й клас) та рах.181902 відбувалися в один день
+                (перша дата валютування або валюти А, або валюти Б)
+28.09.2018 MDom В процедурі переоцінки одноногих угод REV_SPOT_OB, додана умова щоб при виконанні Finish/3800 Форекс-угод
+                відбувалася переоцінка для SPLIT-угод коли одна з дат валютування у рамках SPOT а інша - більше дати угоди
 
- 10.03.2017 Sta закоментарено    ---- update oper   set dk  = 1, kv = xx.kva, nlsa = l_1819, s = xx.suma, kv2 = xx.kvb, nlsb = l_1819, s2 = xx.sumb where ref = xx.ref ;
- 24.02.2017 Sta + Алена Ш. Де-лонгация( но НЕ лонгация !!!!)  депо-свoпов
- 07.02.2017 Sta + Алена Ш. убрали переоц Похидных ФИ, которое БЕК
- 29.12.2016 STA Добили ... forex_ob22.S62 - лицетые счета. а не ББББ/ОО
- 28.12.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
+12.09.2018 MDom В функцію get_forextype додана додаткова умова для Спліт-угод, коли одна з дат валютування у рамках SPOT а інша - більше дати угоди
+                В процедуру pay_fx2, додана окрема обробка для Спліт-угод
+                Логіка по Спліт-угодам перенесена в процедуру pay_split, яка раніше ніколи не визивалася
 
- 25.10.2016 Sta Лонгирование (отрезание и пришивание 2-й ноги) допускается только для ДЕПО-СВОПА
- 20.10.2016 Sta Длина kod = 15 Надо увеличить до 17  SWAP_FORWARD_Cnnn   nnn = количество сделок по процентам
+26.02.2018 Sta Доп.рекв о сделкам Форекс (с новым доп.параметром F092) для корректного формирования ф.510 (файл 3К XML).
+               COBUMMFO-6808, COBUMMFO-6704 - Дзедзюсь Костя
+18.07.2017 Sta - передано напрямую. Все 92** проверены.
+05.07.2017 Sta Форекс-продукты в разрезе ДЛ/КОР + 1/2 (вал/депо) в всязи с переходом на новые бал счета 
+
+10.03.2017 Sta закоментарено    ---- update oper   set dk  = 1, kv = xx.kva, nlsa = l_1819, s = xx.suma, kv2 = xx.kvb, nlsb = l_1819, s2 = xx.sumb where ref = xx.ref ;
+24.02.2017 Sta + Алена Ш. Де-лонгация( но НЕ лонгация !!!!)  депо-свoпов
+07.02.2017 Sta + Алена Ш. убрали переоц Похидных ФИ, которое БЕК
+29.12.2016 STA Добили ... forex_ob22.S62 - лицетые счета. а не ББББ/ОО
+28.12.2016 Sta Переоцінка до "справедл.вартості"= поточному оф.курсу коротких одноногих.
+
+25.10.2016 Sta Лонгирование (отрезание и пришивание 2-й ноги) допускается только для ДЕПО-СВОПА
+20.10.2016 Sta Длина kod = 15 Надо увеличить до 17  SWAP_FORWARD_Cnnn   nnn = количество сделок по процентам
                Защита от использования в филиалах . Только для гл.МФО !
                Проверка возможности пролонгации второг ноги
 
- 11/10/2015 Sta Доступ к сч6209 при переоц на финише (от технолога)
- 04.10.2016 Sta Испр ош при открытиии новых сч
- 02/09/2016 Sta Счета крд и деб задолж по переоценке до справ.стоимости - в разрезе контрагентов
+11/10/2015 Sta Доступ к сч6209 при переоц на финише (от технолога)
+04.10.2016 Sta Испр ош при открытиии новых сч
+02/09/2016 Sta Счета крд и деб задолж по переоценке до справ.стоимости - в разрезе контрагентов
 
- 27.02.2015 Sta + Билошицкая. Самоопределяющаяся виза в P3800/
-            Чтобы унифицировать отражение сделок в балансе,
-            брать на позицию все (в т.ч. и налальные) сделки, по которым дата валютирования - сегодня, при регламентном закрытии дня,
-            Либо при ручном запуске процедуры Finish 3800.
+27.02.2015 Sta + Билошицкая. Самоопределяющаяся виза в P3800/
+                             Чтобы унифицировать отражение сделок в балансе, брать на позицию все (в т.ч. и налальные) сделки,
+                             по которым дата валютирования - сегодня, при регламентном закрытии дня,
+                             Либо при ручном запуске процедуры Finish 3800.
 
  03.02.2015 Sta Идентификация временем всех атоматных проводок
  22.01.2015 Sta Полное анулирование с процентами
@@ -335,11 +345,20 @@ begin
   end;
   ---------------------------------
 
-for xx in (select x.*    from fx_deal x   where x.swap_tag is null
-             and FOREX.get_forextype3K(x.deal_tag)  = l_kod   and EXISTS (SELECT 1 FROM oper  WHERE REF = x.REF AND sos > 0)
-             AND NVL (x.sos, 10) < 15                         and x.DEAL_TAG = decode ( p_DEAL_TAG , 0, x.DEAL_TAG , p_DEAL_TAG )
-           )
-
+for xx in (select x.*
+			 from fx_deal x
+			where x.swap_tag is null
+              --and FOREX.get_forextype3K(x.deal_tag) = l_kod --2018.09.28 закоментовано
+              --2018.09.28 нова умова, щоб відбувалася переоцінка для SPLIT-угод коли дати валютування > дати угоди та одна з дат валютування у рамках SPOT
+              and (forex.get_forextype3K(x.deal_tag) = l_kod or
+                   (forex.get_forextype3K(x.deal_tag) = 'SPLIT' and x.dat_a > x.dat and x.dat_b > x.dat))
+              ----
+              and EXISTS (SELECT 1
+						   FROM oper
+						  WHERE REF = x.REF
+							AND sos > 0)
+              AND NVL (x.sos, 10) < 15
+			  and x.DEAL_TAG = decode(p_DEAL_TAG, 0, x.DEAL_TAG, p_DEAL_TAG))
 loop
 
   dd.NBS    := substr(ff.s3d,1,4) ;
@@ -486,6 +505,12 @@ begin  l_dat := dat_next_u( p_dat, 2);
   if p_dat = p_data and p_dat = p_datb         then  l_fxtype := g_fxtype_tod    ;  -- 1 - TOD - день в день
   elsif p_dat = p_data and p_datb > p_dat
      or p_dat = p_datb and p_data > p_dat      then  l_fxtype := g_fxtype_split  ;  -- 1a - SPLIT
+  --COBUMMFO-7334 когда одна из дат A/B в пределах SPOT, а другая отличается, тоже определяем как SPLIT
+  elsif (p_data between p_dat and l_dat and
+         p_data <> p_datb and p_datb > p_dat) or 
+        (p_datb between p_dat and l_dat and
+         p_data <> p_datb and p_datb > p_dat)  then  l_fxtype := g_fxtype_split  ;  -- 1a - SPLIT
+  ----
   elsif p_dat < p_data and p_data <= l_dat and
         p_dat < p_datb and p_datb <= l_dat     then  l_fxtype := g_fxtype_spot   ;  -- 2 - SPOT
   else                                               l_fxtype := g_fxtype_forward;  -- 3 - FORWARD
@@ -710,14 +735,29 @@ procedure FX_CLOSE (p_dat date   ,  -- отчетная дата
   procedure FX_CLOSE1 (p_dat date, xx fx_deal%rowtype ) is
      l_sos int ;     l_kod varchar2 (30); l_PVq number ;
   begin
-      if ( xx.dat_a > p_dat and xx.dat_b > p_dat  OR     xx.dat_a = xx.dat and xx.dat_b = xx.dat and xx.dat = p_dat )     then l_sos := 10 ; -- НеЗавершенные сделки-ОДИНОЧКИ и части СВОПОВ/ Расчет еще НЕ наступил
-      Elsif xx.dat_a = p_dat OR  xx.dat_b = p_dat then l_sos := 12 ; -- пл.дата наступила - хотябы по одной из сторон
+      if (xx.dat_a > p_dat and
+		  xx.dat_b > p_dat)
+	   OR
+         (xx.dat_a = xx.dat and
+		  xx.dat_b = xx.dat and
+		  xx.dat = p_dat )     then
+        l_sos := 10 ; -- НеЗавершенные сделки-ОДИНОЧКИ и части СВОПОВ/ Расчет еще НЕ наступил
+      Elsif xx.dat_a = p_dat OR 
+			xx.dat_b = p_dat then
+        l_sos := 12 ; -- пл.дата наступила - хотябы по одной из сторон
 
       Elsif xx.dat_a < p_dat and xx.dat_b < p_dat then
-         If xx.swap_tag is null                   then l_sos := 15 ; -- Завершенные сделки-ОДИНОЧКИ
-         Else                                          l_sos := 14 ; -- Завершенные части СВОПА
-            begin select 14 into l_sos from dual where exists (select 1 from fx_deal where swap_tag = xx.swap_tag and ( dat_a>= p_dat or dat_b >= p_dat) );
-            exception when no_data_found          then l_sos := 15 ; -- Завершенный СВОП
+         If xx.swap_tag is null                   then
+		   l_sos := 15 ; -- Завершенные сделки-ОДИНОЧКИ
+         Else
+		   l_sos := 14 ; -- Завершенные части СВОПА
+           begin
+			 select 14
+			   into l_sos
+			   from dual
+		      where exists (select 1 from fx_deal where swap_tag = xx.swap_tag and ( dat_a>= p_dat or dat_b >= p_dat) );
+            exception when no_data_found then 
+			  l_sos := 15 ; -- Завершенный СВОП
             end ;
          end if ;
       end if ;
@@ -1185,7 +1225,23 @@ is
   l_acca    number := null;
   l_accb    number := null;
   l_tt_nls  tts.nlsk%type ;
-
+  
+  --2018.10.01 COBUMMFO-7334 для вірного формування бухгалтерської моделі SPLIT-угод, коли одна з дат валютування в межах SPOT
+  function f_get_correct_date(
+    p_fx_deal     fx_deal%rowtype,
+    p_date_val    date) return date
+  is
+  begin
+    --якщо тип угоди SPLIT і дати валютування не дорівнюють даті угоди, тоді це SPLIT, коли одна з дат валютування у рамках SPOT
+    if get_forextype(p_fx_deal.dat, p_fx_deal.dat_a, p_fx_deal.dat_b) = 'SPLIT' and p_fx_deal.dat_a <> p_fx_deal.dat and p_fx_deal.dat_b <> p_fx_deal.dat then
+       --закриття внебалансу (9й клас) та рах. 181902 в один день (в першу дату валютування або валюти А, або валюти Б)
+      return least(p_fx_deal.dat_a, p_fx_deal.dat_b);
+    else
+      --інакше повертаємо ту саму дату, яку передали в функцію
+      return p_date_val;
+    end if;
+  end;
+  ----
 begin
 --logger.info('XXX-1*'|| p_fxtype||p_fxdeal.deal_tag||'*'|| p_fxdeal.swap_tag||'*');
 logger.info('XXX-11*'|| gl.bdate||'*'||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*');
@@ -1226,20 +1282,20 @@ logger.info('XXX-11*'|| gl.bdate||'*'||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*'
 
 --logger.info('XXX-2*'|| gl.bdate||p_fxdeal.dat_a||'*'|| p_fxdeal.dat_b||'*');
 
-  If p_fxdeal.dat_a > gl.bdate then 
-     pay_subdoc(0, l_oper.ref, gl.bdate,       l_oper.tt, 1, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Розкрити вимоги');
-     pay_subdoc(0, l_oper.ref, p_fxdeal.dat_a, l_oper.tt, 0, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Закрити вимоги');
+  If p_fxdeal.dat_a > gl.bdate then
+     pay_subdoc(0, l_oper.ref, gl.bdate,                                                        l_oper.tt, 1, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Розкрити вимоги');
+     pay_subdoc(0, l_oper.ref, /*p_fxdeal.dat_a*/ f_get_correct_date(p_fxdeal, p_fxdeal.dat_a), l_oper.tt, 0, p_fxdeal.kva, l_oper.nlsa, p_fxdeal.suma, p_fxdeal.kva, l_tt_nls,    p_fxdeal.suma, 'Закрити вимоги');
   end if ;
 
-  If p_fxdeal.dat_b > gl.bdate then 
-     pay_subdoc(0, l_oper.ref, gl.bdate,       l_oper.tt, 1, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Розкрити зобов`язання');
-     pay_subdoc(0, l_oper.ref, p_fxdeal.dat_b, l_oper.tt, 0, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Закрити зобов`язання');
+  If p_fxdeal.dat_b > gl.bdate then
+     pay_subdoc(0, l_oper.ref, gl.bdate,                                                        l_oper.tt, 1, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Розкрити зобов`язання');
+     pay_subdoc(0, l_oper.ref, /*p_fxdeal.dat_b*/ f_get_correct_date(p_fxdeal, p_fxdeal.dat_b), l_oper.tt, 0, p_fxdeal.kvb, l_tt_nls,    p_fxdeal.sumb, p_fxdeal.kvb, l_oper.nlsb, p_fxdeal.sumb, 'Закрити зобов`язання');
  end if;
 
   -- FX2
   if p_fxdeal.vn_flag = 0 then
-     pay_subdoc(0, l_oper.ref, p_fxdeal.dat_a, 'FX2', 1, p_fxdeal.kva, l_nls_3540, p_fxdeal.suma, p_fxdeal.kva, l_nls_1819, p_fxdeal.suma, 'Розкрити деб.заборгованiсть на МБ');
-     pay_subdoc(0, l_oper.ref, p_fxdeal.dat_b, 'FX2', 1, p_fxdeal.kvb, l_nls_1819, p_fxdeal.sumb, p_fxdeal.kvb, l_nls_3640, p_fxdeal.sumb, 'Розкрити кред.заборгованiсть на МБ');
+     pay_subdoc(0, l_oper.ref, /*p_fxdeal.dat_a*/ f_get_correct_date(p_fxdeal, p_fxdeal.dat_a), 'FX2', 1, p_fxdeal.kva, l_nls_3540, p_fxdeal.suma, p_fxdeal.kva, l_nls_1819, p_fxdeal.suma, 'Розкрити деб.заборгованiсть на МБ');
+     pay_subdoc(0, l_oper.ref, /*p_fxdeal.dat_b*/ f_get_correct_date(p_fxdeal, p_fxdeal.dat_b), 'FX2', 1, p_fxdeal.kvb, l_nls_1819, p_fxdeal.sumb, p_fxdeal.kvb, l_nls_3640, p_fxdeal.sumb, 'Розкрити кред.заборгованiсть на МБ');
   end if;
 
   p_fxdeal.ref := l_oper.ref;
@@ -1319,6 +1375,22 @@ begin
   end if;
 
 end pay_spot;
+
+procedure pay_split (p_fxdeal in out fx_deal%rowtype,
+                     p_cust   in     t_cust,
+                     p_nazn          varchar2)
+  is
+  l_oper  oper%rowtype;
+begin
+  --COBUMMFO-7334 когда любая из дат валютирования совпадает с датой заключения сделки, подходит алгоритм pay_tod, как и было раньше
+  if p_fxdeal.dat = p_fxdeal.dat_a or p_fxdeal.dat = p_fxdeal.dat_b then
+    pay_tod(p_fxdeal, p_cust, p_nazn); 
+  --иначе, если одна из дат A/B в пределах SPOT, а другая отличается - действуем по алгоритму SPOT
+  else
+    pay_spot(p_fxdeal, p_cust, p_nazn);
+  end if;
+  ----
+end pay_split;
 
 -------------------------------------------------------------------------------
 -- pay_forward
@@ -1432,9 +1504,16 @@ procedure pay_fx2 (
 is
 begin
 
-  if    p_fxtype = g_fxtype_tod or p_fxtype = g_fxtype_split then  pay_tod     (p_fxdeal, p_cust, p_nazn) ; 
-  elsif p_fxtype = g_fxtype_spot                             then  pay_spot    (p_fxdeal, p_cust, p_nazn) ;  -- 1.2 - SPOT   
-  else                                                             pay_forward (p_fxdeal, p_cust, p_nazn) ;  -- 1.3 - FORVARD
+  if    p_fxtype = g_fxtype_tod then --or p_fxtype = g_fxtype_split   then --2018.09.12 закомментировано, т.к. перенесено в pay_split
+    pay_tod     (p_fxdeal, p_cust, p_nazn) ; 
+  elsif p_fxtype = g_fxtype_spot then 
+    pay_spot    (p_fxdeal, p_cust, p_nazn) ;  -- 1.2 - SPOT   
+  --COBUMMFO-7334
+  elsif p_fxtype = g_fxtype_split then
+    pay_split(p_fxdeal, p_cust, p_nazn);
+  ----
+  else
+    pay_forward (p_fxdeal, p_cust, p_nazn) ;  -- 1.3 - FORVARD
   end if;
 
   set_operw(p_fxdeal.ref, 'SUMKL', p_fxdeal.sumc);
