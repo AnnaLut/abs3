@@ -38,7 +38,7 @@ begin
 , Q003_2          VARCHAR2(50 CHAR) 
 , Q007_1          VARCHAR2(10 CHAR) 
 , F027            VARCHAR2(2 CHAR) 
-, F02D            VARCHAR2(1 CHAR) 
+, F02D            VARCHAR2(2 CHAR) 
 , Q006            VARCHAR2(160 CHAR) 
 , DESCRIPTION     VARCHAR2(250)
 , ACC_ID          NUMBER(38)
