@@ -9,7 +9,7 @@ PROMPT *** Create  procedure CP_PEREOC_P ***
 
 CREATE OR REPLACE PROCEDURE CP_PEREOC_P (mode_ in INT, p_vob in oper.vob%type)
 IS
-   -- v.1.17 23/06/2018
+   -- v.1.19 26/09/2018
    title   CONSTANT VARCHAR2 (20) := 'CP_PEREOC_P:';
    --ce               cp_deal%ROWTYPE;  -- реквизиты сделки с ЦП
    l_accs           cp_deal.accs%type; -- счет переоценки /уценки/дооценки
@@ -40,7 +40,7 @@ IS
    l_dazs          cp_deal.dazs%type;   
    l_s8            varchar2(8);   
    l_p4            integer;   
-   l_nls_fxp       cp_accc.nls_fxp%type;
+--   l_nls_fxp       cp_accc.nls_fxp%type;
 BEGIN
    bars_audit.info(title||' Начало работы. Инициализация.');
 
@@ -199,7 +199,8 @@ BEGIN
                 || ' шт.';
       bars_audit.info(title|| op.nazn);
 
-      if ca.pf != 1 or k.kv != 980
+      
+      if ca.pf not in (1, 4) or k.kv != 980
       then
          bars_audit.info(title|| 'ca.pf != 1 ,k.kv ='|| k.kv);
           --сумма переоценки от курса котировки поля Переоц-ка~пакет~ Грф.22
@@ -271,7 +272,7 @@ BEGIN
                 where o.ref = op.REF;
              END IF;
       else
-        bars_audit.info(title|| 'ca.pf = 1 ');
+        bars_audit.info(title|| 'ca.pf = '||ca.pf);
             --pf = 1 http://jira.unity-bars.com.ua:11000/browse/COBUPRVN-246
             /* Прохання доопрацювати АБС Барс "Millenium"- АРМ "Цінні папери", а саме - згідно Постанови НБУ № 400 переоцінка цінних паперів
                в портфелі на продаж повинна розраховуватись як різниця між попередньою і наступною переоцінкою (по дельті).
@@ -281,6 +282,17 @@ BEGIN
                Тобто, залишок рахунку 5102 (980) має дорівнювати залишку рахунку 1415 (840) по курсу нової переоцінки.
                Звертаємо увагу, що в балансовую вартість цінних паперів при розрахунку переоцінки (АРМ "Цінні папери"- функція" Форма розрахунку переоцінки",
                необхідно включити ( з мінусом ) суму резерву за попередню дату баланса, а також Кт-залишок по рахунках нарахованих процентів. */
+               
+             /* http://jira.unity-bars.com:11000/browse/COBUMMFO-8649 
+                Фіалкович: 
+             Сергей прав, такая заявка была : по переоценке на дельту в портфеле на продажу. Она была составлена на требование инструкции 400. В портфеле на продажу был четко оговоренный пункт , что при следующей переоценке, надо учитывать сумму предыдущей. Т.е. переоценка должна быть проведена на дельту между предыдущей и следующей. Так было прописано для портфеля на продажу. А для торгового - такого пункта не было. Поэтому тогда возникли такие разные требования.
+             В новой 14-й инструкции такого категорического заявления- нет.
+             Поэтому банк сам принимает решение как делать переоценку- на дельту или сворачиванием предыдущей и разворачиванием новой переоценки (накручиваются обороты).
+             Поэтому решаем так:
+                                Поскольку функционал переоценки в портфеле на продажу уже нормально отработан, т. е. гривневая переоценка идет на дельту, а валютная сворачивает обороты по предыдущей по предыдущему курсу и новой переоценки по новому курсу.
+                                Пусть Сергей задействует этот функционал и для торгового портфеля.
+             */  
+               
              --сумма переоценки от курса котировки поля Переоц-ка~пакет~ Грф.22
           op.s := ABS (k.k22) * 100;
              if (op.s != 0) then
@@ -293,7 +305,7 @@ BEGIN
               bars_audit.info(title|| ' op.s='|| to_char(op.s)||', op.s2='|| to_char(op.s2));
 
               S_  := op.S;
-              SQ_ := op.s2;-- сумма документа по предыдущему курсу для портфеля на продаж pf = 1
+              SQ_ := op.s2;-- сумма документа по предыдущему курсу для портфеля 
 
               IF   (k.k22 > 0)
                 THEN  op.dk := 1;
@@ -381,13 +393,11 @@ BEGIN
       select  a.nlss2,
               (select ac.cp_acc from cp_accounts ac where ac.cp_ref = k.ref and ac.cp_acctype = 'S2') as accs2,
               a.nlss2_6,
-              (select acc from accounts where nls = a.nlss2_6 and kv = 980) accs2_6,
-              a.nls_fxp
+              (select acc from accounts where nls = a.nlss2_6 and kv = 980) accs2_6
          into l_nlss2,
               l_accs2_vnesist,
               l_nlss2_6,
-              l_accs2_6,
-              l_nls_fxp
+              l_accs2_6
       from cp_kod kod
       left join cp_accc a on (a.ryn = k.ryn and nvl(k.pf, a.pf) = a.pf and k.emi = a.emi and substr(k.nls,1,4)=a.vidd )
       where kod.id = k.id;
@@ -401,10 +411,10 @@ BEGIN
            from accounts
           where kv = 980
             and dazs is null
-            and nls = l_nls_fxp;
+            and nls = l_nlss2_6;
         exception
           when NO_DATA_FOUND then 
-            l_err := l_err||CHR(10)||CHR(13)||'Не знайдені реквізіти консолідованого рахунку переоцінки з cp_accc Рах.FXP('||l_nls_fxp||') для ref='|| k.REF || ' ' || l_msg;
+            l_err := l_err||CHR(10)||CHR(13)||'Не знайдені реквізіти консолідованого рахунку переоцінки(опціон) з cp_accc ('||l_nlss2_6||') для ref='|| k.REF || ' ' || l_msg;
       end;
 
       if l_accs2_vnesist is null then
