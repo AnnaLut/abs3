@@ -917,9 +917,9 @@ is
                                                                  and agrmnt_type = 17) > 0 then 'N'
                                                         else 'N'
                                                      end)                                                           ||';'||*/
-              'DEPOSIT_TARGET_CONTRACT_NUMBER=' || d.dptrcp_acc                                                     ||';'||
-              'DEPOSIT_TARGET_CBS_NUMBER='      || d.dptrcp_mfo                                                       ||';'||
-              'DEPOSIT_TARGET_MEMBER_ID='       || l_target
+              'DEPOSIT_TARGET_CONTRACT_NUMBER=' || null                                                               ||';'||
+              'DEPOSIT_TARGET_CBS_NUMBER='      || d.dptrcp_acc                                                     ||';'||
+              'DEPOSIT_TARGET_MEMBER_ID='       || d.dptrcp_mfo
             )
           ), -- Contract
           XmlElement("Info",
@@ -1032,9 +1032,9 @@ is
                                                                  and agrmnt_type = 17) > 0 then 'N'
                                                         else 'N'
                                                      end)                                                           ||';'||*/
-              'DEPOSIT_TARGET_CONTRACT_NUMBER=' || d.dptrcp_acc                                                     ||';'||
-              'DEPOSIT_TARGET_CBS_NUMBER='      || f_ourmfo_g                                                       ||';'||
-              'DEPOSIT_TARGET_MEMBER_ID='       || l_target
+              'DEPOSIT_TARGET_CONTRACT_NUMBER=' || null                                                             ||';'||
+              'DEPOSIT_TARGET_CBS_NUMBER='      || d.dptrcp_acc                                                     ||';'||
+              'DEPOSIT_TARGET_MEMBER_ID='       || f_ourmfo_g
             )
           ), -- Contract
           XmlElement("Info",
