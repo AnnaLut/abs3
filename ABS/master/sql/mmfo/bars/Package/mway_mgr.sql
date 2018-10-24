@@ -166,7 +166,7 @@ is
   --
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64)  := 'version 4.82  05/07/2018';
+  g_body_version  constant varchar2(64)  := 'version 4.83  13/09/2018';
   g_awk_body_defs constant varchar2(512) := '';
   g_dbgcode constant varchar2(12) := 'mway_mgr.';
 
@@ -1428,7 +1428,7 @@ is
     l_servicecode varchar2(100);
     l_is_replenished int;
     l_sep int := 0;
-    l_nazn varchar2(160);
+    l_nazn varchar2(160) := 'Переказ коштів ч/з Веб-банкінг';
     l_limit_for_day number;
     l_drn_tr mway_match.drn_tr%type;
     l_termadd        number;
@@ -1500,7 +1500,7 @@ is
       end if;
       l_servicecode := get_transprop_codeval(p_xml,'ServiceProperties','SERVICE_CODE');
       l_rrn := get_docrefset_parm(p_xml,'RRN');
-      l_nazn := substr(p_xml.extract('UFXMsg/MsgData/Doc/Description/text()').getStringVal(),1,160);
+      --l_nazn := substr(p_xml.extract('UFXMsg/MsgData/Doc/Description/text()').getStringVal(),1,160);
       logger.trace('WAY4 logger: select TT '||l_th||' time: '||to_char(sysdate,'dd.mm.yyyy hh24:mi:ss')||' l_sum='||to_char(l_sum));
       begin
         select tt into l_tt from mway_pay_tt where service_code = l_servicecode and is_fee = 0;
@@ -2166,6 +2166,7 @@ is
             l_sep := 1;
             l_nlsa := p_xml.extract('UFXMsg/MsgData/Doc/Originator/ContractNumber/text()').getStringVal();
             l_sum := to_number(get_transaction_exvalue(p_xml,'SourceAmount','Amount')) * 100;
+			l_nazn := substr(p_xml.extract('UFXMsg/MsgData/Doc/Description/text()').getStringVal(),1,160);
             begin
               select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.nls = l_nlsa and t.lcv = l_lcv;
               select * into l_cusa from customer where rnk = l_acca.rnk;
@@ -2266,6 +2267,7 @@ is
               l_obj_operation := get_transprop_codeval(p_xml,'OperationProperties','REQUESTOR');
               l_nlsa := substr(l_obj_operation,1,instr(l_obj_operation,'.') - 1);
               l_sum := to_number(get_transaction_exvalue(p_xml,'SourceAmount','Amount')) * 100;
+			  l_nazn := substr(p_xml.extract('UFXMsg/MsgData/Doc/Description/text()').getStringVal(),1,160);
               begin
                 select a.* into l_acca from accounts a, tabval$global t where a.kv = t.kv and a.nls = l_nlsa and t.lcv = l_lcv;
                 select * into l_cusa from customer where rnk = l_acca.rnk;
@@ -2366,7 +2368,7 @@ is
       l_impdoc.dk     := l_dk      ;
       l_impdoc.tt     := l_tt      ;
       l_impdoc.vob    := l_vob     ;
-      l_impdoc.nazn   := 'Переказ коштів ч/з Веб-банкінг'; --l_nazn    ;
+      l_impdoc.nazn   := ltrim(l_nazn); -- Непонятно что прийдет от Веб - банкинга, а часто так и есть что приходит не буду говорить что
       l_impdoc.datp   := trunc(l_date)     ;
 
       l_impdoc.userid := null     ;
