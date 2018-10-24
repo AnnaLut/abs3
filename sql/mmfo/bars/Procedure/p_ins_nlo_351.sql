@@ -9,10 +9,11 @@ PROMPT *** Create  procedure P_INS_NLO_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_INS_NLO_351 (p_dat01 date) IS
 
-/* Версия 3.1  22-11-2017  14-07-2017  09-03-2017  27-01-2017
+/* Версия 3.2  23-10-2018  22-11-2017  14-07-2017  09-03-2017  27-01-2017
    НЕОПОЗНАННЫе СЧЕТа
    -------------------------------------
 
+ 4) 23-10-2018(3.2) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
  3) 22-11-2017(3.1) - Новый план счетов
  2) 14-07-2017 - проверка по хоз дбиторке (может быть несколько строк с одним и тем же ACC)
  1) 09-03-2017 - custtype,OKPO в NBU23_REZ FIN -- ? ? ?
@@ -41,16 +42,16 @@ begin
       end;
    end LOOP;
 
-   INSERT INTO REZ_CR (fdat   , RNK   , NMK  , ND    , KV      , NLS          , ACC , EAD   , EADQ   , FIN    , PD   , VKR ,
-                       IDF    , KOL   , FIN23, TEXT  , CR      , CRQ          , tipa, pawn  , zal    , zalq   , kpz  , vidd,
-                       tip_zal, bv    , bvq  , LGD   , CUSTTYPE, CR_LGD       , nbs , zal_bv, zal_bvq, S250   , dv   , RC  ,
-                       RCQ    , KL_351, sdate, RZ    , tip     , OVKR         , BV02, bv02q , ob22   , grp    , cc_id, pd_0,
-                       P_DEF  , OVD   , OPD  , istval, wdate   , ddd_6B       , CCF , rpb   , tip_fin, s080 )
-                SELECT p_dat01, rnk   , NMK  , nd    , KV      , nls          , ND  , BV    , BVQ    , fin    , PD   , NULL,
-                       NULL   , 0     , NULL , NULL  , REZ     , REZQ         , 99  , NULL  , 0      , 0      , null , NULL,
-                       NULL   , BV    , BVQ  , LGD   , CUSTTYPE, REZ          , nbs , 0     , 0      , NULL   , 0    , 0   ,
-                       0      , 0     , NULL , RZ    , tip     , NULL         , BV  , BVQ   , ob22   , null   , null , 0   ,
-                       null   , null  , null , istval, null    , f_ddd_6B(nbs), null, 0     , tip_fin  , s080
+   INSERT INTO REZ_CR (fdat   , RNK   , NMK  , ND  , KV      , NLS   , ACC          , EAD   , EADQ   , FIN    , PD   , VKR ,
+                       IDF    , KOL   , FIN23, TEXT, CR      , CRQ   , tipa         , pawn  , zal    , zalq   , kpz  , vidd,
+                       tip_zal, bv    , bvq  , LGD , CUSTTYPE, CR_LGD, nbs          , zal_bv, zal_bvq, S250   , dv   , RC  ,
+                       RCQ    , KL_351, sdate, RZ  , tip     , OVKR  , BV02         , bv02q , ob22   , grp    , cc_id, pd_0,
+                       okpo   , P_DEF , OVD  , OPD , istval  , wdate , ddd_6B       , CCF   , rpb    , tip_fin, s080 )
+                SELECT p_dat01, rnk   , NMK  , nd  , KV      , nls   , ND           , BV    , BVQ    , fin    , PD   , NULL,
+                       NULL   , 0     , NULL , NULL, REZ     , REZQ  , 99           , NULL  , 0      , 0      , null , NULL,
+                       NULL   , BV    , BVQ  , LGD , CUSTTYPE, REZ   , nbs          , 0     , 0      , NULL   , 0    , 0   ,
+                       0      , 0     , NULL , RZ  , tip     , NULL  , BV           , BVQ   , ob22   , null   , null , 0   ,
+                       okpo   ,null   , null , null, istval  , null  , f_ddd_6B(nbs), null  , 0      , tip_fin, s080
                  from  V_rez_NLO_351;
 
    INSERT INTO NBU23_REZ ( ob22  , tip, acc , FDAT   , branch, nls  , nmk  , RNK   , NBS, KV  , ND , ID       , BV  , BVQ   , custtype,

@@ -9,8 +9,9 @@ PROMPT *** Create  procedure MBDK_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.MBDK_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 11.2  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 08-02-2017  24-01-2017  10-01-2017  25-11-2016
+/* Версия 11.3  23-10-2018  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 
    Розрахунок кредитного ризику по МБДК + коррахунки
+14) 23-10-2018(11.3) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 13) 27-09-2017(11.2)  - Запись IDF <-- l_idf, было l_fp
 12) 14-09-2017 - PD по l_idf ,было по l_fp
 11) 05-04-2017 - rnk = 90931101
@@ -69,7 +70,7 @@ begin
       l_tipa := d.tipa;
       for s in (select a.tip, a.nls, a.ob22, a.acc, a.kv,  a.nbs, - ost_korr(a.acc,l_dat31,null,a.nbs) S, a.rnk,
                 substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, c.custtype cus,
-                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ
+                DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ, c.okpo
                 from nd_acc n, accounts a,customer c
                 where n.nd=d.nd and n.acc=a.acc and a.nbs like '15%' and  ost_korr(a.acc,l_dat31,null,a.nbs)<0 and a.rnk=c.rnk
                 )
@@ -166,16 +167,16 @@ begin
             l_zal_bv  := z.sall/100;
             l_zal_bvq := p_icurval(s.kv,l_zal_bv*100,l_dat31)/100;
             l_CR_LGD  := l_ead*l_pd*l_lgd;
-            INSERT INTO REZ_CR (fdat     , RNK   , NMK     , ND       , SDATE  , wdate  , KV    , NLS     , ACC    , EAD     , EADQ    , FIN   ,
-                                PD       , CR    , CRQ     , bv       , bvq    , VKR    , IDF   , KOL     , FIN23  , TEXT    , tipa    , pawn  ,
-                                zal      , zalq  , zal_bv  , zal_bvq  , kpz    , OVKR   , P_DEF , OVD     , OPD    , istval  , CR_LGD  , dv    ,
-                                cc_id    , pd_0  , vidd    , tip_zal  , LGD    , nbs    , tip   , custtype, RC     , BV02    , s080    , ddd_6B,
-                                tip_fin  , ob22  , bv02q   , KL_351   , RZ     )
-                        VALUES (p_dat01  , s.RNK , s.NMK   , d.nd     , d.sdate, d.wdate, s.kv  , s.nls   , s.acc  , l_ead   , l_eadq  , l_fin ,
-                                l_pd     , l_CR  , l_CRQ   , l_bv     , l_bvq  , d.VKR  , l_idf , d.kol   , d.fin23, null    , l_tipa  , z.pawn,
-                                l_zal    , l_zalq, l_zal_bv, l_zal_bvq, z.kpz  , l_OVKR , l_PDEF, l_OVD   , l_OPD  , l_istval, l_CR_LGD, l_dv  ,
-                                d.cc_id  , 0     , d.vidd  , z.tip    , l_LGD  , s.nbs  , s.tip , s.cus   , l_RC   , l_bv02  , l_s080  , l_ddd ,
-                                l_tip_fin, s.ob22, l_bv02q , z.kl_351 , s.RZ   );
+            INSERT INTO REZ_CR (fdat   , RNK      , NMK     , ND       , SDATE   , wdate  , KV    , NLS     , ACC    , EAD     , EADQ    , FIN   ,
+                                PD     , CR       , CRQ     , bv       , bvq     , VKR    , IDF   , KOL     , FIN23  , TEXT    , tipa    , pawn  ,
+                                zal    , zalq     , zal_bv  , zal_bvq  , kpz     , OVKR   , P_DEF , OVD     , OPD    , istval  , CR_LGD  , dv    ,
+                                cc_id  , pd_0     , vidd    , tip_zal  , LGD     , nbs    , tip   , custtype, RC     , BV02    , s080    , ddd_6B,
+                                okpo   , tip_fin  , ob22    , bv02q    , KL_351  , RZ     )
+                        VALUES (p_dat01, s.RNK    , s.NMK   , d.nd     , d.sdate , d.wdate, s.kv  , s.nls   , s.acc  , l_ead   , l_eadq  , l_fin ,
+                                l_pd   , l_CR     , l_CRQ   , l_bv     , l_bvq   , d.VKR  , l_idf , d.kol   , d.fin23, null    , l_tipa  , z.pawn,
+                                l_zal  , l_zalq   , l_zal_bv, l_zal_bvq, z.kpz   , l_OVKR , l_PDEF, l_OVD   , l_OPD  , l_istval, l_CR_LGD, l_dv  ,
+                                d.cc_id, 0        , d.vidd  , z.tip    , l_LGD   , s.nbs  , s.tip , s.cus   , l_RC   , l_bv02  , l_s080  , l_ddd ,
+                                s.okpo , l_tip_fin, s.ob22  , l_bv02q  , z.kl_351, s.RZ   );
 
             for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV from nd_acc n,accounts a
                       where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') and nbs not in (3648))
@@ -188,10 +189,10 @@ begin
                   IF SQL%ROWCOUNT=0 then
                      INSERT INTO REZ_CR (fdat   , RNK   , NMK      , ND    , KV     , NLS    , ACC   , EAD     , EADQ    , FIN    , CR  , CRQ  ,
                                          bv     , bvq   , VKR      , KOL   , FIN23  , tipa   , vidd  , CUSTTYPE, nbs     , dv     , BV02, tip  ,
-                                         s080   , ddd_6B, tip_fin  , ob22  , bv02q  , sdate  , RZ    , cc_id   , istval  , wdate  , pd_0)
+                                         s080   , ddd_6B, tip_fin  , ob22  , bv02q  , sdate  , RZ    , cc_id   , istval  , wdate  , pd_0, okpo )
                                  VALUES (p_dat01, s.RNK , s.NMK    , d.nd  , i.kv   , i.nls  , i.acc , 0       , 0       , l_fin  , 0   , 0    ,
                                          l_bv   , l_bvq , d.VKR    , d.kol , d.fin23, l_tipa , d.vidd, s.CUS   , i.nbs   , l_dv   , l_bv, i.tip,
-                                         l_s080 , l_ddd , l_tip_fin, i.ob22, l_bvq  , d.sdate, s.RZ  , d.cc_id , l_istval, d.wdate, 0   );
+                                         l_s080 , l_ddd , l_tip_fin, i.ob22, l_bvq  , d.sdate, s.RZ  , d.cc_id , l_istval, d.wdate, 0   , s.okpo);
                   end if;
                end if;
             END LOOP;

@@ -9,9 +9,10 @@ PROMPT *** Create  procedure P_KOL_ND_BPK ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_KOL_ND_BPK (p_dat01 date, p_mode integer) IS
 
-/* Версия 4.3  26-03-2018 08-02-2017   24-01-2017  03-10-2016
+/* Версия 4.4  23-10-2018  26-03-2018 08-02-2017   24-01-2017  03-10-2016
    К_льк_сть дн_в прострочки по договорам БПК
    -------------------------------------
+ 8) 23-10-2018(4.4) - Проверка: если клас не определен и в договоре только 9129 - клас =1, иначе самый плохой
  7) 26-03-2018(4.3) - если фін.класс не определен для физ.=5, для юр. =10  (Письмо Коваленко Светланы 23-03-2018)
  6) 24-10-2017(4.2) - 2625,2627 - и нет др. задолженности - fin = 5, VKR = 'ГГГ', PD = 1
  5) 08-02-2017 - Изменено условие пересчета к-ва дней по БПК
@@ -79,10 +80,15 @@ begin
             l_cls := nvl(fin_nbu.zn_p_nd('CLS',  l_f, p_dat01, k.nd, k.rnk),0);
             if l_cls = 0 THEN
                begin
-                  select nd into l_nd from rez_w4_bpk where nd = k.nd and nbs in ('2625','2627') and rownum=1;   --COBUMMFO-5208
+                  select nd into l_nd from rez_w4_bpk where nd = k.nd and nbs in ('2625','2627','2620','2203','2208') and rownum=1;   --COBUMMFO-5208
                   l_fin := 5;
                   FIN_ZP.SET_ND_VNCRR(k.nd, k.rnk, 'ГГГ');
-               EXCEPTION WHEN NO_DATA_FOUND THEN  l_fin := NULL;
+               EXCEPTION WHEN NO_DATA_FOUND THEN  
+                  begin
+                     select nd into l_nd from rez_w4_bpk where nd = k.nd and nbs in ('9129') and rownum=1;   --COBUMMFO-5208
+                     l_fin := 1;
+                  EXCEPTION WHEN NO_DATA_FOUND THEN  l_fin := NULL;
+                  end;
                end;
             else
                if l_f = 56 THEN
