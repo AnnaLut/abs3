@@ -1055,7 +1055,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.11  12.07.2018';
+  g_body_version  constant varchar2(32)  := 'version 48.13  22.10.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -13922,7 +13922,15 @@ is
             select p_datend, fdat, ostf - dos + kos, 0, 0
               from saldoho
              where fdat = l_maxdat
-               and l_maxdat < p_datend);
+               and l_maxdat < p_datend
+	    union
+            -- движение за первый день, если была пролонгация и было пополнение (капитализация) 
+            select fdat, fdat, ostf, dos, kos
+              from saldoho
+             where fdat = l_mindat     
+               and ostf > 0
+               and dos + kos > 0
+			);
 
     if l_accturn.count = 0 then
       select p_accid,
