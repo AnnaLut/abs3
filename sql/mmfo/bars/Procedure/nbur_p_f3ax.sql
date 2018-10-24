@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 3AX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.003  01/08/2018 (25/07/2018)
+% VERSION     :  v.1.004  23/10/2018 (01/08/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.003  01/08/2018';
+  ver_              char(30)  := 'v.1.004   23/10/2018';
   
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_A3A3F2          constant varchar2(6 char) := 'A3A3F2';
@@ -182,6 +182,7 @@ BEGIN
                 from   v_nbur_#3a_dtl
                 where  report_date = p_report_date
                    and kf = p_kod_filii
+                   and not (kf = '300465' and seg_03 = '1502' and cust_id = 90931101)
              )
       group by
                        report_date
