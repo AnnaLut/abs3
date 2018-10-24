@@ -1,13 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/13/2017 15:29:31" ReportInfo.Modified="01/18/2017 16:45:05" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/13/2017 15:29:31" ReportInfo.Modified="10/22/2018 15:14:23" ReportInfo.CreatorVersion="2014.3.2.0">
   <Styles>
     <Style Name="Style1" Fill.Color="Gray"/>
   </Styles>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf+gvpbNHwVPW6tQy2YDRJvw==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00 okpo_otr,&#13;&#10;       char01 name_otr,&#13;&#10;       num00 clmn1,&#13;&#10;       num01 clmn2,&#13;&#10;       num02 clmn3,&#13;&#10;       char02 clmn4,&#13;&#10;       num03  clmn5,&#13;&#10;       char03 clmn6,&#13;&#10;       num04 clmn7,&#13;&#10;       num05 clmn8,&#13;&#10;       num06 clmn9,&#13;&#10;       dat00 dt1,&#13;&#10;       dat01 dt2&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQLoqtCWIgrrfBw+Gs9nunzU=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select&#13;&#10;case when okpob is null and typ is not null then typ &#13;&#10;     when okpob is not null and typ = 'VI' then  okpob end as okpo_otr,&#13;&#10;case when okpob is null and typ = 'IV' then 'Теплові генерації всього:'&#13;&#10;     when okpob is null and typ = 'VI' then 'Всьго інші:'&#13;&#10;     when okpob is null and typ is null then 'Всього перераховано:'&#13;&#10;     else max(namb) end as namb,  &#13;&#10;sum(clmn_3a+clmn_5a+clmn_8a+clmn_9a) clmn1, &#13;&#10;sum(clmn_3a+clmn_5a) clmn2, &#13;&#10;sum(clmn_3a) clmn3,&#13;&#10;case when sum(clmn_3a)+sum(clmn_5a)=0 then 0 else  round(sum(clmn_3a)/(sum(clmn_3a)+sum(clmn_5a)),4)*100 end clmn4, &#13;&#10;sum(clmn_5a) clmn5, &#13;&#10;case when sum(clmn_3a)+sum(clmn_5a)=0 then 0 else  round(sum(clmn_5a)/(sum(clmn_3a)+sum(clmn_5a)),4)*100 end clmn6,&#13;&#10;sum(clmn_8a+clmn_9a) clmn7, &#13;&#10;sum(clmn_8a) clmn8, &#13;&#10;sum(clmn_9a) clmn9&#13;&#10;from &#13;&#10;(select d.okpob,&#13;&#10;case when okpob = '21515381' then 'I'&#13;&#10;     when okpob = '37995466' then 'II'&#13;&#10;     when okpob = '24584661' then 'III'&#13;&#10;     when okpob in ('22927045','00130872','23343582','23269555','31831942','00131305') then 'IV'&#13;&#10;     when okpob = '20588716' then 'V'&#13;&#10;     else 'VI' end as typ,&#13;&#10;case when okpob = '21515381' then 'ДП &quot;Енергоринок&quot;'&#13;&#10;     when okpob = '37995466' then 'ШЕВЧЕНКІВСЬКЕ РВДК У М.КИЄВІ (інвестиційна складова)'&#13;&#10;     when okpob = '24584661' then 'НАЕК &quot;Енергоатом&quot;'&#13;&#10;     when okpob = '20588716' then 'ВАТ &quot;Центренерго&quot;'&#13;&#10;     else max(d.namb) end as namb,&#13;&#10;sum(case when a.nls='26032301861'      and d.mfob in     (select kf from kf_ru) and a.kod_analyt  =  '01' then d.sq else 0 end)/100 clmn_3a,&#13;&#10;sum(case when a.nls='26032301861'      and d.mfob not in (select kf from kf_ru) and a.kod_analyt  =  '01' then d.sq else 0 end)/100 clmn_5a,&#13;&#10;sum(case when substr(a.nls,1,4)='2603' and d.mfob in     (select kf from kf_ru) and a.kod_analyt  &lt;&gt; '01' then d.sq else 0 end)/100 clmn_8a,&#13;&#10;sum(case when substr(a.nls,1,4)='2603' and d.mfob not in (select kf from kf_ru) and a.kod_analyt  &lt;&gt; '01' then d.sq else 0 end)/100 clmn_9a&#13;&#10;from ob_corp_data_acc a&#13;&#10;  join v_ob_corp_rep_nbs q on q.rep_id = 5039 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;  join ob_corp_data_doc d on A.ACC = d.acc and A.SESS_ID = d.sess_id and a.kf = d.kf&#13;&#10;where a.corp_id=5&#13;&#10;  and a.is_last = 1 &#13;&#10;  and a.kf='300465' &#13;&#10;  and d.okpoa='21515381' &#13;&#10;  and a.fdat between :sFdat1 and :sFdat2&#13;&#10;group by okpob&#13;&#10;)&#13;&#10;group by rollup(typ,okpob)&#13;&#10;HAVING GROUPING_ID(typ,okpob) IN (1, 3) or (GROUPING_ID(typ,okpob) = 0 and  typ in ('IV', 'VI'))&#13;&#10;order by typ  NULLS FIRST, okpob  NULLS FIRST">
         <Column Name="OKPO_OTR" DataType="System.String"/>
-        <Column Name="NAME_OTR" DataType="System.String"/>
         <Column Name="CLMN1" DataType="System.Decimal" Format="Number"/>
         <Column Name="CLMN2" DataType="System.Decimal"/>
         <Column Name="CLMN3" DataType="System.Decimal"/>
@@ -17,9 +16,9 @@
         <Column Name="CLMN7" DataType="System.Decimal"/>
         <Column Name="CLMN8" DataType="System.Decimal"/>
         <Column Name="CLMN9" DataType="System.Decimal"/>
-        <Column Name="DT1" DataType="System.DateTime"/>
-        <Column Name="DT2" DataType="System.DateTime"/>
-        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+        <Column Name="NAMB" DataType="System.String"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
@@ -31,7 +30,7 @@
       <TextObject Name="Text2" Left="132.3" Top="9.45" Width="481.95" Height="66.15" Text="                      Інформація щодо перерахування коштів з &#13;&#10;Оптового ринку електричної енергії України НАЕК &quot;Енергоатом&quot;, &#13;&#10;тепловим енергогенеруючим компаніям та іншим виробникам &#13;&#10;	електричної енергії з [sFdat1] по [sFdat2] " Font="Arial, 9pt"/>
     </ReportTitleBand>
     <PageHeaderBand Name="PageHeader1" Top="79.6" Width="718.2" Height="151.2">
-      <TableObject Name="Table1" Width="718.2" Height="151.2" CanBreak="false">
+      <TableObject Name="Table1" Width="718.2" Height="151.2" Fill.Color="Silver" CanBreak="false">
         <TableColumn Name="Column1" Width="56.7"/>
         <TableColumn Name="Column2" Width="151.2"/>
         <TableColumn Name="Column3" Width="56.7"/>
@@ -90,7 +89,7 @@
           <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
         </Highlight>
       </TextObject>
-      <TextObject Name="Text3" Left="56.7" Width="151.2" Height="18.9" Border.Lines="All" Text="[Table.NAME_OTR]" Font="Arial, 9pt">
+      <TextObject Name="Text3" Left="56.7" Width="151.2" Height="18.9" Border.Lines="All" Text="[Table.NAMB]" Font="Arial, 9pt">
         <Highlight>
           <Condition Expression="[Row#]&lt;15&amp;!String.IsNullOrEmpty ([Table.OKPO_OTR])" Fill.Color="Gray" ApplyFill="true" ApplyTextFill="false"/>
         </Highlight>

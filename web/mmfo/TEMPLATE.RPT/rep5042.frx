@@ -1,28 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2017 16:12:27" ReportInfo.Modified="02/15/2017 16:03:43" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/09/2017 16:12:27" ReportInfo.Modified="10/24/2018 12:36:00" ReportInfo.CreatorVersion="2014.3.2.0">
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTf35xjaaUXDcycS2AHgdbTtg==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;       char00 name_cli,&#13;&#10;       char01 nls,&#13;&#10;       char02 okpo,&#13;&#10;       char03 name,&#13;&#10;       num00 sdb,&#13;&#10;       num01 ckr,&#13;&#10;       char04 dt1,&#13;&#10;       char05 dt2&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQPThmaIC2kVWvYaJqciwctk=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select name_cli,&#13;&#10;       nls,&#13;&#10;       okpo,&#13;&#10;       name,&#13;&#10;       nvl(sum (nvl(sdb,0)),0) sdb,&#13;&#10;       nvl(sum (nvl(skr,0)),0) skr&#13;&#10; from (select case when d.dk = 1 then d.namb else d.nama end name_cli,&#13;&#10;              a.nls,&#13;&#10;              case when d.dk = 1 then d.okpoa else d.okpob end okpo,&#13;&#10;              case when d.dk = 1 then d.nama else d.namb end name,&#13;&#10;              case when d.dk = 0 then d.sq / 100 else 0 end sdb,&#13;&#10;              case when d.dk = 1 then d.sq / 100 else 0 end skr&#13;&#10;         from ob_corp_data_acc a&#13;&#10;         join ob_corp_data_doc d on a.sess_id = d.sess_id and a.acc = d.acc&#13;&#10;         join v_ob_corp_rep_nbs q on q.rep_id = 5041 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;        where a.corp_id = 5&#13;&#10;          and a.fdat between :sFdat1 and :sFdat2&#13;&#10;          and case when d.dk = 1 then d.okpob else d.okpoa end = :okpo&#13;&#10;          and a.kf = :kf&#13;&#10;          and a.nls = :nls)&#13;&#10;     group by name_cli, nls, okpo, name">
         <Column Name="NAME_CLI" DataType="System.String"/>
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="OKPO" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
         <Column Name="SDB" DataType="System.Decimal"/>
-        <Column Name="CKR" DataType="System.Decimal"/>
-        <Column Name="DT1" DataType="System.String"/>
-        <Column Name="DT2" DataType="System.String"/>
-        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+        <Column Name="SKR" DataType="System.Decimal"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="okpo" DataType="126" Expression="[okpo]"/>
+        <CommandParameter Name="kf" DataType="126" Expression="[kf]"/>
+        <CommandParameter Name="nls" DataType="126" Expression="[nls]"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="session_id" DataType="System.Decimal"/>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
     <Parameter Name="sFdat2" DataType="System.DateTime"/>
+    <Parameter Name="nls" DataType="System.String"/>
+    <Parameter Name="kf" DataType="System.String"/>
+    <Parameter Name="okpo" DataType="System.String"/>
     <Total Name="Total" Expression="[Table.SDB]" Evaluator="Data1"/>
-    <Total Name="Total1" Expression="[Table.CKR]" Evaluator="Data1"/>
+    <Total Name="Total1" Expression="[Table.SKR]" Evaluator="Data1"/>
   </Dictionary>
   <ReportPage Name="Page1">
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="94.5">
-      <TextObject Name="Text1" Left="37.8" Top="9.45" Width="614.25" Height="66.15" Text="Рух коштів по поточних рахунках із спеціальним режимом використання&#13;&#10;[Table.NAME_CLI]&#13;&#10;[Table.NLS]&#13;&#10;з [Table.DT1] по [Table.DT2]&#13;&#10;"/>
+      <TextObject Name="Text1" Left="37.8" Top="9.45" Width="614.25" Height="66.15" Text="Рух коштів по поточних рахунках із спеціальним режимом використання&#13;&#10;[Table.NAME_CLI]&#13;&#10;[nls]&#13;&#10;з [sFdat1] по [sFdat2]&#13;&#10;">
+        <Formats>
+          <DateFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
       <TextObject Name="Text3" Left="548.1" Top="75.6" Width="56.7" Height="18.9" Text="грн." HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
     </ReportTitleBand>
     <PageHeaderBand Name="PageHeader1" Top="98.5" Width="718.2" Height="47.25">
@@ -61,7 +72,7 @@
           <TableCell Name="Cell15" Border.Lines="All" Text="[Table.OKPO]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell16" Border.Lines="All" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell17" Border.Lines="All" Text="[Table.SDB]" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell18" Border.Lines="All" Text="[Table.CKR]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell18" Border.Lines="All" Text="[Table.SKR]" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
       </TableObject>
     </DataBand>

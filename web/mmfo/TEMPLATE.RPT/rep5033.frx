@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="04/05/2016 16:30:44" ReportInfo.Modified="05/05/2017 13:31:07" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/05/2016 16:30:44" ReportInfo.Modified="10/22/2018 12:58:43" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,18 +22,24 @@ namespace FastReport
     {
       get 
       {
-        DateTime DateFrom = ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;));
-        DateTime DateTo = ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;));
+        try{
+          DateTime DateFrom = ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;));
+          DateTime DateTo = ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;));
       
-        TimeSpan ts = DateTo - DateFrom; // Difference in days, hours, and minutes.
-        int differenceInDays = ts.Days; // Difference in days.
-        if (differenceInDays == 0)
-        {
-          return (&quot;за &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString(&quot;dd.MM.yyyy&quot;));
+          TimeSpan ts = DateTo - DateFrom; // Difference in days, hours, and minutes.
+          int differenceInDays = ts.Days; // Difference in days.
+          if (differenceInDays == 0)
+          {
+            return (&quot;за &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString(&quot;dd.MM.yyyy&quot;));
+          }
+          else
+          {
+            return (&quot;за період з &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString(&quot;dd.MM.yyyy&quot;) + &quot; по &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)).ToString(&quot;dd.MM.yyyy&quot;));
+          }
         }
-        else
+        catch
         {
-          return (&quot;за період з &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString(&quot;dd.MM.yyyy&quot;) + &quot; по &quot; + ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)).ToString(&quot;dd.MM.yyyy&quot;));
+          return &quot;&quot;;
         }
       }
     }
@@ -41,8 +47,8 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="SBERDEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXawgQMNksAJZokM+/w71MdFsM+YEJ6NgGKWNhwTjoC2g==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as npp,&#13;&#10;       c.corporation_name,&#13;&#10;       case when b.mfou = 300465 then b.mfo else null end as mfo_obu,&#13;&#10;       case when b.mfou != 300465 then b.mfo else null end as mfo_other,&#13;&#10;       case when b.mfou != 300465 then b.nb else null end as nb_other,&#13;&#10;       cd.okpoa,&#13;&#10;       cd.nama,&#13;&#10;       nvl(cd.sq / 100,0) as sq&#13;&#10;  from banks$base b, V_ORG_corporationS c, ob_corporation_data cd&#13;&#10; where cd.mfoa = b.mfo&#13;&#10;   and c.external_id = cd.kod_ustan and c.base_extid=cd.corporation_id&#13;&#10;   and cd.rowtype = 1&#13;&#10;   and cd.DOCTYPE = 1&#13;&#10;   and',' || decode(replace(:mfo, ' ', ''), '%', cd.kf, replace(:mfo, ' ', '')) || ',' like '%,' || cd.kf || ',%'&#13;&#10;   and cd.corporation_id = :corp_id&#13;&#10;   and kfile_pack.get_correct_session_id(corporation_id,kf,session_id)=1&#13;&#10;   and kfile_pack.get_correct_nbs(corporation_id,substr(nls,1,4))=1&#13;&#10;   and cd.file_date BETWEEN TRUNC(:date_start, 'DDD') AND TRUNC(:date_end, 'DDD')&#13;&#10;   and cd.nls = cd.nlsb&#13;&#10;   and substr(cd.nlsb, 1, 4) = '2603'&#13;&#10;   and substr(cd.nlsa, 1, 4) in ('2600', '2602', '2604', '2063', '2610', '2520', '2541', '2542', '2650')&#13;&#10;   and ',' || decode(replace(:a_code, ' ', ''), '%', cd.kod_analyt, replace(:a_code, ' ', '')) || ',' like '%,' || cd.kod_analyt || ',%'">
+    <OracleDataConnection Name="SBERDEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQLrHJjoCfc5hZ7AIFg5nGe8=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rownum as npp,&#13;&#10;       c.corporation_name,&#13;&#10;       case when b.mfou = 300465 then b.mfo else null end as mfo_obu,&#13;&#10;       case when b.mfou != 300465 then b.mfo else null end as mfo_other,&#13;&#10;       case when b.mfou != 300465 then b.nb else null end as nb_other,&#13;&#10;       d.okpoa,&#13;&#10;       d.nama,&#13;&#10;       nvl(d.sq / 100,0) as sq,&#13;&#10;       to_number(:Param0) as korp_id,&#13;&#10;       to_number(a.kf) as mfo&#13;&#10;  from ob_corp_data_acc a&#13;&#10;  join v_ob_corp_rep_nbs q on q.rep_id = 5033 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;  join ob_corp_data_doc d on A.ACC = d.acc and A.SESS_ID = d.sess_id and a.kf = d.kf&#13;&#10;  left join banks$base b on d.mfoa = b.mfo&#13;&#10;  left join v_org_corporations c on c.external_id = a.kod_ustan and c.base_extid=to_char(a.corp_id)&#13;&#10;  where d.dk = 1&#13;&#10;    and a.is_last = 1&#13;&#10;    and case when replace(:KF, ' ', '') = '%' then nvl(a.kf,' ') else replace(:KF, ' ', '') end like '%'||nvl(a.kf,' ')||'%'&#13;&#10;    and a.corp_id = :Param0&#13;&#10;    and a.fdat BETWEEN :sFdat1 AND :sFdat2&#13;&#10;    and substr(d.nlsb, 1, 4) = '2603'&#13;&#10;    and substr(d.nlsa, 1, 4) in ('2600', '2602', '2604', '2062', '2063', '2610', '2520', '2541', '2542', '2650')&#13;&#10;    and case when replace(:kod_analyt, ' ', '') = '%' then nvl(a.kod_analyt,' ') else replace(:kod_analyt, ' ', '') end like '%'||nvl(a.kod_analyt,' ')||'%'">
         <Column Name="NPP" DataType="System.Decimal"/>
         <Column Name="CORPORATION_NAME" DataType="System.String"/>
         <Column Name="MFO_OBU" DataType="System.String"/>
@@ -51,11 +57,13 @@ namespace FastReport
         <Column Name="OKPOA" DataType="System.String"/>
         <Column Name="NAMA" DataType="System.String"/>
         <Column Name="SQ" DataType="System.Decimal"/>
-        <CommandParameter Name="mfo" DataType="126" Expression="[KF]" DefaultValue="000000"/>
-        <CommandParameter Name="date_start" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
-        <CommandParameter Name="date_end" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
-        <CommandParameter Name="a_code" DataType="126" Expression="[kod_analyt]"/>
-        <CommandParameter Name="corp_id" DataType="113" Expression="[Param0]" DefaultValue="0"/>
+        <Column Name="KORP_ID" DataType="System.Decimal"/>
+        <Column Name="MFO" DataType="System.Decimal"/>
+        <CommandParameter Name="kf" DataType="126" Expression="[KF]" DefaultValue="000000"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="kod_analyt" DataType="126" Expression="[kod_analyt]"/>
+        <CommandParameter Name="Param0" DataType="113" Expression="[Param0]" DefaultValue="0"/>
       </TableDataSource>
       <TableDataSource Name="Table3" DataType="System.Int32" Enabled="true" SelectCommand="select c.corporation_name from ob_corporation c where c.id = :corp_id">
         <Column Name="CORPORATION_NAME" DataType="System.String"/>
