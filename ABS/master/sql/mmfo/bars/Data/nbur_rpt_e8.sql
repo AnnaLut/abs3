@@ -79,35 +79,52 @@ begin
     Insert into NBUR_REF_PREPARE_XML
        (FILE_CODE, DESC_XML, DATE_START)
      Values
-       ('E8X', 'select EKP
-        , K020
-        , Q003_1
-        , Q001
-        , Q029
-        , K074
-        , K110
-        , K040
-        , KU_1
-        , Q020
-        , K014
-        , Q003_2
-        , Q007_1
-        , Q007_2
-        , T070_1
-        , T070_2
-        , T070_3
-        , T070_4
-        , T090
-        , R030
-        , R020
-        , K021
-        , Q003_12
-    from   nbur_log_fE8X
-    where  report_date = :p_rpt_dt
-           and kf = :p_kf
-    order by Q003_12       
-
-        ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+       ('E8X', 'select a.*,
+                row_number() over (order by k020, q003_1, r030, r020) as Q003_12
+            from (
+            select EKP
+                    , K020
+                    , Q003_1
+                    , Q001
+                    , Q029
+                    , K074
+                    , K110
+                    , K040
+                    , KU_1
+                    , Q020
+                    , K014
+                    , Q003_2
+                    , Q007_1
+                    , Q007_2
+                    , sum(T070_1) as T070_1
+                    , sum(T070_2) as T070_2
+                    , sum(T070_3) as T070_3
+                    , sum(T070_4) as T070_4
+                    , max(T090) as T090
+                    , R030
+                    , R020
+                    , K021
+                from   nbur_log_fE8X
+                where  report_date = :p_rpt_dt
+                       and kf = :p_kf
+            group by EKP
+                    , K020
+                    , Q003_1
+                    , Q001
+                    , Q029
+                    , K074
+                    , K110
+                    , K040
+                    , KU_1
+                    , Q020
+                    , K014
+                    , Q003_2
+                    , Q007_1
+                    , Q007_2
+                    , R030
+                    , R020
+                    , K021) a', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
     COMMIT;
 end;
 /
+
