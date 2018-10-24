@@ -824,7 +824,7 @@ create or replace package body ow_transform_acc is
                   and t.mfob = c.kf
                   and t.kvb = c.kv;
 
-            /*--- Журнал счетов
+            --- Журнал счетов
             delete from accounts_update where acc = c.acc and trunc(chgdate) = trunc(sysdate);
 
             ----- закрыть chgaction = 3
@@ -855,7 +855,7 @@ create or replace package body ow_transform_acc is
                     c.isp  ,c.nms  ,c.pap ,c.grp,c.sec ,c.seci, c.seco,c.vid  ,c.tip ,  -- yjdsq nbg cx
                     c.dazs ,c.blkd ,c.blkk,c.lim, c.pos,c.accc,c.tobo ,c.mdate, c.ostx,c.rnk ,c.kf   ,
                     sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',c.kf), gc_bnk_dt, c.branch, c.ob_new,
-                    gc_bnk_dt, c.send_sms);*/
+                    gc_bnk_dt, c.send_sms);
 
             -- коммитим каждые 1000 счетов
             if MOD(l_count,1000) = 0 then
@@ -1385,7 +1385,7 @@ create or replace package body ow_transform_acc is
             end if;
 
             --- Журнал счетов
- /*           delete from accounts_update where acc = c.acc and trunc(chgdate) = trunc(sysdate);
+            delete from accounts_update where acc = c.acc and trunc(chgdate) = trunc(sysdate);
 
             ----- закрыть chgaction = 3
             INSERT INTO accounts_update
@@ -1416,7 +1416,7 @@ create or replace package body ow_transform_acc is
                     c.dazs ,c.blkd ,c.blkk,c.lim, c.pos,c.accc,c.tobo ,c.mdate, c.ostx,c.rnk ,c.kf   ,
                     sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',c.kf), gc_bnk_dt, c.branch, c.ob_new,
                     gc_bnk_dt, c.send_sms);
-*/
+
             if MOD(l_count,1000) = 0 then
 			   commit;
             end if;

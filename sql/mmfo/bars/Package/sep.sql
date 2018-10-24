@@ -1784,7 +1784,7 @@ END IF;
 --  today-s value-date
 
     IF accv_ IS NULL AND (dk_=1 OR dk_=0) THEN     -- Pay it
-       IF tt_='R01' AND dk_=1 AND (tip_ LIKE 'PK_' or tip_ LIKE 'W4_' or tip_ LIKE 'NLE')
+       IF tt_='R01' AND dk_=1 AND (tip_ LIKE 'PK_' or tip_ LIKE 'W4_' or tipk_ LIKE 'W4_' /*COBUMMFO-7501 check tip alt account*/ or tip_ LIKE 'NLE')
        THEN
           BEGIN
              SELECT nls INTO nlst_ FROM accounts WHERE acc=accd_;
