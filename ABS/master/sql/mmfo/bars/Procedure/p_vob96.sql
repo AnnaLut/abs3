@@ -28,13 +28,18 @@ for k in (  select distinct
             to_char(o.userid) ISP,
             substr(to_char(o.vdat,'dd-mm-yyyy'),-4,4)   JEAR,substr(o.tt,1,3) tt
             from oper o, opl pa ,opl pb,meta_month m
-            where m.n=to_number(substr(TO_CHAR(vDAT,'dd-mm-yyyy'),4,2)) and
-                  o.ref=pa.ref and o.vob in (96,99)
-                  and o.sos=5
-                  and pa.fdat>=dat1_ and pa.fdat<=dat2_
-                  and pa.stmt=pb.stmt and pa.fdat=pb.fdat
-                  and pa.dk=0 and pb.dk=1
-                  and (isp_ = 0 and o.branch like sys_context('bars_context', 'user_branch_mask')) or o.userid = isp_)
+            where m.n=to_number(substr(TO_CHAR(vDAT,'dd-mm-yyyy'),4,2)) 
+            and o.ref=pa.ref 
+            and o.ref=pb.ref
+            and o.vob in (96,99)
+            and o.sos=5
+            and pa.fdat>=dat1_ and pa.fdat<=dat2_
+            and pa.stmt=pb.stmt and pa.fdat=pb.fdat
+            and pa.dk=0 and pb.dk=1
+            and ((isp_ = 0 and o.branch like sys_context('bars_context', 'user_branch_mask'))
+                    or o.userid = isp_)
+            and (sys_context('bars_context', 'user_mfo') is null or o.kf = sys_context('bars_context', 'user_mfo'))
+            )
 loop
      insert into tmp_vob96 (ID,REF,VDAT,FDAT,ND,NLSA,KVA,NAMA,NLSB,KVB,NAMB,
                             SUMM,SQ,NAZN,ISP,JEAR,TT,CC,D6,K6,D7,K7)
