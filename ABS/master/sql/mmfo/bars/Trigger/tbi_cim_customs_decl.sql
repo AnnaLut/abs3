@@ -7,11 +7,11 @@ PROMPT =========================================================================
 
 PROMPT *** Create  trigger TBI_CIM_CUSTOMS_DECL ***
 
-  CREATE OR REPLACE TRIGGER BARS.TBI_CIM_CUSTOMS_DECL 
+  CREATE OR REPLACE TRIGGER tbi_cim_customs_decl
 before insert on customs_decl
 for each row
 declare
-  PRAGMA AUTONOMOUS_TRANSACTION;
+--  PRAGMA AUTONOMOUS_TRANSACTION; --якщо просто бефоре інстерт і каунт в ньому то мутації не буде 
   l_id number;
   l_n number;
 begin
@@ -30,7 +30,7 @@ begin
   if l_n <= 0 then
     :new.cim_original := 1;
   end if;
-  COMMIT;
+--  COMMIT;
 end;
 
 /
