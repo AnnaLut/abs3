@@ -1,210 +1,485 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/25/2017 17:03:55" ReportInfo.Modified="01/26/2017 11:54:54" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/25/2017 17:03:55" ReportInfo.Modified="10/24/2018 14:47:33" ReportInfo.CreatorVersion="2014.3.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private int d_beg = 0;
+    private int d_end = 0; 
+    private float m_zn = 1050;
+    private float all_w = 1750;
+    private float st_w = 133;
+    private float c1_mw = 133;
+    private int st_cell = 5;
+    private float c1_w = 0;
+    private float c2_w = 0;
+    private float c3_w = 0;
+    private float c4_w = 0;
+    private float c5_w = 0;
+    private float left_w = 0; 
+    private float wid = 0;
+
+    
+    
+    private void wide()
+    {
+      int cou = 0;
+      string d_beg_st;
+      string d_end_st;
+      c1_w = 113;
+      c2_w = 187;
+      c3_w = 90;
+      c4_w = 113;
+      c5_w = 113;
+      d_beg_st = ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString();
+      d_end_st = ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)).ToString();
+      if ( string.IsNullOrEmpty(d_beg_st))
+      {
+        d_beg = 0;
+      }
+      else 
+      {
+        d_beg = Int32.Parse(d_beg_st.Substring(0,2));  
+      }
+      if ( string.IsNullOrEmpty(d_end_st))
+      {
+        d_end = 0;
+      }
+      else 
+      {
+        d_end = Int32.Parse(d_end_st.Substring(0,2));  
+      }
+      for ( int i = d_beg-1; i&lt; d_end; i++)
+      {
+        cou++;
+      } 
+      wid = m_zn/cou;
+      if (wid&gt;st_w) {
+        wid=st_w;  
+        left_w = all_w-cou*st_w;
+        left_w = left_w - c2_w;
+        if (left_w &gt;c1_w+2*st_w) {
+          if (left_w-2*st_w&lt;c1_mw){
+            c1_w = left_w-2*st_w;
+          }
+          else {
+            c1_w = c1_mw;
+          }
+          c3_w = st_w;
+          c4_w = st_w;  
+        }
+        else {
+          c3_w = left_w/2;
+          c4_w = left_w/2;
+        }
+      }  
+    }
+    
+    private void Table1_ManualBuild(object sender, EventArgs e)
+    {
+          
+      int d_beg = 0;
+      int d_end = 0;
+      string d_beg_st;
+      string d_end_st;
+      int rc = st_cell;
+      string temp = &quot;&quot;;
+      wide();
+      TableObject tab  = sender as TableObject;
+      d_beg_st = ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString();
+      d_end_st = ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)).ToString();
+      if ( string.IsNullOrEmpty(d_beg_st))
+      {
+        d_beg = 0;
+      }
+      else 
+      {
+        d_beg = Int32.Parse(d_beg_st.Substring(0,2));  
+      }
+      if ( string.IsNullOrEmpty(d_end_st))
+      {
+        d_end = 0;
+      }
+      else 
+      {
+        d_end = Int32.Parse(d_end_st.Substring(0,2));  
+      }
+      DataSourceBase rowData = Report.GetDataSource(&quot;Table&quot;);
+      rowData.Init();
+      tab.PrintRow(0);
+      tab.Columns[0].Width = c1_w;
+      tab.Columns[1].Width = c2_w;
+      tab.Columns[2].Width = c3_w;
+      tab.Columns[3].Width = c4_w;
+      tab.Columns[4].Width = c5_w;
+      if (d_beg != 0 || d_end != 0){
+        for ( int i = 0; i&lt; st_cell; i++) 
+        { 
+          tab.PrintColumn(i);
+        } 
+            
+        for ( int i = d_beg-1; i&lt; d_end; i++)
+        { 
+           tab.Columns[i+st_cell].Width = wid;
+          tab.PrintColumn(i+st_cell);
+            
+        }
+        tab.PrintRow(1);
+      
+         tab.Columns[0].Width = c1_w;
+         tab.Columns[1].Width = c2_w;
+         tab.Columns[2].Width = c3_w;
+         tab.Columns[3].Width = c4_w;
+         tab.Columns[4].Width = c5_w;
+        if (d_beg != 0 || d_end != 0){
+          for ( int i = 0; i&lt; st_cell; i++) 
+          { 
+            tab.PrintColumn(i);
+          } 
+            
+          for ( int i = d_beg-1; i&lt; d_end; i++)
+          { 
+            rc++;  
+            temp = rc.ToString(); 
+            tab[i+st_cell,1].Text = temp;
+             
+             tab.Columns[i+st_cell].Width = wid;
+            tab.PrintColumn(i+st_cell);
+            
+          }
+        } 
+      }  
+    }
+    
+    private void Table2_ManualBuild(object sender, EventArgs e)
+    {
+          
+      int d_beg = 0;
+      int d_end = 0;
+      string d_beg_st;
+      string d_end_st;
+      string temp = &quot;&quot;;
+      wide();
+      TableObject tab  = sender as TableObject;
+      d_beg_st = ((DateTime)Report.GetParameterValue(&quot;sFdat1&quot;)).ToString();
+      d_end_st = ((DateTime)Report.GetParameterValue(&quot;sFdat2&quot;)).ToString();
+      if ( string.IsNullOrEmpty(d_beg_st))
+      {
+        d_beg = 0;
+      }
+      else 
+      {
+        d_beg = Int32.Parse(d_beg_st.Substring(0,2));  
+      }
+      if ( string.IsNullOrEmpty(d_end_st))
+      {
+        d_end = 0;
+      }
+      else 
+      {
+        d_end = Int32.Parse(d_end_st.Substring(0,2));  
+      }
+      DataSourceBase rowData = Report.GetDataSource(&quot;Table&quot;);
+      rowData.Init();
+      tab.PrintRow(0);
+      tab.Columns[0].Width = c1_w;
+      tab.Columns[1].Width = c2_w;
+      tab.Columns[2].Width = c3_w;
+      tab.Columns[3].Width = c4_w;
+      tab.Columns[4].Width = c5_w;
+      for ( int i = 0; i&lt; st_cell; i++) 
+      { 
+        tab.PrintColumn(i);
+      }
+      if (d_beg != 0 || d_end != 0){
+        for ( int i = d_end; i&gt;= d_beg; i--){
+          if (d_beg != 0 &amp;&amp; d_end != 0) {
+            temp = tab[i+4,0].Text; 
+          }
+        
+          tab[i+4,0].Text = temp;
+        }
+      
+        for ( int i = d_beg-1; i&lt; d_end; i++)
+        { 
+          tab.Columns[i+st_cell].Width = wid;
+          tab.PrintColumn(i+st_cell);
+            
+        }
+      }
+    }      
+  }
+}
+</ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoX3V4zY8FFHzkIAqmYIxZTfIrQ46ZlnYBQ+SBrfAMZV2w==">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select char00 reg,&#13;&#10;       char01 liz,&#13;&#10;       char02 type,&#13;&#10;       num00 clmn1,&#13;&#10;       num01 clmn2,&#13;&#10;       num02 clmn3,&#13;&#10;       num03 clmn4,&#13;&#10;       num04 clmn5,&#13;&#10;       num05 clmn6,&#13;&#10;       num06 clmn7,&#13;&#10;       num07 clmn8,&#13;&#10;       num08 clmn9,&#13;&#10;       num09 clmn10,&#13;&#10;       num10 clmn11,&#13;&#10;       num11 clmn12,&#13;&#10;       num12 clmn13,&#13;&#10;       num13 clmn14,&#13;&#10;       num14 clmn15,&#13;&#10;       num15 clmn16,&#13;&#10;       num16 clmn17,&#13;&#10;       num17 clmn18,&#13;&#10;       num18 clmn19,&#13;&#10;       num19 clmn20,&#13;&#10;       num20 clmn21,&#13;&#10;       num21 clmn22,&#13;&#10;       num22 clmn23,&#13;&#10;       num23 clmn24,&#13;&#10;       num24 clmn25,&#13;&#10;       num25 clmn26,&#13;&#10;       num26 clmn27,&#13;&#10;       num27 clmn28,&#13;&#10;       num28 clmn29,&#13;&#10;       num29 clmn30,&#13;&#10;       num30 clmn31,&#13;&#10;       num31 clmn32,&#13;&#10;       num32 clmn33&#13;&#10;  from rs_tmp_report_data &#13;&#10; where session_id=:session_id order by id">
-        <Column Name="REG" DataType="System.String"/>
-        <Column Name="LIZ" DataType="System.String"/>
-        <Column Name="TYPE" DataType="System.String"/>
-        <Column Name="CLMN1" DataType="System.Decimal"/>
-        <Column Name="CLMN2" DataType="System.Decimal"/>
-        <Column Name="CLMN3" DataType="System.Decimal"/>
-        <Column Name="CLMN4" DataType="System.Decimal"/>
-        <Column Name="CLMN5" DataType="System.Decimal"/>
-        <Column Name="CLMN6" DataType="System.Decimal"/>
-        <Column Name="CLMN7" DataType="System.Decimal"/>
-        <Column Name="CLMN8" DataType="System.Decimal"/>
-        <Column Name="CLMN9" DataType="System.Decimal"/>
-        <Column Name="CLMN10" DataType="System.Decimal"/>
-        <Column Name="CLMN11" DataType="System.Decimal"/>
-        <Column Name="CLMN12" DataType="System.Decimal"/>
-        <Column Name="CLMN13" DataType="System.Decimal"/>
-        <Column Name="CLMN14" DataType="System.Decimal"/>
-        <Column Name="CLMN15" DataType="System.Decimal"/>
-        <Column Name="CLMN16" DataType="System.Decimal"/>
-        <Column Name="CLMN17" DataType="System.Decimal"/>
-        <Column Name="CLMN18" DataType="System.Decimal"/>
-        <Column Name="CLMN19" DataType="System.Decimal"/>
-        <Column Name="CLMN20" DataType="System.Decimal"/>
-        <Column Name="CLMN21" DataType="System.Decimal"/>
-        <Column Name="CLMN22" DataType="System.Decimal"/>
-        <Column Name="CLMN23" DataType="System.Decimal"/>
-        <Column Name="CLMN24" DataType="System.Decimal"/>
-        <Column Name="CLMN25" DataType="System.Decimal"/>
-        <Column Name="CLMN26" DataType="System.Decimal"/>
-        <Column Name="CLMN27" DataType="System.Decimal"/>
-        <Column Name="CLMN28" DataType="System.Decimal"/>
-        <Column Name="CLMN29" DataType="System.Decimal"/>
-        <Column Name="CLMN30" DataType="System.Decimal"/>
-        <Column Name="CLMN31" DataType="System.Decimal"/>
-        <Column Name="CLMN32" DataType="System.Decimal"/>
-        <Column Name="CLMN33" DataType="System.Decimal"/>
-        <CommandParameter Name="session_id" DataType="107" Expression="[session_id]" DefaultValue="-1"/>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQIJ8gIsH1UQFh6FvDAy9HIk=">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select q.name,&#13;&#10;(select corporation_name from ob_corporation where base_corp=5 and id = q.liz) as corp_name,&#13;&#10;case when q.lizenziat is null then 'разом за підрозділом' else q.lizenziat end as lizenziat1,&#13;&#10;round(sum(ost)/count(distinct dd)/100, 2) as sred,&#13;&#10;sum(ost)/100 as ost,&#13;&#10;sum(case when mont = 1 and dd = 1 then ost else 0 end)/100 as d_1,&#13;&#10;sum(case when mont = 1 and dd = 2 then ost else 0 end)/100 as d_2, &#13;&#10;sum(case when mont = 1 and dd = 3 then ost else 0 end)/100 as d_3, &#13;&#10;sum(case when mont = 1 and dd = 4 then ost else 0 end)/100 as d_4, &#13;&#10;sum(case when mont = 1 and dd = 5 then ost else 0 end)/100 as d_5, &#13;&#10;sum(case when mont = 1 and dd = 6 then ost else 0 end)/100 as d_6, &#13;&#10;sum(case when mont = 1 and dd = 7 then ost else 0 end)/100 as d_7, &#13;&#10;sum(case when mont = 1 and dd = 8 then ost else 0 end)/100 as d_8, &#13;&#10;sum(case when mont = 1 and dd = 9 then ost else 0 end)/100 as d_9, &#13;&#10;sum(case when mont = 1 and dd = 10 then ost else 0 end)/100 as d_10, &#13;&#10;sum(case when mont = 1 and dd = 11 then ost else 0 end)/100 as d_11, &#13;&#10;sum(case when mont = 1 and dd = 12 then ost else 0 end)/100 as d_12, &#13;&#10;sum(case when mont = 1 and dd = 13 then ost else 0 end)/100 as d_13, &#13;&#10;sum(case when mont = 1 and dd = 14 then ost else 0 end)/100 as d_14, &#13;&#10;sum(case when mont = 1 and dd = 15 then ost else 0 end)/100 as d_15, &#13;&#10;sum(case when mont = 1 and dd = 16 then ost else 0 end)/100 as d_16, &#13;&#10;sum(case when mont = 1 and dd = 17 then ost else 0 end)/100 as d_17, &#13;&#10;sum(case when mont = 1 and dd = 18 then ost else 0 end)/100 as d_18, &#13;&#10;sum(case when mont = 1 and dd = 19 then ost else 0 end)/100 as d_19, &#13;&#10;sum(case when mont = 1 and dd = 20 then ost else 0 end)/100 as d_20, &#13;&#10;sum(case when mont = 1 and dd = 21 then ost else 0 end)/100 as d_21, &#13;&#10;sum(case when mont = 1 and dd = 22 then ost else 0 end)/100 as d_22, &#13;&#10;sum(case when mont = 1 and dd = 23 then ost else 0 end)/100 as d_23, &#13;&#10;sum(case when mont = 1 and dd = 24 then ost else 0 end)/100 as d_24, &#13;&#10;sum(case when mont = 1 and dd = 25 then ost else 0 end)/100 as d_25, &#13;&#10;sum(case when mont = 1 and dd = 26 then ost else 0 end)/100 as d_26, &#13;&#10;sum(case when mont = 1 and dd = 27 then ost else 0 end)/100 as d_27, &#13;&#10;sum(case when mont = 1 and dd = 28 then ost else 0 end)/100 as d_28, &#13;&#10;sum(case when mont = 1 and dd = 29 then ost else 0 end)/100 as d_29, &#13;&#10;sum(case when mont = 1 and dd = 30 then ost else 0 end)/100 as d_30, &#13;&#10;sum(case when mont = 1 and dd = 31 then ost else 0 end)/100 as d_31,&#13;&#10;grouping_id(liz, lizenziat) as gr_id&#13;&#10;from&#13;&#10;   (select case when o.parent_id='5' then o.id else org.id end liz,&#13;&#10;           case when o.parent_id='5'  then 'ліцензіат' &#13;&#10;                when o.parent_id&lt;&gt;'5' then 'всі структурні підрозділи' end lizenziat,&#13;&#10;           case when trunc(:sFdat1,'MM')=trunc(:sFdat2,'MM') then 1 else 0 end as mont,&#13;&#10;           ostq + obdbq - obkrq as ost,    &#13;&#10;           to_number(to_char(postdat,'DD')) as dd,&#13;&#10;           m.name&#13;&#10;     from ob_corp_data_acc a&#13;&#10;     join v_ob_corp_rep_nbs q on q.rep_id = 5040 and q.nbs = substr(a.nls,1,4) and Q.CORP_ID = a.corp_id&#13;&#10;     left join (select * from ob_corporation where base_corp=5) o on a.kod_ustan=o.external_id&#13;&#10;     left join (select * from ob_corporation where base_corp=5) org on o.parent_id=org.id&#13;&#10;     left join clim_mfo m on a.kf=m.kf&#13;&#10;     where a.corp_id=5&#13;&#10;       and a.is_last = 1&#13;&#10;       and fdat between :sFdat1 and :sFdat2 &#13;&#10;       and (substr (nls, 1, 4) = '2600' or (substr (nls, 1, 4) = '2603' and kod_analyt not in ('50', '53')))            &#13;&#10;       and instr(decode(:kod_analyt,'%',nvl(kod_analyt,' '),:kod_analyt),nvl(kod_analyt,' '))&gt;0&#13;&#10;       and instr(decode(:kod_ustan,'%',nvl(a.kod_ustan,-100),:kod_ustan),nvl(a.kod_ustan,-100))&gt;0&#13;&#10;       ) q &#13;&#10;       where liz is not null&#13;&#10;       group by rollup(liz, lizenziat), name&#13;&#10;       having grouping_id(liz, lizenziat) in (0,1)&#13;&#10;       order by liz, q.lizenziat">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="CORP_NAME" DataType="System.String"/>
+        <Column Name="LIZENZIAT1" DataType="System.String"/>
+        <Column Name="SRED" DataType="System.Decimal"/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="D_1" DataType="System.Decimal"/>
+        <Column Name="D_2" DataType="System.Decimal"/>
+        <Column Name="D_3" DataType="System.Decimal"/>
+        <Column Name="D_4" DataType="System.Decimal"/>
+        <Column Name="D_5" DataType="System.Decimal"/>
+        <Column Name="D_6" DataType="System.Decimal"/>
+        <Column Name="D_7" DataType="System.Decimal"/>
+        <Column Name="D_8" DataType="System.Decimal"/>
+        <Column Name="D_9" DataType="System.Decimal"/>
+        <Column Name="D_10" DataType="System.Decimal"/>
+        <Column Name="D_11" DataType="System.Decimal"/>
+        <Column Name="D_12" DataType="System.Decimal"/>
+        <Column Name="D_13" DataType="System.Decimal"/>
+        <Column Name="D_14" DataType="System.Decimal"/>
+        <Column Name="D_15" DataType="System.Decimal"/>
+        <Column Name="D_16" DataType="System.Decimal"/>
+        <Column Name="D_17" DataType="System.Decimal"/>
+        <Column Name="D_18" DataType="System.Decimal"/>
+        <Column Name="D_19" DataType="System.Decimal"/>
+        <Column Name="D_20" DataType="System.Decimal"/>
+        <Column Name="D_21" DataType="System.Decimal"/>
+        <Column Name="D_22" DataType="System.Decimal"/>
+        <Column Name="D_23" DataType="System.Decimal"/>
+        <Column Name="D_24" DataType="System.Decimal"/>
+        <Column Name="D_25" DataType="System.Decimal"/>
+        <Column Name="D_26" DataType="System.Decimal"/>
+        <Column Name="D_27" DataType="System.Decimal"/>
+        <Column Name="D_28" DataType="System.Decimal"/>
+        <Column Name="D_29" DataType="System.Decimal"/>
+        <Column Name="D_30" DataType="System.Decimal"/>
+        <Column Name="D_31" DataType="System.Decimal"/>
+        <Column Name="GR_ID" DataType="System.Decimal"/>
+        <CommandParameter Name="sFdat1" DataType="106" Expression="[sFdat1]" DefaultValue="01.01.1900"/>
+        <CommandParameter Name="kod_analyt" DataType="126" Expression="[kod_analyt]"/>
+        <CommandParameter Name="kod_ustan" DataType="126" Expression="[kod_ustan]"/>
+        <CommandParameter Name="sFdat2" DataType="106" Expression="[sFdat2]" DefaultValue="01.01.1900"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="sFdat1" DataType="System.DateTime"/>
     <Parameter Name="sFdat2" DataType="System.DateTime"/>
-    <Parameter Name="session_id" DataType="System.Decimal"/>
+    <Parameter Name="kod_ustan" DataType="System.String"/>
+    <Parameter Name="kod_analyt" DataType="System.String"/>
   </Dictionary>
   <ReportPage Name="Page1" PaperWidth="470">
     <ReportTitleBand Name="ReportTitle1" Width="1701" Height="47.25">
       <TextObject Name="Text2" Left="-9450" Top="-9450" Width="481.95" Height="66.15" Text="                      Інформація щодо перерахування коштів з &#13;&#10;Оптового ринку електричної енергії України НАЕК &quot;Енергоатом&quot;, &#13;&#10;тепловим енергогенеруючим компаніям та іншим виробникам &#13;&#10;	електричної енергії з [sFdat1] по [sFdat2] " Font="Arial, 9pt"/>
-      <TextObject Name="Text3" Left="56.7" Top="9.45" Width="481.95" Height="37.8" Text="         Інформація щодо залишків коштів на поточних рахунках &#13;&#10;із спеціальним режимом використання членів ОРЕ [sFdat1] по [sFdat2] " Font="Arial, 9pt"/>
+      <TextObject Name="Text3" Left="56.7" Top="9.45" Width="481.95" Height="37.8" Text="         Інформація щодо залишків коштів на поточних рахунках &#13;&#10;із спеціальним режимом використання членів ОРЕ [sFdat1] по [sFdat2]" Font="Arial, 9pt">
+        <Formats>
+          <DateFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
     </ReportTitleBand>
-    <PageHeaderBand Name="PageHeader1" Top="52.58" Width="1701" Height="122.85">
-      <TableObject Name="Table1" Top="47.25" Width="1701" Height="75.6" Border.Lines="All">
-        <TableColumn Name="Column1" Width="94.5"/>
-        <TableColumn Name="Column2" Width="94.5"/>
+    <PageHeaderBand Name="PageHeader1" Top="51.25" Width="1701" Height="75.6">
+      <TableObject Name="Table1" Width="1540.35" Height="75.6" Border.Lines="All" ManualBuildEvent="Table1_ManualBuild">
+        <TableColumn Name="Column1" Width="132.3"/>
+        <TableColumn Name="Column2" Width="198.45"/>
         <TableColumn Name="Column3" Width="103.95"/>
         <TableColumn Name="Column4" Width="113.4"/>
         <TableColumn Name="Column5" Width="113.4"/>
-        <TableColumn Name="Column6" Width="37.8"/>
-        <TableColumn Name="Column7" Width="37.8"/>
-        <TableColumn Name="Column8" Width="37.8"/>
-        <TableColumn Name="Column9" Width="37.8"/>
-        <TableColumn Name="Column10" Width="37.8"/>
-        <TableColumn Name="Column11" Width="37.8"/>
-        <TableColumn Name="Column12" Width="37.8"/>
-        <TableColumn Name="Column13" Width="37.8"/>
-        <TableColumn Name="Column14" Width="37.8"/>
-        <TableColumn Name="Column15" Width="37.8"/>
-        <TableColumn Name="Column16" Width="37.8"/>
-        <TableColumn Name="Column17" Width="37.8"/>
-        <TableColumn Name="Column18" Width="37.8"/>
-        <TableColumn Name="Column19" Width="37.8"/>
-        <TableColumn Name="Column20" Width="37.8"/>
-        <TableColumn Name="Column21" Width="37.8"/>
-        <TableColumn Name="Column22" Width="37.8"/>
-        <TableColumn Name="Column23" Width="37.8"/>
-        <TableColumn Name="Column24" Width="37.8"/>
-        <TableColumn Name="Column25" Width="37.8"/>
-        <TableColumn Name="Column26" Width="37.8"/>
-        <TableColumn Name="Column27" Width="37.8"/>
-        <TableColumn Name="Column28" Width="37.8"/>
-        <TableColumn Name="Column29" Width="37.8"/>
-        <TableColumn Name="Column30" Width="37.8"/>
-        <TableColumn Name="Column31" Width="37.8"/>
-        <TableColumn Name="Column32" Width="37.8"/>
-        <TableColumn Name="Column33" Width="37.8"/>
-        <TableColumn Name="Column34" Width="37.8"/>
-        <TableColumn Name="Column35" Width="37.8"/>
-        <TableColumn Name="Column36" Width="47.25"/>
+        <TableColumn Name="Column6" Width="28.35"/>
+        <TableColumn Name="Column7" Width="28.35"/>
+        <TableColumn Name="Column8" Width="28.35"/>
+        <TableColumn Name="Column9" Width="28.35"/>
+        <TableColumn Name="Column10" Width="28.35"/>
+        <TableColumn Name="Column11" Width="28.35"/>
+        <TableColumn Name="Column12" Width="28.35"/>
+        <TableColumn Name="Column13" Width="28.35"/>
+        <TableColumn Name="Column14" Width="28.35"/>
+        <TableColumn Name="Column15" Width="28.35"/>
+        <TableColumn Name="Column16" Width="28.35"/>
+        <TableColumn Name="Column17" Width="28.35"/>
+        <TableColumn Name="Column18" Width="28.35"/>
+        <TableColumn Name="Column19" Width="28.35"/>
+        <TableColumn Name="Column20" Width="28.35"/>
+        <TableColumn Name="Column21" Width="28.35"/>
+        <TableColumn Name="Column22" Width="28.35"/>
+        <TableColumn Name="Column23" Width="28.35"/>
+        <TableColumn Name="Column24" Width="28.35"/>
+        <TableColumn Name="Column25" Width="28.35"/>
+        <TableColumn Name="Column26" Width="28.35"/>
+        <TableColumn Name="Column27" Width="28.35"/>
+        <TableColumn Name="Column28" Width="28.35"/>
+        <TableColumn Name="Column29" Width="28.35"/>
+        <TableColumn Name="Column30" Width="28.35"/>
+        <TableColumn Name="Column31" Width="28.35"/>
+        <TableColumn Name="Column32" Width="28.35"/>
+        <TableColumn Name="Column33" Width="28.35"/>
+        <TableColumn Name="Column34" Width="28.35"/>
+        <TableColumn Name="Column35" Width="28.35"/>
+        <TableColumn Name="Column36" Width="28.35"/>
         <TableRow Name="Row1" Height="37.8">
-          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Aquamarine" Text="Регіон" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Aquamarine" Text="Ліцензіат" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Aquamarine" Text="Ліцензіат" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell1" Border.Lines="All" Fill.Color="Silver" Text="Регіон" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell2" Border.Lines="All" Fill.Color="Silver" Text="Ліцензіат" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell3" Border.Lines="All" Fill.Color="Silver" Text="Ліцензіат" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell4" Border.Lines="All" Fill.Color="Aqua" Text="Середньоденні залишки" HorzAlign="Center" VertAlign="Center"/>
           <TableCell Name="Cell5" Border.Lines="All" Fill.Color="Aquamarine" Text="Всього за період" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Aqua" Text="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Aqua" Text="2" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Aqua" Text="3" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell29" Border.Lines="All" Fill.Color="Aqua" Text="4" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Aqua" Text="5" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell31" Border.Lines="All" Fill.Color="Aqua" Text="6" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell32" Border.Lines="All" Fill.Color="Aqua" Text="7" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell33" Border.Lines="All" Fill.Color="Aqua" Text="8" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Aqua" Text="9" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Aqua" Text="10" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell36" Border.Lines="All" Fill.Color="Aqua" Text="11" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell37" Border.Lines="All" Fill.Color="Aqua" Text="12" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell38" Border.Lines="All" Fill.Color="Aqua" Text="13" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell39" Border.Lines="All" Fill.Color="Aqua" Text="14" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell40" Border.Lines="All" Fill.Color="Aqua" Text="15" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell41" Border.Lines="All" Fill.Color="Aqua" Text="16" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell42" Border.Lines="All" Fill.Color="Aqua" Text="17" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell43" Border.Lines="All" Fill.Color="Aqua" Text="18" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell44" Border.Lines="All" Fill.Color="Aqua" Text="19" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell45" Border.Lines="All" Fill.Color="Aqua" Text="20" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell46" Border.Lines="All" Fill.Color="Aqua" Text="21" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell47" Border.Lines="All" Fill.Color="Aqua" Text="22" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Aqua" Text="23" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell49" Border.Lines="All" Fill.Color="Aqua" Text="24" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell50" Border.Lines="All" Fill.Color="Aqua" Text="25" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell51" Border.Lines="All" Fill.Color="Aqua" Text="26" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell52" Border.Lines="All" Fill.Color="Aqua" Text="27" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell53" Border.Lines="All" Fill.Color="Aqua" Text="28" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell54" Border.Lines="All" Fill.Color="Aqua" Text="29" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell55" Border.Lines="All" Fill.Color="Aqua" Text="30" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Aqua" Text="31" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Fill.Color="Silver" Text="1" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell27" Border.Lines="All" Fill.Color="Silver" Text="2" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell28" Border.Lines="All" Fill.Color="Silver" Text="3" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell29" Border.Lines="All" Fill.Color="Silver" Text="4" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell30" Border.Lines="All" Fill.Color="Silver" Text="5" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell31" Border.Lines="All" Fill.Color="Silver" Text="6" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell32" Border.Lines="All" Fill.Color="Silver" Text="7" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell33" Border.Lines="All" Fill.Color="Silver" Text="8" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Silver" Text="9" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Silver" Text="10" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" Fill.Color="Silver" Text="11" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" Border.Lines="All" Fill.Color="Silver" Text="12" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Fill.Color="Silver" Text="13" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Fill.Color="Silver" Text="14" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Fill.Color="Silver" Text="15" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Fill.Color="Silver" Text="16" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="All" Fill.Color="Silver" Text="17" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Fill.Color="Silver" Text="18" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Fill.Color="Silver" Text="19" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Fill.Color="Silver" Text="20" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Fill.Color="Silver" Text="21" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell47" Border.Lines="All" Fill.Color="Silver" Text="22" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell48" Border.Lines="All" Fill.Color="Silver" Text="23" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell49" Border.Lines="All" Fill.Color="Silver" Text="24" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell50" Border.Lines="All" Fill.Color="Silver" Text="25" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell51" Border.Lines="All" Fill.Color="Silver" Text="26" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell52" Border.Lines="All" Fill.Color="Silver" Text="27" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell53" Border.Lines="All" Fill.Color="Silver" Text="28" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell54" Border.Lines="All" Fill.Color="Silver" Text="29" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell55" Border.Lines="All" Fill.Color="Silver" Text="30" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell56" Border.Lines="All" Fill.Color="Silver" Text="31" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
         <TableRow Name="Row2" Height="37.8">
-          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="DarkGray" Text="1" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="DarkGray" Text="2" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="DarkGray" Text="3" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="DarkGray" Text="4" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="DarkGray" Text="5" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="DarkGray" Text="6" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="DarkGray" Text="7" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="DarkGray" Text="8" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="DarkGray" Text="9" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="DarkGray" Text="10" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="DarkGray" Text="11" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="DarkGray" Text="12" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="DarkGray" Text="13" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
-          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="DarkGray" Text="14" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="DarkGray" Text="15" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="DarkGray" Text="16" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="DarkGray" Text="17" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell69" Border.Lines="All" Fill.Color="DarkGray" Text="18" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="DarkGray" Text="19" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell71" Border.Lines="All" Fill.Color="DarkGray" Text="20" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell72" Border.Lines="All" Fill.Color="DarkGray" Text="21" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell73" Border.Lines="All" Fill.Color="DarkGray" Text="22" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell74" Border.Lines="All" Fill.Color="DarkGray" Text="23" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell75" Border.Lines="All" Fill.Color="DarkGray" Text="24" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell76" Border.Lines="All" Fill.Color="DarkGray" Text="25" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell77" Border.Lines="All" Fill.Color="DarkGray" Text="26" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell78" Border.Lines="All" Fill.Color="DarkGray" Text="27" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell79" Border.Lines="All" Fill.Color="DarkGray" Text="28" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell80" Border.Lines="All" Fill.Color="DarkGray" Text="29" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell81" Border.Lines="All" Fill.Color="DarkGray" Text="30" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell82" Border.Lines="All" Fill.Color="DarkGray" Text="31" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell83" Border.Lines="All" Fill.Color="DarkGray" Text="32" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell84" Border.Lines="All" Fill.Color="DarkGray" Text="33" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell85" Border.Lines="All" Fill.Color="DarkGray" Text="34" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="DarkGray" Text="35" HorzAlign="Center" VertAlign="Center"/>
-          <TableCell Name="Cell87" Border.Lines="All" Fill.Color="DarkGray" Text="36" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell6" Border.Lines="All" Fill.Color="Silver" Text="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" Fill.Color="Silver" Text="2" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" Fill.Color="Silver" Text="3" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell9" Border.Lines="All" Fill.Color="Aqua" Text="4" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell10" Border.Lines="All" Fill.Color="Aquamarine" Text="5" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell57" Border.Lines="All" Fill.Color="Silver" Text="6" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell58" Border.Lines="All" Fill.Color="Silver" Text="7" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell59" Border.Lines="All" Fill.Color="Silver" Text="8" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell60" Border.Lines="All" Fill.Color="Silver" Text="9" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell61" Border.Lines="All" Fill.Color="Silver" Text="10" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell62" Border.Lines="All" Fill.Color="Silver" Text="11" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell63" Border.Lines="All" Fill.Color="Silver" Text="12" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell64" Border.Lines="All" Fill.Color="Silver" Text="13" HorzAlign="Center" VertAlign="Center" TabWidth="1"/>
+          <TableCell Name="Cell65" Border.Lines="All" Fill.Color="Silver" Text="14" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Fill.Color="Silver" Text="15" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Fill.Color="Silver" Text="16" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Fill.Color="Silver" Text="17" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell69" Border.Lines="All" Fill.Color="Silver" Text="18" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell70" Border.Lines="All" Fill.Color="Silver" Text="19" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell71" Border.Lines="All" Fill.Color="Silver" Text="20" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell72" Border.Lines="All" Fill.Color="Silver" Text="21" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell73" Border.Lines="All" Fill.Color="Silver" Text="22" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell74" Border.Lines="All" Fill.Color="Silver" Text="23" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell75" Border.Lines="All" Fill.Color="Silver" Text="24" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell76" Border.Lines="All" Fill.Color="Silver" Text="25" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell77" Border.Lines="All" Fill.Color="Silver" Text="26" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell78" Border.Lines="All" Fill.Color="Silver" Text="27" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell79" Border.Lines="All" Fill.Color="Silver" Text="28" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell80" Border.Lines="All" Fill.Color="Silver" Text="29" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell81" Border.Lines="All" Fill.Color="Silver" Text="30" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell82" Border.Lines="All" Fill.Color="Silver" Text="31" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell83" Border.Lines="All" Fill.Color="Silver" Text="32" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell84" Border.Lines="All" Fill.Color="Silver" Text="33" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell85" Border.Lines="All" Fill.Color="Silver" Text="34" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell86" Border.Lines="All" Fill.Color="Silver" Text="35" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell87" Border.Lines="All" Fill.Color="Silver" Text="36" HorzAlign="Center" VertAlign="Center"/>
         </TableRow>
       </TableObject>
     </PageHeaderBand>
-    <DataBand Name="Data1" Top="180.77" Width="1701" Height="75.6" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
-      <TextObject Name="Text1" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.REG]" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text5" Left="94.5" Width="94.5" Height="18.9" Border.Lines="All" Text="[Table.LIZ]" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text7" Left="189" Width="103.95" Height="18.9" Border.Lines="All" Text="[Table.TYPE]" HorzAlign="Center" VertAlign="Center"/>
-      <TextObject Name="Text9" Left="292.95" Width="113.4" Height="18.9" Border.Lines="All" Fill.Color="Aqua" Text="[Table.CLMN1]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text11" Left="406.35" Width="113.4" Height="18.9" Border.Lines="All" Fill.Color="Aquamarine" Text="[Table.CLMN2]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text13" Left="519.75" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN3]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text15" Left="557.55" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN4]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text17" Left="595.35" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN5]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text4" Left="633.15" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN6]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text8" Left="670.95" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN7]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text12" Left="708.75" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN8]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text16" Left="746.55" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN9]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text19" Left="784.35" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN10]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text23" Left="859.95" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN12]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text21" Left="822.15" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN11]" Format="Number" Format.UseLocale="true" HorzAlign="Center" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text6" Left="897.75" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN13]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text14" Left="935.55" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN14]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text20" Left="973.35" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN15]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text24" Left="1011.15" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN16]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text26" Left="1048.95" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN17]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text28" Left="1086.75" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN18]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text30" Left="1124.55" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN19]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text32" Left="1162.35" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN20]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text10" Left="1200.15" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN21]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text22" Left="1237.95" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN22]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text27" Left="1275.75" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN23]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text31" Left="1313.55" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN24]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text34" Left="1351.35" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN25]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text18" Left="1389.15" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN26]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text35" Left="1464.75" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN28]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text29" Left="1426.95" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN27]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text25" Left="1502.55" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN29]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text33" Left="1540.35" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN30]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text36" Left="1578.15" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN31]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text37" Left="1615.95" Width="37.8" Height="18.9" Border.Lines="All" Text="[Table.CLMN32]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
-      <TextObject Name="Text38" Left="1653.75" Width="47.25" Height="18.9" Border.Lines="All" Text="[Table.CLMN33]" Format="Number" Format.UseLocale="true" HorzAlign="Justify" WordWrap="false" Trimming="EllipsisCharacter"/>
+    <DataBand Name="Data1" Top="130.85" Width="1701" Height="28.35" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true">
+      <TableObject Name="Table2" Width="1540.35" Height="28.35" Border.Lines="All" ManualBuildEvent="Table2_ManualBuild">
+        <TableColumn Name="Column37" Width="132.3"/>
+        <TableColumn Name="Column38" Width="198.45"/>
+        <TableColumn Name="Column39" Width="103.95"/>
+        <TableColumn Name="Column40" Width="113.4"/>
+        <TableColumn Name="Column41" Width="113.4"/>
+        <TableColumn Name="Column42" Width="28.35"/>
+        <TableColumn Name="Column43" Width="28.35"/>
+        <TableColumn Name="Column44" Width="28.35"/>
+        <TableColumn Name="Column45" Width="28.35"/>
+        <TableColumn Name="Column46" Width="28.35"/>
+        <TableColumn Name="Column47" Width="28.35"/>
+        <TableColumn Name="Column48" Width="28.35"/>
+        <TableColumn Name="Column49" Width="28.35"/>
+        <TableColumn Name="Column50" Width="28.35"/>
+        <TableColumn Name="Column51" Width="28.35"/>
+        <TableColumn Name="Column52" Width="28.35"/>
+        <TableColumn Name="Column53" Width="28.35"/>
+        <TableColumn Name="Column54" Width="28.35"/>
+        <TableColumn Name="Column55" Width="28.35"/>
+        <TableColumn Name="Column56" Width="28.35"/>
+        <TableColumn Name="Column57" Width="28.35"/>
+        <TableColumn Name="Column58" Width="28.35"/>
+        <TableColumn Name="Column59" Width="28.35"/>
+        <TableColumn Name="Column60" Width="28.35"/>
+        <TableColumn Name="Column61" Width="28.35"/>
+        <TableColumn Name="Column62" Width="28.35"/>
+        <TableColumn Name="Column63" Width="28.35"/>
+        <TableColumn Name="Column64" Width="28.35"/>
+        <TableColumn Name="Column65" Width="28.35"/>
+        <TableColumn Name="Column66" Width="28.35"/>
+        <TableColumn Name="Column67" Width="28.35"/>
+        <TableColumn Name="Column68" Width="28.35"/>
+        <TableColumn Name="Column69" Width="28.35"/>
+        <TableColumn Name="Column70" Width="28.35"/>
+        <TableColumn Name="Column71" Width="28.35"/>
+        <TableColumn Name="Column72" Width="28.35"/>
+        <TableRow Name="Row3" Height="28.35">
+          <TableCell Name="Cell88" Border.Lines="All" Text="[Table.NAME]"/>
+          <TableCell Name="Cell89" Border.Lines="All" Text="[Table.CORP_NAME]"/>
+          <TableCell Name="Cell90" Border.Lines="All" Text="[Table.LIZENZIAT1]"/>
+          <TableCell Name="Cell91" Border.Lines="All" Fill.Color="Aqua" Text="[Table.SRED]"/>
+          <TableCell Name="Cell92" Border.Lines="All" Fill.Color="Aquamarine" Text="[Table.OST]"/>
+          <TableCell Name="Cell113" Border.Lines="All" Text="[Table.D_1]"/>
+          <TableCell Name="Cell114" Border.Lines="All" Text="[Table.D_2]"/>
+          <TableCell Name="Cell115" Border.Lines="All" Text="[Table.D_3]"/>
+          <TableCell Name="Cell116" Border.Lines="All" Text="[Table.D_4]"/>
+          <TableCell Name="Cell117" Border.Lines="All" Text="[Table.D_5]"/>
+          <TableCell Name="Cell118" Border.Lines="All" Text="[Table.D_6]"/>
+          <TableCell Name="Cell119" Border.Lines="All" Text="[Table.D_7]"/>
+          <TableCell Name="Cell120" Border.Lines="All" Text="[Table.D_8]"/>
+          <TableCell Name="Cell121" Border.Lines="All" Text="[Table.D_9]"/>
+          <TableCell Name="Cell122" Border.Lines="All" Text="[Table.D_10]"/>
+          <TableCell Name="Cell123" Border.Lines="All" Text="[Table.D_11]"/>
+          <TableCell Name="Cell124" Border.Lines="All" Text="[Table.D_12]"/>
+          <TableCell Name="Cell125" Border.Lines="All" Text="[Table.D_13]"/>
+          <TableCell Name="Cell126" Border.Lines="All" Text="[Table.D_14]"/>
+          <TableCell Name="Cell127" Border.Lines="All" Text="[Table.D_15]"/>
+          <TableCell Name="Cell128" Border.Lines="All" Text="[Table.D_16]"/>
+          <TableCell Name="Cell129" Border.Lines="All" Text="[Table.D_17]"/>
+          <TableCell Name="Cell130" Border.Lines="All" Text="[Table.D_18]"/>
+          <TableCell Name="Cell131" Border.Lines="All" Text="[Table.D_19]"/>
+          <TableCell Name="Cell132" Border.Lines="All" Text="[Table.D_20]"/>
+          <TableCell Name="Cell133" Border.Lines="All" Text="[Table.D_21]"/>
+          <TableCell Name="Cell134" Border.Lines="All" Text="[Table.D_22]"/>
+          <TableCell Name="Cell135" Border.Lines="All" Text="[Table.D_23]"/>
+          <TableCell Name="Cell136" Border.Lines="All" Text="[Table.D_24]"/>
+          <TableCell Name="Cell137" Border.Lines="All" Text="[Table.D_25]"/>
+          <TableCell Name="Cell138" Border.Lines="All" Text="[Table.D_26]"/>
+          <TableCell Name="Cell139" Border.Lines="All" Text="[Table.D_27]"/>
+          <TableCell Name="Cell140" Border.Lines="All" Text="[Table.D_28]"/>
+          <TableCell Name="Cell141" Border.Lines="All" Text="[Table.D_29]"/>
+          <TableCell Name="Cell142" Border.Lines="All" Text="[Table.D_30]"/>
+          <TableCell Name="Cell143" Border.Lines="All" Text="[Table.D_31]"/>
+        </TableRow>
+      </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="261.7" Width="1701" Height="18.9"/>
+    <PageFooterBand Name="PageFooter1" Top="163.2" Width="1701" Height="18.9"/>
   </ReportPage>
 </Report>

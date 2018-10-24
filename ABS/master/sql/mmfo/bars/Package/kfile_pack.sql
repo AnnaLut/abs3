@@ -1,9 +1,9 @@
-CREATE OR REPLACE PACKAGE BARS."KFILE_PACK" IS
+CREATE OR REPLACE PACKAGE BARS.KFILE_PACK IS
     -- Author  : Alex.Iurchenko
     -- Created : 31.12.1899 23:59:59
     -- Purpose : package for work with k-files data(CA LEVEL)
     -- Версія пакету
-    G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'VERSION 1.01 09/08/2018';
+    G_HEADER_VERSION CONSTANT VARCHAR2(64) := 'VERSION 1.01 12/09/2018';
 
     C_OB_CORPORATION_STATE CONSTANT VARCHAR2(25 CHAR) := 'OB_CORPORATION_STATE';
     C_OB_STATE_ACTIVE      CONSTANT INT := 1;
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BARS."KFILE_PACK" IS
     -- fill data on date(p_date format DDMMYYYY)
     procedure fill_data(p_date date, p_corp_code varchar2);
     -----------------------------------------------------------p_lic26_kfile_mmfo
-    procedure lic26_kfile(p_s date, p_corpc number, p_sess_id out number);
+    procedure lic26_kfile(p_date date, p_corpc number, p_sess_id out number);
 
     FUNCTION GET_ALL_UNITS(P_ACC ACCOUNTS.ACC%TYPE) RETURN T_UNITS PIPELINED;
 
@@ -81,32 +81,36 @@ CREATE OR REPLACE PACKAGE BARS."KFILE_PACK" IS
 
     function get_possible_units(p_id_unit ob_corporation.id%type) return t_units pipelined;
     --процедура обновления счетов корпоративных клиентов(обновляет включение в выписку, код ТРКК, код подразделения, дату открытия и альтернат. корпорацию)
-    procedure UPDATE_ACC_CORP(p_acc      number,
+    procedure update_acc_corp(p_acc      number,
                               p_invp     varchar2,
                               p_trkk     varchar2,
                               p_sub_corp varchar2,
                               p_alt_corp varchar2,
-                              p_daos     date);
+                              p_alt_ust  varchar2);
     procedure ins_customerw(p_rnk         customerw.rnk%type,
                             p_external_id varchar2,
                             p_org_id      varchar2);
 
     procedure crt_txt_k_file(p_sess_id in number,
                              p_corp_id in number,
-                             p_kf      in varchar2,
                              p_fname   in out varchar2,
                              p_k_file  out clob);
 
     procedure crt_kfile(p_sess_id in number,
-                        p_kf      in varchar2,
-                        p_corp_id in number default null);
+                        p_corp_id in number,
+                        p_f_path out varchar2,
+                        p_fname  out varchar2,
+                        p_blob   out blob);
+    
+    procedure call_web_serv(p_sess_id in number,
+                            p_corp_id in number default null);
 
 END KFILE_PACK;
 /
-CREATE OR REPLACE PACKAGE BODY BARS."KFILE_PACK"
+CREATE OR REPLACE PACKAGE BODY BARS.KFILE_PACK
 IS
     -- Версія пакету
-    G_BODY_VERSION   CONSTANT VARCHAR2 (64) := 'VERSION 1.11 04/12/2017';
+    G_BODY_VERSION   CONSTANT VARCHAR2 (64) := 'VERSION 1.11 12/09/2018';
     G_DBGCODE        CONSTANT VARCHAR2 (20) := 'KFILE_PACK';
     ------------------------------------------------------------------------------------
 
@@ -137,36 +141,6 @@ IS
      where s.id = p_id;
  commit;    
  end; 
- 
- function encode_base64(p_blob in blob) return clob is
-            l_clob           clob;
-            l_result         clob;
-            l_offset         integer;
-            l_chunk_size     binary_integer := 23808;
-            l_buffer_varchar varchar2(32736);
-            l_buffer_raw     raw(32736);
-          begin
-            if (p_blob is null) then
-              return null;
-            end if;
-
-            dbms_lob.createtemporary(l_clob, false);
-
-            l_offset := 1;
-            for i in 1 .. ceil(dbms_lob.getlength(p_blob) / l_chunk_size) loop
-              dbms_lob.read(p_blob, l_chunk_size, l_offset, l_buffer_raw);
-              l_buffer_raw     := utl_encode.base64_encode(l_buffer_raw);
-              l_buffer_varchar := utl_raw.cast_to_varchar2(l_buffer_raw);
-              l_buffer_varchar :=regexp_replace(l_buffer_varchar, '\s', '');
-              dbms_lob.writeappend(l_clob, length(l_buffer_varchar), l_buffer_varchar);
-              l_offset := l_offset + l_chunk_size;
-            end loop;
-
-            l_result := l_clob;
-            dbms_lob.freetemporary(l_clob);
-
-            return l_result;
-        end;
         
  function clob_to_blob(p_clob in clob) return blob is
      l_blob         blob;
@@ -207,7 +181,6 @@ IS
 
  procedure crt_txt_k_file(p_sess_id in number,
                           p_corp_id in number,
-                          p_kf      in varchar2,
                           p_fname   in out varchar2,
                           p_k_file  out clob) is
      l_clob clob;
@@ -253,8 +226,7 @@ IS
                       rpadchr(substr(nms, 1, 60), ' ', 60) || '|' ||
                       rpadchr(tt, ' ', 3) || '|' || chr(13) || chr(10) as k_file_str
                  from V_OB_CORP_REPORT
-                where kf = p_kf
-                  and corporation_id = p_corp_id
+                where corporation_id = p_corp_id
                   and session_id = p_sess_id) loop
          DBMS_LOB.WRITEAPPEND(l_clob, length(j.k_file_str), j.k_file_str);
      end loop;
@@ -265,8 +237,7 @@ IS
                                             into l_filename
        FROM BARS.ob_corp_sess t1
        left join bars.clim_mfo k on k.kf = t1.kf
-       where t1.id = p_sess_id
-         and t1.kf = p_kf;
+       where t1.id = p_sess_id;
 
      p_fname:= l_filename;
      p_k_file:= l_clob;
@@ -275,49 +246,58 @@ IS
     logger.error(substr(G_DBGCODE || to_char(p_sess_id) || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
  end;
-
- procedure crt_kfile(p_sess_id in number,
-                     p_kf      in varchar2,
-                     p_corp_id in number default null) is
-
+ 
+ procedure call_web_serv(p_sess_id in number,
+                         p_corp_id in number default null) is
   l_url           varchar2(1024) :=  branch_attribute_utl.get_value('LINK_FOR_ABSBARS_WEBAPISERVICES')||'kfiles/CrtKfile';
-  l_f_path        varchar2(255) :=branch_attribute_utl.get_value('TMS_REPORTS_DIR');
   l_wallet_path   varchar2(256) := getglobaloption('PATH_FOR_ABSBARS_WALLET');
   l_wallet_pwd    varchar2(256) := getglobaloption('PASS_FOR_ABSBARS_WALLET');
   l_login         varchar2(400):= branch_attribute_utl.get_value('TMS_LOGIN');
   l_password      varchar2(400):= branch_attribute_utl.get_value('TMS_PASS');
   l_response      wsm_mgr.t_response;
-  fname           varchar2(50);
-  l_clob          clob;
   begin
 
   for i in (select corp_id
               from ob_corp_sess_corp c
-             where c.kf = p_kf
-               and c.sess_id = p_sess_id
-               and c.is_last = 1
+             where c.sess_id = p_sess_id
                and case when p_corp_id is null then -1 else c.corp_id end = case when p_corp_id is null then -1 else p_corp_id end)
            loop
            
-           crt_txt_k_file(p_sess_id, i.corp_id, p_kf, fname, l_clob);
-           
-           if l_clob is not null then          
-           l_clob:=encode_base64(utl_compress.lz_compress(clob_to_blob(l_clob)));
-           
              wsm_mgr.prepare_request(p_url=> l_url,
                           p_action      => null,
-                          p_http_method => wsm_mgr.g_http_post,
+                          p_http_method => wsm_mgr.g_http_get,
                           p_wallet_path => l_wallet_path,
-                          p_wallet_pwd  => l_wallet_pwd,
-                          p_body        => l_clob);
-             WSM_MGR.add_parameter('path', l_f_path);
-             WSM_MGR.add_parameter('filename', fname);
+                          p_wallet_pwd  => l_wallet_pwd);
+             wsm_mgr.add_parameter('sessId', to_clob(p_sess_id));
+             wsm_mgr.add_parameter('corpId', to_clob(i.corp_id));
              WSM_MGR.add_header('Authorization', 'Basic ' ||
              utl_raw.cast_to_varchar2(utl_encode.base64_encode(utl_raw.cast_to_raw(l_login || ':' || l_password))));
              -- позвать метод веб-сервиса
              wsm_mgr.execute_api(l_response);
-           end if;
            end loop;
+  exception when others then
+      logger.error(substr(G_DBGCODE || to_char(p_sess_id) || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
+      raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+  end;
+
+ procedure crt_kfile(p_sess_id in number,
+                     p_corp_id in number,
+                     p_f_path out varchar2,
+                     p_fname  out varchar2,
+                     p_blob   out blob) is
+  l_f_path        varchar2(255) :=branch_attribute_utl.get_value('TMS_REPORTS_DIR');
+  fname           varchar2(50);
+  l_clob          clob;
+  begin
+           
+  crt_txt_k_file(p_sess_id, p_corp_id, fname, l_clob);
+           
+           if l_clob is not null then  
+           p_f_path:= l_f_path;
+           p_fname:= fname;       
+           p_blob:= clob_to_blob(l_clob);           
+           end if;
+           
   exception when others then
       logger.error(substr(G_DBGCODE || to_char(p_sess_id) || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
       raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
@@ -326,11 +306,10 @@ IS
   procedure kfile_vzd is 
   l_date date:= gl.bd();
   l_corpc number:=null;
-  l_kf varchar2(6):=f_ourmfo();
   l_session number;
   begin
   lic26_kfile(l_date, l_corpc, l_session);
-  crt_kfile(l_session, l_kf);
+  call_web_serv(l_session);
   end;
 
 ---------------------------------------------------------------------------------------
@@ -446,6 +425,12 @@ IS
     if SYS_CONTEXT ('bars_context', 'user_mfo') is null then
     raise_application_error(-20000, 'Формування К-файлів на рівні "/" заборонено!!');
     end if;
+    if p_date > trunc(sysdate) then 
+    raise_application_error(-20000, 'Формування К-файлів за майбутню дату: '||to_char(p_date, 'dd.mm.yyyy')||' заборонено!!');
+    end if;
+    if p_date < trunc(add_months(sysdate, -1)) then 
+    raise_application_error(-20000, 'Формування К-файлів за дату меншу ніж : '||to_char(add_months(sysdate, -1), 'dd.mm.yyyy')||' заборонено!!');
+    end if;
 
     dbms_scheduler.create_job(job_name => l_jobname,
                               job_type => 'PLSQL_BLOCK',
@@ -460,7 +445,7 @@ exception
         raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
     end;
 
-PROCEDURE lic26_kfile (p_s           date,           -- дата по
+PROCEDURE lic26_kfile (p_date        date,           -- дата по
                        p_corpc       number,
                        p_sess_id out number)      -- код корпорации
 is
@@ -541,27 +526,27 @@ end;
 begin
    DBMS_LOB.CREATETEMPORARY(l_err_clob, true, DBMS_LOB.SESSION);
 
-   bars_audit.trace('p_lic26_kfile: формирование К файла за: ' ||to_char(p_s,'dd/mm/yyyy') ||' маска корпорации: '||p_corpc);
+   bars_audit.trace('p_lic26_kfile: формирование К файла за: ' ||to_char(p_date,'dd/mm/yyyy') ||' маска корпорации: '||p_corpc);
   
-        l_sync := get_sync_id(f_ourmfo, p_s);
+        l_sync := get_sync_id(f_ourmfo, p_date);
         p_sess_id:=l_sync;
    -----------------------------
    -- по счетам
    -----------------------------
    for c0 in (select case when dapp is not null then acc else null end as sal_acc,
                acc, fdat, ost, nls, kv, kos, dos, nms, dapp, okpo, nmkk nmk,
-               (ost+dos-kos) ostf, rnk, typnls, nvl(alt_corp_cod,corp_kod) kodk, kodu, pos
+               (ost+dos-kos) ostf, rnk, lpad(typnls, 2, '0') as typnls, nvl(alt_corp_cod,corp_kod) kodk, kodu, pos
                from(
-                    select a.acc, trunc(p_s) fdat, a.nls, a.kv, nvl(s.kos,0) as kos,
+                    select a.acc, trunc(p_date) fdat, a.nls, a.kv, nvl(s.kos,0) as kos,
                            nvl(s.dos,0) as dos, a.nms nms, c.okpo, c.nmkk, a.rnk,
                            coalesce(s.pdat,(select max(fdat)
                                                    from saldoa s
-                                                   where s.fdat  <= trunc(p_s)
+                                                   where s.fdat  <= trunc(p_date)
                                                    and s.acc = a.acc)) as dapp,
                            nvl((select ost from (SELECT s.acc, s.fdat,
                                                         nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) as OST,
                                                         max(s.fdat) over (partition by s.acc) as m_fdat
-                                                        FROM saldoa s where s.fdat  <= trunc(p_s)) q
+                                                        FROM saldoa s where s.fdat  <= trunc(p_date)) q
                                                         where m_fdat = fdat and q.acc = a.acc),0) as ost,
                      (SELECT s.TYPNLS
                       FROM SPECPARAM_INT s
@@ -583,14 +568,14 @@ begin
     join accountsw aw on a.acc = aw.acc
     join customerw cw on a.rnk = cw.rnk
     join customer c on a.rnk = c.rnk
-    left join saldoa s on s.acc = a.acc and s.fdat = trunc(p_s)
+    left join saldoa s on s.acc = a.acc and s.fdat = trunc(p_date)
     where aw.TAG = 'CORPV' and aw.value = 'Y'
     and cw.TAG = 'OBPCP'
     and exists(select 1
                from ob_corporation obc
                where obc.external_id = cw.value
                and obc.parent_id is null)
-    and (a.dazs >= trunc(p_s) or a.dazs is null))
+    and (a.dazs >= trunc(p_date) or a.dazs is null))
     where decode(p_corpc,null, nvl(alt_corp_cod,corp_kod), p_corpc) = nvl(alt_corp_cod,corp_kod))
             loop
 
@@ -652,6 +637,7 @@ begin
                 l_data_doc(l_data_doc.last).acc:= c0.acc;
                 l_data_doc(l_data_doc.last).kf:= gl.amfo;
                 l_data_doc(l_data_doc.last).ref:= c1.ref;
+                l_data_doc(l_data_doc.last).stmt:= c1.stmt;
                 l_data_doc(l_data_doc.last).docdat :=c2.datd;
                 l_data_doc(l_data_doc.last).valdat :=c2.vdat;
                 l_data_doc(l_data_doc.last).nd:= trim(c2.nd);
@@ -724,8 +710,8 @@ begin
                  from accounts a, customer c
                 where a.rnk = c.rnk
                   and acc = (select acc
-                               from opldok
-                              where ref = c1.ref and stmt = c1.stmt and dk<> c1.dk);
+                               from opldok o
+                              where o.ref = c1.ref and o.stmt = c1.stmt and o.dk<> c1.dk);
 
                   if l_whoiam = 0 then
                             l_data_doc(l_data_doc.last).mfob  := l_mfo_d;
@@ -805,8 +791,9 @@ begin
                l_data_doc.extend;
                l_data_doc(l_data_doc.last).sess_id:= l_sync;
                l_data_doc(l_data_doc.last).acc:= c0.acc;
-                l_data_doc(l_data_doc.last).kf:= gl.amfo;
-               l_data_doc(l_data_doc.last).ref:= '0';
+               l_data_doc(l_data_doc.last).kf:= gl.amfo;
+               l_data_doc(l_data_doc.last).ref:= 0;
+               l_data_doc(l_data_doc.last).stmt:= 0;
             if (l_psum > 0 ) then
                l_data_doc(l_data_doc.last).nlsa := '3801';
                l_data_doc(l_data_doc.last).nlsb := c0.nls;
@@ -834,9 +821,9 @@ begin
             else
                 l_data_doc(l_data_doc.last).nazn := 'Коригування при обчисленнi еквiваленту';
             end if;
-                l_data_doc(l_data_doc.last).postdat:=p_s;
-                l_data_doc(l_data_doc.last).docdat :=p_s;
-                l_data_doc(l_data_doc.last).valdat :=p_s;
+                l_data_doc(l_data_doc.last).postdat:=p_date;
+                l_data_doc(l_data_doc.last).docdat :=p_date;
+                l_data_doc(l_data_doc.last).valdat :=p_date;
                 l_data_doc(l_data_doc.last).nd     :=to_char(sysdate,'hh24miss');
                 l_data_doc(l_data_doc.last).vob    :=6;
                 l_data_doc(l_data_doc.last).mfoa   :=gl.amfo;
@@ -859,7 +846,7 @@ begin
                 l_data_acc(l_data_acc.last).sess_id   := l_sync;
                 l_data_acc(l_data_acc.last).acc       := c0.acc;
                 l_data_acc(l_data_acc.last).kf        := gl.amfo;
-                l_data_acc(l_data_acc.last).fdat      := p_s;
+                l_data_acc(l_data_acc.last).fdat      := p_date;
                 l_data_acc(l_data_acc.last).corp_id   := c0.kodk;
                 l_data_acc(l_data_acc.last).nls       := c0.nls;
                 l_data_acc(l_data_acc.last).kv        := c0.kv;
@@ -893,7 +880,7 @@ begin
         l_ins_data_doc(l_data_doc);
     l_data_doc.delete;
     
-    set_last_corp (p_s, p_corpc, f_ourmfo, l_sync);
+    set_last_corp (p_date, p_corpc, f_ourmfo, l_sync);
     
     
    
@@ -910,7 +897,7 @@ begin
     
 
 exception when others then
-    logger.error(substr(G_DBGCODE || to_char(p_s, 'ddmmyyyy') || p_corpc || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
+    logger.error(substr(G_DBGCODE || to_char(p_date, 'ddmmyyyy') || p_corpc || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     log_err(3, l_sync, l_err_clob);
     rollback;
     dbms_lob.freetemporary(l_err_clob);
@@ -956,7 +943,8 @@ END lic26_kfile;
              pipe row(l_unit);
          end loop;
      end if;
- exception when others then
+ exception when no_data_needed then null;
+           when others then
     logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
  end;
@@ -1307,7 +1295,8 @@ END lic26_kfile;
              pipe row(l_unit);
          end loop;
      end if;
- exception when others then
+ exception when no_data_needed then null;
+           when others then
     logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
  end;
@@ -1320,21 +1309,21 @@ END lic26_kfile;
                            p_trkk     varchar2,
                            p_sub_corp varchar2,
                            p_alt_corp varchar2,
-                           p_daos     date) as
-     l_daos  date;
+                           p_alt_ust  varchar2) as
      l_obpcp varchar2(500);
+     l_alt_corp varchar2(500);
+     l_rnk   number;
      res     number;
      --l_obcrp varchar2(500);
  begin
+       select cw1.value
+       into l_obpcp
+       from accounts a
+       join customerw cw1
+         on a.rnk = cw1.rnk
+        and cw1.tag = 'OBPCP'
+      where a.acc = p_acc;
  
-     --дата відкриття
-     /*select daos into l_daos from accounts t where t.acc = p_acc;
-     if (l_daos <> p_daos and p_daos is not null) then
-         update accounts t set t.daos = p_daos where t.acc = p_acc;
-     elsif p_daos is null then
-         raise_application_error(-20000,
-                                 'Поле дата відкриття порожнє!!');
-     end if;*/
  
      --выписка
      if p_invp in ('Y', 'N') then
@@ -1355,10 +1344,10 @@ END lic26_kfile;
  
      --trkk код
      begin
-         select count(*) into res from typnls_corp t where t.kod = p_trkk;
+         select count(*) into res from typnls_corp t where t.kod = p_trkk and t.corp_id = l_obpcp;
      exception
          when no_data_found then
-             null;
+             raise_application_error(-20000, 'Код ТРКК '||p_trkk||' для корпорації '||l_obpcp||' відсутній в довіднику!!'); 
      end;
      if (res <> 0 or p_trkk is null) then
          update specparam_int t set t.typnls = p_trkk where t.acc = p_acc;
@@ -1369,46 +1358,75 @@ END lic26_kfile;
                  (p_acc, p_trkk);
          end if;
      elsif (res = 0) then
-         raise_application_error(-20000,
-                                 'Код ТРКК відсутній в довіднику!!');
+         raise_application_error(-20000, 'Код ТРКК '||p_trkk||' для корпорації '||l_obpcp||' відсутній в довіднику!!');
      end if;
      --get customer corp_code and inst_code
-     select cw1.value
-       into l_obpcp
-       from accounts a
-       join customerw cw1
-         on a.rnk = cw1.rnk
-        and cw1.tag = 'OBPCP'
-      where a.acc = p_acc;
+
  
      --проверим, есть ли такое подразделение у корпорации клиента или альтернативной корпорации
-     begin
-         select 1
+     begin         
+         select count(*)
            into res
            from v_org_corporations t
-          where (t.base_extid = l_obpcp or t.base_extid = p_alt_corp)
-            and rownum = 1
-            and t.external_id = p_sub_corp;
+          where t.base_extid = p_alt_corp
+            and t.external_id = p_alt_ust;
          --јод установи
-         update accountsw t
-            set t.value = p_sub_corp
-          where t.acc = p_acc
-            and t.tag = 'OBCORPCD';
-         if sql%rowcount = 0 then
-             insert into accountsw t
-                 (acc, tag, value)
-             values
-                 (p_acc, 'OBCORPCD', p_sub_corp);
+         if p_alt_ust is null then
+             delete from accountsw t 
+              where t.acc = p_acc
+                and t.tag = 'OBCORPCD';
+         elsif res > 0 then
+             update accountsw t
+                set t.value = p_alt_ust
+              where t.acc = p_acc
+                and t.tag = 'OBCORPCD';
+             if sql%rowcount = 0 then
+                 insert into accountsw t
+                     (acc, tag, value)
+                 values
+                     (p_acc, 'OBCORPCD', p_alt_ust);
+             end if;
+         else
+         raise_application_error(-20500,
+                                     'В довіднику віднсутній підрозділ ' ||
+                                     p_alt_ust ||
+                                     ' з альтернитивною корпорацією ' ||
+                                     p_alt_corp); 
          end if;
-     exception
-         when no_data_found then
-             raise_application_error(-20500,
+     end;
+     
+     begin         
+         select count(*)
+           into res
+           from v_org_corporations t
+          where t.base_extid = l_obpcp
+            and t.external_id = p_sub_corp;
+          
+          select a.rnk into l_rnk from accounts a where a.acc = p_acc;
+          
+         --јод установи
+         if p_sub_corp is null then
+             delete from customerw t 
+              where t.rnk = l_rnk
+                and t.tag = 'OBCRP';
+         elsif res > 0 then
+             update customerw t
+                set t.value = p_sub_corp
+              where t.rnk = l_rnk
+                and t.tag = 'OBCRP';
+             if sql%rowcount = 0 then
+                 insert into customerw t
+                     (rnk, tag, value)
+                 values
+                     (l_rnk, 'OBCRP', p_sub_corp);
+             end if;
+         else
+         raise_application_error(-20500,
                                      'В довіднику віднсутній підрозділ ' ||
                                      p_sub_corp ||
-                                     ' з основною корпорацією ' || l_obpcp ||
-                                     ' або альтернитивною корпорацією ' ||
-                                     p_alt_corp);
-     end;
+                                     ' з основною корпорацією ' || l_obpcp ); 
+         end if;
+     end;     
  
      --альтернатива
      select count(*)
@@ -1417,20 +1435,24 @@ END lic26_kfile;
       where t.external_id = p_alt_corp;
  
      --check, if alt_corp != customer's corp
-     if (l_obpcp != p_alt_corp and res <> 0) or p_alt_corp is null then
-         update ACCOUNTSW t
-            set t.VALUE = p_alt_corp
-          where t.ACC = p_acc
-            and t.TAG = 'obcorp';
-         if SQL%rowcount = 0 then
-             insert into accountsw t
-                 (acc, tag, value)
-             values
-                 (p_acc, 'obcorp', p_alt_corp);
-         end if;
+     if p_alt_corp is null then
+             delete from accountsw t 
+              where t.acc = p_acc
+                and t.tag = 'OBCORP';
+     elsif (l_obpcp != p_alt_corp and res <> 0) then
+             update ACCOUNTSW t
+                set t.VALUE = p_alt_corp
+              where t.ACC = p_acc
+                and t.TAG = 'OBCORP';
+             if SQL%rowcount = 0 then
+                 insert into accountsw t
+                     (acc, tag, value)
+                 values
+                     (p_acc, 'OBCORP', p_alt_corp);
+             end if;
      else
          raise_application_error(-20500,
-                                 'код альтернативної ' || p_alt_corp ||
+                                 'Код альтернативної ' || p_alt_corp ||
                                  ' корпорації не знайдено в довіднику корпорацій!!');
      end if;
  exception when others then
@@ -1468,7 +1490,9 @@ END lic26_kfile;
      -- суммируем в выбранном периоде остатки
      l_d_sql := 'SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.kf, cd.fdat
                        FROM ob_corp_data_acc cd
+                       join v_ob_corp_rep_nbs q on q.nbs = substr(cd.nls,1,4) and Q.CORP_ID = cd.corp_id 
                       WHERE cd.is_last = 1 
+                        AND q.rep_id = :P_REP_ID 
                         AND CD.CORP_ID = :P_CORP_ID
                         AND substr(CD.NLS,1,4) = :P_NBS' || case
                     when p_kv_flag = 1 then
@@ -1489,10 +1513,10 @@ END lic26_kfile;
                         order by CD.kf asc, cd.fdat desc';
      if p_kod_analyt <> '%' then
          open l_ref_cur for l_d_sql
-             using p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
+             using p_rep_id, p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
      else
          open l_ref_cur for l_d_sql
-             using p_corp_id, p_nbs, p_date_start, p_date_end;
+             using p_rep_id, p_corp_id, p_nbs, p_date_start, p_date_end;
      end if;
      loop
          fetch l_ref_cur
@@ -1531,8 +1555,8 @@ END lic26_kfile;
          end;
      end loop;
      return;
- exception
-     when others then
+ exception when no_data_needed then null;
+           when others then
          close l_ref_cur;
          logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
          raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
@@ -1567,8 +1591,10 @@ END lic26_kfile;
     -- то будет прогнозный расчет cо значением остатка=текущему
     -- суммируем в выбранном периоде остатки
     l_d_sql := 'SELECT SUM(cd.ostq-cd.obkrq+cd.obdbq) as suma, CD.KOD_USTAN, cd.fdat
-                     FROM ob_corp_data_acc cd                   
+                     FROM ob_corp_data_acc cd  
+                     join v_ob_corp_rep_nbs q on q.nbs = substr(cd.nls,1,4) and Q.CORP_ID = cd.corp_id                    
                     WHERE cd.is_last = 1 
+                      AND q.rep_id = :p_rep_id 
                       AND CD.CORP_ID = :P_CORP_ID
                       AND substr(CD.NLS,1,4) = :P_NBS ' || case
                    when p_kv_flag = 1 then
@@ -1590,10 +1616,10 @@ END lic26_kfile;
 
     if p_kod_analyt <> '%' then
         open l_ref_cur for l_d_sql
-            using p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
+            using p_rep_id, p_corp_id, p_nbs, p_kod_analyt, p_date_start, p_date_end;
     else
         open l_ref_cur for l_d_sql
-            using p_corp_id, p_nbs, p_date_start, p_date_end;
+            using p_rep_id, p_corp_id, p_nbs, p_date_start, p_date_end;
     end if;
     loop
         fetch l_ref_cur
@@ -1636,8 +1662,8 @@ END lic26_kfile;
     end loop;
 
     return;
-exception
-    when others then
+exception when no_data_needed then null;
+           when others then
     close l_ref_cur;
     logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));
     raise_application_error(-20000, dbms_utility.format_error_backtrace || ' ' || sqlerrm);
@@ -1647,9 +1673,31 @@ exception
 procedure ins_customerw (p_rnk customerw.rnk%type,p_external_id varchar2, p_org_id varchar2)
 is
  begin
-
-      insert into customerw(rnk, tag, value, isp) values (p_rnk, 'OBPCP', p_external_id, 0);
-      insert into customerw(rnk, tag, value, isp) values (p_rnk, 'OBCRP', p_org_id, 0);
+      if p_external_id is null then 
+        delete customerw where tag = 'OBPCP' and rnk = p_rnk;
+      else 
+      begin
+            insert into customerw(rnk, tag, value, isp) values (p_rnk, 'OBPCP', p_external_id, 0);
+      exception when dup_val_on_index then
+            update customerw t
+               set t.value = p_external_id 
+             where t.tag = 'OBPCP' 
+               and t.rnk = p_rnk;
+      end;
+      end if;
+      
+      if p_org_id is null then 
+        delete customerw where tag = 'OBCRP' and rnk = p_rnk;
+      else 
+      begin
+            insert into customerw(rnk, tag, value, isp) values (p_rnk, 'OBCRP', p_org_id, 0);
+      exception when dup_val_on_index then
+            update customerw t
+               set t.value = p_org_id 
+             where t.tag = 'OBCRP' 
+               and t.rnk = p_rnk;
+      end;
+      end if;
  exception
     when others then
     logger.error(substr(G_DBGCODE || ' - ' || sqlerrm || dbms_utility.format_error_backtrace(), 1, 4000));

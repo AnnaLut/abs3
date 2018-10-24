@@ -151,6 +151,7 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+umu.add_reference2arm_bytabname('OB_CORP_DICT_OKPO', '$RM_WCRC', 2, 1);
 umu.add_report2arm(75,'$RM_WCRC');
 umu.add_report2arm(5014,'$RM_WCRC');
 umu.add_report2arm(5015,'$RM_WCRC');
