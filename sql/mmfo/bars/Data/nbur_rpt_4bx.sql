@@ -63,21 +63,13 @@ begin
 
   dbms_output.put_line( 'Created new file #' || to_char(l_file_id) );
 
-  for l in ( select *
-               from NBUR_REF_FILES_LOCAL
-              where FILE_ID = ( select ID  from nbur_ref_files
-                                 where file_code ='#01' )
-                and KF ='300465'
-           )
-  loop
     NBUR_FILES.SET_FILE_LOCAL
-    ( p_kf        => l.KF
+    ( p_kf        => '300465'
     , p_file_id   => l_file_id
-    , p_file_path => l.FILE_PATH
-    , p_nbuc      => l.NBUC
-    , p_e_address => l.E_ADDRESS
+    , p_file_path => 'C:\'
+    , p_nbuc      => '300465'
+    , p_e_address => 'ILP'
     );
-  end loop;
 
   NBUR_FILES.SET_FILE_PROC
   ( p_proc_id => l_proc_id
