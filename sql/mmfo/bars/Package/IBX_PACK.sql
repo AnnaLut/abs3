@@ -1115,7 +1115,6 @@ procedure pay_to_sep (
                
        else --- одно РУ
         --Достаем тип счета получателя  
-logger.info('ibx_pack.pay_common:l_mfo = v_receiver_mfo');        
           begin 
            select tip into l_acc_tip from accounts a where a.nls=v_receiver_acc;  
           exception 
@@ -1148,7 +1147,7 @@ logger.info('ibx_pack.pay_common:l_mfo = v_receiver_mfo');
                          tt_ => l_tt,
                         dk0_ => l_dk,
                         kva_ => v_receiver_curr,
-                       nls1_ => l_trans_2902,
+                       nls1_ => l_debit_nls,
                          sa_ => l_pay_amount,
                         kvb_ => v_receiver_curr,
                        nls2_ => v_receiver_acc,
