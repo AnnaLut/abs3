@@ -1,4 +1,6 @@
-=========  svn diff --summarize -r 68716:68752 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 68716:68783 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\Kf_chk.frx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5020.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5021.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5030.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5022.frx
@@ -17,8 +19,7 @@
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5019.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5038.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5039.frx
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\Kf_chk.frx
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT\rep5020.frx
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\TEMPLATE.RPT
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web\barsroot\version.abs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.12\mmfo\web
-Bugfix_2.0.48.a.12 (Rev:68716-68752
+Bugfix_2.0.48.a.12 (Rev:68716-68783
