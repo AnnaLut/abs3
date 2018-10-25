@@ -1664,11 +1664,7 @@ BEGIN
   if p_flag_visa = 0
   or p_flag_visa = 1 and not is_customer_visa(Rnk_) 
   then
-     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_,case passp_ 
-                                                     when 1 then 
-                                                       Pdate_ 
-                                                     else null 
-                                                   end,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
+     setPersonAttrEx(Rnk_,Sex_,Passp_,Ser_,Numdoc_, Pdate_,Organ_,l_fdate,Bday_,Bplace_,Teld_,Telw_,Telm_,actual_date_,eddr_id_);
 $if KL_PARAMS.CLV $then
   else
      declare
@@ -1768,7 +1764,10 @@ BEGIN
          organ       = Organ_ ,
          bday        = BDay_  ,
          bplace      = BPlace_,
-         date_photo  = nvl(Fdate_, date_photo),
+         date_photo  = case passp_
+                         when 1 then nvl(fdate_,date_photo)
+                         else Fdate_
+                       end,
          actual_date = actual_date_,
          eddr_id     = eddr_id_
    WHERE rnk = rnk_;
