@@ -262,17 +262,6 @@ exception when others then
  end;
 /
 
-PROMPT *** Create  index I4_REZ_CR_FDAT_OKPO ***
-begin   
- execute immediate '
-  CREATE INDEX BARS.I4_REZ_CR_FDAT_OKPO ON BARS.REZ_CR (FDAT, OKPO) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSDYND ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
 PROMPT *** Create  index I1_REZ_CR_FDAT_ACC ***
 begin   
  execute immediate '
@@ -400,6 +389,18 @@ exception when others then
 end;
 /
 COMMENT ON COLUMN REZ_CR.OKPO  IS 'Œ œŒ';
+
+PROMPT *** Create  index I4_REZ_CR_FDAT_OKPO ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I4_REZ_CR_FDAT_OKPO ON BARS.REZ_CR (FDAT, OKPO) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSDYND ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
 
 PROMPT *** Create  grants  REZ_CR ***
 grant SELECT                                                                 on REZ_CR          to BARS_ACCESS_DEFROLE;
