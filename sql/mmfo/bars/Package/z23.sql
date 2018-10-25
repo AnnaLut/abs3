@@ -443,7 +443,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.Z23 IS
                        );
   TYPE accm IS TABLE OF accr INDEX BY BINARY_INTEGER ;
   acct accm   ;
-  acc_ BINARY_INTEGER ;
+  acc_ accounts.acc%type ;
   sa_  number ;
   ddd_ NBU23_REZ.DDD%type;
 
