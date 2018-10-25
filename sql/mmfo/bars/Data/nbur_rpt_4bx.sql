@@ -41,11 +41,11 @@ declare
   l_proc_id     nbur_ref_procs.id%type;
 begin
 
-  l_file_code := '4BX';
+  l_file_code := '44B';
 
   NBUR_FILES.SET_FILE
   ( p_file_id          => l_file_id
-  , p_file_code        => '#4B'
+  , p_file_code        => l_file_code
   , p_scm_code         => 'C'
   , p_file_tp          => '1'                                     
   , p_file_nm          => '4BX -Дані про дотримання вимог щодо достатності регулятивного капіталу та економічних нормативів'
@@ -62,6 +62,10 @@ begin
   );
 
   dbms_output.put_line( 'Created new file #' || to_char(l_file_id) );
+
+  update nbur_ref_files
+    set file_code ='#4B'
+   where file_code ='44B';
 
     NBUR_FILES.SET_FILE_LOCAL
     ( p_kf        => '300465'
