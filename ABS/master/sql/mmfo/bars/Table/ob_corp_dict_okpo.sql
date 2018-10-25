@@ -68,7 +68,7 @@ begin
  execute immediate '
   CREATE UNIQUE INDEX BARS.PK_OB_CORP_DICT_OKPO ON BARS.OB_CORP_DICT_OKPO (REP_ID, OKPO) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSNLI ';
+  TABLESPACE BRSSMLI ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
