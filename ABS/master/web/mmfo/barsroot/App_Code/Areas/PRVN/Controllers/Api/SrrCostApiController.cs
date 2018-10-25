@@ -31,7 +31,7 @@ namespace BarsWeb.Areas.PRVN.Controllers.Api
 
                 List<InsertRowResult> errors = _repo.UploadSrrCostFile(httpPostedFile);
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { hasErrors = errors.Count, errors = errors });
+                return Request.CreateResponse(HttpStatusCode.OK, new { hasErrors = errors.Count, errors = errors }, new MediaTypeHeaderValue("text/json"));
             }
             catch (Exception ex)
             {
