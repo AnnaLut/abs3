@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "PRVN";
+}
+
+<script src="~/Scripts/respond.min.js?14_06_2018__14_58_40"></script>
+<script src="~/Areas/PRVN/Scripts/CommonJS.js?14_06_2018__14_58_40"></script>
+<script src="~/Areas/PRVN/Scripts/SrrCost/Main.js?14_06_2018__14_58_40"></script>
+<link rel="stylesheet" href="~/Areas/PRVN/Css/SrrCost/Main.css?14_06_2018__14_58_40" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<div id="fileUploaderDiv" style="display: inline-block;">
+    <input id="fileUploader" accept=".xlsx" type="file" name="SrrCostFile" />
+</div>
+
+<hr />
+
+<div id="uploadResults" class="invisible">
+    <label>Файл "<label id="errorFileName" style="font-weight:bold;"></label>" завантажено з помилками :</label>
+    <div id="uploadErrors"></div>
+</div>
+

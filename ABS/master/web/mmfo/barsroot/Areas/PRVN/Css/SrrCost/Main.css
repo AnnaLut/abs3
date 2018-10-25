@@ -1,0 +1,97 @@
+.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.search-box {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+    padding: 10px;
+    max-width: 1111px;
+    position: relative;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox {
+    width: 200px;
+}
+
+.page-header {
+    margin: 10px 0px 10px;
+}
+
+.custom-btn {
+    background-size: 85% !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-color: rgb(204, 204, 204);
+    border-radius: 4px !important;
+    margin-left: 3px !important;
+    height: 30px !important;
+    text-align: center !important;
+    line-height: 15px;
+}
+
+    .custom-btn:hover {
+        background-color: lightgray;
+    }
+
+    .custom-btn:active {
+        background-color: gray;
+    }
+
+    .custom-btn:focus {
+        background-color: lightgray;
+    }
+
+.custom-btn-import-add-file {
+    background-position: 4% 50%;
+    background-size: 22px 20px !important;
+    width: auto !important;
+    padding-left: 35px;
+    height: 30px !important;
+}
+
+.custom-btn-import-add-file {
+    background-image: url(/barsroot/Content/images/PureFlat/16/download.png);
+}
+
+.k-upload-status {
+    display: none !important;
+}
+
+#fileUploaderDiv > div > div, #fileUploaderDiv > div, .k-dropzone {
+    /*width: 0px !important;*/
+}
+
+.k-dropzone {
+    padding-left: 0px;
+}
+
+.k-upload-selected {
+    display: none;
+}
+
+.invisible {
+    display: none;
+}
