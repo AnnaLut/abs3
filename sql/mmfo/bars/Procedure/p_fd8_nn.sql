@@ -7,7 +7,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : ѕроцедура формировани€ #D8 дл€  Ѕ (универсальна€)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 03/09/2018 (17/08/2018)
+% VERSION     : 24/10/2018 (10/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетна€ дата
                sheme_ - схема формировани€
@@ -18,6 +18,12 @@ IS
     содержитьс€ в поле RNKA (в RNKB участвующие клиенты нашего банка или
     пустое значение дл€ не клиентов банка)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%10/10/2018 - изменено формирование показател€ 111 дл€ первого транша
+%08/10/2018 - дл€ формировани€ части показател€ "H" дополнительно 
+              определ€ем переменную PD_0_ из NBU23_REZ по ACC счета 
+%13/09/2018 - изменил формирование переменной ND_ACC_ 
+              (было n.nd из ND_ACC сейчас NVL(cc.ndg, cc.nd) из CC_DEAL)
+              изменено формирование показател€ 126 дл€ б/с по ÷Ѕ
 %30/08/2018 - дл€ группы 204 изменено формирование показателей 131 и 132
 %17/08/2018 - добавлена обработка новых типов счетов
               tt.tip:='KSS'; tt.name := 'W4. редит на Ѕѕ ~2203';
@@ -3792,7 +3798,7 @@ BEGIN
           comm_ := 'NDG = ' || to_char(nd_);
 
           BEGIN
-             select n.nd
+             select NVL(cc.ndg, cc.nd)
                 into nd_acc_
              from nd_acc n, cc_deal cc 
              where n.acc = acc_
@@ -4383,13 +4389,14 @@ BEGIN
                    END;
                 end if;
 
-                if fin_ = '0'
-                then
+                --if fin_ = '0'
+                --then
                    BEGIN
                       select pd_0, NVL(s080_z, s080),
                              --decode(NVL(s250_23,'0'), '8', '0', s080)
-                             s080
-                         into pd_0_, s080_, fin_
+                             s080,
+                             NVL(s250_23,'0')
+                         into pd_0_, s080_, fin_, s250_23_ 
                       from nbu23_rez
                       where fdat = dat23_
                         and acc = acc_
@@ -4397,7 +4404,7 @@ BEGIN
                    EXCEPTION WHEN NO_DATA_FOUND THEN
                       null;
                    END;
-                end if;
+                --end if;
 
                 --if p070_ like '351%'
                 --OR p070_ like '355%'
@@ -4855,9 +4862,12 @@ BEGIN
                                               begin
                                                  select min(t.fdat)
                                                     into p111_
-                                                 from cc_trans_dat t, nd_acc n
-                                                 where t.acc = n.acc
-                                                   and n.nd = nd_acc_;
+                                                 from cc_trans_dat t
+                                                 where t.acc = acc_
+                                                   and exists ( select 1
+                                                                from nd_acc n
+                                                                where n.nd = nd_acc_
+                                                              );
                                               exception when no_data_found then
                                                  p111_ := k.p111;
                                               end;
@@ -5341,7 +5351,7 @@ BEGIN
                                                      and kol_351 <> 0
                                                      and rownum = 1;
                                                 EXCEPTION WHEN NO_DATA_FOUND THEN
-                                                   s190_ := 1;
+                                                   s190_ := 0;
                                                 END;
                                              END;
                                           END;
