@@ -4,7 +4,8 @@ declare
   l_file_code   nbur_ref_files.file_code%type;
   l_proc_id     nbur_ref_procs.id%type;
 begin
-
+  bc.home;
+  
   l_file_code := '79X';
 
   select *
@@ -86,8 +87,8 @@ begin
         to_char(Q007_4, ''dd.mm.yyyy'') as Q007_4, 
         Q003_1, Q003_2, Q003_3, 
         T070_1, T070_2, T070_3, T070_4, 
-        trim(to_char(T090_1, ''0.00'')) as T090_1, 
-        trim(to_char(T090_2, ''0.0000'')) as T090_2
+        trim(to_char(T090_1, ''990.00'')) as T090_1, 
+        trim(to_char(T090_2, ''990.0000'')) as T090_2
 from nbur_log_f79X 
 where report_date = :p_rpt_dt
            and kf = :p_kf ', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
