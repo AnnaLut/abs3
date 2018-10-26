@@ -337,7 +337,210 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  constraint FK_INSDEALS_BRANCH_BRANCH ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_BRANCH_BRANCH foreign key (BRANCH)
+      references BRANCH (BRANCH)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
 
+
+PROMPT *** Create  constraint FK_INSDEALS_GRTID_GRTDEALS ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_GRTID_GRTDEALS foreign key (GRT_ID)
+      references GRT_DEALS (DEAL_ID)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_ND_CCDEAL ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_ND_CCDEAL foreign key (ND)
+      references CC_DEAL (ND)
+      deferrable
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_NEWID_INSDEALS ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_NEWID_INSDEALS foreign key (RENEW_NEWID, KF)
+      references INS_DEALS (ID, KF)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_OT_OBJTYPES_ID ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_OT_OBJTYPES_ID foreign key (OBJECT_TYPE)
+      references INS_OBJECT_TYPES (ID)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_PARTNERTYPES ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_PARTNERTYPES foreign key (PARTNER_ID, TYPE_ID, KF)
+      references INS_PARTNER_TYPES (PARTNER_ID, TYPE_ID, KF)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_PF_FREQ ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_PF_FREQ foreign key (PAY_FREQ)
+      references FREQ (FREQ)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_RNK_CUSTOMER ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_RNK_CUSTOMER foreign key (RNK)
+      references CUSTOMER (RNK)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_SKV_TABVAL ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_SKV_TABVAL foreign key (SUM_KV)
+      references TABVAL$GLOBAL (KV)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_STFID_STAFF ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_STFID_STAFF foreign key (STAFF_ID)
+      references STAFF$BASE (ID)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+
+PROMPT *** Create  constraint FK_INSDEALS_STSID_STATUSES ***
+begin   
+  execute immediate '
+    alter table INS_DEALS
+      add constraint FK_INSDEALS_STSID_STATUSES foreign key (STATUS_ID)
+      references INS_DEAL_STATUSES (ID)
+      novalidate
+  ';
+exception when others then
+  if  sqlcode in (-2260,-2261,-2264,-2275,-1442) 
+    then null; 
+  else 
+    raise; 
+  end if;
+end;
+/
+  
+  
+PROMPT *** Disable  constraint fk_insdeals_grtid_grtdeals ***
+begin   
+ execute immediate 'alter table ins_deals disable constraint fk_insdeals_grtid_grtdeals';
+end;
+/
 
 PROMPT *** Create  grants  INS_DEALS ***
 grant SELECT                                                                 on INS_DEALS       to BARSREADER_ROLE;
