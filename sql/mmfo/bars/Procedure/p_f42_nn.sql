@@ -14,14 +14,20 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :  06/09/2018 (05/05/2018)
+% VERSION     : 23/10/2018 (06/08/2018)
 %------------------------------------------------------------------------
+% 23/10/2018 - показгник A10000000 буде формуватися в блоці де формується 
+%              показник 02NNNN000     
+%              показгник A20000000 буде формуватися в блоці де формується 
+%              показник 04NNNN000     
+% 03/08/2018 - c 03.08.2018 будет формироваться новый показатель 
+%              'A90000000'
 % 02/03/2017 - для МФО=380388 (Платинум банк) изменил признак PR_BANK
 %              со значения "T" (временнаяй адм.) на "Л" (ликвидация)
 %              с даты 24.02.2017
 % 15/02/2017 - для МФО=380388 (Платинум банк) изменил дату действия
 %              временной адм. на 01.10.2017
-%              для показателей 073-080 будем вічитать сумму резерва
+%              для показателей 073-080 будем в_читать сумму резерва
 % 20/01/2017 - из расчета суммы резерва по контрагенту (табл. OTC_C5_PROC)
 %              исключаем бал.счет 3570
 % 19/12/2016 - из расшифровки убрал 9129 с R013 <> '1'
@@ -43,15 +49,18 @@ IS
    dat_Zm1_   DATE := TO_DATE('01042006','ddmmyyyy'); -- формуються новi показники 61NNNN, 62NNNN, 630000
    dat_Zm2_   DATE := TO_DATE('19112009','ddmmyyyy'); -- формується новий показник 71NNNN
    dat_Zm3_   DATE := TO_DATE('19072010','ddmmyyyy'); -- формується новий показник 82NNNN
-   dat_Zm4_   DATE := TO_DATE('24042015','ddmmyyyy'); -- формуються нові показники
-                                                      -- 98NNNNVVV, 99NNNNVVV і нова
+   dat_Zm4_   DATE := TO_DATE('24042015','ddmmyyyy'); -- формуються нов_ показники
+                                                      -- 98NNNNVVV, 99NNNNVVV _ нова
                                                       -- структура показника
    dat_Zm5_   DATE := TO_DATE('15062015','ddmmyyyy'); -- не будуть формуватися показники 03NNNN000
                                                       --  41NNNN000,42NNNN000,43NNNN000,62NNNN000,
                                                       --  65NNNN000,66NNNN000,94NNNN000,96NNNN000
-   dat_Zm6_   DATE := TO_DATE('12112015','ddmmyyyy'); -- формуються нові показники
+   dat_Zm6_   DATE := TO_DATE('12112015','ddmmyyyy'); -- формуються нов_ показники
                                                       -- A00000000, A10000000, A20000000
+   dat_Zm7_   DATE := TO_DATE('02082018','ddmmyyyy'); -- формується новий показник
+                                                      -- A90000000 
 
+   datz_      date := Dat_Next_U(dat_, 1);
    pr_bank    VARCHAR2 (1);
    k041_      VARCHAR2 (1);
    k042_      VARCHAR2 (1);
@@ -72,6 +81,7 @@ IS
    ddd_       VARCHAR2 (3);
    r012_      VARCHAR2 (1);
    r013_      VARCHAR2 (1);
+   r011_      VARCHAR2 (1);   
    r050_      VARCHAR2 (2);
    kv_        SMALLINT;
    kvp_       SMALLINT;
@@ -251,6 +261,7 @@ IS
                     NVL(d.groupname, c.nmk),
                     DECODE (c.PRINSIDER, NULL, 2, 0, 2, 99, 2, 1)) a
     ) s
+    where s.rnk <> 90092301
     group by  s.ddd, s.rnk, s.link_code, s.link_name, s.prins
     order by ddd, znap desc;
     -------------------------------------------------------------------------
@@ -361,7 +372,7 @@ BEGIN
 
    if cnt_ = 0 then
       raise_application_error(-20001, 'Файл #C5 за '||to_char(dat_, 'dd/mm/yyyy')||
-      ' ще не сформовано! Сформуйте #C5, а потім ще раз запустіть формування #42!');
+      ' ще не сформовано! Сформуйте #C5, а пот_м ще раз запуст_ть формування #42!');
    end if;
 
    execute immediate('alter session set nls_numeric_characters=''.,''');
@@ -377,7 +388,7 @@ BEGIN
    EXECUTE IMMEDIATE 'truncate table otcn_f42_temp';
    EXECUTE IMMEDIATE 'truncate table otcn_f42_zalog';
    EXECUTE IMMEDIATE 'TRUNCATE TABLE otcn_fa7_temp';
-
+   EXECUTE IMMEDIATE 'TRUNCATE TABLE TMP_KOD_R020';
 -------------------------------------------------------------------
 -- свой МФО
    mfo_ := F_Ourmfo ();
@@ -398,16 +409,16 @@ BEGIN
       SELECT r020
         FROM kl_r020
        WHERE trim(prem) = 'КБ'
-         AND LOWER (txt) LIKE '%прострочені нарах%доход%'
+         AND LOWER (txt) LIKE '%прострочен_ нарах%доход%'
          AND t020 = '1';
 
-   -- тип банку (0 - універсальний, 1 - спеціалізований ощадний)
+   -- тип банку (0 - ун_версальний, 1 - спец_ал_зований ощадний)
    flag_ := F_Get_Params ('NORM_TPB', 0);
 
-   -- відсоток негативно класифікованих активів у відповідній групі активів
+   -- в_дсоток негативно класиф_кованих актив_в у в_дпов_дн_й груп_ актив_в
    IF flag_ > 0 THEN
          vNKA_ := F_Get_Params ('NOR_NKA', 0);
-   ELSE  -- для універсального банку не має значення
+   ELSE  -- для ун_версального банку не має значення
          vNKA_ := 0;
    END IF;
 
@@ -488,36 +499,36 @@ BEGIN
       IF kodf_ IS NOT NULL AND userid_ IS NOT NULL THEN
          p_ins(' -------------------------------- Формування #42 файлу  --------------------------------- ', NULL);
 
-         p_ins('Тип банку -  '|| (CASE flag_ WHEN 0 THEN  'універсальний' ELSE 'ощадний' END), NULL);
+         p_ins('Тип банку -  '|| (CASE flag_ WHEN 0 THEN  'ун_версальний' ELSE 'ощадний' END), NULL);
 
          IF vNKA_ > 0 THEN
-             p_ins('Відсоток негативно-класифікованих активів: '||TO_CHAR(vNKA_), NULL);
+             p_ins('В_дсоток негативно-класиф_кованих актив_в: '||TO_CHAR(vNKA_), NULL);
          END IF;
 
          p_ins(' --------------------------------- НОРМАТИВИ --------------------------------- ',NULL);
 
          p_ins('Регулятивний капiтал (РК1): ', sum_k_);
 
-         p_ins('Показник 01 та 41 ('||TO_CHAR(k1_*100)||'% від РК1): ',sum_k_ * k1_);
+         p_ins('Показник 01 та 41 ('||TO_CHAR(k1_*100)||'% в_д РК1): ',sum_k_ * k1_);
 
-         p_ins('Показник 02 (10% від РК1): ',sum_k_ * 0.1);
+         p_ins('Показник 02 (10% в_д РК1): ',sum_k_ * 0.1);
 
-         p_ins('Показник 42 ('||TO_CHAR(k2_*100)||'% від РК1): ',sum_k_ * k2_);
+         p_ins('Показник 42 ('||TO_CHAR(k2_*100)||'% в_д РК1): ',sum_k_ * k2_);
 
-         p_ins('Показник 06  (15% від РК1): ',sum_k_ * 0.15);
+         p_ins('Показник 06  (15% в_д РК1): ',sum_k_ * 0.15);
 
          IF flag_>0 THEN
-           p_ins('Показник 61 (20% від РК1): ',sum_k_ * 0.2);
+           p_ins('Показник 61 (20% в_д РК1): ',sum_k_ * 0.2);
          END IF;
 
          p_ins(' ----------------------------------------------------------------------------------------- ',NULL);
 
          p_ins('Статутний капiтал: ', sum_SK_);
 
-         p_ins('Показник 03 ('||TO_CHAR(k2_*100)||'% від статутного капiталу): ',sum_SK_ * k2_);
+         p_ins('Показник 03 ('||TO_CHAR(k2_*100)||'% в_д статутного капiталу): ',sum_SK_ * k2_);
 
          IF k3_ <> 0 THEN
-            p_ins('Показник 63 ('||TO_CHAR(k3_*100)||'% від статутного капiталу): ',sum_SK_ * k3_);
+            p_ins('Показник 63 ('||TO_CHAR(k3_*100)||'% в_д статутного капiталу): ',sum_SK_ * k3_);
          END IF;
 
          p_ins('Показник 72  (15% в_д статутного капiталу): ',sum_SK_ * 0.15);
@@ -1075,8 +1086,16 @@ BEGIN
                   INSERT INTO RNBU_TRACE
                               (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm
                               )
-                       VALUES (nlsp_, 0, dat_, kodp_, to_char(ABS (se_) - s_zal_), rnk_, rnk_, link_code_, comm_
+                       VALUES (nlsp_, 0, dat_, kodp_, to_char(ABS (se_)), rnk_, rnk_, link_code_, comm_
                               );
+
+                  IF dat_ >= dat_Zm6_ and s_zal_ <> 0 THEN
+                     kodp_ := 'A1' || '0000' || '000';
+                      
+                        INSERT INTO RNBU_TRACE
+                                 (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
+                          VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
+                  END IF;
                 END IF;
 
                 -- показник 41
@@ -1164,7 +1183,15 @@ BEGIN
 
                    INSERT INTO RNBU_TRACE
                                (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm )
-                   VALUES (nlsp_, 0, dat_, kodp_, to_char(ABS (se_) - s_zal_), rnk_, rnk_, link_code_, comm_);
+                   VALUES (nlsp_, 0, dat_, kodp_, to_char(ABS (se_)), rnk_, rnk_, link_code_, comm_);
+
+                   IF dat_ >= dat_Zm6_ and s_zal_ <> 0 THEN
+                      kodp_ := 'A2' || '0000' || '000';
+                      
+                         INSERT INTO RNBU_TRACE
+                                  (nls, kv, odate, kodp, znap, rnk, ref, nbuc, comm)
+                           VALUES (nlsp_, 0, dat_, kodp_,  TO_CHAR (s_zal_), null, rnk_, link_code_, comm_);
+                   END IF;
 
                    -- з 21.12.2005 перевищення 5% Статутного капiталу банку
                    IF ((dat_ >= dat_Zm_ AND ABS (se_) > ROUND (sum_SK_ * k2_, 0)) OR
@@ -1770,21 +1797,19 @@ BEGIN
 
             EXECUTE IMMEDIATE sql_ USING dat_;
 
-
             for k in (select *
                       from otcn_f42_cp
                       where fdat = dat_
                         and substr(nls,4,1)<>'8'
                       )
                 loop
-
                    begin
-                      select r013, s240
-                         into r013_, s240_
+                      select r011, s240
+                         into r011_, s240_
                       from specparam
                       where acc=k.acc;
                    exception when no_data_found then
-                      r013_ := '0';
+                      r011_ := '0';
                       s240_ := '0';
                    end;
 
@@ -1800,11 +1825,13 @@ BEGIN
 
                    if znap_ <> 0
                    then
-                      if ((substr(k.nls,1,4) in ('1410','1420',
+                      if ( (substr(k.nls,1,4) in ('1410','1420',
                                                  '1430','1435','1436','1437',
                                                  '1440','1446','1447')) or
-                          (substr(k.nls,1,4) in ('1415','1416','1417','1426','1427') and r013_ not in ('3','9'))) and
-                          k.kodp is null
+                           (substr(k.nls,1,4) in ('1415','1416','1417','1426','1427') and r013_ not in ('3','9'))
+                         ) 
+                          and s240_ <= '5'
+                          and k.kodp is null
                       then
                          insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, ref, acc)
                          VALUES (k.nls, k.kv, dat_, kodp_, znap_, k.rnk, k.rnk, k.acc);
@@ -1845,6 +1872,58 @@ BEGIN
                    end if;
                 end loop;
          end if;
+      end if;
+-----------------------------------------------------------------------------
+      -- формирование нового кода A90000000 з 03.08.2018
+      if dat_ >= dat_Zm7_   
+      then
+
+         insert /*+ append */
+            into TMP_KOD_R020
+         SELECT r020
+         FROM kod_r020
+         WHERE a010 = 'C5'
+           AND trim(prem) = 'КБ'
+           AND r020 like '14%'
+           AND d_open between TO_DATE ('01011997', 'ddmmyyyy') and datz_
+           and (d_close is null or
+                d_close > datz_);
+
+         sql_acc_ := 'SELECT *
+                      FROM ACCOUNTS a
+                      WHERE nvl(a.nbs, SUBSTR (a.nls, 1, 4)) in ( SELECT r020
+                                                                  FROM tmp_kod_r020
+                                                                )';
+
+         ret_ := BARS.F_POP_OTCN( dat_, 1, sql_acc_, null, 0, 1);
+
+         for k in ( SELECT /*+ PARALLEL(8) */
+                       a.acc, NVL(a.nbs, substr(a.nls,1,4)), a.nls, a.kv, 
+                       a.FDAT, NVL(p.r011, '0') r011, 
+                       c.rnk rnk, c.mdate, 
+                       sum(decode(a.kv, 980, a.ost, a.ostq)) ost
+                    FROM OTCN_SALDO a, otcn_acc c, SPECPARAM p
+                    WHERE a.ost <> 0
+                      and a.acc=c.acc
+                      and a.acc = p.acc(+)
+                      and a.nbs is null 
+                      and substr(a.nls,4,1) <> '8'
+                      and NVL (p.r011, '0') in ('C','D')
+                    GROUP BY a.acc, NVL(a.nbs, substr(a.nls,1,4)), a.nls, a.kv, 
+                             a.FDAT, NVL(p.r011, '0'),
+                             c.rnk, c.mdate 
+                  )
+            loop
+
+               if k.mdate - Dat_ < 183 
+               then
+                  kodp_ := 'A90000000';
+                  znap_ := -k.ost;
+                  insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc, mdate)
+                  VALUES (k.nls, k.kv, dat_, kodp_, znap_, k.rnk, k.acc, k.mdate);
+               end if;
+
+            end loop;
       end if;
       -----------------------------------------------------------------------
    end if;
@@ -1926,22 +2005,22 @@ BEGIN
     end loop;
 
     -- c 12.11.2015 формирование новых кодов A10000000, A20000000
-    if dat_ >= dat_Zm6_
-    then
-       for k in ( select r1.nls, r1.kv, decode(substr(r2.kodp,1,2),'02','A1','A2') ddd,
-                         r1.kodp, r1.znap, r1.acc, r1.rnk
-                  from rnbu_trace r1, rnbu_trace r2
-                  where r1.rnk = r2.rnk
-                    and substr(r1.kodp,1,2) in ('47','51')
-                    and substr(r2.kodp,1,2) in ('02','04')
-                )
-       loop
-          kodp_ := k.ddd || '0000' || '000';
+    --if dat_ >= dat_Zm6_
+    --then
+    --   for k in ( select r1.nls, r1.kv, decode(substr(r2.kodp,1,2),'02','A1','A2') ddd,
+    --                     r1.kodp, r1.znap, r1.acc, r1.rnk
+    --              from rnbu_trace r1, rnbu_trace r2
+    --              where r1.rnk = r2.rnk
+    --                and substr(r1.kodp,1,2) in ('47','51')
+    --                and substr(r2.kodp,1,2) in ('02','04')
+    --           )
+    --   loop
+    --      kodp_ := k.ddd || '0000' || '000';
 
-          insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc)
-          VALUES (k.nls, k.kv, dat_, kodp_, k.znap, k.rnk, k.acc);
-       end loop;
-    end if;
+    --      insert into rnbu_trace(nls, kv, odate, kodp, znap, rnk, acc)
+    --      VALUES (k.nls, k.kv, dat_, kodp_, k.znap, k.rnk, k.acc);
+    --   end loop;
+    --end if;
 
     IF type_ = 0
     THEN
