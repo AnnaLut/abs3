@@ -409,7 +409,7 @@ end ins_pack;
 CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
 
   -- Private constant declarations
-  g_body_version  constant varchar2(64) := 'version 3.0 07/07/2017';
+  g_body_version  constant varchar2(64) := 'version 3.1 25/10/2018';
   g_awk_body_defs constant varchar2(512) := '';
 --3.0
 --исправлены мелкие ошибки при создании договоров страхования (форматы дат и т.п.)
@@ -1394,6 +1394,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.INS_PACK is
                     l_deal_id);
 
     return l_deal_id;
+  exception
+    when others then
+      bars_audit.info(g_modcode||'.create_deal error '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      raise_application_error(-20001, 'Помилка створення СД '||chr(10)||sqlerrm);
   end create_deal;
 
   -- Визначення чи є зміни у дод. угоді (0/1)
