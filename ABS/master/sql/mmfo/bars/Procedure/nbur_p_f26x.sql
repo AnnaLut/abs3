@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования 26X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.003  19/10/2018 (03/10/2018)
+% VERSION     :  v.18.004  25/10/2018 (19/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.003    19.10.2018';
+  ver_                     char(30)  := 'v.18.004    25.10.2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -133,7 +133,8 @@ BEGIN
     pivot (max(field_value) for seg_01 in ('97' as K180, '98' as Q001))) a
     left outer join
     -- інформація про рахунки та залишки
-    (select F033, R020, R030, R011, R013, S181, S245, S580,  
+    (select (case when R020 = '1500' then F033 else '0' end) as F033, 
+           R020, R030, R011, R013, S181, S245, S580,  
            (case when DEBG is not null then '1' else '2' end) T020, 
            nvl(DEBG, 0) + nvl(KREG, 0) T070, nvl(DEBV, 0) + nvl(KREV, 0) T071,
            CUST_ID, ACC_ID, ACC_NUM, KV, BRANCH
