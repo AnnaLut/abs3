@@ -141,7 +141,7 @@ begin
       select bars_sqnc.get_nextval('s_dpt_deposit_clos') into l_idupd from dual;
 
       insert into dpt_deposit_clos
-        (idupd, deposit_id, nd, vidd, acc, kv, rnk,
+        (idupd, kf, deposit_id, nd, vidd, acc, kv, rnk,
          freq, datz, dat_begin, dat_end, dat_end_alt,
          mfo_p, nls_p, name_p, okpo_p,
          dpt_d, acc_d, mfo_d, nls_d, nms_d, okpo_d,
@@ -149,7 +149,7 @@ begin
          action_id, actiion_author, "WHEN", bdate, stop_id,
          cnt_dubl, cnt_ext_int, dat_ext_int, userid, archdoc_id, forbid_extension, branch, wb)
       values
-        (l_idupd,:new.deposit_id,:new.nd,:new.vidd,:new.acc,:new.kv,:new.rnk,
+        (l_idupd, :new.kf, :new.deposit_id,:new.nd,:new.vidd,:new.acc,:new.kv,:new.rnk,
          :new.freq,:new.datz,:new.dat_begin,:new.dat_end,:new.dat_end_alt,
          :new.mfo_p,:new.nls_p,:new.name_p,:new.okpo_p,
          :new.dpt_d,:new.acc_d,:new.mfo_d,:new.nls_d,:new.nms_d,:new.okpo_d,
