@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" ReportInfo.Version="0.2.3" ReportInfo.Created="04/18/2013 18:20:22" ReportInfo.Modified="03/03/2015 16:38:35" ReportInfo.CreatorVersion="2013.2.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" ReportInfo.Version="0.2.3" ReportInfo.Created="04/18/2013 18:20:22" ReportInfo.Modified="09/04/2018 09:45:25" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -202,7 +202,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9SEZoacNJntaKIKp6mVF18t3N5WTocA0ARXAZ2I9tsXqxlsPHbqkZZ8j2333FaUp7NEZKfwRzqgcHIjxaWbZy9x98Jy+6yFJZwF+BHWvDOs=">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Q8QBxubLDgd9RgEqduFggFLtlBO3nHwTfviYSl4ORGBa9sR1UFJnTQ8bjWA/LW9fVxtfmq6pTAwEWYUXp6y3iFJRtOHsrkltzGE1zW+ld6K">
       <TableDataSource Name="Table" Alias="BUH_MODEL" DataType="System.Int32" Enabled="true" SelectCommand="SELECT o.tt,o.dk,a.nls,a.kv,t.dig, trunc(o.fdat) fdat1,o.s/t.denom,gl.p_icurval(a.kv, o.s, o.fdat)/100,o.txt,r.nls,r.kv&#13;&#10;                                             FROM opldok o, accounts a, tabval$global t, accounts r &#13;&#10;                                             WHERE t.kv=a.kv and a.acc=o.acc and r.acc(+)=a.accc and o.ref=:p_ref and o.sos is not null&#13;&#10;                                             ORDER BY o.fdat, a.kv, o.stmt, o.tt, o.dk">
         <Column Name="TT" DataType="System.String"/>
         <Column Name="DK" DataType="System.Int16"/>
@@ -230,13 +230,13 @@ namespace FastReport
         <CommandParameter Name="p_ref" DataType="113" Expression="[p_ref_c]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_ref_c" DataType="System.Int32" Expression="38382201"/>
+    <Parameter Name="p_ref_c" DataType="System.Int64" Expression="144055050811"/>
     <Parameter Name="p_buh_c" DataType="System.Int32" Expression="0"/>
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" TopMargin="5" RightMargin="5" BottomMargin="5" FirstPageSource="15" OtherPagesSource="15" Guides="75.98,162.92,9.45,75.6,162.54,275.94,275.56,341.71,342.09,464.94,464.56,589.3,710.64,708.75,340.2,585.9" StartPageEvent="_StartReport">
     <ReportTitleBand Name="ReportTitle1" Width="737.1" Height="28.35" CanGrow="true" CanShrink="true" BeforePrintEvent="ReportTitle1_BeforePrint"/>
-    <DataBand Name="Data1" Top="33.68" Width="737.1" Height="387.45" CanGrow="true" CanShrink="true" BeforePrintEvent="Data1_AfterPrint">
-      <TableObject Name="Table1" Width="359.1" Height="349.65" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
+    <DataBand Name="Data1" Top="30.39" Width="737.1" Height="488.64" CanGrow="true" CanShrink="true" BeforePrintEvent="Data1_AfterPrint">
+      <TableObject Name="Table1" Width="359.1" Height="482.7" Border.Lines="Bottom" Border.Style="Dot" Border.Width="0.25" GrowToBottom="true">
         <TableColumn Name="Column1" Width="35.91"/>
         <TableColumn Name="Column2" Width="35.91"/>
         <TableColumn Name="Column3" Width="35.91"/>
@@ -283,8 +283,8 @@ namespace FastReport
           <TableCell Name="Cell39" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell40" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row4" Height="9.45">
-          <TableCell Name="Cell16" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного підрозділу банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row4" Height="17.32">
+          <TableCell Name="Cell16" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного &#13;&#10;підрозділу уповноваженого банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell17" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell18" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell19" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
@@ -380,13 +380,13 @@ namespace FastReport
           <TableCell Name="Cell110" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row12" Height="9.45">
-          <TableCell Name="Cell111" Border.Lines="All" Border.Width="0.25" Text="Назва валюти та  Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell111" Border.Lines="All" Border.Width="0.25" Text="(назва валюти та сума)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
           <TableCell Name="Cell112" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell113" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell114" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell115" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell116" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell117" Border.Lines="All" Border.Width="0.25" Text="Назва валюти  та   Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell117" Border.Lines="All" Border.Width="0.25" Text="(назва валюти та сума)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
           <TableCell Name="Cell118" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell119" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell120" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
@@ -452,7 +452,7 @@ namespace FastReport
           <TableCell Name="Cell170" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row18" Height="9.45">
-          <TableCell Name="Cell171" Text="   Клiєнт:  &lt;b&gt;&lt;i&gt; [Tag(&quot;OPayer&quot;)]&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell171" Text="   Клiєнт**:  &lt;b&gt;&lt;i&gt; [Tag(&quot;OPayer&quot;,IFF_SummB(150000))] &lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
           <TableCell Name="Cell172" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell173" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell174" VertAlign="Center" Font="Arial, 6pt"/>
@@ -475,7 +475,7 @@ namespace FastReport
           <TableCell Name="Cell189" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell190" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row20" Height="9.45" AutoSize="true">
+        <TableRow Name="Row20" Height="13.02">
           <TableCell Name="Cell191" Text="Сума збору на обов’язкове державне пенсійне страхування: &lt;b&gt;&lt;i&gt;[Tag(&quot;SUM_05K&quot;)] UAH ( [Tag(&quot;SUM_05KLit&quot;)]  )&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
           <TableCell Name="Cell192" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell193" VertAlign="Center" Font="Arial, 6pt"/>
@@ -487,7 +487,7 @@ namespace FastReport
           <TableCell Name="Cell199" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell200" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row21" Height="9.45" AutoSize="true">
+        <TableRow Name="Row21" Height="11.49">
           <TableCell Name="Cell201" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="&lt;i&gt;  [Tag(&quot;DR_PASPV&quot;,IFF_SummB(150000))]  [Tag(&quot;DR_PASPN&quot;,IFF_SummB(150000))] &lt;/i&gt; &lt;i&gt;[Tag(&quot;DR_ATRT&quot;,IFF_SummB(150000))]&lt;/i&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
           <TableCell Name="Cell202" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell203" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
@@ -499,8 +499,8 @@ namespace FastReport
           <TableCell Name="Cell209" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell210" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row23" Height="9.45">
-          <TableCell Name="Cell221" Text="(зазначаються додаткові реквізити, необхідні для проведення валютно-обмінних операцій)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row23" Height="20.43">
+          <TableCell Name="Cell221" Text="Додаткові реквізити ________________________________________________________&#13;&#10;                                      (реквізити, необхідні для проведення валютно-обмінних операцій)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell222" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell223" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell224" VertAlign="Center" Font="Arial, 6pt"/>
@@ -523,8 +523,8 @@ namespace FastReport
           <TableCell Name="Cell239" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell240" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row25" Height="9.45">
-          <TableCell Name="Cell241" Text="Пiдпис клiєнта  ____________________" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row25">
+          <TableCell Name="Cell241" Text="_________________________________&#13;&#10;                             (підпис клієнта)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell242" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell243" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell244" VertAlign="Center" Font="Arial, 6pt"/>
@@ -535,8 +535,8 @@ namespace FastReport
           <TableCell Name="Cell249" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell250" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row26" Height="9.45">
-          <TableCell Name="Cell251" Text="Надаю згоду на проведення операції з купівлі іноземної валюти без оформлення " VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row26" Height="21.88">
+          <TableCell Name="Cell251" Text="Надаю згоду на проведення валютно-обмінної операції без оформлення першого примірника квитанції про здійснення валютно-обмінної операції (примірника клієнта)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell252" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell253" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell254" VertAlign="Center" Font="Arial, 6pt"/>
@@ -547,8 +547,44 @@ namespace FastReport
           <TableCell Name="Cell259" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell260" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row27" Height="9.45">
-          <TableCell Name="Cell261" Text="довідки-certificate за формою № 377" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row168" Height="8.55">
+          <TableCell Name="Cell1671"/>
+          <TableCell Name="Cell1672"/>
+          <TableCell Name="Cell1673"/>
+          <TableCell Name="Cell1674"/>
+          <TableCell Name="Cell1675"/>
+          <TableCell Name="Cell1676"/>
+          <TableCell Name="Cell1677"/>
+          <TableCell Name="Cell1678"/>
+          <TableCell Name="Cell1679"/>
+          <TableCell Name="Cell1680"/>
+        </TableRow>
+        <TableRow Name="Row167" Height="10.97">
+          <TableCell Name="Cell1661"/>
+          <TableCell Name="Cell1662"/>
+          <TableCell Name="Cell1663"/>
+          <TableCell Name="Cell1664"/>
+          <TableCell Name="Cell1665"/>
+          <TableCell Name="Cell1666" Border.Lines="Top" Border.Style="Dot" Border.Width="0.25" Text="(підпис клієнта проставляється " HorzAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1667"/>
+          <TableCell Name="Cell1668"/>
+          <TableCell Name="Cell1669"/>
+          <TableCell Name="Cell1670"/>
+        </TableRow>
+        <TableRow Name="Row166" Height="11.26">
+          <TableCell Name="Cell1651"/>
+          <TableCell Name="Cell1652"/>
+          <TableCell Name="Cell1653"/>
+          <TableCell Name="Cell1654"/>
+          <TableCell Name="Cell1655"/>
+          <TableCell Name="Cell1656" Text="в разі надання такої згоди)" HorzAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1657"/>
+          <TableCell Name="Cell1658"/>
+          <TableCell Name="Cell1659"/>
+          <TableCell Name="Cell1660"/>
+        </TableRow>
+        <TableRow Name="Row27">
+          <TableCell Name="Cell261" Text="Надаю згоду на проведення операції з купівлі іноземної валюти без оформлення довідки-certificate за формою № 377" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell262" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell263" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell264" VertAlign="Center" Font="Arial, 6pt"/>
@@ -575,9 +611,7 @@ namespace FastReport
           <TableCell Name="Cell281" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell282" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell283" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell284" VertAlign="Center" Font="Arial, 6pt">
-            <LineObject Name="Line1" Left="1.89" Width="-39.31" Diagonal="true"/>
-          </TableCell>
+          <TableCell Name="Cell284" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell285" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell286" Text="(підпис клієнта-нерезидента проставляється " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
           <TableCell Name="Cell287" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
@@ -598,7 +632,9 @@ namespace FastReport
           <TableCell Name="Cell300" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row31" Height="9.45">
-          <TableCell Name="Cell301" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell301" VertAlign="Center" Font="Arial, 6pt">
+            <PictureObject Name="Picture1" Width="360.61" Height="28.35" CanGrow="true" CanShrink="true" DataColumn="PICT.PICT"/>
+          </TableCell>
           <TableCell Name="Cell302" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell303" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell304" VertAlign="Center" Font="Arial, 6pt"/>
@@ -622,31 +658,31 @@ namespace FastReport
           <TableCell Name="Cell320" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row33" Height="9.45">
-          <TableCell Name="Cell321" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell321" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
           <TableCell Name="Cell322" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell323" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell324" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell325" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell326" Text="Місце для відбитка штампа" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell326" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
           <TableCell Name="Cell327" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell328" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell329" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell330" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row34" Height="9.45">
-          <TableCell Name="Cell331" Text="підпис працівника (ів) банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell331" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell332" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell333" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell334" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell335" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell336" VertAlign="Center" Font="Arial, 6pt"/>
+          <TableCell Name="Cell336" Text="Місце для відбитка штампа***" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
           <TableCell Name="Cell337" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell338" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell339" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell340" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row35" Height="9.45">
-          <TableCell Name="Cell341" VertAlign="Center" Font="Arial, 6pt"/>
+        <TableRow Name="Row35" Height="8.68">
+          <TableCell Name="Cell341" Border.Lines="Top" Border.Style="Dash" Border.Width="0.25" Text="підпис працівника (ів) уповноваженого банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
           <TableCell Name="Cell342" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell343" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell344" VertAlign="Center" Font="Arial, 6pt"/>
@@ -658,7 +694,7 @@ namespace FastReport
           <TableCell Name="Cell350" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row36" Height="9.45">
-          <TableCell Name="Cell351" Text="* Здійснення операції з купівлі у фізичної особи-нерезидента готівкової іноземної алюти без оформлення довідки-certificate за формою № 377 не дає підстав для воротного обміну.&#13;&#10;" VertAlign="Center" Font="Arial, 6pt" ColSpan="10" RowSpan="3"/>
+          <TableCell Name="Cell351" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell352" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell353" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell354" VertAlign="Center" Font="Arial, 6pt"/>
@@ -669,20 +705,8 @@ namespace FastReport
           <TableCell Name="Cell359" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell360" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row37" Height="9.45">
-          <TableCell Name="Cell361" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell362" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell363" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell364" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell365" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell366" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell367" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell368" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell369" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell370" VertAlign="Center" Font="Arial, 6pt"/>
-        </TableRow>
-        <TableRow Name="Row38" Height="9.45">
-          <TableCell Name="Cell371" VertAlign="Center" Font="Arial, 6pt"/>
+        <TableRow Name="Row38" Height="66.15">
+          <TableCell Name="Cell371" Text="* Здійснення операції з купівлі у фізичної особи-нерезидента готівкової іноземної валюти без оформлення довідки-certificate за формою № 377 не дає підстав для зворотного обміну.&#13;&#10;** Реквізити заповнюються під час здійснення валютно-обмінної операції на суму, що дорівнює чи перевищує в еквіваленті 150000 гривень.&#13;&#10;*** Не проставляється для другого примірника квитанції, що оформлений банком у вигляді електронного документа." VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell372" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell373" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell374" VertAlign="Center" Font="Arial, 6pt"/>
@@ -694,7 +718,7 @@ namespace FastReport
           <TableCell Name="Cell380" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="Table7" Left="376.89" Width="359.1" Height="368.55" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
+      <TableObject Name="Table7" Left="376.89" Width="359.1" Height="483.27" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
         <TableColumn Name="Column11" Width="35.91"/>
         <TableColumn Name="Column12" Width="35.91"/>
         <TableColumn Name="Column13" Width="35.91"/>
@@ -741,8 +765,8 @@ namespace FastReport
           <TableCell Name="Cell429" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell430" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row44" Height="9.45">
-          <TableCell Name="Cell431" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного підрозділу банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row44" Height="17.61">
+          <TableCell Name="Cell431" Border.Lines="Top" Border.LeftLine.Style="Dot" Border.TopLine.Style="Dot" Border.TopLine.Width="0.25" Text="(найменування та місцезнаходження структурного&#13;&#10;підрозділу уповноваженого банку)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell432" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell433" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell434" Border.Lines="Top" VertAlign="Center" Font="Arial, 6pt"/>
@@ -838,13 +862,13 @@ namespace FastReport
           <TableCell Name="Cell510" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row52" Height="9.45">
-          <TableCell Name="Cell511" Border.Lines="All" Border.Width="0.25" Text="Назва валюти та  Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell511" Border.Lines="All" Border.Width="0.25" Text="(назва валюти та сума)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
           <TableCell Name="Cell512" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell513" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell514" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell515" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell516" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell517" Border.Lines="All" Border.Width="0.25" Text="Назва валюти  та   Сума " HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell517" Border.Lines="All" Border.Width="0.25" Text="(назва валюти та сума)" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
           <TableCell Name="Cell518" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell519" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell520" Border.Lines="All" Border.Width="0.25" HorzAlign="Center" VertAlign="Center" Font="Arial, 6pt"/>
@@ -910,7 +934,7 @@ namespace FastReport
           <TableCell Name="Cell570" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row58" Height="9.45">
-          <TableCell Name="Cell571" Text="   Клiєнт:  &lt;b&gt;&lt;i&gt; [Tag(&quot;OPayer&quot;)]&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
+          <TableCell Name="Cell571" Text="   Клiєнт**:  &lt;b&gt;&lt;i&gt; [Tag(&quot;OPayer&quot;,IFF_SummB(150000))] &lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
           <TableCell Name="Cell572" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell573" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell574" VertAlign="Center" Font="Arial, 6pt"/>
@@ -933,7 +957,7 @@ namespace FastReport
           <TableCell Name="Cell589" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell590" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row60" Height="9.45" AutoSize="true">
+        <TableRow Name="Row60" Height="13.53">
           <TableCell Name="Cell591" Text="Сума збору на обов’язкове державне пенсійне страхування: &lt;b&gt;&lt;i&gt;[Tag(&quot;SUM_05K&quot;)] UAH ( [Tag(&quot;SUM_05KLit&quot;)]  )&lt;/i&gt;&lt;/b&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
           <TableCell Name="Cell592" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell593" VertAlign="Center" Font="Arial, 6pt"/>
@@ -945,7 +969,7 @@ namespace FastReport
           <TableCell Name="Cell599" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell600" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row61" Height="9.45" AutoSize="true">
+        <TableRow Name="Row61" Height="9.45">
           <TableCell Name="Cell601" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" Text="&lt;i&gt;  [Tag(&quot;DR_PASPV&quot;,IFF_SummB(150000))]  [Tag(&quot;DR_PASPN&quot;,IFF_SummB(150000))] &lt;/i&gt; &lt;i&gt;[Tag(&quot;DR_ATRT&quot;,IFF_SummB(150000))]&lt;/i&gt;" VertAlign="Center" Font="Arial, 6pt" HtmlTags="true" ColSpan="10"/>
           <TableCell Name="Cell602" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell603" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
@@ -957,8 +981,8 @@ namespace FastReport
           <TableCell Name="Cell609" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell610" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row63" Height="9.45">
-          <TableCell Name="Cell621" Text="(зазначаються додаткові реквізити, необхідні для проведення валютно-обмінних операцій)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row63" Height="21.96">
+          <TableCell Name="Cell621" Text="Додаткові реквізити ________________________________________________________&#13;&#10;                                      (реквізити, необхідні для проведення валютно-обмінних операцій)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell622" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell623" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell624" VertAlign="Center" Font="Arial, 6pt"/>
@@ -981,8 +1005,8 @@ namespace FastReport
           <TableCell Name="Cell639" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell640" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row65" Height="9.45">
-          <TableCell Name="Cell641" Text="Пiдпис клiєнта  ____________________" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row65">
+          <TableCell Name="Cell641" Text="_________________________________&#13;&#10;                             (підпис клієнта)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell642" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell643" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell644" VertAlign="Center" Font="Arial, 6pt"/>
@@ -993,8 +1017,8 @@ namespace FastReport
           <TableCell Name="Cell649" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell650" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row66" Height="9.45">
-          <TableCell Name="Cell651" Text="Надаю згоду на проведення операції з купівлі іноземної валюти без оформлення " VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row66" Height="21.49">
+          <TableCell Name="Cell651" Text="Надаю згоду на проведення валютно-обмінної операції без оформлення першого примірника квитанції про здійснення валютно-обмінної операції (примірника клієнта)" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell652" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell653" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell654" VertAlign="Center" Font="Arial, 6pt"/>
@@ -1005,8 +1029,44 @@ namespace FastReport
           <TableCell Name="Cell659" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell660" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row67" Height="9.45">
-          <TableCell Name="Cell661" Text="довідки-certificate за формою № 377" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
+        <TableRow Name="Row169" Height="9.21">
+          <TableCell Name="Cell1681"/>
+          <TableCell Name="Cell1682"/>
+          <TableCell Name="Cell1683"/>
+          <TableCell Name="Cell1684"/>
+          <TableCell Name="Cell1685"/>
+          <TableCell Name="Cell1686"/>
+          <TableCell Name="Cell1687"/>
+          <TableCell Name="Cell1688"/>
+          <TableCell Name="Cell1689"/>
+          <TableCell Name="Cell1690"/>
+        </TableRow>
+        <TableRow Name="Row170" Height="9.72">
+          <TableCell Name="Cell1691"/>
+          <TableCell Name="Cell1692"/>
+          <TableCell Name="Cell1693"/>
+          <TableCell Name="Cell1694"/>
+          <TableCell Name="Cell1695"/>
+          <TableCell Name="Cell1696" Border.Lines="Top" Border.Style="Dot" Border.Width="0.25" Text="(підпис клієнта проставляється " HorzAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1697"/>
+          <TableCell Name="Cell1698"/>
+          <TableCell Name="Cell1699"/>
+          <TableCell Name="Cell1700"/>
+        </TableRow>
+        <TableRow Name="Row171" Height="12.27">
+          <TableCell Name="Cell1701"/>
+          <TableCell Name="Cell1702"/>
+          <TableCell Name="Cell1703"/>
+          <TableCell Name="Cell1704"/>
+          <TableCell Name="Cell1705"/>
+          <TableCell Name="Cell1706" Text="в разі надання такої згоди)" HorzAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell1707"/>
+          <TableCell Name="Cell1708"/>
+          <TableCell Name="Cell1709"/>
+          <TableCell Name="Cell1710"/>
+        </TableRow>
+        <TableRow Name="Row67">
+          <TableCell Name="Cell661" Text="Надаю згоду на проведення операції з купівлі іноземної валюти без оформлення довідки-certificate за формою № 377" VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell662" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell663" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell664" VertAlign="Center" Font="Arial, 6pt"/>
@@ -1065,7 +1125,7 @@ namespace FastReport
           <TableCell Name="Cell709" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell710" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row72" Height="9.45">
+        <TableRow Name="Row72" Height="18.63">
           <TableCell Name="Cell711" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell712" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell713" VertAlign="Center" Font="Arial, 6pt"/>
@@ -1078,19 +1138,19 @@ namespace FastReport
           <TableCell Name="Cell720" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row73" Height="9.45">
-          <TableCell Name="Cell721" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell721" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell722" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell723" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell724" Border.Lines="Bottom" Border.BottomLine.Style="Dash" Border.BottomLine.Width="0.25" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell725" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell726" Text="Місце для відбитка штампа" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
+          <TableCell Name="Cell726" Text="Місце для відбитка штампа***" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
           <TableCell Name="Cell727" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell728" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell729" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell730" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
         <TableRow Name="Row74" Height="9.45">
-          <TableCell Name="Cell731" Text="підпис працівника (ів) банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="4"/>
+          <TableCell Name="Cell731" Text="підпис працівника (ів) уповноваженого банку" VertAlign="Center" Font="Arial, 6pt" ColSpan="5"/>
           <TableCell Name="Cell732" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell733" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell734" VertAlign="Center" Font="Arial, 6pt"/>
@@ -1101,7 +1161,7 @@ namespace FastReport
           <TableCell Name="Cell739" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell740" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row75" Height="9.45">
+        <TableRow Name="Row75" Height="9.2">
           <TableCell Name="Cell741" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell742" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell743" VertAlign="Center" Font="Arial, 6pt"/>
@@ -1113,32 +1173,8 @@ namespace FastReport
           <TableCell Name="Cell749" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell750" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row76" Height="9.45">
-          <TableCell Name="Cell751" Text="* Здійснення операції з купівлі у фізичної особи-нерезидента готівкової іноземної алюти без оформлення довідки-certificate за формою № 377 не дає підстав для воротного обміну.&#13;&#10;" VertAlign="Center" Font="Arial, 6pt" ColSpan="10" RowSpan="3"/>
-          <TableCell Name="Cell752" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell753" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell754" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell755" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell756" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell757" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell758" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell759" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell760" VertAlign="Center" Font="Arial, 6pt"/>
-        </TableRow>
-        <TableRow Name="Row77" Height="9.45">
-          <TableCell Name="Cell761" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell762" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell763" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell764" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell765" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell766" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell767" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell768" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell769" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell770" VertAlign="Center" Font="Arial, 6pt"/>
-        </TableRow>
-        <TableRow Name="Row78" Height="9.45">
-          <TableCell Name="Cell771" VertAlign="Center" Font="Arial, 6pt"/>
+        <TableRow Name="Row78" Height="66.15">
+          <TableCell Name="Cell771" Text="* Здійснення операції з купівлі у фізичної особи-нерезидента готівкової іноземної валюти без оформлення довідки-certificate за формою № 377 не дає підстав для зворотного обміну.&#13;&#10;** Реквізити заповнюються під час здійснення валютно-обмінної операції на суму, що дорівнює чи перевищує в еквіваленті 150000 гривень.&#13;&#10;*** Не проставляється для другого примірника квитанції, що оформлений банком у вигляді електронного документа." VertAlign="Center" Font="Arial, 6pt" ColSpan="10"/>
           <TableCell Name="Cell772" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell773" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell774" VertAlign="Center" Font="Arial, 6pt"/>
@@ -1149,35 +1185,10 @@ namespace FastReport
           <TableCell Name="Cell779" VertAlign="Center" Font="Arial, 6pt"/>
           <TableCell Name="Cell780" VertAlign="Center" Font="Arial, 6pt"/>
         </TableRow>
-        <TableRow Name="Row79" Height="9.45">
-          <TableCell Name="Cell781" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell782" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell783" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell784" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell785" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell786" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell787" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell788" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell789" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell790" VertAlign="Center" Font="Arial, 6pt"/>
-        </TableRow>
-        <TableRow Name="Row80" Height="9.45">
-          <TableCell Name="Cell791" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell792" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell793" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell794" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell795" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell796" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell797" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell798" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell799" VertAlign="Center" Font="Arial, 6pt"/>
-          <TableCell Name="Cell800" VertAlign="Center" Font="Arial, 6pt"/>
-        </TableRow>
       </TableObject>
-      <LineObject Name="Line2" Left="368.44" Height="378" Border.Style="Dot" Border.Width="0.25"/>
-      <PictureObject Name="Picture1" Top="349.65" Width="360.61" Height="28.35" CanGrow="true" CanShrink="true" DataColumn="PICT.PICT"/>
+      <LineObject Name="Line2" Left="368.44" Height="481.95" Border.Style="Dot" Border.Width="0.25"/>
     </DataBand>
-    <DataBand Name="Data2" Top="426.47" Width="737.1" Height="379" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data2" Top="521.07" Width="737.1" Height="379" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table8" Left="0.45" Top="1" Width="359.1" Height="378" Border.Lines="Bottom" Border.BottomLine.Style="Dot" Border.BottomLine.Width="0.25" GrowToBottom="true">
         <TableColumn Name="Column21" Width="35.91"/>
         <TableColumn Name="Column22" Width="35.91"/>
@@ -2069,7 +2080,7 @@ namespace FastReport
       <LineObject Name="Line3" Left="369.44" Height="378" Border.Style="Dot" Border.Width="0.25"/>
       <PictureObject Name="Picture2" Left="378.38" Top="340.2" Width="360.61" Height="28.35" CanGrow="true" CanShrink="true" DataColumn="PICT.PICT"/>
     </DataBand>
-    <DataBand Name="BUH_MODEL_B" Top="872.83" Width="737.1" Height="18.9" CanGrow="true" CanShrink="true" Guides="0,18.9" DataSource="Table" KeepTogether="true" KeepDetail="true">
+    <DataBand Name="BUH_MODEL_B" Top="960.85" Width="737.1" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table" KeepTogether="true" KeepDetail="true">
       <TextObject Name="Text3" Left="75.98" Width="86.94" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.FDAT1]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
       <TextObject Name="Text1" Left="9.45" Width="66.15" Height="18.9" Border.Lines="All" Text="[BUH_MODEL.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
       <TextObject Name="Text4" Left="162.54" Width="113.4" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.NLS]" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
@@ -2077,9 +2088,9 @@ namespace FastReport
       <TextObject Name="Text5" Left="342.09" Width="122.85" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,[BUH_MODEL.O.S/T.DENOM],null)]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
       <TextObject Name="Text6" Left="464.56" Width="124.74" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[IIf([BUH_MODEL.DK]==0,null,[BUH_MODEL.O.S/T.DENOM])]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
       <TextObject Name="Text7" Left="589.3" Width="121.34" Height="18.9" Border.Lines="Right, Top, Bottom" Text="[BUH_MODEL.GL.P_ICURVAL(A.KV,O.S,O.FDAT)/100]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
-      <DataHeaderBand Name="BUH_MODEL_H" Top="810.8" Width="737.1" Height="56.7" CanShrink="true" Guides="28.35,56.7,0">
+      <DataHeaderBand Name="BUH_MODEL_H" Top="902.11" Width="737.1" Height="56.7" CanShrink="true">
         <TextObject Name="Text8" Left="9.45" Top="28.35" Width="66.15" Height="28.35" Border.Lines="All" Text="Тип&#13;&#10;трн." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-        <TextObject Name="Text15" Left="9.45" Width="699.3" Height="28.35" Border.Lines="Top" Border.Style="Dash" Text="     Перелік транзакцій для документа # [p_ref_c]" VertAlign="Center" Font="Arial, 9pt"/>
+        <TextObject Name="Text15" Left="9.45" Width="699.3" Height="28.35" Text="     Перелік транзакцій для документа # [p_ref_c]" VertAlign="Center" Font="Arial, 9pt"/>
         <TextObject Name="Text9" Left="75.6" Top="28.35" Width="86.94" Height="28.35" Border.Lines="Top, Bottom" Text="Дата &#13;&#10;валютування" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         <TextObject Name="Text10" Left="162.54" Top="28.35" Width="113.4" Height="28.35" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TabWidth="55"/>
         <TextObject Name="Text11" Left="275.56" Top="28.35" Width="66.15" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Валюта" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
@@ -2088,6 +2099,6 @@ namespace FastReport
         <TextObject Name="Text14" Left="585.9" Top="28.35" Width="124.74" Height="28.35" Border.Lines="Right, Top, Bottom" Text="Еквівалент" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
       </DataHeaderBand>
     </DataBand>
-    <PageFooterBand Name="PageFooter1" Top="897.07" Width="737.1" Height="9.45"/>
+    <PageFooterBand Name="PageFooter1" Top="981.79" Width="737.1" Height="9.45"/>
   </ReportPage>
 </Report>
