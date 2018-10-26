@@ -9,7 +9,7 @@ IS
 % DESCRIPTION :  Процедура формирования #A7 для КБ (универсальная)
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.022  22/10/2018 (09/10/2018)
+% VERSION     :  v.18.023  24/10/2018 (22/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: Dat_ - отчетная дата
                pmode_ = режим (0 - для отчетности, 1 - для ANI-отчетов, 2 - для @77)
@@ -32,6 +32,7 @@ IS
 12     VVV        R030 код валюты
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 24.10.2018 розраховуємо суму обтяження для ЦП в еквіваленті 
  09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок 
             активу 3541
  20.09.2018 для счетов резерва параметр S181 изменяем на "1" если значение 
@@ -1813,6 +1814,7 @@ BEGIN
                 END IF;
 
                 dk_ := iif_n (se_, 0, '1', '2', '2');
+                sum_zal := gl.p_icurval(kv_, sum_zal, dat_);
 
                 pp_doda;
 
@@ -2250,6 +2252,8 @@ BEGIN
                    else
                        sum_zal := 0;
                    end if;
+
+                   sum_zal := gl.p_icurval(kv_, sum_zal, dat_);
 
                    if s242_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
@@ -3032,7 +3036,7 @@ BEGIN
              end if;
 
              znap_ := to_char(sign(k.szq) * sum_);
-             comm_ := SUBSTR (' резерв під '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'в_дсотки '||' sumc='||to_char(sumc_) , 1, 200);
+             comm_ := SUBSTR (' резерв п_д '||(case when k.tip in ('SPN', 'XPN') then 'прострочен_ ' else '' end)||'в_дсотки '||' sumc='||to_char(sumc_) , 1, 200);
           else
              kodp_ := k.sign_rez||nbs_||r011_||r013_||s181_||s242_||k.rz||substr(k.kodp, 11,4);
 
@@ -3052,7 +3056,7 @@ BEGIN
 
              if k.cnt = 1 then
                 znap_ := to_char(sign(k.szq) * srez_);
-                comm_ := SUBSTR (k.tobo || ' резерв під осн.борг (1) ', 1, 200);
+                comm_ := SUBSTR (k.tobo || ' резерв п_д осн.борг (1) ', 1, 200);
              else
                 sum_ := round(srez_ * k.koef);
 
@@ -3068,7 +3072,7 @@ BEGIN
 
                 znap_ := to_char(sign(k.szq) * sum_);
 
-                comm_ := SUBSTR (k.tobo || ' резерв під осн. борг (2) (розбивка по S240='||k.s240||')' , 1, 200);
+                comm_ := SUBSTR (k.tobo || ' резерв п_д осн. борг (2) (розбивка по S240='||k.s240||')' , 1, 200);
              end if;
           end if;
 
@@ -3547,9 +3551,9 @@ BEGIN
 
              if sakt_ = 0 then
                 s240_ := 'Z';
-                comm_ := SUBSTR (k.tobo || ' резерв під погашені відсотки (залишок = 0) ', 1, 200);
+                comm_ := SUBSTR (k.tobo || ' резерв п_д погашен_ в_дсотки (залишок = 0) ', 1, 200);
              else
-                comm_ := SUBSTR (k.tobo || ' резерв під  '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'відсотки ', 1, 200);
+                comm_ := SUBSTR (k.tobo || ' резерв п_д  '||(case when k.tip in ('SPN', 'XPN') then 'прострочен_ ' else '' end)||'в_дсотки ', 1, 200);
              end if;
 
              if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
@@ -3568,7 +3572,7 @@ BEGIN
 
                 znap_ := to_char(k.szq);
 
-                comm_ := SUBSTR (k.tobo || ' резерв під прострочку по осн.боргу (4) ' , 1, 200);
+                comm_ := SUBSTR (k.tobo || ' резерв п_д прострочку по осн.боргу (4) ' , 1, 200);
              else
                 if s240_ ='Z' and s190_ ='0'  then  s190_ :='A';  end if;
 
@@ -3580,7 +3584,7 @@ BEGIN
 
                 znap_ := to_char(sign(k.szq) * srez_);
 
-                comm_ := SUBSTR (k.tobo || ' резерв під осн.борг (5) ', 1, 200);
+                comm_ := SUBSTR (k.tobo || ' резерв п_д осн.борг (5) ', 1, 200);
              end if;
           end if;
 
@@ -3805,7 +3809,7 @@ BEGIN
 
          if k.rnum = 1 then
             znap_ := to_char(k.sumdp_k);
-            comm_ := substr(k.comm || ' заміна по рахунку '||k.nlsa||'('||to_char(k.kv)||')',1,200);
+            comm_ := substr(k.comm || ' зам_на по рахунку '||k.nlsa||'('||to_char(k.kv)||')',1,200);
 
             update rnbu_trace
             set kodp = kodp_,
@@ -3820,7 +3824,7 @@ BEGIN
                 kodp_ := substr(k.kodp, 1,7) || substr(k.s181_s240_a,1,1) || '1' || substr(k.kodp, 10,1) || k.s190_a || substr(k.kodp, 12,3);
 
                 znap_ := to_char(over_);
-                comm_ := substr(k.comm || ' перевищення дисконту (> ніж залишок по рахунку '||k.nlsa||'('||to_char(k.kv)||') )',1,200);
+                comm_ := substr(k.comm || ' перевищення дисконту (> н_ж залишок по рахунку '||k.nlsa||'('||to_char(k.kv)||') )',1,200);
 
                 insert into rnbu_trace(recid, userid, nls, kv, odate, kodp,
                           znap, acc,rnk, isp, mdate, comm, nd, nbuc, tobo)
