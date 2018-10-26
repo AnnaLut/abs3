@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования 42X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.001 21/09/2018
+% VERSION     :  v.18.002 25/10/2018 (21/09/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.001    21.09.2018';
+  ver_                     char(30)  := 'v.18.002    25/10/2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -96,7 +96,8 @@ BEGIN
            ACC_ID, ACC_NUM, KV, CUST_ID, kf as BRANCH          
         from v_nbur_#42_dtl p
         where p.report_date = p_report_date and
-              p.kf = p_kod_filii     
+              p.kf = p_kod_filii and    
+              p.seg_01 not in ('47', '51') -- закриті показники, що використовуються як допоміжні
      ); 
 
   --Агрегированный нам не нужен, так как агрегированные данные будут поступать из XML-формата
