@@ -1036,7 +1036,7 @@ begin
           ---         elt.RAB_DNI(greatest(n.DAT_BEG,DAT1_), least(nvl(n.DAT_END,DAT2_ ),DAT2_)
           ---                             )) / KOL_, 0) S,
                     0 S,
-                    nvl(n.dat_beg,DAT1_) dat_b, nvl(n.dat_end,DAT2_) dat_e,
+                    nvl(trunc(n.dat_beg),DAT1_) dat_b, nvl(trunc(n.dat_end),DAT2_) dat_e,
                     e.id ID, e.npd_3570, ob22_6110, e.id_glob, e.fl1, n.nd
              FROM e_tar_nd n, e_tarif e  WHERE n.nd=k.ND and n.id=e.id
                                            AND n.dat_beg is not null) --jeka 05.07.2017
@@ -1066,6 +1066,8 @@ begin
      end if;
 
      if fl5=1 then
+       logger.info('ELT_TRACE l_kol = '||to_char(l_kol)||', KOL_ = '||to_char(KOL_));
+  --     raise_application_error(-20001,'ELT_TRACE l_kol = '||to_char(l_kol)||', KOL_ = '||to_char(KOL_));
         S5:= round(ELT.Tarif(DAT1_, DAT2_, d.ND, l_id) * l_kol / KOL_,0);
         S_ := S5;
      end if;
@@ -1334,7 +1336,7 @@ end;
    END LOOP;  -- d
    DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор
 exception when others then
-  DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор   
+  DBMS_SQL.CLOSE_CURSOR(c);   -- закрыть курсор
   raise_application_error(-20001,SQLERRM);
 END;
    end if;  ----  k.nls3 like ...
@@ -1669,7 +1671,7 @@ END;
       rollback to DO_O;
     else
       raise_application_error(-20203,'ELT.OPL  nd='||k.nd||';  MODE ='|| MODE_ ||' ERROR= '||SQLERRM);
-    end if;    
+    end if;
   end;
 end loop;   -- k
 --commit;
@@ -1836,7 +1838,7 @@ for k in (SELECT d.ND, d.CC_ID, d.SDATE, c.OKPO,
             and d.sos<>15  -- без закритих угод
             and ((nvl(a3.ostc,0)<0 and MODE_ = 7)
                  or (nvl(a8.ostc,0)<0 and MODE_  = 8))
-          order by d.nd 
+          order by d.nd
           )
   loop
     logger.info('ELT.BORG  nd='||k.nd||';  MODE ='|| MODE_ ||' begin');
