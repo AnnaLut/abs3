@@ -3307,8 +3307,8 @@ end ;
       END IF;
    -- COBUMMFO - 7501 Begin
    ELSIF KOD_ = 9997 THEN
-      select t.nlsb
-        into l_nlsb
+      select t.nlsb, t.kv2
+        into l_nlsb, l_kv
         from oper t
        where t.ref = p_ref;
 
@@ -3316,7 +3316,8 @@ end ;
         into l_cnt
         from accounts t
        where t.tip = 'KW4'
-         and t.nls = l_nlsb;
+         and t.nls = l_nlsb
+             and t.kv = l_kv;
       
       IF l_cnt > 0
       THEN
@@ -3330,7 +3331,11 @@ end ;
                      when 1 then t.nlsb
 					 else t.nlsa
                 end
-         into l_nlsb
+                , case ap.dk
+                     when 1 then t.kv2
+					 else t.kv
+                end
+         into l_nlsb, l_kv
          from oper t
          join ttsap ap on ap.tt = t.tt and ap.ttap = '!!U'
          where t.ref = p_ref;
@@ -3339,7 +3344,8 @@ end ;
          into l_cnt
          from accounts t
          where t.tip like 'W4%'
-              and t.nls = l_nlsb;
+              and t.nls = l_nlsb
+              and t.kv = l_kv;
 
       exception
 		 when others then
