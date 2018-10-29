@@ -13,7 +13,7 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.019          10.10.2018
+% VERSION     :   v.18.020          29.10.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
@@ -26,6 +26,7 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+29.10.2018  q006 заполняется только из доп.реквизитов сделок
 10.10.2018  -добавлены операции дт2622-кт2900(3739)               [9700]
 25.09.2018  -добавлены операции дт2900/ob22=01-кт2625, tt=PRK     [9499]
             -удаление проводок занесенных в NBUR_TMP_DEL_70       [9512]
@@ -405,10 +406,10 @@ IS
         --для продажу валюти i надходження вiд нерезидентiв новий показник
 
         IF dat_ >= TO_DATE('13082007','ddmmyyyy') AND ko_ = 2 then
-           p_kodp_ := 'Q006';
+--           p_kodp_ := 'Q006';
            p_value_ :=NVL (SUBSTR (TRIM (p_value_), 1, 70), '');
 
-           if trim(p_value_) is null then
+/*           if trim(p_value_) is null then
               BEGIN
                  select DECODE(substr(lower(txt),1,13), 'продано вир.в', 'продаж валютної виручки',txt)
                     into p_value_
@@ -419,15 +420,10 @@ IS
               END;
 
            end if;
-
+*/
         END IF;
 
---        IF trim(p_value_) is NULL and mfo_ in (300465,333368)
---        THEN
---           p_value_ := substr(nazn_,1,70);
---        END IF;
-
-        if mfo_ = 300465 and nlsk_ like '2900%' and nls_ like '2909%'
+/*        if mfo_ = 300465 and nlsk_ like '2900%' and nls_ like '2909%'
         then
            p_value_ := '555';
         end if;
@@ -436,8 +432,8 @@ IS
         then
            p_value_ := 'вiльний продаж';
         end if;
-
-        IF mfou_ = 300465 and ko_ = 2
+*/
+/*        IF mfou_ = 300465 and ko_ = 2
         THEN
            case
               when d1#D3_ = '11' then p_value_ := 'Виручка';
@@ -456,6 +452,7 @@ IS
                d1#D3_ := null;
             end case;
         END IF;
+*/
       ELSE
          p_kodp_ := 'NN';
       END IF;
