@@ -1,7 +1,143 @@
-CREATE OR REPLACE package body      zp
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /sql/bars/package/zp.sql =========*** Run *** 
+PROMPT ===================================================================================== 
+
+create or replace package bars.zp is
+  g_head_version  constant varchar2(64)  := 'version 1.21 01.08.2018';
+
+  --
+  -- определение версии заголовка пакета
+  --
+  function header_version return varchar2;
+  --
+  -- определение версии тела пакета
+  --
+  function body_version   return varchar2;
+
+  procedure send_central ;
+  procedure create_deal(p_rnk            customer.rnk%type,
+                      p_deal_name      zp_deals.deal_name%type,
+                      p_start_date     date,
+                      p_deal_premium   zp_deals.deal_premium%type,
+                      p_central        zp_deals.central%type,
+                      p_kod_tarif      zp_deals.kod_tarif%type,
+                      p_acc            number   default null,
+                      p_fs             zp_deals.fs%type default 2,
+                      p_branch         branch.branch%type default null
+                      );
+
+  procedure approve_deal(p_id zp_deals.id%type, p_comm_reject zp_deals.comm_reject%type);
+
+  procedure update_deal(p_id             zp_deals.id%type,
+                      p_deal_name      zp_deals.deal_name%type,
+                      p_start_date     date,
+                      p_deal_premium   zp_deals.deal_premium%type,
+                      p_central        zp_deals.central%type,
+                      p_kod_tarif      zp_deals.kod_tarif%type,
+                      p_fs             zp_deals.fs%type default 1,
+                      p_acc_3570       zp_deals.acc_3570%type default null,
+                      p_branch         branch.branch%type default null
+                      );
+  procedure del_deal(p_id  zp_deals.id%type );
+  procedure authorize_deal(p_id  zp_deals.id%type );
+  procedure reject_deal(p_id  zp_deals.id%type, p_comm_reject zp_deals.comm_reject%type );
+  procedure zp_acc_migr(p_id zp_deals.id%type) ;
+  procedure set_acc_sos (p_acc accounts.acc%type, p_sost number);
+  procedure close_deal(p_id  zp_deals.id%type , p_comm zp_deals.comm_reject%type );
+  procedure change_ref_zp_tarif(p_kod zp_tarif.kod%type, p_kv zp_tarif.kv%type, p_type number);
+  procedure additional_change_deal(p_id  zp_deals.id%type , p_comm zp_deals.comm_reject%type );
+  procedure create_payroll_draft ( p_zp_id zp_deals.id%type, p_id out zp_payroll.id%type);
+  procedure del_zp_payroll(p_id zp_payroll.id%type);
+procedure approve_payroll(p_sign_doc_set t_sign_doc_set,p_id zp_payroll.id%type);
+procedure add_payroll_doc(p_id_pr        zp_payroll.id%type,
+                          p_okpob        zp_payroll_doc.okpob%type,
+                          p_namb         zp_payroll_doc.namb%type,
+                          p_mfob         zp_payroll_doc.mfob%type,
+                          p_nlsb         zp_payroll_doc.nlsb%type,
+                          p_source       zp_payroll_doc.source%type,
+                          p_nazn         zp_payroll_doc.nazn%type,
+                          p_s            zp_payroll_doc.s%type,
+                          p_id           zp_payroll_doc.id%type           default null,
+                          p_id_file      zp_payroll_doc.id_file%type      default null,
+                          p_passp_serial zp_payroll_doc.passp_serial%type default null,
+                          p_passp_num    zp_payroll_doc.passp_num%type    default null,
+                          p_id_card_num  varchar2                         default null -- Паспорт гр.України у вигляді картки (поки не використовується)
+                          );
+ procedure del_payroll_doc(p_id  zp_payroll_doc.id%type);
+ procedure create_payroll (p_id          zp_payroll.id%type,
+                          p_pr_date     zp_payroll.pr_date%type,
+                          p_payroll_num zp_payroll.payroll_num%type,
+                          p_nazn        zp_payroll.nazn%type
+                          );
+procedure payroll_doc_clone(p_old_id number,p_new_id number);
+procedure reject_payroll(p_id zp_payroll.id%type, p_comm  zp_payroll.comm_reject%type);
+procedure pay3570 (p_acc accounts.acc%type);
+procedure pay_payroll(p_id       zp_payroll.id%type,
+                      p_sign     zp_payroll.sign%type,
+                      p_key_id   zp_payroll.key_id%type,
+                      p_docbufer varchar2);
+procedure payroll_imp(p_id_pr            zp_payroll.id%type,
+                      p_file_name        zp_payroll_imp_files.file_name%type,
+                      p_clob             blob,
+                      p_encoding         varchar2 ,
+                      p_nazn             varchar2,
+                      p_id_dbf_type      number,
+                      p_file_type        varchar2,
+                      p_nlsb_map         varchar2 default null,
+                      p_s_map            varchar2 default null,
+                      p_okpob_map        varchar2 default null,
+                      p_mfob_map         varchar2 default null,
+                      p_namb_map         varchar2 default null,
+                      p_nazn_map         varchar2 default null,
+                      p_save_draft       varchar2 default null,
+                      p_sum_delimiter    number   default 1 ,
+                      p_err          out varchar2);
+procedure payroll_imp_del(p_id zp_payroll_imp_files.id%type);
+procedure del_deals_fs(p_id number);
+procedure prev_dbf_load(  p_blob             blob,
+                          p_encoding         varchar2
+);
+type docs_buffer_rec is record
+   (
+      id               zp_payroll_doc.id%type,
+      doc_buffer       varchar2(730)
+   );
+type docs_buffer_set is table of docs_buffer_rec;
+function get_docs_buffer (p_id zp_payroll.id%type)
+   return docs_buffer_set
+   pipelined;
+function get_payroll_buffer (p_id zp_payroll.id%type)
+   return varchar2;
+function get_user_key_id
+   return varchar2;
+procedure set_central(p_mfo varchar2,p_nls varchar2, p_central number);
+
+  -----------------------------------------------------------------------------------------
+  --  get_doc_person
+  --
+  --    Метод повертає паспортні дані клієнта по рахунку
+  --
+  --      p_nls - Вхідний параметр рахунок клієнта (2625)
+  --      p_okpo        - ІПН клієнта (out)
+  --      p_nmk         - ПІБ клієнта (out)
+  --      p_pass_serial - Серія паспорта (out)
+  --      p_pass_num    - Номер паспорта (out)
+  --      p_pass_card   - Номер паспорта у вигляді картки (out)
+  --      p_actual_date - Дата актуальності паспорта у вигляді картки (out)
+  --
+  procedure get_doc_person(p_nls in accounts.nls%type,
+                           p_okpo        out customer.okpo%type,
+                           p_nmk         out customer.nmk%type,
+                           p_pass_serial out person.ser%type,
+                           p_pass_num    out person.numdoc%type,
+                           p_pass_card   out person.numdoc%type,
+                           p_actual_date out person.actual_date%type);
+end;
+/
+create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.26 19.10.2018';
+g_body_version   constant varchar2(64)   := 'version 1.27 28.10.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -1401,9 +1537,21 @@ begin
         where nls=p_nlsb
         and kv=980
         and dazs is null;
-      exception when no_data_found then
-        raise_application_error(-20000, 'Рахунок - '||p_nlsb||' не знайдено, або рахунок закритий.');
-      end ;
+        --пошук по альтернативному рахунку при імпорті відомості. 
+      exception 
+        when no_data_found then
+          begin
+           select rnk into l_rnk
+              from accounts
+              where nlsalt=p_nlsb
+              and kv=980
+              and dazs is null;
+          exception when no_data_found then
+                    raise_application_error(-20000, 'Не знайдено альтернативний рахунок - '|| p_nlsb||', або рахунок закрито.');    
+          end;
+        when others then
+                  raise_application_error(-20000, 'Помилка пошуку рахунка '|| p_nlsb||'. '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+      end;
 
       begin
        select 1 into n
@@ -2666,5 +2814,12 @@ end;
 begin
   init;
 end zp;
-
 /
+show err;
+
+grant execute on bars.zp to  bars_access_defrole;
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /sql/bars/package/zp.sql =========*** End *** 
+PROMPT ===================================================================================== 
