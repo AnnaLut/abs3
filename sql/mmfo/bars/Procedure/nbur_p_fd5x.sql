@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования D5X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.002 09/10/2018 (05/09/2018)
+% VERSION     :  v.1.003 24/10/2018 (09/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                   char(30)  := 'v.1.002  09/10/2018';
+  ver_                   char(30)  := 'v.1.003  24/10/2018';
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
   c_date_fmt             constant varchar2(10 char) := 'dd.mm.yyyy';
   c_old_file_code        constant varchar2(3 char) := '#D5';
@@ -25,9 +25,9 @@ is
   l_version_id           nbur_lst_files.version_id%type;
   l_next_mnth_frst_dt    date;
   l_ret                  number;
-    
+
   c_XXXXXX               constant varchar2(6 char) := 'XXXXXX';
-  
+
   --Exeption
   e_ptsn_not_exsts exception;
 
@@ -37,9 +37,9 @@ BEGIN
 
   -- определение начальных параметров (код области или МФО или подразделение)
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type);
-  
+
   execute immediate 'truncate table NBUR_TMP_DESC_EKP';
-  
+
   --Очистка партиции для хранения детального протокола
   begin
     execute immediate 'alter table NBUR_LOG_FD5X truncate subpartition for ( to_date('''
@@ -64,14 +64,14 @@ BEGIN
   logger.trace(c_title || 'Определена первая дата следующего месяца - ' || to_char(l_next_mnth_frst_dt, c_date_fmt));
 
   -- очікуємо формування старого файлу
-  nbur_waiting_form(p_kod_filii, p_report_date, c_old_file_code, c_title);   
-  
+  nbur_waiting_form(p_kod_filii, p_report_date, c_old_file_code, c_title);
+
   -- наповнення довідника для визначення кодів показників
   l_ret := f_nbur_get_ekp_d5x(l_datez);
-  
+
   --Теперь сохрянем полученные данные в детальном протоколе
-  insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040, 
-                            k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description, 
+  insert into nbur_log_fd5x(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r013, r030, k040,
+                            k072, k111, k140, f074, s032, s080, s183, s190, s241, s260, f048, t070, description,
                             acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
       select
              p_report_date /*report_date*/
@@ -89,7 +89,7 @@ BEGIN
              , coalesce(t.seg_6, '#') /*k072*/
              , t.seg_5 /*k111*/
              , t.seg_7 /*k140*/
-             , (case when g.link_group is not null then '001' 
+             , (case when g.link_group is not null then '001'
                     when r.kol24 = '101' then '100'
                     when r.kol24 = '010' then '000'
                     else nvl(r.kol24, '000')
@@ -102,8 +102,8 @@ BEGIN
                  when ac.mdate is null then '1'
                  when ac.mdate - p_report_date < 365 and ac.mdate > p_report_date then '1'
                  when ac.mdate - p_report_date > 365 and ac.mdate > p_report_date then '2'
-                 when ac.mdate < p_report_date then 'Z'                      
-                 else '1'                     
+                 when ac.mdate < p_report_date then 'Z'
+                 else '1'
                end  /*s241*/
              , t.seg_15 /*s260*/
              , case
@@ -157,22 +157,22 @@ BEGIN
                from   v_nbur_#d5_dtl d
                where d.report_date = p_report_date and
                      d.kf = p_kod_filii and
-                     (d.seg_01 = '1' and d.seg_02 in ('1', '2') and d.seg_16 = '2' -- залишки по рахунках 
-                        or 
+                     (d.seg_01 = '1' and d.seg_02 in ('1', '2') and d.seg_16 = '2' -- залишки по рахунках
+                        or
                       d.seg_01 = '1' and d.seg_02 in ('0') and d.seg_16 = '5' -- списання безнадійної заборгованості
-                      ) 
+                      )
              ) t
-             join accounts ac 
-             on (ac.kf = p_kod_filii and 
+             join accounts ac
+             on (ac.kf = p_kod_filii and
                  t.acc = ac.acc)
-             left outer join int_accn i 
-             on (i.kf = p_kod_filii and 
-                 t.acc = i.acc)                 
-             left outer join specparam s 
-             on (s.kf = p_kod_filii and 
+             left outer join int_accn i
+             on (i.kf = p_kod_filii and
+                 t.acc = i.acc)
+             left outer join specparam s
+             on (s.kf = p_kod_filii and
                  t.acc = s.acc)
              left outer join nd_txt n
-             on (n.kf = p_kod_filii and 
+             on (n.kf = p_kod_filii and
                  n.nd = t.nd and
                  n.tag = 'FLR')
              left join (select r020, max(I010) I010
@@ -182,7 +182,7 @@ BEGIN
                                  r020
                        ) kl on (t.seg_3 = kl.r020)
              left join (select  t.acc
-                                   , max(coalesce(trim(replace(replace(kol24, '[', ''), ']', '')), '#')) as kol24
+                                   , max(trim(replace(replace(kol24, '[', ''), ']', ''))) as kol24
                            from    rez_cr t
                            where   t.fdat = l_next_mnth_frst_dt
                            group by
