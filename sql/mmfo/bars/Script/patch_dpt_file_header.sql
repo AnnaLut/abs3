@@ -119,6 +119,24 @@ end;
 /
 
 declare
+  e_idx_exists           exception;
+  pragma exception_init( e_idx_exists,      -00955 );
+  e_col_already_idx      exception;
+  pragma exception_init( e_col_already_idx, -01408 );
+begin
+  execute immediate q'[create index DPTFILEHDR_FILENM_SUM_INFLEN on DPT_FILE_HEADER ( KF, FILENAME, SUM, INFO_LENGTH )
+  tablespace BRSBIGI
+  COMPRESS 1 ]';
+  dbms_output.put_line( 'Index "DPTFILEHDR_FILENM_SUM_INFLEN" created.' );
+exception
+  when e_idx_exists 
+  then dbms_output.put_line( 'Name is already used by an existing object.' );
+  when e_col_already_idx 
+  then dbms_output.put_line( 'Such column list already indexed.' );
+end;
+/
+
+declare
   E_IDX_NOT_EXISTS        exception;
   pragma exception_init( E_IDX_NOT_EXISTS, -01418 );
 begin
