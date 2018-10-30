@@ -1,17 +1,16 @@
 
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_social.sql =========*** Run *** 
+PROMPT ===================================================================================== 
  
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/package/dpt_social.sql =========*** Run *** 
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE PACKAGE BARS.DPT_SOCIAL 
+CREATE OR REPLACE PACKAGE BARS.DPT_SOCIAL 
 is
   -- ---------------------------------------------------- --
   --  Пакет работы с депозитами пенсионеров и безработных --
   -- ---------------------------------------------------- --
 
   -- поддержка версионности пакета
-  g_header_version  constant varchar2(64)  := 'version 14.2  08.09.2017';
+  g_header_version  constant varchar2(64)  := 'version 14.3  29.10.2018';
   
   -- фиксация типа данных и маск.размерности для текстов сообщений
   g_errmsg          varchar2(3000);
@@ -316,12 +315,23 @@ is
   -- закрытие социального договора
   procedure close_contract (p_contractid  in  social_contracts.contract_id%type);
 
+   --
+  -- перевірка на наявність оплаченого файлу з такою ж назвою, сумою та кількістю рядків
+  -- протягом поточного та попереднього банківського дня 
+  --
+  function CHK_PYMT_FILE
+  ( p_hdr_id        dpt_file_header.header_id%type
+  ) return varchar2;
+  
 end DPT_SOCIAL;
 /
+
+show errors;
+
 CREATE OR REPLACE PACKAGE BODY BARS.DPT_SOCIAL 
 is
   
-  g_body_version  constant varchar2(64) := 'version 13.30  08.09.2017';
+  g_body_version  constant varchar2(64) := 'version 13.31  29.10.2018';
   g_modcode       constant varchar2(3)  := 'SOC';
 
 type acc_rec is record (id     accounts.acc%type,
@@ -1110,6 +1120,66 @@ begin
 
 end look4acc;
 --
+-- перевірка на наявність оплаченого файлу з такою ж назвою, сумою та кількістю рядків
+-- протягом поточного та попереднього банківського дня 
+--
+function CHK_PYMT_FILE
+( p_hdr_id        dpt_file_header.header_id%type
+) return varchar2
+is
+  l_errmsg        g_errmsg%type;
+  l_pymt_dt       date;
+begin
+
+  l_pymt_dt := DAT_NEXT_U( GL.GBD(), -1 );
+  
+  begin
+    select 'Файл з ім`ям '            || t2.FILENAME
+        || ' на загальну суму '       || to_char(t2.SUM)
+        || ' грн., кількість рядків ' || to_char(t2.INFO_LENGTH)
+        || ' вже оплачено. Повторна оплата заборонена!'
+      into l_errmsg
+      from DPT_FILE_HEADER t1
+      join DPT_FILE_HEADER t2
+        on ( t2.KF = t1.KF and t2.FILENAME = t1.FILENAME and t2.SUM = t1.SUM and t2.INFO_LENGTH = t1.INFO_LENGTH )
+      join DPT_FILE_ROW t3
+        on ( t3.HEADER_ID = t2.HEADER_ID )
+      join OPLDOK o
+        on (o.ref = t3.ref)
+     where t1.HEADER_ID   = p_hdr_id
+       and t1.HEADER_ID  <> t2.HEADER_ID
+       and t3.REF Is Not Null
+       and o.fdat between l_pymt_dt and GL.GBD()
+     group by t2.HEADER_ID, t2.FILENAME, t2.SUM, t2.INFO_LENGTH
+    having count( t3.REF ) > 0;
+  exception
+    when NO_DATA_FOUND
+    then l_errmsg := null;
+    when TOO_MANY_ROWS then
+      select 'Файл з ім`ям '            || t2.FILENAME
+        || ' на загальну суму '       || to_char(t2.SUM)
+        || ' грн., кількість рядків ' || to_char(t2.INFO_LENGTH)
+        || ' вже оплачено. Повторна оплата заборонена!'
+      into l_errmsg
+      from DPT_FILE_HEADER t1
+      join DPT_FILE_HEADER t2
+        on ( t2.KF = t1.KF and t2.FILENAME = t1.FILENAME and t2.SUM = t1.SUM and t2.INFO_LENGTH = t1.INFO_LENGTH )
+      join DPT_FILE_ROW t3
+        on ( t3.HEADER_ID = t2.HEADER_ID )
+      join OPLDOK o
+        on (o.ref = t3.ref)
+     where t1.HEADER_ID   = p_hdr_id
+       and t1.HEADER_ID  <> t2.HEADER_ID
+       and t3.REF Is Not Null
+       and o.fdat between l_pymt_dt and GL.GBD()
+       and rownum = 1
+     group by t2.HEADER_ID, t2.FILENAME, t2.SUM, t2.INFO_LENGTH
+     having count( t3.REF ) > 0;
+  end;
+  return l_errmsg;
+end CHK_PYMT_FILE;
+
+--
 -- оплата файла зачисления пенсии / мат.помощи - UNI
 --
 procedure pay_bankfile_uni
@@ -1204,6 +1274,15 @@ begin
 
   bars_audit.trace('%s текущее подразделение - %s', title, l_branch);
 
+  --
+  l_errmsg := CHK_PYMT_FILE( p_headerid );
+
+  if ( l_errmsg Is Not Null )
+  then
+    bars_audit.error( title||': '||l_errmsg );
+    bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', l_errmsg );
+  end if;
+  
   -- умолчательное назначение платежа (и проверка существования операции)
   begin
   select nvl(nazn, name) into l_nazn from tts where tt = p_tt;
@@ -4318,7 +4397,7 @@ end close_contract;
 
 END DPT_SOCIAL;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  DPT_SOCIAL ***
 grant EXECUTE                                                                on DPT_SOCIAL      to BARS_ACCESS_DEFROLE;
@@ -4326,8 +4405,7 @@ grant EXECUTE                                                                on 
 grant EXECUTE                                                                on DPT_SOCIAL      to WR_ALL_RIGHTS;
 
  
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_social.sql =========*** End *** 
- PROMPT ===================================================================================== 
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/BARS/package/dpt_social.sql =========*** End *** 
+PROMPT ===================================================================================== 
  
