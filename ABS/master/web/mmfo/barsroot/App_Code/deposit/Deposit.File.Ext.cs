@@ -385,22 +385,45 @@ public class BankFileExt
                     (cmdInsertInfo.Parameters["info_id"].Value as Array).GetValue(i)
                     ));
 
-            if (setupAgencies)
+            string isUniqueFileMessage = String.Empty;
+            using (OracleCommand cmd = connect.CreateCommand())
             {
-                OracleCommand cmdFinish = connect.CreateCommand();
-                cmdFinish.CommandText = "begin dpt_social.set_agencyid(:header_id); end;";
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = @"select dpt_social.CHK_PYMT_FILE(:p_hdr_id) from dual";
+                cmd.Parameters.Add("p_hdr_id", OracleDbType.Decimal, header.id, ParameterDirection.Input);
+                using (OracleDataReader rdr = cmd.ExecuteReader())
+                    if (rdr.Read())
+                        isUniqueFileMessage = String.IsNullOrEmpty(rdr.GetValue(0).ToString()) ? String.Empty : rdr.GetString(0);
 
-                cmdFinish.Parameters.Add("header_id", OracleDbType.Decimal, header.id, ParameterDirection.Input);
-                cmdFinish.ExecuteNonQuery();
             }
 
-            _dbLogger.Debug("Пользователь успешно принял банковский файл " 
-				+ header.filename + " за " + header.dtCreated.ToShortDateString()
-				,"deposit");
+            if (isUniqueFileMessage == String.Empty)
+            {
 
-            tx.Commit();
-            txCommitted = true;
-		}
+                if (setupAgencies)
+                {
+                    OracleCommand cmdFinish = connect.CreateCommand();
+                    cmdFinish.CommandText = "begin dpt_social.set_agencyid(:header_id); end;";
+
+                    cmdFinish.Parameters.Add("header_id", OracleDbType.Decimal, header.id, ParameterDirection.Input);
+                    cmdFinish.ExecuteNonQuery();
+                }
+
+                _dbLogger.Debug("Пользователь успешно принял банковский файл "
+                    + header.filename + " за " + header.dtCreated.ToShortDateString()
+                    , "deposit");
+
+                tx.Commit();
+                txCommitted = true;
+            }
+            else
+            {
+                _dbLogger.Debug("Користувач спробував завантажити не унікальний файл "
+                      + header.filename + " за " + header.dtCreated.ToShortDateString()
+                      , "deposit");
+                throw new SocialDepositException(isUniqueFileMessage);
+            }
+        }
 		finally
 		{
             if (!txCommitted) tx.Rollback();
