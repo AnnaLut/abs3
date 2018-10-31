@@ -148,6 +148,8 @@ create or replace package body ow_transform_acc is
       from (
               select 1 from accounts where nls = p_nls_new and kf = p_kf and (nlsalt is null or nlsalt <> p_nls)
               union all
+              select 1 from ACCOUNTS_RSRV where nls = p_nls_new and kf = p_kf
+              union all
               select 1 from TRANSFORM_2017_FORECAST where new_nls = p_nls_new and kf = p_kf and acc <> p_acc
            );
       return (l_count = 0 and length(p_nls_new) = 14);
@@ -282,9 +284,9 @@ create or replace package body ow_transform_acc is
          end if;
          l_nbs := c.nbs;
       end loop;
-      bars_audit.info(l_trace||'Оброблені рахунки по балансовому KF='||p_kf||', NSB='||l_nbs||', Всього рахунків ='||l_acc_cnt);
 
       commit;
+      bars_audit.info(l_trace||'Оброблені рахунки по балансовому KF='||p_kf||', NSB='||l_nbs||', Всього рахунків ='||l_acc_cnt);
 
       bars_audit.info(l_trace||'Завершення для KF='||p_kf);
       bc.home();
@@ -730,21 +732,31 @@ create or replace package body ow_transform_acc is
          l_try := 0;
          while l_try < 100 loop
             begin
-               update accounts
-               set NLS       = c.nls_new
-                   , nbs     = c.nbs_new
-                   , ob22    = c.ob_new
-                   , nlsalt  = c.Nls_Old
-                   , nbs2    = c.nbs_old
-                   , DAT_ALT = gc_bnk_dt
-               where acc = c.ACC;
+			   if check_nls(
+				              p_acc       => c.acc
+                              , p_nls     => c.nls
+                              , p_nls_new => c.nls_new
+                              , p_kf      => c.kf
+                           ) then
+                  update accounts
+                  set NLS       = c.nls_new
+                      , nbs     = c.nbs_new
+                      , ob22    = c.ob_new
+                      , nlsalt  = c.Nls_Old
+                      , nbs2    = c.nbs_old
+                      , DAT_ALT = gc_bnk_dt
+                  where acc = c.ACC;
 
-               l_try := 100;
+                  l_try := 100;
+               else
+                  c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => c.nbs_new , p_nls => c.nbs_new||'0'||trunc(dbms_random.value(100000000, 999999999)));
+                  l_try := tools.iif(l_try = 99, 101, l_try + 1);
+               end if;
             exception
                when DUP_VAL_ON_INDEX then
 				    -- что-то вдруг пошло не так, генерируем новый номер счета и повторяем попытку (и так 100 раз)
                     c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => c.nbs_new , p_nls => c.nbs_new||'0'||trunc(dbms_random.value(100000000, 999999999)));
-                    l_try := l_try + 1 ;
+                    l_try := tools.iif(l_try = 99, 101, l_try + 1);
                when others then
                     l_try := 101;
             end;
@@ -796,7 +808,7 @@ create or replace package body ow_transform_acc is
 			-- сохраняем старый OB22
             update SPECPARAM set OB22_alt = c.ob_old  where acc = c.ACC ;
 
-            -- обновляем новый номер счета в депозитах
+            /*-- обновляем новый номер счета в депозитах
             update DPT_DEPOSIT t
             set t.nls_p = c.nls_new
             where t.rnk = c.rnk
@@ -809,9 +821,9 @@ create or replace package body ow_transform_acc is
             where t.rnk = c.rnk
                   and t.kv = c.kv
                   and t.mfo_d = c.kf
-                  and t.nls_d = c.nls_old;
+                  and t.nls_d = c.nls_old;*/
 
-            -- обновляем новый номер счета регулярных платежах
+            /*-- обновляем новый номер счета регулярных платежах
             update sto_det t
             set nlsa = c.nls_new
             where nlsa = c.nls_old
@@ -822,7 +834,7 @@ create or replace package body ow_transform_acc is
             set nlsb = c.nls_new
             where nlsb = c.nls_old
                   and t.mfob = c.kf
-                  and t.kvb = c.kv;
+                  and t.kvb = c.kv;*/
 
             --- Журнал счетов
             delete from accounts_update where acc = c.acc and trunc(chgdate) = trunc(sysdate);
@@ -851,7 +863,7 @@ create or replace package body ow_transform_acc is
             INSERT INTO   accounts_update
                (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
                  chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
-            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,c.nbs_new, c.nbs2, c.DAOS ,-- дата откр
+            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,c.nbs_new, c.nbs_old, c.DAOS ,-- дата откр
                     c.isp  ,c.nms  ,c.pap ,c.grp,c.sec ,c.seci, c.seco,c.vid  ,c.tip ,  -- yjdsq nbg cx
                     c.dazs ,c.blkd ,c.blkk,c.lim, c.pos,c.accc,c.tobo ,c.mdate, c.ostx,c.rnk ,c.kf   ,
                     sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',c.kf), gc_bnk_dt, c.branch, c.ob_new,
@@ -876,22 +888,105 @@ create or replace package body ow_transform_acc is
    procedure account_interest_transform(p_kf in accounts.kf%type)
    is
       l_trace varchar2(100) := 'ow_transform_acc.account_interest_transform: ';
+      l_count number        := 0;
    begin
       bc.go(p_kf);
       bars_audit.info(l_trace||'Старт для='||p_kf);
 
-      for j in (
-                  select  i.rowid, i.mfob, i.nlsb, i.kvb, a.nls, i.id
-                  from bars.int_accn i
-                  join bars.accounts a on i.mfob = a.kf and i.nlsb = a.nlsalt and i.kvb = a.kv
-                  where i.mfob = p_kf
-                        and a.nlsalt like gc_nbs_person||'%'
-               )
+      bars_audit.info(l_trace||'МФО='||p_kf||'. Старт оновлення процентних ставок');
+      for c_int in (
+                     select  i.rowid, i.mfob, i.nlsb, i.kvb, a.nls, i.id
+                     from bars.int_accn i
+                     join bars.accounts a on i.mfob = a.kf 
+                                             and i.nlsb = a.nlsalt 
+                                             and i.kvb = a.kv
+                                             and a.dazs is not null
+                     where i.mfob = p_kf
+                           and a.nlsalt like gc_nbs_person||'%'
+                  )
       loop
-         update bars.int_accn set nlsb = j.nls where rowid = j.rowid;
+         update bars.int_accn set nlsb = c_int.nls where rowid = c_int.rowid;
+         l_count := l_count + 1;
       end loop;
 
       commit;
+      bars_audit.info(l_trace||'МФО для='||p_kf||'. Завершення оновлення процентних ставок. Оброблено записів '||l_count);
+
+      bars_audit.info(l_trace||'МФО='||p_kf||'. Старт оновлення ф.190 Рахунок вiдправника');
+      l_count := 0;
+      For c_sto_a in (
+		                select d.idd, d.branch, a.nls, d.kf
+                        from bars.sto_det d
+                        join bars.accounts a on a.nlsalt = d.nlsa 
+                                                and a.kf = d.kf
+                                                and a.kv = d.kva
+                                                and a.dazs is not null
+                        where d.kf = p_kf
+                              and d.nlsa like gc_nbs_person||'%'
+                     )
+      loop
+         update sto_det set nlsa = c_sto_a.nls where kf = c_sto_a.kf and idd = c_sto_a.idd;
+         l_count := l_count + 1;
+      end loop;
+
+      commit;
+      bars_audit.info(l_trace||'МФО для='||p_kf||'. Завершення оновлення ф.190 Рахунок вiдправника. Оброблено записів '||l_count);
+
+      bars_audit.info(l_trace||'МФО='||p_kf||'. Старт оновлення ф.190 Рахунок отримувача');
+      l_count := 0;
+      For c_sto_b in (
+		                select d.idd, d.branch, a.nls, d.kf
+                        from bars.sto_det d 
+                        join bars.accounts a on a.nlsalt = d.nlsb
+                                             and a.kf = d.mfob
+                                             and a.kv = d.kvb
+                                             and a.dazs is not null
+                        where d.kf = p_kf
+                               and d.nlsb like gc_nbs_person||'%')
+      loop
+         update sto_det set nlsb = c_sto_b.nls where kf = c_sto_b.kf and idd = c_sto_b.idd;
+         l_count := l_count + 1;
+      end loop;
+      commit;
+      bars_audit.info(l_trace||'МФО для='||p_kf||'. Завершення оновлення ф.190 Рахунок отримувача. Оброблено записів '||l_count);
+
+      bars_audit.info(l_trace||'МФО='||p_kf||'. Старт оновлення депозитів ФО Счет для выплаты %%');
+      l_count := 0;
+      For c_dep_p in (
+		                select d.deposit_id, d.branch, a.nls, d.kf
+                        from bars.dpt_deposit d
+                        join bars.accounts a on a.nlsalt = d.nls_p 
+                                                and a.kf = d.mfo_p
+                                                and a.kv = d.kv
+                                                and a.dazs is not null
+                        where d.nls_p like gc_nbs_person||'%'
+                     ) 
+      loop
+         update dpt_deposit set nls_p = c_dep_p.nls where kf = c_dep_p.kf and deposit_id = c_dep_p.deposit_id;
+         l_count := l_count + 1;
+      end loop;
+      commit;
+      bars_audit.info(l_trace||'МФО для='||p_kf||'. Завершення оновлення депозитів ФО Счет для выплаты %%. Оброблено записів '||l_count);
+
+      bars_audit.info(l_trace||'МФО='||p_kf||'. Старт оновлення депозитів ФО Техн.счет');
+      l_count := 0;
+      For c_dep_d in (
+                        select d.deposit_id, d.branch, a.nls, d.kf
+                        from bars.dpt_deposit d
+                        join bars.accounts a on a.nlsalt = d.nls_d 
+                                                and a.kf = d.mfo_d
+                                                and a.kv = d.kv
+                                                and a.dazs is not null
+                        where d.nls_d like  gc_nbs_person||'%'
+                     ) 
+      loop
+         update dpt_deposit set nls_d = c_dep_d.nls where kf = c_dep_d.kf and deposit_id = c_dep_d.deposit_id;
+         l_count := l_count + 1;
+      end loop;
+
+      commit;
+      bars_audit.info(l_trace||'МФО для='||p_kf||'. Завершення оновлення депозитів ФО Техн.счет. Оброблено записів '||l_count);
+
       bars_audit.info(l_trace||'Завершення для KF='||p_kf);
       bc.home();
    end;
@@ -1003,7 +1098,7 @@ create or replace package body ow_transform_acc is
 		               if sqlcode = -20666 then -- accreg.OPN_ACC генерирует ошибку ORA-20666
                           -- что-то вдруг пошло не так при открытии счета, генерируем новый номер счета и повторяем попытку (и так 100 раз)
                           c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => c.nbs_new , p_nls => c.nbs_new||'0'||trunc(dbms_random.value(100000000, 999999999)));
-                          l_try := l_try + 1 ;
+                          l_try := tools.iif(l_try = 99, 101, l_try + 1);
                        else
                           l_try := 101;
                        end if;
@@ -1229,6 +1324,7 @@ create or replace package body ow_transform_acc is
    procedure account_interest_transform_le(p_kf in accounts.kf%type)
    is
       l_trace varchar2(100) := 'ow_transform_acc.account_interest_transform_le: ';
+      l_count number        := 0;
    begin
       bc.go(p_kf);
       bars_audit.info(l_trace||'Старт для='||p_kf);
@@ -1236,7 +1332,9 @@ create or replace package body ow_transform_acc is
       for j in (
                   select  i.rowid, i.mfob, i.nlsb, i.kvb, a.nls, i.id
                   from bars.int_accn i
-                  join bars.accounts a on i.mfob = a.kf and i.nlsb = a.nlsalt and i.kvb = a.kv
+                  join bars.accounts a on i.mfob = a.kf 
+                                          and i.nlsb = a.nlsalt 
+                                          and i.kvb = a.kv
                   where i.mfob = p_kf
                         and (
                                a.nlsalt like gc_nbs_legal_entity||'%'
@@ -1246,10 +1344,11 @@ create or replace package body ow_transform_acc is
                )
       loop
          update bars.int_accn set nlsb = j.nls where rowid = j.rowid;
+         l_count := l_count + 1;
       end loop;
 
       commit;
-      bars_audit.info(l_trace||'Завершення для KF='||p_kf);
+      bars_audit.info(l_trace||'Завершення для KF='||p_kf||' Оброблено записів '||l_count);
       bc.home();
    end;
 
@@ -1324,18 +1423,28 @@ create or replace package body ow_transform_acc is
          l_try := 0;
          while l_try < 100 loop
             begin
-               update accounts
-               set NLS       = c.nls_new
-                   , nlsalt  = c.Nls_Old
-                   , DAT_ALT = gc_bnk_dt
-               where acc = c.ACC;
+			   if check_nls(
+				              p_acc       => c.acc
+                              , p_nls     => c.nls
+                              , p_nls_new => c.nls_new
+                              , p_kf      => c.kf
+                           ) then
+                  update accounts
+                  set NLS       = c.nls_new
+                      , nlsalt  = c.Nls_Old
+                      , DAT_ALT = gc_bnk_dt
+                  where acc = c.ACC;
 
-               l_try := 100;
+                  l_try := 100;
+               else
+                  c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => c.nbs_new , p_nls => c.nbs_new||'0'||trunc(dbms_random.value(100000000, 999999999)));
+                  l_try := tools.iif(l_try = 99, 101, l_try + 1);
+               end if;
             exception
                when DUP_VAL_ON_INDEX then
 				    -- что-то вдруг пошло не так, генерируем новый номер счета и повторяем попытку (и так 100 раз)
                     c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => '2620' , p_nls => '26200'||trunc(dbms_random.value(100000000, 999999999)));
-                    l_try := l_try + 1 ;
+                    l_try := tools.iif(l_try = 99, 101, l_try + 1);
                when others then
                     l_try := 101;
             end;
@@ -1411,7 +1520,7 @@ create or replace package body ow_transform_acc is
             INSERT INTO   accounts_update
                (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
                  chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
-            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,c.nbs_new, c.nbs2, c.DAOS ,-- дата откр
+            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,c.nbs_new, c.nbs_old, c.DAOS ,-- дата откр
                     c.isp  ,c.nms  ,c.pap ,c.grp,c.sec ,c.seci, c.seco,c.vid  ,c.tip ,  -- yjdsq nbg cx
                     c.dazs ,c.blkd ,c.blkk,c.lim, c.pos,c.accc,c.tobo ,c.mdate, c.ostx,c.rnk ,c.kf   ,
                     sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',c.kf), gc_bnk_dt, c.branch, c.ob_new,
