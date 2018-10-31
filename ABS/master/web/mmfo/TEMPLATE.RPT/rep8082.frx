@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" UseFileCache="true" ReportInfo.Created="09/16/2014 10:45:29" ReportInfo.Modified="08/16/2018 12:26:58" ReportInfo.CreatorVersion="2014.1.2.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+
+    private void ListBox1_Click(object sender, EventArgs e)
+    {
+      
+    }
+
+    private void TextBox1_Click(object sender, EventArgs e)
+    {
+      
+    }
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <OracleDataConnection Name="DEV" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWFpREtfBsfNvap9ZxEEn2r" CommandTimeout="4000">
+      <TableDataSource Name="Table1" Alias="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NMK, NUM00 ND, CHAR01 CC_ID, NUM01 KV, NUM02 SDOG, NUM03 ND_SUM, CHAR02 SDATE, CHAR03 WDATE, NUM04 BODY_NORM, NUM05 EXPIRED_BODY, CHAR04 DATE_EXPIRED_BODY, NUM06 DAY_EXPIRED_BODY, NUM07 PERSENT_NORM, NUM08 EXPIRED_PERSENTM31, NUM09 EXPIRED_PERSENTB31, CHAR05 DATE_EXPIRED_PERSENT, NUM10 DAY_EXPIRED_PERSENT from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="ND" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <Column Name="CC_ID" DataType="System.String"/>
+        <Column Name="SDOG" DataType="System.Decimal"/>
+        <Column Name="ND_SUM" DataType="System.Decimal"/>
+        <Column Name="SDATE" DataType="System.String"/>
+        <Column Name="WDATE" DataType="System.String"/>
+        <Column Name="BODY_NORM" DataType="System.Decimal"/>
+        <Column Name="EXPIRED_BODY" DataType="System.Decimal"/>
+        <Column Name="DATE_EXPIRED_BODY" DataType="System.Char"/>
+        <Column Name="DAY_EXPIRED_BODY" DataType="System.Decimal"/>
+        <Column Name="PERSENT_NORM" DataType="System.Decimal"/>
+        <Column Name="EXPIRED_PERSENTM31" DataType="System.Decimal"/>
+        <Column Name="EXPIRED_PERSENTB31" DataType="System.Decimal"/>
+        <Column Name="DATE_EXPIRED_PERSENT" DataType="System.Char"/>
+        <Column Name="DAY_EXPIRED_PERSENT" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="113" Expression="[session_id]" DefaultValue="1"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="sFdat1" DataType="System.DateTime" Description="01/01/2010"/>
+    <Parameter Name="session_id" DataType="System.Int64"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="530" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15" Duplex="Simplex">
+    <ReportTitleBand Name="ReportTitle1" Width="1927.8" Height="160.65">
+      <TableObject Name="Table2" Width="1927.8" Height="160.65" CanBreak="false" RepeatHeaders="false">
+        <TableColumn Name="Column13" Width="160.65"/>
+        <TableColumn Name="Column21" Width="103.95"/>
+        <TableColumn Name="Column22" Width="113.4"/>
+        <TableColumn Name="Column75" Width="103.95"/>
+        <TableColumn Name="Column34" Width="103.95"/>
+        <TableColumn Name="Column43" Width="113.4"/>
+        <TableColumn Name="Column46" Width="85.05"/>
+        <TableColumn Name="Column47" Width="103.95"/>
+        <TableColumn Name="Column50" Width="132.3"/>
+        <TableColumn Name="Column51" Width="132.3"/>
+        <TableColumn Name="Column52" Width="132.3"/>
+        <TableColumn Name="Column53" Width="113.4"/>
+        <TableColumn Name="Column55" Width="113.4"/>
+        <TableColumn Name="Column56" Width="122.85"/>
+        <TableColumn Name="Column57" Width="122.85"/>
+        <TableColumn Name="Column58" Width="85.05"/>
+        <TableColumn Name="Column59" Width="85.05"/>
+        <TableRow Name="Row3" Height="85.05">
+          <TableCell Name="Cell69" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Звіт з визначення кількості днів прострочки за кред.ЮО на дату [FormatDateTime([sFdat1])]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 16pt, style=Bold" ColSpan="17">
+            <Formats>
+              <GeneralFormat/>
+              <GeneralFormat/>
+              <GeneralFormat/>
+            </Formats>
+          </TableCell>
+          <TableCell Name="Cell78" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell80" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell300"/>
+          <TableCell Name="Cell124" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell164"/>
+          <TableCell Name="Cell176"/>
+          <TableCell Name="Cell180"/>
+          <TableCell Name="Cell192"/>
+          <TableCell Name="Cell196"/>
+          <TableCell Name="Cell200"/>
+          <TableCell Name="Cell267"/>
+          <TableCell Name="Cell270"/>
+          <TableCell Name="Cell272"/>
+          <TableCell Name="Cell274"/>
+          <TableCell Name="Cell276"/>
+          <TableCell Name="Cell278"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="75.6">
+          <TableCell Name="Cell154" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Позичальник" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell159" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Реф.КД" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell160" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Номер КД" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell301" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Код валюти" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell163" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Сума по договору ном." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell167" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Сума по договору екв." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell179" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Дата початку договору" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell183" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text=" Дата завершення договору" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell264" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Нормальний борг по тілу екв." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell265" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Прострочений борг по тілу екв." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell266" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Дата виникнення Простроченого Осн.боргу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell268" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Кіл-ть днів Простроч Осн.боргу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell271" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Нормальний борг по %% екв." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell273" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Простр(&lt;=31) борг по %% екв." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell275" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Простр(&gt;31) борг по %% екв" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell277" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Дата виникн Простроч Проц.боргу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          <TableCell Name="Cell279" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.5" Text="Кіл днів Простроч Проц.боргу" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data3" Top="164.65" Width="1927.8" Height="23.61" CanGrow="true" CanShrink="true" DataSource="Table1" KeepTogether="true">
+      <TableObject Name="Table2" Width="1927.8" Height="23.61" Border.Lines="All" GrowToBottom="true">
+        <TableColumn Name="Column1" Width="160.65"/>
+        <TableColumn Name="Column2" Width="103.95"/>
+        <TableColumn Name="Column6" Width="113.4"/>
+        <TableColumn Name="Column76" Width="103.95"/>
+        <TableColumn Name="Column36" Width="103.95"/>
+        <TableColumn Name="Column37" Width="113.4"/>
+        <TableColumn Name="Column38" Width="85.05"/>
+        <TableColumn Name="Column39" Width="103.95"/>
+        <TableColumn Name="Column42" Width="132.3"/>
+        <TableColumn Name="Column35" Width="132.3"/>
+        <TableColumn Name="Column40" Width="132.3"/>
+        <TableColumn Name="Column54" Width="113.4"/>
+        <TableColumn Name="Column65" Width="113.4"/>
+        <TableColumn Name="Column66" Width="122.85"/>
+        <TableColumn Name="Column67" Width="122.85"/>
+        <TableColumn Name="Column68" Width="85.05"/>
+        <TableColumn Name="Column69" Width="85.05"/>
+        <TableRow Name="Row4" Height="23.61" AutoSize="true">
+          <TableCell Name="Cell90" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.NMK]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell91" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.ND]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell94" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.CC_ID]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell302" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.KV]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell130" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.SDOG]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell132" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.ND_SUM]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell134" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.SDATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell136" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.WDATE]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell143" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.BODY_NORM]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell138" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.EXPIRED_BODY]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell128" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.DATE_EXPIRED_BODY]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell269" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.DAY_EXPIRED_BODY]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell290" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.PERSENT_NORM]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell291" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.EXPIRED_PERSENTM31]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell292" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.EXPIRED_PERSENTB31]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell293" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.DATE_EXPIRED_PERSENT]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell294" Border.Lines="All" Border.Color="72, 94, 136" Border.Width="0.25" Text="[Table.DAY_EXPIRED_PERSENT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+  </ReportPage>
+</Report>
