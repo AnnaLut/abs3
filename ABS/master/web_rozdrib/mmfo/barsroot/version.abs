@@ -1,5 +1,10 @@
-=========  svn diff --summarize -r 69104:69251 D:\SVN\master\web\mmfo
+=========  svn diff --summarize -r 69104:69265 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot\App_Data\forms\frm_fin2_form_k.xml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot\credit\fin_nbu\credit_defolt.aspx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot\credit\fin_nbu\credit_defolt.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot\credit\fin_nbu\fin_form_f3.aspx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot\credit\fin_nbu\fin_kved.aspx.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot\App_Code\deposit\Deposit.File.Ext.cs
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web\barsroot
 ---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.16\mmfo\web
-Bugfix_2.0.48.a.16 (Rev:69104-69251
+Bugfix_2.0.48.a.16 (Rev:69104-69265
