@@ -35,7 +35,7 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
         }
     }
 
-    [OracleCustomTypeMappingAttribute("BARS.R_SLAVE_CLIENT_EBK")]
+    [OracleCustomTypeMappingAttribute("BARS.R_SLAVE_CLIENT_EBK_V1")]
     public class SlaveClientFactory : IOracleCustomTypeFactory
     {
         public IOracleCustomType CreateObject()
@@ -44,7 +44,7 @@ namespace BarsWeb.Areas.Cdm.Models.Transport
         }
     }
 
-    [OracleCustomTypeMappingAttribute("BARS.T_SLAVE_CLIENT_EBK")]
+    [OracleCustomTypeMappingAttribute("BARS.T_SLAVE_CLIENT_EBK_V1")]
     public class SlaveClientArrayFactory : IOracleArrayTypeFactory
     {
         public Array CreateArray(int numElems)
