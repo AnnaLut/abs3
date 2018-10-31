@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/19/2013 16:38:25" ReportInfo.Modified="06/22/2018 18:19:02" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/19/2013 16:38:25" ReportInfo.Modified="10/08/2018 15:28:01" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +18,26 @@ namespace FastReport
 {
   public class ReportScript
   {
+    private void skip_band(object sender, EventArgs e)
+    {
+      if (((Decimal)Report.GetColumnValue(&quot;fin_110.RES&quot;)) == 1 )
+      {
+        DataHeader1.Visible = false;
+        Data2.Visible = false;
+        DataHeader3.Visible = false;
+        Data3.Visible = false;
+        DataFooter1.Visible = false;
+      }
+      else
+      {
+        DataHeader1.Visible = true;
+        Data2.Visible = true;
+        DataHeader3.Visible = true;
+        Data3.Visible = true;
+        DataFooter1.Visible = true;
+      }
+    }
+    
     public decimal GetDyn(decimal Sn1, decimal Sn2)
     {
       if (Sn2!=0)
@@ -206,7 +226,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5QvwwJUacBSMab9TeMMUg5numMbxnOxg2+g/dNi06yonT/HfL54URrGxmk4fB63nrGJ8mP2Wx6T0EmzUjvXk/bw=" CommandTimeout="120">
+    <OracleDataConnection Name="dev" ConnectionString="rijcmlqIEnsMSbpo3gQbTFwv+dS5Y3Neg7DvdR2Vu1DbZYHDJIJHEDEQst4kKpqTLmpSao9W2MdMSKyR/ccTP3egwr3TA==" CommandTimeout="120">
       <TableDataSource Name="Table" Alias="OFS" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT kod, name, &#13;&#10;              FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, add_months(trunc(dat_),-6)) as zn2, &#13;&#10;              FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, add_months(trunc(dat_),-3)) as zn1, &#13;&#10;              FIN_OBU.F_GET_FIN_ND(rnk_, nd_, kod, idf, dat_) as zn,&#13;&#10;              FIN_OBU.CALC_SCOR_BAL(kod, idf, add_months(trunc(dat_),-6), rnk_, nd_) as dat2 , &#13;&#10;              FIN_OBU.CALC_SCOR_BAL(kod, idf, add_months(trunc(dat_),-3), rnk_, nd_) as dat1 , &#13;&#10;              FIN_OBU.CALC_SCOR_BAL(kod, idf, dat_, rnk_, nd_) as dat, nd_, rnk_, dat_,  add_months(trunc(dat_),-3) as dat_1,  add_months (trunc(dat_),-6) as dat_2&#13;&#10;    FROM FIN_QUESTION f, (select :rnk as rnk_,:nd as nd_ ,  to_date(:dat_f,'dd.mm.yyyy') as dat_ from dual) d&#13;&#10;   WHERE idf IN (33)&#13;&#10;ORDER BY idf DESC, ord ASC">
         <Column Name="KOD" DataType="System.String"/>
         <Column Name="NAME" DataType="System.String"/>
@@ -439,6 +459,10 @@ namespace FastReport
         <CommandParameter Name="DAT4" DataType="106" Expression="[datf2.DAT4]" DefaultValue="01-01-1900"/>
         <CommandParameter Name="DAT5" DataType="106" Expression="[datf2.DAT5]" DefaultValue="01-01-1900"/>
       </TableDataSource>
+      <TableDataSource Name="Table10" Alias="fin_110" DataType="System.Int32" Enabled="true" SelectCommand="select f_get_osbb_k110_type(:RNK) as RES from dual">
+        <Column Name="RES" DataType="System.Decimal"/>
+        <CommandParameter Name="RNK" DataType="113" Expression="[rnk]" DefaultValue="1"/>
+      </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="ND" DataType="System.String" Expression="&quot;134965626&quot;"/>
     <Parameter Name="fdat" DataType="System.String" Expression="&quot;01/01/2017&quot;"/>
@@ -446,7 +470,7 @@ namespace FastReport
     <Parameter Name="zdat" DataType="System.String" Expression="&quot;01/01/2017&quot;"/>
     <Total Name="Total bal" Expression="[client_dani.BAL]" Evaluator="Data1"/>
   </Dictionary>
-  <ReportPage Name="Page1">
+  <ReportPage Name="Page1" StartPageEvent="skip_band">
     <DataBand Name="Data1" Top="4" Width="718.2" Height="642.6" BeforePrintEvent="Data1_BeforePrint" DataSource="Table3">
       <TextObject Name="Text3" Left="9.45" Top="94.5" Width="198.45" Height="28.35" Text="Назва регіонал управл.&#13;&#10;МФО установи&#13;&#10;" VertAlign="Center" Font="Arial, 8pt, style=Underline"/>
       <TextObject Name="Text5" Left="378" Top="122.85" Width="132.3" Height="18.9" Text="Ознака інсайдера" VertAlign="Center" Font="Arial, 8pt, style=Underline"/>

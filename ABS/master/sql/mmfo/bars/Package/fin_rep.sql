@@ -243,7 +243,7 @@ END fin_rep;
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_REP 
 AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.6 10.12.2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.0.7 29.10.2018';
 
 /*
  2017-05-23 1.0.2  - COBUSUPMMFO-588 Если Клиент одновременно входит в группу под общим контролем
@@ -2603,6 +2603,9 @@ begin
 			l_rep.rv    := 1;             l_rep.sort := '1000'; 	l_rep.kod  := 'VNKRO'; 			l_rep.name := 'ВКР операції';
 			l_rep.s    := fin_obu.GET_VNKR(x.zdat, p_rnk, p_nd);
 
+               if f_get_osbb_k110_type (p_rnk) = 1 and l_rep.s is null then
+                l_rep.s    := CCK_APP.GET_ND_TXT( p_nd, 'VNCRR');
+               end if;
 			PIPE ROW(l_rep);
 
 			l_rep.rv    := 2;            l_rep.sort := '2000';   	l_rep.kod  := 'VNCRP';  		l_rep.name := 'Попередній ВКР контрагента';
@@ -2649,8 +2652,11 @@ begin
                   AND (dazs IS NULL OR dazs > x.zdat)  				  )
 				Where num = 1;
             exception when no_data_found then
-			  l_rep.s := null;
-			end;
+              l_rep.s := null;
+              if f_get_osbb_k110_type (p_rnk) = 1 and l_rep.s is null   then
+              l_rep.s := CCK_APP.GET_ND_TXT( p_nd, 'VNCRR');
+              end if;
+             end;
 			PIPE ROW(l_rep);
 
 
