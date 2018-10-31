@@ -4,7 +4,7 @@ PROMPT =========================================================================
 
 create or replace package bars.zp_corp2_intg
 is
-   g_head_version   constant varchar2 (64) := 'version 1.2 22.06.2018';
+   g_head_version   constant varchar2 (64) := 'version 2.0 31.10.2018';
 
    --
    -- пакет интеграции с Corp2
@@ -35,17 +35,24 @@ is
    procedure imp_salary_cards_order (p_blob_data in blob, p_response out blob, p_mfo in varchar2, p_errmsg out varchar2);
 
    --импорт ведомостей
-   procedure set_payrolls (p_clob_data in clob, p_clob_out out clob);
+   procedure set_payrolls (p_clob_data in clob, 
+                           p_clob_out out clob, 
+                           p_source    in number default 5);
 
    function form_cards_dictionary return clob;
 
    procedure send_payrolls_result;
+   
+   function encodebase64 (inclearchar  in clob) return clob;
+   function decodebase64 (inbase64char in clob) return clob;
+
+   function form_payrolls_result return clob;
 end;
 /
 
 create or replace package body bars.zp_corp2_intg
 is
-   g_body_version   constant varchar2 (64) := 'version 1.28 22.06.2018';
+   g_body_version   constant varchar2 (64) := 'version 2.0 31.10.2018';
 
    g_p_name         constant varchar2 (13) := 'zp_corp2_intg';
 
@@ -312,7 +319,7 @@ is
       if inclearchar is null or nvl (cloblen, 0) = 0
       then
          return null;
-      elsif cloblen <= 24000
+      elsif cloblen <= 2000
       then
          return utl_raw.cast_to_varchar2 (
                    utl_encode.base64_encode (utl_raw.cast_to_raw (inclearchar)));
@@ -365,7 +372,7 @@ is
       if inbase64char is null or nvl (cloblen, 0) = 0
       then
          return null;
-      elsif cloblen <= 32000
+      elsif cloblen <= 2000
       then
          return utl_raw.cast_to_varchar2 (
                    utl_encode.base64_decode (utl_raw.cast_to_raw (inbase64char)));
@@ -480,7 +487,7 @@ is
    is
       l_rnk        customer.rnk%type;
       l_kodtarif   number;
-      l_act        varchar2 (100) := '.get_zp_deal_par.';
+      l_act        varchar2 (100) := '.get_zp_deal_par ';
    begin
       bc.go (p_mfo);
 
@@ -1952,7 +1959,9 @@ is
       return l_clob;
     end;
 
-   procedure set_payrolls (p_clob_data in clob, p_clob_out out clob)
+   procedure set_payrolls (p_clob_data in clob, 
+                           p_clob_out out clob, 
+                           p_source    in number default 5) -- 5 - corp2 / 6 - CorpLite
    is
       l_parser              dbms_xmlparser.parser;
       l_doc                 dbms_xmldom.domdocument;
@@ -2004,6 +2013,8 @@ is
 
       l_buff := decodebase64(p_clob_data);
 
+      bars_audit.info (g_p_name || l_act || 'decodebase64(p_clob_data)=' || substr(l_buff,1,2000));
+
       l_parser := dbms_xmlparser.newparser;
       dbms_xmlparser.parseclob (l_parser, l_buff);
       l_doc := dbms_xmlparser.getdocument (l_parser);
@@ -2019,25 +2030,27 @@ is
 
          bc.go(l_payroll_row.mfo);
 
+         bars_audit.info (g_p_name || l_act || 'l_payroll_row.mfo='||l_payroll_row.mfo);
+
          dbms_xslprocessor.valueof (l_analytic, 'rnk/text()', l_tmp);
          l_payroll_row.rnk := add_ru_tail (l_tmp);
 
-         --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.rnk='||to_char(l_payroll_row.rnk));
+         bars_audit.info (g_p_name || l_act || 'l_payroll_row.rnk='||to_char(l_payroll_row.rnk));
 
          dbms_xslprocessor.valueof (l_analytic, 'payroll_id/text()', l_payroll_row.payroll_id);
          dbms_xslprocessor.valueof (l_analytic, 'payroll_num/text()', l_tmp);
          l_payroll_row.payroll_num := substr (l_tmp, 1, 64);
          dbms_xslprocessor.valueof (l_analytic, 'payroll_date/text()', l_tmp);
-         l_payroll_row.payroll_date := to_date (l_tmp, 'DD-MON-YY');
+         l_payroll_row.payroll_date := to_date (l_tmp, 'DD.MM.YYYY');
          dbms_xslprocessor.valueof (l_analytic, 'nazn/text()', l_tmp);
          l_payroll_row.nazn := substr (l_tmp, 1, 160);
          dbms_xslprocessor.valueof (l_analytic, 'nls_2909/text()', l_payroll_row.nls_2909);
 
          l_analyticlist_docs := dbms_xslprocessor.selectnodes (l_analytic, 'docs/doc');
 
+         bars_audit.info (g_p_name || l_act || 'l_payroll_row.nls_2909='||to_char(l_payroll_row.nls_2909));
          --проверяем счет 2909
          begin
-           --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.nls_2909='||to_char(l_payroll_row.nls_2909));
             select acc
               into l_acc
               from accounts a
@@ -2067,8 +2080,6 @@ is
                l_payroll_row.err := 'zp_deal_not_found';
          end;
 
-         --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.err='||l_payroll_row.err);
-
          --проверяем ,не  записана ли эта ведомость
          begin
             select 1
@@ -2086,8 +2097,6 @@ is
                null;
          end;
 
-         --bars_audit.info ('zp_corp2_intg.set_payrolls l_payroll_row.err='||l_payroll_row.err);
-
          if l_payroll_row.err is null
          then
             l_zp_payroll.id := bars_sqnc.get_nextval ('s_zp_payroll');
@@ -2095,7 +2104,7 @@ is
             l_zp_payroll.zp_id := l_zp_deals.id;
             l_zp_payroll.zp_deal_id := l_zp_deals.deal_id;
             l_zp_payroll.sos := 2;
-            l_zp_payroll.source := 5;
+            l_zp_payroll.source := p_source; -- 5 - corp2 / 6 - CorpLite
             l_zp_payroll.crt_date := sysdate;
             l_zp_payroll.branch := l_zp_deals.branch;
             l_zp_payroll.kf := l_payroll_row.mfo;
@@ -2253,6 +2262,8 @@ is
       dbms_xmldom.freedocument (l_doc);
 
       p_clob_out := l_clob_data;
+
+      bars_audit.info (g_p_name || l_act || 'p_clob_out=' || substr(p_clob_out,1,2000));
       bars_audit.info (g_p_name || l_act || 'finish');
    exception
       when others
@@ -2279,56 +2290,44 @@ is
       dbms_lob.createtemporary (l_clob_data, false);
       dbms_lob.append (l_clob_data, '<rowset>');
 
-      --for j in (select * from mv_kf)
-      --loop
-
-         for l in (select log.*
-                     from zp_payroll_log log
-                    where send_status = 0)
-         loop
+       for l in (select log.*
+                   from zp_payroll_log log
+                  where send_status = 0)
+       loop
 
 
-            dbms_lob.append (l_clob_data, '<row>');
-            dbms_lob.append (l_clob_data, '<payroll_id>' || l.corp2_id || '</payroll_id>');
-            dbms_lob.append (l_clob_data, '<payroll_status>' || l.status || '</payroll_status>');
-            dbms_lob.append (l_clob_data, '<payroll_err>' || l.err || '</payroll_err>');
-            dbms_lob.append (l_clob_data, '<docs>');
+          dbms_lob.append (l_clob_data, '<row>');
+          dbms_lob.append (l_clob_data, '<payroll_id>' || l.corp2_id || '</payroll_id>');
+          dbms_lob.append (l_clob_data, '<payroll_status>' || l.status || '</payroll_status>');
+          dbms_lob.append (l_clob_data, '<payroll_err>' || l.err || '</payroll_err>');
+          dbms_lob.append (l_clob_data, '<docs>');
 
-            for c
-               in (select d.corp2_id,
-                          log.status,
-                          log.err,
-                          o.ref,
-                          o.sos,
-                          d.doc_comment
-                     from zp_payroll_log log, zp_payroll_doc d, oper o
-                    where     send_status = 0
-                          and d.id_pr = log.id
-                          and d.ref = o.ref(+)
-                          and log.corp2_id = l.corp2_id)
-            loop
-               dbms_lob.append (l_clob_data, '<doc>');
-               dbms_lob.append (l_clob_data, '<doc_id>' || c.corp2_id || '</doc_id>');
-               dbms_lob.append (l_clob_data, '<ref>' || c.ref || '</ref>');
-               dbms_lob.append (l_clob_data, '<doc_sos>' || c.sos || '</doc_sos>');
-               dbms_lob.append (l_clob_data, '<doc_comm>' || c.doc_comment || '</doc_comm>');
-               dbms_lob.append (l_clob_data, '</doc>');
-            end loop;
+          for c
+             in (select d.corp2_id,
+                        log.status,
+                        log.err,
+                        o.ref,
+                        o.sos,
+                        d.doc_comment
+                   from zp_payroll_log log, zp_payroll_doc d, oper o
+                  where     send_status = 0
+                        and d.id_pr = log.id
+                        and d.ref = o.ref(+)
+                        and log.corp2_id = l.corp2_id)
+          loop
+             dbms_lob.append (l_clob_data, '<doc>');
+             dbms_lob.append (l_clob_data, '<doc_id>' || c.corp2_id || '</doc_id>');
+             dbms_lob.append (l_clob_data, '<ref>' || c.ref || '</ref>');
+             dbms_lob.append (l_clob_data, '<doc_sos>' || c.sos || '</doc_sos>');
+             dbms_lob.append (l_clob_data, '<doc_comm>' || c.doc_comment || '</doc_comm>');
+             dbms_lob.append (l_clob_data, '</doc>');
+          end loop;
 
-            dbms_lob.append (l_clob_data, '</docs>');
-            dbms_lob.append (l_clob_data, '</row>');
-            /*
-            update zp_payroll_log
-               set send_status = 1
-             where corp2_id = l.corp2_id;
-             */
-         end loop;
-
-      --end loop;
+          dbms_lob.append (l_clob_data, '</docs>');
+          dbms_lob.append (l_clob_data, '</row>');
+       end loop;
 
       dbms_lob.append (l_clob_data, '</rowset>');
-
-      bars_audit.info (g_p_name || l_act || ' finish.' || substr (l_clob_data, 1, 100));
 
       if dbms_lob.getlength (l_clob_data) > 0
       then
@@ -2337,7 +2336,8 @@ is
          return empty_clob ();
       end if;
    end;
-
+  
+  -- Запис результатів обробки статусів відомостей та документів в Corp2
   procedure set_payroll_log_result(p_result in clob)
   is
     l_parser      dbms_xmlparser.parser;
@@ -2359,9 +2359,11 @@ is
     l_satatus    varchar2(255);
     l_message    clob;
     l_act        varchar2 (256) := '.set_payroll_log_result.';
+    l_xml        xmltype;
   begin
+    
     dbms_lob.createtemporary (l_message, false);
-
+    /*
     l_parser := dbms_xmlparser.newparser;
     dbms_xmlparser.parseclob (l_parser, p_result);
     l_doc := dbms_xmlparser.getdocument (l_parser);
@@ -2372,10 +2374,14 @@ is
     for j in 1 .. dbms_xmldom.getlength (l_analyticlist)
     loop
        l_analytic := dbms_xmldom.item (l_analyticlist, j - 1);
-       dbms_xslprocessor.valueof (l_analytic, 'status/text()', l_satatus);
-       dbms_xslprocessor.valueof (l_analytic, 'message/text()', l_message);
+       l_satatus := dbms_xslprocessor.valueof (l_analytic, 'status/text()');
+       l_message := dbms_xslprocessor.valueof (l_analytic, 'message/text()');
     end loop;
-
+    */
+    l_xml := xmltype(p_result);
+    l_satatus := l_xml.extract('SendPayrollResultToCorp2Response/SendPayrollResultToCorp2Result/status/text()','xmlns="http://ws.unity-bars-utl.com.ua/"').getStringVal();
+    l_message := l_xml.extract('SendPayrollResultToCorp2Response/SendPayrollResultToCorp2Result/message/text()','xmlns="http://ws.unity-bars-utl.com.ua/"').getClobVal();
+    
     if upper(l_satatus) = 'OK' and l_message is not null then
       l_message := decodebase64(l_message);
 
@@ -2412,7 +2418,7 @@ is
     when others then
       dbms_xmlparser.freeparser (l_parser);
       dbms_xmldom.freedocument (l_doc);
-      raise;
+      raise_application_error(-20000,'Помилка розбору результатів обробки в CORP2 err = '|| sqlerrm || chr(10) || dbms_utility.format_error_backtrace);
   end set_payroll_log_result;
 
    procedure send_payrolls_result
@@ -2421,7 +2427,7 @@ is
       l_request     soap_rpc.t_request;
       l_response    soap_rpc.t_response;
       l_url         params$global.val%type
-         --:= 'http://10.10.10.44:18000/barsroot/webservices/SalaryBagServices/ZPServiceMain.asmx';
+         --:= 'http://10.10.10.97:10003/barsroot/webservices/SalaryBagServices/ZPServiceMain.asmx';
          :=    getglobaloption ('ABSBARS_WEBSERVER_PROTOCOL')
             || '://'
             || getglobaloption ('ABSBARS_WEBSERVER_IP_ADRESS')
@@ -2462,6 +2468,8 @@ is
       l_response := soap_rpc.invoke (l_request);
 
       l_clob := l_response.doc.getclobval ();
+
+      bars_audit.info (g_p_name || l_act || ' l_response.doc.getclobval() l_clob='||substr(l_clob,1,2000));
 
       set_payroll_log_result(l_clob);
 
