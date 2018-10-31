@@ -56,7 +56,8 @@
     </asp:Panel>
     <asp:Panel ID="Panel1" runat="server" Width="950px">
         <asp:Wizard ID="Wizard1" runat="server" Width="100%" BackColor="#EFF3FB" BorderColor="#B5C7DE"
-            BorderWidth="1px" Font-Names="Verdana" CellPadding="10" ActiveStepIndex="5" Font-Size="Small"
+            BorderWidth="1px" Font-Names="Verdana" CellPadding="10" 
+            ActiveStepIndex="5" Font-Size="Small"
             StartNextButtonText="Наступна" StepNextButtonText="Наступна" StepPreviousButtonText="Попередня"
             CancelButtonText="Відмінити" FinishCompleteButtonText="Готово" FinishPreviousButtonText="Попередня"
             OnNextButtonClick="BtNext" OnPreviousButtonClick="BtPrevious">
@@ -168,13 +169,17 @@
                             <tr>
                                 <td colspan="4">
                                     <asp:Label ID="Lb_vncr" runat="server" Text="Внутрішній кредитний рейтинг  "></asp:Label>
-                                    <asp:TextBox ID="tb_vncr" runat="server" Enabled="False" Width="90px"></asp:TextBox>
+                                    <asp:DropDownList ID="tb_vncr" runat="server" Width="90px" DataSource='<%# SQL_SELECT_dataset(@"select code as id, code as name from CCK_RATING where code not in ("+ ((char)39).ToString() + "Д" +((char)39).ToString() + ")" ) %>'
+                                        DataTextField="NAME" DataValueField="ID" Enabled="true"></asp:DropDownList>
                                     <Bars:Separator ID="Sp2" runat="server" Visible="False" BorderWidth="1px" />
-                                    <Bars:ImageTextButton ID="Ib_vncrr" runat="server" ButtonStyle="Image" ImageUrl="/Common/Images/default/16/document_edit.png"
+                                    <Bars:ImageTextButton ID="Ib_save_vncrr" runat="server" ButtonStyle="Image" ImageUrl="/Common/Images/default/16/document_edit.png"
+                                        OnClick="Bt_Clic_set_Vnkr" ToolTip="Зберегти ВКР" CausesValidation="False"
+                                        EnabledAfter="0" />
+                                    <bars:ImageTextButton ID="Ib_vncrr" runat="server" ButtonStyle="Image" ImageUrl="/Common/Images/default/16/document_edit.png"
                                         OnClick="BtI_Clic_Vnkr" ToolTip="Перейти на розрахунок ВНКР позичальника " CausesValidation="False"
-                                        Visible="true" EnabledAfter="0" />
+                                        EnabledAfter="0" />
                                 </td>
-                            </tr>
+                            
                         </table>
                         <table>
                             <tr>
@@ -199,8 +204,8 @@
                                     <asp:Label ID="Lb_dpres" runat="server" Text="Дата проведення реструктуризації" Visible="False"></asp:Label>
                                 </td>
                                 <td>
-                                    <Bars:TextBoxDate ID="tb_dpres" runat="server" IsRequired="true" style="text-align: right"
-                                        Width="100px" Visible="False" MinValue="01/01/1900" MaxValue="01/01/2999"></Bars:TextBoxDate>
+                                    <Bars:TextBoxDate ID="tb_dpres" runat="server" IsRequired="true" Width="100px" Visible="False"
+                                        MinValue="01/01/1900" MaxValue="01/01/2999"></Bars:TextBoxDate>
                                 </td>
                             </tr>
                             <tr>
@@ -230,7 +235,7 @@
                     </asp:Panel>
                 </asp:WizardStep>
                 <asp:WizardStep ID="WizardStep1" runat="server" Title=" Належність до груп та їх вплив на контрагента">
-                    <asp:Panel ID="Panel2" runat="server">
+                    <asp:Panel ID="Panel2" runat="server" Enabled="true">
                         <table>
                             <tr>
                                 <td style="width: 355Px">
@@ -447,37 +452,33 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <asp:Label ID="Lb_GP2" runat="server" Text="2. Контрагент належить до ОСББ/ЖБК" Width="655px"
-                                            Visible="true"></asp:Label>
+                                        <asp:Label ID="Lb_GP2" runat="server" Text="2. Контрагент належить до ОСББ/ЖБК" Width="655px"></asp:Label>
                                     </td>
                                     <td>
                                         <asp:DropDownList ID="Dl_GP2" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "GP2" +((char)39).ToString() + "and idf = 51 ") %>'
-                                            DataTextField="NAME" DataValueField="VAL" Width="60px" AutoPostBack="True" OnSelectedIndexChanged="Dl_GP_SelectedIndexChanged"
-                                            Visible="true">
+                                            DataTextField="NAME" DataValueField="VAL" Width="60px" AutoPostBack="True" OnSelectedIndexChanged="Dl_GP_SelectedIndexChanged">
                                         </asp:DropDownList>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <asp:Label ID="Lb_GP3" runat="server" Text="3. Забезпечення за кредитною операцією Позичальнника є грошові кошти (у т.ч. грошове покриття) та/або майнові права на грошові кошти, що розміщені на депозитному рахунку  в установі банку, коофіциент покритт я заборгованості за основною сумою становить не менше 1,0"
-                                            Width="655px" Visible="true"></asp:Label>
+                                            Width="655px"></asp:Label>
                                     </td>
                                     <td>
                                         <asp:DropDownList ID="Dl_GP3" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "GP3" +((char)39).ToString() + "and idf = 51 ") %>'
-                                            DataTextField="NAME" DataValueField="VAL" Width="60px" AutoPostBack="True" OnSelectedIndexChanged="Dl_GP_SelectedIndexChanged"
-                                            Visible="true">
+                                            DataTextField="NAME" DataValueField="VAL" Width="60px" AutoPostBack="True" OnSelectedIndexChanged="Dl_GP_SelectedIndexChanged">
                                         </asp:DropDownList>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <asp:Label ID="Lb_GP4" runat="server" Text="4. Контрагент є Ключовим учасником группи пов`язаних контрагентів"
-                                            Width="655px" Visible="true"></asp:Label>
+                                            Width="655px"></asp:Label>
                                     </td>
                                     <td>
                                         <asp:DropDownList ID="Dl_GP4" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "GP4" +((char)39).ToString() + "and idf = 51 ") %>'
-                                            DataTextField="NAME" DataValueField="VAL" Width="60px" AutoPostBack="True" OnSelectedIndexChanged="Dl_GP_SelectedIndexChanged"
-                                            Visible="true">
+                                            DataTextField="NAME" DataValueField="VAL" Width="60px" AutoPostBack="True" OnSelectedIndexChanged="Dl_GP_SelectedIndexChanged">
                                         </asp:DropDownList>
                                     </td>
                                 </tr>
@@ -608,15 +609,15 @@
                                     <asp:Label ID="l_PD8_d" runat="server" Text="Дата проведення  останньої зміни активу на інший актив"></asp:Label>
                                 </td>
                                 <td>
-                                    <Bars:TextBoxDate ID="tb_PD8_d" runat="server" IsRequired="true" style="text-align: right"
-                                        Width="100px" MinValue="01/01/1900" MaxValue="01/01/2999"></Bars:TextBoxDate>
+                                    <Bars:TextBoxDate ID="tb_PD8_d" runat="server" IsRequired="true" Width="100px" MinValue="01/01/1900"
+                                        MaxValue="01/01/2999"></Bars:TextBoxDate>
                                 </td>
                             </tr>
                         </table>
                     </asp:Panel>
                 </asp:WizardStep>
                 <asp:WizardStep ID="WizardStep4" runat="server" Title=" Ознаки визнання дефолту">
-                    <asp:Panel ID="Pn_Wizar4" runat="server" Enabled="true">
+                    <asp:Panel ID="Pn_Wizar4" runat="server">
                         <asp:GridView ID="GrWiz4" runat="server" AutoGenerateColumns="False" BorderColor="#EFF3FB"
                             CssClass="barsGridView" DataKeyNames="KOD,IDF,NAME,POB" ShowHeader="False">
                             <Columns>
@@ -666,75 +667,133 @@
                     </asp:Panel>
                 </asp:WizardStep>
                 <asp:WizardStep ID="WizardStep5" runat="server" Title=" Ознаки припинення дефолту">
-                    <asp:Panel ID="Pn_Wizar5" runat="server">
-                        <asp:GridView ID="GrWiz5" runat="server" AutoGenerateColumns="False" CssClass="barsGridView"
-                            DataKeyNames="KOD, IDF, NAME, POB" BorderColor="#EFF3FB" ShowHeader="False">
-                            <Columns>
-                                <asp:BoundField DataField="NAME" HeaderText="" HtmlEncode="False">
-                                    <ItemStyle Wrap="true" HorizontalAlign="left" Width="600px" Font-Italic="True" />
-                                </asp:BoundField>
-                                <asp:TemplateField HeaderText="" FooterStyle-HorizontalAlign="Left">
-                                    <ItemTemplate>
-                                        <asp:DropDownList ID="DropDownList1" AppendDataBoundItems="true" DataSource='<%# SQL_SELECT_dataset(""+Eval("L_SQL")+"")%>'
-                                            DataTextField="NAME" DataValueField="VAL" Text='<%#Eval("S")%>' Enabled='<%# (Convert.ToString(Eval("POB")) == "1")?(false):(true) %>'
-                                            Width="100px" runat="server" ToolTip='<%# Eval("DESCRIPT")%>' Visible="true">
-                                        </asp:DropDownList>
-                                    </ItemTemplate>
-                                    <FooterStyle HorizontalAlign="Left" />
-                                    <ItemStyle HorizontalAlign="Left" />
-                                </asp:TemplateField>
-                                <asp:TemplateField>
-                                    <ItemTemplate>
-                                        <asp:Image ID="Im4" runat="server" Visible='<%# (Convert.ToString(Eval("DESCRIPT")).Length == 0)?(false):(true) %>'
-                                            ToolTip='<%# Eval("DESCRIPT")%>' ImageUrl="/Common/Images/default/16/help2.png" />
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                            </Columns>
-                        </asp:GridView>
-                    </asp:Panel>
-                    <asp:Panel ID="p_events" runat="server"  Visible="false">
+                    <asp:Panel ID="w5_p1" runat="server" GroupingText="Фінансова реструктуризація">
                         <table>
                             <tr>
-                                <td style="width: 550Px">
-                                    <asp:Label ID="lb_ZD4" runat="server" Text="  3 - З моменту усунення події/подій, на підставі якої/яких було визнано дефолт божника, минуло щонайменше 180 днів " Width="550"></asp:Label>
-                                </td>
-                                <td style="width: 100Px">
-                                    <asp:DropDownList ID="dl_ZD4" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD4" +((char)39).ToString() + "and idf = 55 ") %>'
-                                        DataTextField="NAME" DataValueField="VAL" Enabled="false" Width="100px">
-                                    </asp:DropDownList>
-                                </td>
-                                <td style="width: 50Px">
-                                <%-- <asp:Image ID="Im_ZD4" runat="server" Visible='<%# (Convert.ToString(Eval("DESCRIPT")).Length == 0)?(false):(true) %>'
-                                            ToolTip='<%# Eval("DESCRIPT")%>' ImageUrl="/Common/Images/default/16/help2.png" />--%>
-                                </td>
-                            </tr>
-                        </table>
-                    </asp:Panel>
-                    <asp:Panel ID="Pn_Wizar5_2" runat="server" GroupingText="Судження банку..." Visible="false">
-                        <table>
-                            <tr>
-                                <td style="width: 400Px">
-                                    <asp:Label ID="Lb_ZD3" runat="server" Text="Банк має документально підтверджене обґрунтоване судження, що Контрагент, попри наявні фінансові труднощі, спроможний обслуговувати борг"></asp:Label>
+                                <td style="width: 300Px">
+                                    <asp:Label ID="Lb_zd6" runat="server" Text="Відбулась фінансова реструктуризація"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:DropDownList ID="Dl_ZD3" runat="server" Width="100px" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD3" +((char)39).ToString() + "and idf = 55 ") %>'
-                                        Enabled="true" DataTextField="NAME" DataValueField="VAL">
+                                    <asp:DropDownList ID="Dd_zd6" runat="server" Width="100px" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD6" +((char)39).ToString() + "and idf = 55 ") %>'
+                                        DataTextField="NAME" DataValueField="VAL" AutoPostBack="True" OnSelectedIndexChanged="Dd_zd6_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <asp:Label ID="Lb_dzd6" runat="server" Text=" Дата фінансової реструктуризації "></asp:Label>
+                                </td>
+                                <td>
+                                    <Bars:TextBoxDate ID="Tb_dzd6" runat="server" Width="100" />
+                                </td>
+                            </tr>
+                            <tr>
+                            <td>
+                             <asp:Label ID="Lb_zd8" runat="server" Text="Запроваджено процедуру фінансової реструктуризації"></asp:Label>
+                            </td>
+                            <td>
+                             <asp:DropDownList ID="Dd_zd8" runat="server" Width="100px" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD8" +((char)39).ToString() + "and idf = 55 ") %>'
+                                        DataTextField="NAME" DataValueField="VAL" AutoPostBack="True" OnSelectedIndexChanged="Dd_zd6_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                            </td>
+                            <td><asp:Image ID="Im_zd8" runat="server" ImageUrl="/Common/Images/default/16/help2.png"
+                                            ToolTip="1 - учасниками якої є банки - резиденти України *
+2 - учасниками якої є банки - резиденти України, банки-нерезиденти, іноземні державні експортні кредитні агенції, міжнародні фінансові організації, утримувачі єврооблігацій* 
+ * за умови, що строк дії забезпечення не менше ніж строк фінансової реструктуризації боржника та банк зберігає право звернути стягнення на таке забезпечення як протягом проведення процедури такої реструктуризації, так і після її завершення" /></td>
+                            </tr>
+                            <tr>
+                                <td style="width: 300Px">
+                                    <asp:Label ID="Lb_zd7" runat="server" Text="Зняти дефолт?"></asp:Label>
+                                </td>
+                                <td>
+                                    <asp:DropDownList ID="Dd_zd7" runat="server" Width="100px" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD7" +((char)39).ToString() + "and idf = 55 ") %>'
+                                        DataTextField="NAME" DataValueField="VAL" AutoPostBack="True" OnSelectedIndexChanged="Dd_zd7_SelectedIndexChanged">
                                     </asp:DropDownList>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <asp:Label ID="Lb_ZDN1" runat="server" Text="Рішення колегіального органу №" Visible="true"></asp:Label>
-                                    <asp:TextBox ID="Tb_ZDN1" runat="server" Width="100Px" Visible="true" AutoPostBack="true"
-                                        OnTextChanged="Tb_ZDN1_TextChanged"></asp:TextBox>
-                                    <asp:Label ID="Lb_ZDD1" runat="server" Text=" від " Visible="true"></asp:Label>
-                                    <Bars:TextBoxDate ID="Tb_ZDD1" runat="server" Visible="true" OnValueChanged="Tb_ZDN1_TextChanged" />
-                                    <asp:RangeValidator runat="server" ID="RangeValidator_Tb_ZDN1" ControlToValidate="Tb_ZDN1"
-                                        MinimumValue="0" MaximumValue="99999999" Type="Integer" ErrorMessage="Не вірно вказано"
-                                        Display="Dynamic" SetFocusOnError="True"></asp:RangeValidator>
+                                    <asp:Label ID="Lb_nzd7" runat="server" Text="Рішення колегіального органу №"></asp:Label>
+                                    <asp:TextBox ID="Tb_nzd7" runat="server" Width="100px" AutoPostBack="True"></asp:TextBox>
+                                    <asp:Label ID="Lb_dzd7" runat="server" Text=" від "></asp:Label>
+                                    <Bars:TextBoxDate ID="tb_dzd7" runat="server" />
+                                    <asp:RangeValidator runat="server" ID="RV_nzd7" ControlToValidate="Tb_nzd7" MinimumValue="0"
+                                        MaximumValue="99999999" Type="Integer" ErrorMessage="Не вірно вказано" Display="Dynamic"
+                                        SetFocusOnError="True"></asp:RangeValidator>
                                 </td>
                             </tr>
                         </table>
+                    </asp:Panel>
+                    <asp:Panel ID="w5_p2" runat="server">
+                        <asp:Panel ID="Pn_Wizar5" runat="server">
+                            <asp:GridView ID="GrWiz5" runat="server" AutoGenerateColumns="False" CssClass="barsGridView"
+                                DataKeyNames="KOD,IDF,NAME,POB" BorderColor="#EFF3FB" ShowHeader="False">
+                                <Columns>
+                                    <asp:BoundField DataField="NAME" HtmlEncode="False">
+                                        <ItemStyle Wrap="True" HorizontalAlign="Left" Width="600px" Font-Italic="True" />
+                                    </asp:BoundField>
+                                    <asp:TemplateField>
+                                        <ItemTemplate>
+                                            <asp:DropDownList ID="DropDownList1" AppendDataBoundItems="true" DataSource='<%# SQL_SELECT_dataset(""+Eval("L_SQL")+"")%>'
+                                                DataTextField="NAME" DataValueField="VAL" Text='<%#Eval("S")%>' Enabled='<%# (Convert.ToString(Eval("POB")) == "1")?(false):(true) %>'
+                                                Width="100px" runat="server" ToolTip='<%# Eval("DESCRIPT")%>' Visible="true">
+                                            </asp:DropDownList>
+                                        </ItemTemplate>
+                                        <FooterStyle HorizontalAlign="Left" />
+                                        <ItemStyle HorizontalAlign="Left" />
+                                    </asp:TemplateField>
+                                    <asp:TemplateField>
+                                        <ItemTemplate>
+                                            <asp:Image ID="Im4" runat="server" Visible='<%# (Convert.ToString(Eval("DESCRIPT")).Length == 0)?(false):(true) %>'
+                                                ToolTip='<%# Eval("DESCRIPT")%>' ImageUrl="/Common/Images/default/16/help2.png" />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                            </asp:GridView>
+                        </asp:Panel>
+                        <asp:Panel ID="p_events" runat="server" Visible="false">
+                            <table>
+                                <tr>
+                                    <td style="width: 550Px">
+                                        <asp:Label ID="lb_ZD4" runat="server" Text="  3 - З моменту усунення події/подій, на підставі якої/яких було визнано дефолт боржника, минуло щонайменше 180 днів "
+                                            Width="550px"></asp:Label>
+                                    </td>
+                                    <td style="width: 100Px">
+                                        <asp:DropDownList ID="dl_ZD4" runat="server" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD4" +((char)39).ToString() + "and idf = 55 ") %>'
+                                            DataTextField="NAME" DataValueField="VAL" Enabled="false" Width="100px" 
+                                            OnSelectedIndexChanged="dl_ZD4_SelectedIndexChanged" AutoPostBack="true" >
+                                        </asp:DropDownList>
+                                    </td>
+                                    <td style="width: 50Px">
+                                    </td>
+                                </tr>
+                            </table>
+                        </asp:Panel>
+                        <asp:Panel ID="Pn_Wizar5_2" runat="server" GroupingText="Судження банку..." Visible="False">
+                            <table>
+                                <tr>
+                                    <td style="width: 400Px">
+                                        <asp:Label ID="Lb_ZD3" runat="server" Text="Банк має документально підтверджене обґрунтоване судження, що Контрагент, попри наявні фінансові труднощі, спроможний обслуговувати борг"></asp:Label>
+                                    </td>
+                                    <td>
+                                        <asp:DropDownList ID="Dl_ZD3" runat="server" Width="100px" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD3" +((char)39).ToString() + "and idf = 55 ") %>'
+                                            DataTextField="NAME" DataValueField="VAL">
+                                        </asp:DropDownList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <asp:Label ID="Lb_ZDN1" runat="server" Text="Рішення колегіального органу №"></asp:Label>
+                                        <asp:TextBox ID="Tb_ZDN1" runat="server" Width="100px" AutoPostBack="True" OnTextChanged="Tb_ZDN1_TextChanged"></asp:TextBox>
+                                        <asp:Label ID="Lb_ZDD1" runat="server" Text=" від "></asp:Label>
+                                        <Bars:TextBoxDate ID="Tb_ZDD1" runat="server" OnValueChanged="Tb_ZDN1_TextChanged" />
+                                        <asp:RangeValidator runat="server" ID="RangeValidator_Tb_ZDN1" ControlToValidate="Tb_ZDN1"
+                                            MinimumValue="0" MaximumValue="99999999" Type="Integer" ErrorMessage="Не вірно вказано"
+                                            Display="Dynamic" SetFocusOnError="True"></asp:RangeValidator>
+                                    </td>
+                                </tr>
+                            </table>
+                        </asp:Panel>
                     </asp:Panel>
                 </asp:WizardStep>
                 <asp:WizardStep ID="WizardStep6" runat="server" Title="Додаткові показники коригування коофіциенту PD">
@@ -808,9 +867,9 @@
                                 <td>
                                 </td>
                                 <td>
-                                    <Bars:ImageTextButton ID="Bt_save" runat="server" ButtonStyle="ImageAndText" ImageUrl="/Common/Images/default/16/money_calc.png"
+                                    <Bars:ImageTextButton ID="Bt_save" runat="server" ImageUrl="/Common/Images/default/16/money_calc.png"
                                         Text="Розрахувати" ToolTip="Скорегувати клас та розрахувати показник PD " CssClass="navigationButton"
-                                        Width="110Px" Height="35Px" OnClick="Bt_save_Click" />
+                                        OnClick="Bt_save_Click" EnabledAfter="0" />
                                 </td>
                             </tr>
                         </table>

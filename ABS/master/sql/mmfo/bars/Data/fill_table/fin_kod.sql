@@ -20,7 +20,7 @@ Begin
 End;
 Begin
 
-
+ 
 delete from fin_kod  where idf = 6 and kod like 'PK%' and fm = '0';
 delete from fin_kod  where idf in (11,12,13)  and fm = '0';
 
@@ -1856,7 +1856,7 @@ l_FIN_KOD.FM :='0';
 l_FIN_KOD.NAME :='Чистий прибуток / збиток';
 l_FIN_KOD.ORD :=17;
 l_FIN_KOD.KOD :='AZ17';
-l_FIN_KOD.IDF :=11;
+l_FIN_KOD.IDF :=11; 
 l_FIN_KOD.FM :='F';
 
  p_merge( l_FIN_KOD);
@@ -1880,6 +1880,30 @@ l_FIN_KOD.FM :='0';
  p_merge( l_FIN_KOD);
 
 
+l_FIN_KOD.NAME :='Дата фінансової реструктуризації data (ознак приппинення дефолту)';
+l_FIN_KOD.ORD :=622;
+l_FIN_KOD.KOD :='DZD6';
+l_FIN_KOD.IDF :=55;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD); 
+ 
+ 
+l_FIN_KOD.NAME :='Рішення колегіального органу data (ознак припинення дефолту)';
+l_FIN_KOD.ORD :=620;
+l_FIN_KOD.KOD :='DZD7';
+l_FIN_KOD.IDF :=55;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
+ 
+ l_FIN_KOD.NAME :='Рішення колегіального органу № (ознак припинення дефолту)';
+l_FIN_KOD.ORD :=620;
+l_FIN_KOD.KOD :='NZD7';
+l_FIN_KOD.IDF :=55;
+l_FIN_KOD.FM :='0';
+
+ p_merge( l_FIN_KOD);
 commit;
 END;
 /

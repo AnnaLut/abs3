@@ -6,7 +6,7 @@
  
   CREATE OR REPLACE PACKAGE BARS.FIN_FORMAF3 
 AS
-   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.1.0  16.06.2017';
+   G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 1.1.1  18.08.2018';
 
 TYPE t_col_F3DC IS RECORD
  (
@@ -134,7 +134,7 @@ END fin_formaf3;
 CREATE OR REPLACE PACKAGE BODY BARS.FIN_FORMAF3 
 AS
 
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.1.0  16.06.2017';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.1.1  18.08.2018';
 
    -- маска формата для преобразования char <--> number
   g_number_format constant varchar2(128) := 'FM999999999999999999999999999990';

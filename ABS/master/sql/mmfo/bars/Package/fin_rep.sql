@@ -268,7 +268,7 @@ AS
  */
 function header_version return varchar2 is
 begin
-  return 'Package header FIN_NBU '||G_HEADER_VERSION;
+  return 'Package header FIN_REP '||G_HEADER_VERSION;
 end header_version;
 
 /**
@@ -276,7 +276,7 @@ end header_version;
  */
 function body_version return varchar2 is
 begin
-  return 'Package body FIN_NBU '||G_BODY_VERSION;
+  return 'Package body FIN_REP '||G_BODY_VERSION;
 end body_version;
 
 
@@ -554,11 +554,17 @@ XLSX_BUILDER_PKG.cell( 34, 6, '', p_borderId => XLSX_BUILDER_PKG.get_border( 'me
 
    i := 7;
     for x in (
-					select gl.kf  , r.fdat , '' "3", r.rnk,r.nmk,' ' "6",c.country,c.ise, n.cc_id,n.sdate,'' "11",n.wdate,r.kv,r.nls,decode(r.rz,1,'[0000]',2,'[1000]') misce, sum(r.eadq)*100 kol16,kol17,
-							  sum (r.ZALq)*100 kol18, 0 rc, r.lgd, r.fin_z kol21, '[000/00]' kol22,kol23,kol24,kol25,kol26,kol27,kol28,kol29,r.fin kol30,kol31, sum(r.CRQ)*100 kol32 , n.rezq39*100 kol33 ,n.rezq23*100  kol34, n.nd, r.dv, t4
+					select gl.kf  , r.fdat , '' "3", r.rnk,r.nmk,' ' "6",c.country,c.ise, n.cc_id,n.sdate,
+                 '' "11",n.wdate,r.kv,r.nls,decode(r.rz,1,'[0000]',2,'[1000]') misce, sum(r.eadq)*100 kol16,kol17,
+  							  sum (r.ZALq)*100 kol18, 0 rc, r.lgd, r.fin_z kol21, '[000/00]' kol22,kol23,
+                  kol24,kol25,kol26,kol27,kol28,kol29,r.fin kol30,kol31, sum(r.CRQ)*100 kol32 , 
+                  n.rezq39*100 kol33 ,n.rezq23*100  kol34, n.nd, r.dv, t4
 					from rez_cr r,customer c, nbu23_rez n
 				   where r.fdat= p_dat and r.rnk=c.rnk and n.fdat= p_dat and r.acc=n.acc  and r.t4=1
-					group by  gl.kf ,r.fdat,1,r.rnk,r.nmk,6,c.country,c.ise, n.cc_id,11,n.sdate,n.wdate,r.kv,r.nls,decode(r.rz,1,'[0000]',2,'[1000]'),  0 , r.lgd, r.fin_z, 22 ,kol23,kol24,kol25,kol26,kol27,kol28,kol29,r.fin,  n.rezq39*100,n.rezq23*100 ,r.acc,kol17,kol31, n.nd, r.dv, t4
+					group by  gl.kf ,r.fdat,1,r.rnk,r.nmk,6,c.country,c.ise, n.cc_id,11,n.sdate,
+                    n.wdate,r.kv,r.nls,decode(r.rz,1,'[0000]',2,'[1000]'),  0 , r.lgd, r.fin_z, 22 ,
+                    kol23,kol24,kol25,kol26,kol27,kol28,kol29,r.fin,  n.rezq39*100,n.rezq23*100 ,
+                    r.acc,kol17,kol31, n.nd, r.dv, t4
 					order by  r.rnk, r.nls
 	          )
 	LOOP
@@ -1590,8 +1596,7 @@ end;
 
 	 for s in 1 .. t_deal.rnk(n_rnk).nd.count()
 		loop
-			  if t_deal.rnk(n_rnk).nd(s).nd = p_nd
-				 then n_nd := s;
+		  if t_deal.rnk(n_rnk).nd(s).nd = p_nd then n_nd := s;
 					  --trace(L_MOD, ' Дані є в колекції ND='||p_nd);
 					  goto  get_update;
 			  end if;
@@ -1827,7 +1832,7 @@ end;
 		end if;
 
 
-		if l_tipa in(3,9,10,4) then
+		if l_tipa in(3,9,10,4, 30, 90, 92) then
 
 	/*
 		t_deal.rnk(n_rnk).nd(n_nd).kol23 :='['||l_.p161_1||l_.p161_2||l_.p161_3||'/'||
@@ -2155,19 +2160,26 @@ as
 
 
 		 case    
-		    when l_c0(i).tipa in (4)  then l_idf := 76;
-			when l_c0(i).custtype = 2 then l_idf := 56;
-                                      else l_idf := 60;
+	       when l_c0(i).tipa in (4)  then 
+           l_idf := 76;
+			   when l_c0(i).custtype = 2 then 
+           l_idf := 56;
+         else 
+           l_idf := 60;
 		 end case;
 
-		case    when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) 
-		     then l_fin_p := NULL;
-             else l_fin_p := fin_nbu.zn_p_nd('CLSP', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
+		   case    
+         when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) then 
+           l_fin_p := NULL;
+         else 
+           l_fin_p := fin_nbu.zn_p_nd('CLSP', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
         end case;
 
-	    case    when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) 
-		    then l_fin_d := NULL;
-            else l_fin_d := fin_nbu.zn_p_nd('CLS', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
+       case    
+         when l_c0(i).tipa in (17,21,12,15,6, 5,92,93,30) then 
+           l_fin_d := NULL;
+         else 
+           l_fin_d := fin_nbu.zn_p_nd('CLS', l_idf, p_dat, l_c0(i).nd, l_c0(i).rnk);
 		end case;
                  
 		if l_fin_p = 0 THEN l_fin_p := NULL; end if;
@@ -2401,6 +2413,37 @@ begin
 
 
 	PIPE ROW(l_rep);
+
+	-- COBUSUPABS-7190 1.5
+	l_rep.rv    := null;
+	l_rep.sort := '7010';
+	l_rep.kod  := null;
+	l_rep.name := '- показники коригування PD :';
+	l_rep.s := null;
+	
+	PIPE ROW(l_rep);
+	
+	l_rep.rv    := null;
+	For p_pd in (select '71'||lpad(q.ord,2,'0') ord, q.kod, q.name, R.NAME as repl
+					from FIN_QUESTION q, fin_nd_hist h, FIN_QUESTION_REPLY r
+				   where q.idf in (50) 
+					 and q.idf = h.idf       and q.kod = h.kod
+					 and q.idf = r.idf  	 and q.kod = r.kod
+					 and h.s = R.VAL 		 
+					 and h.nd = x.nd    	 and h.rnk = x.rnk
+					 and h.fdat = x.fdat
+			   )
+	loop
+	l_rep.sort := p_pd.ord;
+	l_rep.kod  := p_pd.kod;
+	l_rep.name := p_pd.name;
+	l_rep.s    := p_pd.repl;
+	PIPE ROW(l_rep);
+    end loop;
+	
+	
+	
+	
 
 	l_rep.rv    := 7;
 	l_rep.sort := '8000';
