@@ -144,7 +144,8 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
             cmd.Parameters.Add("dat", OracleDbType.Date, Convert.ToDateTime(DATP_.Value, cinfo), ParameterDirection.Input);
             cmd.Parameters.Add("dat", OracleDbType.Date, dat, ParameterDirection.Input);
             cmd.Parameters.Add("OKPO", OracleDbType.Decimal, rnk, ParameterDirection.Input);
-            cmd.CommandText = @" select c.nmk, c.okpo, f.ved, (select count(1) from fin_kved where okpo = c.okpo and dat = f.fdat and flag = 1) kol, case when (sysdate-datea) < 366 then to_char(:dat,'DD.MM.YYYY') else to_char(trunc(f.fdat,'YYYY') -1,'YYYY') end Year_, case when (sysdate-datea) < 366 then 1 else 0 end tips, to_char(datea) as datea
+            cmd.CommandText = @" select c.nmk, c.okpo, f.ved, (select count(1) from fin_kved where okpo = c.okpo and dat = f.fdat and flag = 1) kol, case when (sysdate-datea) < 366 then to_char(:dat,'DD.MM.YYYY') else to_char(trunc(f.fdat,'YYYY') -1,'YYYY') end Year_, case when (sysdate-datea) < 366 then 1 else 0 end tips, to_char(datea) as datea,
+                                        (select sum(s)+ fin_nbu.LOGK_read (DAT_ => f.fdat, OKPO_ => f.okpo,  IDF_ => 2,  mode_ => 1) from fin_rnk where okpo = f.okpo and fdat = f.fdat and idf = 2 and kod in ('2000','2010','2120')) s_2000
                                   from fin_customer c 
                                        left join fin_fm f on c.okpo = f.okpo and f.fdat = :dat 
                                  where c.rnk = :rnk";
@@ -164,6 +165,41 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
                 
                 LbNMK.Text = Convert.ToString(rdr["NMK"]);
                 Decimal Flag = Convert.ToDecimal(rdr["KOL"]);
+                Decimal S_2000 = Convert.ToDecimal(rdr["S_2000"]);
+
+
+   if (S_2000 == 0)
+     {
+      try
+                    {
+                        InitOraConnection();
+                        DD_ved.DataSource = SQL_SELECT_dataset("select ved, ved||'-'||name as name from ved where d_close is null and ved not in ('00000','99999','ZZZZZ') order by ved").Tables[0];
+                        DD_ved.DataTextField = "name";
+                        DD_ved.DataValueField = "ved";
+                        //Биндим
+                        DD_ved.DataBind();
+                        DD_ved.Items.Insert(0, new ListItem("Виберіть вид економічної діяльності", ""));
+                    }
+                    finally
+                    {
+                        DisposeOraConnection();
+                    }
+                    
+                   if (!string.IsNullOrEmpty(Convert.ToString(rdr["VED"])))
+                    {
+                        DD_ved.SelectedValue = Convert.ToString(rdr["VED"]);
+                    }
+                    else
+                    {
+                        ShowError("Виберіть вид економічної діяльності " + ". !!!");
+                    }
+
+                   BtSave.Visible = true;
+     }
+
+     else{
+
+
 
                 if (Flag == 0)
                 {
@@ -231,6 +267,10 @@ public partial class credit_fin_nbu_fin_kved : Bars.BarsPage
                     }
 
                 }
+
+     }
+
+
             }
 
             rdr.Close();

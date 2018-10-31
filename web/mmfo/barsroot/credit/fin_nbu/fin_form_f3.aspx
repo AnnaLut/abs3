@@ -123,7 +123,7 @@
                         <Bars:NumericEdit ID="tbS3" runat="server" Enabled='<%# (Convert.ToString(t_read.Text) == "0")?(false):(true) %>'
                             EnableTheming="True" MaxValue="1000000000" MinValue="-1000000000" Value='<%#  (Convert.ToString(Eval("COLUM3")) == "")?(0):(Convert.ToDecimal(Eval("COLUM3")))  %>'
                             Visible='<%# (Convert.ToString(Eval("KOD")) == ""|Convert.ToString(Eval("COL3"))=="X")?(false):(true) %>' Width="150px" />
-                             <asp:TextBox ID="idTexb3" runat="server"  readonly= "true" Text='<%#  Convert.ToString(Eval("COL3"))   %>' 
+                             <asp:TextBox ID="idTexb3" runat="server"  readonly= "true" 
                         Visible='<%# (Convert.ToString(Eval("COL3"))=="X")?(true):(false) %>' Width="150px"  Style="text-align: center;" ></asp:TextBox>
                     </ItemTemplate>
                     <ItemStyle HorizontalAlign="Right" />
@@ -133,7 +133,7 @@
                         <Bars:NumericEdit ID="tbS4" runat="server" Enabled='<%# (Convert.ToString(t_read.Text) == "0")?(false):(true) %>'
                             EnableTheming="True" MaxValue="1000000000" MinValue="-1000000000" Value='<%#  (Convert.ToString(Eval("COLUM4")) == "")?(0):(Convert.ToDecimal(Eval("COLUM4")))  %>'
                             Visible='<%# (Convert.ToString(Eval("KOD")) == ""|Convert.ToString(Eval("COL4"))=="X")?(false):(true) %>' Width="150px" />
-                        <asp:TextBox ID="idTexb4" runat="server"  readonly= "true" Text='<%#  Convert.ToString(Eval("COL4"))   %>' 
+                        <asp:TextBox ID="idTexb4" runat="server"  readonly= "true" 
                         Visible='<%# (Convert.ToString(Eval("COL4"))=="X")?(true):(false) %>' Width="150px"  Style="text-align: center;" ></asp:TextBox>
                     </ItemTemplate>
                     <ItemStyle HorizontalAlign="Right" />

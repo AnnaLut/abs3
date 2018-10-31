@@ -114,8 +114,8 @@
           select '9' as n, 'Баланс(актив)' as txt, '1300' as rr, NVL(SUM(decode(KOD,'1300',S,0)),0) SL, '1095+1195+1200' as rr2, NVL(SUM(decode(KOD,'1300',0,S)),0) SR
           from fin_rnk where OKPO=:OKPO and FDAT=:DAT and idf=:nForm and kod in ('1300','1095','1195','1200')
           UNION ALL
-          select '10' as n, 'Усього за розділом I' as txt, '1495' as rr, NVL(SUM(decode(KOD,'1495',S,0)),0) SL, '1400+1405+1410+1415+1420+1425+1430+1435' as rr2,  NVL(SUM(decode(KOD,'1495',0,S)),0) SR
-          from fin_rnk where OKPO=:OKPO and FDAT=:DAT and idf=:nForm and kod in ('1495','1400','1405','1410','1415','1420','1425','1430','1435')
+          select '10' as n, 'Усього за розділом I' as txt, '1495' as rr, NVL(SUM(decode(KOD,'1495',S,0)),0) SL, '1400+1405+1410+1415+1420+1425+1430+1435+1490' as rr2,  NVL(SUM(decode(KOD,'1495',0,S)),0) SR
+          from fin_rnk where OKPO=:OKPO and FDAT=:DAT and idf=:nForm and kod in ('1495','1400','1405','1410','1415','1420','1425','1430','1435','1490')
           UNION ALL
           select * from (
           select '11' as n, 'Усього за розділом II' as txt, '1595' as rr, NVL(SUM(decode(KOD,'1595',S,0)),0) SL, '1500+1505+1510+1515+1520+1525+1530+1535+1540+1545' as rr2, NVL(SUM(decode(KOD,'1595',0,S)),0) SR

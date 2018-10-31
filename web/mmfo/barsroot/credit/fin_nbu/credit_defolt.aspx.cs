@@ -29,10 +29,9 @@ public partial class credit_defolt : Bars.BarsPage
     String Err_name;
 
 
-
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        
         // Create the ToolTip and associate with the Form container.
         ToolTip toolTip1 = new ToolTip();
 
@@ -43,7 +42,7 @@ public partial class credit_defolt : Bars.BarsPage
         // Force the ToolTip text to be displayed whether or not the form is active.
         toolTip1.ShowAlways = true;
         toolTip1.ToolTipTitle = "132465798";
-
+        Decimal Set_Papams;
 
 
         if (!IsPostBack)
@@ -69,8 +68,54 @@ public partial class credit_defolt : Bars.BarsPage
             // Розрахунок класу позичальника з інтегрального показника.   //переніс в load_form
             calculation_class();
             //Tb_clas.Text = read_zn_p(Tb_okpo.Text, "CLAS", "6", TB_Dat.Text);
+
+
+            Set_Papams = read_osbb(RNK_.Value);
+
+            if (Set_Papams == 1)
+            {
+                tb_vncr.Enabled = true;
+                Ib_save_vncrr.Visible = true;
+                Ib_vncrr.Visible = false;
+            }
+            else
+            {
+                tb_vncr.Enabled = false;
+                Ib_save_vncrr.Visible = false;
+                Ib_vncrr.Visible = true;
+            }
         }
 
+    }
+
+    public static Decimal read_osbb(String rnk_)
+    {
+        Decimal res_type_; 
+        {
+            OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
+            OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con);
+            try
+            {
+                cmd.Parameters.Add("RNK", OracleDbType.Int64, Convert.ToInt64(rnk_), ParameterDirection.Input);
+                cmd.CommandText = ("select f_get_osbb_k110_type(:RNK) as RES from dual");
+                OracleDataReader rdr = cmd.ExecuteReader();
+                if (rdr.Read())
+                {
+                    res_type_ = rdr["RES"] == DBNull.Value ? (Decimal)0 : (Decimal)rdr["RES"];
+                    if (res_type_ != null)
+                    { return Convert.ToDecimal(res_type_); }
+                    else { return 0; }
+                }
+                rdr.Close();
+                rdr.Dispose();
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return 0; 
+        }
     }
 
     public static Decimal greatest(Decimal par1_, Decimal Par2_ )
@@ -380,7 +425,6 @@ public partial class credit_defolt : Bars.BarsPage
 
                 if (rdr.Read())
                 {
-
                     SS_ = rdr["SN"] == DBNull.Value ? (DateTime)Convert.ToDateTime(null, cinfo) : (DateTime)rdr["SN"];
                     return SS_;
                 }
@@ -736,7 +780,7 @@ public partial class credit_defolt : Bars.BarsPage
 
         ErrR = "0";
 
-        if (String.IsNullOrEmpty(tb_vncr.Text) && Tb_okpo.Text.Length != 12 )
+        if (String.IsNullOrEmpty(tb_vncr.SelectedValue) && Tb_okpo.Text.Length != 12 )
         {
             ErrR = "1";
             Err_name = Err_name + ".  ВНКР  <>  Необхідно провести розрахунок ВНКР!!! ";
@@ -1065,8 +1109,102 @@ public partial class credit_defolt : Bars.BarsPage
     /// </summary>
     protected void save_gr5()
     {
-        //Response.Write("save_gr5");
-        //char j = (char)10;
+        CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+        cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+        cinfo.DateTimeFormat.DateSeparator = "/";
+        ErrR = "0";
+
+        if ( String.IsNullOrEmpty(Dd_zd6.SelectedValue ))
+        {
+            ErrR = "1";
+            Err_name = Err_name + "Відбулась фінансова реструктуризація  " + "      ";
+        }
+
+        
+
+        if (Dd_zd6.SelectedValue == "1")
+        {   //Відбулась фінансова реструктуризація  - Yes
+            if ((Convert.ToString(Tb_dzd6.Value, cinfo) == "01/01/1901 00:00:00" || String.IsNullOrEmpty(Convert.ToString(Tb_dzd6.Value, cinfo))))
+            {
+                ErrR = "1";
+                Err_name = Err_name + "Дата фінансової реструктуризації " + "      ";
+            }
+
+            if (String.IsNullOrEmpty(Dd_zd8.SelectedValue))
+            {
+                ErrR = "1";
+                Err_name = Err_name + "Запроваджено процедуру фінансової реструктуризації ?  " + "      ";
+            }
+
+            if (String.IsNullOrEmpty(Dd_zd7.SelectedValue))
+            {
+                ErrR = "1";
+                Err_name = Err_name + "Зняти дефолт?  " + "      ";
+            }
+
+            
+            if (Dd_zd7.SelectedValue == "1")
+            {
+                if (String.IsNullOrEmpty(Convert.ToString(tb_dzd7.Value, cinfo)) || (Convert.ToString(tb_dzd7.Value, cinfo) == "01/01/1901 00:00:00"))
+                {
+                    ErrR = "1";
+                    Err_name = Err_name + "Рішення колегіального органу дата " + "      ";
+                }
+
+                if (String.IsNullOrEmpty(Tb_nzd7.Text))
+                {
+                    ErrR = "1";
+                    Err_name = Err_name + "Рішення колегіального органу № " + "      ";
+                }
+
+            }
+            else
+            {
+
+            }
+
+
+            if (ErrR == "1")
+            {
+                ShowError(" Не заповнено показник:   " + Err_name.ToUpper());
+                Wizard1.ActiveStepIndex = Wizard1.WizardSteps.IndexOf(this.WizardStep3);
+            }
+
+
+            if (Dd_zd7.SelectedValue == "1")
+            { record_fp_nd("RK3", "1", "56"); }  // знімаємо   дефолт
+            else
+            { record_fp_nd("RK3", "0", "56"); }  // не знімаємо дефолт
+
+            record_fp_nd("ZD1", null, "55");
+            record_fp_nd("ZD2", null, "55");
+            record_fp_nd("ZD3", null, "55");
+            record_fp_nd("ZDN1", null, "57");
+
+
+        }
+        else 
+        {
+            save_gr5_defolt();
+        }
+
+        record_fp_nd("ZD6", Dd_zd6.SelectedValue, "55");
+        record_fp_nd("ZD7", Dd_zd7.SelectedValue, "55");
+
+        record_fp_nd_date("DZD6", Convert.ToDateTime(tb_dzd7.Value), "55");
+        record_fp_nd("NZD7", Tb_nzd7.Text, "55");
+        record_fp_nd_date("DZD7", Convert.ToDateTime(tb_dzd7.Value), "55");
+        record_fp_nd("ZD8", Dd_zd8.SelectedValue, "55");
+
+
+        FillData_Wizar6();
+
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    protected void save_gr5_defolt()
+    {
         ErrR = "0";
         int pos = 0;
         String RK3_ = "1";
@@ -1117,13 +1255,21 @@ public partial class credit_defolt : Bars.BarsPage
         cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
         cinfo.DateTimeFormat.DateSeparator = "/";
 
-        if (!String.IsNullOrEmpty(Tb_ZDN1.Text) &  ( Convert.ToString(Tb_ZDD1.Value, cinfo) == "01/01/0001"  || String.IsNullOrEmpty(Convert.ToString(Tb_ZDD1.Value, cinfo)) ) )
+        if (String.IsNullOrEmpty(dl_ZD4.SelectedValue))
         {
             ErrR = "1";
-            Err_name = Err_name + "Дата рішення колегіального органу " + "      ";
-        
+            Err_name = Err_name + "З моменту усунення події/подій, на підставі якої/яких було визнано дефолт божника, минуло щонайменше 180 днів   " + "      ";
         }
-         
+        else
+        {
+            if (!String.IsNullOrEmpty(Tb_ZDN1.Text) & (Convert.ToString(Tb_ZDD1.Value, cinfo) == "01/01/1900 00:00:00" || String.IsNullOrEmpty(Convert.ToString(Tb_ZDD1.Value, cinfo))))
+            {
+                ErrR = "1";
+                Err_name = Err_name + "Дата рішення колегіального органу " + "      ";
+
+            }
+        }
+
 
 
         if (ErrR == "1")
@@ -1140,7 +1286,7 @@ public partial class credit_defolt : Bars.BarsPage
 
         if (read_nd(ND_.Value, RNK_.Value, "RK2", "56", Dl_Zdat.SelectedValue) == "1" && RK3_ == "1")
         {
-            if (read_nd(ND_.Value, RNK_.Value, "RK1", "56", Dl_Zdat.SelectedValue)  == "1")
+            if (read_nd(ND_.Value, RNK_.Value, "RK1", "56", Dl_Zdat.SelectedValue) == "1")
             { record_fp_nd("RK3", "0", "56"); }
             else
             { record_fp_nd("RK3", "1", "56"); }
@@ -1154,11 +1300,7 @@ public partial class credit_defolt : Bars.BarsPage
         record_fp_nd("ZD3", Dl_ZD3.SelectedValue, "55");
         record_fp_nd("ZDN1", Tb_ZDN1.Text, "57");
         record_fp_nd_date("ZDD1", Convert.ToDateTime(Tb_ZDD1.Value), "57");
-
-        FillData_Wizar6();
-
     }
-
     /// <summary>
     /// Зберігаємо дані гріда Wizard5
     /// </summary>
@@ -1246,7 +1388,7 @@ public partial class credit_defolt : Bars.BarsPage
             //cmd.Parameters.Add("ND_",  OracleDbType.Decimal, nd , ParameterDirection.Input);
             cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
             cmd.CommandText = @"  select c.nmk nmkk, to_char(C.datea,'dd/mm/yyyy') datea, c.okpo,
-                                         to_char(round(gl.bd,'MM'),'dd/mm/yyyy') zp_dat, 
+                                         to_char(gl.bd,'dd/mm/yyyy') zp_dat, 
                                          (select to_char(nvl(max(fdat), trunc(gl.bd,'Q') ),'dd/mm/yyyy') from fin_fm where okpo = c.okpo and fdat < gl.bd) dat 
                                   from  fin_customer c
                                  where  rnk =:rnk_";
@@ -1264,13 +1406,15 @@ public partial class credit_defolt : Bars.BarsPage
                     try
                     {
                         InitOraConnection();
-                        String l_sql_dat = "select to_char(add_months(trunc(to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy'),'mm'),num-2),'DD/MM/YYYY') dat from conductor where 3 >= num order by num ";
+                        String l_sql_dat = "select to_char(dat,'dd/mm/yyyy') dat from (select  add_months(trunc(to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy'),'mm'),num-2) dat from conductor where 3 >= num) where dat >= to_date('" + (String)rdr["ZP_DAT"] + "','dd/mm/yyyy')-10 order by 1 ";
                         Dl_Zdat.DataSource = SQL_SELECT_dataset(l_sql_dat).Tables[0];
                         Dl_Zdat.DataTextField = "dat";
                         Dl_Zdat.DataValueField = "dat";
+                       // Dl_Zdat.DataTextFormatString = " {0:dd/MM/yyyy} ";
                         Dl_Zdat.DataBind();
 
                         Dl_Zdat.SelectedValue = (String)rdr["ZP_DAT"];
+
 
                     }
                     finally
@@ -1304,8 +1448,8 @@ public partial class credit_defolt : Bars.BarsPage
 
             if (rdr2.Read())
             {
-                tb_vncr.Text = rdr2["VNKRR"] == DBNull.Value ? (String)null : (String)rdr2["VNKRR"];
-                if (String.IsNullOrEmpty(tb_vncr.Text))
+                tb_vncr.SelectedValue = rdr2["VNKRR"] == DBNull.Value ? (String)null : (String)rdr2["VNKRR"];
+                if (String.IsNullOrEmpty(tb_vncr.SelectedValue))
                 {
                     Ib_vncrr.Visible = true;
                     Sp2.Visible = true;
@@ -1387,10 +1531,20 @@ public partial class credit_defolt : Bars.BarsPage
             dl_ZD4.DataBind();
             dl_ZD4.Items.Insert(0, new ListItem("", ""));
 
-            
+
+            Dd_zd6.DataBind();
+            Dd_zd6.Items.Insert(0, new ListItem("", ""));
+
+            Dd_zd7.DataBind();
+            Dd_zd7.Items.Insert(0, new ListItem("", ""));
+
+            Dd_zd8.DataBind();
+            Dd_zd8.Items.Insert(0, new ListItem("", ""));
 
             Dl_val.DataBind();
             Dl_tzvd.DataBind();
+
+            tb_vncr.DataBind();
 
             //Dl_inv.DataBind();
             //Dl_etp.DataBind();
@@ -1447,7 +1601,11 @@ public partial class credit_defolt : Bars.BarsPage
         //Dl_inv.SelectedValue = read_zn_p(Tb_okpo.Text, "INV", "32", TB_Dat.Text);
         //Dl_etp.SelectedValue = read_zn_p(Tb_okpo.Text, "ETP", "32", TB_Dat.Text);
 
-
+        Dd_zd6.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD6", "55", Dl_Zdat.SelectedValue);
+        Dd_zd7.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD7", "55", Dl_Zdat.SelectedValue);
+        Dd_zd8.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD8", "55", Dl_Zdat.SelectedValue);
+        Dd_zd6_SelectedIndexChanged(null, null);
+        Dd_zd7_SelectedIndexChanged(null, null);
 
         FillData_Wizar1();
         Dl_GP_SelectedIndexChanged(null, null);
@@ -1479,12 +1637,14 @@ public partial class credit_defolt : Bars.BarsPage
     private void FillData_Wizar1()
     {
         Selected_Dl_Ngrp(null, null);
+        
+
         //Dl_GP1.SelectedValue = read_nd(ND_.Value, RNK_.Value, "GP1", "51", Dl_Zdat.SelectedValue);
         Dl_GP2.SelectedValue = read_nd(ND_.Value, RNK_.Value, "GP2", "51", Dl_Zdat.SelectedValue);
         Dl_GP3.SelectedValue = read_nd(ND_.Value, RNK_.Value, "GP3", "51", Dl_Zdat.SelectedValue);
         Dl_GP4.SelectedValue = read_nd(ND_.Value, RNK_.Value, "GP4", "51", Dl_Zdat.SelectedValue);
         //Dl_GP5.SelectedValue = read_nd(ND_.Value, RNK_.Value, "GP5", "51", Dl_Zdat.SelectedValue);
-
+        Dl_GP_SelectedIndexChanged(null, null);
         try
         {
             CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
@@ -1675,7 +1835,7 @@ public partial class credit_defolt : Bars.BarsPage
                                                                  'select -99 as val, null as name from dual union all select val, name as name from FIN_QUESTION_REPLY where kod='''||KOD||''' and idf = '||IDF  l_sql
                                                                  --,(select count(1) from fin_question_reply where kod = q.kod and idf = q.idf) tip
                                                           from  FIN_QUESTION q
-                                                           where  q.idf = 55  and kod not in ( 'ZD3','ZD4','ZD5' )
+                                                           where  q.idf = 55  and kod  in ( 'ZD1','ZD2')
                                                            ORDER BY ord");
 
 
@@ -2164,7 +2324,7 @@ public partial class credit_defolt : Bars.BarsPage
             Pn_povk.Visible = true;
             Lb_cls2.Visible = true;
             Tb_cls2.Visible = true;
-            Dl_GP_SelectedIndexChanged(null,null);
+            Dl_GP_SelectedIndexChanged(null, null); 
         } 
     }
 
@@ -2391,7 +2551,7 @@ public partial class credit_defolt : Bars.BarsPage
 
     protected void Dl_Zdat_SelectedIndexChanged(object sender, EventArgs e)
     {
-
+       
         load_form();
     }
 
@@ -2410,12 +2570,39 @@ public partial class credit_defolt : Bars.BarsPage
     {
         backToFolders("/barsroot/credit/fin_nbu/fin_form_obu.aspx?okpo=" + Tb_okpo.Text + "&rnk=" + Convert.ToString(RNK_.Value) + "&frm=" + Convert.ToString(ND_.Value) + "&dat=" + TB_Dat.Text);
     }
+    protected void Bt_Clic_set_Vnkr(object sender, EventArgs e)
+    {
+        try
+        {
+            InitOraConnection();
+            {
+                ClearParameters();
 
+
+                SetParameters("nd_", DB_TYPE.Decimal, Convert.ToDecimal(ND_.Value), DIRECTION.Input);
+                SetParameters("vnkr", DB_TYPE.Varchar2, tb_vncr.SelectedValue, DIRECTION.Input);
+
+                SQL_NONQUERY(@"begin  
+                                cck_app.Set_ND_TXT(:nd_ ,'VNCRR' , :vnkr);                                
+                               end;");
+
+            }
+
+        }
+        finally
+        {
+            DisposeOraConnection();
+        }
+
+        ScriptManager.RegisterStartupScript(this, this.GetType(), "send_success", "alert('Значення ВКР - " + tb_vncr.SelectedValue + " втановлено на договір " + ND_.Value + "');" , true);
+    }
     protected void BtI_Clic_Print(object sender, EventArgs e)
     {
         backToFolders("/barsroot/credit/fin_nbu/Print_fin.aspx?frt=fin_obu_CGD_Pot_351&rnk=" + Convert.ToString(RNK_.Value) + "&ND=" + Convert.ToString(ND_.Value) +
-                           "&fdat=" + TB_Dat.Text + "&zdat=" + Dl_Zdat.SelectedValue);
-        
+                           "&fdat=" + TB_Dat.Text + "&zdat=" + Convert.ToString(Dl_Zdat.SelectedValue).Substring(0, 10));
+       
+
+
     }
     protected void BtI_Clic_Grp(object sender, EventArgs e)
     {
@@ -2577,7 +2764,7 @@ public partial class credit_defolt : Bars.BarsPage
             cmd.Parameters.Add("ND", OracleDbType.Decimal, Convert.ToInt64(ND_.Value), ParameterDirection.Input);
             cmd.Parameters.Add("DAT", OracleDbType.Date, dat, ParameterDirection.Input);
             cmd.Parameters.Add("clas", OracleDbType.Varchar2, Tb_clsb.Text, ParameterDirection.Input);
-            cmd.Parameters.Add("vnkr", OracleDbType.Varchar2, tb_vncr.Text, ParameterDirection.Input);
+            cmd.Parameters.Add("vnkr", OracleDbType.Varchar2, tb_vncr.SelectedValue, ParameterDirection.Input);
             cmd.CommandText = (@"select   fin_nbu.get_pd (  p_rnk   =>  :rnk,
                                                             p_nd    =>  :nd,
                                                             p_dat   =>  :dat,  
@@ -2670,6 +2857,91 @@ public partial class credit_defolt : Bars.BarsPage
             p_events.Visible = false;
             Pn_Wizar5_2.Visible = false;
         }
+
+    }
+
+
+    protected void Dd_zd6_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (Dd_zd6.SelectedValue == "1")
+        {   //Відбулась фінансова реструктуризація  - Yes
+            Lb_dzd6.Visible = true;
+            Tb_dzd6.Visible = true;
+            Tb_dzd6.Value = read_nd_date_hist(ND_.Value, RNK_.Value, "DZD6", "55", Dl_Zdat.SelectedValue); 
+            Lb_zd7.Visible = true;
+            Dd_zd7.Visible = true;
+
+            Lb_zd8.Visible = true;
+            Dd_zd8.Visible = true;
+            Im_zd8.Visible = true;
+
+            Dd_zd7_SelectedIndexChanged(null, null);
+            w5_p2.Visible = false;
+        }
+        else
+        {  // Відбулась фінансова реструктуризація  = No
+            Lb_dzd6.Visible = false;
+            Tb_dzd6.Visible = false;
+
+            Tb_dzd6.Value = null;
+            Dd_zd7.SelectedValue = null;
+            Tb_nzd7.Text = null;
+            tb_dzd7.Value = null;
+            Lb_zd7.Visible = false;
+            Dd_zd7.Visible = false;
+
+            Lb_zd8.Visible = false;
+            Dd_zd8.Visible = false;
+            Dd_zd8.SelectedValue = null;
+            Im_zd8.Visible = false;
+
+            Dd_zd7_SelectedIndexChanged(null, null);
+            w5_p2.Visible = true;
+        }
+    }
+
+    protected void Dd_zd7_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (Dd_zd7.SelectedValue == "1")
+        {
+            Lb_nzd7.Visible = true;
+            Tb_nzd7.Visible = true;
+            Lb_dzd7.Visible = true;
+            tb_dzd7.Visible = true;
+
+            Tb_nzd7.Text  = read_nd(ND_.Value, RNK_.Value, "NZD7", "55", Dl_Zdat.SelectedValue);
+            tb_dzd7.Value = read_nd_date_hist(ND_.Value, RNK_.Value, "DZD7", "55", Dl_Zdat.SelectedValue); ;
+
+        }
+        else
+        {
+            Lb_nzd7.Visible = false;
+            Tb_nzd7.Visible = false;
+            Lb_dzd7.Visible = false;
+            tb_dzd7.Visible = false;
+        }
+    }
+
+    protected void dl_ZD4_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+            if (dl_ZD4.SelectedValue == "1")
+            {
+                Pn_Wizar5_2.Visible = true;
+                Dl_ZD3.SelectedValue = read_nd(ND_.Value, RNK_.Value, "ZD3", "55", Dl_Zdat.SelectedValue);
+                Tb_ZDN1.Text = read_nd(ND_.Value, RNK_.Value, "ZDN1", "57", Dl_Zdat.SelectedValue);
+                Tb_ZDD1.Value = read_nd_date(ND_.Value, RNK_.Value, "ZDD1", "57", Dl_Zdat.SelectedValue);
+
+
+            }
+            else
+            {
+                Pn_Wizar5_2.Visible = false;
+                Dl_ZD3.SelectedValue = "0";
+                Tb_ZDN1.Text = null;
+                Tb_ZDD1.Value = null;
+            }
+
 
     }
 }
