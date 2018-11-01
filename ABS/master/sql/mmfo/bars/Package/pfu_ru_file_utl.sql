@@ -122,7 +122,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_FILE_UTL is
 					select ac.nbs, ac.tip
 						into l_nbs, l_tip
 						from accounts ac
-					 where ac.nls = l_nlsb or (ac.nls = l_nlsb and ac.tip like 'W4%' and ac.nls like '2620%') -- COBUMMFO-7501 Добавлен поиск по альтернативе
+					 where ac.nls = l_nlsb or (ac.nlsalt = l_nlsb and ac.tip like 'W4%' and ac.nls like '2620%') -- COBUMMFO-7501 Добавлен поиск по альтернативе
 						 and ac.kv = 980;
 
 					if (/*l_nbs = '2625' and Comment COBUMMFO-7501 оставили проверку только по типу счета */ l_tip like 'W4%') then
