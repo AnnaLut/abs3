@@ -394,7 +394,7 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.Add("p_id", OracleDbType.Decimal).Value = data.payrollId;
-                    cmd.Parameters.Add("p_sign", OracleDbType.Varchar2).Value = data.records[0].Sign;
+                    cmd.Parameters.Add("p_sign", OracleDbType.Clob).Value = data.records[0].Sign;
                     cmd.Parameters.Add("p_key_id", OracleDbType.Varchar2).Value = data.records[0].SubjectSN;
                     cmd.Parameters.Add("p_docbufer", OracleDbType.Varchar2).Value = data.records[0].buffer;
 
