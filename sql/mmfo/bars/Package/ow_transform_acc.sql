@@ -492,7 +492,11 @@ create or replace package body ow_transform_acc is
                             , t.nls    NUMBER_2620
                      from accounts t
                      join ow_params p on p.kf = t.kf and p.par = 'W4_BRANCH' and p.kf = sys_context('bars_context','user_mfo')
-                     where t.dazs is null and t.nlsalt is not null
+                     where (
+                              t.dazs is null 
+                              or exists(select 1 from w4_acc_instant i where i.acc = t.acc)  
+                           )
+                           and t.nlsalt is not null
                            and t.dat_alt is not null
                            and regexp_like(t.nlsalt, '^'||gc_nbs_person)
 
