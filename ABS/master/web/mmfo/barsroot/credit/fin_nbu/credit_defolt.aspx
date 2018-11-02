@@ -56,7 +56,8 @@
     </asp:Panel>
     <asp:Panel ID="Panel1" runat="server" Width="950px">
         <asp:Wizard ID="Wizard1" runat="server" Width="100%" BackColor="#EFF3FB" BorderColor="#B5C7DE"
-            BorderWidth="1px" Font-Names="Verdana" CellPadding="10" ActiveStepIndex="0" Font-Size="Small"
+            BorderWidth="1px" Font-Names="Verdana" CellPadding="10" 
+            ActiveStepIndex="5" Font-Size="Small"
             StartNextButtonText="Наступна" StepNextButtonText="Наступна" StepPreviousButtonText="Попередня"
             CancelButtonText="Відмінити" FinishCompleteButtonText="Готово" FinishPreviousButtonText="Попередня"
             OnNextButtonClick="BtNext" OnPreviousButtonClick="BtPrevious">
@@ -685,6 +686,20 @@
                                 <td>
                                     <Bars:TextBoxDate ID="Tb_dzd6" runat="server" Width="100" />
                                 </td>
+                            </tr>
+                            <tr>
+                            <td>
+                             <asp:Label ID="Lb_zd8" runat="server" Text="Запроваджено процедуру фінансової реструктуризації"></asp:Label>
+                            </td>
+                            <td>
+                             <asp:DropDownList ID="Dd_zd8" runat="server" Width="100px" DataSource='<%# SQL_SELECT_dataset("select val, name as name from FIN_QUESTION_REPLY where kod=" + ((char)39).ToString() + "ZD8" +((char)39).ToString() + "and idf = 55 ") %>'
+                                        DataTextField="NAME" DataValueField="VAL" AutoPostBack="True" OnSelectedIndexChanged="Dd_zd6_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                            </td>
+                            <td><asp:Image ID="Im_zd8" runat="server" ImageUrl="/Common/Images/default/16/help2.png"
+                                            ToolTip="1 - учасниками якої є банки - резиденти України *
+2 - учасниками якої є банки - резиденти України, банки-нерезиденти, іноземні державні експортні кредитні агенції, міжнародні фінансові організації, утримувачі єврооблігацій* 
+ * за умови, що строк дії забезпечення не менше ніж строк фінансової реструктуризації боржника та банк зберігає право звернути стягнення на таке забезпечення як протягом проведення процедури такої реструктуризації, так і після її завершення" /></td>
                             </tr>
                             <tr>
                                 <td style="width: 300Px">
