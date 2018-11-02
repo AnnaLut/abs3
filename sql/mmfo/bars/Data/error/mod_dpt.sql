@@ -890,6 +890,24 @@ begin
     bars_error.add_message(l_mod, 540, l_exc, l_rus, 'Функция %s не используется', '', 1, 'PROCEDURE_DEPRECATED');
     bars_error.add_message(l_mod, 540, l_exc, l_ukr, 'Функція %s не використовується', '', 1, 'PROCEDURE_DEPRECATED');
 
+    bars_error.add_message(l_mod, 701, l_exc, l_rus, 'Депозит на акционных условиях не может быть открыт: По состоянию на %s у клиента нет депозитов на сумму более 200 тыс. грн. (в наличии %s)', '', 1, 'NOT_ENOUGH_BALANCE');
+    bars_error.add_message(l_mod, 701, l_exc, l_ukr, 'Депозит на акційних умовах не може бути відкрито: Станом на %s у клієнта немає депозитів на суму більше ніж 200 тис. грн. (в наявності %s)', '', 1, 'NOT_ENOUGH_BALANCE');
+    
+    bars_error.add_message(l_mod, 702, l_exc, l_rus, 'Депозит на акционных условиях не может быть открыт: Фактический остаток действующих депозитов (%s) меньше остатка на %s (%s)', '', 1, 'CURRENT_BALANCE_LESS_CONTROL');
+    bars_error.add_message(l_mod, 702, l_exc, l_ukr, 'Депозит на акційних умовах не може бути відкрито: Фактичний залишок діючих депозитів (%s) менше ніж залишок на %s (%s)', '', 1, 'CURRENT_BALANCE_LESS_CONTROL');
+
+    bars_error.add_message(l_mod, 703, l_exc, l_rus, 'Для вида вклада %s не указана мин.допустимая сумма на деп.счетах клиента!', '', 1, 'MIN_DEPBALANCE_FAILED');
+    bars_error.add_message(l_mod, 703, l_exc, l_ukr, 'Для виду вклада %s не вказана мін.припустима сума на деп.рахунках клієнта!', '', 1, 'MIN_DEPBALANCE_FAILED');    
+    
+    bars_error.add_message(l_mod, 704, l_exc, l_rus, 'Для вида вклада %s не указана дата начала действия вклада!', '', 1, 'VIDD_DATN_NOT_FOUND');
+    bars_error.add_message(l_mod, 704, l_exc, l_ukr, 'Для виду вклада %s не вказана дата початку дії вклада!', '', 1, 'VIDD_DATN_NOT_FOUND');    
+    
+    bars_error.add_message(l_mod, 705, l_exc, l_rus, 'Параметр %s не найден', '', 1, 'VIDDPARAM_NOT_FOUND');
+    bars_error.add_message(l_mod, 705, l_exc, l_ukr, 'Параметр %s не знайдено', '', 1, 'VIDDPARAM_NOT_FOUND');    
+
+    bars_error.add_message(l_mod, 706, l_exc, l_rus, 'По депозитному портфелю клиента есть незавизированные платежи. Завершите визирование и повторите попытку открытия депозита!', '', 1, 'FUTURE_BALANCE_LESS_CURRENT');
+    bars_error.add_message(l_mod, 706, l_exc, l_ukr, 'Для депозитного портфелю клієнта є незавізовані операції. Треба завершити візування та повторити спробу відкриття депозита!', '', 1, 'FUTURE_BALANCE_LESS_CURRENT');
+    
     bars_error.add_message(l_mod, 666, l_exc, l_rus, '%s', '', 1, 'GENERAL_ERROR_CODE');
     bars_error.add_message(l_mod, 666, l_exc, l_ukr, '%s', '', 1, 'GENERAL_ERROR_CODE');
 
