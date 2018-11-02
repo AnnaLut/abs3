@@ -1,1 +1,8 @@
-Bugfix_2.0.48.a.18 (Rev:69266-69388) 
+=========  svn diff --summarize -r 69389:69484 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\version.abs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\deposit\Deloitte\depositcontract.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\deposit
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\credit\fin_nbu\credit_defolt.aspx
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web
+Bugfix_2.0.48.a.19 (Rev:69389-69484
