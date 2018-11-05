@@ -92,6 +92,8 @@ end get_nls2924foracc;
       l_nazn := case
                   when p_nls like ('3141%') then --не перекодовується
                    p_comments || ', ' || l_rec_asvo.fio || ', ' || l_rec_asvo.idcode || ', номер нерухомого вкладу №' || l_nazn
+                  when p_nls like ('2909%') then --Для рублей берем из alien_immobile.comments
+                   p_comments 
                   else
                    'Виплата нерухомого вкладу №' || l_nazn || ', ' || l_rec_asvo.fio
                 end;

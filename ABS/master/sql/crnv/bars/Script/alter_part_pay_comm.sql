@@ -1,0 +1,1 @@
+alter table PART_PAY_IMMOBILE modify COMMENTS varchar2(160 BYTE);
