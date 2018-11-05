@@ -118,8 +118,10 @@ public partial class cbirep_rep_query : Bars.BarsPage
         {
             if (Request.Params.Get("codeapp") != null)
                 ViewState["PrevUrl"] = "rep_list.aspx?codeapp=" + Request.Params.Get("codeapp");
-            else
+            else if (Request.UrlReferrer != null)
                 ViewState["PrevUrl"] = Request.UrlReferrer.ToString();
+            else
+                btBack.Visible = false;
 
             // заголовок страницы
             this.Title = String.Format(this.Title, CbirepRep.REP_ID, CbirepRep.REP_DESC);
@@ -160,7 +162,7 @@ public partial class cbirep_rep_query : Bars.BarsPage
                     DATE.Value = Param.DefaultValueDate;
 
                     DATE.MaxValue = DateTime.Now.AddYears(1);
-                    DATE.MinValue = DateTime.Now.AddYears(-3);
+                    DATE.MinValue = DateTime.Now.AddYears(Request.Params.Get("repid")  == "7101" ? (-10) : (-3));
 
                     DATE.ValidationGroup = "ReportParams";
 

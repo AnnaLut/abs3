@@ -74,7 +74,10 @@ public partial class confirm : Bars.BarsPage
                                              REFPAY, 
                                              STATUS, 
                                              ERRMSG, 
-                                             FL      
+                                             FL ,
+                                             date_come as DATE_CREATE,
+                                             date_last as DATE_CHANGE,
+                                             edit as EDITED     
                                            from v_asvo_immobile_pay ";
        
             SelectCommand += "where 1=1 ";
@@ -151,5 +154,4 @@ public partial class confirm : Bars.BarsPage
     {
         ScriptManager.RegisterStartupScript(this, this.GetType(), "open", " window.open('" + URL + "');", true);
     }
-
 }

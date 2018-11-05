@@ -17,6 +17,15 @@
     <link href="/Common/CSS/barsextenders.css" type="text/css" rel="stylesheet" />
     <link href="/Common/CSS/default.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="/Common/WebEdit/NumericEdit.js"></script>
+	<script type="text/javascript" language="javascript">
+	function GetReport(key) {
+	    window.open("/barsroot/cbirep/rep_query.aspx?repid=7101&Param0=" + key, "_blank");
+	}
+
+	function ShowHistory(key) {
+	    window.open("/barsroot/customerlist/custhistory.aspx?key="+ key , "_blank");
+	}
+	</script>
 </head>
 <body>
     <form id="formOperationList" runat="server">
@@ -144,7 +153,16 @@
                        <img src="/Common/Images/default/16/reference_open.png" title="Редагувати" onclick='<%# "location.href=(\"/barsroot/neruhomi/confirm_immobile_edit.aspx?key=" + Eval("KEY") + "\");return false;" %>' />
                    </ItemTemplate>
                 </asp:TemplateField> --%>
-
+                <asp:TemplateField>
+                    <ItemTemplate>
+                        <asp:Image runat="server" src="/Common/Images/default/16/options.png" title="Виписка по рахунку"  onclick='<%# "GetReport(" + Eval("KEY") + ");" %>'/>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField>
+                    <ItemTemplate>
+                        <asp:Image runat="server" src="/Common/Images/default/16/document_view.png" title="Історія змін"  onclick='<%# "ShowHistory(" + Eval("KEY") + ");" %>'></asp:Image> 
+                    </ItemTemplate>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="ПІБ">
                     <ItemTemplate>
                         <asp:Label ID="lbClient" runat="server" Text='<%# String.Format("{0}", Eval("FIO")) %>' ToolTip='<%# String.Format("ПІБ: {0}; Дата нар.: {1}; Місце нар.: {2}; Стать: {3}", Eval("FIO"), Eval("BIRTHDAT", "{0:d}"), Eval("BIRTHPL"), Eval("SEX")) %>'></asp:Label>
@@ -193,11 +211,16 @@
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:BoundField DataField="STATUS" HeaderText="Статус"/>
+                <asp:BoundField DataField="EDITED" HeaderText="Редагування"/>
+                <asp:BoundField DataField="DATE_CREATE" HeaderText="Дата надходження"/>
+                <asp:BoundField DataField="DATE_CHANGE" HeaderText="Дата ост. руху"/>
                 <asp:TemplateField>
                     <ItemTemplate>
                         <asp:Label ID="lbERR" ToolTip="Текст помилки" runat="server" Text='<%#String.Format("{0}",Eval("ERRMSG")) %>' Visible='<%#Convert.ToDecimal(String.Format("{0}",Eval("FL")))<0?(true):(false) %>'></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:BoundField DataField="KEY" Visible="false" />
+
             </Columns>
             <RowStyle CssClass="normalRow"></RowStyle>
         </BarsEx:BarsGridViewEx>

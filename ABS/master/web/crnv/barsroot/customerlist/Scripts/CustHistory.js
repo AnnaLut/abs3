@@ -3,24 +3,17 @@ function InitCustHistory()
 {
   LocalizeHtmlTitles();
   LoadXslt("Xslt/History_" + getCurrentPageLanguage() + ".xsl");
-  rnk = getParamFromUrl("rnk",location.href);
-  var mode = getParamFromUrl("mode",location.href);
-  var type = getParamFromUrl("type",location.href);
-  dd_data["cmb1"] = 'dialog.aspx?type=metatab&tail="tabid in (SELECT tabid FROM acc_par WHERE pr='+mode+')"&role=wr_metatab&tabname=META_TABLES';
-  if(mode == 1)
-   lbHist.innerText = LocalizedString('Message12');
-  else if(mode == 2)
-   lbHist.innerText = LocalizedString('Message13');
-  v_data[3] = 'h.dat desc, t.tabid, h.idupd desc';
-  v_data[9] = rnk;
+  key = getParamFromUrl("key",location.href);
+ // v_data[3] = 'h.dat desc, t.tabid, h.idupd desc';
+  v_data[9] = key;
   v_data[10] = document.getElementById("date1").value;
   v_data[11] = document.getElementById("date2").value;
-  v_data[12] = mode;
-  v_data[13] = type;
+  //v_data[12] = mode;
+  //v_data[13] = type;
   var obj = new Object();
   obj.v_serviceObjName = 'webService';
   obj.v_serviceName = 'CustService.asmx';
-  obj.v_serviceMethod = 'ShowHistory';
+  obj.v_serviceMethod = 'ShowHistoryImmobile';
   obj.v_serviceFuncAfter = "LoadCustHistory";
   fn_InitVariables(obj);	
   InitGrid();
@@ -39,8 +32,8 @@ function LoadCustHistory()
 function fnRefreshHist()
 {
   var filter = "";
-  if(document.getElementById('cmb1').value != 0) filter += "AND t.tabid="+document.getElementById('cmb1').value;
-  if(document.getElementById('cmb2').value != 0) filter += "AND c.colid="+document.getElementById('cmb2').value;
+  //if(document.getElementById('cmb1').value != 0) filter += "AND t.tabid="+document.getElementById('cmb1').value;
+  //if(document.getElementById('cmb2').value != 0) filter += "AND c.colid="+document.getElementById('cmb2').value;
   v_data[0] = filter;
   v_data[10] = document.getElementById("date1").value;
   v_data[11] = document.getElementById("date2").value;
@@ -48,11 +41,11 @@ function fnRefreshHist()
 }
 function fnCmb1()
 {
- if(document.getElementById('cmb1').value != ""){
-	document.getElementById('cmb2').disabled = false;
-	var val = document.getElementById('cmb1').value; 
-	dd_data["cmb2"] = 'dialog.aspx?type=metatab&tail="tabid='+val+' AND colid in (select colid from acc_par where tabid='+val+')"&role=wr_metatab&tabname=meta_columns';
- }	
+ //if(document.getElementById('cmb1').value != ""){
+ //   document.getElementById('cmb2').disabled = false;
+ //   var val = document.getElementById('cmb1').value; 
+ //   dd_data["cmb2"] = 'dialog.aspx?type=metatab&tail="tabid='+val+' AND colid in (select colid from acc_par where tabid='+val+')"&role=wr_metatab&tabname=meta_columns';
+ //}	
 }
 //Локализация
 function LocalizeHtmlTitles() { 
@@ -61,12 +54,12 @@ function LocalizeHtmlTitles() {
 }
 function getValueForCmd1(ddlist)
 {
- if(ddlist.selectedIndex == 1){
- var result = window.showModalDialog(dd_data[ddlist.id],"","dialogWidth:450px;center:yes;edge:sunken;help:no;status:no;");
- if(result != null){
-  ddlist.options[1].value = result[0];
-  ddlist.options[1].text = result[1];
-  fnCmb1();
-  }
- } 
+ //if(ddlist.selectedIndex == 1){
+ //var result = window.showModalDialog(dd_data[ddlist.id],"","dialogWidth:450px;center:yes;edge:sunken;help:no;status:no;");
+ //if(result != null){
+ // ddlist.options[1].value = result[0];
+ // ddlist.options[1].text = result[1];
+ // fnCmb1();
+ // }
+ //} 
 }

@@ -171,7 +171,7 @@
         <hr style="margin-left: 10px; margin-right: 10px" />
         <script type="text/javascript">
                function open_window(key) {
-                   var myWindow = window.showModalDialog("/barsroot/neruhomi/alien_immobile.aspx?key=" + key, "", "dialogHeight:650px;dialogWidth:600px;center:yes;edge:sunken;scroll:no;help:no;status:no;");
+                   var myWindow = window.showModalDialog("/barsroot/neruhomi/alien_immobile.aspx?key=" + key, "", "dialogHeight:800px;dialogWidth:600px;center:yes;edge:sunken;scroll:yes;help:no;status:no;");
                    if (myWindow == true) {
                        document.getElementById('bt_refresh').click();
                        /*document.location.href = document.location.href;*/

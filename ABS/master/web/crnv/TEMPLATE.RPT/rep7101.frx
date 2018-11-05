@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="04/10/2018 12:14:34" ReportInfo.Modified="10/02/2018 15:40:31" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWyHnRErSvdLCXtb/HJC8yA">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 TT,&#13;&#10;        NUM00  REF,&#13;&#10;        CHAR01 ND,&#13;&#10;        NUM01/100  DT,&#13;&#10;       nvl( case  when NUM03 = -1 then 0 else NUM01 end /100,0) DT_TOTAL,&#13;&#10;        NUM02/100  KT,&#13;&#10;       nvl( case  when NUM03 = -1 then 0 else NUM02 end /100,0) KT_TOTAL,&#13;&#10;        CHAR02 NAZN,&#13;&#10;        CHAR03 DAT1,&#13;&#10;        CHAR04 DAT2,&#13;&#10;        CHAR05 NLS,&#13;&#10;        DAT00  PDAT,&#13;&#10;        CHAR06 NAME,&#13;&#10;        NUM03  SOS,&#13;&#10;        CHAR07 FIO,&#13;&#10;        CHAR08 IDCODE,&#13;&#10;        NUM04 /100  OST,&#13;&#10;        NUM05  KV&#13;&#10;   from rs_tmp_report_data&#13;&#10;  where session_id = :SESSION_ID&#13;&#10;  order by id">
+        <Column Name="TT" DataType="System.String"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="ND" DataType="System.String"/>
+        <Column Name="DT" DataType="System.String"/>
+        <Column Name="KT" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="DAT1" DataType="System.String"/>
+        <Column Name="DAT2" DataType="System.String"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="PDAT" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="SOS" DataType="System.Decimal"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <Column Name="IDCODE" DataType="System.String"/>
+        <Column Name="DT_TOTAL" DataType="System.String"/>
+        <Column Name="KT_TOTAL" DataType="System.String"/>
+        <Column Name="Column" DataType="System.Int32" Calculated="true" Expression=""/>
+        <Column Name="OST" DataType="System.Decimal"/>
+        <Column Name="KV" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+      <TableDataSource Name="Table1" Alias="TOTAL" DataType="System.Int32" Enabled="true" SelectCommand="select&#13;&#10;        max(nvl(NUM04,0)) /100  OST,&#13;&#10;sum( nvl( case  when NUM03 = -1 then 0 else NUM01 end /100,0)) DT_TOTAL,&#13;&#10;sum(       nvl( case  when NUM03 = -1 then 0 else NUM02 end /100,0)) KT_TOTAL&#13;&#10;   from rs_tmp_report_data&#13;&#10;  where session_id = :SESSION_ID&#13;&#10;--and rownum =1&#13;&#10;  order by id">
+        <Column Name="OST" DataType="System.Decimal" Format="Number"/>
+        <Column Name="DT_TOTAL" DataType="System.Decimal"/>
+        <Column Name="KT_TOTAL" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="[session_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32"/>
+    <Total Name="Total" Expression="[Table.DT_TOTAL]" Evaluator="Data1"/>
+    <Total Name="Total1" Expression="[Table.KT_TOTAL]" Evaluator="Data1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06" Height="151.2">
+      <TextObject Name="Text4" Left="319.41" Top="7.56" Width="370.44" Height="18.9" Text="  Виписка по рахунку  [Table.NLS]   " Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text6" Left="357.21" Top="28.35" Width="241.92" Height="18.9" Text="з   [Table.DAT1]   по   [Table.DAT2]"/>
+      <TextObject Name="Text9" Left="-1890" Top="-1890" Width="47.25" Height="18.9" Text="[Page]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+      <TextObject Name="Text26" Left="35.91" Top="52.92" Width="94.5" Height="18.9" Text="ПІБ:" HorzAlign="Right"/>
+      <TextObject Name="Text27" Left="35.91" Top="73.71" Width="94.5" Height="18.9" Text="ІНН:" HorzAlign="Right"/>
+      <TextObject Name="Text28" Left="132.3" Top="52.92" Width="548.1" Height="18.9" CanGrow="true" CanShrink="true" Text="[Table.FIO]"/>
+      <TextObject Name="Text29" Left="130.41" Top="73.71" Width="549.99" Height="18.9" CanGrow="true" CanShrink="true" Text="[Table.IDCODE]"/>
+      <TextObject Name="Text32" Left="37.8" Top="94.5" Width="94.5" Height="18.9" Text="Валюта:" HorzAlign="Right"/>
+      <TextObject Name="Text33" Left="132.3" Top="94.5" Width="94.5" Height="18.9" Text="[Table.KV]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text34" Left="37.8" Top="113.4" Width="189" Height="18.9" Text="Дата надходження в ЦРНВ:" VertAlign="Center"/>
+      <TextObject Name="Text35" Left="274.05" Top="132.3" Width="557.55" Height="18.9" Text="[TOTAL.OST]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" WordWrap="false" Trimming="EllipsisCharacter"/>
+      <TextObject Name="Text36" Left="37.8" Top="132.3" Width="236.25" Height="18.9" Text="Сумма надходження в ЦРНВ:" VertAlign="Center"/>
+      <TextObject Name="Text37" Left="274.05" Top="113.4" Width="241.92" Height="18.9" Text="[Table.DAT1]"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="155.2" Width="1047.06" Height="35.91">
+      <TextObject Name="Text1" Left="7.56" Top="3.78" Width="64.26" Height="32.13" Border.Lines="All" Text="Код операції" HorzAlign="Center"/>
+      <TextObject Name="Text2" Left="71.82" Top="3.78" Width="92.61" Height="32.13" Border.Lines="All" Text="Референс" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text3" Left="257.04" Top="3.78" Width="111.51" Height="32.13" Border.Lines="All" Text="Рахунок" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text7" Left="368.55" Top="3.78" Width="105.84" Height="32.13" Border.Lines="All" Text="Сума Дт" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text14" Left="474.39" Top="3.78" Width="107.73" Height="32.13" Border.Lines="All" Text="Сума Кт" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text12" Left="582.12" Top="3.78" Width="285.39" Height="32.13" Border.Lines="All" Text="Призначення платежу" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text16" Left="164.43" Top="3.78" Width="92.61" Height="32.13" Border.Lines="All" Text="Номер &#13;&#10;документу" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text18" Left="867.51" Top="3.78" Width="92.61" Height="32.13" Border.Lines="All" Text="Дата" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text24" Left="960.12" Top="3.78" Width="77.49" Height="32.13" Border.Lines="All" Text="Стан документа" HorzAlign="Center" VertAlign="Center"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="195.11" Width="1047.06" Height="18.9" CanGrow="true" DataSource="Table">
+      <TextObject Name="Text10" Left="7.56" Width="64.26" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text11" Left="71.82" Width="92.61" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text5" Left="257.04" Width="111.51" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.NLS]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text8" Left="368.55" Width="105.84" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.DT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text15" Left="474.39" Width="107.73" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.KT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text13" Left="164.43" Width="92.61" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text17" Left="582.12" Width="285.39" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.NAZN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text19" Left="867.51" Width="92.61" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.PDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text25" Left="960.12" Width="77.49" Height="18.9" Border.Lines="All" CanGrow="true" GrowToBottom="true" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="218.01" Width="1047.06" Height="37.8">
+      <TextObject Name="Text21" Left="7.56" Width="360.99" Height="18.9" Border.Lines="All" Text="Загальна сума" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="Text22" Left="368.55" Width="105.84" Height="18.9" Border.Lines="All" Text="[Total]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="Text23" Left="474.39" Width="107.73" Height="18.9" Border.Lines="All" Text="[Total1]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="Text30" Left="37.8" Top="18.9" Width="236.25" Height="18.9" Text="Залишок коштів на [Table.DAT2]: " VertAlign="Center"/>
+      <TextObject Name="Text31" Left="274.05" Top="18.9" Width="557.55" Height="18.9" Text="[[TOTAL.OST]-([TOTAL.DT_TOTAL])] " Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1" WordWrap="false" Trimming="EllipsisCharacter"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="259.81" Width="1047.06" Height="170.1">
+      <TextObject Name="Text20" Left="988.47" Top="13.23" Width="47.25" Height="18.9" Text="[Page]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

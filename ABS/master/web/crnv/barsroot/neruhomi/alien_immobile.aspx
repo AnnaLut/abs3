@@ -12,6 +12,8 @@
 <%@ Register Src="~/credit/usercontrols/TextBoxRefer.ascx" TagName="TextBoxRefer" TagPrefix="bec" %>
 <%@ Register Src="~/credit/usercontrols/TextBoxScanner.ascx" TagName="TextBoxScanner" TagPrefix="Bars" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajax" %>
+<%@ Register Src="~/credit/usercontrols/TextBoxString.ascx" TagName="TextBoxString" TagPrefix="bec" %>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Реквізити для виплати</title>
@@ -25,7 +27,7 @@
         .hand {cursor:pointer;}
     </style>
 </head>
-<body>
+<body style="width: 550px;">
 
 
     <form id="formOperationList" runat="server">
@@ -50,16 +52,13 @@
                 return true;
             }
         }
-
-
-
      </script>
 
     <div class="pageTitle">
         <asp:Label ID="lbTitle" runat="server" Text="Реквізити для виплати" />
     </div>
     <asp:Panel  ID="pnAlien" GroupingText="Реквізити:" runat="server" Style="margin-left: 10px;
-        margin-right: 10px">
+        margin-right: 10px;">
         <table>
         <tr>
             <td>
@@ -103,7 +102,7 @@
                     <asp:Label ID="lb_MFO_NAME" runat="server" Text="МФО отримувача:"></asp:Label>
                 </td>
                 <td>
-                   <bec:TextBoxRefer ID="lbMFO" runat="server" TAB_NAME="BANKS" KEY_FIELD="MFO" SEMANTIC_FIELD="NB" IsRequired="true" /> 
+                   <bec:TextBoxRefer ID="lbMFO" runat="server" TAB_NAME="BANKS" KEY_FIELD="MFO" SEMANTIC_FIELD="NB" IsRequired="true" OnValueChanged="LbMFO_Changed"/> 
                 </td>
             </tr>
             <tr>
@@ -151,13 +150,77 @@
                      <asp:RequiredFieldValidator id="tbNLS_Validator" runat="server" ControlToValidate="tbNLS" ErrorMessage="Не заповнено рахунок отримувача!"  ForeColor="Red"></asp:RequiredFieldValidator>
                 </td>
             </tr>
-            
+            <asp:Panel ID="DopInfo" runat="server" Visible="false">
+                <tr>
+
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_name" runat="server"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_name" runat="server" OnValueChanged="DopInfoValueChanged"></bec:TextBoxString>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_okpo" runat="server" Text="РНОКПП:"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_okpo" runat="server" OnValueChanged="DopInfoValueChanged" MaxLength="10"></bec:TextBoxString>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_pasp_num" runat="server" Text="Паспорт №:"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_pasp_num" runat="server" OnValueChanged="DopInfoValueChanged"></bec:TextBoxString>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_pasp_serial" runat="server" Text="Паспорт серія:"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_pasp_serial" runat="server" OnValueChanged="DopInfoValueChanged"></bec:TextBoxString>
+                    </td>
+                </tr> 
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_doc_num" runat="server"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_doc_num" runat="server" OnValueChanged="DopInfoValueChanged"></bec:TextBoxString>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_part_of_inheritance" runat="server" Text="Частка спадку"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_part_of_inheritance" runat="server" OnValueChanged="DopInfoValueChanged"></bec:TextBoxString>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="lbl_dop_doc_date" runat="server"></asp:Label>
+                    </td>
+                    <td>
+                        <bec:TextBoxString ID="dop_doc_date" runat="server" OnValueChanged="DopInfoValueChanged"></bec:TextBoxString>
+                    </td>
+                </tr>
+                <tr>
+
+                </tr>
+        </asp:Panel>
 	    <tr>
                 <td>
                     <asp:Label ID="lbPurposePayment" runat="server" Text="Призначення платежу:"></asp:Label>
                 </td>
                 <td>
-                    <asp:TextBox ID="tbPurposePayment" runat="server" TextMode="MultiLine" Rows="3" Width="250" Enabled="false" onkeypress="return CheckLength();"  MaxLength="100"></asp:TextBox>
+                    <asp:TextBox ID="tbPurposePayment" runat="server" TextMode="MultiLine" Rows="3" Width="250" Enabled="false" onkeypress="return CheckLength();"  MaxLength="160"></asp:TextBox>
+                    <asp:TextBox ID="PurposeLayout" runat="server" Enabled="false" Visible="false"></asp:TextBox>
                 </td>
             </tr>
 
@@ -181,7 +244,7 @@
             </tr>
         </table>
     </asp:Panel>
-    <asp:Panel ID="pnSum" GroupingText="Параметри виплати:" runat="server" Style="margin-left: 10px; margin-right: 10px" Enabled="true">
+    <asp:Panel ID="pnSum" GroupingText="Параметри виплати:" runat="server" Style="margin-left: 10px; margin-right: 10px;" Enabled="true">
         <table>
             <tr>
                 <td>
@@ -209,7 +272,7 @@
         </table>
     </asp:Panel>
     <asp:Panel  ID="pnPay" GroupingText="Виконання дій:" runat="server" Style="margin-left: 10px;
-        margin-right: 10px">
+        margin-right: 10px;">
         <tr>
             <td>
                 <asp:ImageButton runat="server" ID="bt_back" ToolTip="Перечитати" OnClick="bt_Cencel_Click" ImageUrl="\Common\Images\default\24\refresh.png"/>
@@ -228,6 +291,8 @@
                     <asp:Label ID="lbERR" runat="server" ForeColor="#f00c00"></asp:Label>
                 </td>
             </tr>
+            <asp:HiddenField runat="server" ID="EnableFullPay"/>
+            <asp:HiddenField runat="server" ID="ND"/>
 
         </table>
    </form>

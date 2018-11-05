@@ -166,8 +166,42 @@ namespace CustomerList
 				DisposeOraConnection();
 			}
 		}
-		
-		[WebMethod(EnableSession = true)]
+
+        [WebMethod(EnableSession = true)]
+        public object[] ShowHistoryImmobile(string[] data)
+        {
+            object[] obj = new object[5];
+            string key = data[9];
+            string date1 = data[10];
+            string date2 = data[11];
+            try
+            {
+                InitOraConnection(Context);
+                ClearParameters();
+                string cond = "key=:key";
+                SetParameters("key", DB_TYPE.Decimal, key, DIRECTION.Input);
+                if (date1 != "" && date2 != "")
+                {
+                    SetParameters("date1", DB_TYPE.Varchar2, date1.Replace('.', '/'), DIRECTION.Input);
+                    SetParameters("date2", DB_TYPE.Varchar2, date2.Replace('.', '/'), DIRECTION.Input);
+                    cond += " and TRUNC(TO_DATE(chgdate), 'DD') BETWEEN to_date(:date1, 'dd/MM/yyyy') and to_date(:date2, 'dd/MM/yyyy')";
+                }
+                object[] temp = BindTableWithFilter("tag as PAR, old, new, TO_CHAR(chgdate,'DD/MM/YYYY HH24:MI:SS') DAT, donebuy as USR, fio", "v_asvo_immobile_history", cond, "tag", data);
+                obj[0] = temp[0];
+                obj[1] = temp[1];
+                obj[2] = date1;
+                obj[3] = date2;
+                ClearParameters();
+                return obj;
+            }
+
+            finally
+            {
+                DisposeOraConnection();
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
 		public object[] GetCustAcc(string[] data)
 		{
 			object[] obj = new object[3];
