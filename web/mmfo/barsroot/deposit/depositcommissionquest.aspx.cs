@@ -236,10 +236,10 @@ public partial class deposit_depositcommissionquest : System.Web.UI.Page
             cmd.Parameters.Add("dpt_id", OracleDbType.Decimal, Convert.ToString(Request["dpt_id"]), ParameterDirection.Input);
 
             String result = Convert.ToString(cmd.ExecuteScalar());
-            if (!String.IsNullOrEmpty(result))
-                btForm.Disabled = true;
-            else
-                btForm.Disabled = false;
+            //if (!String.IsNullOrEmpty(result))
+            //    btForm.Disabled = true;
+            //else
+            //    btForm.Disabled = false;
 
             return result;
         }
