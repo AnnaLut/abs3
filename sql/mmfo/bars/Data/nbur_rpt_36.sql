@@ -15,7 +15,7 @@ begin
 
   NBUR_FILES.SET_FILE
   ( p_file_id          => l_file_id
-  , p_file_code        => '#36'
+  , p_file_code        => l_file_code
   , p_scm_code         => r_file.SCHEME_CODE
   , p_file_tp          => r_file.FILE_TYPE
   , p_file_nm          => '(xml) 36X Дані про резидентів–суб’єктів зовн-економ. діяль-ті, які порушили строки'

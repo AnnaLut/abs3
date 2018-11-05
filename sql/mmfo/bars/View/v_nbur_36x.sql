@@ -1,5 +1,5 @@
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_nbur_79X.sql =========*** Run *** =
+PROMPT *** Run *** ========== Scripts /Sql/BARS/View/v_nbur_36X.sql =========*** Run *** =
 PROMPT ===================================================================================== 
 
 PROMPT *** Create  view v_nbur_36X ***
@@ -47,7 +47,7 @@ comment on table V_NBUR_36X              is 'Файл 36X - Дані про концетрацію риз
 comment on column V_NBUR_36X.REPORT_DATE is 'Звiтна дата';
 comment on column V_NBUR_36X.KF          is 'Фiлiя';
 comment on column V_NBUR_36X.VERSION_ID  is 'Номер версії файлу';
-comment on column V_NBUR_36X_DTL.EKP     is 'Код показника';
+comment on column V_NBUR_36X.EKP     is 'Код показника';
 comment on column V_NBUR_36X.B040        is 'Код стуктурного підрозділу';
 comment on column V_NBUR_36X.F021        is 'Код повідомлення про взяття на контроль/зняття з контролю';        
 comment on column V_NBUR_36X.K020        is 'Код резидента';        
