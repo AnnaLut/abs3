@@ -34,6 +34,7 @@ begin
         K190            VARCHAR2(1 CHAR),
         S240            VARCHAR2(1 CHAR),
         BLKD            VARCHAR2(1 CHAR),
+        BLKK            VARCHAR2(1 CHAR),
         MSG_RETURN_FLG  VARCHAR2(1 CHAR),
         DEFAULT_FLG     VARCHAR2(1 CHAR),
         LIQUID_TYPE     VARCHAR2(1 CHAR),
@@ -63,6 +64,15 @@ exception when others then
 end; 
 /  
 
+begin 
+  execute immediate '
+  ALTER TABLE BARS.NBUR_DCT_F6EX_NBS 
+  ADD (BLKK  VARCHAR2(1 CHAR))';
+exception when others then       
+  if sqlcode=-01430 then null; else raise; end if; 
+end; 
+/ 
+
 PROMPT *** ALTER_POLICIES to NBUR_DCT_F6EX_NBS ***
  exec bpa.alter_policies('NBUR_DCT_F6EX_NBS');
 
@@ -81,6 +91,7 @@ COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.K190 IS 'Параметр K190';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.S240 IS 'Параметр S240';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.FACTOR IS 'Множник показника';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.BLKD IS 'Флаг наявності блокування дебетування рахунку';
+COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.BLKD IS 'Флаг наявності блокування кредитування рахунку';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.MSG_RETURN_FLG IS 'Флаг наявності повідомлення про повернення вкладу/депозиту';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.DEFAULT_FLG IS 'Флаг дефолту';
 COMMENT ON COLUMN BARS.NBUR_DCT_F6EX_NBS.LIQUID_TYPE IS 'Тип ліквідних активів';

@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6EX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.004  17/10/2018 (26/09/2018)
+% VERSION     :  v.1.005  30/10/2018 (17/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.004  17/10/2018';
+  ver_          char(30)  := 'v.1.005  30/10/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -45,9 +45,16 @@ BEGIN
   -- определение начальных параметров (код области или МФО или подразделение)
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 0, l_file_code, l_nbuc, l_type);
 
-  l_next_mnth_frst_dt := last_day(trunc(p_report_date)) + 1; --Первый день следующего месяца
+  l_next_mnth_frst_dt := last_day(trunc(p_report_date)) + 1; --Первый день следующего месяца (для даних з розрахунку рнзнрву)
   l_mnth_last_work_dt := DAT_NEXT_U(last_day(trunc(p_report_date)) + 1, -1);   --Определяем дату последнего рабочего дня в этом месяце
   l_prior_mnth_last_work_dt := DAT_NEXT_U(trunc(p_report_date, 'MM'), -1); --Определяем дату последнего рабочего дня в предыдущем месяце
+   
+  -- дата розрахунку резервiв
+  select last_day(trunc(max(dat))) + 1
+  into l_next_mnth_frst_dt
+  from rez_protocol
+  where dat <= l_next_mnth_frst_dt;  
+  
   logger.trace(
                 c_title 
                 || ' Первый день следующего месяца - ' || to_char(l_next_mnth_frst_dt, c_date_fmt)
@@ -80,7 +87,9 @@ BEGIN
       end;
 
       --Сначало вставляем данные в промежуточную витрину для анализа
-      insert into nbur_tmp_f6ex(report_date, kf, t020, nbs, r011, r013, s181, s240, k040, s190, amount, s080, kol, kol26, restruct_date, k030, m030, k180, k190, blkd, msg_return_flg, default_flg, liquid_type, cust_type, cust_rating, credit_work_flg, s130, description, acc_id, acc_num, kv, maturity_date, cust_id, nd, branch)
+      insert into nbur_tmp_f6ex(report_date, kf, t020, nbs, r011, r013, s181, s240, k040, s190, amount, s080, kol, 
+            kol26, restruct_date, k030, m030, k180, k190, blkd, blkk, msg_return_flg, default_flg, liquid_type, cust_type, 
+            cust_rating, credit_work_flg, s130, description, acc_id, acc_num, kv, maturity_date, cust_id, nd, branch)
             select p_report_date /*report_date*/
                    , p_kod_filii /*kf*/
                    , t.t020 /*t020*/
@@ -101,6 +110,7 @@ BEGIN
                    , t.k180 /*k180*/
                    , t.k190 /*k190*/
                    , t.blkd /*blkd*/
+                   , t.blkk /*blkk*/
                    , t.msg_return_flg /*msg_return_flg*/
                    , t.default_flg /*default_flg*/
                    , t.liquid_type /*liquid_type*/
@@ -149,7 +159,7 @@ BEGIN
                               , t.k030
                               , case
                                   when t.MATURITY_DATE is null
-                                       or t.MATURITY_DATE <= last_day(p_report_date) + 31 
+                                       or t.MATURITY_DATE <= last_day(p_report_date) + 30 
                                   then '1'
                                 else
                                   '0'
@@ -157,11 +167,17 @@ BEGIN
                               , null as k180
                               , null as k190
                               , --Анализируем наличия кода блокировки на счете
-                                case
+                             case
                                   when t.blc_code_db <> 0 then '1'
                                 else
                                   '0'
                                 end as blkd
+                              , --Анализируем наличия кода блокировки на счете
+                                case
+                                  when t.blc_code_cr <> 0 then '1'
+                                else
+                                  '0'
+                                end as blkk
                               , '0' as msg_return_flg --Пока нет информации где хранится данный показатель
                               , null as default_flg
                               , null as liquid_type
@@ -173,13 +189,18 @@ BEGIN
                                   when t.k070 in ('12602', '12603', '12702','12703','12799') then 'T3'
                                 end as cust_type
                               , case
-                                -- інвестиційний клас
-                                 when b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
-                                      or substr(b.rating, 1, 1) in ('A', 'T', 'F')
-                                then
-                                  'R1'
-                                else
-                                  null
+                                    -- неінвестиційний клас
+                                    when not (b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
+                                              or substr(b.rating, 1, 1) in ('A', 'T', 'F'))
+                                    then
+                                      'R0'
+                                    -- інвестиційний клас
+                                    when b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
+                                          or substr(b.rating, 1, 1) in ('A', 'T', 'F')
+                                    then
+                                      'R1'
+                                    else
+                                      null
                                 end as cust_rating
                               , t.DESCRIPTION
                               , t.ACC_ID
@@ -213,6 +234,7 @@ BEGIN
                                       , cust.cust_type
                                       , cust.k070
                                       , ac.blc_code_db
+                                      , ac.blc_code_cr
                                 from  v_nbur_#a7_dtl t
                                       left join nbur_dm_accounts ac on (ac.kf = p_kod_filii)
                                                                        and (t.ACC_ID = ac.acc_id)
@@ -253,6 +275,7 @@ BEGIN
                                       , cust.cust_type
                                       , cust.k070
                                       , ac.blc_code_db
+                                      , ac.blc_code_cr
                                 from  nbur_dm_accounts ac
                                       join nbur_dm_balances_daily d on (ac.kf = d.kf)
                                                                        and (ac.acc_id = d.acc_id)
@@ -334,6 +357,7 @@ BEGIN
                                                and ((t.k190 = nvl(n.k190, t.k190)) or (t.k190 is null and n.k190 is null))
                                                and ((t.s240 = nvl(n.s240, t.s240)) or (t.s240 is null and n.s240 is null))
                                                and ((t.blkd = nvl(n.blkd, t.blkd)) or (t.blkd is null and n.blkd is null))
+                                               and ((t.blkk = nvl(n.blkk, t.blkk)) or (t.blkk is null and n.blkk is null))
                                                and ((t.msg_return_flg = nvl(n.msg_return_flg, t.msg_return_flg)) or (t.msg_return_flg is null and n.msg_return_flg is null))
                                                and ((t.default_flg = nvl(n.default_flg, t.default_flg)) or (t.default_flg is null and n.default_flg is null))
                                                and ((t.liquid_type = nvl(n.liquid_type, t.liquid_type)) or (t.liquid_type is null and n.liquid_type is null))
@@ -453,9 +477,9 @@ BEGIN
           from      (
                       select r030
                              , to_char(A6E004) as A6E004
-                             , to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) * 100 else 0 end), '0.0000') as A6E005
+                             , trim(to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) * 100 else 0 end), '9990.0000')) as A6E005
                              , to_char(A6E009) as A6E009
-                             , to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) * 100 else 0 end), '0.0000') as A6E010
+                             , trim(to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) * 100 else 0 end), '9990.0000')) as A6E010
                       from   (
                                 select r030
                                        , A6E001
