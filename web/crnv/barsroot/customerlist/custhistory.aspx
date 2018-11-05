@@ -10,7 +10,7 @@
 		<LINK href="Styles.css" type="text/css" rel="stylesheet">
 		<LINK href="\Common\WebGrid\Grid.css" type="text/css" rel="stylesheet">
 		<script language="JavaScript" src="Scripts\Common.js"></script>
-		<script language="JavaScript" src="Scripts\CustHistory.js"></script>
+		<script language="JavaScript" src="Scripts\CustHistory.js?v.1.0.1"></script>
 		<script language="JavaScript" src="\Common\WebGrid\Grid2005.js"></script>
 		<script language="javascript" src="/Common/Script/Localization.js"></script>
 		<script language="javascript">
