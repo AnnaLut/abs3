@@ -53,7 +53,7 @@ IS
   i          number;
   l_val operw.value%type;
   l_s number;
-
+  l_fl integer;
 BEGIN
 
   BEGIN
@@ -177,8 +177,14 @@ BEGIN
 
 	delete from PART_PAY_IMMOBILE where key=l_val and sum=l_s and refpay=Ref_ and rownum=1;
 
+        begin
+            select count(1) into l_fl
+               from PART_PAY_IMMOBILE
+               where key=l_val;
+        end;
+
 	update asvo_immobile
-		set fl=5, comments = null where key=l_val and refpay=Ref_;
+		set fl= decode(l_fl,0,5,11), comments = null where key=l_val /*and refpay=Ref_*/;
 
   -- БПК: операция для ПЦ
   -- старый процессинг
