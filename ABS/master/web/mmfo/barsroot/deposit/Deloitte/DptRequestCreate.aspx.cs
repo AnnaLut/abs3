@@ -531,7 +531,7 @@ public partial class DptClientRequestCreate : Bars.BarsPage
             FrxParameters pars = new FrxParameters();
             pars.Add(new FrxParameter("p_req_id", TypeCode.Int64, req_id.Value));
 
-            String template = (req_type == 0 ? "DPT_ACCESS_APPLICATION_CARD" : "DPT_ACCESS_APPLICATION");
+            String template = (rbClientCard.Checked ? "DPT_ACCESS_APPLICATION_CARD" : "DPT_ACCESS_APPLICATION"); 
 
             FrxDoc doc = new FrxDoc(FrxDoc.GetTemplatePathByFileName(FrxDoc.GetTemplateFileNameByID(template)), pars, this.Page);
 
