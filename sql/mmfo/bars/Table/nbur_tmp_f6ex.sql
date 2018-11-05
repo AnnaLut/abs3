@@ -43,6 +43,7 @@ begin
      , K180             VARCHAR2(1 CHAR)
      , K190             VARCHAR2(1 CHAR)
      , BLKD             VARCHAR2(1 CHAR)
+     , BLKK             VARCHAR2(1 CHAR)
      , MSG_RETURN_FLG   VARCHAR2(1 CHAR)
      , DEFAULT_FLG      VARCHAR2(1 CHAR)
      , LIQUID_TYPE      VARCHAR2(1 CHAR)
@@ -88,6 +89,7 @@ comment on column BARS.NBUR_TMP_F6EX.M030 IS 'Срок погашення до 30 днів';
 comment on column BARS.NBUR_TMP_F6EX.K180 IS 'Параметр K180';
 comment on column BARS.NBUR_TMP_F6EX.K190 IS 'Параметр K190';
 comment on column BARS.NBUR_TMP_F6EX.BLKD IS 'Флаг наявності блокування дебетування рахунку';
+comment on column BARS.NBUR_TMP_F6EX.BLKK IS 'Флаг наявності блокування кредитування рахунку';
 comment on column BARS.NBUR_TMP_F6EX.MSG_RETURN_FLG IS 'Флаг наявності повідомлення про повернення вкладу/депозиту';
 comment on column BARS.NBUR_TMP_F6EX.DEFAULT_FLG IS 'Флаг дефолту';
 comment on column BARS.NBUR_TMP_F6EX.LIQUID_TYPE IS 'Тип ліквідних активів';
