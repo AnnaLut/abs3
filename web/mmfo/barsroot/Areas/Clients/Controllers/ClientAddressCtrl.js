@@ -154,11 +154,13 @@
             }
 
             vm.close = function () {
-                //window.parent.angular.element("#winClientAddress").data("kendoWindow").close();
                 window.parent.$('#winClientAddress').data('kendoWindow').close();
             }
-
             vm.save = function () {
+
+                if (vm.indexNotApprove(vm.legalModel , 'Юридичної')) return;
+                if (vm.indexNotApprove(vm.actualModel, 'Фактичної')) return;
+                if (vm.indexNotApprove(vm.mailModel, 'Поштової')) return;
 
                 if (vm.legalModel.SETTLEMET_NAME == "" || vm.legalModel.SETTLEMET_NAME == null) {
                     bars.ui.alert({ text: "Населений пункт має бути заповненим" });
@@ -178,7 +180,6 @@
                     vm.updateCustomerAddressActual();
                     vm.updateCustomerAddressMail();
 
-                    //window.parent.angular.element("#winClientAddress").data("kendoWindow").close();
                     window.parent.$('#winClientAddress').data('kendoWindow').close();
                 }
 
@@ -354,6 +355,64 @@
                     }
                 },
                 dataSource: vm.houseDataSource
+            }
+
+            vm.testIndex = function (_model) {
+                if (_model.STR_ID && _model.index.length > 4) {
+                    $.ajax({
+                        type: "GET",
+                        url: bars.config.urlContent("/Clients/clientAddress/GetHouse"),
+                        data: {
+                            sort: ''
+                            , group: ''
+                            , filter: "HOUSE_NUM_FULL~startswith~'" + _model.HOUSE_NUM_FULL.toUpperCase() + "'"
+                            , columnName: 'HOUSE_NUM_FULL'
+                            , streetId: _model.STR_ID
+                            , _: Math.random()
+                        },
+                        success: function (result) {
+                            if (result && result.length) {
+                                for (var i = 0; i < result.length; i++) {
+                                    if (_model.HOUSE_NUM_FULL.toUpperCase() === result[i].HOUSE_NUM_FULL.toUpperCase()) {
+                                        if (result[i].POSTAL_CODE) {
+                                            _model.indexDict = result[i].POSTAL_CODE;
+                                            _model.indexChecked = true;
+                                        }
+                                    }
+                                };
+                            }
+                        }
+                    });
+                }
+            }
+
+            vm.approve = function (msg, _model) {
+                //bars.ui.approve({ text: msg }
+                //    , function () { _model.indexDict = _model.index; vm.save(); } // yes
+                //    , function () { }); // no
+                options = { id: 'clientAddressCloseDialog',
+                    text: msg, title: 'Підтвердження!', winType: 'confirm', actions: ["Pin", "Close"], pinned: true, draggable: false,
+                    buttons: [
+                        { text: 'Ні', click: function () { this.close(); }, cssClass: 'k-primary' },
+                        { text: '<span class="k-icon k-i-tick"></span> Так',
+                         click: function () {
+                                _model.indexDict = _model.index; vm.save();
+                                this.close();
+                         }
+                        }
+                    ]
+                };
+                return bars.ui.alert(options);
+            }
+
+            vm.indexNotApprove = function (_model, modelName) {
+                var isNotEqual = (_model.indexDict != _model.index);
+                if (isNotEqual) {
+                    vm.approve("Зазначений індекс " + modelName + " адреси (" + _model.index + ")<br\> не "
+                    + (_model.indexChecked ? "співпадає із довідником" :
+                            "вдалося перевірити по довіднику,<br\> оскільки адреса вводилась без використання довідників.<br\> Попереднє значення індекса") + " (" + _model.indexDict + "). Зберегти зміни?", _model);
+                }
+                return isNotEqual
             }
 
             $scope.preventDefaultBackSpace = function (e, elem) {

@@ -346,6 +346,7 @@
 
             $scope.changeActualIndex = function () {
                 $scope.clientAddress.actualModel.index = $scope.actualIndex;
+                $scope.clientAddress.testIndex($scope.clientAddress.actualModel);
             }
 
             $scope.changeActualRegion = function (regionName) {
@@ -494,6 +495,7 @@
                     SETL_TP_NM: "",
                     STR_TP_ID: 0,
                     index: "",
+                    indexDict: "",
                     REGION_NAME: "",
                     AREA_NAME: "",
                     SETTLEMET_NAME: "",
@@ -517,7 +519,8 @@
 
                 var actualModel = $scope.clientAddress.actualModel;
 
-                $scope.actualIndex = actualModel.index;
+                actualModel.indexChecked = false;
+                $scope.actualIndex = actualModel.indexDict = actualModel.index;
                 $scope.actualRegion = actualModel.REGION_NAME;
                 $scope.actualArea = actualModel.AREA_NAME;
                 $scope.actualSettlement = actualModel.SETTLEMET_NAME;
@@ -622,8 +625,8 @@
                 $scope.clientAddress.actualModel.HOUSE_ID = data.HOUSE_ID;
 
                 if (data.POSTAL_CODE) {
-                    $scope.actualIndex = $scope.clientAddress.actualModel.index = data.POSTAL_CODE;
-                    $scope.disabledIndex = true;
+                    $scope.actualIndex = $scope.clientAddress.actualModel.indexDict = $scope.clientAddress.actualModel.index = data.POSTAL_CODE;
+                    $scope.clientAddress.actualModel.indexChecked = $scope.disabledIndex = true;
                 }
                 else {
                     $scope.actualIndex = $scope.clientAddress.actualModel.index = "";

@@ -6,7 +6,7 @@
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 containerIndex">
             <label>Індекс:</label>
-            <input type="text" id="mailIndexEdit" class="k-textbox txtIndex textBoxSize" ng-change="clrAdrMail.changeIndex(clrAdrMail.indexEdit)" ng-model="clrAdrMail.indexEdit" ng-disabled="clrAdrMail.disabledIndex" ng-class="{'readOnly': clrAdrMail.disabledIndex}"/>
+            <input type="text" id="mailIndexEdit" class="k-textbox txtIndex textBoxSize" ng-change="clrAdrMail.changeIndex(clrAdrMail.indexEdit)" ng-model="clrAdrMail.indexEdit" numbers-only="" @*ng-disabled="clrAdrMail.disabledIndex" ng-class="{'readOnly': clrAdrMail.disabledIndex}" COBUMMFO-8100 *@/>
             <button type="button" ng-click="clrAdr.clearAddress('mail')" id="btnClearAddress" class="k-button"><i class="pf-icon pf-16 pf-reload_rotate"></i>Очистити</button>
         </div>
         <div class="text col-lg-6 col-md-6 col-sm-6 col-xs-6 containerRegion">
