@@ -1,8 +1,18 @@
-=========  svn diff --summarize -r 69389:69484 D:\SVN\master\web\mmfo
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\version.abs
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\deposit\Deloitte\depositcontract.aspx.cs
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\deposit
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot\credit\fin_nbu\credit_defolt.aspx
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web\barsroot
----web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.19\mmfo\web
-Bugfix_2.0.48.a.19 (Rev:69389-69484
+=========  svn diff --summarize -r 69485:69548 D:\SVN\master\web\mmfo
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressMailCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressLegalCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Controllers\ClientAddressActualCtrl.js
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddressMail.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddressLegal.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClearAddressMailPartial.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClearAddressLegalPartial.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddressActual.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClearAddressActualPartial.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\Areas\Clients\Views\ClientAddress\ClientAddress.cshtml
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\deposit\depositcommissionquest.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\deposit\Deloitte\DptRequestCreate.aspx.cs
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot\deposit
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web\barsroot
+---web_release----: D:\SVN\Releases\Bugfix_2.0.48.a.20\mmfo\web
+Bugfix_2.0.48.a.20 (Rev:69485-69548
