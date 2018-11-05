@@ -4,7 +4,7 @@
     </div>
     <div class="text col-lg-7 col-md-7 col-sm-7 col-xs-7 containerIndex">
         <span>Індекс:</span>
-        <input type="text" ng-model="mailIndex" class="k-textbox txtIndex" ng-change="changeMailIndex()" ng-disabled="disabledIndex" numbers-only=""  ng-class="{'readOnly': disabledIndex}"/>
+        <input type="text" ng-model="mailIndex" class="k-textbox txtIndex" ng-change="changeMailIndex()" numbers-only=""  @*ng-disabled="disabledIndex" ng-class="{'readOnly': disabledIndex}" COBUMMFO-8100 *@/>
     </div>
     <div class="text col-lg-5 col-md-5 col-sm-5 col-xs-5  text-right">
         <button type="button" ng-click="clearMailAddress()" id="btnCloseAddress" class="k-button"><i class="pf-icon pf-16 pf-reload_rotate"></i>Очистити</button>

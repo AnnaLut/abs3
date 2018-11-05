@@ -350,6 +350,7 @@
 
             $scope.changeMailIndex = function () {
                 $scope.clientAddress.mailModel.index = $scope.mailIndex;
+                $scope.clientAddress.testIndex($scope.clientAddress.mailModel);
             }
 
             $scope.changeMailRegion = function (regionName) {
@@ -499,6 +500,7 @@
                     SETL_TP_NM: "",
                     STR_TP_ID: 0,
                     index: "",
+                    indexDict: "",
                     REGION_NAME: "",
                     AREA_NAME: "",
                     SETTLEMET_NAME: "",
@@ -522,7 +524,8 @@
 
                 var mailModel = $scope.clientAddress.mailModel;
 
-                $scope.mailIndex = mailModel.index;
+                mailModel.indexChecked = false;
+                $scope.mailIndex = mailModel.indexDict = mailModel.index;
                 $scope.mailRegion = mailModel.REGION_NAME;
                 $scope.mailArea = mailModel.AREA_NAME;
                 $scope.mailSettlement = mailModel.SETTLEMET_NAME;
@@ -626,8 +629,8 @@
                 $scope.clientAddress.mailModel.HOUSE_ID = data.HOUSE_ID;
 
                 if (data.POSTAL_CODE) {
-                    $scope.mailIndex = $scope.clientAddress.mailModel.index = data.POSTAL_CODE;
-                    $scope.disabledIndex = true;
+                    $scope.mailIndex = $scope.clientAddress.mailModel.indexDict = $scope.clientAddress.mailModel.index = data.POSTAL_CODE;
+                    $scope.clientAddress.mailModel.indexChecked = $scope.disabledIndex = true;
                 }
                 else {
                     $scope.mailIndex = $scope.clientAddress.mailModel.index = "";

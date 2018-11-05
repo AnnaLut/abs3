@@ -315,6 +315,7 @@
 
             $scope.changeLegalIndex = function () {
                 $scope.clientAddress.legalModel.index = $scope.legalIndex;
+                $scope.clientAddress.testIndex($scope.clientAddress.legalModel);
             }
 
             $scope.changeLegalRegion = function (regionName) {
@@ -464,6 +465,7 @@
                     SETL_TP_NM: "",
                     STR_TP_ID: 0,
                     index: "",
+                    indexDict: "",
                     REGION_NAME: "",
                     AREA_NAME: "",
                     SETTLEMET_NAME: "",
@@ -487,7 +489,8 @@
 
                 var legalModel = $scope.clientAddress.legalModel;
 
-                $scope.legalIndex = legalModel.index;
+                legalModel.indexChecked = false;
+                $scope.legalIndex = legalModel.indexDict = legalModel.index;
                 $scope.legalRegion = legalModel.REGION_NAME;
                 $scope.legalArea = legalModel.AREA_NAME;
                 $scope.legalSettlement = legalModel.SETTLEMET_NAME;
@@ -613,8 +616,8 @@
                 $scope.clientAddress.legalModel.HOUSE_ID = data.HOUSE_ID;
 
                 if (data.POSTAL_CODE) {
-                    $scope.legalIndex = $scope.clientAddress.legalModel.index = data.POSTAL_CODE;
-                    $scope.disabledIndex = true;
+                    $scope.legalIndex = $scope.clientAddress.legalModel.indexDict = $scope.clientAddress.legalModel.index = data.POSTAL_CODE;
+                    $scope.clientAddress.legalModel.indexChecked = $scope.disabledIndex = true;
                 }
                 else {
                     $scope.legalIndex = $scope.clientAddress.legalModel.index = "";
@@ -629,7 +632,6 @@
                     }
                 };
             }
-
 
             $scope.checkKeyDown = function (e, type) {
                 if (e.keyCode === $scope.KEY_ENTER)
