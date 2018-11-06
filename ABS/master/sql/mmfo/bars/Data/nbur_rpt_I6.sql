@@ -78,6 +78,8 @@ begin
    
   delete from NBUR_REF_PREPARE_XML WHERE FILE_CODE in ('I6X');
   
+  delete from NBUR_REF_EKP_R020 where file_code = 'I6X';
+  
   update NBUR_REF_FILES
    set file_code = '#I6'
    where id = l_file_id;
