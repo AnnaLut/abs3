@@ -243,489 +243,461 @@ CREATE OR REPLACE PACKAGE BODY BARS.sps is
       logger.info(g_log_prefix || 'Оновлення отримувача perekr_b.id=' || p_id || ' по схемі перекриття ids=' || p_scheme_id);
     end if;
   end;
+
+
   ------------------------------------------------------------------------------
-  -- sel015 -
-PROCEDURE SEL015
-( Mode_ int, Grp  int, sSps varchar2 default '', sParS varchar2 default 'A', isp number default 0)
+  --sel015
+  PROCEDURE SEL015(
+    Mode_ int,
+    Grp   int,
+    sSps  varchar2 default '',
+    sParS varchar2 default 'A',
+    isp   number   default 0)
 is
 /****************************************************************************
-24.03.2017 Додано трансляцію призначень платежу. Тобто можна в призначенні платежу використоувавати
-деякі значення з самого платежу:
- #(S)', - зашальний залишок рахунку
- #(S2)', -   суму платежу
- #(NLSA)',  - рахунок А
- #(NLSB)',  - рахунок Б
- #(MFOA)', -  МФО А
- #(MFOB)',  - МФО Б
- #(KV)',   -  вал. А
- #(KV2)',  -  вал. Б
- #(TT)',   -  код операції
- #(KOEF)',' -  коефіцієнт
-Також в призначенні можна використовувати формлу виду:  #{F_DOG_PER (1)}
-функція F_DOG_PER (1) вибирає значення з таблиці perekr_dog відповідно до ID (в нашому випадку це 1)
-Інших інтерпритацій не передбачено. При не правильному записі формули вона не буде
-трансльована і передасться в призначення як є, тобто помилковий запис формули.
-19.01.2017 введено додатковий параметр "isp number default 0" в процедуру, який буде визначати
-чи необхідно до загальної виборки додавати умову відбору рахунків по виконавцю. Введено для
-реалізації функцій виду: Sel015(hWndMDI,1,2, 'S','a.isp='||Str(GetUserId()))
-Якщо необхідно додати умову, параметру треба поставити значення 1
-17.01.2017 додано для кожної вибірки умову по KF для таблиць saldo або accounts та perekr_b
-(a.kf=sys_context('bars_context','user_mfo'), pb.kf=sys_context('bars_context','user_mfo'))
-29.07.2016 дані в таблиці записються і відбираються з sys_context('bars_global','user_id')
-07.07.2016 додано обробку формул для перекриттів SEL015.
-18.06.2016 додає в призначення % перерахованих коштів (н-д 33%)
-17.06.2016 добавлено перевірку на закритий рахунок по поточному МФО
-(select dazs from accounts where nls=pb.nlsb and kv=pb.kv and PB.MFOB=bars.f_ourmfo()) is null
-16.06.2016
-добавив поле ID NUMBER (38),
-(з таблиці perekr_b), добавив поле MFOA (з таблиць accounts or saldo)
-треба для проводок
-Mode_ - параметр, який у виборці відповідає за те чи відбирати рахунки з
-відслідковуванням планових залишків (плановий залитшок = фактичному Mode_= 1)
-або без відслідковування (плановий залишок не довівнює фактичному Mode_= 1)
-GRP - номер групи перекриття
-sParS - Параметр який задає чи буде виборка робитися з таблиці saldo (не має
-політик доступу на таблиці saldo) замість accounts (
-по суті доступ до рахунків по наданим правам)
-sSps - Параметр який задає спосіб обчислення суми документу для перерахування
-(01,29,763)
-формула виводиться у виборку завжди (таб, perekr_b поле formula)
-(pb.formula - формула,pb.kod - порядок сортування (буде першим списуватися
-з формулою потім з коефіцієнтом))
-/*****************************************************************/
-/*Логіка для перекриттів яка включає обрахунок сум документів
-при використанні формул.
-06.07.2016 Алгоритм обраховує розщеплення по рахунку NLSA. Якщо в розщепленнні
-є формули з відповідними KOD (порядок обрахування формул) то спочатку обраховуються
-стрічки з формулами у яких найменший KOD, після обрахування всіх стрічок з формулами
-обраховуються рядки з коефіцієнтами, починаючи з найменшого до найбільшого коефіцієнта.
-Останній рядок отримує суму лишку  віднімання від залишку на рахунку всіх вище перерахованих сум.
-02.07.2016
---Важливо: При встановленні в таблиці формул типу F_TARIF(46,980,#(NLSA), #(S))
-необхідно обов'язково дивитися щоб було проставлено для кожної
-вписаної формули поле KOD. KOD - задає порядок (послідовність) обрахунку сум по формулам.
-KOD=1,2,3...
-*/
-/*****************************************************************/
-  sSql        varchar2(4000); --загальний запит
-  l_mfo       char(6);        --поточне мфо
-  strTabN     varchar2(30);   --в залежності від параметрів saldo or accounts
-  sSps1       varchar2(2);   --спосіб обчислення суми
-  l_sSps      varchar2 (25);
-  s1          number;
-  l_U_ID      number;
-  l_str       varchar2(255 BYTE); --змінна для запису формули
-  l_sf        number; -- локальна змінна для суми формули
-  s2          number; -- змінна для залишкової суми після віднімання формули
-  s3          number; --залишкова сума
-  B_sum       number;
-  num    number;
- -------------змінні для трансляції призначення платежу
- l_nazn     varchar2(4000); --перепризначене призначення
- l_s        varchar2(4000); -- проміжні значення формул
- s_nazn     varchar2(4000); --значення формули
- l_s1       varchar2(4000); -- проміжні значення формул
- n1         number; --позиція початку входження формули
- n2         number;--позиція кінця входження формули
- n3         number; --позиція початку входження формули
- n4         number; --позиція кінця входження формули
------------------------------------
+  26.09.2018 MDom скореговано parsing призначень (tsel015.nazn), додана умова для обробки TO_CHAR, F_TARIF - COBUMMFO-9481
+  24.03.2017 Додано трансляцію призначень платежу. Тобто можна в призначенні платежу використоувавати
+  деякі значення з самого платежу:
+   #(S)', - зашальний залишок рахунку
+   #(S2)', -   суму платежу
+   #(NLSA)',  - рахунок А
+   #(NLSB)',  - рахунок Б
+   #(MFOA)', -  МФО А
+   #(MFOB)',  - МФО Б
+   #(KV)',   -  вал. А
+   #(KV2)',  -  вал. Б
+   #(TT)',   -  код операції
+   #(KOEF)',' -  коефіцієнт
+  Також в призначенні можна використовувати формлу виду:  #{F_DOG_PER (1)}
+  функція F_DOG_PER (1) вибирає значення з таблиці perekr_dog відповідно до ID (в нашому випадку це 1)
+  Інших інтерпритацій не передбачено. При не правильному записі формули вона не буде
+  трансльована і передасться в призначення як є, тобто помилковий запис формули.
+  19.01.2017 введено додатковий параметр "isp number default 0" в процедуру, який буде визначати
+  чи необхідно до загальної виборки додавати умову відбору рахунків по виконавцю. Введено для
+  реалізації функцій виду: Sel015(hWndMDI,1,2, 'S','a.isp='||Str(GetUserId()))
+  Якщо необхідно додати умову, параметру треба поставити значення 1
+  17.01.2017 додано для кожної вибірки умову по KF для таблиць saldo або accounts та perekr_b
+  (a.kf=sys_context('bars_context','user_mfo'), pb.kf=sys_context('bars_context','user_mfo'))
+  29.07.2016 дані в таблиці записються і відбираються з sys_context('bars_global','user_id')
+  07.07.2016 додано обробку формул для перекриттів SEL015.
+  18.06.2016 додає в призначення % перерахованих коштів (н-д 33%)
+  17.06.2016 добавлено перевірку на закритий рахунок по поточному МФО
+  (select dazs from accounts where nls=pb.nlsb and kv=pb.kv and PB.MFOB=bars.f_ourmfo()) is null
+  16.06.2016
+  добавив поле ID NUMBER (38),
+  (з таблиці perekr_b), добавив поле MFOA (з таблиць accounts or saldo)
+  треба для проводок
+  Mode_ - параметр, який у виборці відповідає за те чи відбирати рахунки з
+  відслідковуванням планових залишків (плановий залитшок = фактичному Mode_= 1)
+  або без відслідковування (плановий залишок не довівнює фактичному Mode_= 1)
+  GRP - номер групи перекриття
+  sParS - Параметр який задає чи буде виборка робитися з таблиці saldo (не має
+  політик доступу на таблиці saldo) замість accounts (
+  по суті доступ до рахунків по наданим правам)
+  sSps - Параметр який задає спосіб обчислення суми документу для перерахування
+  (01,29,763)
+  формула виводиться у виборку завжди (таб, perekr_b поле formula)
+  (pb.formula - формула,pb.kod - порядок сортування (буде першим списуватися
+  з формулою потім з коефіцієнтом))
+  /*****************************************************************/
+  /*Логіка для перекриттів яка включає обрахунок сум документів
+  при використанні формул.
+  06.07.2016 Алгоритм обраховує розщеплення по рахунку NLSA. Якщо в розщепленнні
+  є формули з відповідними KOD (порядок обрахування формул) то спочатку обраховуються
+  стрічки з формулами у яких найменший KOD, після обрахування всіх стрічок з формулами
+  обраховуються рядки з коефіцієнтами, починаючи з найменшого до найбільшого коефіцієнта.
+  Останній рядок отримує суму лишку  віднімання від залишку на рахунку всіх вище перерахованих сум.
+  02.07.2016
+  --Важливо: При встановленні в таблиці формул типу F_TARIF(46,980,#(NLSA), #(S))
+  необхідно обов'язково дивитися щоб було проставлено для кожної
+  вписаної формули поле KOD. KOD - задає порядок (послідовність) обрахунку сум по формулам.
+  KOD=1,2,3...
+  */
+  /*****************************************************************/
+    sSql        varchar2(4000); --загальний запит
+    l_mfo       char(6);        --поточне мфо
+    strTabN     varchar2(30);   --в залежності від параметрів saldo or accounts
+    sSps1       varchar2(2);   --спосіб обчислення суми
+    l_sSps      varchar2 (25);
+    s1          number;
+    l_U_ID      number;
+    l_str       varchar2(255 BYTE); --змінна для запису формули
+    l_sf        number; -- локальна змінна для суми формули
+    s2          number; -- змінна для залишкової суми після віднімання формули
+    s3          number; --залишкова сума
+    B_sum       number;
+    num     number;
+    -------------змінні для трансляції призначення платежу
+    l_nazn  varchar2(4000); --перепризначене призначення
+    l_s     varchar2(4000); --проміжні значення формул
+    s_nazn  varchar2(4000); --значення формули
+    l_s1    varchar2(4000); --проміжні значення формул
+    n1      number; --позиція початку входження формули
+    n2      number; --позиція кінця входження формули
+    n3      number; --позиція початку входження формули
+    n4      number; --позиція кінця входження формули
+    -----------------------------------
+  begin
+    if Grp is null then
+      RAISE_APPLICATION_ERROR(-20000, 'Не вірний номер групи перекриття');
+    end if;
 
-begin
-  if  Grp is null then
+    --беремо поточне МФО
+    l_mfo := bars.f_ourmfo();
 
-        RAISE_APPLICATION_ERROR(-20000,'Не вірний номер групи перекриття');
+    --аналізуємо параметр на предмет використання saldo чи accounts
+    IF SUBSTR(sParS, 1, 1) = 'S' THEN
+      strTabN := 'saldo';
+    ELSE
+      strTabN := 'accounts';
+    END IF;
+    
+    --Аналізуємо параметр СПОСІБ ОБЧИСЛЕННЯ СУМИ sSps varchar2
+    --якщо явно заданий sSps тоді вираховуємо суму документа через
+    --функцію KAZ, якщо не задано явно - вираховуємо через KAZ з
+    --з поточним SPS (SPECPARAM поле SPS)
+    IF sSps IS NULL THEN
+      l_ssps := 'KAZ(pa.sps, pa.acc)';
+    ELSE
+      l_ssps := 'KAZ('||sSps||', pa.acc)';
+    END IF;
 
-   end if;
+    -------------------------
+    sSql := q'[
+               SELECT a.nls as NLSA,
+                      a.kv as KVA,
+                      pb.mfob as MFOB,
+                      SUBSTR(
+                        VKRZN(
+                          SUBSTR(pb.mfob, 1, 5),
+                          TRIM(
+                            SUBSTR(
+                              DECODE(
+                                SUBSTR(pb.nlsb, 5, 1),
+                                '*',
+                                SUBSTR(pb.nlsb, 1, 4) || SUBSTR(a.nls, 5), pb.nlsb),
+                              1, 14)
+                            )
+                          ),
+                        1, 14) as NLSB,
+                        pb.kv as KVB,
+                        pb.tt as TT,
+                        pb.vob as VOB,
+                        ABS(%sSps) as SUMA_SPS,
+                        pb.koef as KOEF,
+                        SUBSTR(DECODE(pb.mfob, %mfo, a.nms, NVL(k.nmkk, k.nmk)), 1, 38) as NMK,
+                        SUBSTR(a.nms, 1, 38) as NMS,
+                        DECODE(SUBSTR(pb.nlsb, 5, 1), '*', NVL(k.nmkk, k.nmk), pb.polu) as NMKB,
+                        pb.nazn as NAZN,
+                        a.acc as ACC,
+                        k.okpo as OKPOA,
+                        DECODE(SUBSTR(pb.nlsb, 5, 1), '*', k.okpo, pb.okpo) as OKPOB,
+                        pb.idr as IDR,
+                        t.dig as DIG,
+                        pa.sps as sps,
+                        CASE WHEN KAZ(pa.sps, pa.acc) < 0 THEN 0 ELSE 1 END as DK,
+                        ABS(%sSps*pb.koef) as SUMA,
+                        pb.KOD as KOD,
+                        pb.FORMULA as FORMULA,
+                        pb.id as ID,
+                        a.KF as MFOA,
+                        rownum as U_ID,
+                        (select sys_context('bars_global', 'user_id') from dual) as US_ID
+                   from SPECPARAM pa,
+                        PEREKR_B  pb,
+                        %STRTABN  a,
+                        TABVAL    t,
+                        CUSTOMER  k,
+                        CUST_ACC  c
+                  WHERE pa.ids = pb.ids
+                    AND pa.acc = a.acc
+                    AND a.kv = t.kv
+                    AND c.acc = a.acc
+                    AND c.rnk = k.rnk
+                    AND pa.idg = %GRP
+                    AND pb.koef > 0
+                    AND %sSps <> 0]'||
+                    case
+                      when (Mode_ = 11) then ''
+                      else chr(13)||chr(10)||q'[                    AND KAZ(763, pa.acc)<>0]'
+                    end||q'[
+                    AND a.kf = sys_context('bars_context', 'user_mfo')
+                    AND pb.kf = sys_context('bars_context', 'user_mfo')]';
+    
+    sSql := REPLACE(sSql, '%sSps', l_sSps);
+    sSql := REPLACE(sSql, '%mfo', l_mfo);
+    sSql := REPLACE(sSql, '%STRTABN', strTabN);
+    sSql := REPLACE(sSql, '%GRP', TO_CHAR(Grp));
 
-  --беремо поточне МФО
-  l_mfo:=bars.f_ourmfo();
-
-  --аналізуємо параметр на предмет використання saldo чи accounts
-IF SUBSTR(sParS,1,1)='S'THEN strTabN:='saldo'; ELSE strTabN:='accounts'; END IF;
-
- --Аналізуємо параметр СПОСБ ОБЧИСЛЕННЯ СУМИ sSps varchar2
- --якщо явно заданий sSps тоді вираховуємо суму документа через
- --функцію KAZ, якщо не задано явно - вираховуємо через KAZ з
- --з поточним SPS (SPECPARAM поле SPS)
- IF  sSps IS NULL THEN l_ssps:='KAZ(pa.sps, pa.acc)';
-                  ELSE l_ssps:='KAZ('||sSps||', pa.acc)';
-                  END IF;
-
--------------------------
-IF ( Mode_ = 11 ) THEN
-
-  sSql:=q'[SELECT a.nls as NLSA,
-       a.kv as KVA,
-       pb.mfob as MFOB,
-       SUBSTR (VKRZN (SUBSTR (pb.mfob, 1, 5),TRIM (SUBSTR (DECODE (SUBSTR (pb.nlsb, 5, 1),'*', SUBSTR (pb.nlsb, 1, 4) || SUBSTR (a.nls, 5),pb.nlsb),1,14))),1,14) as NLSB,
-       pb.kv as KVB,
-       pb.tt as TT,
-       pb.vob as VOB,
-       ABS(%sSps) as SUMA_SPS,
-       pb.koef as KOEF,
-       SUBSTR (DECODE (pb.mfob, %mfo, a.nms, NVL (k.nmkk, k.nmk)), 1, 38) as NMK,
-       SUBSTR (a.nms, 1, 38) as NMS,
-       DECODE (SUBSTR (pb.nlsb, 5, 1), '*', NVL (k.nmkk, k.nmk), pb.polu) as NMKB,
-       pb.nazn as NAZN,
-       a.acc as ACC,
-       k.okpo as OKPOA,
-       DECODE (SUBSTR (pb.nlsb, 5, 1), '*', k.okpo, pb.okpo) as OKPOB,
-       pb.idr as IDR,
-       t.dig as DIG,
-       pa.sps as sps,
-       CASE WHEN KAZ (pa.sps, pa.acc) < 0 THEN 0 ELSE 1 END as DK,
-       ABS(%sSps*pb.koef) as SUMA,
-       pb.KOD as KOD,
-       pb.FORMULA as FORMULA,
-       pb.id as ID,
-       a.KF as MFOA,
-       rownum as U_ID,
-       (select sys_context('bars_global','user_id') from dual) as US_ID
-  from SPECPARAM pa,
-       PEREKR_B  pb,
-       %STRTABN  a,
-       TABVAL    t,
-       CUSTOMER  k,
-       CUST_ACC  c
- WHERE pa.ids = pb.ids
-   AND pa.acc = a.acc
-   AND a.kv = t.kv
-   AND c.acc = a.acc
-   AND c.rnk = k.rnk
-   AND pa.idg = %GRP
-   AND pb.koef > 0
-   AND %sSps <> 0
-   AND a.kf=sys_context('bars_context','user_mfo')
-   AND pb.kf=sys_context('bars_context','user_mfo')]';
-
-
-  sSql := REPLACE( sSql, '%sSps', l_sSps );
-  sSql := REPLACE( sSql, '%mfo', l_mfo );
-  sSql := REPLACE( sSql, '%STRTABN', strTabN );
-  sSql := REPLACE( sSql, '%GRP', TO_CHAR(Grp) );
-
- ELSE
-
-  sSql:=q'[SELECT a.nls as NLSA,
-       a.kv as KVA,
-       pb.mfob as MFOB,
-       SUBSTR (VKRZN (SUBSTR (pb.mfob, 1, 5),TRIM (SUBSTR (DECODE (SUBSTR (pb.nlsb, 5, 1),'*', SUBSTR (pb.nlsb, 1, 4) || SUBSTR (a.nls, 5),pb.nlsb),1,14))),1,14) as NLSB,
-       pb.kv as KVB,
-       pb.tt as TT,
-       pb.vob as VOB,
-       ABS(%sSps) as SUMA_SPS,
-       pb.koef as KOEF,
-       SUBSTR (DECODE (pb.mfob, %mfo, a.nms, NVL (k.nmkk, k.nmk)), 1, 38) as NMK,
-       SUBSTR (a.nms, 1, 38) as NMS,
-       DECODE (SUBSTR (pb.nlsb, 5, 1), '*', NVL (k.nmkk, k.nmk), pb.polu) as NMKB,
-       pb.nazn as NAZN,
-       a.acc as ACC,
-       k.okpo as OKPOA,
-       DECODE (SUBSTR (pb.nlsb, 5, 1), '*', k.okpo, pb.okpo) as OKPOB,
-       pb.idr as IDR,
-       t.dig as DIG,
-       pa.sps as sps,
-       CASE WHEN KAZ (pa.sps, pa.acc) < 0 THEN 0 ELSE 1 END as DK,
-       ABS(%sSps*pb.koef) as SUMA,
-       pb.KOD as KOD,
-       pb.FORMULA as FORMULA,
-       pb.id as ID,
-       a.KF as MFOA,
-       rownum as U_ID,
-       (select sys_context('bars_global','user_id') from dual) as US_ID
-  from SPECPARAM pa,
-       PEREKR_B  pb,
-       %STRTABN  a,
-       TABVAL    t,
-       CUSTOMER  k,
-       CUST_ACC  c
- WHERE pa.ids = pb.ids
-   AND pa.acc = a.acc
-   AND a.kv = t.kv
-   AND c.acc = a.acc
-   AND c.rnk = k.rnk
-   AND pa.idg = %GRP
-   AND pb.koef > 0
-   AND %sSps <> 0
-   AND KAZ(763, pa.acc)<>0
-   AND a.kf=sys_context('bars_context','user_mfo')
-   AND pb.kf=sys_context('bars_context','user_mfo')]';
-
-  sSql := REPLACE( sSql, '%sSps', l_sSps );
-  sSql := REPLACE( sSql, '%mfo', l_mfo );
-  sSql := REPLACE( sSql, '%STRTABN', strTabN );
-  sSql := REPLACE( sSql, '%GRP', TO_CHAR(Grp) );
-
-end if;
-
-   -- видалення даних з таблиці по USER_ID
-BEGIN
-   DELETE FROM tsel015
-         WHERE US_ID =
-                  (SELECT SYS_CONTEXT ('bars_global', 'user_id') FROM DUAL);
-COMMIT;
-END;
-
-   --аналізуємо вхідний параметр ISP. Якщо параметр =1 то додаємо до загальної виборки
-   --умову відбору по виконавцю.
-  CASE isp
-        WHEN 1 THEN sSql:=sSql||'and a.isp = '||SYS_CONTEXT('bars_global','user_id');
-            ELSE NULL;
-  END CASE;
-
-BEGIN
-   logger.info('SPS: '||ssql);
-   EXECUTE IMMEDIATE 'insert into TSEL015 ' || sSql;
-   COMMIT;
-    --вираховування сум  перерахувань, враховуючи округлення та формули
-
-       --відбір рахунку А
-        for A in (select distinct NLSA, KVA, suma_sps from TSEL015 where US_ID  = sys_context('bars_global','user_id'))
-            loop
-                  s2:=A.suma_sps;
-                           for B in (  SELECT
-                                           NLSA,
-                                           NLSB,
-                                           KVB,
-                                           KOEF,
-                                           SUMA_SPS,
-                                           SUMA,
-                                           U_ID,
-                                           ROUND (SUMA_SPS * KOEF, 0) AS ROUND_SUMA,
-                                           FORMULA,
-                                           KOD,
-                                           TT,
-                                           sum (suma) over (partition by NLSA) as all_suma,   --сума всіх розподільчих сум, використовується для перевірки з початковим залишком на рахунку
-                                           ROW_NUMBER () OVER (PARTITION BY nlsa ORDER BY formula, kod, koef) AS ROW_NUMBER,   --порядковий номер рядка в пачці,  використовується для порівняння
-                                           COUNT (*) OVER (PARTITION BY nlsa ORDER BY formula, kod, koef ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS total_count --к-ть рядків в пачці, використовується для порівняння
-                                         from tsel015
-                                         where NLSA   =  A.NLSA
-                                          and  KVA = A.KVA
-                                          and  US_ID  =  sys_context('bars_global','user_id')
-                                         order by kod, koef, row_number) -- сортування спочатку по формулі потім код і коефіцієнт, важливо при обрахунках
-                        loop
-                             select count(1) into num from tsel015 where NLSA=A.NLSA  and  US_ID  =  sys_context('bars_global','user_id') and formula is not null; -- флаг присутності формули у підвиборці
-                              l_str:=B.formula;
-                              --розрахунок якщо передається формула в рядку
-                        IF B.formula is not null THEN
-                            BEGIN
-                                if instr (l_str,'#(NLSA)')>0
-                                    then l_str:=replace (l_str,'#(NLSA)', to_char(A.NLSA));
-                                    end if; --рахунок А
-                                if instr (l_str,'#(NLSB)')>0
-                                    then l_str:=replace (l_str,'#(NLSB)', to_char(B.NLSB));
-                                    end if; --рахунок B
-                                if instr (l_str,'#(S0)')>0
-                                    then l_str:=replace (l_str,'#(S0)', to_char(S2)); --- залишкова сума
-                                    end if; -- поточний залишок
-                                if instr (l_str,'#(TT)')>0
-                                    then l_str:=replace (l_str,'#(TT)', to_char(B.TT));
-                                    end if; --код операції
-                                if instr (l_str,'#(S)')>0
-                                    then l_str:=replace (l_str,'#(S)', to_char(round(A.suma_sps*B.koef,0)));
-                                    end if; --сума: загальний залишок на рахунку А * на коефіцієнт
-                               begin
-                                execute immediate 'select '||l_str||' from dual' into l_sf; --вирахування по формулі
-                                  exception when others then
-                                                          begin
-                                                          RAISE_APPLICATION_ERROR (-20004,'Помилка при виконанні обрахунку формули: '||l_str) ;
-                                                          end;
-                              end;
-                                -- перевірка формування суми по формулі, перериваємо виконання процедури, якщо сума
-                                --яка сформована по формулі перевищує залишок на рахунку
-                                if l_sf>S2
-                                    then
-                                    RAISE_APPLICATION_ERROR (-20000,'Сума сформована формулою більша чим залишкова сума на рахунку - '||A.NLSA) ;
-                                    end if;
-                                -- якщо поточний номер рядка дорівнює загальній к-ті рядків (тобто останній рядок)
-                                --якщо для одного рахунку розщеплення тільки один рахунок з формулою і ми списуємо
-                                --суму яка менша чим повний залишок по рахунку.
-                                if b.total_count <>1 then --якщо для одного рахунку розщеплення більше чим один рахунок зарахувань
-                                          if b.row_number = b.total_count then null; --03.02.2017 при розрахунку формул не будемо   --- old l_sf:=s2; --присвоюємо всю суму яка лишилася
-                                                                                    --закидувати всю суму на останній рах. (стрічку)
-                                                   else
-                                                   s2:=s2-l_sf; --якщо рядок не останній віднімаємо від поточного залишку обраховану по формулі суму
-                                                   s3:=s2;
-                                                   end if;
-                                       --else s2:=s2-l_sf;
-                                end if;
-                                -- перевірка формування суми по формулі, перериваємо виконання процедури, якщо сума
-                                --перевірка чи сума не менша за 0
-                                IF l_sf<0
-                                    THEN
-                                    RAISE_APPLICATION_ERROR (-20001,'Сума для перерахування з рахунку '|| A.NLSA ||' на рахунок '||B.NLSB || ' менша за 0');
-                                    END IF;
-
-                                update tsel015 --апдейтимо суму документу (рядка)
-                                set suma=l_sf
-                                where NLSA=A.NLSA and
-                                      NLSB=B.NLSB and
-                                      koef=B.koef and
-                                      U_ID=B.U_ID;
-
-                            END;
-                        end if; -- для формули
-                        -- для рядків які обраховуються не по формулі
-                        IF B.formula is null THEN
-                            --суму документу вибираємо по CASE
-                            update tsel015
-                            set suma =  case
-                                        when b.row_number = b.total_count then --s2, s3 --якщо рядок останній сума документу весь зилишок
-                                                                              case when num=0 then s2
-                                                                                              else s3
-                                                                              end
-
-                                                              else case when num=0 then round(B.suma_sps * b.koef,0) --якщо рядок не останній сума документу = поточний залишоку на рахунку * на коефіцієнт
-                                                                                   else round(s2 * b.koef,0) end
-                                        end
-                               where NLSA=A.NLSA and
-                               NLSB=B.NLSB and
-                               koef=B.koef and
-                               U_ID=B.U_ID;
-                          s3:=s3-round(s2 * b.koef,0); --залишкова сума, якщо використ. коефіц + формули.
-                        --перевірка чи сума не менша за 0
-                          /*logger.info('SPS debug A.NLSA: '    ||A.NLSA);
-                          logger.info('SPS debug A.KVA: '     ||A.KVA);
-                          logger.info('SPS debug A.suma_sps: '||A.suma_sps);
-                          logger.info('SPS debug s2: '        ||s2);
-                          logger.info('SPS debug s2 B.NLSB: ' ||B.NLSB);
-                          logger.info('SPS debug s2 B.NLSA: ' ||B.NLSA);
-                          logger.info('SPS debug s2 B.KVB: '  ||B.KVB);*/
-                          IF s2<0
-                             THEN
-                             RAISE_APPLICATION_ERROR (-20002,'Сума для перерахування з рахунку '|| A.NLSA ||' на рахунок '||B.NLSB || ' менша за 0');
-                          END IF;
-
-                          --перевірка, якщо рядок не останній то від поточного залишку віднімаємо обраховану суму (поточний залишок * на коефіцієнт)
-                          IF b.row_number <> b.total_count THEN --s2:=s2-round(B.suma_sps * B.koef,0);
-                                                                 case num
-                                                                      when 0 then s2:=s2-round(B.suma_sps * B.koef,0);
-                                                                      else null;
-                                                                 end case;
-
-
-                          end if;
-
-                        END IF;
-       end loop;   --кінець циклу В
-
-/*        SELECT SUM (suma)
-          INTO B_sum
-          FROM TSEL015
-         WHERE NLSA = A.NLSA and US_ID  =  sys_context('bars_global','user_id');
-*/
-
---        IF B_sum <> A.suma_sps
---           THEN
---              RAISE_APPLICATION_ERROR (-20003,'Сума всіх розщеплень по рахунку '|| A.NLSA|| ' не рівна залишку на рахунку '|| A.NLSA);
---           END IF;
-
-      end loop; --кінець циклу А
+    --видалення даних з таблиці по USER_ID
+    DELETE FROM tsel015 WHERE US_ID = SYS_CONTEXT('bars_global', 'user_id'); --(SELECT SYS_CONTEXT('bars_global', 'user_id') FROM DUAL);
     COMMIT;
 
--------------------------------------- ТРАНСЛЯЦІЯ ПРИЗНАЧЕНЬ
-begin
-for k in (select * from TSEL015 where US_ID=SYS_CONTEXT('bars_global','user_id'))
- loop
-  l_nazn:=k.nazn;
-  --розбір формул виду #{F_DOG_PER (1)}
-  if regexp_like(l_nazn, '#') then
+    --аналізуємо вхідний параметр ISP. Якщо параметр = 1 то додаємо до загальної виборки
+    --умову відбору по виконавцю.
+    /*CASE isp
+      WHEN 1 THEN
+        sSql := sSql||chr(13)||chr(10)||'                  and a.isp = '||SYS_CONTEXT('bars_global', 'user_id');
+      ELSE NULL;
+    END CASE;*/
+    if isp = 1 then
+      sSql := sSql||chr(13)||chr(10)||'                    and a.isp = '||SYS_CONTEXT('bars_global', 'user_id');
+    end if;
 
-    begin
+    logger.info('SPS: '||ssql);
+    
+    sSql := 'insert into TSEL015 '||sSql;
+    EXECUTE IMMEDIATE sSql;
+    COMMIT;
+    --вираховування сум  перерахувань, враховуючи округлення та формули
+
+    --відбір рахунку А
+    for A in (select distinct NLSA, KVA, suma_sps
+                from TSEL015
+               where US_ID = sys_context('bars_global', 'user_id'))
+    loop
+      s2 := A.suma_sps;
+      
+      for B in (SELECT NLSA,
+                       NLSB,
+                       KVB,
+                       KOEF,
+                       SUMA_SPS,
+                       SUMA,
+                       U_ID,
+                       ROUND(SUMA_SPS * KOEF, 0) AS ROUND_SUMA,
+                       FORMULA,
+                       KOD,
+                       TT,
+                       sum(suma) over (partition by NLSA) as all_suma, --сума всіх розподільчих сум, використовується для перевірки з початковим залишком на рахунку
+                       ROW_NUMBER() OVER (PARTITION BY nlsa ORDER BY formula, kod, koef) AS ROW_NUMBER, --порядковий номер рядка в пачці, використовується для порівняння
+                       --к-ть рядків в пачці, використовується для порівняння
+                       COUNT(*) OVER (PARTITION BY nlsa ORDER BY formula, kod, koef ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS total_count
+                  from tsel015
+                 where NLSA = A.NLSA
+                   and KVA = A.KVA
+                   and US_ID = sys_context('bars_global', 'user_id')
+                 order by kod, koef, row_number) --сортування спочатку по формулі потім код і коефіцієнт, важливо при обрахунках
+      loop
+        select count(1)
+          into num
+          from tsel015
+         where NLSA = A.NLSA
+           and US_ID = sys_context('bars_global', 'user_id')
+           and formula is not null; --флаг присутності формули у підвиборці
+        
+        l_str := B.formula;
+        
+        --розрахунок якщо передається формула в рядку
+        IF B.formula is not null THEN
+          
+          if instr(l_str, '#(NLSA)') > 0 then
+            l_str := replace(l_str, '#(NLSA)', to_char(A.NLSA));
+          end if; --рахунок А
+          
+          if instr(l_str, '#(NLSB)') > 0 then
+            l_str := replace (l_str, '#(NLSB)', to_char(B.NLSB));
+          end if; --рахунок B
+          
+          if instr(l_str, '#(S0)') > 0 then
+            l_str := replace(l_str, '#(S0)', to_char(S2)); --залишкова сума
+          end if; --поточний залишок
+          
+          if instr(l_str, '#(TT)') > 0 then
+            l_str := replace (l_str, '#(TT)', to_char(B.TT));
+          end if; --код операції
+          
+          if instr(l_str, '#(S)') > 0 then
+            l_str := replace (l_str, '#(S)', to_char(round(A.suma_sps*B.koef, 0)));
+          end if; --сума: загальний залишок на рахунку А * на коефіцієнт 
+
+          --вирахування по формулі
+          begin
+            execute immediate 'select '||l_str||' from dual' into l_sf;
+          exception
+            when others then
+              RAISE_APPLICATION_ERROR(-20004, 'Помилка при виконанні обрахунку формули: '||l_str);
+          end;
+          
+          --перевірка формування суми по формулі, перериваємо виконання процедури, якщо сума
+          --яка сформована по формулі перевищує залишок на рахунку
+          if l_sf > S2 then
+            RAISE_APPLICATION_ERROR(-20000, 'Сума сформована формулою більша чим залишкова сума на рахунку - '||A.NLSA);
+          end if;
+          
+          --якщо поточний номер рядка дорівнює загальній к-ті рядків (тобто останній рядок)
+          --якщо для одного рахунку розщеплення тільки один рахунок з формулою і ми списуємо
+          --суму яка менша чим повний залишок по рахунку.
+          if b.total_count <> 1 then --якщо для одного рахунку розщеплення більше чим один рахунок зарахувань
+            if b.row_number = b.total_count then
+              null; --03.02.2017 при розрахунку формул не будемо закидувати всю суму на останній рах. (стрічку)
+              --old l_sf := s2; --присвоюємо всю суму яка лишилася
+            else
+              s2 := s2 - l_sf; --якщо рядок не останній віднімаємо від поточного залишку обраховану по формулі суму
+              s3 := s2;
+            end if;
+          --else s2 := s2 - l_sf;
+          end if;
+          
+          --перевірка формування суми по формулі, перериваємо виконання процедури, якщо сума
+          --перевірка чи сума не менша за 0
+          IF l_sf < 0 THEN
+            RAISE_APPLICATION_ERROR(-20001, 'Сума для перерахування з рахунку '||A.NLSA||' на рахунок '||B.NLSB||' менша за 0');
+          END IF;
+          
+          update tsel015 --апдейтимо суму документу (рядка)
+             set suma = l_sf
+           where NLSA = A.NLSA
+             and NLSB = B.NLSB
+             and koef = B.koef
+             and U_ID = B.U_ID;
+        end if; --для формули
+        
+        --для рядків які обраховуються не по формулі
+        IF B.formula is null THEN
+          --суму документу вибираємо по CASE
+          update tsel015
+             set suma = case
+                          when b.row_number = b.total_count then --s2, s3 --якщо рядок останній сума документу весь зилишок
+                            case
+                              when num = 0 then s2
+                              else s3
+                            end
+                          else
+                            case
+                              when num = 0 then
+                                round(B.suma_sps * b.koef, 0) --якщо рядок не останній сума документу = поточний залишку на рахунку * на коефіцієнт
+                              else
+                                round(s2 * b.koef, 0)
+                            end
+                        end
+           where NLSA = A.NLSA
+             and NLSB = B.NLSB
+             and koef = B.koef
+             and U_ID = B.U_ID;
+          
+          s3 := s3 - round(s2 * b.koef, 0); --залишкова сума, якщо використ. коефіц + формули.
+          
+          --перевірка чи сума не менша за 0
+          /*
+          logger.info('SPS debug A.NLSA: '    ||A.NLSA);
+          logger.info('SPS debug A.KVA: '     ||A.KVA);
+          logger.info('SPS debug A.suma_sps: '||A.suma_sps);
+          logger.info('SPS debug s2: '        ||s2);
+          logger.info('SPS debug s2 B.NLSB: ' ||B.NLSB);
+          logger.info('SPS debug s2 B.NLSA: ' ||B.NLSA);
+          logger.info('SPS debug s2 B.KVB: '  ||B.KVB);
+          */
+          IF s2 < 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Сума для перерахування з рахунку '||A.NLSA||' на рахунок '||B.NLSB||' менша за 0');
+          END IF;
+
+          --перевірка, якщо рядок не останній то від поточного залишку віднімаємо обраховану суму (поточний залишок * на коефіцієнт)
+          IF b.row_number <> b.total_count THEN
+            --s2:=s2-round(B.suma_sps * B.koef,0);
+            case num
+              when 0 then s2:=s2-round(B.suma_sps * B.koef,0);
+              else null;
+            end case;
+          end if;
+        END IF;
+      end loop; --кінець циклу В
+
+      /*
+      SELECT SUM (suma)
+        INTO B_sum
+        FROM TSEL015
+       WHERE NLSA = A.NLSA and US_ID = sys_context('bars_global', 'user_id');
+        
+      IF B_sum <> A.suma_sps THEN
+        RAISE_APPLICATION_ERROR (-20003,'Сума всіх розщеплень по рахунку '|| A.NLSA|| ' не рівна залишку на рахунку '|| A.NLSA);
+      END IF;
+      */
+    end loop; --кінець циклу А
+    COMMIT;
+
+    --------------------------------------ТРАНСЛЯЦІЯ ПРИЗНАЧЕНЬ
+    for k in (select *
+                from TSEL015
+               where US_ID = SYS_CONTEXT('bars_global','user_id'))
+    loop
+      l_nazn := k.nazn;
+      
+      --2018.09.26 MDom parsing всіх формул #{F_DOG_PER (1)}, #{TO_CHAR (1)}, #{F_TARIF (1)}
+      --old розбір формул виду #{F_DOG_PER (1)}
+      if regexp_like(l_nazn, '#') then
+        -----------------------розбір формул реквізитів документу
+        --2018.09.26 MDom нова умова, та перенесено перед F_DOG_PER/TO_CHAR/F_TARIF бо щоб спрацювала формула, спочатку потрібно зробити parsing значень
+        if regexp_like(l_nazn, '#\(') then --якщо знаходимо '#(', то робимо parsing
+        /*--old закоментовано тому що перевіряло лише перший '#' і наприклад '#{TO_CHAR(#(S)/600,''9999990.99'')}' parsing не зробився би
+        if regexp_like(l_nazn, '#') then
+          IF SUBSTR(l_nazn, regexp_instr(l_nazn,'#',1), 2)='#(' THEN*/
+            l_nazn := REPLACE(UPPER(l_nazn), '#(S)',    TO_CHAR(k.suma_sps));
+            l_nazn := REPLACE(UPPER(l_nazn), '#(S2)',   TO_CHAR(k.suma));
+            l_nazn := REPLACE(UPPER(l_nazn), '#(NLSA)', ''''||k.nlsa||'''');
+            l_nazn := REPLACE(UPPER(l_nazn), '#(NLSB)', ''''||k.nlsb||'''');
+            l_nazn := REPLACE(UPPER(l_nazn), '#(MFOA)', ''''||k.mfoa||'''');
+            l_nazn := REPLACE(UPPER(l_nazn), '#(MFOB)', ''''||k.mfob||'''');
+            l_nazn := REPLACE(UPPER(l_nazn), '#(KV)',   TO_CHAR(k.kva));
+            l_nazn := REPLACE(UPPER(l_nazn), '#(KV2)',  TO_CHAR(k.kvb));
+            l_nazn := REPLACE(UPPER(l_nazn), '#(TT)',   ''''||k.tt||'''');
+            l_nazn := REPLACE(UPPER(l_nazn), '#(KOEF)', ''''||TO_CHAR(k.koef,'0D0000')||'''');
+          --end if;
+        end if;
+        
         --На#(MFOA)--#(MFOB)--#(KV)--#(KV2)--#(TT)--#(KOEF) вик.п.НКРЕ #{F_DOG_PER(1)}, в т.ч.ПДВ--#{F_DOG_PER (1)}--#(S), #(NLSA)--#(NLSb)
-       --тільки для ЦА
-       if regexp_like(l_nazn,'F_DOG_PER') then
-                                               begin
-                                               -- цикли забрали, проходимо по призначенню тільки один раз.
-                                                -- while regexp_like(l_nazn,'(#{)')
-                                                -- loop
-                                               --вирізаємо запис формули для replace
-                                               n1:=regexp_instr(l_nazn,'(#{)',1);-- позиція першого входження #
-                                               --DBMS_OUTPUT.PUT_LINE('N1: '||n1);
-                                                --#{F_DOG_PER (1)}
-                                               n2:=regexp_instr(l_nazn,'\)}',1); --позиція першого входження }
-                                               --DBMS_OUTPUT.PUT_LINE('N2: '||n2);
-                                               --s1:=substr(l_nazn, regexp_instr(l_nazn,'#',1), 16);
-                                               l_s1:=substr(l_nazn, n1,n2-n1+2); --вирізаємо повну форму формули
-                                               --DBMS_OUTPUT.PUT_LINE('Формула -1: '||s1);
-                                               -------------------------------------------------
-                                               --з запису вирізаємо саму формулу для обрахунку
-                                               n3:= regexp_instr(l_s1,'#',1)+2;
-                                               --DBMS_OUTPUT.PUT_LINE('N3: '||n3);
-                                               --DBMS_OUTPUT.PUT_LINE('S1: '||s1);
-                                               n4:=regexp_instr(l_s1,'\)}',1)-2;
-                                               --DBMS_OUTPUT.PUT_LINE('N4: '||n4);
-
-                                               l_s:=substr(l_s1, n3, n4);
-                                               --DBMS_OUTPUT.PUT_LINE('Формула: '||s);
-                                               --обрахунок значення по формулі
-                                               begin
-                                               execute immediate 'select '||l_s||' from dual' into s_nazn ; --порахували формулу
-                                               --DBMS_OUTPUT.PUT_LINE('Формула 0: '||s_nazn);
-                                               exception when others then
-                                                          begin
-                                                          RAISE_APPLICATION_ERROR (-20004,'Помилка при виконанні обрахунку формули в призначенні: '||l_s||'NLSB: '||k.NLSB||'Призначення: '||k.NAZN) ;
-                                                          end;
-                                               end;
-                                               --заміна формули на значення формули в призначенні
-                                               l_nazn:= replace(l_nazn, l_s1 , s_nazn);
-                                               --DBMS_OUTPUT.PUT_LINE('Формула 1: '||l_nazn);
-                                               --end loop;
-
-                                               end;
-
-       end if; --закінчення IF  по формулі #{F_DOG_PER (1)}
-
-       -----------------------розбір формул реквізитів документу
-     if regexp_like(l_nazn, '#') then
-       begin
-      -- while regexp_like(l_nazn,'#')
-      --loop
-
-      IF SUBSTR(l_nazn, regexp_instr(l_nazn,'#',1), 2)='#(' THEN
-         BEGIN
-           l_nazn := REPLACE(UPPER(l_nazn),'#(S)',                    TO_CHAR(k.suma_sps));
-           l_nazn := REPLACE(UPPER(l_nazn),'#(S2)',                       TO_CHAR(k.suma));
-           l_nazn := REPLACE(UPPER(l_nazn),'#(NLSA)',                  ''''||k.nlsa||'''');
-           l_nazn := REPLACE(UPPER(l_nazn),'#(NLSB)',                  ''''||k.nlsb||'''');
-           l_nazn := REPLACE(UPPER(l_nazn),'#(MFOA)',                  ''''||k.mfoa||'''');
-           l_nazn := REPLACE(UPPER(l_nazn),'#(MFOB)',                  ''''||k.mfob||'''');
-           l_nazn := REPLACE(UPPER(l_nazn),'#(KV)',                        TO_CHAR(k.kva));
-           l_nazn := REPLACE(UPPER(l_nazn),'#(KV2)',                       TO_CHAR(k.kvb));
-           l_nazn := REPLACE(UPPER(l_nazn),'#(TT)',                      ''''||k.tt||'''');
-           l_nazn := REPLACE(UPPER(l_nazn),'#(KOEF)',''''||TO_CHAR(k.koef,'0D0000')||'''');
-
-         END;
-
-      end if;
-
-    --end loop;
-
-   end;
-     end if;
-
-     --DBMS_OUTPUT.PUT_LINE('Призначення full:     '||l_nazn);
-      l_nazn:= substr(l_nazn,1,160); --обрізаємо наформоване призначення платежу до 160 символів
-     --DBMS_OUTPUT.PUT_LINE('Призначення shot:  '||l_nazn);
-     --апдейтимо призначення для стрічки
-       update TSEL015
-       set nazn= l_nazn
-       where US_ID=SYS_CONTEXT('bars_global','user_id')
-             and U_ID=k.U_ID;
-       commit;
-
-     end;
-
-    end if;  --загальний IF
-
- end loop;
-end;
---------------------------------
+        --тільки для ЦА
+        --2018.09.26 MDom додано TO_CHAR та F_TARIF
+        if regexp_like(l_nazn, 'F_DOG_PER') or regexp_like(l_nazn, 'TO_CHAR') or regexp_like(l_nazn, 'F_TARIF') then
+          --цикли забрали, проходимо по призначенню тільки один раз.
+          --while regexp_like(l_nazn, '(#{)')
+          --loop
+          --вирізаємо запис формули для replace
+          n1 := regexp_instr(l_nazn, '(#{)', 1); --позиція першого входження #
+          --DBMS_OUTPUT.PUT_LINE('N1: '||n1);
+          --#{F_DOG_PER (1)}
+          n2 := regexp_instr(l_nazn, '\)}', 1); --позиція першого входження }
+          --DBMS_OUTPUT.PUT_LINE('N2: '||n2);
+          --s1:=substr(l_nazn, regexp_instr(l_nazn,'#',1), 16);
+          l_s1 := substr(l_nazn, n1, n2-n1+2); --вирізаємо повну форму формули
+          --DBMS_OUTPUT.PUT_LINE('Формула -1: '||s1);
+          -------------------------------------------------
+          --з запису вирізаємо саму формулу для обрахунку
+          n3 := regexp_instr(l_s1, '#', 1) + 2;
+          --DBMS_OUTPUT.PUT_LINE('N3: '||n3);
+          --DBMS_OUTPUT.PUT_LINE('S1: '||s1);
+          n4 := regexp_instr(l_s1, '\)}', 1) - 2;
+          --DBMS_OUTPUT.PUT_LINE('N4: '||n4);
+          l_s := substr(l_s1, n3, n4);
+          --DBMS_OUTPUT.PUT_LINE('Формула: '||s);
+          --обрахунок значення по формулі
+          begin
+            execute immediate 'select '||l_s||' from dual' into s_nazn; --порахували формулу
+            --DBMS_OUTPUT.PUT_LINE('Формула 0: '||s_nazn);
+          exception when others then
+            RAISE_APPLICATION_ERROR (-20004, 'Помилка при виконанні обрахунку формули в призначенні: '||l_s||'NLSB: '||k.NLSB||'Призначення: '||k.NAZN);
+          end;
+          --заміна формули на значення формули в призначенні
+          l_nazn := replace(l_nazn, l_s1 , s_nazn);
+          --DBMS_OUTPUT.PUT_LINE('Формула 1: '||l_nazn);
+          --end loop;
+        end if; --закінчення IF по формулі #{F_DOG_PER (1)}
+        
+        --DBMS_OUTPUT.PUT_LINE('Призначення full:     '||l_nazn);
+        l_nazn := substr(l_nazn, 1, 160); --обрізаємо наформоване призначення платежу до 160 символів
+        --DBMS_OUTPUT.PUT_LINE('Призначення shot:  '||l_nazn);
+        --апдейтимо призначення для стрічки
+        update TSEL015
+           set nazn = l_nazn
+         where US_ID = SYS_CONTEXT('bars_global', 'user_id')
+           and U_ID = k.U_ID;
+        commit;
+      end if; --загальний IF
+    end loop;
+    --------------------------------
+  end SEL015;
 
 
-end;
-end SEL015;
 procedure pay_perekr  (
                        tt_     CHAR,   --код операції
                        vob_    NUMBER, --код документу
