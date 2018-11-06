@@ -101,7 +101,7 @@ BEGIN
           to_char(row_number() over (order by k020, p17, p16, to_date(doc_date, 'ddmmyyyy')), 'fm0000')  as Q003_2, 
           p17 as Q003_3, p16 as Q007_1, p21 as Q007_2, p23 as Q007_3, p24 as Q007_4, 
           to_date(doc_date, 'ddmmyyyy') as Q007_5, lpad(p09, 3, '0') as K040, 
-          p01 as D070, p18 as F008, p02 as K112, nvl(p20, '9') as F019, p19 as F020, 
+          p01 as D070, p18 as F008, substr(p02,1,1) as K112, nvl(p20, '9') as F019, p19 as F020, 
           lpad(p14, 3, '0') as R030, 
           l_b040_8 || b041 as Q023, p27 as Q006, p13 as T070, p15 as T071, 
           null as ACC_ID, null as ACC_NUM, p14 as KV, rnk as CUST_ID, BRANCH        
