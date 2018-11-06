@@ -18,7 +18,7 @@ begin
   , p_file_code        => l_file_code
   , p_scm_code         => r_file.SCHEME_CODE
   , p_file_tp          => r_file.FILE_TYPE
-  , p_file_nm          => '(xml) Дані про процентні ставки за непогашеними сумами кредитів (за класифікаціями видів кредитів та контрагентів)'
+  , p_file_nm          => '(xml) I5X Дані про процентні ставки за непогашеними сумами кредитів (за класифікаціями видів кредитів та контрагентів)'
   , p_file_fmt         => 'XML'
   , p_scm_num          => r_file.SCHEME_NUMBER
   , p_unit_code        => r_file.UNIT_CODE
@@ -31,58 +31,67 @@ begin
   , p_f_turns          => r_file.flag_turns
   );
   
-  dbms_output.put_line( 'Created new file #' || to_char(l_file_id) );
+  if l_file_id is not null then
+      dbms_output.put_line( 'Created new file #' || to_char(l_file_id) );
 
-  for l in ( select *
-               from NBUR_REF_FILES_LOCAL
-              where FILE_ID = r_file.ID 
-           )
-  loop
-    NBUR_FILES.SET_FILE_LOCAL
-    ( p_kf        => l.KF
-    , p_file_id   => l_file_id
-    , p_file_path => l.FILE_PATH
-    , p_nbuc      => l.NBUC
-    , p_e_address => l.E_ADDRESS
-    );
-  end loop;
+      for l in ( select *
+                   from NBUR_REF_FILES_LOCAL
+                  where FILE_ID = r_file.ID 
+               )
+      loop
+        NBUR_FILES.SET_FILE_LOCAL
+        ( p_kf        => l.KF
+        , p_file_id   => l_file_id
+        , p_file_path => l.FILE_PATH
+        , p_nbuc      => l.NBUC
+        , p_e_address => l.E_ADDRESS
+        );
+      end loop;
 
-  NBUR_FILES.SET_FILE_PROC
-  ( p_proc_id => l_proc_id
-   , p_file_id => l_file_id
-   , p_proc_type => 'O'
-   , p_proc_active => 'Y'
-   , p_scheme => 'BARS'
-   , p_proc_name => 'NBUR_P_FI5X_NC'
-   , p_description => '(xml) '||r_file.FILE_NAME
-   , p_version => '1.0'
-   , p_date_start => date '2015-01-01'
-   );
+      NBUR_FILES.SET_FILE_PROC
+      ( p_proc_id => l_proc_id
+       , p_file_id => l_file_id
+       , p_proc_type => 'O'
+       , p_proc_active => 'Y'
+       , p_scheme => 'BARS'
+       , p_proc_name => 'NBUR_P_FI5X_NC'
+       , p_description => '(xml) '||r_file.FILE_NAME
+       , p_version => '1.0'
+       , p_date_start => date '2015-01-01'
+       );
 
-  --Удалим все ранее привязанные к отчету объекты, если такие были
-  NBUR_FILES.SET_OBJECT_DEPENDENCIES
-  ( 
-    p_file_id => l_file_id
-    , p_obj_id => null
-    , p_strt_dt => date '2015-01-01'
-  );
+      --Удалим все ранее привязанные к отчету объекты, если такие были
+      NBUR_FILES.SET_OBJECT_DEPENDENCIES
+      ( 
+        p_file_id => l_file_id
+        , p_obj_id => null
+        , p_strt_dt => date '2015-01-01'
+      );
 
-  NBUR_FILES.SET_FILE_DEPENDENCIES
-  ( p_file_id  => l_file_id
-  , p_file_pid => r_file.ID
-  );
+      NBUR_FILES.SET_FILE_DEPENDENCIES
+      ( p_file_id  => l_file_id
+      , p_file_pid => null
+      );
+  else
+      l_file_id := 37353;
+  end if;
 
+  delete from NBUR_REF_PREPARE_XML WHERE FILE_CODE in ('I5X');
+   
+  update NBUR_REF_FILES
+   set file_code = '#I5'
+   where id = l_file_id;
 end;
 /
 commit;
 
 -- опис для підготовки XML
 begin
-    delete from NBUR_REF_PREPARE_XML WHERE FILE_CODE = 'I5X'; 
+    delete from NBUR_REF_PREPARE_XML WHERE FILE_CODE in ('#I5'); 
     Insert into NBUR_REF_PREPARE_XML
        (FILE_CODE, DESC_XML, DATE_START)
      Values
-   ('I5X', 'select * from (
+   ('#I5', 'select * from (
                     select EKP, KU, T020, R020, R011, R030, K040, K072, K111, 
                            K140, F074, S032, S183, S241, S260, F048, 
                            to_char(sum(T070)) as T070, 
@@ -98,7 +107,9 @@ end;
 /
 
 begin
-    delete from NBUR_REF_EKP_R020 where file_code = 'I5X';
+    execute immediate 'alter table NBUR_REF_EKP_R020 disable constraint FK_NBURREFEKPR020_NBURREFFILES';
+    
+    delete from NBUR_REF_EKP_R020 where file_code in ('I5X');
     Insert into NBUR_REF_EKP_R020
        (EKP, DSC, DESC_R020, DATE_START)
      Values
