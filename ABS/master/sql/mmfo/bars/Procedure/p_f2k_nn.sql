@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.008     25.09.2018
+% VERSION     : v.18.009     06.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 06.11.2018  правильная выборка при обработке "второго" набора доп.параметров
  25.09.2018  корректировка алгоритма обработки "второго" набора доп.параметров
  14.08.2018  обработка "второго" набора доп.параметров клиента с санкциями
  30.05.2018  DDD=270 -залишок коштiв на дату введення санкцiй (дата-1)
@@ -267,7 +268,7 @@ BEGIN
 
 EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS = ''.,'' ';
 -------------------------------------------------------------------
-logger.info ('P_F2K_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy'));
+logger.info ('P_F2K_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||'   v.18.009');
 -------------------------------------------------------------------
 userid_ := user_id;
 DELETE FROM RNBU_TRACE WHERE userid = userid_;
@@ -634,11 +635,11 @@ select
                                                 where p.tag like 'RNB1S'
                                                   and regexp_instr(p.value,'01|02|03|04|05|99') >0
                                                   and p.rnk=u.rnk) 
-                                   and tag in ('RNB1R', 'RNB1U', 'RNB1S', 'RNB1D')
+                                   and tag in ('RNB1R', 'RNBOU', 'RNB1S', 'RNBOD')
                               ) pivot
                               ( max(trim(value))
-                                for tag in ('RNB1R' as RNBOR, 'RNB1U' as RNBOU,
-                                            'RNB1S' as RNBOS, 'RNB1D' as RNBOD)
+                                for tag in ('RNB1R' as RNBOR, 'RNBOU' as RNBOU,
+                                            'RNB1S' as RNBOS, 'RNBOD' as RNBOD)
                               )
                      ) re
                where c.rnk = re.rnk
