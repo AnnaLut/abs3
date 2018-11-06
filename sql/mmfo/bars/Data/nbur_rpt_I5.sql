@@ -77,6 +77,8 @@ begin
   end if;
 
   delete from NBUR_REF_PREPARE_XML WHERE FILE_CODE in ('I5X');
+  
+  delete from NBUR_REF_EKP_R020 where file_code in ('I5X');
    
   update NBUR_REF_FILES
    set file_code = '#I5'
