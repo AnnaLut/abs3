@@ -9,7 +9,7 @@ CREATE OR REPLACE PROCEDURE NBUR_P_FI6X (
                                            , p_report_date      date
                                            , p_form_id          number
                                            , p_scheme           varchar2 default 'C'
-                                           , p_file_code        varchar2 default 'I6X'
+                                           , p_file_code        varchar2 default '#I6'
                                       )
 is
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,7 +87,7 @@ BEGIN
   nbur_waiting_form(p_kod_filii, p_report_date, c_old_file_code, c_title);  
   
       -- наповнення довідника для визначення кодів показників
-  l_ret := f_nbur_get_ekp_xxx(p_file_code, l_datez);
+  l_ret := f_nbur_get_ekp_xxx('I6X', l_datez);
 
   --Теперь сохрянем полученные данные в детальном протоколе
   insert into nbur_log_fI6X(report_date, kf, nbuc, version_id, ekp, ku, t020, r020, r011, r030, k040,
