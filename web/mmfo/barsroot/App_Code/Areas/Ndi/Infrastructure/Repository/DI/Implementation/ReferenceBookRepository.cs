@@ -1163,10 +1163,18 @@ namespace BarsWeb.Areas.Ndi.Infrastructure.Repository.DI.Implementation
             var nativeMetaColumns = DbColumnsToMetaColumnsForGetData(dbMetaColumns);
             bool lazyLoad = false;
 
-            if (dataModel is ExcelDataModel && dataModel.GetAll && nsiEditParams != null && nsiEditParams.ExcelParam == "ALL_CSV")
+            if (dataModel is ExcelDataModel && dataModel.GetAll && nsiEditParams != null && !string.IsNullOrEmpty(nsiEditParams.ExcelParam))
             {
-                lazyLoad = true;// nsiEditParams != null && nsiEditParams.ExcelParam == "ALL_CSV";
-                dataModel.Limit = 9999999;
+                if (nsiEditParams.ExcelParam == "ALL_CSV")
+                {
+                    lazyLoad = true;
+                    dataModel.Limit = 9999999;
+                }
+                if(nsiEditParams.ExcelParam.Contains("COUNT_"))
+                {
+                   int limit = Convert.ToInt32(nsiEditParams.ExcelParam.Substring("COUNT_".Length));
+                    dataModel.Limit = limit > 10000 ? 10000 : limit;
+                }
             }
           
             var startInfo = new GetDataStartInfo
