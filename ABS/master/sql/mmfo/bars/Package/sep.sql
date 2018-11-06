@@ -1690,7 +1690,7 @@ LOOP
                      SELECT a.acc,a.nlsalt,a.tip,a.isp, a.grp, a.nms,cu.rnk,a.sec
                        INTO   acck_,nlsalt_,tipk_, isp_,  grp_,  nms_,  rnk_, sec_
                        FROM accounts a,cust_acc cu
-                      WHERE a.acc = cu.acc AND a.nlsalt = nlsb_ AND a.kv = kv_;
+                      WHERE a.acc = cu.acc AND a.nlsalt = nlsb_ AND a.kv = kv_ and a.tip like 'W4%';
                   EXCEPTION
                      WHEN NO_DATA_FOUND THEN 
                          acck_ := ch_acc( gl.aMFO, kv_, ts_ );
