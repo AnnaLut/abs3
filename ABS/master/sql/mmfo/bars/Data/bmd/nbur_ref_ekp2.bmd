@@ -134,7 +134,7 @@ begin
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop
     l_newcolid := bars_metabase.get_colid(l_tabid, l_extrnval(i).srccolname);
-    if (l_newcolid is not null) then
+    if (l_newcolid is not null) and l_extrnval(i).srccolname !='EKP' then
       bars_metabase.add_extrnval(
         l_extrnval(i).tabid,
         l_extrnval(i).colid,
@@ -143,6 +143,17 @@ begin
         l_extrnval(i).tab_alias,
         l_extrnval(i).tab_cond,
         l_extrnval(i).src_cond,
+        l_extrnval(i).col_dyn_tabname);
+    end if;
+    if (l_newcolid is not null) and l_extrnval(i).srccolname ='EKP'  then
+      bars_metabase.add_extrnval(
+        l_extrnval(i).tabid,
+        l_extrnval(i).colid,
+        l_tabid,
+        l_newcolid,
+        l_extrnval(i).tab_alias,
+        l_extrnval(i).tab_cond,
+        'FILE_CODE=''''4BX'''' ',
         l_extrnval(i).col_dyn_tabname);
     end if;
   end loop;

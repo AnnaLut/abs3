@@ -41,7 +41,7 @@ declare
   l_proc_id     nbur_ref_procs.id%type;
 begin
 
-  l_file_code := '44B';
+  l_file_code := '4BX';
 
   NBUR_FILES.SET_FILE
   ( p_file_id          => l_file_id
@@ -65,7 +65,7 @@ begin
 
   update nbur_ref_files
     set file_code ='#4B'
-   where file_code ='44B';
+   where file_code ='4BX';
 
     NBUR_FILES.SET_FILE_LOCAL
     ( p_kf        => '300465'
