@@ -80,7 +80,7 @@ BEGIN
 
   logger.trace(c_title || ' Version_id is ' || l_version_id);
   
-  l_date_z_end := trunc(p_report_date, 'mm');
+  l_date_z_end := last_day(p_report_date) + 1;
   l_b040_8 := '00626804';
   
   -- детальний протокол
