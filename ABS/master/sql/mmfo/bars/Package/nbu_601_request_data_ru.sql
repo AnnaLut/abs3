@@ -873,7 +873,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                 where  bpk.nd = dt.nd and
                                        dt.kf = kf_ and
                                        dt.tag = 'FREQP'),1) as periodproc,
-                               sumarrears.sum_ost as sumarrears,
+                               nvl(abs(sumarrears.sum_ost),0) as sumarrears,
                                sp.sp_sum  as arrearbase ,
                                spn.spn_sum as arrearproc,
                                nbu23_rez.daybase,
@@ -881,7 +881,9 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                bpk.dat_close as factendday,
                                '' as flagz,
                                nbu23_rez.fin as klass,
-                               nbu23_rez.cr as risk
+                               nbu23_rez.cr as risk,
+                               case when flg.value='1' then 'true'
+                                 else 'false' end flaginsurance
                        from (select rnk,kf from nbu_person_fo
                              union
                              select rnk,kf from nbu_person_uo) rnk_client,
@@ -936,6 +938,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   group by t.acc) proc on proc.acc = bpk.acc_pk
                                                 -- and bpk.nbs in ('2625', '2202', '2203', '2605', '2062', '2063','9129') --номінальна процентна ставка
 
+                       left join (select s.kf,s.nd, s.tag,s.value from bpk_parameters  s where tag='FLAGINSURANCE') flg on flg.nd=bpk.nd and flg.kf=bpk.kf
                        --sumpay
                        left join(select nd ,sum(sumo+sumk) as sumpay
                                        from cc_lim
@@ -944,16 +947,16 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                        --
 
                        where rnk_client.rnk = bpk.rnk and rnk_client.kf = kf_
-					   and bpk.nbs in (2625,2202,2203,2605,9129,3578) and  sumzagal1.sum_zagal+0 is not null and sumzagal1.sum_zagal+0 is not null  )
+					   and bpk.nbs in (2625,2202,2203,2605,9129,3578) and  sumzagal1.sum_zagal+0 is not null)
 
           loop
             begin
            insert into nbu_credit ( rnk,nd,ordernum,flagosoba,typecredit,numdog,dogday,endday,sumzagal,r030,proccredit,sumpay,periodbase ,periodproc, sumarrears, arrearbase,arrearproc,
-                                    daybase,dayproc,factendday,flagz,klass,risk ,status,kf)
+                                    daybase,dayproc,factendday,flagz,klass,risk,flaginsurance,status,kf)
                                   values
                               (person.rnk,person.nd,person.ordernum,person.flagosoba,person.typecredit,person.numberdog,person.dogday,person.endday,person.sumzagal,person.r030,
                                person.proccredit,person.sumpay,person.periodbase,person.periodproc,person.sumarrears,person.arrearbase,person.arrearproc,
-                               person.daybase,person.dayproc,person.factendday,person.flagz,person.klass,person.risk,'',kf_);
+                               person.daybase,person.dayproc,person.factendday,person.flagz,person.klass,person.risk,person.flaginsurance,'',kf_);
              exception when dup_val_on_index then null;
              end;
         end loop;
@@ -1026,7 +1029,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                      nvl((select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQP')
                                         ,(select ltrim(decode(dt.txt,5,1,7,2,180,3,120,4,360,4,400,5,40,6,2,6,30,1))  as freq from nd_txt dt where d.nd=dt.nd  and dt.kf=kf_ and dt.tag='FREQ')) as periodproc,
                                      --sumarrears.sum_ost as sumarrears,
-                                     (abs(sumarrears.sum_ost)+abs(nvl(sumacommission.sum_ostcom,0))) as sumarrears,
+                                     (abs(nvl(sumarrears.sum_ost,0))+abs(nvl(sumacommission.sum_ostcom,0))) as sumarrears,
                                      ltrim(nbu23_rez.daybase) as daybase,
                                      ltrim(nbu23_rez.daybase) as dayproc,
                                      a.dazs as factendday,
@@ -1040,11 +1043,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                        end flagz,
                                      ltrim(nbu23_rez.fin) as klass,
                                      nbu23_rez.cr as risk,
-                                     case 
-                                      when nt.tag='INSCC' and txt='Taк' then 'true'
-                                      when nt.tag='INSCC' and txt='Ні' then 'false'
-                                       --else null
-                                      end flagInsurance                                    
+                                     ndt.flagInsurance
                      /*case when  (d.prod like '2082%' or  d.prod like '2232%') then 'true'
                                          when  (d.prod like '2083%' or  d.prod like '2233%') then 'true'
                                            end flagInsurance*/
@@ -1128,7 +1127,12 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                            where  t.id = 0 and t4.acc = t2.acc and t2.tip in('LIM')and t.acc=t4.acc  and bdat< trunc(sysdate,'mm')
                                   and d.nd=t4.nd
                                   and d.ndg is not null
-                           group by d.nd,t.acc) proc1 on proc1.nd = ad.nd,
+                           group by d.nd,t.acc) proc1 on proc1.nd = ad.nd
+                     left join (select nd, case
+												               when txt='Taк' then 'true'
+												               when txt='Ні' then 'false'
+												               end flagInsurance
+							          	             from nd_txt where tag='INSCC') ndt on ndt.nd=ad.nd,
                           nd_acc n,
                           nd_txt nt,
                           accounts a
@@ -1247,20 +1251,24 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                  case when p.sdatz  is not null then p.sdatz
                       when p.sdatz is null then c1.creditdate end as pledgeday,
                 (select s031  from cc_pawn cp where cp.pawn=p.pawn) as s031 , ac.kv as r030,
-                fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  as sumppladge,p.sv as  pricepledge, '' as lastpledgeday ,'' as codrealty,'' as ziprealty
-                       ,'' as squarerealty,'' as real6income,'' as noreal6income,'' as flaginsurancepledge , dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,
+                abs(fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))) as sumppladge,p.sv as  pricepledge, '' as lastpledgeday ,'' as codrealty,'' as ziprealty
+                       ,'' as squarerealty,'' as real6income,'' as noreal6income,
+                       case when fins.tag is not null then 'true'
+                            else 'false'
+                            end flaginsurancepledge,
+                              dep.nd as numdogdp, dep.date_begin as dogdaydp, dep.kv as r030dp , limit as  sumdp, '' as status ,
                        case when (select s031  from cc_pawn cp where cp.pawn=p.pawn)=34 then  fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))  end sumBail,
                        case when (select s031  from cc_pawn cp where cp.pawn=p.pawn) in (11 , 12,  13, 14, 16, 20, 23, 31, 60, 61, 62, 63, 64, 65) then
                              fost(ac.acc,dat_next_u(trunc(sysdate,'mm'),-1))end sumGuarantee
                    from accounts ac
-                                   left join (select rnk,max(c.dogday) creditdate from nbu_credit c
-                                         group by rnk) c1 on c1.rnk=ac.rnk ,
-                                 pawn_acc p
-                                    left join( select nd,d.acc,a.kv as kv ,dat_begin as date_begin , sum as limit , dpu_id as  deposit_id from dpu_deal d ,  accounts a
-                                          where a.acc=d.acc
-                                          union
-                                          select nd,acc,kv,dat_begin as date_begin, limit,deposit_id from dpt_deposit) dep on dep.deposit_id=p.deposit_id
-                      where ac.acc=p.acc)
+                            left join (select rnk,max(c.dogday) creditdate from nbu_credit c
+                                         group by rnk) c1 on c1.rnk=ac.rnk
+                            left join (select acc,tag,kf from accountsw where tag='Z_POLIS') fins on fins.acc=ac.acc and fins.kf=ac.kf,
+                        pawn_acc p
+                            left join (select nd,d.acc,a.kv as kv ,dat_begin as date_begin ,sum as limit,dpu_id as  deposit_id from dpu_deal d,accounts a where a.acc=d.acc
+                                       union
+                                       select nd,acc,kv,dat_begin as date_begin, limit,deposit_id from dpt_deposit) dep on dep.deposit_id=p.deposit_id
+                                       where ac.acc=p.acc)
                       loop
     insert into  nbu_pledge_dep(rnk,acc,ordernum,numberpledge,pledgeday,s031,r030,sumpledge,pricepledge,lastpledgeday,codrealty,ziprealty,squarerealty, real6income,
                                  noreal6income,flaginsurancepledge,numdogdp,dogdaydp,r030dp,sumdp,status,kf,sumBail,sumGuarantee) values
