@@ -80,6 +80,7 @@ begin
                      or (
                            a.nlsalt = decode(z.dk,:new.dk,:new.nlsb,:new.nlsa)
                            and a.nlsalt like '2625%'
+                           and a.dat_alt is not null
                         ) /* COBUMMFO-7501 провер€ем по альтернативному счету дл€ физиков*/
                   )
               and a.kv  = decode(z.dk,:new.dk,nvl(:new.kv2,:new.kv),:new.kv)
