@@ -938,7 +938,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                   group by t.acc) proc on proc.acc = bpk.acc_pk
                                                 -- and bpk.nbs in ('2625', '2202', '2203', '2605', '2062', '2063','9129') --номінальна процентна ставка
 
-                       left join (select s.kf,s.nd, s.tag,s.value from bpk_parameters  s where tag='FLAGINSURANCE') flg on flg.nd=bpk.nd and flg.kf=bpk.kf
+                       left join (select s.nd, s.tag,s.value from bpk_parameters  s where tag='FLAGINSURANCE') flg on flg.nd=bpk.nd 
                        --sumpay
                        left join(select nd ,sum(sumo+sumk) as sumpay
                                        from cc_lim
