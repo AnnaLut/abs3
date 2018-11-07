@@ -904,7 +904,7 @@ create or replace package body ow_transform_acc is
                      join bars.accounts a on i.mfob = a.kf 
                                              and i.nlsb = a.nlsalt 
                                              and i.kvb = a.kv
-                                             and a.dazs is not null
+                                             and a.dazs is null
                      where i.mfob = p_kf
                            and a.nlsalt like gc_nbs_person||'%'
                   )
@@ -924,7 +924,7 @@ create or replace package body ow_transform_acc is
                         join bars.accounts a on a.nlsalt = d.nlsa 
                                                 and a.kf = d.kf
                                                 and a.kv = d.kva
-                                                and a.dazs is not null
+                                                and a.dazs is null
                         where d.kf = p_kf
                               and d.nlsa like gc_nbs_person||'%'
                      )
@@ -944,7 +944,7 @@ create or replace package body ow_transform_acc is
                         join bars.accounts a on a.nlsalt = d.nlsb
                                              and a.kf = d.mfob
                                              and a.kv = d.kvb
-                                             and a.dazs is not null
+                                             and a.dazs is null
                         where d.kf = p_kf
                                and d.nlsb like gc_nbs_person||'%')
       loop
@@ -962,7 +962,7 @@ create or replace package body ow_transform_acc is
                         join bars.accounts a on a.nlsalt = d.nls_p 
                                                 and a.kf = d.mfo_p
                                                 and a.kv = d.kv
-                                                and a.dazs is not null
+                                                and a.dazs is null
                         where d.nls_p like gc_nbs_person||'%'
                      ) 
       loop
@@ -980,7 +980,7 @@ create or replace package body ow_transform_acc is
                         join bars.accounts a on a.nlsalt = d.nls_d 
                                                 and a.kf = d.mfo_d
                                                 and a.kv = d.kv
-                                                and a.dazs is not null
+                                                and a.dazs is null
                         where d.nls_d like  gc_nbs_person||'%'
                      ) 
       loop
