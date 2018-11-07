@@ -4,7 +4,8 @@ create or replace type t_core_loan under t_core_object
     customer_id   integer,
     core_customer_id integer,
 
-    ordernum      number(2),
+    lnd           number(30),
+	ordernum      number(2),
     flagosoba     varchar2(5 char),
     codcredit     number(20),
     codman        number(20),
@@ -50,7 +51,7 @@ create or replace type t_core_loan under t_core_object
     return clob
 )
 /
-create or replace type body t_core_loan is
+CREATE OR REPLACE TYPE BODY t_core_loan is
 
     constructor function t_core_loan(
         p_report_id in integer,
@@ -69,7 +70,7 @@ create or replace type body t_core_loan is
         l_core_loan_row := nbu_core_service.get_core_credit_row(p_report_id, p_loan_id, p_loan_kf);
 
         ordernum         := 1;
-
+        lnd              := l_core_loan_row.nd;
         flagosoba        := l_core_loan_row.flagosoba;
         typecredit       := l_core_loan_row.typecredit;
         numberdog        := l_core_loan_row.numdog;
@@ -238,6 +239,7 @@ create or replace type body t_core_loan is
         p_is_valid out boolean,
         p_validation_message out varchar2)
     is
+    count_credit_fact_day number(10);
     begin
        p_is_valid := true;
 
@@ -245,7 +247,19 @@ create or replace type body t_core_loan is
            p_is_valid := false;
            p_validation_message := 'Номер кредитного договору не вказаний';
        end if;
-
+       
+       if (factendday is not null) then
+           select count(*) into  count_credit_fact_day
+                           from core_credit c 
+                           where c.rnk=core_customer_id and c.nd=lnd and c.kf=core_object_kf and c.factendday is not null;
+           if (count_credit_fact_day >=2) then
+               p_is_valid := false;
+               p_validation_message := 'До НБУ даний кредит був відправлений із датою закриття ('||to_char(factendday,'dd.mm.yyyy')||'). Наступного разу інформація передаватися не буде.';
+           else 
+              p_is_valid := true;
+           end if;   
+       end if;
+       
        if (dogday is null) then
            p_is_valid := false;
            p_validation_message := case when p_validation_message is null then null else p_validation_message || ', ' end ||
@@ -314,7 +328,7 @@ create or replace type body t_core_loan is
         l_attributes(17) := json_utl.make_json_value('arrearProc', nvl(arrearProc, 0), p_mandatory => true);
         l_attributes(18) := json_utl.make_json_value('dayBase', nvl(dayBase, 0), p_mandatory => true);
         l_attributes(19) := json_utl.make_json_value('dayProc', nvl(dayProc, 0), p_mandatory => true);
-        l_attributes(20) := json_utl.make_json_date('factEndDay', factEndDay, p_mandatory => false);
+        l_attributes(20) := json_utl.make_json_date('factEndDay', factEndDay, p_mandatory => true);
         l_attributes(21) := json_utl.make_json_value('flagZ', nvl(flagZ, 'false'), p_mandatory => true);
         l_attributes(22) := json_utl.make_json_value('klass', klass, p_mandatory => true);
         l_attributes(23) := json_utl.make_json_value('risk', risk, p_mandatory => true);
