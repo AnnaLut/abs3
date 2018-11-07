@@ -7,7 +7,7 @@ begin
      (
             id number(38) not null,
             customer_object_id number(38) not null,
-            loan_number varchar2(30 char) not null,
+            loan_number varchar2(50 char) not null,
             loan_date date not null,
             loan_amount number(38),
             loan_currency_id number(3),
@@ -30,4 +30,6 @@ exception
     when name_already_used then
          null;
 end;
+/
+alter table nbu_reported_loan modify loan_number varchar2(50 char);
 /
