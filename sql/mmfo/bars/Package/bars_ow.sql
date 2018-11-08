@@ -7495,15 +7495,30 @@ function check_available(p_nls in varchar2, p_kv in number, p_s in number)
   return boolean is
   l_accnts accounts%rowtype;
   l_result boolean := true;
+  l_lim number;
 begin
   l_accnts := account_utl.lock_account(p_nls, p_kv, p_lock_mode => 1);
-  if l_accnts.pap = 1 and l_accnts.lim + l_accnts.ostc + p_s * 100 > 0 then
+  -- якщо працюЇмо в поточн≥й банк≥вськ≥й дат≥, то вибираЇмо
+  -- значенн€ л≥м≥ту з ACCOUNTS ≥накше з ACCOUNTS_UPDATE
+  if gl.bd = gl.gbd then
+     l_lim := l_accnts.lim;
+  else
+     select nvl(min(lim), 0)
+       into l_lim
+       from (select row_number() over(order by idupd desc) rn, lim
+               from accounts_update t
+              where t.acc = l_accnts.acc
+                and t.effectdate <= gl.bd)
+      where rn = 1;
+  end if;
+  if l_accnts.pap = 1 and l_lim + fost(l_accnts.acc, gl.bd) + p_s * 100 > 0 then
     l_result := false;
-  elsif l_accnts.pap = 2 and l_accnts.lim + l_accnts.ostc - p_s * 100 < 0 then
+  elsif l_accnts.pap = 2 and l_lim + fost(l_accnts.acc, gl.bd) - p_s * 100 < 0 then
     l_result := false;
   end if;
   return l_result;
 end;
+
 --------------------
 procedure pay_others_cardpay(
   p_id       in number,
