@@ -17,9 +17,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.010    24/09/2018
+% VERSION     :  v.18.011    07.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := 'v.18.010  24/09/2018';
+  ver_            char(30)  := ' v.18.011  07.11.2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -33,7 +33,7 @@ BEGIN
   logger.info (
                 c_prefix
                 || ' begin for date = ' || to_char(p_report_date, 'dd.mm.yyyy')
-                || ' date_start=' || to_char(l_start_dt, 'dd.mm.yyyy')
+                || ' date_start=' || to_char(l_start_dt, 'dd.mm.yyyy') || ver_
               );
 
   -- определение начальных параметров (код области или МФО или подразделение)
@@ -110,7 +110,10 @@ BEGIN
                                  , to_char(acc.daos, с_date_fmt) as Q007_1
                                  , to_char(acc.dazs, с_date_fmt) as Q007_2
                                  , case when (nvl(acc.BLKD,0) + nvl(acc.BLKK, 0)) <> 0 then '02' else '99' end as Q031_1
-                                 , nvl(to_char(round(fostq(acc.acc, to_date(cust.rnbod, с_date_fmt)))), '0') as T070_1
+--                                 , nvl(to_char(round(fostq(acc.acc, to_date(cust.rnbod, с_date_fmt)))), '0') as T070_1
+                                 , nvl(to_char(round(
+                                           gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), p_report_date) 
+                                                       )), '0')     as T070_1
                                  , nvl(to_char(round(fostq(acc.acc, p_report_date))), '0') as T070_2
                                  --Параметры операции       
                                  , (
