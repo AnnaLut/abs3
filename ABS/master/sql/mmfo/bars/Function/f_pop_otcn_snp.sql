@@ -10,7 +10,7 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Функция наполнения таблиц для формирования отчетности
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     :   12/04/2018 (10/04/2018)
+% VERSION     :   08/11/2018 (12/04/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 06/02/2015 - в таблице OTCN_SALDO не формировались годовые Кт обороты
              Исправлено.
@@ -104,7 +104,12 @@ DatN_ := TRUNC(Dat_ + 1); -- дата наступна за зв_тною
 -- отбор только нужных счетов
 if tp_sql_ = 0 then
     sql_doda_ := 'insert /*+APPEND PARALLEL(8) */  into OTCN_ACC (ACC, NLS, KV, NBS, OB22, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
-                 'select a.acc, a.nls, a.kv, a.nbs, a.ob22, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
+                 'select a.acc, 
+                         (case when :p_report_date < a.dat_alt then a.nlsalt else a.nls end) as nls, 
+                         a.kv, 
+                         (case when :p_report_date < a.dat_alt then substr(a.nlsalt ,1,4) else a.nbs end) as nbs, 
+                         (case when :p_report_date < a.dat_alt then s.ob22_alt else a.ob22 end) as ob22, 
+                         a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
                  'from (select * from accounts where nbs ';
 
     IF Trim(sql_acc_) IS NULL THEN
@@ -116,7 +121,12 @@ if tp_sql_ = 0 then
     sql_doda_ := sql_doda_ || ') a, specparam s where a.acc = s.acc(+) ';
 else
     sql_doda_ := 'insert /*+APPEND PARALLEL(8) */ into OTCN_ACC (ACC, NLS, KV, NBS, OB22, RNK, DAOS, DAPP, ISP, NMS, LIM, PAP, TIP, VID, MDATE, DAZS, ACCC, TOBO, NLS_ALT, OB22_ALT, DAT_ALT) '||
-                 'select distinct a.acc, a.nls, a.kv, a.nbs, a.ob22, a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
+                 'select distinct a.acc, 
+                         (case when :p_report_date < a.dat_alt then a.nlsalt else a.nls end) as nls, 
+                         a.kv, 
+                         (case when :p_report_date < a.dat_alt then substr(a.nlsalt ,1,4) else a.nbs end) as nbs, 
+                         (case when :p_report_date < a.dat_alt then s.ob22_alt else a.ob22 end) as ob22, 
+                         a.rnk, a.daos, a.dapp, a.isp, a.nms, a.lim, a.pap, a.tip, a.vid, a.mdate, a.dazs, a.accc, a.tobo, a.nlsalt, s.ob22_alt, a.dat_alt '||
                  'from (';
 
     IF Trim(sql_acc_) IS NULL THEN
@@ -128,7 +138,7 @@ else
     sql_doda_ := sql_doda_ || ') a, specparam s where a.acc = s.acc(+) ';
 end if;
 
-EXECUTE IMMEDIATE sql_doda_;
+EXECUTE IMMEDIATE sql_doda_ USING dat_, dat_, dat_;
 commit;
 
 if add_KP_ >= 1 then
