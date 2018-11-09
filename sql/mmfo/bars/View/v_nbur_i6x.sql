@@ -27,7 +27,7 @@ select
           , NBUR_LST_FILES v
           , table( XMLSequence( XMLType( v.FILE_BODY ).extract('/NBUSTATREPORT/DATA') ) ) t
    where  f.ID        = v.FILE_ID
-          and f.FILE_CODE = 'I6X'
+          and f.FILE_CODE = '#I6'
           and f.FILE_FMT  = 'XML'
           and v.FILE_STATUS IN ( 'FINISHED', 'BLOCKED');
            
