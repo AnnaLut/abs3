@@ -13,7 +13,7 @@ IS
 % DESCRIPTION :   ѕроцедура формировани€ 3KX     дл€  Ѕ (универсальна€)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.020          29.10.2018
+% VERSION     :   v.18.021          09.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетна€ дата
       sheme_ - схема формировани€
@@ -26,6 +26,8 @@ IS
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+09.11.2018  -mfo 336503, добавлено дт2900-кт26035306015772        [9664]
+            -forex                                                [9924]
 29.10.2018  q006 заполн€етс€ только из доп.реквизитов сделок
 10.10.2018  -добавлены операции дт2622-кт2900(3739)               [9700]
 25.09.2018  -добавлены операции дт2900/ob22=01-кт2625, tt=PRK     [9499]
@@ -575,7 +577,10 @@ BEGIN
                         OR (     o.nlsd like '29003%'
                             AND  o.nlsk like '26039301886%'
                             AND mfo_ = 300465 )
-                       )
+                        OR (     o.nlsd like '2900%'
+                            AND  o.nlsk like '26035306015772%'
+                            AND mfo_ = 336503 )
+                       )                                                      
               GROUP BY '1', o.rnkk, o.REF, o.acck, o.nlsk, o.kv, o.accd, o.nlsd, o.nazn
               UNION ALL -- продаж валюти
               SELECT   '2' ko, o.rnkd, o.REF, o.accd, o.nlsd, o.kv, o.acck, o.nlsk, o.nazn,
@@ -1410,7 +1415,7 @@ BEGIN
          v_sql_ :=
             ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
-          ||'        decode(kodb,''300001'',''3'',''2'') q024, '
+          ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
           ||'               else       ''00'' '
           ||'          end) d100, dat_a, dat, ref, '
@@ -1423,7 +1428,7 @@ BEGIN
           ||' union all '
           ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
-          ||'        decode(kodb,''300001'',''3'',''2'') q024, '
+          ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
           ||'        (case  when nvl(swap_tag,0) != 0  then  ''05'' '
           ||'               else       ''00'' '
           ||'          end) d100, dat_b, dat, ref, '
@@ -1437,7 +1442,7 @@ BEGIN
          v_sql_ :=
             ' select ''3'' f091, kva r030, suma t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
-          ||'        decode(kodb,''300001'',''3'',''2'') q024, '
+          ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
           ||'         ''00''  d100, dat_a, dat, ref, '
           ||'       (select count(*) from operw o where o.ref=f.ref '
           ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
@@ -1448,7 +1453,7 @@ BEGIN
           ||' union all '
           ||' select ''4'' f091, kvb r030, sumb t071, ''0000000006'' k020, ''3'' k021, '
           ||'        (select nb from rcukru where glb=6) q001, '
-          ||'        decode(kodb,''300001'',''3'',''2'') q024, '
+          ||'        decode(kodb,''300001'',''3'',''NBUAUAUXXXX'',''3'',''2'') q024, '
           ||'        ''00'' d100, dat_b, dat, ref, '
           ||'       (select count(*) from operw o where o.ref=f.ref '
           ||'                          and tag =''FOREX'' and trim(value) =''SPOT'')  op_spot '
