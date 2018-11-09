@@ -37,7 +37,7 @@ select p.REPORT_DATE
      , c.NMK  CUST_NAME
      , p.BRANCH
   from NBUR_LOG_FI5X p
-       join NBUR_REF_FILES f on (f.FILE_CODE = 'I5X')
+       join NBUR_REF_FILES f on (f.FILE_CODE = '#I5')
        join NBUR_LST_FILES v on (v.REPORT_DATE = p.REPORT_DATE)
                                 and (v.KF = p.KF)
                                 and (v.VERSION_ID = p.VERSION_ID)
