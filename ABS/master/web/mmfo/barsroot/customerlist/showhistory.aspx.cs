@@ -8,6 +8,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Web;
+using System.Text;
 
 namespace CustomerList
 {
@@ -284,9 +286,10 @@ namespace CustomerList
                     }
                 }
             }
+            string fileName = String.Format("Історія_рах_{0}.xls", nls_name.Value.ToString());
             Response.Clear();
             Response.Buffer = true;
-            Response.AddHeader("content-disposition", "attachment;filename=CustHistory.xls");
+            Response.AddHeader("content-disposition", "attachment;filename="+ HttpUtility.UrlEncode(fileName, Encoding.UTF8));
             Response.Charset = "";
             Response.ContentType = "application/vnd.ms-excel";
 
@@ -322,7 +325,10 @@ namespace CustomerList
 
                     //string style = @"<style> .textmode { } </style>";
 
-                    string style = @"<style> td { mso-number-format:'### ### ### ### ### ##0.00'; } </style> ";
+                    string style = @"<style> 
+                                        td { mso-number-format:'### ### ### ### ### ##0.00'; }
+                                        td.fdate_cell { mso-number-format:'Short Date' }
+                                    </style> ";
 
                     Response.Output.Write(style);
                     Response.Output.Write(string.Join("<br>", hat));
@@ -344,7 +350,15 @@ namespace CustomerList
                             BoundField boundfield = new BoundField();
                             string ht = table2.Columns[i].ColumnName.ToString();
                             string df = table2.Columns[i].DefaultValue.ToString();
-                            boundfield.HeaderText = (ht == "CH_FDAT") ? "Дата руху" : "";
+
+                            if( ht == "CH_FDAT")
+                            {
+                                boundfield.ItemStyle.CssClass = "fdate_cell";
+                                boundfield.HeaderText = "Дата руху";
+                            }
+                            else
+                                boundfield.HeaderText = "";
+
                             boundfield.DataField = ht;
                             excel.Columns.Add(boundfield);
                         }
