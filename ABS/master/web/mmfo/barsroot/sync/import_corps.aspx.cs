@@ -74,7 +74,7 @@ public partial class admin_sync_import_corps : BarsPage
         dsCustomers.PreliminaryStatement = OraConnector.Handler.IOraConnection.GetSetRoleCommand(role_name);
 
         dsCustomers.SelectCommand = @"select KF,CUST_RNK,CUST_ID,NAME,CUST_CODE,ADDRESS,DATE_ON,LEGAL_NAME,CHIEF_NAME,CHIEF_PHONE,BOOKKEEPER_NAME,BOOKKEEPER_PHONE,BRANCH_CODE,BRANCH_NAME,IMPORTED 
-                                    from barsaq.v_sync_customers where cust_type_id = 2";
+                                    from barsaq.v_sync_customers where cust_type_id in (1, 2)";
 
         gvCustomers.DataBind();
 
