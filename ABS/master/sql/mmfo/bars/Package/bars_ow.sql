@@ -6127,6 +6127,52 @@ begin
 
       end if;
 
+     -- Перевод виду рахункок на маску NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
+      if (p_nlsa is null and p_nlsb not like 'NLS%') or  
+         (p_nlsb is null and p_nlsa not like 'NLS%') then
+            
+         -- определяем нормальный счет, по которому потом определим бранч
+         if p_atrn.debit_anlaccount not like 'NLS%' then
+            l_nls := p_atrn.debit_anlaccount;
+            l_kv  := p_atrn.debit_currency;
+         elsif p_atrn.credit_anlaccount not like 'NLS%' then
+            l_nls := p_atrn.credit_anlaccount;
+            l_kv  := p_atrn.credit_currency;
+         end if;
+
+         -- определяем бранч
+         if l_nls is not null then
+            begin
+               select tobo into l_branch
+                 from accounts
+                where nls = l_nls and kv = l_kv;
+            exception when no_data_found then
+               l_branch := null;
+            end;
+         end if;
+         if l_branch is not null then
+
+            if p_nlsa is null then
+               l_nls := p_atrn.debit_anlaccount;
+               -- счет NLS_3801OO
+               if l_nls like 'NLS%' then
+                 l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
+                 p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+               -- нормальный счет - оставляем как есть
+               end if;
+            end if;
+
+            if p_nlsb is null then
+               l_nls := p_atrn.credit_anlaccount;
+               -- счет NLS_3801OO
+               if l_nls like 'NLS%' then
+                     l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
+                     p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+               end if;
+               -- нормальный счет - оставляем как есть
+            end if;
+         end if;        
+     end if;
    end if;
 
 end get_nls_cardpay;
@@ -7050,7 +7096,7 @@ begin
       end if;
 
       if bpay then
-         if substr(l_nlsa,1,4) in ('2909', '2900') then
+         if substr(l_nlsa,1,4) in ('2909', '2900', '1919') then
             begin
                if not check_available(l_nlsa, l_atrn(i).debit_currency, l_atrn(i).debit_amount) then
                   bPay   := false;
@@ -7644,7 +7690,7 @@ begin
          end if;
       end if;
       if bpay then
-         if substr(l_nlsa,1,4) in ('2909', '2900') then
+         if substr(l_nlsa,1,4) in ('2909', '2900', '1919') then
             begin
                if not check_available(l_nlsa, l_atrn(i).debit_currency, l_atrn(i).debit_amount) then
                   bPay   := false;
@@ -12424,7 +12470,8 @@ begin
   -- открытие карточного счета
   op_reg_lock(99, 0, 0, l_grp, l_tmp, p_customer.rnk, l_nls, p_product.kv, l_nms,
      p_product.tip, user_id, l_acc, 1, null,
-     l_vid, null, null, null, null, case when p_product.custtype = 1 then null else 26 end, null, null, null, null, p_branch);
+     l_vid, null, null, null, null, case when p_product.custtype = 1 then null else case when p_product.nbs = '1919' then null else 26 end end, 
+     null, null, null, null, p_branch);
   -- по ЮО закриваємо рахунок і ставимо його в чергу на підтвердження
   if p_product.custtype <> 1 then
      update accounts a set a.dazs = bankdate, a.nbs = null where a.acc = l_acc;
@@ -17580,6 +17627,13 @@ begin
         update w4_acc_instant
            set state  = 2
          where acc = p_acc(i);
+		-- рахунки для НБУ не відправляютьсяв податкову, тому 
+		--після підтвердження активації відправляємо заявку в кардмейк
+		if l_product.nbs = '1919' then 
+           update cm_client_que t
+              set t.oper_status = 1
+            where t.id = l_row.reqid;
+		end if;
 
       end if;
       insert into w4_conf_acc_stat

@@ -201,7 +201,8 @@ AS
                                                     '2655',
                                                     '2552',
                                                     '2554',
-                                                    '2600')
+                                                    '2600',
+													'1919')
                    AND c.rnk = cw.rnk(+)
                    AND cw.tag(+) = 'WORKB') o
            LEFT JOIN bpk_parameters bp1
