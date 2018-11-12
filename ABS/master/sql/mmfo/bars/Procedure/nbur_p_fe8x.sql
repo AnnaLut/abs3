@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования E8X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.003 19/09/2018 (31/07/2018)
+% VERSION     :  v.18.004   09/11/2018 (19/09/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.003    19.09.2018';
+  ver_                     char(30)  := 'v.18.004    09/11/2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -121,7 +121,7 @@ BEGIN
            a.q001, a.q029, a.k074, a.k110, a.k040, 
            (case when a.ku_1 = '0' then '#' else a.ku_1 end) as ku_1, 
            a.q020, a.k020, a.k014, 
-           d.r020, d.r030, b.q003_1, b.q003_2, b.q007_1, b.q007_2, 
+           d.r020, d.r030, c.q003_1, b.q003_2, b.q007_1, b.q007_2, 
            d.t070_1, d.t070_2, d.t070_3, d.t070_4, 
            nvl(trim(c.t090), '0.0000') as t090, a.k021, 
            d.acc_id, d.acc_num, d.kv, d.cust_id, d.branch
