@@ -40,7 +40,7 @@ select v."RNK",v."TGR",v."CUSTTYPE",v."COUNTRY",v."NMK",v."NMKV",v."NMKK",v."COD
           from customer_rel t
          where t.rnk = v.rnk and t.rel_id = 20 ) last_name_contact
   from customer v
- where v.custtype = 2
+ where v.custtype in(1, 2)
    and v.date_off is null;
 
 PROMPT *** Create  grants  V_BPK_CUSTOMER_UO ***
