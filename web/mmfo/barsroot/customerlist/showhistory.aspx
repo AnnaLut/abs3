@@ -18,7 +18,7 @@
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.blockUI.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/jquery/jquery.custom.js"></script>
 
-    <script language="javascript" src="Scripts/AccHistory.js?v1.3"></script>
+    <script language="javascript" src="Scripts/AccHistory.js?v1.4"></script>
     <script language="JavaScript" src="Scripts/Common.js"></script>
     <script language="javascript" src="/Common/Script/Localization.js"></script>
     <script language="javascript" src="/Common/WebEdit/RadInput.js"></script>
@@ -197,6 +197,7 @@
         <input type="hidden" id="wgDeleteAll" value="Удалить все" />
         <input runat="server" type="hidden" id="forbtPrintHtml" meta:resourcekey="forbtPrintHtml" value="Печать выписки по счету за период(html формат)" />
         <input runat="server" type="hidden" id="forbtPrintRtf" meta:resourcekey="forbtPrintRtf" value="Печать выписки по счету за период(rtf формат)" />
+        <asp:HiddenField runat="server" ID="nls_name" />
 
         <div style="display: block; margin: 10px 0px 0px 0px">
         </div>

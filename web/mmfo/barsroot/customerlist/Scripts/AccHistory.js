@@ -25,6 +25,7 @@ function SetTilte()
 {
   document.getElementById("Title").innerText = returnServiceValue[2].text;
   nls = returnServiceValue[3].text;
+  document.getElementById("nls_name").value = nls;
   insertXslRowSelectionTooltip();
 }
 function IniDateTimeControl(name)
