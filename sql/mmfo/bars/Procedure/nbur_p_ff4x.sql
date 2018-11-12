@@ -122,7 +122,7 @@ BEGIN
                         t.seg_09 as D020,
                         t.seg_10 as R030,
                         t.seg_11 as K140,
-                        to_number(trim(t.field_value)) as znap,
+                        sum(to_number(trim(t.field_value))) as znap,
                         t.acc_num, 
                         t.kv,
                         t.field_code as kodp, 
@@ -136,7 +136,40 @@ BEGIN
                         t.maturity_date
                     from v_nbur_#f4_dtl t
                     where t.report_date = p_report_date and
-                         t.kf = p_kod_filii)
+                         t.kf = p_kod_filii and
+                         t.seg_01 = '1'
+                    group by t.seg_01, t.seg_02, t.seg_03, t.seg_04, t.seg_05, t.seg_06, t.seg_07, t.seg_08, t.seg_09, t.seg_10, t.seg_11,
+                             t.acc_num, t.kv, t.field_code, t.nbuc, t.cust_id, t.acc_id, t.ref, t.description, t.nd, t.branch, t.maturity_date
+                    union all
+                      select 
+                        t.seg_01 as DD,
+                        t.seg_02 as T020,
+                        t.seg_03 as R020,
+                        t.seg_04 as R011,
+                        t.seg_06 as K072,
+                        t.seg_07 as S180,
+                        t.seg_09 as D020,
+                        t.seg_10 as R030,
+                        t.seg_11 as K140,
+                        max(to_number(trim(t.field_value))) as znap,
+                        t.acc_num, 
+                        t.kv,
+                        t.field_code as kodp, 
+                        t.nbuc, 
+                        t.cust_id, 
+                        t.acc_id, 
+                        t.ref,
+                        t.description,
+                        t.nd,
+                        t.branch,
+                        t.maturity_date
+                    from v_nbur_#f4_dtl t
+                    where t.report_date = p_report_date and
+                         t.kf = p_kod_filii and
+                         t.seg_01 = '2'
+                    group by t.seg_01, t.seg_02, t.seg_03, t.seg_04, t.seg_05, t.seg_06, t.seg_07, t.seg_08, t.seg_09, t.seg_10, t.seg_11,
+                             t.acc_num, t.kv, t.field_code, t.nbuc, t.cust_id, t.acc_id, t.ref, t.description, t.nd, t.branch, t.maturity_date                    
+                    )
                   pivot (max(znap) for dd in ('1' as T070, '2' as T090)) 
                   group by t020, r020, r011, k072, s180, d020, r030, k140, 
                            acc_num, kv, nbuc, cust_id, acc_id, ref, description, 
