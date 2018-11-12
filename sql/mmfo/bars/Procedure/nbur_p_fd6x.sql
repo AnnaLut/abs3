@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования D6X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.001  31/08/2018 
+% VERSION     :  v.1.002  09/11/2018 (31/08/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.001  31/08/2018';
+  ver_              char(30)  := 'v.1.002  09/11/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   c_old_file_code   constant varchar2(3 char) := '#D6';
@@ -133,7 +133,7 @@ BEGIN
                 from v_nbur_#d6_dtl t
                 where t.report_date = p_report_date and
                      t.kf = p_kod_filii and
-                     regexp_like(field_code, '^(1(1|2)*2)') -- залишки
+                     t.field_code like '1%2' -- залишки
                 ) t  
                 left join accounts a
                 on (t.acc_id = a.acc)   
