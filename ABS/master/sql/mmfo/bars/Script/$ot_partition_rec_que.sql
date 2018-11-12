@@ -44,7 +44,7 @@ execute immediate 'rename TMP_REC_QUE to REC_QUE';
 end;
 /
 COMMENT ON TABLE BARS.REC_QUE IS 'Очередь визирования документов';
-COMMENT ON COLUMN BARS.REC_QUE.REF IS 'Референс документа';
+COMMENT ON COLUMN BARS.REC_QUE.REС IS 'Референс документа';
 COMMENT ON COLUMN BARS.REC_QUE.FMCHECK IS '1-проверено фин.мониторингом';
 COMMENT ON COLUMN BARS.REC_QUE.KF IS '';
 COMMENT ON COLUMN BARS.REC_QUE.OTM IS 'Признак возврата на пред.визу';
