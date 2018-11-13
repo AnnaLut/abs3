@@ -7,6 +7,8 @@ CREATE OR REPLACE procedure BARS.BANK_PF
   l_dat2    date;
    -- единая для РУ ОБ, ГОУ ОБ, НАДРА
    /*
+   31.10.2018 Sta  Для 300465 : Уменьшение  на сумму возвратов - приперечислении налогов в ДКУ.
+
    20.10.2016 MMFO для P_MODE in (1, 3, 4) додано цикл по КF (МФО), return замінено на continue;
    20.11.2015 ing 3622/38 перечисляется как видно на єкране из v_pdfo (а не иначе)
    29.05.2015 Sta Від кого:  Демкович М.С.  Дата 27.05.2015  REF №: 13/3-03/301
@@ -30,6 +32,8 @@ CREATE OR REPLACE procedure BARS.BANK_PF
                  = 2 - Перекриття, перерахування сум ПДФО до бюджету по Бранчам (3522/29,3622/37)
    */
    -------------------------------------------------------------
+   SX_        number ;
+   AX         ACCOUNTS%ROWTYPE;
    Q5_        NUMBER := 0;
    oo         oper%ROWTYPE;
    A12        ACCOUNTS%ROWTYPE;
@@ -59,21 +63,14 @@ BEGIN
   l_dat1 := nvl( p_dat1, to_date( pul.Get_Mas_Ini_Val('sFdat1'), 'dd.mm.yyyy' ) ) ;
   l_dat2 := nvl( p_dat2, to_date( pul.Get_Mas_Ini_Val('sFdat2'), 'dd.mm.yyyy' ) ) ;
 
-   IF NVL (P_MODE, 0) NOT IN (0, 1, 2, 3, 4)
-   THEN
-      RETURN;
-   END IF;
+   IF NVL (P_MODE, 0) NOT IN (0, 1, 2, 3, 4)   THEN      RETURN;   END IF;
 
    -------------------------------------------------------------
-   IF p_mode = 2
-   THEN
+   IF p_mode = 2   THEN
       --Перекриття, перерахування сум ПДФО до бюджету по Бранчам (3522/29,3622/37)
       --Перекриття, перерахування сум ВЗ   до бюджету по Бранчам (3522/30,3622/36+38)
 
-      SELECT ' за ' || NAME_PLAIN || ' ' || to_char( extract( year from l_dat3 ) )
-        INTO sMes_
-        FROM META_MONTH
-       WHERE N = extract( month from l_dat3 );
+      SELECT ' за ' || NAME_PLAIN || ' ' || to_char( extract( year from l_dat3 ) )    INTO sMes_    FROM META_MONTH  WHERE N = extract( month from l_dat3 );
 
       oo.id_a := gl.aOkpo;
       oo.dk   := 1;
@@ -82,108 +79,57 @@ BEGIN
       oo.id_a := gl.aOkpo;
 
       FOR k IN (SELECT *
-                  FROM (SELECT nls6 NLS6,
-                               a6.nms NMS6,
-                               nls5 NLS5,
-                               a5.nms NMS5,
-                               a6.BRANCH,
-                               V100 as V,
-                               P100 as P,
-                               a6.nbs B6,
-                               a6.ob22 O6,
-                               a5.nbs B5,
-                               a5.ob22 O5
-                          FROM V_PDFO v, accounts a5, accounts a6
-                         WHERE a5.acc(+) = v.acc5 AND a6.acc = v.acc6)
-                 WHERE (v > 0 OR p > 0))
+                FROM (SELECT nls6 NLS6,    a6.nms NMS6,  a6.nbs B6,   a6.ob22 O6, 
+                             nls5 NLS5,    a5.nms NMS5,  a5.nbs B5,   a5.ob22 O5,  a6.BRANCH,    V100 as V,       P100 as P
+                      FROM V_PDFO v, accounts a5, accounts a6     WHERE a5.acc(+) = v.acc5 AND a6.acc = v.acc6 )
+                WHERE (v > 0 OR p > 0)
+               )
       LOOP
+         sx_ := 0 ;
+
+         If gl.aMfo ='300465' and k.nls5 ='3522502960000' then -- 29 =перерахунок ПДФО, утриманий з процентних доходўв  за вкладними (депозитними), поточними рахунками фўзичних осўб
+            select * into AX from accounts where nls = '3522129' and kv = 980 and tip ='RET';
+            sx_ := least ( k.p, - AX.ostb );  -- сумма переплаты
+            k.P :=  k.P - sx_ ;
+---         If NOT ( k.v > 0 OR k.p > 0 ) then goto RET_ ; end if;
+         end if ;
+
+         If gl.aMfo ='300465' and k.nls5 ='3522503060000' then -- 30 = вўйськовий збўр, утриманий з процентних доходўв  за вкладними (депозитними), поточними рахунками фўзичних осўб
+            select * into AX from accounts where nls = '3522930' and kv = 980 and tip ='RET';
+            sx_ := least ( k.p, - AX.ostb );  -- сумма переплаты
+            k.P :=  k.P - sx_ ;
+--          If NOT ( k.v > 0 OR k.p > 0 ) then goto RET_; end if;
+         end if;
+         
          BEGIN
-            SELECT SUBSTR (val, 1, 06)
-              INTO oo.mfob
-              FROM BRANCH_PARAMETERS
-             WHERE branch = k.branch AND tag = 'PDFOMFO' AND val IS NOT NULL;
 
-            SELECT SUBSTR (val, 1, 08)
-              INTO oo.id_b
-              FROM BRANCH_PARAMETERS
-             WHERE branch = k.branch AND tag = 'PDFOID' AND val IS NOT NULL;
-
-            SELECT SUBSTR (val, 1, 38)
-              INTO oo.nam_b
-              FROM BRANCH_PARAMETERS
-             WHERE branch = k.branch AND tag = 'PDFONAM' AND val IS NOT NULL;
-
+            SELECT SUBSTR (val, 1, 06)  INTO oo.mfob  FROM BRANCH_PARAMETERS     WHERE branch = k.branch AND tag = 'PDFOMFO' AND val IS NOT NULL;
+            SELECT SUBSTR (val, 1, 08)  INTO oo.id_b  FROM BRANCH_PARAMETERS     WHERE branch = k.branch AND tag = 'PDFOID' AND val IS NOT NULL;
+            SELECT SUBSTR (val, 1, 38)  INTO oo.nam_b FROM BRANCH_PARAMETERS     WHERE branch = k.branch AND tag = 'PDFONAM' AND val IS NOT NULL;
             /*
               19-02-2015
             - для перерахування військового збору – відповідно значення /11011000/.
             - для перерахування ПДФО – проставляти значення /11010800/;
             */
-        if (INSTR (oo.nam_b, '/') != 0)
-            then
-              oo.nam_b := SUBSTR (oo.nam_b, 1, INSTR (oo.nam_b, '/') - 1);
-            end if;
-
-            IF k.B6 = '3622' AND k.o6 IN ('36', '38')
-            THEN
-				sDet_ := 'Військовий збір '||case when  k.o6='38' then 'від погашених купонів казначейських зобов’язань ' else  ' з процентних доходів ' end;
-               --sDet_ := 'Військовий збір';
-               oo.nam_b := SUBSTR ('/11011000/'||oo.nam_b, 1, 38);
-
-               SELECT SUBSTR (val, 1, 14)
-                 INTO oo.nlsb
-                 FROM BRANCH_PARAMETERS
-                WHERE branch = k.branch
-                  AND tag = 'PDFOVZB'
-                  AND val IS NOT NULL;
-            ELSE
-			    sDet_ := 'ПДФО з процентних доходів ';
-               --sDet_ := 'ПДФО';
-               oo.nam_b := SUBSTR ('/11010800/' || oo.nam_b, 1, 38);
-
-               SELECT SUBSTR (val, 1, 14)
-                 INTO oo.nlsb
-                 FROM BRANCH_PARAMETERS
-                WHERE branch = k.branch
-                  AND tag = 'PDFONLS'
-                  AND val IS NOT NULL;
+            if (INSTR (oo.nam_b, '/') != 0)            then oo.nam_b := SUBSTR (oo.nam_b, 1, INSTR (oo.nam_b, '/') - 1);       end if;
+            IF k.B6 = '3622' AND k.o6 IN ('36', '38')  THEN oo.nam_b := SUBSTR ('/11011000/'||oo.nam_b, 1, 38);
+               sDet_ := 'Військовий збір '||case when  k.o6='38' then 'від погашених купонів казначейських зобов’язань ' else  ' з процентних доходів ' end;
+               SELECT SUBSTR (val, 1, 14) INTO oo.nlsb FROM BRANCH_PARAMETERS     WHERE branch = k.branch  AND tag = 'PDFOVZB'  AND val IS NOT NULL;
+            ELSE  sDet_ := 'ПДФО з процентних доходів ';    oo.nam_b := SUBSTR ('/11010800/' || oo.nam_b, 1, 38);
+               SELECT SUBSTR (val, 1, 14) INTO oo.nlsb FROM BRANCH_PARAMETERS     WHERE branch = k.branch  AND tag = 'PDFONLS'  AND val IS NOT NULL;
             END IF;
 
-            SELECT SUBSTR ('. ' || name, 1, 160)
-              INTO oo.nazn
-              FROM branch
-             WHERE branch = k.branch;
+            SELECT SUBSTR ('. ' || name, 1, 160)       INTO oo.nazn  FROM branch  WHERE branch = k.branch;
 
             gl.REF (oo.REF);
-            oo.nd := TRIM (SUBSTR ('     ' || TO_CHAR (oo.REF), -10));
-            oo.nlsa := k.nls6;
+            oo.nd    := TRIM (SUBSTR ('     ' || TO_CHAR (oo.REF), -10));
+            oo.nlsa  := k.nls6;
             oo.nam_a := SUBSTR (k.nms6, 1, 38);
 
-            SELECT SUBSTR (k.nmkk, 1, 38)
-              INTO oo.nam_a
-              FROM customer k, accounts a
-             WHERE k.rnk = a.rnk AND a.kv = 980 AND a.nls = oo.nlsa;
+            SELECT SUBSTR (k.nmkk, 1, 38)              INTO oo.nam_a FROM customer k, accounts a   WHERE k.rnk = a.rnk AND a.kv = 980 AND a.nls = oo.nlsa;
 
-            IF k.p > 0
-            THEN
-               oo.tt := 'PS2';
-               oo.s := k.P;
-               oo.vob := 1;
-               oo.nazn := SUBSTR ('*;101;' || gl.aOkpo || ';' || sDet_ || sMes_ || ';;;' || oo.nazn, 1, 160);
-             --oo.nazn := SUBSTR ('*;101;' || gl.aOkpo || ';' || sDet_ || ' з процентних доходів ' || sMes_ || ';;;' || oo.nazn, 1, 160);
-            /*
-            --13-08-2014 Sta Назн пл от МС Демкович
-            *;101;<gl.aOkpo>;ПДФО з процентних доходів <sMes_>;;;
-            -- 09.01.2015
-            Як приклад для Луганська: ідентиф код 09304612
-            *;101;09304612;ПДФО з процентних доходів  за__________ 2014;;;
-            *;101;09304612;Військовий збір з процентних доходів за__________ 2014;;;
-
-            */
-            ELSE
-               oo.tt   := 'PS1';
-               oo.s    := k.V;
-               oo.vob  := 6;
-               oo.nazn := SUBSTR ('Перекриття сум ' || sDet_ || '.' || sMes_ || oo.nazn, 1, 160);
+            IF k.p > 0 THEN  oo.tt := 'PS2' ; oo.s := k.P ; oo.vob := 1; oo.nazn := SUBSTR ('*;101;' || gl.aOkpo || ';' || sDet_ || sMes_ || ';;;' || oo.nazn, 1, 160);
+            ELSE             oo.tt := 'PS1' ; oo.s := k.V ; oo.vob := 6; oo.nazn := SUBSTR ('Перекриття сум ' || sDet_ || '.' || sMes_ || oo.nazn, 1, 160);
                oo.id_b := gl.aOkpo;
                oo.mfob := gl.aMfo;
                oo.nlsb := k.nls5;
@@ -219,36 +165,14 @@ BEGIN
                         sos_     => 1,
                         prty_    => NULL,
                         uid_     => NULL);
-            PAYTT (0,
-                   oo.REF,
-                   gl.bdate,
-                   oo.tt,
-                   oo.dk,
-                   oo.kv,
-                   oo.nlsa,
-                   oo.s,
-                   oo.kv,
-                   oo.nlsb,
-                   oo.s);
+            PAYTT (0, oo.REF, gl.bdate, oo.tt, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.s);
+            IF k.p > 0 AND k.v > 0  THEN  gl.payv (0, oo.REF, gl.bdate, 'PS1', oo.dk, oo.kv, oo.nlsa, k.V, oo.kv, K.NLS5, oo.s);        END IF;
+            ------------------
+--          <<RET_>> null ;
+            ------------------
+            IF sx_ > 0 THEN  gl.payv (0, oo.REF, gl.bdate, 'PS1', 1, oo.kv, oo.nlsa, SX_, oo.kv, AX.NLS, SX_);        END IF;
 
-            IF k.p > 0 AND k.v > 0
-            THEN
-               gl.payv (0,
-                        oo.REF,
-                        gl.bdate,
-                        'PS1',
-                        oo.dk,
-                        oo.kv,
-                        oo.nlsa,
-                        k.V,
-                        oo.kv,
-                        K.NLS5,
-                        oo.s);
-            END IF;
-         EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN NULL;                                                        --
-                 raise_application_error (-20000,'Не знайдено пл.реквiзити для ПДФО/ВЗ для бранчу='|| k.branch);
+         EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error (-20000,'Не знайдено пл.реквiзити для ПДФО/ВЗ для бранчу='|| k.branch);
          END;
       END LOOP;
       RETURN;
