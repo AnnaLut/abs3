@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="12/28/2015 12:01:11" ReportInfo.Modified="11/06/2018 15:46:40" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
+      <TableDataSource Name="Table" Alias="Table1" DataType="System.Int32" Enabled="true" SelectCommand="select NUM00 CV, CHAR00 TN, DAT00 BG, DAT01 DATZ, CHAR01 WB, DAT02 ED, NUM01 JOBID, CHAR02 JOBNAME, NUM02 RUNID, DAT03 BDAT, DAT04 SDAT, DAT05 FDAT, NUM03 USERID, CHAR03 USERNAME, CHAR04 BRANCH, CHAR05 BRANCHNAME, CHAR06 DPTNUM, CHAR07 OKPO, CHAR08 CCNUM, NUM04 CURID, CHAR09 CURNAME, NUM05 REF, NUM06 DPTSUM, NUM07 INTSUM, NUM08 DPTID, NUM09 CNTDBL, CHAR10 NLSZ, NUM10 FAСTRATE, NUM11 BR, NUM12 BRATE, NUM13 WBBONUS, NUM14 DBLBONUS, NUM15 ZPBONUS, NUM16 EXCLBONUS, NUM17 EXTN, NUM18 MAXBONUS, NUM19 STATUS, CHAR11 ERRMSG from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+        <Column Name="JOBID" DataType="System.Decimal"/>
+        <Column Name="JOBNAME" DataType="System.String"/>
+        <Column Name="RUNID" DataType="System.Decimal"/>
+        <Column Name="BDAT" DataType="System.DateTime"/>
+        <Column Name="SDAT" DataType="System.DateTime"/>
+        <Column Name="FDAT" DataType="System.DateTime"/>
+        <Column Name="USERID" DataType="System.Decimal"/>
+        <Column Name="USERNAME" DataType="System.String"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="BRANCHNAME" DataType="System.String"/>
+        <Column Name="DPTNUM" DataType="System.String"/>
+        <Column Name="OKPO" DataType="System.String"/>
+        <Column Name="CURID" DataType="System.Int16"/>
+        <Column Name="CURNAME" DataType="System.String"/>
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="DPTSUM" DataType="System.Decimal"/>
+        <Column Name="INTSUM" DataType="System.Decimal"/>
+        <Column Name="STATUS" DataType="System.Decimal"/>
+        <Column Name="ERRMSG" DataType="System.String"/>
+        <Column Name="CV" DataType="System.Decimal"/>
+        <Column Name="TN" DataType="System.String"/>
+        <Column Name="ED" DataType="System.DateTime"/>
+        <Column Name="NLSZ" DataType="System.String"/>
+        <Column Name="DPTID" DataType="System.Decimal"/>
+        <Column Name="CNTDBL" DataType="System.Decimal"/>
+        <Column Name="FAСTRATE" DataType="System.Decimal"/>
+        <Column Name="BR" DataType="System.Decimal"/>
+        <Column Name="BRATE" DataType="System.Decimal"/>
+        <Column Name="WBBONUS" DataType="System.Decimal"/>
+        <Column Name="DBLBONUS" DataType="System.Decimal"/>
+        <Column Name="ZPBONUS" DataType="System.Decimal"/>
+        <Column Name="EXCLBONUS" DataType="System.Decimal"/>
+        <Column Name="MAXBONUS" DataType="System.Decimal"/>
+        <Column Name="CCNUM" DataType="System.String"/>
+        <Column Name="BG" DataType="System.DateTime"/>
+        <Column Name="WB" DataType="System.String"/>
+        <Column Name="DATZ" DataType="System.DateTime"/>
+        <Column Name="EXTN" DataType="System.Decimal"/>
+        <CommandParameter Name="session_id" DataType="112" Expression="session_id" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Description="0"/>
+    <Total Name="Total_S" Expression="[Table1.DPTSUM]"/>
+    <Total Name="Total_INT" Expression="[Table1.INTSUM]"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="520" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1890" Height="97.4" Guides="147">
+      <TextObject Name="Text3" Top="11.65" Width="1879.04" Height="34.9" Text="Протокол виконання автоматичної операції &#13;&#10;Автопереоформлення вкладів" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text4" Top="45.95" Width="1879.04" Height="51.45" Text="Виконавець: [Table1.USERID]&#13;&#10;            Час: [FormatDateTime([Table1.SDAT],&quot;yyyy-MM-dd HH:mm:ss&quot;)] - [FormatDateTime([Table1.FDAT],&quot;yyyy-MM-dd HH:mm:ss&quot;)]&#13;&#10;  Банк.дата: [Table1.BDAT]" VertAlign="Center">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+          <DateFormat Format="F"/>
+          <DateFormat/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <DataBand Name="Data2" Top="187" Width="1890" Height="50.9" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0" DataSource="Table">
+      <TableObject Name="Table1" Width="1878.96" Height="50.9" GrowToBottom="true">
+        <TableColumn Name="Column42" Width="113.4"/>
+        <TableColumn Name="Column14" Width="130.41"/>
+        <TableColumn Name="Column46" Width="151.2"/>
+        <TableColumn Name="Column15" Width="190.13"/>
+        <TableColumn Name="Column44"/>
+        <TableColumn Name="Column40" Width="37.8"/>
+        <TableColumn Name="Column16" Width="37.8"/>
+        <TableColumn Name="Column17" Width="37.8"/>
+        <TableColumn Name="Column49" Width="75.6"/>
+        <TableColumn Name="Column38" Width="85.05"/>
+        <TableColumn Name="Column18" Width="96.77"/>
+        <TableColumn Name="Column19" Width="119.83"/>
+        <TableColumn Name="Column20" Width="43.85"/>
+        <TableColumn Name="Column21" Width="57.78"/>
+        <TableColumn Name="Column22" Width="48.38"/>
+        <TableColumn Name="Column29" Width="52.54"/>
+        <TableColumn Name="Column32"/>
+        <TableColumn Name="Column31"/>
+        <TableColumn Name="Column30"/>
+        <TableColumn Name="Column33"/>
+        <TableColumn Name="Column50"/>
+        <TableColumn Name="Column36"/>
+        <TableColumn Name="Column23" Width="137.57"/>
+        <TableRow Name="Row2" Height="50.9">
+          <TableCell Name="Cell82" Border.Lines="All" Border.Style="Dot" Text="[Table1.BRANCH]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Border.Style="Dot" Text="[Table1.DPTNUM]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell88" Border.Lines="All" Border.Style="Dot" Text="[Table1.TN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell35" Border.Lines="All" Border.Style="Dot" Text="[Table1.CCNUM]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell85" Border.Lines="All" Border.Style="Dot" Text="[Table1.CURID]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell79" Border.Lines="All" Border.Style="Dot" Text="[Table1.WB]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" Border.Style="Dot" Text="[Table1.NLSZ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" Border.Lines="All" Border.Style="Dot" Text="[Table1.CNTDBL]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell91" Border.Lines="Top, Bottom" Border.Style="Dot" Text="[Table1.DATZ]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell76" Border.Lines="All" Border.Style="Dot" Text="[Table1.BG]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Border.Style="Dot" Text="[Table1.ED]" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Border.Style="Dot" Text="[Table1.DPTSUM]" Format="Number" Format.UseLocale="true" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Border.Style="Dot" Text="[Table1.FAСTRATE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Border.Style="Dot" Text="[Table1.BR]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="All" Border.Style="Dot" Text="[Table1.BRATE]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell64" Border.Lines="All" Border.Style="Dot" Text="[Table1.WBBONUS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell67" Border.Lines="All" Border.Style="Dot" Text="[Table1.DBLBONUS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell66" Border.Lines="All" Border.Style="Dot" Text="[Table1.ZPBONUS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell65" Border.Lines="All" Border.Style="Dot" Text="[Table1.EXCLBONUS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell68" Border.Lines="All" Border.Style="Dot" Text="[Table1.MAXBONUS]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell92" Border.Lines="Top, Bottom" Border.Style="Dot" Text="[Table1.EXTN]" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell73" Border.Lines="All" Border.Style="Dot" Text="[Table1.RUNID]" HorzAlign="Right" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Border.Style="Dot" Text="[Table1.ERRMSG]" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+      <DataHeaderBand Name="DataHeader1" Top="101.4" Width="1890" Height="81.6" CanGrow="true" CanShrink="true">
+        <TableObject Name="Table1" Top="24.9" Width="1879.02" Height="56.7">
+          <TableColumn Name="Column41" Width="113.4"/>
+          <TableColumn Name="Column1" Width="130.45"/>
+          <TableColumn Name="Column45" Width="151.2"/>
+          <TableColumn Name="Column12" Width="190.05"/>
+          <TableColumn Name="Column43"/>
+          <TableColumn Name="Column39" Width="37.8"/>
+          <TableColumn Name="Column2" Width="37.8"/>
+          <TableColumn Name="Column24" Width="37.8"/>
+          <TableColumn Name="Column48" Width="75.6"/>
+          <TableColumn Name="Column37" Width="85.05"/>
+          <TableColumn Name="Column13" Width="96.75"/>
+          <TableColumn Name="Column11" Width="119.85"/>
+          <TableColumn Name="Column3" Width="43.95"/>
+          <TableColumn Name="Column4" Width="57.83"/>
+          <TableColumn Name="Column5" Width="48.3"/>
+          <TableColumn Name="Column6" Width="52.55"/>
+          <TableColumn Name="Column25"/>
+          <TableColumn Name="Column26"/>
+          <TableColumn Name="Column27"/>
+          <TableColumn Name="Column28"/>
+          <TableColumn Name="Column47"/>
+          <TableColumn Name="Column35"/>
+          <TableColumn Name="Column34" Width="137.59"/>
+          <TableRow Name="Row3" Height="56.7">
+            <TableCell Name="Cell80" Border.Lines="All" Fill.Color="LightBlue" Text="Підрозділ" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell49" Border.Lines="All" Fill.Color="LightBlue" Text="Номер договору " HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell86" Border.Lines="All" Fill.Color="LightBlue" Text="Вид депозитного договору" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell50" Border.Lines="All" Fill.Color="LightBlue" Text="Депозитний рахунок" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell83" Border.Lines="All" Fill.Color="LightBlue" Text="Валюта" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell77" Border.Lines="All" Fill.Color="LightBlue" Text="WB" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell51" Border.Lines="All" Fill.Color="LightBlue" Text="З/п&#13;&#10;рах" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell52" Border.Lines="All" Fill.Color="LightBlue" Text="Кiл.&#13;&#10;пр-й" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell90" Border.Lines="Top, Bottom" Fill.Color="LightBlue" Text="Дата заключення деп.договору" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell74" Border.Lines="All" Fill.Color="LightBlue" Text="Дата початку деп. договору" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+            <TableCell Name="Cell53" Border.Lines="All" Fill.Color="LightBlue" Text="Дата закінчення деп. договору" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell54" Border.Lines="All" Fill.Color="LightBlue" Text="Сума  депозиту (грн.)" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell55" Border.Lines="All" Fill.Color="LightBlue" Text="Факт%&#13;&#10;став." HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell56" Border.Lines="All" Fill.Color="LightBlue" Text="Код баз.&#13;&#10;ставки" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell57" Border.Lines="All" Fill.Color="LightBlue" Text="Знач.&#13;&#10;баз.ставки" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell58" Border.Lines="All" Fill.Color="LightBlue" Text="WEB" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell59" Border.Lines="All" Fill.Color="LightBlue" Text="прол.прогрес" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell60" Border.Lines="All" Fill.Color="LightBlue" Text="ЗП" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell61" Border.Lines="All" Fill.Color="LightBlue" Text="за суму" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell62" Border.Lines="All" Fill.Color="LightBlue" Text="(макс)" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell89" Border.Lines="All" Fill.Color="LightBlue" Text="пролон" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell71" Border.Lines="All" Fill.Color="LightBlue" Text="№  запуска" HorzAlign="Center" VertAlign="Center"/>
+            <TableCell Name="Cell69" Border.Lines="All" Fill.Color="LightBlue" Text="Текст повідомлення про помилку " HorzAlign="Center" VertAlign="Center"/>
+          </TableRow>
+        </TableObject>
+        <TextObject Name="Text1" Left="1292.2" Width="383.29" Height="24.15" Border.Lines="Left, Right, Top" Fill.Color="LightBlue" Text="Бонуси" HorzAlign="Center" VertAlign="Center"/>
+      </DataHeaderBand>
+    </DataBand>
+  </ReportPage>
+</Report>
