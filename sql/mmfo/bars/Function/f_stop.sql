@@ -44,6 +44,7 @@ IS
      21.10.2013 mom - контроль продажи валюты на эквивалент >= 150000 грн.
      25.11.2014 ing - контроль наличной выдачи металлов с депозита на эквивалент 15000 грн.
      14.09.2016 soshko контроль валюты и металлов до 250000 грн в эквиваленте
+     07.07.2018 LGV - kod = 9995 - STOP правило на перерахування з деп.рахунків на акційний депозит - COBUMMFO-9995
    */
    e_br           VARCHAR2 (100);
 
@@ -99,7 +100,9 @@ IS
   l_sum_month oper.s%type;
   l_comproc   dpt_vidd.comproc%type;
   l_is_bnal   dpt_depositw.value%type;
-
+  --9995
+  l_type_code dpt_vidd.type_cod%type;
+  
    p_value2       operw.VALUE%TYPE;
    n1_            NUMBER;
    ern   CONSTANT POSITIVE := 803;
@@ -3285,7 +3288,56 @@ end ;
       end if;
 
     end; -- end of 1478
-    
+   
+   /* ограничение на пополнение акционного депозита MDPL*/
+   elsif kod_ = 9995 then
+
+    begin
+      
+     begin
+      select dd.deposit_id, dd.acc, v.term_add, dd.dat_begin, dd.limit, v.comproc, v.vidd, v.type_cod
+      into l_deposit, l_acc, l_term_add, l_dat_begin, l_limit, l_comproc, l_vidd, l_type_code
+      from dpt_deposit dd, accounts a, dpt_vidd v
+      where dd.acc = a.acc
+       and a.nls = NLS_
+       and a.kv = KV_
+       and dd.vidd = v.vidd;
+       
+     exception when no_data_found then
+       return 0;
+     end ;
+     
+     bars_audit.trace('9995 ' || 'l_type_code ' || l_type_code);
+       
+     if l_type_code = 'MDPL' then
+      
+         l_ref := 0;
+      
+         begin   
+               select o.ref 
+               into l_ref
+               from oper o,
+                    ttsap t
+               where o.ref = p_ref
+                 and o.nlsa like '2630%' 
+                 and o.nlsb = NLS_
+                 and o.tt = t.tt --in ('DP2', '215', '015', '515', '013')
+                 and t.ttap = '!!P';
+                 
+        exception when no_data_found then
+               l_ref := 0;   
+        end;
+ 
+        bars_audit.trace('9995 ' || 'l_ref ' || to_char(l_ref));
+
+        if nvl(l_ref,0) > 0 then
+           erm := '******Заборонено перерозміщення коштів з депозитних ракунків на акційний';
+           raise err;
+        end if;
+     end if;  -- MDPL
+     
+    end; -- end of 9995 
+ 
    ELSIF KOD_ = 9999 THEN
       select t.nlsa, t.nlsb
         into l_nlsa, l_nlsb
