@@ -74,7 +74,8 @@ AS
                   || (SELECT name
                         FROM bars.country
                        WHERE country = ca.country)
-				  || ', ' || ca.locality || 
+				  || ', ' 
+				  || ca.locality 
                   || ', '
                   || ca.address
              FROM bars.customer_address ca
