@@ -26,7 +26,7 @@ create or replace type t_core_loan under t_core_object
     dayproc       number(5),
     factendday    date,
     flagz         varchar2(5 char),
-    klass         varchar2(1 char),
+    klass         varchar2(2 char),
     risk          number(32),
     flaginsurance varchar2(5 char),
 
