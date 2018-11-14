@@ -421,6 +421,17 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('D1#3M', 'CLS', 'O', 0, 112, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D1#3M'', ''CLS'', ''O'', 0, 112, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('D1#E2', 'CLS', 'O', 1, 40, null, null);
   exception
     when dup_val_on_index then null;
@@ -745,12 +756,12 @@ begin
   delete from chklist_tts where tt='CLS';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (2, 'CLS', 4, null, null, null);
+    values (11, 'CLS', 4, null, null, null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''CLS'', 4, null, null, null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''CLS'', 4, null, null, null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

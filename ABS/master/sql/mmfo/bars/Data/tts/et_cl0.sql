@@ -2,8 +2,8 @@ set lines 1000
 set trimspool on
 set serveroutput on size 1000000
 
-prompt Создание / Обновление операции CLO
-prompt Наименование операции: CLO-SWIFT-доручення (іноземна валюта, OUR)
+prompt Создание / Обновление операции CL0
+prompt Наименование операции: CL0-SWIFT-доручення (іноземна валюта, OUR)
 declare
   cnt_  number;
 begin
@@ -432,6 +432,17 @@ begin
   end;
   begin
     insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
+    values ('D1#3M', 'CL0', 'O', 0, 50, null, null);
+  exception
+    when dup_val_on_index then null;
+    when others then
+      if ( sqlcode = -02291 ) then
+        dbms_output.put_line('Не удалось добавить запись (op_rules: ''D1#3M'', ''CL0'', ''O'', 0, 50, null, null) - первичный ключ не найден!');
+      else raise;
+      end if;
+  end;
+  begin
+    insert into op_rules(TAG, TT, OPT, USED4INPUT, ORD, VAL, NOMODIFY)
     values ('D1#E2', 'CL0', 'O', 1, 40, null, null);
   exception
     when dup_val_on_index then null;
@@ -789,12 +800,12 @@ begin
   delete from chklist_tts where tt='CL0';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (2, 'CL0', 4, null, null, 3);
+    values (11, 'CL0', 4, null, null, 3);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''CL0'', 4, null, null, 3) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 11, ''CL0'', 4, null, null, 3) - первичный ключ не найден!');
       else raise;
       end if;
   end;
@@ -849,11 +860,3 @@ begin
 end;
 /
 commit;
-
-delete BARS.TMP_TTS_REGION where tt = 'CL0' and nls_type = 'NLSK';
-
-Insert into BARS.TMP_TTS_REGION
-   (TT, NLS_TYPE, KF, NLS_STMT)
- Values
-   ('CL0', 'NLSK', '0', '#(get_proc_nls(''T00'',#(KVA)))');
-COMMIT;
