@@ -875,9 +875,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
                 insert into operw(ref, tag, value)
                 values(p_ref, p_dreclist(i).tag, p_dreclist(i).val);
                 if p_dreclist(i).tag = 'ф' then
-                   update oper op
-                      set op.d_rec = op.d_rec || '#'||p_dreclist(i).tag||p_dreclist(i).val||'#'
-                    where op.ref = p_ref;
+                  update oper op
+                     set op.d_rec = op.d_rec || '#'||p_dreclist(i).tag||p_dreclist(i).val||'#'
+                   where op.ref = p_ref;
                 end if;
              exception when others then
                 case sqlcode
@@ -2131,6 +2131,8 @@ is
 
     l_paymode       number(1); -- как платить(по-факту, по-плану)
     l_sos           smallint;
+    l_ccodea        varchar2(100);
+    l_adr           varchar2(150);
 
 begin
 
@@ -2359,6 +2361,10 @@ begin
                 prty_   => 0,
                 uid_    => l_userid
             );
+            
+            select bars.bars_swift.StrToSwift(ca.locality,'TRANS'), 
+                   bars.bars_swift.StrToSwift(ca.address,'TRANS')
+            into l_ccodea, l_adr from bars.customer_address ca, bars.accounts acc where ca.rnk = acc.rnk and acc.nls = p_nlsa and acc.kv = p_kv and acc.dazs is null and ca.type_id = 1;
 
 
             add_dop_req(l_ref, 'EXREF', to_char(p_doc_id),
@@ -2378,13 +2384,13 @@ begin
                                     else '50K' end,
                 '/'||p_nlsa||'$nl$1/'
                    ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end,1,32)||'$nl$2/'
-                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresa,'TRANS') else p_adresa end,1,32)||'$nl$3/'
-                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(upper(p_ccodea),'TRANS') else upper(p_ccodea) end ,1,32),
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(l_adr,'TRANS') else l_adr end,1,32)||'$nl$3/'
+                   ||'UA/'||l_ccodea,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-            add_dop_req(l_ref, '52A', l_biccode,
+            add_dop_req(l_ref, '52A', trim(l_biccode),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             if (p_swiftib is not null and length(trim(p_swiftib)) > 0) then
-                add_dop_req(l_ref, '56A', p_swiftib,
+                add_dop_req(l_ref, '56A', trim(p_swiftib),
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             end if;
             add_dop_req(l_ref, '57A', case when p_coracbb is null then p_swiftbb else
@@ -2394,9 +2400,9 @@ begin
             add_dop_req(l_ref, '59',
                    case when substr(p_nlsb,1,1) = '/' then substr(upper(p_nlsb),1,32)||'$nl$'
                                                       else '/'||substr(upper(p_nlsb),1,32)||'$nl$' end
-                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,1,32)||'$nl$'
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,1,34)||'$nl$'
                    ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end)>32 then substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnameb,'TRANS') else p_fnameb end,33,32)||'$nl$' else '' end 
-                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end,1,32)||'$nl$'
+                   ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end,1,34)||'$nl$'
                    ||case when length(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end)>32 then substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_adresb,'TRANS') else p_adresb end,33,32) else '' end,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
                 
@@ -2416,9 +2422,9 @@ begin
             add_dop_req(l_ref, '71A', substr(p_sw71a,1,34),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
                 
-            add_dop_req(l_ref, '72', substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_dopreq,'TRANS') else p_dopreq end,1,32),
+            /*add_dop_req(l_ref, '72', substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_dopreq,'TRANS') else p_dopreq end,1,32),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
-
+            */
             if (l_blank_ser is not null and l_blank_num is not null) then
                 add_dop_req(l_ref, l_sideA_tag, 'серія ' || l_blank_ser || ' номер ' || l_blank_num,
                     p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
