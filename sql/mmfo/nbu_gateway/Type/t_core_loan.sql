@@ -307,7 +307,8 @@ CREATE OR REPLACE TYPE BODY t_core_loan is
         l_tranche_keys bars.string_list;
         l integer;
     begin
-
+	
+	if (factEndDay is not null) then 
         l_attributes.extend(100);
         l_attributes(1) := json_utl.make_json_value('orderNum', '1', p_mandatory => true);
         l_attributes(2) := json_utl.make_json_value('flagOsoba', flagOsoba, p_mandatory => true);
@@ -333,7 +334,34 @@ CREATE OR REPLACE TYPE BODY t_core_loan is
         l_attributes(22) := json_utl.make_json_value('klass', klass, p_mandatory => true);
         l_attributes(23) := json_utl.make_json_value('risk', risk, p_mandatory => true);
         l_attributes(24) := json_utl.make_json_value('flagInsurance', nvl(flagInsurance, 'false'), p_mandatory => true);
-
+	else
+		l_attributes.extend(100);
+        l_attributes(1) := json_utl.make_json_value('orderNum', '1', p_mandatory => true);
+        l_attributes(2) := json_utl.make_json_value('flagOsoba', flagOsoba, p_mandatory => true);
+        l_attributes(3) := json_utl.make_json_value('codCredit', nvl(codCredit, 0), p_mandatory => true);
+        l_attributes(4) := json_utl.make_json_value('codMan', codMan, p_mandatory => true);
+        l_attributes(5) := json_utl.make_json_value('typeCredit', typeCredit, p_mandatory => true);
+        l_attributes(6) := json_utl.make_json_string('numberDog', numberDog, p_mandatory => true);
+        l_attributes(7) := json_utl.make_json_date('dogDay', dogDay, p_mandatory => true);
+        l_attributes(8) := json_utl.make_json_date('endDay', endDay, p_mandatory => true);
+        l_attributes(9) := json_utl.make_json_value('sumZagal', sumZagal, p_mandatory => true);
+        l_attributes(10) := json_utl.make_json_string('r030', r030, p_mandatory => true);
+        l_attributes(11) := json_utl.make_json_value('procCredit', to_char(procCredit, 'FM99990.00'), p_mandatory => true);
+        l_attributes(12) := json_utl.make_json_value('sumPay', nvl(sumPay, 0), p_mandatory => true);
+        l_attributes(13) := json_utl.make_json_value('periodBase', periodBase, p_mandatory => true);
+        l_attributes(14) := json_utl.make_json_value('periodProc', periodProc, p_mandatory => true);
+        l_attributes(15) := json_utl.make_json_value('sumArrears', nvl(sumArrears, 0), p_mandatory => true);
+        l_attributes(16) := json_utl.make_json_value('arrearBase', nvl(arrearBase, 0), p_mandatory => true);
+        l_attributes(17) := json_utl.make_json_value('arrearProc', nvl(arrearProc, 0), p_mandatory => true);
+        l_attributes(18) := json_utl.make_json_value('dayBase', nvl(dayBase, 0), p_mandatory => true);
+        l_attributes(19) := json_utl.make_json_value('dayProc', nvl(dayProc, 0), p_mandatory => true);
+        l_attributes(20) := json_utl.make_json_date('factEndDay', factEndDay, p_mandatory => false);
+        l_attributes(21) := json_utl.make_json_value('flagZ', nvl(flagZ, 'false'), p_mandatory => true);
+        l_attributes(22) := json_utl.make_json_value('klass', klass, p_mandatory => true);
+        l_attributes(23) := json_utl.make_json_value('risk', risk, p_mandatory => true);
+        l_attributes(24) := json_utl.make_json_value('flagInsurance', nvl(flagInsurance, 'false'), p_mandatory => true);
+	end if;
+		
         if (pledge is not null and pledge is not empty) then
             l_pledge_items := bars.string_list();
             l_pledge_items.extend(pledge.count);
