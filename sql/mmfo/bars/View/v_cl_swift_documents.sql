@@ -68,7 +68,7 @@ AS
              FROM bars.oper_visa ov
             WHERE ov.REF = o.REF AND ov.groupid = 25)
              username_start_sdo,
-          'AT "–û—â–∞–¥–±–∞–Ω–∫"' first_name_bank_start_sdo,
+          'AT "Œ˘‡‰·‡ÌÍ"' first_name_bank_start_sdo,
           (SELECT ov.kf
              FROM bars.oper_visa ov
             WHERE ov.REF = o.REF AND ov.groupid = 25)
@@ -96,29 +96,29 @@ AS
              WHEN o.kv = 978
              THEN
                 REPLACE (
-                   REPLACE (bars.f_sumpr (o.s, o.kv, 'M'), 'EUR', '—î–≤—Ä–æ'),
-                   '—Ü–Ω—Ç',
-                   '—î–≤—Ä–æ—Ü–µ–Ω—Ç—ñ–≤')
+                   REPLACE (bars.f_sumpr (o.s, o.kv, 'M'), 'EUR', '∫‚Ó'),
+                   'ˆÌÚ',
+                   '∫‚ÓˆÂÌÚ≥‚')
              WHEN o.kv = 840
              THEN
                 REPLACE (
                    REPLACE (bars.f_sumpr (o.s, o.kv, 'M'),
                             'USD',
-                            '–¥–æ–ª–∞—Ä—ñ–≤'),
-                   '—Ü–Ω—Ç',
-                   '—Ü–µ–Ω—Ç—ñ–≤')
+                            '‰ÓÎ‡≥‚ —ÿ¿'),
+                   'ˆÌÚ',
+                   'ˆÂÌÚ≥‚')
              WHEN o.kv = 643
              THEN
                 REPLACE (
                    REPLACE (bars.f_sumpr (o.s, o.kv, 'M'),
                             'RUB',
-                            '—Ä—É–±–ª—ñ–≤'),
-                   '–∫–æ–ø',
-                   '–∫–æ–ø—ñ–π–æ–∫')
+                            'Û·Î≥‚'),
+                   'ÍÓÔ',
+                   'ÍÓÔ≥ÈÓÍ')
           END
              sumpr,
           o.nlsa,
-          (SELECT c.nmk
+          (SELECT c.nmkk
              FROM bars.customer c, accounts a
             WHERE a.rnk = c.rnk AND a.nls = o.nlsa AND a.kv = o.kv)
              nam_a,
@@ -127,6 +127,8 @@ AS
                   || (SELECT name
                         FROM country c
                        WHERE c.country = ca.country)
+                  || ', '
+                  ||ca.locality
                   || ', '
                   || ca.address
              FROM bars.customer_address ca, accounts a
@@ -139,7 +141,7 @@ AS
              FROM bars.banks$base bb
             WHERE bb.mfo = o.mfoa)
              payer_bank_name,
-          (SELECT '–£–∫—Ä–∞—ó–Ω–∞, ' || bav.attribute_value
+          (SELECT '”Í‡øÌ‡, ' || bav.attribute_value
              FROM bars.branch_attribute_value bav
             WHERE     bav.attribute_code = 'ADDRESS'
                   AND bav.branch_code = '/' || o.kf || '/')
@@ -154,7 +156,7 @@ AS
              FROM bars.operw ow
             WHERE ow.REF = o.REF AND ow.tag = '56A')
              bic_mediator,
-          (SELECT sb.office || ', ' || sb.city || ', ' || sb.country
+          (SELECT sb.office || ', ' || sb.country
              FROM bars.sw_banks sb
             WHERE sb.bic = (SELECT ow.VALUE
                               FROM bars.operw ow
@@ -176,11 +178,11 @@ AS
                      (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
                                 WHEN '/'
                                 THEN
-                                   SUBSTR (ow.VALUE,
+                                   trim(SUBSTR (ow.VALUE,
                                            INSTR (ow.VALUE, CHR (13)) + 1,
-                                           11)
+                                           11))
                                 ELSE
-                                   SUBSTR (ow.VALUE, 1, 11)
+                                   trim(SUBSTR (ow.VALUE, 1, 11))
                              END
                         FROM bars.operw ow
                        WHERE ow.REF = o.REF AND ow.tag = '57A'))
@@ -188,35 +190,30 @@ AS
           (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
                      WHEN '/'
                      THEN
-                        SUBSTR (ow.VALUE, INSTR (ow.VALUE, CHR (13)) + 1, 11)
+                        trim(SUBSTR (ow.VALUE, INSTR (ow.VALUE, CHR (13)) + 1, 11))
                      ELSE
-                        SUBSTR (ow.VALUE, 1, 11)
+                        trim(SUBSTR (ow.VALUE, 1, 11))
                   END
              FROM bars.operw ow
             WHERE ow.REF = o.REF AND ow.tag = '57A')
              bic_bank_beneficar,
-          (SELECT sb.office || ', ' || sb.city || ', ' || sb.country
+          (SELECT sb.office || ', ' || sb.country
              FROM bars.sw_banks sb
             WHERE sb.bic =
-                     (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
+                       (SELECT CASE SUBSTR (ow.VALUE, 1, 1)
                                 WHEN '/'
                                 THEN
-                                   SUBSTR (ow.VALUE,
+                                   trim(SUBSTR (ow.VALUE,
                                            INSTR (ow.VALUE, CHR (13)) + 1,
-                                           11)
+                                           11))
                                 ELSE
-                                   SUBSTR (ow.VALUE, 1, 11)
+                                   trim(SUBSTR (ow.VALUE, 1, 11))
                              END
                         FROM bars.operw ow
                        WHERE ow.REF = o.REF AND ow.tag = '57A'))
              address_bank_beneficar,
           (SELECT SUBSTR (ow.VALUE,
-                          2,
-                            INSTR (ow.VALUE,
-                                   '/',
-                                   1,
-                                   3)
-                          - 3)
+                          2)
              FROM bars.operw ow
             WHERE ow.REF = o.REF AND ow.tag = '59')
              acc_beneficar,
@@ -224,16 +221,16 @@ AS
                             INSTR (ow.VALUE,
                                    '/',
                                    1,
-                                   3)
+                                   2)
                           + 1,
                             INSTR (ow.VALUE,
                                    '/',
                                    1,
-                                   4)
-                          - INSTR (ow.VALUE,
+                                   3)
+                          - (INSTR (ow.VALUE,
                                    '/',
                                    1,
-                                   3))
+                                   2) + 1))
              FROM bars.operw ow
             WHERE ow.REF = o.REF AND ow.tag = '59')
              name_beneficar,
@@ -241,12 +238,12 @@ AS
                             INSTR (ow.VALUE,
                                    '/',
                                    1,
-                                   4)
+                                   3)
                           + 1)
              FROM bars.operw ow
             WHERE ow.REF = o.REF AND ow.tag = '59')
              address_beneficar,
-          (SELECT ow.VALUE
+          (SELECT replace(replace(ow.VALUE,chr(10),''), chr(13), '')
              FROM bars.operw ow
             WHERE ow.REF = o.REF AND ow.tag = '70')
              remit_info,
@@ -287,7 +284,7 @@ AS
              FROM bars.oper_visa ov
             WHERE ov.REF = o.REF AND ov.groupid = 7)
              username_val_kont,
-          'AT "–û—â–∞–¥–±–∞–Ω–∫"' first_name_bank_val_kont,
+          'AT "Œ˘‡‰·‡ÌÍ"' first_name_bank_val_kont,
           (SELECT ov.kf
              FROM bars.oper_visa ov
             WHERE ov.REF = o.REF AND ov.groupid = 7)
@@ -312,7 +309,7 @@ AS
              FROM bars.oper_visa ov
             WHERE ov.REF = o.REF AND ov.groupid = 11)
              username_complete,
-          'AT "–û—â–∞–¥–±–∞–Ω–∫"' first_name_bank_complete,
+          'AT "Œ˘‡‰·‡ÌÍ"' first_name_bank_complete,
           (SELECT ov.kf
              FROM bars.oper_visa ov
             WHERE ov.REF = o.REF AND ov.groupid = 11)
@@ -326,7 +323,7 @@ AS
                               || '/')
              name_bank_complete
      FROM bars.tmp_cl_payment tcp, bars.oper o
-    WHERE tcp.REF = o.REF AND tcp.TYPE = 2
+    WHERE tcp.REF = o.REF AND tcp.TYPE = 2;
 /
 
 
