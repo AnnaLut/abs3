@@ -1076,7 +1076,7 @@ procedure p_nbu_finperformancepr_uo( kf_ in varchar2)
                                          nd_acc n,
                                          accounts a2
                                   where ag.fdat = add_months(trunc(sysdate,'mm'),-1) and
-                                        a2.tip in ('SS ','SP ', 'SN ','SPN','SNO','CR9','SRR'/*,'SK0'*/) and
+                                        a2.tip in ('SS ','SP ', 'SN ','SPN','SNO','SRR'/*'CR9','SK0'*/) and
                                         n.acc = a2.acc and
                                         n.acc = ag.acc)
                             group by nd, kv) sumarrears on ad.nd = sumarrears.nd and ad.kv = sumarrears.kv
