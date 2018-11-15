@@ -1038,5 +1038,19 @@ namespace BarsWeb.Areas.SalaryBag.Controllers.Api
             }
         }
         #endregion
+
+        [HttpGet]
+        public HttpResponseMessage GetBranches()
+        {
+            try
+            {
+                var data = _repo.SearchGlobal<Branches>(null, SqlCreator.BranchesList());
+                return Request.CreateResponse(HttpStatusCode.OK, data);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ExeptionProcessing(ex));
+            }
+        }
     }
 }

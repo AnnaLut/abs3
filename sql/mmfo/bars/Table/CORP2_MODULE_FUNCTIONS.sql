@@ -26,14 +26,14 @@ end;
 
 -- Add comments to the table 
 comment on table CORP2_MODULE_FUNCTIONS
-  is 'функции модулей системы';
+  is 'Функції модулів системи';
 -- Add comments to the columns 
 comment on column CORP2_MODULE_FUNCTIONS.module_id
-  is 'Id модуля';
+  is 'Ід модуля';
 comment on column CORP2_MODULE_FUNCTIONS.func_id
-  is 'Id функции';
+  is 'Ід функції';
 comment on column CORP2_MODULE_FUNCTIONS.sort_order
-  is 'Порядок сортировки';
+  is 'Порядок сортуваня';
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin

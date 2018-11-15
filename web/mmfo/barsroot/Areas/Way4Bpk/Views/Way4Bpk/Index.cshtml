@@ -1,15 +1,16 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
     //ViewBag.Title = "Way4Bpk";
 }
 
-<script src="~/lib/jsZip/jszip.js"></script>
-<script src="~/Scripts/respond.min.js"></script>
-<script src="~/Areas/Way4Bpk/Scripts/KendoCommon.js?v1.0"></script>
-<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/NewCard.js?v1.1.6"></script>
-<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/AddParams.js?v1.3.3"></script>
-<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/Main.js?v1.1.6"></script>
-<link rel="stylesheet" href="~/Areas/Way4Bpk/Css/Way4Bpk/Main.css" />
+<script src="~/lib/jsZip/jszip.js?12_02_2018__17_10_04"></script>
+<script src="~/Scripts/respond.min.js?12_02_2018__17_10_04"></script>
+<script src="~/Areas/Way4Bpk/Scripts/KendoCommon.js?12_02_2018__17_10_04"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/NewCard.js?12_02_2018__17_10_04"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/AddParams.js?12_02_2018__17_10_04"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/Main.js?12_02_2018__17_10_04"></script>
+<script src="~/Areas/Way4Bpk/Scripts/Way4Bpk/ViewDocumentsFromEA.js?12_02_2018__17_10_04"></script>
+<link rel="stylesheet" href="~/Areas/Way4Bpk/Css/Way4Bpk/Main.css?12_02_2018__17_10_04" />
 
 <div class="page-header">
     <h3 id="title"></h3>
@@ -20,24 +21,24 @@
         <tr>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label for="ndNumber"><b>Номер угоди:</b></label>
+                    <label for="ndNumber" class="bold">Номер угоди:</label>
                     <input type="text" class="form-control" id="ndNumber" placeholder="Вкажіть номер угоди" style="display: inline;width: 150px" />
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label for="accNls"><b>Картковий рахунок:</b></label>
+                    <label for="accNls" class="bold">Картковий рахунок:</label>
                     <input type="text" class="form-control" id="accNls" placeholder="Вкажіть рахунок" style="display: inline;width: 140px" />
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label for="custName"><b>ПІБ (назва) клієнта:</b></label>
+                    <label for="custName" class="bold">ПІБ (назва) клієнта:</label>
                     <input type="text" class="form-control" id="custName" placeholder="Вкажіть ПІБ(назву)" style="display: inline;width: 180px" />
                 </div>
-            </td>            
+            </td>
             <td>
-                <button id="SearchBtn" type="button" class="btn btn-primary" style="margin-bottom:15px" >
+                <button id="SearchBtn" type="button" class="btn btn-primary" style="margin-bottom:15px">
                     <i class="fa fa-search"></i> Пошук
                 </button>
             </td>
@@ -45,24 +46,24 @@
         <tr>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label for="okpo"><b>ІПН:</b></label>
+                    <label for="okpo" class="bold">ІПН:</label>
                     <input type="text" class="form-control" id="okpo" placeholder="Вкажіть ІПН" style="display: inline;width: 140px" />
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label for="passState"><b>Стан передачі:</b></label>
-                    <input type="text" class="form-control" id="passState" style="width: 120px"/>
+                    <label for="passState" class="bold">Стан передачі:</label>
+                    <input type="text" class="form-control" id="passState" style="width: 120px" />
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label for="passDateSelect"><b>Дата передачі:</b></label>
+                    <label for="passDateSelect" class="bold">Дата передачі:</label>
                     <input type="text" class="form-control" id="passDateSelect" style="width: 140px" />
                 </div>
             </td>
         </tr>
-    </table>    
+    </table>
     <div class="clearfix"></div>
 </div>
 
@@ -75,10 +76,10 @@
     <div class="row">
         <div class="col-md-4">
             <a class='k-button' id="edtOper" onclick="showReferOper()"><i class='pf-icon pf-16 pf-book'></i></a>
-            <label class="control-label" for="edtOper"><b>Виберіть операцію</b></label>
+            <label class="control-label bold" for="edtOper">Виберіть операцію</label>
             <div id="edtOperValue"></div>
         </div>
-    </div>    
+    </div>
     <br>
     <div class="row">
         <div class="col-md-3">
@@ -105,25 +106,25 @@
             <td>
                 <div id="fo_W4_PRODUCT_GROUPS_REF" class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4ProductGrp" onclick="showRefer('W4_PRODUCT_GROUPS_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
-                    <label class="control-label" for="gBpkW4ProductGrp"><b>Група продуктів</b></label>
+                    <label class="control-label bold" for="gBpkW4ProductGrp">Група продуктів</label>
                 </div>
             </td>
             <td>
                 <div id="fo_GBPKW4PROECT_REF" class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4Proect" onclick="showRefer('GBPKW4PROECT_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
-                    <label class="control-label" for="gBpkW4Proect"><b>Зарплатний проект</b></label>
+                    <label class="control-label bold" for="gBpkW4Proect">Зарплатний проект</label>
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4Product" onclick="showRefer('GBPKW4PRODUCT_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
-                    <label class="control-label" for="gBpkW4Product"><b>Виберіть Продукт</b></label>
+                    <label class="control-label bold" for="gBpkW4Product">Виберіть Продукт</label>
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4Card" onclick="showRefer('GBPKW4CARD_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
-                    <label class="control-label" for="gBpkW4Card"><b>Виберіть картку</b></label>
+                    <label class="control-label bold" for="gBpkW4Card">Виберіть картку</label>
                 </div>
             </td>
         </tr>
@@ -148,43 +149,65 @@
             <td>
                 <div class="form-group" style="margin-right:15px">
                     <a class='k-button' id="gBpkW4Customer" onclick="showRefer('GBPKW4CUSTOMER_REF')"><i class='pf-icon pf-16 pf-book'></i></a>
-                    <label class="control-label" for="gBpkW4Customer"><b>Виберіть клієнта</b></label>
+                    <label class="control-label bold" for="gBpkW4Customer">Виберіть клієнта</label>
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label class="control-label" for="newCardRnk" placeholder="Вкажіть РНК"><b>РНК</b></label>
+                    <label class="control-label bold" for="newCardRnk" placeholder="Вкажіть РНК">РНК</label>
                     <input type="text" id="newCardRnk" style="display: inline;width: 140px" />
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label class="control-label" for="newCardIpn" placeholder="Вкажіть ІПН"><b>ІПН</b></label>
+                    <label class="control-label bold" for="newCardIpn" placeholder="Вкажіть ІПН">ІПН</label>
                     <input type="text" id="newCardIpn" style="display: inline;width: 140px" />
                 </div>
             </td>
             <td>
                 <div class="form-group" style="margin-right:15px">
-                    <label class="control-label" for="newCardPib" placeholder="Вкажіть ПІБ(назву)"><b>ПІБ(назва)</b></label>
+                    <label class="control-label bold" for="newCardPib" placeholder="Вкажіть ПІБ(назву)">ПІБ(назва)</label>
                     <input type="text" id="newCardPib" width="140" />
                 </div>
             </td>
         </tr>
         <tr>
             <td>
+                @*<div class="form-group" style="margin-right:15px"><div id="gBpkW4CustomerValue" onclick="openClientCard(1);" title="Відкрити карточку клієнта" class="clickable"></div></div>*@
                 <div class="form-group" style="margin-right:15px"><div id="gBpkW4CustomerValue"></div></div>
             </td>
+            <td class="docs-scan">
+                <div class="form-group" style="margin-right:15px">
+                    <a style="color:blue;text-decoration:underline;" id="ScanDocsBtn" onclick="ShowDialog(); return false;">Сканувати</a>
+                </div>
+            </td>
+            <td class="docs-scan">
+                <div class="form-group" style="margin-right:15px">
+                    <a style="color:blue;text-decoration:underline;" id="ShowEaDocs" onclick="ShowDocsFromEa(); return false;">Переглянути документи</a>
+                </div>
+            </td>
+            <td class="docs-scan">
+                <div class="form-group" style="margin-right:15px">
+                    <label for="DocsVerified">Документи перевірено</label>
+                    <input type="checkbox" id="DocsVerified" onclick="processDocsVerifiedChange(this);" />
+                </div>
+            </td>
+        </tr>
+        <tr class="only-fo">
             <td>
-                <div class="form-group" style="margin-right:15px"></div>
+                <button id="btnEditClient" type="button" class="btn btn-primary" style="margin-bottom:15px" title="Редагувати обраного клієнта" onclick="openClientCard(0);" disabled>
+                    <i class="fa fa-edit"></i> Редагувати
+                </button>
             </td>
             <td>
-                <div class="form-group" style="margin-right:15px"></div>
-            </td>
-            <td>
-                <div class="form-group" style="margin-right:15px"></div>
+                <button id="btnCreateNewClient" type="button" class="btn btn-primary" style="margin-bottom:15px" title="Створити нового клієнта" onclick="openClientegistration();">
+                    <i class="fa fa-plus"></i> Новий клієнт
+                </button>
             </td>
         </tr>
     </table>
+    <hr />
+
     <hr />
     <div class="alert alert-danger" id="selectNewCardErrorText">
         Не всі дані заповнено
@@ -196,18 +219,18 @@
 
 <div id="dialogGo2BackOffice" style="display:none">
     <div class="search-Go2BackOffice"></div>
-    
+
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label for="passDate"><b>Дата передачі справ до бек-офісу:</b></label>
+                <label for="passDate" class="bold">Дата передачі справ до бек-офісу:</label>
                 <input type="text" class="form-control" id="passDate" placeholder="Вкажіть дату" style="display: inline;width: 180px" />
                 <div id="passDateErrorMsg" class="alert alert-danger">Дата не може бути більше поточної.</div>
             </div>
         </div>
         <div class="col-md-4 col-md-offset-1">
             <div class="form-group">
-                <label for="passStateDdl"><b>Стан передачі справ до бек-офісу:</b></label>
+                <label for="passStateDdl" class="bold">Стан передачі справ до бек-офісу:</label>
                 <input type="text" class="form-control" id="passStateDdl" style="width:210px" />
             </div>
         </div>
@@ -228,7 +251,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <a class='k-button' id="BUS_MOD" onclick="showReferAddParams('BUS_MOD', ' WHERE BUS_MOD_ID = 13 ')"><i class='pf-icon pf-16 pf-book'></i></a>
-                <label class="control-label" for="BUS_MOD"><b>Тип бізнес моделі для договору</b></label>
+                <label class="control-label bold" for="BUS_MOD">Тип бізнес моделі для договору</label>
                 <hr />
                 <div id="BUS_MOD_Tag"></div>
                 <div id="BUS_MOD_Value"></div>
@@ -237,7 +260,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <a class='k-button' id="IFRS" onclick="showReferAddParams('IFRS', ' WHERE IFRS_ID = \'AC\' ')"><i class='pf-icon pf-16 pf-book'></i></a>
-                <label class="control-label" for="IFRS_MOD"><b>Класифікаіція за МСФЗ</b></label>
+                <label class="control-label bold" for="IFRS_MOD">Класифікаіція за МСФЗ</label>
                 <hr />
                 <div id="IFRS_Tag"></div>
                 <div id="IFRS_Value"></div>
@@ -246,7 +269,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <a class='k-button' id="SPPI" onclick="showReferAddParams('SPPI', ' WHERE SPPI_ID= \'Так\' ')"><i class='pf-icon pf-16 pf-book'></i></a>
-                <label class="control-label" for="SPPI"><b>Відповідність критерію SPPI</b></label>
+                <label class="control-label bold" for="SPPI">Відповідність критерію SPPI</label>
                 <hr />
                 <div id="SPPI_Tag"></div>
                 <div id="SPPI_Value"></div>
@@ -271,19 +294,19 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label for="ndCardUpdate"><b>Номер договору:</b></label>
+                <label for="ndCardUpdate" class="bold">Номер договору:</label>
                 <input type="text" class="form-control" id="ndCardUpdate" readonly style="background-color:cornsilk;display: inline;width: 180px" />
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label for="accNlsCardUpdate"><b>Картковий рахунок:</b></label>
+                <label for="accNlsCardUpdate" class="bold">Картковий рахунок:</label>
                 <input type="text" class="form-control" id="accNlsCardUpdate" readonly style="background-color:cornsilk;display: inline;width:180px" />
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label for="idatCardUpdate"><b>Дата видачі картки:</b></label>
+                <label for="idatCardUpdate" class="bold">Дата видачі картки:</label>
                 <input type="text" class="form-control" id="idatCardUpdate" style="display: inline;width: 180px" />
                 <div id="idatCardUpdateErrorMsg" class="alert alert-danger">Дата не може бути більше поточної.</div>
             </div>

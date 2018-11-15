@@ -3,42 +3,37 @@ using System.Collections.Generic;
 
 namespace Bars.WebServices.XRM.Services.DepositXrm.Models
 {
-    public class AccessRequestReq
+    public class BOAccessRequest
     {
-        public Decimal TransactionId;
-        public String UserLogin;
-        public Int16 OperationType;
-        public Decimal Type;
-        public String TrusteeType;
-        public Decimal Rnk;
-        public String CertifNumber;
-        public DateTime CertifDate;
-        public DateTime StartDate;
-        public DateTime FinishDate;
-        public AccessList[] AccessList;
+        public Decimal Type { get; set; }
+        public String TrusteeType { get; set; }
+        public Decimal Rnk { get; set; }
+        public String CertifNumber { get; set; }
+        public DateTime CertifDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime FinishDate { get; set; }
+        public AccessList[] AccessList { get; set; }
     }
 
     public class AccessList
     {
-        public Decimal DepositId;
-        public Decimal Amount;
-        public Decimal Fl_Report;
-        public Decimal Fl_Money;
-        public Decimal Fl_Early;
-        public Decimal Fl_Agreement;
-        public Decimal Fl_Kv;
+        public Decimal DepositId { get; set; }
+        public Decimal Amount { get; set; }
+        public Decimal FlReport { get; set; }
+        public Decimal FlMoney { get; set; }
+        public Decimal FlEarly { get; set; }
+        public Decimal FlAgreement { get; set; }
+        public Decimal FlKv { get; set; }
     }
 
-    public class AccessRequestRes
+    public class BOAccessResponse
     {
-        public AccessRequestRes()
+        public BOAccessResponse()
         {
             Templates = new List<TemplateDoc>();
         }
 
-        public Int16 ResultCode;
-        public String ResultMessage;
-        public Decimal ReqId;
+        public Decimal ReqId { get; set; }
 
         public List<TemplateDoc> Templates { get; set; }
     }
@@ -53,40 +48,27 @@ namespace Bars.WebServices.XRM.Services.DepositXrm.Models
     }
 
 
-    public class BackOfficeGetAccessReq
+    public class BOGetAccessRequest
     {
-        public Decimal TransactionId;
-        public String UserLogin;
-        public Int16 OperationType;
-        public Decimal Req_id;
-        public Decimal Req_type;
-        public String TrusteeType;
-        public Decimal Cust_id;
-        public String ScAccess;
-        public String ScWarrant;
-        public String ScSignsCard;
-        public Decimal?[] Deposits;
+        public Decimal RequestId { get; set; }
+        public Decimal RequestType { get; set; }
+        public String TrusteeType { get; set; }
+        public Decimal CustomerId { get; set; }
+        public String ScAccess { get; set; }
+        public String ScWarrant { get; set; }
+        public String ScSignsCard { get; set; }
+        public Decimal?[] Deposits { get; set; }
     }
 
-    public class BackOfficeGetAccessRes
+    public class BOGetStateRequest
     {
-        public Decimal ResultCode;
-        public String ResultMessage;
+        public Decimal RequestId { get; set; }
     }
 
-    public class BackOfficeGetStateProcReq
+    public class BOGetStateResponse
     {
-        public Decimal TransactionId;
-        public String UserLogin;
-        public Int16 OperationType;
-        public Decimal ReqId;
-    }
-
-    public class BackOfficeGetStateProcRes
-    {
-        public Decimal? State;
-        public String Comment;
-        public Int32 ResultCode;
-        public String ResultMessage;
+        public  string Message { get; set; }
+        public Decimal? State { get; set; }
+        public String Comment { get; set; }
     }
 }

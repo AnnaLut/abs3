@@ -11,7 +11,7 @@ namespace Bars.EAD.Structs.Params
         [JsonProperty("RNK")]
         public UInt64? Rnk;
         [JsonProperty("doc_id")]
-        public String ID;
+        public String DocPrintNumber;
         [JsonProperty("doc_type")]
         public String StructCode;
         [JsonProperty("doc_request_number")]
@@ -27,9 +27,9 @@ namespace Bars.EAD.Structs.Params
         [JsonProperty("account_currency")]
         public String AccountCurrency;
 
-        public DocumentData(String ID)
+        public DocumentData(String DocPrintNumber)
         {
-            this.ID = ID;
+            this.DocPrintNumber = DocPrintNumber;
         }
         public DocumentData(Decimal rnk, Double? AgreementID, String StructCode)
         {

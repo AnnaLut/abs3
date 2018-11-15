@@ -12,7 +12,7 @@ is
     --
     --
     --
-     g_headerVersion   constant varchar2(64)  := 'version 1.08 07.06.2012';
+     g_headerVersion   constant varchar2(64)  := 'version 1.09 27.09.2018';
      g_headerDefs      constant varchar2(512) := '';
 
 
@@ -507,6 +507,11 @@ is
         p_object_id in varchar2 default null,
         p_auxiliary_info in clob default null,
         p_make_context_snapshot in boolean default false);
+	
+	--COBUMMFO-9485
+	procedure tms_info (p_msg  in  tms_audit.rec_message%type);		
+	procedure tms_error(p_msg  in  tms_audit.rec_message%type);
+	
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_AUDIT 
@@ -2393,6 +2398,105 @@ is
     begin
         log_message(bars_audit.LOG_LEVEL_FATAL, p_procedure_name, p_log_message, p_object_id, p_auxiliary_info, p_make_context_snapshot);
     end;
+	
+		 --COBUMMFO-9485
+	 procedure ins_tms_audit
+		    (p_rectype     in  tms_audit.rec_type%type,
+         p_msg         in  tms_audit.rec_message%type)
+    is
+         pragma autonomous_transaction;	
+				 
+         l_recmodule   tms_audit.rec_module%type;
+         l_recbdate    tms_audit.rec_bdate%type;         
+         l_machine     tms_audit.machine%type;
+         l_appModule   varchar2(48);        /* им€ модул€ устан. через dbms_application_info */
+         l_appAction   varchar2(32);        /*   действие устан. через dbms_application_info */
+
+     begin
+			   
+		     if (g_logLevel < get_level_id(p_rectype)) then
+           return;
+         end if;  
+
+         -- »м€ модул€ либо передаетс€, либо беретс€ установленное SET_MODULE
+         if (g_moduleName is not null) then
+             l_recmodule := g_moduleName;
+         else
+             dbms_application_info.read_module(l_appModule, l_appAction);
+             l_recmodule := substr(l_appModule, 1, MAX_MODULE_LEN);
+         end if;
+
+         -- ќпредел€ем банковскую дату, определ€етс€ в контексте BARS_GL. ≈сли значение на данный
+         -- момент не определено (не было вызова пакета GL), то берем глобальную банковскую дату из BARS_CONTEXT
+         begin
+             l_recbdate  := to_date(sys_context('bars_gl', 'bankdate'), 'mm/dd/yyyy');
+         exception
+             when OTHERS then
+                 begin
+                     l_recbdate  := to_date(sys_context('bars_gl', 'bankdate'), 'mm-dd-yyyy');
+                 exception
+                     when OTHERS then null;
+                 end;
+         end;
+
+         if (l_recbdate is null) then
+             l_recbdate  := to_date(sys_context('bars_context', 'global_bankdate'), 'mm/dd/yyyy');
+         end if;
+
+         -- »м€ машины устанавливаетс€ в контексте
+         l_machine := substr(nvl(g_machinename, sys_context('bars_global', 'host_name'))||'('||sys_context('USERENV', 'IP_ADDRESS')||')', 1, MAX_MACHINE_LEN);
+
+         --ќтдельно дл€ заданий им€ машины
+         if(l_machine is null and sys_context('userenv', 'bg_job_id') is not null) then
+             l_machine := 'LOCALHOST';
+         end if;
+				 
+				 -- Ёто дл€ обхода bug в версии 9.2.0.4
+         if (l_machine is null) then
+             l_machine := 'NOT AVAILABLE';
+         end if;  
+
+-- ¬ставл€ем запись в журнал аудита збд
+         insert into tms_audit(
+             rec_id,
+             rec_uid,
+             rec_userid,
+             rec_uname,
+             rec_uproxy,
+             rec_type,
+             rec_module,             
+             rec_date,
+             rec_bdate,
+             rec_message,            
+             machine,
+             client_identifier )
+         values(
+             s_tmsaudit.nextval,
+             nvl(to_number(sys_context('bars_global', 'user_id')), -1),
+             sys_context('userenv', 'session_userid'),
+             nvl(sys_context('bars_global', 'user_name'), 'UNKNOWN'),
+             sys_context('userenv', 'proxy_user'),
+             p_rectype,
+             l_recmodule,             
+             sysdate,
+             l_recbdate,
+             p_msg,             
+             l_machine,
+             sys_context('userenv', 'client_identifier') );
+
+        commit;
+   end ins_tms_audit;		
+	 
+   procedure tms_info( p_msg  in  tms_audit.rec_message%type) is
+   begin
+			ins_tms_audit('INFO', p_msg);
+   end tms_info;
+	 
+   procedure tms_error( p_msg  in  tms_audit.rec_message%type) is
+	 begin
+		  ins_tms_audit('ERROR', p_msg);
+	 end tms_error;
+	
 begin
     load_param();
 end bars_audit;

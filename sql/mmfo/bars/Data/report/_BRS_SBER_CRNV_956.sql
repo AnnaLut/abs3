@@ -1,5 +1,8 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_CRNV_956.sql =========*** Run
+PROMPT ===================================================================================== 
 prompt ===================================== 
-prompt == Список закритих нерухомих вкладів по рахунках із залишками що дор
+prompt == Список закритих вкладів, по яких утримана комісійна винагорода
 prompt ===================================== 
 
 set serveroutput on
@@ -16,7 +19,7 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'Список закритих нерухомих вкладів по рахунках із залишками що дор';
+   l_zpr.name := 'Список закритих вкладів, по яких утримана комісійна винагорода';
    l_zpr.pkey := '\BRS\SBER\CRNV\956';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
@@ -39,7 +42,7 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'Список закритих нерухомих вкладів по рахунках із залишками що дор';
+    l_zpr.name         := 'Список закритих вкладів, по яких утримана комісійна винагорода';
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':sFdat1=''З_Дати'',:sFdat2=''ПО_Дату''';
     l_zpr.create_stmt  := '';
@@ -61,7 +64,8 @@ begin
                            '    (select dv.type_name from   dpt_vidd dv where dv.vidd=d.vidd) type_name, '||nlchr||
                            '    0 narax_proc, '||nlchr||
                            '    A.OST/100 ostc_and_prc, '||nlchr||
-                           '    ac.dazs '||nlchr||
+                           '    ac.dazs,'||nlchr||
+                           '   a.IDCODE as OKPO '||nlchr||
                            'from '||nlchr||
                            '    bars.asvo_immobile a,'||nlchr||
                            '    bars.dpt_deposit_clos d, '||nlchr||
@@ -70,13 +74,12 @@ begin
                            '    a.dptid=d.deposit_id(+)'||nlchr||
                            '    and d.acc=ac.acc(+)'||nlchr||
                            '    and a.branch like sys_context(''bars_context'',''user_branch_mask'')'||nlchr||
-                           '    and a.fl=0'||nlchr||
-                           '    and d.ACTION_ID = 0 '||nlchr||
+                           '    and a.fl=4'||nlchr||
+                           '    and d.ACTION_ID = 1 '||nlchr||
                            '    and a.source=''BARS'''||nlchr||
                            '    and ac.dazs is not null'||nlchr||
-                           '    and a.ost > bars.get_scale_immobile(nvl(a.kv,980))'||nlchr||
-                           '    and a.dzagr >= :sFdat1 '||nlchr||
-                           '    and a.dzagr <= :sFdat2'||nlchr||
+                           '    and a.ost < bars.get_scale_immobile(nvl(a.kv,980))'||nlchr||
+                           '    and trunc(a.dzagr) between :sFdat1  and :sFdat2 '||nlchr||
                            'ORDER BY SOURCE, A.KV,a.branch, A.FIO'||nlchr||
                            ') S';
     l_zpr.xsl_data     := '';
@@ -109,7 +112,7 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Список закритих нерухомих вкладів по рахунках із залишками що дор';
+    l_rep.description :='Список закритих вкладів, по яких утримана комісійна винагорода';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
@@ -151,3 +154,9 @@ end;
 /                                           
                                             
 commit;                                     
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_CRNV_956.sql =========*** End
+PROMPT ===================================================================================== 

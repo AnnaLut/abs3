@@ -16,11 +16,12 @@ using Areas.Way4Bpk.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using Bars.EAD;
 
 namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
 {
     [AuthorizeApi]
-    public class Way4BpkController: ApiController
+    public class Way4BpkController : ApiController
     {
         readonly IWay4BpkRepository _repo;
         public Way4BpkController(IWay4BpkRepository repo) { _repo = repo; }
@@ -30,7 +31,7 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
         {
             try
             {
-                if (!ndNumber.HasValue && !accNls.HasValue && string.IsNullOrEmpty(custName) && 
+                if (!ndNumber.HasValue && !accNls.HasValue && string.IsNullOrEmpty(custName) &&
                     string.IsNullOrEmpty(okpo) && !passState.HasValue)
                 {
                     return Request.CreateResponse(HttpStatusCode.OK, new { Data = new List<W4DealWeb>(), Total = 0 });
@@ -167,7 +168,7 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
             try
             {
                 string userBranch = _repo.ExecuteStoreQuery<string>(SqlCreator.UserBranch()).SingleOrDefault();
-                
+
                 return Request.CreateResponse(HttpStatusCode.OK, new { userBranch = userBranch });
             }
             catch (Exception ex)
@@ -209,6 +210,53 @@ namespace BarsWeb.Areas.Way4Bpk.Controllers.Api
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetDocumentVerifiedState(string rnk)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, _repo.GetDocumentVerifiedState(Convert.ToDecimal(rnk)));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage SetDocumentVerifiedState(string rnk)
+        {
+            try
+            {
+                _repo.SetDocumentVerifiedState(Convert.ToDecimal(rnk), 1);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetDocumentsFromEA(string rnk)
+        {
+            rnk = rnk.Substring(0, rnk.Length - 2);
+
+            try
+            {
+                string Kf = _repo.GetKf();
+                List<Bars.EAD.Structs.Result.DocumentData> eaDocs = EADService.GetDocumentData("", Convert.ToDecimal(rnk), null, null, null, null, null, null, null, Kf);
+                string[] identDocs = new string[] { "111", "112", "113", "114", "115", "116", "117", "118", "119", "1110", "1111", "121", "122", "13", "142", "145", "147", "401", "148", "1319", "1115" };
+                eaDocs = eaDocs.Where(d=> identDocs.Contains(d.Struct_Code)).ToList();
+
+                return Request.CreateResponse(HttpStatusCode.OK, new ResponseForEaView() { ResultObj = _repo.CheckDocs(eaDocs) });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, new ResponseForEaView() { Result = "ERROR", ErrorMsg = ex.Message });
             }
         }
     }

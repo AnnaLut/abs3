@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 namespace Bars.WebServices.XRM.Services.DepositXrm.Models
 {
-    public class XRMDepositProduct
+    public class Product
     {
-        public Int32 type_id;
-        public string type_name;
-        public string type_code;
-        public string fl_active;
-        public string fl_demand;
-        public string fl_webbanking;
-        public Int32 vidd;
-        public Int32 kv;
-        public string vidd_name;
-        public Int16 duration;
-        public Int16 duration_days;
-        public string LIMIT;
-        public string freq_k;
-        public string dubl;
+        public int TypeId;
+        public string TypeName;
+        public string TypeCode;
+        public string IsActiveStr;
+        public string ProductTypeStr;
+        public string IsWebBanking;
+        public int Vidd;
+        public int Kv;
+        public string ViddName;
+        public short Duration;
+        public short DurationDays;
+        public string Limit;
+        public string PayoutFrequency;
+        public string AutoprolongationText;
     }
 }

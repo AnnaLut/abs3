@@ -140,7 +140,11 @@ namespace BarsWeb.Areas.CDO.CorpLight.Repository
         //    var result = _entities.ExecuteStoreQuery<RelatedCustomer>(sql, custId);
         //    return result;
         //}
-
+        /// <summary>
+        /// get related customers by custId
+        /// </summary>
+        /// <param name="custId"></param>
+        /// <returns></returns>
         public IEnumerable<RelatedCustomer> GetAll(decimal custId)
         {
             var sql = string.Format(baseSql, "") + " where um.cust_id = :p_cust_id";

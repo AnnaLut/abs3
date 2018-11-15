@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="04/07/2017 12:57:04" ReportInfo.Modified="10/27/2017 16:45:02" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="04/07/2017 12:57:04" ReportInfo.Modified="10/25/2018 17:30:33" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,7 +89,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq4prl5GMBG12x0q4xIbdAwh3QWQEu7hE8ZMwKaqn9iJWZkn6MgO+eQo+jklLqj7Z5bIMJIisOViyr3zAgQjSf7dVtn4fDdQ4KKgn/oZI3fVA=">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoUS6qvaX0ql313TsNWhQ15kzMMj3vVmXR0BiXobs7cLvA==">
       <TableDataSource Name="Table" Alias="COMMON" DataType="System.Int32" Enabled="true" SelectCommand="select f_doc_attr('BANK_NAME', :p_nd) as bank_name,&#13;&#10;       f_doc_attr('BRANCH_NAME', :p_nd) as BRANCH_NAME,&#13;&#10;       f_doc_attr('BANK_MFO', :p_nd) as bank_mfo,&#13;&#10;       f_doc_attr('BANK_OKPO', :p_nd) as bank_okpo,&#13;&#10;       f_dat_lit(trunc(sysdate)) as today_in_words,&#13;&#10;       f_doc_attr('BRANCH_ADRESS', :p_nd) as BRANCH_ADRESS,&#13;&#10;       f_doc_attr ('BANK_SYSDATE',:p_nd) as BANK_SYSDATE&#13;&#10;  from dual">
         <Column Name="BANK_NAME" DataType="System.String"/>
         <Column Name="BRANCH_NAME" DataType="System.String"/>
@@ -173,7 +173,7 @@ namespace FastReport
         <Column Name="ACC_BPK_I" DataType="System.String"/>
         <Column Name="ACC_BPK_KKW" DataType="System.String"/>
         <Column Name="ACC_BPK_O" DataType="System.String"/>
-        <CommandParameter Name=":p_nd" DataType="112" Expression="[p_nd]" DefaultValue="0"/>
+        <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="0"/>
       </TableDataSource>
       <TableDataSource Name="Table18" Alias="BPK_SVART" DataType="System.Int32" Enabled="true" SelectCommand="SELECT 0 , to_char(sysdate,'DD/MM/YYYY')SVDP,to_char(-BPK_S_VART(0,:p_nd,3),'9999999999990D99')SVSP, to_char(-BPK_S_VART(0,:p_nd,3),'9999999999990D99')SVP,  '0' SV&#13;&#10;FROM DUAL&#13;&#10;union all&#13;&#10;select * from (with tab as (select rownum-1 X from dual connect by level &lt; f_acc_tag(:p_nd,'PK_TERM'))&#13;&#10;SELECT t.x+1, to_char(to_date(BPK_S_VART(t.x,:p_nd,6),'yyyymmdd'),'DD/MM/YYYY')SVDP,to_char(BPK_S_VART(t.x,:p_nd,4),'9999999999990D99')SVSP,&#13;&#10;to_char(BPK_S_VART(t.x,:p_nd,1),'9999999999990D99')SVP, to_char(BPK_S_VART(t.x,:p_nd,0),'9999999999990D99') SV&#13;&#10;     FROM tab t&#13;&#10;order by 1     )">
         <Column Name="0" DataType="System.Decimal"/>
@@ -181,18 +181,18 @@ namespace FastReport
         <Column Name="SVSP" DataType="System.String"/>
         <Column Name="SVP" DataType="System.String"/>
         <Column Name="SV" DataType="System.String"/>
-        <CommandParameter Name=":p_nd" DataType="112" Expression="[p_nd]" DefaultValue="0"/>
+        <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_nd" DataType="System.Int32" Expression="0"/>
-    <Parameter Name="p_adds" DataType="System.Int32" Expression="0"/>
+    <Parameter Name="p_nd" DataType="System.Int64" Expression="0"/>
+    <Parameter Name="p_adds" DataType="System.Int64" Expression="0"/>
     <Parameter Name="p_doc_id" DataType="System.Int64" Expression="18006698011"/>
   </Dictionary>
   <ReportPage Name="Page13">
     <PageHeaderBand Name="PageHeader5" Width="718.2" Height="15.43" CanGrow="true" CanShrink="true">
       <TextObject Name="Text7" Width="718.2" Height="15.43" Text="АТ «ОЩАДБАНК»" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
     </PageHeaderBand>
-    <DataBand Name="Data13" Top="17.37" Width="718.2" Height="825.41" Border.Lines="Right" Border.Width="0.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="Data13" Top="19.13" Width="718.2" Height="825.41" Border.Lines="Right" Border.Width="0.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table1" Width="716.19" Height="817.96">
         <TableColumn Name="Column290" Width="6.76"/>
         <TableColumn Name="Column291" Width="134.6"/>

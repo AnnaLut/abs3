@@ -2,10 +2,10 @@ prompt create view v_accounts
 create or replace force view v_accounts as
 select
 CHANGENUMBER,
-acc,
+trunc(acc/100) as acc,
 CAST (branch as CHAR(30)) AS branch,
 CAST (kf as CHAR(12)) AS kf,
-CAST (rnk as NUMBER(15)) AS rnk,
+CAST (trunc(rnk/100) as NUMBER(15)) AS rnk,
 CAST (nls as CHAR(15)) AS nls,
 CAST (vidd as CHAR(10)) AS vidd,
 CAST (daos as DATE) AS daos,

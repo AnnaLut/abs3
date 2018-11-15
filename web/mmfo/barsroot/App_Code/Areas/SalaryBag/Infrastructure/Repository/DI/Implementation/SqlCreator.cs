@@ -630,5 +630,14 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                 SqlParams = new object[] { }
             };
         }
+
+        public static BarsSql BranchesList()
+        {
+            return new BarsSql
+            {
+                SqlParams = new object[] { },
+                SqlText = "select * from v_branch_own order by branch"
+            };
+        }
     }
 }

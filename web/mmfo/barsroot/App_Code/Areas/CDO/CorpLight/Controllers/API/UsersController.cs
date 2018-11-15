@@ -84,6 +84,8 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
 
         /// <summary>
         /// Get users by provider
+        /// получению пользователя по типу провайдера
+        /// вызов метода библиотеки корплайт CorpLight.Users.dll
         /// </summary>
         /// <param name="providerType"></param>
         /// <param name="provideValue"></param>
@@ -104,6 +106,7 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
 
         /// <summary>
         /// Get list of users to confirm phone
+        /// получаем из сессии 
         /// </summary>
         /// <returns></returns>
         private List<defaultWebService.ConfirmPhone> GetConfirmPhoneList()

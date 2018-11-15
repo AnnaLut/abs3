@@ -195,7 +195,7 @@
                                     <asp:Label ID="CARDCODETitle" runat="server" Text="Тип картки:"></asp:Label>
                                 </td>
                                 <td>
-                                    <bars:TextBoxRefer ID="CARDCODE" runat="server" TAB_NAME="V_W4_CARD" KEY_FIELD="CODE" WHERE_CLAUSE=" where regexp_like(code,'(VECCST)|(MSTDEBPID)')"
+                                    <bars:TextBoxRefer ID="CARDCODE" runat="server" TAB_NAME="V_W4_CARD" KEY_FIELD="CODE" WHERE_CLAUSE=" where regexp_like(code,'(VECCST)|(MSTDEBPID)|(MWORLDEBPID)')"
                                         SEMANTIC_FIELD="SUB_NAME" IsRequired="true" ValidationGroup="Main" Width="300px"
                                         TabIndex="304" ShowSemantic="true" />
                                 </td>

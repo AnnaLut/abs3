@@ -1,7 +1,8 @@
-  CREATE OR REPLACE PACKAGE BARS.BARS_RELEASE_MGR 
+prompt BARS_RELEASE_MGR
+CREATE OR REPLACE PACKAGE BARS_RELEASE_MGR
 is
 
-g_version varchar2(50) := '4.0.1';
+g_version varchar2(50) := '4.0.2';
 
 
 type t_row is record(rec_id number, rec_date date, inst_type varchar2(10), inst_name varchar2(50), rec_message varchar2(250));
@@ -72,7 +73,7 @@ function diff_report(p_install_id_start in brm_objects_hash.install_id%type,
 
 end bars_release_mgr;
 /
-CREATE OR REPLACE PACKAGE BODY BARS.BARS_RELEASE_MGR 
+CREATE OR REPLACE PACKAGE BODY BARS_RELEASE_MGR
 is
 
 g_r_type varchar2(15) := 'release';
@@ -155,7 +156,8 @@ begin
                              'TYPE BODY',
                              'TABLE',
                              'VIEW',
-                             'MATERIALIZED VIEW');
+                             'MATERIALIZED VIEW')
+    and ao.OWNER in (select schemaname from bars_dev_schema);
 
     -- main log
     insert into brm_install_log (rec_id,
@@ -526,7 +528,7 @@ end diff_report;
 
 end bars_release_mgr;
 /
- show err;
+show err;
  
 PROMPT *** Create  grants  BARS_RELEASE_MGR ***
 grant EXECUTE                                                                on BARS_RELEASE_MGR to PUBLIC;

@@ -27,7 +27,10 @@ PROMPT *** Create  procedure CCK_ARC_CC_LIM ***
 
 l_dat01 date;
 l_change_month int:=0;
+title constant varchar2(32) := 'zbd.cck_arc_cc_lim ';
+l_error_message varchar2(4000);
 begin
+   logger.tms_info( title||'Start КП F6_FD: збереження актуальних ГПК на звітну дату');
 
    -- если последний БАНКОВСКИЙ день или первые 10 дней выполняем процедуру иначе выходим return
    -- LOCK TABLE HR.EMPLOYEES IN EXCLUSIVE MODE;
@@ -76,7 +79,13 @@ begin
    where not exists (select 1 from nd_acc_arc cl where cl.mdat= l_dat01 and rownum=1);
 
    commit;
-
+   
+ logger.tms_info( title||'Finish КП F6_FD: збереження актуальних ГПК на звітну дату');
+	 
+exception when others 
+	then 
+		l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);	 	 
 end;
 /
 show err;

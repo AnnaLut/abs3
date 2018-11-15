@@ -2,10 +2,10 @@ prompt create view v_bpk2
 create or replace force view v_bpk2 as
 select
 CHANGENUMBER,
-CAST (branch as CHAR(30)) AS branch,
-CAST (kf as CHAR(12)) AS kf,
-CAST (rnk as NUMBER(15)) AS rnk,
-CAST (nd as NUMBER(15)) AS nd,
+CAST (branch as VARCHAR2(30)) AS branch,
+CAST (kf as VARCHAR2(6)) AS kf,
+CAST (trunc(rnk/100) as NUMBER(15)) AS rnk,
+CAST (trunc(nd/100) as NUMBER(15)) AS nd,
 CAST (dat_begin as DATE) AS dat_begin,
 CAST (bpk_type as VARCHAR2(50)) AS bpk_type,
 CAST (nls as VARCHAR2(15)) AS nls,
@@ -50,7 +50,7 @@ CAST (DOS as NUMBER(24)) AS DOS,
 CAST (W4_ARSUM as VARCHAR2(254)) AS W4_ARSUM,
 CAST (W4_KPROC as VARCHAR2(254)) AS W4_KPROC,
 CAST (W4_SEC as VARCHAR2(254)) AS W4_SEC,
-CAST (ACC as NUMBER(24)) AS ACC,
+CAST (trunc(ACC/100) as NUMBER(24)) AS ACC,
 CAST (ob22 as VARCHAR2(2)) AS OB22,
 CAST (NMS as VARCHAR2(70)) AS NMS
 FROM

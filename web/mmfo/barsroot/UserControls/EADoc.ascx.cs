@@ -809,7 +809,7 @@ namespace Bars.UserControls
                 _dbLogger.Info("FrxDocLocal:  TemplateID = " + TemplateID, "deposit");
 
                 if (EAStructID.HasValue)
-                    this._DocID = ep.DOC_CREATE("DOC", TemplateID, null, EAStructID, RNK, AgrID);
+                    this._DocID = ep.DOC_CREATE("DOC", TemplateID, null, EAStructID, RNK, AgrID,null);
 
                 // печатаем документ
                 FrxParameters pars = new FrxParameters();

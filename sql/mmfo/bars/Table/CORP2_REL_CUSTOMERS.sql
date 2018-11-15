@@ -45,7 +45,50 @@ end;
 
 -- Add comments to the table 
 comment on table CORP2_REL_CUSTOMERS
-  is 'Пользователи Corp2';
+  is 'Корисувачі Corp2';
+-- Add comments to the columns 
+comment on column CORP2_REL_CUSTOMERS.id
+  is 'Ід корисувача';
+comment on column CORP2_REL_CUSTOMERS.tax_code
+  is 'ІНН корисувача';
+comment on column CORP2_REL_CUSTOMERS.first_name
+  is 'Імя користувача';
+comment on column CORP2_REL_CUSTOMERS.last_name
+  is 'Прізвище користувача';
+comment on column CORP2_REL_CUSTOMERS.second_name
+  is 'По-батькові користувача';
+comment on column CORP2_REL_CUSTOMERS.doc_type
+  is 'Тип документу';
+comment on column CORP2_REL_CUSTOMERS.doc_series
+  is 'Серія документу';
+comment on column CORP2_REL_CUSTOMERS.doc_number
+  is 'Номер документу';
+comment on column CORP2_REL_CUSTOMERS.doc_organization
+  is 'Організація, що видала документ';
+comment on column CORP2_REL_CUSTOMERS.doc_date
+  is 'Дата документу';
+comment on column CORP2_REL_CUSTOMERS.birth_date
+  is 'Дата народження';
+comment on column CORP2_REL_CUSTOMERS.created_date
+  is 'Дата створення користувача';
+comment on column CORP2_REL_CUSTOMERS.cell_phone
+  is 'Номер телефону';
+comment on column CORP2_REL_CUSTOMERS.address
+  is 'Адреса';
+comment on column CORP2_REL_CUSTOMERS.email
+  is 'Електронна адреса';
+comment on column CORP2_REL_CUSTOMERS.no_inn
+  is 'Ознака відмови від ІНН';
+comment on column CORP2_REL_CUSTOMERS.acsk_actual
+  is 'Ознака АЦСК';
+comment on column CORP2_REL_CUSTOMERS.login
+  is 'Логін користувача в КОРП2';
+comment on column CORP2_REL_CUSTOMERS.activate_date
+  is 'Дата активації';
+comment on column CORP2_REL_CUSTOMERS.key_id
+  is 'Номер ключа ';
+comment on column CORP2_REL_CUSTOMERS.fio_card
+  is 'ФІО користувача в родовому відмінку';
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin

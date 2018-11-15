@@ -1,10 +1,10 @@
 PROMPT package/dm_import.sql
-CREATE OR REPLACE PACKAGE DM_IMPORT
+CREATE OR REPLACE PACKAGE BARS_DM.DM_IMPORT
 is
     --
     -- Наполнение витрин для файловых выгрузок в CRM
     --
-    g_header_version  constant varchar2(64)  := 'version 5.0.6 04/09/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
+    g_header_version  constant varchar2(64)  := 'version 5.0.7 10/09/2018 '; -- CUSTOMERS_PLT optimiz.+2620БПК.+gcif
     g_header_defs     constant varchar2(512) := '';
 
     C_FULLIMP         constant period_type.id%TYPE  := 'MONTH';
@@ -232,31 +232,15 @@ is
                                  p_rows       out number,
                                  p_rows_err   out number,
                                  p_state      out varchar2);
-    --
-    -- выгрузка для кредитов по финансовых операциях
-    --
-    procedure credits_oper_imp (p_dat    in date default trunc(sysdate),
-                                p_periodtype in varchar2 default C_FULLIMP,
-                                p_rows       out number,
-                                p_rows_err   out number,
-                                p_state      out varchar2);
-    --
-    -- выгрузка для депозитов по финансовых операциях
-    --
-    procedure deposits_oper_imp (p_dat    in date default trunc(sysdate),
-                                 p_periodtype in varchar2 default C_FULLIMP,
-                                 p_rows       out number,
-                                 p_rows_err   out number,
-                                 p_state      out varchar2);
 end;
 /
 Show errors;
 
-CREATE OR REPLACE PACKAGE BODY DM_IMPORT
+CREATE OR REPLACE PACKAGE BODY BARS_DM.DM_IMPORT
  is
 
 
-    g_body_version constant varchar2(64) := 'Version 5.0.6 04/09/2018';--+2620БПК.+gcif
+    g_body_version constant varchar2(64) := 'Version 5.0.8 14/09/2018';--+2620БПК.+gcif
     g_body_defs    constant varchar2(512) := null;
     G_TRACE        constant varchar2(20) := 'dm_import.';
     -- BARS_INTGR - integration (changenumber by object / KF)
@@ -1609,6 +1593,20 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
 
             ----------------------------
 
+            -----------------9098
+            select max(stp_dat)
+              into l_row.stp_dat
+              from bars.INT_ACCN t, bars.nd_acc na, bars.accounts a
+             where na.nd = cur.nd
+               and t.acc = na.acc
+               and a.acc = na.acc
+               and a.tip = 'SS'
+               and a.dazs is null
+               and t.id = 0
+               and a.kv = 980
+               and a.nbs in ('2203', '2063');
+            -------------------
+
             insert into credits_dyn values l_row;
 
             l_rows := l_rows + 1;
@@ -2060,6 +2058,20 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
            exception
              when no_data_found then null;
            end;
+
+           ------------------9098
+        select max(stp_dat)
+              into l_row.stp_dat
+              from bars.INT_ACCN t, bars.nd_acc na, bars.accounts a
+             where na.nd = cur.nd
+               and t.acc = na.acc
+               and a.acc = na.acc
+               and a.tip = 'SS'
+               and a.dazs is null
+               and t.id = 0
+               and a.kv = 980
+               and a.nbs in ('2203', '2063');
+           ----------------------
 
             insert into credits_dyn values l_row;
             l_rows:=l_rows + 1;
@@ -4590,6 +4602,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
     is
         l_trace  varchar2(500) := G_TRACE || 'customers_plt_imp: ';
         l_per_id periods.id%type;
+        l_changenumber number;
         l_start_time date := sysdate;
 
         l_rows     pls_integer := 0;
@@ -4896,7 +4909,8 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
               (select s.active_directory_name
                  from bars.vip_flags v
                  join bars.staff_ad_user s on v.account_manager = s.user_id
-                where rnk=c.rnk and mfo = c.kf) vip_account_manager --аккаунт працівника по віп в форматі АД
+                where rnk=c.rnk and mfo = c.kf) vip_account_manager, --аккаунт працівника по віп в форматі АД
+              :changenumber
                   from bars.customer c, bars.person p,
                          ( select rnk,
                                 "''1''_C1" au_contry,
@@ -5168,6 +5182,10 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
 
           dbms_application_info.set_client_info('BARS_DM: IMPORT_'||p_periodtype||': CUSTOMERS_PLT '||l_ourmfo);
      begin
+         if (p_periodtype = C_FULLIMP) then
+             -- номер "дельты" для псевдоонлайн выгрузки, берем +1 сейчас, увеличим при записи в лог
+             l_changenumber := bars_intgr.xrm_import.get_object_changenumber('CLIENTFO2') + 1;
+         end if;
           q_insert :=
             q'[
             insert /*+ APPEND */ into CUSTOMERS_PLT ]'||l_insert_target||q'[
@@ -5437,17 +5455,18 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
               P_SETTLEMENT_ID,
               P_STREET_ID,
               P_HOUSE_ID,
-              VIP_ACCOUNT_MANAGER
+              VIP_ACCOUNT_MANAGER,
+              CHANGENUMBER
             )
             ]';
     if (p_periodtype = C_INCRIMP) then
         /* дельта */
        q_str := q_insert || q_str_inc_pre || q_str_main || q_str_inc_suf || q_log_errors;
-       execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, l_per_id;
+       execute immediate q_str using p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, p_dat, l_per_id, l_changenumber;
     else
         /* полная выгрузка */
        q_str := q_insert || q_str_main || q_str_full_suf || q_log_errors;
-       execute immediate q_str using l_per_id;
+       execute immediate q_str using l_per_id, l_changenumber;
             end if;
     l_rows := l_rows + sql%rowcount;
     commit;
@@ -5886,7 +5905,7 @@ CREATE OR REPLACE PACKAGE BODY DM_IMPORT
             l_id_event := null;
             l_final_status := null;
         end loop;
-        
+
         /* вручную переключаем в интегр. схеме витрину accounts_cash */
         declare
         l_rows_ok number;

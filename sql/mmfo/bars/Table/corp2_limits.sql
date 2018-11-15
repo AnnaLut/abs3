@@ -39,8 +39,6 @@ comment on column CORP2_LIMITS.doc_created_count
   is 'Кількість документів введених за день';
 comment on column CORP2_LIMITS.doc_sent_count
   is 'Кількість документів відправлених в банк за день';
--- Create/Recreate check constraints 
-
 
 begin
     execute immediate 'alter table CORP2_LIMITS

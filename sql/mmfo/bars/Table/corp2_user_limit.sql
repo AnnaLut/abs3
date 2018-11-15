@@ -37,6 +37,7 @@ rowdependencies';
 end;
 / 
 
+-- Add comments to the table 
 comment on table CORP2_USER_LIMIT
   is 'Типи лімітів version 1.0';
 -- Add comments to the columns 
@@ -44,13 +45,17 @@ comment on column CORP2_USER_LIMIT.limit_id
   is 'Ідентифікатор типа ліміта';
 comment on column CORP2_USER_LIMIT.user_id
   is 'Ідентифікатор користувача';
+comment on column CORP2_USER_LIMIT.login_type
+  is 'Тип логіну';
 comment on column CORP2_USER_LIMIT.doc_sum
   is 'Сума документів введених за день';
 comment on column CORP2_USER_LIMIT.doc_created_count
   is 'Кількість документів введених за день';
 comment on column CORP2_USER_LIMIT.doc_sent_count
   is 'Кількість документів відправлених в банк за день';
--- Create/Recreate primary, unique and foreign key constraints 
+comment on column CORP2_USER_LIMIT.doc_date_lim
+  is 'Дата ліміту';
+
 begin
     execute immediate 'alter table CORP2_USER_LIMIT
   add constraint PK_CUSTLIMITTEMPL primary key (USER_ID, LOGIN_TYPE)

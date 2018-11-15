@@ -2,6 +2,7 @@
 using Oracle.DataAccess.Client;
 using Bars.WebServices.XRM.Models;
 using System.Collections.Generic;
+using BarsWeb.Core.Logger;
 
 namespace Bars.WebServices.XRM.Services
 {
@@ -10,16 +11,18 @@ namespace Bars.WebServices.XRM.Services
     /// </summary>
     public class XrmBaseWebService : BarsWebService
     {
-        public XrmBaseWebService() { }
+        public XrmBaseWebService()
+        {
+        }
 
-        #region Exception processing
+        #region Exception processing        
         protected T ProcessException<T>(System.Exception ex) where T : IResponse, new()
         {
-            return new T()
-            {
-                ResultCode = -1,
-                ResultMessage = ex.Message
-            };
+            T result = new T();
+            result.ResultCode = -1;
+            result.ResultMessage = ex is Exception.AutenticationException ? string.Format("Помилка авторизації: {0}", ex.Message) : ex.Message;
+            DbLoggerConstruct.NewDbLogger().Info("XRM error :: " + ex.StackTrace + ex.Message, moduleName);
+            return result;
         }
         #endregion
 

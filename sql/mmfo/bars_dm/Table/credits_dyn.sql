@@ -59,7 +59,8 @@ begin
 	AMOUNT_PROSR_COMMISSION NUMBER(15,2), 
 	ES000 VARCHAR2(24), 
 	ES003 VARCHAR2(24), 
-	VIDD_CUSTTYPE NUMBER(1,0)
+	VIDD_CUSTTYPE NUMBER(1,0),
+	stp_dat date
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -69,6 +70,17 @@ exception when others then
 end; 
 /
 
+prompt add column stp_dat
+begin
+execute immediate 'alter table bars_dm.CREDITS_DYN add stp_dat date';
+exception
+  when others then
+     if sqlcode = -1430 then null;
+     else
+       raise;
+     end if;
+end;
+/
 
 COMMENT ON TABLE BARS_DM.CREDITS_DYN IS 'Кредити, динамічні дані';
 COMMENT ON COLUMN BARS_DM.CREDITS_DYN.ES000 IS '';
@@ -122,7 +134,7 @@ COMMENT ON COLUMN BARS_DM.CREDITS_DYN.BORG_PROC_UAH IS 'Сума заборгованості за в
 COMMENT ON COLUMN BARS_DM.CREDITS_DYN.PAY_VDVS IS 'Всього перераховано коштів від ВДВС, грн.';
 COMMENT ON COLUMN BARS_DM.CREDITS_DYN.AMOUNT_COMMISSION IS 'Сума комісії за КД у валюті кредиту';
 COMMENT ON COLUMN BARS_DM.CREDITS_DYN.AMOUNT_PROSR_COMMISSION IS 'Сума простроченої комісії за КД у валюті кредиту';
-
+COMMENT ON COLUMN BARS_DM.CREDITS_DYN.STP_DAT IS 'Сума простроченої комісії за КД у валюті кредиту';
 
 
 
@@ -224,7 +236,6 @@ exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;
 /
-
 
 
 PROMPT *** Create  grants  CREDITS_DYN ***

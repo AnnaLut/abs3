@@ -53,7 +53,8 @@
                                JGridView.Columns.Add("Код", "ID",TypeCode.String),
                                JGridView.Columns.Add("Назва шаблону", "NAME", TypeCode.String),
                                //JGridView.Columns.Add("Структурний код", "STRUCT_CODE",TypeCode.String),
-                               JGridView.Columns.Add("Статус", "STATE", TypeCode.String)
+                               JGridView.Columns.Add("Статус", "STATE", TypeCode.String),
+                               JGridView.Columns.Add("Номер печати", "PRINT_NUMBER", TypeCode.String)
                               },
                       tableId: "tableContracts")
             }
@@ -188,21 +189,30 @@
     //печать по выбранным шаблонам
     function print() {
         function getReportFile() {
-
+            $('body').loader();
             //формируем ссылку для вызова метода действия CreateReportFile, который вернет файл для скачивания
             $.post(url + "?" + idsUrlParams + templatesUrlParams + '&random=' + Math.random(), { }, function (data) {
                 $('body').loader('remove');
-                if (data)
+                if (data === "ok")
                 {
                     document.location.href = '@Url.Action("DownloadReportFile")';
                 }
+                else
+                    barsUiAlert(data, "Помилка при створенні файлу", "warning");
             });
         }
 
         if (selectedRows != null && selectedRows.length > 0) {
+            var idArray = @Html.Raw(Json.Encode(ViewBag.Id));
+            if (selectedRows.length * idArray.length > 50) {
+                barsUiAlert("Дозволяється обрати не більше 50 шаблонів за раз.</br>Ви вибрали договорів :  <b>" + idArray.length +
+                    "</b></br>Ви вибрали шаблонів :  <b>" + selectedRows.length +"</b></br>Всього шаблонів :  <b>" + selectedRows.length * idArray.length +"</b>", 
+                    "Помилка при створенні файлу", "warning");
+                return;
+            }
+
             //формируем url с нужными параметрами
             var url = '@Url.Action("CreateReportFile")';
-            var idArray = @Html.Raw(Json.Encode(ViewBag.Id));
             //коды договоров
             var idsUrlParams = "";
             //коды шаблонов
@@ -254,7 +264,6 @@
 
     //применить пользовательский фильтр
     function applyFilter() {
-        console.log("applyFilter");
         //считываем параметры из полей и формируем строку фильтра
         var attribute = $("#selAttr :selected").val();
         var operand = $("#selFilter :selected").val();
@@ -265,7 +274,6 @@
 
     //отменить пользовательский фильтр
     function cancelFilter() {
-        console.log("cancelFilter");
         userFilter = "";
         $('#tableContracts').jungGridView('refresh');
     }
@@ -477,7 +485,7 @@
                 {
                     document.location.href = '@Url.Action("DownloadReportFileEA")';
                 }
-
+                selectedStructCodes = new Array();
                 $('#btnUpdate').click();
 
             });
@@ -561,16 +569,19 @@
         $('#btnUpdate').click();
     }
 
-
-    function EADocsView_ShowDialog(agr_id, modal) {
+    function EADocsView_ShowDialog(rnk, doc_id, modal) {
 
         modal = true;
+        var rnk = rnk.substring(0, rnk.length - 2);
+        var eas_id = '';
+        var agr_id = '';
+        var req_id = '';
 
         //if (eas_id == '' || rnk == '') return false;
 
-        //var Url = '/barsroot/UserControls/dialogs/EADocsView.aspx?eas_id=' + eas_id + '&rnk=' + rnk + '&agr_id=' + agr_id + '&req_id=' + req_id + '&rnd=' + Math.random();
-
-        var Url = "/barsroot/UserControls/dialogs/EADocsView.aspx?agr_id='" + agr_id + "'&rnd=" + Math.random();
+        var Url = '/barsroot/UserControls/dialogs/EADocsView.aspx?eas_id=' + eas_id + '&rnk=' + rnk + '&agr_id=' + agr_id + '&req_id=' + req_id + '&doc_id=' + doc_id + '&rnd=' + Math.random();
+        
+        //var Url = "/barsroot/UserControls/dialogs/EADocsView.aspx?rnk=" + rnk + "&rnd=" + Math.random();
 
 
 

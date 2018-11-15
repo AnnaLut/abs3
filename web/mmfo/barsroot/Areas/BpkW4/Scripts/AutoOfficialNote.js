@@ -16,16 +16,20 @@
             // Allow: Ctrl/cmd+C
             (e.keyCode == 67 && (e.ctrlKey === true || e.metaKey === true)) ||
             // Allow: Ctrl/cmd+X
-            (e.keyCode == 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+			(e.keyCode == 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+			// Allow: Ctrl/cmd+V
+			(e.keyCode == 86 && (e.ctrlKey === true || e.metaKey === true)) ||
             // Allow: home, end, left, right
             (e.keyCode >= 35 && e.keyCode <= 39)) {
             // let it happen, don't do anything
             return;
-        }
+		}
+
         // Ensure that it is a number and stop the keypress
         if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
             e.preventDefault();
-        }
+		}
+
     });
 
     var ddlReason = $("#ddlReason").kendoDropDownList({
@@ -38,16 +42,16 @@
         enable: true
     }).data("kendoButton");
 
-    $("#btnGetNote").click(function () {
+	$("#btnGetNote").click(function () {		
         var TicketNumValue = $("#txtTicketNum").val();
         var ddlReasonValue = $("#ddlReason").val();
         var txtTicketNumSpan = $('#txtTicketNumSpan');
         var ddlReasonSpan = $('#ddlReasonSpan');
 
-        (TicketNumValue > 0) ? txtTicketNumSpan.hide() : txtTicketNumSpan.show();
+		(TicketNumValue.length > 0) ? txtTicketNumSpan.hide() : txtTicketNumSpan.show();
         (ddlReasonValue > 0) ? ddlReasonSpan.hide() : ddlReasonSpan.show();
 
-        if (ddlReasonValue > 0 && TicketNumValue > 0)
+		if (ddlReasonValue > 0 && TicketNumValue.length > 0)
         {
             Waiting(true);
             window.location = bars.config.urlContent("/api/BpkW4/AutoOfficialNoteApi/GetOfficialNote?id_ticket=") + TicketNumValue + "&reason=" + ddlReasonValue;

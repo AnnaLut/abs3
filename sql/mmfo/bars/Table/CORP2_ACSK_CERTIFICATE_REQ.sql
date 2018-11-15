@@ -67,7 +67,36 @@ begin
     if sqlcode = -1430 or sqlcode = -2260 then null; else raise; 
     end if; 
 end;
-/ 
+/
+
+-- Add comments to the table 
+comment on table CORP2_ACSK_CERTIFICATE_REQ
+  is 'Довідник запитів на сертифікати АЦСК';
+-- Add comments to the columns 
+comment on column CORP2_ACSK_CERTIFICATE_REQ.id
+  is 'Ід запиту';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.rel_cust_id
+  is 'Ід користувача';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.request_time
+  is 'Час запиту';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.request_state
+  is 'Статус запиту';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.request_state_message
+  is 'Коментар до статусу';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.certificate_sn
+  is 'Серійний номер сертифікату';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.template_name
+  is 'Тимчасова назва';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.template_oid
+  is 'Тимчасовий Ід';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.certificate_id
+  is 'Ід сертифікату';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.certificate_body
+  is 'Тіло сертифікату';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.token_sn
+  is 'Серійний номер ключа';
+comment on column CORP2_ACSK_CERTIFICATE_REQ.token_name
+  is 'Назва ключа';
 
 -- Grant/Revoke object privileges 
 grant select, insert, update, delete, alter, debug on CORP2_ACSK_CERTIFICATE_REQ to BARS_ACCESS_DEFROLE;

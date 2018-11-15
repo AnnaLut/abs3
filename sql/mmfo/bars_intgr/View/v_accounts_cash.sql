@@ -2,8 +2,8 @@ prompt create view v_accounts_cash
 create or replace force view v_accounts_cash as
 select
     CHANGENUMBER,
-    acc,
-    rnk,
+    trunc(acc/100) acc,
+    trunc(rnk/100) rnk,
     kf,
     nls,
     kv,

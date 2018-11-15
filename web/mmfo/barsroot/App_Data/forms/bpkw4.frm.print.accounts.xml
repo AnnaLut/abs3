@@ -19,7 +19,7 @@
       </datasource>
       <buttons defaulttype="Button">
         <button id="btnPrint" caption="Далі" hint="Перейти до вибору договорів">
-          <command type="Redirect" url="/barsroot/printcontract/index?multiSelection=false">
+          <command type="Redirect" url="/barsroot/printcontract/index?multiSelection=true">
             <sessionVariables>
               <variable name="multiprint_id" field="ACC_ACC"></variable>
               <variable name="multiprint_filter" field="DOC_ID"></variable>

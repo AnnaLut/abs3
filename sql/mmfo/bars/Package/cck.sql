@@ -2060,6 +2060,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   --Актуализация текущим лимитом дня - вынесла в отдельную процеду
   PROCEDURE lim_bdate(p_nd NUMBER, p_dat DATE default gl.bdate) IS    ll cc_lim%ROWTYPE; l_Kv8 int;
     l_NDG number ;
+    title constant varchar2(32) := 'zbd.cck.lim_bdate ';
+    l_error_message varchar2(4000);	
   BEGIN
 
     BEGIN --  22.05.2018 Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
@@ -2083,6 +2085,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
           end loop  ;  -- d
        end if ; -- l_NDG = p_ND
     EXCEPTION  WHEN no_data_found THEN     NULL;
+	when others then
+      l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+      logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
     END;
 
   END lim_bdate;
@@ -2172,6 +2177,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     l_kv   NUMBER;
     l_irb  NUMBER;
     l_ir   NUMBER;
+	title constant varchar2(32) := 'zbd.cck.set_floating_rate ';
+    l_error_message varchar2(4000);
   BEGIN
 
     -- Есть ли данный КД с плавающей ставкой В принципе ?
@@ -2245,6 +2252,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
       VALUES
         (s.acc, 0, l_ndat, l_ir);
     END LOOP;
+	exception when others
+     then
+    l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
 
   END set_floating_rate;
 
@@ -8614,6 +8625,8 @@ end if;
     l_id        INT;
     l_sos       INT;
     l_s080_old  VARCHAR2(1);
+	title       constant varchar2(32) := 'zbd.cck.cc_prolong ';
+    l_error_message varchar2(4000);
   BEGIN
     BEGIN
       SELECT id, fio INTO l_id, l_fio FROM staff WHERE logname = USER;
@@ -8748,7 +8761,10 @@ end if;
 
     END LOOP;
     --Додаємо відповідний запис про пролонацію в ГПК
-
+  exception when others
+  then
+    l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
   END cc_prolong;
   ----------------------------------------
   PROCEDURE cc_close(nd_ number, serr_ OUT VARCHAR2) IS
@@ -9474,13 +9490,16 @@ end if;
     ibank_ CHAR(1) := nvl(getglobaloption('IBANK'), '0');
     l_cnt  NUMBER;
     l_accs NUMBER;
+	title constant  varchar2(32) := 'zbd.cck.cc_day_lim ';
+    l_error_message varchar2(4000);
 
 
   BEGIN
 
     -- IF nn_ = 0 THEN  RE_ost8 (0) ;  END IF; -- 0. Аварийное Исправление остатка на счете 8999
     -----------------------------------------------------
-    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_))
+	logger.tms_info( title||'Start #0) КП S1: Установить лим.по графику');
+    FOR k IN (SELECT *  FROM cc_deal d WHERE sos < 14    AND vidd IN (1, 2, 3, 11, 12, 13)    AND (nn_ = 0 OR nd = nn_)) 
     LOOP
        cck.set_floating_rate(p_nd => k.nd);                -- пересмотр плавающей % ставки
        cck.lim_bdate(p_nd => k.nd, p_dat => fdat_);        -- установка cc_deal.limit,  cc_add.s, accounts.ostx
@@ -9552,7 +9571,13 @@ end if;
 
     -- 5. Установка плановых пролонгаций КД
     cck.cc_prolong(0, fdat_);
+	
+  logger.tms_info( title||'Finish #0) КП S1: Установить лим.по графику');
 
+  exception when others
+  then
+    l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
   END cc_day_lim;
   -------------------
 
@@ -9633,7 +9658,17 @@ end if;
     i_commit    INT := 0;
     l_ref_check number;
     v_block_flag integer;
+    title constant varchar2(32) := 'zbd.cck.cc_9129 ';
+    l_error_message varchar2(4000);
   BEGIN
+
+    if tip_ = 0 then
+        logger.tms_info( title||'Start КП F1: Вирівнювання залишків на 9129 по КП');
+    elsif tip_ = 2 then
+        logger.tms_info( title||'Start КП F1_2: Вирівнювання залишків на 9129 по КП ЮО');
+    elsif tip_ = 3 then
+        logger.tms_info( title||'Start КП F1_3: Вирівнювання залишків на 9129 по КП ФО');
+    end if;
     -- Проводки по 9129
 
     BEGIN
@@ -9853,7 +9888,8 @@ end if;
           and kv = k.kv;
 
       if v_block_flag >0 then
-        bars_audit.info('CCK.CC_9129: Вирівнювання неможливе, рахунок '||nls9_||' блокований на '||case dk_ when 1 then 'дебетування' when 0 then 'кредитування' end||'!');
+        --bars_audit.info('CCK.CC_9129: Вирівнювання неможливе, рахунок '||nls9_||' блокований на '||case dk_ when 1 then 'дебетування' when 0 then 'кредитування' end||'!');
+		logger.tms_info(title||'Вирівнювання неможливе, рахунок '||nls9_||' блокований на '||case dk_ when 1 then 'дебетування' when 0 then 'кредитування' end||'!');
         continue;
       end if;
 
@@ -9993,6 +10029,18 @@ end if;
 
     COMMIT;
 
+   if tip_ = 0 then
+        logger.tms_info( title||'Finish КП F1: Вирівнювання залишків на 9129 по КП');
+    elsif tip_ = 2 then
+        logger.tms_info( title||'Finish КП F1_2: Вирівнювання залишків на 9129 по КП ЮО');
+    elsif tip_ = 3 then
+        logger.tms_info( title||'Finish КП F1_3: Вирівнювання залишків на 9129 по КП ФО');
+    end if;
+
+  exception when others
+  then
+    l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
   END cc_9129;
 
   -------------------
@@ -13488,10 +13536,17 @@ end if;
     nls_sd4  VARCHAR2(15);
     nls_8006 VARCHAR2(15);
     cc_pay_s INT := nvl(getglobaloption('CC_PAY_S'), '0'); -- 0 -считать сумму досрочным погашением при  погашении превышающем
+	title constant varchar2(32) := 'zbd.cck.cc_asg ';
+    l_error_message varchar2(4000);
     --    текущий лимит ГПК минус текущий платеж
     -- 1- считать сумму досрочным с учетом уже уплаченной суммы за
     --    досрочное погашение
   BEGIN
+  
+    if nregim_ = 0 then
+    logger.tms_info( title||'Start КП F0: Авто-разбір рахунків погашення SG');
+    end if;
+  
     BEGIN
       SELECT nvl(substr(TRIM(val), 1, 3), 'W4X')
         INTO tt_bpk
@@ -13636,7 +13691,8 @@ end if;
       end if;
 
       if k.dazs is not null and k.dazs>gl.bDATE then
-        logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' закритий '||to_char(k.dazs,'dd.mm.yyyy')||'. Списання неможливе. Пропускаємо');
+        --logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' закритий '||to_char(k.dazs,'dd.mm.yyyy')||'. Списання неможливе. Пропускаємо');
+		logger.tms_info(Title||'Рахунок '||k.nlsd||' блокований, списання неможливе. Пропускаємо');
         continue;
       end if;
 
@@ -14347,6 +14403,16 @@ end if;
       <<met_kon>>
       NULL;
     END LOOP; -- k
+	
+	
+    if nregim_ = 0 then
+       logger.tms_info( title||'Finish КП F0: Авто-разбір рахунків погашення SG');
+    end if;
+
+   exception when others
+     then
+    l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
   END cc_asg;
   -----------------------
 
@@ -14541,9 +14607,13 @@ end if;
     l_dat1 DATE; -- прошлый раб день
     l_dat2 DATE; -- поза-прошлый раб день
     ll     cc_lim%ROWTYPE;
+	title  constant varchar2(32) := 'zbd.cck.cc_asp ';
+    l_error_message varchar2(4000);
 
   BEGIN
-
+    logger.tms_info( title||'Start "Start/ Авто-просрочка рахунків боргу SS -  ЮО"');
+	
+	
     SELECT MAX(fdat) INTO l_dat1 FROM fdat WHERE fdat < gl.bdate; -- прошлый раб день
     IF l_dat1 IS NULL THEN      RETURN;    END IF;
     SELECT MAX(fdat) INTO l_dat2 FROM fdat WHERE fdat < l_dat1; -- поза-прошлый раб день
@@ -14690,8 +14760,8 @@ end if;
             s7_      := s7_ - q_;
             i_commit := i_commit + 1;
          EXCEPTION  WHEN OTHERS THEN   ROLLBACK TO do_pr7;
-            BEGIN  logger.info('CCK_ASP ош.реф КД=' || k.nd);  GOTO kin7_;  END;
-         END;
+            --BEGIN  logger.info('CCK_ASP ош.реф КД=' || k.nd);  GOTO kin7_;  END;
+			logger.tms_info( title||'CCK_ASP ош.реф КД=' || k.nd); GOTO kin7_;  END;
          --конец транзакции---------------
          <<kin7_>>    NULL;
       END LOOP; --конец цикла по счетам SS одного договора
@@ -14707,6 +14777,14 @@ end if;
     pul.set_mas_ini('SP_KOL', to_char(l_kol), 'Кол.просроч.');
     i_commit := 0;
 
+	
+	 logger.tms_info( title||'Finish "Start/ Авто-просрочка рахунків боргу SS -  ЮО"');
+
+   exception when others
+    then
+    l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
+	
   END cc_asp;
 
   -------------------

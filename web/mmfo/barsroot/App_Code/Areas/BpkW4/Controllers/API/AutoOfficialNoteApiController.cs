@@ -21,7 +21,7 @@ namespace BarsWeb.Areas.BpkW4.Controllers.Api
             UserMap user = ConfigurationSettings.GetCurrentUserInfo;
 
             FrxParameters pars = new FrxParameters();
-            pars.Add(new FrxParameter("ticket_id", TypeCode.Int64, Convert.ToInt64(id_ticket)));
+            pars.Add(new FrxParameter("ticket_id", TypeCode.String, id_ticket));
             pars.Add(new FrxParameter("Inc", TypeCode.Int32, Convert.ToInt32(reason)));
             pars.Add(new FrxParameter("staff_id", TypeCode.Int32, Convert.ToInt32(user.user_id)));
 

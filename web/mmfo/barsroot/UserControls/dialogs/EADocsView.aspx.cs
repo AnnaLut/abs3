@@ -17,11 +17,12 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
     /// <summary>
     /// Код структуры документа
     /// </summary>
-    public Int16 EAStructID
+    public String EAStructID
     {
         get
         {
-            return Convert.ToInt16(Request.Params.Get("eas_id"));
+            var a = Request.Params.Get("eas_id");
+            return string.IsNullOrWhiteSpace(a) ? "" : a.ToString();
         }
     }
     /// <summary>
@@ -61,6 +62,20 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
         }
     }
 
+    /// <summary>
+    /// doc_id
+    /// </summary>
+    public String DocId
+    {
+        get
+        {
+            if (String.IsNullOrEmpty(Request.Params.Get("doc_id")))
+                return String.Empty;
+
+            return Convert.ToString(Request.Params.Get("doc_id"));
+        }
+    }
+
     # region События
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -72,30 +87,32 @@ public partial class UserControls_dialogs_EADocsView : System.Web.UI.Page
             cmd.CommandText = "SELECT  sys_context('bars_context','user_mfo')  FROM dual";
             cmd.CommandType = CommandType.Text;
             string KF = Convert.ToString(cmd.ExecuteScalar());
-            if (this.EAStructID == 1)
+            if (this.EAStructID == "1" && string.IsNullOrWhiteSpace(DocId))
             {
                 string[] do_list = new string[] { "111", "112", "113", "114", "115", "116", "117", "118", "119", "1110", "1111", "121", "122", "13", "142", "145", "147", "401", "148", "1319", "1115" };
-                
-                List<Bars.EAD.Structs.Result.DocumentData> docs_ea = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID, this.ReqID, KF);
+
+                List<Bars.EAD.Structs.Result.DocumentData> docs_ea = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID, this.ReqID, null, null, null, null, KF);
                 List<Bars.EAD.Structs.Result.DocumentData> docs = new List<Bars.EAD.Structs.Result.DocumentData>();
-                
-                foreach (Bars.EAD.Structs.Result.DocumentData a in docs_ea )
+
+                foreach (Bars.EAD.Structs.Result.DocumentData a in docs_ea)
                 {
                     if (do_list.Contains(a.Struct_Code))
-                    docs.Add(a);
+                        docs.Add(a);
                 }
-                
+
                 lvDocs.DataSource = docs;
                 lvDocs.DataBind();
             }
             else
             {
-                List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(null, this.RNK, this.AgrID, this.EAStructID,  this.ReqID, KF);
-               lvDocs.DataSource = docs;
-               lvDocs.DataBind();
+                String _docId = string.IsNullOrWhiteSpace(DocId) ? null : DocId;
+
+                List<Bars.EAD.Structs.Result.DocumentData> docs = Bars.EAD.EADService.GetDocumentData(_docId, this.RNK, this.AgrID, this.EAStructID, this.ReqID, null, null, null, null, KF);
+                lvDocs.DataSource = docs;
+                lvDocs.DataBind();
             }
 
-           }
+        }
         catch (Exception ex)
         {
             String ErrorText = "Виникли помилки при отриманні відповіді від ЕА: Message = " + ex.Message + "; StackTrace = " + ex.StackTrace;
