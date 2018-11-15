@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="04/07/2017 12:57:04" ReportInfo.Modified="08/22/2017 18:09:07" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;&#13;&#10;Oracle.DataAccess&#13;&#10;FastReport.Oracle" DoublePass="true" UseFileCache="true" FinishReportEvent="_FinishReport" ReportInfo.Created="04/07/2017 12:57:04" ReportInfo.Modified="10/25/2018 17:42:34" ReportInfo.CreatorVersion="2014.1.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -90,14 +90,14 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqEjIkLfv5KVDVMQxm1pETYi2439uNkJphU7VV/DPLnHyLDt7PXXdlAdyT9WtYUl5m2bu7Bu//OxDIYmp6RhRHEQ==">
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlq9wYMuznzcMPqpwaPytuduuh9mljfOgrDaMnRB5RIpqgIVIX7kfjznZAxSQwJ/ALN16kcAs+GX+5wj6ngZwfXlw==">
       <TableDataSource Name="Table12" Alias="BPK_SVART" DataType="System.Int32" Enabled="true" SelectCommand="SELECT 0 , to_char(sysdate,'DD/MM/YYYY')SVDP,to_char(-BPK_S_VART(0,:p_nd,3),'9999999999990D99')SVSP, to_char(-BPK_S_VART(0,:p_nd,3),'9999999999990D99')SVP,  '0' SV&#13;&#10;FROM DUAL&#13;&#10;union all&#13;&#10;select * from (with tab as (select rownum-1 X from dual connect by level &lt; f_acc_tag(:p_nd,'PK_TERM'))&#13;&#10;SELECT t.x+1, to_char(to_date(BPK_S_VART(t.x,:p_nd,6),'yyyymmdd'),'DD/MM/YYYY')SVDP,to_char(BPK_S_VART(t.x,:p_nd,4),'9999999999990D99')SVSP,&#13;&#10;to_char(BPK_S_VART(t.x,:p_nd,1),'9999999999990D99')SVP, to_char(BPK_S_VART(t.x,:p_nd,0),'9999999999990D99') SV&#13;&#10;     FROM tab t&#13;&#10;order by 1     )">
         <Column Name="0" DataType="System.Decimal"/>
         <Column Name="SVDP" DataType="System.String"/>
         <Column Name="SVSP" DataType="System.String"/>
         <Column Name="SVP" DataType="System.String"/>
         <Column Name="SV" DataType="System.String"/>
-        <CommandParameter Name=":p_nd" DataType="112" Expression="[p_nd]" DefaultValue="-1"/>
+        <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="-1"/>
       </TableDataSource>
       <TableDataSource Name="Table14" Alias="INF_CARDHOLD" DataType="System.Int32" Enabled="true" SelectCommand="SELECT f_doc_attr ('ACC_BPK_BDAY',:p_nd) as ACC_BPK_BDAY,&#13;&#10;f_doc_attr ('ACC_BPK_F',:p_nd) as ACC_BPK_F,&#13;&#10;f_doc_attr ('ACC_BPK_I',:p_nd) as ACC_BPK_I,&#13;&#10;f_doc_attr ('ACC_BPK_KKW',:p_nd) as ACC_BPK_KKW,&#13;&#10;f_doc_attr ('ACC_BPK_O',:p_nd) as ACC_BPK_O&#13;&#10;from dual">
         <Column Name="ACC_BPK_BDAY" DataType="System.String"/>
@@ -105,7 +105,7 @@ namespace FastReport
         <Column Name="ACC_BPK_I" DataType="System.String"/>
         <Column Name="ACC_BPK_KKW" DataType="System.String"/>
         <Column Name="ACC_BPK_O" DataType="System.String"/>
-        <CommandParameter Name=":p_nd" DataType="112" Expression="[p_nd]" DefaultValue="0"/>
+        <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="0"/>
       </TableDataSource>
       <TableDataSource Name="Table12" Alias="ACC_BPK" DataType="System.Int32" Enabled="true" SelectCommand="select f_doc_attr ('ACC_BPK_MOB_TEL',:p_nd) as ACC_BPK_MOB_TEL,&#13;&#10;f_doc_attr ('ACC_BPK_NMK_FN_VR',:p_nd) as ACC_BPK_NMK_FN_VR,&#13;&#10;f_doc_attr ('ACC_BPK_NMK_LN_VR',:p_nd) as ACC_BPK_NMK_LN_VR,&#13;&#10;f_doc_attr ('ACC_BPK_NMK_MN_VR',:p_nd) as ACC_BPK_NMK_MN_VR,&#13;&#10;f_doc_attr ('ACC_BPK_PHONE',:p_nd) as ACC_BPK_PHONE,&#13;&#10;f_doc_attr ('ACC_BPK_ADDRESS_VR',:p_nd) as ACC_BPK_ADDRESS_VR,&#13;&#10;f_doc_attr ('ACC_BPK_BDAY',:p_nd) as ACC_BPK_BDAY,&#13;&#10;f_doc_attr ('ACC_BPK_BPLACE',:p_nd) as ACC_BPK_BPLACE,&#13;&#10;f_doc_attr ('ACC_BPK_EMAIL',:p_nd) as ACC_BPK_EMAIL,&#13;&#10;f_doc_attr ('ACC_BPK_FADR_VR',:p_nd) as ACC_BPK_FADR_VR,&#13;&#10;f_doc_attr ('ACC_BPK_OKPO',:p_nd) as ACC_BPK_OKPO,&#13;&#10;f_doc_attr ('ACC_BPK_PASP_ATRT',:p_nd) as ACC_BPK_PASP_ATRT,&#13;&#10;f_doc_attr ('ACC_BPK_PASP_DATE',:p_nd) as ACC_BPK_PASP_DATE,&#13;&#10;f_doc_attr ('ACC_BPK_PASP_N',:p_nd) as ACC_BPK_PASP_N,&#13;&#10;f_doc_attr ('ACC_BPK_PASP_S',:p_nd) as ACC_BPK_PASP_S,&#13;&#10;f_doc_attr ('ACC_BPK_REZID_COUNTRY',:p_nd) as ACC_BPK_REZID_COUNTRY,&#13;&#10;f_doc_attr ('ACC_BPK_TRANSFI',:p_nd) as ACC_BPK_TRANSFI,&#13;&#10;f_doc_attr ('ACC_BPK_NLS',:p_nd) as ACC_BPK_NLS,&#13;&#10;f_doc_attr ('ACC_BPK_NMK',:p_nd) as ACC_BPK_NMK,&#13;&#10;f_doc_attr ('ACC_BPK_NMKK',:p_nd) as ACC_BPK_NMKK,&#13;&#10;f_doc_attr ('ACC_BPK_ND',:p_nd) as ACC_BPK_ND,&#13;&#10;f_doc_attr ('ACC_BPK_PIND',:p_nd) as ACC_BPK_PIND,&#13;&#10;f_doc_attr ('ACC_BPK_SMS',:p_nd) as ACC_BPK_SMS,&#13;&#10;f_doc_attr ('ACC_BPK_PGROUP',:p_nd) as ACC_BPK_PGROUP,&#13;&#10;f_doc_attr ('ACC_BPK_KV_NAME',:p_nd) as ACC_BPK_KV_NAME,&#13;&#10;f_doc_attr ('ACC_BPK_TIP',:p_nd) as ACC_BPK_TIP,&#13;&#10;f_doc_attr ('ACC_BPK_PROC',:p_nd) as ACC_BPK_PROC,&#13;&#10;f_doc_attr ('ACC_BPK_PROC_LIT',:p_nd) as ACC_BPK_PROC_LIT,&#13;&#10;f_doc_attr ('ACC_BPK_PSM',:p_nd) as ACC_BPK_PSM,&#13;&#10;f_doc_attr ('ACC_BPK_PSMZ',:p_nd) as ACC_BPK_PSMZ,&#13;&#10;f_doc_attr ('ACC_BPK_PSMZ_LIT',:p_nd) as ACC_BPK_PSMZ_LIT,&#13;&#10;f_doc_attr ('ACC_BPK_DESIRED_CREDIT_SUM',:p_nd) as ACC_BPK_DESIRED_CREDIT_SUM,&#13;&#10;f_doc_attr ('ACC_BPK_INSTALLED_CREDIT_SUM',:p_nd) as ACC_BPK_INSTALLED_CREDIT_SUM,&#13;&#10;f_doc_attr ('ACC_BPK_INSTALLED_CREDIT_SUM_PROPIS',:p_nd) as ACC_BPK_CREDSUMLIT,&#13;&#10;f_doc_attr ('ACC_BPK_MAX_CREDIT_SUM',:p_nd) as ACC_BPK_MAX_CREDIT_SUM,&#13;&#10;f_doc_attr ('ACC_BPK_SYSDATE_5',:p_nd) as ACC_BPK_SYSDATE_5,&#13;&#10;f_doc_attr ('ACC_BPK_TDK',:p_nd) as ACC_BPK_TDK,&#13;&#10;f_doc_attr ('ACC_BPK_PSKR',:p_nd) as ACC_BPK_PSKR,&#13;&#10;f_doc_attr ('ACC_BPK_PSKR_LIT',:p_nd) as ACC_BPK_PSKR_LIT,&#13;&#10;f_doc_attr ('ACC_BPK_DOVER_KR',:p_nd) as ACC_BPK_DOVER_KR,&#13;&#10;f_doc_attr ('ACC_BPK_FIO_KR',:p_nd) as ACC_BPK_FIO_KR,&#13;&#10;f_doc_attr ('ACC_BPK_POSADA_KR',:p_nd) as ACC_BPK_POSADA_KR,&#13;&#10;f_doc_attr ('ACC_BPK_PSGR',:p_nd) as ACC_BPK_PSGR,&#13;&#10;f_doc_attr ('ACC_BPK_PSGR_LIT',:p_nd) as ACC_BPK_PSGR_LIT,&#13;&#10;f_doc_attr ('ACC_BPK_PSNVK',:p_nd) as ACC_BPK_PSNVK,&#13;&#10;f_doc_attr ('ACC_BPK_PSNVK_LIT',:p_nd) as ACC_BPK_PSNVK_LIT,&#13;&#10;f_doc_attr ('ACC_BPK_SVPS_LIT',:p_nd) as ACC_BPK_SVPS_LIT,&#13;&#10;f_doc_attr ('ACC_BPK_ISP_NAME_S',:p_nd) as ACC_BPK_ISP_NAME_S,&#13;&#10;f_doc_attr ('ACC_BPK_DMORG_ADR_CITY',:p_nd) as ACC_BPK_DMORG_ADR_CITY,&#13;&#10;f_doc_attr ('ACC_BPK_DMORG_ADR_PCODE',:p_nd) as ACC_BPK_DMORG_ADR_PCODE,&#13;&#10;f_doc_attr ('ACC_BPK_DMORG_ADR_STREET',:p_nd) as ACC_BPK_DMORG_ADR_STREET,&#13;&#10;f_doc_attr ('ACC_BPK_DMORG_NAME',:p_nd) as ACC_BPK_DMORG_NAME,&#13;&#10;f_doc_attr ('ACC_BPK_DMORG_POS',:p_nd) as ACC_BPK_DMORG_POS,&#13;&#10;f_doc_attr ('ACC_DATE_OPEN',:p_nd) as ACC_DATE_OPEN,&#13;&#10;f_doc_attr ('ACC_BPK_FIO',:p_nd) as ACC_BPK_FIO,&#13;&#10;f_doc_attr ('ACC_BPK_SVPP',:p_nd) as ACC_BPK_SVPP,&#13;&#10;f_doc_attr ('ACC_BPK_SVPS',:p_nd) as ACC_BPK_SVPS,&#13;&#10;f_doc_attr ('ACC_BPK_SVRPS',:p_nd) as ACC_BPK_SVRPS,&#13;&#10;f_doc_attr ('ACC_BPK_SVZSP',:p_nd) as ACC_BPK_SVZSP,&#13;&#10;f_doc_attr ('ACC_BPK_TDK',:p_nd) as ACC_BPK_TDK,&#13;&#10;f_doc_attr ('ACC_BPK_PSKR',:p_nd) as ACC_BPK_PSKR,&#13;&#10;f_doc_attr ('ACC_BPK_SV_0',:p_nd) as ACC_BPK_SV_0,&#13;&#10;f_doc_attr ('ACC_BPK_SVP_MAX',:p_nd) as ACC_BPK_SVP_MAX,&#13;&#10;f_doc_attr ('ACC_BPK_PHON_BRANCH',:p_nd) as ACC_BPK_PHON_BRANCH,&#13;&#10;f_doc_attr('BANK_NAME', :p_nd) as bank_name,&#13;&#10;f_doc_attr('BRANCH_NAME', :p_nd) as BRANCH_NAME,&#13;&#10;f_doc_attr('BANK_MFO', :p_nd) as bank_mfo,&#13;&#10;f_doc_attr('BANK_OKPO', :p_nd) as bank_okpo,&#13;&#10;f_dat_lit(trunc(sysdate)) as today_in_words,&#13;&#10;f_doc_attr('BRANCH_ADRESS', :p_nd) as BRANCH_ADRESS,&#13;&#10;f_doc_attr ('COMMON.BANK_SYSDATE',:p_nd) as BANK_SYSDATE&#13;&#10;from dual">
         <Column Name="ACC_BPK_MOB_TEL" DataType="System.String"/>
@@ -182,9 +182,9 @@ namespace FastReport
         <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_nd" DataType="System.Int32" Expression="0"/>
-    <Parameter Name="p_adds" DataType="System.Int32"/>
-    <Parameter Name="p_doc_id" DataType="System.Int32" Expression="0"/>
+    <Parameter Name="p_nd" DataType="System.Int64" Expression="0"/>
+    <Parameter Name="p_adds" DataType="System.Int64"/>
+    <Parameter Name="p_doc_id" DataType="System.Int64" Expression="0"/>
   </Dictionary>
   <ReportPage Name="Page13">
     <DataBand Name="Data13" Width="718.2" Height="929.36" Border.Lines="Right" Border.Width="0.25" CanGrow="true" CanShrink="true" CanBreak="true">
@@ -295,7 +295,7 @@ namespace FastReport
       </TableObject>
       <TextObject Name="Text7" Width="718.2" Height="15.43" Text="АТ «ОЩАДБАНК»" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt"/>
     </DataBand>
-    <PageFooterBand Name="PageFooter2" Top="932.03" Width="718.2" Height="18.9"/>
+    <PageFooterBand Name="PageFooter2" Top="933.06" Width="718.2" Height="18.9"/>
   </ReportPage>
   <ReportPage Name="Page14">
     <PageHeaderBand Name="PageHeader6" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true">

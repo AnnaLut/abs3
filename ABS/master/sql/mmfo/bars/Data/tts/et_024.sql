@@ -173,17 +173,6 @@ begin
   delete from chklist_tts where tt='024';
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (2, '024', 5, null, 'substr(NLSA,1,4) not in (2062, 2063, 2082, 2083, 2102, 2103, 2112, 2113, 2122, 2123, 2132, 2133)', null);
-  exception
-    when dup_val_on_index then null;
-    when others then
-      if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 2, ''024'', 5, null, ''substr(NLSA,1,4) not in (2062, 2063, 2082, 2083, 2102, 2103, 2112, 2113, 2122, 2123, 2132, 2133)'', null) - первичный ключ не найден!');
-      else raise;
-      end if;
-  end;
-  begin
-    insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
     values (5, '024', 1, null, null, null);
   exception
     when dup_val_on_index then null;
@@ -195,12 +184,16 @@ begin
   end;
   begin
     insert into chklist_tts(idchk, tt, priority, f_big_amount, sqlval, f_in_charge)
-    values (7, '024', 2, null, '( ( substr(nlsa,1,4) in (''2909'',''3739'') and substr(nlsb,1,4) in (''2620'',''2625'') or substr(nlsb,1,4) in (''2513'',''2525'',''2600'',''2602'',''2603'',''2604'',''2650'',''2650'',''2620'',''2909'') ) and mfob=300465 or mfob<>300465 ) and kv<>980', null);
+    values (7, '024', 2, null, '(  (substr(nlsa,1,4) in (''2909'',''3739'') and substr(nlsb,1,4) in (''2620'',''2622'',''2625'') ) 
+  or (substr(nlsa,1,4) <> ''3720'' and  substr(nlsb,1,4) = ''2909'' ) 
+  or substr(nlsb,1,4) in (''2513'',''2525'',''2600'',''2602'',''2603'',''2604'',''2650'',''2620'') ) and kv<>980 ', null);
   exception
     when dup_val_on_index then null;
     when others then
       if ( sqlcode = -02291 ) then
-        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''024'', 2, null, ''( ( substr(nlsa,1,4) in (''''2909'''',''''3739'''') and substr(nlsb,1,4) in (''''2620'''',''''2625'''') or substr(nlsb,1,4) in (''''2513'''',''''2525'''',''''2600'''',''''2602'''',''''2603'''',''''2604'''',''''2650'''',''''2650'''',''''2620'''',''''2909'''') ) and mfob=300465 or mfob<>300465 ) and kv<>980'', null) - первичный ключ не найден!');
+        dbms_output.put_line('Не удалось добавить запись (chklist_tts: 7, ''024'', 2, null, ''(  (substr(nlsa,1,4) in (''''2909'''',''''3739'''') and substr(nlsb,1,4) in (''''2620'''',''''2625'''') ) 
+  or (substr(nlsa,1,4) <> ''''3720'''' and  substr(nlsb,1,4) = ''''2909'''' ) 
+  or substr(nlsb,1,4) in (''''2513'''',''''2525'''',''''2600'''',''''2602'''',''''2603'''',''''2604'''',''''2650'''',''''2620'''') ) and kv<>980 '', null) - первичный ключ не найден!');
       else raise;
       end if;
   end;

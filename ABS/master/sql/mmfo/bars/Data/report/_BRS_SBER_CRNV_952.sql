@@ -1,5 +1,8 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_CRNV_952.sql =========*** Run
+PROMPT ===================================================================================== 
 prompt ===================================== 
-prompt == Реєстр операцій із залишками до 10 грн або до одиниці  іноземної
+prompt == Реєстр операцій з утримання комісійної винагороди в дохід Банку
 prompt ===================================== 
 
 set serveroutput on
@@ -16,7 +19,7 @@ declare
    l_message   varchar2(1000);    
 
 begin     
-   l_zpr.name := 'Реєстр операцій із залишками до 10 грн або до одиниці  іноземної';
+   l_zpr.name := 'Реєстр операцій з утримання комісійної винагороди в дохід Банку';
    l_zpr.pkey := '\BRS\SBER\CRNV\952';
 
    l_message  := 'Ключ запроса: '||l_zpr.pkey||'  '||nlchr;
@@ -39,7 +42,7 @@ begin
     ------------------------    
                                 
     l_zpr.id           := 1;
-    l_zpr.name         := 'Реєстр операцій із залишками до 10 грн або до одиниці  іноземної';
+    l_zpr.name         := 'Реєстр операцій з утримання комісійної винагороди в дохід Банку';
     l_zpr.namef        := '';
     l_zpr.bindvars     := ':sFdat1=''З_Дати'',:sFdat2=''ПО_Дату''';
     l_zpr.create_stmt  := '';
@@ -60,7 +63,8 @@ begin
                            '    a.branch,'||nlchr||
                            '    nvl(ac.ostc/100, 0) ostc ,'||nlchr||
                            '    A.OST/100 ost ,'||nlchr||
-                           '   (select dv.type_name from   dpt_vidd dv where dv.vidd=d.vidd) type_name'||nlchr||
+                           '   (select dv.type_name from   dpt_vidd dv where dv.vidd=d.vidd) type_name,'||nlchr||
+                           '   a.IDCODE as OKPO'||nlchr||
                            '    from bars.asvo_immobile a, bars.dpt_deposit_clos d, bars.accounts ac'||nlchr||
                            'where '||nlchr||
                            '    a.dptid=d.deposit_id(+)'||nlchr||
@@ -69,8 +73,7 @@ begin
                            '    and a.fl=4'||nlchr||
                            '    and a.ost <= bars.get_scale_immobile(nvl(a.kv,980))'||nlchr||
                            '    and a.branch like sys_context(''bars_context'',''user_branch_mask'')'||nlchr||
-                           '    and a.dzagr >= :sFdat1 '||nlchr||
-                           '    and a.dzagr <= :sFdat2'||nlchr||
+                           '    and trunc(a.dzagr) between :sFdat1  and :sFdat2 '||nlchr||
                            'ORDER BY    a.branch,source, A.KV, a.fio ) S';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
@@ -102,7 +105,7 @@ begin
                                 
 
     l_rep.name        :='Empty';
-    l_rep.description :='Реєстр операцій із залишками до 10 грн або до одиниці  іноземної';
+    l_rep.description :='Реєстр операцій з утримання комісійної винагороди в дохід Банку';
     l_rep.form        :='frm_FastReport';
     l_rep.param       :=l_zpr.kodz||',3,sFdat,sFdat2,"",TRUE,FALSE';
     l_rep.ndat        :=2;
@@ -144,3 +147,9 @@ end;
 /                                           
                                             
 commit;                                     
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_CRNV_952.sql =========*** End
+PROMPT ===================================================================================== 

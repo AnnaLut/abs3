@@ -86,6 +86,29 @@ begin
 end;
 /
 
+begin
+  execute immediate ' ALTER TABLE BARS.EAD_DOCS ADD ( ticket_id VARCHAR2(36) ) ';
+exception
+  when others then
+    if SQLCODE = -01430 then
+      null;
+    else
+      raise;
+    end if; 
+end;
+/ 
+
+begin
+  execute immediate 'alter table EAD_DOCS add (doc_print_number VARCHAR2(32))';
+exception
+  when others then
+    if SQLCODE = -01430 then
+      null;
+    else
+      raise;
+    end if; 
+ end;
+/
 
 PROMPT *** ALTER_POLICIES to EAD_DOCS ***
 exec bpa.alter_policies('EAD_DOCS');
@@ -106,6 +129,8 @@ COMMENT ON COLUMN BARS.EAD_DOCS.AGR_ID IS 'Ід. угоди';
 COMMENT ON COLUMN BARS.EAD_DOCS.PAGE_COUNT IS 'Кіл-ть сторінок';
 COMMENT ON COLUMN BARS.EAD_DOCS.KF IS 'МФО';
 COMMENT ON COLUMN BARS.EAD_DOCS.ACC IS 'Счет документа';
+COMMENT ON COLUMN BARS.EAD_DOCS.ticket_id IS 'Ідентифікатор тікета  у форматі Guid.  sys_guid()';
+comment on column BARS.EAD_DOCS.doc_print_number is 'Номер друку документа.';
 
 
 
@@ -147,7 +172,13 @@ end;
 
 -- 06.02.2018  В поле ead_docs.AgrID теперь будут жыть не только депозиты, но и другие экзотические зверьки
 PROMPT *** Disable constraint FK_EADDOCS_AGRID_DPTDEPOSIT ***
-alter table bars.ead_docs modify constraint FK_EADDOCS_AGRID_DPTDEPOSIT disable;
+begin 
+  execute immediate 
+    ' ALTER TABLE BARS.EAD_DOCS DISABLE CONSTRAINT FK_EADDOCS_AGRID_DPTDEPOSIT';
+exception when others then 
+  if sqlcode=-2431 then null; else raise; end if;
+end;
+/
 
 
 /*
@@ -341,6 +372,23 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index PK_EADDOCS ***
+begin   
+ execute immediate '
+  create index IDX_EADDOCS_RNK on ead_docs(RNK)';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index IDX_EADDOCS_SIGNDATE ***
+begin 
+  execute immediate 
+    'CREATE INDEX BARS.IDX_EADDOCS_SIGNDATE ON BARS.EAD_DOCS (SIGN_DATE)';
+exception when others then 
+  if sqlcode=-955 then null; else raise; end if;
+end;
+/
 
 
 PROMPT *** Create  grants  EAD_DOCS ***

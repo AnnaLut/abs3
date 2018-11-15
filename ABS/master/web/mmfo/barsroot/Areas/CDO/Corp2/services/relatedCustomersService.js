@@ -34,7 +34,7 @@ angular.module(globalSettings.modulesAreas)
             var _getByTaxCode = function (custId, taxCode, docSeries, docNumber) {
                 state.isLoading = true;
                 var deferred = $q.defer();
-
+                //запрос в корп2 
                 var url = 'api/cdo/corp2/getbytaxcode/' + custId + '/'+ (taxCode || null) + '/' + (docSeries || null) + '/' + (docNumber || null);
                 $http.get(bars.config.urlContent(url)).success(function (response) {
                     state.isLoading = false;

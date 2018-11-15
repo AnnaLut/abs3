@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by serhii.karchavets on 17-Jul-17.
  */
 
@@ -10,27 +10,27 @@ var G_CUSTTYPE_CLAUSE = {
 };
 var checkNullArr = ["W4_PRODUCT_GROUPS_REF", "GBPKW4PROECT_REF", "GBPKW4PRODUCT_REF", "GBPKW4CARD_REF"];
 
-var g_deal = { p_gBpkW4Product: null, p_gBpkW4Card: null, p_gBpkW4ProductGrp: null,	p_gBpkW4Proect: null, p_gBpkW4Customer: null };
+var g_deal = { p_gBpkW4Product: null, p_gBpkW4Card: null, p_gBpkW4ProductGrp: null, p_gBpkW4Proect: null, p_gBpkW4Customer: null };
 var g_isKievCard = false;
 
 var IS_DEBUG = false;
-function print(o) {	if(IS_DEBUG){console.log(o);}}
+function print(o) { if (IS_DEBUG) { console.log(o); } }
 function isEmpty(s) { return s === undefined || s === null || s === ""; }
 
 function getCusttype() {
     var custtype = bars.extension.getParamFromUrl('custtype');
-    if(isEmpty(custtype)){
+    if (isEmpty(custtype)) {
         custtype = 1;       // 1 - FO, 2 - UO, 3 - SPD
     }
     return parseInt(custtype);
 }
 
 function getUrlNewCard(isKievCard, rnk, proectId, cardCode) {
-    if(getCusttype() === 2){
+    if (getCusttype() === 2) {
         return "/barsroot/barsweb/dynform.aspx?form=bpkw4.frm.newdeal_uo&rnk=" + rnk + "&proect_id=" + proectId +
             "&card_code=" + cardCode;
     }
-    if(isKievCard){
+    if (isKievCard) {
         return "/barsroot/cardkiev/cardkievparams.aspx?form=bpkw4.ref.card&rnk=" + rnk + "&proect_id=" + proectId +
             "&card_code=" + cardCode + "&card_kiev=1";
     }
@@ -110,24 +110,24 @@ var REFER_SETTINGS = {
             var newCardRnk = $("#newCardRnk").val();
             var newCardIpn = $("#newCardIpn").val();
             var newCardPib = $("#newCardPib").val();
-            if(!isEmpty(newCardRnk)){ where += (" rnk = "+newCardRnk); }
-            if(!isEmpty(newCardIpn)){
-                if(!isEmpty(newCardRnk)){where+=" and";}
-                where += (" okpo = "+newCardIpn);
+            if (!isEmpty(newCardRnk)) { where += (" rnk = " + newCardRnk); }
+            if (!isEmpty(newCardIpn)) {
+                if (!isEmpty(newCardRnk)) { where += " and"; }
+                where += (" okpo = " + newCardIpn);
             }
-            if(!isEmpty(newCardPib)){
-				newCardPib = replaceAll(newCardPib, "%", "");
-                if(!isEmpty(newCardRnk) || !isEmpty(newCardIpn)){where+=" and";}
+            if (!isEmpty(newCardPib)) {
+                newCardPib = replaceAll(newCardPib, "%", "");
+                if (!isEmpty(newCardRnk) || !isEmpty(newCardIpn)) { where += " and"; }
                 where += (" upper(nmk) like '%'|| upper('" + newCardPib + "')||'%' ");
             }
 
             var w = G_CUSTTYPE_CLAUSE[getCusttype()];
-            if(!isEmpty(w)){
-                if(where !== "WHERE"){ where += " and "; }
+            if (!isEmpty(w)) {
+                if (where !== "WHERE") { where += " and "; }
                 where += w;
             }
 
-            if(where === "WHERE"){ where = ""; }
+            if (where === "WHERE") { where = ""; }
             return where;
         },
         fields: "RNK,OKPO,CTYPE,NMK,PK_NAME,ADR,DOC,ISSUER",
@@ -145,11 +145,11 @@ var REFER_SETTINGS = {
 var REFER_SETTINGS_UO_FIXED = ['W4_PRODUCT_GROUPS_REF', 'GBPKW4PROECT_REF'];
 
 function prepareNewCard() {
-    if(getCusttype() === 2){
+    if (getCusttype() === 2) {
         g_deal[REFER_SETTINGS['W4_PRODUCT_GROUPS_REF'].deal] = "CORPORATE";
         g_deal[REFER_SETTINGS['GBPKW4PROECT_REF'].deal] = -1;
 
-        for(var j = 0; j < REFER_SETTINGS_UO_FIXED.length; j++){
+        for (var j = 0; j < REFER_SETTINGS_UO_FIXED.length; j++) {
             $("#fo_" + REFER_SETTINGS_UO_FIXED[j]).hide();
             $("#fo_val_" + REFER_SETTINGS_UO_FIXED[j]).hide();
         }
@@ -157,18 +157,18 @@ function prepareNewCard() {
 
     uiEnabled(["W4_PRODUCT_GROUPS_REF", "GBPKW4CUSTOMER_REF"], true);
 
-    for(var i = checkNullArr.length-1; i > 0; i--){
-        var isPrevVal = g_deal[REFER_SETTINGS[checkNullArr[i-1]].deal] !== null;
+    for (var i = checkNullArr.length - 1; i > 0; i--) {
+        var isPrevVal = g_deal[REFER_SETTINGS[checkNullArr[i - 1]].deal] !== null;
         uiEnabled([checkNullArr[i]], isPrevVal);
     }
 }
 
 function uiEnabled(kArr, isEnabled) {
-    for(var i = 0; i < kArr.length; i++){ $(REFER_SETTINGS[kArr[i]].uiElem).prop('disabled', !isEnabled); }
+    for (var i = 0; i < kArr.length; i++) { $(REFER_SETTINGS[kArr[i]].uiElem).prop('disabled', !isEnabled); }
 }
 
 function clearRefer(kArr) {
-    for(var i = 0; i < kArr.length; i++){
+    for (var i = 0; i < kArr.length; i++) {
         var k = kArr[i];
         g_deal[REFER_SETTINGS[k].deal] = null;
         $(REFER_SETTINGS[k].uiElemValue).removeClass(VALUE_LABEL_CLASS);
@@ -177,7 +177,7 @@ function clearRefer(kArr) {
 }
 
 function reFillRefer(ID) {
-    switch (ID){
+    switch (ID) {
         case "W4_PRODUCT_GROUPS_REF":
             clearRefer(["GBPKW4PROECT_REF", "GBPKW4PRODUCT_REF", "GBPKW4CARD_REF"]);
             uiEnabled(["GBPKW4PROECT_REF"], true);
@@ -198,33 +198,44 @@ function reFillRefer(ID) {
 }
 
 function showRefer(ID) {
-    if(($(REFER_SETTINGS[ID].uiElem)).prop('disabled')){
+    if (($(REFER_SETTINGS[ID].uiElem)).prop('disabled')) {
         return;
     }
 
     bars.ui.handBook(REFER_SETTINGS[ID].tabName, function (data) {
-            var value4save = data[0][REFER_SETTINGS[ID].value4save];
+        if (ID == 'GBPKW4CUSTOMER_REF' && getCusttype() == 1) {
+            kendo.ui.progress($("#dialogNewCard"), true);
+            var rnk = data[0][REFER_SETTINGS[ID].value4save];
 
-            if(value4save !== g_deal[REFER_SETTINGS[ID].deal]){
-                var value4visible = data[0][REFER_SETTINGS[ID].value4visible];
-                var uiElVal = REFER_SETTINGS[ID].uiElemValue;
-                $(uiElVal).text(value4visible);
-                $(uiElVal).addClass(VALUE_LABEL_CLASS);
+            $('#btnEditClient').prop('disabled', false);
 
-                g_deal[REFER_SETTINGS[ID].deal] = value4save;
-                if("GBPKW4CARD_REF" === ID){
-                    g_isKievCard = data[0]['FLAG_KK'] === 1;
+            $.ajax({
+                type: "GET",
+                url: bars.config.urlContent("/api/Way4Bpk/Way4Bpk/GetDocumentVerifiedState?rnk=" + rnk),
+                success: function (res) {
+                    res = res.toString().toLowerCase() == 'true';
+                    $('.docs-scan').css('display', 'inline-block');
+
+                    if (res) {
+                        $('#DocsVerified').prop('checked', true);
+                        $('#DocsVerified').prop('disabled', true);
+                    } else {
+                        $('#DocsVerified').prop('checked', false);
+                        $('#DocsVerified').prop('disabled', false);
+                        $('#selectNewCardBtn').prop('disabled', true);
+                    }
+                },
+                complete: function (jqXHR, textStatus) {
+                    kendo.ui.progress($("#dialogNewCard"), false);
+                    onItemSelected(data, ID);
+                },
+                error: function (jqXHR, textStatus) {
                 }
-
-                reFillRefer(ID);
-
-                print("g_isKievCard:"+g_isKievCard);
-                print(data[0]);
-                print(g_deal);
-
-                visibilityErrorNewCard();
-            }
-        },
+            });
+        } else {
+            onItemSelected(data, ID);
+        }
+    },
         {
             multiSelect: false,
             clause: REFER_SETTINGS[ID].whereClause(),
@@ -234,25 +245,143 @@ function showRefer(ID) {
         });
 }
 
+function onItemSelected(data, ID) {
+    var value4save = data[0][REFER_SETTINGS[ID].value4save];
+    var cb = $('#DocsVerified:checked').length;
+    //&& cb > 0
+
+    if (value4save !== g_deal[REFER_SETTINGS[ID].deal]) {
+        var value4visible = data[0][REFER_SETTINGS[ID].value4visible];
+        var uiElVal = REFER_SETTINGS[ID].uiElemValue;
+        $(uiElVal).text(value4visible);
+        $(uiElVal).addClass(VALUE_LABEL_CLASS);
+
+        g_deal[REFER_SETTINGS[ID].deal] = value4save;
+        if ("GBPKW4CARD_REF" === ID) {
+            g_isKievCard = data[0]['FLAG_KK'] === 1;
+        }
+
+        reFillRefer(ID);
+
+        print("g_isKievCard:" + g_isKievCard);
+        print(data[0]);
+        print(g_deal);
+
+        if (!cb && getCusttype() == 1) return;
+        visibilityErrorNewCard();
+    }
+};
+
+function processDocsVerifiedChange(that) {
+    var c = that.checked;
+    if (c) {
+        kendo.ui.progress($("#dialogNewCard"), true);
+        $.ajax({
+            type: "GET",
+            url: bars.config.urlContent("/api/Way4Bpk/Way4Bpk/SetDocumentVerifiedState?rnk=" + g_deal.p_gBpkW4Customer),
+            success: function (res) {
+                $('#DocsVerified').prop('checked', true);
+                $('#DocsVerified').prop('disabled', true);
+
+                if (g_deal.p_gBpkW4Card)
+                    $('#selectNewCardBtn').prop('disabled', false);
+            },
+            complete: function (jqXHR, textStatus) {
+                kendo.ui.progress($("#dialogNewCard"), false);
+            },
+            error: function (jqXHR, textStatus) {
+                $('#DocsVerified').prop('checked', false);
+                $('#DocsVerified').prop('disabled', false);
+
+                if (!g_deal.p_gBpkW4Card)
+                    $('#selectNewCardBtn').prop('disabled', true);
+            }
+        });
+    }
+};
+
+function ShowDocsFromEa() {
+    showViewEADocsForm({ rnk: g_deal.p_gBpkW4Customer });
+};
+
 function visibilityErrorNewCard() {
-    $("#selectNewCardBtn").prop('disabled', !checkNewCard());
-    if(checkNewCard()){
+    var cardChecked = checkNewCard();
+    $("#selectNewCardBtn").prop('disabled', !cardChecked);
+    if (cardChecked) {
         $("#selectNewCardErrorText").hide();
     }
-    else{
+    else {
         $("#selectNewCardErrorText").show();
     }
 }
 
 function checkNewCard() {
-    for(var k in g_deal){ if(isEmpty(g_deal[k])){ return false; }    }
+    for (var k in g_deal) {
+        if (isEmpty(g_deal[k]))
+            return false;
+    }
     return true;
 }
 
 function selectNewCardBtn() {
-    if(!checkNewCard()){ return; }
+    if (!checkNewCard()) { return; }
     window.location = getUrlNewCard(g_isKievCard,
         g_deal[REFER_SETTINGS['GBPKW4CUSTOMER_REF'].deal],
         g_deal[REFER_SETTINGS['GBPKW4PROECT_REF'].deal],
         g_deal[REFER_SETTINGS['GBPKW4CARD_REF'].deal]);
 }
+
+function ShowDialog() {
+    var rnk = g_deal.p_gBpkW4Customer,
+        rnd = Math.random(),
+        DialogOptions = 'width=1024, height=860, toolbar=yes, location=yes, directories=no, menubar=yes, scrollbars=yes, resizable=yes, status=no';
+
+    //var result = window.showModalDialog('/barsroot/UserControls/dialogs/ScanIdDocs.aspx?rnk=' + rnk + '&rnd=' + rnd, window, DialogOptions);
+    var scanWindow = window.open('/barsroot/UserControls/dialogs/ScanIdDocs.aspx?rnk=' + rnk + '&rnd=' + rnd, "Dialog",
+        DialogOptions);
+
+    scanWindow.onbeforeunload = function () {
+        kendo.ui.progress($("#dialogNewCard"), true);
+        $.ajax({
+            type: "GET",
+            url: bars.config.urlContent("/api/Way4Bpk/Way4Bpk/SetDocumentVerifiedState?rnk=" + g_deal.p_gBpkW4Customer),
+            success: function (res) {
+                $('#DocsVerified').prop('checked', true);
+                $('#DocsVerified').prop('disabled', true);
+            },
+            complete: function (jqXHR, textStatus) {
+                kendo.ui.progress($("#dialogNewCard"), false);
+                console.log('atata');
+            },
+            error: function (jqXHR, textStatus) {
+                $('#DocsVerified').prop('checked', false);
+                $('#DocsVerified').prop('disabled', false);
+            }
+        });
+    };
+    //if (result) return true;
+    //else return false;
+}
+
+function openClientCard(view) {
+    var readOnlyFlag = view ? 1 : 0;
+
+    if (window.showModalDialog)
+        window.showModalDialog('/barsroot/clientregister/registration.aspx?readonly=' + readOnlyFlag + '&rnk=' + g_deal.p_gBpkW4Customer + '&rnd=' + Math.random(), null, 'dialogWidth:900px;dialogHeight:750px');
+    else {
+        var w = 900;
+        var h = 750;
+
+        var left = (screen.width / 2) - (w / 2);
+        var top = (screen.height / 2) - (h / 2);
+
+        var targetWin = window.open('/barsroot/clientregister/registration.aspx?readonly=1&rnk=' + g_deal.p_gBpkW4Customer + '&rnd=' + Math.random(), '', 'modal=yes, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+    }
+}
+
+function openClientegistration() {
+    bars.ui.confirm({ text: 'Зареєструвати нового клієнта ?' }, function () {
+        kendo.ui.progress($("#dialogNewCard"), true);
+        window.location.href = '/barsroot/clientregister/registration.aspx?client=person&spd=0&rezid=1';
+    });
+};

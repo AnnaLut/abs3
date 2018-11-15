@@ -73,10 +73,16 @@ d_rec_ VARCHAR2(80);   -- Additional parameters
 
 G_sepnum  INTEGER  DEFAULT NULL;  -- используемая версия СЭП(по параметру 'SEPNUM')
 
+title   constant varchar2(32) := 'zbd.pay_date ';
+l_error_message varchar2(4000);
+l_msg   varchar2(2000);
+l_msg2  varchar2(4000);
+
 BEGIN
 
-   DELETE FROM TMP_LOG;
+logger.tms_info( title||'Start Оплата документів за вимогою');
 
+   --DELETE FROM TMP_LOG;
    BEGIN
       SELECT   to_number(val)
         INTO   G_sepnum
@@ -216,9 +222,28 @@ END IF;
          msg_:= 'Нет проводок для оплаты';
       END IF;
 
-      INSERT INTO tmp_log (ref,msg) VALUES (c.ref, msg_);
+     
+      --INSERT INTO tmp_log (ref,msg) VALUES (c.ref, msg_); 
+			
+        --write to var result     
+         l_msg := 'ref-'||c.ref||' '||msg_;      
+       
+         --write to var all results  
+         l_msg2 := substr(l_msg2|| chr(10) ||l_msg, 1, 4000);         
+            
 
    END LOOP;
+	 
+	 if l_msg2 is not null then  
+			logger.tms_info( title||l_msg2);	 
+	 end if ;
+ 
+   logger.tms_info( title||'Finish Оплата документів за вимогою');
+	 
+exception when others 
+	then 
+		l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);
 
 END pay_date;
 /

@@ -45,7 +45,7 @@ begin
     execute immediate 'alter table EAD_NBS add ob22 varchar2(3)';
   end loop;
     for i in (select 1 from dual where not exists (select 1 from user_tab_cols where TABLE_NAME = 'EAD_NBS' and COLUMN_NAME = 'ID')) loop
-    execute immediate 'alter table EAD_NBS add id varchar2(3)';
+    execute immediate 'alter table EAD_NBS add id number(10)';
   end loop;  
 end;
 /

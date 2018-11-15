@@ -2032,8 +2032,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CDB_MEDIATOR as
     procedure pay_accrued_interest
     is
     begin
-        bars_audit.log_info('cdb_mediator.pay_accrued_interest', '');
-
+        --bars_audit.log_info('cdb_mediator.pay_accrued_interest', '');
+        logger.tms_info('zbd.cdb_mediator.pay_accrued_interest');
         interest_utl.pay_accrued_interest(p_do_not_store_interest_tails => true);
     end;
 

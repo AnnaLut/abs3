@@ -32,8 +32,7 @@
 .widerMenu .k-datetimepicker,
 .widerMenu .k-numerictextbox,
 .widerMenu .k-dropdown,
-.widerMenu .k-textbox
-{
+.widerMenu .k-textbox {
     width: 200px;
 }
 
@@ -41,3 +40,38 @@
     overflow: hidden;
 }
 
+.bold {
+    font-weight: bold;
+}
+
+.docs-scan {
+    display: none;
+}
+
+/*------------------------------------------*/
+
+.eaViewTitle {
+    width: 100%;
+    text-align: center;
+}
+
+.aeViewFormContainer {
+    overflow: scroll;
+    height: 80%;
+    overflow-x: hidden;
+    border: 1px solid rgb(238, 238, 238);
+}
+
+    .aeViewFormContainer:hover {
+        box-shadow: 5px 5px 10px #888888;
+    }
+
+.modal-buttons {
+    float: right;
+    margin: 5px;
+}
+
+
+.clickable {
+    cursor: pointer;
+}

@@ -27,7 +27,7 @@ is
   l_ret                  number;
 
   c_XXXXXX               constant varchar2(6 char) := 'XXXXXX';
-  
+
   --Exception
   e_ptsn_not_exsts exception;
 
@@ -70,7 +70,7 @@ BEGIN
 
   -- наповнення довідника для визначення кодів показників
   l_ret := f_nbur_get_ekp_d5x(l_datez);
-  
+
   -- перелік балансових рахунків нарахованих доходів/витрат
   INSERT /*+ append */
   INTO otcn_fa7_temp

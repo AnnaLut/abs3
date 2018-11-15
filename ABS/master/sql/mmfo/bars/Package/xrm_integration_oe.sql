@@ -4,7 +4,7 @@ IS
 
    TYPE t_cursor IS REF CURSOR;
 
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.63 20.06.2018';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.64 10.10.2018';
 
    FUNCTION header_version
       RETURN VARCHAR2;
@@ -313,6 +313,10 @@ IS
    function GetDictKeyColumn (tabname user_tab_cols.table_name%type) return varchar2;
    function GetDictNameColumn (tabname user_tab_cols.table_name%type) return varchar2;
 
+   procedure sign_deposit_doc (p_transactionid  IN      NUMBER,
+                               p_archdoc_id     IN  OUT NUMBER,
+                               p_errormessage       OUT VARCHAR2);
+   
    procedure sign_doc (p_transactionid  IN      NUMBER,
                        p_archdoc_id     IN  OUT NUMBER,
                        p_errormessage       OUT VARCHAR2);
@@ -661,7 +665,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.XRM_INTEGRATION_OE
 IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.63 08.10.2018';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 1.64 10.10.2018';
    g_null_date      CONSTANT DATE := null;
 
    FUNCTION body_version
@@ -2764,13 +2768,13 @@ IS
     return l_column;
    end;
 
-   procedure sign_doc (p_transactionid  IN      NUMBER,
+   procedure sign_deposit_doc (p_transactionid  IN      NUMBER,
                        p_archdoc_id     IN  OUT NUMBER,
                        p_errormessage       OUT VARCHAR2)
    is
    l_archdoc_id number;
    begin
-    bars_audit.info ('exec xrm_integration_oe.sign_doc with params p_transactionid='|| to_char(p_transactionid) || ', p_archdoc_id=' || to_char(p_archdoc_id));
+    bars_audit.info ('exec xrm_integration_oe.sign_deposit_doc with params p_transactionid='|| to_char(p_transactionid) || ', p_archdoc_id=' || to_char(p_archdoc_id));
     p_errormessage := 'Ok';
     p_archdoc_id := bars_sqnc.rukey(p_archdoc_id);
     begin
@@ -2801,8 +2805,36 @@ IS
     end;
 
     p_archdoc_id := get_old_key(l_archdoc_id);
-    bars_audit.info ('exec xrm_integration_oe.sign_doc finished with p_archdoc_id=' || to_char(p_archdoc_id));
+    bars_audit.info ('exec xrm_integration_oe.sign_deposit_doc finished with p_archdoc_id=' || to_char(p_archdoc_id));
+   end sign_deposit_doc;
+   
+   
+   procedure sign_doc (p_transactionid  IN      NUMBER,
+                       p_archdoc_id     IN  OUT NUMBER,
+                       p_errormessage       OUT VARCHAR2)
+   is
+   begin
+    bars_audit.info ('exec xrm_integration_oe.sign_doc with params p_transactionid='|| to_char(p_transactionid) || ', p_archdoc_id=' || to_char(p_archdoc_id));
+    p_errormessage := 'Ok';
+
+    begin
+     ead_pack.doc_sign(p_archdoc_id);
+    exception
+        when others then
+            p_errormessage := 'Не виконано підпис документу:' || sqlerrm;
    end;
+
+    begin
+        xrm_ui_oe.xrm_docsign_trans(p_TransactionId =>   p_TransactionId,
+                                    p_archdoc_id    =>   p_archdoc_id,
+                                    p_ERRORMESSAGE  =>   p_errormessage);
+    exception
+        when others then
+            bars_audit.error(title||'xrm_ui_oe.xrm_docsign_trans failed with mess:' || sqlerrm);
+    end;
+
+    bars_audit.info ('exec xrm_integration_oe.sign_doc finished with p_archdoc_id=' || to_char(p_archdoc_id));
+   end sign_doc;
 
 
    procedure request(   p_transactionid  IN      NUMBER,

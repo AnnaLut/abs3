@@ -128,8 +128,8 @@ namespace FastReport
         <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_nd" DataType="System.Int32" Expression="0"/>
-    <Parameter Name="p_adds" DataType="System.Int32"/>
+    <Parameter Name="p_nd" DataType="System.Int64" Expression="0"/>
+    <Parameter Name="p_adds" DataType="System.Int64"/>
     <Parameter Name="p_doc_id" DataType="System.Int64" Expression="0"/>
   </Dictionary>
   <ReportPage Name="Page1">

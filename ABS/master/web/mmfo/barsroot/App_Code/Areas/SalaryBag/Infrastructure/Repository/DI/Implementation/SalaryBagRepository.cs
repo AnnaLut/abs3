@@ -63,6 +63,7 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                 p.Add("p_kod_tarif", model.KodTarif, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_acc", model.Account, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_fs", model.Fs, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_branch", model.Branch, DbType.String, ParameterDirection.Input);
 
                 connection.Execute("zp.create_deal", p, commandType: CommandType.StoredProcedure);
             }
@@ -83,11 +84,10 @@ namespace BarsWeb.Areas.SalaryBag.Infrastructure.DI.Implementation
                 p.Add("p_kod_tarif", model.KodTarif, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_fs", model.Fs, DbType.Decimal, ParameterDirection.Input);
                 p.Add("p_acc_3570", model.acc3570, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_branch", model.Branch, DbType.String, ParameterDirection.Input);
 
                 connection.Execute("zp.update_deal", p, commandType: CommandType.StoredProcedure);
             }
-
-            //_SalaryBag.ExecuteStoreQuery()
         }
 
         public void ApproveDeal(decimal id, string comment)

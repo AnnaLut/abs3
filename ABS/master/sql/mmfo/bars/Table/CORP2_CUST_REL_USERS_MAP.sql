@@ -28,20 +28,26 @@ tablespace BRSDYND
     if sqlcode = -955 then null; else raise; 
     end if; 
 end;
-/ 
+/
 
 -- Add comments to the table 
 comment on table CORP2_CUST_REL_USERS_MAP
-  is 'Связка клиент-пользоватль Corp2';
+  is 'Звязок користувач-клієнт  Corp2';
 -- Add comments to the columns 
 comment on column CORP2_CUST_REL_USERS_MAP.cust_id
-  is 'ID клиента';
+  is 'Ід клієнта';
 comment on column CORP2_CUST_REL_USERS_MAP.rel_cust_id
-  is 'ID пользователя';
+  is 'Ід Користувача';
 comment on column CORP2_CUST_REL_USERS_MAP.sign_number
-  is 'Номер визы';
+  is 'Номер візи';
 comment on column CORP2_CUST_REL_USERS_MAP.user_id
-  is 'ID пользователя CORP2';
+  is 'Ід користувача CORP2';
+comment on column CORP2_CUST_REL_USERS_MAP.is_approved
+  is 'Ознака підтвердження';
+comment on column CORP2_CUST_REL_USERS_MAP.approved_type
+  is 'Тип підтвердження';
+comment on column CORP2_CUST_REL_USERS_MAP.sequential_visa
+  is 'Ознака послідовності візи';
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin

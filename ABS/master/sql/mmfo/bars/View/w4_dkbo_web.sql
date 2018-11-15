@@ -161,7 +161,7 @@ PROMPT *** Create  view W4_DKBO_WEB ***
                      AND SUBSTR (a.nls, 1, 4) NOT IN
                             ('2605', '2655', '2552', '2554')
                      AND a.dazs IS NULL
-                     AND a.nbs = '2625'
+                     AND a.nbs IN ('2620', '2625')
                      AND aw.acc(+) = a.acc
                      AND aw.tag(+) = 'PK_PRCT'
                      AND (   REGEXP_LIKE (aw.VALUE, '^(\d+)([.]?)(\d*)$')

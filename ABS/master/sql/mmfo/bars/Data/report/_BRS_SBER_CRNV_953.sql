@@ -1,3 +1,6 @@
+PROMPT ===================================================================================== 
+PROMPT *** Run *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_CRNV_953.sql =========*** Run
+PROMPT ===================================================================================== 
 prompt ===================================== 
 prompt == Список вкладів, переданих в ЦРНВ
 prompt ===================================== 
@@ -60,7 +63,8 @@ begin
                            '    A.OST/100 ostc,'||nlchr||
                            '   (select dv.type_name from   dpt_vidd dv where dv.vidd=d.vidd) type_name, '||nlchr||
                            '    0 narax_proc, '||nlchr||
-                           '    A.OST/100 ostc_and_prc '||nlchr||
+                           '    A.OST/100 ostc_and_prc,'||nlchr||
+                           '    a.IDCODE as OKPO '||nlchr||
                            'from '||nlchr||
                            '    BARS.asvo_immobile a, '||nlchr||
                            '    BARS.dpt_deposit_clos d, '||nlchr||
@@ -71,8 +75,7 @@ begin
                            '    and d.ACTION_ID = 0'||nlchr||
                            '    and a.branch like sys_context(''bars_context'',''user_branch_mask'')'||nlchr||
                            '    and a.fl=3'||nlchr||
-                           '    and a.dzagr >= :sFdat1 '||nlchr||
-                           '    and a.dzagr <= :sFdat2'||nlchr||
+                           '    and trunc(a.dzagr) between :sFdat1  and :sFdat2 '||nlchr||
                            'ORDER BY SOURCE, A.KV, A.FIO'||nlchr||
                            ') S';
     l_zpr.xsl_data     := '';
@@ -147,3 +150,9 @@ end;
 /                                           
                                             
 commit;                                     
+
+
+
+PROMPT ===================================================================================== 
+PROMPT *** End *** ========== Scripts /Sql/Bars/Data/_BRS_SBER_CRNV_953.sql =========*** End
+PROMPT ===================================================================================== 

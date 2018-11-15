@@ -268,7 +268,8 @@ begin
 	P_SETTLEMENT_ID NUMBER(10,0), 
 	P_STREET_ID NUMBER(10,0), 
 	P_HOUSE_ID NUMBER(10,0), 
-	VIP_ACCOUNT_MANAGER VARCHAR2(4000)
+	VIP_ACCOUNT_MANAGER VARCHAR2(4000),
+    CHANGENUMBER NUMBER
    ) SEGMENT CREATION IMMEDIATE 
 tablespace BRSDMIMP
 PARTITION BY LIST (PER_ID) SUBPARTITION by list (KF)
@@ -323,6 +324,26 @@ exception
         if sqlcode = -1451 then null; else raise; end if;
 end;
 /
+
+prompt add changenumber
+begin
+    execute immediate 'alter table bars_dm.customers_plt add changenumber number';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+
+begin
+    execute immediate 'alter table bars_dm.err$_customers_plt add changenumber varchar2(4000)';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
+
+
+
 
 PROMPT *** Create  grants  CUSTOMERS_PLT ***
 grant SELECT                                                                 on CUSTOMERS_PLT   to BARSREADER_ROLE;

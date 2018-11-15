@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" StartReportEvent="_StartReport" ReportInfo.Created="02/25/2016 14:01:45" ReportInfo.Modified="07/30/2018 14:49:07" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" StartReportEvent="_StartReport" ReportInfo.Created="02/25/2016 14:01:45" ReportInfo.Modified="09/10/2018 15:54:48" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace FastReport
 </ScriptText>
   <Dictionary>
     <OracleDataConnection Name="MMFO6" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
-      <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NUM_DOC, NUM00 ID, NUM01 DK, CHAR01 BEGIN_DATE, NUM02 AMOUNT_IN, NUM03 BASE_AMOUNT_IN, NUM04 CURRENCY, NUM05 CURRENCY_CONV, CHAR02 CURRENCY_NAME, CHAR03 CURRENCY_CONV_NAME, NUM06 KURS_DILER, CHAR04 DETAILS, NUM07 COMMISS, CHAR05 FIO, CHAR06 TEL, CHAR07 NAME_CUSTOMER, CHAR08 OKPO, CHAR09 ADR, CHAR10 NLS29, CHAR11 PHONE, CHAR12 BANK_NAME, CHAR13 BANK_MFO, CHAR14 ADR_BRANCH, CHAR15 ACCOUNT_CUSTOMER, CHAR16 BANK_MFO_CUSTOMER, CHAR17 BANK_NAME_CUSTOMER, CHAR18 ACCOUNT_CUSTOMER_UAH, CHAR19 BANK_MFO_CUSTOMER_UAH, CHAR20 BANK_NAME_CUSTOMER_UAH, CHAR21 VK_FIO, CHAR22 VK_DATE, CHAR23 VK_TIME, CHAR24 VV_FIO, CHAR25 VV_DATE, CHAR26 VV_TIME, CHAR27 POST_KB_DATE, CHAR28 POST_KB_TIME, CHAR29 POST_KB_FIO, CHAR30 SIGN01, CHAR31 SIGN02 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
+      <TableDataSource Name="Table" Alias="QMain" DataType="System.Int32" Enabled="true" SelectCommand="select CHAR00 NUM_DOC, NUM00 ID, NUM01 DK, NUM02 KB, CHAR01 BEGIN_DATE, NUM03 AMOUNT_IN, NUM04 BASE_AMOUNT_IN, NUM05 CURRENCY, NUM06 CURRENCY_CONV, CHAR02 CURRENCY_NAME, CHAR03 CURRENCY_CONV_NAME, NUM07 KURS_DILER, CHAR04 DETAILS, NUM08 COMMISS, CHAR05 FIO, CHAR06 TEL, CHAR07 NAME_CUSTOMER, CHAR08 OKPO, CHAR09 ADR, CHAR10 NLS29, CHAR11 PHONE, CHAR12 BANK_NAME, CHAR13 BANK_MFO, CHAR14 ADR_BRANCH, CHAR15 ACCOUNT_CUSTOMER, CHAR16 BANK_MFO_CUSTOMER, CHAR17 BANK_NAME_CUSTOMER, CHAR18 ACCOUNT_CUSTOMER_UAH, CHAR19 BANK_MFO_CUSTOMER_UAH, CHAR20 BANK_NAME_CUSTOMER_UAH, CHAR21 VK_FIO, CHAR22 VK_DATE, CHAR23 VK_TIME, CHAR24 VV_FIO, CHAR25 VV_DATE, CHAR26 VV_TIME, CHAR27 POST_KB_DATE, CHAR28 POST_KB_TIME, CHAR29 POST_KB_FIO, CHAR30 SIGN01, CHAR31 SIGN02 from rs_tmp_report_data where session_id=:SESSION_ID order by id">
         <Column Name="DETAILS" DataType="System.String"/>
         <Column Name="NUM_DOC" DataType="System.String"/>
         <Column Name="BEGIN_DATE" DataType="System.String"/>
@@ -67,7 +67,8 @@ namespace FastReport
         <Column Name="CURRENCY_CONV_NAME" DataType="System.String"/>
         <Column Name="SIGN01" DataType="System.String"/>
         <Column Name="SIGN02" DataType="System.String"/>
-        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="1"/>
+        <Column Name="KB" DataType="System.Decimal"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="0"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="session_id" DataType="System.Int64"/>
@@ -142,7 +143,7 @@ namespace FastReport
           </TableRow>
         </TableObject>
         <ChildBand Name="Child6" Top="490.5" Width="718.2" Height="264.6" CanGrow="true">
-          <TextObject Name="Text59" Width="718.2" Height="264.6" CanGrow="true" Text="  Зобов'язуємося перерахувати на рахунок № [QMain.NLS29] у [QMain.BANK_NAME], код банку [QMain.BANK_MFO], кошти в гривнях у розмірі, що потрібний для купівлі іноземної валюти або банківських металів за курсом, зазначеним у цій заяві.&#13;&#10;  Якщо після виконання заяви залишаються невикористаними кошти в гривнях, просимо уповноважений банк перерахувати їх на поточний рахунок № [QMain.ACCOUNT_CUSTOMER_UAH] у  – [QMain.BANK_NAME_CUSTOMER], код банку [QMain.BANK_MFO_CUSTOMER].&#13;&#10;  Надаємо право утримати комісійної винагороди у гривнях у розмірі [QMain.COMMISS] (%).&#13;&#10;  Доручаємо уповноваженому банку перерахувати придбану іноземну валюту або банківські метали на поточний рахунок в іноземній валюті або банківських металах  [QMain.ACCOUNT_CUSTOMER] у - [QMain.BANK_NAME_CUSTOMER], код банку [QMain.BANK_MFO_CUSTOMER].&#13;&#10;   Якщо придбана на міжбанківському валютному ринку України іноземна валюта згідно з цією заявою не буде перерахована нами за призначенням у визначений законодавством України строк після зарахування на наш поточний рахунок, то доручаємо уповноваженому банку продати цю іноземну валюту на міжбанківському валютному ринку України." HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TextObject Name="Text59" Width="718.2" Height="264.6" CanGrow="true" Text="  Зобов'язуємося перерахувати на рахунок № [QMain.NLS29] у [QMain.BANK_NAME], код банку [QMain.BANK_MFO], кошти в гривнях у розмірі, що потрібний для купівлі іноземної валюти або банківських металів за курсом, зазначеним у цій заяві.&#13;&#10;  Якщо після виконання заяви залишаються невикористаними кошти в гривнях, просимо уповноважений банк перерахувати їх на поточний рахунок №  [IIf([QMain.KB] == 1, [QMain.ACCOUNT_CUSTOMER_UAH], [QMain.ACCOUNT_CUSTOMER])]  у  – [QMain.BANK_NAME_CUSTOMER], код банку [QMain.BANK_MFO_CUSTOMER].&#13;&#10;  Надаємо право утримати комісійної винагороди у гривнях у розмірі [QMain.COMMISS] (%).&#13;&#10;  Доручаємо уповноваженому банку перерахувати придбану іноземну валюту або банківські метали на поточний рахунок в іноземній валюті або банківських металах  [QMain.ACCOUNT_CUSTOMER] у - [QMain.BANK_NAME_CUSTOMER], код банку [QMain.BANK_MFO_CUSTOMER].&#13;&#10;   Якщо придбана на міжбанківському валютному ринку України іноземна валюта згідно з цією заявою не буде перерахована нами за призначенням у визначений законодавством України строк після зарахування на наш поточний рахунок, то доручаємо уповноваженому банку продати цю іноземну валюту на міжбанківському валютному ринку України.&#13;&#10;&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
           <ChildBand Name="Child7" Top="759.1" Width="718.2" Height="103.95">
             <TextObject Name="Text24" Left="264.6" Top="9.45" Width="66.15" Height="18.9" Text="Підписи" VertAlign="Center" Font="Times New Roman, 10pt"/>
             <TextObject Name="Text25" Left="340.2" Top="28.35" Width="103.95" Height="18.9" Border.Lines="Top" Text="(підпис)" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>

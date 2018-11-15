@@ -29,4 +29,15 @@ begin
 end;
 /   
 
+-- Add comments to the table 
+comment on table CORP2_ACC_VISA_COUNT
+  is 'Кількість різних віз по рахунку';
+-- Add comments to the columns 
+comment on column CORP2_ACC_VISA_COUNT.acc_id
+  is 'Ид рахунку';
+comment on column CORP2_ACC_VISA_COUNT.visa_id
+  is 'Номер візи';
+comment on column CORP2_ACC_VISA_COUNT.count
+  is 'Кількість віз';
+
 grant ALL on  CORP2_ACC_VISA_COUNT to bars_access_defrole;

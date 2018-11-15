@@ -18,6 +18,8 @@ using BarsWeb.Infrastructure.Repository.DI.Abstract;
 using System.Security.Principal;
 using System.Text;
 using System.Web.Security;
+using System.Web.SessionState;
+using System.Data;
 
 namespace BarsWeb.Infrastructure.Repository.DI.Implementation
 {
@@ -202,10 +204,33 @@ namespace BarsWeb.Infrastructure.Repository.DI.Implementation
                 }
             }
             ClearSessionTmpDir();
+            HttpContext.Current.Session["called_logout"] = "true";
             // clear session in db
             _entities.ExecuteStoreCommand("begin bars.bars_login.logout_user; end;");
             // clear context user
             context.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
+        }
+
+        public void LogOutUser(HttpSessionState session)
+        {
+            if (session == null || (session["called_logout"] != null && session["called_logout"].ToString() == "true"))
+                return;
+            
+            ClearSessionTmpDir();
+            string connStr = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnectionString();
+            using (OracleConnection conn = new OracleConnection())
+            using (OracleCommand cmd = new OracleCommand())
+                {
+                    conn.ConnectionString = connStr;
+                    conn.Open();
+                    conn.ClientId = "BRS-" + session.SessionID;
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "bars.bars_login.logout_user";
+                    cmd.ExecuteNonQuery();
+                }
+            
+
         }
         public string GetHostName()
         {

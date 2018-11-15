@@ -875,9 +875,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
                 insert into operw(ref, tag, value)
                 values(p_ref, p_dreclist(i).tag, p_dreclist(i).val);
                 if p_dreclist(i).tag = 'ô' then
-                  update oper op
-                     set op.d_rec = op.d_rec || '#'||p_dreclist(i).tag||p_dreclist(i).val||'#'
-                   where op.ref = p_ref;
+                   update oper op
+                      set op.d_rec = op.d_rec || '#'||p_dreclist(i).tag||p_dreclist(i).val||'#'
+                    where op.ref = p_ref;
                 end if;
              exception when others then
                 case sqlcode

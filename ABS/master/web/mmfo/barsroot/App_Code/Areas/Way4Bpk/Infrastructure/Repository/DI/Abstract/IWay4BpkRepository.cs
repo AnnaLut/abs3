@@ -12,5 +12,10 @@ namespace BarsWeb.Areas.Way4Bpk.Infrastructure.DI.Abstract
         IEnumerable<T> ExecuteStoreQuery<T>(BarsSql searchQuery);
         int ExecuteStoreCommand(string commandText, params object[] parameters);
         Params GetParam(string id);
+
+        bool GetDocumentVerifiedState(decimal rnk);
+        void SetDocumentVerifiedState(decimal rnk, decimal state);
+        string GetKf();
+        List<Bars.EAD.Structs.Result.DocumentData> CheckDocs(List<Bars.EAD.Structs.Result.DocumentData> val);
     }
 }

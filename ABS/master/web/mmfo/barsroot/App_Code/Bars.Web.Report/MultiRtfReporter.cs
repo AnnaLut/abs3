@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +10,7 @@ using Bars.Oracle;
 using ICSharpCode.SharpZipLib.Zip;
 using Oracle.DataAccess.Client;
 using BarsWeb.Core.Logger;
+using Oracle.DataAccess.Types;
 
 namespace Bars.Web.Report
 {
@@ -19,16 +20,16 @@ namespace Bars.Web.Report
         private readonly HttpContext _httpContext;
         string userName;
         private readonly string _tempDir;
-        private long _adds;               //параметр ADDS для договоров
-        private long _nEvent = -1;	             //код события для трасировки сессии Oracle
-        private long _nLevel = -1;	             //уровень детализации события трасировки сессии Oracle
+        private long _adds;               //РїР°СЂР°РјРµС‚СЂ ADDS РґР»СЏ РґРѕРіРѕРІРѕСЂРѕРІ
+        private long _nEvent = -1;	             //РєРѕРґ СЃРѕР±С‹С‚РёСЏ РґР»СЏ С‚СЂР°СЃРёСЂРѕРІРєРё СЃРµСЃСЃРёРё Oracle
+        private long _nLevel = -1;	             //СѓСЂРѕРІРµРЅСЊ РґРµС‚Р°Р»РёР·Р°С†РёРё СЃРѕР±С‹С‚РёСЏ С‚СЂР°СЃРёСЂРѕРІРєРё СЃРµСЃСЃРёРё Oracle
         public MultiPrintRtfReporter(HttpContext context)
         {
             userName = context.User != null ? context.User.Identity.Name.ToLower() : "";
             _httpContext = context;
             _dbLogger = DbLoggerConstruct.NewDbLogger();
-            //-- если в пути будет пробел, то ни один процесс который получает этот 
-            //-- путь как параметр работать не будет (проверил tvSukhov)
+            //-- РµСЃР»Рё РІ РїСѓС‚Рё Р±СѓРґРµС‚ РїСЂРѕР±РµР», С‚Рѕ РЅРё РѕРґРёРЅ РїСЂРѕС†РµСЃСЃ РєРѕС‚РѕСЂС‹Р№ РїРѕР»СѓС‡Р°РµС‚ СЌС‚РѕС‚ 
+            //-- РїСѓС‚СЊ РєР°Рє РїР°СЂР°РјРµС‚СЂ СЂР°Р±РѕС‚Р°С‚СЊ РЅРµ Р±СѓРґРµС‚ (РїСЂРѕРІРµСЂРёР» tvSukhov)
             string strFilePrefix = Path.GetTempPath().Replace("Documents and Settings", "DOCUME~1").Replace("Local Settings", "LOCALS~1");
 
             if ('\\' != strFilePrefix[strFilePrefix.Length - 1])
@@ -38,7 +39,7 @@ namespace Bars.Web.Report
 
             if (_httpContext.Session == null)
             {
-                throw new ApplicationException("Не ініціалізована сесія!");
+                throw new ApplicationException("РќРµ С–РЅС–С†С–Р°Р»С–Р·РѕРІР°РЅР° СЃРµСЃС–СЏ!");
             }
 
             _tempDir = strFilePrefix + _httpContext.Session.SessionID + ".rep";
@@ -78,7 +79,7 @@ namespace Bars.Web.Report
             OracleConnection con = icon.GetUserConnection();
             cmd.Connection = con;
             var strTemplatesId = new StringBuilder();
-            //создаем пустой файл шаблона, в который будем закидывать несколько отдельных шаблонов
+            //СЃРѕР·РґР°РµРј РїСѓСЃС‚РѕР№ С„Р°Р№Р» С€Р°Р±Р»РѕРЅР°, РІ РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµРј Р·Р°РєРёРґС‹РІР°С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ РѕС‚РґРµР»СЊРЅС‹С… С€Р°Р±Р»РѕРЅРѕРІ
             try
             {
                 if (_nEvent != -1 && _nLevel != -1)
@@ -96,65 +97,105 @@ namespace Bars.Web.Report
                     cmd.CommandText = icon.GetSetRoleCommand(role);
                     cmd.ExecuteNonQuery();
                 }
-                // вычитываем шаблоны
+                // РІС‹С‡РёС‚С‹РІР°РµРј С€Р°Р±Р»РѕРЅС‹
+                Dictionary<string, string> templates = new Dictionary<string,string>();
+                ContractNumbers.OrderBy(x => x);
+                string last_template = TemplateIds.LastOrDefault();
+                cmd.CommandText = String.Format("select ID,TEMPLATE from DOC_SCHEME where upper(ID) in ({0}) order by ID", 
+                    String.Join(",", TemplateIds.Select( x => "'" + x + "'")).ToUpper());
 
-              
-                foreach (var templateId in TemplateIds)
+                using (OracleDataReader rdr = cmd.ExecuteReader())
                 {
-                    strTemplatesId.AppendFormat("'{0}',", templateId.ToUpper());
-                }
-                if (strTemplatesId.Length > 0)
-                {
-                    //убрали последнюю запятую
-                    strTemplatesId.Length--;
-                }
-                //выбрать все шаблоны 
-                cmd.CommandText = string.Format(
-                    "select ID, TEMPLATE from DOC_SCHEME " +
-                    "where upper(ID) in ({0}) order by ID", strTemplatesId);
-                var reader = cmd.ExecuteReader();
+                    if (!rdr.HasRows)
+                        throw new ApplicationException("Р’С–РґСЃСѓС‚РЅРёР№ С€Р°Р±Р»РѕРЅ РґР»СЏ РґСЂСѓРєСѓ");
 
-                if (!reader.HasRows) //нет строк шаблона
-                {
-                    throw new ReportException("Відсутні шаблони для друку.");
-                }
-
-                var reports = new List<Report>();
-                try
-                {
-                    while (reader.Read())
+                    while (rdr.Read())
                     {
-                        if (reader.GetValue(1) == DBNull.Value)
+                        using (OracleClob clob = rdr.GetOracleClob(1))
                         {
-                            throw new ApplicationException("Шаблон договору пустий!");
-                        }
-                        string reportId = reader["ID"].ToString();
-                        string reportTemplate = reader["TEMPLATE"].ToString();
-                        charsCounter += reportTemplate.Length;
-                        //создать список договоров для каждого клиента
-                        foreach (var contractNumber in ContractNumbers)
-                        {
-                            reports.Add(new Report(reportId, reportTemplate, contractNumber, _httpContext, _tempDir,
-                                _adds));
+                            if (clob.IsNull || clob.IsEmpty)
+                                throw new ApplicationException("РЁР°Р±Р»РѕРЅ РґРѕРіРѕРІРѕСЂСѓ " + rdr.GetString(0) + " РїСѓСЃС‚РёР№!");
+
+                            templates.Add(rdr.GetString(0), clob.Value);
                         }
                     }
                 }
-                finally
-                {
-                    reader.Close();
-                    reader.Dispose();
-                }
 
-                //создаём каждый из отчетов и добавляем его стили и тело в главный файл отчета
-                foreach (var report in reports.OrderBy(report => report.ContractNumber))
+                foreach (long contractNumber in ContractNumbers)
                 {
-                    report.CreateFile();
-                    mainReport.AddStyle(report);
-                    mainReport.AddBody(report);
+                    foreach (var temp_info in templates)
+                    {
+                        Report tmp = new Report(temp_info.Key, temp_info.Value, contractNumber, _httpContext, _tempDir, _adds);
+                        tmp.CreateFile();
+                        mainReport.AddStyle(tmp);
+                        mainReport.AddBody(tmp);
+
+                        if (last_template == temp_info.Key)
+                        {
+                            mainReport.AddHeader(tmp);
+                            mainReport.AddFooter(tmp);
+                        }
+
+                        tmp = null;
+                    }
                 }
-                //добавляем всё остальное, что должно быть одинаково для всех отчетов из последнего отчета
-                mainReport.AddHeader(reports.Last());
-                mainReport.AddFooter(reports.Last());
+                    
+                //foreach (var templateId in TemplateIds)
+                //{
+                //    strTemplatesId.AppendFormat("'{0}',", templateId.ToUpper());
+                //}
+                //if (strTemplatesId.Length > 0)
+                //{
+                //    //СѓР±СЂР°Р»Рё РїРѕСЃР»РµРґРЅСЋСЋ Р·Р°РїСЏС‚СѓСЋ
+                //    strTemplatesId.Length--;
+                //}
+                ////РІС‹Р±СЂР°С‚СЊ РІСЃРµ С€Р°Р±Р»РѕРЅС‹ 
+                //cmd.CommandText = string.Format(
+                //    "select ID, TEMPLATE from DOC_SCHEME " +
+                //    "where upper(ID) in ({0}) order by ID", strTemplatesId);
+                //var reader = cmd.ExecuteReader();
+
+                //if (!reader.HasRows) //РЅРµС‚ СЃС‚СЂРѕРє С€Р°Р±Р»РѕРЅР°
+                //{
+                //    throw new ReportException("Р’С–РґСЃСѓС‚РЅС– С€Р°Р±Р»РѕРЅРё РґР»СЏ РґСЂСѓРєСѓ.");
+                //}
+
+                //var reports = new List<Report>();
+                //try
+                //{
+                //    while (reader.Read())
+                //    {
+                //        if (reader.GetValue(1) == DBNull.Value)
+                //        {
+                //            throw new ApplicationException("РЁР°Р±Р»РѕРЅ РґРѕРіРѕРІРѕСЂСѓ РїСѓСЃС‚РёР№!");
+                //        }
+                //        string reportId = reader["ID"].ToString();
+                //        string reportTemplate = reader["TEMPLATE"].ToString();
+                //        charsCounter += reportTemplate.Length;
+                //        //СЃРѕР·РґР°С‚СЊ СЃРїРёСЃРѕРє РґРѕРіРѕРІРѕСЂРѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ РєР»РёРµРЅС‚Р°
+                //        foreach (var contractNumber in ContractNumbers)
+                //        {
+                //            reports.Add(new Report(reportId, reportTemplate, contractNumber, _httpContext, _tempDir,
+                //                _adds));
+                //        }
+                //    }
+                //}
+                //finally
+                //{
+                //    reader.Close();
+                //    reader.Dispose();
+                //}
+
+                ////СЃРѕР·РґР°С‘Рј РєР°Р¶РґС‹Р№ РёР· РѕС‚С‡РµС‚РѕРІ Рё РґРѕР±Р°РІР»СЏРµРј РµРіРѕ СЃС‚РёР»Рё Рё С‚РµР»Рѕ РІ РіР»Р°РІРЅС‹Р№ С„Р°Р№Р» РѕС‚С‡РµС‚Р°
+                //foreach (var report in reports.OrderBy(report => report.ContractNumber))
+                //{
+                //    report.CreateFile();
+                //    mainReport.AddStyle(report);
+                //    mainReport.AddBody(report);
+                //}
+                ////РґРѕР±Р°РІР»СЏРµРј РІСЃС‘ РѕСЃС‚Р°Р»СЊРЅРѕРµ, С‡С‚Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РѕРґРёРЅР°РєРѕРІРѕ РґР»СЏ РІСЃРµС… РѕС‚С‡РµС‚РѕРІ РёР· РїРѕСЃР»РµРґРЅРµРіРѕ РѕС‚С‡РµС‚Р°
+                //mainReport.AddHeader(reports.Last());
+                //mainReport.AddFooter(reports.Last());
             }
             finally
             {
@@ -163,7 +204,7 @@ namespace Bars.Web.Report
                 con.Close();
                 con.Dispose();
             }
-            //скидываем всё в один файл
+            //СЃРєРёРґС‹РІР°РµРј РІСЃС‘ РІ РѕРґРёРЅ С„Р°Р№Р»
             return mainReport.CreateReportFile();
         }
     }
@@ -180,12 +221,13 @@ namespace Bars.Web.Report
         private HttpContext _httpContext;
         private long _adds;
         private readonly Encoding _encoding = Encoding.GetEncoding(1251);
+        private string _data;
         public Report(string id, string template, long contractNumber, HttpContext httpContext, string tempDir, long adds)
         {
             Id = id;
             Template = template;
             ContractNumber = contractNumber;
-            //если первые байты шаблона равны 504B, то расматриваем шаблон как сжатый					
+            //РµСЃР»Рё РїРµСЂРІС‹Рµ Р±Р°Р№С‚С‹ С€Р°Р±Р»РѕРЅР° СЂР°РІРЅС‹ 504B, С‚Рѕ СЂР°СЃРјР°С‚СЂРёРІР°РµРј С€Р°Р±Р»РѕРЅ РєР°Рє СЃР¶Р°С‚С‹Р№					
             IsCompressed = Template.StartsWith("504B");
             _httpContext = httpContext;
             _filePath = tempDir + "\\" + "report.rtf";
@@ -201,6 +243,7 @@ namespace Bars.Web.Report
         private string Template { get; set; }
         private bool IsCompressed { get; set; }
         public long ContractNumber { get; private set; }
+        public string Data { get { return _data; } }
 
         public string FilePath
         {
@@ -212,6 +255,7 @@ namespace Bars.Web.Report
             DumpToDisk();
             MakeDataFile();
             MakeReport();
+            _data = File.ReadAllText(_filePath, _encoding);
         }
 
         private void DumpToDisk()
@@ -252,14 +296,14 @@ namespace Bars.Web.Report
                 {
                     proc.Kill();
                     throw new ReportException(
-                        "Процес 'RtfConv.exe' не завершив роботу у відведений час (15 сек).");
+                        "РџСЂРѕС†РµСЃ 'RtfConv.exe' РЅРµ Р·Р°РІРµСЂС€РёРІ СЂРѕР±РѕС‚Сѓ Сѓ РІС–РґРІРµРґРµРЅРёР№ С‡Р°СЃ (15 СЃРµРє).");
                 }
                 int nExitCode = proc.ExitCode;
                 if (0 != nExitCode)
                 {
                     throw new ReportException(
-                        "Процес 'RtfConv.exe' аварійно завершив работу. Код " + nExitCode + "."
-                        + "Опис коду повернення з потоку помилок: " + strError);
+                        "РџСЂРѕС†РµСЃ 'RtfConv.exe' Р°РІР°СЂС–Р№РЅРѕ Р·Р°РІРµСЂС€РёРІ СЂР°Р±РѕС‚Сѓ. РљРѕРґ " + nExitCode + "."
+                        + "РћРїРёСЃ РєРѕРґСѓ РїРѕРІРµСЂРЅРµРЅРЅСЏ Р· РїРѕС‚РѕРєСѓ РїРѕРјРёР»РѕРє: " + strError);
                 }
             }
             TextReader parfile = File.OpenText(_strParamListFile);
@@ -318,7 +362,7 @@ namespace Bars.Web.Report
             {
                 if (proc != null) proc.Kill();
                 throw new ReportException(
-                    "Процес 'ToBin.exe' не завершив роботу у відведений час (15 сек).");
+                    "РџСЂРѕС†РµСЃ 'ToBin.exe' РЅРµ Р·Р°РІРµСЂС€РёРІ СЂРѕР±РѕС‚Сѓ Сѓ РІС–РґРІРµРґРµРЅРёР№ С‡Р°СЃ (15 СЃРµРє).");
             }
         }
         private void Unpack()
@@ -340,14 +384,14 @@ namespace Bars.Web.Report
                 {
                     proc.Kill();
                     throw new ReportException(
-                        "Процес 'pkzip25.exe' не завершив роботу у відведений час (15 сек).");
+                        "РџСЂРѕС†РµСЃ 'pkzip25.exe' РЅРµ Р·Р°РІРµСЂС€РёРІ СЂРѕР±РѕС‚Сѓ Сѓ РІС–РґРІРµРґРµРЅРёР№ С‡Р°СЃ (15 СЃРµРє).");
                 }
                 int nExitCode = proc.ExitCode;
                 if (0 != nExitCode)
                 {
                     throw new ReportException(
-                        "Процес 'pkzip25.exe' аварійно завершив роботу. Код " + nExitCode + "."
-                        + "Опис коду повернення з потоку помилок: " + strError);
+                        "РџСЂРѕС†РµСЃ 'pkzip25.exe' Р°РІР°СЂС–Р№РЅРѕ Р·Р°РІРµСЂС€РёРІ СЂРѕР±РѕС‚Сѓ. РљРѕРґ " + nExitCode + "."
+                        + "РћРїРёСЃ РєРѕРґСѓ РїРѕРІРµСЂРЅРµРЅРЅСЏ Р· РїРѕС‚РѕРєСѓ РїРѕРјРёР»РѕРє: " + strError);
                 }
             }
         }
@@ -366,14 +410,14 @@ namespace Bars.Web.Report
                 {
                     proc.Kill();
                     throw new ReportException(
-                        "Процес 'RtfConv.exe' не завершив роботу у відведений час (15 сек).");
+                        "РџСЂРѕС†РµСЃ 'RtfConv.exe' РЅРµ Р·Р°РІРµСЂС€РёРІ СЂРѕР±РѕС‚Сѓ Сѓ РІС–РґРІРµРґРµРЅРёР№ С‡Р°СЃ (15 СЃРµРє).");
                 }
                 int nExitCode = proc.ExitCode;
                 if (0 != nExitCode)
                 {
                     throw new ReportException(
-                        "Процес 'RtfConv.exe' аварійно завершив роботу. Код " + nExitCode + "."
-                        + "Опис коду повернення з потоку помилок: " + strError);
+                        "РџСЂРѕС†РµСЃ 'RtfConv.exe' Р°РІР°СЂС–Р№РЅРѕ Р·Р°РІРµСЂС€РёРІ СЂРѕР±РѕС‚Сѓ. РљРѕРґ " + nExitCode + "."
+                        + "РћРїРёСЃ РєРѕРґСѓ РїРѕРІРµСЂРЅРµРЅРЅСЏ Р· РїРѕС‚РѕРєСѓ РїРѕРјРёР»РѕРє: " + strError);
                 }
             }
         }
@@ -394,7 +438,7 @@ namespace Bars.Web.Report
         }
         public void AddHeader(Report report)
         {
-            string reportContent = File.ReadAllText(report.FilePath, _encoding);
+            string reportContent = report.Data;
 
             int lastLinkIndex = reportContent.IndexOf(">", reportContent.LastIndexOf("<link"));
             _header.AppendLine(reportContent.Substring(0, lastLinkIndex + 1));
@@ -410,7 +454,7 @@ namespace Bars.Web.Report
         {
             if (!_addedReports.Contains(report.Id))
             {
-                string reportContent = File.ReadAllText(report.FilePath, _encoding);
+                string reportContent = report.Data;
                 int searchStyleFromIndex = reportContent.IndexOf(">", reportContent.LastIndexOf("<link")) + 1;
                 while (reportContent.IndexOf("<style", searchStyleFromIndex) != -1)
                 {
@@ -463,7 +507,7 @@ namespace Bars.Web.Report
         }
         public void AddBody(Report report)
         {
-            string reportContent = File.ReadAllText(report.FilePath, _encoding);
+            string reportContent = report.Data;
 
             int startBodyIndex = reportContent.IndexOf(">", reportContent.IndexOf("<body"));
             int endBodyIndex = reportContent.IndexOf("</body>");
@@ -487,7 +531,7 @@ namespace Bars.Web.Report
         }
         public void AddFooter(Report report)
         {
-            string reportContent = File.ReadAllText(report.FilePath, _encoding);
+            string reportContent = report.Data;
             int endBodyIndex = reportContent.IndexOf("</body>");
             string reportFooter = reportContent.Substring(endBodyIndex, reportContent.Length - endBodyIndex - 1);
             _footer.AppendLine(reportFooter);

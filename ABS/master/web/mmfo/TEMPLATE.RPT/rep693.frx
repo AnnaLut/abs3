@@ -1,0 +1,2255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/24/2018 11:28:23" ReportInfo.Modified="09/24/2018 14:55:18" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQP8Lfd7r2c5CGDAGu1idzCA=">
+      <TableDataSource Name="Table" Alias="zap" DataType="System.Int32" Enabled="true" SelectCommand="  SELECT NUM00 REF,&#13;&#10;         CHAR00 FDAT,&#13;&#10;         CHAR01 MFO,&#13;&#10;         CHAR02 OKPOB,&#13;&#10;         CHAR03 NLSA,&#13;&#10;         CHAR04 NAZN,&#13;&#10;         NUM01 SUMP,&#13;&#10;         CHAR05 NMK,&#13;&#10;         CHAR06 RUK,&#13;&#10;         CHAR07 FSUMPR,&#13;&#10;         CHAR08 BOSS,&#13;&#10;         CHAR09 BUCH,&#13;&#10;         CHAR10 NAME,&#13;&#10;         CHAR11 ADRES&#13;&#10;    FROM rs_tmp_report_data&#13;&#10;   WHERE session_id = :session_id&#13;&#10;ORDER BY id">
+        <Column Name="REF" DataType="System.Decimal"/>
+        <Column Name="FDAT" DataType="System.String"/>
+        <Column Name="MFO" DataType="System.String"/>
+        <Column Name="OKPOB" DataType="System.String"/>
+        <Column Name="NLSA" DataType="System.String"/>
+        <Column Name="NAZN" DataType="System.String"/>
+        <Column Name="SUMP" DataType="System.Decimal"/>
+        <Column Name="NMK" DataType="System.String"/>
+        <Column Name="RUK" DataType="System.String"/>
+        <Column Name="FSUMPR" DataType="System.String"/>
+        <Column Name="BOSS" DataType="System.String"/>
+        <Column Name="BUCH" DataType="System.String"/>
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="ADRES" DataType="System.String"/>
+        <CommandParameter Name="session_id" DataType="126" Expression="[session_id]"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="session_id" DataType="System.Int32" Expression="810387"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="20" TopMargin="5" RightMargin="5" BottomMargin="5" ExtraDesignWidth="true">
+    <ReportTitleBand Name="ReportTitle1" Width="699.3" Height="37.8" CanShrink="true"/>
+    <PageHeaderBand Name="PageHeader1" Top="41.65" Width="699.3" Height="28.35" CanShrink="true"/>
+    <DataBand Name="Data1" Top="73.84" Width="699.3" Height="1124.55" CanGrow="true" CanShrink="true" StartNewPage="true" DataSource="Table">
+      <TableObject Name="Table1" Width="699.3" Height="1086.75">
+        <TableColumn Name="Column2" Width="18.9"/>
+        <TableColumn Name="Column3" Width="18.9"/>
+        <TableColumn Name="Column4" Width="18.9"/>
+        <TableColumn Name="Column5" Width="18.9"/>
+        <TableColumn Name="Column6" Width="18.9"/>
+        <TableColumn Name="Column7" Width="18.9"/>
+        <TableColumn Name="Column8" Width="18.9"/>
+        <TableColumn Name="Column9" Width="18.9"/>
+        <TableColumn Name="Column10" Width="18.9"/>
+        <TableColumn Name="Column11" Width="18.9"/>
+        <TableColumn Name="Column12" Width="18.9"/>
+        <TableColumn Name="Column13" Width="18.9"/>
+        <TableColumn Name="Column14" Width="18.9"/>
+        <TableColumn Name="Column15" Width="18.9"/>
+        <TableColumn Name="Column16" Width="18.9"/>
+        <TableColumn Name="Column17" Width="18.9"/>
+        <TableColumn Name="Column18" Width="18.9"/>
+        <TableColumn Name="Column19" Width="18.9"/>
+        <TableColumn Name="Column20" Width="18.9"/>
+        <TableColumn Name="Column21" Width="18.9"/>
+        <TableColumn Name="Column22" Width="18.9"/>
+        <TableColumn Name="Column23" Width="18.9"/>
+        <TableColumn Name="Column24" Width="18.9"/>
+        <TableColumn Name="Column25" Width="18.9"/>
+        <TableColumn Name="Column26" Width="18.9"/>
+        <TableColumn Name="Column27" Width="18.9"/>
+        <TableColumn Name="Column28" Width="18.9"/>
+        <TableColumn Name="Column29" Width="18.9"/>
+        <TableColumn Name="Column30" Width="18.9"/>
+        <TableColumn Name="Column31" Width="18.9"/>
+        <TableColumn Name="Column32" Width="18.9"/>
+        <TableColumn Name="Column33" Width="18.9"/>
+        <TableColumn Name="Column34" Width="18.9"/>
+        <TableColumn Name="Column35" Width="18.9"/>
+        <TableColumn Name="Column36" Width="18.9"/>
+        <TableColumn Name="Column37" Width="18.9"/>
+        <TableColumn Name="Column38" Width="18.9"/>
+        <TableRow Name="Row1">
+          <TableCell Name="Cell2" Font="Times New Roman, 12pt" ColSpan="7"/>
+          <TableCell Name="Cell3" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell4" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell5" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell26" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell27" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell28" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell29" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell30" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell31" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell32" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell33" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell34" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell35" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell36" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell37" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell38" Font="Times New Roman, 12pt" ColSpan="2"/>
+          <TableCell Name="Cell39" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell40" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell101" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell102" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell103" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell104" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell105" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell106" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell107" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell108" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell109" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell110" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell151" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell152" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell153" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell154" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell155" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell156" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell157" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell158" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row2">
+          <TableCell Name="Cell7" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell8" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell9" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell10" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell41" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell42" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell43" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell44" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell45" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell46" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell47" Text="Рахунок № [zap.REF]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold" ColSpan="14"/>
+          <TableCell Name="Cell48" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell49" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell50" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell51" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell52" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell53" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell54" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell55" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell111" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell112" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell113" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell114" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell115" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell116" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell117" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell118" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell119" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell120" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell161" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell162" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell163" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell164" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell165" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell166" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell167" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell168" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell12" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell13" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell14" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell15" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell56" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell57" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell58" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell59" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell60" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell61" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell62" Text="від [zap.FDAT]" HorzAlign="Center" Font="Times New Roman, 12pt, style=Bold, Italic" ColSpan="14"/>
+          <TableCell Name="Cell63" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell64" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell65" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell66" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell67" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell68" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell69" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell70" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell121" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell122" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell123" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell124" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell125" HorzAlign="Center" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell126" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell127" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell128" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell129" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell130" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell171" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell172" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell173" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell174" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell175" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell176" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell177" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell178" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row4">
+          <TableCell Name="Cell17" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell18" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell19" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell20" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell71" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell72" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell73" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell74" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell75" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell76" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell77" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell78" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell79" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell80" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell81" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell82" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell83" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell84" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell85" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell131" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell132" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell133" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell134" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell135" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell136" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell137" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell138" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell139" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell140" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell181" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell182" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell183" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell184" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell185" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell186" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell187" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell188" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row5">
+          <TableCell Name="Cell22" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell23" Text="Отримувач:  [zap.NAME]" Font="Times New Roman, 10pt" ColSpan="35"/>
+          <TableCell Name="Cell24" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell25" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell86" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell87" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell88" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell89" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell90" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell91" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell92" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell93" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell94" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell95" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell96" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell97" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell98" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell99" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell100" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell141" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell142" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell143" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell144" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell145" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell146" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell147" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell148" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell149" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell150" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell191" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell192" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell193" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell194" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell195" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell196" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell197" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell198" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row6">
+          <TableCell Name="Cell200" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell201" Text="ОДРПОУ: [zap.OKPOB]" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell202" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell203" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell204" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell205" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell206" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell207" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell208" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell209" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell210" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell211" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell212" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell213" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell214" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell215" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell216" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell217" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell218" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell219" Text="Банк [zap.MFO]" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell220" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell221" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell222" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell223" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell224" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell225" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell226" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell227" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell228" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell229" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell230" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell231" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell232" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell233" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell234" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell235" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell236" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row7">
+          <TableCell Name="Cell238" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell239" Text="Р/р [zap.NLSA]" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell240" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell241" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell242" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell243" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell244" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell245" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell246" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell247" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell248" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell249" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell250" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell251" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell252" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell253" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell254" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell255" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell256" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell257" Text="Адреса [zap.ADRES]" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell258" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell259" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell260" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell261" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell262" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell263" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell264" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell265" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell266" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell267" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell268" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell269" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell270" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell271" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell272" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell273" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell274" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row8">
+          <TableCell Name="Cell276" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell277" Text="Платник [zap.NMK]" Font="Times New Roman, 10pt" ColSpan="35"/>
+          <TableCell Name="Cell278" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell279" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell280" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell281" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell282" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell283" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell284" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell285" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell286" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell287" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell288" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell289" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell290" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell291" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell292" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell293" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell294" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell295" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell296" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell297" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell298" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell299" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell300" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell301" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell302" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell303" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell304" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell305" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell306" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell307" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell308" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell309" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell310" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell311" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell312" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row9">
+          <TableCell Name="Cell314" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell315" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell316" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell317" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell318" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell319" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell320" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell321" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell322" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell323" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell324" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell325" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell326" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell327" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell328" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell329" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell330" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell331" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell332" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell333" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell334" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell335" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell336" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell337" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell338" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell339" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell340" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell341" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell342" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell343" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell344" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell345" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell346" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell347" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell348" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell349" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell350" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row10">
+          <TableCell Name="Cell352" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell353" Border.Lines="All" Border.Width="0.5" Text="Платник №&#13;&#10;з/п&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 9pt" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell354" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell355" Border.Lines="All" Border.Width="0.5" Text="Найменування&#13;&#10;продукції&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="17" RowSpan="3"/>
+          <TableCell Name="Cell356" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell357" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell358" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell359" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell360" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell361" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell362" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell363" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell364" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell365" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell366" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell367" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell368" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell369" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell370" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell371" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell372" Border.Lines="All" Border.Width="0.5" Text="Од.&#13;&#10;вим.&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3" RowSpan="3"/>
+          <TableCell Name="Cell373" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell374" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell375" Border.Lines="All" Border.Width="0.5" Text="К-сть&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3" RowSpan="3"/>
+          <TableCell Name="Cell376" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell377" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell378" Border.Lines="All" Border.Width="0.5" Text="Ціна&#13;&#10;без ПДВ&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="5" RowSpan="3"/>
+          <TableCell Name="Cell379" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell380" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell381" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell382" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell383" Border.Lines="All" Border.Width="0.5" Text="Сума&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="5" RowSpan="3"/>
+          <TableCell Name="Cell384" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell385" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell386" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell387" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell388" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell390" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell391" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell392" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell393" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell394" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell395" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell396" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell397" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell398" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell399" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell400" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell401" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell402" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell403" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell404" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell405" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell406" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell407" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell408" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell409" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell410" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell411" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell412" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell413" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell414" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell415" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell416" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell417" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell418" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell419" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell420" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell421" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell422" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell423" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell424" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell425" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell426" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row12">
+          <TableCell Name="Cell428" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell429" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell430" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell431" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell432" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell433" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell434" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell435" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell436" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell437" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell438" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell439" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell440" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell441" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell442" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell443" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell444" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell445" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell446" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell447" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell448" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell449" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell450" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell451" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell452" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell453" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell454" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell455" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell456" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell457" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell458" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell459" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell460" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell461" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell462" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell463" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell464" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row13">
+          <TableCell Name="Cell466" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell467" Border.Lines="All" Border.Width="0.5" Text="1" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell468" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell469" Border.Lines="All" Border.Width="0.5" Text="[zap.NAZN]" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="17" RowSpan="3"/>
+          <TableCell Name="Cell470" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell471" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell472" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell473" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell474" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell475" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell476" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell477" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell478" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell479" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell480" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell481" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell482" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell483" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell484" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell485" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell486" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3" RowSpan="3"/>
+          <TableCell Name="Cell487" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell488" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell489" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3" RowSpan="3"/>
+          <TableCell Name="Cell490" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell491" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell492" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="5" RowSpan="3"/>
+          <TableCell Name="Cell493" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell494" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell495" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell496" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell497" Border.Lines="All" Border.Width="0.5" Text="[zap.SUMP]" Format="Number" Format.UseLocale="true" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="5" RowSpan="3"/>
+          <TableCell Name="Cell498" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell499" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell500" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell501" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell502" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row14">
+          <TableCell Name="Cell504" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell505" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell506" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell507" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell508" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell509" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell510" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell511" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell512" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell513" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell514" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell515" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell516" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell517" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell518" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell519" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell520" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell521" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell522" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell523" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell524" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell525" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell526" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell527" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell528" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell529" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell530" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell531" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell532" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell533" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell534" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell535" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell536" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell537" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell538" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell539" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell540" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row15">
+          <TableCell Name="Cell542" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell543" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell544" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell545" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell546" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell547" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell548" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell549" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell550" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell551" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell552" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell553" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell554" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell555" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell556" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell557" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell558" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell559" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell560" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell561" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell562" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell563" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell564" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell565" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell566" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell567" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell568" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell569" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell570" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell571" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell572" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell573" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell574" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell575" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell576" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell577" Border.Lines="All" Border.Width="0.5" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell578" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row16">
+          <TableCell Name="Cell580" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell581" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell582" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell583" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell584" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell585" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell586" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell587" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell588" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell589" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell590" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell591" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell592" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell593" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell594" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell595" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell596" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell597" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell598" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell599" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell600" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell601" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell602" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell603" Border.Lines="All" Border.Width="0.5" Text="Разом&#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell604" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell605" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell606" Border.Lines="All" Border.Width="0.5" Text="[zap.SUMP]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="10"/>
+          <TableCell Name="Cell607" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell608" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell609" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell610" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell611" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell612" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell613" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell614" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell615" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell616" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row17">
+          <TableCell Name="Cell618" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell619" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell620" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell621" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell622" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell623" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell624" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell625" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell626" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell627" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell628" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell629" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell630" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell631" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell632" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell633" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell634" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell635" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell636" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell637" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell638" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell639" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell640" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell641" Border.Lines="All" Border.Width="0.5" Text="ПДВ&#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell642" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell643" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell644" Border.Lines="All" Border.Width="0.5" Text="0,00" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="10"/>
+          <TableCell Name="Cell645" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell646" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell647" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell648" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell649" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell650" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell651" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell652" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell653" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell654" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row18">
+          <TableCell Name="Cell656" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell657" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell658" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell659" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="17"/>
+          <TableCell Name="Cell660" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell661" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell662" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell663" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell664" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell665" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell666" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell667" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell668" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell669" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell670" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell671" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell672" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell673" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell674" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell675" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell676" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell677" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell678" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell679" Border.Lines="All" Border.Width="0.5" Text="Всього" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3"/>
+          <TableCell Name="Cell680" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell681" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell682" Border.Lines="All" Border.Width="0.5" Text="[zap.SUMP]" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="10"/>
+          <TableCell Name="Cell683" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell684" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell685" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell686" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell687" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell688" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell689" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell690" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell691" Border.Lines="All" Border.Width="0.5" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell692" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row19">
+          <TableCell Name="Cell694" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell695" Border.Lines="All" Border.Width="0.5" Text="Сума прописом: [zap.FSUMPR]" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="35"/>
+          <TableCell Name="Cell696" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell697" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell698" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell699" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell700" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell701" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell702" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell703" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell704" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell705" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell706" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell707" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell708" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell709" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell710" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell711" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell712" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell713" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell714" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell715" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell716" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell717" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell718" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell719" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell720" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell721" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell722" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell723" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell724" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell725" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell726" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell727" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell728" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell729" Border.Lines="All" Border.Width="0.5" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell730" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row20">
+          <TableCell Name="Cell732" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell733" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell734" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell735" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell736" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell737" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell738" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell739" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell740" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell741" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell742" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell743" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell744" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell745" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell746" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell747" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell748" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell749" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell750" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell751" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell752" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell753" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell754" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell755" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell756" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell757" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell758" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell759" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell760" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell761" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell762" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell763" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell764" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell765" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell766" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell767" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell768" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row21">
+          <TableCell Name="Cell770" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell771" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell772" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell773" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell774" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell775" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell776" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell777" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell778" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell779" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell780" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell781" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell782" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell783" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell784" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell785" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell786" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell787" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell788" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell789" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell790" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell791" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell792" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell793" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell794" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell795" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell796" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell797" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell798" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell799" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell800" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell801" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell802" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell803" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell804" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell805" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell806" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row22">
+          <TableCell Name="Cell808" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell809" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell810" Text="Нач. управління  &#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="14"/>
+          <TableCell Name="Cell811" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell812" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell813" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell814" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell815" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell816" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell817" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell818" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell819" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell820" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell821" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell822" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell823" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell824" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell825" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell826" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell827" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell828" Text="Гол. бухгалтер&#13;&#10;" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="14"/>
+          <TableCell Name="Cell829" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell830" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell831" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell832" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell833" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell834" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell835" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell836" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell837" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell838" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell839" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell840" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell841" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell842" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell843" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell844" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row23">
+          <TableCell Name="Cell846" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell847" Text="МП" VertAlign="Center" Font="Times New Roman, 10pt" ColSpan="3" RowSpan="2"/>
+          <TableCell Name="Cell848" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell849" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell850" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell851" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell852" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell853" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell854" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell855" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell856" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell857" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell858" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell859" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell860" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell861" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell862" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell863" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell864" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell865" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell866" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell867" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell868" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell869" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell870" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell871" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell872" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell873" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell874" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell875" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell876" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell877" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell878" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell879" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell880" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell881" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell882" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row24">
+          <TableCell Name="Cell884" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell885" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell886" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell887" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell888" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell889" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell890" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell891" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell892" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell893" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell894" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell895" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell896" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell897" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell898" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell899" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell900" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell901" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell902" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell903" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell904" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell905" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell906" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell907" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell908" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell909" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell910" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell911" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell912" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell913" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell914" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell915" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell916" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell917" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell918" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell919" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell920" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row25">
+          <TableCell Name="Cell922" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell923" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell924" Text="[zap.BOSS]" VertAlign="Center" Font="Times New Roman, 10pt, style=Underline" ColSpan="14"/>
+          <TableCell Name="Cell925" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell926" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell927" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell928" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell929" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell930" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell931" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell932" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell933" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell934" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell935" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell936" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell937" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell938" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell939" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell940" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell941" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell942" Text="[zap.BUCH]" VertAlign="Center" Font="Times New Roman, 10pt, style=Underline" ColSpan="14"/>
+          <TableCell Name="Cell943" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell944" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell945" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell946" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell947" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell948" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell949" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell950" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell951" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell952" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell953" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell954" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell955" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell956" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell957" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell958" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row26">
+          <TableCell Name="Cell960" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell961" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell962" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell963" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell964" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell965" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell966" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell967" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell968" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell969" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell970" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell971" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell972" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell973" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell974" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell975" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell976" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell977" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell978" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell979" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell980" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell981" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell982" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell983" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell984" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell985" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell986" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell987" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell988" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell989" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell990" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell991" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell992" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell993" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell994" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell995" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell996" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row27">
+          <TableCell Name="Cell998" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell999" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1000" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1001" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1002" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1003" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1004" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1005" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1006" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1007" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1008" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1009" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1010" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1011" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1012" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1013" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1014" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1015" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1016" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1017" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1018" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1019" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1020" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1021" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1022" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1023" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1024" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1025" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1026" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1027" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1028" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1029" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1030" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1031" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1032" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1033" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1034" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row28">
+          <TableCell Name="Cell1036" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1037" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1038" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1039" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1040" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1041" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1042" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1043" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1044" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1045" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1046" Text="АКТ&#13;&#10;виконаних робіт (послуг)&#13;&#10;" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 12pt, style=Bold" ColSpan="14" RowSpan="3"/>
+          <TableCell Name="Cell1047" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1048" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1049" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1050" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1051" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1052" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1053" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1054" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1055" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1056" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1057" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1058" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1059" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1060" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1061" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1062" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1063" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1064" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1065" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1066" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1067" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1068" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1069" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1070" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1071" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1072" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row29">
+          <TableCell Name="Cell1074" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1075" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1076" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1077" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1078" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1079" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1080" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1081" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1082" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1083" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1084" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1085" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1086" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1087" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1088" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1089" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1090" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1091" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1092" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1093" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1094" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1095" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1096" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1097" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1098" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1099" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1100" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1101" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1102" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1103" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1104" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1105" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1106" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1107" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1108" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1109" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1110" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row30">
+          <TableCell Name="Cell1112" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1113" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1114" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1115" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1116" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1117" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1118" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1119" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1120" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1121" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1122" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1123" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1124" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1125" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1126" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1127" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1128" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1129" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1130" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1131" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1132" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1133" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1134" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1135" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1136" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1137" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1138" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1139" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1140" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1141" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1142" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1143" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1144" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1145" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1146" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1147" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1148" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row33">
+          <TableCell Name="Cell1226" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1227" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1228" Text="[zap.ADRES]" HorzAlign="Center" Font="Times New Roman, 10pt" ColSpan="13"/>
+          <TableCell Name="Cell1229" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1230" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1231" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1232" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1233" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1234" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1235" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1236" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1237" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1238" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1239" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1240" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1241" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1242" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1243" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1244" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1245" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1246" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1247" Text="[zap.FDAT]" HorzAlign="Center" Font="Times New Roman, 10pt" ColSpan="13"/>
+          <TableCell Name="Cell1248" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1249" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1250" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1251" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1252" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1253" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1254" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1255" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1256" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1257" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1258" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1259" HorzAlign="Center" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1260" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1261" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1262" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row34">
+          <TableCell Name="Cell1264" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1265" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1266" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1267" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1268" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1269" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1270" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1271" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1272" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1273" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1274" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1275" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1276" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1277" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1278" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1279" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1280" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1281" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1282" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1283" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1284" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1285" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1286" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1287" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1288" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1289" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1290" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1291" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1292" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1293" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1294" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1295" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1296" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1297" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1298" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1299" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1300" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row35" AutoSize="true">
+          <TableCell Name="Cell1302" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1303" Text="          Ми, що нижче підписалися: Виконавець в особі начальника [zap.NAME] [zap.BOSS], та Замовник в особі [zap.NMK]   [zap.RUK], склали даний акт про те, що Виконавцем було надано послуги з прийому платежів на користь Замовника:" HorzAlign="Justify" Font="Times New Roman, 10pt" ColSpan="34" RowSpan="3"/>
+          <TableCell Name="Cell1304" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1305" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1306" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1307" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1308" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1309" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1310" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1311" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1312" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1313" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1314" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1315" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1316" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1317" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1318" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1319" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1320" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1321" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1322" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1323" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1324" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1325" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1326" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1327" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1328" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1329" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1330" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1331" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1332" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1333" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1334" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1335" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1336" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1337" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1338" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row36" AutoSize="true">
+          <TableCell Name="Cell1340" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1341" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1342" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1343" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1344" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1345" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1346" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1347" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1348" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1349" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1350" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1351" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1352" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1353" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1354" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1355" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1356" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1357" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1358" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1359" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1360" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1361" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1362" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1363" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1364" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1365" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1366" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1367" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1368" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1369" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1370" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1371" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1372" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1373" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1374" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1375" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1376" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row37" Height="47.25" AutoSize="true">
+          <TableCell Name="Cell1378" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1379" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1380" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1381" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1382" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1383" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1384" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1385" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1386" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1387" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1388" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1389" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1390" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1391" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1392" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1393" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1394" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1395" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1396" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1397" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1398" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1399" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1400" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1401" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1402" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1403" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1404" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1405" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1406" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1407" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1408" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1409" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1410" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1411" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1412" HorzAlign="Justify" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1413" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1414" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row38">
+          <TableCell Name="Cell1416" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1417" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1418" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1419" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1420" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1421" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1422" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1423" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1424" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1425" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1426" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1427" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1428" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1429" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1430" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1431" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1432" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1433" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1434" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1435" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1436" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1437" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1438" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1439" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1440" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1441" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1442" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1443" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1444" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1445" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1446" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1447" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1448" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1449" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1450" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1451" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1452" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row39" AutoSize="true">
+          <TableCell Name="Cell1454" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1455" Text="1. [zap.NAZN]&#13;&#10;   [zap.SUMP] ([zap.FSUMPR]) ,без ПДВ" Font="Times New Roman, 10pt" ColSpan="34" RowSpan="2"/>
+          <TableCell Name="Cell1456" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1457" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1458" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1459" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1460" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1461" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1462" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1463" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1464" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1465" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1466" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1467" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1468" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1469" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1470" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1471" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1472" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1473" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1474" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1475" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1476" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1477" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1478" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1479" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1480" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1481" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1482" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1483" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1484" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1485" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1486" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1487" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1488" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1489" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1490" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row40" AutoSize="true">
+          <TableCell Name="Cell1492" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1493" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1494" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1495" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1496" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1497" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1498" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1499" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1500" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1501" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1502" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1503" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1504" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1505" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1506" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1507" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1508" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1509" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1510" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1511" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1512" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1513" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1514" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1515" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1516" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1517" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1518" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1519" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1520" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1521" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1522" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1523" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1524" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1525" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1526" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1527" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1528" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row41">
+          <TableCell Name="Cell1530" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1531" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1532" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1533" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1534" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1535" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1536" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1537" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1538" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1539" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1540" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1541" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1542" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1543" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1544" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1545" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1546" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1547" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1548" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1549" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1550" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1551" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1552" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1553" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1554" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1555" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1556" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1557" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1558" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1559" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1560" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1561" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1562" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1563" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1564" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1565" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1566" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row42" AutoSize="true">
+          <TableCell Name="Cell1568" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1569" Text=" Загальна сума за надані Банком послуги складає:&#13;&#10;   [zap.SUMP] ([zap.FSUMPR]) , без ПДВ" Font="Times New Roman, 10pt" ColSpan="34" RowSpan="2"/>
+          <TableCell Name="Cell1570" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1571" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1572" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1573" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1574" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1575" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1576" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1577" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1578" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1579" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1580" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1581" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1582" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1583" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1584" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1585" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1586" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1587" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1588" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1589" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1590" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1591" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1592" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1593" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1594" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1595" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1596" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1597" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1598" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1599" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1600" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1601" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1602" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1603" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1604" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row43" AutoSize="true">
+          <TableCell Name="Cell1606" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1607" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1608" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1609" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1610" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1611" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1612" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1613" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1614" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1615" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1616" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1617" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1618" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1619" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1620" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1621" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1622" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1623" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1624" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1625" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1626" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1627" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1628" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1629" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1630" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1631" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1632" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1633" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1634" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1635" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1636" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1637" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1638" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1639" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1640" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1641" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1642" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row44">
+          <TableCell Name="Cell1644" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1645" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1646" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1647" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1648" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1649" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1650" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1651" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1652" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1653" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1654" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1655" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1656" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1657" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1658" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1659" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1660" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1661" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1662" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1663" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1664" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1665" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1666" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1667" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1668" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1669" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1670" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1671" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1672" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1673" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1674" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1675" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1676" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1677" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1678" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1679" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1680" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row45" AutoSize="true">
+          <TableCell Name="Cell1682" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1683" Text="яку необхідно перерахувати на рахунок № [zap.NLSA] в ОПЕРВ [zap.NAME], МФО [zap.MFO], код [zap.OKPOB]" Font="Times New Roman, 10pt" ColSpan="34" RowSpan="2"/>
+          <TableCell Name="Cell1684" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1685" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1686" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1687" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1688" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1689" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1690" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1691" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1692" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1693" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1694" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1695" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1696" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1697" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1698" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1699" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1700" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1701" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1702" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1703" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1704" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1705" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1706" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1707" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1708" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1709" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1710" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1711" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1712" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1713" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1714" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1715" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1716" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1717" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1718" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row46" AutoSize="true">
+          <TableCell Name="Cell1720" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1721" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1722" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1723" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1724" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1725" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1726" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1727" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1728" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1729" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1730" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1731" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1732" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1733" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1734" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1735" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1736" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1737" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1738" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1739" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1740" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1741" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1742" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1743" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1744" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1745" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1746" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1747" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1748" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1749" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1750" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1751" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1752" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1753" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1754" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1755" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1756" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row48">
+          <TableCell Name="Cell1796" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1797" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1798" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1799" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1800" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1801" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1802" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1803" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1804" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1805" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1806" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1807" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1808" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1809" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1810" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1811" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1812" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1813" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1814" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1815" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1816" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1817" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1818" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1819" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1820" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1821" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1822" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1823" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1824" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1825" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1826" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1827" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1828" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1829" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1830" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1831" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1832" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row49">
+          <TableCell Name="Cell1834" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1835" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1836" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1837" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1838" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1839" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1840" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1841" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1842" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1843" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1844" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1845" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1846" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1847" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1848" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1849" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1850" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1851" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1852" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1853" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1854" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1855" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1856" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1857" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1858" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1859" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1860" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1861" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1862" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1863" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1864" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1865" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1866" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1867" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1868" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1869" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1870" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row50">
+          <TableCell Name="Cell1872" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1873" Text="Виконавець: " Font="Times New Roman, 12pt" ColSpan="15"/>
+          <TableCell Name="Cell1874" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1875" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1876" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1877" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1878" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1879" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1880" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1881" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1882" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1883" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1884" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1885" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1886" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1887" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1888" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1889" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1890" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1891" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1892" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1893" Text="Замовник:" Font="Times New Roman, 12pt" ColSpan="13"/>
+          <TableCell Name="Cell1894" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1895" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1896" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1897" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1898" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1899" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1900" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1901" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1902" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1903" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1904" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1905" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1906" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1907" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1908" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row52">
+          <TableCell Name="Cell1948" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1949" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1950" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1951" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1952" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1953" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1954" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1955" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1956" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1957" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1958" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1959" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1960" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1961" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1962" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1963" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1964" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1965" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1966" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1967" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1968" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1969" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1970" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1971" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1972" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1973" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1974" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1975" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1976" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1977" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1978" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1979" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1980" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1981" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1982" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1983" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1984" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row53">
+          <TableCell Name="Cell1986" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell1987" Text="  Начальник   управління                    " Font="Times New Roman, 10pt" ColSpan="15"/>
+          <TableCell Name="Cell1988" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1989" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1990" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1991" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1992" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1993" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1994" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1995" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1996" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1997" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1998" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell1999" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2000" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2001" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2002" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2003" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2004" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2005" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2006" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2007" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2008" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2009" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2010" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2011" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2012" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2013" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2014" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2015" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2016" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2017" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2018" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2019" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2020" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2021" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2022" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row54">
+          <TableCell Name="Cell2024" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2025" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2026" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2027" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2028" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2029" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2030" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2031" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2032" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2033" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2034" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2035" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2036" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2037" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2038" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2039" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2040" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2041" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2042" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2043" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2044" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2045" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2046" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2047" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2048" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2049" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2050" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2051" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2052" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2053" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2054" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2055" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2056" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2057" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2058" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2059" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2060" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row55">
+          <TableCell Name="Cell2062" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2063" Text="_______________[zap.BOSS]" Font="Times New Roman, 10pt" ColSpan="19"/>
+          <TableCell Name="Cell2064" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2065" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2066" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2067" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2068" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2069" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2070" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2071" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2072" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2073" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2074" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2075" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2076" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2077" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2078" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2079" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2080" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2081" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2082" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2083" Text="___________[zap.RUK]" Font="Times New Roman, 10pt" ColSpan="15"/>
+          <TableCell Name="Cell2084" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2085" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2086" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2087" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2088" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2089" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2090" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2091" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2092" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2093" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2094" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2095" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2096" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2097" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2098" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row56">
+          <TableCell Name="Cell2100" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2101" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2102" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2103" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2104" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2105" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2106" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2107" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2108" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2109" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2110" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2111" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2112" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2113" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2114" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2115" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2116" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2117" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2118" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2119" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2120" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2121" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2122" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2123" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2124" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2125" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2126" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2127" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2128" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2129" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2130" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2131" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2132" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2133" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2134" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2135" Font="Times New Roman, 10pt"/>
+          <TableCell Name="Cell2136" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row57">
+          <TableCell Name="Cell2138" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2139" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2140" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2141" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2142" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2143" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2144" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2145" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2146" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2147" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2148" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2149" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2150" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2151" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2152" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2153" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2154" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2155" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2156" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2157" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2158" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2159" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2160" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2161" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2162" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2163" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2164" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2165" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2166" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2167" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2168" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2169" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2170" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2171" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2172" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2173" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2174" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row58">
+          <TableCell Name="Cell2176" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2177" Text="Сторони одна до одної претензій, що стосується розрахунку зазначеної в дійсному Акті суми за надані послуги, що належать Банку ,не мають.&#13;&#10;Даний акт складений в 2(двох) примірниках по одному для кожної із сторін.&#13;&#10;" Font="Times New Roman, 7pt" ColSpan="35" RowSpan="2"/>
+          <TableCell Name="Cell2178" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2179" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2180" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2181" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2182" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2183" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2184" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2185" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2186" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2187" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2188" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2189" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2190" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2191" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2192" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2193" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2194" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2195" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2196" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2197" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2198" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2199" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2200" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2201" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2202" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2203" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2204" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2205" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2206" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2207" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2208" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2209" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2210" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2211" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2212" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row59">
+          <TableCell Name="Cell2214" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2215" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2216" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2217" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2218" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2219" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2220" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2221" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2222" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2223" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2224" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2225" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2226" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2227" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2228" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2229" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2230" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2231" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2232" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2233" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2234" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2235" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2236" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2237" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2238" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2239" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2240" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2241" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2242" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2243" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2244" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2245" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2246" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2247" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2248" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2249" Font="Times New Roman, 7pt"/>
+          <TableCell Name="Cell2250" Font="Times New Roman, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row60">
+          <TableCell Name="Cell2252" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2253" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2254" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2255" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2256" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2257" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2258" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2259" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2260" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2261" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2262" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2263" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2264" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2265" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2266" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2267" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2268" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2269" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2270" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2271" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2272" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2273" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2274" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2275" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2276" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2277" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2278" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2279" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2280" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2281" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2282" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2283" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2284" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2285" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2286" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2287" Font="Times New Roman, 12pt"/>
+          <TableCell Name="Cell2288" Font="Times New Roman, 12pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="1202.24" Width="699.3" Height="18.9"/>
+  </ReportPage>
+</Report>

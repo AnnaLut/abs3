@@ -4,44 +4,33 @@ using System.Collections.Generic;
 
 namespace Bars.WebServices.XRM.Services.DepositXrm.Models
 {
-    public class XRMDptRequestReq
+    public class RequestCreateRequest
     {
-        public Decimal TransactionId;
-        public String UserLogin;
-        public Int16 OperationType;
-        public String KF;
-        public String Branch;
-        public decimal req_type;
-        public string TrusteeType;
-        public decimal cust_id;
-        public string CertifNum;
-        public DateTime CertifDate;
-        public DateTime DateStart;
-        public DateTime DateFinish;
-        public List<AccessInfo> AccessList;
+        public string Kf { get; set; }
+        public string Branch { get; set; }
+        public decimal RequestType { get; set; }
+        public string TrusteeType { get; set; }
+        public decimal CustomerId { get; set; }
+        public string CertificateNumber { get; set; }
+        public DateTime CertificateDate { get; set; }
+        public DateTime DateStart { get; set; }
+        public DateTime DateFinish { get; set; }
+        public List<AccessInfo> AccessList { get; set; }
     }
-    public class XRMDptRequestRes
+    public class RequestCreateResponse
     {
-        public decimal req_id;
-        //public byte[] Doc;
-        public string Doc;
-        public decimal Status;
-        public string ErrMessage;
+        public decimal RequestId { get; set; }
+        public string Doc { get; set; }
     }
-    public class XRMDptRequestStateReq
+    public class RequestStateRequest
     {
-        public Decimal TransactionId;
-        public String UserLogin;
-        public Int16 OperationType;
-        public String KF;
-        public String Branch;
-        public decimal req_id;
+        public string Kf { get; set; }
+        public string Branch { get; set; }
+        public decimal RequestId { get; set; }
     }
-    public class XRMDptRequestStateRes
+    public class RequestStateResponse
     {
-        public decimal RequestState;
-        public string RequestMessage;
-        public decimal Status;
-        public string ErrMessage;
+        public decimal RequestState { get; set; }
+        public string RequestMessage { get; set; }
     }
 }

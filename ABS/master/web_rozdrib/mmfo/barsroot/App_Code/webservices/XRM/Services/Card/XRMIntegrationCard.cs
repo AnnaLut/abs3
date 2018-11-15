@@ -198,45 +198,10 @@ namespace Bars.WebServices.XRM.Services.Card
         #region CardCreditParams+Print
         [SoapHeader("WsHeaderValue", Direction = SoapHeaderDirection.In)]
         [WebMethod(EnableSession = true)]
-        public XRMCardCreditRes SetCardCreditParam(XRMCardCreditReq XRMCardCreditReq)
+        [return: XmlElement(ElementName = "Response")]
+        public XRMResponseDetailed<CardCreditResponse> SetCardCreditParam(XRMRequest<CardCreditRequest> Request)
         {
-            var XRMCardCreditRes = new XRMCardCreditRes();
-            decimal TransSuccess = 0;
-            Byte[] responseBytes;
-
-            using (OracleConnection con = Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
-            {
-                try
-                {
-                    LoginADUserIntSingleCon(con, XRMCardCreditReq.UserLogin);
-
-                    TransSuccess = TransactionCheck(con, XRMCardCreditReq.TransactionId, out responseBytes);
-                    if (TransSuccess == 0)
-                    {
-                        for (int i = 0; i < XRMCardCreditReq.acc.Length; i++)
-                        {
-                            XRMCardCreditReq.acc[i] = XRMCardCreditReq.acc[i].AddRuTail(XRMCardCreditReq.KF.ToString());
-                        }
-                        TransactionCreate(con, XRMCardCreditReq.TransactionId, XRMCardCreditReq.UserLogin, XRMCardCreditReq.OperationType);
-                        XRMCardCreditRes = CardWorker.SetCardCredit(XRMCardCreditReq, con);
-                    }
-                    else
-                    {
-                        String errorMsg = TransSuccess == -1 ? String.Format(TransactionExistsMessage, XRMCardCreditReq.TransactionId) : String.Format(TransactionErrorMessage, XRMCardCreditReq.TransactionId);
-                        XRMCardCreditRes = ToResponse<XRMCardCreditRes>(responseBytes);
-                        XRMCardCreditRes.ResultMessage = errorMsg + "\r" + XRMCardCreditRes.ResultMessage;
-                        return XRMCardCreditRes;
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    XRMCardCreditRes.ResultMessage = ex.Message;
-                    XRMCardCreditRes.ResultCode = -1;
-                }
-                WriteRequestResponseToLog(con, XRMCardCreditReq.TransactionId, XRMCardCreditReq, XRMCardCreditRes);
-            }
-
-            return XRMCardCreditRes;
+            return ExecuteMethod(Request, CardWorker.SetCardCredit);
         }
         #endregion CardCreditParams+Print
 

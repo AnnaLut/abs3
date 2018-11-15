@@ -506,7 +506,7 @@ namespace Bars.WebServices.XRM.Services.RegPayments
                 doc.ExportToMemoryStream(FrxExportTypes.Pdf, ms);
                 bytes = ms.ToArray();
             }
-            return DepositXrm.DepositXrmWorker.GetZipFile(bytes, outfilename).ToArray();
+            return DepositXrm.DepositWorker.GetZipFile(bytes, outfilename).ToArray();
         }
         static byte[] SbonDoc(decimal orderId)
         {
@@ -526,7 +526,7 @@ namespace Bars.WebServices.XRM.Services.RegPayments
                 doc.ExportToMemoryStream(FrxExportTypes.Pdf, ms);
                 bytes = ms.ToArray();
             }
-            return DepositXrm.DepositXrmWorker.GetZipFile(bytes, outfilename).ToArray();
+            return DepositXrm.DepositWorker.GetZipFile(bytes, outfilename).ToArray();
         }
 
         public static XRMRegPayResult ProcCreateRegPay(XRMRegPayReq XRMRegPayReq, string idstype, OracleConnection connect)

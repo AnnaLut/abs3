@@ -1,36 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Bars.WebServices.XRM.Services.DepositXrm.Models
 {
-    public class XRMDPTPortfolioRec
+    public class PortfolioRecord
     {
-        public string mark;
-        public decimal dpt_id;
-        public string dpt_num;
-        public string type_name;
-        public DateTime? datz;
-        public DateTime? dat_end;
-        public string nls;
-        public string lcv;
-        public Int16 dpt_lock;
-        public decimal archdoc_id;
-        public decimal ostc;
-        public decimal ost_int;
+        public decimal DepositId { get; set; }
+        public string DepositNumber { get; set; }
+        public string TypeName { get; set; }
+        public DateTime? DateZ { get; set; }
+        public DateTime? DateEnd { get; set; }
+        public string Nls { get; set; }
+        public string Lcv { get; set; }
+        public Int16 DepositLock { get; set; }
+        public decimal ArchiveDocId { get; set; }
+        public decimal OstC { get; set; }
+        public decimal OstInt { get; set; }
     }
-    public class XRMDPTPortfolioRequest
+    public class PortfolioRequest
     {
-        public Decimal TransactionId;
-        public String UserLogin;
-        public Int16 OperationType;
-        public String KF;
-        public String Branch;
-        public decimal RNK;
-    }
-    public class XRMDPTPortfolioResponce
-    {
-        public XRMDPTPortfolioRec[] XRMDPTPortfolioRec;
-        public int ResultCode;
-        public string ResultMessage;
+        public string Kf { get; set; }
+        public string Branch { get; set; }
+        public decimal Rnk { get; set; }
     }
 }

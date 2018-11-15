@@ -34,24 +34,22 @@ begin
     end if; 
 end;
 / 
-
 -- Add comments to the table 
 comment on table CORP2_FUNCTIONS
-  is 'Функции';
+  is 'Функції КОРП2';
 -- Add comments to the columns 
 comment on column CORP2_FUNCTIONS.func_id
-  is 'Код функции';
+  is 'Код функції';
 comment on column CORP2_FUNCTIONS.func_name
-  is 'Название функции';
+  is 'Назва функції';
 comment on column CORP2_FUNCTIONS.start_page
-  is 'Адрес страницы(url)';
-comment on column CORP2_FUNCTIONS.description 
-  is 'Описание страницы';
+  is 'Адреса сторінки(url)';
+comment on column CORP2_FUNCTIONS.description
+  is 'Опис сторінки';
 comment on column CORP2_FUNCTIONS.func_type
-  is 'Тип функции';
+  is 'Тип функції';
 comment on column CORP2_FUNCTIONS.user_type
-  is 'Тип пользователей';
-
+  is 'Тип користувача';
 
 
 begin

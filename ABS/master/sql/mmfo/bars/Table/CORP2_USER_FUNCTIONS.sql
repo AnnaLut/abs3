@@ -23,4 +23,13 @@ organization index';
 end;
 /
 
+-- Add comments to the table 
+comment on table CORP2_USER_FUNCTIONS
+  is 'Звязок користувач-функція';
+-- Add comments to the columns 
+comment on column CORP2_USER_FUNCTIONS.user_id
+  is 'Ід користувача';
+comment on column CORP2_USER_FUNCTIONS.func_id
+  is 'Ід функції';
+
 grant select, insert, update, delete, alter on CORP2_USER_FUNCTIONS to BARS_ACCESS_DEFROLE;

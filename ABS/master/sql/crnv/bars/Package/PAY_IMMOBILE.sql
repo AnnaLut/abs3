@@ -1,10 +1,24 @@
 CREATE OR REPLACE PACKAGE BARS.PAY_IMMOBILE
 IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.44  25/02/2016';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version 1.45  27/09/2018';
 
  function get_nls2924foracc(p_nls in varchar2) return varchar2;
  -- Процедура виплати клієнту
  procedure pay_immobile_crnv(p_key asvo_immobile.key%type);
+ 
+-- Проверяем, что документ подписан внешней подписью (СЭП) для VEGA2
+-- Внешняя подпись обязательно
+   procedure Check_Sign_VEGA2 (p_ref     in out nocopy number ,
+                               p_sign_id in out        number  );
+                               
+   -- Инсертит записи с подписами VEGA2 в ОДБ (переносим ХЕШ подписи для РЕФеренца сформирвоанный в ОДБ!!! )
+   procedure INS_Vega2_To_ODB (p_ref_odb  in number,
+                               p_ref_crkr in number,
+                               p_TT       in varchar2);
+   
+
+                
+                              
  --маркування для відправки на доходи РУ
  procedure before_send2ru(p_key number);
  -- Процедура повернення на доходи РУ
@@ -29,7 +43,7 @@ END PAY_IMMOBILE;
 /
 
 CREATE OR REPLACE PACKAGE BODY BARS.PAY_IMMOBILE IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.39  17/08/2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.45 27/09/2018';
   g_mfo varchar2(9);
 
  function get_nls2924foracc(p_nls in varchar2)
@@ -599,6 +613,103 @@ end get_nls2924foracc;
       end;
     end if;
   end pay_immobile_crnv;
+  
+  -- Проверяем, что документ подписан внешней подписью (СЭП) VEGA2
+  -- Внешняя подпись обязательно
+ procedure Check_Sign_VEGA2 (p_ref     in out nocopy number,
+                             p_sign_id in out        number  ) is 
+   begin
+   
+  select  max(ext.ref), max(sd.id)
+   into       p_ref   , p_sign_id
+    from sgn_data sd
+        ,sgn_ext_store ext
+   where sd.id = ext.sign_id
+     and ext.ref = p_ref
+     and sd.sign_hex is not null
+     and sd.sign_type = 'VG2';
+     
+  end  Check_Sign_VEGA2;   
+ 
+ -- Инсертит записи с подписами VEGA2 в ОДБ (переносим ХЕШ подписи для РЕФеренца сформирвоанный в ОДБ!!! )
+ procedure INS_Vega2_To_ODB (p_ref_odb  in number,
+                             p_ref_crkr in number,
+                             p_TT       in varchar2 -- тип транзакции
+                             ) is
+   l_seq_out number(25);
+   l_err     varchar2(4000);
+   l_rec_id  number(38);
+  begin
+ -------------------
+  for rec in (  select sd.id,
+                       sd.sign_type,
+                       sd.key_id,
+                       sd.creating_date,
+                       sd.sign_hex,
+                       x.type_sgn,
+                       x.rec_id
+      from sgn_data sd,
+           (select int.ref, int.sign_id, int.rec_id, 1 type_sgn
+              from sgn_int_store int
+             where int.ref = p_ref_crkr 
+            union
+            select ext.ref, ext.sign_id, null rec_id, 2 type_sgn
+              from sgn_ext_store ext
+             where ext.ref = p_ref_crkr 
+             ) x
+     where sd.id = x.sign_id
+       and sd.sign_hex is not null
+       and sd.sign_type = 'VG2')
+ loop
+begin
+
+ --dbms_output.put_line(' stars ->');
+ -- Вытягиваем Сиквенс с ОДБ для таблицы sgn_data@barsdb.grc.ua 
+ sgn_mgr.get_seq_nextval@barsdb.grc.ua(seq_out  => l_seq_out,
+                                       name_seq => 's_sgndata');
+
+--dbms_output.put_line('10_ l_seq_out ->'|| l_seq_out); 
+
+insert into sgn_data@barsdb.grc.ua  (select  l_seq_out ,
+                                             sd1.sign_type,
+                                             sd1.key_id,
+                                             sd1.creating_date,
+                                             sd1.sign_hex       from sgn_data sd1 where sd1.id = rec.id );
+--dbms_output.put_line('20_ l_seq_out ->'|| l_seq_out);
+
+ --  Сховище внутрішніх підписів по документам (OPER_VISA) - Передаем в ОДБ
+  if   rec.type_sgn = 1 then         
+--    добавляем в OPER_VISA
+      chk.put_visa_out@barsdb.grc.ua(p_ref_odb, p_TT, null, 0, null/*p_key*/,null /*p_int_sign*/, null/*p_sep_sign*/, l_rec_id);
+ 
+          sgn_mgr.store_int_sign@barsdb.grc.ua(p_ref       => p_ref_odb,
+                                               p_rec_id    => l_rec_id /*rec.rec_id*/,
+                                               p_sign_type => 'VG2',
+                                               p_key_id    => rec.key_id,
+                                               p_sign_hex  => null,       /*rec.sign_hex*/
+                                               p_data_id   => l_seq_out); 
+  end if;  
+  
+  --  Сховище СЕП підписів по документам (OPER) - Передаем в ОДБ
+ if   rec.type_sgn = 2 then      
+          sgn_mgr.store_sep_sign@barsdb.grc.ua(p_ref       => p_ref_odb,
+                                               p_sign_type => 'VG2',
+                                               p_key_id    => rec.key_id,
+                                               p_sign_hex  => null,       /*rec.sign_hex*/
+                                               p_data_id   => l_seq_out);
+  end if;
+
+Exception
+    when others then
+      l_err := SQLERRM;
+       raise_application_error(-20000, 'Ошибка переноса подписей в АБС: '|| l_err);
+end;
+
+
+ end loop;
+
+end INS_Vega2_To_ODB;
+
 
   --маркування для відправки на доходи РУ
   PROCEDURE before_send2ru(p_key number) is
@@ -978,6 +1089,9 @@ end get_nls2924foracc;
     g_grc_tt_real tts.tt%type;
     g_grc_tt_info tts.tt%type := '514';
     l_errmsg      varchar2(4000);
+    
+    l_data_id  sgn_data.id%type;
+    l_ref_ext  sgn_ext_store.ref%type;
 
   begin
 
@@ -1026,9 +1140,16 @@ end get_nls2924foracc;
       -- оплата документов в ГРЦ
       for cur_o in (select o.*
                       from oper o, crnv_to_grc c
-                     where o.ref = c.ref) loop
+                     where o.ref = c.ref
+   ) loop
         begin
           savepoint before_act_pay;
+
+   -- если подписи в cur_o.sign нет, проверяем, что это действительно подпись VEGA2 
+        l_ref_ext :=  cur_o.ref ;        
+        pay_immobile.check_sign_vega2(p_ref     => l_ref_ext,
+                                      p_sign_id => l_data_id);
+          
           -- проверка параметров документов
           if (cur_o.vdat > l_grc_date) then
             raise_application_error(-20000,
@@ -1038,7 +1159,7 @@ end get_nls2924foracc;
                                     ' більша за банківську дату в ГРЦ ' ||
                                     to_char(l_grc_date, 'dd.mm.yyyy'));
           end if;
-          if (cur_o.sign is null) then
+          if (cur_o.sign is null and l_ref_ext is null ) then  -- Проверка по VEGA1 и VEGA2
             raise_application_error(-20000,
                                     'REF=' || cur_o.ref || ' - ' ||
                                     'На документ не накладено підпис СЕП');
@@ -1051,9 +1172,9 @@ end get_nls2924foracc;
                                     g_mfo);
           end if;
 
-          select o.sos into l_sos from oper o where o.ref = cur_o.ref;
+        --  select o.sos into l_sos from oper o where o.ref = cur_o.ref; -- Зачем надо было ?
 
-          if not (l_sos in (4, 5)) then
+          if not (/*l_sos*/ cur_o.sos in (4, 5)) then
             raise_application_error(-20000,
                                     'REF=' || cur_o.ref ||
                                     ' - Не проведено в ЦРНВ');
@@ -1224,6 +1345,25 @@ end get_nls2924foracc;
               null;
             end if;
           end if;
+
+
+  ------------------------------------
+  -- Подписи по VEGA2 переносим в АБС. 
+  begin 
+   pay_immobile.ins_vega2_to_odb(p_ref_odb  => l_ref,
+                                 p_ref_crkr => cur_o.ref,
+                                 p_TT => l_tt);
+   exception
+          when others then
+            l_err := sqlerrm;
+           raise_application_error(-20000,
+                                    'REF=' || cur_o.ref ||
+                                    'Ошибка переноса подписи VEGA2 в ОДБ: ' || 'err = ' ||
+                                    l_err || ', rec = ' || l_rec);
+        end;
+  
+  -----------------------------------
+  
 
           --  проверяем успешность оплати в СЄП
           if not (l_sos_grc = 5 and l_err = 0 and l_rec > 0) then

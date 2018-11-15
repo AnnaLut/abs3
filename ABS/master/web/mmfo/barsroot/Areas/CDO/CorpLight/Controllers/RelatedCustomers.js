@@ -255,6 +255,7 @@ angular.module(globalSettings.modulesAreas)
             vm.validateTaxCode = function () {
                 var taxCode = vm.currentUser.TaxCode;
                 var custId = document.getElementById('custId').value;
+                //во время заполнения ИНН, преверяем, существует ли пользователь с такими данными в базе АБС,Корп2.
                 if (taxCode) {
                     relatedCustomersService.getByTaxCode(custId, taxCode, vm.currentUser.DocSeries, vm.currentUser.DocNumber).then(
                         function (response) {
@@ -301,6 +302,7 @@ angular.module(globalSettings.modulesAreas)
             vm.currentUser = new RelatedCustomer();
 
             var dateNow = new Date();
+            //человек не может получить паспорт менее чем через 16  лет после рождения
             vm.minBirthDate = new Date(dateNow.getFullYear() - 16, dateNow.getMonth(), dateNow.getDate());
 
             var validate = function () {

@@ -137,7 +137,7 @@ end;
 create or replace package body bars.zp
 is
 
-g_body_version   constant varchar2(64)   := 'version 1.27 28.10.2018';
+g_body_version   constant varchar2(64)   := 'version 1.28 19.10.2018';
 
 g_modcode        constant varchar2(3)   := 'ZP';
 g_aac_tip        constant varchar2(3)   := 'ZRP';
@@ -973,6 +973,18 @@ begin
        update zp_deals
           set branch = p_branch
         where id= p_id;
+       -- COBUMMFO-7001 -- пониження рівня рахунка при зміні бранча договору
+       -- оновлюю по кожному рахунку окремо (бо на груповому оновленні контроль і буде помилка CAC-00003 - Заборонено групове поновлення рахунків)
+       -- upd 2909
+       update accounts a 
+          set a.branch = p_branch,
+              a.tobo   = p_branch
+        where acc = l_zp_deals.acc_2909;
+       -- upd 3570
+       update accounts a 
+          set a.branch = p_branch,
+              a.tobo   = p_branch
+        where acc = coalesce(p_acc_3570,l_zp_deals.acc_3570);
      end if;
    end if;
 
@@ -1548,7 +1560,7 @@ begin
               and dazs is null;
           exception when no_data_found then
                     raise_application_error(-20000, 'Не знайдено альтернативний рахунок - '|| p_nlsb||', або рахунок закрито.');    
-          end;
+      end ;
         when others then
                   raise_application_error(-20000, 'Помилка пошуку рахунка '|| p_nlsb||'. '||dbms_utility.format_error_backtrace || ' ' || sqlerrm);
       end;
@@ -1619,7 +1631,11 @@ begin
        where id = p_id;
 
   end if;
-end;
+exception
+  when others then
+    bars_audit.info ('zp.add_payroll_doc.error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+    raise_application_error(-20001, 'Виникла помилка створення відомості. ' || ' ' || sqlerrm);
+end add_payroll_doc;
 
 --==============================
 --видалення документа із відомості
@@ -2572,6 +2588,7 @@ p_blob:=p_clob;
 
   exception when others
       then
+        bars_audit.info ('zp.payroll_imp.error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
          l_zp_pr_imp.sos:= 2;
          l_zp_pr_imp.err_text:=substr( sqlerrm,1,2000);
 
@@ -2583,7 +2600,10 @@ p_blob:=p_clob;
      set row = l_zp_pr_imp
      where id=l_zp_pr_imp.id;
 
-
+exception
+  when others then
+    bars_audit.info ('zp.payroll_imp.error ' || dbms_utility.format_error_backtrace || ' ' || sqlerrm);
+    raise_application_error(-20001, 'Виникла помилка імпорту відомості. ' || ' ' || sqlerrm);
 end;
 --==============================
 --Видалення імпортованого файла відомості

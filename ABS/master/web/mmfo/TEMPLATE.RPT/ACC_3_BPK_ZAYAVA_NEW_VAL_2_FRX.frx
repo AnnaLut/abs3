@@ -130,11 +130,11 @@ namespace FastReport
       <TableDataSource Name="Table" Alias="DKBO" DataType="System.Int32" Enabled="true" SelectCommand="select distinct deal_id,dkbo_contract_id as ACC_BPK_DKBO_NUM from w4_dkbo_web where acc_acc = :p_nd">
         <Column Name="DEAL_ID" DataType="System.Int64"/>
         <Column Name="ACC_BPK_DKBO_NUM" DataType="System.String"/>
-        <CommandParameter Name=":p_nd" DataType="112" Expression="[p_nd]" DefaultValue="-1"/>
+        <CommandParameter Name=":p_nd" DataType="113" Expression="[p_nd]" DefaultValue="-1"/>
       </TableDataSource>
     </OracleDataConnection>
-    <Parameter Name="p_nd" DataType="System.Int32" Expression="0"/>
-    <Parameter Name="p_adds" DataType="System.Int32"/>
+    <Parameter Name="p_nd" DataType="System.Int64" Expression="0"/>
+    <Parameter Name="p_adds" DataType="System.Int64"/>
     <Parameter Name="p_doc_id" DataType="System.Int64" Expression="0"/>
   </Dictionary>
   <ReportPage Name="Page1">

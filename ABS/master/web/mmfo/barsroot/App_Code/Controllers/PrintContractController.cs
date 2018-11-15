@@ -373,36 +373,35 @@ namespace BarsWeb.Controllers
 
                     sqlText = ServicesClass.GetSelectStryng(
                             entity,
-                            rowName: @" DISTINCT wdw.nd,
-                                wdw.rnk,
-                                DKBO_ID,
-                                DKBO_NUMBER,
-                                a.id,
-                                a.name,
-                                ebp.GET_ARCHIVE_DKBO_DOCID(wdw.acc,
-                                                            wdw.rnk,
-                                                            wd.struct_code,
-                                                            wd.doc_id)
-                                    AS state,
-                                wd.STRUCT_CODE FROM(
-                                SELECT product_code,
-                                nd,
-                                cust_rnk rnk,
-                                DKBO_DATE_FROM,
-                                DKBO_DATE_TO,
-                                DKBO_ID,
-                                DKBO_NUMBER,
-                                acc_acc acc
-                            FROM W4_DEAL_WEB
-                            WHERE acc_acc = :acc) wdw,
-                        w4_product wp,
-                        w4_product_doc wd,
-                        doc_scheme a
-                    WHERE wd.grp_code = wp.grp_code
-                        AND wdw.product_code = wp.code
-                        AND wd.doc_id NOT LIKE '%MIGR%'
-                        AND wd.TYPE = 1
-                        AND a.id = wd.doc_id ",
+                            rowName: @" t1.*,
+                                               ebp.GET_ARCHIVE_DKBO_DOCID(t1.acc, t1.rnk, t1.struct_code, t1.doc_id) AS state,
+                                               (select DOC_PRINT_NUMBER
+                                                  from ead_docs
+                                                 where id = abs(ebp.GET_ARCHIVE_DKBO_DOCID(t1.acc,
+                                                                                           t1.rnk,
+                                                                                           t1.struct_code,
+                                                                                           t1.doc_id))) as print_number
+                                          from (select DISTINCT wdw.rnk,
+                                                                DKBO_ID,
+                                                                DKBO_NUMBER,
+                                                                a.id,
+                                                                a.name,
+                                                                wd.doc_id,
+                                                                wdw.acc,
+                                                                wd.STRUCT_CODE
+                                                  FROM (SELECT CUSTOMER_ID      as rnk,
+                                                               DKBO_DATE_FROM   as DKBO_DATE_FROM,
+                                                               BDKBO_DATE_TO    as DKBO_DATE_TO,
+                                                               DEAL_ID          as DKBO_ID,
+                                                               DKBO_CONTRACT_ID as DKBO_NUMBER,
+                                                               acc_acc          acc
+                                                          FROM W4_DKBO_WEB
+                                                         WHERE acc_acc = :acc) wdw,
+                                                       w4_product_doc wd,
+                                                       doc_scheme a
+                                                 WHERE wd.doc_id NOT LIKE '%MIGR%'
+                                                   AND wd.TYPE = 1
+                                                   AND a.id = wd.doc_id) t1 ",
                             typeSeach: "",
                             filterString: "", //combinedFilter,
                             sort: "", //gridParam.Sort,
@@ -462,10 +461,16 @@ namespace BarsWeb.Controllers
                 ContractNumbers = ids,
                 TemplateIds = templates
             };
-
-            string filePath = reporter.GetReportFile();
-            Session["multiprint_file"] = filePath;
-            return Json(true, JsonRequestBehavior.AllowGet);
+            try
+            {
+                string filePath = reporter.GetReportFile();
+                Session["multiprint_file"] = filePath;
+                return Json("ok", JsonRequestBehavior.AllowGet);
+            }
+            catch(Exception e)
+            {
+                return Json(e.Message, JsonRequestBehavior.AllowGet);
+            }
         }
 
         private bool isNeedShowDialog(string[] templates)
@@ -583,7 +588,7 @@ namespace BarsWeb.Controllers
 
         public FilePathResult DownloadReportFile()
         {
-            string filePath = Session["multiprint_file"].ToString();
+            string filePath = Session["multiprint_file"]+"";
             Session["multiprint_file"] = null;
             if (string.IsNullOrWhiteSpace(filePath))
             {

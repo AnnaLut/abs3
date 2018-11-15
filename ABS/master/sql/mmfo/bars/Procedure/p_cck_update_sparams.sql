@@ -7,9 +7,10 @@ COBUMMFO-6175
 При ручному редагуванні параметра R011 на основному рахунку SS - необхідно реалізувати процедуру, 
 яка буде змінювати R011 на рахунках SP, SDI,SN,SNO, SNA, SPN цієї угоди , - при закритті банківського дня.
 */
-l_title constant varchar2(32) := 'P_CCK_UPDATE_SPARAMS';
+title constant varchar2(32) := 'zbd.P_CCK_UPDATE_SPARAMS';
 begin
-    bars_audit.info(l_title||': start for '||p_start_date||', '||p_end_date);
+      logger.tms_info( title||': Entry with ( p_start_date='||to_char(p_start_date,'dd.mm.yyyy')
+                        ||', p_end_date='||to_char(p_end_date,'dd.mm.yyyy')||' ).' );
     for rec in (
         with
         changed_sp_accs as /* счета SS, по которым менялись спецпараметры за дату */
@@ -32,16 +33,16 @@ begin
     loop
         savepoint sp1;
         begin
-            bars_audit.trace(l_title||': обновляем спецпараметры счета: #'||rec.acc);
+            bars_audit.trace(title||': обновляем спецпараметры счета: #'||rec.acc);
             accreg.setAccountSParam(rec.acc, 'R011', rec.r011);
         exception
             when others then
                 rollback to sp1;
-                bars_audit.error(l_title||': error for acc #'||rec.acc||': '||sqlerrm||' : '||dbms_utility.format_error_backtrace);
+                logger.tms_error( title||': error for acc #'||rec.acc||chr(10)||sqlerrm||chr(10)||dbms_utility.format_error_backtrace);
                 continue;
         end;
     end loop;
-    bars_audit.info(l_title||': finish');
+    logger.tms_info( title||': Finish.' );
 end p_cck_update_sparams;
 /
 Show errors;

@@ -633,7 +633,7 @@ begin
             where o.acc_pk = a.acc and a.dazs is null
               and a.acc = w.acc and w.tag = 'PK_PRCT'
               and w.value = to_char(p_proect_id)
-              and regexp_like(o.card_code,'(VECCST)|(MSTDEBPID)')
+              and regexp_like(o.card_code,'(VECCST)|(MSTDEBPID)|(MWORLDEBPID)')
               and a.rnk = l_rnk;
            l_err := 'Клієнту вже відкрито картку ' || l_card || ' ' || l_nls;
         exception
@@ -641,7 +641,7 @@ begin
               -- обновление реквизитов клиента
               bars_ow.alter_client(l_rnk, l_client_array(i));
            when too_many_rows then
-              l_err := 'Клієнту вже відкрито картки %VECCST% або %MSTDEBPID%';
+              l_err := 'Клієнту вже відкрито картки %VECCST% або %MSTDEBPID% або %MWORLDEBPID%';
         end;
      end if;
 
@@ -713,7 +713,7 @@ begin
 
   bars_audit.trace(h || 'Start.');
 
-  if not regexp_like(p_card_code,'(VECCST)|(MSTDEBPID)') then
+  if not regexp_like(p_card_code,'(VECCST)|(MSTDEBPID)|(MWORLDEBPID)') then
      raise_application_error(-20000, 'Заборонено відкривати картку ' || p_card_code || ' для Електронний студентський квиток');
   end if;
 

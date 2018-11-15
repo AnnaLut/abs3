@@ -27,7 +27,12 @@ PROMPT *** Create  procedure CCK_SCAN ***
   g_Kv  number  ;
   g_Ref number  ;
   g_Err varchar2(252) ;
+  title constant varchar2(32) := 'zbd.CCK_Scan ';
+  l_error_message varchar2(4000);
 begin
+	
+	logger.tms_info( title||'Start Додаткова щоденна бізнес-логіка продуктів КП');
+	
   for k in (select d.nd, c.pFINIS , substr(d.prod,1, 6) PROD  from cc_deal d, cck_ob22 c
             where d.sos >= 10 and d.sos < 15 and d.vidd in (1,2,3,11,12,13) and substr(d.prod,1, 6) = c.nbS||c.ob22
            )
@@ -53,12 +58,22 @@ begin
         SAVEPOINT sp_before_CL;
         -----------------------
         begin execute  immediate sSql_ ; i_Commit := i_Commit + 1 ; If i_Commit >= n_Commit then  COMMIT; i_Commit := 0 ;   end if ;
-        EXCEPTION  WHEN OTHERS THEN      bars_audit.error('CCK_SCAN, проц.'|| k.pFINIS || ', КД='||k.nd|| '*' ||SQLERRM );
+        EXCEPTION  WHEN OTHERS THEN       --bars_audit.error('CCK_SCAN, проц.'|| k.pFINIS || ', КД='||k.nd|| '*' ||SQLERRM );
+		  l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+          logger.tms_error( title||'проц.'|| k.pFINIS || ', КД='||k.nd|| chr(10) ||l_error_message);	
               ROLLBACK TO sp_before_CL ;
         end  ;
      end if  ;
 
   end loop   ;
+	
+	logger.tms_info( title||'Finish Додаткова щоденна бізнес-логіка продуктів КП');
+	
+exception when others 
+	then 
+		l_error_message := substr(sqlerrm||dbms_utility.format_error_backtrace(), 1, 4000);
+    logger.tms_error( title||'exception: '|| chr(10) ||l_error_message);	 	 	
+		
 end CCK_Scan ;
 /
 show err;

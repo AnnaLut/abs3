@@ -3,7 +3,7 @@ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/ead_integration.sql ====
 PROMPT ===================================================================================== 
 
 CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
-   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-43 3.2 10.08.2018 MMFO';
+   g_header_version   CONSTANT VARCHAR2 (64) := 'version  Rel-49 3.3 08.10.2018 MMFO';
    g_type_id  object_type.id%type;
    g_state_id number;
 
@@ -16,6 +16,8 @@ CREATE OR REPLACE PACKAGE BARS.EAD_INTEGRATION IS
    function get_agr_type(p_agr_id in EAD_DOCS.AGR_ID%type) return varchar2;
    function get_acc_type(p_agr_id in EAD_DOCS.AGR_ID%type, p_acc in EAD_DOCS.acc%type) return varchar2;
    procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out number);
+   function get_deal_state_id(p_deal_id in number)
+      return number;
   procedure get_dkbo(p_acc         in accounts.acc%type,
                      p_id          out deal.id%type,
                      p_deal_number out deal.deal_number%type,
@@ -63,8 +65,10 @@ function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs 
       user_login            staff$base.logname%TYPE,
       user_fio              staff$base.fio%TYPE,
       branch_id             ead_docs.crt_branch%TYPE,
-      linkedrnk             NUMBER
-   );
+      linkedrnk             NUMBER,
+      ticket_id             ead_docs.ticket_id%TYPE,
+      doc_print_number      ead_docs.doc_print_number%TYPE
+      );
 
    TYPE Doc_Instance_Set IS TABLE OF Doc_Instance_Rec;
 
@@ -448,12 +452,12 @@ function ead_nbs_check_param  (p_nbs      varchar2, -- можно передавать как nbs 
 
 END ead_integration;
 /
-show errors
+SHOW ERRORS;
 
 
 
 CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
-   g_body_version constant varchar2(64) := 'version 3.1 10.08.2018 MMFO';
+   g_body_version constant varchar2(64) := 'version 3.3 08.10.2018 MMFO';
 
    type TAccAgrParam is record
    (
@@ -508,10 +512,13 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
        when no_data_found then
          -- 2 ищем в ДКБО
          begin
-           select 'dkbo_fo' into l_res from deal d
-            where D.DEAL_TYPE_ID = g_type_id
-              and D.STATE_ID = g_state_id
-              and d.id = p_agr_id;
+           select 'dkbo_fo' into l_res
+           from   deal o
+            where o.deal_type_id = g_type_id
+              and o.id = p_agr_id;
+           if get_deal_state_id(p_deal_id => p_agr_id) <> g_state_id then
+               l_res := null;
+           end if;
          exception
            when no_data_found then
              l_res := null;
@@ -519,6 +526,36 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
      end;
      return l_res;
    end get_agr_type;
+
+   function get_deal_state_id(p_deal_id in number)
+      return number
+    is
+       invalid_identifier_state_id exception;
+       pragma exception_init(invalid_identifier_state_id, -904);
+       l_state_id number;
+   begin
+
+        begin
+            -- попытка выполнить запрос с возвращением поля STATE_ID из OBJECT_STATE
+            execute immediate 'select state_id from deal where id = :p_deal_id '
+              into l_state_id using p_deal_id;
+            -- выполнилось без ошибки выходим
+            return l_state_id;
+        exception
+           when invalid_identifier_state_id then
+              null;
+        end;
+        begin
+            -- попытка выполнить запрос с возвращением поля STATE_ID из OBJECT_STATE
+            execute immediate 'select state_id from object where id = :p_deal_id '
+              into l_state_id using p_deal_id;
+            -- выполнилось без ошибки выходим
+            return l_state_id;
+        exception
+           when invalid_identifier_state_id then
+              null;
+        end;
+   end;
 
    /*ТОЛЬКО ДЛЯ МЕТОДА SetDocumentData (функция get_Doc_Instance) в связи с внедрением ДКБО и печатных документов к нему, требуется определять тип сделки и тип счета по ead_docs*/
    function get_acc_type(p_agr_id in EAD_DOCS.AGR_ID%type, p_acc in EAD_DOCS.acc%type) return varchar2
@@ -548,15 +585,15 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
    procedure get_dkbo_settings(l_type_id out object_type.id%type,  l_state_id out number) is
       invalid_identifier_state_id exception;
       pragma exception_init(invalid_identifier_state_id, -904);
-      
-      
-      l_sql_template    varchar2(500) := 
+
+
+      l_sql_template    varchar2(500) :=
                         q'#
                      FROM object_type ot,  object_state os
                     WHERE ot.type_code = 'DKBO'
                       and OT.ID = OS.OBJECT_TYPE_ID
                       and OS.STATE_CODE = 'CONNECTED'#';
-  
+
    begin
 
      /* -- старый код + нижний exception
@@ -567,43 +604,43 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
         and OT.ID = OS.OBJECT_TYPE_ID
         and OS.STATE_CODE = 'CONNECTED';
         */
-   
+
       -- зависимости между разработками
       -- сделали рефакторинг OBJECT_STATE, но не понятно когда релиз
-       
-      -- оставляем для dependency (запрос пустышка) 
+
+      -- оставляем для dependency (запрос пустышка)
       SELECT max(null)
-        into l_type_id      
+        into l_type_id
         FROM object_type ot,  object_state os
        WHERE ot.type_code = 'DKBO'
          and OT.ID = OS.OBJECT_TYPE_ID
          and OS.STATE_CODE = 'CONNECTED'
-         and 1 = 0; -- 
-       
+         and 1 = 0; --
+
         begin
             -- попытка выполнить запрос с возвращением поля STATE_ID из OBJECT_STATE
             execute immediate 'SELECT ot.id, os.state_id '||
-                              l_sql_template  
+                              l_sql_template
               into l_type_id, l_state_id;
-            -- выполнилось без ошибки выходим   
-            return;  
+            -- выполнилось без ошибки выходим
+            return;
         exception
            when invalid_identifier_state_id then
               null;
            when others then
-              raise;  
+              raise;
         end;
         begin
             -- попытка выполнить запрос с возвращением поля ID из OBJECT_STATE
             execute immediate 'SELECT ot.id, os.id state_id '||
                               l_sql_template
               into l_type_id, l_state_id;
-            return;  
+            return;
         exception
            when invalid_identifier_state_id then
               null;
            when others then
-              raise;  
+              raise;
         end;
    exception when no_data_found then
       bars_audit.error('EBP.GET_ARCHIVE_DKBO_DOCID : Не описаний тип/статуси угоди ДКБО');
@@ -650,18 +687,17 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                                                   FROM object_type tt
                                                  WHERE tt.type_code = 'DKBO')
                 where avs.number_values =  p_acc;
-        exception
-            when no_data_found then
-                null;
+     exception  when no_data_found then
+       null;
         end;
-        
+
         begin
             SELECT  D.DEAL_NUMBER,
-                    D.START_DATE ,
-                    D.STATE_ID
-            into    p_deal_number, p_start_date, p_state_id        
+                    D.START_DATE
+            into    p_deal_number, p_start_date
             from   deal d
             where d.ID = p_id;
+            p_state_id := get_deal_state_id(p_deal_id => p_id);
         exception
             when no_data_found then
                 null;
@@ -672,53 +708,53 @@ CREATE OR REPLACE PACKAGE BODY BARS.EAD_INTEGRATION IS
                                 p_tip      varchar2,
                                 p_ob22     varchar2,
                                 p_CUSTTYPE INTEGER default null ) return number is
- l_nbs varchar2(14);  
- l_id  number(10);   
-                      
+ l_nbs varchar2(14);
+ l_id  number(10);
+
 begin
- l_nbs := substr(p_nbs,1,4); 
-     begin 
-   
+ l_nbs := substr(p_nbs,1,4);
+     begin
+
  for rec in (select e.id,
                 e.nbs,
                 e.tip,
                 e.ob22,
-                case when e.tip is null and e.ob22 is null then e.id end clear , 
+                case when e.tip is null and e.ob22 is null then e.id end clear ,
                 count(e.nbs) over(partition by e.nbs ) coun
            from ead_nbs e
           where e.nbs = l_nbs
           and e.custtype = nvl(p_CUSTTYPE, e.custtype)
-               
+
            )
  loop
 
    --  dbms_output.put_line(' 1 ->'||rec.id ); 
-    if     nvl(rec.tip,'0')  = p_tip and nvl(rec.ob22,'0')  = p_ob22  then l_id:= rec.id ; 
-    elsif nvl(rec.tip,'0')  = p_tip  and nvl(rec.ob22,'0') <> p_ob22 then l_id:= rec.id ; 
-    elsif nvl(rec.tip,'0')  <> p_tip  and    nvl(rec.ob22,'0') = p_ob22 then l_id:= rec.id ;
-    end if;      
+    if    nvl(rec.tip,'0') =  p_tip and nvl(rec.ob22,'0') =  p_ob22           then l_id:= rec.id ; 
+    elsif nvl(rec.tip,'0') =  p_tip and nvl(rec.ob22,'0') <> nvl(p_ob22, 'x') then l_id:= rec.id ; 
+    elsif nvl(rec.tip,'0') <> p_tip and nvl(rec.ob22,'0') =  p_ob22           then l_id:= rec.id ;
+    end if;
 
  end loop;
- 
-  if l_id is null  then 
+
+  if l_id is null  then
       select e.id
-           into l_id  
+           into l_id
            from ead_nbs e
-          where e.nbs = l_nbs 
+          where e.nbs = l_nbs
            and e.tip is null
            and e.ob22 is null
-		   and e.custtype = nvl(p_CUSTTYPE, e.custtype);         
-  end if; 
- 
+		   and e.custtype = nvl(p_CUSTTYPE, e.custtype);
+  end if;
+
     return l_id;
        end;
 end  ead_nbs_check_param;
- 
+
 
     procedure get_accagr_param(p_acc in accounts.acc%type) is
         l_agr_type ead_nbs.agr_type%type;
         l_acc_type ead_nbs.acc_type%type;
-        l_agr_status deal.state_id%type;
+        l_agr_status number;
         l_NDBO varchar2(40);
         l_DDBO varchar2(50);
         l_SDBO varchar2(50);
@@ -826,7 +862,7 @@ end  ead_nbs_check_param;
     procedure get_accagr_param_reserve(p_rsrv_id accounts_rsrv.rsrv_id%type) is
         l_agr_type ead_nbs.agr_type%type;
         l_acc_type ead_nbs.acc_type%type;
-        l_agr_status deal.state_id%type;
+        l_agr_status number;
         l_NDBO varchar2(40);
         l_DDBO varchar2(50);
         l_SDBO varchar2(50);
@@ -976,7 +1012,9 @@ end  ead_nbs_check_param;
                      fio as user_fio,
                      crt_branch as branch_id,
 --                     CASE WHEN rnk <> linkedrnk THEN linkedrnk ELSE NULL END AS linkedrnk
-                     nullif(linkedrnk, rnk) as linkedrnk
+                     nullif(linkedrnk, rnk) as linkedrnk,
+                     ticket_id,
+                     doc_print_number
                 FROM (SELECT d.kf,
                              d.id,
                              (select min(rnk) keep(dense_rank last order by idupd) from bars.dpt_deposit_clos dds where dds.deposit_id = d.agr_id) as rnk,
@@ -991,7 +1029,9 @@ end  ead_nbs_check_param;
                              d.scan_data,
                              a.nls,
                              a.kv,
-                             a.acc
+                             a.acc,
+                             d.ticket_id,
+                             d.doc_print_number
                         FROM ead_docs d
                         left outer join accounts a on d.acc = a.acc
                         left outer join staff$base sb on d.crt_staff_id = sb.id
@@ -1002,7 +1042,7 @@ end  ead_nbs_check_param;
     loop
       l_Doc_Instance_Rec.rnk                := ead_integration.split_key(i.rnk, i.kf);
       l_Doc_Instance_Rec.doc_type           := i.doc_type;
-      l_Doc_Instance_Rec.doc_id             := i.doc_id;
+      l_Doc_Instance_Rec.ticket_id          := i.ticket_id; --      l_Doc_Instance_Rec.doc_id             := i.doc_id;
       l_Doc_Instance_Rec.doc_pages_count    := i.doc_pages_count;
       l_Doc_Instance_Rec.doc_binary_data    := i.doc_binary_data;
       l_Doc_Instance_Rec.doc_request_number := i.doc_request_number;
@@ -1016,6 +1056,7 @@ end  ead_nbs_check_param;
       l_Doc_Instance_Rec.user_login         := i.user_login;
       l_Doc_Instance_Rec.user_fio           := i.user_fio;
       l_Doc_Instance_Rec.branch_id          := i.branch_id;
+      l_Doc_Instance_Rec.doc_print_number   := i.doc_print_number;
 --      l_Doc_Instance_Rec.linkedrnk          := ead_integration.split_key(i.linkedrnk, i.kf);
 
       PIPE ROW(l_Doc_Instance_Rec);
@@ -1159,8 +1200,8 @@ end  ead_nbs_check_param;
                  WHERE rnkfrom != p_rnk and rnkto = p_rnk order by rnkfrom desc)
 */
     for i in (select rnk as mrg_rnk, kf from customer
-               where rnk in (select rnkfrom from rnk2nls where rnkfrom != p_rnk and rnkto = p_rnk)
-                 and rnk in (select rnkfrom from rnk2tbl where rnkfrom != p_rnk and rnkto = p_rnk)
+               where (rnk in (select rnkfrom from rnk2nls where rnkfrom != p_rnk and rnkto = p_rnk)
+                   or rnk in (select rnkfrom from rnk2tbl where rnkfrom != p_rnk and rnkto = p_rnk))
                  and date_off is not null)
     loop
         l_MergedRNK_Rec.mrg_rnk := ead_integration.split_key(i.mrg_rnk, i.kf);
@@ -1295,7 +1336,7 @@ end  ead_nbs_check_param;
         parent_agr_code  deal.id%type;
         parent_agr_number deal.deal_number%type;
         l_agr_date deal.start_date%type;
-        l_agr_status deal.state_id%type;
+        l_agr_status number;
         l_deposit_wb dpt_deposit_clos.wb%type;
     begin
       bc.go('/');
@@ -1461,7 +1502,7 @@ end  ead_nbs_check_param;
                        'dkbo_fo'        as agr_type,
                        d.id             as agr_code,
                        d.deal_number    as agr_number,
-                       decode(D.STATE_ID, g_state_id, 1, 0) as agr_status,  -- статусы в ЕА надо смотреть по цикл жижни угоды
+                       decode(get_deal_state_id(d.id), g_state_id, 1, 0) as agr_status,  -- статусы в ЕА надо смотреть по цикл жижни угоды
                        d.START_DATE     as agr_date_open,
                        D.CLOSE_DATE     as agr_date_close,
                        d.START_DATE     as created,
@@ -1508,10 +1549,10 @@ end  ead_nbs_check_param;
                   join w4_acc w4  on a.acc = w4.acc_pk
                  where 1 = 1
                    and dkbo.id = p_agr_id
-                   and w4.acc_pk member of l_acc_list                  
-                   and (dkbo.start_date > w4.dat_begin 
+                   and w4.acc_pk member of l_acc_list
+                   and (dkbo.start_date > w4.dat_begin
                    or   dkbo.start_date <= greatest(to_date('10/02/2018','dd/mm/yyyy'), ( select max(trunc(MIGRATION_START_TIME) )from migration_log where TABLE_NAME ='DEAL' and MIGRATION_ID= a.kf ))
-                       ) 
+                       )
                  order by w4.nd) loop
 --        exit;
         pipe row(ead_integration.split_key(i.nd, i.kf));
@@ -2045,7 +2086,7 @@ end  ead_nbs_check_param;
                        AND au.idupd = (SELECT MAX (au0.idupd)
                                          FROM accounts_update au0
                                         WHERE au0.acc = a.acc)
-      and a.nbs = case when a.nbs = '2620' and substr(a.tip,1,2) <> 'W4' then null else a.nbs end                                              
+      and a.nbs = case when a.nbs = '2620' and substr(a.tip,1,2) <> 'W4' then null else a.nbs end
                        AND au.doneby = sb.logname(+))
         loop
           l_ACC_Instance_Rec.rnk                       := ead_integration.split_key(i.rnk, i.kf);
@@ -2108,16 +2149,13 @@ begin
    get_dkbo_settings(g_type_id, g_state_id);
 END ead_integration;
 /
-show errors
-
-
+SHOW ERRORS;
 
 prompt ***  grants on ead_integration ***
-grant execute on bars.ead_integration to bars_access_defrole;
+GRANT EXECUTE ON BARS.EAD_INTEGRATION TO BARS_ACCESS_DEFROLE;
+GRANT EXECUTE ON BARS.EAD_INTEGRATION TO BARSREADER_ROLE;
 
- 
  
  PROMPT ===================================================================================== 
  PROMPT *** End *** ========== Scripts /Sql/BARS/package/ead_integration.sql =========*** End
- PROMPT ===================================================================================== 
- 
+ PROMPT =====================================================================================

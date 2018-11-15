@@ -67,6 +67,18 @@ begin
     end if; 
 end;
 / 
+-- Add comments to the table 
+comment on table CORP2_ACSK_REGISTRATION
+  is 'Реєстрація корисувача в АЦСК';
+-- Add comments to the columns 
+comment on column CORP2_ACSK_REGISTRATION.registration_id
+  is 'Ід реєстрації';
+comment on column CORP2_ACSK_REGISTRATION.rel_cust_id
+  is 'Ід користувача';
+comment on column CORP2_ACSK_REGISTRATION.acsk_user_id
+  is 'Ід АЦСК-користувача ';
+comment on column CORP2_ACSK_REGISTRATION.registration_date
+  is 'Дата реєстації';
 
 -- Grant/Revoke object privileges 
 grant select, insert, update, delete, alter, debug on CORP2_ACSK_REGISTRATION to BARS_ACCESS_DEFROLE;

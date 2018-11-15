@@ -51,6 +51,7 @@ begin
     l_zpr.txt          := 'SELECT z.nd num_doc,'||nlchr||
                            '         z.id,'||nlchr||
                            '         z.dk,'||nlchr||
+						   '         case when z.fnamekb = ''CL'' then 1 else 0 end kb,'||nlchr||
                            '         f_dat_lit (z.fdat) begin_date,'||nlchr||
                            '         z.s2 / 100 amount_in,'||nlchr||
                            '         ROUND (z.s2 / 100 * z.KURS_F, 2) base_amount_in,'||nlchr||

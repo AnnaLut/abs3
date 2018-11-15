@@ -2382,7 +2382,9 @@ is
              rollback to before_doc;
 
              l_error_message := sqlerrm || dbms_utility.format_error_backtrace();
-             bars_audit.error('interest_utl.pay_int_reckoning_row (exception)' || chr(10) || l_error_message);
+             --bars_audit.error('interest_utl.pay_int_reckoning_row (exception)' || chr(10) || l_error_message);
+			 logger.tms_error('zbd.interest_utl.pay_int_reckoning_row (exception)' || chr(10) || l_error_message);
+
 
              if (p_silent_mode) then
                  update int_reckoning t

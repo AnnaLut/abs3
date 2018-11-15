@@ -2078,22 +2078,30 @@ END p_cck_interest;
     dd     cc_deal%ROWTYPE;
     k1     SYS_REFCURSOR;
     l_mode INT := 1;
+title constant varchar2(32) := 'zbd.cck_ui.p_interest_cck: ';
 
   BEGIN
 null;
-
     if gl.bdate != dat_last_work(gl.bdate) then
-      logger.info('Поточний банківський день не останній робочий день місяця. Нарахування відсотків виконуємо лише в останній робочий день!');
+      --logger.info('Поточний банківський день не останній робочий день місяця. Нарахування відсотків виконуємо лише в останній робочий день!');
+      logger.tms_info(title||'Поточний банківський день не останній робочий день місяця. Нарахування відсотків виконуємо лише в останній робочий день!');
       return;
     end if;
-
     IF p_type = 1 THEN
-      p_interest_cck1(11, NULL);
-      cdb_mediator.pay_accrued_interest;
+          logger.tms_info(title||'Start Нарахування відсотків,комісій,пені по КП ФО');
+             p_interest_cck1(11, NULL);
+               cdb_mediator.pay_accrued_interest;
     ELSIF p_type = 2 THEN
-      p_interest_cck1(1, NULL);
-      cdb_mediator.pay_accrued_interest;
+			      logger.tms_info(title||'Start Нарахування відсотків,комісій,пені по КП ЮО');
+              p_interest_cck1(1, NULL);
+                cdb_mediator.pay_accrued_interest;
     END IF;
+		
+		IF p_type = 1 THEN 
+		  logger.tms_info(title||'Finish Нарахування відсотків,комісій,пені по КП ФО');
+		ELSIF p_type = 2 THEN
+			logger.tms_info(title||'Finish Нарахування відсотків,комісій,пені по КП ЮО');
+	  END IF;		
   END p_interest_cck;
   --Зміна призначення платежу при нарахуванні % в портфелі ССKF i CCKU
   PROCEDURE p_int_reckoning_nazn_edit

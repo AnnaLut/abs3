@@ -22,4 +22,13 @@ organization index';
 end;
 / 
 
+-- Add comments to the table 
+comment on table CORP2_USER_MODULES
+  is 'Звязок корисувач-модулі';
+-- Add comments to the columns 
+comment on column CORP2_USER_MODULES.user_id
+  is 'Ід корисувача';
+comment on column CORP2_USER_MODULES.module_id
+  is 'Ід модуля';
+
 grant select, insert, update, delete, alter on CORP2_USER_MODULES to BARS_ACCESS_DEFROLE;

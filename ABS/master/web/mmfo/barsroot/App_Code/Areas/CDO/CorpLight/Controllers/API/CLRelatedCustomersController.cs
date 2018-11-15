@@ -109,7 +109,11 @@ namespace BarsWeb.Areas.CDO.CorpLight.Controllers.Api
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
-
+        
+        /// <param name="custId"></param>
+        /// <param name="request"></param>
+        /// <param name="clmode">тип операций которые  можно производить</param>
+        /// <returns></returns>
         [HttpGet]
         //[ODataQueryable]
         [GET("api/cdo/corplight/RelatedCustomers/{custId}")]

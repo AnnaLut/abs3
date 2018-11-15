@@ -30,7 +30,20 @@ end;
 
 -- Add comments to the table 
 comment on table CORP2_REL_CUSTOMERS_ADDRESS
-  is 'Aa?ane iiaycaieo in?a eio?ei iaaaii ainooi ai CorpLight';
+  is 'Адреса корисувачів Корп2';
+-- Add comments to the columns 
+comment on column CORP2_REL_CUSTOMERS_ADDRESS.rel_cust_id
+  is 'Ід користувача';
+comment on column CORP2_REL_CUSTOMERS_ADDRESS.region_id
+  is 'Ід регіоном';
+comment on column CORP2_REL_CUSTOMERS_ADDRESS.city
+  is 'Місто';
+comment on column CORP2_REL_CUSTOMERS_ADDRESS.street
+  is 'Вулиця';
+comment on column CORP2_REL_CUSTOMERS_ADDRESS.house_number
+  is 'Номер будинку';
+comment on column CORP2_REL_CUSTOMERS_ADDRESS.addition
+  is 'Додаткова інформація';
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin

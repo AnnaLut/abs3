@@ -2,7 +2,7 @@
 {
 	public class ActivationReservedAccounts
 	{
-		public int ACC { get; set; }
+		public decimal ACC { get; set; }
 		public decimal? RNK { get; set; }
 		public string NMK { get; set; }
 		public string OKPO { get; set; }

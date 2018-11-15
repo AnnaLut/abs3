@@ -105,8 +105,7 @@ IS
     p_rnk                in deal.customer_id%type,
     p_struct_code        in ead_struct_codes.id%type,
     p_template           in ead_docs.template_id%type
-  ) return number
-    result_cache;
+  ) return number;
   --
   -- Встановлення ознаки перевірки реквізитів документу, що посвідчує особу
   --
@@ -1277,18 +1276,19 @@ IS
     p_struct_code        in ead_struct_codes.id%type,
     p_template           in ead_docs.template_id%type
   ) return number
-    result_cache
   is
    l_res number := null;
    l_type_id number;
    l_state_id number;
+   l_dkbo_accounts_type_id integer;
    p_id number;
   begin
 
     ead_integration.get_dkbo_settings(l_type_id, l_state_id);
-    if (l_type_id is null and l_state_id is null)
-     then return null;
+    if (l_type_id is null and l_state_id is null) then
+        return null;
     else
+        l_dkbo_accounts_type_id := attribute_utl.get_attribute_id('DKBO_ACC_LIST');
         begin
 
         SELECT    MAX (d.id) KEEP (DENSE_RANK LAST ORDER BY av.value_date)  into p_id
@@ -1322,6 +1322,7 @@ IS
                where ed.AGR_ID = p_id
                  and ED.EA_STRUCT_ID = p_struct_code
                  and ED.RNK = p_rnk
+				 and ed.acc = p_acc
                  and ed.template_id = p_template)
                where crt_date = max_crt_date;
         exception

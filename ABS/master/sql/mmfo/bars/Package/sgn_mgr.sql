@@ -11,7 +11,7 @@
   --  Purpose: Пакет для работи с криптографией (ЕЦП)
   --------------------------------------------------------------------------------
 
-  g_header_version constant varchar2(64) := 'version 1.0 14/03/2017 ';
+  g_header_version constant varchar2(64) := 'version 1.1 07/08/2018 ';
   g_trace_module  varchar2(20) := 'sgn_mgr.';
   g_trace_enabled number(1) := 0;
 
@@ -59,7 +59,9 @@
   procedure store_sep_sign(p_ref       oper.ref%type, -- ref документа из oper
                            p_sign_type in sgn_data.sign_type%type, -- тип ЕЦП
                            p_key_id    in sgn_data.key_id%type, -- идентификатор ключа
-                           p_sign_hex  in sgn_data.sign_hex%type -- подпись в HEX формате
+                           p_sign_hex  in sgn_data.sign_hex%type, -- подпись в HEX формате
+                           p_data_id   in sgn_data.id%type default null -- если этот параметр заполнен, то p_sign_hex нам не нужен 
+                                                                        --(Для вызова с базы ЦРКР. ID уже известен)
                            );
 
   --------------------------------------------------------------------------------
@@ -75,7 +77,9 @@
                            p_rec_id    oper_visa.sqnc%type, -- номер записи из oper_visa
                            p_sign_type in sgn_data.sign_type%type, -- тип ЕЦП
                            p_key_id    in sgn_data.key_id%type, -- идентификатор ключа
-                           p_sign_hex  in sgn_data.sign_hex%type -- подпись в HEX формате
+                           p_sign_hex  in sgn_data.sign_hex%type, -- подпись в HEX формате
+                           p_data_id   in sgn_data.id%type default null -- если этот параметр заполнен, то p_sign_hex нам не нужен 
+                                                                        --(Процедуру вызываею с базы ЦРКР, и ID уже известен)
                            );
 
   --------------------------------------------------------------------------------
@@ -109,6 +113,9 @@
   --
   procedure diagnostic_problem_sign(p_ref in number default null);
 
+  ---------Формирует сиквенс для CRNV.
+  PROCEDURE Get_SEQ_Nextval (seq_out IN OUT NUMBER, name_seq in varchar2);
+  
   --------------------------------------------------------------------------------
   -- trace_user - контроль проверки рабочего места
   --
@@ -195,25 +202,31 @@ CREATE OR REPLACE PACKAGE BODY BARS.SGN_MGR is
   procedure store_sep_sign(p_ref       oper.ref%type, -- ref документа из oper
                            p_sign_type in sgn_data.sign_type%type, -- тип ЕЦП
                            p_key_id    in sgn_data.key_id%type, -- идентификатор ключа
-                           p_sign_hex  in sgn_data.sign_hex%type -- подпись в HEX формате
+                           p_sign_hex  in sgn_data.sign_hex%type, -- подпись в HEX формате
+                           p_data_id   in sgn_data.id%type default null -- если этот параметр заполнен, то p_sign_hex нам не нужен 
+                                                                        --(Процедуру вызываею с базы ЦРКР, и ID уже известен)
                            ) is
     l_id      sgn_data.id%type;
     l_id_prev sgn_data.id%type;
   begin
+    
+    if p_data_id is null and p_sign_hex is not null  then
     -- put signature in store
     l_id := sgn_mgr.set_sign_data(p_sign_type, p_key_id, p_sign_hex);
     -- check if already exist
+     end if; 
+     
     begin
       select s.sign_id
         into l_id_prev
         from sgn_ext_store s
        where s.ref = p_ref;
       -- find, then replace sign
-      update sgn_ext_store s set s.sign_id = l_id where s.ref = p_ref;
+      update sgn_ext_store s set s.sign_id = nvl(l_id, p_data_id) where s.ref = p_ref;
       del_sign_data(l_id_prev);
     exception
       when no_data_found then
-        insert into sgn_ext_store (ref, sign_id) values (p_ref, l_id);
+        insert into sgn_ext_store (ref, sign_id) values (p_ref, nvl(l_id, p_data_id));
     end;
   end;
 
@@ -233,17 +246,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.SGN_MGR is
                            p_rec_id    oper_visa.sqnc%type, -- номер записи из oper_visa
                            p_sign_type in sgn_data.sign_type%type, -- тип ЕЦП
                            p_key_id    in sgn_data.key_id%type, -- идентификатор ключа
-                           p_sign_hex  in sgn_data.sign_hex%type -- подпись в HEX формате
+                           p_sign_hex  in sgn_data.sign_hex%type, -- подпись в HEX формате
+                           p_data_id   in sgn_data.id%type default null -- если этот параметр заполнен, то p_sign_hex нам не нужен 
+                                                                        --(Процедуру вызываею с базы ЦРКР, и ID уже известен)
                            ) is
     l_id sgn_data.id%type;
   begin
+    
+   if p_data_id is null and p_sign_hex is not null  then
     -- put signature in store
     l_id := sgn_mgr.set_sign_data(p_sign_type, p_key_id, p_sign_hex);
     -- put link between oper_visa and sign
+   end if;
+    
     insert into sgn_int_store
       (ref, rec_id, sign_id)
     values
-      (p_ref, p_rec_id, l_id);
+      (p_ref, p_rec_id, nvl(l_id, p_data_id));
   end;
 
   --------------------------------------------------------------------------------
@@ -350,6 +369,23 @@ CREATE OR REPLACE PACKAGE BODY BARS.SGN_MGR is
       end;
     end loop;
   end;
+
+ -- Формирует сиквенс для базы CRNV
+PROCEDURE Get_SEQ_Nextval (seq_out IN OUT NUMBER, name_seq in varchar2) IS
+
+   ern   CONSTANT POSITIVE := 201;  -- Cannot obtain ref
+
+BEGIN
+
+   seq_out := bars_sqnc.get_nextval(name_seq);
+
+EXCEPTION
+   WHEN OTHERS THEN
+        raise_application_error(-(20000+ern),
+          '\9345 - Cannot obtain ref value :' || sqlerrm, TRUE);
+END Get_SEQ_Nextval;
+
+
 
   --------------------------------------------------------------------------------
   -- trace_user - контроль проверки рабочего места

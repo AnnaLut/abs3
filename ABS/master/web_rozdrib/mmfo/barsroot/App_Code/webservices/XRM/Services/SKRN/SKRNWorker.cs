@@ -16,27 +16,24 @@ namespace Bars.WebServices.XRM.Services.SKRN
     {
         public static XRMResponse SetDocIsSigned(OracleConnection con, XRMRequest<SetDocIsSignedRequest> request)
         {
-            using (OracleCommand cmd = new OracleCommand())
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleParameter rState = new OracleParameter("p_state", OracleDbType.Decimal, ParameterDirection.Output),
+                                    rCode = new OracleParameter("p_result_code", OracleDbType.Decimal, ParameterDirection.Output),
+                                     rMsg = new OracleParameter("p_result_message", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
             {
-                using (OracleParameter rState = new OracleParameter("p_state", OracleDbType.Decimal, ParameterDirection.Output),
-                                        rCode = new OracleParameter("p_result_code", OracleDbType.Decimal, ParameterDirection.Output),
-                                         rMsg = new OracleParameter("p_result_message", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = "XRM_INTEGRATION_OE.setdocissigned_skrn";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "XRM_INTEGRATION_OE.setdocissigned_skrn";
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add(new OracleParameter("p_id", OracleDbType.Varchar2, 4000, request.AdditionalData.TemplateId, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_adds", OracleDbType.Decimal, request.AdditionalData.Adds, ParameterDirection.Input));
-                    cmd.Parameters.Add(rState);
-                    cmd.Parameters.Add(rCode);
-                    cmd.Parameters.Add(rMsg);
+                cmd.Parameters.Add(new OracleParameter("p_id", OracleDbType.Varchar2, 4000, request.AdditionalData.TemplateId, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_adds", OracleDbType.Decimal, request.AdditionalData.Adds, ParameterDirection.Input));
+                cmd.Parameters.Add(rState);
+                cmd.Parameters.Add(rCode);
+                cmd.Parameters.Add(rMsg);
 
-                    cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
-                    MessageProcessing(rMsg);
-                }
+                MessageProcessing(rMsg);
             }
 
             return new XRMResponse();
@@ -130,44 +127,41 @@ namespace Bars.WebServices.XRM.Services.SKRN
         {
             XRMResponseDetailed<OpenNewBoxResponse> response = new XRMResponseDetailed<OpenNewBoxResponse>();
 
-            using (OracleCommand cmd = new OracleCommand())
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleParameter dealId = new OracleParameter("p_deal_id", OracleDbType.Decimal, ParameterDirection.Output),
+                                    rCode = new OracleParameter("p_resultcode", OracleDbType.Decimal, ParameterDirection.Output),
+                                     rMsg = new OracleParameter("p_resultmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
             {
-                using (OracleParameter dealId = new OracleParameter("p_deal_id", OracleDbType.Decimal, ParameterDirection.Output),
-                                        rCode = new OracleParameter("p_resultcode", OracleDbType.Decimal, ParameterDirection.Output),
-                                         rMsg = new OracleParameter("p_resultmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
+                cmd.CommandText = "XRM_INTEGRATION_OE.OPEN_SAFE_DEPOSIT";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new OracleParameter("p_n_sk", OracleDbType.Decimal, request.AdditionalData.NSk, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_o_sk", OracleDbType.Decimal, request.AdditionalData.OSk, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_keynumber", OracleDbType.Varchar2, 4000, request.AdditionalData.KeyNumber, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_keycount", OracleDbType.Decimal, request.AdditionalData.KeyCount, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_dealnum", OracleDbType.Varchar2, 4000, request.AdditionalData.NDoc, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_tarif_id", OracleDbType.Decimal, request.AdditionalData.TarifId, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_dealstartdate", OracleDbType.Date, request.AdditionalData.DealStartDate, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_dealenddate", OracleDbType.Date, request.AdditionalData.DealEndDate, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_rnk", OracleDbType.Decimal, request.AdditionalData.Rnk, ParameterDirection.Input));
+                cmd.Parameters.Add(dealId);
+                cmd.Parameters.Add(rCode);
+                cmd.Parameters.Add(rMsg);
+
+                cmd.ExecuteNonQuery();
+
+                MessageProcessing(rMsg);
+
+                OracleDecimal _dealId = (OracleDecimal)dealId.Value;
+                if (_dealId.IsNull)
                 {
-                    cmd.Connection = con;
-                    cmd.CommandText = "XRM_INTEGRATION_OE.OPEN_SAFE_DEPOSIT";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.Add(new OracleParameter("p_n_sk", OracleDbType.Decimal, request.AdditionalData.NSk, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_o_sk", OracleDbType.Decimal, request.AdditionalData.OSk, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_keynumber", OracleDbType.Varchar2, 4000, request.AdditionalData.KeyNumber, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_keycount", OracleDbType.Decimal, request.AdditionalData.KeyCount, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_dealnum", OracleDbType.Varchar2, 4000, request.AdditionalData.NDoc, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_tarif_id", OracleDbType.Decimal, request.AdditionalData.TarifId, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_dealstartdate", OracleDbType.Date, request.AdditionalData.DealStartDate, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_dealenddate", OracleDbType.Date, request.AdditionalData.DealEndDate, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_rnk", OracleDbType.Decimal, request.AdditionalData.Rnk, ParameterDirection.Input));
-                    cmd.Parameters.Add(dealId);
-                    cmd.Parameters.Add(rCode);
-                    cmd.Parameters.Add(rMsg);
-
-                    cmd.ExecuteNonQuery();
-
-                    MessageProcessing(rMsg);
-
-                    OracleDecimal _dealId = (OracleDecimal)dealId.Value;
-                    if (_dealId.IsNull)
-                    {
-                        throw new System.Exception("Процедура не повернула значення ID договору.");
-                    }
-
-                    response.Results = new OpenNewBoxResponse()
-                    {
-                        Nd = Convert.ToInt64(_dealId.Value)
-                    };
+                    throw new System.Exception("Процедура не повернула значення ID договору.");
                 }
+
+                response.Results = new OpenNewBoxResponse()
+                {
+                    Nd = Convert.ToInt64(_dealId.Value)
+                };
             }
             return response;
         }
@@ -176,56 +170,50 @@ namespace Bars.WebServices.XRM.Services.SKRN
         {
             XRMResponse response = new XRMResponse();
 
-            using (OracleCommand cmd = new OracleCommand())
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleParameter rCode = new OracleParameter("p_resultcode", OracleDbType.Decimal, ParameterDirection.Output),
+                                    rMsg = new OracleParameter("p_resultmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
             {
-                using (OracleParameter rCode = new OracleParameter("p_resultcode", OracleDbType.Decimal, ParameterDirection.Output),
-                                        rMsg = new OracleParameter("p_resultmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = "XRM_INTEGRATION_OE.СLOSE_CONTRACTLEASE";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "XRM_INTEGRATION_OE.СLOSE_CONTRACTLEASE";
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add(new OracleParameter("p_n_sk", OracleDbType.Decimal, request.AdditionalData.NSk, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_userid", OracleDbType.Decimal, null, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_sum", OracleDbType.Decimal, null, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_ndoc", OracleDbType.Decimal, null, ParameterDirection.Input));
-                    cmd.Parameters.Add(rCode);
-                    cmd.Parameters.Add(rMsg);
+                cmd.Parameters.Add(new OracleParameter("p_n_sk", OracleDbType.Decimal, request.AdditionalData.NSk, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_userid", OracleDbType.Decimal, null, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_sum", OracleDbType.Decimal, null, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_ndoc", OracleDbType.Decimal, null, ParameterDirection.Input));
+                cmd.Parameters.Add(rCode);
+                cmd.Parameters.Add(rMsg);
 
-                    cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
-                    MessageProcessing(rMsg);
-                }
+                MessageProcessing(rMsg);
             }
             return response;
         }
 
         public static XRMResponse OperDepSkrn(OracleConnection con, XRMRequest<OperDepSkrnRequest> request)
         {
-            using (OracleCommand cmd = new OracleCommand())
+            using (OracleCommand cmd = con.CreateCommand())
+            using (OracleParameter rCode = new OracleParameter("p_resultcode", OracleDbType.Decimal, ParameterDirection.Output),
+                                    rMsg = new OracleParameter("p_resultmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
             {
-                using (OracleParameter rCode = new OracleParameter("p_resultcode", OracleDbType.Decimal, ParameterDirection.Output),
-                                        rMsg = new OracleParameter("p_resultmessage", OracleDbType.Varchar2, 4000, null, ParameterDirection.Output))
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = "XRM_INTEGRATION_OE.oper_dep_skrn";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "XRM_INTEGRATION_OE.oper_dep_skrn";
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.Add(new OracleParameter("p_dat", OracleDbType.Date, request.AdditionalData.DateFrom, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_dat2", OracleDbType.Date, request.AdditionalData.DateTo, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_n_sk", OracleDbType.Decimal, request.AdditionalData.NSk, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_mode", OracleDbType.Decimal, request.AdditionalData.OperationCode, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_userid", OracleDbType.Decimal, null, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_sum", OracleDbType.Decimal, request.AdditionalData.Sum, ParameterDirection.Input));
-                    cmd.Parameters.Add(new OracleParameter("p_ndoc", OracleDbType.Varchar2, 4000, request.AdditionalData.NDoc, ParameterDirection.Input));
-                    cmd.Parameters.Add(rCode);
-                    cmd.Parameters.Add(rMsg);
+                cmd.Parameters.Add(new OracleParameter("p_dat", OracleDbType.Date, request.AdditionalData.DateFrom, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_dat2", OracleDbType.Date, request.AdditionalData.DateTo, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_n_sk", OracleDbType.Decimal, request.AdditionalData.NSk, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_mode", OracleDbType.Decimal, request.AdditionalData.OperationCode, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_nd", OracleDbType.Decimal, request.AdditionalData.Nd, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_userid", OracleDbType.Decimal, null, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_sum", OracleDbType.Decimal, request.AdditionalData.Sum, ParameterDirection.Input));
+                cmd.Parameters.Add(new OracleParameter("p_ndoc", OracleDbType.Varchar2, 4000, request.AdditionalData.NDoc, ParameterDirection.Input));
+                cmd.Parameters.Add(rCode);
+                cmd.Parameters.Add(rMsg);
 
-                    cmd.ExecuteNonQuery();
-                    MessageProcessing(rMsg);
-                }
+                cmd.ExecuteNonQuery();
+                MessageProcessing(rMsg);
             }
 
             return new XRMResponse();
@@ -233,9 +221,8 @@ namespace Bars.WebServices.XRM.Services.SKRN
 
         public static XRMResponse MergeAttorney(OracleConnection con, XRMRequest<MergeAttorney> request)
         {
-            using (OracleCommand cmd = new OracleCommand())
+            using (OracleCommand cmd =con.CreateCommand())
             {
-                cmd.Connection = con;
                 cmd.CommandText = "XRM_INTEGRATION_OE.Merge_Skrynka_Attorney";
                 cmd.CommandType = CommandType.StoredProcedure;
 

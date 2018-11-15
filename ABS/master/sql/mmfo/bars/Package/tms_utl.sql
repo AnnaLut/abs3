@@ -181,6 +181,8 @@ is
     return integer
     result_cache;
 
+	procedure p_clean_tmsaudit;
+	
 end TMS_UTL;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.TMS_UTL 
@@ -495,6 +497,9 @@ is
         into l_task_run_id;
 
         track_task_run(l_task_run_id, tms_utl.TASK_RUN_STATE_IDLE, null);
+
+	--COBUMMFO-9485
+	begin dbms_session.set_context('CLIENTCONTEXT', 'task_runid', l_task_run_id); end;
 
         return l_task_run_id;
     end;
@@ -1004,7 +1009,15 @@ is
         set    t.start_time = sysdate
         where  t.id = l_task_run_row.id;
 
-        dbms_scheduler.run_job(job_name => l_task_run_row.wrapper_job_name, use_current_session => false);
+        begin 
+           dbms_scheduler.run_job(job_name => l_task_run_row.wrapper_job_name, use_current_session => false);    
+        exception when others then 
+           --  ORA-27478: job "BARS.TMS_JOB_WRAPPER_139607" is running. 
+           --  данное может произойти, если два закончившихся проуесса взяли один и тот же следующий джоб и начинают его віполнять
+           if sqlcode = -27478 
+                then null; 
+           end if;
+        end;
 
         commit;
 
@@ -1651,6 +1664,25 @@ is
                                             '} - зупинити її виконання не можливо');
         end if;
     end;
+
+PROCEDURE p_clean_tmsaudit
+	IS
+i_commit   pls_integer := 1000;
+i_rowcount pls_integer := 0;  
+BEGIN 
+LOOP 
+     DELETE FROM tms_audit t
+        WHERE t.rec_date < add_months(SYSDATE, -6) 
+				AND  rownum <= i_commit;
+       
+       i_rowcount := i_rowcount + SQL%ROWCOUNT;
+       
+       IF SQL%ROWCOUNT = 0 THEN
+         COMMIT; EXIT;
+       END IF;       
+ COMMIT;
+END LOOP;
+end p_clean_tmsaudit;
 
 end TMS_UTL;
 /

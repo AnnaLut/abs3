@@ -12,6 +12,9 @@ using Bars.Web.Report;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
 using System.Web;
+using Bars.EAD;
+using ibank.core;
+using Bars.WebServices.XRM.Models;
 
 namespace Bars.WebServices.XRM.Services.Card
 {
@@ -263,67 +266,171 @@ namespace Bars.WebServices.XRM.Services.Card
                 rep.TemplateIds = TemplateID;
                 var fullpath = rep.GetReportFile();
                 var filepath = fullpath.Replace(".zip", ".rtf");
+
                 using (StreamReader sr = new StreamReader(filepath, System.Text.Encoding.GetEncoding(1251)))
+                using (StreamWriter writer = new StreamWriter(ms))
                 {
-                    using (StreamWriter writer = new StreamWriter(ms))
-                    {
-                        String str = sr.ReadToEnd();
-                        writer.Write(str);
-                        writer.Flush();
-                        ms.Position = 0;
-                        bytes = ms.ToArray();
-                        File.Delete(fullpath);
-                    }
+                    String str = sr.ReadToEnd();
+                    writer.Write(str);
+                    writer.Flush();
+                    ms.Position = 0;
+                    bytes = ms.ToArray();
+                    File.Delete(fullpath);
                 }
             }
             return bytes;
         }
-        public static XRMCardCreditRes SetCardCredit(XRMCardCreditReq XRMCardCreditReq, OracleConnection connect)
+
+        public static XRMResponseDetailed<CardCreditResponse> SetCardCredit(OracleConnection con, XRMRequest<CardCreditRequest> Request)
         {
-            XRMCardCreditRes XRMCardCreditRes = new XRMCardCreditRes();
-            string filename = string.Empty;
-            XRMCardCreditRes.acc = XRMCardCreditReq.acc;
-            try
+            EadPack ep = new EadPack(new BbConnection());
+
+            XRMResponseDetailed<CardCreditResponse> res = new XRMResponseDetailed<CardCreditResponse>
             {
-                foreach (var acc in XRMCardCreditReq.acc)
+                Results = new CardCreditResponse
                 {
-                    if (XRMCardCreditReq.maxSum > 0)
+                    Accounts = Request.AdditionalData.Accounts
+                }
+            };
+            List<string> frxTemplates = Request.AdditionalData.Templates.Where(e => IsFrx(e)).ToList();
+            List<string> rtfTemplates = Request.AdditionalData.Templates.Where(e => !IsFrx(e)).ToList();
+            string mfo = XrmHelper.GetMfo(con);
+
+            List<long> Accounts = new List<long>();
+            // Добавляємо ключ регіону для ідентифікаторів рахунку
+            Request.AdditionalData.Accounts.ForEach(a => Accounts.Add(a.AddRuTail(mfo)));
+
+            if (Request.AdditionalData.MaxSum > 0)
+            {
+                foreach (long acc in Accounts)
+                {
+                    using (OracleCommand cmd = con.CreateCommand())
                     {
-                        using (OracleCommand cmd = connect.CreateCommand())
-                        {
-                            cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'MAXCRSUM', :maxSum);
+                        cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'MAXCRSUM', :maxSum);
                                                     update accounts set lim = :lim where acc = :acc; 
                                                     end;";
-                            cmd.Parameters.Add("acc", OracleDbType.Decimal).Value = acc;
-                            cmd.Parameters.Add("maxSum", OracleDbType.Varchar2).Value = XRMCardCreditReq.maxSum;
-                            cmd.Parameters.Add("lim", OracleDbType.Decimal).Value = XRMCardCreditReq.maxSum * 100;
-                            cmd.ExecuteNonQuery();
+                        cmd.Parameters.Add("acc", OracleDbType.Decimal).Value = acc;
+                        cmd.Parameters.Add("maxSum", OracleDbType.Varchar2).Value = Request.AdditionalData.MaxSum;
+                        cmd.Parameters.Add("lim", OracleDbType.Decimal).Value = Request.AdditionalData.MaxSum * 100;
+                        cmd.ExecuteNonQuery();
 
-                            cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'DESCRSUM', :desSum); end;";
-                            cmd.Parameters.Clear();
-                            cmd.Parameters.Add("acc", OracleDbType.Decimal).Value = acc;
-                            cmd.Parameters.Add("desSum", OracleDbType.Varchar2).Value = XRMCardCreditReq.desiredSum;
-                            cmd.ExecuteNonQuery();
+                        cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'DESCRSUM', :desSum); end;";
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add("acc", OracleDbType.Decimal).Value = acc;
+                        cmd.Parameters.Add("desSum", OracleDbType.Varchar2).Value = Request.AdditionalData.DesiredSum;
+                        cmd.ExecuteNonQuery();
 
-                            cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'SETCRSUM', :insSum); end;";
-                            cmd.Parameters.Clear();
-                            cmd.Parameters.Add("acc", OracleDbType.Decimal).Value = acc;
-                            cmd.Parameters.Add("insSum", OracleDbType.Varchar2).Value = XRMCardCreditReq.installedSum;
-                            cmd.ExecuteNonQuery();
-                            cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'PRPCRSUM', f_sumpr(:insSum * 100,'980','F')); end;";
-                            cmd.ExecuteNonQuery();
-                            // создаем документы для печати по всем картам из списка public string GetFileForPrint(string id, string templateId)
-                        }
+                        cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'SETCRSUM', :insSum); end;";
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add("acc", OracleDbType.Decimal).Value = acc;
+                        cmd.Parameters.Add("insSum", OracleDbType.Varchar2).Value = Request.AdditionalData.InstalledSum;
+                        cmd.ExecuteNonQuery();
+                        cmd.CommandText = @"begin accreg.setAccountwParam(:acc, 'PRPCRSUM', f_sumpr(:insSum * 100,'980','F')); end;";
+                        cmd.ExecuteNonQuery();
                     }
                 }
-                XRMCardCreditRes.Docs = Convert.ToBase64String(GetFileForPrint(XRMCardCreditReq.acc, XRMCardCreditReq.template, XRMCardCreditReq.maxSum.ToString()));
             }
-            catch (SystemException e)
+
+            if (frxTemplates.Count > 0)
+                res.Results.PdfDocuments = GetPdfDocuments(con, Accounts, frxTemplates);
+            if (rtfTemplates.Count > 0)
+                res.Results.RtfContent = GetRtfDocuments(Accounts, rtfTemplates, Request.AdditionalData.MaxSum);
+
+            return res;
+        }
+
+        private static List<PdfDocument> GetPdfDocuments(OracleConnection con, List<long> accounts, List<string> templates)
+        {
+            List<PdfDocument> result = new List<PdfDocument>();
+
+            FrxCreateData data = GetFrxCreateData(con, accounts, templates);
+            EadPack ep = new EadPack(new BbConnection());
+
+            foreach (FrxAccount acc in data.Accounts)
             {
-                XRMCardCreditRes.ResultCode = -1;
-                XRMCardCreditRes.ResultMessage = e.InnerException + e.Message;
+                foreach (FrxTemplate template in data.Templates)
+                {
+                    decimal? dealId = GetDkboAgrIdByAcc(con, acc.Account);
+                    long? DocID = Convert.ToInt64(ep.DOC_CREATE("DOC", template.Name, null, template.StructCode, acc.Rnk, dealId, acc.Account));
+
+                    FrxParameters pars = new FrxParameters();
+                    pars.Add(new FrxParameter("p_nd", TypeCode.Int64, acc.Account));
+                    pars.Add(new FrxParameter("p_doc_id", TypeCode.Int64, Convert.ToInt64(DocID.Value)));
+                    pars.Add(new FrxParameter("p_adds", TypeCode.Int32, 0));
+
+                    FrxDoc doc = new FrxDoc(FrxDoc.GetTemplatePathByFileName(template.Name + ".frx"), pars, null);
+
+                    using (var str = new MemoryStream())
+                    {
+                        doc.ExportToMemoryStream(FrxExportTypes.Pdf, str);
+                        byte[] tmpData = str.ToArray();
+
+                        result.Add(new PdfDocument
+                        {
+                            DocumentId = DocID.Value,
+                            Content = Convert.ToBase64String(tmpData),
+                            Account = acc.Account.CutRuTail()
+                        });
+                    }
+                }
             }
-            return XRMCardCreditRes;
+
+            return result;
+        }
+        private static FrxCreateData GetFrxCreateData(OracleConnection con, List<long> accounts, List<string> templates)
+        {
+            FrxCreateData data = new FrxCreateData();
+
+            using (OracleCommand cmdAcc = con.CreateCommand())
+            using (OracleCommand cmdTemplate = con.CreateCommand())
+            {
+                foreach (long acc in accounts)
+                {
+                    cmdAcc.CommandText = "select rnk from accounts where acc = :p_acc";
+                    cmdAcc.Parameters.Add("p_acc", OracleDbType.Varchar2, acc, ParameterDirection.Input);
+
+                    object _rnk = cmdAcc.ExecuteScalar();
+                    if (null == _rnk) throw new ArgumentException("No rnk found for acc = " + acc);
+                    data.Accounts.Add(new FrxAccount { Account = acc, Rnk = Convert.ToInt64(_rnk) });
+                }
+
+                foreach (string template in templates)
+                {
+                    cmdTemplate.Parameters.Clear();
+                    cmdTemplate.CommandText = "select struct_code from w4_product_doc where doc_id = :p_template_name and rownum < 2";
+                    cmdTemplate.Parameters.Add("p_template_name", OracleDbType.Varchar2, template, ParameterDirection.Input);
+
+                    object _structCode = cmdTemplate.ExecuteScalar();
+                    if (null == _structCode) throw new ArgumentException("No struct code found for template = " + template);
+
+                    data.Templates.Add(new FrxTemplate { Name = template, StructCode = Convert.ToDecimal(_structCode) });
+                }
+            }
+
+            return data;
+        }
+        private static bool IsFrx(string templateName)
+        {
+            return File.Exists(FrxDoc.GetTemplatePathByFileName(templateName + ".frx"));
+        }
+        private static string GetRtfDocuments(List<long> accounts, List<string> templates, decimal maxSum)
+        {
+            string docs = Convert.ToBase64String(GetFileForPrint(accounts.ToArray(), templates.ToArray(), maxSum.ToString()));
+            return docs;
+        }
+
+        private static decimal? GetDkboAgrIdByAcc(OracleConnection con, long acc)
+        {
+            using (OracleCommand cmd = con.CreateCommand())
+            {
+                cmd.CommandText = @"select max(t.deal_id) deal_id from w4_dkbo_web t where t.acc_acc = :p_acc group by t.customer_id";
+                cmd.Parameters.Add("p_acc", OracleDbType.Decimal, acc, ParameterDirection.Input);
+
+                object res = cmd.ExecuteScalar();
+                if (null == res) throw new System.Exception(string.Format("deal id not found for acc = {0}", acc));
+
+                return Convert.ToDecimal(res);
+            }
         }
         #endregion
 

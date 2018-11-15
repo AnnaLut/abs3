@@ -3,7 +3,7 @@ angular.module(globalSettings.modulesAreas)
     .factory('CDO.CorpLight.relatedCustomersService',
     ['$http', '$q',
         function ($http, $q) {
-
+            //контроллер дл€ работы с пользовател€ми клиента
             var _url = bars.config.urlContent('/api/cdo/corplight/relatedCustomers/');
             var state = {
                 lastUpdate: null,
@@ -47,6 +47,7 @@ angular.module(globalSettings.modulesAreas)
                 });
                 return deferred.promise;
             };
+            //»шем пользовател€ при введении »ЌЌ. если есть - подт€гиваем данные. 
             var _getByTaxCode = function (custId, taxCode, docSeries, docNumber) {
                 state.isLoading = true;
                 var deferred = $q.defer();
@@ -139,7 +140,7 @@ angular.module(globalSettings.modulesAreas)
             var _validateMobilePhone = function (phoneNum) {
                 state.isLoading = true;
                 var deferred = $q.defer();
-
+                
                 $http.post(bars.config.urlContent('/api/cdo/corplight/Users/validateMobilePhone/?phoneNumber=' + phoneNum))
                     .success(function (response) {
                         state.isLoading = false;

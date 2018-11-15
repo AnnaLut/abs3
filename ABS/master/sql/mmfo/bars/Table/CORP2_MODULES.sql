@@ -28,18 +28,18 @@ end;
 
 -- Add comments to the table 
 comment on table CORP2_MODULES
-  is 'Модули';
+  is 'Модулі';
 -- Add comments to the columns 
 comment on column CORP2_MODULES.module_id
   is 'Код модуля';
 comment on column CORP2_MODULES.name
-  is 'Имя модуля';
+  is 'Назва модуля';
 comment on column CORP2_MODULES.user_type
-  is 'Глобальный тип пользователя';
+  is 'Глобальний тип користувача';
 comment on column CORP2_MODULES.sort_order
-  is 'Порядок сортировки модуля';
+  is 'Порядок сортування модуля';
 comment on column CORP2_MODULES.icon_url
-  is 'URL иконки модуля';
+  is 'URL іконки модуля';
 
 -- Create/Recreate check constraints 
 begin

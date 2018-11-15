@@ -10,12 +10,14 @@ namespace Bars.EAD.Structs.Params
     /// </summary>
     public struct Document
     {
+        [JsonProperty("ticket_id")]
+        public String TicketId;
         [JsonProperty("RNK")]
         public UInt64 Rnk;
         [JsonProperty("doc_type")]
         public String DocType;
-        [JsonProperty("doc_id")]
-        public String DocId;
+        [JsonProperty("doc_print_number")]
+        public String DocPrintNumber;
         [JsonProperty("doc_pages_count")]
         public UInt16? DocPagesCount;
         [JsonProperty("doc_binary_data")]
@@ -47,7 +49,7 @@ namespace Bars.EAD.Structs.Params
         {
             using (OracleCommand cmd = con.CreateCommand())
             {
-                cmd.CommandText = @"select rnk, doc_type, doc_id, doc_pages_count, doc_binary_data, doc_request_number, agr_code, 
+                cmd.CommandText = @"select ticket_id, rnk, doc_type, doc_print_number, doc_pages_count, doc_binary_data, doc_request_number, agr_code, 
                                 agr_type, account_type, account_number, account_currency, created, changed, user_login, user_fio, branch_id
                                 from table(ead_integration.get_Doc_Instance(:p_doc_id))";
                 cmd.Parameters.Add("p_doc_id", OracleDbType.Int64, Convert.ToInt64(ObjID), ParameterDirection.Input);
@@ -57,9 +59,10 @@ namespace Bars.EAD.Structs.Params
                 {
                     if (rdr.Read())
                     {
+                    	res.TicketId = Convert.ToString(rdr["ticket_id"]);
                         res.Rnk = Convert.ToUInt64(rdr["rnk"]);
                         res.DocType = Convert.ToString(rdr["doc_type"]);
-                        res.DocId = Convert.ToString(rdr["doc_id"]);
+                        res.DocPrintNumber = Convert.ToString(rdr["doc_print_number"]);
                         res.DocPagesCount = rdr["doc_pages_count"] == DBNull.Value ? (UInt16?)null : Convert.ToUInt16(rdr["doc_pages_count"]);
                         res.DocBinaryData = rdr["doc_binary_data"] == DBNull.Value ? String.Empty : Convert.ToBase64String((Byte[])rdr["doc_binary_data"]);
                         res.DocRequestNumber = Convert.ToString(rdr["doc_request_number"]);
