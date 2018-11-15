@@ -5,7 +5,7 @@ namespace BarsWeb.Areas.Payreg.Models
     public class RegularSbonWithContractOrder
     {
         public int? Id { get; set; }
-        public int PayerAccountId { get; set; }
+        public long PayerAccountId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? StopDate { get; set; }
         public int PaymentFrequency { get; set; }
