@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="07/13/2018 17:29:19" ReportInfo.Modified="07/20/2018 11:10:04" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/13/2018 17:29:19" ReportInfo.Modified="11/12/2018 12:49:04" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQAW3Ay7A8mSxgBAKM6o74wY=">
+    <OracleDataConnection Name="COBUSUPABS_DEV_MMFO_DB" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQITwHA5gpT6Av67R60olYss=">
       <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select * from v_cl_swift_documents t where t.ref = :p_doc_ref">
         <Column Name="REF" DataType="System.Decimal"/>
         <Column Name="DATE_START_SDO" DataType="System.String"/>
@@ -55,58 +55,69 @@
     </OracleDataConnection>
     <Parameter Name="p_doc_ref" DataType="System.Decimal"/>
   </Dictionary>
-  <ReportPage Name="Page1" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15">
+  <ReportPage Name="Page1" FirstPageSource="15" OtherPagesSource="15">
     <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="113.4">
       <TextObject Name="Text2" Top="66.15" Width="718.2" Height="47.25" Text="&lt;b&gt;ПЛАТІЖНЕ ДОРУЧЕННЯ&#13;&#10;В ІНОЗЕМНІЙ ВАЛЮТІ&lt;/b&gt;&#13;&#10;&lt;i&gt;(PAYMENT ORDER)&lt;/i&gt;" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt" HtmlTags="true"/>
       <TextObject Name="Text1" Left="481.95" Width="236.25" Height="103.95" Text="0410001	&#13;&#10;&lt;b&gt;Прийнято СДО :&#13;&#10;ЕЦП перевірено&#13;&#10;Дата&lt;/b&gt; [Table.DATE_START_SDO]р. &lt;b&gt;Час&lt;/b&gt; [Table.TIME_START_SDO]&#13;&#10;[Table.USERNAME_START_SDO]&#13;&#10;[Table.FIRST_NAME_BANK_START_SDO],код [Table.CODE_BANK_START_SDO]&#13;&#10;[Table.NAME_BANK_START_SDO]&#13;&#10;" Font="Arial, 7pt" HtmlTags="true"/>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="117.17" Width="718.2" Height="699.55" CanShrink="true">
+    <DataBand Name="Data1" Top="116.45" Width="718.2" Height="699.55" CanShrink="true">
       <TableObject Name="Table1" Width="718.2" Height="699.55">
         <TableColumn Name="Column1" Width="236.9"/>
-        <TableColumn Name="Column2" Width="481.3"/>
+        <TableColumn Name="Column2" Width="122.2"/>
+        <TableColumn Name="Column5" Width="359.1"/>
         <TableRow Name="Row1" Height="34.99" AutoSize="true">
           <TableCell Name="Cell1" Border.Lines="Top, Bottom" Text="№ &lt;u&gt;&lt;b&gt;[Table.ND]&lt;/b&gt;&lt;/u&gt;" VertAlign="Center" HtmlTags="true"/>
-          <TableCell Name="Cell2" Border.Lines="Top, Bottom" Text="ДАТА (DATE) &lt;b&gt;&lt;u&gt;[Table.DATD]&lt;/b&gt;&lt;/u&gt;" Format="Date" Format.Format="d" VertAlign="Center" HtmlTags="true"/>
+          <TableCell Name="Cell2" Border.Lines="Top, Bottom" Text="ДАТА (DATE) &lt;b&gt;&lt;u&gt;[Table.DATD]&lt;/b&gt;&lt;/u&gt;" Format="Date" Format.Format="d" VertAlign="Center" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell67"/>
         </TableRow>
         <TableRow Name="Row2" Height="72.79" AutoSize="true">
           <TableCell Name="Cell6" Border.Lines="Right, Bottom" Text=":32 ВАЛЮТА ТА СУММА ПЕРЕКАЗУ&#13;&#10;&lt;i&gt;(CURRENCY / AMOUNT)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell7" Border.Lines="Bottom" Text="Цифровий код іноземної валюти  &lt;b&gt;&lt;u&gt;[Table.KV]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Сума цифрами   &lt;b&gt;&lt;u&gt;[Table.S]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Сума та назва іноземної валюти словами  &lt;b&gt;&lt;u&gt;[Table.SUMPR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true"/>
+          <TableCell Name="Cell7" Border.Lines="Bottom" Text="Цифровий код іноземної валюти  &lt;b&gt;&lt;u&gt;[Table.KV]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Сума цифрами   &lt;b&gt;&lt;u&gt;[Table.S]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Сума та назва іноземної валюти словами  &lt;b&gt;&lt;u&gt;[Table.SUMPR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell68"/>
         </TableRow>
         <TableRow Name="Row3" Height="82.24" AutoSize="true">
           <TableCell Name="Cell11" Border.Lines="Right, Bottom" Text=":50 ПЛАТНИК&#13;&#10;&lt;i&gt;(ORDERING CUSTOMER)&lt;/i&gt;&#13;&#10;" HtmlTags="true"/>
-          <TableCell Name="Cell12" Border.Lines="Bottom" Text="№ рахунку &lt;b&gt;&lt;u&gt;[Table.NLSA]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Найменування &lt;b&gt;&lt;u&gt;[Table.NAM_A]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true"/>
+          <TableCell Name="Cell12" Border.Lines="Bottom" Text="№ рахунку &lt;b&gt;&lt;u&gt;[Table.NLSA]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Найменування &lt;b&gt;&lt;u&gt;[Table.NAM_A]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell69"/>
         </TableRow>
         <TableRow Name="Row4" Height="72.79" AutoSize="true">
           <TableCell Name="Cell16" Border.Lines="Right, Bottom" Text=":52 БАНК ПЛАТНИКА&#13;&#10;&lt;i&gt;(ORDERING INSTITUTION)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell17" Border.Lines="Bottom" Text="Найменування &lt;b&gt;&lt;u&gt;[Table.PAYER_BANK_NAME]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_PAYER_BANK]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true"/>
+          <TableCell Name="Cell17" Border.Lines="Bottom" Text="Найменування &lt;b&gt;&lt;u&gt;[Table.PAYER_BANK_NAME]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_PAYER_BANK]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell70"/>
         </TableRow>
         <TableRow Name="Row5" Height="63.34" AutoSize="true">
           <TableCell Name="Cell21" Border.Lines="Right, Bottom" Text=":56 БАНК-ПОСЕРЕДНИК &#13;&#10;&lt;i&gt;(INTERMEDIARY BANK)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell22" Border.Lines="Bottom" Text="Найменування &lt;b&gt;&lt;u&gt;[Table.NAME_BANK_MEDIATOR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;S.W.I.F.T. &lt;b&gt;&lt;u&gt;[Table.BIC_MEDIATOR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_BANK_MEDIATOR]&lt;/b&gt;&lt;/u&gt;" HtmlTags="true"/>
+          <TableCell Name="Cell22" Border.Lines="Bottom" Text="Найменування &lt;b&gt;&lt;u&gt;[Table.NAME_BANK_MEDIATOR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;S.W.I.F.T. &lt;b&gt;&lt;u&gt;[Table.BIC_MEDIATOR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_BANK_MEDIATOR]&lt;/b&gt;&lt;/u&gt;" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell71"/>
         </TableRow>
         <TableRow Name="Row6" Height="82.24" AutoSize="true">
           <TableCell Name="Cell23" Border.Lines="Right, Bottom" Text=":57 БАНК БЕНЕФІЦІАРА &#13;&#10;&lt;i&gt;(ACCOUNT WITH INSTITUTION)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell24" Border.Lines="Bottom" Text="Коррахунок &lt;b&gt;&lt;u&gt;[Table.ACC_BANK_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Найменування &lt;b&gt;&lt;u&gt;[Table.NAME_BANK_MEDIATOR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;S.W.I.F.T. &lt;b&gt;&lt;u&gt;[Table.BIC_BANK_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_BANK_MEDIATOR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;&#13;&#10;" HtmlTags="true"/>
+          <TableCell Name="Cell24" Border.Lines="Bottom" Text="Коррахунок &lt;b&gt;&lt;u&gt;[Table.ACC_BANK_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Найменування &lt;b&gt;&lt;u&gt;[Table.NAME_BANK_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;S.W.I.F.T. &lt;b&gt;&lt;u&gt;[Table.BIC_BANK_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_BANK_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;&#13;&#10;" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell72"/>
         </TableRow>
         <TableRow Name="Row7" Height="63.34" AutoSize="true">
           <TableCell Name="Cell25" Border.Lines="Right, Bottom" Text=":59 БЕНЕФІЦІАР &#13;&#10;&lt;i&gt;(BENEFICIARY CUSTOMER)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell26" Border.Lines="Bottom" Text="№ рахунку/IBAN &lt;b&gt;&lt;u&gt;[Table.ACC_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Найменування &lt;b&gt;&lt;u&gt;[Table.NAME_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Місцезнаходження &lt;b&gt;&lt;u&gt;[Table.ADDRESS_BENEFICAR]&lt;/b&gt;&lt;/u&gt;&#13;&#10;" HtmlTags="true"/>
+          <TableCell Name="Cell26" Border.Lines="Bottom" Text="№ рахунку/IBAN&#13;&#10;Найменування &#13;&#10;Місцезнаходження &#13;&#10;" HtmlTags="true"/>
+          <TableCell Name="Cell73" Border.Lines="Bottom" Text=" &lt;b&gt;&lt;u&gt;[Table.ACC_BENEFICAR]&lt;/b&gt;&lt;/u&gt;" HtmlTags="true"/>
         </TableRow>
         <TableRow Name="Row8" Height="72.79" AutoSize="true">
           <TableCell Name="Cell27" Border.Lines="Right, Bottom" Text=":70 ПРИЗНАЧЕННЯ ПЛАТЕЖУ&#13;&#10;&lt;i&gt;(REMITTANCE INFORMATION)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell28" Border.Lines="Bottom" Text="Номер та дата контракту, вид товарів чи послуг &lt;b&gt;&lt;u&gt;[Table.REMIT_INFO]&lt;/b&gt;&lt;/u&gt;&#13;&#10;X оплата" HtmlTags="true"/>
+          <TableCell Name="Cell28" Border.Lines="Bottom" Text="Номер та дата контракту, вид товарів чи послуг &lt;b&gt;&lt;u&gt;[Table.REMIT_INFO]&lt;/b&gt;&lt;/u&gt;&#13;&#10;X оплата" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell74"/>
         </TableRow>
         <TableRow Name="Row9" Height="63.34" AutoSize="true">
           <TableCell Name="Cell29" Border.Lines="Right, Bottom" Text=":71 КОМІСІЙНІ ЗА РАХУНОК&#13;&#10;&lt;i&gt;(DETAIL OF CHARGES)&lt;/i&gt;" HtmlTags="true"/>
-          <TableCell Name="Cell30" Border.Lines="Bottom" Text="&lt;b&gt;&lt;u&gt;[Table.DETAIL_CHARGE]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Надаємо право утримати комісійну винагороду за здійснення переказу коштів в іноземній валюті  без платіжного доручення платника" HtmlTags="true"/>
+          <TableCell Name="Cell30" Border.Lines="Bottom" Text="&lt;b&gt;&lt;u&gt;[Table.DETAIL_CHARGE]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Надаємо право утримати комісійну винагороду за здійснення переказу коштів в іноземній валюті  без платіжного доручення платника" HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell75"/>
         </TableRow>
         <TableRow Name="Row10" Height="91.69" AutoSize="true">
           <TableCell Name="Cell31" Border.Lines="Right, Bottom" Text="ДОПОМІЖНІ РЕКВІЗИТИ" HtmlTags="true"/>
-          <TableCell Name="Cell32" Border.Lines="Bottom" Text="Код банку платника &lt;b&gt;&lt;u&gt;[Table.CODE_PAYER_BANK]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Ідентифікаційний код платника &lt;b&gt;&lt;u&gt;[Table.OKPO_PAYER]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Код операції &lt;b&gt;&lt;u&gt;[Table.CODE_OPER]&lt;/b&gt;&lt;/u&gt; (4 символи) (заповнює банк)&#13;&#10;Код країни бенефіціара &lt;b&gt;&lt;u&gt;[Table.CODE_COUNTRY]&lt;/b&gt;&lt;/u&gt; (3 символи) (заповнює банк)&#13;&#10;Інші " HtmlTags="true"/>
+          <TableCell Name="Cell32" Border.Lines="Bottom" Text="Код банку платника &lt;b&gt;&lt;u&gt;[Table.CODE_PAYER_BANK]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Ідентифікаційний код платника &lt;b&gt;&lt;u&gt;[Table.OKPO_PAYER]&lt;/b&gt;&lt;/u&gt;&#13;&#10;Код операції &lt;b&gt;&lt;u&gt;[Table.CODE_OPER]&lt;/b&gt;&lt;/u&gt; (4 символи) (заповнює банк)&#13;&#10;Код країни бенефіціара &lt;b&gt;&lt;u&gt;[Table.CODE_COUNTRY]&lt;/b&gt;&lt;/u&gt; (3 символи) (заповнює банк)&#13;&#10;Інші " HtmlTags="true" ColSpan="2"/>
+          <TableCell Name="Cell76"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary1" Top="820.5" Width="718.2" Height="226.8">
+    <ReportSummaryBand Name="ReportSummary1" Top="819.06" Width="718.2" Height="226.8">
       <TableObject Name="Table2" Top="9.45" Width="717.39" Height="207.9" Border.Lines="All">
         <TableColumn Name="Column3" Width="340.27"/>
         <TableColumn Name="Column4" Width="377.12"/>
