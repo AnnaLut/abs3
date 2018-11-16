@@ -12,7 +12,7 @@ PROMPT *** Create  procedure P_F2F ***
 % DESCRIPTION :    Процедура формирования файла                  MMFO
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     :  v.18.001        17.04.2018
+% VERSION     :  v.18.002        15.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    Структура показателя   L DDD N R E KKK ЛЛ MMM VVV H
@@ -30,6 +30,7 @@ PROMPT *** Create  procedure P_F2F ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+15.11.2018 ризик: високий-высокий
 17.04.2018 из показателя DDD=211 исключаются операции с наличкой H=2  
 13.11.2017 переход на новый план счетов
 07.04.2017 DDD=208 исключена корреспонденция дт 2620,2625 -кт 3800
@@ -781,7 +782,7 @@ BEGIN
            '3' ||
                (case when lower(trim(rizik_value)) like '%низький%' then '104'
                      when lower(trim(rizik_value)) like '%середн_й%' then '105'
-                     when lower(trim(rizik_value)) like '%високий%' then '106'
+                     when lower(trim(rizik_value)) like '%в_сокий%' then '106'
                      when lower(trim(rizik_value)) like '%неприйнятно%в_сокий%' then '107'
                       else decode( mfo_, 344443,'108','104' )
                     end) ||
