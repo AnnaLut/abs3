@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6BX (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования 6BX
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001    02.10.2018
+ VERSION     :    v.18.002    16.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.001  02.10.2018';
+  ver_              char(30)  := ' v.18.002  16.11.2018';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -33,7 +33,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_F6BX (p_kod_filii  varchar2
 
   pragma exception_init( e_ptsn_not_exsts, -02149 );
 begin
-  logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
+  logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy')||ver_);
 
   -- визначення початкових параметрів для формування файлу
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type);
@@ -93,8 +93,8 @@ begin
          , seg_02                  as F083
          , seg_03                  as F082
          , seg_04                  as S083
-         , seg_05                  as S080
-         , seg_06                  as S031
+         , decode(seg_05, '0','#',seg_05)                  as S080
+         , decode(seg_06,'00','#',seg_06)                  as S031
          , seg_07                  as K030
          , seg_08                  as R030
          , field_value             as T070
