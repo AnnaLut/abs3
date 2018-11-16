@@ -352,7 +352,6 @@ create or replace package body nbu_601_request_data_ru is
                                                      union
                                                      select b.acc from nbu_w4_bpk b where b.kf = kf_)) and
                            (c.custtype = 2 or (c.custtype = 3 and c.sed = 91))
-                           and rnk<>137562103-- убрать!!
                            ) loop
 
            fill_company_k110(ur.okpo, l_k110, l_ec_year);
@@ -1599,25 +1598,22 @@ for over in (select distinct over_deal.rnk,
                            union
                            select rnk,kf from nbu_person_uo) rnk_client,
                      
-                     cc_deal over_deal 
-                       
+                     cc_deal  over_deal 
+                        
                      left join --загальна сума (ліміт кредитної лінії)
                             (select na.nd,a.lim from accounts a, nd_acc na where na.acc=a.acc and a.nls like '8998%') sumzagal on sumzagal.nd=over_deal.nd
                             
                      left join--залишок заборгованості за кредитною операцією
-                           (select nd ,kv, sum (sum_ost) as sum_ost
+                           (select nd, sum (sum_ost) as sum_ost
                             from (select n.nd, a2.kv,(ag.ost + ag.crkos - ag.crdos) sum_ost
                                   from   agg_monbals ag,
                                          nd_acc n,
-                                         accounts a2,
-                                         cc_add ca
+                                         accounts a2
                                   where ag.fdat = add_months(trunc(sysdate,'mm'),-1) 
                                         and a2.tip in ('OVN') 
                                         and n.acc = a2.acc 
-                                        and n.acc = ag.acc
-                                        and ca.nd=n.nd
-                                        and ca.kv=a2.kv)
-                            group by nd, kv) sumarrears on sumarrears.nd=over_deal.nd
+                                        and n.acc = ag.acc)
+                            group by nd) sumarrears on sumarrears.nd=over_deal.nd 
                     
                      left join--комисия
                            (select nd, sum (sum_ost) as sum_ostcom
@@ -1683,9 +1679,10 @@ for over in (select distinct over_deal.rnk,
                            n.kf = a.kf 
                            and (a.dazs is null or a.dazs >= add_months(trunc(sysdate, 'mm'), -1))
                            and over_deal.vidd=10
-                           and over_deal.sos <>15) loop
+                           and over_deal.sos <>15
+                           ) loop
                  begin
-                 insert into nbu_credit ( rnk,nd,ordernum,flagosoba,typecredit,numdog,dogday,endday,sumzagal,r030,proccredit,sumpay,arrearbase,arrearproc,periodbase ,periodproc, sumarrears,daybase,dayproc,factendday,flagz,klass,risk,flagInsurance,status,kf)
+                 insert into nbu_credit ( rnk,nd,ordernum,flagosoba,typecredit,numdog,dogday,endday,sumzagal,r030,proccredit,sumpay,arrearbase,arrearproc,periodbase,periodproc,sumarrears,daybase,dayproc,factendday,flagz,klass,risk,flagInsurance,status,kf)
                                   values
                               (over.rnk,over.nd,over.ordernum,over.flagosoba,over.typecredit,over.numberdog,over.dogday,over.endday,over.sumzagal,over.r030,
                                over.proccredit,over.sumpay,over.sumarbase,over.sumarproc,over.periodbase,over.periodproc,over.sumarrears,over.daybase,over.dayproc,over.factendday,over.flagz,over.klass,over.risk,over.flagInsurance,'',kf_);  
