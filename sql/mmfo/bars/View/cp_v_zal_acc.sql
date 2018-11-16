@@ -36,7 +36,7 @@ PROMPT *** Create  view CP_V_ZAL_ACC ***
             cp_accounts ca 
       WHERE e.id = k.id
             AND ca.cp_acc = a.acc and e.ref = ca.cp_ref
-            AND ca.cp_acctype in ('N','D','P','R','R2','S','S2')
+            AND ca.cp_acctype in ('N','D','P','R','R2','R3','S','S2')
             /*AND a.acc IN (e.acc,
                           e.accd,
                           e.accp,
