@@ -18,9 +18,9 @@ PROMPT *** Create  procedure NBUR_P_F02 ***
 % DESCRIPTION : Процедура формирования #02 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.16.006  05/11/2018 (14.11.2017)
+% VERSION     :  v.16.007 16/11/2018 (05.11.2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.16.006  05.11.2018';
+  ver_          char(30)  := 'v.16.007  16.11.2018';
 /*
    Структура показника    DD BBBB VVV Y
 
@@ -111,7 +111,7 @@ BEGIN
                              colname,
                              ABS (VALUE) field_value
                         FROM (SELECT /*+ ordered*/
-                                     b.cust_id,
+                                     c.cust_id,
                                      b.acc_id,
                                      a.maturity_date,
                                      a.kf,
@@ -237,7 +237,7 @@ BEGIN
                              colname,
                              ABS (VALUE) field_value
                         FROM (SELECT /*+ ordered*/
-                                     b.cust_id,
+                                     c.cust_id,
                                      b.acc_id,
                                      a.maturity_date,
                                      a.kf,
@@ -364,7 +364,7 @@ BEGIN
                              colname,
                              ABS (VALUE) field_value
                         FROM (SELECT /*+ ordered*/
-                                     d.cust_id,
+                                     c.cust_id,
                                      d.acc_id,
                                      a.maturity_date,
                                      a.kf,
