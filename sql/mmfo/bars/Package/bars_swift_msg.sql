@@ -402,7 +402,7 @@ END bars_swift_msg;
 
 CREATE OR REPLACE PACKAGE BODY BARS.bars_swift_msg
 IS
-   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.61 04.10.2018';
+   VERSION_BODY              CONSTANT VARCHAR2 (64) := 'version 1.62 17.10.2018';
    VERSION_BODY_DEFS         CONSTANT VARCHAR2 (512) := '';
 
    TYPE t_strlist IS TABLE OF sw_operw.VALUE%TYPE;
@@ -2425,8 +2425,8 @@ IS
          flag_        => 'L',
          trans_       => l_transTable,
          apphdrflg_   => l_msgAppHdrFlags,
-         --    sti_        => '001',
-         --    uetr_       => lower(l_guid),
+         sti_        => '001',
+         uetr_       => lower(l_guid),
          cov_         => 'COV');
 
       -- Устанавливаем признак уже оплаченного документа

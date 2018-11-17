@@ -8,6 +8,18 @@ end ;
 /
 COMMIT;
 
+begin
+Insert into BARS.SW_MT
+   (MT, NAME, FLAG)
+ Values
+   (299, 'Free Format Message', '0000000000');
+exception when dup_val_on_index then null; 
+end ; 
+/
+COMMIT;
+
+
+
 
 delete from sw_model where mt in ('299','192');
 

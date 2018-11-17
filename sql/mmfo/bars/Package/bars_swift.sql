@@ -1585,7 +1585,7 @@ is
 --**************************************************************--
 
 
-    g_bodyVersion   constant varchar2(64)  := 'version 3.93 02.10.2018';
+    g_bodyVersion   constant varchar2(64)  := 'version 3.93onlytest 05.10.2018';
     g_bodyDefs      constant varchar2(512) := ''
               || '          для всех банков'           || chr(10)
               || '    3XX - с формированием MT300/320' || chr(10)
@@ -7853,7 +7853,7 @@ END DayFractionToSwift;
                    flags = null
              where swref = p_swref;
 
-            bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
+--            bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
 
         exception
             when NO_DATA_FOUND then
@@ -7984,7 +7984,7 @@ begin
         -- delete from sw_procque
         --  where swref = p_swref;
 
-        bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
+--        bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Снято из очереди на отправку (удалено) SWIFT сообщение с реф. ' || p_swRef);
 
 
 
@@ -8704,7 +8704,7 @@ begin
 
     end if;
 
-    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Выполнено ручная коррекция SWIFT сообщения с реф. ' || p_swRef);
+--    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Выполнено ручная коррекция SWIFT сообщения с реф. ' || p_swRef);
 
 end update_message;
 --**************************************************************--
@@ -10612,7 +10612,7 @@ begin
     delete from sw_procque
      where swref = p_swref;
 
-    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Разблокировано SWIFT сообщение с реф. ' || p_swRef);
+--    bars_audit.write_message(bars_audit.fin_msg, bankdate(), 'Разблокировано SWIFT сообщение с реф. ' || p_swRef);
 
 end unlock_message;
 
