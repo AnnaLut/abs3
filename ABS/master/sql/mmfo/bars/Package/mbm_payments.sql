@@ -876,7 +876,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.MBM_PAYMENTS is
                 values(p_ref, p_dreclist(i).tag, p_dreclist(i).val);
                 if p_dreclist(i).tag = 'ô' then
                    update oper op
-                      set op.d_rec = op.d_rec || '#'||p_dreclist(i).tag||p_dreclist(i).val||'#'
+                      set op.d_rec = case when op.d_rec is null then '#'||p_dreclist(i).tag||p_dreclist(i).val||'#' else op.d_rec || p_dreclist(i).tag||p_dreclist(i).val||'#' end
                     where op.ref = p_ref;
                 end if;
              exception when others then
@@ -1600,7 +1600,7 @@ end add_dop_req;
                 when not matched then
               insert (ref, tag, value) values (l_ref,'Ô', l_ser||to_char(l_numdoc));
              update oper op
-                set op.d_rec = d_rec || '#Ô'||l_ser||to_char(l_numdoc)||'#'
+                set op.d_rec = case when d_rec is null then '#Ô'||l_ser||to_char(l_numdoc)||'#' else d_rec || 'Ô'||l_ser||to_char(l_numdoc)||'#' end
               where op.ref = l_ref;
           end if;
 
