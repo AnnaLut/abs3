@@ -1,4 +1,10 @@
-create or replace package bars_sms
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** Run *** ==
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PACKAGE BARS.BARS_SMS 
 is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
@@ -82,8 +88,7 @@ procedure query_statuses;
 
 end bars_sms;
 /
-
-create or replace package body bars_sms
+CREATE OR REPLACE PACKAGE BODY BARS.BARS_SMS 
 is
 ----
 --  Package BARS_SMS - пакет процедур для отправки SMS
@@ -106,7 +111,7 @@ is
 
 */
 
-g_body_version  constant varchar2(64)  := 'version 2.22  12/07/2018';
+g_body_version  constant varchar2(64)  := 'version 2.23  09/11/2018';
 
 g_awk_body_defs constant varchar2(512) := '';
 
@@ -114,6 +119,8 @@ G_SMS_PROV varchar2(30);                                   -- Имя объектного тип
 
 g_sms_provider    sms_provider;    -- экземпляр объектного типа SMS-Провайдера
 
+g_sms_start number;
+g_sms_stop  number;
 ----
 -- header_version - возвращает версию заголовка пакета
 --
@@ -155,6 +162,21 @@ begin
     execute immediate 'begin :g_sms_provider := new '||G_SMS_PROV||'(); end;'
       using out g_sms_provider;
     --
+    begin
+      g_sms_start := nvl(to_number(getglobaloption('SMS_SEND_START')),800);
+    exception
+      when others then
+        logger.info('BARS_SMS: Помилка отримання значення для параметру SMS_SEND_START: '||sqlerrm);
+        g_sms_start := 800;
+    end;
+    begin
+      g_sms_stop := nvl(to_number(getglobaloption('SMS_SEND_STOP')),2100);
+    exception
+      when others then
+        logger.info('BARS_SMS: Помилка отримання значення для параметру SMS_SEND_STOP: '||sqlerrm);
+        g_sms_stop := 2100;
+    end;
+      
 end init;
 
 --
@@ -271,7 +293,7 @@ begin
      and exists
    (select 1
             from dual
-           where to_number(to_char(sysdate, 'HH24MI')) between 600 and 2100);
+           where to_number(to_char(sysdate, 'HH24MI')) between g_sms_start and g_sms_stop);
 
   if (l_cnt < 100 and l_useparallelexec = 1) or (l_useparallelexec = 0) then
     for c in (select msg_id
@@ -280,7 +302,7 @@ begin
                  and exists
                (select 1
                         from dual
-                       where to_number(to_char(sysdate, 'HH24MI')) between 600 and 2100)
+                       where to_number(to_char(sysdate, 'HH24MI')) between g_sms_start and g_sms_stop)
                order by msg_id
                  for update skip locked) loop
       submit_msg(c.msg_id);
@@ -328,7 +350,7 @@ begin
                (select 1
                     from dual
                     where
-                    to_number(to_char(sysdate,'HH24MI')) between 600 and 2100
+                    to_number(to_char(sysdate,'HH24MI')) between g_sms_start and g_sms_stop
                )
                and msg_id between p_start_id and p_end_id
                order by msg_id for update skip locked)
@@ -377,3 +399,11 @@ begin
   init;
 end bars_sms;
 /
+ show err;
+ 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/bars_sms.sql =========*** End *** ==
+ PROMPT ===================================================================================== 
+ 
