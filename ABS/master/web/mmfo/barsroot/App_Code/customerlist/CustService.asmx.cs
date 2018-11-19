@@ -1116,7 +1116,7 @@ namespace CustomerList
                                 ((data[18] == "1") ? " decode(sign(a.ost), 1, 0, -1, gl.p_icurval(a.kv, (-1*a.ost + decode(greatest(a.dapp, nvl(a.dapp, a.dappq)),bankdate, a.dos, 0) - decode(greatest(a.dapp, nvl(a.dapp, a.dappq)),bankdate, a.kos, 0)), bankdate), 0)/a.denom  \"Вхідний залишок Дебет (екв)\", " : " ") +
                                 "decode(sign(a.ost), -1, 0, 1, a.ost, 0)/a.denom  \"Вхідний залишок Кредит\"," +
                                 ((data[18] == "1") ? " decode(sign(a.ost), -1, 0, 1, gl.p_icurval(a.kv, (a.ost + decode(greatest(a.dapp, nvl(a.dapp, a.dappq)),bankdate, a.dos, 0) - decode(greatest(a.dapp, nvl(a.dapp, a.dappq)),bankdate, a.kos, 0)), bankdate), 0)/a.denom  \"Вхідний залишок Кредит (екв)\", " : " ")
-                            ) : "a.ost/a.denom \"Вхідний залишок\", " + ((data[18] == "1") ? "gl.p_icurval(a.kv, (a.ost + decode(greatest(a.dapp, nvl(a.dapp, a.dappq)), bankdate, a.dos, 0) - decode(greatest(a.dapp, nvl(a.dapp, a.dappq)), bankdate, a.kos, 0)), bankdate)/a.denom  \"Вхідний залишок (екв)\", " : " ")) +
+                            ) : "a.ost/a.denom \"Вхідний залишок\", " + ((data[18] == "1") ? "gl.p_icurval(a.kv, fost_h(a.acc, bankdate) + fdos(a.acc, bankdate, bankdate) - fkos(a.acc, bankdate, bankdate), bankdate)/a.denom \"Вхідний залишок (екв)\", " : " ")) +
                             "a.dos/100 \"Обороти Дебет\"," +
                              ((data[18] == "1") ? " gl.p_icurval(a.kv, decode(greatest(a.dapp, nvl(a.dapp, a.dappq)), bankdate, a.dos, 0), bankdate)/a.denom  \"Обороти Дебет (екв)\", " : " ") +
                             "a.kos/100 \"Обороти Кредит\"," +
