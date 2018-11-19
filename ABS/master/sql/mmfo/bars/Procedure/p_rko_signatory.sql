@@ -64,7 +64,7 @@ PROMPT *** Create  procedure P_RKO_SIGNATORY ***
        end if;
 
    elsif p_mod = 2  then
-     select s_rko_signatory.nextval into l_id from dual;
+     select bars_sqnc.get_nextval('s_rko_signatory') into l_id from dual;
 
         if p_branch is null
            then
