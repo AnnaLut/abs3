@@ -82,18 +82,18 @@ begin
      Values
        ('1PX', 'select p.EKP
        , p.K040_1
-       , p.RCBNK_B010
-       , p.RCBNK_NAME
+       , p.RCBNK_B010 as B010
+       , p.RCBNK_NAME as Q033
        , p.K040_2
        , p.R030
        , p.R020
        , p.R040
        , p.T023
-       , p.RCUKRU_GLB_2
+       , p.RCUKRU_GLB_2 as GLB_2
        , coalesce(p.K018, ''#'') as K018
        , p.K020
        , p.Q001
-       , p.RCUKRU_GLB_1
+       , p.RCUKRU_GLB_1 as GLB_1
        , p.Q003_1
        , p.Q004
        , p.T071
