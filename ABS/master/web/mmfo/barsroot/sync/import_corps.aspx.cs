@@ -190,7 +190,7 @@ public partial class admin_sync_import_corps : BarsPage
             { 
                 if (String.IsNullOrEmpty(Convert.ToString(e.CommandArgument)))
                     return;
-                int acc = Convert.ToInt32(Convert.ToString(e.CommandArgument));
+                long acc = Convert.ToInt64(Convert.ToString(e.CommandArgument));
                 InitOraConnection();
                 try
                 {
