@@ -1039,7 +1039,8 @@ begin
                     nvl(trunc(n.dat_beg),DAT1_) dat_b, nvl(trunc(n.dat_end),DAT2_) dat_e,
                     e.id ID, e.npd_3570, ob22_6110, e.id_glob, e.fl1, n.nd
              FROM e_tar_nd n, e_tarif e  WHERE n.nd=k.ND and n.id=e.id
-                                           AND n.dat_beg is not null) --jeka 05.07.2017
+                                           AND n.dat_beg is not null --jeka 05.07.2017
+                                           and (n.dat_end is null or trunc(n.dat_end)>DAT2_)) 
    LOOP
 
 
