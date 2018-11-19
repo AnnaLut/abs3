@@ -316,7 +316,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ÔÌ. Çá³ã ÏÅÏ ÁÀÇÎÂÈÉ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=FINMON_PUBLIC_CUSTOMERS',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=V_FINMON_PUBLIC_CUSTOMERS',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
