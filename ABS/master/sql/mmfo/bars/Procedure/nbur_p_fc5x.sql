@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 5СX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.004  08/11/2018 (07/11/2018)
+% VERSION     :  v.1.008  16/11/2018 (08/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := ' v.1.004  08/11/2018';
+  ver_              char(30)  := ' v.1.008  16/11/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_old_file_code   constant varchar2(3 char) := '#C5';
   c_sleep_time      constant number := 30; --Время ожидания между тактами проверки
@@ -125,7 +125,7 @@ BEGIN
                      , p.acc_id acc
                      , p.acc_num nls
                      , p.kv
-                     , abs(to_number(p.field_value)) znap
+                     , to_number(p.field_value) znap
                      , p.seg_01 as seg_d
                      , p.seg_02 as seg_bbbb
                      , p.seg_03 as seg_z
