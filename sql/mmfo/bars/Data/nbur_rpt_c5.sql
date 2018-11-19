@@ -73,7 +73,7 @@ commit;
 begin
     delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = 'C5X'; 
     Insert into NBUR_REF_PREPARE_XML
-       (FILE_CODE, DESC_XML, DATE_START, ATTR_NIL)
+       (FILE_CODE, DESC_XML, DATE_START)
      Values
        ('C5X', 'select
        ekp
@@ -105,7 +105,7 @@ begin
        , k077
        , s245
        , s580
-    having abs(sum(t070)) <> 0', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), NULL);
+    having abs(sum(t070)) <> 0', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
     COMMIT;
 end;
 /
