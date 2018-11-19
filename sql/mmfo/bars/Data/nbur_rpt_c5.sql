@@ -1,3 +1,5 @@
+exec bc.home;
+
 declare
   r_file        nbur_ref_files%rowtype;
   l_file_id     nbur_ref_files.id%type;
@@ -66,3 +68,46 @@ begin
 end;
 /
 commit;
+
+-- опис для підготовки XML
+begin
+    delete from BARS.NBUR_REF_PREPARE_XML WHERE FILE_CODE = 'C5X'; 
+    Insert into NBUR_REF_PREPARE_XML
+       (FILE_CODE, DESC_XML, DATE_START, ATTR_NIL)
+     Values
+       ('C5X', 'select
+       ekp
+       , a012
+       , t020
+       , r020
+       , r011
+       , r013
+       , r030_1
+       , r030_2
+       , r017
+       , k077
+       , s245
+       , s580
+       , abs(sum(t070)) as t070
+    from  nbur_log_fc5x t
+    where report_date = :p_rpt_dt
+      and kf = :p_kf
+    group by
+       ekp
+       , a012
+       , t020
+       , r020
+       , r011
+       , r013
+       , r030_1
+       , r030_2
+       , r017
+       , k077
+       , s245
+       , s580
+    having abs(sum(t070)) <> 0', TO_DATE('01/01/2018 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), NULL);
+    COMMIT;
+end;
+/
+
+
