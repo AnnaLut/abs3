@@ -13,11 +13,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FD9X (p_kod_filii  varchar2
  DESCRIPTION :    Процедура формирования D9X
  COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 
- VERSION     :    v.18.001    09.10.2018
+ VERSION     :    v.18.002    16.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.18.001  09.10.2018';
+  ver_              char(30)  := ' v.18.002  16.11.2018';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -33,7 +33,7 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FD9X (p_kod_filii  varchar2
 
   pragma exception_init( e_ptsn_not_exsts, -02149 );
 begin
-  logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
+  logger.info (c_title || ' begin for date = '||to_char(p_report_date, 'dd.mm.yyyy')||ver_);
 
   -- визначення початкових параметрів для формування файлу
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type);
@@ -80,8 +80,11 @@ begin
                         else         '1'
                      end)             K014
          ,          e1.k040           K040
-         ,         decode(ltrim(e1.ku_1,'0'),null,'#',ltrim(e1.ku_1,'0')) 
-                                     KU_1
+         ,          (case
+                       when e1.k040 !='804'             then '#'
+                       when ltrim(e1.ku_1,'0') is null  then '#'
+                        else           ltrim(e1.ku_1,'0')
+                      end)           KU_1
          ,         e1.k110           K110
          ,         nvl(e1.t090_1,0)         T090_1
          ,         nvl(e1.t090_2,0)         T090_2  
