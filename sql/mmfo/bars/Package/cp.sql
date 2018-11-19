@@ -11,8 +11,8 @@ CREATE OR REPLACE PACKAGE CP IS
    --
    -------------------------------------------------------
 
-   G_HEADER_VERSION    constant varchar2(64) := 'v.1.14.6  16.02.2018';
-                                              
+   G_HEADER_VERSION    constant varchar2(64) := 'v.1.14.7  15.06.2018';
+
 
    CP_PAY_   char(1):='0'; --1) 0=Конс-сист., Угоди-несист, 1=Конс-несист., Угоди-сист
    CP_AMORT_ char(1):='0'; --2) 0=ТП Амотр всегда, 1=ТП не аморт
@@ -319,7 +319,8 @@ PROCEDURE CP_KUPON
 
    -- процедура перемещения между портфелями
 PROCEDURE CP_MOVE
- ( GRP_     int, VOB_ int,
+ ( GRP_     int, 
+   VOB_     int,
    nID_     int,
    nRYN1_   int,
    nNBS1_   int,
@@ -331,7 +332,8 @@ PROCEDURE CP_MOVE
    B_4621   varchar2,
    sREF OUT varchar2,
    sErr OUT varchar2,
-   REF_MAIN OUT int );
+   REF_MAIN OUT int,
+   sNLSOPC  IN varchar2 default null);
 
 
 ------------------------------------------------------------------------
@@ -470,10 +472,10 @@ PROCEDURE awry_period (p_id       IN     cp_kod.id%TYPE,
                           p_zal_from     cp_zal.datz_from%type,
                           p_zal_to       cp_zal.datz_to%type,
                           p_mode         int); --для функи ЦП (14)
-                          
+
   procedure cp_inherit_specparam(p_acc   IN number,
                                  p_accc  IN int,               -- рах-ку консол-ї
-                                 p_mode  in number default 0); -- резерв                          
+                                 p_mode  in number default 0); -- резерв
 
 END CP;
 /
@@ -483,8 +485,8 @@ CREATE OR REPLACE PACKAGE body CP IS
 --  Пакет пр-р CP. Работа с цінними паперами
 --  Версія для КБ пізніше 05/2016
 ----------------------------------------------------------------------
-    G_BODY_VERSION      constant varchar2(64) := 'v.2.91.0  13/06/2018';
-    G_TRACE             constant varchar2(20) := 'cp.';  -- 'v.2.90.4'
+    G_BODY_VERSION      constant varchar2(64) := 'v.2.91.4  26/10/2018';
+    G_TRACE             constant varchar2(20) := 'cp.';  
     G_MODULE            constant varchar2(20) := 'CPN';
     G_PAY_CUPON         constant number(1):= 1;
     G_PAY_NOMINAL       constant number(1):= 2;
@@ -2590,10 +2592,10 @@ BEGIN
          IF KUP_ > 0 and k.metr = 4
          THEN
             UPDATE accounts
-               SET ostf = -k.KOL * KUP_ * 100, mdate = k.DNK - 1
+               SET ostf = -k.KOL * KUP_ * 100, mdate = k.DNK 
              WHERE acc = k.accr;
          else
-            UPDATE accounts SET mdate = k.DNK - 1
+            UPDATE accounts SET mdate = k.DNK 
              WHERE acc = k.accr;
          END IF;
         l_txt := 'CP.DOK_DNK: ЦП № '  || k.ID
@@ -3060,19 +3062,21 @@ end CP_KUPON;
 -----------------------
 
 PROCEDURE CP_MOVE
- ( GRP_   IN  int, VOB_ int,
-   nID_   IN  int,
-   nRYN1_ IN  int,
-   nNBS1_ IN  int,
-   nRYN2_ IN  int,
-   nNBS2_ IN  int,
-   SUMN   IN  number,
-   nREF_  IN  int,
-   NAZN_  IN  varchar2,
-   B_4621 IN  varchar2,
-   sREF   OUT varchar2,
-   sErr   OUT varchar2,
-   REF_MAIN OUT int ) is
+ ( GRP_        IN  int, 
+   VOB_        IN int,
+   nID_        IN  int,
+   nRYN1_      IN  int,
+   nNBS1_      IN  int,
+   nRYN2_      IN  int,
+   nNBS2_      IN  int,
+   SUMN        IN  number,
+   nREF_       IN  int,
+   NAZN_       IN  varchar2,
+   B_4621      IN  varchar2,
+   sREF        OUT varchar2,
+   sErr        OUT varchar2,
+   REF_MAIN    OUT int, 
+   sNLSOPC     IN varchar2 default null) is
 
 -- процедура перемещения между портфелями nNBS1_+nRYN1_ =>nNBS2_+nRYN2_
 
@@ -3085,6 +3089,8 @@ PROCEDURE CP_MOVE
  accN_exp int;
  accRD_ number;
  accS2_ number;
+ 
+ acc1405 number;
 
 
  ACRB_D int     ;   ACRB_P int    ;    REF_  int         ; NLS_FXP_1 varchar2(15) ;
@@ -3143,11 +3149,10 @@ begin
   IO_ :=0;  cp_id_r:='';
 
   begin
-    BARS_Audit.info('CP.CP_MOVE:nID_ = ' || nID_ ||'nNBS2_ = ' || nNBS2_|| ' nRYN2_=' || nRYN2_);
+    BARS_Audit.info('CP.CP_MOVE:nID_ = ' || nID_ ||'nNBS2_ = ' || nNBS2_|| ' nRYN2_=' || nRYN2_||' GRP_='||GRP_||' VOB_='||' SUMN='||SUMN||' nREF_='||nREF_||' NAZN_='||NAZN_||' B_4621='||B_4621);
     sERR   :='7.Нет в PARAMS RNK_CP'  ; select to_number(val) into RNK1_ from params  where par = 'RNK_CP' ;
     sERR   :='8.Нет ЦБ '||nID_        ;
     select *  into kk    from cp_kod  where id  = nID_ ;
-    BARS_Audit.info('nNBS2_ = ' || nNBS2_ || ' nRYN2_=' || nRYN2_);
     select *  into ac2   from cp_accc where vidd=nNBS2_ and RYN=nRYN2_ and emi=kk.EMI;
 
     kk.ir  := nvl(kk.ir ,0);            kk.basey := nvl(kk.basey   ,0) ;
@@ -3442,7 +3447,7 @@ begin
         END;
 
         cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK ,NLS_,kk.KV,NMS_,'ODB',gl.aUid,accR_);
-        UPDATE accounts SET mdate= kk.DNK-1,accc=ACCC_, seci=4,daos=VDAT_, pos=1 WHERE acc=accR_;
+        UPDATE accounts SET mdate= kk.DNK,accc=ACCC_, seci=4,daos=VDAT_, pos=1 WHERE acc=accR_;
 
         cp_inherit_specparam (accR_, accc_, 0);
 
@@ -3474,7 +3479,7 @@ begin
         EXCEPTION WHEN NO_DATA_FOUND THEN sERR:='16.Нет сч.купона-2 ИСХ в ФУ'; return;
         END;
         cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK ,nls_, kk.KV ,NMS_,'ODB',gl.aUid,accR2_);
-        UPDATE accounts SET mdate= kk.DNK-1,accc=ACCC_,seci=4,daos=VDAT_, pos=1 WHERE acc=accR2_;
+        UPDATE accounts SET mdate= kk.DNK,accc=ACCC_,seci=4,daos=VDAT_, pos=1 WHERE acc=accR2_;
 
         cp_inherit_specparam (accR2_, accc_, 0);
 
@@ -3494,7 +3499,7 @@ begin
         END;
         cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK ,nls_, kk.KV ,NMS_,'ODB',gl.aUid, accR9_);
         UPDATE accounts
-           SET mdate = kk.DNK-1,
+           SET mdate = kk.DNK,
                accc = ACCC_,
                seci = 4,
                daos = VDAT_,
@@ -3707,7 +3712,10 @@ begin
       and ca.cp_acc = a.acc and a.ostc != 0;
       
     --звернути 
-    if aa.ostc > 0 then dk_  := 1 ; else dk_ := 0 ; s_ := - s_;  end if;
+    if aa.ostc > 0 then 
+      dk_  := 1 ; s_ := aa.ostc; 
+      else dk_ := 0 ; s_ := - aa.ostc;  
+    end if;
     payTT(0,ref_,VDAT_,FXB_, dk_ , aa.kv ,aa.NLS, S_ , aa.KV , B_4621 , S_ );    
       
     begin --!н.д.2
@@ -3743,11 +3751,13 @@ begin
       and ca.cp_acc = a.acc and a.ostc != 0;
       
     --звернути 
-    if aa.ostc > 0 then dk_  := 1 ; else dk_ := 0 ; s_ := - s_;  end if;
+    if aa.ostc > 0 then 
+      dk_  := 1 ; s_ := aa.ostc; 
+      else dk_ := 0 ; s_ := - aa.ostc;  
+    end if;
     payTT(0,ref_,VDAT_,FXB_, dk_ , aa.kv ,aa.NLS, S_ , aa.KV , B_4621 , S_ );    
-      
     begin --!н.д.2
-      select acc, substr(nls,1,5)||'0'||s8_, substr(cp_id_r||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsS2 and kv=kk.KV;
+      select acc, substr(nls,1,5)||'1'||s8_, substr(cp_id_r||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsS2 and kv=kk.KV;
       exception 
         when NO_DATA_FOUND then --!н.д.2   
           sERR:='37.Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ'; 
@@ -3769,6 +3779,61 @@ begin
       when NO_DATA_FOUND then
         null; --ок. не має або нульовий  
   end;    
+
+  --COBUPRVNIX-160
+  --суми можуть бути на рахунках 3040 які ніяк не привязані до угод
+  --їх потрібно розвернути на 1405 опціон
+  if sNLSOPC is not null then
+    begin
+      select a.*
+        into aa
+      from accounts a
+      where a.nls = sNLSOPC and  a.kv = kk.kv;
+      exception 
+        when NO_DATA_FOUND then 
+          sERR:='38.Рахунок '||sNLSOPC||' у валюті '||kk.kv||' не знайдено'; 
+          return;      
+    end; 
+    if aa.ostc != 0 then
+        --звернути 
+      if aa.ostc > 0 then 
+        dk_  := 1 ; s_ := aa.ostc; 
+        else dk_ := 0 ; s_ := - aa.ostc;  
+      end if;
+      payTT(0,ref_,VDAT_,FXB_, dk_ , aa.kv ,aa.NLS, S_ , aa.KV , B_4621 , S_ );    
+      
+      
+      --пошук рахунку 1405 опціону
+      begin --можливо відкривався попередньою операцією
+        select a.*
+          into aa
+        from cp_accounts ca, accounts a
+        where ca.cp_ref = ref_ and ca.cp_acctype = 'S2'
+          and ca.cp_acc = a.acc;    
+        exception
+          when NO_DATA_FOUND then --тоді відкрити
+            begin --!н.д.2
+              select acc, substr(nls,1,5)||'0'||s8_, substr(cp_id_r||nms,1,38) into accc_,NLS_,NMS_ from accounts where nls=ac2.nlsS2 and kv=kk.KV;
+              exception 
+                when NO_DATA_FOUND then --!н.д.2   
+                  sERR:='37.Невказаний рах. переоцінки по опціону S2 ИСХ в ФУ'; 
+                  return;
+            end;            
+            cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK, NLS_,kk.KV,NMS_,'ODB',gl.aUid,accs2_);
+            update accounts set mdate=kk.DATP,accc=ACCC_, seci=4, pos=1, daos=VDAT_, pap=3  where acc=accs2_;   
+            cp_inherit_specparam (accs2_, accc_, 0);  
+            aa.NLS := NLS_;
+      end;      
+      --та розвернути  
+      dk_ := case dk_ 
+         when 0 then 1 
+         when 1 then 0 
+      end;
+      payTT(0,ref_,VDAT_,FXB_, dk_ , kk.KV ,aa.NLS, S_ , kk.KV , B_4621 , S_ );      
+    end if;   
+  end if;     
+    
+ 
 
   --  годовой купон               -- годовой дисконт
   --   SN_*RATE_/100               -- DP_*365 / (kk.DATP - GL.BDATE)
@@ -4072,11 +4137,21 @@ IS
    l_vob          int := VOB_;
 ------------------------------------------------------------------------------
 begin
-  bars_audit.trace('%s Start for ID = %s, tip = %s, nREPO_ = %s',
-                    title,
-                    to_char(nID_),
-                    to_char(TIPD_),
-                    to_char(nREPO_));
+  bars_audit.trace(title || 'Start for  '
+                         || 'ID = ' || to_char(nID_)
+                         || ', tip = ' || to_char(TIPD_)
+                         || ', nREPO_ = ' || to_char(nREPO_)
+                         || ', nNBS_ = ' || to_char(nNBS_) 
+                         || ', nRYN_ = ' || to_char(nRYN_) 
+                         || ', DAT_UG = ' || to_char(DAT_UG,'DDMMYYYY') 
+                         || ', DAT_OPL = ' || to_char(DAT_OPL,'DDMMYYYY') 
+                         || ', DAT_ROZ = ' || to_char(DAT_ROZ,'DDMMYYYY') 
+                         || ', DAT_KOM = ' || to_char(DAT_KOM,'DDMMYYYY')
+                         || ', SUMBN = ' || to_char(SUMBN) 
+                         || ', SUMB = ' || to_char(SUMB) 
+                         || ', SUMBK = ' || to_char(SUMBK) 
+                         || ', RR_ = ' || to_char(RR_) 
+                         || ', NLS9 = ' || to_char(NLS9));
   bars_audit.info(title || ' Start with '
                         || ', CP_METOD = ' || to_char(l_CP_METOD)
                         || ', CP_TRANS_DK = ' || to_char(l_CP_TRANS_DK)
@@ -4430,7 +4505,7 @@ begin
            bars_audit.trace('%s !!goto SVOI_CP!! (ID = %s, tip = %s)', title, to_char(nID_), to_char(TIPD_));
           end if;
         -------------------------------------------------------------------------------
-          <<CHUZI_CP>> null; -- Чужие ЦБ. -- нигде нет перехода сюда
+          --<<CHUZI_CP>> null; -- Чужие ЦБ. -- нигде нет перехода сюда
           bars_audit.trace('%s !!<<CHUZI_CP>>!! (ID = %s, tip = %s)', title, to_char(nID_), to_char(TIPD_));
         -------------------------------------------------------------------------------
           BEGIN
@@ -4450,9 +4525,10 @@ begin
              THEN OP_ := NULL;
           END;
 
-          If NVL(OP_,0) = -2        -- (-2    Продажа чужой ЦБ в будущем)
-           then goto RESHTA_;
-           bars_audit.trace('%s goto RESHTA_(ID = %s, tip = %s)', title, to_char(nID_), to_char(TIPD_));
+          If NVL(OP_,0) = -2        -- (-2    Продажа чужой ЦБ в будущем)         
+           then 
+             bars_audit.trace('%s goto RESHTA_(ID = %s, tip = %s)', title, to_char(nID_), to_char(TIPD_));
+             goto RESHTA_;
           end if;
 
           -- Начальные проводки - номинал+переоценка -- Для будущих и обычных продаж ЧУЖИХ ЦБ  - одинаково
@@ -4978,6 +5054,7 @@ begin
         NLSR_bek := k.NLSR;
      END IF;
 
+     /* там далі робиться кривий, навіщо два рази? 
           -- КУПОН
      if k.OSTR3 > 0 and cpk.dox >= 2
      then
@@ -4999,7 +5076,7 @@ begin
         SR_ := SR_ + S_;-- с накоплением в цикле
         NLSR_bek3 := k.NLSR3;
      END IF;
-
+*/
      IF k.OSTR2 <>0
      THEN
         S_ := ROUND( k.OSTR2 * l_koeff,0);
@@ -5033,13 +5110,13 @@ begin
            SET txt = sKUPON3
          WHERE REF = REF_ AND stmt = gl.ASTMT;
 
-        LOG('CP_PROD R3 ref='||ref_||' '||k.ref||' '||k.nlsr2||' '||S_||' '||k.ostr2,'INFO');
+        LOG('CP_PROD R3 ref='||ref_||' '||k.ref||' '||k.nlsr3||' '||S_||' '||k.ostr3,'INFO');
 
         -- наполняем очередь для модификации потоков
         CP.RMany_DAT(k.REF, REF_, VDAT_, 0, S_);
 
         SR_ := SR_ + S_;     -- с накоплением в цикле для вставки в cp_arch
-        NLSR_bek := k.NLSR3; -- а как же NLSR_bek := k.NLSR???
+        NLSR_bek3 := k.NLSR3; 
      END IF;
 
      IF k.accs IS NOT NULL
@@ -5314,7 +5391,7 @@ begin
         cp.CP_REG_EX(99,0,0,GRP_,r1_, cpk.rnk ,nls_, cpk.kv ,NMS_,'ODB',gl.aUid,accR2_);
 
         UPDATE accounts
-           SET mdate = cpk.dnk - 1,
+           SET mdate = cpk.dnk ,
                accc = ACCCR2_,
                seci = 4,
                pos = 1
@@ -5338,7 +5415,7 @@ begin
     IF cpk.CENA_KUP >0
     THEN
        UPDATE accounts
-          SET mdate = cpk.dnk - 1,
+          SET mdate = cpk.dnk ,
               accc = ACCCR_,
               seci = 4,
               OSTF = -cpk.CENA_KUP,
@@ -5349,7 +5426,7 @@ begin
             VALUES          (accR_, 0,  accR_,  accR6_, 4,      NVL(TTV_,'FX%'),    cpk.basey,  1,      gl.BDATE-1+IO_, IO_);
      else
         UPDATE accounts
-           SET mdate = cpk.dnk - 1,
+           SET mdate = cpk.dnk ,
                accc = ACCCR_,
                seci = 4,
                OSTF = -cpk.CENA_KUP,
@@ -6180,7 +6257,7 @@ BEGIN
           EXCEPTION WHEN NO_DATA_FOUND THEN   sERR:='37.Не налаштовано конс.рах.накопиченого купону.';  RETURN;
           END;
           cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK , nls_, kk.kv ,NMS_,'ODB', gl.aUid ,accR2_);
-          UPDATE accounts SET mdate= kk.DNK-1, accc=ACCC_,seci=4,pos=1, daos=VDAT_
+          UPDATE accounts SET mdate= kk.DNK, accc=ACCC_,seci=4,pos=1, daos=VDAT_
                  WHERE acc=accR2_;
 
           cp_inherit_specparam (accR2_, accc_, 0);
@@ -6212,7 +6289,7 @@ BEGIN
 
           cp.CP_REG_EX(99,0,0,GRP_,r1_, kk.RNK , l_r3.nls, kk.kv,l_r3.NMS,'ODB', gl.aUid, l_r3.acc);
           UPDATE accounts
-             SET mdate = kk.DNK-1,
+             SET mdate = kk.DNK,
                  accc = ACCC_,
                  seci = 4,
                  pos = 1,
@@ -6253,13 +6330,13 @@ BEGIN
           END IF;    */
 
           if CENA_KUP_L >0 and gl.amfo = '300465' and kk.metr=4 then
-             UPDATE accounts SET mdate= kk.DNK-1, accc=ACCC_,seci=4,OSTF= kk.CENA_KUP , pos=1,daos=VDAT_   WHERE acc  = accR_;
+             UPDATE accounts SET mdate= kk.DNK, accc=ACCC_,seci=4,OSTF= kk.CENA_KUP , pos=1,daos=VDAT_   WHERE acc  = accR_;
              insert into int_accn (acc,id,acra,acrb,metr,tt,BASEY,FREQ, ACR_DAT, io)
                values(accR_,1,accR_,accR6_,4,NVL(TTV_,'FX%'), kk.BASEY,1, gl.BDATE-1+IO_, io_);
           else
 
             UPDATE accounts
-               SET mdate = kk.DNK - 1,
+               SET mdate = kk.DNK ,
                    accc = ACCC_,
                    seci = 4,
                    pos = 1,
@@ -7441,7 +7518,7 @@ BEGIN
     bars_audit.trace('%s открытие внеб REF1_ = %s, VOB_NB_ = %s', title, to_char(REF1_), to_char(VOB_NB_));
 
     INSERT INTO oper (ref,  tt,     vob,    nd,     dk,     PDAT,    VDAT,   DATD,      DATP,   nam_a,  nlsa,   mfoa,    kv,    s,  nam_b,  nlsb,   mfob,   kv2, s2, nazn,  userid,  sign,        ID_A,  ID_B)
-         VALUES      (ref1_,FXN_,   VOB_NB_,ref_,   1-DK_,  sysdate, DAT_UG, gl.bdate,  DAT_UG, NMS_ ,  NLSG_,  gl.AMFO, KV_,   SN_,NMS9_,  NLS9_,  gl.AMFO,KV_, SN_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
+         VALUES      (ref1_,FXN_,   VOB_NB_,substr(to_char(REF_),1,10),   1-DK_,  sysdate, DAT_UG, gl.bdate,  DAT_UG, NMS_ ,  NLSG_,  gl.AMFO, KV_,   SN_,NMS9_,  NLS9_,  gl.AMFO,KV_, SN_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
 
     PAYtt(0,    ref1_,  DAT_UG, FXN_,   1-DK_,
           kv_,  nlsG_,  SN_,
@@ -7464,7 +7541,7 @@ BEGIN
      bars_audit.trace('%s закрытие внеб REF1_ = %s, VOB_NB_ = %s', title, to_char(REF1_), to_char(VOB_NB_));
 
      INSERT INTO oper (ref,  tt,     vob,   nd,     dk,    PDAT,    VDAT,    DATD,      DATP,   nam_a,  nlsa,   mfoa,    kv,    s,  nam_b,  nlsb,   mfob,    kv2, s2, nazn,  userid,  sign,        ID_A,  ID_B)
-          VALUES      (ref1_,FXN_,   6,     ref_,   DK_,   sysdate, DAT_ROZ, DAT_ROZ,   DAT_UG, NMS_ ,  NLSG_,  gl.AMFO, KV_,   SN_,NMS9_,  NLS9_,  gl.AMFO, KV_, SN_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
+          VALUES      (ref1_,FXN_,   6,     substr(to_char(REF_),1,10),   DK_,   sysdate, DAT_ROZ, DAT_ROZ,   DAT_UG, NMS_ ,  NLSG_,  gl.AMFO, KV_,   SN_,NMS9_,  NLS9_,  gl.AMFO, KV_, SN_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
 
      PAYtt(0,   ref1_,  DAT_ROZ, FXN_,   DK_,
            kv_, nlsG_,  SN_,
@@ -7513,7 +7590,7 @@ BEGIN
      bars_audit.trace('%s открытие внеб REF1_ = %s, VOB_NB_ = %s', title, to_char(REF1_), to_char(VOB_NB_));
 
      INSERT INTO oper (ref,  tt,    vob,    nd,     dk,    PDAT,    VDAT,   DATD,      DATP,   nam_a,   nlsa,   mfoa,    kv,    s,  nam_b,  nlsb,   mfob,    kv2, s2, nazn,  userid,  sign,        ID_A,  ID_B)
-          VALUES      (ref1_,FXN_,  VOB_NB_,ref_,   DK_,   sysdate, DAT_UG, gl.bdate,  DAT_UG, NMS_,    NLSG_,  gl.AMFO, KV_,   SA_,NMS9_,  NLS9_,  gl.AMFO, KV_, SA_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
+          VALUES      (ref1_,FXN_,  VOB_NB_,substr(to_char(REF_),1,10),   DK_,   sysdate, DAT_UG, gl.bdate,  DAT_UG, NMS_,    NLSG_,  gl.AMFO, KV_,   SA_,NMS9_,  NLS9_,  gl.AMFO, KV_, SA_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
 
      PAYtt(0,   REF1_,  DAT_UG, FXN_,   DK_,
            kv_, nlsG_,  SA_,
@@ -7535,7 +7612,7 @@ BEGIN
      GL.REF (REF1_);
      bars_audit.trace('%s закрытие внеб REF1_ = %s, VOB_NB_ = %s', title, to_char(REF1_), to_char(VOB_NB_));
      INSERT INTO oper (ref,  tt,    vob,nd,     dk,    PDAT,    VDAT,   DATD,      DATP,   nam_a,   nlsa,   mfoa,    kv,    s,  nam_b,  nlsb,   mfob,    kv2, s2, nazn,  userid,  sign,        ID_A,  ID_B)
-          VALUES      (ref1_,FXN_,  6,  ref_,   1-DK_, sysdate, DAT_OPL,DAT_OPL,   DAT_UG, NMS_,    NLSG_,  gl.AMFO, KV_,   SA_,NMS9_,  NLS9_,  gl.AMFO, KV_, SA_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
+          VALUES      (ref1_,FXN_,  6,  substr(to_char(REF_),1,10),   1-DK_, sysdate, DAT_OPL,DAT_OPL,   DAT_UG, NMS_,    NLSG_,  gl.AMFO, KV_,   SA_,NMS9_,  NLS9_,  gl.AMFO, KV_, SA_,NAZN_, USER_ID, GetAutoSign, OKPO_, OKPO_);
 
      PAYtt(0,   REF1_,  DAT_OPL, FXN_,   1-DK_,
            kv_, nlsG_,  SA_,
