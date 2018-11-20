@@ -112,8 +112,7 @@
                     if (isResident) {
                         vm.searchCustomerWin.center().open();
                     } else {
-
-                        var url = bars.config.urlContent('/clientregister/registration.aspx?client=' + type.toLowerCase() + '&spd=' + (type === 'PERSONSPD' ? '1': '0') + '&rezid=' + (isResident ? '1' : '2'));
+                        var url = bars.config.urlContent('/clientregister/registration.aspx?client=' + (type === 'PERSONSPD' ? 'person' : type).toLowerCase() + '&spd=' + (type === 'PERSONSPD' ? '1': '0') + '&rezid=' + (isResident ? '1' : '2'));
                         bars.ui.dialog({
                             actions: ['Maximize', 'Close'],
                             iframe: true,
