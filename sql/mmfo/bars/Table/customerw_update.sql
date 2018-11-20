@@ -200,6 +200,17 @@ exception when others then
 
 
 
+PROMPT *** Create  constraint C_CUSTOMERWUPD_EFFECTDATE_NN ***
+begin 
+  execute immediate 'ALTER TABLE BARS.CUSTOMERW_UPDATE MODIFY (EFFECTDATE DATE CONSTRAINT C_CUSTOMERWUPD_EFFECTDATE_NN NOT NULL ENABLE NOVALIDATE)';
+exception when others then
+  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+end;
+/
+
+
+
+
 PROMPT *** Create  index IDX_CUSTOMERWUPD_TAG_VALUE ***
 begin   
  execute immediate '
