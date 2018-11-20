@@ -816,7 +816,7 @@ public partial class DepositContract : Bars.BarsPage
             cmd.Parameters.Add("p_vidd", OracleDbType.Int32, Convert.ToInt32(listContractType.SelectedValue), ParameterDirection.Input);
             cmd.Parameters.Add("p_rnk", OracleDbType.Int32, ((Deposit)Session["DepositInfo"]).Client.ID, ParameterDirection.Input);
             cmd.ExecuteNonQuery();
-        }
+        } 
 		
         if (listContractType.SelectedItem.Value == "-1000")
             tbContractType.Text = String.Empty;
