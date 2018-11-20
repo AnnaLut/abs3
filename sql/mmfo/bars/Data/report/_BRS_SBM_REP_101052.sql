@@ -168,7 +168,6 @@ end;
 commit;                                     
 
 exec umu.add_report2arm(101052,'$RM_DRU1');
-exec umu.add_report2arm(101052,'$BIL');
 commit;
 
 
