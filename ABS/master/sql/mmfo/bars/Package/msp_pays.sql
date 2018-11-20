@@ -92,6 +92,8 @@ CREATE OR REPLACE package body BARS.msp_pays is
     l_date_off      date;
     --l_rec_resources exchange_of_resources%rowtype;
     l_branch        branch.branch%type;
+    l_rnk           customer.rnk%type;
+    
 
     l_sos number;
     l_rec number;
@@ -110,13 +112,24 @@ CREATE OR REPLACE package body BARS.msp_pays is
       from msp.msp_files f
      where f.id = l_rec_row.file_id;
 
-    select p.okpo into l_okpo
+ 
+  begin 
+   select p.okpo, p.rnk into l_okpo, l_rnk
+      from pfu.pfu_pensioner p, pfu.pfu_pensacc pa
+     where p.rnk = pa.rnk and  p.kf = pa.kf
+          and pa.kf = l_mfo
+          and pa.nls = to_char(l_rec_row.deposit_acc)
+          and pa.dazs is null;
+  exception  when no_data_found then  
+       select p.okpo, p.rnk into l_okpo, l_rnk
       from pfu.pfu_pensioner p
-     where (p.rnk,p.kf) in (select pa.rnk,pa.kf
-                              from pfu.pfu_pensacc pa
-                             where pa.kf = l_mfo
-                               and (pa.nls = to_char(l_rec_row.deposit_acc) or pa.nlsalt = to_char(l_rec_row.deposit_acc)) -- COBUMMFO-7501
-                               and pa.dazs is null);
+     where (p.rnk,p.kf) = (
+						   select pa.rnk,pa.kf
+                             from pfu.pfu_pensacc pa
+                            where pa.kf = l_mfo
+                              and pa.nlsalt = to_char(l_rec_row.deposit_acc) -- COBUMMFO-7501
+						   and pa.dazs is null);
+   end;						   
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
       l_okpo := '0000000000';
@@ -125,10 +138,7 @@ CREATE OR REPLACE package body BARS.msp_pays is
     begin
           select p.ser||p.numdoc, date_off into l_doc, l_date_off
             from pfu.pfu_pensioner p
-           where p.rnk = (select pa.rnk
-                            from pfu.pfu_pensacc pa
-                           where (pa.nls = to_char(l_rec_row.deposit_acc) or pa.nlsalt = to_char(l_rec_row.deposit_acc)) -- COBUMMFO-7501
-                             and pa.kf = l_mfo)
+           where p.rnk = l_rnk
              and p.kf = l_mfo;
           if (l_date_off is not null) then
             raise_application_error(-20000, 'Клієнт закритий!!!');
@@ -665,3 +675,5 @@ begin
   null;
 end msp_pays;
 /
+
+GRANT EXECUTE ON BARS.MSP_PAYS TO BARS_ACCESS_DEFROLE;
