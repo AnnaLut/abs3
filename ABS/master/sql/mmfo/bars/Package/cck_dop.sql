@@ -473,7 +473,10 @@ BEGIN
 
     -- Определяем и сохраняем S260
     begin
-      select s260 into s260_ from cc_potra where id=substr(prod_,1,6);
+      select s260 into s260_ from cck_ob22 c where c.nbs||c.ob22=substr(prod_,1,6);
+/*      if s260_ is null then
+        raise_application_error(-20101,'Не вдалось отримати значення S260 для продукта '||prod_);
+      end if;*/
     exception
       when no_data_found then
         raise_application_error(-20101,'Не знайдено опис продукту в довіднику сс_potra!');
@@ -1575,6 +1578,9 @@ begin
   select * into l_cd_row from cc_deal where nd = p_nd;
   if l_cd_row.sos > 5 then     RETURN;  end if;
   ----------------------------------------------
+  if cck_app.Get_ND_TXT(l_cd_row.nd,'S260') is null then
+    raise_application_error(-20201,'Параметр S260 має бути заповнений! ');
+  end if;
 
   -- COBUSUPABS-4863
   If l_cd_row.vidd in (11,12,13) then

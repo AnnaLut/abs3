@@ -1,12 +1,10 @@
-
- 
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/cck.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.CCK IS
 
-  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.25  16/05/2018 ';
+  g_header_version CONSTANT VARCHAR2(64) := 'ver.3.26  24/06/2018 ';
 
   /*
    16.05.2018 Sta Вынос на просрочку тела КЛ после разделения   PROCEDURE cc_asp
@@ -1170,7 +1168,7 @@ END cck;
 CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
 
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.08  06.08.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.17.08  27.09.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK:';
   ------------------------------------------------------------------
@@ -6195,6 +6193,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                               p_op         int_ratn.op%TYPE) IS
     l_nd    cc_deal.nd%TYPE;
     l_count NUMBER;
+    v_s260  varchar2(2);
+    v_prod  varchar2(6);
+    v_vidd  cc_deal.vidd%type;
   BEGIN
 
     BEGIN
@@ -6206,6 +6207,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     END;
     --bars.bars_audit.info('CCK.p_after_open_deal.UPDATE.p_acc= '||p_acc||' ,p_id='||p_id||' ,p_bdat='||p_bdat||' ,p_ir='||p_ir||' ,p_br='||p_br||' ,p_op='||p_op);
 
+    begin
+      select co.s260, c.prod, c.vidd into v_s260, v_prod, v_vidd
+        from cc_deal c, cck_ob22 co
+        where nd = l_nd
+          and substr(c.prod,1,6) = co.nbs||co.ob22;
+    exception
+      when no_data_found then 
+        v_s260 := null;
+    end;
+/*    if v_vidd != 5 and v_s260 is null then
+      raise_application_error(-20101,'Не вдалось отримати значення S260 для продукта '||v_prod);
+    end if;
+*/
     BEGIN
       SELECT COUNT(1)
         INTO l_count
