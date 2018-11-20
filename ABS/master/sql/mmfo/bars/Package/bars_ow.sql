@@ -2,7 +2,7 @@
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_ow.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
  
-  CREATE OR REPLACE PACKAGE BARS.BARS_OW 
+CREATE OR REPLACE PACKAGE BARS.BARS_OW
 is
 
 g_header_version  constant varchar2(64)  := 'version 4.289 22/08/2018';
@@ -480,7 +480,7 @@ is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 6.023 22/08/2018';
+g_body_version    constant varchar2(64)  := 'version 6.027 20/11/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'BPK';
@@ -6131,7 +6131,7 @@ begin
 
       end if;
 
-     -- Перевод виду рахункок на маску NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
+     -- Платіж рахункок на маску NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
       if (p_nlsa is null and p_nlsb not like 'NLS%') or  
          (p_nlsb is null and p_nlsa not like 'NLS%') then
             
@@ -6154,26 +6154,31 @@ begin
                l_branch := null;
             end;
          end if;
+         
          if l_branch is not null then
 
             if p_nlsa is null then
                l_nls := p_atrn.debit_anlaccount;
-               -- счет NLS_3801OO
-               if l_nls like 'NLS%' then
-                 l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
-                 p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
+               if l_nls like 'NLS_3801%' then
+                  p_nlsa := get_nls_3801_cardpay(l_nls, p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.doc_currency, l_branch);
+               -- счет NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
+               elsif l_nls like 'NLS%' then
+                     l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
+                     p_nlsa := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
                -- нормальный счет - оставляем как есть
                end if;
             end if;
 
             if p_nlsb is null then
                l_nls := p_atrn.credit_anlaccount;
-               -- счет NLS_3801OO
-               if l_nls like 'NLS%' then
+               if l_nls like 'NLS_3801%' then
+                  p_nlsb := get_nls_3801_cardpay(l_nls, p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.doc_currency, l_branch);
+               -- счет NLS_BBBBOO (BBBB - НБС, OO - ОБ22)
+               elsif l_nls like 'NLS%' then
                      l_newnb := get_new_nbs_ob22(substr(l_nls,5,4), substr(l_nls,-2));
                      p_nlsb := nbs_ob22_null(l_newnb.nbs, l_newnb.ob22, l_branch);
-               end if;
                -- нормальный счет - оставляем как есть
+               end if;
             end if;
          end if;        
      end if;
