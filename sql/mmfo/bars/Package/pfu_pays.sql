@@ -86,6 +86,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
     l_err           varchar2(4000);
     l_doc           varchar2(30);
     l_date_off      date;
+	l_rnk           customer.rnk%type;
     --l_rec_resources exchange_of_resources%rowtype;
     l_branch        branch.branch%type;
 
@@ -101,13 +102,19 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
      where d.id = p_id
        for update;
 
-    select p.okpo into l_okpo
+    select p.okpo, p.rnk into l_okpo, l_rnk
       from pfu.pfu_pensioner p
-     where (p.rnk,p.kf) in (select pa.rnk,pa.kf
-                              from pfu.pfu_pensacc pa
-                             where pa.kf = l_rec_row.mfo
-                                   and (pa.nls = l_rec_row.num_acc or pa.nlsalt = l_rec_row.num_acc) -- COBUMMFO-7501
-                               and pa.dazs is null);
+     where (p.rnk,p.kf) = (select pa.rnk,pa.kf
+                             from pfu.pfu_pensacc pa
+                            where pa.kf = l_rec_row.mfo
+                              and pa.nls = l_rec_row.num_acc
+                              and pa.dazs is null
+						    union
+						   select pa.rnk,pa.kf
+                             from pfu.pfu_pensacc pa
+                            where pa.kf = l_rec_row.mfo
+                              and pa.nlsalt = l_rec_row.num_acc -- COBUMMFO-7501
+                              and pa.dazs is null);
 
     if not regexp_like(l_okpo, '^\d{8,10}$', 'i') then
       l_okpo := '0000000000';
@@ -116,10 +123,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
     begin
           select p.ser||p.numdoc, date_off into l_doc, l_date_off
             from pfu.pfu_pensioner p
-           where p.rnk = (select pa.rnk
-                            from pfu.pfu_pensacc pa
-                           where (pa.nls = l_rec_row.num_acc or pa.nlsalt = l_rec_row.num_acc) -- COBUMMFO-7501
-                             and pa.kf = l_rec_row.mfo)
+           where p.rnk = l_rnk
              and p.kf = l_rec_row.mfo;
           if (l_date_off is not null) then
             raise_application_error(-20000, 'Клієнт закритий!!!');
@@ -509,7 +513,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_PAYS is
         when others then
         commit;
 		bars_audit.error(sqlerrm);
-		raise_application_error (-20000, dbms_utility.format_error_backtrace);   
+		raise_application_error (-20000, dbms_utility.format_error_backtrace);
   end;
 
 
