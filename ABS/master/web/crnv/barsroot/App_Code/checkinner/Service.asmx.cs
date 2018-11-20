@@ -10,6 +10,8 @@ using Oracle.DataAccess.Types;
 using System.Xml;
 using System.Web.Script.Services;
 using System.Web.Script.Serialization;
+using bars.services.core.wrapper;
+using bars.services.core.modules.security;
 
 namespace BarsWeb.CheckInner
 {
@@ -85,6 +87,87 @@ namespace BarsWeb.CheckInner
         public Service()
         {
             InitializeComponent();
+        }
+        public class VerifyInfo
+        {
+            public string Id { get; set; }
+            public string Level { get; set; }
+            public string KeyId { get; set; }
+            public string BufferType { get; set; }
+            public string Buffer { get; set; }
+            public string Sign { get; set; }
+            public string ModuleName { get; set; }
+            public string TokenId { get; set; }
+        }
+        public class VerifyResult
+        {
+            public int Status { get; set; }
+            public string Message { get; set; }
+            public string ErrorMessage { get; set; }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public ResultData<string> VerifySignature(VerifyInfo verifyInfo)
+        {
+            var result = new ResultData<string>();
+            var provider = ProviderType.CapiVegaDstu;
+            var data = new CheckSignData()
+            {
+                EncType = EncodingType.Hex,
+                Buffer = verifyInfo.Buffer,
+                SignedBuffer = verifyInfo.Sign,
+                Id = verifyInfo.Id,
+                ProviderType = provider
+            };
+
+            string serviceUrl = Bars.Configuration.ConfigurationSettings.AppSettings["Crypto.CryptoServer"];
+            Uri serviceUri;
+            if (!Uri.TryCreate(serviceUrl, UriKind.Absolute, out serviceUri))
+            {
+                result.ErrorMessage = string.Format("Не вдалося визначити адресу сервіса верифікації (вказано [{0}] у параметрі Crypto.CryptoServer)", serviceUrl);
+                result.Status = 1;
+            }
+            else
+            {
+                var ht = new HttpCaller(serviceUri);
+                result = ht.Verify(data);
+            }
+            var verifyModeOn = Bars.Configuration.ConfigurationSettings.AppSettings["Crypto.VerifyMode"] == "1";
+            var debugModeOn = Bars.Configuration.ConfigurationSettings.AppSettings["Crypto.DebugMode"] == "1";
+
+            if (debugModeOn || (verifyModeOn && result.Status != 0))
+            {
+                using (OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection())
+                {
+                    try
+                    {
+                        OracleCommand cmd = con.CreateCommand();
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("p_ref", OracleDbType.Decimal, verifyInfo.Id, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_level", OracleDbType.Decimal, verifyInfo.Level, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_key_id", OracleDbType.Varchar2, verifyInfo.KeyId, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_sign_mode", OracleDbType.Varchar2, "verify", ParameterDirection.Input);
+                        cmd.Parameters.Add("p_buffer_type", OracleDbType.Varchar2, verifyInfo.BufferType, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_buffer_hex", OracleDbType.Varchar2, verifyInfo.Buffer, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_sign_hex", OracleDbType.Varchar2, verifyInfo.Sign, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_verify_status", OracleDbType.Decimal, result.Status, ParameterDirection.Input);
+                        cmd.Parameters.Add("p_verify_error", OracleDbType.Varchar2, result.ErrorMessage, ParameterDirection.Input);
+                        cmd.CommandText = "sgn_mgr.trace_sign";
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Status = 100;
+                        result.ErrorMessage = "Помилка протоколювання підписів. " + ex.Message;
+                    }
+                    if (verifyModeOn) // проверка не прошла, сохранили в очередь, пускаем дальше 
+                    {
+                        result.Status = 0;
+                        result.ErrorMessage = string.Empty;
+                    }
+                }
+            }
+            return result;
         }
 
         #region Component Designer generated code
@@ -219,11 +302,10 @@ namespace BarsWeb.CheckInner
                 DisposeOraConnection();
             }
         }
-        [WebMethod(EnableSession = true)]
-        public MakeData4VisaResult GetDataForVisa(string grpId, string[] refs, string type)
+        private MakeData4VisaResult PrepareVisaData(string grpId, string[] refs, string type, string keyId, string keyHash, string signType, string chkProcedure)
         {
             MakeData4VisaResult Result = new MakeData4VisaResult();
-            String XmlDataDecoded = MakeInputXml(grpId, "", refs).InnerXml;
+            String XmlDataDecoded = MakeInputXml(grpId, keyId, keyHash, signType, refs).InnerXml;
 
             OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
             OracleCommand cmd = con.CreateCommand();
@@ -244,7 +326,7 @@ namespace BarsWeb.CheckInner
                 }
 
                 // собираем клоб и передаем в процедуру, разбираем результат
-                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.make_data4visa_xml(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
+                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; " + chkProcedure + "(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
                 cmd.Parameters.Clear();
                 cmd.ExecuteNonQuery();
 
@@ -300,6 +382,18 @@ namespace BarsWeb.CheckInner
         }
 
         [WebMethod(EnableSession = true)]
+        public MakeData4VisaResult GetDataForVisa(string grpId, string[] refs, string type)
+        {
+            return PrepareVisaData(grpId, refs, type, string.Empty, string.Empty, string.Empty, "chk.make_data4visa_xml");
+        }
+
+        [WebMethod(EnableSession = true)]
+        public MakeData4VisaResult GetDataForVisaExt(string grpId, string[] refs, string type, string keyId, string keyHash, string signType)
+        {
+            return PrepareVisaData(grpId, refs, type, keyId, keyHash, signType, "chk.make_data4visa_ext_xml");
+        }
+
+        [WebMethod(EnableSession = true)]
         public VisaResult PutVisas(String XmlData, String Type)
         {
             VisaResult Result = new VisaResult();
@@ -349,7 +443,143 @@ namespace BarsWeb.CheckInner
                 String OperationName = String.Empty;
                 switch (docs4visa.Attributes["par"].Value)
                 {
-                    case "-1": 
+                    case "-1":
+                        OperationName = "повернуто";
+                        break;
+                    case "0":
+                        OperationName = "завізовано";
+                        break;
+                    default:
+                        OperationName = "сторновано";
+                        break;
+                }
+
+                // формируем результат визирования
+                String ResultText = String.Empty;
+
+                Int32 DocsCount = 0;
+                Hashtable htDocsSum = new Hashtable();
+
+                cmd.CommandText = @"select o.ref, o.s / power(10, t.dig) as s, t.lcv, t.name as lcv_name
+                                      from oper o, tabval t
+                                     where o.ref = :p_ref
+                                       and o.kv = t.kv";
+
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add("p_ref", OracleDbType.Int64, ParameterDirection.Input);
+
+                for (int i = 0; i < NdList.Count; i++)
+                {
+                    // успешные документы отображаем общей суммой в разрезе валют
+                    if (NdList.Item(i).Attributes["err"].InnerText == "0")
+                    {
+                        DocsCount++;
+
+                        cmd.Parameters["p_ref"].Value = Convert.ToInt64(NdList.Item(i).Attributes["ref"].InnerText);
+
+                        using (OracleDataReader rdr1 = cmd.ExecuteReader())
+                        {
+                            if (rdr1.Read())
+                            {
+                                if (!htDocsSum.Contains((String)rdr1["lcv"])) htDocsSum.Add((String)rdr1["lcv"], (Decimal)0);
+                                htDocsSum[(String)rdr1["lcv"]] = (Decimal)htDocsSum[(String)rdr1["lcv"]] + Convert.ToDecimal(rdr1["s"]);
+                            }
+                            rdr1.Close();
+                        }
+                    }
+                    else
+                    {
+                        ResultText += String.Format("<BR>№{0}: {1}", NdList.Item(i).Attributes["ref"].InnerText, NdList.Item(i).Attributes["erm"].InnerText);
+                    }
+                }
+
+                // если были успешные документы, то отображаем из первыми
+                if (DocsCount > 0)
+                {
+                    String DocsSumText = String.Empty;
+                    foreach (String key in htDocsSum.Keys)
+                        DocsSumText += (!String.IsNullOrEmpty(DocsSumText) ? "; " : "") + String.Format("{0} - {1:### ### ### ### ### ### ### ##0.00#}", key, htDocsSum[key]);
+
+                    Result.Text = String.Format("Успішно {0} {1} док. на суму {2}<BR/>{3}", OperationName, DocsCount, DocsSumText, ResultText);
+                }
+                else
+                {
+                    Result.Text = ResultText;
+                }
+                // закрываем транзакцию
+                trz.Commit();
+            }
+            catch (System.Exception e)
+            {
+                // откатываем транзакцию
+                trz.Rollback();
+                throw e;
+            }
+            finally
+            {
+
+                con.Close();
+                con.Dispose();
+            }
+
+            return Result;
+        }
+
+
+        [WebMethod(EnableSession = true)]
+        public VisaResult PutVisasExt(String XmlData, String Type)
+        {
+            VisaResult Result = new VisaResult();
+            String XmlDataDecoded = HttpUtility.UrlDecode(XmlData);
+
+            OracleConnection con = Bars.Classes.OraConnector.Handler.IOraConnection.GetUserConnection();
+            OracleCommand cmd = con.CreateCommand();
+            OracleTransaction trz = con.BeginTransaction();
+            try
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.Clear();
+
+                // записываем клоб по частям
+                cmd.CommandText = "insert into tmp_lob (id, strdata) values (:p_id, :p_strdata)";
+                for (Int32 i = 0; i <= XmlDataDecoded.Length / CLOB_PIECE_SIZE; i++)
+                {
+                    String StrData = XmlDataDecoded.Substring(i * CLOB_PIECE_SIZE, Math.Min(XmlDataDecoded.Length - i * CLOB_PIECE_SIZE, CLOB_PIECE_SIZE));
+
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("p_id", OracleDbType.Int32, i, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_strdata", OracleDbType.Varchar2, StrData, ParameterDirection.Input);
+                    cmd.ExecuteNonQuery();
+                }
+
+                // собираем клоб и передаем в процедуру, разбираем результат
+                cmd.CommandText = "declare l_in_data  clob; l_out_data clob; begin bars_lob.import_clob(l_in_data); bars_lob.clear_temporary; chk.put_visas_xml_ext(l_in_data, l_out_data); bars_lob.export_clob(l_out_data); end;";
+                cmd.Parameters.Clear();
+                cmd.ExecuteNonQuery();
+
+                // собираем клоб по частям
+                cmd.CommandText = "select l.id, l.strdata from tmp_lob l order by l.id";
+                cmd.Parameters.Clear();
+
+                String OutXmlData = String.Empty;
+                OracleDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    OutXmlData += (String)rdr["strdata"];
+                }
+                rdr.Close();
+
+                // разбираем ответ
+                System.Xml.XmlDocument DotNetXml = new System.Xml.XmlDocument();
+                DotNetXml.InnerXml = OutXmlData;
+                System.Xml.XmlNodeList NdList = DotNetXml.GetElementsByTagName("doc");
+
+                // название выполняемой операции
+                XmlNode docs4visa = DotNetXml.GetElementsByTagName("docs4visa")[0];
+                String OperationName = String.Empty;
+                switch (docs4visa.Attributes["par"].Value)
+                {
+                    case "-1":
                         OperationName = "повернуто";
                         break;
                     case "0":
@@ -431,7 +661,7 @@ namespace BarsWeb.CheckInner
 
             return Result;
         }
-        public System.Xml.XmlDocument MakeInputXml(string grpId, string key, string[] refs)
+        public System.Xml.XmlDocument MakeInputXml(string grpId, string key, string keyHash, string signType, string[] refs)
         {
             XmlDocument XmlDoc = new XmlDocument();
 
@@ -446,7 +676,18 @@ namespace BarsWeb.CheckInner
             XmlAttribute XmlAttrKey = XmlDoc.CreateAttribute("key");
             XmlAttrKey.InnerText = key;
             XmlRootElement.Attributes.Append(XmlAttrKey);
-
+            if (!string.IsNullOrEmpty(keyHash))
+            {
+                XmlAttribute XmlAttrKeyHash = XmlDoc.CreateAttribute("key_hash");
+                XmlAttrKeyHash.InnerText = keyHash;
+                XmlRootElement.Attributes.Append(XmlAttrKeyHash);
+            }
+            if (!string.IsNullOrEmpty(signType))
+            {
+                XmlAttribute XmlAttrSignType = XmlDoc.CreateAttribute("sign_type");
+                XmlAttrSignType.InnerText = signType;
+                XmlRootElement.Attributes.Append(XmlAttrSignType);
+            }
             // создаем все референсы
             foreach (String Ref in refs)
             {

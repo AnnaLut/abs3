@@ -188,10 +188,10 @@ namespace DocInput
                     //Если параметр DEP_UP не пустой, то поле дебет всегда верху
                     if (!string.IsNullOrEmpty(PAR_DEPUP))
                     {
-                        SideA.Style.Add("position", "absolute");
-                        SideB.Style.Add("position", "absolute");
-                        SideB.Style["top"] = "expression(document.all.tdDebet.offsetTop)";
-                        SideA.Style["top"] = "expression(document.all.tdKredit.offsetTop)";
+                        //SideA.Style.Add("position", "absolute");
+                        //SideB.Style.Add("position", "absolute");
+                        //SideB.Style["top"] = "expression(document.all.tdDebet.offsetTop)";
+                        //SideA.Style["top"] = "expression(document.all.tdKredit.offsetTop)";
                         HtmlTableRow trA = trSumA;
                         HtmlTableRow trB = trSumB;
                         tabSums.Rows.Remove(trSumA);
@@ -459,17 +459,20 @@ namespace DocInput
                 }
             }
 
+            var parSignMixedMode = ConfigurationSettings.AppSettings["Crypto.SignMixedMode"];
+            __SIGN_MIXED_MODE.Value = parSignMixedMode;
             // Register our javascripts
             string[] js_list = new string[7] { "cDocHand", "cDocHandAcc", "chkForm", "chkSum", "cDocSign", "cFormProc", "cDocPay" };
             foreach (string js_nam in js_list)
             {
                 if (!ClientScript.IsClientScriptBlockRegistered(js_nam))
-                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.31\"></script>");
+                    ClientScript.RegisterClientScriptBlock(Page.GetType(), js_nam, "<script language=\"javascript\" src=\"js/" + js_nam + ".js?v1.9.32\"></script>");
             }
-            if (1 == PAR_SIGNCC)
+            if ("1" == parSignMixedMode)
             {
-                if (!ClientScript.IsClientScriptBlockRegistered("capicom"))
-                    ClientScript.RegisterClientScriptBlock(Page.GetType(), "capicom", "<script language=\"javascript\" src=\"/Common/Script/CapiComSign.js\"></script>");
+                var signVer = "1.0.3";
+                if (!ClientScript.IsClientScriptBlockRegistered("barsSigner"))
+                    ClientScript.RegisterClientScriptBlock(Page.GetType(), "barsSigner", "<script language=\"javascript\" src=\"/barsroot/Scripts/crypto/barsCrypto.js?v" + signVer + "\"></script>");
             }
 
             // Для Надр прячем платежные инструкции, 
@@ -1388,6 +1391,7 @@ namespace DocInput
 
                 cmd.CommandText = conn.GetSetRoleCommand("WR_DOC_INPUT");
                 cmd.ExecuteNonQuery();
+                var parSignMixedMode = ConfigurationSettings.AppSettings["Crypto.SignMixedMode"];
 
                 cmd.CommandText =
                  "select web_utl.get_bankdate,mfo,nb,docsign.GetIdOper, "
@@ -1409,7 +1413,11 @@ namespace DocInput
                 + "(select nvl(val,'') from params where par='VOB2SEP2') VOB2SEP2, "
                 + "(select nvl(val,'') from params where par='DEP_UP') DEP_UP, "
                 + "(select nvl(val,'') from params where par='WARNPAY') WARNPAY, "
-                + "(select nvl(val,'') from params where par='BANKTYPE') BANKTYPE "
+                + "(select nvl(val,'') from params where par='BANKTYPE') BANKTYPE, "
+                + ((parSignMixedMode == "1") ? ("docsign.get_user_sign_type") : ("null")) + " USER_SIGN_TYPE, "
+                + ((parSignMixedMode == "1") ? ("docsign.get_user_keyid") : ("null")) + " USER_KEYID, "
+                + "(select val from params where par='CRYPTO_USE_VEGA2') CRYPTO_USE_VEGA2, "
+                + "(select val from params where par='CRYPTO_CA_KEY') CRYPTO_CA_KEY "
                 + "from banks where mfo=(select val from params where par='MFO')";
 
                 OracleDataReader rdr = cmd.ExecuteReader();
@@ -1440,6 +1448,10 @@ namespace DocInput
                 PAR_DEPUP = Convert.ToString(rdr.GetValue(20));
                 __WARNPAY.Value = Convert.ToString(rdr.GetValue(21));
                 PAR_BANKYPE = Convert.ToString(rdr.GetValue(22));
+                __USER_SIGN_TYPE.Value = Convert.ToString(rdr["USER_SIGN_TYPE"]);
+                __USER_KEYID.Value = Convert.ToString(rdr["USER_KEYID"]);
+                __CRYPTO_USE_VEGA2.Value = Convert.ToString(rdr["CRYPTO_USE_VEGA2"]);
+                __CRYPTO_CA_KEY.Value = Convert.ToString(rdr["CRYPTO_CA_KEY"]);
 
                 rdr.Close();
                 rdr.Dispose();

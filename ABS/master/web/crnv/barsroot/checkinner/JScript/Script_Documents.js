@@ -142,7 +142,104 @@ function OneStepBackButtonPressed() {
     PutVisaButtonPressed(-1);
 }
 
+// объект для записи ошибок подписи
+var errorData = {
+    hasErrors: false,
+    errorText: "",
+    errorItems: [],
+
+    showModalDialog: function (message) {
+        var msgTextEsc = escape(message);
+        if (msgTextEsc.length > 2000) {
+            msgTextEsc = msgTextEsc.substring(0, 2000) + escape('<BR>...');
+        }
+
+        window.showModalDialog("dialog.aspx?type=1&message=" + msgTextEsc, 'dialogHeight:300px; dialogWidth:400px');
+    },
+    addError: function (msg) {
+        this.hasError = true;
+        this.errorText = msg;
+    },
+    addDocError: function (ref, msg) {
+        this.hasError = true;
+        this.errorItems.push({
+            ref: ref,
+            msg: msg
+        });
+    },
+    showAlert: function (cbFunc) {
+        if (!this.hasError) return;
+
+        var msgText = '';
+        if (this.errorText) msgText += '<BR>' + this.errorText;
+        for (var item in this.errorItems) {
+            msgText += '<BR>№' + item.ref + ' : ' + item.msg;
+        }
+        this.showModalDialog(msgText);
+        if (cbFunc) cbFunc();
+    },
+    clear: function () {
+        this.hasError = false;
+        this.errorText = "";
+        this.errorItems = [];
+    }
+};
+
+// Преобразование документв из XML в массив объектов
+function GetDocsFromXML(xmlDoc) {
+    var result = [];
+    var docNodes = xmlDoc.getElementsByTagName('doc');
+    for (ii = 0; ii < docNodes.length; ii++) {
+        // если ошибочный то переходим к след
+        if (docNodes[ii].getAttribute('err') == '1' || docNodes[ii].getAttribute('err') == '2') continue;
+
+        // объект документа
+        var doc = new oSignDoc();
+        doc.ref = docNodes[ii].getAttribute('ref');
+        doc.f_sign = docNodes[ii].getAttribute('f_sign');
+        doc.f_check = docNodes[ii].getAttribute('f_check');
+
+        // блок данных ЭЦП
+        // внутрення ЭЦП
+        var int_ecp = docNodes[ii].getElementsByTagName('int_ecp')[0];
+        doc.int_buffer_hex = int_ecp.getAttribute('int_buffer_hex');
+
+        var ecpNodesInt = int_ecp.getElementsByTagName('ecp');
+        for (ii0 = 0; ii0 < ecpNodesInt.length; ii0++) {
+            doc.int_ecp.push({
+                id: ecpNodesInt[ii0].getAttribute('id'),
+                sign_type: ecpNodesInt[ii0].getAttribute('sign_type'),
+                buffer_hex: ecpNodesInt[ii0].getAttribute('buffer_hex'),
+                key_id: ecpNodesInt[ii0].getAttribute('key_id'),
+                sign_hex: ecpNodesInt[ii0].getAttribute('sign_hex')
+            });
+        }
+
+        // внешняя ЭЦП
+        var ext_ecp = docNodes[ii].getElementsByTagName('ext_ecp')[0];
+        doc.ext_buffer_hex = ext_ecp.getAttribute('ext_buffer_hex');
+
+        var ecpNodesExt = ext_ecp.getElementsByTagName('ecp')[0];
+        if (ecpNodesExt) {
+            doc.ext_ecp = {
+                id: ecpNodesExt.getAttribute('id'),
+                sign_type: ecpNodesExt.getAttribute('sign_type'),
+                buffer_hex: ecpNodesExt.getAttribute('buffer_hex'),
+                key_id: ecpNodesExt.getAttribute('key_id'),
+                sign_hex: ecpNodesExt.getAttribute('sign_hex')
+            };
+        }
+
+        result.push(doc);
+    }
+
+    return result;
+}
+
 function PutVisaButtonPressed(par) {
+    // отчитка предыдущих ошибок
+    errorData.clear();
+
     var grpId = document.getElementById('hid_grpid').value;
     var chkbList = document.getElementsByName('cnkbox');
     var chkbListChecked = new Array();
@@ -159,6 +256,7 @@ function PutVisaButtonPressed(par) {
     if (chkbListChecked.length == 0) {
         var msg = escape(LocalizedString('Message6')/*'Документы не отмечены!'*/);
         window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
+        return;
     }
 
     // продолжаем
@@ -180,62 +278,176 @@ function PutVisaButtonPressed(par) {
 
     var ask = window.showModalDialog("dialog.aspx?type=confirm&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
     if (ask == '1') {
-        var MakeData4VisaResult = ExecSync('GetDataForVisa', { grpId: grpId, refs: chkbListChecked, type: type }).d;
+        // new mode
+        var mixedMode = document.getElementById("__SIGN_MIXED_MODE").value === "1";
+        //mixedMode = false;
+        if (mixedMode) {
+            // инициализация ЭЦП
+            var options = {};
+            options.KeyId = document.getElementById('__USER_KEYID').value;
+            options.KeyHash = document.getElementById('__USER_KEYHASH').value;
+            options.RegionCode = document.getElementById('__REGNCODE').value;
+            options.CaKey = document.getElementById('__CRYPTO_CA_KEY').value;
+            options.BankDate = document.getElementById('__BDATE').value;
+            options.ModuleType = document.getElementById('__USER_SIGN_TYPE').value;
+            barsCrypto.setDebug(true); // режим отладки
+            // инициализация
+            barsCrypto.init(options);
+            var visaExtInfo = ExecSync('GetDataForVisaExt', { grpId: grpId, refs: chkbListChecked, type: type, keyId: options.KeyId, keyHash: options.KeyHash, signType: options.ModuleType }).d;
+            if (visaExtInfo && visaExtInfo.Code === 'ERROR') {
+                //var msg = escape(visaExtInfo.Text);//escape(LocalizedString('Message10')/*'Нет документов для визирования!'*/);
+                //window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
+                alert(visaExtInfo.Text);
+                DocVisas(-1);
+                ReInitGrid();
+                return;
+            }
+            else if (visaExtInfo && visaExtInfo.Code === 'WARNING') {
+                var msg = escape(visaExtInfo.Text);
+                if (msg.length > 1800) msg = msg.substr(0, 1800) + escape('..............');
+                window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
+            }
+            // загружаем ответный Xml
+            xml_visaData.loadXML(visaExtInfo.DataXml);
+            var Docs = GetDocsFromXML(xml_visaData);
+            // инициализация
+            SignDocsRecursive(Docs.length, Docs, grpId, par,
+                function (Docs) {
+                    /* Структура входящего XML xmlDoc:
+                    <docs4visa>
+                      <doc ref="ref" err="1" erm="ффффф" />
+                      <doc ref="ref" err="0" erm="..." grp="grp" f_pay="f_pay" f_sign="f_sign" f_check="f_check">
+                        <int_ecp int_buffer_hex="">
+                          <ecp id="" sgntype_code="" buffer_hex="" keyid="" sign_hex="" />
+                          ...
+                        </int_ecp>
+                        <ext_ecp ext_buffer_hex="">
+                          <ecp id="" sgntype_code="" buffer_hex="" keyid="" sign_hex="" />
+                        <ext_ecp>
+                      </doc>
+                    </docs4visa>
+                    */
+                    // формируем исходящий XML
+                    var str_putVisaData = '<?xml version="1.0" encoding="utf-8" ?>';
+                    str_putVisaData += '<docs4visa grpid="' + grpId + '" par="' + par + '">';
+                    for (i = 0; i < Docs.length; i++) {
+                        str_putVisaData += '<doc ref="' + Docs[i].ref + '" key_id="' + options.KeyId + '" sign_type="' + options.ModuleType + '" >';
+                        str_putVisaData += '<bufs inner_buf="' + Docs[i].int_buffer_hex + '" outer_buf="' + Docs[i].ext_buffer_hex + '" />';
+                        str_putVisaData += '<ecps inner_ecp="' + Docs[i].int_sign_hex + '" outer_ecp="' + Docs[i].ext_sign_hex + '" />';
+                        str_putVisaData += '</doc>';
+                    }
+                    str_putVisaData += '</docs4visa>';
 
-        // показываем ошибки если были при подготовке данных
-        if (MakeData4VisaResult.Code == 'ERROR') {
-            var msg = escape(LocalizedString('Message10')/*'Нет документов для визирования!'*/);
-            window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
+                    // Повертаємо сформований XML
+                    var tmp_xml_putVisaData = new ActiveXObject('MSXML2.DOMDocument');
+                    tmp_xml_putVisaData.loadXML(str_putVisaData);
+                    // собственно визируем					
+                    var VisaResult = ExecSync('PutVisasExt', { XmlData: encodeURI(tmp_xml_putVisaData.xml), Type: type }).d;
+                    if (VisaResult && VisaResult.Code == 'OK') {
+                        var msg1 = escape(VisaResult.Text);
+                        if (msg1.length > 2000) {
+                            msg1 = msg1.substring(0, 2000) + escape('<BR>...');
+                        }
 
-            DocVisas(-1);
-            ReInitGrid();
+                        var dialogUrl = 'dialog.aspx?type=1&message=' + msg1;
+                        var dialogOptions = 'width=400, height=300, toolbar=no, location=no, directories=no, menubar=no, scrollbars=yes, resizable=yes, status=no';
+                        window.open(dialogUrl, 'view_window', dialogOptions);
 
+                        DocVisas(-1);
+                        ReInitGrid();
+                    }
+                    else {
+                        errorData.addError('Помилки візування документів');
+                        errorData.showAlert();
+                    }
+                },
+                function (errorText, errCode) {
+                    errorData.addError('Помилки накладання ЕЦП: ' + errorText);
+                    if (errCode && errCode === barsCrypto.constants.ENotStarted) {
+                        errorData.addError("<div style='text-align: left; FONT-FAMILY:Verdana'><span style='color:red;'>Помилки накладання ЕЦП.<br/>" + errorText + "</span><br/><span style='color:black'>Буде виконано спробу запуску BarsCryptor, якщо він був встановлений в системі. У наступномі вікні потрбіно дозволити запуск та повторити операцію візування.</span></div>");
+                        errorData.showAlert(function () {
+                            barsCrypto.startBarsCryptor();
+                        });
+                    }
+                    else
+                        errorData.showAlert();
+                });
             return;
         }
-        else if (MakeData4VisaResult.Code == 'WARNING') {
-            var msg = escape(MakeData4VisaResult.Text);
-            if (msg.length > 1800) msg = msg.substr(0, 1800) + escape('..............');
-            window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
-        }
+        else // все по старому
+        {
+            var MakeData4VisaResult = ExecSync('GetDataForVisa', { grpId: grpId, refs: chkbListChecked, type: type }).d;
 
-        // загружаем ответный Xml
-        xml_visaData.loadXML(MakeData4VisaResult.DataXml);
+            // показываем ошибки если были при подготовке данных
+            if (MakeData4VisaResult && MakeData4VisaResult.Code == 'ERROR') {
+                var msg = escape(LocalizedString('Message10')/*'Нет документов для визирования!'*/);
+                window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
 
-        //---------------------------------------------------------
-        // проверяем и подписываем если это не сторнирование
-        var params = new Array();
-        params['INTSIGN'] = document.getElementById('__INTSIGN').value;
-        params['VISASIGN'] = document.getElementById('__VISASIGN').value;
-        params['SEPNUM'] = document.getElementById('__SEPNUM').value;
-        params['SIGNTYPE'] = document.getElementById('__SIGNTYPE').value;
-        params['SIGNLNG'] = document.getElementById('__SIGNLNG').value;
-        params['DOCKEY'] = document.getElementById('__DOCKEY').value;
-        params['REGNCODE'] = document.getElementById('__REGNCODE').value;
-        params['BDATE'] = document.getElementById('__BDATE').value;
+                DocVisas(-1);
+                ReInitGrid();
 
-        // наложение ЭЦП через ActiveX
-        var signDoc = new obj_Sign();
-        if (signDoc.initObject(params))
-            xml_putVisaData = SignDocs(xml_visaData, grpId, par, signDoc);
-        signDoc.showErrorsDialog();
-
-        //собственно визируем					
-        var VisaResult = ExecSync('PutVisas', { XmlData: encodeURI(xml_putVisaData.xml), Type: type }).d;
-        if (VisaResult.Code == 'OK') {
-            var msg1 = escape(VisaResult.Text);
-            if (msg1.length > 2000) {
-                msg1 = msg1.substring(0, 2000) + escape('<BR>...');
+                return;
+            }
+            else if (MakeData4VisaResult && MakeData4VisaResult.Code == 'WARNING') {
+                var msg = escape(MakeData4VisaResult.Text);
+                if (msg.length > 1800) msg = msg.substr(0, 1800) + escape('..............');
+                window.showModalDialog("dialog.aspx?type=1&message=" + msg, 'dialogHeight:300px; dialogWidth:400px');
             }
 
-            var dialogUrl = 'dialog.aspx?type=1&message=' + msg1;
-            var dialogOptions = 'width=400, height=300, toolbar=no, location=no, directories=no, menubar=no, scrollbars=yes, resizable=yes, status=no';
-            window.open(dialogUrl, 'view_window', dialogOptions);
+            // загружаем ответный Xml
+            xml_visaData.loadXML(MakeData4VisaResult.DataXml);
 
-            DocVisas(-1);
-            ReInitGrid();
+            //---------------------------------------------------------
+            // проверяем и подписываем если это не сторнирование
+            var params = new Array();
+            params['INTSIGN'] = document.getElementById('__INTSIGN').value;
+            params['VISASIGN'] = document.getElementById('__VISASIGN').value;
+            params['SEPNUM'] = document.getElementById('__SEPNUM').value;
+            params['SIGNTYPE'] = document.getElementById('__SIGNTYPE').value;
+            params['SIGNLNG'] = document.getElementById('__SIGNLNG').value;
+            params['DOCKEY'] = document.getElementById('__DOCKEY').value;
+            params['REGNCODE'] = document.getElementById('__REGNCODE').value;
+            params['BDATE'] = document.getElementById('__BDATE').value;
+
+            // наложение ЭЦП через ActiveX
+            var signDoc = new obj_Sign();
+            if (signDoc.initObject(params))
+                xml_putVisaData = SignDocs(xml_visaData, grpId, par, signDoc);
+            signDoc.showErrorsDialog();
+
+            //собственно визируем					
+            var VisaResult = ExecSync('PutVisas', { XmlData: encodeURI(xml_putVisaData.xml), Type: type }).d;
+            if (VisaResult && VisaResult.Code == 'OK') {
+                var msg1 = escape(VisaResult.Text);
+                if (msg1.length > 2000) {
+                    msg1 = msg1.substring(0, 2000) + escape('<BR>...');
+                }
+
+                var dialogUrl = 'dialog.aspx?type=1&message=' + msg1;
+                var dialogOptions = 'width=400, height=300, toolbar=no, location=no, directories=no, menubar=no, scrollbars=yes, resizable=yes, status=no';
+                window.open(dialogUrl, 'view_window', dialogOptions);
+
+                DocVisas(-1);
+                ReInitGrid();
+            }
         }
     }
 }
+
+function SignDocsRecursive(lev, Docs, grpId, par, cbSuccess, cbError) {
+    // проверка дошли до дна рекурсии
+    if (lev == 0) {
+        cbSuccess(Docs);
+        return;
+    }
+
+    barsCrypto.processDoc(Docs[lev - 1], function (result) {
+        Docs[lev - 1].int_sign_hex = result.intSign;
+        Docs[lev - 1].ext_sign_hex = result.extSign;
+        SignDocsRecursive(lev - 1, Docs, grpId, par, cbSuccess, cbError);
+    }, cbError);
+}
+
 function makeError(str) {
     var result = "";
     var len = str.split("---").length - 1;

@@ -8,13 +8,15 @@ namespace barsroot
         // Дополнительные сведения о Bundling см. по адресу http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
-            /*bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/common/jquery/jquery-1.10.2.js"));
+			BundleTable.EnableOptimizations = false;   
+            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+                        "~/scripts/jquery/jquery.js",
+                        "~/scripts/jquery/pnotify.custom.min.js")); 
 
-            bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
-                        "~/common/jquery/jquery-ui-{version}.js"));
+            bundles.Add(new ScriptBundle("~/bundles/jquery-ui").Include(
+                        "~/scripts/jquery/jquery-ui.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
+            /*bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/common/jquery/jquery.unobtrusive*",
                         "~/common/jquery/jquery.validate*"));
 

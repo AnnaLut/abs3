@@ -18,6 +18,9 @@
     <script type="text/javascript" src="/Common/Script/Localization.js"></script>
     <script type="text/javascript" src="/Common/WebEdit/NumericEdit.js?v1.0"></script>
     <script type="text/javascript" src="/Common/Script/SignBuf.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
     <script type="text/javascript" src="/Common/WebEdit/RadInput.js?v.10"></script>
     <script type="text/javascript">
         function chkErrMessage(str) {
@@ -695,6 +698,12 @@
                 </td>
                 <td>
                     <input id="__WARNPAY" type="hidden" runat="server" />
+                    <input id="__SIGN_MIXED_MODE" type="hidden" runat="server" />
+                    <input id="__USER_SIGN_TYPE" type="hidden" runat="server" />
+                    <input id="__USER_KEYID" type="hidden" runat="server" />
+                    <input id="__USER_KEYHASH" type="hidden" runat="server" />
+                    <input id="__CRYPTO_USE_VEGA2" type="hidden" runat="server" />
+                    <input id="__CRYPTO_CA_KEY" type="hidden" runat="server" />
                 </td>
             </tr>
             <tr>

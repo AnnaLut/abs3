@@ -56,10 +56,22 @@ function Validate(form) {
 
     if (!(document.getElementById("btPayIt").disabled = AskBeforePay())) return false;
 
-    if (!(document.getElementById("btPayIt").disabled = signDoc(form))) return false;
+    // новый режим работы с подпись
+    if (document.getElementById("__SIGN_MIXED_MODE").value === "1") {
+        signDocMixedMode(form, function (result) {
+            document.getElementById("btPayIt").disabled = true;
+            callOplDoc(form, result);
+        },
+            function (errorText) {
+                document.getElementById("btPayIt").disabled = false;
+                alert(errorText);
+            });
+    }
+    else { // все по старому
+        if (!(document.getElementById("btPayIt").disabled = signDoc(form))) return false;
+        callOplDoc(form);
+    }
 
-
-    callOplDoc(form);
     return false;
 }
 /*Trim for string */
