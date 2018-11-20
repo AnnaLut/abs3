@@ -53,8 +53,7 @@ begin
     l_zpr.default_vars := ':nls_z=''%'',:nls_po=''%'',:kf=''%'',:ob22=''%'',:kv=''%'',:tag1=''OW_DS'',:tag2=''OW_LD'',:tag3=''OWDRN''';
     l_zpr.bind_sql     := '';
     l_zpr.xml_encoding := 'CL8MSWIN1251';
-    l_zpr.txt          := 'select distinct 
-       op.ref, 
+    l_zpr.txt          := 'select op.ref,
        op.tt, 
        nam_a, 
        nam_b, 
@@ -64,19 +63,31 @@ begin
        nazn, 
        pdat, 
        vdat, 
-       opw.value, 
-       op.datd, 
-       op.nd    
-  from oper op, operw opw, accounts acc
- where opw.tag in (:tag1,:tag2,:tag3)                                                                      
-       and op.ref=opw.ref
-       and op.pdat between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'')                 
-       and op.kf = decode(trim(:kf),''%'',op.kf, :kf)
-       and (op.nlsa >=decode(:nls_z,''%'',op.nlsa, :nls_z) or op.nlsb >=decode(:nls_z,''%'',op.nlsb, :nls_z))  
-       and (op.nlsa <=decode(:nls_po,''%'',op.nlsa, :nls_po) or op.nlsb <=decode(:nls_po,''%'',op.nlsb, :nls_po)) 
-       and (op.nlsa=acc.nls or op.nlsb=acc.nls) 
-       and acc.ob22 =decode(trim(:ob22),''%'',acc.ob22, :ob22)                                               
-       and to_char(op.kv)= decode(:kv,''%'',to_char(op.kv), :kv)';
+       (select value from operw opw 
+         where opw.ref=op.ref
+               and opw.tag in (''OW_DS'')) edesc, --доп реквизит описание way4
+       (select value from operw opw 
+         where opw.ref=op.ref
+               and opw.tag in (''OW_LD'')) edate, --доп реквизит date
+       (select value from operw opw 
+         where opw.ref=op.ref
+               and opw.tag in (''OWDRN'')) eref  
+  from oper op
+       
+ where op.pdat between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'')
+       and op.branch like :kf||''%''
+       and op.kv like :kv
+       and 0<(select count(acc) --проверка на нужный ОВ22
+                from accounts acc
+               where ((op.nlsa=acc.nls and op.kv=acc.kv) or (op.nlsb=acc.nls and acc.kv=op.kv2))
+                     and nbs between decode(:nls_z,''%'',nbs,:nls_z) and decode(:nls_po,''%'',nbs,:nls_po) 
+                     and acc.kf=op.kf
+                     and acc.ob22 like :ob22
+                     )
+       and 0<(select count(tag) --Поиск по заданым тегам
+                from operw opw 
+               where op.ref=opw.ref
+                     and opw.tag in (:tag1,:tag2,:tag3)) ';
     l_zpr.xsl_data     := '';
     l_zpr.xsd_data     := '';
 
@@ -153,8 +164,11 @@ begin
 end;                                        
 /                                           
                                             
-commit;                                        
+commit;                                     
 
+exec umu.add_report2arm(101052,'$RM_DRU1');
+exec umu.add_report2arm(101052,'$BIL');
+commit;
 
 
 PROMPT ===================================================================================== 
