@@ -11,7 +11,8 @@ declare
    l_min            date          := to_date('03.03.2000', 'dd.mm.yyyy');
    l_max            date          := bars.gl.bd;
    l_bd             date          := bars.gl.bd;
-   cursor c_data is select u.rowid rid,
+   v_count          number        := 0;
+   cursor c_data is select /*+ full(u) parallel(16)*/ u.rowid rid,
                            case when chgdate between l_min and l_max then trunc(chgdate)
                                 when chgdate < l_min then  l_min 
                                 when chgdate > l_max then  l_bd end as effectdate
@@ -23,7 +24,7 @@ begin
     loop
         l_kf := lc_kf.kf;
         bars.bc.go(l_kf);
-
+        v_count := 0;
         open c_data;
         loop
            fetch c_data bulk collect into l_tbl limit l_lim;
@@ -32,14 +33,16 @@ begin
               update bars.customerw_update
                  set effectdate=l_tbl(i).effectdate
                where rowid = l_tbl(i).rid;
+           v_count := v_count + l_lim;
+           dbms_application_info.set_client_info('ROWS: ' || trim(to_char(v_count, '999G999G999G999G999'))||'/ '||l_kf);
            commit;
         end loop;
         close c_data;
     end loop;
+    bars.bc.home;
 end;
 /
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ===== Scripts /Sql/BARS/Script/customerw_update.sql =====*** End *** ====
 PROMPT ===================================================================================== 
-
