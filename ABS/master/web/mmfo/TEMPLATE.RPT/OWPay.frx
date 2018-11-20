@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="08/08/2018 10:56:44" ReportInfo.CreatorVersion="2014.1.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/30/2018 17:18:47" ReportInfo.Modified="10/22/2018 17:22:29" ReportInfo.CreatorVersion="2014.1.2.0">
   <Dictionary>
-    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQF+t9ApqVdjfhb/SevkWDKc=" CommandTimeout="4000">
-      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select num00 ref, char00 tt,  char01 nam_a, char02 nam_b, num01 debit ,num02 credit , char03 nazn, dat00 pdat, dat01 vdat, char04 value, dat02 datd, char05 nd  from rs_tmp_report_data where&#13;&#10;session_id=:SESSION_ID order by id">
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQNOngWWMwivRb1Ot58H5oHo=" CommandTimeout="4000">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select num00 ref, char00 tt,  char01 nam_a, char02 nam_b, num01 debit ,num02 credit , char03 nazn, dat00 pdat, dat01 vdat, char04 value, char05 datd, char06 nd  from rs_tmp_report_data where&#13;&#10;session_id=:SESSION_ID order by id">
         <Column Name="REF" DataType="System.String"/>
         <Column Name="DEBIT" DataType="System.Decimal"/>
         <Column Name="CREDIT" DataType="System.Decimal"/>
@@ -15,7 +15,7 @@
         <Column Name="TT" DataType="System.String"/>
         <Column Name="NAM_A" DataType="System.String"/>
         <Column Name="NAM_B" DataType="System.String"/>
-        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="809463"/>
+        <CommandParameter Name="SESSION_ID" DataType="113" Expression="[session_id]" DefaultValue="812036"/>
       </TableDataSource>
     </OracleDataConnection>
     <Parameter Name="session_id" DataType="System.Int64"/>
@@ -66,18 +66,18 @@
         <TableColumn Name="Column97" Width="188.21"/>
         <TableColumn Name="Column98" Width="103.16"/>
         <TableRow Name="Row23" Height="66.15">
-          <TableCell Name="Cell255" Border.Lines="All" Text="[Table.REF]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell256" Border.Lines="All" Text="[Table.TT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell257" Border.Lines="All" Text="[Table.NAM_A]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell258" Border.Lines="All" Text="[Table.NAM_B]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell259" Border.Lines="All" Text="[Table.DEBIT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell260" Border.Lines="All" Text="[Table.CREDIT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell261" Border.Lines="All" Text="[Table.NAZN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell262" Border.Lines="All" Text="[Table.PDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell263" Border.Lines="All" Text="[Table.VDAT]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell264" Border.Lines="All" Text="[Table.VALUE]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell265" Border.Lines="All" Text="[Table.DATD]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
-          <TableCell Name="Cell266" Border.Lines="All" Text="[Table.ND]" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell255" Border.Lines="All" Text="[Table.REF]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell256" Border.Lines="All" Text="[Table.TT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell257" Border.Lines="All" Text="[Table.NAM_A]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell258" Border.Lines="All" Text="[Table.NAM_B]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell259" Border.Lines="All" Text="[Table.DEBIT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell260" Border.Lines="All" Text="[Table.CREDIT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell261" Border.Lines="All" Text="[Table.NAZN]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell262" Border.Lines="All" Text="[Table.PDAT]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell263" Border.Lines="All" Text="[Table.VDAT]" HideZeros="true" Format="Date" Format.Format="d" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell264" Border.Lines="All" Text="[Table.VALUE]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell265" Border.Lines="All" Text="[Table.DATD]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell266" Border.Lines="All" Text="[Table.ND]" HideZeros="true" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
     </DataBand>
