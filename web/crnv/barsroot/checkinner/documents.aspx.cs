@@ -84,6 +84,14 @@ namespace BarsWeb.CheckInner
                             }
                     }
 
+                    var parSignMixedMode = Bars.Configuration.ConfigurationSettings.AppSettings["Crypto.SignMixedMode"];
+                    __SIGN_MIXED_MODE.Value = parSignMixedMode;
+                    if ("1" == parSignMixedMode)
+                    {
+                        var signVer = "1.0.2";
+                        if (!ClientScript.IsClientScriptBlockRegistered("barsSigner"))
+                            ClientScript.RegisterClientScriptBlock(Page.GetType(), "barsSigner", "<script language=\"javascript\" src=\"/barsroot/Scripts/crypto/barsCrypto.js?v" + signVer + "\"></script>");
+                    }
                     cmd.Parameters.Clear();
                     cmd.CommandText = @"select to_char(web_utl.get_bankdate, 'yyyy/mm/dd hh:mm:ss') as bdate,
                                             mfo,
@@ -103,8 +111,12 @@ namespace BarsWeb.CheckInner
                                             to_char(sysdate, 'yyyy/mm/dd hh:mm:ss') as sdate,
                                             (select nvl(min(to_number(val)), 0)
                                                 from params
-                                                where par = 'CHKDOCDG') as chkdocdg
-                                        from banks
+                                            where par = 'CHKDOCDG') as chkdocdg, "
+                                            + ((parSignMixedMode == "1") ? ("docsign.get_user_sign_type") : ("null")) + " USER_SIGN_TYPE, "
+                                            + ((parSignMixedMode == "1") ? ("docsign.get_user_keyid") : ("null")) + " USER_KEYID, "
+                                            + "(select val from params where par='CRYPTO_USE_VEGA2') CRYPTO_USE_VEGA2, "
+                                            + "(select val from params where par='CRYPTO_CA_KEY') CRYPTO_CA_KEY " +
+                                        @"from banks
                                         where mfo = (select val from params where par = 'MFO')";
 
                     OracleDataReader rdr1 = cmd.ExecuteReader();
@@ -123,6 +135,10 @@ namespace BarsWeb.CheckInner
                         __SIGNCC.Value = Convert.ToString(rdr1["signcc"]);
                         __SYSDATE.Value = Convert.ToString(rdr1["sdate"]);
                         __SYSDATE.Value = Convert.ToString(rdr1["sdate"]);
+                        __USER_SIGN_TYPE.Value = Convert.ToString(rdr1["USER_SIGN_TYPE"]);
+                        __USER_KEYID.Value = Convert.ToString(rdr1["USER_KEYID"]);
+                        __CRYPTO_USE_VEGA2.Value = Convert.ToString(rdr1["CRYPTO_USE_VEGA2"]);
+                        __CRYPTO_CA_KEY.Value = Convert.ToString(rdr1["CRYPTO_CA_KEY"]);
 
                         ClientScript.RegisterClientScriptBlock(this.GetType(), "chkdocdg_init", String.Format("ShowDocDialog = {0}; ", rdr1["chkdocdg"]), true);
                     }

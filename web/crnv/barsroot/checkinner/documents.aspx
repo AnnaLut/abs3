@@ -11,11 +11,15 @@
     <script language="javascript" type="text/javascript" src="/Common/WebGrid/Grid2005.js"></script>
     <script language="javascript" type="text/javascript" src="/Common/Script/Localization.js"></script>
     <link href="/Common/WebGrid/Grid.css" type="text/css" rel="stylesheet">
-    <script language="javascript" type="text/javascript" src="JScript/additionalFuncs.js?v=1.1"></script>
-    <script language="javascript" type="text/javascript" src="JScript/Script_Documents.js?v=1.5"></script>
-    <script language="JavaScript" type="text/javascript" src="/Common/Script/Sign.js?v=1"></script>
     <script language="javascript" type="text/javascript" src="/Common/jquery/jquery.js"></script>
     <script language="javascript" type="text/javascript" src="/Common/jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
+     <script language="javascript" type="text/javascript" src="JScript/additionalFuncs.js?v=1.1"></script>
+    <script language="javascript" type="text/javascript" src="JScript/Script_Documents.js?v=1.6"></script>
+    <script language="JavaScript" type="text/javascript" src="/Common/Script/Sign.js?v=1"></script>
+    <script type="text/javascript" src="/Common/Script/BarsIe.js?v1.2"></script>
+
     <link type="text/css" rel="stylesheet" href="/Common/CSS/jquery/jquery.css" />
     <style type="text/css">
         .doc_tooltip {
@@ -291,6 +295,12 @@
                 </td>
                 <td>
                     <input id="__CERTNAME" type="hidden" runat="server">
+                    <input id="__SIGN_MIXED_MODE" type="hidden" runat="server" />
+                    <input id="__USER_SIGN_TYPE" type="hidden" runat="server" />
+                    <input id="__USER_KEYID" type="hidden" runat="server" />
+                    <input id="__USER_KEYHASH" type="hidden" runat="server" />
+                    <input id="__CRYPTO_USE_VEGA2" type="hidden" runat="server" />
+                    <input id="__CRYPTO_CA_KEY" type="hidden" runat="server" />
                 </td>
             </tr>
         </table>

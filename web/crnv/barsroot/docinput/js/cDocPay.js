@@ -291,7 +291,7 @@ function CheckNls() {
 }
 
 //Оплата через веб-сервс
-function callOplDoc(form) {
+function callOplDoc(form, signData) {
     var data = new Array();
     data[0] = form.__DOCREF.value;
     data[1] = form.__FLAGS.value;
@@ -349,7 +349,7 @@ function callOplDoc(form) {
     data[31] = form.__DOCSIGN_INT.value;
     data[32] = form.__DIGA.value;
     data[33] = form.__DIGB.value;
-    data[34] = form.__SIGNCC.value;
+    data[34] = ''; //form.__SIGNCC.value;
 
     if (isQdoc())
         data[35] = form.__QDOC_DATP.value; //decodeURIComponent(getParamFromUrl("datp",location.search));
@@ -392,6 +392,30 @@ function callOplDoc(form) {
                 checkDocsList.push(checkInfo);
             }
         }
+    }
+    data[43] = '';
+    data[44] = '';
+    data[45] = (document.getElementById("cbKeepAttribute") && document.getElementById("cbKeepAttribute").checked) ? ("1") : ("0");
+    // mixed mode sign enable
+    if (signData) {
+        // user keyId
+        var userKeyId = signData.KeyId;
+        // 8 sign - for serial number
+        //if (userKeyId.length < 8)
+        //    userKeyId = userKeyId.substr(userKeyId.length - 6);
+        data[5] = userKeyId;
+        // external sign
+        data[4] = signData.extSign.sign_hex;
+        // internal sign
+        data[31] = signData.intSign.sign_hex;
+        // buffer for internal sign
+        data[39] = signData.intSign.buffer_hex;
+        // buffer for external sign
+        data[40] = signData.extSign.buffer_hex;
+        // crypto module type
+        data[43] = signData.ModuleType;
+        // hash of key
+        data[44] = signData.KeyHash;
     }
     webService.useService("DocService.asmx?wsdl", "Doc");
     webService.Doc.callService(onPayDoc, "PayDoc", data, tags, checkDocsList);

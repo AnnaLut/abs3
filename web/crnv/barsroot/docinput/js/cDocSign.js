@@ -21,6 +21,7 @@ function padr(s, n) {
 window.attachEvent("onload", InitActiveX);
 
 function InitActiveX() {
+    if (document.getElementById("__SIGN_MIXED_MODE").value === "1") return; // for new mode init in lib oSign.js
     if (document.getElementById('__SIGNTYPE') && document.getElementById('__SIGNTYPE').value == 'SL2')
         gActiveXName = "Bars.SL2Plugin";
     if (!needToBeSign()) return;
@@ -183,6 +184,9 @@ function signDoc(form) {
         if (!InitSigner(form.__SIGNTYPE.value)) return false;
         // банковская дата    
         aSigner.BankDate = document.getElementById('__BDATEF').value;
+        // пишем в протокол REF документа
+        if (aSigner.GetMajorVersion == 1 && aSigner.GetMinorVersion > 22)
+            aSigner.ProtData = form.__DOCREF.value;
         // обработка версии СЭП (1/2)
         if (1 == num_SEPNUM)
             aSigner.BufferEncoding = "DOS";
@@ -203,6 +207,8 @@ function signDoc(form) {
         var DatP = ("1" == form.__IS_QDOC.value ? form.__QDOC_DATP.value : form.__DATP.value);
         var TrueVOB = ("1" == form.__IS_QDOC.value ? getParamFromUrl("vob", location.search) : num_VOB);
 
+        if (form.DocN.value.length > 10)
+            form.DocN.value = form.DocN.value.substr(form.DocN.value.length - 10);
         // формирование буфера для наложения ЭЦП
         var str_buf = padl(form.Mfo_A.value, 9) + padl(form.Nls_A.value, 14) +
 				padl(form.Mfo_B.value, 9) + padl(form.Nls_B.value, 14) +
@@ -233,6 +239,9 @@ function signDoc(form) {
         aSigner.BufferEncoding = "WIN";
         // банковская дата    
         aSigner.BankDate = document.getElementById('__BDATEF').value;
+        // пишем в протокол REF документа
+        if (aSigner.GetMajorVersion == 1 && aSigner.GetMinorVersion > 22)
+            aSigner.ProtData = form.__DOCREF.value;
         //Для VEG-подписи добавляем 2 символа из REGNCODE
         if ("VEG" == form.__SIGNTYPE.value && form.__DOCKEY.value.length == 6)
             aSigner.IdOper = form.__REGNCODE.value + form.__DOCKEY.value;
@@ -264,6 +273,8 @@ function signDoc(form) {
             typeBank = "UPB";
         var intBuf = new MakeIntDocBuf(typeBank);
         intBuf.ND = form.DocN.value;
+        if (intBuf.ND.length > 10)
+            intBuf.ND = intBuf.ND.substr(intBuf.ND.length - 10);
         intBuf.DOCD = form.DocD_TextBox.value;
         if (isQdoc())
             intBuf.VOB = getParamFromUrl("vob", location.search);
@@ -306,4 +317,201 @@ function CheckIntallerVersion() {
     catch (e) {
         alert(LocalizedString('Message23')); //alert("Невозможно создать елемент ActiveX для определения версии Windows Installer.")
     }
+}
+
+// Отримання буфферу документу для зовнішньої ЕЦП
+function get_ext_buffer(form, pDocN, pDocKey) {
+    if (pDocKey.length > 6)
+        pDocKey = pDocKey.substring(pDocKey.length - 6);
+    // разбираемся с видом документа
+    var num_VOB = parseInt(form.VobList.value);
+    if (form.__VOB2SEP2.value.length > 0) {
+        var str = "," + form.__VOB2SEP2.value + ",";
+        if (str.indexOf("," + num_VOB.toString() + ",") < 0)
+            num_VOB = parseInt(form.__VOB2SEP.value);
+    }
+    else if (1 != num_VOB && 2 != num_VOB && 6 != num_VOB && 33 != num_VOB && 81 != num_VOB)
+        num_VOB = parseInt(form.__VOB2SEP.value);
+
+    var DatP = ("1" == form.__IS_QDOC.value ? form.__QDOC_DATP.value : form.__DATP.value);
+    var TrueVOB = ("1" == form.__IS_QDOC.value ? getParamFromUrl("vob", location.search) : num_VOB);
+
+    // формирование буфера для наложения ЭЦП
+    var str_buf = padl(form.Mfo_A.value, 9) + padl(form.Nls_A.value, 14) +
+		padl(form.Mfo_B.value, 9) + padl(form.Nls_B.value, 14) +
+		form.__DK.value +
+		padl(Math.round(GetValue("SumC") * 100).toString(10), 16) +
+		padl(TrueVOB.toString(), 2) +
+		padr(pDocN, 10) + padl(form.Kv_A.value, 3) +
+		form.DocD_TextBox.value.substring(8, 10) + form.DocD_TextBox.value.substring(3, 5) + form.DocD_TextBox.value.substring(0, 2) +
+		DatP +
+		padr(form.Nam_A.value, 38) + padr(form.Nam_B.value, 38) + padr(form.Nazn.value, 160) +
+		padr(form.Drec.value, 60) + padr(form.NaznK.value, 3) + padr(form.NaznS.value, 2) + padl(form.Id_A.value, 14) + padl(form.Id_B.value, 14) +
+		padl(form.__DOCREF.value, 9) + padr(pDocKey, 6) + padl(form.Bis.value, 2) + padl(' ', 8);
+    return str_buf;
+}
+
+// Отримання буфферу документу для внутрішньої ЕЦП
+function get_int_buffer(form, pDocN) {
+    // формирование буфера для наложения ЭЦП
+    var sumA;
+    var sumB;
+    if (form.SumA.style.visibility == "hidden")
+        sumA = GetValue("SumC");
+    else
+        sumA = GetValue("SumA");
+    if (form.SumB.style.visibility == "hidden")
+        sumB = GetValue("SumC");
+    else
+        sumB = GetValue("SumB");
+    var typeBank = "";
+    if (form.__OURMFO.value == "300001")
+        typeBank = "NBU";
+    else if (form.__OURMFO.value == "300465")
+        typeBank = "OSC";
+    else if (form.__OURMFO.value == "300205")
+        typeBank = "UPB";
+    var intBuf = new MakeIntDocBuf(typeBank);
+
+    intBuf.ND = pDocN;
+    if (intBuf.ND.length > 10)
+        intBuf.ND = intBuf.ND.substr(intBuf.ND.length - 10);
+    intBuf.DOCD = form.DocD_TextBox.value;
+    if (isQdoc())
+        intBuf.VOB = getParamFromUrl("vob", location.search);
+    else
+        intBuf.VOB = form.VobList.value;
+    intBuf.DK = form.__DK.value;
+    intBuf.MFOA = form.Mfo_A.value;
+    intBuf.NLSA = form.Nls_A.value;
+    intBuf.KVA = form.Kv_A.value;
+    intBuf.NAMA = form.Nam_A.value;
+    intBuf.IDA = form.Id_A.value;
+    intBuf.SUMA = Math.round(sumA * 100);
+    intBuf.MFOB = form.Mfo_B.value;
+    intBuf.NLSB = form.Nls_B.value;
+    intBuf.KVB = form.Kv_B.value;
+    intBuf.NAMB = form.Nam_B.value;
+    intBuf.IDB = form.Id_B.value;
+    intBuf.SUMB = Math.round(sumB * 100);
+    intBuf.NAZN = form.Nazn.value;
+    var str_buf = intBuf.getIntBuf();
+    return str_buf;
+}
+
+/**
+* signDocMixedMode() - выполняет наложение ЭЦП на документ
+*/
+function signDocMixedMode(form, cbSuccess, cbError) {
+    // Получаем ref только если еще не был получен
+    if (form.__DOCREF.value == "")
+        cDocHand(3, form);
+    // заполняем  
+    if (form.DocN.value == "") form.DocN.value = form.__DOCREF.value;
+    // инициализация ЭЦП
+    var options = {};
+    options.KeyId = form.__USER_KEYID.value;
+    options.KeyHash = form.__USER_KEYHASH.value;
+    options.CaKey = form.__CRYPTO_CA_KEY.value;
+    options.RegionCode = form.__REGNCODE.value;
+    options.BankDate = form.__BDATE.value;
+    options.docRef = form.__DOCREF.value;
+    if (form.__USER_SIGN_TYPE.value === 'VG2')
+        options.ModuleType = barsCrypto.ModuleTypes.VG2;
+    else
+        options.ModuleType = barsCrypto.ModuleTypes.VEG;
+    barsCrypto.setDebug(true); // режим отладки
+    // инициализация
+    barsCrypto.init(options);
+
+    var result = {
+        KeyId: options.KeyId,
+        KeyHash: options.KeyHash,
+        ModuleType: options.ModuleType,
+        intSign: {},
+        extSign: {}
+    }
+
+    // Накладення внутрішнього підпису
+    function IntSign(needIntSign, buffer, cbSuccess, cbError) {
+        if (!needIntSign) {
+            cbSuccess('');
+            return;
+        }
+        barsCrypto.signBuffer(buffer, cbSuccess, cbError);
+    }
+    // Накладення зовнішнього підпису
+    function ExtSign(needExtSign, buffer, cbSuccess, cbError) {
+        if (!needExtSign) {
+            cbSuccess('');
+            return;
+        }
+        barsCrypto.signBuffer(buffer, cbSuccess, cbError);
+    }
+
+    var signDoc = new oSignDoc();
+    // инициализация параметров документа
+    signDoc.f_sign = form.__FLAGS.value.substring(1, 2);
+    signDoc.f_check = 0;
+
+    signDoc.ref = form.__DOCREF.value;
+
+    VOB = form.VobList.value;
+    VOB2SEP = form.__VOB2SEP2.value;
+    DocN = form.DocN.value;
+
+    // корректная обработка номера документа
+    if (DocN == null || DocN == '') DocN = signDoc.ref;
+    if (DocN.length > 10)
+        DocN = DocN.substr(DocN.length - 10);
+
+    gDocBufferIntHex = null;
+    try {
+        gDocBufferIntHex = barsCrypto.prepareBuffer(get_int_buffer(form, DocN)); // внутренний буфер
+    } catch (err) {
+        cbError(err);
+        return;
+    }
+
+    // Накладення внутрішнього підпису
+    IntSign(signDoc.needIntSign(), gDocBufferIntHex,
+        // callback success
+        function (sign) {
+            form.__DOCSIGN_INT.value = sign;
+            result.intSign.buffer_hex = gDocBufferIntHex;
+            result.intSign.sign_hex = sign;
+            gDocBufferExtHex = null;
+            try {
+                gDocBufferExtHex = barsCrypto.prepareBuffer(get_ext_buffer(form, DocN, options.KeyId)); // внешний буфер
+            } catch (err) {
+                cbError(err);
+                return;
+            }
+
+            // Накладення зовнішнього підпису
+            ExtSign(signDoc.needExtSign(), gDocBufferExtHex,
+                // callback success
+                function (sign) {
+                    form.__DOCSIGN.value = sign;
+                    result.extSign.buffer_hex = gDocBufferExtHex;
+                    result.extSign.sign_hex = sign;
+                    cbSuccess(result);
+                },
+                // callback error
+                function (errorText, errCode) {
+                    cbError('Помилки накладання зовнішнього підпису.\n' + errorText);
+                    if (errCode && errCode === barsCrypto.constants.ENotStarted) {
+                        alert("Буде виконано спробу запуску BarsCryptor, якщо він був встановлений в системі. У наступномі вікні потрбіно дозволити запуск та повторити операцію.")
+                        barsCrypto.startBarsCryptor();
+                    }
+                });
+        },
+        // callback error
+		function (errorText, errCode) {
+		    cbError('Помилки накладання внутрішнього підпису.\n' + errorText);
+		    if (errCode && errCode === barsCrypto.constants.ENotStarted) {
+		        alert("Буде виконано спробу запуску BarsCryptor, якщо він був встановлений в системі. У наступномі вікні потрбіно дозволити запуск та повторити операцію.")
+		        barsCrypto.startBarsCryptor();
+		    }
+		});
 }

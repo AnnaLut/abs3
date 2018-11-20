@@ -55,6 +55,7 @@ namespace Bars.Doc
         public byte Fpy;       // флаг разрешения факт оплаты (всегда 1)
         public string ExtSignHex;	// Внешняя ЭЦП в 16-ричном формате (оно же закодированное поле byte[] Sign)
         public string IntSignHex;	// Внутренняя ЭЦП в 16-ричном формате
+        public string CryptoModule; // тип криптобиблиотеки (для нового режима)
         public string TTFlags;      // Флаги операции
         public string SubAccount;   // Суб. счет
         /// процедура перед/після оплати. виконується в одній транзакції
@@ -79,6 +80,14 @@ namespace Bars.Doc
         private decimal nSA, nSB;
         private string sNlsM, sNlsK;
         private string sS, sS2, sTT;
+        // режим работы с двумя типами подписи
+        private bool isSignMixedMode
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(this.CryptoModule);
+            }
+        }
         // -----------------------------------------------------------------------------------------
         public cDoc(OracleConnection con,
             long Ref,	        // референс (NUMBER_Null для новых)
@@ -261,7 +270,8 @@ namespace Bars.Doc
             if (1 == Flg) FullPay();
 
             // запись внешней и внутренней ЭЦП при включенном режиме INTSIGN=2
-            if (2 == par_INTSIGN) PutVisa();
+            /*if (2 == par_INTSIGN)*/
+            PutVisa();
 
             if (!String.IsNullOrEmpty(this.AfterPayProc))
                 RunPayProc(this.AfterPayProc);
@@ -407,6 +417,22 @@ namespace Bars.Doc
             {
                 throw new BarsException("iDoc: " + GetBarsErrMess(e.Message), e);
             }
+            // sign mixed mode 
+            if (isSignMixedMode && !string.IsNullOrEmpty(this.ExtSignHex) && !string.IsNullOrEmpty(this.OperId))
+            {
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add("p_ref", OracleDbType.Decimal, this.Ref, ParameterDirection.Input);
+                cmd.Parameters.Add("p_sign_type", OracleDbType.Varchar2, this.CryptoModule, ParameterDirection.Input);
+                cmd.Parameters.Add("p_key_id", OracleDbType.Varchar2, this.OperId, ParameterDirection.Input);
+                cmd.Parameters.Add("p_sign_hex", OracleDbType.Varchar2, this.ExtSignHex, ParameterDirection.Input);
+                cmd.CommandText = "sgn_mgr.store_sep_sign";
+                try
+                { cmd.ExecuteNonQuery(); }
+                catch (OracleException e)
+                {
+                    throw new BarsException("sgn_mgr.store_sep_sign: " + GetBarsErrMess(e.Message), e);
+                }
+            }
             return true;
         }
         /// <summary>
@@ -439,19 +465,51 @@ namespace Bars.Doc
             OracleCommand cmd = con.CreateCommand();
             try
             {
-                cmd.CommandText = "begin chk.put_visa(:p_ref,:p_tt,:p_grp,:p_status,:p_keyid,:p_sign1,:p_sign2); end;";
+                var sql = "begin chk.put_visa{0}(:p_ref,:p_tt,:p_grp,:p_status,:p_keyid,:p_sign1,:p_sign2{1}); end;";
                 cmd.Parameters.Add("p_ref", OracleDbType.Long, this.Ref, ParameterDirection.Input);
                 cmd.Parameters.Add("p_tt", OracleDbType.Varchar2, this.TT, ParameterDirection.Input);
                 cmd.Parameters.Add("p_grp", OracleDbType.Long, null, ParameterDirection.Input);
                 cmd.Parameters.Add("p_status", OracleDbType.Long, 0, ParameterDirection.Input);
-                cmd.Parameters.Add("p_keyid", OracleDbType.Varchar2, this.OperId, ParameterDirection.Input);
-                cmd.Parameters.Add("p_sign1", OracleDbType.Varchar2, this.IntSignHex, ParameterDirection.Input);
-                cmd.Parameters.Add("p_sign2", OracleDbType.Varchar2, this.ExtSignHex, ParameterDirection.Input);
+                if (isSignMixedMode) // обнуляем параметры подписи, для старого режима + получаем sqnc из oper_visa
+                {
+                    cmd.CommandText = string.Format(sql, "_out", ",:p_rec_id");
+                    cmd.Parameters.Add("p_keyid", OracleDbType.Varchar2, null, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_sign1", OracleDbType.Varchar2, null, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_sign2", OracleDbType.Varchar2, null, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_rec_id", OracleDbType.Long, 38, 0, ParameterDirection.Output);
+                }
+                else
+                {
+                    cmd.CommandText = string.Format(sql, "", "");
+                    cmd.Parameters.Add("p_keyid", OracleDbType.Varchar2, this.OperId, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_sign1", OracleDbType.Varchar2, this.IntSignHex, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_sign2", OracleDbType.Varchar2, this.ExtSignHex, ParameterDirection.Input);
+                }
+
                 cmd.ExecuteNonQuery();
+
+                if (isSignMixedMode && !string.IsNullOrEmpty(this.IntSignHex) && !string.IsNullOrEmpty(this.OperId)) // генерация подписи
+                {
+                    decimal recId = Convert.ToDecimal(cmd.Parameters["p_rec_id"].Value.ToString());
+                    cmd.Parameters.Clear();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("p_ref", OracleDbType.Decimal, this.Ref, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_rec_id", OracleDbType.Decimal, recId, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_sign_type", OracleDbType.Varchar2, this.CryptoModule, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_key_id", OracleDbType.Varchar2, this.OperId, ParameterDirection.Input);
+                    cmd.Parameters.Add("p_sign_hex", OracleDbType.Varchar2, this.IntSignHex, ParameterDirection.Input);
+                    cmd.CommandText = "sgn_mgr.store_int_sign";
+                    try
+                    { cmd.ExecuteNonQuery(); }
+                    catch (OracleException e)
+                    {
+                        throw new BarsException("sgn_mgr.store_int_sign: " + GetBarsErrMess(e.Message), e);
+                    }
+                }
             }
             catch (OracleException e)
             {
-                throw new BarsException("AfterPayProc:" + GetBarsErrMess(e.Message), e);
+                throw new BarsException("PutVisa:" + GetBarsErrMess(e.Message), e);
             }
         }
         /// <summary>

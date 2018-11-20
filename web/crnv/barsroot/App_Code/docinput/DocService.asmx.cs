@@ -102,6 +102,9 @@ namespace DocInput
             data[18] = Convert.ToString(data[18]).Replace("amp;", "&").Replace("lt;","<").Replace("gt;",">");
             data[9] = Convert.ToString(data[9]).Replace("amp;", "&").Replace("lt;", "<").Replace("gt;", ">");
             data[14] = Convert.ToString(data[14]).Replace("amp;", "&").Replace("lt;", "<").Replace("gt;", ">");
+            // доп. проверка
+            if (data == null || data.Length == 0 || string.IsNullOrEmpty(data[0]))
+                throw new Exception("Порушено цілісніть даних, повторіть оплату або перезайдіть в систему");
 
             oper_stuct oper = new oper_stuct();
 
@@ -202,11 +205,8 @@ namespace DocInput
 
                 // внешняя ЭЦП
                 oper.ExtSignHex = data[4];
-                if (data[34] == "1")
-                {
-                    oper.Sign = Convert.FromBase64String(data[4]);
-                }
-                else
+                // for backward compatibility, data[43] - CryptoModule VEG\VG2
+                if (string.IsNullOrEmpty(data[43]))
                 {
                     oper.Sign = new byte[data[4].Length / 2];
                     int j = 0;
@@ -250,6 +250,9 @@ namespace DocInput
                         oper.Nazn, "", oper.OperId, oper.Sign, oper.Sk, oper.Prty, oper.SQ,
                         oper.ExtSignHex, oper.IntSignHex, AfterPayProcCall, BeforePayProcCall);
 
+                // set crypto module, if mixed mode on
+                ourDoc.CryptoModule = data[43];
+
                 if (TT_Flags[58] == '1')
                     ourDoc.Nom = Convert.ToDecimal((data[30] != "") ? (data[30]) : ("0"), cinfo) * kopA;
 
@@ -274,6 +277,47 @@ namespace DocInput
                     ourDoc.SubAccount = data[42];
 
                 #endregion
+                if (Bars.Configuration.ConfigurationSettings.AppSettings["Crypto.DebugMode"] == "1")
+                {
+                    try
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        if (!string.IsNullOrEmpty(oper.IntSignHex))
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add("p_ref", OracleDbType.Decimal, oper.Ref, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_level", OracleDbType.Decimal, 0, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_key_id", OracleDbType.Varchar2, oper.OperId, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_sign_mode", OracleDbType.Varchar2, "sign", ParameterDirection.Input);
+                            cmd.Parameters.Add("p_buffer_type", OracleDbType.Varchar2, "int", ParameterDirection.Input);
+                            cmd.Parameters.Add("p_buffer_hex", OracleDbType.Varchar2, data[39], ParameterDirection.Input);
+                            cmd.Parameters.Add("p_sign_hex", OracleDbType.Varchar2, oper.IntSignHex, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_verify_status", OracleDbType.Decimal, null, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_verify_error", OracleDbType.Varchar2, null, ParameterDirection.Input);
+                            cmd.CommandText = "sgn_mgr.trace_sign";
+                            cmd.ExecuteNonQuery();
+                        }
+                        if (!string.IsNullOrEmpty(oper.ExtSignHex))
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add("p_ref", OracleDbType.Decimal, oper.Ref, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_level", OracleDbType.Decimal, 0, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_key_id", OracleDbType.Varchar2, oper.OperId, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_sign_mode", OracleDbType.Varchar2, "sign", ParameterDirection.Input);
+                            cmd.Parameters.Add("p_buffer_type", OracleDbType.Varchar2, "ext", ParameterDirection.Input);
+                            cmd.Parameters.Add("p_buffer_hex", OracleDbType.Varchar2, data[40], ParameterDirection.Input);
+                            cmd.Parameters.Add("p_sign_hex", OracleDbType.Varchar2, oper.ExtSignHex, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_verify_status", OracleDbType.Decimal, null, ParameterDirection.Input);
+                            cmd.Parameters.Add("p_verify_error", OracleDbType.Varchar2, null, ParameterDirection.Input);
+                            cmd.CommandText = "sgn_mgr.trace_sign";
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Bars.Logger.DBLogger.Exception(ex);
+                    }
+                }
 
                 /// Якщо це чек - платимо по-іншому
                 if (TT_Flags[61] == '1')
