@@ -725,19 +725,19 @@ function Check_ClientRekvPerson() {
 		var t = getPassDate.split(".");
 		var gDate = new Date(t[2], t[1] - 1, t[0]);
 
-		if (!isIDPassport && !isTempDoc && gDate > pDate) {
+        if (isDocPassport && gDate > pDate) {
 			alert("Дата Видачі не може бути більше чим вклеювання");
 			return false;
 		}
 
 		var currDate = new Date();
-		if (!isIDPassport && !isTempDoc && pDate > currDate) {
+        if (isDocPassport && pDate > currDate) {
 			alert("Дата Вклеювання не може бути більшою ніж поточна дата");
 			return false;
 		}
 
 
-		if (!isIDPassport && !isTempDoc && getCustAge(bDate) > 24) {
+        if (isDocPassport && getCustAge(bDate) > 24) {
 			bDate.setFullYear(bDate.getFullYear() + 25);
 			if (bDate < currDate)
 				if (bDate > pDate) {
