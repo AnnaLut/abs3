@@ -137,7 +137,7 @@ END ;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
   -------------------------------------------------------------------
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.1.0.0  19/09/2017 ';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.1.0.0  19/11/2018 ';
   ------------------------------------------------------------------
   /*
   19/09/2017 COBUSUPABS-6420
@@ -1206,12 +1206,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     ostb_    number;
     l_tt     tts.tt%type; -- код операции дл€ доср.погаш. Ќастроить операцию!
     nls_2924 accounts.nls%type;
+	v_sg_tip accounts.tip%type;
   begin
     begin
       select d.cc_id,
              d.sdate,
              c.okpo,
              SG.nls,
+			 sg.tip,
              substr(SG.nms, 1, 38),
              sg.kv,
              SS.nls,
@@ -1230,6 +1232,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
              dd.sdate,
              RR1.id_a,
              RR1.nlsa,
+			 v_sg_tip,
              RR1.nam_a,
              RR1.kv,
              RR1.nlsb,
@@ -1365,7 +1368,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK_DPK IS
     --  +  погасить все комис                Z2K_,
     --  +  погасить все просрочки            Z1_ - только дл€ Ѕѕ   - верим на слово, что на карточке достаточно денег
 
-    If RR1.nlsa like '2625%' then
+    --If RR1.nlsa like '2625%' then COBUMMFO-9932
+	IF v_sg_tip like 'W4_' THEN
       l_tt  := cck_dpk.TT_W4;
       rr1.s := CCK_DPK.K1_ + cck_dpk.Z2N_ + cck_dpk.Z2K_ + cck_dpk.Z1_; -- 29.05.2015
     else
