@@ -74,7 +74,8 @@ begin
                and opw.tag in (''OWDRN'')) eref  
   from oper op
        
- where op.pdat between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'')
+ where op.odat between to_date(:sFdat1,''dd.mm.yyyy'') and to_date(:sFdat2,''dd.mm.yyyy'')
+       and op.sos = 5
        and op.branch like :kf||''%''
        and op.kv like :kv
        and 0<(select count(acc) --проверка на нужный ОВ22
