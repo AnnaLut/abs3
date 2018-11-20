@@ -58,13 +58,12 @@ begin
            obdbq, obkrq, 
            obdbq_dpt, obkrq_dpt,  
            ostq,
-           userid,  (select fio from staff$base where id = user_id) as fio,  nd, dk,  tt, sk, nlsk, nazn,
+           userid,  '' as fio,  nd, dk,  tt, sk, nlsk, nazn,
            s, s1, sq, sq1, 
            gl.p_icurval(a.kv, s,  :sFdat1)  sqnbu, 
            to_char(stime,''hh24:mi'') stime, to_char(etime,''hh24:mi'') etime, is_ourvisa ourvisa,
            nvl(is_dptdoc, 0)  isdptdoc,
-           substr(bars_report.get_branch(:BRANCH,0),1, 24 )  branch,  b.name branchname, 
-           (select max(ov.userid) keep(dense_rank first order by ov.dat desc) from OPER_VISA ov where ov.ref = a.ref and ov.status = 2) as last_visa_user
+           substr(bars_report.get_branch(:BRANCH,0),1, 24 )  branch,  b.name branchname
    from  (  
                   select 0 flg, nls, kv,  nms, 
                               0 ostf,   0 obdb,    0 obkr,   0 ost,
