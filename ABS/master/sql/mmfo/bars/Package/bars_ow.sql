@@ -276,7 +276,7 @@ procedure create_instant_cards (
   p_cardnum  number );
 
 -- процедура установки параметра "Дата выдачи карты"
-procedure set_idat ( p_nd number, p_dat date );
+procedure set_idat ( p_nd number, p_dat date ); 
 
 -- процедура привязки счетов БПК
 procedure set_w4_acc (
@@ -288,6 +288,9 @@ procedure set_w4_acc (
   p_nls_2207  accounts.nls%type,
   p_nls_2209  accounts.nls%type,
   p_nls_3579  accounts.nls%type );
+
+-- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
+procedure set_account_rate ( p_acc number, p_trmask t_trmask );
 
 function get_impid (p_mode number default null) return number;
 
@@ -4222,7 +4225,8 @@ begin
   -- спецпараметры
   set_sparam(0, l_acc, p_trmask);
   bars_audit.trace(h || 'Specparams for account ' || l_nls || '/' || to_char(l_pk_kv) || ' set.');
-
+   -- % ставки по счету (COBUMMFO-6290)
+  set_account_rate(l_acc, p_trmask);
   p_acc := l_acc;
 
   bars_audit.trace(h || 'Finish.');
@@ -10874,6 +10878,87 @@ begin
 
 end set_accounts_rate;
 
+-------------------------------------------------------------------------------
+-- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
+procedure set_account_rate (
+  p_acc    number,
+  p_trmask t_trmask )
+is
+  h varchar2(100) := 'bars_ow.set_account_rate. ';
+  l_cm_product cm_product%rowtype;
+  l_sql varchar2(32000);
+  l_rate number;
+begin
+
+  bars_audit.info(h || 'Start.');
+  if p_trmask.tab_name = 'W4_ACC' then
+    begin
+    l_sql:= 'select p.percent_osn, p.percent_over, p.percent_mob, p.percent_cred ';
+    l_sql:= l_sql||'from w4_acc o, accounts a, w4_card c, cm_product p ';
+    l_sql:= l_sql||'where o.'||p_trmask.a_w4_acc||' = a.acc and a.dazs is null ';
+    l_sql:= l_sql||'and o.card_code = c.code ';
+    l_sql:= l_sql||'and c.product_code = p.product_code ';
+    l_sql:= l_sql||'and a.acc=:p_acc';
+    execute immediate l_sql into l_cm_product.percent_osn,
+                                 l_cm_product.percent_over,
+                                 l_cm_product.percent_mob,
+                                 l_cm_product.percent_cred
+                           using p_acc;
+        -- установка % ставки по основному счета
+        if p_trmask.a_w4_acc = 'ACC_PK' and l_cm_product.percent_osn is not null then
+           set_acc_rate('PK',  p_acc, l_cm_product.percent_osn);
+           bars_audit.info(h || 'Percent_osn set on ACC '||p_acc);
+        end if;
+        -- установка % ставки по счету несанкционированного овердрафта
+        if p_trmask.a_w4_acc = 'ACC_PK' and l_cm_product.percent_over is not null then
+           set_acc_rate('OVR', p_acc, l_cm_product.percent_over);
+           bars_audit.info(h || 'Percent_ovr set on ACC '||p_acc);
+        end if;
+        -- установка % ставки по счету мобильных сбережений
+        if p_trmask.a_w4_acc = 'ACC_2625D' and l_cm_product.percent_mob is not null then
+           set_acc_rate('MOB', p_acc, l_cm_product.percent_mob);
+           bars_audit.info(h || 'Percent_mob seton on ACC '||p_acc);
+        end if;
+        -- установка % ставки по кредитному счету
+        if p_trmask.a_w4_acc = 'ACC_OVR' and l_cm_product.percent_cred is not null then
+           set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
+           bars_audit.info(h || 'Percent_cred set on ACC '||p_acc);
+        end if;
+        -- установка % ставки по счету просрочки как по кредитному
+        if p_trmask.a_w4_acc = 'ACC_2207' and l_cm_product.percent_cred is not null then
+           set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
+           bars_audit.info(h || 'Percent_cred for 2207 set on ACC '||p_acc);
+        end if;
+
+     exception when no_data_found then null;
+     end;
+   ELSIF p_trmask.TAB_NAME = 'W4_ACC_INST' THEN
+     begin
+        select SUB_INT_RATE into l_rate
+          from w4_acc_inst o
+          join accounts a on o.acc = a.acc
+          join ow_inst_totals t on o.chain_idt = t.chain_idt
+         where a.dazs is null
+           and o.trans_mask = p_trmask.a_w4_acc
+           and a.acc=p_acc;
+
+        if p_trmask.a_w4_acc = 'ACC_2203I' and l_cm_product.percent_cred is not null then
+           set_acc_rate('INST', p_acc, l_rate);
+           bars_audit.info(h || 'Percent_cred for 2203I set on ACC '||p_acc);
+        end if;
+        if p_trmask.a_w4_acc = 'ACC_2203OVDI' and l_cm_product.percent_cred is not null then
+           set_acc_rate('INST', p_acc, l_rate);
+           bars_audit.info(h || 'Percent_cred for 2203OVDI set on ACC '||p_acc);
+        end if;
+
+     exception when no_data_found then null;
+     end;
+     END IF;
+
+
+  bars_audit.info(h || 'Finish.');
+
+end set_account_rate;
 -------------------------------------------------------------------------------
 procedure cm_get_adr (
   p_rnk            in number,
