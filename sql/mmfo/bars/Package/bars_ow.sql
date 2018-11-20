@@ -10183,7 +10183,7 @@ begin
            XmlElement("Doc",
               XmlElement("TransType",
                  XmlElement("TransCode",
-                    XmlElement("MsgCode", p_doc_tbl(i).w4_msgcode)
+                    XmlElement("MsgCode", p_doc_tbl(i).msgcode)
                  ) -- TransCode
               ), -- TransType
               XmlElement("DocRefSet",
@@ -10212,7 +10212,7 @@ begin
 
         select XmlConcat(l_data, l_xml_tmp) into l_data from dual;
 
-        set_form_flag(p_doc_tbl(i).ref, p_doc_tbl(i).dk, l_acc, p_file_name, p_doc_tbl(i).tt, p_doc_tbl(i).w4_msgcode);
+        set_form_flag(p_doc_tbl(i).ref, p_doc_tbl(i).dk, l_acc, p_file_name, p_doc_tbl(i).tt, p_doc_tbl(i).msgcode);
 
      exception when no_data_found then null;
      end get_line;
