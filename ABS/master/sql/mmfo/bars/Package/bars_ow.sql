@@ -290,7 +290,8 @@ procedure set_w4_acc (
   p_nls_3579  accounts.nls%type );
 
 -- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
-procedure set_account_rate ( p_acc number, p_trmask t_trmask );
+--procedure set_account_rate ( p_acc number, p_trmask t_trmask );
+procedure set_account_rate (p_acc number);
 
 function get_impid (p_mode number default null) return number;
 
@@ -4226,7 +4227,8 @@ begin
   set_sparam(0, l_acc, p_trmask);
   bars_audit.trace(h || 'Specparams for account ' || l_nls || '/' || to_char(l_pk_kv) || ' set.');
    -- % ставки по счету (COBUMMFO-6290)
-  set_account_rate(l_acc, p_trmask);
+  --set_account_rate(l_acc, p_trmask);
+  set_account_rate(l_acc);
   p_acc := l_acc;
 
   bars_audit.trace(h || 'Finish.');
@@ -10181,7 +10183,7 @@ begin
            XmlElement("Doc",
               XmlElement("TransType",
                  XmlElement("TransCode",
-                    XmlElement("MsgCode", p_doc_tbl(i).msgcode)
+                    XmlElement("MsgCode", p_doc_tbl(i).w4_msgcode)
                  ) -- TransCode
               ), -- TransType
               XmlElement("DocRefSet",
@@ -10210,7 +10212,7 @@ begin
 
         select XmlConcat(l_data, l_xml_tmp) into l_data from dual;
 
-        set_form_flag(p_doc_tbl(i).ref, p_doc_tbl(i).dk, l_acc, p_file_name, p_doc_tbl(i).tt, p_doc_tbl(i).msgcode);
+        set_form_flag(p_doc_tbl(i).ref, p_doc_tbl(i).dk, l_acc, p_file_name, p_doc_tbl(i).tt, p_doc_tbl(i).w4_msgcode);
 
      exception when no_data_found then null;
      end get_line;
@@ -10885,6 +10887,7 @@ end set_accounts_rate;
 
 -------------------------------------------------------------------------------
 -- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
+/*
 procedure set_account_rate (
   p_acc    number,
   p_trmask t_trmask )
@@ -10963,8 +10966,97 @@ begin
 
   bars_audit.info(h || 'Finish.');
 
+end set_account_rate; */
+-------------------------------------------------------------------------------
+-- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
+procedure set_account_rate (
+  p_acc number )
+is
+  h varchar2(100) := 'bars_ow.set_account_rate. ';
+  l_cm_product cm_product%rowtype;
+begin
+
+  bars_audit.info(h || 'Start.');
+
+     -- установка % ставки по основному счета
+     -- установка % ставки по счету несанкционированного овердрафта
+    begin
+    select  p.percent_osn, p.percent_over
+    into  l_cm_product.percent_osn,l_cm_product.percent_over
+                  from w4_acc o, accounts a, w4_card c, cm_product p
+                 where o.acc_pk = a.acc and a.dazs is null
+                   and o.card_code = c.code
+                   and c.product_code = p.product_code
+                   and (p.percent_osn is not null or p.percent_over is not null)
+                   and a.acc=p_acc;
+
+        if l_cm_product.percent_osn is not null then
+           set_acc_rate('PK',  p_acc, l_cm_product.percent_osn);
+        end if;
+        if l_cm_product.percent_over is not null then
+           set_acc_rate('OVR', p_acc, l_cm_product.percent_over);
+        end if;
+
+     bars_audit.info(h || 'Percent_osn set on ACC '||p_acc);
+     bars_audit.info(h || 'Percent_ovr set on ACC '||p_acc);
+     exception when no_data_found then null;
+     end;
+
+     -- установка % ставки по счету мобильных сбережений
+     begin
+     select  p.percent_mob
+     into l_cm_product.percent_mob
+                  from w4_acc o, accounts a, w4_card c, cm_product p
+                 where o.acc_2625D = a.acc and a.dazs is null
+                   and o.card_code = c.code
+                   and c.product_code = p.product_code
+                   and p.percent_mob is not null
+                   and a.acc=p_acc;
+
+        set_acc_rate('MOB', p_acc, l_cm_product.percent_mob);
+
+     bars_audit.info(h || 'Percent_mob seton on ACC '||p_acc);
+     exception when no_data_found then null;
+     end;
+     -- установка % ставки по кредитному счету
+     begin
+     select  p.percent_cred
+     into  l_cm_product.percent_cred
+                  from w4_acc o, accounts a, w4_card c, cm_product p
+                 where o.acc_ovr = a.acc and a.dazs is null
+                   and o.card_code = c.code
+                   and c.product_code = p.product_code
+                   and p.percent_cred is not null
+                   and a.acc=p_acc;
+
+        set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
+
+     bars_audit.info(h || 'Percent_cred set on ACC '||p_acc);
+     exception when no_data_found then null;
+     end;
+
+     -- установка % ставки по счету просрочки как по кредитному
+     begin
+     select  p.percent_cred
+     into l_cm_product.percent_cred
+                  from w4_acc o, accounts a, w4_card c, cm_product p
+                 where o.acc_2207 = a.acc and a.dazs is null
+                   and o.card_code = c.code
+                   and c.product_code = p.product_code
+                   and p.percent_cred is not null
+                   and a.acc=p_acc;
+
+        set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
+
+     bars_audit.info(h || 'Percent_cred for 2207 set on ACC '||p_acc);
+     exception when no_data_found then null;
+     end;
+
+  bars_audit.info(h || 'Finish.');
+
 end set_account_rate;
 -------------------------------------------------------------------------------
+
 procedure cm_get_adr (
   p_rnk            in number,
   p_typeid         in number,
