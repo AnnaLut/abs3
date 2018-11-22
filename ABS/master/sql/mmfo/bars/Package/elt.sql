@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE ELT
+CREATE OR REPLACE PACKAGE BARS.ELT
 IS
 
 G_HEADER_VERSION  CONSTANT VARCHAR2(64)  := 'version 39.4 â³ä 28/12/2016';
@@ -256,7 +256,17 @@ PROCEDURE shnel
 
 END ELT;
 /
-CREATE OR REPLACE PACKAGE BODY ELT
+
+CREATE OR REPLACE PUBLIC SYNONYM ELT FOR BARS.ELT;
+
+
+GRANT EXECUTE ON BARS.ELT TO BARS_ACCESS_DEFROLE;
+
+GRANT EXECUTE ON BARS.ELT TO ELT;
+
+GRANT EXECUTE ON BARS.ELT TO WR_ALL_RIGHTS;
+
+CREATE OR REPLACE PACKAGE BODY BARS.ELT
 IS
 
   G_BODY_VERSION  CONSTANT VARCHAR2(64)  := 'version 45.12 â³ä 01.09.2017';
@@ -1040,7 +1050,7 @@ begin
                     e.id ID, e.npd_3570, ob22_6110, e.id_glob, e.fl1, n.nd
              FROM e_tar_nd n, e_tarif e  WHERE n.nd=k.ND and n.id=e.id
                                            AND n.dat_beg is not null --jeka 05.07.2017
-                                           and (n.dat_end is null or trunc(n.dat_end)>DAT2_)) 
+                                           and (n.dat_end is null or trunc(n.dat_end)>DAT1_)) 
    LOOP
 
 
@@ -2818,3 +2828,12 @@ BEGIN
 
 END ELT;
 /
+
+CREATE OR REPLACE PUBLIC SYNONYM ELT FOR BARS.ELT;
+
+
+GRANT EXECUTE ON BARS.ELT TO BARS_ACCESS_DEFROLE;
+
+GRANT EXECUTE ON BARS.ELT TO ELT;
+
+GRANT EXECUTE ON BARS.ELT TO WR_ALL_RIGHTS;
