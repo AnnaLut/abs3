@@ -4562,7 +4562,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_prop.tag      := '50K';
             -- новая затребованая фича - для платежей в 840 и 978 шлем как 50F
             -- додав злоті, заявка COBUMMFO-8001
-            if l_doc.kv in (840, 978, 985) then
+            if l_doc.kv in (840, 978, 985, 826) then
                 l_prop.tag      := '50F';
             end if;
             l_prop.value    := trans_value(get_attr_varchar2(l_body, 'SWIFT_50K'), l_doc.kv);
