@@ -409,13 +409,14 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
 
         public override void SaveGcif(ICard card, string batchId)
         {
-            List<EbkSlaveClient> slaveClients=new List<EbkSlaveClient>();
+            //List<EbkSlaveClient> slaveClients=new List<EbkSlaveClient>(); DuplicatesV2Dto
+            List<DuplicatesV2Dto> slaveClients=new List<DuplicatesV2Dto>(); 
             var masterCard = card as CardDataV2;
             if (null==masterCard) return;
 
             if (null!=masterCard.Duplicates && masterCard.Duplicates.Any())
             {
-                slaveClients = masterCard.Duplicates.Select(c => new EbkSlaveClient()
+                slaveClients = masterCard.Duplicates.Select(c => new DuplicatesV2Dto() //EbkSlaveClient
                 {
                     Kf = c.Kf,
                     Rnk = c.Rnk
@@ -682,7 +683,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                                 Value = IndividualPerson.ToString()
                             },
                             new OracleParameter(parameterName: "p_gcif", oraType: OracleDbType.Varchar2)
-                            {
+                        {
                                 Value = gcif
                             },
                             new OracleParameter(parameterName: "p_slave_client_ebk", type: OracleDbType.Array,
@@ -690,7 +691,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.Repository.DI.Implementation.Individu
                             {
                                 UdtTypeName = "BARS.T_SLAVE_CLIENT_EBK",
                                 Value = duplicates.ToArray()
-                            }
+                        }
                         };
 
                         _entities.ExecuteStoreCommand(@"begin
