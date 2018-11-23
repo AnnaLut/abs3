@@ -422,13 +422,14 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
 
         public override void SaveGcif(ICard card, string batchId)
         {
-            List<EbkSlaveClient> slaveClients = new List<EbkSlaveClient>();
+            //List<EbkSlaveClient> slaveClients = new List<EbkSlaveClient>();
+            List<DuplicatesV2Dto> slaveClients = new List<DuplicatesV2Dto>();
             var masterCard = card as CardDataV2;
             if (null == masterCard) return;
 
             if (null != masterCard.Duplicates && masterCard.Duplicates.Any())
             {
-                slaveClients = masterCard.Duplicates.Select(c => new EbkSlaveClient()
+                slaveClients = masterCard.Duplicates.Select(c => new DuplicatesV2Dto//EbkSlaveClient()
                 {
                     Kf = c.Kf,
                     Rnk = c.Rnk
@@ -671,6 +672,14 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
 
                     if (!string.IsNullOrWhiteSpace(gcif))
                     {
+                        var duplicates = new List<DuplicatesV2Dto>();
+                        duplicates.AddRange(card.Duplicates.Select(d => new DuplicatesV2Dto()
+                        {
+                            Gcif = d.Gcif,
+                            Kf = d.Kf,
+                            MasterGcif = d.MasterGcif,
+                            Rnk = d.Rnk
+                        }));
                         sqlParams = new object[]
                         {
                             new OracleParameter(parameterName: "p_batchId", oraType: OracleDbType.Varchar2)
@@ -699,7 +708,7 @@ namespace BarsWeb.Areas.Cdm.Infrastructure.DI.Implementation.Legal
                                 direction: ParameterDirection.Input)
                             {
                                 UdtTypeName = "BARS.T_SLAVE_CLIENT_EBK",
-                                Value = card.Duplicates.ToArray()
+                                Value = duplicates.ToArray()
                             }
                         };
 

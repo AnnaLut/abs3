@@ -58,7 +58,7 @@ begin
            obdbq, obkrq, 
            obdbq_dpt, obkrq_dpt,  
            ostq,
-           userid,  '' as fio,  nd, dk,  tt, sk, nlsk, nazn,
+           userid,  '''' as fio,  nd, dk,  tt, sk, nlsk, nazn,
            s, s1, sq, sq1, 
            gl.p_icurval(a.kv, s,  :sFdat1)  sqnbu, 
            to_char(stime,''hh24:mi'') stime, to_char(etime,''hh24:mi'') etime, is_ourvisa ourvisa,
