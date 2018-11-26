@@ -1562,6 +1562,8 @@ create or replace package body ow_transform_acc is
       l_purpouse oper.nazn%type;
       l_tt       oper.tt%type;
       l_ref      oper.ref%type;
+      
+      l_dpa_blk  accounts.blkd%type := to_number(getglobaloption('DPA_BLK'));
    begin
       bc.go(p_kf);
       bars_audit.info(l_trace||'Старт для='||p_kf);
@@ -1775,7 +1777,7 @@ create or replace package body ow_transform_acc is
          -- Устанавливаем блокировки старого счета на новый
          begin
             update accounts a
-            set a.blkd = c.blkd
+            set a.blkd = decode(a.blkd, l_dpa_blk, l_dpa_blk, c.blkd)
                 , a.blkk = c.blkk
             where acc = c.acc_new ;
          exception

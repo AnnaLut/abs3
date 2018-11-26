@@ -1213,7 +1213,7 @@ end;
 -- функция для получения параметров счета для оплаты документа
 --
 function get_account (
-  p_nls     in varchar2,
+  p_nls    in out varchar2,  -- out adder to COBUMMFO-7501
   p_kv      in number,
   p_nms    out varchar2,
   p_okpo   out varchar2,
@@ -1224,10 +1224,10 @@ is
 
 begin
   begin
-     select nms, okpo, tobo, opt
-       into p_nms, p_okpo, p_branch, l_opt
+     select nms, okpo, tobo, opt, nls -- COBUMMFO-7501
+       into p_nms, p_okpo, p_branch, l_opt, p_nls -- COBUMMFO-7501
        from (  -- COBUMMFO-7501
-               select substr(nvl(c.nmk, a.nms),1,38) nms, c.okpo, a.tobo, nvl(a.opt,0) opt
+               select substr(nvl(c.nmk, a.nms),1,38) nms, c.okpo, a.tobo, nvl(a.opt,0) opt, a.nls -- COBUMMFO-7501
                from accounts a
                join customer c on c.rnk = a.rnk
                where (a.nls = p_nls or (a.nlsalt = p_nls and a.tip like 'W4%' and regexp_like(a.nls, '^26[0,2,5]0'))) 
@@ -1253,7 +1253,7 @@ end get_account;
 -- функция для получения параметров счета для оплаты документа
 --
 function get_account (
-  p_nls     in varchar2,
+  p_nls    in out varchar2, -- out adder to COBUMMFO-7501
   p_kv      in number,
   p_nms    out varchar2,
   p_okpo   out varchar2,
@@ -1266,10 +1266,10 @@ is
 
 begin
   begin
-     select nms, okpo, tobo, opt, acc
-       into p_nms, p_okpo, p_branch, l_opt, p_acc
+     select nms, okpo, tobo, opt, acc, nls -- COBUMMFO-7501
+       into p_nms, p_okpo, p_branch, l_opt, p_acc, p_nls -- COBUMMFO-7501
        from (  -- COBUMMFO-7501
-               select substr(nvl(c.nmk, a.nms),1,38) nms, c.okpo, a.tobo, nvl(a.opt,0) opt, a.acc
+               select substr(nvl(c.nmk, a.nms),1,38) nms, c.okpo, a.tobo, nvl(a.opt,0) opt, a.acc, a.nls -- COBUMMFO-7501
                from accounts a
                join customer c on c.rnk = a.rnk
                where (a.nls = p_nls or (a.nlsalt = p_nls and a.tip like 'W4%' and regexp_like(a.nls, '^26[0,2,5]0'))) 
