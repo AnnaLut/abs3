@@ -184,25 +184,27 @@ CREATE OR REPLACE PACKAGE BODY BARS.ACCOUNT_UTL as
     is
         l_accounts_row accounts%rowtype;
     begin
+            select *
+            into   l_accounts_row
+        from (
+               select *
+            from   accounts a
+               where  (
+                         a.nls = p_account_number 
+                         or (a.nlsalt = p_account_number and a.dat_alt is not null) 
+                      )  
+                      and a.kv = p_currency_id 
+                      and a.kf = p_mfo
+               order by a.daos desc  -- в связи с трансформацией карточных счетов берем последний
+             ) 
+        where rownum = 1;
+
         if (p_lock) then
             select *
             into   l_accounts_row
             from   accounts a
-            where  (a.nls = p_account_number or
-                    a.nlsalt = p_account_number and
-                    a.dat_alt is not null ) and
-                   a.kv = p_currency_id and
-                   a.kf = p_mfo
+            where  a.acc = l_accounts_row.acc
             for update;
-        else
-            select *
-            into   l_accounts_row
-            from   accounts a
-            where  (a.nls = p_account_number or
-                    a.nlsalt = p_account_number and
-                    a.dat_alt is not null )  and
-                   a.kv = p_currency_id and
-                   a.kf = p_mfo;
         end if;
 
         return l_accounts_row;
