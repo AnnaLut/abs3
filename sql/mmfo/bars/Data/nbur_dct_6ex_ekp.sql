@@ -158,7 +158,7 @@ Insert into BARS.NBUR_DCT_F6EX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
     FORMULA, LCY_PCT, FCY_PCT, R030_980)
  Values
-   ('A6E020', 'Сума строкових вкладів фізичних осіб, за якими отримано повідомленням про їх повернення', '1', 'A6E002', 0, 
+   ('A6E020', 'Сума строкових вкладів фізичних осіб, за якими отримано повідомленням про їх повернення', '1', 'A6E002', NULL, 
     NULL, 100, 100, NULL);
 Insert into BARS.NBUR_DCT_F6EX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
@@ -182,7 +182,7 @@ Insert into BARS.NBUR_DCT_F6EX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
     FORMULA, LCY_PCT, FCY_PCT, R030_980)
  Values
-   ('A6E024', 'Сума строкових вкладів суб''єктів господарської діяльності (СГД) за якими отримано повідомленням про їх повернення ', '1', 'A6E002', 0, 
+   ('A6E024', 'Сума строкових вкладів суб''єктів господарської діяльності (СГД) за якими отримано повідомленням про їх повернення ', '1', 'A6E002', NULL, 
     NULL, 100, 100, NULL);
 Insert into BARS.NBUR_DCT_F6EX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
@@ -218,7 +218,7 @@ Insert into BARS.NBUR_DCT_F6EX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
     FORMULA, LCY_PCT, FCY_PCT, R030_980)
  Values
-   ('A6E030', 'Вклади небанківських фінансових установ за якими було отримано повідомленням про їх повернення', '1', 'A6E002', 0, 
+   ('A6E030', 'Вклади небанківських фінансових установ за якими було отримано повідомленням про їх повернення', '1', 'A6E002', NULL, 
     NULL, 100, 100, NULL);
 Insert into BARS.NBUR_DCT_F6EX_EKP
    (EKP, EKP_NAME, GRP_R030, AGGR_EKP, CONSTANT_VALUE, 
