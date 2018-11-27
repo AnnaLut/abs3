@@ -56,6 +56,13 @@ end;
 /
 
 
+begin 
+   execute immediate('alter table BARS.META_CALL_SETTINGS add "custom_options" clob ');
+exception when others then 
+   null; 
+end;
+/
+
 
 
 PROMPT *** ALTER_POLICIES to META_CALL_SETTINGS ***
