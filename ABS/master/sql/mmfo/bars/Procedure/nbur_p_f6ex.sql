@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования 6EX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.005  30/10/2018 (17/10/2018)
+% VERSION     :  v.1.006  20/11/2018 (30/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_          char(30)  := 'v.1.005  30/10/2018';
+  ver_          char(30)  := 'v.1.006  20/11/2018';
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
   c_title              constant varchar2(100 char) := $$PLSQL_UNIT || '.';
   c_base_currency_id   constant varchar2(3 char) := '980';
@@ -32,6 +32,8 @@ is
   l_prior_mnth_last_work_dt date; --Последний рабочий день предыдущего месяца
   l_next_mnth_frst_dt       date;
   l_version_id              nbur_lst_files.version_id%type;
+  
+  l_mrez                    number;
 
   e_ptsn_not_exsts exception;
 
@@ -61,6 +63,8 @@ BEGIN
                 || ' Последний рабочий день месяца - ' || to_char(l_mnth_last_work_dt, c_date_fmt)
                 || ' Последний рабочий день предыдущего месяца - ' || to_char(l_prior_mnth_last_work_dt, c_date_fmt)
               );
+              
+  PUL.put ('DAT_ZAL', to_char(p_report_date,'dd.mm.yyyy'));              
 
   --Запуск разрешаем только за дату последнего рабочего дня месяца
   if (p_report_date = l_mnth_last_work_dt)
@@ -74,7 +78,6 @@ BEGIN
                                                       )
                                 , -1
                               );
-        
         
       logger.trace(c_title || ' Версия файла ' || p_file_code || ' который сейчас формируется - ' || l_version_id);
 
@@ -167,7 +170,7 @@ BEGIN
                               , null as k180
                               , null as k190
                               , --Анализируем наличия кода блокировки на счете
-                             case
+                                case
                                   when t.blc_code_db <> 0 then '1'
                                 else
                                   '0'
@@ -178,7 +181,12 @@ BEGIN
                                 else
                                   '0'
                                 end as blkk
-                              , '0' as msg_return_flg --Пока нет информации где хранится данный показатель
+                              , case 
+                                   when acc_type in ('DEP', 'DEN', 'DPF') 
+                                   then 
+                                      f_nbur_get_autoprolong(t.acc_id, p_report_date) 
+                                   else '0'
+                                end as msg_return_flg 
                               , null as default_flg
                               , null as liquid_type
                               , s.s130 as s130
@@ -191,7 +199,8 @@ BEGIN
                               , case
                                     -- неінвестиційний клас
                                     when not (b.rating in ('BBB', 'BBB+', 'BBB-', 'Baa1', 'Baa2', 'Baa3')
-                                              or substr(b.rating, 1, 1) in ('A', 'T', 'F'))
+                                              or substr(b.rating, 1, 1) in ('A', 'T', 'F')) 
+                                         or trim(b.rating) is null
                                     then
                                       'R0'
                                     -- інвестиційний клас
@@ -235,12 +244,17 @@ BEGIN
                                       , cust.k070
                                       , ac.blc_code_db
                                       , ac.blc_code_cr
+                                      , ac.acc_type
                                 from  v_nbur_#a7_dtl t
-                                      left join nbur_dm_accounts ac on (ac.kf = p_kod_filii)
-                                                                       and (t.ACC_ID = ac.acc_id)
-                                      left join nbur_dm_customers cust on (cust.kf = p_kod_filii)
-                                                                          and (t.CUST_ID = cust.cust_id)
-                                where t.REPORT_DATE = l_mnth_last_work_dt
+                                      left join nbur_dm_accounts ac 
+                                      on (t.report_date = ac.report_date and 
+                                          t.kf = ac.kf and 
+                                          t.ACC_ID = ac.acc_id)
+                                      left join nbur_dm_customers cust 
+                                      on (t.report_date = cust.report_date and 
+                                          t.kf = cust.kf and 
+                                          t.cust_id = cust.cust_id)
+                                where t.report_date = l_mnth_last_work_dt
                                       and t.KF = p_kod_filii
                                       and t.SEG_02 in (
                                                         select distinct t.r020
@@ -276,11 +290,16 @@ BEGIN
                                       , cust.k070
                                       , ac.blc_code_db
                                       , ac.blc_code_cr
+                                      , ac.acc_type
                                 from  nbur_dm_accounts ac
-                                      join nbur_dm_balances_daily d on (ac.kf = d.kf)
-                                                                       and (ac.acc_id = d.acc_id)
-                                      join nbur_dm_customers cust on (ac.kf = cust.kf)
-                                                                     and (ac.cust_id = cust.cust_id)
+                                      join nbur_dm_balances_daily d 
+                                      on (ac.report_date = d.report_date and 
+                                          ac.kf = d.kf and
+                                          ac.acc_id = d.acc_id)
+                                      join nbur_dm_customers cust 
+                                      on (ac.report_date = cust.report_date and 
+                                          ac.kf = cust.kf and 
+                                          ac.cust_id = cust.cust_id)
                                 where ac.report_date = p_report_date
                                       and ac.kf = p_kod_filii
                                       and d.ost <> 0
@@ -329,7 +348,10 @@ BEGIN
                                , n.ekp /*ekp*/
                                , n.rule_id /*rule_id*/
                                , (case when nvl(e.R030_980, '0') = '1' then c_base_currency_id else lpad(to_char(t.KV), 3, '0') end)/*r030*/
-                               , t.amount * nvl(n.factor, 1) /*t100*/
+                               , (case when n.ekp in ('A6E011', 'A6E012') and substr(acc_num, 1, 4) in ('1400', '1410', '1420') -- необтяжені ОВДП
+                                       then nvl(f_nbur_get_sum_ovdp(acc_id, p_report_date), t.amount * nvl(n.factor, 1)) 
+                                       else t.amount * nvl(n.factor, 1) 
+                                 end)/*t100*/
                                , case
                                    when t.kv = 980 then coalesce(n.lcy_pct, e.lcy_pct)
                                  else
@@ -356,8 +378,8 @@ BEGIN
                                                and ((t.k180 = nvl(n.k180, t.k180)) or (t.k180 is null and n.k180 is null))
                                                and ((t.k190 = nvl(n.k190, t.k190)) or (t.k190 is null and n.k190 is null))
                                                and ((t.s240 = nvl(n.s240, t.s240)) or (t.s240 is null and n.s240 is null))
-                                               and ((t.blkd = nvl(n.blkd, t.blkd)) or (t.blkd is null and n.blkd is null))
-                                               and ((t.blkk = nvl(n.blkk, t.blkk)) or (t.blkk is null and n.blkk is null))
+                                               and ((t.blkd = n.blkd and n.blkd is not null) or n.blkd is null) 
+                                               and ((t.blkk = n.blkk and n.blkk is not null) or n.blkk is null)
                                                and ((t.msg_return_flg = nvl(n.msg_return_flg, t.msg_return_flg)) or (t.msg_return_flg is null and n.msg_return_flg is null))
                                                and ((t.default_flg = nvl(n.default_flg, t.default_flg)) or (t.default_flg is null and n.default_flg is null))
                                                and ((t.liquid_type = nvl(n.liquid_type, t.liquid_type)) or (t.liquid_type is null and n.liquid_type is null))
@@ -369,6 +391,14 @@ BEGIN
                    and t.kf = p_kod_filii;
 
         logger.trace(c_title || ' В детальный протокол файла вставлено ' || sql%rowcount || ' записей');
+        
+        -- сума обовязкових резервів
+        begin
+            select nvl(sum(sum_mrez), 0)
+            into l_mrez
+            from nbur_kor_6ex_mrez
+            where p_report_date between date_begin and nvl(date_end, p_report_date);
+        end;         
 
         --Теперь на основании детального протокола формируем агрегированные данные
         insert into nbur_agg_protocols(
@@ -379,7 +409,6 @@ BEGIN
                                         , field_code
                                         , field_value
                                      )
-
                 with w_source_data as
                 (
                           select coalesce(t.ekp, e.ekp) as ekp
@@ -426,7 +455,7 @@ BEGIN
                        , p_file_code /*report_code*/
                        , p_kod_filii /*nbuc*/
                        , ekp || r030
-                       , t100
+                       , t100 - (case when ekp in ('A6E001', 'A6E006') and r030 in ('#', '980') then l_mrez else 0 end) as t100
                 from   (
                           --Схлопнутые показатели согласно классификатора
                           select ekp
@@ -477,9 +506,9 @@ BEGIN
           from      (
                       select r030
                              , to_char(A6E004) as A6E004
-                             , trim(to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) * 100 else 0 end), '9990.0000')) as A6E005
+                             , trim(to_char((case when A6E004 <> 0 then ROUND(A6E001 / A6E004, 4) * 100 else 0 end))) as A6E005
                              , to_char(A6E009) as A6E009
-                             , trim(to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) * 100 else 0 end), '9990.0000')) as A6E010
+                             , trim(to_char((case when A6E009 <> 0 then ROUND(A6E006 / A6E009, 4) * 100 else 0 end))) as A6E010
                       from   (
                                 select r030
                                        , A6E001
@@ -505,7 +534,7 @@ BEGIN
                                                )
                                         group by
                                               r030
-                                      )
+                                      ) 
                                 )
                      )
           unpivot (field_value for ekp in (A6E004 as 'A6E004', A6E005 as 'A6E005', A6E009 as 'A6E009', A6E010 as 'A6E010')) t
