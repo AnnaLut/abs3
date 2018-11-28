@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    ViewBag.Title = "GPI. Перегляд документів";
+}
+
+<script src="@Url.Content("~/lib/jsZip/jszip.js")"></script>
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Swift/Scripts/KendoCommon.js"></script>
+<script src="/barsroot/Scripts/jquery/jquery.iecors.js"></script>
+<script src="~/Areas/Swift/Scripts/GPIDocsReview/GPIDocsReview.js"></script>
+<link rel="stylesheet" href="~/Areas/Swift/Css/Swift/GPIMessages.css" />
+
+<div class="page-header">
+    <h2 id="title" style="color:darkolivegreen;margin: 5px 3px 5px 10px"> GPI. Перегляд документів <span class="filterMessage"> (За останні 5 днів від банківської дати)</span> </h2>
+    <h3 class="filterMessage">*Для скидання фільтру за 5 днів та застосування іншого - скористуйтесь фільтрами на заголовках колонок</h3>
+</div>
+<div id="MainGridToolbar"></div>
+<div id="GTIStatusesGrid"></div>
+
+<h2 id="title" style="color:darkolivegreen;margin: 5px 3px 5px 10px"> Перегляд відповідних повідомлень MT199 </h2>
+<div id="MT199GridToolbar"></div>
+<div id="MT199MessagesGrid"></div>
+
+<div class="search-main"></div>
+<textarea readonly style="background-color:#c7f5f9;display:none" id="textAreaClaimsRow" cols="150"></textarea>

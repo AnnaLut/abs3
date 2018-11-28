@@ -60,7 +60,6 @@
           KURS_F,
           VDATE,
           META,
-          AIM_NAME,
           CONTRACT,
           DATC,
           NUM_VMD,
@@ -360,12 +359,6 @@
         </field>
         <field datatype="DateTime" key="false" name="VDATE">
           <column align="Center" caption="Дата валютування" show="true"></column>
-        </field>
-        <field datatype="Int64" key="false" name="META">
-          <column align="Right" caption="Мета" show="false"  ></column>
-        </field>
-        <field datatype="String" key="false" name="aim_name">
-          <column align="Left" caption="Ціль продажу" show="true" width="150"></column>
         </field>
         <field datatype="String" key="false" name="f092">
           <column align="Left" caption="Мета продажу (510)" show="true" width="200"></column>
