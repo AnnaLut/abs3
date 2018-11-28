@@ -1,0 +1,54 @@
+﻿@using BarsWeb.Areas.Bills.Model
+@model IEnumerable<ReceiverLog>
+@{
+    @* View для отображения дейтвий по решению! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<link href="~/Areas/Bills/Css/Main.css" rel="stylesheet" />
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<script src="~/Areas/Bills/Scripts/Clients.js"></script>
+<script src="~/Areas/Bills/Scripts/Main.js"></script>
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">@ViewBag.receiverName</h2>
+</div>
+<div style="margin-bottom: 50px;">
+    @(Html.Kendo().Grid((IEnumerable<ReceiverLog>)Model)
+              .Name("grid")
+              .Columns(col =>
+              {
+                  col.Bound(x => x.ID).Title("Id").Width(60);
+                  col.Bound(x => x.REC_DATE).Title("Дата").Template(@<text> @if (item.REC_DATE.HasValue)
+                                {@item.REC_DATE.Value.ToString("dd.MM.yyyy HH:mm");
+                                        } </text>).Width(130).HeaderHtmlAttributes(new { style = "white-space: normal" });
+                        col.Bound(x => x.USER_REF).Title("Користувач").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(160);
+                        col.Bound(x => x.ACTION).Title("Дія").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(180);
+                        col.Bound(x => x.RESULT).Title("Результат").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    })
+                    .Resizable(resizable => resizable.Columns(true))
+                    .Reorderable(reorderable => reorderable.Columns(true))
+                    .Scrollable()
+                    .Selectable()
+                    .HtmlAttributes(new { style = "min-height: 50px; height: 100%;" })
+                    .Sortable()
+                    .Filterable()
+                    .Pageable(page => page
+                      .Refresh(true)
+                      .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                      .ButtonCount(10))
+                    .DataSource(dataSource => dataSource
+                      .Server()
+                      .Model(model => model.Id(p => p.ID))
+                    )
+    )
+</div>
+<script>
+    (function () {
+        $(document).keyup(function (e) {
+            if (e.keyCode == 27 && e.target.id !== 'createWindow' && e.target.id !== 'barsUiConfirmDialog' && e.target.id !== 'barsUiErrorDialog' && e.target.id !== 'barsUiAlertDialog') {
+                window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+            }
+        });
+    })()
+</script>

@@ -26,15 +26,8 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           c.prod
      FROM cc_deal c, cc_add d
     WHERE     c.nd = d.nd
-          AND EXISTS
-                 (SELECT 1
-                    FROM nd_acc n, accounts a
-                   WHERE     n.nd = c.nd
-                         AND n.acc = a.acc
-                         
-                         AND tip = 'LIM'
-                         AND nls LIKE '8999%'
-                         AND (dazs IS NULL OR dazs > SYSDATE - 31))
+      and c.vidd in (1,2,3,5,11,12,13)
+      --and sos between 10 and 15
    UNION ALL                                                       -- гарантії
    SELECT 'GAR' AS tip,
           c.vidd,

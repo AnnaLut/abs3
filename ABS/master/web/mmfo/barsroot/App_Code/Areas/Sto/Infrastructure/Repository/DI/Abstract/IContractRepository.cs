@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Areas.Sto.Models;
 using BarsWeb.Areas.Sto.Models;
 
@@ -10,21 +11,27 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Abstract
     public interface IContractRepository
     {
         IQueryable<STO_LST> ContractData();
+        List<STOContractData> GetContractDataList(int group_id);
         IQueryable<pipe_FREQ> GetFREQ();
-        IQueryable<pipe_TTS> GetTTS();
+        List<pipe_TTS> GetTTS();
         IQueryable<string> GetNLS(decimal RNK, decimal? KV);
         IQueryable<string> GetNMK(decimal RNK);
         string CurrentBranch();
         IQueryable<V_STO_DET> ContractDetData();
         IQueryable<STO_GRP> GroupData();
+        List<STOGroup> GetGroupsList();
         int ClaimProc(string idd, string statusId, string disclaimId);
         IQueryable<STO_DISCLAIMER> DisclaimerData();
-        IQueryable<V_STO_DET_HIST> DetInfoData();        
+        IQueryable<V_STO_DET_HIST> DetInfoData();
         decimal AddPayment(payment newpayment);
         decimal AvaliableNPP(decimal IDS);
-        IQueryable<pipe_customer> GetRNKLIST(string OKPO);
+        List<pipe_customer> GetRNKLIST(string OKPO, decimal? RNK);
         decimal AddIDS(ids newids);
         IQueryable<DropDown> GetKVs(decimal? RNK);
-
-    }
+        string Remove_Contract(decimal ids);
+		void BeginTransaction();
+        void Commit();
+        void Rollback();
+		List<PaymentDopRekvModel> GetDopRekvforPaymentList(decimal idd);
+        List<GovBuyingCodeRekv> GetGovCodesValue();    }
 }

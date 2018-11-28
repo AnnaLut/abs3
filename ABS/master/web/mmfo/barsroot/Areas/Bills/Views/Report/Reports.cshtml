@@ -1,0 +1,100 @@
+﻿@using Kendo.Mvc.UI
+@model Int32?
+@{
+    Layout = Model.HasValue && Model.Value == 1 ? null : "~/Views/Shared/_LayoutKendo.cshtml";
+    @* View для формирования отчетов *@
+}
+
+<script>
+    function onChange(e) {
+        var reportID = +$('#REPORT').val();
+        if (reportID !== 0) {
+            $('#data-container').html('');
+            $.post('@Url.Action("ReportParams", "Report")/' + reportID, function (data) {
+                $('#data-container').html(data);
+                $('#id').val(reportID);
+            })
+        }
+    }
+
+    function DataBound(e) {
+        onChange();
+    }
+</script>
+<div>
+
+    <div class="col-xs-12">
+        <div class="fa fa-border col-xs-12 text-center" style="max-width: 550px; padding-bottom: 25px; padding-top: 15px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("REPORT")
+                          .DataTextField("Report_Name")
+                          .DataValueField("Report_ID")
+                          .HtmlAttributes(new { style = "min-width:450px;", id = "REPORT" })
+                          .DataSource(source =>
+                          {
+                              source.Read(read =>
+                              {
+                                  read.Action("GetReportsList", "Report", new { id = Model });
+                              });
+                          })
+                          .Events(e =>
+                            e.Change("onChange")
+                             .DataBound("DataBound")
+                          ))
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div id="data-container" class="fa fa-border col-xs-12 text-center" style="max-width: 550px; padding-top: 25px; padding-bottom: 25px;">
+
+        </div>
+    </div>
+</div>
+
+@if (!Model.HasValue || Model.Value != 1)
+{
+    <script>
+        // открытие окна для выбора значения параметра
+        function OpenSelectWindow(paramCode, values, title, vtype) {
+            var url = '/bills/report/SelectParameterValue?paramCode=' + paramCode + '&values=' + values + '&vtype=' + vtype;
+            var popUpTitle = 'Вибір параметрів для \'' + title + '\'';
+            popUp(url, popUpTitle, '250px', '500px', null, null);
+        }
+
+        // создание и открытие всплывающего окна
+        function popUp(url, title, height, width) {
+            $("#windowContainer").append("<div id='createWindow'></div>");
+            if (width === undefined)
+                width = "800px";
+            if (height === undefined)
+                height = '450px';
+            var createWindow = $("#createWindow").kendoWindow({
+                width: width,
+                height: height,
+                title: title,
+                visible: false,
+                actions: ["Close"],
+                iframe: true,
+                modal: true,
+                resizable: false,
+                deactivate: function () {                    
+                    this.destroy();
+                },
+                content: bars.config.urlContent(url)
+            }).data("kendoWindow");
+
+            createWindow.center().open();
+        }
+
+        // Заполнение поля параметра
+        function fillFields(val, id, text, vtype) {
+            if (vtype === 'number' || vtype === 'varchar2')
+                $('#' + id).val(text);
+            else if (vtype === 'date') {
+                var datepicker = $('#' + id).data("kendoDatePicker");
+                datepicker.value(text);
+            }
+            $('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+        }
+    </script>
+    <div id="windowContainer"></div>
+}

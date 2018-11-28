@@ -77,10 +77,28 @@ public partial class tools_sto_calendar : Bars.BarsPage //System.Web.UI.Page
                 Lb_Nls_b.Text = Convert.ToString(rdr["nlsb"]);
                 Lb_nam_a.Text = Convert.ToString(rdr["nmk"]);
                 Lb_nam_b.Text = Convert.ToString(rdr["polu"]);
-                Lb_Summ.Text = Convert.ToString(rdr["fsum"]);
+                //Lb_Summ.Value = Convert.ToString(rdr["fsum"]);
                 Lb_nazn.Value = Convert.ToString(rdr["nazn"]);
                 DATE_FROM.Value = rdr.GetDateTime(7);
+
+                decimal sumValue = 0m;
+                string stringSum = Convert.ToString(rdr["fsum"]);
+                bool isSummDigit = Decimal.TryParse(stringSum, out sumValue);
+                if (!isSummDigit)
+                {
+
+                    FormulaCheckbox.Checked = true;
+                    Lb_Summ_String.Visible = true;
+                    Lb_Summ_String.Value = stringSum;
+                }
+                else
+                {
+                    Lb_Summ_Numb.Visible = true;
+                    //Lb_Summ_Numb.Value = (sumValue / 100).ToString("0.00");
+                    Lb_Summ_Numb.Value = sumValue / 100;
+                }
             }
+
             cmd.ExecuteNonQuery();
 
         }
@@ -418,8 +436,6 @@ public partial class tools_sto_calendar : Bars.BarsPage //System.Web.UI.Page
         }
     }
 
-
-
     protected void Calendar1_SelectionChanged(object sender, EventArgs e)
     {
         get_fdat(Calendar1.SelectedDate);
@@ -512,6 +528,7 @@ public partial class tools_sto_calendar : Bars.BarsPage //System.Web.UI.Page
 
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Clear();
+
                 cmd.CommandText = @"bars.sto_all.add_det";
                 cmd.Parameters.Add("IDS", OracleDbType.Decimal, data.ids, ParameterDirection.Input);
                 cmd.Parameters.Add("ord", OracleDbType.Decimal, data.ord, ParameterDirection.Input);
@@ -525,7 +542,9 @@ public partial class tools_sto_calendar : Bars.BarsPage //System.Web.UI.Page
                 cmd.Parameters.Add("mfob", OracleDbType.Varchar2, 12, data.mfob, ParameterDirection.Input);
                 cmd.Parameters.Add("polu", OracleDbType.Varchar2, 38, data.polu, ParameterDirection.Input);
                 cmd.Parameters.Add("nazn", OracleDbType.Varchar2, 160, Lb_nazn.Value, ParameterDirection.Input);
-                cmd.Parameters.Add("fsum", OracleDbType.Varchar2, data.fsum, ParameterDirection.Input);
+
+                string sumValue = (FormulaCheckbox.Checked) ? Lb_Summ_String.Value : (Lb_Summ_Numb.Value.Value * 100).ToString();
+                cmd.Parameters.Add("fsum", OracleDbType.Varchar2, sumValue, ParameterDirection.Input);
                 cmd.Parameters.Add("okpo", OracleDbType.Varchar2, 10, data.okpo, ParameterDirection.Input);
                 cmd.Parameters.Add("DAT1", OracleDbType.Date, DATE_FROM.Value, ParameterDirection.Input);
                 cmd.Parameters.Add("DAT2", OracleDbType.Date, data.dat2, ParameterDirection.Input);
@@ -538,7 +557,7 @@ public partial class tools_sto_calendar : Bars.BarsPage //System.Web.UI.Page
 
                 cmd.ExecuteNonQuery();
 
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "send_success", "alert('Дата та призначення успішно збереженні');", true);
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "send_success", "alert('Зміни успішно збереженні');", true);
             }
         }
         finally
@@ -547,4 +566,29 @@ public partial class tools_sto_calendar : Bars.BarsPage //System.Web.UI.Page
             con.Dispose();
         }
     }
+
+    protected void Check_Clicked(object sender, EventArgs e)
+    {
+        Lb_Summ_String.Value = "";
+        Lb_Summ_Numb.Value = null;
+        if (FormulaCheckbox.Checked)
+        {
+            Lb_Summ_String.Visible = true;
+            Lb_Summ_Numb.Visible = false;
+        }
+        else
+        {
+            Lb_Summ_Numb.Visible = true;
+            Lb_Summ_String.Visible = false;
+        }
+    }
+
+    //protected void Summ_KeyPress(object sender, EventArgs e)
+    //{
+    //    if (!FormulaCheckbox.Checked)
+    //    {
+    //        const char Delete = (char)8;
+    //        e.Handled = !Char.IsDigit(e.KeyChar) && e.KeyChar != Delete;
+    //    }
+    //}
 }

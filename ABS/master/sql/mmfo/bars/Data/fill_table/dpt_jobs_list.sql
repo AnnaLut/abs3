@@ -22,3 +22,16 @@ update DPT_JOBS_LIST
  where JOB_ID  = 267;
 
 commit;
+/
+
+begin
+  
+  Insert into DPT_JOBS_LIST
+    ( JOB_ID, JOB_CODE, JOB_NAME, JOB_PROC, ORD, RUN_LVL )
+  Values
+    ( 290, 'DPT_CDED', 'ѕакетное изменение даты окончани€ депозитов', 'dpt_web.change_deposit_end_date', 21, 1);
+exception
+  when dup_val_on_index then null;
+end;
+/
+commit;

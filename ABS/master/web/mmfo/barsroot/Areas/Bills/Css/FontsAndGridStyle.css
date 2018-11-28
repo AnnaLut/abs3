@@ -1,0 +1,18 @@
+﻿.k-grid-content {
+    height: auto !important;
+}
+
+@font-face {
+    font-family: 'glyphicons-halflings-regular';
+    src: url('../../../../Content/fonts/glyphicons-halflings-regular.eot') format('embedded-opentype');
+    src: local('O'), url('../../../../Content/fonts/glyphicons-halflings-regular.woff') 
+        format('woff'), url('../../../../Content/fonts/glyphicons-halflings-regular.ttf') 
+        format('truetype'), url('../../../../Content/fonts/glyphicons-halflings-regular.svg') 
+        format('svg'), url('../../../../Content/fonts/glyphicons-halflings-regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.k-button:focus {
+    outline: none;
+}

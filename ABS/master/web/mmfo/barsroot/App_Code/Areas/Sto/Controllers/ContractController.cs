@@ -25,23 +25,27 @@ namespace BarsWeb.Areas.Sto.Controllers
         }
         public ActionResult GetGroupList([DataSourceRequest] DataSourceRequest request)
         {
-            var list = _repo.GroupData();
-            var result = list.Select(c => new
-            {
-                c.IDG,
-                c.NAME
-            }).OrderBy(e => e.IDG).ToDataSourceResult(request);
+            //var list = _repo.GroupData();
+            //var result = list.Select(c => new
+            //{
+            //    c.IDG,
+            //    c.NAME
+            //}).OrderBy(e => e.IDG).ToDataSourceResult(request);
+
+            var result = _repo.GetGroupsList().ToDataSourceResult(request);
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetContractList([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetContractList([DataSourceRequest] DataSourceRequest request, int group_id)
         {
             var response = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                var branch = _repo.CurrentBranch();
-                var list = _repo.ContractData();
-                response.data = list.Where(a => a.BRANCH.Contains(branch)).Select(x => new { x.IDS, x.RNK, x.NAME, x.SDAT, x.IDG, x.KF, x.BRANCH }).ToDataSourceResult(request); 
+                //var branch = _repo.CurrentBranch();
+                //var list = _repo.ContractData();
+                //response.data = list.Where(a => a.BRANCH.Contains(branch)).Select(x => new { x.IDS, x.RNK, x.NAME, x.SDAT, x.IDG, x.KF, x.BRANCH }).ToDataSourceResult(request); 
+
+                response.data = _repo.GetContractDataList(group_id).ToDataSourceResult(request);
             }
             catch (Exception ex) {
                 response.status = JsonResponseStatus.Error;
@@ -62,7 +66,7 @@ namespace BarsWeb.Areas.Sto.Controllers
                     a.POLU, a.NAZN, a.FSUM, a.OKPO, a.DAT1, a.DAT2, a.FREQ, a.DAT0,
                     a.WEND, a.IDD, a.ORD, a.BRANCH, a.BRANCH_MADE,
                     a.DATETIMESTAMP, a.BRANCH_CARD, a.USERID_MADE, a.STATUS_ID,
-                    a.DISCLAIM_ID, a.STATUS_DATE, a.STATUS_UID
+                    a.DISCLAIM_ID, a.STATUS_DATE, a.STATUS_UID, a.OPERW_EXISTANCE
                 }).ToDataSourceResult(request);
             }
             catch (Exception ex)
@@ -72,6 +76,25 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult GetDopRekvForPayment([DataSourceRequest] DataSourceRequest request, decimal paymentIdd)
+        {
+            JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
+                var dopRekvforPaymentList = _repo.GetDopRekvforPaymentList(paymentIdd);
+                var data = dopRekvforPaymentList.ToDataSourceResult(request);
+                return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetGovCodesValues([DataSourceRequest] DataSourceRequest request)
+        {
+            JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
+
+            var dopRekvforPaymentList = _repo.GetGovCodesValue();
+            var data = dopRekvforPaymentList.ToDataSourceResult(request);
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult GetClaim(string idd, string statusId, string disclaimId)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -97,6 +120,7 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetDisclaimerList([DataSourceRequest] DataSourceRequest request)
         {
             var list = _repo.DisclaimerData();
@@ -192,12 +216,12 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetRNKLIST(string OKPO)
+        public ActionResult GetRNKLIST(string OKPO, decimal? RNK)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                result.data = _repo.GetRNKLIST(OKPO);
+                result.data = _repo.GetRNKLIST(OKPO, RNK);
             }
             catch (Exception e)
             {
@@ -247,8 +271,8 @@ namespace BarsWeb.Areas.Sto.Controllers
                  result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
              }
              return Json(result, JsonRequestBehavior.AllowGet);
-         }
-         public ActionResult AvaliableNPP(decimal IDS)
+        }
+        public ActionResult AvaliableNPP(decimal IDS)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
             try
@@ -261,6 +285,28 @@ namespace BarsWeb.Areas.Sto.Controllers
                 result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
             }
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Delete_Contract(decimal ids)
+        {
+            var result = new JsonResponse(JsonResponseStatus.Ok);
+            try
+            {
+                result.data = _repo.Remove_Contract(ids);
+            }
+            catch (Exception e)
+            {
+                result.status = JsonResponseStatus.Error;
+                result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ExportToExcel(string contentType, string base64, string fileName)
+        {
+            var fileContents = Convert.FromBase64String(base64);
+
+            return File(fileContents, contentType, fileName);
         }
     }
 }

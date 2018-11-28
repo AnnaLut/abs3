@@ -541,7 +541,7 @@ function get_xml_credit_tranche return clob
 
 procedure run_formated_xml_job (p_kf in varchar2, p_user_id in varchar2)
   is
-  id number;
+  id varchar2(4000);
   params BARSTRANS.TRANSP_UTL.t_add_params;
   KF varchar2(6);
   l_request_id_person_fo number;

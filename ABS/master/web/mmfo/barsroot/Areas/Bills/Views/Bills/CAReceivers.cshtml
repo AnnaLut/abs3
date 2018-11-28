@@ -1,0 +1,83 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model Int32
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+@* View для отправки решений на ДКСУ для оплаты! *@
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<script>
+    var count = '@Model';
+</script>
+<script src="~/Areas/Bills/Scripts/caReceicers.js"></script>
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Формування витягу</h2>
+</div>
+
+<div style="margin-bottom: 50px;">
+    @(Html.Kendo().Grid<CA_Receivers>()
+                    .Name("careceivers")
+                    .Columns(col =>
+                    {
+                        col.Bound(x => x.STATUS).Hidden(true);
+                        col.Bound(x => x.EXP_ID).Hidden(true);
+                        col.Bound(x => x.APPLREADY).Hidden(true);
+                        col.Bound(x => x.SNDDOC).Hidden(true);
+                        col.Bound(x => x).ClientTemplate("#=data.NAME#").Title("ПІБ/Найменування").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.INN).Title("ІПН/ЄДРПОУ").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.DOC_NO).Title("Номер документу").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.RES_DATE).Format("{0:dd.MM.yyyy}").HtmlAttributes(new { style = "text-align: center" }).Title("Дата прийняття рішення").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(160);
+                        col.Bound(x => x.RES_CODE).Title("Номер рішення").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.COURTNAME).Title("Найменування суду").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.CURRENCY).Title("Назва валюти").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.AMOUNT).Title("Сума для отримання в грн").Format("{0:n2}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" }).Width(120);
+                        col.Bound(x => x.KF).Title("Код банку").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.BRANCH).Title("Відділення, яке проводить роботу з отримувачем").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.ACCOUNT).Title("Номер рахунка").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.DOC_DATE).Hidden(true);
+                        col.Bound(x => x.DOC_WHO).Hidden(true);
+                        col.Bound(x => x.CL_TYPE).ClientTemplate("#=SetUser(CL_TYPE)#").Title("Тип клієнта (юо/фо)").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.CUR_RATE).Hidden(true);
+                        col.Bound(x => x.STATUS_NAME).Title("Поточний статус").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                        col.Bound(x => x.PHONE).Hidden(true);
+
+                        col.Bound(x => x.REQ_ID).Hidden(true);
+                        col.Bound(x => x.EXT_STATUS).Hidden(true);
+                        col.Bound(x => x.EXT_STATUS_NAME).Title("Статус витягу").Width(120);
+                    })
+                    .Scrollable()
+                    //.Resizable(resizable => resizable.Columns(true))
+                    .Reorderable(reorderable => reorderable.Columns(true))
+                    .Selectable()
+                    .HtmlAttributes(new { style = "min-height: 50px; height: 100%; min-width: 100%;" })
+                    .ToolBar(toolbar =>
+                    {
+                    toolbar.Template(@<text>
+                            <button class="k-button" id="sendSelected" title="Сформувати витяг" onclick="sendReceivers(); return false;">
+                                <span style="color: blue" class="glyphicon glyphicon-export"></span>
+                            </button>
+                            <button class="k-button" id="revoke" title="Відбракувати отримувача" onclick="Revoke(); return false;">
+                                <span style="color: red" class="glyphicon glyphicon-remove"></span>
+                            </button>
+                            <button class="k-button" id="pre-view" title="Попередній перегляд" onclick="preView(); return false;">
+                                <span class="k-icon k-i-pdf"></span>
+                            </button>
+                    </text>);
+                    })
+                    .Sortable()
+                    .Filterable()
+                    .Pageable(page => page
+                        .Refresh(true)
+                        .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                        .ButtonCount(10))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(model => model.Id(x => x.EXP_ID))
+                        .Read(read => read.Action("CA_Receivers_read", "Bills"))
+                        .PageSize(10)
+                    )
+                    .Events(ev => ev.Change("onChange"))
+    )
+</div>
+<div id="windowContainer"></div>

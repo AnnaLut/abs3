@@ -1,0 +1,28 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<div class="row" style="margin-left: 20px; margin-right: 20px;">
+    @(Html.Kendo().Grid<ReportInfo>()
+        .Name("repo")
+        .Selectable()
+        .Sortable()
+        .Filterable()
+        .Columns(col => {
+            col.Bound(x => x.Report_ID).Hidden(true);
+            col.Bound(x => x.Report_Name).Title("Назва звіту").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(250);
+            col.Bound(x => x.Frx_File_Name).Title("Назва файлу").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(160);
+            col.Bound(x => x.Description).Title("Опис звіту").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(200);
+        })
+        .Pageable(page => page
+           .Refresh(true)
+           .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+           .ButtonCount(10))
+         .DataSource(dataSource => dataSource
+             .Ajax()
+             .Read(read => read.Action("GetReporsts_Read", "Report"))
+             .PageSize(10)
+         )
+    )
+</div>

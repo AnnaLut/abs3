@@ -312,6 +312,53 @@ function confirmCngCard() {
     });
 }
 
+//////////////
+function ddlSelect(e, id) {
+    var item = e.sender;
+    var val = item.value();
+
+    if (val == undefined || val == '')
+        delete g_addParamsNew[id];
+    else
+        g_addParamsNew[id] = val;
+
+    $("#" + id + "_Tag").text(item.text());
+    $("#" + id + "_Value").text('');
+
+    check();
+};
+function createDdl(id) {
+    $("#dialogAddParams").find('#' + id).kendoDropDownList({
+        change: function (e) {
+            ddlSelect(e, id);
+        },
+        enable: false
+    });
+};
+
+function createNumeric(numeric) {
+    $("#" + numeric.name).kendoNumericTextBox({
+        decimals: numeric.decimals,
+        format: "{0:#.####}",
+        restrictDecimals: true,
+        spinners: false,
+        change: function (e) {
+            var item = e.sender;
+            var val = item.value();
+
+            if (val == undefined || val == '')
+                delete g_addParamsNew[numeric.name];
+            else
+                g_addParamsNew[numeric.name] = val;
+            $("#" + numeric.name + "_Tag").text(val);
+
+            check();
+        },
+        enable: false
+    });
+};
+/////////////
+
 function onClickBtn(btn) {
     var grid = $('#gridMain').data("kendoGrid");
     var row = grid.dataItem(grid.select());
@@ -326,7 +373,23 @@ function onClickBtn(btn) {
             break;
 
         case "btnAddParams":
-            $("#dialogAddParams").data('kendoWindow').center().open();
+            var kWindow = $("#dialogAddParams").data('kendoWindow');
+
+            if (getCusttype() == 1) {
+                $('#addParamsForFo').css('display', 'block');
+
+                $('.k-window-content').css('height', $(document).height() * 0.8 + 'px');
+
+                //for (var i = 0; i < ddls.length; i++) {
+                //    createDdl(ddls[i]);
+                //}
+
+                //for (var i = 0; i < numerics.length; i++) {
+                //    createNumeric(numerics[i]);
+                //}
+            }
+
+            kWindow.center().open();
             break;
 
         case "btnExcel":
@@ -660,25 +723,18 @@ $(document).ready(function () {
     });
     $("#passDateSelect").kendoMaskedDatePicker({ format: "dd/MM/yyyy" });
 
-    // AJAX({ srcSettings: {
-    //     url: bars.config.urlContent("/api/Way4Bpk/Way4Bpk/UserBranch"),
-    //     success: function (data) {
-    //         var userBranch = data['userBranch'];
-    //         if(userBranch === null || userBranch.length === 8){   //  /300465/
-    //             g_gridMainToolbar = g_gridMainToolbar.concat(g_gridMainToolbarRoot);
-    //         }
-    //         initMainGrid();
-    //     },
-    //     error: function () { bars.ui.error({ title: 'Помилка', text: "Не вдалось зчитати контекст - спробуйте перезайти в систему!" }); }
-    // } });
-
     $("#newCardRnk").kendoNumericTextBox({ format: "#", decimals: 0, spinners: false });
     $("#newCardIpn").kendoNumericTextBox({ format: "#", decimals: 0, spinners: false });
-
 
     visibilityErrorNewCard();
 
     g_gridMainToolbar = g_gridMainToolbar.concat(getCusttype() === 1 ? g_gridMainToolbar_FO : g_gridMainToolbar_UO);
 
     initMainGrid();
+
+    $('#dvFilesFilter').on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            $('#SearchBtn').click();
+        }
+    });
 });

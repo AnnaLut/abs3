@@ -1,0 +1,296 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model Receiver
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    DateTime doc_date = Model.DOC_DATE.HasValue ? Model.DOC_DATE.GetValueOrDefault() : DateTime.Now;
+    @* View для редактирования данных взыскателя! *@
+}
+<script>
+    var needSign = '@((Int32)ViewBag.needSign)';
+</script>
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<script src="~/Areas/Bills/Scripts/SignVega.js"></script>
+<style>
+    .k-textbox[readonly] {
+        background-color: lightgray;
+    }
+
+    .k-textbox[readonly]:hover {
+        background-color: lightgray;
+        cursor: default;
+    }
+</style>
+<script>
+    var date = '';
+    (function () {
+        date = '@doc_date.ToString("dd.MM.yyyy")';
+    })()
+</script>
+<link href="@Url.Content("~/Content/Themes/Kendo/kendo.bootstrap.mobile.min.css")" rel="stylesheet" />
+<div style="margin-left: 70px; margin-right: 20px;">
+    <div class="page-header" style="padding-bottom: 0px; margin: 5px 0 20px;">
+        <h1 id="title">Редагування даних заяви</h1>
+    </div>
+    <div class="page-header-content">
+        <button class="k-button" id="create-request-button" title="Резервування стягувача по рішенню" style="background-color: lightgray;" disabled="disabled" onclick="createRequest(); return false;">
+            <span style="color: steelblue" class="glyphicon glyphicon-circle-arrow-up"></span>
+        </button>
+        <button class="k-button" id="print-bill" style="background-color: lightgray;" disabled="disabled" title="Завантаження заяви про видачу векселів" onclick="DownloadAcceptance('act'); return false; this.blur();">
+            <span class="k-icon k-i-pdf"></span>
+        </button>
+        @*<button class="k-button" id="print-bill" title="Відправити запит для формування заяви на погашення (з ДКСУ)" style="background-color: lightgray;" disabled="disabled" onclick="billRequest('printBill'); return false;">
+            <span class="k-icon k-i-pdf"></span>
+        </button>
+        <button class="k-button" id="download-application" title="Завантажити форму заяви на погашення (збережену)" style="background-color: lightgray;" disabled="disabled" onclick="downloadApplication(); return false;">
+            <span class="glyphicon glyphicon-save-file"></span>
+        </button>*@
+        <button class="k-button" id="attach-application" title="додати документ" style="background-color: lightgray;" disabled="disabled" onclick="attachDocument(); this.blur(); return false;">
+            <span class="glyphicon glyphicon-plus" style="color: darkseagreen; background-position-x: -292px; background-position-y: -101px;"></span>
+        </button>
+        <button class="k-button" id="scan-doc" title="Відсканувати документ" style="background-color: lightgray;" disabled="disabled" onclick="showDialogScanPhoto(); return false;">
+            <span class="k-icon k-i-pdf" style="background-position-x: -292px; background-position-y: -101px;"></span>
+        </button>
+        <button style="color: steelblue" class="k-button" id="upload-scan-doc" title="Сканкопії документів (відправка, сканування)" style="background-color: lightgray;" disabled="disabled" onclick="uploadScanDocs(); return false;">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+        </button>
+        <button class="k-button" id="update-bill" title="Зберегти зміни у заяві по судовому рішенню (відправити до ДКСУ)" style="background-color: lightgray;" disabled="disabled" onclick="SendRequest('UpdateRq'); return false;">
+            <span style="color: tomato" class="glyphicon glyphicon-export"></span>
+        </button>
+        @if (Model.REQ_ID != null)
+        {
+            <button class="k-button" id="update-comments" title="Оновити коментарі" onclick="updateComments(); return false;">
+                <span style="color: green" class="glyphicon glyphicon-refresh"></span>
+            </button>
+        }
+        else
+        {
+            <button class="k-button" id="update-comments" title="Оновити коментарі" disabled="disabled" style="background-color: lightgray;" onclick="updateComments(); return false;">
+                <span style="color: green" class="glyphicon glyphicon-refresh"></span>
+            </button>
+        }
+        <button class="k-button" id="set-req-rec" title="Відправити фактичного/очікуваного стягувача на формування витягу" style="background-color: lightgray;" disabled="disabled" onclick="billRequest('setRecRecReq'); return false;">
+            <span style="color: darkgoldenrod" class="glyphicon glyphicon-lock"></span>
+        </button>
+    </div>
+    <div style="padding-bottom: 50px;">
+        <form id="update_form" action="/barsroot/api/bills/bills/updatereceiver" method="post">
+            <div class="col-lg-6 col-md-6 col-xs-12">
+                <div class="form-horizontal container-fluid">
+                    <div class="form-group">
+                        @Html.HiddenFor(x => x.EXP_ID)
+                    </div>
+                    @if (Model.STATUS != "XX")
+                    {
+                        <div class="form-group">
+                            <label for="Search" class="control-label col-md-4 col-xs-5">
+                                Пошук по ІПН/ЄДРПОУ або ПІБ
+                            </label>
+                            <div class="col-md-5 col-xs-6">
+                                @Html.TextBox("Search", "", new { @class = "k-textbox" })
+                            </div>
+                            <button class="k-button" title="Шукати" onclick="search(); return false;" style="padding: 2px 14px;">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label for="NAME" class="control-label col-md-4 col-xs-5 required">
+                            <b>ПІБ/Найменування</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @Html.TextBoxFor(x => x.NAME, new { @class = "k-textbox editable", required = "required" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="INN" class="control-label col-md-4 col-xs-5 required">
+                            <b>ІПН/ЄДРПОУ</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @Html.TextBoxFor(x => x.INN, new { @class = "k-textbox editable", @required = true })
+                        </div>
+                        <span class="k-invalid-msg" data-for="INN"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="DOC_DATE" class="control-label col-md-4 col-xs-5 required">
+                            <b>Дата видачі документа</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            <input id="DOC_DATE" name="DOC_DATE" class="editable" value="@doc_date.ToString("dd.MM.yyyy")" title="Дата видачі документа" style="width: 100%" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="DOC_NO" class="control-label col-md-4 col-xs-5 required">
+                            <b>Номер документу</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @Html.TextBoxFor(x => x.DOC_NO, new { @class = "k-textbox editable" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="DOC_WHO" class="control-label col-md-4 col-xs-5 required">
+                            <b>Ким виданий</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @Html.TextBoxFor(x => x.DOC_WHO, new { @class = "k-textbox editable" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="CL_TYPE" class="control-label col-md-4 col-xs-5 required">
+                            <b>Тип клієнта (юо/фо)</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @(Html.Kendo().DropDownList()
+                                .Name("CL_TYPE")
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .BindTo(new List<SelectListItem>{
+                                   new SelectListItem { Text = "Фізична особа", Value = "1" },
+                                   new SelectListItem { Text = "Юридична особа", Value = "2" }
+                                })
+                                .HtmlAttributes(new { @class = "editable" })
+                                .Value(Model.CL_TYPE.GetValueOrDefault(1).ToString())
+                            )
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="PHONE" class="control-label col-md-4 col-xs-5 required">
+                            <b>Контактний телефон</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @Html.TextBoxFor(x => x.PHONE, new { @class = "k-textbox editable" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ADDRESS" class="control-label col-md-4 col-xs-5 required">
+                            <b>Адреса</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @Html.TextBoxFor(x => x.ADDRESS, new { @class = "k-textbox editable", maxlength = "250" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ACCOUNTS" class="control-label col-md-4 col-xs-5 required">
+                            <b>Рахунки</b>
+                        </label>
+                        <div class="col-md-5 col-xs-6">
+                            @if (Model.RNK.HasValue && Model.ACCOUNTS != null && Model.ACCOUNTS.Count > 0)
+                            {
+                                @(Html.Kendo().DropDownList()
+                                       .Name("ACCOUNTS")
+                                       .DataTextField("Text")
+                                       .DataValueField("Value")
+                                       .HtmlAttributes(new { style = "text-align: center;" })
+                                       .BindTo(Model.ACCOUNTS.Select(x => new SelectListItem() { Text = x.NLS, Value = x.NLS }).ToList())
+                                       .Value(String.IsNullOrEmpty(Model.ACCOUNT) ? Model.ACCOUNTS.FirstOrDefault().NLS : Model.ACCOUNT)
+                                       .Events(e => { e.Change("accountChange").DataBound("accountChange").Select("accountChange"); }))
+                            }
+                            else
+                            {
+                                @(Html.Kendo().DropDownList()
+                                      .Name("ACCOUNTS")
+                                      .DataTextField("Text")
+                                      .DataValueField("Value")
+                                      .HtmlAttributes(new { style = "text-align: center;" })
+                                      .Value(Model.ACCOUNT)
+                                      .Events(e => { e.Change("accountChange").DataBound("accountChange").Select("accountChange"); }))
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-push-4 col-md-5 text-center">
+                            <br />
+                            <button class="k-button k-primary form-control" style="width: 150px; background-color: lightgray;" disabled="disabled" id="update-btn" onclick="EditReceiver(); return false;" type="button">Зберегти дані</button>
+                        </div>
+                    </div>
+                </div>
+                        </div>
+                        @Html.HiddenFor(x => x.RNK)
+</form>
+        <div class="col-lg-6 col-md-6 col-xs-12">
+            @Html.HiddenFor(x => x.REQ_ID)
+            @Html.HiddenFor(x => x.APPLREADY)
+            @Html.HiddenFor(x => x.RESOLUTION_ID)
+            @Html.HiddenFor(x => x.SNDDOC)
+            @Html.HiddenFor(x => x.STATUS)
+            <div class="form-horizontal container-fluid" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label for="CURRENCY" class="control-label col-md-4 col-xs-5">
+                        <b>ПІБ/Найменування ОЧІКУВАНОГО стягувача</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.TextBoxFor(x => x.EXPECTEDNAME, new { @class = "k-textbox", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="BRANCH" class="control-label col-md-4 col-xs-5">
+                        <b>Відділення</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.TextBoxFor(x => x.BRANCH, new { @class = "k-textbox", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="STATUS" class="control-label col-md-4 col-xs-5">
+                        <b>Поточний статус</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.TextBoxFor(x => x.STATUS_NAME, new { @class = "k-textbox", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ACCOUNT" class="control-label col-md-4 col-xs-5">
+                        <b>Рахунок для перерахування</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.TextBoxFor(x => x.ACCOUNT, new { @class = "k-textbox editable", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="CURRENCY" class="control-label col-md-4 col-xs-5">
+                        <b>Валюта</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @(Html.Kendo().TextBox().Name("CURRENCY").Value(Model.LCV + "/" + Model.CUR_NAME).HtmlAttributes(new { @class = "k-textbox", @readonly = "readonly" }))
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="CUR_RATE" class="control-label col-md-4 col-xs-5">
+                        <b>Курс конвертації суми</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.Kendo().TextBoxFor(x => x.CUR_RATE).Format("{0:n2}").HtmlAttributes(new { @class = "k-textbox", @readonly = "readonly", style = "text-align: right; padding-right: 10px;" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ACCOUNT" class="control-label col-md-4 col-xs-5">
+                        <b>Очікувана сума</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.Kendo().TextBoxFor(x => x.EXPECTED_AMOUNT).Format("{0:n2}").HtmlAttributes(new { @class = "k-textbox", @readonly = "readonly", style = "text-align: right; padding-right: 10px;" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="STATUS" class="control-label col-md-4 col-xs-5">
+                        <b>Сума запиту</b>
+                    </label>
+                    <div class="col-md-5 col-xs-6">
+                        @Html.Kendo().TextBoxFor(x => x.AMOUNT).Format("{0:n2}").HtmlAttributes(new { @class = "k-textbox", @readonly = "readonly", style = "text-align: right; padding-right: 10px;" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-lg-12" id="comments">
+                    @Html.Partial("_Comments", (List<Comment>)ViewBag.comments)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="windowContainer"></div>
+<script src="~/Areas/Bills/Scripts/ScanDialog.js"></script>
+<script src="~/Areas/Bills/Scripts/EditReceiver.js?v.2.2"></script>
+

@@ -23,5 +23,6 @@ namespace BarsWeb.Areas.Sep.Infrastructure.Repository.DI.Abstract
         bool isValidUserBankDate();
         void UpdateDocPrty(decimal rec, decimal blk, decimal prty);
         List<SepBis> GetBIS(decimal rec);
+        bool isSepAuto();
     }
 }

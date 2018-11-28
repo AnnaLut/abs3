@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/18/2018 14:34:26" ReportInfo.Modified="07/19/2018 11:00:30" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rec.name,&#13;&#10;rec.inn,&#13;&#10;case rec.cl_type when 1 then 'ФЛ' when 2 then 'ЮЛ' end cl_type_name,&#13;&#10;rec.doc_no,&#13;&#10;rec.doc_who,&#13;&#10;rec.doc_date,&#13;&#10;res.courtname,&#13;&#10;res.res_date,&#13;&#10;res.res_code,&#13;&#10;rec.amount,&#13;&#10;b.name branch,&#13;&#10;rec.exp_id&#13;&#10;from bills.resolutions res&#13;&#10;join bills.receivers rec on rec.RESOLUTION_ID = res.res_id&#13;&#10;join BARS.BRANCH b on b.branch=REC.branch&#13;&#10;where rec.exp_id =:exp_id ">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="CL_TYPE_NAME" DataType="System.String"/>
+        <Column Name="DOC_NO" DataType="System.String"/>
+        <Column Name="DOC_WHO" DataType="System.String"/>
+        <Column Name="DOC_DATE" DataType="System.DateTime"/>
+        <Column Name="COURTNAME" DataType="System.String"/>
+        <Column Name="RES_DATE" DataType="System.DateTime"/>
+        <Column Name="RES_CODE" DataType="System.String"/>
+        <Column Name="AMOUNT" DataType="System.Double"/>
+        <Column Name="EXP_ID" DataType="System.Decimal"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <CommandParameter Name=":exp_id" DataType="112" Expression="[exp_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="exp_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="226.8">
+      <TableObject Name="Table1" Left="368.55" Top="9.45" Width="340.2" Height="198.48">
+        <TableColumn Name="Column1" Width="340.2"/>
+        <TableRow Name="Row1" Height="39.38">
+          <TableCell Name="Cell1" Text="[Table.BRANCH]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="20.48">
+          <TableCell Name="Cell6" Text="(найменування відокремленого  підрозділу банку)&#13;&#10;" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row3" Height="39.38">
+          <TableCell Name="Cell11" Text="[Table.NAME]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="20.48">
+          <TableCell Name="Cell16" Text="(прізвище, ім'я та по батькові або найменування стягувача) " Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="39.38">
+          <TableCell Name="Cell21" Text="[Table.DOC_NO]  [Table.INN]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="39.38">
+          <TableCell Name="Cell22" Text="(для фізичних осіб - паспортні дані стягувача та номер облікової картки платника податків*,для юридичних осіб - код згідно з ЄДРПОУ) &#13;&#10;" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="230.8" Width="718.2" Height="425.25" DataSource="Table">
+      <TextObject Name="Text1" Top="9.45" Width="708.75" Height="170.1" Text="                                                               ЗАЯВА про видачу&#13;&#10;                                                                  векселів &#13;&#10;&#13;&#10;Відповідно до рішення суду (виконавчого документа) або рішення Європейського суду з прав людини [Table.COURTNAME], виданого або прийнятого  [Table.DOC_DATE] у справі N [Table.RES_CODE] , визначена сума заборгованості [Table.AMOUNT]  (сума заборгованості за курсом Національного банку на дату подання цієї заяви ________________________**). &#13;&#10;Прошу видати на суму заборгованості фінансові казначейські векселі. &#13;&#10;&#13;&#10;" Font="Arial, 12pt"/>
+      <TextObject Name="Text2" Top="217.35" Width="151.2" Height="66.15" Text="______________ &#13;&#10;     (дата) &#13;&#10;" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text3" Left="170.1" Top="217.35" Width="151.2" Height="66.15" Text="__________________&#13;&#10;     (підпис) &#13;&#10;" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text4" Left="359.1" Top="217.35" Width="311.85" Height="66.15" Text="____________________________ &#13;&#10;  (прізвище, ім'я та по батькові) " HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="Text5" Top="340.2" Width="708.75" Height="85.05" Text="* Крім фізичних осіб, які через свої релігійні переконання відмовилися від прийняття реєстраційного номера облікової картки платника податків та повідомили про це відповідному контролюючому органу і мають відмітку у паспорті. &#13;&#10;** Зазначається у разі прийняття рішення суду про стягнення коштів в іноземній валюті.&#13;&#10;"/>
+    </DataBand>
+  </ReportPage>
+</Report>

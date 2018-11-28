@@ -1,6 +1,6 @@
 ﻿@using Areas.DptAdm.Models
 
-<script src="@Url.Content("~/Areas/DptAdm/Scripts/AdmDicts.js")"></script>
+<script src="@Url.Content("~/Areas/DptAdm/Scripts/AdmDicts.js?v.1")"></script>
 <link href="~/Areas/DptAdm/Content/style.css" rel="stylesheet" />
 <script src="~/Areas/DptAdm/Scripts/jquery.maskedinput.js"></script>
 <script src="@Url.Content("~/Areas/DptAdm/Scripts/mdWinTermDepCorr.js")"></script>
@@ -236,6 +236,48 @@
             <div class="confirm">
                 <button class="k-button k-primary" id="confirmTransferSrokdeposits" type="submit">Виконати</button>
                 <button class="k-button k-primary" id="cnclTransferSrokdeposits">Відхилити</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="mdWinCorrHolyday">
+
+    <form id="FormCorrHolyday" class="form-group">
+        <fieldset>
+            <legend>Задайте параметри:</legend>
+
+            <div style="margin-left: 10px">
+                
+                <div>
+                    <label for="HolydayCurrentDateEnd" style="width: 170px">Поточна дата закінчення:</label>
+                    <input id="HolydayCurrentDateEnd" style="width: 150px" />
+
+                </div>
+                <div style="margin-top:10px;">
+                    <label for="HolydayNewDateEnd" style="width: 170px">Нова дата закінчення:</label>
+                    <input id="HolydayNewDateEnd" style="width: 150px" />
+                </div>
+                <br />
+                <ul class="fieldlist" style="margin-left: 70px; width:250px;">
+                    <li>
+                        <input type="radio" name="typeCorr" id="CorrAll" class="k-radio" checked="checked" style="width: 13px !important">
+                        <label class="k-radio-label" for="CorrAll" style="padding-left: 20px;">Всі</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="typeCorr" id="CorrNoAutoProlong" class="k-radio" style="width: 13px !important">
+                        <label class="k-radio-label" for="CorrNoAutoProlong" style="padding-left: 20px;">З відмовою від автопролонгації</label>
+                    </li>
+                </ul>
+
+            </div>
+
+        </fieldset>
+        <br />
+        <div align="center">
+            <div class="confirm">
+                <button class="k-button k-primary" type="submit" id="CorrHolydayOK">Виконати</button>
+                <button class="k-button k-primary" id="CorrHolydayCancel">Відмінити</button>
             </div>
         </div>
     </form>

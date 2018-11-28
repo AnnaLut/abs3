@@ -1,5 +1,5 @@
 create or replace view v_sw_compare_list as
-select /*case when c.cause_err <> 0 and c.is_resolve = 0 then 1 else 0 end*/ c.is_resolve  type,
+select c.is_resolve  type,
        t.name system,
        T.KOD_NBU,
        c.ddate_oper ddate,
@@ -7,10 +7,11 @@ select /*case when c.cause_err <> 0 and c.is_resolve = 0 then 1 else 0 end*/ c.i
        i.transactionid transactionid_EW,
        op.id operation,
        op.name operation_name,
-       trunc(o.pdat) date_bars,
+       o.fdat date_bars,
        i.operdate date_EW,
        o.ref,
        o.tt,
+       e.id   cause_err_id,  
        e.name cause_err,
        c.kf,
        o.oper_branch branch_bars,
@@ -33,19 +34,21 @@ where C.ID = O.COMPARE_ID(+)
   and op.id(+) = i.operation
   and C.CAUSE_ERR  = E.ID (+)
 union all
+       --'переказ є в АБС – відсутній в ЄВ'  
 select 2 type,
        t.name system,
        t.kod_nbu,
-       trunc(o.pdat)  ddate,
+       o.fdat  ddate,
        o.mtsc transactionid_bars,
        null transactionid_EW,
        op.id operation,
        op.name operation_name,
-       trunc(o.pdat) date_bars,
+       o.fdat date_bars,
        null date_EW,
        o.ref,
        o.tt,
-       'переказ є в АБС – відсутній в ЄВ'  cause_err,
+       e.id   cause_err_id,    
+       e.name cause_err,
        o.kf,
        o.oper_branch branch_bars,
        null branch_EW,
@@ -60,12 +63,14 @@ select 2 type,
        -1 ID_C,
        null trn,
        o.prn_file
-from SW_OWN O,SWI_MTI_LIST T,SW_TT_OPER TT, SW_OPERATION op
+from SW_OWN O,SWI_MTI_LIST T,SW_TT_OPER TT, SW_OPERATION op, SW_CAUSE_ERR E
 where o.compare_id = 0
   and O.KOD_NBU = T.KOD_NBU
   and O.TT      = tt.tt
   and op.id     = tt.id
+  and e.id      = 1001
 union all
+    --'переказ є в ЄВ – відсутній в АБС'  
 select 3 type,
        t.name system,
        t.kod_nbu,
@@ -78,7 +83,8 @@ select 3 type,
        i.operdate date_EW,
        null ref,
        null tt,
-       'переказ є в ЄВ – відсутній в АБС'  cause_err,
+       e.id   cause_err_id,    
+       e.name cause_err,       
        i.kf,
        null branch_bars,
        i.barspointcode branch_EW,
@@ -93,8 +99,11 @@ select 3 type,
        -1 ID_C,
        i.trn,
        i.prn_file
-from SW_IMPORT I, SW_SYSTEM S,SWI_MTI_LIST T, SW_OPERATION op
+from SW_IMPORT I, SW_SYSTEM S,SWI_MTI_LIST T, SW_OPERATION op, SW_CAUSE_ERR E
 where i.compare_id = 0
   and I.SYSTEMCODE = S.SYSTEMCODE
   and S.KOD_NBU = T.KOD_NBU
-  and op.id = i.operation;
+  and op.id = i.operation
+  and e.id      = 1002;
+
+grant SELECT                                                on v_sw_compare_list    to BARS_ACCESS_DEFROLE;

@@ -73,6 +73,7 @@ public partial class clientregister_tab_dop_rekv : Bars.BarsPage
     {
         if (!IsPostBack)
         {
+			MenuItem miKred = null; // COBUMMFO-8558
             try
             {
                 InitOraConnection();
@@ -122,6 +123,8 @@ public partial class clientregister_tab_dop_rekv : Bars.BarsPage
                     mi.Text = Convert.ToString(reader[1]);
                     mi.Value = Convert.ToString(reader[0]);
                     mRecvTabs.Items.Add(mi);
+					if(mi.Value == "KRED") // для умолчабельного перехода на вкладку "Для Кредитного реєстру" COBUMMFO-8558
+						miKred = mi;
                 }
                 SQL_Reader_Close();
             }
@@ -156,6 +159,11 @@ public partial class clientregister_tab_dop_rekv : Bars.BarsPage
                 chCheckReq.Disabled = true;
                 chCheckReq.Checked = true;
             }
+			// для умолчабельного перехода на вкладку "Для Кредитного реєстру" COBUMMFO-8558
+            bool isKred = (Request.Params.Get("kred") != null);
+			if( isKred && miKred != null)
+				miKred.Selected = true;
+			
         }
         SetDataSet();
     }
@@ -201,7 +209,7 @@ public partial class clientregister_tab_dop_rekv : Bars.BarsPage
                             w.value, 
                             b.isp, 
                             b.type, 
-                            b.not_to_edit
+                            b.not_to_edit, b.chkr, b.mask
                         FROM ( SELECT 
                                     f.tag, 
                                     f.name, 
@@ -213,7 +221,7 @@ public partial class clientregister_tab_dop_rekv : Bars.BarsPage
                                     nvl(a.isp,0) isp, 
                                     nvl(f.byisp,0) byisp, 
                                     type, 
-                                    not_to_edit 
+                                    not_to_edit , f.chkr, f.mask
                                 FROM ( SELECT 
                                             tag, 
                                             max(isp) isp 

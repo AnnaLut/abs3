@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../Content/Themes/ModernUI/scripts/jquery.tiptip.js"></script>
 
 	<script type="text/javascript" src="typingCheckerCtrl.js"></script>
-    <script type="text/javascript" src="JScriptFortab_client_rekv_person.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>"></script>
+    <script type="text/javascript" src="JScriptFortab_client_rekv_person.js?v=<%= barsroot.ServicesClass.GetVersionWeb() %>01"></script>
     <style type="text/css">
         div.required {
             display: inline;
@@ -61,6 +61,7 @@
             width: 16px;
             height: 16px;
         }
+        .loading {z-index: 1;}
 
     </style>
 </head>
@@ -119,7 +120,7 @@
                                 <td>
                                     <input class="edit" id="ed_ID_ORGAN" tabindex="5" type="text" maxlength="4" />
                                     <button
-                                        style="height: 24px"
+                                        style="padding: 0px; width: 27px; height: 24px;"
                                         onclick="GetIDOrganHelp();ToDoOnChange();"
                                         title="довідник">
                                         <i class="pf-icon pf-16 pf-help"></i>
@@ -146,9 +147,7 @@
                                     <input class="edit" id="ed_SER" tabindex="3" type="text" maxlength="10"
                                         onchange="ValidateDocument(getEl('ddl_PASSP'), getEl('ed_SER'), getEl('ed_NUMDOC')); "
                                         onkeypress="return CheckDocSeries('ed_SER', 'ddl_PASSP'); " />
-                                    <div class="required">
-                                        *
-                                    </div>
+                                    <div id="hlp_SER" class="required">*</div>
                                 </td>
                             </tr>
                             <tr id="trDocNumber">
@@ -156,9 +155,7 @@
                                 </td>
                                 <td>
                                     <input class="edit" id="ed_NUMDOC" tabindex="4" type="text" maxlength="20" onchange="ValidateDocument(getEl('ddl_PASSP'), getEl('ed_SER'), getEl('ed_NUMDOC')); " onkeypress="return CheckDocNumber('ed_NUMDOC', 'ddl_PASSP'); " />
-                                    <div class="required">
-                                        *
-                                    </div>
+                                    <div id="hlp_NumDoc" class="required">*</div>
                                 </td>
                             </tr>
                             <tr id="trDocOrgan">
@@ -172,9 +169,7 @@
                                         title="довідник">
                                         <i class="pf-icon pf-16 pf-help"></i>
                                     </button>
-                                    <div class="required">
-                                        *
-                                    </div>
+                                    <div class="required">*</div>
                                 </td>
                             </tr>
                             <tr id="trDocDate">
@@ -183,9 +178,7 @@
                                 <td>
                                     <input class="edit date" id="ed_PDATE" title="Формат: dd.MM.yyyy" tabindex="6" type="text"
                                         maxlength="10" onchange="isDateCheck(getEl('ed_PDATE'));" />
-                                    <div class="required">
-                                        *
-                                    </div>
+                                    <div class="required">*</div>
                                 </td>
                             </tr>
                             <tr id="datePfotoRow">
@@ -193,9 +186,7 @@
                                 </td>
                                 <td>
                                     <input class="edit date" id="ed_DATE_PHOTO" title="Формат: dd.mm.yyyy" tabindex="7" type="text" maxlength="10" />
-									<div class="required">
-                                        *
-                                    </div>
+									<div class="required">*</div>
                                 </td>
                             </tr>
                             <tr>
@@ -204,9 +195,7 @@
                                 <td>
                                     <input class="edit date" id="ed_BDAY" title="Формат: dd.mm.yyyy" tabindex="8" type="text"
                                         maxlength="10" onchange="isDateCheck(getEl('ed_BDAY'));" />
-                                    <div class="required">
-                                        *
-                                    </div>
+                                    <div class="required">*</div>
                                 </td>
                             </tr>
                             <tr>

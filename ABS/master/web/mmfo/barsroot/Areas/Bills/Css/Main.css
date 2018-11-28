@@ -1,0 +1,43 @@
+﻿.edit-btn {
+    min-width: 40px !important;
+}
+
+.row-color-IN {
+    background-color: white !important;
+}
+
+/*.row-color-RQ {
+    background-color: #f7aeb2 !important;
+}*/
+
+.row-color-VH {
+    background-color: #e6dfde !important;
+}
+
+.row-color-OK {
+    background-color: #b5bee1 !important;
+}
+
+.row-color-RR {
+    background-color: #9ae9df !important;
+}
+
+.row-color-RJ {
+    background-color: #f7aeb2 !important;
+}
+
+.row-color-XX {
+    background-color: #ebf8c5 !important;
+}
+
+.k-state-selected {
+    background-color: rgb(66, 139, 202) !important;
+}
+
+.glyphicon-exclamation-sign {
+    color: red;
+}
+
+.k-grid tr td {
+    border-bottom: 1px solid gray;
+}

@@ -20,6 +20,7 @@ using Oracle.DataAccess.Client;
 using BarsWeb.Areas.DptAdm.Models;
 using System.Globalization;
 using Microsoft.Ajax.Utilities;
+using System.Web.Script.Serialization;
 
 namespace BarsWeb.Areas.DptAdm.Controllers
 {
@@ -1056,6 +1057,19 @@ namespace BarsWeb.Areas.DptAdm.Controllers
                 result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
             }
             return Json(result);
+        }
+
+        public ActionResult CorrectHolydayDeposit(string correct_holyday_data)
+        {
+            try
+            {
+                _repository.CorrectHolydayDeposit(new JavaScriptSerializer().Deserialize<CorrectHolydayData>(correct_holyday_data));
+                return Json(new JsonResponse { status = JsonResponseStatus.Ok });
+            }
+            catch(Exception e)
+            {
+                return Json(new JsonResponse { status = JsonResponseStatus.Error, message = e.Message });
+            }
         }
 
     }

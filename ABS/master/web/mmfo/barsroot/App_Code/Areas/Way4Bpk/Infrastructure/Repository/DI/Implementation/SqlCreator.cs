@@ -190,7 +190,7 @@ namespace BarsWeb.Areas.Way4Bpk.Infrastructure.DI.Implementation {
         {
             return new BarsSql()
             {
-                SqlText = @"select TAG,VALUE from V_BPK_PARAM where ND = :P_ND",
+                SqlText = @"select TAG,VALUE,COMM from V_BPK_PARAM where ND = :P_ND",
                 SqlParams = new object[]
                 {
                     new OracleParameter("P_ND", OracleDbType.Long) { Value = ND }

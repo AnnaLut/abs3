@@ -72,7 +72,7 @@ begin
 
       --  Створюємо дочірню функцію Договора
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Договора',
+															  p_name     => 'Договори',
 															  p_funcname => '/barsroot/sto/contract/getcontractlist',
 															  p_rolename => 'START1' ,
 															  p_frontend => l_application_type_id
@@ -108,7 +108,7 @@ begin
 
       --  Створюємо дочірню функцію Договора, інфо по договору
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Договора, інфо по договору',
+															  p_name     => 'Договори, інфо по договору',
 															  p_funcname => '/barsroot/sto/contract/getcontractdetlist',
 															  p_rolename => 'START1' ,
 															  p_frontend => l_application_type_id
@@ -120,7 +120,7 @@ begin
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Договора на регулярні платежі (операціоніст)',
+                                                  p_name     => 'Договори на регулярні платежі (операціоніст)',
                                                   p_funcname => '/barsroot/sto/contract/index?mode=user',
                                                   p_rolename => 'START1' ,
                                                   p_frontend => l_application_type_id
@@ -138,7 +138,7 @@ begin
 
       --  Створюємо дочірню функцію Договора
                      l_function_deps  :=   abs_utils.add_func(
-															  p_name     => 'Договора',
+															  p_name     => 'Договори',
 															  p_funcname => '/barsroot/sto/contract/getcontractlist',
 															  p_rolename => 'START1' ,
 															  p_frontend => l_application_type_id

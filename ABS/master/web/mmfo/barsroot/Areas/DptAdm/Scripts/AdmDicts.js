@@ -45,6 +45,12 @@
                     },
                     {
                         type: "button",
+                        text: "Корекція дат закінчення депозиту при переносі робочих днів",
+                        imageUrl: "/barsroot/Content/images/PureFlat/16/calendar2.png",
+                        click: CorrHolyday, overflow: "never"
+                    },
+                    {
+                        type: "button",
                         text: "Експорт базових відсоткових ставок",
                         click: openExportsBaseInterestRates,
                         title: "Edit example",
@@ -113,6 +119,25 @@
         function termDepCorr() {
             modalWinTermDepCorr.center().open();
         };
+
+        function CorrHolyday() {
+            mdWinCorrHolyday.center().open();
+        }
+
+        var mdWinCorrHolyday = $("#mdWinCorrHolyday").kendoWindow({
+            width: "370",
+            modal: true,
+            visible: false,
+            actions: [ "Close" ]
+        }).data("kendoWindow");
+
+        var HolydayNewDateEnd = $("#HolydayNewDateEnd").kendoDatePicker({ format: "dd/MM/yyyy" });
+        var HolydayCurrentDateEnd = $("#HolydayCurrentDateEnd").kendoDatePicker({ format: "dd/MM/yyyy" });
+
+        $("#CorrHolydayCancel").click(function () { mdWinCorrHolyday.center().close(); });
+
+        $("#CorrHolydayOK").click(function () { CorrHolydayDpt(); });
+
 
         // При закрытии формы очищаем данные формы
         function onClose(e) {
@@ -913,6 +938,47 @@
         function onShow(e) {
             e.element.parent().css({
                 zIndex: 22222
+            });
+        }
+
+        function CorrHolydayDpt() {
+            bars.ui.loader('body', true);
+
+            var curr_date = $("#HolydayCurrentDateEnd").data("kendoDatePicker").value();
+            var new_date = $("#HolydayNewDateEnd").data("kendoDatePicker").value();
+
+            if (!curr_date) {
+                bars.ui.error({ text: "Поле <b>Поточна дата закінчення</b> - обов'язкове" });
+                return;
+            }
+
+            if (!new_date) {
+                bars.ui.error({ text: "Поле <b>Нова дата закінчення</b> - обов'язкове" });
+                return;
+            }
+
+            $.ajax({
+                url: bars.config.urlContent("/DptAdm/DptAdm/CorrectHolydayDeposit"),
+                method: "POST",
+                dataType: "json",
+                data: {
+                    correct_holyday_data: JSON.stringify({
+                        Current_Date_End: curr_date,
+                        New_Date_End: new_date,
+                        Corr_Type: $("#CorrNoAutoProlong").is(':checked') ? 1 : 0
+                    })
+                },
+                async: true,
+                success: function (data) {
+                    if(data.message)
+                        bars.ui.error({ text: data.message });
+                    else
+                        bars.ui.alert({ text: "Операція успішно почалась." });
+                },
+                complete: function () {
+                    bars.ui.loader('body', false);
+                    mdWinCorrHolyday.close();
+                }
             });
         }
     });

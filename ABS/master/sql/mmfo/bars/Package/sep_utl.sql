@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BARS."SEP_UTL" is
 --                     (C) Unity-BARS (2000-2015)
 --***************************************************************--
 
-g_header_version  constant varchar2(64)  := 'version 1.01 09/03/2017';
+g_header_version  constant varchar2(64)  := 'version 1.02 05/09/2018';
 g_header_defs     constant varchar2(512) := '';
 
 -- header_version - возвращает версию заголовка пакета
@@ -44,6 +44,17 @@ procedure unlock_by_sum_blk(p_sum number,
                             p_msg out varchar2);
 -- копирование  operw
 procedure  copy_operw ( p_ref_new operw.ref%TYPE,p_ref_old operw.ref%TYPE);
+
+procedure unlock_by_func (p_func number /*1,2,3,4*/ ,
+                                 p_sum number default 0,
+                                 p_blk number,
+                                 p_msg out varchar2,
+                                 p_moreless varchar2 default '>=',
+                                 p_mfob varchar2 default null ) ;
+
+procedure set_stp_auto(p_value number);     
+function  get_stp_auto return number;                            
+                                 
 end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS."SEP_UTL" is
@@ -55,7 +66,7 @@ CREATE OR REPLACE PACKAGE BODY BARS."SEP_UTL" is
 --
 -- constants
 --
-g_body_version    constant varchar2(64)  := 'version 1.04 14/05/2018';
+g_body_version    constant varchar2(64)  := 'version 1.05 05/09/2018';
 g_body_defs       constant varchar2(512) := '';
 
 g_modcode         constant varchar2(3)   := 'SEP';
@@ -75,6 +86,18 @@ begin
 end body_version;
 
 -------------------------------------------------------------------------------
+/*отримання значення атрибута STP_AUTO */
+function get_stp_auto return number
+  is
+  l_value number;
+begin  
+  select branch_attribute_utl.get_attribute_value(
+        p_branch_code=>'/300465/',--bars_context.current_branch_code,
+        p_attribute_code=>'STP_AUTO') into l_value
+        from dual;
+   return  l_value;    
+end;
+----
 procedure getT00_902(
                     mfoa_ VARCHAR2, -- Sender's MFOs
                     dk_ SMALLINT, -- Debet/Credit code
@@ -570,6 +593,56 @@ begin
            to_char(l_total_amount / 100, '999999990D00');
 
 end;
+
+------------------------------------------------------------
+--процедура розблокування доків СЕП по вказаним параметрам COBUMMFO-8551
+-------------------------------------------------------------
+procedure unlock_by_func (p_func number /* функція 1,2,3,4*/ ,
+                                 p_sum number default 0,
+                                 p_blk number,
+                                 p_msg out varchar2,
+                                 p_moreless varchar2 default '>=',
+                                 p_mfob varchar2 default null ) is
+  l_distinct_kv  number;
+  l_total_amount number := 0;
+  x              number := 0;
+  --
+  l_sql clob;        
+  l_c   sys_refcursor;      -- cursor variable(weak cursor). 
+  l_rec arc_rrp.rec%TYPE;   -- variable containing fetching data    
+  l_s   arc_rrp.s%TYPE;
+  h varchar2(50):='sep_utl.unlock_by_func.';
+  
+begin
+
+  ----use dictionary functions SEP_UNLOCK_FILTERS
+  select sqlfilter into l_sql from SEP_UNLOCK_FILTERS where idfilter =p_func;     
+ 
+  l_sql:=replace(l_sql,'%p_sum%',p_sum);
+  l_sql:=replace(l_sql,'%p_blk%',p_blk);
+  l_sql:=replace(l_sql,'%p_moreless%',p_moreless);
+  l_sql:=replace(l_sql,'%p_mfob%',p_mfob);       
+
+-- do unlock--------------
+ begin
+  open l_c for l_sql;
+  loop
+    fetch l_c into l_rec,l_s;
+    exit when l_c%notfound;      
+      update arc_rrp set blk = 0 ,prty=1 where rec = l_rec;
+      l_total_amount := l_total_amount+l_s;
+      x              := x + 1;      
+  end loop;
+  close l_c; 
+  p_msg := 'Розблоковано '||to_char(x)||' документів на суму '||to_char(l_total_amount / 100, '999999990D00');             
+ exception
+  when others then 
+    raise_application_error(-20000, 'Помилка у виразі SQL фільтра', false); 
+ end;
+-----------------
+                  
+end unlock_by_func;
+
 ---------
 procedure copy_operw(p_ref_new operw.ref%TYPE, p_ref_old operw.ref%TYPE) is
 l_mfoa_new  oper.mfoa%TYPE;
@@ -615,6 +688,32 @@ end;
     end;
   end loop;
 end;
+   
 
+/*встановлення значення атрибута STP_AUTO*/
+procedure set_stp_auto(p_value number)
+  is
+begin
+     if get_stp_auto<>p_value then
+       branch_attribute_utl.set_attribute_value(
+        p_branch_code=>'/300465/',--bars_context.current_branch_code,
+        p_attribute_code=>'STP_AUTO' ,
+        p_attribute_value =>p_value);
+        bars_audit.info('sep_utl.set_stp_auto:'||p_value);
+     end if;   
+end;  
+  
+  
 end;
 /
+ show err;
+ 
+PROMPT *** Create  grants  SEP_UTL ***
+grant EXECUTE                                                                on SEP_UTL         to BARS_ACCESS_DEFROLE;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/package/sep_utl.sql =========*** End *** ===
+ PROMPT ===================================================================================== 
+ 

@@ -1,0 +1,195 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    @* View для Розрахунок сум реструктуризованої заборгованності! *@
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Розрахунок сум реструктуризованої заборгованності</h2>
+</div>
+
+<script>
+    function DownloadAmountOfRestructuredDept() {
+        var url = '/bills/bills/downloadamountofrestrdebtform';
+        popUp(url, 'Завантаження файлу', '320px', '300px');       
+    }
+
+    function scanDialog() {
+        var id = getSelectedId();
+        if (id === 'undefined') {
+            bars.ui.alert({
+                text: 'Жодної строки не було вибрано',
+                title: 'Увага!'
+            });
+            return;
+        }
+        var width = +$(window).width() - 30;
+        var height = +$(window).height() - 30;
+        var DialogOptions = 'dialogHeight:' + height + 'px; dialogWidth:' + width + 'px; scroll: yes';
+        var DialogObject = { windowName: "DialogBills" };
+        $("#windowContainer").append("<div id='createWindow'></div>");
+        var result = window.showModalDialog('/barsroot/bills/scan_docs.aspx?exp_id=0', DialogObject, DialogOptions);
+        $(".k-overlay").remove();
+        if (result != null) {
+            if (result['SaveBtnEnabled'] == true)
+                SendPost('/barsroot/api/bills/bills/saveamountofrestrdebt/' + id, null, defaultResponseFunc);
+        }
+    }
+
+    function SendAmountOfRestructuredDept() {
+        var id = getSelectedId();
+        if (id === 'undefined') {
+            bars.ui.alert({
+                text: 'Жодної строки не було вибрано',
+                title: 'Увага!'
+            });
+            return;
+        }
+        SendPost('/barsroot/api/bills/bills/SendAmountOfRestrDebt/' + id, null, defaultResponseFunc);
+    }
+
+    function DownloadAmountOfRestructuredDeptScaned() {
+        var id = getSelectedId();
+        if (id === 'undefined') {
+            bars.ui.alert({
+                text: 'Жодної строки не було вибрано',
+                title: 'Увага!'
+            });
+            return;
+        }
+
+        var grid = $('#amountofrestrdebt').data('kendoGrid');
+        var rows = grid.select();
+        var scan_name = rows[0].childNodes[5].innerHTML;
+        if (scan_name === 'undefined' || scan_name === null || scan_name === '') {
+            bars.ui.alert({
+                text: 'Відсканований файл відсутній',
+                title: 'Увага!'
+            });
+            return;
+        }
+
+        var url = '/barsroot/bills/bills/GetScanOfAmountOfRestrDebt/' + id;
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
+
+    function defaultResponseFunc(result) {
+         if (result.status === 1) {
+             bars.ui.alert({
+                 text: 'Виконано успішно!'
+             });
+         }
+         else {
+             bars.ui.error({
+                 text: result.err
+             });
+         }
+         $(".k-overlay").remove();
+         $('#amountofrestrdebt').data('kendoGrid').dataSource.read();
+         $('#amountofrestrdebt').data('kendoGrid').refresh();
+    }
+
+    function SendPost(url, data, successFunc) {
+        $("<div class='k-overlay'></div>").appendTo($(document.body));
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset='utf-8'",
+            url: url,
+            data: data,
+            success: successFunc,
+            error: function (result) {
+                $(".k-overlay").remove();
+            }
+        });
+    }
+
+    function getSelectedId() {
+        var grid = $('#amountofrestrdebt').data('kendoGrid');
+        var rows = grid.select();
+        if (rows.length > 0)
+            return rows[0].childNodes[0].innerHTML;
+        else
+            return 'undefined';
+    }
+
+    function popUp(url, title, height, width) {
+        $("#windowContainer").append("<div id='createWindow'></div>");
+        if (width === undefined)
+            width = "800px";
+        if (height === undefined)
+            height = '450px';
+        var createWindow = $("#createWindow").kendoWindow({
+            width: width,
+            height: height,
+            title: title,
+            visible: false,
+            actions: ["Close"],
+            iframe: true,
+            modal: true,
+            resizable: false,
+            deactivate: function () {
+                this.destroy();
+                $('#amountofrestrdebt').data('kendoGrid').dataSource.read();
+                $('#amountofrestrdebt').data('kendoGrid').refresh();
+            },
+            content: bars.config.urlContent(url)
+        }).data("kendoWindow");
+
+        createWindow.center().open();
+    }
+</script>
+
+<div id="amount-of-restructured-debt">
+    @(Html.Kendo().Grid<AmountOfRestrDebt>()
+            .Name("amountofrestrdebt")
+            .Columns(col =>
+            {
+                col.Bound(x => x.REQUEST_ID).Hidden(true);
+                col.Bound(x => x.REQUEST_NAME).Title("Ім'я файлу").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                col.Bound(x => x.DATE_FROM).Format("{0:dd.MM.yyyy}").Title("Дата з").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                col.Bound(x => x.DATE_TO).Format("{0:dd.MM.yyyy}").Title("Дата по").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                col.Bound(x => x.REQUEST_DATE).Format("{0:dd.MM.yyyy}").Title("Дата отримання файлу").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                col.Bound(x => x.SCAN_NAME).Title("Ім'я файлу сканкопії").Format("{0:dd.MM.yyyy}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                col.Bound(x => x.SCAN_DATE).Title("Дата відправки").Format("{0:dd.MM.yyyy}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                col.Bound(x => x.STATUS).Title("Статус").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                col.Bound(x => x).Title("").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            })
+            .Filterable()
+            .ColumnMenu(x => x.Columns(false))
+            .Resizable(x => x.Columns(true))
+            .Reorderable(x => x.Columns(true))
+            .Sortable()
+            .Scrollable()
+            .Selectable()
+            .Pageable(page => page
+                     .Refresh(true)
+                     .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                     .ButtonCount(10))
+            .HtmlAttributes(new { style = "min-height: 50px; height: 100%;" })
+            .ToolBar(x =>
+            {
+               x.Template(@<text>
+    <div class="col-xs-12 text-left">
+        <button class="k-button" title="Завантажити файл - Розрахунок сум руструктуризованої заборгованності (звіт з ДКСУ)" onclick="DownloadAmountOfRestructuredDept(); return false; this.blur();">
+            <span style="color: dodgerblue" class="glyphicon glyphicon-circle-arrow-down"></span>
+        </button>
+        <button class="k-button" title="Переглянути відсканований файл - Розрахунок сум руструктуризованої заборгованності" onclick="DownloadAmountOfRestructuredDeptScaned(); return false; this.blur();">
+            <span style="color: brown" class="glyphicon glyphicon-circle-arrow-down"></span>
+        </button>
+        <button class="k-button" id="scan-doc" title="Відсканувати файл" onclick="scanDialog(); this.blur(); return false;">
+            <span class="k-icon k-i-pdf" style="background-position-x: -292px; background-position-y: -101px;"></span>
+        </button>
+        <button class="k-button" title="Відправити звіт до ДКСУ" onclick="SendAmountOfRestructuredDept(); return false; this.blur();">
+            <span style="color: darkgoldenrod" class="glyphicon glyphicon-circle-arrow-up"></span>
+        </button>
+    </div>
+               </text>);
+            })
+            .DataSource(x => x.Ajax()
+                .Read(read => read.Action("GetAmountOfRestrDebt", "Bills"))
+            ))
+</div>
+<div id="windowContainer"></div>

@@ -1,0 +1,130 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "EDeclarations";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/EDeclarations/Scripts/KendoCommon.js?v1.0"></script>
+<script src="~/Areas/EDeclarations/Scripts/EDeclarations/Create.js?v1.1"></script>
+<link rel="stylesheet" href="~/Areas/EDeclarations/Css/EDeclarations/Main.css" />
+<link href="~/Areas/EDeclarations/Css/EDeclarations/Create.css" rel="stylesheet" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+
+<form id="eDeclFrom" method="post" action="/barsroot/api/edeclarations/edeclarations/getclient">
+    <div class="form-horizontal container-fluid">
+        <div class="form-group">
+            <label class="control-label col-md-3 col-xs-3"></label>
+            <input type="checkbox" class="form-check-input" id="CheckHaveInn" checked style="margin-left: 15px;">
+            <label class="form-check-label control-label" for="CheckHaveInn"><b>Клієнт має ІПН</b></label>
+        </div>
+        <div style="height:217px">
+            <div class="form-group" id="form-for-inn">
+                <label for="Inn" class="control-label col-md-2 col-xs-3 required">
+                    <b>ІПН</b>
+                </label>
+                <div class="col-md-3 col-xs-6">
+                    <input type="text" id="Inn" name="Inn"
+                           pattern="\d{10}"
+                           placeholder="Введіть ІПН (10 цифр)"
+                           validationMessage="Введіть ІПН" />
+                </div>
+                <span class="k-invalid-msg" data-for="Inn"></span>
+            </div>
+            <div class="form-group" id="form-for-dateOfBirth" style="display:none">
+                <label for="DateOfBirth" class="control-label col-md-2 col-xs-3 required">
+                    <b>Дата Народження</b>
+                </label>
+                <div class="col-md-3 col-xs-6">
+                    <input type="text" id="DateOfBirth" name="DateOfBirth"
+                           placeholder="дд.мм.рррр"
+                           data-max-msg="Enter date before '3/16/2018'"
+                           pattern="^(0[1-9]|[12][0-9]|3[01])[-/.](0[1-9]|1[012])[-/.](19|20)\d\d$"
+                           validationMessage="Введіть дату народження" disabled />
+                </div>
+                <span class="k-invalid-msg" data-for="date"></span>
+            </div>
+            @*<div class="form-group">
+                    <label for="Fullname" class="control-label col-md-2 col-xs-3 required">
+                        <b>ПІБ</b>
+                    </label>
+                    <div class="col-md-3 col-xs-6">
+                        <input type="text" id="Fullname" name="Fullname"
+                               placeholder="Прізвище Ім'я По-батькові"
+                               required validationMessage="Введіть П.І.Б." disabled
+                               class="k-textbox" />
+                    </div>
+                    <span class="k-invalid-msg" data-for="Fullname"></span>
+                </div>*@
+            <div class="form-group" id="form-for-docType" style="display:none">
+                <label for="PersonDocType" class="control-label col-md-2 col-xs-3 required">
+                    <b>Тип документу особи</b>
+                </label>
+                <div class="col-md-3 col-xs-6">
+                    <input type="search" id="PersonDocType" name="PersonDocType"
+                           validationMessage="Оберіть тип документу" disabled />
+                </div>
+                <span class="k-invalid-msg" data-for="PersonDocType"></span>
+            </div>
+            <div class="form-group" id="form-for-serial" style="display:none">
+                <label for="PersonDocSerial" class="control-label col-md-2 col-xs-3 required">
+                    <b>Серія документу</b>
+                </label>
+                <div class="col-md-3 col-xs-6">
+                    <input type="text" id="PersonDocSerial" name="PersonDocSerial"
+                           placeholder="Серія документу"
+                           validationMessage="Введіть серію документу" disabled />
+                </div>
+                <span class="k-invalid-msg" data-for="PersonDocSerial"></span>
+            </div>
+            <div class="form-group" id="form-for-docNumber" style="display:none">
+                <label for="PersonDocNumber" class="control-label col-md-2 col-xs-3 required">
+                    <b>Номер документу</b>
+                </label>
+                <div class="col-md-3 col-xs-6">
+                    <input type="text" id="PersonDocNumber" name="PersonDocNumber"
+                           placeholder="Номер документу"
+                           required validationMessage="Введіть номер документу" disabled />
+                </div>
+                <span class="k-invalid-msg" data-for="PersonDocNumber"></span>
+            </div>
+            <div class="form-group">
+                <label for="DateFrom" class="control-label col-md-2 col-xs-3 required">
+                    <b>Період декларації</b>
+                </label>
+                <div class="col-md-3 col-xs-6">
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6">
+                            <input type="text" id="DateFrom" name="DateFrom"
+                                   placeholder="дд.мм.рррр"
+                                   pattern="^(0[1-9]|[12][0-9]|3[01])[-/.](0[1-9]|1[012])[-/.](19|20)\d\d$"
+                                   validationMessage="Введіть дату початку періоду декларації" />
+                            <span class="k-invalid-msg" data-for="DateFrom"></span>
+                        </div>
+                        <div class="col-md-6  col-xs-6">
+                            <input type="text" id="DateTo" name="DateTo"
+                                   placeholder="дд.мм.рррр"
+                                   pattern="^(0[1-9]|[12][0-9]|3[01])[-/.](0[1-9]|1[012])[-/.](19|20)\d\d$"
+                                   validationMessage="Введіть дату кінця періоду декларації" />
+                            <span class="k-invalid-msg" data-for="DateTo"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group fixed-bottom">
+        <div class="col-md-push-2 col-md-3">
+            <br />
+            <button class="k-button k-primary form-control" type="submit">Сформувати декларацію</button>
+        </div>
+    </div>
+    <div class="form-group">
+        <span class="status"></span>
+    </div>
+    <div class="modal"><!-- Place at bottom of page --></div>
+</form>

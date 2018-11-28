@@ -135,20 +135,21 @@ begin
   bars_metabase.add_column(l_tabid, 17, 'PR', 'N', '% ставка', '', null, 9, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'RNK', 'N', 'Реєстр № ~позичальника', '', null, 3, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 21, 'S', 'N', 'Сума', '', null, 11, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 23, 'S080', 'C', 'Кат.риз.', '', null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 25, 'SROK', 'N', 'Термiн ~в мiсяцях', '', null, 29, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 26, 'DAY', 'N', 'День~ оплати ', '', null, 27, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 29, 'NAMK', 'C', 'Найменування ~ Клiєнта', '', null, 4, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 30, 'SOS', 'C', 'Стан~ договору', '', null, 0, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 31, 'DSDATE', 'D', 'Дата начала~ договора', '', null, 13, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 32, 'OBS', 'N', 'Обслуг~ боргу', '', null, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 33, 'OKPO', 'C', 'Код платника ', '', null, 30, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 34, 'SDOG', 'N', 'Початкова~ сума', '', null, 10, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 35, 'GPK', 'C', 'Графiк ~погашення', '', null, 5, 1, 0, 0, 0, '', '', 0, 1, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 36, 'NLS_SS', 'C', 'Осн.рах.', '', null, 7, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 37, 'FIN', 'N', 'Ф_н стан~позич*', '', null, 16, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 38, 'MFOKRED', 'N', 'MFO', '', 6, 32, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 39, 'ACCKRED', 'N', 'Рахунок для~ видач_*', '', 14, 33, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 40, 'CLASS_INT', 'C', 'Клас за ~інтегр.пок', '', null, 15, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 41, 'CLASS_COR', 'C', 'Скориг.~клас', '', null, 16, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 42, 'VKR', 'C', 'ВКР', '', null, 17, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 43, 'PD', 'N', 'PD', '', null, 18, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CC_AIM');
@@ -193,15 +194,6 @@ begin
     bars_metabase.add_extrnval(l_tabid, 30, l_newtabid, l_newcolid, '', '', '', '');
   else
     dbms_output.put_line('В БМД не описана таблица CC_SOS для описания сложного поля таблицы CC_W11.');
-  end if;
-
-  -- добавляем описание сложного поля
-  l_newtabid := bars_metabase.get_tabid('STAN_FIN');
-  l_newcolid := bars_metabase.get_colid(l_newtabid, 'FIN');
-  if (l_newtabid is not null and l_newcolid is not null) then
-    bars_metabase.add_extrnval(l_tabid, 37, l_newtabid, l_newcolid, '', '', '', '');
-  else
-    dbms_output.put_line('В БМД не описана таблица STAN_FIN для описания сложного поля таблицы CC_W11.');
   end if;
 
   -- добавляем описание вложенных таблиц

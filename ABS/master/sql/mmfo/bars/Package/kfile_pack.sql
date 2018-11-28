@@ -547,7 +547,7 @@ begin
                                                         nvl(s.ostf,0) - nvl(s.dos,0) + nvl(s.kos,0) as OST,
                                                         max(s.fdat) over (partition by s.acc) as m_fdat
                                                         FROM saldoa s where s.fdat  <= trunc(p_date)) q
-                                                        where m_fdat = fdat and q.acc = a.acc),0) as ost,
+                                                        where q.m_fdat = q.fdat and q.acc = a.acc),0) as ost,
                      (SELECT s.TYPNLS
                       FROM SPECPARAM_INT s
                       WHERE a.ACC = s.ACC) typnls, cw.value as corp_kod,
@@ -956,8 +956,18 @@ END lic26_kfile;
                     p_external_id      ob_corporation.external_id%type) is
      l_corporation_id  ob_corporation.id%type;
      l_corporation_row ob_corporation%rowtype;
+     l_base_extid      number;
      res               number;
  begin
+ 
+    if p_parent_id is null then 
+    l_base_extid:= -1;
+    else
+    select to_number(t.base_extid)
+      into l_base_extid
+      from v_org_corporations t
+     where t.id = p_parent_id;
+    end if;
  
      if p_parent_id is null then
          --корневая корпорация
@@ -980,10 +990,7 @@ END lic26_kfile;
                into res
                from v_org_corporations t
               where t.external_id = p_external_id
-                and t.base_extid =
-                    (select t.base_extid
-                       from v_org_corporations t
-                      where t.id = p_parent_id); --находим ид корневой корпорации
+                and t.base_extid = l_base_extid; --находим ид корневой корпорации
              raise_application_error(-20300,
                                      'Підрозділ з таким ідентифікатором вже існує');
          exception
@@ -991,13 +998,11 @@ END lic26_kfile;
                  null;
          end;
      end if;
- 
-     select s_ob_corporation.nextval into l_corporation_id from dual;
- 
+  
      insert into bars.ob_corporation t1
-         (t1.id)
+         (t1.id, t1.base_corp)
      values
-         (l_corporation_id)
+         (s_ob_corporation.nextval, l_base_extid)
      returning id into l_corporation_row.id;
  
      if (p_corporation_name is not null) then

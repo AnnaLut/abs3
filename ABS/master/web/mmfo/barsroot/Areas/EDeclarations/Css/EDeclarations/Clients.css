@@ -1,0 +1,19 @@
+﻿input[type="radio"], input[type="checkbox"] {
+    margin: 25px 10px 0;
+}
+
+.form-check {
+    margin: 15px 15px 24px 0;
+}
+
+.info {
+    margin-left: 37px;
+}
+
+.infob {
+    margin-bottom: 10px;
+}
+
+.center {
+    align-items: center;
+}

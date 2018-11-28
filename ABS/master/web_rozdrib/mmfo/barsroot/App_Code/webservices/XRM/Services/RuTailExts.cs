@@ -79,7 +79,9 @@ namespace Bars.WebServices.XRM.Services
         private static decimal CutTail(object val)
         {
             if (val == null) return 0;
-            return Math.Truncate((decimal)val / 100);
+
+            decimal v = Convert.ToDecimal(val);
+            return Math.Truncate(v / 100);
         }
 
         public static decimal CutRuTail(this decimal? val)

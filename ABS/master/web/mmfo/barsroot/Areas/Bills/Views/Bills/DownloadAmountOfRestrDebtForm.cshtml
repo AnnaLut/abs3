@@ -1,0 +1,33 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    @* View для завантаження Розрахунку сум реструктуризованої заборгованності! *@
+}
+<style>
+    body{
+        overflow: hidden;
+    }
+    #date-label b{
+        margin-left: -15px;
+    }
+</style>
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<form action="DownloadAmountOfRestrDebt" method="post" target="_blank">
+    <div class="col-md-12 col-xs-12">
+        <label for="dateFrom" id="date-label" class="control-label col-md-11 col-xs-11 required">
+            <b>Дата формування</b>
+        </label>
+        @(Html.Kendo().DatePicker()
+            .Name("dateFrom")
+            .Value(DateTime.Now)
+            .Format("dd.MM.yyyy")
+            .HtmlAttributes(new { style = "width: 90%", title = "Дата", type = "date" })
+        )
+        <br /><br />
+    </div>
+    <br /><br />
+    <div class="col-md-11 col-xs-11">
+        <button class="k-button k-primary form-control" type="submit">Завантажити файл</button>
+    </div>
+</form>

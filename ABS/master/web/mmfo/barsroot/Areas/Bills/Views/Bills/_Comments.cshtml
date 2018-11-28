@@ -1,0 +1,55 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model List<Comment>
+@* View для комментариев! *@
+<style>
+    #add-comment-btn {
+        padding: 4px;
+        width: 200px;
+        margin-left: 20px;
+    }
+</style>
+@{
+    <div class="col-lg-8 col-sm-offset-4" style="margin-bottom: 30px;">
+        <div class="form-group">
+            <input type="text" id="txt" class="form-control" style="width: 50%; height: 30px; float: left; padding-left: 5px; padding-right: 5px;" />
+            <a class="btn btn-success col-xs-4" id="add-comment-btn" onclick="addComment()">Додати коментар</a>
+        </div>
+    </div>
+    String username = (String)ViewBag.UserName;
+    foreach (Comment comment in Model)
+    {
+        if (comment.Author.ToLower() != username.ToLower())
+        {
+            <div class="col-xs-12">
+                <div class="col-xs-10 text-left">
+                    <h4><strong>@comment.Author</strong></h4>
+                    <pre class="highlight">@comment.Text</pre>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-offset-2 col-xs-10 text-right">
+                <h4 class="text-success"><strong>@comment.Author</strong></h4>
+                <pre class="highlight">@comment.Text</pre>
+            </div>
+        }
+    }
+    <hr />
+    String err = (String)ViewBag.Error;
+    if (Model.Count() == 0 && String.IsNullOrEmpty(err))
+    {
+        <div class="col-sm-offset-1 col-xs-11 text-center" style="margin-bottom: 50px;">
+            <span class="highlight">Жодних коментарів не було створено</span>
+        </div>
+    }
+
+    if (!String.IsNullOrEmpty(err))
+    {
+        <br />
+        <div class="col-xs-12 text-center">
+            <pre class="highlight text-error">@err</pre>
+        </div>
+    }
+}

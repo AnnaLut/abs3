@@ -568,7 +568,7 @@ IS
       dbms_lob.append(l_result, l_sjson4);        dbms_lob.append(l_result, ',');
       end if;
       dbms_lob.append(l_result, l_sjson5);        dbms_lob.append(l_result, ',');
-      dbms_lob.append(l_result, l_sjson6);        dbms_lob.append(l_result, ',');
+      --dbms_lob.append(l_result, l_sjson6);        dbms_lob.append(l_result, ',');
       dbms_lob.append(l_result, l_sjson7);        dbms_lob.append(l_result, ',');
       dbms_lob.append(l_result, l_sjson8);        dbms_lob.append(l_result, ',');
       dbms_lob.append(l_result, l_sjson9);        dbms_lob.append(l_result, ',');

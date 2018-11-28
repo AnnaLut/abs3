@@ -1,0 +1,27 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "EDeclarations";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/EDeclarations/Scripts/KendoCommon.js?v1.0"></script>
+<script src="~/Areas/EDeclarations/Scripts/EDeclarations/Main.js?v1.1"></script>
+<link rel="stylesheet" href="~/Areas/EDeclarations/Css/EDeclarations/Main.css" />
+
+<div class="page-header">
+    <h1 id="title"></h1>
+</div>
+<div id="search-area"></div>
+<div id="gridMain"></div>
+<div class="search-main"></div>
+<div id="windowContainer"></div>
+<script id="grid_toolbar" type="text/x-kendo-template">
+    <button class="k-button" id="addDeclaration">Створити</button>
+    <button class="k-button" id="search-button" onclick="SearchDeclaration(); return false;">
+        <span class="k-icon k-i-search"></span>
+    </button>
+    <input class="k-textbox" type="text" id="search-edecl" placeholder="ПОШУК ЗА НОМЕРОМ" />
+    <span class="control-label" id="search-label">
+        <b>Пошук за номером декларації</b>
+    </span>
+</script>

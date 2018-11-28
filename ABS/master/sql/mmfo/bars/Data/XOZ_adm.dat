@@ -1,0 +1,134 @@
+prompt -----------1. Створення гл.пар TRZ_XOZ = 3739200703017
+
+begin branch_attribute_utl.add_new_attribute_with_set ( 'TRZ_XOZ ',    'XOZ:рах.в ЦА для проведення відшкодувань по запитам РУ',   'C',   null,null,  '/','3739200703017'  );
+end;
+/
+
+commit;
+/
+
+prompt -------------------------2. зміна назви довідників
+
+update operlist set name = 'XOZ:1.Продукти ДЗ (для редагування)' where codeoper = 3961  ;
+update operlist set name = 'XOZ:2.Моделi закриття ДЗ (для редагування)' where codeoper = 2176  ;
+commit;
+
+prompt ------------------------3. Вилучити з Арму $RM_XOZD - РМ
+
+begin  DEL_FROM_ROLE  
+     ( p_grantee_type_id  => resource_utl.get_resource_type_id('ARM_WEB') ,  
+       p_grantee_id       => user_menu_utl.get_arm_id(  '$RM_XOZD' ), 
+       p_resource_type_id => resource_utl.get_resource_type_id('FUNCTION_WEB'), 
+       p_resource_id      => 3961 ) ;
+end;
+/
+begin  DEL_FROM_ROLE  
+     ( p_grantee_type_id  => resource_utl.get_resource_type_id('ARM_WEB') ,  
+       p_grantee_id       => user_menu_utl.get_arm_id(  '$RM_XOZD' ), 
+       p_resource_type_id => resource_utl.get_resource_type_id('FUNCTION_WEB'), 
+       p_resource_id      => 2176 ) ;
+
+end;
+/
+begin DEL_FROM_ROLE  
+     ( p_grantee_type_id  => resource_utl.get_resource_type_id('ARM_WEB') ,  
+       p_grantee_id       => user_menu_utl.get_arm_id(  '$RM_XOZD' ), 
+       p_resource_type_id => resource_utl.get_resource_type_id('FUNCTION_WEB'), 
+       p_resource_id      => 2177 ) ;
+
+end;
+/
+commit;
+
+prompt ------------------------4. Вилучити з operapp
+delete from operapp  where codeoper in ( 3961,2176,2177) and codeapp <> '$RM_METO'  ;
+update applist set name = 'АРМ-РУ ДЗ  за госп. діяльністю банку' where codeapp ='$RM_XOZD';
+commit;
+/
+
+prompt ------------------------5. Змінти виклик codeoper = 3965  -----funcname like  '%sPar=V_XOZ_RU_CA[NSIFUNCTION]%TZAPROS%';
+update operlist 
+  set funcname = '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||   chr(38) ||
+                 'sPar=V_XOZ_RU_CA'   || 
+                 '[NSIFUNCTION]'   ||
+                 '[CONDITIONS=>V_XOZ_RU_CA.REC in (1,2)]'||
+                 '[showDialogWindow=>false]'    
+  where codeoper = 3965 ;  
+
+commit;
+/
+
+prompt ------------------------6. Добваити в  $RM_XOZD
+
+declare 
+  Arm_MMFO varchar2(10)        := '$RM_XOZD'; 
+  fro_ operlist.FRONTEND%type  := 1     ;  
+  id_  operlist.CODEOPER%type  ;  
+  nam_ operlist.NAME%type      ;
+  fun_ operlist.FUNCNAME%type  ;
+  lik_ operlist.FUNCNAME%type  ;
+
+ procedure ADD_fun ( p_lik varchar2) is
+ begin   ------------ создать.обновить функцию
+   begin select codeoper into id_ from operlist           where funcname  like p_lik  AND FRONTEND = fro_ ;
+         update operlist set  name= nam_, funcname = fun_ where codeoper = id_;
+   exception when no_data_found then  id_ := OPERLISTNEXTID ;
+         Insert into OPERLIST (CODEOPER,NAME,DLGNAME,FUNCNAME,RUNABLE,ROLENAME,FRONTEND) Values (id_,nam_,'N/A', fun_,1,'BARS_ACCESS_DEFROLE', fro_ );
+   end ;
+
+   resource_utl.set_resource_access_mode ( resource_utl.get_resource_type_id('ARM_WEB') ,      user_menu_utl.get_arm_id( Arm_MMFO ), 
+                                           resource_utl.get_resource_type_id('FUNCTION_WEB'), id_,  1,  true ) ; 
+ end add_fun ;
+ -------------
+BEGIN 
+  nam_  := 'XOZ:1.Продукти ДЗ (перегляд)';  
+  lik_ := '%accessCode=1_sPar=XOZ_OB22_CL[showDialogWindow=>false]%' ;
+  fun_  := '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=XOZ_OB22_CL[showDialogWindow=>false]';
+  ADD_fun  (lik_) ;
+ --------------
+  nam_  := 'XOZ:2.Моделi закриття ДЗ (перегляд)';  
+  lik_ := '%accessCode=1_sPar=XOZ_OB22[showDialogWindow=>false]%';
+  fun_  := '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=XOZ_OB22[showDialogWindow=>false]';
+  ADD_fun  (lik_) ;
+end;
+/
+commit;
+
+
+prompt ------------------------7. Новий Арм $RM_XOZC
+
+begin 
+    Insert into APPLIST   (CODEAPP, NAME, FRONTEND) Values   ('$RM_XOZC', 'АРМ-ЦА ДЗ за госп. діяльністю банку', 1 );
+    for k in (select * from operapp where codeapp ='$RM_XOZD')
+    loop
+       resource_utl.set_resource_access_mode ( resource_utl.get_resource_type_id('ARM_WEB') ,      
+                                               user_menu_utl.get_arm_id( '$RM_XOZC'), 
+                                               resource_utl.get_resource_type_id('FUNCTION_WEB'), 
+                                               k.codeoper,  1,  true ) ; 
+    end loop;
+    commit;
+exception when others then   if SQLCODE = -00001 then null;   else raise; end if; -- ORA-00001: unique constraint (BARS.PK_APPLIST) violated
+end;
+/
+
+COMMIT;
+
+prompt ------------------------8. Вилучити з  $RM_XOZD функ 3965
+begin DEL_FROM_ROLE  
+     ( p_grantee_type_id  => resource_utl.get_resource_type_id('ARM_WEB') ,  
+       p_grantee_id       => user_menu_utl.get_arm_id(  '$RM_XOZD' ), 
+       p_resource_type_id => resource_utl.get_resource_type_id('FUNCTION_WEB'), 
+       p_resource_id      => 3965  ) ;
+end;
+/
+
+commit;
+
+prompt ------------------------9.Умовна віза
+
+begin Insert into CHKLIST_TTS   (TT, IDCHK, PRIORITY, SQLVAL) Values   ('MNK', 2, 2, 'NLSA=''3739200703017''');
+exception when others then   if SQLCODE = -00001 then null;   else raise; end if; -- ORA-00001: unique constraint (BARS.PK_APPLIST) violated
+end;
+/
+
+COMMIT;

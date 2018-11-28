@@ -50,7 +50,9 @@ CREATE OR REPLACE PACKAGE PKG_SW_COMPARE IS
                                 p_ddate_oper    in SW_COMPARE.DDATE_OPER%type,
                                 p_prn_file      in SW_COMPARE.PRN_FILE_OWN%type,
                                 p_kf            in  SW_COMPARE.KF%type,
-                                p_comments      in SW_COMPARE.COMMENTS%type);
+                                p_comments      in SW_COMPARE.COMMENTS%type,
+                                p_cause_err_id  in SW_CAUSE_ERR.ID%type,
+                                p_id_c          in SW_COMPARE.ID%type);
  -- удаление квитования
   procedure  del_compare_data  (p_id           in SW_COMPARE.ID%type);
 
@@ -1450,6 +1452,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                        p_prn_file_import in SW_COMPARE.PRN_FILE_IMPORT%type,
                        p_kf            in SW_COMPARE.KF%type,
                        p_COMMENTS      in SW_COMPARE.COMMENTS%type,
+                       p_id_c          in SW_COMPARE.ID%type,
                        p_state         out number
                        )
   is
@@ -1457,28 +1460,38 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
   title        varchar2(100) := 'pkg_SW_COMPARE.set_match. ';
   begin
     bars_audit.info(title);
-    savepoint DO_O;
-    insert into SW_COMPARE(ID,DDATE_OPER,KOD_NBU,DDATE,REF, USERID_REF,KF,IS_RESOLVE,CAUSE_ERR,PRN_FILE_OWN,PRN_FILE_IMPORT,COMMENTS)
-                    values(s_sw_compare.nextval,p_ddate_oper,p_kod_nbu, sysdate,null,null,p_kf,p_resolve,p_cause, p_prn_file_own,p_prn_file_import,p_COMMENTS)
-    returning id into l_id;
+    
+    if p_id_c is null or p_id_c = -1 then  --обычно квитование, либо фиктивное несквитованных
+    
+        savepoint DO_O;
+        insert into SW_COMPARE(ID,DDATE_OPER,KOD_NBU,DDATE,REF, USERID_REF,KF,IS_RESOLVE,CAUSE_ERR,PRN_FILE_OWN,PRN_FILE_IMPORT,COMMENTS)
+                        values(s_sw_compare.nextval,p_ddate_oper,p_kod_nbu, sysdate,null,null,p_kf,p_resolve,p_cause, p_prn_file_own,p_prn_file_import,p_COMMENTS)
+        returning id into l_id;
 
-    update SW_OWN O
-       set o.compare_id = l_id
-     where o.ref = p_ref
-       and o.tt  = p_tt
-       and o.kod_nbu = p_kod_nbu
-       and o.compare_id = 0;
-    if ( sql%rowcount = 0 ) and p_type=1  then rollback to DO_O; end if;  --дубляж, его не квитуем
+        update SW_OWN O
+           set o.compare_id = l_id
+         where o.ref = p_ref
+           and o.tt  = p_tt
+           and o.kod_nbu = p_kod_nbu
+           and o.compare_id = 0;
+        if ( sql%rowcount = 0 ) and p_type=1  then rollback to DO_O; end if;  --дубляж, его не квитуем
 
-    update SW_IMPORT I
-       set I.COMPARE_ID = l_id
-     where I.TRANSACTIONID = p_transactionid
-       and I.OPERATION     = p_operation
-       and i.systemcode in (select ss.systemcode from SW_SYSTEM ss where ss.kod_nbu = p_kod_nbu)
-       and I.compare_id = 0;
-   if ( sql%rowcount = 0 ) and p_type=1   then rollback to DO_O; end if;  --дубляж, его не квитуем
-   p_state:=1;    
-
+        update SW_IMPORT I
+           set I.COMPARE_ID = l_id
+         where I.TRANSACTIONID = p_transactionid
+           and I.OPERATION     = p_operation
+           and i.systemcode in (select ss.systemcode from SW_SYSTEM ss where ss.kod_nbu = p_kod_nbu)
+           and I.compare_id = 0;
+       if ( sql%rowcount = 0 ) and p_type=1   then rollback to DO_O; end if;  --дубляж, его не квитуем
+       p_state:=1;
+   else --фиктивное квитование сквитованых ранее с ошибками 
+     update SW_COMPARE s
+        set s.is_resolve = 5,
+            s.comments   = p_COMMENTS
+     where s.id = p_id_c;   
+   end if;
+  exception when others then
+    raise_application_error(-20001,'Помилка квитування '||SQLERRM);
   end;
 
   -- автоматическое квитование по transactionid
@@ -1552,8 +1565,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                 and O.TT      = TT.TT
                 and I.OPERATION = TT.ID
                 and (o.kod_nbu = p_kod_nbu or p_kod_nbu is null)
-                ) t order by t.n) 
-            
+                ) t order by t.n)
+
   loop
     l_cause :=0;
     l_resolve:=0;
@@ -1590,17 +1603,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
               cur.prn_file_import,
               cur.kf,
               null,
+              null,
               l_state);
-   if  l_state = 1 then          
+   if  l_state = 1 then
   l_count:=l_count+1;
       l_state:=0;
-   end if;   
+   end if;
   end loop;
- 
+
   p_message:='Успішно зквитовано ' ||l_count||' операцій.';
   end;
 
-  -- ручное квитование
+  -- фіктивна квитовка
   procedure compare_data_hand  (p_kod_nbu       in SW_COMPARE.KOD_NBU%type ,
                                 p_ref           in SW_OWN.REF%type,
                                 p_tt            in SW_OWN.TT%type,
@@ -1608,8 +1622,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
                                 p_operation     in SW_IMPORT.operation%type,
                                 p_ddate_oper    in SW_COMPARE.DDATE_OPER%type,
                                 p_prn_file      in SW_COMPARE.PRN_FILE_OWN%type,
-                                p_kf            in  SW_COMPARE.KF%type,
-                                p_comments      in SW_COMPARE.COMMENTS%type)
+                                p_kf            in SW_COMPARE.KF%type,
+                                p_comments      in SW_COMPARE.COMMENTS%type,
+                                p_cause_err_id  in SW_CAUSE_ERR.ID%type,
+                                p_id_c          in SW_COMPARE.ID%type)
   is
     title        varchar2(100) := 'pkg_SW_COMPARE.compare_data_hand. ';
     l_state      number(1):=0;
@@ -1618,7 +1634,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
     set_match(2,
               p_kod_nbu,
               5,
-              case when p_ref is null then 1002 else 1001 end,
+              --case when p_ref is null then 1002 else 1001 end,
+              p_cause_err_id,
               p_ref,
               p_tt,
               p_transactionid,
@@ -1628,6 +1645,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
               case when p_ref is null then p_prn_file else null end,
               p_kf,
               p_comments,
+              p_id_c,
               l_state);
   end;
 
@@ -1655,7 +1673,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_SW_COMPARE IS
   exception when others then raise_application_error(-20001,'Помилка видалення квитовки - ID = '||p_id||' '||SQLERRM,TRUE);
   end;
 
-  -- Устранение причины расхождения
+  -- Вирішенні розбіжності
   procedure  resolve_cause  (p_id           in SW_COMPARE.ID%type,
                              p_comments     in SW_COMPARE.COMMENTS%type default null)
   is

@@ -194,12 +194,16 @@ function ExecSync(method, args) {
     var executor = new Sys.Net.XMLHttpSyncExecutor();
     var request = new Sys.Net.WebRequest();
 
+    addLoader($('body'));
+
     request.set_url(ServiceUrl + '/' + method);
     request.set_httpVerb('POST');
     request.get_headers()['Content-Type'] = 'application/json; charset=utf-8';
     request.set_executor(executor);
     request.set_body(Sys.Serialization.JavaScriptSerializer.serialize(args));
     request.invoke();
+
+    removeLoader($('body'));
 
     if (executor.get_responseAvailable()) {
         return (executor.get_object());
@@ -301,7 +305,7 @@ function GetOrganHelp() {
     }*/
 }
 function GetIDOrganHelp() {
-    window.parent.bars.ui.handBook('KOATUU_REGION_CODE', function (data) {
+    window.parent.bars.ui.handBook('V_DICT_DMSU_DEPTS', function (data) {
         if (data && data.length > 0) {
             getEl('ed_ID_ORGAN').value = data[0].CODE;
         }

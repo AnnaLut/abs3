@@ -8,7 +8,7 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_VISALIST ***
 
   CREATE OR REPLACE FORCE VIEW BARS.V_VISALIST ("REF", "COUNTER", "SQNC", "MARK", "MARKID", "CHECKGROUP", "USERNAME", "DAT", "INCHARGE") AS 
-  SELECT o.REF AS REF,                                            -- кто ввел
+  /*SELECT o.REF AS REF,                                            -- кто ввел
           0 AS Counter,
           0 AS Sqnc,
           'Ввел документ' AS Mark,
@@ -18,7 +18,20 @@ PROMPT *** Create  view V_VISALIST ***
           pdat AS Dat,
           0 AS Incharge
      FROM oper o, staff$base s
+    WHERE o.userid = s.id*/
+	SELECT o.REF AS REF,                                            -- кто ввел
+          0 AS Counter,
+          0 AS Sqnc,
+          'Ввел документ' AS Mark,
+          0 AS MarkID,
+          NULL AS CheckGroup,
+          nvl(OV.USERNAME, s.fio) AS UserName,    -- COBUMMFO-9298 Суть ошибки: Нужно чтобы документы отражались как то указано в oper_visa
+          o.pdat AS Dat,
+          0 AS Incharge
+     FROM oper o, oper_visa ov, staff$base s
     WHERE o.userid = s.id
+          and o.ref = ov.ref(+)
+          and OV.STATUS(+) = 0
    UNION ALL
    SELECT o.REF AS REF,                                     -- наложенные визы
           ct.priority AS Counter,

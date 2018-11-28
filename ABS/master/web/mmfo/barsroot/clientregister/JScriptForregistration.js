@@ -608,7 +608,7 @@ function Check_ClientRekvPerson() {
 		// свидетельство о рождении
 		if(isBirthCertificate){
 			if (CheckSeriaBirthCertificate(curTab) != true) {
-	            alert('Невірний формат серії свідоцтва про народження.\nКоректні приклади: I-КГ, XIV-РН, MCI-АА');
+	            alert('Невірний формат серії свідоцтва про народження.\nКоректні приклади: I-КГ, L-РН, D-АА');
 	            gE(curTab, 'ed_SER').focus();
 	            return false;
 	        }
@@ -778,7 +778,8 @@ function Check_ClientRekvPerson() {
             gE(curTab, 'ddl_SEX').focus();
             return false;
         }
-        if (obj_Parameters['CUSTTYPE'] == 'person' && !gE(curTab, 'notUseTelm').checked) {
+
+        if (obj_Parameters['CUSTTYPE'] == 'person') {
             if (!Check_ClientRekvPhone(false))
                 return false;
         }
@@ -816,6 +817,7 @@ function Check_ClientRekvPerson() {
 }
 
 function Check_ClientRekvPhone(ignoreConfirmation) {
+        
     var validPhone = validatePhone(ignoreConfirmation);
     if (validPhone.Status != 'ok') {
         if (validPhone.Status == 'duplSimbMobPhone') {
@@ -1077,6 +1079,14 @@ function Check_DopReqvValue(tag, tabname, value) {
     }
     else
         return false;
+}
+
+function Validate_DopReqvValue(validator, tag, value) {
+    var rnk = obj_Parameters['ID'];
+    if (!rnk)
+         rnk = 0;
+    return ExecSync('CustDopRecValidate', { funcName: validator, rnk: rnk,tag: tag, value: value }).d; // GetWebServiceData("CheckSPValue", input, 0);
+    ;
 }
 
 // валидация данных клиента и регистрация
@@ -1756,9 +1766,9 @@ function GetPublicFlag(nmk) {
 //Валидация свидетельства рождения
 function CheckSeriaBirthCertificate(curTab) {
     var series = gE(curTab, 'ed_SER').value;
-	var re = new RegExp("^M{0,3}(D?C{0,3}|C[DM])(L?X{0,3}|X[LC])(V?I{0,3}|I[VX])-[АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ]{2}", "g");
+    var re = new RegExp("^[IVXLCDM]{1}-[АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ]{2}", "g");
 	var valid = re.test(series);
-    if (series.length > 6 || !valid) {
+    if (series.length > 4 || !valid) {
         return false;
     }
     else {

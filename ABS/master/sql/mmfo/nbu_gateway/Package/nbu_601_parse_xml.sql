@@ -7,21 +7,21 @@ create or replace package nbu_601_parse_xml  as
  /*function check_request_id ( requst_id number )
   return varchar2;
 */
- procedure p_parse_person_fo (p_id in  NUMBER);
- procedure p_parse_document_fo (p_id in  NUMBER);
- procedure p_parse_address_fo (p_id in  NUMBER);
- procedure p_parse_person_uo (p_id in  NUMBER);
- procedure p_parse_finperformance_uo (p_id in  NUMBER);
- procedure p_parse_groupur_uo (p_id in NUMBER);
- procedure p_parse_finperformancegr_uo(p_id in NUMBER);
- procedure p_parse_finperformancepr_uo(p_id in NUMBER);
- procedure p_parse_ownerjur_uo (p_id in  NUMBER);
- procedure p_parse_ownerpp_uo (p_id in  NUMBER);
- procedure p_parse_partners_uo (p_id in  NUMBER);
- procedure p_parse_credit (p_id in  NUMBER);
- procedure p_parse_credit_pledge (p_id in NUMBER);
- procedure p_parse_pledge_dep (p_id in  NUMBER);
- procedure p_parse_credit_tranche (p_id in  NUMBER);
+ procedure p_parse_person_fo (p_id in  VARCHAR2);
+ procedure p_parse_document_fo (p_id in  VARCHAR2);
+ procedure p_parse_address_fo (p_id in  VARCHAR2);
+ procedure p_parse_person_uo (p_id in  VARCHAR2);
+ procedure p_parse_finperformance_uo (p_id in  VARCHAR2);
+ procedure p_parse_groupur_uo (p_id in VARCHAR2);
+ procedure p_parse_finperformancegr_uo(p_id in VARCHAR2);
+ procedure p_parse_finperformancepr_uo(p_id in VARCHAR2);
+ procedure p_parse_ownerjur_uo (p_id in  VARCHAR2);
+ procedure p_parse_ownerpp_uo (p_id in  VARCHAR2);
+ procedure p_parse_partners_uo (p_id in  VARCHAR2);
+ procedure p_parse_credit (p_id in  VARCHAR2);
+ procedure p_parse_credit_pledge (p_id in VARCHAR2);
+ procedure p_parse_pledge_dep (p_id in  VARCHAR2);
+ procedure p_parse_credit_tranche (p_id in  VARCHAR2);
 
 end nbu_601_parse_xml;
 /
@@ -75,7 +75,7 @@ end;*/
      if check_table='NBU_PERSON_FO' then
        p_parse_person_fo(check_request_id(requst_id),*/
 
- procedure p_parse_person_fo (p_id   in  NUMBER)
+ procedure p_parse_person_fo (p_id   in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -91,7 +91,7 @@ end;*/
    begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+        from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
@@ -217,7 +217,7 @@ end;*/
        commit;
 end;
 
-procedure p_parse_document_fo (p_id in  NUMBER)
+procedure p_parse_document_fo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -233,7 +233,7 @@ procedure p_parse_document_fo (p_id in  NUMBER)
     begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
         l_parser := dbms_xmlparser.newparser;
@@ -328,7 +328,7 @@ procedure p_parse_document_fo (p_id in  NUMBER)
 
 
 
- procedure p_parse_address_fo (p_id in  NUMBER)
+ procedure p_parse_address_fo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -345,7 +345,7 @@ procedure p_parse_document_fo (p_id in  NUMBER)
        begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
         l_parser := dbms_xmlparser.newparser;
@@ -460,7 +460,7 @@ procedure p_parse_document_fo (p_id in  NUMBER)
        commit;
 end;
 
-procedure p_parse_person_uo (p_id in  NUMBER)
+procedure p_parse_person_uo (p_id in  VARCHAR2)
   is
    -- title        varchar2(100) := 'pkg_SW_COMPARE.parse_sw_data. ';
     l_clob       clob;
@@ -479,7 +479,7 @@ procedure p_parse_person_uo (p_id in  NUMBER)
       begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
 
@@ -627,7 +627,7 @@ procedure p_parse_person_uo (p_id in  NUMBER)
        commit;
 end;
 
-procedure p_parse_finperformance_uo (p_id in  NUMBER)
+procedure p_parse_finperformance_uo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -642,7 +642,7 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
     begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
     end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -734,7 +734,7 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
        commit;
   end;
 
- procedure p_parse_groupur_uo (p_id in NUMBER)
+ procedure p_parse_groupur_uo (p_id in VARCHAR2)
    is
     l_clob clob;
     l_parser      dbms_xmlparser.parser;
@@ -751,7 +751,7 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
        begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -850,7 +850,7 @@ procedure p_parse_finperformance_uo (p_id in  NUMBER)
    end;
 
 
-procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
+procedure p_parse_finperformancepr_uo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -866,7 +866,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -958,7 +958,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        commit;
   end;
 
- procedure p_parse_finperformancegr_uo (p_id in  NUMBER)
+ procedure p_parse_finperformancegr_uo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -974,7 +974,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -1071,7 +1071,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        commit;
   end;
 
- procedure p_parse_ownerjur_uo (p_id in  NUMBER)
+ procedure p_parse_ownerjur_uo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1087,7 +1087,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
@@ -1200,7 +1200,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
   end;
 
 
-  procedure p_parse_ownerpp_uo (p_id in  NUMBER)
+  procedure p_parse_ownerpp_uo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1216,7 +1216,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
          begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -1345,7 +1345,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        commit;
   end;
 
-  procedure p_parse_partners_uo (p_id in  NUMBER)
+  procedure p_parse_partners_uo (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1361,7 +1361,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
         begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -1453,7 +1453,7 @@ procedure p_parse_finperformancepr_uo (p_id in  NUMBER)
        commit;
   end;
 
-procedure p_parse_credit (p_id in  NUMBER)
+procedure p_parse_credit (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1469,7 +1469,7 @@ procedure p_parse_credit (p_id in  NUMBER)
        begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
         l_parser := dbms_xmlparser.newparser;
@@ -1656,7 +1656,7 @@ procedure p_parse_credit (p_id in  NUMBER)
        commit;
 end;
 
-procedure p_parse_credit_pledge (p_id in  NUMBER)
+procedure p_parse_credit_pledge (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1672,7 +1672,7 @@ procedure p_parse_credit_pledge (p_id in  NUMBER)
         begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
@@ -1766,7 +1766,7 @@ procedure p_parse_credit_pledge (p_id in  NUMBER)
       commit;
 end;
 
-procedure p_parse_pledge_dep (p_id in  NUMBER)
+procedure p_parse_pledge_dep (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1782,7 +1782,7 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
         begin
        select x.d_clob
         into l_clob
-       from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+       from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
       --  l_clob := replace(replace(replace(l_clob,chr(38)||'lt;','<'),chr(38)||'gt;','>'),'Short','Detail');
@@ -1959,7 +1959,7 @@ procedure p_parse_pledge_dep (p_id in  NUMBER)
       commit;
 end;
 
-procedure p_parse_credit_tranche (p_id in  NUMBER)
+procedure p_parse_credit_tranche (p_id in  VARCHAR2)
   is
     l_clob       clob;
     l_parser      dbms_xmlparser.parser;
@@ -1974,7 +1974,7 @@ procedure p_parse_credit_tranche (p_id in  NUMBER)
        begin
         select x.d_clob
         into l_clob
-        from BARSTRANS.TRANSP_RECEIVE_DATA x where x.id=p_id;
+        from BARSTRANS.Input_reqs x where x.id=p_id;
        end;
 
         l_parser := dbms_xmlparser.newparser;

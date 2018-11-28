@@ -219,7 +219,7 @@ namespace BarsWeb.Areas.CreditUi.Controllers
             try
             {
                 CreateDeal session = _creditRepository.getDeal(nd);
-                return Json(new { Status = Status, Data = session }, JsonRequestBehavior.AllowGet);
+                return Json(new { Status = session.CUST_DATA.Error_Message ?? Status, Data = session }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
             return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
@@ -254,6 +254,18 @@ namespace BarsWeb.Areas.CreditUi.Controllers
         {
             string session = _creditRepository.Authorize(nd,type,pidstava,initiative);
             return Json(session, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetCustData(decimal rnk)
+        {
+            string Status = "OK";
+            try
+            {
+                CustomerInfo cust_data = _creditRepository.GetCustomerInfo(rnk);
+                return Json(new { Status = cust_data.Error_Message ?? Status, Data = cust_data }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e) { Status = e.Message + " StackTrace=" + e.StackTrace; }
+            return Json(new { Status = Status }, JsonRequestBehavior.AllowGet);
         }
     }
 }

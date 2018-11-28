@@ -1,14 +1,11 @@
 
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/CC_W1.sql =========*** Run *** ========
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view CC_W1 ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.CC_W1 ("ID", "ND", "CC_ID", "RNK", "AIM", "KV", "S", "DSDATE", "GPK", "INS_DEAL", "TRANS", "DWDATE", "S080", "PR", "OSTC", "NLS", "NLS_SS", "ACC", "SROK", "SOS", "OBS", "FIN", "CRISK", "K23", "NAMK", "ACC8", "DAY", "DAZS", "OKPO", "SDOG", "BRANCH", "MFOKRED", "ACCKRED") AS 
-  SELECT d.user_id,
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/view/cc_w1.sql =========*** Run *** ========
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE FORCE VIEW BARS.CC_W1 ("ID", "ND", "CC_ID", "RNK", "AIM", "KV", "S", "DSDATE", "GPK", "INS_DEAL", "TRANS", "DWDATE", "PR", "OSTC", "NLS", "NLS_SS", "ACC", "SROK", "SOS", "NAMK", "ACC8", "DAY", "DAZS", "OKPO", "SDOG", "BRANCH", "MFOKRED", "ACCKRED", "VKR", "CLASS_COR", "PD", "CLASS_INT") AS 
+  SELECT d.user_id as id,
           d.nd,
           d.cc_id,
           make_url ('/barsroot/clientregister/registration.aspx',
@@ -20,8 +17,8 @@ PROMPT *** Create  view CC_W1 ***
              AS rnk,
           ad.aim,
           a8.kv,
-          d.LIMIT,
-          d.sdate,
+          d.LIMIT as s,
+          d.sdate as dsdate,
           DECODE (a8.vid,
                   2, 'Класичний',
                   4, 'Аннуiтет',
@@ -40,10 +37,9 @@ PROMPT *** Create  view CC_W1 ***
                   1, 'Транши',
                   NULL)
              trans,
-          d.wdate,
-          p.s080,
-          acrn.fprocn (ac.acc, 0, ''),
-          -a8.ostc / 100,
+          d.wdate as dwdate,
+          acrn.fprocn (ac.acc, 0, '') as pr,
+          -a8.ostc / 100 as ostc,
           make_url ('/barsroot/customerlist/custacc.aspx',
                     'Рахунки',
                     'type',
@@ -53,21 +49,21 @@ PROMPT *** Create  view CC_W1 ***
              nls,
           ac.nls nls_ss,
           ac.acc,
-          ABS (ROUND (MONTHS_BETWEEN (d.wdate, ad.wdate))),
+          ABS (ROUND (MONTHS_BETWEEN (d.wdate, ad.wdate))) as srok,
           d.sos,
-          d.obs23 obs,
-          d.fin23 fin,
-          d.kat23 crisk,
-          d.k23,
-          c.nmk,
-          a8.acc,
-          i.s,
+          c.nmk as namk,
+          a8.acc as acc8,
+          i.s as day,
           a8.dazs,
           c.okpo,
           d.sdog,
           d.branch,
           ad.mfokred,
-          ad.acckred
+          ad.acckred,
+          fin_zp.zn_vncrr(c.rnk, d.nd) as VKR,
+          FIN_NBU.ZN_P_ND('CLS',  56, sysdate, d.ND, c.RNK, null) as class_cor,
+          FIN_NBU.ZN_P_ND('PD',   56, sysdate, d.ND, c.RNK, null) as pd,
+          FIN_NBU.ZN_P_ND('CLAS', 56,  sysdate, d.ND, c.RNK, null) as class_int
      FROM cc_deal d,
           accounts ac,
           specparam p,
@@ -86,8 +82,10 @@ PROMPT *** Create  view CC_W1 ***
           AND i.id(+) = 0
           AND n.acc = a8.acc
           AND a8.tip = 'LIM'
-          AND d.vidd IN (1, 2, 3);
-
+          AND d.vidd IN (1, 2, 3, 5)
+;
+ show err;
+ 
 PROMPT *** Create  grants  CC_W1 ***
 grant SELECT                                                                 on CC_W1           to BARSREADER_ROLE;
 grant FLASHBACK,SELECT                                                       on CC_W1           to BARS_ACCESS_DEFROLE;
@@ -96,8 +94,9 @@ grant SELECT                                                                 on 
 grant DELETE,INSERT,SELECT,UPDATE                                            on CC_W1           to WR_ALL_RIGHTS;
 grant FLASHBACK,SELECT                                                       on CC_W1           to WR_REFREAD;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/CC_W1.sql =========*** End *** ========
-PROMPT ===================================================================================== 
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/view/cc_w1.sql =========*** End *** ========
+ PROMPT ===================================================================================== 
+ 

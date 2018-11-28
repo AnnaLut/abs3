@@ -1,6 +1,7 @@
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/bars_ow.sql =========*** Run *** ===
  PROMPT ===================================================================================== 
+
  
 CREATE OR REPLACE PACKAGE BARS.BARS_OW
 is
@@ -2485,6 +2486,7 @@ is
 
   c_file       varchar2(100) := '/DocFile/FileTrailer/CheckSum/';
   c_doclist    varchar2(100) := '/DocFile/DocList/';
+  c_AddData    varchar2(100) := '/DocFile/DocList/DocBatch/BatchHeader/ContractFor/AddData/';
 
   c_batch      varchar2(254);
   c_doc        varchar2(254);
@@ -2495,6 +2497,7 @@ is
   i number;
   j number;
   g number;
+  k number;
   l_tmp varchar2(2000);
 
   h varchar2(100) := 'bars_ow.iparse_oic_docf. ';
@@ -2530,12 +2533,31 @@ begin
      -- Ид. код получателя (К)
      l_rec.cnt_clientregnumber :=  substr(extract(l_filebody, c_batch || '/BatchHeader/ContractFor/Client/ClientInfo/RegNumber/text()', null), 1, 10);
      -- Наименование получателя  (К)
+              --COBUMMFO-8505
+                     l_tmp     :=         extract(l_filebody, c_batch || '/BatchHeader/Description/text()', null);
+     if l_tmp is null then              
                      l_tmp     :=         extract(l_filebody, c_batch || '/BatchHeader/ContractFor/Client/ClientInfo/CompanyName/text()', null);
+     end if;                
      l_rec.cnt_clientname      :=  substr(trim(dbms_xmlgen.convert(l_tmp,1)),1,38);
      -- Счет отправителя (Д)
      l_rec.org_cbsnumber       :=  substr(extract(l_filebody, c_batch || '/BatchHeader/Originator/CBSNumber/text()', null), 1, 100);
      -- Код банка (МФО) получателя (К)
      l_rec.dest_institution    :=  substr(extract(l_filebody, c_batch || '/BatchHeader/Destination/InstInfo/Institution/text()', null), 4, 6);
+
+-- AddData-----------COBUMMFO-8505---    
+     k:=0;
+     loop
+       k:=k+1;
+       c_doc:= c_AddData||'Parm[' || k || ']';  
+       if l_filebody.existsnode(c_doc) = 0 then
+          exit;
+       end if; 
+       l_xml_doc := xmltype(extract(l_filebody,c_doc,null));
+       if extract(l_xml_doc, '//ParmCode/text()', null)='SO_DTLS2' then 
+         l_rec.cnt_clientregnumber:=extract(l_xml_doc, '//Value/text()', null);
+       end if;
+     end loop;   
+-----------------------------------
 
      i := 0;
 
@@ -5622,6 +5644,95 @@ begin
    return l_branch;
 end get_branch_onorn_cardpay;
 
+function read_atransfers_mask (
+                                 p_mask ow_oic_atransfers_mask.mask%type
+                              )
+return ow_oic_atransfers_mask%rowtype
+as
+   l_ow_oic_atransfers_mask ow_oic_atransfers_mask%rowtype;
+begin 
+   select *
+   into l_ow_oic_atransfers_mask
+   from ow_oic_atransfers_mask
+   where mask = p_mask;
+    
+   return l_ow_oic_atransfers_mask;
+exception 
+   when others then
+	  return null;
+end;
+
+function get_nls_on2924_cardpay (p_nls varchar2, p_kv number, p_pk_acc number) return varchar2
+is
+   l_pk_account     accounts%rowtype;
+   l_mask           ow_oic_atransfers_mask%rowtype;
+   
+   l_nls            accounts.nls%type;
+   l_acc            accounts.acc%type;
+   
+   l_sql            varchar2(4000);
+
+   l_3570           varchar2(6);
+   l_p4             number;
+   
+   l_msg varchar2(100) := 'bars_ow.get_nls_on2924_cardpay. ';
+begin
+
+   if p_nls like 'NLS\_%\_%' escape '\' and p_pk_acc is not null then
+	  l_3570 := substr(p_nls, instr(p_nls,'_',1)+1, 6);
+      l_mask := read_atransfers_mask(l_3570);
+      if l_mask.mask is not null then
+	     begin
+			l_sql := 'select '||l_mask.field_name||' from ow_oic_atransfers_acc a where a.acc_pk = :pk_acc';
+	        execute immediate l_sql
+            into l_acc
+            using p_pk_acc;
+         exception
+      		when no_data_found then
+                 insert into ow_oic_atransfers_acc(nd, acc_pk) values (s_acquiring_deal.nextval, p_pk_acc);
+         end;
+         
+         if l_acc is null then
+
+            bars_audit.trace(l_msg || 'Start: p_pk_acc=>' || to_char(p_pk_acc) || ' nbs=>' || to_char(l_mask.nbs)||' tip=>'||l_mask.tip);
+
+        	l_pk_account := account_utl.read_account(p_pk_acc);
+            
+            l_nls := get_newaccountnumber(l_pk_account.rnk, l_mask.nbs);
+            
+            op_reg_ex(99, 0, 0, null, l_p4, l_pk_account.rnk,
+                      l_nls, l_pk_account.kv, l_mask.nms, l_mask.tip, user_id(), l_acc,
+                      '1', null, 0, null, null, null, null, null, null, null, null, null,
+                       l_pk_account.tobo);
+          
+            bars_audit.trace(l_msg || 'Account ' || l_nls || '/' || to_char(l_pk_account.kv) || ' opened.');
+                       
+            accreg.setAccountSParam(l_acc, 'OB22', l_mask.ob22);
+            bars_audit.trace(l_msg || 'Specparams OB22=['||l_mask.ob22||'] for account ' || l_nls || '/' || to_char(l_pk_account.kv) || ' set.');
+
+            accreg.setAccountSParam(l_acc, 'R011', l_mask.r011);
+            bars_audit.trace(l_msg || 'Specparams R011=['||l_mask.r011||'] for account ' || l_nls || '/' || to_char(l_pk_account.kv) || ' set.');
+
+            accreg.setAccountSParam(l_acc, 'S180', l_mask.s180);
+            bars_audit.trace(l_msg || 'Specparams S180=['||l_mask.s180||'] for account ' || l_nls || '/' || to_char(l_pk_account.kv) || ' set.');
+
+            accreg.setAccountSParam(l_acc, 'R013', l_mask.r013);
+            bars_audit.trace(l_msg || 'Specparams R013=['||l_mask.r013||'] for account ' || l_nls || '/' || to_char(l_pk_account.kv) || ' set.');
+
+			l_sql := 'update ow_oic_atransfers_acc a set a.'||l_mask.field_name||' = :acc where a.acc_pk = :acc_pk';
+            execute immediate l_sql using l_acc, p_pk_acc;
+
+            bars_audit.trace(l_msg || 'Finish.');
+         else
+			l_nls := account_utl.get_account_number(l_acc);
+	     end if;
+      end if;
+   end if;
+
+   return l_nls;
+
+end get_nls_on2924_cardpay;
+
 -----------------------
 function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_pk_acc number) return varchar2
 is
@@ -5923,13 +6034,13 @@ is
    l_newnb t_newnb;
 begin
 
-   -- 1. счет NLS_BBBB_2625
+   -- 1. счет NLS_BBBB_2625 или NLS_BBBBХХ_2924
    if p_nls like 'NLS\_%\_%' escape '\' then
 
-      -- счет 2625
+      -- счет 2625 или 2924
       l_pk_nls := substr(p_nls, instr(p_nls,'_',-1)+1);
 
-      -- ищем счет 2625
+      -- ищем счет 2625 или 2924
       if l_pk_nls is not null then
          begin
 			-- COBUMMFO-7501
@@ -5950,7 +6061,11 @@ begin
 
       -- находим счет
       if l_pk_acc is not null then
+		 if l_pk_nls like '2924%' then
+            l_nls := get_nls_on2924_cardpay(p_nls, p_kv, l_pk_acc);
+		 else
          l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc);
+      end if;
       end if;
 
    -- 2. если нужно искать счет по формуле
@@ -11940,7 +12055,7 @@ if    not regexp_like(upper(l_cmclient.paspissuer),q'{^[АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУ
   if l_iscrm = '1' then
      update cm_client t
         set t.oper_status = 3,
-            t.resp_txt    = 'Емуляція обробки заявки по запитам від CRM'
+            t.resp_txt    = null--'Емуляція обробки заявки по запитам від CRM'(COBUMMFO-9384)
       where t.id = l_cmclient.id;
   end if;
   p_cmclient := l_cmclient;
@@ -16910,7 +17025,7 @@ begin
      if l_iscrm = '1' then
         update cm_client t
            set t.oper_status = 3,
-               t.resp_txt    = 'Емуляція обробки заявки по запитам від CRM'
+            t.resp_txt    = null--'Емуляція обробки заявки по запитам від CRM'(COBUMMFO-9384)
          where t.id = l_cmclient.id;
      end if;
 
@@ -17090,7 +17205,7 @@ begin
      if l_iscrm = '1' then
         update cm_client t
            set t.oper_status = 3,
-               t.resp_txt    = 'Емуляція обробки заявки по запитам від CRM'
+            t.resp_txt    = null--'Емуляція обробки заявки по запитам від CRM'(COBUMMFO-9384)
          where t.id = l_cmclient.id;
      end if;
      

@@ -23,6 +23,7 @@ using System.Windows.Forms;
 
 public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
 {
+    const string strStatusList = "678"; // Перелік статусів зайнятості особи для непрацюючих
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -89,79 +90,179 @@ public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
     {
 
         OracleConnection con = OraConnector.Handler.IOraConnection.GetUserConnection();
-        OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con);
+        //Bars.DataComponents.BarsSqlDataSourceEx dsProductGrp = new Bars.DataComponents.BarsSqlDataSourceEx();
+        //dsProductGrp.ConnectionString = OraConnector.Handler.IOraConnection.GetUserConnectionString();
 
-        try
+        //dsProductGrp.SelectCommand = @"SELECT code, name FROM w4_product_groups 
+        //                                WHERE code Not In ('INSTANT','LOCAL') 
+        //                                  AND date_close Is Null
+        //                                  AND client_type = 1
+        //                                ORDER BY code";
+
+        //listProductGrp.DataBind();
+
+        using (OracleCommand cmd = new OracleCommand(OraConnector.Handler.IOraConnection.GetSetRoleCommand("WR_CREDIT"), con))
         {
-            CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
-            cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
-            cinfo.DateTimeFormat.DateSeparator = "/";
+
+            try
+            {
+                CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");
+                cinfo.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+                cinfo.DateTimeFormat.DateSeparator = "/";
 
 
-            Decimal rnk = Convert.ToDecimal(RNK_.Value);
-            Decimal nd = Convert.ToDecimal(ND_.Value);
+                Decimal rnk = Convert.ToDecimal(RNK_.Value);
+                Decimal nd = Convert.ToDecimal(ND_.Value);
 
 
-            // установка роли
-            cmd.ExecuteNonQuery();
+                // установка роли
+                cmd.ExecuteNonQuery();
 
-
-            cmd.Parameters.Add("ND_", OracleDbType.Decimal, nd, ParameterDirection.Input);
-            cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
-            cmd.CommandText = @"  select v.cc_id, to_char(v.sdate,'dd/mm/yyyy') sdate, fin_zp.zn_vncrr(rnk, nd) as vncrr
+                cmd.Parameters.Add("ND_", OracleDbType.Decimal, nd, ParameterDirection.Input);
+                cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+                cmd.CommandText = @"  select v.cc_id, to_char(v.sdate,'dd/mm/yyyy') sdate, fin_zp.zn_vncrr(rnk, nd) as vncrr
                                   from v_fin_cc_deal v
                                  where v.nd = :nd_ and v.rnk =:rnk_";
-            OracleDataReader rdr0 = cmd.ExecuteReader();
-            if (rdr0.Read())
-            {
-               Dl_bkrr.SelectedValue = rdr0["VNCRR"] == DBNull.Value ? (String)null : (String)rdr0["VNCRR"];
-               Tb_dat.Text = rdr0["SDATE"] == DBNull.Value ? (String)null : (String)rdr0["SDATE"];
-            }
-
-            cmd.Parameters.Clear();
-            cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
-            cmd.CommandText = @"select REAL6MONTH, NOREAL6MONTH, STATUS, MEMBERS, REAL6INCOME, NOREAL6INCOME
+                using (OracleDataReader rdr0 = cmd.ExecuteReader())
+                {
+                    if (rdr0.Read())
+                    {
+                        Dl_bkrr.SelectedValue = rdr0["VNCRR"] == DBNull.Value ? (String)null : (String)rdr0["VNCRR"];
+                        Tb_dat.Text = rdr0["SDATE"] == DBNull.Value ? (String)null : (String)rdr0["SDATE"];
+                    }
+                }
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+                cmd.CommandText = @"select REAL6MONTH, NOREAL6MONTH, STATUS, MEMBERS, REAL6INCOME, NOREAL6INCOME
                                  from  NBU_PROFIT_FO a 
                                  Where a.rnk = :RNK_ ";
-            OracleDataReader rdr1 = cmd.ExecuteReader();
-            if (rdr1.Read())
-            {
-
-                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["REAL6MONTH"]))) tb_real6month.Value = rdr1["REAL6MONTH"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["REAL6MONTH"];
-                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["NOREAL6MONTH"]))) tb_noreal6month.Value = rdr1["NOREAL6MONTH"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["NOREAL6MONTH"];
-
-                dl_status.SelectedValue = Convert.ToString(rdr1["STATUS"]);
-
-                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["MEMBERS"])))
+                using (OracleDataReader rdr1 = cmd.ExecuteReader())
                 {
-                    Decimal l_members;
-                    l_members = Convert.ToDecimal( rdr1["MEMBERS"] );
-                    tb_members.Value = l_members;
+                    if (rdr1.Read())
+                    {
+                        // COBUMMFO-8395 - параметри, що стосуються клієнта в цілому, пересені в картку клієнта та зберігаються в customerw
+
+                        //if (!String.IsNullOrEmpty(Convert.ToString(rdr1["REAL6MONTH"]))) tb_real6month.Value = rdr1["REAL6MONTH"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["REAL6MONTH"];
+                        //if (!String.IsNullOrEmpty(Convert.ToString(rdr1["NOREAL6MONTH"]))) tb_noreal6month.Value = rdr1["NOREAL6MONTH"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["NOREAL6MONTH"];
+                        //dl_status.SelectedValue = Convert.ToString(rdr1["STATUS"]);
+                        //if (!String.IsNullOrEmpty(Convert.ToString(rdr1["MEMBERS"])))
+                        //{
+                        //    Decimal l_members;
+                        //    l_members = Convert.ToDecimal(rdr1["MEMBERS"]);
+                        //    tb_members.Value = l_members;
+                        //}
+
+                        // ------------- !!!! TO DO !!!! ------------------------
+                        //
+                        // відносно доходів поручителя питання не вирішено і залишено як було. Але їх все одно треба переносити в параметри кредитного договору або договору поруки.
+                        //
+                        if (!String.IsNullOrEmpty(Convert.ToString(rdr1["REAL6INCOME"]))) tb_real6income.Value = rdr1["REAL6INCOME"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["REAL6INCOME"];
+                        if (!String.IsNullOrEmpty(Convert.ToString(rdr1["NOREAL6INCOME"]))) tb_noreal6income.Value = rdr1["NOREAL6INCOME"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["NOREAL6INCOME"];
+                    }
+                }
+                // Вичитка довідників
+                dl_Education.Items.Add( new ListItem("Не вказана", ""));
+                dl_typeW.Items.Add(     new ListItem("Не вказаний", ""));
+                dl_status.Items.Add(    new ListItem("Не вказаний", ""));
+
+                cmd.Parameters.Clear();
+                // Освіта
+                cmd.CommandText = "select t.id, t.name  from EDUCATION t";
+                using (OracleDataReader rdr = cmd.ExecuteReader()) {
+                    while (rdr.Read())
+                    {
+                        dl_Education.Items.Add(new ListItem(rdr[1].ToString(),rdr[0].ToString()));
+                    }
+                }
+                // Тип роботодавця
+                cmd.CommandText = "select t.id, t.name  from EMPLOYER_TYPE t";
+                using (OracleDataReader rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        dl_typeW.Items.Add(new ListItem(rdr[1].ToString(), rdr[0].ToString()));
+                    }
+                }
+                // Сімейний статус
+                cmd.CommandText = "select t.kod, t.txt from CIG_D08 t ";
+                using (OracleDataReader rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        dl_status.Items.Add(new ListItem(rdr[1].ToString(), rdr[0].ToString()));
+                    }
                 }
 
-                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["REAL6INCOME"]))) tb_real6income.Value = rdr1["REAL6INCOME"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["REAL6INCOME"];
-                if (!String.IsNullOrEmpty(Convert.ToString(rdr1["NOREAL6INCOME"]))) tb_noreal6income.Value = rdr1["NOREAL6INCOME"] == DBNull.Value ? (decimal)0 : (decimal)rdr1["NOREAL6INCOME"];
+                // COBUMMFO-8395 - параметри, що стосуються клієнта в цілому, пересені в картку клієнта та зберігаються в customerw
+                Panel_epl.Visible = true;
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+                cmd.CommandText = @"select f.tag,w.VALUE,f.name from CUSTOMER_FIELD f, v_customerw w where f.tag = w.tag and f.code in ('KRED','OTHERS') and w.rnk = :RNK_";
+                using (OracleDataReader rdr2 = cmd.ExecuteReader())
+                {
+                    while (rdr2.Read())
+                    {
+                        string strTag = rdr2[0].ToString().Trim();
+                        switch (strTag)
+                        {
+                            case "EDUCA":   // Освіта
+                                Lb_Education.Text = rdr2[2].ToString().Trim();
+                                dl_Education.SelectedValue = rdr2[1].ToString().Trim();
+                                break;
+                            case "STAT":    // Сімейний статус
+                                Lb_status.Text = rdr2[2].ToString().Trim();
+                                dl_status.SelectedValue = rdr2[1].ToString().Trim();
+                                break;
+                            case "MEMB":    // Кількість осіб, що перебувають на утриманні боржника
+                                Lb_members.Text = rdr2[2].ToString().Trim();
+                                tb_members.Value = Convert.ToDecimal(rdr2[1]);
+                                break;
+                            case "REMO":    // Підтверджений дохід Боржника
+                                Lb_real6month.Text = rdr2[2].ToString().Trim();
+                                tb_real6month.Value = Convert.ToDecimal(rdr2[1]);
+                                break;
+                            case "NREMO":   // Непідтверджений дохід Боржника
+                                Lb_noreal6month.Text = rdr2[2].ToString().Trim();
+                                tb_noreal6month.Value = Convert.ToDecimal(rdr2[1]);
+                                break;
+                            case "TYPEW":   // Тип роботодавця
+                                Lb_typeW.Text = rdr2[2].ToString().Trim();
+                                dl_typeW.SelectedValue = rdr2[1].ToString().Trim();
+                                break;
+                            case "EDRPO":   // Ідентифікатор роботодавця
+                                Lb_EDRPO.Text = rdr2[2].ToString().Trim();
+                                tb_EDRPO.Text = rdr2[1].ToString().Trim();
+                                break;
+                            case "NAMEW":   // Найменування роботодавця
+                                Lb_NAMEW.Text = rdr2[2].ToString().Trim();
+                                tb_NAMEW.Text = rdr2[1].ToString().Trim();
+                                break;
+                            case "CIGPO":   // Статус зайнятості особи
+                                h_lbr_type.Value = rdr2[1].ToString().Trim();
+                                Panel_epl.Visible = !strStatusList.Contains(h_lbr_type.Value); // для непрацюючих роботодавця заповнювати не портрібно
+                                break;
+                        }
+                    }
+                }
 
-             
+                // -- Автоматизоване визначення показників	 type 3	
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "fin_nbu.get_subpok_fo";
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
+                cmd.Parameters.Add("ND_", OracleDbType.Decimal, nd, ParameterDirection.Input);
+                cmd.Parameters.Add("DAT_", OracleDbType.Date, Convert.ToDateTime(DAT_.Value, cinfo), ParameterDirection.Input);
+                cmd.ExecuteNonQuery();
+
             }
-
-
-            // -- Автоматизоване визначення показників	 type 3	
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "fin_nbu.get_subpok_fo";
-            cmd.Parameters.Clear();
-            cmd.Parameters.Add("RNK_", OracleDbType.Decimal, rnk, ParameterDirection.Input);
-            cmd.Parameters.Add("ND_",  OracleDbType.Decimal, nd, ParameterDirection.Input);
-            cmd.Parameters.Add("DAT_", OracleDbType.Date, Convert.ToDateTime(DAT_.Value, cinfo), ParameterDirection.Input);
-            cmd.ExecuteNonQuery();
-
-        }
-        finally
-        {
-            con.Close();
-            con.Dispose();
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
         }
     }
+    //string 
 
     protected void set_nd_vncrr(string nd_, string rnk_, String txt_)
     {
@@ -354,19 +455,27 @@ public partial class credit_fin_nbu_fin_form_pd_fo: Bars.BarsPage
  
     protected void Bt_save_Click(object sender, EventArgs e)
     {
+        string strSource = "В картці клієнта ";
 
         if (String.IsNullOrEmpty(Dl_clas.SelectedValue))     { ShowError(" Заповніть!!! " + Lb_clas.Text); return; }
-        if (String.IsNullOrEmpty(Dl_bkrr.SelectedValue))     {ShowError(" Заповніть!!! " + Lb_VNKR.Text); return;}
-        if (String.IsNullOrEmpty(DL_kredhist.SelectedValue)) {ShowError(" Заповніть!!! " + Lb_kredhist.Text); return;}
+        if (String.IsNullOrEmpty(Dl_bkrr.SelectedValue))     { ShowError(" Заповніть!!! " + Lb_VNKR.Text); return;}
+        if (String.IsNullOrEmpty(DL_kredhist.SelectedValue)) { ShowError(" Заповніть!!! " + Lb_kredhist.Text); return;}
         if (String.IsNullOrEmpty(DL_kpz.SelectedValue))      { ShowError(" Заповніть!!! " + Lb_kpz.Text); return; }
 
         // перевірки для додаткових показників
-        if (String.IsNullOrEmpty( Convert.ToString(tb_real6month.Value) ))  { ShowError(" Заповніть!!! " + Lb_real6month.Text); return; }
-        if (String.IsNullOrEmpty(Convert.ToString(tb_noreal6month.Value)))  { ShowError(" Заповніть!!! " + Lb_noreal6month.Text); return; }
-        if (String.IsNullOrEmpty(dl_status.SelectedValue))                  { ShowError(" Заповніть!!! " + Lb_status.Text); return; }
-        if (String.IsNullOrEmpty(Convert.ToString(tb_members.Value)))       { ShowError(" Заповніть!!! " + Lb_members.Text); return; }
-        if (String.IsNullOrEmpty(Convert.ToString(tb_real6income.Value)))   { ShowError(" Заповніть!!! " + Lb_real6income.Text); return; }
-        if (String.IsNullOrEmpty(Convert.ToString(tb_noreal6income.Value))) { ShowError(" Заповніть!!! " + Lb_noreal6income.Text); return; }
+        if (String.IsNullOrEmpty(dl_Education.SelectedValue))               { ShowError(strSource + "Заповніть!!! " + Lb_Education.Text); return; }
+        if (String.IsNullOrEmpty( Convert.ToString(tb_real6month.Value) ))  { ShowError(strSource + "Заповніть!!! " + Lb_real6month.Text); return; }
+        if (String.IsNullOrEmpty(Convert.ToString(tb_noreal6month.Value)))  { ShowError(strSource + "Заповніть!!! " + Lb_noreal6month.Text); return; }
+        if (String.IsNullOrEmpty(dl_status.SelectedValue))                  { ShowError(strSource + "Заповніть!!! " + Lb_status.Text); return; }
+        if (String.IsNullOrEmpty(Convert.ToString(tb_members.Value)))       { ShowError(strSource + "Заповніть!!! " + Lb_members.Text); return; }
+        if (!strStatusList.Contains(h_lbr_type.Value))  // для непрацюючих роботодавця заповнювати не портрібно
+        {
+        if (String.IsNullOrEmpty(dl_typeW.SelectedValue))                   { ShowError(strSource + "Заповніть!!! " + Lb_typeW.Text); return; }
+        if (String.IsNullOrEmpty(tb_EDRPO.Text))                            { ShowError(strSource + "Заповніть!!! " + Lb_EDRPO.Text); return; }
+        if (String.IsNullOrEmpty(tb_NAMEW.Text))                            { ShowError(strSource + "Заповніть!!! " + Lb_NAMEW.Text); return; }
+        }
+        //if (String.IsNullOrEmpty(Convert.ToString(tb_real6income.Value)))   { ShowError(" Заповніть!!! " + Lb_real6income.Text); return; }
+        //if (String.IsNullOrEmpty(Convert.ToString(tb_noreal6income.Value))) { ShowError(" Заповніть!!! " + Lb_noreal6income.Text); return; }
 
 
         record_fp_nd("IP1", DL_kredhist.SelectedValue, "60");

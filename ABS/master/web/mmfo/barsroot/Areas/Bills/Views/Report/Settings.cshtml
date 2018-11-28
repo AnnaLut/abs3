@@ -1,0 +1,48 @@
+﻿@using Kendo.Mvc.UI
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Налаштування звітів</h2>
+</div>
+
+<div class="row" style="margin-left: 10px; margin-right: 10px; padding: 10px;">
+    @*Расположение табов привязано к js функции onSelect*@
+        @(Html.Kendo().TabStrip()
+                .Name("RaportTabs")
+                .Animation(anim => anim.Open(eff => eff.Fade(FadeDirection.In))
+                        .Close(eff => eff.Fade(FadeDirection.Out)))
+                .Events(x => x.Select("onSelect"))
+                .Items(tab =>
+                {
+                    tab.Add()
+                    .Text("Звіти")
+                    .Selected(true)
+                    .LoadContentFrom("ReportsList", "Report");
+
+                    tab.Add()
+                    .Selected(false)
+                    .Text("Параметри звітів")
+                    
+                    .LoadContentFrom("ReportsSettings", "Report")
+                    .ContentHtmlAttributes(new { style = "overflow: hidden; width: 98%;" });
+
+                    tab.Add()
+                    .Text("Значення за замовченням")
+                    .Selected(false)
+                    .LoadContentFrom("ParameterDefaultValues", "Report")
+                    .ContentHtmlAttributes(new { style = "overflow: hidden; margin-top: 10px; margin-bottom-10px; min-height: 300px;" });
+
+                    tab.Add()
+                    .Text("Перевірка звітів")
+                    .Selected(false)
+                    .LoadContentFrom("Reports", "Report", new { id = 1 })
+                    .ContentHtmlAttributes(new { style = "overflow: hidden; margin-top: 10px; margin-bottom-10px; min-height: 300px;" });                    
+                })
+            )
+    </div>
+    <div id="windowContainer"></div>
+
+    <script src="~/Areas/Bills/Scripts/reportSettings.js"></script>

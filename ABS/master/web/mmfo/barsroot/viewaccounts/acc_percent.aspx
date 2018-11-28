@@ -9,7 +9,7 @@
     <script language="jscript" src="/Common/WebGrid/Grid2005.js"></script>
     <script language="javascript" src="/Common/Script/Localization.js"></script>
     <script language="jscript" src="Scripts/Common.js?v.1.0"></script>
-    <script language="jscript" src="Scripts/Percent.js?v1.3"></script>
+    <script language="jscript" src="Scripts/Percent.js?v1.4"></script>
     <script language="jscript">        window.onload = InitPercent;</script>
 </head>
 <body>

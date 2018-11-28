@@ -1,0 +1,129 @@
+﻿@model int
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "TranspUi";
+}
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/TranspUi/Scripts/TranspUi/Main.js?v1.0"></script>
+<script src="~/Areas/TranspUi/Scripts/TranspUiCommon.js?v1.0"></script>
+<script src="~/Areas/TranspUi/Scripts/TranspUi/RequestsWindow.js"></script>
+<script src="~/Areas/TranspUi/Scripts/TranspUi/InputRequestsWindow.js"></script>
+<script src="~/Areas/TranspUi/Scripts/TranspUi/ClobWindow.js"></script>
+<link rel="stylesheet" href="~/Areas/TranspUi/Css/TranspUi/Main.css" />
+
+<div>
+    <h1 id="title"></h1>
+</div>
+
+<input readonly hidden value="@Model" id="formType" />
+
+<div id="gridMain"></div>
+
+<script id="outReqToolbarTemplate" type="text/x-kendo-template">
+    <button id="updateGrid" class="k-button update-grid" title="Оновити">
+        <i class='pf-icon pf-16 pf-reload_rotate'></i>
+    </button>
+    <button id="clearFilters" class="k-button" title="Очистити фільтри">
+        <i class='pf-icon pf-16 pf-filter-remove'></i>
+    </button>
+    <button id="outReqs" class="k-button" title="Вихідні підзапити">
+        Вихідні підзапити
+    </button>
+    <button id="outQueue" class="k-button" title="Черга на відправку">
+        Черга на відправку
+    </button>
+    <button id="outTypes" class="k-button" title="Опис вихідних параметрів">
+        Опис вихідних параметрів
+    </button>
+    <button id="outLog" class="k-button" title="Журнал відправки">
+        Журнал відправки
+    </button>
+    <button id="outParams" class="k-button" title="Параметри запиту">
+        Параметри запиту
+    </button>
+    <button id="clobBtn" class="k-button" title="Текст запиту">
+        Текст запиту
+    </button>
+</script>
+
+<script id="inReqToolbarTemplate" type="text/x-kendo-template">
+    <button id="updateGrid" class="k-button update-grid" title="Оновити">
+        <i class='pf-icon pf-16 pf-reload_rotate'></i>
+    </button>
+    <button id="clearFilters" class="k-button" title="Очистити фільтри">
+        <i class='pf-icon pf-16 pf-filter-remove'></i>
+    </button>
+    <button id="inQueue" class="k-button" title="Черга обробки">
+        Черга обробки
+    </button>
+    <button id="inTypes" class="k-button" title="Опис вхідних параметрів">
+        Опис вхідних параметрів
+    </button>
+    <button id="inLog" class="k-button" title="Журнал прийому">
+        Журнал прийому
+    </button>
+    <button id="clobBtn" class="k-button" title="Текст запиту">
+        Текст запиту
+    </button>
+    <button id="inResponse" class="k-button" title="Відповідь">
+        Відповідь
+    </button>
+    <button id="inResponseParams" class="k-button" title="Параметри відповіді">
+        Параметри відповіді
+    </button>
+    <button id="inRequestParams" class="k-button" title="Параметри запиту">
+        Параметри запиту
+    </button>
+</script>
+
+<script id="requestsToolbarTemplate" type="text/x-kendo-template">
+    <button id="updateRequestsGrid" class="k-button update-grid" title="Оновити">
+        <i class='pf-icon pf-16 pf-reload_rotate'></i>
+    </button>
+    <button id="clearRequestsFilters" class="k-button" title="Очистити фільтри">
+        <i class='pf-icon pf-16 pf-filter-remove'></i>
+    </button>
+    <button id="reqClobBtn" class="k-button invisible" title="Відповідь">
+        Відповідь
+    </button>
+    <button id="respClobBtn" class="k-button invisible" title="Текст відповіді">
+        Текст відповіді
+    </button>
+    <button id="errorClobBtn" class="k-button invisible" title="Текст помилки">
+        Текст помилки
+    </button>
+    <button id="resultClobBtn" class="k-button invisible" title="Розширений текст помилки">
+        Розширений текст помилки
+    </button>
+</script>
+
+<script id="windowTemplate" type="text/x-kendo-template">
+    <div id="grid"></div>
+</script>
+<script id="clobWindowTemplate" type="text/x-kendo-template">
+    <textarea id="clob" class="clob-area"></textarea>
+</script>
+
+@*<script id="commandsTemplate" type="text/x-kendo-template">
+        <div class="editBtnContainer">
+            <a href="\\#" class="k-button k-button-icontext k-grid-add" title="Додати">
+                <span class="pf-icon pf-16 pf-add"></span>Додати
+            </a>
+            <a href="\\#" class="k-button k-button-icontext k-grid-custom" title="Редагувати">
+                <span class="pf-icon pf-16 pf-tool_pencil"></span>Редагувати
+            </a>
+            <a href="\\#" class="k-button k-button-icontext k-grid-delete" title="Видалити">
+                <span class="pf-icon pf-16 pf-delete"></span>Видалити
+            </a>
+        </div>
+
+        <div class="updateCancelContainer">
+            <a role="button" class="k-button k-button-icontext k-grid-update" href="\\#">
+                <span class="k-icon k-i-check"></span>Зберегти
+            </a>
+            <a role="button" class="k-button k-button-icontext k-grid-cancel" href="\\#">
+                <span class="k-icon k-i-cancel"></span>Відмінити
+            </a>
+        </div>
+    </script>*@

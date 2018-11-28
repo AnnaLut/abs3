@@ -1,0 +1,59 @@
+.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.search-box {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+    padding: 10px;
+    max-width: 1111px;
+    position: relative;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox
+{
+    width: 200px;
+}
+
+#search-edecl{
+    width: 200px;
+    float: right;
+    margin-right: 5px;
+}
+#search-button{
+    float:right;
+    margin-right: 20px;
+}
+#search-label {
+    float: right;
+    margin-top: 5px;
+    margin-right: 15px;
+}
+.row-pink {
+    background-color: #f7aeb2;
+}
+.k-state-selected {
+    background-color: rgb(66, 139, 202) !important;
+}

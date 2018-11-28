@@ -20,37 +20,104 @@ BEGIN
 END; 
 /
 
-PROMPT *** Create  table META_NSIFUNCTION ***
+prompt ... 
+
+
+-- Create table
 begin 
-  execute immediate '
-  CREATE TABLE BARS.META_NSIFUNCTION 
-   (	TABID NUMBER(38,0), 
-	FUNCID NUMBER(10,0), 
-	DESCR VARCHAR2(100), 
-	PROC_NAME VARCHAR2(254), 
-	PROC_PAR VARCHAR2(254), 
-	PROC_EXEC VARCHAR2(30), 
-	QST VARCHAR2(254), 
-	MSG VARCHAR2(254), 
-	FORM_NAME VARCHAR2(254), 
-	CHECK_FUNC VARCHAR2(254), 
-	WEB_FORM_NAME VARCHAR2(508), 
-	ICON_ID NUMBER,
-        CUSTOM_OPTIONS CLOB
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
+    execute immediate 'create table META_NSIFUNCTION
+(
+  tabid          NUMBER(38) not null,
+  funcid         NUMBER(10) not null,
+  descr          VARCHAR2(100),
+  proc_name      VARCHAR2(254),
+  proc_par       VARCHAR2(254),
+  proc_exec      VARCHAR2(30),
+  qst            VARCHAR2(254),
+  msg            VARCHAR2(254),
+  form_name      VARCHAR2(254),
+  check_func     VARCHAR2(254),
+  web_form_name  VARCHAR2(508),
+  icon_id        NUMBER,
+  custom_options CLOB
+)
+tablespace BRSSMLD
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+  )';
 exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
+    if sqlcode = -955 then null; else raise; 
+    end if; 
 end; 
 /
 
+begin 
+   execute immediate('alter table META_NSIFUNCTION add custom_options clob ');
+exception when others then 
+   null; 
+end;
+/
 
+-- Add comments to the table 
+comment on table META_NSIFUNCTION
+  is 'Описание функций, выполняемых на справочниках';
+-- Add comments to the columns 
+comment on column META_NSIFUNCTION.tabid
+  is 'Код таблицы';
+comment on column META_NSIFUNCTION.funcid
+  is 'Ид. функции для сортировки';
+comment on column META_NSIFUNCTION.descr
+  is 'Описание функции';
+comment on column META_NSIFUNCTION.proc_name
+  is 'Sql-процедура с параметрами';
+comment on column META_NSIFUNCTION.proc_par
+  is 'Описание параметров для Sql-процедуры';
+comment on column META_NSIFUNCTION.proc_exec
+  is 'Описание выпонения процедуры';
+comment on column META_NSIFUNCTION.qst
+  is 'Вопрос перед выполнением';
+comment on column META_NSIFUNCTION.msg
+  is 'Сообщение после удачного выполнения процедуры';
+comment on column META_NSIFUNCTION.form_name
+  is 'Функция центуры';
+comment on column META_NSIFUNCTION.check_func
+  is 'Функция проверки';
+comment on column META_NSIFUNCTION.web_form_name
+  is 'Функция WEB';
+comment on column META_NSIFUNCTION.icon_id
+  is 'Код иконки для кнопки';
+comment on column META_NSIFUNCTION.custom_options
+  is 'Дополнительные параметры функции';
 
+-- Create/Recreate primary, unique and foreign key constraints 
+begin
+    execute immediate 'alter table META_NSIFUNCTION
+  add constraint PK_METANSIFUNCTION primary key (TABID, FUNCID)
+  using index 
+  tablespace BRSSMLD
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/ 
 
-PROMPT *** ALTER_POLICIES to META_NSIFUNCTION ***
- exec bpa.alter_policies('META_NSIFUNCTION');
 
 PROMPT *** ADD COLUMN  custom_options***
 begin 
@@ -79,50 +146,47 @@ COMMENT ON COLUMN BARS.META_NSIFUNCTION.CUSTOM_OPTIONS IS 'Дополнительные парамe
 
 PROMPT *** Create  constraint CC_METANSIFUNCTION_DESCR_NN ***
 begin   
- execute immediate '
-  ALTER TABLE BARS.META_NSIFUNCTION ADD CONSTRAINT CC_METANSIFUNCTION_DESCR_NN CHECK (descr is not null) ENABLE';
+    execute immediate 'alter table META_NSIFUNCTION
+  add constraint FK_METANSIFUNCTION_ICONID foreign key (ICON_ID)
+  references META_ICONS (ICON_ID)
+  novalidate';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
  end;
 /
 
 
-
-
-PROMPT *** Create  constraint PK_METANSIFUNCTION ***
 begin   
- execute immediate '
-  ALTER TABLE BARS.META_NSIFUNCTION ADD CONSTRAINT PK_METANSIFUNCTION PRIMARY KEY (TABID, FUNCID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD  ENABLE';
+    execute immediate 'alter table META_NSIFUNCTION
+  add constraint FK_METANSIFUNCTION_METATABLES foreign key (TABID)
+  references META_TABLES (TABID)
+  novalidate';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
  end;
 /
 
 
-
-
-PROMPT *** Create  index PK_METANSIFUNCTION ***
+-- Create/Recreate check constraints 
 begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_METANSIFUNCTION ON BARS.META_NSIFUNCTION (TABID, FUNCID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLD ';
+    execute immediate 'alter table META_NSIFUNCTION
+  add constraint CC_METANSIFUNCTION_DESCR_NN
+  check (descr is not null)
+  novalidate';
 exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
  end;
 /
 
-
-
-PROMPT *** Create  grants  META_NSIFUNCTION ***
-grant SELECT                                                                 on META_NSIFUNCTION to BARSREADER_ROLE;
-grant DELETE,INSERT,SELECT,UPDATE                                            on META_NSIFUNCTION to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on META_NSIFUNCTION to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE                                            on META_NSIFUNCTION to START1;
-grant SELECT                                                                 on META_NSIFUNCTION to UPLD;
-
+-- Grant/Revoke object privileges 
+grant select on META_NSIFUNCTION to BARSREADER_ROLE;
+grant select, insert, update, delete on META_NSIFUNCTION to BARS_ACCESS_DEFROLE;
+grant select on META_NSIFUNCTION to BARS_DM;
+grant select, insert, update, delete on META_NSIFUNCTION to START1;
+grant select on META_NSIFUNCTION to UPLD;
 
 
 PROMPT ===================================================================================== 

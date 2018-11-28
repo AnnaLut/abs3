@@ -22,6 +22,8 @@ namespace BarsWeb.Areas.SWCompare.Models
         public decimal p_prn_file { get; set; }
         public string p_kf { get; set; }
         public string p_comments { get; set; }
+        public decimal? p_cause_err_id { get; set; }
+        public decimal p_id_c { get; set; }
     }
 
 }

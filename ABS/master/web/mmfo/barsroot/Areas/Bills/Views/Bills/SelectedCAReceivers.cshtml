@@ -1,0 +1,79 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model List<CA_Receivers>
+@{
+    @* View для отображения списка взыскателей по которым будет сформирована выдержка! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    Int32 index = 1;
+}
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">
+        Підтвердження даного списку є остаточним. <br />
+        Ви впевнені що бажаєте надіслати ці дані до ДКСУ?
+    </h2>
+</div>
+
+<div class="container" style="margin-bottom: 100px;">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <td>#</td>
+                <td>ПІБ/Найменування</td>
+                <td>Відділення</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (CA_Receivers receiver in Model)
+            {
+                <tr>
+                    <td class="hidden exp_id">@receiver.EXP_ID</td>
+                    <td>@index</td>
+                    <td>@receiver.NAME</td>
+                    <td>@receiver.BRANCH</td>
+                </tr>
+                ++index;
+            }
+        </tbody>
+    </table>
+</div>
+<div class="text-center" style="position:fixed; bottom: 0px; margin-left: auto; margin-right: auto; width: 100%; background-color: white; border-top: 1px thin lightgray;">
+    <button class="k-button" style="margin-bottom: 15px; margin-top: 15px;" onclick="sendData(); return false;">
+        Сформувати витяг <span class="glyphicon glyphicon-circle-arrow-up"></span>
+    </button>
+</div>
+
+<script>
+    function sendData() {
+        var list = $('.exp_id');
+        var arr = new Array();
+        for (var i = 0; i < list.length; ++i) {
+            arr[arr.length] = list[i].innerText;
+        }
+        $("<div class='k-overlay'></div>").appendTo($(document.body));
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: '/barsroot/api/bills/bills/BillsRequest?method=SendCAReceivers&str=&id=0',
+            data: JSON.stringify(arr),
+            success: function (result) {
+                if (result.status == 1) {
+                    bars.ui.alert({
+                        title: 'Успішно!',
+                        text: 'Виконано успішно',
+                        close: function () {
+                            window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+                        }
+                    });
+                }
+                else {
+                    bars.ui.error({
+                        text: result.err
+                    });
+                }
+            },
+            error: function (result) {
+                $(".k-overlay").remove();
+            }
+        });
+    }
+</script>

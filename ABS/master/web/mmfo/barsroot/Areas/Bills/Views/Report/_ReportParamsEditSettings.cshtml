@@ -1,0 +1,73 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model List<ReportParam>
+@{
+    Layout = null;
+    @* View создания\редактирования параметров для формирования отчетов *@
+}
+<style>
+    .param-label{
+        margin: 5px 10px 10px 15px;
+        min-width: 250px;
+        float: left;
+    }
+    .param-group{
+        margin-left: 20px;
+        float: left;
+        min-width: 250px;
+    }
+    .param-buttons{
+        margin-left: 20px;
+        float: left;
+        min-width: 100px;
+    }
+    .param-type-label {
+        margin-top: 7px !important;
+        display: block;
+        margin-left: 20px;
+        float:left;
+        min-width: 100px;
+    }
+</style>
+<div class="row" style="margin-left: 10px; margin-right: 10px;">
+
+    @foreach (ReportParam item in Model)
+    {
+        if (!String.IsNullOrEmpty(item.Param_Code) && !String.IsNullOrEmpty(item.Param_Name))
+        {
+            <div class="col-xs-12" style="margin-bottom: 15px;">
+                <div class="form-group">
+                    <label class="control-label param-label">
+                        @item.Param_Name
+                    </label>
+                    <div class="param-group">
+                        @Html.TextBox("Param_Code_" + item.Param_Id, item.Param_Code, new { disabled = "disabled", @class = "k-textbox" })
+                    </div>
+                    <div class="param-type-label">
+                        @{
+                            switch (item.Param_Type)
+                            {
+                                case "INTEGER":
+                                case "NUMBER": <span class="control-label">Числове значення</span>
+                                    break;
+                                case "DATE": <span class="control-label">Дата</span>
+                                    break;
+                                case "VARCHAR2": <span class="control-label">Текстове значення</span>
+                                    break;
+                            }
+                        }
+                    </div>
+                    <div class="param-buttons">
+                        <button class="k-button" title="Редагування параметру" onclick="editParameter(@item.Param_Id, @item.Report_Id)">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                        <button class="k-button" title="Видалення параметру" onclick="removeParameter(@item.Param_Id, @item.Report_Id)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+           
+</div>

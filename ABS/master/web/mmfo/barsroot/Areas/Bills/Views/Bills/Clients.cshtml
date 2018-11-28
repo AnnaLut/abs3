@@ -1,0 +1,49 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model CustomerViewModel
+@*@model IEnumerable<Customer>*@
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    @* View для выбора клиента по рнк! *@
+}
+
+<link href="~/Areas/Bills/Css/Main.css" rel="stylesheet" />
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<script src="~/Areas/Bills/Scripts/Clients.js"></script>
+<script src="~/Areas/Bills/Scripts/Main.js"></script>
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title"></h2>
+</div>
+<div style="margin-bottom: 50px;">
+    @(Html.Kendo().Grid<Customer>()
+                .Name("grid")
+                .Columns(col =>
+                {
+                    col.Bound(x => x.RNK).Title("РНК").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(100);
+                    col.Bound(x => x.NMK).Title("ПІБ").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    col.Bound(x => x.OKPO).Title("ІПН/ЄДРПОУ").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(112);
+                    col.Bound(x => x.NUMDOC).Title("Номер документу").HeaderHtmlAttributes(new { style = "white-space: normal" }).Template(p => p.SER + p.NUMDOC).Width(112);
+                    col.Bound(x => x.ORGAN).Title("Орган, що видав документ").HeaderHtmlAttributes(new { style = "white-space: normal" }).HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    col.Bound(x => x.PDATE).Format("{0:dd.MM.yyyy}").Title("Дата видачі").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                    col.Bound(x => x).Title("Дія").Width(100).ClientTemplate("#=confirmButton(data.RNK)#");
+                })
+                    .Resizable(resizable => resizable.Columns(true))
+                    .Reorderable(reorderable => reorderable.Columns(true))
+                    .Scrollable()
+                    .Selectable()
+                    .HtmlAttributes(new { style = "min-height: 50px; height: 100%;" })
+                    .Sortable()
+                    .Filterable()
+                    .Pageable(page => page
+                      .Refresh(true)
+                      .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                      .ButtonCount(10))
+                    .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .Model(model => model.Id(x => x.RNK))
+                      .Read(read => read.Action("GetCustomers_Read", "Bills", new { param = Model.Param, sqlType = Model.SqlType, count = Model.Count }))
+                      .PageSize(10)
+                      .Events(ev => ev.RequestEnd("loaded").RequestStart("started"))
+                    )
+    )
+</div>

@@ -1,0 +1,115 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model ReportParam
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    String buttonText = !Model.Param_Id.HasValue || Model.Param_Id.Value == 0 ? "Створити параметр" : "Зберегти зміни";
+    Boolean ckecked = Model.Nullable.HasValue && Model.Nullable.Value == 1;
+    Int32 nullable = Model.Nullable.HasValue ? Model.Nullable.Value : 0;
+    Int32 paramId = Model.Param_Id.HasValue ? Model.Param_Id.Value : 0;
+}
+
+<div style="padding-bottom: 20px;">
+    @using (Html.BeginForm("AddOrUpdateParameter", "Report", FormMethod.Post, new { id = "update-create-param-form", style = "padding-top: 25px;" }))
+    {
+        @*ИД отчета*@
+        <input type="hidden" value="@Model.Report_Id" id="Report_Id" name="Report_Id" />
+        @*ИД параметра (если 0 - будет создан новый параметр)*@
+        <input type="hidden" value="@paramId" id="Param_Id" name="Param_Id" />
+        @*Обязательность*@
+        <input type="hidden" value="@nullable" id="Nullable" name="Nullable" />
+        <div class="col-xs-12">
+            <div class="form-horizontal container-fluid">
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Param_Name, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*название параметра (будет отображаться при вводе)*@
+                        @Html.TextBoxFor(x => x.Param_Name, new { @class = "k-textbox", onkeyup = "onChange(); return false;" })
+                    </div>
+                </div>
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Param_Code, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*код параметра (регистро-зависемый)*@
+                        @Html.TextBoxFor(x => x.Param_Code, new { @class = "k-textbox", onkeyup = "onChange(); return false;" })
+                        <br />
+                        @Html.Label("carefully", "*Увага!  Значення чутливе до регистру", new { style = "color: red; font-size: 10px;", @class = "control-label col-md-12 col-xs-12" })
+                    </div>
+                </div>
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Param_Type, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*Описание отчета (не обязательное поле)*@
+                        @(Html.Kendo().DropDownList()
+                            .Name("Param_Type")
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .BindTo(new List<SelectListItem>{
+                                new SelectListItem { Text = "Числове значення", Value = "NUMBER" },
+                                new SelectListItem { Text = "Дата", Value = "DATE" },
+                                new SelectListItem { Text = "Строкове значення", Value = "VARCHAR2" }
+                            })
+                            .HtmlAttributes(new { })
+                            .Value(Model.Param_Type)
+                        )
+                    </div>
+                </div>
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Nullable, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*Обязательность параметра*@
+                        @(Html.Kendo().CheckBox().Name("Null").Checked(ckecked).HtmlAttributes(new { id="Null" }))
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-11" style="text-align: right;">
+                        <button class="k-button k-button-decrease" id="upd-create-submit-button" type="button" onclick="paramFormSubmit(); return false;">@buttonText</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+
+    // обработка нажатия клавиш на обязательных полях
+    function onChange() {
+        var name = $('#Param_Name').val();
+        var paramCode = $('#Param_Code').val();
+        if (name.length === 0)
+            $('#Param_Name').css('border-color', 'red');
+        else if (name.length > 0)
+            $('#Param_Name').css('border-color', '#ccc');
+        if (paramCode.length === 0)
+            $('#Param_Code').css('border-color', 'red');
+        else if (paramCode.length > 0)
+            $('#Param_Code').css('border-color', '#ccc');
+
+        var button = $('#upd-create-submit-button');
+        if (name.length === 0 || paramCode.length === 0) {
+            button.attr('disabled', 'disabled');
+            return false;
+        }
+        else
+            button.removeAttr('disabled');
+        return true;
+    }
+
+    // нажатие кнопки для формирования изменений (сохранить\создать)
+    function paramFormSubmit() {
+        if (onChange()) {
+            var checked = $('#Null')[0].checked;
+            var nullable = checked? 1 : 0;
+            $('#Nullable').val(nullable);
+            $('#update-create-param-form').submit();
+        }
+        else
+            return false;
+    }
+</script>
+
+<style>
+    .k-checkbox-label{
+        margin-top: -9px;
+    }
+</style>

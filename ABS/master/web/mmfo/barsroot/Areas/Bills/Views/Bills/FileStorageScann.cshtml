@@ -1,0 +1,115 @@
+﻿@using BarsWeb.Areas.Bills.Model
+@model SaveFileModel
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link rel="stylesheet" href="~/Content/Bootstrap/bootstrap.min.css" />
+<script src="~/Areas/Bills/Scripts/ScanDialog.js"></script>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10 col-sm-offset-1">
+            <div class="form-group">
+                <label for="FileName" class="control-label col-md-3 col-xs-4">
+                    Назва файлу
+                </label>
+                <div class="col-md-7 col-xs-6">
+                    @Html.TextBoxFor(x => x.FileName, new { @class = "k-textbox editable", @required = true })
+                </div>
+            </div>
+            <br /><br />
+            <div class="form-group">
+                <label for="Description" class="control-label col-md-3 col-xs-4">
+                    Опис файлу
+                </label>
+                <div class="col-md-7 col-xs-6">
+                    @Html.TextBoxFor(x => x.Description, new { @class = "k-textbox editable", @required = true })
+                </div>
+            </div>
+            <br /><br />
+            <div class="form-group"  style="margin-left: 15px;">
+                <input class="k-button k-edit-buttons" type="button" onclick="Scann(); return false;" value="Відсканувати">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var buildAndSendObj = {};
+    (function () {
+        buildAndSendObj = new dataObject();
+    })();
+
+    function Scann() {
+        var description = $('#Description').val();
+        var name = $('#FileName').val();
+        if (name.length === 0) {
+            bars.ui.alert({
+                text: 'Назва файлу обов\'язкова для заповнення'
+            });
+            return;
+        }
+        var url = '/barsroot/api/bills/bills/AttachStorageFile?description=' + description + '&fileName=' + name;
+        showScannDialog(url, buildAndSendObj.DefaultRequestFunction, buildAndSendObj);
+    }
+
+
+    function dataObject() {
+        // отправка запроса методом POST
+        this.SendPostRequest = function (url, data, successFunc) {
+            $("<div class='k-overlay'></div>").appendTo($(document.body));
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: url,
+                data: data,
+                success: successFunc,
+                error: function (result) {
+                    $(".k-overlay").remove();                }
+            });
+        };
+
+        // обработка события нажатия на кнопку
+        this.onButtonClickEvent = function (hideButtonsFunc, successFunc) {
+            var rows = this.getSelectedRows();
+            if (rows.length > 0)
+                successFunc(rows);
+            else {
+                hideButtonsFunc(false);
+                bars.ui.alert({
+                    text: 'Жодної строки не було вибрано',
+                    title: 'Увага!'
+                });
+            }
+        };
+
+        // показ затемняющего окна
+        this.ShowOverlay = function () {
+            $("<div class='k-overlay'></div>").appendTo($(document.body));
+        };
+
+        // скрытие затемняющего окна
+        this.HideOverlay = function () {
+            $(".k-overlay").remove();
+        };
+
+        // Стандартная функция для обработка POST запросов
+        this.DefaultRequestFunction = function (result) {
+            if (result.status === 1) {
+                bars.ui.alert({
+                    text: 'Виконано успішно!',
+                    close: function (e) {
+                        $('#Description').val('');
+                        $('#FileName').val('');
+                    }
+                });
+            }
+            else {
+                bars.ui.error({
+                    text: result.err
+                });
+            }
+            $(".k-overlay").remove();
+        }
+    }
+</script>
+

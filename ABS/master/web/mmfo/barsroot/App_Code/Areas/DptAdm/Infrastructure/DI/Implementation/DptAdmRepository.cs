@@ -647,5 +647,15 @@ namespace BarsWeb.Areas.DptAdm.Infrastructure.Repository.DI.Implementation
 
         }
 
+        public void CorrectHolydayDeposit(CorrectHolydayData data)
+        {
+            _entities.ExecuteStoreCommand("begin dpt_web.change_deposit_end_date(:p_old_dat_end, :p_new_dat_end, :p_ext);  end;",
+                new object[]
+                {
+                    new OracleParameter("p_old_dat_end", OracleDbType.Date, data.Current_Date_End, System.Data.ParameterDirection.Input),
+                    new OracleParameter("p_new_dat_end", OracleDbType.Date, data.New_Date_End, System.Data.ParameterDirection.Input),
+                    new OracleParameter("p_ext", OracleDbType.Int32, data.Corr_Type, System.Data.ParameterDirection.Input),
+                });
+        }
     }   
 }

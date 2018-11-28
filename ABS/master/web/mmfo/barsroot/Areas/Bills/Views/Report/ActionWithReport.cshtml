@@ -1,0 +1,78 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model ReportInfo
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    String buttonText = Model.Report_ID == 0 ? "Створити звіт" : "Зберегти зміни";
+}
+
+<script>
+    // обработка нажатия клавиш на обязательных полях
+    function onChange() {
+        var name = $('#Report_Name').val();
+        var fileName = $('#Frx_File_Name').val();
+        if (name.length === 0)
+            $('#Report_Name').css('border-color', 'red');
+        else if (name.length > 0)
+            $('#Report_Name').css('border-color', '#ccc');
+        if (fileName.length === 0)
+            $('#Frx_File_Name').css('border-color', 'red');
+        else if (fileName.length > 0)
+            $('#Frx_File_Name').css('border-color', '#ccc');
+
+        var button = $('#upd-create-submit-button');
+        if (name.length === 0 || fileName.length === 0) {
+            button.attr('disabled', 'disabled');
+            return false;
+        }
+        else
+            button.removeAttr('disabled');
+        return true;
+    }
+
+    // нажатие кнопки для формирования изменений
+    function formSubmit() {
+        if (onChange())
+            $('#update-create-form').submit();
+        else
+            return false;
+    }
+</script>
+
+<div style="padding-bottom: 20px;">
+    @using (Html.BeginForm("UpdateCreateReport", "Report", FormMethod.Post, new { id = "update-create-form", style = "padding-top: 25px;" }))
+    {
+        @*ИД отчета (если 0 - будет создан новый отчет)*@
+        <input type="hidden" value="@Model.Report_ID" id="Report_ID" name="Report_ID" />
+        <div class="col-xs-12">
+            <div class="form-horizontal container-fluid">
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Report_Name, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*название отчета (будет отображаться при выборе)*@
+                        @Html.TextBoxFor(x => x.Report_Name, new { @class = "k-textbox", onkeyup = "onChange(); return false;" })
+                    </div>
+                </div>
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Frx_File_Name, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*имя файла отчета (к примеру blabla.frx)*@
+                        @Html.TextBoxFor(x => x.Frx_File_Name, new { @class = "k-textbox", onkeyup = "onChange(); return false;" })
+                    </div>
+                </div>
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.Description, new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @*Описание отчета (не обязательное поле)*@
+                        @Html.TextBoxFor(x => x.Description, new { @class = "k-textbox" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-11" style="text-align: right;">
+                        <button class="k-button k-button-decrease" id="upd-create-submit-button" type="button" onclick="formSubmit(); return false;">@buttonText</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -6,7 +6,7 @@ select a.rnk,
            d.dat_begin,
            d.dat_end,
            a.kv,
-           d.limit  sum
+           a.ostc  sum
     from DPT_DEPOSIT d,
          accounts a,
          customer c
@@ -21,7 +21,7 @@ union all
            d.dat_begin,
            d.dat_end,
            a.kv,
-           d.sum
+           a.ostc
     from DPU_DEAL    d,
          accounts a,
          customer c

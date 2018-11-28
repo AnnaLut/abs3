@@ -7,6 +7,9 @@ using Bars.Oracle;
 using Oracle.DataAccess.Client;
 using System.Collections.Generic;
 using BarsWeb.Core.Logger;
+using BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Abstract;
+using BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.Sto;
 
 /// <summary>
 /// Summary description for DepositAddRegular.
@@ -14,9 +17,11 @@ using BarsWeb.Core.Logger;
 public partial class DepositAddRegular : Bars.BarsPage
 {
     private readonly IDbLogger _dbLogger;
+    private IContractRepository stoRepo;
     public DepositAddRegular()
     {
         _dbLogger = DbLoggerConstruct.NewDbLogger();
+        stoRepo = new ContractRepository();
     }
 
     # region Публичные свойства
@@ -82,8 +87,6 @@ public partial class DepositAddRegular : Bars.BarsPage
             Response.Redirect("DepositSearch.aspx?action=agreement");
 
         Page.Header.Title = Resources.Deposit.GlobalResources.hDepositEditAccount;
-
-        Decimal IDD = 0;
 
         Int64 agr_id = Convert.ToInt64(Request.QueryString["agr_id"]);
         RegisterClientScript();
@@ -160,7 +163,7 @@ public partial class DepositAddRegular : Bars.BarsPage
         Weekends.Checked = true;
         Weekends_1.Checked = false;
         textCur.Text = dpt.CurrencyName;
-        StartDate.Value = NextBankdate.ToString("d");        
+        StartDate.Text = NextBankdate.ToString("d");        
         nextBankDate.Value = Convert.ToString(NextBankdate.ToString("d"));
         MFO.Value = BankType.GetOurMfo();        
         MFO.Value = BankType.GetOurMfo();        
@@ -229,6 +232,9 @@ public partial class DepositAddRegular : Bars.BarsPage
         ClientScript.RegisterStartupScript(GetType(), ID + "Script_C", script);
     }
 
+    //стандартная группа регулярных платежей "EBP Регулярні платежі поповнення депозитного договору з картрахунку"
+    private readonly decimal STO_DPT_Group = 6;
+
     /// <summary>
     /// Нажатие на кнопку "Сохранить"
     /// </summary>
@@ -240,134 +246,80 @@ public partial class DepositAddRegular : Bars.BarsPage
             "deposit");
         
         String templateId = String.Empty;
-        Decimal agrId = Decimal.MinValue;
 
         OracleConnection connect = new OracleConnection();
-        OracleTransaction transaction = null; 
+        OracleTransaction transaction = null;
         try
         {
-            // Создаем соединение
+            // Открываем транзакцию
             IOraConnection conn = (IOraConnection)this.Application["OracleConnectClass"];
-            
             connect = conn.GetUserConnection();
             transaction = connect.BeginTransaction();
 
-            // Открываем соединение с БД
+            // Открываем транзакцию в репозитории STO
+            stoRepo.BeginTransaction();
+
             // Установка роли
             OracleCommand cmdSetRole = connect.CreateCommand();
             cmdSetRole.CommandText = conn.GetSetRoleCommand("DPT_ROLE");
 
-            Decimal p_IDG = 6; // STO_GRP. EBP Регулярні платежі поповнення депозитного договору з картрахунку
-            Decimal p_IDS = 0;
-            DateTime p_SDAT = DateTime.Now.Date;           
-
-            OracleCommand cmdMakeRegularLST = connect.CreateCommand();
-            cmdMakeRegularLST.Parameters.Clear();
-            cmdMakeRegularLST.Parameters.Add("IDG", OracleDbType.Decimal, p_IDG, ParameterDirection.Input);
-            cmdMakeRegularLST.Parameters.Add("p_IDS", OracleDbType.Decimal, p_IDS, ParameterDirection.Output);
-            cmdMakeRegularLST.Parameters.Add("RNK", OracleDbType.Decimal, rnk.Value, ParameterDirection.Input);
-            cmdMakeRegularLST.Parameters.Add("NAME", OracleDbType.Varchar2, ("Regular "+NMK.Value), ParameterDirection.Input);
-            cmdMakeRegularLST.Parameters.Add("SDAT", OracleDbType.Date, p_SDAT, ParameterDirection.Input);            
-            cmdMakeRegularLST.CommandText = "begin sto_all.add_RegularLST(:IDG, :p_IDS, :RNK, :NAME, :SDAT); end;";
-            cmdMakeRegularLST.ExecuteNonQuery();
-
-            p_IDS = Convert.ToDecimal(Convert.ToString(cmdMakeRegularLST.Parameters["p_IDS"].Value));                
-
-            _dbLogger.Info("Идентификатор клиента по регулярным платежам = " + Convert.ToString(cmdMakeRegularLST.Parameters["p_IDS"].Value));            
-            
-            Decimal p_ord = Convert.ToDecimal(Proir.SelectedValue);            
-            Decimal p_vob = 6;
-            Decimal p_dk = 1;
-            String  p_nlsa = textBankAccount.Text;
-            Decimal p_kva = Convert.ToDecimal(cur_id.Value);
-            String p_tt = "";
-            if (p_nlsa.Substring(0, 4) == "2625") { p_tt = "PK!"; }
-            if (p_nlsa.Substring(0, 4) == "2620" || p_nlsa.Substring(0, 3) == "263")
-            { p_tt = "191"; }            
-            String p_nlsb = textDPTAccount.Text;
-            Decimal p_kvb = Convert.ToDecimal(cur_id.Value);
-            String p_mfob = MFO.Value;
-            String p_polu = NMK.Value;
-            String p_nazn = textNazn.Text;
-            Decimal p_sum = Convert.ToDecimal(textSumRegular.Value)*100;
-            String p_okpo = OKPO.Value;
-            DateTime p_DatBegin = DateTime.ParseExact(StartDate.Text, "dd/MM/yyyy", null); 
-            DateTime p_DatEnd = DateTime.ParseExact(EndDate.Text, "dd/MM/yyyy", null);             
-            Decimal p_freq = Convert.ToDecimal(Freq.SelectedValue);
-            Decimal p_wend = -1;
-            Decimal p_idd = 0;
-            Decimal p_status = 0;
-            String p_status_text = "";
-            if (Convert.ToDecimal(Weekends_1.Checked) == 1)
+            // Создание договора на выполнение регулярных платежей
+            ids contract = new ids(Convert.ToDecimal(rnk.Value), STO_DPT_Group, ("Regular " + NMK.Value))
             {
-                p_wend = 1;
+                SDAT = DateTime.Now.Date
+            };
+            if (stoRepo.ContractData().Where(x => x.RNK == contract.RNK && x.IDG == contract.IDG).Any())
+            {
+                // если есть уже для этого клиента и группы - берем существующий
+                contract.IDS = stoRepo.ContractData().Where(x => x.RNK == contract.RNK && x.IDG == contract.IDG).First().IDS;
             }
-            String p_dr = String.Empty;      
-               
-            OracleCommand cmdMakeRegular = connect.CreateCommand();         
+            stoRepo.AddIDS(contract);
 
-            cmdMakeRegular.Parameters.Add("IDS", OracleDbType.Decimal, p_IDS, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("ord", OracleDbType.Decimal, p_ord, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("tt", OracleDbType.Varchar2, p_tt, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("vob", OracleDbType.Decimal, p_vob, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("dk", OracleDbType.Decimal, p_dk, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("nlsa", OracleDbType.Varchar2, p_nlsa, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("kva", OracleDbType.Decimal, p_kva, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("nlsb", OracleDbType.Varchar2, p_nlsb, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("kvb", OracleDbType.Decimal, p_kvb, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("mfob", OracleDbType.Varchar2, p_mfob, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("polu", OracleDbType.Varchar2, p_polu, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("nazn", OracleDbType.Varchar2, p_nazn, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("fsum", OracleDbType.Decimal, p_sum, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("okpo", OracleDbType.Varchar2, p_okpo, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("DAT1", OracleDbType.Date, p_DatBegin, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("DAT2", OracleDbType.Date, p_DatEnd, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("FREQ", OracleDbType.Decimal, p_freq, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("WEND", OracleDbType.Decimal, p_wend, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("DR", OracleDbType.Varchar2, p_dr, ParameterDirection.Input);
-            cmdMakeRegular.Parameters.Add("p_idd", OracleDbType.Decimal, p_idd, ParameterDirection.Output);
-            cmdMakeRegular.Parameters.Add("p_status", OracleDbType.Decimal, p_status, ParameterDirection.Output);
-            cmdMakeRegular.Parameters.Add("p_status_text", OracleDbType.Varchar2, p_status_text, ParameterDirection.Output);
+            _dbLogger.Info("Идентификатор договора по регулярным платежам = " + Convert.ToString(contract.IDS));
 
-            cmdMakeRegular.CommandText = @"begin sto_all.Add_RegularTreaty( 
-                                                        :IDS, 
-                                                        :ord, 
-                                                        :tt, 
-                                                        :vob, 
-                                                        :dk, 
-                                                        :nlsa, 
-                                                        :kva, 
-                                                        :nlsb, 
-                                                        :kvb, 
-                                                        :mfob, 
-                                                        :polu, 
-                                                        :nazn,
-                                                        :fsum, 
-                                                        :okpo, 
-                                                        :DAT1, 
-                                                        :DAT2, 
-                                                        :FREQ, 
-                                                        null,
-                                                        :WEND, 
-                                                        :DR, 
-                                                        null,
-                                                        1,
-                                                        sysdate, 
-                                                        :p_idd, 
-                                                        :p_status, 
-                                                        :p_status_text); 
-                                            end;";
-            
-            OracleDataReader rdr = cmdMakeRegular.ExecuteReader();
+            String AccountType;
+            OracleCommand getAccTypeCommand = connect.CreateCommand();
+            getAccTypeCommand.Parameters.Add("nls", OracleDbType.Varchar2, textBankAccount.Text, ParameterDirection.Input);
+            getAccTypeCommand.Parameters.Add("kv", OracleDbType.Decimal, Convert.ToDecimal(cur_id.Value), ParameterDirection.Input);
+            getAccTypeCommand.CommandText = "select TIP from accounts where nls = :nls and kv = :kv";
+            AccountType = (String)getAccTypeCommand.ExecuteScalar();
 
-            OracleCommand cmdCommand = connect.CreateCommand(); 
+
+            // Начало заполнения макета платежа
+            payment payment = new payment()
+            {
+                ord = Convert.ToDecimal(Proir.SelectedValue),
+                vob = 6,
+                dk = 1,
+                nlsa = textBankAccount.Text,
+                kva = Convert.ToDecimal(cur_id.Value),
+                nlsb = textDPTAccount.Text,
+                tt = ((textBankAccount.Text.Substring(0, 4) == "2625") || (textBankAccount.Text.Substring(0, 4) == "2620" && AccountType.StartsWith("W4"))) ? "PK!" : "191",
+                WEND = -1,
+                kvb = Convert.ToDecimal(cur_id.Value),
+                mfob = MFO.Value,
+                polu = NMK.Value,
+                nazn = textNazn.Text,
+                okpo = OKPO.Value,
+                DAT1 = DateTime.ParseExact(StartDate.Text, "dd/MM/yyyy", null),
+                DAT2 = DateTime.ParseExact(EndDate.Text, "dd/MM/yyyy", null),
+                FREQ = Convert.ToDecimal(Freq.SelectedValue),
+                DR = String.Empty,
+                fsum = Convert.ToString(Convert.ToDecimal(textSumRegular.Value) * 100),
+                IDS = contract.IDS
+            };
+
+            // Создание макета платежа
+            Decimal idd = stoRepo.AddPayment(payment);
+
+            // Создаем допсоглашение
+            OracleCommand cmdCommand = connect.CreateCommand();
             Decimal pArgId = 0;
-
             cmdCommand.Parameters.Add("p_id", OracleDbType.Decimal, Convert.ToDecimal(Request["dpt_id"]), ParameterDirection.Input);
             cmdCommand.Parameters.Add("p_agrmnttype", OracleDbType.Decimal, 25, ParameterDirection.Input);
             cmdCommand.Parameters.Add("p_trustcustid", OracleDbType.Decimal, Request["rnk_tr"] == null ? Convert.ToString(dpt.Client.ID) : Convert.ToString(Request["rnk_tr"]), ParameterDirection.Input);
             cmdCommand.Parameters.Add("p_agr_id", OracleDbType.Decimal, pArgId, ParameterDirection.Output);
-            
+
             const string sql = @"begin dpt_web.create_agreement(
                                                 :p_id,
                                                 :p_agrmnttype, 
@@ -394,29 +346,32 @@ public partial class DepositAddRegular : Bars.BarsPage
                                             end;";
             cmdCommand.CommandText = sql;
             cmdCommand.ExecuteNonQuery();
-            p_idd = Convert.ToDecimal(Convert.ToString(cmdMakeRegular.Parameters["p_idd"].Value));
             pArgId = Convert.ToDecimal(Convert.ToString(cmdCommand.Parameters["p_agr_id"].Value));
             _dbLogger.Info("Идентификатор новой додугоды 25 = " + Convert.ToString(pArgId));
+
+            // Создаем связь допсоглашения с созданным макетом платежа
             OracleCommand cmdCommandIns = connect.CreateCommand();
-            cmdCommandIns.Parameters.Add("p_id", OracleDbType.Decimal, p_idd, ParameterDirection.Input);
-             cmdCommandIns.Parameters.Add("p_agr_id", OracleDbType.Decimal, pArgId, ParameterDirection.Input);
-             cmdCommandIns.CommandText = "insert into sto_det_agr(IDD, AGR_ID) values(:p_idd,:p_agr_id)";
+            cmdCommandIns.Parameters.Add("p_id", OracleDbType.Decimal, idd, ParameterDirection.Input);
+            cmdCommandIns.Parameters.Add("p_agr_id", OracleDbType.Decimal, pArgId, ParameterDirection.Input);
+            cmdCommandIns.CommandText = "insert into sto_det_agr(IDD, AGR_ID) values(:p_idd,:p_agr_id)";
             cmdCommandIns.ExecuteNonQuery();
 
-            IDD.Value = Convert.ToString(p_idd); 
-            _dbLogger.Info("Идентификатор нового регулярного платежа" + Convert.ToString(IDD.Value));            
-            
-            if (p_idd != 0) 
-            {
-                btPrint.Enabled = true;
-            }
+            IDD.Value = Convert.ToString(idd);
+            _dbLogger.Info("Идентификатор нового регулярного платежа" + Convert.ToString(IDD.Value));
+
+
+            btPrint.Enabled = true;
+
+            stoRepo.Commit();
             transaction.Commit();
-            rdr.Close();
-            rdr.Dispose();   
         }
-        catch(Exception)
+        catch (Exception ex)
         {
-            if (transaction != null) transaction.Rollback();
+            if (transaction != null)
+            {
+                transaction.Rollback();
+            }
+            stoRepo.Rollback();
             throw;
         }
         finally
@@ -433,7 +388,6 @@ public partial class DepositAddRegular : Bars.BarsPage
 
         GridFill();
         ComboFill();
-        //String add_tr = "&rnk_tr=" + (Request["rnk_tr"] == null ? Convert.ToString(dpt.Client.ID) : Request.QueryString["rnk_tr"]);
     }
 
     /// <summary>

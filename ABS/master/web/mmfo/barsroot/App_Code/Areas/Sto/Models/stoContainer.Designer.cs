@@ -1863,7 +1863,8 @@ namespace Areas.Sto.Models
         /// <param name="nAZN">Initial value of the NAZN property.</param>
         /// <param name="oKPO">Initial value of the OKPO property.</param>
         /// <param name="wEND">Initial value of the WEND property.</param>
-        public static V_STO_DET CreateV_STO_DET(global::System.Decimal iDS, global::System.Decimal iDD, global::System.Decimal oRD, global::System.String tT, global::System.DateTime dAT1, global::System.DateTime dAT2, global::System.String fREQ, global::System.String nLSA, global::System.Decimal kVA, global::System.String nLSB, global::System.Decimal kVB, global::System.String mFOB, global::System.String pOLU, global::System.String nAZN, global::System.String oKPO, global::System.Decimal wEND)
+        /// <param name="oPERW_EXISTANCE">Initial value of the OPERW_EXISTANCE property.</param>
+        public static V_STO_DET CreateV_STO_DET(global::System.Decimal iDS, global::System.Decimal iDD, global::System.Decimal oRD, global::System.String tT, global::System.DateTime dAT1, global::System.DateTime dAT2, global::System.String fREQ, global::System.String nLSA, global::System.Decimal kVA, global::System.String nLSB, global::System.Decimal kVB, global::System.String mFOB, global::System.String pOLU, global::System.String nAZN, global::System.String oKPO, global::System.Decimal wEND, global::System.Decimal oPERW_EXISTANCE)
         {
             V_STO_DET v_STO_DET = new V_STO_DET();
             v_STO_DET.IDS = iDS;
@@ -1882,6 +1883,7 @@ namespace Areas.Sto.Models
             v_STO_DET.NAZN = nAZN;
             v_STO_DET.OKPO = oKPO;
             v_STO_DET.WEND = wEND;
+            v_STO_DET.OPERW_EXISTANCE = oPERW_EXISTANCE;
             return v_STO_DET;
         }
 
@@ -2464,6 +2466,33 @@ namespace Areas.Sto.Models
         private global::System.Decimal _WEND;
         partial void OnWENDChanging(global::System.Decimal value);
         partial void OnWENDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Decimal OPERW_EXISTANCE
+        {
+            get
+            {
+                return _OPERW_EXISTANCE;
+            }
+            set
+            {
+                if (_OPERW_EXISTANCE != value)
+                {
+                    OnOPERW_EXISTANCEChanging(value);
+                    ReportPropertyChanging("OPERW_EXISTANCE");
+                    _OPERW_EXISTANCE = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("OPERW_EXISTANCE");
+                    OnOPERW_EXISTANCEChanged();
+                }
+            }
+        }
+        private global::System.Decimal _OPERW_EXISTANCE;
+        partial void OnOPERW_EXISTANCEChanging(global::System.Decimal value);
+        partial void OnOPERW_EXISTANCEChanged();
     
         /// <summary>
         /// No Metadata Documentation available.

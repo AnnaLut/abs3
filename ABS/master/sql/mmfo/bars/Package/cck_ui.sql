@@ -279,11 +279,12 @@ END cck_ui;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_UI AS
 
-  g_body_version CONSTANT VARCHAR2(64) := 'ver.3.9 17.06.2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'ver.4.0 06.11.2018';
   g_errn NUMBER := -20203;
   g_errs VARCHAR2(16) := 'CCK_UI:';
 
 /*
+  06.11.2018 - COBUMMFO-8866 modified close deal
   16.03.2018 STA По открытию счета просрочки 3578 (фин.дебиторка) попросили изменить формирование названия счета на такое :
                  <Номер договора><Название заемщика>+ <номер счета 3578 основного оdb>. Слово "просроченный" убрать.
 
@@ -2752,10 +2753,28 @@ null;
     l_err VARCHAR(1000);
   BEGIN
     l_nd := nvl(p_nd, to_number(pul.get_mas_ini_val('ND')));
-    cck.cc_close(l_nd, l_err);
+    /*    cck.cc_close(l_nd, l_err);
     IF l_err IS NOT NULL THEN
       raise_application_error(g_errn, g_errs || l_err);
-    END IF;
+    END IF;*/
+		
+	--COBUMMFO-8866
+  for k in (select d.nd from cc_deal d
+		                  where d.sos >= 10 
+											  and d.sos <  15 
+												and d.wdate < gl.bDATE 
+												and d.vidd in (1,2,3,11,12,13)
+												and d.nd = l_nd or d.ndg = l_nd)
+  loop 
+			 cck.cc_close(k.nd, l_err);
+			 
+			 if trim(l_err) is null then   
+					INSERT INTO cc_sob (ND,FDAT,ISP,TXT,otm) values (k.ND,gl.bDATE,gl.aUID,'Договір закритий.' ,6);
+			 elsif l_err IS NOT NULL THEN
+          raise_application_error(g_errn, g_errs || l_err);
+			 end if;  
+			  
+  end loop;
   END cls;
   --------------
   PROCEDURE p9129(p_nd NUMBER) IS

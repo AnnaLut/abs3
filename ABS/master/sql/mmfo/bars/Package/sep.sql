@@ -1132,7 +1132,12 @@ endif
           mfoa_,nlsa_,mfob_,nlsb_,dk_,s_,vob_,nd_,kv_,data_,datp_,
           nam_a_,nam_b_,nazn#,naznk#,nazns_,id_a#,id_b#,id_o_,case when length(ref_a_)>9 then substr(ref_a_, -9) else ref_a_ end,bis_,
           sign_,fn_a_,rec_a_,dat_a#,d_rec#,sos_,blk_,
-          fa_name_,fa_ln_,CASE WHEN otm_=3 THEN 1 ELSE 0 END
+          fa_name_,fa_ln_,
+          CASE 
+            WHEN otm_=3 THEN 1 
+            WHEN sep_utl.get_stp_auto=1 then 1 --COBUMMFO-8551
+              ELSE 0 
+          END
           );
 
    logger.info('BIS2'||rec_);

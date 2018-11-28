@@ -1,29 +1,19 @@
+prompt PACKAGE STO_ALL
 create or replace package sto_all is
 /*
-    06-02-2012 Sta Регулярные платежи.
-    Разрозненные процедуры собраны в один пакедж.
-
-    Отдельные процедуры убиты:
-     drop procedure restore_stodate;
-     drop procedure validate_stodetails;
-     drop procedure setdefault_stodetails;
-     drop procedure generate_stoschedules ;
-
-    TRIGGER bars.taiu_sto_det - исправлен
-
-    Библиотека Bin\Bars002.apd - мсправлена.
-
-    19.07.2017 lypskykh: generate_stoschedules_reg исправлена для работы в ММФО
+    created 06-02-2012 Sta Регулярные платежи (STO)
 */
 
-    G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.7  05.09.2018';
+    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  ' version 2.2  01.10.2018';
+    
+    G_DET_STATUS_ACCEPTED constant pls_integer := 1;
+    
+    G_DET_STATUS_CANCELED constant pls_integer := -1;
 
     -- header_version - возвращает версию заголовка пакета STO_ALL
     function header_version return varchar2;
     -- body_version - возвращает версию тела пакета STO_ALL
     function body_version   return varchar2;
-    -- процедура оплаты рег.платежа--06-02-2012 Sta Дополнительные сопутствующие действия при оплате 1 детали рег пл.
-    PROCEDURE opl1 (p_idd IN sto_det.idd%TYPE, p_Ref IN oper.REF%TYPE);
 
     PROCEDURE generate_stoschedules (p_stoid     IN sto_det.idd%TYPE,
                                      p_stodat0   IN sto_det.dat0%TYPE,
@@ -148,43 +138,86 @@ create or replace package sto_all is
 
     PROCEDURE del_RegularTreaty (p_agr_id IN NUMBER);
 
-    PROCEDURE add_RegularLST (IDG     IN     STO_LST.IDG%TYPE,
-                              p_IDS      OUT STO_LST.IDS%TYPE,
-                              RNK     IN     STO_LST.RNK%TYPE,
-                              NAME    IN     STO_LST.NAME%TYPE,
-                              SDAT    IN     STO_LST.SDAT%TYPE);
+    --
+    -- Удаление / закрытие макета регулярного платежа
+    --
+    procedure remove_det (p_idd in sto_det.idd%type);
 
-    PROCEDURE add_LST (IDG    IN STO_LST.IDG%TYPE,
-                       IDS    IN STO_LST.IDS%TYPE,
-                       RNK    IN STO_LST.RNK%TYPE,
-                       NAME   IN STO_LST.NAME%TYPE,
-                       SDAT   IN STO_LST.SDAT%TYPE);
+    --
+    -- Создание нового договора на регулярные платежи
+    --
+    procedure set_lst (p_ids  out    sto_lst.ids%type, -- null (out) - создание
+                       p_idg  in     sto_lst.idg%type,
+                       p_rnk  in     sto_lst.rnk%type,
+                       p_name in     sto_lst.name%type,
+                       p_sdat in     sto_lst.sdat%type);
+                       
+    --
+    -- Обновление договора на рег. платежи
+    --
+    procedure update_lst ( p_ids  in     sto_lst.ids%type,
+                           p_idg  in     sto_lst.idg%type,
+                           p_rnk  in     sto_lst.rnk%type,
+                           p_name in     sto_lst.name%type,
+                           p_sdat in     sto_lst.sdat%type);
 
+    --
+    -- Удаление договора на рег. платежи - или закрытие, если по нему уже были порождены документы
+    --
+    procedure remove_lst (p_ids       in  sto_lst.ids%type,
+                          p_resultMsg out varchar2);
+    
+    -- Редактирование предустановленных допреквизитов макета платежа (создание, обновление, удаление при пустом value)
+    procedure add_operw (p_idd      IN    STO_operw.IDD%type,
+                         p_tag      IN    STO_operw.TAG%type,
+                         p_value    IN    STO_operw.VALUE%type);
 
-    PROCEDURE add_operw (IDD     IN STO_operw.IDD%TYPE,
-                         TAG     IN STO_operw.TAG%TYPE,
-                         VALUE   IN STO_operw.VALUE%TYPE);
+    --
+    -- Подтвердить / отклонить макет платежа
+    --
+    procedure claim_idd (p_IDD          in     sto_det.idd%type,
+                         p_statusid     in     sto_det.status_id%type,  -- статус (1 - подтвержден, -1 - отклонен)
+                         p_disclaimid   in     sto_det.disclaim_id%type,-- причина отклонения (если статус -1)
+                         p_status       out    int,                     -- статус выполнения (1 - ОК, -1 - ошибка)
+                         p_resultMsg    out    varchar2);               -- результирующее сообщение
+    --
+    -- Подтвердить / отклонить макет платежа (бросает ошибку вместо статуса)
+    --
+    procedure claim_idd (p_IDD          in     sto_det.idd%type,
+                         p_statusid     in     sto_det.status_id%type,   -- статус (1 - подтвержден, -1 - отклонен)
+                         p_disclaimid   in     sto_det.disclaim_id%type);-- причина отклонения (если статус -1)
 
-    PROCEDURE claim_idd (p_IDD          IN     sto_det.idd%TYPE,
-                         p_statusid     IN     sto_det.status_id%TYPE,
-                         p_disclaimid   IN     sto_det.disclaim_id%TYPE
-                        /* p_status          OUT INT,
-                         p_msgcode         OUT VARCHAR2*/);
-       TYPE r_FREQ_REC IS RECORD(FREQ int, name varchar2(50));
-       TYPE t_FREQ_SET IS TABLE OF r_FREQ_REC;
-       FUNCTION get_FREQ RETURN t_FREQ_SET PIPELINED;
+    /*todo: rewrite*/
+    function get_AvaliableNPP(p_IDS in number) RETURN number;
 
-       TYPE r_TTS_REC IS RECORD(TT char(3), name_ varchar2(500));
-       TYPE t_TTS_SET IS TABLE OF r_TTS_REC;
-       FUNCTION get_TTS RETURN t_TTS_SET PIPELINED;
-       FUNCTION get_AvaliableNPP(p_IDS in number) RETURN number;
-
-       TYPE r_RNK_REC IS RECORD(RNK number(38), NMK varchar2(500));
-       TYPE t_RNK_SET IS TABLE OF r_RNK_REC;
-       FUNCTION get_RNKBYOKPO(p_okpo in varchar2) RETURN t_RNK_SET PIPELINED;
-
-       procedure pay_docs(p_IDD in sto_det.idd%type, p_dat in date);
-       function fsumFunction(fSum in varchar2, KVA in int, KVB in int , NLSA in varchar2, NLSB in varchar2, tt in varchar2 ) return number;
+    --
+    -- Оплата документов - "Виконання регулярних платежів"
+    --
+    procedure pay_docs(p_idd in sto_det.idd%type,
+                       p_dat in date);
+    
+    --
+    -- Проверить формулу суммы; Возвращает текст ошибки или null (если формула корректна)
+    --
+    function check_fsumFunction(fSum in varchar2, 
+                                kva  in int, 
+                                kvb  in int, 
+                                nlsa in varchar2, 
+                                nlsb in varchar2, 
+                                tt   in varchar2)
+    return varchar2;
+    
+    --
+    -- Формула суммы платежа
+    --
+    function fsumFunction(fSum        in varchar2, 
+                          KVA         in int, 
+                          KVB         in int, 
+                          NLSA        in varchar2, 
+                          NLSB        in varchar2, 
+                          tt          in varchar2,
+                          raise_error in number default 0)
+    return number;
 
 
 END STO_ALL;
@@ -195,52 +228,68 @@ create or replace package body sto_all is
     Разрозненные процедуры собраны в один пакедж.
 */
 --------------------------------------------------------------
--- используется как версия тела пакета. Название как-нибудь потом поменяем
-    G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :=  'version 1.8.6  12.12.2017';
+    
+    G_BODY_VERSION  CONSTANT VARCHAR2(64)  :=  ' version 2.2  01.10.2018';
 
     -- header_version - возвращает версию заголовка пакета STO_ALL
-    FUNCTION header_version
-    RETURN VARCHAR2
-    IS
-    BEGIN
-       RETURN 'Package header STO_ALL ' || G_HEADER_VERSION;
-    END header_version;
+    function header_version
+    return varchar2
+    is
+    begin
+       return 'Package header '|| $$PLSQL_UNIT || G_HEADER_VERSION;
+    end header_version;
 
     -- body_version - возвращает версию тела пакета STO_ALL
-    FUNCTION body_version
-       RETURN VARCHAR2
-    IS
-    BEGIN
-       RETURN 'Package body STO_ALL ' || G_BODY_VERSION;
-    END body_version;
+    function body_version
+       return varchar2
+    is
+    begin
+       return 'Package body '|| $$PLSQL_UNIT || G_BODY_VERSION;
+    end body_version;
 
     --06-02-2012 Sta Дополнительные сопутствующие действия при оплате 1 детали рег пл.
     PROCEDURE opl1 (p_idd IN sto_det.idd%TYPE, p_Ref IN oper.REF%TYPE)
     IS
-      l_br3 sto_det.branch%type;
+      l_br3         sto_det.branch%type;
+      l_oper_exists pls_integer;
     begin
-      --отметка о последней дате выполнения
-      UPDATE sto_det  SET dat0 = gl.BDATE WHERE idd = p_idd ;
+        -- проверка на наличие порожденного платежа (т.е. ненулевая сумма, в противном случае сохраняем только референс)
+        select case when exists 
+                        (select 1 from oper where ref = p_ref) 
+                    then 1 
+                    else 0 end
+        into l_oper_exists
+        from dual;
+        --отметка о последней дате выполнения
+        update sto_det  
+        set dat0 = gl.BDATE 
+        where idd = p_idd;
 
-      -- референс выполнения платежа в данную дату
-      UPDATE sto_dat  SET ref  = p_Ref    WHERE idd = p_Idd AND dat = gl.bdate;
+        -- референс выполнения платежа в данную дату
+        update sto_dat  
+        set ref  = p_ref    
+        where idd = p_idd AND dat = gl.bdate;
+        
+        if l_oper_exists = 1 then
+            -- реквизит для бюджетирования дох/рас (прежде всего, неоперационных)
+            select branch into l_br3 from sto_det where idd = p_idd;
+            if l_br3 is not null then
+                UPDATE opldok set txt = l_br3 where ref = p_ref;
+            end if;
 
-      -- реквизит для бюджетирования дох/рас (прежде всего, неоперационных)
-      begin
-        SELECT branch into l_br3 FROM sto_det WHERE idd=p_Idd and branch is not null;
-        UPDATE opldok set txt  = l_br3    where ref = p_Ref ;
-      exception when no_data_found then null;
-      end;
-
-      -- доп.реквизиты платежа. предусмотренные настройками данного рег.платежа
-      for k in (select * from sto_operw where idd= p_Idd )
-      loop
-         update operw set value = k.value where tag = k.TAG and ref = p_ref;
-         if SQL%rowcount = 0 then
-            INSERT into operw (ref,tag,value) values (p_Ref,k.tag, k.value);
-         end if;
-      end loop;
-
+            -- доп.реквизиты платежа. предусмотренные настройками данного рег.платежа
+            merge into operw OW
+            using (select kf, idd, tag, value from sto_operw where idd = p_idd) SW 
+            on (OW.ref = p_ref and OW.tag = SW.tag)
+            when matched then 
+                UPDATE
+                set value = SW.value
+            when not matched then 
+                INSERT
+                (ref, tag, value, kf)
+                values
+                (p_ref, SW.tag, SW.value, SW.kf);
+        end if;
     end opl1;
 
     --------------------------------------------------------------------
@@ -260,10 +309,8 @@ create or replace package body sto_all is
        l_stopdat              DATE;
        l_nextdat              DATE;
        l_tempdat              DATE;
-       l_idg                  NUMBER;
        l_nd                   NUMBER;
        l_sdate                DATE;
-       l_s                    NUMBER;
        l_cc_id                VARCHAR2 (50);
        l_CCdat                DATE;
        l_accepted_startdate   DATE;
@@ -396,10 +443,8 @@ create or replace package body sto_all is
        l_stopdat              DATE;
        l_nextdat              DATE;
        l_tempdat              DATE;
-       l_idg                  NUMBER;
        l_nd                   NUMBER;
        l_sdate                DATE;
-       l_s                    NUMBER;
        l_cc_id                VARCHAR2 (50);
        l_CCdat                DATE;
        l_accepted_startdate   DATE;
@@ -985,24 +1030,26 @@ create or replace package body sto_all is
       end if;
     end add_det;
 
+    --
+    -- Удаление (закрытие) макетов рег. платежей депозитного договора (в привязке к допсоглашению)
+    --
     procedure del_RegularTreaty(p_agr_id number)
     is
-    p_idd sto_det.idd%type;
+    l_iddToRemove sto_det.idd%type;
     begin
-        BEGIN
-           SELECT idd
-             INTO p_idd
-             FROM sto_det_agr
-            WHERE agr_id = p_agr_id;
-        EXCEPTION
-           WHEN OTHERS
-           THEN NULL;
-        END;
+        begin
+           select idd
+             into l_iddToRemove
+             from sto_det_agr
+            where agr_id = p_agr_id;
+        exception
+           when others
+           then null;
+        end;
 
-        if nvl(p_idd,0) <> 0
+        if nvl(l_iddToRemove,0) <> 0
         then
-              delete from sto_dat where idd =  p_idd;
-              delete from sto_det where idd =  p_idd;
+            remove_det(l_iddToRemove);
         end if;
     end del_RegularTreaty;
 
@@ -1039,82 +1086,82 @@ create or replace package body sto_all is
        l_mfo              varchar2(6);
 	   l_nmk				  customer.nmk%type;
 	   l_okpo			  customer.okpo%type;
-    BEGIN
-       begin
-       SELECT rnk
-         INTO l_rnk
-         FROM accounts
-        WHERE nls = nlsa
-          AND kv = kva;
-       exception when no_data_found
-          then raise_application_error ( -20001, 'У клієнта немає рахунків в обраній валюті!', false);
-       end;
+       l_status_claim     pls_integer;
+       l_status_msg       varchar2(256);
+    begin
+        begin
+            select rnk
+              into l_rnk
+              from accounts
+             where nls = nlsa
+               and kv = kva;
+        exception when no_data_found
+           then raise_application_error (-20001, 'У клієнта немає рахунків в обраній валюті!', false);
+        end;
 
-       l_valid_mobphone := BARS.VERIFY_CELLPHONE_BYRNK (l_rnk);
+        l_valid_mobphone := BARS.VERIFY_CELLPHONE_BYRNK (l_rnk);
 
-       IF l_valid_mobphone = 0
-       THEN
-          -- В картці клієнта не заповнено або невірно заповнено мобільний телефон
-          bars_error.raise_nerror ('CAC', 'ERROR_MPNO');
-          raise_application_error ( -20001, 'ERR:  В картці клієнта не заповнено або невірно заповнено мобільний телефон! Заповніть корректний моб.телефон в картці клієнта і спробуйте знову.', TRUE);
-       ELSE
-          p_status := 0;
+        if l_valid_mobphone = 0
+        then
+            -- В картці клієнта не заповнено або невірно заповнено мобільний телефон
+            bars_error.raise_nerror ('CAC', 'ERROR_MPNO');
+            raise_application_error ( -20001, 'ERR:  В картці клієнта не заповнено або невірно заповнено мобільний телефон! Заповніть корректний моб.телефон в картці клієнта і спробуйте знову.', TRUE);
+        else
+            p_status := 0;
 
-          l_sto_det.IDS := IDS;
-          l_sto_det.ord := ord;
-          l_sto_det.tt := tt;
-          l_sto_det.vob := vob;
-          l_sto_det.dk := dk;
-          l_sto_det.nlsa := nlsa;
-          l_sto_det.kva := kva;
-          l_sto_det.nlsb := replace(nlsb,'_','');
-          l_sto_det.kvb := kvb;
-          l_sto_det.mfob := mfob;
-          l_sto_det.polu := polu;
-          l_sto_det.nazn := nazn;
-          l_sto_det.fsum := fsum;
-          l_sto_det.okpo := replace(okpo,'_','');
-          l_sto_det.DAT1 := DAT1;
-          l_sto_det.DAT2 := DAT2;
-          l_sto_det.FREQ := FREQ;
-          l_sto_det.DAT0 := DAT0;
-          l_sto_det.WEND := WEND;
-          l_sto_det.DR := DR;
-          l_sto_det.branch := branch;
-          l_sto_det.userid_made := user_id;
-          l_sto_det.branch_made := SYS_CONTEXT ('bars_context', 'user_branch');
-          l_sto_det.status_id := 0;
-          l_sto_det.disclaim_id := 0;
+            l_sto_det.IDS := IDS;
+            l_sto_det.ord := ord;
+            l_sto_det.tt := tt;
+            l_sto_det.vob := vob;
+            l_sto_det.dk := dk;
+            l_sto_det.nlsa := nlsa;
+            l_sto_det.kva := kva;
+            l_sto_det.nlsb := replace(nlsb,'_','');
+            l_sto_det.kvb := kvb;
+            l_sto_det.mfob := mfob;
+            l_sto_det.polu := polu;
+            l_sto_det.nazn := nazn;
+            l_sto_det.fsum := fsum;
+            l_sto_det.okpo := replace(okpo,'_','');
+            l_sto_det.DAT1 := DAT1;
+            l_sto_det.DAT2 := DAT2;
+            l_sto_det.FREQ := FREQ;
+            l_sto_det.DAT0 := DAT0;
+            l_sto_det.WEND := WEND;
+            l_sto_det.DR := DR;
+            l_sto_det.branch := branch;
+            l_sto_det.userid_made := user_id;
+            l_sto_det.branch_made := SYS_CONTEXT ('bars_context', 'user_branch');
+            l_sto_det.status_id := 0;
+            l_sto_det.disclaim_id := 0;
 
-          if nvl(fsum,'0')='0'
-          then
-           raise_application_error ( -20001, 'Не корректно введено суму!', false);
-          end if;
+            if nvl(fsum,'0')='0'
+            then
+                raise_application_error (-20001, 'Не корректно введено суму!', false);
+            end if;
 
-          if BARS.f_validokpo(l_sto_det.okpo) != 0
-          then
-          raise_application_error ( -20001, 'Не корректно введено ЗКПО отримувача!', false);
-          end if;
+            if BARS.f_validokpo(l_sto_det.okpo) != 0
+            then
+                raise_application_error (-20001, 'Не корректно введено ЗКПО отримувача!', false);
+            end if;
 
-          if l_sto_det.nlsb=''
-          then
-           raise_application_error ( -20001, 'Не корректно номер рахунку отримувача!', false);
-          end if;
-          begin
-           select mfo
-             into l_mfo
-             from banks
-             where mfo = mfob;
-          exception when no_data_found
-          then   raise_application_error ( -20001, 'Введеного МФО не існує в довіднику банків!', false);
-          end;
+            if l_sto_det.nlsb is null
+            then
+                raise_application_error (-20001, 'Не корректно номер рахунку отримувача!', false);
+            end if;
+            begin
+                select mfo into l_mfo from banks where mfo = mfob;
+            exception 
+                when no_data_found then
+                    raise_application_error (-20001, 'Введеного МФО не існує в довіднику банків!', false);
+            end;
 
-          if nvl(polu,'0')='0'
-          then raise_application_error ( -20001, 'Не корректно введено найменування отримувача!', false);
-          end if;
-          if nvl(nazn,'0')='0'
-          then raise_application_error ( -20001, 'Призначення платежу не може бути пустим!', false);
-          end if;
+            if nvl(polu,'0')='0'
+                then raise_application_error (-20001, 'Не корректно введено найменування отримувача!', false);
+            end if;
+            if nvl(nazn,'0')='0'
+                then raise_application_error (-20001, 'Призначення платежу не може бути пустим!', false);
+            end if;
 
             BEGIN
                SELECT branch
@@ -1128,260 +1175,328 @@ create or replace package body sto_all is
                THEN l_sto_det.branch_card := '';
             END;
 
-          l_sto_det.kf := SYS_CONTEXT ('bars_context', 'user_mfo');
-          l_sto_det.stmp := SYSDATE;
-          l_sto_det.datetimestamp := SYSDATE;
+            l_sto_det.kf := SYS_CONTEXT ('bars_context', 'user_mfo');
+            l_sto_det.stmp := SYSDATE;
+            l_sto_det.datetimestamp := SYSDATE;
 
-          BEGIN
-             SELECT idd
-               INTO p_idd
-               FROM sto_det
-              WHERE IDS = l_sto_det.IDS
-                AND ord = l_sto_det.ord
-                AND nlsa = l_sto_det.nlsa
-                AND nlsb = l_sto_det.nlsb
-                AND nazn = l_sto_det.nazn
-                AND DAT1 = l_sto_det.DAT1
-                AND DAT2 = l_sto_det.DAT2;
+            begin
+                select idd
+                  into p_idd
+                  from sto_det
+                 where IDS = l_sto_det.IDS
+                   and ord = l_sto_det.ord
+                   and nlsa = l_sto_det.nlsa
+                   and nlsb = l_sto_det.nlsb
+                   and nazn = l_sto_det.nazn
+                   and DAT1 = l_sto_det.DAT1
+                   and DAT2 = l_sto_det.DAT2;
 
-             p_status := 1;                   --(вже існує з заданими параметрами)
-             p_status_text := '';
-          EXCEPTION
-             WHEN NO_DATA_FOUND
-             THEN
+                p_status := 1;                   --(вже існує з заданими параметрами)
+                p_status_text := '';
+            exception
+                when NO_DATA_FOUND then
                 p_status := 0;                                           --(новий)
                 p_status_text := '';
 
-
-
               begin
-                INSERT INTO sto_det
-                     VALUES l_sto_det
-					 RETURNING idd into l_sto_det.idd;
-				begin
-					select upper(NMK), okpo into l_nmk, l_okpo
-					from customer
-					where rnk = (select rnk from sto_lst where ids = l_sto_det.ids);
-				exception
-					when no_data_found then null;
-				end;
+                  INSERT INTO sto_det
+                       VALUES l_sto_det
+                       RETURNING idd into l_sto_det.idd;
+                  begin
+                      select upper(NMK), okpo into l_nmk, l_okpo
+                      from customer
+                      where rnk = (select rnk from sto_lst where ids = l_sto_det.ids);
+                  exception
+                      when no_data_found then null;
+                  end;
 
-                /* автопідтвердження ф.190 на погашення кредитів Дт2625-Кт2620
-				поповнення депозитів Дт2625-Кт2630/2635 #COBUMMFO-5328 */
-                if      substr(case when l_sto_det.dk = 1 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2625','2620') --8212
-                    and substr(case when l_sto_det.dk = 1 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620','2630', '2635')
-					and upper(l_sto_det.POLU) = l_nmk
-					and l_sto_det.okpo = l_okpo
-					and l_sto_det.mfob = l_sto_det.kf
-                then
-                    sto_all.claim_idd(l_sto_det.idd, 1, 0);
-                end if;
+                  /* автопідтвердження ф.190 на погашення кредитів Дт2625-Кт2620
+                  поповнення депозитів Дт2625-Кт2630/2635 #COBUMMFO-5328 */
+                  if      substr(case when l_sto_det.dk = 1 then l_sto_det.nlsa else l_sto_det.nlsb end, 1, 4) in ('2625','2620') --8212
+                      and substr(case when l_sto_det.dk = 1 then l_sto_det.nlsb else l_sto_det.nlsa end, 1, 4) in ('2620','2630', '2635')
+                      and upper(l_sto_det.POLU) = l_nmk
+                      and l_sto_det.okpo = l_okpo
+                      and l_sto_det.mfob = l_sto_det.kf
+                  then
+                      sto_all.claim_idd(l_sto_det.idd, 1, 0, l_status_claim, l_status_msg);
+                  end if;
 
-              exception when others then
-               if (sqlerrm like '%NLSB%') then
-                raise_application_error ( -20001, 'Не корректно введено рахунок отримувача!', false);
-               elsif (sqlerrm like '%NAZN%') then
-                raise_application_error ( -20001, 'Не корректно введено призначення!', false);
-               elsif (sqlerrm like '%MFOB%') then
-                raise_application_error ( -20001, 'Не корректно введено МФО отримувача!', false);
-               elsif (sqlerrm like '%POLU%') then
-                raise_application_error ( -20001, 'Не корректно введено найменування отримувача!', false);
-               elsif (sqlerrm like '%OKPO%') then
-                raise_application_error ( -20001, 'Не корректно введено ЗКПО отримувача!', false);
-               elsif (sqlerrm like '%DATES%') then
-                raise_application_error ( -20001, 'Не корректно введені дати дії договору! Перевірте дату початку і дату закінчення', false);
-               elsif (sqlerrm like '%UK_STODET%') then
-                raise_application_error ( -20001, 'Не корректно введено порядковий номер виконання', false);
-               else
-                raise_application_error ( -20001, sqlerrm, TRUE);
-               end if;
+              exception 
+                  when others then
+                      if (sqlerrm like '%NLSB%') then
+                          raise_application_error (-20001, 'Не корректно введено рахунок отримувача!', false);
+                      elsif (sqlerrm like '%NAZN%') then
+                          raise_application_error (-20001, 'Не корректно введено призначення!', false);
+                      elsif (sqlerrm like '%MFOB%') then
+                          raise_application_error (-20001, 'Не корректно введено МФО отримувача!', false);
+                      elsif (sqlerrm like '%POLU%') then
+                          raise_application_error (-20001, 'Не корректно введено найменування отримувача!', false);
+                      elsif (sqlerrm like '%OKPO%') then
+                          raise_application_error (-20001, 'Не корректно введено ЗКПО отримувача!', false);
+                      elsif (sqlerrm like '%DATES%') then
+                          raise_application_error (-20001, 'Не корректно введені дати дії договору! Перевірте дату початку і дату закінчення', false);
+                      elsif (sqlerrm like '%UK_STODET%') then
+                          raise_application_error (-20001, 'Не корректно введено порядковий номер виконання', false);
+                      else
+                          raise_application_error (-20001, sqlerrm, TRUE);
+                      end if;
               end;
-          END;
+            end;
 
-          begin
-          SELECT idd
-            INTO p_idd
-            FROM sto_det
-           WHERE     IDS = l_sto_det.IDS
-                 AND ord = l_sto_det.ord
-                 AND nlsa = l_sto_det.nlsa
-                 AND nlsb = l_sto_det.nlsb
-                 AND nazn = l_sto_det.nazn
-                 AND DAT1 = l_sto_det.DAT1
-                 AND DAT2 = l_sto_det.DAT2;
+            begin
+                select idd
+                into p_idd
+                from sto_det
+                where     IDS = l_sto_det.IDS
+                 and ord = l_sto_det.ord
+                 and nlsa = l_sto_det.nlsa
+                 and nlsb = l_sto_det.nlsb
+                 and nazn = l_sto_det.nazn
+                 and DAT1 = l_sto_det.DAT1
+                 and DAT2 = l_sto_det.DAT2;
 
-          add_operw (p_idd, 'TREAT', p_nd);
-          exception when no_data_found then  raise_application_error ( -20001, 'Не збережено!', false);
-          end;
-       END IF;
+                add_operw (p_idd, 'TREAT', p_nd);
+            exception 
+                when no_data_found then  
+                    raise_application_error ( -20001, 'Не збережено!', false);
+            end;
+        END IF;
     END Add_RegularTreaty;
 
-    PROCEDURE add_LST (IDG    IN STO_LST.IDG%TYPE,
-                       IDS    IN STO_LST.IDS%TYPE,
-                       RNK    IN STO_LST.RNK%TYPE,
-                       NAME   IN STO_LST.NAME%TYPE,
-                       SDAT   IN STO_LST.SDAT%TYPE)
-    IS
-        l_sto_lst sto_lst%rowtype;
-    BEGIN
-        l_sto_lst.IDG    :=     IDG;
-        l_sto_lst.IDS    :=     IDS;
-        l_sto_lst.RNK    :=     RNK;
-        l_sto_lst.NAME   :=     NAME;
-        l_sto_lst.SDAT   :=     SDAT;
-
-       update sto_lst
-          set IDG   =   l_sto_lst.IDG ,
-              RNK   =   l_sto_lst.RNK ,
-              NAME  =   l_sto_lst.NAME,
-              SDAT  =   l_sto_lst.SDAT
-        where ids = l_sto_lst.ids;
-
-      IF SQL%ROWCOUNT=0 THEN
-      insert into sto_lst ( IDG  ,         RNK,               NAME,              SDAT)
-                   values (l_sto_lst.IDG,  l_sto_lst.RNK,     l_sto_lst.NAME,    l_sto_lst.SDAT);
-      end if;
-    END add_LST;
-
-    PROCEDURE add_RegularLST (IDG     IN     STO_LST.IDG%TYPE,
-                              p_IDS      OUT STO_LST.IDS%TYPE,
-                              RNK     IN     STO_LST.RNK%TYPE,
-                              NAME    IN     STO_LST.NAME%TYPE,
-                              SDAT    IN     STO_LST.SDAT%TYPE)
-    IS
-       l_sto_lst   sto_lst%ROWTYPE;
-    BEGIN
-       bars_audit.info ('>>start');
-       l_sto_lst.IDG := IDG;
-       l_sto_lst.RNK := RNK;
-       l_sto_lst.NAME := NAME;
-       l_sto_lst.SDAT := SDAT;
-
-       bars_audit.info ('>>sdat = ' || TO_CHAR (sdat));
-
-       BEGIN
-          SELECT sl.IDS
-            INTO p_IDS
-            FROM sto_lst sl
-           WHERE sl.IDG = l_sto_lst.IDG AND sl.RNK = l_sto_lst.RNK;
-
-          bars_audit.info ('>>p_ids = ' || TO_CHAR (p_ids));
-       EXCEPTION
-          WHEN NO_DATA_FOUND
-          THEN
-             INSERT INTO sto_lst (IDG,
-                                  RNK,
-                                  NAME,
-                                  SDAT)
-                  VALUES (l_sto_lst.IDG,
-                          l_sto_lst.RNK,
-                          l_sto_lst.NAME,
-                          l_sto_lst.SDAT);
-       END;
-
-       SELECT sl.IDS
-         INTO p_IDS
-         FROM sto_lst sl
-        WHERE sl.IDG = l_sto_lst.IDG AND sl.RNK = l_sto_lst.RNK;
-
-       bars_audit.info ('>>p_ids = ' || TO_CHAR (p_ids));
-    END add_RegularLST;
-
-    PROCEDURE add_operw (IDD      IN    STO_operw.IDD%TYPE,
-                         TAG      IN    STO_operw.TAG%TYPE,
-                         VALUE    IN    STO_operw.VALUE%TYPE)
-    IS
-       l_sto_operw   sto_operw%ROWTYPE;
-    BEGIN
-       l_sto_operw.IDD := IDD;
-       l_sto_operw.TAG := TAG;
-       l_sto_operw.VALUE := VALUE;
-       l_sto_operw.kf := SYS_CONTEXT ('bars_context', 'user_mfo');
-
-       IF l_sto_operw.VALUE IS NOT NULL
-       THEN
-          UPDATE sto_operw
-             SET VALUE = l_sto_operw.VALUE
-           WHERE idd = l_sto_operw.idd AND tag = l_sto_operw.tag;
-
-          IF SQL%ROWCOUNT = 0
-          THEN
-             INSERT INTO sto_operw
-                  VALUES l_sto_operw;
-          END IF;
-       ELSE
-          DELETE FROM sto_operw
-                WHERE idd = l_sto_operw.IDD AND TAG = l_sto_operw.TAG;
-       END IF;
-    END add_operw;
-
-    PROCEDURE claim_idd (p_IDD          IN     sto_det.idd%TYPE,
-                         p_statusid     IN     sto_det.status_id%TYPE,
-                         p_disclaimid   IN     sto_det.disclaim_id%TYPE
-                         /*p_status          OUT INT,
-                         p_msgcode         OUT VARCHAR2*/)
-    is
-     l_disclaim_txt sto_disclaimer.name%type;
-     l_status          INT;
-     l_msgcode         VARCHAR2(100);
+    --
+    -- Удаление / закрытие макета регулярного платежа
+    --
+    procedure remove_det (p_idd in sto_det.idd%type)
+        is
+    l_docs_exists    pls_integer;
+    l_trace constant varchar2(150) := 'STO_ALL.remove_det: ';
     begin
-     l_status := 1;
+        select
+                case when exists (select 1 
+                                  from sto_dat d 
+                                  where d.idd = p_idd and 
+                                  d.ref is not null)
+                     then 1
+                     else 0
+                     end
+        into l_docs_exists
+        from dual;
+        if l_docs_exists = 1 then
+            -- если по макету были порождены документы - закрываем
+            claim_idd(p_idd        => p_idd,
+                      p_statusid   => G_DET_STATUS_CANCELED,
+                      p_disclaimid => 2); -- "відмова клієнта"
+            bars_audit.info(l_trace || 'CANCEL idd='||p_idd);
+        else
+            -- если нет - удаляем
+            delete from sto_dat where idd = p_idd;
+            delete from sto_det where idd = p_idd;
+            bars_audit.info(l_trace || 'DELETE idd='||p_idd);
+        end if;
+    end remove_det;
 
-     begin
-     select name
-       into l_disclaim_txt
-       from sto_disclaimer
-      where id = p_disclaimid;
-     exception when no_data_found
-               then l_status := -1;
-                    l_msgcode := 'Помилка обробки статусу рег.платежа № '||to_char(p_idd)||'бек-офісом! Не знайдено коду причини відмови в бек-офісі з ідентифікатором '||to_char(p_disclaimid);
-                    bars_audit.error('sto_all.claim_idd: помилка обробки статусу рег.платежа № '||to_char(p_idd)||'бек-офісом! Не знайдено коду причини відмови в бек-офісі з ідентифікатором '||to_char(p_disclaimid));
-     end;
-     l_msgcode := case when p_statusid = 1  then 'Регулярний платіж №' || to_char(p_IDD) ||' підтверджено.'
-                       when p_statusid = -1 then 'Регулярний платіж №' || to_char(p_IDD) ||' відхилено зі статусом ' || l_disclaim_txt
-                  end;
-     begin
-         update sto_det
-            set status_id = p_statusid,
-                disclaim_id = p_disclaimid,
-                status_date = trunc(sysdate),
-                status_uid = user_id
-         where idd = p_IDD;
-     exception when others
-               then l_status := -1;
-                    l_msgcode := 'Помилка обробки статусу рег.платежа № '||to_char(p_idd)||'бек-офісом!';
-                    bars_audit.error('sto_all.claim_idd: помилка обробки статусу рег.платежа № '||to_char(p_idd)||'бек-офісом');
-     end;
+    --
+    -- Создание нового договора на регулярные платежи
+    --
+    procedure set_lst (p_ids  out    sto_lst.ids%type, -- null (out) - создание
+                       p_idg  in     sto_lst.idg%type,
+                       p_rnk  in     sto_lst.rnk%type,
+                       p_name in     sto_lst.name%type,
+                       p_sdat in     sto_lst.sdat%type)
+    is
+    l_trace constant varchar2(150) := 'STO_ALL.set_lst: ';
+    l_params varchar2(250) := 'idg='||to_char(p_idg)||';rnk='||to_char(p_rnk)||';name='||p_name||';sdat='||to_char(p_sdat, 'dd.mm.yyyy')||';';
+    begin
+        if p_ids is null then
+            insert into sto_lst (ids, rnk, name, sdat, idg)
+            values (p_ids, p_rnk, p_name, p_sdat, p_idg)
+            returning ids into p_ids;
+            bars.bars_audit.info(l_trace||'Создан договор на рег. платеж с параметрами: ['||l_params||'ids='||to_char(p_ids)||']');
+        else
+            update sto_lst
+            set idg = p_idg,
+                rnk = p_rnk,
+                name = p_name,
+                sdat = p_sdat
+            where ids = p_ids;
+            if sql%rowcount = 0 then
+                raise_application_error(-20000, 'Договора за вказаним внутрішнім ід ['||to_char(p_ids)||'] не знайдено');
+            else
+                bars.bars_audit.info(l_trace||'Обновлен договор на рег. платеж с параметрами: ['||l_params||'ids='||to_char(p_ids)||']');
+            end if;
+        end if;
+    end set_lst;
+    
+    --
+    -- Обновление договора на рег. платежи
+    --
+    procedure update_lst ( p_ids  in     sto_lst.ids%type,
+                           p_idg  in     sto_lst.idg%type,
+                           p_rnk  in     sto_lst.rnk%type,
+                           p_name in     sto_lst.name%type,
+                           p_sdat in     sto_lst.sdat%type)
+    is
+    l_trace constant varchar2(150) := 'STO_ALL.update_lst: ';
+    l_params varchar2(250) := 'idg='||to_char(p_idg)||';rnk='||to_char(p_rnk)||';name='||p_name||';sdat='||to_char(p_sdat, 'dd.mm.yyyy')||';';
+    begin
+        update sto_lst
+        set idg = p_idg,
+            rnk = p_rnk,
+            name = p_name,
+            sdat = p_sdat
+        where ids = p_ids;
+        if sql%rowcount = 0 then
+            raise_application_error(-20000, 'Договора за вказаним внутрішнім ід ['||to_char(p_ids)||'] не знайдено');
+        else
+            bars.bars_audit.info(l_trace||'Обновлен договор на рег. платеж с параметрами: ['||l_params||'ids='||to_char(p_ids)||']');
+        end if;
+    end update_lst;
+    
+    --
+    -- Удаление договора на рег. платежи - или закрытие, если по нему уже были порождены документы
+    --
+    procedure remove_lst (p_ids       in  sto_lst.ids%type,
+                          p_resultMsg out varchar2)
+    is
+    l_claim_status pls_integer;
+    l_claim_msg    varchar2(256);
+    l_docs_exists  pls_integer;
+    begin
+        select
+                case when exists (select 1 
+                                  from sto_dat d 
+                                  join sto_det t on d.idd = t.idd 
+                                  where t.ids = p_ids and 
+                                  d.ref is not null)
+                     then 1
+                     else 0
+                     end
+        into l_docs_exists
+        from dual;
+        if l_docs_exists = 1 then
+            /* если по договору есть макеты платежей и были порождены документы - закрываем */
+            for det in (
+                            select idd 
+                            from sto_det
+                            where ids = p_ids and nvl(status_id, 0) in (0, 1)
+                        )
+            loop
+                /* закрываем все созданные макеты платежей */
+                sto_all.claim_idd(p_IDD        => det.idd,
+                                  p_statusid   => -1, -- отмена
+                                  p_disclaimid => 3,  -- "скасовано за ініціативою банку"
+                                  p_status     => l_claim_status,
+                                  p_resultMsg  => l_claim_msg);
+                if l_claim_status = -1 then
+                    /* не удалось изменить статус макету - откат и выходим */
+                    rollback;
+                    p_resultMsg := 'Внутрішня помилка при видаленні макету idd='||to_char(det.idd)||'. Операцію скасовано';
+                    return;
+                end if;
+            end loop;
+            /* закрываем договор */
+            update sto_lst
+            set date_close = sysdate
+            where ids = p_ids;
+            p_resultMsg := 'Договір закрито';
+            bars_audit.info('STO_ALL.REMOVE_LST: Закрытие договора ids='||to_char(p_ids));
+        else
+            /* иначе - удаляем */
+            delete from sto_dat where idd in (select idd from sto_det where ids = p_ids);
+            delete from sto_operw where idd in (select idd from sto_det where ids = p_ids);
+            delete from sto_det where ids = p_ids;
+            delete from sto_lst where ids = p_ids;
+            p_resultMsg := 'Договір видалено';
+            bars_audit.info('STO_ALL.REMOVE_LST: Удаление договора ids='||to_char(p_ids));
+        end if;
+    end remove_lst;
+    
+    -- Редактирование предустановленных допреквизитов макета платежа (создание, обновление, удаление при пустом value)
+    procedure add_operw (p_idd      IN    STO_operw.IDD%type,
+                         p_tag      IN    STO_operw.TAG%type,
+                         p_value    IN    STO_operw.VALUE%type)
+    is
+        l_sto_operw   sto_operw%rowtype;
+    begin
+        l_sto_operw.IDD := p_idd;
+        l_sto_operw.TAG := p_tag;
+        l_sto_operw.VALUE := p_value;
+        l_sto_operw.kf := sys_context('bars_context', 'user_mfo');
+
+        if l_sto_operw.value is not null
+        then
+            UPDATE sto_operw
+               set value = l_sto_operw.VALUE
+             where idd = l_sto_operw.idd and tag = l_sto_operw.tag;
+            if sql%rowcount = 0
+            then
+               INSERT into sto_operw values l_sto_operw;
+            end if;
+        else
+            DELETE from sto_operw where idd = l_sto_operw.IDD and tag = l_sto_operw.TAG;
+        end if;
+    end add_operw;
+
+    --
+    -- Подтвердить / отклонить макет платежа
+    --
+    procedure claim_idd (p_IDD          in     sto_det.idd%type,
+                         p_statusid     in     sto_det.status_id%type,  -- статус (1 - подтвержден, -1 - отклонен)
+                         p_disclaimid   in     sto_det.disclaim_id%type,-- причина отклонения (если статус -1)
+                         p_status       out    int,                     -- статус выполнения (1 - ОК, -1 - ошибка)
+                         p_resultMsg    out    varchar2)                -- результирующее сообщение
+    is
+    l_disclaim_txt sto_disclaimer.name%type;
+    begin
+        p_status := G_DET_STATUS_ACCEPTED; 
+        begin
+            select name
+            into l_disclaim_txt
+            from sto_disclaimer
+            where id = p_disclaimid;
+        exception 
+            when no_data_found then
+                p_status := G_DET_STATUS_CANCELED;
+                p_resultMsg := 'Помилка обробки статусу рег.платежа № '||to_char(p_idd)||' бек-офісом! Не знайдено коду причини відмови в бек-офісі з ідентифікатором '||to_char(p_disclaimid);
+                bars_audit.error('sto_all.claim_idd: помилка обробки статусу рег.платежа № '||to_char(p_idd)||
+                                 ' бек-офісом! Не знайдено коду причини відмови в бек-офісі з ідентифікатором '||to_char(p_disclaimid));
+                return;
+        end;
+        p_resultMsg := case when p_statusid = G_DET_STATUS_ACCEPTED  then 'Регулярний платіж №' || to_char(p_IDD) ||' підтверджено.'
+                            when p_statusid = G_DET_STATUS_CANCELED then 'Регулярний платіж №' || to_char(p_IDD) ||' відхилено зі статусом ' || l_disclaim_txt
+                     end;
+        begin
+            update sto_det
+               set status_id = p_statusid,
+                   disclaim_id = p_disclaimid,
+                   status_date = trunc(sysdate),
+                   status_uid = user_id
+             where idd = p_IDD;
+        exception 
+            when others then
+               p_status := G_DET_STATUS_CANCELED;
+               p_resultMsg := 'Помилка обробки статусу рег.платежа № '||to_char(p_idd)||' бек-офісом!';
+               bars_audit.error('sto_all.claim_idd: помилка обробки статусу рег.платежа № '||to_char(p_idd)||' бек-офісом:'||
+                                dbms_utility.format_error_stack||chr(10)||dbms_utility.format_error_backtrace);
+        end;
     end claim_idd;
-     FUNCTION get_FREQ
-         RETURN t_FREQ_SET PIPELINED
-      is
-     l_freq_REC r_freq_REC;
-     begin
-     bars_audit.trace ('get_FREQ start');
-
-         FOR i IN ( select freq, name from freq)
-         LOOP
-            l_freq_REC.freq := i.freq;
-            l_freq_REC.name := i.name;
-
-            PIPE ROW (l_freq_REC);
-         END LOOP;
-     end;
-
-     FUNCTION get_TTS RETURN t_TTS_SET PIPELINED
-     is
-     l_tts_REC r_tts_REC;
-     begin
-     bars_audit.trace ('get_TTS start');
-     FOR i IN ( select tt, tt||'('||name||')' as name_ from tts where tt in ('PKD', '310', '101','D66', 'PKR', '440', '420', '445', 'K20', 'M19', '190', 'PKQ', 'W4W', 'PK!', 'W4T', 'DOR') )
-         LOOP
-            l_tts_REC.tt := i.tt;
-            l_tts_REC.name_ := i.name_;
-
-            PIPE ROW (l_tts_REC);
-         END LOOP;
-     end;
+    
+    --
+    -- Подтвердить / отклонить макет платежа (бросает ошибку вместо статуса)
+    --
+    procedure claim_idd (p_IDD          in     sto_det.idd%type,
+                         p_statusid     in     sto_det.status_id%type,   -- статус (1 - подтвержден, -1 - отклонен)
+                         p_disclaimid   in     sto_det.disclaim_id%type)-- причина отклонения (если статус -1)
+    is
+    l_status    pls_integer;
+    l_resultmsg varchar2(256);
+    begin
+        sto_all.claim_idd(p_idd, p_statusid, p_disclaimid, l_status, l_resultmsg);
+        if l_status = G_DET_STATUS_CANCELED then
+            raise_application_error(-20000, l_resultmsg);
+        end if;
+    end claim_idd;
+    
     FUNCTION get_AvaliableNPP(p_IDS in number) RETURN number
     is
     l_npp number := 1;
@@ -1395,30 +1510,18 @@ create or replace package body sto_all is
      end;
      return(l_npp);
     end;
-
-    FUNCTION get_RNKBYOKPO(p_okpo in varchar2) RETURN t_RNK_SET PIPELINED
-    is
-    l_RNK_REC r_RNK_REC;
-     begin
-     bars_audit.trace ('get_RNKBYOKPO start');
-     FOR i IN ( select rnk, nmk from customer where okpo = p_okpo)
-         LOOP
-            l_RNK_REC.rnk := i.rnk;
-            l_RNK_REC.nmk := i.nmk;
-
-            PIPE ROW (l_RNK_REC);
-         END LOOP;
-    end;
-
-    procedure pay_docs(
-        p_idd in sto_det.idd%type,
-        p_dat in date)
+    
+    --
+    -- Оплата документов - "Виконання регулярних платежів"
+    --
+    procedure pay_docs(p_idd in sto_det.idd%type,
+                       p_dat in date)
     is
         l_title   constant varchar2(17) := 'sto_all.pay_docs:';
         l_doc     oper%rowtype;
-        l_ex      int;
-        l_sos     integer;
-        l_flag    integer;
+        l_ex      pls_integer;
+        l_sos     pls_integer;
+        l_flag    pls_integer;
     begin
         bars_audit.trace(l_title || 'start with param: ' || p_idd || ',' || to_char(p_dat, 'dd/mm/yyyy'));
 
@@ -1431,7 +1534,6 @@ create or replace package body sto_all is
         exception
             when no_data_found then
                  raise_application_error ( -20001, 'Не обрано жодного платежа', false);
-                 --- ??????
                  bars_audit.trace(l_title|| 'не обрано платежа, помилка пошуку для оновлення');
                  return;
         end;
@@ -1451,7 +1553,7 @@ create or replace package body sto_all is
                v.idb,
                v.dk,
                v.mfoa
-               ,to_number(substr(tts.flags,38,1)) 
+               ,to_number(substr(tts.flags,38,1))
         into   l_doc.nlsa,
                l_doc.kv,
                l_doc.mfob,
@@ -1471,8 +1573,7 @@ create or replace package body sto_all is
         from   v_stoschedules_web v, tts
         where  v.tt = tts.tt and
                recid = p_idd and
-               paydat = p_dat
-        order by v.deal_id, v.ord;
+               paydat = p_dat;
 
         l_doc.s2   := l_doc.s;
         l_doc.vdat := gl.bd;
@@ -1530,62 +1631,92 @@ create or replace package body sto_all is
                       sb_    => l_doc.s2,
                       sq_    => null,
                       nom_   => null);
+        else
+            bars_audit.info(l_title||' документ с нулевой суммой, реф='||l_doc.ref);
         end if;
-/*
-    paytt(0, l_doc.ref, l_doc.vdat, l_doc.tt, l_doc.dk,l_doc.kv, l_doc.nlsa,l_doc.s, l_doc.kv2, l_doc.nlsb,l_doc.s2);
-   for k in (   SELECT a.ttap tt, a.dk
-                  FROM tts t, ttsap a
-                 where t.tt='PK!'
-                   and a.tt = t.tt)
-   loop
-    paytt(0, l_doc.ref, l_doc.vdat, k.tt, k.dk,l_doc.kv, l_doc.nlsa,l_doc.s, l_doc.kv2, l_doc.nlsb,l_doc.s2);
-   end loop;
-*/
-        update sto_det t
-        set    t.dat0 = l_doc.vdat
-        where  t.idd = p_idd;
+        -- сопутствующие действия при оплате
+        opl1(p_idd => p_idd, p_Ref => l_doc.ref);
+    end pay_docs;
 
-        update sto_dat t
-        set    t.ref = l_doc.ref
-        where  t.idd = p_idd and
-               t.dat = p_dat;
-    end;
-
-    function fsumFunction(fSum in varchar2, KVA in int, KVB in int , NLSA in varchar2, NLSB in varchar2, tt in varchar2 ) return number
-    is
-     l_tmpsql varchar2(4000);
-     l_fSum   varchar2(4000);
-     l_sum    number;
-     l_check  int;
+    --
+    -- Проверить формулу суммы; Возвращает текст ошибки или null (если формула корректна)
+    --
+    function check_fsumFunction(fSum in varchar2, 
+                                kva  in int, 
+                                kvb  in int, 
+                                nlsa in varchar2, 
+                                nlsb in varchar2, 
+                                tt   in varchar2)
+    return varchar2
+        is
+    l_trace          varchar2(256) := 'STO_ALL.check_fsumFunction: ';
+    l_func_result    number;
+    l_result_message varchar2(500);
     begin
-     begin
-         begin
-          select 1 into l_check from tabval where kv = KVA;
-         exception when no_data_found
-                   then raise_application_error ( -20001, 'Валюти не '|| to_char(KVA) ||'існує', false);
-         end;
-
-         begin
-          select 1 into l_check from tabval where kv = KVB;
-         exception when no_data_found
-                   then raise_application_error ( -20001, 'Валюти не '|| to_char(KVB) ||'існує', false);
-         end;
-
-         l_fSum := fSum;
-         l_fSum := replace(l_fSum,'#(KVA)',to_char(KVA));
-         l_fSum := replace(l_fSum,'#(KVB)',to_char(KVB));
-         l_fSum := replace(l_fSum,'#(NLSA)',NLSA);
-         l_fSum := replace(l_fSum,'#(NLSB)',NLSB);
-         l_fSum := replace(l_fSum,'#(TT)',TT);
-
-         l_tmpsql := 'select ' || l_fSum || ' from dual';
-         bars_audit.info(fSum ||l_tmpsql );
-         execute immediate l_tmpsql into l_sum;
-     exception when others then l_sum := 0;
-     end;
-     return l_sum;
-    end;
-
+        l_func_result := fsumFunction(fsum, kva, kvb, nlsa, nlsb, tt);
+        return l_result_message;
+    exception
+        when others then
+            l_result_message := 'Помилка перевірки формули суми: '||substr(dbms_utility.format_error_stack || chr(10) || dbms_utility.format_error_backtrace, 1, 500);
+            return l_result_message;
+    end check_fsumFunction;
+    
+    --
+    -- Формула суммы платежа
+    --
+    function fsumFunction(fSum        in varchar2, 
+                          KVA         in int, 
+                          KVB         in int, 
+                          NLSA        in varchar2, 
+                          NLSB        in varchar2, 
+                          tt          in varchar2,
+                          raise_error in number default 0) 
+    return number
+    is
+    l_trace          varchar2(256) := 'STO_ALL.fsumFunction: ';
+    l_function       varchar2(500) := regexp_replace(upper(fsum), '#\(([[:alpha:]]+)\)', ':\1');
+    l_tmpSql         varchar2(1000);
+    l_cursor_id      pls_integer;
+    rows_processed   pls_integer;
+    l_func_result    number;
+    begin
+        begin
+            l_tmpSql := 'select '||l_function||' from dual';
+            bars_audit.trace(l_trace||'sql=['||l_tmpSql||']');
+            l_cursor_id := dbms_sql.open_cursor;
+            dbms_sql.PARSE(c => l_cursor_id, statement => l_tmpSql, language_flag => dbms_sql.native);
+            dbms_sql.define_column(l_cursor_id, 1, l_func_result);
+            if l_function like '%:KVA%' then 
+                dbms_sql.bind_variable(l_cursor_id, ':KVA', kva); 
+            end if;
+            if l_function like '%:KVB%' then 
+                dbms_sql.bind_variable(l_cursor_id, ':KVB', kvb);
+            end if;
+            if l_function like '%:NLSA%' then 
+                dbms_sql.bind_variable(l_cursor_id, ':NLSA', nlsa); 
+            end if;
+            if l_function like '%:NLSB%' then 
+                dbms_sql.bind_variable(l_cursor_id, ':NLSB', nlsb); 
+            end if;
+            if l_function like '%:TT%' then 
+                dbms_sql.bind_variable(l_cursor_id, ':TT', tt); 
+            end if;
+            rows_processed := dbms_sql.execute_and_fetch(l_cursor_id);
+            dbms_sql.column_value(l_cursor_id, 1, l_func_result);
+            dbms_sql.CLOSE_CURSOR(l_cursor_id);
+            bars_audit.trace(l_trace||'result=['||l_func_result||']');
+        exception
+            when others then
+                dbms_sql.CLOSE_CURSOR(l_cursor_id);
+                l_func_result := 0;
+                if raise_error = 1 then
+                    raise;
+                end if;
+                bars_audit.trace(l_trace||'check failed:['||substr(dbms_utility.format_error_stack || chr(10) || dbms_utility.format_error_backtrace, 1, 500)||']');
+        end;
+        return l_func_result;
+    end fsumFunction;
+    
 end STO_ALL;
 /
 show err;

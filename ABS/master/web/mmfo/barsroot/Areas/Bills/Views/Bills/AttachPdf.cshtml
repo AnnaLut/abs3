@@ -1,0 +1,58 @@
+﻿@model Int32
+@using Kendo.Mvc.UI
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link rel="stylesheet" href="~/Content/Bootstrap/bootstrap.min.css" />
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10 col-sm-offset-1">
+            @using (Html.BeginForm("AttachFile", "Bills", new { id = Model }, FormMethod.Post, new { id = "attach-form", name = "attach-form" }))
+            {
+                @Html.Hidden("fType")
+                <div class="form-group">
+                    <label for="fileType" class="control-label col-md-3 col-xs-4 required">
+                        <b>Тип документу</b>
+                    </label>
+                    <div class="col-md-6 col-xs-6">
+                        @(Html.Kendo().DropDownList()
+                            .Name("fileType")
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .BindTo(new List<SelectListItem>{
+                                 new SelectListItem { Text = "Заява на погашення", Value = "2" },
+                                 new SelectListItem { Text = "Інщі документи", Value = "3" }
+                            })
+                            .HtmlAttributes(new { @class = "editable" })
+                        )
+                        <br /><br />
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label for="fileType" class="control-label col-md-3 col-xs-4 required">
+                        <b>Додати файл (PDF)</b>
+                    </label>
+                    <div class="col-md-6 col-xs-6">
+                        @(Html.Kendo().Upload()
+                             .Name("File")
+                             .Messages(x => x.Select("Вибрати файл"))
+                             .HtmlAttributes(new { accept = "application/pdf" })
+                        )
+                    </div>
+                </div>
+                <br />
+                <div class="form-group">
+                    <input class="k-button k-edit-buttons" type="button" onclick="onBegin(); return false;" value="Зберегти">
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function onBegin(e) {
+        var fType = $('#fileType').val();
+        $('#fType').val(fType);
+        $('#attach-form').submit();
+    }
+</script>

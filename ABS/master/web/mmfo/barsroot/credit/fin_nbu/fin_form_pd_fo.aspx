@@ -33,6 +33,48 @@
             padding-top: 10px;
         }
     </style>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.bars.ui.js"></script>
+
+    <link href="/barsroot/Content/Themes/Kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="/barsroot/Content/Themes/Kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="/barsroot/Content/Themes/Kendo/kendo.dataviz.min.css" rel="stylesheet" />
+    <link href="/barsroot/Content/Themes/Kendo/kendo.bootstrap.min.css" rel="stylesheet" />
+    <link href="/barsroot/Content/Themes/Kendo/kendo.dataviz.bootstrap.min.css" rel="stylesheet" />
+<link href="/barsroot/Content/images/PureFlat/pf-icons.css" rel="stylesheet" />
+    <script src="/barsroot/Scripts/kendo/kendo.all.min.js"></script>
+    <script src="/barsroot/Scripts/kendo/kendo.aspnetmvc.min.js"></script>
+    <script src="/barsroot/Scripts/kendo/cultures/kendo.culture.uk.min.js"></script>
+    <script src="/barsroot/Scripts/kendo/cultures/kendo.culture.uk-UA.min.js"></script>
+    <script src="/barsroot/Scripts/kendo/messages/kendo.messages.uk-UA.min.js"></script>
+	
+    <script src="/barsroot/Scripts/Bars/bars.ui.js"></script>
+    <script src="/barsroot/Scripts/Bars/bars.utils.js"></script>
+    <script src="/barsroot/Scripts/Bars/bars.config.js"></script>
+    <script language="javascript" type="text/javascript">
+		var viewCustomerWinOptions = {
+			width: 1111,
+			height: 610
+		}
+		function EditClient() {
+			var rnk = document.getElementById("RNK_").value;
+            var oldUrl = window.location.href;
+			var url = bars.config.urlContent('/clientregister/registration.aspx?readonly=0&kred=1&rnk='+rnk);
+			bars.ui.dialog({
+				actions:['Maximize', 'Close'],
+				close: function () {
+                    window.location.href = oldUrl;//.reload(true);
+				},
+				iframe: true,
+				content: {
+					url: url
+				},
+				width: viewCustomerWinOptions.width,
+				height: viewCustomerWinOptions.height
+			});	
+		}
+	</script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -175,94 +217,69 @@
         <asp:Panel ID="Pn_dop601" runat="server" Width="905px" Style="margin-left: 20px;
             margin-right: 10px; margin-top: 10px">
             <table>
+                  <colgroup> <col style="width: 330px"/> <col style="width: 550px"/> </colgroup>
+                  <tr><td></td><td><asp:Label ID="Lb_nampan" runat="server" Text="Додаткові показники" CssClass ="pageTitle" ></asp:Label><asp:HiddenField ID="h_lbr_type" runat="server"/> </td></tr>
+              </table>
+
+            <asp:Panel ID="Panel_epl" runat="server" Width="920px" ToolTip="Місце роботи ( organization)" GroupingText="Місце роботи"
+            CssClass="pageContainer">
+              <table>
+                  <colgroup> <col style="width: 190px"/> <col style="width: 140px"/> <col style="width: 300px"/> <col style="width: 250px"/> </colgroup>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td colspan="2" style="width: 550Px; text-align: center;">
-                        <asp:Label ID="Lb_nampan" runat="server" Text="Додаткові показники" CssClass ="pageTitle" ></asp:Label>
+                      <td><asp:Label ID="Lb_typeW" runat="server" Text="Тип роботодавця"></asp:Label></td><td><asp:DropDownList ID="dl_typeW" runat="server" Enabled="false"></asp:DropDownList></td>
+                      <td style="text-align:right;">
+                          <asp:Label ID="Lb_EDRPO" runat="server" Text="Код ЕДРПОУ роботодавця"></asp:Label></td><td><asp:TextBox ID="tb_EDRPO" runat="server" Enabled="false"></asp:TextBox></td>
+                </tr>
+                  <tr><td><asp:Label ID="Lb_NAMEW" runat="server" Text="Найменування роботодавця"></asp:Label></td><td colspan="3"><asp:TextBox ID="tb_NAMEW" runat="server" style="width: 710px" Enabled="false"></asp:TextBox></td></tr>
+              </table>
+            </asp:Panel>
+
+            <table>
+                  <colgroup> <col style="width: 190px"/> <col style="width: 140px"/> <col style="width: 300px"/> <col style="width: 250px; text-align: center;"/> </colgroup>
+                <tr><td>&nbsp;</td></tr>
+                <tr>
+                    <td></td> <td></td> <td><asp:Label ID="Lb_Education" runat="server" Text="Освіта"></asp:Label></td> 
+                    <td>
+                        <asp:DropDownList ID="dl_Education" runat="server" CssClass="BaseDropDownList" Enabled="false"></asp:DropDownList>
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                        <asp:Label ID="Lb_real6month" runat="server" Text="Підтверджений дохід боржника"></asp:Label>
-                    </td>
-                    <td style="width: 250Px; text-align: center;">
-                        <%--<bars:NumericEdit ID="tb_real6month" runat="server" Width="190Px" IsRequired="true"   CausesValidation="true"></bars:NumericEdit>--%>
-                        <bec:TextBoxDecimal runat="server" ID="tb_real6month" IsRequired="false" Width="190Px"  MinValue="0"  />
+                    <td> 
+						<button Class="navigationButton" type="button" style="margin-left: 25px" title="Редагувати картку клієнта" OnClick="return EditClient();">Редагувати</button> 
+					</td> <td></td> 
+					<td> <asp:Label ID="Lb_real6month" runat="server" Text="Підтверджений дохід боржника"></asp:Label></td>
+                    <td>
+                        <bec:TextBoxDecimal runat="server" ID="tb_real6month" Width="190Px"  MinValue="0" Enabled="false" />
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                        <asp:Label ID="Lb_noreal6month" runat="server" Text="Непідтверджений дохід боржника"></asp:Label>
-                    </td>
-                    <td style="width: 250Px; text-align: center;">
-                        <%--<bars:NumericEdit ID="tb_noreal6month" runat="server" Width="190Px" IsRequired="true"  CausesValidation="true"></bars:NumericEdit>--%>
-                        <bec:TextBoxDecimal runat="server" ID="tb_noreal6month" IsRequired="false" Width="190Px"  MinValue="0"    />
+                    <td></td> <td></td> <td><asp:Label ID="Lb_noreal6month" runat="server" Text="Непідтверджений дохід боржника"></asp:Label></td>
+                    <td>
+                        <bec:TextBoxDecimal runat="server" ID="tb_noreal6month" Width="190Px"  MinValue="0"  Enabled="false"  />
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                        <asp:Label ID="Lb_status" runat="server" Text="Сімейний стан боржника"></asp:Label>
-                    </td>
-                    <td style="width: 250Px; text-align: center;">
-                        <asp:DropDownList ID="dl_status" runat="server"  Width="190px">
-                            <asp:ListItem Text="-" Value="" Selected="True"></asp:ListItem>
-                            <asp:ListItem Text="Одружений(а)" Value="true"></asp:ListItem>
-                            <asp:ListItem Text="Неодружений(а)" Value="fale"></asp:ListItem>
-                        </asp:DropDownList>
+                    <td></td> <td></td> <td><asp:Label ID="Lb_status" runat="server" Text="Сімейний стан боржника"></asp:Label></td>
+                    <td>
+                        <asp:DropDownList ID="dl_status" runat="server"  Width="190px" Enabled="false"></asp:DropDownList>
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                        <asp:Label ID="Lb_members" runat="server" Text="Кількість осіб, що перебувають на утриманні Боржника"></asp:Label>
-                    </td>
-                    <td style="width: 250Px; text-align: center;">
-                        <%--<bars:NumericEdit ID="tb_members" runat="server" Width="190Px" IsRequired="true"  CausesValidation="true"></bars:NumericEdit>--%>
-                        <bec:TextBoxNumb runat="server" ID="tb_members" IsRequired="false" Width="190Px"   MinValue="0"  />
-                        
+                    <td></td> <td></td> <td><asp:Label ID="Lb_members" runat="server" Text="Кількість осіб, що перебувають на утриманні Боржника"></asp:Label></td>
+                    <td>
+                        <bec:TextBoxNumb runat="server" ID="tb_members" Enabled="false" Width="190Px"/>
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                        <asp:Label ID="Lb_real6income" runat="server" Text="Середній підтверджений  дохід особи, що надала фінансову поруку (гарантію)"></asp:Label>
-                    </td>
-                    <td style="width: 250Px; text-align: center;">
-                        <%--<bars:NumericEdit ID="tb_real6income" runat="server" Width="190Px" IsRequired="true"  CausesValidation="true"></bars:NumericEdit>--%>
-                        <bec:TextBoxDecimal runat="server" ID="tb_real6income" IsRequired="false" Width="190Px"   MinValue="0"  />
+                    <td></td> <td></td> <td><asp:Label ID="Lb_real6income" runat="server" Text="Середній підтверджений  дохід особи, що надала фінансову поруку (гарантію)"></asp:Label></td>
+                    <td>
+                        <bec:TextBoxDecimal runat="server" ID="tb_real6income" IsRequired="false" RequiredErrorText="Необхідно заповнити середній підтверджений дохід особи" Enabled="true" Width="190Px" MinValue="0"  />
                     </td>
                 </tr>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 140Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                        <asp:Label ID="Lb_noreal6income" runat="server" Text="Регулярний непідтверджений дохід особи, що надала фінансову поруку (гарантію)"></asp:Label>
-                    </td>
-                    <td style="width: 250Px; text-align: center;">
-                       <bec:TextBoxDecimal runat="server" ID="tb_noreal6income" Width="190Px"   MinValue="0"  />
+                    <td></td> <td></td> <td><asp:Label ID="Lb_noreal6income" runat="server" Text="Регулярний непідтверджений дохід особи, що надала фінансову поруку (гарантію)"></asp:Label></td>
+                    <td>
+                       <bec:TextBoxDecimal runat="server" ID="tb_noreal6income" IsRequired="false" Width="190Px" MinValue="0"  />
                      
                     </td>
                 </tr>
@@ -272,12 +289,10 @@
             margin-top: 30px">
             <table>
                 <tr>
-                    <td style="width: 190Px">
-                    </td>
-                    <td style="width: 100Px">
-                    </td>
-                    <td style="width: 300Px; text-align: left;">
-                    </td>
+                    <td style="width: 190Px"></td>
+                    <td style="width: 100Px"></td>
+                    <td style="width: 300Px; text-align: left;"></td>
+
                     <td style="width: 280Px; text-align: center;">
                         <asp:Button ID="Bt_save" runat="server" Text="Зберегти" Width="110Px" Height="35Px"
                             CssClass="navigationButton" OnClick="Bt_save_Click" />

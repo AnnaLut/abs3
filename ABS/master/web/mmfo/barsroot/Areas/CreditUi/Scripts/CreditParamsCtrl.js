@@ -156,6 +156,13 @@
             if ($rootScope.nd == null){
                 $rootScope.credit.listUnsedValue = getUnsedValueByVidd(dd.dataSource._data);
             }
+            $rootScope.ShowCustInfo = false;
+            if (dd.dataSource && [11, 12, 13].indexOf(dd.dataSource._data[0].VIDD) !== -1) {
+                $scope.GetCustInfo($rootScope.credit.rnkValue);
+                $rootScope.ShowCustInfo = true;
+            }
+            $rootScope.$apply();
+
         },
         dataTextField: "NAME",
         dataValueField: "VIDD" //"METR"
@@ -391,6 +398,7 @@
             $rootScope.credit.rnkValue = data[0].RNK;
             $rootScope.credit.nmkValue = data[0].NMK;
             $scope.ddlVidd.dataSource.read();
+            //$scope.GetCustInfo(data[0].RNK);
             $rootScope.$apply();
         },
         {
@@ -515,5 +523,30 @@
             ResizedColumns: true
         });
     }
+
+    $scope.GetCustInfo = function (rnk) {
+        $http.get(bars.config.urlContent('/creditui/newcredit/GetCustData/?rnk=' + rnk)).then(function (request) {
+            $rootScope.CUST_INFO.EDRPO = $rootScope.CUST_INFO.EDUCA = $rootScope.CUST_INFO.MEMB = $rootScope.CUST_INFO.NAMEW =
+               $rootScope.CUST_INFO.NREMO = $rootScope.CUST_INFO.REMO = $rootScope.CUST_INFO.STAT = $rootScope.CUST_INFO.TYPEW =
+                 $rootScope.CUST_INFO.REAL6INCOME = $rootScope.CUST_INFO.NOREAL6INCOME = "";
+
+            if (!$scope.validateRequest(request)) { return; }
+
+            var _cust_data = request.data.Data;
+            if (_cust_data !== null) {
+                $rootScope.CUST_INFO.EDRPO = _cust_data.EDRPO;
+                $rootScope.CUST_INFO.EDUCA = _cust_data.EDUCA;
+                $rootScope.CUST_INFO.MEMB = _cust_data.MEMB;
+                $rootScope.CUST_INFO.NAMEW = _cust_data.NAMEW;
+                $rootScope.CUST_INFO.NREMO = _cust_data.NREMO;
+                $rootScope.CUST_INFO.REMO = _cust_data.REMO;
+                $rootScope.CUST_INFO.STAT = _cust_data.STAT;
+                $rootScope.CUST_INFO.TYPEW = _cust_data.TYPEW;
+                $rootScope.CUST_INFO.REAL6INCOME = _cust_data.REAL6INCOME;
+                $rootScope.CUST_INFO.NOREAL6INCOME = _cust_data.NOREAL6INCOME;
+                $rootScope.ShowCustInfo = true;
+            }
+        });
+      }
 
 }]);

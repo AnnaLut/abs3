@@ -32,10 +32,20 @@ function InitObjects() {
     $(function () {
         var gridInputs = $('#gvMain tbody input');
         gridInputs.filter('[tagtype="N"]').numberMask({ pattern: /^[0-9]*$/ });
+        gridInputs.filter('[tagtype="E"]').numberMask({ pattern: /^([0-9])*(\.)?([0-9])*$/ });
         gridInputs.filter('[tagtype="D"]').mask("99/99/9999");
         // custom validation UUDV
         gridInputs.filter('[tag="UUDV "]').numberMask({ beforePoint: 10, pattern: /^([0-9])*(\.|\,)?([0-9])*$/ });
         gridInputs.attr('maxlength', '500');
+        // set mask
+        var maskElems = gridInputs.filter('[mask]').each(function (elem) {
+            var strMask = this.getAttribute('mask');
+            if (strMask) {
+                $(this).mask(strMask);
+                //if (!$(this).val()) 
+                //        $(this).attr("placeholder", strMask);
+            }
+        });
     });
 }
 
@@ -43,10 +53,13 @@ function addToSaveTags(elem) {
     var tag = elem.getAttribute("TAG");
     var tabname = elem.getAttribute("TABNAME");
     var colname = elem.getAttribute("COLNAME");
+    var validator = elem.getAttribute("VALIDATOR");
+    var isNotOpt = elem.getAttribute("OPT") == '0';
+    var strTitle = elem.getAttribute("TITLE");
     if (tag === "UUDV ") {
         var x = parseFloat(elem.value);
         if (isNaN(x) || x < 0 || x > 100) {
-            alert("Значення реквізиту має бути числовим в межах від 0 до 100.");
+            alert("Значення реквізиту '" + strTitle + "' має бути числовим в межах від 0 до 100.");
             elem.value = "";
         } else
             elem.value = +x.toFixed(10);
@@ -56,23 +69,37 @@ function addToSaveTags(elem) {
     if (type == "N") {
         if (isNaN(elem.value)) {
             elem.value = "";
-            alert("Значення реквізиту має бути числовим.");
+            alert("Значення реквізиту '" + strTitle + "' має бути числовим.");
             return;
         }
     }
     else if (type == "D") {
         if (elem.value && !elem.value.match(/^(0?[1-9]|[12][0-9]|3[01])[\/](0?[1-9]|1[012])[\/]\d{4}$/)) {
             elem.value = "";
-            alert("Значення реквізиту має бути у форматі дати(DD/MM/YYYY).");
+            alert("Значення реквізиту '" + strTitle + "' має бути у форматі дати(DD/MM/YYYY).");
         }
     }
 
+    // преревіка значення по sql-фукції валідатору
+    if (validator && elem.value) {
+        var result = parent.Validate_DopReqvValue(validator, tag, elem.value);
+        switch (result.Code) {
+            case 'NOT_VALID':
+                alert("Невірне значення (" + elem.value + ") реквізиту '" + strTitle + "'. " + result.Message);
+                if (isNotOpt) return;
+                break;
+            case 'ERROR':
+                alert("Системна помилка при перевірці реквізиту '" + strTitle + "'. " + result.Message);
+                if (isNotOpt) return;
+                break;
+        }
+    }
     // проверка значения по справочнику
-    if (tabname && colname) {
+    if (tabname && colname && elem.value!=="") {
         var check = parent.Check_DopReqvValue(colname, tabname, elem.value);
         if (!check) {
+            alert("Невірне значення (" + elem.value + ") реквізиту '" + strTitle + "'. Виберіть значення з довідника.");
             elem.value = "";
-            alert("Невірне значення реквізиту. Виберіть значення з довідника.");
             return;
         }
     }

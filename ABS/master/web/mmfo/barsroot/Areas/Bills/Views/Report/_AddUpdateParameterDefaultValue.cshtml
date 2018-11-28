@@ -1,0 +1,91 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model ParameterValue
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    String buttonText = Model.ID == 0 ? "Створити значення" : "Зберегти зміни";
+    String paramType = ViewBag.TYPE.ToString();
+}
+
+<div style="padding-bottom: 20px;">
+    @using (Html.BeginForm("AddOrUpdateParameterValue", "Report", FormMethod.Post, new { id = "update-create-param-value-form", style = "padding-top: 25px;" }))
+    {
+        @*ИД параметра*@
+        <input type="hidden" value="@Model.PARAMETER_ID" id="PARAMETER_ID" name="PARAMETER_ID" />
+        @*ИД значения параметра (если 0 - будет создано новое значение параметра)*@
+        <input type="hidden" value="@Model.ID" id="ID" name="ID" />
+        <div class="col-xs-12">
+            <div class="form-horizontal container-fluid">
+                <div class="form-group" style="padding-bottom: 10px;">
+                    @Html.LabelFor(x => x.VALUE, new { @class = "control-label col-md-4 col-xs-4", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @switch (paramType)
+                        {
+                            case "NUMBER":
+                                @(Html.TextBoxFor(x => x.VALUE, new { @class = "k-textbox", type = "number", onkeyup = "OnChange(); return false;" }))
+                                break;
+                            case "DATE":
+                                <script>
+                                    var dateValue = '@Model.VALUE';
+                                </script>
+                                @(Html.Kendo().DatePicker()
+                                            .Name("VALUE")
+                                            .Format("dd.MM.yyyy")
+                                            .Value(Model.VALUE)
+                                            .Events(e => e.Change("OnChange"))
+                                            .HtmlAttributes(new { style = "text-align: center;", title = "Дата", type = "text", id = "date-time" }))
+                                break;
+                            case "VARCHAR2":
+                                @(Html.TextBoxFor(x => x.VALUE, new { @class = "k-textbox", onkeyup = "OnChange(); return false;" }))
+                                break;
+                        }                        
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-11" style="text-align: right;">
+                        <button class="k-button k-button-decrease" id="upd-create-submit-button" type="button" onclick="paramValueFormSubmit(); return false;">@buttonText</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    (function () {
+        // Привязка события к изменению даты
+        if ($('#date-time').length)
+            $('#date-time').on("keyup", OnChange);
+    })();
+
+    // Событие нажатия сохранения\изменения параметра
+    function paramValueFormSubmit(e) {
+        if (OnChange())
+            $('#update-create-param-value-form').submit();
+    }
+
+    // событие изменения параметра
+    function OnChange(e) {
+        // поле с датой
+        if ($('#date-time').length) {
+            var datepicker = $('#date-time').data("kendoDatePicker");
+            var dateText = datepicker.element[0].value;
+            if (dateText.length > 0) {
+                $('.k-picker-wrap').css('border-color', '');
+                return true;
+            }
+            else
+                $('.k-picker-wrap').css('border-color', 'red');
+        }
+        // текстовое поле или числовое
+        else {
+            var value = $('#VALUE').val();
+            if (value.length > 0) {
+                $('#VALUE').css('border-color', '');
+                return true;
+            }
+            else
+                $('#VALUE').css('border-color', 'red');
+        }
+        return false;
+    }
+</script>

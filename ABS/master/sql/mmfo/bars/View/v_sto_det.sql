@@ -7,7 +7,7 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_STO_DET ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_STO_DET ("IDS", "IDD", "STATUS_ID", "DISCLAIM_ID", "STATUS_DATE", "STATUS_UID", "ORD", "TT", "DAT1", "DAT2", "FREQ", "NLSA", "KVA", "NLSB", "KVB", "MFOB", "POLU", "NAZN", "FSUM", "OKPO", "DAT0", "WEND", "BRANCH", "BRANCH_MADE", "DATETIMESTAMP", "BRANCH_CARD", "USERID_MADE") AS 
+  CREATE OR REPLACE FORCE VIEW BARS.V_STO_DET ("IDS", "IDD", "STATUS_ID", "DISCLAIM_ID", "STATUS_DATE", "STATUS_UID", "ORD", "TT", "DAT1", "DAT2", "FREQ", "NLSA", "KVA", "NLSB", "KVB", "MFOB", "POLU", "NAZN", "FSUM", "OKPO", "DAT0", "WEND", "BRANCH", "BRANCH_MADE", "DATETIMESTAMP", "BRANCH_CARD", "USERID_MADE", "OPERW_EXISTANCE") AS 
   SELECT  IDS, IDD,
         (select name from sto_status where s.status_id = id) as STATUS_ID,
         (select name from sto_disclaimer where s.disclaim_id = id) as DISCLAIM_ID,
@@ -33,7 +33,8 @@ PROMPT *** Create  view V_STO_DET ***
         BRANCH_MADE,
         DATETIMESTAMP,
         BRANCH_CARD,
-        (select FIO from staff$base where id = s.USERID_MADE) as USERID_MADE
+        (select FIO from staff$base where id = s.USERID_MADE) as USERID_MADE,
+        case when exists (select 1 from sto_operw w where w.idd = s.idd) then 1 else 0 end as operw_existance
       FROM sto_det s, freq f
      WHERE  f.freq = s.freq;
 

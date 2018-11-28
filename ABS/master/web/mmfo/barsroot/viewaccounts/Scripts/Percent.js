@@ -78,7 +78,7 @@ function LoadTable()
  obj.v_serviceFuncAfter = 'AfterPercentTable';
  obj.v_funcCheckValue = 'fnSavePerTbl';
  obj.v_funcDelRow = 'onDelRow';
- //obj.v_showPager = false;
+ obj.pageSize = 10;
  fn_InitVariables(obj);	
  InitGrid();
 }

@@ -102,7 +102,7 @@ namespace BarsWeb.Areas.SWCompare.Infrastructure.DI.Implementation
             {
                 SqlText = @"begin
                                 pkg_sw_compare.compare_data_hand(:p_kod_nbu,
-                                :p_ref, :p_tt, :p_transactionid, :p_operation, :p_ddate_oper, :p_prn_file, :p_kf, :p_comments);
+                                :p_ref, :p_tt, :p_transactionid, :p_operation, :p_ddate_oper, :p_prn_file, :p_kf, :p_comments, :p_cause_err_id, :p_id_c);
                             end;",
                 SqlParams = new object[]
                 {
@@ -114,7 +114,10 @@ namespace BarsWeb.Areas.SWCompare.Infrastructure.DI.Implementation
                     new OracleParameter("p_ddate_oper", OracleDbType.Date).Value = handModel.p_ddate_oper,
                     new OracleParameter("p_prn_file", OracleDbType.Decimal).Value = handModel.p_prn_file,
                     new OracleParameter("p_kf", OracleDbType.Varchar2).Value = handModel.p_kf,
-                    new OracleParameter("p_comments", OracleDbType.Varchar2).Value = handModel.p_comments
+                    new OracleParameter("p_comments", OracleDbType.Varchar2).Value = handModel.p_comments,
+                    new OracleParameter("p_cause_err_id", OracleDbType.Decimal).Value = handModel.p_cause_err_id,
+                    new OracleParameter("p_id_c", OracleDbType.Decimal).Value = handModel.p_id_c
+
                 }
             };
         }

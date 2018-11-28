@@ -1,301 +1,339 @@
+prompt ... 
 
 
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/CUSTOMER_FIELD.sql =========*** Run **
-PROMPT ===================================================================================== 
+-- Create table
+begin
+    execute immediate 'create table CUSTOMER_FIELD
+(
+  tag             CHAR(5),
+  name            VARCHAR2(70),
+  b               NUMBER(1),
+  u               NUMBER(1),
+  f               NUMBER(1),
+  tabname         VARCHAR2(60),
+  byisp           NUMBER(1),
+  type            CHAR(1),
+  opt             NUMBER(1),
+  tabcolumn_check VARCHAR2(30),
+  sqlval          VARCHAR2(254),
+  code            VARCHAR2(30) default ''OTHERS'',
+  not_to_edit     NUMBER(1) default 0,
+  hist            NUMBER(1),
+  parid           NUMBER(22),
+  u_nrez          NUMBER(1),
+  f_nrez          NUMBER(1),
+  f_spd           NUMBER(1),
+  chkr            VARCHAR2(250),
+  mask            VARCHAR2(50)
+)
+tablespace BRSSMLD
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -955 then null; else raise; 
+    end if; 
+end;
+/ 
 
 
-PROMPT *** ALTER_POLICY_INFO to CUSTOMER_FIELD ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''CUSTOMER_FIELD'', ''CENTER'' , null, null, null, null);
-               bpa.alter_policy_info(''CUSTOMER_FIELD'', ''FILIAL'' , null, null, null, null);
-               bpa.alter_policy_info(''CUSTOMER_FIELD'', ''WHOLE'' , null, null, null, null);
-               null;
-           end; 
-          '; 
-END; 
+begin
+  execute immediate 'alter table BARS.CUSTOMER_FIELD ADD chkr VARCHAR2(250)';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "chkr" already exists in table.');
+    else raise;
+    end if;
+end;
 /
 
-PROMPT *** Create  table CUSTOMER_FIELD ***
-begin 
-  execute immediate '
-  CREATE TABLE BARS.CUSTOMER_FIELD 
-   (	TAG CHAR(5), 
-	NAME VARCHAR2(70), 
-	B NUMBER(1,0), 
-	U NUMBER(1,0), 
-	F NUMBER(1,0), 
-	TABNAME VARCHAR2(60), 
-	BYISP NUMBER(1,0), 
-	TYPE CHAR(1), 
-	OPT NUMBER(1,0), 
-	TABCOLUMN_CHECK VARCHAR2(30), 
-	SQLVAL VARCHAR2(254), 
-	CODE VARCHAR2(30) DEFAULT ''OTHERS'', 
-	NOT_TO_EDIT NUMBER(1,0) DEFAULT 0, 
-	HIST NUMBER(1,0), 
-	PARID NUMBER(22,0), 
-	U_NREZ NUMBER(1,0), 
-	F_NREZ NUMBER(1,0), 
-	F_SPD NUMBER(1,0)
-   ) SEGMENT CREATION IMMEDIATE 
-  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
- NOCOMPRESS LOGGING
-  TABLESPACE BRSSMLD ';
-exception when others then       
-  if sqlcode=-955 then null; else raise; end if; 
-end; 
+begin
+  execute immediate 'alter table BARS.CUSTOMER_FIELD ADD mask VARCHAR2(50)';
+  dbms_output.put_line('Table altered.');
+exception
+  when OTHERS then
+    if ( sqlcode = -01430 )
+    then dbms_output.put_line('Column "mask" already exists in table.');
+    else raise;
+    end if;
+end;
 /
 
-
-
-
-PROMPT *** ALTER_POLICIES to CUSTOMER_FIELD ***
- exec bpa.alter_policies('CUSTOMER_FIELD');
-
-
-COMMENT ON TABLE BARS.CUSTOMER_FIELD IS 'Справочник доп. реквизитов клиентов';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.TAG IS 'Код реквизита';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.NAME IS 'Наименование реквизита';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.B IS 'Признак заполнения для клиента Банк (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.U IS 'Признак заполнения для клиента ЮЛ (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.F IS 'Признак заполнения для клиента ФЛ (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.TABNAME IS 'Справочник';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.BYISP IS 'Учитывать доступ по исполнителю';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.TYPE IS 'Тип реквизита (N, D, S)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.OPT IS 'Обязательность заполнения доп.реквизита(1/0)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.TABCOLUMN_CHECK IS 'Контроль значения по полю';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.SQLVAL IS 'Sql-выражение для умолчательного значения доп.реквизита (напр., select '1' from dual)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.CODE IS '';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.NOT_TO_EDIT IS 'Запретить редактировать в карточке клиента';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.HIST IS 'Признак: используется в историзированной таблице параметров';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.PARID IS 'Код параметра';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.U_NREZ IS 'Признак заполнения для клиента ЮЛ-нерезидент (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.F_NREZ IS 'Признак заполнения для клиента ФЛ-нерезидент (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
-COMMENT ON COLUMN BARS.CUSTOMER_FIELD.F_SPD IS 'Признак заполнения для клиента ФЛ-СПД (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_B ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_B CHECK (b in (0, 1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_U ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_U CHECK (u in (0, 1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_F ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_F CHECK (f in (0, 1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_UNREZ ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_UNREZ CHECK (u_nrez in (0, 1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_FNREZ ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_FNREZ CHECK (f_nrez in (0, 1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_FSPD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_FSPD CHECK (f_spd in (0, 1, 2)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint UK_CUSTOMERFIELD_PARID ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT UK_CUSTOMERFIELD_PARID UNIQUE (PARID)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint PK_CUSTOMERFIELD ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT PK_CUSTOMERFIELD PRIMARY KEY (TAG)
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_BYISP ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_BYISP CHECK (byisp in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_OPT ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD ADD CONSTRAINT CC_CUSTOMERFIELD_OPT CHECK (opt in (0,1)) ENABLE';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_TAG_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (TAG CONSTRAINT CC_CUSTOMERFIELD_TAG_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_NAME_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (NAME CONSTRAINT CC_CUSTOMERFIELD_NAME_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_CODE_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (CODE CONSTRAINT CC_CUSTOMERFIELD_CODE_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  constraint CC_CUSTOMERFIELD_NOTTOEDIT_NN ***
-begin   
- execute immediate '
-  ALTER TABLE BARS.CUSTOMER_FIELD MODIFY (NOT_TO_EDIT CONSTRAINT CC_CUSTOMERFIELD_NOTTOEDIT_NN NOT NULL ENABLE)';
-exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index PK_CUSTOMERFIELD ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.PK_CUSTOMERFIELD ON BARS.CUSTOMER_FIELD (TAG) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-
-PROMPT *** Create  index UK_CUSTOMERFIELD_PARID ***
-begin   
- execute immediate '
-  CREATE UNIQUE INDEX BARS.UK_CUSTOMERFIELD_PARID ON BARS.CUSTOMER_FIELD (PARID) 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSMDLI ';
-exception when others then
-  if  sqlcode=-955  then null; else raise; end if;
- end;
-/
-
-
-
-PROMPT *** Create  grants  CUSTOMER_FIELD ***
-grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_FIELD  to ABS_ADMIN;
-grant SELECT                                                                 on CUSTOMER_FIELD  to BARSREADER_ROLE;
-grant SELECT                                                                 on CUSTOMER_FIELD  to BARSUPL;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_FIELD  to BARS_ACCESS_DEFROLE;
-grant SELECT                                                                 on CUSTOMER_FIELD  to BARS_DM;
-grant DELETE,INSERT,SELECT,UPDATE                                            on CUSTOMER_FIELD  to CUSTOMER_FIELD;
-grant SELECT                                                                 on CUSTOMER_FIELD  to RCC_DEAL;
-grant SELECT                                                                 on CUSTOMER_FIELD  to START1;
-grant SELECT                                                                 on CUSTOMER_FIELD  to UPLD;
-grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CUSTOMER_FIELD  to WR_ALL_RIGHTS;
-grant SELECT                                                                 on CUSTOMER_FIELD  to WR_CUSTREG;
-grant FLASHBACK,SELECT                                                       on CUSTOMER_FIELD  to WR_REFREAD;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/CUSTOMER_FIELD.sql =========*** End **
-PROMPT ===================================================================================== 
+-- Add comments to the table 
+comment on table CUSTOMER_FIELD
+  is 'Справочник доп. реквизитов клиентов';
+-- Add comments to the columns 
+comment on column CUSTOMER_FIELD.tag
+  is 'Код реквизита';
+comment on column CUSTOMER_FIELD.name
+  is 'Наименование реквизита';
+comment on column CUSTOMER_FIELD.b
+  is 'Признак заполнения для клиента Банк (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
+comment on column CUSTOMER_FIELD.u
+  is 'Признак заполнения для клиента ЮЛ (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
+comment on column CUSTOMER_FIELD.f
+  is 'Признак заполнения для клиента ФЛ (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
+comment on column CUSTOMER_FIELD.tabname
+  is 'Справочник';
+comment on column CUSTOMER_FIELD.byisp
+  is 'Учитывать доступ по исполнителю';
+comment on column CUSTOMER_FIELD.type
+  is 'Тип реквизита (N, D, S)';
+comment on column CUSTOMER_FIELD.opt
+  is 'Обязательность заполнения доп.реквизита(1/0)';
+comment on column CUSTOMER_FIELD.tabcolumn_check
+  is 'Контроль значения по полю';
+comment on column CUSTOMER_FIELD.sqlval
+  is 'Sql-выражение для умолчательного значения доп.реквизита (напр., select ''1'' from dual)';
+comment on column CUSTOMER_FIELD.not_to_edit
+  is 'Запретить редактировать в карточке клиента';
+comment on column CUSTOMER_FIELD.hist
+  is 'Признак: используется в историзированной таблице параметров';
+comment on column CUSTOMER_FIELD.parid
+  is 'Код параметра';
+comment on column CUSTOMER_FIELD.u_nrez
+  is 'Признак заполнения для клиента ЮЛ-нерезидент (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
+comment on column CUSTOMER_FIELD.f_nrez
+  is 'Признак заполнения для клиента ФЛ-нерезидент (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
+comment on column CUSTOMER_FIELD.f_spd
+  is 'Признак заполнения для клиента ФЛ-СПД (0-не заполнять, 1-заполнять, 2-заполнять обязательно)';
+comment on column CUSTOMER_FIELD.chkr
+  is 'Строка вызова процедуры проверки значения';
+comment on column CUSTOMER_FIELD.mask
+  is 'Маска ввода значения ';
+
+-- Create/Recreate primary, unique and foreign key constraints 
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint PK_CUSTOMERFIELD primary key (TAG)
+  using index 
+  tablespace BRSSMLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 128K
+    next 128K
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -2261 or sqlcode = -2260 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint UK_CUSTOMERFIELD_PARID unique (PARID)
+  using index 
+  tablespace BRSMDLI
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 64K
+    minextents 1
+    maxextents unlimited
+  )';
+ exception when others then 
+    if sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint FK_CUSTOMERFIELD_CODES foreign key (CODE)
+  references CUSTOMER_FIELD_CODES (CODE)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint FK_CUSTOMERFIELD_METACOLTYPES foreign key (TYPE)
+  references META_COLTYPES (COLTYPE)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2275 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+-- Create/Recreate check constraints 
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_B
+  check (b in (0, 1, 2))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_BYISP
+  check (byisp in (0,1))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_CODE_NN
+  check ("CODE" IS NOT NULL)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_F
+  check (f in (0, 1, 2))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_FNREZ
+  check (f_nrez in (0, 1, 2))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_FSPD
+  check (f_spd in (0, 1, 2))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_NAME_NN
+  check ("NAME" IS NOT NULL)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_NOTTOEDIT_NN
+  check ("NOT_TO_EDIT" IS NOT NULL)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_OPT
+  check (opt in (0,1))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_TAG_NN
+  check ("TAG" IS NOT NULL)
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_U
+  check (u in (0, 1, 2))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+
+begin
+    execute immediate 'alter table CUSTOMER_FIELD
+  add constraint CC_CUSTOMERFIELD_UNREZ
+  check (u_nrez in (0, 1, 2))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on CUSTOMER_FIELD to ABS_ADMIN;
+grant select on CUSTOMER_FIELD to BARSREADER_ROLE;
+grant select on CUSTOMER_FIELD to BARSUPL;
+grant select, insert, update, delete on CUSTOMER_FIELD to BARS_ACCESS_DEFROLE;
+grant select on CUSTOMER_FIELD to BARS_DM;
+grant select, insert, update, delete on CUSTOMER_FIELD to CUSTOMER_FIELD;
+grant select on CUSTOMER_FIELD to RCC_DEAL;
+grant select on CUSTOMER_FIELD to START1;
+grant select on CUSTOMER_FIELD to UPLD;
+grant select, insert, update, delete on CUSTOMER_FIELD to WR_ALL_RIGHTS;
+grant select on CUSTOMER_FIELD to WR_CUSTREG;
+grant select on CUSTOMER_FIELD to WR_REFREAD;
