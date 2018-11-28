@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования D6X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.002  09/11/2018 (31/08/2018) 
+% VERSION     :  v.1.004  21/11/2018 (16/11/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.002  09/11/2018';
+  ver_              char(30)  := 'v.1.004  21/11/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   c_old_file_code   constant varchar2(3 char) := '#D6';
@@ -118,7 +118,7 @@ BEGIN
                     t.seg_08 as S183,
                     t.seg_11 as R030,
                     t.seg_12 as K040,
-                    abs(to_number(trim(t.field_value))) as T070,
+                    to_number(trim(t.field_value)) as T070,
                     t.acc_num, 
                     t.kv,
                     t.field_code as kodp, 
@@ -135,7 +135,7 @@ BEGIN
                      t.kf = p_kod_filii and
                      t.field_code like '1%2' -- залишки
                 ) t  
-                left join accounts a
+                left outer join accounts a
                 on (t.acc_id = a.acc)   
                 left join
                     (select T.R020, max(t.i010) as i010 
