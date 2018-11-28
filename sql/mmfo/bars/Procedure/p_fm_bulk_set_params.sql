@@ -21,7 +21,7 @@ is
 /* created by Lypskykh O.S. 12.05.2017
 пакетное проставление параметров ФМ
 ММФО
-v1.0.0 30.05.2017 */
+v1.0.1 28.11.2018 */
 g_modcode constant varchar2(3) := 'FMN';
 l_refs_to_audit varchar2(2000);
 begin
@@ -50,6 +50,10 @@ begin
                                                           from oper o
                                                           join accounts a on o.nlsa = a.nls and o.kv = a.kv and o.mfoa = a.kf
                                                           where o.ref = r.CV), -- ищем по счету
+                                                         (select a.rnk
+                                                          from oper o
+                                                          join accounts a on o.nlsa = a.nlsalt and o.kv = a.kv and o.mfoa = a.kf
+                                                          where o.ref = r.CV), -- пошук по альтернативному рахунку
                                                          (select max(co.rnk) -- ищем по окпо в документе - если такой клиент один
                                                           from customer co
                                                           join oper o on co.okpo = o.id_a
@@ -64,6 +68,10 @@ begin
                                                           from oper o
                                                           join accounts a on o.nlsb = a.nls and nvl(o.kv2, o.kv) = a.kv and o.mfob = a.kf
                                                           where o.ref = r.CV), -- ищем по счету
+                                                         (select a.rnk
+                                                          from oper o
+                                                          join accounts a on o.nlsb = a.nlsalt and nvl(o.kv2, o.kv) = a.kv and o.mfob = a.kf
+                                                          where o.ref = r.CV), -- пошук по альтернативному рахунку
                                                          (select max(co.rnk) -- ищем по окпо в документе - если такой клиент один
                                                           from customer co
                                                           join oper o on co.okpo = o.id_b
@@ -74,27 +82,35 @@ begin
                                    )
   when not matched then insert(ref, rec, status, opr_vid1, opr_vid2, comm_vid2, opr_vid3, comm_vid3, monitor_mode, agent_id, rnk_a, rnk_b)
   values (r.CV, null, 'I', p_opr_vid1, p_opr_vid2, p_comm2, p_opr_vid3, p_comm3, p_mode, user_id, coalesce((select a.rnk
-                                                                                                                          from oper o
-                                                                                                                          join accounts a on o.nlsa = a.nls and o.kv = a.kv and o.mfoa = a.kf
-                                                                                                                          where o.ref = r.CV),
-                                                                                                                         (select max(co.rnk)
-                                                                                                                          from customer co
-                                                                                                                          join oper o on co.okpo = o.id_a
-                                                                                                                          where o.ref = r.CV
-                                                                                                                          group by co.okpo
-                                                                                                                          having count(*)=1
-                                                                                                                         )),
+                                                                                                            from oper o
+                                                                                                            join accounts a on o.nlsa = a.nls and o.kv = a.kv and o.mfoa = a.kf
+                                                                                                            where o.ref = r.CV),
+                                                                                                           (select a.rnk
+                                                                                                            from oper o
+                                                                                                            join accounts a on o.nlsa = a.nlsalt and o.kv = a.kv and o.mfoa = a.kf
+                                                                                                            where o.ref = r.CV), -- пошук по альтернативному рахунку
+                                                                                                           (select max(co.rnk)
+                                                                                                            from customer co
+                                                                                                            join oper o on co.okpo = o.id_a
+                                                                                                            where o.ref = r.CV
+                                                                                                            group by co.okpo
+                                                                                                            having count(*)=1
+                                                                                                           )),
                                                                                                   coalesce((select a.rnk
-                                                                                                                          from oper o
-                                                                                                                          join accounts a on o.nlsb = a.nls and nvl(o.kv2, o.kv) = a.kv and o.mfob = a.kf
-                                                                                                                          where o.ref = r.CV),
-                                                                                                                         (select max(co.rnk)
-                                                                                                                          from customer co
-                                                                                                                          join oper o on co.okpo = o.id_b
-                                                                                                                          where o.ref = r.CV
-                                                                                                                          group by co.okpo
-                                                                                                                          having count(*)=1
-                                                                                                                         ))
+                                                                                                            from oper o
+                                                                                                            join accounts a on o.nlsb = a.nls and nvl(o.kv2, o.kv) = a.kv and o.mfob = a.kf
+                                                                                                            where o.ref = r.CV),
+                                                                                                           (select a.rnk
+                                                                                                            from oper o
+                                                                                                            join accounts a on o.nlsb = a.nlsalt and nvl(o.kv2, o.kv) = a.kv and o.mfob = a.kf
+                                                                                                            where o.ref = r.CV), -- пошук по альтернативному рахунку
+                                                                                                           (select max(co.rnk)
+                                                                                                            from customer co
+                                                                                                            join oper o on co.okpo = o.id_b
+                                                                                                            where o.ref = r.CV
+                                                                                                            group by co.okpo
+                                                                                                            having count(*)=1
+                                                                                                           ))
   );
   bars_audit.trace('%s: %s merged, refs=>(%s)', g_modcode, $$PLSQL_UNIT, l_refs_to_audit);
   -- если есть доп. коды ОМ
