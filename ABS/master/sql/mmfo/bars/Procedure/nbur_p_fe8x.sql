@@ -16,9 +16,9 @@ is
 % DESCRIPTION : Процедура формирования E8X в формате XML для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.004   09/11/2018 (19/09/2018)
+% VERSION     :  v.18.005  22/11/2018 (09/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                     char(30)  := 'v.18.004    09/11/2018';
+  ver_                     char(30)  := 'v.18.005    22/11/2018';
 
   c_title                  constant varchar2(200 char) := $$PLSQL_UNIT;
   c_date_fmt               constant varchar2(10 char) := 'dd.mm.yyyy'; --Формат преобразования даты в строку
@@ -87,7 +87,10 @@ BEGIN
              T070_1, T070_2, T070_3, T070_4, T090, Q003_12, K021, ACC_ID, ACC_NUM, KV, 
              CUST_ID, BRANCH)
     select REPORT_DATE, KF, VERSION_ID, NBUC, KU, EKP, Q001, Q029, K074, K110, 
-           K040, KU_1, Q020, K020, K014, R020, R030, Q003_1, Q003_2, Q007_1, Q007_2, 
+           K040, KU_1, Q020, K020, 
+           -- робимл перекодування, бо довідник відрізняєтьмя
+           (case K014 when '1' then '3' when '2' then '1' when '3' then '2' else K014 end) as K014, 
+           R020, R030, Q003_1, Q003_2, Q007_1, Q007_2, 
            T070_1, T070_2, T070_3, T070_4, T090, 
            row_number() over (order by k020, q003_1, r030, r020, acc_num) as Q003_12, 
            K021, ACC_ID, ACC_NUM, KV, CUST_ID, BRANCH
