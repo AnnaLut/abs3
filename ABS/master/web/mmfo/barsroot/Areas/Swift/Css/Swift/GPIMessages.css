@@ -1,0 +1,12 @@
+﻿th {
+    white-space:normal;
+}
+
+th.k-header {
+    text-align: center;
+}
+
+.filterMessage {
+    font-size:medium;
+    font-style:italic;
+}

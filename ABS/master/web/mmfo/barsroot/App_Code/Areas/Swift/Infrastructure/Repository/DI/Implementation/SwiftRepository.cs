@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Objects;
 using System.Linq;
+using Oracle.DataAccess.Client;
+using Bars.Classes;
 
 namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation
 {
@@ -53,6 +55,78 @@ namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation
         public Params GetParam(string id)
         {
             return _globalData.GetParam(id);
+        }
+        #endregion
+
+        #region Individual, based on types of messages requests
+        public List<SwiftGPIStatuses> GetMTGridItems()
+        {
+            List<SwiftGPIStatuses> dataList = new List<SwiftGPIStatuses>();
+            using (OracleConnection conn = OraConnector.Handler.IOraConnection.GetUserConnection())
+            {
+                using (OracleCommand command = conn.CreateCommand())
+                {
+                    command.CommandText = @"Select 
+                                Ref, 
+                                MT103, 
+                                io_ind_103 as InputOutputInd103,
+                                swref_103 as SWRef,
+                                date_input_103 as DateIn,
+                                vdate_103 as VDate,
+                                date_output_103 as DateOut,
+                                sender_103 as SenderCode,
+                                sender_account as SenderAccount,
+                                receiver_103 as ReceiverCode,
+                                payer_103 as Payer,
+                                payee_103 as Payee,
+                                amount as Summ,
+                                Currency,
+                                STI,
+                                UETR,
+                                status_code as Status,
+                                status_description as StatusDescription
+                                    from v_sw_gpi_statuses";
+                    command.CommandType = System.Data.CommandType.Text;
+
+                    using (OracleDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            SwiftGPIStatuses row = new SwiftGPIStatuses();
+                            row.Ref = Convert.ToInt64(reader["Ref"].ToString());
+                            row.MT103 = Convert.ToInt64(reader["MT103"].ToString());
+                            row.InputOutputInd103 = reader["InputOutputInd103"].ToString();
+                            row.SWRef = Convert.ToInt64(reader["SWRef"].ToString());
+                            if (reader["DateIn"].ToString() != null)
+                            {
+                                row.DateIn = Convert.ToDateTime(reader["DateIn"].ToString());
+                            }
+                            if (reader["VDate"].ToString() != null)
+                            {
+                                row.VDate = Convert.ToDateTime(reader["VDate"].ToString());
+                            }
+                            if (reader["DateOut"].ToString() != null)
+                            {
+                                row.DateOut = Convert.ToDateTime(reader["DateOut"].ToString());
+                            }
+                            row.SenderCode = reader["SenderCode"].ToString();
+                            row.SenderAccount = reader["SenderAccount"].ToString();
+                            row.ReceiverCode = reader["ReceiverCode"].ToString();
+                            row.Payer = reader["Payer"].ToString();
+                            row.Payee = reader["Payee"].ToString();
+                            row.Summ = Convert.ToDecimal(reader["Summ"].ToString());
+                            row.Currency = reader["Currency"].ToString();
+                            row.STI = reader["STI"].ToString();
+                            row.UETR = reader["UETR"].ToString();
+                            row.Status = reader["Status"].ToString();
+                            row.StatusDescription = reader["StatusDescription"].ToString();
+
+                            dataList.Add(row);
+                        }
+                    }
+                }
+            }
+            return dataList;
         }
         #endregion
     }
