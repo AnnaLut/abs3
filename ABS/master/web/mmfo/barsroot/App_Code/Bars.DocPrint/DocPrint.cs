@@ -379,11 +379,28 @@ namespace Bars.DocPrint
                                     tagW = tag + opt;
                                     cmd.Parameters.Clear();
                                     cmd.Parameters.Add("ref", OracleDbType.Decimal, InRef, ParameterDirection.Input);
-                                    cmd.Parameters.Add("tag", OracleDbType.Char, tagW, ParameterDirection.Input);
-                                    cmd.CommandText = "select trim(value) from operw where ref=:ref and tag=:tag";
-                                    string val = Convert.ToString(cmd.ExecuteScalar());
-                                    if (!string.IsNullOrEmpty(val))
-                                        so.WriteLine("".PadRight(4 - tagW.Length) + tagW + ": " + val);
+                                    if (tag != "59")
+                                    {
+                                        cmd.Parameters.Add("tag", OracleDbType.Char, tagW, ParameterDirection.Input);
+                                        cmd.CommandText = "select trim(value) from operw where ref=:ref and tag=:tag";
+                                        string val = Convert.ToString(cmd.ExecuteScalar());
+                                        if (!string.IsNullOrEmpty(val))
+                                            so.WriteLine("".PadRight(4 - tagW.Length) + tagW + ": " + val);
+                                    }
+                                    else
+                                    {
+                                        cmd.CommandText = "select trim(value), trim(tag) from operw where ref=:ref and tag like '59%' ";
+                                        using (OracleDataReader rdr = cmd.ExecuteReader())
+                                        {
+                                            if (rdr.Read())
+                                            {
+                                                string tag_val = String.IsNullOrEmpty(rdr.GetValue(0).ToString()) ? String.Empty : rdr.GetString(0);
+                                                string tag_name = String.IsNullOrEmpty(rdr.GetValue(1).ToString()) ? String.Empty : rdr.GetString(1);
+                                                if (tag_val != String.Empty)
+                                                    so.WriteLine("".PadRight(4 - tag_name.Length) + tag_name + ": " + tag_val);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
