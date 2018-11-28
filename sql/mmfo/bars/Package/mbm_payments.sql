@@ -1443,7 +1443,12 @@ end add_dop_req;
                 from bars.accounts a
                where a.nls = p_nlsa
                  and ((a.nbs = 2600 and a.ob22 = 14) 
-                   or (a.nbs = 2650 and a.ob22 = 12));
+                   or (a.nbs = 2650 and a.ob22 = 12)
+                   or (a.nbs = 2520 and a.ob22 = 02)
+                   or (a.nbs = 2641 and a.ob22 = 01)
+                   or (a.nbs = 2542 and a.ob22 = 01)
+                   or (a.nbs = 2655 and a.ob22 = 11)
+                   or (a.nbs = 2505));
                if l_cnt > 0 then
                  raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
                end if;

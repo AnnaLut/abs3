@@ -3546,6 +3546,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         --
     exception when others then
         --
+        logger.error(get_error_msg());
+        --
         if l_tx
         then
             rollback to sp;
@@ -4301,7 +4303,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
          where (a.nls = l_doc.nls_a or 
                 a.nlsalt = l_doc.nls_a)
            and ((a.nbs = 2600 and a.ob22 = 14)
-             or (a.nbs = 2650 and a.ob22 = 12));
+             or (a.nbs = 2650 and a.ob22 = 12)
+             or (a.nbs = 2520 and a.ob22 = 02)
+             or (a.nbs = 2641 and a.ob22 = 01)
+             or (a.nbs = 2542 and a.ob22 = 01)
+             or (a.nbs = 2655 and a.ob22 = 11)
+             or (a.nbs = 2505));
          if l_cnt > 0 then
            raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
          end if;
@@ -5960,8 +5967,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   procedure get_doc_export_old_state
     is
   begin
-    insert into tmp_old_state
-    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45;
+    execute immediate 'insert into tmp_old_state
+    select doc_id, status_id from ibank.v_doc_export_open t where t.status_id = 45';
     logger.info('doc_export_old_state'||sql%rowcount);
   end;
 
