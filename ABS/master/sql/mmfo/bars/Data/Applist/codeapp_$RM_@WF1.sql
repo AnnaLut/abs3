@@ -387,6 +387,18 @@ begin
                                                   p_frontend => l_application_type_id
                                                   );
 
+    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію SWIFT. GPI. Перегляд документів  ********** ');
+          --  Створюємо функцію SWIFT. GPI. Перегляд документів
+      l := l +1;
+      l_function_ids.extend(l);
+      l_function_ids(l)   :=   abs_utils.add_func(
+                                                  p_name     => 'GPI. Перегляд документів',
+                                                  p_funcname => '/barsroot/swift/gpidocsreview/index',
+                                                  p_rolename => 'START1' ,
+                                                  p_frontend => l_application_type_id
+                                                  );
+
+
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_@WF1) - АРМ SWIFT. Обробка повідомлень (повна)  ');
     l := l_function_ids.first;
