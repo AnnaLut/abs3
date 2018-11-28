@@ -6,11 +6,15 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #3A для КБ (универсальная) с 01.06.2009
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 09/11/2018 (01/11/2018)
+% VERSION     : 19/11/2018 (09/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+19/11/2018 - не будут включаться в файл Дт обороты которые были в
+             кореспонденции со счетами овердрафтов - перенос на просрочку
+             ( Дт 2203 (тип "SP","KSP") Кт 223(2233)
+             ( Дт 2233 (тип "SP","KSP") Кт 220(2203)
 01/11/2018 - не будут включаться в файл Дт обороты которые были в
              кореспонденции со счетами овердрафтов - перенос на просрочку
              ( Дт 2203 (тип "KSP") Кт 2625(2620) (овердрафт) )
@@ -1032,6 +1036,78 @@ BEGIN
                                AND accd=acc_
                                AND nlsk like poisk_
                                AND acck in (select acc_pk from w4_acc where dat_close is null);
+
+                             p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
+
+                             p_ins_log (   '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') DK=0 r020='''
+                                        || nbs_
+                                        || ''' Счет='''
+                                        || nls_
+                                        || ''' вал='''
+                                        || kv_
+                                        || ''' дата='''
+                                        || data_
+                                        || ''' сумма=',
+                                        vost_);
+                          EXCEPTION
+                             WHEN NO_DATA_FOUND
+                          THEN
+                             vost_ := 0;
+                          END;
+
+                          -- вычитаем "переброски"
+                          sdos_ := sdos_ - vost_;
+                       end if;
+
+                       if substr(trim(nls_),1,3) = '220' and
+                          trim(tips_) in ('SP','KSP') and vost_ = 0
+                       then
+                          poisk_ := '223%';
+
+                          BEGIN
+                             -- переброски с гр.2203 в гр.223 просрочка
+                             SELECT NVL(SUM(s*100), 0)
+                                INTO vost_
+                             FROM tmp_file03
+                             WHERE FDAT = data_
+                               AND accd=acc_
+                               AND nlsk like poisk_;
+
+                             p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
+
+                             p_ins_log (   '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') DK=0 r020='''
+                                        || nbs_
+                                        || ''' Счет='''
+                                        || nls_
+                                        || ''' вал='''
+                                        || kv_
+                                        || ''' дата='''
+                                        || data_
+                                        || ''' сумма=',
+                                        vost_);
+                          EXCEPTION
+                             WHEN NO_DATA_FOUND
+                          THEN
+                             vost_ := 0;
+                          END;
+
+                          -- вычитаем "переброски"
+                          sdos_ := sdos_ - vost_;
+                       end if;
+
+                       if substr(trim(nls_),1,3) = '223' and
+                          trim(tips_) in ('SP','KSP') and vost_ = 0
+                       then
+                          poisk_ := '220%';
+
+                          BEGIN
+                             -- переброски с гр.2233 в гр.220 просрочка
+                             SELECT NVL(SUM(s*100), 0)
+                                INTO vost_
+                             FROM tmp_file03
+                             WHERE FDAT = data_
+                               AND accd=acc_
+                               AND nlsk like poisk_;
 
                              p_ins_del (acc_, nls_, kv_, '(переброски с '||substr(trim(nls_),1,3)||' на '||poisk_||') ', sdos_, vost_);
 
@@ -3488,7 +3564,7 @@ BEGIN
                        and nd=i.nd
                      group by nd;
                  exception
-                    when no_data_found then 
+                    when no_data_found then
                         RAISE_APPLICATION_ERROR(-20002, 'рах. '||i.nls||' Реф.дог. '||i.nd||' Помилка: не заповнена сума лiмiту');
                  end;
               end if;
@@ -3496,8 +3572,8 @@ BEGIN
               BEGIN
                  cntr_ := ((s_zd2_ * i.prc / (b_yea * 100) + kommr_) / s_zd2_) * b_yea * 100;
               EXCEPTION
-                 WHEN OTHERS THEN
-                    RAISE_APPLICATION_ERROR(-20003, 'рах. '||i.nls||' Реф.дог. '||i.nd||' Помилка: не заповнена сума лiмiту');
+                        WHEN OTHERS THEN
+                 RAISE_APPLICATION_ERROR(-20003, 'рах. '||i.nls||' Реф.дог. '||i.nd||' Помилка: не заповнена сума лiмiту');
               END;
 
               -- обновление процентной ставки
