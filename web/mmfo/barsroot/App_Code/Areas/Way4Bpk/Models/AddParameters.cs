@@ -14,6 +14,7 @@ namespace Areas.Way4Bpk.Models
     {
         public string Tag { get; set; }
         public string Value { get; set; }
+        public string Comm { get; set; }
     }
 
     public class AddParamVal

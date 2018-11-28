@@ -22,8 +22,9 @@ loop
     accreg.setAccountwParam(cur.acc, 'Z_POLIS', cur.a8);
   end loop;
   end;
+commit; 
 end loop;
-bc.home;  
+bc.home; 
 exception when others then bc.home;
 end;
 /

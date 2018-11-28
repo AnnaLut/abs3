@@ -1,0 +1,172 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model List<SelectListItem>
+@{
+    @* View для отправки векселей на регионы! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<script>
+    var selectDefault = '-- Вибрати всі --';
+
+    // Событие изменения региона (отфильтровка в гриде)
+    function onSelect(e) {
+        if (e.item) {
+            var dataItem = this.dataItem(e.item);
+            var text = dataItem.Text;
+            var grid = $('#regionsend').data().kendoGrid;
+            var filter = $(grid.thead.find("th:not(.k-hierarchy-cell,.k-group-cell)")[0]).data("kendoFilterMenu").filterModel.filters[0];
+            if (text !== selectDefault) {
+                filter.value = text;
+                grid.dataSource.filter(filter);
+            }
+            else {
+                filter.value = '';
+                grid.dataSource.filter({});
+            }
+            grid.refresh();
+        }
+    }
+
+    // Получение выбранного региона и отправка векселей
+    function sendBills() {
+        var dropdownlist = $("#BRANCH").data("kendoDropDownList");
+        var selected = dropdownlist.text();
+        var message = '';
+        if (selected !== selectDefault)
+            message = 'Відправити векселі до "' + selected + '" регіону?';
+        else
+            message = 'Відправити векселі до всіх регіонів?';
+        bars.ui.confirm({
+            text: message,
+            title: 'У В А Г А!'
+        }, function () {
+            var data = selected === selectDefault ? 'ALL' : selected;
+            send(data);
+        })
+    }
+
+    // отправка на регион(ы)
+    function send(branch) {
+        $("<div class='k-overlay'></div>").appendTo($(document.body));
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset='utf-8'",
+            url: '/barsroot/api/bills/bills/BillsRequest?method=SendToRegion&str=' + branch + '&id=0',
+            success: function (result) {
+                if (result.status === 1) {
+                    bars.ui.alert({
+                        text: 'Виконано успішно!',
+                        close: function (e) {
+                        }
+                    });
+                }
+                else {
+                    bars.ui.error({
+                        text: result.err
+                    });
+                }
+                $(".k-overlay").remove();
+                $("#BRANCH").data("kendoDropDownList").dataSource.read();
+                $('#regionsend').data('kendoGrid').dataSource.read();
+                $('#regionsend').data('kendoGrid').refresh();
+            },
+            error: function (result) {
+                $(".k-overlay").remove();
+                $('#regionsend').data('kendoGrid').dataSource.read();
+                $('#regionsend').data('kendoGrid').refresh();
+                $("#BRANCH").data("kendoDropDownList").dataSource.read();
+            }
+        });
+    }
+
+    // загрузка акта (PDF)
+    function getAct(actType) {
+        var dropdownlist = $("#BRANCH").data("kendoDropDownList");
+        var branch = dropdownlist.text();
+        if (branch === '-- Вибрати всі --') {
+            bars.ui.error({
+                text: 'Для завантаження акту необхідно вибрати регіон!'
+            });
+            return;
+        }
+        $("<div class='k-overlay'></div>").appendTo($(document.body));
+        var url = '/barsroot/bills/bills/GetActOfTransferToRegion?branch=' + branch + '&reportType=' + actType;
+        var win = window.open(url, '_blank');
+        win.focus();
+        setTimeout(function () {
+            $(".k-overlay").remove();
+        }, 4000);
+    }
+
+</script>
+
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Передача векселів на регіони</h2>
+</div>
+
+@(Html.Kendo().Grid<BillsModel>()
+                        .Name("regionsend")
+                        .Columns(col =>
+                        {
+                            col.Bound(x => x.BRANCH).Hidden(true);
+                            col.Bound(x => x.EXP_ID).Hidden(true);
+                            col.Bound(x => x.REQ_ID).Hidden(true);
+                            col.Bound(x => x.RNK).Hidden(true);
+                            col.Bound(x => x.BILL_NO).Title("Серія та номер векселя").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                            col.Bound(x => x.NAME).Title("ПІБ/Найменування отримувача").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                            col.Bound(x => x.INN).Title("ІПН/ЄДРПО отримувача").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                            col.Bound(x => x.DT_ISSUE).Format("{0:dd.MM.yyyy}").Title("Дата випуску векселя").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                            col.Bound(x => x.AMOUNT).Format("{0:n2}").Title("Сума векселя").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" });
+                            col.Bound(x => x.EXTRACT_NUMBER_ID).Title("Номер витягу").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                            col.Bound(x => x.STATUS_NAME).Title("Поточний статус").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                        })
+                        .ToolBar(toolbar =>
+                        {
+                            toolbar.Template(@<text>
+                                <button class="k-button" id="sendbills" title="Відправити векселі до регіону" style="float: left;" onclick="sendBills(); return false;">
+                                    <span style="color: green" class="glyphicon glyphicon-export"></span>
+                                </button>
+                                <button class="k-button" id="getactca" title="Акт приймання-передачі" style="float: left;" onclick="getAct('acttransfer'); return false;">
+                                    <span style="color:coral" class="glyphicon glyphicon-import"></span>
+                                </button>
+                                <button class="k-button" id="getbagca" title="Акт приймання-здавання опломбованих інкасаторських сумок" style="float: left;" onclick="getAct('actbags'); return false;">
+                                    <span style="color: #c45757" class="glyphicon glyphicon-import"></span>
+                                </button>
+                                <div class="col-lg-6 col-md-7 col-sm-8 col-xs-8 col-sm-offset-1">
+                                    <div class="form-group">
+                                        <label for="BRANCH" class="control-label required" style="margin-top: 5px; width: 100px; float: left">
+                                            <b>Вибір регіону</b>
+                                        </label>
+                                        <div class="" style="min-width: 50px; float:left;">
+                                            @(Html.Kendo().DropDownList()
+                                                   .Name("BRANCH")
+                                                   .DataTextField("Text")
+                                                   .DataValueField("Value")
+                                                   .BindTo(Model)
+                                                   .Events(e => e.Select("onSelect"))
+                                                   .OptionLabel("-- Вибрати всі --")
+                                                   .HtmlAttributes(new { style = "min-width: 150px; text-align: center;" })
+                                            )
+                                        </div>
+                                    </div>
+                                </div>
+                            </text>);
+                                })
+                                                .Selectable()
+                                                .Sortable()
+                                                .Scrollable()
+                                                .Filterable()
+                                                .HtmlAttributes(new { style = "width: 100%;" })
+                                                .Pageable(x => x
+                                                    .Refresh(true)
+                                                    .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                                                    .ButtonCount(10))
+                                                .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .Read(read => read.Action("GetConfirmedBills_Read", "Bills"))
+                                                    .PageSize(10)
+                                                )
+)
+

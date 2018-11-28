@@ -1,0 +1,105 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    @* View для отображения списка отсканированных документов и работы с ними! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<style>
+    .edit-btn {
+        min-width: 40px !important;
+    }
+
+    .k-edit-cell input {
+        color: black;
+    }
+    .open-pdf {
+        width: 25px;
+        min-width: 25px !important;
+        padding-left: 5px !important;
+    }
+</style>
+
+<script src="~/Areas/Bills/Scripts/ScanDialog.js"></script>
+<script src="~/Areas/Bills/Scripts/FileStorage.js"></script>
+<div style="margin-left: 20px; margin-right: 20px;">
+
+    <div class="page-header" style="padding-bottom: 0px; margin: 5px 0 20px;">
+        <h1 id="title">Звітність</h1>
+    </div>
+
+    @(Html.Kendo().Grid<File_Archive>()
+                                  .Name("documents")
+                                  .ToolBar(toolbar =>
+                                  {
+                                      toolbar.Template(@<text>
+                                        <button class="k-button" id="generate-report" title="Створити звіт" onclick="generateReport(); return false;">
+                                            <span class="k-icon k-i-pdf"></span>
+                                        </button>
+                                        <button class="k-button" id="remove" title="Видалити документ" onclick="removeDocument(); return false;">
+                                            <span style="color: red" class="glyphicon glyphicon-remove"></span>
+                                        </button>
+                                        <button class='k-button' id="scann-new" title="Відсканувати документ" onclick='ScannNew();'>
+                                            <span class="k-icon k-i-pdf" style="background-position-x: -292px; background-position-y: -101px;"></span>
+                                        </button>
+                                        <button style="color: forestgreen" class="k-button" id="attach-application" title="додати документ" onclick="attachDocument(); this.blur(); return false;">
+                                            <span class="glyphicon glyphicon-plus" style="background-position-x: -292px; background-position-y: -101px;"></span>
+                                        </button>
+                                        @*<button class="k-button" id="add-description" title="Змінити назву файлу" onclick="AddDescription('name'); return false;">
+                                                <span class="glyphicon glyphicon-pencil"></span>
+                                            </button>
+                                            <button class="k-button" id="add-description" title="Додати коментар до файлу" onclick="AddDescription('description'); return false;">
+                                                <span class="glyphicon glyphicon-pencil"></span>
+                                            </button>*@
+                                        <button style="color: dodgerblue" class="k-button" id="save-updates" title="Зберегти зміни в описах" onclick="saveUpdates(); return false;">
+                                            <span class="glyphicon glyphicon-floppy-saved"></span>
+                                        </button>
+
+                                        <button style="color: darkgoldenrod" class="k-button" id="send-report" title="Надіслати звіт до ДКСУ" onclick="sendReport(); return false;">
+                                            <span class="glyphicon glyphicon-send"></span>
+                                        </button>
+                                    </text>);
+
+                                        })
+                                              .Columns(col =>
+                                              {
+                                                  col.Bound(x => x.FILE_ID).Hidden();
+                                                  col.Bound(x => x.FILE_STATUS).Hidden(true);
+                                                  col.Bound(x => x.FILE_ID).Title("").ClientTemplate("#=previewButton(data.FILE_ID)#").Width(70);
+                                                  col.Bound(x => x.FILE_NAME).Title("Ім'я файлу");
+                                                  col.Bound(x => x.DESCRIPTION).Title("Опис документу");
+                                                  col.Bound(x => x.LOAD_DATE).Title("Дата створення").Format("{0:dd.MM.yyyy}").HtmlAttributes(new { style = "text-align: center" });
+                                              })
+                                                  .Resizable(resizable => resizable.Columns(true))
+                                                  .Reorderable(reorderable => reorderable.Columns(true))
+                                                  .Scrollable()
+                                                  .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                                  .Selectable()
+                                                  .HtmlAttributes(new { style = "height: 100%;" })
+                                                  .Sortable()
+                                                  .Events(x => x.Change("Selected").DataBound("DataBound"))
+                                                  .Filterable()
+                                                  .Pageable(page => page
+                                                  .Refresh(true)
+                                                  .PageSizes(new List<Int32>
+                                                  { 5, 7, 10, 20, 50 })
+                                                  .ButtonCount(10))
+                                                  .DataSource(dataSource => dataSource
+                                                  .Ajax()
+                                                  .Read(read => read.Action("FileStorage_Read", "Bills"))
+                                                  .PageSize(10)
+                                                  .Model(model =>
+                                                  {
+                                                      model.Id(x => x.FILE_ID);
+                                                      model.Field(x => x.FILE_ID).Editable(false);
+                                                      model.Field(x => x.FILE_NAME).Editable(true);
+                                                      model.Field(x => x.FILE_STATUS).Editable(false);
+                                                      model.Field(x => x.KF).Editable(false);
+                                                      model.Field(x => x.LOAD_DATE).Editable(false);
+                                                      model.Field(x => x.DESCRIPTION).Editable(true);
+                                                  })
+                                              )
+    )
+</div>
+
+<div id="windowContainer"></div>

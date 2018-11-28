@@ -1,0 +1,12 @@
+﻿@{
+    Layout = null;// "~/Views/Shared/_LayoutKendo.cshtml";
+    String result = ((Int32)ViewBag.Result) == 0 ? "Виконано з помилкою" : "Виконано успішно";
+}
+
+<div class="container">
+    <div class="row text-center">
+        <span class="control-label">
+            <b>@result</b>
+        </span>
+    </div>
+</div>

@@ -2,13 +2,13 @@
     Layout = "~/Views/Shared/_LayoutKendo.cshtml";
     //ViewBag.Title = "";
 }
-<script src="~/Areas/CreditUi/Scripts/creditUiServices.js?v1.0.2"></script>
+<script src="~/Areas/CreditUi/Scripts/creditUiServices.js?v1.0.12"></script>
 <script src="~/Areas/CreditUi/Scripts/maskedDatePicker.js"></script>
-<script src="~/Areas/CreditUi/Scripts/mainCreditCtrl.js?v1.0.2"></script>
-<script src="~/Areas/CreditUi/Scripts/creditParamsCtrl.js?v1.0.2"></script>
-<script src="~/Areas/CreditUi/Scripts/dataMaturityCtrl.js"></script>
-<script src="~/Areas/CreditUi/Scripts/commitionLimitCtrl.js"></script>
-<script src="~/Areas/CreditUi/Scripts/moreCreditParamsCtrl.js?v1.0.2"></script>
+<script src="~/Areas/CreditUi/Scripts/mainCreditCtrl.js?v1.0.12"></script>
+<script src="~/Areas/CreditUi/Scripts/creditParamsCtrl.js?v1.0.10"></script>
+<script src="~/Areas/CreditUi/Scripts/dataMaturityCtrl.js?v1.0.3"></script>
+<script src="~/Areas/CreditUi/Scripts/commitionLimitCtrl.js?v1.0.2"></script>
+<script src="~/Areas/CreditUi/Scripts/moreCreditParamsCtrl.js?v1.0.7"></script>
 <div ng-controller="CreditUi.mainCreditCtrl">
     <h1>{{Title}}</h1>
     <div kendo-tool-bar="mainTool">
@@ -83,5 +83,9 @@
 
     .k-state-disabled {
         opacity: 1;
+    }
+
+    #tab_credit_params label {
+        margin-bottom: 0px;
     }
 </style>

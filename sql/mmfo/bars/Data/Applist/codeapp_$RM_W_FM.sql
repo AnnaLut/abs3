@@ -340,7 +340,7 @@ begin
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
                                                   p_name     => 'ФМ. Перевірка ТЕРОРИСТИ',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=> klient_is_reft (gl.bd)][QST=>Виконати перевірку всіх клієнтів банку?][MSG=>Перевірку завершено. Перевірте довідник підозрілих клієнтів.]',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1&sPar=[PROC=> fm_utl.run_deferred_task(''fm_terrorist_utl.check_terrorists'', ''Перевірку клієнтів на список терористів завершено. Перевірте довідник підозрілих клієнтів.'')][QST=>Запустити перевірку всіх клієнтів банку?][MSG=>Перевірку запущено, очікуйте повідомлення]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );

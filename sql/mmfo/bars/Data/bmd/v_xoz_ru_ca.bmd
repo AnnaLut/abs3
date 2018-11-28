@@ -58,8 +58,8 @@ declare
 
 begin
 
-  l_tabsemantic := '15.06.17.V_XOZ_RU_CA.Відшкодування в ЦА госп.ДЗ, що виникла в РУ';
-  l_tablinesdef := '';
+  l_tabsemantic := 'Відшкодування в ЦА госп.ДЗ, що виникла в РУ/V_XOZ_RU_CA';
+  l_tablinesdef := '25';
   l_tabselect_statement := '';
   l_tabname     := 'V_XOZ_RU_CA';
 
@@ -125,17 +125,21 @@ begin
 
   -- добавляем описание полей
   bars_metabase.add_column(l_tabid, 2, 'MFOA', 'C', 'МФО РУ~ДЗ', '1', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'NAM_A', 'C', 'Назва~рахунку', '2', null, 6, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 4, 'NAZN', 'C', 'Причина~виникнення', '3', 160, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок~ДЗ', '1', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 6, 'REC', 'N', 'REC деб.запиту~в ЦА', '1', null, 95, 0, 1, 0, 0, '', '', 0, 0, '', 0, 0, 0, 'sPar=V_REC[ACCESSCODE=>1][PROC=>PUL.put(''REC'',:REC)][EXEC=>BEFORE][showDialogWindow=>false] ', '', 0);
-  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Сума~запиту', '1', null, 5, 0, 0, 0, 0, '', '0.00', 0, 0, 'Sum (S) ', 0, 0, 0, 'sPar=V_XOZ7_CA[NSIFUNCTION][PROC=>PUL.PUT(''PROD'',:PROD);pul.put(''RECD_CA'',:REC)][EXEC=>BEFORE][ACCESSCODE=>2][EDIT_MODE=>MULTI_EDIT][showDialogWindow=>false]', '', 0);
-  bars_metabase.add_column(l_tabid, 8, 'REF1', 'C', 'REF виник~ДЗ в РУ', '1', null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '/barsroot/documentview/default.aspx?ref=:REF1', '', 0);
-  bars_metabase.add_column(l_tabid, 9, 'REFD_RU', 'C', 'REF деб.запиту~в РУ', '1', null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REFD_RU', '', 0);
+  bars_metabase.add_column(l_tabid, 3, 'NAM_A', 'C', 'Назва~рахунку', '2', null, 7, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 4, 'NAZN', 'C', 'Причина~виникнення', '3', 160, 8, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 5, 'NLSA', 'C', 'Рахунок~ДЗ', '1', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 6, 'REC', 'N', 'Стан запиту', '1', null, 99, 0, 1, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 7, 'S', 'N', 'Сума~запиту', '1', null, 6, 0, 0, 0, 0, '', '# ##0.00', 0, 0, 'Sum (S) ', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 8, 'REF1', 'N', 'REF виник~в РУ', '1', null, 2, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF1', '', 0);
+  bars_metabase.add_column(l_tabid, 9, 'REFD_RU', 'N', 'Id.запиту', '1', null, 98, 0, 0, 0, 0, '', '', 0, 0, '', 0, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 10, 'RU', 'N', '№~РУ', '.2', null, 25, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 11, 'NAME ', 'C', 'Назва~РУ', '2', null, 0, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 12, 'OB22', 'C', 'Ob~22', '.2', null, 3, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 13, 'PROD', 'C', 'Код~прод', '.5', null, 8, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 12, 'OB22', 'C', 'Ob~22', '.2', null, 4, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 13, 'PROD', 'C', 'Код~прод', '.5', null, 35, 0, 0, 0, 1, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 16, 'DATZ', 'D', 'Дат запиту~з РУ', '1', null, 9, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 17, 'FDAT', 'D', 'Дат виник~в РУ', '1', null, 5, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 18, 'REF2_CA', 'N', 'REF сплати~в ЦА', '1', null, 91, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF2_CA', '', 0);
+  bars_metabase.add_column(l_tabid, 19, 'REF2_KF', 'N', 'REF сплати~в РУ', '1', null, 92, 0, 0, 0, 0, '', '', 0, 0, '', 0, 0, 0, '/barsroot/documentview/default.aspx?ref=:REF2_KF', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('V_NBSOB22');
@@ -150,7 +154,22 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 15, 'Складні оп.закриття ДЗ, що виникла в РУ', '', '', 'EACH', '', 'ОК', '', '', 'sPar=V_XOZ7_CA[NSIFUNCTION][PROC=>PUL.PUT(''PROD'',:PROD);pul.put(''RECD_CA'',:REC)][EXEC=>BEFORE][ACCESSCODE=>2][EDIT_MODE=>MULTI_EDIT][showDialogWindow=>false]', 58);
+  bars_metabase.add_nsifunction(l_tabid, 15, 'Перерахування суми для закриття ДЗ, що виникла в РУ', '', '', 'EACH', '', 'ОК', '', '', 'sPar=V_XOZ7_CA[NSIFUNCTION][PROC=>PUL.PUT(''PROD'',:PROD);pul.put(''REFD'',:REFD_RU)][EXEC=>BEFORE][ACCESSCODE=>2][EDIT_MODE=>MULTI_EDIT][showDialogWindow=>false]', 58);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 20, 'Відмовити в сумі для закриття ДЗ, що виникла в РУ', 'xoz.XOZ7(99, :REFD_RU, ''*'', 0, :T,  ''*'', ''*'')', ':T(SEM=Підстава)', 'EACH', '', 'ОК', '', '', '', 158);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 30, 'АРХІВ відшкодувань госп.ДЗ, що виникла в РУ', '', '', 'ONCE', '', '', '', '', 'sPar=V_XOZ_RU_CA[showDialogWindow=>false][ACCESSCODE=>1][CONDITIONS=>V_XOZ_RU_CA.REC NOT in (1,2)]', 36);
+
+  -- добавляем описание раскраски
+  bars_metabase.add_tblcolor(l_tabid, 1, null, 'REC = 2', 1, 'COLOR_Green ');
+
+  -- добавляем описание раскраски
+  bars_metabase.add_tblcolor(l_tabid, 2, null, 'REC = 1', 1, 'COLOR_Blue');
+
+  -- добавляем описание раскраски
+  bars_metabase.add_tblcolor(l_tabid, 3, null, 'REC = -2', 1, 'COLOR_Red');
 
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_extrnval.count loop

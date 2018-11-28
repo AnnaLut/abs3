@@ -4,6 +4,7 @@
 
 <%@ Register Src="~/credit/usercontrols/TextBoxDate.ascx" TagName="TextBoxDate" TagPrefix="bec" %>
 <%@ Register Src="~/credit/usercontrols/TextBoxString.ascx" TagName="TextBoxString" TagPrefix="bec" %>
+<%@ Register Src="~/credit/usercontrols/TextBoxNumb.ascx" TagName="TextBoxNumb" TagPrefix="bec" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -34,8 +35,16 @@
             </tr>
 
            <tr> <td>                                                                   </td>
-                <td> Формула суми                                                      </td>
-                <td> <asp:Label ID="Lb_Summ" runat="server"></asp:Label>               </td>
+                <td> Сума платежу                                                      </td>
+                <td> <div style="margin-bottom:5px"> Сума формулою (так):  
+                    <asp:CheckBox ID="FormulaCheckbox" runat="server"
+                    AutoPostBack="True"
+                    Text=""
+                    TextAlign="Left"
+                    OnCheckedChanged="Check_Clicked"
+                    /> </div>
+                    <bec:TextBoxString ID="Lb_Summ_String" runat="server" Width="550" MaxLength="160" IsRequired="true" Visible="false" AutoPostBack="True"/>
+                    <bec:TextBoxNumb ID="Lb_Summ_Numb" runat="server" Width="550" MaxLength="160" IsRequired="true" Visible="false" AutoPostBack="True"/></td>
                 <td>                                                                   </td>
 
             </tr>
@@ -58,7 +67,7 @@
             <tr>
                 <td>                                                                   </td>
                 <td>                                           </td>
-                <td>   <asp:Button runat="server" ID="Save_date_nazn" Text="Зберегти призначення та дату" OnClick="Save_date_nazn_Click"/>
+                <td>   <asp:Button runat="server" ID="Save_date_nazn" Text="Зберегти зміни" OnClick="Save_date_nazn_Click"/>
              </td>
                 <td>                      </td> 
             </tr>

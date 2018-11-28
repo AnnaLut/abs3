@@ -24,13 +24,14 @@ PROMPT *** Create  table STO_LST ***
 begin 
   execute immediate '
   CREATE TABLE BARS.STO_LST 
-   (	IDS NUMBER, 
+   (IDS NUMBER, 
 	RNK NUMBER(*,0), 
 	NAME VARCHAR2(100), 
 	SDAT DATE DEFAULT SYSDATE, 
 	IDG NUMBER(*,0), 
 	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''), 
-	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch'')
+	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'',''user_branch''),
+    DATE_CLOSE DATE
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -39,9 +40,14 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
-
-
+prompt add column date_close
+begin
+    execute immediate 'alter table sto_lst add date_close date';
+exception
+    when others then
+        if sqlcode = -1430 then null; else raise; end if;
+end;
+/
 
 PROMPT *** ALTER_POLICIES to STO_LST ***
  exec bpa.alter_policies('STO_LST');
@@ -49,12 +55,13 @@ PROMPT *** ALTER_POLICIES to STO_LST ***
 
 COMMENT ON TABLE BARS.STO_LST IS 'Договора на рег.платежи';
 COMMENT ON COLUMN BARS.STO_LST.IDS IS 'Реф Договора';
-COMMENT ON COLUMN BARS.STO_LST.RNK IS 'RNK Поручителя';
-COMMENT ON COLUMN BARS.STO_LST.NAME IS 'Детали Договора';
+COMMENT ON COLUMN BARS.STO_LST.RNK IS 'RNK клиента';
+COMMENT ON COLUMN BARS.STO_LST.NAME IS 'Детали Договора / название';
 COMMENT ON COLUMN BARS.STO_LST.SDAT IS 'Дата Договора';
 COMMENT ON COLUMN BARS.STO_LST.IDG IS 'Ид группы';
-COMMENT ON COLUMN BARS.STO_LST.KF IS '';
-COMMENT ON COLUMN BARS.STO_LST.BRANCH IS '';
+COMMENT ON COLUMN BARS.STO_LST.KF IS 'Код филиала';
+COMMENT ON COLUMN BARS.STO_LST.BRANCH IS 'Бранч договора';
+COMMENT ON COLUMN BARS.STO_LST.DATE_CLOSE IS 'Дата закрытия договора';
 
 
 
@@ -179,6 +186,17 @@ begin
   CREATE UNIQUE INDEX BARS.UK_STOLST ON BARS.STO_LST (KF, IDS) 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   TABLESPACE BRSDYNI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
+
+PROMPT *** Create  index I_STO_LST_KF_IDG ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.I_STO_LST_KF_IDG ON BARS.STO_LST (KF, IDG) 
+  COMPUTE STATISTICS 
+  TABLESPACE brsmdli ';
 exception when others then
   if  sqlcode=-955  then null; else raise; end if;
  end;

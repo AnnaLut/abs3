@@ -124,6 +124,7 @@ begin
   end if;
 
   -- добавляем описание полей
+  bars_metabase.add_column(l_tabid, 1, 'TERM_DAY', 'N', 'NN дня~погашення', '', 2, 5, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 4, 'NBS_P', 'C', 'Бал/ob22~Простр~фін/деб', '', null, 2, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 5, 'NBS_N', 'C', 'Бал/ob22~Норм~фін/деб', '', null, 1, 1, 1, 1, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);
   bars_metabase.add_column(l_tabid, 6, 'MOD_ABS', 'N', 'Признак~мод.~АБС', '', null, 0, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '', '', 0);

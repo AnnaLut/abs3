@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.5 13.08.2018';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.4 10.07.2018';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -109,7 +109,7 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.5 13.08.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.4 10.07.2018';
 /*
 10.07.2018 LitvinSO COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
 06.04.2018  Нач %% через JOB

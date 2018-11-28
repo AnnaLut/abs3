@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../Scripts/jquery/jquery.numbermask.js"></script>
     <script type="text/javascript" src="../scripts/jquery/jquery.maskedinput-1.3.1.js"></script>
 
-    <script language="javascript" type="text/jscript" src="JScriptFortab_dop_rekv.js?v1.9"></script>
+    <script language="javascript" type="text/jscript" src="JScriptFortab_dop_rekv.js?v2.1"></script>
     <script language="javascript" type="text/jscript" src="additionalFuncs.js"></script>
 
 </head>
@@ -95,6 +95,9 @@
                                     tabname='<%# Eval("TABNAME") %>' 
                                     value='<%# Eval("VALUE") %>'
                                     nottoedit='<%# Eval("NOT_TO_EDIT") %>'
+                                    mask='<%# Eval("MASK") %>'
+                                    validator ='<%# Eval("CHKR") %>'
+                                    title ='<%# Eval("NAME") %>'
                                     id="edEdVal"
                                     onfocusout="addToSaveTags(this)" 
                                     maxlength="490"/>

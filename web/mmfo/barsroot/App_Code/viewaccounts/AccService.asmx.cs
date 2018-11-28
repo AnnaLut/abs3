@@ -1199,7 +1199,6 @@ namespace ViewAccounts
         {
             object[] obj = new object[2];
             DataSet ds = new DataSet();
-            int count = 0;
             if (data[9] == "0") data[9] = "-1";
             if (string.IsNullOrEmpty(data[10])) data[10] = "1";
             try
@@ -1214,8 +1213,10 @@ namespace ViewAccounts
                 ds = SQL_SELECT_dataset(@"SELECT rownum ID,TO_CHAR(i.bdat,'DD/MM/YYYY') BDAT,i.ir IR,DECODE(i.op,'0','','1','+','2','-','3','*','4','/') OP,b.name NAME,i.br BR
 										  FROM int_ratN i, brates b
 										  WHERE i.acc=:acc AND i.id=:id AND i.br=b.br_id (+) ORDER BY " + order, startpos, pageSize);
+                ClearParameters();
+                SetParameters("acc", DB_TYPE.Decimal, data[9], DIRECTION.Input);
                 obj[0] = ds.GetXml();
-                obj[1] = count;
+                obj[1] = Convert.ToInt32(SQL_SELECT_scalar("SELECT count(*) from int_ratN where acc=:acc"));
                 return obj;
             }
             catch (System.Exception ex)

@@ -7,6 +7,7 @@ using Oracle.DataAccess.Client;
 using System;
 using BarsWeb.Infrastructure.Repository.DI.Abstract;
 using BarsWeb.Models;
+using System.Reflection;
 
 namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
 {
@@ -415,8 +416,7 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                                       from params p, int_metr m
                                      where p.par = 'CC_KOM'
                                        and to_char(m.metr) = p.val";*/
-                cmd.CommandText = @"select m.metr, m.name
-                                      from  int_metr m";
+                cmd.CommandText = @"select metr as id, metr || ' - ' || name as name from int_metr order by metr";
                 using (OracleDataReader reader = cmd.ExecuteReader())
                 {
 
@@ -1147,6 +1147,8 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                         credit.INSPECTOR_ID = String.IsNullOrEmpty(reader.GetValue(57).ToString()) ? (int?)null : reader.GetInt32(57);
                     }
                 }
+                credit.CUST_DATA = GetCustomerInfo(credit.nRNK, connection);
+
             }
             finally
             {
@@ -1387,6 +1389,87 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Implementation
                     return 3;
 
                 default: return 3;
+            }
+        }
+
+
+        public CustomerInfo GetCustomerInfo(decimal rnk, OracleConnection conn = null)
+        {
+            CustomerInfo cst_inf = new CustomerInfo();
+            OracleConnection connect = conn ?? OraConnector.Handler.UserConnection;
+            try
+            {
+                Dictionary<string, string> query_data = new Dictionary<string, string>();
+                using (OracleCommand cmd = connect.CreateCommand())
+                {
+
+                    cmd.CommandText = @"select trim(t.tag), w.value from CUSTOMER_FIELD t, customerw w
+                                        where t.code = 'KRED' 
+                                          and t.tag = w.tag (+)
+                                          and w.rnk (+) = :rnk";
+                    cmd.Parameters.Add("rnk", OracleDbType.Decimal, rnk, System.Data.ParameterDirection.Input);
+
+                    using (OracleDataReader reader = cmd.ExecuteReader())
+                        while (reader.Read())
+                            query_data.Add(reader.GetString(0), String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetString(1));
+                }
+
+                foreach (PropertyInfo prop in typeof(CustomerInfo).GetProperties())
+                {
+                    var search_data = cst_inf.data_names.FirstOrDefault(item => item.Item1 == prop.Name.ToString());
+                    if (prop.Name == "Error_Message" || prop.Name == "REAL6INCOME" || prop.Name == "NOREAL6INCOME")
+                        break;
+
+                    if (search_data == null) //without tab_name
+                        prop.SetValue(cst_inf, query_data[prop.Name.ToString()], null);
+                    else
+                        prop.SetValue(cst_inf, GetNameValue(search_data.Item2, search_data.Item3, search_data.Item4, query_data[prop.Name.ToString()], connect ), null);
+                }
+
+
+                using(OracleCommand cmd = connect.CreateCommand())
+                {
+                    cmd.CommandText = @"select REAL6INCOME, NOREAL6INCOME
+                                 from  NBU_PROFIT_FO a 
+                                 Where a.rnk = :rnk";
+                    cmd.Parameters.Add("rnk", OracleDbType.Decimal, rnk, System.Data.ParameterDirection.Input);
+                    using (OracleDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            cst_inf.REAL6INCOME = String.IsNullOrEmpty(reader.GetValue(0).ToString()) ? String.Empty : reader.GetDecimal(0).ToString();
+                            cst_inf.NOREAL6INCOME = String.IsNullOrEmpty(reader.GetValue(1).ToString()) ? String.Empty : reader.GetDecimal(1).ToString();
+                        }
+                    }
+                }
+
+                return cst_inf;
+                
+            }
+            catch (Exception e)
+            {
+                cst_inf.Error_Message = e.Message + "</br> StackTrace=" + e.StackTrace;
+                return cst_inf;
+            }
+            finally
+            {
+                if(conn == null)
+                {
+                    connect.Dispose();
+                    connect.Close();
+                }
+            }
+        }
+
+        private string GetNameValue(string tab_name, string id_column, string name_column, string value, OracleConnection conn)
+        {
+            if (value == "")
+                return "";
+
+            using (OracleCommand cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = String.Format("Select {0} from {1} where {2} = {3}", name_column, tab_name, id_column, value);
+                return cmd.ExecuteScalar().ToString();
             }
         }
     }

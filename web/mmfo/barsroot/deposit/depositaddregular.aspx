@@ -50,13 +50,13 @@
             var result = true;
             var nls = document.getElementById('textBankAccount');
 
-            var startDate = document.getElementById('StartDate_t');
-            var endDate = document.getElementById('EndDate_t');
+            var startDate = document.getElementById('StartDate');
+            var endDate = document.getElementById('EndDate');
 
-            var startDateArray = document.getElementById('StartDate_t').value.split('/')//date format 'dd/MM/yyyy'
+            var startDateArray = document.getElementById('StartDate').value.split('/')//date format 'dd/MM/yyyy'
             var startDate1 = new Date(startDateArray[2], parseInt(startDateArray[1], 10) - 1, startDateArray[0])
 
-            var endDateArray = document.getElementById('EndDate_t').value.split('/')//date format 'dd/MM/yyyy'
+            var endDateArray = document.getElementById('EndDate').value.split('/')//date format 'dd/MM/yyyy'
             var endDate1 = new Date(endDateArray[2], parseInt(endDateArray[1], 10) - 1, endDateArray[0])
             var tmpDate = new Date();
             var nextBankDateArray = document.getElementById('nextBankDate').value.split('/')//date format 'dd/MM/yyyy'
@@ -377,11 +377,11 @@
                         </td>
                         <td class="style6">
                             <input type="hidden" runat="server" id="nextBankDate" clientidmode="Static" />
-                            <igtxt:webdatetimeedit id="StartDate" runat="server" ToolTip="Дата початку"
+                            <asp:TextBox ID="StartDate" runat="server" ToolTip="Дата початку"
                                 EditModeFormat="dd/MM/yyyy" DisplayModeFormat="dd/MM/yyyy" HorizontalAlign="Center"
                                  tabIndex="25" CssClass="InfoDateSum"  BorderWidth="1">
                                 <clientsideevents blur="dtBirthDate_Blur"></clientsideevents>
-                            </igtxt:webdatetimeedit>
+                            </asp:TextBox>
                             <span runat="server" id="StartDateValidate" style="color: red"></span>
                         </td>
                     </tr>
@@ -390,11 +390,11 @@
                             <asp:Label ID="lbEndDate" meta:resourcekey="lbEndDate" runat="server" CssClass="InfoText">Дата завершення договора</asp:Label>
                         </td>
                         <td class="style6">
-                            <igtxt:webdatetimeedit id="EndDate" runat="server" ToolTip="Дата закінчення"
+                            <asp:TextBox ID="EndDate" runat="server" ToolTip="Дата закінчення"
                                 EditModeFormat="dd/MM/yyyy" DisplayModeFormat="dd/MM/yyyy" HorizontalAlign="Center"
                                 MinValue="2000-01-01" tabIndex="25" CssClass="InfoDateSum" BorderWidth="1">
                                 <clientsideevents blur="dtBirthDate_Blur"></clientsideevents>
-                            </igtxt:webdatetimeedit>      
+                            </asp:TextBox>      
                             <span runat="server" id="EndDateValidate" style="color: red"></span>                                          
                         </td>
                     </tr>

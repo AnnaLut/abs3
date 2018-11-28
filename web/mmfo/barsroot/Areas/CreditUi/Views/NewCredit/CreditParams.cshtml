@@ -5,7 +5,7 @@
     //var nd = "";
 }
 <div ng-controller="CreditUi.creditParamsCtrl" style="width: 100%">
-    <table border="0">
+    <table border="0" id="tab_credit_params">
         <tr>
             <td>
                 <label>№ договору</label>
@@ -50,7 +50,7 @@
             <td>
                 <select kendo-drop-down-list name="ddlCur" id="ddlCur" style="width: 250px" k-ng-model="credit.curValue" k-options="ddlCurOptions" k-ng-disabled="isSaveFunc()"></select>
             </td>
-            <td colspan="2" rowspan="6">
+            <td colspan="2" rowspan="11">
                 <div class="panel panel-default" style="display: inline-flex;width:100%">
                     <div class="panel-body">
                         <div class="form-group">
@@ -129,6 +129,88 @@
                                     </td>
                                     <td>
                                         <select kendo-drop-down-list name="ddlObs" id="ddlObs" style="width: 150px" k-ng-model="credit.obsValue" k-options="ddlObsOptions" k-ng-disabled="isSave"></select>
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <label>Найм роботодавця</label>
+                                    </td>
+                                    <td>
+                                        <label>Тип роботодавця</label>
+                                    </td>
+                                    <td>
+                                        <label>Код ЄДРПОУ роботодавця</label>
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.NAMEW" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.TYPEW" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.EDRPO" disabled class="k-textbox" />
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <label>Освіта</label>
+                                    </td>
+                                    <td>
+                                        <label>Сімейний стан боржника</label>
+                                    </td>
+                                    <td>
+                                        <label>Кіл.осіб на утриманні </label>
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.EDUCA" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.STAT" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.MEMB" disabled class="k-textbox" />
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <label>Підтверджений дохід боржника</label>
+                                    </td>
+                                    <td>
+                                        <label>Непідтверджений дохід боржника</label>
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.REMO" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.NREMO" disabled class="k-textbox" />
+                                    </td>
+                                </tr>
+                                  <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <label>Середній підтв. дохід особи</label>
+                                    </td>
+                                    <td>
+                                        <label>Регулярний непідтв. дохід особи</label>
+                                    </td>
+                                    <td>
+                                       
+                                    </td>
+                                </tr>
+                                <tr ng-show="isShowCustInfo()">
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.REAL6INCOME" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+                                        <input type="text" ng-model="CUST_INFO.NOREAL6INCOME" disabled class="k-textbox" />
+                                    </td>
+                                    <td>
+
                                     </td>
                                 </tr>
                             </table>
@@ -252,6 +334,10 @@
             <td></td>
             <td></td>
         </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
         <tr>
             <td>
                 <label>Вид</label>
@@ -461,12 +547,6 @@
                 </kendo-button>
         </tr>
         <tr>
-            <td><br /></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
             <td colspan="4">
                 <label>Платіжні інструкції</label>
                 <input type="text" ng-model="credit.mfoValue" ng-disabled="isSaveFunc()" class="k-textbox" style="width: 100px" />
@@ -491,10 +571,10 @@
         </tr>
         <tr>
             <td colspan="2">
-                <textarea id="taPurpose" name="taPurpose" ng-model="credit.purposeValue" rows="4" class="k-textbox" style="width: 400px" ng-disabled="isSaveFunc()"></textarea>
+                <textarea id="taPurpose" name="taPurpose" ng-model="credit.purposeValue" rows="3" class="k-textbox" style="width: 400px" ng-disabled="isSaveFunc()"></textarea>
             </td>
             <td colspan="2">
-                <textarea id="taGuarantee" name="taGuarantee" ng-model="credit.guaranteeValue" rows="4" class="k-textbox" style="width: 400px" ng-disabled="isSaveFunc()"></textarea>
+                <textarea id="taGuarantee" name="taGuarantee" ng-model="credit.guaranteeValue" rows="3" class="k-textbox" style="width: 400px" ng-disabled="isSaveFunc()"></textarea>
             </td>
         </tr>
     </table>

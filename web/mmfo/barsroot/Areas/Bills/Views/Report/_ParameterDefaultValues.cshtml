@@ -1,0 +1,69 @@
+﻿@using Kendo.Mvc.UI
+@{
+    Layout = null;
+}
+
+<script>
+    var isReportsLoaded = false;
+    var isParametersLoaded = false;
+</script>
+<style>
+    #parameter-type-label {
+        text-align: center;
+        font-size: 17px;
+        margin-top: 20px;
+        min-width: 400px;
+    }
+</style>
+<div>
+    <div class="col-lg-7 col-md-8 col-xs-12">
+        <div class="fa fa-border col-xs-12 text-center" style="padding-bottom: 25px; padding-top: 15px;">
+            @Html.Label("reportitems", "Звіти", new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left;" })
+            <div class="col-md-6 col-xs-7">
+                @(Html.Kendo().DropDownList()
+                      .Name("reportitems")
+                      .DataTextField("Report_Name")
+                      .DataValueField("Report_ID")
+                      .HtmlAttributes(new { style = "min-width:400px; margin-left: 20px;", id = "reportitems" })
+                      .DataSource(source =>
+                      {
+                          source.Read(read =>
+                          {
+                              read.Action("GetReportsList", "Report", new { id = 1 });
+                          });
+                      })
+                      .Events(e =>
+                        e.Change("onReportItemsChange")
+                         .DataBound("onReportItemsDataBound")
+                      ))
+                </div>
+            </div>
+        </div>
+    <div class="col-lg-7 col-md-8 col-xs-12">
+        <div class="fa fa-border col-xs-12 text-center" style="padding-bottom: 25px; padding-top: 15px;">
+            @Html.Label("reportparams", "Параметри", new { @class = "control-label col-md-2 col-xs-3", style = "text-align: left; margin-top: 5px;" })
+            <div class="col-md-7 col-xs-8">
+                <button class="k-button" style="color: forestgreen; margin-left: -20px; float: right;" title="Додати нове значення параметру" onclick="createParamValue(); return false;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                @(Html.Kendo().DropDownList()
+                                      .Name("reportparams")
+                                      .DataTextField("PARAM_NAME")
+                                      .DataValueField("PARAM_ID")
+                                      .HtmlAttributes(new { style = "min-width:400px; float-left; margin-left: -50px;", id = "reportparams" })
+                                      .Events(e =>
+                                        e.Change("onReportParameterChange")
+                                         .DataBound("onReportParameterDataBound")
+                                      ))
+            </div>
+            <div class="col-xs-12">
+                @Html.Label("ParameterType"," ", new { @class = "control-label col-md-2 col-xs-3 col-md-offset-2 col-xs-offset-2", id = "parameter-type-label" })
+            </div>
+            </div>
+        </div>
+</div>
+<div class="col-lg-7 col-md-8 col-xs-12">
+    <div class="fa fa-border col-xs-12 text-center" style="padding-bottom: 25px; padding-top: 15px;">
+        <div id="parameter-value-container"></div>
+    </div>
+</div>

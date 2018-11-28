@@ -154,7 +154,8 @@ function initMainGrid(user) {
                     TRN: { type: 'string' },
                     TT: { type: 'string' },
                     PRN_FILE: { type: 'number' },
-                    KOD_NBU: { type: 'string' }
+                    KOD_NBU: { type: 'string' },
+                    CAUSE_ERR_ID: { type: 'number' }
                 }
             }
         },
@@ -268,13 +269,13 @@ function initMainGrid(user) {
 
 
                 if (type == 1 && user != "/")
-                    $("#solveBtn").css("display", "block");
+                    $("#solveBtn").css("display", "inline");
 
-                if ((type == 2 || type == 3) && user != "/")
-                    $("#handBtn").css("display", "block");
+                if ((type == 2 || type == 3 || type == 1) && user != "/")
+                    $("#handBtn").css("display", "inline");
 
                 if ((type == 4 || type == 5) && user != "/")
-                    $("#deleteBtn").css("display", "block");
+                    $("#deleteBtn").css("display", "inline");
 
                 $(formConfig.ticketsGrid).show();
             } else {
@@ -342,7 +343,9 @@ function getComments(comments) {
         p_ddate_oper: selectedItem.DDATE,
         p_prn_file: selectedItem.PRN_FILE,
         p_kf: selectedItem.KF,
-        p_comments: comments
+        p_comments: comments,
+        p_cause_err_id: selectedItem.CAUSE_ERR_ID,
+        p_id_c: selectedItem.ID_C
     };
 
     $.ajax({

@@ -760,4 +760,18 @@ public class SepLockDocsRepository : ISepLockDocsRepository
         _entities.ExecuteStoreCommand(query, parameters);
     }
 
+    public bool isSepAuto()
+    {
+        try
+        {
+            string query = "select sep_utl.get_STP_AUTO from dual";
+            int isSepAuto = _entities.ExecuteStoreQuery<int>(query, new object[0]).Single();
+            return (isSepAuto == 1) ? true : false;
+        }
+        catch (Exception)
+        {
+
+        }
+        return false;
+    }
 }

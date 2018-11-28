@@ -1,0 +1,178 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    @* View для выдачи векселей взыскателю! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Видача векселів стягувачу</h2>
+</div>
+
+<script>
+    function onExpandRow(e) {
+        this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+    }
+
+    function refreshBills() {
+        var url = '/barsroot/api/bills/bills/BillsRequest?method=GetBills&str=&id=0';
+        sendPostRequest(url);
+    }
+
+    function refreshGrid() {
+        $(".k-overlay").remove();
+        $('#receivers').data('kendoGrid').dataSource.read();
+        $('#receivers').data('kendoGrid').refresh();
+    }
+
+    function issueBillsOfExchange(id) {
+        bars.ui.confirm({
+            title: 'У В А Г А!',
+            text: 'Видати векселі стягувачу?'
+        }, function () {
+            if (setTimeout) {
+                setTimeout(function () {
+                    $("<div class='k-overlay'></div>").appendTo($(document.body));
+                }, 500);
+            }
+            var url = '/barsroot/api/bills/bills/BillsRequest?method=IssueBillsOfExchange&str=&id=' + id;
+            sendPostRequest(url);
+        });
+    }
+
+    function sendPostRequest(url) {
+        $("<div class='k-overlay'></div>").appendTo($(document.body));
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: url,
+            success: function (result) {
+                if (result.status === 1) {
+                    bars.ui.alert({
+                        text: 'Виконано успішно!',
+                        close: function (e) {
+                            refreshGrid();
+                        }
+                    });
+                }
+                else {
+                    bars.ui.error({
+                        text: result.err,
+                        close: function (e) {
+                            refreshGrid();
+                        }
+                    });
+                }
+            },
+            error: function (result) {
+                refreshGrid();
+            }
+        });
+    }
+
+    function DownloadAcceptance(type) {
+        var grid = $('#receivers').data('kendoGrid');
+        var selected = grid.select();
+        if (selected.length == 0) {
+            bars.ui.alert({
+                text: 'Жодної строки не було вибрано',
+                title: 'Увага!'
+            });
+            return;
+        }
+        var exp_id = selected[0].childNodes[1].innerHTML;
+        var url = '/barsroot/bills/bills/DownloadReport/' + exp_id + '?reportType=';
+        url += type === 'acc' ? 'acceptancereceiverfrombank' : 'act';
+        downloadPdf(url);
+    }
+
+    function downloadPdf(url) {
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
+
+</script>
+
+<div id="extractsBody">
+    @(Html.Kendo().Grid<ReceiversForBills>()
+                .Name("receivers")
+                .Columns(col =>
+                {
+                    col.Bound(x => x.EXP_ID).Hidden(true);
+                    col.Bound(x => x.STATUS).Hidden(true);
+                    col.Bound(x => x.NAME).Title("ПІБ/Найменування").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    col.Bound(x => x.INN).Title("ІПН/ЄДРПОУ").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    col.Bound(x => x.DOC_NO).Title("Номер документу").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    col.Bound(x => x.EXPECTED_AMOUNT).Format("{0:n2}").Title("Очікувана сума").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" });
+                    col.Bound(x => x.STATUS)
+                        .ClientTemplate("#if (STATUS == 'RR' && EnableButton == true) {#" + "<button class='k-button' onclick='issueBillsOfExchange(#= EXP_ID #); return false;'>Видати векселі</button>" + "# } #")
+                        .Width(160)
+                        .Title("");
+                    col.Bound(x => x.EnableButton).Hidden(true);
+                })
+                .Filterable()
+                .ColumnMenu(x => x.Columns(false))
+                .Resizable(x => x.Columns(true))
+                .Reorderable(x => x.Columns(true))
+                .Selectable()
+                .Sortable()
+                .Scrollable()
+                .Pageable(page => page
+                         .Refresh(true)
+                         .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                         .ButtonCount(10))
+                .Events(x => x.DetailExpand("onExpandRow"))
+                .HtmlAttributes(new { style = "min-height: 50px; height: 100%;" })
+                .ToolBar(x =>
+                {
+                    x.Template(@<text>
+                        <div class="col-xs-12 text-left">
+                            @*<button class="k-button" id="update-bills" title="Оновити векселі" onclick="refreshBills(); return false;">
+                                <span class="glyphicon glyphicon-refresh"></span>
+                            </button>*@
+                            <button class="k-button" title="Завантаження акту прийому-передачі векселів" onclick="DownloadAcceptance('acc'); return false; this.blur();">
+                                <span class="k-icon k-i-pdf"></span>
+                            </button>
+                            @*<button class="k-button" title="Завантаження заяви про видачу векселів" onclick="DownloadAcceptance('act'); return false; this.blur();">
+                                <span class="k-icon k-i-pdf"></span>
+                            </button>*@
+                        </div>
+                    </text>);
+                        })
+                        .DataSource(x => x.Ajax()
+                            .Read(read => read.Action("GetReceiversForBills", "Bills"))
+                        )
+                        .ClientDetailTemplateId("list"))
+</div>
+
+<script id="list" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<BillsModel>()
+                .Name("bills#=EXP_ID#")
+                .HtmlAttributes(new { style = "width: 100%;" })
+                .Sortable()
+                .Columns(col =>
+                {
+                    col.Bound(x => x.EXP_ID).Hidden(true);
+                    col.Bound(x => x.STATUS).Hidden(true);
+                    col.Bound(x => x.BILL_NO).Title("Серія та номер векселя").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                    col.Bound(x => x.DT_ISSUE).Format("{0:dd.MM.yyyy}").Title("Дата випуску векселя").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                    col.Bound(x => x.AMOUNT).Format("{0:n2}").Title("Сума векселя").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" });
+                    col.Bound(x => x.STATUS_NAME).Title("Поточний статус").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                })
+                .Filterable()
+                .Selectable()
+                .Scrollable()
+                .Pageable(page => page
+                    .Refresh(true)
+                    .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                    .ButtonCount(10))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Model(model => model.Id(x => x.EXP_ID))
+                    .Read(read => read.Action("GetBillsByExpID", "Bills", new { id = "#=EXP_ID#" }))
+                    .PageSize(10)
+                )
+                .ToClientTemplate()
+    )
+</script>
+

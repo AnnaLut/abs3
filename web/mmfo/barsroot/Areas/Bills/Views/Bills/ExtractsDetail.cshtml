@@ -1,0 +1,105 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    @* View для отображения выдержек по рещениям! *@
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<script>
+    base_url = '/barsroot/bills/bills/DownloadReport/';
+    function onExpandRow(e) {
+        this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+    }
+
+    function downloadReport(type) {
+        var ext_id = Ext_id();
+        if (ext_id === -1)
+            return;
+        var url = base_url + ext_id + '?reportType=' + type;
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
+
+    function Ext_id() {
+        var grid = $('#extracts').data('kendoGrid');
+        var selected = grid.select();
+        if (selected.length == 0) {
+            bars.ui.alert({
+                text: 'Жодної строки не було вибрано',
+                title: 'Увага!'
+            });
+            return -1;
+        }
+        return selected[0].childNodes[1].innerHTML;
+    }
+</script>
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Архів реєстру витягів</h2>
+</div>
+
+<div id="extractsBody">
+    @(Html.Kendo().Grid<Extract>()
+                .Name("extracts")
+                .Columns(col =>
+                {
+                    col.Bound(x => x.Extract_number_id).Title("Номер витягу");
+                    col.Bound(x => x.EXTRACT_DATE).Format("{0:dd.MM.yyyy}").Title("Дата формування витягу").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                })
+                .Filterable()
+                .ColumnMenu(x => x.Columns(false))
+                .Resizable(x => x.Columns(true))
+                .Reorderable(x => x.Columns(true))
+                .Sortable()
+                .Scrollable()
+                .Selectable()
+                .Pageable(page => page
+                         .Refresh(true)
+                         .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                         .ButtonCount(10))
+                .Events(x => x.DetailExpand("onExpandRow"))
+                .HtmlAttributes(new { style = "min-height: 50px; height: 100%;" })
+                .DataSource(x => x.Ajax()
+                    .Read(read => read.Action("ExtractsDetail_Read", "Bills"))
+                )
+                .ClientDetailTemplateId("list"))
+</div>
+
+<script id="list" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<CA_Receivers>()
+                 .Name("receivers#=Extract_number_id#")
+                 .HtmlAttributes(new { style = "width: 100%;" })
+                 .Sortable()
+                 .Columns(col =>
+                 {
+                     col.Bound(x => x.EXP_ID).Hidden(true);
+                     col.Bound(x => x.STATUS).Hidden(true);
+                     col.Bound(x => x.NAME).Title("ПІБ/Найменування").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(200);
+                     col.Bound(x => x.AMOUNT).Title("Сума для отримання в грн").ClientTemplate("<div class='text-right'>\\#=kendo.toString(AMOUNT/100,'n')\\#</div>")
+                        .HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" }).Width(160);
+                     col.Bound(x => x.DOC_NO).Title("Номер документу").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                     col.Bound(x => x.INN).Title("ІПН/ЄДРПОУ").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                     col.Bound(x => x.BRANCH).Title("Відділення, яке проводить роботу з отримувачем").HeaderHtmlAttributes(new { style = "white-space: normal" }).Width(120);
+                     col.Bound(x => x.EXT_STATUS).Hidden(true);
+                     col.Bound(x => x.EXT_STATUS_NAME).Title("Статус").Width(220);
+                 })
+                 .Filterable()
+                 .ColumnMenu(x => x.Columns(false))
+                 .Resizable(x => x.Columns(true))
+                 .Reorderable(x => x.Columns(true))
+                 .Scrollable()
+                 .Events(x => x.DetailExpand("onExpandRow"))
+                 .Sortable()
+                 .Pageable(page => page
+                     .Refresh(true)
+                     .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                     .ButtonCount(10))
+                 .DataSource(dataSource => dataSource
+                     .Ajax()
+                     .Model(model => model.Id(x => x.EXP_ID))
+                     .Read(read => read.Action("CA_ExtractsDetail_Receivers_read", "Bills", new { id = "#=Extract_number_id#" }))
+                     .PageSize(10)
+                 )
+                 .ToClientTemplate()
+    )
+</script>

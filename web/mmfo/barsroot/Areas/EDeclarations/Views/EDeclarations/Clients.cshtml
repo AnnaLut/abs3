@@ -1,0 +1,52 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "EDeclarations";
+}
+@model ClientSearchResultModel
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/EDeclarations/Scripts/KendoCommon.js?v1.0"></script>
+<script src="~/Areas/EDeclarations/Scripts/EDeclarations/Clients.js?v1.1"></script>
+<link rel="stylesheet" href="~/Areas/EDeclarations/Css/EDeclarations/Main.css" />
+<link href="~/Areas/EDeclarations/Css/EDeclarations/Clients.css" rel="stylesheet" />
+
+@if (Model.Clients.Count == 0)
+{
+    <div style="line-height: 200px; text-align: center;">За введеними даними клієнтів не знайдено.</div>
+}
+else
+{
+<form id="eDeclFrom">
+    <div class="form-horizontal container-fluid">
+        <div class="center" id="date" data-datefrom="@Model.DateFrom.ToString(" yyyy-MM-dd")" data-dateto="@Model.DateTo.ToString(" yyyy-MM-dd")">
+            @foreach (var client in @Model.Clients)
+            {
+            <div class="form-check">
+                <label>
+                    <input class="form-check-input" name="radio" type="radio" data-rnk="@client.Rnk" data-nmk="@client.Nmk" data-ipn="@client.Okpo"
+                           data-bday="@if (@client.Bday.HasValue)
+                           {@client.Bday.Value.ToString(" yyyy-MM-dd")}"
+                           data-doctypeid="@client.docTypeId" data-ser="@client.Ser" data-numdoc="@client.Numdoc">
+                    <b class="infob nmk" data-rnk="@client.Rnk" data-nmk="@client.Nmk">@client.Nmk</b>
+                </label>
+                <p class="info"><b>РНК:</b> @client.Rnk</p>
+                <p class="info"><b>ІПН:</b> @client.Okpo</p>
+                <p class="info"><b>Дата народження:</b> @if (@client.Bday.HasValue)
+                {@client.Bday.Value.ToString("dd-MM-yyyy")}</p>
+                <p class="info"><b>Документ:</b> @client.docType @client.Ser @client.Numdoc</p>
+            </div>
+            }
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="text-center">
+            <br />
+            <button class="k-button k-primary" id="CreateDecl">Сформувати декларацію</button>
+            <button class="k-button btn-default" id="Cancel">Скасувати</button>
+        </div>
+        <div class="form-group">
+            <span class="status"></span>
+        </div>
+    </div>
+</form>
+}

@@ -3,7 +3,34 @@
  */
 
 
-var g_params = ["BUS_MOD", "IFRS", "SPPI"];
+var g_params = ["BUS_MOD", "IFRS", "SPPI", "FLAGINSURANCE", "TYPEW", "NAMEW", "EDUCA", "EDRPO", "MEMB", 'FLAGINSURANCE', 'TYPEW', 'STAT', 'NREMO', 'REMO'];
+//var ddls = ['FLAGINSURANCE', 'TYPEW', 'EDUCATION', 'STATUS'];
+var ddls = [];
+var numerics = [];
+//var numerics = [
+//    { name: 'NOREAL6MONTH', decimals: 4 },
+//    { name: 'REAL6MONTH', decimals: 4 },
+//    { name: 'MEMBERS', decimals: 0 }
+//];
+var gParamsExtended = {
+    BUS_MOD: {
+        id: 'BUS_MOD_ID',
+        name: 'BUS_MOD_NAME'
+    },
+    IFRS: {
+        id: 'IFRS_ID',
+        name: 'IFRS_NAME'
+    },
+    SPPI: {
+        id: 'SPPI_ID',
+        name: 'SPPI_NAME'
+    },
+    EDUCATION: {
+        id: 'KOD',
+        name: 'TXT',
+        handBookName: 'CIG_D07'
+    }
+};
 var g_addParams = {};
 var g_addParamsNew = {};
 
@@ -27,16 +54,36 @@ function check() {
     }
 }
 
+function inputChange(that, regExp) {
+    var val = that.value;
+    if (regExp) {
+        val = val.replace(regExp, '');
+        that.value = val;
+    }
+    if (val == undefined || val == '')
+        delete g_addParamsNew[that.id];
+    else
+        g_addParamsNew[that.id] = val;
+    $("#" + that.id + "_Tag").text(val);
+
+    check();
+};
+
 function showReferAddParams(id, clause) {
-    bars.ui.handBook(id, function (data) {
-        g_addParamsNew[id] = data[0][id + "_ID"];
-        $("#" + id + "_Tag").text(data[0][id + "_ID"]);
-        $("#" + id + "_Value").text(data[0][id + "_NAME"]);
+    var a = gParamsExtended[id], hbName = id;
+    if (a.handBookName) {
+        hbName = a.handBookName;
+    }
+
+    bars.ui.handBook(hbName, function (data) {
+        g_addParamsNew[id] = data[0][a.name];
+        $("#" + id + "_Tag").text(data[0][a.id]);
+        $("#" + id + "_Value").text(data[0][a.name]);
         check();
     },
         {
             multiSelect: false,
-            columns: id + "_ID," + id + "_NAME",
+            columns: a.id + ',' + a.name,
             clause: clause || ''
         });
 }
@@ -102,24 +149,16 @@ function openDialogAddParams() {
                     return;
                 }
 
-                WaitingForID(true, ".search-AddParams");
-                AJAX({
-                    srcSettings: {
-                        url: bars.config.urlContent("/api/Way4Bpk/Way4Bpk/GetAddParamValue"),
-                        success: function (req) {
-                            for (var i = 0; i < req.length; i++) {
-                                g_addParams[req[i].Tag] = req[i].ID;
-                                g_addParamsNew[req[i].Tag] = req[i].ID;
-                                $("#" + req[i].Tag + "_Tag").text(req[i].ID);
-                                $("#" + req[i].Tag + "_Value").text(req[i].NAME);
-                            }
-                            check();
-                        },
-                        complete: function (jqXHR, textStatus) { WaitingForID(false, ".search-AddParams"); }
-                        , data: JSON.stringify(data)
-                    }
-                });
+                for (var i = 0; i < data.length; i++) {
+                    var cur = data[i];
+                    var comm = cur.Comm || '';
 
+                    g_addParams[cur.Tag] = cur.Value;
+                    g_addParamsNew[cur.Tag] = cur.Value;
+
+                    $("#" + cur.Tag + "_Tag").text(cur.Value + ' ' + comm);
+                }
+                check();
             },
             complete: function (jqXHR, textStatus) { WaitingForID(false, ".search-AddParams"); }
             , data: JSON.stringify({ ND: row.ND })

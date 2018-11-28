@@ -1,4 +1,10 @@
-CREATE OR REPLACE PROCEDURE p_add_zal
+
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_add_zal.sql =========*** Run ***
+ PROMPT ===================================================================================== 
+ 
+  CREATE OR REPLACE PROCEDURE BARS.P_ADD_ZAL 
 (
   p_nd   NUMBER
  , --дог.займа займа
@@ -41,28 +47,42 @@ CREATE OR REPLACE PROCEDURE p_add_zal
   p4_    NUMBER;
   acc8_  NUMBER;
   l_pawn NUMBER;
+  v_flag integer := 0;
+  v_err  varchar2(4000);
 BEGIN
   /*raise_application_error(g_errn
                                ,g_errs || p_pawn);*/
-if p_rnk is not null and p_acc is not null then
-  if p_sv is null  and p_del is null then
-     raise_application_error(g_errn
-                               ,' Перевірте коректність заповнення полів ''Справ.варт.забезп'' та ''+Доб-Зменш''!!');
+  if p_rnk is not null and p_acc is not null then
+    if p_sv is null  and p_del is null then
+       v_err := ' Перевірте коректність заповнення полів [Справ.варт.забезп] та [+Доб-Зменш]!!<br/>';
+    end if;
+  elsif  p_acc is  null then
+      if    p_sv is not null  then
+       v_err := 'При додаванні нового забезпечення поле [Справ.варт.забезп] повинне буде пусте!<br/>';
+    end if;
   end if;
-elsif  p_acc is  null then
-    if    p_sv is not null  then
-     raise_application_error(g_errn
-                               ,'При додаванні нового забезпечення поле ''Справ.варт.забезп'' повинне буде пусте!');
+
+  -- ob22 должен быть заполнен обязательно!
+  if p_ob22 is not null then
+    az.ob22 := p_ob22;
   end if;
-end if;
- /* bars.bars_audit.info('P_ADD_ZAl params.p_nd=' || p_nd || ' ,p_ACCS' ||
+
+  if (p_strahz  is null or  p_cc_idz is null or  p_sdatz is null) then
+    v_err := v_err||'Всі три поля ("№ дог.заб","Дата дог. забез","Страхування застави") мають бути заповнені!<br/>';
+  end if;
+
+  if v_err is not null then
+    raise_application_error(g_errn,'<br/><b>'||v_err||'</b><br/>');
+  end if;
+
+  bars.bars_audit.info('P_ADD_ZAl params.p_nd=' || p_nd || ' ,p_ACCS' ||
                        p_accs || ' ,p_RNK=' || p_rnk || ' ,p_pawn=' ||
                        p_pawn || ' ,p_ACC=' || p_acc || ' ,p_kv' || p_kv ||
                        ' ,p_sv=' || p_sv || ' ,p_del=' || p_del || ' ,p_cc_idz=' || p_cc_idz || ' ,p_sdatz=' ||
                        p_sdatz || ' ,p_mdate=' || p_mdate || ' ,p_nree=' ||
                        p_nree || ' ,p_Depid=' || p_depid || ' ,p_mpawn=' ||
                        p_mpawn || ' ,p_PR_12=' || p_pr_12 || ' ,p_nazn=' ||
-                       p_nazn);*/
+                       p_nazn||', p_ob22 = '||p_ob22);
 
   IF pul.get_mas_ini_val('PAP') = 2 THEN
     l_pawn := 999999;
@@ -90,7 +110,7 @@ end if;
     BEGIN
       SELECT * INTO dd FROM cc_deal WHERE nd = l_nd;
       IF acc8_ IS NULL
-         AND dd.vidd IN (1, 2, 3, 11, 12, 13) THEN
+         AND dd.vidd IN (1, 2, 3, 5, 11, 12, 13, 10) THEN
         SELECT a.acc
           INTO acc8_
           FROM accounts a, nd_acc n
@@ -187,11 +207,15 @@ end if;
     UPDATE accounts
        SET mdate = p_mdate, tobo = az.branch
      WHERE acc = az.acc;
-    SELECT MIN(ob22)
-      INTO az.ob22
-      FROM sb_ob22
-     WHERE d_close IS NULL
-       AND r020 = substr(az.nls, 1, 4);
+    if p_ob22 is not null then
+      az.ob22 := p_ob22;
+    else
+      SELECT MIN(ob22)
+        INTO az.ob22
+        FROM sb_ob22
+       WHERE d_close IS NULL
+         AND r020 = substr(az.nls, 1, 4);
+    end if;
     accreg.setaccountsparam(az.acc, 'OB22', az.ob22);
     IF l_nd > 0 THEN
       INSERT INTO nd_acc (nd, acc) VALUES (l_nd, az.acc);
@@ -212,10 +236,6 @@ end if;
       accreg.setAccountSParam(az.acc, 'OB22', p_ob22);
 end if;
 
-/*if (p_strahz  is null or  p_cc_idz is null or  p_sdatz is null) then
-      raise_application_error(g_errn
-                             ,g_errs || 'Всі три поля ("№ дог.заб","Дата дог. забез","Страхування застави") мають бути заповнені!');
-end if; */   
 if p_strahz is not null then
   accreg.setAccountwParam(az.acc, 'Z_POLIS', p_strahz);
 end if;
@@ -233,7 +253,9 @@ end if;
   FOR k IN (SELECT *
               FROM accounts
              WHERE accc = acc8_
-                OR acc = l_accs)
+                OR acc = l_accs
+                or (tip = 'CR9' and acc in (select acc from nd_acc where nd = p_nd))
+           )
   LOOP
     p_pawn_nd(l_nd
              ,az.acc
@@ -249,6 +271,7 @@ end if;
              ,p_depid
              ,p_pr_12
              ,p_pawn);
+    v_flag := 1;
   END LOOP;
   -----------------------------
   IF nvl(p_del, 0) = 0 THEN
@@ -368,3 +391,15 @@ SELECT t.nls,substr(t.nms ,1,38) INTO oo.nlsb, oo.nam_b
 
 END p_add_zal;
 /
+ show err;
+ 
+PROMPT *** Create  grants  P_ADD_ZAL ***
+grant EXECUTE                                                                on P_ADD_ZAL       to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on P_ADD_ZAL       to START1;
+
+ 
+ 
+ PROMPT ===================================================================================== 
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_add_zal.sql =========*** End ***
+ PROMPT ===================================================================================== 
+ 

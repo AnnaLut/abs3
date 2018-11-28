@@ -14,6 +14,7 @@ PROMPT *** Create  procedure CCK_OSBB ***
 -- p_mode = 2 Фініш       первинного КД ОСББ + Авто-Старт вторинного КД ОСББ
 -- p_mode = 3 Авторизація вторинного КД ОСББ - як самостійного КД
 /*
+24/06/2018 LitvinSO COBUMMFO-8388  параметр «Страхування кредиту» повинен унаслідуватись з договору кредитної лінії
 08/02/2018 LitvinSO COBUSUPABS-7041 При створенні нового договору необхідно автоматично згенерувати параметр CIG_D13 зі значенням 1
 10/11/2017 LitvinSO Для p_mode = 2 с учетом на переход новый план счетов так как мы не меняем cc_deal.PROD анализируем продукт
 26/05/2017 Pivanova додано заміну коми на крапку при вичитуванні тагу S_SDI
@@ -63,8 +64,17 @@ PROMPT *** Create  procedure CCK_OSBB ***
   dd1 cc_deal%rowtype  ; aa1 accounts%rowtype ; ad1 cc_add%rowtype   ;  sd1 accounts%rowtype ; ii1 int_accn%rowtype;
   dd2 cc_deal%rowtype  ; aa2 accounts%rowtype ; oo1 oper%rowtype     ;  l_pl1  number        ; SumR_ number        ; SumP_ number ;
   l_datnp date         ; l_ir number          ; s_Txt1 varchar2(250) ;  s_Txt2 varchar2(250) ; nTmp_ number        ; sTmp_ varchar2(100);
-  sErr varchar2(2000)  ; nlchr char(2)        := chr(13)||chr(10)    ;  s_GRAC1 varchar2(10) ; d_GRAC1 date        ;
+  sErr varchar2(2000)  ; nlchr char(2)        := chr(13)||chr(10)    ;  s_GRAC1 varchar2(10) ; d_GRAC1 date        ; l_ndg number ;
 begin
+	begin -- Проверка на суб.
+	 select ndg into l_ndg from bars.cc_deal where nd = p_nd1;
+	EXCEPTION WHEN NO_DATA_FOUND THEN
+	  return;
+	end;
+
+	  if l_ndg <> p_nd1 then
+	   return;
+	  end if;
 
 If p_mode in (0,1,2) then
 
@@ -311,6 +321,8 @@ If p_mode = 2 then
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBSF',CCK_APP.Get_ND_TXT (dd1.ND,'EIBSF') );
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBPF',CCK_APP.Get_ND_TXT (dd1.ND,'EIBPF') );
    CCK_APP.SET_ND_TXT(dd2.nd,'EIBCB',CCK_APP.Get_ND_TXT (dd1.ND,'EIBCB') );
+   --COBUMMFO-8388  параметр «Страхування кредиту» повинен унаслідуватись з договору кредитної лінії
+   CCK_APP.SET_ND_TXT(dd2.nd,'INSCC',CCK_APP.Get_ND_TXT (dd1.ND,'INSCC') );
    ------ автозовать с полным фаршем.
    oo1.nazn := Substr( s_Txt1||dd2.nd||s_Txt2,1, 160) ;
 

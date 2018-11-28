@@ -1,0 +1,88 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    @* View для получения векселей с ЦА! *@
+
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<style>
+    #count, #summ {
+        display: block;
+        padding: 3px;
+        padding-left: 6px;
+        width: 75px;
+        margin: 5px 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        color: #333;
+        word-break: break-all;
+        word-wrap: break-word;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+<script src="~/Areas/Bills/Scripts/getbills.js"></script>
+
+
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Отримання векселів від ЦА</h2>
+</div>
+
+@(Html.Kendo().Grid<BillsModel>()
+            .Name("confirmbills")
+            .Selectable()
+            .Columns(col =>
+            {
+                col.Bound(x => x.STATUS).Hidden(true);
+                col.Bound(x => x.EXP_ID).Hidden(true);
+                col.Bound(x => x.REQ_ID).Hidden(true);
+                col.Bound(x => x.RNK).Hidden(true);
+                col.Bound(x => x).ClientTemplate("<input type='checkbox' #=onRefresh(data.EXP_ID, data.BILL_NO)#  class='chk-bills'/>").Width(60);
+                col.Bound(x => x.BILL_NO).Title("Серія та номер векселя").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                col.Bound(x => x.NAME).Title("ПІБ/Найменування отримувача").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                col.Bound(x => x.INN).Title("ІПН/ЄДРПО отримувача").HeaderHtmlAttributes(new { style = "white-space: normal" });
+                col.Bound(x => x.DT_ISSUE).Format("{0:dd.MM.yyyy}").Title("Дата випуску векселя").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+                col.Bound(x => x.AMOUNT).Format("{0:n2}").Title("Сума векселя").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" });
+                //col.Bound(x => x.EXTRACT_NUMBER_ID).Title("Номер витягу").HeaderHtmlAttributes(new { style = "white-space: normal" });
+            })
+            .ToolBar(toolbar =>
+            {
+                toolbar.Template(@<text>
+                    <div class="col-xs-11 text-left">
+                        <h4 style="width: 75px; float: left;"><strong>Вибрано:</strong></h4>
+                        <pre id="count" style="float: left;">0</pre>
+                        <h4 style="width: 75px; float: left; margin-left: 20px;"><strong>На суму:</strong></h4>
+                        <pre id="summ" style="text-align: right; width: 120px;">0.00</pre>
+                        <button class="k-button" id="getbills" title="Підтвердити векселі" style="float: left;" onclick="confirmBills(); return false;">
+                            <span style="color: green" class="glyphicon glyphicon-export"></span>
+                        </button>
+                        <button class="k-button" id="refresh" title="Отримати оновлений список з ЦА" onclick="refresh(); return false;">
+                            <span style="color: blue" class="glyphicon glyphicon-refresh"></span>
+                        </button>
+                        <button class="k-button" id="getactca" title="Акт приймання-передачі від ЦА" onclick="getact('actexchveks_161'); return false;">
+                            <span style="color:coral" class="glyphicon glyphicon-import"></span>
+                        </button>
+                        <button class="k-button" id="getbagca" title="Акт приймання-здавання опломбованих інкасаторських сумок від ЦА" onclick="getact('veks_collktr_bag_162'); return false;">
+                            <span style="color: #c45757" class="glyphicon glyphicon-import"></span>
+                        </button>
+                    </div>
+                </text>);
+            })
+            .Sortable()
+            .Scrollable()
+            .Filterable()
+            .Events(x => x.DataBound("dataBound"))
+            .HtmlAttributes(new { style = "width: 100%;" })
+            .Pageable(x => x
+                .Refresh(true)
+                .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                .ButtonCount(10))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+
+                .Read(read => read.Action("AllFromCABills_Read", "Bills"))
+                .PageSize(10)
+            )
+)

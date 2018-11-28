@@ -1,13 +1,12 @@
-
  PROMPT ===================================================================================== 
  PROMPT *** Run *** ========== Scripts /Sql/BARS/package/xoz.sql =========*** Run *** =======
  PROMPT ===================================================================================== 
  
   CREATE OR REPLACE PACKAGE BARS.XOZ IS
-  g_header_version   CONSTANT VARCHAR2 (64) := 'version 4.1  17.10.2017';
+  g_header_version   CONSTANT VARCHAR2 (64) := 'version 4.2  24.09.2018';
 --============ контроль деб.зажолженности по хоз.деятельности банка  ===============----------------
 /*
-17.10.2017 Sta ОДНА сума закриття призначена для закриття 2-х і більше виникнень,і тому вона більша кожної з них, перевірку на суму взагалі відмінити 
+17.10.2017 Sta ОДНА сума закриття призначена для закриття 2-х і більше виникнень,і тому вона більша кожної з них, перевірку на суму взагалі відмінити
 29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
 14.08.2017 СУХОВА. Добавлен протокол квитовки. Удаление установленной связи
 27.07.2017 Sta Процедура довески "гири" при отрицательной разбалансировке procedure Balancing
@@ -50,8 +49,6 @@ procedure BEK_441( p_ref2 number);
 procedure PULX( p_ref1 number,  p_stmt1 number);                             -- Разметка таблицы для ввода частных сумм по Бранч-3
 procedure xozU ( p_mode int, p_rec number  ,  p_nls varchar2,    p_s   number , p_RI varchar2 ) ;
 FUNCTION  MDATE(p_acc  opldok.acc%type,  p_fdat opldok.fdat%type  ) return xoz_ref.mdate%type;
-FUNCTION  DREC (p_drec varchar2, p_tag  varchar2 ) return varchar2 ;         --Вычлегнение доп.рекв из DREC
-
 procedure INS_REF1( p_ref1  XOZ_ref.ref1%type,  p_stmt1 XOZ_ref.stmt1%type ); --Вставка в картотеку дебиторов
 
  --Корр в картотеке дебиторов
@@ -104,28 +101,7 @@ procedure OPL_REFD( p_acc   XOZ_ref.acc%type   ,
                     p_OB40  varchar2           ,
                     p_nlsa  oper.nlsa%type     ) ;
 
-
--- Перерахування на Відшкодування коштів по ДЗ в РУ з транзитного  рахунку  по ВПС
-procedure OPL_REFK
-( p_rec  IN  number  ,
-  p_txt  IN  varchar2,
-  oo     OUT oper%rowtype
- ) ;
-
--- Закриття транзмтного рахунку на витрати
-procedure OPL_REFK1
-( p_rec   number            ,
-  p_s     number            ,
-  p_nlsa  oper.nlsa%type    ,   -- :A(SEM=Рах Деб,REF=V_XOZOB22_NLS),
-  p_ZO    int               ,   -- :Z(SEM=Корр=1,TYPE=N),
-  p_nazn  oper.nazn%type    ,   -- :T(SEM=Підстава),
-  p_KDZ1  varchar2          ,   -- :X(SEM=Код ДЗ,REF=KOD_DZ),
-  p_OB40  varchar2              -- :O(SEM=OB40 для ф40,REF=KF_OB40)
-) ;
 ----------------------------------------------------
-procedure OPL_CA (p_mode int  )  ;  -- на старте-финише -- Закрити заборгованість коштами ЦА, що надійшли
-----------------------------------------------------
-
 --Стартовое формирование картотеки
 procedure INS0 ( p_acc XOZ_ref.acc%type);
 
@@ -138,12 +114,17 @@ procedure REZ ( S_DAT01 IN  VARCHAR2, --:s(SEM=Зв_дата_01,TYPE=s),
    FUNCTION body_version     RETURN VARCHAR2;
 -------------------
 END XOZ;
+
 /
+ 
 CREATE OR REPLACE PACKAGE BODY BARS.XOZ IS
-   g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  29.09.2017-1';
+   g_body_version   CONSTANT VARCHAR2 (64) := 'version 4  24.09.2018-1';
 --------------------------------------------
 
 /*
+  21.09.2018 Sta Контроль логики функции и уровня пользователя
+
+  19.09.2018 Sta Отказываемся от деб.запрсов через ВПС
   20.04.2018 Sta Протоколирование закрытия хоз.деб вs sec_AUDIT c принзаком XOZ_AUDIT
   29.09.2017 Авто-Закриття по закритим рахункам XOZ.CLS (0)
   29.08.2017 Сухова  --простановка отметки о закрытии этим реф2 = oo.ref (от авто-квитовки отказались)
@@ -226,10 +207,10 @@ XOZ_AUDIT varchar2(15) :='XOZ_AUDIT:';
 --------------------------------------------------------------------
 procedure CLS  (p_acc number ) is --- Авто-Закриття по закритим рахункам
 begin
-  update xoz_ref x 
+  update xoz_ref x
      set x.ref2  = 0,
          x.datz  = (select dazs from accounts where acc = x.acc )
-  where p_acc in ( 0, x.acc) 
+  where p_acc in ( 0, x.acc)
     and ref2  is   null
     and exists   ( select 1 from accounts where acc = x.acc and dazs is not null) ;
 end  CLS;
@@ -314,66 +295,74 @@ procedure XOZ7   ( p_mode int,  -- 2 - разметка для проводок. 77 - проверка бала
                    p_kodz varchar2,
                    p_ob40 varchar2 ) is
 
-   aa arc_rrP%rowtype;
+   aa accounts%rowtype;
+   o1 oper%rowtype;
    oo oper%rowtype;
-
+   xx xoz_ref%rowtype;
 begin
+   bc.go('/');
 
-   aa.rec := to_number (pul.get('RECD_CA')  ) ;
-   If aa.rec is null  then  RETURN ;  end if  ;
+   If p_mode = 99 then   update XOZ_DEB_ZAP set sos = -2, txt = p_NAZN  WHERE REFD = p_RI and sos = 1 ; end if ;  -- відмовити
+
+   XX.REFD := to_number (pul.get('REFD')  ) ;
+   If XX.REFD is null  then  RETURN ;  end if  ;
 
 ---------------------------------------
 
-If p_mode = 2 then
-   If p_ri is null then
-      insert into bars.XOZ7_ca ( REC, ACC7,   S7    ,   KODZ,   OB40,   nazn  )
-                       select aa.rec, acc , p_s7*100, p_kodz, p_ob40, p_nazn
-                       from accounts where kv = gl.baseval and nls =p_nls7 ;
-   else
-      update bars.XOZ7_ca set
-        ACC7 = (select acc from accounts where kv=gl.baseval and nls =p_nls7 ),
-          S7 = p_s7*100,   KODZ = p_kodz,   OB40 = p_ob40,     nazn = p_nazn
-       where rowid = p_ri;
+   If p_mode = 2 then -- разбить на частные суммы  
+
+      If p_ri is null then  insert into XOZ7_ca (REC,ACC7,S7,KODZ,OB40,nazn) select XX.REFD, acc , p_s7*100, p_kodz, p_ob40, p_nazn  from accounts where kv = gl.baseval and nls =p_nls7 and kf ='300465' ;
+      else update bars.XOZ7_ca set  ACC7 = (select acc from accounts where kv=gl.baseval and nls =p_nls7 ), S7 = p_s7*100,  KODZ =p_kodz, OB40 = p_ob40, nazn = p_nazn where rowid = p_ri;
+      end if;
+      RETURN;
    end if;
 
-elsIf p_mode = 77 then
 
-   select NVL( sum(s7), 0)  into oo.S from XOZ7_ca x where rec = aa.rec and exists (select 1 from accounts where acc = x.acc7)  ;
+If p_mode = 77 then  -- оплатить 
+
+   -- проверка суммы
+   select NVL( sum(s7), 0)  into oo.S from XOZ7_ca x where rec = XX.REFD and exists (select 1 from accounts where acc = x.acc7 and kf ='300465')  ;
    If oo.S <= 0 then raise_application_error(-20000, 'XOZ7: сума <= 0. Оплата НЕМОЖЛИВА !' );  end if;
 
-   begin select * into aa from arc_rrP  WHERE rec = aa.rec and  dk = 2 ;
-   EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000, 'XOZ7 НЕ знайдено деб.запит '|| aa.rec|| ' від РУ ! ' );
+   begin select x1.* into xx from xoz_ref x1, XOZ_DEB_ZAP z1 WHERE z1.REFD = XX.REFD and z1.sos = 1 and x1.ref1 = z1.ref1 and x1.stmt1 = z1.stmt1 and x1.kf = z1.kf ;
+   EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000, 'XOZ7 НЕ знайдено деб.запит '|| XX.REFD|| ' від РУ ! ' );
    end;
 
-   If oo.S <> aa.s then
-      raise_application_error(-20000, 'XOZ7:ЗАГАЛЬНА СУМА '|| TO_CHAR (aa.s/100,'FM999,999,999,999,999,990.00','NLS_NUMERIC_CHARACTERS=''. ''') ||
+   begin select * into o1 from oper where ref = xx.ref1 and kf = xx.kf ;
+         ------oo.nam_b := o1.nam_a; oo.nlsb := o1.nlsa; oo.id_b := o1.id_a  ;
+         select substr(a.nms,1,38), a.nls, c.okpo into oo.nam_B, oo.nlsB, oo.id_B from accounts a, customer c where a.acc= xx.acc and a.rnk = c.RNK  and a.kf = xx.KF  ;
+   EXCEPTION WHEN NO_DATA_FOUND THEN    raise_application_error(-20000, 'XOZ7 НЕ знайдено перв.док(або рахунок) '|| XX.kf|| '/'|| xx.ref1  );
+   end;
+
+   If oo.S <> xx.s then
+      raise_application_error(-20000, 'XOZ7:ЗАГАЛЬНА СУМА '|| TO_CHAR (xx.s/100,'FM999,999,999,999,999,990.00','NLS_NUMERIC_CHARACTERS=''. ''') ||
                                       ' НЕ дорівнює СУМІ ЧАСТОК '|| TO_CHAR (oo.S/100,'FM999,999,999,999,999,990.00','NLS_NUMERIC_CHARACTERS=''. ''') ||
-                                      '=РІЗНИЦЯ='|| TO_CHAR (aa.s/100 - oo.s/100,'FM999,999,999,999,999,990.00','NLS_NUMERIC_CHARACTERS=''. ''') ) ;
+                                      '=РІЗНИЦЯ='|| TO_CHAR (xx.s/100 - oo.s/100,'FM999,999,999,999,999,990.00','NLS_NUMERIC_CHARACTERS=''. ''') ) ;
    end if;
 -------------------------------------------------------
-   oo.kv    := gl.baseval ;
-   oo.kv2   := gl.baseval ;
+   oo.kv  := gl.baseval ;
+   oo.kv2 := gl.baseval ;
+   aa.nls := '3739200703017' ; --pul.get ('TRZ_XOZ') ;
 
-   oo.nam_a := aa.nam_b ;  --\  транзитник
-   oo.nlsa  := aa.nlsb  ;  -- \
-   oo.mfoa  := aa.Mfob  ;  -- /
-   oo.id_a  := aa.id_b  ;  --/
-   oo.nd    := aa.nd    ;
+   bc.go('300465');
+   begin select * into aa from accounts where kf ='300465' and kv = 980 and dazs is null and nls = aa.nls ;
+   EXCEPTION WHEN NO_DATA_FOUND THEN     bc.go('/');  raise_application_error(-20000, 'XOZ7 НЕ знайдено транз.рах.300465/'|| aa.nls );
+   end;
 
-   oo.nam_b := aa.nam_a ;
-   oo.nlsb  := aa.nlsa  ;
-   oo.mfob  := aa.Mfoa  ;
-   oo.id_b  := aa.id_a  ;
-   oo.nazn  := aa.nazn  ;
-   oo.d_rec := aa.d_rec ;
-
+   oo.nam_a := Substr(aa.nms,1,38) ;  --\  транзитник
+   oo.nlsa  := aa.nls   ;  -- \
+   oo.mfoa  := aa.KF    ;  -- /
+   oo.id_a  := gl.aOkpo ;  --/
+   oo.nd    := Substr(xx.REFD,1,10) ;
+   oo.mfob  := o1.Mfoa  ;
+   oo.nazn  := p_NAZN   ;
    oo.vob   := 6 ;
-   oo.vdat  := gl.bdate ;
+   oo.vdat  := gl.bdate ; 
    ----------------
    oo.dk    := 1  ;
    oo.tt := 'MNK' ;
-   oo.s     := aa.s ;
-   oo.s2    := aa.s ;
+   oo.s     := xx.s ;
+   oo.s2    := xx.s ;
 
    gl.ref(oo.REF) ;
    gl.in_doc3 (ref_  => oo.Ref  , tt_  => oo.tt  , vob_ => oo.vob , nd_  => oo.nd,  pdat_  => SYSDATE,  vdat_ => gl.BDATE,  dk_ => oo.dk ,
@@ -383,6 +372,8 @@ elsIf p_mode = 77 then
               nazn_  => oo.nazn, d_rec_=> oo.d_rec,
               id_a_  => oo.id_a , id_b_=> oo.id_b, id_o_=> null, sign_=> null ,  sos_  => 1,   prty_ => null,  uid_ => null );
    paytt( 0, oo.REF, gl.bDATE, oo.TT, oo.dk, oo.kv, oo.nlsa, oo.s, oo.kv2, oo.nlsb, oo.S2);
+
+   update XOZ_DEB_ZAP set sos = 2 , ref2_CA = oo.REF WHERE REFD = XX.REFD and kf = xx.kf ;
 
 -------------------------------------------------------
    oo.dk    := 0 ;
@@ -395,16 +386,13 @@ elsIf p_mode = 77 then
       oo.vdat := dat_next_u( trunc(gl.BDATE,'MM'), -1 );
    end if;
 
-   for k in (select x.rowid RI, a.nms, a.nls,  x.S7, x.KODZ, x.OB40, x.NAZN
-             from XOZ7_ca x , accounts a
-             where x.rec = aa.rec and x.s7 > 0 and x.acc7 = a.acc
-            )
+   for k in (select x.rowid RI, a.nms, a.nls,  x.S7, x.KODZ, x.OB40, x.NAZN from XOZ7_ca x , accounts a   where x.rec = xx.REFD and x.s7 > 0 and x.acc7 = a.acc  )
    loop  gl.ref(oo.REF);
          oo.s     := k.s7  ;
          oo.s2    := k.s7  ;
          oo.nam_b := substr(k.nms,1,38) ;
          oo.nlsb  := k.nls ;
-         oo.nazn  := NVL( k.nazn, aa.nazn);
+         oo.nazn  := NVL( k.nazn, p_nazn);
 
          gl.in_doc3 (ref_ => oo.REF  , tt_   => oo.tt   ,  vob_ => oo.vob ,  nd_ => oo.nd, pdat_ =>SYSDATE, vdat_=>oo.vdat ,  dk_ =>oo.dk,
                       kv_ => oo.kv   , s_    => oo.S    ,  kv2_ => oo.kv2 ,  s2_ => oo.S2, sk_   => null  , data_=>gl.BDATE, datp_=>gl.bdate,
@@ -417,11 +405,12 @@ elsIf p_mode = 77 then
          If k.OB40 is not null then  BARS.set_operw ( p_ref => oo.ref, p_tag => 'OB40' ,   p_value => k.ob40 ) ; end if ;
          delete from XOZ7_ca  where rowid = k.RI ;
    end loop ; -- k
-   delete from tzaproS where rec = aa.rec ;
-   pul.put('RECD_CA', null ) ;
+
+   bc.go('/');
+
+   pul.put('REFD', null ) ;
 
 end if ;
-
 
 end XOZ7;
 -------------
@@ -438,12 +427,7 @@ BEGIN -- выбрать все нужные ссудные счета
        UPDATE  ACCOUNTS SET TIP = K2.TIP  WHERE ACC = K2.ACC ;
   end loop; -- K2
   ----------------
-
-
-  for a35 in (select * from accounts where dazs is null and pap = 1
---and kv = 980
-                and tip IN ('XOZ','W4X') and p_acc in (0,acc) and dazs is null
-              )
+  for a35 in (select * from accounts where dazs is null and pap = 1   and tip IN ('XOZ','W4X') and p_acc in (0,acc) and dazs is null ) --and kv = 980
   loop
      delete  from xoz_ref where acc = a35.acc ;
      If a35.ostc < 0 then
@@ -542,8 +526,6 @@ begin
              delete from tmp_OPER where rowid = k.RI ;
        end loop;
 
-
-
  else  -- вCтравка/Корр частных сумм
 
     l_ref := to_number ( pul.Get('REFX') );
@@ -564,35 +546,9 @@ FUNCTION MDATE (p_acc  opldok.acc%type,     p_fdat opldok.fdat%type ) return xoz
 begin begin select XOZ_MDATE ( acc, p_fdat, nbs, ob22, mdate)  into l_mdate  from accounts where acc = p_acc  ;
       EXCEPTION WHEN NO_DATA_FOUND THEN null  ;
       end;
-       RETURN l_mdate;
+      RETURN l_mdate;
 end MDATE;
 --------------------------------------------------------
-
---Вычлегнение доп.рекв из DREC
-FUNCTION DREC (p_drec varchar2, p_tag  varchar2 ) return varchar2 is
-  n_ int ;
-  l_ int ;
-  k_ int ;
-  l_tag varchar2 (38) ;
-  l_rec varchar2 (38) ;
-begin
-  l_tag := '#C'||p_tag||':'    ;          -- тег с обвертуами
-  l_    := length  (l_tag)     ;          -- длина тега доп.реквизита
-
-  If l_ > 3 then
-
-     n_ := instr(p_drec, l_tag, 1)  ; -- начало доп.реквизита
-     If SUBSTR(  p_drec, n_, l_ ) = l_tag then
-        n_ := n_ + l_ ;
-        k_ := instr(p_drec, '#' , n_)      ; -- конец  доп.реквизита
-        l_ := k_ - n_ ;                               -- длина знач.доп.реквизита
-        l_rec := substr ( p_drec, n_, l_) ;
-     end if;
-  end if;
-
-  RETURN l_rec;
-
-end;
 
 --Вставка в картотеку дебиторов
 procedure INS_REF1( p_ref1  XOZ_ref.ref1%type  ,
@@ -634,7 +590,7 @@ begin
  update XOZ_ref set fdat = p_fdat, mdate = p_mdate, notp = p_notp where ref1 = p_ref1 and stmt1 = p_stmt1;
 
  LOGGER.INFO( XOZ_AUDIT || 'ref1='||p_ref1||' and stmt1='||p_stmt1||
-    ' : Корекція картотеки: БУЛО fdat='||to_char(xx.fdat,'dd.mm.yyyy') || ' , mdate='||to_char(xx.mdate,'dd.mm.yyyy') || 
+    ' : Корекція картотеки: БУЛО fdat='||to_char(xx.fdat,'dd.mm.yyyy') || ' , mdate='||to_char(xx.mdate,'dd.mm.yyyy') ||
                       ' -> СТАЛО fdat='||to_char( p_fdat,'dd.mm.yyyy') || ' , mdate='||to_char( p_mdate,'dd.mm.yyyy') ) ;
 end ;
 --------------------------
@@ -658,12 +614,12 @@ begin
    x_Txt := 'ref1='||p_ref1||' and stmt1='||p_stmt1||' : ЗАКРИТТЯ картотеки';
 
    If p_REF2 > 0 then l_ref2 := P_ref2 ; -- проверить на допустимость этого реф-2 на закрытие
-      begin select o.vdat  into l_datz from oper o, opldok p where o.ref = p_ref2  and p.ref =o.ref and p.acc = p_acc and p.dk =1 and rownum=1 ;  --and p.s <= p_SP*100 
+      begin select o.vdat  into l_datz from oper o, opldok p where o.ref = p_ref2  and p.ref =o.ref and p.acc = p_acc and p.dk =1 and rownum=1 ;  --and p.s <= p_SP*100
       EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-20000, 'XOZ/Реф.2=' || p_REF2 || ' не може закривати Реф.1='|| p_ref1 );
       end ;             x_Txt  := x_Txt ||' АВТОМАТИЧНЕ ref2='||P_ref2 ;
    else l_Ref2 := 0;    x_Txt  := x_Txt ||' РУЧНЕ ref2=0';
-      If p_zo = 1 then  x_Txt  := x_Txt || ' корр.' ; 
-                        l_datz := dat_next_u(trunc(gl.BDATE, 'MM'),-1);                         
+      If p_zo = 1 then  x_Txt  := x_Txt || ' корр.' ;
+                        l_datz := dat_next_u(trunc(gl.BDATE, 'MM'),-1);
       else              l_datz := gl.BDATE;
       end if;
    end if ;
@@ -682,10 +638,10 @@ begin
 
       If l_DV2 = p_DV1 then  x_Txt := x_Txt || ' ЗБЕРЕЖЕНО =' ; select mdate into l_mdate from xoz_ref   where ref1=p_ref1 and stmt1=p_stmt1;
       else                   x_Txt := x_Txt || ' ЗМІНЕНО ='   ;                   l_mdate :=   xoz.MDATE ( p_acc,l_DV2 ) ;
-      end if; 
+      end if;
       x_Txt := x_Txt || to_char(l_DV2,'dd.mm.yyyy') || ' та ' || to_char(l_mdate,'dd.mm.yyyy' );
 
-      INSERT INTO XOZ_ref (acc, ref1,   stmt1,   s,  s0,  fdat, mdate ) values ( p_acc, p_ref1, gl_stmt, l_s, l_s, l_DV2, l_mdate ); 
+      INSERT INTO XOZ_ref (acc, ref1,   stmt1,   s,  s0,  fdat, mdate ) values ( p_acc, p_ref1, gl_stmt, l_s, l_s, l_DV2, l_mdate );
       update xoz_ref SET ref2 = nvl(p_REF2,0), datz = l_datz, s0 = p_sp*100  where ref1=p_ref1 and stmt1=p_stmt1;  -- старую запись закрыть
 
    end if;
@@ -797,6 +753,11 @@ procedure OPL_REFD( p_acc   XOZ_ref.acc%type   ,
   aa accounts%rowtype      ;
 begin
 
+  If gl.aMfo ='300465' or gl.aMfo  is null then
+     raise_application_error(-20000,'Користувач з МФО = '|| gl.aMfo ||  'Не має права на деб.запити - тілки для ВПС' );
+  end if;
+
+
   begin  select * into aa from accounts where acc = p_acc  ;
   EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20000,'Не знайдено Acc = '|| p_acc );
   end ;
@@ -808,60 +769,13 @@ begin
   begin  select *    into oo     from oper     where ref = p_ref1 ;
   EXCEPTION WHEN NO_DATA_FOUND THEN  raise_application_error(-20000,'Не знайдено Ref = '|| p_ref1 );
   end ;
-
-  oo.s :=  p_S * 100 ;
-  oo.mfob := '300465';  oo.nlsb := '35105';  oo.id_b := '00032129';  oo.nam_b := 'Відшкодування госп.деб.заборгов. РУ' ;
-  oo.dk   := 2 ;        oo.tt   := 'KLI'  ;  oo.vob  := 2 ;
-
-  oo.ref  := null ;
-  gl.ref (oo.REF);
-  oo.d_rec := '#COB:' || aa.ob22 || '#CF1:' || p_ref1 || '#CFD:' || oo.ref || '#' ;
-
-  gl.in_doc3(ref_=> oo.REF  , tt_   => oo.tt   , vob_  => oo.vob  , nd_  => oo.nd   , pdat_ => SYSDATE , vdat_ => gl.bdate, dk_ => oo.dk,
-           kv_   => oo.kv   , s_    => oo.S    , kv2_  => oo.kv   , s2_  => oo.s    , sk_   => null    , data_ => gl.bdate,
-           datp_ => gl.bdate, nam_a_=> oo.nam_a, nlsa_ => oo.nlsa , mfoa_=> oo.Mfoa , nam_b_=> oo.nam_b, nlsb_ => oo.nlsb ,
-           mfob_ => oo.Mfob , nazn_ => oo.nazn , d_rec_=> oo.d_rec, id_a_=> oo.id_a , id_b_ => oo.id_b , id_o_ => null    ,
-           sign_ => null    , sos_  => 1       , prty_ => null    , uid_ => null   );
-
---- ?? Деб.запрос - без визы
-  gl.pay(2, oo.ref, gl.bDATE);
-  SEP.in_sep(err_     => l_err, -- OUT INTEGER,-- Return code
-             rec_     => l_rec, -- OUT INTEGER, -- Record number
-             mfoa_    => gl.aMfo, -- VARCHAR2,  -- Sender's MFOs
-             nlsa_    => oo.nlsa, -- VARCHAR2,  -- Sender's account number
-             mfob_    => oo.mfob, -- VARCHAR2,  -- Destination MFO
-             nlsb_    => oo.nlsb, -- VARCHAR2,  -- Target account number
-             dk_      => oo.dk, -- SMALLINT, -- Debet/Credit code
-             s_       => oo.s, -- DECIMAL,  -- Amount
-             vob_     => oo.vob, -- SMALLINT, -- Document type
-             nd_      => oo.nd, -- VARCHAR2, -- Document number
-             kv_      => oo.kv, -- SMALLINT, -- Currency code
-             data_    => gl.bdate, -- DATE,     -- Posting date
-             datp_    => gl.bdate, -- DATE,     -- Document date
-             nam_a_   => oo.nam_a, -- VARCHAR2, -- Sender's customer name
-             nam_b_   => oo.nam_b, -- VARCHAR2, -- Target customer name
-             nazn_    => oo.nazn ,
-             naznk_   => null, -- CHAR,     -- Narrative code
-             nazns_   => null, -- CHAR,     -- Narrative contens type
-             id_a_    => oo.id_a, -- VARCHAR2, -- Sender's customer identifier
-             id_b_    => oo.id_b, -- VARCHAR2, -- Target customer identifier
-             id_o_    => oo.id_o, -- VARCHAR2, -- Teller identifier
-             ref_a_   => substr('000000000' || oo.ref, -9), --VARCHAR2,-- Sender's reference
-             bis_     => 0, --  SMALLINT,    -- BIS number
-             sign_    => null, -- VARCHAR2,    -- Signature
-             fn_a_    => null, -- CHAR,        -- Input file name
-             rec_a_   => null, --- SMALLINT,   -- Input file record number
-             dat_a_   => null, --  DATE,       -- Input file date/time
-             d_rec_   => oo.d_rec,
-             otm_i    => 0, -- SMALLINT,    -- Processing flag
-             ref_i    => oo.ref, -- INTEGER    DEFAULT NULL, -- PreAssigned Reference
-             blk_i    => null, -- SMALLINT   DEFAULT NULL, -- Blocking code
-             ref_swt_ => null  -- VARCHAR2 DEFAULT NULL  -- Source REF ($A||#rec or Swift F20)
-           );
+--19.09.2018 деб.запрос без ВПС
+  oo.ref := null ;
+  --gl.ref (oo.REF);
+  oo.ref := S_xoz.nextval ;
   update xoz_ref SET refD = oo.ref where ref1 = p_ref1 and stmt1=p_stmt1;  -- старую запись пометить
-
---1) В РУ выставить запрос = начальная вставка деб запрса в таблицу
-  Insert into XOZ_RU_CA ( REF1, REFD_RU, RECD_RU, RECD_CA, REFK_CA , REF2) values (p_ref1, oo.ref, l_rec, null, null, null ) ;
+  Insert into XOZ_DEB_ZAP ( KF, refd, REF1, STMT1, DATZ, REF2_CA, ref2_KF, sos ) values (aa.kf, oo.REF, p_ref1, p_stmt1, gl.bdate, null, null, 1 ) ;
+--------------------------------------------------------------------------------------------
 
 end OPL_REFD;
 ----------------------------------------------------
@@ -897,108 +811,10 @@ begin
            sign_ => null    , sos_  => 1       , prty_ => null    , uid_ => null   );
   paytt  (0, oo.REF, gl.bDATE, oo.TT, oo.dk , oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.S);
 
---if nvl(GetGlobalOption('PEDAL_PROFIX'),0)=1 then
-     gl.pay(2, oo.ref, gl.bDATE);
----- If oo.mfoa <> oo.mfob then
-        SEP.in_sep(err_     => l_err, -- OUT INTEGER,-- Return code
-                   rec_     => l_rec, -- OUT INTEGER, -- Record number
-                   mfoa_    => oo.Mfoa, -- VARCHAR2,  -- Sender's MFOs
-                   nlsa_    => oo.nlsa, -- VARCHAR2,  -- Sender's account number
-                   mfob_    => oo.mfob, -- VARCHAR2,  -- Destination MFO
-                   nlsb_    => oo.nlsb, -- VARCHAR2,  -- Target account number
-                   dk_      => oo.dk, -- SMALLINT, -- Debet/Credit code
-                   s_       => oo.s, -- DECIMAL,  -- Amount
-                   vob_     => oo.vob, -- SMALLINT, -- Document type
-                   nd_      => oo.nd, -- VARCHAR2, -- Document number
-                   kv_      => oo.kv, -- SMALLINT, -- Currency code
-                   data_    => gl.bdate, -- DATE,     -- Posting date
-                   datp_    => gl.bdate, -- DATE,     -- Document date
-                   nam_a_   => oo.nam_a, -- VARCHAR2, -- Sender's customer name
-                   nam_b_   => oo.nam_b, -- VARCHAR2, -- Target customer name
-                   nazn_    => oo.nazn ,
-                   naznk_   => null, -- CHAR,     -- Narrative code
-                   nazns_   => null, -- CHAR,     -- Narrative contens type
-                   id_a_    => oo.id_a, -- VARCHAR2, -- Sender's customer identifier
-                   id_b_    => oo.id_b, -- VARCHAR2, -- Target customer identifier
-                   id_o_    => oo.id_o, -- VARCHAR2, -- Teller identifier
-                   ref_a_   => substr('000000000' || oo.ref, -9), --VARCHAR2,-- Sender's reference
-                   bis_     => 0, --  SMALLINT,    -- BIS number
-                   sign_    => null, -- VARCHAR2,    -- Signature
-                   fn_a_    => null, -- CHAR,        -- Input file name
-                   rec_a_   => null, --- SMALLINT,   -- Input file record number
-                   dat_a_   => null, --  DATE,       -- Input file date/time
-                   d_rec_   => oo.d_rec ,
-                   otm_i    => 0, -- SMALLINT,    -- Processing flag
-                   ref_i    => oo.ref, -- INTEGER    DEFAULT NULL, -- PreAssigned Reference
-                   blk_i    => null, -- SMALLINT   DEFAULT NULL, -- Blocking code
-                   ref_swt_ => null  -- VARCHAR2 DEFAULT NULL  -- Source REF ($A||#rec or Swift F20)
-                 );
-
-                 l_ref1    := substr(xoz.DREC (oo.D_REC, 'F1'),1, 38) ;
-                 l_refd_ru := substr(xoz.DREC (oo.D_REC, 'FD'),1, 38) ;
-                 -- 2) В ЦА  удовлетворить запрос
-                 update XOZ_RU_CA set RECD_CA = p_rec, REFK_CA = oo.ref where  REF1 = l_ref1 and REFD_RU = l_refd_ru ;
-                 IF SQL%ROWCOUNT = 0 THEN
-                    Insert into  XOZ_RU_CA ( REF1, REFD_RU, RECD_RU, RECD_CA, REFK_CA , REF2) values (l_ref1, l_refd_ru, null, p_rec, oo.ref, null ) ;
-                 end if;
-                 delete from  tzapros where rec = p_rec;
------end if;   --- mfoa<> mfob
---end if ; авто-виза
 end;
 
--- Закриття транзмтного рахунку на витрати
-procedure OPL_REFK1
-( p_rec   number            ,
-  p_s     number            ,
-  p_nlsa  oper.nlsa%type    ,   -- :A(SEM=Рах Деб,REF=V_XOZOB22_NLS),
-  p_ZO    int               ,   -- :Z(SEM=Корр=1,TYPE=N),
-  p_nazn  oper.nazn%type    ,   -- :T(SEM=Підстава),
-  p_KDZ1  varchar2          ,   -- :X(SEM=Код ДЗ,REF=KOD_DZ),
-  p_OB40  varchar2              -- :O(SEM=OB40 для ф40,REF=KF_OB40)
-) IS
-  z_rec number   ;
-  oo oper%rowtype;
-begin
---- XOZ.OPL_REFK1(:REC, :S, :A,:Z, :T, :X, :O )
-  --:A(SEM=Рах Деб,REF=V_XOZOB22_NLS),
-  --:Z(SEM=Корр=1,TYPE=N),
-  --:T(SEM=Підстава),
-  --:X(SEM=Код ДЗ,REF=KOD_DZ),
-  --:O(SEM=OB40 для ф40,REF=KF_OB40)
-
-  begin select rec into z_rec from  tzapros where rec = p_rec;        XOZ.OPL_REFK ( p_rec, p_nazn, oo);
-  EXCEPTION WHEN NO_DATA_FOUND THEN null ;
-  end;
-
-  begin  select o.* into oo from oper o, xoz_ru_ca x where o.ref = x.refk_ca and x.recd_ca = p_rec ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-20000, 'XOZ/Реc.=' || p_Rec || ' не знайдено док (перерахування на РУ)');
-  end;
-
-  If p_zo = 1 then oo.vob := 96; oo.vdat := dat_next_u(trunc(gl.BDATE, 'MM'),-1);
-  else             oo.vob := 06; oo.vdat :=                  gl.BDATE;
-  end if;
-  oo.kv:= gl.baseval ;
-  If p_S > 0 then   oo.s :=  p_S  * 100 ; end if ;
-
-  --- Проводка по закрытию
-  begin select substr(nms,1,38), nls into oo.nam_a, oo.nlsa from accounts where dazs is null and kv = oo.kv and nls = p_NLSA ;
-  EXCEPTION WHEN NO_DATA_FOUND THEN raise_application_error(-20000, 'XOZ/Реc.=' || p_Rec || ' не знайдено рах(витрат) для закриття '|| p_nlsa);
-  end;
-
-  gl.ref (oo.REF);  oo.nd := substr( to_char(oo.REF), 1,10 ) ;  oo.nazn := substr(p_nazn,1,160);
-  gl.in_doc3(ref_=> oo.REF  , tt_   => '441'   , vob_  => oo.vob , nd_  => oo.nd   , pdat_ => SYSDATE , vdat_ => oo.vdat , dk_ => 0,
-           kv_   => oo.kv   , s_    => oo.S    , kv2_  => oo.kv  , s2_  => oo.s    , sk_   => null    , data_ => gl.bdate,
-           datp_ => gl.bdate, nam_a_=> oo.nam_a, nlsa_ => oo.nlsa, mfoa_=> gl.aMfo , nam_b_=> oo.nam_b, nlsb_ => oo.nlsb ,
-           mfob_ => gl.aMfo , nazn_ => oo.nazn , d_rec_=> null   , id_a_=> gl.aOkpo, id_b_ => gl.aOkpo, id_o_ => null    ,
-           sign_ => null    , sos_  => 1       , prty_ => null   , uid_ => null   );
-  gl.payv (0, oo.REF, oo.Vdat, '441', 1, oo.kv, oo.nlsa, oo.s, oo.kv, oo.nlsb, oo.S);
-  gl.pay  (2, oo.ref, gl.bdate ) ;
-  insert into operw (ref,tag,value) select oo.REF, 'K_DZ1', p_KDZ1  from dual where p_KDZ1 is not null ;
-  insert into operw (ref,tag,value) select oo.REF, 'OB40' , p_OB40  from dual where p_OB40 is not null ;
-
-end OPL_REFK1;
-
 ----------------------------------------------------
+/*
 -- Закрити заборгованість коштами ЦА, що надійшли
 procedure OPL_CA (p_mode int  )  is
   -- на старте-финише
@@ -1023,6 +839,7 @@ begin
    end loop ;
 
 end OPL_CA ;
+*/
 ----------------------------------------------------
 
 --Стартовое формирование картотеки -- НЕ ИСПОЛЬЗУЕТСЯ !!!!!!!!!!!!!!
@@ -1185,15 +1002,6 @@ end REZ;
 --------------
 END XOZ;
 /
- show err;
+show err;
  
-PROMPT *** Create  grants  XOZ ***
-grant EXECUTE                                                                on XOZ             to BARS_ACCESS_DEFROLE;
-grant EXECUTE                                                                on XOZ             to START1;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/package/xoz.sql =========*** End *** =======
- PROMPT ===================================================================================== 
  

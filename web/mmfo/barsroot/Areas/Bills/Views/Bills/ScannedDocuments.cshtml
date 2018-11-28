@@ -1,0 +1,106 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model Int32
+@{
+    @* View для отображения списка отсканированных документов и работы с ними! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<style>
+    .edit-btn {
+        min-width: 40px !important;
+    }
+
+    .k-edit-cell input {
+        color: black;
+    }
+</style>
+
+<script src="~/Areas/Bills/Scripts/ScanDialog.js"></script>
+<script src="~/Areas/Bills/Scripts/ScannedDocuments.js"></script>
+<div style="margin-left: 70px; margin-right: 20px;">
+
+    <div class="page-header" style="padding-bottom: 0px; margin: 5px 0 20px;">
+        <h1 id="title">Робота з відсканованими файлами</h1>
+    </div>
+
+    <input type="hidden" value="@Model" id="Exp-ID" />
+    @Html.Hidden("STATUS", (String)ViewBag.STATUS)
+    @(Html.Kendo().Grid<V_Documents>()
+                          .Name("documents")
+                          .ToolBar(toolbar =>
+                          {
+                              toolbar.Template(@<text>
+                                <button class="k-button" id="remove" title="Видалити документ" disabled="disabled" style="background-color: lightgray;" onclick="removeDocument(); return false;">
+                                    <span style="color: red" class="glyphicon glyphicon-remove"></span>
+                                </button>
+                                <button class='k-button' id="update-application" title="Оновити заяву" disabled="disabled" style="background-color: lightgray;" onclick='UpdateApplication();'>
+                                    <span class="k-icon k-i-pdf"></span>
+                                </button>
+                                <button class="k-button" id="scann-app" title="Відсканувати заяву" disabled="disabled" style="background-color: lightgray;" onclick="AppScann()">
+                                    <span style="color: lightblue" class="glyphicon glyphicon-refresh"></span>
+                                </button>
+                                <button class='k-button' id="scann-new" title="Відсканувати документ" onclick='ScannNew();'>
+                                    <span class="k-icon k-i-pdf" style="background-position-x: -292px; background-position-y: -101px;"></span>
+                                </button>
+                                <button class="k-button" id="attach-application" title="додати документ" onclick="attachDocument(); this.blur(); return false;">
+                                    <span class="glyphicon glyphicon-plus" style="color: blue; background-position-x: -292px; background-position-y: -101px;"></span>
+                                </button>
+                                <button class="k-button" id="open-file" title="Переглянути файл" disabled="disabled" style="background-color: lightgray" onclick="openPdfPreview(); return false;">
+                                    <span style="color: tomato" class="glyphicon glyphicon-open-file"></span>
+                                </button>
+                                <button class="k-button" id="add-description" title="Додати коментар до файлу" onclick="AddDescription(); return false;">
+                                    <span style="color: dodgerblue" class="glyphicon glyphicon-pencil"></span>
+                                </button>
+                                <button class="k-button" id="save-updates" title="Зберегти зміни в описах" onclick="saveUpdates(); return false;">
+                                    <span style="color: green" class="glyphicon glyphicon-floppy-saved"></span>
+                                </button>
+                                <button class="k-button" id="send-files" title="Надіслати файли до ДКСУ" onclick="sendFiles(); return false;">
+                                    <span style="color: steelblue" class="glyphicon glyphicon-circle-arrow-up"></span>
+                                </button>
+                            </text>);
+
+                                })
+                                      .Columns(col =>
+                                      {
+                                          col.Bound(x => x.DOC_ID).Hidden();
+                                          col.Bound(x => x.REC_ID).Hidden();
+                                          col.Bound(x => x.TYPE_ID).Hidden(true);
+                                          col.Bound(x => x.TYPE_CODE).Hidden(true);
+                                          col.Bound(x => x.STATUS).Hidden(true);
+                                          col.Bound(x => x.EXT_ID).Hidden(true);
+                                          col.Bound(x => x.FILENAME).Title("Ім'я файлу");
+                                          col.Bound(x => x.TYPE_DESCRIPTION).Title("Опис типу");
+                                          col.Bound(x => x.DESCRIPT).Title("Опис документу");
+                                          col.Bound(x => x.STATUS_NAME).Title("Статус документа");
+                                      })
+                                      .Resizable(resizable => resizable.Columns(true))
+                                      .Reorderable(reorderable => reorderable.Columns(true))
+                                      .Scrollable()
+                                      .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                      .Selectable()
+                                      .HtmlAttributes(new { style = "height: 100%;" })
+                                      .Sortable()
+                                      .Events(x => x.Change("Selected").DataBound("DataBound"))
+                                      .Filterable()
+                                      .Pageable(page => page
+                                        .Refresh(true)
+                                        .PageSizes(true)
+                                        .ButtonCount(5))
+                                      .DataSource(dataSource => dataSource
+                                          .Ajax()
+                                          .Read(read => read.Action("ScannedDocuments_read", "Bills", new { id = Model }))
+                                          .Model(model =>
+                                          {
+                                              model.Id(x => x.DOC_ID);
+                                              model.Field(x => x.EXT_ID);
+                                              model.Field(x => x.FILENAME).Editable(false);
+                                              model.Field(x => x.TYPE_DESCRIPTION).Editable(false);
+                                              model.Field(x => x.DESCRIPT).Editable(true);
+                                              model.Field(x => x.STATUS_NAME).Editable(false);
+                                          })
+                                      )
+    )
+</div>
+
+<div id="windowContainer"></div>

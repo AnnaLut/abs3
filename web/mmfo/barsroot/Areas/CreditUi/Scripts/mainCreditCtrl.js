@@ -38,6 +38,10 @@
     };
     $rootScope.isViddValid = function () { return !isEmpty($rootScope.credit.viddValue); };
 
+    $rootScope.ShowCustInfo = false;
+
+    $rootScope.isShowCustInfo = function () { return $rootScope.ShowCustInfo; };
+
 
     $rootScope.isFlagsValid = function () { return !($rootScope.credit.holidayValue.ID == "9" && $rootScope.credit.previousValue.ID == "2"); };  //92 - неможливе значення FLAGS
 
@@ -116,6 +120,8 @@
 
     $rootScope.credit = dataService.clearCredit();
 
+    $rootScope.CUST_INFO = dataService.CUST_INFO();
+
     $rootScope.update = function (mode) {
         var url = "";
         if ($rootScope.nd != null) {
@@ -123,11 +129,27 @@
             bars.ui.loader('body', true);
             url = '/creditui/newcredit/getDeal/?nd=' + $rootScope.nd;
             $http.get(bars.config.urlContent(url)).then(function (request) {
-                if (!$scope.validateRequest(request)) { return; }
+                var error = $scope.validateRequest(request);
                 var save = $rootScope.credit;
                 dataService.getDeal(save, request.data.Data);
                 if ($rootScope.isTagOnly) {
                     $scope.mainTabStrip.select(3);
+                }
+                var _cust_data = request.data.Data.CUST_DATA;
+                if (_cust_data !== null) {
+                    $rootScope.CUST_INFO.EDRPO = _cust_data.EDRPO;
+                    $rootScope.CUST_INFO.EDUCA = _cust_data.EDUCA;
+                    $rootScope.CUST_INFO.MEMB = _cust_data.MEMB;
+                    $rootScope.CUST_INFO.NAMEW = _cust_data.NAMEW;
+                    $rootScope.CUST_INFO.NREMO = _cust_data.NREMO;
+                    $rootScope.CUST_INFO.REMO = _cust_data.REMO;
+                    $rootScope.CUST_INFO.STAT = _cust_data.STAT;
+                    $rootScope.CUST_INFO.TYPEW = _cust_data.TYPEW;
+                    $rootScope.CUST_INFO.REAL6INCOME = _cust_data.REAL6INCOME;
+                    $rootScope.CUST_INFO.NOREAL6INCOME = _cust_data.NOREAL6INCOME;
+
+
+                    $rootScope.ShowCustInfo = true;
                 }
 
                 url = '/creditui/newcredit/getMultiExtInt/?nd=' + $rootScope.nd;

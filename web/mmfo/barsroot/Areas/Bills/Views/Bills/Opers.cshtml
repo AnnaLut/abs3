@@ -1,0 +1,52 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+@* View для отображения проводок по векселям! *@
+<link href="~/Areas/Bills/Css/FontsAndGridStyle.css" rel="stylesheet" />
+<div class="page-header" style="margin: 10px 0 10px !important;">
+    <h2 id="title">Перегляд проводок по векселям</h2>
+</div>
+
+<div style="margin-bottom: 50px;">
+    @(Html.Kendo().Grid<Opers>()
+          .Name("opers")
+          .Columns(col =>
+          {
+              col.Bound(x => x.ID).Hidden(true);
+              col.Bound(x => x.OPER_DT).Title("Дата операції").Format("{0:dd.MM.yyyy}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+              col.Bound(x => x.DBT).Title("Рахунок дебета").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.CRD).Title("Рахунок кредита").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.AMOUNT).Title("Сума операції").Format("{0:n2}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: right" });
+              col.Bound(x => x.STATE).Title("Статус операції").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.DOC_REF).Title("Посилання на документ в АБС").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.CUR_CODE).Title("Валюта операції").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.PURPOSE).Title("Призначення платежу").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.MESSAGE).Title("Повідомлення про обробку").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.USER_REF).Title("Користувач, який виконав операцію").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.LAST_DT).Title("Дата+час останньої зміни").Format("{0:dd.MM.yyyy hh:mm:ss}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+              col.Bound(x => x.MFO).Title("МФО").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.VDAT).Title("Банківська дата проведення").Format("{0:dd.MM.yyyy}").HeaderHtmlAttributes(new { style = "white-space: normal" }).HtmlAttributes(new { style = "text-align: center" });
+              col.Bound(x => x.KF).Title("МФО банку").HeaderHtmlAttributes(new { style = "white-space: normal" });
+              col.Bound(x => x.BRANCH).Title("Відділення").HeaderHtmlAttributes(new { style = "white-space: normal" });
+          })
+          .Resizable(resizable => resizable.Columns(true))
+          .Reorderable(reorderable => reorderable.Columns(true))
+          .Selectable()
+          .HtmlAttributes(new { style = "min-height: 50px; height: 100%;" })
+          .Sortable()
+          .Scrollable()
+          .Filterable()
+          .Pageable(page => page
+              .Refresh(true)
+              .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+              .ButtonCount(10))
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Read(read => read.Action("GetOpers_Read", "Bills"))
+              .PageSize(10)
+          )
+    )
+</div>
+<div id="windowContainer"></div>

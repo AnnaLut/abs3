@@ -1,4 +1,157 @@
-﻿$(document).ready(function () {    
+﻿function correctFSumOutput(fSum) {
+
+    var result = parseInt(fSum) / 100;
+
+    if (isNaN(result))
+        return fSum;
+    else 
+        return result;
+}
+
+
+function openDopRekvViewWindow(rowIdd) {
+
+    var window = $("#ViewDopRekvWindow").data("kendoWindow");
+    window.title(" Додаткові реквізити платежу №" + rowIdd);
+    window.center().open();
+
+    //Read only doprekvs grid:
+    $("#ContractDopRekvGrid").kendoGrid({
+        columns: [
+            {
+                field: "RekvName",
+                title: "Назва реквізиту",
+                width: 200
+            },
+            {
+                field: "RekvValue",
+                title: "Значення реквізиту",
+                width: 100
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    type: "GET",
+                    dataType: 'json',
+                    url: bars.config.urlContent('/sto/Contract/GetDopRekvForPayment'),
+                    data: { paymentIdd: rowIdd },
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                error: "Errors",
+                model: {
+                    fields: {
+                        RekvName: { type: "string" },
+                        RekvValue: { type: "string" }
+                    }
+                }
+            },
+            error: function (e) {
+                alert(e.errorThrown);
+            },
+            pageSize: 10,
+            serverPaging: true,
+        },
+        autobind: false,
+        filterable: false,
+        resizable: false,
+        pageable: {
+            refresh: true,
+            pageSizes: [10, 20],
+            buttonCount: 3
+        },
+        height: "270px",
+        noRecords: {
+            template: '<div class="k-label" style="color:grey; margin:20px 20px;"> Відсутні додаткові реквізити для даного платежу! </div>'
+        },
+    });
+
+    $("#ContractDopRekvGrid").data('kendoGrid').dataSource.read();
+    $("#ContractDopRekvGrid").data('kendoGrid').refresh();
+}
+
+function openGovCodesReferenceWindow() {
+
+    $("#AddGovCodeWindow").kendoWindow({
+        height: "350px",
+        width: "450px",
+        title: "Довідник кодів державної закупівлі:",
+        visible: false,
+        dragable: false,
+        resizable: false,
+        actions: ["Close"],
+    });
+
+    var window = $("#AddGovCodeWindow").data("kendoWindow");
+    window.center().open();
+
+    $("#GovCodesGrid").kendoGrid({
+        columns: [
+            {
+                field: "GovCode",
+                title: "Код",
+                width: 100
+            },
+            {
+                field: "GovCodeText",
+                title: "Опис коду",
+                width: 300
+            }
+        ],
+        dataSource: {
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    type: "GET",
+                    dataType: 'json',
+                    url: bars.config.urlContent('/sto/Contract/GetGovCodesValues'),
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                error: "Errors",
+                model: {
+                    fields: {
+                        GovCode: { type: "string" },
+                        GovCodeText: { type: "string" }
+                    }
+                }
+            },
+            error: function (e) {
+                alert(e.errorThrown);
+            },
+            pageSize: 10,
+            serverPaging: true,
+            serverFiltering:true
+        },
+        autobind: true,
+        filterable: true,
+        selectable: "row",
+        resizable: true,
+        pageable: {
+            refresh: true,
+            pageSizes: [10, 20],
+            buttonCount: 3
+        },
+    });
+
+    var selectedGovCodeValue = null;
+
+    $("#GovCodesGrid").on("dblclick", "tr.k-state-selected", function () {
+        var codesGrid = $("#GovCodesGrid").data("kendoGrid"),
+            selectedGovCodeValue = codesGrid.dataItem(codesGrid.select());
+
+        window.close();
+        $("#govCodeField").val(selectedGovCodeValue.GovCode);
+    });
+}
+
+$(document).ready(function () {    
     html = document.documentElement;
     var height = Math.max(html.clientHeight, html.scrollHeight, html.offsetHeight);
     var global_idg = -1;
@@ -11,11 +164,24 @@
             return null;
     }
 
+    var dopRekvViewWindow = $('#ViewDopRekvWindow').kendoWindow({
+        title: "Додаткові реквізити платежу ",
+        visible: false,
+        height: "300px",
+        width: "600px",
+        scrollable: true,
+        resizable: false,
+        modal: true,
+        actions: ["Close"]
+    });
+
     function showActualGrpData() {
         currentRowData();
-        //debugger;
         $('#ContractDet').data('kendoGrid').dataSource.read();
         $('#ContractDet').data('kendoGrid').refresh();
+
+        var detGridContent = detGrid.find(".k-grid-content");
+        detGridContent.css("overflow", "auto");
     }
 
     function setDefaultRow() {
@@ -23,22 +189,29 @@
         if (grid != null) {
             grid.select("tr:eq(1)");
         }
+
+        var detGridContent = detGrid.find(".k-grid-content");
+        detGridContent.css("overflow", "auto");
     }
 
-
-
     var contractGrid = $('#Contract').kendoGrid({
-        autobind: true,
+        autobind: false,
         selectable: "row",
         scrollable: true,
         sortable: true,
-        height: (height).toString() + "px",
-        toolbar: kendo.template($("#template").html()),
+        resizable: true,
+        //height: (height).toString() + "px",  //
+        toolbar: kendo.template($("#ContractGridTemplate").html()),
+        excel: {
+            allPages: true,
+            fileName: "Договори на регулярні платежі.xlsx",
+            proxyURL: bars.config.urlContent("/sto/Contract/ExportToExcel")
+        },
         columns: [
             {
                 field: "IDS",
-                title: "Реф. Договору",
-                width: "5%",
+                title: "Реф. договору",
+                width: "10%",
                 attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
             },
             {
@@ -48,15 +221,22 @@
                 attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
             },
             {
-                field: "NAME",
-                title: "Деталі Договору",
-                width: "30%",
+                field: "NMK",
+                title: "Назва клієнта",
+                width: "20%",
                 attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
             },
             {
-                field: "SDAT",
-                title: "Дата Договору",
-                template: "#= kendo.toString(kendo.parseDate(SDAT, 'dd/MM/yyyy'), 'dd/MM/yyyy') #"
+                field: "Name",
+                title: "Деталі договору",
+                width: "20%",
+                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+            },
+            {
+                field: "SDat",
+                title: "Дата договору",
+                width: "10%",
+                template: "#= (SDat!=null) ? kendo.toString(kendo.parseDate(SDat, 'dd/MM/yyyy'), 'dd/MM/yyyy') :'' #"
 
             },
             /*{
@@ -68,10 +248,16 @@
                 title: "_KF"
             },*/
             {
-                field: "BRANCH",
+                field: "Branch",
                 title: "Відділення",
-                width: "25%",
+                width: "15%",
                 attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+            },
+            {
+                field: "ClosingDate",
+                title: "Дата закриття",
+                width: "10%",
+                template: "#= (ClosingDate!=null) ? kendo.toString(kendo.parseDate(ClosingDate, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #"
             }
         ],
         dataSource: {
@@ -79,9 +265,18 @@
             transport: {
                 read: {
                     dataType: 'json',
-                    url: bars.config.urlContent('/sto/Contract/GetContractList')
+                    url: bars.config.urlContent('/sto/Contract/GetContractList'),
+                    data: function () {
+                        var id = -1;
+                        var grpDropdown = $("#grp").data("kendoDropDownList");
+                        if (grpDropdown != undefined && grpDropdown.value() != "")
+                            id = parseInt(grpDropdown.value());
+                        return { group_id: id };
+                    }
                 }
             },
+            serverFiltering: true,
+            serverSorting: true,
             schema: {
                 data: "data.Data",
                 total: "data.Total",
@@ -89,37 +284,58 @@
                     fields: {
                         IDS: { type: "number" },
                         RNK: { type: "number" },
-                        NAME: { type: "string" },
-                        SDAT: { type: "date" },
-                        IDG: { type: "number" },
+                        NMK: {type: "string"},
+                        Name: { type: "string" },
+                        SDat: { type: "date" },
                         KF: { type: "string" },
-                        BRANCH: { type: "string" }
+                        IDG: { type: "number" },
+                        BRANCH: { type: "string" },
+                        ClosingDate: { type: "date" },
                     }
                 }
             }
         },
         filterable: true,
         change: showActualGrpData,
-        dataBound: setDefaultRow
+        dataBound: setDefaultRow,
+        excelExport: function (e) {
+            var columns = e.workbook.sheets[0].columns;
+            columns.forEach(function (column) {
+                delete column.width;
+                column.autoWidth = true;
+            });
+        }
+        //pageable: {
+        //    alwaysVisible: false,
+        //    pageSizes: [5, 10, 20, 100]
+        //},
     });
 
-    $("#Contract").on("dblclick", "tr.k-state-selected", function () {
+    function showClientCard() {
         var grid = $("#Contract").data("kendoGrid");
-        var selectedItem = grid.dataItem(grid.select());
-        bars.ui.dialog({
-            content: "/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + selectedItem.RNK,
-            iframe: true,
-            maximize: true
-        });
+        var currentRow = grid.dataItem(grid.select());
+        if (!!currentRow) {
+            bars.ui.dialog({
+                content: "/barsroot/clientregister/registration.aspx?readonly=1&rnk=" + currentRow.RNK,
+                iframe: true,
+                maximize: true
+            });
+        }
+        else {
+            bars.ui.alert({ text: 'Оберіть запис!' });
+        }
+    }
+
+    $("#Contract").on("dblclick", "tr.k-state-selected", function () {
+        showClientCard();
     });
 
     var dropDown = contractGrid.find("#grp").kendoDropDownList({
-        dataTextField: "NAME",
+        dataTextField: "Name",
         dataValueField: "IDG",
         autoBind: false,
-        optionLabel: "Всі",
+        optionLabel: "Оберіть групу для відображення договорів...",
         dataSource: {
-            type: "odata",
             severFiltering: true,
             transport: {
                 read: {
@@ -135,12 +351,11 @@
         change: function () {
             var value = this.value();
             if (value) {
-                contractGrid.data("kendoGrid").dataSource.filter({ field: "IDG", operator: "eq", value: parseInt(value) });
-                global_idg = value;
+                global_idg = parseInt(value);
             } else {
-                contractGrid.data("kendoGrid").dataSource.filter({});
                 global_idg = -1;
             }
+            contractGrid.data("kendoGrid").dataSource.read({ group_id: global_idg });
         }
     });
 
@@ -158,52 +373,93 @@
         });
     }
 
+    function AllowNumericOnly(jqelement) {
+        jqelement.keydown(function (e) {
+            var key = e.charCode || e.keyCode || 0;
+            // allow backspace, tab, delete, enter, arrows, numbers and keypad numbers ONLY
+            // home, end, period, and numpad decimal
+            return ((
+                key == 8 ||
+                key == 9 ||
+                key == 13 ||
+                key == 46 ||
+                key == 110 ||
+                key == 190 ||
+                (key >= 35 && key <= 40) ||
+                (key >= 48 && key <= 57) ||
+                (key >= 96 && key <= 105))
+            );
+        });
+    }
+
+    $("#SumCheckBox").change(function () {
+        if ($(this)[0].checked) {
+            $("#summFormula").val("");
+            $("#summNumber").data("kendoNumericTextBox").wrapper.hide();
+            $("#summFormula").show();
+        }
+        else {
+            $("#summNumber").data("kendoNumericTextBox").value("");
+            $("#summNumber").data("kendoNumericTextBox").wrapper.show();
+            $("#summFormula").hide();
+        }
+    });
+
     var detGrid = $('#ContractDet').kendoGrid({
         autobind: false,
         selectable: "row",
-        scrollable: true,
+        //scrollable: true,
         sortable: true,
-        height: (height).toString() + "px",
-        columns: [ 
+        resizable: true,
+        //height: (height).toString() + "px",
+        toolbar: kendo.template($("#ContractDetGridTemplate").html()),
+        excel: {
+            allPages: true,
+            fileName: "Шаблони регулярних платежів по договору.xlsx",
+            proxyURL: bars.config.urlContent("/sto/Contract/ExportToExcel")
+        },
+        columns: [
             {
-                field: "IDD",              
-                title: "Ід.<br/>договору",
+                field: "IDD",
+                title: "Ід. договору",
                 width: "80px",
-                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px; white-space:normal;" }
             },
             {
-                field: "STATUS_ID",               
-                title: "Статус<br/>рег.плат",
+                field: "STATUS_ID",
+                title: "Статус рег.плат",
                 width: "125px",
-                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px; white-space: normal" }
             },
             {
-                field: "DISCLAIM_ID",                
-                title: "Ід. відмови<br/>(0 - пітдверджено)",
+                field: "DISCLAIM_ID",
+                title: "Ід. відмови (0 - пітдверджено)",
                 width: "125px",
-                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px; white-space: normal" }
             },
             {
                 field: "STATUS_DATE",
-                title: "Дата та час<br />обробки<br/>в бек-офісі",                
-                template: "#= STATUS_DATE != null ? kendo.toString(kendo.parseDate(STATUS_DATE, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #"
+                title: "Дата та час обробки в бек-офісі",
+                width: "50px",
+                template: "#= STATUS_DATE != null ? kendo.toString(kendo.parseDate(STATUS_DATE, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "STATUS_UID",
                 width: "170px",
-                title: "Користувач,<br />що обробив запит<br /> в бек-офисе"                ,                
-                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+                title: "Користувач, що обробив запит в бек-офисе",
+                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px;white-space: normal;" }
             },
             {
                 field: "ORD",
                 width: "50px",
-                title: "Порядок<br/>виконання",               
-                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px" }
+                title: "Порядок виконання",
+                attributes: { "class": "table-cell", style: "text-align: left; font-size: 12px;white-space: normal;" }
             },
             {
                 field: "TT",
                 width: "50px",
-                title: "Код<br/>операцiї"
+                title: "Код операцiї",
             },
             {
                 field: "DAT1",
@@ -225,7 +481,8 @@
             {
                 field: "NLSA",
                 width: "150px",
-                title: "Рах<br/>вiдправника"
+                title: "Рах вiдправника",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "KVA",
@@ -235,7 +492,8 @@
             {
                 field: "NLSB",
                 width: "150px",
-                title: "Рах<br/>отримувача"
+                title: "Рах отримувача",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "KVB",
@@ -245,39 +503,47 @@
             {
                 field: "MFOB",
                 width: "90px",
-                title: "Банк<br/>отримувача"
+                title: "Банк отримувача",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "POLU",
                 width: "300px",
-                title: "Назва<br/>отримувача"
+                title: "Назва отримувача",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "NAZN",
                 width: "400px",
-                title: "Призначення<br/>платежу"
+                title: "Призначення платежу",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "FSUM",
                 width: "400px",
-                title: "Формула<br/>суми"
+                title: "Формула суми",
+                template: "#= correctFSumOutput(FSUM) #",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "OKPO",
                 width: "90px",
-                title: "ОКПО<br/>отримувача"
+                title: "ОКПО отримувача",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "DAT0",
                 width: "90px",
-                title: "Дата<br/>пред.платежy",
+                title: "Дата пред.платежy",
                 //format: "{0:dd/MM/yyyy}",
-                template: "#= DAT0 != null ? kendo.toString(kendo.parseDate(DAT0, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #"
+                template: "#= DAT0 != null ? kendo.toString(kendo.parseDate(DAT0, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "WEND",
                 width: "50px",
-                title: "Вих<br/>(-1 або +1)"
+                title: "Вих (-1 або +1)",
+                attributes: { style: "white-space: normal" }
             },
             /*{
                 field: "STMP",
@@ -299,35 +565,47 @@
             {
                 field: "BRANCH",
                 width: "200px",
-                title: "Бранч<br/>для бюджету"
+                title: "Бранч для бюджету",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "BRANCH_MADE",
                 width: "200px",
-                title: "Відділення,<br />де створено<br/>рег.плат"
+                title: "Відділення, де створено рег.плат",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "DATETIMESTAMP",
                 width: "90px",
-                title: "Дата та час<br/>створення",
+                title: "Дата та час створення",
                 //format: "{0:dd/MM/yyyy}",
-                template: "#= DATETIMESTAMP != null ? kendo.toString(kendo.parseDate(DATETIMESTAMP, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #"
+                template: "#= DATETIMESTAMP != null ? kendo.toString(kendo.parseDate(DATETIMESTAMP, 'dd/MM/yyyy'), 'dd/MM/yyyy') : '' #",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "BRANCH_CARD",
                 width: "200px",
-                title: "Відділення<br />карткового<br/>рахунку"
+                title: "Відділення карткового рахунку",
+                attributes: { style: "white-space: normal" }
             },
             {
                 field: "USERID_MADE",
                 width: "200px",
-                title: "Номер користувача,<br />що створив рег.плат<br /> бек-офісі"
+                title: "Номер користувача, що створив рег.плат бек-офісі",
+                attributes: { style: "white-space: normal" }
+            },
+            {
+                field: "OPERW_EXISTANCE",
+                width: "100px",
+                title: "Дод. рекв-ти",
+                template: function (dataItem) {
+                    var dopRekvButton = "";
+                    if (dataItem.OPERW_EXISTANCE == 1)
+                        dopRekvButton = "<a class='k-button' onclick='openDopRekvViewWindow(" + dataItem.IDD + ")'>...</a>";
+                    return dopRekvButton;
+                },
+                attributes: { style: "white-space: normal" }
             }
-            /*{
-                field: "USERID",
-                width: "200px",
-                title: "_USERID"
-            },*/
         ],
         dataSource: {
             type: "aspnetmvc-ajax",
@@ -372,21 +650,26 @@
                         BRANCH_MADE: { type: "string" },
                         DATETIMESTAMP: { type: "date" },
                         BRANCH_CARD: { type: "string" },
-                        USERID_MADE: { type: "string" }
+                        USERID_MADE: { type: "string" },
+                        OPERW_EXISTANCE: { type: "number" }
 
                         /*VOB: { type: "number" },
                         DK: { type: "number" },
                         STMP: { type: "date" },
                         KF: { type: "string" },
                         DR: { type: "string" },
-                        USERID: { type: "number" }*/   
+                        USERID: { type: "number" }*/
                     }
                 }
             }
         },
         filterable: false,
         resizable: true,
-        dataBound: markRow
+        scrollable: true,
+        dataBound: function () {
+            markRow();
+            this.element.find('tbody tr:first').addClass('k-state-selected');
+        }
     });
 
     function confirm(procType) {
@@ -506,7 +789,7 @@
                 {
                     field: "IDD",
                     width: "100px",
-                    title: "Ід.<br />рег. платежу"
+                    title: "Ід.<br />рег. платежу",
                 },
                 {
                     field: "ACTION",
@@ -670,27 +953,70 @@
                         bars.ui.alert({ text: 'Оберіть запис!' });
                     }
                 }, overflow: "never"
-            }
+            }, 
+            {
+                id: "excel",
+                type: "button",
+                text: '<span class="k-icon k-i-excel"></span>Вивантажити в Excel',
+                //text: 'Вивантажити в Excel',
+                title: "Вивантажити в Excel",
+                click: function () {
+                    $('#ContractDet').data('kendoGrid').saveAsExcel();
+                }, overflow: "never"
+            },
         ]        
     });
+
     Redirect = function () {
         var grid = $('#ContractDet').data('kendoGrid');
         var currentRow = grid.dataItem(grid.select());
         if (!!currentRow) {
-            var calendarUrl = window.location.href;            
-            calendarUrl =calendarUrl.substring(0, calendarUrl.indexOf('barsroot')) + "barsroot/tools/sto/sto_calendar.aspx?IDD=" + currentRow.IDD + "&mode=RW";
-            window.location = calendarUrl;
+
+            var docUrl = bars.config.urlContent("tools/sto/sto_calendar.aspx?IDD=" + currentRow.IDD + "&mode=RW");
+
+            $('#schedule-window').kendoWindow({
+                title: "Графік платежів",
+                modal: true,
+                resizable: true,
+                width: 1000,
+                height: 870,
+                content: docUrl,
+                iframe: true,
+                visible: false,
+                close: function () {
+                    grid.dataSource.read();
+                    //setTimeout(function () {
+                    //    $('#schedule-window').kendoWindow('destroy');
+                    //}, 200);
+                }
+            });
+
+            $('#schedule-window').data('kendoWindow').center().open();
+
+            //var calendarUrl = window.location.href;            
+            //calendarUrl =calendarUrl.substring(0, calendarUrl.indexOf('barsroot')) + "barsroot/tools/sto/sto_calendar.aspx?IDD=" + currentRow.IDD + "&mode=RW";
+            //window.location = calendarUrl;
+
+            ////var docUrl = bars.config.urlContent("tools/sto/sto_calendar.aspx?IDD=" + currentRow.IDD + "&mode=RW");
+            //var newWindow = window.open(docUrl, '', 'modal=yes, toolbar=no, location=no, directories=no, status=no, menubar=no, resizable=yes, copyhistory=no, width=' + 1000 + ', height=' + 870 + ', top=' + 50 + ', left=' + 500);
+            //newWindow.onbeforeunload = function () {
+            //    grid.dataSource.read();
+            //}
         } else {
-           alert('Оберіть платіж для перегляду календаря!' );
+            bars.ui.alert({ text: 'Оберіть платіж для перегляду календаря!' });
         }
     }
+
+    function refreshContractDetGrid() {
+        $('#ContractDet').data('kendoGrid').refresh();
+    }
+
     var stoToolbar = $("#sto-toolbar").kendoToolBar({
         items: [
             { type: 'separator' },           
             {
                 id: "create",
                 type: "button",
-                //spriteCssClass: "pf-icon pf-16 pf-ok",
                 text: '<i class="pf-icon pf-16 pf-add" title="Додати платника в групу договорів"></i>',
                 title: "Додати",
                 click: function () {
@@ -702,14 +1028,41 @@
             {
                 id: "reload",
                 type: "button",
-                //spriteCssClass: "pf-icon pf-16 pf-ok",
                 text: '<i class="pf-icon pf-16 pf-reload_rotate" title="Перечитати"></i>',
                 title: "Перечитати",
                 click: function () {
                     reloadGrids();
                 },
                 enable: !doThis()
-            }
+            },
+            {
+                id: "delete",
+                type: "button",
+                text: '<i class="pf-icon pf-16 pf-delete" title="Видалити/Закрити договір"></i>',
+                title: "Видалити/Закрити договір",
+                click: function () {
+                    deleteContract();
+                },
+                enable: !doThis()
+            },
+            {
+                id: "info",
+                type: "button",
+                text: '<i class="pf-icon pf-16 pf-info" title="Детальна інформація по клієнту"></i>',
+                title: "Довідка",
+                click: function () {
+                    showClientCard();
+                }, overflow: "never"
+            }, 
+            {
+                id: "excel",
+                type: "button",
+                text: '<span class="k-icon k-i-excel"></span>Вивантажити в Excel',
+                title: "Вивантажити в Excel",
+                click: function () {
+                    $('#Contract').data('kendoGrid').saveAsExcel();
+                }, overflow: "never"
+            },
         ]
     });
 
@@ -742,7 +1095,7 @@
 
     var tts_list = kendo.data.Model.define({
         id: tts_list,
-        fields: { TT: { type: "string" }, NAME_: {type:"string"} }
+        fields: { TT: { type: "string" }, NAME: {type:"string"} }
     });
 
     var tts_data = new kendo.data.DataSource({
@@ -754,7 +1107,7 @@
     $('#ttsddl').kendoDropDownList({
         dataSource: tts_data,
         filters: "contain",
-        dataTextField: "NAME_",
+        dataTextField: "NAME",
         dataValueField: "TT",
         filter: "contains"
     });
@@ -774,13 +1127,16 @@
         if (grid.select().length > 0) {
             currentRowData = grid.dataItem(grid.select());
             wnd_stodet.center().open();
-            $('#from').val(kendo.toString(kendo.parseDate(today, 'dd/MM/yyyy'), 'dd/MM/yyyy'));
-            $('#from').val(null);
+            $('#from').val(kendo.toString(kendo.parseDate(today, 'dd/MM/yyyy'), 'dd.MM.yyyy'));
+            $('#till').val(null);
             $('#nazn').val(null);
             $('#mfo_b').val(null);
             $('#nls_b').val(null);
             $('#okpo_b').val(null);
             $('#name_b').val(null);
+            $("#summNumber").data("kendoNumericTextBox").value("");
+            $("#summFormula").val("");
+            $("#govCodeField").val(null);
             $("#NPP").data("kendoNumericTextBox").value(grid_det._data.length + 1);
             $('input[name=week][value=-1]').prop('checked', true);
             if (currentRowData.RNK != null) {
@@ -811,41 +1167,46 @@
                     filter: "contains"
                 });
 
-                var kv_a_data = new kendo.data.DataSource({
-                    type: "aspnetmvc-ajax",
-                    transport: { read: { dataType: 'json', url: bars.config.urlContent('/sto/Contract/GetKVs?RNK=' + currentRowData.RNK) } },
-                    schema: { data: "data", model: nls_list }
-                });
 
-                $('#kv_a').kendoDropDownList({
-                    dataSource: kv_a_data,
-                    dataTextField: "NAME",
-                    dataValueField: "KV",
-                    filter: "contains",
-                    change: function () {
-                        dropdown_nls = angular.element("#nls_a").data("kendoDropDownList");
-                        dropdown_nls.dataSource.read();
+                //get datasource for KVs based on client's rnk, initialize ddls with currencies
+                //Sender's and receiver's currency should be the same according to requirement
+                $.ajax({
+                    type: "GET",
+                    url: bars.config.urlContent('/sto/Contract/GetKVs?RNK=' + currentRowData.RNK),
+                    success: function (result) {
+                        if (result.status == "error") {
+                            bars.ui.error({ text: 'Помилка при отриманні валюти платника: ' + result.message });
+                        }
+                        else {
+                            $('#kv_a').kendoDropDownList({
+                                dataSource: result.data,
+                                dataTextField: "NAME",
+                                dataValueField: "KV",
+                                filter: "contains",
+                                change: function () {
+                                    dropdown_nls = angular.element("#nls_a").data("kendoDropDownList");
+                                    dropdown_nls.dataSource.read();
+                                },
+                                select: function (e) {
+                                    selected_kv_a = this.dataItem(e.item).KV;
+                                }
+                            });
+
+                            $('#kv_b').kendoDropDownList({
+                                dataSource: result.data,
+                                dataTextField: "NAME",
+                                dataValueField: "KV",
+                                filter: "contains",
+                                change: function () {
+                                },
+                                select: function (e) {
+                                    selected_kv_b = this.dataItem(e.item).KV;
+                                }
+                            });
+                        }
                     },
-                    select: function (e) {
-                        selected_kv_a = this.dataItem(e.item).KV;
-                    }
-                });
-
-                var kv_b_data = new kendo.data.DataSource({
-                    type: "aspnetmvc-ajax",
-                    transport: { read: { dataType: 'json', url: bars.config.urlContent('/sto/Contract/GetKVs?RNK=' + null) } },
-                    schema: { data: "data", model: nls_list }
-                });
-
-                $('#kv_b').kendoDropDownList({
-                    dataSource: kv_b_data,
-                    dataTextField: "NAME",
-                    dataValueField: "KV",
-                    filter: "contains",
-                    change: function () {
-                    },
-                    select: function (e) {
-                        selected_kv_b = this.dataItem(e.item).KV;
+                    error: function () {
+                        bars.ui.error({ text: 'Помилка: '+ result.message });
                     }
                 });
 
@@ -867,17 +1228,64 @@
                 });
             }
         }
-        else alert('Оберіть платника в верхньому списку!');
+        else
+            bars.ui.alert({ text: 'Оберіть платника в верхньому списку!' });
     }
+
+    clearNewContractWindowData = function () {
+        $("#OKPO").val("");
+        $("#RNK").val("");
+
+        if ($("#RNK_LIST").data("kendoDropDownList")) {
+            $("#RNK_LIST").data("kendoDropDownList").select(0);
+            $("#RNK_LIST").data("kendoDropDownList").wrapper.hide();
+            $("#RNK_List_Label").hide();
+        };
+
+        $("#name_ids").val("");
+    }
+
     prepareNewSto = function () {
         var wnd_stolst = $("#wnd_stolst").data("kendoWindow");
         var grid = $("#Contract").data("kendoGrid");               
         if (global_idg >= 1) {
             var today = new Date();
-            $('#from_ids').val(kendo.toString(kendo.parseDate(today, 'dd/MM/yyyy'), 'dd/MM/yyyy'));
+            $('#from_ids').val(kendo.toString(kendo.parseDate(today, 'dd/MM/yyyy'), 'dd.MM.yyyy'));
             wnd_stolst.center().open();
+            clearNewContractWindowData();
         }
-        else { alert('Оберіть групу платежів з випадаючого списку вгорі!');}
+        else {
+            bars.ui.alert({ text: 'Оберіть групу платежів з випадаючого списку вгорі!'});
+        }
+    }
+    
+    deleteContract = function () {
+        var grid = $('#Contract').data('kendoGrid');
+        var currentRow = grid.dataItem(grid.select());
+
+        if (currentRow == null) {
+            bars.ui.alert({ text: 'Оберіть рядок з договором!' });
+        }
+        else {
+            bars.ui.confirm({ text: "Ви дійсно бажаєте видалити усі макети платежів та закрити договір?" }, function () {
+                $.ajax({
+                    type: "Get",
+                    url: bars.config.urlContent('/sto/Contract/Delete_Contract?ids=' + currentRow.IDS),
+                    success: function (result) {
+                        if (result.status == 'error') {
+                            bars.ui.error({ text: result.message });
+                        } else {
+                            grid.dataSource.read();
+                            grid.refresh();
+                            bars.ui.alert({ text: result.data });
+                        }
+                    },
+                    error: function (result) {
+                        bars.ui.error({ text: result.message });
+                    }
+                });
+            });
+        }
     }
 
     var freq_list = kendo.data.Model.define({
@@ -896,17 +1304,11 @@
         dataValueField: "FREQ",
         dataSource: freq_data
     });
-    $('#kvddl').kendoDropDownList({
-        dataTextField: "name",
-        dataValueField: "kv",
-        dataSource: {
-            data: [
-                { kv: 980, name: "Гривня Украіни" },
-                { kv: 840, name: "Доллар США" },
-                { kv: 978, name: "Євро" }
-            ]
-        }
+    
+    $("#from_ids").kendoDatePicker({
+        format: "dd/MM/yyyy"
     });
+
     $("#NPP").kendoNumericTextBox({
         width: "100px",
         maxlength: "5",
@@ -915,14 +1317,7 @@
         format: "d",
         min:1
     });
-    $("#summ").kendoNumericTextBox({
-        width: "100px",
-        maxlength: "15",
-        readonly: false,
-        spinners: true,
-        format: "d",
-        placeholder: "Введіть суму"
-    });
+
     $("#nazn").kendoMaskedTextBox({
       //  mask: "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",        
         required: true,
@@ -933,9 +1328,6 @@
     });    
     $("#name_ids").kendoMaskedTextBox({
        // mask: "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-    });
-    $("#RNK").kendoMaskedTextBox({
-        // mask: "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
     });
     $("#name_b").kendoMaskedTextBox({
        // mask: "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
@@ -950,24 +1342,53 @@
         mask: "0000000000"
     });
 
+    AllowNumericOnly($("#RNK"));
+    AllowNumericOnly($("#OKPO"));
+    //AllowNumericOnly($("#summ"));
+
+    $("#summNumber").kendoNumericTextBox({
+        width: "250px",
+        maxlength: "15",
+        readonly: false,
+        spinners: false,
+        format: "#.00",
+    });
 
     validatePayment = function () {
         var $stoFrm = $('#wnd_stodet');        
-        if ($stoFrm.find('#NPP').val() == null) { alert('Введіть порядок виконання платежу'); return false; }
+        if ($stoFrm.find('#NPP').val() == null) {
+            bars.ui.alert({ text: 'Введіть порядок виконання платежу' });
+            return false;
+        }
         else {
             return true;          
         }        
     }
     validateIDS = function () {
         var $stoFrm = $('#wnd_stolst');
-        if ($stoFrm.find('#RNK_LIST').val() == null) { alert('Оберіть клієнта'); return false; }
+        if (($stoFrm.find('#RNK_LIST')!= undefined && $stoFrm.find('#RNK_LIST').val() == "")) {
+            bars.ui.alert({ text: 'Оберіть клієнта' });
+            return false;
+        }
         else {
-            return true;
+            if ($("#name_ids").val() == "") {
+                bars.ui.alert({ text: 'Введіть найменування договору!' });
+                return false;
+            } 
+            else 
+                return true;
         }
     }
 
     collectPayment = function () {
-        var $stoFrm = $('#wnd_stodet');      
+        var $stoFrm = $('#wnd_stodet');
+        var sumValue=0;
+        if ($("#SumCheckBox")[0].checked) {
+            sumValue = $("#summFormula").val();
+        }
+        else {
+            sumValue = $("#summNumber").data("kendoNumericTextBox").value()*100;
+        }
         return {
             IDS: currentRowData().ids,
             ord: $stoFrm.find('#NPP').val(),
@@ -980,8 +1401,8 @@
             kvb :$stoFrm.find('#kv_b').val(),
             mfob :$stoFrm.find('#mfo_b').val(),
             polu: $stoFrm.find('#name_b').val().replace("_", ""),
-            nazn :$stoFrm.find('#nazn').val(),
-            fsum :$stoFrm.find('#summ').val(),
+            nazn: $stoFrm.find('#nazn').val(),
+            fsum: sumValue,
             okpo: $stoFrm.find('#okpo_b').val().replace("_", ""),
             DAT1: $stoFrm.find('#from').val(),
             DAT2: $stoFrm.find('#till').val(),
@@ -992,35 +1413,19 @@
             sdate: null,
             idd: 0,
             status: 0,
-            status_text : ""}
+            status_text: "",
+            govBuyCode: $stoFrm.find("#govCodeField").val()
+        }
     }
     collectIDS = function () {
         var $stoFrm = $('#wnd_stolst');
         return {
             RNK: $stoFrm.find('#RNK_LIST').val(),
             NAME :$stoFrm.find('#name_ids').val(),
-            SDAT :$stoFrm.find('#from_ids').val(),
+            SDat :$stoFrm.find('#from_ids').val(),
             IDG : global_idg
         }
     }
-    saveIDS = function () {
-        if (validateIDS()) {
-            collectIDS();
-            $.ajax({
-                type: "POST",
-                url: bars.config.urlContent('/sto/Contract/AddIDS'),
-                data: collectIDS(),
-                success: function (data) {
-                    if (data.status == 'error' && data.message != 'Sequence contains no elements') {
-                        alert('Не збережено!     ' + data.message);
-                    } else {
-                        alert('Збережено!')
-                    }
-                },
-                error: function (data) { alert(data.message); }
-            });
-        }
-    };
 
     savePayment = function () {
         if (validatePayment()) {
@@ -1031,15 +1436,33 @@
                     data: collectPayment(),
                     success: function (data) {
                         if (data.status == 'error' && data.message != 'Sequence contains no elements') {
-                            alert('Не збережено!     ' + data.message);
+                            bars.ui.alert({ text: 'Не збережено!     ' + data.message });
                         } else {
-                            alert('Збережено!')
+                            bars.ui.alert({ text: 'Збережено!' });
+                            $("#wnd_stodet").data("kendoWindow").close();
                         }
                     },
-                    error: function (data) { alert(data.message);}
+                    error: function (data) {
+                        bars.ui.error({ text: data.message });
+                    }
                 });
         }
     };
+
+    var AddContractWindow = $("#wnd_stolst");
+    AddContractWindow.kendoWindow({
+        height: "350px",
+        width: "450px",
+        title: "Новий договір на регулярні платежі",
+        visible: false,
+        //content: docUrl,
+        //iframe: true,
+        dragable: true,
+        resizable: false,
+        actions: ["Close"],
+    });
+
+
     $("#buttonsave").kendoButton();
     var button = $("#buttonsave").data("kendoButton");
     button.bind("click", function (e) {
@@ -1049,41 +1472,120 @@
         showActualGrpData();
     });
 
+    var AddDopRekvWindow = $("#AddDopRekvWindow").kendoWindow({
+        height: "350px",
+        width: "450px",
+        title: "Додавання додаткових реквізитів платежу",
+        visible: false,
+        dragable: true,
+        resizable: false,
+        actions: ["Close"],
+    });
+
+    var dopRekvOpenButton = $("#dopRekvButton").kendoButton();
+    dopRekvOpenButton.bind("click", function (e) {
+        $("#AddDopRekvWindow").data("kendoWindow").center.open();
+    });
+
+    var addGovCodeButton = $("#addGovCodeButton").kendoButton();
+    addGovCodeButton.bind("click", openGovCodesReferenceWindow);
+
     $("#buttonSearch").kendoButton();
     var buttonSearchRNK = $("#buttonSearch").data("kendoButton");
     buttonSearchRNK.bind("click", function (e) {
-        var $stoFrm = $('#wnd_stolst');        
-        var OKPO = $stoFrm.find('#RNK').val();
-        var rnk_list = kendo.data.Model.define({
-            id: rnk_list,
-            fields: { RNK: { type: "int" }, NMK: { type: "string" } }
-        });
-
-        var rnk_data = new kendo.data.DataSource({
-            type: "aspnetmvc-ajax",
-            transport: { read: { dataType: 'json', url: bars.config.urlContent('/sto/Contract/GetRNKLIST?OKPO=' + OKPO) } },
-            schema: { data: "data", model: rnk_list }
-        });
-
-        $('#RNK_LIST').kendoDropDownList({
-            dataTextField: "NMK",
-            dataValueField: "RNK",
-            dataSource: rnk_data
-        });
+        var $stoFrm = $('#wnd_stolst');
+        var OKPO = $stoFrm.find('#OKPO').val();
+        var RNK = $stoFrm.find('#RNK').val();
+        if (OKPO == "" && RNK == "") {
+            bars.ui.alert({ text: " Заповніть хоча б один критерій пошуку: ІНН або РНК !" });
+            return;
         }
-    );
-    $("#buttonsaveids").kendoButton();
-    var buttonIDS = $("#buttonsaveids").data("kendoButton");
-    buttonIDS.bind("click", function (e) {
-        var wnd = $("#wnd_stolst").data("kendoWindow");
-        saveIDS();
-        wnd.refresh();
-        $('#Contract').data('kendoGrid').dataSource.read();
-        $('#Contract').data('kendoGrid').refresh();
-        showActualGrpData();
+
+        $.ajax({
+            type: "POST",
+            url: bars.config.urlContent('/sto/Contract/GetRNKLIST?OKPO=' + OKPO + "&RNK=" + RNK),
+            success: function (result) {
+                if (result.status == 'error') {
+                    bars.ui.error({ text: result.message });
+                } else
+                    if (result.data.length == 0) {
+                        bars.ui.alert({ text: "Жодного клієнта не знайдено за заданими умовами пошуку!" });
+                    }
+                    else {
+
+                        $("#RNK_List_Label").show();
+                        $('#RNK_LIST').kendoDropDownList({
+                            dataTextField: "NMK",
+                            dataValueField: "RNK",
+                            dataSource: result.data,
+                            template: '<span style="font-size:0.8em">#:NMK#</span>'
+                        });
+                    }
+            },
+            error: function (data) {
+                bars.ui.error({ text: data.message });
+            }
+        });
+
     });
-    $("#splitter").kendoSplitter({
+
+    $("#buttonSaveContractInfo").kendoButton();
+    var buttonIDS = $("#buttonSaveContractInfo").data("kendoButton");
+    buttonIDS.bind("click", function (e) {
+        var newClientWindow = $("#wnd_stolst").data("kendoWindow");
+        if (validateIDS()) {
+            collectIDS();
+
+            //Write new Contract into in DB:
+            $.ajax({
+                type: "POST",
+                url: bars.config.urlContent('/sto/Contract/AddIDS'),
+                data: collectIDS(),
+                success: function (data) {
+                    if (data.status == 'error' && data.message != 'Sequence contains no elements') {
+                        bars.ui.alert({ text: 'Не збережено!     ' + data.message });
+                    }
+                    else {
+                        bars.ui.alert({ text: 'Збережено!' });
+
+                        $('#Contract').data('kendoGrid').dataSource.read();
+                        $('#Contract').data('kendoGrid').refresh();
+                        showActualGrpData();
+                        newClientWindow.close();
+                    }
+                },
+                error: function (data) {
+                    bars.ui.error({ text: data.message });
+                }
+            });
+        }
+    });
+
+    $("#buttonCancelNewContractInfo").on("click", function () {
+        var newClientWindow = $("#wnd_stolst").data("kendoWindow");
+        newClientWindow.close();
+    });
+
+    var splitter =  $("#splitter").kendoSplitter({
         orientation: "vertical",
-        panes: [{ size: "60%" }, {}]
+        panes: [{ size: "60%" }, { size: "40%" }],
+        resize: function (e) {
+
+            if (contractGrid !== undefined) {
+                var contractGridHeight = $(".panel-primary").height();
+                contractGrid.height(contractGridHeight);
+                var contractContentHeight = contractGridHeight - contractGrid.find(".k-grid-header").height() - contractGrid.find(".k-grid-toolbar").height() - $(".k-splitbar").outerHeight();
+                contractGrid.find(".k-grid-content").css("height", contractContentHeight);
+            }
+
+            if (detGrid !== undefined) {
+                var detGridHeight = $(".panel-info").height();
+                detGrid.height(detGridHeight);
+                var detContentHeight = detGridHeight - detGrid.find(".k-grid-header").height() - detGrid.find(".k-grid-toolbar").height() - $(".k-splitbar").outerHeight();
+                var detGridContent = detGrid.find(".k-grid-content");
+                detGridContent.css("height", detContentHeight);
+            }
+        }
     })
+
 });

@@ -102,6 +102,7 @@ warning 6002: The table/view 'BARS.V_STO_DET' does not have a primary key define
             <PropertyRef Name="NAZN" />
             <PropertyRef Name="OKPO" />
             <PropertyRef Name="WEND" />
+            <PropertyRef Name="OPERW_EXISTANCE" />
           </Key>
           <Property Name="IDS" Type="number" Precision="38" Scale="0" Nullable="false" />
           <Property Name="IDD" Type="number" Precision="38" Scale="0" Nullable="false" />
@@ -125,6 +126,7 @@ warning 6002: The table/view 'BARS.V_STO_DET' does not have a primary key define
           <Property Name="OKPO" Type="varchar2" MaxLength="10" Nullable="false" />
           <Property Name="DAT0" Type="date" />
           <Property Name="WEND" Type="number" Precision="38" Scale="0" Nullable="false" />
+          <Property Name="OPERW_EXISTANCE" Type="number" Precision="38" Scale="0" Nullable="false" />
           <Property Name="BRANCH" Type="varchar2" MaxLength="30" />
           <Property Name="BRANCH_MADE" Type="varchar2" MaxLength="30" />
           <Property Name="DATETIMESTAMP" Type="timestamp" Precision="6" />
@@ -203,6 +205,7 @@ warning 6035: The relationship 'FK_STODET_STOLST2' has columns that are not part
 "V_STO_DET"."OKPO" AS "OKPO", 
 "V_STO_DET"."DAT0" AS "DAT0", 
 "V_STO_DET"."WEND" AS "WEND", 
+"V_STO_DET"."OPERW_EXISTANCE" AS "OPERW_EXISTANCE", 
 "V_STO_DET"."BRANCH" AS "BRANCH", 
 "V_STO_DET"."BRANCH_MADE" AS "BRANCH_MADE", 
 "V_STO_DET"."DATETIMESTAMP" AS "DATETIMESTAMP", 
@@ -388,6 +391,7 @@ FROM "BARS"."V_STO_DET_HIST" "V_STO_DET_HIST"</DefiningQuery>
             <PropertyRef Name="NAZN" />
             <PropertyRef Name="OKPO" />
             <PropertyRef Name="WEND" />
+            <PropertyRef Name="OPERW_EXISTANCE" />
           </Key>
           <Property Name="IDS" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
           <Property Name="IDD" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
@@ -411,6 +415,7 @@ FROM "BARS"."V_STO_DET_HIST" "V_STO_DET_HIST"</DefiningQuery>
           <Property Name="OKPO" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="DAT0" Type="DateTime" />
           <Property Name="WEND" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
+		  <Property Name="OPERW_EXISTANCE" Type="Decimal" Nullable="false" Precision="38" Scale="0" />
           <Property Name="BRANCH" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="BRANCH_MADE" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="DATETIMESTAMP" Type="DateTime" Precision="6" />
@@ -529,6 +534,7 @@ FROM "BARS"."V_STO_DET_HIST" "V_STO_DET_HIST"</DefiningQuery>
                 <ScalarProperty Name="BRANCH_MADE" ColumnName="BRANCH_MADE" />
                 <ScalarProperty Name="BRANCH" ColumnName="BRANCH" />
                 <ScalarProperty Name="WEND" ColumnName="WEND" />
+                <ScalarProperty Name="OPERW_EXISTANCE" ColumnName="OPERW_EXISTANCE" />
                 <ScalarProperty Name="DAT0" ColumnName="DAT0" />
                 <ScalarProperty Name="OKPO" ColumnName="OKPO" />
                 <ScalarProperty Name="FSUM" ColumnName="FSUM" />

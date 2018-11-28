@@ -44,6 +44,22 @@ end;
 PROMPT *** ALTER_POLICIES to FIN_DEBT ***
  exec bpa.alter_policies('FIN_DEBT');
 
+declare
+  v_num integer;
+begin
+  select count(1) into v_num 
+    from user_tab_columns 
+    where table_name = 'FIN_DEBT'
+      and column_name = 'TERM_DAY';
+  if v_num = 0 then
+    execute immediate 'ALTER TABLE FIN_DEBT ADD TERM_DAY NUMBER';
+  end if;
+end;
+/
+
+COMMENT ON COLUMN FIN_DEBT.TERM_DAY
+IS 'номер дня – кінцевий день кожного місяця для погашення';
+
 
 COMMENT ON TABLE BARS.FIN_DEBT IS 'Довідник рахунків дебіторської заборгованості';
 COMMENT ON COLUMN BARS.FIN_DEBT.NBS_N IS 'Бал/ob22 дебіторської заборгованості';

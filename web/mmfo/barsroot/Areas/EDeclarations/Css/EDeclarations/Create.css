@@ -1,0 +1,91 @@
+﻿#form-horizontal {
+    margin: 0;
+    padding: 0;
+}
+
+    #form-horizontal li {
+        list-style: none;
+        padding-bottom: .7em;
+        text-align: left;
+    }
+
+    #form-horizontal label {
+        display: block;
+        padding-bottom: .3em;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: #444;
+    }
+
+    #form-horizontal li.status {
+        text-align: center;
+    }
+
+    #form-horizontal li .k-widget:not(.k-tooltip),
+    #form-horizontal li .k-textbox {
+        margin: 0 5px 5px 0;
+    }
+
+input#PersonDocSerial {
+    /*text-transform: uppercase;*/
+}
+
+span .k-input, #PersonDocType_listbox li{
+    font-size: 12px;
+}
+
+.confirm {
+    padding-top: 1em;
+}
+
+.valid {
+    color: green;
+}
+
+.invalid {
+    color: red;
+}
+
+#form-horizontal input[type="checkbox"] {
+    margin: 0 5px 0 0;
+}
+
+span.k-widget.k-tooltip-validation {
+    display: inline-block;
+    width: 160px;
+    text-align: left;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: none;
+    box-shadow: none;
+    color: red;
+}
+
+.k-tooltip-validation .k-warning {
+    display: none;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 19000;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba( 255, 255, 255, .8 ) url('/barsroot/content/spinners/ajax-loader.gif') 50% 50% no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+form.loading .modal {
+    overflow: hidden;
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+form.loading .modal {
+    display: block;
+}

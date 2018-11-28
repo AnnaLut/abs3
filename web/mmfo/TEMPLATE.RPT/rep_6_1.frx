@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="07/09/2018 11:13:56" ReportInfo.Modified="10/18/2018 17:47:50" ReportInfo.CreatorVersion="2014.1.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="Connection" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select rec.name,&#13;&#10;rec.inn,&#13;&#10;case rec.cl_type when 1 then 'ФЛ' when 2 then 'ЮЛ' end cl_type_name,&#13;&#10;rec.doc_no,&#13;&#10;rec.doc_who,&#13;&#10;rec.doc_date,&#13;&#10;rec.res_date,&#13;&#10;rec.res_code,&#13;&#10;rec.courtname,&#13;&#10;rec.account nls,&#13;&#10;rec.cur_name,&#13;&#10;rec.amount,&#13;&#10;rec.KF,&#13;&#10;rec.branch,&#13;&#10;rec.EXTRACT_NUMBER_ID,&#13;&#10;to_char(sysdate,'HH24:mm:ss') time,&#13;&#10;trunc (sysdate)  date1,&#13;&#10;(select fio from  staff$base where id=user_id) FIO&#13;&#10;from bills.v_ca_receivers rec&#13;&#10;where rec.EXTRACT_NUMBER_ID = :extract_number_id and status in ('SN', 'VH')">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="CL_TYPE_NAME" DataType="System.String"/>
+        <Column Name="DOC_NO" DataType="System.String"/>
+        <Column Name="DOC_WHO" DataType="System.String"/>
+        <Column Name="DOC_DATE" DataType="System.DateTime"/>
+        <Column Name="RES_DATE" DataType="System.DateTime"/>
+        <Column Name="RES_CODE" DataType="System.String"/>
+        <Column Name="COURTNAME" DataType="System.String"/>
+        <Column Name="CUR_NAME" DataType="System.String"/>
+        <Column Name="AMOUNT" DataType="System.Double"/>
+        <Column Name="KF" DataType="System.Int32"/>
+        <Column Name="BRANCH" DataType="System.String"/>
+        <Column Name="EXTRACT_NUMBER_ID" DataType="System.Decimal"/>
+        <Column Name="NLS" DataType="System.String"/>
+        <Column Name="TIME" DataType="System.String"/>
+        <Column Name="DATE1" DataType="System.DateTime"/>
+        <Column Name="FIO" DataType="System.String"/>
+        <CommandParameter Name="extract_number_id" DataType="112" Expression="[extract_number_id]" DefaultValue="945"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="extract_number_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="500" PaperHeight="210" FirstPageSource="15" OtherPagesSource="15">
+    <ReportTitleBand Name="ReportTitle1" Width="1814.4" Height="255.15">
+      <TextObject Name="Text1" Left="529.2" Top="113.4" Width="859.95" Height="28.35" Text="ВИТЯГ з реєстру виплат за рішеннями судів на ____________ 20__ року №   [extract_number_id]" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <PictureObject Name="Picture1" Left="28.35" Top="9.45" Width="387.45" Height="132.3" Image="iVBORw0KGgoAAAANSUhEUgAAAJsAAABNCAYAAACxBha+AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwwAADsMBx2+oZAAABF1JREFUeF7tkwGKHTkQQ/+VcomQ+x8hkHNMKINA0chud//uYoZI8Da2XrWHzFZer18/P0J4mkqWLbSQZQttZNlCG1m20EaWLbSRZQttZNlCG1m20EaWLbSRZQttZNlCG48vm8bNhP+D8f/fiXfhrDqGc8Vp79idUxDnijNx3zNHM5qjmZ1eOfJXGG868Q6cM479rK/MnPYOxLkVHOcLzso7xyDOMcjKVc449s69w3jTiXdAnCs4MzfrKzOnvaJxMzM4zheclXcOcJxnkJWrXHHa38F414mrcJwHyNm+MnPaK5hB1M/QuJmCs/LOAXhEPYOsXGXXIdzdyXjbiatwnAfI2b4yc9oz7Dk8MwNziHrAcf4I/g5hryArV9lxCM/dzXjfiatwnAfI2b4yc9oz7Dk840D4XNG5HX8Ef4ewV5CVqxw5ROfuZvwMJ66COMcgZ/vKzGkPnOOoY9Qj3KmruK7C84xziPYAWbnKyiE68wTj5zhxFY7zADnbV2ZOe+AcRx1AXFfh/h0H77qK9gBZucqRQ3TubsbPcOIqHOcBcravzJz27FZx3xUzh8z6ijr2s34V/Ya/W7nKjkN47m7G+05cheM8QM72lZnTHs71BXLVVXZ69a7XDj2y8itX2XUId3cy3nbiHRDnCs7MzfrKzO32DOJ67QBnp185hDuGM3Pas6tccdrfwXjXiXdBdntwR/Qtfl9B9F7hOYXjuln4DXyjHcOZOe3ZVa66ivp3GO85cQezuNk7QJw7w+4biHPfHcS5q4z3nPiOIM6dYfcNxLnwmfG7cuI7gjh3ht03EOfCZ8bvyonvCOLcGXbfQJwLnxm/KydCuJssW2gjyxbayLKFNrJsoY0sW2gjyxbayLKFNrJsoY2xbH9+//gI4WmybKGNLFtoI8sW2siyhTaybKGNLFtoI8sW2siyhTaybKGNLFtoI8sW2siyhTa+xLK9Xq9/cDPhPPhdfpXf6ZdYtvB/8MiyuX9J3NWZ/9XpvN65Z5zXu+vc2d0du99UD8567XiW4RnMrTr1u2/cxWPL5v5i6GZnnuX7UQ/0Lb2jm5111qFz7rvVnef5zOzO89l5dO7s7uhcfwcty4Y7utnZ3ZlZD2ZvKezddyt4Fmf+ls/coZ+dmZl3d5ydR6ee4Vme0f4OHls2/ZP/Ekdn3BX2OoM79zzLOI/uiKPvZ2+h52+Am131DDue0Z4dA8ceZ3Z38PiyKdy7Gf5e4V5n8D3gTuf4zPCcg+f4O3ToceZOe3SreXWzeXY6MzvP7gy7O3h02fjMfwF3xp2/UXh2NY+7zrHjs5tz8JyedcaBGZ3jHo5nuF/N8x0dOzfH59X9Dr7MsmEeHd+535nH/WhWz7jzmZnN6Cwco57n2LHH+cw87vwN9zg7t/J38MiyheDIsoU2smyhjSxbaCPLFtrIsoU2smyhjSxbaCPLFtrIsoU2smyhjSxbaCPLFtrIsoU2smyhjSxbaGMs2/hvkjyej4+/0toSXVdVStIAAAAASUVORK5CYII="/>
+      <TextObject Name="Text2" Left="1058.4" Top="170.1" Width="378" Height="66.15" Text="Дата формування: [Table.DATE1]&#13;&#10;&#13;&#10;Час формування: [Table.TIME]&#13;&#10;&#13;&#10;" VertAlign="Center">
+        <Formats>
+          <DateFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="260.48" Width="1814.4" Height="236.25" Guides="75.6">
+      <TableObject Name="Table1" Width="1776.6" Height="236.25">
+        <TableColumn Name="Column1" Width="28.35"/>
+        <TableColumn Name="Column2" Width="198.45"/>
+        <TableColumn Name="Column3" Width="170.1"/>
+        <TableColumn Name="Column4" Width="113.4"/>
+        <TableColumn Name="Column5" Width="132.3"/>
+        <TableColumn Name="Column6" Width="141.75"/>
+        <TableColumn Name="Column7" Width="141.75"/>
+        <TableColumn Name="Column8" Width="113.4"/>
+        <TableColumn Name="Column9" Width="151.2"/>
+        <TableColumn Name="Column10" Width="132.3"/>
+        <TableColumn Name="Column11" Width="122.85"/>
+        <TableColumn Name="Column12" Width="151.2"/>
+        <TableColumn Name="Column13" Width="179.55"/>
+        <TableRow Name="Row1" Height="47.25">
+          <TableCell Name="Cell1" Border.Lines="All" Text="№" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Найменування або&#13;&#10;прізвище, імя та по&#13;&#10;батькові стягувача" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Код згідно з&#13;&#10;ЄДРПОУ або&#13;&#10;реєстраційний&#13;&#10;номер облікової&#13;&#10;картки платника&#13;&#10;податків, або серія&#13;&#10;та номер паспорта&#13;&#10;(для осіб, які&#13;&#10;мають відмітку у&#13;&#10;паспорті про&#13;&#10;право здійснювати&#13;&#10;платежі за його&#13;&#10;серією та&#13;&#10;номером)" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Для&#13;&#10;фізичних&#13;&#10;осіб&#13;&#10;серія та&#13;&#10;номер&#13;&#10;паспорта&#13;" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell20" Border.Lines="All" Text="Рішення суду (виконавчий документ)" HorzAlign="Center" VertAlign="Center" ColSpan="4"/>
+          <TableCell Name="Cell21" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell22" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell23" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell24" Border.Lines="All" Text="Сума за рішенням суду&#13;&#10;(виконавчим документом)" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+          <TableCell Name="Cell25" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="Код банку&#13;" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="Номер рахунка&#13;" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Відокремлений підрозділ банку" HorzAlign="Center" VertAlign="Center" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="170.1">
+          <TableCell Name="Cell6" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell7" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell8" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell9" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="дата прийняття&#13;&#10;рішення (видачі&#13;&#10;виконавчого&#13;&#10;документа)&#13;" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell30" Border.Lines="All" Text="номер рішення&#13;&#10;(виконавчого&#13;&#10;документа)&#13;" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell31" Border.Lines="All" Text="найменування&#13;&#10;суду (органу,&#13;&#10;що видав&#13;&#10;виконавчий&#13;&#10;документ)&#13;" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell32" Border.Lines="All" Text="номер заяви&#13;&#10;стягувача та назва&#13;&#10;рішення (для&#13;&#10;Європейського суду з&#13;&#10;прав людини)" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell33" Border.Lines="All" Text="назва валюти" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell34" Border.Lines="All" Text="сума" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell35" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell36" Border.Lines="All" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell37" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+        <TableRow Name="Row3">
+          <TableCell Name="Cell11" Border.Lines="All" Text="1" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell12" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell13" Border.Lines="All" Text="3" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell14" Border.Lines="All" Text="4" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell38" Border.Lines="All" Text="5" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell39" Border.Lines="All" Text="6" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell40" Border.Lines="All" Text="7" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell41" Border.Lines="All" Text="8" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell42" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell43" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell44" Border.Lines="All" Text="11" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell45" Border.Lines="All" Text="12" HorzAlign="Center" VertAlign="Center"/>
+          <TableCell Name="Cell46" Border.Lines="All" Text="13" HorzAlign="Center" VertAlign="Center"/>
+        </TableRow>
+      </TableObject>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="502.07" Width="1814.4" Height="18.9" CanGrow="true" CanBreak="true" DataSource="Table">
+      <TableObject Name="Table2" Width="1776.6" Height="18.9" AdjustSpannedCellsWidth="true">
+        <TableColumn Name="Column14" Width="28.35"/>
+        <TableColumn Name="Column15" Width="198.45"/>
+        <TableColumn Name="Column16" Width="170.1"/>
+        <TableColumn Name="Column17" Width="113.4"/>
+        <TableColumn Name="Column18" Width="132.3"/>
+        <TableColumn Name="Column19" Width="141.75"/>
+        <TableColumn Name="Column20" Width="141.75"/>
+        <TableColumn Name="Column21" Width="113.4"/>
+        <TableColumn Name="Column22" Width="151.2"/>
+        <TableColumn Name="Column23" Width="132.3"/>
+        <TableColumn Name="Column24" Width="122.85"/>
+        <TableColumn Name="Column25" Width="151.2"/>
+        <TableColumn Name="Column26" Width="179.55"/>
+        <TableRow Name="Row4" AutoSize="true">
+          <TableCell Name="Cell47" Border.Lines="All"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="[Table.NAME]"/>
+          <TableCell Name="Cell49" Border.Lines="All" Text="[Table.INN]"/>
+          <TableCell Name="Cell50" Border.Lines="All" Text="[Table.DOC_NO]"/>
+          <TableCell Name="Cell51" Border.Lines="All" Text="[Table.RES_DATE]"/>
+          <TableCell Name="Cell72" Border.Lines="All" Text="[Table.RES_CODE]"/>
+          <TableCell Name="Cell73" Border.Lines="All" Text="[Table.COURTNAME]"/>
+          <TableCell Name="Cell74" Border.Lines="All"/>
+          <TableCell Name="Cell75" Border.Lines="All" Text="[Table.CUR_NAME]"/>
+          <TableCell Name="Cell76" Border.Lines="All" Text="[Table.AMOUNT]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="," Format.GroupSeparator=" " Format.NegativePattern="1"/>
+          <TableCell Name="Cell77" Border.Lines="All" Text="[Table.KF]"/>
+          <TableCell Name="Cell78" Border.Lines="All" Text="[Table.NLS]"/>
+          <TableCell Name="Cell79" Border.Lines="All" Text="[Table.BRANCH]"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="526.3" Width="1814.4" Height="37.8">
+      <TextObject Name="Text3" Left="9.45" Top="9.45" Width="444.15" Height="18.9" Text="Виконавець:  [Table.FIO]" VertAlign="Center"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

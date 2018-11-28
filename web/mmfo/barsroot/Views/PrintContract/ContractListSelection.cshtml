@@ -4,9 +4,13 @@
     string[] SendTicketToEa = new string[] {  "DKBOEA26_CANCEL_FRX",
                                               "DKBOEA10_ADDCARD_FRX",
                                               "DKBOEA12_CARDHOLDER_CLAIM_FRX",
-                                              "ACC_3_BPK_ZAYAVA_NEW_VAL_1_FRX",
-                                              "ACC_3_BPK_ZAYAVA_NEW_VAL_2_FRX",
-                                              "DKBOEA12A_DODCLIENTS_CLAIM_FRX" };
+                                              "DKBOEA12A_DODCLIENTS_CLAIM_FRX",
+                                              "ACC_1_BPK_ZAYAVA_NEW_FRX",
+                                              "ACC_1_BPK_ZAYAVA_NEW_DKBO_KK_FRX",
+                                              "ACC_1_BPK_ZAYAVA_NEW_KKU_FRX",
+                                              "ACC_1_BPK_ZAYAVA_NEW_PENS_FRX",
+                                              "ACC_1_BPK_ZAYAVA_NEW_PENS_SOC_FRX",
+                                              "ACC_1_BPK_ZAYAVA_NEW_PENS_VIJSK_FRX"};
 }
 @foreach (var contract in Model)
 {
@@ -32,7 +36,7 @@
                     @*отключить возможность подписания кредитных заявок с последующей отправкой в ЭА*@
                     if (!SendTicketToEa.Contains(contract.Id))
                     {
-                        <td>
+                        <td width="100">
                             <input type="checkbox"
                                    id="signed"
                                    disabled="disabled" />
@@ -40,23 +44,24 @@
                     }
                     else
                     {
-                        <td>
+                        <td bgcolor="crimson" width="100">
                             <input type="checkbox"
                                    id="signed"
-                                   onclick="if(confirm('Підписати документ?')) SignDocument(@contract.State); else UpdatePage();" />
+                                   onclick="if(confirm('Підписати документ?')) SignDocument(@contract.State); else UpdatePage();"
+                                   title="Потрібно натиснути тут" />
+                            <font color="ghostwhite" size="12">Необхідно підписати!</font>
                         </td>
                         }
                 }
 
                 if (@contract.State > 0)
                 {
-                    <td>
+                    <td width="100">
                         <input type="checkbox"
                                 id="signed"
                                 checked="checked"
                                 disabled="disabled" />
-                        @*Html.Label(contract.State.ToString(), new { @class = "label" })*@
-
+                        
                         @if (contract.DKBO_NUMBER != null)
                         {
                             <a href="" onclick="EADocsView_ShowDialog('@contract.RNK.ToString()','@contract.PRINT_NUMBER.ToString().Replace("-", "")')">Перегляд док. ЕА</a>

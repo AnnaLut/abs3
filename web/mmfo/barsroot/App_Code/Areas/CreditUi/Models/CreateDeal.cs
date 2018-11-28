@@ -66,5 +66,6 @@ namespace BarsWeb.Areas.CreditUi.Models
         public string DAYNPNAME { get; set; }
         public decimal? LIM { get; set; }
         public int? INSPECTOR_ID { get; set; }
+        public CustomerInfo CUST_DATA { get; set; }
     }
 }

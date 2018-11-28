@@ -219,6 +219,20 @@ angular.module("BarsWeb.Areas").factory('dataService', function(){
             save.diffDaysValue = save.dayPayDiffValue ? true : false;
             save.lim = resp.LIM;
             save.inspector_id = resp.INSPECTOR_ID;
+        },
+        CUST_INFO: function () {
+            return {
+                EDRPO: null,
+                EDUCA: null,
+                MEMB: null,
+                NAMEW: null,
+                NREMO: null,
+                REMO: null,
+                STAT: null,
+                TYPEW: null,
+                REAL6INCOME: null,
+                NOREAL6INCOME: null
+        	}
         }
     };
 });

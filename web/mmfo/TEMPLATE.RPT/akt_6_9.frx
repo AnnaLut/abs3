@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/31/2018 10:57:00" ReportInfo.Modified="07/05/2018 17:05:49" ReportInfo.CreatorVersion="2014.3.2.0">
+  <Dictionary>
+    <OracleDataConnection Name="sberdev" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoWXUDfStkW0ICxUpS+2ugIw">
+      <TableDataSource Name="Table" DataType="System.Int32" Enabled="true" SelectCommand="select &#13;&#10;'Номер векселя '||BILL_NO|| ' сума векселя '||AMOUNT||' строк платежу '||to_char(DT_PAYMENT,'dd.mm.yyyy') VEKSEL,&#13;&#10;name,&#13;&#10;inn,&#13;&#10;bill_no,&#13;&#10;cast(amount as number(12, 2)) as amount,&#13;&#10;count( * ) over(order by 1) as cnt_overral,&#13;&#10;dt_payment,&#13;&#10;cast(sum(amount) over(order by 1) as number(12, 2)) as sum_overral&#13;&#10;from bills.v_rec_bills t where exp_id = :exp_id&#13;&#10;&#13;&#10;">
+        <Column Name="NAME" DataType="System.String"/>
+        <Column Name="INN" DataType="System.String"/>
+        <Column Name="BILL_NO" DataType="System.String"/>
+        <Column Name="AMOUNT" DataType="System.Double"/>
+        <Column Name="CNT_OVERRAL" DataType="System.Decimal"/>
+        <Column Name="SUM_OVERRAL" DataType="System.Double"/>
+        <Column Name="DT_PAYMENT" DataType="System.DateTime"/>
+        <Column Name="VEKSEL" DataType="System.String"/>
+        <CommandParameter Name="exp_id" DataType="112" Expression="[exp_id]" DefaultValue="0"/>
+      </TableDataSource>
+    </OracleDataConnection>
+    <Parameter Name="exp_id" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1">
+    <DataBand Name="Data1" Top="268.51" Width="718.2" Height="18.9" CanGrow="true" CanShrink="true" DataSource="Table">
+      <TextObject Name="Text1" Left="-9.45" Width="661.5" Height="18.9" Text="    [Table.VEKSEL]"/>
+      <DataHeaderBand Name="DataHeader1" Width="718.2" Height="264.51" Guides="274.05">
+        <TableObject Name="Table2" Top="9.45" Width="708.76" Height="255.06">
+          <TableColumn Name="Column3" Width="354.38"/>
+          <TableColumn Name="Column4" Width="354.38"/>
+          <TableRow Name="Row5" Height="68.49">
+            <TableCell Name="Cell18" Text="6.9. Додаток 9" Font="Arial, 10pt, style=Bold"/>
+            <TableCell Name="Cell19"/>
+          </TableRow>
+          <TableRow Name="Row6" Height="68.49">
+            <TableCell Name="Cell23" Text="АКТ&#13;&#10;Приймання-передачі векселів" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" ColSpan="2"/>
+            <TableCell Name="Cell24"/>
+          </TableRow>
+          <TableRow Name="Row7" Height="68.49">
+            <TableCell Name="Cell28" Text="&lt;&lt;__&gt;&gt;______________2018 р.                     ________________________________________     &#13;&#10;" HorzAlign="Center" VertAlign="Center" ColSpan="2"/>
+            <TableCell Name="Cell29"/>
+          </TableRow>
+          <TableRow Name="Row8" Height="49.59">
+            <TableCell Name="Cell33" Text="Ми, що нижче підписалися, представник АТ &quot;Ощадбанк&quot;, в особі          ___________________________, склали цей Акт про наступне.&#13;&#10;  АТ &quot;Ощадбанк&quot; видав, а [Table.NAME], [Table.INN]   прийняв веселі в кількості  [Table.CNT_OVERRAL] штук,     " ColSpan="2"/>
+            <TableCell Name="Cell34"/>
+          </TableRow>
+        </TableObject>
+      </DataHeaderBand>
+      <DataFooterBand Name="DataFooter1" Top="291.41" Width="718.2" Height="226.78">
+        <TextObject Name="Text2" Width="661.5" Height="18.9" Text="  на загальну суму [Table.SUM_OVERRAL] гривень."/>
+        <TableObject Name="Table1" Top="47.25" Width="708.75" Height="160.63" Border.Lines="All">
+          <TableColumn Name="Column1" Width="311.85"/>
+          <TableColumn Name="Column2" Width="396.9"/>
+          <TableRow Name="Row1" Height="51.97">
+            <TableCell Name="Cell1"/>
+            <TableCell Name="Cell2" Border.Lines="All" Text="[Table.NAME], [Table.INN]"/>
+          </TableRow>
+          <TableRow Name="Row2" Height="23.62">
+            <TableCell Name="Cell6" Border.Lines="All"/>
+            <TableCell Name="Cell7" Border.Lines="All"/>
+          </TableRow>
+          <TableRow Name="Row3" Height="51.97">
+            <TableCell Name="Cell11" Border.Lines="All" Text="________________"/>
+            <TableCell Name="Cell12" Border.Lines="All" Text="_________________підпис фізичної особи або уповноваженої особи для юридичних осіб"/>
+          </TableRow>
+          <TableRow Name="Row4" Height="33.07">
+            <TableCell Name="Cell16"/>
+            <TableCell Name="Cell17" Border.Lines="All"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+    </DataBand>
+  </ReportPage>
+</Report>

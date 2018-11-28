@@ -1,0 +1,19 @@
+using BarsWeb.Areas.Kernel.Models;
+using Oracle.DataAccess.Client;
+using System;
+using System.Data;
+
+namespace BarsWeb.Areas.EDeclarations.Infrastructure.DI.Implementation {
+    public class SqlCreator
+    {
+        public static BarsSql SearchMain()
+        {
+            return new BarsSql()
+            {
+                SqlText = @"select * from bars.v_eds_request_audit",
+                SqlParams = new object[] { }
+            };
+
+        }
+    }
+}

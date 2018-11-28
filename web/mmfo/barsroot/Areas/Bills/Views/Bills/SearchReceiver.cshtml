@@ -1,0 +1,84 @@
+﻿@using BarsWeb.Areas.Bills.Model
+@model IEnumerable<ExpectedReceivers>
+@{
+    @* View для отображения результата поиска решения *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    String message = String.IsNullOrEmpty((String)ViewBag.Err) ? "Пошук не дав жодного результату" : (String)ViewBag.Err;
+}
+
+<div style="margin-left: 20px; margin-right: 20px;">
+    <div class="page-header">
+        <h1 id="title">Результат пошуку</h1>
+    </div>
+    <div>
+        @if (message == "Пошук не дав жодного результату" && Model.Count() > 0)
+        {
+            @(Html.Kendo().Grid(Model).
+                 Name("expectedGrid")
+                 .Columns(col =>
+                 {
+                     col.Bound(x => x.RECEIVER_NAME).Title("ПІБ/Найменування отримувача"); ;
+                     col.Bound(x => x.RECEIVER_CODE).Title("ІПН/ЄДРПОУ");
+                     col.Bound(x => x.RECEIVER_DOC_NO).Title("Номер документу");
+                     col.Bound(x => x.AMOUNT).Title("Сума");
+                     col.Bound(x => x.CURRENCY_ID).Title("Код валюти");
+                     col.Template(templ => "<button class='k-button' onclick='AddResceiver(" + templ.EXP_ID + ")'>Додати</button>");
+                 })
+                 .Sortable()
+                 .Scrollable()
+                 .Filterable()
+                 .Pageable(page => page
+                    .Refresh(true)
+                    .PageSizes(true)
+                    .ButtonCount(5))
+                 .DataSource(source => source.Server())
+            )
+        }
+        else
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2 col-xs-3">
+                    <b>Статус пошуку</b>
+                </label>
+                <div class="col-md-4 col-xs-6">
+                    <label>@Html.Raw(message)</label>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+<script>
+    (function () {
+        window.parent.$('.k-overlay').css('z-index', '10002');
+    })()
+    function AddResceiver(id) {
+        window.parent.$('.k-overlay').css('z-index', '15002');
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: '/barsroot/api/bills/bills/BillsRequest?method=SelectReceiver&str=""&id=0' + id,
+            success: function (result) {
+                window.parent.$('.k-overlay').css('z-index', '10002');
+                if (result.status == 1) {
+                    bars.ui.alert({
+                        text: 'Додано до списку!',
+                        close: function (e) {
+                            window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+                        }
+                    });
+                }
+                else {
+                    bars.ui.error({
+                        text: result.err
+                    });
+                }
+            },
+            error: function (result) {
+                window.parent.$('.k-overlay').css('z-index', '10002');
+                alert(result);
+            }
+        });
+
+    }
+</script>

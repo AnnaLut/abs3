@@ -7,7 +7,7 @@ is
   --
   -- основной пакет процедур для работы модуля "Вклады населения-WEB"
   --
-  g_header_version  constant varchar2(32)  := 'version 40.02  30.05.2018';
+  g_header_version  constant varchar2(32)  := 'version 40.03  08.10.2018';
   g_awk_header_defs constant varchar2(512) := 'расширенный функционал: '                              || chr(10) ||
                                               '  - учет доп.соглашений'                               || chr(10) ||
                                               '  - формирование запросов'                             || chr(10) ||
@@ -227,6 +227,17 @@ is
                                     p_restrcpacc    in dpt_deposit.nls_d%type, -- счет получателя депозита
                                     p_restrcpmfo    in dpt_deposit.mfo_d%type); -- МФО счета получателя депозита
 
+  --
+  --  Пакетное изменение даты окончания вклада
+  --
+  procedure change_deposit_end_date
+  ( p_old_dat_end in    date,
+    p_new_dat_end in    date,
+    p_ext         in    number default 0, -- признак отказа от автопролонгации (0 - все, 1 - с отказом от автопролонгации)
+    p_runid        in  dpt_jobs_jrnl.run_id%type default 0, -- Ід. запуску автомат.завдання
+    p_bdate        in  fdat.fdat%type  default gl.bDATE  -- текущая банковская дата
+  );
+  
   --
   -- Перерасчет процентов при частичном снятия суммы депозита
   --
@@ -1047,6 +1058,8 @@ is
   function check_for_extension(p_dptid in dpt_deposit.deposit_id%type)
     return number;
 
+  
+  
 end dpt_web;
 /
 
@@ -1055,7 +1068,7 @@ show errors;
 create or replace package body DPT_WEB
 is
 
-  g_body_version  constant varchar2(32)  := 'version 48.13  22.10.2018';
+  g_body_version  constant varchar2(32)  := 'version 48.12  08.10.2018';
   g_awk_body_defs constant varchar2(512) := 'Сбербанк' || chr(10) ||
                                             'KF - мульти-МФО схема с доступом по филиалам' || chr(10) ||
                                             'MULTIFUNC - расширенный функционал' || chr(10) ||
@@ -19478,6 +19491,138 @@ is
     return l_out;
   end;
 
+  --
+  --  Пакетное изменение даты окончания вклада
+  --
+  procedure change_deposit_end_date
+  ( p_old_dat_end in    date,
+    p_new_dat_end in    date,
+    p_ext         in    number default 0, -- признак отказа от автопролонгации (0 - все, 1 - с отказом от автопролонгации)
+    p_runid        in  dpt_jobs_jrnl.run_id%type default 0, -- Ід. запуску автомат.завдання
+    p_bdate        in  fdat.fdat%type default gl.bDATE      -- текущая банковская дата
+  ) is
+    title        constant varchar2(64) := 'dpt_web.change_deposit_end_date: ';
+    l_jobid      constant dpt_jobs_list.job_id%type := 290; -- Ідентифікатор завдання
+    l_runid      dpu_jobs_jrnl.run_id%type;                 -- Ідентификатор запуску
+    l_branch     dpt_deposit.branch%type;
+    l_errmsg     sec_audit.rec_message%type;
+    l_msg        varchar2(3000) := '';
+    l_err_cnt    number := 0;
+    cursor c_dpt is
+    select dd.kf, dd.deposit_id, dd.acc, dd.rnk, dd.dat_begin, dd.dat_end, dd.cnt_dubl, dd.nd, a.nls, dd.kv
+           from dpt_deposit dd
+           join accounts a
+               on ( a.KF = dd.KF and a.ACC = dd.ACC )
+           left join dpt_extrefusals r on (r.dptid = dd.deposit_id and r.req_state = 1)    
+           where dd.dat_end = p_old_dat_end
+            and (p_ext = 0 or (p_ext = 1 and r.dptid is not null));
+    t_dpt c_dpt%rowtype;    
+    
+  begin
+
+    bars_audit.trace( '%s: Entry, runid=>%s, bdate=>%s, old_date_end=>%s, new_date_end=>%s', title, to_char(p_runid), to_char(p_bdate,'dd.mm.yyyy'), 
+    to_char(p_old_dat_end,'dd.mm.yyyy'), to_char(p_new_dat_end,'dd.mm.yyyy'));
+
+    --проверяем, банковская ли дата, которая указана, как новая
+    if trunc(dat_next_u(p_new_dat_end,0)) <> trunc(p_new_dat_end) then
+      RAISE_APPLICATION_ERROR( -20666, 'Обрана дата '||to_char(p_new_dat_end,'dd.mm.yyyy')||' не є банківською!', true );
+    end if;
+    
+    l_branch := sys_context('bars_context','user_branch');
+
+    if ( length(l_branch)=8 )
+    then
+      dbms_application_info.set_module( g_modcode, 'CHANGE_DPT_DATE_END');
+    else
+      RAISE_APPLICATION_ERROR( -20666, 'Забрононено виконання '||to_char((length(l_branch)-1)/7)||' рівні!', true );
+--    bars_error.raise_nerror( g_modcode, 'GENERAL_ERROR_CODE', 'Забрононено виконання рівні /' );
+    end if;
+
+    if ( nvl(p_runid,0)=0 )
+    then -- фіксація старту виконання автоматичного завдання в журналі виконання
+      DPT_JOBS_AUDIT.P_START_JOB( p_modcode => g_modcode
+                                , p_jobid   => l_jobid
+                                , p_branch  => l_branch
+                                , p_bdate   => p_bdate
+                                , p_run_id  => l_runid );
+    else
+      l_runid := p_runid;
+    end if;
+
+    bars_audit.info( bars_msg.get_msg( g_modcode, 'CHANGE_DPT_DATE_END_ENTRY', l_branch ) );
+
+    OPEN c_dpt;
+   
+    << FETCH_CRSR >>
+    loop
+      fetch c_dpt
+       into t_dpt;
+      
+      exit when c_dpt%notfound;
+      
+      l_errmsg := null;      
+      savepoint del_ok;
+
+      begin
+        bars_audit.trace( '%s: deposit_id =>%s ', title, to_char(t_dpt.deposit_id));
+        dpt.correct_deposit_term(t_dpt.deposit_id, trunc(t_dpt.dat_begin), trunc(t_dpt.dat_end), trunc(t_dpt.dat_begin), trunc(p_new_dat_end), t_dpt.cnt_dubl);
+        l_msg := 'Для депозита '||to_char(t_dpt.deposit_id)||' дата окончания '||to_char(p_old_dat_end,'dd.mm.yyyy')||' изменена на '|| to_char(p_new_dat_end,'dd.mm.yyyy');
+      exception
+              when others then
+                l_err_cnt := l_err_cnt + 1;
+                l_errmsg := substr( dbms_utility.format_error_stack() || dbms_utility.format_error_backtrace(), 1, g_errmsg_dim );
+                bars_audit.error( 'Помилка зміни кінцевої дати деп.дог. ID ' || to_char(t_dpt.deposit_id) || l_errmsg );
+                rollback to del_ok;
+      end;
+    
+      if mod(c_dpt%rowcount,500) = 0 then
+        commit;
+      end if;  
+
+          -- запись в журнал
+          DPT_JOBS_AUDIT.P_SAVE2LOG( p_runid      => l_runid
+                                   , p_dptid      => t_dpt.deposit_id
+                                   , p_dealnum    => t_dpt.nd
+                                   , p_branch     => l_branch
+                                   , p_ref        => null
+                                   , p_rnk        => t_dpt.rnk
+                                   , p_nls        => t_dpt.nls
+                                   , p_kv         => t_dpt.kv
+                                   , p_dptsum     => null
+                                   , p_intsum     => null
+                                   , p_status     => case when l_errmsg is null then 1 else -1 end
+                                   , p_errmsg     => case when l_errmsg is null then l_msg else l_errmsg end
+                                   , p_contractid => null );
+
+    end loop FETCH_CRSR;
+    
+    commit;
+    
+    l_msg := 'Для РУ '||sys_context( 'bars_context', 'user_mfo' )||' депозитам з датою закінчення '||to_char(p_old_dat_end,'dd.mm.yyyy')
+    ||' встановлена нова дата закінчення - '||to_char(p_new_dat_end,'dd.mm.yyyy')||chr(10)
+    ||' Оброблено '||to_char(c_dpt%rowcount)||' депозитів. З них оброблено з помилкою - '||to_char(l_err_cnt)||chr(10)||
+    'Для більш детальної інформації сформуйте звіт №3062 ';
+    
+    CLOSE c_dpt;
+
+    if ( nvl(p_runid,0)=0 )
+    then -- фіксація успішного завершення автоматичного завдання в журналі
+      DPT_JOBS_AUDIT.P_FINISH_JOB( g_modcode, l_runid );
+    end if;
+    bars_audit.info(l_msg);
+    bars_audit.info( bars_msg.get_msg( g_modcode, 'CHANGE_DPT_DATE_END_DONE', l_branch ) );
+    
+     bms.send_message(p_receiver_id     => user_id,
+                      p_message_type_id => 1,
+                      p_message_text    => l_msg,
+                      p_delay           => 0,
+                      p_expiration      => 0);
+     
+    dbms_application_info.set_module(NULL, NULL);
+    dbms_application_info.set_client_info(NULL);
+
+  end change_deposit_end_date;
+  
 end dpt_web;
 /
 

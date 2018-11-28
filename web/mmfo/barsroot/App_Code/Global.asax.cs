@@ -206,9 +206,10 @@ namespace BarsWeb
 
         public void Session_OnEnd()
         {
-            var sessionId = this.Session.SessionID;
-            AccountRepository accountRepository = new AccountRepository(new AppModel(), null);
-            accountRepository.LogOutUser(this.Session);
+            new AccountRepository(new AppModel(), null).ClearSessionTmpDir();
+			//var sessionId = this.Session.SessionID;
+            //AccountRepository accountRepository = new AccountRepository(new AppModel(), null);
+            //accountRepository.LogOutUser(this.Session);
         }
 
         public static void EnsureSsl()

@@ -26,6 +26,7 @@ namespace BarsWeb.Areas.Sto
         public DateTime? sdate{ get; set; }
         public decimal idd { get; set; }             
         public decimal status { get; set; }   
-        public string status_text { get; set; }   
+        public string status_text { get; set; }
+        public string govBuyCode { get; set; }
     }
 }

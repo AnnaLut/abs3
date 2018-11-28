@@ -1,0 +1,133 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model List<ParameterViewModel>
+@{
+    Layout = null;
+    @* View для формирования отчетов *@
+}
+<style>
+    .form-group-padding{
+        padding-bottom: 10px;
+    }
+</style>
+
+<div class="row">
+    @using (Ajax.BeginForm("GetReport", "Report", new AjaxOptions { HttpMethod = "POST" }, new { id = "report-form", target = "_blank" }))
+    {
+        @*ИД отчета*@
+        <input type="hidden" value="@ViewBag.ReportId.ToString()" name="report_id" id="report_id" />
+        <div class="col-xs-12">
+            @for (Int32 i = 0; i < Model.Count(); ++i)
+            {
+                if (!String.IsNullOrEmpty(Model[i].PARAM_TYPE) && !String.IsNullOrEmpty(Model[i].PARAM_NAME))
+                {
+                        <div class="form-horizontal container-fluid">
+                            <div class="form-group form-group-padding">
+                                    @Html.Label("info" + i, Model[i].PARAM_NAME, new { @class = "control-label col-md-4 col-xs-5", style = "text-align: left; margin-top: 6px;" })
+                                <div class="col-md-6 col-xs-6">
+                                    <input type="hidden" id="@String.Format("argument{0}", i)" name="@String.Format("argument{0}", i)" value="@Model[i].PARAM_CODE" />
+                                    <input type="hidden" id="@String.Format("type{0}", i)" name="@String.Format("type{0}", i)" value="@Model[i].PARAM_TYPE" />
+                                    @{
+                                        String readOnly = String.IsNullOrEmpty(Model[i].VALUES) ? "false" : "readonly";
+                                        String style = String.IsNullOrEmpty(Model[i].VALUES) ? "" : "width: 85%; float: left;  background-color: lightgray;";
+                                        String requiredClass = !Model[i].NULLABLE.HasValue || Model[i].NULLABLE.Value == 1 ? "required" : "";
+                                    }
+                                    @if (!String.IsNullOrEmpty(Model[i].VALUES))
+                                    {
+                                        <button class="k-button" style="float: right;" title="Вибрати значення" onclick="OpenSelectWindow('@Model[i].PARAM_CODE', '@Model[i].VALUES', '@Model[i].PARAM_NAME', '@Model[i].PARAM_TYPE.ToLower()'); return false;">
+                                            <span class="glyphicon glyphicon-modal-window"></span>
+                                        </button>
+                                    }
+                                    @switch (Model[i].PARAM_TYPE.ToLower())
+                                    {
+                                        case "number":
+                                            if (!String.IsNullOrEmpty(Model[i].VALUES))
+                                            {
+                                                <input class="k-textbox @requiredClass" type="number" id="@Model[i].PARAM_CODE" name="@Model[i].PARAM_CODE" style="@style" readonly="readonly" data-type="NUMBER" onkeyup="onEdit();" />
+                                            }
+                                            else
+                                            {
+                                                <input class="k-textbox @requiredClass" type="number" id="@Model[i].PARAM_CODE" name="@Model[i].PARAM_CODE" required="@Model[i].NULLABLE.Value"  data-type="NUMBER" onkeyup="onEdit();" />
+                                            }
+                                            break;
+                                        case "date":
+                                            if (!String.IsNullOrEmpty(Model[i].VALUES))
+                                            {
+                                                @(Html.Kendo().DatePicker()
+                                                            .Name(Model[i].PARAM_CODE)
+                                                            .Format("dd.MM.yyyy")
+                                                            .Events(e => e.Change("onEdit"))
+                                                            .HtmlAttributes(new { style = style + "text-align: center;", title = "Дата", type = "text", @readonly = "readonly", @class = requiredClass, data_type = "DATE", onkeyup = "onEdit();" }))
+                                            }
+                                            else
+                                            {
+                                                @(Html.Kendo().DatePicker()
+                                                            .Name(Model[i].PARAM_CODE)
+                                                            .Format("dd.MM.yyyy")
+                                                            .Events(e => e.Change("onEdit"))
+                                                            .HtmlAttributes(new { style = "text-align: center;", title = "Дата", type = "text", @class = requiredClass, data_type = "DATE", onkeyup = "onEdit();" }))
+                                            }
+                                            break;
+                                        case "varchar2":
+                                            if (!String.IsNullOrEmpty(Model[i].VALUES))
+                                            {
+                                                @(Html.TextBox(Model[i].PARAM_CODE, "", new { style = style, @class = "k-textbox " + requiredClass, @readonly = "readonly", data_type = "VARCHAR2", onkeyup = "onEdit();" }))
+                                            }
+                                            else
+                                            {
+                                                @(Html.TextBox(Model[i].PARAM_CODE, "", new { @class = "k-textbox " + requiredClass, data_type = "VARCHAR2", onkeyup = "onEdit();" }))
+                                            }
+                                            break;
+                                    }
+                                    <div class="col-xs-offset-3 col-xs-9">
+                                        @if (!Model[i].NULLABLE.HasValue || Model[i].NULLABLE.Value == 1)
+                                        {
+                                            <span style="font-size: 9px; color: red">*обов'язкове для заповнення</span>
+                                        }
+                                    </div>
+                                </div>
+                                </div>
+                        </div>
+                }
+            }
+        </div>
+        <button class="k-button" type="button" onclick="onGetReportSubmit(); return false;">Сформувати звіт</button>
+    }
+</div>
+<script>
+    function onGetReportSubmit() {
+        if (onEdit()) {
+            $("<div class='k-overlay'></div>").appendTo($(document.body));
+            $('#report-form').submit();
+            setTimeout(function () {
+                $(".k-overlay").remove();
+            }, 4000);
+        }
+    }
+
+    function onEdit() {
+        var result = true;
+        var list = $('.required[data-type]');
+        for (var index = 0; index < list.length; ++index) {
+            var item = $(list[index]);
+            var attr = $(item).data('type');
+            if (attr.length) {
+                if ($(item).val().length === 0) {
+                    result = false;
+                    if (attr === 'DATE')
+                        $(item).parent().css('border-color', 'red');
+                    else
+                        $(item).css('border-color', 'red');
+                }
+                else {
+                    if (attr === 'DATE')
+                        $(item).parent().css('border-color', '');
+                    else
+                        $(item).css('border-color', '');
+                }
+
+            }
+        }
+        return result;
+    }
+</script>

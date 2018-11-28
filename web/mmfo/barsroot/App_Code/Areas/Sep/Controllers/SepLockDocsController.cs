@@ -39,6 +39,7 @@ namespace BarsWeb.Areas.Sep.Controllers
         {
             ViewBag.MFO = _kernelParams.GetParam("MFO").Value;
             ViewBag.IsValidDate = _repo.isValidUserBankDate();
+            ViewBag.IsAutoStp = _repo.isSepAuto();
             return View();
         }
 
@@ -338,6 +339,137 @@ namespace BarsWeb.Areas.Sep.Controllers
 
                 return Json(e.Message, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult GetCodes()
+        {
+            using (var connection = OraConnector.Handler.UserConnection)
+            {
+                var codes = connection.Query<Int32>(@"SELECT distinct BLK rule
+                                                      FROM V_RECQUE_ARCRRP_DATA, bp_rrp, s_er
+                                                      WHERE V_RECQUE_ARCRRP_DATA.blk = bp_rrp.rule(+)
+                                                      AND V_RECQUE_ARCRRP_DATA.blk = S_ER.K_ER(+)
+                                                      GROUP BY BLK
+                                                      ORDER BY blk").ToList();
+                return Json(new { Data = codes }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult UnlockByCodeAndSum(decimal code, string summa)
+        {
+            using (var connection = OraConnector.Handler.UserConnection)
+            {
+                decimal sum;
+                decimal.TryParse(summa, out sum);
+
+                var p = new DynamicParameters();
+                p.Add("p_func", 1, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_sum", sum * 100, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_blk", code, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_msg", null, DbType.String, ParameterDirection.Output, 4000);
+                try
+                {
+                    connection.Execute("SEP_UTL.unlock_by_func", p, commandType: System.Data.CommandType.StoredProcedure);
+                }
+                catch (Exception e)
+                {
+                    return Json(new { Result = "Error", Msg = e.Message }, JsonRequestBehavior.AllowGet);
+                }
+
+                var msg = p.Get<string>("p_msg");
+                return Json(new { Result = "OK", Msg = msg }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult UnlockBudget(decimal code)
+        {
+            using (var connection = OraConnector.Handler.UserConnection)
+            {
+                var p = new DynamicParameters();
+                p.Add("p_func", 2, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_blk", code, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_msg", null, DbType.String, ParameterDirection.Output, 4000);
+                try
+                {
+                    connection.Execute("SEP_UTL.unlock_by_func", p, commandType: System.Data.CommandType.StoredProcedure);
+                }
+                catch (Exception e)
+                {
+                    return Json(new { Result = "Error", Msg = e.Message }, JsonRequestBehavior.AllowGet);
+                }
+
+                var msg = p.Get<string>("p_msg");
+                return Json(new { Result = "OK", Msg = msg }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult UnlockByMfo(decimal code, string mfo)
+        {
+            using (var connection = OraConnector.Handler.UserConnection)
+            {
+                var p = new DynamicParameters();
+                p.Add("p_func", 3, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_blk", code, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_mfob", mfo, DbType.String, ParameterDirection.Input);
+                p.Add("p_msg", null, DbType.String, ParameterDirection.Output, 4000);
+                try
+                {
+                    connection.Execute("SEP_UTL.unlock_by_func", p, commandType: System.Data.CommandType.StoredProcedure);
+                }
+                catch (Exception e)
+                {
+                    return Json(new { Result = "Error", Msg = e.Message }, JsonRequestBehavior.AllowGet);
+                }
+
+                var msg = p.Get<string>("p_msg");
+                return Json(new { Result = "OK", Msg = msg }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult UnlockAllByCode(decimal code)
+        {
+            using (var connection = OraConnector.Handler.UserConnection)
+            {
+                var p = new DynamicParameters();
+                p.Add("p_func", 4, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_blk", code, DbType.Decimal, ParameterDirection.Input);
+                p.Add("p_msg", null, DbType.String, ParameterDirection.Output, 4000);
+                try
+                {
+                    connection.Execute("SEP_UTL.unlock_by_func", p, commandType: System.Data.CommandType.StoredProcedure);
+                }
+                catch (Exception e)
+                {
+                    return Json(new { Result = "Error", Msg = e.Message }, JsonRequestBehavior.AllowGet);
+                }
+
+                var msg = p.Get<string>("p_msg");
+                return Json(new { Result = "OK", Msg = msg }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult SetFlagStp(int isFlagged)
+        {
+            using( var connection = OraConnector.Handler.UserConnection)
+            {
+                var p = new DynamicParameters();
+                p.Add("p_value", isFlagged, DbType.Decimal, ParameterDirection.Input);
+                try
+                {
+                    connection.Execute("SEP_UTL.set_STP_AUTO", p, commandType: System.Data.CommandType.StoredProcedure);
+                }
+                catch (Exception e)
+                {
+                    return Json(new { Result = "Error", Msg = e.Message }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json(new { Result = "OK" }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetFlagStp()
+        {
+            bool isSepAuto = _repo.isSepAuto();
+            return Json(new { Data = isSepAuto }, JsonRequestBehavior.AllowGet);
         }
     }
 }

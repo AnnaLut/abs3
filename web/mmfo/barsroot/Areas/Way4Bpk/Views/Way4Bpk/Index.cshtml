@@ -248,34 +248,208 @@
     <div class="search-AddParams"></div>
 
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-5">
             <div class="form-group">
                 <a class='k-button' id="BUS_MOD" onclick="showReferAddParams('BUS_MOD', ' WHERE BUS_MOD_ID = 13 ')"><i class='pf-icon pf-16 pf-book'></i></a>
                 <label class="control-label bold" for="BUS_MOD">Тип бізнес моделі для договору</label>
-                <hr />
-                <div id="BUS_MOD_Tag"></div>
-                <div id="BUS_MOD_Value"></div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
+            <div id="BUS_MOD_Tag"></div>
+            <div id="BUS_MOD_Value"></div>
+        </div>
+    </div>
+
+    <hr style="margin:3px;" />
+
+    <div class="row">
+        <div class="col-md-5">
             <div class="form-group">
                 <a class='k-button' id="IFRS" onclick="showReferAddParams('IFRS', ' WHERE IFRS_ID = \'AC\' ')"><i class='pf-icon pf-16 pf-book'></i></a>
                 <label class="control-label bold" for="IFRS_MOD">Класифікаіція за МСФЗ</label>
-                <hr />
-                <div id="IFRS_Tag"></div>
-                <div id="IFRS_Value"></div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
+            <div id="IFRS_Tag"></div>
+            <div id="IFRS_Value"></div>
+        </div>
+    </div>
+
+    <hr style="margin:3px;" />
+
+    <div class="row">
+        <div class="col-md-5">
             <div class="form-group">
                 <a class='k-button' id="SPPI" onclick="showReferAddParams('SPPI', ' WHERE SPPI_ID= \'Так\' ')"><i class='pf-icon pf-16 pf-book'></i></a>
                 <label class="control-label bold" for="SPPI">Відповідність критерію SPPI</label>
-                <hr />
-                <div id="SPPI_Tag"></div>
-                <div id="SPPI_Value"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="SPPI_Tag"></div>
+            <div id="SPPI_Value"></div>
+        </div>
+    </div>
+
+    <div id="addParamsForFo" style="display:none;">
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="EDUCA">Освіта</label>
+                    @*<select id="EDUCATION" disabled>
+                            <option value="" selected></option>
+                            <option value="Початкова освіта">Початкова освіта</option>
+                            <option value="Базова загальна середня освіта">Базова загальна середня освіта</option>
+                            <option value="Повна загальна середня освіта">Повна загальна середня освіта</option>
+                            <option value="Професійно-технічна освіта">Професійно-технічна освіта</option>
+                            <option value="Вища освіта">Вища освіта</option>
+                        </select>*@
+                    @*<input class="k-textbox" id="EDUCA_Comm" disabled />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="EDUCA_Tag"></div>
+                <div id="EDUCA_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="FLAGINSURANCE">Страхування кредиту</label>
+                    @*<select id="FLAGINSURANCE" style="width:60px;" disabled>
+                            <option value="" selected></option>
+                            <option value="1">Так</option>
+                            <option value="0">Ні</option>
+                        </select>*@
+                    @*<input class="k-textbox" id="FLAGINSURANCE_Comm" style="width:60px;" disabled />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="FLAGINSURANCE_Tag"></div>
+                <div id="FLAGINSURANCE_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="NAMEW">Найменування роботодавця</label>
+                    @*<input id="NAMEW_Comm" class="k-textbox k-state-disabled" maxlength="254" onchange="inputChange(this);" disabled />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="NAMEW_Tag"></div>
+                <div id="NAMEW_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="TYPEW">Тип роботодавця</label>
+                    @*<select id="TYPEW" disabled>
+                            <option value="" selected></option>
+                            <option value="Юридична особа">Юридична особа</option>
+                            <option value="Фізична особа-суб'єкт підприємницької діяльності">Фізична особа-суб'єкт підприємницької діяльності</option>
+                        </select>*@
+                    @*<input class="k-textbox" id="TYPEW_Comm" disabled />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="TYPEW_Tag"></div>
+                <div id="TYPEW_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="EDRPO">Код ЕДРПОУ роботодавця</label>
+                    @*<input id="EDRPO_Comm" class="k-textbox k-state-disabled" maxlength="50" onchange="inputChange(this, /[^0-9]/g);" disabled />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="EDRPO_Tag"></div>
+                <div id="EDRPO_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="REAL6MONTH">Підтверджений дохід боржника</label>
+                    @*<input id="REMO_Comm" maxlength="32"  disabled class="k-state-disabled" />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="REMO_Tag"></div>
+                <div id="REMO_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="NREMO">Непідтверджений дохід боржника</label>
+                    @*<input id="NREMO_Comm" maxlength="32"  disabled class="k-state-disabled" />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="NREMO_Tag"></div>
+                <div id="NREMO_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="STAT ">Сімейний стан</label>
+                    @*<select id="STATUS" disabled>
+                            <option value="null" selected>Інформація відсутня</option>
+                            <option value="true">одружений/заміжня</option>
+                            <option value="false">неодружений/незаміжня</option>
+                        </select>*@
+                    @*<input class="k-textbox" id="STAT_Comm" disabled />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="STAT_Tag"></div>
+                <div id="STAT_Value"></div>
+            </div>
+        </div>
+
+        <hr style="margin:3px;" />
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label bold" for="MEMB">Кількість осіб, що перебувають на утриманні боржника</label>
+                    @*<input id="MEMB_Comm" maxlength="2" disabled class="k-state-disabled" />*@
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="MEMB_Tag"></div>
+                <div id="MEMB_Value"></div>
             </div>
         </div>
     </div>
+
     <hr />
     <div class="row">
         <div class="col-md-12">

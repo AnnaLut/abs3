@@ -2,6 +2,7 @@
 using BarsWeb.Areas.CreditUi.Models;
 using System;
 using System.Collections.Generic;
+using Oracle.DataAccess.Client;
 
 namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract
 {
@@ -35,5 +36,6 @@ namespace BarsWeb.Areas.CreditUi.Infrastructure.DI.Abstract
         string SetProlog(decimal nd, DateTime bnkDate, decimal kprolog, decimal sos, DateTime dateStart, DateTime dateEnd);
         AuthStaticData GetAuthStaticData(decimal nd);
         string Authorize(decimal nd, int type, string pidstava, string initiative);
+        CustomerInfo GetCustomerInfo(decimal rnk, OracleConnection conn = null);
     }
 }

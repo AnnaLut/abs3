@@ -1,0 +1,40 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@{
+    Layout = null;
+}
+
+<div class="row" style="margin-left: 20px; margin-right: 20px;">
+    @(Html.Kendo().Grid<ReportInfo>()
+                .Name("reportlist")
+                .Selectable()
+                .Sortable()
+                .Filterable()
+                .Columns(col =>
+                {
+                    col.Bound(x => x.Report_ID).Hidden(true);
+                    col.Bound(x => x).ClientTemplate("#=getReportEditButtons(data.Report_ID, 'edit', data.Active)#").MinScreenWidth(40);
+                    col.Bound(x => x.Report_Name).Title("Назва звіту").HeaderHtmlAttributes(new { style = "white-space: normal" }).MinScreenWidth(250);
+                    col.Bound(x => x.Frx_File_Name).Title("Назва файлу").HeaderHtmlAttributes(new { style = "white-space: normal" }).MinScreenWidth(160);
+                    col.Bound(x => x.Description).Title("Опис звіту").HeaderHtmlAttributes(new { style = "white-space: normal" }).MinScreenWidth(200);
+                    col.Bound(x => x.Active).Title("Стан звіту").ClientTemplate("#if(Active != null && Active == 1){#<span>Активний</span>#}else{#<span>Деактивований</span>#}#").HeaderHtmlAttributes(new { style = "white-space: normal" }).MinScreenWidth(100);
+                })
+                .ToolBar(toolbar =>
+                {
+                toolbar.Template(@<text>
+                <button class="k-button" id="create-new-report" style="color: forestgreen;" title="Створення нового звіту" onclick="popUp('/bills/report/actionwithreport?actionType=create','Створення звіту', '400px', '750px', 'reportlist'); this.blur(); return false;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </text>);
+                })
+                .Pageable(page => page
+                  .Refresh(true)
+                  .PageSizes(new List<Int32> { 5, 10, 20, 50 })
+                  .ButtonCount(10))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Read(read => read.Action("GetReporsts_Read", "Report", new { id = 1 }))
+            .PageSize(10)
+        )
+    )
+</div>

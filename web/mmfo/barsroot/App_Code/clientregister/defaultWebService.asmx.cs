@@ -3156,7 +3156,50 @@ namespace clientregister
             }
             return result;
         }
+        /// <summary>
+        /// Валідатор для додаткових параметрів клієнта 
+        /// Може містити наступні макро:
+        /// #(RNK) - РНК
+        /// #(TAG) - ім'я тега
+        /// #(VAL) - значення для перевірки
+        /// </summary>
+        /// <param name="funcName">Ім'я функції - валідатора (має повернути текст помилки або null)</param>
+        /// <param name="rnk">РНК</param>
+        /// <param name="tag">ім'я тега</param>
+        /// <param name="value">значення для перевірки</param>
+        /// <returns></returns>
+        [WebMethod(EnableSession = true)]
+        public ValidationResult CustDopRecValidate(string funcName, decimal rnk, string tag, string value)
+        {
+            var result = new ValidationResult("OK");
+            InitOraConnection();
+            try
+            {
+                SetRole("WR_CUSTREG");
 
+                if (funcName.Contains("#(RNK)")) { funcName = funcName.Replace("#(RNK)", ":p_rnk"); SetParameters("p_rnk", DB_TYPE.Decimal,  rnk,   DIRECTION.Input); }
+                if (funcName.Contains("#(TAG)")) { funcName = funcName.Replace("#(TAG)", ":p_TAG"); SetParameters("p_TAG", DB_TYPE.Varchar2, tag.Trim(),   DIRECTION.Input); }
+                if (funcName.Contains("#(VAL)")) { funcName = funcName.Replace("#(VAL)", ":p_VAL"); SetParameters("p_VAL", DB_TYPE.Varchar2, value, DIRECTION.Input); }
+                
+                string strTmp = Convert.ToString(SQL_SELECT_scalar("select " + funcName + " from dual"));
+                //string strTmp = Convert.ToString(SQL_SELECT_scalar("select " + funcName + "(:p_rnk, :p_TAG, :p_VAL) from dual"));
+                if (strTmp.Length > 0)
+                {
+                    result.Code = "NOT_VALID";
+                    result.Message = strTmp;
+                }
+            }
+            catch (Exception e)
+            {
+                result.Code = "ERROR";
+                result.Message = e.InnerException == null ? e.Message : e.InnerException.Message;
+            }
+            finally
+            {
+                DisposeOraConnection();
+            }
+            return result;
+        }
         [WebMethod(EnableSession = true)]
         public ValidationResult SaveCustChangeForPrint(decimal rnk, ChangeCustTags custTags)
         {

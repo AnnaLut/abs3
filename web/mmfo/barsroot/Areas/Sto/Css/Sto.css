@@ -21,3 +21,49 @@
     position: relative;
     height: 100%;
 }
+
+.row {
+    margin-top:5px;
+    padding-left:15px;
+    padding-right:15px;
+}
+
+/*.footer {
+    text-align: center;
+    position:absolute;
+    left:0px;
+    bottom:0px;
+    width:100%;
+}
+
+.btns-group {
+    padding-bottom:20px;
+}*/
+.footer {
+    text-align: right;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+}
+
+.btns-group {
+    padding-bottom: 20px;
+    padding-right: 22px;
+}
+
+input {
+    background-color: none !important;
+}
+
+#wnd_stolst {
+    overflow:hidden;
+}
+
+td {
+    padding:3px;
+}
+
+label {
+    margin-bottom: 0px;
+}

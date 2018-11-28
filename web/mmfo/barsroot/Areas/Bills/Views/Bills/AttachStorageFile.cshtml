@@ -1,0 +1,63 @@
+﻿@using BarsWeb.Areas.Bills.Model
+@model SaveFileModel
+@using Kendo.Mvc.UI
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<link rel="stylesheet" href="~/Content/Bootstrap/bootstrap.min.css" />
+<div class="container">
+    <div class="row">
+        <div class="col-xs-11 col-sm-offset-1">
+            @using (Html.BeginForm("UploadStorageFile", "Bills", FormMethod.Post, new { id = "attach-form", name = "attach-form" }))
+            {
+                        <div class="form-group">
+                            <label for="FileName" class="control-label col-md-3 col-xs-4">
+                                Назва файлу
+                            </label>
+                            <div class="col-md-9 col-xs-8">
+                                @Html.TextBoxFor(x => x.FileName, new { @class = "k-textbox editable", @required = true })
+                            </div>
+                        </div>
+                        <br /><br />
+                        <div class="form-group">
+                            <label for="Description" class="control-label col-md-3 col-xs-4">
+                                Опис файлу
+                            </label>
+                            <div class="col-md-9 col-xs-8">
+                                @Html.TextBoxFor(x => x.Description, new { @class = "k-textbox editable", @required = true })
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label for="fileType" class="control-label col-md-3 col-xs-4 required">
+                                <b>Додати файл (PDF)</b>
+                            </label>
+                            <div class="col-md-9 col-xs-8">
+                                @(Html.Kendo().Upload()
+                                     .Name("fileData")
+                                     .Messages(x => x.Select("Вибрати файл"))
+                                     .HtmlAttributes(new { accept = "application/pdf" })
+                                )
+                            </div>
+                        </div>
+                        <br /><br />
+                        <div class="form-group">
+                            <input class="k-button k-edit-buttons" style="margin-left: 15px;" type="button" onclick="onBegin(); return false;" value="Зберегти">
+                        </div>                
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function onBegin(e) {
+        var fileName = $('#FileName').val();
+        if (fileName.length === 0) {
+            bars.ui.alert({
+                text: 'Назва файлу є обов\'язковою для заповнення',
+            });
+            return;
+        }
+
+        $('#attach-form').submit();
+    }
+</script>

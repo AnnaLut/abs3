@@ -1,0 +1,32 @@
+﻿@using BarsWeb.Areas.Bills.Model
+@model List<ParameterValue>
+@{ 
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+<script>
+    function selectValue(){
+        var val = $('#ParamValue').val();
+        var id = $('#parameter-id').val();
+        var text = $("#ParamValue").data("kendoDropDownList").text();
+        var vtype = $('#vtype').val();
+        window.parent.fillFields(val, id, text, vtype);
+    }
+</script>
+
+<input type="hidden" value="@ViewBag.ID" id="parameter-id"/>
+<input type="hidden" name="vtype" id="vtype" value="@ViewBag.VType" />
+<div style="text-align:center;">
+    <div class="col-xs-12">
+        <div class="fa fa-border col-xs-12 text-center" style="max-width: 550px; padding-bottom: 25px; padding-top: 15px;">
+            @(Html.Kendo().DropDownList()
+                 .Name("ParamValue")
+                 .DataTextField("VALUE")
+                 .DataValueField("ID")
+                 .HtmlAttributes(new { style = "min-width:450px;", id = "ParamValue" })
+                 .BindTo(Model)
+                 .AutoBind(true)
+            )
+        </div>
+    </div>
+    <button class="k-button" style="margin-top: 20px;" type="button" onclick="selectValue(); return false;">Вибрати значення</button>
+</div>

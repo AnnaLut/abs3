@@ -1,0 +1,61 @@
+﻿@using Kendo.Mvc.UI
+@using BarsWeb.Areas.Bills.Model
+@model List<ParameterValue>
+@{
+    Layout = null;
+}
+<style>
+    .param-label {
+        margin: 5px 10px 10px 15px;
+        min-width: 250px;
+        float: left;
+    }
+
+    .param-group {
+        margin-left: 20px;
+        float: left;
+        min-width: 250px;
+    }
+
+    .param-buttons {
+        margin-left: 20px;
+        float: left;
+        min-width: 100px;
+        text-align: left;
+       
+    }
+
+    .param-type-label {
+        margin-top: 7px !important;
+        display: block;
+        margin-left: 20px;
+        float: left;
+        min-width: 100px;
+    }
+</style>
+<div class="col-xs-12">
+
+    @foreach (ParameterValue item in Model)
+    {
+        <div class="form-horizontal container-fluid">
+            <div class="form-group form-group-padding">
+                <div class="col-xs-12" style="margin-left: -15px; padding-left: 0px;">
+                    @Html.Label("paramLabel", "Значення параметру", new { @class = "control-label col-md-2 col-xs-2", style = "text-align: left;" })
+                    <div class="col-md-6 col-xs-7">
+                        @Html.TextBox(item.ID.ToString(), item.VALUE, new { @class = "k-textbox", style = "float: left;  background-color: lightgray; max-width: 400px; text-align: center; margin-left: 50px;", @readonly = "readonly" })
+                    </div>
+                    <div class="param-buttons col-md-2 col-xs-2">
+                        <button class="k-button" title="Редагування параметру" onclick="editParameterValue(@item.PARAMETER_ID, @item.ID)">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                        <button class="k-button" title="Видалення параметру" onclick="removeParameterValue(@item.PARAMETER_ID, @item.ID)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+</div>

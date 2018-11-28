@@ -44,6 +44,7 @@
   cc_daynp   NUMBER; -- Переносить день погашения на 0 - пятницу 1 - понед
   cc_slstp   NUMBER; -- При відкр рах SL призупиняти нарах-ня (0) чи продовжувати нарах - 1
   g_cck_migr NUMBER; -- 1- включен режим миграции
+  g_inscc NUMBER;    -- Флаг для включения проверки при авторизации параметра  INSCC(сделано на всякий случай что бы быстро отключить не меняя пакет) 1- включена проверка
   ern CONSTANT POSITIVE := 203;
   erm VARCHAR2(250);
   err EXCEPTION;
@@ -1185,8 +1186,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
   */
 
   /*
-22.02.2018 LSO Убрал проверку зарегестрирован ли счет по договору в процедуре cc_op_nls, так как там неверно отрабатывает.
+04-10-2018 VPogoda  в cc_asg логика обработки 2620 вейских сделана аналогично 2625
 01-08-2018 VPogoda  закрытие гендоговора с субдоговорами
+24.06.2018 LitvinSO   COBUMMFO-8388
+            Для кредитів фізичних/юридичних осіб та овердрафтів забезпечити контроль обов’язковості заповнення параметру кредитного договору «Страхування кредиту» (заборона авторизації без заповнення).
 22.05.2018 Sta PROCEDURE lim_bdate: Не делаем ничего для Суб/дог, хотя у них есть технический ГПК( в cc_lim 2 записи), а только для простых КД или ген.дог.
                FUNCTION cc_stop: Для операции КК1 + дебет счета SS - для проверки нач.комиссии
 17.05.2018 Sta  PROCEDURE cc_day_lim + PROCEDURE lim_bdate  Обновление cc_deal.limit, cc_add.s, accounts.ostx по суб.дог
@@ -1875,6 +1878,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                  p_ref  OUT NUMBER) IS
     oo oper%ROWTYPE;
     kk accounts%ROWTYPE;
+    v_accd_tip accounts.tip%type;
   BEGIN
 
     IF p_kvd = p_kvk THEN
@@ -1903,8 +1907,9 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
              substr(k.nms, 1, 38),
              k.tip,
              k.acc,
-             c.okpo
-        INTO oo.nam_a, oo.nam_b, kk.tip, kk.acc, oo.id_a
+             c.okpo,
+             d.tip
+        INTO oo.nam_a, oo.nam_b, kk.tip, kk.acc, oo.id_a, v_accd_tip
         FROM accounts d, accounts k, customer c
        WHERE d.kv = p_kvd
          AND d.nls = p_nlsd
@@ -1919,6 +1924,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                                 '\8999  не знайдено рах.' || p_nlsd || ', ' ||
                                 p_nlsk);
     END;
+
+    if v_accd_tip like 'W4_' then
+      oo.tt := 'W4I';
+    end if;
 
     oo.nlsa := p_nlsd;
     oo.nlsb := p_nlsk;
@@ -1980,7 +1989,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
     gl.ref(oo.ref);
     oo.nd := substr('          ' || to_char(oo.ref), -10);
     gl.in_doc3(ref_   => oo.ref,
-               tt_    => 'ISG',
+               tt_    => oo.tt,
                vob_   => oo.vob,
                nd_    => oo.nd,
                pdat_  => SYSDATE,
@@ -2009,17 +2018,24 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                prty_  => NULL,
                uid_   => NULL);
 
-    gl.payv(0,
-            oo.ref,
-            gl.bdate,
-            oo.tt,
-            1,
-            oo.kv,
-            oo.nlsa,
-            oo.s,
-            oo.kv2,
-            oo.nlsb,
-            oo.s2);
+    gl.dyntt2(sos_   => oo.sos,
+              mod1_  => 0,
+              mod2_  => 1,
+              ref_   => oo.ref,
+              vdat1_ => gl.bdate,
+              vdat2_ => gl.bdate,
+              tt0_   => oo.tt,
+              dk_    => 1,
+              kva_   => oo.kv,
+              mfoa_  => gl.amfo,
+              nlsa_  => oo.nlsa,
+              sa_    => oo.s,
+              kvb_   => oo.kv2,
+              mfob_  => gl.amfo,
+              nlsb_  => oo.nlsb,
+              sb_    => oo.s2,
+              sq_    => 0,
+              nom_   => 0);
 
     IF kk.tip = 'SN8' THEN
       BEGIN
@@ -6269,7 +6285,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
            p_ir,
            p_br,
            p_op,
-           sys_context('bars_global', 'user_id')) log errors INTO err$_int_ratn
+           user_id/*sys_context('bars_global', 'user_id')*/) log errors INTO err$_int_ratn
           ('INSERT') reject LIMIT unlimited;
       END IF;
     END IF;
@@ -9136,6 +9152,13 @@ end if;
     ssql_    VARCHAR2(2000);
     stmp_    VARCHAR2(15);
     l_err_code NUMBER;
+    l_inscc_val  varchar2(250);
+    l_mes        varchar2(4000);
+    l_mes1       varchar2(4000);
+    l_mes2        varchar2(4000);
+    l_value      VARCHAR2(500);
+    l_custtype   customer.custtype%type;
+    l_k050       customer.k050%type;
   BEGIN
 
     BEGIN
@@ -9217,6 +9240,101 @@ end if;
         (nd, npp, mdate, fdat)
         SELECT dd.nd, 0, dd.wdate, MIN(fdat) FROM cc_lim WHERE nd = dd.nd;
     END IF;
+
+    if dd.vidd != 5 then
+
+      --проверка заполненности параметров
+      --COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
+      if g_inscc = 1 then
+        begin
+          begin
+              select txt
+              into   l_inscc_val
+              from   nd_txt
+              where  tag = 'INSCC' and
+                     nd = dd.nd;
+          exception
+              when no_data_found then
+                   null;
+          end;
+
+          if (l_inscc_val is null) then
+              l_mes1:='НЕ заповнено обов’язковий параметр «Страхування кредиту»';
+          end if;
+        end;
+      end if;
+       --COBUMMFO-8460
+     begin
+       select c.custtype, c.k050 into l_custtype, l_k050 from customer c where c.rnk = dd.rnk;
+     exception when no_data_found then  l_custtype:=null;
+     end;
+     if l_custtype = 3 and l_k050 = '000' then
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'EDUCA';
+       exception when no_data_found then  l_mes2:=l_mes2||', «Освіта»';
+       end;
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'REMO';
+       exception when no_data_found then  l_mes2:=l_mes2||', «Підтверджений дохід Боржника»';
+       end;
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'NREMO';
+       exception when no_data_found then  l_mes2:=l_mes2||', «Непідтверджений дохід Боржника»';
+       end;
+       begin
+          select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'STAT';
+       exception when no_data_found then  l_mes2:=l_mes2||', «Сімейний статус»';
+       end;
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'NAMEW';
+       exception when no_data_found  then
+         begin
+           select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'CIGPO';
+            if l_value not in (6,8,7) then
+              l_mes2:=l_mes2||', «Найменування роботодавця»';
+            end if;
+          exception when no_data_found then
+            l_mes2:=l_mes2||', «Статус зайнятості особи»';
+         end;
+       end;
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'EDRPO';
+       exception when no_data_found then
+         begin
+           select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'CIGPO';
+            if l_value not in (6,8,7) then
+               l_mes2:=l_mes2||', «Код ЄДРПОУ роботодавця»';
+            end if;
+         exception when no_data_found then
+            l_mes2:=l_mes2||', «Статус зайнятості особи»';
+         end;
+       end;
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'MEMB';
+       exception when no_data_found then  l_mes2:=l_mes2||', «Кількість осіб, що перебувають на утриманні боржника»';
+       end;
+       begin
+         select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'TYPEW';
+       exception when no_data_found then
+         begin
+           select c.value into l_value  from customerw c where c.rnk = dd.rnk and c.tag = 'CIGPO';
+            if l_value not in (6,8,7) then
+              l_mes2:=l_mes2||', «Тип роботодавця»';
+            end if;
+         exception when no_data_found then
+            l_mes2:=l_mes2||', «Статус зайнятості особи»';
+         end;
+       end;
+      if l_mes2 is not null then
+         l_mes2:=' Параметри: '||substr(l_mes2,3) ||' повинні бути заповнені на картці клієнта';
+      end if;
+     end if;
+
+      l_mes:=l_mes1||l_mes2;
+      if l_mes is not null then
+        raise_application_error(-20203,l_mes);
+      end if;
+    end if;
 
     ssql_ := 'select pStart from cck_ob22 where nbs= ''' ||
              substr(dd.prod, 1, 4) || ''' and ob22= ''' ||
@@ -13552,6 +13670,9 @@ end if;
     cc_pay_s INT := nvl(getglobaloption('CC_PAY_S'), '0'); -- 0 -считать сумму досрочным погашением при  погашении превышающем
 	title constant varchar2(32) := 'zbd.cck.cc_asg ';
     l_error_message varchar2(4000);
+    v_crd_name varchar2(38);
+    v_crd_okpo varchar2(12);
+
     --    текущий лимит ГПК минус текущий платеж
     -- 1- считать сумму досрочным с учетом уже уплаченной суммы за
     --    досрочное погашение
@@ -13677,10 +13798,9 @@ end if;
                      (SELECT *
                         FROM cc_deal
                        WHERE sdate < gl.bdate
-                         AND sos >= 1
-                         AND sos < 14
+                         AND sos between 1 and 13
                          AND vidd IN (1, 2, 3, 11, 12, 13)
-                         and substr(prod, 1, 1) <> '9'
+                         and not prod like  '9%'
                          AND (nregim_ < 0 AND nd = -nregim_ OR nregim_ >= 0)) d
                WHERE a8.tip = 'LIM'
                  AND n8.acc = a8.acc
@@ -13700,7 +13820,8 @@ end if;
                         decode(a.nbs, '3739', 1, '2620', decode(substr(a.tip,1,2),'W4',3,2), 3)) LOOP
       --цикл по счетам гашения
       if k.blkd>0 then
-        logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' блокований, списання неможливе. Пропускаємо');
+        --logger.info('CCK.CC_ASG: Рахунок '||k.nlsd||' блокований, списання неможливе. Пропускаємо');
+        logger.tms_info(Title||'Рахунок '||k.nlsd||' блокований, списання неможливе. Пропускаємо');
         continue;
       end if;
 
@@ -14341,6 +14462,17 @@ end if;
                           ELSE
                            p.nlsk
                         END);
+              begin
+                select substr(a.nms,1,38), gl.aMFO
+                  into v_crd_name, v_crd_okpo
+                  from accounts a
+                  where a.nls = l_nlsk
+                    and a.kv = 980;
+              exception
+                when others then 
+                  v_crd_name := p.nmsk;
+                  v_crd_okpo := gl.aMFO;
+              end;
               gl.in_doc3(ref_   => ref_,
                          tt_    => tt_,
                          vob_   => vob_,
@@ -14358,13 +14490,13 @@ end if;
                          nam_a_ => k.nmsd,
                          nlsa_  => k.nlsd,
                          mfoa_  => gl.amfo,
-                         nam_b_ => p.nmsk,
+                         nam_b_ => v_crd_name,
                          nlsb_  => l_nlsk,
                          mfob_  => gl.amfo,
                          nazn_  => nazn_,
                          d_rec_ => NULL,
                          id_a_  => k.okpo,
-                         id_b_  => k.okpo,
+                         id_b_  => v_crd_okpo,
                          id_o_  => NULL,
                          sign_  => NULL,
                          sos_   => 0,
@@ -16003,6 +16135,7 @@ BEGIN
   g_cc_kom_ := to_number(getglobaloption('CC_KOM'));
   cc_daynp  := to_number(nvl(getglobaloption('CC_DAYNP'), '1')); -- день гашения - следующий либо предыдущий для выбранного рабочего дня
   cc_slstp  := to_number(nvl(getglobaloption('CC_SLSTP'), '0'));
+  g_inscc  := to_number(nvl(getglobaloption('INSCC'), '0')); -- Флаг для включения проверки при авторизации параметра  INSCC(сделано на всякий случай что бы быстро отключить не меняя пакет) 1- включена проверка
   IF to_date(getglobaloption('CCK_MIGR'), 'dd/mm/yyyy') >=
      nvl(gl.bdate, trunc(SYSDATE)) THEN
     g_cck_migr := 1;

@@ -214,10 +214,14 @@ END CCK_DOP;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.CCK_DOP IS
 
-  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.1 22/06/2018';
+  G_BODY_VERSION CONSTANT VARCHAR2(64) :=  'ver.6.06 13/07/2018';
 
    /*
-   22/06/2018 COBUMMFO-8206 - добавлена логика для расщепления операции КК1 при перечислении средств на карточный счет
+ 13/07/2018 COBUMMFO-8410 Проверки и наследование обеспечения при авторизации
+ 27.11.2017 Sta+Вика Семенова : При авторизации кред.линий (Ген.договора - VIDD=2,3) при типе авторизации 1 (полная авторизация)
+              автоматически открывать суб.договор (или несколько суб.договоров) и счета на нем (SS и SN) c параметрами Ген.договора (валюта, % ставка, база начисления)
+
+  28/03/2017 Приведение дисконта в формат NNNNNN.NN
   02/03/2017 вызов стандартной процедуры авторизации перенесен после открытия счетов
   15/02/2017 COBUSUPABS-5326
               3.1    При повній авторизації кредитних договорів з типами:
@@ -380,10 +384,6 @@ BEGIN
     end if;
 
     --должна отработать новая процедура
-    if wdate - sdate >30 then
-    cck.CC_GPK( GPK, ND_, ACC8_, SDATE_, DATN_, WDATE_, SDOG, nFREQ, fPROC, 2);
-    logger.trace('CCK_DOP.CC_OPEN  Создан ГПК');
-    end if;
     -- сумма первоночальной комисии (дисконта)
     if SumSDI is not null then
        Insert into nd_txt (ND,TAG,TXT) Values (ND_,'S_SDI', replace(to_char (replace (round(SumSDI,2), ',', '.'),'9999999999.99'),' '));
@@ -400,6 +400,12 @@ BEGIN
       insert into int_ratn (acc,id,bdat,ir)                  values (Acc8_, 2, SDATE_, METR_R);
     end if;
 
+    if wdate - sdate >30 then
+      cck_ui.p_gpk_default(nd => nd_, GPK_TYPE => gpk,ROUND_TYPE => 2);
+
+--      cck.CC_GPK( GPK, ND_, ACC8_, SDATE_, DATN_, WDATE_, SDOG, nFREQ, fPROC, 2);
+    logger.info('CCK_DOP.CC_OPEN  Создан ГПК');
+    end if;
 
 
     --сохраняем данные о залогах
@@ -848,7 +854,7 @@ return; -- cobuprvnix-161
                             k.rnk,
                             k.sour,
                             k.nd,
-                            k.kv,
+                            980,--k.kv,
                             'SDI',
                             'SD ',
                             k.prod,
@@ -1481,7 +1487,7 @@ return; -- cobuprvnix-161
     -- поиск ответ исполнителя по счетам КД
     --l_isp := cck_dop.get_isp_by_user(l_user_id);
     -- Ставим пользователя который выполняет авторизацию
-      l_isp := sys_context('bars_global', 'user_id');
+      l_isp := user_id;--sys_context('bars_global', 'user_id');
 
     -- балансовый номер счета в зависимости от типа счета
     case (p_tip)
@@ -1763,7 +1769,7 @@ begin
      l_new_nls  accounts.nls%type  ; l_ob22     accounts.ob22%type            ;
      l_new_acc  accounts.acc%type  ; l_vob      number  ; nazn_ varchar2(160) ;
      l_sb_row   staff$base%rowtype ; l_dk       int     ; l_ccv cc_v%rowtype  ;
-
+     l_mes        varchar2(4000);
      -- код залоговика, уровень которого м.б. выше,
      -- чем уровень с которого делается эта процедура
      -- запомнить свой уровень (не начальный по STAFF$BASE, а после возможного прикида)
@@ -1779,7 +1785,7 @@ begin
      bc.subst_branch(l_ccv.branch);
 
      --l_sb_row.id := cck_dop.get_isp_by_branch( l_ccv.branch);
-     l_sb_row.id := sys_context('bars_global', 'user_id');
+     l_sb_row.id := user_id;--sys_context('bars_global', 'user_id');
 
      -- ищем контр счет для обеспечения
      select nlsm,substr(flags,38,1) into l_nls9,l_fl_opl from tts where tt='ZAL';
@@ -1796,14 +1802,24 @@ begin
      end;
      -- поочередно перебираем сохраненніе в допреквизитах параметры обеспечения
      for k in
-        (SELECT cck_app.to_number2(txt)                          as PAWN,
- (select nbsz from cc_pawn where pawn = to_number(n.txt))        as NBSZ,
- 100 * cck_app.to_number2(
-       cck_app.get_nd_txt(p_nd,'ZAY'||substr(n.tag,4,1) || 'S')) as SUM,
-       cck_app.to_number2(
-       cck_app.get_nd_txt(p_nd,'ZAY'||substr(n.tag,4,1) || 'R')) as RNK
-         FROM nd_txt n
-         WHERE n.nd = p_nd and tag like 'ZAY_P'
+         (SELECT cck_app.to_number2 (txt) AS PAWN,
+                   (SELECT nbsz
+                      FROM cc_pawn
+                     WHERE pawn = TO_NUMBER (n.txt))
+                      AS NBSZ,
+                     100
+                   * cck_app.to_number2 (
+                        cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'S'))
+                      AS SUM,
+                   cck_app.to_number2 (
+                      cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'R'))
+                      AS RNK,
+                   cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'T') ZAYT,
+                   cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'U') ZAYU,
+                   cck_app.get_nd_txt (p_nd, 'ZAY' || SUBSTR (n.tag, 4, 1) || 'V') ZAYV,
+                   (select name from cc_tag where tag = n.tag and n.tag like 'ZAY_P') NAMEP
+              FROM nd_txt n
+             WHERE n.nd = p_nd AND tag LIKE 'ZAY_P'
          )
 
      LOOP
@@ -1812,6 +1828,23 @@ begin
        select substr(nmk,1,38),okpo,custtype into l_nms_zal,l_okpo,l_custtype
        from customer where rnk = k.rnk;
 
+       -- Проверки обеспечения
+       begin
+           if k.ZAYT is null then
+              l_mes := chr(13)||chr(10)||'Не заповнено параметр "Страхування забезпечення/поруки" для '||k.NAMEP||chr(13)||chr(10);
+           end if;
+           if k.ZAYU is null then
+              l_mes := 'Не заповнено параметр "Номер договору забезпечення/поруки" для '||k.NAMEP||chr(13)||chr(10);
+           end if;
+           if k.ZAYV is null then
+              l_mes := 'Не заповнено параметр "Дата укладення договору забезпечення/поруки" для '||k.NAMEP||chr(13)||chr(10);
+           end if;
+           
+           if l_mes is not null then
+            l_mes := 'Увага :'||l_mes||' заповніть у параметрах договору!';
+            raise_application_error(-20203,l_mes);  
+           end if;
+       end;
        -- открываем счет обеспечения
        l_new_nls := bars.f_newnls2(l_ccv.acc8,'ZAL', k.nbsz,  l_ccv.rnk, null);
 
@@ -1869,7 +1902,10 @@ begin
 
        Accreg.setAccountSParam( l_new_acc, 'OB22', l_ob22 );
 
-       update pawn_acc set sv = k.sum where acc = l_new_acc;
+      if k.ZAYT is not null then
+         Accreg.setAccountwParam( l_new_acc, 'Z_POLIS', case when k.ZAYT = 'Taк' then 1 else 0 end );
+       end if;
+       update pawn_acc set sv = k.sum, cc_idz = k.ZAYU, sdatz = to_date(k.ZAYV,'dd/mm/yyyy') where acc = l_new_acc;
 
        -- привязка счета к счетам договора
        insert into cc_accp    (acc, accs, nd)
@@ -1978,7 +2014,7 @@ function get_kk1_crd (p_nls  in accounts.nls%type
   v_ret accounts.nls%type;
 begin
   logger.info('p_nls = '||p_nls||', p_kv = '||p_kv||', p_nlsa = '||p_nlsa);
-  select tip 
+  select tip
     into v_tip
     from accounts a
     where a.nls = p_nls
@@ -1993,8 +2029,8 @@ begin
     v_ret := p_nls;
   end if;
   return v_ret;
-exception 
-  when others then 
+exception
+  when others then
     logger.info('CCK_DOP.GET_KK1_CRD: Помилка при визначенні дебетового рахунку: '||sqlerrm);
     return p_nls;
 end get_kk1_crd;

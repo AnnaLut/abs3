@@ -11,13 +11,18 @@ using Bars.Oracle;
 using BarsWeb.Core.Logger;
 using FastReport.Cloud;
 using Oracle.DataAccess.Client;
+using BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Abstract;
+using BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation;
+using BarsWeb.Areas.Sto;
 
 public partial class dedosit_AddRegularPayment : Page
 {
     private readonly IDbLogger _dbLogger;
+    private IContractRepository stoRepo;
     public dedosit_AddRegularPayment()
     {
         _dbLogger = DbLoggerConstruct.NewDbLogger();
+        stoRepo = new ContractRepository();
     }
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -25,14 +30,14 @@ public partial class dedosit_AddRegularPayment : Page
         {
             SavePayment();
         }
-        var typeParam = HttpContext.Current.Request.Params.GetValues("type");
-        var rnkParam = HttpContext.Current.Request.Params.GetValues("RNK");
+        string[] typeParam = HttpContext.Current.Request.Params.GetValues("type");
+        string[] rnkParam = HttpContext.Current.Request.Params.GetValues("RNK");
         if (typeParam != null && Convert.ToString(typeParam.GetValue(0)).ToUpper() == "PRINT")
         {
             if (rnkParam != null)
             {
-                var rnk = Convert.ToDecimal(rnkParam.GetValue(0));
-                var iddParam = HttpContext.Current.Request.Params.GetValues("idd");
+                decimal rnk = Convert.ToDecimal(rnkParam.GetValue(0));
+                string[] iddParam = HttpContext.Current.Request.Params.GetValues("idd");
                 decimal idd = Convert.ToDecimal(iddParam.GetValue(0));
                 PrintPayment(rnk,idd);                
             }
@@ -40,12 +45,12 @@ public partial class dedosit_AddRegularPayment : Page
         else
         {
             var param = HttpContext.Current.Request.Params;
-            var nlsParam = param.GetValues("NLS");
-            var ndParam = param.GetValues("ND");
+            string[] nlsParam = param.GetValues("NLS");
+            string[] ndParam = param.GetValues("ND");
 
             if (rnkParam != null)
             {
-                var rnk = Convert.ToDecimal(rnkParam.GetValue(0));
+                decimal rnk = Convert.ToDecimal(rnkParam.GetValue(0));
                 string nls = nlsParam == null ? "" : Convert.ToString(nlsParam.GetValue(0));
                 RNK.Value = Convert.ToString(rnk);
                 NLS.Value = nls;
@@ -53,15 +58,15 @@ public partial class dedosit_AddRegularPayment : Page
                 decimal nd = ndParam == null ? 0 : Convert.ToDecimal(ndParam.GetValue(0));
                 IOraConnection conn = (IOraConnection) Application["OracleConnectClass"];
                 OracleConnection connect = conn.GetUserConnection();
-                var ccDial = GetCcDial(nd, connect);
-                var nlsDial = GetNLSDial(nls, connect);
+                CC_DIAL ccDial = GetCcDial(nd, connect);
+                NLS_DIAL nlsDial = GetNLSDial(nls, connect);
 
                 try
                 {
-                    var command = connect.CreateCommand();
+                    OracleCommand command = connect.CreateCommand();
                     command.CommandText = "select * from customer where rnk = :p_rnk";
                     command.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, ParameterDirection.Input);
-                    var reader = command.ExecuteReader();
+                    OracleDataReader reader = command.ExecuteReader();
 
                     if (reader.Read())
                     {
@@ -77,7 +82,7 @@ public partial class dedosit_AddRegularPayment : Page
                     StartDate.Value = Convert.ToString(dat_begin.ToString("d"));
 
                     CodVal.Value = Convert.ToString(param.GetValues("CodeVal").GetValue(0)); //GetCodVal(rnk, nd, connect);
-                    var sum = Convert.ToString(GetSumm(ccDial.CC_ID, ccDial.SDATE, connect));
+                    String sum = Convert.ToString(GetSumm(ccDial.CC_ID, ccDial.SDATE, connect));
                     SUM.Value = sum;
                     SUMtext.Value = GetSummT(ccDial.CC_ID, ccDial.SDATE);
 
@@ -103,7 +108,7 @@ public partial class dedosit_AddRegularPayment : Page
         command.CommandText = @"SELECT val from params where par = 'MFO'";
         return Convert.ToString(command.ExecuteScalar());
     }
-    public string GetCodVal(decimal rnk,decimal nd,OracleConnection connect)
+    public string GetCodVal(decimal rnk, decimal nd, OracleConnection connect)
     {
         OracleCommand command = connect.CreateCommand();
         command.CommandText = @"select 
@@ -130,7 +135,7 @@ public partial class dedosit_AddRegularPayment : Page
         // Регулярные платежи
         OracleCommand cmd = connect.CreateCommand();
         cmd.CommandText = "select * from BARS.FREQ where freq=2 order by FREQ";
-        var reader = cmd.ExecuteReader();
+        OracleDataReader reader = cmd.ExecuteReader();
         while (reader.Read())
         {
             Freq.Items.Add(new ListItem
@@ -156,8 +161,8 @@ public partial class dedosit_AddRegularPayment : Page
                                     AND F.FREQ(+) = SD.FREQ";
         cmd.Parameters.Add("p_rnk", OracleDbType.Decimal, rnk, ParameterDirection.Input);
 
-        var reader2 = cmd.ExecuteReader();
-        var listExist = new List<decimal>();
+        OracleDataReader reader2 = cmd.ExecuteReader();
+        List<decimal> listExist = new List<decimal>();
 
         while (reader2.Read())
         {
@@ -256,8 +261,12 @@ public partial class dedosit_AddRegularPayment : Page
         String summT = string.Format("Згідно з графіком погашення кредиту № {0} від {1}",ccId,date); 
         return summT;
     }
+
+    //стандартная группа регулярных платежей "Кредити (авто-погашення з картрахунку)"
+    private readonly decimal STO_Credits_Group = 12;
+
     /// <summary>
-    /// Нажатие на кнопку "Сохранить"
+    /// Нажатие на кнопку "Сохранить", создание договора на выполнение рег. платежа и макета
     /// </summary>
     protected void SavePayment()
     {
@@ -270,162 +279,72 @@ public partial class dedosit_AddRegularPayment : Page
             // Открываем соединение с БД
             OracleCommand command = connect.CreateCommand();
 
-            Decimal pIdg = 12; // STO_GRP. 
-            Decimal pIds = 0;
-            DateTime pSdat = DateTime.Now.Date;
-
             var param = HttpContext.Current.Request.Params;
-            string nmk = param.Get("NMK");
 
-            command.Parameters.Clear();
-            command.Parameters.Add("IDG", OracleDbType.Decimal, pIdg, ParameterDirection.Input);
-            command.Parameters.Add("p_IDS", OracleDbType.Decimal, pIds, ParameterDirection.Output);
-            command.Parameters.Add("RNK", OracleDbType.Decimal, RNK.Value, ParameterDirection.Input);
-            command.Parameters.Add("NAME", OracleDbType.Varchar2, (nmk), ParameterDirection.Input);
-            command.Parameters.Add("SDAT", OracleDbType.Date, pSdat, ParameterDirection.Input);
-            command.CommandText = "begin sto_all.add_RegularLST(:IDG, :p_IDS, :RNK, :NAME, :SDAT); end;";
-            command.ExecuteNonQuery();
-
-            pIds = Convert.ToDecimal(Convert.ToString(command.Parameters["p_IDS"].Value));
-
-            _dbLogger.Info(string.Format("Створено новий регулярний платіж {0}", pIds) ,"Credit");
-
-            Decimal ord = Convert.ToDecimal(param.Get("Prior"));           
-            Decimal vob = 6;
-            Decimal dk = 1;
-            String nlsa = param.Get("NLSA");
-            Decimal kva = Convert.ToDecimal(param.Get("CodVal"));
-            String nlsb = Convert.ToString(param.GetValues("NLS").GetValue(0));
-            String tt = String.Empty;
-            Decimal wend = -1;
-
-            if (nlsb.Substring(0, 4) == "2625")
+            // Создание договора на выполнение регулярных платежей
+            ids contract = new ids(Convert.ToDecimal(RNK.Value), STO_Credits_Group, param.Get("NMK"))
             {
-                 tt = "PKO";        
+                SDAT = DateTime.Now.Date
+            };
+            if (stoRepo.ContractData().Where(x => x.RNK == contract.RNK && x.IDG == contract.IDG).Any())
+            {
+                // если есть уже для этого клиента и группы - берем существующий
+                contract.IDS = stoRepo.ContractData().Where(x => x.RNK == contract.RNK && x.IDG == contract.IDG).First().IDS;
             }
-            else 
-            {    tt = "PK!";   
-            }
-           
+            stoRepo.AddIDS(contract);
 
-            Decimal kvb = Convert.ToDecimal(param.Get("CodVal"));
-            String mfob = MFO.Value;
-            String polu = nmk.Length > 38 ? nmk.Substring(0, 38) : nmk;
-            String nazn = param.Get("textNazn");
-            decimal nd = Convert.ToDecimal(param.Get("ND"));
+            _dbLogger.Info(string.Format("Створено новий договір на регулярні платежі: {0}", contract.IDS), "Credits");
+
+			decimal nd = Convert.ToDecimal(param.Get("ND"));
             var ccDial = GetCcDial(nd,connect);
-            string sum = string.Format("F_GET_SUM_CCK( '{0}', to_date('{1}','dd/mm/yyyy'))", ccDial.CC_ID, ccDial.SDATE);
-            String okpo = OKPO.Value;
-            DateTime datBegin = Convert.ToDateTime(param.Get("StartDate"));
-            DateTime datEnd = Convert.ToDateTime(param.Get("EndDate"));
-            Decimal freq = Convert.ToDecimal(param.Get("Freq"));           
-            Decimal idd = 0;
+			
+            // Начало заполнения макета платежа
+            payment payment = new payment()
+            {
+                ord = Convert.ToDecimal(param.Get("Prior")),
+                vob = 6,
+                dk = 1,
+                nlsa = param.Get("NLSA"),
+                kva = Convert.ToDecimal(param.Get("CodVal")),
+                nlsb = Convert.ToString(param.GetValues("NLS").GetValue(0)),
+                tt = (Convert.ToString(param.GetValues("NLS").GetValue(0)).Substring(0, 4) == "2625") ? "PKO" : "PK!",
+                WEND = -1,
+                kvb = Convert.ToDecimal(param.Get("CodVal")),
+                mfob = MFO.Value,
+                polu = param.Get("NMK").Length > 38 ? param.Get("NMK").Substring(0, 38) : param.Get("NMK"),
+                nazn = param.Get("textNazn"),
+                okpo = OKPO.Value,
+                DAT1 = Convert.ToDateTime(param.Get("StartDate")),
+                DAT2 = Convert.ToDateTime(param.Get("EndDate")),
+                FREQ = Convert.ToDecimal(param.Get("Freq")),
+                DR = String.Empty,
+                fsum = string.Format("F_GET_SUM_CCK( '{0}', to_date('{1}','dd/mm/yyyy'))", ccDial.CC_ID, ccDial.SDATE),
+                IDS = contract.IDS
+            };
 
-            decimal statusId = 0;
-            string statusText ="";
-           
-            String dr = String.Empty;
+            // Создание макета платежа
+            Decimal idd = stoRepo.AddPayment(payment);
 
             var cultute = new CultureInfo("uk-UA")
             {
                 DateTimeFormat = {ShortDatePattern = "dd/MM/yyyy", DateSeparator = "/"}
             };
 
-            command.Parameters.Clear();
-            command.Parameters.Add("IDS", OracleDbType.Decimal, pIds, ParameterDirection.Input);
-            command.Parameters.Add("ord", OracleDbType.Decimal, ord, ParameterDirection.Input);
-            command.Parameters.Add("tt", OracleDbType.Varchar2, tt, ParameterDirection.Input);
-            command.Parameters.Add("vob", OracleDbType.Decimal, vob, ParameterDirection.Input);
-            command.Parameters.Add("dk", OracleDbType.Decimal, dk, ParameterDirection.Input);
-            command.Parameters.Add("nlsa", OracleDbType.Varchar2, nlsa, ParameterDirection.Input);
-            command.Parameters.Add("kva", OracleDbType.Decimal, kva, ParameterDirection.Input);
-            command.Parameters.Add("nlsb", OracleDbType.Varchar2, nlsb, ParameterDirection.Input);
-            command.Parameters.Add("kvb", OracleDbType.Decimal, kvb, ParameterDirection.Input);
-            command.Parameters.Add("mfob", OracleDbType.Varchar2, mfob, ParameterDirection.Input);
-            command.Parameters.Add("polu", OracleDbType.Varchar2, polu, ParameterDirection.Input);
-            command.Parameters.Add("nazn", OracleDbType.Varchar2, nazn, ParameterDirection.Input);
-            command.Parameters.Add("fsum", OracleDbType.Varchar2, sum, ParameterDirection.Input);
-            command.Parameters.Add("okpo", OracleDbType.Varchar2, okpo, ParameterDirection.Input);
-            command.Parameters.Add("DAT1", OracleDbType.Date, datBegin, ParameterDirection.Input);
-            command.Parameters.Add("DAT2", OracleDbType.Date, datEnd, ParameterDirection.Input);
-            command.Parameters.Add("FREQ", OracleDbType.Decimal, freq, ParameterDirection.Input);
-            command.Parameters.Add("WEND", OracleDbType.Decimal, wend, ParameterDirection.Input);
-            command.Parameters.Add("DR", OracleDbType.Varchar2, dr, ParameterDirection.Input);
-            command.Parameters.Add("p_nd", OracleDbType.Decimal, ccDial.ND, ParameterDirection.Input);
-            command.Parameters.Add("p_sdate", OracleDbType.Date, Convert.ToDateTime(ccDial.SDATE,cultute) , ParameterDirection.Input);
-            command.Parameters.Add("p_idd", OracleDbType.Decimal, idd, ParameterDirection.Output);
-            command.Parameters.Add("p_status", OracleDbType.Decimal, statusId, ParameterDirection.Output);
-            command.Parameters.Add("p_status_text", OracleDbType.Varchar2, 50000, statusText, ParameterDirection.Output);
-
-            
-            command.CommandText = @"begin sto_all.Add_RegularTreaty( 
-                                            :IDS, 
-                                            :ord, 
-                                            :tt, 
-                                            :vob, 
-                                            :dk, 
-                                            :nlsa,
-                                            :kva, 
-                                            :nlsb, 
-                                            :kvb, 
-                                            :mfob, 
-                                            :polu, 
-                                            :nazn,
-                                            :fsum, 
-                                            :okpo, 
-                                            :DAT1, 
-                                            :DAT2, 
-                                            :FREQ, 
-                                            null,
-                                            :WEND, 
-                                            :DR, 
-                                            null, 
-                                            :p_nd,
-                                            :p_sdate,
-                                            :p_idd,
-                                            :p_status,
-                                            :p_status_text);
-                                        end;";
-
-            _dbLogger.Info(Convert.ToString(command.Parameters["IDS"].Value) + "," +
-                Convert.ToString(command.Parameters["ord"].Value) + "," +
-                Convert.ToString(command.Parameters["tt"].Value) + "," +
-                Convert.ToString(command.Parameters["vob"].Value) + "," +
-                Convert.ToString(command.Parameters["dk"].Value) + "," +
-                Convert.ToString(command.Parameters["p_idd"].Value) + "," +
-                Convert.ToString(command.Parameters["nlsa"].Value)
-                );
-            OracleDataReader rdr = command.ExecuteReader();
-
-            idd = Convert.ToDecimal(Convert.ToString(command.Parameters["p_idd"].Value));
-            statusId = Convert.ToDecimal(Convert.ToString(command.Parameters["p_status"].Value));
-            statusText = Convert.ToString(command.Parameters["p_status_text"].Value);
-            //DBLogger.Info(Convert.ToString(command.Parameters["p_status_text"].Value));
-
             IDD.Value = Convert.ToString(idd);
             _dbLogger.Info(Convert.ToString(IDD.Value));
 
-            if (statusId == 0)
+            saveResult.InnerHtml = string.Format("<div class=\"k-block k-success-colored\"><span class=\"k-icon k-i-note\">error</span> Платіж збережено. № {0}</div>", idd);
+            Prior.Items.Clear();
+            Prior.Items.Add(new ListItem
             {
-                saveResult.InnerHtml =
-                    string.Format("<div class=\"k-block k-success-colored\"><span class=\"k-icon k-i-note\">error</span> Платіж збережено. № {0}</div>", idd);
-                Prior.Items.Clear();
-                Prior.Items.Add(new ListItem
-                {
-                    Selected = true, 
-                    Value = Convert.ToString(ord) ,
-                    Text = Convert.ToString(ord)
-                });
-                //btPrint.Enabled = true;
-            }
-            else
-            {
-                saveResult.InnerHtml =
-                    string.Format("<div class=\"k-block k-error-colored\"><span class=\"k-icon k-i-note\">error</span> Помилка при збереженні:<div> {0}</div></div>", statusText); 
-            }
-
-            rdr.Close();
-            rdr.Dispose();
+                Selected = true, 
+                Value = Convert.ToString(payment.ord) ,
+                Text = Convert.ToString(payment.ord)
+            });
+        }
+        catch (Exception e)
+        {
+            saveResult.InnerHtml = string.Format("<div class=\"k-block k-error-colored\"><span class=\"k-icon k-i-note\">error</span> Помилка при збереженні:<div> {0}</div></div>", e.Message);
         }
         finally
         {

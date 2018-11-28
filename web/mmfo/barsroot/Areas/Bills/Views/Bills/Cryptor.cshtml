@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+
+<style>
+    #btReadKey {
+        margin-top: 80px;
+    }
+
+    #sign-form {
+        margin-top: 40px;
+    }
+
+    #ddSecDeviceType, #ddSecFiles {
+        padding: 3px;
+    }
+
+    .sign-label {
+        margin-top: 3px;
+    }
+</style>
+
+<div class="form-group" style="margin: 10px;">
+    <form class="form-horizontal" id="sign-form" role="form" onsubmit="return submit_handler(this)">
+        <input type="hidden" name="partial" value="true" />
+        <div class="form-group">
+            <label class="col-xs-3 control-label no-padding-right sign-label" for="ddSecDeviceType">Носій ключа</label>
+            <div class="col-xs-9">
+                <select class="col-xs-9 col-sm-offset-1" id="ddSecDeviceType" onchange="onDeviceChange()"></select>
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label class="col-xs-3 control-label no-padding-right sign-label" for="ddSecDeviceType">Файл ключа</label>
+            <div class="col-xs-9">
+                <select id="ddSecFiles" class="col-xs-9 col-sm-offset-1"></select>
+                <button id="imgRefresh" class="k-button" style="margin-left: 10px" type="button" onclick="onRefresh()" data-rel="tooltip" data-placement="bottom">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12 ">
+                <table style="width:90%">
+                    <tr id="trRegistration" style="visibility:visible">
+                        <td>
+                            <button class="btn-sm btn-primary no-border btn pull-right" id="btReadKey" onclick="window.parent.onSign(); return false;" type="button" autofocus><i class="icon-key default"></i>Підписати</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="pull-right"><span class="badge" id="spVersion"></span></div>
+        <table style="text-align: left;">
+            <tr>
+                <td align="left" colspan="3">
+                    <table id="tabStatus">
+                        <tr>
+                            <td valign="top">
+                                <img id="imgStatus" alt="" style="vertical-align: top; color:black;" />
+                            </td>
+                            <td>
+                                <div id="dvStatus" class="ctrl-lbl" style="color:black;visibility:hidden">
+                                    Завантаження списку носіїв.
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<input type="hidden" id="sign-data" value="" />
+<script src="~/Areas/Bills/Scripts/SignForm.js"></script>

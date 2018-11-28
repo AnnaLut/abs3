@@ -1,0 +1,317 @@
+﻿@model BarsWeb.Areas.Bills.Model.SearchReceiverModel
+@{
+    @* View для поиска решения! *@
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+}
+
+<div style="margin-left: 20px; margin-right: 20px;">
+    <div class="page-header" style="padding-bottom: 0px; margin: 5px 0 20px;">
+        <h1 id="title">Пошук рішення</h1>
+    </div>
+    <div>
+        <div id="search_form" action="/barsroot/bills/bills/searchreceiver" method="get">
+            <div class="form-horizontal container-fluid">
+                <div class="form-group">
+                    <label for="ResolutionDate" class="control-label col-md-2 col-xs-3 required">
+                        <b>Дата рішення</b>
+                    </label>
+                    <div class="col-md-3 col-xs-6">
+                        @(Html.Kendo().DatePicker()
+                             .Name("ResolutionDate")
+                             .Value(Model.ResolutionDate.ToShortDateString())
+                             .Format("dd.MM.yyyy")
+                             .HtmlAttributes(new { style = "width: 100%", title = "ResolutionDate", type = "text" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ResolutionNumber" class="control-label col-md-2 col-xs-3 required">
+                        <b>Номер рішення</b>
+                    </label>
+                    <div class="col-md-3 col-xs-6">
+                        @Html.TextBoxFor(x => x.ResolutionNumber, new { @class = "k-textbox", @onkeypress = "onEnterKeyPress(event);", autocomplete = "off" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-push-2 col-md-3 text-center">
+                        <br />
+                        <button class="k-button k-primary form-control" style="width: 150px;" id="search-btn" onclick="Search(); return false;" type="button">Пошук рішення</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var keyCodes = { '48': 0, '49': 1, '50': 2, '51': 3, '52': 4, '53': 5, '54': 6, '55': 7, '56': 8, '57': 9 };
+    function Search() {
+        if ($('#ResolutionDate').val().length < 10 || $('#ResolutionNumber').val().length === 0) {
+            bars.ui.error({
+                text: 'Введіть параметри для пошуку!'
+            })
+            return;
+        }
+        window.parent.$('.k-overlay').css('z-index', '15002');
+        var list = $('#search_form').serializeArray();
+        var url = '/barsroot/bills/bills/searchreceiver';
+        var date = $('#ResolutionDate').val();
+        var numb = $('#ResolutionNumber').val();
+        var arr = date.split('.');
+        url += '?ResolutionDate=' + arr[2] + '-' + arr[1] + '-' + arr[0];
+        url += '&ResolutionNumber=' + numb;
+        window.location = url;
+    }
+
+    (function () {
+        // событие нажатия на клавишу в поле для ввода даты
+        $('#ResolutionDate').bind('keypress', function (e) {
+            onKeyPressEvent(e);            
+        });
+
+        // обработка нажатий клавиш 'Backspace' и 'Delete'
+        $('#ResolutionDate').bind('keydown', function (e) {
+            var keyCode = (e.keyCode ? e.keyCode : e.which);
+            var itemObj = e.currentTarget; // полусение объекта для поля даты
+            var objText = $('#ResolutionDate').val(); // текст ранее введенной даты
+            // если нажата кнопка 'Delete' или 'Backspace'
+            if (keyCode === 46 || keyCode === 8) {
+                e.stopPropagation();
+                e.preventDefault();
+                // если поля объекта существуют (chrome)
+                if (itemObj.selectionStart && itemObj.selectionStart >= 0) {
+                    // начальное и конечное значение каретки
+                    var start = +itemObj.selectionStart;
+                    var end = +itemObj.selectionEnd;
+                    var str = '';
+                    if (start <= objText.length) {
+                        for (var i = 0; i < objText.length; ++i) {
+                            if (keyCode === 46 && start !== i && objText[i] !== '.')
+                                str += objText[i];
+                            else if (keyCode === 8 && start - 1 !== i && objText[i] !== '.')
+                                str += objText[i];
+                            if (str.length === 2 || str.length === 5)
+                                str += '.';
+                        }
+                        $('#ResolutionDate').val(str);
+                        var itemObj = e.currentTarget;
+                        if (keyCode === 8 && start > 0)
+                            start--;
+                        itemObj.selectionStart = start;
+                        itemObj.selectionEnd = start;
+                    }
+                }
+                else if (document.selection) {
+                    itemObj.focus();
+                    var range = document.selection.createRange(); // получение объекта выделенной строки
+                    var objRange = itemObj.createTextRange(); // получение объекта не выделенной строки (весь текст)
+                    // если объект выделенной строки пустой
+                    if (range === null || range === 'undefined')
+                        return;
+                    var strt = -range.moveStart("character", -objText.length); // позиция каретки
+                    var str = '';
+                    if (strt <= objText.length) {
+                        for (var i = 0; i < objText.length; ++i) {
+                            if (keyCode === 46 && strt !== i && objText[i] !== '.')
+                                str += objText[i];
+                            else if (keyCode === 8 && strt - 1 !== i && objText[i] !== '.')
+                                str += objText[i];
+                            if (str.length === 2 || str.length === 5)
+                                str += '.';
+                        }
+                        $('#ResolutionDate').val(str);
+                        objRange.collapse(true);
+                        if (keyCode === 8 && strt > 0)
+                            strt--;
+                        objRange.moveStart('character', strt);
+                        objRange.select();
+                    }
+                }
+            }
+            else if (keyCode >= 65 && keyCode <= 90) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            else
+                onKeyPressEvent(e);
+        });
+
+        // закрытие окна при нажатии на клавишу Esc
+        $(window).keydown(function (e) {
+            if (e.keyCode == 27) {
+                window.parent.$('#createWindow').closest(".k-window-content").data("kendoWindow").close();
+            }
+        });
+    })()
+
+    // Обработка события нажатия клавиши в поле с датой
+    function onKeyPressEvent(e) {
+        var keyCode = (e.keyCode ? e.keyCode : e.which); // код нажатой кнопки
+        var item = keyCodes[keyCode]; // значение нажатой кнопки
+        // если значение числовое (получение из масива хранимого только часла)
+        if (item !== undefined && item !== null) {
+            // остановка всех действий (изменение данных)
+            var event = e || window.event;
+            event.stopPropagation();
+            event.preventDefault();
+
+            var itemObj = e.currentTarget; // полусение объекта для поля даты
+            var value = $('#ResolutionDate').val(); // текст поля
+            if ((itemObj.selectionStart || itemObj.selectionStart === 0) && itemObj.selectionStart >= 0 && itemObj.selectionStart < value.length && value.length < 10) {
+                // начальное и конечное значение каретки
+                var start = +itemObj.selectionStart;
+                var end = +itemObj.selectionEnd;
+                var str = '';
+                for (var i = 0; i < value.length; ++i) {
+                    if (start === i)
+                        str += item;
+                    if (str.length === 2 || str.length === 5)
+                        str += '.';
+                    if (value[i] != '.')
+                        str += value[i];
+                    if (str.length === 2 || str.length === 5)
+                        str += '.';
+                }
+                $('#ResolutionDate').val(str);
+                ++start;
+                itemObj.selectionStart = start;
+                itemObj.selectionEnd = start;
+                return;
+            }
+            else if (document.selection) {
+                itemObj.focus();
+                var range = document.selection.createRange(); // получение объекта выделенной строки
+                var objRange = itemObj.createTextRange(); // получение объекта не выделенной строки (весь текст)
+                // если объект выделенной строки пустой
+                if (range === null || range === 'undefined')
+                    return;
+                var objText = $('#ResolutionDate').val(); // текст ранее введенной даты
+                var strt = -range.moveStart("character", -objText.length); // позиция каретки
+                if (strt >= 0 && strt < value.length && value.length < 10) {
+                    var str = '';
+                    for (var i = 0; i < value.length; ++i) {
+                        if (strt === i)
+                            str += item;
+                        if (str.length === 2 || str.length === 5)
+                            str += '.';
+                        if (value[i] != '.')
+                            str += value[i];
+                        if (str.length === 2 || str.length === 5)
+                            str += '.';
+                    }
+                    $('#ResolutionDate').val(str);
+                    objRange.collapse(true);
+                    ++strt;
+                    objRange.moveStart('character', strt);
+                    objRange.select();
+                    return;
+                }
+            }
+            if (value.length === 2 || value.length === 5) // если необходимо поставить точку после ввода числа или месяца
+                $('#ResolutionDate').val(value + '.' + item);
+            else if (value.length < 10) // если длинна меньше длинны заполненной даты
+                $('#ResolutionDate').val(value + item);
+            // если поля объекта существуют (chrome)
+            if (itemObj.selectionStart || itemObj.selectionStart >= 0) {
+                // начальное и конечное значение каретки
+                var start = +itemObj.selectionStart;
+                var end = +itemObj.selectionEnd;
+                // если начальное значение стоит в конце заполненной даты
+                if (start === 10)
+                    return;
+                // исли строка не была выделена, а просто стоит каретка
+                if (start === end && start < value.length) {
+                    // если каретка стоит перед точкой
+                    if (start === 2 || start === 5)
+                        start++;
+                    // если каретка стоит вначале
+                    if (start === 0)
+                        value = item + value.substr(1);
+                    else // если каретка стоит не в начале
+                        value = value.substr(0, start) + item + value.substr(start + 1);
+                    $('#ResolutionDate').val(value);
+                    // перемещаем каретку на одну позицию вперед
+                    start++;
+                    itemObj.selectionStart = start;
+                    itemObj.selectionEnd = start;
+                    return;
+                }
+                // если строка была выделена
+                if (itemObj.selectionStart < 10 && itemObj.selectionStart !== itemObj.selectionEnd) {
+                    // если начальная позиция каретки находится перед точкой
+                    if (start === 2 || start === 5) {
+                        itemObj.selectionStart = start + 1;
+                        start++;
+                    }
+                    // если начальная позиция каретки не находится перед точкой
+                    if (start !== 2 || start !== 5) {
+                        value = value.substr(0, start) + item + value.substr(start + 1);
+                        $('#ResolutionDate').val(value);
+                        itemObj.selectionStart = start + 1;
+                        itemObj.selectionEnd = end;
+                    }
+                }
+            }
+            // если IE
+            else if (document.selection) {
+                itemObj.focus();
+                var range = document.selection.createRange(); // получение объекта выделенной строки
+                var objRange = itemObj.createTextRange(); // получение объекта не выделенной строки (весь текст)
+                // если объект выделенной строки пустой
+                if (range === null || range === 'undefined')
+                    return;
+                var objText = $('#ResolutionDate').val(); // текст ранее введенной даты
+                if (objText.length < 10)
+                    objText = objText.substr(0, objText.length - 1);
+                var text = range.text; // выделенный текст
+                // если текст не был выделен (поставленна позиция каретки)
+                if (text === '') {
+                    var strt = -range.moveStart("character", -objText.length); // позиция каретки
+                    // если позиция не в конце полной даты
+                    if (strt < 10) {
+                        // если каретка не стоит перед точкой
+                        if (strt === 2 || strt === 5)
+                            strt++;
+                        objText = objText.substr(0, strt) + item + objText.substr(strt + 1); // измененный текст
+                        $('#ResolutionDate').val(objText);
+                        // изменение позиции каретки на одну позицию в перед
+                        objRange.collapse(true);
+                        ++strt;
+                        objRange.moveStart('character', strt);
+                        objRange.select();
+                    }
+                    return;
+                }
+                var start = objText.indexOf(text); // начальная позиция выделенной строки
+                var end = start + text.length; // конечна позиция выделенной строки
+                // если выделение начинается с точки
+                if (text.substr(0, 1) === '.')
+                    range.text = range.text.substr(0, 1) + item + range.text.substr(2);
+                else // если выделение не начинается с точки
+                    range.text = item + text.substr(1);
+                // если первый символ выделенной строки начинается на точку
+                if (start === 2 || start === 5)
+                    start++;
+                // изменений начальной позиции выделенной строки
+                objRange.collapse(true);
+                objRange.moveStart('character', start + 1);
+                objRange.moveEnd('character', 10);
+                objRange.select();
+            }
+        }
+        // если нажата клавиша Enter
+        else if (keyCode === 13)
+            Search();
+        else if (keyCode >= 65 && keyCode <= 90) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }
+
+    // функция обработчик события при нажатии на клавишу Enter
+    function onEnterKeyPress(e) {
+        var keyCode = (e.keyCode ? e.keyCode : e.which);
+        if (keyCode === 13)
+            Search();
+    }
+</script>

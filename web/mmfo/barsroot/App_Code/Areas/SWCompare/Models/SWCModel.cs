@@ -31,5 +31,6 @@ namespace BarsWeb.Areas.SWCompare.Models
         public string TT { get; set; }
         public decimal? PRN_FILE { get; set; }
         public string KOD_NBU { get; set; }
+        public decimal? CAUSE_ERR_ID { get; set; }
     }
 }

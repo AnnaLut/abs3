@@ -12,7 +12,7 @@ PROMPT *** Create  view V_FM_OSC_RULE20 ***
   from oper o, opldok p, accounts a, customer c, customer_risk r
  where o.ref = p.ref
    and p.acc = a.acc
-   and (   a.nbs in ('2520', '2560', '2570', '2600', '2604', '2605', '2610', '2615', '2650', '2651', '2652', '2655')
+   and (   a.nbs in ('2520', '2560', '2570', '2600', '2604', '2605', '2610', '2615', '2650', '2651', '2652', '2655', '2601', '2602', '2610', '2611', '2654')
         or a.nbs like '264_'
         or a.nbs = '2603' and a.kv = 980 )
    and a.rnk = c.rnk and c.custtype = 2
