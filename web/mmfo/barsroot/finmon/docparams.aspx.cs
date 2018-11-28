@@ -252,6 +252,11 @@ public partial class finmon_docparams : Bars.BarsPage
                                                                            where a.nls = :p_nls 
                                                                            and a.kv = :p_kv 
                                                                            and a.kf = :p_mfo), -- ищем по счету
+                                                                          (select a.rnk
+                                                                           from accounts a 
+                                                                           where a.nlsalt = :p_nls
+                                                                           and a.kv = :p_kv
+                                                                           and a.kf = :p_mfo), -- пошук по альтернативному рахунку
                                                                           (select max(co.rnk) -- ищем по окпо в документе - если такой клиент один
                                                                            from customer co
                                                                            where co.okpo = :p_okpo
