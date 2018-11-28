@@ -9056,7 +9056,14 @@ begin
     loop
 
         -- выделяем отдельную строку
-        l_pos   := instr(l_value, l_crln);
+--        l_pos   := instr(l_value, l_crln); /COBUMMFO-9695
+        if instr(l_value, chr(13) || chr(10))>0 then 
+             l_crln := chr(13) || chr(10);
+             else  l_crln := chr(10);
+           l_pos   := instr(l_value, l_crln);            
+        end if;
+----        
+
 
         if (l_pos != 0) then
             l_row   := substr(l_value, 1, l_pos-1);
