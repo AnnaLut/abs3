@@ -4,7 +4,7 @@ IS
 % DESCRIPTION : Процедура формирования #С5 для КБ (универсальная)
 % COPYRIGHT : Copyright UNITY-BARS Limited, 1999. All Rights Reserved.
 %
-% VERSION : v.17.040 23/10/2018 (22/10/2018)
+% VERSION : v.17.043 27/11/2018 (15/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  параметры: Dat_ - отчетная дата
 
@@ -22,12 +22,16 @@ IS
  17 K K077 код сектору економiки
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 23.10.2018 розраховуємо суму обтяження для ЦП в еквіваленті 
- 09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок 
+ 27.11.2018 вирівнювання 2049 
+ 15.11.2018 добавлені новые бал.счета 1426,1428 lkz выравнивания с балансом
+ 14.11.2018 из табл. OTC_C5_PROC не удаляем сумму резерва если есть другие 
+            счета по договору тип 'SS' или 'SP' с ненулевым остатком 
+ 23.10.2018 розраховуємо суму обтяження для ЦП в екв_валент_
+ 09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок
  активу 3541
  21.08.2018 для наполнения таблиц? OTC_C5_PROC по счетам ЦБ добавлено новое
-            значение параметра R011='P' 
- 03.07.2018 вирівнювання з А7 файлом рахунків резервів
+            значение параметра R011='P'
+ 03.07.2018 вир_внювання з А7 файлом рахунк_в резерв_в
  26.12.2017 изменение структуры показателей с отчета за 26.12.2017
  19.12.2017 исключение из основнго скрипта новых счетов резервов
  28.07.2017 отдельное определение r012 для счетов 1592
@@ -62,17 +66,17 @@ IS
  ничего не писать в архив, если в операционное время - технологи выполняют
  формирование файла - в архив фиксируем запись
  15/10/2014 - для блока "списання за рахунок резерву" добавлено умову
-              and x.nls not like '3800%' тому що при перенесенні суми
-              з одного рахунку 2400 на інший і потім погашення з іншого
+              and x.nls not like '3800%' тому що при перенесенн_ суми
+              з одного рахунку 2400 на _нший _ пот_м погашення з _ншого
               не включались суми погашення
- 20/11/2013 - суттєва аоптимізація
+ 20/11/2013 - суттєва аоптим_зац_я
  23/09/2013 - не враховуволось погашення за рахунок резерву на 3599
- 11/09/2013 - доопрацювання по r012 для дисконтів
- 20/08/2013 - доопрацювання по S580 (додала перевірку інвесттиц. класу для всіх)
- 15/08/2013 - виправила помилку по 1528 (зауваження від ПКБ) при роботі з INT_ACCN
- 14/08/2013 - з ГОУ надійшло зауваження, що не виконується розбивка по R013
-              для рахунків 1408, 1418, 1428
- 13/08/2013 - виключила рахунок 2924 3 формування показників по резерву (ГОУ)
+ 11/09/2013 - доопрацювання по r012 для дисконт_в
+ 20/08/2013 - доопрацювання по S580 (додала перев_рку _нвесттиц. класу для вс_х)
+ 15/08/2013 - виправила помилку по 1528 (зауваження в_д ПКБ) при робот_ з INT_ACCN
+ 14/08/2013 - з ГОУ над_йшло зауваження, що не виконується розбивка по R013
+              для рахунк_в 1408, 1418, 1428
+ 13/08/2013 - виключила рахунок 2924 3 формування показник_в по резерву (ГОУ)
  22/07/2013 - для курсора SALDO_CP добавив параметр S580 iз SPECPARAM
               (зауваження ГОУ)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -338,7 +342,7 @@ BEGIN
              || TO_CHAR (dat_, 'mmyyyy'),
              'ddmmyyyy'
              );
-             
+
              dat_end_ := TO_DATE (LPAD (10 * i, 2, '0')
              || TO_CHAR (dat_, 'mmyyyy'),
              'ddmmyyyy'
@@ -494,9 +498,9 @@ BEGIN
          dat <= dat_;
 
    datp_ := datp_ + 1;
-   
+
    if datr_ = to_date('01062018', 'ddmmyyyy') and dat_ >= to_date('25062018', 'ddmmyyyy') then
-      datb_ := to_date('25062018', 'ddmmyyyy'); 
+      datb_ := to_date('25062018', 'ddmmyyyy');
    end if;
 
    insert /*+ append */
@@ -570,15 +574,15 @@ BEGIN
                          decode(t.r020, null, 0, 1) fa7p, i.freq,
                          decode(k.k077,null,decode(substr(a.nbs,1,1),''1'',''1'',''3''),k.k077) k077
                     from (SELECT   /*+ ordered full(s) */
-                                   a.acc, 
-                                   (case when :dat_ < a.dat_alt 
-                                         then a.nls_alt 
-                                         else a.nls 
-                                    end) as nls, 
-                                   a.kv, a.daos, :dat_, 
-                                   (case when :dat_ < a.dat_alt 
-                                         then substr(a.nls_alt, 1, 4) 
-                                         else a.nbs 
+                                   a.acc,
+                                   (case when :dat_ < a.dat_alt
+                                         then a.nls_alt
+                                         else a.nls
+                                    end) as nls,
+                                   a.kv, a.daos, :dat_,
+                                   (case when :dat_ < a.dat_alt
+                                         then substr(a.nls_alt, 1, 4)
+                                         else a.nbs
                                     end) as nbs,
                                    NVL(trim(cc.r011), ''0'') r011,
                                    NVL(trim(cc.r013), ''0'') r013, NVL (cc.s080, ''1'') s080,
@@ -661,8 +665,8 @@ BEGIN
           if   trim(tips_) in ('SK9','SP','SPN','XPN','OFR','KSP','KK9','KPN','SNA')
           then
                s245_ :='2';
-               
-               -- додаткова перевірка, бо не завжди'SNA' точно прострочені 
+
+               -- додаткова перев_рка, бо не завжди'SNA' точно прострочен_
                if trim(tips_) = 'SNA' then
                   select nvl(max(s245), '1')
                   into s245_
@@ -887,15 +891,15 @@ BEGIN
                     THEN
                        -- є обтяжея по ЦП
                        if nbs_ = '1408' and o_r013_1 = '9' and sum_zal <> 0 then
-                           -- не обтяжені
+                           -- не обтяжен_
                            kodp_ := dk_ || nbs_ || r011_|| o_r013_1 || LPAD (kv_,3,'0') || s580_|| r017_|| segm_WWW|| s245_|| k077_;
- 
+
                            znap_ := TO_CHAR (ABS (o_se_1 - sum_zal));
 
                            p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_,
                                         substr(comm_ || o_comm_1,1,200), nd_, acc_, mdate_, nbuc_, tobo_);
 
-                           -- обтяжені
+                           -- обтяжен_
                            kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) || o_r013_1 || LPAD (kv_,3,'0') || s580_|| r017_|| segm_WWW|| s245_|| k077_;
 
                            znap_ := TO_CHAR (ABS (sum_zal));
@@ -928,7 +932,7 @@ BEGIN
                  THEN
                     dk_ := iif_n (se_, 0, '1', '2', '2');
 
-                    -- індексовані ЦП
+                    -- _ндексован_ ЦП
                     if  nbs_ in ( '1400', '1405', '1406', '1408') and r011_ in ('1', 'C') or
                         nbs_ =  '3040' and r011_ = '1'
                     then
@@ -952,14 +956,14 @@ BEGIN
                     p_set_s580_def(nbs_, dk_, r011_, s245_);
 
                     if sum_zal <> 0 then
-                       -- необтяжені ЦП
+                       -- необтяжен_ ЦП
                        kodp_ := dk_ || nbs_ || r011_||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
                        znap_ := TO_CHAR (ABS (se_ - sum_zal));
 
                        p_add_rec(s_rnbu_record.nextval, userid_, nls_, kv_, data_, kodp_, znap_, rnk_, isp_, substr(comm_,1,200),
                                      nd_, acc_, mdate_, nbuc_, tobo_);
-                       
-                       -- обтяжені ЦП
+
+                       -- обтяжен_ ЦП
                        kodp_ := dk_ || nbs_ || (case r011_ when 'C' then '1' when 'D' then '2' when 'E' then '3' else r011_ end) ||r013_ || LPAD (kv_,3,'0') || s580_||r017_||segm_WWW||s245_||k077_;
 
                        znap_ := TO_CHAR (ABS (sum_zal));
@@ -1166,9 +1170,9 @@ BEGIN
              VALUES (s_rnbu_record.nextval, userid_, p.nls, p.kv, p.odate, kodp_, znap_, rnk_, acc_,
                 'Перевищення над залишком по активу (2)', p.nbuc, p.isp, p.tobo, nd_);
           else
-             if sk_all_ = 0 then -- немає відповідного активу
+             if sk_all_ = 0 then -- немає в_дпов_дного активу
                  update rnbu_trace
-                 set comm = substr(comm || ' + заміна по активу (2)',1,200),
+                 set comm = substr(comm || ' + зам_на по активу (2)',1,200),
                      nd = nd_,
                      kodp = substr(kodp,1,10) || '9' || substr(kodp,12)
                  where recid = p.recid;
@@ -1274,7 +1278,7 @@ BEGIN
 
       s580a_ := substr(k.kodp, 11, 1);
 
-      -- тимчасово, поки НБУ не зніме контроль на 3590
+      -- тимчасово, поки НБУ не зн_ме контроль на 3590
       if nbs_ = '3590' and k.nbs not in ('3510', '3511', '3519') then
          s245_ := '2';
       else
@@ -1283,7 +1287,7 @@ BEGIN
 
       select count( * ) into cnt_ from otcn_fa7_temp where r020 = k.nbs;
 
-      -- ознака рахунку нарахованих відсотків
+      -- ознака рахунку нарахованих в_дсотк_в
       TP_SND := (case when substr(k.nls, 1,1) in ('1','2','3') and
                            ( (substr(k.nls,1,4) in ('2607','2627','2657') and k.tip = 'SNA') or
                              substr(k.nls,4,1) = '8' or
@@ -1296,7 +1300,7 @@ BEGIN
           if TP_SND then
              r012_ :='B';
 
-             -- для рахунків нарахованих %, де немає розбивки по R013
+             -- для рахунк_в нарахованих %, де немає розбивки по R013
              if nbs_ in ('2609','2629','2659') then
                 kodp_ := k.sign_rez||nbs_||'0'||r013_||substr(k.kodp,8,3)||s580a_||substr(k.kodp,12,4)||s245_||substr(k.kodp,17);
              else
@@ -1319,7 +1323,7 @@ BEGIN
 
              znap_ := to_char(sign(k.szq) * sum_);
 
-             comm_ := SUBSTR (' резерв під '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'відсотки відносимо до R012='||r012_||' sumc='||to_char(sumc_) , 1, 200);
+             comm_ := SUBSTR (' резерв п_д '||(case when k.tip in ('SPN', 'XPN') then 'прострочен_ ' else '' end)||'в_дсотки в_дносимо до R012='||r012_||' sumc='||to_char(sumc_) , 1, 200);
           else
              r012_ := 'A';
 
@@ -1347,7 +1351,7 @@ BEGIN
 
              if k.cnt = 1 then
                 znap_ := to_char(sign(k.szq) * srez_);
-                comm_ := SUBSTR (' резерв під борг відносимо до R012='||r012_||'(1)' , 1, 200);
+                comm_ := SUBSTR (' резерв п_д борг в_дносимо до R012='||r012_||'(1)' , 1, 200);
              else
                 sum_ := round(srez_ * k.koef);
 
@@ -1363,7 +1367,7 @@ BEGIN
 
                 znap_ := to_char(sign(k.szq) * sum_);
 
-                comm_ := SUBSTR (' резерв під борг відносимо до R012='||r012_||'(2)' , 1, 200);
+                comm_ := SUBSTR (' резерв п_д борг в_дносимо до R012='||r012_||'(2)' , 1, 200);
              end if;
           end if;
 
@@ -1407,7 +1411,7 @@ BEGIN
           if k.discont_SDF <> 0 then
 	      	 r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
 		  	 r011_ := substr(k.kodp,6,1);
- 
+
  			 kodp_ := '2'||'2046'||r011_||r013_||substr(k.kodp,8);
              znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
@@ -1427,7 +1431,7 @@ BEGIN
          if k.discont_SDF <> 0 then
 			r013_ := (case when trim(k.tip) in ('SS', 'SP') then '4' else substr(k.kodp,7,1) end);
 			r011_ := substr(k.kodp,6,1);
- 
+
 			kodp_ := '2'||'2046'||r011_||r013_||substr(k.kodp,8);
             znap_ := to_char(gl.p_icurval(k.kv, k.discont_SDF, dat_));
 
@@ -1645,7 +1649,7 @@ BEGIN
 
       select count( * ) into cnt_ from otcn_fa7_temp where r020 = k.nbs;
 
-      -- ознака рахунку нарахованих відсотків
+      -- ознака рахунку нарахованих в_дсотк_в
       TP_SND := (case when substr(k.nls, 1,1) in ('1','2','3') and
                            ( (substr(k.nls,1,4) in ('2607','2627','2657') and k.tip = 'SNA') or
                              substr(k.nls,4,1) = '8' or
@@ -1662,7 +1666,7 @@ BEGIN
              kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
              znap_ := to_char(k.szq);
 
-             comm_ := SUBSTR (' резерв під '||(case when k.tip in ('SPN', 'XPN') then 'прострочені ' else '' end)||'відсотки ' , 1, 200);
+             comm_ := SUBSTR (' резерв п_д '||(case when k.tip in ('SPN', 'XPN') then 'прострочен_ ' else '' end)||'в_дсотки ' , 1, 200);
           else
 --?? как здесь определить просрочку
              if substr(k.nls, 4, 1)  = '7' and
@@ -1672,14 +1676,14 @@ BEGIN
                 kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
                 znap_ := to_char(k.szq);
 
-                comm_ := SUBSTR (' резерв під прострочку по осн. борг відносимо до R012=B ' , 1, 200);
+                comm_ := SUBSTR (' резерв п_д прострочку по осн. борг в_дносимо до R012=B ' , 1, 200);
              else
                 r012_:='A';
 
                 kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||s245_||k077_;
                 znap_ := to_char(sign(k.szq) * srez_);
 
-                comm_ := SUBSTR (' резерв під осн. борг відносимо до R012='||r012_||' R013R='||r013_, 1,100);
+                comm_ := SUBSTR (' резерв п_д осн. борг в_дносимо до R012='||r012_||' R013R='||r013_, 1,100);
              end if;
 
              discont_ := k.discont;
@@ -1709,7 +1713,7 @@ BEGIN
              kodp_ := k.sign_rez||nbs_||r011_||r013_||k.r030||s580a_||r017_||segm_WWW||'2'||k077_;
              znap_ := to_char(sign(k.szq) * srezp_);
 
-             comm_ := SUBSTR (' перевищення відносимо до R012='||r012_||' R013R='||r013_||' '||k.szq, 1,100);
+             comm_ := SUBSTR (' перевищення в_дносимо до R012='||r012_||' R013R='||r013_||' '||k.szq, 1,100);
 
              INSERT INTO rnbu_trace
                           (recid, userid,
@@ -1868,7 +1872,7 @@ BEGIN
        end loop;
    end;
 ------------------------------------------------
-   -- вирівнювання з А7 по рахунках резерву на декадну дату
+   -- вир_внювання з А7 по рахунках резерву на декадну дату
    if dat_ = dat_end_ then
  	   -- по резервах
        merge into rnbu_trace a
@@ -1894,7 +1898,7 @@ BEGIN
             update set a.znap = a.znap + b.rizn,
                    comm = comm || ' *=' || to_char(b.rizn)
        WHERE b.acc is not null;
- 
+
  -- по дсиконтах
  merge into rnbu_trace a
  using (select a.acc, a.s245, a.nbs, nvl(a.ost,0)-nvl(b.ost,0) rizn
@@ -1928,7 +1932,7 @@ BEGIN
    begin
        for k in (select nvl(a.nbuc, b.nbuc) nbuc, nvl(a.t020, b.t020) t020,
                         nvl(a.nbs, b.nbs) nbs, nvl(a.kv, b.kv) kv,  nvl(a.rez, b.rez) rez,
-                        a.ostq ost1, b.ostq ost2, nvl(a.ostq, 0) - nvl(b.ostq, 0) rizn,
+                        a.ostq ost1, b.ostq ost2, nvl(a.ostq, 0) - ABS(nvl(b.ostq, 0)) rizn,
                         R013_s580, R013_s580_A
                 from (select nbuc, t020, rez, nbs, kv,
                             ostq +
@@ -1951,8 +1955,8 @@ BEGIN
                                           '1490','1491','1492','1493','1590','1592','1890',
                                           '2890','3190','3290','3590','3599','3690','3692',
                                           '9010','9015','9030','9031','9036','9500',
-                                          '1419','1429','1509','1519','1529','2039','2046','2049',
-                                          '2069','2089','2109','2119','2129',
+                                          '1419','1426','1428','1429','1509','1519','1529',
+                                          '2039','2046','2049','2069','2089','2109','2119','2129',
                                           '2609','2629','2659',
                                           '2139','2206','2209','2236','2239','3119','3219')
                               and a.acc = s.acc
@@ -1966,7 +1970,7 @@ BEGIN
                     (select r.nbuc,
                             substr(r.kodp, 1, 1) t020, 2-MOD(c.codcagent,2) rez,
                             substr(r.kodp, 2, 4) nbs, r.kv,
-                            abs(sum(to_number(r.znap))) ostq,
+                            sum(to_number(r.znap)) ostq,
                             min('1'||substr(kodp, 6, 2)) R013_s580,
                             min('1'||substr(kodp, 6, 2)) R013_s580_A
                         from rnbu_trace r, customer c
@@ -1974,14 +1978,14 @@ BEGIN
                                       '1490','1491','1492','1493','1590','1592','1890',
                                       '2400','2401','2890','3190','3290','3590','3599','3690','3692',
                                       '9010','9015','9030','9031','9036','9500',
-                                      '1419','1429','1509','1519','1529','2039','2046','2049',
-                                      '2069','2089','2109','2119','2129',
+                                      '1419','1426','1428','1429','1509','1519','1529',
+                                      '2039','2046','2049','2069','2089','2109','2119','2129',
                                       '2609','2629','2659',
                                       '2139','2206','2209','2236','2239','3119','3219')
                           and r.rnk = c.rnk
                         group by r.nbuc, substr(r.kodp, 1, 1), 2-MOD(c.codcagent,2),substr(r.kodp, 2, 4), r.kv) b
                     on (a.nbuc = b.nbuc and a.t020 = b.t020 and a.rez = b.rez and a.nbs = b.nbs and a.kv = b.kv)
-                where abs(nvl(a.ostq, 0) - nvl(b.ostq, 0)) between 1 and granica_
+                where abs(nvl(a.ostq, 0) - ABS(nvl(b.ostq, 0))) between 1 and granica_
                 order by 1, 2, 3, 4, 9 )
        loop
           begin
@@ -1993,7 +1997,7 @@ BEGIN
                      substr(kodp,16,1) = '2' and
                      substr(kodp,6,2) = substr(k.R013_s580,2,2) and
                     (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                     sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                     sign(k.rizn) = 1 and to_number(r.znap) <> 0) and
                      r.rnk = c.rnk and
                      2-MOD(c.codcagent,2) = k.rez and
                     rownum = 1;
@@ -2007,7 +2011,7 @@ BEGIN
                          r.kodp like k.t020||k.nbs||'__'||lpad(k.kv,3,'0')||'%' and
                          substr(kodp,6,2) = substr(k.R013_s580,2,2) and
                         (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                         sign(k.rizn) = 1 and to_number(r.znap) <> 0) and
                          r.rnk = c.rnk and
                          2-MOD(c.codcagent,2) = k.rez and
                         rownum = 1;
@@ -2021,7 +2025,7 @@ BEGIN
                                  r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
                                  substr(kodp, 6, 2) = substr(k.R013_s580_A,2,2) and
                                 (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                                 sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                 sign(k.rizn) = 1 and to_number(r.znap) <> 0) and
                                 r.rnk = c.rnk and
                                 2-MOD(c.codcagent,2) = k.rez and
                                 rownum = 1;
@@ -2035,7 +2039,7 @@ BEGIN
                                          r.kodp like k.t020||k.nbs||'__'||lpad(k.kv, 3, '0')||'%' and
                                          substr(kodp, 6, 2) = substr(k.R013_s580,2,2) and
                                         (sign(k.rizn) = -1 and to_number(r.znap) >= abs(k.rizn) or
-                                         sign(k.rizn) = 1 and to_number(r.znap) > 0) and
+                                         sign(k.rizn) = 1 and to_number(r.znap) <> 0) and
                                          r.rnk = c.rnk and
                                          2-MOD(c.codcagent,2) = k.rez and
                                          rownum = 1;
@@ -2048,7 +2052,7 @@ BEGIN
           end;
 
           if recid_ is not null then
-             -- вирівнювання по рахунках резерву в бік збільшення
+             -- вир_внювання по рахунках резерву в б_к зб_льшення
              if k.nbs in ('1090','1190','1419','1429','1509','1519','1529',
                         '1549','1609','1890','2019','2029','2039','2049',
                         '2069','2079','2089','2109','2119','2129','2139',
@@ -2056,7 +2060,7 @@ BEGIN
                         '2319','2329','2339','2349','2359','2369','2379',
                         '2409','2419','2429','2439','2609','2629','2659',
                         '2890','3119','3219','3569','3590','3599','3690',
-                        '3692','2236') and
+                        '3692','1426','2206','2236') and
               k.t020 = '2' and
               k.rizn > 0
              then
@@ -2065,14 +2069,14 @@ BEGIN
                select s_rnbu_record.nextval, userid, nls, kv, odate,
                     substr(kodp, 1, 15)||'2'||substr(kodp, 17),
                     to_char(k.rizn) znap, nbuc,
-                    isp, rnk, acc, ref, 'Вирів-ня з балансом на '||to_char(k.rizn) comm,
+                    isp, rnk, acc, ref, 'Вир_в-ня з балансом на '||to_char(k.rizn) comm,
                     nd, mdate, tobo
                from rnbu_trace
                where recid = recid_;
              else
                 update rnbu_trace
-                set znap = to_char(to_number(znap) + k.rizn),
-                    comm = substr(comm || ' + вирів-ня з балансом на '||to_char(k.rizn), 1, 200)
+                set znap = to_char(to_number(znap) + sign(k.ost2) * k.rizn),
+                    comm = substr(comm || ' + вир_в-ня з балансом на '||to_char(k.rizn), 1, 200)
                 where recid = recid_;
              end if;
           end if;
@@ -2100,10 +2104,10 @@ BEGIN
    having SUM (znap)<>0;
 
 ----------------------------------------
-    -- Макаренко И.В.(налаштований job о 19:00 по формуванню файлу для розшифровки показників
-    -- та вивантаженню в файл і протокол зберігається під BARS, а інші користувачі потім не можуть
-    -- його вилучити (такі були вимоги для ГОУ: хто формує, той лише може вилучити)
-    -- тому, при такому формуванні не потрібно зберігати протокол в архів
+    -- Макаренко И.В.(налаштований job о 19:00 по формуванню файлу для розшифровки показник_в
+    -- та вивантаженню в файл _ протокол збер_гається п_д BARS, а _нш_ користувач_ пот_м не можуть
+    -- його вилучити (так_ були вимоги для ГОУ: хто формує, той лише може вилучити)
+    -- тому, при такому формуванн_ не потр_бно збер_гати протокол в арх_в
     if mfo_ = 300465 then
        select sysdate into CurrDate from dual;
        select to_date(to_char(trunc(sysdate),'dd/mm/yyyy')||' 19:00:00','dd/mm/yyyy hh24:mi:ss') into Checkdate from dual;
@@ -2356,20 +2360,29 @@ BEGIN
     -----------------------------------------------------
 
     delete
-    FROM OTC_C5_PROC
-    WHERE datf = dat_ and
-       substr(kodp,1,1) = '2' and
-       substr(kodp,2,4) in ('1090','1190','1419','1429','1509','1519','1529',
+    FROM OTC_C5_PROC o
+    WHERE o.datf = dat_ and
+       substr(o.kodp,1,1) = '2' and
+       substr(o.kodp,2,4) in ('1090','1190','1419','1429','1509','1519','1529',
                             '1549','1609','1890','2019','2029','2039','2049',
                             '2069','2079','2089','2109','2119','2129','2139',
                             '2149','2209','2219','2229','2239','2249','2309',
                             '2319','2329','2339','2349','2359','2369','2379',
                             '2409','2419','2429','2439','2609','2629','2659',
                             '2890','3119','3219','3569','3590','3599','3690','3692') and
-       acc in (select /*+ index(s, XPK_SNAP_BALANCES)*/
-                    acc
-               from snap_balances s
-               where fdat = dat_ and ost=0);
+       o.acc in (select /*+ index(s, XPK_SNAP_BALANCES)*/
+                      acc
+                 from snap_balances s
+                 where fdat = dat_ and ost=0) and 
+      not exists ( select 1 from otc_c5_proc o1, accounts a 
+                   where o1.datf = dat_ 
+                     and o1.kodp like '1%' 
+                     and o1.acc = a.acc 
+                     and o1.kv = o.kv 
+                     and trim(a.tip) in ('SS', 'SP')
+                     and o1.nd = o.nd 
+                     and o1.znap <> 0  
+                 );
     commit;
 
    logger.info ('P_FC5: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
