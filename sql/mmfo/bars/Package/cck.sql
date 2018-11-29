@@ -3235,8 +3235,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.CCK IS
                  AND d.wdate < dat_
                  AND mode_ IN (0, d.nd)
                  AND (custtype_ = 0 OR
-                     custtype_ <= 2 AND d.vidd IN (1, 2, 3) OR
-                     custtype_ = 3 AND d.vidd IN (11, 12, 13))) LOOP
+                     (custtype_ <= 2 AND d.vidd IN (1, 2, 3) and not d.prod like '9000%') OR
+                     (custtype_ = 3 AND d.vidd IN (11, 12, 13)) 
+                     )
+              ) LOOP
       cck.cc_asp(k.nd, 0);
 
       IF k.vidd < 10 THEN
@@ -14785,6 +14787,7 @@ end if;
     FOR k IN (SELECT a.acc8, a.ost, a.kv8, a.rnk, d.nd, d.cc_id, d.sdate, a.tobo, d.vidd, d.NDG
               FROM cc_deal d,  nd_acc n,   (SELECT tobo, acc acc8, -ostc ost, kv kv8, rnk FROM accounts WHERE tip = 'LIM'  AND ostc = ostb  AND ostc < 0 AND ostx <= 0) a
               WHERE nd_ IN (0, d.nd)       AND d.nd = n.nd    AND n.acc = a.acc8
+                and not d.prod like '9000%'
                 AND nvl(d.branch, 0) LIKE  nvl(l_branch || '%', nvl(d.branch, 0))
                 AND (l_vidd IS NULL OR l_vidd = 1 AND d.vidd IN (1, 2, 3) OR   l_vidd = 11 AND d.vidd IN (11, 12, 13))
              )
