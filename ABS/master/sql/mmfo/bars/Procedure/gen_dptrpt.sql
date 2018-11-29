@@ -188,7 +188,7 @@ begin
            (select p.ref, p.tt, p.s, p.dk, o.nd, o.kv,
                    o.mfoa, o.nlsa, o.nam_a, o.id_a,
                    o.mfob, o.nlsb, o.nam_b, o.id_b,
-                   o.userid, o.sk, decode(o.tt, p.tt, o.nazn, t.name) nazn
+                   o.userid, o.sk, nvl(o.nazn,t.name) nazn  --decode(o.tt, p.tt, o.nazn, t.name) nazn  --- COBUMMFO-9624
               from opldok p, oper o, tts t
              where p.acc  = trn.acc
                and p.fdat = trn.fdat
@@ -308,7 +308,7 @@ begin
            (select p.ref, p.tt, p.s, p.dk, o.nd, o.kv,
                    o.mfoa, o.nlsa, o.nam_a, o.id_a,
                    o.mfob, o.nlsb, o.nam_b, o.id_b,
-                   o.userid, o.sk, decode(o.tt, p.tt, o.nazn, t.name) nazn
+                   o.userid, o.sk, nvl(o.nazn,t.name) nazn  --decode(o.tt, p.tt, o.nazn, t.name) nazn  --- COBUMMFO-9624
               from opldok p, oper o, tts t
              where p.ref  = o.ref
                and p.tt   = t.tt
