@@ -32,6 +32,7 @@ PROMPT *** Create  view V_VISALIST ***
     WHERE o.userid = s.id
           and o.ref = ov.ref(+)
           and OV.STATUS(+) = 0
+		  and OV.PASSIVE(+) is null
    UNION ALL
    SELECT o.REF AS REF,                                     -- наложенные визы
           ct.priority AS Counter,
