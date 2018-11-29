@@ -1,8 +1,12 @@
 begin
-  /* вручну вкл/викл
+
+  begin 
   execute immediate 'ALTER TRIGGER barsaq.tu_oper_guard DISABLE';
   execute immediate 'ALTER TRIGGER tu_oper_guard DISABLE';  
-  */
+  exception
+    when others then null;
+  end;
+
   bc.go(300465);
 
   update oper set nd = '4027'  where ref = 161220891901 and nd = 'FRS9$91901';
@@ -25,10 +29,15 @@ begin
   exception when others 
     then 
       bc.home;
-      /*
+      
+      begin
       execute immediate 'ALTER TRIGGER barsaq.tu_oper_guard enable';
       execute immediate 'ALTER TRIGGER tu_oper_guard enable';      
-      */
+      exception
+        when others then null;
+      end;
+
+
       bars_audit.error('CP: Перенумерація по заявці COBUMMFO-10041 впала.  '||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
       dbms_output.put_line('CP: Перенумерація по заявці COBUMMFO-10041 впала.  '||SQLERRM||','||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
 end;
