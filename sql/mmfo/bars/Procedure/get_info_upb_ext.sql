@@ -50,9 +50,10 @@ PROMPT *** Create  procedure GET_INFO_UPB_EXT ***
    LocalBD_ IN date default  gl.bd -- Дата, на которую можем получить информацию по КД
 ) IS
 
--- ver 3.38
+-- ver 3.39
 
 /*
+   21-11-2018  LitvinSO уточнение по типу счета для 2620, после переезда карточек на данную аналитику
    25-10-2016  Изменен подход к поиску КД так контр. розр.  счета 8999  уже не по номеру КД
    02-04-2015  Нельзя применять процедуру  CCK.INT_METR_A к счетам прострочки
    26-02-2015  Проценты по класике вычислять от даты погашения , а не от сегоднешнего дня
@@ -237,7 +238,7 @@ CC_DAYNP:= CCK_APP.GET_ND_TXT(ND_,'DAYNP');
    SELECT a.nls,a.ostc/100
    into NLSK_,l_ost
    from nd_acc n, accounts a where n.nd=ND_
-   and a.NBS='2620' and a.kv=KV_ and n.acc=a.acc and a.dazs is null;
+   and a.NBS='2620' and a.TIP = 'DEP' and a.kv=KV_ and n.acc=a.acc and a.dazs is null;
      CC_DAYNP:=-2;  -- для новой математики никаких смещений
      CC_PAY_D:=null; -- для новой математики никаких предустановленных дней только платежный день
   EXCEPTION
