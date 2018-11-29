@@ -1,5 +1,3 @@
-
-
 PROMPT ===================================================================================== 
 PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/DPT_VIDD_UPDATE.sql =========*** Run *
 PROMPT ===================================================================================== 
@@ -154,6 +152,16 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IDX001_DPTVIDDUPDATE ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX001_DPTVIDDUPDATE ON BARS.DPT_VIDD_UPDATE (VIDD, DATEU, IDU, BR_ID) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE BRSSMLI ';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  DPT_VIDD_UPDATE ***
