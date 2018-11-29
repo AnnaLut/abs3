@@ -230,7 +230,10 @@ begin
     l_Sql := 'insert into tmp_bal ( NBS,DOS,KOS,OSTD,OSTK )
       select nbs, sum(dos), sum(kos), sum(ostd), sum(ostk)
       from (
-          select a.nbs,
+          select case
+                   when a.dat_alt < :l_DAT1 then substr(a.nlsalt, 1, 4)
+                   else a.nbs
+                 end nbs,
                sum(b.dosq) DOS, sum(b.kosq) KOS ,
                sum(decode( sign(b.ostq),-1, -b.ostq, 0 )) OSTD,
                sum(decode( sign(b.ostq), 1,  b.ostq, 0 )) OSTK
@@ -242,7 +245,10 @@ begin
            and ( b.dosq>0 or b.kosq>0 or b.ostq<>0 )
            and nvl(a.dat_alt, :l_DAT1 - 1) <> :l_DAT1
            and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
-         group by a.nbs
+         group by case
+                    when a.dat_alt < :l_DAT1 then substr(a.nlsalt, 1, 4)
+                    else a.nbs
+                  end
             union all
          select substr(b.acc_num, 1, 4),
                 sum( b.dosq_repd ) DOS, sum( b.kosq_repd ) KOS ,
@@ -308,6 +314,8 @@ begin
      else
         execute immediate l_Sql using l_DAT1;
      end if;
+  elsif l_id1 = 0 and l_id2 = 0 then
+    execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1;
   else
      execute immediate l_Sql using l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1, l_DAT1 ;
   end if;
