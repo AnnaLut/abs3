@@ -333,14 +333,23 @@ create or replace package body ow_transform_acc is
                          , a.nls
                          , a.ob22
                          , nvl(r020_new, '2620') new_nbs
-                         , t.ob_new new_ob22
+                         , nvl2(t.ob_new, '36', nvl2(a.ob22, '36', null)) new_ob22
                          , get_new_nls(a.kf, nvl(r020_new, '2620'), a.nls) new_nls
                   from accounts a
-                  join w4_acc_instant i on a.acc = i.acc
+                  left join w4_acc_instant i on a.acc = i.acc
                   left join transfer_2017 t on a.nbs = t.r020_old
                                                and a.ob22 = t.ob_old
                   where a.kf = p_kf
                         and regexp_like(a.nls, '^'||gc_nbs_person)
+                        and ( 
+                              i.acc is not null
+                              or (
+                                    i.acc is null
+                                    and a.nbs is null
+                                    and a.daos = a.dazs
+                                    and a.ob22 in ('29', '30')
+                                 )
+                            )
                   order by a.nbs
                )
       loop
@@ -370,7 +379,7 @@ create or replace package body ow_transform_acc is
 
          l_nbs := c.nbs;
       end loop;
-      bars_audit.info(l_trace||'Оброблені рахунки по балансовому KF='||p_kf||', NBS=INSTANT, Всього рахунків ='||l_acc_cnt);
+      bars_audit.info(l_trace||'Оброблені рахунки по балансовому KF='||p_kf||', NBS=INSTANT(ВПО, ЕПП), Всього рахунків ='||l_acc_cnt);
 
       commit;
 
@@ -495,6 +504,7 @@ create or replace package body ow_transform_acc is
                      where (
                               t.dazs is null 
                               or exists(select 1 from w4_acc_instant i where i.acc = t.acc)  
+                              or (t.daos = t.dazs and t.ob22 = '36' and t.nbs is null)
                            )
                            and t.nlsalt is not null
                            and t.dat_alt is not null
@@ -1413,15 +1423,24 @@ create or replace package body ow_transform_acc is
                          , a.ob22    ob_old
                          , a.nls     nls_old
                          , t.new_nbs nbs_new
-                         , t.ob22    ob_new
+                         , nvl2(t.new_ob22, t.new_ob22, nvl2(a.ob22, '36', null)) ob_new
                          , coalesce(t.new_nls, get_new_nls(a.kf, '2620', a.nls)) nls_new
                          , t.new_nls nls_new_forecast
                   from accounts a
-                  join w4_acc_instant i on i.acc = a.acc
+                  left join w4_acc_instant i on i.acc = a.acc
                   left join transform_2017_forecast t on a.acc = t.acc
                   where a.dat_alt is null
                         and a.kf = p_kf
                         and regexp_like(a.nls, '^'||gc_nbs_person)
+                        and ( 
+                              i.acc is not null
+                              or (
+                                    i.acc is null
+                                    and a.nbs is null
+                                    and a.daos = a.dazs
+                                    and a.ob22 in ('29', '30')
+                                 )
+                            )
              )
       loop
          l_try := 0;
@@ -1437,11 +1456,12 @@ create or replace package body ow_transform_acc is
                   set NLS       = c.nls_new
                       , nlsalt  = c.Nls_Old
                       , DAT_ALT = gc_bnk_dt
+                      , ob22    = c.ob_new
                   where acc = c.ACC;
 
                   l_try := 100;
                else
-                  c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => c.nbs_new , p_nls => c.nbs_new||'0'||trunc(dbms_random.value(100000000, 999999999)));
+                  c.nls_new := get_new_nls(p_kf => p_kf, p_nbs => '2620', p_nls => '26200'||trunc(dbms_random.value(100000000, 999999999)));
                   l_try := tools.iif(l_try = 99, 101, l_try + 1);
                end if;
             exception
@@ -1497,12 +1517,18 @@ create or replace package body ow_transform_acc is
                end;
             end if;
 
+            if c.ob_old is not null then
+               update SPECPARAM set OB22_alt = c.ob_old  where acc = c.ACC ;
+            end if;
+
             --- Журнал счетов
             delete from accounts_update where acc = c.acc and trunc(chgdate) = trunc(sysdate);
 
             ----- закрыть chgaction = 3
             INSERT INTO accounts_update
-               (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
+               (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, 
+               grp, sec, seci, seco, vid, tip, dazs,
+                blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
                 chgdate , chgaction , doneby ,idupd  , effectdate, branch,ob22, globalbd,send_sms  )
             VALUES (c.acc   ,c.nls  ,c.nlsalt,c.kv    ,c.nbs_old   ,c.nbs2,c.daos  ,c.isp   ,c.nms   ,c.pap,
                  c.grp   ,c.sec  ,c.seci  ,c.seco  ,c.vid   ,c.tip , gc_bnk_dt,   -- дата закр
@@ -1512,9 +1538,12 @@ create or replace package body ow_transform_acc is
 
             ----- открыть chgaction = 1
             INSERT INTO accounts_update
-               (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
-                chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
-            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,c.nbs_new,c.nbs_old, gc_bnk_dt,-- дата откр
+               (acc, nls, nlsalt, kv, nbs, nbs2, daos,
+                isp, nms  , pap, grp, sec, seci, seco, vid, tip, 
+                dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
+                chgdate , chgaction , doneby,idupd  , effectdate, branch, ob22,
+                globalbd, send_sms  )
+            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,nvl2(c.nbs_old, c.nbs_new, c.nbs_old),c.nbs_old, gc_bnk_dt,-- дата откр
                     c.isp  ,c.nms  ,c.pap ,c.grp,c.sec ,c.seci, c.seco,c.vid  ,c.tip ,  -- yjdsq nbg cx
                     c.dazs ,c.blkd ,c.blkk,c.lim, c.pos,c.accc,c.tobo ,c.mdate,c.ostx,c.rnk ,c.kf   ,
                     sysdate     ,1,user_name ,bars_sqnc.get_nextval('s_accounts_update',c.kf), gc_bnk_dt, c.branch, c.ob_new ,
@@ -1522,9 +1551,12 @@ create or replace package body ow_transform_acc is
 
             -- Update  chgaction = 2 Воccтановить для ХД дату открытия = дате открытия из accounts c.DAOS
             INSERT INTO   accounts_update
-               (acc, nls, nlsalt, kv, nbs, nbs2, daos, isp, nms  , pap, grp, sec, seci, seco, vid, tip, dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
-                 chgdate , chgaction , doneby,idupd  , effectdate, branch,ob22,globalbd,send_sms  )
-            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,c.nbs_new, c.nbs_old, c.DAOS ,-- дата откр
+               (acc, nls, nlsalt, kv, nbs, nbs2, daos,
+                isp, nms  , pap, grp, sec, seci, seco, vid, tip,
+                dazs, blkd, blkk, lim, pos, accc, tobo, mdate, ostx, rnk, kf ,
+                chgdate, chgaction , doneby,idupd  , effectdate, branch, ob22,
+                globalbd, send_sms  )
+            VALUES (c.acc  ,c.nls_new  ,c.nls ,c.kv ,nvl2(c.nbs_old, c.nbs_new, c.nbs_old), c.nbs_old, c.DAOS ,-- дата откр
                     c.isp  ,c.nms  ,c.pap ,c.grp,c.sec ,c.seci, c.seco,c.vid  ,c.tip ,  -- yjdsq nbg cx
                     c.dazs ,c.blkd ,c.blkk,c.lim, c.pos,c.accc,c.tobo ,c.mdate, c.ostx,c.rnk ,c.kf   ,
                     sysdate     ,2,user_name ,bars_sqnc.get_nextval('s_accounts_update',c.kf), gc_bnk_dt, c.branch, c.ob_new,
