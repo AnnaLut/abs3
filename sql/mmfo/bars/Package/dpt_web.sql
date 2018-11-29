@@ -8862,6 +8862,7 @@ is
     l_actrate   int_ratn.ir%type;
     l_indrate   int_ratn.ir%type;
     l_basrate   int_ratn.br%type;
+    l_f_brate   int_ratn.br%type;
     l_opid      int_ratn.op%type;
     l_min_summ  dpt_vidd.min_summ%type;
     l_br_id     dpt_vidd.br_id%type;
@@ -8901,7 +8902,49 @@ is
       end;
       return l_bonus_val;
     end;
+    
+    function get_base_rate(p_vidd dpt_vidd.vidd%type, p_dat dpt_deposit.datz%type)
+      return number is
+      l_base_rate   brates.br_id%type;
+      l_dat         date;
+    begin  
+      bars_audit.trace('f_get_base_rate: p_vidd => %s , p_dat => %s',
+                     to_char(p_vidd), to_char(p_dat, 'dd.mm.yyyy'));
+      -- есть ситуации, когда время совпадает до сотых...
+      begin
+        select v.br_id
+        into l_base_rate
+        from dpt_vidd_update v
+        where v.vidd = p_vidd
+          and v.dateu = (select max(dateu)
+                         from dpt_vidd_update dv
+                        where dv.vidd = p_vidd
+                          and dv.dateu <= p_dat + 0.99999);
 
+       exception when too_many_rows then
+         
+         select max(dateu)
+         into l_dat
+         from dpt_vidd_update dv
+         where dv.vidd = p_vidd
+         and dv.dateu <= p_dat + 0.99999;
+       
+         select v.br_id
+         into l_base_rate
+         from dpt_vidd_update v
+         where v.vidd = p_vidd
+           and v.idu = (select max(idu)
+                         from dpt_vidd_update dv
+                        where dv.vidd = p_vidd
+                          and dv.dateu = l_dat);
+      when others then
+         l_base_rate := 0;                    
+      end;
+      bars_audit.trace('f_get_base_rate: return => %s', to_char(l_base_rate));
+                     
+      return l_base_rate;                                               
+    end;       
+                                              
   begin
 
     bars_audit.trace('%s entry, dptid => %s',
@@ -9029,6 +9072,8 @@ is
                       ', l_extype =' || to_char(l_extype) ||
                       ', p_dptdata.cntdubl= ' ||
                       to_char(p_dptdata.cntdubl));
+      l_f_brate := get_base_rate(p_dptdata.dptype, p_dptdata.dptdat);                
+      
       for ext in (select indv_rate indv_rate,
                          oper_id oper_id,
                          base_rate base_rate,
@@ -9054,13 +9099,7 @@ is
                                    when method_id not in (5, 9) then
                                     base_rate
                                    else
-                                    (select v.br_id
-                                       from dpt_vidd_update v
-                                      where v.vidd = p_dptdata.dptype
-                                        and idu = (select max(idu)
-                                                   from dpt_vidd_update v
-                                                   where v.vidd = p_dptdata.dptype
-                                                     and dateu <= p_dptdata.dptdat + 0.99999))
+                                    l_f_brate
                                  end base_rate,
                                  method_id,
                                  ext_num,
@@ -9072,6 +9111,7 @@ is
                    where (p_dptdata.cntdubl between ext_num and next_num)
                       or (next_num is null and p_dptdata.cntdubl >= ext_num)
                    order by term_mnth, term_days) loop
+                   
         bars_audit.trace('%s rateereviewdat %s, rate = (%s, %s, %s/%s)',
                          title,
                          to_char(ext.intdat, 'dd.mm.yyyy'),
