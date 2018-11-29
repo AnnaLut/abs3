@@ -83,16 +83,17 @@
          FROM cc_deal d, accounts a8, int_accn ia, nd_acc n, nd_txt tz
         WHERE p_type = 17
           AND vidd IN (11, 12, 13)
-      AND ia.acc = a8.acc
-      and ia.stp_dat is null
-      AND n.acc = a8.acc
-      AND n.nd = d.nd
-      and tz.nd = d.nd
-          AND ia.id in (0, 1)
-      and tz.tag = 'FLAGS'
-      and ia.s = 25
-      and substr(tz.txt, 2, 1) = '0'
-          and d.sos <> 15;
+		  AND ia.acc = a8.acc
+		  and ia.stp_dat is null
+		  AND n.acc = a8.acc
+		  AND n.nd = d.nd
+		  and tz.nd = d.nd
+		  AND ia.id in (0, 1)
+		  and tz.tag = 'FLAGS'
+		  and ia.s = 25
+		  --AND substr(tz.txt, 2, 1) = '0' COBUMMFO-7232
+		  and tz.txt = '00'
+		  and d.sos <> 15;
   ELSIF p_type = -999 THEN
      -- Õ¿ ¬»ÃŒ√”- ÔÓ 1  ƒ
      OPEN k1 FOR
