@@ -32,6 +32,15 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Abstract
 		void BeginTransaction();
         void Commit();
         void Rollback();
-		List<PaymentDopRekvModel> GetDopRekvforPaymentList(decimal idd);
-        List<GovBuyingCodeRekv> GetGovCodesValue();    }
+        /// <summary>
+        /// Добавление предустановленных допреквизитов к макету платежа
+        /// </summary>
+        /// <param name="idd">ИД макета</param>
+        /// <param name="tag">Тег допреквизита</param>
+        /// <param name="value">Предустановленное значение</param>
+        void SetStoOperw(decimal idd, string tag, string value);
+
+        List<PaymentDopRekvModel> GetDopRekvforPaymentList(decimal idd);
+        List<GovBuyingCodeRekv> GetGovCodesValue();
+    }
 }
