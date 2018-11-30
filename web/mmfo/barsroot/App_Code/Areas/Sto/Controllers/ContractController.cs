@@ -23,28 +23,26 @@ namespace BarsWeb.Areas.Sto.Controllers
         {
             return View(accessMode);
         }
+
+        /// <summary>
+        /// Список групп рег. платежей
+        /// </summary>
         public ActionResult GetGroupList([DataSourceRequest] DataSourceRequest request)
         {
-            //var list = _repo.GroupData();
-            //var result = list.Select(c => new
-            //{
-            //    c.IDG,
-            //    c.NAME
-            //}).OrderBy(e => e.IDG).ToDataSourceResult(request);
-
             var result = _repo.GetGroupsList().ToDataSourceResult(request);
-
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Список договоров на рег. платежи по выбранной группе
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="group_id">ИД группы РП</param>
         public ActionResult GetContractList([DataSourceRequest] DataSourceRequest request, int group_id)
         {
             var response = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                //var branch = _repo.CurrentBranch();
-                //var list = _repo.ContractData();
-                //response.data = list.Where(a => a.BRANCH.Contains(branch)).Select(x => new { x.IDS, x.RNK, x.NAME, x.SDAT, x.IDG, x.KF, x.BRANCH }).ToDataSourceResult(request); 
-
                 response.data = _repo.GetContractDataList(group_id).ToDataSourceResult(request);
             }
             catch (Exception ex) {
@@ -55,6 +53,12 @@ namespace BarsWeb.Areas.Sto.Controllers
             result.MaxJsonLength = Int32.MaxValue;
             return result;
         }
+
+        /// <summary>
+        /// Список макетов рег. платежей по выбранному договору
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="ids">ИД договора на РП</param>
         public ActionResult GetContractDetList([DataSourceRequest] DataSourceRequest request, decimal ids)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -77,6 +81,11 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Список предустановленных допреквизитов макета платежа
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="paymentIdd">ИД макета РП</param>
         public ActionResult GetDopRekvForPayment([DataSourceRequest] DataSourceRequest request, decimal paymentIdd)
         {
             JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
@@ -85,22 +94,32 @@ namespace BarsWeb.Areas.Sto.Controllers
                 return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Список (справочник) кодов госзакупок
+        /// </summary>
         public ActionResult GetGovCodesValues([DataSourceRequest] DataSourceRequest request)
         {
             JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
 
             var dopRekvforPaymentList = _repo.GetGovCodesValue();
-            var data = dopRekvforPaymentList.ToDataSourceResult(request);
+            DataSourceResult data = dopRekvforPaymentList.ToDataSourceResult(request);
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Подтверждение / отмена макета рег. платежа
+        /// </summary>
+        /// <param name="idd">ИД макета РП</param>
+        /// <param name="statusId">ИД Статуса (ОК / отмена)</param>
+        /// <param name="disclaimId">ИД причины отмены</param>
+        /// <returns></returns>
         public ActionResult GetClaim(string idd, string statusId, string disclaimId)
         {
-            var result = new JsonResponse(JsonResponseStatus.Ok);
+            JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                var claimReult = _repo.ClaimProc(idd, statusId, disclaimId);
+                int claimReult = _repo.ClaimProc(idd, statusId, disclaimId);
                 switch (claimReult)
                 {
                     case 0:
@@ -121,10 +140,13 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Список причин отмены макета рег. платежа
+        /// </summary>
         public ActionResult GetDisclaimerList([DataSourceRequest] DataSourceRequest request)
         {
             var list = _repo.DisclaimerData();
-            var result = list.Where(x => x.ID != 0).Select(c => new
+            DataSourceResult result = list.Where(x => x.ID != 0).Select(c => new
             {
                 c.ID,
                 c.NAME
@@ -133,6 +155,11 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Получение истории изменений макета рег. платежа
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="idd">ИД макета РП</param>
         public ActionResult GetDetListRowInfo([DataSourceRequest] DataSourceRequest request, decimal idd)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -158,6 +185,10 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Получение списка вариантов частоты выполнения рег. платежа
+        /// </summary>
         public ActionResult GetFREQ()
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -172,6 +203,10 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Получение списка допустимых операций (tts) для рег. платежа
+        /// </summary>
         public ActionResult GetTTS()
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -186,6 +221,12 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Получение счетов клиента
+        /// </summary>
+        /// <param name="RNK">РНК</param>
+        /// <param name="KV">Валюта - цифровой код</param>
         public ActionResult GetNLS(decimal RNK, decimal? KV = null)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -201,6 +242,10 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Получение списка валют, доступных клиенту
+        /// </summary>
+        /// <param name="RNK">РНК</param>
         public ActionResult GetKVs(decimal? RNK)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -216,6 +261,11 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Поиск клиентов по ИНН / РНК
+        /// </summary>
+        /// <param name="OKPO">ИНН</param>
+        /// <param name="RNK">РНК</param>
         public ActionResult GetRNKLIST(string OKPO, decimal? RNK)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -230,6 +280,11 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Получение наименования / ФИО клиента по РНК
+        /// </summary>
+        /// <param name="RNK">РНК</param>
         public ActionResult GetNMK(decimal RNK)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -244,20 +299,37 @@ namespace BarsWeb.Areas.Sto.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Создание нового макета платежа
+        /// </summary>
+        /// <param name="newpayment">Данные макета платежа</param>
+        /// <returns>ИД созданного макета</returns>
          public ActionResult AddPayment(payment newpayment)
         {
-            var result = new JsonResponse(JsonResponseStatus.Ok);
+            JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
             try
             {
-                result.data = _repo.AddPayment(newpayment);
+                _repo.BeginTransaction();
+                decimal idd = _repo.AddPayment(newpayment);
+                result.data = idd;
+                _repo.SetStoOperw(idd, "KODDZ", newpayment.govBuyCode);
+                _repo.Commit();
             }
             catch (Exception e)
             {
+                _repo.Rollback();
                 result.status = JsonResponseStatus.Error;
                 result.message = e.InnerException == null ? e.Message : e.InnerException.Message;
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Создание нового договора на рег. платежи
+        /// </summary>
+        /// <param name="newids">Данные договора</param>
+        /// <returns>ИД созданного договора</returns>
          public ActionResult AddIDS(ids newids)
          {
              var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -272,6 +344,11 @@ namespace BarsWeb.Areas.Sto.Controllers
              }
              return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Получение следующего порядкового номера макета рег. платежа для договора
+        /// </summary>
+        /// <param name="IDS">ИД договора РП</param>
         public ActionResult AvaliableNPP(decimal IDS)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);
@@ -287,6 +364,11 @@ namespace BarsWeb.Areas.Sto.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Удаление / закрытие договора на рег. платежи
+        /// </summary>
+        /// <param name="ids">ИД договора РП</param>
+        /// <returns>Результирующее сообщение</returns>
         public ActionResult Delete_Contract(decimal ids)
         {
             var result = new JsonResponse(JsonResponseStatus.Ok);

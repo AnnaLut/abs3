@@ -26,18 +26,27 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
 
         private System.Data.Common.DbTransaction transaction;
 
+        /// <summary>
+        /// Открывает транзакцию EF
+        /// </summary>
         public void BeginTransaction ()
         {
-            if (_sto.Connection.State != System.Data.ConnectionState.Open)
+            if (_sto.Connection.State != ConnectionState.Open)
                 _sto.Connection.Open();
             transaction = _sto.Connection.BeginTransaction();
         }
 
+        /// <summary>
+        /// Коммит транзакции EF
+        /// </summary>
         public void Commit ()
         {
             transaction.Commit();
         }
 
+        /// <summary>
+        /// Откат транзакции EF
+        /// </summary>
         public void Rollback ()
         {
             if (transaction != null)
@@ -97,15 +106,19 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
 
         public IQueryable<V_STO_DET> ContractDetData()
         {
-            var data = _sto.V_STO_DET;
-            return data;
+            return _sto.V_STO_DET;
         }
+        /// <summary>
+        /// Список групп регулярных платежей (чтение из таблицы)
+        /// </summary>
         public IQueryable<STO_GRP> GroupData()
         {
             return _sto.STO_GRP;
         }
 
-        //Makes the same as GroupData() but might be faster
+        /// <summary>
+        /// Список групп регулярных платежей (чтение из таблицы); Makes the same as GroupData() but might be faster
+        /// </summary>
         public List<STOGroup> GetGroupsList()
         {
             List<STOGroup> groups = new List<STOGroup>();
@@ -133,6 +146,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
 
             return groups;
         }
+
         /// <summary>
         /// Подтверждение / отклонение макета рег. платежа
         /// </summary>
@@ -142,7 +156,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
         /// <returns>1 - выполнено успешно, 0 - ошибка</returns>
         public int ClaimProc(string idd, string statusId, string disclaimId)
         {
-            var procResult = 1;
+            int procResult = 1;
             const string command = @"
                     begin
                         sto_all.claim_idd ( :p_IDD, :p_statusid, :p_disclaimid);
@@ -163,6 +177,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             }
             return procResult;
         }
+
         /// <summary>
         /// Список причин отклонения макета РП
         /// </summary>
@@ -171,6 +186,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
         {
             return _sto.STO_DISCLAIMER;
         }
+
         /// <summary>
         /// История изменений макетов РП
         /// </summary>
@@ -180,12 +196,17 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             return _sto.V_STO_DET_HIST;
         }
 
+        /// <summary>
+        /// Получение текущего отделения пользователя из контекста БД
+        /// </summary>
+        /// <returns></returns>
         public string CurrentBranch()
         {
             const string query = @"select SYS_CONTEXT('bars_context', 'user_branch') from dual";
             var branch = _sto.ExecuteStoreQuery<string>(query).Single();
             return branch;
         }
+
         /// <summary>
         /// Частота выполнения РП (справочник)
         /// </summary>
@@ -195,6 +216,13 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             const string query = @"select freq, name from FREQ";
             return _sto.ExecuteStoreQuery<pipe_FREQ>(query).AsQueryable();
         }
+
+        /// <summary>
+        /// Получение данных активного клиента по ИНН / РНК
+        /// </summary>
+        /// <param name="OKPO">ИНН</param>
+        /// <param name="RNK">РНК</param>
+        /// <returns>(RNK, NMK, OKPO)</returns>
         public List<pipe_customer> GetRNKLIST(string OKPO, decimal? RNK)
         {
             List<pipe_customer> list = new List<pipe_customer>();
@@ -242,6 +270,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             }
             return list;
         }
+
         /// <summary>
         /// Операции, доступные для использования в макетах РП
         /// </summary>
@@ -268,9 +297,15 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
                     }
                 }
             }
-
             return tts_list;
         }
+
+        /// <summary>
+        /// Получение счетов клиента
+        /// </summary>
+        /// <param name="RNK">РНК</param>
+        /// <param name="KV">Валюта (числовой код)</param>
+        /// <returns>Лицевые номера счетов</returns>
         public IQueryable<string> GetNLS(decimal RNK, decimal? KV)
         {
             string query = "";
@@ -279,7 +314,7 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             {
                 query = @"select nls from accounts where rnk = :p_rnk and dazs is null";
                 parameters = new object[] {
-                new OracleParameter("p_rnk", OracleDbType.Decimal) { Value = RNK}
+                    new OracleParameter("p_rnk", OracleDbType.Decimal) { Value = RNK}
                 };
             }
             else
@@ -288,11 +323,16 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
                 parameters = new object[] {
                     new OracleParameter("p_rnk", OracleDbType.Decimal) { Value = RNK},
                     new OracleParameter("p_kv", OracleDbType.Decimal) { Value = KV}
-                    };
+                };
             }
             return _sto.ExecuteStoreQuery<string>(query, parameters).AsQueryable();
         }
 
+        /// <summary>
+        /// Получение валют доступных счетов клиента
+        /// </summary>
+        /// <param name="RNK">РНК</param>
+        /// <returns>(KV, NAME) - числовой код валюты, название</returns>
         public IQueryable<DropDown> GetKVs(decimal? RNK)
         {
             string query = "";
@@ -311,6 +351,12 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             }
             return _sto.ExecuteStoreQuery<DropDown>(query, parameters).AsQueryable();
         }
+
+        /// <summary>
+        /// Получение наименования клиента / ФИО
+        /// </summary>
+        /// <param name="RNK">РНК</param>
+        /// <returns>NMK - наименование / ФИО</returns>
         public IQueryable<string> GetNMK(decimal RNK)
         {
             const string query = @"select nmk from customer where rnk = :p_rnk";
@@ -327,60 +373,46 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
         /// <returns>ИД созданного макета</returns>
         public decimal AddPayment(payment newpayment)
         {
-            try
-            {
-                BeginTransaction();
-                const string query = @"begin sto_all.Add_RegularTreaty( :IDS,:ord, :tt, :vob, :dk, :nlsa,:kva, :nlsb, :kvb, :mfob, :polu, " +
-                    ":nazn,:fsum, :okpo, :DAT1, :DAT2, :FREQ, null,:WEND, :DR, null, :p_nd,:p_sdate,:p_idd,:p_status,:p_status_text);end;";
-                OracleParameter p_idd = new OracleParameter("p_idd", OracleDbType.Decimal, newpayment.idd, System.Data.ParameterDirection.Output); // результирующий ИД макета платежа
-                var parameters = new object[] {
-                new OracleParameter("IDS", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.IDS},
-                new OracleParameter("ord", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.ord},
-                new OracleParameter("tt", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.tt},
-                new OracleParameter("vob", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.vob},
-                new OracleParameter("dk", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.dk},
-                new OracleParameter("nlsa", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.nlsa},
-                new OracleParameter("kva", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.kva},
-                new OracleParameter("nlsb", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.nlsb},
-                new OracleParameter("kvb", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.kvb},
-                new OracleParameter("mfob", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.mfob},
-                new OracleParameter("polu", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.polu},
-                new OracleParameter("nazn", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.nazn},
-                new OracleParameter("fsum", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.fsum},
-                new OracleParameter("okpo", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.okpo},
-                new OracleParameter("DAT1", OracleDbType.Date, System.Data.ParameterDirection.Input) { Value = newpayment.DAT1},
-                new OracleParameter("DAT2", OracleDbType.Date, System.Data.ParameterDirection.Input) { Value = newpayment.DAT2},
-                new OracleParameter("FREQ", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.FREQ},
-                new OracleParameter("WEND", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.WEND},
-                new OracleParameter("DR", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newpayment.DR},
-                new OracleParameter("p_nd", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newpayment.nd},
-                new OracleParameter("p_sdate", OracleDbType.Date, System.Data.ParameterDirection.Input) { Value = newpayment.sdate},
-                p_idd,
-                new OracleParameter("p_status", OracleDbType.Decimal, System.Data.ParameterDirection.Output) { Value = newpayment.status},
-                new OracleParameter("p_status_text", OracleDbType.Varchar2, 4000, System.Data.ParameterDirection.Output) { Value = newpayment.status_text} };
+            const string query = @"begin sto_all.Add_RegularTreaty( :IDS,:ord, :tt, :vob, :dk, :nlsa,:kva, :nlsb, :kvb, :mfob, :polu, " +
+                ":nazn,:fsum, :okpo, :DAT1, :DAT2, :FREQ, null,:WEND, :DR, null, :p_nd,:p_sdate,:p_idd,:p_status,:p_status_text);end;";
+            OracleParameter p_idd = new OracleParameter("p_idd", OracleDbType.Decimal, newpayment.idd, ParameterDirection.Output); // результирующий ИД макета платежа
+            var parameters = new object[] {
+            new OracleParameter("IDS", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.IDS},
+            new OracleParameter("ord", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.ord},
+            new OracleParameter("tt", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.tt},
+            new OracleParameter("vob", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.vob},
+            new OracleParameter("dk", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.dk},
+            new OracleParameter("nlsa", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.nlsa},
+            new OracleParameter("kva", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.kva},
+            new OracleParameter("nlsb", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.nlsb},
+            new OracleParameter("kvb", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.kvb},
+            new OracleParameter("mfob", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.mfob},
+            new OracleParameter("polu", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.polu},
+            new OracleParameter("nazn", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.nazn},
+            new OracleParameter("fsum", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.fsum},
+            new OracleParameter("okpo", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.okpo},
+            new OracleParameter("DAT1", OracleDbType.Date, ParameterDirection.Input) { Value = newpayment.DAT1},
+            new OracleParameter("DAT2", OracleDbType.Date, ParameterDirection.Input) { Value = newpayment.DAT2},
+            new OracleParameter("FREQ", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.FREQ},
+            new OracleParameter("WEND", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.WEND},
+            new OracleParameter("DR", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.DR},
+            new OracleParameter("p_nd", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.nd},
+            new OracleParameter("p_sdate", OracleDbType.Date, ParameterDirection.Input) { Value = newpayment.sdate},
+            p_idd,
+            new OracleParameter("p_status", OracleDbType.Decimal, ParameterDirection.Output) { Value = newpayment.status},
+            new OracleParameter("p_status_text", OracleDbType.Varchar2, 4000, ParameterDirection.Output) { Value = newpayment.status_text} };
 
-                _sto.ExecuteStoreCommand(query, parameters);
-                newpayment.idd = ((OracleDecimal)p_idd.Value).Value;
+            _sto.ExecuteStoreCommand(query, parameters);
+            newpayment.idd = ((OracleDecimal)p_idd.Value).Value;
 
-                const string addKodGovBuyQuery = @"begin sto_all.add_operw(:p_idd, :p_tag, :p_value); end;";
-                var addKodGovBuyQueryParameters =
-                new object[]
-                {
-                      new OracleParameter("p_idd", OracleDbType.Decimal, ParameterDirection.Input) { Value = newpayment.idd},
-                      new OracleParameter("p_tag", OracleDbType.Varchar2, ParameterDirection.Input) { Value = "KODDZ"},
-                      new OracleParameter("p_value", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newpayment.govBuyCode},
-                };
-                _sto.ExecuteStoreCommand(addKodGovBuyQuery, addKodGovBuyQueryParameters);
-                Commit();
-            }
-            catch (Exception ex)
-            {
-                Rollback();
-                throw ex;
-            }
             return newpayment.idd;
         }
 
+        /// <summary>
+        /// Хитрое получение следующего порядкового номера макета
+        /// </summary>
+        /// <param name="IDS"></param>
+        /// <returns></returns>
         public decimal AvaliableNPP(decimal IDS)
         {
             const string query = @"select bars.sto_all.get_AvaliableNPP(:p_ids) from dual";
@@ -399,13 +431,13 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
         public decimal AddIDS(ids newids)
         {
             const string query = @"begin sto_all.set_lst( :IDG,:IDS, :RNK, :NAME, :SDAT); end;";
-            OracleParameter IDS = new OracleParameter("IDS", OracleDbType.Decimal, newids.IDS, System.Data.ParameterDirection.Output); // результирующий ИД договора
+            OracleParameter IDS = new OracleParameter("IDS", OracleDbType.Decimal, newids.IDS, ParameterDirection.Output); // результирующий ИД договора
             OracleParameter[] parameters = new OracleParameter[] {
                 IDS,
-                new OracleParameter("IDG", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newids.IDG},
-                new OracleParameter("RNK", OracleDbType.Decimal, System.Data.ParameterDirection.Input) { Value = newids.RNK},
-                new OracleParameter("NAME", OracleDbType.Varchar2, System.Data.ParameterDirection.Input) { Value = newids.NAME},
-                new OracleParameter("SDAT", OracleDbType.Date, System.Data.ParameterDirection.Input) { Value = newids.SDAT}
+                new OracleParameter("IDG", OracleDbType.Decimal, ParameterDirection.Input) { Value = newids.IDG},
+                new OracleParameter("RNK", OracleDbType.Decimal, ParameterDirection.Input) { Value = newids.RNK},
+                new OracleParameter("NAME", OracleDbType.Varchar2, ParameterDirection.Input) { Value = newids.NAME},
+                new OracleParameter("SDAT", OracleDbType.Date, ParameterDirection.Input) { Value = newids.SDAT}
              };
             _sto.ExecuteStoreCommand(query, parameters);
             newids.IDS = ((OracleDecimal)IDS.Value).Value;
@@ -430,6 +462,11 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
             return resultMessage;
         }
 
+        /// <summary>
+        /// Список предустановленных реквизитов макета платежа
+        /// </summary>
+        /// <param name="idd">ИД макета платежа</param>
+        /// <returns>(Название реквизита, значение)</returns>
         public List<PaymentDopRekvModel> GetDopRekvforPaymentList(decimal idd)
         {
             List<PaymentDopRekvModel> dopRekvList = new List<PaymentDopRekvModel>();
@@ -454,10 +491,32 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
                     }
                 }
             }
-
             return dopRekvList;
         }
 
+        /// <summary>
+        /// Добавление предустановленных допреквизитов к макету платежа
+        /// </summary>
+        /// <param name="idd">ИД макета</param>
+        /// <param name="tag">Тег допреквизита</param>
+        /// <param name="value">Предустановленное значение</param>
+        public void SetStoOperw (decimal idd, string tag, string value)
+        {
+            const string setOperwQuery = @"begin sto_all.add_operw(:p_idd, :p_tag, :p_value); end;";
+            var Params =
+            new object[]
+            {
+                      new OracleParameter("p_idd", OracleDbType.Decimal, ParameterDirection.Input) { Value = idd},
+                      new OracleParameter("p_tag", OracleDbType.Varchar2, ParameterDirection.Input) { Value = tag},
+                      new OracleParameter("p_value", OracleDbType.Varchar2, ParameterDirection.Input) { Value = value},
+            };
+            _sto.ExecuteStoreCommand(setOperwQuery, Params);
+        }
+
+        /// <summary>
+        /// Получение данных справочника "Коди державної закупівлі"
+        /// </summary>
+        /// <returns>Код, название</returns>
         public List<GovBuyingCodeRekv> GetGovCodesValue()
         {
             List<GovBuyingCodeRekv> dopRekvList = new List<GovBuyingCodeRekv>();
@@ -481,7 +540,6 @@ namespace BarsWeb.Areas.Sto.Infrastructure.Repository.DI.Implementation
                     }
                 }
             }
-
             return dopRekvList;
         }
     }
