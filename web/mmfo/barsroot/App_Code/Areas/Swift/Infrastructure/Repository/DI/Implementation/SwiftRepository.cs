@@ -10,6 +10,7 @@ using System.Data.Objects;
 using System.Linq;
 using Oracle.DataAccess.Client;
 using Bars.Classes;
+using System.Data;
 
 namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation
 {
@@ -118,6 +119,55 @@ namespace BarsWeb.Areas.Swift.Infrastructure.DI.Implementation
                             row.Currency = reader["Currency"].ToString();
                             row.STI = reader["STI"].ToString();
                             row.UETR = reader["UETR"].ToString();
+                            row.Status = reader["Status"].ToString();
+                            row.StatusDescription = reader["StatusDescription"].ToString();
+
+                            dataList.Add(row);
+                        }
+                    }
+                }
+            }
+            return dataList;
+        }
+
+        public List<SwiftGPIStatusesMT199> GetMT199GridItems(string uetr)
+        {
+            List<SwiftGPIStatusesMT199> dataList = new List<SwiftGPIStatusesMT199>();
+            using (OracleConnection conn = OraConnector.Handler.IOraConnection.GetUserConnection())
+            {
+                using (OracleCommand command = conn.CreateCommand())
+                {
+                    command.CommandText = @"Select 
+                                UETR,
+                                Ref, 
+                                MT, 
+                                date_out as DateOut,
+                                sender as SenderCode,
+                                receiver as ReceiverCode,
+                                amount as Summ,
+                                Currency,
+                                Status,
+                                status_description as StatusDescription
+                                    from V_SW_GPI_STATUSES_MT199 where UETR = :p_uetr";
+                    //command.CommandType = CommandType.Text;
+                    command.Parameters.Add("p_uetr", OracleDbType.Varchar2, uetr, ParameterDirection.Input);
+
+                    using (OracleDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            SwiftGPIStatusesMT199 row = new SwiftGPIStatusesMT199();
+                            row.UETR = reader["UETR"].ToString();
+                            row.Ref = Convert.ToInt64(reader["Ref"].ToString());
+                            row.MT = Convert.ToInt64(reader["MT"].ToString());
+                            if (reader["DateOut"].ToString() != null)
+                            {
+                                row.DateOut = Convert.ToDateTime(reader["DateOut"].ToString());
+                            }
+                            row.SenderCode = reader["SenderCode"].ToString();
+                            row.ReceiverCode = reader["ReceiverCode"].ToString();
+                            row.Summ = Convert.ToDecimal(reader["Summ"].ToString());
+                            row.Currency = reader["Currency"].ToString();
                             row.Status = reader["Status"].ToString();
                             row.StatusDescription = reader["StatusDescription"].ToString();
 
