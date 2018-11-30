@@ -32,10 +32,8 @@ function fillGPIMessagesGrid() {
 }
 
 function fillMT199Grid() {
-    if (!!getSelectedMainGridRow()) {
         $("#MT199MessagesGrid").data("kendoGrid").dataSource.read();
         $("#MT199MessagesGrid").data("kendoGrid").refresh();
-    }
 }
 
 function functionName(func) {
@@ -56,6 +54,12 @@ function functionName(func) {
 function createLinkTemplate(fieldName, parameter, clickFunction) {
     //here clickFunction parameter is passed like reference to function, while we need only name
     return '<a href="#" onclick="' + functionName(clickFunction) + '(\'' + parameter + '\')" style="color: blue">' + fieldName + '</a>';
+}
+
+function makeAutofitColumnWidth(grid) {
+    for (var i = 0; i < grid.columns.length; i++) {
+        grid.autoFitColumn(i);
+    }
 }
 
 function initMainGrid() {
@@ -300,6 +304,7 @@ function initMainGrid() {
         autobind: true,
         dataBound: function (e) {
             e.sender.select("tr:eq(1)");
+            makeAutofitColumnWidth(this);
         },
         change: fillMT199Grid,
         selectable: "row",
@@ -315,6 +320,13 @@ function initMainGrid() {
             allPages: true,
             fileName: "GPI. Список повідомлень.xlsx",
             proxyURL: bars.config.urlContent("/Swift/GPIDocsReview/ConvertBase64ToFile")
+        },
+        excelExport: function (e) {
+            var columns = e.workbook.sheets[0].columns;
+            columns.forEach(function (column) {
+                delete column.width;
+                column.autoWidth = true;
+            });
         },
         noRecords: {
             template: '<div class="k-label" style="color:grey; margin:20px 20px;"> Відсутні записи! </div>'
@@ -443,7 +455,7 @@ function initMT199MessagesGrid() {
                         if (!!selectedRow)
                             UETRval = selectedRow.UETR;
                         else
-                            UETRval = null;
+                            UETRval = "";
 
                         UETRobj = {
                             curUETR: UETRval
@@ -479,6 +491,9 @@ function initMT199MessagesGrid() {
             serverPaging: true,
         },
         autobind: false,
+        dataBound: function (e) {
+            makeAutofitColumnWidth(this);
+        },
         filterable: true,
         sortable: true,
         resizable: true,
@@ -491,6 +506,13 @@ function initMT199MessagesGrid() {
             allPages: true,
             fileName: "GPI. Повідомлення MT199.xlsx",
             proxyURL: bars.config.urlContent("/Swift/GPIDocsReview/ConvertBase64ToFile")
+        },
+        excelExport: function (e) {
+            var columns = e.workbook.sheets[0].columns;
+            columns.forEach(function (column) {
+                delete column.width;
+                column.autoWidth = true;
+            });
         },
         noRecords: {
             template: '<div class="k-label" style="color:grey; margin:20px 20px;"> Відсутні записи! </div>'
