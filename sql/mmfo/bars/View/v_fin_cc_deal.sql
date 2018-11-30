@@ -7,9 +7,8 @@ PROMPT =========================================================================
 
 PROMPT *** Create  view V_FIN_CC_DEAL ***
 
-  CREATE OR REPLACE FORCE VIEW BARS.V_FIN_CC_DEAL ("TIP", "VIDD", "RNK", "ND", "CC_ID", "SDATE", "WDATE", "BRANCH", "FIN23", "OBS23", "KAT23", "K23", "KV", "SOS", "PROD") AS 
-  
-   SELECT 'CCK' AS tip,
+  CREATE OR REPLACE FORCE VIEW BARS.V_FIN_CC_DEAL ("TIP", "VIDD", "RNK", "ND", "CC_ID", "SDATE", "WDATE", "BRANCH", "FIN23", "OBS23", "KAT23", "K23", "KV", "SOS", "PROD", "IS_CLOSED") AS 
+  SELECT /*+ first_rows(10) */ 'CCK' AS tip,
           c.vidd,
           c.rnk,
           c.nd,
@@ -23,9 +22,13 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           c.k23,
           d.kv,
           c.sos,
-          c.prod
+          c.prod,
+          case sos
+            when 15 then 1
+            else 0
+          end as is_closed
      FROM cc_deal c, cc_add d
-    WHERE     c.nd = d.nd
+    WHERE c.nd = d.nd
       and c.vidd in (1,2,3,5,11,12,13)
       --and sos between 10 and 15
    UNION ALL                                                       -- гарантії
@@ -43,7 +46,11 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           c.k23,
           980 AS kv,
           c.sos,
-          c.prod
+          c.prod,
+          case sos
+            when 15 then 1
+            else 0
+          end as is_closed
      FROM cc_deal c
     WHERE vidd IN (29, 39, 19)
    UNION ALL                     -- Все що не ввійшло в модуля (по номеру асс)
@@ -61,7 +68,11 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           c.k,
           a.kv AS kv,
           NULL AS sos,
-          a.nbs AS prod
+          a.nbs AS prod,
+          case
+            when a.dazs is not null then 1
+            else 0
+          end as is_closed
      FROM ACC_FIN_OBS_KAT c, accounts a
     WHERE     a.nbs IN ('9020')
           AND a.acc = c.acc
@@ -69,7 +80,7 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
                  (SELECT 1
                     FROM nd_acc
                    WHERE acc = a.acc)
-          AND (a.dazs IS NULL OR a.dazs > SYSDATE - 31)
+/*          AND (a.dazs IS NULL OR a.dazs > SYSDATE - 31)*/
    UNION ALL                                                       -- гарантії
    SELECT 'OVR' AS tip,
           c.vidd,
@@ -85,7 +96,11 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           c.k23,
           980 AS kv,
           c.sos,
-          c.prod
+          c.prod,
+          case c.sos
+            when 15 then 1
+            else 0
+          end
      FROM cc_deal c
     WHERE vidd IN (110)
    UNION ALL                                                      -- овердрафт
@@ -103,7 +118,8 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           o.k23,
           a.kv,
           NULL AS sos,
-          a.nbs AS prod
+          a.nbs AS prod,
+          0
      FROM acc_over o, accounts a
         WHERE o.acc = a.acc AND o.acc = o.acco AND 1 = 0
    UNION ALL                                                            -- БПК
@@ -121,7 +137,11 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           o.k23,
           a.kv,
           NULL AS sos,
-          a.nbs AS prod
+          a.nbs AS prod,
+          case
+            when a.dazs is not null then 1
+            else 0
+          end
      FROM bpk_acc o, accounts a
     WHERE     (   acc_9129 IS NOT NULL
                OR acc_ovr IS NOT NULL
@@ -131,7 +151,7 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
                OR acc_3579 IS NOT NULL
                OR acc_2209 IS NOT NULL)
           AND o.acc_pk = a.acc
-          AND (a.dazs IS NULL OR a.dazs > SYSDATE - 31)
+--          AND (a.dazs IS NULL OR a.dazs > SYSDATE - 31)
           AND 1 = 0
    UNION ALL                                                        -- опенвей
    SELECT 'OW4' AS tip,
@@ -148,8 +168,12 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
           o.k23,
           a.kv,
           NULL AS sos,
-          a.nbs AS prod
-     FROM w4_acc o, accounts a   
+          a.nbs AS prod,
+          case
+            when a.dazs is not null then 1
+            else 0
+          end
+     FROM w4_acc o, accounts a
     WHERE /*(   acc_9129 IS NOT NULL -- В рамках проставляння ВКР для кредитної фабрики прибрано умову наявності хоч одного рахунку
            OR acc_ovr IS NOT NULL
            OR acc_3570 IS NOT NULL
@@ -158,7 +182,8 @@ PROMPT *** Create  view V_FIN_CC_DEAL ***
            OR acc_3579 IS NOT NULL
            OR acc_2209 IS NOT NULL)
       AND*/
-          o.acc_pk = a.acc AND (a.dazs IS NULL OR a.dazs > SYSDATE - 31);
+          o.acc_pk = a.acc --AND (a.dazs IS NULL OR a.dazs > SYSDATE - 31)
+;
 
 PROMPT *** Create  grants  V_FIN_CC_DEAL ***
 grant SELECT                                                                 on V_FIN_CC_DEAL   to BARSREADER_ROLE;

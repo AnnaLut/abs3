@@ -437,6 +437,17 @@
     </grid>
 
     <grid id="Id3" title="Кредитні угоди клієнта" pagesize="5" showpagesizebox="true" >
+      <!--Фільтри-->
+      <filters buttontext="Знайти" columnscount="3" caption="Пошук угод">
+        <filter id="fId1" caption="№ договора" field="CC_ID"  condition="LikeBoth" columnindex="1"></filter>
+        <filter id="fId2" caption="REF КД" field="ND"  condition="Equal" columnindex="2"></filter>
+        <filter id="fId3" caption="Статус угоди" field="is_closed"   condition="Equal"  columnindex="3">
+          <uicontrol type="DropDownList" table="(select 0 as val, 'Відкрита' as name from dual union all select 1 as val , 'Закрита' as name  from dual)"
+                          keyfield="val" valuefield="name"  addemptyitem="true">
+            <defaultvalue type="Constant" value="0"/>
+          </uicontrol>
+        </filter>
+      </filters>      
       <datasource>
         <sql>
           select  c.*, :okpo as okpo, :rnk1 as rnk1 ,
@@ -623,6 +634,11 @@
 
         <field name="PD" key="false" datatype="Decimal"  >
           <column caption="Значення коофіціента PD п.351" show="true" width="15"   align="Center" formatstring="{0:N3}" ></column>
+        </field>
+
+        <field name="is_closed" key="false" datatype="Boolean"  >
+          <column caption="Закрита" show="true" width="10"   align="Center"></column>
+		  <form><uicontrol type="CheckBox" truevalue="1" falsevalue="0"></uicontrol></form>
         </field>
         
       </fields>
