@@ -43,13 +43,31 @@ namespace BarsWeb.Areas.Swift.Controllers
                 }
 
                 var dataList = _repo.GetMTGridItems();
-
                 return Json(dataList.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
-                return Json(new { Errors = "Помилка у методі GetMainGridItems: \n" + ex.Message }, JsonRequestBehavior.AllowGet);
+                return Json(new DataSourceResult { Errors = "Помилка у методі GetMainGridItems: " + ex.Message }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult GetMT199GridItems([DataSourceRequest]DataSourceRequest request, string curUETR)
+        {
+            JsonResponse result = new JsonResponse(JsonResponseStatus.Ok);
+            if (String.IsNullOrEmpty(curUETR))
+            {
+                return Json(new DataSourceResult { Errors = "Помилка у методі GetMT199GridItems: значення UETR не може бути порожнім" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+                try
+                {
+                    var dataList = _repo.GetMT199GridItems(curUETR);
+                    return Json(dataList.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    return Json(new DataSourceResult { Errors = "Помилка у методі GetMT199GridItems: " + ex.Message }, JsonRequestBehavior.AllowGet);
+                }
         }
     }
 }

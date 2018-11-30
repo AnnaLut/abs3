@@ -3,11 +3,9 @@ using System;
 using BarsWeb.Areas.Swift.Infrastructure.DI.Abstract;
 using Areas.Swift.Models;
 using BarsWeb.Areas.Kernel.Models;
-using BarsWeb.Areas.Swift.Infrastructure.DI.Abstract;
 using BarsWeb.Areas.Swift.Infrastructure.DI.Implementation;
 using BarsWeb.Core.Models;
 using BarsWeb.Core.Models.Binders.Api;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -21,7 +19,7 @@ using BarsWeb;
 
 namespace BarsWeb.Areas.Swift.Controllers
 {
-    //[AuthorizeApi]
+    [AuthorizeApi]
     public class GPIDocsReviewApiController : ApiController
     {
 

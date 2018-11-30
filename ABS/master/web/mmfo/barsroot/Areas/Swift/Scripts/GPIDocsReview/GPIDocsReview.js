@@ -32,8 +32,10 @@ function fillGPIMessagesGrid() {
 }
 
 function fillMT199Grid() {
-    $("#MT199MessagesGrid").data("kendoGrid").dataSource.read();
-    $("#MT199MessagesGrid").data("kendoGrid").refresh();
+    if (!!getSelectedMainGridRow()) {
+        $("#MT199MessagesGrid").data("kendoGrid").dataSource.read();
+        $("#MT199MessagesGrid").data("kendoGrid").refresh();
+    }
 }
 
 function functionName(func) {
@@ -264,6 +266,10 @@ function initMainGrid() {
                 data: "Data",
                 total: "Total",
                 error: "Errors",
+                errors: function (response) {
+                    if (response.Errors)
+                        bars.ui.error({ text: response.Errors });
+                },
                 model: {
                     fields: {
                         Ref: { type: "number" },
@@ -286,13 +292,6 @@ function initMainGrid() {
                         StatusDescription: { type: "string" }
                     }
                 }
-            },
-            error: function (err) {
-                if (err != null) {
-                    bars.ui.error({ title: 'Помилка!', text: err.errors });
-                }
-                else
-                    bars.ui.error({ title: 'Помилка!', text: e.errorThrown });
             },
             pageSize: 10,
             serverPaging: true,
@@ -321,6 +320,12 @@ function initMainGrid() {
             template: '<div class="k-label" style="color:grey; margin:20px 20px;"> Відсутні записи! </div>'
         }
     });
+}
+
+function getSelectedMainGridRow() {
+    var mainGrid = $("#GTIStatusesGrid").data("kendoGrid");
+    var selectedRow = mainGrid.dataItem(mainGrid.select());
+    return selectedRow;
 }
 
 function initMT199MessagesGrid() {
@@ -429,10 +434,10 @@ function initMT199MessagesGrid() {
             transport: {
                 read: {
                     type: "GET",
-                    url: bars.config.urlContent('Api/Swift/GPIDocsReviewApi/GetMT199GridItems'),
+                    //url: bars.config.urlContent('Api/Swift/GPIDocsReviewApi/GetMT199GridItems'),
+                    url: bars.config.urlContent('/Swift/GPIDocsReview/GetMT199GridItems'),
                     data: function () {
-                        var mainGrid = $("#GTIStatusesGrid").data("kendoGrid");
-                        var selectedRow = mainGrid.dataItem(mainGrid.select());
+                        var selectedRow = getSelectedMainGridRow();
                         var UETRobj, UETRval;
                         
                         if (!!selectedRow)
@@ -451,7 +456,10 @@ function initMT199MessagesGrid() {
             schema: {
                 data: "Data",
                 total: "Total",
-                error: "Errors",
+                errors: function (response) {
+                    if (response.Errors)
+                        bars.ui.error({ text: response.Errors });
+                },
                 model: {
                     fields: {
                         UETR: { type: "string" },
@@ -466,9 +474,6 @@ function initMT199MessagesGrid() {
                         DateOut: { type: "date" }
                     }
                 }
-            },
-            error: function (e) {
-                alert(e.errorThrown);
             },
             pageSize: 10,
             serverPaging: true,
