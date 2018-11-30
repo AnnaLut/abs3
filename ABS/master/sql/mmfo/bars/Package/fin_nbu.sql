@@ -6273,7 +6273,13 @@ begin
        else null;
     end case;
 
-
+	
+	case
+       when ZN_P_ND('RG2', 59, DAT_) = 1 and ZN_P_ND('RG3', 59, DAT_) = 1 then
+         l_klass := greatest(l_klass, 9); -- не менше 8
+       else null;
+    end case;
+/*
     -- Чиста кредитна заборгованість до чистої виручки від реалізації >2.5
     case
        when ZN_P_ND('RG2', 59, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8
@@ -6285,7 +6291,7 @@ begin
        when ZN_P_ND('RG3', 59, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 8
        else null;
     end case;
-
+*/
         -- Відсутність достатність виручки
  /*    case
        when ZN_P_ND('RG4', 59, DAT_) = 1 then l_klass := greatest(l_klass, 9); -- не менше 9
