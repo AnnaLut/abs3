@@ -1692,6 +1692,28 @@ begin
   begin
 
      if p_mode = 0 then
+        -- COBUMMFO-7501 Begin
+        select nvl(alt.acc, a.acc), nvl(alt.nls, a.nls),  nvl(alt.kv, a.kv)
+               , q.dk, o.tt, decode(o.kv, o.kv2, o.s, decode(o.dk, 0, o.s, o.s2))
+               , o.sos, o.currvisagrp, o.nextvisagrp, nvl2(trim(wt.tt),1,0)
+               , nvl2(ow.ref,1,0), decode(o.mfoa, o.mfob, 1, 0), o.s2
+          into l_acc, l_nlsb, l_kv, l_dk, l_tt, l_s, l_sos, l_currvisagrp, l_nextvisagrp, l_tt_w4_flag, l_locpay_flag, l_isourmfo, l_s2
+          from ow_pkk_que q
+               left join ow_locpay_match ow on q.ref = ow.ref
+               join oper o on q.ref = o.ref
+               left join w4_sto_tts wt on o.tt = wt.tt
+               join accounts a on q.acc = a.acc
+               left join accounts alt on alt.nlsalt = a.nls 
+                                         and alt.kf = a.kf
+                                         and alt.kv = a.kv
+                                         and alt.tip like 'W4%' 
+                                         and regexp_like(alt.nls, '^26[0,2,5]0')
+         where q.ref = p_ref
+           and q.dk  = p_dk
+           and q.sos = 1
+           and o.sos > 0;
+        -- COBUMMFO-7501 End
+        /* Comment COBUMMFO-7501
         select a.acc, a.nls,  a.kv, q.dk, o.tt, decode(o.kv, o.kv2, o.s, decode(o.dk, 0, o.s, o.s2)), o.sos, o.currvisagrp, o.nextvisagrp, nvl2(trim(wt.tt),1,0), nvl2(ow.ref,1,0), decode(o.mfoa, o.mfob, 1, 0), o.s2
           into l_acc, l_nlsb, l_kv, l_dk, l_tt, l_s, l_sos, l_currvisagrp, l_nextvisagrp, l_tt_w4_flag, l_locpay_flag, l_isourmfo, l_s2
           from ow_pkk_que q, oper o, accounts a, w4_sto_tts wt, ow_locpay_match ow
@@ -1702,7 +1724,7 @@ begin
            and q.acc = a.acc
            and o.sos > 0
            and o.tt = wt.tt(+)
-           and q.ref = ow.ref(+);
+           and q.ref = ow.ref(+);*/
      elsif p_mode = 2 then
         select a.acc, a.nls,  a.kv, 0, o.tt, decode(o.kv, o.kv2, o.s, decode(o.dk, 0, o.s, o.s2)), o.sos, o.currvisagrp, o.nextvisagrp, nvl2(trim(wt.tt),1,0), decode(o.mfoa, o.mfob, 1, 0), o.s2
           into l_acc, l_nlsb, l_kv, l_dk, l_tt, l_s, l_sos, l_currvisagrp, l_nextvisagrp, l_tt_w4_flag, l_isourmfo, l_s2

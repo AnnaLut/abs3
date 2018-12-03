@@ -1061,7 +1061,7 @@ begin
           -- COBUMMFO-7501 Begin
           -- Блокируем трансформированный счет по дебиту и кредиту
           if l_acc is not null and l_tip like 'OW%' 
-			 and regexp_like(l_nlsalt, '^26[0,5]5') and l_daos <= trunc(sysdate) - 3 then
+			 and regexp_like(l_nlsalt, '^26[0,5]5') and l_daos >= trunc(sysdate)-3 then
              update accounts a
              set a.blkd = 99
                  , a.blkk = 99
