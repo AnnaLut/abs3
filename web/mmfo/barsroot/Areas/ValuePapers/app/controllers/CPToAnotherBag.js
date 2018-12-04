@@ -293,10 +293,20 @@
 
     $scope.InsertValuePaper = function () {
         $scope.SendPaperWindow.close();
+        var send_data = {
+            id: $scope.id_paper,
+            pf_1: $scope.first_combo_select.VIDD,
+            ryn_1: $scope.second_combo_select.RYN,
+            pf_2: $scope.third_combo_select.VIDD,
+            ryn_2: $scope.fourth_combo_select.RYN,
+            sum: angular.element("#sum").val(),
+            _ref: angular.element("#ref").val(),
+            nazn: $scope.ticket_text,
+            kor: angular.element("#kor").is(':checked')
+        };
         $.ajax({
-            url: bars.config.urlContent("/api/valuepapers/CPToAnotherBagApi/InsertValuePaper") + "?id=" + $scope.id_paper + "&pf_1=" + $scope.first_combo_select.VIDD +
-                "&ryn_1=" + $scope.second_combo_select.RYN + "&pf_2=" + $scope.third_combo_select.VIDD + "&ryn_2=" + $scope.fourth_combo_select.RYN + "&sum=" + angular.element("#sum").val() +
-                "&_ref=" + angular.element("#ref").val() + "&nazn=" + $scope.ticket_text + "&kor=" + angular.element("#kor").is(':checked'),
+            url: bars.config.urlContent("/api/valuepapers/CPToAnotherBagApi/InsertValuePaper"),
+            data: { valuepaper : JSON.stringify(send_data) },
             method: "GET",
             dataType: "json",
             async: false,
