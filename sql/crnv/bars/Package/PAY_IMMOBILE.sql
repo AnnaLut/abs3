@@ -43,7 +43,7 @@ END PAY_IMMOBILE;
 /
 
 CREATE OR REPLACE PACKAGE BODY BARS.PAY_IMMOBILE IS
-  g_body_version CONSTANT VARCHAR2(64) := 'version 1.45 27/09/2018';
+  g_body_version CONSTANT VARCHAR2(64) := 'version 1.46 04/12/2018';
   g_mfo varchar2(9);
 
  function get_nls2924foracc(p_nls in varchar2)
@@ -1185,7 +1185,7 @@ end INS_Vega2_To_ODB;
             when 1 then
               if cur_o.kv = 980 then
                 if (cur_o.mfob = '300465') then
-				    if cur_o.nlsb like '2625%' then
+				    if cur_o.nlsb like '262%' then
 				          l_tt := 'PKR';
 				     else l_tt := 'DP2';
 				     end if;
@@ -1194,7 +1194,7 @@ end INS_Vega2_To_ODB;
                 end if;
               else
                 if (cur_o.mfob = '300465') then
-				   	 if cur_o.nlsb like '2625%' then
+				   	 if cur_o.nlsb like '262%' then
 				          l_tt := 'PKR';
 				     else l_tt := 'DPI';
 				     end if;
@@ -1286,7 +1286,7 @@ end INS_Vega2_To_ODB;
                         cur_o.nlsa,
                         cur_o.s,
                         cur_o.kv,
-                        case when cur_o.mfob = 300465 then get_nls2924foracc(cur_o.nlsb) else
+                        case when cur_o.mfob = '300465' then get_nls2924foracc(cur_o.nlsb) else
                         g_grc_nls_t00 end,
                         cur_o.s);
             l_ref1 := l_ref;
@@ -1300,7 +1300,7 @@ end INS_Vega2_To_ODB;
                         cur_o.nlsa,
                         cur_o.s,
                         cur_o.kv,
-                        case when cur_o.mfob = 300465 then cur_o.nlsb else
+                        case when cur_o.mfob = '300465' then cur_o.nlsb else
                         g_grc_nls_t0D end,
                         cur_o.s);
             l_ref2 := l_ref;
@@ -1310,7 +1310,7 @@ end INS_Vega2_To_ODB;
           -- Отправка в СЄП
           select o.sos into l_sos_grc from grc_oper o where o.ref = l_ref;
           if (l_sos_grc = 5) then
-            if cur_o.mfob != 300465 then
+            if cur_o.mfob != '300465' then
               grc_sep.in_sep(l_err,
                              l_rec,
                              cur_o.mfoa,
