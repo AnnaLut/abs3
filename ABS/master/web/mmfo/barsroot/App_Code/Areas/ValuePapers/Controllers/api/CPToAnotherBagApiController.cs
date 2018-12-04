@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Script.Serialization;
 
 namespace BarsWeb.Areas.ValuePapers.Controllers.Api
 {
@@ -62,10 +63,13 @@ namespace BarsWeb.Areas.ValuePapers.Controllers.Api
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpGet]
-        public HttpResponseMessage InsertValuePaper(decimal id, decimal pf_1, decimal ryn_1, decimal pf_2, decimal ryn_2, decimal sum, decimal _ref, string nazn, bool kor)
+        public HttpResponseMessage InsertValuePaper(string valuepaper)
         {
-            var data = _repository.InsertValuePaper(id, pf_1, ryn_1, pf_2, ryn_2, sum, _ref, nazn, kor);
-            return Request.CreateResponse(HttpStatusCode.OK, data);
+            InsertValuePaperData paper_data = new JavaScriptSerializer().Deserialize<InsertValuePaperData>(valuepaper);
+            return Request.CreateResponse(HttpStatusCode.OK, 
+                _repository.InsertValuePaper(paper_data.id, paper_data.pf_1, paper_data.ryn_1, paper_data.pf_2, 
+                paper_data.ryn_2, paper_data.sum, paper_data._ref, paper_data.nazn, paper_data.kor)
+                );
         }
 
         [HttpGet]
