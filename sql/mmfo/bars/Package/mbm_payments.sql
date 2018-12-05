@@ -2390,7 +2390,8 @@ begin
                 '/'||p_nlsa||'$nl$1/'
                    ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(p_fnamea,'TRANS') else p_fnamea end,1,32)||'$nl$2/'
                    ||substr(case when p_kv!=643 then bars.bars_swift.StrToSwift(l_adr,'TRANS') else l_adr end,1,32)||'$nl$3/'
-                   ||'UA/'||l_ccodea,
+                   ||'UA/'||l_ccodea||'$nl$6/'
+                   ||'UA/'||p_okpoa,
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
             add_dop_req(l_ref, '52A', trim(l_biccode),
                 p_s,p_s,p_kv,p_kv,p_nlsa,l_nlsb,p_mfoa, l_mfob, l_tt);
