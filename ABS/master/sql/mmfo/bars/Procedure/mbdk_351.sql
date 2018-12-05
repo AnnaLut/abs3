@@ -9,8 +9,9 @@ PROMPT *** Create  procedure MBDK_351 ***
 
   CREATE OR REPLACE PROCEDURE BARS.MBDK_351 (p_dat01 date, p_mode integer  default 0 ) IS
 
-/* Версия 11.3  23-10-2018  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 
+/* Версия 11.4  30-11-2018  23-10-2018  27-09-2017  14-09-2017  05-04-2017  10-03-2017  06-03-2017  03-03-2017 
    Розрахунок кредитного ризику по МБДК + коррахунки
+15) 30-11-2018(11.4) - (COBUMMFO-10179) - LGD для активов, державна власність > 51% через довідник REZ_PAR
 14) 23-10-2018(11.3) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 13) 27-09-2017(11.2)  - Запись IDF <-- l_idf, было l_fp
 12) 14-09-2017 - PD по l_idf ,было по l_fp
@@ -34,7 +35,7 @@ PROMPT *** Create  procedure MBDK_351 ***
 
  l_pd      NUMBER ; l_CRQ    NUMBER ; l_zalq  NUMBER ; l_EAD     NUMBER ; l_zal    NUMBER ; l_dv     NUMBER ;  l_EADQ    NUMBER ;
  l_LGD     NUMBER ; l_zal_BV NUMBER ; l_CR    NUMBER ; l_RC      NUMBER ; l_CR_LGD NUMBER ; l_bv     NUMBER ;  l_BVQ     NUMBER ;
- l_zal_BVq NUMBER ; l_bv02   NUMBER ; l_BV02q NUMBER ; l_zal_lgd NUMBER ; l_s      NUMBER ; l_lgd_51 NUMBER := 0.3;
+ l_zal_BVq NUMBER ; l_bv02   NUMBER ; l_BV02q NUMBER ; l_zal_lgd NUMBER ; l_s      NUMBER ; l_lgd_51 NUMBER ;
  acc8_     INTEGER; l_idf    INTEGER; l_fin   INTEGER; l_tipa    INTEGER; l_fin23  INTEGER;  l_fp    INTEGER;  l_tip_fin INTEGER;
  --l_kol   INTEGER;
 
@@ -49,7 +50,8 @@ begin
    l_dat31   := Dat_last_work (p_dat01 - 1);  -- последний рабочий день месяца
    l_tip_fin := 1;
    if p_mode = 0 THEN p_kol_nd_MBDK(p_dat01, 0); end if;
-   delete from REZ_CR where fdat=p_Dat01 and tipa in ( 5, 6);
+   --delete from REZ_CR where fdat=p_Dat01 and tipa in ( 5, 6);
+   l_lgd_51 := GET_REZ_PAR( 'LGD' );
    for d in (SELECT d.nd, d.cc_id, d.sdate, d.wdate, d.vidd, D.FIN23, D.BRANCH,f_get_nd_val_n ('KOL', d.nd, p_dat01, 5, d.rnk) KOL, 5 tipa,
                     FIN_351, PD, f_vkr_MBDK(d.rnk) VKR, 'МБДК ' l_vkr
              FROM (select * from accounts where  nbs >'1500' and nbs < '1600') a,
