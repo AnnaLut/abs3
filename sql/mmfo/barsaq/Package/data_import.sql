@@ -183,7 +183,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   --
   procedure notify_ibank;
-
+  
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -229,7 +229,8 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   procedure sync_account_stmt2(
     p_acc       in number default null,
     p_startdate in date default trunc(sysdate-1));
-
+    
+   
   ----
   -- sync_account_stmt - синхронизирует историю движения по счету
   --
@@ -292,6 +293,12 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- sync_doc_export - синхронизирует документы
   --
   procedure sync_doc_export(p_startdate in date default trunc(sysdate-1));
+  
+  ----
+  -- sync_doc_export - синхронизирует документы
+  --
+  procedure sync_doc_export_kf(p_kf        in varchar2,
+                               p_startdate in date default trunc(sysdate-1));
 
    ----
   -- sync_doc_export - синхронизирует зависшие документы
@@ -848,7 +855,8 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
         --
     exception
         when no_data_found then
-            if p_status<>JOB_STATUS_ENQUEUED
+--            if p_status<>JOB_STATUS_ENQUEUED
+            if p_status not in (JOB_STATUS_ENQUEUED, JOB_STATUS_STARTED)
             then
                 raise_application_error(-20000, 'Запис статусу синхронізації неможливий. Зверніться до розробника.');
             end if;
@@ -2048,7 +2056,6 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_turnovers2;
-
 
   ----
   -- sync_acc_period_turnovers2 - синхронизиреут историю остатков и оборотов в АБС для передачи в систему
@@ -3546,8 +3553,6 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         --
     exception when others then
         --
-        logger.error(get_error_msg());
-        --
         if l_tx
         then
             rollback to sp;
@@ -4066,7 +4071,6 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
 
 ----
-  ----
   -- import_payment - выполняет импорт платежного документа
   --
   -- возвращает положительный статус импорта
@@ -4288,7 +4292,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             when numeric_value_error then
                 raise_application_error(-20000, 'Код отримувача занадто довгий');
         end;
-
+        
         -- дата валютирования
         if is_attr_exists(l_body, 'VALUE_DATE') then
             l_doc.vdat  := get_attr_date(l_body, 'VALUE_DATE');
@@ -4296,7 +4300,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- вычленяем балансовые счета
         l_nbsa := substr(l_doc.nls_a, 1, 4);
         l_nbsb := substr(l_doc.nls_b, 1, 4);
-
+        
         select count(*)
           into l_cnt
           from bars.accounts a
@@ -4312,7 +4316,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
          if l_cnt > 0 then
            raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
          end if;
-
+            
     end if;
     --
     -- внутренний документ
@@ -5253,7 +5257,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     logger.trace('%s: start '||sysdate, l_title);
     for c in (
-        select * from doc_import where
+        select * from doc_import where 
         case
         when booking_flag is not null and notification_flag is null then 'Y'
         else null
@@ -5309,7 +5313,9 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     logger.trace('%s: doc_count '||counter, l_title);
     logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
-
+  
+  
+  
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -5877,7 +5883,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
-
+            
             commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
@@ -5931,7 +5937,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                     p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                     p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
                 );
-
+           
         end loop;
         -- фиксируем изменения
         commit;
@@ -5960,6 +5966,171 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export;
+  
+  
+  ----
+  -- sync_doc_export - синхронизирует документы
+  --
+  procedure sync_doc_export_kf(p_kf        in varchar2,
+                               p_startdate in date default trunc(sysdate-1)) is
+    l_local_tag raw(2000); l_remote_tag raw(2000);
+    l_change_time   date;
+    l_back_reason   varchar2(4000);
+    l_docid         integer;
+    l_scn           number;
+  begin
+    --
+    write_sync_status(TAB_DOC_EXPORT||'_'||p_kf, JOB_STATUS_STARTED);
+    --
+    -- apply-процесс должен быть приостановлен на время ручной синхронизации
+    check_requirements(TAB_DOC_EXPORT);
+    --
+    begin
+        -- точка отката
+        savepoint sp;
+        -- точка отсчета
+        l_scn := dbms_flashback.get_system_change_number();
+        --
+        replace_tags(l_local_tag, l_remote_tag);
+        --
+        -- инстанцируем таблицу схемы BARSAQ базы АБС БАРС в базе IBANK
+        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_DOC_EXPORT, g_global_name, l_scn);
+        --
+       /* for c in (select kf from v_kf)
+        loop*/
+            -- устанавливаем точку синхронизации для удаленной таблицы на текущий момент
+            rpc_sync.manual_instantiate_now(TAB_DOC_EXPORT, p_kf);
+        /*end loop;*/
+        -- идем по платежным документам
+        for c in (
+               select *
+                 from (select i.ref, e.doc_id, e.status_id, e.bank_ref,
+                       e.status_change_time, e.bank_accept_date, e.bank_back_date,
+                       o.status, o.change_time, o.back_reason, o.pdat
+                         from doc_import i, doc_export e,
+                            (select ref,case
+                                        when sos<0 then -20
+                                        when sos>=5 then 50
+                                        else 45
+                                        end as status,
+                                    (select value from bars.operw where ref=p.ref and tag='BACKR')
+                                    as back_reason,
+                                    (select change_time from bars.sos_track s
+                                     where old_sos<>new_sos and sos_tracker=
+                                        (select max(sos_tracker) from bars.sos_track
+                                         where ref=s.ref and new_sos=s.new_sos and old_sos<>new_sos)
+                                        and ref=p.ref and new_sos=p.sos
+                                    ) change_time,
+                                    pdat
+                             from bars.oper p
+                            where p.kf = p_kf) o
+                         where i.insertion_date >= p_startdate
+                           and o.status != e.status_id
+                           and i.ref is not null -- только документы АБС
+                           and e.doc_id=to_number(i.ext_ref) and i.ref=o.ref
+                         ) 
+                 )
+        loop
+            -- блокируем строку в doc_export
+            select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
+            -- если нету истории изменений по oper.sos, то ставим время создания документа
+            l_change_time := nvl(c.change_time, c.pdat);
+            --
+            l_back_reason := nvl(c.back_reason, 'Причину сторнування не вказано');
+            --
+            set_status_info(
+                p_docid                   => c.doc_id,
+                p_statusid                => c.status,
+                p_status_change_time      => l_change_time,
+                p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
+                p_bank_ref                => c.ref,
+                p_bank_back_date          => case when c.status<0 then l_change_time else null end,
+                p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
+            );
+            
+            commit;
+        end loop;
+        -- идем по заявкам на покупку/продажу валюты
+        for c in (select *
+                    from (select d.doc_id,
+                                 case
+                                    when z.sos =-1 then -20
+                                    when z.sos = 2 then  50
+                                    else 45
+                                 end as status,
+                                 (select max(change_time)
+                                    from bars.zay_track
+                                   where id = z.id
+                                     and new_sos = z.sos
+                                 ) as status_change_time,
+                                 z.datedokkb as creating_time,
+                                 to_char(z.id) as bank_ref,
+                                 case
+                                    when z.sos=-1 and z.idback is not null
+                                        then
+                                            (select reason
+                                               from bars.zay_back
+                                              where id = z.idback)
+                                    else
+                                        null
+                                 end as bank_back_reason
+                            from doc_export d,
+                                 zayavka_id_map m,
+                                 bars.zayavka z,
+                                 bars.zay_track zt
+                           where d.doc_id = m.doc_id
+                             and m.idz = z.id
+                             and z.id = zt.id
+                             and z.kf = p_kf
+                             and zt.change_time >= p_startdate
+                         ) as of scn l_scn
+                )
+        loop
+                -- блокируем строку в doc_export
+                select doc_id into l_docid from doc_export where doc_id=c.doc_id for update nowait;
+                -- если нету истории изменений по oper.sos, то ставим время создания документа
+                l_change_time := nvl(c.status_change_time, c.creating_time);
+                --
+                l_back_reason := nvl(c.bank_back_reason, 'Причину відхилення не вказано');
+                --
+                set_status_info(
+                    p_docid                   => c.doc_id,
+                    p_statusid                => c.status,
+                    p_status_change_time      => l_change_time,
+                    p_bank_accept_date        => case when c.status=50 then l_change_time else null end,
+                    p_bank_ref                => c.bank_ref,
+                    p_bank_back_date          => case when c.status<0 then l_change_time else null end,
+                    p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
+                );
+           
+        end loop;
+        -- фиксируем изменения
+        commit;
+        -- устанавливаем SCN, с которого необходимо синхронизировать таблицу в будущем
+        dbms_apply_adm.set_table_instantiation_scn(SRCTAB_SOS_TRACK, g_global_name, l_scn);
+        -- устанавливаем SCN, с которого необходимо синхронизировать таблицу в будущем
+        dbms_apply_adm.set_table_instantiation_scn(SRCTAB_ZAY_TRACK, g_global_name, l_scn);
+        --
+        restore_tags(l_local_tag, l_remote_tag);
+        --
+        bars.bars_audit.info('Виконано синхронізацію статусів документів з дати '||to_char(p_startdate, 'DD.MM.YYYY'));
+        --
+    exception when others then
+        --
+        rollback to sp;
+        --
+        restore_tags(l_local_tag, l_remote_tag);
+        --
+        raise_application_error(-20000, get_error_msg());
+    end;
+    --
+    write_sync_status(TAB_DOC_EXPORT||'_'||p_kf, JOB_STATUS_SUCCEEDED);
+    --
+  exception when others then
+    --
+    write_sync_status(TAB_DOC_EXPORT||'_'||p_kf, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
+    --
+  end sync_doc_export_kf;
 
   ---
   -- get_doc_export_old_state
