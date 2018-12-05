@@ -14,11 +14,15 @@ IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :  Процедура формирование файла #42 для КБ
 % COPYRIGHT   :  Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 23/10/2018 (06/08/2018)
+% VERSION     : 27/11/2018 (16/11/2018)
 %------------------------------------------------------------------------
-% 23/10/2018 - показгник A10000000 буде формуватися в блоці де формується 
+% 27/11/2018 - изменено формирование части кода показателя "NNNN" для 
+%              показателя 05
+% 16/11/2018 - изменено формирование части кода показателя "NNNN" для 
+               показателя 05
+% 23/10/2018 - показгник A10000000 буде формуватися в блоц_ де формується 
 %              показник 02NNNN000     
-%              показгник A20000000 буде формуватися в блоці де формується 
+%              показгник A20000000 буде формуватися в блоц_ де формується 
 %              показник 04NNNN000     
 % 03/08/2018 - c 03.08.2018 будет формироваться новый показатель 
 %              'A90000000'
@@ -1939,9 +1943,9 @@ BEGIN
     rnk_ := 0;
     ddd_ := '00';
 
-    for k in (select kodp, rnk, trim(comm) comm
+    for k in (select kodp, rnk, ref, trim(comm) comm
               from rnbu_trace
-              where substr(kodp,1,2) not in ('R1', 'R2')
+              where substr(kodp,1,2) not in ('05','R1', 'R2')
               order by substr(kodp,1,2), to_number(znap) DESC, rnk )
     loop
         -- в поле COMM (комментарий) заполняем название клиента
@@ -1967,6 +1971,10 @@ BEGIN
                  update rnbu_trace set
                     kodp = substr(k.kodp,1,2) || LPAD (TO_CHAR (nnnn01_), 4, '0') || '000'
                  where rnk = k.rnk and kodp = k.kodp;
+
+                 update rnbu_trace set
+                    kodp = '05' || LPAD (TO_CHAR (nnnn01_), 4, '0') || '000'
+                 where ref = k.ref and substr(kodp,1,2)='05';
               end if;
            else
               if substr(k.kodp,3,4) <> '0000' then
@@ -1990,7 +1998,7 @@ BEGIN
                  if Dat_ < dat_Zm4_ then
                     update rnbu_trace set
                        kodp=substr(k.kodp,1,2)||LPAD (TO_CHAR (nnnn1_), 4, '0')
-                    where rnk=k.rnk and kodp=k.kodp;
+                    where rnk = k.rnk and kodp=k.kodp;
                  else
                     update rnbu_trace set
                        kodp = substr(k.kodp,1,2)||LPAD (TO_CHAR (nnnn1_), 4, '0') || '000'
