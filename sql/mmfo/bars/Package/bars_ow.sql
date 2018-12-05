@@ -764,7 +764,7 @@ procedure get_address_client(
   )
   as
 begin
- select
+select
      case
        when to_char(ca.locality_type_n) is not null then --NEW
                                                 (select ln.settlement_tp_nm
@@ -773,8 +773,8 @@ begin
          else --OLD
            (select lo.name from address_locality_type lo where lo.id=ca.locality_type )
      end  city_type
-     ,ca.home as  house
-     ,ca.room as  flat
+     ,aht.value ||ca.home as  house
+     ,art.value ||ca.room as  flat
      ,case
        when to_char(ca.street_type_n) is not null then --NEW
                                               (select sn.str_tp_nm
@@ -784,11 +784,14 @@ begin
             (select so.name from address_street_type so where so.id=ca.street_type )
      end street_type
      ,ca.street
+     --,aht.value aht
+     --,art.value art
      into p_city_type,p_house,p_flat,p_street_type,p_street
      from customer_address ca
         left join address_street_type adst on adst.id=ca.street_type
-     where ca.rnk = p_rnk and ca.type_id = p_type;
- exception
+        left join ADR_HOME_TYPE aht on aht.id=ca.home_type
+        left join adr_room_type art on art.id=ca.room_type
+     where ca.rnk = p_rnk and ca.type_id = p_type; exception
    when no_data_found then --null;
        p_city_type:=null;
        p_house:=null;
