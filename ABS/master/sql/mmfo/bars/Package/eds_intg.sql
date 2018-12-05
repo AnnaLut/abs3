@@ -179,8 +179,8 @@ create or replace package body eds_intg is
        and r.param_type = 'GET';
        exception when no_data_found then
         raise_application_error(-20001,'GET Параметр DECL_ID не передано в запиті');
-        end;  
-        
+        end;
+
 
     select xmlroot( XmlElement("ROOT",
                     Xmlelement("FileName", 'EDECL_FR.frx'),
@@ -319,7 +319,7 @@ procedure crt_data_set(p_req_id varchar2,
                                end;
                                         end loop;
 
-                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.name, a.kf
+                       for account in (select bars.fost(a.acc,trunc(cust.date_to)) as END_BAL, a.acc, a.nls, a.nbs, a.kv, b.name, a.kf,a.tip
                                          from accounts a
                                          left join branch b on  a.branch=b.branch
                                         where a.rnk=cust.rnk
@@ -335,6 +335,9 @@ procedure crt_data_set(p_req_id varchar2,
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).OPEN_IN:=account.name;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).END_BAL:=account.END_BAL;
                                         EDS_DPT_DATA(EDS_DPT_DATA.LAST).KF:=account.kf;
+                                        EDS_DPT_DATA(EDS_DPT_DATA.LAST).TIP:=account.tip;
+                                        
+                                        
 
 
                                        begin
@@ -482,7 +485,7 @@ end;
    l_id          number;
    l_buff        clob;
    l_transp_id   varchar2(50);
-   
+
   begin
     begin
       if p_eds_decl.doc_type = 7 then
@@ -510,7 +513,7 @@ end;
        exception when no_data_found then
        l_id:=null;
     end;
-    
+
     if l_id is null then
         l_eds_decl:= p_eds_decl;
         l_eds_decl.state:= st_DECLARATION_REGISTER;
@@ -526,15 +529,15 @@ end;
         eds_intg.create_send_job1(l_eds_decl.id);
         begin
         l_buff:=crt_xml(l_id);
-        select c.TRANSP_REQ_ID into l_transp_id  from eds_crt_req_log c  where c.id=p_eds_decl.id; 
-        barstrans.transp_utl.add_resp(l_transp_id, l_buff);   
+        select c.TRANSP_REQ_ID into l_transp_id  from eds_crt_req_log c  where c.id=p_eds_decl.id;
+        barstrans.transp_utl.add_resp(l_transp_id, l_buff);
         exception when no_data_found then null;
         end;
-    else 
+    else
       begin
         l_buff:=crt_xml(l_id);
-        select c.TRANSP_REQ_ID into l_transp_id  from eds_crt_req_log c  where c.id=p_eds_decl.id; 
-        barstrans.transp_utl.add_resp(l_transp_id, l_buff);  
+        select c.TRANSP_REQ_ID into l_transp_id  from eds_crt_req_log c  where c.id=p_eds_decl.id;
+        barstrans.transp_utl.add_resp(l_transp_id, l_buff);
         exception when no_data_found then null;
         end;
     end if;
@@ -644,14 +647,14 @@ end;
            set e.state=st_DECLARATION_REJECTED
         where e.id=p_id;
       end if;
-      
+
       if (l_prepare+l_err)=l_count_mass and l_transp_id is not null then
       barstrans.transp_utl.add_resp(l_transp_id, crt_xml(p_id));
       end if;
-      
+
       commit;
   end;
--------------------- 
+--------------------
 --xml_2_obj-----------------------------------------------------------------------------------
   function xml_2_obj(p_xml clob) return eds_decl%rowtype is
   l_retval   eds_decl%rowtype;
@@ -676,7 +679,7 @@ end;
   l_retval.BRANCH     := xml_extract(l_xml, '/ROOT/BRANCH/text()');
   return l_retval;
   end;
--------------------------  
+-------------------------
   --  set_request_state
 function log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2 default null) return varchar2 is
       pragma autonomous_transaction;
@@ -730,7 +733,7 @@ function log_crt_req(p_transp_id varchar2, p_kf varchar2, p_req_body varchar2 de
     l_eds_decl.id := l_id;
 
     eds_intg.crt_decl(l_eds_decl);
-    
+
     --crt_decl(l_eds_decl, P_TRANSP_ID);
 
 
