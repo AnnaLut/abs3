@@ -1,9 +1,11 @@
 CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode integer  default 0 ) IS
 
-/* Версия 15.1   23-10-2018  10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 
+/* Версия 15.2   30-11-2018  23-10-2018  10-09-2018  12-07-2018  20-04-2018  10-04-2018  26-03-2018  28-11-2017 
    Розрахунок кредитного ризику по кредитах + БПК
 
    ----------------------------------------------
+34) 30-11-2018(15.2) - (COBUMMFO-10056) - убраны счета 8911
+33) 30-11-2018(15.2) - (COBUMMFO-10179) - LGD для активов, державна власність > 51% через довідник REZ_PAR
 32) 23-10-2018(15.1) - (COBUMMFO-7488) - Добавлено ОКПО в REZ_CR
 31) 10-09-2018(15.0) - ОВЕР - 2600 добавлен 
 30) 12-07-2018(14.9) - Новые счета - ('SDI','SDA','SDM','SDF','SRR') по ОВЕРАМ выборка , как по кредитам
@@ -67,7 +69,7 @@ CREATE OR REPLACE PROCEDURE BARS.CCK_351 (p_dat01 date, p_nd integer, p_mode int
  l_pd       NUMBER ; l_CRQ     NUMBER ; l_EAD      NUMBER ; l_zal     NUMBER ; l_EADQ     NUMBER ; l_LGD       NUMBER ; l_CR     NUMBER ;
  l_RC       NUMBER ; l_bv      NUMBER ; l_BVQ      NUMBER ; l_bv02    NUMBER ; l_BV02q    NUMBER ; l_ccf       NUMBER ; l_srok   NUMBER ;
  L_RCQ      NUMBER ; L_CR_LGD  NUMBER ; l_zalq     NUMBER ; l_zal_BV  NUMBER ; l_zal_BVq  NUMBER ; l_dv        NUMBER ; l_polis  NUMBER ;
- l_zal_lgd  NUMBER ; l_s       NUMBER ; l_EADR     NUMBER ; l_RZ      NUMBER ; l_tip_kv   NUMBER ; l_fin_okpo  NUMBER ; l_lgd_51 NUMBER := 0.3;
+ l_zal_lgd  NUMBER ; l_s       NUMBER ; l_EADR     NUMBER ; l_RZ      NUMBER ; l_tip_kv   NUMBER ; l_fin_okpo  NUMBER ; l_lgd_51 NUMBER ;
 
  VKR_  varchar2(3);  l_txt  varchar2(1000);  l_vkr   varchar2(50)  ;  l_real  varchar2(3);  l_text  VARCHAR2(250) ; l_kf varchar2(6);
 
@@ -88,7 +90,8 @@ begin
       p_kol_nd_bpk(p_dat01, 0);
    end if;
    delete from ex_kl351;
-   delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 9, 41, 42, 4, 10, 90, 94);
+   --delete from REZ_CR where fdat=p_Dat01 and tipa in ( 3, 9, 41, 42, 4, 10, 90, 94);
+   l_lgd_51 := GET_REZ_PAR( 'LGD' );
    for d in (SELECT e.nd, e.cc_id, e.vidd, e.fin23, decode(e.vidd, 110, 10, 3) tipa, sdate, wdate, e.prod, e.rnk, e.pd,
                     cck_app.get_nd_txt(e.nd, 'VNCRR') vkr
              FROM CC_DEAL e, nd_open n
@@ -137,7 +140,7 @@ begin
                       substr( decode(c.custtype,3, c.nmk, nvl(c.nmkk,c.nmk) ) , 1,35) NMK, decode(trim(c.sed),'91',3,c.custtype) custtype,
                       a.branch, DECODE (NVL (c.codcagent, 1), '2', 2, '4', 2, '6', 2, 1) RZ,trim(c.sed) sed, c.okpo
                from   nd_acc n, accounts a, customer c
-               where  n.nd = d.nd and n.acc = a.acc and nls not like '3%' and a.nbs not in ('2620','9611','9601')
+               where  n.nd = d.nd and n.acc = a.acc and nls not like '3%' and nls not like '8%' and a.nbs not in ('2620','9611','9601')
                  and  (a.tip in  ('SNO','SN ','SL ','SLN','SPN','SS ','SP ','SK9','SK0','CR9','SNA','SDI','SDA','SDM','SDF','SRR')
                  and  ost_korr(a.acc,l_dat31,null,a.nbs) <>0 or a.nbs='2600' and ost_korr(a.acc,l_dat31,null,a.nbs) <0)  
                  and a.rnk = c.rnk order by a.tip desc;
@@ -408,7 +411,7 @@ begin
                                    s.okpo , l_poci, l_ddd , l_tip_fin, nvl(z.rpb,0));
 
             end LOOP;
-           elsif s.s <> 0 THEN
+           elsif s.s <> 0 and s.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') THEN
                 --for i in (select a.*, -ost_korr(a.acc,l_dat31,null,a.nbs) BV from nd_acc n,accounts a
                 --          where  n.nd = d.nd and n.acc=a.acc and a.tip in ('SNA','SDI','SDA','SDM','SDF','SRR') and nbs not in (3648))
                 --LOOP
@@ -434,7 +437,7 @@ begin
       end;
    End LOOP;
    z23.to_log_rez (user_id , 351 , p_dat01 ,'Конец Кредиты + БПК 351 ');
-   if not f_mmfo THEN over_351 (p_dat01,1); end if;
+   --if not f_mmfo THEN over_351 (p_dat01,1); end if;
 end;
 /
 show err;
