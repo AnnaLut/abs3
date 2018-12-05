@@ -39,7 +39,8 @@
                    p_res_code out number,
                    p_res_text out varchar2,
                    p_res_ref  out oper.ref%type,
-                   p_trade_point in varchar2                    
+                   p_trade_point in varchar2,
+                   p_receiver_kf in varchar2
                    );
 
 
@@ -415,7 +416,8 @@ function get_md5 (input_string varchar2) return varchar2
                       p_res_code   =>v_res_code,                         --код результата
                       p_res_text   =>v_comment,                          --коммент результата 
                       p_res_ref    =>v_res_ref,                          --ref созданного дока
-                      p_trade_point =>v_trade_point                      --номер терминала
+                      p_trade_point =>v_trade_point,                     --номер терминала
+                      p_receiver_kf =>v_receiver_kf
                       );
      /*     pay_common (
                           p_trade_point in varchar2,--код терминала +МФО его
@@ -490,7 +492,8 @@ function get_md5 (input_string varchar2) return varchar2
                   p_res_code out number,
                   p_res_text out varchar2,
                   p_res_ref  out oper.ref%type,
-                  p_trade_point in varchar2 
+                  p_trade_point in varchar2,
+                  p_receiver_kf in varchar2
                   )
     is
 
@@ -549,7 +552,9 @@ function get_md5 (input_string varchar2) return varchar2
          into l_acc
          from accounts a
         where a.nls = p_deal_id
-          and a.kv = 980;
+          and a.kv = 980
+          and a.kf=p_receiver_kf
+          ;
     exception
       when no_data_found then
         p_res_code := 3;
