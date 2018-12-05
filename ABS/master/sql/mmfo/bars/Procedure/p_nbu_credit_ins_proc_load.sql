@@ -22,9 +22,9 @@ is
   l_tab     l_req_set := l_req_set ();
 
 begin
-savepoint before_job_start;
    bars.bars_login.login_user(sys_guid,p_User,null,null);
    bars.bc.go(p_branch);
+   savepoint before_job_start;
 
   begin
     update NBU_CREDIT_INSURANCE_FILES F
@@ -37,7 +37,7 @@ savepoint before_job_start;
   end;
 
 for cur in ( /*select distinct n.kf from  NBU_CREDIT_INSURANCE n where n.pid = p_file_id */
-              select * from regions where kf=substr(p_branch,2,6) or p_branch = '/')
+              select r.* from regions r where (r.kf=substr(p_branch,2,6) or p_branch = '/'))
 loop
   bc.go(cur.kf);
 
@@ -105,13 +105,13 @@ loop
          l_state   := 2;
          l_MESSAGE:= substr(dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(),1,1000);*/
        end;
-       if l_tab(j).numb is not null then
+       if l_tab(j).nd2 is not null then
          update  NBU_CREDIT_INSURANCE i
          set i.state   = l_state,
              i.message = l_MESSAGE
          where i.pid  = p_file_id
            and i.kf = cur.kf
-           and i.numb = l_tab(j).numb ;
+           and i.nd = l_tab(j).nd2 ;
        end if;    
      end loop;
      end if;
@@ -128,7 +128,8 @@ end loop;
    bars.bars_login.logout_user;
 exception when others then
    rollback to savepoint before_job_start;
-   bms.enqueue_msg( 'Обробку реєстру користувача '|| p_User|| ' ЗАВЕРШЕНО З ПОМИЛКОЮ! -'||SQLERRM , dbms_aq.no_delay, dbms_aq.never, p_User );
+   bms.enqueue_msg( 'Обробку реєстру користувача '|| p_User|| ' ЗАВЕРШЕНО З ПОМИЛКОЮ! -'|| dbms_utility.format_error_stack() ||
+                              chr(10) || dbms_utility.format_error_backtrace() , dbms_aq.no_delay, dbms_aq.never, p_User );
    bars.bars_login.logout_user;
 end;
 /

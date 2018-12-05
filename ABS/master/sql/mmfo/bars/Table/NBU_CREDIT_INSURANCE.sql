@@ -116,11 +116,18 @@ create index I_NBUCREDITINSURANCE_KFND on NBU_CREDIT_INSURANCE (KF, ND)
 end;
 / 
 
+begin 
+  execute immediate 'ALTER TABLE BARS.NBU_CREDIT_INSURANCE DROP PRIMARY KEY';
+exception when others then 
+  if sqlcode in (-942,-02441) then null; else raise; end if;
+end;
+/
+
 
 -- Create/Recreate primary, unique and foreign key constraints 
 begin
     execute immediate 'alter table NBU_CREDIT_INSURANCE
-  add constraint PK_NBUCREDITINSURANCE primary key (PID, NUMB, KF)
+  add constraint PK_NBUCREDITINSURANCE primary key (PID, ND)
   using index 
   tablespace BRSDYNI
   pctfree 10
@@ -138,3 +145,4 @@ begin
     end if; 
 end;
 / 
+
