@@ -149,7 +149,6 @@
 function getGridOptions(options, dataSourse, showSign, sosFilterDs) {
     if (options === undefined || options == null) options = {};
     if (dataSourse === undefined || dataSourse == null) dataSourse = {};
-    var toShow = true;
 
     options = $.extend(true,
         {
@@ -347,8 +346,8 @@ function mainGridChangeEventHandler() {
         var money = +this.dataItem(this.select()).not_enogh_money;
 
         if (formCfg.formType == 0) {
-            enableElem('.custom-btn-payroll-ok', (sos == 1 || sos == -1) && src != 5);
-            enableElem('.custom-btn-payroll-edit, .custom-btn-payroll-delete', (sos == 1 || sos == -1 || sos == 3) && src != 5);
+            enableElem('.custom-btn-payroll-ok', (sos === 1 || sos === -1) && src !== 5 && src !== 6);
+            enableElem('.custom-btn-payroll-edit, .custom-btn-payroll-delete', canEditPayroll(sos, src));
         } else {
             if (formCfg.currentGridName == 'accepted') {
                 enableElem('.custom-btn-payroll-enrollment', money == 1);
@@ -570,7 +569,9 @@ function addEventListenersToButtons() {
     $('#accepted_grid, #draft_grid, #processed_grid').on('dblclick', 'tr:not(:first)', function () {
         checkIfRowIsSelected(function () {
             var sos = this[0].sos;
-            if (+sos == -1 || +sos == 1 || +sos == 3) {
+            var src = this[0].src;
+
+            if (canEditPayroll(sos, src)) {
                 $('.custom-btn-payroll-edit').click();
             } else {
                 $('.custom-btn-payroll-view').click();
@@ -969,7 +970,10 @@ function changeGridMaxHeight() {
     var a4 = a3 - a2.top;
 
     $(".k-grid-content").css("max-height", a4 * 0.7);
-};
+}
+function canEditPayroll(sos, src) {
+    return (+sos === -1 || +sos === 1 || +sos === 3) && (src !== 5 && src !== 6);
+}
 
 $(document).ready(function () {
     formCfg.setFormType(getUrlParameter('formType'));
