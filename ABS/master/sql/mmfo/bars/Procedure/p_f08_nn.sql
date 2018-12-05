@@ -6,16 +6,22 @@ PROMPT =========================================================================
 PROMPT *** Create  procedure P_F08_NN ***
 
 
-  CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
+CREATE OR REPLACE PROCEDURE BARS.P_F08_NN (Dat_ DATE,
                                       sheme_ varchar2 default 'G')  IS
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирование файла #08 для КБ
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
-% VERSION     : 09/02/2018 (08/02/2018, 06/02/2018)
+% VERSION     :30/11/2018 (09/10/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+30.11.2018 включено для обробки два бал.рахунки 3500 і 3600 які будуть 
+           включатися в файл #08X і не будуть включатися в файл #08.  
+09.10.2018 при розбитті залишку для групи бал.рах. 704 параметр R011 
+           формуємо із значенням "0" 
+07.08.2018 для 3521,3522,3621,3622 змінено формування параметру K072
+08.05.2018 для бал.счета 3648 параметр R011 будем формировать равным нулю
 09.02.2018 для 3653, 3658 змінено формування параметру K072
 08.02.2018 для бал.счетов 2924, 3570 и S183='0' изменяем S183_ на '1'
 06.02.2018 для группы 290 и бал.счетов 2920, 2924 R011='0'
@@ -137,6 +143,7 @@ country_   varchar2(3);
 dat_Izm1  date := to_date('29/12/2017','dd/mm/yyyy');
 custtype_  Number;
 codcagent_ Number;
+ob22_      accounts.ob22%type;
 
 CURSOR Saldo IS
    select a.*, n.nd, i.freq
@@ -147,7 +154,7 @@ CURSOR Saldo IS
               s.ost, s.ostq, s.dos96, s.kos96, s.dosq96, s.kosq96,
               s.dos99, s.kos99, s.dosq99, s.kosq99,
               s.doszg, s.koszg, a.isp, a.tobo, a.nms, a.tip, 
-              NVL(cc.s130,'90') S130, lpad (to_char(c.country), 3, '0')
+              NVL(cc.s130,'90') S130, lpad (to_char(c.country), 3, '0'), nvl(a.ob22, '00')
        FROM  otcn_saldo s, specparam cc, otcn_acc a, customer c 
        WHERE (s.ost-s.dos96+s.kos96+s.doszg-s.koszg <> 0 OR
               s.ostq-s.dosq96+s.kosq96 <> 0)
@@ -218,13 +225,17 @@ begin
       s_:= 'N2';
    end if;
 
-   if p_nbs_ in ('3623') and s_<>'30' then
+   if p_nbs_ in ('3520','3521','3620','3621') and s_ not in ('30','32') then
       s_:='30';
    end if;
 
-   --if p_nbs_ in ('6031','6033','7030') and s_<>'31' then
-   --   s_:='31';
-   --end if;
+   if p_nbs_ in ('3522','3622') and s_ not in ('30','31','32','33') then
+      s_:='30';
+   end if;
+
+   if p_nbs_ in ('3623') and s_<>'30' then
+      s_:='30';
+   end if;
 
    if (p_nbs_ in ('3653','3658') or 
       substr(p_nbs_,1,3) in ('355','605','606','610','611','704')) and 
@@ -247,12 +258,6 @@ begin
       s_:= 'N3';
    end if;
 
-   --if substr(p_nbs_,1,3) in ('604','704') and r_=2 and 
-   --   s_ not in ('N1','N2','N3','N4','N5','N6','N7','N8') 
-   --then
-   --   s_:= 'N2';
-   --end if;
-
    -- только для резидентов
    if p_nbs_ in ('2902','2903','2909','6020','6025') and r_<>2 and s_='00'
    then
@@ -265,22 +270,10 @@ begin
       s_:='42';
    end if;
 
-   --if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
-   --   r_<>2 and p_r011_='1' and s_<>'12'
-   --then
-   --   s_:='12';
-   --end if;
-
-   --if mfo_ <> 300120 and p_nbs_ in ('2902','2903','2909') and 
-   --   r_<>2 and p_r011_='2' and s_ not in ('41','42','43')
-   --then
-   --   s_:='42';
-   --end if;
-
    if ( p_nbs_ in ('6090','6091','6092','6093','6094','6095',
                   '6120','6121','6122','6123','6124','6125',
                   '7140') OR substr(p_nbs_,1,3) in ('602','603','607','630','702')
-      ) and custtype_ = 2 and r_ = 2 and s_ = '00'
+      ) and custtype_ = 2 and r_ = 2 and s_ in ('00', 'N2')
    then
       s_ := 'N6';
    end if;
@@ -304,6 +297,23 @@ begin
    then
       s_ := 'N8';
    end if;
+   
+   if p_nbs_ = '7030' and r_=1 and s_ not in ('30', '31', '32', '33')
+   then
+      s_:= (case  
+                when ob22_ in ('01', '06', '07', '08','51') then '30'
+                when ob22_ in ('47', '48') then '31'
+                else '30'
+            end);
+   end if;   
+
+   if p_nbs_ in ('1919') and s_ = '2D' then
+      s_:='21';
+   end if;
+   
+    if substr(p_nbs_,1,3) = '602' and s_ = '21' then
+       s_ := '2B';
+    end if;   
     
    Ostn_:= to_number(p_znap_);
 
@@ -323,8 +333,7 @@ begin
                       nlsk=trim(p_nls_)
                 group by accd, nlsd, kv, acck, nlsk )
       loop
-
-         if substr(k.nlsd,1,1) in ('1','2','3') then
+         if substr(k.nlsd,1,1) in ('1','2','3') and k.nlsd not like '3739%' then
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
                    ca.tobo, ca.nms
               into s1_, r1_, s2_, tobo_, nms_
@@ -353,10 +362,24 @@ begin
 
          if mfo_ = 324805
          then
-            s1_ := 'N2';
+            if substr(p_nbs_,1,3) = '602' then
+               s1_ := 'N6';
+            else
+               s1_ := 'N2';
+            end if;
+            
             r1_ := '2';
          end if;
 
+        -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
+         if substr(p_nbs_,1,3) = '605' and s1_ <> 'N8' and r1_ = '2' then
+            s1_:='N8';
+         end if;   
+
+         if substr(p_nbs_,1,3) = '605' and s1_ not in ('42', '43') and r1_ = '1' then
+            s1_:='42';
+         end if;   
+         
          if dat_ < dat_Izm1 
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
@@ -430,11 +453,26 @@ begin
 
          if mfo_ = 324805
          then
-            s_ := 'N2';
+            if substr(p_nbs_,1,3) in ('602', '702') then
+               s1_ := 'N6';
+               s_  := 'N6';
+            else
+               s1_ := 'N2';
+               s_  := 'N2';
+            end if;
+            
             r_ := '2';
-            s1_ := 'N2';
             r1_ := '2';
          end if;
+
+        -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
+         if substr(p_nbs_,1,3) = '605' and s1_ <> 'N8' and r1_ = '2' then
+            s1_:='N8';
+         end if;   
+
+         if substr(p_nbs_,1,3) = '605' and s1_ not in ('42', '43') and r1_ = '1' then
+            s1_:='42';
+         end if;   
 
          if dat_ < dat_Izm1
          then
@@ -476,12 +514,10 @@ begin
    end if;
 
    if ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_<>300465) OR
-       ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_=300465 and 
-         p_k072_ in ('XX','21'
-       ) 
+      ( substr(p_nbs_,1,3) in ('702','707','709') and mfo_=300465 and 
+         p_k072_ in ('XX','21') 
       ) 
    then
-
       for k in (select accd, nlsd, kv, decode(kv,980,sum(s*100),sum(sq*100)) s,
                        acck, nlsk
                 from otcn_f08_history
@@ -497,7 +533,6 @@ begin
                       nlsd=trim(p_nls_)
                 group by accd, nlsd, kv, acck, nlsk )
       loop
-
          comm1_ := comm_;
 
          if substr(k.nlsk,1,1) in ('2','3','8') then
@@ -552,8 +587,20 @@ begin
             s1_ := 'N2';
             r1_ := '2';
          end if;
+         
+        -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
+         if substr(p_nbs_,1,3) in ('702') and s1_='N2' and r1_ = '2' then
+            s1_:='N6';
+         end if;   
 
-         if dat_ < dat_Izm1
+         if substr(p_nbs_,1,3) = '702' and s1_='42' and r1_ = '1' then
+            s1_:='41';
+         end if;         
+
+         if substr(p_nbs_,1,3) = '702' and s1_='21' and r1_ = '1' then
+            s1_:='2D';
+         end if;  
+                  if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
          else 
@@ -644,6 +691,19 @@ begin
             s1_ := 'N2';
             r1_ := '2';
          end if;
+         
+        -- тимчасово, бо N2 чомусь не є допустимим значенням (наприклад, посольство КНР)
+         if substr(p_nbs_,1,3) in ('702') and s1_='N2' and r1_ = '2' then
+            s1_:='N6';
+         end if;   
+
+         if substr(p_nbs_,1,3) = '702' and s1_='42' and r1_ = '1' then
+            s1_:='41';
+         end if;         
+
+         if substr(p_nbs_,1,3) = '702' and s1_='21' and r1_ = '1' then
+            s1_:='2D';
+         end if;          
 
          if dat_ < dat_Izm1
          then
@@ -701,8 +761,8 @@ begin
 
          if substr(k.nlsk,1,1) in ('2','8') then
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
-                   ca.tobo, ca.nms
-                 into s1_, r1_, s2_, tobo_, nms_
+                   ca.tobo, ca.nms, c.codcagent, c.custtype
+                 into s1_, r1_, s2_, tobo_, nms_, codcagent_, custtype_
             from accounts ca, customer c, specparam s, kl_k070 p
             where ca.acc=k.acck and
                   ca.rnk=c.rnk  and
@@ -739,6 +799,16 @@ begin
             s1_ := 'N2';
             r1_ := '2';
          end if;
+         
+         if custtype_ = 3 and codcagent_ = 5 and s1_ not in ('42','43')
+         then
+            s1_ := '42';
+         end if;
+         
+         if (custtype_ = 3 and codcagent_ = 6 or r1_ = '2') and s1_ not in ('N8')
+         then
+            s1_ := 'N8';
+         end if;         
 
          if dat_ < dat_Izm1
          then
@@ -779,8 +849,8 @@ begin
 
          if substr(k.nlsd,1,1) in ('2','8') then
             select NVL(p.k072,'00'), 2-mod(c.codcagent,2), nvl(lpad(trim(s.k072), 2, 'X'),'00'),
-                   ca.tobo, ca.nms
-                 into s1_, r1_, s2_, tobo_, nms_
+                   ca.tobo, ca.nms, c.codcagent, c.custtype
+                 into s1_, r1_, s2_, tobo_, nms_, codcagent_, custtype_
             from accounts ca, customer c, specparam s, kl_k070 p
             where ca.acc=k.accd and
                   ca.rnk=c.rnk  and
@@ -820,6 +890,16 @@ begin
             r1_ := '2';
          end if;
 
+         if custtype_ = 3 and codcagent_ = 5 and s1_ not in ('42','43')
+         then
+            s1_ := '42';
+         end if;
+         
+         if (custtype_ = 3 and codcagent_ = 6 or r1_ = '2') and s1_ not in ('N8')
+         then
+            s1_ := 'N8';
+         end if;         
+         
          if dat_ < dat_Izm1
          then
             kod_:= p_tp_ || p_nbs_ || p_r013_ || s1_ || r1_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
@@ -850,8 +930,13 @@ begin
       then
          kod_:= p_tp_ || p_nbs_ || p_r013_ || s_ || r_ || lpad(p_kv_,3,'0') || p_s183_ || p_s130_;
       else
-         kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
-                p_s183_ || p_s130_ || p_country_;         
+         if substr(p_nbs_,1,3) in ('704') then
+            kod_:= p_tp_ || p_nbs_ || '0' || s_ || r_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;         
+         else
+            kod_:= p_tp_ || p_nbs_ || p_r011_ || s_ || r_ || lpad(p_kv_,3,'0') || 
+                   p_s183_ || p_s130_ || p_country_;         
+         end if;
       end if;
 
       INSERT INTO rnbu_trace
@@ -895,7 +980,7 @@ Datng_:= to_date('0201'||to_char(Dat_,'YYYY'),'ddmmyyyy');
 p_proc_set(kodf_,sheme_,nbuc1_,typ_);
 
 -- вместо классификатора KL_R020 будем использовать KOD_R020
-sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''08'' ';
+sql_acc_ := 'select r020 from kod_r020 where trim(prem)=''КБ'' and a010=''08'' union select ''3500'' from dual union select ''3600'' from dual ';
 
    if mfou_ <> 300465 and to_char(Dat_,'MM')='12' then
       ret_ := f_pop_otcn(Dat_, 4, sql_acc_, null, 1);   
@@ -1082,9 +1167,14 @@ LOOP
    FETCH SALDO INTO rnk_, acc_, nls_, kv_, data_, nbs1_, r011_, r013_, k072_,
                     Ostn_, Ostq_, Dos96_, Kos96_, Dosq96_, Kosq96_,
                     Dos99_, Kos99_, Dosq99_, Kosq99_,
-                    Doszg_, Koszg_, isp_, tobo_, nms_, tip_, s130_, country_, 
+                    Doszg_, Koszg_, isp_, tobo_, nms_, tip_, s130_, country_, ob22_, 
                     nd_, freq_;
    EXIT WHEN SALDO%NOTFOUND;
+
+   if substr(nbs1_,1,3) = '290' OR nbs1_ in ('2920', '2924', '3648') 
+   then
+      r011_ := '0';
+   end if;
 
    comm_ := 'R011=' || r011_ || '   R013='||r013_;
    nd_:=null;
@@ -1359,6 +1449,7 @@ DELETE FROM tmp_nbu where kodf=kodf_ and datf= dat_;
 INSERT INTO tmp_nbu(kodf, datf, kodp, znap, nbuc)
 SELECT kodf_, Dat_, kodp, SUM (znap), nbuc
 FROM rnbu_trace
+WHERE substr(kodp,2,4) not in ('3500','3600') 
 GROUP BY kodf_, Dat_, kodp, nbuc;
 
 logger.info ('P_F08_NN: End for datf = '||to_char(dat_, 'dd/mm/yyyy'));
