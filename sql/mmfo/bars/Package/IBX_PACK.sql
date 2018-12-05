@@ -83,7 +83,7 @@ end ibx_pack;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.IBX_PACK is
   -- ================================== Константы ===============================================
-  g_body_version constant varchar2(64) := 'version 2.2.2 30.05.2018'; 
+  g_body_version constant varchar2(64) := 'version 2.2.3 05.12.2018'; 
 
   -- ===============================================================================================
   -- header_version - возвращает версию заголовка пакета
@@ -945,7 +945,7 @@ procedure pay_to_sep (
      end;
 -- сверка счета из справочника IBX_TP_PARAMS-NLS_ACC и открытых счетов
      begin
-         select ac.nls, ac.nms,ac.tip
+         select ac.nls, substr(ac.nms,1,38),ac.tip
          into l_debit_nls, l_debit_name,l_acc_tip
          from accounts ac
          where ac.nls = get_tp_param(l_trade_point,'NLS_ACC')
@@ -1164,6 +1164,7 @@ procedure pay_to_sep (
     exception when others then
        p_res_code := 101;
        p_res_text := sqlerrm;
+       bars_audit.info('IBX_PACK.pay_common ERROR '||dbms_utility.format_error_stack()||chr(10)||dbms_utility.format_error_backtrace());
        rollback;
 
   end pay_common;----------------------------------------------------------------
