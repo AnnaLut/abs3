@@ -1060,7 +1060,7 @@ function showDeposits() {
             { title: "Номер депозиту", field: "ID", width: 100 },
             { title: "Дата початку",  field: "DAT_BEGIN", width: 100, template: "#= kendo.toString(kendo.parseDate(DAT_BEGIN, 'yyyy-MM-dd'), 'dd/MM/yyyy') #" },
             { title: "Валюта", field: "KV", width: 50 },
-            { field: "Сума", width: 100, template: '#= kendo.toString(SUM, "n2") #' }],
+            { field: "Сума", width: 100, template: '#= kendo.toString(SUM / 100, "n2") #' }],
         multiSelect: false,
         clause: "where rnk = " + $("#RNK").val(),
         ResizedColumns: true

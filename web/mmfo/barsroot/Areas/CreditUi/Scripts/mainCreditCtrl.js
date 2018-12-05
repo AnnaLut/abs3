@@ -136,7 +136,7 @@
                     $scope.mainTabStrip.select(3);
                 }
                 var _cust_data = request.data.Data.CUST_DATA;
-                if (_cust_data !== null) {
+                if (_cust_data !== null && $rootScope.custtype !== "2" ) {
                     $rootScope.CUST_INFO.EDRPO = _cust_data.EDRPO;
                     $rootScope.CUST_INFO.EDUCA = _cust_data.EDUCA;
                     $rootScope.CUST_INFO.MEMB = _cust_data.MEMB;
