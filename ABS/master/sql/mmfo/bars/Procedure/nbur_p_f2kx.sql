@@ -17,9 +17,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.011    07.11.2018
+% VERSION     :  v.18.012    03.12.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := ' v.18.011  07.11.2018';
+  ver_            char(30)  := ' v.18.012  03.12.2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -28,7 +28,8 @@ is
   l_type          number;
   l_datez         date := p_report_date + 1;
   l_file_code     varchar2(2) := substr(p_file_code, 2, 2);
-  l_start_dt      date := trunc(p_report_date, 'MM'); --Дата начала месяца для охвата операций
+  l_start_dt      date   := trunc(p_report_date, 'MM');     --Дата начала месяца для охвата операций
+  l_nbu_rpt_dt    date   := last_day(p_report_date)+1;               --отчетная дата НБУ, первое число месяца
 BEGIN
   logger.info (
                 c_prefix
@@ -110,9 +111,8 @@ BEGIN
                                  , to_char(acc.daos, с_date_fmt) as Q007_1
                                  , to_char(acc.dazs, с_date_fmt) as Q007_2
                                  , case when (nvl(acc.BLKD,0) + nvl(acc.BLKK, 0)) <> 0 then '02' else '99' end as Q031_1
---                                 , nvl(to_char(round(fostq(acc.acc, to_date(cust.rnbod, с_date_fmt)))), '0') as T070_1
                                  , nvl(to_char(round(
-                                           gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), p_report_date) 
+                                           gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), l_nbu_rpt_dt) 
                                                        )), '0')     as T070_1
                                  , nvl(to_char(round(fostq(acc.acc, p_report_date))), '0') as T070_2
                                  --Параметры операции       
