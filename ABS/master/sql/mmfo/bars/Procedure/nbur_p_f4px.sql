@@ -10,9 +10,9 @@ is
 % DESCRIPTION : ѕроцедура формировани€ 4PX дл€ ќщадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.003 10/10/2018 (03/09/2018)
+% VERSION     :  v.18.006       03.12.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_               char(30)  := 'v.1.003  10/10/2018';
+  ver_               char(30)  := ' v.18.006   03.12.2018';
   c_title            constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
 
   -- онстанты определ€ющие форматы данных
@@ -114,7 +114,7 @@ BEGIN
                 || ' begin for date = ' || to_char(p_report_date, 'dd.mm.yyyy')
                 || ' kod_filii=' || p_kod_filii
                 || ' form_id=' || p_form_id
-                || ' scheme=' || p_scheme
+                || ' scheme=' || p_scheme || ver_
              );
 
   -- ќпределение параметров построени€ отчета
@@ -142,7 +142,7 @@ BEGIN
   -- оч≥куЇмо формуванн€ старого файлу
   nbur_waiting_form(p_kod_filii, p_report_date, c_old_file_code, c_title);
 
-  --ќпредел€ем полседнюю рабочую дату в этом мес€це
+  --ќпредел€ем последнюю рабочую дату в этом мес€це
   select max(fdat)
      into
          l_mnth_last_work_dt
@@ -220,7 +220,7 @@ BEGIN
                    , '#' as f055
                    , '#' as f056
                    , seg_03 as f057
-                   , '0' as f070
+                   , '#' as f070
                    , (case when seg_03 in ('230', '262', '271', '272', '273', '279', '330', '362')
                            then '0000000000' 
                            else lpad(c.okpo, 10, '0')
@@ -284,10 +284,98 @@ BEGIN
             q003_1, q003_2, q003_3, q006, q007_1, q007_2, q007_3, q010_1, q010_2, 
             q012, q013, q021, q022, t071, description, nd, branch)
         select unique p_report_date as report_date, p_kod_filii as kf, branch as nbuc, 
-            l_version_id as version_id, B040, substr(ekp, 1, 6) EKP, R020, R030_1, R030_2, 
-            K040, substr(ekp, 7, 1) S050, S184, substr(ekp, 8, 1) as F028, F045, 
-            F046, F047, F048, F049, F050, 
-            F052, F053, F054, F055, F056, F057, F070, 
+            l_version_id as version_id, B040, substr(ekp, 1,6) EKP,
+            (case 
+                when F057 is not null  and  F047 !='1'  and
+                       ( substr(EKP, 1,6) in ('A4P006','A4P007')  and
+                                F057 in ('230','262','271','272','273','279','330','362') 
+                         or     F057 in ('100','311','312','320','341','342','350','361') )
+                   then         '#'
+                else           R020
+             end)            as  R020,
+            R030_1,
+              (case
+                  when substr(EKP, 1,6) ='A4P006' and r030_2 is null and
+                       (F057 is null or F057 not in ('230','262','271','272','273','279','330','362'))
+                    then        r030_1
+                  else          r030_2   
+                end)         as  R030_2, 
+            K040,
+            substr(ekp, 7,1) as  S050,
+            S184,
+            substr(ekp, 8,1) as  F028,
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F045))
+                end)         as  F045, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F046))
+                end)         as  F046, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F047))
+                end)         as  F047, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F048))
+                end)         as  F048, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F049))
+                end)         as  F049, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F050))
+                end)         as  F050, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F052))
+                end)         as  F052, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F053))
+                end)         as  F053, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                    then       '#'
+                  else         trim(to_char(F054))
+                end)         as  F054, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F055))
+                end)         as  F055, 
+              (case
+                  when F057 is not null  and  substr(EKP, 1,6) ='A4P006'
+                                         and  F057 in ('230','262','271','272','273','279','330','362')
+                     then      '#'
+                  else         trim(to_char(F056))
+                end)         as  F056, 
+            F057,
+            (case
+                when substr(EKP, 1,6) ='A4P005'
+                   then                  trim(to_char(F070))
+                 else                    '#'
+              end)           as  F070, 
             K020, Q001_1, Q001_2, Q003_1, Q003_2, Q003_3,  Q006, 
             to_char(Q007_1, 'dd.mm.yyyy') as Q007_1, to_char(Q007_2, 'dd.mm.yyyy') as Q007_2, 
             to_char(Q007_3, 'dd.mm.yyyy') as Q007_3, Q010_1, Q010_2, Q012, Q013, Q021, Q022, value as T071,
@@ -442,84 +530,101 @@ BEGIN
             q012, q013, q021, q022, t071, description, nd, branch)
         select unique p_report_date as report_date, p_kod_filii as kf, branch as nbuc, 
             l_version_id as version_id, 
-            B040, EKP, R020, R030_1, R030_2, 
+            B040, EKP,
+            (case 
+                when EKP ='A4P007'  and  F057 is not null  and  F047 !='1'  and
+                                         F057 in ('100','311','312','320','341','342','350','361',
+                                                  '230','262','271','272','273','279','330','362' ) 
+                   then         '#'
+                else            R020
+             end)        as  R020,
+            R030_1,
+            R030_2, 
             K040, S050, S184, F028, F045, 
             F046, F047, F048, F049, F050, 
-            F052, F053, F054, F055, F056, F057, F070, 
+            F052, F053, F054, F055, F056, F057,
+            (case
+                when EKP ='A4P005'  then F070
+                 else                    '#'
+              end)              F070, 
             K020, Q001_1, Q001_2, Q003_1, Q003_2, Q003_3,  Q006, to_char(Q007_1, 'dd.mm.yyyy') as Q007_1, 
             to_char(Q007_2, 'dd.mm.yyyy') as Q007_2,  to_char(Q007_3, 'dd.mm.yyyy') as Q007_3, 
             Q010_1, Q010_2, Q012, Q013, Q021, Q022, T071,
             'F504' DESCRIPTION, ND, BRANCH
-        from (SELECT CONTR_ID,
+        from (SELECT c.CONTR_ID,
                    c.BRANCH,
-                   KF,
-                   'A4P007' as EKP,
-                   P101 as Q001_1,
-                   lpad(trim(Z), 10, '0') as K020,
-                   P010 as F047,
-                   P107 as Q001_2,
-                   P030 as K040,
-                   P108 as F052,
-                   P184 as S184,
-                   PVAL as R030_1,
-                   P140 as F055,
-                   M as F045,
-                   '#' as f049,
-                   P142 as F054,
-                   P020 as R020,
-                   R_AGREE_NO as Q003_2,
-                   P103 as Q007_2,
-                   P143 as F056,
-                   T as Q003_3,
-                   to_char(P950, '90.000') as Q022,
-                   P960 as F050,
-                   P310 as Q007_3,
-                   P999 as Q006,
-                   null as F048,
-                   p080 as Q012, 
-                   trim(to_char(P070, '9990.0000')) as Q013,
-                   P090 as Q021,
-                   P050 as Q003_1,
-                   P060 as Q007_1,
-                   null as F046,
-                   '#' as F070,       
-                   P330 as R030_2,
+--                   c.KF,
+                   'A4P007'   as EKP,
+                   c.P101     as Q001_1,
+                   lpad(trim(c.Z), 10,'0')  as K020,
+                   c.P010     as F047,
+                   c.P107     as Q001_2,
+                   c.P030     as K040,
+                   c.P108     as F052,
+                   c.P184     as S184,
+                   c.PVAL     as R030_1,
+                   c.P140     as F055,
+                   c.M        as F045,
+                   nvl(to_char(f.p9800), '#')   as F049,         -- из формы 503
+                   c.P142     as F054,
+                   c.P020     as R020,
+                   c.R_AGREE_NO  as Q003_2,
+                   c.P103     as Q007_2,
+                   c.P143     as F056,
+                   c.T        as Q003_3,
+                   to_char(c.P950, '90.000') as Q022,
+                   c.P960     as F050,
+                   c.P310     as Q007_3,
+                   c.P999     as Q006,
+                   nvl(to_char(f.p0400), '#')   as F048,         -- из формы 503
+                   c.p080     as Q012, 
+                   trim(to_char(c.P070, '9990.0000')) as Q013,
+                   c.P090     as Q021,
+                   c.P050     as Q003_1,
+                   c.P060     as Q007_1,
+                   nvl(to_char(f.p3000), '#')   as F046,         -- из формы 503
+                   nvl(to_char(f.p3200), '#')   as F070,         -- из формы 503
+                   c.P330     as R030_2,
                    (case
-                      when trim(F057) is not null then trim(F057)
-                      when P108 = '6' and P184 = '1' then '211'
-                      when P108 = '6' and P184 = '2' then '241'
-                      when P108 = '1' and P184 = '1' then '212'
-                      when P108 = '1' and P184 = '2' then '242'
-                      when P108 = '2' and P184 = '1' then '311'
-                      when P108 = '2' and P184 = '2' then '341'
-                      when P108 = '5' and P184 = '1' then '312'
-                      when P108 = '5' and P184 = '2' then '342'
-                      when P108 in ('4','7','8') and P184 = '1' then '320'
-                      when P108 in ('4','7','8') and P184 = '2' then '350'
-                      when P184 = '1' then '320'
-                      when P184 = '2' then '350'
+                      when trim(c.F057) is not null then trim(c.F057)
+                      when c.P108 = '6' and c.P184 = '1' then '211'
+                      when c.P108 = '6' and c.P184 = '2' then '241'
+                      when c.P108 = '1' and c.P184 = '1' then '212'
+                      when c.P108 = '1' and c.P184 = '2' then '242'
+                      when c.P108 = '2' and c.P184 = '1' then '311'
+                      when c.P108 = '2' and c.P184 = '2' then '341'
+                      when c.P108 = '5' and c.P184 = '1' then '312'
+                      when c.P108 = '5' and c.P184 = '2' then '342'
+                      when c.P108 in ('4','7','8') and c.P184 = '1' then '320'
+                      when c.P108 in ('4','7','8') and c.P184 = '2' then '350'
+                      when c.P184 = '1' then '320'
+                      when c.P184 = '2' then '350'
                       else '000'
-                   end) f057,
-                   P141 as F053,
-                   d.pmes as Q010_1,
-                   d.pyear as Q010_2,
-                   CONTR_ID as nd, 
-                   nvl2(b.b040, substr(b.b040, length(b.b040)-11, 12), 'XXXXXXXXXXXX') as b040,
-                   d.val as T071,
+                   end)      as F057,
+                   c.P141    as F053,
+                   d.pmes    as Q010_1,
+                   (case
+                       when d.pyear = to_char(p_report_date, 'yyyy') and d.pmes = '0' 
+                                   then '9999'
+                        else            d.pyear
+                     end)                            as Q010_2,
+                   c.CONTR_ID  as nd, 
+                   nvl2(b.b040, substr(b.b040, length(b.b040)-11, 12), 'XXXXXXXXXXXX') as B040,
+                   d.val       as T071,
                    (case d.indicator_id 
                         when 212 then '1'
                         when 213 then '1'
                         when 292 then '2'
                         when 293 then '2'
                         else '#'
-                   end) as S050,
+                   end)        as S050,
                    (case d.indicator_id 
                         when 212 then '1'
                         when 213 then '2'
                         when 292 then '1'
                         when 293 then '2'
                         else '#'
-                   end) as F028
+                   end)        as F028
               FROM cim_f504 c
               left outer join (select F504_ID, INDICATOR_ID, RRRR, W, VAL, 
                                     (CASE
@@ -554,13 +659,17 @@ BEGIN
                                     select F504_ID, INDICATOR_ID, RRRR, W, VAL
                                     from cim_f504_detail d1
                                     where indicator_id in (292, 293))
-                                where (TO_CHAR (last_day(p_report_date), 'yyyymm') <= RRRR || LPAD (W, 2, '0')
+                                where (TO_CHAR (last_day(p_report_date), 'yyyymm') <= RRRR || decode(W,'A','10','B','11','C','12',lpad(W,2,'0'))
                                        OR W = '0' AND TO_CHAR (last_day(p_report_date), 'yyyy') <= RRRR
                                        OR RRRR IN ('8888', '9999')
                                        OR RRRR is null)) d
               on (d.f504_id = c.f504_id)
               left outer join branch b
-              on (c.branch = b.branch)
+                      on (c.branch = b.branch)
+              left outer join cim_f503 f
+                      on (     lpad(trim(f.Z), 10,'0') = lpad(trim(c.Z), 10,'0')
+                           and f.r_agree_no = c.r_agree_no
+                           and nvl(f.contr_id,-1) = nvl(c.contr_id,-1) )
               WHERE c.branch LIKE '/'|| p_kod_filii ||'/%')
         where t071 is not null;
 
@@ -571,6 +680,7 @@ BEGIN
         WHEN OTHERS  THEN
           logger.error(c_title || 'Error inserting rows from source #35: ' || SQLERRM);
       END;      
+
   else
     logger.info(c_title || '”казанна€ дата не €вл€етс€ последним рабочий днем мес€ца, поэтому не осуществ€лем запуск отчета!');
   end if;
