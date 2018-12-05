@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="11/02/2018 12:24:11" ReportInfo.CreatorVersion="2014.3.2.0">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/04/2017 10:07:08" ReportInfo.Modified="11/28/2018 18:27:49" ReportInfo.CreatorVersion="2014.3.2.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -310,7 +310,7 @@ namespace FastReport
 }
 </ScriptText>
   <Dictionary>
-    <OracleDataConnection Name="edecl" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQO2RTGch6YBzqAOB82or4Jw=">
+    <OracleDataConnection Name="edecl" ConnectionString="rijcmlqHytUMhhPg9gG4fal5Q6rRB0BvRbh0nDbCWvtDA1bLoXA5F1HMEY1qSyYCzmMlYGK5S75auXYOG6vOu2k3E2pQNE6q3xAFNhWAFAEfdw09M8=">
       <TableDataSource Name="Table" Alias="salary" DataType="System.Int32" Enabled="true" SelectCommand="select d.decl_id,s.rnk,s.acc,s.nls,s.kv,s.open_in,s.acc_type, s.end_bal/100as END_BAL  ,s.amount_period/100 as AMOUNT_PERIOD,s.other_accruals/100 as OTHER_ACCRUALS,s.kf,ps.name,&#13;&#10; case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name    &#13;&#10;from bars.eds_w4_data s&#13;&#10;     left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=s.acc&#13;&#10;, bars.eds_decl d , bars.ps &#13;&#10;where s.req_id=d.id and s.acc_type='SALARY' and (s.end_bal&gt;0 or s.amount_period&gt;0 or s.other_accruals&gt;0) and ps.nbs=substr(s.nls,1,4)  and decl_id=:p_decl_id">
         <Column Name="NLS" DataType="System.String"/>
         <Column Name="DECL_ID" DataType="System.Decimal"/>
@@ -395,7 +395,7 @@ namespace FastReport
         <Column Name="RATES_978" DataType="System.Decimal"/>
         <CommandParameter Name="p_decl_id" DataType="112" Expression="[p_decl_id]" DefaultValue="22"/>
       </TableDataSource>
-      <TableDataSource Name="Table5" Alias="deposit" DataType="System.Int32" Enabled="true" SelectCommand="select de.decl_id,&#13;&#10;       d.req_id,&#13;&#10;       d.rnk,&#13;&#10;       d.acc,&#13;&#10;       d.nls,&#13;&#10;       d.kv,&#13;&#10;       d.open_in,&#13;&#10;       d.end_bal/100 as end_bal ,&#13;&#10;       d.sum_proc/100 as sum_proc,&#13;&#10;       d.sum_pdfo/100 as sum_pdfo,&#13;&#10;       d.sum_mil/100 as sum_mil,&#13;&#10;       d.sum_totaly as sum_totaly,&#13;&#10;       d.kf,&#13;&#10;       ps.name,&#13;&#10;       case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name           &#13;&#10;       from bars.eds_dpt_data d&#13;&#10;             left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=d.acc,&#13;&#10;            bars.eds_decl de,bars.ps,accounts a &#13;&#10;       where d.req_id=de.id and (d.end_bal&gt;0 or d.sum_proc&gt;0 or d.sum_pdfo&gt;0 or d.sum_mil&gt;0) and ps.nbs=substr(d.nls,1,4) and de.decl_id=:p_decl_id ">
+      <TableDataSource Name="Table5" Alias="deposit" DataType="System.Int32" Enabled="true" SelectCommand="select de.decl_id,&#13;&#10;       d.req_id,&#13;&#10;       d.rnk,&#13;&#10;       d.acc,&#13;&#10;       d.nls,&#13;&#10;       d.kv,&#13;&#10;       d.open_in,&#13;&#10;       d.end_bal/100 as end_bal ,&#13;&#10;       d.sum_proc/100 as sum_proc,&#13;&#10;       d.sum_pdfo/100 as sum_pdfo,&#13;&#10;       d.sum_mil/100 as sum_mil,&#13;&#10;       d.sum_totaly as sum_totaly,&#13;&#10;       d.kf,&#13;&#10;       ps.name,&#13;&#10;       case when ac.tip is not null then 'Мобільні заощадження'&#13;&#10;             else null&#13;&#10;             end mob_name           &#13;&#10;       from bars.eds_dpt_data d&#13;&#10;             left join(select a.acc,a.tip from accounts a where a.tip='KW4') ac on ac.acc=d.acc,&#13;&#10;            bars.eds_decl de,bars.ps&#13;&#10;       where d.req_id=de.id and (d.end_bal&gt;0 or d.sum_proc&gt;0 or d.sum_pdfo&gt;0 or d.sum_mil&gt;0) and ps.nbs=substr(d.nls,1,4) and de.decl_id=:p_decl_id ">
         <Column Name="DECL_ID" DataType="System.Decimal"/>
         <Column Name="RNK" DataType="System.Decimal"/>
         <Column Name="ACC" DataType="System.Decimal"/>

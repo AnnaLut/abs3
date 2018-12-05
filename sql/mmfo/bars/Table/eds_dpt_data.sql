@@ -90,6 +90,11 @@ exception when others then
  end;
 /
 
+begin
+execute immediate'alter table eds_dpt_data add tip CHAR(3)';
+exception when others then if sqlcode=-1430 then null;else raise; end if; 
+end;
+/
 
 PROMPT *** Create  grants  EDS_DPT_DATA ***
 grant SELECT                                                                 on EDS_DPT_DATA    to BARS_ACCESS_DEFROLE;
