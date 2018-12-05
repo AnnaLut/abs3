@@ -1487,11 +1487,20 @@ end add_dop_req;
             /*COBUBB-1480 start*/
             begin
 
-                select *
-                  into l_acc
-                  from accounts a
-                 where a.nls = p_nlsb
-                   and a.kv = l_kv;
+                begin 
+                  select *
+                    into l_acc
+                    from accounts a
+                   where a.nls = p_nlsb
+                     and a.kv = l_kv;
+                exception when no_data_found then
+                  select *
+                    into l_acc
+                    from accounts a
+                   where a.nlsalt = p_nlsb
+                     and a.tip like 'W4%'
+                     and a.kv = l_kv;
+                end;
 
                 select cust.okpo
                   into l_okpo
