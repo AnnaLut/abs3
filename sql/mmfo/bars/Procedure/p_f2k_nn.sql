@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.009     06.11.2018
+% VERSION     : v.18.010     03.12.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -27,6 +27,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+ 03.12.2018  DDD=270 -эквивалент по курсу отченой даты НБУ
  06.11.2018  правильная выборка при обработке "второго" набора доп.параметров
  25.09.2018  корректировка алгоритма обработки "второго" набора доп.параметров
  14.08.2018  обработка "второго" набора доп.параметров клиента с санкциями
@@ -73,6 +74,7 @@ flag_acc_   number;
 flag_opp_   number;
 
 dat_rnbo_         date;
+dat_rpt_nbu       date;
 is_dat_exist_     number;
 
 p_030          varchar2(70);
@@ -292,6 +294,7 @@ DELETE FROM RNBU_TRACE WHERE userid = userid_;
    nnnn_ :=0;
    nnno_ := nnnn_;
 
+   dat_rpt_nbu := last_day(dat_)+1;
    dats_ := trunc(dat_, 'mm');
    
    for k in ( select c.okpo, c.codcagent, c.ise,
@@ -385,8 +388,8 @@ select
        for u in ( select a.acc, a.kv, a.nbs, a.nls, a.daos, a.dazs,
                          to_char(a.daos,'ddmmyyyy') c_daos,
                          decode(a.dazs,null,null,to_char(a.dazs,'ddmmyyyy') ) c_dazs,
-                         to_char( (case when round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_) ) <0 then 0
-                                        else round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_) )
+                         to_char( (case when round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_rpt_nbu) ) <0 then 0
+                                        else round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_rpt_nbu) )
                                     end) )  p_270,
                          to_char( (case when round(fostq(a.acc,dat_)) <0 then 0
                                         else round(fostq(a.acc,dat_))
