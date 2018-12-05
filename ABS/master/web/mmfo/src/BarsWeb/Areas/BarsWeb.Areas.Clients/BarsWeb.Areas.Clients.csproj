@@ -179,12 +179,12 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
+  <!-- ItemGroup>
     <ProjectReference Include="..\..\BarsWeb.Core\BarsWeb.Core.csproj">
       <Project>{c4294f94-2221-4b00-ad42-07d2e113f37f}</Project>
       <Name>BarsWeb.Core</Name>
     </ProjectReference>
-  </ItemGroup>
+  </ItemGroup -->
   <ItemGroup>
     <EmbeddedResource Include="Resources\ClientsResource.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
