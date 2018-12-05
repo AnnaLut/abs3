@@ -45,11 +45,8 @@ begin
   exception
     when e_ptsn_not_exsts then
       null;
-  end;                                                11 11            
-                                            version  #D8-6F #D8-6G #D8-6H #D8-6I
-                                                    #d8 wainting
+  end; 
 
-                                                    6F not waitin versin 11
   -- очікуємо формування старого файлу
   nbur_waiting_form(p_kod_filii, p_report_date, l_old_file_code, c_title);
   
