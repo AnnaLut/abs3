@@ -118,7 +118,7 @@ BEGIN
                                 FROM lines_f
                                WHERE     nls = f.nls
                                      AND kv = f.kv
-                                     AND otype = f.otype);
+                                     AND otype IN (1, 6));
 
                IF    (                                -- получена квитанция @R
                        (  l_fnr LIKE '@R%' OR l_fnr LIKE '@I%')
