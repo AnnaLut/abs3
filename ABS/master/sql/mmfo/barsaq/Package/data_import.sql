@@ -183,7 +183,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   --
   procedure notify_ibank;
-  
+
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -230,7 +230,14 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
     p_acc       in number default null,
     p_startdate in date default trunc(sysdate-1));
     
-   
+    
+  ----
+  -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
+  -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
+  -- @param p_kf - МФО
+  procedure sync_account_stmt2_kf(
+    p_startdate in date default trunc(sysdate-1),
+    p_kf        in varchar2);
   ----
   -- sync_account_stmt - синхронизирует историю движения по счету
   --
@@ -2056,6 +2063,173 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_turnovers2;
+  
+   ----
+  -- sync_acc_turnovers2_kf - синхронизиреут историю остатков и оборотов в АБС для передачи в систему
+  --
+  -- @p_startdate - банковская дата, начиная с которой будем синхронизировать записи
+  -- @p_kf - МФО
+  --
+  procedure sync_acc_turnovers2_kf(
+    p_startdate in date     default null,
+    p_kf        in varchar2   default null)
+  is
+    l_startdate date;
+    l_bankdate  date;
+    l_scn       number;
+    --
+    l_bankid    acc_turnovers.bank_id%type;
+    l_accnum    acc_turnovers.acc_num%type;
+    l_curid     acc_turnovers.cur_id%type;
+    --
+    l_info_msg  varchar2(512);
+    l_cnt       integer;
+  begin
+    -- точка отката
+   -- savepoint sp;
+    --
+    --l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
+    --
+    /*if p_acc is not null
+    then
+      select kf, nls, kv
+        into l_bankid, l_accnum, l_curid
+        from v_kf_accounts
+       where acc = p_acc;
+    else*/
+      l_bankid := null;
+      l_accnum := null;
+      l_curid  := null;
+--    end if;
+    -- по филиалам для мульти-мфо базы
+    /*for f in (select kf from v_kf)
+    loop*/
+        -- действия выполняем внутри МФО
+        begin
+            bars_sync.subst_mfo(p_kf);
+            l_bankdate := bars.gl.bd();
+            l_startdate := nvl(p_startdate, l_bankdate);
+            --
+            -- населяем временную таблицу счетов
+            delete
+              from tmp_acc;
+            --
+            insert
+              into tmp_acc(acc, bank_id, acc_num, cur_id, dapp)
+            select a.acc, p_kf, a.nls, a.kv, nvl(a.dapp, a.daos)
+              from v_kf_accounts a, ibank_acc c
+             where a.acc = c.acc
+               and c.kf  = p_kf;
+           --    and c.acc = case when p_acc is null then c.acc else p_acc end;
+            --
+            l_cnt := sql%rowcount;
+            --
+            logger.trace('наповнено таблицю tmp_acc, к-сть рядків = %s', to_char(l_cnt));
+            --
+            write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_INPROGRESS, 'видалення старих оборотів з АБС БАРС');
+            -- удаляем старые значения локально
+            /*if p_acc is null
+            then*/
+                -- удаляем данные по всем счетам
+                delete
+                  from acc_turnovers
+                 where turns_date >= l_startdate
+                   and bank_id = p_kf;
+                l_cnt := sql%rowcount;
+ /*           else
+                if l_bankid = f.kf then
+                -- удаляем данные по одному счету
+                delete
+                  from acc_turnovers
+                 where bank_id = l_bankid
+                   and acc_num = l_accnum
+                   and cur_id  = l_curid
+                   and turns_date >= l_startdate;
+                l_cnt := sql%rowcount;
+              end if;
+            end if;*/
+            --
+            logger.trace('видалено старі обороти з локальної таблиці, к-сть рядків = %s', to_char(l_cnt));
+            --
+            write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_INPROGRESS, 'вставка нових оборотів в АБС БАРС');
+            -- вставляем новые в локальную таблицу
+            /*if p_acc is null
+            then*/
+                -- по всем счетам
+                insert
+                  into acc_turnovers (
+                          bank_id, acc_num, cur_id, turns_date, prev_turns_date,
+                          balance, debit_turns, credit_turns, balance_eq, debit_turns_eq, credit_turns_eq)
+                select *
+                  from (select c.bank_id, c.acc_num, c.cur_id, s.fdat, s.pdat,
+                               s.ostf/t.denom, s.dos/t.denom, s.kos/t.denom,
+                               bars.gl.p_icurval(t.kv, s.ostf, s.fdat)/g_base_denom,
+                               bars.gl.p_icurval(t.kv, s.dos, s.fdat)/g_base_denom,
+                               bars.gl.p_icurval(t.kv, s.kos, s.fdat)/g_base_denom
+                          from tmp_acc c,
+                               bars.saldoa /*as of scn l_scn*/ s,
+                               bars.tabval/* as of scn l_scn*/ t
+                         where c.acc     = s.acc
+                           and c.cur_id  = t.kv
+                           and c.bank_id = p_kf
+                           and s.fdat   >= l_startdate
+                        );
+                l_cnt := sql%rowcount;
+                l_info_msg := sqlerrm;
+            /*else
+                if l_bankid = f.kf then
+                -- по одному счету
+                insert
+                  into acc_turnovers (
+                          bank_id, acc_num, cur_id, turns_date, prev_turns_date,
+                          balance, debit_turns, credit_turns, balance_eq, debit_turns_eq, credit_turns_eq)
+                select *
+                  from (select l_bankid, l_accnum, l_curid, s.fdat, s.pdat,
+                               s.ostf/t.denom, s.dos/t.denom, s.kos/t.denom,
+                               bars.gl.p_icurval(t.kv, s.ostf, s.fdat)/g_base_denom,
+                               bars.gl.p_icurval(t.kv, s.dos, s.fdat)/g_base_denom,
+                               bars.gl.p_icurval(t.kv, s.kos, s.fdat)/g_base_denom
+                              from bars.saldoa s,
+                                   bars.tabval t
+                         where t.kv      = l_curid
+                           and s.acc     = p_acc
+                           and s.fdat   >= l_startdate
+                        );
+                l_cnt := sql%rowcount;
+            end if;
+            end if;*/
+            --
+            logger.trace('наповнено нові обороти в локальній таблиці, к-сть рядків = %s', to_char(l_cnt));
+            --
+            bars_sync.set_context();
+            --
+        exception when others then
+            bars_sync.set_context();
+            raise_application_error(-20000, get_error_msg());
+        end;
+        --
+  --  end loop;
+    --
+    /*if p_acc is null
+    then*/
+        l_info_msg := 'по всіх рахунках';
+    /*else
+        select 'по рахунку '||nls||'('||to_char(kv)||')'
+          into l_info_msg
+          from v_kf_accounts
+         where acc=p_acc;
+    end if;*/
+    bars.bars_audit.info('Наповнено локальну таблицю оборотів '
+                       ||l_info_msg
+                       ||' починаючи з дати '||to_char(l_startdate,'DD.MM.YYYY'));
+  exception when others then
+    --
+    -- rollback to sp;
+    --
+    raise_application_error(-20000, get_error_msg());
+    --
+  end sync_acc_turnovers2_kf;
+
 
   ----
   -- sync_acc_period_turnovers2 - синхронизиреут историю остатков и оборотов в АБС для передачи в систему
@@ -2510,6 +2684,288 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     raise_application_error(-20000, get_error_msg());
     --
   end sync_acc_transactions2;
+  
+  ----
+  -- sync_acc_transactions2_kf - синхронизиреут проводки в АБС для передачи в систему
+  --
+  -- @p_startdate - банковская дата, начиная с которой будем синхронизировать записи
+  -- @p_kf - МФО
+  --
+  procedure sync_acc_transactions2_kf(
+    p_startdate in date    default null,
+    p_kf        in number  default null)
+  is
+    l_startdate date;
+    l_bankdate  date;
+    l_scn       number;
+    --
+    l_bankid    acc_transactions.bank_id%type;
+    l_accnum    acc_transactions.acc_num%type;
+    l_curid     acc_transactions.cur_id%type;
+    l_cnt       integer;
+    l_ref92     bars.operw.value%type;
+    l_ref92_bank_id acc_transactions.ref92_bank_id%type;
+    l_ref92_cust_code acc_transactions.ref92_cust_code%type;
+    l_ref92_acc_num acc_transactions.ref92_acc_num%type;
+    l_ref92_acc_name acc_transactions.ref92_acc_name%type;
+    l_ref92_bank_name acc_transactions.ref92_bank_name%type;
+  begin
+    -- точка отката
+  --    savepoint sp;
+    --
+   -- l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
+    --
+    /*if p_acc is not null
+    then
+      select kf, nls, kv
+        into l_bankid, l_accnum, l_curid
+        from v_kf_accounts
+       where acc = p_acc;
+    else*/
+      l_bankid := null;
+      l_accnum := null;
+      l_curid  := null;
+   -- end if;
+    -- по филиалам для мульти-мфо базы
+    /*for f in (select kf from v_kf)
+    loop*/
+        bars_sync.subst_mfo(p_kf);
+        l_bankdate := bars.gl.bd();
+        l_startdate := nvl(p_startdate, l_bankdate);
+        -- населяем временную таблицу счетов
+        delete from tmp_acc;
+        --
+        insert
+          into tmp_acc(acc, bank_id, acc_num, cur_id)
+        select a.acc, p_kf, a.nls, a.kv
+          from v_kf_accounts a, ibank_acc c
+         where a.acc = c.acc
+           and c.kf  = p_kf;
+           --and c.acc = case when p_acc is null then c.acc else p_acc end;
+        --
+        l_cnt := sql%rowcount;
+        --
+        logger.trace('наповнено таблицю tmp_acc, к-сть рядків = %s', to_char(l_cnt));
+        --
+        write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_INPROGRESS, 'видалення старих проводок з АБС БАРС');
+        -- удаляем старые значения локально
+      /*  if p_acc is null
+        then*/
+            delete
+              from acc_transactions
+             where trans_date >= l_startdate
+               and bank_id = p_kf;
+            l_cnt := sql%rowcount;
+        /*else
+            if l_bankid = f.kf then
+            delete
+              from acc_transactions
+             where bank_id = l_bankid
+               and acc_num = l_accnum
+               and cur_id = l_curid
+               and trans_date >= l_startdate;
+            l_cnt := sql%rowcount;
+        end if;
+        end if;*/
+        --
+        logger.trace('видалено старі проводки з локальної таблиці, к-сть рядків = %s', to_char(l_cnt));
+        --
+        write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_INPROGRESS, 'вставка нових батьківських проводок в АБС БАРС');
+        -- вставляем новые в локальную таблицу
+        -- сначала родительские транзакции
+        for cur_r in (
+          select c.bank_id, c.acc_num,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.nam_a
+               else d.nam_b
+               end
+               as name,
+               c.cur_id, p.fdat, to_char(p.stmt) stmt, to_char(p.ref) ref, nvl(d.nd, substr(to_char(p.ref),1,10)) nd,
+               (select nvl(max(dat), d.pdat) from bars.oper_visa where ref=d.ref and status = 2 and groupid not in (80, 81, 30, 130))  dat,
+               case when p.dk=0 then 'D' else 'C' end as type_id, p.s/t.denom as trans_sum, p.sq/g_base_denom as trans_sum_eq,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.mfob
+               else d.mfoa
+               end
+               as corr_bank_id,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then
+                    (select nb from bars.banks where mfo=d.mfob)
+               else
+                    (select nb from bars.banks where mfo=d.mfoa)
+               end
+               as corr_bank_name,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.id_b
+               else d.id_a
+               end
+               as corr_ident_code,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.nlsb
+               else d.nlsa
+               end
+               as corr_acc_num,
+               case
+               when p.dk=0 and d.dk=1 or p.dk=1 and d.dk=0 then d.nam_b
+               else d.nam_a
+               end
+               as corr_name,
+               d.nazn,
+               case when d.mfoa<>d.mfob or p.tt='R01' then
+                    ibank_accounts.extract_bis_external_clob(d.ref, null)
+               else
+                    ibank_accounts.extract_bis_internal_clob(d.ref, null)
+               end as narrative_extra,
+               (select to_number(value) from bars.operw/* as of scn l_scn*/ where tag='EXREF' and ref=d.ref)
+               as ibank_docid,
+               p.tt
+          from tmp_acc c,
+               bars.opldok p,  --as of scn l_scn p,
+               bars.oper d,   -- as of scn l_scn d,
+               bars.tabval t, -- as of scn l_scn t,
+               bars.oper_visa v --as of scn l_scn v
+         where c.bank_id  = p_kf
+           and p.acc = c.acc
+           and p.fdat >= l_startdate
+           and p.sos = 5
+           and p.ref = d.ref
+           and c.cur_id = t.kv
+           and (  not (d.kv is not null and d.kv2 is not null and d.kv<>d.kv2) -- не разновалютные
+                  and p.tt=d.tt and p.s=d.s -- код операции и сумма совпадают
+                  or p.tt='R01' -- или проводка типа R01
+               )
+           and d.ref = v.ref (+)
+           and v.groupid (+) not in (77, 80, 81, 30, 130)
+           and v.status (+) = 2)
+           loop
+
+        l_ref92_bank_id := null;
+        l_ref92_cust_code := null;
+        l_ref92_acc_num := null;
+        l_ref92_acc_name := null;
+        l_ref92_bank_name := null;
+
+        if cur_r.tt in ('902','901') then
+          begin
+         select value into l_ref92 from bars.operw where ref=cur_r.ref and tag='REF92';
+            select mfoa, id_a,  nlsa, nam_a
+             into l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name
+            from bars.oper where ref= l_ref92;
+         select b.nb into l_ref92_bank_name from bars.BANKS$BASE b where b.Mfo = l_ref92_bank_id;
+           exception
+             when NO_DATA_FOUND then null;
+           end;
+         end if;
+
+        insert
+          into acc_transactions (
+                   bank_id, acc_num, name, cur_id, trans_date, trans_id, doc_id, doc_number, doc_date,
+                   type_id, trans_sum, trans_sum_eq,
+                   corr_bank_id, corr_bank_name, corr_ident_code, corr_acc_num, corr_name,
+                   narrative, narrative_extra, ibank_docid, ref92_bank_id, ref92_cust_code, ref92_acc_num, ref92_acc_name, ref92_bank_name)
+        values (cur_r.bank_id, cur_r.acc_num, cur_r.name, cur_r.cur_id, cur_r.fdat, cur_r.stmt, cur_r.ref, cur_r.nd, cur_r.dat,
+                   cur_r.type_id,  cur_r.trans_sum, cur_r.trans_sum_eq,
+                   cur_r.corr_bank_id, cur_r.corr_bank_name, cur_r.corr_ident_code, cur_r.corr_acc_num, cur_r.corr_name,
+                   cur_r.nazn, cur_r.narrative_extra, cur_r.ibank_docid, l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name, l_ref92_bank_name);
+            end loop;
+        --
+        l_cnt := sql%rowcount;
+        --
+        logger.trace('вставлено батьківські проводки в локальну таблицю, к-сть рядків = %s', to_char(l_cnt));
+        --
+        write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_INPROGRESS, 'вставка нових дочірніх проводок в АБС БАРС');
+        -- теперь дочерние
+        for cur_d in (
+          select c.bank_id, c.acc_num, c.cur_id,
+               p.fdat as trans_date,
+               to_char(p.stmt) as trans_id,
+               to_char(p.ref) as doc_id,
+               nvl(d.nd, substr(to_char(p.ref),1,10)) as doc_number,
+               nvl(v.dat,d.pdat) as doc_date,
+               case when p.dk=0 then 'D' else 'C' end as type_id, p.s/t.denom as trans_sum, p.sq/g_base_denom as trans_sum_eq,
+               a2.kf as corr_bank_id,
+               b2.nb as corr_bank_name,
+               c2.okpo as corr_ident_code,
+               a2.nls as corr_acc_num,
+               substr(a2.nms,1,38) as corr_name,
+               trim(p.txt)||' '||trim(d.nazn) as narrative,
+               null as narrative_extra,
+               null as ibank_docid,
+               p.tt
+          from tmp_acc c,
+               bars.opldok          /*as of scn l_scn*/ p,
+               bars.oper            /*as of scn l_scn*/ d,
+               bars.tabval          /*as of scn l_scn*/ t,
+               bars.opldok          /*as of scn l_scn*/ p2,
+               v_kf_accounts         a2,
+               bars.banks            b2,
+               bars.customer        /*as of scn l_scn*/ c2,
+               bars.oper_visa         /*as of scn l_scn*/ v
+         where c.bank_id  = p_kf
+           and p.acc = c.acc
+           and p.fdat >= l_startdate
+           and p.sos = 5
+           and p.ref = d.ref
+           and c.cur_id = t.kv
+           and (  d.kv is not null and d.kv2 is not null and d.kv<>d.kv2 -- разновалютные
+               or p.tt<>d.tt or p.s<>d.s -- код операции или сумма не совпадают
+             )
+           and p.tt<>'R01' -- и проводка не R01
+           and p.ref=p2.ref and p.stmt=p2.stmt and p.dk=1-p2.dk -- правая сторона проводки
+           and p2.acc=a2.acc and a2.kf=b2.mfo and a2.rnk=c2.rnk
+           and d.ref = v.ref (+)
+           and v.groupid (+) not in (77, 80, 81, 30)
+           and v.status (+) = 2
+          )
+          loop
+
+        l_ref92_bank_id := null;
+        l_ref92_cust_code := null;
+        l_ref92_acc_num := null;
+        l_ref92_acc_name := null;
+        l_ref92_bank_name := null;
+
+        if cur_d.tt in ('902','901') then
+          begin
+         select value into l_ref92 from bars.operw where ref=cur_d.doc_id and tag='REF92';
+            select mfoa, id_a,  nlsa, nam_a
+             into l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name
+            from bars.oper where ref= l_ref92;
+         select b.nb into l_ref92_bank_name from bars.BANKS$BASE b where b.Mfo = l_ref92_bank_id;
+           exception
+             when NO_DATA_FOUND then null;
+           end;
+         end if;
+
+        insert
+          into acc_transactions (
+               bank_id, acc_num, cur_id, trans_date, trans_id, doc_id, doc_number, doc_date,
+               type_id, trans_sum, trans_sum_eq,
+               corr_bank_id, corr_bank_name, corr_ident_code, corr_acc_num, corr_name,
+               narrative, narrative_extra, ibank_docid, ref92_bank_id, ref92_cust_code, ref92_acc_num, ref92_acc_name, ref92_bank_name)
+           values
+               (cur_d.bank_id, cur_d.acc_num, cur_d.cur_id, cur_d.trans_date, cur_d.trans_id, cur_d.doc_id, cur_d.doc_number, cur_d.doc_date,
+               cur_d.type_id, cur_d.trans_sum, cur_d.trans_sum_eq,
+               cur_d.corr_bank_id, cur_d.corr_bank_name, cur_d.corr_ident_code, cur_d.corr_acc_num, cur_d.corr_name,
+               cur_d.narrative, cur_d.narrative_extra, cur_d.ibank_docid, l_ref92_bank_id, l_ref92_cust_code, l_ref92_acc_num, l_ref92_acc_name, l_ref92_bank_name);
+           end loop;
+        --
+        l_cnt := sql%rowcount;
+        --
+        logger.trace('вставлено дочірні проводки в локальну таблицю, к-сть рядків = %s', to_char(l_cnt));
+        --
+   -- end loop;
+    --
+    bars.bars_audit.info('Наповнено локальну таблицю проводок '
+                       ||'по всіх рахунках'
+                       ||' починаючи з дати '||to_char(l_startdate,'DD.MM.YYYY'));
+  exception when others then
+    --
+    --rollback to sp;
+    --
+    raise_application_error(-20000, get_error_msg());
+    --
+  end sync_acc_transactions2_kf;
 
 
 procedure sync_acc_transactions2_TEST(
@@ -3553,6 +4009,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         --
     exception when others then
         --
+        logger.error(get_error_msg());
+        --
         if l_tx
         then
             rollback to sp;
@@ -3571,6 +4029,173 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_ACC_TRANSACTIONS, JOB_STATUS_FAILED, l_acc_msg, SQLCODE, get_error_msg());
     --
   end sync_account_stmt2;
+  
+  ----
+  -- sync_account_stmt2_kf - синхронизирует историю движения по счетам
+  -- @param p_startdate - банковская дата, начиная с которой будем синхронизировать записи
+  -- @param p_kf - МФО
+  procedure sync_account_stmt2_kf(
+    p_startdate in date default trunc(sysdate-1),
+    p_kf        in varchar2)
+  is
+    l_local_tag     raw(2000);
+    l_remote_tag    raw(2000);
+    l_scn           number;
+    l_acc_msg       varchar2(128);
+    l_startdate     date := p_startdate;
+    l_dapp          date; -- дата последнего движения по счету
+    l_tx            boolean;
+    l_bankid        acc_turnovers.bank_id%type;
+    l_accnum        acc_turnovers.acc_num%type;
+    l_curid         acc_turnovers.cur_id%type;
+  begin
+    -- проверка: apply-процесс должен быть остановлен всегда
+    --           capture - только для точечной синхронизации
+    /*check_requirements(
+        TAB_ACC_TRANSACTIONS,
+        p_check_capture => case
+                           when p_acc is not null then
+                                true
+                           else
+                                false
+                           end
+    );*/
+    --
+    -- точка отсчета
+    /*if p_acc is null
+    then -- по всем счетам до текущей точки*/
+     --   l_scn := dbms_flashback.get_system_change_number();
+        l_acc_msg := 'по всіх рахунках';
+    /*else
+        -- по конкретному счету до последней точки, пройденной apply-процессом
+        -- с этой точки начнется захват данных после старта apply-процесса
+        l_scn := get_oldest_scn();
+        --
+        select 'по рахунку '||nls||'('||to_char(kv)||')', dapp, kf, nls, kv
+          into l_acc_msg, l_dapp, l_bankid, l_accnum, l_curid
+          from v_kf_accounts
+         where acc=p_acc;
+       -- дату начала синхронизации берем не больше даты последнего движения по счету
+       l_startdate := least(l_startdate, l_dapp);
+       --
+    end if;*/
+    --
+    write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_STARTED, l_acc_msg);
+    --
+    -- apply-процесс должен быть приостановлен на время ручной синхронизации
+    --check_requirements(TAB_ACC_TRANSACTIONS);
+    --
+    begin
+        -- точка отката
+       -- savepoint sp;
+        -- входим в транзакцию
+        l_tx := true;
+        --
+        -- проверка состояния пакета
+        check_package_state();
+        --
+        replace_tags(l_local_tag, l_remote_tag);
+        --
+        -- инстанцируем таблицы схемы BARSAQ базы АБС БАРС в базе IBANK
+        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_ACC_TURNOVERS, g_global_name, l_scn);
+        rpc_sync.instantiate_alien_table(SYNC_SCHEMA||'.'||TAB_ACC_TRANSACTIONS, g_global_name, l_scn);
+        --
+        -- устанавливаем(передвигаем) точку синхронизации для удаленных таблиц на текущий момент
+        -- чтобы потоки на IBANK не применяли лишних данных
+        /*if p_acc is null
+        then
+            for c in (select kf from v_kf)
+            loop*/
+                rpc_sync.manual_instantiate_now(TAB_ACC_TURNOVERS, p_kf);
+                rpc_sync.manual_instantiate_now(TAB_ACC_TRANSACTIONS, p_kf);
+           /* end loop;
+        end if;*/
+
+        -- синхронизируем обороты локально
+        sync_acc_turnovers2_kf(
+            p_startdate => l_startdate,
+            p_kf       =>  p_kf);
+        --
+        -- синхронизируем проводки локально
+        sync_acc_transactions2_kf(
+            p_startdate => l_startdate,
+            p_kf        => p_kf);
+        --
+        --
+        -- очищаем удаленные временные таблицы(truncate в автономной транзакции)
+        rpc_sync.trunc_tmp_table(TAB_ACC_TURNOVERS);
+        rpc_sync.trunc_tmp_table(TAB_ACC_TRANSACTIONS);
+        --
+        logger.trace('Очищено віддалені тимчасові таблиці');
+        --
+        -- наполняем удаленные временные таблицы в текущей транзакции
+        rpc_sync.fill_tmp_acc_turnovers(l_startdate, p_kf, l_accnum, l_curid);
+        rpc_sync.fill_tmp_acc_transactions(l_startdate, p_kf, l_accnum, l_curid);
+        --
+        logger.trace('Наповнено віддалені тимчасові таблиці');
+        --
+        -- фиксируем изменения
+        commit;
+        --
+        l_tx := false;
+        --
+        logger.trace('Транзакцію зафіксовано');
+        --
+        -- вот теперь самое важное -
+        -- вызываем удаленную процедуру по синхронизации временных и постоянных таблиц на стороне IBANK
+        -- в ней фиксируем транзакцию
+        -- таким образом минимизируются блокировки постоянных таблиц
+        --
+       /* if p_acc is not null
+        then
+            -- по конкретному счету
+            rpc_sync.sync_stmt(l_startdate, l_bankid, l_accnum, l_curid);
+        else
+            -- по всем счетам каждого МФО
+            for c in (select kf from v_kf)
+            loop*/
+                -- bars_sync.subst_mfo(c.kf);
+                -- bars.logger.info('debug:: sync_stmt c.kf=' || c.kf);
+                rpc_sync.sync_stmt(l_startdate, p_kf, null, null);
+          /*  end loop;
+        end if;*/
+        --
+        logger.trace('Виконано віддалену процедуру синхронізації тимчасових та перманентних таблиць');
+        --
+        -- устанавливаем SCN, с которого необходимо синхронизировать таблицы в будущем
+        -- только если синхронизация выполнялась по всем счетам сразу
+        /*if p_acc is null and false -- temporary 02.06.2017
+        then
+            dbms_apply_adm.set_table_instantiation_scn(SRCTAB_SALDOA, g_global_name, l_scn);
+            dbms_apply_adm.set_table_instantiation_scn(SRCTAB_OPLDOK, g_global_name, l_scn);
+        end if;*/
+        --
+        restore_tags(l_local_tag, l_remote_tag);
+        --
+        bars.bars_audit.info('Виконано синхронізацію виписок починаючи з дати '
+            ||to_char(p_startdate,'DD.MM.YYYY')||' '||l_acc_msg);
+        --
+    exception when others then
+        --
+        /*if l_tx
+        then
+            rollback to sp;
+            l_tx := false;
+        end if;*/
+        --
+        restore_tags(l_local_tag, l_remote_tag);
+        --
+        raise_application_error(-20000, get_error_msg());
+    end;
+    --
+    write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_SUCCEEDED, l_acc_msg);
+    --
+  exception when others then
+    --
+    write_sync_status(TAB_ACC_TRANSACTIONS||'_'||p_kf, JOB_STATUS_FAILED, l_acc_msg, SQLCODE, get_error_msg());
+    raise_application_error(-20000, get_error_msg());
+    --
+  end sync_account_stmt2_kf;
 
 
   ----
@@ -4071,6 +4696,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
 
 ----
+  ----
   -- import_payment - выполняет импорт платежного документа
   --
   -- возвращает положительный статус импорта
@@ -4292,7 +4918,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             when numeric_value_error then
                 raise_application_error(-20000, 'Код отримувача занадто довгий');
         end;
-        
+
         -- дата валютирования
         if is_attr_exists(l_body, 'VALUE_DATE') then
             l_doc.vdat  := get_attr_date(l_body, 'VALUE_DATE');
@@ -4300,7 +4926,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- вычленяем балансовые счета
         l_nbsa := substr(l_doc.nls_a, 1, 4);
         l_nbsb := substr(l_doc.nls_b, 1, 4);
-        
+
         select count(*)
           into l_cnt
           from bars.accounts a
@@ -4316,7 +4942,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
          if l_cnt > 0 then
            raise_application_error(-20000, ' Счета БПК 2600/14 и 2650/12 заблокированы для списания!!!');
          end if;
-            
+
     end if;
     --
     -- внутренний документ
@@ -5257,7 +5883,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
   begin
     logger.trace('%s: start '||sysdate, l_title);
     for c in (
-        select * from doc_import where 
+        select * from doc_import where
         case
         when booking_flag is not null and notification_flag is null then 'Y'
         else null
@@ -5313,9 +5939,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     logger.trace('%s: doc_count '||counter, l_title);
     logger.trace('%s: finish '||sysdate, l_title);
   end notify_ibank;
-  
-  
-  
+
   ----
   -- notify_ibank - уведомляет интернет-банкинг об оплате документов
   -- p_kf
@@ -5883,7 +6507,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
-            
+
             commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
@@ -5937,7 +6561,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                     p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                     p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
                 );
-           
+
         end loop;
         -- фиксируем изменения
         commit;
