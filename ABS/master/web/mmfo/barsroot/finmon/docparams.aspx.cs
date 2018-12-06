@@ -244,6 +244,9 @@ public partial class finmon_docparams : Bars.BarsPage
             SetParameters("p_kv", DB_TYPE.Decimal, Convert.ToDecimal(p_kv), DIRECTION.Input);
             SetParameters("p_mfo", DB_TYPE.Varchar2, p_mfo, DIRECTION.Input);
             SetParameters("p_okpo", DB_TYPE.Varchar2, p_okpo, DIRECTION.Input);
+            SetParameters("p_nlsalt", DB_TYPE.Varchar2, p_nls, DIRECTION.Input);
+            SetParameters("p_kvalt", DB_TYPE.Decimal, Convert.ToDecimal(p_kv), DIRECTION.Input);
+            SetParameters("p_mfoalt", DB_TYPE.Varchar2, p_mfo, DIRECTION.Input);
 
             resClient = SQL_SELECT_reader(@"select to_char(c.rnk), c.nmk, c.okpo from customer c
                                                     where c.rnk = coalesce(to_number(:p_rnk), -- если уже заполнен
@@ -254,9 +257,9 @@ public partial class finmon_docparams : Bars.BarsPage
                                                                            and a.kf = :p_mfo), -- ищем по счету
                                                                           (select a.rnk
                                                                            from accounts a 
-                                                                           where a.nlsalt = :p_nls
-                                                                           and a.kv = :p_kv
-                                                                           and a.kf = :p_mfo), -- пошук по альтернативному рахунку
+                                                                           where a.nlsalt = :p_nlsalt
+                                                                           and a.kv = :p_kvalt
+                                                                           and a.kf = :p_mfoalt), -- пошук по альтернативному рахунку
                                                                           (select max(co.rnk) -- ищем по окпо в документе - если такой клиент один
                                                                            from customer co
                                                                            where co.okpo = :p_okpo
