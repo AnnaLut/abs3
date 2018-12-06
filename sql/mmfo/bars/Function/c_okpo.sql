@@ -20,8 +20,18 @@ BEGIN
    BEGIN
       SELECT k.okpo,k.codcagent,k.custtype,k.country
         INTO   okpo_,   c_ag_,      c_type_, country_
-        FROM customer k,cust_acc c,accounts a
-       WHERE a.acc=c.acc AND k.rnk=c.rnk AND a.nls=nls_ AND a.kv=gl.BaseVal;
+        FROM customer k
+        join cust_acc c on k.rnk = c.rnk
+        join accounts a on a.acc = c.acc
+       WHERE (
+                a.nls = nls_ 
+                or (  -- COBUMMFO-10278
+                      regexp_like(nls_, '^26[0,2,5]5')
+                      and a.nlsalt = nls_
+                      and a.tip like 'W4%'
+                   )
+             )
+             AND a.kv=gl.BaseVal;
 
    EXCEPTION
       WHEN NO_DATA_FOUND THEN RETURN TRUE;
