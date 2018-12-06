@@ -53,7 +53,7 @@ is
   --
   -- constants
   --
-  g_body_version  constant varchar2(64) := 'version 3.4  2018.10.25';
+  g_body_version  constant varchar2(64) := 'version 3.5  2018.12.05';
   g_dt_fmt        constant varchar2(10) := 'dd.mm.yyyy';
 
   --
@@ -743,6 +743,7 @@ $end
     l_period_type        nbur_ref_files.period_type%type;
     l_rpt_dt             nbur_lst_files.report_date%type;
     l_day                number;
+    l_change_elements    nbur_ref_prepare_xml.attr_nil%type default null;
   begin
 
     bars_audit.trace( '%s: Entry.', title );
@@ -802,41 +803,60 @@ $end
     l_clob := REGEXP_REPLACE( l_clob, '<([^>]+?)/>', '<\1></\1>' );
 
     -- вставка атрибуту xsi:nil для елементів ...
-    case l_rpt_code
-    when '3E'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)(></)', '\1 xsi:nil = "true" \2' );
-    when '3K'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q006|<Q001)(></)', '\1 xsi:nil = "true" \2' );
-    when '3M'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
-    when 'D9'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q029_1)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q029_2)(></)', '\1 xsi:nil = "true" \2' );
-    when '2K' 
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q007_3)(></)', '\1 xsi:nil = "true" \2' );
-    when 'E8'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q001|<Q029)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2|<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
-    when '4P'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q001_1|<Q001_2|Q003_1|Q006|Q007_1|Q007_2|Q007_3)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q012|<Q013|Q021|Q022)(></)', '\1 xsi:nil = "true" \2' );
-    when '36'
-    then
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q001_1|<Q001_2|<Q002)(></)', '\1 xsi:nil = "true" \2' );
-      l_clob := REGEXP_REPLACE( l_clob, '(<Q006|<Q007_3|<Q007_4)(></)', '\1 xsi:nil = "true" \2' );
-    else
-      null;
-    end case;
+      begin
+          select attr_nil into l_change_elements 
+            from nbur_ref_prepare_xml
+           where file_code=(select file_code
+                          from nbur_ref_files
+                         where id=p_file_id);
+            exception when no_data_found then
+                    -- вставка атрибуту xsi:nil для елементів (старий варіант)...
+                      case l_rpt_code
+                      when '3E'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q007_7|<Q007_8)(></)', '\1 xsi:nil = "true" \2' );
+                      when '3K'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q006|<Q001)(></)', '\1 xsi:nil = "true" \2' );
+                      when '3M'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q007_1)(></)', '\1 xsi:nil = "true" \2' );
+                      when 'D9'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q029_1)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q029_2)(></)', '\1 xsi:nil = "true" \2' );
+                      when '2K' 
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q007_3)(></)', '\1 xsi:nil = "true" \2' );
+                      when 'E8'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q001|<Q029)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q003_2|<Q007_2)(></)', '\1 xsi:nil = "true" \2' );
+                      when '4P'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q001_1|<Q001_2|Q003_1|Q006|Q007_1|Q007_2|Q007_3)(></)', '\1 xsi:nil = "true" \2' );
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q012|<Q013|Q021|Q022)(></)', '\1 xsi:nil = "true" \2' );
+                      when '3B'
+                      then
+                        l_clob := REGEXP_REPLACE( l_clob, '(<Q001|<Q026)(></)', '\1 xsi:nil = "true" \2' );
+                      else
+                        null;
+                      end case;
+                      -----------	end exception
+      end; 
+      if (l_change_elements is not null) then
+              -- додамо символ '<' на початок кожного значення набору
+              l_change_elements := REGEXP_REPLACE(l_change_elements, '(\s)+?','');      
+              l_change_elements := l_change_elements||',';
+              l_change_elements := REGEXP_REPLACE(l_change_elements, '(.+?),','<\1,');
+              l_change_elements := TRIM( both ',' from l_change_elements);
+              -- змінимо в наборі ',' на '|' 
+              l_change_elements := REGEXP_REPLACE(l_change_elements, ',+?', '|' );
+              l_clob := REGEXP_REPLACE( l_clob, '('||l_change_elements||')(></)', '\1 xsi:nil = "true" \2' );
+      end if;
     -----------
 
     l_errmsg := CHK_XML( p_file_id, p_rpt_dt, l_clob );
