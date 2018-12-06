@@ -92,8 +92,19 @@ COMMENT ON COLUMN BARS.NBUR_REF_PREPARE_XML.DESC_XML IS 'Опис SQL-запитів для фо
 
 COMMENT ON COLUMN BARS.NBUR_REF_PREPARE_XML.DATE_START IS 'Дата початку дії';
 
+PROMT ========================================================== 
+PROMT ======================== ADD COLUMNS =====================
+PROMT ========================================================== 
+begin  EXECUTE IMMEDIATE 'ALTER TABLE BARS.NBUR_REF_PREPARE_XML ADD (ATTR_NIL varchar(128)) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
+comment on column BARS.NBUR_REF_PREPARE_XML.ATTR_NIL is 'Перелік (через кому без пробілів, elem1,elem2,...,elemN) елементів для заміни атрибуту xsi:nil';
+/
+
 prompt -- ======================================================
 prompt -- Grants
 prompt -- ======================================================
+
 
 GRANT SELECT ON BARS.NBUR_REF_PREPARE_XML TO BARS_ACCESS_DEFROLE;
