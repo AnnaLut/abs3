@@ -24,7 +24,13 @@ BEGIN
         join cust_acc c on k.rnk = c.rnk
         join accounts a on a.acc = c.acc
        WHERE (
-                a.nls = nls_ 
+                (
+                  a.nls = nls_ 
+                  and ( -- COBUMMFO-10304
+                        (regexp_like(a.nls, '^26[0,5]5') and dazs is null)
+                        or not regexp_like(a.nls, '^26[0,5]5')
+                      )
+                )
                 or (  -- COBUMMFO-10304
                       regexp_like(nls_, '^26[0,2,5]5')
                       and a.nlsalt = nls_
