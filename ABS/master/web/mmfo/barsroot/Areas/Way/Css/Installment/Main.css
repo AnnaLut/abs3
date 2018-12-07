@@ -1,0 +1,181 @@
+﻿.search-catalog {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+}
+
+#tabstrip .k-content {
+    min-height: 10px !important;
+}
+
+#tabstrip h2 {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#gridFiles th.k-header {
+    text-align: center;
+}
+
+.search-box {
+    background-color: rgba(20,53,80,0.038);
+    border: 1px solid rgba(20,53,80,0.05);
+    border-radius: 2px;
+    padding: 10px;
+    max-width: 1111px;
+    position: relative;
+}
+
+.widerMenu .k-combobox,
+.widerMenu .k-datepicker,
+.widerMenu .k-timepicker,
+.widerMenu .k-datetimepicker,
+.widerMenu .k-numerictextbox,
+.widerMenu .k-dropdown,
+.widerMenu .k-textbox {
+    width: 200px;
+}
+
+.colored-box {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    border: 0.5px solid rgb(0, 0, 0);
+    border: 1px solid rgba(0, 0, 0, .5);
+}
+
+.sub-label {
+    font-size: 14px;
+    margin-top: 2px;
+    margin-left: 6px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.contract-label {
+    font-size: 14px;
+    margin-top: 2px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.color-button {
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 4px;
+    margin: 4px 2px;
+    cursor: pointer;
+    /*padding: 1px 1px;*/
+    padding: 0px;
+    width: 20px;
+    height: 20px;
+}
+
+    .color-button:focus {
+        border-style: solid;
+        border-color: #428bca;
+        border-width: 0.5px;
+    }
+
+.k-grid .k-state-focused {
+    background-color: transparent !important;
+}
+
+.k-grid th a.k-state-active {
+    background-color: lightblue;
+}
+
+.k-grid tr td {
+    border-bottom: 1px solid #ccc;
+}
+
+.k-state-selected {
+    background-color: #428bca !important;
+}
+
+.k-grid tr {
+    height: auto !important;
+}
+
+/*.k-grid-content tr {
+    height: 50px !important;
+}*/
+
+.k-grid td {
+    text-overflow: unset;
+    line-height: 1.5em !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    text-align: center;
+    white-space: pre-line !important;
+}
+
+.filter-box {
+    width: 30%;
+    margin-top: 2px;
+    margin-bottom: 5px;
+}
+
+.k-filter-menu [type="submit"] {
+    width: 54% !important;
+    margin-right: 1% !important;
+}
+
+.k-filter-menu [type="reset"] {
+    width: 44% !important;
+    margin-left: 1% !important;
+}
+
+.sp-tabs {
+    padding: 5px !important;
+}
+
+.k-tabstrip-items {
+    padding: .3em .3em 0 !important;
+}
+
+.typeGreen {
+    background-color: #66cc94;
+}
+
+.typeRed {
+    background: #f28c8c;
+}
+
+.typeYellow {
+    background: #ffcf4d;
+}
+
+a {
+    text-decoration: none;
+    color: blue;
+}
+
+a:link {
+    text-decoration: none;
+    color: blue;
+}
+a:visited {
+    text-decoration: none;
+    color: blue;
+}
+
+a:active {
+    text-decoration: underline;
+    color: black;
+}
+a:hover {
+    text-decoration: underline;
+    color: black;
+}
+
+.k-grid-header th.k-header, .k-filter-row th {
+    overflow: initial;
+    white-space: pre-wrap !important;
+    text-align: center !important;
+    max-height: 50px;
+}

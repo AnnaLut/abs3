@@ -1,0 +1,66 @@
+﻿@model int?
+@{
+    Layout = "~/Views/Shared/_LayoutKendo.cshtml";
+    //ViewBag.Title = "RecipientsContracts";
+}
+<meta charset="utf-8" />
+
+<script src="~/Scripts/respond.min.js"></script>
+<script src="~/Areas/Way/Scripts/Installment/InstallmentMain.js?1.2"></script>
+<script src="~/Areas/Way/Scripts/Installment/InstallmentCommon.js?1.2"></script>
+<script src="~/lib/jsZip/jszip.min.js"></script>
+<link href="~/Areas/Way/Css/Installment/Main.css" rel="stylesheet" />
+
+
+<h1 id="title" style="padding-bottom: 0px;"></h1>
+
+
+<div style="float: right;">
+    <button id='typeGreen' type='button' class='color-button typeGreen' title='Сплачено' data-value="[0]" data-selected="&\\#10004;"></button>
+
+    <button id='typeYellow' type='button' class='color-button typeYellow' title='Сплачено частково' data-value="[4,5]" data-selected="&\\#10004;"></button>
+
+    <button id='typeRed' type='button' class='color-button typeRed' title='Прострочено' data-value="[1]" data-selected="&\\#10004;"></button>
+</div>
+
+<br />
+<br />
+
+<input readonly hidden value="@Model" id="nd" />
+
+<div id="tabstrip">
+    <ul>
+        <li id="contracts">Субдоговори</li>
+        <li id="payments">Графік платежів</li>
+        <li id="accounts">Рахунки</li>
+    </ul>
+    <div data-type="contracts" class="sp-tabs">
+        <a id="contractsFilter" class="filter-box"></a>
+        <div id="contractsGrid"></div>
+    </div>
+    <div data-type="payments" class="sp-tabs">
+        <label>Договір: </label><label class="contract-label"></label>
+        <label>Субдоговір: </label><label class="sub-label"></label>
+        <a id="paymentsFilter" class="filter-box"></a>
+        <div id="paymentsGrid"></div>
+    </div>
+    <div data-type="accounts" class="sp-tabs">
+        <label>Договір:</label><label class="contract-label"></label>
+        <label>Субдоговір:</label><label class="sub-label"></label>        
+        <div id="accountsGrid"></div>
+    </div>
+</div>
+
+<hr class="modal-hr" />
+
+<script id="toolbarTemplate" type="text/x-kendo-template">
+    <button class="k-button update-grid" title="Оновити">
+        <i class='pf-icon pf-16 pf-reload_rotate'></i>
+    </button>
+    <button type='button' class='k-button k-grid-excel' title='Вивантажити в EXCEL'>
+        <i class='pf-icon pf-16 pf-exel'></i>
+    </button>    
+    <button id="clearFilters" class="k-button clear-filters" title="Очистити фільтри">
+        <i class='pf-icon pf-16 pf-filter-remove'></i>
+    </button>
+</script>
