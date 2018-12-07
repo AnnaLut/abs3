@@ -105,7 +105,7 @@ end;
 /
 CREATE OR REPLACE PACKAGE BODY BARS.BARS_DPA is
 
-g_body_version constant varchar2(64)  := 'Version 1.27 27/08/2018';
+g_body_version constant varchar2(64)  := 'Version 1.30 07/12/2018';
 g_body_defs    constant varchar2(512) := '';
 
 g_modcode      constant varchar2(3)   := 'DPA';
@@ -979,7 +979,8 @@ begin
                  and dat > sysdate-30
                  and nls = l_account
                  and kv  = l_currency
-                 and otype in (1,6);
+                 and otype in (1,6)
+                 and n = l_f_rec;
 
            else
               select n into l_tmpn
