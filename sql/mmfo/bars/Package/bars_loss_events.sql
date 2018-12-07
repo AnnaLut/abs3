@@ -44,7 +44,7 @@ show err
 
 create or replace package body BARS_LOSS_EVENTS
 is
-  g_body_version  constant varchar2(64) := 'version 5.7  05.01.2018';
+  g_body_version  constant varchar2(64) := 'version 5.8  23.05.2018';
 /*
   12.12.2017 KVA - COBUMMFO-5385 - дубль в файле lossdays (Киевское РУ) за 31.11.2017
   02.10.2017 KVA - COBUSUPABS-6451 - ... не для всех типов договоров учитывается признак корректирующих проводок
@@ -563,38 +563,45 @@ is
 
       when g_XOZ
       then -- Госп.Деб.
-         begin
-             SELECT nvl(x.mdate, xoz_mdate(a.acc, x.fdat, a.nbs, a.ob22, a.MDATE )) mdate
-              into x_event_date
-                from   xoz_ref x
-                join accounts a
-                on (x.acc=a.acc)
-                where   x.fdat <p_date and (x.datz >= p_date or x.datz is null) and x.s0<>0 and x.s<>0
-                       and  a.tip in ('W4X', 'XOZ')
-                       AND id = p_nd;
 
-              if x_event_date > p_date then
-                    x_event_date := null;
-              end if;
+        begin
+          select nvl( x.MDATE, XOZ_MDATE( a.acc, x.fdat, a.nbs, a.ob22, a.MDATE ) )
+            into x_event_date
+            from XOZ_REF x
+            join ACCOUNTS a
+              on (x.acc=a.acc)
+           where x.fdat < p_date
+             and (x.datz >= p_date or x.datz is null)
+             and x.s0<>0
+             and x.s <>0
+             and a.tip in ('W4X', 'XOZ')
+             and id = p_nd;
+
+          if ( x_event_date >= p_date )
+          then
+            x_event_date := null;
+          end if;
 
          exception
-            when no_data_found then null;
+            when no_data_found then
+              x_event_date := null;
          end;
+
       else
         null;
     end case;
 
     case p_object_type
-      when g_CCK then n_Const := 90;
-      when g_OVR then n_Const := 90;
-      when g_DEB then n_Const := 90; -- Фін.Деб. ????
-      when g_MBK then n_Const := 07;
-      when g_CP  then n_Const := 30;
-      when g_XOZ then n_Const := 90; -- Госп.Деб.
-      else            n_Const := 00;
+    when g_CCK then n_Const := 90;
+    when g_OVR then n_Const := 90;
+    when g_DEB then n_Const := 90; -- Фін.Деб.
+    when g_MBK then n_Const := 07;
+    when g_CP  then n_Const := 30;
+    when g_XOZ then n_Const := 90; -- Госп.Деб.
+    else            n_Const := 00;
     end case;
 
-    p_days       := p_date - x_event_date + 1;
+    p_days       := p_date - x_event_date + case p_object_type when g_XOZ then 0 else 1 end;
     p_days_corr  := p_days;
     x_event_date := x_event_date + n_Const;
 
@@ -1050,13 +1057,13 @@ begin
         null;
       else
 
-        If k.TIP = g_DEB
-           then loss_delay(k.TIP, k.GND, null, k.sdate, k.ND, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate);
-        elsif  k.TIP = g_XOZ
-           then loss_delay(k.TIP, k.GND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate);   --VVV  или для ХДЗ другой алгоритм?
-           --then loss_delay(k.TIP, k.GND, null, k.sdate, null, null, p_date, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate);  --VVV
-        else loss_delay(k.TIP, k.GND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate);
-        end if;
+        case k.TIP
+        when g_DEB
+        then LOSS_DELAY( k.TIP, k.GND, null, k.sdate, k.ND, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
+        when g_XOZ
+        then LOSS_DELAY( k.TIP, k.GND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
+        else LOSS_DELAY( k.TIP, k.GND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
+        end case;
 
         if l_status = 1
         then
