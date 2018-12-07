@@ -218,7 +218,7 @@ BEGIN
            from accounts a, nd_acc n, cc_deal d,cc_add ca
            where trim(d.CC_ID)=trim(CC_ID_) and d.sdate=DAT1_ and d.nd  = n.ND
              and d.nd=ca.nd  and ca.adds=0  and d.vidd in (11,12,13)
-             and ca.kv =kv_  and (a.tip = 'SG ' or nbs ='2620' ) AND A.KV=CA.KV
+             and ca.kv =kv_  and (a.tip = 'SG ' or  (nbs ='2620' and a.tip = 'DEP')) AND A.KV=CA.KV
              and a.acc=n.acc and a.dazs is null and d.sos<14
           order by a.nbs, a.acc)
         where rownum=1;
