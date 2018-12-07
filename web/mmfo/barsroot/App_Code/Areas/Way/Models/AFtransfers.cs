@@ -10,7 +10,7 @@ namespace BarsWeb.Areas.Way.Models
         public decimal? DOC_ORN { get; set; }
         public decimal? DK { get; set; }
         public string NLSA { get; set; }
-        [JsonIgnore]
+        //[JsonIgnore]
         public decimal? S { get; set; }
 
         public decimal? Sgrn
@@ -26,7 +26,7 @@ namespace BarsWeb.Areas.Way.Models
         }
         public decimal? KV { get; set; }
         public string NLSB { get; set; }
-        [JsonIgnore]
+        //[JsonIgnore]
         public decimal? S2 { get; set; }
 
         public decimal? Sgrn2
@@ -44,5 +44,7 @@ namespace BarsWeb.Areas.Way.Models
         public string NAZN { get; set; }
         public string ERR_TEXT { get; set; }
         public string URL { get; set; }
+        public decimal? INST_CHAIN_IDT { get; set; }
+        public decimal? INST_PLAN_ID { get; set; }
     }
 }

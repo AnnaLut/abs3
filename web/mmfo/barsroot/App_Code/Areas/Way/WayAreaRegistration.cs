@@ -45,6 +45,7 @@ namespace BarsWeb.Areas.Way
             var ninjectKernel = controllerFactory.NinjectKernel;
             ninjectKernel.Bind<IWayRepository>().To<WayRepository>();
             ninjectKernel.Bind<IInstantCardsRepository>().To<InstantCardsRepository>();
+            ninjectKernel.Bind<IInstallmentRepository>().To<InstallmentRepository>();
         }
     }    
 }

@@ -30,7 +30,8 @@ var g_gridMainToolbar_FO = [
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Приєднати до ДКБО" id="btnConnDkbo" ><i class="pf-icon pf-16 pf-database-arrow_right"></i></a>' },
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Сформувати запит" id="btnRunSelect" ><i class="pf-icon pf-16 pf-mail-arrow_right"></i></a>' },
     { template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткова картка по КК" id="btnAddCard" ><i class="pf-icon pf-16 pf-man_1-update"></i></a>' },
-    { template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткова картка школяра" id="btnSchoolboy" ><i class="pf-icon pf-16 pf-user"></i></a>' }
+	{ template: '<a class="k-button" onclick="onClickBtn(this)" title="Додаткова картка школяра" id="btnSchoolboy" ><i class="pf-icon pf-16 pf-user"></i></a>' },
+	{ template: '<a class="k-button" onclick="onClickBtn(this)" title="Портфель договорів Інстолмент" id="btnInstallment" ><i class="pf-icon pf-16 pf-info"></i></a>' }
 ];
 
 var g_gridMainToolbar_UO = [
@@ -534,6 +535,17 @@ function onClickBtn(btn) {
             var _nd = row ? row.ND : "";
             window.location = "/barsroot/InsUi/cardinsurance?bpkw4nd=" + _nd;
             break;
+		case "btnInstallment":
+			var installmentWindow = $("<div />").kendoWindow({
+				actions: ["Maximize", "Close"],
+                title: "Портфель договорів Інстолмент",
+				width: "90%",
+				height: "90%",
+				content: bars.config.urlContent("/Way/Installment/Index?nd=" + row.ND),
+				iframe: true
+			});
+			installmentWindow.data("kendoWindow").center().open();
+			break;
     }
 }
 

@@ -714,6 +714,8 @@
                         { field: "Sgrn2", title: "Сума екв.", width: 75 },
                         { field: "KV2", title: "Код<br/> валюти екв.", width: 75 },
                         { field: "NAZN", title: "Призначення платежу", width: 350 },
+                        { field: "INST_CHAIN_IDT", title: "ІД субдоговору", width: 75 },
+                        { field: "INST_PLAN_ID", title: "ІД плану", width: 75 },
                         { field: "ERR_TEXT", title: "Помилки в тексті", width: 350 }
                     ];
                     break;

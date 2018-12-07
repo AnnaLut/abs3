@@ -60,6 +60,10 @@ namespace BarsWeb.Areas.Way.Controllers.Api
                     case "R_DOCUMENTS_REV":
                         // todo: add !!!!!
                         break;
+                    case "INSTPLANDEL":
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    case "INSTPLAN":
+                        return Request.CreateResponse(HttpStatusCode.OK);
                     case "DOCUMENTSDEL":
                         noProccessedFiles = _repository.DeletedDocuments(id).ToList();
                         break;
@@ -71,8 +75,8 @@ namespace BarsWeb.Areas.Way.Controllers.Api
                         noProccessedFiles = _repository.DeletedStransfers(id).ToList();
                         break;
                 }
-                
-                if(noProccessedFiles == null)
+
+                if (noProccessedFiles == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, string.Format("Непідтримуваний тип файлу: id={0} mode={1}", id, mode));
                 }
