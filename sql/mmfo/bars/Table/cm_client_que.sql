@@ -371,6 +371,26 @@ exception when others then
  end;
 /
 
+begin
+    execute immediate 'alter table CM_CLIENT_QUE
+  drop constraint CC_CMCLIENTQUE_OPERSTATUS';
+ exception when others then 
+    if sqlcode = -2443 then null; else raise; 
+    end if; 
+end;
+/
+
+begin
+    execute immediate 'alter table CM_CLIENT_QUE
+  add constraint CC_CMCLIENTQUE_OPERSTATUS
+  check (oper_status in (1,2,3,10,20,30,99))
+  novalidate';
+ exception when others then 
+    if sqlcode = -2264 or sqlcode = -2261 then null; else raise; 
+    end if; 
+end;
+/ 
+
 PROMPT *** Create  grants  CM_CLIENT_QUE ***
 grant DELETE,FLASHBACK,INSERT,SELECT,UPDATE                                  on CM_CLIENT_QUE   to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on CM_CLIENT_QUE   to BARS_DM;

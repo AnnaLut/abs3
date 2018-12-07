@@ -769,7 +769,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
         l_code := 0;
         l_nd   := null;
         l_cardcode := null;
-        l_productcode := null;        
+        l_productcode := null;
         if l_epp(i).document_type = 1 then
           if regexp_like(trim(l_epp(i).document_id), '^[0-9]{9}$') then
             l_epp(i).document_type := 7;
@@ -813,8 +813,8 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                                 tag_ => 'PENSN',
                                 val_ => l_epp(i).epp_number,
                                 otd_ => 0);
-       
-          if l_code = 1 then  
+
+          if l_code = 1 then
             l_productcode := case when l_epp(i).type_pens = 1 and l_epp(i).displaced_person_flag = 1 then 'PENS_SOC_MIGRANT'
                                   when l_epp(i).type_pens = 1 and l_epp(i).displaced_person_flag = 0 then 'PENS_SOC_UAH_24'
                                   when l_epp(i).type_pens = 2 and l_epp(i).displaced_person_flag = 1 then 'PENS_ARSL_MIGRANT'
@@ -837,7 +837,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
               if (l_count + length(l_last_name) > 24) then
                  l_last_name := substr(l_last_name, 1, 24 - l_count);
               end if;
-              
+
               l_cardcode := case when l_epp(i).type_pens = 1 and l_epp(i).displaced_person_flag = 1 then 'PENS_SOC_MIGRANT_NSMEP'
                                  when l_epp(i).type_pens = 1 and l_epp(i).displaced_person_flag = 0 then 'PENS_SOC_UAH_24_MWORLDEBPP_EPP'
                                  when l_epp(i).type_pens = 2 and l_epp(i).displaced_person_flag = 1 then 'PENS_ARSL_MIGRANT_NSMEP'
@@ -897,7 +897,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
               elsif (l_productcode = 'PENS_ARSL_UAH_27') and (l_cardcode != 'PENS_ARSL_UAH_27_MWORLDEBPP_EPP') then
                  update w4_acc w
                     set w.card_code = 'PENS_ARSL_UAH_27_MWORLDEBPP_EPP'
-                  where w.nd = l_nd;                                    
+                  where w.nd = l_nd;
               end if;
               get_nls_maxterm(l_nd, l_epp(i).nls, l_term);
 
@@ -1048,7 +1048,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                                  when l_epp.type_pens = 1 and l_epp.displaced_person_flag = 0 then 'PENS_SOC_UAH_24_MWORLDEBPP_EPP'
                                  when l_epp.type_pens = 2 and l_epp.displaced_person_flag = 1 then 'PENS_ARSL_MIGRANT_NSMEP'
                                  when l_epp.type_pens = 2 and l_epp.displaced_person_flag = 0 then 'PENS_ARSL_UAH_27_MWORLDEBPP_EPP'
-                                 else 'PENS_SOC_MIGRANT_NSMEP' end;              
+                                 else 'PENS_SOC_MIGRANT_NSMEP' end;
               bars_ow.open_card(p_rnk          => l_rnk,
                                 p_nls          => null,
                                 p_cardcode     => l_cardcode,
@@ -1101,7 +1101,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
               elsif (l_productcode = 'PENS_ARSL_UAH_27') and (l_cardcode != 'PENS_ARSL_UAH_27_MWORLDEBPP_EPP') then
                  update w4_acc w
                     set w.card_code = 'PENS_ARSL_UAH_27_MWORLDEBPP_EPP'
-                  where w.nd = l_nd;                                    
+                  where w.nd = l_nd;
               end if;
               get_nls_maxterm(l_nd, l_epp.nls, l_term);
 
@@ -1500,13 +1500,14 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                              when 100 then
                               'Заявку оброблено успішно'
                            end message,
-                           last_day(ac.dat_end) eppexpired
+                           last_day(ac.dat_end) eppexpired,
+                           c.id id_cm
                       from table(p_id_list) t
                       join pfu_epp_line_processing p
                         on value(t) = p.id
                       join accounts a
                         on p.nls = a.nls
-                      join w4_acc ac on ac.acc_pk = a.acc   
+                      join w4_acc ac on ac.acc_pk = a.acc
                       left join cm_client_que c --v_cm_client c
                         on c.acc = a.acc and c.oper_type in (1, 5, 9) and
                            c.card_br_iss = p.epp_number)
@@ -1542,7 +1543,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
       l_supp_text    := dbms_xmldom.createtextnode(l_domdoc,
                                                    to_char(sup_rec.eppexpired, 'dd.mm.yyyy'));
       l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
-                                                dbms_xmldom.makenode(l_supp_text));    
+                                                dbms_xmldom.makenode(l_supp_text));
 
       l_supp_element := dbms_xmldom.createelement(l_domdoc, 'message');
       l_supp_node    := dbms_xmldom.appendchild(l_supplier_node,
@@ -1551,7 +1552,10 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                                                    sup_rec.message);
       l_supp_tnode   := dbms_xmldom.appendchild(l_supp_node,
                                                 dbms_xmldom.makenode(l_supp_text));
-                                                                                            
+      update cm_client_que cm
+         set cm.OPER_STATUS  = case when cm.OPER_STATUS = 3 then 20 --успешно
+                                    else 30 end -- не успешно
+       where cm.ID = sup_rec.id_cm;
 
     end loop;
 
@@ -1827,7 +1831,6 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
         end if;
       
         pfu_ru_file_utl.get_ebp_processing(i.file_data, i.id);
-     
       commit;
       exception
         when others then
