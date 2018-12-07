@@ -25,10 +25,11 @@ BEGIN
         join accounts a on a.acc = c.acc
        WHERE (
                 a.nls = nls_ 
-                or (  -- COBUMMFO-10278
+                or (  -- COBUMMFO-10304
                       regexp_like(nls_, '^26[0,2,5]5')
                       and a.nlsalt = nls_
                       and a.tip like 'W4%'
+                      and a.dat_alt is not null
                    )
              )
              AND a.kv=gl.BaseVal;
