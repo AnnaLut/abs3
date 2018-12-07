@@ -296,9 +296,6 @@ procedure set_w4_acc (
   p_nls_2209  accounts.nls%type,
   p_nls_3579  accounts.nls%type );
 
--- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
---procedure set_account_rate ( p_acc number, p_trmask t_trmask );
-procedure set_account_rate (p_acc number);
 
 function get_impid (p_mode number default null) return number;
 
