@@ -1,4 +1,5 @@
 ﻿<%@ Register TagPrefix="igtxt" Namespace="Infragistics.WebUI.WebDataInput" Assembly="Infragistics.WebUI.WebDataInput.v1, Version=1.0.20041.14, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb" %>
+
 <%@ Page Language="c#" CodeFile="DepositAddRegular.aspx.cs" AutoEventWireup="true" Inherits="DepositAddRegular" %>
 
 
@@ -17,36 +18,32 @@
 <head id="Head1" runat="server">
     <title>Депозитний модуль: Додаткова угода Довгострокове доручення вкладника на списання коштів</title>
     <link href="/barsroot/deposit/style/dpt.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/json3.min.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/Script/Localization.js"></script>
     <script type="text/javascript" language="javascript" src="/Common/Script/cross.js"></script>
     <script type="text/javascript" language="javascript" src="/barsroot/deposit/js/js.js"></script>
     <script type="text/javascript" language="javascript" src="/barsroot/deposit/js/ck.js"></script>
     <script type="text/javascript" language="javascript" src="/barsroot/deposit/js/AccCk.js"></script>
-    <script type="text/javascript" src="../Scripts/jquery/jquery.js"></script>
-    <script type="text/javascript" src="../Scripts/bootstrap/bootstrap.js"></script>
-    <script type="text/javascript" src="../Scripts/jquery/jquery.bars.ui.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/bootstrap/bootstrap.js"></script>
+    <script type="text/javascript" src="/barsroot/Scripts/jquery/jquery.bars.ui.js"></script>
+    <script type="text/javascript" language="javascript" src="/barsroot/deposit/js/jquery.mask.min.js"></script>
     <script type="text/javascript" language="javascript">
         function AddListener4Enter() {
             AddListeners("textBankAccount,textBankMFO,textIntRcpName,textIntRcpOKPO,textAccountNumber,textRestRcpMFO,textRestRcpOKPO,textRestRcpName",
-		    'onkeydown', TreatEnterAsTab);
+                'onkeydown', TreatEnterAsTab);
         }
         function AfterPageLoad() {
-            // document.getElementById('textBankMFO').fireEvent('onblur');
-            // document.getElementById('textRestRcpMFO').fireEvent('onblur');
-
-            //document.getElementById('textRestRcpMFO').readOnly = true;
-            //document.getElementById('textAccountNumber').readOnly = true;
-            //document.getElementById('textRestRcpName').readOnly = true;
-            //document.getElementById('textRestRcpOKPO').readOnly = true;
+            $('#StartDate').mask('00/00/0000');
+            $('#EndDate').mask('00/00/0000');
 
             if (document.getElementById('textBankAccount')) {
                 document.getElementById('textBankMFO').readOnly = true;
                 document.getElementById('textBankAccount').readOnly = true;
                 document.getElementById('textIntRcpName').readOnly = true;
                 document.getElementById('textIntRcpOKPO').readOnly = true;
-            }
 
-            // focusControl('btnDeposit');
+            }
         }
 
         function validateForm() {
@@ -58,7 +55,7 @@
 
             var startDateArray = document.getElementById('StartDate').value.split('/')//date format 'dd/MM/yyyy'
             var startDate1 = new Date(startDateArray[2], parseInt(startDateArray[1], 10) - 1, startDateArray[0])
-                        
+
             var endDateArray = document.getElementById('EndDate').value.split('/')//date format 'dd/MM/yyyy'
             var endDate1 = new Date(endDateArray[2], parseInt(endDateArray[1], 10) - 1, endDateArray[0])
 
@@ -75,13 +72,13 @@
                 document.getElementById('NlsValidate').innerHTML = '';
             }
 
-            if (startDate.value == '') {              
+            if (startDate.value == '') {
                 result = false;
                 addClass(startDate, 'error');
                 document.getElementById('StartDateValidate').innerHTML = 'Заповніть поле дата початку';
             }
             else {
-                if (startDate1 < nextBankDate) {                    
+                if (startDate1 < nextBankDate) {
                     result = false;
                     addClass(startDate, 'error');
                     document.getElementById('StartDateValidate').innerHTML = 'Дата "з" не може бути меншою за наступну банківську дату';
@@ -123,231 +120,233 @@
         CrossAddEventListener(window, 'onload', AddListener4Enter);
     </script>
     <style type="text/css">
-        .InfoLabel
-        {
+        .InfoLabel {
             text-align: center;
         }
-        .style1
-        {
+
+        .style1 {
             height: 232px;
         }
-        .style2
-        {
+
+        .style2 {
             width: 23%;
         }
-        .style3
-        {
+
+        .style3 {
             width: 758px;
         }
-        .style4
-        {
+
+        .style4 {
             width: 875px;
         }
+
         .error input[type=text],
         input.error {
             border: 1px solid red !important;
             background-color: #fffacd;
         }
-        .style7
-        {
+
+        .style7 {
             font-family: Arial;
             font-size: 10pt;
         }
     </style>
-    </head>
+</head>
 <body onload="AfterPageLoad();">
     <form id="Form1" method="post" runat="server">
-    <table class="MainTable" id="InnerTable">
-        <tr align="center"  dir="ltl">
-            <td>
-                <table id="ContractTable" class="InnerTable">
-                    <tr>
-                        <td class="style4">
-                            <asp:Label ID="lbDUInfo" meta:resourcekey="lbDUInfo" CssClass="InfoLabel"
-                                runat="server" Height="20px">Додаткова угода "Довгострокове доручення вкладника на списання коштів з карткового рахунку"</asp:Label>
-                        </td>
-                    </tr>
-            </td>
-            <tr>
-         
-                <td colspan="1" class="style4">
-                <table id="tbTerm" runat="server" class="InnerTable">
-                  <tr>
-                       <td class="style2"> 
-                         <asp:Label ID="lbClientInfo" meta:resourcekey="lbClientInfo2" CssClass="InfoText" runat="server">Вкладник</asp:Label>
-                       </td>
-                       <td class="style3">
-                         <asp:TextBox ID="textClientName" runat="server" CssClasts="InfoText" 
-                               ReadOnly="True" BackColor="WhiteSmoke" Width="600px"></asp:TextBox>
-                       </td>
-                  </tr>                  
-                  <tr>
-                       <td class="style2"> 
-                         <asp:Label ID="lbContractType" meta:resourcekey="lbContractType" runat="server" CssClass="InfoText">Вид договора</asp:Label>
-                       </td>
-                       <td class="style3">
-                         <asp:TextBox ID="textContractType" meta:resourcekey="textContractTypeName" 
-                               runat="server" CssClass="InfoText" ToolTip="Вид депозитного договору" 
-                               ReadOnly="true" BackColor="WhiteSmoke" Width="600px"/>
-                       </td>
-                  </tr>
-                  <tr>
-                       <td class="style2"> 
-                         <asp:Label ID="lbContractID" meta:resourcekey="lbContractID" runat="server" CssClass="InfoText">Идентификатор договора</asp:Label>
-                       </td>
-                       <td class="style3">
-                         <asp:TextBox ID="textContractID" meta:resourcekey="textContractIDName" 
-                               runat="server" CssClass="InfoText" 
-                               ToolTip="Идентификатор депозитного договору"  ReadOnly="true" 
-                               BackColor="WhiteSmoke" Width="600px"/>
-                       </td>
-                  </tr>
-                   <tr>
-                       <td class="style2"> 
-                         <asp:Label ID="lbCur" meta:resourcekey="lbCur" runat="server" CssClass="InfoText">Валюта договора</asp:Label>
-                       </td>
-                       <td class="style3">
-                         <asp:TextBox ID="textCur" runat="server" CssClass="InfoText" 
-                               ToolTip="Валюта договору" BackColor="WhiteSmoke" ReadOnly="true" Width="600px"></asp:TextBox>
-                       </td>
-                  </tr>
-                  
-                  <tr> <td class="style2"></td>
-                       <td class="style3" > 
-                         <asp:Label ID="lbClientInfo3" meta:resourcekey="lbClientInfo3" CssClass="InfoLabel" runat="server">Перелік існуючих ДУ про регулярні платежі клієнта</asp:Label>
-                       </td>                    
-                  </tr>
-                 	<tr>
-					<td colSpan="2" class="style1">
-                        <asp:datagrid id="gridRegular" runat="server" 
-                            CssClass="style7" EnableViewState="False" HorizontalAlign="Left"
-							AutoGenerateColumns="False" style="margin-right: 0px" Width="1297px">
-							<Columns>
-								<asp:BoundColumn DataField="ord" HeaderText="№">
-									<HeaderStyle Width="2%"></HeaderStyle>
-								</asp:BoundColumn>
-								<asp:BoundColumn DataField="freq" HeaderText="Періодичність">
-									<HeaderStyle Width="2%"></HeaderStyle>
-								</asp:BoundColumn>
-                                <asp:BoundColumn DataField="DAT1" HeaderText="З">
-									<HeaderStyle Width="2%"></HeaderStyle>
-								</asp:BoundColumn>
-                                <asp:BoundColumn DataField="DAT2" HeaderText="По">
-									<HeaderStyle Width="3%"></HeaderStyle>
-								</asp:BoundColumn>
-                                <asp:BoundColumn DataField="nlsa" HeaderText="Рахунок А">
-									<HeaderStyle Width="3%"></HeaderStyle>
-								</asp:BoundColumn>
-								<asp:BoundColumn DataField="nlsb" HeaderText="Рахунок B">
-									<HeaderStyle Width="15%"></HeaderStyle>
-								</asp:BoundColumn>								
-                                <asp:BoundColumn DataField="FSUM" HeaderText="Сума">
-									<HeaderStyle Width="15%"></HeaderStyle>
-								</asp:BoundColumn>						    
-                                <asp:BoundColumn DataField="NAZN" HeaderText="Призначення">
-									<HeaderStyle Width="50%"></HeaderStyle>
-								</asp:BoundColumn>						    
-                                <asp:BoundColumn DataField="USERID_MADE" HeaderText="Створив користувач">
-					            <HeaderStyle Width="5%"></HeaderStyle>
-				                </asp:BoundColumn>						    
-				                <asp:BoundColumn DataField="BRANCH_MADE" HeaderText="Відділення">
-					                <HeaderStyle Width="10%"></HeaderStyle>
-				                </asp:BoundColumn>		
-                                <asp:BoundColumn DataField="BRANCH_CARD" HeaderText="Бранч, де відкрито картрахунок">
-					                <HeaderStyle Width="10%"></HeaderStyle>
-				                </asp:BoundColumn>		
-                                <asp:BoundColumn DataField="DATETIMESTAMP" HeaderText="Дата/час створення">
-					            <HeaderStyle Width="15%"></HeaderStyle>
-								</asp:BoundColumn>					  
-							</Columns>
-						</asp:datagrid></td>
-				</tr>
+        <table class="MainTable" id="InnerTable">
+            <tr align="center" dir="ltl">
+                <td>
+                    <table id="ContractTable" class="InnerTable">
+                        <tr>
+                            <td class="style4">
+                                <asp:Label ID="lbDUInfo" meta:resourcekey="lbDUInfo" CssClass="InfoLabel"
+                                    runat="server" Height="20px">Додаткова угода "Довгострокове доручення вкладника на списання коштів з карткового рахунку"</asp:Label>
+                            </td>
+                        </tr>
+                </td>
+                <tr>
 
-                    <tr> <td class="style2"></td>
-                        <td class="style3">
-                        <asp:Label ID="lbDUInfo2" meta:resourcekey="lbDUInfo2" CssClass="InfoLabel"
-                             runat="server" >Додати новий регулярний платіж</asp:Label>
-                        </td>
-                    </tr>
+                    <td colspan="1" class="style4">
+                        <table id="tbTerm" runat="server" class="InnerTable">
+                            <tr>
+                                <td class="style2">
+                                    <asp:Label ID="lbClientInfo" meta:resourcekey="lbClientInfo2" CssClass="InfoText" runat="server">Вкладник</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textClientName" runat="server" CssClasts="InfoText"
+                                        ReadOnly="True" BackColor="WhiteSmoke" Width="600px"></asp:TextBox>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2">
+                                    <asp:Label ID="lbContractType" meta:resourcekey="lbContractType" runat="server" CssClass="InfoText">Вид договора</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textContractType" meta:resourcekey="textContractTypeName"
+                                        runat="server" CssClass="InfoText" ToolTip="Вид депозитного договору"
+                                        ReadOnly="true" BackColor="WhiteSmoke" Width="600px" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2">
+                                    <asp:Label ID="lbContractID" meta:resourcekey="lbContractID" runat="server" CssClass="InfoText">Идентификатор договора</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textContractID" meta:resourcekey="textContractIDName"
+                                        runat="server" CssClass="InfoText"
+                                        ToolTip="Идентификатор депозитного договору" ReadOnly="true"
+                                        BackColor="WhiteSmoke" Width="600px" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2">
+                                    <asp:Label ID="lbCur" meta:resourcekey="lbCur" runat="server" CssClass="InfoText">Валюта договора</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textCur" runat="server" CssClass="InfoText"
+                                        ToolTip="Валюта договору" BackColor="WhiteSmoke" ReadOnly="true" Width="600px"></asp:TextBox>
+                                </td>
+                            </tr>
 
-                   <tr>
-                       <td class="style2"> 
-                         <asp:Label ID="lbAccountNLS" meta:resourcekey="lbAccountNLS" runat="server" CssClass="InfoText">Картковий рахунок в валюті договора (Рахунок відправника)</asp:Label>
-                       &nbsp;</td>
-                       <td class="style3">
-                        <asp:TextBox ID="textBankAccount" meta:resourcekey="textNLS" runat="server" CssClass="InfoText"
-                                            BorderStyle="Outset" MaxLength="14" ToolTip="Номер счета" 
-                               TabIndex="2" Font-Bold="True"></asp:TextBox>   
-                           <span runat="server" id="NlsValidate" style="color: red"></span>                        
-                            <input type="button" id="btnPercent" value="?" runat="server" class="HelpButton" BackColor = "whitesmoke"
-                            onclick="SearchAccounts('', 'textBankAccount', 'textBankMFO', 'textIntRcpOKPO', 'textIntRcpName');" />
-                       </td>
-                  </tr>
-                  <tr>
-                   <td class="style2" dir="rtl">
-                     <asp:Label ID="lbBankMFO" Text="МФО банку" meta:resourcekey="lbMFO" 
-                           runat="server" CssClass="InfoText" ForeColor="#999999" 
-                           Font-Size="X-Small" />
-                   </td>
-                   <td class="style3">
-                     <asp:TextBox ID="textBankMFO" meta:resourcekey="textMFO" runat="server" 
-                           CssClass="InfoText" readonly="true"
-                                            BorderStyle="Inset" MaxLength="12" 
-                           ToolTip="МФО банка" TabIndex="1" BackColor="WhiteSmoke"></asp:TextBox>
-                   </td>
-                  </tr>
-                  <tr>
-                   <td class="style2" dir="rtl">
-                     <asp:Label ID="lbIntRcpName" meta:resourcekey="lbNMK2" runat="server" 
-                           CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Назва клієнта-платника</asp:Label>
-                   </td>
-                   <td class="style3">
-                      <asp:TextBox ID="textIntRcpName" meta:resourcekey="textNMK" runat="server" CssClass="InfoText"  readonly="true" BackColor="WhiteSmoke"
+                            <tr>
+                                <td class="style2"></td>
+                                <td class="style3">
+                                    <asp:Label ID="lbClientInfo3" meta:resourcekey="lbClientInfo3" CssClass="InfoLabel" runat="server">Перелік існуючих ДУ про регулярні платежі клієнта</asp:Label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="style1">
+                                    <asp:DataGrid ID="gridRegular" runat="server"
+                                        CssClass="style7" EnableViewState="False" HorizontalAlign="Left"
+                                        AutoGenerateColumns="False" Style="margin-right: 0px" Width="1297px">
+                                        <Columns>
+                                            <asp:BoundColumn DataField="ord" HeaderText="№">
+                                                <HeaderStyle Width="2%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="freq" HeaderText="Періодичність">
+                                                <HeaderStyle Width="2%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="DAT1" HeaderText="З">
+                                                <HeaderStyle Width="2%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="DAT2" HeaderText="По">
+                                                <HeaderStyle Width="3%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="nlsa" HeaderText="Рахунок А">
+                                                <HeaderStyle Width="3%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="nlsb" HeaderText="Рахунок B">
+                                                <HeaderStyle Width="15%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="FSUM" HeaderText="Сума">
+                                                <HeaderStyle Width="15%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="NAZN" HeaderText="Призначення">
+                                                <HeaderStyle Width="50%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="USERID_MADE" HeaderText="Створив користувач">
+                                                <HeaderStyle Width="5%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="BRANCH_MADE" HeaderText="Відділення">
+                                                <HeaderStyle Width="10%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="BRANCH_CARD" HeaderText="Бранч, де відкрито картрахунок">
+                                                <HeaderStyle Width="10%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                            <asp:BoundColumn DataField="DATETIMESTAMP" HeaderText="Дата/час створення">
+                                                <HeaderStyle Width="15%"></HeaderStyle>
+                                            </asp:BoundColumn>
+                                        </Columns>
+                                    </asp:DataGrid></td>
+                            </tr>
+
+                            <tr>
+                                <td class="style2"></td>
+                                <td class="style3">
+                                    <asp:Label ID="lbDUInfo2" meta:resourcekey="lbDUInfo2" CssClass="InfoLabel"
+                                        runat="server">Додати новий регулярний платіж</asp:Label>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="style2">
+                                    <asp:Label ID="lbAccountNLS" meta:resourcekey="lbAccountNLS" runat="server" CssClass="InfoText">Картковий рахунок в валюті договора (Рахунок відправника)</asp:Label>
+                                    &nbsp;</td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textBankAccount" meta:resourcekey="textNLS" runat="server" CssClass="InfoText"
+                                        BorderStyle="Outset" MaxLength="14" ToolTip="Номер счета"
+                                        TabIndex="2" Font-Bold="True"></asp:TextBox>
+                                    <span runat="server" id="NlsValidate" style="color: red"></span>
+                                    <input type="button" id="btnPercent" value="?" runat="server" class="HelpButton" backcolor="whitesmoke"
+                                        onclick="SearchAccounts('', 'textBankAccount', 'textBankMFO', 'textIntRcpOKPO', 'textIntRcpName');" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2" dir="rtl">
+                                    <asp:Label ID="lbBankMFO" Text="МФО банку" meta:resourcekey="lbMFO"
+                                        runat="server" CssClass="InfoText" ForeColor="#999999"
+                                        Font-Size="X-Small" />
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textBankMFO" meta:resourcekey="textMFO" runat="server"
+                                        CssClass="InfoText" ReadOnly="true"
+                                        BorderStyle="Inset" MaxLength="12"
+                                        ToolTip="МФО банка" TabIndex="1" BackColor="WhiteSmoke"></asp:TextBox>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2" dir="rtl">
+                                    <asp:Label ID="lbIntRcpName" meta:resourcekey="lbNMK2" runat="server"
+                                        CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Назва клієнта-платника</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textIntRcpName" meta:resourcekey="textNMK" runat="server" CssClass="InfoText" ReadOnly="true" BackColor="WhiteSmoke"
                                         BorderStyle="Inset" MaxLength="12" ToolTip="     Назва клієнта-платника" TabIndex="4"></asp:TextBox>
-                   </td>
-                  </tr>
-                  <tr>
-                   <td class="style2" dir="rtl">
-                    <asp:Label ID="lbIntRcpOKPO" meta:resourcekey="lbIntRcpOKPO" runat="server" 
-                           CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Код ЄДРПОУ платника</asp:Label>
-                   </td>
-                   <td class="style3">
-                   <asp:TextBox ID="textIntRcpOKPO" meta:resourcekey="textIntRcpOKPO" runat="server" readonly="true" enable="false" BackColor="WhiteSmoke"
-                                            CssClass="InfoText" BorderStyle="Inset" MaxLength="10" ToolTip="     Код ОКПО" TabIndex="3"></asp:TextBox>
-                   </td>
-                  </tr>
-                    <tr>
-                       <td class="style2" dir="rtl"> 
-                         <asp:Label ID="lbAccountDPTNLS" meta:resourcekey="lbAccountDPTNLS" runat="server" 
-                               CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Рахунок договора (Рахунок отримувача)</asp:Label>
-                       </td>
-                       <td class="style3">
-                         <asp:TextBox ID="textDPTAccount" runat="server" BorderStyle="Inset" readonly = "true" CssClass="InfoText" MaxLength="14" meta:resourcekey="textNLS" BackColor="WhiteSmoke" ToolTip="Номер счета"></asp:TextBox>
-                       </td>
-                     </tr>  
-                   </tr>
-                   <tr>
-                       <td class="style2"> 
-                         <asp:Label ID="lbSumRegular" meta:resourcekey="lbSumRegular" runat="server" CssClass="InfoText">Сума регулярного платежу</asp:Label>
-                       </td>
-                       <td class="style3">
-                        <Bars:BarsNumericTextBox ID="textSumRegular" Style="text-align: right" runat="server" DbValue='<%# Bind("S") %>'>
-                                        <NumberFormat AllowRounding="false" DecimalDigits="2" GroupSeparator="" />
-                        </Bars:BarsNumericTextBox>                        
-                       </td>
-                  </tr>
-                    <tr>
-                       <td class="style2" dir="rtl"> 
-                         <asp:Label ID="lbNazn" meta:resourcekey="lbNazn" runat="server" 
-                               CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Призначення платежу</asp:Label>
-                       </td>
-                       <td class="style3">
-                         <asp:TextBox ID="textNazn" runat="server" BorderStyle="Inset" readonly = "true" 
-                               CssClass="InfoText" MaxLength="14" meta:resourcekey="textNAZN" 
-                               ToolTip="Призначення платежу" Width="610px" BackColor="WhiteSmoke"></asp:TextBox>
-                       </td>
-                     </tr>  
-                   </tr>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2" dir="rtl">
+                                    <asp:Label ID="lbIntRcpOKPO" meta:resourcekey="lbIntRcpOKPO" runat="server"
+                                        CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Код ЄДРПОУ платника</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textIntRcpOKPO" meta:resourcekey="textIntRcpOKPO" runat="server" ReadOnly="true" enable="false" BackColor="WhiteSmoke"
+                                        CssClass="InfoText" BorderStyle="Inset" MaxLength="10" ToolTip="     Код ОКПО" TabIndex="3"></asp:TextBox>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="style2" dir="rtl">
+                                    <asp:Label ID="lbAccountDPTNLS" meta:resourcekey="lbAccountDPTNLS" runat="server"
+                                        CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Рахунок договора (Рахунок отримувача)</asp:Label>
+                                </td>
+                                <td class="style3">
+                                    <asp:TextBox ID="textDPTAccount" runat="server" BorderStyle="Inset" ReadOnly="true" CssClass="InfoText" MaxLength="14" meta:resourcekey="textNLS" BackColor="WhiteSmoke" ToolTip="Номер счета"></asp:TextBox>
+                                </td>
+                            </tr>
+                </tr>
+                <tr>
+                    <td class="style2">
+                        <asp:Label ID="lbSumRegular" meta:resourcekey="lbSumRegular" runat="server" CssClass="InfoText">Сума регулярного платежу</asp:Label>
+                    </td>
+                    <td class="style3">
+                        <bars:BarsNumericTextBox ID="textSumRegular" Style="text-align: right" runat="server" DbValue='<%# Bind("S") %>'>
+                            <numberformat allowrounding="false" decimaldigits="2" groupseparator="" />
+                        </bars:BarsNumericTextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="style2" dir="rtl">
+                        <asp:Label ID="lbNazn" meta:resourcekey="lbNazn" runat="server"
+                            CssClass="InfoText" ForeColor="#999999" Font-Size="X-Small">Призначення платежу</asp:Label>
+                    </td>
+                    <td class="style3">
+                        <asp:TextBox ID="textNazn" runat="server" BorderStyle="Inset" ReadOnly="true"
+                            CssClass="InfoText" MaxLength="14" meta:resourcekey="textNAZN"
+                            ToolTip="Призначення платежу" Width="610px" BackColor="WhiteSmoke"></asp:TextBox>
+                    </td>
+                </tr>
+            </tr>
             <tr>
                 <td class="style2">
                     <input id="NMK" type="hidden" runat="server" />
@@ -357,90 +356,90 @@
                     <input id="MFO" type="hidden" runat="server" /><input id="err_n" type="hidden" runat="server"
                         value="0" />
                 </td>
-                       
+
             </tr>
-                    <tr>
-                        <td>
-                            <asp:Label ID="lbStartDate" meta:resourcekey="lbStartDate" runat="server" CssClass="InfoText" >Дата початку дії договору</asp:Label>
-                        </td>
-                        <td>
-                            <input type="hidden" runat="server" id="nextBankDate" />
-                            <asp:TextBox ID="StartDate" runat="server" ToolTip="Дата початку"
-                                EditModeFormat="dd/MM/yyyy" DisplayModeFormat="dd/MM/yyyy" HorizontalAlign="Center"
-                                 tabIndex="25" CssClass="InfoDateSum"  BorderWidth="1"> 
-                            </asp:TextBox>
-                            <span runat="server" id="StartDateValidate" style="color: red"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <asp:Label ID="lbEndDate" meta:resourcekey="lbEndDate" runat="server" CssClass="InfoText">Дата завершення договора</asp:Label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="EndDate" runat="server" ToolTip="Дата закінчення"
-                                DisplayModeFormat="dd/MM/yyyy" EditModeFormat="dd/MM/yyyy"  HorizontalAlign="Center"
-                                tabIndex="26" CssClass="InfoDateSum" BorderWidth="1">                               
-                            </asp:TextBox>      
-                            <span runat="server" id="EndDateValidate" style="color: red"></span>                        
-                        </td>
-                    </tr>
-                      <tr>
-                        <td class="style2">
-                            <asp:Label ID="lbFreq" meta:resourcekey="lbFreq" runat="server" CssClass="InfoText">Періодичність</asp:Label>
-                        </td>                        
-                        <td class="style3">
-                            <asp:dropdownlist ID="Freq" runat="server" CssClass="InfoText" ReadOnly="False">                                                                           
-                            </asp:dropdownlist>
-                        </td>
-                    </tr>                      
-                      <tr>
-                        <td class="style2">
-                            <asp:Label ID="lbWeek" meta:resourcekey="lbWeek" runat="server" CssClass="InfoText">Врахування вихідних днів</asp:Label>
-                        </td>                        
-                        <td class="style3">
-                            <asp:RadioButton ID="Weekends" Text="-1" runat="server" GroupName="RequestType" PostBack="true" />
-                            <asp:RadioButton ID="Weekends_1" Text="+1" runat="server" GroupName="RequestType" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="style2">
-                        <asp:Label ID="lbPrior" meta:resourcekey="lbPrior" runat="server" CssClass="InfoText">Прiоритет виконання</asp:Label>
-                        </td>
-                        <td class="style3">
-                            <asp:dropdownlist ID="Proir" runat="server" CssClass="InfoText" ReadOnly="False">                                                                       
-                            </asp:dropdownlist>
-                        </td>
-                        </tr>
-                    </table>
+            <tr>
+                <td>
+                    <asp:Label ID="lbStartDate" meta:resourcekey="lbStartDate" runat="server" CssClass="InfoText">Дата початку дії договору</asp:Label>
                 </td>
+                <td>
+                    <input type="hidden" runat="server" id="nextBankDate" />
+                    <asp:TextBox ID="StartDate" runat="server" ToolTip="Дата початку"
+                        EditModeFormat="dd/MM/yyyy" DisplayModeFormat="dd/MM/yyyy" HorizontalAlign="Center"
+                        TabIndex="25" CssClass="InfoDateSum" BorderWidth="1"> 
+                    </asp:TextBox>
+                    <span runat="server" id="StartDateValidate" style="color: red"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="lbEndDate" meta:resourcekey="lbEndDate" runat="server" CssClass="InfoText">Дата завершення договора</asp:Label>
+                </td>
+                <td>
+                    <asp:TextBox ID="EndDate" runat="server" ToolTip="Дата закінчення"
+                        DisplayModeFormat="dd/MM/yyyy" EditModeFormat="dd/MM/yyyy" HorizontalAlign="Center"
+                        TabIndex="26" CssClass="InfoDateSum" BorderWidth="1">                               
+                    </asp:TextBox>
+                    <span runat="server" id="EndDateValidate" style="color: red"></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="style2">
+                    <asp:Label ID="lbFreq" meta:resourcekey="lbFreq" runat="server" CssClass="InfoText">Періодичність</asp:Label>
+                </td>
+                <td class="style3">
+                    <asp:DropDownList ID="Freq" runat="server" CssClass="InfoText" ReadOnly="False">
+                    </asp:DropDownList>
+                </td>
+            </tr>
+            <tr>
+                <td class="style2">
+                    <asp:Label ID="lbWeek" meta:resourcekey="lbWeek" runat="server" CssClass="InfoText">Врахування вихідних днів</asp:Label>
+                </td>
+                <td class="style3">
+                    <asp:RadioButton ID="Weekends" Text="-1" runat="server" GroupName="RequestType" PostBack="true" />
+                    <asp:RadioButton ID="Weekends_1" Text="+1" runat="server" GroupName="RequestType" />
+                </td>
+            </tr>
+            <tr>
+                <td class="style2">
+                    <asp:Label ID="lbPrior" meta:resourcekey="lbPrior" runat="server" CssClass="InfoText">Прiоритет виконання</asp:Label>
+                </td>
+                <td class="style3">
+                    <asp:DropDownList ID="Proir" runat="server" CssClass="InfoText" ReadOnly="False">
+                    </asp:DropDownList>
+                </td>
+            </tr>
+        </table>
+        </td>
                </tr>
    </tr>
                     <tr>
                         <td class="style4">
                             <table class="InnerTable">
                                 <tr>
-                                    <td align="left" style="width:5%">
-                                        <asp:Button ID="btnBack" Text="Назад" runat="server" CausesValidation="false" 
-                                            tabindex="2" CssClass="AcceptButton" onclick="btnBack_Click" />
+                                    <td align="left" style="width: 5%">
+                                        <asp:Button ID="btnBack" Text="Назад" runat="server" CausesValidation="false"
+                                            TabIndex="2" CssClass="AcceptButton" OnClick="btnBack_Click" />
                                     </td>
-                                    <td align="left" style="width:15%" height="13">
-                                        <asp:Button id="btReg" meta:resourcekey="btReg" type="button" 
-                                            Text="Створити регулярне поповнення депозитного договору" runat="server" 
-                                            tabindex="0" class="AcceptButton" onclick = "btnReg_ServerClick" OnClientClick="return validateForm();" 
-                                            Width="559px"/>
-                                        <asp:Button ID="btPrint" runat="server" Text="Друк" onclick="btPrint_Click" />
-                                    </td>                                    
+                                    <td align="left" style="width: 15%" height="13">
+                                        <asp:Button ID="btReg" meta:resourcekey="btReg" type="button"
+                                            Text="Створити регулярне поповнення депозитного договору" runat="server"
+                                            TabIndex="0" class="AcceptButton" OnClick="btnReg_ServerClick" OnClientClick="return validateForm();"
+                                            Width="559px" />
+                                        <asp:Button ID="btPrint" runat="server" Text="Друк" OnClick="btPrint_Click" />
+                                    </td>
                                 </tr>
                             </table>
-                        </td>                        
-                    </tr>               
-                </table>
+                        </td>
+                    </tr>
+        </table>
             </td>
         </tr>
     </table>
     <!-- #include virtual="/barsroot/deposit/Inc/DepositAccCk.inc"-->
-    <!-- #include virtual="/barsroot/deposit/Inc/DepositCk.inc"-->
-    <!-- #include virtual="/barsroot/deposit/Inc/DepositJs.inc"-->
+        <!-- #include virtual="/barsroot/deposit/Inc/DepositCk.inc"-->
+        <!-- #include virtual="/barsroot/deposit/Inc/DepositJs.inc"-->
     </form>
 </body>
 </html>
