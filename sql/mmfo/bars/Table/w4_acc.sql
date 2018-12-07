@@ -99,7 +99,19 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
+PROMPT *** Add  columns for Instolment ***
+begin 
+execute immediate'
+alter table w4_acc add (
+  ACC_9129I      NUMBER(22))';
+exception
+ when others 
+ then 
+ if sqlcode = -1430 then null; 
+ else raise;
+ end if;
+end;
+/
 
 
 
@@ -139,7 +151,7 @@ COMMENT ON COLUMN BARS.W4_ACC.KOL_SP IS 'К-во дней просрочки по договору';
 COMMENT ON COLUMN BARS.W4_ACC.S250 IS 'Портфельный метод (8)';
 COMMENT ON COLUMN BARS.W4_ACC.GRP IS 'група активу портфельного методу';
 COMMENT ON COLUMN BARS.W4_ACC.NOT_USE_REZ23 IS 'Карточка не используется в расчете резерва по 23 постанове';
-
+COMMENT ON COLUMN BARS.W4_ACC.ACC_9129I IS 'Невикористаний ліміт, що надано клієнтам(Інстолмент)';
 
 
 

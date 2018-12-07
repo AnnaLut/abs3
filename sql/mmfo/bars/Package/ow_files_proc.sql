@@ -66,6 +66,9 @@ CREATE OR REPLACE PACKAGE OW_FILES_PROC is
    function check_w4_form_oper return T_ow_iicfiles_oper_lst;
    function w4_form_sto return T_ow_iicfiles_form_lst;
    function w4_form return T_ow_iicfiles_form_lst;
+   
+   procedure int_plan_add_eff_r(p_chain_idt in ow_inst_totals.chain_idt%type,
+                               p_eff_rate  in ow_inst_totals.eff_rate%type);
 end;
 
 /
@@ -80,6 +83,7 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
   g_filetype_riic constant varchar2(30) := 'R_IIC_DOCUMENTS';
   g_filetype_cng  constant varchar2(30) := 'CNGEXPORT';
   g_filetype_roic constant varchar2(30) := 'R_DOCUMENTS_REV';
+  g_filetype_inst constant varchar2(30) := 'INSTPLAN';
   g_keytype       constant varchar2(30) := 'WAY_DOC';
 
   --types
@@ -225,6 +229,8 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
       l_filetype := g_filetype_rxa;
     elsif instr(l_filename, 'R_IIC_DOCUMENTS') > 0 then
       l_filetype := g_filetype_riic;
+	elsif instr(l_filename, 'OIC_INSTPLAN') > 0 then
+     l_filetype := g_filetype_inst;
     else
       l_filetype := null;
     end if;
@@ -489,6 +495,12 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 
         dbms_xslprocessor.valueof(l_analytic, 'DocInfo/AmountData/Extra/AddData/Parm[ParmCode="TRANS_INFO"]/Value/text()', l_str);
         l_rec(l_rec.last).trans_info := trim(convert(dbms_xmlgen.convert(l_str,1), 'CL8MSWIN1251', 'UTF8'));
+        
+        dbms_xslprocessor.valueof(l_analytic, 'DocInfo/AmountData/Extra/AddData/Parm[ParmCode="INST_PLAN_ID"]/Value/text()', l_str);
+        l_rec(l_rec.last).inst_plan_id := convert_to_number(l_str);
+        
+        dbms_xslprocessor.valueof(l_analytic, 'DocInfo/AmountData/Extra/AddData/Parm[ParmCode="INST_CHAIN_IDT"]/Value/text()', l_str);
+        l_rec(l_rec.last).inst_chain_idt := convert_to_number(l_str);
 
       else
 
@@ -2296,6 +2308,545 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
 
     bars_audit.info(h || 'Finish.');
   end iparse_roic_doc_rev;
+  
+  --Процедура вставки ефективної ставки Instolment
+
+  procedure int_plan_add_eff_r(p_chain_idt in ow_inst_totals.chain_idt%type,
+                               p_eff_rate  in ow_inst_totals.eff_rate%type) is
+ l_plans_in_history number:=1;
+ l_total ow_inst_totals_hist%rowtype;
+ type t_ow_inst_sub_p is table of ow_inst_sub_p%rowtype;
+ type t_ow_inst_portions is table of ow_inst_portions%rowtype;
+ type t_ow_inst_sub_t is table of ow_inst_sub_t%rowtype;
+ l_ow_inst_sub_p t_ow_inst_sub_p:=t_ow_inst_sub_p();
+ l_ow_inst_portions t_ow_inst_portions:=t_ow_inst_portions();
+ l_ow_inst_sub_t t_ow_inst_sub_t:=t_ow_inst_sub_t();
+ begin
+      update ow_inst_totals t 
+         set t.eff_rate = p_eff_rate,
+             t.plans_in_history = t.plans_in_history+1
+       where t.chain_idt = p_chain_idt;
+ 
+        select w.id,
+               w.idn,
+               w.nd,
+               w.contract,
+               w.contract_idt,
+               w.scheme,
+               w.plan_id,
+               w.chain_idt,
+               w.document_id,
+               w.status,
+               w.total_amount,
+               w.amount_to_pay,
+               w.written_off_amount,
+               w.overdue_amount,
+               w.sub_int_rate,
+               w.sub_fee_rate,
+               w.eff_rate,
+               w.tenor,
+               w.posting_date,
+               w.pay_b_date,
+               w.end_date_p,
+               w.end_date_f,
+               w.ovd_90_days,
+               w.plans_in_history,
+               gl.bd,
+               w.kf
+               into l_total
+              from ow_inst_totals w
+             where w.chain_idt = p_chain_idt; 
+        
+        insert into ow_inst_totals_hist values l_total;            
+        l_plans_in_history:=l_total.plan_num; 
+      
+    select * bulk collect into l_ow_inst_sub_p from ow_inst_sub_p a where a.chain_idt = p_chain_idt;
+      
+    select * bulk collect into l_ow_inst_portions from ow_inst_portions a where a.chain_idt = p_chain_idt;
+      
+    select * bulk collect into l_ow_inst_sub_t from ow_inst_sub_t a where a.chain_idt = p_chain_idt;
+    
+    forall j in l_ow_inst_sub_t.first .. l_ow_inst_sub_t.last
+      insert into ow_inst_sub_t_hist a values
+      (l_ow_inst_sub_t(j).chain_idt, l_plans_in_history, l_ow_inst_sub_t(j).type, l_ow_inst_sub_t(j).code, l_ow_inst_sub_t(j).status, l_ow_inst_sub_t(j).total_amount,
+      l_ow_inst_sub_t(j).amount_to_pay, l_ow_inst_sub_t(j).written_off_amount, l_ow_inst_sub_t(j).overdue_amount, l_ow_inst_sub_t(j).kf);
+      
+    forall j in l_ow_inst_portions.first .. l_ow_inst_portions.last
+      insert into ow_inst_portions_hist values 
+      (l_ow_inst_portions(j).chain_idt, l_plans_in_history, l_ow_inst_portions(j).status, l_ow_inst_portions(j).eff_date, 
+       l_ow_inst_portions(j).due_date, l_ow_inst_portions(j).rep_date, l_ow_inst_portions(j).seq_number, l_ow_inst_portions(j).total_amount, 
+       l_ow_inst_portions(j).amount_to_pay, l_ow_inst_portions(j).written_off_amount, l_ow_inst_portions(j).overdue_amount, l_ow_inst_portions(j).kf);
+      
+    forall j in l_ow_inst_sub_p.first .. l_ow_inst_sub_p.last
+      insert into ow_inst_sub_p_hist values
+      (l_ow_inst_sub_p(j).chain_idt, l_plans_in_history, l_ow_inst_sub_p(j).idp, l_ow_inst_sub_p(j).type, l_ow_inst_sub_p(j).code, l_ow_inst_sub_p(j).status,
+      l_ow_inst_sub_p(j).total_amount, l_ow_inst_sub_p(j).amount_to_pay, l_ow_inst_sub_p(j).written_off_amount, l_ow_inst_sub_p(j).overdue_amount, l_ow_inst_sub_p(j).kf);  
+  end;
+  -------------------------------------------------------------------------------
+  -- iparse_oic_instplan
+  -- процедура разбора файла OIC_InstPlan*LOCPAYREV*.xml
+  --
+
+  procedure iparse_oic_instplan(p_fileid   in number,
+                                p_filename in varchar2,
+                                p_filebody in clob) is
+
+  l_parser         dbms_xmlparser.parser;
+  l_doc            dbms_xmldom.domdocument;
+  l_fileheader     dbms_xmldom.DOMNodeList;
+  l_header         dbms_xmldom.DOMNode;
+  l_instplans      dbms_xmldom.DOMNodeList;
+  l_instplan       dbms_xmldom.DOMNode;
+---InstalmentPlan----elems--
+  l_inst_elem      dbms_xmldom.DOMElement;
+  l_sub_insts      dbms_xmldom.DOMNodeList;
+  l_sub_inst       dbms_xmldom.DOMNode;
+---sub_InstalmentPlan----elems--
+  l_2inst_sub      dbms_xmldom.DOMElement;
+  l_2sub_insts     dbms_xmldom.DOMNodeList;
+  l_2sub_inst      dbms_xmldom.DOMNode;
+---sub_sub_InstalmentPlan----elems--
+  l_3inst_sub      dbms_xmldom.DOMElement;
+  l_3sub_insts     dbms_xmldom.DOMNodeList;
+  l_3sub_inst      dbms_xmldom.DOMNode;
+
+
+  l_str varchar2(2000);
+  l_idn pls_integer;
+  --l_f_seq number;
+  l_errors number;
+  l_dat_crt varchar2(20);
+  l_chk_sm_count number:=0;
+  l_chk_sum number;
+  l_chk_cou number;
+
+  l_status     number;
+  l_err        varchar2(254);
+
+  h varchar2(100) := 'ow_files_proc_inst.iparse_oic_instplan. ';
+--------------------------------------------------------------------------------
+  --type t_total is table of ow_inst_totals%rowtype;
+  type t_portion is table of  ow_inst_portions%rowtype;
+  type t_subtotal_t is table of  ow_inst_sub_t%rowtype;
+  type t_subtotal_p is table of  ow_inst_sub_p%rowtype;
+  l_total ow_inst_totals%rowtype;
+  --l_totals t_total:= t_total();
+  l_portions t_portion:= t_portion();
+  l_subtotals_t t_subtotal_t:=t_subtotal_t();
+  l_subtotals_p t_subtotal_p:=t_subtotal_p();
+--------------------------------------------------------------------------------
+    function get_nd(p_contract_idt varchar2) return number is
+      l_nls_pk varchar2(20);
+      l_nd     number;
+  begin
+      l_nls_pk := substr(p_contract_idt, instr(p_contract_idt, '-', -1) + 1);
+  
+      select nd
+        into l_nd
+        from w4_acc w
+        join accounts a
+          on a.acc = w.acc_pk
+         and a.kf = w.kf
+       where a.nls = l_nls_pk;
+  
+      return l_nd;
+  exception when no_data_found then
+      raise_application_error(-20000, 'Не знайдено  договір для рахунку - '||l_nls_pk);
+  end;
+    
+  procedure bulk_ins(lp_totals in ow_inst_totals%rowtype,
+                     lp_sub_t in t_subtotal_t,
+                     lp_portions in t_portion,                     
+                     lp_sub_p in t_subtotal_p) is
+ ll_plans_in_history number:=1;
+ ll_total ow_inst_totals_hist%rowtype;
+             
+  begin
+    begin
+        insert into ow_inst_totals values lp_totals;
+    exception when dup_val_on_index then
+      update ow_inst_totals t 
+         set t.id = lp_totals.id,
+             t.idn = lp_totals.idn,
+             t.scheme = lp_totals.scheme,
+             t.plan_id = lp_totals.plan_id,
+             t.status = lp_totals.status,
+             t.total_amount = lp_totals.total_amount,
+             t.amount_to_pay = lp_totals.amount_to_pay,
+             t.written_off_amount = lp_totals.written_off_amount,
+             t.overdue_amount = lp_totals.overdue_amount,
+             t.sub_int_rate = lp_totals.sub_int_rate,
+             t.sub_fee_rate = lp_totals.sub_fee_rate,
+             t.end_date_p = lp_totals.end_date_p,
+             t.tenor = lp_totals.tenor,
+             t.plans_in_history = t.plans_in_history+1
+       where t.chain_idt = lp_totals.chain_idt;
+    end;   
+        select w.id,
+               w.idn,
+               w.nd,
+               w.contract,
+               w.contract_idt,
+               w.scheme,
+               w.plan_id,
+               w.chain_idt,
+               w.document_id,
+               w.status,
+               w.total_amount,
+               w.amount_to_pay,
+               w.written_off_amount,
+               w.overdue_amount,
+               w.sub_int_rate,
+               w.sub_fee_rate,
+               w.eff_rate,
+               w.tenor,
+               w.posting_date,
+               w.pay_b_date,
+               w.end_date_p,
+               w.end_date_f,
+			   w.ovd_90_days,
+               w.plans_in_history,
+               gl.bd,
+               w.kf
+               into ll_total
+              from ow_inst_totals w
+             where w.chain_idt = lp_totals.chain_idt; 
+        
+        insert into ow_inst_totals_hist values ll_total;            
+        ll_plans_in_history:=ll_total.plan_num; 
+        
+    
+    forall j in lp_sub_p.first .. lp_sub_p.last
+      delete from ow_inst_sub_p a where a.chain_idt = lp_sub_p(j).chain_idt and a.idp = lp_sub_p(j).idp and a.code = lp_sub_p(j).code;
+      
+    forall j in lp_portions.first .. lp_portions.last
+      delete from ow_inst_portions a where a.chain_idt = lp_portions(j).chain_idt and a.seq_number = lp_portions(j).seq_number;
+      
+    forall j in lp_sub_t.first .. lp_sub_t.last
+      delete from ow_inst_sub_t a where a.chain_idt = lp_sub_t(j).chain_idt and a.code = lp_sub_t(j).code;
+      
+    forall j in lp_sub_t.first .. lp_sub_t.last
+      insert into ow_inst_sub_t_hist a values
+      (lp_sub_t(j).chain_idt, ll_plans_in_history, lp_sub_t(j).type, lp_sub_t(j).code, lp_sub_t(j).status, lp_sub_t(j).total_amount,
+      lp_sub_t(j).amount_to_pay, lp_sub_t(j).written_off_amount, lp_sub_t(j).overdue_amount, lp_sub_t(j).kf);
+      
+    forall j in lp_portions.first .. lp_portions.last
+      insert into ow_inst_portions_hist values 
+      (lp_portions(j).chain_idt, ll_plans_in_history, lp_portions(j).status, lp_portions(j).eff_date, lp_portions(j).due_date, lp_portions(j).rep_date, 
+      lp_portions(j).seq_number, lp_portions(j).total_amount, lp_portions(j).amount_to_pay, lp_portions(j).written_off_amount, lp_portions(j).overdue_amount, lp_portions(j).kf);
+      
+    forall j in lp_sub_p.first .. lp_sub_p.last
+      insert into ow_inst_sub_p_hist values
+      (lp_sub_p(j).chain_idt, ll_plans_in_history, lp_sub_p(j).idp, lp_sub_p(j).type, lp_sub_p(j).code, lp_sub_p(j).status,
+      lp_sub_p(j).total_amount, lp_sub_p(j).amount_to_pay, lp_sub_p(j).written_off_amount, lp_sub_p(j).overdue_amount, lp_sub_p(j).kf);
+        
+    
+    forall j in lp_sub_t.first .. lp_sub_t.last
+      insert into ow_inst_sub_t a values lp_sub_t(j);
+      
+    forall j in lp_portions.first .. lp_portions.last
+      insert into ow_inst_portions values lp_portions(j);
+      
+    forall j in lp_sub_p.first .. lp_sub_p.last
+      insert into ow_inst_sub_p values lp_sub_p(j);
+  
+  end;
+
+--------------------------------------------------------------------------------
+begin
+  bars_audit.info(h || 'Start. p_fileid=' || p_fileid || '(' || p_filename || ')');
+
+
+  l_parser := dbms_xmlparser.newparser;
+  dbms_xmlparser.parseclob(l_parser, p_filebody);
+  bars_audit.info(h || 'clob loaded p_fileid=' || p_fileid || '(' || p_filename || ')');
+
+  l_doc := dbms_xmlparser.getdocument(l_parser);
+  bars_audit.info(h || 'getdocument done p_fileid=' || p_fileid || '(' || p_filename || ')');
+
+savepoint bef_pars;
+
+  ----------------------------Doc_header----------------------------------------
+  --l_fileheader := dbms_xmldom.getelementsbytagname(l_doc, 'FileHeader');
+  --l_header := dbms_xmldom.item(l_fileheader, 0);
+
+
+  --dbms_xslprocessor.valueof(l_header, 'CreationDate/text()', l_str);
+  --l_dat_crt:=l_str;
+
+  --dbms_xslprocessor.valueof(l_header, 'CreationTime/text()', l_str);
+  --l_dat_crt:=l_dat_crt||' '||l_str;
+  --dbms_output.put_line(l_dat_crt);
+
+  --dbms_xslprocessor.valueof(l_header, 'FileSeqNumber/text()', l_str);
+  --l_f_seq:= to_number(l_str);
+
+--------------------------------------------------------------------------------
+
+  l_instplans := dbms_xmldom.getelementsbytagname(l_doc, 'InstalmentPlan');
+  for i in 0 .. dbms_xmldom.getlength(l_instplans)-1
+        loop
+
+        l_instplan := dbms_xmldom.item(l_instplans, i);
+        l_inst_elem := dbms_xmldom.makeElement(l_instplan);
+        l_idn:=i+1;
+        l_total.id:= p_fileid;
+        l_total.idn:= l_idn;
+
+-------------Total----------------
+        l_sub_insts:=dbms_xmldom.getelementsbytagname(l_inst_elem,'Total');
+        l_sub_inst := dbms_xmldom.item(l_sub_insts, 0);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'Contract/text()', l_str);
+        l_total.Contract:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'ContractIDT/text()', l_str);
+        l_total.Contract_IDT:= l_str;
+        
+        l_total.nd:= get_nd(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'Scheme/text()', l_str);
+        l_total.Scheme:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'PlanID/text()', l_str);
+        l_total.Plan_ID:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'ChainIDT/text()', l_str);
+        l_total.Chain_IDT:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'Document/text()', l_str);
+        l_total.Document_ID:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'Status/text()', l_str);
+        l_total.Status:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'TotalAmount/text()', l_str);
+        l_total.Total_Amount:= to_number(l_str);
+        l_chk_sm_count:=l_chk_sm_count+to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'AmountToPay/text()', l_str);
+        l_total.Amount_To_Pay:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'WrittenOffAmount/text()', l_str);
+        l_total.Written_Off_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'OverdueAmount/text()', l_str);
+        l_total.Overdue_Amount:= to_number(l_str);
+                
+        dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "TENOR"]/Value/text()', l_str); 
+        l_total.tenor:= to_number(l_str);
+        
+        dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "SUB_INT_RATE"]/Value/text()', l_str);
+        l_total.sub_int_rate := to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "SUB_FEE_RATE"]/Value/text()', l_str);        
+        l_total.sub_fee_rate := to_number(l_str);
+        
+        --dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "ORIG_DATE"]/Value/text()', l_str);            
+        --l_total.orig_date := to_date(l_str, 'yymmdd');
+        
+        --dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "INT_START_DATE"]/Value/text()', l_str);    
+        --l_total.int_start_date := to_date(l_str, 'yymmdd');
+        
+        dbms_xslprocessor.valueof(l_instplan, 'Portions/Portion[SeqNumber = "'||to_char(l_total.tenor, 'FM009')||'"]/DueDate/text()', l_str);
+        l_total.end_date_p := to_date(l_str, 'yyyy-mm-dd');
+       
+        --dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "TARIFF_DATA"]/Value/text()', l_str);    
+        --l_totals(l_totals.last).tariff_data := to_number(l_str);
+        
+        --dbms_xslprocessor.valueof(l_sub_inst, 'Tags/Tag[Code = "EFF_RATE"]/Value/text()', l_str);    
+        --l_totals(l_totals.last).eff_rate := to_number(l_str);
+        
+        l_total.plans_in_history:=1;
+
+        l_total.kf := sys_context('bars_context','user_mfo');
+
+---------Subtotals------------
+
+        l_sub_insts:=dbms_xmldom.getelementsbytagname(l_inst_elem,'Subtotals');
+        l_sub_inst := dbms_xmldom.item(l_sub_insts, 0);
+
+        l_2inst_sub := dbms_xmldom.makeElement(l_sub_inst);
+        l_2sub_insts:=dbms_xmldom.getelementsbytagname(l_2inst_sub,'Subtotal');
+
+        for j in 0 .. dbms_xmldom.getlength(l_2sub_insts)-1
+        loop
+
+
+        l_2sub_inst := dbms_xmldom.item(l_2sub_insts, j);
+
+
+        l_subtotals_t.extend;
+        l_subtotals_t(l_subtotals_t.last).Chain_IDT:= l_total.Chain_IDT;
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'Type/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Type:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'Code/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Code:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'Status/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Status:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'TotalAmount/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Total_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'AmountToPay/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Amount_To_Pay:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'WrittenOffAmount/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Written_Off_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'OverdueAmount/text()', l_str);
+        l_subtotals_t(l_subtotals_t.last).Overdue_Amount:= to_number(l_str);
+
+        l_subtotals_t(l_subtotals_t.last).kf := sys_context('bars_context','user_mfo');
+
+
+        end loop;
+
+
+---------------------Portions----------------
+
+        l_sub_insts:=dbms_xmldom.getelementsbytagname(l_inst_elem,'Portions');
+        l_sub_inst := dbms_xmldom.item(l_sub_insts, 0);
+
+        l_2inst_sub := dbms_xmldom.makeElement(l_sub_inst);
+        l_2sub_insts:=dbms_xmldom.getelementsbytagname(l_2inst_sub,'Portion');
+
+        for j in 0 .. dbms_xmldom.getlength(l_2sub_insts)-1
+        loop
+
+        l_2sub_inst := dbms_xmldom.item(l_2sub_insts, j);
+
+        l_portions.extend;
+        l_portions(l_portions.last).Chain_IDT:= l_total.Chain_IDT;
+
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'Status/text()', l_str);
+        l_portions(l_portions.last).Status:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'EffDate/text()', l_str);
+        l_portions(l_portions.last).Eff_Date:= to_date(l_str,'yyyy-mm-dd');
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'DueDate/text()', l_str);
+        l_portions(l_portions.last).Due_Date:= to_date(l_str,'yyyy-mm-dd');
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'RepDate/text()', l_str);
+        l_portions(l_portions.last).Rep_Date:= to_date(l_str,'yyyy-mm-dd');
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'SeqNumber/text()', l_str);
+        l_portions(l_portions.last).Seq_Number:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'TotalAmount/text()', l_str);
+        l_portions(l_portions.last).Total_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'AmountToPay/text()', l_str);
+        l_portions(l_portions.last).Amount_To_Pay:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'WrittenOffAmount/text()', l_str);
+        l_portions(l_portions.last).Written_Off_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_2sub_inst, 'OverdueAmount/text()', l_str);
+        l_portions(l_portions.last).Overdue_Amount:= to_number(l_str);
+
+        l_portions(l_portions.last).kf := sys_context('bars_context','user_mfo');
+
+-----------------------Subtotal-----------
+
+        l_3inst_sub := dbms_xmldom.makeElement(l_2sub_inst);
+        l_3sub_insts:=dbms_xmldom.getelementsbytagname(l_3inst_sub,'Subtotal');
+
+        for k in 0 .. dbms_xmldom.getlength(l_3sub_insts)-1
+        loop
+
+
+        l_3sub_inst := dbms_xmldom.item(l_3sub_insts, k);
+
+        l_subtotals_p.extend;
+        l_subtotals_p(l_subtotals_p.last).Chain_IDT:= l_portions(l_portions.last).Chain_IDT;
+        l_subtotals_p(l_subtotals_p.last).idp:= l_portions(l_portions.last).Seq_Number;
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'Type/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Type:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'Code/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Code:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'Status/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Status:= trim(l_str);
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'TotalAmount/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Total_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'AmountToPay/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Amount_To_Pay:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'WrittenOffAmount/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Written_Off_Amount:= to_number(l_str);
+
+        dbms_xslprocessor.valueof(l_3sub_inst, 'OverdueAmount/text()', l_str);
+        l_subtotals_p(l_subtotals_p.last).Overdue_Amount:= to_number(l_str);
+
+
+        l_subtotals_p(l_subtotals_p.last).kf := sys_context('bars_context','user_mfo');
+        end loop;
+
+        end loop;
+        
+        bulk_ins(l_total,
+                 l_subtotals_t,
+                 l_portions,                     
+                 l_subtotals_p);
+        l_total:=null;         
+        l_subtotals_t.delete;
+        l_portions.delete;
+        l_subtotals_p.delete;
+
+        end loop;
+
+----------------FileTrailer--------------
+ l_fileheader := dbms_xmldom.getelementsbytagname(l_doc, 'FileTrailer');
+  l_header := dbms_xmldom.item(l_fileheader, 0);
+
+
+  dbms_xslprocessor.valueof(l_header, 'CheckSum/text()', l_str);
+  l_chk_sum:= to_number(l_str);
+
+  dbms_xslprocessor.valueof(l_header, 'RecCount/text()', l_str);
+  l_chk_cou:= to_number(l_str);
+
+  bars_audit.info(h || 'load done p_fileid=' || p_fileid || '(' ||
+                    p_filename || ')');
+
+
+  dbms_xmlparser.freeparser(l_parser);
+  DBMS_XMLDOM.freeDocument(l_doc);
+
+    bars_audit.info(h || 'p_fileid=' || p_fileid || '(' || p_filename || ')' || ' ' ||
+                    to_char(l_idn) || ' rows parsed:' || ' l_check_n=>' ||
+                    to_char(l_idn) || ' l_file_n=>' ||
+                    to_char(l_chk_cou) || ' l_check_summ=>' ||
+                    to_char(l_chk_sum) || ' l_file_summ=>' ||
+                    to_char(l_chk_sm_count));
+
+   if l_idn <> l_chk_cou or l_chk_sum<>l_chk_sm_count then
+      rollback to bef_pars;
+      l_chk_cou := 0;
+      l_status := 3;
+      l_err    := 'Не співпадають контрольні суми';
+    else
+      l_status := 1;
+      l_err    := null;
+    end if;
+    set_file_status(p_fileid, l_chk_cou, l_status, l_err);
+
+ bars_audit.info(h || 'Finish.p_fileid=' || p_fileid || '(' ||
+                    p_filename || ')');
+
+ end iparse_oic_instplan;
+
+-------------------------------------------------------------------------------
 
   procedure parse_file(p_fileid in number) is
     l_filetype ow_files.file_type%type;
@@ -2356,6 +2907,8 @@ CREATE OR REPLACE PACKAGE BODY OW_FILES_PROC is
       iparse_riic_file(p_fileid, l_filename, l_fileclob);
     elsif l_filetype = g_filetype_roic then
       iparse_roic_doc_rev(p_fileid, l_filename, l_fileclob);
+	elsif l_filetype = g_filetype_inst then
+      iparse_oic_instplan(p_fileid, l_filename, l_fileclob);
     end if;
 
     begin

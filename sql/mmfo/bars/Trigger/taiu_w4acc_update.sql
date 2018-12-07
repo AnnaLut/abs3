@@ -10,6 +10,7 @@ PROMPT *** Create  trigger TAIU_W4ACC_UPDATE ***
   CREATE OR REPLACE TRIGGER BARS.TAIU_W4ACC_UPDATE AFTER UPDATE OR INSERT OR DELETE ON "BARS"."W4_ACC" FOR EACH ROW 
 declare
   -- ver. 07.12.2016
+  -- ver. 11.09.2018  Add columns (ACC_9129I) for Instolment
   l_rec    W4_ACC_UPDATE%rowtype;
 begin
 
@@ -48,6 +49,8 @@ begin
     l_rec.S250         := :old.S250;
     l_rec.GRP          := :old.GRP;
     l_rec.KF           := :old.KF;
+    l_rec.ACC_9129I    := :old.ACC_9129I;
+    
 
   else
 
@@ -162,6 +165,10 @@ begin
            (:old.GRP          != :new.GRP) or
            (:old.GRP is Null AND :new.GRP is Not Null) or
            (:new.GRP is Null AND :old.GRP is Not Null)
+           OR
+           (:old.ACC_9129I    != :new.ACC_9129I) or
+           (:old.ACC_9129I is Null AND :new.ACC_9129I is Not Null) or
+           (:new.ACC_9129I is Null AND :old.ACC_9129I is Not Null)
          )
       then
         l_rec.CHGACTION := 'U';
@@ -201,6 +208,7 @@ begin
     l_rec.S250       := :new.S250;
     l_rec.GRP        := :new.GRP;
     l_rec.KF         := :new.KF;
+    l_rec.ACC_9129I  := :new.ACC_9129I;
 
   end if;
 

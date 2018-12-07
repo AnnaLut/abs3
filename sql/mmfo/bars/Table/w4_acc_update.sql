@@ -59,7 +59,8 @@ begin
 	S250 VARCHAR2(1), 
 	GRP NUMBER(*,0), 
 	GLOBAL_BDATE DATE, 
-	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+	KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+	ACC_9129I NUMBER(22)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -69,7 +70,19 @@ exception when others then
 end; 
 /
 
-
+PROMPT *** Add  columns for Instolment ***
+begin 
+execute immediate'
+alter table BARS.W4_ACC_UPDATE add (
+  ACC_9129I      NUMBER(22))';
+exception
+ when others 
+ then 
+ if sqlcode = -1430 then null; 
+ else raise;
+ end if;
+end;
+/
 
 
 PROMPT *** ALTER_POLICIES to W4_ACC_UPDATE ***
@@ -113,7 +126,7 @@ COMMENT ON COLUMN BARS.W4_ACC_UPDATE.ACC_2625D IS 'Вклад на вимогу Мобільний';
 COMMENT ON COLUMN BARS.W4_ACC_UPDATE.ACC_2628 IS 'Нараховані витрати за коштами на вимогу ';
 COMMENT ON COLUMN BARS.W4_ACC_UPDATE.ACC_2203 IS '';
 COMMENT ON COLUMN BARS.W4_ACC_UPDATE.FIN IS '';
-
+COMMENT ON COLUMN BARS.W4_ACC_UPDATE.ACC_9129I IS 'Невикористаний ліміт, що надано клієнтам(Інстолмент)';
 
 
 

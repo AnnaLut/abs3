@@ -20,6 +20,8 @@ IS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %28/11/2018 - добавлено формирование показател€ 092 при наличии
               показател€ 125 и отсутствии показателей 118,119,121,123 
+%25/10/2018 - доработки дл€ »нстолмента (б/c 2203, 2208, 3570 
+              тип 'ISS','IKN','IK0') 
 %09/11/2018 - изменено формирование показател€ 164
 %10/10/2018 - изменено формирование показател€ 111 дл€ первого транша
 %08/10/2018 - дл€ формировани€ части показател€ "H" дополнительно
@@ -576,6 +578,7 @@ IS
    zamina_a     Varchar2(1);
 
    p111_dop     date;
+   idt_         Number;
 
 --- виды залогов дл€ кредитного счета
    CURSOR kredit
@@ -1258,7 +1261,7 @@ IS
       end if;
 
       if substr(nls_,1,4) in ('2625','2627','2202','2203','2208','9129')
-         and trim(tip_) not in ('SS','SP','SN')
+         and trim(tip_) not in ('SS','SP','SN','ISS','IKN')
       then
          begin
             select dat_end
@@ -1275,6 +1278,23 @@ IS
             exception when no_data_found then
                null;
             end;
+         end;
+
+         p080_ := '33';
+         p081_ := 0;
+      end if;
+
+      if substr(nls_,1,4) in ('2203','2208','3570')
+         and trim(tip_) in ('ISS','IKN','IK0')
+      then
+         begin
+            select w.nd, NVL(w.chain_idt, 'N дог.'), a.daos, a.daos, a.mdate
+               into nd_, p090_, dat_nkd_, p111p_, p112p_
+            from w4_acc_inst w, accounts a
+            where w.acc = acc_
+              and a.acc = w.acc; 
+         exception when no_data_found then
+            null;
          end;
 
          p080_ := '33';
@@ -4405,12 +4425,14 @@ BEGIN
                    END;
                 end if;
 
+                --if fin_ = '0'
+                --then
                 BEGIN
                    select pd_0, NVL(s080_z, s080),
                           --decode(NVL(s250_23,'0'), '8', '0', s080)
-                          s080,  
-                          NVL(s250_23,'0')
-                      into pd_0_, s080_, fin_, s250_23_
+                             s080,
+                             NVL(s250_23,'0')
+                         into pd_0_, s080_, fin_, s250_23_ 
                    from nbu23_rez
                    where fdat = dat23_
                      and acc = acc_
@@ -4418,6 +4440,7 @@ BEGIN
                 EXCEPTION WHEN NO_DATA_FOUND THEN
                    null;
                 END;
+                --end if;
 
                 --if fin_ = '0'
                 --then
@@ -6102,6 +6125,91 @@ for z in ( select r.acc, r.nls, r.kv, r.nd, r.kodp
 
           end if;
   end loop;
+
+-------------------------------------------------------------------------------------------------
+-- блок дл€ »нстолмента
+for z in ( select distinct r.nd nd 
+           from rnbu_trace r
+           where substr(kodp,1,3)  in ('121','123')
+             and substr(kodp, 25, 2) = '00'
+             and (r.nls like '2203%' or r.nls like '2208%' or r.nls like '3570%')
+             and r.acc in (select acc from accounts where tip in ('ISS','ISP','IKN','IKP','IK0','IK9'))
+           order by 1
+         )
+     loop
+
+          idt_ := 0;
+          n_trans := 0;
+
+          for k in ( select r.nd, w.chain_idt idt, r.acc, r.nls, r.kv,  r.kodp 
+                     from rnbu_trace r, w4_acc_inst w
+                     where r.nd = z.nd 
+                       and r.acc = w.acc 
+                       order by 1,2
+                   )
+             loop
+
+               if idt_ <> k.idt
+               then
+                  n_trans := n_trans + 1;
+                  idt_ := k.idt;
+
+                  kod_mm := substr(sep.h2_rrp(trunc(mod(n_trans,36*36)/36)),1,1)
+                         || substr(sep.h2_rrp(mod(n_trans,36)),1,1);
+               end if; 
+
+               -- код класса контрагента/инсайдера
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='085' and acc = k.acc;
+
+               -- дата виникненн€ заборгованост_
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='111' and acc = k.acc;
+
+               -- дата погашенн€ заборгованост_ зг_дно з договором
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='112' and acc = k.acc;
+
+               -- сума траншу
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='121' and acc = k.acc;
+
+               -- нарахован_ доходи код 123
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='123' and acc = k.acc;
+
+               -- сума резерв_в код 125
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='125' and acc = k.acc;
+
+               -- процентна ставка за кредитом код 130
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='130' and acc = k.acc;
+
+               -- стан заборгованост_
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='160' and acc = k.acc;
+
+               -- код активноњ банк_вськоњ операц_њ
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='161' and acc = k.acc;
+
+               -- коеф_ц_Їнт LGD
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='162' and acc = k.acc;
+
+               -- коеф_ц_Їнт PD
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='163' and acc = k.acc;
+
+               -- код скоригованого класу
+               update rnbu_trace set kodp = substr(kodp,1,24)||kod_mm||substr(kodp,27)
+               where substr(kodp,1,3)='164' and acc = k.acc;
+          end loop;
+
+  end loop;
+
+-------------------------------------------------------------------------------------------------
 
    logger.info ('P_FD8_NN: End etap 5 for datf = '||to_char(dat_, 'dd/mm/yyyy'));
 ----------------------------------------------------------------------------

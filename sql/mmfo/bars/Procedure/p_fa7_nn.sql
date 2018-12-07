@@ -33,6 +33,7 @@ IS
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  24.10.2018 розраховуємо суму обтяження для ЦП в еквіваленті 
+ 23.10.2018 доработки для Инстолменту
  09.10.2018 для рахунку резерву 3599 будемо формувати R011='2' якщо рахунок 
             активу 3541
  20.09.2018 для счетов резерва параметр S181 изменяем на "1" если значение 
@@ -4445,7 +4446,63 @@ BEGIN
             end loop;
         end;
     end if;
+   --------------------------------------------------
 
+   -- блок для Инстолмента
+   for k in ( select r.* 
+              from rnbu_trace r, accounts a
+              where r.acc = a.acc 
+                and a.tip in ('ISS','IKN','IK0')
+                and a.nbs in ('2203','2208','3570') 
+            )
+     loop
+
+         znap_ := k.znap;
+         nbs_ := substr(k.nls, 1, 4);
+
+         for z in ( select w2.total_amount*100 total_amount, w1.rep_date, w1.seq_number 
+                    from W4_ACC_INST w4, OW_INST_PORTIONS w1, OW_INST_SUB_P w2  
+                    where w4.acc = k.acc 
+                      and w4.chain_idt = w1.chain_idt 
+                      and w2.chain_idt = w1.chain_idt
+                      and w1.rep_date >= dat_
+                      and w2.idp = w1.seq_number 
+                      and w2.code = decode(nbs_, '2203','PRINCIPAL','2208','INT','FEE')
+                    order by w1.chain_idt, w1.seq_number 
+                  )
+            loop
+
+               if znap_ > z.total_amount 
+               then
+                  s240_ := F_SROK(dat_, z.rep_date, 2);
+                  s181_ := substr(k.kodp,8,1);
+
+                  if s240_ > 'B' and s181_ = '1' then
+                     s181_ :='2';
+                  end if;
+                  if s240_ <= 'B' and s181_ = '2' then
+                     s181_ :='1';
+                  end if;
+
+                  kodp_ := substr(k.kodp,1,7)||s181_||s240_||substr(k.kodp,10);
+                             
+                  INSERT INTO RNBU_TRACE(recid, userid, nls, kv, odate, kodp, znap, rnk, acc, comm, nbuc, isp, tobo, nd)
+                  VALUES (s_rnbu_record.nextval, userid_, k.nls, k.kv, k.odate, kodp_, to_char(z.total_amount), k.rnk, k.acc,
+                     'Инстолмент N = '|| to_char(z.seq_number), k.nbuc, k.isp, k.tobo, k.nd);
+ 
+                  znap_ := znap_ - z.total_amount;
+               end if;  
+        
+         end loop;
+
+            if znap_ <> 0 
+            then
+               kodp_ := substr(k.kodp,1,7)||'1'||'1'||substr(k.kodp,10);
+               update rnbu_trace set kodp = kodp_, znap = znap_, comm = substr('Коригування Инстолмент'|| k.comm,1,200) 
+               where recid = k.recid;  
+            end if;
+
+   end loop; 
    --------------------------------------------------
    if dat_ <to_date('20171226','yyyymmdd')  then
        delete from rnbu_trace

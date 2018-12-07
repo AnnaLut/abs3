@@ -585,6 +585,15 @@ begin
 															  p_frontend => l_application_type_id
 															  );
 					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
+				
+      --  Створюємо дочірню функцію Портфель договорів Інстолмент
+                     l_function_deps  :=   abs_utils.add_func(
+															  p_name     => 'Портфель договорів Інстолмент',
+															  p_funcname => '/barsroot/Way/Installment/Index',
+															  p_rolename => '' ,
+															  p_frontend => l_application_type_id
+															  );
+					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_W_W4) - АРМ "БПК – Way4"  ');
     l := l_function_ids.first;

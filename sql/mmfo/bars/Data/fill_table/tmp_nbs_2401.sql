@@ -1,40 +1,4 @@
-delete from BARS.TMP_NBS_2401;
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '09', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '10', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '25', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '26', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '52', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '53', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '54', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2063', '55', 4);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '07', 3);
+delete from TMP_NBS_2401;
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
@@ -43,6 +7,30 @@ Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
    ('2203', '32', 1);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '54', 1);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '67', 1);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '80', 1);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '81', 1);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'A9', 1);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'B1', 1);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
@@ -82,6 +70,42 @@ Insert into BARS.TMP_NBS_2401
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
+   ('2203', '49', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '50', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '70', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '87', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'C6', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'C7', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'D0', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'D1', 2);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '07', 3);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
    ('2203', '46', 3);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
@@ -94,31 +118,7 @@ Insert into BARS.TMP_NBS_2401
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
-   ('2203', '49', 2);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '50', 2);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '53', 5);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '54', 1);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
    ('2203', '58', 3);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '67', 1);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '70', 2);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
@@ -131,22 +131,6 @@ Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
    ('2203', '74', 3);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '77', 5);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '80', 1);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '81', 1);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', '87', 2);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
@@ -174,27 +158,11 @@ Insert into BARS.TMP_NBS_2401
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
-   ('2203', 'A0', 5);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', 'A1', 5);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
    ('2203', 'A4', 3);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
    ('2203', 'A5', 3);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', 'A9', 1);
-Insert into BARS.TMP_NBS_2401
-   (NBS, OB22, GRP)
- Values
-   ('2203', 'B1', 1);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
@@ -206,9 +174,49 @@ Insert into BARS.TMP_NBS_2401
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
-   ('2203', 'D0', 2);
+   ('2063', '09', 4);
 Insert into BARS.TMP_NBS_2401
    (NBS, OB22, GRP)
  Values
-   ('2203', 'D1', 2);
+   ('2063', '10', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2063', '25', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2063', '26', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2063', '52', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2063', '53', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2063', '54', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2063', '55', 4);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '53', 5);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', '77', 5);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'A0', 5);
+Insert into BARS.TMP_NBS_2401
+   (NBS, OB22, GRP)
+ Values
+   ('2203', 'A1', 5);
 COMMIT;

@@ -54,7 +54,11 @@ begin
     BRANCH VARCHAR2(30), 
     DOC_ORN NUMBER(22,0), 
     ACCOUNT_2924_016 VARCHAR2(14), 
-    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo'')
+    KF VARCHAR2(6) DEFAULT sys_context(''bars_context'',''user_mfo''),
+    TRANS_INFO          VARCHAR2(4000 BYTE),
+    STATE               NUMBER(5),
+    INST_CHAIN_IDT      NUMBER,
+    INST_PLAN_ID        NUMBER
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -64,6 +68,19 @@ exception when others then
 end; 
 /
 
+begin
+execute immediate'alter table OW_OIC_ATRANSFERS_DATA add INST_CHAIN_IDT NUMBER';
+exception when others then
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
+
+begin
+execute immediate'alter table OW_OIC_ATRANSFERS_DATA add INST_PLAN_ID NUMBER';
+exception when others then
+if sqlcode = -01430 then null; else raise; end if;
+end;
+/
 
 
 

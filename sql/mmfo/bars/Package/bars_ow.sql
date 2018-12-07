@@ -186,7 +186,7 @@ procedure add_deal_to_cmque (
 procedure set_accounts_rate (p_par number);
 
 -- процедура установки спецпараметров счетов
-procedure set_sparam (p_mode varchar2, p_acc number, p_trmask t_trmask);
+procedure set_sparam (p_mode varchar2, p_acc number, p_trmask t_trmask, p_inst_chain number default null);
 
 -- процедура изменения типа карточки
 procedure cng_card ( p_nd number, p_card varchar2 );
@@ -251,6 +251,12 @@ procedure pk_repay_card (p_pk_nd number);
 -- процедура закрытия счетов PK
 procedure pk_close_card (p_pk_nd number);
 
+--Закриття рахунків Instolment
+procedure close_inst_acc;
+
+--Встановлення дати визнання проблемним Instolment
+procedure set_inst_ovd_90_days;
+
 -- процедура проверки: можно закрыть договор?
 procedure can_close_deal (
   p_nd   in number,
@@ -310,9 +316,9 @@ procedure set_nd_param_innumber (p_nd number, p_tag varchar2, p_value number);
 
 procedure set_msgcode_payaccad (p_ref number, p_flag number);
 
-function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_pk_acc number) return varchar2;
+function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_pk_acc number, p_inst_chain number default null) return varchar2;
 
-function get_nls_on2625_cardpay (p_nls varchar2, p_kv number) return varchar2;
+function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_inst_chain number default null) return varchar2;
 
 procedure set_pass_date (
   p_nd         number,
@@ -432,6 +438,7 @@ procedure set_cck_sob (
   p_transfer_flag number,
   p_sucs_flag     boolean );
 
+  procedure set_account_rate (  p_acc number, p_trmask  t_trmask);
 -------------------------------------------------------------------------------
 -- COBUMMFO-7501
 function get_nls (  
@@ -495,7 +502,7 @@ g_filetype_rxa    constant varchar2(30)  := 'RXADVAPL';
 g_filetype_riic   constant varchar2(30)  := 'R_IIC_DOCUMENTS';
 g_filetype_cng    constant varchar2(30)  := 'CNGEXPORT';
 g_filetype_roic   constant varchar2(30)  := 'R_DOCUMENTS_REV';
-
+g_filetype_inst   constant varchar2(30)  := 'INSTPLAN';
 g_keytype         constant varchar2(30)  := 'WAY_DOC';
 g_check_limit     number;
 -- латиница: A-Z(загловн_ л_тери),
@@ -959,6 +966,8 @@ begin
      l_filetype := g_filetype_rxa;
   elsif instr(l_filename, 'R_IIC_DOCUMENTS') > 0 then
      l_filetype := g_filetype_riic;
+  elsif instr(l_filename, 'OIC_INSTPLAN') > 0 then
+     l_filetype := g_filetype_inst;
   else
      l_filetype := null;
   end if;
@@ -3970,7 +3979,7 @@ end iparse_riic_file;
 -- set_sparam
 -- процедура установки спецпараметров счетов
 --
-procedure set_sparam (p_mode varchar2, p_acc number, p_trmask t_trmask)
+procedure set_sparam (p_mode varchar2, p_acc number, p_trmask t_trmask, p_inst_chain number default null)
 is
   l_nd         number;
   l_pk_tip     accounts.tip%type;
@@ -4016,6 +4025,7 @@ begin
                when '9129'  then 'o.acc_9129'
                else ''''''
             end*/     
+    if p_trmask.tab_name = 'W4_ACC' then
     execute immediate
     'select o.nd, a.tip, nvl(a.nbs, substr(a.nls,1,4)), a.ob22, p.grp_code
        from w4_acc o, accounts a, w4_card c, w4_product p
@@ -4025,6 +4035,18 @@ begin
         and c.product_code = p.code'
        into l_nd, l_pk_tip, l_pk_nbs, l_pk_ob22, l_grpcode
       using p_acc;
+    elsif p_trmask.tab_name = 'W4_ACC_INST' then
+    select o.nd, a.tip, nvl(a.nbs, substr(a.nls,1,4)), a.ob22, p.grp_code
+      into l_nd, l_pk_tip, l_pk_nbs, l_pk_ob22, l_grpcode
+       from w4_acc o, w4_acc_inst i, accounts a, w4_card c, w4_product p
+      where o.acc_pk = i.acc_pk
+        and o.acc_pk = a.acc
+        and i.acc = p_acc
+        and i.chain_idt = p_inst_chain
+        and i.trans_mask = p_trmask.a_w4_acc
+        and o.card_code = c.code
+        and c.product_code = p.code;   
+    end if;
   exception when no_data_found then
      -- Для режима p_mode не найден счет ACC=p_acc
      bars_audit.error(h || 'Для режима ' || p_trmask.nbs || ' не найден счет ACC=' || to_char(p_acc));
@@ -4116,7 +4138,8 @@ end set_sparam;
 procedure open_acc (
   p_pk_acc  number,
   p_trmask  t_trmask,
-  p_acc out number )
+  p_acc out number,
+  p_inst_chain number default null)
 is
   l_cardcode     w4_acc.card_code%type;
   l_edat         date;
@@ -4167,6 +4190,15 @@ begin
      bars_audit.trace(h || 'Счет ACC=' || to_char(p_pk_acc) || ' не найден в портфеле БПК-Way4');
      bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', to_char(p_pk_acc));
   end;
+
+  if p_inst_chain is not null then
+      begin
+      select end_date_p into l_edat from ow_inst_totals t where t.chain_idt = p_inst_chain;
+      exception when no_data_found then
+       bars_audit.trace(h || 'Счет ACC=' || to_char(p_pk_acc) || ' не найден в портфеле БПК-Way4 Instolment');
+      bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', to_char(p_pk_acc));
+      end;
+  end if;
 
   -- определение БС
 
@@ -4261,9 +4293,12 @@ begin
      update w4_acc set acc_3579 = l_acc where acc_pk = p_pk_acc;
   elsif p_mode = '9129' then
      update w4_acc set acc_9129 = l_acc where acc_pk = p_pk_acc;*/
-  if p_trmask.a_w4_acc is not null then
+  if p_trmask.a_w4_acc is not null and p_trmask.tab_name = 'W4_ACC' then
      l_sql := 'update w4_acc set '|| p_trmask.a_w4_acc||' = :acc where acc_pk = :acc_pkk';
      execute immediate l_sql using l_acc, p_pk_acc;
+  elsif p_trmask.a_w4_acc is not null and p_trmask.tab_name = 'W4_ACC_INST' then
+      INSERT INTO W4_ACC_INST(nd, acc_pk, chain_idt, trans_mask, acc, crt_bd) 
+                             VALUES (l_nd, p_pk_acc, p_inst_chain, p_trmask.a_w4_acc, l_acc, gl.bd());
   else
      -- Неизвестный режим счета p_mode
      bars_audit.error(h || 'Неизвестный режим счета ' ||  to_char(p_trmask.nbs)||p_trmask.tip);
@@ -4271,11 +4306,11 @@ begin
   end if;
 
   -- спецпараметры
-  set_sparam(0, l_acc, p_trmask);
+  set_sparam(0, l_acc, p_trmask, p_inst_chain);
   bars_audit.trace(h || 'Specparams for account ' || l_nls || '/' || to_char(l_pk_kv) || ' set.');
-   -- % ставки по счету (COBUMMFO-6290)
-  --set_account_rate(l_acc, p_trmask);
-  set_account_rate(l_acc);
+    -- % ставки по счету (COBUMMFO-6290)
+  set_account_rate(l_acc, p_trmask);   
+  ---- 
   p_acc := l_acc;
 
   bars_audit.trace(h || 'Finish.');
@@ -5434,8 +5469,8 @@ is
         and exists ( select 1 from ow_match_tt where code = a.doc_descr and tt is not null )
          -- только по карточным счетам
          -- исключаем документы погашения задолженности по кредиту
-        and ( (substr(debit_anlaccount,1,4)  in (select unique nbs from w4_nbs_ob22) and not regexp_like (credit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+'))
-           or (substr(credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) and not regexp_like (debit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+')));
+        and ( (substr(debit_anlaccount,1,4)  in (select unique nbs from w4_nbs_ob22) and not regexp_like (credit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900)(|i)))_(2625|2620)+'))
+           or (substr(credit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22) and not regexp_like (debit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900)(|i)))_(2625|2620)+')));
 
      bars_audit.info(l || 'l_atrn.count=>' || l_atrn.count);
 
@@ -5759,7 +5794,7 @@ begin
 end get_nls_on2924_cardpay;
 
 -----------------------
-function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_pk_acc number) return varchar2
+function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_pk_acc number, p_inst_chain number default null) return varchar2
 is
    l_nls     varchar2(100) := null;
    l_acc     number;
@@ -5770,7 +5805,7 @@ begin
 
    if p_nls like 'NLS\_%\_%' escape '\' and p_pk_acc is not null then
       begin 
-        select * into l_trmask from OW_TRANSNLSMASK t where p_nls like mask||'%';
+        select * into l_trmask from OW_TRANSNLSMASK t where substr(p_nls, 1, instr(p_nls,'_', -1)-1) = mask;
 
         --l_nls_tip := substr(replace(p_nls,'NLS_',''),1,instr(replace(p_nls,'NLS_',''),'_')-1);
 
@@ -5807,17 +5842,25 @@ begin
       exception when no_data_found then
          bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', p_pk_acc);
         end;*/
+        
+       
+            if l_trmask.tab_name = 'W4_ACC' then
+               begin     
         l_sql :='select '||l_trmask.a_w4_acc||' from w4_acc w where w.acc_pk = :p_pk_acc';
-        begin
-          execute immediate l_sql
-             into l_acc
-            using p_pk_acc;
+                    execute immediate l_sql into l_acc using p_pk_acc;
         exception when no_data_found then
            bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', p_pk_acc);
       end;
+            elsif l_trmask.tab_name = 'W4_ACC_INST' then
+        begin
+                    select acc  into l_acc from w4_acc_inst w where w.acc_pk = p_pk_acc and w.chain_idt = p_inst_chain and w.trans_mask = l_trmask.a_w4_acc;
+        exception when no_data_found then
+           bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', p_pk_acc);
+      end;
+            end if;
       -- открываем счет
       if l_acc is null then
-           open_acc(p_pk_acc, l_trmask, l_acc);
+           open_acc(p_pk_acc, l_trmask, l_acc, p_inst_chain);
       end if;
 
       begin
@@ -5836,7 +5879,7 @@ begin
 end get_nls_on2625_cardpay;
 
 -----------------------
-function get_nls_on2625_cardpay (p_nls varchar2, p_kv number) return varchar2
+function get_nls_on2625_cardpay (p_nls varchar2, p_kv number, p_inst_chain number default null) return varchar2
 is
    l_nls    varchar2(14) := null;
    l_pk_nls varchar2(30);
@@ -5870,7 +5913,7 @@ begin
 
       -- находим счет
       if l_pk_acc is not null then
-         l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc);
+         l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc, p_inst_chain);
       end if;
 
    end if;
@@ -6049,7 +6092,8 @@ function get_nls_cardpay (
      --  p_synthcode - код синт.проводки для определения бранча, используется только из pay_others
    p_synthcode varchar2 default null,
      -- p_currency - валюта документа для счета 3801/980, используется только из pay_others
-   p_currency  number default null ) return varchar2
+   p_currency  number default null,
+   p_inst_chain number default null) return varchar2
 is
    l_branch  varchar2(30) := null;
    l_nls     varchar2(30) := null;
@@ -6089,7 +6133,7 @@ begin
 		 if l_pk_nls like '2924%' then
             l_nls := get_nls_on2924_cardpay(p_nls, p_kv, l_pk_acc);
 		 else
-         l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc);
+         l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc, p_inst_chain);
       end if;
       end if;
 
@@ -6190,10 +6234,10 @@ begin
 
          -- передаем код синт.проводки для определения бранча
          if p_nlsa is null then
-            p_nlsa := get_nls_cardpay(p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.debit_anlaccount,  p_atrn.debit_currency,  p_atrn.anl_synthcode, p_atrn.doc_currency);
+            p_nlsa := get_nls_cardpay(p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.debit_anlaccount,  p_atrn.debit_currency,  p_atrn.anl_synthcode, p_atrn.doc_currency, p_atrn.inst_chain_idt);
          end if;
          if p_nlsb is null then
-            p_nlsb := get_nls_cardpay(p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.credit_anlaccount, p_atrn.credit_currency, p_atrn.anl_synthcode, p_atrn.doc_currency);
+            p_nlsb := get_nls_cardpay(p_dat, p_atrn.doc_drn, p_atrn.doc_orn, p_atrn.credit_anlaccount, p_atrn.credit_currency, p_atrn.anl_synthcode, p_atrn.doc_currency, p_atrn.inst_chain_idt);
          end if;
 
       -- DRN пусто
@@ -6338,7 +6382,8 @@ procedure get_nls_cardpay (
    p_dat      in     date,
    p_drn      in     number,
    p_orn      in     number,
-   p_currency in     number )
+   p_currency in     number,
+   p_inst_chain number default null )
 is
    l_pk_nls    varchar2(14) := null;
    l_pk_kv     number;
@@ -6363,7 +6408,7 @@ is
       elsif p_nls = 'NLS_LOCPAY' then
          l_nls :=  GetGlobalOption('NLS_292427_LOCPAY');
       -- счет NLS_9900
-      elsif p_nls = 'NLS_9900' then
+      elsif p_nls in ('NLS_9900', 'NLS_9900i') then
 
          if g_nls9900 is not null then
             l_nls := g_nls9900;
@@ -6381,7 +6426,7 @@ is
       -- счет NLS_%_2625%
       elsif p_nls like 'NLS\_%\_%' escape '\' then
 
-         l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc);
+         l_nls := get_nls_on2625_cardpay(p_nls, p_kv, l_pk_acc, p_inst_chain);
 
       -- счет NLS_3801OO
       elsif p_nls like 'NLS_3801%' then
@@ -7172,7 +7217,7 @@ begin
        -- исключаем операции пополнения/списания, инициированные 3-ей системой, кроме гашения задолженности по кредиту
         and (not exists ( select 1 from ow_match_tt where code = a.doc_descr ) or
              (exists ( select 1 from ow_match_tt where code = a.doc_descr ) and
-             (regexp_like(debit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+') or regexp_like(credit_anlaccount,'^NLS_(((220|357)[0-9])|(6[0-9]{3})|9129|9900)_(2625|2620)+'))))
+             (regexp_like(debit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900)(|i)))_(2625|2620)+') or regexp_like(credit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900(|i)))_(2625|2620)+'))))
        -- 2625% or NLS_%_2625%
       and ( substr(debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
          or substr(debit_anlaccount, instr(debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
@@ -7188,6 +7233,16 @@ begin
 
    begin
 
+   if l_atrn(i).inst_chain_idt is not null then
+   update ow_inst_totals t 
+      set t.posting_date = l_atrn(i).anl_postingdate,
+          t.pay_b_date = gl.bdate
+   where t.chain_idt = l_atrn(i).inst_chain_idt
+     and t.document_id = l_atrn(i).doc_drn
+     and t.posting_date is null
+     and t.pay_b_date is null;
+    end if;
+       
       savepoint sp1;
 
       bPay  := true;
@@ -7218,7 +7273,7 @@ begin
 
       if bPay then
 
-         get_nls_cardpay(l_nlsa, l_kv1, l_nlsb, l_kv2, p_filedate, l_atrn(i).doc_drn, l_atrn(i).doc_orn, l_atrn(i).doc_currency);
+         get_nls_cardpay(l_nlsa, l_kv1, l_nlsb, l_kv2, p_filedate, l_atrn(i).doc_drn, l_atrn(i).doc_orn, l_atrn(i).doc_currency, l_atrn(i).inst_chain_idt);
 
          -- счет-А (Дебет)
          if l_nlsa is null then
@@ -10828,6 +10883,9 @@ begin
   -- Процентная ставка по счету несанкционированного овердрафта
   elsif p_mode = 'OVR' then
      l_id := 0;
+  -- Процентная ставка по счету Instolment
+  elsif p_mode = 'INST' then
+     l_id := 0;
   else
      -- Неизвестный режим счета p_mode
      bars_error.raise_nerror(g_modcode, 'UNKNOWN_MODE', p_mode);
@@ -11026,10 +11084,10 @@ begin
 end set_accounts_rate;
 
 -------------------------------------------------------------------------------
+
 -- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
-/*
 procedure set_account_rate (
-  p_acc    number,
+  p_acc    number, 
   p_trmask t_trmask )
 is
   h varchar2(100) := 'bars_ow.set_account_rate. ';
@@ -11040,7 +11098,7 @@ begin
 
   bars_audit.info(h || 'Start.');
   if p_trmask.tab_name = 'W4_ACC' then
-    begin
+    begin 
     l_sql:= 'select p.percent_osn, p.percent_over, p.percent_mob, p.percent_cred ';
     l_sql:= l_sql||'from w4_acc o, accounts a, w4_card c, cm_product p ';
     l_sql:= l_sql||'where o.'||p_trmask.a_w4_acc||' = a.acc and a.dazs is null ';
@@ -11048,9 +11106,9 @@ begin
     l_sql:= l_sql||'and c.product_code = p.product_code ';
     l_sql:= l_sql||'and a.acc=:p_acc';
     execute immediate l_sql into l_cm_product.percent_osn,
-                                 l_cm_product.percent_over,
-                                 l_cm_product.percent_mob,
-                                 l_cm_product.percent_cred
+                                 l_cm_product.percent_over, 
+                                 l_cm_product.percent_mob, 
+                                 l_cm_product.percent_cred 
                            using p_acc;
         -- установка % ставки по основному счета
         if p_trmask.a_w4_acc = 'ACC_PK' and l_cm_product.percent_osn is not null then
@@ -11061,142 +11119,53 @@ begin
         if p_trmask.a_w4_acc = 'ACC_PK' and l_cm_product.percent_over is not null then
            set_acc_rate('OVR', p_acc, l_cm_product.percent_over);
            bars_audit.info(h || 'Percent_ovr set on ACC '||p_acc);
-        end if;
+        end if;   
         -- установка % ставки по счету мобильных сбережений
         if p_trmask.a_w4_acc = 'ACC_2625D' and l_cm_product.percent_mob is not null then
            set_acc_rate('MOB', p_acc, l_cm_product.percent_mob);
            bars_audit.info(h || 'Percent_mob seton on ACC '||p_acc);
-        end if;
+        end if; 
         -- установка % ставки по кредитному счету
-        if p_trmask.a_w4_acc = 'ACC_OVR' and l_cm_product.percent_cred is not null then
+        if p_trmask.a_w4_acc = 'ACC_OVR' and l_cm_product.percent_cred is not null then        
            set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
            bars_audit.info(h || 'Percent_cred set on ACC '||p_acc);
         end if;
         -- установка % ставки по счету просрочки как по кредитному
-        if p_trmask.a_w4_acc = 'ACC_2207' and l_cm_product.percent_cred is not null then
+        if p_trmask.a_w4_acc = 'ACC_2207' and l_cm_product.percent_cred is not null then        
            set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
            bars_audit.info(h || 'Percent_cred for 2207 set on ACC '||p_acc);
-        end if;
-
+        end if; 
+    
      exception when no_data_found then null;
      end;
-   ELSIF p_trmask.TAB_NAME = 'W4_ACC_INST' THEN
-     begin
-        select SUB_INT_RATE into l_rate
+   ELSIF p_trmask.TAB_NAME = 'W4_ACC_INST' THEN  
+     begin     
+        select SUB_INT_RATE into l_rate 
           from w4_acc_inst o
           join accounts a on o.acc = a.acc
           join ow_inst_totals t on o.chain_idt = t.chain_idt
          where a.dazs is null
            and o.trans_mask = p_trmask.a_w4_acc
            and a.acc=p_acc;
-
-        if p_trmask.a_w4_acc = 'ACC_2203I' and l_cm_product.percent_cred is not null then
+     
+        if p_trmask.a_w4_acc = 'ACC_2203I' and l_rate is not null then        
            set_acc_rate('INST', p_acc, l_rate);
            bars_audit.info(h || 'Percent_cred for 2203I set on ACC '||p_acc);
         end if;
-        if p_trmask.a_w4_acc = 'ACC_2203OVDI' and l_cm_product.percent_cred is not null then
+        if p_trmask.a_w4_acc = 'ACC_2203OVDI' and l_rate is not null then        
            set_acc_rate('INST', p_acc, l_rate);
            bars_audit.info(h || 'Percent_cred for 2203OVDI set on ACC '||p_acc);
-        end if;
-
-     exception when no_data_found then null;
+        end if;  
+        
+     exception when no_data_found then null;     
      end;
      END IF;
-
-
-  bars_audit.info(h || 'Finish.');
-
-end set_account_rate; */
--------------------------------------------------------------------------------
--- % ставки по счету (COBUMMFO-6290),вызов из OPEN_ACC
-procedure set_account_rate (
-  p_acc number )
-is
-  h varchar2(100) := 'bars_ow.set_account_rate. ';
-  l_cm_product cm_product%rowtype;
-begin
-
-  bars_audit.info(h || 'Start.');
-
-     -- установка % ставки по основному счета
-     -- установка % ставки по счету несанкционированного овердрафта
-    begin
-    select  p.percent_osn, p.percent_over
-    into  l_cm_product.percent_osn,l_cm_product.percent_over
-                  from w4_acc o, accounts a, w4_card c, cm_product p
-                 where o.acc_pk = a.acc and a.dazs is null
-                   and o.card_code = c.code
-                   and c.product_code = p.product_code
-                   and (p.percent_osn is not null or p.percent_over is not null)
-                   and a.acc=p_acc;
-
-        if l_cm_product.percent_osn is not null then
-           set_acc_rate('PK',  p_acc, l_cm_product.percent_osn);
-        end if;
-        if l_cm_product.percent_over is not null then
-           set_acc_rate('OVR', p_acc, l_cm_product.percent_over);
-        end if;
-
-     bars_audit.info(h || 'Percent_osn set on ACC '||p_acc);
-     bars_audit.info(h || 'Percent_ovr set on ACC '||p_acc);
-     exception when no_data_found then null;
-     end;
-
-     -- установка % ставки по счету мобильных сбережений
-     begin
-     select  p.percent_mob
-     into l_cm_product.percent_mob
-                  from w4_acc o, accounts a, w4_card c, cm_product p
-                 where o.acc_2625D = a.acc and a.dazs is null
-                   and o.card_code = c.code
-                   and c.product_code = p.product_code
-                   and p.percent_mob is not null
-                   and a.acc=p_acc;
-
-        set_acc_rate('MOB', p_acc, l_cm_product.percent_mob);
-
-     bars_audit.info(h || 'Percent_mob seton on ACC '||p_acc);
-     exception when no_data_found then null;
-     end;
-     -- установка % ставки по кредитному счету
-     begin
-     select  p.percent_cred
-     into  l_cm_product.percent_cred
-                  from w4_acc o, accounts a, w4_card c, cm_product p
-                 where o.acc_ovr = a.acc and a.dazs is null
-                   and o.card_code = c.code
-                   and c.product_code = p.product_code
-                   and p.percent_cred is not null
-                   and a.acc=p_acc;
-
-        set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
-
-     bars_audit.info(h || 'Percent_cred set on ACC '||p_acc);
-     exception when no_data_found then null;
-     end;
-
-     -- установка % ставки по счету просрочки как по кредитному
-     begin
-     select  p.percent_cred
-     into l_cm_product.percent_cred
-                  from w4_acc o, accounts a, w4_card c, cm_product p
-                 where o.acc_2207 = a.acc and a.dazs is null
-                   and o.card_code = c.code
-                   and c.product_code = p.product_code
-                   and p.percent_cred is not null
-                   and a.acc=p_acc;
-
-        set_acc_rate('KRED', p_acc, l_cm_product.percent_cred);
-
-     bars_audit.info(h || 'Percent_cred for 2207 set on ACC '||p_acc);
-     exception when no_data_found then null;
-     end;
+       
 
   bars_audit.info(h || 'Finish.');
 
 end set_account_rate;
--------------------------------------------------------------------------------
-
+--
 procedure cm_get_adr (
   p_rnk            in number,
   p_typeid         in number,
@@ -13431,6 +13400,7 @@ begin
 
   l_trmask.a_w4_acc := 'ACC_PK';
   l_trmask.nbs := substr(account_utl.read_account(l_acc).nls,1,4);
+  l_trmask.tab_name :='W4_ACC';
   
   -- specparams:
   set_sparam('1', l_acc, l_trmask);
@@ -15588,6 +15558,97 @@ begin
   bars_audit.info(h || 'Finish.');
 
 end pk_repay_card;
+
+
+procedure close_inst_acc is
+l_info varchar2(4000);
+l_can_close number;
+l_bd date;
+l_gl_bd date;
+l_noclose_acc number:=0;
+begin
+
+l_bd:= gl.bd();
+l_gl_bd:= bankdate;
+
+for i in (select t.chain_idt 
+            from ow_inst_totals t
+           where t.end_date_f is null
+             and t.status in ('CLOSED', 'PAID')
+             and not exists
+                 (select 1
+                    from w4_acc_inst i
+                    join accounts ac
+                      on ac.acc = i.acc
+                     and (ac.ostc <> 0 or ac.ostf <> 0 or ac.ostb <> 0)
+                   where i.chain_idt = t.chain_idt)) loop
+
+        l_noclose_acc:=0;
+        savepoint bef_close;
+        
+        for j in ( select a.acc, a.ostc, a.ostb, a.ostf, a.dapp, a.daos
+                     from w4_acc_inst ins
+                     join accounts a on ins.acc = a.acc
+                    where ins.chain_idt = i.chain_idt ) loop
+
+              if j.ostc = 0 and j.ostb = 0 and j.ostf = 0 and j.dapp is null or j.dapp < l_gl_bd and j.daos <= l_gl_bd then
+                
+                ACCREG.closeAccount(j.acc, l_info, l_can_close);
+                    
+                    if l_can_close <> 1 then 
+                        logger.info('W4_ACC_INST.CLOSE ACCOUNT '||j.acc||' ERROR: '||l_info);
+                        l_noclose_acc:=l_noclose_acc+1;
+                    else 
+                        logger.info('W4_ACC_INST.CLOSE ACCOUNT '||j.acc||' : closed.');
+                    end if;
+              else
+                    logger.info('W4_ACC_INST.CLOSE ACCOUNT '||j.acc||' ERROR.');
+                    l_noclose_acc:=l_noclose_acc+1;
+              end if;      
+   
+        end loop; 
+     
+     if l_noclose_acc = 0 then
+         update ow_inst_totals t
+            set t.end_date_f = l_bd
+          where t.chain_idt = i.chain_idt; 
+     else
+     rollback to bef_close;
+     end if;
+end loop;
+
+end;
+
+procedure set_inst_ovd_90_days is
+l_dat_dat_spz date;
+l_bd date;
+begin
+
+l_bd:= gl.bd();
+
+for i in (select t.chain_idt , ai.acc, t.kf
+            from ow_inst_totals t 
+            join w4_acc_inst ai on ai.chain_idt = t.chain_idt
+            join accounts a on ai.acc = a.acc
+           where t.end_date_f is null
+             and t.ovd_90_days is null
+             and a.tip in ('ISP', 'IPN', 'IK9')
+             and a.ostc <> 0) loop
+
+    l_dat_dat_spz:=DAT_SPZ(i.acc, l_bd, 1);
+
+    if l_bd - l_dat_dat_spz >= 90 then
+
+        update ow_inst_totals t
+           set t.ovd_90_days = l_dat_dat_spz
+         where t.kf = i.kf
+           and t.chain_idt = i.chain_idt;
+    
+    end if;
+
+end loop;
+end;
+
 
 -------------------------------------------------------------------------------
 -- pk_close_card
