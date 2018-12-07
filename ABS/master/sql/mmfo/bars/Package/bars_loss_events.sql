@@ -129,7 +129,7 @@ is
   g_DEB        constant varchar2(3) := 'DEB';
   g_OVR        constant varchar2(3) := 'OVR';
   g_XOZ        constant varchar2(3) := 'XOZ';
-
+  g_BPK_INST   constant varchar2(3) := 'INS';--кредит на виплату по карткам(інстолмент)
   g_TAG_VNCRP  constant varchar2(5) := 'VNCRP';
   g_TAG_VNCRR  constant varchar2(5) := 'VNCRR';
 
@@ -586,7 +586,15 @@ is
             when no_data_found then
               x_event_date := null;
          end;
-
+      when g_BPK_INST 
+        then --Інстолемент
+          select min(DAT_SPZ(a.ACC, p_date, l_ZO))
+            into x_event_date
+            from BARS.ACCOUNTS a
+            join BARS.W4_Acc_Inst   n
+              on ( n.ACC = a.ACC )
+           where n.chain_idt = p_nd
+             and a.TIP in ( 'IPN', 'ISP' );
       else
         null;
     end case;
@@ -598,6 +606,7 @@ is
     when g_MBK then n_Const := 07;
     when g_CP  then n_Const := 30;
     when g_XOZ then n_Const := 90; -- Госп.Деб.
+      when g_BPK_INST then n_Const := 90;--Інстолемент
     else            n_Const := 00;
     end case;
 
@@ -981,6 +990,16 @@ begin
                  on ( a.ACC = w.ACC_PK )
               where a.DAOS <= l_dat31
                 and ( w.DAT_CLOSE is Null OR w.DAT_CLOSE > l_dat31 )
+              
+              UNION ALL -- БПК інстолемент
+             select g_BPK_INST TIP, o.chain_idt GND, o.chain_idt nd, a.rnk, o.posting_date, 4 as VIDD, LEAST(o.end_date_p, o.end_date_f)
+                from w4_acc w
+                join ow_inst_totals o on w.nd = o.nd
+                join accounts  a on w.acc_pk = a.acc
+               where a.DAOS <= l_dat31
+                and ( w.DAT_CLOSE is Null OR w.DAT_CLOSE > l_dat31 )
+                and (o.end_date_f > l_dat31 or o.end_date_f is null)
+
               UNION ALL
              select -- 3) МБК + NOSTRO
                     g_MBK as TIP, d.nd GND, d.ND, d.RNK, d.SDATE, d.vidd, d.WDATE
@@ -1062,6 +1081,8 @@ begin
         then LOSS_DELAY( k.TIP, k.GND, null, k.sdate, k.ND, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
         when g_XOZ
         then LOSS_DELAY( k.TIP, k.GND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
+        when g_BPK_INST
+        then LOSS_DELAY( k.TIP, k.ND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
         else LOSS_DELAY( k.TIP, k.GND, null, k.sdate, null, null, l_dat31, l_event_type, l_event_date, l_status, l_days, l_days_corr, l_ZO, k.mdate );
         end case;
 

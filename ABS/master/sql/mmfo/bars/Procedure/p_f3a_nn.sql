@@ -18,6 +18,7 @@ IS
 01/11/2018 - не будут включаться в файл Дт обороты которые были в
              кореспонденции со счетами овердрафтов - перенос на просрочку
              ( Дт 2203 (тип "KSP") Кт 2625(2620) (овердрафт) )
+19/10/2018 - добавлен блок пересчета процентной ставки для Инстолмента
 17/08/2018 - не будет включаться овердрафт для 2620 с OB22='36' с нулевой %%
              ставкой
 15/06/2018 - виключення оборот_в по IF0,IF1,IF2,IF3,IF4,IF5,IF6
@@ -3613,6 +3614,56 @@ BEGIN
        null;
    end if;
 ---------------------------------------------------
+   -- ПЕРЕСЧЕТ % ставок для ИНСТОЛМЕНТА
+   FOR i IN (SELECT  a.kodp, a.acc acc_, a.nls, a.kv, TO_NUMBER (a.znap) ost, b.znap prc,
+                     (TO_NUMBER (a.znap) * TO_NUMBER (b.znap))/36500 ost_prc, b.recid
+             FROM RNBU_TRACE a, RNBU_TRACE b, ACCOUNTS s
+             WHERE SUBSTR (a.kodp, 2) = SUBSTR (b.kodp, 2)
+               AND SUBSTR (a.kodp, 1, 1) = '1'
+               AND SUBSTR (b.kodp, 1, 1) = '2'
+               and nvl(a.nd, 0) <> 1
+               AND a.acc = b.acc
+               AND a.recid = b.recid - 1
+               AND a.odate = b.odate
+               AND a.acc=s.acc
+               AND s.nbs = '2203' 
+               and s.tip in ('ISS','ISP')
+             ORDER BY a.kodp)
+    LOOP
+
+         BEGIN
+            select OW.SUB_INT_RATE + OW.SUB_FEE_RATE 
+               into cntr_
+            from w4_acc_inst w4, ow_inst_totals ow
+            where w4.acc = i.acc_
+              and w4.chain_idt = ow.chain_idt; 
+         EXCEPTION WHEN NO_DATA_FOUND THEN
+             cntr_ := 0;
+         END;
+
+         -- обновление процентной ставки
+         -- в протоколе
+         if cntr_ <> 0 
+         then
+            UPDATE RNBU_TRACE
+               SET znap = Trim(TO_CHAR (ROUND (cntr_, 4), fmt_))
+            WHERE recid=i.recid;
+
+            -- обновление (остатка*процентную ставку)
+            -- в протоколе
+            UPDATE RNBU_TRACE
+               SET znap = Trim(TO_CHAR (se_*ROUND(cntr_,4)))
+            WHERE acc = i.acc_ and kodp like '3%';
+
+            -- в архиве
+            UPDATE RNBU_HISTORY
+               SET ints=cntr_
+            WHERE odate = dat_ and acc = i.acc_;
+         end if;
+
+   END LOOP;
+---------------------------------------------------
+
 ---------------------------------------------------
    if flag_blk = 0 then
        DELETE FROM TMP_NBU

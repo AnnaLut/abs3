@@ -1856,12 +1856,14 @@ begin
        where ACC in ( select ACC_ID
                         from ( select ACC_2203, ACC_2207, ACC_2208, ACC_2209, ACC_2625X
                                     , ACC_2627, ACC_2628, ACC_3570, ACC_3579, ACC_2627X
-                                    , ACC_9129, ACC_2625D, ACC_OVR
+                                    , ACC_9129, ACC_2625D, ACC_OVR, ACC_9129I
                                  from W4_ACC
                                 where ACC_PK = p_acc
                               ) unpivot ( ACC_ID FOR ACC_FILD IN ( ACC_2203, ACC_2207, ACC_2208, ACC_2209, ACC_2625X
                                                                  , ACC_2627, ACC_2628, ACC_3570, ACC_3579, ACC_2627X
-                                                                 , ACC_9129, ACC_2625D, ACC_OVR ) )
+                                                                 , ACC_9129, ACC_2625D, ACC_OVR, ACC_9129I ) )
+                                union all
+                                select acc from w4_acc_inst where ACC_PK = p_acc                                  
                     )
          and OSTC <> 0;
 

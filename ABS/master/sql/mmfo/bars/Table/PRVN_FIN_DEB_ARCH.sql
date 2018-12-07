@@ -40,12 +40,8 @@ exception when others then
 end; 
 /
 
-
-
-
 PROMPT *** ALTER_POLICIES to PRVN_FIN_DEB_ARCH ***
  exec bpa.alter_policies('PRVN_FIN_DEB_ARCH');
-
 
 COMMENT ON TABLE BARS.PRVN_FIN_DEB_ARCH IS 'Архів зв`язків рах. Фін.Деб.';
 COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.CHG_ID IS '';
@@ -57,9 +53,6 @@ COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.ACC_SP IS 'Рахунок простроченого тіла Ф
 COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.EFFECTDATE IS '';
 COMMENT ON COLUMN BARS.PRVN_FIN_DEB_ARCH.AGRM_ID IS 'Ід. кредитного договору';
 
-
-
-
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_KF_NN ***
 begin   
  execute immediate '
@@ -68,9 +61,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_ACCSS_NN ***
 begin   
@@ -81,20 +71,17 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_ACCSP_NN ***
 begin   
+ --execute immediate '
+ -- ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (ACC_SP CONSTRAINT CC_PRVNFINDEBARCH_ACCSP_NN NOT NULL ENABLE)';
  execute immediate '
-  ALTER TABLE BARS.PRVN_FIN_DEB_ARCH MODIFY (ACC_SP CONSTRAINT CC_PRVNFINDEBARCH_ACCSP_NN NOT NULL ENABLE)';
+ ALTER TABLE BARS.PRVN_FIN_DEB_ARCH DROP CONSTRAINT CC_PRVNFINDEBARCH_ACCSP_NN';
 exception when others then
-  if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
+  if  sqlcode=-02443 then null; else raise; end if;
+  --ORA-02443: Cannot drop constraint  - nonexistent constraint
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_EFFDT_NN ***
 begin   
@@ -104,9 +91,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint PK_PRVNFINDEBARCH ***
 begin   
@@ -119,9 +103,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_CHGID_NN ***
 begin   
  execute immediate '
@@ -130,9 +111,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_CHGDT_NN ***
 begin   
@@ -143,9 +121,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  constraint CC_PRVNFINDEBARCH_CLSDT_NN ***
 begin   
  execute immediate '
@@ -154,9 +129,6 @@ exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
 /
-
-
-
 
 PROMPT *** Create  index PK_PRVNFINDEBARCH ***
 begin   
@@ -169,9 +141,6 @@ exception when others then
  end;
 /
 
-
-
-
 PROMPT *** Create  index IDX_PRVNFINDEBARCH_CLSDT_KF ***
 begin   
  execute immediate '
@@ -183,14 +152,10 @@ exception when others then
  end;
 /
 
-
-
 PROMPT *** Create  grants  PRVN_FIN_DEB_ARCH ***
 grant SELECT                                                                 on PRVN_FIN_DEB_ARCH to BARSUPL;
 grant SELECT                                                                 on PRVN_FIN_DEB_ARCH to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on PRVN_FIN_DEB_ARCH to UPLD;
-
-
 
 PROMPT ===================================================================================== 
 PROMPT *** End *** ========== Scripts /Sql/BARS/Table/PRVN_FIN_DEB_ARCH.sql =========*** End

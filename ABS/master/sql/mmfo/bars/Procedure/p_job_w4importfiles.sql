@@ -54,7 +54,7 @@ begin
      if z.file_status = 0 then
 
         if lock_file(z.id, z.file_status) = true then
-           bars_ow.parse_file(z.id);
+           ow_files_proc.parse_file(z.id);
         else
            bars_audit.info(h || 'File ' || z.file_name || ' is processed by another application');
            if p_id is not null then

@@ -8,12 +8,13 @@ PROMPT =========================================================================
 PROMPT *** Create  view V_OW_OIC_ATRANSFERS_DATA ***
 
 create or replace view v_ow_oic_atransfers_data
-(id, idn, synthcode, doc_drn, doc_orn, dk, nlsa, s, kv, nlsb, s2, kv2, nazn, err_text, url, state)
+(id, idn, synthcode, doc_drn, doc_orn, dk, nlsa, s, kv, nlsb, s2, kv2, nazn, inst_chain_idt, inst_plan_id, err_text, url, state)
 as
 select a.id, a.idn, a.anl_synthcode, a.doc_drn, a.doc_orn, w.dk,
        a.debit_anlaccount, a.debit_amount*100, a.debit_currency,
        a.credit_anlaccount, a.credit_amount*100, a.credit_currency,
-       substr(a.anl_trndescr, 1, 160), a.err_text,
+       substr(a.anl_trndescr, 1, 160), a.inst_chain_idt, a.inst_plan_id, 
+       a.err_text,
        make_docinput_url(case
                            when a.debit_currency = a.credit_currency then
                             'OW1'

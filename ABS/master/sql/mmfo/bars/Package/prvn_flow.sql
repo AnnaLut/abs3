@@ -216,6 +216,16 @@ is
                        );
   type many is table of many1 index by varchar2(8);
 
+  -- типы договоров по справочнику PRVN_OBJECT_TYPE
+  g_CCK        constant varchar2(3) := 'CCK';
+  g_BPK        constant varchar2(3) := 'BPK';
+  g_CP         constant varchar2(2) := 'CP';
+  g_MBK        constant varchar2(3) := 'MBK';
+  g_DEB        constant varchar2(3) := 'DEB';
+  g_OVR        constant varchar2(3) := 'OVR';
+  g_XOZ        constant varchar2(3) := 'XOZ';
+  g_BPK_INST   constant varchar2(3) := 'INS';--кредит на виплату по карткам(інстолмент)
+
   --
   -- Перевірка 100%-ї Готовністі НБУ-23
   --
@@ -1255,7 +1265,12 @@ begin -- OSA_V_PROV_RESULTS_OSH = PRVN_FV_REZ => PRVN_OSA= > PRVN_OSAq
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,   0)) over (partition by 1))
                          from nbu23_rez where fdat= z_dat01 and BVu >= 0 and ( rez9 = 0 or p_mode = 12 )
                           and tipa = 4  and nd = x.ND  AND (id like 'W4%'  or id like 'BPK%' or id like 'DEBF%') ;
-
+       ElsIf x.TIP = 23   then   --  Instalment  COBUINST-8
+             OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
+                                       Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  ,BVu )) over (partition by 1)),
+                                       Div0( BVu, sum(decode(substr(nls,1,1),'9', BVu,   0)) over (partition by 1))
+                         from nbu23_rez where fdat= z_dat01 and BVu >= 0 and ( rez9 = 0 or p_mode = 12 )
+                          and tipa = 23  and nd = x.ND  AND (id like 'INS%' or id like 'DEBF%') ;
        ElsIf x.TIP = 10  then
              OPEN s1 FOR select lead(substr(nls,1,1),1,-1) over(order by substr(nls,1,1) ), substr(nls,1,1), ROWID, nls, BVuq, KV, BVu,
                                        Div0( BVu, sum(decode(substr(nls,1,1),'9', 0  ,BVu )) over (partition by 1)),
@@ -2562,24 +2577,55 @@ end nos_del;
   ( p_dat       in     date
   ) is
     title   constant   varchar2(64) := $$PLSQL_UNIT||'.ADD_FIN_DEB';
-    fd                 prvn_fin_deb%rowtype;
     l_eff_dt           date;
     l_kf               varchar2(6) := sys_context('bars_context','user_mfo');
     l_chg_dt           prvn_fin_deb_arch.chg_dt%type;
     l_cls_dt           prvn_fin_deb_arch.cls_dt%type;
     l_err_tag          varchar2(40) := l_kf||'_'||to_char(p_dat,'yyyymmdd')||'_'||to_char(sysdate,'yyyymmddhh24miss');
-    cursor err_log
-    is
-    select cast( ACC_SS as number(24) )  as ACC_SS
-         , cast( ACC_SP as number(24) )  as ACC_SP
-         , cast( EFFECTDATE as date )    as EFFECTDATE
-         , cast( KF as varchar2(6) )     as KF
-         , cast( AGRM_ID as number(38) ) as AGRM_ID
-      from PRVN_FIN_DEB_ERRLOG
-     where ORA_ERR_TAG$ like '%'||l_err_tag
-       and ORA_ERR_OPTYP$ = 'I'
-       and ORA_ERR_MESG$ like '%UK_PRVNFINDEB_ACCSS%'
-       for update;
+
+    cursor err_log_SS is
+           select e.ROWID                         as RID
+                , cast( e.ACC_SS as number(24) )  as ACC_SS
+                , cast( e.ACC_SP as number(24) )  as ACC_SP
+                , cast( e.EFFECTDATE as date )    as EFFECTDATE
+                , cast( e.KF as varchar2(6) )     as KF
+                , cast( e.AGRM_ID as number(38) ) as AGRM_ID
+                , e.ORA_ERR_OPTYP$                as OP_TYP
+                , d.ROWID                         as FD_RID
+                , d.ACC_SS                        as FD_ACC_SS
+                , d.ACC_SP                        as FD_ACC_SP
+                , d.EFFECTDATE                    as FD_EFFECTDATE
+                , d.AGRM_ID                       as FD_AGRM_ID
+             from bars.PRVN_FIN_DEB_ERRLOG e
+             left join bars.PRVN_FIN_DEB d on (e.ACC_SS = d.ACC_SS and e.KF = d.KF)
+            where e.ORA_ERR_TAG$ like l_err_tag||'%'
+              and e.ORA_ERR_OPTYP$ = 'I'
+              and e.ORA_ERR_MESG$ like '%UK_PRVNFINDEB_ACCSS%'
+              and e.KF = l_kf
+              for update;
+    fd                 err_log_SS%rowtype;
+
+    cursor err_log_SP is
+           select e.ROWID                         as RID
+                , cast( e.ACC_SS as number(24) )  as ACC_SS
+                , cast( e.ACC_SP as number(24) )  as ACC_SP
+                , cast( e.EFFECTDATE as date )    as EFFECTDATE
+                , cast( e.KF as varchar2(6) )     as KF
+                , cast( e.AGRM_ID as number(38) ) as AGRM_ID
+                , e.ORA_ERR_OPTYP$                as OP_TYP
+                , d.ROWID                         as FD_RID
+                , d.ACC_SS                        as FD_ACC_SS
+                , d.ACC_SP                        as FD_ACC_SP
+                , d.EFFECTDATE                    as FD_EFFECTDATE
+                , d.AGRM_ID                       as FD_AGRM_ID
+             from bars.PRVN_FIN_DEB_ERRLOG e
+             left join bars.PRVN_FIN_DEB d on (decode(e.ACC_SP, d.ACC_SP, 1, 0) = 1 and e.KF = d.KF)
+            where e.ORA_ERR_TAG$ like l_err_tag||'%'
+              and e.ORA_ERR_MESG$ like '%UK_PRVNFINDEB_ACCSP%'
+              and e.KF = l_kf
+              for update;
+    r_sp       err_log_SP%rowtype;
+
   begin
 
     bars_audit.trace( '%s: Entry with ( p_dat=%s, l_kf=%s ).', title, to_char(p_dat,'dd.mm.yyyy'), l_kf );
@@ -2601,27 +2647,29 @@ end nos_del;
       bars_audit.info( title || ': BARS_LOSS_EVENTS.G_RECEIVABLES = TRUE' );
 
       -- clear old errors --
-      delete PRVN_FIN_DEB_ERRLOG
-       where ORA_ERR_TAG$ like '%'||l_kf||'%';
+      --delete PRVN_FIN_DEB_ERRLOG
+      -- where kf = l_kf; --ORA_ERR_TAG$ like '%'||l_kf||'%';
 
       bars_audit.info( title || ': '||to_char(sql%rowcount)||' row(s) deleted.' );
 
       -- Рах. фін. деб. кредитних договорів ('SK0','SK9')
       insert
-        into PRVN_FIN_DEB
-           ( ACC_SS, ACC_SP, KF, AGRM_ID )
-      select nvl(ACC_SS,ACC_SP) as ACC_SS
+        into bars.PRVN_FIN_DEB
+           ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+      select nvl(ACC_SS, ACC_SP) as ACC_SS
            , ACC_SP
+           , l_eff_dt
            , KF
            , ND
         from ( select r.KF, r.ND
                     , a.ACC, a.TIP, a.KV
-                 from ND_ACC   r
-                 join ACCOUNTS a
+                 from bars.ND_ACC   r
+                 join bars.ACCOUNTS a
                    on ( r.KF = a.KF and r.ACC = a.ACC )
                  left
-                 join PRVN_FIN_DEB d
-                   on ( d.AGRM_ID = r.ND )
+                 join bars.PRVN_FIN_DEB d
+                   --on ( d.AGRM_ID = r.ND )
+                   on ( d.KF = r.KF and d.AGRM_ID = r.ND and r.ACC = any(d.ACC_SS, d.ACC_SP)) --V.Kharin --иначе AGRM_ID может пересечся с БПК
                 where a.TIP in ('SK0','SK9')
                   and a.NBS like '3%'
                   and a.DAOS <= p_dat
@@ -2629,14 +2677,14 @@ end nos_del;
                   and d.AGRM_ID IS Null
              ) pivot ( max(ACC) for TIP in ( 'SK0' as ACC_SS, 'SK9' as ACC_SP ) )
          log errors
-        into PRVN_FIN_DEB_ERRLOG( 'CCK_'||l_err_tag )
+        into bars.PRVN_FIN_DEB_ERRLOG( l_err_tag||'_CCK' )
       REJECT LIMIT UNLIMITED;
 
       bars_audit.info( title || ': CCK (SK0+SK9) '||to_char(sql%rowcount)||' row(s) inserted.' );
 
       -- Рах. фін. деб. Кредитних Договорів ('ODB')
       merge
-        into PRVN_FIN_DEB d
+        into bars.PRVN_FIN_DEB d
        using ( select nvl(ACC_SS,ACC_SP) as ACC_SS
                     , ACC_SP
                     , KF
@@ -2647,11 +2695,11 @@ end nos_del;
                              , t.ROW_NUM
                              , t.ACC_TP
                              , dense_rank() over ( partition by a.NBS, a.OB22, r.ND order by r.ACC ) as ACC_RANK
-                          from ND_ACC   r
-                          join ACCOUNTS a
+                          from bars.ND_ACC   r
+                          join bars.ACCOUNTS a
                             on ( r.KF = a.KF and r.ACC = a.ACC )
                           left
-                          join PRVN_FIN_DEB d
+                          join bars.PRVN_FIN_DEB d
                             on ( d.KF = r.KF and d.AGRM_ID = r.ND and r.ACC = any(d.ACC_SS, d.ACC_SS) )
                           join ( with NBSOB22 as ( select rownum as ROW_NUM
                                                         , NBS_N, NBS_P
@@ -2659,7 +2707,7 @@ end nos_del;
                                                         , SubStr(NBS_N,5,2) as SS_OB22
                                                         , SubStr(NBS_P,1,4) as SP_NBS
                                                         , SubStr(NBS_P,5,2) as SP_OB22
-                                                     from FIN_DEBT
+                                                     from bars.FIN_DEBT
                                                     where NBS_N Like '3%'
                                                  )
                                  select ROW_NUM
@@ -2686,104 +2734,185 @@ end nos_del;
           on ( t.ACC_SS = d.ACC_SS )
         when MATCHED
         then update -- зявився рахунок прострочки
-                set d.ACC_SP  = t.ACC_SP
---                , d.AGRM_ID = t.ND
---                , d.EFFECTDATE =
+                set d.ACC_SP     = t.ACC_SP
+                  , d.AGRM_ID    = t.ND
+                  , d.EFFECTDATE = l_eff_dt
               where d.ACC_SP  = d.ACC_SS
         when NOT MATCHED
-        then insert ( ACC_SS, ACC_SP, KF, AGRM_ID )
-             values ( t.ACC_SS, t.ACC_SP, t.KF, t.ND )
+        then insert ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+             values ( t.ACC_SS, t.ACC_SP, l_eff_dt, t.KF, t.ND )
          log errors
-        into PRVN_FIN_DEB_ERRLOG( 'CCK_'||l_err_tag )
+        into bars.PRVN_FIN_DEB_ERRLOG( l_err_tag||'_CCK' )
          REJECT LIMIT UNLIMITED;
 
       bars_audit.info( title || ': CCK (ODB) '||to_char(sql%rowcount)||' row(s) merged.' );
 
       -- Рах. фін. деб. БПК
       insert
-        into PRVN_FIN_DEB
-           ( ACC_SS, ACC_SP, KF, AGRM_ID )
-      select ACC_SS, ACC_SP, KF, ND
+        into bars.PRVN_FIN_DEB
+           ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+      select ACC_SS, ACC_SP, l_eff_dt, KF, ND
         from ( select w4.ACC_SS, w4.ACC_SP, w4.KF, w4.ND
                  from ( select nvl(ACC_3570,ACC_3579) as ACC_SS
                              , ACC_3579               as ACC_SP
                              , KF, ND
-                          from W4_ACC
+                          from bars.W4_ACC
                          where coalesce( ACC_3570, ACC_3579, 0 ) > 0
                            and DAT_CLOSE Is Null
                          union all
                         select nvl(ACC_3570,ACC_3579) as ACC_SS
                              , ACC_3579               as ACC_SP
                              , KF, ND
-                          from BPK_ACC
+                          from bars.BPK_ACC
                          where coalesce( ACC_3570, ACC_3579, 0 ) > 0
                            and DAT_CLOSE Is Null
                       ) w4
-                 join ACCOUNTS an
+                 join bars.ACCOUNTS an
                    on ( an.KF = w4.KF and an.ACC = w4.ACC_SS )
                  left
-                 join ACCOUNTS ap
+                 join bars.ACCOUNTS ap
                    on ( ap.KF = w4.KF and ap.ACC = w4.ACC_SP )
                  where an.DAZS is Null
                     or ap.DAZS is Null
              )
        minus
-      select ACC_SS, ACC_SP, KF, AGRM_ID
-        from PRVN_FIN_DEB
+      select ACC_SS, ACC_SP, l_eff_dt, KF, AGRM_ID
+        from bars.PRVN_FIN_DEB
        where AGRM_ID is not null
-         log errors
-        into PRVN_FIN_DEB_ERRLOG( 'BPK_'||l_err_tag )
-      REJECT LIMIT UNLIMITED;
+         log errors into bars.PRVN_FIN_DEB_ERRLOG( l_err_tag||'_BPK' ) REJECT LIMIT UNLIMITED;
 
       bars_audit.info( title || ': BPK '||to_char(sql%rowcount)||' row(s) inserted.' );
 
-      --------------------
-      -- parsing errors --
-      --------------------
+      -- Рах. фін. деб. БПК Instolment
+      merge into bars.PRVN_FIN_DEB d
+      using (
+               with
+                NBSOB22 as ( select rownum as ROW_NUM
+                                  , NBS_N, NBS_P
+                                  , SubStr(NBS_N,1,4) as SS_NBS
+                                  , SubStr(NBS_N,5,2) as SS_OB22
+                                  , SubStr(NBS_P,1,4) as SP_NBS
+                                  , SubStr(NBS_P,5,2) as SP_OB22
+                               from bars.FIN_DEBT
+                              where MOD_ABS = 9 ), 
+                  FDEBT as ( select ROW_NUM, 'SS' as ACC_TP, SS_NBS as R020, SS_OB22 as OB22 from NBSOB22
+                              union
+                             select ROW_NUM, 'SP' as ACC_TP, SP_NBS as R020, SP_OB22 as OB22 from NBSOB22 where NBS_P Is Not Null )
+               select coalesce(fn.ACC_SS, fn.ACC_SP) as ACC_SS
+                    , fn.ACC_SP
+                    , fn.KF
+                    , fn.CHAIN_IDT as AGRM_ID
+                 from ( select f.KF, f.ACC, f.CHAIN_IDT, f.ACC_TP, f.ROW_NUM, f.ACC_RANK
+                          from ( select ac.KF, ac.ACC, ac.CHAIN_IDT, a.NBS, a.OB22, fdebt.ACC_TP, fdebt.ROW_NUM,
+                                        dense_rank() over ( partition by ac.CHAIN_IDT, fdebt.ACC_TP, fdebt.ROW_NUM order by ac.acc ) as ACC_RANK
+                                   from bars.W4_ACC_INST ac
+                                   join bars.ACCOUNTS    a  on ( ac.KF = a.KF and ac.ACC = a.ACC )
+                                   join fdebt               on ( a.NBS = fdebt.R020 and a.OB22 = fdebt.OB22 )
+                                  where a.DAOS <= p_dat
+                                    and lnnvl( a.DAZS <= p_dat )
+                                    --and a.TIP in ('IK0','IK9')
+                               ) f
+                      ) pivot ( max(ACC) for ACC_TP in ( 'SS' as ACC_SS, 'SP' as ACC_SP ) ) fn
+                 left join bars.PRVN_FIN_DEB fd  on (  fd.KF = fn.KF and
+                                                       fd.AGRM_ID = fn.CHAIN_IDT and
+                                                       fd.ACC_SS = coalesce(fn.ACC_SS, fn.ACC_SP) and
+                                                       decode(fd.ACC_SP, fn.ACC_SP, 1, 0) = 1)
+                where fd.ACC_SS is null
+            ) t on ( t.ACC_SS = d.ACC_SS ) -- and t.AGRM_ID = d.AGRM_ID)
+       when MATCHED then
+            update -- зявився або пропав рахунок прострочки
+               set d.ACC_SP  = t.ACC_SP
+                 , d.EFFECTDATE = l_eff_dt
+                 , d.AGRM_ID = t.AGRM_ID
+       when NOT MATCHED then
+            insert ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+            values ( t.ACC_SS, t.ACC_SP, l_eff_dt, t.KF, t.AGRM_ID )
+       log errors into bars.PRVN_FIN_DEB_ERRLOG( l_err_tag||'_INS' ) REJECT LIMIT UNLIMITED;
 
-      open err_log;
+      bars_audit.info( title || ': INS '||to_char(sql%rowcount)||' row(s) inserted.' );
 
+      ----------------------------------------
+      -- parsing errors UK_PRVNFINDEB_ACCSS --
+      open err_log_SS;
       loop
-
-        fetch err_log
-         into fd;
-
-        exit when err_log%NOTFOUND;
-
-        savepoint SP_ERRLOG;
+        fetch err_log_SS into fd;
+        exit when err_log_SS%NOTFOUND;
+        savepoint SP_ERRLOG_SS;
 
         begin
+          -- 1) delete from PRVN_FIN_DEB for ACC_SS
+             delete bars.PRVN_FIN_DEB
+              where ACC_SS = fd.ACC_SS
+                 or (acc_ss = fd.ACC_SP and acc_ss = acc_sp);
 
-          -- 1) insert into PRVN_FIN_DEB_ARCH from PRVN_FIN_DEB
-          insert
-            into PRVN_FIN_DEB_ARCH
-               ( CHG_ID, CHG_DT, CLS_DT, KF, ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID )
-          values
-               ( S_PRVN_FIN_DEB_ARCH.NextVal, l_chg_dt, l_cls_dt
-                , fd.KF, fd.ACC_SS, fd.ACC_SP, fd.EFFECTDATE, fd.AGRM_ID );
+          -- 2) insert into ...
+             insert into bars.PRVN_FIN_DEB ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+              values ( fd.ACC_SS, fd.ACC_SP, fd.EFFECTDATE, fd.KF, fd.AGRM_ID );
 
-          -- 2) delete from PRVN_FIN_DEB
-          delete PRVN_FIN_DEB
-           where ACC_SS = fd.ACC_SS;
+             if fd.FD_ACC_SS is not null then
+               insert into bars.PRVN_FIN_DEB_ARCH ( CHG_ID, CHG_DT, CLS_DT, KF, ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID )
+                 values ( S_PRVN_FIN_DEB_ARCH.NextVal, l_chg_dt, l_cls_dt, fd.KF, fd.FD_ACC_SS, fd.FD_ACC_SP, fd.FD_EFFECTDATE, fd.FD_AGRM_ID );
+             end if;
 
-          -- 3) insert into PRVN_FIN_DEB from PRVN_FIN_DEB_ERRLOG
-          insert
-            into PRVN_FIN_DEB
-          values fd;
-
-          -- 4) delete from PRVN_FIN_DEB_ERRLOG ( where current of )
-          delete PRVN_FIN_DEB_ERRLOG
-           where current of err_log;
+          -- 3) delete from PRVN_FIN_DEB_ERRLOG ( where current of )
+             delete bars.PRVN_FIN_DEB_ERRLOG
+              where ROWID = fd.RID;
+              ---where current of err_log_SS;
 
         exception
           when OTHERS then
-           bars_audit.error( title ||': ACC_SS='||to_char(fd.ACC_SS)||chr(10)||sqlerrm );
-           rollback to SP_ERRLOG;
+--           bars_audit.error(title || ' SS' ||': ACC_SS='||to_char(fd.ACC_SS)||': ACC_SP='||to_char(fd.ACC_SP)||':'||sqlerrm);
+           bars_audit.error(title || ' SS' ||':SS='||to_char(fd.ACC_SS)||':SP='||to_char(fd.ACC_SP)||':'||sqlerrm);
+           rollback to SP_ERRLOG_SS;
         end;
-
       end loop;
 
-      close err_log;
+      bars_audit.info( title || ': err_log_SS '||err_log_SS%ROWCOUNT||' row(s) processed.' );
+
+      close err_log_SS;
+      -- parsing errors UK_PRVNFINDEB_ACCSS --
+      ----------------------------------------
+
+      ----------------------------------------
+      -- parsing errors UK_PRVNFINDEB_ACCSP --
+      open err_log_SP;
+      loop
+        fetch err_log_SP into r_sp;
+        exit when err_log_SP%NOTFOUND;
+        savepoint SP_ERRLOG_SP;
+
+        begin
+          -- 1) delete from PRVN_FIN_DEB for ACC_SP duplicate
+             delete bars.PRVN_FIN_DEB 
+              where (r_sp.FD_RID is not null and ROWID  = r_sp.FD_RID)  -- аналогично ACC_SP = r_sp.ACC_SP но по ROWID
+                 or ACC_SS = r_sp.ACC_SS;                               -- удаление по SS нужно в случае ошибки update при merge
+
+          -- 2) insert into ...
+             insert into bars.PRVN_FIN_DEB ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+              values ( r_sp.ACC_SS, r_sp.ACC_SP, r_sp.EFFECTDATE, r_sp.KF, r_sp.AGRM_ID );
+             if r_sp.FD_ACC_SS is not null then
+               insert into bars.PRVN_FIN_DEB_ARCH ( CHG_ID, CHG_DT, CLS_DT, KF, ACC_SS, ACC_SP, EFFECTDATE, AGRM_ID )
+                 values ( S_PRVN_FIN_DEB_ARCH.NextVal, l_chg_dt, l_cls_dt, r_sp.KF, r_sp.FD_ACC_SS, r_sp.FD_ACC_SP, r_sp.FD_EFFECTDATE, r_sp.FD_AGRM_ID );
+             end if;
+
+          -- 3) delete from PRVN_FIN_DEB_ERRLOG ( where current of )
+             delete bars.PRVN_FIN_DEB_ERRLOG
+              where ROWID = r_sp.RID;
+              --where current of err_log_SP;
+
+        exception
+          when OTHERS then
+--           bars_audit.error(title || ' SS' ||': ACC_SS='||to_char(r_sp.ACC_SS)||': ACC_SP='||to_char(r_sp.ACC_SP)||':'||sqlerrm);
+           bars_audit.error(title || ' SP' ||':SS='||to_char(r_sp.ACC_SS)||':SP='||to_char(r_sp.ACC_SP)||':'||sqlerrm);
+           rollback to SP_ERRLOG_SP;
+        end;
+      end loop;
+
+      bars_audit.info( title || ': err_log_SP '||err_log_SP%ROWCOUNT||' row(s) processed.' );
+
+      close err_log_SP;
+      -- parsing errors UK_PRVNFINDEB_ACCSP --
+      ----------------------------------------
 
       -- all ACC_SS
       insert
@@ -2891,10 +3020,25 @@ end nos_del;
         fd.ACC_SP     := k.ACC_SP;
 
         begin
-          insert into PRVN_FIN_DEB values FD;
+--          insert into PRVN_FIN_DEB (ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID)
+--            values (fd.ACC_SS, fd.ACC_SP, fd.EFFECTDATE, fd.KF, fd.AGRM_ID);
+          merge into bars.PRVN_FIN_DEB d
+          using ( select fd.ACC_SS as ACC_SS, fd.ACC_SP as ACC_SP, fd.EFFECTDATE as EFFECTDATE, fd.KF as KF, fd.AGRM_ID as AGRM_ID from dual
+                ) t on ( t.ACC_SS = d.ACC_SS )
+           when MATCHED then
+                update -- зявився або пропав рахунок прострочки
+                   set d.ACC_SP  = t.ACC_SP
+                     , d.EFFECTDATE = t.EFFECTDATE
+                     , d.AGRM_ID = t.AGRM_ID
+                where decode(d.ACC_SP,  t.ACC_SP,  1, 0) = 0
+                   or decode(d.AGRM_ID, t.AGRM_ID, 1, 0) = 0
+           when NOT MATCHED then
+                insert ( ACC_SS, ACC_SP, EFFECTDATE, KF, AGRM_ID )
+                values ( t.ACC_SS, t.ACC_SP, t.EFFECTDATE, t.KF, t.AGRM_ID );
+
            exception
         when OTHERS then
-           bars_audit.error( title ||': ACC_SS='||to_char(fd.ACC_SS)||', ACC_SP='||to_char(fd.ACC_SP)||chr(10)||sqlerrm );
+           bars_audit.error( title ||':SS='||to_char(fd.ACC_SS)||':SP='||to_char(fd.ACC_SP)||':MOD_ABS='||k.MOD_ABS||':'||sqlerrm );
         end;
 
       Else
@@ -2902,8 +3046,7 @@ end nos_del;
       end if;
 
     end loop;
-
-    bars_audit.trace( '%s: Exit.', title );
+    bars_audit.info( title || ': FINISH' );
 
   end ADD_FIN_DEB;
 
@@ -3036,38 +3179,106 @@ end nos_del;
           agr.gen_end_dt  := cur.END_DT;
           agr.tot_dbt     := 0;
 
-          if ( p_adj_f = 1 )
-          then -- з архіву ГПК
-            select ND
-                 , FDAT
-                 , LIM2+SUMG as LMT_INPT
-                 , LIM2      as LMT_OTPT
-                 , SUMG      as SS
-                 , SUMO-SUMG as SN
-                 , 0         as SNO
-                 , 0         as SNP
-                 , 0         as SSP
-                 , FDAT-lag(FDAT,1,p_rpt_dt-1) over (order by FDAT) as DAY_QTY
-                 , null, 0, 0
-              bulk collect
-              into agr.gen_shd
-              from CC_LIM_ARC
-             where MDAT  = p_rpt_dt
-               and ND    = cur.AGR_ID
-               and FDAT >= p_rpt_dt
-             order by FDAT;
-          else -- з поточного ГПК
-            select ND, FDAT, LIM2+SUMG, LIM2, SUMG, SUMO-SUMG
-                 , 0, 0, 0
-                 , FDAT-lag(FDAT,1,FDAT) over (order by FDAT) as DAY_QTY
-                 , null, 0, 0
-              bulk collect
-              into agr.gen_shd
-              from CC_LIM
-             where ND    = cur.AGR_ID
-               and FDAT >= p_rpt_dt
-             order by FDAT;
-          end if;
+          if ( cur.AGR_TP = 'INS' )
+          then -- Instolment
+              /* приводим график Instolment к аналогу cc_lim */
+              with tot as ( select h.chain_idt,
+                                   h.idp,
+                                   h.plan_num,
+                                   h.sum_int*100 as sum_int,
+                                   h.sum_fee*100 as sum_fee,
+                                   h.sum_princ*100 as sum_princ,
+                                   sum(h.sum_int*100) over   (partition by h.CHAIN_IDT, h.plan_num) as t_int,
+                                   sum(h.sum_fee*100) over   (partition by h.CHAIN_IDT, h.plan_num) as t_fee,
+                                   sum(h.sum_PRINC*100) over (partition by h.CHAIN_IDT, h.plan_num) as t_PRINC
+                              from ( SELECT sph.chain_idt,
+                                            sph.idp,
+                                            sph.plan_num,
+                                            SUM(decode(sph.code, 'INT', sph.total_amount, 0))       AS sum_int,
+                                            SUM(decode(sph.code, 'FEE', sph.total_amount, 0))       AS sum_fee,
+                                            SUM(decode(sph.code, 'PRINCIPAL', sph.total_amount, 0)) AS sum_PRINC
+                                       FROM bars.OW_INST_SUB_P_HIST sph
+                                      where sph.PLAN_NUM = (select max(PLAN_NUM) as PLAN_NUM from bars.OW_INST_TOTALS_HIST t where t.CHAIN_IDT = sph.chain_idt and INS_BD <= p_rpt_dt )
+                                        and sph.chain_idt = cur.AGR_ID
+                                      GROUP BY chain_idt, idp, plan_num) h
+                             where h.chain_idt = cur.AGR_ID
+                          )
+              select g.ND, g.FDAT, g.LMT_INPT, g.LMT_OTPT, g.SS, g.SN, g.SNO, g.SNP, g.SSP, g.DAY_QTY, g.IR, g.SN1, g.SN2
+                bulk collect
+                into agr.gen_shd
+                from ( select distinct /* первый поток графика от даты выдачи кредита */
+                              tot.CHAIN_IDT   as ND
+                            , th.POSTING_DATE as FDAT
+                            , tot.T_PRINC     as LMT_INPT
+                            , tot.T_PRINC     as LMT_OTPT
+                            , 0               as SS
+                            , 0               as SN
+                            , 0               as SNO
+                            , 0               as SNP
+                            , 0               as SSP
+                            , 0               as DAY_QTY
+                            --, th.SUB_INT_RATE + th.SUB_FEE_RATE as IR
+                            , th.SUB_INT_RATE as IR
+                            , 0               as SN1
+                            , 0               as SN2
+                         from tot
+                         join bars.OW_INST_TOTALS_HIST th on (th.CHAIN_IDT = tot.CHAIN_IDT and th.PLAN_NUM = tot.PLAN_NUM)
+                       union all
+                       select tot.CHAIN_IDT as ND
+                            , ph.EFF_DATE as FDAT
+                            , tot.t_PRINC - sum(tot.SUM_PRINC) over ( partition by tot.CHAIN_IDT order by tot.IDP ) + tot.SUM_PRINC as LMT_INPT
+                            , tot.t_PRINC - sum(tot.SUM_PRINC) over ( partition by tot.CHAIN_IDT order by tot.IDP ) as LMT_OTPT
+                            , tot.SUM_PRINC as SS --сумма гашения по телу
+                            , tot.sum_int + tot.sum_fee as SN --сумма гашения процентов+комиссия
+                            , 0 as SNO
+                            , 0 as SNP
+                            , 0 as SSP
+                            , ph.EFF_DATE-lag(ph.EFF_DATE,1,th.POSTING_DATE) over ( partition by tot.CHAIN_IDT order by ph.EFF_DATE ) as DAY_QTY
+                            --, th.SUB_INT_RATE + th.SUB_FEE_RATE as IR
+                            , th.SUB_INT_RATE as IR
+                            , 0 as SN1
+                            , 0 as SN2
+                         from tot
+                         join bars.OW_INST_PORTIONS_HIST ph on (tot.CHAIN_IDT = ph.CHAIN_IDT and tot.PLAN_NUM = ph.PLAN_NUM and tot.IDP = ph.SEQ_NUMBER)
+                         join bars.OW_INST_TOTALS_HIST   th on (th.CHAIN_IDT = tot.CHAIN_IDT and th.PLAN_NUM = tot.PLAN_NUM)
+                     ) g
+               where g.FDAT >= p_rpt_dt
+                 and g.ND    = cur.AGR_ID
+               order by g.FDAT;
+          else -- cur.AGR_TP = 'INS'
+            if ( p_adj_f = 1 )
+            then -- з архіву ГПК
+              select ND
+                   , FDAT
+                   , LIM2+SUMG as LMT_INPT
+                   , LIM2      as LMT_OTPT
+                   , SUMG      as SS
+                   , SUMO-SUMG as SN
+                   , 0         as SNO
+                   , 0         as SNP
+                   , 0         as SSP
+                   , FDAT-lag(FDAT,1,p_rpt_dt-1) over (order by FDAT) as DAY_QTY
+                   , null, 0, 0
+                bulk collect
+                into agr.gen_shd
+                from CC_LIM_ARC
+               where MDAT  = p_rpt_dt
+                 and ND    = cur.AGR_ID
+                 and FDAT >= p_rpt_dt
+               order by FDAT;
+            else -- з поточного ГПК
+              select ND, FDAT, LIM2+SUMG, LIM2, SUMG, SUMO-SUMG
+                   , 0, 0, 0
+                   , FDAT-lag(FDAT,1,FDAT) over (order by FDAT) as DAY_QTY
+                   , null, 0, 0
+                bulk collect
+                into agr.gen_shd
+                from CC_LIM
+               where ND    = cur.AGR_ID
+                 and FDAT >= p_rpt_dt
+               order by FDAT;
+            end if; --p_adj_f = 1
+          end if; --cur.AGR_TP = 'INS'
 
           agr.sar_dtl := t_sar_type();
 
@@ -3110,6 +3321,37 @@ end nos_del;
                           and ac.NBS like '2___'
                      );
 
+            elsif ( cur.AGR_TP = 'INS' )
+            then --Instolment
+
+              select nvl( abs( sum( case TIP when 'ISS' then BAL else 0 end ) ), 0 ) as BAL_SS  --Кред. інстолмент. #NMS
+                   , nvl( abs( sum( case TIP when 'ISP' then BAL else 0 end ) ), 0 ) as BAL_SP  --Простр.заборг. за кред. інстолмент. #NMK
+                   , nvl( abs( sum( case TIP when 'IKN' then BAL else 0 end ) ), 0 ) as BAL_SN  --Нарах.дох.за кред. інстолмент. #NMS
+                   , nvl( abs( sum( case TIP when 'IPN' then BAL else 0 end ) ), 0 ) as BAL_SPN --Простр.нарах.дох. за кред. інстолмент. #NMK
+                   , 0                      as BAL_SNO
+                   , max(agr.gen_shd(1).IR) as RATE_SS
+                   , max( case TIP when 'ISP ' then ACRN.FPROCN( ACC, 0, p_rpt_dt-1 ) else 0 end ) as RATE_SP
+                into agr.sar_dtl(agr.sar_dtl.last).dbt      -- SS
+                   , agr.sar_dtl(agr.sar_dtl.last).dbt_odue -- SP
+                   , agr.sar_dtl(agr.sar_dtl.last).int      -- SN
+                   , agr.sar_dtl(agr.sar_dtl.last).int_odue -- SPN
+                   , agr.sar_dtl(agr.sar_dtl.last).int_dfr  -- SNO
+                   , agr.sar_dtl(agr.sar_dtl.last).sar_rate -- відсоткова ставка
+                   , agr.sar_dtl(agr.sar_dtl.last).sar_fine
+                from ( select ac.ACC, ac.NBS, ac.TIP, ac.KV
+                            , mb.OST + p_adj_f * ( mb.CrKos  - mb.CrDos  ) as BAL
+                         from bars.W4_ACC_INST   da
+                         join bars.ACCOUNTS ac
+                           on ( ac.ACC = da.ACC )
+                         join bars.AGG_MONBALS mb
+                           on ( mb.ACC = ac.ACC and mb.FDAT = l_snp_dt )
+                        where da.CHAIN_IDT = cur.AGR_ID
+                          and ac.DAOS < p_rpt_dt
+                          and lnnvl( ac.DAZS < p_rpt_dt )
+                          and ac.TIP in ('ISS', 'ISP', 'IKN', 'IPN')
+                          and ac.NBS like '2___'
+                     );
+              
             else -- liabilities
 
               select nvl( abs( sum( case TIP when 'DEP' then BAL else 0 end ) ), 0 ) as BAL_DEP
@@ -3148,7 +3390,7 @@ end nos_del;
 
           end if;
 
-        else -- транш ген.дог.
+        else -- транш ген.дог.  (cur.GEN_ID Is not Null)
 
           if ( agr.gen_id = cur.GEN_ID )
           then
@@ -3205,7 +3447,7 @@ end nos_del;
 
           end if;
 
-        end if;
+        end if; --(cur.GEN_ID Is Null)
 /*
         bars_audit.trace( title||': sar_id='  ||to_char(agr.sar_dtl(agr.sar_dtl.last).sar_id)
                                ||', dbt='     ||to_char(agr.sar_dtl(agr.sar_dtl.last).dbt)
@@ -3417,7 +3659,7 @@ end nos_del;
                   -- залишок в валюті траншу
                   agr.sar_dtl(a).dbt := agr.sar_dtl(a).dbt - r_shd.SS;
 
-                else
+                else --agr.gen_shd(r).SS > 0
 
                   r_shd.SS := 0;
 
@@ -3496,7 +3738,7 @@ end nos_del;
 
             agr.sar_dtl.delete();
 
-          else -- без графіка (відстутній або повністю прострочений КД)
+          else -- (agr.gen_shd.count > 0) без графіка (відстутній або повністю прострочений КД)
 
             << PRC_SAR >>
             for a in 1 .. agr.sar_dtl.count
@@ -3559,6 +3801,7 @@ end nos_del;
     l_adj_f            number(1);
     l_ast_cur          prvn_flow.c_cur_type;
     l_lby_cur          prvn_flow.c_cur_type;
+    l_bpi_cur          prvn_flow.c_cur_type;
   begin
 
     bars_audit.info( title||': Entry with ( p_rpt_dt='||to_char(p_rpt_dt,'dd/mm/yyyy')
@@ -3608,8 +3851,8 @@ end nos_del;
 
     insert
       into PRVN_FLOW_DETAILS
-         ( MDAT,     ND, FDAT, LIM1,     LIM2,     SS, SN, SNO, SPN, SP,  IR, SN1, SN2 ) -- , DAT1, DAT2 )
-    select l_rpt_dt, ND, FDAT, LMT_INPT, LMT_OTPT, SS, SN, SNO, SNP, SSP, IR, SN1, SN2
+         ( MDAT,     ND, FDAT, LIM1,     LIM2,     SS, SN, SNO, SPN, SP,  IR, SN1, SN2, OBJECT_TYPE ) -- , DAT1, DAT2 )
+    select l_rpt_dt, ND, FDAT, LMT_INPT, LMT_OTPT, SS, SN, SNO, SNP, SSP, IR, SN1, SN2, g_CCK
       from table( PRVN_FLOW.GET_ADJ_SHD( l_ast_cur, l_rpt_dt, l_adj_f ) );
 
     bars_audit.trace( '%s: %s rows inserted.', title, to_char(sql%rowcount) );
@@ -3638,11 +3881,33 @@ end nos_del;
 
     insert
       into PRVN_FLOW_DETAILS
-         ( MDAT,     ND, FDAT, LIM1,     LIM2,     SS, SN, SNO, SPN, SP,  IR, SN1, SN2 ) -- , DAT1, DAT2 )
-    select l_rpt_dt, ND, FDAT, LMT_INPT, LMT_OTPT, SS, SN, SNO, SNP, SSP, IR, SN1, SN2
+         ( MDAT,     ND, FDAT, LIM1,     LIM2,     SS, SN, SNO, SPN, SP,  IR, SN1, SN2, OBJECT_TYPE ) -- , DAT1, DAT2 )
+    select l_rpt_dt, ND, FDAT, LMT_INPT, LMT_OTPT, SS, SN, SNO, SNP, SSP, IR, SN1, SN2, g_CCK
       from table( PRVN_FLOW.GET_ADJ_SHD( l_lby_cur, l_rpt_dt, l_adj_f ) );
 
     bars_audit.trace( '%s: %s rows inserted.', title, to_char(sql%rowcount) );
+
+    --> Instolment
+    open l_bpi_cur
+     for select 980          as CCY_ID
+              , t.CHAIN_IDT  as AGR_ID
+              , t.END_DATE_P as END_DT
+              , null    as GEN_ID  -- график свой на каждом договоре Instolment -> GEN_ID = null   --, t.ND as GEN_ID
+              , 1 as AGR_QTY
+              , 1 as AGR_NUM
+              , 'INS' as AGR_TP
+          from bars.OW_INST_TOTALS t
+         where lnnvl(END_DATE_F < l_rpt_dt)
+         order by t.nd, t.idn;
+
+    insert
+      into PRVN_FLOW_DETAILS
+         ( MDAT,     ND, FDAT, LIM1,     LIM2,     SS, SN, SNO, SPN, SP,  IR, SN1, SN2, OBJECT_TYPE ) -- , DAT1, DAT2 )
+    select l_rpt_dt, ND, FDAT, LMT_INPT, LMT_OTPT, SS, SN, SNO, SNP, SSP, IR, SN1, SN2, g_BPK_INST
+      from table( PRVN_FLOW.GET_ADJ_SHD( l_bpi_cur, l_rpt_dt, l_adj_f ) );
+
+    bars_audit.trace( '%s: %s rows inserted.', title, to_char(sql%rowcount) );
+    --< Instolment
 
     bars_audit.trace( '%s: Exit.', title );
 

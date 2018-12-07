@@ -48,7 +48,25 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
-
+PROMPT *** Add  columns for Instolment ***
+begin 
+execute immediate'
+alter table w4_nbs_ob22 add (
+  OB_2203I     CHAR(2 BYTE),
+  OB_2203OVDI  CHAR(2 BYTE),
+  OB_2208I     CHAR(2 BYTE),
+  OB_2208OVDI  CHAR(2 BYTE),
+  OB_3570I     CHAR(2 BYTE),  
+  OB_3570OVDI  CHAR(2 BYTE),
+  OB_9129I     CHAR(2 BYTE))';
+exception
+ when others 
+ then 
+ if sqlcode = -1430 then null; 
+ else raise;
+ end if;
+end;
+/
 
 
 
@@ -73,7 +91,13 @@ COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2627X IS '';
 COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2625D IS '';
 COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2628 IS '';
 COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_6110 IS '';
-
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2203I IS 'Короткострокові кредити на поточні потреби, що надані фізичним особам(Інстолмент)';
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2203OVDI IS 'Прострочена заборгованість за кредитами на поточні потреби, що надані фізичним особам(Інстолмент)';
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2208I IS 'Нараховані доходи за кредитами на поточні потреби, що надані фізичним особам(Інстолмент)';
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_2208OVDI IS 'Прострочені нараховані доходи за кредитами на поточні потреби, що надані фізичним особам(Інстолмент)';
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_3570OVDI IS 'Прострочені інші нараховані доходи(Інстолмент)';
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_3570I IS 'Інші нараховані доходи(Інстолмент)';
+COMMENT ON COLUMN BARS.W4_NBS_OB22.OB_9129I IS 'Iнші зобов''язання з кредитування, що надані кліїнтам(Інстолмент)';
 
 
 
