@@ -130,11 +130,11 @@ namespace BarsWeb.Areas.Clients.Controllers.Api.V1
 
             if (customerType == CustomerType.PersonSpd)
             {
-                customers = customers.Where(i => i.Sed == "91" && (i.VED != "00000" || i.VED == null) && (i.ISE == "14200" || i.ISE == "14100" || i.ISE == "14201" || i.ISE == "14101")).ToList();
+                customers = customers.Where(i => i.Sed.Trim() == "91" && (i.VED != "00000" || i.VED == null) && (i.ISE == "14200" || i.ISE == "14100" || i.ISE == "14201" || i.ISE == "14101")).ToList();
             }
             else if (customerType == CustomerType.Person)
             {
-                customers = customers.Where(i => (i.Sed == "00" || i.Sed == null) && i.ISE != "14200" && i.ISE != "14100" && i.ISE != "14201" && i.ISE != "14101").ToList();
+                customers = customers.Where(i => (i.Sed.Trim() =="00" || i.Sed == null) && i.ISE != "14200" && i.ISE != "14100" && i.ISE != "14201" && i.ISE != "14101").ToList();
             }
             else if (customerType == CustomerType.Corp)
             {

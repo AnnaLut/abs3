@@ -46,7 +46,7 @@ namespace BarsWeb.Areas.Clients.Infrastructure.Repository
             {
                 return new BarsSql
                 {
-                    SqlText = string.Format(@"{0} where a.CUSTTYPE = :P_CUSTTYPE and A.SED = '00' and A.ISE not in ('14200','14100','14201','14101') {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null"),
+                    SqlText = string.Format(@"{0} where a.CUSTTYPE = :P_CUSTTYPE and decode(a.sed, null, '00', trim(a.sed)) = '00' and A.ISE not in ('14200','14100','14201','14101') {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null"),
                     SqlParams = new object[]
                     {
                     new OracleParameter("P_CUSTTYPE", OracleDbType.Int32) {Value = (int)type}
@@ -57,7 +57,7 @@ namespace BarsWeb.Areas.Clients.Infrastructure.Repository
             {
                 return new BarsSql
                 {
-                    SqlText = string.Format(@"{0} where A.SED = '91' and A.ISE in ('14200', '14100', '14201', '14101') and nvl(a.ved , '00000') != '00000' {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null")
+                    SqlText = string.Format(@"{0} where decode(a.sed, null, '00', trim(a.sed)) = '91' and A.ISE in ('14200', '14100', '14201', '14101') and nvl(a.ved , '00000') != '00000' {1}", SelectCustomer, showClosed ? "" : "and a.DATE_OFF is null")
                 };
             }
 
