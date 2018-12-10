@@ -80,7 +80,7 @@ create or replace package nbu_601_request_data_ru is
     procedure  p_nbu_pledge_dep  (kf_ in varchar2);
 end;
 /
-create or replace package body nbu_601_request_data_ru is
+CREATE OR REPLACE package body BARS.nbu_601_request_data_ru is
 
     g_balance_accounts string_list := string_list('2010', '2018', '2020', '2027', '2028', '2029', '2030', '2037', '2038', '2039', '2060', '2062',
                                                   '2063', '2067', '2068', '2069', '2071', '2077', '2078', '2079', '2082', '2083', '2087', '2088',
@@ -1580,7 +1580,7 @@ for over in (select distinct over_deal.rnk,
                                             end endday,
                                      sumzagal.lim as sumzagal,
                                       currency.kv as r030,
-                                      ltrim((proc.proccredit)) as proccredit,
+                                      nvl(proc1.proccredit,ltrim(proc.proccredit))   as proccredit,
                                       sum_lim.sumpay as sumpay,
                                       6 as periodbase,
                                       5 as periodproc,
@@ -1610,7 +1610,7 @@ for over in (select distinct over_deal.rnk,
                                          nd_acc n,
                                          accounts a2
                                   where ag.fdat = add_months(trunc(sysdate,'mm'),-1) 
-                                        and a2.tip in ('OVN') 
+                                        and a2.tip in ('OVN','SN') 
                                         and n.acc = a2.acc 
                                         and n.acc = ag.acc)
                             group by nd) sumarrears on sumarrears.nd=over_deal.nd 
@@ -1662,6 +1662,16 @@ for over in (select distinct over_deal.rnk,
                            where  t.id = 0 and t4.acc = t2.acc and t.acc=t4.acc and bdat< trunc(sysdate,'mm') 
                              and t2.nls like '8998%'    
                            group by t4.nd,t.acc) proc on proc.nd = over_deal.nd
+                           
+                     left join (select t4.nd,t.acc, max(t.ir) keep(dense_rank last order by bdat) as proccredit
+                           from int_ratn t,
+                                accounts t2,
+                                nd_acc t4
+                           where  t.id = 0 and t4.acc = t2.acc and t.acc=t4.acc and bdat< trunc(sysdate,'mm') 
+                             and t2.nls like '2600%'    
+                           group by t4.nd,t.acc) proc1 on proc1.nd = over_deal.nd
+                    ----------------------------             
+                           
 
                      left join (select nd, case
                                        when txt='Taê' then 'true'
