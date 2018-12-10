@@ -5852,7 +5852,7 @@ begin
         begin
                     select acc  into l_acc from w4_acc_inst w where w.acc_pk = p_pk_acc and w.chain_idt = p_inst_chain and w.trans_mask = l_trmask.a_w4_acc;
         exception when no_data_found then
-           bars_error.raise_nerror(g_modcode, 'W4ACC_NOT_FOUND', p_pk_acc);
+           l_acc:=null;
       end;
             end if;
       -- открываем счет
