@@ -85,7 +85,7 @@ namespace BarsWeb.Areas.Clients.Infrastructure.Repository
                 customers = customers.Where(i => i.TypeId == typeId);
                 if (type == CustomerType.PersonSpd)
                 {
-                    customers = customers.Where(i => i.Sed == "91");
+                    customers = customers.Where(i => i.Sed.Trim() == "91" && (i.VED != "00000" || i.VED == null) && (i.ISE == "14200" || i.ISE == "14100" || i.ISE == "14201" || i.ISE == "14101"));
                 }
             }
 
