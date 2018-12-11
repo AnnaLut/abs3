@@ -347,7 +347,7 @@ create or replace package body ow_transform_acc is
                                     i.acc is null
                                     and a.nbs is null
                                     and a.daos = a.dazs
-                                    and a.ob22 in ('29', '30')
+                                    and a.ob22 in ('29', '30', '26', '33')
                                  )
                             )
                   order by a.nbs
@@ -1438,7 +1438,7 @@ create or replace package body ow_transform_acc is
                                     i.acc is null
                                     and a.nbs is null
                                     and a.daos = a.dazs
-                                    and a.ob22 in ('29', '30')
+                                    and a.ob22 in ('29', '30', '26', '33')
                                  )
                             )
              )

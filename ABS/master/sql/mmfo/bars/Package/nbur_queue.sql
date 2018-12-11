@@ -135,6 +135,9 @@ is
   g_body_version  constant varchar2(64)  := 'version 7.5  2018.09.20';
   g_body_defs     constant varchar2(512) := '';
 
+  -- COBUMMFO-7501
+  gc_block_date   constant date := to_date('15122017', 'ddmmyyyy');
+  
   MODULE_PREFIX   constant varchar2(10)  := 'NBUR';
 
   --
