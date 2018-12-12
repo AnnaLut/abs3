@@ -13,7 +13,7 @@
       <datasource>
         <sql>
           select id, name, nvl(okpo,grp_code) okpo, product_code, product_name, grp_code
-          from v_bpk_proect
+          from v_bpk_proect_only
           order by id
         </sql>
       </datasource>
