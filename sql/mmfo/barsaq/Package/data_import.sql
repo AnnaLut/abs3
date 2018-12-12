@@ -300,7 +300,7 @@ CREATE OR REPLACE PACKAGE BARSAQ.data_import is
   -- sync_doc_export - синхронизирует документы
   --
   procedure sync_doc_export(p_startdate in date default trunc(sysdate-1));
-  
+
   ----
   -- sync_doc_export - синхронизирует документы
   --
@@ -2086,7 +2086,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_cnt       integer;
   begin
     -- точка отката
-   -- savepoint sp;
+    --savepoint sp;
     --
     --l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
     --
@@ -2224,7 +2224,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
                        ||' починаючи з дати '||to_char(l_startdate,'DD.MM.YYYY'));
   exception when others then
     --
-    -- rollback to sp;
+   -- rollback to sp;
     --
     raise_application_error(-20000, get_error_msg());
     --
@@ -2711,7 +2711,7 @@ CREATE OR REPLACE PACKAGE BODY BARSAQ.DATA_IMPORT is
     l_ref92_bank_name acc_transactions.ref92_bank_name%type;
   begin
     -- точка отката
-  --    savepoint sp;
+    --savepoint sp;
     --
    -- l_scn := nvl(p_scn, dbms_flashback.get_system_change_number());
     --
@@ -4836,12 +4836,12 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     l_doc.ext_ref   := to_char(l_docid);
     -- и другие общие параметры
     begin
-        begin  
+        begin
            select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
             where kf=l_doc.mfo_a and nls=l_doc.nls_a and kv=l_doc.kv;
          exception when no_data_found then
            select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ acc, isp into l_acc, l_doc.userid from v_kf_accounts
-            where kf=l_doc.mfo_a and nlsalt =l_doc.nls_a and kv=l_doc.kv;
+            where kf=l_doc.mfo_a and nlsalt =l_doc.nls_a and tip like 'W4%' and kv=l_doc.kv;
         end;
         if l_doc.userid is null then
             raise_application_error(-20000, 'Караул! Рахунок без виконавця: kf='||l_doc.mfo_a||', nls='||l_doc.nls_a||', kv='||l_doc.kv, true);
@@ -4890,10 +4890,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
         -- перевірка рахунка отримувача
         begin
-          begin 
+          begin
             select /*+ INDEX UK_ACCOUNTS_KF_NLS_KV*/ case when a.dazs is not null then 1 else 0 end into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nls = l_doc.nls_b and kv=l_doc.kv;
            exception when no_data_found then
-            select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ case when a.dazs is not null then 1 else 0 end into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and kv=l_doc.kv;
+            select /*+ INDEX IDX_ACCOUNTS_NLSALT_KV*/ case when a.dazs is not null then 1 else 0 end into l_is_nls_closed from v_kf_accounts a where kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and a.tip like 'W4%' and kv=l_doc.kv;
           end;
 
           if l_is_nls_closed = 1 then
@@ -4930,7 +4930,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         select count(*)
           into l_cnt
           from bars.accounts a
-         where (a.nls = l_doc.nls_a or 
+         where (a.nls = l_doc.nls_a or
                 a.nlsalt = l_doc.nls_a)
            and ((a.nbs = 2600 and a.ob22 = 14)
              or (a.nbs = 2650 and a.ob22 = 12)
@@ -4956,13 +4956,13 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_idb      bars.customer.okpo%type;
             l_idb_bank bars.customer.okpo%type;
         begin
-          begin 
+          begin
               select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
                   where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nls=l_doc.nls_b  and a.kv=l_doc.kv;
-           exception when no_data_found then    
+           exception when no_data_found then
              select trim(c.okpo), (select trim(val) from bars.params$base where par='OKPO' and kf=l_doc.mfo_b) into l_idb, l_idb_bank from bars.customer c, v_kf_accounts a
-                  where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b  and a.kv=l_doc.kv;
-          end;    
+                  where c.rnk=a.rnk and a.kf=l_doc.mfo_b and a.nlsalt = l_doc.nls_b and a.tip like 'W4%' and a.kv=l_doc.kv;
+          end;
             if l_idb<>l_doc.id_b and l_idb_bank<>l_doc.id_b then
                 raise_application_error(-20000,
                     'Ідентифікаційний код отримувача задано невірно, правильний код = '''||l_idb||''' або '''||l_idb_bank||'''', true);
@@ -4972,7 +4972,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 ||l_doc.mfo_b||', Рахунок='||l_doc.nls_b||', Валюта='||l_doc.kv, true);
         end;
 
-		    begin 
+		    begin
             select *
               into l_acc_a_rec
               from bars.accounts
@@ -4983,9 +4983,10 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
               into l_acc_a_rec
               from bars.accounts
              where nlsalt = l_doc.nls_a
+               and tip like 'W4%'
                and kv = l_doc.kv;
         end;
-        begin 
+        begin
             select *
               into l_acc_b_rec
               from bars.accounts
@@ -4996,6 +4997,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
               into l_acc_b_rec
               from bars.accounts
              where nlsalt = l_doc.nls_b
+               and tip like 'W4%'
                and kv = nvl(l_doc.kv2, l_doc.kv);
         end;
         --
@@ -5041,7 +5043,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
         -- проверка наличия обязательных только для данной операции атрибутов
         check_mandatory_attr(l_body, 'PAYEE_BANK_CODE');
 
-        begin 
+        begin
             select *
               into l_acc_a_rec
               from bars.accounts a
@@ -5053,6 +5055,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
               into l_acc_a_rec
               from bars.accounts a
              where a.nlsalt = l_doc.nls_a
+               and a.tip like 'W4%'
                and a.kv = l_doc.kv
                and a.dazs is null;
         end;
@@ -5067,7 +5070,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
             l_doc.tt := 'IB2'; -- Internet-Banking: СЕП
             --
         end if;
-        
+
         if l_acc_a_rec.nbs = '2602' and l_acc_a_rec.ob22 = '09' then
           if substr(l_doc.nazn, 1, 8) = '#REFUND#' then
             l_doc.tt := 'IBE';
@@ -5364,16 +5367,16 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
 
     -- обрабатываем ид.код получателя 10 нулей - строна A
     if l_doc.id_a = l_blank_id_code /* or l_doc.id_a = l_blank_id_code9*/ then
-        begin     
+        begin
             begin
                 select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
                  where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nls=l_doc.nls_a and a.kv=l_doc.kv;
-         
+
              exception when no_data_found then
                 select ser, numdoc into l_blank_ser, l_blank_num from bars.person p, bars.customer c, v_kf_accounts a
-                 where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nlsalt=l_doc.nls_a and a.kv=l_doc.kv;
+                 where c.rnk=a.rnk and p.rnk=c.rnk and a.kf=l_doc.mfo_a and a.nlsalt=l_doc.nls_a and a.tip like 'W4%' and a.kv=l_doc.kv;
             end;
-               
+
          exception when no_data_found then
             raise_application_error(-20000, 'Для власника рахунку '||l_doc.nls_a||'('||l_doc.kv||') не знайдено паспортних данних', true);
         end;
@@ -6590,8 +6593,8 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
     write_sync_status(TAB_DOC_EXPORT, JOB_STATUS_FAILED, null, SQLCODE, get_error_msg());
     --
   end sync_doc_export;
-  
-  
+
+
   ----
   -- sync_doc_export - синхронизирует документы
   --
@@ -6652,7 +6655,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                            and o.status != e.status_id
                            and i.ref is not null -- только документы АБС
                            and e.doc_id=to_number(i.ext_ref) and i.ref=o.ref
-                         ) 
+                         )
                  )
         loop
             -- блокируем строку в doc_export
@@ -6671,7 +6674,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                 p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                 p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
             );
-            
+
             commit;
         end loop;
         -- идем по заявкам на покупку/продажу валюты
@@ -6726,7 +6729,7 @@ dbms_application_info.set_action(cur_d.rn||'/'||cur_d.cnt||' Chld');
                     p_bank_back_date          => case when c.status<0 then l_change_time else null end,
                     p_bank_back_reason        => case when c.status<0 then l_back_reason else null end
                 );
-           
+
         end loop;
         -- фиксируем изменения
         commit;
