@@ -11,9 +11,9 @@ is
 % DESCRIPTION : Процедура формирования 07X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.003  12/11/2018   (14/09/2018) 
+% VERSION     :  v.1.004  12/12/2018 (12/11/2018) 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.003  12/11/2018';
+  ver_              char(30)  := 'v.1.004  12/12/2018';
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
   c_old_file_code   constant varchar2(3 char) := '#07';
@@ -219,8 +219,6 @@ BEGIN
                     p.t020 = t.t020 and
                     p.r020 = t.nbs  and
                     p.ekp like '%1')      
-                where t.nbs not like '%9' or
-                      t.r020 like '%9' and tip = 'SNA'           
              );
              
   logger.info(c_title || ' end for date = '||to_char(p_report_date, 'dd.mm.yyyy'));
