@@ -609,7 +609,7 @@ namespace CustomerList
                 SetParameters("rnk", DB_TYPE.Decimal, rnk, DIRECTION.Input);
 
                 //Изправления отображения 1й колонки названия параметра для пользователей и счетов
-                string s_fields = "upper(t.tabname) TABNAME,h.valold OLD, h.valnew NEW, TO_CHAR(h.dat,'DD/MM/YYYY HH24:mm:ss') DAT, h.isp USR, s.fio FIO";
+                string s_fields = "upper(t.tabname) TABNAME,h.valold OLD, h.valnew NEW, TO_CHAR(h.dat,'DD/MM/YYYY HH24:mi:ss') DAT, h.isp USR, s.fio FIO";
                 string colmn_cust = "h.parname PAR, ";
                 //string colmn_acc = "c.semantic PAR, "; //old parameter
 
