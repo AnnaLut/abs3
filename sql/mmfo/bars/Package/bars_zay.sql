@@ -5628,6 +5628,7 @@ begin
     soap_rpc.add_parameter(l_request, 'sos', to_char(0));
     soap_rpc.add_parameter(l_request,'viza', to_char(1));
     soap_rpc.add_parameter(l_request, 'id_back', to_char(p_idback));
+    soap_rpc.add_parameter(l_request, 'mfo', to_char(l_mfo));--COBUMMFO-9974
     if p_comm is not null then
        soap_rpc.add_parameter(l_request, 'reason_comm', to_char(p_comm));
     end if;
