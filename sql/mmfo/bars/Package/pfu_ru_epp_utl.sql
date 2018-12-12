@@ -1506,7 +1506,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
                       join pfu_epp_line_processing p
                         on value(t) = p.id
                       join accounts a
-                        on p.nls = a.nls
+                        on (p.nls = a.nls or p.nls = a.nlsalt)
                       join w4_acc ac on ac.acc_pk = a.acc
                       left join cm_client_que c --v_cm_client c
                         on c.acc = a.acc and c.oper_type in (1, 5, 9) and
