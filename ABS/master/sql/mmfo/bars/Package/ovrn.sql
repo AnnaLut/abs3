@@ -2826,7 +2826,7 @@ BEGIN
        where o.nlsB in (select nls from tt)  and o.id_B = OKPO_2600 AND O.DK = 1
          and o.id_A not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_B)
          and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_B and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) -- эти БС в 2017 избыточны
-         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1  
          and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
 
 --STA   05.09.2017 --дЕБЕТОВІЕ ДОК
@@ -2837,7 +2837,7 @@ BEGIN
        where o.nlsA in (select nls from tt)  and o.id_A = OKPO_2600 AND O.DK = 0
          and o.id_B not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_A)
          and o.NLSB not in (select a.nls from accounts a where a.rnk=o.id_A and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) -- эти БС в 2017 избыточны
-         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1 
          and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
 END;
 
@@ -3091,11 +3091,12 @@ BEGIN
             If oo.NLSA is not Null then
                oo.REF  := null     ;
                oo.vdat := gl.bdate ;
-               oo.dk   := 1 -oo.DK ;
+               oo.dk   := oo.DK ;
                oo.S    := -A36.OSTF;
                oo.S2   := oo.S     ;
                oo.Nazn := Substr( 'Остаточна амортизацiя поч.комiсiї по Дог.№ '|| dd.cc_id ||' вiд ' || to_date( dd.sdate, 'dd.mm.yyyy') || ' в зв`язку з достроковим закриттям угоди' , 1, 160) ;
                OVRN.OPL1 (oo)      ; -- опрлата
+               Gl.pay (2, oo.ref, gl.Bdate);
             end if;
          end loop;  -- a36
      end ;
@@ -3134,12 +3135,17 @@ BEGIN
   -- ставим обметку о закрытии дог. Переходит в портфель закрытых .    Добавлю опцию «просмотра закрытых»
   for k in (select * from accounts   where acc in (select acc from nd_acc where nd = dd.nd)  and dazs is null      )
   loop
-     If    k.nbs in ('2600','2650','2602','2603','2604')     then  update accounts set lim = 0, accc = null where acc = k.ACC;  -- эти БС в 2017 не меняются
+     If    k.nbs in ('2600','2650','2602','2603','2604')     then  
+       
+     update accounts set lim = 0, accc = null where acc = k.ACC;  -- эти БС в 2017 не меняются
                                                                    update accounts set ostc = ostc - k.ostc where acc = k.accc;
-
+          
      ----чистка тормозной зоны по счету, который используется повторно уже с другим договором
      delete from OVR_TERM_TRZ where acc = k.ACC;
-
+     ----обнуляем лимиты
+     delete from OVR_LIM     where acc = k.ACC;
+     delete from OVR_LIM_DOG where acc = k.ACC;
+                                                                   
      elsIf k.nbs in ('2608','2658')                          then  null;                                                        -- эти БС в 2017 не меняются
      elsIf k.tip in ('OVN')                                  then  update accounts set dazs = l_bDat_Next where acc = k.ACC;
      elsIf k.tip in ('SN ') and k.ostc =0                    then  update accounts set dazs = l_bDat_Next where acc = k.ACC;
