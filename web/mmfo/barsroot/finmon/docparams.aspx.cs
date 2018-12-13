@@ -239,33 +239,33 @@ public partial class finmon_docparams : Bars.BarsPage
         try
         {
             ClearParameters();
-            SetParameters("p_rnk", DB_TYPE.Varchar2, p_rnk, DIRECTION.Input);
+            SetParameters("p_rnk", DB_TYPE.Decimal, string.IsNullOrEmpty(p_rnk) ? null : p_rnk, DIRECTION.Input);
             SetParameters("p_nls", DB_TYPE.Varchar2, p_nls, DIRECTION.Input);
             SetParameters("p_kv", DB_TYPE.Decimal, Convert.ToDecimal(p_kv), DIRECTION.Input);
             SetParameters("p_mfo", DB_TYPE.Varchar2, p_mfo, DIRECTION.Input);
-            SetParameters("p_okpo", DB_TYPE.Varchar2, p_okpo, DIRECTION.Input);
             SetParameters("p_nlsalt", DB_TYPE.Varchar2, p_nls, DIRECTION.Input);
             SetParameters("p_kvalt", DB_TYPE.Decimal, Convert.ToDecimal(p_kv), DIRECTION.Input);
             SetParameters("p_mfoalt", DB_TYPE.Varchar2, p_mfo, DIRECTION.Input);
+            SetParameters("p_okpo", DB_TYPE.Varchar2, p_okpo, DIRECTION.Input);
 
             resClient = SQL_SELECT_reader(@"select to_char(c.rnk), c.nmk, c.okpo from customer c
-                                                    where c.rnk = coalesce(to_number(:p_rnk), -- если уже заполнен
-                                                                          (select a.rnk
-                                                                           from accounts a 
-                                                                           where a.nls = :p_nls 
-                                                                           and a.kv = :p_kv 
-                                                                           and a.kf = :p_mfo), -- ищем по счету
-                                                                          (select a.rnk
-                                                                           from accounts a 
-                                                                           where a.nlsalt = :p_nlsalt
-                                                                           and a.kv = :p_kvalt
-                                                                           and a.kf = :p_mfoalt), -- пошук по альтернативному рахунку
-                                                                          (select max(co.rnk) -- ищем по окпо в документе - если такой клиент один
-                                                                           from customer co
-                                                                           where co.okpo = :p_okpo
-                                                                           group by co.okpo
-                                                                           having count(*)=1
-                                                                          ))");
+                                                    where c.rnk = coalesce(:p_rnk, -- если уже заполнен
+                                                                           (select a.rnk
+                                                                            from accounts a 
+                                                                            where a.nls = :p_nls 
+                                                                            and a.kv = :p_kv 
+                                                                            and a.kf = :p_mfo), -- ищем по счету
+                                                                           (select a.rnk
+                                                                            from accounts a 
+                                                                            where a.nlsalt = :p_nlsalt
+                                                                            and a.kv = :p_kvalt
+                                                                            and a.kf = :p_mfoalt), -- пошук по альтернативному рахунку
+                                                                           (select max(co.rnk) -- ищем по окпо в документе - если такой клиент один
+                                                                            from customer co
+                                                                            where co.okpo = :p_okpo
+                                                                            group by co.okpo
+                                                                            having count(*)=1)
+                                                                           )");
         }
         catch (Exception e)
         {
