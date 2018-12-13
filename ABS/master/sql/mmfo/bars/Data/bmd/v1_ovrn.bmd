@@ -138,16 +138,17 @@ begin
   bars_metabase.add_column(l_tabid, 12, 'SOS', 'N', 'Стан~дог~-------~ПОДІЇ', '.3', null, 34, 0, 0, 0, 1, '', '', 1, 0, '', 1, 0, 0, 'sPar=CC_SOB[NSIFUNCTION][ACCESSCODE=>4][PROC=>PUL.Set_Mas_Ini(''ND'',:ND, ''X'' )][CONDITIONS=> nd=:ND][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditFFiltered("CC_SOB", 0, "nd = "|| Str( :ND)  ) ', 0);
   bars_metabase.add_column(l_tabid, 13, 'WDATE', 'D', 'Дата~завешення', '1.3', null, 19, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 14, 'KV', 'N', 'Вал', '', null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 15, 'NLS8', 'C', 'Рахунок~косолідації~-------------~УЧАСНИКИ', '1.5', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V2_OVRN[NSIFUNCTION][CONDITIONS=>ND=:ND][ACCESSCODE=>5][PROC=>OVRN.PUL_OVR(1,:ND,:ACC)][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditFFiltered("V2_OVRN[PROC=>OVRN.PUL_OVR( 1, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]", 5 ,"nd="||Str(:ND)  )', 0);
+  bars_metabase.add_column(l_tabid, 15, 'NLS8', 'C', 'Рахунок~косолідації~-------------~УЧАСНИКИ', '1.5', null, 11, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 0, 'sPar=V2_OVRN[NSIFUNCTION][CONDITIONS=>V2_OVRN.ND=:ND][ACCESSCODE=>5][PROC=>OVRN.PUL_OVR(1,:ND,:ACC)][EXEC=>BEFORE][showDialogWindow=>false]', 'FunNSIEditFFiltered("V2_OVRN[PROC=>OVRN.PUL_OVR( 1, "||Str(:ND)||","||Str(:ACC)||")][EXEC=>BEFORE]", 5 ,"nd="||Str(:ND)  )', 0);
   bars_metabase.add_column(l_tabid, 16, 'NLS', 'C', 'Гол.Рах.~відповідач', '1.5', null, 1, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', 'Sel027 ( hWndMDI, 2, :ND, Str( :RNK ),Str( :ACC )  ) ', 0);
   bars_metabase.add_column(l_tabid, 17, 'DAY', 'N', '%%~День~плат.', '.3', null, 28, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 18, 'AVT', 'B', 'Автори~зован', '', null, 99, 0, 0, 0, 0, '', '', 1, 0, '', 1, 1, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 19, 'PD', 'N', 'Ліміт~ від ЧКО~(%)', '.5', null, 29, 0, 0, 0, 0, '', '#0.00', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 20, 'ISP ', 'N', 'Відпов~вик', '.8', null, 40, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 21, 'METR', 'B', 'Плав~%ст', '.5', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 22, 'IDR', 'N', '№ шк. ~Плав~%ст', '.5', null, 24, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 21, 'METR', 'B', '+Дифер.~% ст', '.5', null, 23, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 22, 'IDR', 'N', '№ шк. ~Плав~%ст', '.5', null, 25, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'DT_SOS', 'C', 'Зміна~Стану', '1', null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'KF', 'C', 'Код~МФО', '1.5', null, 40, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 25, 'MMETR', 'B', '+Макс. ставка при Дифер.~% ст', '.5', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
@@ -198,7 +199,7 @@ begin
   bars_metabase.add_sortorder(l_tabid, 7, 1, 'ASC ');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'OVRN.ADD_master (:ND, :ACC, :CC_ID, :SDATE, :WDATE, :LIMIT, :IR0, :IR1 , :NLS, :KV, :DAY, :PD, :ISP,:METR, :IDR ) ');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'OVRN.ADD_master (:ND, :ACC, :CC_ID, :SDATE, :WDATE, :LIMIT, :IR0, :IR1 , :NLS, :KV, :DAY, :PD, :ISP, :METR, :IDR, NULL, :MMETR )');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -240,7 +241,7 @@ begin
   bars_metabase.add_nsifunction(l_tabid, 20, '2.0) Нарахування дох та витрат (%%, комісія) за ПОТОЧНИЙ період', 'OVRN.INTX(1, DATETIME_Null, :D,0,0)', ':D(SEM=Вкл_ПО_дату,TYPE=D) ', 'ONCE', '', 'Виконано !', 'FunNSIEditF("OVR_INTX[NSIFUNCTION][PROC=>OVRN.INTX(0,:D,0,0)][PAR=>:D(SEM=Вкл_по_дату,TYPE=D)][EXEC=>BEFORE]",2) ', '', '', null);
 
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 21, '2.1)Детальний по дням Протокол  нарахування за ПОТОЧНИЙ період', '', '', '', '', '', '', '', 'sPar=OVR_INTX[ACCESSCODE=>1][CONDITIONS=>(OVR_INTX.MOD1=1)]', null);
+  bars_metabase.add_nsifunction(l_tabid, 21, '2.1)Детальний по дням Протокол  нарахування за ПОТОЧНИЙ період', '', '', '', '', '', '', '', 'sPar=OVR_INTX[ACCESSCODE=>1][CONDITIONS=>(OVR_INTX.MOD1=1 and OVR_INTX.state = 0)]', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 22, '2.2)Підсумковий за період Протокол нарахування  + Проводки', '', '', '', '', '', '', '', 'sPar=VX_OVRN[NSIFUNCTION][ACCESSCODE=>1][DESCR=>2.2)Підсумковий за період Протокол нарахування  + Проводки]', null);
@@ -256,6 +257,9 @@ begin
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 34, '4.*) Нарах. дох та витрат з ПРОВОДКАМИ по 1 дог.за поточний період', 'OVRN.INTX(1, DATETIME_Null, :D, :ACC, 0) ; OVRN.INTB(1)', ':D(SEM=Вкл_ПО_дату,TYPE=D) ', 'EACH', 'Увага ! Ця дія  НЕзворотня ! Виконати ?', 'Виконано !', '', '', '', null);
+
+  -- добавляем описание функции на справочник
+  bars_metabase.add_nsifunction(l_tabid, 35, '5) Нарахування Відсотків,  Комісії, Пені', '', '', 'ONCE', '', '', '', '', 'sPar=V_INTEREST_CCK[NSIFUNCTION][ACCESSCODE=>2][PROC=>p_interest_cck1(18,:E)][PAR=>:E(SEM=Дата по,TYPE=D)][EXEC=>BEFORE][showDialogWindow=>false]', null);
 
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 90, '1.БЭК-супровід. Старт дня. 1 Дог.', 'OVRN.background  ( 1, 0, :ND,  DATETIME_Null ) ', '', 'EACH', '', 'Виконано !', '', '', '', null);

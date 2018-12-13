@@ -1,14 +1,5 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/View/V_INTEREST_CCK.sql =========*** Run ***
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  view V_INTEREST_CCK ***
-
-  CREATE OR REPLACE FORCE VIEW BARS.V_INTEREST_CCK ("DEAL_ID", "ACCOUNT_ID", "INTEREST_KIND", "DEAL_NUMBER", "CURRENCY_ID", "MFO", "PARTNER_NAME", "ACCOUNT_NUMBER", "ACCOUNT_NAME", "ACCOUNT_REST", "INTEREST_RATE", "INTEREST_AMOUNT", "DATE_FROM", "DATE_TO", "PURPOSE", "OPERATION_TYPE", "INTEREST_ACCOUNT_NUMBER", "INCOME_ACCOUNT", "MESSAGE", "STATE_ID", "ID", "RECKONING_ID", "OPER_REF") AS 
-  SELECT d.nd deal_id
+CREATE OR REPLACE VIEW V_INTEREST_CCK AS
+SELECT d.nd deal_id
       ,t.account_id
       ,t.interest_kind
       ,d.nd deal_number
@@ -34,11 +25,13 @@ PROMPT *** Create  view V_INTEREST_CCK ***
   FROM int_reckoning t
   JOIN nd_acc d
     ON d.acc = t.account_id
+  JOIN cc_deal cc 
+    ON cc.nd = d.nd and cc.vidd <> 110    
   JOIN accounts a
     ON a.acc = t.account_id
   JOIN int_accn i
     ON i.acc = a.acc
-   AND i.id = a.pap - 1
+   AND i.id = t.interest_kind
   JOIN customer c
     ON c.rnk = a.rnk
   LEFT JOIN accounts ia
@@ -47,14 +40,4 @@ PROMPT *** Create  view V_INTEREST_CCK ***
     ON inc.acc = i.acrb
  WHERE t.reckoning_id = sys_context('bars_pul', 'reckoning_id')
    AND t.interest_amount > 0
-   and t.oper_ref is null
-;
-
-PROMPT *** Create  grants  V_INTEREST_CCK ***
-grant SELECT,UPDATE                                                          on V_INTEREST_CCK  to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/View/V_INTEREST_CCK.sql =========*** End ***
-PROMPT ===================================================================================== 
+   and t.oper_ref is null;

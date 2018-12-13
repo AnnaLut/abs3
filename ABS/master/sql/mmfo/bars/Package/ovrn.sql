@@ -164,6 +164,7 @@ SB_2067 SB_OB22%rowtype;
 SB_2069 SB_OB22%rowtype;
 SB_6020 SB_OB22%rowtype;
 SB_6111 SB_OB22%rowtype;
+
 -------------------------------------
 function Get_NLS  (p_R4 accounts.NBS%type ) return accounts.NLS%type   is   --получение № лиц.сч по случ.числам
                     nTmp_ number ;            l_nls accounts.NLS%type ;
@@ -805,7 +806,7 @@ begin
      l_donor := nvl(to_number (OVRN.GetW(a26.acc,'DONOR' ) ),0) ;
 
      If l_donor <> 1 then
-
+      begin
         -- если тек = 0, то берем предыдущий НЕ нулевой
         If a26.LKT = 0 then
            select max(fdat) into dTmp_ from OVR_LIM  where nd = l_ND and acc = a26.acc and fdat < dat21_ and lim >0 and ok = 1;
@@ -838,6 +839,9 @@ begin
        delete from OVR_LIM  where ND = l_ND and acc=a26.acc and fdat =dat21_ ;
        Insert into OVR_LIM (PR, ND, ACC, fdat, Lim ) values (1, l_ND, a26.acc, dat21_, round(LKN_,0) );
 
+      exception when others then
+        bars_audit.info('OVRN ERROR '||substr(sqlerrm || chr(10) ||    dbms_utility.format_call_stack(), 0,4000));
+      end;
      end if;
 
   end loop;
@@ -891,6 +895,8 @@ PROCEDURE AUTOR ( p_nd number , p_x varchar2) is ---- авторизация
   l_ob22_9129 accounts.ob22%type;
   l_acc_9129  accounts.acc%type;
   l_inscc_val  varchar2(250);
+  cc         cc_deal%rowtype;
+  l_err_text varchar2(32000);
 BEGIN
 
   if  length(trim(p_x )) < 6 then raise_application_error(g_errn, g_errS||'Не задано підставу для авторизації' )  ;  end if;
@@ -1257,7 +1263,6 @@ BEGIN
      FROM OPER O , (select x.ref from opldok x, saldoa y where y.acc in (select acc from tt) and y.acc=x.acc and y.fdat >= dat1_ and y.fdat < dat2_ and y.kos>0 and y.fdat=x.fdat and x.dk= 1 and x.sos=5 ) p
      where o.id_B = OKPO_2600 and o.nlsB in (select nls from tt) and o.dk = 1
        and o.mfoB = gl.aMfo   and o.ref  = p.ref
-
        and o.id_A not in (select distinct z.okpo from customer z, accounts q, nd_acc w  where z.rnk = q.rnk and q.acc = w.acc and W.nd = l_nd  and z.okpo <> OKPO_2600 )
        and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_B and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' ))   -- Эти БС в 2017 в списке избыточны
        and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
@@ -1626,25 +1631,27 @@ begin
   u_ND := null ;
   OVRN.ins_110 (d_nd => l_ND, p_acc26 => aa.acc, p_ACC => aa.acc, u_nd => U_ND ) ; -- открыть новый дог 110
 
+
   update accounts set  ostc = (select sum(ostC) from accounts where accc= a8.acc),
                        ostb = (select sum(ostB) from accounts where accc= a8.acc),
                        ostf = (select sum(ostF) from accounts where accc= a8.acc)
                   where acc = a8.acc;
 
+
   OVRN.INT_OLD (aa.acc, DD.SDATE-1 ); ---------- Доначислить проц по <вчера>
 
   -----------------------------------------------------------------
 
-  begin 
+  begin
      insert into nd_acc (nd,acc) values ( dd.nd, aa.acc ); -- добавить 2600 в дог 10
   exception when dup_val_on_index then  null;
   end ;
 
-  begin 
-     insert into nd_acc (nd,acc) 
-     select dd.nd, i.acra 
-     from int_accn i 
-     where i.acc = aa.acc 
+  begin
+     insert into nd_acc (nd,acc)
+     select dd.nd, i.acra
+     from int_accn i
+     where i.acc = aa.acc
        and i.id = 1
        and (i.acra is not null or (i.acra is null and l_BUSSL=2));  -- COBUMMFO-9630 Для ММСБ допустимо отсутствие счета 2608
   exception when dup_val_on_index then  null; -- добавить 2608 в дог 10
@@ -2190,10 +2197,10 @@ begin
            end if;
         end if;
 
-        for  x in (select rnk, acc, kv, nls, OVRN.FOST_SAL ( acc, d.cdat) ost 
-                   from accounts 
-                   where accc= a8.acc 
-                     and (p_acc2 = 0 or p_acc2 = acc) 
+        for  x in (select rnk, acc, kv, nls, OVRN.FOST_SAL ( acc, d.cdat) ost
+                   from accounts
+                   where accc= a8.acc
+                     and (p_acc2 = 0 or p_acc2 = acc)
                      and (a8.BUSSL=2 and OVRN.FOST_SAL ( acc, d.cdat)<0))  --COBUMMFO-9630 не насчитываем проценты по пассиву по ММСБ
         loop
            tmpD(d8).id         := S_OVR_INTX_COUNT.NEXTVAL;
@@ -2346,9 +2353,10 @@ loop
         end if ;
      end if;
 
+     --перенесено на P_INTEREST_CCK1
      --COBUMMFO-5491  доначис  %   по просрочке+      -- COBUMMFO-6843=автоматичне нарахування пені
-     For xx in (select * from accounts where tip in  ('SP ','SPN')  and acc in (select acc from nd_acc where nd = dd.nd)   )
-     loop OVRN.INT_OLD ( xx.acc, x.dat2 ) ; end loop;
+/*     For xx in (select * from accounts where tip in  ('SP ','SPN')  and acc in (select acc from nd_acc where nd = dd.nd)   )
+     loop OVRN.INT_OLD ( xx.acc, x.dat2 ) ; end loop;*/
 
   EXCEPTION WHEN NO_DATA_FOUND THEN null;
   end ;
@@ -2818,7 +2826,7 @@ BEGIN
        where o.nlsB in (select nls from tt)  and o.id_B = OKPO_2600 AND O.DK = 1
          and o.id_A not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_B)
          and o.NLSA not in (select a.nls from accounts a where a.rnk=o.id_B and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) -- эти БС в 2017 избыточны
-         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1  
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
          and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
 
 --STA   05.09.2017 --дЕБЕТОВІЕ ДОК
@@ -2829,7 +2837,7 @@ BEGIN
        where o.nlsA in (select nls from tt)  and o.id_A = OKPO_2600 AND O.DK = 0
          and o.id_B not in (select cc.okpo from customer cc, accounts aa, nd_acc nn   where cc.rnk = aa.rnk and aa.acc = nn.acc and nn.nd = dd.nd and cc.okpo <> o.id_A)
          and o.NLSB not in (select a.nls from accounts a where a.rnk=o.id_A and a.nbs not in ('2610', '2615', '2651', '2652', '2062', '2063', '2082', '2083' )) -- эти БС в 2017 избыточны
-         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1 
+         and o.ref  = p.ref and p.fdat = p_dat and p.sos = 5 and  p.acc in (select acc from tt) and p.dk = 1
          and NOT exists (select 1 from  OVR_CHKO_DET where acc = ACC_2600 and ref = o.REF);
 END;
 
@@ -3128,10 +3136,10 @@ BEGIN
   loop
      If    k.nbs in ('2600','2650','2602','2603','2604')     then  update accounts set lim = 0, accc = null where acc = k.ACC;  -- эти БС в 2017 не меняются
                                                                    update accounts set ostc = ostc - k.ostc where acc = k.accc;
-          
+
      ----чистка тормозной зоны по счету, который используется повторно уже с другим договором
      delete from OVR_TERM_TRZ where acc = k.ACC;
-                                                                   
+
      elsIf k.nbs in ('2608','2658')                          then  null;                                                        -- эти БС в 2017 не меняются
      elsIf k.tip in ('OVN')                                  then  update accounts set dazs = l_bDat_Next where acc = k.ACC;
      elsIf k.tip in ('SN ') and k.ostc =0                    then  update accounts set dazs = l_bDat_Next where acc = k.ACC;
@@ -3193,7 +3201,7 @@ begin
      uu.vidd  := 110    ;
      INSERT INTO cc_deal values uu;
      u_ND     := uu.nd  ;
-     
+
   else
      select min(d.nd) into u_nd from cc_deal d, nd_acc n where d.vidd =110 and d.nd = n.nd and  n.acc = p_acc26 and d.sos <15  ;
      If  u_nd is null then raise_application_error(g_errn,'Не зайдено дод.Дог(110) для acc_2600=' || p_acc26 )  ; end if ;
