@@ -1693,7 +1693,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.PFU_RU_EPP_UTL is
         update accounts
            set daos = decode(dapp, null, bankdate, daos),
                dazs = null,
-               nbs  = '2625'
+               nbs  = '2620'
          where acc = i.acc and dazs is not null;
 
         l_accreclist(l_accreclist.last).id := i.f_id;
