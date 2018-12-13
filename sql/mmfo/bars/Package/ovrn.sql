@@ -1464,7 +1464,7 @@ procedure ADD_master (p_ND number, p_ACC number, p_CC_ID varchar2, p_sdate date,
                       p_METR int, -- =1 = ѕризнак  плав.ставки
                       p_SK   int,  -- = є шкалы дл€ плав.ставки
                       p_NZ   int,  -- признак "без обеспечени€"
-                      p_MMETR int default null -- =1 = ѕризнак максимальной ставки при плав.ставки                      
+                      p_MMETR int default null -- =1 = ѕризнак максимальной ставки при плав.ставки
                      ) is
   aa accounts%rowtype ;
   a8 accounts%rowtype ;
