@@ -28,6 +28,7 @@
      p_type = 3 , 13 ЩОДЕННЕ   - по пл. датах
      p_type = 4 , 14 ЩОДЕННЕ   - по прострочених дог.
      p_type = 17   для Києва тимчасово
+     p_type = 18   договора овердрафта
 
      p_type < 0 НА ВИМОГУ - по 1 КД
    */
@@ -47,7 +48,7 @@
  BEGIN
 
    IF p_type >= 0
-      AND p_type NOT IN (1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 17) THEN
+      AND p_type NOT IN (1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 17, 18) THEN
      RETURN;
    END IF;
    interest_utl.start_reckoning;
@@ -193,6 +194,14 @@
           AND (p_type = 4 AND vidd IN (1, 2, 3) OR
               p_type = 14 AND vidd IN (11, 12, 13));
 
+   ELSIF p_type IN (18) THEN
+     -- НА ВИМОГУ- по ВСІМ овердрафтам
+     OPEN k1 FOR
+       SELECT nd, cc_id, sdate, wdate,ndg
+         FROM cc_deal d
+        WHERE sos >= 10
+          AND sos < 14
+          AND vidd =10;
    END IF;
 
    IF NOT k1%ISOPEN THEN
