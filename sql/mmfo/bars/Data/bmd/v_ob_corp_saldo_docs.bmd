@@ -138,23 +138,24 @@ begin
   bars_metabase.add_column(l_tabid, 16, 'SQ',         'N', 'Сума в~грн',              1.5, '', 16, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
   bars_metabase.add_column(l_tabid, 17, 'ND',         'C', 'Номер~документу',         2,   '', 17, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '/barsroot/KFiles/KFiles/DataKFiles'||chr(63)||'d_sess_id=:SESS_ID'||chr(38)||'d_acc=:ACC'||chr(38)||'d_kf=:KF'||chr(38)||'d_ref=:REF'||chr(38)||'d_dk=:DK');
   bars_metabase.add_column(l_tabid, 18, 'VOB',        'N', 'Вид~документу',           1,   '', 18, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 19, 'D_DOC',      'C', 'Дата~ОДБ',                1.5, '', 19, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 20, 'T_DOC',      'C', 'Час',                     1.5, '', 20, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
-  bars_metabase.add_column(l_tabid, 21, 'POSTDAT',    'D', 'Дата/Час ОДБ',            2,   '', 21, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 22, 'DK',         'N', 'Ознака~проводки',         1,   '', 22, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 23, 'MFOA',       'C', 'Код банку~платника',      1.5, '', 23, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 24, 'NLSA',       'C', 'Рахунок~платника',        2,   '', 24, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 25, 'KVA',        'N', 'Валюта~платника',         1.5, '', 25, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 26, 'OKPOA',      'C', 'Ідентифікатор~платника',  2,   '', 26, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 27, 'NAMA',       'C', 'Найменування~платника',   2,   '', 27, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 28, 'MFOB',       'C', 'Код банку~отримувача',    1.5, '', 28, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 29, 'NLSB',       'C', 'Рахунок~отримувача',      2,   '', 29, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 30, 'KVB',        'N', 'Валюта~отримувача',       1.5, '', 30, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 31, 'OKPOB',      'C', 'Ідентифікатор~отримувача',2,   '', 31, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 32, 'NAMB',       'C', 'Найменування~отримувача', 2,   '', 32, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 33, 'TT',         'C', 'Код~операції',            1,   '', 33, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 34, 'NAZN',       'C', 'Призначення платежу',     2,   '', 34, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
-  bars_metabase.add_column(l_tabid, 35, 'IS_LAST',    'N', 'Останій документ',        2,   '', 35, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 1, 1, '');   
+  bars_metabase.add_column(l_tabid, 19, 'VOB_MAME',   'C', 'Назва~виду документу',    2,   '', 19, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 20, 'D_DOC',      'C', 'Дата~ОДБ',                1.5, '', 20, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 21, 'T_DOC',      'C', 'Час',                     1.5, '', 21, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
+  bars_metabase.add_column(l_tabid, 22, 'POSTDAT',    'D', 'Дата/Час ОДБ',            2,   '', 22, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 23, 'DK',         'N', 'Ознака~проводки',         1,   '', 23, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 24, 'MFOA',       'C', 'Код банку~платника',      1.5, '', 24, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 25, 'NLSA',       'C', 'Рахунок~платника',        2,   '', 25, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 26, 'KVA',        'N', 'Валюта~платника',         1.5, '', 26, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 27, 'OKPOA',      'C', 'Ідентифікатор~платника',  2,   '', 27, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 28, 'NAMA',       'C', 'Найменування~платника',   2,   '', 28, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 29, 'MFOB',       'C', 'Код банку~отримувача',    1.5, '', 29, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 30, 'NLSB',       'C', 'Рахунок~отримувача',      2,   '', 30, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 31, 'KVB',        'N', 'Валюта~отримувача',       1.5, '', 31, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 32, 'OKPOB',      'C', 'Ідентифікатор~отримувача',2,   '', 32, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 33, 'NAMB',       'C', 'Найменування~отримувача', 2,   '', 33, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 34, 'TT',         'C', 'Код~операції',            1,   '', 34, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 35, 'NAZN',       'C', 'Призначення платежу',     2,   '', 35, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
+  bars_metabase.add_column(l_tabid, 36, 'IS_LAST',    'N', 'Останій документ',        2,   '', 36, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 1, 1, '');   
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -206,6 +207,7 @@ begin
         l_arr_metafiltertbl(i).flag_del,
         l_arr_metafiltertbl(i).flag_upd);
   end loop;
+  
 
 end;
 /

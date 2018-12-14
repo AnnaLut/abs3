@@ -55,16 +55,17 @@ begin
 															  );
 					 abs_utils.add_func2deps( l_function_ids(l)  ,l_function_deps);
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Перегляд отриманих пакетів даних ********** ');
-          --  Створюємо функцію Перегляд отриманих пакетів даних
+      DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Довідники NEW ********** ');
+      --  Створюємо функцію Довідники NEW
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Перегляд отриманих пакетів даних',
-                                                  p_funcname => '/barsroot/kfiles/kfiles/adminca',
+                                                  p_name     => 'Довідники NEW',
+                                                  p_funcname => '/barsroot/referencebook/referencelist/',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
+												  
 												  
 	  l := l +1;
       l_function_ids.extend(l);
@@ -98,37 +99,14 @@ begin
 												  p_rolename => '' ,
                                                   p_frontend  =>      l_application_type_id ); 
 
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Адміністрування корпоративних клієнтів ********** ');
-          --  Створюємо функцію Адміністрування корпоративних клієнтів
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Адміністрування корпоративних клієнтів',
-                                                  p_funcname => '/barsroot/kfiles/kfiles/index',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-												  
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
 													p_name      =>  'Адміністрування корпоративних клієнтів(NEW)',          
-													p_funcname  =>  '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=V_OB_CORP_L1[CONDITIONS=>PARENT_ID IS NULL][NSIFUNCTION][showDialogWindow=>false]',     
+													p_funcname  =>  '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=2'||chr(38)||'sPar=V_OB_CORP_L1[CONDITIONS=>V_OB_CORP_L1.PARENT_ID IS NULL][NSIFUNCTION][showDialogWindow=>false]',     
 													p_rolename => '' ,
                                                     p_frontend  =>   l_application_type_id );
 													
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Б/Р корпоративних клієнтів(включення в звітність)(ГРЦ) ********** ');
-          --  Створюємо функцію Б/Р корпоративних клієнтів(включення в звітність)(ГРЦ)
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Б/Р корпоративних клієнтів(включення в звітність)(ГРЦ)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=5'||chr(38)||'sPar=OB_CORPORATION_NBS_REPORT_GRC',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
 
    DBMS_OUTPUT.PUT_LINE(chr(13)||chr(10)||'  Прикріпляємо ресурси функцій до даного АРМу ($RM_WCRC) - АРМ Корпоративні клієнти(ЦБД)  ');
     l := l_function_ids.first;
@@ -152,6 +130,10 @@ begin
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
 umu.add_reference2arm_bytabname('OB_CORP_DICT_OKPO', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('OB_CORP_REP_NBS', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('OB_CORP_DICT_NBS', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('OB_CORP_DICT_REP', '$RM_WCRC', 2, 1);
+umu.add_reference2arm_bytabname('TYPNLS_CORP', '$RM_WCRC', 2, 1);
 umu.add_report2arm(75,'$RM_WCRC');
 umu.add_report2arm(5014,'$RM_WCRC');
 umu.add_report2arm(5015,'$RM_WCRC');

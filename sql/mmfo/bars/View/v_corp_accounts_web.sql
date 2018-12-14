@@ -18,10 +18,11 @@ PROMPT *** Create  view V_CORP_ACCOUNTS_WEB ***
    NLS,
    KV,
    NMS,
-   INST_KOD,
+   USTAN_KOD,
    TRKK_KOD,
    USE_INVP,
    ALT_CORP_COD,
+   ALT_USTAN_COD,
    BRANCH,
    DAOS,
    DAZS
@@ -36,10 +37,11 @@ SELECT corp_kod,
           NLS,
           KV,
           NMS,
-          inst_kod,
+          ustan_kod,
           trkk_kod,
           use_invp,
-          CASE WHEN W1 <> CWPVAL THEN W1 ELSE NULL END AS alt_corp_cod,
+          CASE WHEN W1 <> CWPVAL THEN W1 ELSE NULL END AS ALT_CORP_COD,
+          inst_kod AS ALT_USTAN_COD,
           BRANCH,
           DAOS,
           DAZS
@@ -53,10 +55,10 @@ SELECT corp_kod,
                   a.NLS,
                   a.KV,
                   a.NMS,
-                  (SELECT w3.VALUE
-                     FROM accountsw w3
-                    WHERE a.ACC = w3.ACC AND w3.TAG = 'OBCORPCD')
-                     AS inst_kod,
+                  (SELECT cw2.VALUE
+                     FROM customerw cw2
+                    WHERE a.RNK = cw2.RNK AND cw2.TAG = 'OBCRP')
+                     AS ustan_kod,
                   (SELECT s.TYPNLS
                      FROM SPECPARAM_INT s
                     WHERE a.ACC = s.ACC)
@@ -70,6 +72,10 @@ SELECT corp_kod,
                      FROM accountsw w1
                     WHERE a.ACC = w1.ACC AND w1.TAG = 'OBCORP')
                      AS W1,
+                  (SELECT w3.VALUE
+                     FROM accountsw w3
+                    WHERE a.ACC = w3.ACC AND w3.TAG = 'OBCORPCD')
+                     AS inst_kod,
                   cwp.VALUE AS CWPVAL,
                   a.BRANCH,
                   a.DAOS,

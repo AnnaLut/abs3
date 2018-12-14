@@ -68,7 +68,7 @@ begin
  execute immediate '
   ALTER TABLE BARS.TYPNLS_CORP ADD CONSTRAINT PK_TYPNLS_CORP PRIMARY KEY (CORP_ID, KOD)
   USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  TABLESPACE BRSSMLI  ENABLE';
+  TABLESPACE BRSSMLI ENABLE';
 exception when others then
   if  sqlcode=-2260 or sqlcode=-2261 or sqlcode=-2264 or sqlcode=-2275 or sqlcode=-1442 then null; else raise; end if;
  end;
@@ -88,10 +88,8 @@ COMMENT ON COLUMN BARS.TYPNLS_CORP.CORP_ID IS 'ІД корпорації';
 
 
 PROMPT *** Create  grants  TYPNLS_CORP ***
-grant SELECT                                                                 on TYPNLS_CORP     to BARSREADER_ROLE;
-grant FLASHBACK,SELECT                                                       on TYPNLS_CORP     to BARS_ACCESS_DEFROLE;
+grant FLASHBACK,SELECT, INSERT, UPDATE, DELETE                               on TYPNLS_CORP     to BARS_ACCESS_DEFROLE;
 grant SELECT                                                                 on TYPNLS_CORP     to BARS_DM;
-grant SELECT                                                                 on TYPNLS_CORP     to UPLD;
 grant FLASHBACK,SELECT                                                       on TYPNLS_CORP     to WR_REFREAD;
 
 

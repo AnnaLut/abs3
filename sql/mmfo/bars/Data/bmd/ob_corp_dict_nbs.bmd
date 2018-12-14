@@ -1,3 +1,5 @@
+set serveroutput on
+
 declare
   type t_rec_metaextrnval is record (
      tabid      meta_extrnval.tabid%type,
@@ -30,32 +32,32 @@ declare
   l_arr_metafiltertbl t_tab_metafiltertbl := t_tab_metafiltertbl();
 
   l_tabid       meta_tables.tabid%type;
-  l_tablinesdef meta_tables.linesdef%type;
   l_tabname     meta_tables.tabname%type;
   l_tabsemantic meta_tables.semantic%type;
   l_newtabid    meta_tables.tabid%type;
   l_newcolid    meta_columns.colid%type;
   l_varcolid    meta_columns.colid%type;
   l_colname     meta_columns.colname%type;
+  l_tablinesdef  varchar2(16);
   i             number;
 
 begin
 
-  l_tabsemantic := 'Сесії передачі К-файлів';
+  l_tabsemantic := 'Перелік балансових рахунків корпоративних клієнтів';
   l_tablinesdef := '30';
-  l_tabname := 'V_OB_CORP_SESS_CORP';
+  l_tabname := 'OB_CORP_DICT_NBS';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
 
   -- если таблица не описана в БМД
   if l_tabid is null then
-  
+
      -- получаем код для новой таблицы
      l_tabid := bars_metabase.get_newtabid();
 
      -- добавляем описание таблицы в БМД
-     bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic, null, l_tablinesdef);
+     bars_metabase.add_table(l_tabid, l_tabname, l_tabsemantic);
 
   -- если таблица описана в БМД
   else
@@ -120,28 +122,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID',        'N', 'Номер синхронізації',       1.8, '', 1, 0, 1 ,0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=V_OB_CORP_SALDO[CONDITIONS=>V_OB_CORP_SALDO.KF=SUBSTR(:MFO,1,6) AND V_OB_CORP_SALDO.SESS_ID=:ID AND V_OB_CORP_SALDO.CORP_ID=:CORP][ACCESSCODE=>1][showDialogWindow=>false]');
-  bars_metabase.add_column(l_tabid, 2, 'MFO',       'C', 'МФО даних синхронізації',   3,   '', 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 3, 'FILE_DATE', 'D', 'Дата даних',                2,   '', 3, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 4, 'CORP',      'C', 'Номер корпорації',          3,   '', 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 5, 'STATE',     'C', 'Статус',                    2,   '', 5, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 6, 'IS_LAST',   'C', 'Статус',                    2,   '', 6, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
-  bars_metabase.add_column(l_tabid, 7, 'SYNCTIME',  'D', 'Дата та час~синхронізації', 2,   '', 7, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 8, 'FILENAME',  'C', 'Імя файлу'                , 2,   '', 8, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 1, 'NBS',  'C', 'Балансовий~рахунок',           1, '', 1, 1, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 2, 'NBS_NAME', 'C', 'Назва~балансовий рахунок', 10, '', 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 1, '');
 
 
-  
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
-  
-  -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Завантажити К-файл', '', '', 'SELECTED_ONE', '', '', '', '', 'sPar=[DESCR=>Завантажити К-файл][EXEC=>SELECTED_ONE][PROC=>KFILE_PACK.CRT_TXT_K_FILE(:ID, to_number(:CORP), :FILENAME, :P_K_FILE)][OUT_PARAMS=>:P_K_FILE(SEM=ФАЙЛ,TYPE=CLOB,KIND=GET_FILE,FILE_NAME_GET_FROM=COL,SRC_FILE_NAME=FILENAME)]', 7);
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Вивантажити К-файл', 'KFILE_PACK.CALL_WEB_SERV(:ID, :CORP)', '', 'SELECTED_ONE', '', '', '', '', '', 59);
-  
- -- добавляем описание сортировки
-  bars_metabase.add_sortorder(l_tabid, 1, 1, 'DESC');
- 
+
+  -- добавляем описание раскраски
+
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_arr_metaextrnval.count
   loop
@@ -186,8 +176,11 @@ begin
         l_arr_metafiltertbl(i).flag_del,
         l_arr_metafiltertbl(i).flag_upd);
   end loop;
+  
+    -- добавление таблицы в справочники
+  bars_metabase.addTableToRef(l_tabid,0);
+
 end;
 /
 commit;
 /
-

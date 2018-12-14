@@ -137,8 +137,6 @@ begin
   bars_metabase.delete_nsifunction(l_tabid);
   
   -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Додати корпорацію', 'KFILE_PACK.ADD_CORP (:P_CORP_CODE, :P_CORP_NAME, null, :P_EXT_ID)',':P_CORP_NAME(SEM=Назва установи,TYPE=С), :P_CORP_CODE(SEM=ОКПО установи,TYPE=С), :P_EXT_ID(SEM=Номер установи,TYPE=С)', 'ONCE', '', '', '', '', '', 63);
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Додати підрозділ',  'KFILE_PACK.ADD_CORP (:P_CORP_CODE, :P_CORP_NAME, :ID, :P_EXT_ID)', ':P_CORP_NAME(SEM=Назва установи,TYPE=С), :P_CORP_CODE(SEM=ОКПО установи,TYPE=С), :P_EXT_ID(SEM=Номер установи,TYPE=С)', 'SELECTED_ONE', '', '', '', '', '', 4);
   bars_metabase.add_nsifunction(l_tabid, 3, 'Блокувати',         'KFILE_PACK.LOCK_CORP_ITEM(:ID)',                                   '', 'SELECTED_ONE', 'Підрозділ та всі її підрозділи заблоковано', '', '', '', '', 11);
   bars_metabase.add_nsifunction(l_tabid, 4, 'Розблокувати',      'KFILE_PACK.UNLOCK_CORP_ITEM(:ID)',                                 '', 'SELECTED_ONE', 'Підрозділ буде розблоковано', '', '', '', '', 65);
   bars_metabase.add_nsifunction(l_tabid, 5, 'Закрити',           'KFILE_PACK.CLOSE_CORP_ITEM(:ID)',                                  '', 'SELECTED_ONE', 'Підрозділ та всі її підрозділи будуть закриті і не зможуть бути повернуті в список діючих', '', '', '', '', 5);
@@ -192,7 +190,7 @@ begin
         l_arr_metafiltertbl(i).flag_upd);
   end loop;
   
-  bars_metabase.add_extrnval(l_tabid,4,bars_metabase.get_tabid('V_ORG_CORPORATIONS'), 3,'ORG',null,'select ID, q.NAME FROM TABLE(KFILE_PACK.GET_POSSIBLE_UNITS(:ID)) q');
+  bars_metabase.add_extrnval(l_tabid,7,bars_metabase.get_tabid('V_ORG_CORPORATIONS'), 3,'ORG',null,'select ID, q.NAME FROM TABLE(KFILE_PACK.GET_POSSIBLE_UNITS(:ID)) q');
 
 end;
 /

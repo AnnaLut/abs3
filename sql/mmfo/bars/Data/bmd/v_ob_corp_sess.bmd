@@ -120,13 +120,13 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Номер синхронізації', 1.8, '', 1, 0, 1 ,0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=V_OB_CORP_SALDO[CONDITIONS=>V_OB_CORP_SALDO.KF=SUBSTR(:MFO,1,6) AND V_OB_CORP_SALDO.SESS_ID=:ID][ACCESSCODE=>1][showDialogWindow=>false]');
-  bars_metabase.add_column(l_tabid, 2, 'MFO', 'C', 'МФО даних синхронізації', 3, '', 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 3, 'FILE_DATE', 'D', 'Дата даних', 2, '', 3, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 4, 'CORP', 'C', 'Номер корпорації', 3, '', 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=V_OB_CORP_SESS_CORP[CONDITIONS=>V_OB_CORP_SESS_CORP.MFO=SUBSTR(:MFO,1,6) AND V_OB_CORP_SESS_CORP.ID=:ID][ACCESSCODE=>1][NSIFUNCTION][showDialogWindow=>false]');
+  bars_metabase.add_column(l_tabid, 1, 'ID', 'N', 'Номер синхронізації',             1.8, '', 1, 0, 1 ,0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=V_OB_CORP_SALDO[CONDITIONS=>V_OB_CORP_SALDO.KF=SUBSTR(:MFO,1,6) AND V_OB_CORP_SALDO.SESS_ID=:ID][ACCESSCODE=>1][showDialogWindow=>false]');
+  bars_metabase.add_column(l_tabid, 2, 'MFO', 'C', 'МФО даних синхронізації',        3, '', 2, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 3, 'FILE_DATE', 'D', 'Дата даних',               2, '', 3, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 4, 'CORP', 'C', 'Номер корпорації',              3, '', 4, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, 'sPar=V_OB_CORP_SESS_CORP[CONDITIONS=>V_OB_CORP_SESS_CORP.MFO=SUBSTR(:MFO,1,6) AND V_OB_CORP_SESS_CORP.ID=:ID][ACCESSCODE=>1][NSIFUNCTION][showDialogWindow=>false]');
   bars_metabase.add_column(l_tabid, 5, 'SYNCTIME', 'D', 'Дата та час~синхронізації', 2, '', 5, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 6, 'STATE', 'C', 'Статус', 2, '', 6, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
-
+  bars_metabase.add_column(l_tabid, 6, 'STATE', 'C', 'Статус',                       2, '', 6, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 7, 'ERR_LOG', 'C', 'Текст помилки',              3, '', 7, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');
   
 
   -- очищаем описание функций на справочник
@@ -134,7 +134,7 @@ begin
   
   -- добавляем описание функции на справочник
   bars_metabase.add_nsifunction(l_tabid, 1, 'Формування К-файлу' , 'KFILE_PACK.FILL_DATA(:P_DATE, :P_CORP)', ':P_DATE(SEM=ДАТА,TYPE=D), :P_CORP(SEM=НОМЕР КОРПОРАЦІЇ,TYPE=С)', 'ONCE', '', '', '', '', '', 4);
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Вивантажити К-файли', 'KFILE_PACK.CRT_KFILE(:ID, :MFO)',   '', 'SELECTED_ONE', '', '', '', '', '', 7);
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Вивантажити К-файли', 'KFILE_PACK.CALL_WEB_SERV(:ID)',      '', 'SELECTED_ONE', '', '', '', '', '', 7);
  -- добавляем описание сортировки
   bars_metabase.add_sortorder(l_tabid, 1, 1, 'DESC');
  

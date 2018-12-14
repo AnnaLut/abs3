@@ -132,21 +132,22 @@ begin
   bars_metabase.add_column(l_tabid, 10, 'NMS',           'C', 'Назва~рахунку',           3,   '', 10, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '');
   bars_metabase.add_column(l_tabid, 11, 'USE_INVP',      'C', 'Виписка',                 1,   '', 11, 0, 0 ,0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
   bars_metabase.add_column(l_tabid, 12, 'TRKK_KOD',      'C', 'Код~ТРКК',                1,   '', 12, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');
-  bars_metabase.add_column(l_tabid, 13, 'INST_KOD',      'C', 'Код~устан.',              1,   '', 13, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 13, 'USTAN_KOD',     'C', 'Код~устан.',              1,   '', 13, 0, 0 ,0, 1, '', '', 1, 0, '', 0, 0, 1, '');
   bars_metabase.add_column(l_tabid, 14, 'ALT_CORP_COD',  'C', 'Альт.~Корп.',             1,   '', 14, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
-  bars_metabase.add_column(l_tabid, 15, 'DAOS',          'D', 'Дата~відкриття',          2,   '', 15, 0, 0, 0, 0, '', '', 1, 0, '', 0, 0, 1, ''); 
+  bars_metabase.add_column(l_tabid, 15, 'ALT_USTAN_COD', 'C', 'Альт.~Устан.',            1,   '', 15, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 16, 'DAOS',          'D', 'Дата~відкриття',          2,   '', 16, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, ''); 
 
     -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'kfile_pack.UPDATE_ACC_CORP(:ACC, :USE_INVP, :TRKK_KOD, :INST_KOD, :ALT_CORP_COD, :DAOS)');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'kfile_pack.UPDATE_ACC_CORP(:ACC, :USE_INVP, :TRKK_KOD, :USTAN_KOD, :ALT_CORP_COD, :ALT_USTAN_COD)');
   
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
   
    -- добавляем описание функции на справочник
-  bars_metabase.add_nsifunction(l_tabid, 1, 'Встановити ознаку на включення в виписку', 'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :P_USE_INVP, :TRKK_KOD, :INST_KOD, :ALT_CORP_COD, :DAOS)',':P_USE_INVP(SEM=Виписка,TYPE=С)', 'EACH', '', '', '', '', '', '');
-  bars_metabase.add_nsifunction(l_tabid, 2, 'Встановити код ТРКК',                      'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :USE_INVP, :P_TRKK_KOD, :INST_KOD, :ALT_CORP_COD, :DAOS)',':P_TRKK_KOD(SEM=Код ТРКК,TYPE=С)', 'EACH', '', '', '', '', '', '');
-  bars_metabase.add_nsifunction(l_tabid, 3, 'Встановити код установи',                  'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :USE_INVP, :TRKK_KOD, :P_INST_KOD, :ALT_CORP_COD, :DAOS)',':P_INST_KOD(SEM=Код установи,TYPE=С)', 'EACH', '', '', '', '', '', '');
+  bars_metabase.add_nsifunction(l_tabid, 1, 'Встановити ознаку на включення в виписку', 'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :P_USE_INVP, :TRKK_KOD, :USTAN_KOD, :ALT_CORP_COD, :ALT_USTAN_COD)',':P_USE_INVP(SEM=Виписка,TYPE=С)', 'EACH', '', '', '', '', '', '');
+  bars_metabase.add_nsifunction(l_tabid, 2, 'Встановити код ТРКК',                      'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :USE_INVP, :P_TRKK_KOD, :USTAN_KOD, :ALT_CORP_COD, :ALT_USTAN_COD)',':P_TRKK_KOD(SEM=Код ТРКК,TYPE=С)', 'EACH', '', '', '', '', '', '');
+  bars_metabase.add_nsifunction(l_tabid, 3, 'Встановити код установи',                  'KFILE_PACK.UPDATE_ACC_CORP (:ACC, :USE_INVP, :TRKK_KOD, :P_INST_KOD, :ALT_CORP_COD, :ALT_USTAN_COD)',':P_INST_KOD(SEM=Код установи,TYPE=С)', 'EACH', '', '', '', '', '', '');
   -- восстанавливаем ссылки сложных полей других таблиц
   for i in 1..l_arr_metaextrnval.count
   loop
@@ -194,8 +195,9 @@ begin
 
 --опис зв'язкe між таблицями  
 bars_metabase.add_extrnval(l_tabid,12,bars_metabase.get_tabid('TYPNLS_CORP'),2,null,null,'select KOD as id, TXT as name from TYPNLS_CORP v where v.CORP_ID = :CORP_KOD');
-bars_metabase.add_extrnval(l_tabid,13,bars_metabase.get_tabid('V_ORG_CORPORATIONS'),1,'ORG',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :CORP_KOD');
+bars_metabase.add_extrnval(l_tabid,13,bars_metabase.get_tabid('V_ORG_CORPORATIONS'),3,'ORG',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :CORP_KOD');
 bars_metabase.add_extrnval(l_tabid,14,bars_metabase.get_tabid('V_ROOT_CORPORATION'),1,'ROOT'); 
+bars_metabase.add_extrnval(l_tabid,15,bars_metabase.get_tabid('V_ORG_CORPORATIONS'),3,'ORG1',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :ALT_CORP_COD');
 
 end;
 /

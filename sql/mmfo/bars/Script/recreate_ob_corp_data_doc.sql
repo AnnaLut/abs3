@@ -1,29 +1,7 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/OB_CORP_DATA_DOC.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** ALTER_POLICY_INFO to OB_CORP_DATA_DOC ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''OB_CORP_DATA_DOC'', ''CENTER'' , null, null, ''E'', null);
-               bpa.alter_policy_info(''OB_CORP_DATA_DOC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''OB_CORP_DATA_DOC'', ''WHOLE'' , null, null, ''E'', null);
-               null;
-           end; 
-          '; 
-END; 
-/
-
-PROMPT *** Create  table OB_CORP_DATA_DOC ***
+PROMPT *** Create  table TMP_OB_CORP_DATA_DOC ***
 begin 
   execute immediate '
-  CREATE TABLE BARS.OB_CORP_DATA_DOC
+  CREATE TABLE BARS.TMP_OB_CORP_DATA_DOC
    (SESS_ID NUMBER,
     ACC NUMBER, 
     KF VARCHAR2(6), 
@@ -97,14 +75,22 @@ begin
   PARTITION P_SID_40000 VALUES LESS THAN (41000),
   PARTITION P_SID_41000 VALUES LESS THAN (42000),
   PARTITION P_SID_42000 VALUES LESS THAN (43000),
-  PARTITION P_SID_43000 VALUES LESS THAN (44000))';
+  PARTITION P_SID_43000 VALUES LESS THAN (44000),
+  PARTITION P_SID_44000 VALUES LESS THAN (45000))';
 exception when others then       
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
 
+INSERT INTO TMP_OB_CORP_DATA_DOC SELECT SESS_ID, ACC, KF, REF, 1 as STMT, DK, 
+                                        POSTDAT, DOCDAT, VALDAT, ND, VOB, MFOA, 
+                                        NLSA, KVA, NAMA, OKPOA, MFOB, NLSB, KVB, 
+                                        NAMB, OKPOB, S, DOCKV, SQ, NAZN, TT 
+                                   FROM OB_CORP_DATA_DOC;
+                                   
+drop table OB_CORP_DATA_DOC;
 
-
+RENAME TMP_OB_CORP_DATA_DOC to OB_CORP_DATA_DOC;
 
 PROMPT *** ALTER_POLICIES to OB_CORP_DATA_DOC ***
  exec bpa.alter_policies('OB_CORP_DATA_DOC');
@@ -165,16 +151,12 @@ exception when others then
 
 
 
-
+exec dbms_stats.gather_table_stats('BARS', 'OB_CORP_DATA_DOC');
+/
 
 
 
 PROMPT *** Create  grants  OB_CORP_DATA_DOC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OB_CORP_DATA_DOC to BARS_ACCESS_DEFROLE;
 
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/OB_CORP_DATA_DOC.sql =========*** End 
-PROMPT ===================================================================================== 
-
+                                   

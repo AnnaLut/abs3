@@ -57,9 +57,9 @@ declare
 
 begin
 
-  l_tabsemantic := 'Коди типів рахунків корпоративного клієнта';
+  l_tabsemantic := 'Прив''язка клієнтів до корпорацій';
   l_tablinesdef := '30';
-  l_tabname     := 'TYPNLS_CORP';
+  l_tabname     := 'V_CUSTOMER_CORP';
 
   -- получаем код таблицы
   l_tabid := bars_metabase.get_tabid(l_tabname);
@@ -119,9 +119,16 @@ begin
   end if;
 
   -- добавляем описание полей
-  bars_metabase.add_column(l_tabid, 1, 'KOD',     'C', 'Код',                           1, '', 1, 1, 1, 0, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 2, 'TXT',     'C', 'Постанова (розпорядження) КМУ', 5, '', 2, 1, 0, 1, 0, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 3, 'CORP_ID', 'C', 'Номер корпорації',              1, '', 3, 1, 0, 0, 1, '', '', 1, 0, '', 0, 0, 0, '', '', 0);
+  bars_metabase.add_column(l_tabid, 1, 'RNK',        'N', 'Ідентифікатор~клієнта',   1, '', 1, 0, 1, 0, 0, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 2, 'NMK',        'C', 'Ім''я клієнта',           3, '', 2, 0, 0, 0, 0, '', '', 1, 0, '', 1, 0, 1, '');
+  bars_metabase.add_column(l_tabid, 3, 'EXTERNAL_ID','N', 'Код~корпорації',          1, '', 3, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '');  
+  bars_metabase.add_column(l_tabid, 4, 'ORG_ID',     'N', 'Код установи~корпорації', 1, '', 4, 0, 0, 0, 1, '', '', 1, 0, '', 0, 0, 1, '');
+
+
+  -- добавляем описание процедур
+  bars_metabase.add_actiontbl(l_tabid, 'INSERT', 'kfile_pack.ins_customerw(:RNK,:EXTERNAL_ID,:ORG_ID)');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'kfile_pack.ins_customerw(:RNK,:EXTERNAL_ID,:ORG_ID)');
+  bars_metabase.add_actiontbl(l_tabid, 'DELETE', 'kfile_pack.ins_customerw(:RNK,null,null)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
@@ -183,12 +190,16 @@ begin
       l_dependency(i).condition );
   end loop;
   
-  bars_metabase.add_extrnval(l_tabid,3,bars_metabase.get_tabid('V_ROOT_CORPORATION'),1,'ROOT'); 
+  --опис зв'язкe між таблицями  
+  	bars_metabase.add_extrnval(l_tabid,3,bars_metabase.get_tabid('V_ROOT_CORPORATION'),1,'ROOT'); 
+	bars_metabase.add_extrnval(l_tabid,4,bars_metabase.get_tabid('V_ORG_CORPORATIONS'), 1,'ORG',null,'select EXTERNAL_ID as id, CORPORATION_NAME as name from V_ORG_CORPORATIONS v where v.BASE_EXTID = :EXTERNAL_ID');
+	
+  --добавление таблицы в справочники
+bars_metabase.addTableToRef(l_tabid,0);
 
-    -- добавление таблицы в справочники
-  bars_metabase.addTableToRef(l_tabid,0);
 
 end;
 /
+
 commit;
 /
