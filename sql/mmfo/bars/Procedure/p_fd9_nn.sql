@@ -3,11 +3,12 @@ CREATE OR REPLACE PROCEDURE BARS.p_fd9_NN (Dat_ DATE ,
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION : Процедура формирования #D9 для КБ (универсальная)
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     : 29/11/2018 (27/11/2018, 11/05/2018)
+% VERSION     : 12/12/2018 (29/11/2018, 27/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+12.12.2018 - учасники ФО і ФОП не будуть включатися в файл
 29.11.2018 - изменено формирование кода ЗЗЗЗЗЗЗЗЗЗ для ФЛ нерезидентов
 27.11.2018 - не будет формироваться код 219 если ОКПО участника
              '0000000000' или '9999999999'  
@@ -192,6 +193,7 @@ BEGIN
                               where datf = Dat_
                                 and rnk is not null
                                 and p040 <> 0 )
+                and NVL(c.prinsider,99) = 99
                 and b.region_u = to_char(k.C_REG(+))
                 and c.rnk = b.rnka
                 and c.rnk <> 94809201
@@ -205,39 +207,40 @@ BEGIN
                 and nvl(b.edate, Dat_) >= Dat_
                 and nvl(b.bdate, Dat_) <= Dat_
                 and (c.date_off is null or c.date_off > Dat_)
-              UNION
-              select c.rnk RNK, NVL(c.okpo,'0000000000') OKPO,
-                     c.codcagent CODC, c.nmk NMK, NVL(c.ise,'00000') ISE,
-                     b.name NMK_U, NVL(trim(b.okpo_u),'0000000000') OKPO_U,
-                     b.custtype_u TK, -- 1 - юрлицо, 2 - физлицо
-                     b.country_u K040, nvl(TO_CHAR (k.KO), b.region_u) OBL,
-                     c.date_on DAT,
-                     NVL(b.rnkb,0) RNKA, b.rnka RNKB,
-                     b.notes NOTES, b.vaga1 VAGA1, b.vaga2 VAGA2,
-                     NVL(b.ved_u,'     ') VED_U, NVL(b.fs_u,'00') FS_U,
-                     NVL(b.ise_u,'00000') ISE_U,
-                     DECODE(b.country_u,804,1,2) REZ,
-                     NVL(trim(b.doc_serial),'') SER, NVL(trim(b.doc_number),'000000') NUMDOC,
-                     'XXXXX' TAG, '0' VALUE
-              from  customer c, cust_bun b, kodobl_reg k
-              where c.rnk in (select distinct rnk
-                              from otcn_f71_history
-                              where datf = Dat_
-                                and rnk is not null
-                                and p040 <> 0 )
-                and NVL(c.prinsider,99) = 99
-                and b.region_u = to_char(k.C_REG(+))
-                and c.rnk = b.rnka
-                and c.rnk <> 94809201
-                and c.custtype = 3
-                and b.id_rel in (select max(id_rel)
-                                 from cust_bun
-                                 where rnka = b.rnka
-                                   and id_rel in (5, 12)
-                                 group by rnka, rnkb, okpo_u, doc_number)
-                and nvl(b.edate, Dat_) >= Dat_
-                and nvl(b.bdate, Dat_) <= Dat_
-                and (c.date_off is null or c.date_off > Dat_) )
+              --UNION
+              --select c.rnk RNK, NVL(c.okpo,'0000000000') OKPO,
+              --       c.codcagent CODC, c.nmk NMK, NVL(c.ise,'00000') ISE,
+              --       b.name NMK_U, NVL(trim(b.okpo_u),'0000000000') OKPO_U,
+              --       b.custtype_u TK, -- 1 - юрлицо, 2 - физлицо
+              --       b.country_u K040, nvl(TO_CHAR (k.KO), b.region_u) OBL,
+              --       c.date_on DAT,
+              --       NVL(b.rnkb,0) RNKA, b.rnka RNKB,
+              --       b.notes NOTES, b.vaga1 VAGA1, b.vaga2 VAGA2,
+              --       NVL(b.ved_u,'     ') VED_U, NVL(b.fs_u,'00') FS_U,
+              --       NVL(b.ise_u,'00000') ISE_U,
+              --       DECODE(b.country_u,804,1,2) REZ,
+              --       NVL(trim(b.doc_serial),'') SER, NVL(trim(b.doc_number),'000000') NUMDOC,
+              --       'XXXXX' TAG, '0' VALUE
+              --from  customer c, cust_bun b, kodobl_reg k
+              --where c.rnk in (select distinct rnk
+              --                from otcn_f71_history
+              --                where datf = Dat_
+              --                  and rnk is not null
+              --                  and p040 <> 0 )
+              --  and NVL(c.prinsider,99) = 99
+              --  and b.region_u = to_char(k.C_REG(+))
+              --  and c.rnk = b.rnka
+              --  and c.rnk <> 94809201
+              --  and c.custtype = 3
+              --  and b.id_rel in (select max(id_rel)
+              --                   from cust_bun
+              --                   where rnka = b.rnka
+              --                     and id_rel in (5, 12)
+              --                   group by rnka, rnkb, okpo_u, doc_number)
+              --  and nvl(b.edate, Dat_) >= Dat_
+              --  and nvl(b.bdate, Dat_) <= Dat_
+              --  and (c.date_off is null or c.date_off > Dat_) 
+             )
 
    loop
        nbuc_ := NVL(nbuc1_,'0');
