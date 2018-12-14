@@ -125,7 +125,7 @@ begin
                       m.nmkk nmk,
                       (s.ost+s.dos-s.kos) ostf, m.rnk, trkk_kod typnls,
                       decode(nvl(alt_corp_cod,0),  0,  a.corp_kod, alt_corp_cod )  kodk,
-              inst_kod kodu, c.pos
+              ALT_USTAN_COD kodu, c.pos
                  from sal s, customer m, /*V_CORP_ACCOUNTS_KFILE*/ V_CORP_ACCOUNTS_WEB a, accounts c
                 where s.acc(+)    = a.acc
                   and a.acc= c.acc

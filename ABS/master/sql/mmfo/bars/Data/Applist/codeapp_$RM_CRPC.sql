@@ -236,18 +236,6 @@ begin
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Рахунки корпоративних клієнтів ********** ');
-          --  Створюємо функцію Рахунки корпоративних клієнтів
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Рахунки корпоративних клієнтів',
-                                                  p_funcname => '/barsroot/kfiles/kfiles/AccountCorp',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
 												  
 	  l := l +1;
       l_function_ids.extend(l);
@@ -281,13 +269,6 @@ begin
 												  p_rolename => '' ,
                                                   p_frontend  =>      l_application_type_id ); 
 												  
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-													p_name      =>  'Адміністрування корпоративних клієнтів(NEW)',          
-													p_funcname  =>  '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=V_OB_CORP_L1[CONDITIONS=>PARENT_ID IS NULL][showDialogWindow=>false]',     
-													p_rolename => '' ,
-                                                    p_frontend  =>   l_application_type_id );
 
 
     DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Прив''язка клієнтів до корпорацій ********** ');
@@ -295,44 +276,8 @@ begin
       l := l +1;
       l_function_ids.extend(l);
       l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Прив''язка клієнтів до корпорацій',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0'||chr(38)||'sPar=V_CUSTOMER_CORPORATIONS',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Повторне формування та відправка даних в ЦА ********** ');
-          --  Створюємо функцію Повторне формування та відправка даних в ЦА
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Повторне формування та відправка даних в ЦА',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=[PROC=>kfile_pack.KFILE_SEND(:Param0,:Param1)][PAR=>:Param0(SEM=Дата(ДДММГГГГ),TYPE=C),:Param1(SEM=Код корпоррації(%-всі),TYPE=C)][QST=>Виконати?][MSG=>ОК!]',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Оновлення довідника корпорацій ********** ');
-          --  Створюємо функцію Оновлення довідника корпорацій
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Оновлення довідника корпорацій',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=1'||chr(38)||'sPar=[PROC=>kfile_pack.kfile_get_dict][QST=>Виконати?][MSG=>Довідник оновлено.]',
-                                                  p_rolename => '' ,
-                                                  p_frontend => l_application_type_id
-                                                  );
-
-
-    DBMS_OUTPUT.PUT_LINE( chr(13)||chr(10)||' ********** Створюємо функцію Б/Р корпоративних клієнтів(включення в звітність) ********** ');
-          --  Створюємо функцію Б/Р корпоративних клієнтів(включення в звітність)
-      l := l +1;
-      l_function_ids.extend(l);
-      l_function_ids(l)   :=   abs_utils.add_func(
-                                                  p_name     => 'Б/Р корпоративних клієнтів(включення в звітність)',
-                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=5'||chr(38)||'sPar=OB_CORPORATION_NBS_REPORT',
+                                                  p_name     => 'Прив''язка клієнтів до корпорацій(NEW)',
+                                                  p_funcname => '/barsroot/ndi/referencebook/GetRefBookData/?accessCode=0'||chr(38)||'sPar=V_CUSTOMER_CORP[showDialogWindow=>false]',
                                                   p_rolename => '' ,
                                                   p_frontend => l_application_type_id
                                                   );
@@ -515,6 +460,9 @@ begin
     end loop;
      DBMS_OUTPUT.PUT_LINE(' Commit;  ');
    commit;
+umu.add_reference2arm_bytabname('OB_CORP_REP_NBS', '$RM_CRPC', 2, 1);
+umu.add_reference2arm_bytabname('OB_CORP_DICT_NBS', '$RM_CRPC', 1, 1);
+umu.add_reference2arm_bytabname('OB_CORP_DICT_REP', '$RM_CRPC', 1, 1);
 umu.add_report2arm(412,'$RM_CRPC');
 umu.add_report2arm(490,'$RM_CRPC');
 umu.add_report2arm(491,'$RM_CRPC');

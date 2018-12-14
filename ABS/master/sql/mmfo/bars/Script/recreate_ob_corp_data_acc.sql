@@ -1,29 +1,7 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Table/OB_CORP_DATA_ACC.sql =========*** Run 
-PROMPT ===================================================================================== 
-
-
-PROMPT *** ALTER_POLICY_INFO to OB_CORP_DATA_ACC ***
-
-
-BEGIN 
-        execute immediate  
-          'begin  
-               bpa.alter_policy_info(''OB_CORP_DATA_ACC'', ''CENTER'' , null, null, ''E'', null);
-               bpa.alter_policy_info(''OB_CORP_DATA_ACC'', ''FILIAL'' , ''M'', ''M'', ''M'', ''M'');
-               bpa.alter_policy_info(''OB_CORP_DATA_ACC'', ''WHOLE'' , null, null, ''E'', null);
-               null;
-           end; 
-          '; 
-END; 
-/
-
 PROMPT *** Create  table OB_CORP_DATA_ACC ***
 begin 
   execute immediate '
-  CREATE TABLE BARS.OB_CORP_DATA_ACC 
+  CREATE TABLE BARS.TMP_OB_CORP_DATA_ACC 
    (SESS_ID NUMBER, 
     ACC NUMBER, 
     KF VARCHAR2(6), 
@@ -47,7 +25,7 @@ begin
     IS_LAST NUMBER(1,0)
    ) PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
   TABLESPACE BRSBIGD COMPRESS 
-  partition by range (FDAT)
+  PARTITION BY RANGE (FDAT)
   INTERVAL(NUMTOYMINTERVAL(1, ''MONTH''))
  (PARTITION P_OLD_DAT VALUES LESS THAN ( TO_DATE(''01.03.2017'',''DD.MM.YYYY'')),
   PARTITION P_03_2017 VALUES LESS THAN ( TO_DATE(''01.04.2017'',''DD.MM.YYYY'')),
@@ -73,9 +51,11 @@ exception when others then
   if sqlcode=-955 then null; else raise; end if; 
 end; 
 /
+insert into TMP_OB_CORP_DATA_ACC select * from OB_CORP_DATA_ACC;
 
+drop table OB_CORP_DATA_ACC;
 
-
+RENAME TMP_OB_CORP_DATA_ACC to OB_CORP_DATA_ACC;
 
 PROMPT *** ALTER_POLICIES to OB_CORP_DATA_ACC ***
  exec bpa.alter_policies('OB_CORP_DATA_ACC');
@@ -104,9 +84,6 @@ COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.NAMK IS 'Найменування клієнта';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.NMS IS 'Найменування рахунку';
 COMMENT ON COLUMN BARS.OB_CORP_DATA_ACC.IS_LAST IS 'Актуальність даних';
 
-
-
-
 PROMPT *** Create  constraint PK_OB_CORP_DATA_ACC ***
 begin   
  execute immediate '
@@ -129,14 +106,8 @@ exception when others then
  end;
 /
 
-
+exec dbms_stats.gather_table_stats('BARS', 'OB_CORP_DATA_ACC');
+/
 
 PROMPT *** Create  grants  OB_CORP_DATA_ACC ***
 grant DELETE,INSERT,SELECT,UPDATE                                            on OB_CORP_DATA_ACC to BARS_ACCESS_DEFROLE;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Table/OB_CORP_DATA_ACC.sql =========*** End 
-PROMPT ===================================================================================== 
-

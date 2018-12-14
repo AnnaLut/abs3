@@ -3,7 +3,9 @@ select
 case when (select count(*) from ob_corporation w where w.parent_id = q.id) <> 0 then '++->' else null end as eh_ch,
 CONNECT_BY_ROOT EXTERNAL_ID AS base_extid,
 CONNECT_BY_ROOT CORPORATION_NAME AS base_name,
-id, corporation_code as corp_code, corporation_name as corp_name, parent_id, 
+id,
+corporation_name as corp_name, 
+parent_id, 
 case when state_id = 1 then 'Активний' 
      when state_id = 2 then 'Заблоковано' 
      when state_id = 3 then 'Закритий' 
