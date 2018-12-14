@@ -3339,8 +3339,8 @@ end ;
     end; -- end of 9995 
  
    ELSIF KOD_ = 9999 THEN
-      select t.nlsa, t.nlsb
-        into l_nlsa, l_nlsb
+      select t.nlsa, t.nlsb, t.kv2
+        into l_nlsa, l_nlsb, l_kv
         from oper t
        where t.ref = p_ref;
 
@@ -3349,13 +3349,28 @@ end ;
         into l_cnt
         from accounts t
        where t.tip like 'W4%'
-         and t.nls in (l_nlsa, l_nlsb);
+         and t.nls in (l_nlsa, l_nlsb)
+         and kv in(kv_, l_kv);
 
       IF l_cnt > 0
       THEN
          bars_audit.info ('!f_stop#9999 Заборонено проведення операції по рахункам БПК');
          erm := 'Заборонено проведення операції по рахункам БПК';
          RAISE err;
+      ELSE 
+         select count(*)
+           into l_cnt
+           from accounts t
+          where t.tip like 'W4%'
+            and t.nlsalt in (l_nlsa, l_nlsb)
+            and kv in(kv_, l_kv)
+            and t.dat_alt is not null;
+         IF l_cnt > 0
+         THEN
+            bars_audit.info ('!f_stop#9999 Заборонено проведення операції по рахункам БПК');
+            erm := 'Заборонено проведення операції по рахункам БПК';
+            RAISE err;
+         END IF;  
       END IF;
    -- COBUMMFO - 7501 Begin
    ELSIF KOD_ = 9997 THEN
