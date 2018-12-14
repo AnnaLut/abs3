@@ -148,7 +148,6 @@ begin
   bars_metabase.add_column(l_tabid, 22, 'IDR', 'N', '№ шк. ~Плав~%ст', '.5', null, 25, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 23, 'DT_SOS', 'C', 'Зміна~Стану', '1', null, 33, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
   bars_metabase.add_column(l_tabid, 24, 'KF', 'C', 'Код~МФО', '1.5', null, 40, 0, 0, 0, 1, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
-  bars_metabase.add_column(l_tabid, 25, 'MMETR', 'B', '+Макс. ставка при Дифер.~% ст', '.5', null, 24, 0, 0, 0, 0, '', '', 0, 0, '', 1, 0, 0, '', '', 0);
 
   -- добавляем описание сложного поля
   l_newtabid := bars_metabase.get_tabid('CUSTOMER');
@@ -199,7 +198,7 @@ begin
   bars_metabase.add_sortorder(l_tabid, 7, 1, 'ASC ');
 
   -- добавляем описание процедур
-  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'OVRN.ADD_master (:ND, :ACC, :CC_ID, :SDATE, :WDATE, :LIMIT, :IR0, :IR1 , :NLS, :KV, :DAY, :PD, :ISP, :METR, :IDR, NULL, :MMETR )');
+  bars_metabase.add_actiontbl(l_tabid, 'UPDATE', 'OVRN.ADD_master (:ND, :ACC, :CC_ID, :SDATE, :WDATE, :LIMIT, :IR0, :IR1 , :NLS, :KV, :DAY, :PD, :ISP, :METR, :IDR, NULL)');
 
   -- очищаем описание функций на справочник
   bars_metabase.delete_nsifunction(l_tabid);
