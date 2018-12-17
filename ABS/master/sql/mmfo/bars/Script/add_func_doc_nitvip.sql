@@ -7,6 +7,10 @@ begin
                     p_funcname  =>     '/barsroot/DocView/Docs/DocumentDateFilter?type=3', 
                     p_frontend  =>      1 );                       -- 1 - web интерфейс, 0 - desctop
 
+    -- По просьбе Демкович в АРМ в ее роли
+	umu.add_func2arm(l_codeoper, '$RM_BUHG', 1);  -- АРМ Головний Бухгалтер
+					
+					
     commit;
 end;
 /
