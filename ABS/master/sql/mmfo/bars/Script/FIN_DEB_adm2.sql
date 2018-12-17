@@ -25,7 +25,8 @@ begin
                                     );
          -- дать в АРМ общую функцию «Довідники»  - если ее там нет
         resource_utl.set_resource_access_mode ( resource_utl.get_resource_type_id('ARM_WEB') ,  
-                                                user_menu_utl.get_arm_id( aa.ID ), 
+---                                             user_menu_utl.get_arm_id( aa.ID ),   ---           
+                                                aa.ID , 
                                                 resource_utl.get_resource_type_id('FUNCTION_WEB'), 
                                                 4420,  1 , true ) ; 
 
@@ -49,5 +50,6 @@ end ;
 /
 
 commit;
+
 
 
