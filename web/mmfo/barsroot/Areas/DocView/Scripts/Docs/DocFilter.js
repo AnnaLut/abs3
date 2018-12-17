@@ -30,6 +30,9 @@
         case 2:
             $("#docTypeName").text("Документи за доступними рахунками");
             break;
+        case 3:
+            $("#docTypeName").text("Документи відділення");
+            break;
         default: alert("Невірні параметри");
     }
 

@@ -13,7 +13,7 @@
     <script type="text/javascript" src="/Common/Script/Localization.js"></script>
     <script type="text/javascript" src="\Common\WebGrid\Grid2005.js"></script>
     <script type="text/javascript" src="/Common/Script/BarsIe.js?v1.2"></script>
-    <script type="text/javascript" src="Script.js?v1.5"></script>
+    <script type="text/javascript" src="Script.js?v1.6"></script>
     <script src="/common/jquery/jquery.js"></script>
     <link href="../lib/alertify/css/alertify.core.css" rel="stylesheet" />
     <link href="../lib/alertify/css/alertify.default.css" rel="stylesheet" />

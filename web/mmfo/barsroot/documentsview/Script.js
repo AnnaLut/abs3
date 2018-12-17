@@ -45,6 +45,10 @@ function InitDocuments() {
             document.getElementById("lb_DocTitles").innerText += LocalizedString('Message9');
             v_data[11] = "V_DOCS_SALDO";
         }
+        if (args.type == '3') {
+            document.getElementById("lb_DocTitles").innerText += LocalizedString('Message2');
+            v_data[11] = "V_DOCS_TOBO_OUT_NOTVIP";
+        }
     }
     if (args.par.charAt(1) == '2') {
         document.getElementById("lb_DocTitles").innerText = LocalizedString('Message4');
@@ -59,6 +63,10 @@ function InitDocuments() {
         if (args.type == '2') {
             document.getElementById("lb_DocTitles").innerText += LocalizedString('Message9');
             v_data[11] = "V_DOCS_SALDO";
+        }
+        if (args.type == '3') {
+            document.getElementById("lb_DocTitles").innerText += LocalizedString('Message2');
+            v_data[11] = "V_DOCS_TOBO_OUT_NOTVIP";
         }
     }
 
