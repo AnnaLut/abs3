@@ -34,11 +34,12 @@ namespace BarsWeb.DocumentsView
                         break;
                     case "2": role = "WR_DOCLIST_SALDO";
                         break;
+                    case "3": break;
                     default:
                         throw new Exception("Страница вызвана без необходимого параметра!");
                 }
-
-				SetRole(role);
+                if (role != "")
+				    SetRole(role);
 				
 				CultureInfo cinfo = CultureInfo.CreateSpecificCulture("en-GB");	
 				cinfo.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
