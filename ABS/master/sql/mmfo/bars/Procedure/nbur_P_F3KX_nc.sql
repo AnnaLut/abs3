@@ -13,7 +13,7 @@ CREATE OR REPLACE procedure BARS.nbur_P_F3KX_nc(
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 begin
    p_f3kx_NN (p_report_date,'C');
-   
-   p_nbu_save_rezult(p_report_date, p_kod_filii, '#3K'); 
+  
+--   p_nbu_save_rezult(p_report_date, p_kod_filii, '#3K'); 
 end;
 /
