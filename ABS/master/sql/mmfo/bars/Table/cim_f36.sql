@@ -11,10 +11,7 @@ PROMPT *** ALTER_POLICY_INFO to CIM_F36 ***
 BEGIN 
         execute immediate  
           'begin  
-               bpa.alter_policy_info(''CIM_F36'', ''CENTER'' , null, null, null, null);
                bpa.alter_policy_info(''CIM_F36'', ''FILIAL'' , ''F'', ''F'', ''F'', ''F'');
-               bpa.alter_policy_info(''CIM_F36'', ''WHOLE'' , null, null, null, null);
-               null;
            end; 
           '; 
 END; 
@@ -53,7 +50,8 @@ begin
 	CREATE_DATE DATE, 
 	P27 VARCHAR2(3), 
 	BRANCH VARCHAR2(30) DEFAULT sys_context(''bars_context'', ''user_branch''), 
-	P21_NEW DATE
+	P21_NEW DATE,
+    RNK     NUMBER(38)
    ) SEGMENT CREATION IMMEDIATE 
   PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
  NOCOMPRESS LOGGING
@@ -63,7 +61,13 @@ exception when others then
 end; 
 /
 
-
+begin 
+  execute immediate 'ALTER TABLE BARS.CIM_F36 ADD (RNK     NUMBER(38))';
+exception
+    when others then 
+        if sqlcode=-1430 then null; else raise; end if;
+end;        
+/
 
 
 PROMPT *** ALTER_POLICIES to CIM_F36 ***
@@ -101,6 +105,7 @@ COMMENT ON COLUMN BARS.CIM_F36.P24 IS 'Дата зняття з контролю резидента';
 COMMENT ON COLUMN BARS.CIM_F36.P25 IS 'Код підрозділу, який ліквідовано';
 COMMENT ON COLUMN BARS.CIM_F36.CREATE_DATE IS 'Дата створення';
 COMMENT ON COLUMN BARS.CIM_F36.P27 IS 'Примітка (порядковий номер запису для записів з однаковими номерами контрактів та різними назвами нерезидентів)';
+COMMENT ON COLUMN BARS.CIM_F36.RNK IS 'РНК контрагента';
 
 
 

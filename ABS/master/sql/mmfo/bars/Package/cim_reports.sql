@@ -718,14 +718,29 @@ begin
   end if;
 
   bars_audit.info('CIM p_f531  '||p_date||': :'||user_id||':');
+  
   l_sysdate:=trunc(sysdate);
-  select nvl(substr(par_value,1,3),'XXX') into l_oblcode from cim_params where par_name='EL_COD_OBL';
+  
+  select nvl(substr(par_value,1,3),'XXX') 
+  into l_oblcode 
+  from cim_params 
+  where par_name='EL_COD_OBL';
+  
   l_filename:='#36'||l_oblcode||num_code(to_number(to_char(l_sysdate,'MM')))||
               num_code(to_number(to_char(l_sysdate,'DD')))||'.E'||num_code(to_number(to_char(p_date,'MM')))||'1';
-  p_error:=l_filename; select nvl(substr(par_value,1,2),'XX') into l_oblcode from cim_params where  par_name='OBL_CODE';
+              
+  p_error:=l_filename; 
+  
+  select nvl(substr(par_value,1,2),'XX') into l_oblcode from cim_params where  par_name='OBL_CODE';
 
-  dbms_lob.createtemporary(l_txt_clob, false); l_date_z_end:=last_day(add_months(p_date,-1))+1;
-  select nvl(max(create_date), add_months(l_date_z_end,-1)) into l_last_date from cim_f36 where branch like sys_context('bars_context', 'user_mfo_mask');
+  dbms_lob.createtemporary(l_txt_clob, false); 
+  
+  l_date_z_end:=last_day(add_months(p_date,-1))+1;
+  
+  select nvl(max(create_date), add_months(l_date_z_end,-1)) 
+  into l_last_date 
+  from cim_f36 
+  where branch like sys_context('bars_context', 'user_mfo_mask');
 
   if l_last_date=l_date_z_end and
           (to_char(l_sysdate,'yyyymm')=to_char(l_last_date,'yyyymm') and to_number(to_char(l_sysdate,'dd'))<=10 or
@@ -733,12 +748,11 @@ begin
         add_months(l_last_date,1)=l_date_z_end and
           (to_number(to_char(l_sysdate,'yyyymm'))+1=to_number(to_char(l_date_z_end,'yyyymm')) and to_number(to_char(l_sysdate,'dd'))>10 or
            to_number(to_char(l_sysdate,'yyyymm'))+1>to_number(to_char(l_date_z_end,'yyyymm')) )
-  --      or to_char(p_date,'yyyymm')='201505'
   then
-
     delete from cim_f36 where create_date=l_date_z_end and branch like sys_context('bars_context', 'user_mfo_mask');
     insert into cim_f36 (b041, k020, p17, p16, doc_date, p21, p14, p01, p22, p15, p18, create_date)
                  values (0, 0, '0', to_date('01/01/2015', 'dd/mm/yyyy'), '01012015', to_date('01/01/2015', 'dd/mm/yyyy'), 0, 0, 0, 0, 0, l_date_z_end);
+                 
     for l in
     (
       select * from (
@@ -752,9 +766,7 @@ begin
                decode(a.p22, 1, a.p18, a.f_p18) as p18, decode(a.p22, 3, a.f_p19, a.p19) as p19, nvl2(a.p15, decode(a.p22, 1, a.p20, a.f_p20), a.f_p20) as p20,
                case when a.p15 is null or a.m_p22=3 then a.f_p21 else nvl(a.f_p21,a.p21) end as p21, a.p22, decode(a.p22, 2, l_date_z_end, null) as p23,
                decode(a.p22, 3, case when a.p15=0 then a.max_pdat else null end, null) as p24, case when a.p27=0 then null else to_char(a.p27, 'fm999') end as p27, a.doc_date,
-               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new
-               /*row_number() over ( partition by a.k020, decode(a.p22, 3, nvl(a.f_p08_old, a.f_p08), a.p08),
-               case when a.p15 is null or a.m_p22=3 then a.f_p17 else a.p17 end order by a.p16 ) as p27*/
+               case when a.p22=2 and a.f_p21<>a.p21 then a.p21 else null end as p21_new, a.rnk
          from
          ( select nvl(m.m_p22,
                       case when x.p15=0 or x.p21<add_months(l_date_z_end,-120) or x.p15 is null then 3
@@ -764,7 +776,7 @@ begin
                       x.b041, x.k020, x.p01, e.k112 as p02, x.f_p02, x.f_p02_old, k.nmk as p06 , x.f_p06, x.f_p06_old, nvl(x.adr, k.adr) as p07, x.f_p07, x.f_p07_old,
                       substr(b.benef_name,1,135) as p08, x.f_p08, x.f_p08_old, to_char(b.country_id, 'fm000') as p09, x.f_p09, x.p14, x.p15, x.p16, x.p17, x.p18, x.f_p18,
                       x.p19, x.f_p19, x.p20, x.f_p20, x.p21, x.max_pdat, x.contr_id, x.doc_date,
-                      x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, x.f_p21_new, m.m_p22, x.p27
+                      x.f_b041, x.f_k020, x.f_p01, x.f_p14, x.f_p16, x.f_p17, x.f_p21, x.f_p21_new, m.m_p22, x.p27, x.rnk
              from
              ( select x.*, (select substr(b.b040,9,12) from branch b where b.branch=x.branch) as b041,
                       (select nvl2(zip, zip || ', ', '') || case when upper(domain) like '%МІСТО%' and upper(domain) like '%'||upper(locality)||'%' then '' else nvl2(domain, domain || ', ', '') end ||
@@ -837,14 +849,14 @@ begin
              left outer join kl_k110 e on e.d_close is null and e.k110=k.ved
              left outer join ( select 3 as m_p22 from dual union all select 1 as m_p22 from dual ) m
                on x.b041 != x.f_b041 and x.p15>0 and x.f_b041 is not null and x.p15 is not null ) a
-              where a.p22>0 )
+             )
       order by b041, k020, p17, p08, p16, p21, p01
     )
     loop
       begin
-        insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, create_date)
+        insert into cim_f36 (b041, k020, doc_date, p01, p02, p06, p07, p08, p09, p13, p14, p15, p16, p17, p18, p19, p20, p21, p21_new, p22, p23, p24, p27, rnk, create_date)
                      values (l.b041, l.k020, l.doc_date, l.p01, l.p02, l.p06, l.p07, l.p08, l.p09, l.p13, l.p14, l.p15, l.p16, l.p17, l.p18,
-                             l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l_date_z_end);
+                             l.p19, l.p20, l.p21, l.p21_new, l.p22, l.p23, l.p24, l.p27, l.rnk, l_date_z_end);
       --COBUMMFO-9323
       exception
         when dup_val_on_index then
@@ -863,7 +875,8 @@ begin
                  f36.p22 = l.p22,
                  f36.p23 = l.p23,
                  f36.p24 = l.p24,
-                 f36.p27 = l.p27
+                 f36.p27 = l.p27,
+                 f36.rnk = l.rnk
            where f36.BRANCH = sys_context('bars_context', 'user_branch')
              and f36.B041 = l.b041
              and f36.K020 = l.k020
@@ -879,27 +892,19 @@ begin
     end loop;
     commit;
   elsif l_date_z_end>l_last_date then
---    (l_date_z_end<l_last_date or l_last_date=l_date_z_end and to_char(l_sysdate,'mmyyyy')=to_char(l_last_date,'mmyyyy') and to_number(to_char(l_sysdate,'dd'))>7) and to_char(p_date,'yyyymm') != '201505' ) then
     p_error:='Формування звіту #36 за '||to_char(l_date_z_end,'dd.mm.yyyy')||'р. неможливе! Дата останнього сформованого звіту #36 - '||to_char(l_last_date,'dd.mm.yyyy')||'р.'; return '';
   end if;
 
   for l in
   ( select f.b041, f.k020, f.p01, f.p02, f.p06, f.p07, f.p08, f.p09, f.p13, f.p14, f.p15, f.p16, f.p17, f.p18, f.p19, f.p20, f.p21, f.p22, f.p23, f.p24, f.doc_date, f.p27
       from cim_f36 f
-           /* join
-           ( select k020, p16, p17, p08, row_number() over ( partition by k020, p16, p17 order by p08) as p27, count (p08) over ( partition by k020, p16, p17 ) as n_p27
-               from
-               ( select distinct k020, p16, p17, p08
-                   from cim_f36 where b041 != 0 and create_date=l_date_z_end group by k020, p16, p17, p08 ) ) a
-           on a.k020=F.K020 and a.p16=f.p16 and a.p17=f.p17 and a.p08=f.p08 */
-     where f.b041 != 0 and f.create_date=l_date_z_end
+     where f.b041 != 0 
+       and f.create_date=l_date_z_end
+       and F.P22 > 0
        and f.branch like sys_context('bars_context', 'user_mfo_mask')
      order by f.b041, f.k020, f.p16, f.p17, f.p08, f.p21, f.p01 )
   loop
     if l_okpo != l.k020 or l_contr_date != l.p16 or l_contr_num != l.p17 then
-    /*  if l.p27=1 then
-        if l.p17=l_contr_num and l.p08 != l_benef_name and l_p22=l.p22 then l_p27:=l_p27+1; else l_p27:=1; end if;
-      end if;*/
       l_okpo:=l.k020; l_contr_date:=l.p16; l_contr_num:= l.p17; l_n_contr:=l_n_contr+1;  l_p22:=l.p22;
     elsif l_last_p21=l.p21 then
       l_n_contr:=l_n_contr+1;
@@ -950,7 +955,9 @@ begin
     end;
     l_txt:=l_txt||'#1='||l_oblcode||'='||l_b041||chr(13)||chr(10);
   end if;
+  
   dbms_lob.createtemporary(l_result, false); dbms_lob.append(l_result, l_txt); dbms_lob.append(l_result, l_txt_clob);
+  
   return l_result;
 end  p_f531;
 
