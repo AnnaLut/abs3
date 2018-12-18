@@ -4340,6 +4340,16 @@ exception when others then
  end;
 /
 
+PROMPT *** Create  index IDX_OPLDOK_ACC_FDAT ***
+begin   
+ execute immediate '
+  CREATE INDEX BARS.IDX_OPLDOK_ACC_FDAT ON BARS.OPLDOK (ACC, FDAT) 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255  NOLOGGING 
+  TABLESPACE BRSOPLDOKI  LOCAL';
+exception when others then
+  if  sqlcode=-955  then null; else raise; end if;
+ end;
+/
 
 
 PROMPT *** Create  grants  OPLDOK ***
