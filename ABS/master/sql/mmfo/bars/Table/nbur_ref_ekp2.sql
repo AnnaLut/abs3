@@ -81,6 +81,15 @@ COMMENT ON COLUMN BARS.NBUR_REF_EKP2.EKP IS 'Код показника';
 COMMENT ON COLUMN BARS.NBUR_REF_EKP2.DSC IS 'Опис показника';
 COMMENT ON COLUMN BARS.NBUR_REF_EKP2.FILE_CODE IS 'Код файлу';
 
+prompt ================= ADD COLUMNS ============================
+begin  EXECUTE IMMEDIATE 'ALTER TABLE BARS.nbur_ref_ekp2 ADD (DESC_EKP CLOB) ' ;
+exception when others then   if SQLCODE = - 01430 then null;   else raise; end if; -- ORA-01430: column being added already exists in table
+end;
+/
+comment on column BARS.nbur_ref_ekp2.DESC_EKP is 'Опис правил формування показника з файлу Registry_XXX.xls';
+/
+
+
 prompt -- ======================================================
 prompt -- Grants
 
