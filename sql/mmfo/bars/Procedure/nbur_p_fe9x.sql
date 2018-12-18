@@ -7,11 +7,11 @@ CREATE OR REPLACE PROCEDURE BARS.NBUR_P_FE9X (p_kod_filii  varchar2
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DESCRIPTION :    Процедура формирования #E9 для схема "C"
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
-% VERSION     :    07/09/2018 (27/07/2018)
+% VERSION     :    17/12/2018 (07/09/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     параметры: p_report_date - отчетная дата
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_              char(30)  := 'v.1.003  07/09/2018';
+  ver_              char(30)  := 'v.1.004  12/12/2018';
 
   c_title           constant varchar2(100 char) := $$PLSQL_UNIT || '.';
 
@@ -51,7 +51,7 @@ begin
   nbur_waiting_form(p_kod_filii, p_report_date, l_old_file_code, c_title);
 
   select max(version_id)
-  into l_version
+  into l_version_id
   from v_nbur_#e9
   where report_date = p_report_date and
         kf = p_kod_filii;
@@ -124,7 +124,7 @@ begin
                        , l_version_id as version_id
                        , substr(substr(field_code,1,16)||substr(field_code,19),1,1) ekp_1
                        , substr(substr(field_code,1,16)||substr(field_code,19),2) ekp_2
-                       , field_value
+                       , sum(field_value) field_value
                        , description 
                        , acc_id
                        , acc_num
@@ -135,12 +135,22 @@ begin
                   from v_nbur_#e9_dtl
                   where report_date = p_report_date and
                         kf = p_kod_filii
+                  group by nbuc
+                       , substr(substr(field_code,1,16)||substr(field_code,19),1,1)
+                       , substr(substr(field_code,1,16)||substr(field_code,19),2)
+                       , description 
+                       , acc_id
+                       , acc_num
+                       , kv
+                       , cust_id
+                       , ref
+                       , branch
                   union all
                   select nbuc
                        , l_version_id
                        , substr(field_code,1,1) ekp_1
                        , substr(field_code,2) ekp_2
-                       , field_value
+                       , to_number(field_value) field_value
                        , description 
                        , null acc_id
                        , null acc_num
