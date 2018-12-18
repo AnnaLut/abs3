@@ -146,6 +146,7 @@ function InitCustAcc() {
     if (type == 0
         || (type == 3 && getParamFromUrl("nd", location.href))
         || (type == 5 && getParamFromUrl("bpkw4nd", location.href))
+        || (type == 4 && getParamFromUrl("acc", location.href))
         || type == 8
         || type == 9 /* перегляд рахунків угоди з АРМ Цінні Папери ->ЦП Потрфель Загальний */
     ) {
