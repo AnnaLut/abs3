@@ -13,11 +13,12 @@ IS
 % DESCRIPTION :   Процедура формирования 3KX     для КБ (универсальная)
 % COPYRIGHT   :   Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :   v.18.021          09.11.2018
+% VERSION     :   v.18.021          17.12.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
       sheme_ - схема формирования
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+    ver_           varchar2(30)        := ' v.18.021    17.12.2018';
 /*
    Структура показателя    DDDD NNN
 
@@ -63,7 +64,6 @@ IS
    kons_sum_    number;
 
    kodp_      varchar2(10);
-   znap_      varchar2(70);
    kodf_      VARCHAR2 (2)   := '3K';
    nbuc_      varchar2(12);
    nbuc1_     varchar2(12);
@@ -99,7 +99,7 @@ IS
    t071_      number;
    k020_      varchar2(20);
    k021_      varchar2(1);
-   q001_      varchar2(38);
+   q001_      varchar2(135);
    q024_      varchar2(1);
    d100_      varchar2(2);
    k_days_    number;
@@ -108,9 +108,9 @@ IS
    kod_obl_   varchar2(2);
    rnk_       number;
    okpo_      varchar2(14);
-   nmk_       varchar2(70);
+   nmk_       varchar2(256);
    k040_      varchar2(3);
-   adr_       varchar2(70);
+   adr_       varchar2(256);
    ise_       varchar2(5);
    fs_        varchar2(2);
    i_cnt_25_       number;                   --количество счетов раздела 25
@@ -150,18 +150,21 @@ IS
    IS
       SELECT   t.ko,
                nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
-               c.rnk, c.okpo, c.nmk, TO_CHAR (c.country), c.adr,
+               c.rnk, c.okpo, nvl(substr(trim(p.nmku),1,135),c.nmk) nmk,
+               to_char(c.country), c.adr,
                NVL (c.ise, '00000'), NVL (c.fs, '00'), c.codcagent,
                SUM (t.s_eqv),
                SUM (gl.p_icurval (t.kv, t.s_kom, dat_))     --сумма в формате грн.коп
-          FROM OTCN_PROV_TEMP t, customer c, tobo b         --branch b
+          FROM OTCN_PROV_TEMP t, customer c, tobo b,         --branch b
+               corps p
          WHERE t.rnk = c.rnk
+           and c.rnk = p.rnk(+)
            and c.tobo = b.tobo(+)                           --c.branch = b.branch
       GROUP BY t.ko,
                nvl(decode(substr(b.b040,9,1),'2',substr(b.b040,15,2),substr(b.b040,10,2)),nbuc_),
                c.rnk,
                c.okpo,
-               c.nmk,
+               nvl(substr(trim(p.nmku),1,135),c.nmk),
                TO_CHAR (c.country),
                c.adr,
                NVL (c.ise, '00000'), NVL (c.fs, '00'),
@@ -207,7 +210,7 @@ IS
    PROCEDURE p_ins (p_np IN NUMBER, p_kodp IN VARCHAR2, p_znap IN VARCHAR2)
    IS
       l_kodp   varchar2 (10);
-      l_znap   varchar2 (70);
+      l_znap   varchar2 (256);
    BEGIN
       l_kodp := p_kodp || LPAD (TO_CHAR (p_np), 3, '0');
       l_znap := p_znap;
@@ -218,9 +221,12 @@ IS
            l_znap := substr(p_znap,1,2)||'.'||substr(p_znap,3,2)||'.'||substr(p_znap,5,4);
       end if;
 
-      INSERT INTO rnbu_trace
-                ( nls, kv, odate, kodp, znap, nbuc, ref, rnk, comm, acc )
-         VALUES ( nls_, kv_, dat_, l_kodp, l_znap, nbuc_, ref_, rnk_, to_char(refd_), acc_ );
+          insert
+            into NBUR_DETAIL_PROTOCOLS
+               ( REPORT_DATE, KF, REPORT_CODE, NBUC, FIELD_CODE, FIELD_VALUE, DESCRIPTION
+               , ACC_ID, ACC_NUM, KV, CUST_ID, REF )
+          values ( dat_, mfo_, '#3K', nbuc_, l_kodp, nvl(l_znap,' '), to_char(refd_),
+                   acc_, nls_, kv_, rnk_, ref_ );
 
    END;
 
@@ -480,11 +486,9 @@ IS
 BEGIN
 
    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_NUMERIC_CHARACTERS=''.,''';
-   logger.info ('P_F3KX begin for date = '||to_char(dat_, 'dd.mm.yyyy'));
+   logger.info ('P_F3KX begin for date = '||to_char(dat_, 'dd.mm.yyyy')||ver_);
 -------------------------------------------------------------------
    userid_ := user_id;
-
-   EXECUTE IMMEDIATE 'TRUNCATE TABLE RNBU_TRACE';
 
    EXECUTE IMMEDIATE 'TRUNCATE TABLE OTCN_PROV_TEMP';
 -------------------------------------------------------------------
@@ -641,7 +645,7 @@ BEGIN
 
    delete
    from OTCN_PROV_TEMP
-   where ref in (select ref from NBUR_TMP_DEL_70 where kodf = '3K' and datf = dat_); 
+   where ref in (select ref from NBUR_TMP_DEL_70 where kodf = kodf_ and datf = dat_); 
 
    -- для РУ Ощадбанку видаляємо проводки виду Дт 2600/2620/2650 Кт 2900
    -- якщо наявна заявка на продаж валюти на цю суму по цьому клієнту в найближчі +/- 3 дні
@@ -1320,6 +1324,7 @@ BEGIN
 
    CLOSE c_main;
 
+   logger.info ('P_F3KX etap 1 after c_main');
 ------------------------------------------------------------
 --                                    зеркальные операции для 2620, 2625, 2630
    if mfou_ =300465  then             --and mfo_ !=300465  then
@@ -1345,20 +1350,26 @@ BEGIN
      end loop;
 
    end if;
+   logger.info ('P_F3KX etap 2');
 ------------------------------------------------------------
-   DELETE FROM tmp_nbu
-         WHERE kodf = kodf_ AND datf = dat_;
+   delete from nbur_agg_protocols
+         where kf =mfo_
+           and report_date =dat_
+           and report_code ='#3K';
 
    f089_ :='1';
---   консолидация  операций  по rnbu_trace    операция 216 для клиентов
+--   консолидация  операций  по detail_protocols    операция 216 для клиентов
    for u in ( select f091, r030, f092, sum(t071) t071
                 from ( select *
-                         from ( select substr(kodp,5,3) ekp_2,
-                                       substr(kodp,1,4) ekp_1, znap 
-                                  from rnbu_trace
+                         from ( select substr(field_code,5,3) ekp_2,
+                                       substr(field_code,1,4) ekp_1, field_value 
+                                  from nbur_detail_protocols
+                                 where kf =mfo_
+                                   and report_date =dat_
+                                   and report_code ='#3K'
                               )
                               pivot
-                              ( max(trim(znap))
+                              ( max(trim(field_value))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
                                                  'K020' as K020, 'K021' as K021, 'Q001' as Q001,
                                                  'Q024' as Q024, 'D100' as D100, 'S180' as S180,
@@ -1372,29 +1383,55 @@ BEGIN
    ) loop
           nnnn_ := nnnn_+1;
           kodp_ := LPAD (TO_CHAR (nnnn_), 3, '0');
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'F091'||kodp_, u.f091, nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'R030'||kodp_, LPAD (u.r030, 3,'0'), nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'T071'||kodp_, TO_CHAR (u.t071), nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'K020'||kodp_, '0', nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'K021'||kodp_, '#', nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'Q024'||kodp_, '2', nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'D100'||kodp_, '00', nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'S180'||kodp_, '#', nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'F089'||kodp_, f089_, nbuc_);
-          insert into tmp_nbu (kodf, datf, kodp, znap, nbuc)   values (kodf_, dat_, 'F092'||kodp_, '216', nbuc_);
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'F091'||kodp_, u.f091 );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'R030'||kodp_, lpad (u.r030, 3,'0') );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'T071'||kodp_, to_char (u.t071) );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'K020'||kodp_, '0' );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'K021'||kodp_,  '#' );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'Q024'||kodp_,  '2' );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'D100'||kodp_,  '00' );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'S180'||kodp_,  '#' );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'F089'||kodp_,  f089_ );
+          insert into nbur_agg_protocols
+              ( kf, report_date, report_code, nbuc, field_code, field_value )
+           values ( mfo_, dat_, '#3K', nbuc_, 'F092'||kodp_,  '216' );
 
-          update rnbu_trace
-             set comm = substr(substr(kodp,5,3)||' консолідовано'||comm,1,200),
-                 kodp = substr(kodp,1,4)||kodp_,
-                 znap = case when substr(kodp,1,4)='F089' then '1' else znap end
-           where substr(kodp,5,3) in ( select ekp_2 from (
+          update nbur_detail_protocols
+             set description = substr(substr(field_code,5,3)||' консолідовано'||description,1,200),
+                 field_code = substr(field_code,1,4)||kodp_,
+                 field_value = case when substr(field_code,1,4)='F089' then '1' else field_value end
+           where kf =mfo_
+             and report_date =dat_
+             and report_code ='#3K'
+             and substr(field_code,5,3) in ( select ekp_2 from (
                        select ekp_2
-                         from ( select substr(kodp,5,3) ekp_2,
-                                       substr(kodp,1,4) ekp_1, znap 
-                                  from rnbu_trace
+                         from ( select substr(field_code,5,3) ekp_2,
+                                       substr(field_code,1,4) ekp_1, field_value 
+                                  from nbur_detail_protocols
+                                 where kf =mfo_
+                                   and report_date =dat_
+                                   and report_code ='#3K'
                               )
                               pivot
-                              ( max(trim(znap))
+                              ( max(trim(field_value))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
                                                  'K020' as K020, 'K021' as K021, 'Q001' as Q001,
                                                  'Q024' as Q024, 'D100' as D100, 'S180' as S180,
@@ -1406,6 +1443,7 @@ BEGIN
                                       ) );
                                     
    end loop;
+   logger.info ('P_F3KX etap 3 after consolidation 1');
    nbuc_ := nbuc1_;
    f089_ :='2';
 
@@ -1530,6 +1568,7 @@ BEGIN
     END LOOP;
     CLOSE rfc1_;
 
+   logger.info ('P_F3KX etap 4 after FOREX');
 --    банковские операции FXE
     for u in ( SELECT  '3' ko, o.rnkk rnk, o.REF, o.acck, o.nlsk,
                        o.kv, o.accd, o.nlsd, o.nazn,
@@ -1592,20 +1631,26 @@ BEGIN
          end if;
     end loop;
 
+   logger.info ('P_F3KX etap 5 after FXE');
 ---------------------------------------------------
-   INSERT INTO tmp_nbu
-            (kodf, datf, kodp, znap, nbuc)
-      select kodf_, dat_, kodp, znap, nbuc
-        from rnbu_trace
-       where userid = userid_
-         and substr(kodp,5,3) not in ( select ekp_2  from (
+   insert into nbur_agg_protocols
+            ( kf, report_date, report_code, nbuc, field_code, field_value )
+      select kf, report_date, report_code, nbuc, field_code, field_value
+        from nbur_detail_protocols
+       where kf =mfo_
+         and report_date = dat_
+         and report_code ='#3K'
+         and substr(field_code,5,3) not in ( select ekp_2  from (
                        select *
-                         from ( select substr(kodp,5,3) ekp_2,
-                                       substr(kodp,1,4) ekp_1, znap 
-                                  from rnbu_trace
+                         from ( select substr(field_code,5,3) ekp_2,
+                                       substr(field_code,1,4) ekp_1, field_value 
+                                  from nbur_detail_protocols
+                                 where kf =mfo_
+                                   and report_date = dat_
+                                   and report_code ='#3K'
                               )
                               pivot
-                              ( max(trim(znap))
+                              ( max(trim(field_value))
                                   for ekp_1 in ( 'F091' as F091, 'R030' as R030, 'T071' as T071,
                                                  'K020' as K020, 'K021' as K021, 'Q001' as Q001,
                                                  'Q024' as Q024, 'D100' as D100, 'S180' as S180,
@@ -1614,13 +1659,17 @@ BEGIN
                               )   
                         where  f091 ='4' and f092 ='216' and f089 ='1') );
 ----------------------------------------
+   logger.info ('P_F3KX etap 6 after consolidation 2');
 
 DELETE FROM OTCN_TRACE_70
          WHERE kodf = kodf_ and datf= dat_ ;
 
-insert into OTCN_TRACE_70(KODF, DATF, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO)
-select kodf_, dat_, USERID_, NLS, KV, ODATE, KODP, ZNAP, NBUC, ISP, RNK, ACC, REF, COMM, ND, MDATE, TOBO
-from rnbu_trace;
+insert into OTCN_TRACE_70
+         (KODF, DATF, USERID, NLS, KV, ODATE, KODP, ZNAP, NBUC, RNK, ACC, REF, COMM, ND)
+ select kodf_, dat_, userid_, acc_num, kv, dat_, field_code, field_value, nbuc, cust_id, acc_id, ref, description, nd
+   from nbur_detail_protocols
+  where report_date = dat_  and  kf =mfo_
+    and report_code ='#3K';
 
 --             otc_del_arch('3K', dat_, 1);
 --             OTC_SAVE_ARCH('3K', dat_, 1);
@@ -1628,6 +1677,7 @@ from rnbu_trace;
 
     logger.info ('P_F3KX  end  for date = '||to_char(dat_, 'dd.mm.yyyy'));
 
+   commit;
 END;
 /         
 
