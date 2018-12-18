@@ -1,18 +1,9 @@
-
-
-PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_GET_S080_S180.sql =========*** R
-PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_GET_S080_S180 ***
-
-  CREATE OR REPLACE PROCEDURE BARS.P_GET_S080_S180 (dat_ in date, mfou_ in varchar2,
+CREATE OR REPLACE PROCEDURE BARS.P_GET_S080_S180 (dat_ in date, mfou_ in varchar2,
    acc_ in out number, nls_ in varchar2, kv_ in accounts.KV%type, acc2_ in out number,
    nd_ in number, vidd_ in number, rezid_ in number, comm_ in out varchar2,
    s080_ in out specparam.S080%type, s180_ in out specparam.S180%type)
    -------------------------------------------------
-   -- VERSION - 09/08/2017 (23/05/2017)
+   -- VERSION - 12/12/2018 (09/08/2017)
    --
    -- 23/05/2017 для определения S180 дополнительно обрабатываем счета типа 
    --            SS, SP при нулевых остатках и ненулевых Кт оборотах за месяц
@@ -56,7 +47,6 @@ begin
            and k.fdat = dat_
            and trim(k.tip) = 'SS'
            and nvl(s.s180,'0') not in ('0', '8', '9')
-           --and k.acc <> acc_
            and k.kv = kv_
            and k.ost <> 0
            and k.acc = s.acc
@@ -72,7 +62,6 @@ begin
                and k.fdat = dat_
                and trim(k.tip) = 'SP'
                and nvl(s.s180,'0') not in ('0', '8', '9')
-               --and k.acc <> acc_
                and k.kv = kv_
                and k.ost <> 0
                and k.acc = s.acc
@@ -87,7 +76,6 @@ begin
                    and n.acc = a.acc
                    and trim(a.tip) = 'SS'
                    and nvl(s.s180,'0') not in ('0', '8', '9')
-                   --and a.acc <> acc_
                    and a.acc = s.acc
                    and nvl(a.dazs, dat_+1) > dat_ 
                    and fost(a.acc, dat_) <> 0  
@@ -133,7 +121,6 @@ begin
                                and k.fdat = dat_
                                and trim(k.tip) = 'SS'
                                and nvl(s.s180,'0') not in ('0', '8', '9')
-                               --and k.acc <> acc_
                                and k.kv = kv_
                                and k.ost = 0
                                and FKOS(k.acc, trunc(dat_,'MM'), dat_) <> 0
@@ -150,7 +137,6 @@ begin
                                    and k.fdat = dat_
                                    and trim(k.tip) = 'SP'
                                    and nvl(s.s180,'0') not in ('0', '8', '9')
-                                   --and k.acc <> acc_
                                    and k.kv = kv_
                                    and k.ost = 0
                                    and FKOS(k.acc, trunc(dat_,'MM'), dat_) <> 0
@@ -173,14 +159,6 @@ begin
              s180_ := s180_k;   
              comm_ := substr(comm_ || ' ACC1='||to_char(acc2_),1,200);
           end if;
-      end if;
-          
-      if substr(nls_,4,1) = '7' OR 
-        (substr(nls_,4,1) in ('8','9') AND tips_sna = 'SNA') 
-      then
-         acc2_ := acc_;
-      else
-         acc2_ := null;
       end if;
    elsif nbs_ IN ('2607', '2627', '2657')  
    THEN
@@ -208,9 +186,3 @@ begin
 end;
 /
 show err;
-
-
-
-PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_GET_S080_S180.sql =========*** E
-PROMPT ===================================================================================== 

@@ -1,13 +1,7 @@
-
- 
- PROMPT ===================================================================================== 
- PROMPT *** Run *** ========== Scripts /Sql/BARS/function/f_get_s031.sql =========*** Run ***
- PROMPT ===================================================================================== 
- 
-  CREATE OR REPLACE FUNCTION BARS.F_GET_S031 (acc_ in number, dat_ in date, s031_ in varchar2,
+CREATE OR REPLACE FUNCTION BARS.f_get_s031(acc_ in number, dat_ in date, s031_ in varchar2,
             nd_ number default null) return varchar2
     ----------------------------------------------------------------------------
-    -- version 05/11/2014 (22/08/2014, 06/06/2014)
+    -- version 17/12/2018 (12/12/2018)
     ----------------------------------------------------------------------------
     -- 05/11/2014 добавлены блоки
     --           ELSIF s1_25+s1_26+s1_31+s1_37+s1_50+s1_56 >=
@@ -25,21 +19,6 @@
     -- 10/02/2014 добавлен блок который был выполнен Вирко для банка Демарк
     --            30/05/2013 для Демарка формируем вид обеспечения по мах.сумме
     --                       ипотеки (анализ переменной s_mx)
-    -- 06/09/2013 кол-во видов обеспечения для оверов определяем из ACC_OVER
-    --            по полям ACCO, ACC_9129
-    -- 20/08/2013 s031='50' добавляется до S031='37',
-    -- 26/07/2013 кол-во видов обеспечения для оверов определяем из ACC_OVER
-    -- 05/04/2013 вместо табл.TMP_REZ_OBESP23 используем TMP_REZ_ZALOG23
-    -- 04/04/2013 из расчета видов обеспечения 40-45 исключаем S031='29'
-    -- 12/03/2013 s031='37' добавляется до S031='31',
-    --            а S031='56' добавляется до S031='29'
-    -- 09.02.2013 вместо табл.TMP_REZ_RISK2 используем TMP_REZ_OBESP23
-    -- 09.11.2012 из CC_DEAL выбираем только кредиты или гарантии
-    --           добавил условие " vidd in (1,2,3,11,12,13,9,19,29,39) "
-    --           (в УПБ были строки в CC_DEAL не для кредитов и не для гарантий)
-    -- 07.02.2011 т.к. бал.сч.9031 включается при рассчете суммы обеспечения
-    -- будем его включать при обработке
-    -- nd_ - РЕФ КД, якщо є (якщо не заповнений, то визначемо у функції)
     ----------------------------------------------------------------------------
 is
     p080f_  varchar2(2);
@@ -117,8 +96,6 @@ begin
        pnd_ := null;
     end if;
 
-    p080_ := s031_;
-
     if pnd_ is not null then -- кредитный договор найден
         -- виды залогов
         OPEN kredit;
@@ -136,8 +113,6 @@ begin
               s1_25 :=  s1_25 + ostz_;
            elsif p080f_ = '26' then
               s1_26 :=  s1_26 + ostz_;
-           --elsif p080f_ = '29' then   -- з 01.03.2013 нова назва
-           --   s1_29 :=  s1_29 + ostz_;
            elsif p080f_ = '31' then
               s1_31 :=  s1_31 + ostz_;
            elsif p080f_ = '37' then
@@ -154,7 +129,12 @@ begin
         END LOOP;
 
         CLOSE kredit;
-
+        
+        -- немає запису в PAWN_ACC, тоді і немає забезпечення (Семенова В. 17/12/2018)
+        if kol_dz = 0 then
+           return '90';
+        end if;
+        
         if s1_25+s1_26+s1_31+s1_37+s1_50+s1_56+s1_v =  0
         then
            OPEN nokredit;
@@ -172,8 +152,6 @@ begin
                  s1_25 :=  s1_25 + ostz_;
               elsif p080f_ = '26' then
                  s1_26 :=  s1_26 + ostz_;
-              --elsif p080f_ = '29' then   -- з 01.03.2013 нова назва
-              --   s1_29 :=  s1_29 + ostz_;
               elsif p080f_ = '31' then
                  s1_31 :=  s1_31 + ostz_;
               elsif p080f_ = '37' then
@@ -192,6 +170,8 @@ begin
            CLOSE nokredit;
         end if;
     else -- кредитный договор не найден
+        p080_ := s031_;
+        
         -- виды залогов
         OPEN nokredit;
 
@@ -208,8 +188,6 @@ begin
               s1_25 :=  s1_25 + ostz_;
            elsif p080f_ = '26' then
               s1_26 :=  s1_26 + ostz_;
-           --elsif p080f_ = '29' then   -- з 01.03.2013 нова назва
-           --   s1_29 :=  s1_29 + ostz_;
            elsif p080f_ = '31' then
               s1_31 :=  s1_31 + ostz_;
            elsif p080f_ = '37' then
@@ -226,6 +204,11 @@ begin
         END LOOP;
 
         CLOSE nokredit;
+    end if;
+    
+    -- немає запису в PAWN_ACC, тоді і немає забезпечення (Семенова В. 17/12/2018)
+    if kol_dz = 0 then
+       return '90';
     end if;
 
     if dat_ >= to_date('31012013', 'ddmmyyyy') then
@@ -354,7 +337,7 @@ begin
                         nvl(sum(case when p.s031 = '50' then t.SALL else 0 end), 0),
                         nvl(sum(case when p.s031 = '56' then t.SALL else 0 end), 0)
                    into s_V, s_25 , s_26, s_31, s_37, s_50, s_56
-                 from tmp_rez_zalog23 t, cc_pawn p  --tmp_rez_obesp23 t, cc_pawn p
+                 from tmp_rez_zalog23 t, cc_pawn p  
                  where t.accs = acc_
                    and t.dat = dat23_
                    and t.pawn = p.pawn;
@@ -429,17 +412,6 @@ begin
 	   p080_:=p080_23;
 	end if;
 
-    return p080_;
+    return nvl(p080_, '90');
 end;
 /
- show err;
- 
-PROMPT *** Create  grants  F_GET_S031 ***
-grant EXECUTE                                                                on F_GET_S031      to BARS_ACCESS_DEFROLE;
-
- 
- 
- PROMPT ===================================================================================== 
- PROMPT *** End *** ========== Scripts /Sql/BARS/function/f_get_s031.sql =========*** End ***
- PROMPT ===================================================================================== 
- 

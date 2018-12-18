@@ -10,9 +10,9 @@ is
 % DESCRIPTION : Процедура формирования D5X для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.1.006  26/11/2018 (22/11/2018)
+% VERSION     :  v.1.007  11/12/2018 (26/11/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_                   char(30)  := 'v.1.006  26/11/2018';
+  ver_                   char(30)  := 'v.1.007  11/12/2018';
   c_title                constant varchar2(100 char) := $$PLSQL_UNIT || '. ';
   c_date_fmt             constant varchar2(10 char) := 'dd.mm.yyyy';
   c_old_file_code        constant varchar2(3 char) := '#D5';
@@ -37,19 +37,6 @@ BEGIN
 
   -- определение начальных параметров (код области или МФО или подразделение)
   nbur_files.P_PROC_SET(p_kod_filii, p_file_code, p_scheme, l_datez, 1, l_file_code, l_nbuc, l_type);
-
-  execute immediate 'truncate table NBUR_TMP_DESC_EKP';
-  execute immediate 'TRUNCATE TABLE otcn_fa7_temp';
-  execute immediate 'TRUNCATE TABLE nbur_tmp_f42';
-  
-  --Очистка партиции для хранения детального протокола
-  begin
-    execute immediate 'alter table NBUR_LOG_FD5X truncate subpartition for ( to_date('''
-                      || to_char(p_report_date,'YYYYMMDD')||''',''YYYYMMDD''), ''' || p_kod_filii || ''' )';
-  exception
-    when e_ptsn_not_exsts then
-      null;
-  end;
 
   --Определяем версию файла для хранения детальеного протокола
   l_version_id := coalesce(
