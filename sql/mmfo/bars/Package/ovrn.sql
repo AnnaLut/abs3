@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.4 10.07.2018';
+CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.1 19.12.2018';
 -- 06.04.2018  Нач %% через JOB
  g_TIP  tips.tip%type     := 'OVN';
  g_VIDD cc_vidd.vidd%type := 10   ;  -- <<Солsдарний>> Оверд
@@ -15,10 +15,10 @@ CREATE OR REPLACE PACKAGE OVRN IS  G_HEADER_VERSION  CONSTANT VARCHAR2(64)  :='v
 
 
 /*
- g_TAR144 Tarif.KOD%type := 144 ;  --Ком?с?я за Овердр.Одного Дня (% в?д макс.деб.зал.)
- g_TAR143 Tarif.KOD%type := 143 ;  --Ком?с?я за п?дключення послуги NPP
- g_TAR142 Tarif.KOD%type := 142 ;  --Ком?с?я за п?дключення Овердрафту Холд?нгу
- g_TAR141 Tarif.KOD%type := 141 ;  --Ком?с?я за надання Овердрафту (% в?д л?м?ту)
+ g_TAR144 Tarif.KOD%type := 144 ;  --Комісія за Овердр.Одного Дня (% від макс.деб.зал.)
+ g_TAR143 Tarif.KOD%type := 143 ;  --Комісія за підключення послуги NPP
+ g_TAR142 Tarif.KOD%type := 142 ;  --Комісія за підключення Овердрафту Холдінгу
+ g_TAR141 Tarif.KOD%type := 141 ;  --Комісія за надання Овердрафту (% від ліміту)
 */
 
 /*
@@ -109,7 +109,7 @@ procedure repl_acc (p_nd number, p_old_acc number, p_new_kv int, p_new_nls varch
 END ;
 /
 CREATE OR REPLACE PACKAGE BODY OVRN IS
- G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.4 10.07.2018';
+ G_BODY_VERSION  CONSTANT VARCHAR2(64)  :='ver.6.1 19.12.2018';
 /*
 10.07.2018 LitvinSO COBUMMFO-8388 - Проверка параметра Страхування кредиту при авторизации
 06.04.2018  Нач %% через JOB
@@ -2201,7 +2201,7 @@ begin
                    from accounts
                    where accc= a8.acc
                      and (p_acc2 = 0 or p_acc2 = acc)
-                     and (a8.BUSSL=2 and OVRN.FOST_SAL ( acc, d.cdat)<0))  --COBUMMFO-9630 не насчитываем проценты по пассиву по ММСБ
+                     and (((a8.BUSSL=2 and OVRN.FOST_SAL ( acc, d.cdat)<0)) or (a8.BUSSL<>2)))  --COBUMMFO-9630 не насчитываем проценты по пассиву по ММСБ
         loop
            tmpD(d8).id         := S_OVR_INTX_COUNT.NEXTVAL;
            tmpD(d8).Ost2 := x.ost;
