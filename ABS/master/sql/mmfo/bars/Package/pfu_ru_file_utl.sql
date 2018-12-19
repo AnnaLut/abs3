@@ -1515,17 +1515,23 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
         select t.nls into l_nls
           from pfu_epp_line_processing t
          where t.id = p_id;
-
-        select t.blkd into l_blkd
-          from accounts t
-         where t.nls = l_nls;
+         
+        begin  
+          select t.blkd into l_blkd
+            from accounts t
+           where t.nls = l_nls;
+         exception when no_data_found then
+           select t.blkd into l_blkd
+            from accounts t
+           where t.nlsalt = l_nls and t.tip like 'W4%';
+        end;
 
        l_date :=sysdate;
 
         if (l_blkd = 0) then
            update accounts a
               set a.blkd = G_BLK
-            where a.nls = l_nls;
+            where a.nls = l_nls or (a.nlsalt = l_nls and a.tip like 'W4%');
            update pfu_epp_line_processing p
               set p.is_blk = 1,
                   p.date_blk = l_date,
@@ -1585,16 +1591,23 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
                                                   dbms_xmldom.makenode(l_supp_text));
     elsif (p_id is null and p_nls is not null) then
 
-        select t.blkd, t.acc into l_blkd, l_acc
-          from accounts t
-         where t.nls = p_nls;
+        begin 
+          select t.blkd, t.acc into l_blkd, l_acc
+            from accounts t
+           where t.nls = p_nls;
+         exception when no_data_found then
+           select t.blkd, t.acc into l_blkd, l_acc
+            from accounts t
+           where t.nlsalt = l_nls and t.tip like 'W4%';
+        end;
 
        l_date :=sysdate;
 
         if (l_blkd = 0) then
            update accounts a
               set a.blkd = G_BLK
-            where a.nls = p_nls;
+            where a.nls = p_nls
+               or (a.nlsalt = l_nls and a.tip like 'W4%');
             p_comment := 'Ѕлокировка на счет установлена';
         else
            insert into acc_to_block_vso
@@ -1690,17 +1703,24 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
         select t.nls into l_nls
           from pfu_epp_line_processing t
          where t.id = p_id;
+        
+        begin 
+          select t.blkd into l_blkd
+            from accounts t
+           where t.nls = l_nls;
+         exception when no_data_found then
+           select t.blkd into l_blkd
+            from accounts t
+           where t.nlsalt = l_nls and t.tip like 'W4%';
+        end;
 
-        select t.blkd into l_blkd
-          from accounts t
-         where t.nls = l_nls;
-
-       l_date :=sysdate;
+        l_date :=sysdate;
 
         if (l_blkd = G_BLK) then
            update accounts a
               set a.blkd = 0
-            where a.nls = l_nls;
+            where a.nls = l_nls
+               or (a.nlsalt = l_nls and a.tip like 'W4%');
         end if;
            update pfu_epp_line_processing p
               set p.is_blk = 1,
@@ -1754,16 +1774,23 @@ dbms_xmldom.writetoclob(l_domdoc, l_clob);
                                                   dbms_xmldom.makenode(l_supp_text));
     elsif (p_id is null and p_nls is not null) then
 
-        select t.blkd, t.acc into l_blkd, l_acc
-          from accounts t
-         where t.nls = p_nls;
+        begin 
+          select t.blkd, t.acc into l_blkd, l_acc
+            from accounts t
+           where t.nls = p_nls;
+         exception when no_data_found then
+           select t.blkd, t.acc into l_blkd, l_acc
+            from accounts t
+           where t.nlsalt = l_nls and t.tip like 'W4%';
+        end;
 
        l_date :=sysdate;
 
         if (l_blkd = G_BLK) then
            update accounts a
               set a.blkd = 0
-            where a.nls = p_nls;
+            where a.nls = p_nls
+               or (a.nlsalt = l_nls and a.tip like 'W4%');
             p_comment := '—чет разблокирован';
         else
            delete
