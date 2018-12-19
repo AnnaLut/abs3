@@ -38,6 +38,7 @@ begin
        and ora_dict_obj_name not like '%\_BAK'     escape '\' -- все таблицы с суффиксом _BAK
        and ora_dict_obj_name not like 'EXT\_%'     escape '\' -- external tables
        and ora_dict_obj_name not like 'MLOG$\_%'   escape '\' -- materialized log for MV
+       and ora_dict_obj_name not like 'RUPD$\_%'   escape '\' -- materialized log for MV refresh
        and ora_dict_obj_name not like '%\_QT'      escape '\' -- queue table
        and ora_dict_obj_name not like 'ERR$\_%'    escape '\' -- error logging tables
        and ora_dict_obj_name not like 'DIFF\_%'    escape '\' -- difference tables
@@ -48,12 +49,14 @@ begin
        	  select 1 into l_dummy from policy_table
           where owner = ora_dict_obj_owner and table_name = ora_dict_obj_name and rownum=1;
        exception when no_data_found then
-          raise_application_error(-20999, 'До создания таблицы ее необходимо описать в таблице POLICY_TABLE');
+          raise_application_error(-20999, 'До создания таблицы '||ora_dict_obj_name||' ее необходимо описать в таблице POLICY_TABLE');
        end;
 
    end if;
 
 end;
+
+
 
 
 /
