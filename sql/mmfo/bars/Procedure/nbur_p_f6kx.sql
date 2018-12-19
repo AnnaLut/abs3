@@ -372,7 +372,7 @@ BEGIN
                        , t.cust_type /*cust_type*/
                        , t.cust_rating /*cust_rating*/
                        , case
-                          when t.S080 not in ('J', 'Q', 'L')
+                          when (t.S080 is null or t.S080 not in ('J', 'Q', 'L'))
                                and (coalesce(t.kol, 0) = 0)
                                and (t.kol26 is null or t.kol26 = '000000000')
                                and (t.restruct_date is null or t.restruct_date < (p_report_date - 180))
