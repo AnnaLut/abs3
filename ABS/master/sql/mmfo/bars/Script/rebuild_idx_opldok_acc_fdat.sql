@@ -12,7 +12,7 @@ end;
 PROMPT *** Rebuild  index IDX_OPLDOK_ACC_FDAT ***  
 DECLARE
   l_chunk_sql  VARCHAR2(1000);
-  l_sql_stmt   VARCHAR2(1000);
+  l_sql_stmt   VARCHAR2(4000);
   l_status     NUMBER;
   l_paralel    int := 16;
   l_task_name  varchar2(30) := 'rebuild_index';
@@ -29,7 +29,11 @@ BEGIN
   l_chunk_sql := 'select level-1 start_id, level-1 en_id from dual connect by level <= '||to_char(l_paralel);
   DBMS_PARALLEL_EXECUTE.create_chunks_by_SQL(l_task_name, l_chunk_sql, false);
  
-  l_sql_stmt := q'{begin
+  l_sql_stmt := q'{
+                 declare 
+				            res_busy exception;
+                    pragma exception_init(res_busy, -54);
+				         begin
                  for cur in
                    (
                       select subpartition_name, rn
@@ -44,8 +48,13 @@ BEGIN
                           )
                      where rn between :start_id and :end_id
                    )
-                 loop   
-                   execute immediate 'ALTER INDEX IDX_OPLDOK_ACC_FDAT REBUILD SUBPARTITION '|| cur.subpartition_name ||' ONLINE';
+                 loop
+                   begin				 
+                    execute immediate 'ALTER INDEX IDX_OPLDOK_ACC_FDAT REBUILD SUBPARTITION '|| cur.subpartition_name;
+				            exception 
+                      when res_busy then 
+					            execute immediate 'ALTER INDEX IDX_OPLDOK_ACC_FDAT REBUILD SUBPARTITION '|| cur.subpartition_name ||' ONLINE';
+				          end;					
                  end loop;
                 end;}';
   DBMS_PARALLEL_EXECUTE.RUN_TASK(l_task_name, l_sql_stmt, DBMS_SQL.NATIVE, parallel_level => l_paralel);
