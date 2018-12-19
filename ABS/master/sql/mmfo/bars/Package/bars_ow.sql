@@ -1717,6 +1717,7 @@ begin
                                          and alt.kv = a.kv
                                          and alt.tip like 'W4%' 
                                          and regexp_like(alt.nls, '^26[0,2,5]0')
+                                         and a.dazs is not null
          where q.ref = p_ref
            and q.dk  = p_dk
            and q.sos = 1
@@ -16051,8 +16052,8 @@ procedure open_2203 (
    p_newnbs  in varchar2,
    p_newacc out number)
 is
- l_bdate         date;
- l_mfo           varchar2(6);
+   l_bdate   date;
+   l_mfo     varchar2(6);
    l_acc     number := null;
    l_ost     number;
    l_newnls  accounts.nls%type;
@@ -16067,6 +16068,9 @@ is
    l_nazn    varchar2(160) := 'Перенесення залишків коштів, в зв''язку зі зміною банківського продукту';
    l_trmask t_trmask;
 begin
+   l_bdate := gl.bdate;
+   l_mfo   := gl.amfo;
+
    select * into l_trmask from ow_transnlsmask t where t.nbs = p_newnbs and t.tip = 'KSS' and rownum = 1;
    -- открываем счет
    open_acc(p_pk_acc, l_trmask, l_acc);

@@ -25,7 +25,7 @@ BEGIN
         join accounts a on a.acc = c.acc
        WHERE (
                 (
-                  a.nls = nls_ 
+                  a.nls = nls_
                   and ( -- COBUMMFO-10304
                         (regexp_like(a.nls, '^26[0,5]5') and dazs is null)
                         or not regexp_like(a.nls, '^26[0,5]5')
@@ -36,6 +36,13 @@ BEGIN
                       and a.nlsalt = nls_
                       and a.tip like 'W4%'
                       and a.dat_alt is not null
+                      and (
+                             ( 
+                                regexp_like(nls_, '^26[0,5]5')
+                                and exists(select 1 from accounts where nls = nls_ and dazs is not null)
+                             )
+                             or not regexp_like(nls_, '^26[0,5]5')
+                          )
                    )
              )
              AND a.kv=gl.BaseVal;
