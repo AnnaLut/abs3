@@ -35,13 +35,17 @@ BEGIN
                       select subpartition_name, rn
                       from(
                             select u.subpartition_name,  u.num_rows, mod(row_number() over (order by u.num_rows desc, u.subpartition_name ),}'||to_char(l_paralel)||q'{) rn      
-                            from user_tab_subpartitions u
-                            where u.table_name = 'OPLDOK'             
+                            from user_tab_subpartitions u,
+                                 user_ind_subpartitions i
+                            where u.table_name = 'OPLDOK'
+                              and i.index_name = 'IDX_OPLDOK_ACC_FDAT'
+                              and i.subpartition_name = u.subpartition_name
+                              and i.status = 'UNUSABLE'
                           )
                      where rn between :start_id and :end_id
                    )
                  loop   
-                   execute immediate 'ALTER TABLE OPLDOK MODIFY SUBPARTITION '||cur.subpartition_name||' REBUILD UNUSABLE LOCAL INDEXES';
+                   execute immediate 'ALTER INDEX IDX_OPLDOK_ACC_FDAT REBUILD SUBPARTITION '|| cur.subpartition_name ||' ONLINE';
                  end loop;
                 end;}';
   DBMS_PARALLEL_EXECUTE.RUN_TASK(l_task_name, l_sql_stmt, DBMS_SQL.NATIVE, parallel_level => l_paralel);
