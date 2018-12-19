@@ -77,7 +77,7 @@ CREATE OR REPLACE PACKAGE BODY BARS.TIC is
 -- (C) BARS. Documents Print
 --***************************************************************--
 
-G_BODY_VERSION  CONSTANT varchar2(64)  := 'version 1.37 01/04/2018';
+G_BODY_VERSION  CONSTANT varchar2(64)  := 'version 1.38 19/12/2018';
 G_AWK_BODY_DEFS CONSTANT varchar2(512) := ''
   || 'BRANCH - для мультимфо' || chr(13) || chr(10)
 ;
@@ -2521,7 +2521,7 @@ begin
         end;
      end if;
      lszVars := lszVars || sTPar || '~' ;
-     lszVals := lszVals || sTmp || '~' ;
+     lszVals := lszVals || replace(sTmp,'~','`') || '~' ; -- Fix когда приходит в значении ~
   end loop;
 
   if l_kv <> gl.baseval or l_kv2 <> gl.baseval then
