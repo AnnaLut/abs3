@@ -129,7 +129,7 @@ namespace Bars.WebServices
         private IEnumerable<string> GetFile(String path)
         {
             List<string> files = new List<string>();
-            string[] dirs = (Directory.GetFiles(path, "*.*", SearchOption.AllDirectories)).Where(s => s.EndsWith(".VAL") || s.EndsWith(".BMT") || s.EndsWith(".V01") || s.EndsWith(".V02")).ToArray();
+            string[] dirs = (Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly)).Where(s => s.EndsWith(".VAL") || s.EndsWith(".BMT") || s.EndsWith(".V01") || s.EndsWith(".V02")).ToArray();
             foreach (string dir in dirs)
             {
                 files.Add(dir.Replace(path, "").Replace("\\", ""));
