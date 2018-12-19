@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
 % DESCRIPTION :    #D5 for KB
 % COPYRIGHT   :    Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :    v.17.017 12/12/2018 (23/11/2018)
+% VERSION     :    v.18.018   18/12/2018 (12/12/2018)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: Dat_ - отчетная дата
            sheme_ - схема формирования
@@ -33,6 +33,7 @@ CREATE OR REPLACE PROCEDURE BARS.P_FD5_NN (Dat_   DATE,
  27     I          S190 код строку прострочення погашення боргу
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 18.12.2018   підготовка D5X: зміна скрипта для l_ekp, abs(znap)
  11/12/2018 - показник середній залишок по рахунку для рахунків дисконту
               буде формуватися якщо є визнані процентні доходи
  07/12/2018 - для рахунків дисконту параметр S032 формуємо із основного
@@ -1034,7 +1035,7 @@ BEGIN
          l_f074 := (case when l_link_group is not null then '001'
                          when l_kol24 = '101' then '100'
                          when l_kol24 = '010' then '000'
-                         else nvl(l_kol24, '000')
+                         else nvl(lpad(l_kol24,3,'0'), '000')
                      end);
       exception 
         when no_data_found then 
@@ -1086,6 +1087,7 @@ BEGIN
          when no_data_found then
               l_f048 := '0';
       end;   
+      if l_f048 ='0' and nbs_ in ('2203','2233')  then  l_f048 :='3';  end if;
       
       begin
          select max(nvl(trim(ekp), c_XXXXXX))
@@ -1097,9 +1099,9 @@ BEGIN
                          and r020 = nbs_ 
                       group by r020
                    ) kl 
-         on (p.I010 = kl.I010 and
-             p.t020 = dk_ and
-             p.r020 = nbs_);                     
+         on (p.I010 = kl.I010)
+         where   p.t020 = dk_ and
+                 p.r020 = nbs_;                     
       exception
          when no_data_found then
            l_ekp := c_XXXXXX;
@@ -1158,7 +1160,7 @@ BEGIN
                                         acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
              values (dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_1, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
-                      '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, to_number(l_se_1),
+                      '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_1)),
                       comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
           end if;
           
@@ -1169,7 +1171,7 @@ BEGIN
                                         acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
              values (dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013_2, 
                        coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
-                      '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, to_number(l_se_2),
+                      '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(l_se_2)),
                       comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
           end if;
 
@@ -1184,7 +1186,7 @@ BEGIN
                                     acc_id, acc_num, kv, maturity_date, cust_id, ref, nd, branch)
           values (dat_, l_kod_filii, l_kod_filii, l_version_id, l_ekp, l_ku, dk_, nbs_, r011_, l_r013, 
                    coalesce(LPAD(kv_,3,'0'), '#'), coalesce(LPAD(country_, 3, '0'), '#') , coalesce(k072_, '#'), k111_,
-                  '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, to_number(znap_),
+                  '9', l_f074,  s032_, s080_, s183_, s190_, l_s241, nvl(trim(s260_),'00'), l_f048, abs(to_number(znap_)),
                   comm_, acc_, nls_, kv_, l_mdate, rnk_, null, nd_, '');  
        end if;
    end if;
