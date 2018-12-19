@@ -13,7 +13,7 @@ PROMPT *** Create  procedure P_F2K_NN ***
 % DESCRIPTION : Процедура формирование файла #2K
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.All Rights Reserved.
 %
-% VERSION     : v.18.010     03.12.2018
+% VERSION     : v.18.011     19.12.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 параметры: dat_ - отчетная дата
            sheme_ - схема формирования
@@ -270,7 +270,7 @@ BEGIN
 
 EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS = ''.,'' ';
 -------------------------------------------------------------------
-logger.info ('P_F2K_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||'   v.18.009');
+logger.info ('P_F2K_NN: Begin for datf = '||to_char(dat_, 'dd/mm/yyyy')||'   v.18.011');
 -------------------------------------------------------------------
 userid_ := user_id;
 DELETE FROM RNBU_TRACE WHERE userid = userid_;
@@ -391,8 +391,8 @@ select
                          to_char( (case when round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_rpt_nbu) ) <0 then 0
                                         else round( gl.p_icurval (a.kv, fost(a.acc,dat_rnbo_-1), dat_rpt_nbu) )
                                     end) )  p_270,
-                         to_char( (case when round(fostq(a.acc,dat_)) <0 then 0
-                                        else round(fostq(a.acc,dat_))
+                         to_char( (case when round( gl.p_icurval (a.kv, fost(a.acc,dat_), dat_rpt_nbu) ) <0 then 0
+                                        else round( gl.p_icurval (a.kv, fost(a.acc,dat_), dat_rpt_nbu) )
                                     end) )  p_280,
                          nvl(a.blkd,0)+nvl(a.blkk,0) acc_blk
                     from accounts a
