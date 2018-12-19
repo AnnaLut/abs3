@@ -17,9 +17,9 @@ is
 % DESCRIPTION : Процедура формирования 2KX для Ощадного банку
 % COPYRIGHT   : Copyright UNITY-BARS Limited, 1999.  All Rights Reserved.
 %
-% VERSION     :  v.18.012    03.12.2018
+% VERSION     :  v.18.013    19.12.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-  ver_            char(30)  := ' v.18.012  03.12.2018';
+  ver_            char(30)  := '  v.18.013 19.12.2018';
 
   c_prefix        constant varchar2(100 char) := 'NBUR_P_F2KX';
   с_date_fmt      constant varchar2(10 char) := 'dd.mm.yyyy';
@@ -89,7 +89,9 @@ BEGIN
                                  , tr.ref                                
                                  --Параметры клиента          
                                  , cust.cust_name as Q001_1
-                                 , cust.cust_adr as Q002
+                                 , coalesce(f_get_adr(cust.cust_id,2),
+                                             f_get_adr(cust.cust_id,1),
+                                               cust.cust_adr )    as Q002
                                  , cust.rnbor as Q003_2
                                  , cust.rnb1r as Q003_2a
                                  , coalesce(cust.rnbou, 'немае даних') as Q003_3
@@ -114,7 +116,9 @@ BEGIN
                                  , nvl(to_char(round(
                                            gl.p_icurval (acc.kv, fost(acc.acc, to_date(cust.rnbod, с_date_fmt)), l_nbu_rpt_dt) 
                                                        )), '0')     as T070_1
-                                 , nvl(to_char(round(fostq(acc.acc, p_report_date))), '0') as T070_2
+                                 , nvl(to_char(round(
+                                           gl.p_icurval (acc.kv, fost(acc.acc, p_report_date), l_nbu_rpt_dt) 
+                                                       )), '0')     as T070_2
                                  --Параметры операции       
                                  , (
                                      case 
