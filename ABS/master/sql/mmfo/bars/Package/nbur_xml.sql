@@ -764,6 +764,24 @@ $end
                                 when l_day between 11 and 20 then '21'||to_char(p_rpt_dt, 'mmyyyy')
                                 else to_char(last_day( p_rpt_dt ) + 1, 'ddmmyyyy')
                            end), 'ddmmyyyy');
+    elsif  (l_period_type = 'Y') then
+      l_rpt_dt := add_months(trunc(p_rpt_dt,'yyyy'),12);
+    elsif  (l_period_type = 'P') then
+      l_rpt_dt := (case
+                      when extract(month from p_rpt_dt) between 1 and 6
+                              then add_months(trunc(p_rpt_dt,'yyyy'),6)
+                      else         add_months(trunc(p_rpt_dt,'yyyy'),12)
+                    end) ;
+    elsif  (l_period_type = 'Q') then
+      l_rpt_dt := (case
+                      when extract(month from p_rpt_dt) in (1,2,3)
+                              then add_months(trunc(p_rpt_dt,'yyyy'),3)
+                      when extract(month from p_rpt_dt) in (4,5,6)
+                              then add_months(trunc(p_rpt_dt,'yyyy'),6)
+                      when extract(month from p_rpt_dt) in (7,8,9)
+                              then add_months(trunc(p_rpt_dt,'yyyy'),9)
+                      else         add_months(trunc(p_rpt_dt,'yyyy'),12)
+                    end) ;
     else      
       l_rpt_dt := DAT_NEXT_U( p_rpt_dt, 1 );
     end if;
