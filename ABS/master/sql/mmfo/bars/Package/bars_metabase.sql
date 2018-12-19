@@ -2152,22 +2152,30 @@ end;
 
 procedure check_dyn_filter(p_tabid        in number,
                            p_where_clause varchar2) is
-  l_where_clause dyn_filter.where_clause%type;
-  l_tabname      meta_tables.tabname%type;
-  l_cur          integer;
-  l_statement    varchar2(4000);
+  l_where_clause  dyn_filter.where_clause%type;
+  l_tabname       meta_tables.tabname%type;
+  l_sql_statement clob;
+  l_cur           integer;
+  l_statement     clob;
 
 begin
-  select t.tabname
-    into l_tabname
+  select t.tabname, t.select_statement
+    into l_tabname, l_sql_statement
     from meta_tables t
    where t.tabid = p_tabid;
-
+  
   l_cur := dbms_sql.open_cursor();
-  l_where_clause := replace(p_where_clause, '$~~ALIAS~~$', l_tabname);
-  l_statement := 'select 1 from ' || l_tabname || ' where ' ||
-                 l_where_clause;
-   bars_audit.info('create_dyn_filter: '||l_statement);
+  
+  if trim(l_sql_statement) is null then
+    l_where_clause := replace(p_where_clause, '$~~ALIAS~~$', l_tabname);
+    l_statement := 'select 1 from ' || l_tabname || ' where ' ||
+                   l_where_clause;
+  else
+    l_where_clause := replace(p_where_clause, '$~~ALIAS~~$', 'tmp');
+    l_statement := 'select 1 from (' || l_sql_statement || ') tmp where ' ||
+                   l_where_clause;    
+  end if;               
+  bars_audit.info('create_dyn_filter: '||l_statement);
   dbms_sql.parse(l_cur, l_statement, dbms_sql.native);
   dbms_sql.close_cursor(l_cur);
 exception
