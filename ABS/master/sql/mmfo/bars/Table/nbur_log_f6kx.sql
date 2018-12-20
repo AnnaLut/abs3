@@ -6,6 +6,7 @@ PROMPT *** ALTER_POLICY_INFO to NBUR_LOG_F6KX ***
 
 BEGIN 
   bpa.alter_policy_info('NBUR_LOG_F6KX', 'WHOLE' , null, null, null, null);    
+  bpa.alter_policy_info('NBUR_LOG_F6KX', 'FILIAL',  'M', NULL,  'E',  'E');    
 END; 
 /
 
