@@ -1,11 +1,8 @@
 
 
 PROMPT ===================================================================================== 
-PROMPT *** Run *** ========== Scripts /Sql/BARS/Procedure/P_BAL_SNP.sql =========*** Run ***
+ PROMPT *** Run *** ========== Scripts /Sql/BARS/procedure/p_bal_snp.sql =========*** Run ***
 PROMPT ===================================================================================== 
-
-
-PROMPT *** Create  procedure P_BAL_SNP ***
 
   CREATE OR REPLACE PROCEDURE BARS.P_BAL_SNP 
 ( p_id    number    -- режим (разрез)
@@ -231,7 +228,7 @@ begin
       select nbs, sum(dos), sum(kos), sum(ostd), sum(ostk)
       from (
           select case
-                   when a.dat_alt < :l_DAT1 then substr(a.nlsalt, 1, 4)
+                   when :l_DAT1 <= a.dat_alt then substr(a.nlsalt, 1, 4)
                    else a.nbs
                  end nbs,
                sum(b.dosq) DOS, sum(b.kosq) KOS ,
@@ -246,7 +243,7 @@ begin
            and nvl(a.dat_alt, :l_DAT1 - 1) <> :l_DAT1
            and a.BRANCH like sys_context(''bars_context'',''user_branch_mask'')
          group by case
-                    when a.dat_alt < :l_DAT1 then substr(a.nlsalt, 1, 4)
+                    when :l_DAT1 <= a.dat_alt then substr(a.nlsalt, 1, 4)
                     else a.nbs
                   end
             union all
@@ -379,6 +376,7 @@ begin
   end loop;
 
 end P_BAL_SNP;
+
 /
 show err;
 
@@ -389,5 +387,6 @@ grant EXECUTE                                                                on 
 
 
 PROMPT ===================================================================================== 
-PROMPT *** End *** ========== Scripts /Sql/BARS/Procedure/P_BAL_SNP.sql =========*** End ***
+ PROMPT *** End *** ========== Scripts /Sql/BARS/procedure/p_bal_snp.sql =========*** End ***
 PROMPT ===================================================================================== 
+ 
