@@ -7215,7 +7215,7 @@ begin
        -- исключаем операции пополнения/списания, инициированные 3-ей системой, кроме гашения задолженности по кредиту
         and (not exists ( select 1 from ow_match_tt where code = a.doc_descr ) or
              (exists ( select 1 from ow_match_tt where code = a.doc_descr ) and
-             (regexp_like(debit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900)(|i)))_(2625|2620)+') or regexp_like(credit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900(|i)))_(2625|2620)+'))))
+             (regexp_like(debit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900)(|i)))_(2625|2620)+') or regexp_like(credit_anlaccount,'^NLS_(((220|357)[0-9](|i))|(6[0-9]{3})|((9129|9900)(|i)))_(2625|2620)+'))))
        -- 2625% or NLS_%_2625%
       and ( substr(debit_anlaccount,1,4) in (select unique nbs from w4_nbs_ob22)
          or substr(debit_anlaccount, instr(debit_anlaccount,'_',-1)+1,4) in (select unique nbs from w4_nbs_ob22)
