@@ -57,7 +57,14 @@ end;
 
 
 begin 
-   execute immediate('alter table BARS.META_CALL_SETTINGS add "custom_options" clob ');
+   execute immediate('ALTER TABLE BARS.META_CALL_SETTINGS DROP COLUMN "custom_options"');
+exception when others then 
+   null; 
+end;
+/
+
+begin 
+   execute immediate('alter table BARS.META_CALL_SETTINGS add "CUSTOM_OPTIONS" clob ');
 exception when others then 
    null; 
 end;
