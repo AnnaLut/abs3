@@ -108,3 +108,7 @@ exception when others then
    p_message:= substr(title || ': ' || dbms_utility.format_error_stack() || chr(10) || dbms_utility.format_error_backtrace(),1,4000);
 end;
 /
+
+grant EXECUTE                                                                on p_nbur_ovdp_6ex_ins to ABS_ADMIN;
+grant EXECUTE                                                                on p_nbur_ovdp_6ex_ins to BARS_ACCESS_DEFROLE;
+grant EXECUTE                                                                on p_nbur_ovdp_6ex_ins to WR_ALL_RIGHTS;
